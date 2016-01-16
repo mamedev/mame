@@ -118,7 +118,7 @@ ioport_constructor c64_final_chesscard_device::device_input_ports() const
 //  c64_final_chesscard_device - constructor
 //-------------------------------------------------
 
-c64_final_chesscard_device::c64_final_chesscard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c64_final_chesscard_device::c64_final_chesscard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_FCC, "Final ChessCard", tag, owner, clock, "c64_fcc", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),

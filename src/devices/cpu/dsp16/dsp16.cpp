@@ -34,7 +34,7 @@ const device_type DSP16 = &device_creator<dsp16_device>;
 //  dsp16_device - constructor
 //-------------------------------------------------
 
-dsp16_device::dsp16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dsp16_device::dsp16_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, DSP16, "DSP16", tag, owner, clock, "dsp16", __FILE__),
 		m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1),
 		m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1),

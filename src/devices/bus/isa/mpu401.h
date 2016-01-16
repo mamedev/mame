@@ -21,7 +21,7 @@ class isa8_mpu401_device :
 {
 public:
 		// construction/destruction
-		isa8_mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		isa8_mpu401_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 		required_device<mpu401_device> m_mpu401;
 

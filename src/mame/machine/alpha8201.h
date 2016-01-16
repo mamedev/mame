@@ -14,7 +14,7 @@
 class alpha_8201_device : public device_t
 {
 public:
-	alpha_8201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	alpha_8201_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~alpha_8201_device() {}
 
 	DECLARE_READ8_MEMBER(mcu_data_r);

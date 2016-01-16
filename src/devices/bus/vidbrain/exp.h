@@ -110,7 +110,7 @@ class videobrain_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	videobrain_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~videobrain_expansion_slot_device() { }
 
 	template<class _Object> static devcb_base &set_extres_wr_callback(device_t &device, _Object object) { return downcast<videobrain_expansion_slot_device &>(device).m_write_extres.set_callback(object); }

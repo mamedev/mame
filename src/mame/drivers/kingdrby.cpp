@@ -85,7 +85,7 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 class kingdrby_state : public driver_device
 {
 public:
-	kingdrby_state(const machine_config &mconfig, device_type type, const char *tag)
+	kingdrby_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_attr(*this, "attr"),

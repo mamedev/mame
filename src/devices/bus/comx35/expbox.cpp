@@ -129,7 +129,7 @@ machine_config_constructor comx_eb_device::device_mconfig_additions() const
 //  comx_eb_device - constructor
 //-------------------------------------------------
 
-comx_eb_device::comx_eb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+comx_eb_device::comx_eb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COMX_EB, "COMX-35E Expansion Box", tag, owner, clock, "comx_eb", __FILE__),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_rom(*this, "e000"),

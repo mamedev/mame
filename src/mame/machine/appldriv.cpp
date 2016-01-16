@@ -297,7 +297,7 @@ const device_type FLOPPY_APPLE = &device_creator<apple525_floppy_image_device>;
 //  apple525_floppy_image_device - constructor
 //-------------------------------------------------
 
-apple525_floppy_image_device::apple525_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+apple525_floppy_image_device::apple525_floppy_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: legacy_floppy_image_device(mconfig, FLOPPY_APPLE, "Apple Disk II", tag, owner, clock, "floppy_apple", __FILE__)
 {
 }

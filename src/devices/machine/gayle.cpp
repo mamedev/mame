@@ -33,7 +33,7 @@ const device_type GAYLE = &device_creator<gayle_device>;
 //  gayle_device - constructor
 //-------------------------------------------------
 
-gayle_device::gayle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+gayle_device::gayle_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, GAYLE, "GAYLE", tag, owner, clock, "gayle", __FILE__),
 	m_int2_w(*this),
 	m_cs0_read(*this),

@@ -29,7 +29,7 @@ ADDRESS_MAP_END
 
 // note: a lot of bits are left uninitialized by the games, the default values are uncertain
 
-st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: z80_device(mconfig, ST0016_CPU, "ST0016", tag, owner, clock, "st0016_cpu", __FILE__),
 		st0016_game(-1),
 		st0016_spr_bank(0),

@@ -42,7 +42,7 @@
 class tomcat_state : public driver_device
 {
 public:
-	tomcat_state(const machine_config &mconfig, device_type type, const char *tag)
+	tomcat_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_tms(*this, "tms"),
 		m_shared_ram(*this, "shared_ram"),

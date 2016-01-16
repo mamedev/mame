@@ -260,7 +260,7 @@ ioport_constructor amigakbd_device::device_input_ports() const
 //  amigakbd_device - constructor
 //-------------------------------------------------
 
-amigakbd_device::amigakbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+amigakbd_device::amigakbd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AMIGAKBD, "Amiga 500 Keyboard with 6570-036 MPU", tag, owner, clock, "amigakbd", __FILE__),
 	m_write_kclk(*this),
 	m_write_kdat(*this),

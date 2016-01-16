@@ -157,7 +157,7 @@ p2 ink doesn't always light up in test mode
 class marinedt_state : public driver_device
 {
 public:
-	marinedt_state(const machine_config &mconfig, device_type type, const char *tag)
+	marinedt_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_tx_tileram(*this, "tx_tileram"),
 		m_maincpu(*this, "maincpu"),

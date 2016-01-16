@@ -35,7 +35,7 @@ public:
 protected:
 	ns10_decrypter_device(
 		device_type type, const ns10_decrypter_device::ns10_crypto_logic &logic,
-		const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 private:
 	UINT16 _mask;
@@ -57,43 +57,43 @@ private:
 class chocovdr_decrypter_device : public ns10_decrypter_device
 {
 public:
-	chocovdr_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	chocovdr_decrypter_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class gamshara_decrypter_device : public ns10_decrypter_device
 {
 public:
-	gamshara_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gamshara_decrypter_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class gjspace_decrypter_device : public ns10_decrypter_device
 {
 public:
-	gjspace_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gjspace_decrypter_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class knpuzzle_decrypter_device : public ns10_decrypter_device
 {
 public:
-	knpuzzle_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	knpuzzle_decrypter_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class konotako_decrypter_device : public ns10_decrypter_device
 {
 public:
-	konotako_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	konotako_decrypter_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class nflclsfb_decrypter_device : public ns10_decrypter_device
 {
 public:
-	nflclsfb_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nflclsfb_decrypter_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class startrgn_decrypter_device : public ns10_decrypter_device
 {
 public:
-	startrgn_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	startrgn_decrypter_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

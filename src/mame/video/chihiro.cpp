@@ -2655,7 +2655,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			}
 		}
 		else {
-			machine().logerror("Unsupported primitive %d for method 0x1810\n", primitive_type);
+			machine().logerror("Unsupported primitive %d for method 0x1810\n", (int)primitive_type);
 		}
 		countlen--;
 	}
@@ -2800,7 +2800,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			}
 		}
 		else {
-			machine().logerror("Unsupported primitive %d for method 0x1800/8\n", primitive_type);
+			machine().logerror("Unsupported primitive %d for method 0x1800/8\n", (int)primitive_type);
 			countlen = 0;
 		}
 		while (countlen > 0) {
@@ -2978,7 +2978,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			}
 		}
 		else {
-			machine().logerror("Unsupported primitive %d for method 0x1818\n", primitive_type);
+			machine().logerror("Unsupported primitive %d for method 0x1818\n", (int)primitive_type);
 			countlen = 0;
 		}
 	}
@@ -3108,7 +3108,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			bytespixel_rendertarget = 1;
 			break;
 		default:
-			machine().logerror("Unknown render target color format %d\n\r", colorformat_rendertarget);
+			machine().logerror("Unknown render target color format %d\n\r", (int)colorformat_rendertarget);
 			bytespixel_rendertarget = 4;
 			break;
 		}

@@ -12,7 +12,7 @@
 
 const device_type MOS6551 = &device_creator<mos6551_device>;
 
-mos6551_device::mos6551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mos6551_device::mos6551_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MOS6551, "MOS6551", tag, owner, clock, "mos6551", __FILE__),
 	m_internal_clock(*this, "clock"),
 	m_irq_handler(*this),
@@ -551,7 +551,7 @@ WRITE_LINE_MEMBER(mos6551_device::receiver_clock)
 				{
 					if (!m_rxd && !m_dtr)
 					{
-						if (LOG) logerror("MOS6551 '%s': RX START BIT\n", tag());
+						if (LOG) logerror("MOS6551 '%s': RX START BIT\n", tag().c_str());
 					}
 					else
 					{
@@ -573,7 +573,7 @@ WRITE_LINE_MEMBER(mos6551_device::receiver_clock)
 					{
 						m_rx_counter = 0;
 
-						if (LOG) logerror("MOS6551 '%s': RX FALSE START BIT\n", tag());
+						if (LOG) logerror("MOS6551 '%s': RX FALSE START BIT\n", tag().c_str());
 					}
 				}
 				break;
@@ -585,11 +585,11 @@ WRITE_LINE_MEMBER(mos6551_device::receiver_clock)
 
 					if (m_rx_bits < m_wordlength)
 					{
-						if (LOG) logerror("MOS6551 '%s': RX DATA BIT %d %d\n", tag(), m_rx_bits, m_rxd);
+						if (LOG) logerror("MOS6551 '%s': RX DATA BIT %d %d\n", tag().c_str(), m_rx_bits, m_rxd);
 					}
 					else
 					{
-						if (LOG) logerror("MOS6551 '%s': RX PARITY BIT %x\n", tag(), m_rxd);
+						if (LOG) logerror("MOS6551 '%s': RX PARITY BIT %x\n", tag().c_str(), m_rxd);
 					}
 
 					if (m_rxd)
@@ -614,7 +614,7 @@ WRITE_LINE_MEMBER(mos6551_device::receiver_clock)
 				{
 					m_rx_counter = 0;
 
-					if (LOG) logerror("MOS6551 '%s': RX STOP BIT\n", tag());
+					if (LOG) logerror("MOS6551 '%s': RX STOP BIT\n", tag().c_str());
 
 					if (!(m_status & SR_RDRF))
 					{
@@ -714,11 +714,11 @@ WRITE_LINE_MEMBER(mos6551_device::transmitter_clock)
 					}
 					else if (!(m_status & SR_TDRE))
 					{
-						if (LOG) logerror("MOS6551 '%s': TX DATA %x\n", tag(), m_tdr);
+						if (LOG) logerror("MOS6551 '%s': TX DATA %x\n", tag().c_str(), m_tdr);
 
 						m_tx_output = OUTPUT_TXD;
 
-						if (LOG) logerror("MOS6551 '%s': TX START BIT\n", tag());
+						if (LOG) logerror("MOS6551 '%s': TX START BIT\n", tag().c_str());
 
 						m_status |= SR_TDRE;
 					}
@@ -726,7 +726,7 @@ WRITE_LINE_MEMBER(mos6551_device::transmitter_clock)
 					{
 						m_tx_output = OUTPUT_BREAK;
 
-						if (LOG) logerror("MOS6551 '%s': TX BREAK START\n", tag());
+						if (LOG) logerror("MOS6551 '%s': TX BREAK START\n", tag().c_str());
 					}
 					else
 					{
@@ -756,7 +756,7 @@ WRITE_LINE_MEMBER(mos6551_device::transmitter_clock)
 
 							if (m_tx_output == OUTPUT_TXD)
 							{
-								if (LOG) logerror("MOS6551 '%s': TX DATA BIT %d %d\n", tag(), m_tx_bits, m_txd);
+								if (LOG) logerror("MOS6551 '%s': TX DATA BIT %d %d\n", tag().c_str(), m_tx_bits, m_txd);
 							}
 						}
 						else if (m_tx_bits == m_wordlength && m_parity != PARITY_NONE)
@@ -782,7 +782,7 @@ WRITE_LINE_MEMBER(mos6551_device::transmitter_clock)
 
 							if (m_tx_output == OUTPUT_TXD)
 							{
-								if (LOG) logerror("MOS6551 '%s': TX PARITY BIT %d\n", tag(), m_txd);
+								if (LOG) logerror("MOS6551 '%s': TX PARITY BIT %d\n", tag().c_str(), m_txd);
 							}
 						}
 						else
@@ -793,7 +793,7 @@ WRITE_LINE_MEMBER(mos6551_device::transmitter_clock)
 
 							if (m_tx_output == OUTPUT_TXD)
 							{
-								if (LOG) logerror("MOS6551 '%s': TX STOP BIT\n", tag());
+								if (LOG) logerror("MOS6551 '%s': TX STOP BIT\n", tag().c_str());
 							}
 						}
 					}
@@ -806,7 +806,7 @@ WRITE_LINE_MEMBER(mos6551_device::transmitter_clock)
 						{
 							if (!m_brk)
 							{
-								if (LOG) logerror("MOS6551 '%s': TX BREAK END\n", tag());
+								if (LOG) logerror("MOS6551 '%s': TX BREAK END\n", tag().c_str());
 
 								m_tx_counter = 0;
 								m_tx_state = STATE_STOP;

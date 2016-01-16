@@ -29,7 +29,7 @@ extern const device_type GENEVE_MAPPER;
 class geneve_mouse_device : public device_t
 {
 public:
-	geneve_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	geneve_mouse_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	void poll();
 	line_state  left_button();  // left button is not connected to the V9938 but to a TMS9901 pin
 
@@ -57,7 +57,7 @@ private:
 class geneve_keyboard_device : public device_t
 {
 public:
-	geneve_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	geneve_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	DECLARE_WRITE_LINE_MEMBER( reset_line );
 	DECLARE_WRITE_LINE_MEMBER( send_scancodes );
 	DECLARE_WRITE_LINE_MEMBER( clock_control );
@@ -109,7 +109,7 @@ private:
 class geneve_mapper_device : public device_t
 {
 public:
-	geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	geneve_mapper_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	void set_geneve_mode(bool geneve);
 	void set_direct_mode(bool direct);
 	void set_cartridge_size(int size);

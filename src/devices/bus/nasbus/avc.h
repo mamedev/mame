@@ -26,7 +26,7 @@ class nascom_avc_device : public device_t, public device_nasbus_card_interface
 {
 public:
 	// construction/destruction
-	nascom_avc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nascom_avc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	DECLARE_WRITE8_MEMBER(control_w);

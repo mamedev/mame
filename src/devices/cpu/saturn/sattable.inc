@@ -40,25 +40,25 @@ static const int sub_right[]={B,C,A,C, I,I,I,I, A,B,C,D, B,C,A,C};
 void saturn_device::saturn_invalid3( int op1, int op2, int op3 )
 {
 	logerror( "SATURN '%s' invalid opcode %x%x%x at %05x\n",
-			tag(), op1, op2, op3, m_pc-3 );
+			tag().c_str(), op1, op2, op3, m_pc-3 );
 }
 
 void saturn_device::saturn_invalid4( int op1, int op2, int op3, int op4 )
 {
 	logerror( "SATURN '%s' invalid opcode %x%x%x%x at %05x\n",
-			tag(), op1, op2, op3, op4, m_pc-4 );
+			tag().c_str(), op1, op2, op3, op4, m_pc-4 );
 }
 
 void saturn_device::saturn_invalid5( int op1, int op2, int op3, int op4, int op5 )
 {
 	logerror( "SATURN '%s' invalid opcode %x%x%x%x%x at %05x\n",
-			tag(), op1, op2, op3, op4, op5, m_pc-5 );
+			tag().c_str(), op1, op2, op3, op4, op5, m_pc-5 );
 }
 
 void saturn_device::saturn_invalid6( int op1, int op2, int op3, int op4, int op5, int op6 )
 {
 	logerror( "SATURN '%s' invalid opcode %x%x%x%x%x%x at %05x\n",
-			tag(), op1, op2, op3, op4, op5, op6, m_pc-6 );
+			tag().c_str(), op1, op2, op3, op4, op5, op6, m_pc-6 );
 }
 
 

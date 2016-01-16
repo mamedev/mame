@@ -38,7 +38,7 @@ processor speed is 533MHz <- likely to be a Celeron or a Pentium III class CPU -
 class queen_state : public pcat_base_state
 {
 public:
-	queen_state(const machine_config &mconfig, device_type type, const char *tag)
+	queen_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pcat_base_state(mconfig, type, tag)
 	{
 	}

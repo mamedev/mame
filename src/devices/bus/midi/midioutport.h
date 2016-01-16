@@ -18,7 +18,7 @@ class midiout_port_device : public device_t,
 	public device_midi_port_interface
 {
 public:
-	midiout_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	midiout_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { if (started()) m_midiout->tx(state); }

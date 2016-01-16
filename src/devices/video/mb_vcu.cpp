@@ -37,7 +37,7 @@ const device_type MB_VCU = &device_creator<mb_vcu_device>;
 //  palette device
 //-------------------------------------------------
 
-void mb_vcu_device::static_set_palette_tag(device_t &device, const char *tag)
+void mb_vcu_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<mb_vcu_device &>(device).m_palette.set_tag(tag);
 }
@@ -150,7 +150,7 @@ inline void mb_vcu_device::write_io(offs_t address, UINT8 data)
 //  mb_vcu_device - constructor
 //-------------------------------------------------
 
-mb_vcu_device::mb_vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mb_vcu_device::mb_vcu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MB_VCU, "Mazer Blazer custom VCU", tag, owner, clock, "mb_vcu", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),

@@ -25,7 +25,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_ram) {};
 
-	virtual void rom_alloc(size_t size, int width, endianness_t end, const char *tag);
+	virtual void rom_alloc(size_t size, int width, endianness_t end, std::string tag);
 	virtual void ram_alloc(UINT32 size);
 
 	UINT8* get_rom_base()  { return m_rom; }
@@ -88,7 +88,7 @@ class generic_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	generic_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	generic_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~generic_slot_device();
 
 	static void static_set_device_load(device_t &device, device_image_load_delegate callback) { downcast<generic_slot_device &>(device).m_device_image_load = callback; }

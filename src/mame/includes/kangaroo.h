@@ -11,7 +11,7 @@
 class kangaroo_state : public driver_device
 {
 public:
-	kangaroo_state(const machine_config &mconfig, device_type type, const char *tag)
+	kangaroo_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_video_control(*this, "video_control"),
 		m_maincpu(*this, "maincpu"),

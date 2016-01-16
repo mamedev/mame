@@ -151,7 +151,7 @@ machine_config_constructor a2232_device::device_mconfig_additions() const
 //  a2232_device - constructor
 //-------------------------------------------------
 
-a2232_device::a2232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2232_device::a2232_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, A2232, "CBM A2232 Serial Card", tag, owner, clock, "a2232", __FILE__),
 	device_zorro2_card_interface(mconfig, *this),
 	m_iocpu(*this, "iocpu"),

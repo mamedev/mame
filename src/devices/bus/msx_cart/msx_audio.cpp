@@ -70,7 +70,7 @@ const device_type MSX_CART_MSX_AUDIO_NMS1205 = &device_creator<msx_cart_msx_audi
 const device_type MSX_CART_MSX_AUDIO_FSCA1 = &device_creator<msx_cart_msx_audio_fsca1>;
 
 
-msx_cart_msx_audio_hxmu900::msx_cart_msx_audio_hxmu900(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_msx_audio_hxmu900::msx_cart_msx_audio_hxmu900(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_MSX_AUDIO_HXMU900, "MSX Cartridge - MSX-AUDIO HX-MU900", tag, owner, clock, "msx_audio_hxmu900", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_y8950(*this, "y8950")
@@ -127,7 +127,7 @@ READ8_MEMBER(msx_cart_msx_audio_hxmu900::read_cart)
 
 
 
-msx_cart_msx_audio_nms1205::msx_cart_msx_audio_nms1205(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_msx_audio_nms1205::msx_cart_msx_audio_nms1205(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_MSX_AUDIO_NMS1205, "MSX Cartridge - MSX-AUDIO NMS-1205", tag, owner, clock, "msx_audio_nms1205", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_y8950(*this, "y8950")
@@ -235,7 +235,7 @@ READ8_MEMBER(msx_cart_msx_audio_nms1205::read_cart)
 
 
 
-msx_cart_msx_audio_fsca1::msx_cart_msx_audio_fsca1(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_msx_audio_fsca1::msx_cart_msx_audio_fsca1(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_MSX_AUDIO_FSCA1, "MSX Cartridge - MSX-AUDIO FS-CA1", tag, owner, clock, "msx_audio_fsca1", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_y8950(*this, "y8950")

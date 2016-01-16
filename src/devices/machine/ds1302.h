@@ -43,7 +43,7 @@ class ds1302_device :  public device_t,
 {
 public:
 	// construction/destruction
-	ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ds1302_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( sclk_w );

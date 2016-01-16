@@ -32,7 +32,7 @@
 class ggconnie_state : public pce_common_state
 {
 public:
-	ggconnie_state(const machine_config &mconfig, device_type type, const char *tag)
+	ggconnie_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pce_common_state(mconfig, type, tag),
 		m_rtc(*this, "rtc"),
 		m_oki(*this, "oki")

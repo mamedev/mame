@@ -100,7 +100,7 @@ const device_type L7A1045 = &device_creator<l7a1045_sound_device>;
 //  l7a1045_sound_device - constructor
 //-------------------------------------------------
 
-l7a1045_sound_device::l7a1045_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+l7a1045_sound_device::l7a1045_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, L7A1045, "L7A1045 L6028 DSP-A", tag, owner, clock, "l7a1045_custom", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),

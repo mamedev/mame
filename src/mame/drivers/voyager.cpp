@@ -26,7 +26,7 @@ TODO: VIA KT133a chipset support, GeForce 2MX video support, lots of things ;-)
 class voyager_state : public pcat_base_state
 {
 public:
-	voyager_state(const machine_config &mconfig, device_type type, const char *tag)
+	voyager_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pcat_base_state(mconfig, type, tag)
 	{
 	}

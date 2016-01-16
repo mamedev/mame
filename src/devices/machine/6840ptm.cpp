@@ -69,7 +69,7 @@ const device_type PTM6840 = &device_creator<ptm6840_device>;
 //  ptm6840_device - constructor
 //-------------------------------------------------
 
-ptm6840_device::ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ptm6840_device::ptm6840_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PTM6840, "6840 PTM", tag, owner, clock, "ptm6840", __FILE__),
 		m_internal_clock(0.0),
 		m_out0_cb(*this),
@@ -313,7 +313,7 @@ UINT16 ptm6840_device::compute_counter( int counter ) const
 	// If there's no timer, return the count
 	if (!m_enabled[counter])
 	{
-		PLOG(("MC6840 #%s: read counter(%d): %d\n", tag(), counter, m_counter[counter]));
+		PLOG(("MC6840 #%s: read counter(%d): %d\n", tag().c_str(), counter, m_counter[counter]));
 		return m_counter[counter];
 	}
 
@@ -321,12 +321,12 @@ UINT16 ptm6840_device::compute_counter( int counter ) const
 	if (m_control_reg[counter] & 0x02)
 	{
 		clock = m_internal_clock;
-		PLOG(("MC6840 #%s: %d internal clock freq %f \n", tag(), counter, clock));
+		PLOG(("MC6840 #%s: %d internal clock freq %f \n", tag().c_str(), counter, clock));
 	}
 	else
 	{
 		clock = m_external_clock[counter];
-		PLOG(("MC6840 #%s: %d external clock freq %f \n", tag(), counter, clock));
+		PLOG(("MC6840 #%s: %d external clock freq %f \n", tag().c_str(), counter, clock));
 	}
 	// See how many are left
 	int remaining = (m_timer[counter]->remaining() * clock).as_double();
@@ -339,7 +339,7 @@ UINT16 ptm6840_device::compute_counter( int counter ) const
 		int lsb = remaining % divisor;
 		remaining = (msb << 8) | lsb;
 	}
-	PLOG(("MC6840 #%s: read counter(%d): %d\n", tag(), counter, remaining));
+	PLOG(("MC6840 #%s: read counter(%d): %d\n", tag().c_str(), counter, remaining));
 	return remaining;
 }
 
@@ -360,12 +360,12 @@ void ptm6840_device::reload_count(int idx)
 	if (m_control_reg[idx] & 0x02)
 	{
 		clock = m_internal_clock;
-		PLOG(("MC6840 #%s: %d internal clock freq %f \n", tag(), idx, clock));
+		PLOG(("MC6840 #%s: %d internal clock freq %f \n", tag().c_str(), idx, clock));
 	}
 	else
 	{
 		clock = m_external_clock[idx];
-		PLOG(("MC6840 #%s: %d external clock freq %f \n", tag(), idx, clock));
+		PLOG(("MC6840 #%s: %d external clock freq %f \n", tag().c_str(), idx, clock));
 	}
 
 	// Determine the number of clock periods before we expire
@@ -399,7 +399,7 @@ void ptm6840_device::reload_count(int idx)
 	}
 
 	// Set the timer
-	PLOG(("MC6840 #%s: reload_count(%d): clock = %f  count = %d\n", tag(), idx, clock, count));
+	PLOG(("MC6840 #%s: reload_count(%d): clock = %f  count = %d\n", tag().c_str(), idx, clock, count));
 
 	attotime duration = attotime::from_hz(clock) * count;
 	if (idx == 2)
@@ -407,7 +407,7 @@ void ptm6840_device::reload_count(int idx)
 		duration *= m_t3_divisor;
 	}
 
-	PLOG(("MC6840 #%s: reload_count(%d): output = %f\n", tag(), idx, duration.as_double()));
+	PLOG(("MC6840 #%s: reload_count(%d): output = %f\n", tag().c_str(), idx, duration.as_double()));
 
 #if 0
 	if (!(m_control_reg[idx] & 0x02))
@@ -447,7 +447,7 @@ READ8_MEMBER( ptm6840_device::read )
 
 		case PTM_6840_STATUS:
 		{
-			PLOG(("%s: MC6840 #%s: Status read = %04X\n", machine().describe_context(), tag(), m_status_reg));
+			PLOG(("%s: MC6840 #%s: Status read = %04X\n", machine().describe_context(), tag().c_str(), m_status_reg));
 			m_status_read_since_int |= m_status_reg & 0x07;
 			val = m_status_reg;
 			break;
@@ -469,7 +469,7 @@ READ8_MEMBER( ptm6840_device::read )
 
 			m_lsb_buffer = result & 0xff;
 
-			PLOG(("%s: MC6840 #%s: Counter %d read = %04X\n", machine().describe_context(), tag(), idx, result >> 8));
+			PLOG(("%s: MC6840 #%s: Counter %d read = %04X\n", machine().describe_context(), tag().c_str(), idx, result >> 8));
 			val = result >> 8;
 			break;
 		}
@@ -510,7 +510,7 @@ WRITE8_MEMBER( ptm6840_device::write )
 			m_mode[idx] = (data >> 3) & 0x07;
 			m_control_reg[idx] = data;
 
-			PLOG(("MC6840 #%s : Control register %d selected\n", tag(), idx));
+			PLOG(("MC6840 #%s : Control register %d selected\n", tag().c_str(), idx));
 			PLOG(("operation mode   = %s\n", opmode[ m_mode[idx] ]));
 			PLOG(("value            = %04X\n", m_control_reg[idx]));
 			PLOG(("t3divisor        = %d\n", m_t3_divisor));
@@ -537,7 +537,7 @@ WRITE8_MEMBER( ptm6840_device::write )
 				// Holding reset down
 				if (data & 0x01)
 				{
-					PLOG(("MC6840 #%s : Timer reset\n", tag()));
+					PLOG(("MC6840 #%s : Timer reset\n", tag().c_str()));
 					for (int i = 0; i < 3; i++)
 					{
 						m_timer[i]->enable(false);
@@ -569,7 +569,7 @@ WRITE8_MEMBER( ptm6840_device::write )
 		case PTM_6840_MSBBUF2:
 		case PTM_6840_MSBBUF3:
 		{
-			PLOG(("MC6840 #%s msbbuf%d = %02X\n", tag(), offset / 2, data));
+			PLOG(("MC6840 #%s msbbuf%d = %02X\n", tag().c_str(), offset / 2, data));
 			m_msb_buffer = data;
 			break;
 		}
@@ -591,7 +591,7 @@ WRITE8_MEMBER( ptm6840_device::write )
 				reload_count(idx);
 			}
 
-			PLOG(("%s:MC6840 #%s: Counter %d latch = %04X\n", machine().describe_context(), tag(), idx, m_latch[idx]));
+			PLOG(("%s:MC6840 #%s: Counter %d latch = %04X\n", machine().describe_context(), tag().c_str(), idx, m_latch[idx]));
 			break;
 		}
 	}
@@ -604,7 +604,7 @@ WRITE8_MEMBER( ptm6840_device::write )
 
 void ptm6840_device::timeout(int idx)
 {
-	PLOG(("**ptm6840 %s t%d timeout**\n", tag(), idx));
+	PLOG(("**ptm6840 %s t%d timeout**\n", tag().c_str(), idx));
 
 	// Set the interrupt flag
 	m_status_reg |= (1 << idx);
@@ -616,7 +616,7 @@ void ptm6840_device::timeout(int idx)
 		if ((m_mode[idx] == 0)||(m_mode[idx] == 2))
 		{
 			m_output[idx] = m_output[idx] ? 0 : 1;
-			PLOG(("**ptm6840 %s t%d output %d **\n", tag(), idx, m_output[idx]));
+			PLOG(("**ptm6840 %s t%d output %d **\n", tag().c_str(), idx, m_output[idx]));
 
 			switch (idx)
 			{
@@ -636,7 +636,7 @@ void ptm6840_device::timeout(int idx)
 			if (!m_fired[idx])
 			{
 				m_output[idx] = 1;
-				PLOG(("**ptm6840 %s t%d output %d **\n", tag(), idx, m_output[idx]));
+				PLOG(("**ptm6840 %s t%d output %d **\n", tag().c_str(), idx, m_output[idx]));
 
 				switch (idx)
 				{

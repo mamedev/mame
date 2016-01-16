@@ -42,7 +42,7 @@ machine_config_constructor pet_userport_cb2_sound_device::device_mconfig_additio
 //  pet_userport_cb2_sound_device - constructor
 //-------------------------------------------------
 
-pet_userport_cb2_sound_device::pet_userport_cb2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pet_userport_cb2_sound_device::pet_userport_cb2_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PET_USERPORT_CB2_SOUND_DEVICE, "PET Userport 'CB2 Sound' Device", tag, owner, clock, "petucb2", __FILE__),
 	device_pet_user_port_interface(mconfig, *this),
 	m_dac(*this, DAC_TAG)

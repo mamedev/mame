@@ -94,7 +94,7 @@ class mc68901_device :  public device_t,
 {
 public:
 	// construction/destruction
-	mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc68901_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void set_timer_clock(device_t &device, int timer_clock) { downcast<mc68901_device &>(device).m_timer_clock = timer_clock; }
 	static void set_rx_clock(device_t &device, int rx_clock) { downcast<mc68901_device &>(device).m_rx_clock = rx_clock; }

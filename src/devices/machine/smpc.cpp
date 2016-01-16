@@ -763,7 +763,7 @@ void saturn_state::smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_s
 			machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(saturn_state::smpc_nmi_set),this),data & 1);
 			break;
 		default:
-			printf ("cpu '%s' (PC=%08X) SMPC: undocumented Command %02x\n", space.device().tag(), space.device().safe_pc(), data);
+			printf ("cpu '%s' (PC=%08X) SMPC: undocumented Command %02x\n", space.device().tag().c_str(), space.device().safe_pc(), data);
 	}
 }
 
@@ -1006,7 +1006,7 @@ READ8_MEMBER( saturn_state::saturn_SMPC_r )
 		}
 	}
 
-	if (LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", space.device().tag(), space.device().safe_pc(), offset, offset>>1, return_data);
+	if (LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", space.device().tag().c_str(), space.device().safe_pc(), offset, offset>>1, return_data);
 
 	return return_data;
 }

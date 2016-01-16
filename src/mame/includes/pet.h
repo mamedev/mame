@@ -36,7 +36,7 @@
 class pet_state : public driver_device
 {
 public:
-	pet_state(const machine_config &mconfig, device_type type, const char *tag) :
+	pet_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, M6502_TAG),
 		m_via(*this, M6522_TAG),
@@ -201,7 +201,7 @@ public:
 class pet2001b_state : public pet_state
 {
 public:
-	pet2001b_state(const machine_config &mconfig, device_type type, const char *tag) :
+	pet2001b_state(const machine_config &mconfig, device_type type, std::string tag) :
 		pet_state(mconfig, type, tag)
 	{ }
 
@@ -212,7 +212,7 @@ public:
 class pet80_state : public pet2001b_state
 {
 public:
-	pet80_state(const machine_config &mconfig, device_type type, const char *tag) :
+	pet80_state(const machine_config &mconfig, device_type type, std::string tag) :
 		pet2001b_state(mconfig, type, tag)
 	{ }
 
@@ -227,7 +227,7 @@ public:
 class superpet_state : public pet80_state
 {
 public:
-	superpet_state(const machine_config &mconfig, device_type type, const char *tag)
+	superpet_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pet80_state(mconfig, type, tag)
 	{ }
 };
@@ -236,7 +236,7 @@ public:
 class cbm8096_state : public pet80_state
 {
 public:
-	cbm8096_state(const machine_config &mconfig, device_type type, const char *tag) :
+	cbm8096_state(const machine_config &mconfig, device_type type, std::string tag) :
 		pet80_state(mconfig, type, tag)
 	{ }
 };
@@ -245,7 +245,7 @@ public:
 class cbm8296_state : public pet80_state
 {
 public:
-	cbm8296_state(const machine_config &mconfig, device_type type, const char *tag) :
+	cbm8296_state(const machine_config &mconfig, device_type type, std::string tag) :
 		pet80_state(mconfig, type, tag),
 		m_basic_rom(*this, "basic"),
 		m_editor_rom(*this, "editor"),

@@ -73,7 +73,7 @@ ___________________________________________________________________________
 class bfmsys85_state : public driver_device
 {
 public:
-	bfmsys85_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag),
+	bfmsys85_state(const machine_config &mconfig, device_type type, std::string tag) : driver_device(mconfig, type, tag),
 		m_vfd(*this, "vfd"),
 		m_maincpu(*this, "maincpu"),
 		m_reel0(*this, "reel0"),

@@ -47,7 +47,7 @@ public:
 		TIMER_SCANLINE
 	};
 
-	midvunit_state(const machine_config &mconfig, device_type type, const char *tag)
+	midvunit_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_nvram(*this, "nvram"),
 			m_ram_base(*this, "ram_base"),

@@ -9,7 +9,7 @@
 
 const device_type EPIC12 = &device_creator<epic12_device>;
 
-epic12_device::epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+epic12_device::epic12_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, EPIC12, "EP1C12 Blitter", tag, owner, clock, "epic12", __FILE__),
 		device_video_interface(mconfig, *this), m_ram16(nullptr), m_gfx_size(0), m_bitmaps(nullptr), m_use_ram(nullptr),
 	m_main_ramsize(0), m_main_rammask(0), m_maincpu(nullptr), m_ram16_copy(nullptr), m_work_queue(nullptr)

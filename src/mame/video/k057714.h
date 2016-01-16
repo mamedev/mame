@@ -8,7 +8,7 @@
 class k057714_device : public device_t
 {
 public:
-	k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k057714_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	template<class _Object> static devcb_base &static_set_irq_callback(device_t &device, _Object object) { return downcast<k057714_device &>(device).m_irq.set_callback(object); }
 
 	int draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

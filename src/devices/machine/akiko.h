@@ -49,7 +49,7 @@
 class akiko_device : public device_t
 {
 public:
-	akiko_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	akiko_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~akiko_device() {}
 
 	// callbacks
@@ -66,7 +66,7 @@ public:
 	DECLARE_WRITE32_MEMBER( write );
 
 	// inline configuration
-	static void set_cputag(device_t &device, const char *tag);
+	static void set_cputag(device_t &device, std::string tag);
 
 protected:
 	// device-level overrides
@@ -146,7 +146,7 @@ private:
 	devcb_read_line m_sda_r;
 	devcb_write_line m_sda_w;
 
-	const char *m_cputag;
+	std::string m_cputag;
 };
 
 // device type definition

@@ -10,7 +10,7 @@
 class mm58274c_device : public device_t
 {
 public:
-	mm58274c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mm58274c_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~mm58274c_device() {}
 
 	static void set_mode24(device_t &device, int mode) { downcast<mm58274c_device &>(device).m_mode24 = mode; }

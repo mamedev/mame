@@ -9,10 +9,10 @@ typedef device_delegate<void (int *code, int *color)> k007420_delegate;
 class k007420_device : public device_t
 {
 public:
-	k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k007420_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~k007420_device() {}
 
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 	static void static_set_bank_limit(device_t &device, int limit) { downcast<k007420_device &>(device).m_banklimit = limit; }
 	static void static_set_callback(device_t &device, k007420_delegate callback) { downcast<k007420_device &>(device).m_callback = callback; }
 

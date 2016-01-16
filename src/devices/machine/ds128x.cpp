@@ -10,7 +10,7 @@ const device_type DS12885 = &device_creator<ds12885_device>;
 //  ds12885_device - constructor
 //-------------------------------------------------
 
-ds12885_device::ds12885_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ds12885_device::ds12885_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: mc146818_device(mconfig, DS12885, "DS12885", tag, owner, clock, "ds12885", __FILE__)
 {
 }

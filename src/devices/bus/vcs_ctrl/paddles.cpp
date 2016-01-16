@@ -50,7 +50,7 @@ ioport_constructor vcs_paddles_device::device_input_ports() const
 //  vcs_paddles_device - constructor
 //-------------------------------------------------
 
-vcs_paddles_device::vcs_paddles_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+vcs_paddles_device::vcs_paddles_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VCS_PADDLES, "Atari / CBM Digital paddles", tag, owner, clock, "vcs_paddles", __FILE__),
 	device_vcs_control_port_interface(mconfig, *this),
 	m_joy(*this, "JOY"),

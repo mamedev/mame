@@ -447,7 +447,7 @@ const rom_entry *isa8_ibm_mfc_device::device_rom_region() const
 //  isa8_ibm_mfc_device - constructor
 //-------------------------------------------------
 
-isa8_ibm_mfc_device::isa8_ibm_mfc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_ibm_mfc_device::isa8_ibm_mfc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8_IBM_MFC, "IBM PC Music Feature Card", tag, owner, clock, "ibm_mfc", __FILE__),
 		device_isa8_card_interface(mconfig, *this), m_tcr(0), m_pc_ppi_c(0), m_z80_ppi_c(0), m_pc_irq_state(0), m_z80_irq_state(0),
 		m_cpu(*this, "ibm_mfc"),

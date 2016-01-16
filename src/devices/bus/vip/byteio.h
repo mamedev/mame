@@ -72,7 +72,7 @@ class vip_byteio_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vip_byteio_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _inst> void set_inst_callback(_inst inst) { m_write_inst.set_callback(inst); }
 

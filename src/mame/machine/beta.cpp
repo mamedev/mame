@@ -26,7 +26,7 @@ BUGS:
 
 const device_type BETA_DISK = &device_creator<beta_disk_device>;
 
-beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+beta_disk_device::beta_disk_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, BETA_DISK, "Beta Disk Interface", tag, owner, clock, "betadisk", __FILE__)
 	, m_betadisk_active(0)
 	, m_wd179x(*this, "wd179x")

@@ -108,7 +108,7 @@ Game is V30 based, with rom banking (2Mb)
 class highvdeo_state : public driver_device
 {
 public:
-	highvdeo_state(const machine_config &mconfig, device_type type, const char *tag)
+	highvdeo_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_blit_ram(*this, "blit_ram"),
 		m_maincpu(*this, "maincpu"),

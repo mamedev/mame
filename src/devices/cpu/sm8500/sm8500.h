@@ -26,7 +26,7 @@ class sm8500_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	sm8500_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	sm8500_cpu_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_dma_cb(device_t &device, _Object object) { return downcast<sm8500_cpu_device &>(device).m_dma_func.set_callback(object); }

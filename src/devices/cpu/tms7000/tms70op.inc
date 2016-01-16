@@ -712,5 +712,5 @@ void tms7020_exl_device::lvdp()
 void tms7000_device::illegal(UINT8 op)
 {
 	m_icount -= 5; // guessed
-	logerror("%s: illegal opcode $%02X @ $%04x\n", tag(), op, m_pc);
+	logerror("%s: illegal opcode $%02X @ $%04x\n", tag().c_str(), op, m_pc);
 }

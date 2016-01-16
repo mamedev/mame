@@ -28,7 +28,7 @@ enum
 class namcona1_state : public driver_device
 {
 public:
-	namcona1_state(const machine_config &mconfig, device_type type, const char *tag)
+	namcona1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_mcu(*this,"mcu"),

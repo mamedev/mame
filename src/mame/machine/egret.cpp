@@ -333,7 +333,7 @@ WRITE8_MEMBER( egret_device::pram_w )
 //  egret_device - constructor
 //-------------------------------------------------
 
-egret_device::egret_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+egret_device::egret_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, EGRET, "Apple Egret", tag, owner, clock, "egret", __FILE__),
 	device_nvram_interface(mconfig, *this),
 	write_reset(*this),

@@ -439,7 +439,7 @@ Keyboard TX commands:
 class pc9801_state : public driver_device
 {
 public:
-	pc9801_state(const machine_config &mconfig, device_type type, const char *tag) :
+	pc9801_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dmac(*this, "i8237"),

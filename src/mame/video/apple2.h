@@ -16,7 +16,7 @@ class a2_video_device :
 {
 public:
 	// construction/destruction
-	a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a2_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_PALETTE_INIT(apple2);
 

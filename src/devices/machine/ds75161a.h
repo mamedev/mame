@@ -90,7 +90,7 @@ class ds75161a_device : public device_t
 {
 public:
 	// construction/destruction
-	ds75161a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ds75161a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_in_ren_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_ren_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_in_ifc_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_ifc_cb.set_callback(object); }

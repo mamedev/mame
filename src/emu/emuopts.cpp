@@ -241,7 +241,7 @@ bool emu_options::add_slot_options(bool isfirstpass)
 		first = false;
 
 		// retrieve info about the device instance
-		const char *name = slot->device().tag() + 1;
+		const char *name = slot->device().tag().c_str() + 1;
 		if (!exists(name))
 		{
 			// add the option
@@ -278,7 +278,7 @@ void emu_options::update_slot_options()
 	for (device_slot_interface *slot = iter.first(); slot != nullptr; slot = iter.next())
 	{
 		// retrieve info about the device instance
-		const char *name = slot->device().tag() + 1;
+		const char *name = slot->device().tag().c_str() + 1;
 		if (exists(name) && slot->first_option() != nullptr)
 		{
 			std::string defvalue = slot->get_default_card_software();

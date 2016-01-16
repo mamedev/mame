@@ -20,7 +20,7 @@ The data bus is 16 bits wide.
 
 const device_type TC0110PCR = &device_creator<tc0110pcr_device>;
 
-tc0110pcr_device::tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc0110pcr_device::tc0110pcr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0110PCR, "Taito TC0110PCR", tag, owner, clock, "tc0110pcr", __FILE__),
 		m_ram(nullptr),
 		m_type(0),
@@ -34,7 +34,7 @@ tc0110pcr_device::tc0110pcr_device(const machine_config &mconfig, const char *ta
 //  palette device
 //-------------------------------------------------
 
-void tc0110pcr_device::static_set_palette_tag(device_t &device, const char *tag)
+void tc0110pcr_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<tc0110pcr_device &>(device).m_palette.set_tag(tag);
 }

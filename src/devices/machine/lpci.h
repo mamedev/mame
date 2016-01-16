@@ -24,7 +24,7 @@ class pci_bus_legacy_device :  public device_t
 {
 public:
 	// construction/destruction
-	pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pci_bus_legacy_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );
@@ -34,7 +34,7 @@ public:
 
 	void set_busnum(int busnum) { m_busnum = busnum; }
 	void set_father(const char *father) { m_father = father; }
-	void set_device(int num, const char *tag, pci_read_func read_func, pci_write_func write_func) {
+	void set_device(int num, std::string tag, pci_read_func read_func, pci_write_func write_func) {
 		m_devtag[num] = tag; m_read_callback[num] = read_func; m_write_callback[num] = write_func; }
 
 	pci_bus_legacy_device *pci_search_bustree(int busnum, int devicenum, pci_bus_legacy_device *pcibus);
@@ -48,7 +48,7 @@ protected:
 
 private:
 	UINT8               m_busnum;
-	const char *        m_devtag[32];
+	std::string         m_devtag[32];
 	pci_read_func       m_read_callback[32];
 	pci_write_func      m_write_callback[32];
 	const char *        m_father;

@@ -24,7 +24,7 @@
 class vip_state : public driver_device
 {
 public:
-	vip_state(const machine_config &mconfig, device_type type, const char *tag)
+	vip_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
 			m_vdc(*this, CDP1861_TAG),

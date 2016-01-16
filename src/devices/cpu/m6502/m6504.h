@@ -15,7 +15,7 @@
 
 class m6504_device : public m6502_device {
 public:
-	m6504_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m6504_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	class mi_6504_normal : public memory_interface {

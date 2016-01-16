@@ -101,7 +101,7 @@ class c64_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c64_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<c64_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<c64_expansion_slot_device &>(device).m_write_nmi.set_callback(object); }

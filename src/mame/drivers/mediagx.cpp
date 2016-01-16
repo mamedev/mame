@@ -86,7 +86,7 @@ struct speedup_entry
 class mediagx_state : public pcat_base_state
 {
 public:
-	mediagx_state(const machine_config &mconfig, device_type type, const char *tag)
+	mediagx_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pcat_base_state(mconfig, type, tag),
 		m_ide(*this, "ide"),
 		m_main_ram(*this, "main_ram"),

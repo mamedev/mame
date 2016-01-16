@@ -205,7 +205,7 @@
 	[window setTitle:[NSString stringWithFormat:@"Debug: %s - %s '%s'",
 												device->machine().system().name,
 												device->name(),
-												device->tag()]];
+												device->tag().c_str()]];
 }
 
 

@@ -86,7 +86,7 @@ ioport_constructor isa16_ide_device::device_input_ports() const
 //  isa16_ide_device - constructor
 //-------------------------------------------------
 
-isa16_ide_device::isa16_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+isa16_ide_device::isa16_ide_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, ISA16_IDE, "IDE Fixed Drive Adapter", tag, owner, clock, "isa_ide", __FILE__),
 		device_isa16_card_interface( mconfig, *this ),
 		m_is_primary(true),

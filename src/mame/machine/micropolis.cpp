@@ -65,7 +65,7 @@ static const UINT8 track_SD[][2] = {
 
 const device_type MICROPOLIS = &device_creator<micropolis_device>;
 
-micropolis_device::micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+micropolis_device::micropolis_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MICROPOLIS, "MICROPOLIS", tag, owner, clock, "micropolis", __FILE__),
 	m_read_dden(*this),
 	m_write_intrq(*this),
@@ -84,9 +84,6 @@ micropolis_device::micropolis_device(const machine_config &mconfig, const char *
 {
 	for (auto & elem : m_buffer)
 		elem = 0;
-
-	for (auto & elem : m_floppy_drive_tags)
-		elem = nullptr;
 }
 
 //-------------------------------------------------
@@ -120,7 +117,7 @@ void micropolis_device::device_reset()
 {
 	for (auto & elem : m_floppy_drive_tags)
 	{
-		if (elem)
+		if (!elem.empty())
 		{
 			legacy_floppy_image_device *img = siblingdevice<legacy_floppy_image_device>(elem);
 
@@ -188,7 +185,7 @@ void micropolis_device::set_drive(UINT8 drive)
 	if (VERBOSE)
 		logerror("micropolis_set_drive: $%02x\n", drive);
 
-	if (m_floppy_drive_tags[drive])
+	if (!m_floppy_drive_tags[drive].empty())
 		m_drive = siblingdevice<legacy_floppy_image_device>(m_floppy_drive_tags[drive]);
 }
 

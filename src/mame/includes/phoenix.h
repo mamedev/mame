@@ -7,7 +7,7 @@
 class phoenix_state : public driver_device
 {
 public:
-	phoenix_state(const machine_config &mconfig, device_type type, const char *tag)
+	phoenix_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_pleiads_custom(*this, "pleiads_custom"),
@@ -83,7 +83,7 @@ class phoenix_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	phoenix_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~phoenix_sound_device() {}
 
 	DECLARE_WRITE8_MEMBER( control_a_w );

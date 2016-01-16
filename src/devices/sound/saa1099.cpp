@@ -133,7 +133,7 @@ const device_type SAA1099 = &device_creator<saa1099_device>;
 //  saa1099_device - constructor
 //-------------------------------------------------
 
-saa1099_device::saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+saa1099_device::saa1099_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SAA1099, "SAA1099", tag, owner, clock, "saa1099", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
@@ -346,7 +346,7 @@ WRITE8_MEMBER( saa1099_device::control_w )
 	if ((data & 0xff) > 0x1c)
 	{
 		/* Error! */
-		logerror("%s: (SAA1099 '%s') Unknown register selected\n", machine().describe_context(), tag());
+		logerror("%s: (SAA1099 '%s') Unknown register selected\n", machine().describe_context(), tag().c_str());
 	}
 
 	m_selected_reg = data & 0x1f;
@@ -431,7 +431,7 @@ WRITE8_MEMBER( saa1099_device::data_w )
 			int i;
 
 			/* Synch & Reset generators */
-			logerror("%s: (SAA1099 '%s') -reg 0x1c- Chip reset\n", machine().describe_context(), tag());
+			logerror("%s: (SAA1099 '%s') -reg 0x1c- Chip reset\n", machine().describe_context(), tag().c_str());
 			for (i = 0; i < 6; i++)
 			{
 				m_channels[i].level = 0;
@@ -440,6 +440,6 @@ WRITE8_MEMBER( saa1099_device::data_w )
 		}
 		break;
 	default:    /* Error! */
-		logerror("%s: (SAA1099 '%s') Unknown operation (reg:%02x, data:%02x)\n", machine().describe_context(), tag(), reg, data);
+		logerror("%s: (SAA1099 '%s') Unknown operation (reg:%02x, data:%02x)\n", machine().describe_context(), tag().c_str(), reg, data);
 	}
 }

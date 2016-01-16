@@ -60,7 +60,7 @@ $7004 writes, related to $7000 reads
 class olibochu_state : public driver_device
 {
 public:
-	olibochu_state(const machine_config &mconfig, device_type type, const char *tag)
+	olibochu_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),

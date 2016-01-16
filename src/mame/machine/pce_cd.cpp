@@ -78,7 +78,7 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 const device_type PCE_CD = &device_creator<pce_cd_device>;
 
 
-pce_cd_device::pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pce_cd_device::pce_cd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, PCE_CD, "PCE CD Add-on", tag, owner, clock, "pcecd", __FILE__),
 						m_maincpu(*this, ":maincpu"),
 						m_msm(*this, "msm5205"),

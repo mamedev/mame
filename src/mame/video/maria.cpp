@@ -58,7 +58,7 @@ const device_type ATARI_MARIA = &device_creator<atari_maria_device>;
 
 
 
-atari_maria_device::atari_maria_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atari_maria_device::atari_maria_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, ATARI_MARIA, "Atari MARIA", tag, owner, clock, "atari_maria", __FILE__)
 {
 }

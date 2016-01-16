@@ -101,7 +101,7 @@ machine_config_constructor abc_sio_device::device_mconfig_additions() const
 //  abc_sio_device - constructor
 //-------------------------------------------------
 
-abc_sio_device::abc_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+abc_sio_device::abc_sio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ABC_SIO, "ABC SIO", tag, owner, clock, "abcsio", __FILE__),
 		device_abcbus_card_interface(mconfig, *this),
 		m_ctc(*this, Z80CTC_TAG),

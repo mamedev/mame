@@ -54,7 +54,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, co
 //  cdi68070_device - constructor
 //-------------------------------------------------
 
-cdi68070_device::cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cdi68070_device::cdi68070_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MACHINE_CDI68070, "CDI68070", tag, owner, clock, "cdi68070", __FILE__)
 {
 }

@@ -18,11 +18,11 @@ class mb_vcu_device : public device_t,
 {
 public:
 	// construction/destruction
-	mb_vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb_vcu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_palette_tag(device_t &device, const char *tag);
-	static void set_cpu_tag(device_t &device, const char *tag) { downcast<mb_vcu_device &>(device).m_cpu.set_tag(tag); }
+	static void static_set_palette_tag(device_t &device, std::string tag);
+	static void set_cpu_tag(device_t &device, std::string tag) { downcast<mb_vcu_device &>(device).m_cpu.set_tag(tag); }
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write_vregs );

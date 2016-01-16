@@ -6,7 +6,7 @@
 
 static const int TIMER_POLL = 1;
 
-pseudo_terminal_device::pseudo_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pseudo_terminal_device::pseudo_terminal_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PSEUDO_TERMINAL, "Pseudo terminal", tag, owner, clock, "pseudo_terminal", __FILE__),
 		device_serial_interface(mconfig, *this),
 		device_rs232_port_interface(mconfig, *this),

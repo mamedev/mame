@@ -54,7 +54,7 @@
 
 const device_type KANEKO_PANDORA = &device_creator<kaneko_pandora_device>;
 
-kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, KANEKO_PANDORA, "Kaneko PANDORA GFX", tag, owner, clock, "kaneko_pandora", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_gfx_region(0),
@@ -70,7 +70,7 @@ kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, cons
 //  gfx decoder
 //-------------------------------------------------
 
-void kaneko_pandora_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void kaneko_pandora_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<kaneko_pandora_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -80,7 +80,7 @@ void kaneko_pandora_device::static_set_gfxdecode_tag(device_t &device, const cha
 //  palette device
 //-------------------------------------------------
 
-void kaneko_pandora_device::static_set_palette_tag(device_t &device, const char *tag)
+void kaneko_pandora_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<kaneko_pandora_device &>(device).m_palette.set_tag(tag);
 }

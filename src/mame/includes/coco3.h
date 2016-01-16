@@ -37,7 +37,7 @@
 class coco3_state : public coco_state
 {
 public:
-	coco3_state(const machine_config &mconfig, device_type type, const char *tag)
+	coco3_state(const machine_config &mconfig, device_type type, std::string tag)
 	: coco_state(mconfig, type, tag),
 		m_gime(*this, GIME_TAG) { }
 

@@ -7,7 +7,7 @@
 class sshangha_state : public driver_device
 {
 public:
-	sshangha_state(const machine_config &mconfig, device_type type, const char *tag)
+	sshangha_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_deco146(*this, "ioprot"),
 			m_deco_tilegen1(*this, "tilegen1"),

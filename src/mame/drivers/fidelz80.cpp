@@ -602,7 +602,7 @@ expect that the software reads these once on startup only.
 class fidelz80_state : public driver_device
 {
 public:
-	fidelz80_state(const machine_config &mconfig, device_type type, const char *tag)
+	fidelz80_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),

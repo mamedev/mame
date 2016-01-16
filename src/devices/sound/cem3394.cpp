@@ -115,7 +115,7 @@ const device_type CEM3394 = &device_creator<cem3394_device>;
 //  cem3394_device - constructor
 //-------------------------------------------------
 
-cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cem3394_device::cem3394_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CEM3394, "CEM3394", tag, owner, clock, "cem3394", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),

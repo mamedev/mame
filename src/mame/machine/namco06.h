@@ -63,9 +63,9 @@ struct namco_06xx_config
 class namco_06xx_device : public device_t
 {
 public:
-	namco_06xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_06xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	static void set_maincpu(device_t &device, const char *tag) { downcast<namco_06xx_device &>(device).m_nmicpu.set_tag(tag); }
+	static void set_maincpu(device_t &device, std::string tag) { downcast<namco_06xx_device &>(device).m_nmicpu.set_tag(tag); }
 
 	template<class _Object> static devcb_base &set_read_0_callback(device_t &device, _Object object) { return downcast<namco_06xx_device &>(device).m_read_0.set_callback(object); }
 	template<class _Object> static devcb_base &set_read_1_callback(device_t &device, _Object object) { return downcast<namco_06xx_device &>(device).m_read_1.set_callback(object); }

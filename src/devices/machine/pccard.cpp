@@ -22,7 +22,7 @@ WRITE16_MEMBER( pccard_interface::write_reg )
 
 const device_type PCCARD_SLOT = &device_creator<pccard_slot_device>;
 
-pccard_slot_device::pccard_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pccard_slot_device::pccard_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PCCARD_SLOT, "PCCARD SLOT", tag, owner, clock, "pccard", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_pccard(nullptr)

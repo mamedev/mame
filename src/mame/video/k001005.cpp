@@ -1170,7 +1170,7 @@ void k001005_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 const device_type K001005 = &device_creator<k001005_device>;
 
-k001005_device::k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k001005_device::k001005_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K001005, "K001005 Polygon Renderer", tag, owner, clock, "k001005", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_k001006(nullptr),
@@ -1457,7 +1457,7 @@ void k001005_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect )
 	m_renderer->draw(bitmap, cliprect);
 }
 
-void k001005_device::set_texel_chip(device_t &device, const char *tag)
+void k001005_device::set_texel_chip(device_t &device, std::string tag)
 {
 	downcast<k001005_device &>(device).m_k001006_tag = tag;
 }

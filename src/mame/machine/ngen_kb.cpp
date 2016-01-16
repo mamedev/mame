@@ -4,7 +4,7 @@
 
 #include "ngen_kb.h"
 
-ngen_keyboard_device::ngen_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
+ngen_keyboard_device::ngen_keyboard_device(const machine_config& mconfig, std::string tag, device_t* owner, UINT32 clock) :
 	serial_keyboard_device(mconfig, NGEN_KEYBOARD, "NGEN Keyboard", tag, owner, 0, "ngen_keyboard", __FILE__),
 	m_keys_down(false)
 {

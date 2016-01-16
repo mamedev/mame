@@ -12,7 +12,7 @@ extern const device_type JASMIN;
 class jasmin_device : public oricext_device
 {
 public:
-	jasmin_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	jasmin_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~jasmin_device();
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);

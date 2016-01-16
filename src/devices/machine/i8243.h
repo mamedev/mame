@@ -41,7 +41,7 @@ class i8243_device :  public device_t
 {
 public:
 	// construction/destruction
-	i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8243_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_read_handler(device_t &device, _Object object) { return downcast<i8243_device &>(device).m_readhandler.set_callback(object); }

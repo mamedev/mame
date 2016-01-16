@@ -79,7 +79,7 @@ class pdp1_device : public cpu_device
 {
 public:
 	// construction/destruction
-	pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pdp1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void pulse_start_clear();
 	void io_complete() { m_ios = 1; }

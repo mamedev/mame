@@ -221,7 +221,7 @@ UINT32 z180_device::ARG16()
  * RETN
  ***************************************************************/
 #define RETN    {                                               \
-	LOG(("Z180 '%s' RETN IFF1:%d IFF2:%d\n", tag(), m_IFF1, m_IFF2)); \
+	LOG(("Z180 '%s' RETN IFF1:%d IFF2:%d\n", tag().c_str(), m_IFF1, m_IFF2)); \
 	POP(PC);                                                  \
 	m_IFF1 = m_IFF2;                                                \
 }

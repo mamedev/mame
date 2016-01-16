@@ -100,7 +100,7 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 class bnstars_state : public ms32_state
 {
 public:
-	bnstars_state(const machine_config &mconfig, device_type type, const char *tag)
+	bnstars_state(const machine_config &mconfig, device_type type, std::string tag)
 		: ms32_state(mconfig, type, tag),
 			m_ms32_tx0_ram(*this, "tx0_ram"),
 			m_ms32_tx1_ram(*this, "tx1_ram"),

@@ -52,7 +52,7 @@ enum
 
 const device_type NILE = &device_creator<nile_device>;
 
-nile_device::nile_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nile_device::nile_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NILE, "NiLe", tag, owner, clock, "nile", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),

@@ -15,7 +15,7 @@
 class exp85_state : public driver_device
 {
 public:
-	exp85_state(const machine_config &mconfig, device_type type, const char *tag)
+	exp85_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, I8085A_TAG),
 			m_rs232(*this, "rs232"),

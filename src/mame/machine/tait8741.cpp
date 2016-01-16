@@ -35,7 +35,7 @@ gladiatr and Great Swordsman set.
 
 const device_type TAITO8741_4PACK = &device_creator<taito8741_4pack_device>;
 
-taito8741_4pack_device::taito8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+taito8741_4pack_device::taito8741_4pack_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TAITO8741_4PACK, "I8741 MCU Simulation (Taito 4Pack)", tag, owner, clock, "taito8741_4pack", __FILE__),
 	m_port_handler_0_r(*this),
 	m_port_handler_1_r(*this),
@@ -347,7 +347,7 @@ joshi Vollyball set.
 
 const device_type JOSVOLLY8741_4PACK = &device_creator<josvolly8741_4pack_device>;
 
-josvolly8741_4pack_device::josvolly8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+josvolly8741_4pack_device::josvolly8741_4pack_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, JOSVOLLY8741_4PACK, "I8741 MCU Simulation (Joshi Volleyball)", tag, owner, clock, "josvolly8741_4pack", __FILE__),
 	m_port_handler_0_r(*this),
 	m_port_handler_1_r(*this),

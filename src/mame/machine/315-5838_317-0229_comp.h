@@ -22,7 +22,7 @@ class sega_315_5838_comp_device :  public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_315_5838_comp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	sega_dec_read_delegate m_read_ch2;
 

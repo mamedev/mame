@@ -131,7 +131,7 @@ machine_config_constructor ep64_exdos_device::device_mconfig_additions() const
 //  ep64_exdos_device - constructor
 //-------------------------------------------------
 
-ep64_exdos_device::ep64_exdos_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ep64_exdos_device::ep64_exdos_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, EP64_EXDOS, "EXDOS", tag, owner, clock, "ep64_exdos", __FILE__),
 	device_ep64_expansion_bus_card_interface(mconfig, *this),
 	m_fdc(*this, WD1770_TAG),

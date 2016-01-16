@@ -20,7 +20,7 @@
 class beta_disk_device : public device_t
 {
 public:
-	beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	beta_disk_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~beta_disk_device() {}
 
 	DECLARE_READ8_MEMBER(status_r);

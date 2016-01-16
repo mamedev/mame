@@ -22,7 +22,7 @@
 const device_type O2_ROM_CHESS = &device_creator<o2_chess_device>;
 
 
-o2_chess_device::o2_chess_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+o2_chess_device::o2_chess_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: o2_rom_device(mconfig, O2_ROM_CHESS, "Odyssey 2 BASIC Carts", tag, owner, clock, "o2_chess", __FILE__),
 					m_cpu(*this, "subcpu")
 {

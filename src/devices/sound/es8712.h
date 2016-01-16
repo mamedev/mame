@@ -28,7 +28,7 @@ class es8712_device : public device_t,
 						public device_sound_interface
 {
 public:
-	es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	es8712_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~es8712_device() { }
 
 protected:

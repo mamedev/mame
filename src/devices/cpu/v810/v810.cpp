@@ -38,7 +38,7 @@
 const device_type V810 = &device_creator<v810_device>;
 
 
-v810_device::v810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+v810_device::v810_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, V810, "V810", tag, owner, clock, "v810", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 32, 32, 0)

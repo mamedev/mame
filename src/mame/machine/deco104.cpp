@@ -1055,7 +1055,7 @@ const device_type DECO104PROT = &device_creator<deco104_device>;
 
 
 
-deco104_device::deco104_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+deco104_device::deco104_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: deco_146_base_device(mconfig, DECO104PROT, "DECO 104 Protection", tag, owner, clock, "deco104", __FILE__)
 {
 	m_bankswitch_swap_read_address = 0x66;

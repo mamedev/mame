@@ -51,7 +51,7 @@ class ram_device :  public device_t
 {
 public:
 	// construction/destruction
-	ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// accessors
 	UINT32 size(void) const { return m_size; }

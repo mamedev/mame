@@ -20,7 +20,7 @@ http://ohwow-arcade.com/Assets/Game_Manuals/RIBBIT%20RACIN.PDF
 class laz_ribrac_state : public driver_device
 {
 public:
-	laz_ribrac_state(const machine_config &mconfig, device_type type, const char *tag)
+	laz_ribrac_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 	//  ,m_maincpu(*this, "maincpu")
 	{ }

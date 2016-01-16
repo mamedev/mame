@@ -245,7 +245,7 @@
 class a400_state : public atari_common_state
 {
 public:
-	a400_state(const machine_config &mconfig, device_type type, const char *tag)
+	a400_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atari_common_state(mconfig, type, tag),
 		m_ram(*this, RAM_TAG),
 		m_pia(*this, "pia"),

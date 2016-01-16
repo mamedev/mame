@@ -46,7 +46,7 @@ Dumped by Chackn
 class pinkiri8_state : public driver_device
 {
 public:
-	pinkiri8_state(const machine_config &mconfig, device_type type, const char *tag)
+	pinkiri8_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_janshi_back_vram(*this, "janshivdp:back_vram"),
 		m_janshi_vram1(*this, "janshivdp:vram1"),
@@ -103,7 +103,7 @@ class janshi_vdp_device : public device_t,
 							public device_memory_interface
 {
 public:
-	janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	janshi_vdp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	DECLARE_ADDRESS_MAP(map, 8);
 protected:
 	virtual void device_config_complete() override;
@@ -133,7 +133,7 @@ ADDRESS_MAP_END
 
 const device_type JANSHIVDP = &device_creator<janshi_vdp_device>;
 
-janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, JANSHIVDP, "Janshi VDP", tag, owner, clock, "janshi_vdp", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,24, 0, address_map_delegate(FUNC(janshi_vdp_device::map), this))

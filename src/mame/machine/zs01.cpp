@@ -22,14 +22,14 @@ inline void ATTR_PRINTF( 3, 4 ) zs01_device::verboselog( int n_level, const char
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: zs01(%s) %s", machine().describe_context(), tag(), buf );
+		logerror( "%s: zs01(%s) %s", machine().describe_context(), tag().c_str(), buf );
 	}
 }
 
 // device type definition
 const device_type ZS01 = &device_creator<zs01_device>;
 
-zs01_device::zs01_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+zs01_device::zs01_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock )
 	: device_t( mconfig, ZS01, "Konami ZS01 PIC", tag, owner, clock, "zs01", __FILE__ ),
 	device_nvram_interface(mconfig, *this),
 	m_cs( 0 ),
@@ -583,11 +583,11 @@ void zs01_device::nvram_default()
 
 	if( !m_region )
 	{
-		logerror( "zs01(%s) region not found\n", tag() );
+		logerror( "zs01(%s) region not found\n", tag().c_str() );
 	}
 	else if( m_region->bytes() != expected_bytes )
 	{
-		logerror( "zs01(%s) region length 0x%x expected 0x%x\n", tag(), m_region->bytes(), expected_bytes );
+		logerror( "zs01(%s) region length 0x%x expected 0x%x\n", tag().c_str(), m_region->bytes(), expected_bytes );
 	}
 	else
 	{

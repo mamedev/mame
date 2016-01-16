@@ -90,7 +90,7 @@ class ics2115_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
-	ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ics2115_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<ics2115_device &>(device).m_irq_cb.set_callback(object); }
 

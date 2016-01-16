@@ -142,7 +142,7 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 class calchase_state : public pcat_base_state
 {
 public:
-	calchase_state(const machine_config &mconfig, device_type type, const char *tag)
+	calchase_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pcat_base_state(mconfig, type, tag),
 			m_dac_l(*this, "dac_l"),
 			m_dac_r(*this, "dac_r")

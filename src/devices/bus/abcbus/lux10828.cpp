@@ -403,7 +403,7 @@ ioport_constructor luxor_55_10828_device::device_input_ports() const
 //  luxor_55_10828_device - constructor
 //-------------------------------------------------
 
-luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, LUXOR_55_10828, "Luxor 55 10828", tag, owner, clock, "lux10828", __FILE__),
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),

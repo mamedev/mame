@@ -1104,7 +1104,7 @@ WRITE16_MEMBER(taitoz_state::spacegun_output_bypass_w)
 CUSTOM_INPUT_MEMBER(taitoz_state::taitoz_pedal_r)
 {
 	static const UINT8 retval[8] = { 0,1,3,2,6,7,5,4 };
-	const char *tag = (const char *)param;
+	std::string tag = (const char *)param;
 	return retval[read_safe(ioport(tag), 0) & 7];
 }
 

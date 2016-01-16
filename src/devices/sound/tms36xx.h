@@ -43,7 +43,7 @@ class tms36xx_device : public device_t,
 						public device_sound_interface
 {
 public:
-	tms36xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms36xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~tms36xx_device() { }
 
 	static void set_subtype(device_t &device, int type)

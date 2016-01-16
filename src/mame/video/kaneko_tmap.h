@@ -5,10 +5,10 @@
 class kaneko_view2_tilemap_device : public device_t
 {
 public:
-	kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kaneko_view2_tilemap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
 	static void set_gfx_region(device_t &device, int region);
 	static void set_offset(device_t &device, int dx, int dy, int xdim, int ydim);
 	static void set_invert_flip(device_t &device, int invert_flip); // for fantasia (bootleg)

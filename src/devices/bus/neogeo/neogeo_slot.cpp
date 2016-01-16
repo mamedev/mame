@@ -23,7 +23,7 @@ const device_type NEOGEO_CART_SLOT = &device_creator<neogeo_cart_slot_device>;
 //-------------------------------------------------
 //  neogeo_cart_slot_device - constructor
 //-------------------------------------------------
-neogeo_cart_slot_device::neogeo_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock) :
+neogeo_cart_slot_device::neogeo_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT16 clock) :
 						device_t(mconfig, NEOGEO_CART_SLOT, "NeoGeo Cartridge Slot", tag, owner, clock, "neogeo_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),

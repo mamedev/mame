@@ -22,7 +22,7 @@ class pc_kbd_keytronic_pc3270_device :  public device_t,
 {
 public:
 	// construction/destruction
-	pc_kbd_keytronic_pc3270_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc_kbd_keytronic_pc3270_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	required_device<cpu_device> m_cpu;
 
@@ -60,7 +60,7 @@ class pc_kbd_keytronic_pc3270_at_device : public pc_kbd_keytronic_pc3270_device
 {
 public:
 	// construction/destruction
-	pc_kbd_keytronic_pc3270_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	pc_kbd_keytronic_pc3270_at_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: pc_kbd_keytronic_pc3270_device(mconfig, tag, owner, clock)
 	{
 	}

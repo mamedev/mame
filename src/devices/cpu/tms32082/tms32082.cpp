@@ -44,7 +44,7 @@ const UINT32 tms32082_mp_device::SHIFT_MASK[] =
 
 
 
-tms32082_mp_device::tms32082_mp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms32082_mp_device::tms32082_mp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, TMS32082_MP, "TMS32082 MP", tag, owner, clock, "tms32082_mp", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(mp_internal_map))
 {
@@ -481,7 +481,7 @@ static ADDRESS_MAP_START(pp_internal_map, AS_PROGRAM, 32, tms32082_pp_device)
 	AM_RANGE(0x01001000, 0x01001fff) AM_RAM AM_SHARE("pp1_param")
 ADDRESS_MAP_END
 
-tms32082_pp_device::tms32082_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms32082_pp_device::tms32082_pp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, TMS32082_PP, "TMS32082 PP", tag, owner, clock, "tms32082_pp", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(pp_internal_map))
 {

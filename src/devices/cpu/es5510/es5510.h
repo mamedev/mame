@@ -16,7 +16,7 @@
 
 class es5510_device : public cpu_device {
 public:
-	es5510_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	es5510_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(host_r);
 	DECLARE_WRITE8_MEMBER(host_w);

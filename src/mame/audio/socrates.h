@@ -9,7 +9,7 @@ class socrates_snd_device : public device_t,
 							public device_sound_interface
 {
 public:
-	socrates_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	socrates_snd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void reg0_w(int data);
 	void reg1_w(int data);

@@ -23,7 +23,7 @@ TODO:
 
 const device_type FLOWER = &device_creator<flower_sound_device>;
 
-flower_sound_device::flower_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+flower_sound_device::flower_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, FLOWER, "Flower Audio Custom", tag, owner, clock, "flower_sound", __FILE__),
 		device_sound_interface(mconfig, *this)
 {

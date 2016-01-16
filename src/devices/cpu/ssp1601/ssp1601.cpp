@@ -192,7 +192,7 @@
 const device_type SSP1601 = &device_creator<ssp1601_device>;
 
 
-ssp1601_device::ssp1601_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ssp1601_device::ssp1601_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SSP1601, "SSP1601", tag, owner, clock, "ssp1601", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_io_config("io", ENDIANNESS_BIG, 16, 4, 0)

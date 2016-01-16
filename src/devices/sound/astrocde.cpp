@@ -57,7 +57,7 @@ const device_type ASTROCADE = &device_creator<astrocade_device>;
 //  astrocade_device - constructor
 //-------------------------------------------------
 
-astrocade_device::astrocade_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+astrocade_device::astrocade_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ASTROCADE, "Astrocade", tag, owner, clock, "astrocade", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),

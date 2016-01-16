@@ -1161,7 +1161,7 @@ WRITE16_MEMBER( cdicdic_device::regs_w )
 //  cdicdic_device - constructor
 //-------------------------------------------------
 
-cdicdic_device::cdicdic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cdicdic_device::cdicdic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MACHINE_CDICDIC, "CDICDIC", tag, owner, clock, "cdicdic", __FILE__)
 {
 }

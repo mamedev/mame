@@ -13,7 +13,7 @@
 class toobin_state : public atarigen_state
 {
 public:
-	toobin_state(const machine_config &mconfig, device_type type, const char *tag)
+	toobin_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atarigen_state(mconfig, type, tag),
 			m_jsa(*this, "jsa"),
 			m_playfield_tilemap(*this, "playfield"),

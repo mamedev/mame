@@ -12,7 +12,7 @@
 
 const device_type VC4000_SND = &device_creator<vc4000_sound_device>;
 
-vc4000_sound_device::vc4000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vc4000_sound_device::vc4000_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VC4000_SND, "Intertion Electronic VC 4000 Audio Custom", tag, owner, clock, "vc4000_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),

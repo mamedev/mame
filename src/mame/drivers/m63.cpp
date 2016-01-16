@@ -126,7 +126,7 @@ Dip locations verified for:
 class m63_state : public driver_device
 {
 public:
-	m63_state(const machine_config &mconfig, device_type type, const char *tag)
+	m63_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_scrollram(*this, "scrollram"),

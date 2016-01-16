@@ -46,17 +46,17 @@ const device_type NES_BF9096 = &device_creator<nes_bf9096_device>;
 const device_type NES_GOLDEN5 = &device_creator<nes_golden5_device>;
 
 
-nes_bf9093_device::nes_bf9093_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_bf9093_device::nes_bf9093_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BF9093, "NES Cart Camerica BF9093 PCB", tag, owner, clock, "nes_bf9093", __FILE__)
 {
 }
 
-nes_bf9096_device::nes_bf9096_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_bf9096_device::nes_bf9096_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BF9096, "NES Cart Camerica BF9096 PCB", tag, owner, clock, "nes_bf9096", __FILE__), m_bank_base(0), m_latch(0)
 				{
 }
 
-nes_golden5_device::nes_golden5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_golden5_device::nes_golden5_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_GOLDEN5, "NES Cart Camerica Golden 5 PCB", tag, owner, clock, "nes_golden5", __FILE__), m_bank_base(0), m_latch(0)
 				{
 }

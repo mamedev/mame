@@ -41,7 +41,7 @@
 class de_2_state : public genpin_class
 {
 public:
-	de_2_state(const machine_config &mconfig, device_type type, const char *tag)
+	de_2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag),
 			m_ym2151(*this, "ym2151"),
 			m_audiocpu(*this, "audiocpu"),

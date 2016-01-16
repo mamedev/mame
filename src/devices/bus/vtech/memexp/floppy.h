@@ -29,7 +29,7 @@ class floppy_controller_device : public device_t, public device_memexp_interface
 {
 public:
 	// construction/destruction
-	floppy_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	floppy_controller_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_ADDRESS_MAP(map, 8);
 

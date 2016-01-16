@@ -40,7 +40,7 @@ ft5_v6_c4.u58 /
 class koftball_state : public driver_device
 {
 public:
-	koftball_state(const machine_config &mconfig, device_type type, const char *tag)
+	koftball_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_main_ram(*this, "main_ram"),

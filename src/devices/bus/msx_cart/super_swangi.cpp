@@ -7,7 +7,7 @@
 const device_type MSX_CART_SUPER_SWANGI = &device_creator<msx_cart_super_swangi>;
 
 
-msx_cart_super_swangi::msx_cart_super_swangi(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_super_swangi::msx_cart_super_swangi(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_SUPER_SWANGI, "MSX Cartridge - Super Swangi", tag, owner, clock, "msx_cart_super_swangi", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_selected_bank(0)

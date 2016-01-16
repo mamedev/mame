@@ -27,7 +27,7 @@ const device_type CASSETTE = &device_creator<cassette_image_device>;
 //  cassette_image_device - constructor
 //-------------------------------------------------
 
-cassette_image_device::cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cassette_image_device::cassette_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CASSETTE, "Cassette", tag, owner, clock, "cassette_image", __FILE__),
 	device_image_interface(mconfig, *this),
 	m_cassette(nullptr),
@@ -391,7 +391,7 @@ void cassette_image_device::call_display()
 	y = 0.5f;
 
 	cassette_device_iterator iter(device().machine().root_device());
-	for (dev = iter.first(); dev != nullptr && strcmp( dev->tag(), device().tag() ); dev = iter.next())
+	for (dev = iter.first(); dev != nullptr && dev->tag()!=device().tag(); dev = iter.next())
 		y += 1;
 
 	y *= device().machine().ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;

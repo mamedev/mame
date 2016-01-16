@@ -121,7 +121,7 @@ class gf1_device :
 {
 public:
 	// construction/destruction
-	gf1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gf1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_txirq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_txirq_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_rxirq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_rxirq_handler.set_callback(object); }
@@ -267,7 +267,7 @@ class isa16_gus_device :
 	public device_isa16_card_interface
 {
 public:
-	isa16_gus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa16_gus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	void set_irq(UINT8 source);
 	void reset_irq(UINT8 source);
 	void set_midi_irq(UINT8 source);

@@ -36,7 +36,7 @@ DEVICE_ADDRESS_MAP_START(map, 32, lpc_acpi_device)
 	AM_RANGE(0x70, 0x73) AM_READWRITE8 (sw_irq_gen_r,     sw_irq_gen_w,     0x000000ff)
 ADDRESS_MAP_END
 
-lpc_acpi_device::lpc_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+lpc_acpi_device::lpc_acpi_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: lpc_device(mconfig, LPC_ACPI, "LPC ACPI", tag, owner, clock, "lpc_acpi", __FILE__)
 {
 }
@@ -88,7 +88,7 @@ READ16_MEMBER( lpc_acpi_device::pm1_sts_r)
 WRITE16_MEMBER(lpc_acpi_device::pm1_sts_w)
 {
 	pm1_sts &= ~data;
-	logerror("%s: pm1_sts = %04x\n", tag(), pm1_sts);
+	logerror("%s: pm1_sts = %04x\n", tag().c_str(), pm1_sts);
 }
 
 READ16_MEMBER( lpc_acpi_device::pm1_en_r)
@@ -99,7 +99,7 @@ READ16_MEMBER( lpc_acpi_device::pm1_en_r)
 WRITE16_MEMBER(lpc_acpi_device::pm1_en_w)
 {
 	COMBINE_DATA(&pm1_en);
-	logerror("%s: pm1_en = %04x\n", tag(), pm1_en);
+	logerror("%s: pm1_en = %04x\n", tag().c_str(), pm1_en);
 }
 
 READ32_MEMBER( lpc_acpi_device::pm1_cnt_r)
@@ -110,7 +110,7 @@ READ32_MEMBER( lpc_acpi_device::pm1_cnt_r)
 WRITE32_MEMBER(lpc_acpi_device::pm1_cnt_w)
 {
 	COMBINE_DATA(&pm1_cnt);
-	logerror("%s: pm1_cnt = %08x\n", tag(), pm1_cnt);
+	logerror("%s: pm1_cnt = %08x\n", tag().c_str(), pm1_cnt);
 }
 
 READ32_MEMBER(lpc_acpi_device::pm1_tmr_r)
@@ -126,7 +126,7 @@ READ32_MEMBER( lpc_acpi_device::proc_cnt_r)
 WRITE32_MEMBER(lpc_acpi_device::proc_cnt_w)
 {
 	COMBINE_DATA(&proc_cnt);
-	logerror("%s: proc_cnt = %08x\n", tag(), proc_cnt);
+	logerror("%s: proc_cnt = %08x\n", tag().c_str(), proc_cnt);
 }
 
 READ8_MEMBER(  lpc_acpi_device::lv2_r)
@@ -142,7 +142,7 @@ READ32_MEMBER( lpc_acpi_device::gpe0_sts_r)
 WRITE32_MEMBER(lpc_acpi_device::gpe0_sts_w)
 {
 	COMBINE_DATA(&gpe0_sts);
-	logerror("%s: gpe0_sts = %08x\n", tag(), gpe0_sts);
+	logerror("%s: gpe0_sts = %08x\n", tag().c_str(), gpe0_sts);
 }
 
 READ32_MEMBER( lpc_acpi_device::gpe0_en_r)
@@ -153,7 +153,7 @@ READ32_MEMBER( lpc_acpi_device::gpe0_en_r)
 WRITE32_MEMBER(lpc_acpi_device::gpe0_en_w)
 {
 	COMBINE_DATA(&gpe0_en);
-	logerror("%s: gpe0_en = %08x\n", tag(), gpe0_en);
+	logerror("%s: gpe0_en = %08x\n", tag().c_str(), gpe0_en);
 }
 
 READ32_MEMBER( lpc_acpi_device::smi_en_r)
@@ -164,7 +164,7 @@ READ32_MEMBER( lpc_acpi_device::smi_en_r)
 WRITE32_MEMBER(lpc_acpi_device::smi_en_w)
 {
 	COMBINE_DATA(&smi_en);
-	logerror("%s: smi_en = %08x\n", tag(), smi_en);
+	logerror("%s: smi_en = %08x\n", tag().c_str(), smi_en);
 }
 
 READ32_MEMBER( lpc_acpi_device::smi_sts_r)
@@ -175,7 +175,7 @@ READ32_MEMBER( lpc_acpi_device::smi_sts_r)
 WRITE32_MEMBER(lpc_acpi_device::smi_sts_w)
 {
 	COMBINE_DATA(&smi_sts);
-	logerror("%s: smi_sts = %08x\n", tag(), smi_sts);
+	logerror("%s: smi_sts = %08x\n", tag().c_str(), smi_sts);
 }
 
 READ16_MEMBER( lpc_acpi_device::alt_gp_smi_en_r)
@@ -186,7 +186,7 @@ READ16_MEMBER( lpc_acpi_device::alt_gp_smi_en_r)
 WRITE16_MEMBER(lpc_acpi_device::alt_gp_smi_en_w)
 {
 	COMBINE_DATA(&alt_gp_smi_en);
-	logerror("%s: alt_gp_smi_en = %04x\n", tag(), alt_gp_smi_en);
+	logerror("%s: alt_gp_smi_en = %04x\n", tag().c_str(), alt_gp_smi_en);
 }
 
 READ16_MEMBER( lpc_acpi_device::alt_gp_smi_sts_r)
@@ -197,7 +197,7 @@ READ16_MEMBER( lpc_acpi_device::alt_gp_smi_sts_r)
 WRITE16_MEMBER(lpc_acpi_device::alt_gp_smi_sts_w)
 {
 	COMBINE_DATA(&alt_gp_smi_sts);
-	logerror("%s: alt_gp_smi_sts = %04x\n", tag(), alt_gp_smi_sts);
+	logerror("%s: alt_gp_smi_sts = %04x\n", tag().c_str(), alt_gp_smi_sts);
 }
 
 READ16_MEMBER( lpc_acpi_device::devact_sts_r)
@@ -208,7 +208,7 @@ READ16_MEMBER( lpc_acpi_device::devact_sts_r)
 WRITE16_MEMBER(lpc_acpi_device::devact_sts_w)
 {
 	COMBINE_DATA(&devact_sts);
-	logerror("%s: devact_sts = %04x\n", tag(), devact_sts);
+	logerror("%s: devact_sts = %04x\n", tag().c_str(), devact_sts);
 }
 
 READ16_MEMBER( lpc_acpi_device::devtrap_en_r)
@@ -219,18 +219,18 @@ READ16_MEMBER( lpc_acpi_device::devtrap_en_r)
 WRITE16_MEMBER(lpc_acpi_device::devtrap_en_w)
 {
 	COMBINE_DATA(&devtrap_en);
-	logerror("%s: devtrap_en = %04x\n", tag(), devtrap_en);
+	logerror("%s: devtrap_en = %04x\n", tag().c_str(), devtrap_en);
 }
 
 READ16_MEMBER( lpc_acpi_device::bus_addr_track_r)
 {
-	logerror("%s: read bus_addr_track\n", tag());
+	logerror("%s: read bus_addr_track\n", tag().c_str());
 	return 0;
 }
 
 READ8_MEMBER(  lpc_acpi_device::bus_cyc_track_r)
 {
-	logerror("%s: read bus_cyc_track\n", tag());
+	logerror("%s: read bus_cyc_track\n", tag().c_str());
 	return 0;
 }
 
@@ -243,7 +243,7 @@ READ8_MEMBER(  lpc_acpi_device::tco_rld_r)
 WRITE8_MEMBER( lpc_acpi_device::tco_rld_w)
 {
 	tco_rld = data;
-	logerror("%s: tco_rld = %02x\n", tag(), tco_rld);
+	logerror("%s: tco_rld = %02x\n", tag().c_str(), tco_rld);
 }
 
 READ8_MEMBER(  lpc_acpi_device::tco_tmr_r)
@@ -254,7 +254,7 @@ READ8_MEMBER(  lpc_acpi_device::tco_tmr_r)
 WRITE8_MEMBER( lpc_acpi_device::tco_tmr_w)
 {
 	tco_tmr = data;
-	logerror("%s: tco_tmr = %02x\n", tag(), tco_tmr);
+	logerror("%s: tco_tmr = %02x\n", tag().c_str(), tco_tmr);
 }
 
 READ8_MEMBER(  lpc_acpi_device::tco_dat_in_r)
@@ -265,7 +265,7 @@ READ8_MEMBER(  lpc_acpi_device::tco_dat_in_r)
 WRITE8_MEMBER( lpc_acpi_device::tco_dat_in_w)
 {
 	tco_dat_in = data;
-	logerror("%s: tco_dat_in = %02x\n", tag(), tco_dat_in);
+	logerror("%s: tco_dat_in = %02x\n", tag().c_str(), tco_dat_in);
 }
 
 READ8_MEMBER(  lpc_acpi_device::tco_dat_out_r)
@@ -276,7 +276,7 @@ READ8_MEMBER(  lpc_acpi_device::tco_dat_out_r)
 WRITE8_MEMBER( lpc_acpi_device::tco_dat_out_w)
 {
 	tco_dat_out = data;
-	logerror("%s: tco_dat_out = %02x\n", tag(), tco_dat_out);
+	logerror("%s: tco_dat_out = %02x\n", tag().c_str(), tco_dat_out);
 }
 
 READ16_MEMBER( lpc_acpi_device::tco1_sts_r)
@@ -287,7 +287,7 @@ READ16_MEMBER( lpc_acpi_device::tco1_sts_r)
 WRITE16_MEMBER(lpc_acpi_device::tco1_sts_w)
 {
 	COMBINE_DATA(&tco1_sts);
-	logerror("%s: tco1_sts = %04x\n", tag(), tco1_sts);
+	logerror("%s: tco1_sts = %04x\n", tag().c_str(), tco1_sts);
 }
 
 READ16_MEMBER( lpc_acpi_device::tco2_sts_r)
@@ -298,7 +298,7 @@ READ16_MEMBER( lpc_acpi_device::tco2_sts_r)
 WRITE16_MEMBER(lpc_acpi_device::tco2_sts_w)
 {
 	COMBINE_DATA(&tco2_sts);
-	logerror("%s: tco2_sts = %04x\n", tag(), tco2_sts);
+	logerror("%s: tco2_sts = %04x\n", tag().c_str(), tco2_sts);
 }
 
 READ16_MEMBER( lpc_acpi_device::tco1_cnt_r)
@@ -309,7 +309,7 @@ READ16_MEMBER( lpc_acpi_device::tco1_cnt_r)
 WRITE16_MEMBER(lpc_acpi_device::tco1_cnt_w)
 {
 	COMBINE_DATA(&tco1_cnt);
-	logerror("%s: tco1_cnt = %04x\n", tag(), tco1_cnt);
+	logerror("%s: tco1_cnt = %04x\n", tag().c_str(), tco1_cnt);
 }
 
 READ16_MEMBER( lpc_acpi_device::tco2_cnt_r)
@@ -320,7 +320,7 @@ READ16_MEMBER( lpc_acpi_device::tco2_cnt_r)
 WRITE16_MEMBER(lpc_acpi_device::tco2_cnt_w)
 {
 	COMBINE_DATA(&tco2_cnt);
-	logerror("%s: tco2_cnt = %04x\n", tag(), tco2_cnt);
+	logerror("%s: tco2_cnt = %04x\n", tag().c_str(), tco2_cnt);
 }
 
 READ8_MEMBER(  lpc_acpi_device::tco_message1_r)
@@ -331,7 +331,7 @@ READ8_MEMBER(  lpc_acpi_device::tco_message1_r)
 WRITE8_MEMBER( lpc_acpi_device::tco_message1_w)
 {
 	tco_message1 = data;
-	logerror("%s: tco_message1 = %02x\n", tag(), tco_message1);
+	logerror("%s: tco_message1 = %02x\n", tag().c_str(), tco_message1);
 }
 
 READ8_MEMBER(  lpc_acpi_device::tco_message2_r)
@@ -342,7 +342,7 @@ READ8_MEMBER(  lpc_acpi_device::tco_message2_r)
 WRITE8_MEMBER( lpc_acpi_device::tco_message2_w)
 {
 	tco_message2 = data;
-	logerror("%s: tco_message2 = %02x\n", tag(), tco_message2);
+	logerror("%s: tco_message2 = %02x\n", tag().c_str(), tco_message2);
 }
 
 READ8_MEMBER(  lpc_acpi_device::tco_wdstatus_r)
@@ -353,7 +353,7 @@ READ8_MEMBER(  lpc_acpi_device::tco_wdstatus_r)
 WRITE8_MEMBER( lpc_acpi_device::tco_wdstatus_w)
 {
 	tco_wdstatus = data;
-	logerror("%s: tco_wdstatus = %02x\n", tag(), tco_wdstatus);
+	logerror("%s: tco_wdstatus = %02x\n", tag().c_str(), tco_wdstatus);
 }
 
 READ8_MEMBER(  lpc_acpi_device::sw_irq_gen_r)
@@ -364,5 +364,5 @@ READ8_MEMBER(  lpc_acpi_device::sw_irq_gen_r)
 WRITE8_MEMBER( lpc_acpi_device::sw_irq_gen_w)
 {
 	sw_irq_gen = data;
-	logerror("%s: sw_irq_gen = %02x\n", tag(), sw_irq_gen);
+	logerror("%s: sw_irq_gen = %02x\n", tag().c_str(), sw_irq_gen);
 }

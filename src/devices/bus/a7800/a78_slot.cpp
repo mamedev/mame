@@ -62,7 +62,7 @@ device_a78_cart_interface::~device_a78_cart_interface ()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_a78_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_a78_cart_interface::rom_alloc(UINT32 size, std::string tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -112,7 +112,7 @@ void device_a78_cart_interface::nvram_alloc(UINT32 size)
 //-------------------------------------------------
 //  a78_cart_slot_device - constructor
 //-------------------------------------------------
-a78_cart_slot_device::a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a78_cart_slot_device::a78_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, A78_CART_SLOT, "Atari 7800 Cartridge Slot", tag, owner, clock, "a78_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this), m_cart(nullptr), m_type(0)

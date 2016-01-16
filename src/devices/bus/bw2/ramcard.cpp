@@ -46,7 +46,7 @@ const rom_entry *bw2_ramcard_device::device_rom_region() const
 //  bw2_ramcard_device - constructor
 //-------------------------------------------------
 
-bw2_ramcard_device::bw2_ramcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+bw2_ramcard_device::bw2_ramcard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, BW2_RAMCARD, "RAMCARD", tag, owner, clock, "bw2_ramcard", __FILE__),
 		device_bw2_expansion_slot_interface(mconfig, *this),
 		m_rom(*this, "ramcard"),

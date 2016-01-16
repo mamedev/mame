@@ -40,7 +40,7 @@
 class pce220_state : public driver_device
 {
 public:
-	pce220_state(const machine_config &mconfig, device_type type, const char *tag)
+	pce220_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_ram(*this, RAM_TAG),
@@ -102,7 +102,7 @@ public:
 class pcg850v_state : public pce220_state
 {
 public:
-	pcg850v_state(const machine_config &mconfig, device_type type, const char *tag)
+	pcg850v_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pce220_state(mconfig, type, tag)
 		{ }
 

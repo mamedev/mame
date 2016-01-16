@@ -27,7 +27,7 @@ ToDo:
 class st_mp200_state : public genpin_class
 {
 public:
-	st_mp200_state(const machine_config &mconfig, device_type type, const char *tag)
+	st_mp200_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_s14001a(*this, "speech")

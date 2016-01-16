@@ -7,11 +7,11 @@ class deco_mxc06_device : public device_t,
 								public device_video_interface
 {
 public:
-	deco_mxc06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	deco_mxc06_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 	static void set_gfx_region(device_t &device, int region);
 	static void set_ram_size(device_t &device, int size)
 	{

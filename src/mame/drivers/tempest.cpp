@@ -295,7 +295,7 @@ Note: Roms for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A03738
 class tempest_state : public driver_device
 {
 public:
-	tempest_state(const machine_config &mconfig, device_type type, const char *tag)
+	tempest_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mathbox(*this, "mathbox"),

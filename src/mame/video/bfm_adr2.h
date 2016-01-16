@@ -7,7 +7,7 @@ class bfm_adder2_device : public device_t
 {
 public:
 	// construction/destruction
-	bfm_adder2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bfm_adder2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	TILE_GET_INFO_MEMBER( get_tile0_info );
 	TILE_GET_INFO_MEMBER( get_tile1_info );

@@ -34,7 +34,7 @@ class i5000snd_device : public device_t,
 {
 public:
 	// construction/destruction
-	i5000snd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i5000snd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);

@@ -106,7 +106,7 @@
 
 const device_type TPI6525 = &device_creator<tpi6525_device>;
 
-tpi6525_device::tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tpi6525_device::tpi6525_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TPI6525, "6525 TPI", tag, owner, clock, "tpi6525", __FILE__),
 	m_out_irq_cb(*this),
 	m_in_pa_cb(*this),
@@ -196,7 +196,7 @@ void tpi6525_device::set_interrupt()
 	{
 		m_interrupt_level = 1;
 
-		DBG_LOG(machine(), 3, "tpi6525", ("%s set interrupt\n", tag()));
+		DBG_LOG(machine(), 3, "tpi6525", ("%s set interrupt\n", tag().c_str()));
 
 		m_out_irq_cb(m_interrupt_level);
 	}
@@ -209,7 +209,7 @@ void tpi6525_device::clear_interrupt()
 	{
 		m_interrupt_level = 0;
 
-		DBG_LOG(machine(), 3, "tpi6525", ("%s clear interrupt\n", tag()));
+		DBG_LOG(machine(), 3, "tpi6525", ("%s clear interrupt\n", tag().c_str()));
 
 		m_out_irq_cb(m_interrupt_level);
 	}
@@ -401,7 +401,7 @@ READ8_MEMBER( tpi6525_device::read )
 			data = (data & ~m_ddr_c) | (m_ddr_c & m_port_c);
 		}
 
-		DBG_LOG(machine(), 2, "tpi6525", ("%s read %.2x %.2x\n", tag(), offset, data));
+		DBG_LOG(machine(), 2, "tpi6525", ("%s read %.2x %.2x\n", tag().c_str(), offset, data));
 		break;
 
 	case 3:
@@ -460,7 +460,7 @@ READ8_MEMBER( tpi6525_device::read )
 
 	}
 
-	DBG_LOG(machine(), 3, "tpi6525", ("%s read %.2x %.2x\n", tag(), offset, data));
+	DBG_LOG(machine(), 3, "tpi6525", ("%s read %.2x %.2x\n", tag().c_str(), offset, data));
 
 	return data;
 }
@@ -468,7 +468,7 @@ READ8_MEMBER( tpi6525_device::read )
 
 WRITE8_MEMBER( tpi6525_device::write )
 {
-	DBG_LOG(machine(), 2, "tpi6525", ("%s write %.2x %.2x\n", tag(), offset, data));
+	DBG_LOG(machine(), 2, "tpi6525", ("%s write %.2x %.2x\n", tag().c_str(), offset, data));
 
 	switch (offset & 7)
 	{

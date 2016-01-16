@@ -116,7 +116,7 @@ struct acan_sprdma_regs_t
 class supracan_state : public driver_device
 {
 public:
-	supracan_state(const machine_config &mconfig, device_type type, const char *tag)
+	supracan_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_soundcpu(*this, "soundcpu"),
@@ -222,7 +222,7 @@ public:
 	TIMER_CALLBACK_MEMBER(supracan_line_off_callback);
 	TIMER_CALLBACK_MEMBER(supracan_video_callback);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(supracan_cart);
-	inline void verboselog(const char *tag, int n_level, const char *s_fmt, ...) ATTR_PRINTF(4,5);
+	inline void verboselog(std::string tag, int n_level, const char *s_fmt, ...) ATTR_PRINTF(4,5);
 	int supracan_tilemap_get_region(int layer);
 	void supracan_tilemap_get_info_common(int layer, tile_data &tileinfo, int count);
 	void supracan_tilemap_get_info_roz(int layer, tile_data &tileinfo, int count);
@@ -236,7 +236,7 @@ public:
 
 
 
-inline void supracan_state::verboselog(const char *tag, int n_level, const char *s_fmt, ...)
+inline void supracan_state::verboselog(std::string tag, int n_level, const char *s_fmt, ...)
 {
 #if ENABLE_VERBOSE_LOG
 	if( VERBOSE_LEVEL >= n_level )
@@ -246,7 +246,7 @@ inline void supracan_state::verboselog(const char *tag, int n_level, const char 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%06x: %s: %s", machine().device(tag)->safe_pc(), tag, buf );
+		logerror( "%06x: %s: %s", machine().device(tag)->safe_pc(), tag.c_str(), buf );
 	}
 #endif
 }

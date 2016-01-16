@@ -79,7 +79,7 @@ DAC and bitbanger values written should be reflected in the read.
 //  ctor
 //-------------------------------------------------
 
-coco_state::coco_state(const machine_config &mconfig, device_type type, const char *tag)
+coco_state::coco_state(const machine_config &mconfig, device_type type, std::string tag)
 	: driver_device(mconfig, type, tag),
 	m_maincpu(*this, MAINCPU_TAG),
 	m_pia_0(*this, PIA0_TAG),

@@ -46,7 +46,7 @@ public:
 		LATTR_BLINK = 0x04
 	};
 
-	oric_state(const machine_config &mconfig, device_type type, const char *tag)
+	oric_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_palette(*this, "palette"),
@@ -114,7 +114,7 @@ protected:
 class telestrat_state : public oric_state
 {
 public:
-	telestrat_state(const machine_config &mconfig, device_type type, const char *tag) :
+	telestrat_state(const machine_config &mconfig, device_type type, std::string tag) :
 		oric_state(mconfig, type, tag),
 		m_via2(*this, "via6522_2"),
 		m_fdc(*this, "fdc"),

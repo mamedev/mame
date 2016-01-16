@@ -57,7 +57,7 @@
 class abc1600_state : public driver_device
 {
 public:
-	abc1600_state(const machine_config &mconfig, device_type type, const char *tag)
+	abc1600_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, MC68008P8_TAG),
 			m_dma0(*this, Z8410AB1_0_TAG),

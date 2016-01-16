@@ -68,7 +68,7 @@ class lh5810_device :   public device_t
 {
 public:
 	// construction/destruction
-	lh5810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	lh5810_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_porta_r_callback(device_t &device, _Object object) { return downcast<lh5810_device &>(device).m_porta_r_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_porta_w_callback(device_t &device, _Object object) { return downcast<lh5810_device &>(device).m_porta_w_cb.set_callback(object); }

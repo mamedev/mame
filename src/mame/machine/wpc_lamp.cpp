@@ -6,7 +6,7 @@
 
 const device_type WPC_LAMP = &device_creator<wpc_lamp_device>;
 
-wpc_lamp_device::wpc_lamp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+wpc_lamp_device::wpc_lamp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, WPC_LAMP, "Williams Pinball Controller Lamp Control", tag, owner, clock, "wpc_lamp", __FILE__)
 {
 	names = nullptr;

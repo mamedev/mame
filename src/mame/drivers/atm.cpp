@@ -24,7 +24,7 @@ computer to boot up (with keyboard problems).
 class atm_state : public spectrum_state
 {
 public:
-	atm_state(const machine_config &mconfig, device_type type, const char *tag)
+	atm_state(const machine_config &mconfig, device_type type, std::string tag)
 		: spectrum_state(mconfig, type, tag)
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")

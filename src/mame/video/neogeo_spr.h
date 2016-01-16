@@ -21,8 +21,8 @@
 class neosprite_base_device : public device_t
 {
 public:
-	neosprite_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock,  device_type type);
-//  neosprite_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neosprite_base_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock,  device_type type);
+//  neosprite_base_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual void optimize_sprite_data();
 	virtual void set_optimized_sprite_data(UINT8* sprdata, UINT32 mask);
@@ -99,7 +99,7 @@ private:
 class neosprite_regular_device : public neosprite_base_device
 {
 public:
-	neosprite_regular_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neosprite_regular_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens) override;
 	virtual void set_sprite_region(UINT8* region_sprites, UINT32 region_sprites_size) override;
 
@@ -111,7 +111,7 @@ extern const device_type NEOGEO_SPRITE_REGULAR;
 class neosprite_optimized_device : public neosprite_base_device
 {
 public:
-	neosprite_optimized_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neosprite_optimized_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual void optimize_sprite_data() override;
 	virtual void set_optimized_sprite_data(UINT8* sprdata, UINT32 mask) override;
 	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens) override;
@@ -129,7 +129,7 @@ extern const device_type NEOGEO_SPRITE_OPTIMZIED;
 class neosprite_midas_device : public neosprite_base_device
 {
 public:
-	neosprite_midas_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neosprite_midas_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens) override;
 

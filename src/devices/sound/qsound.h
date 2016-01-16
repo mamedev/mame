@@ -32,7 +32,7 @@ class qsound_device : public device_t,
 						public device_sound_interface
 {
 public:
-	qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	qsound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~qsound_device() { }
 
 	DECLARE_WRITE8_MEMBER(qsound_w);

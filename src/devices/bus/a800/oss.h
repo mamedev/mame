@@ -12,7 +12,7 @@ class a800_rom_oss8k_device : public a800_rom_device
 {
 public:
 	// construction/destruction
-	a800_rom_oss8k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a800_rom_oss8k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -32,7 +32,7 @@ class a800_rom_oss34_device : public a800_rom_device
 {
 public:
 	// construction/destruction
-	a800_rom_oss34_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a800_rom_oss34_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -52,7 +52,7 @@ class a800_rom_oss43_device : public a800_rom_device
 {
 public:
 	// construction/destruction
-	a800_rom_oss43_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a800_rom_oss43_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -72,7 +72,7 @@ class a800_rom_oss91_device : public a800_rom_device
 {
 public:
 	// construction/destruction
-	a800_rom_oss91_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a800_rom_oss91_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

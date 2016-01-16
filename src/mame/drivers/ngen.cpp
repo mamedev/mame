@@ -80,7 +80,7 @@
 class ngen_state : public driver_device
 {
 public:
-	ngen_state(const machine_config &mconfig, device_type type, const char *tag)
+	ngen_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_i386cpu(*this,"i386cpu"),
@@ -186,7 +186,7 @@ private:
 class ngen386_state : public ngen_state
 {
 public:
-	ngen386_state(const machine_config &mconfig, device_type type, const char *tag)
+	ngen386_state(const machine_config &mconfig, device_type type, std::string tag)
 		: ngen_state(mconfig, type, tag)
 		{}
 private:

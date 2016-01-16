@@ -52,7 +52,7 @@ MX29F1610MC 16M FlashROM (x7)
 class xtom3d_state : public pcat_base_state
 {
 public:
-	xtom3d_state(const machine_config &mconfig, device_type type, const char *tag)
+	xtom3d_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pcat_base_state(mconfig, type, tag)
 			{ }
 

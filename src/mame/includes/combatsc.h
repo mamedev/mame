@@ -12,7 +12,7 @@
 class combatsc_state : public driver_device
 {
 public:
-	combatsc_state(const machine_config &mconfig, device_type type, const char *tag)
+	combatsc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_audiocpu(*this, "audiocpu"),
 		m_k007121_1(*this, "k007121_1"),

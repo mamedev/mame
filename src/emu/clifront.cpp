@@ -247,7 +247,7 @@ int cli_frontend::execute(int argc, char **argv)
 	}
 	catch (add_exception &aex)
 	{
-		osd_printf_error("Tag '%s' already exists in tagged_list\n", aex.tag());
+		osd_printf_error("Tag '%s' already exists in tagged_list\n", aex.tag().c_str());
 		m_result = MAMERR_FATALERROR;
 	}
 	catch (std::exception &ex)
@@ -553,7 +553,7 @@ int cli_frontend::compare_devices(const void *i1, const void *i2)
 {
 	device_t *dev1 = *(device_t **)i1;
 	device_t *dev2 = *(device_t **)i2;
-	return strcmp(dev1->tag(), dev2->tag());
+	return dev1->tag()!=dev2->tag();
 }
 
 void cli_frontend::listdevices(const char *gamename)
@@ -586,27 +586,28 @@ void cli_frontend::listdevices(const char *gamename)
 		for (auto device : device_list)
 		{
 			// extract the tag, stripping the leading colon
-			const char *tag = device->tag();
-			if (*tag == ':')
-				tag++;
+			std::string tag = device->tag();
+			if (tag[0] == ':')
+				tag = tag.erase(0, 1);
 
 			// determine the depth
 			int depth = 1;
-			if (*tag == 0)
+			if (tag.empty())
 			{
 				tag = "<root>";
 				depth = 0;
 			}
 			else
 			{
-				for (const char *c = tag; *c != 0; c++)
+				const char *tag_c = tag.c_str();
+				for (const char *c = tag_c; *c != 0; c++)
 					if (*c == ':')
 					{
-						tag = c + 1;
+						tag_c = c + 1;
 						depth++;
 					}
 			}
-			printf("   %*s%-*s %s", depth * 2, "", 30 - depth * 2, tag, device->name());
+			printf("   %*s%-*s %s", depth * 2, "", 30 - depth * 2, tag.c_str(), device->name());
 
 			// add more information
 			UINT32 clock = device->clock();
@@ -651,7 +652,7 @@ void cli_frontend::listslots(const char *gamename)
 		{
 			if (slot->fixed()) continue;
 			// output the line, up to the list of extensions
-			printf("%-13s%-10s   ", first ? drivlist.driver().name : "", slot->device().tag()+1);
+			printf("%-13s%-10s   ", first ? drivlist.driver().name : "", std::string(slot->device().tag()).erase(0,1).c_str());
 
 			bool first_option = true;
 

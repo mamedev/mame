@@ -23,7 +23,7 @@
 class exerion_state : public driver_device
 {
 public:
-	exerion_state(const machine_config &mconfig, device_type type, const char *tag)
+	exerion_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_main_ram(*this, "main_ram"),
 		m_videoram(*this, "videoram"),

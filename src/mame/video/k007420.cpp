@@ -18,7 +18,7 @@ and a variable amount of ROM. Nothing is known about its external interface.
 
 const device_type K007420 = &device_creator<k007420_device>;
 
-k007420_device::k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k007420_device::k007420_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K007420, "K007420 Sprite Generator", tag, owner, clock, "k007420", __FILE__),
 	m_ram(nullptr),
 	m_flipscreen(0),
@@ -251,7 +251,7 @@ void k007420_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 //  palette device
 //-------------------------------------------------
 
-void k007420_device::static_set_palette_tag(device_t &device, const char *tag)
+void k007420_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<k007420_device &>(device).m_palette.set_tag(tag);
 }

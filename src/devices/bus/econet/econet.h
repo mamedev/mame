@@ -56,7 +56,7 @@ class econet_device : public device_t
 {
 public:
 	// construction/destruction
-	econet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	econet_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_clk_wr_callback(device_t &device, _Object object) { return downcast<econet_device &>(device).m_write_clk.set_callback(object); }
 	template<class _Object> static devcb_base &set_data_wr_callback(device_t &device, _Object object) { return downcast<econet_device &>(device).m_write_data.set_callback(object); }
@@ -116,7 +116,7 @@ class econet_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	econet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	econet_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

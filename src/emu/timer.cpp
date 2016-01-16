@@ -32,7 +32,7 @@ const device_type TIMER = &device_creator<timer_device>;
 //  timer_device - constructor
 //-------------------------------------------------
 
-timer_device::timer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+timer_device::timer_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TIMER, "Timer", tag, owner, clock, "timer", __FILE__),
 		m_type(TIMER_TYPE_GENERIC),
 		m_callback(timer_device_expired_delegate()),
@@ -40,7 +40,6 @@ timer_device::timer_device(const machine_config &mconfig, const char *tag, devic
 		m_start_delay(attotime::zero),
 		m_period(attotime::zero),
 		m_param(0),
-		m_screen_tag(nullptr),
 		m_screen(nullptr),
 		m_first_vpos(0),
 		m_increment(0),
@@ -82,7 +81,7 @@ void timer_device::static_configure_periodic(device_t &device, timer_device_expi
 //  helper to set up a scanline timer
 //-------------------------------------------------
 
-void timer_device::static_configure_scanline(device_t &device, timer_device_expired_delegate callback, const char *screen, int first_vpos, int increment)
+void timer_device::static_configure_scanline(device_t &device, timer_device_expired_delegate callback, std::string screen, int first_vpos, int increment)
 {
 	timer_device &timer = downcast<timer_device &>(device);
 	timer.m_type = TIMER_TYPE_SCANLINE;
@@ -152,14 +151,14 @@ void timer_device::device_validity_check(validity_checker &valid) const
 	switch (m_type)
 	{
 		case TIMER_TYPE_GENERIC:
-			if (m_screen_tag != nullptr || m_first_vpos != 0 || m_start_delay != attotime::zero)
+			if (!m_screen_tag.empty() || m_first_vpos != 0 || m_start_delay != attotime::zero)
 				osd_printf_warning("Generic timer specified parameters for a scanline timer\n");
 			if (m_period != attotime::zero || m_start_delay != attotime::zero)
 				osd_printf_warning("Generic timer specified parameters for a periodic timer\n");
 			break;
 
 		case TIMER_TYPE_PERIODIC:
-			if (m_screen_tag != nullptr || m_first_vpos != 0)
+			if (!m_screen_tag.empty() || m_first_vpos != 0)
 				osd_printf_warning("Periodic timer specified parameters for a scanline timer\n");
 			if (m_period <= attotime::zero)
 				osd_printf_error("Periodic timer specified invalid period\n");
@@ -191,7 +190,7 @@ void timer_device::device_validity_check(validity_checker &valid) const
 void timer_device::device_start()
 {
 	// fetch the screen
-	if (m_screen_tag != nullptr)
+	if (!m_screen_tag.empty())
 		m_screen = machine().device<screen_device>(m_screen_tag);
 
 	// allocate the timer
@@ -235,7 +234,7 @@ void timer_device::device_reset()
 
 		case TIMER_TYPE_SCANLINE:
 			if (m_screen == nullptr)
-				fatalerror("timer '%s': unable to find screen '%s'\n", tag(), m_screen_tag);
+				fatalerror("timer '%s': unable to find screen '%s'\n", tag().c_str(), m_screen_tag.c_str());
 
 			// set the timer to fire immediately
 			m_first_time = true;

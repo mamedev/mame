@@ -3393,7 +3393,7 @@ void cp1610_cpu_device::execute_set_input(int irqline, int state)
 }
 
 
-cp1610_cpu_device::cp1610_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cp1610_cpu_device::cp1610_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, CP1610, "CP1610", tag, owner, clock, "cp1610", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_read_bext(*this)

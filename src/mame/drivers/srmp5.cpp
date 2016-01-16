@@ -66,7 +66,7 @@ This is not a bug (real machine behaves the same).
 class srmp5_state : public driver_device
 {
 public:
-	srmp5_state(const machine_config &mconfig, device_type type, const char *tag)
+	srmp5_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_palette(*this, "palette"),

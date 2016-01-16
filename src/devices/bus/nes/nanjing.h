@@ -12,7 +12,7 @@ class nes_nanjing_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_nanjing_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_nanjing_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

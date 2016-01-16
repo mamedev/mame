@@ -21,7 +21,7 @@ class konppc_device :  public device_t
 {
 public:
 	// construction/destruction
-	konppc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	konppc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void static_set_num_boards(device_t &device, int num) { downcast<konppc_device &>(device).num_cgboards = num; }
 	static void static_set_cbboard_type(device_t &device, int cgtype) { downcast<konppc_device &>(device).cgboard_type = cgtype; }

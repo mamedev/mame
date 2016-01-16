@@ -99,7 +99,7 @@ WRITE16_MEMBER(tmp68301_device::pdr_w)
 }
 
 
-tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tmp68301_device::tmp68301_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMP68301, "TMP68301", tag, owner, clock, "tmp68301", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_in_parallel_cb(*this),

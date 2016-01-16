@@ -30,7 +30,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_
 
 const device_type SGI_MC = &device_creator<sgi_mc_device>;
 
-sgi_mc_device::sgi_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sgi_mc_device::sgi_mc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SGI_MC, "SGI Memory Controller", tag, owner, clock, "sgi_mc", __FILE__),
 		m_tUpdateTimer(nullptr),
 		m_nCPUControl0(0),

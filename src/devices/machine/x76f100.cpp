@@ -25,14 +25,14 @@ inline void ATTR_PRINTF( 3, 4 ) x76f100_device::verboselog( int n_level, const c
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: x76f100(%s) %s", machine().describe_context(), tag(), buf );
+		logerror( "%s: x76f100(%s) %s", machine().describe_context(), tag().c_str(), buf );
 	}
 }
 
 // device type definition
 const device_type X76F100 = &device_creator<x76f100_device>;
 
-x76f100_device::x76f100_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+x76f100_device::x76f100_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock )
 	: device_t( mconfig, X76F100, "X76F100 Flash", tag, owner, clock, "x76f100", __FILE__ ),
 	device_nvram_interface(mconfig, *this),
 	m_cs( 0 ),
@@ -393,11 +393,11 @@ void x76f100_device::nvram_default()
 
 	if( !m_region )
 	{
-		logerror( "x76f100(%s) region not found\n", tag() );
+		logerror( "x76f100(%s) region not found\n", tag().c_str() );
 	}
 	else if( m_region->bytes() != expected_size )
 	{
-		logerror("x76f100(%s) region length 0x%x expected 0x%x\n", tag(), m_region->bytes(), expected_size );
+		logerror("x76f100(%s) region length 0x%x expected 0x%x\n", tag().c_str(), m_region->bytes(), expected_size );
 	}
 	else
 	{

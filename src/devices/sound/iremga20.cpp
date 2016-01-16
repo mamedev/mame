@@ -46,7 +46,7 @@ const device_type IREMGA20 = &device_creator<iremga20_device>;
 //  iremga20_device - constructor
 //-------------------------------------------------
 
-iremga20_device::iremga20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iremga20_device::iremga20_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, IREMGA20, "Irem GA20", tag, owner, clock, "iremga20", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_rom(nullptr),

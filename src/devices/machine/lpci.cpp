@@ -89,12 +89,11 @@ const device_type PCI_BUS_LEGACY = &device_creator<pci_bus_legacy_device>;
 //-------------------------------------------------
 //  pci_bus_legacy_device - constructor
 //-------------------------------------------------
-pci_bus_legacy_device::pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pci_bus_legacy_device::pci_bus_legacy_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PCI_BUS_LEGACY, "PCI Bus Legacy", tag, owner, clock, "pci_bus_legacy", __FILE__),
 		m_father(nullptr)
 {
 	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++) {
-		m_devtag[i]= nullptr;
 		m_read_callback[i] = nullptr;
 		m_write_callback[i] = nullptr;
 	}
@@ -133,7 +132,7 @@ READ32_MEMBER( pci_bus_legacy_device::read )
 	}
 
 	if (LOG_PCI)
-		logerror("read('%s'): offset=%d result=0x%08X\n", tag(), offset, result);
+		logerror("read('%s'): offset=%d result=0x%08X\n", tag().c_str(), offset, result);
 
 	return result;
 }
@@ -165,7 +164,7 @@ WRITE32_MEMBER( pci_bus_legacy_device::write )
 	offset %= 2;
 
 	if (LOG_PCI)
-		logerror("write('%s'): offset=%d data=0x%08X\n", tag(), offset, data);
+		logerror("write('%s'): offset=%d data=0x%08X\n", tag().c_str(), offset, data);
 
 	switch (offset)
 	{
@@ -263,7 +262,7 @@ void pci_bus_legacy_device::device_start()
 
 	/* find all our devices */
 	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++)
-		if (m_devtag[i] != nullptr)
+		if (!m_devtag[i].empty())
 			m_device[i] = machine().device(m_devtag[i]);
 
 	if (m_father != nullptr) {

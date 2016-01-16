@@ -606,10 +606,10 @@ struct mc68328_regs_t
 class mc68328_device : public device_t
 {
 public:
-	mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc68328_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~mc68328_device() {}
 
-	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<mc68328_device &>(device).m_cpu.set_tag(tag); }
+	static void static_set_cpu_tag(device_t &device, std::string tag) { downcast<mc68328_device &>(device).m_cpu.set_tag(tag); }
 	template<class _Object> static devcb_base &set_out_port_a_callback(device_t &device, _Object object) { return downcast<mc68328_device &>(device).m_out_port_a_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_port_b_callback(device_t &device, _Object object) { return downcast<mc68328_device &>(device).m_out_port_b_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_port_c_callback(device_t &device, _Object object) { return downcast<mc68328_device &>(device).m_out_port_c_cb.set_callback(object); }

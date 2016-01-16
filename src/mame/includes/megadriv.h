@@ -40,7 +40,7 @@ struct genesis_z80_vars
 class md_base_state : public driver_device
 {
 public:
-	md_base_state(const machine_config &mconfig, device_type type, const char *tag)
+	md_base_state(const machine_config &mconfig, device_type type, std::string tag)
 	: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_z80snd(*this,"genesis_snd_z80"),
@@ -135,7 +135,7 @@ public:
 class md_boot_state : public md_base_state
 {
 public:
-	md_boot_state(const machine_config &mconfig, device_type type, const char *tag)
+	md_boot_state(const machine_config &mconfig, device_type type, std::string tag)
 	: md_base_state(mconfig, type, tag) { m_protcount = 0;}
 
 	// bootleg specific

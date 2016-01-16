@@ -45,7 +45,7 @@ machine_config_constructor cr511b_device::device_mconfig_additions() const
 //  cr511b_device - constructor
 //-------------------------------------------------
 
-cr511b_device::cr511b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cr511b_device::cr511b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CR511B, "CR-511-B CD-ROM drive", tag, owner, clock, "cr511b", __FILE__),
 	m_cdrom(*this, "cdrom"),
 	m_cdda(*this, "cdda"),

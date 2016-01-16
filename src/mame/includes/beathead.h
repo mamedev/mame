@@ -13,7 +13,7 @@
 class beathead_state : public atarigen_state
 {
 public:
-	beathead_state(const machine_config &mconfig, device_type type, const char *tag)
+	beathead_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atarigen_state(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_jsa(*this, "jsa"),

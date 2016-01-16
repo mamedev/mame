@@ -44,7 +44,7 @@ ToDo:
 class z9001_state : public driver_device
 {
 public:
-	z9001_state(const machine_config &mconfig, device_type type, const char *tag)
+	z9001_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_framecnt(0),

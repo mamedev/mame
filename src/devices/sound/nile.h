@@ -28,7 +28,7 @@ class nile_device : public device_t,
 					public device_sound_interface
 {
 public:
-	nile_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nile_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~nile_device() { }
 
 protected:

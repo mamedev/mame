@@ -49,7 +49,7 @@ const device_type TEA1002 = &device_creator<tea1002_device>;
 //  paula_device - constructor
 //-------------------------------------------------
 
-tea1002_device::tea1002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+tea1002_device::tea1002_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, TEA1002, "TEA1002 PAL colour encoder", tag, owner, clock, "tea1002", __FILE__)
 {
 }

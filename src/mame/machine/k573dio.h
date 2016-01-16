@@ -17,7 +17,7 @@
 class k573dio_device : public device_t
 {
 public:
-	k573dio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k573dio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _write> void set_output_cb(_write _output_cb)
 	{

@@ -1094,7 +1094,7 @@ The lever must be wired to analog port 0 (pin B22 parts side) of the Namco 48-wa
 class namcos12_state : public driver_device
 {
 public:
-	namcos12_state(const machine_config &mconfig, device_type type, const char *tag)
+	namcos12_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "maincpu:ram"),

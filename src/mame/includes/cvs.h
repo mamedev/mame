@@ -22,7 +22,7 @@ struct cvs_star
 class cvs_state : public driver_device
 {
 public:
-	cvs_state(const machine_config &mconfig, device_type type, const char *tag)
+	cvs_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_video_ram(*this, "video_ram"),
 			m_bullet_ram(*this, "bullet_ram"),

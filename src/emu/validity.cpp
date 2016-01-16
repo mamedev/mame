@@ -852,7 +852,7 @@ void validity_checker::validate_condition(ioport_condition &condition, device_t 
 	// resolve the tag
 	// then find a matching port
 	if (port_map.find(device.subtag(condition.tag())) == port_map.end())
-		osd_printf_error("Condition referencing non-existent ioport tag '%s'\n", condition.tag());
+		osd_printf_error("Condition referencing non-existent ioport tag '%s'\n", condition.tag().c_str());
 }
 
 
@@ -887,12 +887,12 @@ void validity_checker::validate_inputs()
 		// do a first pass over ports to add their names and find duplicates
 		for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
 			if (!port_map.insert(port->tag()).second)
-				osd_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port->tag());
+				osd_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port->tag().c_str());
 
 		// iterate over ports
 		for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
 		{
-			m_current_ioport = port->tag();
+			m_current_ioport = port->tag().c_str();
 
 			// iterate through the fields on this port
 			for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
@@ -983,7 +983,7 @@ void validity_checker::validate_devices()
 
 		// look for duplicates
 		if (!device_map.insert(device->tag()).second)
-			osd_printf_error("Multiple devices with the same tag '%s' defined\n", device->tag());
+			osd_printf_error("Multiple devices with the same tag '%s' defined\n", device->tag().c_str());
 
 		// all devices must have a shortname
 		if (strcmp(device->shortname(), "") == 0)
@@ -1042,7 +1042,7 @@ void validity_checker::build_output_prefix(std::string &str)
 
 	// if we have a current (non-root) device, indicate that
 	if (m_current_device != nullptr && m_current_device->owner() != nullptr)
-		str.append(m_current_device->name()).append(" device '").append(m_current_device->tag()+1).append("': ");
+		str.append(m_current_device->name()).append(" device '").append(m_current_device->tag().c_str()+1).append("': ");
 
 	// if we have a current port, indicate that as well
 	if (m_current_ioport != nullptr)

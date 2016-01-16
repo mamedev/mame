@@ -117,7 +117,7 @@ www.multitech.com
 class iteagle_state : public driver_device
 {
 public:
-	iteagle_state(const machine_config &mconfig, device_type type, const char *tag)
+	iteagle_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{}

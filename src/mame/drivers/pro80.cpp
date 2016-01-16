@@ -28,7 +28,7 @@ The cassette used 2 bits for input, plus a D flipflop and a 74LS221 oneshot.
 class pro80_state : public driver_device
 {
 public:
-	pro80_state(const machine_config &mconfig, device_type type, const char *tag)
+	pro80_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_cass(*this, "cassette")

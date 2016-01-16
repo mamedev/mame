@@ -22,7 +22,7 @@ const device_type NVRAM = &device_creator<nvram_device>;
 //  nvram_device - constructor
 //-------------------------------------------------
 
-nvram_device::nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nvram_device::nvram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NVRAM, "NVRAM", tag, owner, clock, "nvram", __FILE__),
 		device_nvram_interface(mconfig, *this),
 		m_default_value(DEFAULT_ALL_1),
@@ -158,12 +158,12 @@ void nvram_device::determine_final_base()
 	{
 		memory_share *share = owner()->memshare(tag());
 		if (share == nullptr)
-			throw emu_fatalerror("NVRAM device '%s' has no corresponding AM_SHARE region", tag());
+			throw emu_fatalerror("NVRAM device '%s' has no corresponding AM_SHARE region", tag().c_str());
 		m_base = share->ptr();
 		m_length = share->bytes();
 	}
 
 	// if we are region-backed for the default, find it now and make sure it's the right size
 	if (m_region != nullptr && m_region->bytes() != m_length)
-		throw emu_fatalerror("NVRAM device '%s' has a default region, but it should be 0x%" SIZETFMT "X bytes", tag(), m_length);
+		throw emu_fatalerror("NVRAM device '%s' has a default region, but it should be 0x%" SIZETFMT "X bytes", tag().c_str(), m_length);
 }

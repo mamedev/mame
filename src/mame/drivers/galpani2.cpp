@@ -332,14 +332,14 @@ WRITE8_MEMBER(galpani2_state::galpani2_coin_lockout_w)
 WRITE8_MEMBER(galpani2_state::galpani2_oki1_bank_w)
 {
 	UINT8 *ROM = memregion("oki1")->base();
-	logerror("%s : %s bank %08X\n",machine().describe_context(),tag(),data);
+	logerror("%s : %s bank %08X\n",machine().describe_context(),tag().c_str(),data);
 	memcpy(ROM + 0x30000, ROM + 0x40000 + 0x10000 * (~data & 0xf), 0x10000);
 }
 
 WRITE8_MEMBER(galpani2_state::galpani2_oki2_bank_w)
 {
 	m_oki2->set_bank_base(0x40000 * (data & 0xf) );
-	logerror("%s : %s bank %08X\n",machine().describe_context(),tag(),data);
+	logerror("%s : %s bank %08X\n",machine().describe_context(),tag().c_str(),data);
 }
 
 

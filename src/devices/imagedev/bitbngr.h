@@ -14,7 +14,7 @@ class bitbanger_device : public device_t,
 {
 public:
 	// construction/destruction
-	bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bitbanger_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
 	virtual bool call_load() override;

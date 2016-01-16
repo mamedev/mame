@@ -24,7 +24,7 @@ struct lcd_spi_t
 class hp49gp_state : public driver_device
 {
 public:
-	hp49gp_state(const machine_config &mconfig, device_type type, const char *tag)
+	hp49gp_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_s3c2410(*this, "s3c2410"),
 		m_steppingstone(*this, "steppingstone"),

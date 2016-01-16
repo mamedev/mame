@@ -34,7 +34,7 @@ Very likely to be 'whatever crystals we had on hand which were close enough for 
 class silvmil_state : public driver_device
 {
 public:
-	silvmil_state(const machine_config &mconfig, device_type type, const char *tag)
+	silvmil_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_gfxdecode(*this, "gfxdecode"),

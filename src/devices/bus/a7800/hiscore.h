@@ -13,7 +13,7 @@ class a78_hiscore_device : public a78_rom_device
 {
 public:
 	// construction/destruction
-	a78_hiscore_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a78_hiscore_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

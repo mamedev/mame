@@ -75,7 +75,7 @@ TODO:
 const device_type MINX = &device_creator<minx_cpu_device>;
 
 
-minx_cpu_device::minx_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+minx_cpu_device::minx_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, MINX, "Nintendo Minx", tag, owner, clock, "minx", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 24, 0)
 {

@@ -69,7 +69,7 @@ class tms3556_device :  public device_t,
 {
 public:
 	// construction/destruction
-	tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms3556_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( vram_r );
 	DECLARE_WRITE8_MEMBER( vram_w );

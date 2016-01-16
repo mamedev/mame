@@ -28,7 +28,7 @@ const device_type WSWAN_SND = &device_creator<wswan_sound_device>;
 //  wswan_sound_device - constructor
 //-------------------------------------------------
 
-wswan_sound_device::wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+wswan_sound_device::wswan_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WSWAN_SND, "WonderSwan Audio Custom", tag, owner, clock, "wswan_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),

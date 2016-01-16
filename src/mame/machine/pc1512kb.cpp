@@ -225,7 +225,7 @@ ioport_constructor pc1512_keyboard_device::device_input_ports() const
 //  pc1512_keyboard_device - constructor
 //-------------------------------------------------
 
-pc1512_keyboard_device::pc1512_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pc1512_keyboard_device::pc1512_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PC1512_KEYBOARD, "Amstrad PC1512 Keyboard", tag, owner, clock, "pc1512kb", __FILE__),
 		m_maincpu(*this, I8048_TAG),
 		m_y1(*this, "Y1"),

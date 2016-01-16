@@ -58,7 +58,7 @@ class cdp1852_device :  public device_t
 {
 public:
 	// construction/destruction
-	cdp1852_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cdp1852_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_mode_rd_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_read_mode.set_callback(object); }
 	template<class _Object> static devcb_base &set_sr_wr_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_write_sr.set_callback(object); }

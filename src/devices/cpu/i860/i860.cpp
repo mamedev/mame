@@ -34,7 +34,7 @@ enum {
 const device_type I860 = &device_creator<i860_cpu_device>;
 
 
-i860_cpu_device::i860_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i860_cpu_device::i860_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, I860, "i860XR", tag, owner, clock, "i860xr", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 64, 32, 0), m_pc(0), m_merge(0), m_pin_bus_hold(0), m_pin_reset(0), m_exiting_readmem(0), m_exiting_ifetch(0), m_pc_updated(0), m_pending_trap(0), m_fir_gets_trap_addr(0), m_single_stepping(0), m_program(nullptr), m_icount(0)
 {

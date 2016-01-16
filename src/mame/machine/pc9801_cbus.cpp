@@ -51,7 +51,7 @@ device_pc9801cbus_card_interface::~device_pc9801cbus_card_interface()
 //  pc9801_slot_device - constructor
 //-------------------------------------------------
 
-pc9801_slot_device::pc9801_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pc9801_slot_device::pc9801_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PC9801CBUS_SLOT, "PC-9801 sound cbus slot", tag, owner, clock, "pc9801_slot", __FILE__),
 		device_slot_interface(mconfig, *this)
 {

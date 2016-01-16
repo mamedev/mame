@@ -103,7 +103,7 @@ inline void nmc9306_device::erase(offs_t offset)
 //  nmc9306_device - constructor
 //-------------------------------------------------
 
-nmc9306_device::nmc9306_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nmc9306_device::nmc9306_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NMC9306, "NMC9306", tag, owner, clock, "nmc9306", __FILE__),
 		device_nvram_interface(mconfig, *this),
 		m_state(STATE_IDLE),
@@ -189,7 +189,7 @@ WRITE_LINE_MEMBER( nmc9306_device::sk_w )
 	switch (m_state)
 	{
 	case STATE_IDLE:
-		if (LOG) logerror("NMC9306 '%s' Idle %u\n", tag(), m_di);
+		if (LOG) logerror("NMC9306 '%s' Idle %u\n", tag().c_str(), m_di);
 
 		if (m_di)
 		{
@@ -200,7 +200,7 @@ WRITE_LINE_MEMBER( nmc9306_device::sk_w )
 		break;
 
 	case STATE_COMMAND:
-		if (LOG) logerror("NMC9306 '%s' Command Bit %u\n", tag(), m_di);
+		if (LOG) logerror("NMC9306 '%s' Command Bit %u\n", tag().c_str(), m_di);
 
 		m_command <<= 1;
 		m_command |= m_di;
@@ -214,7 +214,7 @@ WRITE_LINE_MEMBER( nmc9306_device::sk_w )
 		break;
 
 	case STATE_ADDRESS:
-		if (LOG) logerror("NMC9306 '%s' Address Bit %u\n", tag(), m_di);
+		if (LOG) logerror("NMC9306 '%s' Address Bit %u\n", tag().c_str(), m_di);
 
 		m_address <<= 1;
 		m_address |= m_di;
@@ -228,21 +228,21 @@ WRITE_LINE_MEMBER( nmc9306_device::sk_w )
 				switch (m_command & 0x03)
 				{
 				case EWDS:
-					if (LOG) logerror("NMC9306 '%s' EWDS\n", tag());
+					if (LOG) logerror("NMC9306 '%s' EWDS\n", tag().c_str());
 					m_ewen = false;
 					m_state = STATE_IDLE;
 					break;
 
 				case WRAL:
-					if (LOG) logerror("NMC9306 '%s' WRAL\n", tag());
+					if (LOG) logerror("NMC9306 '%s' WRAL\n", tag().c_str());
 					break;
 
 				case ERAL:
-					if (LOG) logerror("NMC9306 '%s' ERAL\n", tag());
+					if (LOG) logerror("NMC9306 '%s' ERAL\n", tag().c_str());
 					break;
 
 				case EWEN:
-					if (LOG) logerror("NMC9306 '%s' EWEN\n", tag());
+					if (LOG) logerror("NMC9306 '%s' EWEN\n", tag().c_str());
 					m_ewen = true;
 					m_state = STATE_IDLE;
 					break;
@@ -250,18 +250,18 @@ WRITE_LINE_MEMBER( nmc9306_device::sk_w )
 				break;
 
 			case WRITE:
-				if (LOG) logerror("NMC9306 '%s' WRITE %u\n", tag(), m_address & 0x0f);
+				if (LOG) logerror("NMC9306 '%s' WRITE %u\n", tag().c_str(), m_address & 0x0f);
 				m_state = STATE_DATA_IN;
 				break;
 
 			case READ:
-				if (LOG) logerror("NMC9306 '%s' READ %u\n", tag(), m_address & 0x0f);
+				if (LOG) logerror("NMC9306 '%s' READ %u\n", tag().c_str(), m_address & 0x0f);
 				m_data = read(m_address & 0x0f);
 				m_state = STATE_DATA_OUT;
 				break;
 
 			case ERASE:
-				if (LOG) logerror("NMC9306 '%s' ERASE %u\n", tag(), m_address & 0x0f);
+				if (LOG) logerror("NMC9306 '%s' ERASE %u\n", tag().c_str(), m_address & 0x0f);
 				erase(m_address & 0x0f);
 				m_state = STATE_ERASE;
 				break;
@@ -272,7 +272,7 @@ WRITE_LINE_MEMBER( nmc9306_device::sk_w )
 		break;
 
 	case STATE_DATA_IN:
-		if (LOG) logerror("NMC9306 '%s' Data Bit IN %u\n", tag(), m_di);
+		if (LOG) logerror("NMC9306 '%s' Data Bit IN %u\n", tag().c_str(), m_di);
 
 		m_data <<= 1;
 		m_data |= m_di;
@@ -287,7 +287,7 @@ WRITE_LINE_MEMBER( nmc9306_device::sk_w )
 		break;
 
 	case STATE_DATA_OUT:
-		if (LOG) logerror("NMC9306 '%s' Data Bit OUT %u\n", tag(), m_di);
+		if (LOG) logerror("NMC9306 '%s' Data Bit OUT %u\n", tag().c_str(), m_di);
 
 		m_do = BIT(m_data, 15);
 		m_data <<= 1;

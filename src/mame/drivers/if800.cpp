@@ -16,7 +16,7 @@
 class if800_state : public driver_device
 {
 public:
-	if800_state(const machine_config &mconfig, device_type type, const char *tag)
+	if800_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_hgdc(*this, "upd7220"),
 		m_video_ram(*this, "video_ram"),

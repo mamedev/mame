@@ -58,19 +58,19 @@ ADDRESS_MAP_END
 
 
 // device definitions
-upd553_cpu_device::upd553_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd553_cpu_device::upd553_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: ucom4_cpu_device(mconfig, NEC_D553, "uPD553", tag, owner, clock, NEC_UCOM43, 3 /* stack levels */, 11 /* prg width */, ADDRESS_MAP_NAME(program_2k), 7 /* data width */, ADDRESS_MAP_NAME(data_96x4), "upd553", __FILE__)
 { }
 
-upd557l_cpu_device::upd557l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd557l_cpu_device::upd557l_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: ucom4_cpu_device(mconfig, NEC_D557L, "uPD557L", tag, owner, clock, NEC_UCOM43, 3, 11, ADDRESS_MAP_NAME(program_2k), 7, ADDRESS_MAP_NAME(data_96x4), "upd557l", __FILE__)
 { }
 
-upd650_cpu_device::upd650_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd650_cpu_device::upd650_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: ucom4_cpu_device(mconfig, NEC_D650, "uPD650", tag, owner, clock, NEC_UCOM43, 3, 11, ADDRESS_MAP_NAME(program_2k), 7, ADDRESS_MAP_NAME(data_96x4), "upd650", __FILE__)
 { }
 
-upd552_cpu_device::upd552_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd552_cpu_device::upd552_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: ucom4_cpu_device(mconfig, NEC_D552, "uPD552", tag, owner, clock, NEC_UCOM44, 1, 10, ADDRESS_MAP_NAME(program_1k), 6, ADDRESS_MAP_NAME(data_64x4), "upd552", __FILE__)
 { }
 
@@ -232,7 +232,7 @@ UINT8 ucom4_cpu_device::input_r(int index)
 		case NEC_UCOM4_PORTD: inp = m_read_d(index, 0xff) | m_port_out[index]; break;
 
 		default:
-			logerror("%s read from unknown port %c at $%03X\n", tag(), 'A' + index, m_prev_pc);
+			logerror("%s read from unknown port %c at $%03X\n", tag().c_str(), 'A' + index, m_prev_pc);
 			break;
 	}
 
@@ -255,7 +255,7 @@ void ucom4_cpu_device::output_w(int index, UINT8 data)
 		case NEC_UCOM4_PORTI: m_write_i(index, data & 7, 0xff); break;
 
 		default:
-			logerror("%s write to unknown port %c = $%X at $%03X\n", tag(), 'A' + index, data, m_prev_pc);
+			logerror("%s write to unknown port %c = $%X at $%03X\n", tag().c_str(), 'A' + index, data, m_prev_pc);
 			break;
 	}
 
@@ -270,7 +270,7 @@ UINT8 upd557l_cpu_device::input_r(int index)
 	index &= 0xf;
 
 	if (index == NEC_UCOM4_PORTB)
-		logerror("%s read from unknown port %c at $%03X\n", tag(), 'A' + index, m_prev_pc);
+		logerror("%s read from unknown port %c at $%03X\n", tag().c_str(), 'A' + index, m_prev_pc);
 	else
 		return ucom4_cpu_device::input_r(index);
 
@@ -283,7 +283,7 @@ void upd557l_cpu_device::output_w(int index, UINT8 data)
 	data &= 0xf;
 
 	if (index == NEC_UCOM4_PORTH || index == NEC_UCOM4_PORTI)
-		logerror("%s write to unknown port %c = $%X at $%03X\n", tag(), 'A' + index, data, m_prev_pc);
+		logerror("%s write to unknown port %c = $%X at $%03X\n", tag().c_str(), 'A' + index, data, m_prev_pc);
 	else
 	{
 		// only G0 for port G

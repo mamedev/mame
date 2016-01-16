@@ -119,7 +119,7 @@ public:
 		TIMER_FM77AV_VSYNC
 	};
 
-	fm7_state(const machine_config &mconfig, device_type type, const char *tag)
+	fm7_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_shared_ram(*this, "shared_ram"),
 		m_boot_ram(*this, "boot_ram"),

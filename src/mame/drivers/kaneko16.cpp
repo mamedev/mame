@@ -688,7 +688,7 @@ ADDRESS_MAP_END
                                 Shogun Warriors
 ***************************************************************************/
 
-void kaneko16_state::kaneko16_common_oki_bank_w(  const char *bankname, const char* tag, int bank, size_t fixedsize, size_t bankedsize )
+void kaneko16_state::kaneko16_common_oki_bank_w(  const char *bankname, std::string tag, int bank, size_t fixedsize, size_t bankedsize )
 {
 	UINT32 bankaddr;
 	UINT8* samples = memregion(tag)->base();

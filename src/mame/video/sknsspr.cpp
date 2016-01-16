@@ -21,7 +21,7 @@
 const device_type SKNS_SPRITE = &device_creator<sknsspr_device>;
 
 
-sknsspr_device::sknsspr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sknsspr_device::sknsspr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SKNS_SPRITE, "SKNS Sprite", tag, owner, clock, "sknsspr", __FILE__),
 		device_video_interface(mconfig, *this)
 {

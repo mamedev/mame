@@ -33,7 +33,7 @@ extern const char layout_pinball[];
 class de_3_state : public genpin_class
 {
 public:
-	de_3_state(const machine_config &mconfig, device_type type, const char *tag)
+	de_3_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag),
 		m_dmdtype1(*this, "decodmd1"),
 		m_dmdtype2(*this, "decodmd2"),

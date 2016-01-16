@@ -30,9 +30,9 @@
 
 class h8_sci_device : public device_t {
 public:
-	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_sci_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	void set_info(const char *intc, int eri, int rxi, int txi, int tei);
+	void set_info(std::string intc, int eri, int rxi, int txi, int tei);
 	void set_external_clock_period(const attotime &_period);
 
 	DECLARE_WRITE8_MEMBER(smr_w);
@@ -111,7 +111,7 @@ protected:
 	required_device<h8_device> cpu;
 	devcb_write_line tx_cb, clk_cb;
 	h8_intc_device *intc;
-	const char *intc_tag;
+	std::string intc_tag;
 	attotime external_clock_period, cur_sync_time;
 	double external_to_internal_ratio, internal_to_external_ratio;
 	emu_timer *sync_timer;

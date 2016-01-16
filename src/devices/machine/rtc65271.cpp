@@ -672,7 +672,7 @@ const device_type RTC65271 = &device_creator<rtc65271_device>;
 //  rtc65271_device - constructor
 //-------------------------------------------------
 
-rtc65271_device::rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rtc65271_device::rtc65271_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RTC65271, "RTC-65271", tag, owner, clock, "rtc65271", __FILE__),
 		device_nvram_interface(mconfig, *this),
 		m_interrupt_cb(*this)

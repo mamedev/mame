@@ -129,7 +129,7 @@ class mcd212_device : public device_t,
 {
 public:
 	// construction/destruction
-	mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mcd212_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device members
 	DECLARE_READ16_MEMBER( regs_r );

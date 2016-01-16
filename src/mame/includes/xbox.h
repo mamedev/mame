@@ -207,7 +207,7 @@ private:
 class xbox_base_state : public driver_device
 {
 public:
-	xbox_base_state(const machine_config &mconfig, device_type type, const char *tag) :
+	xbox_base_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		nvidia_nv2a(nullptr),
 		debug_irq_active(false),

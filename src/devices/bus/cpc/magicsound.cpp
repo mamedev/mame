@@ -70,7 +70,7 @@ machine_config_constructor al_magicsound_device::device_mconfig_additions() cons
 //  LIVE DEVICE
 //**************************************************************************
 
-al_magicsound_device::al_magicsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+al_magicsound_device::al_magicsound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, AL_MAGICSOUND, "Magic Sound Board", tag, owner, clock, "al_magicsound", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_dac1(*this,"dac1"),

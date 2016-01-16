@@ -58,7 +58,7 @@ static UINT16 tape_crc16_byte(UINT16 crc, UINT8 data);
 
 const device_type DECOCASS_TAPE = &device_creator<decocass_tape_device>;
 
-decocass_tape_device::decocass_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+decocass_tape_device::decocass_tape_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECOCASS_TAPE, "DECO Cassette Tape", tag, owner, clock, "decocass_tape", __FILE__),
 	m_tape_timer(nullptr),
 	m_speed(0),

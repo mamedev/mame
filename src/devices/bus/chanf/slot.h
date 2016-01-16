@@ -35,7 +35,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
 	virtual DECLARE_WRITE8_MEMBER(write_bank) {}
 
-	void rom_alloc(UINT32 size, const char *tag);
+	void rom_alloc(UINT32 size, std::string tag);
 	void ram_alloc(UINT32 size);
 	UINT8* get_rom_base() { return m_rom; }
 	UINT8* get_ram_base() { return &m_ram[0]; }
@@ -60,7 +60,7 @@ class channelf_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	channelf_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	channelf_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~channelf_cart_slot_device();
 
 	// device-level overrides

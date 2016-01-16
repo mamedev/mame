@@ -52,7 +52,7 @@ class pet_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	pet_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pet_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~pet_expansion_slot_device();
 
 	template<class _read, class _write> void set_callbacks(_read rd, _write wr) {

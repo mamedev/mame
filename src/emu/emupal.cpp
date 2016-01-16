@@ -19,7 +19,7 @@
 
 const device_type PALETTE = &device_creator<palette_device>;
 
-palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+palette_device::palette_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PALETTE, "palette", tag, owner, clock, "palette", __FILE__),
 		m_entries(0),
 		m_indirect_entries(0),

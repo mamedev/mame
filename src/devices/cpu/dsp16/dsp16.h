@@ -24,7 +24,7 @@ class dsp16_device : public cpu_device
 {
 public:
 	// construction/destruction
-	dsp16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dsp16_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// public interfaces
 

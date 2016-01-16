@@ -26,7 +26,7 @@ const device_type IOEXP_SLOT = &device_creator<ioexp_slot_device>;
 //  ioexp_slot_device - constructor
 //-------------------------------------------------
 
-ioexp_slot_device::ioexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ioexp_slot_device::ioexp_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, IOEXP_SLOT, "Peripheral Expansion Slot", tag, owner, clock, "ioexp_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_io(nullptr),

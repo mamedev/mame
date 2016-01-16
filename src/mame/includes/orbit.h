@@ -20,7 +20,7 @@
 class orbit_state : public driver_device
 {
 public:
-	orbit_state(const machine_config &mconfig, device_type type, const char *tag)
+	orbit_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_playfield_ram(*this, "playfield_ram"),
 		m_sprite_ram(*this, "sprite_ram"),

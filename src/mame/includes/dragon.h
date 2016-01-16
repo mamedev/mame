@@ -36,7 +36,7 @@
 class dragon_state : public coco12_state
 {
 public:
-	dragon_state(const machine_config &mconfig, device_type type, const char *tag)
+	dragon_state(const machine_config &mconfig, device_type type, std::string tag)
 	: coco12_state(mconfig, type, tag),
 		m_printer(*this, PRINTER_TAG)
 	{
@@ -53,7 +53,7 @@ protected:
 class dragon64_state : public dragon_state
 {
 public:
-	dragon64_state(const machine_config &mconfig, device_type type, const char *tag)
+	dragon64_state(const machine_config &mconfig, device_type type, std::string tag)
 	: dragon_state(mconfig, type, tag),
 		m_acia(*this, ACIA_TAG)
 	{

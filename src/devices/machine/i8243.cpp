@@ -22,7 +22,7 @@ const device_type I8243 = &device_creator<i8243_device>;
 //  i8243_device - constructor
 //-------------------------------------------------
 
-i8243_device::i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8243_device::i8243_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I8243, "8243 I/O Expander", tag, owner, clock, "i8243", __FILE__), m_p2out(0), m_p2(0), m_opcode(0), m_prog(0),
 		m_readhandler(*this),
 		m_writehandler(*this)

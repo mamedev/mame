@@ -154,7 +154,7 @@ machine_config_constructor cs4031_device::device_mconfig_additions() const
 //  cs4031_device - constructor
 //-------------------------------------------------
 
-cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cs4031_device::cs4031_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CS4031, "CS4031", tag, owner, clock, "cs4031", __FILE__),
 	m_read_ior(*this),
 	m_write_iow(*this),
@@ -190,25 +190,25 @@ cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-void cs4031_device::static_set_cputag(device_t &device, const char *tag)
+void cs4031_device::static_set_cputag(device_t &device, std::string tag)
 {
 	cs4031_device &cs4031 = downcast<cs4031_device &>(device);
 	cs4031.m_cputag = tag;
 }
 
-void cs4031_device::static_set_isatag(device_t &device, const char *tag)
+void cs4031_device::static_set_isatag(device_t &device, std::string tag)
 {
 	cs4031_device &cs4031 = downcast<cs4031_device &>(device);
 	cs4031.m_isatag = tag;
 }
 
-void cs4031_device::static_set_biostag(device_t &device, const char *tag)
+void cs4031_device::static_set_biostag(device_t &device, std::string tag)
 {
 	cs4031_device &cs4031 = downcast<cs4031_device &>(device);
 	cs4031.m_biostag = tag;
 }
 
-void cs4031_device::static_set_keybctag(device_t &device, const char *tag)
+void cs4031_device::static_set_keybctag(device_t &device, std::string tag)
 {
 	cs4031_device &cs4031 = downcast<cs4031_device &>(device);
 	cs4031.m_keybctag = tag;

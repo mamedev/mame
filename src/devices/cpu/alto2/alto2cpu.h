@@ -163,7 +163,7 @@ class alto2_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	alto2_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	alto2_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~alto2_cpu_device();
 
 	//! driver interface to set diablo_hd_device

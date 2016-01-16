@@ -21,7 +21,7 @@ class t6a04_device : public device_t
 {
 public:
 	// construction/destruction
-	t6a04_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	t6a04_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void set_size(device_t &device, int w, int h)
 	{

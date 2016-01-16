@@ -36,7 +36,7 @@ const device_type C64_EPYX_FAST_LOAD = &device_creator<c64_epyx_fast_load_cartri
 //  c64_epyx_fast_load_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_epyx_fast_load_cartridge_device::c64_epyx_fast_load_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c64_epyx_fast_load_cartridge_device::c64_epyx_fast_load_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_EPYX_FAST_LOAD, "C64 Epyx Fast Load cartridge", tag, owner, clock, "c64_epyx_fast_load", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this), m_exrom_timer(nullptr)
 {

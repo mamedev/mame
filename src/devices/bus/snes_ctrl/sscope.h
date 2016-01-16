@@ -26,7 +26,7 @@ class snes_sscope_device : public device_t,
 {
 public:
 	// construction/destruction
-	snes_sscope_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	snes_sscope_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;

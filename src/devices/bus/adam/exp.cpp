@@ -51,7 +51,7 @@ device_adam_expansion_slot_card_interface::device_adam_expansion_slot_card_inter
 //  adam_expansion_slot_device - constructor
 //-------------------------------------------------
 
-adam_expansion_slot_device::adam_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+adam_expansion_slot_device::adam_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ADAM_EXPANSION_SLOT, "ADAM expansion slot", tag, owner, clock, "adam_expansion_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	device_image_interface(mconfig, *this),

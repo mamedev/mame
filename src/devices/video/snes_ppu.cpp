@@ -200,7 +200,7 @@ const device_type SNES_PPU = &device_creator<snes_ppu_device>;
 //  snes_ppu_device - constructor
 //-------------------------------------------------
 
-snes_ppu_device::snes_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+snes_ppu_device::snes_ppu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, SNES_PPU, "SNES PPU", tag, owner, clock, "snes_ppu", __FILE__),
 					device_video_interface(mconfig, *this),
 					m_openbus_cb(*this)

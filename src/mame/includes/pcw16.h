@@ -34,7 +34,7 @@
 class pcw16_state : public driver_device
 {
 public:
-	pcw16_state(const machine_config &mconfig, device_type type, const char *tag)
+	pcw16_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_flash0(*this, "flash0"),

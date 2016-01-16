@@ -27,7 +27,7 @@ class es5503_device : public device_t,
 {
 public:
 	// construction/destruction
-	es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	es5503_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void static_set_channels(device_t &device, int channels);
 

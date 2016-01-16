@@ -13,7 +13,7 @@ class el2_3c503_device: public device_t,
 					public device_isa8_card_interface
 {
 public:
-	el2_3c503_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	el2_3c503_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	void el2_3c503_irq_w(int state);

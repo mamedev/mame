@@ -31,7 +31,7 @@ public:
 		IRQ_B_EXT
 	};
 
-	mpcc68561_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mpcc68561_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<mpcc68561_t &>(device).intrq_cb.set_callback(object); }
 

@@ -34,7 +34,7 @@
 class ep64_state : public driver_device
 {
 public:
-	ep64_state(const machine_config &mconfig, device_type type, const char *tag)
+	ep64_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_dave(*this, DAVE_TAG),

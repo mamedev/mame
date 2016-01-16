@@ -29,7 +29,7 @@ const device_type RAM = &device_creator<ram_device>;
 //  ram_device - constructor
 //-------------------------------------------------
 
-ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ram_device::ram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RAM, "RAM", tag, owner, clock, "ram", __FILE__)
 {
 	m_size = 0;
@@ -48,7 +48,7 @@ void ram_device::device_start()
 {
 	/* the device named 'ram' can get ram options from command line */
 	m_size = 0;
-	if (strcmp(tag(), ":" RAM_TAG) == 0)
+	if (strcmp(tag().c_str(), ":" RAM_TAG) == 0)
 	{
 		const char *ramsize_string = machine().options().ram_size();
 		if ((ramsize_string != nullptr) && (ramsize_string[0] != '\0'))
@@ -86,7 +86,7 @@ void ram_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("Invalid default RAM option: %s\n", m_default_size);
 
 	/* command line options are only parsed for the device named RAM_TAG */
-	if (tag() != nullptr && strcmp(tag(), ":" RAM_TAG) == 0)
+	if (!tag().empty() && strcmp(tag().c_str(), ":" RAM_TAG) == 0)
 	{
 		/* verify command line ram option */
 		ramsize_string = mconfig().options().ram_size();

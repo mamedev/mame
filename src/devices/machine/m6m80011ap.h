@@ -43,7 +43,7 @@ class m6m80011ap_device :   public device_t,
 {
 public:
 	// construction/destruction
-	m6m80011ap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m6m80011ap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// I/O operations
 	DECLARE_READ_LINE_MEMBER( read_bit );

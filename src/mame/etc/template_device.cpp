@@ -27,7 +27,7 @@ const device_type XXX = &device_creator<xxx_device>;
 //  xxx_device - constructor
 //-------------------------------------------------
 
-xxx_device::xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+xxx_device::xxx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, XXX, "xxx_longname", tag, owner, clock, "xxx", __FILE__)
 {
 }

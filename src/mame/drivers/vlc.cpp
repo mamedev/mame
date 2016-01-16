@@ -151,7 +151,7 @@ nevada TYPE2 :  64       45      51       06       32      02        31     31  
 class nevada_state : public driver_device
 {
 public:
-	nevada_state(const machine_config &mconfig, device_type type, const char *tag)
+	nevada_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_duart18_68681(*this, "duart18_68681"),
 		m_duart39_68681(*this, "duart39_68681"),

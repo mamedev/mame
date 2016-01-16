@@ -31,7 +31,7 @@ static const int vol_table[4] = { 26, 84, 200, 258 };
 // device type definition
 const device_type NAMCO_63701X = &device_creator<namco_63701x_device>;
 
-namco_63701x_device::namco_63701x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+namco_63701x_device::namco_63701x_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NAMCO_63701X, "Namco 63701X", tag, owner, clock, "namco_63701x", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_rom(*this, DEVICE_SELF),

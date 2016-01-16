@@ -28,7 +28,7 @@
 class pcw_state : public driver_device
 {
 public:
-	pcw_state(const machine_config &mconfig, device_type type, const char *tag)
+	pcw_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_fdc(*this, "upd765"),

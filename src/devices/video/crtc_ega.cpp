@@ -18,7 +18,7 @@
 const device_type CRTC_EGA = &device_creator<crtc_ega_device>;
 
 
-crtc_ega_device::crtc_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+crtc_ega_device::crtc_ega_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CRTC_EGA, "crtc_EGA", tag, owner, clock, "crtc_ega", __FILE__),
 		device_video_interface(mconfig, *this, false),
 		m_res_out_de_cb(*this),

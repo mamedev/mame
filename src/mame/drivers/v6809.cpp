@@ -65,7 +65,7 @@ ToDo:
 class v6809_state : public driver_device
 {
 public:
-	v6809_state(const machine_config &mconfig, device_type type, const char *tag)
+	v6809_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_video_address(0),
 		m_pia0(*this, "pia0"),

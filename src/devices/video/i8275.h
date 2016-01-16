@@ -79,7 +79,7 @@ class i8275_device :   public device_t,
 {
 public:
 	// construction/destruction
-	i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8275_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void static_set_character_width(device_t &device, int value) { downcast<i8275_device &>(device).m_hpixels_per_column = value; }
 	static void static_set_display_callback(device_t &device, i8275_draw_character_delegate callback) { downcast<i8275_device &>(device).m_display_cb = callback; }

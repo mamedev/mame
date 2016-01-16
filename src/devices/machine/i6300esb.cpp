@@ -8,7 +8,7 @@ const device_type I6300ESB_LPC      = &device_creator<i6300esb_lpc_device>;
 DEVICE_ADDRESS_MAP_START(map, 32, i6300esb_watchdog_device)
 ADDRESS_MAP_END
 
-i6300esb_watchdog_device::i6300esb_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i6300esb_watchdog_device::i6300esb_watchdog_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, I6300ESB_WATCHDOG, "i6300ESB southbridge watchdog", tag, owner, clock, "i6300esb_watchdog", __FILE__)
 {
 }
@@ -86,7 +86,7 @@ DEVICE_ADDRESS_MAP_START(internal_io_map, 32, i6300esb_lpc_device)
 ADDRESS_MAP_END
 
 
-i6300esb_lpc_device::i6300esb_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i6300esb_lpc_device::i6300esb_lpc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, I6300ESB_LPC, "i6300ESB southbridge ISA/LPC bridge", tag, owner, clock, "i6300esb_lpc", __FILE__),
 		acpi(*this, "acpi"),
 		rtc (*this, "rtc"),
@@ -156,7 +156,7 @@ WRITE32_MEMBER(i6300esb_lpc_device::pmbase_w)
 {
 	COMBINE_DATA(&pmbase);
 	pmbase &= 0x0000ff80;
-	logerror("%s: pmbase = %08x\n", tag(), pmbase);
+	logerror("%s: pmbase = %08x\n", tag().c_str(), pmbase);
 	remap_cb();
 }
 
@@ -168,7 +168,7 @@ READ8_MEMBER (i6300esb_lpc_device::acpi_cntl_r)
 WRITE8_MEMBER(i6300esb_lpc_device::acpi_cntl_w)
 {
 	acpi_cntl = data;
-	logerror("%s: acpi_cntl = %08x\n", tag(), acpi_cntl);
+	logerror("%s: acpi_cntl = %08x\n", tag().c_str(), acpi_cntl);
 	remap_cb();
 }
 
@@ -180,7 +180,7 @@ READ16_MEMBER (i6300esb_lpc_device::bios_cntl_r)
 WRITE16_MEMBER(i6300esb_lpc_device::bios_cntl_w)
 {
 	COMBINE_DATA(&bios_cntl);
-	logerror("%s: bios_cntl = %08x\n", tag(), bios_cntl);
+	logerror("%s: bios_cntl = %08x\n", tag().c_str(), bios_cntl);
 	remap_cb();
 }
 
@@ -192,7 +192,7 @@ READ8_MEMBER  (i6300esb_lpc_device::tco_cntl_r)
 WRITE8_MEMBER (i6300esb_lpc_device::tco_cntl_w)
 {
 	tco_cntl = data;
-	logerror("%s: tco_cntl = %02x\n", tag(), tco_cntl);
+	logerror("%s: tco_cntl = %02x\n", tag().c_str(), tco_cntl);
 }
 
 READ32_MEMBER (i6300esb_lpc_device::gpio_base_r)
@@ -204,7 +204,7 @@ WRITE32_MEMBER(i6300esb_lpc_device::gpio_base_w)
 {
 	COMBINE_DATA(&gpio_base);
 	gpio_base &= 0x0000ffc0;
-	logerror("%s: gpio_base = %08x\n", tag(), gpio_base);
+	logerror("%s: gpio_base = %08x\n", tag().c_str(), gpio_base);
 	remap_cb();
 }
 
@@ -216,7 +216,7 @@ READ8_MEMBER  (i6300esb_lpc_device::gpio_cntl_r)
 WRITE8_MEMBER (i6300esb_lpc_device::gpio_cntl_w)
 {
 	gpio_cntl = data;
-	logerror("%s: gpio_cntl = %02x\n", tag(), gpio_cntl);
+	logerror("%s: gpio_cntl = %02x\n", tag().c_str(), gpio_cntl);
 	remap_cb();
 }
 
@@ -228,7 +228,7 @@ READ8_MEMBER  (i6300esb_lpc_device::pirq_rout_r)
 WRITE8_MEMBER (i6300esb_lpc_device::pirq_rout_w)
 {
 	pirq_rout[offset] = data;
-	logerror("%s: pirq_rout[%d] = %02x\n", tag(), offset, pirq_rout[offset]);
+	logerror("%s: pirq_rout[%d] = %02x\n", tag().c_str(), offset, pirq_rout[offset]);
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::serirq_cntl_r)
@@ -239,7 +239,7 @@ READ8_MEMBER  (i6300esb_lpc_device::serirq_cntl_r)
 WRITE8_MEMBER (i6300esb_lpc_device::serirq_cntl_w)
 {
 	serirq_cntl = data;
-	logerror("%s: serirq_cntl = %02x\n", tag(), serirq_cntl);
+	logerror("%s: serirq_cntl = %02x\n", tag().c_str(), serirq_cntl);
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::pirq2_rout_r)
@@ -260,7 +260,7 @@ READ8_MEMBER  (i6300esb_lpc_device::d31_err_cfg_r)
 WRITE8_MEMBER (i6300esb_lpc_device::d31_err_cfg_w)
 {
 	d31_err_cfg = data;
-	logerror("%s: d31_err_cfg = %02x\n", tag(), d31_err_cfg);
+	logerror("%s: d31_err_cfg = %02x\n", tag().c_str(), d31_err_cfg);
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::d31_err_sts_r)
@@ -271,7 +271,7 @@ READ8_MEMBER  (i6300esb_lpc_device::d31_err_sts_r)
 WRITE8_MEMBER (i6300esb_lpc_device::d31_err_sts_w)
 {
 	d31_err_sts &= ~data;
-	logerror("%s: d31_err_sts = %02x\n", tag(), d31_err_sts);
+	logerror("%s: d31_err_sts = %02x\n", tag().c_str(), d31_err_sts);
 }
 
 READ16_MEMBER (i6300esb_lpc_device::pci_dma_cfg_r)
@@ -282,7 +282,7 @@ READ16_MEMBER (i6300esb_lpc_device::pci_dma_cfg_r)
 WRITE16_MEMBER(i6300esb_lpc_device::pci_dma_cfg_w)
 {
 	COMBINE_DATA(&pci_dma_cfg);
-	logerror("%s: pci_dma_cfg = %04x\n", tag(), pci_dma_cfg);
+	logerror("%s: pci_dma_cfg = %04x\n", tag().c_str(), pci_dma_cfg);
 }
 
 READ16_MEMBER (i6300esb_lpc_device::gen_pmcon_1_r)
@@ -293,7 +293,7 @@ READ16_MEMBER (i6300esb_lpc_device::gen_pmcon_1_r)
 WRITE16_MEMBER(i6300esb_lpc_device::gen_pmcon_1_w)
 {
 	COMBINE_DATA(&gen_pmcon_1);
-	logerror("%s: gen_pmcon_1 = %04x\n", tag(), gen_pmcon_1);
+	logerror("%s: gen_pmcon_1 = %04x\n", tag().c_str(), gen_pmcon_1);
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::gen_pmcon_2_r)
@@ -304,7 +304,7 @@ READ8_MEMBER  (i6300esb_lpc_device::gen_pmcon_2_r)
 WRITE8_MEMBER (i6300esb_lpc_device::gen_pmcon_2_w)
 {
 	gen_pmcon_2 = data;
-	logerror("%s: gen_pmcon_2 = %02x\n", tag(), gen_pmcon_2);
+	logerror("%s: gen_pmcon_2 = %02x\n", tag().c_str(), gen_pmcon_2);
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::gen_pmcon_3_r)
@@ -315,7 +315,7 @@ READ8_MEMBER  (i6300esb_lpc_device::gen_pmcon_3_r)
 WRITE8_MEMBER (i6300esb_lpc_device::gen_pmcon_3_w)
 {
 	gen_pmcon_3 = data;
-	logerror("%s: gen_pmcon_3 = %02x\n", tag(), gen_pmcon_3);
+	logerror("%s: gen_pmcon_3 = %02x\n", tag().c_str(), gen_pmcon_3);
 }
 
 READ32_MEMBER (i6300esb_lpc_device::rst_cnt2_r)
@@ -326,7 +326,7 @@ READ32_MEMBER (i6300esb_lpc_device::rst_cnt2_r)
 WRITE32_MEMBER(i6300esb_lpc_device::rst_cnt2_w)
 {
 	COMBINE_DATA(&rst_cnt2);
-	logerror("%s: rst_cnt2 = %08x\n", tag(), rst_cnt2);
+	logerror("%s: rst_cnt2 = %08x\n", tag().c_str(), rst_cnt2);
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::apm_cnt_r)
@@ -337,7 +337,7 @@ READ8_MEMBER  (i6300esb_lpc_device::apm_cnt_r)
 WRITE8_MEMBER (i6300esb_lpc_device::apm_cnt_w)
 {
 	apm_cnt = data;
-	logerror("%s: apm_cnt = %02x\n", tag(), apm_cnt);
+	logerror("%s: apm_cnt = %02x\n", tag().c_str(), apm_cnt);
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::apm_sts_r)
@@ -348,7 +348,7 @@ READ8_MEMBER  (i6300esb_lpc_device::apm_sts_r)
 WRITE8_MEMBER (i6300esb_lpc_device::apm_sts_w)
 {
 	apm_sts = data;
-	logerror("%s: apm_sts = %02x\n", tag(), apm_sts);
+	logerror("%s: apm_sts = %02x\n", tag().c_str(), apm_sts);
 }
 
 READ32_MEMBER (i6300esb_lpc_device::gpi_rout_r)
@@ -359,7 +359,7 @@ READ32_MEMBER (i6300esb_lpc_device::gpi_rout_r)
 WRITE32_MEMBER(i6300esb_lpc_device::gpi_rout_w)
 {
 	COMBINE_DATA(&gpi_rout);
-	logerror("%s: gpi_rout = %08x\n", tag(), gpi_rout);
+	logerror("%s: gpi_rout = %08x\n", tag().c_str(), gpi_rout);
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::mon_fwd_en_r)
@@ -370,7 +370,7 @@ READ8_MEMBER  (i6300esb_lpc_device::mon_fwd_en_r)
 WRITE8_MEMBER (i6300esb_lpc_device::mon_fwd_en_w)
 {
 	mon_fwd_en = data;
-	logerror("%s: mon_fwd_en = %02x\n", tag(), mon_fwd_en);
+	logerror("%s: mon_fwd_en = %02x\n", tag().c_str(), mon_fwd_en);
 }
 
 READ16_MEMBER (i6300esb_lpc_device::mon_trp_rng_r)
@@ -381,7 +381,7 @@ READ16_MEMBER (i6300esb_lpc_device::mon_trp_rng_r)
 WRITE16_MEMBER(i6300esb_lpc_device::mon_trp_rng_w)
 {
 	COMBINE_DATA(&mon_trp_rng[offset]);
-	logerror("%s: mon_trp_rng[%d] = %04x\n", tag(), 4+offset, mon_trp_rng[offset]);
+	logerror("%s: mon_trp_rng[%d] = %04x\n", tag().c_str(), 4+offset, mon_trp_rng[offset]);
 }
 
 READ16_MEMBER (i6300esb_lpc_device::mon_trp_msk_r)
@@ -392,7 +392,7 @@ READ16_MEMBER (i6300esb_lpc_device::mon_trp_msk_r)
 WRITE16_MEMBER(i6300esb_lpc_device::mon_trp_msk_w)
 {
 	COMBINE_DATA(&mon_trp_msk);
-	logerror("%s: mon_trp_msk = %04x\n", tag(), mon_trp_msk);
+	logerror("%s: mon_trp_msk = %04x\n", tag().c_str(), mon_trp_msk);
 }
 
 READ32_MEMBER (i6300esb_lpc_device::gen_cntl_r)
@@ -403,7 +403,7 @@ READ32_MEMBER (i6300esb_lpc_device::gen_cntl_r)
 WRITE32_MEMBER(i6300esb_lpc_device::gen_cntl_w)
 {
 	COMBINE_DATA(&gen_cntl);
-	logerror("%s: gen_cntl = %08x\n", tag(), gen_cntl);
+	logerror("%s: gen_cntl = %08x\n", tag().c_str(), gen_cntl);
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::gen_sta_r)
@@ -414,7 +414,7 @@ READ8_MEMBER  (i6300esb_lpc_device::gen_sta_r)
 WRITE8_MEMBER (i6300esb_lpc_device::gen_sta_w)
 {
 	gen_sta = data;
-	logerror("%s: gen_sta = %02x\n", tag(), gen_sta);
+	logerror("%s: gen_sta = %02x\n", tag().c_str(), gen_sta);
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::back_cntl_r)
@@ -425,7 +425,7 @@ READ8_MEMBER  (i6300esb_lpc_device::back_cntl_r)
 WRITE8_MEMBER (i6300esb_lpc_device::back_cntl_w)
 {
 	back_cntl = data;
-	logerror("%s: back_cntl = %02x\n", tag(), back_cntl);
+	logerror("%s: back_cntl = %02x\n", tag().c_str(), back_cntl);
 	remap_cb();
 }
 
@@ -437,7 +437,7 @@ READ8_MEMBER  (i6300esb_lpc_device::rtc_conf_r)
 WRITE8_MEMBER (i6300esb_lpc_device::rtc_conf_w)
 {
 	rtc_conf = data;
-	logerror("%s: rtc_conf = %02x\n", tag(), rtc_conf);
+	logerror("%s: rtc_conf = %02x\n", tag().c_str(), rtc_conf);
 	remap_cb();
 }
 
@@ -449,7 +449,7 @@ READ8_MEMBER  (i6300esb_lpc_device::lpc_if_com_range_r)
 WRITE8_MEMBER (i6300esb_lpc_device::lpc_if_com_range_w)
 {
 	lpc_if_com_range = data;
-	logerror("%s: lpc_if_com_range = %02x\n", tag(), lpc_if_com_range);
+	logerror("%s: lpc_if_com_range = %02x\n", tag().c_str(), lpc_if_com_range);
 	remap_cb();
 }
 
@@ -461,7 +461,7 @@ READ8_MEMBER  (i6300esb_lpc_device::lpc_if_fdd_lpt_range_r)
 WRITE8_MEMBER (i6300esb_lpc_device::lpc_if_fdd_lpt_range_w)
 {
 	COMBINE_DATA(&lpc_if_fdd_lpt_range);
-	logerror("%s: lpc_if_fdd_lpt_range  = %02x\n", tag(), lpc_if_fdd_lpt_range);
+	logerror("%s: lpc_if_fdd_lpt_range  = %02x\n", tag().c_str(), lpc_if_fdd_lpt_range);
 	remap_cb();
 }
 
@@ -473,7 +473,7 @@ READ8_MEMBER  (i6300esb_lpc_device::lpc_if_sound_range_r)
 WRITE8_MEMBER (i6300esb_lpc_device::lpc_if_sound_range_w)
 {
 	COMBINE_DATA(&lpc_if_sound_range);
-	logerror("%s: lpc_if_sound_range  = %02x\n", tag(), lpc_if_sound_range);
+	logerror("%s: lpc_if_sound_range  = %02x\n", tag().c_str(), lpc_if_sound_range);
 	remap_cb();
 }
 
@@ -485,7 +485,7 @@ READ8_MEMBER  (i6300esb_lpc_device::fwh_dec_en1_r)
 WRITE8_MEMBER (i6300esb_lpc_device::fwh_dec_en1_w)
 {
 	fwh_dec_en1 = data | 0x80;
-	logerror("%s: fwh_dec_en1  = %02x\n", tag(), fwh_dec_en1);
+	logerror("%s: fwh_dec_en1  = %02x\n", tag().c_str(), fwh_dec_en1);
 	remap_cb();
 }
 
@@ -497,7 +497,7 @@ READ16_MEMBER (i6300esb_lpc_device::gen1_dec_r)
 WRITE16_MEMBER(i6300esb_lpc_device::gen1_dec_w)
 {
 	COMBINE_DATA(&gen1_dec);
-	logerror("%s: gen1_dec = %04x\n", tag(), gen1_dec);
+	logerror("%s: gen1_dec = %04x\n", tag().c_str(), gen1_dec);
 	remap_cb();
 }
 
@@ -509,7 +509,7 @@ READ16_MEMBER (i6300esb_lpc_device::lpc_en_r)
 WRITE16_MEMBER(i6300esb_lpc_device::lpc_en_w)
 {
 	COMBINE_DATA(&lpc_en);
-	logerror("%s: lpc_en = %04x\n", tag(), lpc_en);
+	logerror("%s: lpc_en = %04x\n", tag().c_str(), lpc_en);
 	remap_cb();
 }
 
@@ -521,7 +521,7 @@ READ32_MEMBER (i6300esb_lpc_device::fwh_sel1_r)
 WRITE32_MEMBER(i6300esb_lpc_device::fwh_sel1_w)
 {
 	COMBINE_DATA(&fwh_sel1);
-	logerror("%s: fwh_sel1 = %08x\n", tag(), fwh_sel1);
+	logerror("%s: fwh_sel1 = %08x\n", tag().c_str(), fwh_sel1);
 	remap_cb();
 }
 
@@ -533,7 +533,7 @@ READ16_MEMBER (i6300esb_lpc_device::gen2_dec_r)
 WRITE16_MEMBER(i6300esb_lpc_device::gen2_dec_w)
 {
 	COMBINE_DATA(&gen2_dec);
-	logerror("%s: gen2_dec = %04x\n", tag(), gen2_dec);
+	logerror("%s: gen2_dec = %04x\n", tag().c_str(), gen2_dec);
 	remap_cb();
 }
 
@@ -545,7 +545,7 @@ READ16_MEMBER (i6300esb_lpc_device::fwh_sel2_r)
 WRITE16_MEMBER(i6300esb_lpc_device::fwh_sel2_w)
 {
 	COMBINE_DATA(&fwh_sel2);
-	logerror("%s: fwh_sel2 = %04x\n", tag(), fwh_sel2);
+	logerror("%s: fwh_sel2 = %04x\n", tag().c_str(), fwh_sel2);
 	remap_cb();
 }
 
@@ -557,7 +557,7 @@ READ8_MEMBER  (i6300esb_lpc_device::fwh_dec_en2_r)
 WRITE8_MEMBER (i6300esb_lpc_device::fwh_dec_en2_w)
 {
 	fwh_dec_en2 = data;
-	logerror("%s: fwh_dec_en2  = %02x\n", tag(), fwh_dec_en2);
+	logerror("%s: fwh_dec_en2  = %02x\n", tag().c_str(), fwh_dec_en2);
 	remap_cb();
 }
 
@@ -569,7 +569,7 @@ READ16_MEMBER (i6300esb_lpc_device::func_dis_r)
 WRITE16_MEMBER(i6300esb_lpc_device::func_dis_w)
 {
 	COMBINE_DATA(&func_dis);
-	logerror("%s: func_dis = %04x\n", tag(), func_dis);
+	logerror("%s: func_dis = %04x\n", tag().c_str(), func_dis);
 }
 
 READ32_MEMBER (i6300esb_lpc_device::etr1_r)
@@ -580,7 +580,7 @@ READ32_MEMBER (i6300esb_lpc_device::etr1_r)
 WRITE32_MEMBER(i6300esb_lpc_device::etr1_w)
 {
 	COMBINE_DATA(&etr1);
-	logerror("%s: etr1 = %08x\n", tag(), etr1);
+	logerror("%s: etr1 = %08x\n", tag().c_str(), etr1);
 }
 
 READ32_MEMBER (i6300esb_lpc_device::mfid_r)
@@ -590,13 +590,13 @@ READ32_MEMBER (i6300esb_lpc_device::mfid_r)
 
 READ32_MEMBER (i6300esb_lpc_device::unk_fc_r)
 {
-	logerror("%s: read undocumented config reg fc\n", tag());
+	logerror("%s: read undocumented config reg fc\n", tag().c_str());
 	return 0;
 }
 
 WRITE32_MEMBER(i6300esb_lpc_device::unk_fc_w)
 {
-	logerror("%s: write undocumented config reg fc (%08x)\n", tag(), data);
+	logerror("%s: write undocumented config reg fc (%08x)\n", tag().c_str(), data);
 }
 
 
@@ -616,7 +616,7 @@ WRITE8_MEMBER (i6300esb_lpc_device::siu_config_port_w)
 	case 1:
 		siu_config_state = data == 0x86 ? 2 : data == 0x80 ? 1 : 0;
 		if(siu_config_state == 2)
-			logerror("%s: siu configuration active\n", tag());
+			logerror("%s: siu configuration active\n", tag().c_str());
 		break;
 	case 2:
 		siu_config_state = data == 0x68 ? 3 : 2;
@@ -624,24 +624,24 @@ WRITE8_MEMBER (i6300esb_lpc_device::siu_config_port_w)
 	case 3:
 		siu_config_state = data == 0x08 ? 0 : data == 0x68 ? 3 : 2;
 		if(!siu_config_state)
-			logerror("%s: siu configuration disabled\n", tag());
+			logerror("%s: siu configuration disabled\n", tag().c_str());
 		break;
 	}
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::siu_data_port_r)
 {
-	logerror("%s: siu config read port %02x\n", tag(), siu_config_port);
+	logerror("%s: siu config read port %02x\n", tag().c_str(), siu_config_port);
 	return 0xff;
 }
 
 WRITE8_MEMBER (i6300esb_lpc_device::siu_data_port_w)
 {
 	if(siu_config_state < 2) {
-		logerror("%s: siu config write port with config disabled (port=%02x, data=%02x)\n", tag(), siu_config_port, data);
+		logerror("%s: siu config write port with config disabled (port=%02x, data=%02x)\n", tag().c_str(), siu_config_port, data);
 		return;
 	}
-	logerror("%s: siu config write port %02x, %02x\n", tag(), siu_config_port, data);
+	logerror("%s: siu config write port %02x, %02x\n", tag().c_str(), siu_config_port, data);
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::nmi_sc_r)
@@ -653,7 +653,7 @@ READ8_MEMBER  (i6300esb_lpc_device::nmi_sc_r)
 WRITE8_MEMBER (i6300esb_lpc_device::nmi_sc_w)
 {
 	nmi_sc = data;
-	logerror("%s: nmi_sc = %02x\n", tag(), nmi_sc);
+	logerror("%s: nmi_sc = %02x\n", tag().c_str(), nmi_sc);
 }
 
 
@@ -710,44 +710,44 @@ void i6300esb_lpc_device::map_extra(UINT64 memory_window_start, UINT64 memory_wi
 	if(acpi_cntl & 0x10)
 		acpi->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, pmbase, io_space);
 	if(gpio_cntl & 0x10)
-		logerror("%s: Warning: gpio range enabled at %04x-%04x\n", tag(), gpio_base, gpio_base+63);
+		logerror("%s: Warning: gpio range enabled at %04x-%04x\n", tag().c_str(), gpio_base, gpio_base+63);
 
 	UINT32 hpet = 0xfed00000 + ((gen_cntl & 0x00018000) >> 3);
-	logerror("%s: Warning: hpet at %08x-%08x\n", tag(), hpet, hpet+0x3ff);
+	logerror("%s: Warning: hpet at %08x-%08x\n", tag().c_str(), hpet, hpet+0x3ff);
 
 	if(lpc_en & 0x1000)
-		logerror("%s: Warning: superio at 2e-2f\n", tag());
+		logerror("%s: Warning: superio at 2e-2f\n", tag().c_str());
 	if(lpc_en & 0x0800)
-		logerror("%s: Warning: mcu at 62/66\n", tag());
+		logerror("%s: Warning: mcu at 62/66\n", tag().c_str());
 	if(lpc_en & 0x0400)
-		logerror("%s: Warning: mcu at 60/64\n", tag());
+		logerror("%s: Warning: mcu at 60/64\n", tag().c_str());
 	if(lpc_en & 0x0200)
-		logerror("%s: Warning: gameport at 208-20f\n", tag());
+		logerror("%s: Warning: gameport at 208-20f\n", tag().c_str());
 	if(lpc_en & 0x0100)
-		logerror("%s: Warning: gameport at 200-207\n", tag());
+		logerror("%s: Warning: gameport at 200-207\n", tag().c_str());
 
 	if(lpc_en & 0x0008) {
 		UINT16 fdc = lpc_if_fdd_lpt_range & 0x10 ? 0x370 : 0x3f0;
-		logerror("%s: Warning: floppy at %04x-%04x\n", tag(), fdc, fdc+7);
+		logerror("%s: Warning: floppy at %04x-%04x\n", tag().c_str(), fdc, fdc+7);
 	}
 
 	if(lpc_en & 0x0004) {
 		static const UINT16 lpt_pos[4] = { 0x378, 0x278, 0x3bc, 0x000 };
 		UINT16 lpt = lpt_pos[lpc_if_fdd_lpt_range & 3];
 		if(lpt)
-			logerror("%s: Warning: lpt at %04x-%04x %04x-%04x\n", tag(), lpt, lpt+7, lpt+0x400, lpt+0x407);
+			logerror("%s: Warning: lpt at %04x-%04x %04x-%04x\n", tag().c_str(), lpt, lpt+7, lpt+0x400, lpt+0x407);
 	}
 
 	static const UINT16 com_pos[8] = { 0x3f8, 0x2f8, 0x220, 0x228, 0x238, 0x2e8, 0x338, 0x3e8 };
 
 	if(lpc_en & 0x0002) {
 		UINT16 comb = com_pos[(lpc_if_com_range >> 4) & 7];
-		logerror("%s: Warning: comb at %04x-%04x\n", tag(), comb, comb+7);
+		logerror("%s: Warning: comb at %04x-%04x\n", tag().c_str(), comb, comb+7);
 	}
 
 	if(lpc_en & 0x0001) {
 		UINT16 coma = com_pos[lpc_if_com_range & 7];
-		logerror("%s: Warning: coma at %04x-%04x\n", tag(), coma, coma+7);
+		logerror("%s: Warning: coma at %04x-%04x\n", tag().c_str(), coma, coma+7);
 	}
 
 	rtc->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, 0, io_space);

@@ -51,7 +51,7 @@
 class rmnimbus_state : public driver_device
 {
 public:
-	rmnimbus_state(const machine_config &mconfig, device_type type, const char *tag) :
+	rmnimbus_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, MSM5205_TAG),

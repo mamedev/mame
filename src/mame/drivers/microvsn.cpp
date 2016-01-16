@@ -31,7 +31,7 @@ of the games were clocked at around 500KHz, 550KHz, or 300KHz.
 class microvision_state : public driver_device
 {
 public:
-	microvision_state(const machine_config &mconfig, device_type type, const char *tag)
+	microvision_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_dac( *this, "dac" ),
 		m_i8021( *this, "maincpu1" ),

@@ -34,7 +34,7 @@ class ym2148_device :  public device_t,
 {
 public:
 	// construction/destruction
-	ym2148_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ym2148_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<ym2148_device &>(device).m_txd_handler.set_callback(object); }

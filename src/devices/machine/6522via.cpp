@@ -142,7 +142,7 @@ ADDRESS_MAP_END
 //  via6522_device - constructor
 //-------------------------------------------------
 
-via6522_device::via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+via6522_device::via6522_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VIA6522, "6522 VIA", tag, owner, clock, "via6522", __FILE__),
 		m_in_a_handler(*this),
 		m_in_b_handler(*this),
@@ -312,7 +312,7 @@ void via6522_device::set_int(int data)
 
 		if (TRACE_VIA)
 		{
-			logerror("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
+			logerror("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag().c_str(), m_ifr);
 		}
 	}
 }
@@ -332,7 +332,7 @@ void via6522_device::clear_int(int data)
 
 		if (TRACE_VIA)
 		{
-			logerror("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
+			logerror("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag().c_str(), m_ifr);
 		}
 	}
 }
@@ -793,7 +793,7 @@ WRITE8_MEMBER( via6522_device::write )
 
 		if (TRACE_VIA)
 		{
-			logerror("%s:6522VIA chip %s: PCR = %02X\n", machine().describe_context(), tag(), data);
+			logerror("%s:6522VIA chip %s: PCR = %02X\n", machine().describe_context(), tag().c_str(), data);
 		}
 
 		if (CA2_FIX_OUTPUT(data) && m_out_ca2 != CA2_OUTPUT_LEVEL(data))
@@ -871,7 +871,7 @@ WRITE_LINE_MEMBER( via6522_device::write_ca1 )
 		m_in_ca1 = state;
 
 		if (TRACE_VIA)
-			logerror("%s:6522VIA chip %s: CA1 = %02X\n", machine().describe_context(), tag(), m_in_ca1);
+			logerror("%s:6522VIA chip %s: CA1 = %02X\n", machine().describe_context(), tag().c_str(), m_in_ca1);
 
 		if ((m_in_ca1 && CA1_LOW_TO_HIGH(m_pcr)) || (!m_in_ca1 && CA1_HIGH_TO_LOW(m_pcr)))
 		{

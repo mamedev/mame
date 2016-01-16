@@ -17,7 +17,7 @@ struct schs_tempsprite
 class superchs_state : public driver_device
 {
 public:
-	superchs_state(const machine_config &mconfig, device_type type, const char *tag)
+	superchs_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this,"ram"),
 		m_spriteram(*this,"spriteram"),

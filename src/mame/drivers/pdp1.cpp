@@ -667,7 +667,7 @@ class pdp1_readtape_image_device :  public device_t,
 {
 public:
 	// construction/destruction
-	pdp1_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pdp1_readtape_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
@@ -691,7 +691,7 @@ protected:
 
 const device_type PDP1_READTAPE = &device_creator<pdp1_readtape_image_device>;
 
-pdp1_readtape_image_device::pdp1_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pdp1_readtape_image_device::pdp1_readtape_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PDP1_READTAPE, "PDP1 Tape Reader", tag, owner, clock, "pdp1_readtape_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -702,7 +702,7 @@ class pdp1_punchtape_image_device : public device_t,
 {
 public:
 	// construction/destruction
-	pdp1_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pdp1_punchtape_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
@@ -726,7 +726,7 @@ protected:
 
 const device_type PDP1_PUNCHTAPE = &device_creator<pdp1_punchtape_image_device>;
 
-pdp1_punchtape_image_device::pdp1_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pdp1_punchtape_image_device::pdp1_punchtape_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PDP1_PUNCHTAPE, "PDP1 Tape Puncher", tag, owner, clock, "pdp1_punchtape_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -738,7 +738,7 @@ class pdp1_printer_image_device :   public device_t,
 {
 public:
 	// construction/destruction
-	pdp1_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pdp1_printer_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_PRINTER; }
@@ -762,7 +762,7 @@ protected:
 
 const device_type PDP1_PRINTER = &device_creator<pdp1_printer_image_device>;
 
-pdp1_printer_image_device::pdp1_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pdp1_printer_image_device::pdp1_printer_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PDP1_PRINTER, "PDP1 Typewriter", tag, owner, clock, "pdp1_printer_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -773,7 +773,7 @@ class pdp1_cylinder_image_device :  public device_t,
 {
 public:
 	// construction/destruction
-	pdp1_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pdp1_cylinder_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_CYLINDER; }
@@ -797,7 +797,7 @@ protected:
 
 const device_type PDP1_CYLINDER = &device_creator<pdp1_cylinder_image_device>;
 
-pdp1_cylinder_image_device::pdp1_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pdp1_cylinder_image_device::pdp1_cylinder_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PDP1_CYLINDER, "PDP1 Cylinder", tag, owner, clock, "pdp1_cylinder_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {

@@ -39,7 +39,7 @@ typedef device_delegate<void (address_space &space, bool dedicated, UINT16 data,
 
 class m68307cpu_device : public m68000_device {
 public:
-	m68307cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m68307cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	/* trampolines so we can specify the 68681 serial configuration when adding the CPU  */
 	template<class _Object> static devcb_base &set_irq_cb(device_t &device, _Object object) { return downcast<m68307cpu_device &>(device).write_irq.set_callback(object); }

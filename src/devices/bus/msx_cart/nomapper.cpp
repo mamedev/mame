@@ -7,7 +7,7 @@
 const device_type MSX_CART_NOMAPPER = &device_creator<msx_cart_nomapper>;
 
 
-msx_cart_nomapper::msx_cart_nomapper(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_nomapper::msx_cart_nomapper(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_NOMAPPER, "MSX Cartridge - ROM", tag, owner, clock, "msx_cart_nomapper", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_start_address(0)

@@ -44,7 +44,7 @@
 class tekxp330_state : public driver_device
 {
 public:
-	tekxp330_state(const machine_config &mconfig, device_type type, const char *tag)
+	tekxp330_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) { }
 
 	virtual void machine_start() override;

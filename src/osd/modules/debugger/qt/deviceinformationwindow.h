@@ -16,7 +16,7 @@ public:
 	DeviceInformationWindow(running_machine* machine, device_t* device = NULL, QWidget* parent=NULL);
 	virtual ~DeviceInformationWindow();
 
-	void set_device(const char *tag);
+	void set_device(std::string tag);
 	const char *device_tag() const;
 
 private:

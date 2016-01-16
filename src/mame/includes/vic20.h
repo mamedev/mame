@@ -31,7 +31,7 @@
 class vic20_state : public driver_device
 {
 public:
-	vic20_state(const machine_config &mconfig, device_type type, const char *tag)
+	vic20_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M6502_TAG),
 			m_via1(*this, M6522_1_TAG),

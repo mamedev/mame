@@ -29,7 +29,7 @@ class mb3773_device :
 {
 public:
 	// construction/destruction
-	mb3773_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock );
+	mb3773_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock );
 
 	// I/O operations
 	WRITE_LINE_MEMBER( write_line_ck );

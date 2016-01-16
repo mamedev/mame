@@ -137,7 +137,7 @@ WRITE8_MEMBER( bml3bus_mp1805_device::bml3_mp1805_w)
 //  LIVE DEVICE
 //**************************************************************************
 
-bml3bus_mp1805_device::bml3bus_mp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+bml3bus_mp1805_device::bml3bus_mp1805_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, BML3BUS_MP1805, "Hitachi MP-1805 Floppy Controller Card", tag, owner, clock, "bml3mp1805", __FILE__),
 	device_bml3bus_card_interface(mconfig, *this),
 	m_mc6843(*this, "mc6843"), m_rom(nullptr)

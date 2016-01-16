@@ -50,7 +50,7 @@ device_vip_expansion_card_interface::device_vip_expansion_card_interface(const m
 //  vip_expansion_slot_device - constructor
 //-------------------------------------------------
 
-vip_expansion_slot_device::vip_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+vip_expansion_slot_device::vip_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VIP_EXPANSION_SLOT, "VIP expansion port", tag, owner, clock, "vip_expansion_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_write_int(*this),

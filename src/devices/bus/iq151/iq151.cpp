@@ -53,7 +53,7 @@ device_iq151cart_interface::~device_iq151cart_interface()
 //-------------------------------------------------
 //  iq151cart_slot_device - constructor
 //-------------------------------------------------
-iq151cart_slot_device::iq151cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+iq151cart_slot_device::iq151cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, IQ151CART_SLOT, "IQ151 cartridge slot", tag, owner, clock, "iq151cart_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this),

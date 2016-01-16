@@ -11,7 +11,7 @@
 
 const device_type KONAMI1 = &device_creator<konami1_device>;
 
-konami1_device::konami1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+konami1_device::konami1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: m6809_base_device(mconfig, "KONAMI-1", tag, owner, clock, KONAMI1, 1, "konami1", __FILE__)
 {
 	m_boundary = 0x0000;

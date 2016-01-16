@@ -83,7 +83,7 @@ class v810_device : public cpu_device
 {
 public:
 	// construction/destruction
-	v810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v810_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

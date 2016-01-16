@@ -23,7 +23,7 @@
 class ax20_state : public driver_device
 {
 public:
-	ax20_state(const machine_config &mconfig, device_type type, const char *tag)
+	ax20_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_p_vram(*this, "p_vram"),

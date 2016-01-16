@@ -11,7 +11,7 @@
 #include "igs028.h"
 
 
-igs028_device::igs028_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+igs028_device::igs028_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, IGS028, "IGS028", tag, owner, clock, "igs028", __FILE__)
 {
 }

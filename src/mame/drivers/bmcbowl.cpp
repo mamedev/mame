@@ -116,7 +116,7 @@ Main board:
 class bmcbowl_state : public driver_device
 {
 public:
-	bmcbowl_state(const machine_config &mconfig, device_type type, const char *tag)
+	bmcbowl_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_stats_ram(*this, "nvram", 16),

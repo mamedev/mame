@@ -188,7 +188,7 @@ ioport_constructor apricot_keyboard_hle_device::device_input_ports() const
 //  apricot_keyboard_hle_device - constructor
 //-------------------------------------------------
 
-apricot_keyboard_hle_device::apricot_keyboard_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+apricot_keyboard_hle_device::apricot_keyboard_hle_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, APRICOT_KEYBOARD_HLE, "Apricot Keyboard (HLE)", tag, owner, clock, "apricotkb_hle", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_txd_handler(*this),

@@ -24,7 +24,7 @@ class mb86235_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	mb86235_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	mb86235_cpu_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
 
 protected:
 	// device-level overrides

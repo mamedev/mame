@@ -82,7 +82,7 @@ NOTE: Trivia Question rom names are the internal names used. IE: read from the f
 class gei_state : public driver_device
 {
 public:
-	gei_state(const machine_config &mconfig, device_type type, const char *tag)
+	gei_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),

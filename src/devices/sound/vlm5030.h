@@ -9,7 +9,7 @@
 									public device_sound_interface
 	{
 	public:
-	vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vlm5030_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~vlm5030_device() {}
 
 	/* set speech rom address */

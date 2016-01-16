@@ -20,7 +20,7 @@ const device_type MB8421 = &device_creator<mb8421_device>;
 //  mb8421_device - constructor
 //-------------------------------------------------
 
-mb8421_device::mb8421_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mb8421_device::mb8421_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MB8421, "MB8421 DPSRAM", tag, owner, clock, "mb8421", __FILE__),
 		m_intl_handler(*this),
 		m_intr_handler(*this)

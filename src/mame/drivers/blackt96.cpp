@@ -93,7 +93,7 @@ There are some unmapped writes past the end of text ram too
 class blackt96_state : public driver_device
 {
 public:
-	blackt96_state(const machine_config &mconfig, device_type type, const char *tag)
+	blackt96_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_tilemapram(*this, "tilemapram"),
 		m_spriteram0(*this, "spriteram0"),

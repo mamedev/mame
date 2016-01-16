@@ -32,7 +32,7 @@ TODO:
 class tk80bs_state : public driver_device
 {
 public:
-	tk80bs_state(const machine_config &mconfig, device_type type, const char *tag)
+	tk80bs_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),

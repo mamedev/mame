@@ -29,7 +29,7 @@ const device_type RTC4543 = &device_creator<rtc4543_device>;
 //  rtc4543_device - constructor
 //-------------------------------------------------
 
-rtc4543_device::rtc4543_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rtc4543_device::rtc4543_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RTC4543, "R4543 RTC", tag, owner, clock, "rtc4543", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		data_cb(*this), m_ce(0), m_clk(0), m_wr(0), m_data(0), m_shiftreg(0), m_curreg(0), m_curbit(0), m_clock_timer(nullptr)
@@ -119,7 +119,7 @@ void rtc4543_device::rtc_clock_updated(int year, int month, int day, int day_of_
 
 WRITE_LINE_MEMBER( rtc4543_device::ce_w )
 {
-	if (VERBOSE) printf("RTC4543 '%s' CE: %u\n", tag(), state);
+	if (VERBOSE) printf("RTC4543 '%s' CE: %u\n", tag().c_str(), state);
 
 	if (!state && m_ce) // complete transfer
 	{
@@ -139,7 +139,7 @@ WRITE_LINE_MEMBER( rtc4543_device::ce_w )
 
 WRITE_LINE_MEMBER( rtc4543_device::wr_w )
 {
-	if (VERBOSE) logerror("RTC4543 '%s' WR: %u\n", tag(), state);
+	if (VERBOSE) logerror("RTC4543 '%s' WR: %u\n", tag().c_str(), state);
 
 	m_wr = state;
 }
@@ -150,7 +150,7 @@ WRITE_LINE_MEMBER( rtc4543_device::wr_w )
 
 WRITE_LINE_MEMBER( rtc4543_device::clk_w )
 {
-	if (VERBOSE) logerror("RTC4543 '%s' CLK: %u\n", tag(), state);
+	if (VERBOSE) logerror("RTC4543 '%s' CLK: %u\n", tag().c_str(), state);
 
 	if (!m_ce) return;
 
@@ -165,7 +165,7 @@ WRITE_LINE_MEMBER( rtc4543_device::clk_w )
 				m_shiftreg = m_regs[m_curreg++];
 
 				if (VERBOSE)
-					logerror("RTC4543 '%s' sending byte: %02x\n", tag(), m_shiftreg);
+					logerror("RTC4543 '%s' sending byte: %02x\n", tag().c_str(), m_shiftreg);
 			}
 
 			// shift data bit
@@ -190,7 +190,7 @@ WRITE_LINE_MEMBER( rtc4543_device::clk_w )
 
 WRITE_LINE_MEMBER( rtc4543_device::data_w )
 {
-	if (VERBOSE) logerror("RTC4543 '%s' I/O: %u\n", tag(), state);
+	if (VERBOSE) logerror("RTC4543 '%s' I/O: %u\n", tag().c_str(), state);
 
 	m_data = state & 1;
 }

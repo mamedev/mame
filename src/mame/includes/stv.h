@@ -21,7 +21,7 @@
 class saturn_state : public driver_device
 {
 public:
-	saturn_state(const machine_config &mconfig, device_type type, const char *tag)
+	saturn_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_rom(*this, "share6"),
 			m_workram_l(*this, "workram_l"),
@@ -699,7 +699,7 @@ public:
 class stv_state : public saturn_state
 {
 public:
-	stv_state(const machine_config &mconfig, device_type type, const char *tag)
+	stv_state(const machine_config &mconfig, device_type type, std::string tag)
 		: saturn_state(mconfig, type, tag),
 		m_adsp(*this, "adsp"),
 		m_adsp_pram(*this, "adsp_pram"),

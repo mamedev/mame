@@ -15,7 +15,7 @@ class wpc_out_device : public device_t
 public:
 	typedef delegate<bool (int, bool)> handler_t;
 
-	wpc_out_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wpc_out_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~wpc_out_device();
 
 	DECLARE_WRITE8_MEMBER(out_w);

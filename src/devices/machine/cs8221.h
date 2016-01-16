@@ -44,16 +44,16 @@ class cs8221_device : public device_t
 {
 public:
 	// construction/destruction
-	cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cs8221_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER( address_w );
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
 
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
-	static void static_set_isatag(device_t &device, const char *tag);
-	static void static_set_biostag(device_t &device, const char *tag);
+	static void static_set_cputag(device_t &device, std::string tag);
+	static void static_set_isatag(device_t &device, std::string tag);
+	static void static_set_biostag(device_t &device, std::string tag);
 
 protected:
 	// device-level overrides
@@ -72,9 +72,9 @@ private:
 	UINT8 m_address;
 	bool m_address_valid;
 
-	const char *m_cputag;
-	const char *m_isatag;
-	const char *m_biostag;
+	std::string m_cputag;
+	std::string m_isatag;
+	std::string m_biostag;
 
 
 	UINT8 m_registers[0x10];

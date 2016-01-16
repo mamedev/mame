@@ -93,7 +93,7 @@ public:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 
-	rm380z_state(const machine_config &mconfig, device_type type, const char *tag)
+	rm380z_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, RM380Z_MAINCPU_TAG),
 		m_messram(*this, RAM_TAG),

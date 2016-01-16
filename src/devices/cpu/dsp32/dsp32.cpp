@@ -142,7 +142,7 @@ const device_type DSP32C = &device_creator<dsp32c_device>;
 //  dsp32c_device - constructor
 //-------------------------------------------------
 
-dsp32c_device::dsp32c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dsp32c_device::dsp32c_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, DSP32C, "DSP32C", tag, owner, clock, "dsp32c", __FILE__),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 24),
 		m_pin(0),

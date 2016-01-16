@@ -172,7 +172,7 @@ machine_config_constructor comx_clm_device::device_mconfig_additions() const
 //  comx_clm_device - constructor
 //-------------------------------------------------
 
-comx_clm_device::comx_clm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+comx_clm_device::comx_clm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COMX_CLM, "COMX 80 Column Card", tag, owner, clock, "comx_clm", __FILE__),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_crtc(*this, MC6845_TAG),

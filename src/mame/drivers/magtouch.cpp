@@ -86,7 +86,7 @@ video card
 class magtouch_state : public pcat_base_state
 {
 public:
-	magtouch_state(const machine_config &mconfig, device_type type, const char *tag)
+	magtouch_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pcat_base_state(mconfig, type, tag),
 			m_uart(*this, "ns16450_0"),
 			m_microtouch(*this, "microtouch"){ }

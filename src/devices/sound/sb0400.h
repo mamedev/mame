@@ -12,7 +12,7 @@
 
 class sb0400_device : public pci_device {
 public:
-	sb0400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sb0400_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;

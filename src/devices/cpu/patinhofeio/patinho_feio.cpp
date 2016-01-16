@@ -46,7 +46,7 @@ static ADDRESS_MAP_START(prog_8bit, AS_PROGRAM, 8, patinho_feio_cpu_device)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("internalram")
 ADDRESS_MAP_END
 
-patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, PATINHO_FEIO, "PATINHO FEIO", tag, owner, clock, "patinho_feio_cpu", __FILE__),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, ADDRESS_MAP_NAME(prog_8bit)),
 		m_icount(0),

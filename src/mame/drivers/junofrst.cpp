@@ -94,7 +94,7 @@ Blitter source graphics
 class junofrst_state : public tutankhm_state
 {
 public:
-	junofrst_state(const machine_config &mconfig, device_type type, const char *tag)
+	junofrst_state(const machine_config &mconfig, device_type type, std::string tag)
 		: tutankhm_state(mconfig, type, tag),
 			m_audiocpu(*this, "audiocpu"),
 			m_i8039(*this, "mcu"),

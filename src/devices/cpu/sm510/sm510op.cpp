@@ -452,5 +452,5 @@ void sm510_base_device::op_idiv()
 
 void sm510_base_device::op_illegal()
 {
-	logerror("%s unknown opcode $%02X at $%04X\n", tag(), m_op, m_prev_pc);
+	logerror("%s unknown opcode $%02X at $%04X\n", tag().c_str(), m_op, m_prev_pc);
 }

@@ -207,7 +207,7 @@
 class _4enlinea_state : public driver_device
 {
 public:
-	_4enlinea_state(const machine_config &mconfig, device_type type, const char *tag)
+	_4enlinea_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_ay(*this, "aysnd"),
 		m_maincpu(*this, "maincpu")
@@ -244,7 +244,7 @@ class isa8_cga_4enlinea_device : public isa8_cga_device
 {
 public:
 	// construction/destruction
-	isa8_cga_4enlinea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_cga_4enlinea_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( _4enlinea_io_read );
 	DECLARE_WRITE8_MEMBER( _4enlinea_mode_control_w );
@@ -259,7 +259,7 @@ const rom_entry *isa8_cga_4enlinea_device::device_rom_region() const
 
 const device_type ISA8_CGA_4ENLINEA = &device_creator<isa8_cga_4enlinea_device>;
 
-isa8_cga_4enlinea_device::isa8_cga_4enlinea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_cga_4enlinea_device::isa8_cga_4enlinea_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		isa8_cga_device( mconfig, ISA8_CGA_4ENLINEA, "ISA8_CGA_4ENLINEA", tag, owner, clock, "4enlinea_cga", __FILE__)
 {
 }

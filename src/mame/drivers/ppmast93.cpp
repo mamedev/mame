@@ -140,7 +140,7 @@ Dip locations added based on the notes above.
 class ppmast93_state : public driver_device
 {
 public:
-	ppmast93_state(const machine_config &mconfig, device_type type, const char *tag)
+	ppmast93_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),

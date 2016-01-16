@@ -7,7 +7,7 @@ const device_type SB0400 = &device_creator<sb0400_device>;
 DEVICE_ADDRESS_MAP_START(map, 32, sb0400_device)
 ADDRESS_MAP_END
 
-sb0400_device::sb0400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sb0400_device::sb0400_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, SB0400, "Creative Labs SB0400 Audigy2 Value", tag, owner, clock, "sb0400", __FILE__)
 {
 }

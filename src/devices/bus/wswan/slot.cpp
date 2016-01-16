@@ -48,7 +48,7 @@ device_ws_cart_interface::~device_ws_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_ws_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_ws_cart_interface::rom_alloc(UINT32 size, std::string tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -76,7 +76,7 @@ void device_ws_cart_interface::nvram_alloc(UINT32 size)
 //-------------------------------------------------
 //  ws_cart_slot_device - constructor
 //-------------------------------------------------
-ws_cart_slot_device::ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ws_cart_slot_device::ws_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, WS_CART_SLOT, "Wonderswan Cartridge Slot", tag, owner, clock, "ws_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),

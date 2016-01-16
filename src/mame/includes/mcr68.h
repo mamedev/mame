@@ -17,7 +17,7 @@ struct counter_state
 class mcr68_state : public driver_device
 {
 public:
-	mcr68_state(const machine_config &mconfig, device_type type, const char *tag)
+	mcr68_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_chip_squeak_deluxe(*this, "csd"),
 		m_sounds_good(*this, "sg"),

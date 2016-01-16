@@ -30,7 +30,7 @@ public:
 	virtual DECLARE_READ32_MEMBER(read_eeprom) { return 0xffffffff; }
 	virtual DECLARE_WRITE32_MEMBER(write_eeprom) {}
 
-	void rom_alloc(UINT32 size, const char *tag);
+	void rom_alloc(UINT32 size, std::string tag);
 	void eeprom_alloc(UINT32 size);
 	UINT32* get_rom_base() { return m_rom; }
 	UINT32* get_eeprom_base() { return &m_eeprom[0]; }
@@ -56,7 +56,7 @@ class vboy_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	vboy_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vboy_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~vboy_cart_slot_device();
 
 	// device-level overrides

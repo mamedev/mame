@@ -366,14 +366,14 @@ class antic_device :  public device_t,
 {
 public:
 	// construction/destruction
-	antic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	antic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	static void set_gtia_tag(device_t &device, const char *tag) { downcast<antic_device &>(device).m_gtia_tag = tag; }
+	static void set_gtia_tag(device_t &device, std::string tag) { downcast<antic_device &>(device).m_gtia_tag = tag; }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -387,7 +387,7 @@ private:
 	static const device_timer_id TIMER_LINE_REND = 2;
 	static const device_timer_id TIMER_LINE_DONE = 3;
 
-	const char *m_gtia_tag;
+	std::string m_gtia_tag;
 	gtia_device  *m_gtia;
 	required_device<cpu_device> m_maincpu;
 	optional_ioport m_djoy_b;

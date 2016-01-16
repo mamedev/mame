@@ -208,7 +208,7 @@ public:
 	};
 
 	// construction/destruction
-	pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pokey_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_pot0_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_pot0_r_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_pot1_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_pot1_r_cb.set_callback(object); }

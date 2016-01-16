@@ -59,7 +59,7 @@ class msm58321_device : public device_t,
 {
 public:
 	// construction/destruction
-	msm58321_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msm58321_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_d0_handler(device_t &device, _Object object) { return downcast<msm58321_device &>(device).m_d0_handler.set_callback(object); }

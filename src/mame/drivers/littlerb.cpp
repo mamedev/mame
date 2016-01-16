@@ -74,7 +74,7 @@ Dip sw.2
 class littlerb_state : public driver_device
 {
 public:
-	littlerb_state(const machine_config &mconfig, device_type type, const char *tag)
+	littlerb_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_indervid(*this, "inder_vid"),

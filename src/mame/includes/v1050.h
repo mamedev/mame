@@ -61,7 +61,7 @@
 class v1050_state : public driver_device
 {
 public:
-	v1050_state(const machine_config &mconfig, device_type type, const char *tag)
+	v1050_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_subcpu(*this, M6502_TAG),

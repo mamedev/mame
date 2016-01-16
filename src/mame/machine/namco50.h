@@ -13,7 +13,7 @@
 class namco_50xx_device : public device_t
 {
 public:
-	namco_50xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_50xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	WRITE8_MEMBER( write );
 	WRITE_LINE_MEMBER(read_request);

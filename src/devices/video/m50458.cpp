@@ -172,7 +172,7 @@ inline void m50458_device::write_word(offs_t address, UINT16 data)
 //  m50458_device - constructor
 //-------------------------------------------------
 
-m50458_device::m50458_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m50458_device::m50458_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, M50458, "M50458 OSD", tag, owner, clock, "m50458", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),

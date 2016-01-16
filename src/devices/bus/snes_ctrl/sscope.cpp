@@ -53,7 +53,7 @@ ioport_constructor snes_sscope_device::device_input_ports() const
 //  snes_sscope_device - constructor
 //-------------------------------------------------
 
-snes_sscope_device::snes_sscope_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+snes_sscope_device::snes_sscope_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 					device_t(mconfig, SNES_SUPERSCOPE, "Nintendo SNES / SFC SuperScope", tag, owner, clock, "snes_sscope", __FILE__),
 					device_snes_control_port_interface(mconfig, *this),
 					m_buttons(*this, "BUTTONS"),

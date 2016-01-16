@@ -34,7 +34,7 @@ class k053252_device : public device_t,
 						public device_video_interface
 {
 public:
-	k053252_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k053252_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~k053252_device() {}
 
 	template<class _Object> static devcb_base &set_int1_en_callback(device_t &device, _Object object) { return downcast<k053252_device &>(device).m_int1_en_cb.set_callback(object); }
@@ -50,7 +50,7 @@ public:
 	void res_change();
 
 
-	static void static_set_slave_screen(device_t &device, const char *tag);
+	static void static_set_slave_screen(device_t &device, std::string tag);
 
 
 protected:
@@ -75,7 +75,7 @@ protected:
 	int                m_offsx;
 	int                m_offsy;
 
-	const char *    m_slave_screen_tag;
+	std::string     m_slave_screen_tag;
 	screen_device * m_slave_screen;
 
 };

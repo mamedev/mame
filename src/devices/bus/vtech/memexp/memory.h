@@ -25,7 +25,7 @@ class laser110_16k_device : public device_t, public device_memexp_interface
 {
 public:
 	// construction/destruction
-	laser110_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	laser110_16k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -41,7 +41,7 @@ class laser210_16k_device : public device_t, public device_memexp_interface
 {
 public:
 	// construction/destruction
-	laser210_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	laser210_16k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -57,7 +57,7 @@ class laser310_16k_device : public device_t, public device_memexp_interface
 {
 public:
 	// construction/destruction
-	laser310_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	laser310_16k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -73,7 +73,7 @@ class laser_64k_device : public device_t, public device_memexp_interface
 {
 public:
 	// construction/destruction
-	laser_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	laser_64k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
 

@@ -5,7 +5,7 @@
 
 class konami1_device : public m6809_base_device {
 public:
-	konami1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	konami1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void set_encryption_boundary(UINT16 adr);
 

@@ -14,7 +14,7 @@
 
 const device_type SEGA315_5313 = &device_creator<sega315_5313_device>;
 
-sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega315_5313_device::sega315_5313_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: sega315_5124_device(mconfig, SEGA315_5313, "Sega 315-5313 Megadrive VDP", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega315_5313", __FILE__), m_render_bitmap(nullptr),
 	m_render_line(nullptr), m_render_line_raw(nullptr), m_megadriv_scanline_timer(nullptr),
 	m_sndirqline_callback(*this),
@@ -35,7 +35,7 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const ch
 //  palette device
 //-------------------------------------------------
 
-void sega315_5313_device::static_set_palette_tag(device_t &device, const char *tag)
+void sega315_5313_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<sega315_5313_device &>(device).m_palette.set_tag(tag);
 }

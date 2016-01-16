@@ -67,7 +67,7 @@
 class pcm_state : public driver_device
 {
 public:
-	pcm_state(const machine_config &mconfig, device_type type, const char *tag)
+	pcm_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_pio_s(*this, "z80pio_s"),

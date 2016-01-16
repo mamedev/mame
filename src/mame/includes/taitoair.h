@@ -25,7 +25,7 @@ struct taitoair_poly {
 class taitoair_state : public driver_device
 {
 public:
-	taitoair_state(const machine_config &mconfig, device_type type, const char *tag)
+	taitoair_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_m68000_mainram(*this, "m68000_mainram"),
 			m_line_ram(*this, "line_ram"),

@@ -86,7 +86,7 @@ would just have taken three extra tracks on the main board and a OR gate in an A
 class ti99_2_state : public driver_device
 {
 public:
-	ti99_2_state(const machine_config &mconfig, device_type type, const char *tag)
+	ti99_2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),

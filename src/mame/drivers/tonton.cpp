@@ -33,7 +33,7 @@
 class tonton_state : public driver_device
 {
 public:
-	tonton_state(const machine_config &mconfig, device_type type, const char *tag)
+	tonton_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_v9938(*this, "v9938"),
 		m_maincpu(*this, "maincpu"),

@@ -1583,13 +1583,13 @@ void memory_manager::dump(FILE *file)
 		fprintf(file, "\n\n"
 						"====================================================\n"
 						"Device '%s' %s address space read handler dump\n"
-						"====================================================\n", space->device().tag(), space->name());
+						"====================================================\n", space->device().tag().c_str(), space->name());
 		space->dump_map(file, ROW_READ);
 
 		fprintf(file, "\n\n"
 						"====================================================\n"
 						"Device '%s' %s address space write handler dump\n"
-						"====================================================\n", space->device().tag(), space->name());
+						"====================================================\n", space->device().tag().c_str(), space->name());
 		space->dump_map(file, ROW_WRITE);
 	}
 }
@@ -1833,7 +1833,7 @@ void address_space::prepare_map()
 		adjust_addresses(entry->m_bytestart, entry->m_byteend, entry->m_bytemask, entry->m_bytemirror);
 
 		// if we have a share entry, add it to our map
-		if (entry->m_share != nullptr)
+		if (!entry->m_share.empty())
 		{
 			// if we can't find it, add it to our map
 			std::string fulltag = entry->m_devbase.subtag(entry->m_share);
@@ -1846,7 +1846,7 @@ void address_space::prepare_map()
 		}
 
 		// if this is a ROM handler without a specified region, attach it to the implicit region
-		if (m_spacenum == AS_0 && entry->m_read.m_type == AMH_ROM && entry->m_region == nullptr)
+		if (m_spacenum == AS_0 && entry->m_read.m_type == AMH_ROM && entry->m_region.empty())
 		{
 			// make sure it fits within the memory region before doing so, however
 			if (entry->m_byteend < devregionsize)
@@ -1857,7 +1857,7 @@ void address_space::prepare_map()
 		}
 
 		// validate adjusted addresses against implicit regions
-		if (entry->m_region != nullptr && entry->m_share == nullptr)
+		if (!entry->m_region.empty() && entry->m_share.empty())
 		{
 			// determine full tag
 			std::string fulltag = entry->m_devbase.subtag(entry->m_region);
@@ -1865,15 +1865,15 @@ void address_space::prepare_map()
 			// find the region
 			memory_region *region = machine().root_device().memregion(fulltag.c_str());
 			if (region == nullptr)
-				fatalerror("Error: device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"\n", m_device.tag(), m_name, entry->m_addrstart, entry->m_addrend, entry->m_region);
+				fatalerror("Error: device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"\n", m_device.tag().c_str(), m_name, entry->m_addrstart, entry->m_addrend, entry->m_region.c_str());
 
 			// validate the region
 			if (entry->m_rgnoffs + (entry->m_byteend - entry->m_bytestart + 1) > region->bytes())
-				fatalerror("Error: device '%s' %s space memory map entry %X-%X extends beyond region \"%s\" size (%X)\n", m_device.tag(), m_name, entry->m_addrstart, entry->m_addrend, entry->m_region, region->bytes());
+				fatalerror("Error: device '%s' %s space memory map entry %X-%X extends beyond region \"%s\" size (%X)\n", m_device.tag().c_str(), m_name, entry->m_addrstart, entry->m_addrend, entry->m_region.c_str(), region->bytes());
 		}
 
 		// convert any region-relative entries to their memory pointers
-		if (entry->m_region != nullptr)
+		if (!entry->m_region.empty())
 		{
 			// determine full tag
 			std::string fulltag = entry->m_devbase.subtag(entry->m_region);
@@ -1976,18 +1976,18 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 
 		case AMH_PORT:
 			install_readwrite_port(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror,
-							(readorwrite == ROW_READ) ? data.m_tag : nullptr,
-							(readorwrite == ROW_WRITE) ? data.m_tag : nullptr);
+							(readorwrite == ROW_READ) ? data.m_tag.c_str() : nullptr,
+							(readorwrite == ROW_WRITE) ? data.m_tag.c_str() : nullptr);
 			break;
 
 		case AMH_BANK:
 			install_bank_generic(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror,
-							(readorwrite == ROW_READ) ? data.m_tag : nullptr,
-							(readorwrite == ROW_WRITE) ? data.m_tag : nullptr);
+							(readorwrite == ROW_READ) ? data.m_tag.c_str() : nullptr,
+							(readorwrite == ROW_WRITE) ? data.m_tag.c_str() : nullptr);
 			break;
 
 		case AMH_DEVICE_SUBMAP:
-			throw emu_fatalerror("Internal mapping error: leftover mapping of '%s'.\n", data.m_tag);
+			throw emu_fatalerror("Internal mapping error: leftover mapping of '%s'.\n", data.m_tag.c_str());
 	}
 }
 
@@ -2087,7 +2087,7 @@ void address_space::locate_memory()
 				if (entry->m_bytestart == bank->bytestart() && entry->m_memory != nullptr)
 				{
 					bank->set_base(entry->m_memory);
-					VPRINTF(("assigned bank '%s' pointer to memory from range %08X-%08X [%p]\n", bank->tag(), entry->m_addrstart, entry->m_addrend, entry->m_memory));
+					VPRINTF(("assigned bank '%s' pointer to memory from range %08X-%08X [%p]\n", bank->tag().c_str(), entry->m_addrstart, entry->m_addrend, entry->m_memory));
 					break;
 				}
 
@@ -2113,18 +2113,18 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 	for (address_map_entry *entry = m_map->m_entrylist.first(); entry != nullptr; entry = entry->next())
 	{
 		// if we haven't assigned this block yet, see if we have a mapped shared pointer for it
-		if (entry->m_memory == nullptr && entry->m_share != nullptr)
+		if (entry->m_memory == nullptr && !entry->m_share.empty())
 		{
 			std::string fulltag = entry->m_devbase.subtag(entry->m_share);
 			memory_share *share = manager().m_sharelist.find(fulltag.c_str());
 			if (share != nullptr && share->ptr() != nullptr)
 			{
 				entry->m_memory = share->ptr();
-				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' [%p]\n", entry->m_addrstart, entry->m_addrend, entry->m_share, entry->m_memory));
+				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' [%p]\n", entry->m_addrstart, entry->m_addrend, entry->m_share.c_str(), entry->m_memory));
 			}
 			else
 			{
-				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' but not found\n", entry->m_addrstart, entry->m_addrend, entry->m_share));
+				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' but not found\n", entry->m_addrstart, entry->m_addrend, entry->m_share.c_str()));
 			}
 		}
 
@@ -2136,14 +2136,14 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 		}
 
 		// if we're the first match on a shared pointer, assign it now
-		if (entry->m_memory != nullptr && entry->m_share != nullptr)
+		if (entry->m_memory != nullptr && !entry->m_share.empty())
 		{
 			std::string fulltag = entry->m_devbase.subtag(entry->m_share);
 			memory_share *share = manager().m_sharelist.find(fulltag.c_str());
 			if (share != nullptr && share->ptr() == nullptr)
 			{
 				share->set_ptr(entry->m_memory);
-				VPRINTF(("setting shared_ptr '%s' = %p\n", entry->m_share, entry->m_memory));
+				VPRINTF(("setting shared_ptr '%s' = %p\n", entry->m_share.c_str(), entry->m_memory));
 			}
 		}
 
@@ -2256,7 +2256,7 @@ void address_space::install_readwrite_port(offs_t addrstart, offs_t addrend, off
 		// find the port
 		ioport_port *port = machine().root_device().ioport(device().siblingtag(rtag).c_str());
 		if (port == nullptr)
-			throw emu_fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag, m_name, m_device.tag());
+			throw emu_fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag, m_name, m_device.tag().c_str());
 
 		// map the range and set the ioport
 		read().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_ioport(*port);
@@ -2267,7 +2267,7 @@ void address_space::install_readwrite_port(offs_t addrstart, offs_t addrend, off
 		// find the port
 		ioport_port *port = machine().root_device().ioport(device().siblingtag(wtag).c_str());
 		if (port == nullptr)
-			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag, m_name, m_device.tag());
+			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag, m_name, m_device.tag().c_str());
 
 		// map the range and set the ioport
 		write().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_ioport(*port);
@@ -2316,7 +2316,7 @@ void address_space::install_bank_generic(offs_t addrstart, offs_t addrend, offs_
 	VPRINTF(("address_space::install_readwrite_bank(%s-%s mask=%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 				core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
-				(rbank != nullptr) ? rbank->tag() : "(none)", (wbank != nullptr) ? wbank->tag() : "(none)"));
+				(rbank != nullptr) ? rbank->tag().c_str() : "(none)", (wbank != nullptr) ? wbank->tag().c_str() : "(none)"));
 
 	// map the read bank
 	if (rbank != nullptr)
@@ -2352,7 +2352,7 @@ void *address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_
 	if (readorwrite == ROW_READ || readorwrite == ROW_READWRITE)
 	{
 		// find a bank and map it
-		memory_bank &bank = bank_find_or_allocate(nullptr, addrstart, addrend, addrmask, addrmirror, ROW_READ);
+		memory_bank &bank = bank_find_or_allocate(std::string(), addrstart, addrend, addrmask, addrmirror, ROW_READ);
 		read().map_range(addrstart, addrend, addrmask, addrmirror, bank.index());
 
 		// if we are provided a pointer, set it
@@ -2381,7 +2381,7 @@ void *address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_
 	if (readorwrite == ROW_WRITE || readorwrite == ROW_READWRITE)
 	{
 		// find a bank and map it
-		memory_bank &bank = bank_find_or_allocate(nullptr, addrstart, addrend, addrmask, addrmirror, ROW_WRITE);
+		memory_bank &bank = bank_find_or_allocate(std::string(), addrstart, addrend, addrmask, addrmirror, ROW_WRITE);
 		write().map_range(addrstart, addrend, addrmask, addrmirror, bank.index());
 
 		// if we are provided a pointer, set it
@@ -2553,7 +2553,7 @@ void *address_space::find_backing_memory(offs_t addrstart, offs_t addrend)
 	offs_t bytestart = address_to_byte(addrstart);
 	offs_t byteend = address_to_byte_end(addrend);
 
-	VPRINTF(("address_space::find_backing_memory('%s',%s,%08X-%08X) -> ", m_device.tag(), m_name, bytestart, byteend));
+	VPRINTF(("address_space::find_backing_memory('%s',%s,%08X-%08X) -> ", m_device.tag().c_str(), m_name, bytestart, byteend));
 
 	if (m_map == nullptr)
 		return nullptr;
@@ -2592,7 +2592,7 @@ void *address_space::find_backing_memory(offs_t addrstart, offs_t addrend)
 bool address_space::needs_backing_store(const address_map_entry *entry)
 {
 	// if we are sharing, and we don't have a pointer yet, create one
-	if (entry->m_share != nullptr)
+	if (!entry->m_share.empty())
 	{
 		std::string fulltag = entry->m_devbase.subtag(entry->m_share);
 		memory_share *share = manager().m_sharelist.find(fulltag.c_str());
@@ -2626,7 +2626,7 @@ bool address_space::needs_backing_store(const address_map_entry *entry)
 //  read/write handler
 //-------------------------------------------------
 
-memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite)
+memory_bank &address_space::bank_find_or_allocate(std::string tag, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite)
 {
 	// adjust the addresses, handling mirrors and such
 	offs_t bytemirror = addrmirror;
@@ -2637,7 +2637,7 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 
 	// if this bank is named, look it up
 	memory_bank *membank = nullptr;
-	if (tag != nullptr)
+	if (!tag.empty())
 		membank = manager().bank(tag);
 
 	// else try to find an exact match
@@ -2653,8 +2653,8 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 		int banknum = manager().m_banknext++;
 		if (banknum > STATIC_BANKMAX)
 		{
-			if (tag != nullptr)
-				throw emu_fatalerror("Unable to allocate new bank '%s'", tag);
+			if (!tag.empty())
+				throw emu_fatalerror("Unable to allocate new bank '%s'", tag.c_str());
 			else
 				throw emu_fatalerror("Unable to allocate bank for RAM/ROM area %X-%X\n", bytestart, byteend);
 		}
@@ -2662,11 +2662,11 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 		// if no tag, create a unique one
 		membank = global_alloc(memory_bank(*this, banknum, bytestart, byteend, tag));
 		std::string temptag;
-		if (tag == nullptr) {
+		if (tag.empty()) {
 			strprintf(temptag, "anon_%p", (void *) membank);
 			tag = temptag.c_str();
 		}
-		manager().m_banklist.append(tag, *membank);
+		manager().m_banklist.append(tag.c_str(), *membank);
 	}
 
 	// add a reference for this space
@@ -3819,7 +3819,7 @@ memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteen
 		m_byteend(byteend),
 		m_data(reinterpret_cast<UINT8 *>(memory))
 {
-	VPRINTF(("block_allocate('%s',%s,%08X,%08X,%p)\n", space.device().tag(), space.name(), bytestart, byteend, memory));
+	VPRINTF(("block_allocate('%s',%s,%08X,%08X,%p)\n", space.device().tag().c_str(), space.name(), bytestart, byteend, memory));
 
 	// allocate a block if needed
 	if (m_data == nullptr)
@@ -3877,18 +3877,18 @@ memory_block::~memory_block()
 //  memory_bank - constructor
 //-------------------------------------------------
 
-memory_bank::memory_bank(address_space &space, int index, offs_t bytestart, offs_t byteend, const char *tag)
+memory_bank::memory_bank(address_space &space, int index, offs_t bytestart, offs_t byteend, std::string tag)
 	: m_next(nullptr),
 		m_machine(space.machine()),
 		m_baseptr(space.manager().bank_pointer_addr(index)),
 		m_index(index),
-		m_anonymous(tag == nullptr),
+		m_anonymous(tag.empty()),
 		m_bytestart(bytestart),
 		m_byteend(byteend),
 		m_curentry(BANK_ENTRY_UNSPECIFIED)
 {
 	// generate an internal tag if we don't have one
-	if (tag == nullptr)
+	if (tag.empty())
 	{
 		strprintf(m_tag,"~%d~", index);
 		strprintf(m_name,"Internal bank #%d", index);
@@ -3896,7 +3896,7 @@ memory_bank::memory_bank(address_space &space, int index, offs_t bytestart, offs
 	else
 	{
 		m_tag.assign(tag);
-		strprintf(m_name,"Bank '%s'", tag);
+		strprintf(m_name,"Bank '%s'", tag.c_str());
 	}
 
 	if (!m_anonymous && space.machine().save().registration_allowed())
@@ -4484,13 +4484,13 @@ void handler_entry_read::set_ioport(ioport_port &ioport)
 {
 	m_ioport = &ioport;
 	if (m_datawidth == 8)
-		set_delegate(read8_delegate(&handler_entry_read::read_stub_ioport<UINT8>, ioport.tag(), this));
+		set_delegate(read8_delegate(&handler_entry_read::read_stub_ioport<UINT8>, ioport.tag().c_str(), this));
 	else if (m_datawidth == 16)
-		set_delegate(read16_delegate(&handler_entry_read::read_stub_ioport<UINT16>, ioport.tag(), this));
+		set_delegate(read16_delegate(&handler_entry_read::read_stub_ioport<UINT16>, ioport.tag().c_str(), this));
 	else if (m_datawidth == 32)
-		set_delegate(read32_delegate(&handler_entry_read::read_stub_ioport<UINT32>, ioport.tag(), this));
+		set_delegate(read32_delegate(&handler_entry_read::read_stub_ioport<UINT32>, ioport.tag().c_str(), this));
 	else if (m_datawidth == 64)
-		set_delegate(read64_delegate(&handler_entry_read::read_stub_ioport<UINT64>, ioport.tag(), this));
+		set_delegate(read64_delegate(&handler_entry_read::read_stub_ioport<UINT64>, ioport.tag().c_str(), this));
 }
 
 
@@ -4778,13 +4778,13 @@ void handler_entry_write::set_ioport(ioport_port &ioport)
 {
 	m_ioport = &ioport;
 	if (m_datawidth == 8)
-		set_delegate(write8_delegate(&handler_entry_write::write_stub_ioport<UINT8>, ioport.tag(), this));
+		set_delegate(write8_delegate(&handler_entry_write::write_stub_ioport<UINT8>, ioport.tag().c_str(), this));
 	else if (m_datawidth == 16)
-		set_delegate(write16_delegate(&handler_entry_write::write_stub_ioport<UINT16>, ioport.tag(), this));
+		set_delegate(write16_delegate(&handler_entry_write::write_stub_ioport<UINT16>, ioport.tag().c_str(), this));
 	else if (m_datawidth == 32)
-		set_delegate(write32_delegate(&handler_entry_write::write_stub_ioport<UINT32>, ioport.tag(), this));
+		set_delegate(write32_delegate(&handler_entry_write::write_stub_ioport<UINT32>, ioport.tag().c_str(), this));
 	else if (m_datawidth == 64)
-		set_delegate(write64_delegate(&handler_entry_write::write_stub_ioport<UINT64>, ioport.tag(), this));
+		set_delegate(write64_delegate(&handler_entry_write::write_stub_ioport<UINT64>, ioport.tag().c_str(), this));
 }
 
 

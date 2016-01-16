@@ -70,7 +70,7 @@ const rom_entry *isa16_svga_s3_device::device_rom_region() const
 //  isa16_vga_device - constructor
 //-------------------------------------------------
 
-isa16_svga_s3_device::isa16_svga_s3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa16_svga_s3_device::isa16_svga_s3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA16_SVGA_S3, "Number Nine 9FX Vision 330 (S3 764) Graphics Card", tag, owner, clock, "s3_764", __FILE__),
 		device_isa16_card_interface(mconfig, *this), m_vga(nullptr), m_8514(nullptr)
 {
@@ -182,7 +182,7 @@ const rom_entry *isa16_s3virge_device::device_rom_region() const
 //  isa16_vga_device - constructor
 //-------------------------------------------------
 
-isa16_s3virge_device::isa16_s3virge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa16_s3virge_device::isa16_s3virge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA16_S3VIRGE, "S3 ViRGE Graphics Card", tag, owner, clock, "s3virge", __FILE__),
 		device_isa16_card_interface(mconfig, *this), m_vga(nullptr)
 {
@@ -269,7 +269,7 @@ const rom_entry *isa16_s3virgedx_device::device_rom_region() const
 //  isa16_vga_device - constructor
 //-------------------------------------------------
 
-isa16_s3virgedx_device::isa16_s3virgedx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa16_s3virgedx_device::isa16_s3virgedx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA16_S3VIRGEDX, "S3 ViRGE/DX Graphics Card", tag, owner, clock, "s3virgedx", __FILE__),
 		device_isa16_card_interface(mconfig, *this), m_vga(nullptr)
 {
@@ -357,7 +357,7 @@ const rom_entry *isa16_stealth3d2kpro_device::device_rom_region() const
 //  isa16_vga_device - constructor
 //-------------------------------------------------
 
-isa16_stealth3d2kpro_device::isa16_stealth3d2kpro_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa16_stealth3d2kpro_device::isa16_stealth3d2kpro_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA16_DMS3D2KPRO, "Diamond Stealth 3D 2000 Pro", tag, owner, clock, "dms3d2kp", __FILE__),
 		device_isa16_card_interface(mconfig, *this), m_vga(nullptr)
 {

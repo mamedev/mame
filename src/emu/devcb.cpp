@@ -37,9 +37,9 @@ devcb_base::devcb_base(device_t &device, UINT64 defmask)
 void devcb_base::reset(callback_type type)
 {
 	m_type = type;
-	m_target_tag = nullptr;
+	m_target_tag.clear();
 	m_target_int = 0;
-	m_space_tag = nullptr;
+	m_space_tag.clear();
 	m_space_num = AS_0;
 	m_space = nullptr;
 	m_target.ptr = nullptr;
@@ -56,9 +56,9 @@ void devcb_base::reset(callback_type type)
 void devcb_base::resolve_ioport()
 {
 	// attempt to resolve, fatal error if fail
-	m_target.ioport = (m_target_tag != nullptr) ? m_device.owner()->ioport(m_target_tag) : nullptr;
+	m_target.ioport = (!m_target_tag.empty()) ? m_device.owner()->ioport(m_target_tag) : nullptr;
 	if (m_target.ioport == nullptr)
-		throw emu_fatalerror("Unable to resolve I/O port callback reference to '%s' in device '%s'\n", m_target_tag, m_device.tag());
+		throw emu_fatalerror("Unable to resolve I/O port callback reference to '%s' in device '%s'\n", m_target_tag.c_str(), m_device.tag().c_str());
 }
 
 
@@ -70,14 +70,14 @@ void devcb_base::resolve_ioport()
 void devcb_base::resolve_inputline()
 {
 	// attempt to resolve, fatal error if fail
-	m_target.device = (m_target_tag != nullptr) ? m_device.owner()->subdevice(m_target_tag) : nullptr;
+	m_target.device = (!m_target_tag.empty()) ? m_device.owner()->subdevice(m_target_tag) : nullptr;
 	if (m_target.device == nullptr)
-		throw emu_fatalerror("Unable to resolve device reference to '%s' in device '%s'\n", m_target_tag, m_device.tag());
+		throw emu_fatalerror("Unable to resolve device reference to '%s' in device '%s'\n", m_target_tag.c_str(), m_device.tag().c_str());
 
 	// make sure we have an execute interface
 	device_execute_interface *exec;
 	if (!m_target.device->interface(exec))
-		throw emu_fatalerror("No execute interface found for device reference to '%s' in device '%s'\n", m_target_tag, m_device.tag());
+		throw emu_fatalerror("No execute interface found for device reference to '%s' in device '%s'\n", m_target_tag.c_str(), m_device.tag().c_str());
 }
 
 
@@ -89,11 +89,11 @@ void devcb_base::resolve_inputline()
 void devcb_base::resolve_space()
 {
 	// attempt to resolve, fatal error if fail
-	device_t *spacedev = (m_space_tag != nullptr) ? m_device.owner()->subdevice(m_space_tag) : nullptr;
+	device_t *spacedev = (!m_space_tag.empty()) ? m_device.owner()->subdevice(m_space_tag) : nullptr;
 	if (spacedev == nullptr)
-		throw emu_fatalerror("Unable to resolve device reference to '%s' in device '%s'\n", m_space_tag, m_device.tag());
+		throw emu_fatalerror("Unable to resolve device reference to '%s' in device '%s'\n", m_space_tag.c_str(), m_device.tag().c_str());
 	if (!spacedev->memory().has_space(m_space_num))
-		throw emu_fatalerror("Unable to resolve device address space %d on '%s' in device '%s'\n", m_space_num, m_space_tag, m_device.tag());
+		throw emu_fatalerror("Unable to resolve device address space %d on '%s' in device '%s'\n", m_space_num, m_space_tag.c_str(), m_device.tag().c_str());
 	m_space = &spacedev->memory().space(m_space_num);
 }
 
@@ -141,7 +141,7 @@ void devcb_read_base::reset(callback_type type)
 void devcb_read_base::resolve()
 {
 	// first resolve any address spaces
-	if (m_space_tag != nullptr)
+	if (!m_space_tag.empty())
 		resolve_space();
 	else
 		m_space = &downcast<driver_device &>(m_device.machine().root_device()).generic_space();
@@ -311,7 +311,7 @@ UINT64 devcb_read_base::read_ioport_adapter(address_space &space, offs_t offset,
 
 UINT64 devcb_read_base::read_logged_adapter(address_space &space, offs_t offset, UINT64 mask)
 {
-	m_device.logerror("%s: read %s\n", m_device.machine().describe_context(), m_target_tag);
+	m_device.logerror("%s: read %s\n", m_device.machine().describe_context(), m_target_tag.c_str());
 	return shift_mask_xor(m_target_int);
 }
 
@@ -369,7 +369,7 @@ void devcb_write_base::reset(callback_type type)
 void devcb_write_base::resolve()
 {
 	// first resolve any address spaces
-	if (m_space_tag != nullptr)
+	if (!m_space_tag.empty())
 		resolve_space();
 	else
 		m_space = &downcast<driver_device &>(m_device.machine().root_device()).generic_space();

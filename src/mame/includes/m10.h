@@ -39,7 +39,7 @@ public:
 		TIMER_INTERRUPT
 	};
 
-	m10_state(const machine_config &mconfig, device_type type, const char *tag)
+	m10_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_memory(*this, "memory"),
 		m_rom(*this, "rom"),

@@ -57,7 +57,7 @@ device_snes_control_port_interface::~device_snes_control_port_interface()
 //  snes_control_port_device - constructor
 //-------------------------------------------------
 
-snes_control_port_device::snes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+snes_control_port_device::snes_control_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, SNES_CONTROL_PORT, "Nintendo SNES / SFC control port", tag, owner, clock, "snes_control_port", __FILE__),
 						device_slot_interface(mconfig, *this), m_device(nullptr)
 {

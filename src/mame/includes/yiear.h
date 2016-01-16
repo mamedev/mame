@@ -6,7 +6,7 @@
 class yiear_state : public driver_device
 {
 public:
-	yiear_state(const machine_config &mconfig, device_type type, const char *tag)
+	yiear_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),

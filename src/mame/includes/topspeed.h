@@ -14,7 +14,7 @@
 class topspeed_state : public driver_device
 {
 public:
-	topspeed_state(const machine_config &mconfig, device_type type, const char *tag)
+	topspeed_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_spritemap(*this, "spritemap"),
 		m_raster_ctrl(*this, "raster_ctrl"),

@@ -23,7 +23,7 @@ months for an average citizen.
 class mk90_state : public driver_device
 {
 public:
-	mk90_state(const machine_config &mconfig, device_type type, const char *tag)
+	mk90_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 

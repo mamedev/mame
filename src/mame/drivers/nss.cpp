@@ -299,7 +299,7 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 class nss_state : public snes_state
 {
 public:
-	nss_state(const machine_config &mconfig, device_type type, const char *tag)
+	nss_state(const machine_config &mconfig, device_type type, std::string tag)
 		: snes_state(mconfig, type, tag),
 		m_m50458(*this,"m50458"),
 		m_s3520cf(*this, "s3520cf"),

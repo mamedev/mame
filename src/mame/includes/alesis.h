@@ -28,7 +28,7 @@ class alesis_dm3ag_device : public device_t
 {
 public:
 	// construction/destruction
-	alesis_dm3ag_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	alesis_dm3ag_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -61,7 +61,7 @@ private:
 class alesis_state : public driver_device
 {
 public:
-	alesis_state(const machine_config &mconfig, device_type type, const char *tag)
+	alesis_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_lcdc(*this, "hd44780"),
 			m_cassette(*this, "cassette"),

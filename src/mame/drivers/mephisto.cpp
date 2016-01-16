@@ -73,7 +73,7 @@ Mephisto 4 Turbo Kit 18mhz - (mm4tk)
 class mephisto_state : public mboard_state
 {
 public:
-	mephisto_state(const machine_config &mconfig, device_type type, const char *tag)
+	mephisto_state(const machine_config &mconfig, device_type type, std::string tag)
 		: mboard_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_beep(*this, "beeper")

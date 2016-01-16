@@ -49,7 +49,7 @@
 class einstein_state : public driver_device
 {
 public:
-	einstein_state(const machine_config &mconfig, device_type type, const char *tag)
+	einstein_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_fdc(*this, IC_I042),
 		m_color_screen(*this, "screen"),
@@ -166,7 +166,7 @@ class einstein_keyboard_daisy_device :  public device_t,
 {
 public:
 	// construction/destruction
-	einstein_keyboard_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	einstein_keyboard_daisy_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 private:
 	virtual void device_start() override;
@@ -186,7 +186,7 @@ class einstein_adc_daisy_device :   public device_t,
 {
 public:
 	// construction/destruction
-	einstein_adc_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	einstein_adc_daisy_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 private:
 	virtual void device_start() override;
@@ -206,7 +206,7 @@ class einstein_fire_daisy_device :  public device_t,
 {
 public:
 	// construction/destruction
-	einstein_fire_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	einstein_fire_daisy_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 private:
 	virtual void device_start() override;

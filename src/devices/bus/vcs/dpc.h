@@ -27,7 +27,7 @@ class dpc_device : public device_t
 {
 public:
 	// construction/destruction
-	dpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dpc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	df_t    m_df[8];
 	UINT8   m_movamt;
@@ -68,7 +68,7 @@ class a26_rom_dpc_device : public a26_rom_f8_device
 {
 public:
 	// construction/destruction
-	a26_rom_dpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a26_rom_dpc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

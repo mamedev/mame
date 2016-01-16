@@ -14,12 +14,12 @@
 
 void upd7810_device::illegal()
 {
-	logerror("uPD7810 '%s': illegal opcode %02x at PC:%04x\n", tag(), OP, PC);
+	logerror("uPD7810 '%s': illegal opcode %02x at PC:%04x\n", tag().c_str(), OP, PC);
 }
 
 void upd7810_device::illegal2()
 {
-	logerror("uPD7810 '%s': illegal opcode %02x %02x at PC:%04x\n", tag(), OP, OP2, PC);
+	logerror("uPD7810 '%s': illegal opcode %02x %02x at PC:%04x\n", tag().c_str(), OP, OP2, PC);
 }
 
 /* prefix 48 */
@@ -8653,7 +8653,7 @@ void upd7810_device::SKN_bit()
 			val = RP( UPD7807_PORTT );
 			break;
 		default:
-			logerror("uPD7810 '%s': illegal opcode %02x %02x at PC:%04x\n", tag(), OP, imm, PC);
+			logerror("uPD7810 '%s': illegal opcode %02x %02x at PC:%04x\n", tag().c_str(), OP, imm, PC);
 			val = 0;
 			break;
 	}
@@ -8707,7 +8707,7 @@ void upd7810_device::SETB()
 //          PT is input only
 //          break;
 		default:
-			logerror("uPD7810 '%s': illegal opcode %02x %02x at PC:%04x\n", tag(), OP, imm, PC);
+			logerror("uPD7810 '%s': illegal opcode %02x %02x at PC:%04x\n", tag().c_str(), OP, imm, PC);
 			break;
 	}
 }
@@ -8757,7 +8757,7 @@ void upd7810_device::CLR()
 //          PT is input only
 //          break;
 		default:
-			logerror("uPD7810 '%s': illegal opcode %02x %02x at PC:%04x\n", tag(), OP, imm, PC);
+			logerror("uPD7810 '%s': illegal opcode %02x %02x at PC:%04x\n", tag().c_str(), OP, imm, PC);
 			break;
 	}
 }
@@ -8806,7 +8806,7 @@ void upd7810_device::SK_bit()
 			val = RP( UPD7807_PORTT );
 			break;
 		default:
-			logerror("uPD7810 '%s': illegal opcode %02x %02x at PC:%04x\n", tag(), OP, imm, PC);
+			logerror("uPD7810 '%s': illegal opcode %02x %02x at PC:%04x\n", tag().c_str(), OP, imm, PC);
 			val = 0;
 			break;
 	}

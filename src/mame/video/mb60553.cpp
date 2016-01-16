@@ -14,7 +14,7 @@
 
 const device_type MB60553 = &device_creator<mb60553_zooming_tilemap_device>;
 
-mb60553_zooming_tilemap_device::mb60553_zooming_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mb60553_zooming_tilemap_device::mb60553_zooming_tilemap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MB60553, "MB60553 Zooming Tilemap", tag, owner, clock, "mb60553", __FILE__),
 	m_vram(nullptr),
 	m_pal_base(0),
@@ -59,7 +59,7 @@ void mb60553_zooming_tilemap_device::set_gfx_region(device_t &device, int gfxreg
 	dev.m_gfx_region = gfxregion;
 }
 
-void mb60553_zooming_tilemap_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void mb60553_zooming_tilemap_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<mb60553_zooming_tilemap_device &>(device).m_gfxdecode.set_tag(tag);
 }

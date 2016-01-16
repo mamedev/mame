@@ -20,7 +20,7 @@
 const device_type SNS_PFEST94 = &device_creator<sns_pfest94_device>;
 
 
-sns_pfest94_device::sns_pfest94_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sns_pfest94_device::sns_pfest94_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SNS_PFEST94, "SNES Powerfest '94", tag, owner, clock, "sns_pfest94", __FILE__),
 		device_sns_cart_interface(mconfig, *this),
 		m_upd7725(*this, "dsp"),

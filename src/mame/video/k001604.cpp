@@ -17,7 +17,7 @@
 
 const device_type K001604 = &device_creator<k001604_device>;
 
-k001604_device::k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k001604_device::k001604_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K001604, "K001604 2D tilemaps + 2x ROZ", tag, owner, clock, "k001604", __FILE__),
 	m_gfx_index_1(0),
 	m_gfx_index_2(0),
@@ -41,7 +41,7 @@ k001604_device::k001604_device(const machine_config &mconfig, const char *tag, d
 //  gfx decoder
 //-------------------------------------------------
 
-void k001604_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void k001604_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<k001604_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -425,7 +425,7 @@ WRITE32_MEMBER( k001604_device::reg_w )
 //  palette device
 //-------------------------------------------------
 
-void k001604_device::static_set_palette_tag(device_t &device, const char *tag)
+void k001604_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<k001604_device &>(device).m_palette.set_tag(tag);
 }

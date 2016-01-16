@@ -25,7 +25,7 @@
 class jr200_state : public driver_device
 {
 public:
-	jr200_state(const machine_config &mconfig, device_type type, const char *tag)
+	jr200_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_cram(*this, "cram"),

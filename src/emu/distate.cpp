@@ -605,7 +605,7 @@ void device_state_interface::interface_post_start()
 {
 	// make sure we got something during startup
 	if (m_state_list.count() == 0)
-		throw emu_fatalerror("No state registered for device '%s' that supports it!", m_device.tag());
+		throw emu_fatalerror("No state registered for device '%s' that supports it!", m_device.tag().c_str());
 }
 
 

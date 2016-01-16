@@ -111,7 +111,7 @@ machine_config_constructor abc_hdc_device::device_mconfig_additions() const
 //  abc_hdc_device - constructor
 //-------------------------------------------------
 
-abc_hdc_device::abc_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+abc_hdc_device::abc_hdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ABC_HDC, "ABC HDC", tag, owner, clock, "abc_hdc", __FILE__),
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG)

@@ -67,7 +67,7 @@ ROM_END
 //  qsound_device - constructor
 //-------------------------------------------------
 
-qsound_device::qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+qsound_device::qsound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, QSOUND, "Q-Sound", tag, owner, clock, "qsound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_cpu(*this, "qsound"),

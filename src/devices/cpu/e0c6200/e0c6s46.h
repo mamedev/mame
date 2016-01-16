@@ -66,7 +66,7 @@ typedef void (*e0c6s46_pixel_update_func)(device_t &device, bitmap_ind16 &bitmap
 class e0c6s46_device : public e0c6200_cpu_device
 {
 public:
-	e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e0c6s46_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_write_r0_callback(device_t &device, _Object object) { return downcast<e0c6s46_device &>(device).m_write_r0.set_callback(object); }

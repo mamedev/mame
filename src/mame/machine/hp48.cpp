@@ -921,7 +921,7 @@ void hp48_port_image_device::hp48_fill_port()
 {
 	hp48_state *state = machine().driver_data<hp48_state>();
 	int size = state->m_port_size[m_port];
-	LOG(( "hp48_fill_port: %s module=%i size=%i rw=%i\n", tag(), m_module, size, state->m_port_write[m_port] ));
+	LOG(( "hp48_fill_port: %s module=%i size=%i rw=%i\n", tag().c_str(), m_module, size, state->m_port_write[m_port] ));
 	state->m_port_data[m_port] = make_unique_clear<UINT8[]>(2 * size);
 	state->m_modules[m_module].off_mask = 2 * (( size > 128 * 1024 ) ? 128 * 1024 : size) - 1;
 	state->m_modules[m_module].read     = read8_delegate();
@@ -955,7 +955,7 @@ bool hp48_port_image_device::call_load()
 	/* check size */
 	if ( (size < 32*1024) || (size > m_max_size) || (size & (size-1)) )
 	{
-		logerror( "hp48: image size for %s should be a power of two between %i and %i\n", tag(), 32*1024, m_max_size );
+		logerror( "hp48: image size for %s should be a power of two between %i and %i\n", tag().c_str(), 32*1024, m_max_size );
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -978,7 +978,7 @@ bool hp48_port_image_device::call_create(int format_type, option_resolution *for
 	/* size must be a power of 2 between 32K and max_size */
 	if ( (size < 32*1024) || (size > m_max_size) || (size & (size-1)) )
 	{
-		logerror( "hp48: image size for %s should be a power of two between %i and %i\n", tag(), 32*1024, m_max_size );
+		logerror( "hp48: image size for %s should be a power of two between %i and %i\n", tag().c_str(), 32*1024, m_max_size );
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -992,7 +992,7 @@ void hp48_port_image_device::call_unload()
 {
 	hp48_state *state = machine().driver_data<hp48_state>();
 	LOG(( "hp48_port image unload: %s size=%i rw=%i\n",
-			tag(), state->m_port_size[m_port], state->m_port_write[m_port] ));
+			tag().c_str(), state->m_port_size[m_port], state->m_port_write[m_port] ));
 	if ( state->m_port_write[m_port] )
 	{
 		state->hp48_encode_nibble( state->m_port_data[m_port].get(), state->m_port_data[m_port].get(), state->m_port_size[m_port] );
@@ -1010,7 +1010,7 @@ void hp48_port_image_device::device_start()
 	hp48_unfill_port();
 }
 
-hp48_port_image_device::hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hp48_port_image_device::hp48_port_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HP48_PORT, "HP48 memory card", tag, owner, clock, "hp48_port_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
