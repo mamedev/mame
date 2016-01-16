@@ -12,7 +12,7 @@
 
 <!-- All images in this list were created from original discs, most contain copy protection. -->
 
-<softwarelist name="bbcb_orig_flop" description="BBC Micro Model B Original disks">
+<softwarelist name="bbcb_flop_orig" description="BBC Micro Model B Original disks">
 
 	<!-- Games -->
 
@@ -757,7 +757,7 @@
 
 	<software name="fabfour1">
 		<description>Fab Four Vol.1</description>
-		<year>1990</year>
+		<year>1989</year>
 		<publisher>Audiogenic</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side [A]"/>
@@ -1130,7 +1130,7 @@
 
 	<software name="impmiss">
 		<description>Impossible Mission</description>
-		<year>1985</year>
+		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="105085">
@@ -1229,7 +1229,7 @@
 
 	<software name="sharrier">
 		<description>Strike Force Harrier</description>
-		<year>1986</year>
+		<year>1985</year>
 		<publisher>Mirrorsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102539">
@@ -1544,8 +1544,8 @@
 
 	<software name="discdebg">
 		<description>Disc Debug and Copy All</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Basil Bloom</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104953">
 				<rom name="190 disk debug and copy-all.fsd" size="104953" crc="20dc59e1" sha1="c5e998e839cef9f9a53b531e10a0d2de4ee8050a" offset="0" />
@@ -2065,7 +2065,7 @@
 	<software name="story">
 		<description>Story</description>
 		<year>1983</year>
-		<publisher>H &amp; H Software</publisher>
+		<publisher>H&amp;H Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="105191">
 				<rom name="342 story.fsd" size="105191" crc="3cfde5fc" sha1="99e1bdaacf6615d10279b87c279213188434a57a" offset="0" />
@@ -2114,7 +2114,7 @@
 	</software>
 
 	<software name="bismarck">
-		<description>Bismarck Death of a Battleship</description>
+		<description>Bismarck: Death of a Battleship</description>
 		<year>1987</year>
 		<publisher>BBC Soft</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -3423,48 +3423,31 @@
 		</part>
 	</software>
 
-	<software name="farmcash">
-		<description>FarmCash Setup v1.12</description>
+	<software name="farmman">
+		<description>Farm Management Suite</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
 		<info name="protection" value="None" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="FarmCash Setup"/>
 			<dataarea name="flop" size="204800">
 				<rom name="240 farmcash.ssd" size="204800" crc="ba011313" sha1="5f502b669b83dd80ef524addc75875b946ae0121" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="fieldfil">
-		<description>FieldFile Setup v1.11</description>
-		<year>198?</year>
-		<publisher>Acornsoft</publisher>
-		<info name="protection" value="None" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="FieldFile Setup"/>
 			<dataarea name="flop" size="204800">
 				<rom name="241 fieldfile.ssd" size="204800" crc="61938782" sha1="50ede0e4380043268a9b010587a4bdb5285ea0f2" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="capcost">
-		<description>CapCost Setup v1.11</description>
-		<year>1983</year>
-		<publisher>Acornsoft</publisher>
-		<info name="protection" value="None" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="CapCost Setup"/>
 			<dataarea name="flop" size="204800">
 				<rom name="242 capcost.ssd" size="204800" crc="78f00286" sha1="d747ca27c7490c7638870a099e7660d623eaf54e" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="farmplan">
-		<description>FarmPlanner Setup v1.01</description>
-		<year>1983</year>
-		<publisher>Acornsoft</publisher>
-		<info name="protection" value="None" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="FarmPlanner Setup"/>
 			<dataarea name="flop" size="204800">
 				<rom name="243 farmplanner.ssd" size="204800" crc="142493ad" sha1="3dc58f3d23893f9a926858ff16edf3418ba1b0fd" offset="0" />
 			</dataarea>
@@ -3780,7 +3763,7 @@
 
 	<software name="longwave">
 		<description>Longitudinal Waves</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Five Ways Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="57770">

@@ -8,7 +8,7 @@
       Reset with Z80 co-processor enabled and Acorn CP/M System Disc 1 in drive 0.
 -->
 
-<softwarelist name="bbc_torch_flop" description="Torch Z80 Co-Processor Discs">
+<softwarelist name="bbc_flop_torch" description="Torch Z80 Co-Processor Discs">
 
 	<software name="advent" supported="no">
 		<description>Adventure B01 - 550 points</description>
@@ -24,7 +24,7 @@
 	</software>
 
 	<software name="bbcbasic" supported="no">
-		<description>BBC Basic (Z80) v2.30</description>
+		<description>Torch BBC BASIC (Z80) v2.30</description>
 		<year>1984</year>
 		<publisher>Torch</publisher>
 		<info name="release" value="SC02" />
