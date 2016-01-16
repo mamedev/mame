@@ -27,6 +27,7 @@
 #include "osdepend.h"
 #include "softlist.h"
 
+#include <algorithm>
 #include <new>
 #include <ctype.h>
 
@@ -549,13 +550,6 @@ void cli_frontend::listsamples(const char *gamename)
 //  referenced by a given game or set of games
 //-------------------------------------------------
 
-int cli_frontend::compare_devices(const void *i1, const void *i2)
-{
-	device_t *dev1 = *(device_t **)i1;
-	device_t *dev2 = *(device_t **)i2;
-	return dev1->tag()!=dev2->tag();
-}
-
 void cli_frontend::listdevices(const char *gamename)
 {
 	// determine which drivers to output; return an error if none found
@@ -580,10 +574,12 @@ void cli_frontend::listdevices(const char *gamename)
 			device_list.push_back(device);
 
 		// sort them by tag
-		qsort(&device_list[0], device_list.size(), sizeof(device_list[0]), compare_devices);
+		std::sort(device_list.begin(), device_list.end(), [](device_t *dev1, device_t *dev2) {
+			return dev1->tag() < dev2->tag();
+		});
 
 		// dump the results
-		for (auto device : device_list)
+		for (device_t *device : device_list)
 		{
 			// extract the tag, stripping the leading colon
 			std::string tag = device->tag();
