@@ -75,12 +75,12 @@
 
 - (NSString *)tag {
 	return (device == &machine->root_device()) ? @"<root>"
-											   : [NSString stringWithUTF8String:device->basetag()];
+											   : [NSString stringWithUTF8String:device->basetag().c_str()];
 }
 
 
 - (NSString *)name {
-	return [NSString stringWithUTF8String:device->name()];
+	return [NSString stringWithUTF8String:device->name().c_str()];
 }
 
 

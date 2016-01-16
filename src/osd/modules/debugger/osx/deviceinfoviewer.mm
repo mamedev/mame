@@ -157,11 +157,11 @@
 			toView:contentView];
 	[self addLabel:@"Name:"
 		 withWidth:100
-		  andField:[NSString stringWithUTF8String:device->name()]
+		  andField:[NSString stringWithUTF8String:device->name().c_str()]
 			toView:contentView];
 	[self addLabel:@"Shortname:"
 		 withWidth:100
-		  andField:[NSString stringWithUTF8String:device->shortname()]
+		  andField:[NSString stringWithUTF8String:device->shortname().c_str()]
 			toView:contentView];
 
 	// add interfaces if present

@@ -204,7 +204,7 @@
 	[dasmView selectSubviewForDevice:device];
 	[window setTitle:[NSString stringWithFormat:@"Debug: %s - %s '%s'",
 												device->machine().system().name,
-												device->name(),
+												device->name().c_str(),
 												device->tag().c_str()]];
 }
 
