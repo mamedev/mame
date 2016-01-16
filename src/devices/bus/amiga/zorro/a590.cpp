@@ -192,7 +192,7 @@ const rom_entry *dmac_hdc_device::device_rom_region() const
 //-------------------------------------------------
 
 dmac_hdc_device::dmac_hdc_device(const machine_config &mconfig, device_type type, std::string tag,
-	device_t *owner, UINT32 clock, const char *name, const char *shortname) :
+	device_t *owner, UINT32 clock, std::string name, std::string shortname) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	m_int6(false),
 	m_dmac(*this, "dmac"),

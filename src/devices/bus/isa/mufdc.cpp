@@ -129,7 +129,7 @@ const rom_entry *fdcmag_device::device_rom_region() const
 //  mufdc_device - constructor
 //-------------------------------------------------
 
-mufdc_device::mufdc_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, const char *name, const char *shortname) :
+mufdc_device::mufdc_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, std::string name, std::string shortname) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	device_isa8_card_interface( mconfig, *this ),
 	m_fdc(*this, "fdc"),

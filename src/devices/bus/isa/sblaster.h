@@ -97,7 +97,7 @@ class sb_device :
 {
 public:
 		// construction/destruction
-		sb_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, const char *name, std::string shortname, std::string source);
+		sb_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, std::string name, std::string shortname, std::string source);
 
 		required_device<dac_device> m_dacl;
 		required_device<dac_device> m_dacr;
@@ -158,7 +158,7 @@ class sb8_device : public sb_device,
 {
 public:
 		// construction/destruction
-		sb8_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, const char *name, std::string shortname, std::string source);
+		sb8_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, std::string name, std::string shortname, std::string source);
 
 		DECLARE_READ8_MEMBER(ym3812_16_r);
 		DECLARE_WRITE8_MEMBER(ym3812_16_w);
@@ -212,7 +212,7 @@ class sb16_device : public sb_device,
 {
 public:
 		// construction/destruction
-		sb16_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, const char *name, std::string shortname, std::string source);
+		sb16_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, std::string name, std::string shortname, std::string source);
 		DECLARE_READ8_MEMBER(mpu401_r);
 		DECLARE_WRITE8_MEMBER(mpu401_w);
 		DECLARE_READ8_MEMBER(mixer_r);

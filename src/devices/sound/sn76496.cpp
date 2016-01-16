@@ -130,7 +130,7 @@
 #define MAX_OUTPUT 0x7fff
 
 
-sn76496_base_device::sn76496_base_device(const machine_config &mconfig, device_type type,  const char *name,
+sn76496_base_device::sn76496_base_device(const machine_config &mconfig, device_type type, std::string name,
 	std::string tag, int feedbackmask, int noisetap1, int noisetap2, bool negate, bool stereo, int clockdivider, int sega,
 	device_t *owner, UINT32 clock, std::string shortname, std::string source)
 

@@ -30,7 +30,7 @@ class dmac_hdc_device : public device_t
 public:
 	// construction/destruction
 	dmac_hdc_device(const machine_config &mconfig, device_type type, std::string tag,
-		device_t *owner, UINT32 clock, const char *name, const char *shortname);
+		device_t *owner, UINT32 clock, std::string name, std::string shortname);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

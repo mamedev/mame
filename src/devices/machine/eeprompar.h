@@ -51,7 +51,7 @@ class eeprom_parallel_base_device : public eeprom_base_device
 {
 protected:
 	// construction/destruction
-	eeprom_parallel_base_device(const machine_config &mconfig, device_type devtype, const char *name, std::string tag, device_t *owner, const char *shortname, const char *file);
+	eeprom_parallel_base_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source);
 
 protected:
 	// device-level overrides
@@ -67,7 +67,7 @@ class eeprom_parallel_28xx_device : public eeprom_parallel_base_device
 {
 protected:
 	// construction/destruction
-	eeprom_parallel_28xx_device(const machine_config &mconfig, device_type devtype, const char *name, std::string tag, device_t *owner, const char *shortname, const char *file);
+	eeprom_parallel_28xx_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source);
 
 public:
 	// read/write data lines - for now we cheat and ignore the control lines, assuming

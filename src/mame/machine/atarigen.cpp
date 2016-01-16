@@ -830,8 +830,8 @@ const device_type ATARI_EEPROM_2816 = &device_creator<atari_eeprom_2816_device>;
 //  atari_eeprom_device - constructor
 //-------------------------------------------------
 
-atari_eeprom_device::atari_eeprom_device(const machine_config &mconfig, device_type devtype, const char *name, std::string tag, device_t *owner, const char *shortname, const char *file)
-	: device_t(mconfig, devtype, name, tag, owner, 0, shortname, file),
+atari_eeprom_device::atari_eeprom_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source)
+	: device_t(mconfig, devtype, name, tag, owner, 0, shortname, source),
 		m_eeprom(*this, "eeprom"),
 		m_unlocked(false)
 {

@@ -122,7 +122,7 @@ const device_type NAMCO56XX = &device_creator<namco56xx_device>;
 const device_type NAMCO58XX = &device_creator<namco58xx_device>;
 const device_type NAMCO59XX = &device_creator<namco59xx_device>;
 
-namcoio_device::namcoio_device(const machine_config &mconfig, device_type type, const char* name, std::string tag, device_t *owner, UINT32 clock, const char *shortname)
+namcoio_device::namcoio_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 		m_in_0_cb(*this),
 		m_in_1_cb(*this),

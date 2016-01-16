@@ -20,7 +20,7 @@ class dmv_ram_device :
 {
 public:
 	// construction/destruction
-	dmv_ram_device(const machine_config &mconfig, device_type type, UINT32 size, const char *name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	dmv_ram_device(const machine_config &mconfig, device_type type, UINT32 size, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 protected:
 	// device-level overrides

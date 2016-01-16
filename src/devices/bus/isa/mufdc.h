@@ -36,7 +36,7 @@ class mufdc_device : public device_t,
 {
 public:
 	// construction/destruction
-	mufdc_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, const char *name, const char *shortname);
+	mufdc_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, std::string name, std::string shortname);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
