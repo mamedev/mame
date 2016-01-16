@@ -693,10 +693,17 @@ if string.find(_OPTIONS["gcc"], "clang") and ((version < 30500) or (_OPTIONS["ta
 		"-std=c++1y",
 	}
 else
-	buildoptions_cpp {
-		"-x c++",
-		"-std=c++14",
-	}
+	if _OPTIONS["targetos"]=="os2" then
+		buildoptions_cpp {
+			"-x c++",
+			"-std=gnu++14",
+		}
+	else
+		buildoptions_cpp {
+			"-x c++",
+			"-std=c++14",
+		}
+	end
 
 	buildoptions_objc {
 		"-x objective-c++",
