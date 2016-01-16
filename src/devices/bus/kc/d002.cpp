@@ -88,7 +88,7 @@ static MACHINE_CONFIG_FRAGMENT( kc_d002 )
 	// expansion interface
 	MCFG_DEVICE_ADD("exp", KCCART_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(kc85_exp, nullptr, false)
-	MCFG_KCEXP_SLOT_NEXT_SLOT(nullptr)
+	MCFG_KCEXP_SLOT_NEXT_SLOT("")
 	MCFG_KCEXP_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
 	MCFG_KCEXP_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
 	MCFG_KCEXP_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))

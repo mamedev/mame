@@ -976,7 +976,7 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc",mc6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", MC6845, nullptr, 19980000 / 9)  // divisor unknown -- /9 gives 60Hz output, so likely correct
+	MCFG_MC6845_ADD("crtc", MC6845, "", 19980000 / 9)  // divisor unknown -- /9 gives 60Hz output, so likely correct
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(9)
 	MCFG_MC6845_UPDATE_ROW_CB(ngen_state, crtc_update_row)
@@ -1086,7 +1086,7 @@ static MACHINE_CONFIG_START( ngen386, ngen386_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc",mc6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", MC6845, nullptr, 19980000 / 9)  // divisor unknown -- /9 gives 60Hz output, so likely correct
+	MCFG_MC6845_ADD("crtc", MC6845, "", 19980000 / 9)  // divisor unknown -- /9 gives 60Hz output, so likely correct
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(9)
 	MCFG_MC6845_UPDATE_ROW_CB(ngen_state, crtc_update_row)
