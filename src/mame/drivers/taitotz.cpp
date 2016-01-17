@@ -590,7 +590,6 @@ public:
 
 
 	UINT32 m_reg105;
-	UINT32 m_displist_addr;
 	int m_count;
 
 	std::unique_ptr<taitotz_renderer> m_renderer;
@@ -622,20 +621,25 @@ public:
 class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6, 50000>
 {
 public:
-	taitotz_renderer(taitotz_state &state, int width, int height, UINT32 *texram)
+	taitotz_renderer(taitotz_state &state, int width, int height, UINT32 *scrram, UINT32 *texram)
 		: poly_manager<float, taitotz_polydata, 6, 50000>(state.machine()),
 			m_state(state)
 	{
+		m_fb = std::make_unique<bitmap_rgb32>(width, height);
 		m_zbuffer = std::make_unique<bitmap_ind32>(width, height);
 		m_texture = texram;
+		m_screen_ram = scrram;
 
 		m_diffuse_intensity = 224;
 		m_ambient_intensity = 32;
 		m_specular_intensity = 256;
 		m_specular_power = 20;
+
+		m_cliprect = m_state.m_screen->visible_area();
+
+		setup_viewport(0, 0, 256, 192, 256, 192);
 	}
 
-	void set_fb(bitmap_rgb32 *fb) { m_fb = fb; }
 	void render_displaylist(const rectangle &cliprect);
 	void draw_object(UINT32 address, float scale, UINT8 alpha);
 	float line_plane_intersection(const vertex_t *v1, const vertex_t *v2, PLANE cp);
@@ -643,6 +647,13 @@ public:
 	void setup_viewport(int x, int y, int width, int height, int center_x, int center_y);
 	void draw_scanline_noz(INT32 scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid);
 	void draw_scanline(INT32 scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid);
+
+	void push_tnl_fifo(UINT32 data);
+	void push_direct_poly_fifo(UINT32 data);
+
+	void render_tnl_object(UINT32 address, float scale, UINT8 alpha);
+
+	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
 	enum
@@ -658,9 +669,12 @@ private:
 	//static const float ZBUFFER_MAX = 10000000000.0f;
 
 	taitotz_state &m_state;
-	bitmap_rgb32 *m_fb;
+	std::unique_ptr<bitmap_rgb32> m_fb;
 	std::unique_ptr<bitmap_ind32> m_zbuffer;
 	UINT32 *m_texture;
+	UINT32 *m_screen_ram;
+
+	rectangle m_cliprect;
 
 	PLANE m_clip_plane[6];
 	float m_matrix[4][3];
@@ -693,6 +707,11 @@ private:
 
 	UINT32 m_reg_10000100;
 	UINT32 m_reg_10000101;
+
+	UINT32 m_tnl_fifo[64];
+	UINT32 m_direct_fifo[64];
+	int m_tnl_fifo_ptr;
+	int m_direct_fifo_ptr;
 };
 
 
@@ -747,7 +766,7 @@ void taitotz_state::video_start()
 	m_texture_ram = std::make_unique<UINT32[]>(0x800000);
 
 	/* create renderer */
-	m_renderer = std::make_unique<taitotz_renderer>(*this, width, height, m_texture_ram.get());
+	m_renderer = std::make_unique<taitotz_renderer>(*this, width, height, m_screen_ram.get(), m_texture_ram.get());
 
 	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitotz_exit), &machine()));
 }
@@ -1154,139 +1173,6 @@ int taitotz_renderer::clip_polygon(const vertex_t *v, int num_vertices, PLANE cp
 	return clip_verts;
 }
 
-void taitotz_renderer::draw_object(UINT32 address, float scale, UINT8 alpha)
-{
-	const rectangle& visarea = m_state.m_screen->visible_area();
-
-	UINT32 *src = &m_state.m_screen_ram[address];
-	taitotz_renderer::vertex_t v[10];
-
-
-	// fetch global light vector
-	int ilx = (m_reg_10000100 >> 16) & 0x1ff;
-	if (ilx & 0x100) ilx |= 0xfffffe00;
-	int ily = m_reg_10000100 & 0x1ff;
-	if (ily & 0x100) ily |= 0xfffffe00;
-	int ilz = m_reg_10000101 & 0x7f;
-
-	float light_x = (float)(ilx) / 127.0f;
-	float light_y = (float)(ily) / 127.0f;
-	float light_z = (float)(ilz) / 127.0f;
-
-	// normalize
-	float l = finvsqrt(light_x * light_x + light_y * light_y + light_z * light_z);
-	light_x *= l;
-	light_y *= l;
-	light_z *= l;
-
-	int end = 0;
-	int index = 0;
-	do
-	{
-		taitotz_polydata &extra = object_data_alloc();
-
-		int num_verts;
-
-		if (src[index] & 0x10000000)
-			end = 1;
-
-		if (src[index] & 0x01000000)
-			num_verts = 4;
-		else
-			num_verts = 3;
-
-		int texture = src[index] & 0x7ff;
-		int tex_switch = (src[index+3] >> 26) & 3;
-
-		/*
-		INT8 polyinx = (src[index+1] >> 16) & 0xff;
-		INT8 polyiny = (src[index+1] >> 8) & 0xff;
-		INT8 polyinz = src[index+1] & 0xff;
-		float polynx = (float)(polyinx) / 128.0f;
-		float polyny = (float)(polyiny) / 128.0f;
-		float polynz = (float)(polyinz) / 128.0f;
-		*/
-
-		index += 4;
-
-		for (int i=0; i < num_verts; i++)
-		{
-			// texture coordinates
-			UINT8 tu = (src[index] >> 8) & 0xff;
-			UINT8 tv = (src[index] >> 0) & 0xff;
-			v[i].p[POLY_U] = (float)(tu);
-			v[i].p[POLY_V] = (float)(tv);
-
-			// coordinates
-			INT16 x = src[index + 1] & 0xffff;
-			INT16 y = src[index + 2] & 0xffff;
-			INT16 z = src[index + 3] & 0xffff;
-			float px = ((float)(x) / 256.0f) * scale;
-			float py = ((float)(y) / 256.0f) * scale;
-			float pz = ((float)(z) / 256.0f) * scale;
-
-			// normals
-			INT8 inx = (src[index + 1] >> 16) & 0xff;
-			INT8 iny = (src[index + 2] >> 16) & 0xff;
-			INT8 inz = (src[index + 3] >> 16) & 0xff;
-			float nx = (float)(inx) / 128.0f;
-			float ny = (float)(iny) / 128.0f;
-			float nz = (float)(inz) / 128.0f;
-
-			// transform
-			v[i].x          = (px * m_matrix[0][0]) + (py * m_matrix[1][0]) + (pz * m_matrix[2][0]) + m_matrix[3][0];
-			v[i].y          = (px * m_matrix[0][1]) + (py * m_matrix[1][1]) + (pz * m_matrix[2][1]) + m_matrix[3][1];
-			v[i].p[POLY_Z]  = (px * m_matrix[0][2]) + (py * m_matrix[1][2]) + (pz * m_matrix[2][2]) + m_matrix[3][2];
-
-			v[i].p[POLY_NX] = (nx * m_matrix[0][0]) + (ny * m_matrix[1][0]) + (nz * m_matrix[2][0]);
-			v[i].p[POLY_NY] = (nx * m_matrix[0][1]) + (ny * m_matrix[1][1]) + (nz * m_matrix[2][1]);
-			v[i].p[POLY_NZ] = (nx * m_matrix[0][2]) + (ny * m_matrix[1][2]) + (nz * m_matrix[2][2]);
-
-			index += 4;
-		}
-
-		// clip against viewport frustum
-		num_verts = clip_polygon(v, num_verts, m_clip_plane[0], v);
-		num_verts = clip_polygon(v, num_verts, m_clip_plane[1], v);
-		num_verts = clip_polygon(v, num_verts, m_clip_plane[2], v);
-		num_verts = clip_polygon(v, num_verts, m_clip_plane[3], v);
-		num_verts = clip_polygon(v, num_verts, m_clip_plane[4], v);
-
-		// apply homogeneous Z-transform on coords and perspective correction on UV coords
-		for (int i=0; i < num_verts; i++)
-		{
-			float ooz = 1.0f / v[i].p[POLY_Z];
-			v[i].x = (((v[i].x * ooz) * m_vp_focus) * m_vp_mul) + m_vp_center_x;
-			v[i].y = (((v[i].y * ooz) * m_vp_focus) * m_vp_mul) + m_vp_center_y;
-			v[i].p[POLY_Z] = ooz;
-			v[i].p[POLY_U] *= ooz;
-			v[i].p[POLY_V] *= ooz;
-		}
-
-		extra.texture = texture;
-		extra.alpha = alpha;
-		extra.flags = tex_switch;
-		extra.diffuse_r = m_diffuse_r;
-		extra.diffuse_g = m_diffuse_g;
-		extra.diffuse_b = m_diffuse_b;
-		extra.ambient_r = m_ambient_r;
-		extra.ambient_g = m_ambient_g;
-		extra.ambient_b = m_ambient_b;
-		extra.specular_r = m_specular_r;
-		extra.specular_g = m_specular_g;
-		extra.specular_b = m_specular_b;
-		extra.light[0] = light_x;
-		extra.light[1] = light_y;
-		extra.light[2] = -light_z;
-
-		for (int i=2; i < num_verts; i++)
-		{
-			render_triangle(visarea, render_delegate(FUNC(taitotz_renderer::draw_scanline), this), 6, v[0], v[i-1], v[i]);
-		}
-	}
-	while (!end);
-}
-
 void taitotz_renderer::setup_viewport(int x, int y, int width, int height, int center_x, int center_y)
 {
 	m_vp_center_x = center_x;
@@ -1338,266 +1224,204 @@ void taitotz_renderer::setup_viewport(int x, int y, int width, int height, int c
 	m_clip_plane[4].d = 0.1f;
 }
 
-void taitotz_renderer::render_displaylist(const rectangle &cliprect)
+void taitotz_renderer::render_tnl_object(UINT32 address, float scale, UINT8 alpha)
 {
-	float zvalue = 0;//ZBUFFER_MAX;
-	m_zbuffer->fill(*(int*)&zvalue, cliprect);
+	UINT32 *src = &m_screen_ram[address];
+	vertex_t v[10];
 
-	const rectangle& visarea = m_state.m_screen->visible_area();
-	vertex_t v[8];
-
-	UINT32 *src = (UINT32*)&m_state.m_work_ram[0];
-
-	UINT32 w[32];
-	int j;
-	int end = 0;
-
-	UINT32 index = m_state.m_displist_addr / 4;
-
-	setup_viewport(0, 0, 256, 192, 256, 192);
-
-
-	m_specular_r = 0xff;
-	m_specular_g = 0xff;
-	m_specular_b = 0xff;
-	m_diffuse_r = 0;
-	m_diffuse_g = 0;
-	m_diffuse_b = 0;
-	m_ambient_r = 0;
-	m_ambient_g = 0;
-	m_ambient_b = 0;
-
-
-#if LOG_DISPLAY_LIST
-	printf("--------------------------------------------\n");
-	printf("Start of displist\n");
-#endif
-
+	bool end = false;
+	int index = 0;
 	do
 	{
-		UINT32 cmd = src[index^1];
-		index++;
+		taitotz_polydata &extra = object_data_alloc();
 
-		if (cmd == 0xffff0011)
-		{
-			for (j=0; j < 16; j++)
-			{
-				w[j] = src[index^1];
-				index++;
-			}
+		int num_verts;
 
-			m_matrix[0][0]= *(float*)&w[4];
-			m_matrix[1][0]= *(float*)&w[5];
-			m_matrix[2][0]= *(float*)&w[6];
-			m_matrix[3][0]= *(float*)&w[7];
+		if (src[index] & 0x10000000)
+			end = true;
 
-			m_matrix[0][1]= *(float*)&w[8];
-			m_matrix[1][1]= *(float*)&w[9];
-			m_matrix[2][1]= *(float*)&w[10];
-			m_matrix[3][1]= *(float*)&w[11];
-
-			m_matrix[0][2]= *(float*)&w[12];
-			m_matrix[1][2]= *(float*)&w[13];
-			m_matrix[2][2]= *(float*)&w[14];
-			m_matrix[3][2]= *(float*)&w[15];
-
-			float scale = *(float*)&w[1];
-			if (scale < 1.0f)
-				scale *= 2;
-
-			UINT32 alpha = w[2];
-
-			draw_object(w[0] & 0x1fffff, scale, alpha);
-
-#if LOG_DISPLAY_LIST
-			printf("0xffff0011:   %08X, %08X, %08X, %08X\n", w[0], w[1], w[2], w[3]);
-#endif
-		}
-		else if (cmd == 0xffff0010)
-		{
-#if LOG_DISPLAY_LIST
-			printf("0xffff0010\n");
-#endif
-		}
-		else if (cmd == 0xffff0020)
-		{
-#if LOG_DISPLAY_LIST
-			printf("0xffff0020\n");
-#endif
-		}
-		else if (cmd == 0xffff0021)
-		{
-			taitotz_polydata &extra = object_data_alloc();
-
-			int num_verts;
-			w[0] = src[index^1];
-			index++;
-			w[1] = src[index^1];
-			index++;
-			w[2] = src[index^1];
-			index++;
-			w[3] = src[index^1];
-			index++;
-
-			num_verts = ((w[0] >> 8) & 0xf) + 1;
-
-			for (j=0; j < num_verts; j++)
-			{
-				w[4] = src[index^1];
-				index++;
-				w[5] = src[index^1];
-				index++;
-				w[6] = src[index^1];
-				index++;
-				w[7] = src[index^1];
-				index++;
-
-				UINT16 x = (w[4] >> 16) & 0xffff;
-				UINT16 y = (w[4] >>  0) & 0xffff;
-				UINT16 tu = (w[6] >> 20) & 0xfff;
-				UINT16 tv = (w[6] >>  4) & 0xfff;
-//              UINT16 z = (w[5] & 0xffff);
-
-				v[j].x = x;
-				v[j].y = y;     // batlgear needs -50 modifier here (why?)
-				v[j].p[POLY_U] = tu;
-				v[j].p[POLY_V] = tv;
-			}
-
-			extra.texture = w[1] & 0x7ff;
-
-			for (j=2; j < num_verts; j++)
-			{
-				render_triangle(visarea, render_delegate(FUNC(taitotz_renderer::draw_scanline_noz), this), 3, v[0], v[j-1], v[j]);
-			}
-
-#if LOG_DISPLAY_LIST
-			printf("0xffff0021:   %08X, %08X, %08X, %08X\n", w[0], w[1], w[2], w[3]);
-#endif
-		}
-		else if (cmd == 0xffff0022)
-		{
-			w[0] = src[index^1];
-			index++;
-
-#if LOG_DISPLAY_LIST
-			printf("0xffff0022:    %08X\n", w[0]);
-#endif
-		}
-		else if (cmd == 0xffff0030)
-		{
-			UINT32 address = src[index^1];
-			index++;
-			UINT32 num = src[index^1];
-			index++;
-
-#if LOG_DISPLAY_LIST
-			printf("0xffff0030:   %08X = ", address);
-#endif
-
-			int addr = address;
-
-			for (j=0; j < num; j++)
-			{
-				UINT32 word = src[index^1];
-				index++;
-
-				if (addr == 0x100)
-				{
-					m_reg_100 = word;
-				}
-				else if (addr == 0x101)
-				{
-					m_reg_101 = word;
-				}
-				else if (addr == 0x102)
-				{
-					m_reg_102 = word;
-				}
-				else if (addr == 0x10000100)
-				{
-					m_reg_10000100 = word;
-				}
-				else if (addr == 0x10000101)
-				{
-					m_reg_10000101 = word;
-				}
-				else if (addr == 0x10000102)
-				{
-					m_diffuse_r = ((word >> (16+10)) & 0x1f) << 3;
-					m_diffuse_g = ((word >> (16+5)) & 0x1f) << 3;
-					m_diffuse_b = ((word >> 16) & 0x1f) << 3;
-					m_ambient_r = ((word >> 10) & 0x1f) << 3;
-					m_ambient_g = ((word >> 5) & 0x1f) << 3;
-					m_ambient_b = (word & 0x1f) << 3;
-				}
-				addr++;
-
-#if LOG_DISPLAY_LIST
-				printf("%08X, ", word);
-#endif
-			}
-#if LOG_DISPLAY_LIST
-			printf("\n");
-#endif
-
-			if (address == 0x100)
-			{
-				int vpw = (m_reg_101 >> 16) & 0xffff;
-				int vph = (m_reg_101 >>  0) & 0xffff;
-				int xw = (m_reg_100 >>  0) & 0xffff;
-				int xh = (m_reg_100 >> 16) & 0xffff;
-
-				setup_viewport(xw, xh, vpw-xw, vph-xh, vpw, vph);
-			}
-
-			/*
-			if (address == 0x10000100)
-			{
-			    int in1 = (m_reg_10000100 >> 16) & 0x1ff;
-			    if (in1 & 0x100) in1 |= 0xfffffe00;
-			    int in2 = m_reg_10000100 & 0x1ff;
-			    if (in2 & 0x100) in2 |= 0xfffffe00;
-			    int in3 = m_reg_10000101 & 0x7f;
-
-			    float n1 = (float)(in1) / 127.0f;
-			    float n2 = (float)(in2) / 127.0f;
-			    float n3 = (float)(in3) / 127.0f;
-
-			    printf("UNK: %f, %f, %f\n", n1, n2, n3);
-			}
-			*/
-		}
-		else if (cmd == 0xffff0080)
-		{
-		}
-		else if (cmd == 0xffff00ff)
-		{
-			end = 1;
-			w[0] = src[index^1];
-			index++;
-			w[1] = src[index^1];
-			index++;
-		}
+		if (src[index] & 0x01000000)
+			num_verts = 4;
 		else
+			num_verts = 3;
+
+		int texture = src[index] & 0x7ff;
+		int tex_switch = (src[index+3] >> 26) & 0x3;
+
+		index += 4;
+
+		for (int i=0; i < num_verts; i++)
 		{
-#if LOG_DISPLAY_LIST
-			printf("%08X: %08X (unknown)\n", index, cmd);
-#endif
-			end = 1;
+			// texture coords
+			UINT8 tu = src[index] >> 8;
+			UINT8 tv = src[index] & 0xff;
+			v[i].p[POLY_U] = (float)(tu);
+			v[i].p[POLY_V] = (float)(tv);
+
+			// coords
+			INT16 x = src[index + 1] & 0xffff;
+			INT16 y = src[index + 2] & 0xffff;
+			INT16 z = src[index + 3] & 0xffff;
+			float px = ((float)(x) / 256.0f) * scale;
+			float py = ((float)(y) / 256.0f) * scale;
+			float pz = ((float)(z) / 256.0f) * scale;
+
+			// normals
+			INT8 inx = (src[index + 1] >> 16) & 0xff;
+			INT8 iny = (src[index + 2] >> 16) & 0xff;
+			INT8 inz = (src[index + 3] >> 16) & 0xff;
+			float nx = (float)(inx) / 128.0f;
+			float ny = (float)(iny) / 128.0f;
+			float nz = (float)(inz) / 128.0f;
+
+			// transform
+			v[i].x          = (px * m_matrix[0][0]) + (py * m_matrix[1][0]) + (pz * m_matrix[2][0]) + m_matrix[3][0];
+			v[i].y          = (px * m_matrix[0][1]) + (py * m_matrix[1][1]) + (pz * m_matrix[2][1]) + m_matrix[3][1];
+			v[i].p[POLY_Z]  = (px * m_matrix[0][2]) + (py * m_matrix[1][2]) + (pz * m_matrix[2][2]) + m_matrix[3][2];
+
+			v[i].p[POLY_NX] = (nx * m_matrix[0][0]) + (ny * m_matrix[1][0]) + (nz * m_matrix[2][0]);
+			v[i].p[POLY_NY] = (nx * m_matrix[0][1]) + (ny * m_matrix[1][1]) + (nz * m_matrix[2][1]);
+			v[i].p[POLY_NZ] = (nx * m_matrix[0][2]) + (ny * m_matrix[1][2]) + (nz * m_matrix[2][2]);
+
+			index += 4;
+		}
+
+		// clip against viewport frustum
+		num_verts = clip_polygon(v, num_verts, m_clip_plane[0], v);
+		num_verts = clip_polygon(v, num_verts, m_clip_plane[1], v);
+		num_verts = clip_polygon(v, num_verts, m_clip_plane[2], v);
+		num_verts = clip_polygon(v, num_verts, m_clip_plane[3], v);
+		num_verts = clip_polygon(v, num_verts, m_clip_plane[4], v);
+
+		// apply homogeneous Z-transform on coords and perspective correction on UV coords
+		for (int i=0; i < num_verts; i++)
+		{
+			float ooz = 1.0f / v[i].p[POLY_Z];
+			v[i].x = (((v[i].x * ooz) * m_vp_focus) * m_vp_mul) + m_vp_center_x;
+			v[i].y = (((v[i].y * ooz) * m_vp_focus) * m_vp_mul) + m_vp_center_y;
+			v[i].p[POLY_Z] = ooz;
+			v[i].p[POLY_U] *= ooz;
+			v[i].p[POLY_V] *= ooz;
+		}
+
+		extra.texture = texture;
+		extra.alpha = alpha;
+		extra.flags = tex_switch;
+		extra.diffuse_r = 0xff;
+		extra.diffuse_g = 0xff;
+		extra.diffuse_b = 0xff;
+		extra.ambient_r = 0x00;
+		extra.ambient_g = 0x00;
+		extra.ambient_b = 0x00;
+		extra.specular_r = 0xff;
+		extra.specular_g = 0xff;
+		extra.specular_b = 0xff;
+		extra.light[0] = 0.0f;
+		extra.light[1] = 0.0f;
+		extra.light[2] = -1.0f;
+
+		for (int i=2; i < num_verts; i++)
+		{
+			render_triangle(m_cliprect, render_delegate(FUNC(taitotz_renderer::draw_scanline), this), 6, v[0], v[i-1], v[i]);
 		}
 	}
 	while (!end);
+}
 
-	wait("render_polygons");
+
+
+void taitotz_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	wait();
+	copybitmap(bitmap, *m_fb, 0, 0, 0, 0, cliprect);
+
+	float zvalue = 0.0f;
+	m_zbuffer->fill(*(int*)&zvalue, cliprect);
+}
+
+void taitotz_renderer::push_tnl_fifo(UINT32 data)
+{
+	m_tnl_fifo[m_tnl_fifo_ptr] = data;
+	m_tnl_fifo_ptr++;
+
+	if (m_tnl_fifo_ptr >= 16)
+	{
+		m_matrix[0][0] = u2f(m_tnl_fifo[4]);
+		m_matrix[1][0] = u2f(m_tnl_fifo[5]);
+		m_matrix[2][0] = u2f(m_tnl_fifo[6]);
+		m_matrix[3][0] = u2f(m_tnl_fifo[7]);
+
+		m_matrix[0][1] = u2f(m_tnl_fifo[8]);
+		m_matrix[1][1] = u2f(m_tnl_fifo[9]);
+		m_matrix[2][1] = u2f(m_tnl_fifo[10]);
+		m_matrix[3][1] = u2f(m_tnl_fifo[11]);
+
+		m_matrix[0][2] = u2f(m_tnl_fifo[12]);
+		m_matrix[1][2] = u2f(m_tnl_fifo[13]);
+		m_matrix[2][2] = u2f(m_tnl_fifo[14]);
+		m_matrix[3][2] = u2f(m_tnl_fifo[15]);
+
+		float scale = u2f(m_tnl_fifo[1]);
+		if (scale < 1.0f)
+			scale *= 2.0f;
+
+		UINT32 alpha = m_tnl_fifo[2];
+		render_tnl_object(m_tnl_fifo[0] & 0x1fffff, scale, alpha);
+
+//		printf("TNL FIFO: %08X, %f, %08X, %08X\n", m_tnl_fifo[0], u2f(m_tnl_fifo[1]), m_tnl_fifo[2], m_tnl_fifo[3]);
+		m_tnl_fifo_ptr = 0;
+	}
+}
+
+void taitotz_renderer::push_direct_poly_fifo(UINT32 data)
+{
+	m_direct_fifo[m_direct_fifo_ptr] = data;
+	m_direct_fifo_ptr++;
+
+	int num_verts = ((m_direct_fifo[0] >> 8) & 0x7) + 1;
+	int expected_size;
+	switch ((m_direct_fifo[0] >> 8) & 0x7)
+	{
+		case 0: expected_size = 24; break;		
+		case 2: expected_size = 16; break;
+		case 3: expected_size = 24; break;
+		case 4: expected_size = 24; break;
+		case 5: expected_size = 32; break;
+		case 6: expected_size = 32; break;
+		default: fatalerror("push_direct_poly_fifo: %08X, num_verts = %d\n", m_direct_fifo[0], num_verts); break;
+	}
+
+	if (m_direct_fifo_ptr >= expected_size)
+	{
+		vertex_t v[8];
+		taitotz_polydata &extra = object_data_alloc();
+
+		int index = 4;
+		for (int i=0; i < num_verts; i++)
+		{
+			v[i].x = (m_direct_fifo[index+0] >> 16) & 0xffff;
+			v[i].y = m_direct_fifo[index+0] & 0xffff;
+			v[i].p[POLY_U] = (m_direct_fifo[index+2] >> 20) & 0xfff;
+			v[i].p[POLY_V] = (m_direct_fifo[index+2] >> 4) & 0xfff;
+			//UINT16 z = m_direct_fifo[index+1] & 0xffff;
+
+			index += 4;
+		}
+
+		extra.texture = m_direct_fifo[1] & 0x7ff;
+
+		for (int i=2; i < num_verts; i++)
+		{
+			render_triangle(m_cliprect, render_delegate(FUNC(taitotz_renderer::draw_scanline_noz), this), 3, v[0], v[i-1], v[i]);
+		}
+
+		m_direct_fifo_ptr = 0;
+	}
 }
 
 UINT32 taitotz_state::screen_update_taitotz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0x000000, cliprect);
-	m_renderer->set_fb(&bitmap);
-	m_renderer->render_displaylist(cliprect);
-
+	m_renderer->draw(bitmap, cliprect);
 
 	UINT16 *screen_src = (UINT16*)&m_screen_ram[m_scr_base];
 
@@ -1826,7 +1650,7 @@ READ64_MEMBER(taitotz_state::video_chip_r)
 		{
 			case 0x14:
 				{
-					r |= 0xffffffff;
+					r |= 0xff;		// more busy flags? (value & 0x11ff == 0xff expected)
 					break;
 				}
 
@@ -1982,13 +1806,14 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 	}
 	else if (command == 0x1)
 	{
-		// FIFO command/packet write
+		// Direct Polygon FIFO
 
 		if (ACCESSING_BITS_32_63)
 		{
 			if (m_video_fifo_ptr >= 8)
 			{
-				logerror("FIFO packet w: %08X at %08X\n", (UINT32)(data >> 32), space.device().safe_pc());
+				m_renderer->push_direct_poly_fifo((UINT32)(data >> 32));
+				//logerror("FIFO packet w: %08X at %08X\n", (UINT32)(data >> 32), space.device().safe_pc());
 			}
 			m_video_fifo_ptr++;
 		}
@@ -1996,7 +1821,29 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 		{
 			if (m_video_fifo_ptr >= 8)
 			{
-				logerror("FIFO packet w: %08X at %08X\n", (UINT32)(data), space.device().safe_pc());
+				m_renderer->push_direct_poly_fifo((UINT32)(data));
+				//logerror("FIFO packet w: %08X at %08X\n", (UINT32)(data), space.device().safe_pc());
+			}
+			m_video_fifo_ptr++;
+		}
+	}
+	else if (command == 0x0)
+	{
+		// T&L FIFO
+
+		if (ACCESSING_BITS_32_63)
+		{
+			if (m_video_fifo_ptr >= 8)
+			{
+				m_renderer->push_tnl_fifo((UINT32)(data >> 32));
+			}
+			m_video_fifo_ptr++;
+		}
+		if (ACCESSING_BITS_0_31)
+		{
+			if (m_video_fifo_ptr >= 8)
+			{
+				m_renderer->push_tnl_fifo((UINT32)(data));
 			}
 			m_video_fifo_ptr++;
 		}
@@ -2169,6 +2016,30 @@ WRITE64_MEMBER(taitotz_state::ppc_common_w)
 			machine().scheduler().trigger(TLCS_PPC_COMM_TRIGGER);
 		}
 	}
+
+#if 0
+	// debug hookup
+	if ((m_io_share_ram[0xd82] & 0xff) == 0xff)
+	{
+		for (int i=0; i < 0x80; i++)
+		{
+			UINT16 w = m_io_share_ram[0x900+i];
+			printf("%c%c", w & 0xff, (w >> 8) & 0xff);
+		}
+		printf("\n");
+		m_io_share_ram[0xd82] = 0;
+	}
+	if ((m_io_share_ram[0xd8a] & 0xff) == 0xff)
+	{
+		for (int i=0; i < 0x80; i++)
+		{
+			UINT16 w = m_io_share_ram[0xb00+i];
+			printf("%c%c", w & 0xff, (w >> 8) & 0xff);
+		}
+		printf("\n");
+		m_io_share_ram[0xd8a] = 0;
+	}
+#endif
 }
 
 // BAT Config:
@@ -2739,6 +2610,12 @@ void taitotz_state::init_taitotz_152()
 	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	rom[(0x2c87c^4)/4] = 0x38600000;    // skip sound load timeout...
 //  rom[(0x2c620^4)/4] = 0x48000014;    // ID check skip (not needed with correct serial number)
+
+#if 0
+	rom[(0x2c164^4)/4] = 0x39600001;		// enable game debug output
+	rom[(0x2c174^4)/4] = 0x39200001;		// enable game debug output
+	rom[(0x2c978^4)/4] = 0x48000028;
+#endif
 }
 
 // Init for BIOS 1.11a
@@ -2773,8 +2650,6 @@ DRIVER_INIT_MEMBER(taitotz_state,landhigh)
 	m_hdd_serial_number = LANDHIGH_HDD_SERIAL;
 
 	m_scr_base = 0x1c0000;
-
-	m_displist_addr = 0x5200b8;
 }
 
 DRIVER_INIT_MEMBER(taitotz_state,batlgear)
@@ -2785,8 +2660,6 @@ DRIVER_INIT_MEMBER(taitotz_state,batlgear)
 	m_hdd_serial_number = nullptr;
 
 	m_scr_base = 0x1c0000;
-
-	m_displist_addr = 0x420038;
 }
 
 DRIVER_INIT_MEMBER(taitotz_state,batlgr2)
@@ -2796,8 +2669,6 @@ DRIVER_INIT_MEMBER(taitotz_state,batlgr2)
 	m_hdd_serial_number = BATLGR2_HDD_SERIAL;
 
 	m_scr_base = 0x1e0000;
-
-	m_displist_addr = 0x3608e4;
 }
 
 DRIVER_INIT_MEMBER(taitotz_state,batlgr2a)
@@ -2807,8 +2678,6 @@ DRIVER_INIT_MEMBER(taitotz_state,batlgr2a)
 	m_hdd_serial_number = BATLGR2A_HDD_SERIAL;
 
 	m_scr_base = 0x1e0000;
-
-	m_displist_addr = 0x3608e4;
 }
 
 DRIVER_INIT_MEMBER(taitotz_state,pwrshovl)
@@ -2819,8 +2688,6 @@ DRIVER_INIT_MEMBER(taitotz_state,pwrshovl)
 	m_hdd_serial_number = nullptr;
 
 	m_scr_base = 0x1c0000;
-
-	m_displist_addr = 0x4a989c;
 }
 
 DRIVER_INIT_MEMBER(taitotz_state,raizpin)
@@ -2830,8 +2697,6 @@ DRIVER_INIT_MEMBER(taitotz_state,raizpin)
 	m_hdd_serial_number = RAIZPIN_HDD_SERIAL;
 
 	m_scr_base = 0x1c0000;
-
-	m_displist_addr = 0x33480c;
 }
 
 DRIVER_INIT_MEMBER(taitotz_state,raizpinj)
@@ -2841,8 +2706,6 @@ DRIVER_INIT_MEMBER(taitotz_state,raizpinj)
 	m_hdd_serial_number = RAIZPINJ_HDD_SERIAL;
 
 	m_scr_base = 0x1c0000;
-
-	m_displist_addr = 0x33480c;
 }
 
 DRIVER_INIT_MEMBER(taitotz_state,styphp)
@@ -2852,8 +2715,6 @@ DRIVER_INIT_MEMBER(taitotz_state,styphp)
 	m_hdd_serial_number = STYPHP_HDD_SERIAL;
 
 	m_scr_base = 0x1e0000;
-
-	m_displist_addr = 0x490b70;
 }
 
 
