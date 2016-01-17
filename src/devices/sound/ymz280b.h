@@ -29,7 +29,7 @@ class ymz280b_device : public device_t,
 									public device_sound_interface
 {
 public:
-	ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ymz280b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ymz280b_device &>(device).m_irq_handler.set_callback(object); }

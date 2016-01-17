@@ -47,7 +47,7 @@ device_sound_interface::sound_route &device_sound_interface::static_add_route(de
 	// find our sound interface
 	device_sound_interface *sound;
 	if (!device.interface(sound))
-		throw emu_fatalerror("MCFG_SOUND_ROUTE called on device '%s' with no sound interface", device.tag());
+		throw emu_fatalerror("MCFG_SOUND_ROUTE called on device '%s' with no sound interface", device.tag().c_str());
 
 	// append a new route to the list
 	return sound->m_route_list.append(*global_alloc(sound_route(output, input, gain, target, mixoutput)));
@@ -64,7 +64,7 @@ void device_sound_interface::static_reset_routes(device_t &device)
 	// find our sound interface
 	device_sound_interface *sound;
 	if (!device.interface(sound))
-		throw emu_fatalerror("MCFG_SOUND_ROUTES_RESET called on device '%s' with no sound interface", device.tag());
+		throw emu_fatalerror("MCFG_SOUND_ROUTES_RESET called on device '%s' with no sound interface", device.tag().c_str());
 
 	// reset the routine list
 	sound->m_route_list.reset();
@@ -245,7 +245,7 @@ void device_sound_interface::interface_validity_check(validity_checker &valid) c
 		// if it's not a speaker or a sound device, error
 		const device_sound_interface *sound;
 		if (target != nullptr && target->type() != SPEAKER && !target->interface(sound))
-			osd_printf_error("Attempting to route sound to a non-sound device '%s' (%s)\n", route->m_target.c_str(), target->name());
+			osd_printf_error("Attempting to route sound to a non-sound device '%s' (%s)\n", route->m_target.c_str(), target->name().c_str());
 	}
 }
 
@@ -324,7 +324,7 @@ void device_sound_interface::interface_post_start()
 						int streaminputnum;
 						sound_stream *inputstream = input_to_stream_input(inputnum++, streaminputnum);
 						if (inputstream == nullptr)
-							fatalerror("Sound device '%s' targeted output #%d to non-existant device '%s' input %d\n", route->m_target.c_str(), outputnum, m_device.tag(), inputnum - 1);
+							fatalerror("Sound device '%s' targeted output #%d to non-existant device '%s' input %d\n", route->m_target.c_str(), outputnum, m_device.tag().c_str(), inputnum - 1);
 
 						// set the input
 						inputstream->set_input(streaminputnum, outputstream, streamoutputnum, route->m_gain);
@@ -408,7 +408,7 @@ void device_mixer_interface::interface_pre_start()
 	// no inputs? that's weird
 	if (m_auto_allocated_inputs == 0)
 	{
-		device().logerror("Warning: mixer \"%s\" has no inputs\n", device().tag());
+		device().logerror("Warning: mixer \"%s\" has no inputs\n", device().tag().c_str());
 		return;
 	}
 

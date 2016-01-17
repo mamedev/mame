@@ -26,7 +26,7 @@ class sm8500_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	sm8500_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	sm8500_cpu_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_dma_cb(device_t &device, _Object object) { return downcast<sm8500_cpu_device &>(device).m_dma_func.set_callback(object); }
@@ -71,7 +71,7 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
@@ -79,9 +79,9 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	inline void get_sp();
-	UINT8 mem_readbyte(UINT32 offset);
+	UINT8 mem_readbyte(UINT32 offset) const;
 	void mem_writebyte(UINT32 offset, UINT8 data);
-	inline UINT16 mem_readword(UINT32 address) { return (mem_readbyte(address ) << 8) | (mem_readbyte(address+1)); }
+	inline UINT16 mem_readword(UINT32 address) const { return (mem_readbyte(address ) << 8) | (mem_readbyte(address+1)); }
 	inline void mem_writeword(UINT32 address, UINT16 value) { mem_writebyte(address, value >> 8); mem_writebyte(address+1, value); }
 	inline void take_interrupt(UINT16 vector);
 	void process_interrupts();

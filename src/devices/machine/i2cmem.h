@@ -90,7 +90,7 @@ class i2cmem_device :
 {
 public:
 	// construction/destruction
-	i2cmem_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock );
+	i2cmem_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock );
 
 	static void set_address(device_t &device, int address) { downcast<i2cmem_device &>(device).m_slave_address = address; }
 	static void set_page_size(device_t &device, int page_size) { downcast<i2cmem_device &>(device).m_page_size = page_size; }

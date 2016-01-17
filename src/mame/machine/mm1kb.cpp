@@ -205,7 +205,7 @@ ioport_constructor mm1_keyboard_t::device_input_ports() const
 //  mm1_keyboard_t - constructor
 //-------------------------------------------------
 
-mm1_keyboard_t::mm1_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mm1_keyboard_t::mm1_keyboard_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MM1_KEYBOARD, "MikroMikko 1 keyboard", tag, owner, clock, "mm1kb", __FILE__),
 	m_write_kbst(*this),
 	m_samples(*this, "keyboard_and_chassis_sounds"),

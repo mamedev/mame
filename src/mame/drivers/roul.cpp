@@ -72,7 +72,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 class roul_state : public driver_device
 {
 public:
-	roul_state(const machine_config &mconfig, device_type type, const char *tag)
+	roul_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu") { }
@@ -188,8 +188,8 @@ WRITE8_MEMBER(roul_state::ball_w)
 {
 	int lamp = data;
 
-	output_set_lamp_value(data, 1);
-	output_set_lamp_value(m_lamp_old, 0);
+	output().set_lamp_value(data, 1);
+	output().set_lamp_value(m_lamp_old, 0);
 	m_lamp_old = lamp;
 }
 

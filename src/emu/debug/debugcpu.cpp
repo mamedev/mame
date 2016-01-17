@@ -319,7 +319,7 @@ bool debug_comment_save(running_machine &machine)
 				xml_data_node *curnode = xml_add_child(systemnode, "cpu", nullptr);
 				if (curnode == nullptr)
 					throw emu_exception();
-				xml_set_attribute(curnode, "tag", device->tag());
+				xml_set_attribute(curnode, "tag", device->tag().c_str());
 
 				// export the comments
 				if (!device->debug()->comment_export(*curnode))
@@ -1110,7 +1110,7 @@ static void process_source_file(running_machine &machine)
     based on a case insensitive tag search
 -------------------------------------------------*/
 
-static device_t *expression_get_device(running_machine &machine, const char *tag)
+static device_t *expression_get_device(running_machine &machine, std::string tag)
 {
 	// convert to lowercase then lookup the name (tags are enforced to be all lower case)
 	std::string fullname(tag);
@@ -1754,7 +1754,7 @@ void device_debug::start_hook(const attotime &endtime)
 			}
 		}
 		// check for debug keypresses
-		if (ui_input_pressed(m_device.machine(), IPT_UI_DEBUG_BREAK))
+		if (m_device.machine().ui_input().pressed(IPT_UI_DEBUG_BREAK))
 			global->visiblecpu->debug()->halt_on_next_instruction("User-initiated break\n");
 	}
 
@@ -1792,7 +1792,7 @@ void device_debug::interrupt_hook(int irqline)
 	if ((m_flags & DEBUG_FLAG_STOP_INTERRUPT) != 0 && (m_stopirq == -1 || m_stopirq == irqline))
 	{
 		global->execution_state = EXECUTION_STATE_STOPPED;
-		debug_console_printf(m_device.machine(), "Stopped on interrupt (CPU '%s', IRQ %d)\n", m_device.tag(), irqline);
+		debug_console_printf(m_device.machine(), "Stopped on interrupt (CPU '%s', IRQ %d)\n", m_device.tag().c_str(), irqline);
 		compute_debug_flags();
 	}
 }
@@ -1811,7 +1811,7 @@ void device_debug::exception_hook(int exception)
 	if ((m_flags & DEBUG_FLAG_STOP_EXCEPTION) != 0 && (m_stopexception == -1 || m_stopexception == exception))
 	{
 		global->execution_state = EXECUTION_STATE_STOPPED;
-		debug_console_printf(m_device.machine(), "Stopped on exception (CPU '%s', exception %d)\n", m_device.tag(), exception);
+		debug_console_printf(m_device.machine(), "Stopped on exception (CPU '%s', exception %d)\n", m_device.tag().c_str(), exception);
 		compute_debug_flags();
 	}
 }
@@ -1871,7 +1871,7 @@ void device_debug::instruction_hook(offs_t curpc)
 			{
 				machine.debug_view().update_all();
 				machine.debug_view().flush_osd_updates();
-				debugger_refresh_display(machine);
+				machine.debugger().refresh_display();
 			}
 		}
 	}
@@ -1889,7 +1889,7 @@ void device_debug::instruction_hook(offs_t curpc)
 		// check the temp running breakpoint and break if we hit it
 		else if ((m_flags & DEBUG_FLAG_STOP_PC) != 0 && m_stopaddr == curpc)
 		{
-			debug_console_printf(machine, "Stopped at temporary breakpoint %X on CPU '%s'\n", m_stopaddr, m_device.tag());
+			debug_console_printf(machine, "Stopped at temporary breakpoint %X on CPU '%s'\n", m_stopaddr, m_device.tag().c_str());
 			global->execution_state = EXECUTION_STATE_STOPPED;
 		}
 
@@ -1919,7 +1919,7 @@ void device_debug::instruction_hook(offs_t curpc)
 
 		// update all views
 		machine.debug_view().update_all();
-		debugger_refresh_display(m_device.machine());
+		machine.debugger().refresh_display();
 
 		// wait for the debugger; during this time, disable sound output
 		m_device.machine().sound().debugger_mute(true);
@@ -1938,7 +1938,7 @@ void device_debug::instruction_hook(offs_t curpc)
 			if (global->memory_modified)
 			{
 				machine.debug_view().update_all(DVT_DISASSEMBLY);
-				debugger_refresh_display(m_device.machine());
+				machine.debugger().refresh_display();
 			}
 
 			// check for commands in the source file

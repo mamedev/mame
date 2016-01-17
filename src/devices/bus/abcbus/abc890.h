@@ -27,8 +27,8 @@ class abc890_t :  public device_t,
 {
 public:
 	// construction/destruction
-	abc890_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	abc890_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc890_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	abc890_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -58,7 +58,7 @@ class abc_expansion_unit_t :  public abc890_t
 {
 public:
 	// construction/destruction
-	abc_expansion_unit_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc_expansion_unit_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -71,7 +71,7 @@ class abc894_t :  public abc890_t
 {
 public:
 	// construction/destruction
-	abc894_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc894_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -84,7 +84,7 @@ class abc850_t :  public abc890_t
 {
 public:
 	// construction/destruction
-	abc850_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc850_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -97,7 +97,7 @@ class abc852_t :  public abc890_t
 {
 public:
 	// construction/destruction
-	abc852_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc852_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -110,7 +110,7 @@ class abc856_t :  public abc890_t
 {
 public:
 	// construction/destruction
-	abc856_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc856_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

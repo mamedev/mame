@@ -43,7 +43,7 @@ const device_type PCE220SERIAL = &device_creator<pce220_serial_device>;
 //  pce220_serial_device - constructor
 //-------------------------------------------------
 
-pce220_serial_device::pce220_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pce220_serial_device::pce220_serial_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PCE220SERIAL, "Sharp PC-E220 serial", tag, owner, clock, "pce220_serial", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -190,7 +190,7 @@ void pce220_serial_device::device_timer(emu_timer &timer, device_timer_id id, in
 			break;
 		case SIO_SEND_PARITY:
 			if (m_xout != calc_parity(m_current_byte))
-				logerror("SIO %s: byte %d has wrong parity!\n", tag(), m_bytes_count);
+				logerror("SIO %s: byte %d has wrong parity!\n", tag().c_str(), m_bytes_count);
 			break;
 		case SIO_SEND_STOP1:
 		case SIO_SEND_STOP2:

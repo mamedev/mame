@@ -101,7 +101,7 @@ class melps4_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	melps4_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, int d_pins, UINT8 sm_page, UINT8 int_page, const char *shortname, const char *source)
+	melps4_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, int d_pins, UINT8 sm_page, UINT8 int_page, std::string shortname, std::string source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, -1, program)
 		, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
@@ -160,7 +160,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;

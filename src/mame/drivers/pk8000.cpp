@@ -23,7 +23,7 @@
 class pk8000_state : public pk8000_base_state
 {
 public:
-	pk8000_state(const machine_config &mconfig, device_type type, const char *tag)
+	pk8000_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pk8000_base_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cassette(*this, "cassette")

@@ -740,7 +740,7 @@ ioport_constructor abc850_floppy_device::device_input_ports() const
 //  luxor_55_21046_device - constructor
 //-------------------------------------------------
 
-luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, LUXOR_55_21046, "Luxor 55 21046", tag, owner, clock, "lux21046", __FILE__),
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),
@@ -760,7 +760,7 @@ luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, cons
 {
 }
 
-luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),
@@ -780,27 +780,27 @@ luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, devi
 {
 }
 
-abc830_device::abc830_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+abc830_device::abc830_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: luxor_55_21046_device(mconfig, ABC830, "ABC 830", tag, owner, clock, "abc830", __FILE__)
 {
 }
 
-abc832_device::abc832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+abc832_device::abc832_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: luxor_55_21046_device(mconfig, ABC832, "ABC 832", tag, owner, clock, "abc832", __FILE__)
 {
 }
 
-abc834_device::abc834_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+abc834_device::abc834_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: luxor_55_21046_device(mconfig, ABC834, "ABC 834", tag, owner, clock, "abc834", __FILE__)
 {
 }
 
-abc838_device::abc838_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+abc838_device::abc838_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: luxor_55_21046_device(mconfig, ABC838, "ABC 838", tag, owner, clock, "abc838", __FILE__)
 {
 }
 
-abc850_floppy_device::abc850_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+abc850_floppy_device::abc850_floppy_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: luxor_55_21046_device(mconfig, ABC850_FLOPPY, "ABC 850 floppy", tag, owner, clock, "lux21046", __FILE__)
 {
 }

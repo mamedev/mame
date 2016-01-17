@@ -33,8 +33,8 @@ WRITE8_MEMBER(simpsons_state::simpsons_eeprom_w)
 WRITE8_MEMBER(simpsons_state::simpsons_coin_counter_w)
 {
 	/* bit 0,1 coin counters */
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 	/* bit 2 selects mono or stereo sound */
 	/* bit 3 = enable char ROM reading through the video RAM */
 	m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);

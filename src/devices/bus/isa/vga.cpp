@@ -49,7 +49,7 @@ const rom_entry *isa8_vga_device::device_rom_region() const
 //  isa8_vga_device - constructor
 //-------------------------------------------------
 
-isa8_vga_device::isa8_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_vga_device::isa8_vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8_VGA, "IBM VGA Graphics Card", tag, owner, clock, "ibm_vga", __FILE__),
 		device_isa8_card_interface(mconfig, *this), m_vga(nullptr)
 {

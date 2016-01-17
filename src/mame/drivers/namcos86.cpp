@@ -273,15 +273,15 @@ WRITE8_MEMBER(namcos86_state::watchdog2_w)
 
 WRITE8_MEMBER(namcos86_state::coin_w)
 {
-	coin_lockout_global_w(machine(), data & 1);
-	coin_counter_w(machine(), 0,~data & 2);
-	coin_counter_w(machine(), 1,~data & 4);
+	machine().bookkeeping().coin_lockout_global_w(data & 1);
+	machine().bookkeeping().coin_counter_w(0,~data & 2);
+	machine().bookkeeping().coin_counter_w(1,~data & 4);
 }
 
 WRITE8_MEMBER(namcos86_state::led_w)
 {
-	set_led_status(machine(), 0,data & 0x08);
-	set_led_status(machine(), 1,data & 0x10);
+	output().set_led_value(0,data & 0x08);
+	output().set_led_value(1,data & 0x10);
 }
 
 

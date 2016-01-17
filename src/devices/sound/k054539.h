@@ -42,7 +42,7 @@ public:
 	};
 
 	// construction/destruction
-	k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k054539_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	static void set_analog_callback(device_t &device, k054539_cb_delegate callback) { downcast<k054539_device &>(device).m_apan_cb = callback; }

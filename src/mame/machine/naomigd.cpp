@@ -326,7 +326,7 @@ void naomi_gdrom_board::write_from_qword(UINT8 *region, UINT64 qword)
 		region[i] = qword >> (56-(i*8));
 }
 
-naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: naomi_board(mconfig, NAOMI_GDROM_BOARD, "Sega NAOMI GDROM Board", tag, owner, clock, "naomi_gdrom_board", __FILE__)
 {
 	image_tag = nullptr;
@@ -433,7 +433,7 @@ void naomi_gdrom_board::device_start()
 		logerror("key is %08x%08x\n", (UINT32)((key & 0xffffffff00000000ULL)>>32), (UINT32)(key & 0x00000000ffffffffULL));
 
 		UINT8 buffer[2048];
-		cdrom_file *gdromfile = cdrom_open(get_disk_handle(machine(), image_tag));
+		cdrom_file *gdromfile = cdrom_open(machine().rom_load().get_disk_handle(image_tag));
 		// primary volume descriptor
 		// read frame 0xb06e (frame=sector+150)
 		// dimm board firmware starts straight from this frame

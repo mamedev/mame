@@ -71,7 +71,7 @@ public:
 
 	static const UINT32 c_dma_bank_words = 0x2000;
 
-	mlanding_state(const machine_config &mconfig, device_type type, const char *tag)
+	mlanding_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),

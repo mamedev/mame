@@ -95,7 +95,7 @@ const device_type SP0256 = &device_creator<sp0256_device>;
 //  LIVE DEVICE
 //**************************************************************************
 
-sp0256_device::sp0256_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sp0256_device::sp0256_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, SP0256, "SP0256", tag, owner, clock, "sp0256", __FILE__),
 					device_sound_interface(mconfig, *this),
 					m_rom(*this, DEVICE_SELF),

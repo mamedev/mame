@@ -89,7 +89,7 @@ bool sdl_osd_interface::output_init()
 		fflush(output);
 	}
 
-	output_set_notifier(NULL, notifier_callback, NULL);
+	machine().output().set_notifier(NULL, notifier_callback, NULL);
 	return true;
 }
 

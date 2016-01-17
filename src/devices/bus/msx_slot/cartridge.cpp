@@ -33,7 +33,7 @@ const device_type MSX_SLOT_CARTRIDGE = &device_creator<msx_slot_cartridge_device
 const device_type MSX_SLOT_YAMAHA_EXPANSION = &device_creator<msx_slot_yamaha_expansion_device>;
 
 
-msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_SLOT_CARTRIDGE, "MSX Cartridge slot", tag, owner, clock, "msx_slot_cartridge", __FILE__)
 	, device_image_interface(mconfig, *this)
 	, device_slot_interface(mconfig, *this)
@@ -44,7 +44,7 @@ msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconf
 }
 
 
-msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_image_interface(mconfig, *this)
 	, device_slot_interface(mconfig, *this)
@@ -200,7 +200,7 @@ void msx_slot_cartridge_device::call_unload()
 
 bool msx_slot_cartridge_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 	return true;
 }
 
@@ -278,7 +278,7 @@ int msx_slot_cartridge_device::get_cart_type(UINT8 *rom, UINT32 length)
 }
 
 
-void msx_slot_cartridge_device::get_default_card_software(std::string &result)
+std::string msx_slot_cartridge_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -337,10 +337,9 @@ void msx_slot_cartridge_device::get_default_card_software(std::string &result)
 			slot_string = msx_cart_get_slot_option(type);
 		}
 
-		result.assign(slot_string);
-		return;
+		return std::string(slot_string);
 	}
-	software_get_default_slot(result, "nomapper");
+	return software_get_default_slot("nomapper");
 }
 
 
@@ -365,7 +364,7 @@ WRITE8_MEMBER(msx_slot_cartridge_device::write)
 
 
 
-msx_slot_yamaha_expansion_device::msx_slot_yamaha_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_slot_yamaha_expansion_device::msx_slot_yamaha_expansion_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: msx_slot_cartridge_device(mconfig, MSX_SLOT_YAMAHA_EXPANSION, "MSX Yamaha Expansion slot", tag, owner, clock, "msx_slot_yamaha_expansion", __FILE__)
 {
 }

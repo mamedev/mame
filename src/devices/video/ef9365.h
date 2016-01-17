@@ -40,10 +40,10 @@ class ef9365_device :   public device_t,
 {
 public:
 	// construction/destruction
-	ef9365_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ef9365_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 	static void static_set_nb_bitplanes(device_t &device, int nb_bitplanes );
 	static void static_set_display_mode(device_t &device, int display_mode );
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ef9365_device &>(device).m_irq_handler.set_callback(object); }

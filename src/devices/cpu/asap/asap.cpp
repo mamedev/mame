@@ -136,7 +136,7 @@ const device_type ASAP = &device_creator<asap_device>;
 //  asap_device - constructor
 //-------------------------------------------------
 
-asap_device::asap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+asap_device::asap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, ASAP, "ASAP", tag, owner, clock, "asap", __FILE__),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 32),
 		m_pc(0),
@@ -186,7 +186,6 @@ void asap_device::device_start()
 	m_direct = &m_program->direct();
 
 	// register our state for the debugger
-	std::string tempstr;
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
 	state_add(STATE_GENPCBASE, "GENPCBASE", m_ppc).noshow();
 	state_add(STATE_GENSP,     "GENSP",     m_src2val[REGBASE + 31]).noshow();
@@ -194,7 +193,7 @@ void asap_device::device_start()
 	state_add(ASAP_PC,         "PC",        m_pc);
 	state_add(ASAP_PS,         "PS",        m_flagsio).callimport().callexport();
 	for (int regnum = 0; regnum < 32; regnum++)
-		state_add(ASAP_R0 + regnum, strformat(tempstr, "R%d", regnum).c_str(), m_src2val[REGBASE + regnum]);
+		state_add(ASAP_R0 + regnum, strformat("R%d", regnum).c_str(), m_src2val[REGBASE + regnum]);
 
 	// register our state for saving
 	save_item(NAME(m_pc));
@@ -281,7 +280,7 @@ void asap_device::state_export(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void asap_device::state_string_export(const device_state_entry &entry, std::string &str)
+void asap_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

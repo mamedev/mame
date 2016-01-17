@@ -112,8 +112,8 @@ INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
 	if (newval)
 	{
 		/* increment the coin counter */
-		coin_counter_w(machine(), 0, 1);
-		coin_counter_w(machine(), 0, 0);
+		machine().bookkeeping().coin_counter_w(0, 1);
+		machine().bookkeeping().coin_counter_w(0, 0);
 
 		coin_in();
 	}
@@ -2301,8 +2301,8 @@ INPUT_CHANGED_MEMBER(vicdual_state::nsub_coin_in)
 				}
 
 				// increment coin counter
-				coin_counter_w(machine(), which, 1);
-				coin_counter_w(machine(), which, 0);
+				machine().bookkeeping().coin_counter_w(which, 1);
+				machine().bookkeeping().coin_counter_w(which, 0);
 				break;
 
 			// service coin

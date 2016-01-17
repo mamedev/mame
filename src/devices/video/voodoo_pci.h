@@ -21,7 +21,7 @@
 
 class voodoo_pci_device : public pci_device {
 public:
-	voodoo_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	voodoo_pci_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
 							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;
 	// optional information overrides
@@ -29,7 +29,7 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
-	void set_cpu_tag(const char *tag);
+	void set_cpu_tag(std::string tag);
 	static void set_type(const int type) {m_type = type;}
 	void set_fbmem(const int fbmem) {m_fbmem = fbmem;}
 	void set_tmumem(const int tmumem0, const int tmumem1) {m_tmumem0 = tmumem0; m_tmumem1 = tmumem1;}
@@ -45,7 +45,7 @@ private:
 	required_device<voodoo_device> m_voodoo;
 	static int m_type;
 	int m_fbmem, m_tmumem0, m_tmumem1;
-	const char *m_cpu_tag;
+	std::string m_cpu_tag;
 
 	UINT32 m_pcictrl_reg[0x10];
 	DECLARE_ADDRESS_MAP(voodoo_reg_map, 32);

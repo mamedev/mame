@@ -283,7 +283,7 @@ MH86171 Color Palette RAMDAC
 class sfbonus_state : public driver_device
 {
 public:
-	sfbonus_state(const machine_config &mconfig, device_type type, const char *tag)
+	sfbonus_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -1180,22 +1180,22 @@ UINT32 sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind16 
 		|| (ipt == INPUT_PORTS_NAME(amcoe2_poker)))
 	{
 		// based on pirpok2
-		output_set_lamp_value(0, (m_1800_regs[6] & 0x1) >> 0);
-		output_set_lamp_value(1, (m_1800_regs[6] & 0x4) >> 2);
-		output_set_lamp_value(2, (m_1800_regs[5] & 0x4) >> 2);
-		output_set_lamp_value(3, (m_1800_regs[5] & 0x1) >> 0);
-		output_set_lamp_value(4, (m_1800_regs[4] & 0x4) >> 2);
-		output_set_lamp_value(5, (m_1800_regs[4] & 0x1) >> 0);
+		output().set_lamp_value(0, (m_1800_regs[6] & 0x1) >> 0);
+		output().set_lamp_value(1, (m_1800_regs[6] & 0x4) >> 2);
+		output().set_lamp_value(2, (m_1800_regs[5] & 0x4) >> 2);
+		output().set_lamp_value(3, (m_1800_regs[5] & 0x1) >> 0);
+		output().set_lamp_value(4, (m_1800_regs[4] & 0x4) >> 2);
+		output().set_lamp_value(5, (m_1800_regs[4] & 0x1) >> 0);
 	}
 	else if ((ipt == INPUT_PORTS_NAME(amcoe1_reels3)) || (ipt == INPUT_PORTS_NAME(amcoe1_reels4))
 		|| (ipt == INPUT_PORTS_NAME(amcoe1_poker)))
 	{
-		output_set_lamp_value(0, (m_1800_regs[0] & 0x2) >> 1);
-		output_set_lamp_value(1, (m_1800_regs[4] & 0x2) >> 1);
-		output_set_lamp_value(2, (m_1800_regs[3] & 0x2) >> 1);
-		output_set_lamp_value(3, (m_1800_regs[6] & 0x4) >> 2);
-		output_set_lamp_value(4, (m_1800_regs[4] & 0x4) >> 2);
-		output_set_lamp_value(5, (m_1800_regs[3] & 0x4) >> 2);
+		output().set_lamp_value(0, (m_1800_regs[0] & 0x2) >> 1);
+		output().set_lamp_value(1, (m_1800_regs[4] & 0x2) >> 1);
+		output().set_lamp_value(2, (m_1800_regs[3] & 0x2) >> 1);
+		output().set_lamp_value(3, (m_1800_regs[6] & 0x4) >> 2);
+		output().set_lamp_value(4, (m_1800_regs[4] & 0x4) >> 2);
+		output().set_lamp_value(5, (m_1800_regs[3] & 0x4) >> 2);
 	}
 
 	return 0;

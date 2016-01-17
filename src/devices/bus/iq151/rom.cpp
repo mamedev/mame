@@ -41,7 +41,7 @@ const device_type IQ151_AMOS3 = &device_creator<iq151_amos3_device>;
 //  iq151_rom_device - constructor
 //-------------------------------------------------
 
-iq151_rom_device::iq151_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+iq151_rom_device::iq151_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_iq151cart_interface(mconfig, *this), m_rom(nullptr)
 {
@@ -83,7 +83,7 @@ UINT8* iq151_rom_device::get_cart_base()
 //  iq151_basic6_device - constructor
 //-------------------------------------------------
 
-iq151_basic6_device::iq151_basic6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iq151_basic6_device::iq151_basic6_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: iq151_rom_device(mconfig, IQ151_BASIC6, "IQ151 BASIC6", tag, owner, clock, "iq151_basic6", __FILE__)
 {
 }
@@ -108,7 +108,7 @@ void iq151_basic6_device::read(offs_t offset, UINT8 &data)
 //  iq151_basicg_device - constructor
 //-------------------------------------------------
 
-iq151_basicg_device::iq151_basicg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iq151_basicg_device::iq151_basicg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: iq151_rom_device(mconfig, IQ151_BASICG, "IQ151 BASICG", tag, owner, clock, "iq151_basicg", __FILE__)
 {
 }
@@ -134,7 +134,7 @@ void iq151_basicg_device::read(offs_t offset, UINT8 &data)
 //  iq151_amos1_device - constructor
 //-------------------------------------------------
 
-iq151_amos1_device::iq151_amos1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iq151_amos1_device::iq151_amos1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: iq151_rom_device(mconfig, IQ151_AMOS1, "IQ151 AMOS cart 1", tag, owner, clock, "iq151_amos1", __FILE__),
 		m_active(true)
 {
@@ -168,7 +168,7 @@ void iq151_amos1_device::io_write(offs_t offset, UINT8 data)
 //  iq151_amos2_device - constructor
 //-------------------------------------------------
 
-iq151_amos2_device::iq151_amos2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iq151_amos2_device::iq151_amos2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: iq151_rom_device(mconfig, IQ151_AMOS2, "IQ151 AMOS cart 2", tag, owner, clock, "iq151_amos2", __FILE__),
 		m_active(false)
 {
@@ -202,7 +202,7 @@ void iq151_amos2_device::io_write(offs_t offset, UINT8 data)
 //  iq151_amos3_device - constructor
 //-------------------------------------------------
 
-iq151_amos3_device::iq151_amos3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iq151_amos3_device::iq151_amos3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: iq151_rom_device(mconfig, IQ151_AMOS3, "IQ151 AMOS cart 3", tag, owner, clock, "iq151_amos3", __FILE__),
 		m_active(true)
 {

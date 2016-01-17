@@ -23,7 +23,7 @@
 class vegaeo_state : public eolith_state
 {
 public:
-	vegaeo_state(const machine_config &mconfig, device_type type, const char *tag)
+	vegaeo_state(const machine_config &mconfig, device_type type, std::string tag)
 		: eolith_state(mconfig, type, tag) { }
 
 	std::unique_ptr<UINT32[]> m_vega_vram;

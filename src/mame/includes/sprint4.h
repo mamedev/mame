@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 class sprint4_state : public driver_device
 {
@@ -8,7 +8,7 @@ public:
 		TIMER_NMI
 	};
 
-	sprint4_state(const machine_config &mconfig, device_type type, const char *tag)
+	sprint4_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),

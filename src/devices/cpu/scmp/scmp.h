@@ -30,8 +30,8 @@ class scmp_device : public cpu_device
 {
 public:
 	// construction/destruction
-	scmp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	scmp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	scmp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	scmp_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_flag_out_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_flag_out_func.set_callback(object); }
@@ -56,7 +56,7 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
@@ -105,7 +105,7 @@ class ins8060_device : public scmp_device
 {
 public:
 	// construction/destruction
-	ins8060_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ins8060_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 2 - 1) / 2; }

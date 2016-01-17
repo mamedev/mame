@@ -43,7 +43,7 @@ class bsmt2000_device : public device_t,
 
 public:
 	// construction/destruction
-	bsmt2000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bsmt2000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
 	static void static_set_ready_callback(device_t &device, ready_callback callback);

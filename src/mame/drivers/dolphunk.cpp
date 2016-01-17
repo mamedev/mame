@@ -91,7 +91,7 @@
 class dauphin_state : public driver_device
 {
 public:
-	dauphin_state(const machine_config &mconfig, device_type type, const char *tag)
+	dauphin_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
@@ -127,7 +127,7 @@ WRITE_LINE_MEMBER( dauphin_state::cass_w )
 
 WRITE8_MEMBER( dauphin_state::port00_w )
 {
-	output_set_digit_value(offset, data);
+	output().set_digit_value(offset, data);
 }
 
 WRITE8_MEMBER( dauphin_state::port06_w )

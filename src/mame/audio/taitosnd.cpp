@@ -40,7 +40,7 @@ const device_type TC0140SYT = &device_creator<tc0140syt_device>;
 //  tc0140syt_device - constructor
 //-------------------------------------------------
 
-tc0140syt_device::tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc0140syt_device::tc0140syt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0140SYT, "Taito TC0140SYT", tag, owner, clock, "tc0140syt", __FILE__),
 		m_mainmode(0),
 		m_submode(0),

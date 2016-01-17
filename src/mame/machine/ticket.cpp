@@ -38,7 +38,7 @@ const device_type TICKET_DISPENSER = &device_creator<ticket_dispenser_device>;
 //  ticket_dispenser_device - constructor
 //-------------------------------------------------
 
-ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TICKET_DISPENSER, "Ticket Dispenser", tag, owner, clock, "ticket_dispenser", __FILE__),
 		m_motor_sense(TICKET_MOTOR_ACTIVE_LOW),
 		m_status_sense(TICKET_STATUS_ACTIVE_LOW),
@@ -141,7 +141,7 @@ WRITE8_MEMBER( ticket_dispenser_device::write )
 		{
 			LOG(("%s: Ticket Power Off\n", machine().describe_context()));
 			m_timer->adjust(attotime::never);
-			set_led_status(machine(), 2,0);
+			machine().output().set_led_value(2,0);
 			m_power = 0;
 		}
 	}
@@ -197,12 +197,12 @@ void ticket_dispenser_device::device_timer(emu_timer &timer, device_timer_id id,
 	}
 
 	// update LED status (fixme: should map to an output)
-	set_led_status(machine(), 2, (m_status == m_ticketdispensed));
+	machine().output().set_led_value(2, (m_status == m_ticketdispensed));
 
 	// if we just dispensed, increment global count
 	if (m_status == m_ticketdispensed)
 	{
-		increment_dispensed_tickets(machine(), 1);
+		machine().bookkeeping().increment_dispensed_tickets(1);
 		LOG(("Ticket Dispensed\n"));
 	}
 }

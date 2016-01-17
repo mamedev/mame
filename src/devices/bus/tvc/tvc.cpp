@@ -52,7 +52,7 @@ device_tvcexp_interface::~device_tvcexp_interface()
 //-------------------------------------------------
 //  tvcexp_slot_device - constructor
 //-------------------------------------------------
-tvcexp_slot_device::tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+tvcexp_slot_device::tvcexp_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, TVCEXP_SLOT, "TVC64 Expansion Slot", tag, owner, clock, "tvcexp_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		m_out_irq_cb(*this),

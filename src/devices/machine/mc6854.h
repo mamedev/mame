@@ -41,7 +41,7 @@ typedef device_delegate<void (UINT8 *data, int length)> mc6854_out_frame_delegat
 class mc6854_device : public device_t
 {
 public:
-	mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc6854_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~mc6854_device() {}
 
 	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<mc6854_device &>(device).m_out_irq_cb.set_callback(object); }

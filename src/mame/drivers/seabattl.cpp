@@ -41,7 +41,7 @@ the sound board should be fully discrete.
 class seabattl_state : public driver_device
 {
 public:
-	seabattl_state(const machine_config &mconfig, device_type type, const char *tag)
+	seabattl_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),
@@ -284,8 +284,8 @@ WRITE8_MEMBER(seabattl_state::seabattl_control_w)
 	// bit 3: inverse image
 	// bit 4: lamp
 	// bit 5: enable wave
-	coin_counter_w(machine(), 0, BIT(data, 2));
-	output_set_lamp_value(0, BIT(data,4));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
+	output().set_lamp_value(0, BIT(data,4));
 	m_waveenable = BIT(data, 5);
 }
 

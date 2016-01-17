@@ -20,7 +20,7 @@ static ADDRESS_MAP_START(internal_pgm, AS_PROGRAM, 32, tms57002_device)
 	AM_RANGE(0x000, 0x3ff) AM_RAM
 ADDRESS_MAP_END
 
-tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms57002_device::tms57002_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, TMS57002, "TMS57002", tag, owner, clock, "tms57002", __FILE__),
 		device_sound_interface(mconfig, *this), macc(0), st0(0), st1(0), sti(0),
 		txrd(0),

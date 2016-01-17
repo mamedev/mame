@@ -145,8 +145,8 @@ public:
 	void revert(int priority = OPTION_PRIORITY_MAXIMUM);
 
 	// output
-	const char *output_ini(std::string &buffer, const core_options *diff = nullptr);
-	const char *output_help(std::string &buffer);
+	std::string output_ini(const core_options *diff = nullptr) const;
+	std::string output_help() const;
 
 	// reading
 	const char *value(const char *option) const;

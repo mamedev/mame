@@ -5021,8 +5021,8 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 	int val;
 
 	/* validate configuration */
-	assert(m_screen != nullptr);
-	assert(m_cputag != nullptr);
+	assert(!m_screen.empty());
+	assert(!m_cputag.empty());
 	assert(m_fbmem > 0);
 
 	/* store a pointer back to the device */
@@ -5831,13 +5831,11 @@ static void dump_rasterizer_stats(voodoo_state *v)
 	}
 }
 
-voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_fbmem(0),
 		m_tmumem0(0),
 		m_tmumem1(0),
-		m_screen(nullptr),
-		m_cputag(nullptr),
 		m_vblank(*this),
 		m_stall(*this)
 {
@@ -5885,7 +5883,7 @@ void voodoo_device::device_stop()
 
 const device_type VOODOO_1 = &device_creator<voodoo_1_device>;
 
-voodoo_1_device::voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+voodoo_1_device::voodoo_1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: voodoo_device(mconfig, VOODOO_1, "3dfx Voodoo Graphics", tag, owner, clock, "voodoo_1", __FILE__)
 {
 }
@@ -5902,7 +5900,7 @@ void voodoo_1_device::device_start()
 
 const device_type VOODOO_2 = &device_creator<voodoo_2_device>;
 
-voodoo_2_device::voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+voodoo_2_device::voodoo_2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: voodoo_device(mconfig, VOODOO_2, "3dfx Voodoo 2", tag, owner, clock, "voodoo_2", __FILE__)
 {
 }
@@ -5919,12 +5917,12 @@ void voodoo_2_device::device_start()
 
 const device_type VOODOO_BANSHEE = &device_creator<voodoo_banshee_device>;
 
-voodoo_banshee_device::voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+voodoo_banshee_device::voodoo_banshee_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: voodoo_device(mconfig, VOODOO_BANSHEE, "3dfx Voodoo Banshee", tag, owner, clock, "voodoo_banshee", __FILE__)
 {
 }
 
-voodoo_banshee_device::voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+voodoo_banshee_device::voodoo_banshee_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: voodoo_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
@@ -5941,7 +5939,7 @@ void voodoo_banshee_device::device_start()
 
 const device_type VOODOO_3 = &device_creator<voodoo_3_device>;
 
-voodoo_3_device::voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+voodoo_3_device::voodoo_3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: voodoo_banshee_device(mconfig, VOODOO_3, "3dfx Voodoo 3", tag, owner, clock, "voodoo_3", __FILE__)
 {
 }

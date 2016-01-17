@@ -20,7 +20,7 @@
 class wpc_dot_state : public driver_device
 {
 public:
-	wpc_dot_state(const machine_config &mconfig, device_type type, const char *tag)
+	wpc_dot_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_wpcsnd(*this,"wpcsnd"),
@@ -84,7 +84,7 @@ private:
 class wpc_flip1_state : public wpc_dot_state
 {
 public:
-	wpc_flip1_state(const machine_config &mconfig, device_type type, const char *tag)
+	wpc_flip1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: wpc_dot_state(mconfig, type, tag)
 	{ }
 public:
@@ -95,7 +95,7 @@ public:
 class wpc_flip2_state : public wpc_flip1_state
 {
 public:
-	wpc_flip2_state(const machine_config &mconfig, device_type type, const char *tag)
+	wpc_flip2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: wpc_flip1_state(mconfig, type, tag)
 	{ }
 public:
@@ -105,7 +105,7 @@ public:
 class wpc_dcs_state : public wpc_flip2_state
 {
 public:
-	wpc_dcs_state(const machine_config &mconfig, device_type type, const char *tag)
+	wpc_dcs_state(const machine_config &mconfig, device_type type, std::string tag)
 		: wpc_flip2_state(mconfig, type, tag),
 			m_dcs(*this, "dcs")
 	{ }

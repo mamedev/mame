@@ -15,7 +15,7 @@
 class zac_2_state : public driver_device
 {
 public:
-	zac_2_state(const machine_config &mconfig, device_type type, const char *tag)
+	zac_2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_p_ram(*this, "ram"),
@@ -196,7 +196,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_outtimer)
 	{
 		UINT8 display = (m_out_offs >> 3) & 7;
 		UINT8 digit = m_out_offs & 7;
-		output_set_digit_value(display * 10 + digit, patterns[m_p_ram[m_out_offs]&15]);
+		output().set_digit_value(display * 10 + digit, patterns[m_p_ram[m_out_offs]&15]);
 	}
 }
 

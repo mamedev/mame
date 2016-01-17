@@ -31,7 +31,7 @@ All clock timing comes from crystal 1
 class supduck_state : public driver_device
 {
 public:
-	supduck_state(const machine_config &mconfig, device_type type, const char *tag)
+	supduck_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),

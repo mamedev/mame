@@ -172,7 +172,7 @@ const rom_entry *a2bus_aevm80_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_videx80_device::a2bus_videx80_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_videx80_device::a2bus_videx80_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_chrrom(nullptr), m_framecnt(0),
 	m_crtc(*this, VIDEOTERM_MC6845_NAME), m_rambank(0),
@@ -180,32 +180,32 @@ a2bus_videx80_device::a2bus_videx80_device(const machine_config &mconfig, device
 {
 }
 
-a2bus_videoterm_device::a2bus_videoterm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_videoterm_device::a2bus_videoterm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	a2bus_videx80_device(mconfig, A2BUS_VIDEOTERM, "Videx VideoTerm", tag, owner, clock, "a2vidtrm", __FILE__)
 {
 }
 
-a2bus_ap16_device::a2bus_ap16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_ap16_device::a2bus_ap16_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	a2bus_videx80_device(mconfig, A2BUS_IBSAP16, "IBS AP-16 80 column card", tag, owner, clock, "a2ap16", __FILE__)
 {
 }
 
-a2bus_ap16alt_device::a2bus_ap16alt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_ap16alt_device::a2bus_ap16alt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	a2bus_videx80_device(mconfig, A2BUS_IBSAP16ALT, "IBS AP-16 80 column card (alt. version)", tag, owner, clock, "a2ap16a", __FILE__)
 {
 }
 
-a2bus_vtc1_device::a2bus_vtc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_vtc1_device::a2bus_vtc1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	a2bus_videx80_device(mconfig, A2BUS_VTC1, "Unknown VideoTerm clone #1", tag, owner, clock, "a2vtc1", __FILE__)
 {
 }
 
-a2bus_vtc2_device::a2bus_vtc2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_vtc2_device::a2bus_vtc2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	a2bus_videx80_device(mconfig, A2BUS_VTC2, "Unknown VideoTerm clone #2", tag, owner, clock, "a2vtc2", __FILE__)
 {
 }
 
-a2bus_aevm80_device::a2bus_aevm80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_aevm80_device::a2bus_aevm80_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	a2bus_videx80_device(mconfig, A2BUS_AEVIEWMASTER80, "Applied Engineering Viewmaster 80", tag, owner, clock, "a2aevm80", __FILE__)
 {
 }

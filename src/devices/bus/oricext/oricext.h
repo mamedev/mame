@@ -25,16 +25,16 @@ class oricext_connector: public device_t,
 							public device_slot_interface
 {
 public:
-	oricext_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	oricext_connector(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~oricext_connector();
 
-	void set_cputag(const char *tag);
+	void set_cputag(std::string tag);
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<oricext_connector &>(device).irq_handler.set_callback(object); }
 	void irq_w(int state);
 
 protected:
 	devcb_write_line irq_handler;
-	const char *cputag;
+	std::string cputag;
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 };
@@ -43,13 +43,13 @@ class oricext_device : public device_t,
 						public device_slot_card_interface
 {
 public:
-	oricext_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	oricext_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
-	void set_cputag(const char *tag);
+	void set_cputag(std::string tag);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 
 protected:
-	const char *cputag;
+	std::string cputag;
 	m6502_device *cpu;
 	oricext_connector *connector;
 	memory_bank *bank_c000_r, *bank_e000_r, *bank_f800_r, *bank_c000_w, *bank_e000_w, *bank_f800_w;

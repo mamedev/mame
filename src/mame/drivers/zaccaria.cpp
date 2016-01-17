@@ -175,7 +175,7 @@ WRITE8_MEMBER(zaccaria_state::port1b_w)
 	m_acs = ~data & 0x08;
 
 	// bit 4 = led (for testing?)
-	set_led_status(machine(), 0,~data & 0x10);
+	output().set_led_value(0,~data & 0x10);
 }
 
 
@@ -237,7 +237,7 @@ READ8_MEMBER(zaccaria_state::prot2_r)
 
 WRITE8_MEMBER(zaccaria_state::coin_w)
 {
-	coin_counter_w(machine(), 0,data & 1);
+	machine().bookkeeping().coin_counter_w(0,data & 1);
 }
 
 WRITE8_MEMBER(zaccaria_state::nmi_mask_w)

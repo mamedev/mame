@@ -537,7 +537,7 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 
 const device_type SEGA_S32_PCB = &device_creator<segas32_state>;
 
-segas32_state::segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segas32_state::segas32_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, SEGA_S32_PCB, "Sega System 32 PCB", tag, owner, clock, "segas32_pcb", __FILE__),
 		m_z80_shared_ram(*this,"z80_shared_ram"),
 		m_ga2_dpram(*this,"ga2_dpram"),
@@ -891,10 +891,10 @@ void segas32_state::common_io_chip_w(address_space &space, int which, offs_t off
 				m_eeprom->cs_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 				m_eeprom->clk_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			}
-/*            coin_lockout_w(machine(), 1 + 2*which, data & 0x08);
-            coin_lockout_w(machine(), 0 + 2*which, data & 0x04);*/
-			coin_counter_w(machine(), 1 + 2*which, data & 0x02);
-			coin_counter_w(machine(), 0 + 2*which, data & 0x01);
+/*            machine().bookkeeping().coin_lockout_w(1 + 2*which, data & 0x08);
+            machine().bookkeeping().coin_lockout_w(0 + 2*which, data & 0x04);*/
+			machine().bookkeeping().coin_counter_w(1 + 2*which, data & 0x02);
+			machine().bookkeeping().coin_counter_w(0 + 2*which, data & 0x01);
 			break;
 
 		/* tile banking */
@@ -2521,7 +2521,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_S32_REGULAR_DEVICE = &device_creator<segas32_regular_state>;
 
-segas32_regular_state::segas32_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segas32_regular_state::segas32_regular_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: segas32_state(mconfig, tag, owner, clock)
 {
 }
@@ -2545,7 +2545,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_S32_V25_DEVICE = &device_creator<segas32_v25_state>;
 
-segas32_v25_state::segas32_v25_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segas32_v25_state::segas32_v25_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: segas32_state(mconfig, tag, owner, clock)
 {
 }
@@ -2608,7 +2608,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_MULTI32_DEVICE = &device_creator<sega_multi32_state>;
 
-sega_multi32_state::sega_multi32_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega_multi32_state::sega_multi32_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: segas32_state(mconfig, tag, owner, clock)
 {
 }
@@ -2622,7 +2622,7 @@ machine_config_constructor sega_multi32_state::device_mconfig_additions() const
 class segas32_new_state : public driver_device
 {
 public:
-	segas32_new_state(const machine_config &mconfig, device_type type, const char *tag)
+	segas32_new_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_mainpcb(*this, "mainpcb"),
 	m_slavepcb(*this, "slavepcb")
@@ -4945,15 +4945,15 @@ void segas32_state::segas32_common_init(read16_delegate custom_r, write16_delega
 void segas32_state::radm_sw1_output( int which, UINT16 data )
 {
 	if (which == 0)
-		output_set_value("Start_lamp", BIT(data, 2));
+		machine().output().set_value("Start_lamp", BIT(data, 2));
 }
 
 void segas32_state::radm_sw2_output( int which, UINT16 data )
 {
 	if (which == 0)
 	{
-		output_set_value("Wiper_lamp", BIT(data, 0));
-		output_set_value("Lights_lamp", BIT(data, 1));
+		machine().output().set_value("Wiper_lamp", BIT(data, 0));
+		machine().output().set_value("Lights_lamp", BIT(data, 1));
 	}
 }
 
@@ -4961,8 +4961,8 @@ void segas32_state::radr_sw2_output( int which, UINT16 data )
 {
 	if (which == 0)
 	{
-		output_set_value("Entry_lamp", BIT(data, 0));
-		output_set_value("Winner_lamp", BIT(data, 1));
+		machine().output().set_value("Entry_lamp", BIT(data, 0));
+		machine().output().set_value("Winner_lamp", BIT(data, 1));
 	}
 }
 
@@ -4970,8 +4970,8 @@ void segas32_state::alien3_sw1_output( int which, UINT16 data )
 {
 	if (which == 0)
 	{
-		output_set_value("Player1_Gun_Recoil", BIT(data, 2));
-		output_set_value("Player2_Gun_Recoil", BIT(data, 3));
+		machine().output().set_value("Player1_Gun_Recoil", BIT(data, 2));
+		machine().output().set_value("Player2_Gun_Recoil", BIT(data, 3));
 	}
 }
 
@@ -4979,8 +4979,8 @@ void segas32_state::arescue_sw1_output( int which, UINT16 data )
 {
 	if (which == 0)
 	{
-		output_set_value("Start_lamp", BIT(data, 2));
-		output_set_value("Back_lamp", BIT(data, 4));
+		machine().output().set_value("Start_lamp", BIT(data, 2));
+		machine().output().set_value("Back_lamp", BIT(data, 4));
 	}
 }
 
@@ -4988,8 +4988,8 @@ void segas32_state::f1lap_sw1_output( int which, UINT16 data )
 {
 	if (which == 0)
 	{
-		output_set_value("lamp0", BIT(data, 2));
-		output_set_value("lamp1", BIT(data, 3));
+		machine().output().set_value("lamp0", BIT(data, 2));
+		machine().output().set_value("lamp1", BIT(data, 3));
 	}
 }
 
@@ -4997,8 +4997,8 @@ void segas32_state::jpark_sw1_output( int which, UINT16 data )
 {
 	if (which == 0)
 	{
-		output_set_value("Left_lamp", BIT(data, 2));
-		output_set_value("Right_lamp", BIT(data, 3));
+		machine().output().set_value("Left_lamp", BIT(data, 2));
+		machine().output().set_value("Right_lamp", BIT(data, 3));
 	}
 }
 
@@ -5007,15 +5007,15 @@ void segas32_state::orunners_sw1_output( int which, UINT16 data )
 	/* note ma = monitor A and mb = Monitor B */
 	if (which == 0)
 	{
-		output_set_value("MA_Check_Point_lamp", BIT(data, 1));
-		output_set_value("MA_Race_Leader_lamp", BIT(data, 3));
-		output_set_value("MA_Steering_Wheel_motor", BIT(data, 4));
+		machine().output().set_value("MA_Check_Point_lamp", BIT(data, 1));
+		machine().output().set_value("MA_Race_Leader_lamp", BIT(data, 3));
+		machine().output().set_value("MA_Steering_Wheel_motor", BIT(data, 4));
 	}
 	else
 	{
-		output_set_value("MB_Check_Point_lamp", BIT(data, 1));
-		output_set_value("MB_Race_Leader_lamp", BIT(data, 3));
-		output_set_value("MB_Steering_Wheel_motor", BIT(data, 4));
+		machine().output().set_value("MB_Check_Point_lamp", BIT(data, 1));
+		machine().output().set_value("MB_Race_Leader_lamp", BIT(data, 3));
+		machine().output().set_value("MB_Steering_Wheel_motor", BIT(data, 4));
 	}
 }
 
@@ -5026,13 +5026,13 @@ void segas32_state::orunners_sw2_output( int which, UINT16 data )
 	/* the bijokkoy driver might be used as an example for handling these outputs */
 	if (which == 0)
 	{
-		output_set_value("MA_DJ_Music_lamp", BIT(data, 0));
-		output_set_value("MA_<<_>>_lamp", BIT(data, 1));
+		machine().output().set_value("MA_DJ_Music_lamp", BIT(data, 0));
+		machine().output().set_value("MA_<<_>>_lamp", BIT(data, 1));
 	}
 	else
 	{
-		output_set_value("MB_DJ_Music_lamp", BIT(data, 0));
-		output_set_value("MB_<<_>>_lamp", BIT(data, 1));
+		machine().output().set_value("MB_DJ_Music_lamp", BIT(data, 0));
+		machine().output().set_value("MB_<<_>>_lamp", BIT(data, 1));
 	}
 }
 
@@ -5040,68 +5040,68 @@ void segas32_state::harddunk_sw1_output( int which, UINT16 data )
 {
 	if (which == 0)
 	{
-		output_set_value("1P_Start_lamp", BIT(data, 2));
-		output_set_value("2P_Start_lamp", BIT(data, 3));
+		machine().output().set_value("1P_Start_lamp", BIT(data, 2));
+		machine().output().set_value("2P_Start_lamp", BIT(data, 3));
 	}
 	else
 	{
-		output_set_value("4P_Start_lamp", BIT(data, 2));
-		output_set_value("5P_Start_lamp", BIT(data, 3));
+		machine().output().set_value("4P_Start_lamp", BIT(data, 2));
+		machine().output().set_value("5P_Start_lamp", BIT(data, 3));
 	}
 }
 
 void segas32_state::harddunk_sw2_output( int which, UINT16 data )
 {
 	if (which == 0)
-		output_set_value("Left_Winner_lamp", BIT(data, 0));
+		machine().output().set_value("Left_Winner_lamp", BIT(data, 0));
 	else
-		output_set_value("Right_Winner_lamp", BIT(data, 0));
+		machine().output().set_value("Right_Winner_lamp", BIT(data, 0));
 }
 
 void segas32_state::harddunk_sw3_output( int which, UINT16 data )
 {
-	output_set_value("3P_Start_lamp", BIT(data, 4));
-	output_set_value("6P_Start_lamp", BIT(data, 5));
+	machine().output().set_value("3P_Start_lamp", BIT(data, 4));
+	machine().output().set_value("6P_Start_lamp", BIT(data, 5));
 }
 
 void segas32_state::titlef_sw1_output( int which, UINT16 data )
 {
 	if (which == 0)
 	{
-		output_set_value("Blue_Button_1P_lamp", BIT(data, 2));
-		output_set_value("Blue_Button_2P_lamp", BIT(data, 3));
+		machine().output().set_value("Blue_Button_1P_lamp", BIT(data, 2));
+		machine().output().set_value("Blue_Button_2P_lamp", BIT(data, 3));
 	}
 	else
 	{
-		output_set_value("Red_Button_1P_lamp", BIT(data, 2));
-		output_set_value("Red_Button_2P_lamp", BIT(data, 3));
+		machine().output().set_value("Red_Button_1P_lamp", BIT(data, 2));
+		machine().output().set_value("Red_Button_2P_lamp", BIT(data, 3));
 	}
 }
 
 void segas32_state::titlef_sw2_output( int which, UINT16 data )
 {
 	if (which == 0)
-		output_set_value("Blue_Corner_lamp", BIT(data, 0));
+		machine().output().set_value("Blue_Corner_lamp", BIT(data, 0));
 	else
-		output_set_value("Red_Corner_lamp", BIT(data, 0));
+		machine().output().set_value("Red_Corner_lamp", BIT(data, 0));
 }
 
 void segas32_state::scross_sw1_output( int which, UINT16 data )
 {
 	/* note ma = monitor A and mb = Monitor B */
 	if (which == 0)
-		output_set_value("MA_Start_lamp", BIT(data, 2));
+		machine().output().set_value("MA_Start_lamp", BIT(data, 2));
 	else
-		output_set_value("MB_Start_lamp", BIT(data, 2));
+		machine().output().set_value("MB_Start_lamp", BIT(data, 2));
 }
 
 void segas32_state::scross_sw2_output( int which, UINT16 data )
 {
 	/* Note:  I'm not an expert on digits, so I didn't know the right map to use, I just added it manually and it seems to work fine. */
 	if (which == 0)
-		output_set_value("MA_Digit", data);
+		machine().output().set_value("MA_Digit", data);
 	else
-		output_set_value("MB_Digit", data);
+		machine().output().set_value("MB_Digit", data);
 }
 
 /*************************************

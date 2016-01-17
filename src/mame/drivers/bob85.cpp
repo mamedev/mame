@@ -30,7 +30,7 @@ Test Paste:
 class bob85_state : public driver_device
 {
 public:
-	bob85_state(const machine_config &mconfig, device_type type, const char *tag)
+	bob85_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cass(*this, "cassette"),
@@ -137,7 +137,7 @@ READ8_MEMBER(bob85_state::bob85_keyboard_r)
 
 WRITE8_MEMBER(bob85_state::bob85_7seg_w)
 {
-	output_set_digit_value(offset, BITSWAP8( data,3,2,1,0,7,6,5,4 ));
+	output().set_digit_value(offset, BITSWAP8( data,3,2,1,0,7,6,5,4 ));
 }
 
 static ADDRESS_MAP_START( bob85_mem, AS_PROGRAM, 8, bob85_state )

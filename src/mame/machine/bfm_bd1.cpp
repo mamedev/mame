@@ -101,7 +101,7 @@ static const UINT16 BD1charset[]=
 	0x4406, // 0100 0100 0000 0110 ?
 };
 
-bfm_bd1_t::bfm_bd1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+bfm_bd1_t::bfm_bd1_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, BFM_BD1, "BFM BD1 VFD controller", tag, owner, clock, "bfm_bd1", __FILE__),
 	m_port_val(0)
 {
@@ -184,7 +184,7 @@ void bfm_bd1_t::update_display()
 		{
 			m_outputs[i] = 0;
 		}
-		output_set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
+		machine().output().set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
 	}
 }
 ///////////////////////////////////////////////////////////////////////////

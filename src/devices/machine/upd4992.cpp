@@ -33,7 +33,7 @@ const device_type UPD4992 = &device_creator<upd4992_device>;
 //  upd4992_device - constructor
 //-------------------------------------------------
 
-upd4992_device::upd4992_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd4992_device::upd4992_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, UPD4992, "uPD4992 RTC", tag, owner, clock, "upd4992", __FILE__),
 		device_rtc_interface(mconfig, *this), m_timer_clock(nullptr)
 {

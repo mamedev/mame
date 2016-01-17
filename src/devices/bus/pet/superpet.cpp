@@ -174,7 +174,7 @@ inline bool superpet_device::is_ram_writable()
 //  superpet_device - constructor
 //-------------------------------------------------
 
-superpet_device::superpet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+superpet_device::superpet_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SUPERPET, "SuperPET", tag, owner, clock, "pet_superpet", __FILE__),
 	device_pet_expansion_card_interface(mconfig, *this),
 	m_maincpu(*this, M6809_TAG),

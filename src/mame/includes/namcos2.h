@@ -96,7 +96,7 @@ enum
 class namcos2_shared_state : public driver_device
 {
 public:
-	namcos2_shared_state(const machine_config &mconfig, device_type type, const char *tag)
+	namcos2_shared_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_dspmaster(*this, "dspmaster"),
 			m_dspslave(*this, "dspslave"),
@@ -259,7 +259,7 @@ public:
 class namcos2_state : public namcos2_shared_state
 {
 public:
-	namcos2_state(const machine_config &mconfig, device_type type, const char *tag)
+	namcos2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: namcos2_shared_state(mconfig, type, tag),
 			m_dpram(*this, "dpram"),
 			m_paletteram(*this, "paletteram"),
@@ -363,6 +363,11 @@ public:
 	DECLARE_READ16_MEMBER( namcos2_68k_key_r );
 	DECLARE_WRITE16_MEMBER( namcos2_68k_key_w );
 	DECLARE_READ16_MEMBER( namcos2_finallap_prot_r );
+	void GollyGhostUpdateLED_c4( int data );
+	void GollyGhostUpdateLED_c6( int data );
+	void GollyGhostUpdateLED_c8( int data );
+	void GollyGhostUpdateLED_ca( int data );
+	void GollyGhostUpdateDiorama_c0( int data );
 
 };
 

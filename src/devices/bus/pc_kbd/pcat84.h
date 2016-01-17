@@ -29,8 +29,8 @@ class ibm_pc_at_84_keyboard_device :  public device_t,
 {
 public:
 	// construction/destruction
-	ibm_pc_at_84_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	ibm_pc_at_84_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ibm_pc_at_84_keyboard_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	ibm_pc_at_84_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
@@ -97,7 +97,7 @@ class ibm_3270pc_122_keyboard_device :  public ibm_pc_at_84_keyboard_device
 {
 public:
 	// construction/destruction
-	ibm_3270pc_122_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ibm_3270pc_122_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;

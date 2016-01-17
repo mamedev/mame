@@ -39,7 +39,7 @@ static ADDRESS_MAP_START( lpc2103_map, AS_PROGRAM, 32, lpc210x_device )
 ADDRESS_MAP_END
 
 
-lpc210x_device::lpc210x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+lpc210x_device::lpc210x_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: arm7_cpu_device(mconfig, LPC2103, "LPC2103", tag, owner, clock, "lpc2103", __FILE__, 4, eARM_ARCHFLAGS_T, ENDIANNESS_LITTLE),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, ADDRESS_MAP_NAME(lpc2103_map))
 {

@@ -67,7 +67,7 @@ class colecovision_control_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	colecovision_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	colecovision_control_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~colecovision_control_port_device() { }
 
 	// static configuration helpers

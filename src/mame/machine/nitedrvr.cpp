@@ -227,7 +227,7 @@ D5 = Spare (Not used)
 
 WRITE8_MEMBER(nitedrvr_state::nitedrvr_out1_w)
 {
-	set_led_status(machine(), 0, data & 0x10);
+	output().set_led_value(0, data & 0x10);
 
 	m_crash_en = data & 0x01;
 

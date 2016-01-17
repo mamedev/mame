@@ -11,7 +11,7 @@
 class md_cons_state : public md_base_state
 {
 public:
-	md_cons_state(const machine_config &mconfig, device_type type, const char *tag)
+	md_cons_state(const machine_config &mconfig, device_type type, std::string tag)
 	: md_base_state(mconfig, type, tag),
 	m_32x(*this,"sega32x"),
 	m_segacd(*this,"segacd"),

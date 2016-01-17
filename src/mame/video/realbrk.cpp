@@ -29,8 +29,8 @@ WRITE16_MEMBER(realbrk_state::realbrk_flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0,    data & 0x0001);
-		coin_counter_w(machine(), 1,    data & 0x0004);
+		machine().bookkeeping().coin_counter_w(0,    data & 0x0001);
+		machine().bookkeeping().coin_counter_w(1,    data & 0x0004);
 
 		flip_screen_set(    data & 0x0080);
 	}

@@ -23,7 +23,7 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 
 WRITE8_MEMBER(hyperspt_state::hyperspt_coin_counter_w)
 {
-	coin_counter_w(machine(), offset, data);
+	machine().bookkeeping().coin_counter_w(offset, data);
 }
 
 WRITE8_MEMBER(hyperspt_state::irq_mask_w)

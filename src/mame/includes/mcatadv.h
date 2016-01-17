@@ -4,7 +4,7 @@
 class mcatadv_state : public driver_device
 {
 public:
-	mcatadv_state(const machine_config &mconfig, device_type type, const char *tag)
+	mcatadv_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram1(*this, "videoram1"),
 		m_videoram2(*this, "videoram2"),

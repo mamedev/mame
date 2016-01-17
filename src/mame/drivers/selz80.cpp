@@ -37,7 +37,7 @@ ToDo:
 class selz80_state : public driver_device
 {
 public:
-	selz80_state(const machine_config &mconfig, device_type type, const char *tag)
+	selz80_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_p_ram(*this, "ram")
@@ -137,7 +137,7 @@ WRITE8_MEMBER( selz80_state::scanlines_w )
 
 WRITE8_MEMBER( selz80_state::digit_w )
 {
-	output_set_digit_value(m_digit, BITSWAP8(data, 3, 2, 1, 0, 7, 6, 5, 4));
+	output().set_digit_value(m_digit, BITSWAP8(data, 3, 2, 1, 0, 7, 6, 5, 4));
 }
 
 READ8_MEMBER( selz80_state::kbd_r )

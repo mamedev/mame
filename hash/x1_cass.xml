@@ -207,6 +207,19 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<!-- This is supposed to work on a regular X1, but in MAME only the x1turbo drivers can load it -->
+	<software name="fantsian">
+		<description>Fantasian</description>
+		<year>1985</year>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<info name="alt_title" value="ファンタジアン"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="24382972">
+				<rom name="fantsian.wav" size="24382972" crc="1f65588a" sha1="1657223787a45e81a7bf0bcfc9bbe5c19fbb54b1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="firecrys">
 		<description>The Fire Crystal</description>
 		<year>1986</year>
@@ -439,6 +452,20 @@ Titles, publishers and release dates taken from:
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="240004">
 				<rom name="pac-man.tap" size="240004" crc="a384d58f" sha1="bd92ad9be1053292f175db948fe2ee6f15fe7ce2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinball">
+		<description>Pinball</description>
+		<year>1982</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="alt_title" value="ピンボール"/>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="12021244">
+				<rom name="pinball.wav" size="12021244" crc="0ecdd227" sha1="2b521b68a1e302ee508d72c7ef16b5ebc41edc7a" offset="0" />
 			</dataarea>
 		</part>
 	</software>

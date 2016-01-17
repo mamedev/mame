@@ -25,7 +25,7 @@
 
 
 // disasm
-void e0c6200_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void e0c6200_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -824,7 +824,7 @@ void e0c6200_cpu_device::execute_one()
 
 		// illegal opcode
 		default:
-			logerror("%s unknown opcode $%03X at $%04X\n", tag(), m_op, m_prev_pc);
+			logerror("%s unknown opcode $%03X at $%04X\n", tag().c_str(), m_op, m_prev_pc);
 			break;
 
 			} // 0xff0

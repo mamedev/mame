@@ -33,7 +33,7 @@ MACHINE_CONFIG_END
 //  centronics_covox_device - constructor
 //-------------------------------------------------
 
-centronics_covox_device::centronics_covox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+centronics_covox_device::centronics_covox_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CENTRONICS_COVOX, "Covox Speech Thing", tag, owner, clock, "covox", __FILE__),
 	device_centronics_peripheral_interface( mconfig, *this ),
 	m_dac(*this, "dac"),
@@ -88,7 +88,7 @@ MACHINE_CONFIG_END
 //  centronics_covox_stereo_device - constructor
 //-------------------------------------------------
 
-centronics_covox_stereo_device::centronics_covox_stereo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+centronics_covox_stereo_device::centronics_covox_stereo_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CENTRONICS_COVOX_STEREO, "Covox (Stereo-in-1)", tag, owner, clock, "covox_stereo", __FILE__),
 	device_centronics_peripheral_interface( mconfig, *this ),
 	m_dac_left(*this, "dac_left"),

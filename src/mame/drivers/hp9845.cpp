@@ -56,7 +56,7 @@
 class hp9845_state : public driver_device
 {
 public:
-	hp9845_state(const machine_config &mconfig, device_type type, const char *tag) :
+	hp9845_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag)
 	{ }
 
@@ -69,7 +69,7 @@ INPUT_PORTS_END
 class hp9845b_state : public driver_device
 {
 public:
-	hp9845b_state(const machine_config &mconfig, device_type type, const char *tag) :
+	hp9845b_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 				m_lpu(*this , "lpu"),
 				m_ppu(*this , "ppu"),

@@ -55,7 +55,7 @@ device_generic_cart_interface::~device_generic_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_generic_cart_interface::rom_alloc(size_t size, int width, endianness_t endian, const char *tag)
+void device_generic_cart_interface::rom_alloc(size_t size, int width, endianness_t endian, std::string tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -83,7 +83,7 @@ void device_generic_cart_interface::ram_alloc(UINT32 size)
 //-------------------------------------------------
 //  generic_slot_device - constructor
 //-------------------------------------------------
-generic_slot_device::generic_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+generic_slot_device::generic_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, GENERIC_SOCKET, "Generic ROM Socket / RAM Socket / Cartridge Slot", tag, owner, clock, "generic_socket", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -169,7 +169,7 @@ void generic_slot_device::call_unload()
 
 bool generic_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 	return TRUE;
 }
 
@@ -179,9 +179,9 @@ bool generic_slot_device::call_softlist_load(software_list_device &swlist, const
  get default card software
  -------------------------------------------------*/
 
-void generic_slot_device::get_default_card_software(std::string &result)
+std::string generic_slot_device::get_default_card_software()
 {
-	software_get_default_slot(result, m_default_card);
+	return software_get_default_slot(m_default_card);
 }
 
 

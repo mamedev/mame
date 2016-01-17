@@ -16,7 +16,7 @@ TODO:
 const device_type YM2148 = &device_creator<ym2148_device>;
 
 
-ym2148_device::ym2148_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ym2148_device::ym2148_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YM2148, "YM2148", tag, owner, clock, "ym2148", __FILE__)
 	, device_serial_interface(mconfig, *this)
 	, m_txd_handler(*this)

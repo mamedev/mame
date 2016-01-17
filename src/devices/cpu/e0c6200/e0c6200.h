@@ -16,7 +16,7 @@ class e0c6200_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	e0c6200_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor program, address_map_constructor data, const char *shortname, const char *source)
+	e0c6200_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, address_map_constructor program, address_map_constructor data, std::string shortname, std::string source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_BIG, 16, 13, -1, program)
 		, m_data_config("data", ENDIANNESS_BIG, 8, 12, 0, data), m_program(nullptr), m_data(nullptr), m_op(0), m_prev_op(0), m_irq_vector(0), m_irq_id(0), m_possible_irq(false), m_halt(false),
@@ -44,7 +44,7 @@ protected:
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;

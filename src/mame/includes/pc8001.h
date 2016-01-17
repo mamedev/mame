@@ -31,7 +31,7 @@
 class pc8001_state : public driver_device
 {
 public:
-	pc8001_state(const machine_config &mconfig, device_type type, const char *tag)
+	pc8001_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_rtc(*this, UPD1990A_TAG),
@@ -82,7 +82,7 @@ public:
 class pc8001mk2_state : public pc8001_state
 {
 public:
-	pc8001mk2_state(const machine_config &mconfig, device_type type, const char *tag)
+	pc8001mk2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pc8001_state(mconfig, type, tag),
 			m_kanji_rom(*this, "kanji")
 	{ }

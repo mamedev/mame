@@ -20,7 +20,7 @@ class dmv_k233_device :
 {
 public:
 	// construction/destruction
-	dmv_k233_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmv_k233_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

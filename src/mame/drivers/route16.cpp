@@ -946,7 +946,7 @@ READ8_MEMBER(route16_state::routex_prot_read)
 {
 	if (space.device().safe_pc() == 0x2f) return 0xfb;
 
-	logerror ("cpu '%s' (PC=%08X): unmapped prot read\n", space.device().tag(), space.device().safe_pc());
+	logerror ("cpu '%s' (PC=%08X): unmapped prot read\n", space.device().tag().c_str(), space.device().safe_pc());
 	return 0x00;
 
 }

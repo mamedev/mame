@@ -152,7 +152,7 @@ Iron PCB (same as Final Fight 2?)
 class snesb_state : public snes_state
 {
 public:
-	snesb_state(const machine_config &mconfig, device_type type, const char *tag)
+	snesb_state(const machine_config &mconfig, device_type type, std::string tag)
 		: snes_state(mconfig, type, tag) { }
 
 	std::unique_ptr<INT8[]> m_shared_ram;

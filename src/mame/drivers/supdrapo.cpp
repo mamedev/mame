@@ -70,7 +70,7 @@
 class supdrapo_state : public driver_device
 {
 public:
-	supdrapo_state(const machine_config &mconfig, device_type type, const char *tag)
+	supdrapo_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -241,12 +241,12 @@ WRITE8_MEMBER(supdrapo_state::debug7c00_w)
 
 WRITE8_MEMBER(supdrapo_state::coinin_w)
 {
-	coin_counter_w(machine(), 0, data & 0x01);  /* Coin In */
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);  /* Coin In */
 }
 
 WRITE8_MEMBER(supdrapo_state::payout_w)
 {
-	coin_counter_w(machine(), 1, data & 0x01);  /* Payout */
+	machine().bookkeeping().coin_counter_w(1, data & 0x01);  /* Payout */
 }
 
 

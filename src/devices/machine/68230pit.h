@@ -86,8 +86,8 @@ class pit68230_device :  public device_t, public device_execute_interface
 {
 public:
 // construction/destruction
-pit68230_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
-pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+pit68230_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source);
+pit68230_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 template<class _Object> static devcb_base &set_pa_wr_callback (device_t &device, _Object object)
 {
 		return downcast<pit68230_device &>(device).m_write_pa.set_callback (object);

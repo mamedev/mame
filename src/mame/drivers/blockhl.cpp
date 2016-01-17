@@ -34,7 +34,7 @@
 class blockhl_state : public driver_device
 {
 public:
-	blockhl_state(const machine_config &mconfig, device_type type, const char *tag)
+	blockhl_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_bank5800(*this, "bank5800"),
@@ -188,8 +188,8 @@ WRITE8_MEMBER( blockhl_state::banking_callback )
 	// bit 2, unknown (always 0)
 
 	// bits 3/4 = coin counters
-	coin_counter_w(machine(), 0, data & 0x08);
-	coin_counter_w(machine(), 1, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, data & 0x08);
+	machine().bookkeeping().coin_counter_w(1, data & 0x10);
 
 	// bit 5 = select palette RAM or work RAM at 5800-5fff
 	m_bank5800->set_bank(BIT(data, 5));

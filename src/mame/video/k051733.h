@@ -7,7 +7,7 @@
 class k051733_device : public device_t
 {
 public:
-	k051733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k051733_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~k051733_device() {}
 
 	DECLARE_WRITE8_MEMBER( write );

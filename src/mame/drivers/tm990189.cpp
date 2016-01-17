@@ -76,7 +76,7 @@
 class tm990189_state : public driver_device
 {
 public:
-	tm990189_state(const machine_config &mconfig, device_type type, const char *tag)
+	tm990189_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_tms9980a(*this, "maincpu"),
 	m_speaker(*this, "speaker"),
@@ -246,7 +246,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tm990189_state::display_callback)
 	{
 		m_old_segment_state[i] |= m_segment_state[i];
 		sprintf(ledname,"digit%d",i);
-		output_set_digit_value(i, m_old_segment_state[i]);
+		output().set_digit_value(i, m_old_segment_state[i]);
 		m_old_segment_state[i] = m_segment_state[i];
 		m_segment_state[i] = 0;
 	}
@@ -254,7 +254,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tm990189_state::display_callback)
 	for (i = 0; i < 7; i++)
 	{
 		sprintf(ledname,"led%d",i);
-		output_set_value(ledname, !BIT(m_LED_state, i));
+		output().set_value(ledname, !BIT(m_LED_state, i));
 	}
 }
 
@@ -429,7 +429,7 @@ class tm990_189_rs232_image_device :    public device_t,
 {
 public:
 	// construction/destruction
-	tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tm990_189_rs232_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_SERIAL; }
@@ -455,7 +455,7 @@ protected:
 
 const device_type TM990_189_RS232 = &device_creator<tm990_189_rs232_image_device>;
 
-tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TM990_189_RS232, "TM990/189 RS232 port", tag, owner, clock, "tm990_189_rs232_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {

@@ -104,7 +104,7 @@ inline void zx8301_device::writebyte(offs_t address, UINT8 data)
 //  zx8301_device - constructor
 //-------------------------------------------------
 
-zx8301_device::zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+zx8301_device::zx8301_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ZX8301, "Sinclair ZX8301", tag, owner, clock, "zx8301", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),

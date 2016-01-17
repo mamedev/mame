@@ -9,7 +9,7 @@
 class popper_state : public driver_device
 {
 public:
-	popper_state(const machine_config &mconfig, device_type type, const char *tag)
+	popper_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_ol_videoram(*this, "ol_videoram"),
 		m_videoram(*this, "videoram"),

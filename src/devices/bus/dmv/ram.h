@@ -20,7 +20,7 @@ class dmv_ram_device :
 {
 public:
 	// construction/destruction
-	dmv_ram_device(const machine_config &mconfig, device_type type, UINT32 size, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	dmv_ram_device(const machine_config &mconfig, device_type type, UINT32 size, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 protected:
 	// device-level overrides
@@ -41,7 +41,7 @@ class dmv_k200_device :
 {
 public:
 	// construction/destruction
-	dmv_k200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmv_k200_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -50,7 +50,7 @@ class dmv_k202_device :
 {
 public:
 	// construction/destruction
-	dmv_k202_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmv_k202_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -59,7 +59,7 @@ class dmv_k208_device :
 {
 public:
 	// construction/destruction
-	dmv_k208_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmv_k208_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

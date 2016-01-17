@@ -122,9 +122,9 @@ void tehkanwc_state::video_start()
 void tehkanwc_state::gridiron_draw_led(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 led,int player)
 {
 	if (led&0x80)
-		output_set_digit_value(player, led&0x7f);
+		output().set_digit_value(player, led&0x7f);
 		else
-		output_set_digit_value(player, 0x00);
+		output().set_digit_value(player, 0x00);
 }
 
 void tehkanwc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)

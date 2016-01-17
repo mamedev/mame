@@ -67,7 +67,7 @@ const rom_entry *buddha_device::device_rom_region() const
 //  buddha_device - constructor
 //-------------------------------------------------
 
-buddha_device::buddha_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+buddha_device::buddha_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, BUDDHA, "Buddha IDE controller", tag, owner, clock, "buddha", __FILE__),
 	device_zorro2_card_interface(mconfig, *this),
 	m_ata_0(*this, "ata_0"),
@@ -103,7 +103,7 @@ void buddha_device::device_reset()
 void buddha_device::autoconfig_base_address(offs_t address)
 {
 	if (VERBOSE)
-		logerror("%s('%s'): autoconfig_base_address received: 0x%06x\n", shortname(), basetag(), address);
+		logerror("%s('%s'): autoconfig_base_address received: 0x%06x\n", shortname().c_str(), basetag().c_str(), address);
 
 	if (VERBOSE)
 		logerror("-> installing buddha\n");
@@ -156,7 +156,7 @@ void buddha_device::autoconfig_base_address(offs_t address)
 WRITE_LINE_MEMBER( buddha_device::cfgin_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): configin_w (%d)\n", shortname(), basetag(), state);
+		logerror("%s('%s'): configin_w (%d)\n", shortname().c_str(), basetag().c_str(), state);
 
 	if (state == 0)
 	{
@@ -185,7 +185,7 @@ READ16_MEMBER( buddha_device::speed_r )
 	UINT16 data = 0xffff;
 
 	if (VERBOSE)
-		logerror("%s('%s'): ide_0_interrupt_r %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
+		logerror("%s('%s'): ide_0_interrupt_r %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
 
 	return data;
 }
@@ -193,13 +193,13 @@ READ16_MEMBER( buddha_device::speed_r )
 WRITE16_MEMBER( buddha_device::speed_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): speed_w %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
+		logerror("%s('%s'): speed_w %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
 }
 
 WRITE_LINE_MEMBER( buddha_device::ide_0_interrupt_w)
 {
 	if (VERBOSE)
-		logerror("%s('%s'): ide_0_interrupt_w (%d)\n", shortname(), basetag(), state);
+		logerror("%s('%s'): ide_0_interrupt_w (%d)\n", shortname().c_str(), basetag().c_str(), state);
 
 	m_ide_0_interrupt = state;
 
@@ -210,7 +210,7 @@ WRITE_LINE_MEMBER( buddha_device::ide_0_interrupt_w)
 WRITE_LINE_MEMBER( buddha_device::ide_1_interrupt_w)
 {
 	if (VERBOSE)
-		logerror("%s('%s'): ide_1_interrupt_w (%d)\n", shortname(), basetag(), state);
+		logerror("%s('%s'): ide_1_interrupt_w (%d)\n", shortname().c_str(), basetag().c_str(), state);
 
 	m_ide_1_interrupt = state;
 
@@ -225,7 +225,7 @@ READ16_MEMBER( buddha_device::ide_0_interrupt_r )
 	data = m_ide_0_interrupt << 15;
 
 	if (VERBOSE)
-		logerror("%s('%s'): ide_0_interrupt_r %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
+		logerror("%s('%s'): ide_0_interrupt_r %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
 
 	logerror("%s\n", device().machine().describe_context());
 
@@ -239,7 +239,7 @@ READ16_MEMBER( buddha_device::ide_1_interrupt_r )
 	data = m_ide_1_interrupt << 15;
 
 	if (VERBOSE)
-		logerror("%s('%s'): ide_1_interrupt_r %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
+		logerror("%s('%s'): ide_1_interrupt_r %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
 
 	return data;
 }
@@ -247,7 +247,7 @@ READ16_MEMBER( buddha_device::ide_1_interrupt_r )
 WRITE16_MEMBER( buddha_device::ide_interrupt_enable_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): ide_interrupt_enable_w %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
+		logerror("%s('%s'): ide_interrupt_enable_w %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
 
 	// writing any value here enables ide interrupts to the zorro slot
 	m_ide_interrupts_enabled = true;
@@ -261,7 +261,7 @@ READ16_MEMBER( buddha_device::ide_0_cs0_r )
 	data = m_ata_0->read_cs0(space, (offset >> 1) & 0x07, mem_mask);
 
 	if (VERBOSE)
-		logerror("%s('%s'): ide_0_cs0_r(%04x) %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
+		logerror("%s('%s'): ide_0_cs0_r(%04x) %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), offset, data, mem_mask);
 
 	return (data << 8) | (data >> 8);
 }
@@ -269,7 +269,7 @@ READ16_MEMBER( buddha_device::ide_0_cs0_r )
 WRITE16_MEMBER( buddha_device::ide_0_cs0_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): ide_0_cs0_w(%04x) %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
+		logerror("%s('%s'): ide_0_cs0_w(%04x) %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), offset, data, mem_mask);
 
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = (data << 8) | (data >> 8);
@@ -285,7 +285,7 @@ READ16_MEMBER( buddha_device::ide_0_cs1_r )
 	data = m_ata_0->read_cs1(space, (offset >> 1) & 0x07, mem_mask);
 
 	if (VERBOSE)
-		logerror("%s('%s'): ide_0_cs1_r(%04x) %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
+		logerror("%s('%s'): ide_0_cs1_r(%04x) %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), offset, data, mem_mask);
 
 	return (data << 8) | (data >> 8);
 }
@@ -293,7 +293,7 @@ READ16_MEMBER( buddha_device::ide_0_cs1_r )
 WRITE16_MEMBER( buddha_device::ide_0_cs1_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): ide_0_cs1_w(%04x) %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
+		logerror("%s('%s'): ide_0_cs1_w(%04x) %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), offset, data, mem_mask);
 
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = (data << 8) | (data >> 8);
@@ -309,7 +309,7 @@ READ16_MEMBER( buddha_device::ide_1_cs0_r )
 	data = m_ata_1->read_cs0(space, (offset >> 1) & 0x07, mem_mask);
 
 	if (VERBOSE)
-		logerror("%s('%s'): ide_1_cs0_r(%04x) %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
+		logerror("%s('%s'): ide_1_cs0_r(%04x) %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), offset, data, mem_mask);
 
 	return (data << 8) | (data >> 8);
 }
@@ -317,7 +317,7 @@ READ16_MEMBER( buddha_device::ide_1_cs0_r )
 WRITE16_MEMBER( buddha_device::ide_1_cs0_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): ide_1_cs0_w(%04x) %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
+		logerror("%s('%s'): ide_1_cs0_w(%04x) %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), offset, data, mem_mask);
 
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = (data << 8) | (data >> 8);
@@ -333,7 +333,7 @@ READ16_MEMBER( buddha_device::ide_1_cs1_r )
 	data = m_ata_1->read_cs1(space, (offset >> 1) & 0x07, mem_mask);
 
 	if (VERBOSE)
-		logerror("%s('%s'): ide_1_cs1_r(%04x) %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
+		logerror("%s('%s'): ide_1_cs1_r(%04x) %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), offset, data, mem_mask);
 
 	return (data << 8) | (data >> 8);
 }
@@ -341,7 +341,7 @@ READ16_MEMBER( buddha_device::ide_1_cs1_r )
 WRITE16_MEMBER( buddha_device::ide_1_cs1_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): ide_1_cs1_w(%04x) %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
+		logerror("%s('%s'): ide_1_cs1_w(%04x) %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), offset, data, mem_mask);
 
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = (data << 8) | (data >> 8);

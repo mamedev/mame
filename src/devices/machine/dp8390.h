@@ -38,7 +38,7 @@ class dp8390_device : public device_t,
 {
 public:
 	// construction/destruction
-	dp8390_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, float bandwidth, const char *shortname, const char *source);
+	dp8390_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, float bandwidth, std::string shortname, std::string source);
 
 	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_breq_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_breq_cb.set_callback(object); }
@@ -130,13 +130,13 @@ private:
 class rtl8019a_device : public dp8390_device
 {
 public:
-	rtl8019a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rtl8019a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class dp8390d_device : public dp8390_device
 {
 public:
-	dp8390d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dp8390d_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 // device type definition

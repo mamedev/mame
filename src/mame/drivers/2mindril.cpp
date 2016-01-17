@@ -43,7 +43,7 @@ DAC               -26.6860Mhz
 class _2mindril_state : public taito_f3_state
 {
 public:
-	_2mindril_state(const machine_config &mconfig, device_type type, const char *tag)
+	_2mindril_state(const machine_config &mconfig, device_type type, std::string tag)
 		: taito_f3_state(mconfig, type, tag),
 		m_iodata(*this, "iodata") { }
 
@@ -116,10 +116,10 @@ WRITE16_MEMBER(_2mindril_state::drill_io_w)
 	switch(offset)
 	{
 		case 0x8/2:
-			coin_counter_w(machine(), 0, m_iodata[offset] & 0x0400);
-			coin_counter_w(machine(), 1, m_iodata[offset] & 0x0800);
-			coin_lockout_w(machine(), 0, ~m_iodata[offset] & 0x0100);
-			coin_lockout_w(machine(), 1, ~m_iodata[offset] & 0x0200);
+			machine().bookkeeping().coin_counter_w(0, m_iodata[offset] & 0x0400);
+			machine().bookkeeping().coin_counter_w(1, m_iodata[offset] & 0x0800);
+			machine().bookkeeping().coin_lockout_w(0, ~m_iodata[offset] & 0x0100);
+			machine().bookkeeping().coin_lockout_w(1, ~m_iodata[offset] & 0x0200);
 			break;
 	}
 

@@ -15,7 +15,7 @@
 class mephisto_pinball_state : public driver_device
 {
 public:
-	mephisto_pinball_state(const machine_config &mconfig, device_type type, const char *tag)
+	mephisto_pinball_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }

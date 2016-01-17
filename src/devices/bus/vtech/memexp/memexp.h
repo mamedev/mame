@@ -67,7 +67,7 @@ class memexp_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	memexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	memexp_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~memexp_slot_device();
 
 	void set_program_space(address_space *program);

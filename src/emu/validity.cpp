@@ -295,8 +295,7 @@ void validity_checker::validate_one(const game_driver &driver)
 	// if we had warnings or errors, output
 	if (m_errors > start_errors || m_warnings > start_warnings || !m_verbose_text.empty())
 	{
-		std::string tempstr;
-		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): %d errors, %d warnings\n", driver.name, core_filename_extract_base(tempstr, driver.source_file).c_str(), m_errors - start_errors, m_warnings - start_warnings);
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): %d errors, %d warnings\n", driver.name, core_filename_extract_base(driver.source_file).c_str(), m_errors - start_errors, m_warnings - start_warnings);
 		if (m_errors > start_errors)
 			output_indented_errors(m_error_text, "Errors");
 		if (m_warnings > start_warnings)
@@ -524,18 +523,17 @@ void validity_checker::validate_inlines()
 void validity_checker::validate_driver()
 {
 	// check for duplicate names
-	std::string tempstr;
 	if (!m_names_map.insert(std::make_pair(m_current_driver->name, m_current_driver)).second)
 	{
 		const game_driver *match = m_names_map.find(m_current_driver->name)->second;
-		osd_printf_error("Driver name is a duplicate of %s(%s)\n", core_filename_extract_base(tempstr, match->source_file).c_str(), match->name);
+		osd_printf_error("Driver name is a duplicate of %s(%s)\n", core_filename_extract_base(match->source_file).c_str(), match->name);
 	}
 
 	// check for duplicate descriptions
 	if (!m_descriptions_map.insert(std::make_pair(m_current_driver->description, m_current_driver)).second)
 	{
 		const game_driver *match = m_descriptions_map.find(m_current_driver->description)->second;
-		osd_printf_error("Driver description is a duplicate of %s(%s)\n", core_filename_extract_base(tempstr, match->source_file).c_str(), match->name);
+		osd_printf_error("Driver description is a duplicate of %s(%s)\n", core_filename_extract_base(match->source_file).c_str(), match->name);
 	}
 
 	// determine if we are a clone
@@ -854,7 +852,7 @@ void validity_checker::validate_condition(ioport_condition &condition, device_t 
 	// resolve the tag
 	// then find a matching port
 	if (port_map.find(device.subtag(condition.tag())) == port_map.end())
-		osd_printf_error("Condition referencing non-existent ioport tag '%s'\n", condition.tag());
+		osd_printf_error("Condition referencing non-existent ioport tag '%s'\n", condition.tag().c_str());
 }
 
 
@@ -889,12 +887,12 @@ void validity_checker::validate_inputs()
 		// do a first pass over ports to add their names and find duplicates
 		for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
 			if (!port_map.insert(port->tag()).second)
-				osd_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port->tag());
+				osd_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port->tag().c_str());
 
 		// iterate over ports
 		for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
 		{
-			m_current_ioport = port->tag();
+			m_current_ioport = port->tag().c_str();
 
 			// iterate through the fields on this port
 			for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
@@ -981,18 +979,18 @@ void validity_checker::validate_devices()
 		m_current_device = device;
 
 		// validate the device tag
-		validate_tag(device->basetag());
+		validate_tag(device->basetag().c_str());
 
 		// look for duplicates
 		if (!device_map.insert(device->tag()).second)
-			osd_printf_error("Multiple devices with the same tag '%s' defined\n", device->tag());
+			osd_printf_error("Multiple devices with the same tag '%s' defined\n", device->tag().c_str());
 
 		// all devices must have a shortname
-		if (strcmp(device->shortname(), "") == 0)
+		if (device->shortname().empty())
 			osd_printf_error("Device does not have short name defined\n");
 
 		// all devices must have a source file defined
-		if (strcmp(device->source(), "") == 0)
+		if (device->source().empty())
 			osd_printf_error("Device does not have source file location defined\n");
 
 		// check for device-specific validity check
@@ -1019,9 +1017,9 @@ void validity_checker::validate_devices()
 				if (!device->configured())
 					device->config_complete();
 
-			if (strcmp(dev->shortname(), "") == 0) {
+			if (dev->shortname().empty()) {
 				if (slot_device_map.insert(dev->name()).second)
-					osd_printf_error("Device '%s' is slot cart device but does not have short name defined\n",dev->name());
+					osd_printf_error("Device '%s' is slot cart device but does not have short name defined\n",dev->name().c_str());
 			}
 
 			const_cast<machine_config &>(*m_current_config).device_remove(&m_current_config->root_device(), temptag.c_str());
@@ -1044,7 +1042,7 @@ void validity_checker::build_output_prefix(std::string &str)
 
 	// if we have a current (non-root) device, indicate that
 	if (m_current_device != nullptr && m_current_device->owner() != nullptr)
-		str.append(m_current_device->name()).append(" device '").append(m_current_device->tag()+1).append("': ");
+		str.append(m_current_device->name()).append(" device '").append(m_current_device->tag().c_str()+1).append("': ");
 
 	// if we have a current port, indicate that as well
 	if (m_current_ioport != nullptr)

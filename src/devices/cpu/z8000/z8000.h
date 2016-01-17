@@ -35,8 +35,8 @@ class z8002_device : public cpu_device
 {
 public:
 	// construction/destruction
-	z8002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	z8002_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	z8002_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	z8002_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	~z8002_device();
 
 	template<class _Object> static devcb_base &set_mo_callback(device_t &device, _Object object) { return downcast<z8002_device &>(device).m_mo_out.set_callback(object); }
@@ -67,7 +67,7 @@ protected:
 	}
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
@@ -628,7 +628,7 @@ class z8001_device : public z8002_device
 {
 public:
 	// construction/destruction
-	z8001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z8001_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

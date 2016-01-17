@@ -25,7 +25,7 @@ To diagnose game, turn on service mode and:
 class mw18w_state : public driver_device
 {
 public:
-	mw18w_state(const machine_config &mconfig, device_type type, const char *tag)
+	mw18w_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu")
 	{ }
@@ -55,7 +55,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_sound0_w)
 	// d5: crash sound
 	// d6-d7: brake sound
 
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
 WRITE8_MEMBER(mw18w_state::mw18w_sound1_w)
@@ -64,7 +64,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_sound1_w)
 	// d6: bell sound
 	// d7: backdrop lamp dim control
 
-	output_set_lamp_value(80, data >> 7 & 1);
+	output().set_lamp_value(80, data >> 7 & 1);
 }
 
 WRITE8_MEMBER(mw18w_state::mw18w_lamps_w)
@@ -77,7 +77,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_lamps_w)
 
 	// refresh lamp status
 	for (int i = 0; i < 5; i++)
-		output_set_lamp_value(col * 10 + i, rows >> i & 1);
+		output().set_lamp_value(col * 10 + i, rows >> i & 1);
 
 	/* lamps info:
 
@@ -142,7 +142,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_led_display_w)
 
 	// d4-7: 7442 (BCD to decimal) -> pick digit panel
 	if ((data & 0xf0) > 0x90) return;
-	output_set_digit_value(data >> 4, _7448_map[data & 0xf]);
+	output().set_digit_value(data >> 4, _7448_map[data & 0xf]);
 }
 
 WRITE8_MEMBER(mw18w_state::mw18w_irq0_clear_w)

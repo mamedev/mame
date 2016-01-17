@@ -30,7 +30,7 @@ displayed.
 class shanghai_state : public driver_device
 {
 public:
-	shanghai_state(const machine_config &mconfig, device_type type, const char *tag)
+	shanghai_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_hd63484(*this, "hd63484") { }
@@ -140,8 +140,8 @@ WRITE16_MEMBER(shanghai_state::shanghai_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0,data & 1);
-		coin_counter_w(machine(), 1,data & 2);
+		machine().bookkeeping().coin_counter_w(0,data & 1);
+		machine().bookkeeping().coin_counter_w(1,data & 2);
 	}
 }
 

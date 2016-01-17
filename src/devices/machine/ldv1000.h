@@ -47,7 +47,7 @@ class pioneer_ldv1000_device : public laserdisc_device
 {
 public:
 	// construction/destruction
-	pioneer_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pioneer_ldv1000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// input and output
 	void data_w(UINT8 data);

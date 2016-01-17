@@ -29,8 +29,8 @@ class lynx_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	lynx_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	lynx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	lynx_sound_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	lynx_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -68,7 +68,7 @@ protected:
 class lynx2_sound_device : public lynx_sound_device
 {
 public:
-	lynx2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	lynx2_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

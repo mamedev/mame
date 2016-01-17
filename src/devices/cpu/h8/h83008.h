@@ -24,7 +24,7 @@
 
 class h83008_device : public h8h_device {
 public:
-	h83008_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h83008_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(syscr_r);
 	DECLARE_WRITE8_MEMBER(syscr_w);

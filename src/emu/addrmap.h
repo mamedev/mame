@@ -55,14 +55,13 @@ public:
 		: m_type(AMH_NONE),
 			m_bits(0),
 			m_mask(0),
-			m_name(nullptr),
-			m_tag(nullptr) { }
+			m_name(nullptr) { }
 
 	map_handler_type        m_type;             // type of the handler
 	UINT8                   m_bits;             // width of the handler in bits, or 0 for default
 	UINT64                  m_mask;             // mask for which lanes apply
 	const char *            m_name;             // name of the handler
-	const char *            m_tag;              // tag for I/O ports and banks
+	std::string             m_tag;              // tag for I/O ports and banks
 };
 
 
@@ -83,27 +82,27 @@ public:
 	void set_mirror(offs_t _mirror) { m_addrmirror = _mirror; }
 	void set_read_type(map_handler_type _type) { m_read.m_type = _type; }
 	void set_write_type(map_handler_type _type) { m_write.m_type = _type; }
-	void set_region(const char *tag, offs_t offset) { m_region = tag; m_rgnoffs = offset; }
-	void set_share(const char *tag) { m_share = tag; }
+	void set_region(std::string tag, offs_t offset) { m_region = tag; m_rgnoffs = offset; }
+	void set_share(std::string tag) { m_share = tag; }
 
 	// mask setting
 	void set_mask(offs_t _mask);
 
 	// I/O port configuration
-	void set_read_port(const char *tag) { m_read.m_type = AMH_PORT; m_read.m_tag = tag; }
-	void set_write_port(const char *tag) { m_write.m_type = AMH_PORT; m_write.m_tag = tag; }
-	void set_readwrite_port(const char *tag) { set_read_port(tag); set_write_port(tag); }
+	void set_read_port(std::string tag) { m_read.m_type = AMH_PORT; m_read.m_tag = tag; }
+	void set_write_port(std::string tag) { m_write.m_type = AMH_PORT; m_write.m_tag = tag; }
+	void set_readwrite_port(std::string tag) { set_read_port(tag); set_write_port(tag); }
 
 	// memory bank configuration
-	void set_read_bank(const char *tag) { m_read.m_type = AMH_BANK; m_read.m_tag = tag; }
-	void set_write_bank(const char *tag) { m_write.m_type = AMH_BANK; m_write.m_tag = tag; }
-	void set_readwrite_bank(const char *tag) { set_read_bank(tag); set_write_bank(tag); }
+	void set_read_bank(std::string tag) { m_read.m_type = AMH_BANK; m_read.m_tag = tag; }
+	void set_write_bank(std::string tag) { m_write.m_type = AMH_BANK; m_write.m_tag = tag; }
+	void set_readwrite_bank(std::string tag) { set_read_bank(tag); set_write_bank(tag); }
 
 	// set offset handler (only one version, since there is no data width to consider)
 	void set_handler(setoffset_delegate func);
 
 	// submap referencing
-	void set_submap(const char *tag, address_map_delegate func, int bits, UINT64 mask);
+	void set_submap(std::string tag, address_map_delegate func, int bits, UINT64 mask);
 
 	// public state
 	address_map_entry *     m_next;                 // pointer to the next entry
@@ -118,8 +117,8 @@ public:
 	map_handler_data        m_read;                 // data for read handler
 	map_handler_data        m_write;                // data for write handler
 	map_handler_data        m_setoffsethd;          // data for setoffset handler
-	const char *            m_share;                // tag of a shared memory block
-	const char *            m_region;               // tag of region containing the memory backing this entry
+	std::string             m_share;                // tag of a shared memory block
+	std::string             m_region;               // tag of region containing the memory backing this entry
 	offs_t                  m_rgnoffs;              // offset within the region
 
 	// handlers

@@ -586,7 +586,7 @@ inline void mos6526_device::synchronize()
 //  mos6526_device - constructor
 //-------------------------------------------------
 
-mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
@@ -603,7 +603,7 @@ mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-mos6526_device::mos6526_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos6526_device::mos6526_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MOS6526, "MOS6526", tag, owner, clock, "mos6526", __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
@@ -619,13 +619,13 @@ mos6526_device::mos6526_device(const machine_config &mconfig, const char *tag, d
 		m_write_pb(*this)
 { }
 
-mos6526a_device::mos6526a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos6526a_device::mos6526a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: mos6526_device(mconfig, MOS6526A, "MOS6526A", tag, owner, clock, TYPE_6526A, "mos6526a", __FILE__) { }
 
-mos8520_device::mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos8520_device::mos8520_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: mos6526_device(mconfig, MOS8520, "MOS8520", tag, owner, clock, TYPE_8520, "mos8520", __FILE__) { }
 
-mos5710_device::mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos5710_device::mos5710_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: mos6526_device(mconfig, MOS5710, "MOS5710", tag, owner, clock, TYPE_5710, "mos5710", __FILE__) { }
 
 

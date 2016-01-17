@@ -151,7 +151,7 @@ Control registers
 
 const device_type TC0480SCP = &device_creator<tc0480scp_device>;
 
-tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc0480scp_device::tc0480scp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0480SCP, "Taito TC0480SCP", tag, owner, clock, "tc0480scp", __FILE__),
 	m_tx_ram(nullptr),
 	m_char_ram(nullptr),
@@ -187,7 +187,7 @@ tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *ta
 //  gfx decoder
 //-------------------------------------------------
 
-void tc0480scp_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void tc0480scp_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<tc0480scp_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -197,7 +197,7 @@ void tc0480scp_device::static_set_gfxdecode_tag(device_t &device, const char *ta
 //  palette device
 //-------------------------------------------------
 
-void tc0480scp_device::static_set_palette_tag(device_t &device, const char *tag)
+void tc0480scp_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<tc0480scp_device &>(device).m_palette.set_tag(tag);
 }

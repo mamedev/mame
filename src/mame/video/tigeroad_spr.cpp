@@ -21,7 +21,7 @@
 
 const device_type TIGEROAD_SPRITE = &device_creator<tigeroad_spr_device>;
 
-tigeroad_spr_device::tigeroad_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tigeroad_spr_device::tigeroad_spr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TIGEROAD_SPRITE, "Simple Capcom (Tiger Road) Sprite", tag, owner, clock, "tigeroad_spr", __FILE__)
 {
 }

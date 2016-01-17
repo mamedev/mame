@@ -143,7 +143,7 @@ protected:
 	};
 
 	// construction/destruction
-	tms3203x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 chiptype, address_map_constructor internal_map, const char *shortname, const char *source);
+	tms3203x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, address_map_constructor internal_map, std::string shortname, std::string source);
 	virtual ~tms3203x_device();
 
 public:
@@ -179,7 +179,7 @@ protected:
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override;
@@ -793,7 +793,7 @@ class tms32031_device : public tms3203x_device
 {
 public:
 	// construction/destruction
-	tms32031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms32031_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -803,7 +803,7 @@ class tms32032_device : public tms3203x_device
 {
 public:
 	// construction/destruction
-	tms32032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms32032_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

@@ -42,7 +42,7 @@ class microdrive_image_device : public device_t,
 {
 public:
 	// construction/destruction
-	microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	microdrive_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~microdrive_image_device();
 
 	template<class _Object> static devcb_base &set_comms_out_wr_callback(device_t &device, _Object object) { return downcast<microdrive_image_device &>(device).m_write_comms_out.set_callback(object); }

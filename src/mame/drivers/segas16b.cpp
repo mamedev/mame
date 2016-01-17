@@ -1130,10 +1130,10 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 			m_sprites->set_flip(data & 0x40);
 			if (!m_disable_screen_blanking)
 				m_segaic16vid->set_display_enable(data & 0x20);
-			set_led_status(machine(), 1, data & 0x08);
-			set_led_status(machine(), 0, data & 0x04);
-			coin_counter_w(machine(), 1, data & 0x02);
-			coin_counter_w(machine(), 0, data & 0x01);
+			output().set_led_value(1, data & 0x08);
+			output().set_led_value(0, data & 0x04);
+			machine().bookkeeping().coin_counter_w(1, data & 0x02);
+			machine().bookkeeping().coin_counter_w(0, data & 0x01);
 			return;
 	}
 	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", space.device().safe_pc(), offset * 2, data, mem_mask);
@@ -1600,9 +1600,9 @@ WRITE16_MEMBER( segas16b_state::hwchamp_custom_io_w )
 					// bit 4 is GONG
 			//      if (data & 0x10) popmessage("GONG");
 					// are the following really lamps?
-			//      set_led_status(space.machine(), 1,data & 0x20);
-			//      set_led_status(space.machine(), 2,data & 0x40);
-			//      set_led_status(space.machine(), 3,data & 0x80);
+			//      output().set_led_value(1,data & 0x20);
+			//      output().set_led_value(2,data & 0x40);
+			//      output().set_led_value(3,data & 0x80);
 					break;
 			}
 			break;

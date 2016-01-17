@@ -40,7 +40,7 @@ $c088-$c095 player tiles
 class jangou_state : public driver_device
 {
 public:
-	jangou_state(const machine_config &mconfig, device_type type, const char *tag)
+	jangou_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_cpu_0(*this, "cpu0"),
 		m_cpu_1(*this, "cpu1"),
@@ -290,9 +290,9 @@ WRITE8_MEMBER(jangou_state::output_w)
 	---- ---x coin counter
 	*/
 //  printf("%02x\n", data);
-	coin_counter_w(machine(), 0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 //  flip_screen_set(data & 0x04);
-//  coin_lockout_w(machine(), 0, ~data & 0x20);
+//  machine().bookkeeping().coin_lockout_w(0, ~data & 0x20);
 }
 
 READ8_MEMBER(jangou_state::input_mux_r)

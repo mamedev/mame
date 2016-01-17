@@ -57,7 +57,7 @@
 class eacc_state : public driver_device
 {
 public:
-	eacc_state(const machine_config &mconfig, device_type type, const char *tag)
+	eacc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_pia(*this, "pia"),
@@ -210,14 +210,14 @@ WRITE8_MEMBER( eacc_state::eacc_segment_w )
 			for (i = 0; i < 8; i++)
 			{
 				sprintf(lednum,"led%d",i);
-				output_set_value(lednum, BIT(data, i));
+				output().set_value(lednum, BIT(data, i));
 			}
 		}
 		else
 		{
 			for (i = 3; i < 7; i++)
 				if (BIT(m_digit, i))
-					output_set_digit_value(i, BITSWAP8(data, 7, 0, 1, 4, 5, 6, 2, 3));
+					output().set_digit_value(i, BITSWAP8(data, 7, 0, 1, 4, 5, 6, 2, 3));
 		}
 	}
 }

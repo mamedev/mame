@@ -99,7 +99,7 @@ void debug_view_disasm::enumerate_sources()
 	std::string name;
 	for (device_disasm_interface *dasm = iter.first(); dasm != nullptr; dasm = iter.next())
 	{
-		strprintf(name,"%s '%s'", dasm->device().name(), dasm->device().tag());
+		strprintf(name,"%s '%s'", dasm->device().name().c_str(), dasm->device().tag().c_str());
 		m_source_list.append(*global_alloc(debug_view_disasm_source(name.c_str(), dasm->device())));
 	}
 

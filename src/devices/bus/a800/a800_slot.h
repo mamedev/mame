@@ -56,7 +56,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_80xx) {}
 	virtual DECLARE_WRITE8_MEMBER(write_d5xx) {}
 
-	void rom_alloc(UINT32 size, const char *tag);
+	void rom_alloc(UINT32 size, std::string tag);
 	void ram_alloc(UINT32 size);
 	void nvram_alloc(UINT32 size);
 	UINT8* get_rom_base() { return m_rom; }
@@ -85,8 +85,8 @@ class a800_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a800_cart_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	a800_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~a800_cart_slot_device();
 
 	// device-level overrides
@@ -113,7 +113,7 @@ public:
 	virtual const char *file_extensions() const override { return "bin,rom,car"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_80xx);
@@ -136,13 +136,13 @@ class a5200_cart_slot_device : public a800_cart_slot_device
 {
 public:
 	// construction/destruction
-	a5200_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a5200_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~a5200_cart_slot_device();
 
 	virtual const char *file_extensions() const override { return "bin,rom,car,a52"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 };
 
 // ======================> xegs_cart_slot_device
@@ -151,13 +151,13 @@ class xegs_cart_slot_device : public a800_cart_slot_device
 {
 public:
 	// construction/destruction
-	xegs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	xegs_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~xegs_cart_slot_device();
 
 	virtual const char *file_extensions() const override { return "bin,rom,car"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 };
 
 // device type definition

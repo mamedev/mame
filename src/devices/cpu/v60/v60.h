@@ -84,8 +84,8 @@ class v60_device : public cpu_device
 {
 public:
 	// construction/destruction
-	v60_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	v60_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	v60_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	v60_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	void stall();
 
@@ -774,7 +774,7 @@ class v70_device : public v60_device
 {
 public:
 	// construction/destruction
-	v70_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v70_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;

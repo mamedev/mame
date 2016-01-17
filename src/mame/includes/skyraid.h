@@ -1,11 +1,11 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 #include "sound/discrete.h"
 
 class skyraid_state : public driver_device
 {
 public:
-	skyraid_state(const machine_config &mconfig, device_type type, const char *tag)
+	skyraid_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_pos_ram(*this, "pos_ram"),
 		m_alpha_num_ram(*this, "alpha_num_ram"),

@@ -94,8 +94,8 @@
 class tms6100_device : public device_t
 {
 public:
-	tms6100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms6100_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	tms6100_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms6100_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	static void enable_4bit_mode(device_t &device) { downcast<tms6100_device &>(device).m_4bit_mode = true; }
 
@@ -140,7 +140,7 @@ protected:
 class m58819_device : public tms6100_device
 {
 public:
-	m58819_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m58819_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

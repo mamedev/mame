@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Paul Leaman
 #include "emu.h"
 #include "includes/blktiger.h"
@@ -147,8 +147,8 @@ WRITE8_MEMBER(blktiger_state::blktiger_scrollx_w)
 WRITE8_MEMBER(blktiger_state::blktiger_video_control_w)
 {
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(machine(), 0,data & 1);
-	coin_counter_w(machine(), 1,data & 2);
+	machine().bookkeeping().coin_counter_w(0,data & 1);
+	machine().bookkeeping().coin_counter_w(1,data & 2);
 
 	/* bit 5 resets the sound CPU */
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);

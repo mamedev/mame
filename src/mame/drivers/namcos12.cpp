@@ -1094,7 +1094,7 @@ The lever must be wired to analog port 0 (pin B22 parts side) of the Namco 48-wa
 class namcos12_state : public driver_device
 {
 public:
-	namcos12_state(const machine_config &mconfig, device_type type, const char *tag)
+	namcos12_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "maincpu:ram"),
@@ -1322,13 +1322,13 @@ WRITE16_MEMBER(namcos12_state::system11gun_w)
 		/* blowback 1 */
 		/* blowback 2 */
 		/* Note: output label has been changed for the Engrish Impaired ;-) */
-		output_set_value("Player1_Gun_Recoil", (~data & 0x02)>>1);
-		output_set_value("Player2_Gun_Recoil", (~data & 0x01));
+		output().set_value("Player1_Gun_Recoil", (~data & 0x02)>>1);
+		output().set_value("Player2_Gun_Recoil", (~data & 0x01));
 
 		/* start 1 */
-		output_set_value("P2_Start_lamp", (~data & 0x08)>>3);
+		output().set_value("P2_Start_lamp", (~data & 0x08)>>3);
 		/* start 2 */
-		output_set_value("P2_Start_lamp", (~data & 0x04)>>2);
+		output().set_value("P2_Start_lamp", (~data & 0x04)>>2);
 
 		verboselog(1, "system11gun_w: outputs (%08x %08x)\n", data, mem_mask );
 		break;

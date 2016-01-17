@@ -36,7 +36,7 @@
 
 const device_type ADC12130 = &device_creator<adc12130_device>;
 
-adc12130_device::adc12130_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+adc12130_device::adc12130_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: adc12138_device(mconfig, ADC12130, "ADC12130", tag, owner, clock, "adc12130", __FILE__)
 {
 }
@@ -44,7 +44,7 @@ adc12130_device::adc12130_device(const machine_config &mconfig, const char *tag,
 
 const device_type ADC12132 = &device_creator<adc12132_device>;
 
-adc12132_device::adc12132_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+adc12132_device::adc12132_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: adc12138_device(mconfig, ADC12132, "ADC12132", tag, owner, clock, "adc12132", __FILE__)
 {
 }
@@ -52,11 +52,11 @@ adc12132_device::adc12132_device(const machine_config &mconfig, const char *tag,
 
 const device_type ADC12138 = &device_creator<adc12138_device>;
 
-adc12138_device::adc12138_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+adc12138_device::adc12138_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ADC12138, "ADC12138", tag, owner, clock, "adc12138", __FILE__)
 {
 }
-adc12138_device::adc12138_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+adc12138_device::adc12138_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

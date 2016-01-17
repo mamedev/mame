@@ -177,9 +177,9 @@ void jpmsys5_state::sys5_draw_lamps()
 	int i;
 	for (i = 0; i <8; i++)
 	{
-		output_set_lamp_value( (16*m_lamp_strobe)+i,  (m_muxram[(4*m_lamp_strobe)] & (1 << i)) !=0);
-		output_set_lamp_value((16*m_lamp_strobe)+i+8, (m_muxram[(4*m_lamp_strobe) +1 ] & (1 << i)) !=0);
-		output_set_indexed_value("sys5led",(8*m_lamp_strobe)+i,(m_muxram[(4*m_lamp_strobe) +2 ] & (1 << i)) !=0);
+		output().set_lamp_value( (16*m_lamp_strobe)+i,  (m_muxram[(4*m_lamp_strobe)] & (1 << i)) !=0);
+		output().set_lamp_value((16*m_lamp_strobe)+i+8, (m_muxram[(4*m_lamp_strobe) +1 ] & (1 << i)) !=0);
+		output().set_indexed_value("sys5led",(8*m_lamp_strobe)+i,(m_muxram[(4*m_lamp_strobe) +2 ] & (1 << i)) !=0);
 	}
 }
 

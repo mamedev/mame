@@ -11,7 +11,7 @@ const device_type MSX_CART_ASCII16_SRAM = &device_creator<msx_cart_ascii16_sram>
 const device_type MSX_CART_MSXWRITE = &device_creator<msx_cart_msxwrite>;
 
 
-msx_cart_ascii8::msx_cart_ascii8(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_ascii8::msx_cart_ascii8(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_ASCII8, "MSX Cartridge - ASCII8", tag, owner, clock, "msx_cart_ascii8", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
@@ -95,7 +95,7 @@ WRITE8_MEMBER(msx_cart_ascii8::write_cart)
 
 
 
-msx_cart_ascii16::msx_cart_ascii16(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_ascii16::msx_cart_ascii16(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_ASCII16, "MSX Cartridge - ASCII16", tag, owner, clock, "msx_cart_ascii16", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
@@ -185,7 +185,7 @@ WRITE8_MEMBER(msx_cart_ascii16::write_cart)
 
 
 
-msx_cart_ascii8_sram::msx_cart_ascii8_sram(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_ascii8_sram::msx_cart_ascii8_sram(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_ASCII8_SRAM, "MSX Cartridge - ASCII8 w/SRAM", tag, owner, clock, "msx_cart_ascii8_sram", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
@@ -310,7 +310,7 @@ WRITE8_MEMBER(msx_cart_ascii8_sram::write_cart)
 
 
 
-msx_cart_ascii16_sram::msx_cart_ascii16_sram(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_ascii16_sram::msx_cart_ascii16_sram(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_ASCII16_SRAM, "MSX Cartridge - ASCII16 w/SRAM", tag, owner, clock, "msx_cart_ascii16_sram", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
@@ -445,7 +445,7 @@ WRITE8_MEMBER(msx_cart_ascii16_sram::write_cart)
 
 
 
-msx_cart_msxwrite::msx_cart_msxwrite(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_msxwrite::msx_cart_msxwrite(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_MSXWRITE, "MSX Cartridge - MSXWRITE", tag, owner, clock, "msx_cart_msxwrite", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)

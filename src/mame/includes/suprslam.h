@@ -11,7 +11,7 @@
 class suprslam_state : public driver_device
 {
 public:
-	suprslam_state(const machine_config &mconfig, device_type type, const char *tag)
+	suprslam_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_screen_videoram(*this, "screen_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),

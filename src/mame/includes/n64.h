@@ -15,7 +15,7 @@ class n64_rdp;
 class n64_state : public driver_device
 {
 public:
-	n64_state(const machine_config &mconfig, device_type type, const char *tag)
+	n64_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
@@ -58,7 +58,7 @@ private:
 
 public:
 	// construction/destruction
-	n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	n64_periphs(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ32_MEMBER( is64_r );
 	DECLARE_WRITE32_MEMBER( is64_w );

@@ -27,28 +27,28 @@
 /*
     Constructors
 */
-ti_video_device::ti_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+ti_video_device::ti_video_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 : bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source),
 m_tms9928a(nullptr)
 {
 }
 
-ti_std_video_device::ti_std_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti_std_video_device::ti_std_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: ti_video_device(mconfig, TI99VIDEO, "TI99 STD Video subsystem", tag, owner, clock, "ti99_video", __FILE__)
 {
 }
 
-ti_exp_video_device::ti_exp_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti_exp_video_device::ti_exp_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: ti_video_device(mconfig, V9938VIDEO, "TI99 EXP Video subsystem", tag, owner, clock, "v9938_video", __FILE__), m_v9938(nullptr)
 {
 }
 
-ti_sound_sn94624_device::ti_sound_sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti_sound_sn94624_device::ti_sound_sn94624_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: ti_sound_system_device(mconfig, TISOUND_94624, "Onboard sound (SN94624)", tag, owner, clock, "ti_sound_sn94624", __FILE__)
 {
 }
 
-ti_sound_sn76496_device::ti_sound_sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti_sound_sn76496_device::ti_sound_sn76496_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: ti_sound_system_device(mconfig, TISOUND_76496, "Onboard sound (SN76496)", tag, owner, clock, "ti_sound_sn76496", __FILE__)
 {
 }

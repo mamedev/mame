@@ -41,7 +41,7 @@ struct nascom1_portstat_t
 class nascom_state : public driver_device
 {
 public:
-	nascom_state(const machine_config &mconfig, device_type type, const char *tag)
+	nascom_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_hd6402(*this, "hd6402"),
@@ -90,7 +90,7 @@ private:
 class nascom1_state : public nascom_state
 {
 public:
-	nascom1_state(const machine_config &mconfig, device_type type, const char *tag) :
+	nascom1_state(const machine_config &mconfig, device_type type, std::string tag) :
 	nascom_state(mconfig, type, tag)
 	{}
 
@@ -102,7 +102,7 @@ private:
 class nascom2_state : public nascom_state
 {
 public:
-	nascom2_state(const machine_config &mconfig, device_type type, const char *tag) :
+	nascom2_state(const machine_config &mconfig, device_type type, std::string tag) :
 	nascom_state(mconfig, type, tag),
 	m_nasbus(*this, "nasbus"),
 	m_socket1(*this, "socket1"),

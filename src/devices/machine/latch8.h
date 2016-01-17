@@ -27,7 +27,7 @@
 class latch8_device : public device_t
 {
 public:
-	latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	latch8_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 
 	/* write & read full byte */

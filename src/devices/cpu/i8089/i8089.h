@@ -44,7 +44,7 @@ class i8089_device : public cpu_device
 
 public:
 	// construction/destruction
-	i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8089_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// callbacks
 	template<class _sintr1> void set_sintr1_callback(_sintr1 sintr1) { m_write_sintr1.set_callback(sintr1); }
@@ -88,15 +88,15 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// device_state_interface overrides
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
-	bool sysbus_width() { return BIT(m_sysbus, 0); }
-	bool remotebus_width() { return BIT(m_soc, 0); }
-	bool request_grant() { return BIT(m_soc, 1); }
+	bool sysbus_width() const { return BIT(m_sysbus, 0); }
+	bool remotebus_width() const { return BIT(m_soc, 0); }
+	bool request_grant() const { return BIT(m_soc, 1); }
 
 	UINT8 read_byte(bool space, offs_t address);
 	UINT16 read_word(bool space, offs_t address);

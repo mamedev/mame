@@ -201,7 +201,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port1_w)
 	//logerror("%04x: 6801U4 port 1 write %02x\n", space.device().safe_pc(), data);
 
 	// bit 4: coin lockout
-	coin_lockout_global_w(machine(), ~data & 0x10);
+	machine().bookkeeping().coin_lockout_global_w(~data & 0x10);
 
 	// bit 5: select 1-way or 2-way coin counter
 

@@ -254,9 +254,9 @@ WRITE8_MEMBER( hardbox_device::ppi1_pc_w )
 
 	*/
 
-	output_set_led_value(LED_A, !BIT(data, 0));
-	output_set_led_value(LED_B, !BIT(data, 1));
-	output_set_led_value(LED_READY, !BIT(data, 2));
+	machine().output().set_led_value(LED_A, !BIT(data, 0));
+	machine().output().set_led_value(LED_B, !BIT(data, 1));
+	machine().output().set_led_value(LED_READY, !BIT(data, 2));
 }
 
 //-------------------------------------------------
@@ -346,7 +346,7 @@ ioport_constructor hardbox_device::device_input_ports() const
 //  hardbox_device - constructor
 //-------------------------------------------------
 
-hardbox_device::hardbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hardbox_device::hardbox_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HARDBOX, "HardBox", tag, owner, clock, "hardbox", __FILE__),
 		device_ieee488_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),

@@ -103,7 +103,7 @@ class jaguar_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool isdsp);
+	jaguar_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, bool isdsp);
 	~jaguar_cpu_device();
 
 	// static configuration helpers
@@ -127,7 +127,7 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
@@ -251,7 +251,7 @@ class jaguargpu_cpu_device : public jaguar_cpu_device
 {
 public:
 	// construction/destruction
-	jaguargpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	jaguargpu_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE32_MEMBER(ctrl_w) override;
 	DECLARE_READ32_MEMBER(ctrl_r) override;
@@ -266,7 +266,7 @@ class jaguardsp_cpu_device : public jaguar_cpu_device
 {
 public:
 	// construction/destruction
-	jaguardsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	jaguardsp_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE32_MEMBER(ctrl_w) override;
 	DECLARE_READ32_MEMBER(ctrl_r) override;

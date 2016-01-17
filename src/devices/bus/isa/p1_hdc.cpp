@@ -115,7 +115,7 @@ WRITE8_MEMBER(p1_hdc_device::p1_HDC_w)
 //  p1_hdc_device - constructor
 //-------------------------------------------------
 
-p1_hdc_device::p1_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+p1_hdc_device::p1_hdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, P1_HDC, "Poisk-1 MFM disk B942", tag, owner, clock, "p1_hdc", __FILE__),
 	device_isa8_card_interface( mconfig, *this ),
 	m_hdc(*this, KM1809VG7_TAG)

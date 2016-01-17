@@ -325,8 +325,8 @@ WRITE8_MEMBER(thunderx_state::scontra_bankswitch_w)
 	m_bank5800->set_bank((data & 0x10) >> 4);
 
 	// bits 5-6 coin counters
-	coin_counter_w(machine(), 0, data & 0x20);
-	coin_counter_w(machine(), 1, data & 0x40);
+	machine().bookkeeping().coin_counter_w(0, data & 0x20);
+	machine().bookkeeping().coin_counter_w(1, data & 0x40);
 
 	// bit 7 controls layer priority
 	m_priority = data & 0x80;
@@ -340,8 +340,8 @@ WRITE8_MEMBER(thunderx_state::thunderx_videobank_w)
 	m_bank5800->set_bank(data & 0x10 ? 2 : (data & 0x1));
 
 	/* bits 1-2 coin counters */
-	coin_counter_w(machine(), 0, data & 0x02);
-	coin_counter_w(machine(), 1, data & 0x04);
+	machine().bookkeeping().coin_counter_w(0, data & 0x02);
+	machine().bookkeeping().coin_counter_w(1, data & 0x04);
 
 	/* bit 3 controls layer priority */
 	m_priority = data & 0x08;
@@ -352,8 +352,8 @@ WRITE8_MEMBER(thunderx_state::gbusters_videobank_w)
 	// same as thunderx without the PMC
 	m_bank5800->set_bank(data & 0x1);
 
-	coin_counter_w(machine(), 0, data & 0x02);
-	coin_counter_w(machine(), 1, data & 0x04);
+	machine().bookkeeping().coin_counter_w(0, data & 0x02);
+	machine().bookkeeping().coin_counter_w(1, data & 0x04);
 
 	m_priority = data & 0x08;
 }

@@ -49,7 +49,7 @@ class ccpu_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	ccpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ccpu_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_external_func(device_t &device, _Object object) { return downcast<ccpu_cpu_device &>(device).m_external_input.set_callback(object); }
@@ -82,7 +82,7 @@ protected:
 	}
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
@@ -113,6 +113,7 @@ protected:
 
 	UINT8               m_waiting;
 	UINT8               m_watchdog;
+	UINT8               m_extinput;
 
 	int                 m_icount;
 

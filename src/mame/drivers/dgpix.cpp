@@ -159,7 +159,7 @@ Notes:
 class dgpix_state : public driver_device
 {
 public:
-	dgpix_state(const machine_config &mconfig, device_type type, const char *tag)
+	dgpix_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_vblank(*this, "VBLANK") { }
@@ -309,8 +309,8 @@ WRITE32_MEMBER(dgpix_state::vbuffer_w)
 
 WRITE32_MEMBER(dgpix_state::coin_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
 READ32_MEMBER(dgpix_state::vblank_r)

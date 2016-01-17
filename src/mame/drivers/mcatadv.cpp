@@ -157,10 +157,10 @@ WRITE16_MEMBER(mcatadv_state::mcat_coin_w)
 {
 	if(ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0, data & 0x1000);
-		coin_counter_w(machine(), 1, data & 0x2000);
-		coin_lockout_w(machine(), 0, ~data & 0x4000);
-		coin_lockout_w(machine(), 1, ~data & 0x8000);
+		machine().bookkeeping().coin_counter_w(0, data & 0x1000);
+		machine().bookkeeping().coin_counter_w(1, data & 0x2000);
+		machine().bookkeeping().coin_lockout_w(0, ~data & 0x4000);
+		machine().bookkeeping().coin_lockout_w(1, ~data & 0x8000);
 	}
 }
 #endif

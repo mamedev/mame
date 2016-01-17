@@ -158,8 +158,8 @@ WRITE16_MEMBER(nemesis_state::salamand_control_port_word_w)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_lockout_w(machine(), 0, data & 0x0200);
-		coin_lockout_w(machine(), 1, data & 0x0400);
+		machine().bookkeeping().coin_lockout_w(0, data & 0x0200);
+		machine().bookkeeping().coin_lockout_w(1, data & 0x0400);
 
 		if (data & 0x0800)
 			m_audiocpu->set_input_line(0, HOLD_LINE);

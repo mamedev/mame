@@ -69,7 +69,7 @@ U0564 LH28F800SU OBJ4-1
 class feversoc_state : public driver_device
 {
 public:
-	feversoc_state(const machine_config &mconfig, device_type type, const char *tag)
+	feversoc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_mainram(*this, "workram"),
 		m_spriteram(*this, "spriteram"),
@@ -144,18 +144,18 @@ WRITE32_MEMBER(feversoc_state::output_w)
 	if(ACCESSING_BITS_16_31)
 	{
 		/* probably eeprom stuff too */
-		coin_lockout_w(machine(), 0,~data>>16 & 0x40);
-		coin_lockout_w(machine(), 1,~data>>16 & 0x40);
-		coin_counter_w(machine(), 0,data>>16 & 1);
+		machine().bookkeeping().coin_lockout_w(0,~data>>16 & 0x40);
+		machine().bookkeeping().coin_lockout_w(1,~data>>16 & 0x40);
+		machine().bookkeeping().coin_counter_w(0,data>>16 & 1);
 		//data>>16 & 2 coin out
-		coin_counter_w(machine(), 1,data>>16 & 4);
+		machine().bookkeeping().coin_counter_w(1,data>>16 & 4);
 		//data>>16 & 8 coin hopper
 		m_oki->set_bank_base(0x40000 * (((data>>16) & 0x20)>>5));
 	}
 	if(ACCESSING_BITS_0_15)
 	{
 		/* -xxx xxxx lamps*/
-		coin_counter_w(machine(), 2,data & 0x2000); //key in
+		machine().bookkeeping().coin_counter_w(2,data & 0x2000); //key in
 		//data & 0x4000 key out
 	}
 }

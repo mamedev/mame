@@ -106,7 +106,7 @@ INPUT_CHANGED_MEMBER(astrof_state::coin_inserted)
 {
 	/* coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
-	coin_counter_w(machine(), 0, newval);
+	machine().bookkeeping().coin_counter_w(0, newval);
 }
 
 

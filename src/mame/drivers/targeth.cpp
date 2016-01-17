@@ -61,7 +61,7 @@ WRITE16_MEMBER(targeth_state::OKIM6295_bankswitch_w)
 
 WRITE16_MEMBER(targeth_state::targeth_coin_counter_w)
 {
-	coin_counter_w( machine(), (offset >> 3) & 0x01, data & 0x01);
+	machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01, data & 0x01);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, targeth_state )

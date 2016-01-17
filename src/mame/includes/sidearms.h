@@ -1,11 +1,11 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Paul Leaman, Curt Coder
 #include "video/bufsprite.h"
 
 class sidearms_state : public driver_device
 {
 public:
-	sidearms_state(const machine_config &mconfig, device_type type, const char *tag)
+	sidearms_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),

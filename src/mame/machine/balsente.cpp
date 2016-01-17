@@ -314,7 +314,7 @@ WRITE8_MEMBER(balsente_state::balsente_misc_output_w)
 	}
 	else
 	{
-//      set_led_status(machine(), offset, data);
+//      output().set_led_value(offset, data);
 	}
 }
 

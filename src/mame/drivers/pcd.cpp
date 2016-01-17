@@ -30,7 +30,7 @@
 class pcd_state : public driver_device
 {
 public:
-	pcd_state(const machine_config &mconfig, device_type type, const char *tag) :
+	pcd_state(const machine_config &mconfig, device_type type, std::string tag) :
 	driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_pic1(*this, "pic1"),

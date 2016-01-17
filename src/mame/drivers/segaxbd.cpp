@@ -272,7 +272,7 @@ ROMs:
 
 const device_type SEGA_XBD_PCB = &device_creator<segaxbd_state>;
 
-segaxbd_state::segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segaxbd_state::segaxbd_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, SEGA_XBD_PCB, "Sega X-Board PCB", tag, owner, clock, "segaxbd_pcb", __FILE__),
 			m_maincpu(*this, "maincpu"),
 			m_subcpu(*this, "subcpu"),
@@ -343,7 +343,7 @@ void segaxbd_state::device_reset()
 class segaxbd_new_state : public driver_device
 {
 public:
-	segaxbd_new_state(const machine_config &mconfig, device_type type, const char *tag)
+	segaxbd_new_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_mainpcb(*this, "mainpcb")
 	{
@@ -365,7 +365,7 @@ public:
 class segaxbd_new_state_double : public segaxbd_new_state
 {
 public:
-	segaxbd_new_state_double(const machine_config &mconfig, device_type type, const char *tag)
+	segaxbd_new_state_double(const machine_config &mconfig, device_type type, std::string tag)
 		: segaxbd_new_state(mconfig, type, tag),
 		m_subpcb(*this, "subpcb")
 	{
@@ -854,7 +854,7 @@ void segaxbd_state::generic_iochip0_lamps_w(UINT8 data)
 	// d4: coin counter
 	// d7: mute audio (always handled above)
 	// other bits: lamps
-	coin_counter_w(machine(), 0, (data >> 4) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 4) & 0x01);
 
 	//
 	//    aburner2:
@@ -864,10 +864,10 @@ void segaxbd_state::generic_iochip0_lamps_w(UINT8 data)
 	// d6: danger lamp
 	// in clone aburner, lamps work only in testmode?
 
-	output_set_lamp_value(0, (data >> 5) & 0x01);
-	output_set_lamp_value(1, (data >> 6) & 0x01);
-	output_set_lamp_value(2, (data >> 1) & 0x01);
-	output_set_lamp_value(3, (data >> 2) & 0x01);
+	machine().output().set_lamp_value(0, (data >> 5) & 0x01);
+	machine().output().set_lamp_value(1, (data >> 6) & 0x01);
+	machine().output().set_lamp_value(2, (data >> 1) & 0x01);
+	machine().output().set_lamp_value(3, (data >> 2) & 0x01);
 }
 
 
@@ -1867,7 +1867,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_XBD_REGULAR_DEVICE = &device_creator<segaxbd_regular_state>;
 
-segaxbd_regular_state::segaxbd_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segaxbd_regular_state::segaxbd_regular_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: segaxbd_state(mconfig, tag, owner, clock)
 {
 }
@@ -1893,7 +1893,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_XBD_FD1094_DEVICE = &device_creator<segaxbd_fd1094_state>;
 
-segaxbd_fd1094_state::segaxbd_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segaxbd_fd1094_state::segaxbd_fd1094_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: segaxbd_state(mconfig, tag, owner, clock)
 {
 }
@@ -1935,7 +1935,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_XBD_LASTSURV_FD1094_DEVICE = &device_creator<segaxbd_lastsurv_fd1094_state>;
 
-segaxbd_lastsurv_fd1094_state::segaxbd_lastsurv_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segaxbd_lastsurv_fd1094_state::segaxbd_lastsurv_fd1094_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: segaxbd_state(mconfig, tag, owner, clock)
 {
 }
@@ -1965,7 +1965,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_XBD_LASTSURV_DEVICE = &device_creator<segaxbd_lastsurv_state>;
 
-segaxbd_lastsurv_state::segaxbd_lastsurv_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segaxbd_lastsurv_state::segaxbd_lastsurv_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: segaxbd_state(mconfig, tag, owner, clock)
 {
 }
@@ -2008,7 +2008,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_XBD_SMGP_FD1094_DEVICE = &device_creator<segaxbd_smgp_fd1094_state>;
 
-segaxbd_smgp_fd1094_state::segaxbd_smgp_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segaxbd_smgp_fd1094_state::segaxbd_smgp_fd1094_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: segaxbd_state(mconfig, tag, owner, clock)
 {
 }
@@ -2051,7 +2051,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_XBD_SMGP_DEVICE = &device_creator<segaxbd_smgp_state>;
 
-segaxbd_smgp_state::segaxbd_smgp_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segaxbd_smgp_state::segaxbd_smgp_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: segaxbd_state(mconfig, tag, owner, clock)
 {
 }
@@ -2077,7 +2077,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_XBD_RASCOT_DEVICE = &device_creator<segaxbd_rascot_state>;
 
-segaxbd_rascot_state::segaxbd_rascot_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segaxbd_rascot_state::segaxbd_rascot_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: segaxbd_state(mconfig, tag, owner, clock)
 {
 }

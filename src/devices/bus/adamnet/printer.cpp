@@ -100,7 +100,7 @@ machine_config_constructor adam_printer_device::device_mconfig_additions() const
 //  adam_printer_device - constructor
 //-------------------------------------------------
 
-adam_printer_device::adam_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+adam_printer_device::adam_printer_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ADAM_PRN, "Adam printer", tag, owner, clock, "adam_prn", __FILE__),
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG)

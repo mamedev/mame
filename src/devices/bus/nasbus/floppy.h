@@ -26,7 +26,7 @@ class nascom_fdc_device : public device_t, public device_nasbus_card_interface
 {
 public:
 	// construction/destruction
-	nascom_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nascom_fdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(select_r);
 	DECLARE_WRITE8_MEMBER(select_w);

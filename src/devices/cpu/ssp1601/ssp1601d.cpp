@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Pierpaolo Prazzoli
+// copyright-holders:Pierpaolo Prazzoli,Grazvydas Ignotas
 /*
 
  SSP1601 disassembler

@@ -9,7 +9,7 @@
 class pcat_base_state : public driver_device
 {
 public:
-	pcat_base_state(const machine_config &mconfig, device_type type, const char *tag)
+	pcat_base_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dma8237_1(*this, "dma8237_1"),

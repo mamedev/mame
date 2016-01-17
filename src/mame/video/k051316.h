@@ -28,7 +28,7 @@ class k051316_device : public device_t,
 						public device_gfx_interface
 {
 public:
-	k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k051316_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~k051316_device() {}
 
 	static const gfx_layout charlayout4;

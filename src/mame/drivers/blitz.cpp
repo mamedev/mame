@@ -268,7 +268,7 @@
 class blitz_state : public driver_device
 {
 public:
-	blitz_state(const machine_config &mconfig, device_type type, const char *tag)
+	blitz_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -419,16 +419,16 @@ WRITE8_MEMBER(blitz_state::mux_w)
 
 WRITE8_MEMBER(blitz_state::lamps_a_w)
 {
-//  output_set_lamp_value(0, 1 - ((data) & 1));         /* Lamp 0 */
-//  output_set_lamp_value(1, 1 - ((data >> 1) & 1));    /* Lamp 1 */
-//  output_set_lamp_value(2, 1 - ((data >> 2) & 1));    /* Lamp 2 */
-//  output_set_lamp_value(3, 1 - ((data >> 3) & 1));    /* Lamp 3 */
-//  output_set_lamp_value(4, 1 - ((data >> 4) & 1));    /* Lamp 4 */
+//  output().set_lamp_value(0, 1 - ((data) & 1));         /* Lamp 0 */
+//  output().set_lamp_value(1, 1 - ((data >> 1) & 1));    /* Lamp 1 */
+//  output().set_lamp_value(2, 1 - ((data >> 2) & 1));    /* Lamp 2 */
+//  output().set_lamp_value(3, 1 - ((data >> 3) & 1));    /* Lamp 3 */
+//  output().set_lamp_value(4, 1 - ((data >> 4) & 1));    /* Lamp 4 */
 
 //  popmessage("written : %02X", data);
-//  coin_counter_w(machine(), 0, data & 0x40);    /* counter1 */
-//  coin_counter_w(machine(), 1, data & 0x80);    /* counter2 */
-//  coin_counter_w(machine(), 2, data & 0x20);    /* counter3 */
+//  machine().bookkeeping().coin_counter_w(0, data & 0x40);    /* counter1 */
+//  machine().bookkeeping().coin_counter_w(1, data & 0x80);    /* counter2 */
+//  machine().bookkeeping().coin_counter_w(2, data & 0x20);    /* counter3 */
 }
 
 

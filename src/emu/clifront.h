@@ -44,7 +44,6 @@ public:
 	void listcrc(const char *gamename = "*");
 	void listroms(const char *gamename = "*");
 	void listsamples(const char *gamename = "*");
-	static int compare_devices(const void *i1, const void *i2);
 	void listdevices(const char *gamename = "*");
 	void listslots(const char *gamename = "*");
 	void listmedia(const char *gamename = "*");

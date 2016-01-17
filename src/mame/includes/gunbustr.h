@@ -21,7 +21,7 @@ public:
 		TIMER_GUNBUSTR_INTERRUPT5
 	};
 
-	gunbustr_state(const machine_config &mconfig, device_type type, const char *tag)
+	gunbustr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_tc0480scp(*this, "tc0480scp"),

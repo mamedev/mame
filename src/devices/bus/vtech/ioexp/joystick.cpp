@@ -64,7 +64,7 @@ ioport_constructor joystick_interface_device::device_input_ports() const
 //  joystick_interface_device - constructor
 //-------------------------------------------------
 
-joystick_interface_device::joystick_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+joystick_interface_device::joystick_interface_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, JOYSTICK_INTERFACE, "Laser/VZ Joystick Interface", tag, owner, clock, "joystick", __FILE__),
 	device_ioexp_interface(mconfig, *this),
 	m_joy0(*this, "joystick_0"),

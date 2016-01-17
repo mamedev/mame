@@ -74,7 +74,7 @@ Dumping Notes:
 class lgp_state : public driver_device
 {
 public:
-	lgp_state(const machine_config &mconfig, device_type type, const char *tag)
+	lgp_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc") ,
 		m_tile_ram(*this, "tile_ram"),

@@ -40,7 +40,7 @@ const rom_entry *wordpro_device::device_rom_region() const
 //  wordpro_device - constructor
 //-------------------------------------------------
 
-wordpro_device::wordpro_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+wordpro_device::wordpro_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, WORDPRO, "DSE VZ-300 WordPro", tag, owner, clock, "wordpro", __FILE__),
 	device_memexp_interface(mconfig, *this)
 {

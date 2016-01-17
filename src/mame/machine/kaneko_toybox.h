@@ -335,7 +335,7 @@ static const UINT8 decryption_table_alt[0x100] = {
 class kaneko_toybox_device : public device_t
 {
 public:
-	kaneko_toybox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kaneko_toybox_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void set_table(device_t &device, int tabletype);
 	static void set_game_type(device_t &device, int gametype);

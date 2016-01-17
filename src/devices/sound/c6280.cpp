@@ -231,7 +231,7 @@ WRITE8_MEMBER( c6280_device::c6280_w )
 
 const device_type C6280 = &device_creator<c6280_device>;
 
-c6280_device::c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c6280_device::c6280_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, C6280, "HuC6280", tag, owner, clock, "c6280", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_cpudevice(*this)

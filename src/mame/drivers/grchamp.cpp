@@ -94,7 +94,7 @@ void grchamp_state::machine_start()
 	void grchamp_state::machine_reset()
 {
 	/* if the coin system is 1 way, lock Coin B (Page 40) */
-	coin_lockout_w(machine(), 1, (ioport("DSWB")->read() & 0x10) ? 1 : 0);
+	machine().bookkeeping().coin_lockout_w(1, (ioport("DSWB")->read() & 0x10) ? 1 : 0);
 }
 
 
@@ -178,8 +178,8 @@ WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 			/* bit 4:   coin lockout */
 			/* bit 5:   Game Over lamp */
 			/* bit 6-7: n/c */
-			coin_lockout_global_w(machine(), (data >> 4) & 1);
-			output_set_value("led0", (~data >> 5) & 1);
+			machine().bookkeeping().coin_lockout_global_w((data >> 4) & 1);
+			output().set_value("led0", (~data >> 5) & 1);
 			break;
 
 		case 0x0a:  /* OUT10 */
@@ -228,7 +228,7 @@ WRITE8_MEMBER(grchamp_state::led_board_w)
 
 		case 0x0c:
 			m_ledram[m_ledaddr & 0x07] = m_ledlatch;
-			output_set_digit_value(m_ledaddr & 0x07, ls247_map[m_ledram[m_ledaddr & 0x07] & 0x0f]);
+			output().set_digit_value(m_ledaddr & 0x07, ls247_map[m_ledram[m_ledaddr & 0x07] & 0x0f]);
 			/*
 			    ledram[0] & 0x0f = score LSD
 			    ledram[1] & 0x0f = score

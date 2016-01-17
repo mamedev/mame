@@ -330,7 +330,7 @@
 class fortecar_state : public driver_device
 {
 public:
-	fortecar_state(const machine_config &mconfig, device_type type, const char *tag)
+	fortecar_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_vram(*this, "vram"),
@@ -487,7 +487,7 @@ WRITE8_MEMBER(fortecar_state::ayporta_w)
 	int i;
 
 	for(i = 0; i < 8; i++)
-		output_set_lamp_value(i, (data >> i) & 1);
+		output().set_lamp_value(i, (data >> i) & 1);
 }
 
 

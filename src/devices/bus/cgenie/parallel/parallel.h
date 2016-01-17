@@ -46,7 +46,7 @@ class parallel_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	parallel_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~parallel_slot_device();
 
 	// IOA

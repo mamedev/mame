@@ -155,10 +155,7 @@ int find_input_strings(running_machine &machine)
 	{
 		for (int j = 0; j < 16; j++)
 		{
-			char tempstr[32];
-			sprintf(tempstr, "IN%d-%d", i, j);
-
-			sc4inputs[i][j].name = tempstr;
+			sc4inputs[i][j].name = strformat("IN%d-%d", i, j);
 			sc4inputs[i][j].used = false;
 		}
 	}

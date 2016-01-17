@@ -76,7 +76,7 @@ ADDRESS_MAP_END
 //  namco_c45_road_device -- constructor
 //-------------------------------------------------
 
-namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NAMCO_C45_ROAD, "Namco C45 Road", tag, owner, clock, "namco_c45_road", __FILE__),
 		device_gfx_interface(mconfig, *this, gfxinfo),
 		device_memory_interface(mconfig, *this),

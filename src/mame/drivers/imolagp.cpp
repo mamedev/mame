@@ -90,7 +90,7 @@ www.andys-arcade.com
 class imolagp_state : public driver_device
 {
 public:
-	imolagp_state(const machine_config &mconfig, device_type type, const char *tag)
+	imolagp_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_slavecpu(*this, "slave"),
@@ -262,7 +262,7 @@ WRITE8_MEMBER(imolagp_state::imola_led_board_w)
 	static const UINT8 ls48_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
-	output_set_digit_value(offset, ls48_map[data & 0x0f]);
+	output().set_digit_value(offset, ls48_map[data & 0x0f]);
 /*
     score:         0,  1,  2,  3
     time:          4,  5

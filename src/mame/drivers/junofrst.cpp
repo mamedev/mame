@@ -94,7 +94,7 @@ Blitter source graphics
 class junofrst_state : public tutankhm_state
 {
 public:
-	junofrst_state(const machine_config &mconfig, device_type type, const char *tag)
+	junofrst_state(const machine_config &mconfig, device_type type, std::string tag)
 		: tutankhm_state(mconfig, type, tag),
 			m_audiocpu(*this, "audiocpu"),
 			m_i8039(*this, "mcu"),
@@ -279,7 +279,7 @@ WRITE8_MEMBER(junofrst_state::flip_screen_w)
 
 WRITE8_MEMBER(junofrst_state::coincounter_w)
 {
-	coin_counter_w(machine(), offset, data);
+	machine().bookkeeping().coin_counter_w(offset, data);
 }
 
 WRITE8_MEMBER(junofrst_state::irq_enable_w)

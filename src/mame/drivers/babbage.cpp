@@ -34,7 +34,7 @@
 class babbage_state : public driver_device
 {
 public:
-	babbage_state(const machine_config &mconfig, device_type type, const char *tag)
+	babbage_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_pio_1(*this, "z80pio_1"),
@@ -161,7 +161,7 @@ WRITE8_MEMBER( babbage_state::pio1_b_w )
 	for (int i = 0; i < 8; i++)
 	{
 		sprintf(ledname,"led%d",i);
-		output_set_value(ledname, BIT(data, i));
+		output().set_value(ledname, BIT(data, i));
 	}
 }
 
@@ -182,7 +182,7 @@ WRITE8_MEMBER( babbage_state::pio2_b_w )
 		m_step = true;
 	}
 	else
-		output_set_digit_value(data, m_segment);
+		output().set_digit_value(data, m_segment);
 }
 
 static const z80_daisy_config babbage_daisy_chain[] =

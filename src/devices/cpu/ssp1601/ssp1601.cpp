@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli,Grazvydas Ignotas
 /*
  * Samsung SSP1601 DSP emulator
@@ -192,7 +192,7 @@
 const device_type SSP1601 = &device_creator<ssp1601_device>;
 
 
-ssp1601_device::ssp1601_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ssp1601_device::ssp1601_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SSP1601, "SSP1601", tag, owner, clock, "ssp1601", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_io_config("io", ENDIANNESS_BIG, 16, 4, 0)
@@ -547,7 +547,7 @@ void ssp1601_device::device_start()
 }
 
 
-void ssp1601_device::state_string_export(const device_state_entry &entry, std::string &str)
+void ssp1601_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

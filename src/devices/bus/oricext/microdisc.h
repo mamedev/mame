@@ -12,7 +12,7 @@ extern const device_type MICRODISC;
 class microdisc_device : public oricext_device
 {
 public:
-	microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	microdisc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~microdisc_device();
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);

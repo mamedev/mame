@@ -1,5 +1,5 @@
-// license:LGPL-2.1+
-// copyright-holders:Dirk Verwiebe, Robbbert, Cowering
+// license:???
+// copyright-holders:Dirk Verwiebe, Robbbert, Cowering, Ralf Schaefer
 /***************************************************************************
 Mephisto Glasgow 3 S chess computer
 Dirk V.
@@ -58,16 +58,19 @@ R.Schaefer Oct 2010
 class glasgow_state : public mboard_state
 {
 public:
-	glasgow_state(const machine_config &mconfig, device_type type, const char *tag)
+	glasgow_state(const machine_config &mconfig, device_type type, std::string tag)
 		: mboard_state(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_beep(*this, "beeper"),
-	m_line0(*this, "LINE0"),
-	m_line1(*this, "LINE1")
+		m_maincpu(*this, "maincpu"),
+		m_beep(*this, "beeper"),
+		m_line0(*this, "LINE0"),
+		m_line1(*this, "LINE1")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;
+	required_ioport m_line0;
+	required_ioport m_line1;
+
 	DECLARE_WRITE16_MEMBER(glasgow_lcd_w);
 	DECLARE_WRITE16_MEMBER(glasgow_lcd_flag_w);
 	DECLARE_READ16_MEMBER(glasgow_keys_r);
@@ -80,17 +83,18 @@ public:
 	DECLARE_WRITE32_MEMBER(write_lcd_flag32);
 	DECLARE_READ32_MEMBER(read_newkeys32);
 	DECLARE_WRITE32_MEMBER(write_beeper32);
+
 	UINT8 m_lcd_shift_counter;
 	UINT8 m_led7;
 	UINT8 m_irq_flag;
 	UINT16 m_beeper;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+
 	DECLARE_MACHINE_START(dallas32);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi32);
-	required_ioport m_line0;
-	required_ioport m_line1;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 
@@ -100,7 +104,7 @@ WRITE16_MEMBER( glasgow_state::glasgow_lcd_w )
 	UINT8 lcd_data = data >> 8;
 
 	if (m_led7 == 0)
-		output_set_digit_value(m_lcd_shift_counter, lcd_data);
+		output().set_digit_value(m_lcd_shift_counter, lcd_data);
 
 	m_lcd_shift_counter--;
 	m_lcd_shift_counter &= 3;
@@ -146,7 +150,7 @@ WRITE16_MEMBER( glasgow_state::write_lcd )
 {
 	UINT8 lcd_data = data >> 8;
 
-	output_set_digit_value(m_lcd_shift_counter, mboard_lcd_invert & 1 ? lcd_data^0xff : lcd_data);
+	output().set_digit_value(m_lcd_shift_counter, mboard_lcd_invert & 1 ? lcd_data^0xff : lcd_data);
 	m_lcd_shift_counter--;
 	m_lcd_shift_counter &= 3;
 	logerror("LCD Offset = %d Data low = %x \n", offset, lcd_data);
@@ -218,7 +222,7 @@ WRITE32_MEMBER( glasgow_state::write_lcd32 )
 {
 	UINT8 lcd_data = data >> 8;
 
-	output_set_digit_value(m_lcd_shift_counter, mboard_lcd_invert & 1 ? lcd_data^0xff : lcd_data);
+	output().set_digit_value(m_lcd_shift_counter, mboard_lcd_invert & 1 ? lcd_data^0xff : lcd_data);
 	m_lcd_shift_counter--;
 	m_lcd_shift_counter &= 3;
 	//logerror("LCD Offset = %d Data   = %x \n  ", offset, lcd_data);

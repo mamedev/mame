@@ -12,8 +12,8 @@ class nes_cony_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_cony_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_cony_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_cony_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_cony_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -47,7 +47,7 @@ class nes_yoko_device : public nes_cony_device
 {
 public:
 	// construction/destruction
-	nes_yoko_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_yoko_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

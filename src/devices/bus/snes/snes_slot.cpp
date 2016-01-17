@@ -88,7 +88,7 @@ device_sns_cart_interface::~device_sns_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_sns_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_sns_cart_interface::rom_alloc(UINT32 size, std::string tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -172,7 +172,7 @@ void device_sns_cart_interface::rom_map_setup(UINT32 size)
 //-------------------------------------------------
 //  base_sns_cart_slot_device - constructor
 //-------------------------------------------------
-base_sns_cart_slot_device::base_sns_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+base_sns_cart_slot_device::base_sns_cart_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 						device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -181,17 +181,17 @@ base_sns_cart_slot_device::base_sns_cart_slot_device(const machine_config &mconf
 {
 }
 
-sns_cart_slot_device::sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sns_cart_slot_device::sns_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						base_sns_cart_slot_device(mconfig, SNS_CART_SLOT, "SNES Cartridge Slot", tag, owner, clock, "sns_cart_slot", __FILE__)
 {
 }
 
-sns_sufami_cart_slot_device::sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sns_sufami_cart_slot_device::sns_sufami_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						base_sns_cart_slot_device(mconfig, SNS_SUFAMI_CART_SLOT, "SNES Sufami Turbo Cartridge Slot", tag, owner, clock, "sns_sufami_cart_slot", __FILE__)
 {
 }
 
-sns_bsx_cart_slot_device::sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sns_bsx_cart_slot_device::sns_bsx_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						base_sns_cart_slot_device(mconfig, SNS_BSX_CART_SLOT, "SNES BS-X Cartridge Slot", tag, owner, clock, "sns_bsx_cart_slot", __FILE__)
 {
 }
@@ -886,7 +886,7 @@ void base_sns_cart_slot_device::setup_nvram()
 
 bool base_sns_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry );
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
@@ -999,7 +999,7 @@ void base_sns_cart_slot_device::get_cart_type_addon(UINT8 *ROM, UINT32 len, int 
  get default card software
  -------------------------------------------------*/
 
-void base_sns_cart_slot_device::get_default_card_software(std::string &result)
+std::string base_sns_cart_slot_device::get_default_card_software()
 {
 	bool fullpath = open_image_file(mconfig().options());
 
@@ -1058,11 +1058,10 @@ void base_sns_cart_slot_device::get_default_card_software(std::string &result)
 
 		clear();
 
-		result.assign(slot_string);
-		return;
+		return std::string(slot_string);
 	}
 
-	software_get_default_slot(result, "lorom");
+	return software_get_default_slot("lorom");
 }
 
 

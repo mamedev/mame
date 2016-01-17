@@ -336,7 +336,7 @@ WRITE8_MEMBER(m79amb_state::m79amb_8003_w)
 {
 	/* Self Test goes low on reset and lights LED */
 	/* LED goes off on pass */
-	output_set_value("SELF_TEST", data & 0x01);
+	output().set_value("SELF_TEST", data & 0x01);
 	m_discrete->write(space, M79AMB_MC_REV_EN, data & 0x02);
 	m_discrete->write(space, M79AMB_MC_CONTROL_EN, data & 0x04);
 	m_discrete->write(space, M79AMB_TANK_TRUCK_JEEP_EN, data & 0x08);

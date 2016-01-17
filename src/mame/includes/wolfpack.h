@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 #include "sound/s14001a.h"
 
@@ -10,7 +10,7 @@ public:
 		TIMER_PERIODIC
 	};
 
-	wolfpack_state(const machine_config &mconfig, device_type type, const char *tag)
+	wolfpack_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_alpha_num_ram(*this, "alpha_num_ram"),
 		m_maincpu(*this, "maincpu"),

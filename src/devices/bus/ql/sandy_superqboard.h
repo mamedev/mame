@@ -29,8 +29,8 @@ class sandy_superqboard_t : public device_t,
 {
 public:
 	// construction/destruction
-	sandy_superqboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	sandy_superqboard_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int ram_size);
+	sandy_superqboard_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sandy_superqboard_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int ram_size);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
@@ -90,7 +90,7 @@ class sandy_superqboard_512k_t :  public sandy_superqboard_t
 {
 public:
 	// construction/destruction
-	sandy_superqboard_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sandy_superqboard_512k_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -100,7 +100,7 @@ class sandy_superqmouse_t :  public sandy_superqboard_t
 {
 public:
 	// construction/destruction
-	sandy_superqmouse_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sandy_superqmouse_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -113,7 +113,7 @@ class sandy_superqmouse_512k_t :  public sandy_superqboard_t
 {
 public:
 	// construction/destruction
-	sandy_superqmouse_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sandy_superqmouse_512k_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;

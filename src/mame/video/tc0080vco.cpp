@@ -77,7 +77,7 @@ this seems to be the only zoom feature actually used in the games.
 
 const device_type TC0080VCO = &device_creator<tc0080vco_device>;
 
-tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc0080vco_device::tc0080vco_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0080VCO, "Taito TC0080VCO", tag, owner, clock, "tc0080vco", __FILE__),
 	m_ram(nullptr),
 	m_bg0_ram_0(nullptr),
@@ -113,7 +113,7 @@ tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *ta
 //  gfx decoder
 //-------------------------------------------------
 
-void tc0080vco_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void tc0080vco_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<tc0080vco_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -123,7 +123,7 @@ void tc0080vco_device::static_set_gfxdecode_tag(device_t &device, const char *ta
 //  palette device
 //-------------------------------------------------
 
-void tc0080vco_device::static_set_palette_tag(device_t &device, const char *tag)
+void tc0080vco_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<tc0080vco_device &>(device).m_palette.set_tag(tag);
 }

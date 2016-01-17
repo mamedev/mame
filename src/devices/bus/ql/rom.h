@@ -82,7 +82,7 @@ class ql_rom_cartridge_slot_t : public device_t,
 {
 public:
 	// construction/destruction
-	ql_rom_cartridge_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ql_rom_cartridge_slot_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// computer interface
 	UINT8 read(address_space &space, offs_t offset, UINT8 data) { if (m_card) data = m_card->read(space, offset, data); return data; }
@@ -110,7 +110,7 @@ protected:
 	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 
 	device_ql_rom_cartridge_card_interface *m_card;
 };

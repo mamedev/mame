@@ -21,7 +21,7 @@
 
 const device_type EXCELLENT_SPRITE = &device_creator<excellent_spr_device>;
 
-excellent_spr_device::excellent_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+excellent_spr_device::excellent_spr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, EXCELLENT_SPRITE, "Excellent 8-bit Sprite", tag, owner, clock, "excellent_spr", __FILE__),
 		device_video_interface(mconfig, *this)
 {

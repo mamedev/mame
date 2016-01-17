@@ -8,7 +8,7 @@ const device_type H83336 = &device_creator<h83336_device>;
 const device_type H83337 = &device_creator<h83337_device>;
 
 
-h83337_device::h83337_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+h83337_device::h83337_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	h8_device(mconfig, type, name, tag, owner, clock, shortname, source, true, address_map_delegate(FUNC(h83337_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -30,7 +30,7 @@ h83337_device::h83337_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-h83337_device::h83337_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h83337_device::h83337_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	h8_device(mconfig, H83337, "H8/3337", tag, owner, clock, "h83337", __FILE__, true, address_map_delegate(FUNC(h83337_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -53,13 +53,13 @@ h83337_device::h83337_device(const machine_config &mconfig, const char *tag, dev
 	ram_start = 0xf780;
 }
 
-h83334_device::h83334_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h83334_device::h83334_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	h83337_device(mconfig, H83334, "H8/3334", tag, owner, clock, "h83334", __FILE__)
 {
 	ram_start = 0xfb80;
 }
 
-h83336_device::h83336_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h83336_device::h83336_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	h83337_device(mconfig, H83336, "H8/3336", tag, owner, clock, "h83336", __FILE__)
 {
 	ram_start = 0xf780;
@@ -211,7 +211,7 @@ READ8_MEMBER(h83337_device::syscr_r)
 WRITE8_MEMBER(h83337_device::syscr_w)
 {
 	syscr = data;
-	logerror("%s: syscr = %02x\n", tag(), data);
+	logerror("%s: syscr = %02x\n", tag().c_str(), data);
 }
 
 READ8_MEMBER(h83337_device::wscr_r)
@@ -221,7 +221,7 @@ READ8_MEMBER(h83337_device::wscr_r)
 
 WRITE8_MEMBER(h83337_device::wscr_w)
 {
-	logerror("%s: wscr = %02x\n", tag(), data);
+	logerror("%s: wscr = %02x\n", tag().c_str(), data);
 }
 
 READ8_MEMBER(h83337_device::stcr_r)
@@ -231,7 +231,7 @@ READ8_MEMBER(h83337_device::stcr_r)
 
 WRITE8_MEMBER(h83337_device::stcr_w)
 {
-	logerror("%s: stcr = %02x\n", tag(), data);
+	logerror("%s: stcr = %02x\n", tag().c_str(), data);
 	timer8_0->set_extra_clock_bit(data & 0x01);
 	timer8_1->set_extra_clock_bit(data & 0x02);
 }
@@ -243,5 +243,5 @@ READ8_MEMBER(h83337_device::mdcr_r)
 
 WRITE8_MEMBER(h83337_device::mdcr_w)
 {
-	logerror("%s: mdcr = %02x\n", tag(), data);
+	logerror("%s: mdcr = %02x\n", tag().c_str(), data);
 }

@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Paul Leaman
 #include "emu.h"
 #include "includes/gunsmoke.h"
@@ -73,8 +73,8 @@ WRITE8_MEMBER(gunsmoke_state::gunsmoke_colorram_w)
 WRITE8_MEMBER(gunsmoke_state::gunsmoke_c804_w)
 {
 	/* bits 0 and 1 are for coin counters */
-	coin_counter_w(machine(), 1, data & 0x01);
-	coin_counter_w(machine(), 0, data & 0x02);
+	machine().bookkeeping().coin_counter_w(1, data & 0x01);
+	machine().bookkeeping().coin_counter_w(0, data & 0x02);
 
 	/* bits 2 and 3 select the ROM bank */
 	membank("bank1")->set_entry((data & 0x0c) >> 2);

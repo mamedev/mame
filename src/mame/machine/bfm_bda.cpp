@@ -83,7 +83,7 @@ static const UINT16 BDAcharset[]=
 	0x4406, // 0100 0100 0000 0110 ?
 };
 
-bfm_bda_t::bfm_bda_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+bfm_bda_t::bfm_bda_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, BFM_BDA, "BFM BDA VFD controller", tag, owner, clock, "bfm_bda", __FILE__),
 	m_port_val(0)
 {
@@ -153,7 +153,7 @@ void bfm_bda_t::device_post_load()
 {
 	for (int i =0; i<16; i++)
 	{
-		output_set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
+		machine().output().set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
 	}
 }
 
@@ -169,7 +169,7 @@ void bfm_bda_t::update_display()
 		{
 			m_outputs[i] = 0;
 		}
-		output_set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
+		machine().output().set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
 	}
 }
 ///////////////////////////////////////////////////////////////////////////

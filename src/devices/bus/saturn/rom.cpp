@@ -18,13 +18,13 @@
 const device_type SATURN_ROM = &device_creator<saturn_rom_device>;
 
 
-saturn_rom_device::saturn_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+saturn_rom_device::saturn_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_sat_cart_interface( mconfig, *this )
 {
 }
 
-saturn_rom_device::saturn_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+saturn_rom_device::saturn_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, SATURN_ROM, "Saturn ROM Carts", tag, owner, clock, "sat_rom", __FILE__),
 						device_sat_cart_interface( mconfig, *this )
 {

@@ -103,13 +103,13 @@ WRITE32_MEMBER(gunbustr_state::gunbustr_input_w)
 			{
 				if (m_coin_lockout)
 				{
-					coin_lockout_w(machine(), 0, ~data & 0x01000000);
-					coin_lockout_w(machine(), 1, ~data & 0x02000000);
+					machine().bookkeeping().coin_lockout_w(0, ~data & 0x01000000);
+					machine().bookkeeping().coin_lockout_w(1, ~data & 0x02000000);
 				}
 
 				// game does not write a separate counter for coin 2! maybe in linked mode?
-				coin_counter_w(machine(), 0, data & 0x04000000);
-				coin_counter_w(machine(), 1, data & 0x04000000);
+				machine().bookkeeping().coin_counter_w(0, data & 0x04000000);
+				machine().bookkeeping().coin_counter_w(1, data & 0x04000000);
 				m_coin_word = (data >> 16) &0xffff;
 			}
 			//logerror("CPU #0 PC %06x: write input %06x\n",device->safe_pc(),offset);
@@ -122,9 +122,9 @@ WRITE32_MEMBER(gunbustr_state::motor_control_w)
 {
 	// Standard value poked into MSW is 0x3c00
 	// (0x2000 and zero are written at startup)
-	output_set_value("Player1_Gun_Recoil", (data & 0x1000000) ? 1 : 0);
-	output_set_value("Player2_Gun_Recoil", (data & 0x10000) ? 1 : 0);
-	output_set_value("Hit_lamp", (data & 0x40000) ? 1 : 0);
+	output().set_value("Player1_Gun_Recoil", (data & 0x1000000) ? 1 : 0);
+	output().set_value("Player2_Gun_Recoil", (data & 0x10000) ? 1 : 0);
+	output().set_value("Hit_lamp", (data & 0x40000) ? 1 : 0);
 }
 
 

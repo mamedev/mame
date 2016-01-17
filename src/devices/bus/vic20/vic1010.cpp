@@ -51,7 +51,7 @@ machine_config_constructor vic1010_device::device_mconfig_additions() const
 //  vic1010_device - constructor
 //-------------------------------------------------
 
-vic1010_device::vic1010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vic1010_device::vic1010_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VIC1010, "VIC1010", tag, owner, clock, "vic1010", __FILE__),
 		device_vic20_expansion_card_interface(mconfig, *this),
 		m_slot1(*this, "slot1"),

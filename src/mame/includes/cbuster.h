@@ -12,7 +12,7 @@
 class cbuster_state : public driver_device
 {
 public:
-	cbuster_state(const machine_config &mconfig, device_type type, const char *tag)
+	cbuster_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),

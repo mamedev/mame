@@ -45,7 +45,7 @@ ADDRESS_MAP_END
 
 
 // device definitions
-e0c6s46_device::e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e0c6s46_device::e0c6s46_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: e0c6200_cpu_device(mconfig, E0C6S46, "E0C6S46", tag, owner, clock, ADDRESS_MAP_NAME(e0c6s46_program), ADDRESS_MAP_NAME(e0c6s46_data), "e0c6s46", __FILE__)
 	, m_vram1(*this, "vram1")
 	, m_vram2(*this, "vram2"), m_osc(0), m_svd(0), m_lcd_control(0), m_lcd_contrast(0)
@@ -405,7 +405,7 @@ void e0c6s46_device::clock_watchdog()
 	// initial reset after 3 to 4 seconds
 	if (++m_watchdog_count == 4)
 	{
-		logerror("%s watchdog reset\n", tag());
+		logerror("%s watchdog reset\n", tag().c_str());
 		m_watchdog_count = 0;
 		device_reset();
 	}
@@ -705,7 +705,7 @@ READ8_MEMBER(e0c6s46_device::io_r)
 
 		default:
 			if (!space.debugger_access())
-				logerror("%s unknown io_r from $0F%02X at $%04X\n", tag(), offset, m_prev_pc);
+				logerror("%s unknown io_r from $0F%02X at $%04X\n", tag().c_str(), offset, m_prev_pc);
 			break;
 	}
 
@@ -773,7 +773,7 @@ WRITE8_MEMBER(e0c6s46_device::io_w)
 			// d2: OSC3 on (high freq)
 			// d3: clock source OSC1 or OSC3
 			if (data & 8)
-				logerror("%s io_w selected OSC3! PC=$%04X\n", tag(), m_prev_pc);
+				logerror("%s io_w selected OSC3! PC=$%04X\n", tag().c_str(), m_prev_pc);
 			m_osc = data;
 			break;
 
@@ -876,7 +876,7 @@ WRITE8_MEMBER(e0c6s46_device::io_w)
 			// d2: reset envelope
 			// d3: trigger one-shot buzzer
 			if (data & 1)
-				logerror("%s io_w enabled envelope, PC=$%04X\n", tag(), m_prev_pc);
+				logerror("%s io_w enabled envelope, PC=$%04X\n", tag().c_str(), m_prev_pc);
 			m_bz_envelope = data & 3;
 			m_bz_1shot_on |= data & 8;
 			break;
@@ -889,7 +889,7 @@ WRITE8_MEMBER(e0c6s46_device::io_w)
 
 		default:
 			if (machine().phase() > MACHINE_PHASE_RESET)
-				logerror("%s unknown io_w $%X to $0F%02X at $%04X\n", tag(), data, offset, m_prev_pc);
+				logerror("%s unknown io_w $%X to $0F%02X at $%04X\n", tag().c_str(), data, offset, m_prev_pc);
 			break;
 	}
 }

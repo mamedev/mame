@@ -2,7 +2,7 @@
 // copyright-holders:Barry Rodewald
 #include "machine/x68k_kbd.h"
 
-x68k_keyboard_device::x68k_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
+x68k_keyboard_device::x68k_keyboard_device(const machine_config& mconfig, std::string tag, device_t* owner, UINT32 clock) :
 	serial_keyboard_device(mconfig, X68K_KEYBOARD, "X68k Keyboard", tag, owner, 0, "x68k_keyboard", __FILE__),
 	m_io_kbd8(*this, "TERM_LINE8"),
 	m_io_kbd9(*this, "TERM_LINE9"),
@@ -50,13 +50,13 @@ void x68k_keyboard_device::write(UINT8 data)
 
 	if(data & 0x80)  // LED status
 	{
-		output_set_value("key_led_kana",(data & 0x01) ? 0 : 1);
-		output_set_value("key_led_romaji",(data & 0x02) ? 0 : 1);
-		output_set_value("key_led_code",(data & 0x04) ? 0 : 1);
-		output_set_value("key_led_caps",(data & 0x08) ? 0 : 1);
-		output_set_value("key_led_insert",(data & 0x10) ? 0 : 1);
-		output_set_value("key_led_hiragana",(data & 0x20) ? 0 : 1);
-		output_set_value("key_led_fullsize",(data & 0x40) ? 0 : 1);
+		machine().output().set_value("key_led_kana",(data & 0x01) ? 0 : 1);
+		machine().output().set_value("key_led_romaji",(data & 0x02) ? 0 : 1);
+		machine().output().set_value("key_led_code",(data & 0x04) ? 0 : 1);
+		machine().output().set_value("key_led_caps",(data & 0x08) ? 0 : 1);
+		machine().output().set_value("key_led_insert",(data & 0x10) ? 0 : 1);
+		machine().output().set_value("key_led_hiragana",(data & 0x20) ? 0 : 1);
+		machine().output().set_value("key_led_fullsize",(data & 0x40) ? 0 : 1);
 		logerror("KB: LED status set to %02x\n",data & 0x7f);
 	}
 

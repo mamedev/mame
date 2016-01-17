@@ -49,7 +49,7 @@ Z Goto Prom (0xC000)
 class swtpc_state : public driver_device
 {
 public:
-	swtpc_state(const machine_config &mconfig, device_type type, const char *tag)
+	swtpc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG)

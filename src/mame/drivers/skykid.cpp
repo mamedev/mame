@@ -28,9 +28,9 @@ WRITE8_MEMBER(skykid_state::inputport_select_w)
 		m_inputport_selected = data & 0x07;
 	else if ((data & 0xe0) == 0xc0)
 	{
-		coin_lockout_global_w(machine(), ~data & 1);
-		coin_counter_w(machine(), 0,data & 2);
-		coin_counter_w(machine(), 1,data & 4);
+		machine().bookkeeping().coin_lockout_global_w(~data & 1);
+		machine().bookkeeping().coin_counter_w(0,data & 2);
+		machine().bookkeeping().coin_counter_w(1,data & 4);
 	}
 }
 
@@ -59,8 +59,8 @@ READ8_MEMBER(skykid_state::inputport_r)
 
 WRITE8_MEMBER(skykid_state::skykid_led_w)
 {
-	set_led_status(machine(), 0,data & 0x08);
-	set_led_status(machine(), 1,data & 0x10);
+	output().set_led_value(0,data & 0x08);
+	output().set_led_value(1,data & 0x10);
 }
 
 WRITE8_MEMBER(skykid_state::skykid_subreset_w)

@@ -186,7 +186,7 @@ READ8_MEMBER( stereo_fx_device::invalid_r )
 	return 0xff;
 }
 
-stereo_fx_device::stereo_fx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+stereo_fx_device::stereo_fx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ISA8_STEREO_FX, "ATI Stereo F/X Audio Adapter", tag, owner, clock, "stereo_fx", __FILE__),
 	device_isa8_card_interface(mconfig, *this),
 	m_dacl(*this, "dacl"),

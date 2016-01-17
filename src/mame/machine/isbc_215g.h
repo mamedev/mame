@@ -12,7 +12,7 @@
 class isbc_215g_device : public device_t
 {
 public:
-	isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isbc_215g_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	const rom_entry *device_rom_region() const override;

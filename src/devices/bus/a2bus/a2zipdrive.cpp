@@ -69,14 +69,14 @@ const rom_entry *a2bus_zipdrivebase_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_zipdrivebase_device::a2bus_zipdrivebase_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_zipdrivebase_device::a2bus_zipdrivebase_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_ata(*this, ZIPDRIVE_ATA_TAG), m_rom(nullptr), m_lastdata(0)
 {
 }
 
-a2bus_zipdrive_device::a2bus_zipdrive_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_zipdrive_device::a2bus_zipdrive_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	a2bus_zipdrivebase_device(mconfig, A2BUS_ZIPDRIVE, "Zip Technologies ZipDrive", tag, owner, clock, "a2zipdrv", __FILE__)
 {
 }

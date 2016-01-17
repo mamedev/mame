@@ -2364,7 +2364,7 @@ layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simpl
 	}
 	m_input_mask = xml_get_attribute_int_with_subst(machine, itemnode, "inputmask", 0);
 	if (m_output_name[0] != 0 && m_element != nullptr)
-		output_set_value(m_output_name.c_str(), m_element->default_state());
+		machine.output().set_value(m_output_name.c_str(), m_element->default_state());
 	parse_bounds(machine, xml_get_sibling(itemnode.child, "bounds"), m_rawbounds);
 	parse_color(machine, xml_get_sibling(itemnode.child, "color"), m_color);
 	parse_orientation(machine, xml_get_sibling(itemnode.child, "orientation"), m_orientation);
@@ -2420,7 +2420,7 @@ int layout_view::item::state() const
 
 	// if configured to an output, fetch the output value
 	if (m_output_name[0] != 0)
-		state = output_get_value(m_output_name.c_str());
+		state = m_element->machine().output().get_value(m_output_name.c_str());
 
 	// if configured to an input, fetch the input value
 	else if (m_input_tag[0] != 0)

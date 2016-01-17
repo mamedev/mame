@@ -19,7 +19,7 @@ class sma_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	sma_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sma_prot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 
 	DECLARE_WRITE16_MEMBER( kof99_bankswitch_w );

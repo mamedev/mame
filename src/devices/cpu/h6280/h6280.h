@@ -60,7 +60,7 @@ class h6280_device : public cpu_device
 {
 public:
 	// construction/destruction
-	h6280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h6280_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// public interfaces
 	void set_irq_line(int irqline, int state);
@@ -98,7 +98,7 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// device_state_interface overrides
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// opcode accessors
 	UINT8 program_read8(offs_t addr);

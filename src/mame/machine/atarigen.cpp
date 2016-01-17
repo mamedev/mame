@@ -43,7 +43,7 @@ inline const atarigen_screen_timer *get_screen_timer(screen_device &screen)
 		if (state->m_screen_timer[i].screen == &screen)
 			return &state->m_screen_timer[i];
 
-	fatalerror("Unexpected: no atarivc_eof_update_timer for screen '%s'\n", screen.tag());
+	fatalerror("Unexpected: no atarivc_eof_update_timer for screen '%s'\n", screen.tag().c_str());
 	return nullptr;
 }
 
@@ -60,9 +60,8 @@ const device_type ATARI_SOUND_COMM = &device_creator<atari_sound_comm_device>;
 //  atari_sound_comm_device - constructor
 //-------------------------------------------------
 
-atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ATARI_SOUND_COMM, "Atari Sound Communications", tag, owner, clock, "atarscom", __FILE__),
-		m_sound_cpu_tag(nullptr),
 		m_main_int_cb(*this),
 		m_sound_cpu(nullptr),
 		m_main_to_sound_ready(false),
@@ -353,7 +352,7 @@ const device_type ATARI_VAD = &device_creator<atari_vad_device>;
 //  atari_vad_device - constructor
 //-------------------------------------------------
 
-atari_vad_device::atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atari_vad_device::atari_vad_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ATARI_VAD, "Atari VAD", tag, owner, clock, "atarivad", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_scanline_int_cb(*this),
@@ -831,8 +830,8 @@ const device_type ATARI_EEPROM_2816 = &device_creator<atari_eeprom_2816_device>;
 //  atari_eeprom_device - constructor
 //-------------------------------------------------
 
-atari_eeprom_device::atari_eeprom_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
-	: device_t(mconfig, devtype, name, tag, owner, 0, shortname, file),
+atari_eeprom_device::atari_eeprom_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source)
+	: device_t(mconfig, devtype, name, tag, owner, 0, shortname, source),
 		m_eeprom(*this, "eeprom"),
 		m_unlocked(false)
 {
@@ -898,7 +897,7 @@ void atari_eeprom_device::device_reset()
 //  atari_eeprom_2804_device - constructor
 //-------------------------------------------------
 
-atari_eeprom_2804_device::atari_eeprom_2804_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atari_eeprom_2804_device::atari_eeprom_2804_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: atari_eeprom_device(mconfig, ATARI_EEPROM_2804, "Atari EEPROM Interface (2804)", tag, owner, "atari2804", __FILE__)
 {
 }
@@ -923,7 +922,7 @@ machine_config_constructor atari_eeprom_2804_device::device_mconfig_additions() 
 //  atari_eeprom_2816_device - constructor
 //-------------------------------------------------
 
-atari_eeprom_2816_device::atari_eeprom_2816_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atari_eeprom_2816_device::atari_eeprom_2816_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: atari_eeprom_device(mconfig, ATARI_EEPROM_2816, "Atari EEPROM Interface (2816)", tag, owner, "atari2816", __FILE__)
 {
 }
@@ -949,7 +948,7 @@ machine_config_constructor atari_eeprom_2816_device::device_mconfig_additions() 
     OVERALL INIT
 ***************************************************************************/
 
-atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, const char *tag)
+atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, std::string tag)
 	: driver_device(mconfig, type, tag),
 		m_earom(*this, "earom"),
 		m_earom_data(0),

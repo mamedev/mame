@@ -129,8 +129,8 @@ void tiamc1_state::machine_reset()
 
 WRITE8_MEMBER(tiamc1_state::tiamc1_control_w)
 {
-	coin_lockout_w(machine(), 0, ~data & 0x02);
-	coin_counter_w(machine(), 0, data & 0x04);
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 }
 
 

@@ -80,7 +80,7 @@ public:
 		TIMER_BLITTER_TICK
 	};
 
-	st_state(const machine_config &mconfig, device_type type, const char *tag)
+	st_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M68000_TAG),
 			m_fdc(*this, WD1772_TAG),
@@ -341,7 +341,7 @@ protected:
 class megast_state : public st_state
 {
 public:
-	megast_state(const machine_config &mconfig, device_type type, const char *tag)
+	megast_state(const machine_config &mconfig, device_type type, std::string tag)
 		: st_state(mconfig, type, tag)
 	{ }
 
@@ -358,7 +358,7 @@ public:
 		TIMER_MICROWIRE_TICK
 	};
 
-	ste_state(const machine_config &mconfig, device_type type, const char *tag)
+	ste_state(const machine_config &mconfig, device_type type, std::string tag)
 		: st_state(mconfig, type, tag),
 			m_lmc1992(*this, LMC1992_TAG)
 	{ }
@@ -433,7 +433,7 @@ protected:
 class megaste_state : public ste_state
 {
 public:
-	megaste_state(const machine_config &mconfig, device_type type, const char *tag)
+	megaste_state(const machine_config &mconfig, device_type type, std::string tag)
 		: ste_state(mconfig, type, tag)
 	{ }
 
@@ -448,7 +448,7 @@ public:
 class stbook_state : public ste_state
 {
 public:
-	stbook_state(const machine_config &mconfig, device_type type, const char *tag)
+	stbook_state(const machine_config &mconfig, device_type type, std::string tag)
 		: ste_state(mconfig, type, tag),
 			m_sw400(*this, "SW400")
 	{ }

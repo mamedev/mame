@@ -58,9 +58,9 @@ public:
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_firq_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_firq.set_callback(object); }
 	template<class _Object> static devcb_base &set_floating_bus_rd_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_read_floating_bus.set_callback(object); }
-	static void set_maincpu_tag(device_t &device, const char *tag) { downcast<gime_base_device &>(device).m_maincpu_tag = tag; }
-	static void set_ram_tag(device_t &device, const char *tag) { downcast<gime_base_device &>(device).m_ram_tag = tag; }
-	static void set_ext_tag(device_t &device, const char *tag) { downcast<gime_base_device &>(device).m_ext_tag = tag; }
+	static void set_maincpu_tag(device_t &device, std::string tag) { downcast<gime_base_device &>(device).m_maincpu_tag = tag; }
+	static void set_ram_tag(device_t &device, std::string tag) { downcast<gime_base_device &>(device).m_ram_tag = tag; }
+	static void set_ext_tag(device_t &device, std::string tag) { downcast<gime_base_device &>(device).m_ext_tag = tag; }
 
 	// read/write
 	DECLARE_READ8_MEMBER( read ) { return read(offset); }
@@ -91,7 +91,7 @@ public:
 	void set_il2(bool value) { set_interrupt_value(INTERRUPT_EI2, value); }
 
 protected:
-	gime_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, const char *shortname, const char *source);
+	gime_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, std::string shortname, std::string source);
 
 	// device-level overrides
 	virtual void device_start(void) override;
@@ -202,9 +202,9 @@ private:
 	pixel_t                     m_rgb_palette[64];
 	UINT8                       m_dummy_bank[0x2000];
 
-	const char *m_maincpu_tag;  /* tag of main CPU */
-	const char *m_ram_tag;      /* tag of RAM device */
-	const char *m_ext_tag;      /* tag of expansion device */
+	std::string m_maincpu_tag;  /* tag of main CPU */
+	std::string m_ram_tag;      /* tag of RAM device */
+	std::string m_ext_tag;      /* tag of expansion device */
 
 	// timer constants
 	static const device_timer_id TIMER_FRAME = 0;
@@ -295,13 +295,13 @@ private:
 class gime_ntsc_device : public gime_base_device
 {
 public:
-	gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gime_ntsc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class gime_pal_device : public gime_base_device
 {
 public:
-	gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gime_pal_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type GIME_NTSC;

@@ -86,7 +86,7 @@ UINT8* device_videobrain_expansion_card_interface::videobrain_ram_pointer(runnin
 //  videobrain_expansion_slot_device - constructor
 //-------------------------------------------------
 
-videobrain_expansion_slot_device::videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+videobrain_expansion_slot_device::videobrain_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VIDEOBRAIN_EXPANSION_SLOT, "VideoBrain expansion port", tag, owner, clock, "videobrain_expansion_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	device_image_interface(mconfig, *this),
@@ -144,7 +144,7 @@ bool videobrain_expansion_slot_device::call_load()
 
 bool videobrain_expansion_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 
 	return true;
 }
@@ -154,9 +154,9 @@ bool videobrain_expansion_slot_device::call_softlist_load(software_list_device &
 //  get_default_card_software -
 //-------------------------------------------------
 
-void videobrain_expansion_slot_device::get_default_card_software(std::string &result)
+std::string videobrain_expansion_slot_device::get_default_card_software()
 {
-	software_get_default_slot(result, "standard");
+	return software_get_default_slot("standard");
 }
 
 

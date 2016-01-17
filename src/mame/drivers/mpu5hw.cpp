@@ -52,7 +52,7 @@
 class mpu5_state : public driver_device
 {
 public:
-	mpu5_state(const machine_config &mconfig, device_type type, const char *tag)
+	mpu5_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }
@@ -234,9 +234,9 @@ WRITE8_MEMBER(mpu5_state::asic_w8)
 		}
 		case 0x0b:
 		{
-			output_set_value("statuslamp1", ((data&0x10) != 0));
+			output().set_value("statuslamp1", ((data&0x10) != 0));
 
-			output_set_value("statuslamp2", ((data&0x20) != 0));
+			output().set_value("statuslamp2", ((data&0x20) != 0));
 
 			if (data & 0x40)
 			{

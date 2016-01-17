@@ -22,7 +22,7 @@
 class amu880_state : public driver_device
 {
 public:
-	amu880_state(const machine_config &mconfig, device_type type, const char *tag)
+	amu880_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_cassette(*this, "cassette"),
 			m_z80sio(*this, Z80SIO_TAG),

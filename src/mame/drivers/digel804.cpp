@@ -68,7 +68,7 @@
 class digel804_state : public driver_device
 {
 public:
-	digel804_state(const machine_config &mconfig, device_type type, const char *tag)
+	digel804_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
@@ -332,12 +332,12 @@ WRITE8_MEMBER( digel804_state::op46 )
 		//popmessage("LEDS: %s %s %s Func: %s%d\n", (data&0x80)?"INPUT":"-----", (data&0x40)?"BUSY":"----", (data&0x20)?"ERROR":"-----", (data&0x10)?"None":"", (data&0x10)?-1:(~data&0xF));
 		//fprintf("LEDS: %s %s %s Func: %s%d\n", (data&0x80)?"INPUT":"-----", (data&0x40)?"BUSY":"----", (data&0x20)?"ERROR":"-----", (data&0x10)?"None":"", (data&0x10)?-1:(~data&0xF));
 
-	output_set_value("input_led", BIT(data,7));
-	output_set_value("busy_led",  BIT(data,6));
-	output_set_value("error_led", BIT(data,5));
+	output().set_value("input_led", BIT(data,7));
+	output().set_value("busy_led",  BIT(data,6));
+	output().set_value("error_led", BIT(data,5));
 
 	for(int i=0; i<16; i++)
-		output_set_indexed_value("func_led", i, (!(data & 0x10) && ((~data & 0x0f) == i)) ? 1 : 0);
+		output().set_indexed_value("func_led", i, (!(data & 0x10) && ((~data & 0x0f) == i)) ? 1 : 0);
 }
 
 WRITE8_MEMBER( digel804_state::op47 ) // eprom timing/power and control write

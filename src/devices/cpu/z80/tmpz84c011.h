@@ -75,7 +75,7 @@
 class tmpz84c011_device : public z80_device
 {
 public:
-	tmpz84c011_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32);
+	tmpz84c011_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_zc0_callback(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_zc0_cb.set_callback(object); }

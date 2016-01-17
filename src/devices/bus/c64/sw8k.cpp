@@ -71,7 +71,7 @@ ioport_constructor c64_switchable_8k_cartridge_device::device_input_ports() cons
 //  c64_switchable_8k_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_switchable_8k_cartridge_device::c64_switchable_8k_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c64_switchable_8k_cartridge_device::c64_switchable_8k_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_SW8K, "C64 Switchable 8K cartridge", tag, owner, clock, "c64_sw8k", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_sw(*this, "SW"), m_bank(0)

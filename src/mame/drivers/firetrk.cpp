@@ -46,7 +46,7 @@ INPUT_CHANGED_MEMBER(firetrk_state::gear_changed)
 	if (newval)
 	{
 		m_gear = (FPTR)param;
-		output_set_value("P1gear", m_gear+1);
+		output().set_value("P1gear", m_gear+1);
 	}
 }
 
@@ -69,24 +69,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(firetrk_state::firetrk_scanline)
 WRITE8_MEMBER(firetrk_state::firetrk_output_w)
 {
 	/* BIT0 => START1 LAMP */
-	set_led_status(machine(), 0, !(data & 0x01));
+	output().set_led_value(0, !(data & 0x01));
 
 	/* BIT1 => START2 LAMP */
-	set_led_status(machine(), 1, !(data & 0x02));
+	output().set_led_value(1, !(data & 0x02));
 
 	/* BIT2 => FLASH       */
 	m_flash = data & 0x04;
 
 	/* BIT3 => TRACK LAMP  */
-	set_led_status(machine(), 3, !(data & 0x08));
+	output().set_led_value(3, !(data & 0x08));
 
 	/* BIT4 => ATTRACT     */
 	m_discrete->write(space, FIRETRUCK_ATTRACT_EN, data & 0x10);
-	coin_lockout_w(machine(), 0, !(data & 0x10));
-	coin_lockout_w(machine(), 1, !(data & 0x10));
+	machine().bookkeeping().coin_lockout_w(0, !(data & 0x10));
+	machine().bookkeeping().coin_lockout_w(1, !(data & 0x10));
 
 	/* BIT5 => START3 LAMP */
-	set_led_status(machine(), 2, !(data & 0x20));
+	output().set_led_value(2, !(data & 0x20));
 
 	/* BIT6 => UNUSED      */
 
@@ -98,28 +98,28 @@ WRITE8_MEMBER(firetrk_state::firetrk_output_w)
 WRITE8_MEMBER(firetrk_state::superbug_output_w)
 {
 	/* BIT0 => START LAMP */
-	set_led_status(machine(), 0, offset & 0x01);
+	output().set_led_value(0, offset & 0x01);
 
 	/* BIT1 => ATTRACT    */
 	m_discrete->write(space, SUPERBUG_ATTRACT_EN, offset & 0x02);
-	coin_lockout_w(machine(), 0, !(offset & 0x02));
-	coin_lockout_w(machine(), 1, !(offset & 0x02));
+	machine().bookkeeping().coin_lockout_w(0, !(offset & 0x02));
+	machine().bookkeeping().coin_lockout_w(1, !(offset & 0x02));
 
 	/* BIT2 => FLASH      */
 	m_flash = offset & 0x04;
 
 	/* BIT3 => TRACK LAMP */
-	set_led_status(machine(), 1, offset & 0x08);
+	output().set_led_value(1, offset & 0x08);
 }
 
 
 WRITE8_MEMBER(firetrk_state::montecar_output_1_w)
 {
 	/* BIT0 => START LAMP    */
-	set_led_status(machine(), 0, !(data & 0x01));
+	output().set_led_value(0, !(data & 0x01));
 
 	/* BIT1 => TRACK LAMP    */
-	set_led_status(machine(), 1, !(data & 0x02));
+	output().set_led_value(1, !(data & 0x02));
 
 	/* BIT2 => ATTRACT       */
 	m_discrete->write(space, MONTECAR_ATTRACT_INV, data & 0x04);
@@ -128,13 +128,13 @@ WRITE8_MEMBER(firetrk_state::montecar_output_1_w)
 	/* BIT4 => UNUSED        */
 
 	/* BIT5 => COIN3 COUNTER */
-	coin_counter_w(machine(), 0, data & 0x80);
+	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 
 	/* BIT6 => COIN2 COUNTER */
-	coin_counter_w(machine(), 1, data & 0x40);
+	machine().bookkeeping().coin_counter_w(1, data & 0x40);
 
 	/* BIT7 => COIN1 COUNTER */
-	coin_counter_w(machine(), 2, data & 0x20);
+	machine().bookkeeping().coin_counter_w(2, data & 0x20);
 }
 
 

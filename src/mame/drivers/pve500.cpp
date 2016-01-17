@@ -62,7 +62,7 @@
 class pve500_state : public driver_device
 {
 public:
-	pve500_state(const machine_config &mconfig, device_type type, const char *tag)
+	pve500_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "subcpu")
@@ -309,7 +309,7 @@ printf("io_expander_w: PORTA (io_SC=%02X)\n", data);
 			for (int j=0; j<8; j++){
 				if (!BIT(io_SC,j)){
 					for (int i=0; i<4; i++)
-						output_set_digit_value(8*swap[i] + j, LD_data[i]);
+						output().set_digit_value(8*swap[i] + j, LD_data[i]);
 				}
 			}
 			break;

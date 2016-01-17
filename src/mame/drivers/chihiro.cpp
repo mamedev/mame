@@ -364,14 +364,11 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/lpci.h"
 #include "machine/pic8259.h"
-#include "machine/pit8253.h"
 #include "machine/idectrl.h"
 #include "machine/idehd.h"
 #include "machine/naomigd.h"
 #include "video/poly.h"
-#include "bitmap.h"
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 #include "debug/debugcpu.h"
@@ -384,7 +381,7 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 class chihiro_state : public xbox_base_state
 {
 public:
-	chihiro_state(const machine_config &mconfig, device_type type, const char *tag) :
+	chihiro_state(const machine_config &mconfig, device_type type, std::string tag) :
 		xbox_base_state(mconfig, type, tag),
 		usbhack_index(-1),
 		usbhack_counter(0),
@@ -600,7 +597,7 @@ class ide_baseboard_device : public ata_mass_storage_device
 {
 public:
 	// construction/destruction
-	ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ide_baseboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual int  read_sector(UINT32 lba, void *buffer) override;
 	virtual int  write_sector(UINT32 lba, const void *buffer) override;
@@ -624,7 +621,7 @@ const device_type IDE_BASEBOARD = &device_creator<ide_baseboard_device>;
 //  ide_baseboard_device - constructor
 //-------------------------------------------------
 
-ide_baseboard_device::ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ide_baseboard_device::ide_baseboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: ata_mass_storage_device(mconfig, IDE_BASEBOARD, "IDE Baseboard", tag, owner, clock, "ide_baseboard", __FILE__)
 {
 }

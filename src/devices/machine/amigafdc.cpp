@@ -18,7 +18,7 @@ FLOPPY_FORMATS_MEMBER( amiga_fdc::floppy_formats )
 	FLOPPY_ADF_FORMAT
 FLOPPY_FORMATS_END
 
-amiga_fdc::amiga_fdc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+amiga_fdc::amiga_fdc(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, AMIGA_FDC, "Amiga FDC", tag, owner, clock, "amiga_fdc", __FILE__),
 	m_write_index(*this), floppy(nullptr), t_gen(nullptr), dsklen(0), pre_dsklen(0), dsksync(0), dskbyt(0), adkcon(0), dmacon(0), dskpt(0), dma_value(0), dma_state(0)
 {
@@ -432,13 +432,13 @@ void amiga_fdc::setup_leds()
 			floppy == floppy_devices[2] ? 2 :
 			3;
 
-		output_set_value("drive_0_led", drive == 0);
-		output_set_value("drive_1_led", drive == 1);
-		output_set_value("drive_2_led", drive == 2);
-		output_set_value("drive_3_led", drive == 3);
+		machine().output().set_value("drive_0_led", drive == 0);
+		machine().output().set_value("drive_1_led", drive == 1);
+		machine().output().set_value("drive_2_led", drive == 2);
+		machine().output().set_value("drive_3_led", drive == 3);
 
-		set_led_status(machine(), 1, drive == 0); /* update internal drive led */
-		set_led_status(machine(), 2, drive == 1); /* update external drive led */
+		machine().output().set_led_value(1, drive == 0); /* update internal drive led */
+		machine().output().set_led_value(2, drive == 1); /* update external drive led */
 	}
 }
 
@@ -471,7 +471,7 @@ WRITE8_MEMBER( amiga_fdc::ciaaprb_w )
 		floppy->dir_w((data >> 1) & 1);
 		floppy->stp_w(data & 1);
 		floppy->mon_w((data >> 7) & 1);
-		output_set_value("fdc_led", data & 0x80); // LED directly connected to FDC motor
+		machine().output().set_value("fdc_led", data & 0x80); // LED directly connected to FDC motor
 	}
 
 	if(floppy) {

@@ -21,7 +21,7 @@ class iq151_rom_device :
 {
 public:
 	// construction/destruction
-	iq151_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	iq151_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
@@ -44,7 +44,7 @@ class iq151_basic6_device :
 {
 public:
 	// construction/destruction
-	iq151_basic6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	iq151_basic6_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// iq151cart_interface overrides
@@ -58,7 +58,7 @@ class iq151_basicg_device :
 {
 public:
 	// construction/destruction
-	iq151_basicg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	iq151_basicg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// iq151cart_interface overrides
@@ -73,7 +73,7 @@ class iq151_amos1_device :
 {
 public:
 	// construction/destruction
-	iq151_amos1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	iq151_amos1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// iq151cart_interface overrides
@@ -91,7 +91,7 @@ class iq151_amos2_device :
 {
 public:
 	// construction/destruction
-	iq151_amos2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	iq151_amos2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// iq151cart_interface overrides
@@ -109,7 +109,7 @@ class iq151_amos3_device :
 {
 public:
 	// construction/destruction
-	iq151_amos3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	iq151_amos3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// iq151cart_interface overrides

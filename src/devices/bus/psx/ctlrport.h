@@ -66,7 +66,7 @@ class psx_standard_controller_device :  public device_t,
 										public device_psx_controller_interface
 {
 public:
-	psx_standard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	psx_standard_controller_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -88,7 +88,7 @@ private:
 class psxcontrollerports_device : public device_t
 {
 public:
-	psxcontrollerports_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	psxcontrollerports_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	void ack();
 
 	template<class _Object> static devcb_base &set_dsr_handler(device_t &device, _Object object) { return downcast<psxcontrollerports_device &>(device).m_dsr_handler.set_callback(object); }
@@ -113,7 +113,7 @@ class psx_controller_port_device :  public device_t,
 									public device_slot_interface
 {
 public:
-	psx_controller_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	psx_controller_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	typedef delegate<void ()> void_cb;

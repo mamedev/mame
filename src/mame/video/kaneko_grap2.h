@@ -22,13 +22,13 @@
 class kaneko_grap2_device : public device_t
 {
 public:
-	kaneko_grap2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kaneko_grap2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 
 	int m_chipnum; // used to decide where we write the palette
 
 	static void set_chipnum(device_t &device, int chipnum);
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 
 	DECLARE_READ16_MEMBER(galpani3_regs1_r);
 	DECLARE_WRITE16_MEMBER(galpani3_regs1_go_w);

@@ -86,7 +86,7 @@ Is there another alt program rom set labeled 9 & 10?
 class sandscrp_state : public driver_device
 {
 public:
-	sandscrp_state(const machine_config &mconfig, device_type type, const char *tag)
+	sandscrp_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -226,8 +226,8 @@ WRITE16_MEMBER(sandscrp_state::coincounter_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0,   data  & 0x0001);
-		coin_counter_w(machine(), 1,   data  & 0x0002);
+		machine().bookkeeping().coin_counter_w(0,   data  & 0x0001);
+		machine().bookkeeping().coin_counter_w(1,   data  & 0x0002);
 	}
 }
 

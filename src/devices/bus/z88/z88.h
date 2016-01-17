@@ -83,7 +83,7 @@ class z88cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z88cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~z88cart_slot_device();
 
 	template<class _Object> static devcb_base &set_out_flp_callback(device_t &device, _Object object) { return downcast<z88cart_slot_device &>(device).m_out_flp_cb.set_callback(object); }
@@ -109,7 +109,7 @@ public:
 	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read);

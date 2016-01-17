@@ -63,8 +63,8 @@ WRITE8_MEMBER( kaypro_state::kayproii_pio_system_w )
 		m_floppy->ss_w(!BIT(data, 2)); // signal exists even though drives are single sided
 	}
 
-	output_set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
-	output_set_value("ledB", BIT(data, 1));
+	output().set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
+	output().set_value("ledB", BIT(data, 1));
 
 	m_centronics->write_strobe(BIT(data, 4));
 
@@ -124,8 +124,8 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 		m_floppy->ss_w(!BIT(data, 2));
 	}
 
-	output_set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
-	output_set_value("ledB", BIT(data, 1));
+	output().set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
+	output().set_value("ledB", BIT(data, 1));
 
 	m_centronics->write_strobe(BIT(data, 3));
 

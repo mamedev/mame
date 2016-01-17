@@ -7,7 +7,7 @@
 class drgnmst_state : public driver_device
 {
 public:
-	drgnmst_state(const machine_config &mconfig, device_type type, const char *tag)
+	drgnmst_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_vidregs(*this, "vidregs"),
 		m_fg_videoram(*this, "fg_videoram"),

@@ -14,7 +14,7 @@
 class sgi_mc_device : public device_t
 {
 public:
-	sgi_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sgi_mc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~sgi_mc_device() {}
 
 DECLARE_READ32_MEMBER(read);

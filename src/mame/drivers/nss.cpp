@@ -299,7 +299,7 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 class nss_state : public snes_state
 {
 public:
-	nss_state(const machine_config &mconfig, device_type type, const char *tag)
+	nss_state(const machine_config &mconfig, device_type type, std::string tag)
 		: snes_state(mconfig, type, tag),
 		m_m50458(*this,"m50458"),
 		m_s3520cf(*this, "s3520cf"),
@@ -599,8 +599,8 @@ WRITE8_MEMBER(nss_state::port_03_w)
 
 WRITE8_MEMBER(nss_state::port_04_w)
 {
-	coin_counter_w(machine(), 0, (data >> 0) & 1);
-	coin_counter_w(machine(), 1, (data >> 1) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 1);
+	machine().bookkeeping().coin_counter_w(1, (data >> 1) & 1);
 }
 
 WRITE8_MEMBER(nss_state::port_07_w)

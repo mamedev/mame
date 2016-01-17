@@ -38,7 +38,7 @@ struct calc3_hit_t
 class kaneko_hit_device : public device_t
 {
 public:
-	kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kaneko_hit_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void set_type(device_t &device, int hittype);
 

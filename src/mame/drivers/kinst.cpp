@@ -146,7 +146,7 @@ public:
 		TIMER_IRQ0_STOP
 	};
 
-	kinst_state(const machine_config &mconfig, device_type type, const char *tag)
+	kinst_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_rambase(*this, "rambase"),
 		m_rambase2(*this, "rambase2"),

@@ -33,7 +33,7 @@
 const device_type NES_NANJING = &device_creator<nes_nanjing_device>;
 
 
-nes_nanjing_device::nes_nanjing_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_nanjing_device::nes_nanjing_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_NANJING, "NES Cart Nanjing PCB", tag, owner, clock, "nes_nanjing", __FILE__),
 	m_count(0),
 	m_latch1(0),

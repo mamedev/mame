@@ -47,7 +47,7 @@ typedef device_delegate<void (void)> ttl74153_output_delegate;
 class ttl74153_device : public device_t
 {
 public:
-	ttl74153_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ttl74153_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~ttl74153_device() {}
 
 	static void set_output_callback(device_t &device, ttl74153_output_delegate callback) { downcast<ttl74153_device &>(device).m_output_cb = callback; }

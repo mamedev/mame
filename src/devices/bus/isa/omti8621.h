@@ -33,7 +33,7 @@ class omti_disk_image_device;
 class omti8621_device : public device_t, public device_isa16_card_interface
 {
 public:
-	omti8621_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+	omti8621_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock);
 	~omti8621_device() {}
 
 	DECLARE_READ16_MEMBER(read);
@@ -130,7 +130,7 @@ private:
 class omti8621_pc_device : public omti8621_device
 {
 public:
-	omti8621_pc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	omti8621_pc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type ISA16_OMTI8621;
@@ -140,7 +140,7 @@ extern const device_type ISA16_OMTI8621;
 class omti8621_apollo_device : public omti8621_device
 {
 public:
-	omti8621_apollo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	omti8621_apollo_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// get sector diskaddr of logical unit lun into data_buffer
 	UINT32 get_sector(INT32 diskaddr, UINT8 *data_buffer, UINT32 length, UINT8 lun);

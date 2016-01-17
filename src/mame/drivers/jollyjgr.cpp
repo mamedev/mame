@@ -107,7 +107,7 @@ Notes:
 class jollyjgr_state : public driver_device
 {
 public:
-	jollyjgr_state(const machine_config &mconfig, device_type type, const char *tag)
+	jollyjgr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -205,7 +205,7 @@ WRITE8_MEMBER(jollyjgr_state::jollyjgr_misc_w)
 
 WRITE8_MEMBER(jollyjgr_state::jollyjgr_coin_lookout_w)
 {
-	coin_lockout_global_w(machine(), data & 1);
+	machine().bookkeeping().coin_lockout_global_w(data & 1);
 
 	/* bits 4, 5, 6 and 7 are used too */
 }

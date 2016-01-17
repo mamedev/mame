@@ -24,7 +24,7 @@ class harddisk_image_device :   public device_t,
 {
 public:
 	// construction/destruction
-	harddisk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	harddisk_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~harddisk_image_device();
 
 	static void static_set_device_load(device_t &device, device_image_load_delegate callback) { downcast<harddisk_image_device &>(device).m_device_image_load = callback; }
@@ -35,7 +35,7 @@ public:
 	virtual bool call_load() override;
 	virtual bool call_create(int create_format, option_resolution *create_args) override;
 	virtual void call_unload() override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override { load_software_part_region(*this, swlist, swname, start_entry ); return TRUE; }
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override { machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry ); return TRUE; }
 
 	virtual iodevice_t image_type() const override { return IO_HARDDISK; }
 
@@ -53,7 +53,7 @@ public:
 	chd_file *get_chd_file();
 
 protected:
-	harddisk_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	harddisk_image_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// device-level overrides
 	virtual void device_config_complete() override;

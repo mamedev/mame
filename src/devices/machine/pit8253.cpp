@@ -46,7 +46,7 @@ enum
 const device_type PIT8253 = &device_creator<pit8253_device>;
 
 
-pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pit8253_device::pit8253_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PIT8253, "8253 PIT", tag, owner, clock, "pit8253", __FILE__),
 	m_clk0(0),
 	m_clk1(0),
@@ -57,7 +57,7 @@ pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_clk0(0),
 	m_clk1(0),
@@ -71,7 +71,7 @@ pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, 
 
 const device_type PIT8254 = &device_creator<pit8254_device>;
 
-pit8254_device::pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pit8254_device::pit8254_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pit8253_device(mconfig, PIT8254, "8254 PIT", tag, owner, clock, "pit8254", __FILE__)
 {
 }

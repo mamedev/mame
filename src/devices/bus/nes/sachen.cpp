@@ -60,82 +60,82 @@ const device_type NES_SACHEN_8259C = &device_creator<nes_sachen_8259c_device>;
 const device_type NES_SACHEN_8259D = &device_creator<nes_sachen_8259d_device>;
 
 
-nes_sachen_sa009_device::nes_sachen_sa009_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_sachen_sa009_device::nes_sachen_sa009_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_SACHEN_SA009, "NES Cart Sachen SA009 PCB", tag, owner, clock, "nes_sa009", __FILE__)
 {
 }
 
-nes_sachen_sa0036_device::nes_sachen_sa0036_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_sachen_sa0036_device::nes_sachen_sa0036_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_SACHEN_SA0036, "NES Cart Sachen sa0036 PCB", tag, owner, clock, "nes_sa0036", __FILE__)
 {
 }
 
-nes_sachen_sa0037_device::nes_sachen_sa0037_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_sachen_sa0037_device::nes_sachen_sa0037_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_SACHEN_SA0037, "NES Cart Sachen sa0037 PCB", tag, owner, clock, "nes_sa0037", __FILE__)
 {
 }
 
-nes_sachen_sa72007_device::nes_sachen_sa72007_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_sachen_sa72007_device::nes_sachen_sa72007_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_SACHEN_SA72007, "NES Cart Sachen SA72007 PCB", tag, owner, clock, "nes_sa72007", __FILE__)
 {
 }
 
-nes_sachen_sa72008_device::nes_sachen_sa72008_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_sachen_sa72008_device::nes_sachen_sa72008_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_SACHEN_SA72008, "NES Cart Sachen SA72008 PCB", tag, owner, clock, "nes_sa72008", __FILE__)
 {
 }
 
-nes_sachen_tca01_device::nes_sachen_tca01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_sachen_tca01_device::nes_sachen_tca01_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_SACHEN_TCA01, "NES Cart Sachen TCA-01 PCB", tag, owner, clock, "nes_tca01", __FILE__)
 {
 }
 
-nes_sachen_tcu01_device::nes_sachen_tcu01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_sachen_tcu01_device::nes_sachen_tcu01_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_SACHEN_TCU01, "NES Cart Sachen TCU-01 PCB", tag, owner, clock, "nes_tcu01", __FILE__)
 {
 }
 
-nes_sachen_tcu02_device::nes_sachen_tcu02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_sachen_tcu02_device::nes_sachen_tcu02_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_SACHEN_TCU02, "NES Cart Sachen TCU-02 PCB", tag, owner, clock, "nes_tcu02", __FILE__), m_latch(0)
 				{
 }
 
-nes_sachen_74x374_device::nes_sachen_74x374_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+nes_sachen_74x374_device::nes_sachen_74x374_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_latch(0), m_mmc_vrom_bank(0)
 				{
 }
 
-nes_sachen_74x374_device::nes_sachen_74x374_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_sachen_74x374_device::nes_sachen_74x374_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_SACHEN_74X374, "NES Cart Sachen 74*374 PCB", tag, owner, clock, "nes_s74x34", __FILE__), m_latch(0), m_mmc_vrom_bank(0)
 				{
 }
 
-nes_sachen_74x374_alt_device::nes_sachen_74x374_alt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_sachen_74x374_alt_device::nes_sachen_74x374_alt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_sachen_74x374_device(mconfig, NES_SACHEN_74X374_ALT, "NES Cart Sachen 74*374 Alt PCB", tag, owner, clock, "nes_s74x34a", __FILE__)
 {
 }
 
-nes_sachen_8259a_device::nes_sachen_8259a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+nes_sachen_8259a_device::nes_sachen_8259a_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: nes_sachen_74x374_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-nes_sachen_8259a_device::nes_sachen_8259a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_sachen_8259a_device::nes_sachen_8259a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_sachen_74x374_device(mconfig, NES_SACHEN_8259A, "NES Cart Sachen 8259A PCB", tag, owner, clock, "nes_s8259a", __FILE__)
 {
 }
 
-nes_sachen_8259b_device::nes_sachen_8259b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_sachen_8259b_device::nes_sachen_8259b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_sachen_8259a_device(mconfig, NES_SACHEN_8259B, "NES Cart Sachen 8259B PCB", tag, owner, clock, "nes_s8259b", __FILE__)
 {
 }
 
-nes_sachen_8259c_device::nes_sachen_8259c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_sachen_8259c_device::nes_sachen_8259c_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_sachen_8259a_device(mconfig, NES_SACHEN_8259C, "NES Cart Sachen 8259C PCB", tag, owner, clock, "nes_s8259c", __FILE__)
 {
 }
 
-nes_sachen_8259d_device::nes_sachen_8259d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_sachen_8259d_device::nes_sachen_8259d_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_sachen_8259a_device(mconfig, NES_SACHEN_8259D, "NES Cart Sachen 8259D PCB", tag, owner, clock, "nes_s8259d", __FILE__)
 {
 }

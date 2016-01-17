@@ -56,7 +56,7 @@ ICS8080
 class tk80_state : public driver_device
 {
 public:
-	tk80_state(const machine_config &mconfig, device_type type, const char *tag)
+	tk80_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 	{ }
@@ -79,12 +79,12 @@ public:
 
 READ8_MEMBER( tk80_state::display_r )
 {
-	return output_get_digit_value(offset);
+	return output().get_digit_value(offset);
 }
 
 WRITE8_MEMBER( tk80_state::display_w )
 {
-	output_set_digit_value(offset, data);
+	output().set_digit_value(offset, data);
 }
 
 static ADDRESS_MAP_START(tk80_mem, AS_PROGRAM, 8, tk80_state)

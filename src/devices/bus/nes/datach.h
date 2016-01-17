@@ -45,7 +45,7 @@ class nes_datach_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_datach_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_datach_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~nes_datach_slot_device();
 
 	// device-level overrides
@@ -67,7 +67,7 @@ public:
 	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 
 	virtual DECLARE_READ8_MEMBER(read);
 	void write_prg_bank(UINT8 bank) { if (m_cart) m_cart->write_prg_bank(bank); }
@@ -97,8 +97,8 @@ class nes_datach_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_datach_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_datach_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_datach_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_datach_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
@@ -116,7 +116,7 @@ class nes_datach_24c01_device : public nes_datach_rom_device
 {
 public:
 	// construction/destruction
-	nes_datach_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_datach_24c01_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -139,7 +139,7 @@ class nes_datach_device : public nes_lz93d50_device
 {
 public:
 	// construction/destruction
-	nes_datach_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_datach_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

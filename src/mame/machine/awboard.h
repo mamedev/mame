@@ -12,7 +12,7 @@
 class aw_rom_board : public naomi_g1_device
 {
 public:
-	aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	aw_rom_board(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void static_set_keyregion(device_t &device, const char *_keyregion);
 

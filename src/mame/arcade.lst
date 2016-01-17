@@ -2715,6 +2715,7 @@ toto            //
 honeydol        // (c) 1995 Barko Corp
 twinadv         // (c) 1995 Barko Corp
 twinadvk        // (c) 1995 Barko Corp
+multi96			// (c) 1996 Barko Corp
 snowbro3        // (c) 2002 Syrmex
 ballboy         // bootleg
 // SemiCom games on "SnowBros"-like hardware
@@ -6375,8 +6376,9 @@ avengrgs        // MCG (c) 1995 Data East Corporation (World)
 avengrgsj       // MCG (c) 1995 Data East Corporation (Japan)
 skullfng        // MCH (c) 1996 Data East Corporation (World)
 skullfngj       // MCH (c) 1996 Data East Corporation (Japan)
-stadhr96        // MCM (c) 1996 Data East
-stadhr96j       // MCM (c) 1996 Data East
+stadhr96        // MCM (c) 1996 Data East Corporation (World)
+stadhr96u       // MCM (c) 1996 Data East Corporation (USA)
+stadhr96j       // MCM (c) 1996 Data East Corporation (Japan)
 
 // SemiCom games on Tumble Pop based hardware
 metlsavr        // (c) 1994 First Amusements
@@ -12032,6 +12034,7 @@ tvgunhed        // (c) 1989 Hudson / Toho Sunrise (Tourvision bootleg)
 tvmrheli        // (c) 1989 IREM Corp (Tourvision bootleg)
 tvusapb         // (c) 1989 Aicom (Tourvision bootleg)
 tvvolfd         // (c) 1989 Taito (Tourvision bootleg)
+tvdormon        // (c) 1989 Hudson / Fujiko-Shogakukan-TV Asahi (Tourvision bootleg)
 tvdunexp        // (c) 1989 Hudson / Atlus (Tourvision bootleg)
 tvwnshot        // (c) 1989 Data East Corp. (Tourvision bootleg)
 tvablast        // (c) 1990 Hudson / Kaneko (Tourvision bootleg)

@@ -23,7 +23,7 @@ class nec_common_device : public cpu_device
 {
 public:
 	// construction/destruction
-	nec_common_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool is_16bit, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type);
+	nec_common_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, bool is_16bit, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type);
 
 protected:
 	// device-level overrides
@@ -42,7 +42,7 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr); }
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
 
@@ -399,27 +399,27 @@ union necbasicregs
 class v20_device : public nec_common_device
 {
 public:
-	v20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v20_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class v30_device : public nec_common_device
 {
 public:
-	v30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v30_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class v33_device : public nec_common_device
 {
 public:
-	v33_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v33_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class v33a_device : public nec_common_device
 {
 public:
-	v33a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v33a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

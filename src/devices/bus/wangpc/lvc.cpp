@@ -166,7 +166,7 @@ inline void wangpc_lvc_device::set_irq(int state)
 //  wangpc_lvc_device - constructor
 //-------------------------------------------------
 
-wangpc_lvc_device::wangpc_lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+wangpc_lvc_device::wangpc_lvc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, WANGPC_LVC, "Wang PC Low Resolution Video Card", tag, owner, clock, "wangpc_lvc", __FILE__),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_crtc(*this, MC6845_TAG),

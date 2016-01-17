@@ -44,7 +44,7 @@ ioport_constructor nes_vaus_device::device_input_ports() const
 //  nes_vaus_device - constructor
 //-------------------------------------------------
 
-nes_vaus_device::nes_vaus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+nes_vaus_device::nes_vaus_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_nes_control_port_interface(mconfig, *this),
 						m_paddle(*this, "PADDLE"),
@@ -52,7 +52,7 @@ nes_vaus_device::nes_vaus_device(const machine_config &mconfig, device_type type
 				{
 }
 
-nes_vaus_device::nes_vaus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_vaus_device::nes_vaus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 					device_t(mconfig, NES_ARKPADDLE, "NES Arkanoid Vaus Controller", tag, owner, clock, "nes_vaus", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_paddle(*this, "PADDLE"),
@@ -60,7 +60,7 @@ nes_vaus_device::nes_vaus_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-nes_vausfc_device::nes_vausfc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_vausfc_device::nes_vausfc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 					nes_vaus_device(mconfig, NES_ARKPADDLE_FC, "FC Arkanoid Vaus Controller", tag, owner, clock, "nes_vausfc", __FILE__)
 {
 }

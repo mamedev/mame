@@ -53,7 +53,7 @@ mcu_subcmd  = kaneko16_mcu_ram[0x0014/2];    // sub-command parameter, happens o
 
 const device_type KANEKO_TOYBOX = &device_creator<kaneko_toybox_device>;
 
-kaneko_toybox_device::kaneko_toybox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+kaneko_toybox_device::kaneko_toybox_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, KANEKO_TOYBOX, "Kaneko Toybox MCU", tag, owner, clock, "kaneko_toybox", __FILE__),
 		m_mcuram(*this, ":mcuram"),
 		m_gametype(GAME_NORMAL),
@@ -158,7 +158,7 @@ WRITE16_MEMBER(kaneko_toybox_device::mcu_com3_w){ mcu_com_w(offset, data, mem_ma
 */
 READ16_MEMBER(kaneko_toybox_device::mcu_status_r)
 {
-	logerror("CPU %s (PC=%06X) : read MCU status\n", space.device().tag(), space.device().safe_pcbase());
+	logerror("CPU %s (PC=%06X) : read MCU status\n", space.device().tag().c_str(), space.device().safe_pcbase());
 	return 0; // most games test bit 0 for failure
 }
 

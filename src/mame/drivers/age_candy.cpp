@@ -18,7 +18,7 @@ Device is a 27c256   location U3
 class age_candy_state : public driver_device
 {
 public:
-	age_candy_state(const machine_config &mconfig, device_type type, const char *tag)
+	age_candy_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 	//  ,m_maincpu(*this, "maincpu")
 	{ }

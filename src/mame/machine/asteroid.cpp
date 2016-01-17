@@ -100,8 +100,8 @@ WRITE8_MEMBER(asteroid_state::asteroid_bank_switch_w)
 	m_ram1->set_entry(bank);
 	m_ram2->set_entry(bank);
 
-	set_led_status (machine(), 0, ~data & 0x02);
-	set_led_status (machine(), 1, ~data & 0x01);
+	output().set_led_value(0, ~data & 0x02);
+	output().set_led_value(1, ~data & 0x01);
 }
 
 
@@ -114,7 +114,7 @@ WRITE8_MEMBER(asteroid_state::astdelux_bank_switch_w)
 
 WRITE8_MEMBER(asteroid_state::astdelux_led_w)
 {
-	set_led_status(machine(), offset, (data & 0x80) ? 0 : 1);
+	output().set_led_value(offset, (data & 0x80) ? 0 : 1);
 }
 
 void asteroid_state::machine_start()

@@ -58,7 +58,7 @@ Note that left-most digit is not wired up, and therefore will always be blank.
 class acrnsys1_state : public driver_device
 {
 public:
-	acrnsys1_state(const machine_config &mconfig, device_type type, const char *tag)
+	acrnsys1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ttl74145(*this, "ic8_7445"),
@@ -151,7 +151,7 @@ WRITE8_MEMBER( acrnsys1_state::acrnsys1_led_segment_w )
 {
 	UINT8 key_line = m_ttl74145->read();
 
-	output_set_digit_value(key_line, data);
+	output().set_digit_value(key_line, data);
 }
 
 

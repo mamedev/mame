@@ -48,7 +48,7 @@ static const int channel_bits[4] =
 
 const device_type EXIDY440 = &device_creator<exidy440_sound_device>;
 
-exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, EXIDY440, "Exidy 440 CVSD", tag, owner, clock, "exidy440_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_sound_command(0),

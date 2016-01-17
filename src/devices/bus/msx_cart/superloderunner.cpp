@@ -6,7 +6,7 @@
 const device_type MSX_CART_SUPERLODERUNNER = &device_creator<msx_cart_superloderunner>;
 
 
-msx_cart_superloderunner::msx_cart_superloderunner(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_superloderunner::msx_cart_superloderunner(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_SUPERLODERUNNER, "MSX Cartridge - Super Lode Runner", tag, owner, clock, "msx_cart_superloderunner", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_selected_bank(0)

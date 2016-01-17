@@ -22,7 +22,7 @@
 class s11_state : public genpin_class
 {
 public:
-	s11_state(const machine_config &mconfig, device_type type, const char *tag)
+	s11_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_audiocpu(*this, "audiocpu"),
@@ -123,7 +123,7 @@ private:
 class s11a_state : public s11_state
 {
 public:
-	s11a_state(const machine_config &mconfig, device_type type, const char *tag)
+	s11a_state(const machine_config &mconfig, device_type type, std::string tag)
 		: s11_state(mconfig, type, tag)
 	{ }
 
@@ -141,7 +141,7 @@ private:
 class s11b_state : public s11a_state
 {
 public:
-	s11b_state(const machine_config &mconfig, device_type type, const char *tag)
+	s11b_state(const machine_config &mconfig, device_type type, std::string tag)
 		: s11a_state(mconfig, type, tag),
 		m_bg_hc55516(*this, "hc55516_bg")
 
@@ -174,7 +174,7 @@ private:
 class s11c_state : public s11b_state
 {
 public:
-	s11c_state(const machine_config &mconfig, device_type type, const char *tag)
+	s11c_state(const machine_config &mconfig, device_type type, std::string tag)
 		: s11b_state(mconfig, type, tag)
 	{ }
 

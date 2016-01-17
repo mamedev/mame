@@ -66,7 +66,7 @@ class colecovision_cartridge_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	colecovision_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	colecovision_cartridge_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~colecovision_cartridge_slot_device() { }
 
 	// computer interface
@@ -93,7 +93,7 @@ protected:
 	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 
 	device_colecovision_cartridge_interface *m_card;
 };

@@ -101,7 +101,7 @@ const device_type HD61700 = &device_creator<hd61700_cpu_device>;
 //  hd61700_cpu_device - constructor
 //-------------------------------------------------
 
-hd61700_cpu_device::hd61700_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hd61700_cpu_device::hd61700_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, HD61700, "HD61700", tag, owner, clock, "hd61700", __FILE__),
 		m_program_config("program", ENDIANNESS_BIG, 16, 18, -1),
 		m_ppc(0x0000),
@@ -183,8 +183,7 @@ void hd61700_cpu_device::device_start()
 
 	for (int ireg=0; ireg<32; ireg++)
 	{
-		std::string tmpstr;
-		state_add(HD61700_MAINREG + ireg, strformat(tmpstr, "R%d", ireg).c_str(), m_regmain[ireg]).callimport().callexport().formatstr("%02X");
+		state_add(HD61700_MAINREG + ireg, strformat("R%d", ireg).c_str(), m_regmain[ireg]).callimport().callexport().formatstr("%02X");
 	}
 
 	state_add(STATE_GENPC, "curpc", m_curpc).callimport().callexport().formatstr("%8s").noshow();
@@ -271,7 +270,7 @@ void hd61700_cpu_device::state_import(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void hd61700_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void hd61700_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

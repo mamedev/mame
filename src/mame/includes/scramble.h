@@ -8,7 +8,7 @@
 class scramble_state : public galaxold_state
 {
 public:
-	scramble_state(const machine_config &mconfig, device_type type, const char *tag)
+	scramble_state(const machine_config &mconfig, device_type type, std::string tag)
 		: galaxold_state(mconfig, type, tag),
 		m_konami_7474(*this, "konami_7474"),
 		m_ppi8255_0(*this, "ppi8255_0"),

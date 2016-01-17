@@ -37,7 +37,7 @@ extern UINT8 macs_cart_slot;
 class st0016_cpu_device : public z80_device
 {
 public:
-	st0016_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32);
+	st0016_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32);
 
 	DECLARE_WRITE8_MEMBER(st0016_sprite_bank_w);
 	DECLARE_WRITE8_MEMBER(st0016_palette_bank_w);

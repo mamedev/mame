@@ -178,8 +178,8 @@ public:
 	// hack until disk system is made modern!
 	virtual void disk_flip_side() { }
 
-	void prg_alloc(size_t size, const char *tag);
-	void vrom_alloc(size_t size, const char *tag);
+	void prg_alloc(size_t size, std::string tag);
+	void vrom_alloc(size_t size, std::string tag);
 	void prgram_alloc(size_t size);
 	void vram_alloc(size_t size);
 	void battery_alloc(size_t size);
@@ -335,7 +335,7 @@ class nes_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~nes_cart_slot_device();
 
 	// device-level overrides
@@ -363,7 +363,7 @@ public:
 	virtual device_image_partialhash_func get_partial_hash() const override { return &nes_partialhash; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 	const char * get_default_card_ines(UINT8 *ROM, UINT32 len);
 	const char * get_default_card_unif(UINT8 *ROM, UINT32 len);
 	const char * nes_get_slot(int pcb_id);

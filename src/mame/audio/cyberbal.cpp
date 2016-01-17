@@ -52,8 +52,8 @@ READ8_MEMBER(cyberbal_state::sound_6502_stat_r)
 WRITE8_MEMBER(cyberbal_state::sound_bank_select_w)
 {
 	membank("soundbank")->set_base(&m_bank_base[0x1000 * ((data >> 6) & 3)]);
-	coin_counter_w(machine(), 1, (data >> 5) & 1);
-	coin_counter_w(machine(), 0, (data >> 4) & 1);
+	machine().bookkeeping().coin_counter_w(1, (data >> 5) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 4) & 1);
 	m_daccpu->set_input_line(INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 	if (!(data & 0x01)) machine().device("ymsnd")->reset();
 }

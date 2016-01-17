@@ -55,7 +55,7 @@ class upd65031_device : public device_t
 {
 public:
 	// construction/destruction
-	upd65031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd65031_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_kb_rd_callback(device_t &device, _Object object) { return downcast<upd65031_device &>(device).m_read_kb.set_callback(object); }
 	template<class _Object> static devcb_base &set_int_wr_callback(device_t &device, _Object object) { return downcast<upd65031_device &>(device).m_write_int.set_callback(object); }

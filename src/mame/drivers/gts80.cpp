@@ -31,7 +31,7 @@ ToDO:
 class gts80_state : public genpin_class
 {
 public:
-	gts80_state(const machine_config &mconfig, device_type type, const char *tag)
+	gts80_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_r0_sound(*this, "r0sound")
@@ -298,15 +298,15 @@ WRITE8_MEMBER( gts80_state::port2a_w )
 	{
 		case 0x10: // player 1&2
 			if (!BIT(m_segment, 7)) seg2 |= 0x300; // put '1' in the middle
-			output_set_digit_value(data & 15, seg2);
+			output().set_digit_value(data & 15, seg2);
 			break;
 		case 0x20: // player 3&4
 			if (!BIT(m_segment, 7)) seg2 |= 0x300; // put '1' in the middle
-			output_set_digit_value((data & 15)+20, seg2);
+			output().set_digit_value((data & 15)+20, seg2);
 			break;
 		case 0x40: // credits & balls
 			if (!BIT(m_segment, 7)) m_segment = 1; // turn '1' back to normal
-			output_set_digit_value((data & 15)+40, patterns[m_segment & 15]);
+			output().set_digit_value((data & 15)+40, patterns[m_segment & 15]);
 			break;
 	}
 }

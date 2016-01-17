@@ -50,7 +50,7 @@ READ8_MEMBER(gameplan_state::trvquest_question_r)
 
 WRITE_LINE_MEMBER(gameplan_state::trvquest_coin_w)
 {
-	coin_counter_w(machine(), 0, ~state & 1);
+	machine().bookkeeping().coin_counter_w(0, ~state & 1);
 }
 
 WRITE_LINE_MEMBER(gameplan_state::trvquest_misc_w)

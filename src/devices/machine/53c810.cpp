@@ -621,7 +621,7 @@ void lsi53c810_device::add_opcode(UINT8 op, UINT8 mask, opcode_handler_delegate 
 	}
 }
 
-lsi53c810_device::lsi53c810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+lsi53c810_device::lsi53c810_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: legacy_scsi_host_adapter(mconfig, LSI53C810, "53C810 SCSI", tag, owner, clock, "lsi53c810", __FILE__)
 {
 }

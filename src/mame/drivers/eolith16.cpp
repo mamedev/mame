@@ -22,7 +22,7 @@
 class eolith16_state : public eolith_state
 {
 public:
-	eolith16_state(const machine_config &mconfig, device_type type, const char *tag)
+	eolith16_state(const machine_config &mconfig, device_type type, std::string tag)
 		: eolith_state(mconfig, type, tag) { }
 
 	std::unique_ptr<UINT16[]> m_vram;
@@ -45,7 +45,7 @@ public:
 WRITE16_MEMBER(eolith16_state::eeprom_w)
 {
 	m_vbuffer = (data & 0x80) >> 7;
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 
 	m_eepromoutport->write(data, 0xff);
 

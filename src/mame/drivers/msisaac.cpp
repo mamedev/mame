@@ -59,7 +59,7 @@ WRITE8_MEMBER(msisaac_state::flip_screen_w)
 
 WRITE8_MEMBER(msisaac_state::msisaac_coin_counter_w)
 {
-	coin_counter_w(machine(), offset,data);
+	machine().bookkeeping().coin_counter_w(offset,data);
 }
 #endif
 

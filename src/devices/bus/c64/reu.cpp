@@ -58,7 +58,7 @@ machine_config_constructor c64_reu_cartridge_device::device_mconfig_additions() 
 //  c64_reu_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_reu_cartridge_device::c64_reu_cartridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, int jp1, size_t ram_size, const char *shortname, const char *source) :
+c64_reu_cartridge_device::c64_reu_cartridge_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, int jp1, size_t ram_size, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_dmac(*this, MOS8726R1_TAG),
@@ -70,13 +70,13 @@ c64_reu_cartridge_device::c64_reu_cartridge_device(const machine_config &mconfig
 {
 }
 
-c64_reu1700_cartridge_device::c64_reu1700_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c64_reu1700_cartridge_device::c64_reu1700_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: c64_reu_cartridge_device(mconfig, C64_REU1700, "1700 REU", tag, owner, clock, TYPE_1700, 0, 128 * 1024, "c64_1700reu", __FILE__) { }
 
-c64_reu1750_cartridge_device::c64_reu1750_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c64_reu1750_cartridge_device::c64_reu1750_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: c64_reu_cartridge_device(mconfig, C64_REU1750, "1750 REU", tag, owner, clock, TYPE_1750, 1, 256 * 1024, "c64_1750reu", __FILE__) { }
 
-c64_reu1764_cartridge_device::c64_reu1764_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c64_reu1764_cartridge_device::c64_reu1764_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: c64_reu_cartridge_device(mconfig, C64_REU1764, "1764 REU", tag, owner, clock, TYPE_1764, 1, 512 * 1024, "c64_1764reu", __FILE__) { }
 
 

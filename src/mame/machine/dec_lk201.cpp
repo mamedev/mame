@@ -461,7 +461,7 @@ ioport_constructor lk201_device::device_input_ports() const
 //  lk201_device - constructor
 //-------------------------------------------------
 
-lk201_device::lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+lk201_device::lk201_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, LK201, "DEC LK201 keyboard", tag, owner, clock, "lk201", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_maincpu(*this, LK201_CPU_TAG),
@@ -630,10 +630,10 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 			if (((data & 0x80) == 0) && (ports[offset] & 0x80))
 			{
 				// Lower nibble contains the LED values (1 = on, 0 = off)
-				output_set_value("led_wait"   , (led_data & 0x1) == 0);
-				output_set_value("led_compose", (led_data & 0x2) == 0);
-				output_set_value("led_hold"   , (led_data & 0x4) == 0);
-				output_set_value("led_lock"   , (led_data & 0x8) == 0);
+				machine().output().set_value("led_wait"   , (led_data & 0x1) == 0);
+				machine().output().set_value("led_compose", (led_data & 0x2) == 0);
+				machine().output().set_value("led_hold"   , (led_data & 0x4) == 0);
+				machine().output().set_value("led_lock"   , (led_data & 0x8) == 0);
 			}
 #endif
 

@@ -473,57 +473,57 @@ $a00000 checks have been seen on the Final Lap boards.
 /* 68000/6809/63705 Shared memory area - DUAL PORT Memory    */
 /*************************************************************/
 
-static void GollyGhostUpdateLED_c4( int data )
+void namcos2_state::GollyGhostUpdateLED_c4( int data )
 {
-	output_set_value("zip100", data >> 4);
-	output_set_value("zip10", data & 0x0f);
+	output().set_value("zip100", data >> 4);
+	output().set_value("zip10", data & 0x0f);
 }
 
-static void GollyGhostUpdateLED_c6( int data )
+void namcos2_state::GollyGhostUpdateLED_c6( int data )
 {
-	output_set_value("zip1", data >> 4);
-	output_set_value("time10", data & 0x0f);
+	output().set_value("zip1", data >> 4);
+	output().set_value("time10", data & 0x0f);
 }
 
-static void GollyGhostUpdateLED_c8( int data )
+void namcos2_state::GollyGhostUpdateLED_c8( int data )
 {
-	output_set_value("time1", data >> 4);
-	output_set_value("zap100", data & 0x0f);
+	output().set_value("time1", data >> 4);
+	output().set_value("zap100", data & 0x0f);
 }
 
-static void GollyGhostUpdateLED_ca( int data )
+void namcos2_state::GollyGhostUpdateLED_ca( int data )
 {
-	output_set_value("zap10", data >> 4);
-	output_set_value("zap1", data & 0x0f);
+	output().set_value("zap10", data >> 4);
+	output().set_value("zap1", data & 0x0f);
 }
 
-static void GollyGhostUpdateDiorama_c0( int data )
+void namcos2_state::GollyGhostUpdateDiorama_c0( int data )
 {
 	if (data & 0x80)
 	{
-		output_set_value("dollhouse", 1); /* diorama is lit up */
+		output().set_value("dollhouse", 1); /* diorama is lit up */
 
 		/* dollhouse controller; solenoids control physical components */
-		output_set_value("toybox",      (data >> 0) & 1);
-		output_set_value("bathroom",    (data >> 1) & 1);
-		output_set_value("bureau",      (data >> 2) & 1);
-		output_set_value("refrigerator",(data >> 3) & 1);
-		output_set_value("porch",       (data >> 4) & 1);
+		output().set_value("toybox",      (data >> 0) & 1);
+		output().set_value("bathroom",    (data >> 1) & 1);
+		output().set_value("bureau",      (data >> 2) & 1);
+		output().set_value("refrigerator",(data >> 3) & 1);
+		output().set_value("porch",       (data >> 4) & 1);
 		/* gun recoils */
-		output_set_value("Player1_Gun_Recoil",(data & 0x20)>>5);
-		output_set_value("Player2_Gun_Recoil",(data & 0x40)>>6);
+		output().set_value("Player1_Gun_Recoil",(data & 0x20)>>5);
+		output().set_value("Player2_Gun_Recoil",(data & 0x40)>>6);
 
 	}
 	else
 	{
-		output_set_value("dollhouse",0);
-		output_set_value("toybox", 0);
-		output_set_value("bathroom", 0);
-		output_set_value("bureau", 0);
-		output_set_value("refrigerator", 0);
-		output_set_value("porch", 0);
-		output_set_value("Player1_Gun_Recoil",0);
-		output_set_value("Player2_Gun_Recoil",0);
+		output().set_value("dollhouse",0);
+		output().set_value("toybox", 0);
+		output().set_value("bathroom", 0);
+		output().set_value("bureau", 0);
+		output().set_value("refrigerator", 0);
+		output().set_value("porch", 0);
+		output().set_value("Player1_Gun_Recoil",0);
+		output().set_value("Player2_Gun_Recoil",0);
 	}
 }
 

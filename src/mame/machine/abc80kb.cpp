@@ -167,7 +167,7 @@ ioport_constructor abc80_keyboard_device::device_input_ports() const
 //  abc80_keyboard_device - constructor
 //-------------------------------------------------
 
-abc80_keyboard_device::abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+abc80_keyboard_device::abc80_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ABC80_KEYBOARD, "ABC-80 Keyboard", tag, owner, clock, "abc80kb", __FILE__),
 		m_write_keydown(*this),
 		m_maincpu(*this, I8048_TAG)

@@ -54,7 +54,7 @@ const device_type C64H156 = &device_creator<c64h156_device>;
 //  c64h156_device - constructor
 //-------------------------------------------------
 
-c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c64h156_device::c64h156_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64H156, "64H156", tag, owner, clock, "c64h156", __FILE__),
 	m_write_atn(*this),
 	m_write_sync(*this),

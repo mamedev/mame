@@ -11,7 +11,7 @@
 class segasp_state : public naomi_state
 {
 public:
-	segasp_state(const machine_config &mconfig, device_type type, const char *tag)
+	segasp_state(const machine_config &mconfig, device_type type, std::string tag)
 		: naomi_state(mconfig, type, tag),
 		m_sp_eeprom(*this, "sp_eeprom")
 	{   }

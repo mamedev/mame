@@ -54,7 +54,7 @@ enum kr2376_output_pin_t
 class kr2376_device : public device_t
 {
 public:
-	kr2376_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kr2376_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~kr2376_device() {}
 
 	template<class _Object> static devcb_base &set_strobe_wr_callback(device_t &device, _Object object) { return downcast<kr2376_device &>(device).m_write_strobe.set_callback(object); }

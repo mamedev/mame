@@ -62,7 +62,7 @@ WRITE8_MEMBER(shootout_state::flipscreen_w)
 
 WRITE8_MEMBER(shootout_state::coincounter_w)
 {
-	coin_counter_w(machine(), 0, data);
+	machine().bookkeeping().coin_counter_w(0, data);
 }
 
 /*******************************************************************************/

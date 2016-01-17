@@ -190,7 +190,7 @@ class cosmac_device : public cpu_device
 {
 public:
 	// construction/destruction
-	cosmac_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	cosmac_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	template<class _Object> static devcb_base &set_wait_rd_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_read_wait.set_callback(object); }
 	template<class _Object> static devcb_base &set_clear_rd_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_read_clear.set_callback(object); }
@@ -232,7 +232,7 @@ protected:
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override;
@@ -447,7 +447,7 @@ class cdp1801_device : public cosmac_device
 {
 public:
 	// construction/destruction
-	cdp1801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cdp1801_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device_disasm_interface overrides
@@ -465,7 +465,7 @@ class cdp1802_device : public cosmac_device
 {
 public:
 	// construction/destruction
-	cdp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cdp1802_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device_disasm_interface overrides

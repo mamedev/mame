@@ -69,7 +69,7 @@ D.9B         [f99cac4b] /
 class panicr_state : public driver_device
 {
 public:
-	panicr_state(const machine_config &mconfig, device_type type, const char *tag)
+	panicr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_t5182(*this, "t5182"),
@@ -399,8 +399,8 @@ WRITE8_MEMBER(panicr_state::scrollx_hi_w)
 WRITE8_MEMBER(panicr_state::output_w)
 {
 	// d6, d7: play counter? (it only triggers on 1st coin)
-	coin_counter_w(machine(), 0, (data & 0x40) ? 1 : 0);
-	coin_counter_w(machine(), 1, (data & 0x80) ? 1 : 0);
+	machine().bookkeeping().coin_counter_w(0, (data & 0x40) ? 1 : 0);
+	machine().bookkeeping().coin_counter_w(1, (data & 0x80) ? 1 : 0);
 
 	logerror("output_w %02x\n", data);
 

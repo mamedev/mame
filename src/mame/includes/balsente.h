@@ -31,7 +31,7 @@
 class balsente_state : public driver_device
 {
 public:
-	balsente_state(const machine_config &mconfig, device_type type, const char *tag)
+	balsente_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_scanline_timer(*this, "scan_timer"),
 			m_counter_0_timer(*this, "8253_0_timer"),

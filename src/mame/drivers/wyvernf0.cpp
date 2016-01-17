@@ -37,7 +37,7 @@ Actual game video: http://www.nicozon.net/watch/sm10823430
 class wyvernf0_state : public driver_device
 {
 public:
-	wyvernf0_state(const machine_config &mconfig, device_type type, const char *tag)
+	wyvernf0_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_bgram(*this,"bgram"),
 		m_fgram(*this,"fgram"),
@@ -321,8 +321,8 @@ WRITE8_MEMBER(wyvernf0_state::rambank_w)
 	flip_screen_x_set(data & 0x01);
 	flip_screen_y_set(data & 0x02);
 
-	coin_lockout_w(machine(), 0, !(data & 0x40));
-	coin_lockout_w(machine(), 1, !(data & 0x40));
+	machine().bookkeeping().coin_lockout_w(0, !(data & 0x40));
+	machine().bookkeeping().coin_lockout_w(1, !(data & 0x40));
 
 	m_rambank = data;
 	membank("rambank")->set_entry((data & 0x80) ? 1 : 0);

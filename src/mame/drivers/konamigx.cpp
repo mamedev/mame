@@ -475,8 +475,8 @@ WRITE32_MEMBER(konamigx_state::eeprom_w)
 
 		m_eepromout->write(odata, 0xff);
 
-		coin_counter_w(machine(), 0, odata & 0x08);
-		coin_counter_w(machine(), 1, odata & 0x10);
+		machine().bookkeeping().coin_counter_w(0, odata & 0x08);
+		machine().bookkeeping().coin_counter_w(1, odata & 0x10);
 
 		m_gx_wrport1_0 = odata;
 	}
@@ -981,7 +981,7 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 // cabinet lamps for type 1 games
 WRITE32_MEMBER(konamigx_state::type1_cablamps_w)
 {
-	set_led_status(machine(), 0, (data>>24)&1);
+	output().set_led_value(0, (data>>24)&1);
 }
 
 /**********************************************************************************/

@@ -42,9 +42,9 @@ static const char opname[][5] =
 class tms99xx_device : public cpu_device
 {
 public:
-	tms99xx_device(const machine_config &mconfig, device_type type,  const char *name,
-				const char *tag, int databus_width, int prg_addr_bits, int cru_addr_bits,
-				device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	tms99xx_device(const machine_config &mconfig, device_type type, std::string name,
+				std::string tag, int databus_width, int prg_addr_bits, int cru_addr_bits,
+				device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	~tms99xx_device();
 
@@ -224,9 +224,9 @@ private:
 	// State / debug management
 	UINT16  m_state_any;
 	static const char* s_statename[];
-	void    state_import(const device_state_entry &entry) override;
-	void    state_export(const device_state_entry &entry) override;
-	void    state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// Interrupt handling
 	void service_interrupt();
@@ -393,7 +393,7 @@ private:
 class tms9900_device : public tms99xx_device
 {
 public:
-	tms9900_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms9900_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

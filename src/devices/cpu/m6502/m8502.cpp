@@ -13,7 +13,7 @@
 
 const device_type M8502 = &device_creator<m8502_device>;
 
-m8502_device::m8502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+m8502_device::m8502_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	m6510_device(mconfig, M8502, "M8502", tag, owner, clock, "m8502", __FILE__)
 {
 }

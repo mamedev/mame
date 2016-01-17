@@ -320,10 +320,10 @@ WRITE8_MEMBER(galpani2_state::galpani2_mcu_nmi2_w)//driven by CPU2's int5 ISR
 
 WRITE8_MEMBER(galpani2_state::galpani2_coin_lockout_w)
 {
-		coin_counter_w(machine(), 0, data & 0x01);
-		coin_counter_w(machine(), 1, data & 0x02);
-		coin_lockout_w(machine(), 0,~data & 0x04);
-		coin_lockout_w(machine(), 1,~data & 0x08);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
+		machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
+		machine().bookkeeping().coin_lockout_w(1,~data & 0x08);
 		// & 0x10     CARD in lockout?
 		// & 0x20     CARD in lockout?
 		// & 0x40     CARD out
@@ -332,14 +332,14 @@ WRITE8_MEMBER(galpani2_state::galpani2_coin_lockout_w)
 WRITE8_MEMBER(galpani2_state::galpani2_oki1_bank_w)
 {
 	UINT8 *ROM = memregion("oki1")->base();
-	logerror("%s : %s bank %08X\n",machine().describe_context(),tag(),data);
+	logerror("%s : %s bank %08X\n",machine().describe_context(),tag().c_str(),data);
 	memcpy(ROM + 0x30000, ROM + 0x40000 + 0x10000 * (~data & 0xf), 0x10000);
 }
 
 WRITE8_MEMBER(galpani2_state::galpani2_oki2_bank_w)
 {
 	m_oki2->set_bank_base(0x40000 * (data & 0xf) );
-	logerror("%s : %s bank %08X\n",machine().describe_context(),tag(),data);
+	logerror("%s : %s bank %08X\n",machine().describe_context(),tag().c_str(),data);
 }
 
 

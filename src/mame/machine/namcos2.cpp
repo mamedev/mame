@@ -739,7 +739,7 @@ WRITE8_MEMBER( namcos2_shared_state::namcos2_mcu_analog_ctrl_w )
 			m_mcu_analog_data=ioport("AN7")->read();
 			break;
 		default:
-			output_set_value("anunk",data);
+			output().set_value("anunk",data);
 		}
 #if 0
 		/* Perform the offset handling on the input port */

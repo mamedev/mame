@@ -95,7 +95,7 @@
 #define LOG logerror
 #define VERBOSE 1
 
-ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 : ti_expansion_card_device(mconfig, TI99_P_CODE, "TI-99 P-Code Card", tag, owner, clock, "ti99_pcode", __FILE__), m_rom(nullptr), m_bank_select(0), m_switch(false)
 {
 }

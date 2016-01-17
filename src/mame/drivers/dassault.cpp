@@ -241,7 +241,7 @@ READ16_MEMBER(dassault_state::dassault_control_r)
 
 WRITE16_MEMBER(dassault_state::dassault_control_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 	if (data & 0xfffe)
 		logerror("Coin cointrol %04x\n", data);
 }

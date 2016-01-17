@@ -225,7 +225,7 @@ ioport_constructor tandy2k_keyboard_device::device_input_ports() const
 //  tandy2k_keyboard_device - constructor
 //-------------------------------------------------
 
-tandy2k_keyboard_device::tandy2k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tandy2k_keyboard_device::tandy2k_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TANDY2K_KEYBOARD, "Tandy 2000 Keyboard", tag, owner, clock, "tandy2kb", __FILE__),
 		m_maincpu(*this, I8048_TAG),
 		m_y0(*this, "Y0"),
@@ -407,8 +407,8 @@ WRITE8_MEMBER( tandy2k_keyboard_device::kb_p2_w )
 	m_keylatch = ((data & 0x0f) << 8) | (m_keylatch & 0xff);
 
 	// led output
-	output_set_led_value(LED_2, !BIT(data, 4));
-	output_set_led_value(LED_1, !BIT(data, 5));
+	machine().output().set_led_value(LED_2, !BIT(data, 4));
+	machine().output().set_led_value(LED_1, !BIT(data, 5));
 
 	// keyboard clock
 	int clock = BIT(data, 6);

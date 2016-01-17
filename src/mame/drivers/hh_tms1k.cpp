@@ -211,7 +211,7 @@ void hh_tms1k_state::display_update()
 		if (m_display_cache[y] != active_state[y])
 		{
 			if (m_display_segmask[y] != 0)
-				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
+				output().set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
 			for (int x = 0; x <= m_display_maxx; x++)
@@ -231,8 +231,8 @@ void hh_tms1k_state::display_update()
 					sprintf(buf1, "lamp%d", y * mul + x);
 					sprintf(buf2, "%d.%d", y, x);
 				}
-				output_set_value(buf1, state);
-				output_set_value(buf2, state);
+				output().set_value(buf1, state);
+				output().set_value(buf2, state);
 			}
 		}
 
@@ -242,7 +242,7 @@ void hh_tms1k_state::display_update()
 	if (m_power_led != m_power_on)
 	{
 		m_power_led = m_power_on;
-		output_set_value("power_led", m_power_led ? 1 : 0);
+		output().set_value("power_led", m_power_led ? 1 : 0);
 	}
 }
 
@@ -349,7 +349,7 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 class mathmagi_state : public hh_tms1k_state
 {
 public:
-	mathmagi_state(const machine_config &mconfig, device_type type, const char *tag)
+	mathmagi_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -527,7 +527,7 @@ MACHINE_CONFIG_END
 class amaztron_state : public hh_tms1k_state
 {
 public:
-	amaztron_state(const machine_config &mconfig, device_type type, const char *tag)
+	amaztron_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -668,7 +668,7 @@ MACHINE_CONFIG_END
 class h2hbaseb_state : public hh_tms1k_state
 {
 public:
-	h2hbaseb_state(const machine_config &mconfig, device_type type, const char *tag)
+	h2hbaseb_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -806,7 +806,7 @@ MACHINE_CONFIG_END
 class h2hfootb_state : public hh_tms1k_state
 {
 public:
-	h2hfootb_state(const machine_config &mconfig, device_type type, const char *tag)
+	h2hfootb_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -944,7 +944,7 @@ MACHINE_CONFIG_END
 class tc4_state : public hh_tms1k_state
 {
 public:
-	tc4_state(const machine_config &mconfig, device_type type, const char *tag)
+	tc4_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -1099,7 +1099,7 @@ MACHINE_CONFIG_END
 class ebball_state : public hh_tms1k_state
 {
 public:
-	ebball_state(const machine_config &mconfig, device_type type, const char *tag)
+	ebball_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -1230,7 +1230,7 @@ MACHINE_CONFIG_END
 class ebball2_state : public hh_tms1k_state
 {
 public:
-	ebball2_state(const machine_config &mconfig, device_type type, const char *tag)
+	ebball2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -1360,7 +1360,7 @@ MACHINE_CONFIG_END
 class ebball3_state : public hh_tms1k_state
 {
 public:
-	ebball3_state(const machine_config &mconfig, device_type type, const char *tag)
+	ebball3_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -1523,7 +1523,7 @@ MACHINE_CONFIG_END
 class einvader_state : public hh_tms1k_state
 {
 public:
-	einvader_state(const machine_config &mconfig, device_type type, const char *tag)
+	einvader_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -1631,7 +1631,7 @@ MACHINE_CONFIG_END
 class efootb4_state : public hh_tms1k_state
 {
 public:
-	efootb4_state(const machine_config &mconfig, device_type type, const char *tag)
+	efootb4_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -1760,7 +1760,7 @@ MACHINE_CONFIG_END
 class ebaskb2_state : public hh_tms1k_state
 {
 public:
-	ebaskb2_state(const machine_config &mconfig, device_type type, const char *tag)
+	ebaskb2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -1886,7 +1886,7 @@ MACHINE_CONFIG_END
 class raisedvl_state : public hh_tms1k_state
 {
 public:
-	raisedvl_state(const machine_config &mconfig, device_type type, const char *tag)
+	raisedvl_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -2018,7 +2018,7 @@ MACHINE_CONFIG_END
 class gpoker_state : public hh_tms1k_state
 {
 public:
-	gpoker_state(const machine_config &mconfig, device_type type, const char *tag)
+	gpoker_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag),
 		m_beeper(*this, "beeper")
 	{ }
@@ -2163,7 +2163,7 @@ MACHINE_CONFIG_END
 class gjackpot_state : public gpoker_state
 {
 public:
-	gjackpot_state(const machine_config &mconfig, device_type type, const char *tag)
+	gjackpot_state(const machine_config &mconfig, device_type type, std::string tag)
 		: gpoker_state(mconfig, type, tag)
 	{ }
 
@@ -2278,7 +2278,7 @@ MACHINE_CONFIG_END
 class elecdet_state : public hh_tms1k_state
 {
 public:
-	elecdet_state(const machine_config &mconfig, device_type type, const char *tag)
+	elecdet_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -2402,7 +2402,7 @@ MACHINE_CONFIG_END
 class starwbc_state : public hh_tms1k_state
 {
 public:
-	starwbc_state(const machine_config &mconfig, device_type type, const char *tag)
+	starwbc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -2527,7 +2527,7 @@ MACHINE_CONFIG_END
 class astro_state : public hh_tms1k_state
 {
 public:
-	astro_state(const machine_config &mconfig, device_type type, const char *tag)
+	astro_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -2651,7 +2651,7 @@ MACHINE_CONFIG_END
 class mdndclab_state : public hh_tms1k_state
 {
 public:
-	mdndclab_state(const machine_config &mconfig, device_type type, const char *tag)
+	mdndclab_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -2848,7 +2848,7 @@ MACHINE_CONFIG_END
 class comp4_state : public hh_tms1k_state
 {
 public:
-	comp4_state(const machine_config &mconfig, device_type type, const char *tag)
+	comp4_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -2947,7 +2947,7 @@ MACHINE_CONFIG_END
 class simon_state : public hh_tms1k_state
 {
 public:
-	simon_state(const machine_config &mconfig, device_type type, const char *tag)
+	simon_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -3046,7 +3046,7 @@ MACHINE_CONFIG_END
 class ssimon_state : public hh_tms1k_state
 {
 public:
-	ssimon_state(const machine_config &mconfig, device_type type, const char *tag)
+	ssimon_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -3194,7 +3194,7 @@ MACHINE_CONFIG_END
 class bigtrak_state : public hh_tms1k_state
 {
 public:
-	bigtrak_state(const machine_config &mconfig, device_type type, const char *tag)
+	bigtrak_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -3247,11 +3247,11 @@ WRITE16_MEMBER(bigtrak_state::write_o)
 	// O4: right motor reverse
 	// O5: ext out
 	// O6: N/C
-	output_set_value("left_motor_forward", data >> 1 & 1);
-	output_set_value("left_motor_reverse", data >> 2 & 1);
-	output_set_value("right_motor_forward", data >> 3 & 1);
-	output_set_value("right_motor_reverse", data >> 4 & 1);
-	output_set_value("ext_out", data >> 5 & 1);
+	output().set_value("left_motor_forward", data >> 1 & 1);
+	output().set_value("left_motor_reverse", data >> 2 & 1);
+	output().set_value("right_motor_forward", data >> 3 & 1);
+	output().set_value("right_motor_reverse", data >> 4 & 1);
+	output().set_value("ext_out", data >> 5 & 1);
 
 	// O0,O7(,R10)(tied together): speaker out
 	m_speaker->level_w((data & 1) | (data >> 6 & 2) | (m_r >> 8 & 4));
@@ -3373,7 +3373,7 @@ MACHINE_CONFIG_END
 class cnsector_state : public hh_tms1k_state
 {
 public:
-	cnsector_state(const machine_config &mconfig, device_type type, const char *tag)
+	cnsector_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -3506,7 +3506,7 @@ MACHINE_CONFIG_END
 class merlin_state : public hh_tms1k_state
 {
 public:
-	merlin_state(const machine_config &mconfig, device_type type, const char *tag)
+	merlin_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -3625,7 +3625,7 @@ MACHINE_CONFIG_END
 class mmerlin_state : public merlin_state
 {
 public:
-	mmerlin_state(const machine_config &mconfig, device_type type, const char *tag)
+	mmerlin_state(const machine_config &mconfig, device_type type, std::string tag)
 		: merlin_state(mconfig, type, tag)
 	{ }
 };
@@ -3679,7 +3679,7 @@ MACHINE_CONFIG_END
 class stopthief_state : public hh_tms1k_state
 {
 public:
-	stopthief_state(const machine_config &mconfig, device_type type, const char *tag)
+	stopthief_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -3800,7 +3800,7 @@ MACHINE_CONFIG_END
 class bankshot_state : public hh_tms1k_state
 {
 public:
-	bankshot_state(const machine_config &mconfig, device_type type, const char *tag)
+	bankshot_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -3923,7 +3923,7 @@ MACHINE_CONFIG_END
 class splitsec_state : public hh_tms1k_state
 {
 public:
-	splitsec_state(const machine_config &mconfig, device_type type, const char *tag)
+	splitsec_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -4024,7 +4024,7 @@ MACHINE_CONFIG_END
 class tandy12_state : public hh_tms1k_state
 {
 public:
-	tandy12_state(const machine_config &mconfig, device_type type, const char *tag)
+	tandy12_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -4196,7 +4196,7 @@ MACHINE_CONFIG_END
 class tbreakup_state : public hh_tms1k_state
 {
 public:
-	tbreakup_state(const machine_config &mconfig, device_type type, const char *tag)
+	tbreakup_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag),
 		m_expander(*this, "expander")
 	{ }
@@ -4392,7 +4392,7 @@ MACHINE_CONFIG_END
 class phpball_state : public hh_tms1k_state
 {
 public:
-	phpball_state(const machine_config &mconfig, device_type type, const char *tag)
+	phpball_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -4460,7 +4460,7 @@ INPUT_CHANGED_MEMBER(phpball_state::flipper_button)
 {
 	// rectangular LEDs under LEDs D,F and E,G are directly connected
 	// to the left and right flipper buttons - output them to lamp90 and 91
-	output_set_lamp_value(90 + (int)(FPTR)param, newval);
+	output().set_lamp_value(90 + (int)(FPTR)param, newval);
 }
 
 

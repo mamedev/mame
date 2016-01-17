@@ -28,7 +28,7 @@ void ui_menu_pty_info::populate()
 
 	pty_interface_iterator iter(machine().root_device());
 	for (device_pty_interface *pty = iter.first(); pty != nullptr; pty = iter.next()) {
-		const char *port_name = pty->device().owner()->tag() + 1;
+		const char *port_name = pty->device().owner()->tag().c_str() + 1;
 		if (pty->is_open()) {
 			item_append(port_name , pty->slave_name() , MENU_FLAG_DISABLE , nullptr);
 		} else {

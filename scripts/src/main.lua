@@ -44,7 +44,7 @@ end
 	flags {
 		"Unicode",
 	}
-if (_OPTIONS["SOURCES"] == nil) then 
+
 	configuration { "x64", "Release" }
 		targetsuffix "64"
 		if _OPTIONS["PROFILE"] then
@@ -80,7 +80,7 @@ if (_OPTIONS["SOURCES"] == nil) then
 		if _OPTIONS["PROFILE"] then
 			targetsuffix "dp"
 		end
-end
+
 	configuration { "mingw*" or "vs*" }
 		targetextension ".exe"
 

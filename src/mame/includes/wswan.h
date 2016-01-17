@@ -34,7 +34,7 @@ struct SoundDMA
 class wswan_state : public driver_device
 {
 public:
-	wswan_state(const machine_config &mconfig, device_type type, const char *tag)
+	wswan_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_vdp(*this, "vdp"),

@@ -30,7 +30,7 @@
 class bullet_state : public driver_device
 {
 public:
-	bullet_state(const machine_config &mconfig, device_type type, const char *tag)
+	bullet_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_ctc(*this, Z80CTC_TAG),
@@ -131,7 +131,7 @@ public:
 class bulletf_state : public bullet_state
 {
 public:
-	bulletf_state(const machine_config &mconfig, device_type type, const char *tag) :
+	bulletf_state(const machine_config &mconfig, device_type type, std::string tag) :
 		bullet_state(mconfig, type, tag),
 		m_floppy8(*this, MB8877_TAG":8"),
 		m_floppy9(*this, MB8877_TAG":9"),

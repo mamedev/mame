@@ -64,17 +64,18 @@ class nubus_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	nubus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	nubus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	nubus_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nubus_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// device-level overrides
 	virtual void device_start() override;
 
 	// inline configuration
-	static void static_set_nubus_slot(device_t &device, const char *tag, const char *slottag);
+	static void static_set_nubus_slot(device_t &device, std::string tag, std::string slottag);
 protected:
 	// configuration
-	const char *m_nubus_tag, *m_nubus_slottag;
+	std::string m_nubus_tag;
+	std::string m_nubus_slottag;
 };
 
 // device type definition
@@ -87,12 +88,12 @@ class nubus_device : public device_t
 {
 public:
 	// construction/destruction
-	nubus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	nubus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	nubus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nubus_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	~nubus_device() { m_device_list.detach_all(); }
 
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
+	static void static_set_cputag(device_t &device, std::string tag);
 	template<class _Object> static devcb_base &set_out_irq9_callback(device_t &device, _Object object) { return downcast<nubus_device &>(device).m_out_irq9_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_irqa_callback(device_t &device, _Object object) { return downcast<nubus_device &>(device).m_out_irqa_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_irqb_callback(device_t &device, _Object object) { return downcast<nubus_device &>(device).m_out_irqb_cb.set_callback(object); }
@@ -106,7 +107,7 @@ public:
 	void install_device(offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler, UINT32 mask=0xffffffff);
 	void install_readonly_device(offs_t start, offs_t end, read32_delegate rhandler, UINT32 mask=0xffffffff);
 	void install_writeonly_device(offs_t start, offs_t end, write32_delegate whandler, UINT32 mask=0xffffffff);
-	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
+	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, std::string tag, UINT8 *data);
 	void set_irq_line(int slot, int state);
 
 	DECLARE_WRITE_LINE_MEMBER( irq9_w );
@@ -132,7 +133,7 @@ protected:
 	devcb_write_line    m_out_irqe_cb;
 
 	simple_list<device_nubus_card_interface> m_device_list;
-	const char *m_cputag;
+	std::string m_cputag;
 };
 
 
@@ -156,7 +157,7 @@ public:
 
 	// helper functions for card devices
 	void install_declaration_rom(device_t *dev, const char *romregion, bool mirror_all_mb = false, bool reverse_rom = false);
-	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
+	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, std::string tag, UINT8 *data);
 
 	UINT32 get_slotspace() { return 0xf0000000 | (m_slot<<24); }
 	UINT32 get_super_slotspace() { return m_slot<<28; }
@@ -165,10 +166,11 @@ public:
 	void lower_slot_irq() { m_nubus->set_irq_line(m_slot, CLEAR_LINE); }
 
 	// inline configuration
-	static void static_set_nubus_tag(device_t &device, const char *tag, const char *slottag);
+	static void static_set_nubus_tag(device_t &device, std::string tag, std::string slottag);
 public:
 	nubus_device  *m_nubus;
-	const char *m_nubus_tag, *m_nubus_slottag;
+	std::string m_nubus_tag;
+	std::string m_nubus_slottag;
 	int m_slot;
 	device_nubus_card_interface *m_next;
 	dynamic_buffer m_declaration_rom;

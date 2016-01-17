@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 /***************************************************************************
 
@@ -35,7 +35,7 @@ public:
 		TIMER_QUARTER
 	};
 
-	flyball_state(const machine_config &mconfig, device_type type, const char *tag)
+	flyball_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -276,7 +276,7 @@ WRITE8_MEMBER(flyball_state::misc_w)
 	switch (offset)
 	{
 	case 0:
-		set_led_status(machine(), 0, bit);
+		output().set_led_value(0, bit);
 		break;
 	case 1:
 		/* crowd very loud */

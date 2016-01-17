@@ -33,7 +33,7 @@
 class cardline_state : public driver_device
 {
 public:
-	cardline_state(const machine_config &mconfig, device_type type, const char *tag)
+	cardline_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -196,14 +196,14 @@ READ8_MEMBER(cardline_state::hsync_r)
 WRITE8_MEMBER(cardline_state::lamps_w)
 {
 	/* button lamps 1-8 (collect, card 1-5, bet, start) */
-	output_set_lamp_value(5,(data >> 0) & 1);
-	output_set_lamp_value(0,(data >> 1) & 1);
-	output_set_lamp_value(1,(data >> 2) & 1);
-	output_set_lamp_value(2,(data >> 3) & 1);
-	output_set_lamp_value(3,(data >> 4) & 1);
-	output_set_lamp_value(4,(data >> 5) & 1);
-	output_set_lamp_value(6,(data >> 6) & 1);
-	output_set_lamp_value(7,(data >> 7) & 1);
+	output().set_lamp_value(5,(data >> 0) & 1);
+	output().set_lamp_value(0,(data >> 1) & 1);
+	output().set_lamp_value(1,(data >> 2) & 1);
+	output().set_lamp_value(2,(data >> 3) & 1);
+	output().set_lamp_value(3,(data >> 4) & 1);
+	output().set_lamp_value(4,(data >> 5) & 1);
+	output().set_lamp_value(6,(data >> 6) & 1);
+	output().set_lamp_value(7,(data >> 7) & 1);
 }
 
 static ADDRESS_MAP_START( mem_prg, AS_PROGRAM, 8, cardline_state )

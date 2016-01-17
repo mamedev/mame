@@ -292,15 +292,15 @@ WRITE16_MEMBER(bbusters_state::gun_select_w)
 
 WRITE16_MEMBER(bbusters_state::two_gun_output_w)
 {
-	output_set_value("Player1_Gun_Recoil",(data & 0x01));
-	output_set_value("Player2_Gun_Recoil",(data & 0x02)>>1);
+	output().set_value("Player1_Gun_Recoil",(data & 0x01));
+	output().set_value("Player2_Gun_Recoil",(data & 0x02)>>1);
 }
 
 WRITE16_MEMBER(bbusters_state::three_gun_output_w)
 {
-	output_set_value("Player1_Gun_Recoil",(data & 0x01));
-	output_set_value("Player2_Gun_Recoil",(data & 0x02)>>1);
-	output_set_value("Player3_Gun_Recoil",(data & 0x04)>>2);
+	output().set_value("Player1_Gun_Recoil",(data & 0x01));
+	output().set_value("Player2_Gun_Recoil",(data & 0x02)>>1);
+	output().set_value("Player3_Gun_Recoil",(data & 0x04)>>2);
 }
 
 READ16_MEMBER(bbusters_state::kludge_r)

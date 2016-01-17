@@ -41,7 +41,7 @@ static int cCpuAscending(const void* a, const void* b)
 {
 	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
 	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return strcmp(left->debugInterface()->device().tag(), right->debugInterface()->device().tag());
+	return left->debugInterface()->device().tag() != right->debugInterface()->device().tag();
 }
 
 static int cCpuDescending(const void* a, const void* b)
@@ -155,7 +155,7 @@ void debug_view_watchpoints::enumerate_sources()
 	for (device_disasm_interface *dasm = iter.first(); dasm != nullptr; dasm = iter.next())
 	{
 		std::string name;
-		strprintf(name, "%s '%s'", dasm->device().name(), dasm->device().tag());
+		strprintf(name, "%s '%s'", dasm->device().name().c_str(), dasm->device().tag().c_str());
 		m_source_list.append(*global_alloc(debug_view_source(name.c_str(), &dasm->device())));
 	}
 

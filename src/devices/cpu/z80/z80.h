@@ -39,7 +39,7 @@ enum
 class z80_device : public cpu_device
 {
 public:
-	z80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_line );
 
@@ -48,7 +48,7 @@ public:
 	template<class _Object> static devcb_base &set_refresh_cb(device_t &device, _Object object) { return downcast<z80_device &>(device).m_refresh_cb.set_callback(object); }
 
 protected:
-	z80_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	z80_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -68,7 +68,7 @@ protected:
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
@@ -298,7 +298,7 @@ extern const device_type Z80;
 class nsc800_device : public z80_device
 {
 public:
-	nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nsc800_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

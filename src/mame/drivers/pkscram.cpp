@@ -22,7 +22,7 @@ driver by David Haywood and few bits by Pierpaolo Prazzoli
 class pkscram_state : public driver_device
 {
 public:
-	pkscram_state(const machine_config &mconfig, device_type type, const char *tag)
+	pkscram_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_pkscramble_fgtilemap_ram(*this, "fgtilemap_ram"),
 		m_pkscramble_mdtilemap_ram(*this, "mdtilemap_ram"),
@@ -111,7 +111,7 @@ WRITE16_MEMBER(pkscram_state::pkscramble_output_w)
 		m_interrupt_line_active = 0;
 	}
 
-	coin_counter_w(machine(), 0, data & 0x80);
+	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 }
 
 static ADDRESS_MAP_START( pkscramble_map, AS_PROGRAM, 16, pkscram_state )

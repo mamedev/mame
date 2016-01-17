@@ -509,7 +509,7 @@ static void check_osd_inputs(running_machine &machine)
 	sdl_window_info *window = sdlinput_get_focus_window();
 
 	// check for toggling fullscreen mode
-	if (ui_input_pressed(machine, IPT_OSD_1))
+	if (machine.ui_input().pressed(IPT_OSD_1))
 	{
 		sdl_window_info *curwin = sdl_window_list;
 
@@ -520,14 +520,14 @@ static void check_osd_inputs(running_machine &machine)
 		}
 	}
 
-	if (ui_input_pressed(machine, IPT_OSD_2))
+	if (machine.ui_input().pressed(IPT_OSD_2))
 	{
 		//FIXME: on a per window basis
 		video_config.fullstretch = !video_config.fullstretch;
 		machine.ui().popup_time(1, "Uneven stretch %s", video_config.fullstretch? "enabled":"disabled");
 	}
 
-	if (ui_input_pressed(machine, IPT_OSD_4))
+	if (machine.ui_input().pressed(IPT_OSD_4))
 	{
 		//FIXME: on a per window basis
 		video_config.keepaspect = !video_config.keepaspect;
@@ -536,17 +536,17 @@ static void check_osd_inputs(running_machine &machine)
 
 	#if (USE_OPENGL || SDLMAME_SDL2)
 		//FIXME: on a per window basis
-		if (ui_input_pressed(machine, IPT_OSD_5))
+		if (machine.ui_input().pressed(IPT_OSD_5))
 		{
 			video_config.filter = !video_config.filter;
 			machine.ui().popup_time(1, "Filter %s", video_config.filter? "enabled":"disabled");
 		}
 	#endif
 
-	if (ui_input_pressed(machine, IPT_OSD_6))
+	if (machine.ui_input().pressed(IPT_OSD_6))
 		window->modify_prescale(-1);
 
-	if (ui_input_pressed(machine, IPT_OSD_7))
+	if (machine.ui_input().pressed(IPT_OSD_7))
 		window->modify_prescale(1);
 }
 

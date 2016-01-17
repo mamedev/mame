@@ -20,7 +20,7 @@ Platform also used by Lowen? (at least some of their sets use the same address l
 class astrafr_state : public driver_device
 {
 public:
-	astrafr_state(const machine_config &mconfig, device_type type, const char *tag)
+	astrafr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_slavecpu(*this, "slavecpu")

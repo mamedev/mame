@@ -49,7 +49,7 @@ device_vcs_cart_interface::~device_vcs_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_vcs_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_vcs_cart_interface::rom_alloc(UINT32 size, std::string tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -77,7 +77,7 @@ void device_vcs_cart_interface::ram_alloc(UINT32 size)
 //-------------------------------------------------
 //  vcs_cart_slot_device - constructor
 //-------------------------------------------------
-vcs_cart_slot_device::vcs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+vcs_cart_slot_device::vcs_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, VCS_CART_SLOT, "Atari VCS 2600 Cartridge Slot", tag, owner, clock, "vcs_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this), m_cart(nullptr), m_type(0)
@@ -333,7 +333,7 @@ void vcs_cart_slot_device::call_unload()
 
 bool vcs_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry );
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
@@ -781,7 +781,7 @@ int vcs_cart_slot_device::identify_cart_type(UINT8 *ROM, UINT32 len)
  get default card software
  -------------------------------------------------*/
 
-void vcs_cart_slot_device::get_default_card_software(std::string &result)
+std::string vcs_cart_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -797,10 +797,10 @@ void vcs_cart_slot_device::get_default_card_software(std::string &result)
 
 		clear();
 
-		result.assign(slot_string);
+		return std::string(slot_string);
 	}
 	else
-		software_get_default_slot(result, "a26_4k");
+		return software_get_default_slot("a26_4k");
 }
 
 

@@ -283,10 +283,10 @@ WRITE16_MEMBER(taitof2_state::growl_coin_word_w)/* what about coins 3&4 ?? */
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_lockout_w(machine(), 0, ~data & 0x01);
-		coin_lockout_w(machine(), 1, ~data & 0x02);
-		coin_counter_w(machine(), 0,  data & 0x04);
-		coin_counter_w(machine(), 1,  data & 0x08);
+		machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+		machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+		machine().bookkeeping().coin_counter_w(0,  data & 0x04);
+		machine().bookkeeping().coin_counter_w(1,  data & 0x08);
 	}
 }
 
@@ -294,14 +294,14 @@ WRITE16_MEMBER(taitof2_state::taitof2_4p_coin_word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_lockout_w(machine(), 0, ~data & 0x01);
-		coin_lockout_w(machine(), 1, ~data & 0x02);
-		coin_lockout_w(machine(), 2, ~data & 0x04);
-		coin_lockout_w(machine(), 3, ~data & 0x08);
-		coin_counter_w(machine(), 0,  data & 0x10);
-		coin_counter_w(machine(), 1,  data & 0x20);
-		coin_counter_w(machine(), 2,  data & 0x40);
-		coin_counter_w(machine(), 3,  data & 0x80);
+		machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+		machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+		machine().bookkeeping().coin_lockout_w(2, ~data & 0x04);
+		machine().bookkeeping().coin_lockout_w(3, ~data & 0x08);
+		machine().bookkeeping().coin_counter_w(0,  data & 0x10);
+		machine().bookkeeping().coin_counter_w(1,  data & 0x20);
+		machine().bookkeeping().coin_counter_w(2,  data & 0x40);
+		machine().bookkeeping().coin_counter_w(3,  data & 0x80);
 	}
 }
 
@@ -309,14 +309,14 @@ WRITE16_MEMBER(taitof2_state::ninjak_coin_word_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_lockout_w(machine(), 0, ~data & 0x0100);
-		coin_lockout_w(machine(), 1, ~data & 0x0200);
-		coin_lockout_w(machine(), 2, ~data & 0x0400);
-		coin_lockout_w(machine(), 3, ~data & 0x0800);
-		coin_counter_w(machine(), 0,  data & 0x1000);
-		coin_counter_w(machine(), 1,  data & 0x2000);
-		coin_counter_w(machine(), 2,  data & 0x4000);
-		coin_counter_w(machine(), 3,  data & 0x8000);
+		machine().bookkeeping().coin_lockout_w(0, ~data & 0x0100);
+		machine().bookkeeping().coin_lockout_w(1, ~data & 0x0200);
+		machine().bookkeeping().coin_lockout_w(2, ~data & 0x0400);
+		machine().bookkeeping().coin_lockout_w(3, ~data & 0x0800);
+		machine().bookkeeping().coin_counter_w(0,  data & 0x1000);
+		machine().bookkeeping().coin_counter_w(1,  data & 0x2000);
+		machine().bookkeeping().coin_counter_w(2,  data & 0x4000);
+		machine().bookkeeping().coin_counter_w(3,  data & 0x8000);
 	}
 }
 

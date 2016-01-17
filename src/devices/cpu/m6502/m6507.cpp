@@ -13,7 +13,7 @@
 
 const device_type M6507 = &device_creator<m6507_device>;
 
-m6507_device::m6507_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+m6507_device::m6507_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	m6502_device(mconfig, M6507, "M6507", tag, owner, clock, "m6507", __FILE__)
 {
 	program_config.m_addrbus_width = 13;

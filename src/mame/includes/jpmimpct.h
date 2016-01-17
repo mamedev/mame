@@ -59,7 +59,7 @@ struct bt477_t
 class jpmimpct_state : public driver_device
 {
 public:
-	jpmimpct_state(const machine_config &mconfig, device_type type, const char *tag)
+	jpmimpct_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_vfd(*this, "vfd"),
 			m_vram(*this, "vram") ,

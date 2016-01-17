@@ -175,13 +175,13 @@ void stm95_eeprom_device::set_sck_line(int state)
 const device_type MD_EEPROM_STM95 = &device_creator<md_eeprom_stm95_device>;
 
 
-md_eeprom_stm95_device::md_eeprom_stm95_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+md_eeprom_stm95_device::md_eeprom_stm95_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_md_cart_interface( mconfig, *this ), m_rdcnt(0)
 				{
 }
 
-md_eeprom_stm95_device::md_eeprom_stm95_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+md_eeprom_stm95_device::md_eeprom_stm95_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, MD_EEPROM_STM95, "MD Cart + EEPROM STM95", tag, owner, clock, "md_eeprom_stm95", __FILE__),
 					device_md_cart_interface( mconfig, *this ), m_rdcnt(0)
 				{

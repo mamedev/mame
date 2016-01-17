@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 #include "machine/mb14241.h"
 
@@ -10,7 +10,7 @@ public:
 		TIMER_INTERRUPT
 	};
 
-	fgoal_state(const machine_config &mconfig, device_type type, const char *tag)
+	fgoal_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mb14241(*this, "mb14241"),

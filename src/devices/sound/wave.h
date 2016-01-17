@@ -16,7 +16,7 @@ class wave_device : public device_t,
 									public device_sound_interface
 {
 public:
-	wave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wave_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void static_set_cassette_tag(device_t &device, const char *cassette_tag);
 

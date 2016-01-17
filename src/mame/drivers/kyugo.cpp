@@ -135,7 +135,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(kyugo_state::kyugo_coin_counter_w)
 {
-	coin_counter_w(machine(), offset, data & 1);
+	machine().bookkeeping().coin_counter_w(offset, data & 1);
 }
 
 static ADDRESS_MAP_START( gyrodine_sub_portmap, AS_IO, 8, kyugo_state )

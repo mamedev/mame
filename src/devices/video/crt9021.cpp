@@ -60,7 +60,7 @@ const device_type CRT9021 = &device_creator<crt9021_t>;
 //  crt9021_t - constructor
 //-------------------------------------------------
 
-crt9021_t::crt9021_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+crt9021_t::crt9021_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CRT9021, "SMC CRT9021", tag, owner, clock, "crt9021", __FILE__),
 	device_video_interface(mconfig, *this),
 	m_data(0),
@@ -131,7 +131,7 @@ void crt9021_t::device_start()
 
 WRITE_LINE_MEMBER( crt9021_t::ld_sh_w )
 {
-	if (LOG) logerror("CRT9021 '%s' LD/SH: %u\n", tag(), state);
+	if (LOG) logerror("CRT9021 '%s' LD/SH: %u\n", tag().c_str(), state);
 
 	if (!m_ld_sh && state)
 	{
@@ -171,7 +171,7 @@ WRITE_LINE_MEMBER( crt9021_t::ld_sh_w )
 
 WRITE_LINE_MEMBER( crt9021_t::vsync_w )
 {
-	if (LOG) logerror("CRT9021 '%s' VSYNC: %u\n", tag(), state);
+	if (LOG) logerror("CRT9021 '%s' VSYNC: %u\n", tag().c_str(), state);
 }
 
 

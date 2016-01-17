@@ -20,7 +20,7 @@
 const device_type A78_HISCORE = &device_creator<a78_hiscore_device>;
 
 
-a78_hiscore_device::a78_hiscore_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+a78_hiscore_device::a78_hiscore_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: a78_rom_device(mconfig, A78_HISCORE, "Atari 7800 High Score Cart", tag, owner, clock, "a78_highscore", __FILE__),
 						m_hscslot(*this, "hsc_slot")
 {

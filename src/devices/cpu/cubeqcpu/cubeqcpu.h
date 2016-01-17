@@ -140,11 +140,11 @@ class cquestsnd_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	cquestsnd_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cquestsnd_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_dac_w(device_t &device, _Object object) { return downcast<cquestsnd_cpu_device &>(device).m_dac_w.set_callback(object); }
-	static void set_sound_region(device_t &device, const char *tag) { downcast<cquestsnd_cpu_device &>(device).m_sound_region_tag = tag; }
+	static void set_sound_region(device_t &device, std::string tag) { downcast<cquestsnd_cpu_device &>(device).m_sound_region_tag = tag; }
 
 	DECLARE_WRITE16_MEMBER(sndram_w);
 	DECLARE_READ16_MEMBER(sndram_r);
@@ -193,7 +193,7 @@ private:
 	int m_prev_ipwrt;
 
 	devcb_write16 m_dac_w;
-	const char *m_sound_region_tag;
+	std::string m_sound_region_tag;
 	UINT16 *m_sound_data;
 
 	address_space *m_program;
@@ -208,7 +208,7 @@ class cquestrot_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	cquestrot_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cquestrot_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_linedata_w(device_t &device, _Object object) { return downcast<cquestrot_cpu_device &>(device).m_linedata_w.set_callback(object); }
@@ -232,7 +232,7 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 8; }
@@ -290,7 +290,7 @@ class cquestlin_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	cquestlin_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cquestlin_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_linedata_r(device_t &device, _Object object) { return downcast<cquestlin_cpu_device &>(device).m_linedata_r.set_callback(object); }
@@ -316,7 +316,7 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 8; }

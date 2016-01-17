@@ -99,8 +99,8 @@ class mc6845_device :   public device_t,
 
 public:
 	// construction/destruction
-	mc6845_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	mc6845_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	mc6845_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mc6845_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	static void set_show_border_area(device_t &device, bool show) { downcast<mc6845_device &>(device).m_show_border_area = show; }
 	static void set_visarea_adjust(device_t &device, int min_x, int max_x, int min_y, int max_y)
@@ -329,7 +329,7 @@ protected:
 class mc6845_1_device : public mc6845_device
 {
 public:
-	mc6845_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc6845_1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -339,7 +339,7 @@ protected:
 class r6545_1_device : public mc6845_device
 {
 public:
-	r6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	r6545_1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -349,7 +349,7 @@ protected:
 class c6545_1_device : public mc6845_device
 {
 public:
-	c6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c6545_1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -359,7 +359,7 @@ protected:
 class h46505_device : public mc6845_device
 {
 public:
-	h46505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h46505_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -369,7 +369,7 @@ protected:
 class hd6845_device : public mc6845_device
 {
 public:
-	hd6845_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd6845_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -379,7 +379,7 @@ protected:
 class sy6545_1_device : public mc6845_device
 {
 public:
-	sy6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sy6545_1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -389,7 +389,7 @@ protected:
 class sy6845e_device : public mc6845_device
 {
 public:
-	sy6845e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sy6845e_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -399,7 +399,7 @@ protected:
 class hd6345_device : public mc6845_device
 {
 public:
-	hd6345_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd6345_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -409,7 +409,7 @@ protected:
 class ams40041_device : public mc6845_device
 {
 public:
-	ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ams40041_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -419,7 +419,7 @@ protected:
 class ams40489_device : public mc6845_device
 {
 public:
-	ams40489_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ams40489_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -430,8 +430,8 @@ class mos8563_device : public mc6845_device,
 						public device_memory_interface
 {
 public:
-	mos8563_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos8563_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	mos8563_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
@@ -493,7 +493,7 @@ protected:
 class mos8568_device : public mos8563_device
 {
 public:
-	mos8568_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos8568_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

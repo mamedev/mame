@@ -72,7 +72,7 @@
 class pengo_state : public pacman_state
 {
 public:
-	pengo_state(const machine_config &mconfig, device_type type, const char *tag)
+	pengo_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pacman_state(mconfig, type, tag), m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 	DECLARE_WRITE8_MEMBER(pengo_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
@@ -115,7 +115,7 @@ public:
 
 WRITE8_MEMBER(pengo_state::pengo_coin_counter_w)
 {
-	coin_counter_w(machine(), offset, data & 1);
+	machine().bookkeeping().coin_counter_w(offset, data & 1);
 }
 
 WRITE8_MEMBER(pengo_state::irq_mask_w)

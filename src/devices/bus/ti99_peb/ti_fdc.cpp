@@ -47,7 +47,7 @@
 
 #define TI_FDC_TAG "ti_dssd_controller"
 
-ti_fdc_device::ti_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti_fdc_device::ti_fdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 			: ti_expansion_card_device(mconfig, TI99_FDC, "TI-99 Standard DSSD Floppy Controller", tag, owner, clock, "ti99_fdc", __FILE__), m_address(0), m_DRQ(), m_IRQ(),
 	m_lastval(0), m_DVENA(), m_inDsrArea(false), m_WAITena(false), m_WDsel(false), m_DSEL(0), m_SIDSEL(), m_motor_on_timer(nullptr),
 			m_fd1771(*this, FDC_TAG), m_dsrrom(nullptr), m_current_floppy(nullptr), m_debug_dataout(false)
@@ -379,7 +379,7 @@ void ti_fdc_device::device_reset()
 	for (int i=0; i < 3; i++)
 	{
 		if (m_floppy[i] != nullptr)
-			logerror("tifdc: Connector %d with %s\n", i, m_floppy[i]->name());
+			logerror("tifdc: Connector %d with %s\n", i, m_floppy[i]->name().c_str());
 		else
 			logerror("tifdc: No floppy attached to connector %d\n", i);
 	}

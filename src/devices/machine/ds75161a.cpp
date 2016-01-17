@@ -26,7 +26,7 @@ const device_type DS75161A = &device_creator<ds75161a_device>;
 //  ds75161a_device - constructor
 //-------------------------------------------------
 
-ds75161a_device::ds75161a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ds75161a_device::ds75161a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DS75161A, "DS75161A", tag, owner, clock, "ds75161a", __FILE__),
 		m_in_ren_cb(*this),
 		m_in_ifc_cb(*this),

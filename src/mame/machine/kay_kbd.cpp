@@ -287,8 +287,8 @@ MACHINE_RESET_MEMBER(kaypro_state,kay_kbd)
 	kay_kbd_t *kbd = m_kbd = auto_alloc_clear(machine(), <kay_kbd_t>());
 
 	/* disable CapsLock LED initially */
-	set_led_status(machine(), 1, 1);
-	set_led_status(machine(), 1, 0);
+	output().set_led_value(1, 1);
+	output().set_led_value(1, 0);
 	kbd->beeper = machine().device<beep_device>("beeper");
 	kbd->beep_on = 1;
 	kbd->control_status = 0x14;
@@ -344,7 +344,7 @@ INTERRUPT_GEN_MEMBER(kaypro_state::kay_kbd_interrupt)
 		kbd->lastrow = row;
 		/* CapsLock LED */
 		if( row == 3 && chg == 0x80 )
-			set_led_status(machine(), 1, (kbd->keyrows[3] & 0x80) ? 0 : 1);
+			output().set_led_value(1, (kbd->keyrows[3] & 0x80) ? 0 : 1);
 
 		if (newval & chg)   /* key(s) pressed ? */
 		{

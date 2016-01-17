@@ -157,8 +157,8 @@ READ8_MEMBER(atetris_state::slapstic_r)
 
 WRITE8_MEMBER(atetris_state::coincount_w)
 {
-	coin_counter_w(machine(), 0, (data >> 5) & 1);
-	coin_counter_w(machine(), 1, (data >> 4) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 1);
+	machine().bookkeeping().coin_counter_w(1, (data >> 4) & 1);
 }
 
 

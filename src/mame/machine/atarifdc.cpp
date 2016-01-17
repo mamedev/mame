@@ -754,7 +754,7 @@ legacy_floppy_image_device *atari_fdc_device::atari_floppy_get_device_child(int 
 
 const device_type ATARI_FDC = &device_creator<atari_fdc_device>;
 
-atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atari_fdc_device::atari_fdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ATARI_FDC, "Atari FDC", tag, owner, clock, "atari_fdc", __FILE__),
 	m_serout_count(0),
 	m_serout_offs(0),

@@ -61,7 +61,7 @@
 class binbug_state : public driver_device
 {
 public:
-	binbug_state(const machine_config &mconfig, device_type type, const char *tag)
+	binbug_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_rs232(*this, KEYBOARD_TAG),
 		m_cass(*this, "cassette"),
@@ -408,7 +408,7 @@ ToDo:
 class dg680_state : public binbug_state
 {
 public:
-	dg680_state(const machine_config &mconfig, device_type type, const char *tag)
+	dg680_state(const machine_config &mconfig, device_type type, std::string tag)
 		: binbug_state(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_ctc(*this, "z80ctc"),

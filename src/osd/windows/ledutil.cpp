@@ -398,7 +398,7 @@ static LRESULT handle_copydata(WPARAM wparam, LPARAM lparam)
 	strcpy(string, data->string);
 	idmaplist = entry;
 
-	DEBUG_PRINTF(("  id %d = '%s'\n", entry->id, entry->name));
+	DEBUG_PRINTF(("  id %d = '%s'\n", (int)entry->id, entry->name));
 
 	return 0;
 }

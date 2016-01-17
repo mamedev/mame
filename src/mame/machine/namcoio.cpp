@@ -122,7 +122,7 @@ const device_type NAMCO56XX = &device_creator<namco56xx_device>;
 const device_type NAMCO58XX = &device_creator<namco58xx_device>;
 const device_type NAMCO59XX = &device_creator<namco59xx_device>;
 
-namcoio_device::namcoio_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+namcoio_device::namcoio_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 		m_in_0_cb(*this),
 		m_in_1_cb(*this),
@@ -133,19 +133,19 @@ namcoio_device::namcoio_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-namco56xx_device::namco56xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+namco56xx_device::namco56xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: namcoio_device(mconfig, NAMCO56XX, "Namco 56xx", tag, owner, clock, "56xx")
 {
 	m_device_type = TYPE_NAMCO56XX;
 }
 
-namco58xx_device::namco58xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+namco58xx_device::namco58xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: namcoio_device(mconfig, NAMCO58XX, "Namco 58xx", tag, owner, clock, "58xx")
 {
 	m_device_type = TYPE_NAMCO58XX;
 }
 
-namco59xx_device::namco59xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+namco59xx_device::namco59xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: namcoio_device(mconfig, NAMCO59XX, "Namco 59xx", tag, owner, clock, "59xx")
 {
 	m_device_type = TYPE_NAMCO59XX;

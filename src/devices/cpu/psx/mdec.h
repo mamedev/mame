@@ -24,7 +24,7 @@ extern const device_type PSX_MDEC;
 class psxmdec_device : public device_t
 {
 public:
-	psxmdec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	psxmdec_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );

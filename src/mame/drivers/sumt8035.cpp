@@ -19,7 +19,7 @@ hardware. We don't have the ROMs for that though.
 class sumt8035_state : public driver_device
 {
 public:
-	sumt8035_state(const machine_config &mconfig, device_type type, const char *tag)
+	sumt8035_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }

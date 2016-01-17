@@ -36,7 +36,7 @@ machine_config_constructor cpc_doubler_device::device_mconfig_additions() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_doubler_device::cpc_doubler_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cpc_doubler_device::cpc_doubler_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CPC_DOUBLER, "Draysoft Doubler", tag, owner, clock, "cpc_doubler", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_tape(*this,"doubler_tape")

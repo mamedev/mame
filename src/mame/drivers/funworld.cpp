@@ -1015,17 +1015,17 @@ WRITE8_MEMBER(funworld_state::funworld_lamp_a_w)
     -x-- ----   Hopper Motor (inverted).
     x--- ----   HOLD4 lamp.
 */
-	output_set_lamp_value(0, 1-((data >> 1) & 1));  /* Hold1 (inverted) */
-	output_set_lamp_value(2, 1-((data >> 1) & 1));  /* Hold3 (inverted, see pinouts) */
+	output().set_lamp_value(0, 1-((data >> 1) & 1));  /* Hold1 (inverted) */
+	output().set_lamp_value(2, 1-((data >> 1) & 1));  /* Hold3 (inverted, see pinouts) */
 
-	output_set_lamp_value(1, 1-((data >> 3) & 1));  /* Hold2 / Low (inverted) */
-	output_set_lamp_value(3, (data >> 7) & 1);      /* Hold4 / High */
-	output_set_lamp_value(5, 1-((data >> 5) & 1));  /* Cancel / Collect (inverted) */
+	output().set_lamp_value(1, 1-((data >> 3) & 1));  /* Hold2 / Low (inverted) */
+	output().set_lamp_value(3, (data >> 7) & 1);      /* Hold4 / High */
+	output().set_lamp_value(5, 1-((data >> 5) & 1));  /* Cancel / Collect (inverted) */
 
-	coin_counter_w(machine(), 0, data & 0x01);  /* Credit In counter */
-	coin_counter_w(machine(), 7, data & 0x04);  /* Credit Out counter, mapped as coin 8 */
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);  /* Credit In counter */
+	machine().bookkeeping().coin_counter_w(7, data & 0x04);  /* Credit Out counter, mapped as coin 8 */
 
-	output_set_lamp_value(7, 1-((data >> 6) & 1));      /* Hopper Motor (inverted) */
+	output().set_lamp_value(7, 1-((data >> 6) & 1));      /* Hopper Motor (inverted) */
 
 //  popmessage("Lamps A: %02X", (data ^ 0xff));
 }
@@ -1039,8 +1039,8 @@ WRITE8_MEMBER(funworld_state::funworld_lamp_b_w)
     ---- -x--   Unknown (inverted).
     xxxx x---   Unknown.
 */
-	output_set_lamp_value(4, (data >> 0) & 1);      /* Hold5 / Bet */
-	output_set_lamp_value(6, (data >> 1) & 1);      /* Start / Deal / Draw */
+	output().set_lamp_value(4, (data >> 0) & 1);      /* Hold5 / Bet */
+	output().set_lamp_value(6, (data >> 1) & 1);      /* Start / Deal / Draw */
 
 //  popmessage("Lamps B: %02X", data);
 }

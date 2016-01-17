@@ -202,10 +202,10 @@ WRITE8_MEMBER( segas18_state::misc_outputs_w )
 	m_sprites->set_flip(data & 0x20);
 	// These are correct according to cgfm's docs, but mwalker and ddcrew both
 	// enable the lockout and never turn it off
-	// coin_lockout_w(machine(), 1, data & 0x08);
-	// coin_lockout_w(machine(), 0, data & 0x04);
-	coin_counter_w(machine(), 1, data & 0x02);
-	coin_counter_w(machine(), 0, data & 0x01);
+	// machine().bookkeeping().coin_lockout_w(1, data & 0x08);
+	// machine().bookkeeping().coin_lockout_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
 
@@ -418,9 +418,9 @@ WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
 
 WRITE8_MEMBER( segas18_state::lghost_gun_recoil_w )
 {
-	output_set_value("P1_Gun_Recoil", (~data & 0x01));
-	output_set_value("P2_Gun_Recoil", (~data & 0x02)>>1);
-	output_set_value("P3_Gun_Recoil", (~data & 0x04)>>2);
+	output().set_value("P1_Gun_Recoil", (~data & 0x01));
+	output().set_value("P2_Gun_Recoil", (~data & 0x02)>>1);
+	output().set_value("P3_Gun_Recoil", (~data & 0x04)>>2);
 }
 
 

@@ -79,12 +79,12 @@ bool sha1_t::from_string(const char *string, int length)
 //  as_string - convert to a string
 //-------------------------------------------------
 
-const char *sha1_t::as_string(std::string &buffer) const
+std::string sha1_t::as_string() const
 {
-	buffer.clear();
+	std::string buffer;
 	for (auto & elem : m_raw)
 		strcatprintf(buffer, "%02x", elem);
-	return buffer.c_str();
+	return buffer;
 }
 
 
@@ -122,12 +122,12 @@ bool md5_t::from_string(const char *string, int length)
 //  as_string - convert to a string
 //-------------------------------------------------
 
-const char *md5_t::as_string(std::string &buffer) const
+std::string md5_t::as_string() const
 {
-	buffer.clear();
+	std::string buffer;
 	for (auto & elem : m_raw)
 		strcatprintf(buffer, "%02x", elem);
-	return buffer.c_str();
+	return buffer;
 }
 
 
@@ -166,10 +166,9 @@ bool crc32_t::from_string(const char *string, int length)
 //  as_string - convert to a string
 //-------------------------------------------------
 
-const char *crc32_t::as_string(std::string &buffer) const
+std::string crc32_t::as_string() const
 {
-	strprintf(buffer, "%08x", m_raw);
-	return buffer.c_str();
+	return strformat("%08x", m_raw);
 }
 
 
@@ -215,21 +214,18 @@ bool crc16_t::from_string(const char *string, int length)
 }
 
 /**
- * @fn  const char *crc16_t::as_string(std::string &buffer) const
+ * @fn  std::string crc16_t::as_string() const
  *
  * @brief   -------------------------------------------------
  *            as_string - convert to a string
  *          -------------------------------------------------.
  *
- * @param [in,out]  buffer  The buffer.
- *
- * @return  null if it fails, else a char*.
+ * @return  a std::string.
  */
 
-const char *crc16_t::as_string(std::string &buffer) const
+std::string crc16_t::as_string() const
 {
-	strprintf(buffer, "%04x", m_raw);
-	return buffer.c_str();
+	return strformat("%04x", m_raw);
 }
 
 /**

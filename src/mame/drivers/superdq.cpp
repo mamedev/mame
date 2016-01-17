@@ -31,7 +31,7 @@
 class superdq_state : public driver_device
 {
 public:
-	superdq_state(const machine_config &mconfig, device_type type, const char *tag)
+	superdq_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc") ,
 		m_videoram(*this, "videoram"),
@@ -164,8 +164,8 @@ WRITE8_MEMBER(superdq_state::superdq_io_w)
 	if ( data & 0x40 ) /* bit 6 = irqack */
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 
-	coin_counter_w( machine(), 0, data & 0x08 );
-	coin_counter_w( machine(), 1, data & 0x04 );
+	machine().bookkeeping().coin_counter_w(0, data & 0x08 );
+	machine().bookkeeping().coin_counter_w(1, data & 0x04 );
 
 	m_color_bank = ( data & 2 ) ? 1 : 0;
 

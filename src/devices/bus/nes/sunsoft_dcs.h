@@ -39,7 +39,7 @@ class nes_ntb_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_ntb_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_ntb_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~nes_ntb_slot_device();
 
 	// device-level overrides
@@ -61,7 +61,7 @@ public:
 	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 
 	virtual DECLARE_READ8_MEMBER(read);
 
@@ -90,7 +90,7 @@ class nes_ntb_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_ntb_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_ntb_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
@@ -120,7 +120,7 @@ class nes_sunsoft_dcs_device : public nes_sunsoft_4_device
 {
 public:
 	// construction/destruction
-	nes_sunsoft_dcs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_sunsoft_dcs_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

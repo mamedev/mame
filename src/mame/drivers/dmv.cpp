@@ -38,7 +38,7 @@
 class dmv_state : public driver_device
 {
 public:
-	dmv_state(const machine_config &mconfig, device_type type, const char *tag)
+	dmv_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_hgdc(*this, "upd7220"),
@@ -202,7 +202,7 @@ WRITE8_MEMBER(dmv_state::leds_w)
 	*/
 
 	for(int i=0; i<8; i++)
-		output_set_led_value(8-i, BIT(data, i));
+		output().set_led_value(8-i, BIT(data, i));
 }
 
 READ8_MEMBER(dmv_state::ramsel_r)

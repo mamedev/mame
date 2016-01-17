@@ -70,9 +70,8 @@ const device_type SAM6883 = &device_creator<sam6883_device>;
 //  ctor
 //-------------------------------------------------
 
-sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sam6883_device::sam6883_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SAM6883, "SAM6883", tag, owner, clock, "sam6883", __FILE__),
-		m_cpu_tag(nullptr),
 		m_cpu_space_ref(AS_PROGRAM),
 		m_read_res(*this),
 		m_space_0000(*this),

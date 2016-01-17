@@ -65,7 +65,7 @@ JALCF1   BIN     1,048,576  02-07-99  1:11a JALCF1.BIN
 class acommand_state : public driver_device
 {
 public:
-	acommand_state(const machine_config &mconfig, device_type type, const char *tag)
+	acommand_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_ac_bgvram(*this, "ac_bgvram"),
 		m_ac_txvram(*this, "ac_txvram"),

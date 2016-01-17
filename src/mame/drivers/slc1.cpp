@@ -57,7 +57,7 @@ Pasting doesn't work, but if it did...
 class slc1_state : public driver_device
 {
 public:
-	slc1_state(const machine_config &mconfig, device_type type, const char *tag)
+	slc1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_speaker(*this, "speaker")
@@ -100,7 +100,7 @@ WRITE8_MEMBER( slc1_state::io_w )
 	if (offset == 0x2f07)
 		return;
 
-	UINT8 segdata = output_get_digit_value(m_digit);
+	UINT8 segdata = output().get_digit_value(m_digit);
 	UINT8 segnum  = offset & 7;
 	UINT8 segmask = 1 << segnum;
 
@@ -109,9 +109,9 @@ WRITE8_MEMBER( slc1_state::io_w )
 	else
 		segdata &= ~segmask;
 
-	output_set_digit_value(m_digit, segdata);
+	output().set_digit_value(m_digit, segdata);
 
-	output_set_value("busyled", busyled);
+	output().set_value("busyled", busyled);
 
 	if (m_digit == 3)
 		m_kbd_type = (segdata);

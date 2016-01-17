@@ -384,15 +384,15 @@ WRITE16_MEMBER(cischeat_state::scudhamm_leds_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(machine(), 0, data & 0x0100);    // 3 buttons
-		set_led_status(machine(), 1, data & 0x0200);
-		set_led_status(machine(), 2, data & 0x0400);
+		output().set_led_value(0, data & 0x0100);    // 3 buttons
+		output().set_led_value(1, data & 0x0200);
+		output().set_led_value(2, data & 0x0400);
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-//      set_led_status(machine(), 3, data & 0x0010);   // if we had more leds..
-//      set_led_status(machine(), 4, data & 0x0020);
+//      output().set_led_value(3, data & 0x0010);   // if we had more leds..
+//      output().set_led_value(4, data & 0x0020);
 	}
 }
 
@@ -483,16 +483,16 @@ WRITE16_MEMBER(cischeat_state::armchmp2_leds_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(machine(), 0, data & 0x0100);
-		set_led_status(machine(), 1, data & 0x1000);
-		set_led_status(machine(), 2, data & 0x2000);
-		set_led_status(machine(), 3, data & 0x4000);
+		output().set_led_value(0, data & 0x0100);
+		output().set_led_value(1, data & 0x1000);
+		output().set_led_value(2, data & 0x2000);
+		output().set_led_value(3, data & 0x4000);
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0, data & 0x0040);
-		coin_counter_w(machine(), 1, data & 0x0080);
+		machine().bookkeeping().coin_counter_w(0, data & 0x0040);
+		machine().bookkeeping().coin_counter_w(1, data & 0x0080);
 	}
 }
 
@@ -525,10 +525,10 @@ WRITE16_MEMBER(cischeat_state::captflag_leds_w)
 	COMBINE_DATA( &m_captflag_leds );
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 1, data & 0x0100);    // coin 2
-		set_led_status(machine(), 0, data & 0x0200);    // decide
-		coin_counter_w(machine(), 0, data & 0x0400);    // coin 1
-		set_led_status(machine(), 1, data & 0x2000);    // select
+		machine().bookkeeping().coin_counter_w(1, data & 0x0100);    // coin 2
+		output().set_led_value(0, data & 0x0200);    // decide
+		machine().bookkeeping().coin_counter_w(0, data & 0x0400);    // coin 1
+		output().set_led_value(1, data & 0x2000);    // select
 
 		int power = (data & 0x1000);
 		m_captflag_hopper->write(space, 0, power ? 0x80 : 0x00);    // prize motor
@@ -621,7 +621,7 @@ void cischeat_state::captflag_motor_move(int side, UINT16 data)
 		dev.reset();
 	}
 
-	output_set_value((side == RIGHT) ? "right" : "left", pos);
+	output().set_value((side == RIGHT) ? "right" : "left", pos);
 }
 
 CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_pos_r)

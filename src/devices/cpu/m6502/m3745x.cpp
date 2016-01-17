@@ -37,7 +37,7 @@ const device_type M37450 = &device_creator<m37450_device>;
 //-------------------------------------------------
 //  m3745x_device - constructor
 //-------------------------------------------------
-m3745x_device::m3745x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal_map, const char *shortname, const char *source) :
+m3745x_device::m3745x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, address_map_constructor internal_map, std::string shortname, std::string source) :
 	m740_device(mconfig, type, name, tag, owner, clock, "m3745x", source),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map),
 	read_p3(*this),
@@ -498,12 +498,12 @@ static ADDRESS_MAP_START( m37450_map, AS_PROGRAM, 8, m37450_device )
 	AM_RANGE(0x0100, 0x01ff) AM_RAM
 ADDRESS_MAP_END
 
-m37450_device::m37450_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+m37450_device::m37450_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	m3745x_device(mconfig, M37450, "Mitsubishi M37450", tag, owner, clock, ADDRESS_MAP_NAME(m37450_map), "m3745x", __FILE__)
 {
 }
 
-m37450_device::m37450_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+m37450_device::m37450_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	m3745x_device(mconfig, type, name, tag, owner, clock, ADDRESS_MAP_NAME(m37450_map), shortname, source)
 {
 }

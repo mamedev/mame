@@ -52,7 +52,7 @@ void device_colecovision_cartridge_interface::rom_alloc(size_t size)
 //  colecovision_cartridge_slot_device - constructor
 //-------------------------------------------------
 
-colecovision_cartridge_slot_device::colecovision_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+colecovision_cartridge_slot_device::colecovision_cartridge_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COLECOVISION_CARTRIDGE_SLOT, "ColecoVision cartridge port", tag, owner, clock, "coleco_cartridge_port", __FILE__),
 	device_slot_interface(mconfig, *this),
 	device_image_interface(mconfig, *this), m_card(nullptr)
@@ -102,7 +102,7 @@ bool colecovision_cartridge_slot_device::call_load()
 
 bool colecovision_cartridge_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 
 	return true;
 }
@@ -112,18 +112,15 @@ bool colecovision_cartridge_slot_device::call_softlist_load(software_list_device
 //  get_default_card_software -
 //-------------------------------------------------
 
-void colecovision_cartridge_slot_device::get_default_card_software(std::string &result)
+std::string colecovision_cartridge_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
 		UINT32 length = core_fsize(m_file);
 		if (length == 0x100000 || length == 0x200000)
-		{
-			software_get_default_slot(result, "xin1");
-			return;
-		}
+			return software_get_default_slot("xin1");
 	}
-	software_get_default_slot(result, "standard");
+	return software_get_default_slot("standard");
 }
 
 

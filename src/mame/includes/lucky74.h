@@ -5,7 +5,7 @@
 class lucky74_state : public driver_device
 {
 public:
-	lucky74_state(const machine_config &mconfig, device_type type, const char *tag)
+	lucky74_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_fg_colorram(*this, "fg_colorram"),

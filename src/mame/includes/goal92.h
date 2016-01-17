@@ -9,7 +9,7 @@
 class goal92_state : public driver_device
 {
 public:
-	goal92_state(const machine_config &mconfig, device_type type, const char *tag)
+	goal92_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_bg_data(*this, "bg_data"),
 		m_fg_data(*this, "fg_data"),

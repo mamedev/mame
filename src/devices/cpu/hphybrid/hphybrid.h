@@ -90,7 +90,7 @@ public:
 		template<class _Object> static devcb_base &set_pa_changed_func(device_t &device, _Object object) { return downcast<hp_hybrid_cpu_device &>(device).m_pa_changed_func.set_callback(object); }
 
 protected:
-        hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname , UINT8 addrwidth);
+        hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname , UINT8 addrwidth);
 
                 // device-level overrides
                 virtual void device_start() override;
@@ -112,7 +112,7 @@ protected:
                 virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
 
                 // device_state_interface overrides
-                void state_string_export(const device_state_entry &entry, std::string &str) override;
+                void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
                 // device_disasm_interface overrides
                 virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
@@ -190,7 +190,7 @@ private:
 class hp_5061_3001_cpu_device : public hp_hybrid_cpu_device
 {
 public:
-		hp_5061_3001_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		hp_5061_3001_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void set_boot_mode_static(device_t &device, bool mode) { downcast<hp_5061_3001_cpu_device &>(device).m_boot_mode = mode; }
 
@@ -230,7 +230,7 @@ private:
 class hp_5061_3011_cpu_device : public hp_hybrid_cpu_device
 {
 public:
-		hp_5061_3011_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		hp_5061_3011_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 		virtual UINT32 execute_max_cycles() const override { return 25; }

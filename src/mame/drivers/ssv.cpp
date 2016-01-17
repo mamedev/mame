@@ -290,10 +290,10 @@ WRITE16_MEMBER(ssv_state::lockout_w)
 //  popmessage("%02X",data & 0xff);
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_lockout_w(machine(), 1,~data & 0x01);
-		coin_lockout_w(machine(), 0,~data & 0x02);
-		coin_counter_w(machine(), 1, data & 0x04);
-		coin_counter_w(machine(), 0, data & 0x08);
+		machine().bookkeeping().coin_lockout_w(1,~data & 0x01);
+		machine().bookkeeping().coin_lockout_w(0,~data & 0x02);
+		machine().bookkeeping().coin_counter_w(1, data & 0x04);
+		machine().bookkeeping().coin_counter_w(0, data & 0x08);
 //                        data & 0x40?
 		enable_video(data & 0x80);
 	}
@@ -305,10 +305,10 @@ WRITE16_MEMBER(ssv_state::lockout_inv_w)
 //  popmessage("%02X",data & 0xff);
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_lockout_w(machine(), 1, data & 0x01);
-		coin_lockout_w(machine(), 0, data & 0x02);
-		coin_counter_w(machine(), 1, data & 0x04);
-		coin_counter_w(machine(), 0, data & 0x08);
+		machine().bookkeeping().coin_lockout_w(1, data & 0x01);
+		machine().bookkeeping().coin_lockout_w(0, data & 0x02);
+		machine().bookkeeping().coin_counter_w(1, data & 0x04);
+		machine().bookkeeping().coin_counter_w(0, data & 0x08);
 //                        data & 0x40?
 		enable_video(data & 0x80);
 	}

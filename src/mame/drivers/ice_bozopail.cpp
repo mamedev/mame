@@ -22,7 +22,7 @@ http://www.highwaygames.com/arcade-machines/bozo-s-grand-prize-game-6751/
 class ice_bozopail : public driver_device
 {
 public:
-	ice_bozopail(const machine_config &mconfig, device_type type, const char *tag)
+	ice_bozopail(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 	//  ,m_maincpu(*this, "maincpu")
 	{ }

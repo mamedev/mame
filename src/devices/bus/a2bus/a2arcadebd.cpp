@@ -57,7 +57,7 @@ machine_config_constructor a2bus_arcboard_device::device_mconfig_additions() con
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_arcboard_device::a2bus_arcboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_arcboard_device::a2bus_arcboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, A2BUS_ARCADEBOARD, "Third Millenium Engineering Arcade Board", tag, owner, clock, "a2arcbd", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG),
@@ -65,7 +65,7 @@ a2bus_arcboard_device::a2bus_arcboard_device(const machine_config &mconfig, cons
 {
 }
 
-a2bus_arcboard_device::a2bus_arcboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_arcboard_device::a2bus_arcboard_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG),

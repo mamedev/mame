@@ -326,7 +326,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 class amiga_state : public driver_device
 {
 public:
-	amiga_state(const machine_config &mconfig, device_type type, const char *tag) :
+	amiga_state(const machine_config &mconfig, device_type type, std::string tag) :
 	driver_device(mconfig, type, tag),
 	m_agnus_id(AGNUS_NTSC),
 	m_denise_id(DENISE),

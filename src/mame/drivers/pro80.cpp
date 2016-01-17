@@ -28,7 +28,7 @@ The cassette used 2 bits for input, plus a D flipflop and a 74LS221 oneshot.
 class pro80_state : public driver_device
 {
 public:
-	pro80_state(const machine_config &mconfig, device_type type, const char *tag)
+	pro80_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_cass(*this, "cassette")
@@ -58,12 +58,12 @@ WRITE8_MEMBER( pro80_state::segment_w )
 {
 	if (m_digit_sel)
 	{
-		if (!BIT(m_digit_sel, 0)) output_set_digit_value(0, data);
-		if (!BIT(m_digit_sel, 1)) output_set_digit_value(1, data);
-		if (!BIT(m_digit_sel, 2)) output_set_digit_value(2, data);
-		if (!BIT(m_digit_sel, 3)) output_set_digit_value(3, data);
-		if (!BIT(m_digit_sel, 4)) output_set_digit_value(4, data);
-		if (!BIT(m_digit_sel, 5)) output_set_digit_value(5, data);
+		if (!BIT(m_digit_sel, 0)) output().set_digit_value(0, data);
+		if (!BIT(m_digit_sel, 1)) output().set_digit_value(1, data);
+		if (!BIT(m_digit_sel, 2)) output().set_digit_value(2, data);
+		if (!BIT(m_digit_sel, 3)) output().set_digit_value(3, data);
+		if (!BIT(m_digit_sel, 4)) output().set_digit_value(4, data);
+		if (!BIT(m_digit_sel, 5)) output().set_digit_value(5, data);
 		m_cass->output( BIT(data, 6) ? -1.0 : +1.0);
 
 		m_digit_sel = 0;

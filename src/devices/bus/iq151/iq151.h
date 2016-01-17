@@ -77,7 +77,7 @@ class iq151cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	iq151cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	iq151cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~iq151cart_slot_device();
 
 	template<class _Object> static devcb_base &set_out_irq0_callback(device_t &device, _Object object) { return downcast<iq151cart_slot_device &>(device).m_out_irq0_cb.set_callback(object); }
@@ -106,7 +106,7 @@ public:
 	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 
 	// reading and writing
 	virtual void read(offs_t offset, UINT8 &data);

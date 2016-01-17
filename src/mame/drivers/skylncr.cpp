@@ -99,7 +99,7 @@
 class skylncr_state : public driver_device
 {
 public:
-	skylncr_state(const machine_config &mconfig, device_type type, const char *tag)
+	skylncr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -406,7 +406,7 @@ WRITE8_MEMBER(skylncr_state::reelscroll4_w)
 
 WRITE8_MEMBER(skylncr_state::skylncr_coin_w)
 {
-	coin_counter_w(machine(), 0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 }
 
 READ8_MEMBER(skylncr_state::ret_ff)

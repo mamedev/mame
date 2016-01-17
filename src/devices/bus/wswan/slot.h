@@ -35,7 +35,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_io) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_io) {}
 
-	void rom_alloc(UINT32 size, const char *tag);
+	void rom_alloc(UINT32 size, std::string tag);
 	void nvram_alloc(UINT32 size);
 	UINT8* get_rom_base() { return m_rom; }
 	UINT8* get_nvram_base() { return &m_nvram[0]; }
@@ -66,7 +66,7 @@ class ws_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ws_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~ws_cart_slot_device();
 
 	// device-level overrides
@@ -96,7 +96,7 @@ public:
 	virtual const char *file_extensions() const override { return "ws,wsc,bin"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom20);

@@ -22,7 +22,7 @@ class k005289_device : public device_t,
 						public device_sound_interface
 {
 public:
-	k005289_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k005289_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~k005289_device() { }
 
 protected:

@@ -59,7 +59,7 @@ ToDo:
 class atari_s1_state : public genpin_class
 {
 public:
-	atari_s1_state(const machine_config &mconfig, device_type type, const char *tag)
+	atari_s1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_ram(*this, "ram")
@@ -372,13 +372,13 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s1_state::nmi )
 		// Player number
 		char wordnum[8];
 		sprintf(wordnum,"text%d",m_out_offs>>2);
-		output_set_value(wordnum, !BIT(patterns[m_p_ram[m_out_offs]&15], 6)); // uses 'g' segment
+		output().set_value(wordnum, !BIT(patterns[m_p_ram[m_out_offs]&15], 6)); // uses 'g' segment
 	}
 	else
 	{
 		// Digits
-		output_set_digit_value(m_out_offs << 1, patterns[m_p_ram[m_out_offs]>>4]);
-		output_set_digit_value((m_out_offs << 1)+1, patterns[m_p_ram[m_out_offs]&15]);
+		output().set_digit_value(m_out_offs << 1, patterns[m_p_ram[m_out_offs]>>4]);
+		output().set_digit_value((m_out_offs << 1)+1, patterns[m_p_ram[m_out_offs]&15]);
 	}
 }
 

@@ -88,7 +88,7 @@ static MACHINE_CONFIG_FRAGMENT( kc_d002 )
 	// expansion interface
 	MCFG_DEVICE_ADD("exp", KCCART_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(kc85_exp, nullptr, false)
-	MCFG_KCEXP_SLOT_NEXT_SLOT(nullptr)
+	MCFG_KCEXP_SLOT_NEXT_SLOT("")
 	MCFG_KCEXP_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
 	MCFG_KCEXP_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
 	MCFG_KCEXP_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
@@ -108,7 +108,7 @@ const device_type KC_D002 = &device_creator<kc_d002_device>;
 //  kc_d002_device - constructor
 //-------------------------------------------------
 
-kc_d002_device::kc_d002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+kc_d002_device::kc_d002_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, KC_D002, "D002 Bus Driver", tag, owner, clock, "kc_d002", __FILE__),
 		device_kcexp_interface( mconfig, *this ), m_slot(nullptr)
 	{

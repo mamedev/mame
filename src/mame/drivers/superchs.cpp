@@ -147,10 +147,10 @@ WRITE32_MEMBER(superchs_state::superchs_input_w)
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				coin_lockout_w(machine(), 0,~data & 0x01000000);
-				coin_lockout_w(machine(), 1,~data & 0x02000000);
-				coin_counter_w(machine(), 0, data & 0x04000000);
-				coin_counter_w(machine(), 1, data & 0x08000000);
+				machine().bookkeeping().coin_lockout_w(0,~data & 0x01000000);
+				machine().bookkeeping().coin_lockout_w(1,~data & 0x02000000);
+				machine().bookkeeping().coin_counter_w(0, data & 0x04000000);
+				machine().bookkeeping().coin_counter_w(1, data & 0x08000000);
 				m_coin_word=(data >> 16) &0xffff;
 			}
 		}

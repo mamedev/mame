@@ -129,7 +129,7 @@ class z180_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	z180_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	z180_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
 
 protected:
 	// device-level overrides
@@ -152,7 +152,7 @@ protected:
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }

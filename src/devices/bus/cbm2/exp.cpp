@@ -62,7 +62,7 @@ device_cbm2_expansion_card_interface::~device_cbm2_expansion_card_interface()
 //  cbm2_expansion_slot_device - constructor
 //-------------------------------------------------
 
-cbm2_expansion_slot_device::cbm2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cbm2_expansion_slot_device::cbm2_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, CBM2_EXPANSION_SLOT, "CBM-II expansion port", tag, owner, clock, "cbm2_expansion_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this), m_card(nullptr)
@@ -145,7 +145,7 @@ bool cbm2_expansion_slot_device::call_load()
 
 bool cbm2_expansion_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 
 	return true;
 }
@@ -155,9 +155,9 @@ bool cbm2_expansion_slot_device::call_softlist_load(software_list_device &swlist
 //  get_default_card_software -
 //-------------------------------------------------
 
-void cbm2_expansion_slot_device::get_default_card_software(std::string &result)
+std::string cbm2_expansion_slot_device::get_default_card_software()
 {
-	software_get_default_slot(result, "standard");
+	return software_get_default_slot("standard");
 }
 
 

@@ -26,7 +26,7 @@
 class tmc1800_base_state : public driver_device
 {
 public:
-	tmc1800_base_state(const machine_config &mconfig, device_type type, const char *tag)
+	tmc1800_base_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
 			m_cassette(*this, "cassette"),
@@ -55,7 +55,7 @@ public:
 		TIMER_SETUP_BEEP
 	};
 
-	tmc1800_state(const machine_config &mconfig, device_type type, const char *tag)
+	tmc1800_state(const machine_config &mconfig, device_type type, std::string tag)
 		: tmc1800_base_state(mconfig, type, tag),
 			m_vdc(*this, CDP1861_TAG)
 	{ }
@@ -84,7 +84,7 @@ protected:
 class osc1000b_state : public tmc1800_base_state
 {
 public:
-	osc1000b_state(const machine_config &mconfig, device_type type, const char *tag)
+	osc1000b_state(const machine_config &mconfig, device_type type, std::string tag)
 		: tmc1800_base_state(mconfig, type, tag)
 	{ }
 
@@ -107,7 +107,7 @@ public:
 class tmc2000_state : public tmc1800_base_state
 {
 public:
-	tmc2000_state(const machine_config &mconfig, device_type type, const char *tag)
+	tmc2000_state(const machine_config &mconfig, device_type type, std::string tag)
 		: tmc1800_base_state(mconfig, type, tag),
 			m_cti(*this, CDP1864_TAG),
 			m_colorram(*this, "color_ram"),
@@ -164,7 +164,7 @@ public:
 class nano_state : public tmc1800_base_state
 {
 public:
-	nano_state(const machine_config &mconfig, device_type type, const char *tag)
+	nano_state(const machine_config &mconfig, device_type type, std::string tag)
 		: tmc1800_base_state(mconfig, type, tag),
 			m_cti(*this, CDP1864_TAG),
 			m_ny0(*this, "NY0"),

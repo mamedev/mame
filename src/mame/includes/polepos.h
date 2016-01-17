@@ -15,7 +15,7 @@
 class polepos_state : public driver_device
 {
 public:
-	polepos_state(const machine_config &mconfig, device_type type, const char *tag)
+	polepos_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
@@ -114,7 +114,7 @@ class polepos_sound_device : public device_t,
 								public device_sound_interface
 {
 public:
-	polepos_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	polepos_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~polepos_sound_device() { }
 
 protected:

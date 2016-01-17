@@ -38,7 +38,7 @@
 const device_type V810 = &device_creator<v810_device>;
 
 
-v810_device::v810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+v810_device::v810_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, V810, "V810", tag, owner, clock, "v810", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 32, 32, 0)
@@ -1314,7 +1314,7 @@ void v810_device::device_start()
 	m_icountptr = &m_icount;
 }
 
-void v810_device::state_string_export(const device_state_entry &entry, std::string &str)
+void v810_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

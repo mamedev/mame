@@ -23,7 +23,7 @@ not sure what the actual inputs / outputs would be on this, maybe just track pos
 class ice_tbd_state : public driver_device
 {
 public:
-	ice_tbd_state(const machine_config &mconfig, device_type type, const char *tag)
+	ice_tbd_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		,m_maincpu(*this, "maincpu")
 		{ }

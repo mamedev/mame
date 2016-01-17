@@ -70,10 +70,10 @@ WRITE8_MEMBER(tnzs_state::tnzs_port2_w)
 {
 //  logerror("I8742:%04x  Write %02x to port 2\n", space.device().safe_pcbase(), data);
 
-	coin_lockout_w(machine(), 0, (data & 0x40));
-	coin_lockout_w(machine(), 1, (data & 0x80));
-	coin_counter_w(machine(), 0, (~data & 0x10));
-	coin_counter_w(machine(), 1, (~data & 0x20));
+	machine().bookkeeping().coin_lockout_w(0, (data & 0x40));
+	machine().bookkeeping().coin_lockout_w(1, (data & 0x80));
+	machine().bookkeeping().coin_counter_w(0, (~data & 0x10));
+	machine().bookkeeping().coin_counter_w(1, (~data & 0x20));
 
 	m_input_select = data;
 }
@@ -123,7 +123,7 @@ void tnzs_state::mcu_handle_coins( int coin )
 		if (coin & 0x01)    /* coin A */
 		{
 //          logerror("Coin dropped into slot A\n");
-			coin_counter_w(machine(),0,1); coin_counter_w(machine(),0,0); /* Count slot A */
+			machine().bookkeeping().coin_counter_w(0,1); machine().bookkeeping().coin_counter_w(0,0); /* Count slot A */
 			m_mcu_coins_a++;
 			if (m_mcu_coins_a >= m_mcu_coinage[0])
 			{
@@ -132,11 +132,11 @@ void tnzs_state::mcu_handle_coins( int coin )
 				if (m_mcu_credits >= 9)
 				{
 					m_mcu_credits = 9;
-					coin_lockout_global_w(machine(), 1); /* Lock all coin slots */
+					machine().bookkeeping().coin_lockout_global_w(1); /* Lock all coin slots */
 				}
 				else
 				{
-					coin_lockout_global_w(machine(), 0); /* Unlock all coin slots */
+					machine().bookkeeping().coin_lockout_global_w(0); /* Unlock all coin slots */
 				}
 			}
 		}
@@ -144,7 +144,7 @@ void tnzs_state::mcu_handle_coins( int coin )
 		if (coin & 0x02)    /* coin B */
 		{
 //          logerror("Coin dropped into slot B\n");
-			coin_counter_w(machine(),1,1); coin_counter_w(machine(),1,0); /* Count slot B */
+			machine().bookkeeping().coin_counter_w(1,1); machine().bookkeeping().coin_counter_w(1,0); /* Count slot B */
 			m_mcu_coins_b++;
 			if (m_mcu_coins_b >= m_mcu_coinage[2])
 			{
@@ -153,11 +153,11 @@ void tnzs_state::mcu_handle_coins( int coin )
 				if (m_mcu_credits >= 9)
 				{
 					m_mcu_credits = 9;
-					coin_lockout_global_w(machine(), 1); /* Lock all coin slots */
+					machine().bookkeeping().coin_lockout_global_w(1); /* Lock all coin slots */
 				}
 				else
 				{
-					coin_lockout_global_w(machine(), 0); /* Unlock all coin slots */
+					machine().bookkeeping().coin_lockout_global_w(0); /* Unlock all coin slots */
 				}
 			}
 		}
@@ -173,7 +173,7 @@ void tnzs_state::mcu_handle_coins( int coin )
 	else
 	{
 		if (m_mcu_credits < 9)
-			coin_lockout_global_w(machine(), 0); /* Unlock all coin slots */
+			machine().bookkeeping().coin_lockout_global_w(0); /* Unlock all coin slots */
 
 		m_mcu_reportcoin = 0;
 	}
@@ -702,22 +702,22 @@ WRITE8_MEMBER(tnzs_state::tnzs_bankswitch1_w)
 				/* Coin count and lockout is handled by the i8742 */
 				break;
 		case MCU_NONE_INSECTX:
-				coin_lockout_w(machine(), 0, (~data & 0x04));
-				coin_lockout_w(machine(), 1, (~data & 0x08));
-				coin_counter_w(machine(), 0, (data & 0x10));
-				coin_counter_w(machine(), 1, (data & 0x20));
+				machine().bookkeeping().coin_lockout_w(0, (~data & 0x04));
+				machine().bookkeeping().coin_lockout_w(1, (~data & 0x08));
+				machine().bookkeeping().coin_counter_w(0, (data & 0x10));
+				machine().bookkeeping().coin_counter_w(1, (data & 0x20));
 				break;
 		case MCU_NONE_TNZSB:
 		case MCU_NONE_KABUKIZ:
-				coin_lockout_w(machine(), 0, (~data & 0x10));
-				coin_lockout_w(machine(), 1, (~data & 0x20));
-				coin_counter_w(machine(), 0, (data & 0x04));
-				coin_counter_w(machine(), 1, (data & 0x08));
+				machine().bookkeeping().coin_lockout_w(0, (~data & 0x10));
+				machine().bookkeeping().coin_lockout_w(1, (~data & 0x20));
+				machine().bookkeeping().coin_counter_w(0, (data & 0x04));
+				machine().bookkeeping().coin_counter_w(1, (data & 0x08));
 				break;
 		case MCU_NONE_KAGEKI:
-				coin_lockout_global_w(machine(), (~data & 0x20));
-				coin_counter_w(machine(), 0, (data & 0x04));
-				coin_counter_w(machine(), 1, (data & 0x08));
+				machine().bookkeeping().coin_lockout_global_w((~data & 0x20));
+				machine().bookkeeping().coin_counter_w(0, (data & 0x04));
+				machine().bookkeeping().coin_counter_w(1, (data & 0x08));
 				break;
 		case MCU_ARKANOID:
 		case MCU_EXTRMATN:

@@ -39,7 +39,7 @@ const device_type AAKART = &device_creator<aakart_device>;
 //  aakart_device - constructor
 //-------------------------------------------------
 
-aakart_device::aakart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+aakart_device::aakart_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AAKART, "AAKART", tag, owner, clock, "aakart", __FILE__), m_rxtimer(nullptr), m_txtimer(nullptr), m_mousetimer(nullptr), m_keybtimer(nullptr),
 		m_out_tx_cb(*this),
 		m_out_rx_cb(*this), m_tx_latch(0), m_rx(0), m_new_command(0), m_status(0), m_mouse_enable(0), m_keyb_enable(0), m_keyb_row(0), m_keyb_col(0), m_keyb_state(0)

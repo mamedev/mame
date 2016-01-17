@@ -37,7 +37,7 @@
 class jongkyo_state : public driver_device
 {
 public:
-	jongkyo_state(const machine_config &mconfig, device_type type, const char *tag)
+	jongkyo_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu") { }
@@ -153,7 +153,7 @@ WRITE8_MEMBER(jongkyo_state::jongkyo_coin_counter_w)
 	/* bit 0 = hopper out? */
 
 	/* bit 1 = coin counter */
-	coin_counter_w(machine(), 0, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 2);
 
 	/* bit 2 always set? */
 	m_flip_screen = (data & 4) >> 2;

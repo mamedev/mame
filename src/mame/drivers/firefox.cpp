@@ -41,7 +41,7 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 class firefox_state : public driver_device
 {
 public:
-	firefox_state(const machine_config &mconfig, device_type type, const char *tag)
+	firefox_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc") ,
 		m_tileram(*this, "tileram"),
@@ -483,12 +483,12 @@ WRITE8_MEMBER(firefox_state::self_reset_w)
 
 WRITE8_MEMBER(firefox_state::led_w)
 {
-	set_led_status( machine(), offset, ( data & 0x80 ) == 0 );
+	output().set_led_value(offset, ( data & 0x80 ) == 0 );
 }
 
 WRITE8_MEMBER(firefox_state::firefox_coin_counter_w)
 {
-	coin_counter_w( machine(), offset, data & 0x80 );
+	machine().bookkeeping().coin_counter_w(offset, data & 0x80 );
 }
 
 

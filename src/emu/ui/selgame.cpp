@@ -94,7 +94,7 @@ void ui_menu_select_game::build_driver_list()
 void ui_menu_select_game::handle()
 {
 	// ignore pause keys by swallowing them before we process the menu
-	ui_input_pressed(machine(), IPT_UI_PAUSE);
+	machine().ui_input().pressed(IPT_UI_PAUSE);
 
 	// process the menu
 	const ui_menu_event *menu_event = process(0);
@@ -325,7 +325,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		strprintf(tempbuf[1], "%s, %-.100s", driver->year, driver->manufacturer);
 
 		// next line source path
-		strprintf(tempbuf[2],"Driver: %-.100s", core_filename_extract_base(tempbuf[3], driver->source_file).c_str());
+		strprintf(tempbuf[2],"Driver: %-.100s", core_filename_extract_base(driver->source_file).c_str());
 
 		// next line is overall driver status
 		if (driver->flags & MACHINE_NOT_WORKING)

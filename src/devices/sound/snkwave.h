@@ -28,7 +28,7 @@ class snkwave_device : public device_t,
 						public device_sound_interface
 {
 public:
-	snkwave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	snkwave_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~snkwave_device() { }
 
 protected:

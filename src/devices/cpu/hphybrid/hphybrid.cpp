@@ -109,7 +109,7 @@ WRITE_LINE_MEMBER(hp_hybrid_cpu_device::flag_w)
 		}
 }
 
-hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname , UINT8 addrwidth)
+hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname , UINT8 addrwidth)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 			m_pa_changed_func(*this),
 			m_program_config("program", ENDIANNESS_BIG, 16, addrwidth, -1),
@@ -616,15 +616,15 @@ UINT16 hp_hybrid_cpu_device::execute_one_sub(UINT16 opcode)
 				return m_reg_P + 1;
 }
 
-void hp_hybrid_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void hp_hybrid_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
-				if (entry.index() == STATE_GENFLAGS) {
-								strprintf(str, "%s %s %c %c",
-														BIT(m_flags , HPHYBRID_DB_BIT) ? "Db":"..",
-														BIT(m_flags , HPHYBRID_CB_BIT) ? "Cb":"..",
-														BIT(m_flags , HPHYBRID_O_BIT) ? 'O':'.',
-														BIT(m_flags , HPHYBRID_C_BIT) ? 'E':'.');
-				}
+	if (entry.index() == STATE_GENFLAGS) {
+		strprintf(str, "%s %s %c %c",
+					BIT(m_flags , HPHYBRID_DB_BIT) ? "Db":"..",
+					BIT(m_flags , HPHYBRID_CB_BIT) ? "Cb":"..",
+					BIT(m_flags , HPHYBRID_O_BIT) ? 'O':'.',
+					BIT(m_flags , HPHYBRID_C_BIT) ? 'E':'.');
+	}
 }
 
 offs_t hp_hybrid_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
@@ -1061,7 +1061,7 @@ void hp_hybrid_cpu_device::WIO(UINT8 pa , UINT8 ic , UINT16 v)
 				m_io->write_word(HP_MAKE_IOADDR(pa, ic) << 1 , v);
 }
 
-hp_5061_3001_cpu_device::hp_5061_3001_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hp_5061_3001_cpu_device::hp_5061_3001_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: hp_hybrid_cpu_device(mconfig, HP_5061_3001, "HP-5061-3001", tag, owner, clock, "5061-3001", 22),
 			m_boot_mode(false)
 {
@@ -1581,7 +1581,7 @@ void hp_5061_3001_cpu_device::write_non_common_reg(UINT16 addr , UINT16 v)
 		}
 }
 
-hp_5061_3011_cpu_device::hp_5061_3011_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hp_5061_3011_cpu_device::hp_5061_3011_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: hp_hybrid_cpu_device(mconfig, HP_5061_3011, "HP-5061-3011", tag, owner, clock, "5061-3011", 16)
 {
 }

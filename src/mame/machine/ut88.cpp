@@ -45,7 +45,7 @@ void ut88_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		break;
 	case TIMER_UPDATE_DISPLAY:
 		for (int i=0;i<6;i++)
-			output_set_digit_value(i, hex_to_7seg[m_lcd_digit[i]]);
+			output().set_digit_value(i, hex_to_7seg[m_lcd_digit[i]]);
 		timer_set(attotime::from_hz(60), TIMER_UPDATE_DISPLAY);
 		break;
 	default:

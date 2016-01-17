@@ -125,7 +125,7 @@ NETLIST_EXTERNAL(breakout)
 class ttl_mono_state : public driver_device
 {
 public:
-	ttl_mono_state(const machine_config &mconfig, device_type type, const char *tag)
+	ttl_mono_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_video(*this, "fixfreq"),
@@ -158,7 +158,7 @@ private:
 class pong_state : public ttl_mono_state
 {
 public:
-	pong_state(const machine_config &mconfig, device_type type, const char *tag)
+	pong_state(const machine_config &mconfig, device_type type, std::string tag)
 		: ttl_mono_state(mconfig, type, tag),
 			m_sw1a(*this, "maincpu:sw1a"),
 			m_sw1b(*this, "maincpu:sw1b")
@@ -185,7 +185,7 @@ private:
 class breakout_state : public ttl_mono_state
 {
 public:
-	breakout_state(const machine_config &mconfig, device_type type, const char *tag)
+	breakout_state(const machine_config &mconfig, device_type type, std::string tag)
 		: ttl_mono_state(mconfig, type, tag),
 		m_led_serve(*this, "maincpu:led_serve"),
 		m_lamp_credit1(*this, "maincpu:lamp_credit1"),
@@ -209,22 +209,22 @@ public:
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(serve_cb)
 	{
-		output_set_value("serve_led", (data < 3.5) ? 1 : 0);
+		output().set_value("serve_led", (data < 3.5) ? 1 : 0);
 	}
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(credit1_cb)
 	{
-		output_set_value("lamp_credit1", (data < 2.0) ? 0 : 1);
+		output().set_value("lamp_credit1", (data < 2.0) ? 0 : 1);
 	}
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(credit2_cb)
 	{
-		output_set_value("lamp_credit2", (data < 2.0) ? 0 : 1);
+		output().set_value("lamp_credit2", (data < 2.0) ? 0 : 1);
 	}
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(coin_counter_cb)
 	{
-		coin_counter_w(machine(), 0, (data > 2.0) ? 0 : 1);
+		machine().bookkeeping().coin_counter_w(0, (data > 2.0) ? 0 : 1);
 	}
 
 	DECLARE_INPUT_CHANGED_MEMBER(cb_free_play)

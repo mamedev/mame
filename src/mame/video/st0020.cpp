@@ -15,7 +15,7 @@
 
 const device_type ST0020_SPRITES = &device_creator<st0020_device>;
 
-st0020_device::st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+st0020_device::st0020_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ST0020_SPRITES, "Seta ST0020 Sprites", tag, owner, clock, "st0020", __FILE__),
 		m_gfxdecode(*this),
 		m_palette(*this)
@@ -29,7 +29,7 @@ st0020_device::st0020_device(const machine_config &mconfig, const char *tag, dev
 //  gfx decoder
 //-------------------------------------------------
 
-void st0020_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void st0020_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<st0020_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -39,7 +39,7 @@ void st0020_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 //  palette device
 //-------------------------------------------------
 
-void st0020_device::static_set_palette_tag(device_t &device, const char *tag)
+void st0020_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<st0020_device &>(device).m_palette.set_tag(tag);
 }

@@ -100,7 +100,7 @@ class ucom4_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	ucom4_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int family, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	ucom4_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, int family, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_BIG, 8, prgwidth, 0, program)
 		, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
@@ -157,7 +157,8 @@ protected:
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	// device_state_interface overrides
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -315,14 +316,14 @@ protected:
 class upd553_cpu_device : public ucom4_cpu_device
 {
 public:
-	upd553_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd553_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class upd557l_cpu_device : public ucom4_cpu_device
 {
 public:
-	upd557l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd557l_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual UINT8 input_r(int index) override;
@@ -333,14 +334,14 @@ protected:
 class upd650_cpu_device : public ucom4_cpu_device
 {
 public:
-	upd650_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd650_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class upd552_cpu_device : public ucom4_cpu_device
 {
 public:
-	upd552_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd552_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

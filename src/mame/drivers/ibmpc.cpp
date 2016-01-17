@@ -268,7 +268,7 @@ XT U44 IBM.bin: IBM 5160 PC/XT Bank-selection decoding ROM (256x4 bit). Not mapp
 class ibmpc_state : public driver_device
 {
 public:
-	ibmpc_state(const machine_config &mconfig, device_type type, const char *tag)
+	ibmpc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 

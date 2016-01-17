@@ -18,7 +18,7 @@
 
 const device_type WARPWARP = &device_creator<warpwarp_sound_device>;
 
-warpwarp_sound_device::warpwarp_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+warpwarp_sound_device::warpwarp_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WARPWARP, "Warp Warp Audio Custom", tag, owner, clock, "warpwarp_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_decay(nullptr),

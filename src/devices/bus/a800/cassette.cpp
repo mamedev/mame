@@ -44,7 +44,7 @@ machine_config_constructor a8sio_cassette_device::device_mconfig_additions() con
 //  LIVE DEVICE
 //**************************************************************************
 
-a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, A8SIO_CASSETTE, "Atari 8 bit cassette", tag, owner, clock, "a8sio_cass", __FILE__)
 	, device_a8sio_card_interface(mconfig, *this)
 	, m_cassette(*this, "cassette"), m_read_timer(nullptr)
@@ -53,7 +53,7 @@ a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, cons
 {
 }
 
-a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_a8sio_card_interface(mconfig, *this)
 	, m_cassette(*this, "cassette"), m_read_timer(nullptr)

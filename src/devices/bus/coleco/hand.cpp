@@ -89,7 +89,7 @@ ioport_constructor coleco_hand_controller_t::device_input_ports() const
 //  coleco_hand_controller_t - constructor
 //-------------------------------------------------
 
-coleco_hand_controller_t::coleco_hand_controller_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+coleco_hand_controller_t::coleco_hand_controller_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COLECO_HAND_CONTROLLER, "ColecoVision Hand Controller", tag, owner, clock, "coleco_hand", __FILE__),
 	device_colecovision_control_port_interface(mconfig, *this),
 	m_io_common0(*this, "COMMON0"),

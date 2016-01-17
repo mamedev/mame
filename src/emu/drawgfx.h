@@ -452,7 +452,7 @@ class gfxdecode_device : public device_t, public device_gfx_interface
 {
 public:
 	// construction/destruction
-	gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gfxdecode_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override {};

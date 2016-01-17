@@ -83,7 +83,7 @@ class wangpcbus_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	wangpcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wangpcbus_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -111,7 +111,7 @@ class wangpcbus_device : public device_t
 {
 public:
 	// construction/destruction
-	wangpcbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wangpcbus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~wangpcbus_device() { m_device_list.detach_all(); }
 
 	template<class _Object> static devcb_base &set_irq2_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_irq2.set_callback(object); }

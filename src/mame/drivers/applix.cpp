@@ -52,7 +52,7 @@
 class applix_state : public driver_device
 {
 public:
-	applix_state(const machine_config &mconfig, device_type type, const char *tag)
+	applix_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_base(*this, "base"),
 		m_maincpu(*this, "maincpu"),

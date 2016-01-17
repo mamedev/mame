@@ -59,7 +59,7 @@
 class rex6000_state : public driver_device
 {
 public:
-	rex6000_state(const machine_config &mconfig, device_type type, const char *tag)
+	rex6000_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_ram(*this, RAM_TAG),

@@ -33,7 +33,7 @@
 class tonton_state : public driver_device
 {
 public:
-	tonton_state(const machine_config &mconfig, device_type type, const char *tag)
+	tonton_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_v9938(*this, "v9938"),
 		m_maincpu(*this, "maincpu"),
@@ -75,8 +75,8 @@ WRITE_LINE_MEMBER(tonton_state::tonton_vdp0_interrupt)
 
 WRITE8_MEMBER(tonton_state::tonton_outport_w)
 {
-	coin_counter_w(machine(), offset, data & 0x01);
-	coin_lockout_global_w(machine(), data & 0x02);  /* Coin Lock */
+	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
+	machine().bookkeeping().coin_lockout_global_w(data & 0x02);  /* Coin Lock */
 	m_hopper->write(space, 0, (data & 0x02));    /* Hopper Motor */
 
 //  if(data & 0xfe)

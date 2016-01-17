@@ -237,7 +237,7 @@ WRITE_LINE_MEMBER( tmc2000e_state::q_w )
 	m_cti->aoe_w(state);
 
 	// set Q led status
-	set_led_status(machine(), 1, state);
+	output().set_led_value(1, state);
 
 	// tape out
 	m_cassette->output(state ? -1.0 : +1.0);

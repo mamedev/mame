@@ -82,7 +82,7 @@ const device_type SSEMCPU = &device_creator<ssem_device>;
 //  ssem_device - constructor
 //-------------------------------------------------
 
-ssem_device::ssem_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ssem_device::ssem_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SSEMCPU, "SSEMCPU", tag, owner, clock, "ssem_cpu", __FILE__),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
 		m_pc(1),
@@ -149,7 +149,7 @@ const address_space_config *ssem_device::memory_space_config(address_spacenum sp
 //  for the debugger
 //-------------------------------------------------
 
-void ssem_device::state_string_export(const device_state_entry &entry, std::string &str)
+void ssem_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

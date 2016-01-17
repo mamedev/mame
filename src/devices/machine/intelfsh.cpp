@@ -160,7 +160,7 @@ ADDRESS_MAP_END
 //  intelfsh_device - constructor
 //-------------------------------------------------
 
-intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
@@ -390,94 +390,94 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 	m_space_config = address_space_config("flash", ENDIANNESS_BIG, m_bits, addrbits, (m_bits == 8) ? 0 : -1, map);
 }
 
-intelfsh8_device::intelfsh8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+intelfsh8_device::intelfsh8_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source)
 	: intelfsh_device(mconfig, type, name, tag, owner, clock, variant, shortname, source) { }
 
-intelfsh16_device::intelfsh16_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+intelfsh16_device::intelfsh16_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source)
 	: intelfsh_device(mconfig, type, name, tag, owner, clock, variant, shortname, source) { }
 
 
-intel_28f016s5_device::intel_28f016s5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+intel_28f016s5_device::intel_28f016s5_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, INTEL_28F016S5, "Intel 28F016S5 Flash", tag, owner, clock, FLASH_INTEL_28F016S5, "intel_28f016s5", __FILE__) { }
 
-fujitsu_29f160t_device::fujitsu_29f160t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+fujitsu_29f160t_device::fujitsu_29f160t_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, FUJITSU_29F160T, "Fujitsu 29F160 Flash", tag, owner, clock, FLASH_FUJITSU_29F160T, "fujitsu_29f160t", __FILE__) { }
 
-fujitsu_29f016a_device::fujitsu_29f016a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+fujitsu_29f016a_device::fujitsu_29f016a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, FUJITSU_29F016A, "Fujitsu 29F016A Flash", tag, owner, clock, FLASH_FUJITSU_29F016A, "fujitsu_29f016a", __FILE__) { }
 
-fujitsu_29dl16x_device::fujitsu_29dl16x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+fujitsu_29dl16x_device::fujitsu_29dl16x_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, FUJITSU_29DL16X, "Fujitsu 29DL16X Flash", tag, owner, clock, FLASH_FUJITSU_29DL16X, "fujitsu_29dl16x", __FILE__) { }
 
-sharp_lh28f016s_device::sharp_lh28f016s_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sharp_lh28f016s_device::sharp_lh28f016s_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, SHARP_LH28F016S, "Sharp LH28F016S Flash", tag, owner, clock, FLASH_SHARP_LH28F016S, "sharp_lh28f016s", __FILE__) { }
 
-atmel_29c010_device::atmel_29c010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atmel_29c010_device::atmel_29c010_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, ATMEL_29C010, "Atmel 29C010 Flash", tag, owner, clock, FLASH_ATMEL_29C010, "atmel_29c010", __FILE__) { }
 
-amd_29f010_device::amd_29f010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+amd_29f010_device::amd_29f010_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, AMD_29F010, "AMD 29F010 Flash", tag, owner, clock, FLASH_AMD_29F010, "amd_29f010", __FILE__) { }
 
-amd_29f040_device::amd_29f040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+amd_29f040_device::amd_29f040_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, AMD_29F040, "AMD 29F040 Flash", tag, owner, clock, FLASH_AMD_29F040, "amd_29f040", __FILE__) { }
 
-amd_29f080_device::amd_29f080_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+amd_29f080_device::amd_29f080_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, AMD_29F080, "AMD 29F080 Flash", tag, owner, clock, FLASH_AMD_29F080, "amd_29f080", __FILE__) { }
 
-amd_29f400t_device::amd_29f400t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+amd_29f400t_device::amd_29f400t_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, AMD_29F400T, "AMD 29F400 Flash", tag, owner, clock, FLASH_AMD_29F400T, "amd_29f400t", __FILE__) { }
 
-amd_29f800t_device::amd_29f800t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+amd_29f800t_device::amd_29f800t_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, AMD_29F800T, "AMD 29F800 Flash", tag, owner, clock, FLASH_AMD_29F800T, "amd_29f800t", __FILE__) { }
 
-amd_29lv200t_device::amd_29lv200t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+amd_29lv200t_device::amd_29lv200t_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, AMD_29LV200T, "AMD 29LV200T Flash", tag, owner, clock, FLASH_AMD_29LV200T, "amd_29lv200t", __FILE__) { }
 
-intel_e28f008sa_device::intel_e28f008sa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+intel_e28f008sa_device::intel_e28f008sa_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, INTEL_E28F008SA, "Intel E28F008SA Flash", tag, owner, clock, FLASH_INTEL_E28F008SA, "intel_e28f008sa", __FILE__) { }
 
-macronix_29l001mc_device::macronix_29l001mc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+macronix_29l001mc_device::macronix_29l001mc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, MACRONIX_29L001MC, "Macronix 29L001MC Flash", tag, owner, clock, FLASH_MACRONIX_29L001MC, "macronix_29l001mc", __FILE__) { }
 
-macronix_29lv160tmc_device::macronix_29lv160tmc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+macronix_29lv160tmc_device::macronix_29lv160tmc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, MACRONIX_29LV160TMC, "Macronix 29LV160TMC Flash", tag, owner, clock, FLASH_MACRONIX_29LV160TMC, "macronix_29lv160tmc", __FILE__) { }
 
-panasonic_mn63f805mnp_device::panasonic_mn63f805mnp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+panasonic_mn63f805mnp_device::panasonic_mn63f805mnp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, PANASONIC_MN63F805MNP, "Panasonic MN63F805MNP Flash", tag, owner, clock, FLASH_PANASONIC_MN63F805MNP, "panasonic_mn63f805mnp", __FILE__) { }
 
-sanyo_le26fv10n1ts_device::sanyo_le26fv10n1ts_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sanyo_le26fv10n1ts_device::sanyo_le26fv10n1ts_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, SANYO_LE26FV10N1TS, "Sanyo LE26FV10N1TS Flash", tag, owner, clock, FLASH_SANYO_LE26FV10N1TS, "sanyo_le26fv10n1ts", __FILE__) { }
 
-sst_28sf040_device::sst_28sf040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sst_28sf040_device::sst_28sf040_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, SST_28SF040, "SST 28SF040 Flash", tag, owner, clock, FLASH_SST_28SF040, "sst_28sf040", __FILE__) { }
 
-sst_39vf020_device::sst_39vf020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sst_39vf020_device::sst_39vf020_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, SST_39VF020, "SST 39VF020 Flash", tag, owner, clock, FLASH_SST_39VF020, "sst_39vf020", __FILE__) { }
 
-sharp_lh28f400_device::sharp_lh28f400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sharp_lh28f400_device::sharp_lh28f400_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh16_device(mconfig, SHARP_LH28F400, "Sharp LH28F400 Flash", tag, owner, clock, FLASH_SHARP_LH28F400, "sharp_lh28f400", __FILE__) { }
 
-intel_te28f160_device::intel_te28f160_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+intel_te28f160_device::intel_te28f160_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh16_device(mconfig, INTEL_TE28F160, "Intel TE28F160 Flash", tag, owner, clock, FLASH_INTEL_TE28F160, "intel_te28f160", __FILE__) { }
 
-intel_e28f400b_device::intel_e28f400b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+intel_e28f400b_device::intel_e28f400b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh16_device(mconfig, INTEL_E28F400B, "Intel E28F400B Flash", tag, owner, clock, FLASH_INTEL_E28F400B, "intel_e28f400b", __FILE__) { }
 
-sharp_unk128mbit_device::sharp_unk128mbit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sharp_unk128mbit_device::sharp_unk128mbit_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh16_device(mconfig, SHARP_UNK128MBIT, "Sharp Unknown 128Mbit Flash", tag, owner, clock, FLASH_SHARP_UNK128MBIT, "sharp_unk128mbit", __FILE__) { }
 
-intel_28f320j3d_device::intel_28f320j3d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+intel_28f320j3d_device::intel_28f320j3d_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh16_device(mconfig, INTEL_28F320J3D, "Intel 28F320J3D Flash", tag, owner, clock, FLASH_INTEL_28F320J3D, "intel_28f320j3d", __FILE__) { }
 
-intel_28f320j5_device::intel_28f320j5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+intel_28f320j5_device::intel_28f320j5_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh16_device(mconfig, INTEL_28F320J5, "Intel 28F320J3D_a Flash", tag, owner, clock, FLASH_INTEL_28F320J5, "intel_28f320j5", __FILE__) { }
 
 
-sst_39vf400a_device::sst_39vf400a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sst_39vf400a_device::sst_39vf400a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh16_device(mconfig, SST_39VF400A, "SST 39VF400A Flash", tag, owner, clock, FLASH_SST_39VF400A, "sst_39vf400a", __FILE__) { }
 
 
-tms_29f040_device::tms_29f040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms_29f040_device::tms_29f040_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, TMS_29F040, "Texas Instruments 29F040 Flash", tag, owner, clock, FLASH_TMS_29F040, "tms_29f040", __FILE__) { }
 
 //-------------------------------------------------

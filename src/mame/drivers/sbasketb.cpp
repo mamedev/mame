@@ -57,7 +57,7 @@ WRITE8_MEMBER(sbasketb_state::sbasketb_sh_irqtrigger_w)
 
 WRITE8_MEMBER(sbasketb_state::sbasketb_coin_counter_w)
 {
-	coin_counter_w(machine(), offset, data);
+	machine().bookkeeping().coin_counter_w(offset, data);
 }
 
 WRITE8_MEMBER(sbasketb_state::irq_mask_w)

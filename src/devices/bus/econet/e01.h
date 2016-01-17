@@ -28,8 +28,8 @@ class e01_device : public device_t,
 {
 public:
 	// construction/destruction
-	e01_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	e01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e01_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	e01_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	enum
 	{
@@ -121,7 +121,7 @@ class e01s_device :  public e01_device
 {
 public:
 	// construction/destruction
-	e01s_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e01s_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

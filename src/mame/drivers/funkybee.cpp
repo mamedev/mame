@@ -87,7 +87,7 @@ READ8_MEMBER(funkybee_state::funkybee_input_port_0_r)
 
 WRITE8_MEMBER(funkybee_state::funkybee_coin_counter_w)
 {
-	coin_counter_w(machine(), offset, data);
+	machine().bookkeeping().coin_counter_w(offset, data);
 }
 
 static ADDRESS_MAP_START( funkybee_map, AS_PROGRAM, 8, funkybee_state )

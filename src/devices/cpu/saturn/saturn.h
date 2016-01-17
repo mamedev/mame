@@ -76,7 +76,7 @@ class saturn_device : public cpu_device
 {
 public:
 	// construction/destruction
-	saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saturn_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_out_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_out_func.set_callback(object); }
@@ -104,7 +104,7 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
 

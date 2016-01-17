@@ -35,10 +35,10 @@ public:
 		DIV
 	};
 
-	h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	h8_timer8_channel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	h8_timer8_channel_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h8_timer8_channel_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
-	void set_info(const char *intc, int irq_ca, int irq_cb, int irq_v, int div1, int div2, int div3, int div4, int div5, int div6);
+	void set_info(std::string intc, int irq_ca, int irq_cb, int irq_v, int div1, int div2, int div3, int div4, int div5, int div6);
 
 	DECLARE_READ8_MEMBER(tcr_r);
 	DECLARE_WRITE8_MEMBER(tcr_w);
@@ -80,7 +80,8 @@ protected:
 	required_device<h8_device> cpu;
 	h8_timer8_channel_device *chained_timer;
 	h8_intc_device *intc;
-	const char *chain_tag, *intc_tag;
+	std::string chain_tag;
+	std::string intc_tag;
 	int irq_ca, irq_cb, irq_v, chain_type;
 	int div_tab[6];
 	UINT8 tcor[2];
@@ -101,10 +102,10 @@ protected:
 
 class h8h_timer8_channel_device : public h8_timer8_channel_device {
 public:
-	h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8h_timer8_channel_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~h8h_timer8_channel_device();
 
-	void set_info(const char *intc, int irq_ca, int irq_cb, int irq_v, const char *chain_tag, int chain_type, bool has_adte, bool has_ice);
+	void set_info(std::string intc, int irq_ca, int irq_cb, int irq_v, std::string chain_tag, int chain_type, bool has_adte, bool has_ice);
 };
 
 extern const device_type H8_TIMER8_CHANNEL;

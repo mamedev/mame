@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Paul Leaman, Andreas Naive, Nicola Salmoria
 /***************************************************************************
 
@@ -749,7 +749,7 @@ WRITE16_MEMBER( cps_state::cps2_eeprom_port_w )
 		if (m_audiocpu != nullptr)
 			m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
 
-		coin_counter_w(machine(), 0, data & 0x0001);
+		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
 		if (m_cps2_dial_type == 1) // pzloop2
 		{
 			// Puzz Loop 2 uses coin counter 2 input to switch between stick and paddle controls
@@ -757,28 +757,28 @@ WRITE16_MEMBER( cps_state::cps2_eeprom_port_w )
 		}
 		else
 		{
-			coin_counter_w(machine(), 1, data & 0x0002);
+			machine().bookkeeping().coin_counter_w(1, data & 0x0002);
 		}
 
 		if (strncmp(machine().system().name, "mmatrix", 7) == 0)      // Mars Matrix seems to require the coin lockout bit to be reversed
 		{
-			coin_lockout_w(machine(), 0, data & 0x0010);
-			coin_lockout_w(machine(), 1, data & 0x0020);
-			coin_lockout_w(machine(), 2, data & 0x0040);
-			coin_lockout_w(machine(), 3, data & 0x0080);
+			machine().bookkeeping().coin_lockout_w(0, data & 0x0010);
+			machine().bookkeeping().coin_lockout_w(1, data & 0x0020);
+			machine().bookkeeping().coin_lockout_w(2, data & 0x0040);
+			machine().bookkeeping().coin_lockout_w(3, data & 0x0080);
 		}
 		else
 		{
-			coin_lockout_w(machine(), 0, ~data & 0x0010);
-			coin_lockout_w(machine(), 1, ~data & 0x0020);
-			coin_lockout_w(machine(), 2, ~data & 0x0040);
-			coin_lockout_w(machine(), 3, ~data & 0x0080);
+			machine().bookkeeping().coin_lockout_w(0, ~data & 0x0010);
+			machine().bookkeeping().coin_lockout_w(1, ~data & 0x0020);
+			machine().bookkeeping().coin_lockout_w(2, ~data & 0x0040);
+			machine().bookkeeping().coin_lockout_w(3, ~data & 0x0080);
 		}
 
 		/*
-		set_led_status(machine(), 0, data & 0x01);
-		set_led_status(machine(), 1, data & 0x10);
-		set_led_status(machine(), 2, data & 0x20);
+		output().set_led_value(0, data & 0x01);
+		output().set_led_value(1, data & 0x10);
+		output().set_led_value(2, data & 0x20);
 		*/
 	}
 }

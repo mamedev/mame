@@ -10,6 +10,6 @@
 
 #include "machine/steppers.h"
 
-void awp_draw_reel(const char* reeltag, stepper_device &reel);
+void awp_draw_reel(running_machine &machine, const char* reeltag, stepper_device &reel);
 
 #endif

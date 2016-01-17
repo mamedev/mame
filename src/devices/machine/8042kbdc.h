@@ -54,7 +54,7 @@ class kbdc8042_device : public device_t
 {
 public:
 	// construction/destruction
-	kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kbdc8042_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 

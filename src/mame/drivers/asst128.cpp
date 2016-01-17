@@ -13,7 +13,7 @@ class asst128_mb_device : public ibm5150_mb_device
 {
 public:
 	// construction/destruction
-	asst128_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	asst128_mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: ibm5150_mb_device(mconfig, tag, owner, clock) { }
 
 protected:
@@ -39,7 +39,7 @@ class asst128_state : public driver_device
 {
 public:
 	// construction/destruction
-	asst128_state(const machine_config &mconfig, device_type type, const char *tag)
+	asst128_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_mb(*this, "mb")

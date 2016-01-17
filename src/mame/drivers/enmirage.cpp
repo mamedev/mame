@@ -56,7 +56,7 @@
 class mirage_state : public driver_device
 {
 public:
-	mirage_state(const machine_config &mconfig, device_type type, const char *tag)
+	mirage_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_fdc(*this, "wd1772"),
@@ -161,7 +161,7 @@ WRITE8_MEMBER(mirage_state::mirage_via_write_porta)
 		}
 
 		m_l_hi = seg;
-		output_set_digit_value(0, m_l_segs);
+		output().set_digit_value(0, m_l_segs);
 //      printf("L LED: seg %d (hi %d conv %02x, %02x)\n", seg, m_l_hi, segconv[seg], m_l_segs);
 	}
 	// right LED selected?
@@ -179,7 +179,7 @@ WRITE8_MEMBER(mirage_state::mirage_via_write_porta)
 		}
 
 		m_r_hi = seg;
-		output_set_digit_value(1, m_r_segs);
+		output().set_digit_value(1, m_r_segs);
 //      printf("R LED: seg %d (hi %d conv %02x, %02x)\n", seg, m_r_hi, segconv[seg], m_r_segs);
 	}
 }

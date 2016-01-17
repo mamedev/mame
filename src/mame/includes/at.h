@@ -50,7 +50,7 @@
 class at586_state : public driver_device
 {
 public:
-	at586_state(const machine_config &mconfig, device_type type, const char *tag)
+	at586_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 	required_device<cpu_device> m_maincpu;
@@ -61,7 +61,7 @@ public:
 class at_state : public driver_device
 {
 public:
-	at_state(const machine_config &mconfig, device_type type, const char *tag)
+	at_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_pic8259_master(*this, "pic8259_master"),
@@ -170,7 +170,7 @@ public:
 class megapc_state : public driver_device
 {
 public:
-	megapc_state(const machine_config &mconfig, device_type type, const char *tag)
+	megapc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_wd7600(*this, "wd7600"),

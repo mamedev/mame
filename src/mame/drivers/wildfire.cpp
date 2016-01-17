@@ -35,7 +35,7 @@
 class wildfire_state : public driver_device
 {
 public:
-	wildfire_state(const machine_config &mconfig, device_type type, const char *tag)
+	wildfire_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
@@ -136,10 +136,10 @@ void wildfire_state::display_update()
 		if (m_display_cache[i] != active_state[i])
 		{
 			if (index_is_7segled(i))
-				output_set_digit_value(i, BITSWAP8(active_state[i],7,0,1,2,3,4,5,6) & 0x7f);
+				output().set_digit_value(i, BITSWAP8(active_state[i],7,0,1,2,3,4,5,6) & 0x7f);
 
 			for (int j = 0; j < 8; j++)
-				output_set_lamp_value(i*10 + j, active_state[i] >> j & 1);
+				output().set_lamp_value(i*10 + j, active_state[i] >> j & 1);
 		}
 
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));

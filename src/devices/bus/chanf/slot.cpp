@@ -45,7 +45,7 @@ device_channelf_cart_interface::~device_channelf_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_channelf_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_channelf_cart_interface::rom_alloc(UINT32 size, std::string tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -72,7 +72,7 @@ void device_channelf_cart_interface::ram_alloc(UINT32 size)
 //-------------------------------------------------
 //  channelf_cart_slot_device - constructor
 //-------------------------------------------------
-channelf_cart_slot_device::channelf_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+channelf_cart_slot_device::channelf_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, CHANF_CART_SLOT, "Fairchild Channel F Cartridge Slot", tag, owner, clock, "cf_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -207,7 +207,7 @@ bool channelf_cart_slot_device::call_load()
 
 bool channelf_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 	return TRUE;
 }
 
@@ -217,7 +217,7 @@ bool channelf_cart_slot_device::call_softlist_load(software_list_device &swlist,
  get default card software
  -------------------------------------------------*/
 
-void channelf_cart_slot_device::get_default_card_software(std::string &result)
+std::string channelf_cart_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -235,10 +235,9 @@ void channelf_cart_slot_device::get_default_card_software(std::string &result)
 		//printf("type: %s\n", slot_string);
 		clear();
 
-		result.assign(slot_string);
-		return;
+		return std::string(slot_string);
 	}
-	software_get_default_slot(result, "chess");
+	return software_get_default_slot("chess");
 }
 
 /*-------------------------------------------------

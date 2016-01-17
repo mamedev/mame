@@ -18,7 +18,7 @@
 const device_type NEOGEO_MSLUGX_CART = &device_creator<neogeo_mslugx_cart>;
 
 
-neogeo_mslugx_cart::neogeo_mslugx_cart(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT16 clock, const char *shortname, const char *source)
+neogeo_mslugx_cart::neogeo_mslugx_cart(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT16 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_neogeo_cart_interface( mconfig, *this ),
 						m_banked_cart(*this, "banked_cart"),
@@ -26,7 +26,7 @@ neogeo_mslugx_cart::neogeo_mslugx_cart(const machine_config &mconfig, device_typ
 {
 }
 
-neogeo_mslugx_cart::neogeo_mslugx_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock)
+neogeo_mslugx_cart::neogeo_mslugx_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT16 clock)
 					: device_t(mconfig, NEOGEO_MSLUGX_CART, "NEOGEO Metal Slug X Cart", tag, owner, clock, "neogeo_rom", __FILE__),
 						device_neogeo_cart_interface( mconfig, *this ),
 						m_banked_cart(*this, "banked_cart"),

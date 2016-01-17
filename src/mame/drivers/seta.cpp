@@ -1947,8 +1947,8 @@ WRITE16_MEMBER(seta_state::zombraid_gun_w)
 			default:
 				/* Gun Recoils */
 				/* Note:  In debug menu recoil solenoids strobe when held down.  Is this correct?? */
-				output_set_value("Player1_Gun_Recoil", (data & 0x10)>>4 );
-				output_set_value("Player2_Gun_Recoil", (data & 0x8)>>3 );
+				output().set_value("Player1_Gun_Recoil", (data & 0x10)>>4 );
+				output().set_value("Player2_Gun_Recoil", (data & 0x8)>>3 );
 
 				m_gun_input_bit = m_gun_bit_count - 4;
 				m_gun_input_bit = 8 - m_gun_input_bit; // Reverse order
@@ -2497,7 +2497,7 @@ WRITE16_MEMBER(seta_state::magspeed_lights_w)
 	COMBINE_DATA( &m_magspeed_lights[offset] );
 
 	for (int i = 0; i < 16; i++)
-		set_led_status(machine(), offset * 16 + i, BIT(m_magspeed_lights[offset], i));
+		output().set_led_value(offset * 16 + i, BIT(m_magspeed_lights[offset], i));
 
 //  popmessage("%04X %04X %04X", m_magspeed_lights[0], m_magspeed_lights[1], m_magspeed_lights[2]);
 }

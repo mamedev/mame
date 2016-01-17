@@ -82,7 +82,7 @@ class upd7220_device :  public device_t,
 {
 public:
 	// construction/destruction
-	upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd7220_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void static_set_display_pixels_callback(device_t &device, upd7220_display_pixels_delegate callback) { downcast<upd7220_device &>(device).m_display_cb = callback; }
 	static void static_set_draw_text_callback(device_t &device, upd7220_draw_text_delegate callback) { downcast<upd7220_device &>(device).m_draw_text_cb = callback; }

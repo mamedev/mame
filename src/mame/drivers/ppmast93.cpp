@@ -140,7 +140,7 @@ Dip locations added based on the notes above.
 class ppmast93_state : public driver_device
 {
 public:
-	ppmast93_state(const machine_config &mconfig, device_type type, const char *tag)
+	ppmast93_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
@@ -194,8 +194,8 @@ WRITE8_MEMBER(ppmast93_state::bgram_w)
 
 WRITE8_MEMBER(ppmast93_state::port4_w)
 {
-	coin_counter_w(machine(), 0, data & 0x08);
-	coin_counter_w(machine(), 1, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, data & 0x08);
+	machine().bookkeeping().coin_counter_w(1, data & 0x10);
 
 	membank("cpubank")->set_entry(data & 0x07);
 }

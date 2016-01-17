@@ -1161,7 +1161,7 @@ WRITE16_MEMBER( cdicdic_device::regs_w )
 //  cdicdic_device - constructor
 //-------------------------------------------------
 
-cdicdic_device::cdicdic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cdicdic_device::cdicdic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MACHINE_CDICDIC, "CDICDIC", tag, owner, clock, "cdicdic", __FILE__)
 {
 }
@@ -1232,7 +1232,7 @@ void cdicdic_device::device_reset()
 	else
 	{
 		// MAME case
-		m_cd = cdrom_open(get_disk_handle(machine(), ":cdrom"));
+		m_cd = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
 		state->m_cdda->set_cdrom(m_cd);
 	}
 }

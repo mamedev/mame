@@ -19,8 +19,8 @@ class s3virge_vga_device :  public s3_vga_device
 {
 public:
 	// construction/destruction
-	s3virge_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	s3virge_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	s3virge_vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	s3virge_vga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	virtual READ8_MEMBER(port_03b0_r) override;
 	virtual WRITE8_MEMBER(port_03b0_w) override;
@@ -51,8 +51,8 @@ class s3virgedx_vga_device :  public s3virge_vga_device
 {
 public:
 	// construction/destruction
-	s3virgedx_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	s3virgedx_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	s3virgedx_vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	s3virgedx_vga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 protected:
 	// device-level overrides
@@ -66,7 +66,7 @@ class s3virgedx_rev1_vga_device :  public s3virgedx_vga_device
 {
 public:
 	// construction/destruction
-	s3virgedx_rev1_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s3virgedx_rev1_vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

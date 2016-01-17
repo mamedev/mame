@@ -64,7 +64,7 @@ class sega_16bit_sprite_device : public sprite16_device_ind16
 {
 protected:
 	// construction/destruction
-	sega_16bit_sprite_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, const char *shortname, const char *source);
+	sega_16bit_sprite_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source);
 
 public:
 	// live configuration
@@ -109,7 +109,7 @@ class sega_hangon_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	sega_hangon_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_hangon_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// subclass overrides
@@ -123,7 +123,7 @@ class sega_sharrier_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	sega_sharrier_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_sharrier_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// subclass overrides
@@ -137,9 +137,9 @@ class sega_outrun_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_outrun_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 protected:
-	sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, bool xboard_variant, const char *shortname, const char *source);
+	sega_outrun_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock, bool xboard_variant, std::string shortname, std::string source);
 
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
@@ -152,7 +152,7 @@ class sega_xboard_sprite_device : public sega_outrun_sprite_device
 {
 public:
 	// construction/destruction
-	sega_xboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_xboard_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -162,7 +162,7 @@ class sega_sys16a_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	sega_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_sys16a_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// subclass overrides
@@ -176,7 +176,7 @@ class bootleg_sys16a_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	bootleg_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bootleg_sys16a_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// configuration
 	static void static_set_remap(device_t &device, UINT8 offs0, UINT8 offs1, UINT8 offs2, UINT8 offs3, UINT8 offs4, UINT8 offs5, UINT8 offs6, UINT8 offs7);
@@ -196,7 +196,7 @@ class sega_sys16b_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	sega_sys16b_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_sys16b_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// subclass overrides
@@ -210,7 +210,7 @@ class sega_yboard_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	sega_yboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_yboard_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	void set_rotate_ptr(rotate_info* segaic16_rotate) { m_segaic16_rotate = segaic16_rotate; }
 
 protected:

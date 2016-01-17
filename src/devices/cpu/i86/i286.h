@@ -64,7 +64,7 @@ class i80286_cpu_device : public i8086_common_cpu_device
 {
 public:
 	// construction/destruction
-	i80286_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i80286_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
@@ -77,7 +77,7 @@ protected:
 	virtual void execute_run() override;
 	virtual void device_reset() override;
 	virtual void device_start() override;
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 	virtual UINT32 execute_input_lines() const override { return 1; }
 	virtual void execute_set_input(int inputnum, int state) override;
 	bool memory_translate(address_spacenum spacenum, int intention, offs_t &address) override;

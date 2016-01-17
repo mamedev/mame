@@ -3,7 +3,7 @@
 
 #include "scsi.h"
 
-SCSI_PORT_DEVICE::SCSI_PORT_DEVICE(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+SCSI_PORT_DEVICE::SCSI_PORT_DEVICE(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SCSI_PORT, "SCSI Port", tag, owner, clock, "scsi", __FILE__),
 	m_bsy_handler(*this),
 	m_sel_handler(*this),
@@ -666,7 +666,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data7 )
 
 const device_type SCSI_PORT = &device_creator<SCSI_PORT_DEVICE>;
 
-SCSI_PORT_SLOT_device::SCSI_PORT_SLOT_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+SCSI_PORT_SLOT_device::SCSI_PORT_SLOT_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SCSI_PORT_SLOT, "SCSI Connector", tag, owner, clock, "scsi_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_dev(nullptr),

@@ -28,7 +28,7 @@ isbc86 commands: BYTE WORD REAL EREAL ROMTEST. ROMTEST works, the others hang.
 class isbc_state : public driver_device
 {
 public:
-	isbc_state(const machine_config &mconfig, device_type type, const char *tag)
+	isbc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_uart8251(*this, "uart8251"),

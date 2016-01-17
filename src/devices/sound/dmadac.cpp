@@ -198,7 +198,7 @@ void dmadac_sound_device::set_volume(UINT16 volume)
 
 const device_type DMADAC = &device_creator<dmadac_sound_device>;
 
-dmadac_sound_device::dmadac_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dmadac_sound_device::dmadac_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DMADAC, "DMA-driven DAC", tag, owner, clock, "dmadac", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_buffer(nullptr),

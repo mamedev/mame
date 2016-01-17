@@ -56,7 +56,7 @@ public:
 	required_device<msm6222b_device> lcd;
 	required_device<timer_device> midi_timer;
 
-	d110_state(const machine_config &mconfig, device_type type, const char *tag);
+	d110_state(const machine_config &mconfig, device_type type, std::string tag);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -85,7 +85,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-d110_state::d110_state(const machine_config &mconfig, device_type type, const char *tag) :
+d110_state::d110_state(const machine_config &mconfig, device_type type, std::string tag) :
 	driver_device(mconfig, type, tag),
 	cpu(*this, "maincpu"),
 	ram(*this, "ram"),

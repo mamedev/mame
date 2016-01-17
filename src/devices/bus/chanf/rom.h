@@ -13,8 +13,8 @@ class chanf_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	chanf_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	chanf_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	chanf_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	chanf_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override {}
@@ -42,7 +42,7 @@ class chanf_maze_device : public chanf_rom_device
 {
 public:
 	// construction/destruction
-	chanf_maze_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	chanf_maze_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -60,7 +60,7 @@ class chanf_hangman_device : public chanf_rom_device
 {
 public:
 	// construction/destruction
-	chanf_hangman_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	chanf_hangman_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -78,7 +78,7 @@ class chanf_chess_device : public chanf_rom_device
 {
 public:
 	// construction/destruction
-	chanf_chess_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	chanf_chess_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_ram) override { return common_read_3853(offset); }
@@ -92,7 +92,7 @@ class chanf_multi_old_device : public chanf_rom_device
 {
 public:
 	// construction/destruction
-	chanf_multi_old_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	chanf_multi_old_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -115,7 +115,7 @@ class chanf_multi_final_device : public chanf_rom_device
 {
 public:
 	// construction/destruction
-	chanf_multi_final_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	chanf_multi_final_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

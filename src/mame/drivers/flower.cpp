@@ -94,12 +94,12 @@ WRITE8_MEMBER(flower_state::flower_soundcpu_irq_ack)
 
 WRITE8_MEMBER(flower_state::flower_coin_counter_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
 WRITE8_MEMBER(flower_state::flower_coin_lockout_w)
 {
-	coin_lockout_global_w(machine(), ~data & 1);
+	machine().bookkeeping().coin_lockout_global_w(~data & 1);
 }
 
 WRITE8_MEMBER(flower_state::sound_command_w)

@@ -48,7 +48,7 @@ machine_config_constructor c64_dela_ep64_cartridge_device::device_mconfig_additi
 //  c64_dela_ep64_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_dela_ep64_cartridge_device::c64_dela_ep64_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c64_dela_ep64_cartridge_device::c64_dela_ep64_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_DELA_EP64, "C64 Rex 64KB EPROM cartridge", tag, owner, clock, "c64_dela_ep64", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_eprom1(*this, "eprom1"),

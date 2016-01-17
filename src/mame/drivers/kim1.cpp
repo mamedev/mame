@@ -107,7 +107,7 @@ Test Paste:
 class kim1_state : public driver_device
 {
 public:
-	kim1_state(const machine_config &mconfig, device_type type, const char *tag)
+	kim1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_riot2(*this, "miot_u2"),
@@ -236,7 +236,7 @@ WRITE8_MEMBER( kim1_state::kim1_u2_write_a )
 	{
 		if ( data & 0x80 )
 		{
-			output_set_digit_value( idx-4, data & 0x7f );
+			output().set_digit_value( idx-4, data & 0x7f );
 			m_led_time[idx - 4] = 15;
 		}
 	}
@@ -290,7 +290,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_update_leds)
 		if ( m_led_time[i] )
 			m_led_time[i]--;
 		else
-			output_set_digit_value( i, 0 );
+			output().set_digit_value( i, 0 );
 	}
 }
 

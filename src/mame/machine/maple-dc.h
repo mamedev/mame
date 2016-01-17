@@ -15,7 +15,7 @@ class maple_device;
 class maple_dc_device : public device_t
 {
 public:
-	maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	maple_dc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	static void static_set_maincpu_tag(device_t &device, const char *maincpu_tag);
 	static void static_set_irq_cb(device_t &device, void (*irq_cb)(running_machine &));
 

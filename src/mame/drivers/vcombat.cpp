@@ -95,7 +95,7 @@ TODO :  This is a partially working driver.  Most of the memory maps for
 class vcombat_state : public driver_device
 {
 public:
-	vcombat_state(const machine_config &mconfig, device_type type, const char *tag)
+	vcombat_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_tlc34076(*this, "tlc34076"),
 		m_framebuffer_ctrl(*this, "fb_control"),
@@ -237,18 +237,18 @@ static void wiggle_i860_common(i860_cpu_device *device, UINT16 data)
 
 	if (bus_hold)
 	{
-		fprintf(stderr, "M0 asserting bus HOLD to i860 %s\n", device->tag());
+		fprintf(stderr, "M0 asserting bus HOLD to i860 %s\n", device->tag().c_str());
 		device->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
 	}
 	else
 	{
-		fprintf(stderr, "M0 clearing bus HOLD to i860 %s\n", device->tag());
+		fprintf(stderr, "M0 clearing bus HOLD to i860 %s\n", device->tag().c_str());
 		device->i860_set_pin(DEC_PIN_BUS_HOLD, 0);
 	}
 
 	if (reset)
 	{
-		fprintf(stderr, "M0 asserting RESET to i860 %s\n", device->tag());
+		fprintf(stderr, "M0 asserting RESET to i860 %s\n", device->tag().c_str());
 		device->i860_set_pin(DEC_PIN_RESET, 1);
 	}
 	else

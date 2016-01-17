@@ -206,8 +206,8 @@ WRITE16_MEMBER(coolpool_state::amerdart_misc_w)
 {
 	logerror("%08x:IOP_system_w %04x\n",space.device().safe_pc(),data);
 
-	coin_counter_w(machine(), 0, ~data & 0x0001);
-	coin_counter_w(machine(), 1, ~data & 0x0002);
+	machine().bookkeeping().coin_counter_w(0, ~data & 0x0001);
+	machine().bookkeeping().coin_counter_w(1, ~data & 0x0002);
 
 	/* bits 10-15 are counted down over time */
 
@@ -420,8 +420,8 @@ WRITE16_MEMBER(coolpool_state::coolpool_misc_w)
 {
 	logerror("%08x:IOP_system_w %04x\n",space.device().safe_pc(),data);
 
-	coin_counter_w(machine(), 0, ~data & 0x0001);
-	coin_counter_w(machine(), 1, ~data & 0x0002);
+	machine().bookkeeping().coin_counter_w(0, ~data & 0x0001);
+	machine().bookkeeping().coin_counter_w(1, ~data & 0x0002);
 
 	m_dsp->set_input_line(INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 }

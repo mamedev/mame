@@ -409,7 +409,7 @@ void m6805_base_device::interrupt()
 //  m6809_base_device - constructor
 //-------------------------------------------------
 
-m6805_base_device::m6805_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const device_type type, const char *name, UINT32 addr_width, const char *shortname, const char *source)
+m6805_base_device::m6805_base_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock, const device_type type, const char *name, UINT32 addr_width, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_program_config("program", ENDIANNESS_BIG, 8, addr_width)
 {
@@ -493,7 +493,7 @@ const address_space_config *m6805_base_device::memory_space_config(address_space
 //  for the debugger
 //-------------------------------------------------
 
-void m6805_base_device::state_string_export(const device_state_entry &entry, std::string &str)
+void m6805_base_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

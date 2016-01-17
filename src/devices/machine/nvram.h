@@ -77,7 +77,7 @@ public:
 	};
 
 	// construction/destruction
-	nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nvram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
 	static void static_set_default_value(device_t &device, default_value value);

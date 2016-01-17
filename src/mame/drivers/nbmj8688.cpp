@@ -163,8 +163,8 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(nbmj8688_state::barline_output_w)
 {
-	coin_lockout_w(machine(), 0,~data & 0x80);
-	coin_counter_w(machine(), 0,data & 0x02);
+	machine().bookkeeping().coin_lockout_w(0,~data & 0x80);
+	machine().bookkeeping().coin_counter_w(0,data & 0x02);
 }
 
 static ADDRESS_MAP_START( barline_io_map, AS_IO, 8, nbmj8688_state )

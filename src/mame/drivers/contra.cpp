@@ -46,10 +46,10 @@ WRITE8_MEMBER(contra_state::contra_sh_irqtrigger_w)
 WRITE8_MEMBER(contra_state::contra_coin_counter_w)
 {
 	if (data & 0x01)
-		coin_counter_w(machine(), 0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
 
 	if (data & 0x02)
-		coin_counter_w(machine(), 1, (data & 0x02) >> 1);
+		machine().bookkeeping().coin_counter_w(1, (data & 0x02) >> 1);
 }
 
 WRITE8_MEMBER(contra_state::cpu_sound_command_w)

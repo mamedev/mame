@@ -113,7 +113,7 @@ WRITE8_MEMBER(mos6532_t::io_w)
 //  mos6530_base_t - constructor
 //-------------------------------------------------
 
-mos6530_base_t::mos6530_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+mos6530_base_t::mos6530_base_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_ram(*this),
 	m_irq_cb(*this),
@@ -176,7 +176,7 @@ mos6530_base_t::mos6530_base_t(const machine_config &mconfig, device_type type, 
 //  mos6530_t - constructor
 //-------------------------------------------------
 
-mos6530_t::mos6530_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos6530_t::mos6530_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: mos6530_base_t(mconfig, MOS6530n, "MOS6530n", tag, owner, clock, "mos6530n", __FILE__) { }
 
 
@@ -184,7 +184,7 @@ mos6530_t::mos6530_t(const machine_config &mconfig, const char *tag, device_t *o
 //  mos6532_t - constructor
 //-------------------------------------------------
 
-mos6532_t::mos6532_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos6532_t::mos6532_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: mos6530_base_t(mconfig, MOS6532n, "MOS6532n", tag, owner, clock, "mos6532n", __FILE__) { }
 
 
@@ -460,7 +460,7 @@ void mos6530_base_t::edge_detect()
 
 	if ((m_pa7 ^ state) && (m_pa7_dir ^ state) == 0)
 	{
-		if (LOG) logerror("%s %s '%s' edge-detect IRQ\n", machine().time().as_string(), name(), tag());
+		if (LOG) logerror("%s %s '%s' edge-detect IRQ\n", machine().time().as_string(), name().c_str(), tag().c_str());
 
 		m_irq_edge = true;
 		update_irq();
@@ -476,7 +476,7 @@ void mos6530_base_t::edge_detect()
 
 void mos6530_base_t::pa_w(int bit, int state)
 {
-	if (LOG) logerror("%s %s %s '%s' Port A Data Bit %u State %u\n", machine().time().as_string(), machine().describe_context(), name(), tag(), bit, state);
+	if (LOG) logerror("%s %s %s '%s' Port A Data Bit %u State %u\n", machine().time().as_string(), machine().describe_context(), name().c_str(), tag().c_str(), bit, state);
 
 	m_pa_in &= ~(1 << bit);
 	m_pa_in |= (state << bit);
@@ -491,7 +491,7 @@ void mos6530_base_t::pa_w(int bit, int state)
 
 void mos6530_base_t::pb_w(int bit, int state)
 {
-	if (LOG) logerror("%s %s %s '%s' Port B Data Bit %u State %u\n", machine().time().as_string(), machine().describe_context(), name(), tag(), bit, state);
+	if (LOG) logerror("%s %s %s '%s' Port B Data Bit %u State %u\n", machine().time().as_string(), machine().describe_context(), name().c_str(), tag().c_str(), bit, state);
 
 	m_pb_in &= ~(1 << bit);
 	m_pb_in |= (state << bit);
@@ -527,7 +527,7 @@ READ8_MEMBER( mos6530_base_t::pa_data_r )
 	UINT8 ddr_in = m_pa_ddr ^ 0xff;
 	UINT8 data = (out & ddr_out) | (in & ddr_in);
 
-	if (LOG) logerror("%s %s %s '%s' Port A Data In %02x\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data);
+	if (LOG) logerror("%s %s %s '%s' Port A Data In %02x\n", machine().time().as_string(), machine().describe_context(), name().c_str(), tag().c_str(), data);
 
 	return data;
 }
@@ -541,7 +541,7 @@ WRITE8_MEMBER( mos6530_base_t::pa_data_w )
 {
 	m_pa_out = data;
 
-	if (LOG) logerror("%s %s %s '%s' Port A Data Out %02x\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data);
+	if (LOG) logerror("%s %s %s '%s' Port A Data Out %02x\n", machine().time().as_string(), machine().describe_context(), name().c_str(), tag().c_str(), data);
 
 	update_pa();
 	edge_detect();
@@ -556,7 +556,7 @@ WRITE8_MEMBER( mos6530_base_t::pa_ddr_w )
 {
 	m_pa_ddr = data;
 
-	if (LOG) logerror("%s %s %s '%s' Port A DDR %02x\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data);
+	if (LOG) logerror("%s %s %s '%s' Port A DDR %02x\n", machine().time().as_string(), machine().describe_context(), name().c_str(), tag().c_str(), data);
 
 	update_pa();
 	edge_detect();
@@ -592,7 +592,7 @@ READ8_MEMBER( mos6530_base_t::pb_data_r )
 	UINT8 ddr_in = m_pb_ddr ^ 0xff;
 	UINT8 data = (out & ddr_out) | (in & ddr_in);
 
-	if (LOG) logerror("%s %s %s '%s' Port B Data In %02x\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data);
+	if (LOG) logerror("%s %s %s '%s' Port B Data In %02x\n", machine().time().as_string(), machine().describe_context(), name().c_str(), tag().c_str(), data);
 
 	return data;
 }
@@ -606,7 +606,7 @@ WRITE8_MEMBER( mos6530_base_t::pb_data_w )
 {
 	m_pb_out = data;
 
-	if (LOG) logerror("%s %s %s '%s' Port B Data Out %02x\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data);
+	if (LOG) logerror("%s %s %s '%s' Port B Data Out %02x\n", machine().time().as_string(), machine().describe_context(), name().c_str(), tag().c_str(), data);
 
 	update_pb();
 }
@@ -620,7 +620,7 @@ WRITE8_MEMBER( mos6530_base_t::pb_ddr_w )
 {
 	m_pb_ddr = data;
 
-	if (LOG) logerror("%s %s %s '%s' Port B DDR %02x\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data);
+	if (LOG) logerror("%s %s %s '%s' Port B DDR %02x\n", machine().time().as_string(), machine().describe_context(), name().c_str(), tag().c_str(), data);
 
 	update_pb();
 }
@@ -660,7 +660,7 @@ UINT8 mos6530_base_t::timer_r(bool ie)
 
 	data = cur_live.value;
 
-	if (LOG_TIMER) logerror("%s %s %s '%s' Timer read %02x IE %u\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data, m_ie_timer ? 1 : 0);
+	if (LOG_TIMER) logerror("%s %s %s '%s' Timer read %02x IE %u\n", machine().time().as_string(), machine().describe_context(), name().c_str(), tag().c_str(), data, m_ie_timer ? 1 : 0);
 
 	checkpoint();
 	live_run();
@@ -721,7 +721,7 @@ void mos6530_base_t::timer_w(offs_t offset, UINT8 data, bool ie)
 	}
 	update_irq();
 
-	if (LOG_TIMER) logerror("%s %s %s '%s' Timer value %02x prescale %u IE %u\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data, m_prescale, m_ie_timer ? 1 : 0);
+	if (LOG_TIMER) logerror("%s %s %s '%s' Timer value %02x prescale %u IE %u\n", machine().time().as_string(), machine().describe_context(), name().c_str(), tag().c_str(), data, m_prescale, m_ie_timer ? 1 : 0);
 
 	checkpoint();
 
@@ -743,7 +743,7 @@ WRITE8_MEMBER( mos6530_base_t::edge_w )
 	m_pa7_dir = BIT(data, 0);
 	m_ie_edge = BIT(data, 1) ? false : true;
 
-	if (LOG) logerror("%s %s %s '%s' %s edge-detect, %s interrupt\n", machine().time().as_string(), machine().describe_context(), name(), tag(), m_pa7_dir ? "positive" : "negative", m_ie_edge ? "enable" : "disable");
+	if (LOG) logerror("%s %s %s '%s' %s edge-detect, %s interrupt\n", machine().time().as_string(), machine().describe_context(), name().c_str(), tag().c_str(), m_pa7_dir ? "positive" : "negative", m_ie_edge ? "enable" : "disable");
 }
 
 
@@ -834,7 +834,7 @@ void mos6530_base_t::live_run(const attotime &limit)
 				live_delay(RUNNING_SYNCPOINT);
 				return;
 			} else {
-				if (LOG_TIMER) logerror("%s %s '%s' timer %02x\n", cur_live.tm.as_string(), name(), tag(), cur_live.value);
+				if (LOG_TIMER) logerror("%s %s '%s' timer %02x\n", cur_live.tm.as_string(), name().c_str(), tag().c_str(), cur_live.value);
 
 				cur_live.tm += cur_live.period;
 			}
@@ -842,7 +842,7 @@ void mos6530_base_t::live_run(const attotime &limit)
 		}
 
 		case RUNNING_SYNCPOINT: {
-			if (LOG_TIMER) logerror("%s %s '%s' timer %02x interrupt\n", cur_live.tm.as_string(), name(), tag(), cur_live.value);
+			if (LOG_TIMER) logerror("%s %s '%s' timer %02x interrupt\n", cur_live.tm.as_string(), name().c_str(), tag().c_str(), cur_live.value);
 
 			cur_live.tm_irq = cur_live.tm;
 			m_irq_timer = true;
@@ -862,7 +862,7 @@ void mos6530_base_t::live_run(const attotime &limit)
 
 			cur_live.value--;
 
-			if (LOG_TIMER) logerror("%s %s '%s' timer %02x\n", cur_live.tm.as_string(), name(), tag(), cur_live.value);
+			if (LOG_TIMER) logerror("%s %s '%s' timer %02x\n", cur_live.tm.as_string(), name().c_str(), tag().c_str(), cur_live.value);
 
 			if (!cur_live.value) {
 				cur_live.state = IDLE;

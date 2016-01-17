@@ -89,7 +89,7 @@ Side 2 = 0x8F7DDD (or 0x880000 | ( 0x77 << 12 ) | 0x0DDD)
 class cliffhgr_state : public driver_device
 {
 public:
-	cliffhgr_state(const machine_config &mconfig, device_type type, const char *tag)
+	cliffhgr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc"),
 			m_port_bank(0),
@@ -128,7 +128,7 @@ public:
 
 WRITE8_MEMBER(cliffhgr_state::cliff_test_led_w)
 {
-	set_led_status(machine(), 0, offset ^ 1);
+	output().set_led_value(0, offset ^ 1);
 }
 
 WRITE8_MEMBER(cliffhgr_state::cliff_port_bank_w)
@@ -165,7 +165,7 @@ WRITE8_MEMBER(cliffhgr_state::cliff_phillips_clear_w)
 
 WRITE8_MEMBER(cliffhgr_state::cliff_coin_counter_w)
 {
-	coin_counter_w(machine(), 0, (data & 0x40) ? 1 : 0 );
+	machine().bookkeeping().coin_counter_w(0, (data & 0x40) ? 1 : 0 );
 }
 
 READ8_MEMBER(cliffhgr_state::cliff_irq_ack_r)

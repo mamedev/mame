@@ -830,7 +830,7 @@ public:
 	void post_coded(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
 
 	void frame_update(ioport_port &port, ioport_value &digital);
-	const char *key_name(std::string &str, unicode_char ch);
+	std::string key_name(unicode_char ch) const;
 
 	// debugging
 	std::string dump();
@@ -850,7 +850,7 @@ private:
 	attotime choose_delay(unicode_char ch);
 	void internal_post(unicode_char ch);
 	void timer(void *ptr, int param);
-	const char *unicode_to_string(std::string &buffer, unicode_char ch);
+	std::string unicode_to_string(unicode_char ch);
 	const keycode_map_entry *find_code(unicode_char ch) const;
 
 	// internal state
@@ -889,19 +889,19 @@ public:
 
 	// construction/destruction
 	ioport_condition() { reset(); }
-	ioport_condition(condition_t condition, const char *tag, ioport_value mask, ioport_value value) { set(condition, tag, mask, value); }
+	ioport_condition(condition_t condition, std::string tag, ioport_value mask, ioport_value value) { set(condition, tag, mask, value); }
 
 	// getters
-	const char *tag() const { return m_tag; }
+	std::string tag() const { return m_tag; }
 
 	// operators
-	bool operator==(const ioport_condition &rhs) const { return (m_mask == rhs.m_mask && m_value == rhs.m_value && m_condition == rhs.m_condition && strcmp(m_tag, rhs.m_tag) == 0); }
+	bool operator==(const ioport_condition &rhs) const { return (m_mask == rhs.m_mask && m_value == rhs.m_value && m_condition == rhs.m_condition && m_tag==rhs.m_tag); }
 	bool eval() const;
 	bool none() const { return (m_condition == ALWAYS); }
 
 	// configuration
-	void reset() { set(ALWAYS, nullptr, 0, 0); }
-	void set(condition_t condition, const char *tag, ioport_value mask, ioport_value value)
+	void reset() { set(ALWAYS, std::string(), 0, 0); }
+	void set(condition_t condition, std::string tag, ioport_value mask, ioport_value value)
 	{
 		m_condition = condition;
 		m_tag = tag;
@@ -914,7 +914,7 @@ public:
 private:
 	// internal state
 	condition_t     m_condition;    // condition to use
-	const char *    m_tag;          // tag of port whose condition is to be tested
+	std::string     m_tag;          // tag of port whose condition is to be tested
 	ioport_port *   m_port;         // reference to the port to be tested
 	ioport_value    m_mask;         // mask to apply to the port
 	ioport_value    m_value;        // value to compare against
@@ -1188,7 +1188,7 @@ class ioport_port
 
 public:
 	// construction/destruction
-	ioport_port(device_t &owner, const char *tag);
+	ioport_port(device_t &owner, std::string tag);
 	~ioport_port();
 
 	// getters
@@ -1197,7 +1197,7 @@ public:
 	device_t &device() const { return m_device; }
 	running_machine &machine() const;
 	ioport_field *first_field() const { return m_fieldlist.first(); }
-	const char *tag() const { return m_tag.c_str(); }
+	std::string tag() const { return m_tag.c_str(); }
 	int modcount() const { return m_modcount; }
 	ioport_value active() const { return m_active; }
 	ioport_port_live &live() const { assert(m_live != nullptr); return *m_live; }
@@ -1353,6 +1353,8 @@ struct ioport_port_live
 };
 
 
+enum class config_type;
+
 // ======================> ioport_manager
 
 // private input port state
@@ -1396,7 +1398,7 @@ public:
 	bool has_keyboard() const;
 	INT32 frame_interpolate(INT32 oldval, INT32 newval);
 	ioport_type token_to_input_type(const char *string, int &player) const;
-	const char *input_type_to_token(std::string &str, ioport_type type, int player);
+	std::string input_type_to_token(ioport_type type, int player);
 
 private:
 	// internal helpers
@@ -1406,17 +1408,17 @@ private:
 	void frame_update_callback();
 	void frame_update();
 
-	ioport_port *port(const char *tag) const { return m_portlist.find(tag); }
+	ioport_port *port(std::string tag) const { return m_portlist.find(tag); }
 	void exit();
 	input_seq_type token_to_seq_type(const char *string);
 	void update_defaults();
 
-	void load_config(int config_type, xml_data_node *parentnode);
+	void load_config(config_type cfg_type, xml_data_node *parentnode);
 	void load_remap_table(xml_data_node *parentnode);
 	bool load_default_config(xml_data_node *portnode, int type, int player, const input_seq *newseq);
 	bool load_game_config(xml_data_node *portnode, int type, int player, const input_seq *newseq);
 
-	void save_config(int config_type, xml_data_node *parentnode);
+	void save_config(config_type cfg_type, xml_data_node *parentnode);
 	void save_sequence(xml_data_node *parentnode, input_seq_type type, ioport_type porttype, const input_seq &seq);
 	bool save_this_input_field_type(ioport_type type);
 	void save_default_inputs(xml_data_node *parentnode);
@@ -1478,8 +1480,8 @@ public:
 	static const char *string_from_token(const char *string);
 
 	// port helpers
-	void port_alloc(const char *tag);
-	void port_modify(const char *tag);
+	void port_alloc(std::string tag);
+	void port_modify(std::string tag);
 
 	// field helpers
 	void field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name = nullptr);
@@ -1513,7 +1515,7 @@ public:
 	void setting_alloc(ioport_value value, const char *name);
 
 	// misc helpers
-	void set_condition(ioport_condition::condition_t condition, const char *tag, ioport_value mask, ioport_value value);
+	void set_condition(ioport_condition::condition_t condition, std::string tag, ioport_value mask, ioport_value value);
 	void onoff_alloc(const char *name, ioport_value defval, ioport_value mask, const char *diplocation);
 
 private:

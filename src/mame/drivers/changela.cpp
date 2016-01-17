@@ -198,7 +198,7 @@ WRITE8_MEMBER(changela_state::changela_collision_reset_1)
 
 WRITE8_MEMBER(changela_state::changela_coin_counter_w)
 {
-	coin_counter_w(machine(), offset, data);
+	machine().bookkeeping().coin_counter_w(offset, data);
 }
 
 

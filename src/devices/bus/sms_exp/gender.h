@@ -29,7 +29,7 @@ class sms_gender_adapter_device : public device_t,
 {
 public:
 	// construction/destruction
-	sms_gender_adapter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sms_gender_adapter_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device_sms_expansion_slot_interface overrides
 	virtual DECLARE_READ8_MEMBER(read) override;

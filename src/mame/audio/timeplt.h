@@ -8,7 +8,7 @@ class timeplt_audio_device : public device_t,
 									public device_sound_interface
 {
 public:
-	timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	timeplt_audio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~timeplt_audio_device() {}
 
 	DECLARE_WRITE8_MEMBER( sh_irqtrigger_w );

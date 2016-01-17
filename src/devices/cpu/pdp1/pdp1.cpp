@@ -380,7 +380,7 @@
 const device_type PDP1 = &device_creator<pdp1_device>;
 
 
-pdp1_device::pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pdp1_device::pdp1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, PDP1, "PDP1", tag, owner, clock, "pdp1_cpu", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 18, 0)
 {
@@ -737,7 +737,7 @@ void pdp1_device::state_export(const device_state_entry &entry)
 }
 
 
-void pdp1_device::state_string_export(const device_state_entry &entry, std::string &str)
+void pdp1_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

@@ -142,33 +142,33 @@ DRIVER_INIT_MEMBER(gaelco2_state,snowboar)
 WRITE16_MEMBER(gaelco2_state::gaelco2_coin_w)
 {
 	/* Coin Lockouts */
-	coin_lockout_w(machine(), 0, ~data & 0x01);
-	coin_lockout_w(machine(), 1, ~data & 0x02);
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
 
 	/* Coin Counters */
-	coin_counter_w(machine(), 0, data & 0x04);
-	coin_counter_w(machine(), 1, data & 0x08);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
 WRITE16_MEMBER(gaelco2_state::gaelco2_coin2_w)
 {
 	/* coin counters */
-	coin_counter_w(machine(), offset & 0x01,  data & 0x01);
+	machine().bookkeeping().coin_counter_w(offset & 0x01,  data & 0x01);
 }
 
 WRITE16_MEMBER(wrally2_state::wrally2_coin_w)
 {
 	/* coin counters */
-	coin_counter_w(machine(), (offset >> 3) & 0x01,  data & 0x01);
+	machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01,  data & 0x01);
 }
 
 WRITE16_MEMBER(gaelco2_state::touchgo_coin_w)
 {
 	if ((offset >> 2) == 0){
-		coin_counter_w(machine(), 0, data & 0x01);
-		coin_counter_w(machine(), 1, data & 0x02);
-		coin_counter_w(machine(), 2, data & 0x04);
-		coin_counter_w(machine(), 3, data & 0x08);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
+		machine().bookkeeping().coin_counter_w(2, data & 0x04);
+		machine().bookkeeping().coin_counter_w(3, data & 0x08);
 	}
 }
 
@@ -290,7 +290,7 @@ WRITE16_MEMBER(gaelco2_state::gaelco2_eeprom_data_w)
 READ16_MEMBER(gaelco2_state::snowboar_protection_r)
 {
 
-	chd_file * table = get_disk_handle(machine(), ":decrypt");
+	chd_file * table = machine().rom_load().get_disk_handle(":decrypt");
 	UINT8 temp[1024];
 	table->read_hunk(snowboard_latch>>9, &temp[0]);
 	UINT16 data = (temp[(snowboard_latch & 0x1ff)*2]<<8) | temp[((snowboard_latch & 0x1ff)*2)+1];

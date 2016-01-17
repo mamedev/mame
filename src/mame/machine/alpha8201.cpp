@@ -282,7 +282,7 @@ const device_type ALPHA_8201 = &device_creator<alpha_8201_device>;
 //  alpha_8201_device - constructor
 //-------------------------------------------------
 
-alpha_8201_device::alpha_8201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+alpha_8201_device::alpha_8201_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ALPHA_8201, "ALPHA-8201", tag, owner, clock, "alpha8201", __FILE__),
 	m_mcu(*this, "mcu")
 {
@@ -369,7 +369,7 @@ READ8_MEMBER(alpha_8201_device::mcu_data_r)
 	if (m_bus && ~m_mcu_d & 4)
 		ret = m_shared_ram[m_mcu_address];
 	else
-		logerror("%s: MCU side invalid read\n", tag());
+		logerror("%s: MCU side invalid read\n", tag().c_str());
 
 	if (offset == HMCS40_PORT_R0X)
 		ret >>= 4;

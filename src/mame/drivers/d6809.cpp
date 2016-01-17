@@ -91,7 +91,7 @@ devices.
 class d6809_state : public driver_device
 {
 public:
-	d6809_state(const machine_config &mconfig, device_type type, const char *tag)
+	d6809_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG)

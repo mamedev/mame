@@ -240,7 +240,7 @@ TODO:
 class spc1500_state : public driver_device
 {
 public:
-	spc1500_state(const machine_config &mconfig, device_type type, const char *tag)
+	spc1500_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_vdg(*this, "mc6845")
@@ -293,7 +293,6 @@ public:
 	DECLARE_VIDEO_START(spc);
 	MC6845_UPDATE_ROW(crtc_update_row); 
 	MC6845_RECONFIGURE(crtc_reconfig);
-//	TIMER_DEVICE_CALLBACK_MEMBER(timer);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);	
 private:
 	UINT8 *m_p_ram;
@@ -427,19 +426,6 @@ READ8_MEMBER( spc1500_state::crtc_r)
 	}
 	return 0;
 }
-
-	/*
-TIMER_DEVICE_CALLBACK_MEMBER(spc1500_state::timer)
-{
-	switch (param)
-	{
-		case TIMER_TC:
-			printf("m_fdc->tc_w(false)\n");
-//			m_fdc->tc_w(false);
-			break;
-	}
-}
-	*/
 
 void spc1500_state::get_pcg_addr()
 {
@@ -1019,8 +1005,7 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(spc1500_state, portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(spc1500_state, portc_w))
 	
-//	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz", spc1500_state, timer, attotime::from_hz(1))
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_4MHz / 2)

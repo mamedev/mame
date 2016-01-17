@@ -16,7 +16,7 @@ class taito_zoom_device : public device_t
 
 {
 public:
-	taito_zoom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	taito_zoom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~taito_zoom_device() {}
 
 	DECLARE_WRITE16_MEMBER(sound_irq_w);

@@ -129,7 +129,7 @@ WRITE8_MEMBER(_20pacgal_state::timer_pulse_w)
 
 WRITE8_MEMBER(_20pacgal_state::_20pacgal_coin_counter_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
 

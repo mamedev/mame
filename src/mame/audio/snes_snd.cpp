@@ -155,7 +155,7 @@ static const int ENVCNT[0x20]
 
 const device_type SNES = &device_creator<snes_sound_device>;
 
-snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+snes_sound_device::snes_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 						: device_t(mconfig, SNES, "SNES Custom DSP (SPC700)", tag, owner, clock, "snes_sound", __FILE__),
 							device_sound_interface(mconfig, *this)
 {

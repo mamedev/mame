@@ -21,6 +21,8 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+extern struct io_procs image_ioprocs;
+
 class software_list;
 
 enum iodevice_t
@@ -206,10 +208,10 @@ public:
 	void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
 	const char * working_directory();
 
-	UINT8 *get_software_region(const char *tag);
-	UINT32 get_software_region_length(const char *tag);
+	UINT8 *get_software_region(std::string tag);
+	UINT32 get_software_region_length(std::string tag);
 	const char *get_feature(const char *feature_name);
-	bool load_software_region(const char *tag, optional_shared_ptr<UINT8> &ptr);
+	bool load_software_region(std::string tag, optional_shared_ptr<UINT8> &ptr);
 
 	UINT32 crc();
 	hash_collection& hash() { return m_hash; }
@@ -257,9 +259,9 @@ protected:
 	void image_checkhash();
 	void update_names(const device_type device_type = nullptr, const char *inst = nullptr, const char *brief = nullptr);
 
-	software_part *find_software_item(const char *path, bool restrict_to_interface);
+	software_part *find_software_item(const char *path, bool restrict_to_interface) const;
 	bool load_software_part(const char *path, software_part *&swpart);
-	void software_get_default_slot(std::string &result, const char *default_card_slot);
+	std::string software_get_default_slot(const char *default_card_slot) const;
 
 	// derived class overrides
 
@@ -273,7 +275,7 @@ protected:
 
 	/* variables that are only non-zero when an image is mounted */
 	core_file *m_file;
-	emu_file *m_mame_file;
+	std::unique_ptr<emu_file> m_mame_file;
 	std::string m_image_name;
 	std::string m_basename;
 	std::string m_basename_noext;

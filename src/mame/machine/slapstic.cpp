@@ -186,7 +186,7 @@
 
 extern const device_type SLAPSTIC = &device_creator<atari_slapstic_device>;
 
-atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SLAPSTIC, "Atari Slapstic", tag, owner, clock, "slapstic", __FILE__),
 	state(0),
 	current_bank(0),

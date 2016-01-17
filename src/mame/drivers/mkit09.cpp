@@ -42,7 +42,7 @@ Test Paste:
 class mkit09_state : public driver_device
 {
 public:
-	mkit09_state(const machine_config &mconfig, device_type type, const char *tag)
+	mkit09_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_pia(*this, "pia")
 		, m_cass(*this, "cassette")
@@ -171,7 +171,7 @@ WRITE8_MEMBER( mkit09_state::pa_w )
 	data ^= 0xff;
 	if (m_keydata > 3)
 	{
-		output_set_digit_value(m_keydata, BITSWAP8(data, 7, 0, 5, 6, 4, 2, 1, 3));
+		output().set_digit_value(m_keydata, BITSWAP8(data, 7, 0, 5, 6, 4, 2, 1, 3));
 		m_keydata = 0;
 	}
 

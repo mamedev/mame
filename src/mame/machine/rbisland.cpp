@@ -753,10 +753,10 @@ TIMER_CALLBACK_MEMBER(rbisland_state::cchip_timer)
 		m_CRAM[1][0x149] = 0xFF;
 	}
 
-	coin_lockout_w(machine(), 1, m_CRAM[0][8] & 0x80);
-	coin_lockout_w(machine(), 0, m_CRAM[0][8] & 0x40);
-	coin_counter_w(machine(), 1, m_CRAM[0][8] & 0x20);
-	coin_counter_w(machine(), 0, m_CRAM[0][8] & 0x10);
+	machine().bookkeeping().coin_lockout_w(1, m_CRAM[0][8] & 0x80);
+	machine().bookkeeping().coin_lockout_w(0, m_CRAM[0][8] & 0x40);
+	machine().bookkeeping().coin_counter_w(1, m_CRAM[0][8] & 0x20);
+	machine().bookkeeping().coin_counter_w(0, m_CRAM[0][8] & 0x10);
 
 	m_CRAM[0][3] = ioport("800007")->read();    /* STARTn + SERVICE1 */
 	m_CRAM[0][4] = ioport("800009")->read();    /* COINn */

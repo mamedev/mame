@@ -8,7 +8,7 @@
 class qx10_keyboard_device : public serial_keyboard_device
 {
 public:
-	qx10_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	qx10_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ioport_constructor device_input_ports() const override;
 
 protected:

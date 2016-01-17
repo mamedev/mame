@@ -67,7 +67,7 @@ Z - more scan lines per row (cursor is bigger)
 class tavernie_state : public driver_device
 {
 public:
-	tavernie_state(const machine_config &mconfig, device_type type, const char *tag) :
+	tavernie_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "videoram"),
 		m_cass(*this, "cassette"),

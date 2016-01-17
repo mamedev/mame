@@ -65,7 +65,7 @@
 class tispellb_state : public hh_tms1k_state
 {
 public:
-	tispellb_state(const machine_config &mconfig, device_type type, const char *tag)
+	tispellb_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag),
 		m_subcpu(*this, "subcpu"),
 		m_tms6100(*this, "tms6100")

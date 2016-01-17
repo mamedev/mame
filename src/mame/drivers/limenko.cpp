@@ -34,7 +34,7 @@
 class limenko_state : public driver_device
 {
 public:
-	limenko_state(const machine_config &mconfig, device_type type, const char *tag)
+	limenko_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
@@ -117,7 +117,7 @@ public:
 
 WRITE32_MEMBER(limenko_state::limenko_coincounter_w)
 {
-	coin_counter_w(machine(),0,data & 0x10000);
+	machine().bookkeeping().coin_counter_w(0,data & 0x10000);
 }
 
 

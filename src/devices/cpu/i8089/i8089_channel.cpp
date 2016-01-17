@@ -48,7 +48,7 @@ const device_type I8089_CHANNEL = &device_creator<i8089_channel>;
 //  i8089_channel - constructor
 //-------------------------------------------------
 
-i8089_channel::i8089_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+i8089_channel::i8089_channel(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, I8089_CHANNEL, "Intel 8089 I/O Channel", tag, owner, clock, "i8089_channel", __FILE__),
 	m_write_sintr(*this),
 	m_iop(nullptr),
@@ -200,7 +200,7 @@ INT16 i8089_channel::imm16()
 void i8089_channel::terminate_dma(int offset)
 {
 	if (VERBOSE)
-		logerror("%s('%s'): terminating dma transfer\n", shortname(), tag());
+		logerror("%s('%s'): terminating dma transfer\n", shortname().c_str(), tag().c_str());
 
 	set_reg(TP, m_r[TP].w + offset);
 	m_r[PSW].w |= 1 << 2;
@@ -230,9 +230,9 @@ int i8089_channel::execute_run()
 
 			if (VERBOSE)
 			{
-				logerror("%s('%s'): ---- starting dma transfer ----\n", shortname(), tag());
-				logerror("%s('%s'): ga = %06x, gb = %06x, gc = %06x\n", shortname(), tag(), m_r[GA].w, m_r[GB].w, m_r[GC].w);
-				logerror("%s('%s'): bc = %04x, cc = %04x, mc = %04x\n", shortname(), tag(), m_r[BC].w, m_r[CC].w, m_r[MC].w);
+				logerror("%s('%s'): ---- starting dma transfer ----\n", shortname().c_str(), tag().c_str());
+				logerror("%s('%s'): ga = %06x, gb = %06x, gc = %06x\n", shortname().c_str(), tag().c_str(), m_r[GA].w, m_r[GB].w, m_r[GC].w);
+				logerror("%s('%s'): bc = %04x, cc = %04x, mc = %04x\n", shortname().c_str(), tag().c_str(), m_r[BC].w, m_r[CC].w, m_r[MC].w);
 			}
 		}
 
@@ -240,7 +240,7 @@ int i8089_channel::execute_run()
 		{
 		case DMA_IDLE:
 			if (VERBOSE_DMA)
-				logerror("%s('%s'): entering state: DMA_IDLE (bc = %04x)\n", shortname(), tag(), m_r[BC].w);
+				logerror("%s('%s'): entering state: DMA_IDLE (bc = %04x)\n", shortname().c_str(), tag().c_str(), m_r[BC].w);
 
 			// synchronize on source?
 			if (CC_SYNC == 0x01)
@@ -256,7 +256,7 @@ int i8089_channel::execute_run()
 
 		case DMA_FETCH:
 			if (VERBOSE_DMA)
-				logerror("%s('%s'): entering state: DMA_FETCH\n", shortname(), tag());
+				logerror("%s('%s'): entering state: DMA_FETCH\n", shortname().c_str(), tag().c_str());
 
 			// source is 16-bit?
 			if (BIT(m_r[PSW].w, 1))
@@ -309,7 +309,7 @@ int i8089_channel::execute_run()
 			break;
 
 		case DMA_TRANSLATE:
-			fatalerror("%s('%s'): dma translate requested\n", shortname(), tag());
+			fatalerror("%s('%s'): dma translate requested\n", shortname().c_str(), tag().c_str());
 
 		case DMA_WAIT_FOR_DEST_DRQ:
 			if (m_drq)
@@ -318,7 +318,7 @@ int i8089_channel::execute_run()
 
 		case DMA_STORE:
 			if (VERBOSE_DMA)
-				logerror("%s('%s'): entering state: DMA_STORE", shortname(), tag());
+				logerror("%s('%s'): entering state: DMA_STORE", shortname().c_str(), tag().c_str());
 
 			// destination is 16-bit?
 			if (BIT(m_r[PSW].w, 0))
@@ -351,15 +351,15 @@ int i8089_channel::execute_run()
 			break;
 
 		case DMA_COMPARE:
-			fatalerror("%s('%s'): dma compare requested\n", shortname(), tag());
+			fatalerror("%s('%s'): dma compare requested\n", shortname().c_str(), tag().c_str());
 
 		case DMA_TERMINATE:
 			if (VERBOSE_DMA)
-				logerror("%s('%s'): entering state: DMA_TERMINATE\n", shortname(), tag());
+				logerror("%s('%s'): entering state: DMA_TERMINATE\n", shortname().c_str(), tag().c_str());
 
 			// terminate on masked compare?
 			if (CC_TMC & 0x03)
-				fatalerror("%s('%s'): terminate on masked compare not supported\n", shortname(), tag());
+				fatalerror("%s('%s'): terminate on masked compare not supported\n", shortname().c_str(), tag().c_str());
 
 			// terminate on byte count?
 			else if (CC_TBC && m_r[BC].w == 0)
@@ -367,7 +367,7 @@ int i8089_channel::execute_run()
 
 			// terminate on single transfer
 			else if (CC_TS)
-				fatalerror("%s('%s'): terminate on single transfer not supported\n", shortname(), tag());
+				fatalerror("%s('%s'): terminate on single transfer not supported\n", shortname().c_str(), tag().c_str());
 
 			// not terminated, continue transfer
 			else
@@ -386,7 +386,7 @@ int i8089_channel::execute_run()
 
 		case DMA_STORE_BYTE_HIGH:
 			if (VERBOSE_DMA)
-				logerror("%s('%s'): entering state: DMA_STORE_BYTE_HIGH[ %02x ]\n", shortname(), tag(), (m_dma_value >> 8) & 0xff);
+				logerror("%s('%s'): entering state: DMA_STORE_BYTE_HIGH[ %02x ]\n", shortname().c_str(), tag().c_str(), (m_dma_value >> 8) & 0xff);
 
 			m_iop->write_byte(m_r[GA - CC_SOURCE].t, m_r[GB - CC_SOURCE].w, (m_dma_value >> 8) & 0xff);
 			m_r[GB - CC_SOURCE].w++;
@@ -708,7 +708,7 @@ void i8089_channel::attention()
 	// no channel command
 	case 0:
 		if (VERBOSE)
-			logerror("%s('%s'): command received: update psw\n", shortname(), tag());
+			logerror("%s('%s'): command received: update psw\n", shortname().c_str(), tag().c_str());
 
 		if(executing())
 			m_prio = chained() ? PRIO_PROG_CHAIN : PRIO_PROG;
@@ -723,7 +723,7 @@ void i8089_channel::attention()
 	// start channel, tb in local space
 	case 1:
 		if (VERBOSE)
-			logerror("%s('%s'): command received: start channel in local space\n", shortname(), tag());
+			logerror("%s('%s'): command received: start channel in local space\n", shortname().c_str(), tag().c_str());
 
 		examine_ccw(ccw);
 
@@ -737,9 +737,9 @@ void i8089_channel::attention()
 
 		if (VERBOSE)
 		{
-			logerror("%s('%s'): ---- starting channel ----\n", shortname(), tag());
-			logerror("%s('%s'): parameter block address: %06x\n", shortname(), tag(), m_r[PP].w);
-			logerror("%s('%s'): task pointer: %04x\n", shortname(), tag(), m_r[TP].w);
+			logerror("%s('%s'): ---- starting channel ----\n", shortname().c_str(), tag().c_str());
+			logerror("%s('%s'): parameter block address: %06x\n", shortname().c_str(), tag().c_str(), m_r[PP].w);
+			logerror("%s('%s'): task pointer: %04x\n", shortname().c_str(), tag().c_str(), m_r[TP].w);
 		}
 
 		break;
@@ -747,7 +747,7 @@ void i8089_channel::attention()
 	// reserved
 	case 2:
 		if (VERBOSE)
-			logerror("%s('%s'): command received: invalid command 010\n", shortname(), tag());
+			logerror("%s('%s'): command received: invalid command 010\n", shortname().c_str(), tag().c_str());
 		m_prio = PRIO_IDLE;
 
 		break;
@@ -755,7 +755,7 @@ void i8089_channel::attention()
 	// start channel, tb in system space
 	case 3:
 		if (VERBOSE)
-			logerror("%s('%s'): command received: start channel in system space\n", shortname(), tag());
+			logerror("%s('%s'): command received: start channel in system space\n", shortname().c_str(), tag().c_str());
 
 		examine_ccw(ccw);
 
@@ -768,16 +768,16 @@ void i8089_channel::attention()
 
 		if (VERBOSE)
 		{
-			logerror("%s('%s'): ---- starting channel ----\n", shortname(), tag());
-			logerror("%s('%s'): parameter block address: %06x\n", shortname(), tag(), m_r[PP].w);
-			logerror("%s('%s'): task pointer: %06x\n", shortname(), tag(), m_r[TP].w);
+			logerror("%s('%s'): ---- starting channel ----\n", shortname().c_str(), tag().c_str());
+			logerror("%s('%s'): parameter block address: %06x\n", shortname().c_str(), tag().c_str(), m_r[PP].w);
+			logerror("%s('%s'): task pointer: %06x\n", shortname().c_str(), tag().c_str(), m_r[TP].w);
 		}
 
 		break;
 
 	case 4:
 		if (VERBOSE)
-			logerror("%s('%s'): command received: invalid command 100\n", shortname(), tag());
+			logerror("%s('%s'): command received: invalid command 100\n", shortname().c_str(), tag().c_str());
 		m_prio = PRIO_IDLE;
 
 		break;
@@ -785,7 +785,7 @@ void i8089_channel::attention()
 	// continue channel processing
 	case 5:
 		if (VERBOSE)
-			logerror("%s('%s'): command received: continue channel processing\n", shortname(), tag());
+			logerror("%s('%s'): command received: continue channel processing\n", shortname().c_str(), tag().c_str());
 
 		// restore task pointer and parameter block
 		movp_pm(TP, PP, m_r[PP].w);
@@ -797,8 +797,8 @@ void i8089_channel::attention()
 
 		if (VERBOSE)
 		{
-			logerror("%s('%s'): ---- continuing channel ----\n", shortname(), tag());
-			logerror("%s('%s'): task pointer: %06x\n", shortname(), tag(), m_r[TP].w);
+			logerror("%s('%s'): ---- continuing channel ----\n", shortname().c_str(), tag().c_str());
+			logerror("%s('%s'): task pointer: %06x\n", shortname().c_str(), tag().c_str(), m_r[TP].w);
 		}
 
 		break;
@@ -806,7 +806,7 @@ void i8089_channel::attention()
 	// halt channel, save tp
 	case 6:
 		if (VERBOSE)
-			logerror("%s('%s'): command received: halt channel and save tp\n", shortname(), tag());
+			logerror("%s('%s'): command received: halt channel and save tp\n", shortname().c_str(), tag().c_str());
 
 		// save task pointer and psw to parameter block
 		movp_mp(PP, TP, m_r[TP].w);
@@ -818,7 +818,7 @@ void i8089_channel::attention()
 	// halt channel, don't save tp
 	case 7:
 		if (VERBOSE)
-			logerror("%s('%s'): command received: halt channel\n", shortname(), tag());
+			logerror("%s('%s'): command received: halt channel\n", shortname().c_str(), tag().c_str());
 
 		hlt();
 
@@ -834,7 +834,7 @@ void i8089_channel::ca()
 WRITE_LINE_MEMBER( i8089_channel::ext_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): ext_w: %d\n", shortname(), tag(), state);
+		logerror("%s('%s'): ext_w: %d\n", shortname().c_str(), tag().c_str(), state);
 	if(transferring() && state)
 		terminate_dma((CC_TX - 1) * 4);
 }
@@ -842,7 +842,7 @@ WRITE_LINE_MEMBER( i8089_channel::ext_w )
 WRITE_LINE_MEMBER( i8089_channel::drq_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): drq_w: %d\n", shortname(), tag(), state);
+		logerror("%s('%s'): drq_w: %d\n", shortname().c_str(), tag().c_str(), state);
 
 	m_drq = state;
 }

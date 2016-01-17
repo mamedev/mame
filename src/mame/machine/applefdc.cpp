@@ -105,7 +105,7 @@ enum
 //  ctor
 //-------------------------------------------------
 
-applefdc_base_device::applefdc_base_device(applefdc_base_device::applefdc_t fdc_type, const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+applefdc_base_device::applefdc_base_device(applefdc_base_device::applefdc_t fdc_type, const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 	m_type = fdc_type;
@@ -567,7 +567,7 @@ UINT8 applefdc_base_device::get_lines()
 
 const device_type APPLEFDC = &device_creator<applefdc_device>;
 
-applefdc_device::applefdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+applefdc_device::applefdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: applefdc_base_device(APPLEFDC_APPLE2, mconfig, APPLEFDC, "Apple FDC", tag, owner, clock, "apple_fdc", __FILE__)
 {
 }
@@ -580,7 +580,7 @@ applefdc_device::applefdc_device(const machine_config &mconfig, const char *tag,
 
 const device_type IWM = &device_creator<iwm_device>;
 
-iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iwm_device::iwm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: applefdc_base_device(APPLEFDC_IWM, mconfig, IWM, "Apple IWM (Integrated Woz Machine)", tag, owner, clock, "iwm", __FILE__)
 {
 }

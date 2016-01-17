@@ -67,7 +67,7 @@ public:
 
 	// getters
 	bool flag(char flag) const { return (m_flags.find_first_of(flag) != std::string::npos); }
-	const char *hash_types(std::string &buffer) const;
+	std::string hash_types() const;
 
 	// hash manipulators
 	void reset();
@@ -83,9 +83,9 @@ public:
 	void add_sha1(sha1_t sha1) { m_has_sha1 = true; m_sha1 = sha1; }
 
 	// string conversion
-	const char *internal_string(std::string &buffer) const;
-	const char *macro_string(std::string &buffer) const;
-	const char *attribute_string(std::string &buffer) const;
+	std::string internal_string() const;
+	std::string macro_string() const;
+	std::string attribute_string() const;
 	bool from_internal_string(const char *string);
 
 	// creation

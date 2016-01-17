@@ -206,7 +206,7 @@ struct CDE_DMA
 class konamim2_state : public driver_device
 {
 public:
-	konamim2_state(const machine_config &mconfig, device_type type, const char *tag)
+	konamim2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_main_ram(*this, "main_ram"),
 		m_maincpu(*this, "maincpu"),
@@ -499,7 +499,7 @@ WRITE64_MEMBER(konamim2_state::reset_w)
 
 void konamim2_state::cde_init()
 {
-	cdrom_file *cdfile = cdrom_open(get_disk_handle(machine(), ":cdrom"));
+	cdrom_file *cdfile = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
 
 	const cdrom_toc *toc = cdrom_get_toc(cdfile);
 

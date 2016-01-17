@@ -27,7 +27,7 @@ ToDo:
 class nsm_state : public driver_device
 {
 public:
-	nsm_state(const machine_config &mconfig, device_type type, const char *tag)
+	nsm_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu")
 	{ }
@@ -103,7 +103,7 @@ WRITE8_MEMBER( nsm_state::cru_w )
 				for (j = 0; j < 5; j++)
 				{
 					segments = m_cru_data[8-j]^0xff;
-					output_set_digit_value(j * 10 + i, BITSWAP16(segments, 8, 8, 8, 8, 8, 8, 0, 0, 1, 1, 2, 3, 4, 5, 6, 7));
+					output().set_digit_value(j * 10 + i, BITSWAP16(segments, 8, 8, 8, 8, 8, 8, 0, 0, 1, 1, 2, 3, 4, 5, 6, 7));
 				}
 			}
 		}

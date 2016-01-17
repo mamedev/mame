@@ -11,7 +11,7 @@
 class gberet_state : public driver_device
 {
 public:
-	gberet_state(const machine_config &mconfig, device_type type, const char *tag)
+	gberet_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),

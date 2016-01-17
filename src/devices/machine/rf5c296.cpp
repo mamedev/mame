@@ -6,7 +6,7 @@
 
 const device_type RF5C296 = &device_creator<rf5c296_device>;
 
-rf5c296_device::rf5c296_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+rf5c296_device::rf5c296_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PCCARD_SLOT, "PCCARD SLOT", tag, owner, clock, "pccard", __FILE__), m_rf5c296_reg(0), m_pccard(nullptr), m_pccard_name(nullptr)
 {
 }

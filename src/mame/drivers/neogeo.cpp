@@ -1012,15 +1012,15 @@ void neogeo_state::set_outputs(  )
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	/* EL */
-	output_set_digit_value(0, led_map[m_el_value]);
+	output().set_digit_value(0, led_map[m_el_value]);
 
 	/* LED1 */
-	output_set_digit_value(1, led_map[m_led1_value >> 4]);
-	output_set_digit_value(2, led_map[m_led1_value & 0x0f]);
+	output().set_digit_value(1, led_map[m_led1_value >> 4]);
+	output().set_digit_value(2, led_map[m_led1_value & 0x0f]);
 
 	/* LED2 */
-	output_set_digit_value(3, led_map[m_led2_value >> 4]);
-	output_set_digit_value(4, led_map[m_led2_value & 0x0f]);
+	output().set_digit_value(3, led_map[m_led2_value >> 4]);
+	output().set_digit_value(4, led_map[m_led2_value & 0x0f]);
 }
 
 

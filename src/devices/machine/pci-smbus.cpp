@@ -26,7 +26,7 @@ DEVICE_ADDRESS_MAP_START(map, 32, smbus_device)
 	AM_RANGE(0x14, 0x17) AM_READ8      (notify_dhigh_r,                     0xff000000)
 ADDRESS_MAP_END
 
-smbus_device::smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+smbus_device::smbus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, SMBUS, "SMBUS interface", tag, owner, clock, "smbus", __FILE__)
 {
 }
@@ -70,7 +70,7 @@ READ8_MEMBER  (smbus_device::hst_sts_r)
 WRITE8_MEMBER (smbus_device::hst_sts_w)
 {
 	hst_sts &= ~data;
-	logerror("%s: hst_sts = %02x\n", tag(), hst_sts);
+	logerror("%s: hst_sts = %02x\n", tag().c_str(), hst_sts);
 }
 
 READ8_MEMBER  (smbus_device::hst_cnt_r)
@@ -81,7 +81,7 @@ READ8_MEMBER  (smbus_device::hst_cnt_r)
 WRITE8_MEMBER (smbus_device::hst_cnt_w)
 {
 	hst_cnt = data;
-	logerror("%s: hst_cnt = %02x\n", tag(), hst_cnt);
+	logerror("%s: hst_cnt = %02x\n", tag().c_str(), hst_cnt);
 
 	if(xmit_slva != 0xa1)
 		hst_sts = 4;
@@ -118,7 +118,7 @@ READ8_MEMBER  (smbus_device::hst_cmd_r)
 WRITE8_MEMBER (smbus_device::hst_cmd_w)
 {
 	hst_cmd = data;
-	logerror("%s: hst_cmd = %02x\n", tag(), hst_cmd);
+	logerror("%s: hst_cmd = %02x\n", tag().c_str(), hst_cmd);
 }
 
 READ8_MEMBER  (smbus_device::xmit_slva_r)
@@ -129,7 +129,7 @@ READ8_MEMBER  (smbus_device::xmit_slva_r)
 WRITE8_MEMBER (smbus_device::xmit_slva_w)
 {
 	xmit_slva = data;
-	logerror("%s: xmit_slva = %02x\n", tag(), xmit_slva);
+	logerror("%s: xmit_slva = %02x\n", tag().c_str(), xmit_slva);
 }
 
 READ8_MEMBER  (smbus_device::hst_d0_r)
@@ -140,7 +140,7 @@ READ8_MEMBER  (smbus_device::hst_d0_r)
 WRITE8_MEMBER (smbus_device::hst_d0_w)
 {
 	hst_d0 = data;
-	logerror("%s: hst_d0 = %02x\n", tag(), hst_d0);
+	logerror("%s: hst_d0 = %02x\n", tag().c_str(), hst_d0);
 }
 
 READ8_MEMBER  (smbus_device::hst_d1_r)
@@ -151,7 +151,7 @@ READ8_MEMBER  (smbus_device::hst_d1_r)
 WRITE8_MEMBER (smbus_device::hst_d1_w)
 {
 	hst_d1 = data;
-	logerror("%s: hst_d1 = %02x\n", tag(), hst_d1);
+	logerror("%s: hst_d1 = %02x\n", tag().c_str(), hst_d1);
 }
 
 READ8_MEMBER  (smbus_device::host_block_db_r)
@@ -162,7 +162,7 @@ READ8_MEMBER  (smbus_device::host_block_db_r)
 WRITE8_MEMBER (smbus_device::host_block_db_w)
 {
 	host_block_db = data;
-	logerror("%s: host_block_db = %02x\n", tag(), host_block_db);
+	logerror("%s: host_block_db = %02x\n", tag().c_str(), host_block_db);
 }
 
 READ8_MEMBER  (smbus_device::pec_r)
@@ -173,7 +173,7 @@ READ8_MEMBER  (smbus_device::pec_r)
 WRITE8_MEMBER (smbus_device::pec_w)
 {
 	pec = data;
-	logerror("%s: pec = %02x\n", tag(), pec);
+	logerror("%s: pec = %02x\n", tag().c_str(), pec);
 }
 
 READ8_MEMBER  (smbus_device::rcv_slva_r)
@@ -184,7 +184,7 @@ READ8_MEMBER  (smbus_device::rcv_slva_r)
 WRITE8_MEMBER (smbus_device::rcv_slva_w)
 {
 	rcv_slva = data;
-	logerror("%s: rcv_slva = %02x\n", tag(), rcv_slva);
+	logerror("%s: rcv_slva = %02x\n", tag().c_str(), rcv_slva);
 }
 
 READ16_MEMBER (smbus_device::slv_data_r)
@@ -195,7 +195,7 @@ READ16_MEMBER (smbus_device::slv_data_r)
 WRITE16_MEMBER(smbus_device::slv_data_w)
 {
 	slv_data = data;
-	logerror("%s: slv_data = %02x\n", tag(), slv_data);
+	logerror("%s: slv_data = %02x\n", tag().c_str(), slv_data);
 }
 
 READ8_MEMBER  (smbus_device::aux_sts_r)
@@ -206,7 +206,7 @@ READ8_MEMBER  (smbus_device::aux_sts_r)
 WRITE8_MEMBER (smbus_device::aux_sts_w)
 {
 	aux_sts = data;
-	logerror("%s: aux_sts = %02x\n", tag(), aux_sts);
+	logerror("%s: aux_sts = %02x\n", tag().c_str(), aux_sts);
 }
 
 READ8_MEMBER  (smbus_device::aux_ctl_r)
@@ -217,7 +217,7 @@ READ8_MEMBER  (smbus_device::aux_ctl_r)
 WRITE8_MEMBER (smbus_device::aux_ctl_w)
 {
 	aux_ctl = data;
-	logerror("%s: aux_ctl = %02x\n", tag(), aux_ctl);
+	logerror("%s: aux_ctl = %02x\n", tag().c_str(), aux_ctl);
 }
 
 READ8_MEMBER  (smbus_device::smlink_pin_ctl_r)
@@ -228,7 +228,7 @@ READ8_MEMBER  (smbus_device::smlink_pin_ctl_r)
 WRITE8_MEMBER (smbus_device::smlink_pin_ctl_w)
 {
 	smlink_pin_ctl = data;
-	logerror("%s: smlink_pin_ctl = %02x\n", tag(), smlink_pin_ctl);
+	logerror("%s: smlink_pin_ctl = %02x\n", tag().c_str(), smlink_pin_ctl);
 }
 
 READ8_MEMBER  (smbus_device::smbus_pin_ctl_r)
@@ -239,7 +239,7 @@ READ8_MEMBER  (smbus_device::smbus_pin_ctl_r)
 WRITE8_MEMBER (smbus_device::smbus_pin_ctl_w)
 {
 	smbus_pin_ctl = data;
-	logerror("%s: smbus_pin_ctl = %02x\n", tag(), smbus_pin_ctl);
+	logerror("%s: smbus_pin_ctl = %02x\n", tag().c_str(), smbus_pin_ctl);
 }
 
 READ8_MEMBER  (smbus_device::slv_sts_r)
@@ -250,7 +250,7 @@ READ8_MEMBER  (smbus_device::slv_sts_r)
 WRITE8_MEMBER (smbus_device::slv_sts_w)
 {
 	slv_sts = data;
-	logerror("%s: slv_sts = %02x\n", tag(), slv_sts);
+	logerror("%s: slv_sts = %02x\n", tag().c_str(), slv_sts);
 }
 
 READ8_MEMBER  (smbus_device::slv_cmd_r)
@@ -261,7 +261,7 @@ READ8_MEMBER  (smbus_device::slv_cmd_r)
 WRITE8_MEMBER (smbus_device::slv_cmd_w)
 {
 	slv_cmd = data;
-	logerror("%s: slv_cmd = %02x\n", tag(), slv_cmd);
+	logerror("%s: slv_cmd = %02x\n", tag().c_str(), slv_cmd);
 }
 
 READ8_MEMBER  (smbus_device::notify_daddr_r)

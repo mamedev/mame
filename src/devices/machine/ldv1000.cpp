@@ -121,7 +121,7 @@ ROM_END
 //  pioneer_ldv1000_device - constructor
 //-------------------------------------------------
 
-pioneer_ldv1000_device::pioneer_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pioneer_ldv1000_device::pioneer_ldv1000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: laserdisc_device(mconfig, PIONEER_LDV1000, "Pioneer LD-V1000", tag, owner, clock, "ldv1000", __FILE__),
 		m_z80_cpu(*this, "ldv1000"),
 		m_z80_ctc(*this, "ldvctc"),

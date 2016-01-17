@@ -17,18 +17,18 @@
 #include "machine/steppers.h"
 
 
-void awp_draw_reel(const char* reeltag, stepper_device &reel)
+void awp_draw_reel(running_machine &machine, const char* reeltag, stepper_device &reel)
 {
 	char rg[16];
 
 	int reelpos =  reel.get_position();
-	if (reelpos == output_get_value(reeltag))
+	if (reelpos == machine.output().get_value(reeltag))
 	{
 		// Not moved, no need to update.
 	}
 	else
 	{
-		output_set_value(reeltag,(reelpos));
+		machine.output().set_value(reeltag,(reelpos));
 
 		// if the reel isn't configured don't do this, otherwise you'll get DIV0
 		if (reel.get_max())
@@ -37,7 +37,7 @@ void awp_draw_reel(const char* reeltag, stepper_device &reel)
 			// normalize the value
 			int sreelpos = (reelpos * 0x10000) / reel.get_max();
 
-			output_set_value(rg,sreelpos);
+			machine.output().set_value(rg,sreelpos);
 		}
 	}
 }

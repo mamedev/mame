@@ -224,7 +224,7 @@ machine_config_constructor abc1600_mover_device::device_mconfig_additions() cons
 //  abc1600_mover_device - constructor
 //-------------------------------------------------
 
-abc1600_mover_device::abc1600_mover_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+abc1600_mover_device::abc1600_mover_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ABC1600_MOVER, "ABC 1600 Mover", tag, owner, clock, "abc1600mover", __FILE__),
 	device_memory_interface(mconfig, *this),
 	m_space_config("vram", ENDIANNESS_BIG, 16, 18, -1, *ADDRESS_MAP_NAME(mover_map)),

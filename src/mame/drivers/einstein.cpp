@@ -459,7 +459,7 @@ UINT32 einstein_state::screen_update_einstein2(screen_device &screen, bitmap_rgb
 	else if (&screen == m_crtc_screen)
 		m_mc6845->screen_update( screen, bitmap, cliprect);
 	else
-		fatalerror("Unknown screen '%s'\n", screen.tag());
+		fatalerror("Unknown screen '%s'\n", screen.tag().c_str());
 
 	return 0;
 }

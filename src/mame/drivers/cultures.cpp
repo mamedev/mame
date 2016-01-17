@@ -20,7 +20,7 @@
 class cultures_state : public driver_device
 {
 public:
-	cultures_state(const machine_config &mconfig, device_type type, const char *tag)
+	cultures_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -177,7 +177,7 @@ WRITE8_MEMBER(cultures_state::bg_bank_w)
 		m_bg2_bank = (data & 0xc) >> 2;
 		m_bg2_tilemap->mark_all_dirty();
 	}
-	coin_counter_w(machine(), 0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 }
 
 

@@ -10,7 +10,7 @@
 class maple_device : public device_t
 {
 public:
-	maple_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	maple_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	static void static_set_host(device_t &device, const char *_host_tag, int _host_port);
 	virtual void maple_w(const UINT32 *data, UINT32 in_size) = 0;

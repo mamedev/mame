@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 /*************************************************************************
 
@@ -27,7 +27,7 @@
 class dragrace_state : public driver_device
 {
 public:
-	dragrace_state(const machine_config &mconfig, device_type type, const char *tag)
+	dragrace_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_playfield_ram(*this, "playfield_ram"),
 		m_position_ram(*this, "position_ram"),

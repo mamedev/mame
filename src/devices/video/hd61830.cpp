@@ -95,7 +95,7 @@ inline void hd61830_device::writebyte(offs_t address, UINT8 data)
 //  hd61830_device - constructor
 //-------------------------------------------------
 
-hd61830_device::hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+hd61830_device::hd61830_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, HD61830, "HD61830 LCDC", tag, owner, clock, "hd61830", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
@@ -196,7 +196,7 @@ void hd61830_device::set_busy_flag()
 
 READ8_MEMBER( hd61830_device::status_r )
 {
-	if (LOG) logerror("HD61830 '%s' Status Read: %s\n", tag(), m_bf ? "busy" : "ready");
+	if (LOG) logerror("HD61830 '%s' Status Read: %s\n", tag().c_str(), m_bf ? "busy" : "ready");
 
 	return m_bf ? 0x80 : 0;
 }
@@ -220,7 +220,7 @@ READ8_MEMBER( hd61830_device::data_r )
 {
 	UINT8 data = m_dor;
 
-	if (LOG) logerror("HD61830 '%s' Display Data Read %02x\n", tag(), m_dor);
+	if (LOG) logerror("HD61830 '%s' Display Data Read %02x\n", tag().c_str(), m_dor);
 
 	m_dor = readbyte(m_cac);
 
@@ -238,7 +238,7 @@ WRITE8_MEMBER( hd61830_device::data_w )
 {
 	if (m_bf)
 	{
-		logerror("HD61830 '%s' Ignoring data write %02x due to business\n", tag(), data);
+		logerror("HD61830 '%s' Ignoring data write %02x due to business\n", tag().c_str(), data);
 		return;
 	}
 
@@ -249,12 +249,12 @@ WRITE8_MEMBER( hd61830_device::data_w )
 
 		if (LOG)
 		{
-			logerror("HD61830 '%s' %s CG\n", tag(), (data & MODE_EXTERNAL_CG) ? "External" : "Internal");
-			logerror("HD61830 '%s' %s Display Mode\n", tag(), (data & MODE_GRAPHIC) ? "Graphic" : "Character");
-			logerror("HD61830 '%s' %s Mode\n", tag(), (data & MODE_MASTER) ? "Master" : "Slave");
-			logerror("HD61830 '%s' Cursor %s\n", tag(), (data & MODE_CURSOR) ? "On" : "Off");
-			logerror("HD61830 '%s' Blink %s\n", tag(), (data & MODE_BLINK) ? "On" : "Off");
-			logerror("HD61830 '%s' Display %s\n", tag(), (data & MODE_DISPLAY_ON) ? "On" : "Off");
+			logerror("HD61830 '%s' %s CG\n", tag().c_str(), (data & MODE_EXTERNAL_CG) ? "External" : "Internal");
+			logerror("HD61830 '%s' %s Display Mode\n", tag().c_str(), (data & MODE_GRAPHIC) ? "Graphic" : "Character");
+			logerror("HD61830 '%s' %s Mode\n", tag().c_str(), (data & MODE_MASTER) ? "Master" : "Slave");
+			logerror("HD61830 '%s' Cursor %s\n", tag().c_str(), (data & MODE_CURSOR) ? "On" : "Off");
+			logerror("HD61830 '%s' Blink %s\n", tag().c_str(), (data & MODE_BLINK) ? "On" : "Off");
+			logerror("HD61830 '%s' Display %s\n", tag().c_str(), (data & MODE_DISPLAY_ON) ? "On" : "Off");
 		}
 		break;
 
@@ -262,38 +262,38 @@ WRITE8_MEMBER( hd61830_device::data_w )
 		m_hp = (data & 0x07) + 1;
 		m_vp = (data >> 4) + 1;
 
-		if (LOG) logerror("HD61830 '%s' Horizontal Character Pitch: %u\n", tag(), m_hp);
-		if (LOG) logerror("HD61830 '%s' Vertical Character Pitch: %u\n", tag(), m_vp);
+		if (LOG) logerror("HD61830 '%s' Horizontal Character Pitch: %u\n", tag().c_str(), m_hp);
+		if (LOG) logerror("HD61830 '%s' Vertical Character Pitch: %u\n", tag().c_str(), m_vp);
 		break;
 
 	case INSTRUCTION_NUMBER_OF_CHARACTERS:
 		m_hn = (data & 0x7f) + 1;
 
-		if (LOG) logerror("HD61830 '%s' Number of Characters: %u\n", tag(), m_hn);
+		if (LOG) logerror("HD61830 '%s' Number of Characters: %u\n", tag().c_str(), m_hn);
 		break;
 
 	case INSTRUCTION_NUMBER_OF_TIME_DIVISIONS:
 		m_nx = (data & 0x7f) + 1;
 
-		if (LOG) logerror("HD61830 '%s' Number of Time Divisions: %u\n", tag(), m_nx);
+		if (LOG) logerror("HD61830 '%s' Number of Time Divisions: %u\n", tag().c_str(), m_nx);
 		break;
 
 	case INSTRUCTION_CURSOR_POSITION:
 		m_cp = (data & 0x7f) + 1;
 
-		if (LOG) logerror("HD61830 '%s' Cursor Position: %u\n", tag(), m_cp);
+		if (LOG) logerror("HD61830 '%s' Cursor Position: %u\n", tag().c_str(), m_cp);
 		break;
 
 	case INSTRUCTION_DISPLAY_START_LOW:
 		m_dsa = (m_dsa & 0xff00) | data;
 
-		if (LOG) logerror("HD61830 '%s' Display Start Address Low %04x\n", tag(), m_dsa);
+		if (LOG) logerror("HD61830 '%s' Display Start Address Low %04x\n", tag().c_str(), m_dsa);
 		break;
 
 	case INSTRUCTION_DISPLAY_START_HIGH:
 		m_dsa = (data << 8) | (m_dsa & 0xff);
 
-		if (LOG) logerror("HD61830 '%s' Display Start Address High %04x\n", tag(), m_dsa);
+		if (LOG) logerror("HD61830 '%s' Display Start Address High %04x\n", tag().c_str(), m_dsa);
 		break;
 
 	case INSTRUCTION_CURSOR_ADDRESS_LOW:
@@ -306,19 +306,19 @@ WRITE8_MEMBER( hd61830_device::data_w )
 			m_cac = (m_cac & 0xff00) | data;
 		}
 
-		if (LOG) logerror("HD61830 '%s' Cursor Address Low %02x: %04x\n", tag(), data, m_cac);
+		if (LOG) logerror("HD61830 '%s' Cursor Address Low %02x: %04x\n", tag().c_str(), data, m_cac);
 		break;
 
 	case INSTRUCTION_CURSOR_ADDRESS_HIGH:
 		m_cac = (data << 8) | (m_cac & 0xff);
 
-		if (LOG) logerror("HD61830 '%s' Cursor Address High %02x: %04x\n", tag(), data, m_cac);
+		if (LOG) logerror("HD61830 '%s' Cursor Address High %02x: %04x\n", tag().c_str(), data, m_cac);
 		break;
 
 	case INSTRUCTION_DISPLAY_DATA_WRITE:
 		writebyte(m_cac, data);
 
-		if (LOG) logerror("HD61830 '%s' Display Data Write %02x -> %04x row %u col %u\n", tag(), data, m_cac, m_cac / 40, m_cac % 40);
+		if (LOG) logerror("HD61830 '%s' Display Data Write %02x -> %04x row %u col %u\n", tag().c_str(), data, m_cac, m_cac / 40, m_cac % 40);
 
 		m_cac++;
 		break;
@@ -330,7 +330,7 @@ WRITE8_MEMBER( hd61830_device::data_w )
 
 		md &= ~(1 << bit);
 
-		if (LOG) logerror("HD61830 '%s' Clear Bit %u at %04x\n", tag(), bit + 1, m_cac);
+		if (LOG) logerror("HD61830 '%s' Clear Bit %u at %04x\n", tag().c_str(), bit + 1, m_cac);
 
 		writebyte(m_cac, md);
 
@@ -345,7 +345,7 @@ WRITE8_MEMBER( hd61830_device::data_w )
 
 		md |= 1 << bit;
 
-		if (LOG) logerror("HD61830 '%s' Set Bit %u at %04x\n", tag(), bit + 1, m_cac);
+		if (LOG) logerror("HD61830 '%s' Set Bit %u at %04x\n", tag().c_str(), bit + 1, m_cac);
 
 		writebyte(m_cac, md);
 
@@ -354,7 +354,7 @@ WRITE8_MEMBER( hd61830_device::data_w )
 		break;
 
 	default:
-		logerror("HD61830 '%s' Illegal Instruction %02x!\n", tag(), m_ir);
+		logerror("HD61830 '%s' Illegal Instruction %02x!\n", tag().c_str(), m_ir);
 		return;
 	}
 

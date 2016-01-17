@@ -57,7 +57,7 @@
  * </PRE>
  */
 
-diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+diablo_hd_device::diablo_hd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, DIABLO_HD, "Diablo Disk", tag, owner, clock, "diablo_hd", __FILE__),
 #if DIABLO_DEBUG
 	m_log_level(8),
@@ -1322,7 +1322,7 @@ void diablo_hd_device::device_start()
 	m_image = static_cast<diablo_image_device *>(subdevice("drive"));
 
 	m_packs = 1;        // FIXME: get from configuration?
-	m_unit = strstr(m_image->tag(), "diablo0") ? 0 : 1;
+	m_unit = strstr(m_image->tag().c_str(), "diablo0") ? 0 : 1;
 	m_timer = timer_alloc(1, nullptr);
 }
 

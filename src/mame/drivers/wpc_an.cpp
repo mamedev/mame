@@ -17,7 +17,7 @@
 class wpc_an_state : public driver_device
 {
 public:
-	wpc_an_state(const machine_config &mconfig, device_type type, const char *tag)
+	wpc_an_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_bg(*this,"bg"),
@@ -195,8 +195,8 @@ void wpc_an_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		// update LED segments
 		for(x=0;x<16;x++)
 		{
-			output_set_digit_value(x,BITSWAP16(m_wpc->get_alphanumeric(x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
-			output_set_digit_value(x+16,BITSWAP16(m_wpc->get_alphanumeric(20+x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(x,BITSWAP16(m_wpc->get_alphanumeric(x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(x+16,BITSWAP16(m_wpc->get_alphanumeric(20+x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		}
 		m_wpc->reset_alphanumeric();
 		m_vblank_count++;

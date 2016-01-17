@@ -30,7 +30,7 @@
 
 const device_type SEGA005 = &device_creator<sega005_sound_device>;
 
-sega005_sound_device::sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega005_sound_device::sega005_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGA005, "Sega 005 Audio Custom", tag, owner, clock, "sega005_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_sega005_sound_timer(nullptr),

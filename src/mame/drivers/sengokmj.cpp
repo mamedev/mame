@@ -64,7 +64,7 @@ RSSENGO2.72   chr.
 class sengokmj_state : public driver_device
 {
 public:
-	sengokmj_state(const machine_config &mconfig, device_type type, const char *tag)
+	sengokmj_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -371,9 +371,9 @@ WRITE16_MEMBER(sengokmj_state::out_w)
 	/* ---- ---- ---- -x-- Coin counter (done AFTER you press start)*/
 	/* ---- ---- ---- --x- Cash enable (lockout)*/
 	/* ---- ---- ---- ---x Hopper 10 */
-	coin_lockout_w(machine(), 0,~data & 2);
-	coin_lockout_w(machine(), 1,~data & 2);
-	coin_counter_w(machine(), 0,data & 4);
+	machine().bookkeeping().coin_lockout_w(0,~data & 2);
+	machine().bookkeeping().coin_lockout_w(1,~data & 2);
+	machine().bookkeeping().coin_counter_w(0,data & 4);
 	m_hopper_io = ((data & 1)<<6);
 //  popmessage("%02x",m_hopper_io);
 }

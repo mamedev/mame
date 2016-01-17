@@ -199,12 +199,12 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_led_callback)
 	if(m_led_state == 1)
 	{
 		for(drive=0;drive<4;drive++)
-			output_set_indexed_value("ctrl_drv",drive,m_fdc.led_ctrl[drive] ? 0 : 1);
+			output().set_indexed_value("ctrl_drv",drive,m_fdc.led_ctrl[drive] ? 0 : 1);
 	}
 	else
 	{
 		for(drive=0;drive<4;drive++)
-			output_set_indexed_value("ctrl_drv",drive,1);
+			output().set_indexed_value("ctrl_drv",drive,1);
 	}
 
 }
@@ -637,7 +637,7 @@ WRITE16_MEMBER(x68k_state::x68k_fdc_w)
 				{
 					m_fdc.led_ctrl[drive] = data & 0x80;  // blinking drive LED if no disk inserted
 					m_fdc.led_eject[drive] = data & 0x40;  // eject button LED (on when set to 0)
-					output_set_indexed_value("eject_drv",drive,(data & 0x40) ? 1 : 0);
+					output().set_indexed_value("eject_drv",drive,(data & 0x40) ? 1 : 0);
 					if((data & 0x60) == 0x20)  // ejects disk
 						m_fdc.floppy[drive]->unload();
 				}
@@ -656,9 +656,9 @@ WRITE16_MEMBER(x68k_state::x68k_fdc_w)
 			if(m_fdc.floppy[i]->exists())
 				m_fdc.floppy[i]->mon_w(!BIT(data, 7));
 
-		output_set_indexed_value("access_drv",x,0);
+		output().set_indexed_value("access_drv",x,0);
 		if(x != m_fdc.select_drive)
-			output_set_indexed_value("access_drv",m_fdc.select_drive,1);
+			output().set_indexed_value("access_drv",m_fdc.select_drive,1);
 		m_fdc.select_drive = x;
 		logerror("FDC: Drive #%i: Drive selection set to %02x\n",x,data);
 		break;
@@ -1522,18 +1522,18 @@ MACHINE_RESET_MEMBER(x68k_state,x68000)
 	m_mfpdev->i7_w(1); // h-sync
 
 	// reset output values
-	output_set_value("key_led_kana",1);
-	output_set_value("key_led_romaji",1);
-	output_set_value("key_led_code",1);
-	output_set_value("key_led_caps",1);
-	output_set_value("key_led_insert",1);
-	output_set_value("key_led_hiragana",1);
-	output_set_value("key_led_fullsize",1);
+	output().set_value("key_led_kana",1);
+	output().set_value("key_led_romaji",1);
+	output().set_value("key_led_code",1);
+	output().set_value("key_led_caps",1);
+	output().set_value("key_led_insert",1);
+	output().set_value("key_led_hiragana",1);
+	output().set_value("key_led_fullsize",1);
 	for(drive=0;drive<4;drive++)
 	{
-		output_set_indexed_value("eject_drv",drive,1);
-		output_set_indexed_value("ctrl_drv",drive,1);
-		output_set_indexed_value("access_drv",drive,1);
+		output().set_indexed_value("eject_drv",drive,1);
+		output().set_indexed_value("ctrl_drv",drive,1);
+		output().set_indexed_value("access_drv",drive,1);
 	}
 	m_fdc.select_drive = 0;
 

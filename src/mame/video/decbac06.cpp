@@ -67,7 +67,7 @@ Priority word (Midres):
 
 const device_type DECO_BAC06 = &device_creator<deco_bac06_device>;
 
-deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+deco_bac06_device::deco_bac06_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO_BAC06, "DECO BAC06 Tilemap", tag, owner, clock, "deco_bac06", __FILE__),
 		m_pf_data(nullptr),
 		m_pf_rowscroll(nullptr),
@@ -98,7 +98,7 @@ deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *
 //  gfx decoder
 //-------------------------------------------------
 
-void deco_bac06_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void deco_bac06_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<deco_bac06_device &>(device).m_gfxdecode.set_tag(tag);
 }

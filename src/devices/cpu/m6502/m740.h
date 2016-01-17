@@ -36,15 +36,15 @@ public:
 			M740_SET_OVERFLOW = m6502_device::V_LINE
 		};
 
-		m740_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-		m740_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+		m740_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+		m740_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 		virtual void device_start() override;
 		virtual void device_reset() override;
 
 		static const disasm_entry disasm_entries[0x200];
 
-		virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+		virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 		virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 		virtual void do_exec_full() override;

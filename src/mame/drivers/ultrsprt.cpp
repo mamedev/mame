@@ -16,7 +16,7 @@
 class ultrsprt_state : public driver_device
 {
 public:
-	ultrsprt_state(const machine_config &mconfig, device_type type, const char *tag)
+	ultrsprt_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -117,7 +117,7 @@ WRITE32_MEMBER(ultrsprt_state::eeprom_w)
 			m_cpu_vram_page = vram_page;
 		}
 
-		coin_counter_w(machine(), 0, data & 0x10000000);
+		machine().bookkeeping().coin_counter_w(0, data & 0x10000000);
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, data & 0x80000000 ? CLEAR_LINE : ASSERT_LINE);
 	}
 }

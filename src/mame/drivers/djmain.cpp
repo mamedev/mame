@@ -291,10 +291,10 @@ WRITE32_MEMBER(djmain_state::light_ctrl_1_w)
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		output_set_value("right-red-hlt",  !(data & 0x08000000));   // Right red HIGHLIGHT
-		output_set_value("left-red-hlt",   !(data & 0x04000000));   // Left red HIGHLIGHT
-		output_set_value("left-blue-hlt",  !(data & 0x02000000));   // Left blue HIGHLIGHT
-		output_set_value("right-blue-hlt", !(data & 0x00200000));   // Right blue HIGHLIGHT
+		output().set_value("right-red-hlt",  !(data & 0x08000000));   // Right red HIGHLIGHT
+		output().set_value("left-red-hlt",   !(data & 0x04000000));   // Left red HIGHLIGHT
+		output().set_value("left-blue-hlt",  !(data & 0x02000000));   // Left blue HIGHLIGHT
+		output().set_value("right-blue-hlt", !(data & 0x00200000));   // Right blue HIGHLIGHT
 	}
 }
 
@@ -302,11 +302,11 @@ WRITE32_MEMBER(djmain_state::light_ctrl_2_w)
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		output_set_value("left-ssr",       !!(data & 0x08000000));  // SSR
-		output_set_value("right-ssr",      !!(data & 0x08000000));  // SSR
-		set_led_status(machine(), 0, data & 0x00010000);            // 1P START
-		set_led_status(machine(), 1, data & 0x00020000);            // 2P START
-		set_led_status(machine(), 2, data & 0x00040000);            // EFFECT
+		output().set_value("left-ssr",       !!(data & 0x08000000));  // SSR
+		output().set_value("right-ssr",      !!(data & 0x08000000));  // SSR
+		output().set_led_value(0, data & 0x00010000);            // 1P START
+		output().set_led_value(1, data & 0x00020000);            // 2P START
+		output().set_led_value(2, data & 0x00040000);            // EFFECT
 	}
 }
 
@@ -1364,9 +1364,9 @@ void djmain_state::machine_reset()
 	sndram_set_bank();
 
 	/* reset LEDs */
-	set_led_status(machine(), 0, 1);
-	set_led_status(machine(), 1, 1);
-	set_led_status(machine(), 2, 1);
+	output().set_led_value(0, 1);
+	output().set_led_value(1, 1);
+	output().set_led_value(2, 1);
 }
 
 

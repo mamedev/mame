@@ -23,7 +23,7 @@ const device_type NEOGEO_CART_SLOT = &device_creator<neogeo_cart_slot_device>;
 //-------------------------------------------------
 //  neogeo_cart_slot_device - constructor
 //-------------------------------------------------
-neogeo_cart_slot_device::neogeo_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock) :
+neogeo_cart_slot_device::neogeo_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT16 clock) :
 						device_t(mconfig, NEOGEO_CART_SLOT, "NeoGeo Cartridge Slot", tag, owner, clock, "neogeo_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -195,7 +195,7 @@ void neogeo_cart_slot_device::call_unload()
 
 bool neogeo_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry );
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
@@ -204,9 +204,9 @@ bool neogeo_cart_slot_device::call_softlist_load(software_list_device &swlist, c
  get default card software
  -------------------------------------------------*/
 
-void neogeo_cart_slot_device::get_default_card_software(std::string &result)
+std::string neogeo_cart_slot_device::get_default_card_software()
 {
-	software_get_default_slot(result, "rom");
+	return software_get_default_slot("rom");
 }
 
 /*-------------------------------------------------

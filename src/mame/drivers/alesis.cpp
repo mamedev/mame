@@ -44,15 +44,15 @@ READ8_MEMBER( alesis_state::kb_r )
 
 WRITE8_MEMBER( alesis_state::led_w )
 {
-	output_set_value("patt_led",  data & 0x01 ? 1 : 0);
-	output_set_value("song_led",  data & 0x01 ? 0 : 1);
-	output_set_value("play_led",  data & 0x02 ? 0 : 1);
-	output_set_value("record_led",data & 0x04 ? 0 : 1);
-	output_set_value("voice_led", data & 0x08 ? 0 : 1);
-	output_set_value("tune_led",  data & 0x10 ? 0 : 1);
-	output_set_value("mix_led",   data & 0x20 ? 0 : 1);
-	output_set_value("tempo_led", data & 0x40 ? 0 : 1);
-	output_set_value("midi_led",  data & 0x80 ? 0 : 1);
+	output().set_value("patt_led",  data & 0x01 ? 1 : 0);
+	output().set_value("song_led",  data & 0x01 ? 0 : 1);
+	output().set_value("play_led",  data & 0x02 ? 0 : 1);
+	output().set_value("record_led",data & 0x04 ? 0 : 1);
+	output().set_value("voice_led", data & 0x08 ? 0 : 1);
+	output().set_value("tune_led",  data & 0x10 ? 0 : 1);
+	output().set_value("mix_led",   data & 0x20 ? 0 : 1);
+	output().set_value("tempo_led", data & 0x40 ? 0 : 1);
+	output().set_value("midi_led",  data & 0x80 ? 0 : 1);
 }
 
 READ8_MEMBER( alesis_state::p3_r )
@@ -76,13 +76,13 @@ WRITE8_MEMBER( alesis_state::sr16_lcd_w )
 
 WRITE8_MEMBER( alesis_state::mmt8_led_w )
 {
-	output_set_value("play_led", data & 0x01 ? 0 : 1);
-	output_set_value("record_led" , data & 0x02 ? 0 : 1);
-	output_set_value("part_led", data & 0x04 ? 0 : 1);
-	output_set_value("edit_led", data & 0x08 ? 0 : 1);
-	output_set_value("song_led", data & 0x10 ? 0 : 1);
-	output_set_value("echo_led", data & 0x20 ? 0 : 1);
-	output_set_value("loop_led", data & 0x40 ? 0 : 1);
+	output().set_value("play_led", data & 0x01 ? 0 : 1);
+	output().set_value("record_led" , data & 0x02 ? 0 : 1);
+	output().set_value("part_led", data & 0x04 ? 0 : 1);
+	output().set_value("edit_led", data & 0x08 ? 0 : 1);
+	output().set_value("song_led", data & 0x10 ? 0 : 1);
+	output().set_value("echo_led", data & 0x20 ? 0 : 1);
+	output().set_value("loop_led", data & 0x40 ? 0 : 1);
 
 	m_leds = data;
 }
@@ -95,7 +95,7 @@ READ8_MEMBER( alesis_state::mmt8_led_r )
 WRITE8_MEMBER( alesis_state::track_led_w )
 {
 	for (int i=0; i<8; i++)
-		output_set_indexed_value("track_led", i + 1, BIT(data, i));
+		output().set_indexed_value("track_led", i + 1, BIT(data, i));
 }
 
 READ8_MEMBER( alesis_state::mmt8_p3_r )

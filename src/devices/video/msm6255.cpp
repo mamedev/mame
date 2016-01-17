@@ -74,7 +74,7 @@ ADDRESS_MAP_END
 //  msm6255_device - constructor
 //-------------------------------------------------
 
-msm6255_device::msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+msm6255_device::msm6255_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MSM6255, "MSM6255", tag, owner, clock, "msm6255", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),

@@ -45,7 +45,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, pc_fdc_at_device)
 	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
 ADDRESS_MAP_END
 
-pc_fdc_family_device::pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+pc_fdc_family_device::pc_fdc_family_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	pc_fdc_interface(mconfig, type, name, tag, owner, clock, shortname, source), fdc(*this, "upd765"),
 	intrq_cb(*this),
 	drq_cb(*this)
@@ -103,7 +103,7 @@ void pc_fdc_family_device::device_reset()
 
 WRITE8_MEMBER( pc_fdc_family_device::dor_w )
 {
-	logerror("%s: dor = %02x\n", tag(), data);
+	logerror("%s: dor = %02x\n", tag().c_str(), data);
 	UINT8 pdor = dor;
 	dor = data;
 
@@ -136,7 +136,7 @@ READ8_MEMBER( pc_fdc_family_device::dir_r )
 WRITE8_MEMBER( pc_fdc_family_device::ccr_w )
 {
 	static const int rates[4] = { 500000, 300000, 250000, 1000000 };
-	logerror("%s: ccr = %02x\n", tag(), data);
+	logerror("%s: ccr = %02x\n", tag().c_str(), data);
 	fdc->set_rate(rates[data & 3]);
 }
 
@@ -170,7 +170,7 @@ void pc_fdc_family_device::check_irq()
 	bool pirq = irq;
 	irq = fdc_irq && (dor & 4) && (dor & 8);
 	if(irq != pirq && !intrq_cb.isnull()) {
-		logerror("%s: pc_irq = %d\n", tag(), irq);
+		logerror("%s: pc_irq = %d\n", tag().c_str(), irq);
 		intrq_cb(irq);
 	}
 }
@@ -183,10 +183,10 @@ void pc_fdc_family_device::check_drq()
 		drq_cb(drq);
 }
 
-pc_fdc_xt_device::pc_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : pc_fdc_family_device(mconfig, PC_FDC_XT, "PC FDC XT", tag, owner, clock, "pc_fdc_xt", __FILE__)
+pc_fdc_xt_device::pc_fdc_xt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : pc_fdc_family_device(mconfig, PC_FDC_XT, "PC FDC XT", tag, owner, clock, "pc_fdc_xt", __FILE__)
 {
 }
 
-pc_fdc_at_device::pc_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : pc_fdc_family_device(mconfig, PC_FDC_AT, "PC FDC AT", tag, owner, clock, "pc_fdc_at", __FILE__)
+pc_fdc_at_device::pc_fdc_at_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : pc_fdc_family_device(mconfig, PC_FDC_AT, "PC FDC AT", tag, owner, clock, "pc_fdc_at", __FILE__)
 {
 }

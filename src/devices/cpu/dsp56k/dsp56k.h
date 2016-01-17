@@ -202,7 +202,7 @@ struct dsp56k_core
 class dsp56k_device : public cpu_device
 {
 public:
-	dsp56k_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	dsp56k_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
 
 	DECLARE_READ16_MEMBER( peripheral_register_r );
 	DECLARE_WRITE16_MEMBER( peripheral_register_w );
@@ -231,7 +231,7 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : nullptr ); }
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }

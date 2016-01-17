@@ -29,8 +29,8 @@ WRITE8_MEMBER(hcastle_state::hcastle_soundirq_w)
 
 WRITE8_MEMBER(hcastle_state::hcastle_coin_w)
 {
-	coin_counter_w(machine(), 0, data & 0x40);
-	coin_counter_w(machine(), 1, data & 0x80);
+	machine().bookkeeping().coin_counter_w(0, data & 0x40);
+	machine().bookkeeping().coin_counter_w(1, data & 0x80);
 }
 
 

@@ -13,7 +13,7 @@ class nes_oekakids_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_oekakids_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_oekakids_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -38,8 +38,8 @@ class nes_fcg_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_fcg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_fcg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_fcg_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_fcg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -64,8 +64,8 @@ class nes_lz93d50_device : public nes_fcg_device
 {
 public:
 	// construction/destruction
-	nes_lz93d50_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_lz93d50_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_lz93d50_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_lz93d50_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual DECLARE_WRITE8_MEMBER(write_h) override { fcg_write(space, offset, data, mem_mask); }
@@ -78,8 +78,8 @@ class nes_lz93d50_24c01_device : public nes_lz93d50_device
 {
 public:
 	// construction/destruction
-	nes_lz93d50_24c01_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_lz93d50_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_lz93d50_24c01_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_lz93d50_24c01_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -101,7 +101,7 @@ class nes_lz93d50_24c02_device : public nes_lz93d50_24c01_device
 {
 public:
 	// construction/destruction
-	nes_lz93d50_24c02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_lz93d50_24c02_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -114,7 +114,7 @@ class nes_fjump2_device : public nes_lz93d50_device
 {
 public:
 	// construction/destruction
-	nes_fjump2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_fjump2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

@@ -40,7 +40,7 @@ ToDo:
 class spinb_state : public genpin_class
 {
 public:
-	spinb_state(const machine_config &mconfig, device_type type, const char *tag)
+	spinb_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")

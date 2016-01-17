@@ -108,7 +108,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 class mirax_state : public driver_device
 {
 public:
-	mirax_state(const machine_config &mconfig, device_type type, const char *tag)
+	mirax_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -289,12 +289,12 @@ WRITE8_MEMBER(mirax_state::sound_cmd_w)
 
 WRITE8_MEMBER(mirax_state::coin_counter0_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
 WRITE8_MEMBER(mirax_state::coin_counter1_w)
 {
-	coin_counter_w(machine(), 1, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 1);
 }
 
 /* One address flips X, the other flips Y, but I can't tell which is which - Since the value is the same for the 2 addresses, it doesn't really matter */

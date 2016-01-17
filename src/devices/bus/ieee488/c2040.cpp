@@ -363,13 +363,13 @@ WRITE8_MEMBER( c2040_t::riot1_pb_w )
 	*/
 
 	// activity led 1
-	output_set_led_value(LED_ACT1, BIT(data, 3));
+	machine().output().set_led_value(LED_ACT1, BIT(data, 3));
 
 	// activity led 0
-	output_set_led_value(LED_ACT0, BIT(data, 4));
+	machine().output().set_led_value(LED_ACT0, BIT(data, 4));
 
 	// error led
-	output_set_led_value(LED_ERR, BIT(data, 5));
+	machine().output().set_led_value(LED_ERR, BIT(data, 5));
 }
 
 
@@ -674,7 +674,7 @@ inline void c2040_t::update_ieee_signals()
 //  c2040_t - constructor
 //-------------------------------------------------
 
-c2040_t::c2040_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+c2040_t::c2040_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_ieee488_interface(mconfig, *this),
 	m_maincpu(*this, M6502_TAG),
@@ -694,7 +694,7 @@ c2040_t::c2040_t(const machine_config &mconfig, device_type type, const char *na
 {
 }
 
-c2040_t::c2040_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c2040_t::c2040_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C2040, "C2040", tag, owner, clock, "c2040", __FILE__),
 	device_ieee488_interface(mconfig, *this),
 	m_maincpu(*this, M6502_TAG),
@@ -719,7 +719,7 @@ c2040_t::c2040_t(const machine_config &mconfig, const char *tag, device_t *owner
 //  c3040_t - constructor
 //-------------------------------------------------
 
-c3040_t::c3040_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c3040_t::c3040_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	c2040_t(mconfig, C3040, "C3040", tag, owner, clock, "c3040", __FILE__) { }
 
 
@@ -727,7 +727,7 @@ c3040_t::c3040_t(const machine_config &mconfig, const char *tag, device_t *owner
 //  c4040_t - constructor
 //-------------------------------------------------
 
-c4040_t::c4040_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c4040_t::c4040_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	c2040_t(mconfig, C4040, "C4040", tag, owner, clock, "c4040", __FILE__) { }
 
 

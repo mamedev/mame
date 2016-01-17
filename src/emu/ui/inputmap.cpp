@@ -180,7 +180,7 @@ void ui_menu_input_specific::populate()
 				if (field->type() >= IPT_START1 && field->type() < IPT_ANALOG_LAST)
 				{
 					sortorder = (field->type() << 2) | (field->player() << 12);
-					if (strcmp(field->device().tag(), ":"))
+					if (field->device().tag()!=":")
 						sortorder |= (port_count & 0xfff) * 0x10000;
 				}
 				else
@@ -201,7 +201,7 @@ void ui_menu_input_specific::populate()
 					item->sortorder = sortorder + suborder[seqtype];
 					item->type = field->is_analog() ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
 					item->name = name;
-					item->owner_name = field->device().tag();
+					item->owner_name = field->device().tag().c_str();
 					item->next = itemlist;
 					itemlist = item;
 
@@ -266,7 +266,7 @@ void ui_menu_input::handle()
 		input_item_data *item = pollingitem;
 
 		/* if UI_CANCEL is pressed, abort */
-		if (ui_input_pressed(machine(), IPT_UI_CANCEL))
+		if (machine().ui_input().pressed(IPT_UI_CANCEL))
 		{
 			pollingitem = nullptr;
 			record_next = false;
@@ -434,7 +434,7 @@ void ui_menu_input::populate_and_sort(input_item_data *itemlist)
 		/* otherwise, generate the sequence name and invert it if different from the default */
 		else
 		{
-			machine().input().seq_name(subtext, item->seq);
+			subtext = machine().input().seq_name(item->seq);
 			flags |= (item->seq != *item->defseq) ? MENU_FLAG_INVERT : 0;
 		}
 
@@ -565,13 +565,13 @@ void ui_menu_settings::populate()
 					flags |= MENU_FLAG_RIGHT_ARROW;
 
 				/* add the menu item */
-				if (strcmp(field->device().tag(), prev_owner.c_str()) != 0)
+				if (field->device().tag()!=prev_owner)
 				{
 					if (first_entry)
 						first_entry = false;
 					else
 						item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-					strprintf(name, "[root%s]", field->device().tag());
+					strprintf(name, "[root%s]", field->device().tag().c_str());
 					item_append(name.c_str(), nullptr, 0, nullptr);
 					prev_owner.assign(field->device().tag());
 				}
@@ -869,13 +869,13 @@ void ui_menu_analog::populate()
 						analog_item_data *data;
 						UINT32 flags = 0;
 						std::string name;
-						if (strcmp(field->device().tag(), prev_owner.c_str()) != 0)
+						if (field->device().tag() != prev_owner.c_str())
 						{
 							if (first_entry)
 								first_entry = false;
 							else
 								item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-							strprintf(name,"[root%s]", field->device().tag());
+							strprintf(name,"[root%s]", field->device().tag().c_str());
 							item_append(name.c_str(), nullptr, 0, nullptr);
 							prev_owner.assign(field->device().tag());
 						}

@@ -485,7 +485,7 @@ inline void abc99_device::scan_mouse()
 //  abc99_device - constructor
 //-------------------------------------------------
 
-abc99_device::abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+abc99_device::abc99_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ABC99, "Luxor ABC 99", tag, owner, clock, "abc99", __FILE__),
 	abc_keyboard_interface(mconfig, *this), m_serial_timer(nullptr), m_mouse_timer(nullptr),
 	m_maincpu(*this, I8035_Z2_TAG),
@@ -588,14 +588,14 @@ WRITE8_MEMBER( abc99_device::z2_led_w )
 {
 	if (m_led_en) return;
 
-	output_set_led_value(LED_1, BIT(data, 0));
-	output_set_led_value(LED_2, BIT(data, 1));
-	output_set_led_value(LED_3, BIT(data, 2));
-	output_set_led_value(LED_4, BIT(data, 3));
-	output_set_led_value(LED_5, BIT(data, 4));
-	output_set_led_value(LED_6, BIT(data, 5));
-	output_set_led_value(LED_7, BIT(data, 6));
-	output_set_led_value(LED_8, BIT(data, 7));
+	machine().output().set_led_value(LED_1, BIT(data, 0));
+	machine().output().set_led_value(LED_2, BIT(data, 1));
+	machine().output().set_led_value(LED_3, BIT(data, 2));
+	machine().output().set_led_value(LED_4, BIT(data, 3));
+	machine().output().set_led_value(LED_5, BIT(data, 4));
+	machine().output().set_led_value(LED_6, BIT(data, 5));
+	machine().output().set_led_value(LED_7, BIT(data, 6));
+	machine().output().set_led_value(LED_8, BIT(data, 7));
 }
 
 
@@ -631,9 +631,9 @@ WRITE8_MEMBER( abc99_device::z2_p1_w )
 	m_t1_z5 = BIT(data, 2);
 
 	// key LEDs
-	output_set_led_value(LED_INS, BIT(data, 3));
-	output_set_led_value(LED_ALT, BIT(data, 4));
-	output_set_led_value(LED_CAPS_LOCK, BIT(data, 5));
+	machine().output().set_led_value(LED_INS, BIT(data, 3));
+	machine().output().set_led_value(LED_ALT, BIT(data, 4));
+	machine().output().set_led_value(LED_CAPS_LOCK, BIT(data, 5));
 
 	// speaker output
 	m_speaker->level_w(!BIT(data, 6));

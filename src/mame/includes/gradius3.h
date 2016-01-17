@@ -13,7 +13,7 @@
 class gradius3_state : public driver_device
 {
 public:
-	gradius3_state(const machine_config &mconfig, device_type type, const char *tag)
+	gradius3_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_gfxram(*this, "k052109"),
 		m_gfxrom(*this, "k051960"),

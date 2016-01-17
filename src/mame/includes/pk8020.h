@@ -23,7 +23,7 @@
 class pk8020_state : public driver_device
 {
 public:
-	pk8020_state(const machine_config &mconfig, device_type type, const char *tag)
+	pk8020_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ppi8255_1(*this, "ppi8255_1"),

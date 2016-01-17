@@ -26,7 +26,7 @@ Other:  BMC B816140 (CPLD)
 class bmcpokr_state : public driver_device
 {
 public:
-	bmcpokr_state(const machine_config &mconfig, device_type type, const char *tag)
+	bmcpokr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_hopper(*this,"hopper"),
@@ -327,8 +327,8 @@ WRITE16_MEMBER(bmcpokr_state::mux_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_hopper->write(space, 0,   (data & 0x0001) ? 0x80 : 0x00); // hopper motor
-		coin_counter_w(machine(), 1, data & 0x0002);                // coin-in / key-in
-		coin_counter_w(machine(), 2, data & 0x0004);                // pay-out
+		machine().bookkeeping().coin_counter_w(1, data & 0x0002);                // coin-in / key-in
+		machine().bookkeeping().coin_counter_w(2, data & 0x0004);                // pay-out
 		//                           data & 0x0060                  // DSW mux
 		//                           data & 0x0080                  // ? always on
 	}

@@ -237,12 +237,12 @@ INPUT_PORTS_END
 
 TIMER_CALLBACK_MEMBER(mpf1_state::led_refresh)
 {
-	if (BIT(m_lednum, 5)) output_set_digit_value(0, param);
-	if (BIT(m_lednum, 4)) output_set_digit_value(1, param);
-	if (BIT(m_lednum, 3)) output_set_digit_value(2, param);
-	if (BIT(m_lednum, 2)) output_set_digit_value(3, param);
-	if (BIT(m_lednum, 1)) output_set_digit_value(4, param);
-	if (BIT(m_lednum, 0)) output_set_digit_value(5, param);
+	if (BIT(m_lednum, 5)) output().set_digit_value(0, param);
+	if (BIT(m_lednum, 4)) output().set_digit_value(1, param);
+	if (BIT(m_lednum, 3)) output().set_digit_value(2, param);
+	if (BIT(m_lednum, 2)) output().set_digit_value(3, param);
+	if (BIT(m_lednum, 1)) output().set_digit_value(4, param);
+	if (BIT(m_lednum, 0)) output().set_digit_value(5, param);
 }
 
 READ8_MEMBER( mpf1_state::ppi_pa_r )
@@ -291,7 +291,7 @@ WRITE8_MEMBER( mpf1_state::ppi_pc_w )
 	}
 
 	/* bit 7, tape output, tone and led */
-	set_led_status(machine(), 0, !BIT(data, 7));
+	output().set_led_value(0, !BIT(data, 7));
 	m_speaker->level_w(BIT(data, 7));
 	m_cassette->output( BIT(data, 7) ? 1.0 : -1.0);
 }
@@ -312,7 +312,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpf1_state::check_halt_callback)
 	// halt-LED; the red one, is turned on when the processor is halted
 	// TODO: processor seems to halt, but restarts(?) at 0x0000 after a while -> fix
 	INT64 led_halt = m_maincpu->state_int(Z80_HALT);
-	set_led_status(machine(), 1, led_halt);
+	output().set_led_value(1, led_halt);
 }
 
 void mpf1_state::machine_start()

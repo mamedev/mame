@@ -32,7 +32,7 @@
 class a1000_state : public amiga_state
 {
 public:
-	a1000_state(const machine_config &mconfig, device_type type, const char *tag) :
+	a1000_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_bootrom(*this, "bootrom"),
 	m_wom(*this, "wom")
@@ -56,7 +56,7 @@ private:
 class a2000_state : public amiga_state
 {
 public:
-	a2000_state(const machine_config &mconfig, device_type type, const char *tag) :
+	a2000_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_rtc(*this, "u65"),
 	m_zorro(*this, ZORROBUS_TAG),
@@ -93,7 +93,7 @@ private:
 class a500_state : public amiga_state
 {
 public:
-	a500_state(const machine_config &mconfig, device_type type, const char *tag) :
+	a500_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_side(*this, EXP_SLOT_TAG),
 	m_side_int2(0),
@@ -122,7 +122,7 @@ private:
 class cdtv_state : public amiga_state
 {
 public:
-	cdtv_state(const machine_config &mconfig, device_type type, const char *tag) :
+	cdtv_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_rtc(*this, "u61"),
 	m_dmac(*this, "u36"),
@@ -170,7 +170,7 @@ private:
 class a3000_state : public amiga_state
 {
 public:
-	a3000_state(const machine_config &mconfig, device_type type, const char *tag) :
+	a3000_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag)
 	{ }
 
@@ -190,7 +190,7 @@ private:
 class a500p_state : public amiga_state
 {
 public:
-	a500p_state(const machine_config &mconfig, device_type type, const char *tag) :
+	a500p_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_rtc(*this, "u9"),
 	m_side(*this, EXP_SLOT_TAG),
@@ -224,7 +224,7 @@ private:
 class a600_state : public amiga_state
 {
 public:
-	a600_state(const machine_config &mconfig, device_type type, const char *tag) :
+	a600_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_gayle_int2(0)
 	{ }
@@ -246,7 +246,7 @@ private:
 class a1200_state : public amiga_state
 {
 public:
-	a1200_state(const machine_config &mconfig, device_type type, const char *tag) :
+	a1200_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_gayle_int2(0)
 	{ }
@@ -268,7 +268,7 @@ private:
 class a4000_state : public amiga_state
 {
 public:
-	a4000_state(const machine_config &mconfig, device_type type, const char *tag) :
+	a4000_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_ata(*this, "ata"),
 	m_ramsey_config(0),
@@ -304,7 +304,7 @@ private:
 class cd32_state : public amiga_state
 {
 public:
-	cd32_state(const machine_config &mconfig, device_type type, const char *tag) :
+	cd32_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_p1_port(*this, "p1_cd32_buttons"),
 	m_p2_port(*this, "p2_cd32_buttons"),
@@ -909,7 +909,7 @@ WRITE8_MEMBER( cd32_state::akiko_cia_0_port_a_write )
 	m_cdda->set_output_gain(0, BIT(data, 0) ? 0.0 : 1.0);
 
 	// bit 1, power led
-	set_led_status(machine(), 0, BIT(data, 1) ? 0 : 1);
+	output().set_led_value(0, BIT(data, 1) ? 0 : 1);
 
 	handle_cd32_joystick_cia(machine(), data, m_cia_0->read(space, 2));
 }

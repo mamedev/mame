@@ -117,7 +117,7 @@ E000-FFFF  | R | D D D D D D D D | 8K ROM
 
 const device_type BFM_ADDER2 = &device_creator<bfm_adder2_device>;
 
-bfm_adder2_device::bfm_adder2_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+bfm_adder2_device::bfm_adder2_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock )
 	: device_t(mconfig, BFM_ADDER2, "BFM ADDER2", tag, owner, clock, "bfm_adder2", __FILE__),
 		m_cpu(*this, "adder2"),
 		m_gfxdecode(*this, "gfxdecode"),

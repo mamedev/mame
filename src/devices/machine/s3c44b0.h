@@ -600,7 +600,7 @@ enum
 class s3c44b0_device : public device_t
 {
 public:
-	s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s3c44b0_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~s3c44b0_device() {}
 
 	template<class _Object> static devcb_base &set_gpio_port_r_callback(device_t &device, _Object object) { return downcast<s3c44b0_device &>(device).m_port_r_cb.set_callback(object); }

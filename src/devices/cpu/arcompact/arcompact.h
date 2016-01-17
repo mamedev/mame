@@ -61,7 +61,7 @@ class arcompact_device : public cpu_device
 {
 public:
 	// construction/destruction
-	arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	arcompact_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ32_MEMBER( arcompact_auxreg002_LPSTART_r);
 	DECLARE_WRITE32_MEMBER(arcompact_auxreg002_LPSTART_w);

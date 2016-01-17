@@ -12,7 +12,7 @@
 class twincobr_state : public driver_device
 {
 public:
-	twincobr_state(const machine_config &mconfig, device_type type, const char *tag)
+	twincobr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_sharedram(*this, "sharedram"),
 		m_spriteram8(*this, "spriteram8"),

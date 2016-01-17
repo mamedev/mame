@@ -163,8 +163,8 @@ WRITE16_MEMBER(exterm_state::exterm_output_port_0_w)
 			m_slave->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 		/* Bits 14-15 = Coin counters */
-		coin_counter_w(machine(), 0, data & 0x8000);
-		coin_counter_w(machine(), 1, data & 0x4000);
+		machine().bookkeeping().coin_counter_w(0, data & 0x8000);
+		machine().bookkeeping().coin_counter_w(1, data & 0x4000);
 	}
 
 	COMBINE_DATA(&m_last);

@@ -24,7 +24,7 @@
 class orion_state : public radio86_state
 {
 public:
-	orion_state(const machine_config &mconfig, device_type type, const char *tag)
+	orion_state(const machine_config &mconfig, device_type type, std::string tag)
 		: radio86_state(mconfig, type, tag)
 		, m_fdc(*this, "fd1793")
 		, m_ram(*this, RAM_TAG)

@@ -68,7 +68,7 @@ class tms34061_device :  public device_t,
 {
 public:
 	// construction/destruction
-	tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms34061_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void set_rowshift(device_t &device, UINT8 rowshift) { downcast<tms34061_device &>(device).m_rowshift = rowshift; }
 	static void set_vram_size(device_t &device, UINT32 vramsize) { downcast<tms34061_device &>(device).m_vramsize = vramsize; }

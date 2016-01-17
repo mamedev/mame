@@ -31,7 +31,7 @@ class i8086_common_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	i8086_common_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	i8086_common_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	template<class _Object> static devcb_base &set_lock_handler(device_t &device, _Object object)
 		{ return downcast<i8086_common_cpu_device &>(device).m_lock_handler.set_callback(object); }
@@ -127,7 +127,7 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// device_state_interface overrides
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	virtual void interrupt(int int_num, int trap = 1);
 	bool common_op(UINT8 op);
@@ -192,7 +192,7 @@ protected:
 	inline void set_OFB_Add(UINT32 x,UINT32 y,UINT32 z);
 	inline void set_OFW_Sub(UINT32 x,UINT32 y,UINT32 z);
 	inline void set_OFB_Sub(UINT32 x,UINT32 y,UINT32 z);
-	inline UINT16 CompressFlags();
+	inline UINT16 CompressFlags() const;
 	inline void ExpandFlags(UINT16 f);
 
 	// rep instructions
@@ -341,8 +341,8 @@ class i8086_cpu_device : public i8086_common_cpu_device
 {
 public:
 	// construction/destruction
-	i8086_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	i8086_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int data_bus_size);
+	i8086_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8086_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int data_bus_size);
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
@@ -364,7 +364,7 @@ class i8088_cpu_device : public i8086_cpu_device
 {
 public:
 	// construction/destruction
-	i8088_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8088_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

@@ -41,7 +41,7 @@ TODO:
 class superwng_state : public driver_device
 {
 public:
-	superwng_state(const machine_config &mconfig, device_type type, const char *tag)
+	superwng_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -302,12 +302,12 @@ WRITE8_MEMBER(superwng_state::superwng_flip_screen_w)
 
 WRITE8_MEMBER(superwng_state::superwng_cointcnt1_w)
 {
-	coin_counter_w(machine(), 0, data);
+	machine().bookkeeping().coin_counter_w(0, data);
 }
 
 WRITE8_MEMBER(superwng_state::superwng_cointcnt2_w)
 {
-	coin_counter_w(machine(), 1, data);
+	machine().bookkeeping().coin_counter_w(1, data);
 }
 
 WRITE8_MEMBER(superwng_state::superwng_hopper_w)

@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo, Stefan Jokisch
 /***************************************************************************
 
@@ -54,8 +54,8 @@ WRITE8_MEMBER(starshp1_state::starshp1_audio_w)
 		break;
 	}
 
-	coin_lockout_w(machine(), 0, !m_attract);
-	coin_lockout_w(machine(), 1, !m_attract);
+	machine().bookkeeping().coin_lockout_w(0, !m_attract);
+	machine().bookkeeping().coin_lockout_w(1, !m_attract);
 }
 
 
@@ -158,7 +158,7 @@ WRITE8_MEMBER(starshp1_state::starshp1_misc_w)
 		m_mux = data;
 		break;
 	case 7:
-		set_led_status(machine(), 0, !data);
+		output().set_led_value(0, !data);
 		break;
 	}
 }

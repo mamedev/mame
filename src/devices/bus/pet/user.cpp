@@ -12,7 +12,7 @@
 
 const device_type PET_USER_PORT = &device_creator<pet_user_port_device>;
 
-pet_user_port_device::pet_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pet_user_port_device::pet_user_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PET_USER_PORT, "PET user port", tag, owner, clock, "pet_user_port", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_2_handler(*this),

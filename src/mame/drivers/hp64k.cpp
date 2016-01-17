@@ -169,7 +169,7 @@
 class hp64k_state : public driver_device
 {
 public:
-		hp64k_state(const machine_config &mconfig, device_type type, const char *tag);
+		hp64k_state(const machine_config &mconfig, device_type type, std::string tag);
 
 		virtual void driver_start() override;
 		//virtual void machine_start();
@@ -347,7 +347,7 @@ static ADDRESS_MAP_START(cpu_io_map , AS_IO , 16 , hp64k_state)
 		AM_RANGE(HP_MAKE_IOADDR(12 , 0) , HP_MAKE_IOADDR(12 , 3)) AM_WRITE(hp64k_irl_mask_w)
 ADDRESS_MAP_END
 
-hp64k_state::hp64k_state(const machine_config &mconfig, device_type type, const char *tag)
+hp64k_state::hp64k_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig , type , tag),
 		m_cpu(*this , "cpu"),
 		m_crtc(*this , "crtc"),

@@ -21,7 +21,7 @@
 class smc91c9x_device : public device_t
 {
 public:
-	smc91c9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	smc91c9x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	~smc91c9x_device() {}
 
 	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<smc91c9x_device &>(device).m_irq_handler.set_callback(object); }
@@ -67,7 +67,7 @@ private:
 class smc91c94_device : public smc91c9x_device
 {
 public:
-	smc91c94_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	smc91c94_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type SMC91C94;
@@ -75,7 +75,7 @@ extern const device_type SMC91C94;
 class smc91c96_device : public smc91c9x_device
 {
 public:
-	smc91c96_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	smc91c96_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type SMC91C96;

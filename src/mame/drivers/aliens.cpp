@@ -20,8 +20,8 @@ Preliminary driver by:
 WRITE8_MEMBER(aliens_state::aliens_coin_counter_w)
 {
 	/* bits 0-1 = coin counters */
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 	/* bit 5 = select work RAM or palette */
 	m_bank0000->set_bank((data & 0x20) >> 5);

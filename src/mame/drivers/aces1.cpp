@@ -37,7 +37,7 @@ JPM style Reel MCU? Certainly reel data seems to be muxed together in aweird way
 class aces1_state : public driver_device
 {
 public:
-	aces1_state(const machine_config &mconfig, device_type type, const char *tag)
+	aces1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_reel0(*this, "reel0"),
@@ -105,7 +105,7 @@ public:
 	{
 		if (m_led_strobe != m_input_strobe)
 		{
-			output_set_digit_value(m_input_strobe,data);
+			output().set_digit_value(m_input_strobe,data);
 			m_led_strobe = m_input_strobe;
 		}
 	}
@@ -122,7 +122,7 @@ public:
 
 			for (i = 0; i < 8; i++)
 			{
-				output_set_lamp_value((8*m_input_strobe)+i, ((data  & (1 << i)) !=0));
+				output().set_lamp_value((8*m_input_strobe)+i, ((data  & (1 << i)) !=0));
 			}
 			m_lamp_strobe = m_input_strobe;
 		}

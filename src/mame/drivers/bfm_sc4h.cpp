@@ -255,10 +255,10 @@ WRITE8_MEMBER(bfm_sc45_state::mux_output_w)
 	int off = offset<<3;
 
 	for (i=0; i<8; i++)
-		output_set_lamp_value(off+i, ((data & (1 << i)) != 0));
+		output().set_lamp_value(off+i, ((data & (1 << i)) != 0));
 
 
-	output_set_indexed_value("matrix", off+i, ((data & (1 << i)) != 0));
+	output().set_indexed_value("matrix", off+i, ((data & (1 << i)) != 0));
 }
 
 WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
@@ -269,14 +269,14 @@ WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
 	// some games use this as a matrix port (luckb etc.)
 	for (i=0; i<8; i++)
 	{
-		output_set_indexed_value("matrix", off+i, ((data & (1 << i)) != 0));
+		output().set_indexed_value("matrix", off+i, ((data & (1 << i)) != 0));
 	}
 
 	// others drive 7-segs with it..  so rendering it there as well in our debug layouts
 
 	// todo: reorder properly!
 	UINT8 bf7segdata = BITSWAP8(data,7,6,5,4,3,2,1,0);
-	output_set_digit_value(offset, bf7segdata);
+	output().set_digit_value(offset, bf7segdata);
 }
 
 WRITE16_MEMBER(sc4_state::sc4_mem_w)
@@ -518,13 +518,13 @@ void sc4_state::bfm_sc4_68307_porta_w(address_space &space, bool dedicated, UINT
 	if(m_reel1)
 	{
 		m_reel1->update( data    &0x0f);
-		awp_draw_reel("reel1", m_reel1);
+		awp_draw_reel(machine(),"reel1", m_reel1);
 	}
 
 	if (m_reel2)
 	{
 		m_reel2->update((data>>4)&0x0f);
-		awp_draw_reel("reel2", m_reel2);
+		awp_draw_reel(machine(),"reel2", m_reel2);
 	}
 }
 
@@ -535,7 +535,7 @@ WRITE8_MEMBER( sc4_state::bfm_sc4_reel3_w )
 	if(m_reel3)
 	{
 		m_reel3->update( data    &0x0f);
-		awp_draw_reel("reel3", m_reel3);
+		awp_draw_reel(machine(),"reel3", m_reel3);
 	}
 }
 
@@ -546,7 +546,7 @@ WRITE8_MEMBER( sc4_state::bfm_sc4_reel4_w )
 	if(m_reel4)
 	{
 		m_reel4->update( data    &0x0f);
-		awp_draw_reel("reel4", m_reel4);
+		awp_draw_reel(machine(),"reel4", m_reel4);
 	}
 }
 
@@ -640,13 +640,13 @@ WRITE8_MEMBER(sc4_state::bfm_sc4_duart_output_w)
 	if(m_reel5)
 	{
 		m_reel5->update( data    &0x0f);
-		awp_draw_reel("reel5", m_reel5);
+		awp_draw_reel(machine(),"reel5", m_reel5);
 	}
 
 	if (m_reel6)
 	{
 		m_reel6->update((data>>4)&0x0f);
-		awp_draw_reel("reel6", m_reel6);
+		awp_draw_reel(machine(),"reel6", m_reel6);
 	}
 }
 

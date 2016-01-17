@@ -65,7 +65,7 @@ public:
 		TIMER_OKEAN_BOOT
 	};
 
-	okean240_state(const machine_config &mconfig, device_type type, const char *tag)
+	okean240_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_term_data(0),
 		m_j(0),

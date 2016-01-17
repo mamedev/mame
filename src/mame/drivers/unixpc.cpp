@@ -26,7 +26,7 @@
 class unixpc_state : public driver_device
 {
 public:
-	unixpc_state(const machine_config &mconfig, device_type type, const char *tag)
+	unixpc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_ram(*this, RAM_TAG),
@@ -103,10 +103,10 @@ WRITE16_MEMBER( unixpc_state::misc_control_w )
 {
 	logerror("misc_control_w: %04x\n", data);
 
-	output_set_value("led_0", !BIT(data,  8));
-	output_set_value("led_1", !BIT(data,  9));
-	output_set_value("led_2", !BIT(data, 10));
-	output_set_value("led_3", !BIT(data, 11));
+	output().set_value("led_0", !BIT(data,  8));
+	output().set_value("led_1", !BIT(data,  9));
+	output().set_value("led_2", !BIT(data, 10));
+	output().set_value("led_3", !BIT(data, 11));
 }
 
 

@@ -474,15 +474,15 @@ static const char *const gaplus_sample_names[] =
 
 WRITE8_MEMBER(gaplus_state::out_lamps0)
 {
-	set_led_status(machine(), 0, data & 1);
-	set_led_status(machine(), 1, data & 2);
-	coin_lockout_global_w(machine(), data & 4);
-	coin_counter_w(machine(), 0, ~data & 8);
+	output().set_led_value(0, data & 1);
+	output().set_led_value(1, data & 2);
+	machine().bookkeeping().coin_lockout_global_w(data & 4);
+	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
 
 WRITE8_MEMBER(gaplus_state::out_lamps1)
 {
-	coin_counter_w(machine(), 1, ~data & 1);
+	machine().bookkeeping().coin_counter_w(1, ~data & 1);
 }
 
 void gaplus_state::machine_start()

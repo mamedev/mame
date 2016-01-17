@@ -3,7 +3,7 @@
 class pass_state : public driver_device
 {
 public:
-	pass_state(const machine_config &mconfig, device_type type, const char *tag)
+	pass_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram"),

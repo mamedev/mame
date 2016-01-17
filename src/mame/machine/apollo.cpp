@@ -127,7 +127,7 @@ INPUT_PORTS_END
 class apollo_config_device : public device_t
 {
 public:
-	apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apollo_config_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
@@ -141,7 +141,7 @@ extern const device_type APOLLO_CONF;
 
 const device_type APOLLO_CONF = &device_creator<apollo_config_device>;
 
-apollo_config_device::apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+apollo_config_device::apollo_config_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, APOLLO_CONF, "Apollo Configuration", tag, owner, clock, "apollo_config", __FILE__)
 {
 }
@@ -278,14 +278,14 @@ WRITE16_MEMBER(apollo_state::apollo_csr_control_register_w)
 
 	cpu_control_register = (cpu_control_register & ~mem_mask) | (data & mem_mask);
 
-	output_set_value("internal_led_1", (cpu_control_register >> 15) & 1);
-	output_set_value("internal_led_2", (cpu_control_register >> 14) & 1);
-	output_set_value("internal_led_3", (cpu_control_register >> 13) & 1);
-	output_set_value("internal_led_4", (cpu_control_register >> 12) & 1);
-	output_set_value("external_led_a", (cpu_control_register >> 11) & 1);
-	output_set_value("external_led_b", (cpu_control_register >> 10) & 1);
-	output_set_value("external_led_c", (cpu_control_register >> 9) & 1);
-	output_set_value("external_led_d", (cpu_control_register >> 8) & 1);
+	output().set_value("internal_led_1", (cpu_control_register >> 15) & 1);
+	output().set_value("internal_led_2", (cpu_control_register >> 14) & 1);
+	output().set_value("internal_led_3", (cpu_control_register >> 13) & 1);
+	output().set_value("internal_led_4", (cpu_control_register >> 12) & 1);
+	output().set_value("external_led_a", (cpu_control_register >> 11) & 1);
+	output().set_value("external_led_b", (cpu_control_register >> 10) & 1);
+	output().set_value("external_led_c", (cpu_control_register >> 9) & 1);
+	output().set_value("external_led_d", (cpu_control_register >> 8) & 1);
 
 	leds = ((cpu_control_register >> 8) & 0xff) ^ 0xff;
 
@@ -724,7 +724,7 @@ TIMER_CALLBACK_MEMBER( apollo_state::apollo_rtc_timer )
 #undef VERBOSE
 #define VERBOSE 0
 
-apollo_sio::apollo_sio(const machine_config &mconfig, const char *tag,
+apollo_sio::apollo_sio(const machine_config &mconfig, std::string tag,
 		device_t *owner, UINT32 clock) :
 	mc68681_device(mconfig, tag, owner, clock),
 	m_csrb(0),
@@ -880,7 +880,7 @@ const device_type APOLLO_NI = &device_creator<apollo_ni> ;
 //  apollo_ni - constructor
 //-------------------------------------------------
 
-apollo_ni::apollo_ni(const machine_config &mconfig, const char *tag,
+apollo_ni::apollo_ni(const machine_config &mconfig, std::string tag,
 		device_t *owner, UINT32 clock) :
 	device_t(mconfig, APOLLO_NI, "Node ID", tag, owner, clock, "node_id",
 			__FILE__), device_image_interface(mconfig, *this)
@@ -1288,7 +1288,7 @@ const device_type APOLLO_STDIO = &device_creator<apollo_stdio_device> ;
 //-------------------------------------------------
 
 apollo_stdio_device::apollo_stdio_device(const machine_config &mconfig,
-		const char *tag, device_t *owner, UINT32 clock) :
+		std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, APOLLO_STDIO, "Apollo STDIO", tag, owner, clock,
 			"apollo_stdio", __FILE__), device_serial_interface(mconfig, *this),
 			m_tx_w(*this)

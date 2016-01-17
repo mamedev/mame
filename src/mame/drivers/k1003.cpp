@@ -49,7 +49,7 @@ The writes to ports 0A, 11 & 13 are continuous.
 class k1003_state : public driver_device
 {
 public:
-	k1003_state(const machine_config &mconfig, device_type type, const char *tag)
+	k1003_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
@@ -111,8 +111,8 @@ UINT8 k1003_state::bit_to_dec(UINT8 val)
 
 WRITE8_MEMBER( k1003_state::disp_w )
 {
-	output_set_digit_value(bit_to_dec(data)*2,   m_disp_1);
-	output_set_digit_value(bit_to_dec(data)*2+1, m_disp_2);
+	output().set_digit_value(bit_to_dec(data)*2,   m_disp_1);
+	output().set_digit_value(bit_to_dec(data)*2+1, m_disp_2);
 }
 
 static ADDRESS_MAP_START( k1003_io, AS_IO, 8, k1003_state )

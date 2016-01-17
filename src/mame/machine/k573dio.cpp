@@ -105,7 +105,7 @@ static MACHINE_CONFIG_FRAGMENT( k573dio )
 	MCFG_DS2401_ADD( "digital_id" )
 MACHINE_CONFIG_END
 
-k573dio_device::k573dio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k573dio_device::k573dio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, KONAMI_573_DIGITAL_IO_BOARD, "Konami 573 digital I/O board", tag, owner, clock, "k573dio", __FILE__),
 	mas3507d(*this, "mpeg"),
 	digital_id(*this, "digital_id"),
@@ -147,37 +147,37 @@ void k573dio_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 READ16_MEMBER(k573dio_device::a00_r)
 {
-	logerror("%s: a00_r (%s)\n", tag(), machine().describe_context());
+	logerror("%s: a00_r (%s)\n", tag().c_str(), machine().describe_context());
 	return 0x0000;
 }
 
 READ16_MEMBER(k573dio_device::a02_r)
 {
-	logerror("%s: a02_r (%s)\n", tag(), machine().describe_context());
+	logerror("%s: a02_r (%s)\n", tag().c_str(), machine().describe_context());
 	return 0x0001;
 }
 
 READ16_MEMBER(k573dio_device::a04_r)
 {
-	logerror("%s: a04_r (%s)\n", tag(), machine().describe_context());
+	logerror("%s: a04_r (%s)\n", tag().c_str(), machine().describe_context());
 	return 0x0000;
 }
 
 READ16_MEMBER(k573dio_device::a06_r)
 {
-	logerror("%s: a06_r (%s)\n", tag(), machine().describe_context());
+	logerror("%s: a06_r (%s)\n", tag().c_str(), machine().describe_context());
 	return 0x0000;
 }
 
 READ16_MEMBER(k573dio_device::a0a_r)
 {
-	logerror("%s: a0a_r (%s)\n", tag(), machine().describe_context());
+	logerror("%s: a0a_r (%s)\n", tag().c_str(), machine().describe_context());
 	return 0x0000;
 }
 
 READ16_MEMBER(k573dio_device::a80_r)
 {
-	logerror("%s: a80_r (%s)\n", tag(), machine().describe_context());
+	logerror("%s: a80_r (%s)\n", tag().c_str(), machine().describe_context());
 	return 0x1234;
 }
 
@@ -304,7 +304,7 @@ WRITE16_MEMBER(k573dio_device::digital_id_w)
 
 READ16_MEMBER(k573dio_device::fpga_status_r)
 {
-	logerror("%s: fpga_status_r (%s)\n", tag(), machine().describe_context());
+	logerror("%s: fpga_status_r (%s)\n", tag().c_str(), machine().describe_context());
 
 	// fpga/digital board status checks
 	// wants & c000 = 8000 (just after program upload?)

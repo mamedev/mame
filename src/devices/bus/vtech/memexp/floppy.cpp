@@ -67,7 +67,7 @@ machine_config_constructor floppy_controller_device::device_mconfig_additions() 
 //  floppy_controller_device - constructor
 //-------------------------------------------------
 
-floppy_controller_device::floppy_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+floppy_controller_device::floppy_controller_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, FLOPPY_CONTROLLER, "Laser/VZ Floppy Disk Controller", tag, owner, clock, "laserfdc", __FILE__),
 	device_memexp_interface(mconfig, *this),
 	m_memexp(*this, "mem"),

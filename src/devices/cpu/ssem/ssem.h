@@ -22,7 +22,7 @@ class ssem_device : public cpu_device
 {
 public:
 	// construction/destruction
-	ssem_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ssem_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -45,7 +45,7 @@ public:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// device_state_interface overrides
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// address spaces
 	const address_space_config m_program_config;

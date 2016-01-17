@@ -70,7 +70,7 @@
 class abc800_state : public driver_device
 {
 public:
-	abc800_state(const machine_config &mconfig, device_type type, const char *tag) :
+	abc800_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_ctc(*this, Z80CTC_TAG),
@@ -160,7 +160,7 @@ public:
 class abc800m_state : public abc800_state
 {
 public:
-	abc800m_state(const machine_config &mconfig, device_type type, const char *tag) :
+	abc800m_state(const machine_config &mconfig, device_type type, std::string tag) :
 		abc800_state(mconfig, type, tag),
 		m_crtc(*this, MC6845_TAG),
 		m_palette(*this, "palette"),
@@ -189,7 +189,7 @@ public:
 class abc800c_state : public abc800_state
 {
 public:
-	abc800c_state(const machine_config &mconfig, device_type type, const char *tag) :
+	abc800c_state(const machine_config &mconfig, device_type type, std::string tag) :
 		abc800_state(mconfig, type, tag),
 		m_trom(*this, SAA5052_TAG),
 		m_palette(*this, "palette"),
@@ -218,7 +218,7 @@ public:
 class abc802_state : public abc800_state
 {
 public:
-	abc802_state(const machine_config &mconfig, device_type type, const char *tag) :
+	abc802_state(const machine_config &mconfig, device_type type, std::string tag) :
 		abc800_state(mconfig, type, tag),
 		m_crtc(*this, MC6845_TAG),
 		m_palette(*this, "palette"),
@@ -262,7 +262,7 @@ public:
 class abc806_state : public abc800_state
 {
 public:
-	abc806_state(const machine_config &mconfig, device_type type, const char *tag) :
+	abc806_state(const machine_config &mconfig, device_type type, std::string tag) :
 		abc800_state(mconfig, type, tag),
 		m_crtc(*this, MC6845_TAG),
 		m_palette(*this, "palette"),

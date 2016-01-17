@@ -15,10 +15,10 @@
 class deco_bac06_device : public device_t
 {
 public:
-	deco_bac06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	deco_bac06_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
 	static void set_gfx_region_wide(device_t &device, int region8x8, int region16x16, int wide);
 
 	std::unique_ptr<UINT16[]> m_pf_data;

@@ -111,8 +111,8 @@ WRITE8_MEMBER(ironhors_state::palettebank_w)
 		machine().tilemap().mark_all_dirty();
 	}
 
-	coin_counter_w(machine(), 0, data & 0x10);
-	coin_counter_w(machine(), 1, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 
 	/* bit 6 unknown - set after game over */
 

@@ -30,7 +30,7 @@ class ti_rs232_pio_device : public ti_expansion_card_device
 	friend class ti_rs232_attached_device;
 
 public:
-	ti_rs232_pio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti_rs232_pio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 
@@ -117,7 +117,7 @@ private:
 class ti_rs232_attached_device : public device_t, public device_image_interface
 {
 public:
-	ti_rs232_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti_rs232_attached_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	iodevice_t image_type() const override { return IO_SERIAL; }
 	bool is_readable()  const override           { return true; }
@@ -145,7 +145,7 @@ private:
 class ti_pio_attached_device : public device_t, public device_image_interface
 {
 public:
-	ti_pio_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti_pio_attached_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	iodevice_t image_type() const override { return IO_PARALLEL; }
 	bool is_readable()  const override           { return true; }

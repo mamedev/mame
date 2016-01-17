@@ -57,7 +57,7 @@
 class kc_state : public driver_device
 {
 public:
-	kc_state(const machine_config &mconfig, device_type type, const char *tag)
+	kc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_z80pio(*this, "z80pio"),
@@ -158,7 +158,7 @@ public:
 class kc85_4_state : public kc_state
 {
 public:
-	kc85_4_state(const machine_config &mconfig, device_type type, const char *tag)
+	kc85_4_state(const machine_config &mconfig, device_type type, std::string tag)
 		: kc_state(mconfig, type, tag)
 		{ }
 

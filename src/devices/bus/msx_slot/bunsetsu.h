@@ -17,10 +17,10 @@ extern const device_type MSX_SLOT_BUNSETSU;
 class msx_slot_bunsetsu_device : public msx_slot_rom_device
 {
 public:
-	msx_slot_bunsetsu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_slot_bunsetsu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	static void set_bunsetsu_region_tag(device_t &device, const char *tag) { dynamic_cast<msx_slot_bunsetsu_device &>(device).m_bunsetsu_region_tag = tag; }
+	static void set_bunsetsu_region_tag(device_t &device, std::string tag) { dynamic_cast<msx_slot_bunsetsu_device &>(device).m_bunsetsu_region_tag = tag; }
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -30,7 +30,7 @@ public:
 
 private:
 	memory_region *m_bunsetsu_region;
-	const char *m_bunsetsu_region_tag;
+	std::string m_bunsetsu_region_tag;
 	UINT32 m_bunsetsu_address;
 };
 

@@ -91,7 +91,7 @@ Stephh's notes (based on the game TMS9995 code and some tests) :
 class pachifev_state : public driver_device
 {
 public:
-	pachifev_state(const machine_config &mconfig, device_type type, const char *tag)
+	pachifev_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 

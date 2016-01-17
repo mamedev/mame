@@ -181,7 +181,7 @@ ones.  The other 7 words are ignored.  Global scrollx is ignored.
 
 const device_type K056832 = &device_creator<k056832_device>;
 
-k056832_device::k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k056832_device::k056832_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K056832, "K056832 Tilemap Generator", tag, owner, clock, "k056832", __FILE__),
 	//m_tilemap[K056832_PAGE_COUNT],
 	//*m_pixmap[K056832_PAGE_COUNT],
@@ -195,7 +195,6 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	m_bpp(-1),
 	m_big(0),
 	m_djmain_hack(0),
-	m_k055555_tag(nullptr),
 	//m_layer_assoc_with_page[K056832_PAGE_COUNT],
 	//m_layer_offs[8][2],
 	//m_lsram_page[8][2],
@@ -230,7 +229,7 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 //  gfx decoder
 //-------------------------------------------------
 
-void k056832_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void k056832_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<k056832_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -241,7 +240,7 @@ void k056832_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 //  palette device
 //-------------------------------------------------
 
-void k056832_device::static_set_palette_tag(device_t &device, const char *tag)
+void k056832_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<k056832_device &>(device).m_palette.set_tag(tag);
 }

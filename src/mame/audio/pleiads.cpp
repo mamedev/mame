@@ -20,13 +20,13 @@
 
 const device_type PLEIADS = &device_creator<pleiads_sound_device>;
 
-pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PLEIADS, "Pleiads Audio Custom", tag, owner, clock, "pleiads_sound", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 }
 
-pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),
@@ -119,7 +119,7 @@ void pleiads_sound_device::device_start()
 
 const device_type NAUGHTYB = &device_creator<naughtyb_sound_device>;
 
-naughtyb_sound_device::naughtyb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+naughtyb_sound_device::naughtyb_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pleiads_sound_device(mconfig, NAUGHTYB, "Naughty Boy Audio Custom", tag, owner, clock, "naughtyb_sound", __FILE__)
 {
 }
@@ -197,7 +197,7 @@ void naughtyb_sound_device::device_start()
 
 const device_type POPFLAME = &device_creator<popflame_sound_device>;
 
-popflame_sound_device::popflame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+popflame_sound_device::popflame_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pleiads_sound_device(mconfig, POPFLAME, "Pop Flamer Audio Custom", tag, owner, clock, "popflame_sound", __FILE__)
 {
 }

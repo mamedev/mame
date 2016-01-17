@@ -78,7 +78,7 @@ of save-state is also needed.
 class wmg_state : public williams_state
 {
 public:
-	wmg_state(const machine_config &mconfig, device_type type, const char *tag)
+	wmg_state(const machine_config &mconfig, device_type type, std::string tag)
 		: williams_state(mconfig, type, tag)
 		, m_p_ram(*this, "nvram")
 	{ }
@@ -245,7 +245,7 @@ WRITE_LINE_MEMBER( wmg_state::wmg_port_select_w )
 
 CUSTOM_INPUT_MEMBER(wmg_state::wmg_mux_r)
 {
-	const char *tag = (const char *)param;
+	const char* tag = (const char *)param;
 
 	if (m_wmg_port_select)
 		for (int i = 0; i < m_wmg_port_select; i++)

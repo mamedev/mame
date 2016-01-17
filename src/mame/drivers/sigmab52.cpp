@@ -139,7 +139,7 @@
 class sigmab52_state : public driver_device
 {
 public:
-	sigmab52_state(const machine_config &mconfig, device_type type, const char *tag)
+	sigmab52_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -260,22 +260,22 @@ WRITE8_MEMBER(sigmab52_state::hopper_w)
 
 WRITE8_MEMBER(sigmab52_state::lamps1_w)
 {
-	output_set_lamp_value(offset, data & 1);
+	output().set_lamp_value(offset, data & 1);
 }
 
 WRITE8_MEMBER(sigmab52_state::lamps2_w)
 {
-	output_set_lamp_value(6 + offset, data & 1);
+	output().set_lamp_value(6 + offset, data & 1);
 }
 
 WRITE8_MEMBER(sigmab52_state::tower_lamps_w)
 {
-	output_set_indexed_value("towerlamp", offset, data & 1);
+	output().set_indexed_value("towerlamp", offset, data & 1);
 }
 
 WRITE8_MEMBER(sigmab52_state::coin_enable_w)
 {
-	coin_lockout_w(machine(), 0, data & 0x01 ? 0 : 1);
+	machine().bookkeeping().coin_lockout_w(0, data & 0x01 ? 0 : 1);
 }
 
 WRITE8_MEMBER(sigmab52_state::audiocpu_cmd_irq_w)

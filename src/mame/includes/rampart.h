@@ -13,7 +13,7 @@
 class rampart_state : public atarigen_state
 {
 public:
-	rampart_state(const machine_config &mconfig, device_type type, const char *tag)
+	rampart_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atarigen_state(mconfig, type, tag),
 			m_mob(*this, "mob"),
 			m_oki(*this, "oki"),

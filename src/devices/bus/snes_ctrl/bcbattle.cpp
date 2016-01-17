@@ -81,7 +81,7 @@ void snes_bcbattle_device::device_timer(emu_timer &timer, device_timer_id id, in
 //  snes_bcbattle_device - constructor
 //-------------------------------------------------
 
-snes_bcbattle_device::snes_bcbattle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+snes_bcbattle_device::snes_bcbattle_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 					device_t(mconfig, SNES_BARCODE_BATTLER, "Epoch Barcode Battler (SFC)", tag, owner, clock, "snes_bcbattle", __FILE__),
 					device_snes_control_port_interface(mconfig, *this),
 					m_reader(*this, "battler"), m_pending_code(0), m_new_code(0), m_transmitting(0), m_cur_bit(0), m_cur_byte(0), battler_timer(nullptr), m_strobe(0), m_idx(0)

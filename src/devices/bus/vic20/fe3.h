@@ -28,7 +28,7 @@ class vic20_final_expansion_3_t :  public device_t,
 {
 public:
 	// construction/destruction
-	vic20_final_expansion_3_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vic20_final_expansion_3_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;

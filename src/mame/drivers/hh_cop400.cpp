@@ -28,7 +28,7 @@
 class hh_cop400_state : public driver_device
 {
 public:
-	hh_cop400_state(const machine_config &mconfig, device_type type, const char *tag)
+	hh_cop400_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN"),
@@ -149,7 +149,7 @@ void hh_cop400_state::display_update()
 		if (m_display_cache[y] != active_state[y])
 		{
 			if (m_display_segmask[y] != 0)
-				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
+				output().set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
 			for (int x = 0; x <= m_display_maxx; x++)
@@ -169,8 +169,8 @@ void hh_cop400_state::display_update()
 					sprintf(buf1, "lamp%d", y * mul + x);
 					sprintf(buf2, "%d.%d", y, x);
 				}
-				output_set_value(buf1, state);
-				output_set_value(buf2, state);
+				output().set_value(buf1, state);
+				output().set_value(buf2, state);
 			}
 		}
 
@@ -239,7 +239,7 @@ UINT8 hh_cop400_state::read_inputs(int columns)
 class ctstein_state : public hh_cop400_state
 {
 public:
-	ctstein_state(const machine_config &mconfig, device_type type, const char *tag)
+	ctstein_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_cop400_state(mconfig, type, tag)
 	{ }
 };
@@ -289,7 +289,7 @@ MACHINE_CONFIG_END
 class einvaderc_state : public hh_cop400_state
 {
 public:
-	einvaderc_state(const machine_config &mconfig, device_type type, const char *tag)
+	einvaderc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_cop400_state(mconfig, type, tag)
 	{ }
 
@@ -400,7 +400,7 @@ MACHINE_CONFIG_END
 class funjacks_state : public hh_cop400_state
 {
 public:
-	funjacks_state(const machine_config &mconfig, device_type type, const char *tag)
+	funjacks_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_cop400_state(mconfig, type, tag)
 	{ }
 
@@ -511,7 +511,7 @@ MACHINE_CONFIG_END
 class funrlgl_state : public hh_cop400_state
 {
 public:
-	funrlgl_state(const machine_config &mconfig, device_type type, const char *tag)
+	funrlgl_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_cop400_state(mconfig, type, tag)
 	{ }
 
@@ -602,7 +602,7 @@ MACHINE_CONFIG_END
 class plus1_state : public hh_cop400_state
 {
 public:
-	plus1_state(const machine_config &mconfig, device_type type, const char *tag)
+	plus1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_cop400_state(mconfig, type, tag)
 	{ }
 };
@@ -658,7 +658,7 @@ MACHINE_CONFIG_END
 class lightfgt_state : public hh_cop400_state
 {
 public:
-	lightfgt_state(const machine_config &mconfig, device_type type, const char *tag)
+	lightfgt_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_cop400_state(mconfig, type, tag)
 	{ }
 

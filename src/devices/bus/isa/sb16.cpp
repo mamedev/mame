@@ -678,7 +678,7 @@ WRITE8_MEMBER( sb16_lle_device::mpu401_w )
 
 }
 
-sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sb16_lle_device::sb16_lle_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ISA16_SB16, "SoundBlaster 16 Audio Adapter LLE", tag, owner, clock, "sb16", __FILE__),
 	device_isa16_card_interface(mconfig, *this),
 	m_dacl(*this, "dacl"),

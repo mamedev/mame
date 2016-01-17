@@ -34,8 +34,8 @@ enum tagmap_error
 class add_exception
 {
 public:
-	add_exception(const char *tag) : m_tag(tag) { }
-	const char *tag() const { return m_tag.c_str(); }
+	add_exception(std::string tag) : m_tag(tag) { }
+	std::string tag() const { return m_tag; }
 private:
 	std::string m_tag;
 };
@@ -61,7 +61,7 @@ public:
 	void reset() { m_list.reset(); m_map.clear(); }
 
 	// add the given object to the head of the list
-	_ElementType &prepend(const char *tag, _ElementType &object)
+	_ElementType &prepend(std::string tag, _ElementType &object)
 	{
 		if (!m_map.insert(std::make_pair(tag, &object)).second)
 			throw add_exception(tag);
@@ -69,7 +69,7 @@ public:
 	}
 
 	// add the given object to the tail of the list
-	_ElementType &append(const char *tag, _ElementType &object)
+	_ElementType &append(std::string tag, _ElementType &object)
 	{
 		if (!m_map.insert(std::make_pair(tag, &object)).second)
 			throw add_exception(tag);
@@ -77,8 +77,8 @@ public:
 	}
 
 	// operations by tag
-	void remove(const char *tag) { auto search = m_map.find(tag);  if (search != m_map.end()) { m_list.remove(*search->second); m_map.erase(search); } }
-	_ElementType *find(const char *tag) const { auto search = m_map.find(tag); return (search == m_map.end()) ? nullptr : search->second; }
+	void remove(std::string tag) { auto search = m_map.find(tag);  if (search != m_map.end()) { m_list.remove(*search->second); m_map.erase(search); } }
+	_ElementType *find(std::string tag) const { auto search = m_map.find(tag); return (search == m_map.end()) ? nullptr : search->second; }
 
 private:
 	// internal state

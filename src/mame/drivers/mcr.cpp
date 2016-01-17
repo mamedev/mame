@@ -314,9 +314,9 @@ WRITE8_MEMBER(mcr_state::mcr_control_port_w)
 	        D0 = coin meter 1
 	*/
 
-	coin_counter_w(machine(), 0, (data >> 0) & 1);
-	coin_counter_w(machine(), 1, (data >> 1) & 1);
-	coin_counter_w(machine(), 2, (data >> 2) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 1);
+	machine().bookkeeping().coin_counter_w(1, (data >> 1) & 1);
+	machine().bookkeeping().coin_counter_w(2, (data >> 2) & 1);
 	mcr_cocktail_flip = (data >> 6) & 1;
 }
 
@@ -384,7 +384,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::dpoker_hopper_callback)
 		dpoker_coin_status &= ~8;
 	}
 
-	coin_counter_w(machine(), 3, dpoker_coin_status & 8);
+	machine().bookkeeping().coin_counter_w(3, dpoker_coin_status & 8);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::dpoker_coin_in_callback)
@@ -421,24 +421,24 @@ READ8_MEMBER(mcr_state::dpoker_ip0_r)
 WRITE8_MEMBER(mcr_state::dpoker_lamps1_w)
 {
 	// cpanel button lamps (white)
-	output_set_lamp_value(0, data >> 0 & 1); // hold 1
-	output_set_lamp_value(1, data >> 4 & 1); // hold 2
-	output_set_lamp_value(2, data >> 5 & 1); // hold 3
-	output_set_lamp_value(3, data >> 6 & 1); // hold 4
-	output_set_lamp_value(4, data >> 7 & 1); // hold 5
-	output_set_lamp_value(5, data >> 1 & 1); // deal
-	output_set_lamp_value(6, data >> 2 & 1); // cancel
-	output_set_lamp_value(7, data >> 3 & 1); // stand
+	output().set_lamp_value(0, data >> 0 & 1); // hold 1
+	output().set_lamp_value(1, data >> 4 & 1); // hold 2
+	output().set_lamp_value(2, data >> 5 & 1); // hold 3
+	output().set_lamp_value(3, data >> 6 & 1); // hold 4
+	output().set_lamp_value(4, data >> 7 & 1); // hold 5
+	output().set_lamp_value(5, data >> 1 & 1); // deal
+	output().set_lamp_value(6, data >> 2 & 1); // cancel
+	output().set_lamp_value(7, data >> 3 & 1); // stand
 }
 
 WRITE8_MEMBER(mcr_state::dpoker_lamps2_w)
 {
 	// d5: button lamp: service or change
-	output_set_lamp_value(8, data >> 5 & 1);
+	output().set_lamp_value(8, data >> 5 & 1);
 
 	// d0-d4: marquee lamps: coin 1 to 5 --> output lamps 9 to 13
 	for (int i = 0; i < 5; i++)
-		output_set_lamp_value(9 + i, data >> i & 1);
+		output().set_lamp_value(9 + i, data >> i & 1);
 
 	// d6, d7: unused?
 }
@@ -590,7 +590,7 @@ WRITE8_MEMBER(mcr_state::dotron_op4_w)
 	*/
 	/* bit 7 = FL1 (J1-3) on flasher control board */
 	/* bit 6 = FL0 (J1-4) on flasher control board */
-	output_set_value("backlight", (data >> 6) & 1);
+	output().set_value("backlight", (data >> 6) & 1);
 
 	/*
 	    Lamp Sequencer:

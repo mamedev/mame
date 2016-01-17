@@ -15,8 +15,8 @@
 
 class m65ce02_device : public m65c02_device {
 public:
-	m65ce02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	m65ce02_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	m65ce02_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m65ce02_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	static const disasm_entry disasm_entries[0x100];
 
@@ -34,7 +34,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	inline void dec_SP_ce() { if(P & F_E) SP = set_l(SP, SP-1); else SP--; }
 	inline void inc_SP_ce() { if(P & F_E) SP = set_l(SP, SP+1); else SP++; }

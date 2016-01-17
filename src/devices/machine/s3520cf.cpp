@@ -35,7 +35,7 @@ const device_type S3520CF = &device_creator<s3520cf_device>;
 //  s3520cf_device - constructor
 //-------------------------------------------------
 
-s3520cf_device::s3520cf_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+s3520cf_device::s3520cf_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, S3520CF, "S-3520CF RTC", tag, owner, clock, "s3520cf", __FILE__), m_dir(0), m_latch(0), m_reset_line(0), m_read_latch(0), m_current_cmd(0), m_cmd_stream_pos(0), m_rtc_addr(0), m_mode(0), m_sysr(0), m_rtc_state()
 {
 }

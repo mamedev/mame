@@ -22,7 +22,7 @@ void t10sbc::t10_reset()
 	m_disk = m_image->get_hard_disk_file();
 	if (!m_disk)
 	{
-		m_device->logerror("T10SBC %s: no HD found!\n", m_image->owner()->tag());
+		m_device->logerror("T10SBC %s: no HD found!\n", m_image->owner()->tag().c_str());
 	}
 	else
 	{

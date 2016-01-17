@@ -22,19 +22,19 @@ const device_type ARCADIA_ROM_STD = &device_creator<arcadia_rom_device>;
 const device_type ARCADIA_ROM_GOLF = &device_creator<arcadia_golf_device>;
 
 
-arcadia_rom_device::arcadia_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+arcadia_rom_device::arcadia_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_arcadia_cart_interface( mconfig, *this )
 {
 }
 
-arcadia_rom_device::arcadia_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+arcadia_rom_device::arcadia_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, ARCADIA_ROM_STD, "Emerson Arcadia Standard Carts", tag, owner, clock, "arcadia_rom", __FILE__),
 						device_arcadia_cart_interface( mconfig, *this )
 {
 }
 
-arcadia_golf_device::arcadia_golf_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+arcadia_golf_device::arcadia_golf_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: arcadia_rom_device(mconfig, ARCADIA_ROM_GOLF, "Emerson Arcadia Golf Cart", tag, owner, clock, "arcadia_golf", __FILE__)
 {
 }

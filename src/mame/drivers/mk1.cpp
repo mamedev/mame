@@ -50,7 +50,7 @@ TODO:
 class mk1_state : public driver_device
 {
 public:
-	mk1_state(const machine_config &mconfig, device_type type, const char *tag)
+	mk1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
@@ -156,8 +156,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(mk1_state::mk1_update_leds)
 {
 	for (int i = 0; i < 4; i++)
 	{
-		output_set_digit_value(i, m_led[i] >> 1);
-		output_set_led_value(i, m_led[i] & 0x01);
+		output().set_digit_value(i, m_led[i] >> 1);
+		output().set_led_value(i, m_led[i] & 0x01);
 		m_led[i] = 0;
 	}
 }

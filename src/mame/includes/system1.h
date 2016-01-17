@@ -6,7 +6,7 @@
 class system1_state : public driver_device
 {
 public:
-	system1_state(const machine_config &mconfig, device_type type, const char *tag)
+	system1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
 		m_ram(*this, "ram"),

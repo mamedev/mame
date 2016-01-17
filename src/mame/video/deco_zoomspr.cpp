@@ -15,7 +15,7 @@
 
 const device_type DECO_ZOOMSPR = &device_creator<deco_zoomspr_device>;
 
-deco_zoomspr_device::deco_zoomspr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+deco_zoomspr_device::deco_zoomspr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO_ZOOMSPR, "DECO Zooming Sprites", tag, owner, clock, "deco_zoomspr", __FILE__),
 	m_palette(*this),
 	m_gfxdecode(*this)
@@ -27,7 +27,7 @@ deco_zoomspr_device::deco_zoomspr_device(const machine_config &mconfig, const ch
 //  palette device
 //-------------------------------------------------
 
-void deco_zoomspr_device::static_set_palette_tag(device_t &device, const char *tag)
+void deco_zoomspr_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<deco_zoomspr_device &>(device).m_palette.set_tag(tag);
 }
@@ -37,7 +37,7 @@ void deco_zoomspr_device::static_set_palette_tag(device_t &device, const char *t
 //  gfx decoder
 //-------------------------------------------------
 
-void deco_zoomspr_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void deco_zoomspr_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<deco_zoomspr_device &>(device).m_gfxdecode.set_tag(tag);
 }

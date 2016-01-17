@@ -62,7 +62,7 @@ class scudsp_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	scudsp_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	scudsp_cpu_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
 
 	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<scudsp_cpu_device &>(device).m_out_irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_in_dma_callback(device_t &device, _Object object) { return downcast<scudsp_cpu_device &>(device).m_in_dma_cb.set_callback(object); }
@@ -96,7 +96,7 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ); }
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }

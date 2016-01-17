@@ -71,7 +71,7 @@ The source code there implies that *maybe* ff7e and ff7f are also open bus.
 class aim65_40_state : public driver_device
 {
 public:
-	aim65_40_state(const machine_config &mconfig, device_type type, const char *tag)
+	aim65_40_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) { }
 
 	// devices

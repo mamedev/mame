@@ -35,7 +35,7 @@
 class upscope_state : public amiga_state
 {
 public:
-	upscope_state(const machine_config &mconfig, device_type type, const char *tag)
+	upscope_state(const machine_config &mconfig, device_type type, std::string tag)
 		: amiga_state(mconfig, type, tag),
 	m_prev_cia1_porta(0xff),
 	m_parallel_data(0xff)
@@ -148,7 +148,7 @@ WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
 
 				case 0x02:
 					/* coin counter */
-					coin_counter_w(machine(), 0, data & 1);
+					machine().bookkeeping().coin_counter_w(0, data & 1);
 					break;
 
 				case 0x03:

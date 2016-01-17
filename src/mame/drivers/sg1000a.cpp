@@ -124,7 +124,7 @@ CN4               CN5
 class sg1000a_state : public driver_device
 {
 public:
-	sg1000a_state(const machine_config &mconfig, device_type type, const char *tag)
+	sg1000a_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
@@ -255,7 +255,7 @@ WRITE_LINE_MEMBER(sg1000a_state::vdp_interrupt)
 
 WRITE8_MEMBER(sg1000a_state::sg1000a_coin_counter_w)
 {
-	coin_counter_w(machine(), 0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
 /*************************************

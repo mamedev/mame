@@ -8,7 +8,7 @@
 class dec0_state : public driver_device
 {
 public:
-	dec0_state(const machine_config &mconfig, device_type type, const char *tag)
+	dec0_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -113,7 +113,7 @@ public:
 class dec0_automat_state : public dec0_state
 {
 public:
-	dec0_automat_state(const machine_config &mconfig, device_type type, const char *tag)
+	dec0_automat_state(const machine_config &mconfig, device_type type, std::string tag)
 		: dec0_state(mconfig, type, tag) {
 	}
 

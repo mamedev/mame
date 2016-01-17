@@ -77,27 +77,27 @@ WRITE8_MEMBER( aim65_state::aim65_pia_b_w )
 
 WRITE16_MEMBER( aim65_state::aim65_update_ds1)
 {
-	output_set_digit_value(0 + (offset ^ 3), data);
+	output().set_digit_value(0 + (offset ^ 3), data);
 }
 
 WRITE16_MEMBER( aim65_state::aim65_update_ds2)
 {
-	output_set_digit_value(4 + (offset ^ 3), data);
+	output().set_digit_value(4 + (offset ^ 3), data);
 }
 
 WRITE16_MEMBER( aim65_state::aim65_update_ds3)
 {
-	output_set_digit_value(8 + (offset ^ 3), data);
+	output().set_digit_value(8 + (offset ^ 3), data);
 }
 
 WRITE16_MEMBER( aim65_state::aim65_update_ds4)
 {
-	output_set_digit_value(12 + (offset ^ 3), data);
+	output().set_digit_value(12 + (offset ^ 3), data);
 }
 
 WRITE16_MEMBER( aim65_state::aim65_update_ds5)
 {
-	output_set_digit_value(16 + (offset ^ 3), data);
+	output().set_digit_value(16 + (offset ^ 3), data);
 }
 
 

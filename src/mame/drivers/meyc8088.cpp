@@ -38,7 +38,7 @@
 class meyc8088_state : public driver_device
 {
 public:
-	meyc8088_state(const machine_config &mconfig, device_type type, const char *tag)
+	meyc8088_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_vram(*this, "vram"),
@@ -255,14 +255,14 @@ WRITE8_MEMBER(meyc8088_state::meyc8088_lights1_w)
 {
 	// lite 1-8
 	for (int i = 0; i < 8; i++)
-		output_set_lamp_value(i, ~data >> i & 1);
+		output().set_lamp_value(i, ~data >> i & 1);
 }
 
 WRITE8_MEMBER(meyc8088_state::meyc8088_lights2_w)
 {
 	// lite 9-16
 	for (int i = 0; i < 8; i++)
-		output_set_lamp_value(i + 8, ~data >> i & 1);
+		output().set_lamp_value(i + 8, ~data >> i & 1);
 }
 
 WRITE8_MEMBER(meyc8088_state::meyc8088_common_w)

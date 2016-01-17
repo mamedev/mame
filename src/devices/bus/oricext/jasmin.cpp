@@ -42,7 +42,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, jasmin_device)
 	AM_RANGE(0x3fc, 0x3ff) AM_WRITE(select_w)
 ADDRESS_MAP_END
 
-jasmin_device::jasmin_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+jasmin_device::jasmin_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	oricext_device(mconfig, JASMIN, "Jasmin floppy drive interface", tag, owner, clock, "jasmin", __FILE__),
 	fdc(*this, "fdc"), side_sel(false), fdc_reset(false), ram_access(false), rom_access(false), jasmin_rom(nullptr), cur_floppy(nullptr)
 {

@@ -27,7 +27,7 @@ class z8_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	z8_device(const machine_config &mconfig, device_type type, const char *name, const char *_tag, device_t *_owner, UINT32 _clock, const char *shortname, const char *source, int size);
+	z8_device(const machine_config &mconfig, device_type type, std::string name, std::string _tag, device_t *_owner, UINT32 _clock, std::string shortname, std::string source, int size);
 
 protected:
 	// device-level overrides
@@ -59,7 +59,7 @@ protected:
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
@@ -295,21 +295,21 @@ private:
 class z8601_device : public z8_device
 {
 public:
-	z8601_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	z8601_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
 };
 
 
 class ub8830d_device : public z8_device
 {
 public:
-	ub8830d_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	ub8830d_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
 };
 
 
 class z8611_device : public z8_device
 {
 public:
-	z8611_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	z8611_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
 };
 
 

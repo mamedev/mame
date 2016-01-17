@@ -78,7 +78,7 @@ void debug_view_state::enumerate_sources()
 	std::string name;
 	for (device_state_interface *state = iter.first(); state != nullptr; state = iter.next())
 	{
-		strprintf(name,"%s '%s'", state->device().name(), state->device().tag());
+		strprintf(name,"%s '%s'", state->device().name().c_str(), state->device().tag().c_str());
 		m_source_list.append(*global_alloc(debug_view_state_source(name.c_str(), state->device())));
 	}
 
@@ -276,7 +276,7 @@ void debug_view_state::view_update()
 				if (m_last_update != total_cycles)
 					curitem->m_lastval = curitem->m_currval;
 				curitem->m_currval = source.m_stateintf->state_int(curitem->m_index);
-				source.m_stateintf->state_string(curitem->m_index, valstr);
+				valstr = source.m_stateintf->state_string(curitem->m_index);
 			}
 
 			// see if we changed

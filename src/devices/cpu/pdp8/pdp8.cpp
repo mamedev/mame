@@ -50,7 +50,7 @@ const device_type PDP8CPU = &device_creator<pdp8_device>;
 //  pdp8_device - constructor
 //-------------------------------------------------
 
-pdp8_device::pdp8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pdp8_device::pdp8_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, PDP8CPU, "PDP8CPU", tag, owner, clock, "pdp8_cpu", __FILE__),
 		m_program_config("program", ENDIANNESS_BIG, 12, 12),
 		m_pc(0),
@@ -72,7 +72,6 @@ void pdp8_device::device_start()
 	m_program = &space(AS_PROGRAM);
 
 	// register our state for the debugger
-	std::string tempstr;
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_l).callimport().callexport().formatstr("%1s").noshow();
 	state_add(PDP8_PC,         "PC",        m_pc).mask(0xfff);
@@ -136,7 +135,7 @@ const address_space_config *pdp8_device::memory_space_config(address_spacenum sp
 //  for the debugger
 //-------------------------------------------------
 
-void pdp8_device::state_string_export(const device_state_entry &entry, std::string &str)
+void pdp8_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

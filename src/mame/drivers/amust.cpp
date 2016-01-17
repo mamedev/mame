@@ -99,7 +99,7 @@ public:
 		TIMER_BEEP_OFF
 	};
 
-	amust_state(const machine_config &mconfig, device_type type, const char *tag)
+	amust_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")

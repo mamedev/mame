@@ -230,7 +230,7 @@ machine_config_constructor decodmd_type1_device::device_mconfig_additions() cons
 	return MACHINE_CONFIG_NAME( decodmd1 );
 }
 
-decodmd_type1_device::decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+decodmd_type1_device::decodmd_type1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECODMD1, "Data East Pinball Dot Matrix Display Type 1", tag, owner, clock, "decodmd1", __FILE__),
 		m_cpu(*this,"dmdcpu"),
 		m_rombank1(*this,"dmdbank1"),
@@ -266,7 +266,7 @@ void decodmd_type1_device::device_reset()
 	m_frameswap = false;
 }
 
-void decodmd_type1_device::static_set_gfxregion(device_t &device, const char *tag)
+void decodmd_type1_device::static_set_gfxregion(device_t &device, std::string tag)
 {
 	decodmd_type1_device &cpuboard = downcast<decodmd_type1_device &>(device);
 	cpuboard.m_gfxtag = tag;

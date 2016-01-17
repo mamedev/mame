@@ -31,7 +31,7 @@ are the same of IGS.  AMT may be previous IGS name.
 class cabaret_state : public driver_device
 {
 public:
-	cabaret_state(const machine_config &mconfig, device_type type, const char *tag)
+	cabaret_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_fg_tile_ram(*this, "fg_tile_ram"),
 		m_fg_color_ram(*this, "fg_color_ram"),
@@ -154,12 +154,12 @@ WRITE8_MEMBER(cabaret_state::cabaret_nmi_and_coins_w)
 //      popmessage("%02x",data);
 	}
 
-	coin_counter_w(machine(), 0,        data & 0x01);   // coin_a
-	coin_counter_w(machine(), 1,        data & 0x04);   // coin_c
-	coin_counter_w(machine(), 2,        data & 0x08);   // key in
-	coin_counter_w(machine(), 3,        data & 0x10);   // coin m_out mech
+	machine().bookkeeping().coin_counter_w(0,        data & 0x01);   // coin_a
+	machine().bookkeeping().coin_counter_w(1,        data & 0x04);   // coin_c
+	machine().bookkeeping().coin_counter_w(2,        data & 0x08);   // key in
+	machine().bookkeeping().coin_counter_w(3,        data & 0x10);   // coin m_out mech
 
-	set_led_status(machine(), 6,        data & 0x40);   // led for coin m_out / hopper active
+	output().set_led_value(6,        data & 0x40);   // led for coin m_out / hopper active
 
 	m_nmi_enable = data;    //  data & 0x80     // nmi enable?
 

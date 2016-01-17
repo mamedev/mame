@@ -43,8 +43,8 @@ WRITE8_MEMBER(battlnts_state::battlnts_bankswitch_w)
 	m_rombank->set_entry((data & 0xc0) >> 6);
 
 	/* bits 4 & 5 = coin counters */
-	coin_counter_w(machine(), 0, data & 0x10);
-	coin_counter_w(machine(), 1, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 
 	/* other bits unknown */
 }

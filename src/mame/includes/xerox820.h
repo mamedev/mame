@@ -44,7 +44,7 @@
 class xerox820_state : public driver_device
 {
 public:
-	xerox820_state(const machine_config &mconfig, device_type type, const char *tag) :
+	xerox820_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_kbpio(*this, Z80PIO_KB_TAG),
@@ -118,7 +118,7 @@ public:
 class bigboard_state : public xerox820_state
 {
 public:
-	bigboard_state(const machine_config &mconfig, device_type type, const char *tag)
+	bigboard_state(const machine_config &mconfig, device_type type, std::string tag)
 		: xerox820_state(mconfig, type, tag),
 			m_beeper(*this, "beeper")
 	{ }
@@ -137,7 +137,7 @@ public:
 class xerox820ii_state : public xerox820_state
 {
 public:
-	xerox820ii_state(const machine_config &mconfig, device_type type, const char *tag) :
+	xerox820ii_state(const machine_config &mconfig, device_type type, std::string tag) :
 		xerox820_state(mconfig, type, tag),
 		m_speaker(*this, "speaker"),
 		m_sasibus(*this, SASIBUS_TAG)

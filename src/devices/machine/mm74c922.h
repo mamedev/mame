@@ -79,7 +79,7 @@ class mm74c922_device :  public device_t
 {
 public:
 	// construction/destruction
-	mm74c922_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mm74c922_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void static_set_cap_osc(device_t &device, double value) { downcast<mm74c922_device &>(device).m_cap_osc = value; }
 	static void static_set_cap_debounce(device_t &device, double value) { downcast<mm74c922_device &>(device).m_cap_debounce = value; }

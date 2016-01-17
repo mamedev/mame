@@ -6,12 +6,12 @@
 class tc0080vco_device : public device_t
 {
 public:
-	tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tc0080vco_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~tc0080vco_device() {}
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 	static void set_gfx_region(device_t &device, int gfxnum) { downcast<tc0080vco_device &>(device).m_gfxnum = gfxnum; }
 	static void set_tx_region(device_t &device, int txnum) { downcast<tc0080vco_device &>(device).m_txnum = txnum; }
 	static void set_offsets(device_t &device, int x_offset, int y_offset)

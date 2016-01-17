@@ -14,7 +14,7 @@
 class orao_state : public driver_device
 {
 public:
-	orao_state(const machine_config &mconfig, device_type type, const char *tag)
+	orao_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_memory(*this, "memory"),
 		m_video_ram(*this, "video_ram"),

@@ -27,8 +27,8 @@ class nes_vaus_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_vaus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_vaus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_vaus_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_vaus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -54,7 +54,7 @@ class nes_vausfc_device : public nes_vaus_device
 {
 public:
 	// construction/destruction
-	nes_vausfc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_vausfc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual UINT8 read_bit34() override { return 0; }

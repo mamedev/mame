@@ -8,7 +8,7 @@
 class djmain_state : public driver_device
 {
 public:
-	djmain_state(const machine_config &mconfig, device_type type, const char *tag)
+	djmain_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_obj_ram(*this, "obj_ram"),
 		m_maincpu(*this, "maincpu"),

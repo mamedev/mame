@@ -30,7 +30,7 @@
 class sms_state : public driver_device
 {
 public:
-	sms_state(const machine_config &mconfig, device_type type, const char *tag)
+	sms_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_vdp(*this, "sms_vdp"),
@@ -220,7 +220,7 @@ protected:
 class smssdisp_state : public sms_state
 {
 public:
-	smssdisp_state(const machine_config &mconfig, device_type type, const char *tag)
+	smssdisp_state(const machine_config &mconfig, device_type type, std::string tag)
 	: sms_state(mconfig, type, tag),
 	m_control_cpu(*this, "control")
 	{ }

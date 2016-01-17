@@ -81,7 +81,7 @@ void nes_bcbattle_device::device_timer(emu_timer &timer, device_timer_id id, int
 //  nes_bcbattle_device - constructor
 //-------------------------------------------------
 
-nes_bcbattle_device::nes_bcbattle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_bcbattle_device::nes_bcbattle_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 					device_t(mconfig, NES_BARCODE_BATTLER, "Epoch Barcode Battler (FC)", tag, owner, clock, "nes_bcbattle", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_reader(*this, "battler"), m_pending_code(0), m_new_code(0), m_transmitting(0), m_cur_bit(0), m_cur_byte(0), battler_timer(nullptr)

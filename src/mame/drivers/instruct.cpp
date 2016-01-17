@@ -52,7 +52,7 @@
 class instruct_state : public driver_device
 {
 public:
-	instruct_state(const machine_config &mconfig, device_type type, const char *tag)
+	instruct_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_ram(*this, "mainram")
@@ -90,7 +90,7 @@ private:
 // flag led
 WRITE_LINE_MEMBER( instruct_state::flag_w )
 {
-	output_set_value("led8", !state);
+	output().set_value("led8", !state);
 }
 
 // user port
@@ -100,7 +100,7 @@ WRITE8_MEMBER( instruct_state::port_w )
 	for (int i = 0; i < 8; i++)
 	{
 		sprintf(ledname,"led%d",i);
-		output_set_value(ledname, !BIT(data, i));
+		output().set_value(ledname, !BIT(data, i));
 	}
 }
 
@@ -119,7 +119,7 @@ WRITE8_MEMBER( instruct_state::portf8_w )
 WRITE8_MEMBER( instruct_state::portf9_w )
 {
 	if (m_valid_digit)
-		output_set_digit_value(m_digit, data);
+		output().set_digit_value(m_digit, data);
 	m_valid_digit = false;
 }
 

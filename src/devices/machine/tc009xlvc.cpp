@@ -164,7 +164,7 @@ static ADDRESS_MAP_START( tc0091lvc_map8, AS_0, 8, tc0091lvc_device )
 	AM_RANGE(0x080000, 0x0801ff) AM_READWRITE(tc0091lvc_paletteram_r,tc0091lvc_paletteram_w)
 ADDRESS_MAP_END
 
-tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0091LVC, "Taito TC0091LVC", tag, owner, clock, "tc0091lvc", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, nullptr, *ADDRESS_MAP_NAME(tc0091lvc_map8)),
@@ -178,7 +178,7 @@ tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *ta
 //  gfx decoder
 //-------------------------------------------------
 
-void tc0091lvc_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void tc0091lvc_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<tc0091lvc_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -189,7 +189,7 @@ void tc0091lvc_device::static_set_gfxdecode_tag(device_t &device, const char *ta
 //  palette device
 //-------------------------------------------------
 
-void tc0091lvc_device::static_set_palette_tag(device_t &device, const char *tag)
+void tc0091lvc_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<tc0091lvc_device &>(device).m_palette.set_tag(tag);
 }

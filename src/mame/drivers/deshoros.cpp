@@ -36,7 +36,7 @@ TODO:
 class destiny_state : public driver_device
 {
 public:
-	destiny_state(const machine_config &mconfig, device_type type, const char *tag)
+	destiny_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_beeper(*this, "beeper")
@@ -135,7 +135,7 @@ WRITE8_MEMBER(destiny_state::display_w)
 WRITE8_MEMBER(destiny_state::out_w)
 {
 	// d0: coin blocker
-	coin_lockout_w(machine(), 0, ~data & 1);
+	machine().bookkeeping().coin_lockout_w(0, ~data & 1);
 
 	// d1: paper cutter 1
 	// d2: paper cutter 2
@@ -156,7 +156,7 @@ INPUT_CHANGED_MEMBER(destiny_state::coin_inserted)
 
 	// coincounter on coin insert
 	if (((int)(FPTR)param) == 0)
-		coin_counter_w(machine(), 0, newval);
+		machine().bookkeeping().coin_counter_w(0, newval);
 }
 
 WRITE8_MEMBER(destiny_state::sound_w)

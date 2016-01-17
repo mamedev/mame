@@ -35,7 +35,7 @@ class cclimber_audio_device : public device_t
 {
 public:
 	// construction/destruction
-	cclimber_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cclimber_audio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER( sample_trigger_w );
 	DECLARE_WRITE8_MEMBER( sample_rate_w );

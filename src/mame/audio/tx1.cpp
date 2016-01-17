@@ -53,13 +53,13 @@ static const double tx1_engine_gains[16] =
 
 const device_type TX1 = &device_creator<tx1_sound_device>;
 
-tx1_sound_device::tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tx1_sound_device::tx1_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TX1, "TX-1 Audio Custom", tag, owner, clock, "tx1_sound", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 }
 
-tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
@@ -346,7 +346,7 @@ static const double bb_engine_gains[16] =
 
 const device_type BUGGYBOY = &device_creator<buggyboy_sound_device>;
 
-buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tx1_sound_device(mconfig, BUGGYBOY, "Buggy Boy Audio Custom", tag, owner, clock, "buggyboy_sound", __FILE__)
 {
 }
@@ -464,8 +464,8 @@ WRITE8_MEMBER( buggyboy_sound_device::ym2_b_w )
 
 	if (!strcmp(space.machine().system().name, "buggyboyjr"))
 	{
-		coin_counter_w(space.machine(), 0, data & 0x01);
-		coin_counter_w(space.machine(), 1, data & 0x02);
+		space.machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		space.machine().bookkeeping().coin_counter_w(1, data & 0x02);
 	}
 
 	/*

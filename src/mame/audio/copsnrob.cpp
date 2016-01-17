@@ -729,7 +729,7 @@ WRITE8_MEMBER(copsnrob_state::copsnrob_misc_w)
 
 		case 0x06:
 			/* One Start */
-			set_led_status(machine(), 0, !special_data);
+			output().set_led_value(0, !special_data);
 			break;
 
 		case 0x07:

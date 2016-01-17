@@ -92,7 +92,7 @@ static const UINT8 t6834_cmd_len[0x47] =
 
 struct x07_kb
 {
-	const char *tag;        //input port tag
+	std::string tag;        //input port tag
 	UINT8       mask;       //bit mask
 	UINT8       codes[7];   //port codes
 };
@@ -160,7 +160,7 @@ static const x07_kb x07_keycodes[56] =
 class x07_state : public driver_device
 {
 public:
-	x07_state(const machine_config &mconfig, device_type type, const char *tag)
+	x07_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_printer(*this, "printer"),

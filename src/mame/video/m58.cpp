@@ -200,8 +200,8 @@ WRITE8_MEMBER(m58_state::flipscreen_w)
 	/* screen flip is handled both by software and hardware */
 	flip_screen_set((data & 0x01) ^ (~ioport("DSW2")->read() & 0x01));
 
-	coin_counter_w(machine(), 0, data & 0x02);
-	coin_counter_w(machine(), 1, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, data & 0x02);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 }
 
 

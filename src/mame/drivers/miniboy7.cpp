@@ -147,7 +147,7 @@
 class miniboy7_state : public driver_device
 {
 public:
-	miniboy7_state(const machine_config &mconfig, device_type type, const char *tag)
+	miniboy7_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram_a(*this, "videoram_a"),
 		m_colorram_a(*this, "colorram_a"),
@@ -303,13 +303,13 @@ WRITE8_MEMBER(miniboy7_state::ay_pa_w)
 
 	data = data ^ 0xff;
 
-//    output_set_lamp_value(0, (data) & 1);         // [----x]
-//    output_set_lamp_value(1, (data >> 1) & 1);    // [---x-]
-//    output_set_lamp_value(2, (data >> 2) & 1);    // [--x--]
-//    output_set_lamp_value(3, (data >> 3) & 1);    // [-x---]
-//    output_set_lamp_value(4, (data >> 4) & 1);    // [x----]
+//    output().set_lamp_value(0, (data) & 1);         // [----x]
+//    output().set_lamp_value(1, (data >> 1) & 1);    // [---x-]
+//    output().set_lamp_value(2, (data >> 2) & 1);    // [--x--]
+//    output().set_lamp_value(3, (data >> 3) & 1);    // [-x---]
+//    output().set_lamp_value(4, (data >> 4) & 1);    // [x----]
 
-	coin_counter_w(machine(), 0, data & 0x40);    // counter
+	machine().bookkeeping().coin_counter_w(0, data & 0x40);    // counter
 
 //  popmessage("Out Lamps: %02x", data);
 //  logerror("Out Lamps: %02x\n", data);

@@ -48,8 +48,8 @@ class x2212_device :    public device_t,
 {
 public:
 	// construction/destruction
-	x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	x2212_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	x2212_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	x2212_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// inline configuration helpers
 	static void static_set_auto_save(device_t &device);
@@ -97,7 +97,7 @@ protected:
 class x2210_device :    public x2212_device
 {
 public:
-	x2210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	x2210_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

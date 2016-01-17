@@ -78,7 +78,7 @@ machine_config_constructor c64_siel_midi_cartridge_device::device_mconfig_additi
 //  c64_siel_midi_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_siel_midi_cartridge_device::c64_siel_midi_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c64_siel_midi_cartridge_device::c64_siel_midi_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_MIDI_SIEL, "C64 Siel MIDI", tag, owner, clock, "c64_midisiel", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_acia(*this, MC6850_TAG)

@@ -32,13 +32,13 @@ const device_type Z88_1024K_RAM = &device_creator<z88_1024k_ram_device>;
 //  z88_32k_ram_device - constructor
 //-------------------------------------------------
 
-z88_32k_ram_device::z88_32k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z88_32k_ram_device::z88_32k_ram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, Z88_32K_RAM, "Z88 32KB RAM", tag, owner, clock, "z88_32k_ram", __FILE__),
 		device_z88cart_interface( mconfig, *this ), m_ram(nullptr)
 	{
 }
 
-z88_32k_ram_device::z88_32k_ram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+z88_32k_ram_device::z88_32k_ram_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_z88cart_interface( mconfig, *this ), m_ram(nullptr)
 	{
@@ -48,7 +48,7 @@ z88_32k_ram_device::z88_32k_ram_device(const machine_config &mconfig, device_typ
 //  z88_128k_ram_device - constructor
 //-------------------------------------------------
 
-z88_128k_ram_device::z88_128k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z88_128k_ram_device::z88_128k_ram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: z88_32k_ram_device(mconfig, Z88_128K_RAM, "Z88 128KB RAM", tag, owner, clock, "z88_128k_ram", __FILE__)
 {
 }
@@ -57,7 +57,7 @@ z88_128k_ram_device::z88_128k_ram_device(const machine_config &mconfig, const ch
 //  z88_512k_ram_device - constructor
 //-------------------------------------------------
 
-z88_512k_ram_device::z88_512k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z88_512k_ram_device::z88_512k_ram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: z88_32k_ram_device(mconfig, Z88_512K_RAM, "Z88 512KB RAM", tag, owner, clock, "z88_512k_ram", __FILE__)
 {
 }
@@ -66,7 +66,7 @@ z88_512k_ram_device::z88_512k_ram_device(const machine_config &mconfig, const ch
 //  z88_1024k_ram_device - constructor
 //-------------------------------------------------
 
-z88_1024k_ram_device::z88_1024k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z88_1024k_ram_device::z88_1024k_ram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: z88_32k_ram_device(mconfig, Z88_1024K_RAM, "Z88 1024KB RAM", tag, owner, clock, "z88_1024k_ram", __FILE__)
 {
 }
@@ -78,7 +78,7 @@ z88_1024k_ram_device::z88_1024k_ram_device(const machine_config &mconfig, const 
 
 void z88_32k_ram_device::device_start()
 {
-	m_ram = machine().memory().region_alloc(tag(), get_cart_size(), 1, ENDIANNESS_LITTLE)->base();
+	m_ram = machine().memory().region_alloc(tag().c_str(), get_cart_size(), 1, ENDIANNESS_LITTLE)->base();
 	memset(m_ram, 0, get_cart_size());
 }
 

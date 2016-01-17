@@ -36,7 +36,7 @@
 class elecbowl_state : public hh_tms1k_state
 {
 public:
-	elecbowl_state(const machine_config &mconfig, device_type type, const char *tag)
+	elecbowl_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 

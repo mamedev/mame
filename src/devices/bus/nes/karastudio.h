@@ -42,7 +42,7 @@ class nes_kstudio_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_kstudio_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~nes_kstudio_slot_device();
 
 	// device-level overrides
@@ -64,7 +64,7 @@ public:
 	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 
 	virtual DECLARE_READ8_MEMBER(read);
 	void write_prg_bank(UINT8 bank) { if (m_cart) m_cart->write_prg_bank(bank); }
@@ -94,7 +94,7 @@ class nes_kstudio_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_kstudio_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_kstudio_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
@@ -122,7 +122,7 @@ class nes_karaokestudio_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_karaokestudio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_karaokestudio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

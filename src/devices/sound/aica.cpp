@@ -1466,7 +1466,7 @@ READ16_MEMBER( aica_device::midi_out_r )
 
 const device_type AICA = &device_creator<aica_device>;
 
-aica_device::aica_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+aica_device::aica_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AICA, "AICA", tag, owner, clock, "aica", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_master(false),

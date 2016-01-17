@@ -27,7 +27,7 @@ class msm6255_device :  public device_t,
 {
 public:
 	// construction/destruction
-	msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msm6255_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8);
 

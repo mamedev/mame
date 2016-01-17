@@ -331,7 +331,7 @@ void lua_engine::emu_hook_output(lua_State *L)
 	hook_output_cb.set(L, 1);
 
 	if (!output_notifier_set) {
-		output_set_notifier(nullptr, s_output_notifier, this);
+		machine().output().set_notifier(nullptr, s_output_notifier, this);
 		output_notifier_set = true;
 	}
 }
@@ -357,7 +357,7 @@ void lua_engine::emu_set_hook(lua_State *L)
 	if (strcmp(hookname, "output") == 0) {
 		hook_output_cb.set(L, 1);
 		if (!output_notifier_set) {
-			output_set_notifier(nullptr, s_output_notifier, this);
+			machine().output().set_notifier(nullptr, s_output_notifier, this);
 			output_notifier_set = true;
 		}
 	} else if (strcmp(hookname, "frame") == 0) {

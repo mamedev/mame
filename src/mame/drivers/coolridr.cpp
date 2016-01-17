@@ -298,7 +298,7 @@ to the same bank as defined through A20.
 class coolridr_state : public driver_device
 {
 public:
-	coolridr_state(const machine_config &mconfig, device_type type, const char *tag)
+	coolridr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_textBytesToWrite(0x00),
 		m_blitterSerialCount(0x00),

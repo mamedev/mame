@@ -295,7 +295,7 @@ READ8_MEMBER(wiz_state::wiz_protection_r)
 
 WRITE8_MEMBER(wiz_state::wiz_coin_counter_w)
 {
-	coin_counter_w(machine(), offset, data & 1);
+	machine().bookkeeping().coin_counter_w(offset, data & 1);
 }
 
 WRITE8_MEMBER(wiz_state::wiz_main_nmi_mask_w)

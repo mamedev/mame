@@ -784,33 +784,33 @@ WRITE8_MEMBER(calomega_state::pia1_bout_w)
 WRITE8_MEMBER(calomega_state::lamps_903a_w)
 {
 	/* First 5 bits of PIA0 port B */
-	output_set_lamp_value(1, 1-((data) & 1));       /* L1 (Hold 1) */
-	output_set_lamp_value(2, 1-((data >> 1) & 1));  /* L2 (Hold 2) */
-	output_set_lamp_value(3, 1-((data >> 2) & 1));  /* L3 (Hold 3) */
-	output_set_lamp_value(4, 1-((data >> 3) & 1));  /* L4 (Hold 4) */
-	output_set_lamp_value(5, 1-((data >> 4) & 1));  /* L5 (Hold 5) */
+	output().set_lamp_value(1, 1-((data) & 1));       /* L1 (Hold 1) */
+	output().set_lamp_value(2, 1-((data >> 1) & 1));  /* L2 (Hold 2) */
+	output().set_lamp_value(3, 1-((data >> 2) & 1));  /* L3 (Hold 3) */
+	output().set_lamp_value(4, 1-((data >> 3) & 1));  /* L4 (Hold 4) */
+	output().set_lamp_value(5, 1-((data >> 4) & 1));  /* L5 (Hold 5) */
 }
 
 WRITE8_MEMBER(calomega_state::lamps_903b_w)
 {
 	/* First 4 bits of PIA1 port A */
-	output_set_lamp_value(6, 1-((data) & 1));       /* L6 (Cancel) */
-	output_set_lamp_value(7, 1-((data >> 1) & 1));  /* L7 (Bet) */
-	output_set_lamp_value(8, 1-((data >> 2) & 1));  /* L8 (Take) */
-	output_set_lamp_value(9, 1-((data >> 3) & 1));  /* L9 (Door?) */
+	output().set_lamp_value(6, 1-((data) & 1));       /* L6 (Cancel) */
+	output().set_lamp_value(7, 1-((data >> 1) & 1));  /* L7 (Bet) */
+	output().set_lamp_value(8, 1-((data >> 2) & 1));  /* L8 (Take) */
+	output().set_lamp_value(9, 1-((data >> 3) & 1));  /* L9 (Door?) */
 }
 
 WRITE8_MEMBER(calomega_state::lamps_905_w)
 {
 	/* Whole 8 bits of PIA0 port B */
-	output_set_lamp_value(1, 1-((data) & 1));       /* L1 (Hold 1) */
-	output_set_lamp_value(2, 1-((data >> 1) & 1));  /* L2 (Hold 2) */
-	output_set_lamp_value(3, 1-((data >> 2) & 1));  /* L3 (Hold 3) */
-	output_set_lamp_value(4, 1-((data >> 3) & 1));  /* L4 (Hold 4) */
-	output_set_lamp_value(5, 1-((data >> 4) & 1));  /* L5 (Hold 5) */
-	output_set_lamp_value(6, 1-((data >> 5) & 1));  /* L6 (unknown) */
-	output_set_lamp_value(7, 1-((data >> 6) & 1));  /* L7 (unknown) */
-	output_set_lamp_value(8, 1-((data >> 7) & 1));  /* L8 (unknown) */
+	output().set_lamp_value(1, 1-((data) & 1));       /* L1 (Hold 1) */
+	output().set_lamp_value(2, 1-((data >> 1) & 1));  /* L2 (Hold 2) */
+	output().set_lamp_value(3, 1-((data >> 2) & 1));  /* L3 (Hold 3) */
+	output().set_lamp_value(4, 1-((data >> 3) & 1));  /* L4 (Hold 4) */
+	output().set_lamp_value(5, 1-((data >> 4) & 1));  /* L5 (Hold 5) */
+	output().set_lamp_value(6, 1-((data >> 5) & 1));  /* L6 (unknown) */
+	output().set_lamp_value(7, 1-((data >> 6) & 1));  /* L7 (unknown) */
+	output().set_lamp_value(8, 1-((data >> 7) & 1));  /* L8 (unknown) */
 }
 
 

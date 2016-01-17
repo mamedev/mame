@@ -272,8 +272,8 @@ WRITE8_MEMBER(travrusa_state::travrusa_flipscreen_w)
 
 	flip_screen_set(data & 1);
 
-	coin_counter_w(machine(), 0, data & 0x02);
-	coin_counter_w(machine(), 1, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, data & 0x02);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 }
 
 

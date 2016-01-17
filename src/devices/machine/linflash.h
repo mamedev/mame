@@ -19,7 +19,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_memory) override;
 
 protected:
-	linear_flash_pccard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
+	linear_flash_pccard_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock,std::string shortname, std::string source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -37,7 +37,7 @@ extern const device_type LINEAR_FLASH_PCCARD_16MB;
 class linear_flash_pccard_16mb_device : public linear_flash_pccard_device
 {
 public:
-	linear_flash_pccard_16mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	linear_flash_pccard_16mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
@@ -50,7 +50,7 @@ extern const device_type LINEAR_FLASH_PCCARD_32MB;
 class linear_flash_pccard_32mb_device : public linear_flash_pccard_device
 {
 public:
-	linear_flash_pccard_32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	linear_flash_pccard_32mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
@@ -62,7 +62,7 @@ extern const device_type LINEAR_FLASH_PCCARD_64MB;
 class linear_flash_pccard_64mb_device : public linear_flash_pccard_device
 {
 public:
-	linear_flash_pccard_64mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	linear_flash_pccard_64mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

@@ -14,7 +14,7 @@
 ***************************************************************************/
 
 
-ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_io_kbd0(*this, "TERM_LINE0")
 	, m_io_kbd1(*this, "TERM_LINE1")
@@ -25,7 +25,7 @@ ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, device
 {
 }
 
-ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, IE15_KEYBOARD, "15WWW-97-006 Keyboard", tag, owner, clock, "ie15_keyboard", __FILE__)
 	, m_io_kbd0(*this, "TERM_LINE0")
 	, m_io_kbd1(*this, "TERM_LINE1")

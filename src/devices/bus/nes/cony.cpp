@@ -39,7 +39,7 @@ const device_type NES_CONY = &device_creator<nes_cony_device>;
 const device_type NES_YOKO = &device_creator<nes_yoko_device>;
 
 
-nes_cony_device::nes_cony_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+nes_cony_device::nes_cony_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_irq_count(0),
 	m_irq_enable(0),
@@ -50,12 +50,12 @@ nes_cony_device::nes_cony_device(const machine_config &mconfig, device_type type
 				{
 }
 
-nes_cony_device::nes_cony_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_cony_device::nes_cony_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_CONY, "NES Cart Cony PCB", tag, owner, clock, "nes_cony", __FILE__), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr), m_latch1(0), m_latch2(0), m_extra1(0)
 				{
 }
 
-nes_yoko_device::nes_yoko_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_yoko_device::nes_yoko_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_cony_device(mconfig, NES_YOKO, "NES Cart Yoko PCB", tag, owner, clock, "nes_yoko", __FILE__), m_extra2(0)
 				{
 }

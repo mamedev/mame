@@ -28,7 +28,7 @@ machine_config_constructor x68k_neptune_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( x68k_neptunex );
 }
 
-x68k_neptune_device::x68k_neptune_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+x68k_neptune_device::x68k_neptune_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, X68K_NEPTUNEX, "Neptune-X", tag, owner, clock, "x68k_neptunex", __FILE__),
 		device_x68k_expansion_card_interface(mconfig, *this),
 	m_slot(nullptr),

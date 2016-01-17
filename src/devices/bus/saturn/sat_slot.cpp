@@ -56,7 +56,7 @@ device_sat_cart_interface::~device_sat_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_sat_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_sat_cart_interface::rom_alloc(UINT32 size, std::string tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -101,7 +101,7 @@ void device_sat_cart_interface::dram1_alloc(UINT32 size)
 //-------------------------------------------------
 //  sat_cart_slot_device - constructor
 //-------------------------------------------------
-sat_cart_slot_device::sat_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sat_cart_slot_device::sat_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, SATURN_CART_SLOT, "Saturn Cartridge Slot", tag, owner, clock, "sat_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this), m_cart(nullptr)
@@ -210,7 +210,7 @@ void sat_cart_slot_device::call_unload()
 
 bool sat_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 	return TRUE;
 }
 
@@ -219,9 +219,9 @@ bool sat_cart_slot_device::call_softlist_load(software_list_device &swlist, cons
  get default card software
  -------------------------------------------------*/
 
-void sat_cart_slot_device::get_default_card_software(std::string &result)
+std::string sat_cart_slot_device::get_default_card_software()
 {
-	software_get_default_slot(result, "rom");
+	return software_get_default_slot("rom");
 }
 
 

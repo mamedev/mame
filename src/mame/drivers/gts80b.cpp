@@ -21,7 +21,7 @@
 class gts80b_state : public genpin_class
 {
 public:
-	gts80b_state(const machine_config &mconfig, device_type type, const char *tag)
+	gts80b_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_r0_sound(*this, "r0sound")
@@ -334,7 +334,7 @@ WRITE8_MEMBER( gts80b_state::port2b_w )
 			{ // display a character
 				segment = patterns[m_dispcmd & 0x7f]; // ignore blank/inverse bit
 				segment = BITSWAP16(segment, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 3, 2, 1, 0, 0);
-				output_set_digit_value(m_digit[i]+i*20, segment);
+				output().set_digit_value(m_digit[i]+i*20, segment);
 				m_digit[i]++; // auto-increment pointer
 				if (m_digit[i] > 19) m_digit[i] = 0; // check for overflow
 			}

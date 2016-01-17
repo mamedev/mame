@@ -118,8 +118,8 @@ WRITE16_MEMBER(niyanpai_state::tmp68301_parallel_port_w)
 	//  bit 8-9 video page select?
 
 	m_motor_on = data & 4;
-	coin_counter_w(machine(),0,data & 1);
-	coin_lockout_w(machine(),0,data & 0x08);
+	machine().bookkeeping().coin_counter_w(0,data & 1);
+	machine().bookkeeping().coin_lockout_w(0,data & 0x08);
 }
 
 CUSTOM_INPUT_MEMBER(niyanpai_state::musobana_outcoin_flag_r)

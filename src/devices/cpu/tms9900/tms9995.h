@@ -48,8 +48,8 @@ enum
 class tms9995_device : public cpu_device
 {
 public:
-	tms9995_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms9995_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	tms9995_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms9995_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// READY input line. When asserted (high), the memory is ready for data exchange.
 	// We chose to use a direct method instead of a delegate to keep performance
@@ -106,7 +106,7 @@ private:
 	static const char* s_statename[];
 	void    state_import(const device_state_entry &entry) override;
 	void    state_export(const device_state_entry &entry) override;
-	void    state_string_export(const device_state_entry &entry, std::string &str) override;
+	void    state_string_export(const device_state_entry &entry, std::string &str) const override;
 	UINT16  read_workspace_register_debug(int reg);
 	void    write_workspace_register_debug(int reg, UINT16 data);
 
@@ -436,7 +436,7 @@ private:
 class tms9995_mp9537_device : public tms9995_device
 {
 public:
-	tms9995_mp9537_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	tms9995_mp9537_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tms9995_device(mconfig, TMS9995_MP9537, "TMS9995-MP9537", tag, owner, clock, "tms9995_mp9537", __FILE__)
 	{
 		m_mp9537 = true;

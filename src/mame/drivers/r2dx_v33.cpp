@@ -72,7 +72,7 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 class r2dx_v33_state : public raiden2_state
 {
 public:
-	r2dx_v33_state(const machine_config &mconfig, device_type type, const char *tag)
+	r2dx_v33_state(const machine_config &mconfig, device_type type, std::string tag)
 		: raiden2_state(mconfig, type, tag),
 		m_eeprom(*this, "eeprom"),
 		m_math(*this, "math"),

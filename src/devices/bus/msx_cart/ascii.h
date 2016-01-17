@@ -17,7 +17,7 @@ class msx_cart_ascii8 : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_ascii8(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_ascii8(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -41,7 +41,7 @@ class msx_cart_ascii16 : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_ascii16(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_ascii16(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -65,7 +65,7 @@ class msx_cart_ascii8_sram : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_ascii8_sram(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_ascii8_sram(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -92,7 +92,7 @@ class msx_cart_ascii16_sram : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_ascii16_sram(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_ascii16_sram(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -119,7 +119,7 @@ class msx_cart_msxwrite : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_msxwrite(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_msxwrite(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

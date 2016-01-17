@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Steven Frew, Phil Stroffolino, Paul Leaman
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino, Paul Leaman
+// thanks-to: Steven Frew (the author of Slutte)
 /***************************************************************************
 
     Bionic Commando Video Hardware
@@ -171,8 +172,8 @@ WRITE16_MEMBER(bionicc_state::bionicc_gfxctrl_w)
 		m_bg_tilemap->enable(data & 0x2000);    /* guess */
 		m_fg_tilemap->enable(data & 0x1000);    /* guess */
 
-		coin_counter_w(machine(), 0, data & 0x8000);
-		coin_counter_w(machine(), 1, data & 0x4000);
+		machine().bookkeeping().coin_counter_w(0, data & 0x8000);
+		machine().bookkeeping().coin_counter_w(1, data & 0x4000);
 	}
 }
 

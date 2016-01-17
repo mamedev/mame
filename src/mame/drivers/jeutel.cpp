@@ -25,7 +25,7 @@ ToDo:
 class jeutel_state : public genpin_class
 {
 public:
-	jeutel_state(const machine_config &mconfig, device_type type, const char *tag)
+	jeutel_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cpu2(*this, "cpu2")
@@ -119,7 +119,7 @@ WRITE8_MEMBER( jeutel_state::ppi0a_w )
 
 	if BIT(data, 6)
 	{
-		output_set_digit_value(40+m_digit, 0x3f); //patterns[data&15];
+		output().set_digit_value(40+m_digit, 0x3f); //patterns[data&15];
 		return;
 	}
 	switch (data & 0x0f)
@@ -144,12 +144,12 @@ WRITE8_MEMBER( jeutel_state::ppi0a_w )
 	}
 	if BIT(data, 4)
 	{
-		output_set_digit_value(m_digit, (blank) ? 0 : segment);
+		output().set_digit_value(m_digit, (blank) ? 0 : segment);
 	}
 	else
 	if BIT(data, 5)
 	{
-		output_set_digit_value(20+m_digit, (blank) ? 0 : segment);
+		output().set_digit_value(20+m_digit, (blank) ? 0 : segment);
 	}
 }
 

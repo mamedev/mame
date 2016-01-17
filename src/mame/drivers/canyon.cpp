@@ -95,7 +95,7 @@ READ8_MEMBER(canyon_state::canyon_options_r)
 
 WRITE8_MEMBER(canyon_state::canyon_led_w)
 {
-	set_led_status(machine(), offset & 0x01, offset & 0x02);
+	output().set_led_value(offset & 0x01, offset & 0x02);
 }
 
 

@@ -68,7 +68,7 @@ static inline INT32 normalize_yscroll(const bitmap_t &bitmap, INT32 yscroll)
 
 const device_type GFXDECODE = &device_creator<gfxdecode_device>;
 
-gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+gfxdecode_device::gfxdecode_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, GFXDECODE, "gfxdecode", tag, owner, clock, "gfxdecode", __FILE__),
 	device_gfx_interface(mconfig, *this)
 {

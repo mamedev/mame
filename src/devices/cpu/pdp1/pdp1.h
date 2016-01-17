@@ -79,7 +79,7 @@ class pdp1_device : public cpu_device
 {
 public:
 	// construction/destruction
-	pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pdp1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void pulse_start_clear();
 	void io_complete() { m_ios = 1; }
@@ -107,7 +107,7 @@ protected:
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }

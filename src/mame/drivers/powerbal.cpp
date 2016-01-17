@@ -24,7 +24,7 @@ Magic Sticks:
 class powerbal_state : public playmark_state
 {
 public:
-	powerbal_state(const machine_config &mconfig, device_type type, const char *tag)
+	powerbal_state(const machine_config &mconfig, device_type type, std::string tag)
 		: playmark_state(mconfig, type, tag),
 			m_eeprom(*this, "eeprom") { }
 
@@ -53,7 +53,7 @@ WRITE16_MEMBER(powerbal_state::magicstk_coin_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0, data & 0x20);
+		machine().bookkeeping().coin_counter_w(0, data & 0x20);
 
 		m_eeprom->cs_write((data & 8) ? ASSERT_LINE : CLEAR_LINE);
 		m_eeprom->di_write((data & 2) >> 1);

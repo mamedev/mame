@@ -5,7 +5,7 @@
 const device_type NSCSI_BUS = &device_creator<nscsi_bus_device>;
 const device_type NSCSI_CONNECTOR = &device_creator<nscsi_connector>;
 
-nscsi_bus_device::nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nscsi_bus_device::nscsi_bus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, NSCSI_BUS, "NSCSI Bus", tag, owner, clock, "nscsi_bus", __FILE__), data(0), ctrl(0)
 {
 	devcnt = 0;
@@ -49,7 +49,7 @@ void nscsi_bus_device::regen_ctrl(int refid)
 
 	if(0) {
 		logerror("%s: ctrl %c%c%c%c%c%c%c%c%c %s %04x -",
-					tag(),
+					tag().c_str(),
 					ctrl & nscsi_device::S_RST ? 'R' : '.',
 					ctrl & nscsi_device::S_ATN ? 'A' : '.',
 					ctrl & nscsi_device::S_ACK ? 'K' : '.',
@@ -132,7 +132,7 @@ void nscsi_bus_device::device_config_complete()
 }
 
 
-nscsi_connector::nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nscsi_connector::nscsi_connector(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, NSCSI_CONNECTOR, "NSCSI Connector Abstraction", tag, owner, clock, "nscsi_connector", __FILE__),
 	device_slot_interface(mconfig, *this)
 {
@@ -151,7 +151,7 @@ nscsi_device *nscsi_connector::get_device()
 	return dynamic_cast<nscsi_device *>(get_card_device());
 }
 
-nscsi_device::nscsi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+nscsi_device::nscsi_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_slot_card_interface(mconfig, *this)
 {
@@ -175,7 +175,7 @@ void nscsi_device::device_start()
 	save_item(NAME(scsi_id));
 }
 
-nscsi_full_device::nscsi_full_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+nscsi_full_device::nscsi_full_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	nscsi_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
@@ -268,13 +268,13 @@ void nscsi_full_device::step(bool timeout)
 		scsi_bus->data_w(scsi_refid, 0);
 		scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
 		scsi_state = IDLE;
-		logerror("%s: scsi bus reset\n", tag());
+		logerror("%s: scsi bus reset\n", tag().c_str());
 		return;
 	}
 
 	if(0)
 		logerror("%s: state=%d.%d %s\n",
-					tag(), scsi_state & STATE_MASK, (scsi_state & SUB_MASK) >> SUB_SHIFT,
+					tag().c_str(), scsi_state & STATE_MASK, (scsi_state & SUB_MASK) >> SUB_SHIFT,
 					timeout ? "timeout" : "change");
 
 	switch(scsi_state & SUB_MASK ? scsi_state & SUB_MASK : scsi_state & STATE_MASK) {
@@ -420,7 +420,7 @@ void nscsi_full_device::step(bool timeout)
 		if(ctrl & S_SEL)
 			return;
 		if(ctrl & S_ATN) {
-			logerror("%s: Parity error? Say what?\n", tag());
+			logerror("%s: Parity error? Say what?\n", tag().c_str());
 			scsi_state = IDLE;
 			break;
 		}
@@ -437,7 +437,7 @@ void nscsi_full_device::step(bool timeout)
 
 	default:
 		logerror("%s: step() unexpected state %d.%d\n",
-					tag(),
+					tag().c_str(),
 					scsi_state & STATE_MASK, (scsi_state & SUB_MASK) >> SUB_SHIFT);
 		exit(0);
 	}
@@ -512,7 +512,7 @@ bool nscsi_full_device::command_done()
 nscsi_full_device::control *nscsi_full_device::buf_control_push()
 {
 	if(buf_control_wpos == int(ARRAY_LENGTH(buf_control)))
-		throw emu_fatalerror("%s: buf_control overflow\n", tag());
+		throw emu_fatalerror("%s: buf_control overflow\n", tag().c_str());
 
 	control *c = buf_control + buf_control_wpos;
 	buf_control_wpos++;
@@ -522,7 +522,7 @@ nscsi_full_device::control *nscsi_full_device::buf_control_push()
 nscsi_full_device::control *nscsi_full_device::buf_control_pop()
 {
 	if(buf_control_rpos == buf_control_wpos)
-		throw emu_fatalerror("%s: buf_control underflow\n", tag());
+		throw emu_fatalerror("%s: buf_control underflow\n", tag().c_str());
 
 	control *c = buf_control + buf_control_rpos;
 	buf_control_rpos++;
@@ -571,7 +571,7 @@ void nscsi_full_device::sense(bool deferred, UINT8 key)
 
 void nscsi_full_device::scsi_unknown_command()
 {
-	logerror("%s: Unhandled command %s", tag(), command_names[scsi_cmdbuf[0]]);
+	logerror("%s: Unhandled command %s", tag().c_str(), command_names[scsi_cmdbuf[0]]);
 	for(int i=0; i != scsi_cmdsize; i++)
 		logerror(" %02x", scsi_cmdbuf[i]);
 	logerror("\n");
@@ -584,7 +584,7 @@ void nscsi_full_device::scsi_command()
 {
 	switch(scsi_cmdbuf[0]) {
 	case SC_REQUEST_SENSE:
-		logerror("%s: command REQUEST SENSE\n", tag());
+		logerror("%s: command REQUEST SENSE\n", tag().c_str());
 		scsi_data_in(SBUF_SENSE, 8);
 		scsi_status_complete(SS_GOOD);
 		break;
@@ -601,7 +601,7 @@ void nscsi_full_device::scsi_message()
 		return;
 	}
 
-	logerror("%s: Unknown message", tag());
+	logerror("%s: Unknown message", tag().c_str());
 	for(int i=0; i != scsi_cmdsize; i++)
 		logerror(" %02x", scsi_cmdbuf[i]);
 	logerror("\n");

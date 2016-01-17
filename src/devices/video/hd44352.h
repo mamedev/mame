@@ -27,7 +27,7 @@ class hd44352_device :
 {
 public:
 	// construction/destruction
-	hd44352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd44352_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_on_callback(device_t &device, _Object object) { return downcast<hd44352_device &>(device).m_on_cb.set_callback(object); }
 

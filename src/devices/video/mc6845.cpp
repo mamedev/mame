@@ -89,7 +89,7 @@ const device_type MOS8568 = &device_creator<mos8568_device>;
 #define ATTR_ALTERNATE_CHARSET      BIT(attr, 7)
 
 
-mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this, false),
 		m_show_border_area(true),
@@ -106,7 +106,7 @@ mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-mc6845_device::mc6845_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mc6845_device::mc6845_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MC6845, "MC6845 CRTC", tag, owner, clock, "mc6845", __FILE__),
 		device_video_interface(mconfig, *this, false),
 		m_show_border_area(true),
@@ -1395,66 +1395,66 @@ static ADDRESS_MAP_START( mos8563_videoram_map, AS_0, 8, mos8563_device )
 ADDRESS_MAP_END
 
 
-r6545_1_device::r6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+r6545_1_device::r6545_1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: mc6845_device(mconfig, R6545_1, "R6545-1 CRTC", tag, owner, clock, "r6545_1", __FILE__)
 {
 }
 
 
-h46505_device::h46505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+h46505_device::h46505_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: mc6845_device(mconfig, H46505, "H46505 CRTC", tag, owner, clock, "h46505", __FILE__)
 {
 }
 
 
-mc6845_1_device::mc6845_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mc6845_1_device::mc6845_1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: mc6845_device(mconfig, MC6845_1, "MC6845-1 CRTC", tag, owner, clock, "mc6845_1", __FILE__)
 {
 }
 
 
-hd6845_device::hd6845_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hd6845_device::hd6845_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: mc6845_device(mconfig, HD6845, "HD6845 CRTC", tag, owner, clock, "hd6845", __FILE__)
 {
 }
 
 
-c6545_1_device::c6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c6545_1_device::c6545_1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: mc6845_device(mconfig, C6545_1, "C6545-1 CRTC", tag, owner, clock, "c6545_1", __FILE__)
 {
 }
 
 
-sy6545_1_device::sy6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sy6545_1_device::sy6545_1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: mc6845_device(mconfig, SY6545_1, "SY6545-1 CRTC", tag, owner, clock, "sy6545_1", __FILE__)
 {
 }
 
 
-sy6845e_device::sy6845e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sy6845e_device::sy6845e_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: mc6845_device(mconfig, SY6845E, "SY6845E CRTC", tag, owner, clock, "sy6845e", __FILE__)
 {
 }
 
 
-hd6345_device::hd6345_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hd6345_device::hd6345_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: mc6845_device(mconfig, HD6345, "HD6345 CRTC", tag, owner, clock, "hd6345", __FILE__)
 {
 }
 
 
-ams40041_device::ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ams40041_device::ams40041_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: mc6845_device(mconfig, AMS40041, "AMS40041 CRTC", tag, owner, clock, "ams40041", __FILE__)
 {
 }
 
-ams40489_device::ams40489_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ams40489_device::ams40489_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: mc6845_device(mconfig, AMS40489, "AMS40489 ASIC (CRTC)", tag, owner, clock, "ams40489", __FILE__)
 {
 }
 
 
-mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: mc6845_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
 		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
@@ -1464,7 +1464,7 @@ mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, 
 }
 
 
-mos8563_device::mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos8563_device::mos8563_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: mc6845_device(mconfig, MOS8563, "MOS8563", tag, owner, clock, "mos8563", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
@@ -1474,7 +1474,7 @@ mos8563_device::mos8563_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-mos8568_device::mos8568_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos8568_device::mos8568_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: mos8563_device(mconfig, MOS8568, "MOS8568", tag, owner, clock, "mos8568", __FILE__)
 {
 }

@@ -124,10 +124,10 @@ class vic3_device : public device_t,
 					public device_video_interface
 {
 public:
-	vic3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vic3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~vic3_device() {}
 
-	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<vic3_device &>(device).m_cpu.set_tag(tag); }
+	static void static_set_cpu_tag(device_t &device, std::string tag) { downcast<vic3_device &>(device).m_cpu.set_tag(tag); }
 	static void set_vic3_type(device_t &device, vic3_type type) { downcast<vic3_device &>(device).m_type = type; }
 	template<class _Object> static devcb_base &set_dma_read_callback(device_t &device, _Object object) { return downcast<vic3_device &>(device).m_dma_read_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_dma_read_color_callback(device_t &device, _Object object) { return downcast<vic3_device &>(device).m_dma_read_color_cb.set_callback(object); }

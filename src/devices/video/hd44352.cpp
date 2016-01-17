@@ -34,7 +34,7 @@ const device_type HD44352 = &device_creator<hd44352_device>;
 //  hd44352_device - constructor
 //-------------------------------------------------
 
-hd44352_device::hd44352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock):
+hd44352_device::hd44352_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock):
 	device_t(mconfig, HD44352, "hd44352", tag, owner, clock, "hd44352", __FILE__),
 	m_on_cb(*this)
 {

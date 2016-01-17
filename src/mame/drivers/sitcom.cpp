@@ -40,7 +40,7 @@
 class sitcom_state : public driver_device
 {
 public:
-	sitcom_state(const machine_config &mconfig, device_type type, const char *tag)
+	sitcom_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_ds0(*this, "ds0"),
@@ -87,12 +87,12 @@ void sitcom_state::machine_reset()
 
 WRITE16_MEMBER(sitcom_state::sitcom_update_ds0)
 {
-	output_set_digit_value(offset, data);
+	output().set_digit_value(offset, data);
 }
 
 WRITE16_MEMBER(sitcom_state::sitcom_update_ds1)
 {
-	output_set_digit_value(4 + offset, data);
+	output().set_digit_value(4 + offset, data);
 }
 
 // SID line used as serial input from a pc
@@ -103,7 +103,7 @@ READ_LINE_MEMBER( sitcom_state::sid_line )
 
 WRITE_LINE_MEMBER( sitcom_state::sod_led )
 {
-	output_set_value("sod_led", state);
+	output().set_value("sod_led", state);
 }
 
 static MACHINE_CONFIG_START( sitcom, sitcom_state )

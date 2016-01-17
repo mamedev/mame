@@ -746,7 +746,7 @@ void rsp_cop2::start()
 	}
 }
 
-void rsp_cop2::state_string_export(const int index, std::string &str)
+void rsp_cop2::state_string_export(const int index, std::string &str) const
 {
 	switch (index)
 	{

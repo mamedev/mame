@@ -51,7 +51,7 @@ class rtc9701_device :  public device_t,
 {
 public:
 	// construction/destruction
-	rtc9701_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rtc9701_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 
 	// I/O operations

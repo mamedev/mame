@@ -26,7 +26,7 @@ const device_type C64_DINAMIC = &device_creator<c64_dinamic_cartridge_device>;
 //  c64_dinamic_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_dinamic_cartridge_device::c64_dinamic_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c64_dinamic_cartridge_device::c64_dinamic_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_DINAMIC, "C64 Dinamic cartridge", tag, owner, clock, "c64_dinamic", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_bank(0)

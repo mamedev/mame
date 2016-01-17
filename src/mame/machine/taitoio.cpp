@@ -56,7 +56,7 @@ Newer version of the I/O chip ?
 
 const device_type TC0220IOC = &device_creator<tc0220ioc_device>;
 
-tc0220ioc_device::tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc0220ioc_device::tc0220ioc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0220IOC, "Taito TC0220IOC", tag, owner, clock, "tc0220ioc", __FILE__),
 	m_read_0_cb(*this),
 	m_read_1_cb(*this),
@@ -137,10 +137,10 @@ WRITE8_MEMBER( tc0220ioc_device::write )
 
 		case 0x04:  /* coin counters and lockout, hi nibble irrelevant */
 
-			coin_lockout_w(machine(), 0, ~data & 0x01);
-			coin_lockout_w(machine(), 1, ~data & 0x02);
-			coin_counter_w(machine(), 0, data & 0x04);
-			coin_counter_w(machine(), 1, data & 0x08);
+			machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+			machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+			machine().bookkeeping().coin_counter_w(0, data & 0x04);
+			machine().bookkeeping().coin_counter_w(1, data & 0x08);
 
 //if (data & 0xf0)
 //logerror("PC %06x: warning - write %02x to TC0220IOC address %02x\n",space.device().safe_pc(),data,offset);
@@ -182,7 +182,7 @@ WRITE8_MEMBER( tc0220ioc_device::portreg_w )
 
 const device_type TC0510NIO = &device_creator<tc0510nio_device>;
 
-tc0510nio_device::tc0510nio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc0510nio_device::tc0510nio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0510NIO, "Taito TC0510NIO", tag, owner, clock, "tc0510nio", __FILE__),
 	m_read_0_cb(*this),
 	m_read_1_cb(*this),
@@ -260,10 +260,10 @@ WRITE8_MEMBER( tc0510nio_device::write )
 			break;
 
 		case 0x04:  /* coin counters and lockout */
-			coin_lockout_w(machine(), 0, ~data & 0x01);
-			coin_lockout_w(machine(), 1, ~data & 0x02);
-			coin_counter_w(machine(), 0, data & 0x04);
-			coin_counter_w(machine(), 1, data & 0x08);
+			machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+			machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+			machine().bookkeeping().coin_counter_w(0, data & 0x04);
+			machine().bookkeeping().coin_counter_w(1, data & 0x08);
 			break;
 
 		default:
@@ -309,7 +309,7 @@ WRITE16_MEMBER( tc0510nio_device::halfword_wordswap_w )
 
 const device_type TC0640FIO = &device_creator<tc0640fio_device>;
 
-tc0640fio_device::tc0640fio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc0640fio_device::tc0640fio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0640FIO, "Taito TC0640FIO", tag, owner, clock, "tc0640fio", __FILE__),
 	m_read_0_cb(*this),
 	m_read_1_cb(*this),
@@ -387,10 +387,10 @@ WRITE8_MEMBER( tc0640fio_device::write )
 			break;
 
 		case 0x04:  /* coin counters and lockout */
-			coin_lockout_w(machine(), 0, ~data & 0x01);
-			coin_lockout_w(machine(), 1, ~data & 0x02);
-			coin_counter_w(machine(), 0, data & 0x04);
-			coin_counter_w(machine(), 1, data & 0x08);
+			machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+			machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+			machine().bookkeeping().coin_counter_w(0, data & 0x04);
+			machine().bookkeeping().coin_counter_w(1, data & 0x08);
 			break;
 
 		default:

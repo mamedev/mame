@@ -23,7 +23,7 @@ Memo:
 
 const device_type NB1413M3 = &device_creator<nb1413m3_device>;
 
-nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nb1413m3_device::nb1413m3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NB1413M3, "NB1413M3 Mahjong Custom", tag, owner, clock, "nb1413m3", __FILE__),
 	m_sndromrgntag("voice"),
 	m_sndrombank1(0),
@@ -597,7 +597,7 @@ WRITE8_MEMBER( nb1413m3_device::outcoin_w )
 			break;
 	}
 
-	set_led_status(space.machine(), 2, m_outcoin_flag);      // out coin
+	space.machine().output().set_led_value(2, m_outcoin_flag);      // out coin
 }
 
 WRITE8_MEMBER( nb1413m3_device::vcrctrl_w )
@@ -605,11 +605,11 @@ WRITE8_MEMBER( nb1413m3_device::vcrctrl_w )
 	if (data & 0x08)
 	{
 		popmessage(" ** VCR CONTROL ** ");
-		set_led_status(space.machine(), 2, 1);
+		space.machine().output().set_led_value(2, 1);
 	}
 	else
 	{
-		set_led_status(space.machine(), 2, 0);
+		space.machine().output().set_led_value(2, 0);
 	}
 }
 

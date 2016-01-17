@@ -191,8 +191,8 @@ const rom_entry *dmac_hdc_device::device_rom_region() const
 //  dmac_hdc_device - constructor
 //-------------------------------------------------
 
-dmac_hdc_device::dmac_hdc_device(const machine_config &mconfig, device_type type, const char *tag,
-	device_t *owner, UINT32 clock, const char *name, const char *shortname) :
+dmac_hdc_device::dmac_hdc_device(const machine_config &mconfig, device_type type, std::string tag,
+	device_t *owner, UINT32 clock, std::string name, std::string shortname) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	m_int6(false),
 	m_dmac(*this, "dmac"),
@@ -200,7 +200,7 @@ dmac_hdc_device::dmac_hdc_device(const machine_config &mconfig, device_type type
 {
 }
 
-a590_device::a590_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a590_device::a590_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	dmac_hdc_device(mconfig, A590, tag, owner, clock, "CBM A590 HD Controller", "a590"),
 	device_exp_card_interface(mconfig, *this),
 	m_dips(*this, "dips"),
@@ -210,7 +210,7 @@ a590_device::a590_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
-a2091_device::a2091_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2091_device::a2091_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	dmac_hdc_device(mconfig, A2091, tag, owner, clock, "CBM A2091 HD Controller", "a2091"),
 	device_zorro2_card_interface(mconfig, *this),
 	m_jp1(*this, "jp1"),

@@ -26,7 +26,7 @@
 class svmu_state : public driver_device
 {
 public:
-	svmu_state(const machine_config &mconfig, device_type type, const char *tag)
+	svmu_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_flash(*this, "flash"),
@@ -174,10 +174,10 @@ static LC8670_LCD_UPDATE( svmu_lcd_update )
 		bitmap.fill(0, cliprect);
 	}
 
-	output_set_value("file_icon" , lcd_enabled ? BIT(vram[0xc1],6) : 0);
-	output_set_value("game_icon" , lcd_enabled ? BIT(vram[0xc2],4) : 0);
-	output_set_value("clock_icon", lcd_enabled ? BIT(vram[0xc3],2) : 0);
-	output_set_value("flash_icon", lcd_enabled ? BIT(vram[0xc4],0) : 0);
+	device.machine().output().set_value("file_icon" , lcd_enabled ? BIT(vram[0xc1],6) : 0);
+	device.machine().output().set_value("game_icon" , lcd_enabled ? BIT(vram[0xc2],4) : 0);
+	device.machine().output().set_value("clock_icon", lcd_enabled ? BIT(vram[0xc3],2) : 0);
+	device.machine().output().set_value("flash_icon", lcd_enabled ? BIT(vram[0xc4],0) : 0);
 
 	return 0;
 }

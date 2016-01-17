@@ -435,7 +435,7 @@ class am29000_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	am29000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	am29000_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
@@ -462,7 +462,7 @@ protected:
 	}
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }

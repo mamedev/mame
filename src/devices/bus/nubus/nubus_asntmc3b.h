@@ -21,7 +21,7 @@ class nubus_mac8390_device :
 {
 public:
 		// construction/destruction
-		nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+		nubus_mac8390_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
@@ -51,13 +51,13 @@ private:
 class nubus_asntmc3nb_device : public nubus_mac8390_device
 {
 public:
-	nubus_asntmc3nb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nubus_asntmc3nb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class nubus_appleenet_device : public nubus_mac8390_device
 {
 public:
-	nubus_appleenet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nubus_appleenet_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual const rom_entry *device_rom_region() const override;
 };
 

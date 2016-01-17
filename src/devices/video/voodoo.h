@@ -71,14 +71,14 @@ void voodoo_set_init_enable(device_t *device, UINT32 newval);
 class voodoo_device : public device_t
 {
 public:
-	voodoo_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	voodoo_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	~voodoo_device();
 
 
 	static void static_set_fbmem(device_t &device, int value) { downcast<voodoo_device &>(device).m_fbmem = value; }
 	static void static_set_tmumem(device_t &device, int value1, int value2) { downcast<voodoo_device &>(device).m_tmumem0 = value1; downcast<voodoo_device &>(device).m_tmumem1 = value2; }
-	static void static_set_screen_tag(device_t &device, const char *tag) { downcast<voodoo_device &>(device).m_screen = tag; }
-	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<voodoo_device &>(device).m_cputag = tag; }
+	static void static_set_screen_tag(device_t &device, std::string tag) { downcast<voodoo_device &>(device).m_screen = tag; }
+	static void static_set_cpu_tag(device_t &device, std::string tag) { downcast<voodoo_device &>(device).m_cputag = tag; }
 	template<class _Object> static devcb_base &static_set_vblank_callback(device_t &device, _Object object) { return downcast<voodoo_device &>(device).m_vblank.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_stall_callback(device_t &device, _Object object)  { return downcast<voodoo_device &>(device).m_stall.set_callback(object); }
 
@@ -92,8 +92,8 @@ public:
 	UINT8               m_fbmem;
 	UINT8               m_tmumem0;
 	UINT8               m_tmumem1;
-	const char *        m_screen;
-	const char *        m_cputag;
+	std::string         m_screen;
+	std::string         m_cputag;
 	devcb_write_line   m_vblank;
 	devcb_write_line   m_stall;
 
@@ -110,7 +110,7 @@ private:
 class voodoo_1_device : public voodoo_device
 {
 public:
-	voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	voodoo_1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -121,7 +121,7 @@ extern const device_type VOODOO_1;
 class voodoo_2_device : public voodoo_device
 {
 public:
-	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	voodoo_2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -132,8 +132,8 @@ extern const device_type VOODOO_2;
 class voodoo_banshee_device : public voodoo_device
 {
 public:
-	voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	voodoo_banshee_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	voodoo_banshee_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	DECLARE_READ32_MEMBER( banshee_r );
 	DECLARE_WRITE32_MEMBER( banshee_w );
@@ -157,7 +157,7 @@ extern const device_type VOODOO_BANSHEE;
 class voodoo_3_device : public voodoo_banshee_device
 {
 public:
-	voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	voodoo_3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

@@ -26,7 +26,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 
 const device_type PSX_RCNT = &device_creator<psxrcnt_device>;
 
-psxrcnt_device::psxrcnt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+psxrcnt_device::psxrcnt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PSX_RCNT, "Sony PSX RCNT", tag, owner, clock, "psxrcnt", __FILE__),
 	m_irq0_handler(*this),
 	m_irq1_handler(*this),

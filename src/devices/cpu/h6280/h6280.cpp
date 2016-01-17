@@ -158,7 +158,7 @@ const device_type H6280 = &device_creator<h6280_device>;
 //  h6280_device - constructor
 //-------------------------------------------------
 
-h6280_device::h6280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+h6280_device::h6280_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, H6280, "H6280", tag, owner, clock, "h6280", __FILE__),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 21),
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 2)
@@ -2191,7 +2191,7 @@ OP(op,ff) { h6280_cycles(4); bbs(7, rd_zpg());         } // 6/8 BBS7 ZPG,REL
 //  for the debugger
 //-------------------------------------------------
 
-void h6280_device::state_string_export(const device_state_entry &entry, std::string &str)
+void h6280_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

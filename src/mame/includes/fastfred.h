@@ -12,7 +12,7 @@
 class fastfred_state : public galaxold_state
 {
 public:
-	fastfred_state(const machine_config &mconfig, device_type type, const char *tag)
+	fastfred_state(const machine_config &mconfig, device_type type, std::string tag)
 		: galaxold_state(mconfig, type, tag),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_palette(*this, "palette"),

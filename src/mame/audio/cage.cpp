@@ -112,13 +112,13 @@ const device_type ATARI_CAGE = &device_creator<atari_cage_device>;
 //  atari_cage_device - constructor
 //-------------------------------------------------
 
-atari_cage_device::atari_cage_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+atari_cage_device::atari_cage_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ATARI_CAGE, "Atari CAGE", tag, owner, clock, "atari_cage", __FILE__),
 	m_irqhandler(*this)
 {
 }
 
-atari_cage_device::atari_cage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+atari_cage_device::atari_cage_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_irqhandler(*this)
 {
@@ -684,7 +684,7 @@ const device_type ATARI_CAGE_SEATTLE = &device_creator<atari_cage_seattle_device
 //  atari_cage_seattle_device - constructor
 //-------------------------------------------------
 
-atari_cage_seattle_device::atari_cage_seattle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+atari_cage_seattle_device::atari_cage_seattle_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	atari_cage_device(mconfig, ATARI_CAGE_SEATTLE, "Atari CAGE Seattle", tag, owner, clock, "atari_cage_seattle", __FILE__)
 {
 }

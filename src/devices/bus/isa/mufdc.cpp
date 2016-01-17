@@ -129,7 +129,7 @@ const rom_entry *fdcmag_device::device_rom_region() const
 //  mufdc_device - constructor
 //-------------------------------------------------
 
-mufdc_device::mufdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname) :
+mufdc_device::mufdc_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, std::string name, std::string shortname) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	device_isa8_card_interface( mconfig, *this ),
 	m_fdc(*this, "fdc"),
@@ -137,12 +137,12 @@ mufdc_device::mufdc_device(const machine_config &mconfig, device_type type, cons
 {
 }
 
-fdc344_device::fdc344_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+fdc344_device::fdc344_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	mufdc_device(mconfig, ISA8_FDC344, tag, owner, clock, "Ably-Tech FDC-344", "fdc344")
 {
 }
 
-fdcmag_device::fdcmag_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+fdcmag_device::fdcmag_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	mufdc_device(mconfig, ISA8_FDCMAG, tag, owner, clock, "Magitronic Multi Floppy Controller Card", "fdcmag")
 {
 }

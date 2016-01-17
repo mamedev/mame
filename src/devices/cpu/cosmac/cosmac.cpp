@@ -268,7 +268,7 @@ const device_type CDP1802 = &device_creator<cdp1802_device>;
 //  cosmac_device - constructor
 //-------------------------------------------------
 
-cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 3),
@@ -301,7 +301,7 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 //  cdp1801_device - constructor
 //-------------------------------------------------
 
-cdp1801_device::cdp1801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cdp1801_device::cdp1801_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cosmac_device(mconfig, CDP1801, "CDP1801", tag, owner, clock, "cdp1801", __FILE__)
 {
 }
@@ -311,7 +311,7 @@ cdp1801_device::cdp1801_device(const machine_config &mconfig, const char *tag, d
 //  cdp1802_device - constructor
 //-------------------------------------------------
 
-cdp1802_device::cdp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cdp1802_device::cdp1802_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cosmac_device(mconfig, CDP1802, "CDP1802", tag, owner, clock, "cdp1802", __FILE__)
 {
 }
@@ -353,9 +353,8 @@ void cosmac_device::device_start()
 	state_add(COSMAC_I,     "I",    m_i).mask(0xf);
 	state_add(COSMAC_N,     "N",    m_n).mask(0xf);
 
-	std::string tempstr;
 	for (int regnum = 0; regnum < 16; regnum++)
-		state_add(COSMAC_R0 + regnum, strformat(tempstr, "R%x", regnum).c_str(), m_r[regnum]);
+		state_add(COSMAC_R0 + regnum, strformat("R%x", regnum).c_str(), m_r[regnum]);
 
 	state_add(COSMAC_DF,    "DF",   m_df).mask(0x1).noshow();
 	state_add(COSMAC_IE,    "IE",   m_ie).mask(0x1).noshow();
@@ -469,7 +468,7 @@ void cosmac_device::state_export(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void cosmac_device::state_string_export(const device_state_entry &entry, std::string &str)
+void cosmac_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -705,7 +704,7 @@ void cosmac_device::execute_run()
 			{
 			case COSMAC_MODE_LOAD:
 				// RUN mode cannot be initiated from LOAD mode
-				logerror("COSMAC '%s' Tried to initiate RUN mode from LOAD mode\n", tag());
+				logerror("COSMAC '%s' Tried to initiate RUN mode from LOAD mode\n", tag().c_str());
 				m_mode = COSMAC_MODE_LOAD;
 				break;
 

@@ -163,7 +163,7 @@ WRITE8_MEMBER(vsnes_state::sprite_dma_1_w)
 
 WRITE8_MEMBER(vsnes_state::vsnes_coin_counter_w)
 {
-	coin_counter_w( machine(), 0, data & 0x01 );
+	machine().bookkeeping().coin_counter_w(0, data & 0x01 );
 	m_coin = data;
 
 		//"bnglngby" and "cluclu"
@@ -181,7 +181,7 @@ READ8_MEMBER(vsnes_state::vsnes_coin_counter_r)
 
 WRITE8_MEMBER(vsnes_state::vsnes_coin_counter_1_w)
 {
-	coin_counter_w( machine(), 1, data & 0x01 );
+	machine().bookkeeping().coin_counter_w(1, data & 0x01 );
 	if( data & 0xfe ) //vsbball service mode
 	{
 	//do something?

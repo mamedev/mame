@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 /*************************************************************************
 
@@ -26,7 +26,7 @@ public:
 		TIMER_HIT
 	};
 
-	triplhnt_state(const machine_config &mconfig, device_type type, const char *tag)
+	triplhnt_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_playfield_ram(*this, "playfield_ram"),
 		m_vpos_ram(*this, "vpos_ram"),

@@ -207,7 +207,7 @@ SLOT_INTERFACE_START(ata_devices)
 	SLOT_INTERFACE("cdrom", ATAPI_CDROM)
 SLOT_INTERFACE_END
 
-ata_interface_device::ata_interface_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+ata_interface_device::ata_interface_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_irq_handler(*this),
 	m_dmarq_handler(*this),
@@ -217,7 +217,7 @@ ata_interface_device::ata_interface_device(const machine_config &mconfig, device
 
 const device_type ATA_INTERFACE = &device_creator<ata_interface_device>;
 
-ata_interface_device::ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ata_interface_device::ata_interface_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ATA_INTERFACE, "ATA Interface", tag, owner, clock, "ata_interface", __FILE__),
 	m_irq_handler(*this),
 	m_dmarq_handler(*this),
@@ -296,7 +296,7 @@ const device_type ATA_SLOT = &device_creator<ata_slot_device>;
 //  ata_slot_device - constructor
 //-------------------------------------------------
 
-ata_slot_device::ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ata_slot_device::ata_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ATA_SLOT, "ATA Connector", tag, owner, clock, "ata_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		m_dev(nullptr)
