@@ -228,7 +228,9 @@ TODO:
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
+#include "machine/wd_fdc.h"
 #include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
 #include "formats/spc1000_cas.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/upd765.h"
@@ -254,7 +256,9 @@ public:
 		, m_sound(*this, "ay8910")
 		, m_palette(*this, "palette")
 		, m_fdc(*this, "upd765")
+		, m_fd0(nullptr)
 		, m_timer(nullptr)
+		, m_timer_tc(nullptr)
 	{}
 	DECLARE_READ8_MEMBER(psga_r);	
 	DECLARE_READ8_MEMBER(porta_r);
@@ -289,7 +293,8 @@ public:
 	DECLARE_VIDEO_START(spc);
 	MC6845_UPDATE_ROW(crtc_update_row); 
 	MC6845_RECONFIGURE(crtc_reconfig);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer);
+//	TIMER_DEVICE_CALLBACK_MEMBER(timer);
+	DECLARE_FLOPPY_FORMATS(floppy_formats);	
 private:
 	UINT8 *m_p_ram;
 	UINT8 m_ipl;
@@ -327,7 +332,9 @@ private:
 	UINT8 *m_font;        
 	UINT8 m_priority;
 	emu_timer *m_timer;
+	emu_timer *m_timer_tc;
 	void get_pcg_addr();
+	static const device_timer_id TIMER_TC = 0;	
 };
 
 READ8_MEMBER( spc1500_state::keyboard_r )
@@ -421,14 +428,18 @@ READ8_MEMBER( spc1500_state::crtc_r)
 	return 0;
 }
 
+	/*
 TIMER_DEVICE_CALLBACK_MEMBER(spc1500_state::timer)
 {
-	if(m_motor_toggle == true)
+	switch (param)
 	{
-		m_cass->change_state((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		m_motor_toggle = false;
+		case TIMER_TC:
+			printf("m_fdc->tc_w(false)\n");
+//			m_fdc->tc_w(false);
+			break;
 	}
 }
+	*/
 
 void spc1500_state::get_pcg_addr()
 {
@@ -627,12 +638,9 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 WRITE8_MEMBER( spc1500_state::fdc_w )
 {
 	if (m_fd0)
-	{
-		if (BIT(data, 0))
-			m_fdc->set_floppy(m_fd0);
-		m_fd0->mon_w(BIT(data, 2));
-	}
-	printf("fdc_w(0x%02x, 0x%02x)\n", offset & 0xff, data); 
+		m_fd0->mon_w(!BIT(data, 0));
+	m_fdc->tc_w(!BIT(data, 2));
+//	printf("fdc_w(0x%02x, 0x%02x)\n", offset & 0xff, data); 
 }
 
 READ8_MEMBER( spc1500_state::fdc_r )
@@ -642,11 +650,11 @@ READ8_MEMBER( spc1500_state::fdc_r )
 	switch (off)
 	{
 		case 0:
-			m_fdc->tc_w(true);
+//			m_timer_tc->adjust(attotime::zero);
 			data = 0xff;
 			break;
 	}
-	printf("fdc_r(0x%02x, 0x%02x)\n", offset & 0xff, data); 
+//	printf("fdc_r(0x%02x, 0x%02x)\n", offset & 0xff, data); 
 	return data;
 }
 
@@ -661,7 +669,7 @@ WRITE8_MEMBER( spc1500_state::fdcx_w )
 		case 1:
 			m_fdc->fifo_w(space, off, data);
 	}
-	printf("fdcx_w(0x%02x, 0x%02x)\n", offset & 0xff, data); 
+//	printf("fdcx_w(0x%02x, 0x%02x)\n", offset & 0xff, data); 
 }
 
 READ8_MEMBER( spc1500_state::fdcx_r )
@@ -677,7 +685,8 @@ READ8_MEMBER( spc1500_state::fdcx_r )
 			data = m_fdc->fifo_r(space, off, 0xff);
 			break;
 	}
-	printf("fdcx_r(0x%02x, 0x%02x)\n", off, data); 
+	//printf("fdcx_r(0x%02x, 0x%02x)\n", off, data); 
+	fflush(stdout);
 	return data;
 }
 
@@ -935,8 +944,6 @@ void spc1500_state::machine_start()
 	membank("bank4")->set_base(m_p_ram + 0x8000);	
 	m_timer = timer_alloc(0);
 	m_timer->adjust(attotime::zero);
-	m_fd0 = subdevice<floppy_connector>("upd765:0")->get_device();
-
 }
 
 void spc1500_state::machine_reset()
@@ -946,6 +953,9 @@ void spc1500_state::machine_reset()
 	m_double_mode = false;
 	memset(&m_paltbl[0], 1, 8);
 	m_char_count = 0;
+	m_fd0 = subdevice<floppy_connector>("upd765:1")->get_device();
+	m_fdc->set_floppy(m_fd0);
+	m_fd0->mon_w(false);
 }
 
 READ8_MEMBER(spc1500_state::mc6845_videoram_r)
@@ -969,6 +979,10 @@ READ8_MEMBER( spc1500_state::porta_r )
 	data &= ~((m_centronics_busy == 0)<< 5);
 	return data;
 }
+
+FLOPPY_FORMATS_MEMBER( spc1500_state::floppy_formats )
+	FLOPPY_DSK_FORMAT, FLOPPY_D88_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( spc1500_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)
@@ -1005,7 +1019,7 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(spc1500_state, portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(spc1500_state, portc_w))
 	
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz", spc1500_state, timer, attotime::from_hz(1))
+//	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz", spc1500_state, timer, attotime::from_hz(1))
 	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1026,7 +1040,8 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	// floppy drives
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", spc1500_floppies, "dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", spc1500_floppies, "dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:2", spc1500_floppies, "dd", floppy_image_device::default_floppy_formats)
 	
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(spc1000_cassette_formats)
