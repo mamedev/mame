@@ -649,6 +649,7 @@ static ADDRESS_MAP_START( 40love_map, AS_PROGRAM, 8, fortyl_state )
 	AM_RANGE(0x9880, 0x98bf) AM_READWRITE(fortyl_bg_colorram_r, fortyl_bg_colorram_w) AM_SHARE("colorram")      /* background attributes (2 bytes per line) */
 	AM_RANGE(0x98c0, 0x98ff) AM_RAM AM_SHARE("spriteram2")/* sprites part 2 */
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
+	//AM_RANGE(0xbf00, 0xbfff) writes here when zooms-in/out, left-over or pixel line clearance?
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(fortyl_pixram_r, fortyl_pixram_w) /* banked pixel layer */
 ADDRESS_MAP_END
 
@@ -962,6 +963,7 @@ MACHINE_START_MEMBER(fortyl_state,40love)
 	/* video */
 	save_item(NAME(m_pix1));
 	save_item(NAME(m_pix2));
+	save_item(NAME(m_color_bank));
 	/* sound */
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_pending_nmi));
@@ -995,7 +997,8 @@ MACHINE_RESET_MEMBER(fortyl_state,common)
 	m_pix1 = 0;
 	m_pix2[0] = 0;
 	m_pix2[1] = 0;
-
+	m_color_bank = false;
+	
 	/* sound */
 	m_sound_nmi_enable = 0;
 	m_pending_nmi = 0;
