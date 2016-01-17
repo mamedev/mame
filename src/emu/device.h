@@ -589,6 +589,10 @@ private:
 
 inline device_t *device_t::subdevice(std::string tag) const
 {
+	// safety first
+	if (this == nullptr)
+		return nullptr;
+
 	// empty string means this device
 	if (tag.empty())
 		return const_cast<device_t *>(this);
@@ -606,6 +610,10 @@ inline device_t *device_t::subdevice(std::string tag) const
 
 inline device_t *device_t::siblingdevice(std::string tag) const
 {
+	// safety first
+	if (this == nullptr)
+		return nullptr;
+
 	// empty string or NULL means this device
 	if (tag.empty())
 		return const_cast<device_t *>(this);

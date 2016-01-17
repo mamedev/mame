@@ -296,7 +296,7 @@ A detailed description of the hardware can be found also in the patent 4,373,719
 
 ******************************************************************************
 
-Sensory Chess Challenger champion (6502 based, implementation is in drivers/csc.cpp)
+Sensory Chess Challenger champion (6502 based)
 ---------------------------------
 
 Memory map:
@@ -583,14 +583,7 @@ expect that the software reads these once on startup only.
 
 ******************************************************************************/
 
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/mcs48/mcs48.h"
-#include "machine/i8255.h"
-#include "machine/i8243.h"
-#include "machine/z80pio.h"
-#include "sound/speaker.h"
-#include "sound/s14001a.h"
+#include "includes/fidelz80.h"
 
 // internal artwork
 #include "fidel_cc.lh"
@@ -599,57 +592,12 @@ expect that the software reads these once on startup only.
 #include "fidel_vbrc.lh"
 
 
-class fidelz80_state : public driver_device
+class fidelz80_state : public fidelz80base_state
 {
 public:
 	fidelz80_state(const machine_config &mconfig, device_type type, std::string tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_mcu(*this, "mcu"),
-		m_z80pio(*this, "z80pio"),
-		m_ppi8255(*this, "ppi8255"),
-		m_i8243(*this, "i8243"),
-		m_inp_matrix(*this, "IN"),
-		m_speech(*this, "speech"),
-		m_speaker(*this, "speaker"),
-		m_display_wait(33),
-		m_display_maxy(1),
-		m_display_maxx(0)
+		: fidelz80base_state(mconfig, type, tag)
 	{ }
-
-	// devices/pointers
-	required_device<cpu_device> m_maincpu;
-	optional_device<i8041_device> m_mcu;
-	optional_device<z80pio_device> m_z80pio;
-	optional_device<i8255_device> m_ppi8255;
-	optional_device<i8243_device> m_i8243;
-	optional_ioport_array<10> m_inp_matrix; // max 10
-	optional_device<s14001a_device> m_speech;
-	optional_device<speaker_sound_device> m_speaker;
-
-	// misc common
-	UINT16 m_inp_mux;                   // multiplexed keypad/leds mask
-	UINT16 m_led_select;             // 5 bit selects for 7 seg leds and for common other leds, bits are (7seg leds are 0 1 2 3, common other leds are C) 0bxx3210xc
-	UINT16 m_7seg_data;            // data for seg leds
-	UINT16 m_led_data;
-
-	UINT16 read_inputs(int columns);
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
-
-	// display common
-	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
-	int m_display_maxy;                 // display matrix number of rows
-	int m_display_maxx;                 // display matrix number of columns (max 31 for now)
-
-	UINT32 m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
-	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
-	UINT32 m_display_cache[0x20];       // (internal use)
-	UINT8 m_display_decay[0x20][0x20];  // (internal use)
-
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
-	void display_update();
-	void set_display_size(int maxx, int maxy);
-	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
 
 	// model VCC/UVC
 	void vcc_prepare_display();
@@ -683,16 +631,12 @@ public:
 	DECLARE_READ8_MEMBER(mcu_data_r);
 	DECLARE_READ8_MEMBER(mcu_status_r);
 	DECLARE_WRITE8_MEMBER(digit_w);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 };
 
 
 // machine start/reset
 
-void fidelz80_state::machine_start()
+void fidelz80base_state::machine_start()
 {
 	// zerofill
 	memset(m_display_state, 0, sizeof(m_display_state));
@@ -721,7 +665,7 @@ void fidelz80_state::machine_start()
 	save_item(NAME(m_7seg_data));
 }
 
-void fidelz80_state::machine_reset()
+void fidelz80base_state::machine_reset()
 {
 }
 
@@ -736,7 +680,7 @@ void fidelz80_state::machine_reset()
 // The device may strobe the outputs very fast, it is unnoticeable to the user.
 // To prevent flickering here, we need to simulate a decay.
 
-void fidelz80_state::display_update()
+void fidelz80base_state::display_update()
 {
 	UINT32 active_state[0x20];
 
@@ -789,7 +733,7 @@ void fidelz80_state::display_update()
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(fidelz80_state::display_decay_tick)
+TIMER_DEVICE_CALLBACK_MEMBER(fidelz80base_state::display_decay_tick)
 {
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
@@ -800,13 +744,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(fidelz80_state::display_decay_tick)
 	display_update();
 }
 
-void fidelz80_state::set_display_size(int maxx, int maxy)
+void fidelz80base_state::set_display_size(int maxx, int maxy)
 {
 	m_display_maxx = maxx;
 	m_display_maxy = maxy;
 }
 
-void fidelz80_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
+void fidelz80base_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
 {
 	set_display_size(maxx, maxy);
 
@@ -821,7 +765,7 @@ void fidelz80_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 
 // generic input handlers
 
-UINT16 fidelz80_state::read_inputs(int columns)
+UINT16 fidelz80base_state::read_inputs(int columns)
 {
 	UINT16 ret = 0;
 
@@ -833,7 +777,7 @@ UINT16 fidelz80_state::read_inputs(int columns)
 	return ret;
 }
 
-INPUT_CHANGED_MEMBER(fidelz80_state::reset_button)
+INPUT_CHANGED_MEMBER(fidelz80base_state::reset_button)
 {
 	// when RE button is directly wired to RESET pin(s)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);

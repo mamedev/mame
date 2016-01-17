@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Pierpaolo Prazzoli,Grazvydas Ignotas
 /****************************************** SVP related *****************************************/
 

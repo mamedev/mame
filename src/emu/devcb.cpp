@@ -56,7 +56,7 @@ void devcb_base::reset(callback_type type)
 void devcb_base::resolve_ioport()
 {
 	// attempt to resolve, fatal error if fail
-	m_target.ioport = (!m_target_tag.empty()) ? m_device.owner()->ioport(m_target_tag) : nullptr;
+	m_target.ioport = m_device.owner()->ioport(m_target_tag); 
 	if (m_target.ioport == nullptr)
 		throw emu_fatalerror("Unable to resolve I/O port callback reference to '%s' in device '%s'\n", m_target_tag.c_str(), m_device.tag().c_str());
 }
@@ -70,7 +70,7 @@ void devcb_base::resolve_ioport()
 void devcb_base::resolve_inputline()
 {
 	// attempt to resolve, fatal error if fail
-	m_target.device = (!m_target_tag.empty()) ? m_device.owner()->subdevice(m_target_tag) : nullptr;
+	m_target.device = m_device.owner()->subdevice(m_target_tag);
 	if (m_target.device == nullptr)
 		throw emu_fatalerror("Unable to resolve device reference to '%s' in device '%s'\n", m_target_tag.c_str(), m_device.tag().c_str());
 
@@ -89,7 +89,7 @@ void devcb_base::resolve_inputline()
 void devcb_base::resolve_space()
 {
 	// attempt to resolve, fatal error if fail
-	device_t *spacedev = (!m_space_tag.empty()) ? m_device.owner()->subdevice(m_space_tag) : nullptr;
+	device_t *spacedev = m_device.owner()->subdevice(m_space_tag);
 	if (spacedev == nullptr)
 		throw emu_fatalerror("Unable to resolve device reference to '%s' in device '%s'\n", m_space_tag.c_str(), m_device.tag().c_str());
 	if (!spacedev->memory().has_space(m_space_num))

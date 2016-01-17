@@ -5508,9 +5508,9 @@ dybbnao         // 1998.12 Dynamite Baseball NAOMI
 crzytaxi        // 1999.02 Crazy Taxi
 pstone          // 1999.02 Power Stone
 zombrvno        // 1999.02 Zombie Revenge
-zombrvn         // 1999.03 Zombie Revenge (Rev A)
 airlbios        // 1999.03 Airline Pilots (BIOS)
 alpilota        // 1999.03 Airline Pilots (Rev A)
+zombrvn         // 1999.03 Zombie Revenge (Rev A)
 ggram2          // 1999.04 Giant Gram: All Japan Pro Wrestling 2
 				// 1999.05 Taisen Puzzle Kurutto Stone
 ringout         // 1999.06 Ring Out 4x4
@@ -5540,14 +5540,13 @@ alpiltdx        // 1999.?? Airline Pilots Deluxe (Rev B)
 				// 1999.?? Pocket Shooting
 sambap          // 1999.?? Samba de Amigo (prototype)
 spawn           // 1999.?? Spawn In the Demon's Hand
-				// 1999.?? Tokio Bus Guide
-tokyobus        // 1999.?? Tokio Bus Guide (Rev A)
+tokyobus		// 1999.?? Tokyo Bus Guide (Rev A)
 vtennisg        // 1999.?? Virtua Tennis / Power Smash (GD-ROM)
-totdo           // 1999.?? The Typing of the Dead
 18wheelr        // 2000.01 18 Wheeler Deluxe (Rev A)
 18wheels        // 2000.01 18 Wheeler (Standard)
 18wheelu        // 2000.01 18 Wheeler (Upright)
 doa2m           // 2000.01 Dead or Alive 2 Millennium
+totdo           // 2000.01 The Typing of the Dead
 totd            // 2000.01 The Typing of the Dead (Rev A)
 tduno2          // 2000.02 Touch de UNO! 2
 virnba          // 2000.02 Virtua NBA
@@ -5600,9 +5599,9 @@ gundmgd         // 2001.03 Mobile Suit Gundam: Federation Vs. Zeon (GD-ROM)
 gundmct         // 2001.03 Mobile Suit Gundam: Federation Vs. Zeon (cartridge)
 shaktmsp        // 2001.04.04 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika (2K1 SPR)
 dygolf          // 2001.04.27 Dynamic Golf / Virtua Golf (Rev A)
+cvsgd           // 2001.05 Capcom Vs. SNK Millennium Fight 2000 Pro
 monkeyba        // 2001.05 Monkey Ball
 zerogu2         // 2001.05 Zero Gunner 2
-cvsgd           // 2001.06 Capcom Vs. SNK Millennium Fight 2000 Pro
 crakndj2        // 2001.06 Crackin' DJ Part 2
 hmgeo           // 2001.06 Heavy Metal Geomatrix (Rev B)
 wsbbgd          // 2001.06 Super Major League / World Series Baseball
@@ -5645,11 +5644,11 @@ mtkob2          // 2003.02 MushiKing The King Of Beetle
 ggxxrlo         // 2003.02 Guilty Gear XX # Reload
 ggxxrl          // 2003.03 Guilty Gear XX # Reload (Rev A)
 				// 2003.03 Sega Network Taisen Mahjong MJ
-bdrdown         // 2003.04 Border Down (Rev A)
 shikgam2        // 2003.04 Shikigami No Shiro II / The Castle of Shikigami II
 usagiym         // 2003.06 Usagi Yamashiro Mahjong Hen
 				// 2003.07 Sega Network Taisen Mahjong MJ (Rev A)
 oinori          // 2003.08 Oinori-daimyoujin Matsuri
+bdrdown         // 2003.09 Border Down (Rev A)
 psyvar2         // 2003.11 Psyvariar 2 - The Will To Fabricate
 puyofev         // 2003.11 Puyo Puyo Fever
 starhrsp        // 2003.12.01 Star Horse Progress (satellite) (Rev A)
@@ -5700,7 +5699,7 @@ pokasuka        // 2007.07 Pokasuka Ghost!
 sl2007          // 2007.07 Shooting Love
 asndynmt        // 2007.07 Dynamite Deka EX - Asian dynamite
 rhytngk         // 2007.09 Rhythm Tengoku
-ausfache        // 2008.02 Akatsuki Denkou Senki Ausf.Achse
+ausfache        // 2008.02.20 Akatsuki Blitzkampf Ausf. Achse
 illvelo         // 2008.06 Illvelo (Illmatic Envelope)
 mamonoro        // 2008.07 Mamoru-kun wa Norowarete Shimatta!
 mbaao           // 2008.09 Melty Blood Actress Again
@@ -5941,7 +5940,7 @@ scg06nt         // 2005.12 Sega Golf Club 2006: Next Tours (Rev A)
 				// 2006.11 Quest of D Oukoku no Syugosya Ver.3.01
 				// 2006.11 Mobile Suit Gundam 0079 Card Builder Ver.2.02
 				// 2007.03 Mobile Suit Gundam 0083 Card Builder
-mj3evo      // 2007.06 Sega Network Taisen Mahjong MJ 3 Evolution (Rev B)
+mj3evo          // 2007.06 Sega Network Taisen Mahjong MJ 3 Evolution (Rev B)
 				// 2007.10 Mobile Suit Gundam 0083 Card Builder Ryouyuu Gekitotsu
 				// 2007.11 Quest of D The Battle Kingdom Ver.4.00
 				// 2008.01 Quest of D The Battle Kingdom Ver.4.00b

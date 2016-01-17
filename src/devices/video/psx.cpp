@@ -568,7 +568,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	}
 
 	// icky!!!
-	machine().save().save_memory( this, "globals", nullptr, 0, "m_packet", (UINT8 *)&m_packet, 1, sizeof( m_packet ) );
+	machine().save().save_memory( this, "globals", std::string(), 0, "m_packet", (UINT8 *)&m_packet, 1, sizeof( m_packet ) );
 
 	save_pointer(NAME(p_vram.get()), width * height );
 	save_item(NAME(n_gpu_buffer_offset));
