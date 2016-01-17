@@ -84,7 +84,6 @@ sam6883_device::sam6883_device(const machine_config &mconfig, std::string tag, d
 		m_space_FF60(*this),
 		m_space_FFE0(*this)
 {
-	memset(m_banks, '\0', sizeof(m_banks));
 }
 
 
