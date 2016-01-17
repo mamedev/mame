@@ -35,8 +35,8 @@
     Devil Crash
   * Die Hard
     Dodge Ball
-  * Doraemon Meikyuu Daisakusen
-  * Doramon II
+    Doraemon Meikyuu Daisakusen
+  * Doraemon II
   * Down Load
     Dragon Spirit
     Dungeon Explorer
@@ -458,7 +458,9 @@ MACHINE_CONFIG_END
 	ROM_SYSTEM_BIOS( 3, "52", "U4-52" ) \
 	ROMX_LOAD( "u4-52.ic29", 0x0000, 0x8000, CRC(ffd7b0fe) SHA1(d1804865c91e925a01b05cf441e8458a3db23f50), ROM_BIOS(4) ) \
 	ROM_SYSTEM_BIOS( 4, "43", "U4-43" ) \
-	ROMX_LOAD( "u4-43.ic29", 0x0000, 0x8000, CRC(88da23f3) SHA1(9d24faa116129783e55c7f79a4a08902a236d5a6), ROM_BIOS(5) )
+	ROMX_LOAD( "u4-43.ic29", 0x0000, 0x8000, CRC(88da23f3) SHA1(9d24faa116129783e55c7f79a4a08902a236d5a6), ROM_BIOS(5) ) \
+	ROM_SYSTEM_BIOS( 5, "40", "U4-40" ) \
+	ROMX_LOAD( "u4-40.ic29", 0x0000, 0x8000, CRC(ba6290cc) SHA1(92b0e9f55791e892ec209de4fadd80faef370622), ROM_BIOS(6) )
 
 
 ROM_START(tourvis)
@@ -585,6 +587,14 @@ ROM_END
 ROM_START(tvdodgeb)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_dodge_ball.bin", 0x00000, 0x100000, CRC(7a12cf72) SHA1(c477bc5dae4e82a89766052f185afb73ca2234f3) )
+
+	TOURVISION_BIOS
+ROM_END
+
+/* Doraemon Meikyuu Daisakusen */ 
+ROM_START(tvdormon)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_doreamon.bin", 0x00000, 0x100000, CRC(22e8b5ba) SHA1(f21101358df8625c39a5078b9f1b1a0215470bed) )
 
 	TOURVISION_BIOS
 ROM_END
@@ -1032,6 +1042,7 @@ GAME( 19??, tourvis,  0,       tourvision, tourvision, pce_common_state, pce_com
 GAME( 1988, tvdrgnst, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Namcot",                             "Dragon Spirit (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1988, tvlegaxe, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Victor Musical Industries, Inc.",    "Makyo Densetsu - The Legenary Axe (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
+GAME( 1989, tvdormon, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Fujiko-Shogakukan-TV Asahi / Hudson Soft", "Doraemon Meikyuu Daisakusen (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1989, tvdunexp, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Atlus Ltd. / Hudson Soft",           "Dungeon Explorer (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1989, tvflaptw, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Namco Ltd. / Namcot",                "Final Lap Twin (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1989, tvgunhed, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Hudson / Toho Sunrise",              "Gunhed (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
