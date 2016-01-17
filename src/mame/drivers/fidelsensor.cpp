@@ -2,7 +2,7 @@
 // copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco
 /******************************************************************************
 
-WIP: plan to move to main fidelity chess driver
+WIP: plan to move to main fidelity chess driver^Z^Z^Z^Z - move magnet board sensor games to this driver
 
 
 
