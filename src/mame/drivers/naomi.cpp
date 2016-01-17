@@ -332,7 +332,7 @@ Soul Surfer (Rev A)                           840-0095C  23838C  21 (64Mb)   pre
 Star Horse (server)                           840-0055C  23626   17 (64Mb)   present  315-6206  not present   requires 837-13785 ARCNET&IO BD
 The King of Route 66 (Rev A)                  840-0087C  23819A  20 (64Mb)   present  315-6206  not present   content is the same as regular 171-8132A cart
 The Maze of the Kings (prototype)               no cart  *       21 (64Mb)   present  315-6206  FRI           * flash-PCB, not dumped but known to exist
-Tokyo Bus Guide (Rev A)                       840-0045C  23468A  18 (64Mb)   present  315-6206  317-0290-COM
+Tokyo Bus Guide (Rev A)                       840-0045C  23468A  18 (64Mb)   present  315-6206  317-0290-COM  requires 837-13844 JVS IO
 Virtua NBA (prototype)                          no cart  *       21 (64Mb)   present  315-6206  317-0271-COM  * instead of EPROM have tiny PCB with 2 flashroms on it
 Virtua Tennis / Power Smash (prototype)         no cart  *       21 (64Mb)   present  315-6206  317-0263-COM  * flash-PCB, title screen have label "SOFT R&D Dept.#3", not dumped but known to exist
 
