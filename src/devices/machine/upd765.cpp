@@ -4,8 +4,6 @@
 
 #include "upd765.h"
 
-//#define logerror printf
-
 const device_type UPD765A = &device_creator<upd765a_device>;
 const device_type UPD765B = &device_creator<upd765b_device>;
 const device_type I8272A = &device_creator<i8272a_device>;
@@ -364,7 +362,7 @@ READ8_MEMBER(upd765_family_device::msr_r)
 		data_irq = false;
 		check_irq();
 	}
-//	logerror("%s: m:0x%02x\n", tag(), msr);
+
 	return msr;
 }
 
@@ -403,14 +401,12 @@ READ8_MEMBER(upd765_family_device::fifo_r)
 		logerror("%s: fifo_r in phase %d\n", tag().c_str(), main_phase);
 		break;
 	}
-	logerror("%s: r:0x%02x\n", tag(), r);
 
 	return r;
 }
 
 WRITE8_MEMBER(upd765_family_device::fifo_w)
 {
-	logerror("%s: w:0x%02x\n", tag(), data);
 	switch(main_phase) {
 	case PHASE_CMD: {
 		command[command_pos++] = data;
@@ -540,7 +536,6 @@ UINT8 upd765_family_device::fifo_pop(bool internal)
 	int thr = fifocfg & 15;
 	if(fifo_write && fifo_expected && (fifo_pos <= thr || (fifocfg & 0x20)))
 		enable_transfer();
-	logerror("%s: d:0x%02x\n", tag(), r);
 	return r;
 }
 
@@ -1364,10 +1359,10 @@ void upd765_family_device::start_command(int cmd)
 	}
 
 	case C_SPECIFY:
+		logerror("%s: command specify %02x %02x\n",
+					tag().c_str(),
+					command[1], command[2]);
 		spec = (command[1] << 8) | command[2];
-		logerror("%s: command specify %02x %02x spec: %04x\n",
-					tag(),
-					command[1], command[2], spec);
 		main_phase = PHASE_CMD;
 		break;
 
@@ -1393,9 +1388,7 @@ void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 	else
 	{
 		other_irq = true;
-		//data_irq = true;
 		fi.st0_filled = true;
-		//logerror("%s: seek completion\n", tag());
 	}
 	check_irq();
 }
@@ -1427,7 +1420,6 @@ void upd765_family_device::delay_cycles(emu_timer *tm, int cycles)
 void upd765_family_device::seek_continue(floppy_info &fi)
 {
 	for(;;) {
-		logerror("%s: seek_continue: %d %d\n", tag(), fi.main_state, fi.sub_state);
 		switch(fi.sub_state) {
 		case SEEK_MOVE:
 			if(fi.dev) {
@@ -1530,11 +1522,9 @@ void upd765_family_device::read_data_start(floppy_info &fi)
 
 	if(fi.dev)
 	{
-		if (command[1] & 4) 
-		{
+		if (command[1] & 4)
 			command[3] = 1;
-		}
-		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+		fi.dev->ss_w(command[1] & 4 ? 1 : 0);		
 	}
 	read_data_continue(fi);
 }
@@ -1581,7 +1571,11 @@ void upd765_family_device::scan_start(floppy_info &fi)
 	}
 
 	if(fi.dev)
+	{
+		if (command[1] & 4)
+			command[3] = 1;
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+	}
 	read_data_continue(fi);
 }
 
@@ -1756,7 +1750,11 @@ void upd765_family_device::write_data_start(floppy_info &fi)
 				cur_rate);
 
 	if(fi.dev)
+	{
+		if (command[1] & 4)
+			command[3] = 1;
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+	}
 
 	fi.st0 = command[1] & 7;
 	st1 = ST1_MA;
@@ -1897,7 +1895,11 @@ void upd765_family_device::read_track_start(floppy_info &fi)
 	}
 
 	if(fi.dev)
+	{
+		if (command[1] & 4)
+			command[3] = 1;
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+	}
 	read_track_continue(fi);
 }
 
@@ -2059,7 +2061,11 @@ void upd765_family_device::format_track_start(floppy_info &fi)
 	fi.st0 = command[1] & 7;
 
 	if(fi.dev)
+	{
+		if (command[1] & 4)
+			command[3] = 1;
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+	}
 	sector_size = calc_sector_size(command[2]);
 
 	format_track_continue(fi);
@@ -2115,7 +2121,11 @@ void upd765_family_device::read_id_start(floppy_info &fi)
 				cur_rate);
 
 	if(fi.dev)
+	{
+		if (command[1] & 4)
+			command[3] = 1;
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+	}
 
 	fi.st0 = command[1] & 7;
 	st1 = 0x00;
