@@ -19,7 +19,7 @@ TODO:
 class albazc_state : public driver_device
 {
 public:
-	albazc_state(const machine_config &mconfig, device_type type, const char *tag)
+	albazc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram1(*this, "spriteram1"),
 		m_spriteram2(*this, "spriteram2"),

@@ -88,7 +88,7 @@ MACHINE_CONFIG_EXTERN( coco_sound );
 class coco_state : public driver_device
 {
 public:
-	coco_state(const machine_config &mconfig, device_type type, const char *tag);
+	coco_state(const machine_config &mconfig, device_type type, std::string tag);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_0;

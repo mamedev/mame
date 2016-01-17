@@ -58,7 +58,7 @@ machine_config_constructor vic1011_device::device_mconfig_additions() const
 //  vic1011_device - constructor
 //-------------------------------------------------
 
-vic1011_device::vic1011_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vic1011_device::vic1011_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VIC1011, "VIC1011", tag, owner, clock, "vic1011", __FILE__),
 		device_pet_user_port_interface(mconfig, *this),
 		m_rs232(*this, RS232_TAG)

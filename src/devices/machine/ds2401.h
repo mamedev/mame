@@ -20,7 +20,7 @@ class ds2401_device : public device_t
 {
 public:
 	// construction/destruction
-	ds2401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ds2401_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER( write );
 	DECLARE_READ_LINE_MEMBER( read );

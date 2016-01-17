@@ -22,7 +22,7 @@ class ti99_cartridge_connector_device;
 class gromport_device : public bus8z_device, public device_slot_interface
 {
 public:
-	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gromport_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ8Z_MEMBER(crureadz);
@@ -72,7 +72,7 @@ class ti99_cartridge_pcb;
 class ti99_cartridge_device : public bus8z_device, public device_image_interface
 {
 public:
-	ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti99_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
@@ -144,7 +144,7 @@ public:
 	UINT16 grom_mask();
 
 protected:
-	ti99_cartridge_connector_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	ti99_cartridge_connector_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	virtual void device_config_complete() override;
 
 	gromport_device*    m_gromport;
@@ -156,7 +156,7 @@ protected:
 class single_conn_device : public ti99_cartridge_connector_device
 {
 public:
-	single_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	single_conn_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
@@ -184,7 +184,7 @@ private:
 class multi_conn_device : public ti99_cartridge_connector_device
 {
 public:
-	multi_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	multi_conn_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
@@ -216,7 +216,7 @@ private:
 class gkracker_device : public ti99_cartridge_connector_device, public device_nvram_interface
 {
 public:
-	gkracker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gkracker_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
@@ -281,8 +281,8 @@ protected:
 	void                set_cartridge(ti99_cartridge_device *cart);
 	UINT16              grom_base();
 	UINT16              grom_mask();
-	const char*         tag() { return m_tag; }
-	void                set_tag(const char* tag) { m_tag = tag; }
+	std::string         tag() { return m_tag; }
+	void                set_tag(std::string tag) { m_tag = tag; }
 
 	ti99_cartridge_device*  m_cart;
 	ti99_grom_device*   m_grom[5];
@@ -296,7 +296,7 @@ protected:
 	UINT8*              m_grom_ptr;     // for gromemu
 	int                 m_grom_address; // for gromemu
 	int                 m_ram_page;     // for super
-	const char*         m_tag;
+	std::string         m_tag;
 };
 
 /******************** Standard cartridge ******************************/

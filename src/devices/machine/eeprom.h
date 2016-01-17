@@ -49,7 +49,7 @@ class eeprom_base_device :  public device_t,
 {
 protected:
 	// construction/destruction
-	eeprom_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
+	eeprom_base_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source);
 
 public:
 	// timing constants

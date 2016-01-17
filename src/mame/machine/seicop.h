@@ -8,7 +8,7 @@
 class seibu_cop_bootleg_device : public device_t
 {
 public:
-seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+seibu_cop_bootleg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ16_MEMBER( copdxbl_0_r );
 	DECLARE_WRITE16_MEMBER( copdxbl_0_w );

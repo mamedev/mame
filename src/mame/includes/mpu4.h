@@ -94,7 +94,7 @@ struct bwb_chr_table//dynamically populated table for BwB protection
 class mpu4_state : public driver_device
 {
 public:
-	mpu4_state(const machine_config &mconfig, device_type type, const char *tag)
+	mpu4_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_vfd(*this, "vfd"),

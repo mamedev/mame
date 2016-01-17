@@ -26,7 +26,7 @@ struct irmb_ops
 class irobot_state : public driver_device
 {
 public:
-	irobot_state(const machine_config &mconfig, device_type type, const char *tag)
+	irobot_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_nvram(*this, "nvram") ,
 		m_videoram(*this, "videoram"),

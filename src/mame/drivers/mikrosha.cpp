@@ -22,7 +22,7 @@
 class mikrosha_state : public radio86_state
 {
 public:
-	mikrosha_state(const machine_config &mconfig, device_type type, const char *tag)
+	mikrosha_state(const machine_config &mconfig, device_type type, std::string tag)
 		: radio86_state(mconfig, type, tag),
 		m_cart(*this, "cartslot")
 		{ }

@@ -147,7 +147,7 @@ void decospr_device::set_gfx_region(device_t &device, int gfxregion)
 
 const device_type DECO_SPRITE = &device_creator<decospr_device>;
 
-decospr_device::decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+decospr_device::decospr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO_SPRITE, "DECO 52 Sprite", tag, owner, clock, "decospr", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_gfxregion(0),
@@ -169,7 +169,7 @@ decospr_device::decospr_device(const machine_config &mconfig, const char *tag, d
 //  gfx decoder
 //-------------------------------------------------
 
-void decospr_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void decospr_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<decospr_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -629,7 +629,7 @@ void decospr_device::inefficient_copy_sprite_bitmap(bitmap_rgb32 &bitmap, const 
 //  palette device
 //-------------------------------------------------
 
-void decospr_device::static_set_palette_tag(device_t &device, const char *tag)
+void decospr_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<decospr_device &>(device).m_palette.set_tag(tag);
 }

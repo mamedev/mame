@@ -36,8 +36,6 @@ address_map_entry::address_map_entry(device_t &device, address_map &map, offs_t 
 		m_addrend((map.m_globalmask == 0) ? end : end & map.m_globalmask),
 		m_addrmirror(0),
 		m_addrmask(0),
-		m_share(nullptr),
-		m_region(nullptr),
 		m_rgnoffs(0),
 		m_submap_bits(0),
 		m_memory(nullptr),
@@ -66,7 +64,7 @@ void address_map_entry::set_mask(offs_t _mask)
 //  retrieve a submap from a device
 //-------------------------------------------------
 
-void address_map_entry::set_submap(const char *tag, address_map_delegate func, int bits, UINT64 mask)
+void address_map_entry::set_submap(std::string tag, address_map_delegate func, int bits, UINT64 mask)
 {
 	if(!bits)
 		bits = m_map.m_databits;
@@ -337,12 +335,12 @@ address_map::address_map(device_t &device, address_spacenum spacenum)
 	// get our memory interface
 	const device_memory_interface *memintf;
 	if (!device.interface(memintf))
-		throw emu_fatalerror("No memory interface defined for device '%s'\n", device.tag());
+		throw emu_fatalerror("No memory interface defined for device '%s'\n", device.tag().c_str());
 
 	// and then the configuration for the current address space
 	const address_space_config *spaceconfig = memintf->space_config(spacenum);
 	if (spaceconfig == nullptr)
-		throw emu_fatalerror("No memory address space configuration found for device '%s', space %d\n", device.tag(), spacenum);
+		throw emu_fatalerror("No memory address space configuration found for device '%s', space %d\n", device.tag().c_str(), spacenum);
 
 	// construct the internal device map (first so it takes priority)
 	if (spaceconfig->m_internal_map != nullptr)
@@ -503,7 +501,7 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device, dev
 			std::string tag = owner.subtag(entry->m_read.m_tag);
 			device_t *mapdevice = machine.device(tag.c_str());
 			if (mapdevice == nullptr) {
-				throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", tag.c_str(), m_spacenum, device.basetag());
+				throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", tag.c_str(), m_spacenum, device.basetag().c_str());
 			}
 			// Grab the submap
 			address_map submap(*mapdevice, entry);
@@ -678,14 +676,14 @@ void address_map::map_validity_check(validity_checker &valid, const device_t &de
 			osd_printf_error("Wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", spaceconfig.m_name, entry->m_addrstart, entry->m_addrend, alignunit);
 
 		// if this is a program space, auto-assign implicit ROM entries
-		if (entry->m_read.m_type == AMH_ROM && entry->m_region == nullptr)
+		if (entry->m_read.m_type == AMH_ROM && entry->m_region.empty())
 		{
 			entry->m_region = device.tag();
 			entry->m_rgnoffs = entry->m_addrstart;
 		}
 
 		// if this entry references a memory region, validate it
-		if (entry->m_region != nullptr && entry->m_share == nullptr)
+		if (!entry->m_region.empty() && entry->m_share.empty())
 		{
 			// make sure we can resolve the full path to the region
 			bool found = false;
@@ -701,21 +699,21 @@ void address_map::map_validity_check(validity_checker &valid, const device_t &de
 						// verify the address range is within the region's bounds
 						offs_t length = ROMREGION_GETLENGTH(romp);
 						if (entry->m_rgnoffs + (byteend - bytestart + 1) > length)
-							osd_printf_error("%s space memory map entry %X-%X extends beyond region '%s' size (%X)\n", spaceconfig.m_name, entry->m_addrstart, entry->m_addrend, entry->m_region, length);
+							osd_printf_error("%s space memory map entry %X-%X extends beyond region '%s' size (%X)\n", spaceconfig.m_name, entry->m_addrstart, entry->m_addrend, entry->m_region.c_str(), length);
 						found = true;
 					}
 				}
 
 			// error if not found
 			if (!found)
-				osd_printf_error("%s space memory map entry %X-%X references non-existant region '%s'\n", spaceconfig.m_name, entry->m_addrstart, entry->m_addrend, entry->m_region);
+				osd_printf_error("%s space memory map entry %X-%X references non-existant region '%s'\n", spaceconfig.m_name, entry->m_addrstart, entry->m_addrend, entry->m_region.c_str());
 		}
 
 		// make sure all devices exist
 		if (entry->m_read.m_type == AMH_DEVICE_DELEGATE)
 		{
 			// extract the device tag from the proto-delegate
-			const char *devtag = nullptr;
+			std::string devtag;
 			switch (entry->m_read.m_bits)
 			{
 				case 8: devtag = entry->m_rproto8.device_name(); break;
@@ -725,12 +723,12 @@ void address_map::map_validity_check(validity_checker &valid, const device_t &de
 			}
 			if (entry->m_devbase.subdevice(devtag) == nullptr)
 				osd_printf_error("%s space memory map entry reads from nonexistant device '%s'\n", spaceconfig.m_name,
-					devtag != nullptr ? devtag : "<unspecified>");
+					!devtag.empty() ? devtag.c_str() : "<unspecified>");
 		}
 		if (entry->m_write.m_type == AMH_DEVICE_DELEGATE)
 		{
 			// extract the device tag from the proto-delegate
-			const char *devtag = nullptr;
+			std::string devtag;
 			switch (entry->m_write.m_bits)
 			{
 				case 8: devtag = entry->m_wproto8.device_name(); break;
@@ -740,15 +738,15 @@ void address_map::map_validity_check(validity_checker &valid, const device_t &de
 			}
 			if (entry->m_devbase.subdevice(devtag) == nullptr)
 				osd_printf_error("%s space memory map entry writes to nonexistant device '%s'\n", spaceconfig.m_name,
-					devtag != nullptr ? devtag : "<unspecified>");
+					!devtag.empty() ? devtag.c_str() : "<unspecified>");
 		}
 		if (entry->m_setoffsethd.m_type == AMH_DEVICE_DELEGATE)
 		{
 			// extract the device tag from the proto-delegate
-			const char *devtag = entry->m_soproto.device_name();
+			std::string devtag = entry->m_soproto.device_name();
 			if (entry->m_devbase.subdevice(devtag) == nullptr)
 				osd_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig.m_name,
-					devtag != nullptr ? devtag : "<unspecified>");
+					!devtag.empty() ? devtag.c_str() : "<unspecified>");
 		}
 
 		// make sure ports exist
@@ -758,10 +756,10 @@ void address_map::map_validity_check(validity_checker &valid, const device_t &de
 
 		// validate bank and share tags
 		if (entry->m_read.m_type == AMH_BANK)
-			valid.validate_tag(entry->m_read.m_tag);
+			valid.validate_tag(entry->m_read.m_tag.c_str());
 		if (entry->m_write.m_type == AMH_BANK)
-			valid.validate_tag(entry->m_write.m_tag);
-		if (entry->m_share != nullptr)
-			valid.validate_tag(entry->m_share);
+			valid.validate_tag(entry->m_write.m_tag.c_str());
+		if (!entry->m_share.empty())
+			valid.validate_tag(entry->m_share.c_str());
 	}
 }

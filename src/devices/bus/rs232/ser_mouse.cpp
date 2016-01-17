@@ -11,7 +11,7 @@
 #include "ser_mouse.h"
 
 
-serial_mouse_device::serial_mouse_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+serial_mouse_device::serial_mouse_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_rs232_port_interface(mconfig, *this),
 	device_serial_interface(mconfig, *this),
@@ -30,14 +30,14 @@ serial_mouse_device::serial_mouse_device(const machine_config &mconfig, device_t
 
 const device_type MSFT_SERIAL_MOUSE = &device_creator<microsoft_mouse_device>;
 
-microsoft_mouse_device::microsoft_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+microsoft_mouse_device::microsoft_mouse_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: serial_mouse_device(mconfig, MSFT_SERIAL_MOUSE, "Microsoft Serial Mouse", tag, owner, clock, "microsoft_mouse", __FILE__)
 {
 }
 
 const device_type MSYSTEM_SERIAL_MOUSE = &device_creator<mouse_systems_mouse_device>;
 
-mouse_systems_mouse_device::mouse_systems_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mouse_systems_mouse_device::mouse_systems_mouse_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: serial_mouse_device(mconfig, MSYSTEM_SERIAL_MOUSE, "Mouse Systems Serial Mouse", tag, owner, clock, "mouse_systems_mouse", __FILE__)
 {
 }

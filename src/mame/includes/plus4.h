@@ -36,7 +36,7 @@
 class plus4_state : public driver_device
 {
 public:
-	plus4_state(const machine_config &mconfig, device_type type, const char *tag)
+	plus4_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, MOS7501_TAG),
 			m_pla(*this, PLA_TAG),
@@ -161,7 +161,7 @@ public:
 class c16_state : public plus4_state
 {
 public:
-	c16_state(const machine_config &mconfig, device_type type, const char *tag)
+	c16_state(const machine_config &mconfig, device_type type, std::string tag)
 		: plus4_state(mconfig, type, tag)
 	{ }
 

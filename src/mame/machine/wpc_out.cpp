@@ -6,7 +6,7 @@
 
 const device_type WPC_OUT = &device_creator<wpc_out_device>;
 
-wpc_out_device::wpc_out_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+wpc_out_device::wpc_out_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, WPC_OUT, "Williams Pinball Controller Output Control", tag, owner, clock, "wpc_out", __FILE__)
 {
 	names = nullptr;

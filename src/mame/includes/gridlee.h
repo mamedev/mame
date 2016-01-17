@@ -25,7 +25,7 @@
 class gridlee_state : public driver_device
 {
 public:
-	gridlee_state(const machine_config &mconfig, device_type type, const char *tag)
+	gridlee_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
@@ -79,7 +79,7 @@ class gridlee_sound_device : public device_t,
 								public device_sound_interface
 {
 public:
-	gridlee_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gridlee_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~gridlee_sound_device() { }
 
 protected:

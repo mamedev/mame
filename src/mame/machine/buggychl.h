@@ -3,7 +3,7 @@
 class buggychl_mcu_device : public device_t
 {
 public:
-	buggychl_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	buggychl_mcu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~buggychl_mcu_device() {}
 
 	DECLARE_WRITE8_MEMBER( buggychl_mcu_w );

@@ -13,7 +13,7 @@
 class rf5c296_device : public device_t
 {
 public:
-	rf5c296_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rf5c296_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	static void set_pccard_name(device_t &device, const char *name) { downcast<rf5c296_device &>(device).m_pccard_name = name; }

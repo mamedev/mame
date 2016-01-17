@@ -26,7 +26,7 @@ const device_type CBM2_STD = &device_creator<cbm2_standard_cartridge_device>;
 //  cbm2_standard_cartridge_device - constructor
 //-------------------------------------------------
 
-cbm2_standard_cartridge_device::cbm2_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cbm2_standard_cartridge_device::cbm2_standard_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CBM2_STD, "CBM-II standard cartridge", tag, owner, clock, "cbm2_standard", __FILE__),
 	device_cbm2_expansion_card_interface(mconfig, *this)
 {

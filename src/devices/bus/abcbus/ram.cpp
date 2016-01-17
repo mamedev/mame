@@ -26,7 +26,7 @@ const device_type ABC80_16KB_RAM_CARD = &device_creator<abc80_16kb_ram_card_t>;
 //  abc80_16kb_ram_card_t - constructor
 //-------------------------------------------------
 
-abc80_16kb_ram_card_t::abc80_16kb_ram_card_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+abc80_16kb_ram_card_t::abc80_16kb_ram_card_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ABC80_16KB_RAM_CARD, "ABC 80 16KB RAM card", tag, owner, clock, "abc80_16kb", __FILE__),
 	device_abcbus_card_interface(mconfig, *this),
 	m_ram(*this, "ram")

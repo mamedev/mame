@@ -54,7 +54,7 @@ static ADDRESS_MAP_START(memmap, AS_DATA, 8, tms9928a_device)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
-tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_50hz, bool is_reva, bool is_99, const char *shortname, const char *source)
+tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, bool is_50hz, bool is_reva, bool is_99, std::string shortname, std::string source)
 	: device_t( mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
@@ -68,7 +68,7 @@ tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type typ
 }
 
 
-tms9928a_device::tms9928a_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+tms9928a_device::tms9928a_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock )
 	: device_t( mconfig, TMS9928A, "TMS9928A VDP", tag, owner, clock, "tms9928a", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
@@ -82,31 +82,31 @@ tms9928a_device::tms9928a_device( const machine_config &mconfig, const char *tag
 //  static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
 }
 
-tms9129_device::tms9129_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms9129_device::tms9129_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tms9928a_device( mconfig, TMS9129, "TMS9129", tag, owner, clock, true, true, false, "tms9129", __FILE__)
 { }
 
-tms9918_device::tms9918_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms9918_device::tms9918_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tms9928a_device( mconfig, TMS9918, "TMS9918", tag, owner, clock, false, false, true, "tms9918", __FILE__)
 { }
 
-tms9918a_device::tms9918a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms9918a_device::tms9918a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tms9928a_device( mconfig, TMS9918A, "TMS9918A", tag, owner, clock, false, true, true, "tms9918a", __FILE__)
 { }
 
-tms9118_device::tms9118_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms9118_device::tms9118_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tms9928a_device( mconfig, TMS9118, "TMS9118 VDP", tag, owner, clock, false, true, false, "tms9118", __FILE__)
 { }
 
-tms9128_device::tms9128_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms9128_device::tms9128_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tms9928a_device( mconfig, TMS9128, "TMS9128 VDP", tag, owner, clock, false, true, false, "tms9128", __FILE__)
 { }
 
-tms9929_device::tms9929_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms9929_device::tms9929_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tms9928a_device( mconfig, TMS9929, "TMS9929", tag, owner, clock, true, false, true, "tms9929", __FILE__)
 { }
 
-tms9929a_device::tms9929a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms9929a_device::tms9929a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tms9928a_device( mconfig, TMS9929A, "TMS9929A", tag, owner, clock, true, true, true, "tms9929a", __FILE__)
 { }
 
@@ -200,7 +200,7 @@ void tms9928a_device::change_register(UINT8 reg, UINT8 val)
 	val &= Mask[reg];
 	m_Regs[reg] = val;
 
-	if (TRACE_REG) logerror("TMS9928A('%s'): Reg %d = %02xh\n", tag(), reg, (int)val);
+	if (TRACE_REG) logerror("TMS9928A('%s'): Reg %d = %02xh\n", tag().c_str(), reg, (int)val);
 
 	switch (reg)
 	{
@@ -220,12 +220,12 @@ void tms9928a_device::change_register(UINT8 reg, UINT8 val)
 		m_mode = ( (m_reva ? (m_Regs[0] & 2) : 0) | ((m_Regs[1] & 0x10)>>4) | ((m_Regs[1] & 8)>>1));
 		if ((val ^ prev) & 1)
 			update_backdrop();
-		if (TRACE_MODE) logerror("TMS9928A('%s'): %s\n", tag(), modes[m_mode]);
+		if (TRACE_MODE) logerror("TMS9928A('%s'): %s\n", tag().c_str(), modes[m_mode]);
 		break;
 	case 1:
 		check_interrupt();
 		m_mode = ( (m_reva ? (m_Regs[0] & 2) : 0) | ((m_Regs[1] & 0x10)>>4) | ((m_Regs[1] & 8)>>1));
-		if (TRACE_MODE) logerror("TMS9928A('%s'): %s\n", tag(), modes[m_mode]);
+		if (TRACE_MODE) logerror("TMS9928A('%s'): %s\n", tag().c_str(), modes[m_mode]);
 		break;
 	case 2:
 		m_nametbl = (val * 1024) & (m_vram_size - 1);

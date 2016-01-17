@@ -23,7 +23,7 @@
 class ace_sp_state : public driver_device
 {
 public:
-	ace_sp_state(const machine_config &mconfig, device_type type, const char *tag)
+	ace_sp_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }

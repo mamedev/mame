@@ -153,7 +153,7 @@ public:
 		P2_LCD_ENABLE = 0x04
 	};
 
-	mu100_state(const machine_config &mconfig, device_type type, const char *tag)
+	mu100_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_lcd(*this, "lcd"),
@@ -198,7 +198,7 @@ public:
 
 class mu100r_state : public mu100_state {
 public:
-	mu100r_state(const machine_config &mconfig, device_type type, const char *tag)
+	mu100r_state(const machine_config &mconfig, device_type type, std::string tag)
 		: mu100_state(mconfig, type, tag)
 	{ }
 

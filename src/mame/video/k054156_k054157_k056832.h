@@ -38,7 +38,7 @@ typedef device_delegate<void (int layer, int *code, int *color, int *flags)> k05
 class k056832_device : public device_t
 {
 public:
-	k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k056832_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~k056832_device()
 	{
 		m_k055555 = nullptr;
@@ -57,8 +57,8 @@ public:
 	}
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 
 	void SetExtLinescroll();    /* Lethal Enforcers */
 

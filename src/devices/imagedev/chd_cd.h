@@ -24,8 +24,8 @@ class cdrom_image_device :  public device_t,
 {
 public:
 	// construction/destruction
-	cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	cdrom_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	cdrom_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cdrom_image_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	virtual ~cdrom_image_device();
 
 	static void static_set_interface(device_t &device, const char *_interface) { downcast<cdrom_image_device &>(device).m_interface = _interface; }

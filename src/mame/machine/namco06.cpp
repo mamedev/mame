@@ -92,11 +92,11 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::nmi_generate )
 {
 	if (!m_nmicpu->suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 	{
-		LOG(("NMI cpu '%s'\n",m_nmicpu->tag()));
+		LOG(("NMI cpu '%s'\n",m_nmicpu->tag().c_str()));
 		m_nmicpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
-		LOG(("NMI not generated because cpu '%s' is suspended\n",m_nmicpu->tag()));
+		LOG(("NMI not generated because cpu '%s' is suspended\n",m_nmicpu->tag().c_str()));
 }
 
 
@@ -104,11 +104,11 @@ READ8_MEMBER( namco_06xx_device::data_r )
 {
 	UINT8 result = 0xff;
 
-	LOG(("%s: 06XX '%s' read offset %d\n",machine().describe_context(),tag(),offset));
+	LOG(("%s: 06XX '%s' read offset %d\n",machine().describe_context(),tag().c_str(),offset));
 
 	if (!(m_control & 0x10))
 	{
-		logerror("%s: 06XX '%s' read in write mode %02x\n",machine().describe_context(),tag(),m_control);
+		logerror("%s: 06XX '%s' read in write mode %02x\n",machine().describe_context(),tag().c_str(),m_control);
 		return 0;
 	}
 
@@ -123,11 +123,11 @@ READ8_MEMBER( namco_06xx_device::data_r )
 
 WRITE8_MEMBER( namco_06xx_device::data_w )
 {
-	LOG(("%s: 06XX '%s' write offset %d = %02x\n",machine().describe_context(),tag(),offset,data));
+	LOG(("%s: 06XX '%s' write offset %d = %02x\n",machine().describe_context(),tag().c_str(),offset,data));
 
 	if (m_control & 0x10)
 	{
-		logerror("%s: 06XX '%s' write in read mode %02x\n",machine().describe_context(),tag(),m_control);
+		logerror("%s: 06XX '%s' write in read mode %02x\n",machine().describe_context(),tag().c_str(),m_control);
 		return;
 	}
 	if ((m_control & (1 << 0)) && !m_write_0.isnull()) m_write_0(space, 0, data);
@@ -139,13 +139,13 @@ WRITE8_MEMBER( namco_06xx_device::data_w )
 
 READ8_MEMBER( namco_06xx_device::ctrl_r )
 {
-	LOG(("%s: 06XX '%s' ctrl_r\n",machine().describe_context(),tag()));
+	LOG(("%s: 06XX '%s' ctrl_r\n",machine().describe_context(),tag().c_str()));
 	return m_control;
 }
 
 WRITE8_MEMBER( namco_06xx_device::ctrl_w )
 {
-	LOG(("%s: 06XX '%s' control %02x\n",space.machine().describe_context(),tag(),data));
+	LOG(("%s: 06XX '%s' control %02x\n",space.machine().describe_context(),tag().c_str(),data));
 
 	m_control = data;
 
@@ -176,7 +176,7 @@ WRITE8_MEMBER( namco_06xx_device::ctrl_w )
 
 const device_type NAMCO_06XX = &device_creator<namco_06xx_device>;
 
-namco_06xx_device::namco_06xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+namco_06xx_device::namco_06xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NAMCO_06XX, "Namco 06xx", tag, owner, clock, "namco06xx", __FILE__),
 	m_control(0),
 	m_nmicpu(*this),

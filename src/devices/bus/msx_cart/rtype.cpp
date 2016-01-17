@@ -6,7 +6,7 @@
 const device_type MSX_CART_RTYPE = &device_creator<msx_cart_rtype>;
 
 
-msx_cart_rtype::msx_cart_rtype(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_rtype::msx_cart_rtype(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_RTYPE, "MSX Cartridge - R-Type", tag, owner, clock, "msx_cart_rtype", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_selected_bank(0)

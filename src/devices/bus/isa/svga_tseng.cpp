@@ -59,7 +59,7 @@ const rom_entry *isa8_svga_et4k_device::device_rom_region() const
 //  isa8_vga_device - constructor
 //-------------------------------------------------
 
-isa8_svga_et4k_device::isa8_svga_et4k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_svga_et4k_device::isa8_svga_et4k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8_SVGA_ET4K, "SVGA Tseng ET4000 Graphics Card", tag, owner, clock, "et4000", __FILE__),
 		device_isa8_card_interface(mconfig, *this), m_vga(nullptr)
 {

@@ -69,7 +69,7 @@ U0564 LH28F800SU OBJ4-1
 class feversoc_state : public driver_device
 {
 public:
-	feversoc_state(const machine_config &mconfig, device_type type, const char *tag)
+	feversoc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_mainram(*this, "workram"),
 		m_spriteram(*this, "spriteram"),

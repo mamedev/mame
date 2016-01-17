@@ -53,7 +53,7 @@ ADDRESS_MAP_END
 //  tms5501_device - constructor
 //-------------------------------------------------
 
-tms5501_device::tms5501_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+tms5501_device::tms5501_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, TMS5501, "TMS5501", tag, owner, clock, "tms5501", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_write_irq(*this),
@@ -275,7 +275,7 @@ READ8_MEMBER( tms5501_device::sta_r )
 
 WRITE8_MEMBER( tms5501_device::cmd_w )
 {
-	if (LOG) logerror("TMS5501 '%s' Command %02x\n", tag(), data);
+	if (LOG) logerror("TMS5501 '%s' Command %02x\n", tag().c_str(), data);
 
 	m_cmd = data;
 
@@ -314,7 +314,7 @@ WRITE8_MEMBER( tms5501_device::cmd_w )
 
 WRITE8_MEMBER( tms5501_device::rr_w )
 {
-	if (LOG) logerror("TMS5501 '%s' Rate Register %02x\n", tag(), data);
+	if (LOG) logerror("TMS5501 '%s' Rate Register %02x\n", tag().c_str(), data);
 
 	m_rr = data;
 
@@ -348,7 +348,7 @@ WRITE8_MEMBER( tms5501_device::rr_w )
 
 WRITE8_MEMBER( tms5501_device::tb_w )
 {
-	if (LOG) logerror("TMS5501 '%s' Transmitter Buffer %02x\n", tag(), data);
+	if (LOG) logerror("TMS5501 '%s' Transmitter Buffer %02x\n", tag().c_str(), data);
 
 	m_tb = data;
 
@@ -373,7 +373,7 @@ WRITE8_MEMBER( tms5501_device::tb_w )
 
 WRITE8_MEMBER( tms5501_device::xo_w )
 {
-	if (LOG) logerror("TMS5501 '%s' Output %02x\n", tag(), data);
+	if (LOG) logerror("TMS5501 '%s' Output %02x\n", tag().c_str(), data);
 
 	m_write_xo(data);
 }
@@ -385,7 +385,7 @@ WRITE8_MEMBER( tms5501_device::xo_w )
 
 WRITE8_MEMBER( tms5501_device::mr_w )
 {
-	if (LOG) logerror("TMS5501 '%s' Mask Register %02x\n", tag(), data);
+	if (LOG) logerror("TMS5501 '%s' Mask Register %02x\n", tag().c_str(), data);
 
 	m_mr = data;
 
@@ -399,7 +399,7 @@ WRITE8_MEMBER( tms5501_device::mr_w )
 
 WRITE8_MEMBER( tms5501_device::tmr_w )
 {
-	if (LOG) logerror("TMS5501 '%s' Timer %u %02x\n", tag(), offset, data);
+	if (LOG) logerror("TMS5501 '%s' Timer %u %02x\n", tag().c_str(), offset, data);
 
 	m_timer[offset]->adjust(attotime::from_double((double) data / (clock() / 128.0)));
 }
@@ -467,7 +467,7 @@ void tms5501_device::set_interrupt(UINT8 mask)
 {
 	m_irq |= mask;
 
-	if (LOG) logerror("TMS5501 '%s' Interrupt %02x\n", tag(), mask);
+	if (LOG) logerror("TMS5501 '%s' Interrupt %02x\n", tag().c_str(), mask);
 
 	check_interrupt();
 }
@@ -483,7 +483,7 @@ void tms5501_device::check_interrupt()
 
 	if (state == ASSERT_LINE)
 	{
-		if (LOG) logerror("TMS5501 '%s' Interrupt Assert\n", tag());
+		if (LOG) logerror("TMS5501 '%s' Interrupt Assert\n", tag().c_str());
 
 		m_sta |= STA_IP;
 	}
@@ -520,7 +520,7 @@ UINT8 tms5501_device::get_vector()
 
 			check_interrupt();
 
-			if (LOG) logerror("%s: TMS5501 '%s' Interrupt Acknowledge %02x\n", machine().describe_context(), tag(), rst);
+			if (LOG) logerror("%s: TMS5501 '%s' Interrupt Acknowledge %02x\n", machine().describe_context(), tag().c_str(), rst);
 			break;
 		}
 	}

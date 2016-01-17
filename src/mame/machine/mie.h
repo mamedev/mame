@@ -28,7 +28,7 @@ class mie_jvs_device;
 class mie_device : public maple_device
 {
 public:
-	mie_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mie_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void static_set_gpio_name(device_t &device, int entry, const char *name);
 	static void static_set_jvs_name(device_t &device, const char *name);
@@ -123,7 +123,7 @@ public:
 	friend class mie_device;
 
 	// construction/destruction
-	mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mie_jvs_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

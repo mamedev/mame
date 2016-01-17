@@ -155,7 +155,7 @@ UINT16 const s2636_device::SCORE_FONT[16][5] =
 
 const device_type S2636 = &device_creator<s2636_device>;
 
-s2636_device::s2636_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+s2636_device::s2636_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, S2636, "Signetics 2636", tag, owner, clock, "s2636", __FILE__)
 	, device_video_interface(mconfig, *this)
 	, device_sound_interface(mconfig, *this)

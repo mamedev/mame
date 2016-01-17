@@ -14,7 +14,7 @@
 
 class tms57002_device : public cpu_device, public device_sound_interface {
 public:
-	tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms57002_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(data_w);

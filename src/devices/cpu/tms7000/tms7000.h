@@ -45,11 +45,11 @@ class tms7000_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tms7000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms7000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal, UINT32 info_flags, const char *shortname, const char *source);
+	tms7000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms7000_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, address_map_constructor internal, UINT32 info_flags, std::string shortname, std::string source);
 
-	DECLARE_READ8_MEMBER(tms7000_unmapped_rf_r) { if (!space.debugger_access()) logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag(), m_pc, offset + 0x80); return 0; };
-	DECLARE_WRITE8_MEMBER(tms7000_unmapped_rf_w) { logerror("'%s' (%04X): unmapped_rf_w @ $%04x = $%02x\n", tag(), m_pc, offset + 0x80, data); };
+	DECLARE_READ8_MEMBER(tms7000_unmapped_rf_r) { if (!space.debugger_access()) logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag().c_str(), m_pc, offset + 0x80); return 0; };
+	DECLARE_WRITE8_MEMBER(tms7000_unmapped_rf_w) { logerror("'%s' (%04X): unmapped_rf_w @ $%04x = $%02x\n", tag().c_str(), m_pc, offset + 0x80, data); };
 
 	DECLARE_READ8_MEMBER(tms7000_pf_r);
 	DECLARE_WRITE8_MEMBER(tms7000_pf_w);
@@ -250,14 +250,14 @@ protected:
 class tms7020_device : public tms7000_device
 {
 public:
-	tms7020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms7020_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms7020_exl_device : public tms7000_device
 {
 public:
-	tms7020_exl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms7020_exl_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void execute_one(UINT8 op) override;
@@ -270,35 +270,35 @@ private:
 class tms7040_device : public tms7000_device
 {
 public:
-	tms7040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms7040_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms70c00_device : public tms7000_device
 {
 public:
-	tms70c00_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms70c00_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms70c20_device : public tms7000_device
 {
 public:
-	tms70c20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms70c20_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms70c40_device : public tms7000_device
 {
 public:
-	tms70c40_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms70c40_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms70c46_device : public tms7000_device
 {
 public:
-	tms70c46_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms70c46_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(control_r);
 	DECLARE_WRITE8_MEMBER(control_w);
@@ -325,28 +325,28 @@ private:
 class tms7001_device : public tms7000_device
 {
 public:
-	tms7001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms7001_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms7041_device : public tms7000_device
 {
 public:
-	tms7041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms7041_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms7002_device : public tms7000_device
 {
 public:
-	tms7002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms7002_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms7042_device : public tms7000_device
 {
 public:
-	tms7042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms7042_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

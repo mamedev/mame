@@ -92,7 +92,7 @@ inline void i8355_device::write_port(int port, UINT8 data)
 //  i8355_device - constructor
 //-------------------------------------------------
 
-i8355_device::i8355_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8355_device::i8355_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I8355, "Intel 8355", tag, owner, clock, "i8355", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_in_pa_cb(*this),
@@ -184,14 +184,14 @@ WRITE8_MEMBER( i8355_device::io_w )
 	{
 	case REGISTER_PORT_A:
 	case REGISTER_PORT_B:
-		if (LOG) logerror("I8355 '%s' Port %c Write %02x\n", tag(), 'A' + port, data);
+		if (LOG) logerror("I8355 '%s' Port %c Write %02x\n", tag().c_str(), 'A' + port, data);
 
 		write_port(port, data);
 		break;
 
 	case REGISTER_PORT_A_DDR:
 	case REGISTER_PORT_B_DDR:
-		if (LOG) logerror("I8355 '%s' Port %c DDR: %02x\n", tag(), 'A' + port, data);
+		if (LOG) logerror("I8355 '%s' Port %c DDR: %02x\n", tag().c_str(), 'A' + port, data);
 
 		m_ddr[port] = data;
 		write_port(port, data);

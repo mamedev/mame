@@ -106,7 +106,7 @@ public:
 		TIMER_UART
 	};
 
-	lynx_state(const machine_config &mconfig, device_type type, const char *tag)
+	lynx_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_mem_0000(*this, "mem_0000"),
 		m_mem_fc00(*this, "mem_fc00"),

@@ -33,7 +33,7 @@ const device_type I8214 = &device_creator<i8214_device>;
 
 inline void i8214_device::trigger_interrupt(int level)
 {
-	if (LOG) logerror("I8214 '%s' Interrupt Level %u\n", tag(), level);
+	if (LOG) logerror("I8214 '%s' Interrupt Level %u\n", tag().c_str(), level);
 
 	m_a = level;
 
@@ -88,7 +88,7 @@ inline void i8214_device::check_interrupt()
 //  i8214_device - constructor
 //-------------------------------------------------
 
-i8214_device::i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+i8214_device::i8214_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, I8214, "I8214", tag, owner, clock, "i8214", __FILE__),
 	m_write_irq(*this),
 	m_write_enlg(*this)
@@ -127,7 +127,7 @@ UINT8 i8214_device::a_r()
 {
 	UINT8 a = m_a & 0x07;
 
-	if (LOG) logerror("I8214 '%s' A: %01x\n", tag(), a);
+	if (LOG) logerror("I8214 '%s' A: %01x\n", tag().c_str(), a);
 
 	return a;
 }
@@ -141,7 +141,7 @@ void i8214_device::b_w(UINT8 data)
 {
 	m_b = data & 0x07;
 
-	if (LOG) logerror("I8214 '%s' B: %01x\n", tag(), m_b);
+	if (LOG) logerror("I8214 '%s' B: %01x\n", tag().c_str(), m_b);
 
 	// enable interrupts
 	m_int_dis = 0;
@@ -159,7 +159,7 @@ void i8214_device::b_w(UINT8 data)
 
 void i8214_device::r_w(UINT8 data)
 {
-	if (LOG) logerror("I8214 '%s' R: %02x\n", tag(), data);
+	if (LOG) logerror("I8214 '%s' R: %02x\n", tag().c_str(), data);
 
 	m_r = data;
 
@@ -173,7 +173,7 @@ void i8214_device::r_w(UINT8 data)
 
 WRITE_LINE_MEMBER( i8214_device::sgs_w )
 {
-	if (LOG) logerror("I8214 '%s' SGS: %u\n", tag(), state);
+	if (LOG) logerror("I8214 '%s' SGS: %u\n", tag().c_str(), state);
 
 	m_sgs = state;
 
@@ -187,7 +187,7 @@ WRITE_LINE_MEMBER( i8214_device::sgs_w )
 
 WRITE_LINE_MEMBER( i8214_device::etlg_w )
 {
-	if (LOG) logerror("I8214 '%s' ETLG: %u\n", tag(), state);
+	if (LOG) logerror("I8214 '%s' ETLG: %u\n", tag().c_str(), state);
 
 	m_etlg = state;
 }
@@ -199,7 +199,7 @@ WRITE_LINE_MEMBER( i8214_device::etlg_w )
 
 WRITE_LINE_MEMBER( i8214_device::inte_w )
 {
-	if (LOG) logerror("I8214 '%s' INTE: %u\n", tag(), state);
+	if (LOG) logerror("I8214 '%s' INTE: %u\n", tag().c_str(), state);
 
 	m_inte = state;
 }

@@ -94,8 +94,8 @@ class upd7810_device : public cpu_device
 {
 public:
 	// construction/destruction
-	upd7810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	upd7810_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	upd7810_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	upd7810_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_to_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_to_func.set_callback(object); }
@@ -1373,7 +1373,7 @@ class upd7807_device : public upd7810_device
 {
 public:
 	// construction/destruction
-	upd7807_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd7807_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
@@ -1384,7 +1384,7 @@ class upd7801_device : public upd7810_device
 {
 public:
 	// construction/destruction
-	upd7801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd7801_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_reset() override;
@@ -1399,8 +1399,8 @@ class upd78c05_device : public upd7810_device
 {
 public:
 	// construction/destruction
-	upd78c05_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	upd78c05_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	upd78c05_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	upd78c05_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 protected:
 	virtual void device_start() override;
@@ -1416,7 +1416,7 @@ class upd78c06_device : public upd78c05_device
 {
 public:
 	// construction/destruction
-	upd78c06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd78c06_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

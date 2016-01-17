@@ -39,7 +39,7 @@ class fd1089_base_device : public m68000_device
 {
 public:
 	// construction/destruction
-	fd1089_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	fd1089_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// explicit decryption helpers
 	void decrypt(offs_t baseaddr, UINT32 size, offs_t regionoffs, UINT16 *opcodesptr, UINT16 *dataptr) { decrypt(baseaddr, size, &m_plaintext[regionoffs/2], opcodesptr, dataptr); }
@@ -80,7 +80,7 @@ class fd1089a_device : public fd1089_base_device
 {
 public:
 	// construction/destruction
-	fd1089a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fd1089a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual UINT8 decode(UINT8 val, UINT8 key, bool opcode) override;
@@ -94,7 +94,7 @@ class fd1089b_device : public fd1089_base_device
 {
 public:
 	// construction/destruction
-	fd1089b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fd1089b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual UINT8 decode(UINT8 val, UINT8 key, bool opcode) override;

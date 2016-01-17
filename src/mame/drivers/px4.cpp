@@ -48,7 +48,7 @@
 class px4_state : public driver_device, public device_serial_interface
 {
 public:
-	px4_state(const machine_config &mconfig, device_type type, const char *tag) :
+	px4_state(const machine_config &mconfig, device_type type, std::string tag) :
 	driver_device(mconfig, type, tag),
 	device_serial_interface(mconfig, *this),
 	m_z80(*this, "maincpu"),
@@ -244,7 +244,7 @@ private:
 class px4p_state : public px4_state
 {
 public:
-	px4p_state(const machine_config &mconfig, device_type type, const char *tag) :
+	px4p_state(const machine_config &mconfig, device_type type, std::string tag) :
 	px4_state(mconfig, type, tag),
 	m_rdnvram(*this, "rdnvram"),
 	m_rdsocket(*this, "ramdisk_socket"),
@@ -959,7 +959,7 @@ WRITE8_MEMBER( px4_state::artmr_w )
 	stop_bits_t stop_bits = BIT(data, 7) ? STOP_BITS_2 : STOP_BITS_1;
 
 	if (VERBOSE)
-		logerror("%s: serial frame setup: %d-%s-%d\n", tag(), data_bit_count, device_serial_interface::parity_tostring(parity), stop_bits);
+		logerror("%s: serial frame setup: %d-%s-%d\n", tag().c_str(), data_bit_count, device_serial_interface::parity_tostring(parity), stop_bits);
 
 	set_data_frame(1, data_bit_count, parity, stop_bits);
 }

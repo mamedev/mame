@@ -18,7 +18,7 @@
 class decocass_state : public driver_device
 {
 public:
-	decocass_state(const machine_config &mconfig, device_type type, const char *tag)
+	decocass_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),

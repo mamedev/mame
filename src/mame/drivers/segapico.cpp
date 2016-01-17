@@ -129,7 +129,7 @@ C = MB3514 / 9325 M36
 class pico_base_state : public md_cons_state
 {
 public:
-	pico_base_state(const machine_config &mconfig, device_type type, const char *tag)
+	pico_base_state(const machine_config &mconfig, device_type type, std::string tag)
 		: md_cons_state(mconfig, type, tag),
 		m_sega_315_5641_pcm(*this, "315_5641"),
 		m_io_page(*this, "PAGE"),
@@ -160,7 +160,7 @@ public:
 class pico_state : public pico_base_state
 {
 public:
-	pico_state(const machine_config &mconfig, device_type type, const char *tag)
+	pico_state(const machine_config &mconfig, device_type type, std::string tag)
 	: pico_base_state(mconfig, type, tag),
 	m_picocart(*this, "picoslot") { }
 
@@ -554,7 +554,7 @@ S-AUDIO <-| |                              +-----------+           +-------+    
 class copera_state : public pico_base_state
 {
 public:
-	copera_state(const machine_config &mconfig, device_type type, const char *tag)
+	copera_state(const machine_config &mconfig, device_type type, std::string tag)
 	: pico_base_state(mconfig, type, tag),
 	m_picocart(*this, "coperaslot") { }
 

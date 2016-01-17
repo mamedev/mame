@@ -30,7 +30,7 @@
 		</rect>
 	</element>
 
-	<view name="Default Layout">
+	<view name="Internal Layout">
 		<!-- Black background -->
 		<bezel element="background">
 			<bounds left="00" top="00" right="430" bottom="90" />

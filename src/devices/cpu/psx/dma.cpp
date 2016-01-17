@@ -27,7 +27,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 
 const device_type PSX_DMA = &device_creator<psxdma_device>;
 
-psxdma_device::psxdma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+psxdma_device::psxdma_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PSX_DMA, "Sony PSX DMA", tag, owner, clock, "psxdma", __FILE__), m_ram( ), m_ramsize(0), m_dpcp(0), m_dicr(0),
 	m_irq_handler(*this)
 {

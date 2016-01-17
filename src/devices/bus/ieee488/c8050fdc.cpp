@@ -71,7 +71,7 @@ const rom_entry *c8050_fdc_t::device_rom_region() const
 //  c8050_fdc_t - constructor
 //-------------------------------------------------
 
-c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C8050_FDC, "Commodore 8050 FDC", tag, owner, clock, "c8050fdc", __FILE__),
 	m_write_sync(*this),
 	m_write_ready(*this),

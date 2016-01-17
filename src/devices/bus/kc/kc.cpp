@@ -153,25 +153,25 @@ device_kcexp_interface::~device_kcexp_interface()
 //-------------------------------------------------
 //  kcexp_slot_device - constructor
 //-------------------------------------------------
-kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, KCEXP_SLOT, "KC85 Expansion Slot", tag, owner, clock, "kcexp_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		m_out_irq_cb(*this),
 		m_out_nmi_cb(*this),
-		m_out_halt_cb(*this), m_cart(nullptr), m_next_slot_tag(nullptr), m_next_slot(nullptr)
+		m_out_halt_cb(*this), m_cart(nullptr), m_next_slot(nullptr)
 {
 }
 
-kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_slot_interface(mconfig, *this),
 		m_out_irq_cb(*this),
 		m_out_nmi_cb(*this),
-		m_out_halt_cb(*this), m_cart(nullptr), m_next_slot_tag(nullptr), m_next_slot(nullptr)
+		m_out_halt_cb(*this), m_cart(nullptr), m_next_slot(nullptr)
 {
 }
 
-void kcexp_slot_device::static_set_next_slot(device_t &device, const char *next_slot_tag)
+void kcexp_slot_device::static_set_next_slot(device_t &device, std::string next_slot_tag)
 {
 	kcexp_slot_device &kc_slot = dynamic_cast<kcexp_slot_device &>(device);
 
@@ -193,7 +193,7 @@ kcexp_slot_device::~kcexp_slot_device()
 void kcexp_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_kcexp_interface *>(get_card_device());
-	m_next_slot = m_next_slot_tag ? owner()->subdevice<kcexp_slot_device>(m_next_slot_tag) : nullptr;
+	m_next_slot = !m_next_slot_tag.empty() ? owner()->subdevice<kcexp_slot_device>(m_next_slot_tag) : nullptr;
 
 	// resolve callbacks
 	m_out_irq_cb.resolve_safe();
@@ -273,7 +273,7 @@ void kcexp_slot_device::io_write(offs_t offset, UINT8 data)
 
 WRITE_LINE_MEMBER( kcexp_slot_device::mei_w )
 {
-	if (LOG) logerror("KCEXP '%s': %s MEI line\n", tag(), state != CLEAR_LINE ? "ASSERT": "CLEAR");
+	if (LOG) logerror("KCEXP '%s': %s MEI line\n", tag().c_str(), state != CLEAR_LINE ? "ASSERT": "CLEAR");
 
 	if (m_cart)
 		m_cart->mei_w(state);
@@ -285,7 +285,7 @@ WRITE_LINE_MEMBER( kcexp_slot_device::mei_w )
 
 WRITE_LINE_MEMBER( kcexp_slot_device::meo_w )
 {
-	if (LOG) logerror("KCEXP '%s': %s MEO line\n", tag(), state != CLEAR_LINE ? "ASSERT": "CLEAR");
+	if (LOG) logerror("KCEXP '%s': %s MEO line\n", tag().c_str(), state != CLEAR_LINE ? "ASSERT": "CLEAR");
 
 	if (m_next_slot)
 		m_next_slot->mei_w(state);
@@ -299,7 +299,7 @@ WRITE_LINE_MEMBER( kcexp_slot_device::meo_w )
 //-------------------------------------------------
 //  kccart_slot_device - constructor
 //-------------------------------------------------
-kccart_slot_device::kccart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+kccart_slot_device::kccart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		kcexp_slot_device(mconfig, KCCART_SLOT, "KC85 Cartridge Slot", tag, owner, clock, "kccart_slot", __FILE__),
 		device_image_interface(mconfig, *this)
 {

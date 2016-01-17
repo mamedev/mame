@@ -26,7 +26,7 @@ class atari_vg_earom_device :   public device_t,
 {
 public:
 	// construction/destruction
-	atari_vg_earom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atari_vg_earom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

@@ -77,7 +77,7 @@ machine_config_constructor isa8_number_9_rev_device::device_mconfig_additions() 
 //  isa16_vga_device - constructor
 //-------------------------------------------------
 
-isa8_number_9_rev_device::isa8_number_9_rev_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_number_9_rev_device::isa8_number_9_rev_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8_NUM_9_REV, "Number Nine Revolution 512x32/1024x8", tag, owner, clock, "number_9_rev", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
 		m_upd7220(*this, "upd7220"),

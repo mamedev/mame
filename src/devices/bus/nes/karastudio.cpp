@@ -71,7 +71,7 @@ READ8_MEMBER(kstudio_cart_interface::read)
 
 const device_type NES_KSEXPANSION_SLOT = &device_creator<nes_kstudio_slot_device>;
 
-nes_kstudio_slot_device::nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_kstudio_slot_device::nes_kstudio_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 							device_t(mconfig, NES_KSEXPANSION_SLOT, "NES Karaoke Studio Expansion Slot", tag, owner, clock, "nes_ks_slot", __FILE__),
 							device_image_interface(mconfig, *this),
 							device_slot_interface(mconfig, *this), m_cart(nullptr)
@@ -150,7 +150,7 @@ ROM_END
 
 const device_type NES_KSEXPANSION_ROM = &device_creator<nes_kstudio_rom_device>;
 
-nes_kstudio_rom_device::nes_kstudio_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_kstudio_rom_device::nes_kstudio_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 							: device_t(mconfig, NES_KSEXPANSION_ROM, "NES Karaoke Studio Expansion ROM", tag, owner, clock, "nes_ks_rom", __FILE__),
 								kstudio_cart_interface( mconfig, *this )
 {
@@ -187,7 +187,7 @@ UINT8 *nes_kstudio_rom_device::get_cart_base()
 const device_type NES_KARAOKESTUDIO = &device_creator<nes_karaokestudio_device>;
 
 
-nes_karaokestudio_device::nes_karaokestudio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_karaokestudio_device::nes_karaokestudio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_KARAOKESTUDIO, "NES Cart Bandai Karaoke Studio PCB", tag, owner, clock, "nes_karaoke", __FILE__), m_exp_active(0),
 					m_subslot(*this, "exp_slot"),
 					m_mic_ipt(*this, "MIC")

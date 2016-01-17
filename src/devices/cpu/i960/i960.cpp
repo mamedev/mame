@@ -16,7 +16,7 @@ CPU_DISASSEMBLE( i960  );
 const device_type I960 = &device_creator<i960_cpu_device>;
 
 
-i960_cpu_device::i960_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i960_cpu_device::i960_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, I960, "i960kb", tag, owner, clock, "i960kb", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0), m_rcache_pos(0), m_SAT(0), m_PRCB(0), m_PC(0), m_AC(0), m_IP(0), m_PIP(0), m_ICR(0), m_bursting(0), m_immediate_irq(0),
 	m_immediate_vector(0), m_immediate_pri(0), m_program(nullptr), m_direct(nullptr), m_icount(0)

@@ -30,7 +30,7 @@ class konami573_cassette_slot_device : public device_t,
 	friend class konami573_cassette_interface;
 
 public:
-	konami573_cassette_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	konami573_cassette_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_dsr_handler(device_t &device, _Object object) { return downcast<konami573_cassette_slot_device &>(device).m_dsr_handler.set_callback(object); }
 
@@ -91,8 +91,8 @@ class konami573_cassette_x_device: public device_t,
 	public konami573_cassette_interface
 {
 public:
-	konami573_cassette_x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	konami573_cassette_x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
+	konami573_cassette_x_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	konami573_cassette_x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock,std::string shortname, std::string source);
 
 	virtual DECLARE_READ_LINE_MEMBER(read_line_secflash_sda) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d0) override;
@@ -114,7 +114,7 @@ extern const device_type KONAMI573_CASSETTE_XI;
 class konami573_cassette_xi_device: public konami573_cassette_x_device
 {
 public:
-	konami573_cassette_xi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	konami573_cassette_xi_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual DECLARE_READ_LINE_MEMBER(read_line_ds2401) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d4) override;
@@ -167,8 +167,8 @@ class konami573_cassette_y_device: public device_t,
 	public konami573_cassette_interface
 {
 public:
-	konami573_cassette_y_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	konami573_cassette_y_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
+	konami573_cassette_y_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	konami573_cassette_y_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock,std::string shortname, std::string source);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_d0_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d0_handler.set_callback(object); }
@@ -212,7 +212,7 @@ extern const device_type KONAMI573_CASSETTE_YI;
 class konami573_cassette_yi_device: public konami573_cassette_y_device
 {
 public:
-	konami573_cassette_yi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	konami573_cassette_yi_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual DECLARE_READ_LINE_MEMBER(read_line_ds2401) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d4) override;
@@ -231,7 +231,7 @@ class konami573_cassette_zi_device: public device_t,
 	public konami573_cassette_interface
 {
 public:
-	konami573_cassette_zi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	konami573_cassette_zi_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual DECLARE_READ_LINE_MEMBER(read_line_ds2401) override;
 	virtual DECLARE_READ_LINE_MEMBER(read_line_secflash_sda) override;

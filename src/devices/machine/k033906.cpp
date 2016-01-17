@@ -22,8 +22,8 @@ const device_type K033906 = &device_creator<k033906_device>;
 //  k033906_device - constructor
 //-------------------------------------------------
 
-k033906_device::k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K033906, "K033906 PCI bridge", tag, owner, clock, "k033906", __FILE__), m_reg_set(0), m_voodoo_tag(nullptr), m_voodoo(nullptr)
+k033906_device::k033906_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K033906, "K033906 PCI bridge", tag, owner, clock, "k033906", __FILE__), m_reg_set(0), m_voodoo(nullptr)
 {
 }
 

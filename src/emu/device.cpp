@@ -24,7 +24,7 @@
 //  from the provided config
 //-------------------------------------------------
 
-device_t::device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+device_t::device_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: m_type(type),
 		m_name(name),
 		m_shortname(shortname),
@@ -82,14 +82,14 @@ device_t::~device_t()
 // NOTE: this being NULL in a C++ member function can lead to undefined behavior.
 // However, it is relied on throughout MAME, so will remain for now.
 
-memory_region *device_t::memregion(const char *_tag) const
+memory_region *device_t::memregion(std::string _tag) const
 {
 	// safety first
 	if (this == nullptr)
 		return nullptr;
 
 	// build a fully-qualified name and look it up
-	return machine().memory().region(subtag(_tag).c_str());
+	return machine().memory().region(subtag(_tag));
 }
 
 
@@ -98,14 +98,14 @@ memory_region *device_t::memregion(const char *_tag) const
 //  info for a given share
 //-------------------------------------------------
 
-memory_share *device_t::memshare(const char *_tag) const
+memory_share *device_t::memshare(std::string _tag) const
 {
 	// safety first
 	if (this == nullptr)
 		return nullptr;
 
 	// build a fully-qualified name and look it up
-	return machine().memory().shared(subtag(_tag).c_str());
+	return machine().memory().shared(subtag(_tag));
 }
 
 
@@ -114,14 +114,14 @@ memory_share *device_t::memshare(const char *_tag) const
 //  bank info for a given bank
 //-------------------------------------------------
 
-memory_bank *device_t::membank(const char *_tag) const
+memory_bank *device_t::membank(std::string _tag) const
 {
 	// safety first
 	if (this == nullptr)
 		return nullptr;
 
 	// build a fully-qualified name and look it up
-	return machine().memory().bank(subtag(_tag).c_str());
+	return machine().memory().bank(subtag(_tag));
 }
 
 
@@ -130,14 +130,14 @@ memory_bank *device_t::membank(const char *_tag) const
 //  object for a given port name
 //-------------------------------------------------
 
-ioport_port *device_t::ioport(const char *tag) const
+ioport_port *device_t::ioport(std::string tag) const
 {
 	// safety first
 	if (this == nullptr)
 		return nullptr;
 
 	// build a fully-qualified name and look it up
-	return machine().ioport().port(subtag(tag).c_str());
+	return machine().ioport().port(subtag(tag));
 }
 
 
@@ -146,11 +146,11 @@ ioport_port *device_t::ioport(const char *tag) const
 //  object for a given port name
 //-------------------------------------------------
 
-std::string device_t::parameter(const char *tag) const
+std::string device_t::parameter(std::string tag) const
 {
 	// safety first
 	if (this == nullptr)
-		return nullptr;
+		return std::string();
 
 	// build a fully-qualified name and look it up
 	return machine().parameters().lookup(subtag(tag));
@@ -369,9 +369,9 @@ void device_t::start()
 	device_sound_interface *sound;
 	if (state_registrations == 0 && (interface(exec) || interface(sound)) && type() != SPEAKER)
 	{
-		logerror("Device '%s' did not register any state to save!\n", tag());
+		logerror("Device '%s' did not register any state to save!\n", tag().c_str());
 		if ((machine().system().flags & MACHINE_SUPPORTS_SAVE) != 0)
-			fatalerror("Device '%s' did not register any state to save!\n", tag());
+			fatalerror("Device '%s' did not register any state to save!\n", tag().c_str());
 	}
 
 	// let the interfaces do their post-work
@@ -647,7 +647,7 @@ void device_t::device_timer(emu_timer &timer, device_timer_id id, int param, voi
 //  caching the results
 //-------------------------------------------------
 
-device_t *device_t::subdevice_slow(const char *tag) const
+device_t *device_t::subdevice_slow(std::string tag) const
 {
 	// resolve the full path
 	std::string fulltag = subtag(tag);
@@ -680,9 +680,10 @@ device_t *device_t::subdevice_slow(const char *tag) const
 //  to our device based on the provided tag
 //-------------------------------------------------
 
-std::string device_t::subtag(const char *tag) const
+std::string device_t::subtag(std::string _tag) const
 {
 	std::string result;
+	const char *tag = _tag.c_str();
 	// if the tag begins with a colon, ignore our path and start from the root
 	if (*tag == ':')
 	{
@@ -736,7 +737,7 @@ std::string device_t::subtag(const char *tag) const
 //  as a subdevice
 //-------------------------------------------------
 
-device_t *device_t::add_subdevice(device_type type, const char *tag, UINT32 clock)
+device_t *device_t::add_subdevice(device_type type, std::string tag, UINT32 clock)
 {
 	// allocate the device and append to our list
 	device_t *device = (*type)(mconfig(), tag, this, clock);
@@ -755,7 +756,7 @@ device_t *device_t::add_subdevice(device_type type, const char *tag, UINT32 cloc
 //  to replace an existing subdevice
 //-------------------------------------------------
 
-device_t *device_t::replace_subdevice(device_t &old, device_type type, const char *tag, UINT32 clock)
+device_t *device_t::replace_subdevice(device_t &old, device_type type, std::string tag, UINT32 clock)
 {
 	// iterate over all devices and remove any references to the old device
 	device_iterator iter(mconfig().root_device());

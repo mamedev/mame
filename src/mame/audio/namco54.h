@@ -20,9 +20,9 @@
 class namco_54xx_device : public device_t
 {
 public:
-	namco_54xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_54xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	static void set_discrete(device_t &device, const char *tag) { downcast<namco_54xx_device &>(device).m_discrete.set_tag(tag); }
+	static void set_discrete(device_t &device, std::string tag) { downcast<namco_54xx_device &>(device).m_discrete.set_tag(tag); }
 	static void set_basenote(device_t &device, int node) { downcast<namco_54xx_device &>(device).m_basenode = node; }
 
 	DECLARE_READ8_MEMBER( K_r );

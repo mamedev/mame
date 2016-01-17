@@ -36,7 +36,7 @@ class exidy440_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	exidy440_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~exidy440_sound_device() {}
 
 	DECLARE_READ8_MEMBER( sound_command_r );

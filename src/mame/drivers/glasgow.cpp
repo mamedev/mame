@@ -58,7 +58,7 @@ R.Schaefer Oct 2010
 class glasgow_state : public mboard_state
 {
 public:
-	glasgow_state(const machine_config &mconfig, device_type type, const char *tag)
+	glasgow_state(const machine_config &mconfig, device_type type, std::string tag)
 		: mboard_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_beep(*this, "beeper"),

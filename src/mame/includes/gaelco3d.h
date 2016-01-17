@@ -55,7 +55,7 @@ private:
 class gaelco3d_state : public driver_device
 {
 public:
-	gaelco3d_state(const machine_config &mconfig, device_type type, const char *tag)
+	gaelco3d_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_adsp_ram_base(*this,"adsp_ram_base"),
 			m_m68k_ram_base(*this,"m68k_ram_base",0),

@@ -21,32 +21,32 @@ const device_type SATURN_BRAM_16MB = &device_creator<saturn_bram16mb_device>;
 const device_type SATURN_BRAM_32MB = &device_creator<saturn_bram32mb_device>;
 
 
-saturn_bram_device::saturn_bram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+saturn_bram_device::saturn_bram_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_sat_cart_interface( mconfig, *this ),
 						device_nvram_interface(mconfig, *this)
 {
 }
 
-saturn_bram4mb_device::saturn_bram4mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+saturn_bram4mb_device::saturn_bram4mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: saturn_bram_device(mconfig, SATURN_BRAM_4MB, "Saturn Battery RAM 4Mbit Cart", tag, owner, clock, "sat_bram_4mb", __FILE__)
 {
 	m_cart_type = 0x21;
 }
 
-saturn_bram8mb_device::saturn_bram8mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+saturn_bram8mb_device::saturn_bram8mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: saturn_bram_device(mconfig, SATURN_BRAM_8MB, "Saturn Battery RAM 8Mbit Cart", tag, owner, clock, "sat_bram_8mb", __FILE__)
 {
 	m_cart_type = 0x22;
 }
 
-saturn_bram16mb_device::saturn_bram16mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+saturn_bram16mb_device::saturn_bram16mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: saturn_bram_device(mconfig, SATURN_BRAM_16MB, "Saturn Battery RAM 16Mbit Cart", tag, owner, clock, "sat_bram_16mb", __FILE__)
 {
 	m_cart_type = 0x23;
 }
 
-saturn_bram32mb_device::saturn_bram32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+saturn_bram32mb_device::saturn_bram32mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: saturn_bram_device(mconfig, SATURN_BRAM_32MB, "Saturn Battery RAM 32Mbit Cart", tag, owner, clock, "sat_bram_32mb", __FILE__)
 {
 	m_cart_type = 0x24;

@@ -13,8 +13,8 @@ class pce_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	pce_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	pce_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pce_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	pce_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override {}
@@ -30,7 +30,7 @@ class pce_cdsys3_device : public pce_rom_device
 {
 public:
 	// construction/destruction
-	pce_cdsys3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pce_cdsys3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart) override;
@@ -44,7 +44,7 @@ class pce_populous_device : public pce_rom_device
 {
 public:
 	// construction/destruction
-	pce_populous_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pce_populous_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart) override;
@@ -58,7 +58,7 @@ class pce_sf2_device : public pce_rom_device
 {
 public:
 	// construction/destruction
-	pce_sf2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pce_sf2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

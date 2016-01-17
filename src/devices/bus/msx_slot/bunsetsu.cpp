@@ -11,10 +11,9 @@
 const device_type MSX_SLOT_BUNSETSU = &device_creator<msx_slot_bunsetsu_device>;
 
 
-msx_slot_bunsetsu_device::msx_slot_bunsetsu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_slot_bunsetsu_device::msx_slot_bunsetsu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: msx_slot_rom_device(mconfig, MSX_SLOT_BUNSETSU, "MSX Internal BUNSETSU", tag, owner, clock, "msx_slot_bunsetsu", __FILE__)
-	, m_bunsetsu_region(nullptr)
-	, m_bunsetsu_region_tag(nullptr)
+	, m_bunsetsu_region(nullptr)	
 	, m_bunsetsu_address(0)
 {
 }
@@ -24,7 +23,7 @@ void msx_slot_bunsetsu_device::device_start()
 {
 	msx_slot_rom_device::device_start();
 
-	if (m_bunsetsu_region_tag == nullptr)
+	if (m_bunsetsu_region_tag.empty())
 	{
 		fatalerror("msx_slot_bunsetsu_device: no bunsetsu region tag specified\n");
 	}
@@ -33,7 +32,7 @@ void msx_slot_bunsetsu_device::device_start()
 
 	if (m_bunsetsu_region == nullptr)
 	{
-		fatalerror("msx_slot_bunsetsu_device: Unable to find region with tag '%s'\n", m_bunsetsu_region_tag);
+		fatalerror("msx_slot_bunsetsu_device: Unable to find region with tag '%s'\n", m_bunsetsu_region_tag.c_str());
 	}
 
 	if (m_bunsetsu_region->bytes() != 0x20000)

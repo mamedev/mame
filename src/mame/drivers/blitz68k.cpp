@@ -55,7 +55,7 @@ To Do:
 class blitz68k_state : public driver_device
 {
 public:
-	blitz68k_state(const machine_config &mconfig, device_type type, const char *tag)
+	blitz68k_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_nvram(*this, "nvram"),
 			m_frame_buffer(*this, "frame_buffer"),

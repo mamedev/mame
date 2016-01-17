@@ -92,7 +92,7 @@ machine_config_constructor vp575_device::device_mconfig_additions() const
 //  vp575_device - constructor
 //-------------------------------------------------
 
-vp575_device::vp575_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+vp575_device::vp575_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VP575, "VP575", tag, owner, clock, "vp575", __FILE__),
 	device_vip_expansion_card_interface(mconfig, *this)
 {

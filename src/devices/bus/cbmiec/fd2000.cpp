@@ -274,7 +274,7 @@ machine_config_constructor fd2000_device::device_mconfig_additions() const
 //  fd2000_device - constructor
 //-------------------------------------------------
 
-fd2000_device::fd2000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+fd2000_device::fd2000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, FD2000, "FD-2000", tag, owner, clock, "fd2000", __FILE__),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, G65SC02PI2_TAG),
@@ -284,7 +284,7 @@ fd2000_device::fd2000_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, R65C02P4_TAG),
@@ -299,7 +299,7 @@ fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, co
 //  fd4000_device - constructor
 //-------------------------------------------------
 
-fd4000_device::fd4000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+fd4000_device::fd4000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: fd2000_device(mconfig, FD4000, "FD-4000", tag, owner, clock, TYPE_FD4000, "fd4000", __FILE__ ) { }
 
 

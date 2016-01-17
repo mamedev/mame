@@ -26,7 +26,7 @@ class m6805_base_device : public cpu_device
 {
 public:
 	// construction/destruction
-	m6805_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const device_type type, const char *name, UINT32 addr_width, const char *shortname, const char *source);
+	m6805_base_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock, const device_type type, const char *name, UINT32 addr_width, std::string shortname, std::string source);
 
 protected:
 	// device-level overrides
@@ -294,7 +294,7 @@ class m6805_device : public m6805_base_device
 {
 public:
 	// construction/destruction
-	m6805_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	m6805_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: m6805_base_device(mconfig, tag, owner, clock, M6805, "M6805", 12, "m6805", __FILE__) { }
 
 protected:
@@ -307,7 +307,7 @@ class m68hc05eg_device : public m6805_base_device
 {
 public:
 	// construction/destruction
-	m68hc05eg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	m68hc05eg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: m6805_base_device(mconfig, tag, owner, clock, M68HC05EG, "M68HC05EG", 13, "m68hc05eg", __FILE__) { }
 
 protected:
@@ -325,7 +325,7 @@ class m68705_device : public m6805_base_device
 {
 public:
 	// construction/destruction
-	m68705_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	m68705_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: m6805_base_device(mconfig, tag, owner, clock, M68705, "M68705", 12, "m68705", __FILE__) { }
 
 protected:
@@ -343,7 +343,7 @@ class hd63705_device : public m6805_base_device
 {
 public:
 	// construction/destruction
-	hd63705_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	hd63705_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: m6805_base_device(mconfig, tag, owner, clock, HD63705, "HD63705", 16, "hd63705", __FILE__) { }
 
 protected:

@@ -469,18 +469,18 @@ INT8 dsp56k_get_irq_priority(dsp56k_core* cpustate, int index)
 }
 
 /* Given an IRQ name, return its index in the irq table */
-int dsp56k_get_irq_index_by_tag(const char* tag)
+int dsp56k_get_irq_index_by_tag(std::string tag)
 {
 	int i;
 	for (i = 0; i < 32; i++)
 	{
-		if (strcmp(tag, dsp56k_interrupt_sources[i].irq_source) == 0)
+		if (strcmp(tag.c_str(), dsp56k_interrupt_sources[i].irq_source) == 0)
 		{
 			return i;
 		}
 	}
 
-	fatalerror("DSP56K ERROR : IRQ TAG specified incorrectly (get_vector_by_tag) : %s.\n", tag);
+	fatalerror("DSP56K ERROR : IRQ TAG specified incorrectly (get_vector_by_tag) : %s.\n", tag.c_str());
 	// never executed
 	//return -1;
 }

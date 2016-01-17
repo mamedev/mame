@@ -212,7 +212,7 @@ protected:
 	};
 
 	// construction/destruction
-	adsp21xx_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 chiptype, const char *shortname, const char *source);
+	adsp21xx_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, std::string shortname, std::string source);
 	virtual ~adsp21xx_device();
 
 public:
@@ -483,7 +483,7 @@ class adsp2100_device : public adsp21xx_device
 {
 public:
 	// construction/destruction
-	adsp2100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adsp2100_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device_execute_interface overrides
@@ -504,10 +504,10 @@ class adsp2101_device : public adsp21xx_device
 {
 public:
 	// construction/destruction
-	adsp2101_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adsp2101_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	adsp2101_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 chiptype, const char *shortname, const char *source);
+	adsp2101_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, std::string shortname, std::string source);
 
 	// device_execute_interface overrides
 	virtual UINT32 execute_input_lines() const override;
@@ -527,7 +527,7 @@ class adsp2181_device : public adsp21xx_device
 {
 public:
 	// construction/destruction
-	adsp2181_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adsp2181_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device_execute_interface overrides
@@ -557,19 +557,19 @@ public:
 class adsp2104_device : public adsp2101_device
 {
 public:
-	adsp2104_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adsp2104_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class adsp2105_device : public adsp2101_device
 {
 public:
-	adsp2105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adsp2105_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class adsp2115_device : public adsp2101_device
 {
 public:
-	adsp2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adsp2115_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

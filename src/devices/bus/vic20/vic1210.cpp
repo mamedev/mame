@@ -27,7 +27,7 @@ const device_type VIC1210 = &device_creator<vic1210_device>;
 //  vic1210_device - constructor
 //-------------------------------------------------
 
-vic1210_device::vic1210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vic1210_device::vic1210_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VIC1210, "VIC1210", tag, owner, clock, "vic1210", __FILE__),
 		device_vic20_expansion_card_interface(mconfig, *this),
 		m_ram(*this, "ram")

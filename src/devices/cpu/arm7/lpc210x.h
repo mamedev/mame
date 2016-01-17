@@ -22,7 +22,7 @@
 class lpc210x_device : public arm7_cpu_device
 {
 public:
-	lpc210x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32);
+	lpc210x_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32);
 
 	// static configuration helpers
 

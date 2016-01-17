@@ -86,7 +86,7 @@ struct speedup_entry
 class mediagx_state : public pcat_base_state
 {
 public:
-	mediagx_state(const machine_config &mconfig, device_type type, const char *tag)
+	mediagx_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pcat_base_state(mconfig, type, tag),
 		m_ide(*this, "ide"),
 		m_main_ram(*this, "main_ram"),
@@ -879,7 +879,7 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 	MCFG_FRAGMENT_ADD( pcat_common )
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(18, nullptr, cx5510_pci_r, cx5510_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(18, "", cx5510_pci_r, cx5510_pci_w)
 
 	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))

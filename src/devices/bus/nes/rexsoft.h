@@ -12,7 +12,7 @@ class nes_rex_dbz5_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_rex_dbz5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_rex_dbz5_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -34,7 +34,7 @@ class nes_rex_sl1632_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_rex_sl1632_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_rex_sl1632_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

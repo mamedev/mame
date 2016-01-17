@@ -98,7 +98,7 @@ public:
 		TIMER_CLEAR_IRQ
 	};
 
-	socrates_state(const machine_config &mconfig, device_type type, const char *tag)
+	socrates_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "soc_snd"),
@@ -171,7 +171,7 @@ protected:
 class iqunlim_state : public socrates_state
 {
 public:
-	iqunlim_state(const machine_config &mconfig, device_type type, const char *tag)
+	iqunlim_state(const machine_config &mconfig, device_type type, std::string tag)
 		: socrates_state(mconfig, type, tag),
 			m_bank1(*this, "bank1"),
 			m_bank2(*this, "bank2"),

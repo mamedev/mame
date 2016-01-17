@@ -53,7 +53,7 @@ class hd64610_device :  public device_t,
 {
 public:
 	// construction/destruction
-	hd64610_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd64610_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<hd64610_device &>(device).m_out_irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_1hz_callback(device_t &device, _Object object) { return downcast<hd64610_device &>(device).m_out_1hz_cb.set_callback(object); }

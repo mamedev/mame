@@ -18,8 +18,8 @@ class md_jcart_device : public device_t,
 {
 public:
 	// construction/destruction
-	md_jcart_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	md_jcart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_jcart_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	md_jcart_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -43,8 +43,8 @@ class md_seprom_codemast_device : public md_jcart_device
 {
 public:
 	// construction/destruction
-	md_seprom_codemast_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	md_seprom_codemast_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_seprom_codemast_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	md_seprom_codemast_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -68,7 +68,7 @@ class md_seprom_mm96_device : public md_seprom_codemast_device
 {
 public:
 	// construction/destruction
-	md_seprom_mm96_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_seprom_mm96_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

@@ -18,7 +18,7 @@ public:
 
 	typedef delegate<void (UINT32 main_adr, void *dma_ptr, UINT32 length, UINT32 size, bool to_mainram)> dma_cb;
 
-	naomi_g1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	naomi_g1_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	template<class _cb> void set_irq_cb(_cb cb) { irq_cb.set_callback(cb); }
 	void set_dma_cb(dma_cb _cb) { _dma_cb = _cb; }
 

@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( pic16c62xa_ram, AS_DATA, 8, pic16c62x_device )
 ADDRESS_MAP_END
 
 
-pic16c62x_device::pic16c62x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int picmodel)
+pic16c62x_device::pic16c62x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int picmodel)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, program_width, -1
 		, ( ( program_width == 9 ) ? ADDRESS_MAP_NAME(pic16c62x_rom_9) : ( ( program_width == 10 ) ? ADDRESS_MAP_NAME(pic16c62x_rom_10) : ADDRESS_MAP_NAME(pic16c62x_rom_11) )))
@@ -127,32 +127,32 @@ pic16c62x_device::pic16c62x_device(const machine_config &mconfig, device_type ty
 }
 
 
-pic16c620_device::pic16c620_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pic16c620_device::pic16c620_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pic16c62x_device(mconfig, PIC16C620, "PIC16C620", tag, owner, clock, "pic16c620", 9, 0x16C620)
 {
 }
 
-pic16c620a_device::pic16c620a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pic16c620a_device::pic16c620a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pic16c62x_device(mconfig, PIC16C620A, "PIC16C620A", tag, owner, clock, "pic16c620a", 9, 0x16C620A)
 {
 }
 
-pic16c621_device::pic16c621_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pic16c621_device::pic16c621_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pic16c62x_device(mconfig, PIC16C621, "PIC16C621", tag, owner, clock, "pic16c621", 9, 0x16C621)
 {
 }
 
-pic16c621a_device::pic16c621a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pic16c621a_device::pic16c621a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pic16c62x_device(mconfig, PIC16C621A, "PIC16C621A", tag, owner, clock, "pic16c621a", 9, 0x16C621A)
 {
 }
 
-pic16c622_device::pic16c622_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pic16c622_device::pic16c622_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pic16c62x_device(mconfig, PIC16C622, "PIC16C622", tag, owner, clock, "pic16c622", 9, 0x16C622)
 {
 }
 
-pic16c622a_device::pic16c622a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pic16c622a_device::pic16c622a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pic16c62x_device(mconfig, PIC16C622A, "PIC16C622A", tag, owner, clock, "pic16c622a", 9, 0x16C622A)
 {
 }

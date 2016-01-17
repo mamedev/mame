@@ -29,7 +29,7 @@ class tiki100_hdc_t : public device_t,
 {
 public:
 	// construction/destruction
-	tiki100_hdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tiki100_hdc_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

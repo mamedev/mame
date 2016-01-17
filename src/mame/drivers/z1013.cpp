@@ -60,7 +60,7 @@ Due to no input checking, misuse of commands can crash the system.
 class z1013_state : public driver_device
 {
 public:
-	z1013_state(const machine_config &mconfig, device_type type, const char *tag)
+	z1013_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_cass(*this, "cassette"),

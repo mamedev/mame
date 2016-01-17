@@ -57,47 +57,47 @@ const device_type NES_KS7013B = &device_creator<nes_ks7013b_device>;
 const device_type NES_KS7031 = &device_creator<nes_ks7031_device>;
 
 
-nes_ks7058_device::nes_ks7058_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_ks7058_device::nes_ks7058_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_KS7058, "NES Cart Kaiser KS-7058 PCB", tag, owner, clock, "nes_ks7058", __FILE__)
 {
 }
 
-nes_ks7022_device::nes_ks7022_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_ks7022_device::nes_ks7022_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_KS7022, "NES Cart Kaiser KS-7022 PCB", tag, owner, clock, "nes_ks7022", __FILE__), m_latch(0)
 				{
 }
 
-nes_ks7032_device::nes_ks7032_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+nes_ks7032_device::nes_ks7032_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_latch(0), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
 				{
 }
 
-nes_ks7032_device::nes_ks7032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_ks7032_device::nes_ks7032_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_KS7032, "NES Cart Kaiser KS-7032 PCB", tag, owner, clock, "nes_ks7032", __FILE__), m_latch(0), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
 				{
 }
 
-nes_ks202_device::nes_ks202_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_ks202_device::nes_ks202_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_ks7032_device(mconfig, NES_KS202, "NES Cart Kaiser KS-202 PCB", tag, owner, clock, "nes_ks202", __FILE__)
 {
 }
 
-nes_ks7017_device::nes_ks7017_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_ks7017_device::nes_ks7017_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_KS7017, "NES Cart Kaiser KS-7017 PCB", tag, owner, clock, "nes_ks7017", __FILE__), m_latch(0), m_irq_count(0), m_irq_status(0), m_irq_enable(0), irq_timer(nullptr)
 				{
 }
 
-nes_ks7012_device::nes_ks7012_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_ks7012_device::nes_ks7012_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_KS7012, "NES Cart Kaiser KS-7012 PCB", tag, owner, clock, "nes_ks7012", __FILE__)
 {
 }
 
-nes_ks7013b_device::nes_ks7013b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_ks7013b_device::nes_ks7013b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_KS7013B, "NES Cart Kaiser KS-7013B PCB", tag, owner, clock, "nes_ks7013b", __FILE__)
 {
 }
 
-nes_ks7031_device::nes_ks7031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_ks7031_device::nes_ks7031_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_KS7031, "NES Cart Kaiser KS-7031 PCB", tag, owner, clock, "nes_ks7031", __FILE__)
 {
 }

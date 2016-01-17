@@ -90,7 +90,7 @@ void apple2gs_remove_irq(running_machine &machine, UINT16 irq_mask);
 class apple2gs_state : public apple2_state
 {
 public:
-	apple2gs_state(const machine_config &mconfig, device_type type, const char *tag)
+	apple2gs_state(const machine_config &mconfig, device_type type, std::string tag)
 		: apple2_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_es5503(*this, "es5503"),

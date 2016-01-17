@@ -59,7 +59,7 @@ device_gb_cart_interface::~device_gb_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_gb_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_gb_cart_interface::rom_alloc(UINT32 size, std::string tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -137,7 +137,7 @@ void device_gb_cart_interface::ram_map_setup(UINT8 banks)
 //-------------------------------------------------
 //  base_gb_cart_slot_device - constructor
 //-------------------------------------------------
-base_gb_cart_slot_device::base_gb_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+base_gb_cart_slot_device::base_gb_cart_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 						device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -146,12 +146,12 @@ base_gb_cart_slot_device::base_gb_cart_slot_device(const machine_config &mconfig
 {
 }
 
-gb_cart_slot_device::gb_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+gb_cart_slot_device::gb_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						base_gb_cart_slot_device(mconfig, GB_CART_SLOT, "Game Boy Cartridge Slot", tag, owner, clock, "gb_cart_slot", __FILE__)
 {
 }
 
-megaduck_cart_slot_device::megaduck_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+megaduck_cart_slot_device::megaduck_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						base_gb_cart_slot_device(mconfig, MEGADUCK_CART_SLOT, "Megaduck Cartridge Slot", tag, owner, clock, "megaduck_cart_slot", __FILE__)
 {
 }

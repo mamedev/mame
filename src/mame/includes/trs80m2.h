@@ -38,7 +38,7 @@
 class trs80m2_state : public driver_device
 {
 public:
-	trs80m2_state(const machine_config &mconfig, device_type type, const char *tag)
+	trs80m2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_ctc(*this, Z80CTC_TAG),
@@ -142,7 +142,7 @@ public:
 class trs80m16_state : public trs80m2_state
 {
 public:
-	trs80m16_state(const machine_config &mconfig, device_type type, const char *tag)
+	trs80m16_state(const machine_config &mconfig, device_type type, std::string tag)
 		: trs80m2_state(mconfig, type, tag),
 			m_subcpu(*this, M68000_TAG),
 			m_pic(*this, AM9519A_TAG)

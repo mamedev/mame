@@ -173,36 +173,36 @@ machine_config_constructor nes_arcstick_device::device_mconfig_additions() const
 //  nes_joypad_device - constructor
 //-------------------------------------------------
 
-nes_joypad_device::nes_joypad_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+nes_joypad_device::nes_joypad_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 					device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_nes_control_port_interface(mconfig, *this),
 					m_joypad(*this, "JOYPAD"), m_latch(0)
 {
 }
 
-nes_joypad_device::nes_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_joypad_device::nes_joypad_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 					device_t(mconfig, NES_JOYPAD, "Nintendo NES / FC Control Pad", tag, owner, clock, "nes_joypad", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_joypad(*this, "JOYPAD"), m_latch(0)
 {
 }
 
-nes_fcpad2_device::nes_fcpad2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_fcpad2_device::nes_fcpad2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 					nes_joypad_device(mconfig, NES_FCPAD_P2, "Nintendo Family Computer P2 Pad", tag, owner, clock, "nes_fcpad2", __FILE__)
 {
 }
 
-nes_ccpadl_device::nes_ccpadl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_ccpadl_device::nes_ccpadl_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 					nes_joypad_device(mconfig, NES_CCPAD_LEFT, "FC Crazy Climber Left Pad", tag, owner, clock, "nes_ccpadl", __FILE__)
 {
 }
 
-nes_ccpadr_device::nes_ccpadr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_ccpadr_device::nes_ccpadr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 					nes_joypad_device(mconfig, NES_CCPAD_RIGHT, "FC Crazy Climber Right Pad", tag, owner, clock, "nes_ccpadr", __FILE__)
 {
 }
 
-nes_arcstick_device::nes_arcstick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_arcstick_device::nes_arcstick_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						nes_joypad_device(mconfig, NES_ARCSTICK, "Nintendo Family Computer Arcade Stick", tag, owner, clock, "nes_arcstick", __FILE__),
 						m_daisychain(*this, "subexp"),
 						m_cfg(*this, "CONFIG")

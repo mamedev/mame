@@ -16,7 +16,7 @@
 class partner_state : public radio86_state
 {
 public:
-	partner_state(const machine_config &mconfig, device_type type, const char *tag)
+	partner_state(const machine_config &mconfig, device_type type, std::string tag)
 		: radio86_state(mconfig, type, tag),
 		m_ram(*this, RAM_TAG),
 		m_fdc(*this, "wd1793") { }

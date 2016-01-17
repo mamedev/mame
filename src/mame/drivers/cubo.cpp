@@ -324,7 +324,7 @@ routines :
 class cubo_state : public amiga_state
 {
 public:
-	cubo_state(const machine_config &mconfig, device_type type, const char *tag) :
+	cubo_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_p1_port(*this, "P1"),
 	m_p2_port(*this, "P2"),

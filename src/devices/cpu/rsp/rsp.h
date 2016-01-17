@@ -137,7 +137,7 @@ class rsp_device : public cpu_device
 
 public:
 	// construction/destruction
-	rsp_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	rsp_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
 
 	void resolve_cb();
 	template<class _Object> static devcb_base &static_set_dp_reg_r_callback(device_t &device, _Object object) { return downcast<rsp_device &>(device).m_dp_reg_r_func.set_callback(object); }

@@ -28,7 +28,7 @@ class c352_device : public device_t,
 {
 public:
 	// construction/destruction
-	c352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c352_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
 	static void static_set_divider(device_t &device, int setting);

@@ -73,7 +73,7 @@
 class squale_state : public driver_device
 {
 public:
-	squale_state(const machine_config &mconfig, device_type type, const char *tag)
+	squale_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_acia(*this,  "ef6850")
 		, m_ay8910(*this,  "ay8910")

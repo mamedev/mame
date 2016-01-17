@@ -26,7 +26,7 @@
 class flicker_state : public genpin_class
 {
 public:
-	flicker_state(const machine_config &mconfig, device_type type, const char *tag)
+	flicker_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_testport(*this, "TEST")

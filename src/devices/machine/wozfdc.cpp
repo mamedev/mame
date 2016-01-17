@@ -44,17 +44,17 @@ const rom_entry *wozfdc_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-wozfdc_device::wozfdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+wozfdc_device::wozfdc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-diskii_fdc::diskii_fdc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+diskii_fdc::diskii_fdc(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	wozfdc_device(mconfig, DISKII_FDC, "Apple Disk II floppy controller", tag, owner, clock, "d2fdc", __FILE__)
 {
 }
 
-appleiii_fdc::appleiii_fdc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+appleiii_fdc::appleiii_fdc(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	wozfdc_device(mconfig, DISKII_FDC, "Apple III floppy controller", tag, owner, clock, "a3fdc", __FILE__)
 {
 }

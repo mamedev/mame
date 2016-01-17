@@ -74,7 +74,7 @@ class i8279_device :  public device_t
 {
 public:
 	// construction/destruction
-	i8279_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8279_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_out_irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_sl_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_out_sl_cb.set_callback(object); }

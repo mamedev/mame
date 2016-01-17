@@ -24,8 +24,8 @@ class atari_cage_device : public device_t
 {
 public:
 	// construction/destruction
-	atari_cage_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	atari_cage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	atari_cage_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	atari_cage_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	static void static_set_speedup(device_t &device, offs_t speedup) { downcast<atari_cage_device &>(device).m_speedup = speedup; }
 	template<class _Object> static devcb_base &set_irqhandler_callback(device_t &device, _Object object) { return downcast<atari_cage_device &>(device).m_irqhandler.set_callback(object); }
@@ -97,7 +97,7 @@ class atari_cage_seattle_device : public atari_cage_device
 {
 public:
 	// construction/destruction
-	atari_cage_seattle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atari_cage_seattle_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

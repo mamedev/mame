@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( tms32015_ram, AS_DATA, 16, tms32010_device )
 ADDRESS_MAP_END
 
 
-tms32010_device::tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms32010_device::tms32010_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, TMS32010, "TMS32010", tag, owner, clock, "tms32010", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 12, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 8, -1, ADDRESS_MAP_NAME(tms32010_ram))
@@ -111,7 +111,7 @@ tms32010_device::tms32010_device(const machine_config &mconfig, const char *tag,
 }
 
 
-tms32010_device::tms32010_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int addr_mask)
+tms32010_device::tms32010_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int addr_mask)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 12, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 8, -1, ADDRESS_MAP_NAME(tms32015_ram))
@@ -121,13 +121,13 @@ tms32010_device::tms32010_device(const machine_config &mconfig, device_type type
 }
 
 
-tms32015_device::tms32015_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms32015_device::tms32015_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tms32010_device(mconfig, TMS32015, "TMS32015", tag, owner, clock, "tms32015", __FILE__, 0x0fff)
 {
 }
 
 
-tms32016_device::tms32016_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms32016_device::tms32016_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tms32010_device(mconfig, TMS32016, "TMS32016", tag, owner, clock, "tms32016", __FILE__, 0xffff)
 {
 }

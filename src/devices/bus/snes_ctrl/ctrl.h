@@ -52,7 +52,7 @@ class snes_control_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	snes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	snes_control_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~snes_control_port_device();
 
 	static void set_onscreen_callback(device_t &device, snesctrl_onscreen_delegate callback) { downcast<snes_control_port_device &>(device).m_onscreen_cb = callback; }

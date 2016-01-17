@@ -50,7 +50,7 @@ class gayle_device : public device_t
 {
 public:
 	// construction/destruction
-	gayle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gayle_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// callbacks
 	template<class _Object> static devcb_base &set_int2_handler(device_t &device, _Object object)

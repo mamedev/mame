@@ -33,7 +33,7 @@ const device_type I8008 = &device_creator<i8008_device>;
 //-------------------------------------------------
 //  i8008_device - constructor
 //-------------------------------------------------
-i8008_device::i8008_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8008_device::i8008_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, I8008, "i8008", tag, owner, clock, "i8008", __FILE__),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 14),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 8),

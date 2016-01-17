@@ -205,7 +205,7 @@ class abcbus_slot_t : public device_t,
 {
 public:
 	// construction/destruction
-	abcbus_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abcbus_slot_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
 	template<class _nmi> void set_nmi_callback(_nmi nmi) { m_write_nmi.set_callback(nmi); }

@@ -68,7 +68,7 @@ enum
 
 inline void i8257_device::dma_request(int channel, int state)
 {
-	if (LOG) logerror("I8257 '%s' Channel %u DMA Request: %u\n", tag(), channel, state);
+	if (LOG) logerror("I8257 '%s' Channel %u DMA Request: %u\n", tag().c_str(), channel, state);
 
 	if (state)
 	{
@@ -183,7 +183,7 @@ inline void i8257_device::dma_write()
 	case MODE_TRANSFER_VERIFY: {
 		UINT8 v1 = m_in_memr_cb(offset);
 		if(0 && m_temp != v1)
-			logerror("%s: verify error %02x vs. %02x\n", tag(), m_temp, v1);
+			logerror("%s: verify error %02x vs. %02x\n", tag().c_str(), m_temp, v1);
 		break;
 	}
 
@@ -257,7 +257,7 @@ inline void i8257_device::advance()
 //  i8257_device - constructor
 //-------------------------------------------------
 
-i8257_device::i8257_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8257_device::i8257_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I8257, "Intel 8257", tag, owner, clock, "i8257", __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
@@ -597,7 +597,7 @@ WRITE8_MEMBER( i8257_device::write )
 	{
 		m_transfer_mode = data;
 
-		if (LOG) logerror("I8257 '%s' Command Register: %02x\n", tag(), m_transfer_mode);
+		if (LOG) logerror("I8257 '%s' Command Register: %02x\n", tag().c_str(), m_transfer_mode);
 	}
 	trigger(1);
 }
@@ -609,7 +609,7 @@ WRITE8_MEMBER( i8257_device::write )
 
 WRITE_LINE_MEMBER( i8257_device::hlda_w )
 {
-	if (LOG) logerror("I8257 '%s' Hold Acknowledge: %u\n", tag(), state);
+	if (LOG) logerror("I8257 '%s' Hold Acknowledge: %u\n", tag().c_str(), state);
 
 	m_hack = state;
 	trigger(1);
@@ -622,7 +622,7 @@ WRITE_LINE_MEMBER( i8257_device::hlda_w )
 
 WRITE_LINE_MEMBER( i8257_device::ready_w )
 {
-	if (LOG) logerror("I8257 '%s' Ready: %u\n", tag(), state);
+	if (LOG) logerror("I8257 '%s' Ready: %u\n", tag().c_str(), state);
 
 	m_ready = state;
 }

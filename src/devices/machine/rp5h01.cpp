@@ -32,7 +32,7 @@ static const UINT8 initial_data[0x10] =
 
 const device_type RP5H01 = &device_creator<rp5h01_device>;
 
-rp5h01_device::rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rp5h01_device::rp5h01_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RP5H01, "RP5H01 6/7-bit Counter", tag, owner, clock, "rp5h01", __FILE__)
 {
 }

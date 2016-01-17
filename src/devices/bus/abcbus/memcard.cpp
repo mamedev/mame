@@ -109,7 +109,7 @@ const rom_entry *abc_memory_card_t::device_rom_region() const
 //  abc_memory_card_t - constructor
 //-------------------------------------------------
 
-abc_memory_card_t::abc_memory_card_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+abc_memory_card_t::abc_memory_card_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ABC_MEMORY_CARD, "ABC Memory Card", tag, owner, clock, "abc_mem", __FILE__),
 	device_abcbus_card_interface(mconfig, *this),
 	m_dos_rom(*this, "dos"),

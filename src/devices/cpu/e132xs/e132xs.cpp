@@ -292,8 +292,8 @@ ADDRESS_MAP_END
 //  hyperstone_device - constructor
 //-------------------------------------------------
 
-hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
-										const device_type type, UINT32 prg_data_width, UINT32 io_data_width, address_map_constructor internal_map, const char *shortname, const char *source)
+hyperstone_device::hyperstone_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock,
+										const device_type type, UINT32 prg_data_width, UINT32 io_data_width, address_map_constructor internal_map, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map),
 		m_io_config("io", ENDIANNESS_BIG, io_data_width, 15),
@@ -309,7 +309,7 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 //  e116t_device - constructor
 //-------------------------------------------------
 
-e116t_device::e116t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e116t_device::e116t_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: hyperstone_device(mconfig, "E1-16T", tag, owner, clock, E116T, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map), "e116t", __FILE__)
 {
 }
@@ -319,7 +319,7 @@ e116t_device::e116t_device(const machine_config &mconfig, const char *tag, devic
 //  e116xt_device - constructor
 //-------------------------------------------------
 
-e116xt_device::e116xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e116xt_device::e116xt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: hyperstone_device(mconfig, "E1-16XT", tag, owner, clock, E116XT, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map), "e116xt", __FILE__)
 {
 }
@@ -329,7 +329,7 @@ e116xt_device::e116xt_device(const machine_config &mconfig, const char *tag, dev
 //  e116xs_device - constructor
 //-------------------------------------------------
 
-e116xs_device::e116xs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e116xs_device::e116xs_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: hyperstone_device(mconfig, "E1-16XS", tag, owner, clock, E116XS, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map), "e116xs", __FILE__)
 {
 }
@@ -339,7 +339,7 @@ e116xs_device::e116xs_device(const machine_config &mconfig, const char *tag, dev
 //  e116xsr_device - constructor
 //-------------------------------------------------
 
-e116xsr_device::e116xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e116xsr_device::e116xsr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: hyperstone_device(mconfig, "E1-16XSR", tag, owner, clock, E116XT, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map), "e116xsr", __FILE__)
 {
 }
@@ -349,7 +349,7 @@ e116xsr_device::e116xsr_device(const machine_config &mconfig, const char *tag, d
 //  e132n_device - constructor
 //-------------------------------------------------
 
-e132n_device::e132n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e132n_device::e132n_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: hyperstone_device(mconfig, "E1-32N", tag, owner, clock, E132N, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map), "e132n", __FILE__)
 {
 }
@@ -359,7 +359,7 @@ e132n_device::e132n_device(const machine_config &mconfig, const char *tag, devic
 //  e132t_device - constructor
 //-------------------------------------------------
 
-e132t_device::e132t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e132t_device::e132t_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: hyperstone_device(mconfig, "E1-32T", tag, owner, clock, E132T, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map), "e132t", __FILE__)
 {
 }
@@ -369,7 +369,7 @@ e132t_device::e132t_device(const machine_config &mconfig, const char *tag, devic
 //  e132xn_device - constructor
 //-------------------------------------------------
 
-e132xn_device::e132xn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e132xn_device::e132xn_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: hyperstone_device(mconfig, "E1-32XN", tag, owner, clock, E132XN, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map), "e132xn", __FILE__)
 {
 }
@@ -379,7 +379,7 @@ e132xn_device::e132xn_device(const machine_config &mconfig, const char *tag, dev
 //  e132xt_device - constructor
 //-------------------------------------------------
 
-e132xt_device::e132xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e132xt_device::e132xt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: hyperstone_device(mconfig, "E1-32XT", tag, owner, clock, E132XT, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map), "e132xt", __FILE__)
 {
 }
@@ -389,7 +389,7 @@ e132xt_device::e132xt_device(const machine_config &mconfig, const char *tag, dev
 //  e132xs_device - constructor
 //-------------------------------------------------
 
-e132xs_device::e132xs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e132xs_device::e132xs_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: hyperstone_device(mconfig, "E1-32XS", tag, owner, clock, E132XS, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map), "e132xs", __FILE__)
 {
 }
@@ -399,7 +399,7 @@ e132xs_device::e132xs_device(const machine_config &mconfig, const char *tag, dev
 //  e132xsr_device - constructor
 //-------------------------------------------------
 
-e132xsr_device::e132xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e132xsr_device::e132xsr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: hyperstone_device(mconfig, "E1-32XSR", tag, owner, clock, E132XSR, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map), "e132xsr", __FILE__)
 {
 }
@@ -409,7 +409,7 @@ e132xsr_device::e132xsr_device(const machine_config &mconfig, const char *tag, d
 //  gms30c2116_device - constructor
 //-------------------------------------------------
 
-gms30c2116_device::gms30c2116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gms30c2116_device::gms30c2116_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: hyperstone_device(mconfig, "GMS30C2116", tag, owner, clock, GMS30C2116, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map), "gms30c2116", __FILE__)
 {
 }
@@ -419,7 +419,7 @@ gms30c2116_device::gms30c2116_device(const machine_config &mconfig, const char *
 //  gms30c2132_device - constructor
 //-------------------------------------------------
 
-gms30c2132_device::gms30c2132_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gms30c2132_device::gms30c2132_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: hyperstone_device(mconfig, "GMS30C2132", tag, owner, clock, GMS30C2132, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map), "gms30c2132", __FILE__)
 {
 }
@@ -429,7 +429,7 @@ gms30c2132_device::gms30c2132_device(const machine_config &mconfig, const char *
 //  gms30c2216_device - constructor
 //-------------------------------------------------
 
-gms30c2216_device::gms30c2216_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gms30c2216_device::gms30c2216_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: hyperstone_device(mconfig, "GMS30C2216", tag, owner, clock, GMS30C2216, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map), "gms30c2216", __FILE__)
 {
 }
@@ -439,7 +439,7 @@ gms30c2216_device::gms30c2216_device(const machine_config &mconfig, const char *
 //  gms30c2232_device - constructor
 //-------------------------------------------------
 
-gms30c2232_device::gms30c2232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gms30c2232_device::gms30c2232_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: hyperstone_device(mconfig, "GMS30C2232", tag, owner, clock, GMS30C2232, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map), "gms30c2232", __FILE__)
 {
 }

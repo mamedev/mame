@@ -71,7 +71,7 @@ ioport_constructor sms_paddle_device::device_input_ports() const
 //  sms_paddle_device - constructor
 //-------------------------------------------------
 
-sms_paddle_device::sms_paddle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sms_paddle_device::sms_paddle_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SMS_PADDLE, "Sega SMS Paddle", tag, owner, clock, "sms_paddle", __FILE__),
 	device_sms_control_port_interface(mconfig, *this),
 	m_paddle_pins(*this, "CTRL_PORT"),

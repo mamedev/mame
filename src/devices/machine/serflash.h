@@ -42,7 +42,7 @@ class serflash_device :    public device_t,
 public:
 
 	// construction/destruction
-	serflash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	serflash_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( flash_ready_r );
 	DECLARE_READ8_MEMBER( flash_io_r );

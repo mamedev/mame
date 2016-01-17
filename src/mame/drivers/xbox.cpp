@@ -30,7 +30,7 @@
 class xbox_state : public xbox_base_state
 {
 public:
-	xbox_state(const machine_config &mconfig, device_type type, const char *tag) :
+	xbox_state(const machine_config &mconfig, device_type type, std::string tag) :
 		xbox_base_state(mconfig, type, tag),
 		usbhack_index(-1),
 		usbhack_counter(0)

@@ -39,7 +39,7 @@
 
 const device_type MATHBOX = &device_creator<mathbox_device>;
 
-mathbox_device::mathbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mathbox_device::mathbox_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MATHBOX, "Atari MATHBOX", tag, owner, clock, "mathbox", __FILE__)
 {
 }

@@ -4,7 +4,7 @@
 
 const device_type CLOCK = &device_creator<clock_device>;
 
-clock_device::clock_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+clock_device::clock_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CLOCK, "Clock", tag, owner, clock, "clock", __FILE__),
 	m_signal(0),
 	m_timer(nullptr),

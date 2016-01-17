@@ -97,9 +97,9 @@ class apricot_expansion_slot_device : public device_t, public device_slot_interf
 {
 public:
 	// construction/destruction
-	apricot_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	apricot_expansion_slot_device(const machine_config &mconfig, device_type type, const char *name,
-		const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	apricot_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	apricot_expansion_slot_device(const machine_config &mconfig, device_type type, std::string name,
+		std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -115,7 +115,7 @@ class apricot_expansion_bus_device : public device_t
 {
 public:
 	// construction/destruction
-	apricot_expansion_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apricot_expansion_bus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~apricot_expansion_bus_device();
 
 	template<class _Object> static devcb_base &set_dma1_handler(device_t &device, _Object object)
@@ -137,8 +137,8 @@ public:
 		{ return downcast<apricot_expansion_bus_device &>(device).m_int3_handler.set_callback(object); }
 
 	// inline configuration
-	static void set_cpu_tag(device_t &device, device_t *owner, const char *tag);
-	static void set_iop_tag(device_t &device, device_t *owner, const char *tag);
+	static void set_cpu_tag(device_t &device, device_t *owner, std::string tag);
+	static void set_iop_tag(device_t &device, device_t *owner, std::string tag);
 
 	void add_card(device_apricot_expansion_card_interface *card);
 
@@ -174,8 +174,8 @@ private:
 	devcb_write_line m_int3_handler;
 
 	// configuration
-	const char *m_cpu_tag;
-	const char *m_iop_tag;
+	std::string m_cpu_tag;
+	std::string m_iop_tag;
 };
 
 // device type definition

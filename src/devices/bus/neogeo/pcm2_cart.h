@@ -15,8 +15,8 @@ class neogeo_pcm2_cart : public device_t,
 {
 public:
 	// construction/destruction
-	neogeo_pcm2_cart(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT16 clock, const char *shortname, const char *source);
-	neogeo_pcm2_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock);
+	neogeo_pcm2_cart(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT16 clock, std::string shortname, std::string source);
+	neogeo_pcm2_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT16 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -48,7 +48,7 @@ extern const device_type NEOGEO_PCM2_CART;
 class neogeo_pcm2_mslug4_cart : public neogeo_pcm2_cart
 {
 public:
-	neogeo_pcm2_mslug4_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_pcm2_mslug4_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 1; }
 };
@@ -57,7 +57,7 @@ extern const device_type NEOGEO_PCM2_MSLUG4_CART;
 class neogeo_pcm2_ms4plus_cart : public neogeo_pcm2_cart
 {
 public:
-	neogeo_pcm2_ms4plus_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_pcm2_ms4plus_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 0; }
 };
@@ -72,7 +72,7 @@ extern const device_type NEOGEO_PCM2_MS4PLUS_CART;
 class neogeo_pcm2_rotd_cart : public neogeo_pcm2_cart
 {
 public:
-	neogeo_pcm2_rotd_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_pcm2_rotd_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 1; }
 };
@@ -86,7 +86,7 @@ extern const device_type NEOGEO_PCM2_ROTD_CART;
 class neogeo_pcm2_pnyaa_cart : public neogeo_pcm2_cart
 {
 public:
-	neogeo_pcm2_pnyaa_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_pcm2_pnyaa_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 1; }
 };

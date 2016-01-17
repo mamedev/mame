@@ -55,7 +55,7 @@ class pic16c62x_device : public cpu_device
 {
 public:
 	// construction/destruction
-	pic16c62x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int picmodel);
+	pic16c62x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int picmodel);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -206,14 +206,14 @@ class pic16c620_device : public pic16c62x_device
 {
 public:
 	// construction/destruction
-	pic16c620_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pic16c620_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class pic16c620a_device : public pic16c62x_device
 {
 public:
 	// construction/destruction
-	pic16c620a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pic16c620a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 /*
@@ -221,35 +221,35 @@ class pic16cr620a_device : public pic16c62x_device
 {
 public:
     // construction/destruction
-    pic16cr620a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+    pic16cr620a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 }*/
 
 class pic16c621_device : public pic16c62x_device
 {
 public:
 	// construction/destruction
-	pic16c621_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pic16c621_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class pic16c621a_device : public pic16c62x_device
 {
 public:
 	// construction/destruction
-	pic16c621a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pic16c621a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class pic16c622_device : public pic16c62x_device
 {
 public:
 	// construction/destruction
-	pic16c622_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pic16c622_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class pic16c622a_device : public pic16c62x_device
 {
 public:
 	// construction/destruction
-	pic16c622a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pic16c622a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

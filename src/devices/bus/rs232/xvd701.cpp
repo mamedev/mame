@@ -2,7 +2,7 @@
 // copyright-holders:smf
 #include "xvd701.h"
 
-jvc_xvd701_device::jvc_xvd701_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+jvc_xvd701_device::jvc_xvd701_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, JVC_XVD701, "JVC XV-D701", tag, owner, clock, "xvd701", __FILE__),
 	device_serial_interface(mconfig, *this),
 	device_rs232_port_interface(mconfig, *this),

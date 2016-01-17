@@ -88,7 +88,7 @@ const device_type V9938 = &device_creator<v9938_device>;
 const device_type V9958 = &device_creator<v9958_device>;
 
 
-v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock)
+v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, std::string name, std::string shortname, std::string tag, device_t *owner, UINT32 clock)
 :   device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
@@ -122,13 +122,13 @@ v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, cons
 	static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
 }
 
-v9938_device::v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+v9938_device::v9938_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 : v99x8_device(mconfig, V9938, "V9938 VDP", "v9938", tag, owner, clock)
 {
 	m_model = MODEL_V9938;
 }
 
-v9958_device::v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+v9958_device::v9958_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 : v99x8_device(mconfig, V9938, "V9958 VDP", "v9958", tag, owner, clock)
 {
 	m_model = MODEL_V9958;

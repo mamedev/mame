@@ -65,7 +65,7 @@ const device_type RF5C400 = &device_creator<rf5c400_device>;
 //  rf5c400_device - constructor
 //-------------------------------------------------
 
-rf5c400_device::rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rf5c400_device::rf5c400_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RF5C400, "RF5C400", tag, owner, clock, "rf5c400", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_rom(*this, DEVICE_SELF),

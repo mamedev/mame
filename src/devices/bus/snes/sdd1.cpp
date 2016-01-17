@@ -411,13 +411,13 @@ void SDD1_emu::SDD1emu_decompress(UINT8 *ROM, UINT32 *mmc, UINT32 in_buf, UINT16
 const device_type SNS_LOROM_SDD1 = &device_creator<sns_rom_sdd1_device>;
 
 
-sns_rom_sdd1_device::sns_rom_sdd1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+sns_rom_sdd1_device::sns_rom_sdd1_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_sns_cart_interface( mconfig, *this ), m_sdd1_enable(0), m_xfer_enable(0), m_sdd1emu(nullptr)
 				{
 }
 
-sns_rom_sdd1_device::sns_rom_sdd1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sns_rom_sdd1_device::sns_rom_sdd1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, SNS_LOROM_SDD1, "SNES Cart + S-DD1", tag, owner, clock, "sns_rom_sdd1", __FILE__),
 						device_sns_cart_interface( mconfig, *this ), m_sdd1_enable(0), m_xfer_enable(0), m_sdd1emu(nullptr)
 				{

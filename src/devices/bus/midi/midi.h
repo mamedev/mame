@@ -20,7 +20,7 @@ class midi_port_device : public device_t,
 	friend class device_midi_port_interface;
 
 public:
-	midi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	midi_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~midi_port_device();
 
 	// static configuration helpers

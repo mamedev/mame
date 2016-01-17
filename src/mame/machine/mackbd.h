@@ -42,7 +42,7 @@ public:
 	template<class _Object> static devcb_base &set_dataout_handler(device_t &device, _Object object) { return downcast<mackbd_device &>(device).m_dataout_handler.set_callback(object); }
 
 	// construction/destruction
-	mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mackbd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(p0_r);
 	DECLARE_WRITE8_MEMBER(p0_w);

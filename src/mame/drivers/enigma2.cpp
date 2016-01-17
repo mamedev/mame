@@ -58,7 +58,7 @@ TODO:
 class enigma2_state : public driver_device
 {
 public:
-	enigma2_state(const machine_config &mconfig, device_type type, const char *tag)
+	enigma2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),

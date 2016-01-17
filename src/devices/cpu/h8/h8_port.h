@@ -20,7 +20,7 @@
 
 class h8_port_device : public device_t {
 public:
-	h8_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void set_info(int address, UINT8 default_ddr, UINT8 mask);
 

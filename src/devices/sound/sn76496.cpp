@@ -130,9 +130,9 @@
 #define MAX_OUTPUT 0x7fff
 
 
-sn76496_base_device::sn76496_base_device(const machine_config &mconfig, device_type type,  const char *name,
-	const char *tag, int feedbackmask, int noisetap1, int noisetap2, bool negate, bool stereo, int clockdivider, int sega,
-	device_t *owner, UINT32 clock, const char *shortname, const char *source)
+sn76496_base_device::sn76496_base_device(const machine_config &mconfig, device_type type, std::string name,
+	std::string tag, int feedbackmask, int noisetap1, int noisetap2, bool negate, bool stereo, int clockdivider, int sega,
+	device_t *owner, UINT32 clock, std::string shortname, std::string source)
 
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_sound_interface(mconfig, *this),
@@ -147,34 +147,34 @@ sn76496_base_device::sn76496_base_device(const machine_config &mconfig, device_t
 {
 }
 
-sn76496_device::sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sn76496_device::sn76496_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	:  sn76496_base_device(mconfig, SN76496, "SN76496", tag, 0x10000, 0x04, 0x08, false, false, 8, true, owner, clock, "sn76496", __FILE__)
 	{ }
-u8106_device::u8106_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+u8106_device::u8106_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	:  sn76496_base_device(mconfig, U8106, "U8106", tag, 0x4000, 0x01, 0x02, true, false, 8, true, owner, clock, "u8106", __FILE__)
 	{ }
-y2404_device::y2404_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+y2404_device::y2404_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	:  sn76496_base_device(mconfig, Y2404, "Y2404", tag, 0x10000, 0x04, 0x08, false, false, 8, true, owner, clock, "y2404", __FILE__)
 	{ }
-sn76489_device::sn76489_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sn76489_device::sn76489_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	:  sn76496_base_device(mconfig, SN76489, "SN76489", tag, 0x4000, 0x01, 0x02, true, false, 8, true, owner, clock, "sn76489", __FILE__)
 	{ }
-sn76489a_device::sn76489a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sn76489a_device::sn76489a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	:  sn76496_base_device(mconfig, SN76489A, "SN76489A", tag, 0x10000, 0x04, 0x08, false, false, 8, true, owner, clock, "sn76489a", __FILE__)
 	{ }
-sn76494_device::sn76494_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sn76494_device::sn76494_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	:  sn76496_base_device(mconfig, SN76494, "SN76494", tag, 0x10000, 0x04, 0x08, false, false, 1, true, owner, clock, "sn76494", __FILE__)
 	{ }
-sn94624_device::sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sn94624_device::sn94624_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	:  sn76496_base_device(mconfig, SN94624, "SN94624", tag, 0x4000, 0x01, 0x02, true, false, 1, true, owner, clock, "sn94624", __FILE__)
 	{ }
-ncr7496_device::ncr7496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ncr7496_device::ncr7496_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	:  sn76496_base_device(mconfig, NCR7496, "NCR7496", tag, 0x8000, 0x02, 0x20, false, false, 8, true, owner, clock, "ncr7496", __FILE__)
 	{ }
-gamegear_device::gamegear_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gamegear_device::gamegear_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	:  sn76496_base_device(mconfig, GAMEGEAR, "Game Gear PSG", tag, 0x8000, 0x01, 0x08, true, true, 8, false, owner, clock, "gamegear_psg", __FILE__)
 	{ }
-segapsg_device::segapsg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+segapsg_device::segapsg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	:  sn76496_base_device(mconfig, SEGAPSG, "SEGA VDP PSG", tag, 0x8000, 0x01, 0x08, true, false, 8, false, owner, clock, "segapsg", __FILE__)
 	{ }
 

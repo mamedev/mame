@@ -23,7 +23,7 @@
 class b16_state : public driver_device
 {
 public:
-	b16_state(const machine_config &mconfig, device_type type, const char *tag)
+	b16_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_dma8237(*this, "8237dma"),

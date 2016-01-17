@@ -25,7 +25,7 @@ class a2bus_vulcanbase_device:
 {
 public:
 	// construction/destruction
-	a2bus_vulcanbase_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a2bus_vulcanbase_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -55,7 +55,7 @@ private:
 class a2bus_vulcan_device : public a2bus_vulcanbase_device
 {
 public:
-	a2bus_vulcan_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a2bus_vulcan_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual const rom_entry *device_rom_region() const override;
 
 protected:
@@ -67,7 +67,7 @@ protected:
 class a2bus_vulcangold_device : public a2bus_vulcanbase_device
 {
 public:
-	a2bus_vulcangold_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a2bus_vulcangold_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual const rom_entry *device_rom_region() const override;
 };
 

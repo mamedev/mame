@@ -67,7 +67,7 @@ public:
 	typedef delegate<void (floppy_image_device *, int)> wpt_cb;
 
 	// construction/destruction
-	floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	floppy_image_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	virtual ~floppy_image_device();
 
 	virtual void handled_variants(UINT32 *variants, int &var_count) const = 0;
@@ -226,7 +226,7 @@ protected:
 #define DECLARE_FLOPPY_IMAGE_DEVICE(_name, _interface) \
 	class _name : public floppy_image_device { \
 	public: \
-		_name(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock); \
+		_name(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock); \
 		virtual ~_name(); \
 		virtual void handled_variants(UINT32 *variants, int &var_count) const override; \
 		virtual const char *image_interface() const override { return _interface; } \
@@ -276,7 +276,7 @@ extern const device_type FLOPPYSOUND;
 class floppy_sound_device : public samples_device
 {
 public:
-	floppy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	floppy_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	void motor(bool on);
 	void step();
 	bool samples_loaded() { return m_loaded; }
@@ -315,7 +315,7 @@ class floppy_connector: public device_t,
 						public device_slot_interface
 {
 public:
-	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	floppy_connector(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~floppy_connector();
 
 	void set_formats(const floppy_format_type *formats);

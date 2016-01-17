@@ -220,7 +220,7 @@ WRITE16_MEMBER( seibu_crtc_device::layer_scroll_base_w)
 //  seibu_crtc_device - constructor
 //-------------------------------------------------
 
-seibu_crtc_device::seibu_crtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+seibu_crtc_device::seibu_crtc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEIBU_CRTC, "Seibu CRT Controller", tag, owner, clock, "seibu_crtc", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),

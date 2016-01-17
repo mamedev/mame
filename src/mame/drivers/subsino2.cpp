@@ -78,7 +78,7 @@ struct layer_t
 class subsino2_state : public driver_device
 {
 public:
-	subsino2_state(const machine_config &mconfig, device_type type, const char *tag)
+	subsino2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_outputs16(*this, "outputs16"),
 		m_outputs(*this, "outputs"),

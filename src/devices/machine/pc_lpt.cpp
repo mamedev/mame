@@ -12,7 +12,7 @@
 
 const device_type PC_LPT = &device_creator<pc_lpt_device>;
 
-pc_lpt_device::pc_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pc_lpt_device::pc_lpt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PC_LPT, "PC-LPT", tag, owner, clock, "pc_lpt", __FILE__),
 	m_irq(1),
 	m_data(0xff), m_control(0),
@@ -119,7 +119,7 @@ READ8_MEMBER( pc_lpt_device::read )
 	}
 
 	/* if we reach this its an error */
-	logerror("PC-LPT %s: Read from invalid offset %x\n", tag(), offset);
+	logerror("PC-LPT %s: Read from invalid offset %x\n", tag().c_str(), offset);
 
 	return 0xff;
 }

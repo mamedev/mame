@@ -41,7 +41,7 @@
 class atom_state : public driver_device
 {
 public:
-	atom_state(const machine_config &mconfig, device_type type, const char *tag)
+	atom_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, SY6502_TAG),
 			m_vdg(*this, MC6847_TAG),
@@ -120,7 +120,7 @@ public:
 class atomeb_state : public atom_state
 {
 public:
-	atomeb_state(const machine_config &mconfig, device_type type, const char *tag)
+	atomeb_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atom_state(mconfig, type, tag),
 		m_e0(*this, "rom_e0"),
 		m_e1(*this, "rom_e1")

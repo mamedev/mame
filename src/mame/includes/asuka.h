@@ -20,7 +20,7 @@ public:
 		TIMER_CADASH_INTERRUPT5
 	};
 
-	asuka_state(const machine_config &mconfig, device_type type, const char *tag)
+	asuka_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_cadash_shared_ram(*this, "sharedram"),
 		m_maincpu(*this, "maincpu"),

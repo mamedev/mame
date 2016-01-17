@@ -149,18 +149,28 @@ void fortyl_state::fortyl_set_scroll_x( int offset )
 	m_bg_tilemap->set_scrollx(offset / 2, x);
 }
 
+/*!
+ @brief various video related outputs
+ --x- ---- Screen disable bit
+ ---- x--- Global screen color bank
+ ---- -x-- Pix RAM color bank select
+ ---- ---x Flip Screen set
+ */
 WRITE8_MEMBER(fortyl_state::fortyl_pixram_sel_w)
 {
 	int offs;
 	int f = data & 0x01;
-	bool col_bank = bool(data & 8);
+	bool cur_col_bank = bool(data & 8);
+
+	if(data & 0xd2)
+		popmessage("pixram sel = %02x, contact MAMEdev",data);
 	
 	m_pixram_sel = (data & 0x04) >> 2;
-	// data & 0x20: unknown, set by Undoukai
+	m_screen_disable = bool(data & 0x20); // Undoukai
 	
-	if(col_bank != m_color_bank)
+	if(cur_col_bank != m_color_bank)
 	{
-		m_color_bank = col_bank;
+		m_color_bank = cur_col_bank;
 		redraw_pixels();
 	}
 	
@@ -357,6 +367,12 @@ void fortyl_state::draw_pixram( bitmap_ind16 &bitmap, const rectangle &cliprect 
 
 UINT32 fortyl_state::screen_update_fortyl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	if(m_screen_disable == true)
+	{
+		bitmap.fill(m_palette->black_pen(), cliprect);
+		return 0;
+	}
+	
 	draw_pixram(bitmap, cliprect);
 
 	m_bg_tilemap->set_scrolldy(- m_video_ctrl[1] + 1, - m_video_ctrl[1] - 1 );

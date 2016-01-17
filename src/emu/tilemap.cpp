@@ -409,17 +409,17 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, device_gfx_interface &decod
 
 	// save relevant state
 	int instance = manager.alloc_instance();
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_enable));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_attributes));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_palette_offset));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_scrollrows));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_scrollcols));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_rowscroll));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_colscroll));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_dx));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_dx_flipped));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_dy));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_dy_flipped));
+	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_enable));
+	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_attributes));
+	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_palette_offset));
+	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_scrollrows));
+	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_scrollcols));
+	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_rowscroll));
+	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_colscroll));
+	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_dx));
+	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_dx_flipped));
+	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_dy));
+	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_dy_flipped));
 
 	// reset everything after a load
 	machine().save().register_postload(save_prepost_delegate(FUNC(tilemap_t::postload), this));
@@ -1586,7 +1586,7 @@ const device_type TILEMAP = &device_creator<tilemap_device>;
 //  tilemap_device - constructor
 //-------------------------------------------------
 
-tilemap_device::tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tilemap_device::tilemap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TILEMAP, "Tilemap", tag, owner, clock, "tilemap", __FILE__),
 		m_gfxdecode(*this),
 		m_standard_mapper(TILEMAP_STANDARD_COUNT),
@@ -1606,7 +1606,7 @@ tilemap_device::tilemap_device(const machine_config &mconfig, const char *tag, d
 //  gfx decoder
 //-------------------------------------------------
 
-void tilemap_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void tilemap_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<tilemap_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -1764,9 +1764,9 @@ void tilemap_device::device_start()
 {
 	// check configuration
 	if (m_get_info.isnull())
-		throw emu_fatalerror("Tilemap device '%s' has no get info callback!", tag());
+		throw emu_fatalerror("Tilemap device '%s' has no get info callback!", tag().c_str());
 	if (m_standard_mapper == TILEMAP_STANDARD_COUNT && m_mapper.isnull())
-		throw emu_fatalerror("Tilemap device '%s' has no mapper callback!", tag());
+		throw emu_fatalerror("Tilemap device '%s' has no mapper callback!", tag().c_str());
 
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();

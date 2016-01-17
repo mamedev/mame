@@ -61,7 +61,7 @@ machine_config_constructor dsbz80_device::device_mconfig_additions() const
 //  dsbz80_device - constructor
 //-------------------------------------------------
 
-dsbz80_device::dsbz80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+dsbz80_device::dsbz80_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, DSBZ80, "Sega Z80-based Digital Sound Board", tag, owner, clock, "dsbz80", __FILE__),
 	device_sound_interface(mconfig, *this),
 	m_ourcpu(*this, Z80_TAG)

@@ -178,7 +178,7 @@ Notes:
 class aleck64_state : public n64_state
 {
 public:
-	aleck64_state(const machine_config &mconfig, device_type type, const char *tag)
+	aleck64_state(const machine_config &mconfig, device_type type, std::string tag)
 		: n64_state(mconfig, type, tag),
 			m_e90_vram(*this,"e90vram"),
 			m_e90_pal(*this,"e90pal"),

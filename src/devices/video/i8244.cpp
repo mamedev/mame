@@ -101,7 +101,7 @@ static const UINT8 bgr2rgb[8] =
 //  i8244_device - constructor
 //-------------------------------------------------
 
-i8244_device::i8244_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8244_device::i8244_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I8244, "I8244", tag, owner, clock, "i8244", __FILE__)
 	, device_sound_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
@@ -114,7 +114,7 @@ i8244_device::i8244_device(const machine_config &mconfig, const char *tag, devic
 }
 
 
-i8244_device::i8244_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int lines, const char *shortname, const char *source)
+i8244_device::i8244_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, int lines, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_sound_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
@@ -127,7 +127,7 @@ i8244_device::i8244_device(const machine_config &mconfig, device_type type, cons
 }
 
 
-i8245_device::i8245_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8245_device::i8245_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: i8244_device(mconfig, I8245, "I8245", tag, owner, clock, i8245_device::LINES, "i8245", __FILE__)
 {
 }

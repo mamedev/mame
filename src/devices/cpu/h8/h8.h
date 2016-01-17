@@ -46,7 +46,7 @@ public:
 		ADC_7
 	};
 
-	h8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool mode_a16, address_map_delegate map_delegate);
+	h8_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, bool mode_a16, address_map_delegate map_delegate);
 
 	void internal_update();
 

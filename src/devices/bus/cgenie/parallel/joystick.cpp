@@ -92,7 +92,7 @@ ioport_constructor cgenie_joystick_device::device_input_ports() const
 //  cgenie_joystick_device - constructor
 //-------------------------------------------------
 
-cgenie_joystick_device::cgenie_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cgenie_joystick_device::cgenie_joystick_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CGENIE_JOYSTICK, "Joystick Interface EG2013", tag, owner, clock, "cgenie_joystick", __FILE__),
 	device_parallel_interface(mconfig, *this),
 	m_joy(*this, "JOY"),
@@ -125,7 +125,7 @@ void cgenie_joystick_device::device_reset()
 void cgenie_joystick_device::pa_w(UINT8 data)
 {
 	if (VERBOSE)
-		logerror("%s: pa_w %02x\n", tag(), data);
+		logerror("%s: pa_w %02x\n", tag().c_str(), data);
 
 	// d0 to d5 connected
 	m_select = data & 0x3f;
@@ -147,7 +147,7 @@ UINT8 cgenie_joystick_device::pb_r()
 	data |= m_joy[0]->read() > m_select ? 0x80 : 0x00;
 
 	if (VERBOSE)
-		logerror("%s: pb_r %02x\n", tag(), data);
+		logerror("%s: pb_r %02x\n", tag().c_str(), data);
 
 	return data;
 }

@@ -6,7 +6,7 @@
 class input_buffer_device : public device_t
 {
 public:
-	input_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	input_buffer_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	UINT8 read() { return m_input_data; }
 	DECLARE_READ8_MEMBER(read) { return read(); }

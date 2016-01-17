@@ -45,7 +45,7 @@ ToDo:
 class wico_state : public genpin_class
 {
 public:
-	wico_state(const machine_config &mconfig, device_type type, const char *tag)
+	wico_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag)
 		, m_ccpu(*this, "ccpu")
 		, m_hcpu(*this, "hcpu")

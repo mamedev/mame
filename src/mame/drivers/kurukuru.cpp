@@ -204,7 +204,7 @@
 class kurukuru_state : public driver_device
 {
 public:
-	kurukuru_state(const machine_config &mconfig, device_type type, const char *tag)
+	kurukuru_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_audiocpu(*this, "audiocpu"),
 		m_v9938(*this, "v9938"),

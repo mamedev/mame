@@ -42,13 +42,13 @@ static ADDRESS_MAP_START(tmp95c063_mem16, AS_PROGRAM, 16, tmp95c063_device )
 ADDRESS_MAP_END
 
 
-tlcs900h_device::tlcs900h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+tlcs900h_device::tlcs900h_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	m_am8_16(0)
 {
 }
 
-tmp95c061_device::tmp95c061_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tmp95c061_device::tmp95c061_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tlcs900h_device(mconfig, TMP95C061, "TMP95C061", tag, owner, clock, "tmp95c061" ),
 	m_port1_read(*this),
 	m_port1_write(*this),
@@ -87,7 +87,7 @@ void tmp95c061_device::device_config_complete()
 	}
 }
 
-tmp95c063_device::tmp95c063_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tmp95c063_device::tmp95c063_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tlcs900h_device(mconfig, TMP95C063, "TMP95C063", tag, owner, clock, "tmp95c063"),
 	m_port1_read(*this),
 	m_port1_write(*this),

@@ -15,7 +15,7 @@
 
 const device_type ADC1038 = &device_creator<adc1038_device>;
 
-adc1038_device::adc1038_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+adc1038_device::adc1038_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ADC1038, "ADC1038", tag, owner, clock, "adc1038", __FILE__), m_cycle(0), m_clk(0), m_adr(0), m_data_in(0), m_data_out(0), m_adc_data(0), m_sars(0),
 		m_gticlub_hack(0)
 {

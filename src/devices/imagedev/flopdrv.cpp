@@ -509,10 +509,10 @@ legacy_floppy_image_device *floppy_get_device_by_type(running_machine &machine,i
 int floppy_get_drive(device_t *image)
 {
 	int drive =0;
-	if (strcmp(image->tag(), ":" FLOPPY_0) == 0) drive = 0;
-	if (strcmp(image->tag(), ":" FLOPPY_1) == 0) drive = 1;
-	if (strcmp(image->tag(), ":" FLOPPY_2) == 0) drive = 2;
-	if (strcmp(image->tag(), ":" FLOPPY_3) == 0) drive = 3;
+	if (strcmp(image->tag().c_str(), ":" FLOPPY_0) == 0) drive = 0;
+	if (strcmp(image->tag().c_str(), ":" FLOPPY_1) == 0) drive = 1;
+	if (strcmp(image->tag().c_str(), ":" FLOPPY_2) == 0) drive = 2;
+	if (strcmp(image->tag().c_str(), ":" FLOPPY_3) == 0) drive = 3;
 	return drive;
 }
 
@@ -694,7 +694,7 @@ const device_type LEGACY_FLOPPY = &device_creator<legacy_floppy_image_device>;
 //  legacy_floppy_image_device - constructor
 //-------------------------------------------------
 
-legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, LEGACY_FLOPPY, "Floppy Disk", tag, owner, clock, "legacy_floppy_image", __FILE__),
 		device_image_interface(mconfig, *this),
 		m_out_idx_func(*this),
@@ -728,7 +728,7 @@ legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mco
 	memset(&m_extension_list,0,sizeof(m_extension_list));
 }
 
-legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_image_interface(mconfig, *this),
 		m_out_idx_func(*this),

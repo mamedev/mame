@@ -56,7 +56,7 @@ Newer version of the I/O chip ?
 
 const device_type TC0220IOC = &device_creator<tc0220ioc_device>;
 
-tc0220ioc_device::tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc0220ioc_device::tc0220ioc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0220IOC, "Taito TC0220IOC", tag, owner, clock, "tc0220ioc", __FILE__),
 	m_read_0_cb(*this),
 	m_read_1_cb(*this),
@@ -182,7 +182,7 @@ WRITE8_MEMBER( tc0220ioc_device::portreg_w )
 
 const device_type TC0510NIO = &device_creator<tc0510nio_device>;
 
-tc0510nio_device::tc0510nio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc0510nio_device::tc0510nio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0510NIO, "Taito TC0510NIO", tag, owner, clock, "tc0510nio", __FILE__),
 	m_read_0_cb(*this),
 	m_read_1_cb(*this),
@@ -309,7 +309,7 @@ WRITE16_MEMBER( tc0510nio_device::halfword_wordswap_w )
 
 const device_type TC0640FIO = &device_creator<tc0640fio_device>;
 
-tc0640fio_device::tc0640fio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc0640fio_device::tc0640fio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0640FIO, "Taito TC0640FIO", tag, owner, clock, "tc0640fio", __FILE__),
 	m_read_0_cb(*this),
 	m_read_1_cb(*this),

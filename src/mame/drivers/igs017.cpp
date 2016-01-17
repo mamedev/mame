@@ -58,7 +58,7 @@ Notes:
 class igs017_state : public driver_device
 {
 public:
-	igs017_state(const machine_config &mconfig, device_type type, const char *tag)
+	igs017_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_input_addr(-1),
 		m_maincpu(*this, "maincpu"),

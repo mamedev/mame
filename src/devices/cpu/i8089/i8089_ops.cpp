@@ -411,5 +411,5 @@ void i8089_channel::xfer()
 
 void i8089_channel::invalid(int opc)
 {
-	logerror("%s('%s'): invalid opcode: %02x\n", shortname(), tag(), opc);
+	logerror("%s('%s'): invalid opcode: %02x\n", shortname().c_str(), tag().c_str(), opc);
 }

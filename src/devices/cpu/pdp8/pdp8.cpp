@@ -50,7 +50,7 @@ const device_type PDP8CPU = &device_creator<pdp8_device>;
 //  pdp8_device - constructor
 //-------------------------------------------------
 
-pdp8_device::pdp8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pdp8_device::pdp8_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, PDP8CPU, "PDP8CPU", tag, owner, clock, "pdp8_cpu", __FILE__),
 		m_program_config("program", ENDIANNESS_BIG, 12, 12),
 		m_pc(0),

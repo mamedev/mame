@@ -17,7 +17,7 @@ struct lordgun_gun_data
 class lordgun_state : public driver_device
 {
 public:
-	lordgun_state(const machine_config &mconfig, device_type type, const char *tag)
+	lordgun_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),

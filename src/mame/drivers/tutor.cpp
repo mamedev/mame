@@ -182,7 +182,7 @@ A=AMA, P=PRO, these keys don't exist, and so the games cannot be played.
 class tutor_state : public driver_device
 {
 public:
-	tutor_state(const machine_config &mconfig, device_type type, const char *tag)
+	tutor_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),

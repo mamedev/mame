@@ -142,13 +142,13 @@ inline void upd65031_device::interrupt_refresh()
 {
 	if ((m_int & INT_GINT) && ((m_int & m_sta & 0x7c) || ((m_int & INT_TIME) && (m_sta & STA_TIME))))
 	{
-		if (LOG) logerror("uPD65031 '%s': set int\n", tag());
+		if (LOG) logerror("uPD65031 '%s': set int\n", tag().c_str());
 
 		m_write_int(ASSERT_LINE);
 	}
 	else
 	{
-		if (LOG) logerror("uPD65031 '%s': clear int\n", tag());
+		if (LOG) logerror("uPD65031 '%s': clear int\n", tag().c_str());
 
 		m_write_int(CLEAR_LINE);
 	}
@@ -195,7 +195,7 @@ inline void upd65031_device::set_mode(int mode)
 //  upd65031_device - constructor
 //-------------------------------------------------
 
-upd65031_device::upd65031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd65031_device::upd65031_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, UPD65031, "NEC uPD65031", tag, owner, clock, "upd65031", __FILE__),
 	m_read_kb(*this),
 	m_write_int(*this),
@@ -289,7 +289,7 @@ void upd65031_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		// if a key is pressed sets the interrupt
 		if ((m_int & INT_GINT) && (m_int & INT_KEY) && m_read_kb(0) != 0xff)
 		{
-			if (LOG) logerror("uPD65031 '%s': Keyboard interrupt!\n", tag());
+			if (LOG) logerror("uPD65031 '%s': Keyboard interrupt!\n", tag().c_str());
 
 			// awakes CPU from snooze on key down
 			if (m_mode == STATE_SNOOZE)
@@ -416,36 +416,36 @@ READ8_MEMBER( upd65031_device::read )
 			{
 				set_mode(STATE_SNOOZE);
 
-				if (LOG) logerror("uPD65031 '%s': entering snooze!\n", tag());
+				if (LOG) logerror("uPD65031 '%s': entering snooze!\n", tag().c_str());
 			}
 
 			UINT8 data = m_read_kb(offset>>8);
 
-			if (LOG) logerror("uPD65031 '%s': key r %02x: %02x\n", tag(), offset>>8, data);
+			if (LOG) logerror("uPD65031 '%s': key r %02x: %02x\n", tag().c_str(), offset>>8, data);
 
 			return data;
 		}
 
 		// read real time clock status
 		case REG_TSTA:
-			if (LOG) logerror("uPD65031 '%s': tsta r: %02x\n", tag(), m_tsta);
+			if (LOG) logerror("uPD65031 '%s': tsta r: %02x\n", tag().c_str(), m_tsta);
 			return m_tsta & 0x07;
 
 		// read real time clock counters
 		case REG_TIM0:
-			if (LOG) logerror("uPD65031 '%s': TIM0 r: %02x\n", tag(), m_tim[0]);
+			if (LOG) logerror("uPD65031 '%s': TIM0 r: %02x\n", tag().c_str(), m_tim[0]);
 			return m_tim[0];
 		case REG_TIM1:
-			if (LOG) logerror("uPD65031 '%s': TIM1 r: %02x\n", tag(), m_tim[1]);
+			if (LOG) logerror("uPD65031 '%s': TIM1 r: %02x\n", tag().c_str(), m_tim[1]);
 			return m_tim[1];
 		case REG_TIM2:
-			if (LOG) logerror("uPD65031 '%s': TIM2 r: %02x\n", tag(), m_tim[2]);
+			if (LOG) logerror("uPD65031 '%s': TIM2 r: %02x\n", tag().c_str(), m_tim[2]);
 			return m_tim[2];
 		case REG_TIM3:
-			if (LOG) logerror("uPD65031 '%s': TIM3 r: %02x\n", tag(), m_tim[3]);
+			if (LOG) logerror("uPD65031 '%s': TIM3 r: %02x\n", tag().c_str(), m_tim[3]);
 			return m_tim[3];
 		case REG_TIM4:
-			if (LOG) logerror("uPD65031 '%s': TIM4 r: %02x\n", tag(), m_tim[4]);
+			if (LOG) logerror("uPD65031 '%s': TIM4 r: %02x\n", tag().c_str(), m_tim[4]);
 			return m_tim[4];
 
 		// UART
@@ -456,7 +456,7 @@ READ8_MEMBER( upd65031_device::read )
 			return 0;
 
 		default:
-			logerror("uPD65031 '%s': blink r: %04x\n", tag(), offset);
+			logerror("uPD65031 '%s': blink r: %04x\n", tag().c_str(), offset);
 			return 0;
 	}
 }
@@ -482,7 +482,7 @@ WRITE8_MEMBER( upd65031_device::write )
 			break;
 
 		case REG_COM:   // command register
-			if (LOG) logerror("uPD65031 '%s': com w: %02x\n", tag(), data);
+			if (LOG) logerror("uPD65031 '%s': com w: %02x\n", tag().c_str(), data);
 
 			// reset clock?
 			if (data & COM_RESTIM)
@@ -518,7 +518,7 @@ WRITE8_MEMBER( upd65031_device::write )
 			break;
 
 		case REG_INT:   // interrupt control
-			if (LOG) logerror("uPD65031 '%s': int w: %02x\n", tag(), data);
+			if (LOG) logerror("uPD65031 '%s': int w: %02x\n", tag().c_str(), data);
 
 			m_int = data;
 
@@ -528,12 +528,12 @@ WRITE8_MEMBER( upd65031_device::write )
 			break;
 
 		case REG_EPR:   // EPROM programming register
-			if (LOG) logerror("uPD65031 '%s': epr w: %02x\n", tag(), data);
+			if (LOG) logerror("uPD65031 '%s': epr w: %02x\n", tag().c_str(), data);
 			// TODO
 			break;
 
 		case REG_TACK:  // rtc interrupt acknowledge
-			if (LOG) logerror("uPD65031 '%s': tack w: %02x\n", tag(), data);
+			if (LOG) logerror("uPD65031 '%s': tack w: %02x\n", tag().c_str(), data);
 
 			// clear ints that have occurred
 			m_tsta &= ~(data & 0x07);
@@ -545,13 +545,13 @@ WRITE8_MEMBER( upd65031_device::write )
 			break;
 
 		case REG_TMK:   // write rtc interrupt mask
-			if (LOG) logerror("uPD65031 '%s': tmk w: %02x\n", tag(), data);
+			if (LOG) logerror("uPD65031 '%s': tmk w: %02x\n", tag().c_str(), data);
 
 			m_tmk = data & 0x07;
 			break;
 
 		case REG_ACK:   // acknowledge ints
-			if (LOG) logerror("uPD65031 '%s': ack w: %02x\n", tag(), data);
+			if (LOG) logerror("uPD65031 '%s': ack w: %02x\n", tag().c_str(), data);
 
 			m_ack = data;
 			m_sta &= ~(data & 0x7f);
@@ -577,12 +577,12 @@ WRITE8_MEMBER( upd65031_device::write )
 		case REG_TXC:
 		case REG_UMK:
 		case REG_UAK:
-			if (LOG) logerror("uPD65031 '%s': UART w: %02x %02x\n", tag(), port & 7 , data);
+			if (LOG) logerror("uPD65031 '%s': UART w: %02x %02x\n", tag().c_str(), port & 7 , data);
 			// TODO
 			break;
 
 		default:
-			logerror("uPD65031 '%s': blink w: %04x %02x\n", tag(), offset, data);
+			logerror("uPD65031 '%s': blink w: %04x %02x\n", tag().c_str(), offset, data);
 			break;
 	}
 }

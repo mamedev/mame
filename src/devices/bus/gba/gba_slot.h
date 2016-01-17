@@ -36,7 +36,7 @@ public:
 	virtual DECLARE_READ32_MEMBER(read_ram) { return 0xffffffff; }
 	virtual DECLARE_WRITE32_MEMBER(write_ram) {};
 
-	void rom_alloc(UINT32 size, const char *tag);
+	void rom_alloc(UINT32 size, std::string tag);
 	void nvram_alloc(UINT32 size);
 	UINT32* get_rom_base() { return m_rom; }
 	UINT32* get_nvram_base() { return &m_nvram[0]; }
@@ -61,7 +61,7 @@ class gba_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	gba_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gba_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~gba_cart_slot_device();
 
 	// device-level overrides

@@ -49,7 +49,7 @@ ioport_constructor snes_twintap_device::device_input_ports() const
 //  snes_twintap_device - constructor
 //-------------------------------------------------
 
-snes_twintap_device::snes_twintap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+snes_twintap_device::snes_twintap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 					device_t(mconfig, SNES_TWINTAP, "Yonezawa Twin Tap Controller", tag, owner, clock, "snes_twintap", __FILE__),
 					device_snes_control_port_interface(mconfig, *this),
 					m_inputs(*this, "INPUTS"), m_strobe(0), m_latch(0)

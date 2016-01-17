@@ -632,7 +632,7 @@ inline void z80_device::ret_cond(bool cond, UINT8 opcode)
 inline void z80_device::retn()
 {
 	LOG(("Z80 '%s' RETN m_iff1:%d m_iff2:%d\n",
-		tag(), m_iff1, m_iff2));
+		tag().c_str(), m_iff1, m_iff2));
 	pop(m_pc);
 	WZ = PC;
 	m_iff1 = m_iff2;
@@ -1949,7 +1949,7 @@ OP(xycb,ff) { A = set(7, rm(m_ea)); wm(m_ea, A); } /* SET  7,A=(XY+o)  */
 
 OP(illegal,1) {
 	logerror("Z80 '%s' ill. opcode $%02x $%02x\n",
-			tag(), m_decrypted_opcodes_direct->read_byte((PCD-1)&0xffff), m_decrypted_opcodes_direct->read_byte(PCD));
+			tag().c_str(), m_decrypted_opcodes_direct->read_byte((PCD-1)&0xffff), m_decrypted_opcodes_direct->read_byte(PCD));
 }
 
 /**********************************************************
@@ -2537,7 +2537,7 @@ OP(fd,ff) { illegal_1(); op_ff();                            } /* DB   FD       
 OP(illegal,2)
 {
 	logerror("Z80 '%s' ill. opcode $ed $%02x\n",
-			tag(), m_decrypted_opcodes_direct->read_byte((PCD-1)&0xffff));
+			tag().c_str(), m_decrypted_opcodes_direct->read_byte((PCD-1)&0xffff));
 }
 
 /**********************************************************
@@ -3148,7 +3148,7 @@ void z80_device::take_interrupt()
 	/* Say hi */
 	m_irqack_cb(true);
 
-	LOG(("Z80 '%s' single int. irq_vector $%02x\n", tag(), irq_vector));
+	LOG(("Z80 '%s' single int. irq_vector $%02x\n", tag().c_str(), irq_vector));
 
 	/* Interrupt mode 2. Call [i:databyte] */
 	if( m_im == 2 )
@@ -3156,7 +3156,7 @@ void z80_device::take_interrupt()
 		irq_vector = (irq_vector & 0xff) | (m_i << 8);
 		push(m_pc);
 		rm16(irq_vector, m_pc);
-		LOG(("Z80 '%s' IM2 [$%04x] = $%04x\n", tag(), irq_vector, PCD));
+		LOG(("Z80 '%s' IM2 [$%04x] = $%04x\n", tag().c_str(), irq_vector, PCD));
 		/* CALL opcode timing + 'interrupt latency' cycles */
 		m_icount -= m_cc_op[0xcd] + m_cc_ex[0xff];
 	}
@@ -3164,7 +3164,7 @@ void z80_device::take_interrupt()
 	/* Interrupt mode 1. RST 38h */
 	if( m_im == 1 )
 	{
-		LOG(("Z80 '%s' IM1 $0038\n", tag()));
+		LOG(("Z80 '%s' IM1 $0038\n", tag().c_str()));
 		push(m_pc);
 		PCD = 0x0038;
 		/* RST $38 + 'interrupt latency' cycles */
@@ -3175,7 +3175,7 @@ void z80_device::take_interrupt()
 		/* Interrupt mode 0. We check for CALL and JP instructions, */
 		/* if neither of these were found we assume a 1 byte opcode */
 		/* was placed on the databus                                */
-		LOG(("Z80 '%s' IM0 $%04x\n", tag(), irq_vector));
+		LOG(("Z80 '%s' IM0 $%04x\n", tag().c_str(), irq_vector));
 
 		/* check for nop */
 		if (irq_vector != 0x00)
@@ -3483,7 +3483,7 @@ void z80_device::execute_run()
 	/* to just check here */
 	if (m_nmi_pending)
 	{
-		LOG(("Z80 '%s' take NMI\n", tag()));
+		LOG(("Z80 '%s' take NMI\n", tag().c_str()));
 		PRVPC = -1;            /* there isn't a valid previous program counter */
 		leave_halt();            /* Check if processor was halted */
 
@@ -3529,7 +3529,7 @@ void nsc800_device::execute_run()
 	/* to just check here */
 	if (m_nmi_pending)
 	{
-		LOG(("Z80 '%s' take NMI\n", tag()));
+		LOG(("Z80 '%s' take NMI\n", tag().c_str()));
 		PRVPC = -1;            /* there isn't a valid previous program counter */
 		leave_halt();            /* Check if processor was halted */
 
@@ -3711,7 +3711,7 @@ void z80_device::z80_set_cycle_tables(const UINT8 *op, const UINT8 *cb, const UI
 }
 
 
-z80_device::z80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+z80_device::z80_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	cpu_device(mconfig, Z80, "Z80", tag, owner, clock, "z80", __FILE__),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_decrypted_opcodes_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16, 0),
@@ -3721,7 +3721,7 @@ z80_device::z80_device(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
-z80_device::z80_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+z80_device::z80_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_decrypted_opcodes_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16, 0),
@@ -3744,7 +3744,7 @@ const address_space_config *z80_device::memory_space_config(address_spacenum spa
 
 const device_type Z80 = &device_creator<z80_device>;
 
-nsc800_device::nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nsc800_device::nsc800_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: z80_device(mconfig, NSC800, "NSC800", tag, owner, clock, "nsc800", __FILE__)
 {
 }

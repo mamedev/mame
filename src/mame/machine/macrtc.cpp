@@ -40,7 +40,7 @@ const device_type RTC3430042 = &device_creator<rtc3430042_device>;
 //  rtc4543_device - constructor
 //-------------------------------------------------
 
-rtc3430042_device::rtc3430042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rtc3430042_device::rtc3430042_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RTC3430042, "Apple 343-0042 clock/PRAM", tag, owner, clock, "rtc3430042", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this)

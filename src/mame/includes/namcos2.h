@@ -96,7 +96,7 @@ enum
 class namcos2_shared_state : public driver_device
 {
 public:
-	namcos2_shared_state(const machine_config &mconfig, device_type type, const char *tag)
+	namcos2_shared_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_dspmaster(*this, "dspmaster"),
 			m_dspslave(*this, "dspslave"),
@@ -259,7 +259,7 @@ public:
 class namcos2_state : public namcos2_shared_state
 {
 public:
-	namcos2_state(const machine_config &mconfig, device_type type, const char *tag)
+	namcos2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: namcos2_shared_state(mconfig, type, tag),
 			m_dpram(*this, "dpram"),
 			m_paletteram(*this, "paletteram"),

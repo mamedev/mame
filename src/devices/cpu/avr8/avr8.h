@@ -80,7 +80,7 @@ class avr8_device : public cpu_device
 {
 public:
 	// inline configuration helpers
-	static void set_eeprom_tag(device_t &device, const char *tag) { downcast<avr8_device &>(device).m_eeprom_tag = tag; }
+	static void set_eeprom_tag(device_t &device, std::string tag) { downcast<avr8_device &>(device).m_eeprom_tag = tag; }
 
 	// fuse configs
 	void set_low_fuses(UINT8 byte);
@@ -109,7 +109,7 @@ protected:
 		CPU_TYPE_ATMEGA2560
 	};
 
-	avr8_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, UINT32 address_mask, address_map_constructor internal_map, UINT8 cpu_type, const char *shortname, const char *source);
+	avr8_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock, const device_type type, UINT32 address_mask, address_map_constructor internal_map, UINT8 cpu_type, std::string shortname, std::string source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -137,7 +137,7 @@ protected:
 	const address_space_config m_program_config;
 	const address_space_config m_data_config;
 	const address_space_config m_io_config;
-	const char *m_eeprom_tag;
+	std::string m_eeprom_tag;
 	UINT8 *m_eeprom;
 
 	// bootloader
@@ -263,7 +263,7 @@ class atmega88_device : public avr8_device
 {
 public:
 	// construction/destruction
-	atmega88_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atmega88_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 // ======================> atmega644_device
@@ -272,7 +272,7 @@ class atmega644_device : public avr8_device
 {
 public:
 	// construction/destruction
-	atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atmega644_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual void update_interrupt(int source) override;
 };
@@ -283,7 +283,7 @@ class atmega1280_device : public avr8_device
 {
 public:
 	// construction/destruction
-	atmega1280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atmega1280_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual void update_interrupt(int source) override;
 };
@@ -294,7 +294,7 @@ class atmega2560_device : public avr8_device
 {
 public:
 	// construction/destruction
-	atmega2560_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atmega2560_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual void update_interrupt(int source) override;
 };

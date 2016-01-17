@@ -11,7 +11,7 @@
 class segas1x_bootleg_state : public sega_16bit_common_base
 {
 public:
-	segas1x_bootleg_state(const machine_config &mconfig, device_type type, const char *tag)
+	segas1x_bootleg_state(const machine_config &mconfig, device_type type, std::string tag)
 		: sega_16bit_common_base(mconfig, type, tag) ,
 		m_textram(*this, "textram"),
 		m_bg0_tileram(*this, "bg0_tileram"),

@@ -51,7 +51,7 @@ class model3_renderer;
 class model3_state : public driver_device
 {
 public:
-	model3_state(const machine_config &mconfig, device_type type, const char *tag)
+	model3_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_lsi53c810(*this, "lsi53c810"),

@@ -23,7 +23,7 @@
 
 const device_type X68KHDC = &device_creator<x68k_hdc_image_device>;
 
-x68k_hdc_image_device::x68k_hdc_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+x68k_hdc_image_device::x68k_hdc_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, X68KHDC, "SASI Hard Disk", tag, owner, clock, "x68k_hdc_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {

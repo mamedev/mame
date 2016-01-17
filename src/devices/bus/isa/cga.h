@@ -26,8 +26,8 @@ class isa8_cga_device :
 
 public:
 	// construction/destruction
-	isa8_cga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	isa8_cga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	isa8_cga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	isa8_cga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	virtual MC6845_UPDATE_ROW( crtc_update_row );
 	MC6845_UPDATE_ROW( cga_text_inten_update_row );
@@ -97,8 +97,8 @@ class isa8_cga_superimpose_device :
 {
 public:
 	// construction/destruction
-	isa8_cga_superimpose_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	isa8_cga_superimpose_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	isa8_cga_superimpose_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	isa8_cga_superimpose_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 };
 
 // device type definition
@@ -112,7 +112,7 @@ class isa8_cga_poisk2_device :
 {
 public:
 	// construction/destruction
-	isa8_cga_poisk2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_cga_poisk2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
 };
@@ -128,7 +128,7 @@ class isa8_cga_pc1512_device :
 {
 public:
 	// construction/destruction
-	isa8_cga_pc1512_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_cga_pc1512_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const rom_entry *device_rom_region() const override;
@@ -170,7 +170,7 @@ class isa8_wyse700_device :
 {
 public:
 	// construction/destruction
-	isa8_wyse700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_wyse700_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
 
@@ -200,7 +200,7 @@ class isa8_ec1841_0002_device :
 {
 public:
 	// construction/destruction
-	isa8_ec1841_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_ec1841_0002_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
@@ -226,7 +226,7 @@ class isa8_cga_iskr1030m_device :
 {
 public:
 	// construction/destruction
-	isa8_cga_iskr1030m_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_cga_iskr1030m_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual const rom_entry *device_rom_region() const override;
 };
 
@@ -240,7 +240,7 @@ class isa8_cga_iskr1031_device :
 {
 public:
 	// construction/destruction
-	isa8_cga_iskr1031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_cga_iskr1031_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual const rom_entry *device_rom_region() const override;
 };
 
@@ -254,7 +254,7 @@ class isa8_cga_mc1502_device :
 {
 public:
 	// construction/destruction
-	isa8_cga_mc1502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_cga_mc1502_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
 };
@@ -268,7 +268,7 @@ class isa8_cga_m24_device :
 {
 public:
 	// construction/destruction
-	isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_cga_m24_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	// optional information overrides
 	//virtual const rom_entry *device_rom_region() const;

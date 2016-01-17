@@ -64,7 +64,7 @@ class pic16c5x_device : public cpu_device
 {
 public:
 	// construction/destruction
-	pic16c5x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, int picmodel);
+	pic16c5x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, int picmodel);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_read_a_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_a.set_callback(object); }
@@ -237,7 +237,7 @@ class pic16c54_device : public pic16c5x_device
 {
 public:
 	// construction/destruction
-	pic16c54_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pic16c54_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -245,7 +245,7 @@ class pic16c55_device : public pic16c5x_device
 {
 public:
 	// construction/destruction
-	pic16c55_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pic16c55_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -253,7 +253,7 @@ class pic16c56_device : public pic16c5x_device
 {
 public:
 	// construction/destruction
-	pic16c56_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pic16c56_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -261,7 +261,7 @@ class pic16c57_device : public pic16c5x_device
 {
 public:
 	// construction/destruction
-	pic16c57_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pic16c57_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -269,7 +269,7 @@ class pic16c58_device : public pic16c5x_device
 {
 public:
 	// construction/destruction
-	pic16c58_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pic16c58_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 #endif  /* __PIC16C5X_H__ */

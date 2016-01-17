@@ -66,7 +66,7 @@ map:
 const device_type A26_ROM_HARMONY = &device_creator<a26_rom_harmony_device>;
 
 
-a26_rom_harmony_device::a26_rom_harmony_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+a26_rom_harmony_device::a26_rom_harmony_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 						: a26_rom_f8_device(mconfig, A26_ROM_HARMONY, "Atari 2600 ROM Cart HARMONY/MELODY", tag, owner, clock, "a2600_harmony", __FILE__),
 						m_cpu(*this, "arm")
 {

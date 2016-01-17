@@ -40,7 +40,7 @@ public:
 		TIMER_SETUP_GUN_INTERRUPTS
 	};
 
-	tickee_state(const machine_config &mconfig, device_type type, const char *tag)
+	tickee_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),

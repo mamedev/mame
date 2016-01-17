@@ -51,7 +51,7 @@ Note: this is quite clearly a 'Korean bootleg' of Shisensho - Joshiryo-Hen / Mat
 class onetwo_state : public driver_device
 {
 public:
-	onetwo_state(const machine_config &mconfig, device_type type, const char *tag)
+	onetwo_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_paletteram(*this, "paletteram"),
 		m_paletteram2(*this, "paletteram2"),

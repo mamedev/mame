@@ -60,19 +60,19 @@ const device_type BML3BUS_SLOT = &device_creator<bml3bus_slot_device>;
 //-------------------------------------------------
 //  bml3bus_slot_device - constructor
 //-------------------------------------------------
-bml3bus_slot_device::bml3bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+bml3bus_slot_device::bml3bus_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, BML3BUS_SLOT, "Hitachi MB-6890 Slot", tag, owner, clock, "bml3bus_slot", __FILE__),
-		device_slot_interface(mconfig, *this), m_bml3bus_tag(nullptr), m_bml3bus_slottag(nullptr)
+		device_slot_interface(mconfig, *this)
 {
 }
 
-bml3bus_slot_device::bml3bus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+bml3bus_slot_device::bml3bus_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_interface(mconfig, *this), m_bml3bus_tag(nullptr), m_bml3bus_slottag(nullptr)
+		device_slot_interface(mconfig, *this)
 {
 }
 
-void bml3bus_slot_device::static_set_bml3bus_slot(device_t &device, const char *tag, const char *slottag)
+void bml3bus_slot_device::static_set_bml3bus_slot(device_t &device, std::string tag, std::string slottag)
 {
 	bml3bus_slot_device &bml3bus_card = dynamic_cast<bml3bus_slot_device &>(device);
 	bml3bus_card.m_bml3bus_tag = tag;
@@ -96,7 +96,7 @@ void bml3bus_slot_device::device_start()
 
 const device_type BML3BUS = &device_creator<bml3bus_device>;
 
-void bml3bus_device::static_set_cputag(device_t &device, const char *tag)
+void bml3bus_device::static_set_cputag(device_t &device, std::string tag)
 {
 	bml3bus_device &bml3bus = downcast<bml3bus_device &>(device);
 	bml3bus.m_cputag = tag;
@@ -110,19 +110,19 @@ void bml3bus_device::static_set_cputag(device_t &device, const char *tag)
 //  bml3bus_device - constructor
 //-------------------------------------------------
 
-bml3bus_device::bml3bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+bml3bus_device::bml3bus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, BML3BUS, "Hitachi MB-6890 Bus", tag, owner, clock, "bml3bus", __FILE__), m_maincpu(nullptr),
 		m_out_nmi_cb(*this),
 		m_out_irq_cb(*this),
-		m_out_firq_cb(*this), m_cputag(nullptr)
+		m_out_firq_cb(*this)
 {
 }
 
-bml3bus_device::bml3bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+bml3bus_device::bml3bus_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr),
 		m_out_nmi_cb(*this),
 		m_out_irq_cb(*this),
-		m_out_firq_cb(*this), m_cputag(nullptr)
+		m_out_firq_cb(*this)
 {
 }
 //-------------------------------------------------
@@ -204,7 +204,7 @@ WRITE_LINE_MEMBER( bml3bus_device::firq_w ) { m_out_firq_cb(state); }
 device_bml3bus_card_interface::device_bml3bus_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
 		m_bml3bus(nullptr),
-		m_bml3bus_tag(nullptr), m_bml3bus_slottag(nullptr), m_slot(0), m_next(nullptr)
+		m_slot(0), m_next(nullptr)
 {
 }
 
@@ -217,7 +217,7 @@ device_bml3bus_card_interface::~device_bml3bus_card_interface()
 {
 }
 
-void device_bml3bus_card_interface::static_set_bml3bus_tag(device_t &device, const char *tag, const char *slottag)
+void device_bml3bus_card_interface::static_set_bml3bus_tag(device_t &device, std::string tag, std::string slottag)
 {
 	device_bml3bus_card_interface &bml3bus_card = dynamic_cast<device_bml3bus_card_interface &>(device);
 	bml3bus_card.m_bml3bus_tag = tag;
@@ -227,7 +227,7 @@ void device_bml3bus_card_interface::static_set_bml3bus_tag(device_t &device, con
 void device_bml3bus_card_interface::set_bml3bus_device()
 {
 	// extract the slot number from the last digit of the slot tag
-	int tlen = strlen(m_bml3bus_slottag);
+	int tlen = strlen(m_bml3bus_slottag.c_str());
 
 	m_slot = (m_bml3bus_slottag[tlen-1] - '1');
 

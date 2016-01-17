@@ -92,8 +92,8 @@ class sh2_device : public cpu_device
 
 public:
 	// construction/destruction
-	sh2_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
-	sh2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type,address_map_constructor internal_map, int addrlines);
+	sh2_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
+	sh2_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int cpu_type,address_map_constructor internal_map, int addrlines);
 
 	static void set_is_slave(device_t &device, int slave) { downcast<sh2_device &>(device).m_is_slave = slave; }
 	static void set_dma_kludge_callback(device_t &device, sh2_dma_kludge_delegate callback) { downcast<sh2_device &>(device).m_dma_kludge_cb = callback; }
@@ -486,7 +486,7 @@ class sh2a_device : public sh2_device
 {
 public:
 	// construction/destruction
-	sh2a_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	sh2a_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
 
 	DECLARE_READ32_MEMBER(dma_sar0_r);
 	DECLARE_WRITE32_MEMBER(dma_sar0_w);
@@ -519,7 +519,7 @@ class sh1_device : public sh2_device
 {
 public:
 	// construction/destruction
-	sh1_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	sh1_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
 
 	DECLARE_READ16_MEMBER(sh7032_r);
 	DECLARE_WRITE16_MEMBER(sh7032_w);

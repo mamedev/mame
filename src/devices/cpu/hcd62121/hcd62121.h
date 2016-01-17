@@ -37,7 +37,7 @@ class hcd62121_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	hcd62121_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hcd62121_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

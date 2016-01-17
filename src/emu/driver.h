@@ -102,7 +102,7 @@ class driver_device :   public device_t,
 {
 public:
 	// construction/destruction
-	driver_device(const machine_config &mconfig, device_type type, const char *tag);
+	driver_device(const machine_config &mconfig, device_type type, std::string tag);
 	virtual ~driver_device();
 
 	// getters
@@ -283,7 +283,7 @@ private:
 
 // this template function creates a stub which constructs a device
 template<class _DriverClass>
-device_t *driver_device_creator(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+device_t *driver_device_creator(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 {
 	assert(owner == nullptr);
 	assert(clock == 0);

@@ -49,7 +49,7 @@ class tlcs900h_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tlcs900h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
+	tlcs900h_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname);
 
 	// static configuration helpers
 	static void set_am8_16(device_t &device, int am8_16) { downcast<tlcs900h_device &>(device).m_am8_16 = am8_16; }
@@ -636,7 +636,7 @@ class tmp95c061_device : public tlcs900h_device
 {
 public:
 	// construction/destruction
-	tmp95c061_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tmp95c061_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_port1_read(device_t &device, _Object object) { return downcast<tmp95c061_device &>(device).m_port1_read.set_callback(object); }
@@ -756,7 +756,7 @@ class tmp95c063_device : public tlcs900h_device
 {
 public:
 	// construction/destruction
-	tmp95c063_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tmp95c063_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( internal_r );
 	DECLARE_WRITE8_MEMBER( internal_w );

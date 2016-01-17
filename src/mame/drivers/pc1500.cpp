@@ -22,7 +22,7 @@
 class pc1500_state : public driver_device
 {
 public:
-	pc1500_state(const machine_config &mconfig, device_type type, const char *tag)
+	pc1500_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_rtc(*this, "upd1990a"),

@@ -66,7 +66,7 @@ Bugs:
 class mplay_state : public md_base_state
 {
 public:
-	mplay_state(const machine_config &mconfig, device_type type, const char *tag)
+	mplay_state(const machine_config &mconfig, device_type type, std::string tag)
 	: md_base_state(mconfig, type, tag),
 	m_ic3_ram(*this, "ic3_ram"),
 	m_vdp1(*this, "vdp1"),

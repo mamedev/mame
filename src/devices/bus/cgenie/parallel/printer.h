@@ -26,7 +26,7 @@ class cgenie_printer_device : public device_t, public device_parallel_interface
 {
 public:
 	// construction/destruction
-	cgenie_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cgenie_printer_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER(busy_w);
 	DECLARE_WRITE_LINE_MEMBER(perror_w);

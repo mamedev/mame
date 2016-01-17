@@ -13,8 +13,8 @@ class scv_rom8_device : public device_t,
 {
 public:
 	// construction/destruction
-	scv_rom8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	scv_rom8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scv_rom8_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	scv_rom8_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override {}
@@ -30,7 +30,7 @@ class scv_rom16_device : public scv_rom8_device
 {
 public:
 	// construction/destruction
-	scv_rom16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scv_rom16_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart) override;
@@ -43,7 +43,7 @@ class scv_rom32_device : public scv_rom8_device
 {
 public:
 	// construction/destruction
-	scv_rom32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scv_rom32_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart) override;
@@ -56,7 +56,7 @@ class scv_rom32ram8_device : public scv_rom8_device
 {
 public:
 	// construction/destruction
-	scv_rom32ram8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scv_rom32ram8_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -78,7 +78,7 @@ class scv_rom64_device : public scv_rom8_device
 {
 public:
 	// construction/destruction
-	scv_rom64_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scv_rom64_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -99,7 +99,7 @@ class scv_rom128_device : public scv_rom8_device
 {
 public:
 	// construction/destruction
-	scv_rom128_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scv_rom128_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -120,7 +120,7 @@ class scv_rom128ram4_device : public scv_rom8_device
 {
 public:
 	// construction/destruction
-	scv_rom128ram4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scv_rom128ram4_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

@@ -22,7 +22,7 @@ class segaorun_state : public sega_16bit_common_base
 {
 public:
 	// construction/destruction
-	segaorun_state(const machine_config &mconfig, device_type type, const char *tag)
+	segaorun_state(const machine_config &mconfig, device_type type, std::string tag)
 		: sega_16bit_common_base(mconfig, type, tag),
 		m_mapper(*this, "mapper"),
 		m_maincpu(*this, "maincpu"),

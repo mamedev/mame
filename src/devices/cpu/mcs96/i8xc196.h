@@ -15,7 +15,7 @@
 
 class i8xc196_device : public mcs96_device {
 public:
-	i8xc196_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	i8xc196_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	static const disasm_entry disasm_entries[0x100];
 

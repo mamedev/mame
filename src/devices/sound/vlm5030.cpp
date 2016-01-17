@@ -159,7 +159,7 @@ static const int vlm5030_speed_table[8] =
 
 const device_type VLM5030 = &device_creator<vlm5030_device>;
 
-vlm5030_device::vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vlm5030_device::vlm5030_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VLM5030, "VLM5030", tag, owner, clock, "vlm5030", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),

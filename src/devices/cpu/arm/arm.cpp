@@ -228,7 +228,7 @@ const device_type ARM = &device_creator<arm_cpu_device>;
 const device_type ARM_BE = &device_creator<arm_be_cpu_device>;
 
 
-arm_cpu_device::arm_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+arm_cpu_device::arm_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, ARM, "ARM", tag, owner, clock, "arm", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 26, 0)
 	, m_endian(ENDIANNESS_LITTLE)
@@ -238,7 +238,7 @@ arm_cpu_device::arm_cpu_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-arm_cpu_device::arm_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, endianness_t endianness)
+arm_cpu_device::arm_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, endianness_t endianness)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", endianness, 32, 26, 0)
 	, m_endian(endianness)
@@ -248,7 +248,7 @@ arm_cpu_device::arm_cpu_device(const machine_config &mconfig, device_type type, 
 }
 
 
-arm_be_cpu_device::arm_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+arm_be_cpu_device::arm_be_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: arm_cpu_device(mconfig, ARM_BE, "ARM (big endian)", tag, owner, clock, "arm be", __FILE__, ENDIANNESS_BIG)
 {
 }

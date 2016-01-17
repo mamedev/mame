@@ -84,7 +84,7 @@ static const UINT8 command_map[3][MAX_COMMANDS] =
 
 const device_type ASIC65 = &device_creator<asic65_device>;
 
-asic65_device::asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+asic65_device::asic65_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ASIC65, "Atari ASIC65", tag, owner, clock, "asic65", __FILE__),
 	m_asic65_type(0),
 	m_command(0),

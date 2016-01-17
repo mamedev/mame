@@ -79,7 +79,7 @@ class adsp21062_device : public cpu_device
 {
 public:
 	// construction/destruction
-	adsp21062_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	adsp21062_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
 
 	// static configuration helpers
 	static void set_boot_mode(device_t &device, const SHARC_BOOT_MODE boot_mode) { downcast<adsp21062_device &>(device).m_boot_mode = boot_mode; }

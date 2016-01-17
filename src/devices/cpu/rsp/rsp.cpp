@@ -98,7 +98,7 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 #define CACHE_SIZE                      (32 * 1024 * 1024)
 
 
-rsp_device::rsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rsp_device::rsp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, RSP, "RSP", tag, owner, clock, "rsp", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32)
 	, m_cache(CACHE_SIZE + sizeof(internal_rsp_state))

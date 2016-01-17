@@ -62,10 +62,10 @@ class zx8301_device :   public device_t,
 {
 public:
 	// construction/destruction
-	zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	zx8301_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_vsync_wr_callback(device_t &device, _Object object) { return downcast<zx8301_device &>(device).m_write_vsync.set_callback(object); }
-	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<zx8301_device &>(device).m_cpu.set_tag(tag); }
+	static void static_set_cpu_tag(device_t &device, std::string tag) { downcast<zx8301_device &>(device).m_cpu.set_tag(tag); }
 
 	DECLARE_WRITE8_MEMBER( control_w );
 	DECLARE_READ8_MEMBER( data_r );

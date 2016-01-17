@@ -142,7 +142,7 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 class calchase_state : public pcat_base_state
 {
 public:
-	calchase_state(const machine_config &mconfig, device_type type, const char *tag)
+	calchase_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pcat_base_state(mconfig, type, tag),
 			m_dac_l(*this, "dac_l"),
 			m_dac_r(*this, "dac_r")
@@ -664,8 +664,8 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, "", intel82439tx_pci_r, intel82439tx_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, "", intel82371ab_pci_r, intel82371ab_pci_w)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )
@@ -695,8 +695,8 @@ static MACHINE_CONFIG_START( hostinv, calchase_state )
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, "", intel82439tx_pci_r, intel82439tx_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, "", intel82371ab_pci_r, intel82371ab_pci_w)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )

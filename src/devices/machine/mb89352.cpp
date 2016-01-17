@@ -115,7 +115,7 @@ const device_type MB89352A = &device_creator<mb89352_device>;
  * Device
  */
 
-mb89352_device::mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mb89352_device::mb89352_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	legacy_scsi_host_adapter(mconfig, MB89352A, "MB89352A", tag, owner, clock, "mb89352", __FILE__),
 	m_irq_cb(*this),
 	m_drq_cb(*this)

@@ -120,7 +120,7 @@ const device_type RM7000BE = &device_creator<rm7000be_device>;
 const device_type RM7000LE = &device_creator<rm7000le_device>;
 
 
-mips3_device::mips3_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, mips3_flavor flavor, endianness_t endianness)
+mips3_device::mips3_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, mips3_flavor flavor, endianness_t endianness)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, m_program_config("program", endianness, 32, 32, 0, 32, MIPS3_MIN_PAGE_SHIFT)
 	, m_flavor(flavor)

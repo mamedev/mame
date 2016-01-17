@@ -17,7 +17,7 @@
 class hh_melps4_state : public driver_device
 {
 public:
-	hh_melps4_state(const machine_config &mconfig, device_type type, const char *tag)
+	hh_melps4_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN"),
@@ -231,7 +231,7 @@ INPUT_CHANGED_MEMBER(hh_melps4_state::reset_button)
 class cfrogger_state : public hh_melps4_state
 {
 public:
-	cfrogger_state(const machine_config &mconfig, device_type type, const char *tag)
+	cfrogger_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_melps4_state(mconfig, type, tag)
 	{ }
 
@@ -344,7 +344,7 @@ MACHINE_CONFIG_END
 class gjungler_state : public hh_melps4_state
 {
 public:
-	gjungler_state(const machine_config &mconfig, device_type type, const char *tag)
+	gjungler_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_melps4_state(mconfig, type, tag)
 	{ }
 

@@ -39,12 +39,12 @@ const device_type T11 = &device_creator<t11_device>;
 const device_type K1801VM2 = &device_creator<k1801vm2_device>;
 
 
-k1801vm2_device::k1801vm2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k1801vm2_device::k1801vm2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: t11_device(mconfig, K1801VM2, "K1801VM2", tag, owner, clock, "k1801vm2", __FILE__)
 {
 }
 
-t11_device::t11_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+t11_device::t11_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, 0)
 	, c_initial_mode(0)
@@ -54,7 +54,7 @@ t11_device::t11_device(const machine_config &mconfig, device_type type, const ch
 	memset(&m_psw, 0x00, sizeof(m_psw));
 }
 
-t11_device::t11_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+t11_device::t11_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, T11, "T11", tag, owner, clock, "t11", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, 0)
 	, c_initial_mode(0)

@@ -62,7 +62,7 @@ class gottlieb_sound_r0_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	gottlieb_sound_r0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gottlieb_sound_r0_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// read/write
 	DECLARE_WRITE8_MEMBER( write );
@@ -93,8 +93,8 @@ class gottlieb_sound_r1_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, bool populate_votrax);
+	gottlieb_sound_r1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gottlieb_sound_r1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock, bool populate_votrax);
 
 	// read/write
 	DECLARE_WRITE8_MEMBER( write );
@@ -142,7 +142,7 @@ class gottlieb_sound_r1_with_votrax_device : public gottlieb_sound_r1_device
 {
 public:
 	// construction/destruction
-	gottlieb_sound_r1_with_votrax_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gottlieb_sound_r1_with_votrax_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
@@ -158,7 +158,7 @@ class gottlieb_sound_r2_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	gottlieb_sound_r2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gottlieb_sound_r2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	static void static_enable_cobram3_mods(device_t &device);

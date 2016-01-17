@@ -50,7 +50,7 @@ ADDRESS_MAP_END
 //#define AUX_SPACE_ADDRESS_WIDTH 34  // IO space is 32 bits of dwords, so 34-bits
 #define AUX_SPACE_ADDRESS_WIDTH 64 // but the MAME core requires us to use power of 2 values for >32
 
-arcompact_device::arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+arcompact_device::arcompact_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, ARCA5, "ARCtangent-A5", tag, owner, clock, "arca5", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0) // some docs describe these as 'middle endian'?!
 	, m_io_config( "io", ENDIANNESS_LITTLE, 32, AUX_SPACE_ADDRESS_WIDTH, 0, ADDRESS_MAP_NAME( arcompact_auxreg_map ) )

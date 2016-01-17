@@ -12,7 +12,7 @@
 class stactics_state : public driver_device
 {
 public:
-	stactics_state(const machine_config &mconfig, device_type type, const char *tag)
+	stactics_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette_val(*this, "paletteram"),

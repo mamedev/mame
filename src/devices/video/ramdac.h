@@ -38,10 +38,10 @@ class ramdac_device :   public device_t,
 {
 public:
 	// construction/destruction
-	ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ramdac_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 	static void set_split_read(device_t &device, int split) { downcast<ramdac_device &>(device).m_split_read_reg = split; }
 
 	// I/O operations

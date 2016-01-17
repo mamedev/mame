@@ -12,7 +12,7 @@
 class kickgoal_state : public driver_device
 {
 public:
-	kickgoal_state(const machine_config &mconfig, device_type type, const char *tag)
+	kickgoal_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_fgram(*this, "fgram"),
 		m_bgram(*this, "bgram"),

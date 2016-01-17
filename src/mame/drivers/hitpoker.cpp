@@ -54,7 +54,7 @@ Some debug tricks (let's test this CPU as more as possible):
 class hitpoker_state : public driver_device
 {
 public:
-	hitpoker_state(const machine_config &mconfig, device_type type, const char *tag)
+	hitpoker_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_sys_regs(*this, "sys_regs"),
 		m_maincpu(*this, "maincpu"),

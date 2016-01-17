@@ -61,7 +61,7 @@ public:
 
 protected:
 	// construction/destruction
-	tia_video_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock);
+	tia_video_device(const machine_config &mconfig, device_type type, std::string name, std::string shortname, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -208,7 +208,7 @@ private:
 class tia_pal_video_device : public tia_video_device
 {
 public:
-	tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tia_pal_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_PALETTE_INIT(tia_pal);
 
@@ -219,7 +219,7 @@ protected:
 class tia_ntsc_video_device : public tia_video_device
 {
 public:
-	tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tia_ntsc_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_PALETTE_INIT(tia_ntsc);
 

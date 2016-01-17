@@ -81,7 +81,7 @@ machine_config_constructor segam1audio_device::device_mconfig_additions() const
 //  segam1audio_device - constructor
 //-------------------------------------------------
 
-segam1audio_device::segam1audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+segam1audio_device::segam1audio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SEGAM1AUDIO, "Sega Model 1 Sound Board", tag, owner, clock, "segam1audio", __FILE__),
 	m_audiocpu(*this, M68000_TAG),
 	m_multipcm_1(*this, MULTIPCM_1_TAG),

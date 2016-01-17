@@ -80,7 +80,7 @@
 class bus8z_device : public device_t
 {
 public:
-	bus8z_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	bus8z_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source) { }
 	virtual DECLARE_READ8Z_MEMBER(readz) =0;
 	virtual DECLARE_WRITE8_MEMBER(write) =0;
@@ -90,7 +90,7 @@ public:
 class bus16z_device : device_t
 {
 public:
-	bus16z_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	bus16z_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source) { }
 	virtual DECLARE_READ16Z_MEMBER(read16z) =0;
 	virtual DECLARE_WRITE16_MEMBER(write16) =0;

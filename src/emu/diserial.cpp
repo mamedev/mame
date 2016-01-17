@@ -58,8 +58,8 @@ device_serial_interface::~device_serial_interface()
 
 void device_serial_interface::register_save_state(save_manager &save, device_t *device)
 {
-	const char *module = device->name();
-	const char *tag = device->tag();
+	std::string module = device->name();
+	std::string tag = device->tag();
 	save.save_item(device, module, tag, 0, NAME(m_df_start_bit_count));
 	save.save_item(device, module, tag, 0, NAME(m_df_word_length));
 	save.save_item(device, module, tag, 0, NAME(m_df_parity));

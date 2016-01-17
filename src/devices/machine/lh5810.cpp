@@ -27,7 +27,7 @@ const device_type LH5810 = &device_creator<lh5810_device>;
 //  lh5810_device - constructor
 //-------------------------------------------------
 
-lh5810_device::lh5810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+lh5810_device::lh5810_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, LH5810, "LH5810", tag, owner, clock, "lh5810", __FILE__),
 	m_porta_r_cb(*this),
 	m_porta_w_cb(*this),

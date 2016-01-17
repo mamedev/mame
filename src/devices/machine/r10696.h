@@ -32,7 +32,7 @@
 class r10696_device : public device_t
 {
 public:
-	r10696_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	r10696_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~r10696_device() {}
 
 	DECLARE_READ8_MEMBER ( io_r );

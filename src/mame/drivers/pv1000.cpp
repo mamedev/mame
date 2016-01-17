@@ -17,7 +17,7 @@ class pv1000_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pv1000_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER(voice_w);
 
@@ -46,7 +46,7 @@ extern const device_type PV1000;
 
 const device_type PV1000 = &device_creator<pv1000_sound_device>;
 
-pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, PV1000, "NEC D65010G031", tag, owner, clock, "pv1000_sound", __FILE__),
 					device_sound_interface(mconfig, *this)
 {
@@ -142,7 +142,7 @@ void pv1000_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 class pv1000_state : public driver_device
 {
 public:
-	pv1000_state(const machine_config &mconfig, device_type type, const char *tag)
+	pv1000_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "pv1000_sound"),

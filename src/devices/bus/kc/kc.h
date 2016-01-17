@@ -42,8 +42,8 @@ class kcexp_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	kcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	kcexp_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	kcexp_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	kcexp_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	virtual ~kcexp_slot_device();
 
 	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<kcexp_slot_device &>(device).m_out_irq_cb.set_callback(object); }
@@ -54,7 +54,7 @@ public:
 	virtual void device_start() override;
 
 	// inline configuration
-	static void static_set_next_slot(device_t &device, const char *next_module_tag);
+	static void static_set_next_slot(device_t &device, std::string next_module_tag);
 
 	// reading and writing
 	virtual UINT8 module_id_r();
@@ -72,7 +72,7 @@ public:
 
 	device_kcexp_interface*     m_cart;
 
-	const char*                 m_next_slot_tag;
+	std::string                 m_next_slot_tag;
 	kcexp_slot_device*          m_next_slot;
 };
 
@@ -83,7 +83,7 @@ class kccart_slot_device : public kcexp_slot_device,
 {
 public:
 	// construction/destruction
-	kccart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kccart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~kccart_slot_device();
 
 	// device-level overrides

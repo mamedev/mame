@@ -596,7 +596,7 @@ ADDRESS_MAP_END
 //  atmega88_device - constructor
 //-------------------------------------------------
 
-atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atmega88_device::atmega88_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: avr8_device(mconfig, "ATMEGA88", tag, owner, clock, ATMEGA88, 0x0fff, ADDRESS_MAP_NAME(atmega88_internal_map), CPU_TYPE_ATMEGA88, "atmega88", __FILE__)
 {
 }
@@ -605,7 +605,7 @@ atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag,
 //  atmega644_device - constructor
 //-------------------------------------------------
 
-atmega644_device::atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atmega644_device::atmega644_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: avr8_device(mconfig, "ATMEGA644", tag, owner, clock, ATMEGA644, 0xffff, ADDRESS_MAP_NAME(atmega644_internal_map), CPU_TYPE_ATMEGA644, "atmega644", __FILE__)
 {
 }
@@ -614,7 +614,7 @@ atmega644_device::atmega644_device(const machine_config &mconfig, const char *ta
 //  atmega1280_device - constructor
 //-------------------------------------------------
 
-atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atmega1280_device::atmega1280_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: avr8_device(mconfig, "ATMEGA1280", tag, owner, clock, ATMEGA1280, 0x1ffff, ADDRESS_MAP_NAME(atmega1280_internal_map), CPU_TYPE_ATMEGA1280, "atmega1280", __FILE__)
 {
 }
@@ -623,7 +623,7 @@ atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *
 //  atmega2560_device - constructor
 //-------------------------------------------------
 
-atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atmega2560_device::atmega2560_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: avr8_device(mconfig, "ATMEGA2560", tag, owner, clock, ATMEGA2560, 0x1ffff, ADDRESS_MAP_NAME(atmega2560_internal_map), CPU_TYPE_ATMEGA2560, "atmega2560", __FILE__)
 {
 }
@@ -632,13 +632,12 @@ atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *
 //  avr8_device - constructor
 //-------------------------------------------------
 
-avr8_device::avr8_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, UINT32 addr_mask, address_map_constructor internal_map, UINT8 cpu_type, const char *shortname, const char *source)
+avr8_device::avr8_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock, const device_type type, UINT32 addr_mask, address_map_constructor internal_map, UINT8 cpu_type, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_shifted_pc(0),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 22),
 		m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0, internal_map),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 4),
-		m_eeprom_tag(nullptr),
 		m_eeprom(nullptr),
 		m_cpu_type(cpu_type),
 		m_lfuses(0x62),

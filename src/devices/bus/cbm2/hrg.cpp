@@ -147,7 +147,7 @@ machine_config_constructor cbm2_hrg_b_t::device_mconfig_additions() const
 //  cbm2_hrg_t - constructor
 //-------------------------------------------------
 
-cbm2_hrg_t::cbm2_hrg_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+cbm2_hrg_t::cbm2_hrg_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_cbm2_expansion_card_interface(mconfig, *this),
 	m_gdc(*this, EF9366_TAG),
@@ -155,12 +155,12 @@ cbm2_hrg_t::cbm2_hrg_t(const machine_config &mconfig, device_type type, const ch
 {
 }
 
-cbm2_hrg_a_t::cbm2_hrg_a_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cbm2_hrg_a_t::cbm2_hrg_a_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	cbm2_hrg_t(mconfig, CBM2_HRG_A, "CBM 500/600/700 High Resolution Graphics (A)", tag, owner, clock, "cbm2_hrga", __FILE__)
 {
 }
 
-cbm2_hrg_b_t::cbm2_hrg_b_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cbm2_hrg_b_t::cbm2_hrg_b_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	cbm2_hrg_t(mconfig, CBM2_HRG_B, "CBM 500/600/700 High Resolution Graphics (B)", tag, owner, clock, "cbm2_hrgb", __FILE__)
 {
 }

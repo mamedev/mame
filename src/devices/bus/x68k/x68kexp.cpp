@@ -34,7 +34,7 @@ device_x68k_expansion_card_interface::~device_x68k_expansion_card_interface()
 //  LIVE DEVICE
 //**************************************************************************
 
-x68k_expansion_slot_device::x68k_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+x68k_expansion_slot_device::x68k_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, X68K_EXPANSION_SLOT, "Sharp X680x0 expansion slot", tag, owner, clock, "x68k_expansion_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		m_out_irq2_cb(*this),

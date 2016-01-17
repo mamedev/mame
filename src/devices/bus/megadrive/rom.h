@@ -16,8 +16,8 @@ class md_std_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	md_std_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	md_std_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_std_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	md_std_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override {};
@@ -33,7 +33,7 @@ class md_rom_sram_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_sram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -47,7 +47,7 @@ class md_rom_fram_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_fram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_fram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -62,7 +62,7 @@ class md_rom_ssf2_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_ssf2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_ssf2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -83,7 +83,7 @@ class md_rom_cm2in1_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_cm2in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_cm2in1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -103,7 +103,7 @@ class md_rom_mcpirate_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_mcpirate_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_mcpirate_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -124,7 +124,7 @@ class md_rom_bugslife_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_bugslife_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_bugslife_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_a13) override;
@@ -136,7 +136,7 @@ class md_rom_chinf3_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_chinf3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_chinf3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -156,7 +156,7 @@ class md_rom_16mj2_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_16mj2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_16mj2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -168,7 +168,7 @@ class md_rom_elfwor_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_elfwor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_elfwor_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -180,7 +180,7 @@ class md_rom_yasech_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_yasech_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_yasech_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -192,7 +192,7 @@ class md_rom_kof98_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_kof98_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_kof98_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -204,7 +204,7 @@ class md_rom_kof99_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_kof99_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_kof99_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_a13) override;
@@ -216,7 +216,7 @@ class md_rom_lion2_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_lion2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_lion2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -236,7 +236,7 @@ class md_rom_lion3_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_lion3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_lion3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -257,7 +257,7 @@ class md_rom_mjlov_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_mjlov_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_mjlov_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -269,7 +269,7 @@ class md_rom_pokea_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_pokea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_pokea_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_a13) override;
@@ -281,7 +281,7 @@ class md_rom_pokestad_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_pokestad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_pokestad_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -301,7 +301,7 @@ class md_rom_realtec_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_realtec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_realtec_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -321,7 +321,7 @@ class md_rom_redcl_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_redcl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_redcl_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -333,7 +333,7 @@ class md_rom_rx3_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_rx3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_rx3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_a13) override;
@@ -345,7 +345,7 @@ class md_rom_sbubl_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_sbubl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_sbubl_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -357,7 +357,7 @@ class md_rom_smb_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_smb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_smb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_a13) override;
@@ -369,7 +369,7 @@ class md_rom_smb2_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_smb2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_smb2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_a13) override;
@@ -381,7 +381,7 @@ class md_rom_smw64_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_smw64_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_smw64_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -403,7 +403,7 @@ class md_rom_smouse_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_smouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_smouse_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -416,7 +416,7 @@ class md_rom_soulb_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_soulb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_soulb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -428,7 +428,7 @@ class md_rom_squir_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_squir_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_squir_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -448,7 +448,7 @@ class md_rom_tekkensp_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_tekkensp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_tekkensp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -468,7 +468,7 @@ class md_rom_topf_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_topf_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_topf_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -489,7 +489,7 @@ class md_rom_radica_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_radica_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_radica_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -509,7 +509,7 @@ class md_rom_beggarp_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_beggarp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_beggarp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -530,7 +530,7 @@ class md_rom_wukong_device : public md_std_rom_device
 {
 public:
 	// construction/destruction
-	md_rom_wukong_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_wukong_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

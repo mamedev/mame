@@ -17,7 +17,7 @@ public:
 		EXINT_LINE = 1
 	};
 
-	mcs96_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int data_width, const char *shortname, const char *source);
+	mcs96_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, int data_width, std::string shortname, std::string source);
 
 protected:
 	enum {

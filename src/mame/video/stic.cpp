@@ -17,7 +17,7 @@ const device_type STIC = &device_creator<stic_device>;
 //  stic_device - constructor
 //-------------------------------------------------
 
-stic_device::stic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+stic_device::stic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 				device_t(mconfig, STIC, "STIC (Standard Television Interface Chip) Video Chip", tag, owner, clock, "stic", __FILE__),
 				m_grom(*this, "grom"),
 				m_x_scale(1),

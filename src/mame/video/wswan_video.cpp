@@ -20,7 +20,7 @@
 const device_type WSWAN_VIDEO = &device_creator<wswan_video_device>;
 
 
-wswan_video_device::wswan_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+wswan_video_device::wswan_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, WSWAN_VIDEO, "Bandai WonderSwan VDP", tag, owner, clock, "wswan_video", __FILE__),
 					m_vdp_type(VDP_TYPE_WSWAN)
 {

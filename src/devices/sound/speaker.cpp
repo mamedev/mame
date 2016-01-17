@@ -83,7 +83,7 @@ static const int RATE_MULTIPLIER = 4;
 
 const device_type SPEAKER_SOUND = &device_creator<speaker_sound_device>;
 
-speaker_sound_device::speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+speaker_sound_device::speaker_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, SPEAKER_SOUND, "Filtered 1-bit DAC", tag, owner, clock, "speaker_sound", __FILE__),
 						device_sound_interface(mconfig, *this),
 						m_num_levels(2),

@@ -258,7 +258,7 @@ I can't tell ATM if units are seconds (even if values in tables seem very relate
 class tourvision_state : public pce_common_state
 {
 public:
-	tourvision_state(const machine_config &mconfig, device_type type, const char *tag)
+	tourvision_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pce_common_state(mconfig, type, tag),
 		m_subcpu(*this, "subcpu") { }
 

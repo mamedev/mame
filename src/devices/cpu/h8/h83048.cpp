@@ -8,7 +8,7 @@ const device_type H83045 = &device_creator<h83045_device>;
 const device_type H83047 = &device_creator<h83047_device>;
 const device_type H83048 = &device_creator<h83048_device>;
 
-h83048_device::h83048_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+h83048_device::h83048_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	h8h_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(h83048_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -34,7 +34,7 @@ h83048_device::h83048_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-h83048_device::h83048_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h83048_device::h83048_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	h8h_device(mconfig, H83048, "H8/3048", tag, owner, clock, "h83048", __FILE__, address_map_delegate(FUNC(h83048_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -61,19 +61,19 @@ h83048_device::h83048_device(const machine_config &mconfig, const char *tag, dev
 	ram_start = 0xffef10;
 }
 
-h83044_device::h83044_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h83044_device::h83044_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	h83048_device(mconfig, H83044, "H8/3044", tag, owner, clock, "h83044", __FILE__)
 {
 	ram_start = 0xfff710;
 }
 
-h83045_device::h83045_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h83045_device::h83045_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	h83048_device(mconfig, H83045, "H8/3045", tag, owner, clock, "h83045", __FILE__)
 {
 	ram_start = 0xfff710;
 }
 
-h83047_device::h83047_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h83047_device::h83047_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	h83048_device(mconfig, H83047, "H8/3047", tag, owner, clock, "h83047", __FILE__)
 {
 	ram_start = 0xffef10;
@@ -282,5 +282,5 @@ WRITE8_MEMBER(h83048_device::syscr_w)
 {
 	syscr = data;
 	update_irq_filter();
-	logerror("%s: syscr = %02x\n", tag(), data);
+	logerror("%s: syscr = %02x\n", tag().c_str(), data);
 }

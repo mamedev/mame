@@ -632,7 +632,7 @@ class subwoofer_device : public device_t,
 									public device_sound_interface
 {
 public:
-	subwoofer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	subwoofer_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~subwoofer_device() {}
 
 protected:
@@ -651,7 +651,7 @@ extern const device_type SUBWOOFER;
 
 const device_type SUBWOOFER = &device_creator<subwoofer_device>;
 
-subwoofer_device::subwoofer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+subwoofer_device::subwoofer_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SUBWOOFER, "Subwoofer", tag, owner, clock),
 		device_sound_interface(mconfig, *this)
 {

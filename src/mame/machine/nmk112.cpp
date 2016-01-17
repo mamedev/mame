@@ -19,11 +19,9 @@
 
 const device_type NMK112 = &device_creator<nmk112_device>;
 
-nmk112_device::nmk112_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nmk112_device::nmk112_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NMK112, "NMK112", tag, owner, clock, "nmk112", __FILE__),
 		m_page_mask(0xff),
-		m_tag0(nullptr),
-		m_tag1(nullptr),
 		m_rom0(nullptr),
 		m_rom1(nullptr),
 		m_size0(0),
@@ -40,12 +38,12 @@ void nmk112_device::device_start()
 	save_item(NAME(m_current_bank));
 	machine().save().register_postload(save_prepost_delegate(FUNC(nmk112_device::postload_bankswitch), this));
 
-	if (m_tag0)
+	if (!m_tag0.empty())
 	{
 		m_rom0 = machine().root_device().memregion(m_tag0)->base();
 		m_size0 = machine().root_device().memregion(m_tag0)->bytes() - 0x40000;
 	}
-	if (m_tag1)
+	if (!m_tag1.empty())
 	{
 		m_rom1 = machine().root_device().memregion(m_tag1)->base();
 		m_size1 = machine().root_device().memregion(m_tag1)->bytes() - 0x40000;

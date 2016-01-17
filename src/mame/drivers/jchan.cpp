@@ -165,7 +165,7 @@ JC-301-00  W11 9510K7059    23C16000        U85
 class jchan_state : public driver_device
 {
 public:
-	jchan_state(const machine_config &mconfig, device_type type, const char *tag)
+	jchan_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_subcpu(*this,"sub"),

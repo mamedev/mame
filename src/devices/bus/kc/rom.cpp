@@ -42,13 +42,13 @@ const device_type KC_M033     = &device_creator<kc_m033_device>;
 //  kc_8k_device - constructor
 //-------------------------------------------------
 
-kc_8k_device::kc_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+kc_8k_device::kc_8k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, KC_STANDARD, "Standard", tag, owner, clock, "kc_8k", __FILE__),
 		device_kcexp_interface( mconfig, *this ), m_slot(nullptr), m_mei(0), m_rom(nullptr), m_enabled(0), m_base(0)
 	{
 }
 
-kc_8k_device::kc_8k_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+kc_8k_device::kc_8k_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_kcexp_interface( mconfig, *this ), m_slot(nullptr), m_mei(0), m_rom(nullptr), m_enabled(0), m_base(0)
 	{
@@ -142,7 +142,7 @@ WRITE_LINE_MEMBER( kc_8k_device::mei_w )
 //  kc_m006_device - constructor
 //-------------------------------------------------
 
-kc_m006_device::kc_m006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+kc_m006_device::kc_m006_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: kc_8k_device(mconfig, KC_M006, "M006 BASIC", tag, owner, clock, "kc_m006", __FILE__)
 {
 }
@@ -184,7 +184,7 @@ void kc_m006_device::read(offs_t offset, UINT8 &data)
 //  kc_m033_device - constructor
 //-------------------------------------------------
 
-kc_m033_device::kc_m033_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+kc_m033_device::kc_m033_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: kc_8k_device(mconfig, KC_M033, "M033 TypeStar", tag, owner, clock, "kc_m033", __FILE__), m_bank(0)
 	{
 }

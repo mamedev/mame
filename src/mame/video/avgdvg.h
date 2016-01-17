@@ -25,9 +25,9 @@ class avgdvg_device : public device_t
 {
 public:
 	// construction/destruction
-	avgdvg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	avgdvg_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
-	static void static_set_vector_tag(device_t &device, const char *tag);
+	static void static_set_vector_tag(device_t &device, std::string tag);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(done_r);
 	DECLARE_WRITE8_MEMBER(go_w);
@@ -127,7 +127,7 @@ class dvg_device : public avgdvg_device
 {
 public:
 	// construction/destruction
-	dvg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dvg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void dvg_draw_to(int x, int y, int intensity);
 
@@ -154,8 +154,8 @@ class avg_device : public avgdvg_device
 {
 public:
 	// construction/destruction
-	avg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	avg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	avg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	avg_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	int avg_common_strobe1();
 	int avg_common_strobe2();
@@ -184,7 +184,7 @@ class avg_tempest_device : public avg_device
 {
 public:
 	// construction/destruction
-	avg_tempest_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	avg_tempest_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual int handler_6() override;
 	virtual int handler_7() override;
@@ -198,7 +198,7 @@ class avg_mhavoc_device : public avg_device
 {
 public:
 	// construction/destruction
-	avg_mhavoc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	avg_mhavoc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual int handler_1() override;
 	virtual int handler_6() override;
@@ -214,7 +214,7 @@ class avg_starwars_device : public avg_device
 {
 public:
 	// construction/destruction
-	avg_starwars_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	avg_starwars_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual int handler_6() override;
 	virtual int handler_7() override;
 	virtual void update_databus() override;
@@ -227,7 +227,7 @@ class avg_quantum_device : public avg_device
 {
 public:
 	// construction/destruction
-	avg_quantum_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	avg_quantum_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual int handler_0() override;
 	virtual int handler_1() override;
 	virtual int handler_2() override;
@@ -247,7 +247,7 @@ class avg_bzone_device : public avg_device
 {
 public:
 	// construction/destruction
-	avg_bzone_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	avg_bzone_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual int handler_1() override;
 	virtual int handler_6() override;
 	virtual int handler_7() override;
@@ -260,7 +260,7 @@ class avg_tomcat_device : public avg_device
 {
 public:
 	// construction/destruction
-	avg_tomcat_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	avg_tomcat_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual int handler_6() override;
 	virtual int handler_7() override;

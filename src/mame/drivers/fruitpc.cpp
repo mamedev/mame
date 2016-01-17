@@ -25,7 +25,7 @@
 class fruitpc_state : public pcat_base_state
 {
 public:
-	fruitpc_state(const machine_config &mconfig, device_type type, const char *tag)
+	fruitpc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pcat_base_state(mconfig, type, tag),
 			m_inp1(*this, "INP1"),
 			m_inp2(*this, "INP2"),

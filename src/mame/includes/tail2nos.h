@@ -11,7 +11,7 @@
 class tail2nos_state : public driver_device
 {
 public:
-	tail2nos_state(const machine_config &mconfig, device_type type, const char *tag)
+	tail2nos_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_txvideoram(*this, "txvideoram"),
 		m_spriteram(*this, "spriteram"),

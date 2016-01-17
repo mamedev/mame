@@ -31,7 +31,7 @@ public:
 	virtual int get_cart_type() { return m_cart_type; };
 
 
-	void rom_alloc(UINT32 size, const char *tag);
+	void rom_alloc(UINT32 size, std::string tag);
 	void bram_alloc(UINT32 size);
 	void dram0_alloc(UINT32 size);
 	void dram1_alloc(UINT32 size);
@@ -64,7 +64,7 @@ class sat_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	sat_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sat_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~sat_cart_slot_device();
 
 	// device-level overrides

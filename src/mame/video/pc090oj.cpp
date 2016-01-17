@@ -74,7 +74,7 @@ Taito pc090oj
 
 const device_type PC090OJ = &device_creator<pc090oj_device>;
 
-pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pc090oj_device::pc090oj_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PC090OJ, "Taito PC090OJ", tag, owner, clock, "pc090oj", __FILE__),
 	m_ctrl(0),
 	m_sprite_ctrl(0),
@@ -94,7 +94,7 @@ pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, d
 //  gfx decoder
 //-------------------------------------------------
 
-void pc090oj_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void pc090oj_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<pc090oj_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -104,7 +104,7 @@ void pc090oj_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 //  palette device
 //-------------------------------------------------
 
-void pc090oj_device::static_set_palette_tag(device_t &device, const char *tag)
+void pc090oj_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<pc090oj_device &>(device).m_palette.set_tag(tag);
 }

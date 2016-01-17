@@ -150,14 +150,14 @@ WRITE8_MEMBER( ym2612_device::write )
 
 const device_type YM2612 = &device_creator<ym2612_device>;
 
-ym2612_device::ym2612_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ym2612_device::ym2612_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YM2612, "YM2612", tag, owner, clock, "ym2612", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this)
 {
 }
 
-ym2612_device::ym2612_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+ym2612_device::ym2612_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this)
@@ -177,7 +177,7 @@ void ym2612_device::device_config_complete()
 
 const device_type YM3438 = &device_creator<ym3438_device>;
 
-ym3438_device::ym3438_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ym3438_device::ym3438_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: ym2612_device(mconfig, YM3438, "YM3438", tag, owner, clock, "ym3438", __FILE__)
 {
 }

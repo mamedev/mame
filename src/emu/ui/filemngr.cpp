@@ -130,7 +130,7 @@ void ui_menu_file_manager::populate()
 			for (device_image_interface *scan = subiterator.first(); scan != nullptr; scan = subiterator.next())
 			{
 				// if it is a children device, and not something further down the device tree, we want it in the menu!
-				if (strcmp(scan->device().owner()->tag(), dev->tag()) == 0)
+				if (scan->device().owner()->tag() == dev->tag())
 					if (devtags.insert(scan->device().tag()).second)
 					{
 						// check whether we already had some devices with the same owner: if not, output the owner tag!
@@ -140,7 +140,7 @@ void ui_menu_file_manager::populate()
 								first_entry = false;
 							else
 								item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-							strprintf(buffer, "[root%s]", dev->tag());
+							strprintf(buffer, "[root%s]", dev->tag().c_str());
 							item_append(buffer.c_str(), nullptr, 0, nullptr);
 							tag_appended = true;
 						}

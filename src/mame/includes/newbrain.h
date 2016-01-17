@@ -56,7 +56,7 @@
 class newbrain_state : public driver_device
 {
 public:
-	newbrain_state(const machine_config &mconfig, device_type type, const char *tag) :
+	newbrain_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_copcpu(*this, COP420_TAG),
@@ -206,7 +206,7 @@ protected:
 class newbrain_eim_state : public newbrain_state
 {
 public:
-	newbrain_eim_state(const machine_config &mconfig, device_type type, const char *tag)
+	newbrain_eim_state(const machine_config &mconfig, device_type type, std::string tag)
 		: newbrain_state(mconfig, type, tag),
 			m_fdccpu(*this, FDC_Z80_TAG),
 			m_ctc(*this, Z80CTC_TAG),

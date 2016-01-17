@@ -27,7 +27,7 @@ const device_type SMS_MULTITAP = &device_creator<sms_multitap_device>;
 //  sms_multitap_device - constructor
 //-------------------------------------------------
 
-sms_multitap_device::sms_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sms_multitap_device::sms_multitap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SMS_MULTITAP, "Sega SMS Multitap", tag, owner, clock, "sms_multitap", __FILE__),
 	device_sms_control_port_interface(mconfig, *this),
 	m_subctrl1_port(*this, "ctrl1"),

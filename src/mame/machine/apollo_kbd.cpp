@@ -61,7 +61,7 @@ const device_type APOLLO_KBD = &device_creator<apollo_kbd_device>;
 // apollo_kbd_device - constructor
 //-------------------------------------------------
 
-apollo_kbd_device::apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+apollo_kbd_device::apollo_kbd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, APOLLO_KBD, "Apollo Keyboard", tag, owner, clock, "apollo_kbd", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_tx_w(*this),
@@ -148,8 +148,8 @@ const char *apollo_kbd_device::cpu_context()
 	/* if we have an executing CPU, output data */
 	if (cpu != nullptr)
 	{
-		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag(),
-				cpu->safe_pcbase(), tag());
+		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag().c_str(),
+				cpu->safe_pcbase(), tag().c_str());
 	}
 	else
 	{

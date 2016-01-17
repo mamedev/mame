@@ -423,7 +423,7 @@ struct widget_data
 class seattle_state : public driver_device
 {
 public:
-	seattle_state(const machine_config &mconfig, device_type type, const char *tag)
+	seattle_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_nvram(*this, "nvram") ,
 		m_rambase(*this, "rambase"),

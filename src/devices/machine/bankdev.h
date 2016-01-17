@@ -25,7 +25,7 @@ class address_map_bank_device :
 {
 public:
 	// construction/destruction
-	address_map_bank_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock );
+	address_map_bank_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock );
 
 	// static configuration helpers
 	static void set_endianness(device_t &device, endianness_t endianness) { downcast<address_map_bank_device &>(device).m_endianness = endianness; }

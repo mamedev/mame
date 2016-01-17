@@ -26,7 +26,7 @@ const device_type COLECOVISION_STANDARD = &device_creator<colecovision_standard_
 //  colecovision_standard_cartridge_device - constructor
 //-------------------------------------------------
 
-colecovision_standard_cartridge_device::colecovision_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+colecovision_standard_cartridge_device::colecovision_standard_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COLECOVISION_STANDARD, "ColecoVision standard cartridge", tag, owner, clock, "colecovision_standard", __FILE__),
 	device_colecovision_cartridge_interface(mconfig, *this)
 {

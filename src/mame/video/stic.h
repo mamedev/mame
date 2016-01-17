@@ -476,7 +476,7 @@ class stic_device :  public device_t
 {
 public:
 	// construction/destruction
-	stic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	stic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~stic_device();
 
 	DECLARE_READ16_MEMBER(read);

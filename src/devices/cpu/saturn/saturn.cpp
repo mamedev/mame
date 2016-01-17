@@ -42,7 +42,7 @@
 const device_type SATURN = &device_creator<saturn_device>;
 
 
-saturn_device::saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+saturn_device::saturn_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SATURN, "HP Saturn", tag, owner, clock, "saturn_cpu", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
 	, m_out_func(*this)
@@ -325,7 +325,7 @@ void saturn_device::saturn_take_irq()
 	saturn_push(m_pc);
 	m_pc=IRQ_ADDRESS;
 
-	LOG(("Saturn '%s' takes IRQ ($%04x)\n", tag(), m_pc));
+	LOG(("Saturn '%s' takes IRQ ($%04x)\n", tag().c_str(), m_pc));
 
 	standard_irq_callback(SATURN_IRQ_LINE);
 }
@@ -366,7 +366,7 @@ void saturn_device::execute_set_input(int inputnum, int state)
 			m_nmi_state = state;
 			if ( state != CLEAR_LINE )
 			{
-				LOG(( "SATURN '%s' set_nmi_line(ASSERT)\n", tag()));
+				LOG(( "SATURN '%s' set_nmi_line(ASSERT)\n", tag().c_str()));
 				m_pending_irq = 1;
 			}
 			break;
@@ -376,7 +376,7 @@ void saturn_device::execute_set_input(int inputnum, int state)
 			m_irq_state = state;
 			if ( state != CLEAR_LINE && m_irq_enable )
 			{
-				LOG(( "SATURN '%s' set_irq_line(ASSERT)\n", tag()));
+				LOG(( "SATURN '%s' set_irq_line(ASSERT)\n", tag().c_str()));
 				m_pending_irq = 1;
 			}
 			break;
@@ -384,7 +384,7 @@ void saturn_device::execute_set_input(int inputnum, int state)
 		case SATURN_WAKEUP_LINE:
 			if (m_sleeping && state==1)
 			{
-				LOG(( "SATURN '%s' set_wakeup_line(ASSERT)\n", tag()));
+				LOG(( "SATURN '%s' set_wakeup_line(ASSERT)\n", tag().c_str()));
 				standard_irq_callback(SATURN_WAKEUP_LINE);
 				m_sleeping = 0;
 			}

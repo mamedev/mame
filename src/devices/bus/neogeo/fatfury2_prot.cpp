@@ -9,7 +9,7 @@
 extern const device_type FATFURY2_PROT = &device_creator<fatfury2_prot_device>;
 
 
-fatfury2_prot_device::fatfury2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+fatfury2_prot_device::fatfury2_prot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, FATFURY2_PROT, "NeoGeo Protection (Fatal Fury 2)", tag, owner, clock, "fatfury2_prot", __FILE__),
 	m_bankdev(nullptr),
 	m_fatfury2_prot_data(0)

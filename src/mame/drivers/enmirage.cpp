@@ -56,7 +56,7 @@
 class mirage_state : public driver_device
 {
 public:
-	mirage_state(const machine_config &mconfig, device_type type, const char *tag)
+	mirage_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_fdc(*this, "wd1772"),

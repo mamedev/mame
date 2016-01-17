@@ -79,7 +79,7 @@ class mc2661_device :  public device_t,
 {
 public:
 	// construction/destruction
-	mc2661_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc2661_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void static_set_rxc(device_t &device, int clock) { downcast<mc2661_device &>(device).m_rxc = clock; }
 	static void static_set_txc(device_t &device, int clock) { downcast<mc2661_device &>(device).m_txc = clock; }

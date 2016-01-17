@@ -124,7 +124,7 @@ private:
 class ti998_oso_device : public device_t
 {
 public:
-	ti998_oso_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti998_oso_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	void device_start() override;
@@ -145,7 +145,7 @@ private:
 class ti998_spsyn_device : public bus8z_device
 {
 public:
-	ti998_spsyn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti998_spsyn_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<ti998_spsyn_device &>(device).m_ready.set_callback(object); }
 
@@ -186,7 +186,7 @@ private:
 class mainboard8_device : public bus8z_device
 {
 public:
-	mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mainboard8_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<mainboard8_device &>(device).m_ready.set_callback(object); }
 

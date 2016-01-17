@@ -179,7 +179,7 @@ ROM_END
 //  pioneer_pr8210_device - constructor
 //-------------------------------------------------
 
-pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: laserdisc_device(mconfig, PIONEER_PR8210, "Pioneer PR-8210", tag, owner, clock, "pr8210", __FILE__),
 		m_control(0),
 		m_lastcommand(0),
@@ -195,7 +195,7 @@ pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, cons
 {
 }
 
-pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: laserdisc_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_control(0),
 		m_lastcommand(0),
@@ -889,7 +889,7 @@ ROM_END
 // simutrek_special_device - constructor
 //-------------------------------------------------
 
-simutrek_special_device::simutrek_special_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+simutrek_special_device::simutrek_special_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pioneer_pr8210_device(mconfig, SIMUTREK_SPECIAL, "Simutrek Modified PR-8210", tag, owner, clock, "simutrek", __FILE__),
 		m_i8748_cpu(*this, "simutrek"),
 		m_audio_squelch(0),

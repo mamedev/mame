@@ -72,12 +72,12 @@ class device_missing_dependencies : public emu_exception { };
 
 
 // a device_type is simply a pointer to its alloc function
-typedef device_t *(*device_type)(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+typedef device_t *(*device_type)(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 
 // this template function creates a stub which constructs a device
 template<class _DeviceClass>
-device_t *device_creator(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+device_t *device_creator(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 {
 	return global_alloc_clear<_DeviceClass>(mconfig, tag, owner, clock);
 }
@@ -105,19 +105,19 @@ class device_t : public delegate_late_bind
 
 protected:
 	// construction/destruction
-	device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	device_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 public:
 	virtual ~device_t();
 
 	// getters
 	running_machine &machine() const { /*assert(m_machine != NULL);*/ return *m_machine; }
-	const char *tag() const { return m_tag.c_str(); }
-	const char *basetag() const { return m_basetag.c_str(); }
+	std::string tag() const { return m_tag; }
+	std::string basetag() const { return m_basetag; }
 	device_type type() const { return m_type; }
-	const char *name() const { return m_name.c_str(); }
-	const char *shortname() const { return m_shortname.c_str(); }
-	const char *searchpath() const { return m_searchpath.c_str(); }
-	const char *source() const { return m_source.c_str(); }
+	std::string name() const { return m_name; }
+	std::string shortname() const { return m_shortname; }
+	std::string searchpath() const { return m_searchpath; }
+	std::string source() const { return m_source; }
 	device_t *owner() const { return m_owner; }
 	device_t *next() const { return m_next; }
 	UINT32 configured_clock() const { return m_configured_clock; }
@@ -130,7 +130,7 @@ public:
 	UINT8 default_bios() const { return m_default_bios; }
 	UINT8 system_bios() const { return m_system_bios; }
 	std::string default_bios_tag() const { return m_default_bios_tag; }
-	std::string parameter(const char *tag) const;
+	std::string parameter(std::string tag) const;
 
 	// interface helpers
 	device_interface *first_interface() const { return m_interface_list; }
@@ -150,23 +150,23 @@ public:
 
 	// owned object helpers
 	device_t *first_subdevice() const { return m_subdevice_list.first(); }
-	std::string subtag(const char *tag) const;
-	std::string siblingtag(const char *tag) const { return (this != nullptr && m_owner != nullptr) ? m_owner->subtag(tag) : std::string(tag); }
-	memory_region *memregion(const char *tag) const;
-	memory_share *memshare(const char *tag) const;
-	memory_bank *membank(const char *tag) const;
-	ioport_port *ioport(const char *tag) const;
-	device_t *subdevice(const char *tag) const;
-	device_t *siblingdevice(const char *tag) const;
-	template<class _DeviceClass> inline _DeviceClass *subdevice(const char *tag) const { return downcast<_DeviceClass *>(subdevice(tag)); }
-	template<class _DeviceClass> inline _DeviceClass *siblingdevice(const char *tag) const { return downcast<_DeviceClass *>(siblingdevice(tag)); }
+	std::string subtag(std::string tag) const;
+	std::string siblingtag(std::string tag) const { return m_owner != nullptr ? m_owner->subtag(tag) : tag; }
+	memory_region *memregion(std::string tag) const;
+	memory_share *memshare(std::string tag) const;
+	memory_bank *membank(std::string tag) const;
+	ioport_port *ioport(std::string tag) const;
+	device_t *subdevice(std::string tag) const;
+	device_t *siblingdevice(std::string tag) const;
+	template<class _DeviceClass> inline _DeviceClass *subdevice(std::string tag) const { return downcast<_DeviceClass *>(subdevice(tag)); }
+	template<class _DeviceClass> inline _DeviceClass *siblingdevice(std::string tag) const { return downcast<_DeviceClass *>(siblingdevice(tag)); }
 	memory_region *region() const { return m_region; }
 
 	// configuration helpers
 	static void static_set_clock(device_t &device, UINT32 clock);
 	static void static_set_static_config(device_t &device, const void *config) { device.m_static_config = config; }
 	static void static_set_input_default(device_t &device, const input_device_default *config) { device.m_input_defaults = config; }
-	static void static_set_default_bios_tag(device_t &device, const char *tag) { std::string default_bios_tag(tag); device.m_default_bios_tag = default_bios_tag; }
+	static void static_set_default_bios_tag(device_t &device, std::string tag) { std::string default_bios_tag(tag); device.m_default_bios_tag = default_bios_tag; }
 
 	// state helpers
 	void config_complete();
@@ -192,9 +192,9 @@ public:
 
 	// state saving interfaces
 	template<typename _ItemType>
-	void ATTR_COLD save_item(_ItemType &value, const char *valname, int index = 0) { assert(m_save != nullptr); m_save->save_item(this, name(), tag(), index, value, valname); }
+	void ATTR_COLD save_item(_ItemType &value, std::string valname, int index = 0) { assert(m_save != nullptr); m_save->save_item(this, name(), tag(), index, value, valname); }
 	template<typename _ItemType>
-	void ATTR_COLD save_pointer(_ItemType *value, const char *valname, UINT32 count, int index = 0) { assert(m_save != nullptr); m_save->save_pointer(this, name(), tag(), index, value, valname, count); }
+	void ATTR_COLD save_pointer(_ItemType *value, std::string valname, UINT32 count, int index = 0) { assert(m_save != nullptr); m_save->save_pointer(this, name(), tag(), index, value, valname, count); }
 
 	// debugging
 	device_debug *debug() const { return m_debug.get(); }
@@ -206,8 +206,8 @@ public:
 	bool findit(bool isvalidation = false) const;
 
 	// misc
-	void popmessage(const char *format, ...) const;
-	void logerror(const char *format, ...) const;
+	void popmessage(const char *format, ...) const ATTR_PRINTF(2,3);
+	void logerror(const char *format, ...) const ATTR_PRINTF(2,3);
 	void vlogerror(const char *format, va_list args) const;
 
 protected:
@@ -279,10 +279,10 @@ protected:
 
 private:
 	// private helpers
-	device_t *add_subdevice(device_type type, const char *tag, UINT32 clock);
-	device_t *replace_subdevice(device_t &old, device_type type, const char *tag, UINT32 clock);
+	device_t *add_subdevice(device_type type, std::string tag, UINT32 clock);
+	device_t *replace_subdevice(device_t &old, device_type type, std::string tag, UINT32 clock);
 	void remove_subdevice(device_t &device);
-	device_t *subdevice_slow(const char *tag) const;
+	device_t *subdevice_slow(std::string tag) const;
 
 	// private state; accessor use required
 	running_machine *       m_machine;
@@ -587,14 +587,10 @@ private:
 //  name relative to this device
 //-------------------------------------------------
 
-inline device_t *device_t::subdevice(const char *tag) const
+inline device_t *device_t::subdevice(std::string tag) const
 {
-	// safety first
-	if (this == nullptr)
-		return nullptr;
-
-	// empty string or NULL means this device
-	if (tag == nullptr || *tag == 0)
+	// empty string means this device
+	if (tag.empty())
 		return const_cast<device_t *>(this);
 
 	// do a quick lookup and return that if possible
@@ -608,18 +604,14 @@ inline device_t *device_t::subdevice(const char *tag) const
 //  by name relative to this device's parent
 //-------------------------------------------------
 
-inline device_t *device_t::siblingdevice(const char *tag) const
+inline device_t *device_t::siblingdevice(std::string tag) const
 {
-	// safety first
-	if (this == nullptr)
-		return nullptr;
-
 	// empty string or NULL means this device
-	if (tag == nullptr || *tag == 0)
+	if (tag.empty())
 		return const_cast<device_t *>(this);
 
 	// leading caret implies the owner, just skip it
-	if (tag[0] == '^') tag++;
+	if (tag[0] == '^') tag.erase(0, 1);
 
 	// query relative to the parent, if we have one
 	if (m_owner != nullptr)

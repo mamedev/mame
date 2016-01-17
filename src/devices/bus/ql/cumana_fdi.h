@@ -26,7 +26,7 @@ class cumana_floppy_disk_interface_t : public device_t,
 {
 public:
 	// construction/destruction
-	cumana_floppy_disk_interface_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cumana_floppy_disk_interface_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;

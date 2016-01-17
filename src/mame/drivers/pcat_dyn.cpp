@@ -38,7 +38,7 @@ keyboard trick;
 class pcat_dyn_state : public pcat_base_state
 {
 public:
-	pcat_dyn_state(const machine_config &mconfig, device_type type, const char *tag)
+	pcat_dyn_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pcat_base_state(mconfig, type, tag) { }
 
 	DECLARE_DRIVER_INIT(pcat_dyn);

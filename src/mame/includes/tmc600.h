@@ -25,7 +25,7 @@
 class tmc600_state : public driver_device
 {
 public:
-	tmc600_state(const machine_config &mconfig, device_type type, const char *tag)
+	tmc600_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
 			m_vis(*this, CDP1869_TAG),

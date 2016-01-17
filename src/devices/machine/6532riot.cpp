@@ -386,7 +386,7 @@ UINT8 riot6532_device::portb_out_get()
 //  riot6532_device - constructor
 //-------------------------------------------------
 
-riot6532_device::riot6532_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+riot6532_device::riot6532_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RIOT6532, "6532 RIOT", tag, owner, clock, "riot6532", __FILE__),
 		m_in_pa_cb(*this),
 		m_out_pa_cb(*this),

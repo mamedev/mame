@@ -15,8 +15,8 @@ class a78_xboard_device : public a78_rom_device
 {
 public:
 	// construction/destruction
-	a78_xboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	a78_xboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a78_xboard_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	a78_xboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -42,7 +42,7 @@ class a78_xm_device : public a78_xboard_device
 {
 public:
 	// construction/destruction
-	a78_xm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a78_xm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

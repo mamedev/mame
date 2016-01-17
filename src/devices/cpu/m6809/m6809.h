@@ -32,7 +32,7 @@ class m6809_base_device : public cpu_device
 {
 public:
 	// construction/destruction
-	m6809_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, int divider, const char *shortname, const char *source);
+	m6809_base_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock, const device_type type, int divider, std::string shortname, std::string source);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_line );
 	DECLARE_WRITE_LINE_MEMBER( firq_line );
@@ -285,7 +285,7 @@ class m6809_device : public m6809_base_device
 {
 public:
 	// construction/destruction
-	m6809_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m6809_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 // ======================> m6809e_device
@@ -298,7 +298,7 @@ class m6809e_device : public m6809_base_device
 {
 public:
 	// construction/destruction
-	m6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m6809e_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_lic_cb(device_t &device, _Object object) { return downcast<m6809e_device &>(device).m_lic_func.set_callback(object); }

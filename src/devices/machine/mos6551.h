@@ -52,7 +52,7 @@
 class mos6551_device : public device_t
 {
 public:
-	mos6551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos6551_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void set_xtal(device_t &device, UINT32 xtal) { downcast<mos6551_device &>(device).set_xtal(xtal); }
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<mos6551_device &>(device).m_irq_handler.set_callback(object); }

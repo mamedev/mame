@@ -138,7 +138,7 @@ class laserdisc_device :    public device_t,
 {
 protected:
 	// construction/destruction
-	laserdisc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	laserdisc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	virtual ~laserdisc_device();
 
 public:
@@ -169,7 +169,7 @@ public:
 	static void static_set_overlay_clip(device_t &device, INT32 minx, INT32 maxx, INT32 miny, INT32 maxy);
 	static void static_set_overlay_position(device_t &device, float posx, float posy);
 	static void static_set_overlay_scale(device_t &device, float scalex, float scaley);
-	static void static_set_overlay_palette(device_t &device, const char *tag);
+	static void static_set_overlay_palette(device_t &device, std::string tag);
 
 protected:
 	// timer IDs

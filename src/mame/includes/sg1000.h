@@ -43,7 +43,7 @@ public:
 		TIMER_LIGHTGUN_TICK
 	};
 
-	sg1000_state(const machine_config &mconfig, device_type type, const char *tag)
+	sg1000_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_ram(*this, RAM_TAG),
@@ -73,7 +73,7 @@ public:
 class sc3000_state : public sg1000_state
 {
 public:
-	sc3000_state(const machine_config &mconfig, device_type type, const char *tag)
+	sc3000_state(const machine_config &mconfig, device_type type, std::string tag)
 		: sg1000_state(mconfig, type, tag),
 			m_cassette(*this, "cassette"),
 			m_pa0(*this, "PA0"),
@@ -124,7 +124,7 @@ public:
 class sf7000_state : public sc3000_state
 {
 public:
-	sf7000_state(const machine_config &mconfig, device_type type, const char *tag)
+	sf7000_state(const machine_config &mconfig, device_type type, std::string tag)
 		: sc3000_state(mconfig, type, tag),
 			m_fdc(*this, UPD765_TAG),
 			m_centronics(*this, CENTRONICS_TAG),

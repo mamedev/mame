@@ -115,7 +115,7 @@ Eproms are 27512,27010,274001
 class multigam_state : public driver_device
 {
 public:
-	multigam_state(const machine_config &mconfig, device_type type, const char *tag)
+	multigam_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ppu(*this, "ppu") { }

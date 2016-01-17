@@ -10,7 +10,7 @@
 class firetrap_state : public driver_device
 {
 public:
-	firetrap_state(const machine_config &mconfig, device_type type, const char *tag)
+	firetrap_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_bg1videoram(*this, "bg1videoram"),
 		m_bg2videoram(*this, "bg2videoram"),

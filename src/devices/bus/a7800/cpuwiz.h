@@ -13,8 +13,8 @@ class a78_versaboard_device : public a78_rom_sg_device
 {
 public:
 	// construction/destruction
-	a78_versaboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	a78_versaboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a78_versaboard_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	a78_versaboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -35,7 +35,7 @@ class a78_megacart_device : public a78_versaboard_device
 {
 public:
 	// construction/destruction
-	a78_megacart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a78_megacart_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
@@ -50,7 +50,7 @@ class a78_rom_p450_vb_device : public a78_versaboard_device
 {
 public:
 	// construction/destruction
-	a78_rom_p450_vb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a78_rom_p450_vb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

@@ -55,7 +55,7 @@ machine_config_constructor akiko_device::device_mconfig_additions() const
 //  akiko_device - constructor
 //-------------------------------------------------
 
-akiko_device::akiko_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+akiko_device::akiko_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AKIKO, "CBM AKIKO", tag, owner, clock, "akiko", __FILE__),
 	m_c2p_input_index(0),
 	m_c2p_output_index(0),
@@ -103,7 +103,7 @@ akiko_device::akiko_device(const machine_config &mconfig, const char *tag, devic
 //  set_cputag - set cpu tag for cpu we working on
 //-------------------------------------------------
 
-void akiko_device::set_cputag(device_t &device, const char *tag)
+void akiko_device::set_cputag(device_t &device, std::string tag)
 {
 	akiko_device &akiko = downcast<akiko_device &>(device);
 	akiko.m_cputag = tag;

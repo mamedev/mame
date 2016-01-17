@@ -27,7 +27,7 @@ extern const device_type HANDSET;
 class ti99_handset_device : public joyport_attached_device
 {
 public:
-	ti99_handset_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti99_handset_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	UINT8 read_dev() override;
 	void  write_dev(UINT8 data) override;
@@ -72,7 +72,7 @@ extern const device_type TI99_JOYSTICK;
 class ti99_twin_joystick : public joyport_attached_device
 {
 public:
-	ti99_twin_joystick(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti99_twin_joystick(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual void device_start(void) override;
 
 	UINT8 read_dev() override;

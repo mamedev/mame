@@ -21,7 +21,7 @@
 
 const device_type TIMEPLT_AUDIO = &device_creator<timeplt_audio_device>;
 
-timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TIMEPLT_AUDIO, "Time Pilot Audio", tag, owner, clock, "timeplt_audio", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_last_irq_state(0)

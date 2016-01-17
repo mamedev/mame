@@ -164,7 +164,7 @@ static ADDRESS_MAP_START(kb_io_map , AS_IO , 8 , imds2_state)
 	AM_RANGE(MCS48_PORT_T1 , MCS48_PORT_T1) AM_READ(imds2_kb_port_t1_r)
 ADDRESS_MAP_END
 
-imds2_state::imds2_state(const machine_config &mconfig, device_type type, const char *tag)
+imds2_state::imds2_state(const machine_config &mconfig, device_type type, std::string tag)
 	: driver_device(mconfig , type , tag),
 	m_ipccpu(*this , "ipccpu"),
 	m_ipcsyspic(*this , "ipcsyspic"),

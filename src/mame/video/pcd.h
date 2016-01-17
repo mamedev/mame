@@ -14,7 +14,7 @@
 class pcdx_video_device : public device_t
 {
 public:
-	pcdx_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	pcdx_video_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	virtual DECLARE_ADDRESS_MAP(map, 16) = 0;
 	DECLARE_READ8_MEMBER(detect_r);
@@ -33,7 +33,7 @@ protected:
 class pcd_video_device : public pcdx_video_device
 {
 public:
-	pcd_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pcd_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 16) override;
 	DECLARE_WRITE8_MEMBER(vram_sw_w);
@@ -78,7 +78,7 @@ class pcx_video_device : public pcdx_video_device,
 							public device_serial_interface
 {
 public:
-	pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pcx_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<pcx_video_device &>(device).m_txd_handler.set_callback(object); }
 
 	virtual DECLARE_ADDRESS_MAP(map, 16) override;

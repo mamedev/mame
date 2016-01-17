@@ -2296,7 +2296,7 @@ const device_type M68K = &device_creator<m68000_base_device>;
 //  h6280_device - constructor
 //-------------------------------------------------
 
-m68000_base_device::m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m68000_base_device::m68000_base_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, M68K, "M68K", tag, owner, clock, "m68k", __FILE__),
 		m_program_config("program", ENDIANNESS_BIG, 16, 24),
 		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, 16, 24)
@@ -2307,8 +2307,8 @@ m68000_base_device::m68000_base_device(const machine_config &mconfig, const char
 
 
 
-m68000_base_device::m68000_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
-										const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source)
+m68000_base_device::m68000_base_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock,
+										const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map),
 		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map)
@@ -2317,8 +2317,8 @@ m68000_base_device::m68000_base_device(const machine_config &mconfig, const char
 }
 
 
-m68000_base_device::m68000_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
-										const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, const char *shortname, const char *source)
+m68000_base_device::m68000_base_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock,
+										const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits),
 		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits)
@@ -2533,12 +2533,12 @@ const device_type SCC68070 = &device_creator<scc68070_device>;
 const device_type FSCPU32 = &device_creator<fscpu32_device>;
 const device_type MCF5206E = &device_creator<mcf5206e_device>;
 
-m68000_device::m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m68000_device::m68000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: m68000_base_device(mconfig, "M68000", tag, owner, clock, M68000, 16,24, "m68000", __FILE__)
 {
 }
 
-m68000_device::m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+m68000_device::m68000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: m68000_base_device(mconfig, "M68000", tag, owner, clock, M68000, 16,24, shortname, source)
 {
 }
@@ -2548,8 +2548,8 @@ void m68000_device::device_start()
 	init_cpu_m68000();
 }
 
-m68000_device::m68000_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
-										const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source)
+m68000_device::m68000_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock,
+										const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, std::string shortname, std::string source)
 	: m68000_base_device(mconfig, name, tag, owner, clock, type, prg_data_width, prg_address_bits, internal_map, shortname, source)
 {
 }
@@ -2558,7 +2558,7 @@ m68000_device::m68000_device(const machine_config &mconfig, const char *name, co
 
 
 
-m68301_device::m68301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m68301_device::m68301_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: m68000_base_device(mconfig, "M68301", tag, owner, clock, M68301, 16,24, "m68301", __FILE__)
 {
 }
@@ -2576,7 +2576,7 @@ void m68301_device::device_start()
 
 /* m68008_device */
 
-m68008_device::m68008_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m68008_device::m68008_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: m68000_base_device(mconfig, "M68008", tag, owner, clock, M68008, 8,20, "m68008", __FILE__)
 {
 }
@@ -2587,7 +2587,7 @@ void m68008_device::device_start()
 }
 
 
-m68008plcc_device::m68008plcc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m68008plcc_device::m68008plcc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: m68000_base_device(mconfig, "M68008PLCC", tag, owner, clock, M68008, 8,22, "m68008plcc", __FILE__)
 {
 }
@@ -2599,7 +2599,7 @@ void m68008plcc_device::device_start()
 
 
 
-m68010_device::m68010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m68010_device::m68010_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: m68000_base_device(mconfig, "M68010", tag, owner, clock, M68010, 16,24, "m68010", __FILE__)
 {
 }
@@ -2611,7 +2611,7 @@ void m68010_device::device_start()
 
 
 
-m68020_device::m68020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m68020_device::m68020_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: m68000_base_device(mconfig, "M68020", tag, owner, clock, M68020, 32,32, "m68020", __FILE__)
 {
 }
@@ -2622,7 +2622,7 @@ void m68020_device::device_start()
 }
 
 
-m68020fpu_device::m68020fpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m68020fpu_device::m68020fpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: m68000_base_device(mconfig, "M68020FPU", tag, owner, clock, M68020, 32,32, "m68020fpu", __FILE__)
 {
 }
@@ -2633,7 +2633,7 @@ void m68020fpu_device::device_start()
 }
 
 // 68020 with 68851 PMMU
-m68020pmmu_device::m68020pmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m68020pmmu_device::m68020pmmu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: m68000_base_device(mconfig, "M68020PMMU", tag, owner, clock, M68020PMMU, 32,32, "m68020pmmu", __FILE__)
 {
 }
@@ -2659,7 +2659,7 @@ bool m68020hmmu_device::memory_translate(address_spacenum space, int intention, 
 
 // 68020 with Apple HMMU & 68881 FPU
 //      case CPUINFO_FCT_TRANSLATE: info->translate = CPU_TRANSLATE_NAME(m68khmmu);     break;
-m68020hmmu_device::m68020hmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m68020hmmu_device::m68020hmmu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: m68000_base_device(mconfig, "M68020HMMU", tag, owner, clock, M68020HMMU, 32,32, "m68020hmmu", __FILE__)
 {
 }
@@ -2670,7 +2670,7 @@ void m68020hmmu_device::device_start()
 }
 
 
-m68ec020_device::m68ec020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m68ec020_device::m68ec020_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: m68000_base_device(mconfig, "M68EC020", tag, owner, clock, M68EC020, 32,24, "m68ec020", __FILE__)
 {
 }
@@ -2680,7 +2680,7 @@ void m68ec020_device::device_start()
 	init_cpu_m68ec020();
 }
 
-m68030_device::m68030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m68030_device::m68030_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: m68000_base_device(mconfig, "M68030", tag, owner, clock, M68030, 32,32, "m68030", __FILE__)
 {
 }
@@ -2690,7 +2690,7 @@ void m68030_device::device_start()
 	init_cpu_m68030();
 }
 
-m68ec030_device::m68ec030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m68ec030_device::m68ec030_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: m68000_base_device(mconfig, "M68EC030", tag, owner, clock, M68EC030, 32,32, "m68ec030", __FILE__)
 {
 }
@@ -2700,7 +2700,7 @@ void m68ec030_device::device_start()
 	init_cpu_m68ec030();
 }
 
-m68040_device::m68040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m68040_device::m68040_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: m68000_base_device(mconfig, "M68040", tag, owner, clock, M68040, 32,32, "m68040", __FILE__)
 {
 }
@@ -2713,7 +2713,7 @@ void m68040_device::device_start()
 
 
 
-m68ec040_device::m68ec040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m68ec040_device::m68ec040_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: m68000_base_device(mconfig, "M68EC040", tag, owner, clock, M68EC040, 32,32, "m68ec040", __FILE__)
 {
 }
@@ -2725,7 +2725,7 @@ void m68ec040_device::device_start()
 
 
 
-m68lc040_device::m68lc040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m68lc040_device::m68lc040_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: m68000_base_device(mconfig, "M68LC040", tag, owner, clock, M68LC040, 32,32, "m68lc040", __FILE__)
 {
 }
@@ -2736,7 +2736,7 @@ void m68lc040_device::device_start()
 }
 
 
-scc68070_device::scc68070_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+scc68070_device::scc68070_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: m68000_base_device(mconfig, "SCC68070", tag, owner, clock, SCC68070, 16,32, "scc68070", __FILE__)
 {
 }
@@ -2747,13 +2747,13 @@ void scc68070_device::device_start()
 }
 
 
-fscpu32_device::fscpu32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+fscpu32_device::fscpu32_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: m68000_base_device(mconfig, "Freescale CPU32 Core", tag, owner, clock, FSCPU32, 32,32, "fscpu32", __FILE__)
 {
 }
 
-fscpu32_device::fscpu32_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
-										const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source)
+fscpu32_device::fscpu32_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock,
+										const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, std::string shortname, std::string source)
 	: m68000_base_device(mconfig, name, tag, owner, clock, type, prg_data_width, prg_address_bits, internal_map, shortname, source)
 {
 }
@@ -2766,7 +2766,7 @@ void fscpu32_device::device_start()
 
 
 
-mcf5206e_device::mcf5206e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mcf5206e_device::mcf5206e_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: m68000_base_device(mconfig, "MCF5206E", tag, owner, clock, MCF5206E, 32,32, "mcf5206e", __FILE__)
 {
 }

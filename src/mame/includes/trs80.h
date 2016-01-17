@@ -26,7 +26,7 @@
 class trs80_state : public driver_device
 {
 public:
-	trs80_state(const machine_config &mconfig, device_type type, const char *tag)
+	trs80_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_centronics(*this, "centronics"),

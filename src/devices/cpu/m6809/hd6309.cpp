@@ -127,7 +127,7 @@ const device_type HD6309 = &device_creator<hd6309_device>;
 //  hd6309_device - constructor
 //-------------------------------------------------
 
-hd6309_device::hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+hd6309_device::hd6309_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	m6809_base_device(mconfig, "HD6309", tag, owner, clock, HD6309, 4, "hd6309", __FILE__),
 	m_md(0),
 	m_temp_im(0)

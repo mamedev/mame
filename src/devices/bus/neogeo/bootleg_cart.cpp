@@ -18,7 +18,7 @@
 const device_type NEOGEO_BOOTLEG_CART = &device_creator<neogeo_bootleg_cart>;
 
 
-neogeo_bootleg_cart::neogeo_bootleg_cart(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT16 clock, const char *shortname, const char *source)
+neogeo_bootleg_cart::neogeo_bootleg_cart(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT16 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_neogeo_cart_interface(mconfig, *this),
 	m_banked_cart(*this, "banked_cart"),
@@ -27,7 +27,7 @@ neogeo_bootleg_cart::neogeo_bootleg_cart(const machine_config &mconfig, device_t
 {
 }
 
-neogeo_bootleg_cart::neogeo_bootleg_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock)
+neogeo_bootleg_cart::neogeo_bootleg_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT16 clock)
 	: device_t(mconfig, NEOGEO_BOOTLEG_CART, "NEOGEO Bootleg Cart", tag, owner, clock, "neogeo_rom", __FILE__),
 	device_neogeo_cart_interface(mconfig, *this),
 	m_banked_cart(*this, "banked_cart"),
@@ -79,7 +79,7 @@ machine_config_constructor neogeo_bootleg_cart::device_mconfig_additions() const
 
 const device_type NEOGEO_BOOTLEG_GAROUBL_CART = &device_creator<neogeo_bootleg_garoubl_cart>;
 
-neogeo_bootleg_garoubl_cart::neogeo_bootleg_garoubl_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_GAROUBL_CART, "NEOGEO BOOT garoubl Cart", tag, owner, clock, "boot_garoubl_cart", __FILE__) {}
+neogeo_bootleg_garoubl_cart::neogeo_bootleg_garoubl_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_GAROUBL_CART, "NEOGEO BOOT garoubl Cart", tag, owner, clock, "boot_garoubl_cart", __FILE__) {}
 
 void neogeo_bootleg_garoubl_cart::activate_cart(ACTIVATE_CART_PARAMS)
 {
@@ -99,7 +99,7 @@ void neogeo_bootleg_garoubl_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_BOOTLEG_CTHD2003_CART = &device_creator<neogeo_bootleg_cthd2003_cart>;
 
-neogeo_bootleg_cthd2003_cart::neogeo_bootleg_cthd2003_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_CTHD2003_CART, "NEOGEO BOOT cthd2003 Cart", tag, owner, clock, "boot_cthd2003_cart", __FILE__) {}
+neogeo_bootleg_cthd2003_cart::neogeo_bootleg_cthd2003_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_CTHD2003_CART, "NEOGEO BOOT cthd2003 Cart", tag, owner, clock, "boot_cthd2003_cart", __FILE__) {}
 
 void neogeo_bootleg_cthd2003_cart::activate_cart(ACTIVATE_CART_PARAMS)
 {
@@ -116,7 +116,7 @@ void neogeo_bootleg_cthd2003_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_BOOTLEG_CT2K3SP_CART = &device_creator<neogeo_bootleg_ct2k3sp_cart>;
 
-neogeo_bootleg_ct2k3sp_cart::neogeo_bootleg_ct2k3sp_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_CT2K3SP_CART, "NEOGEO BOOT ct2k3sp Cart", tag, owner, clock, "boot_ct2k3sp_cart", __FILE__) {}
+neogeo_bootleg_ct2k3sp_cart::neogeo_bootleg_ct2k3sp_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_CT2K3SP_CART, "NEOGEO BOOT ct2k3sp Cart", tag, owner, clock, "boot_ct2k3sp_cart", __FILE__) {}
 
 void neogeo_bootleg_ct2k3sp_cart::activate_cart(ACTIVATE_CART_PARAMS)
 {
@@ -133,7 +133,7 @@ void neogeo_bootleg_ct2k3sp_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_BOOTLEG_CT2K3SA_CART = &device_creator<neogeo_bootleg_ct2k3sa_cart>;
 
-neogeo_bootleg_ct2k3sa_cart::neogeo_bootleg_ct2k3sa_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_CT2K3SA_CART, "NEOGEO BOOT ct2k3sa Cart", tag, owner, clock, "boot_ct2k3sa_cart", __FILE__) {}
+neogeo_bootleg_ct2k3sa_cart::neogeo_bootleg_ct2k3sa_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_CT2K3SA_CART, "NEOGEO BOOT ct2k3sa Cart", tag, owner, clock, "boot_ct2k3sa_cart", __FILE__) {}
 
 void neogeo_bootleg_ct2k3sa_cart::activate_cart(ACTIVATE_CART_PARAMS)
 {
@@ -152,7 +152,7 @@ void neogeo_bootleg_ct2k3sa_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_BOOTLEG_KF10THEP_CART = &device_creator<neogeo_bootleg_kf10thep_cart>;
 
-neogeo_bootleg_kf10thep_cart::neogeo_bootleg_kf10thep_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_KF10THEP_CART, "NEOGEO BOOT kf10thep Cart", tag, owner, clock, "boot_kf10thep_cart", __FILE__) {}
+neogeo_bootleg_kf10thep_cart::neogeo_bootleg_kf10thep_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_KF10THEP_CART, "NEOGEO BOOT kf10thep Cart", tag, owner, clock, "boot_kf10thep_cart", __FILE__) {}
 
 void neogeo_bootleg_kf10thep_cart::activate_cart(ACTIVATE_CART_PARAMS)
 {
@@ -173,7 +173,7 @@ void neogeo_bootleg_kf10thep_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_BOOTLEG_KF2K5UNI_CART = &device_creator<neogeo_bootleg_kf2k5uni_cart>;
 
-neogeo_bootleg_kf2k5uni_cart::neogeo_bootleg_kf2k5uni_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_KF2K5UNI_CART, "NEOGEO BOOT kf2k5uni Cart", tag, owner, clock, "boot_kf2k5uni_cart", __FILE__) {}
+neogeo_bootleg_kf2k5uni_cart::neogeo_bootleg_kf2k5uni_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_KF2K5UNI_CART, "NEOGEO BOOT kf2k5uni Cart", tag, owner, clock, "boot_kf2k5uni_cart", __FILE__) {}
 
 void neogeo_bootleg_kf2k5uni_cart::activate_cart(ACTIVATE_CART_PARAMS)
 {
@@ -193,7 +193,7 @@ void neogeo_bootleg_kf2k5uni_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_BOOTLEG_KF2K4SE_CART = &device_creator<neogeo_bootleg_kf2k4se_cart>;
 
-neogeo_bootleg_kf2k4se_cart::neogeo_bootleg_kf2k4se_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_KF2K4SE_CART, "NEOGEO BOOT kf2k4se Cart", tag, owner, clock, "boot_kf2k4se_cart", __FILE__) {}
+neogeo_bootleg_kf2k4se_cart::neogeo_bootleg_kf2k4se_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_KF2K4SE_CART, "NEOGEO BOOT kf2k4se Cart", tag, owner, clock, "boot_kf2k4se_cart", __FILE__) {}
 
 void neogeo_bootleg_kf2k4se_cart::activate_cart(ACTIVATE_CART_PARAMS)
 {
@@ -214,7 +214,7 @@ void neogeo_bootleg_kf2k4se_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_BOOTLEG_SVCPLUS_CART = &device_creator<neogeo_bootleg_svcplus_cart>;
 
-neogeo_bootleg_svcplus_cart::neogeo_bootleg_svcplus_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_SVCPLUS_CART, "NEOGEO BOOT svcplus Cart", tag, owner, clock, "boot_svcplus_cart", __FILE__) {}
+neogeo_bootleg_svcplus_cart::neogeo_bootleg_svcplus_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_SVCPLUS_CART, "NEOGEO BOOT svcplus Cart", tag, owner, clock, "boot_svcplus_cart", __FILE__) {}
 
 void neogeo_bootleg_svcplus_cart::activate_cart(ACTIVATE_CART_PARAMS)
 {
@@ -237,7 +237,7 @@ void neogeo_bootleg_svcplus_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_BOOTLEG_SVCPLUSA_CART = &device_creator<neogeo_bootleg_svcplusa_cart>;
 
-neogeo_bootleg_svcplusa_cart::neogeo_bootleg_svcplusa_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_SVCPLUSA_CART, "NEOGEO BOOT svcplusa Cart", tag, owner, clock, "boot_svcplusa_cart", __FILE__) {}
+neogeo_bootleg_svcplusa_cart::neogeo_bootleg_svcplusa_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_SVCPLUSA_CART, "NEOGEO BOOT svcplusa Cart", tag, owner, clock, "boot_svcplusa_cart", __FILE__) {}
 
 void neogeo_bootleg_svcplusa_cart::activate_cart(ACTIVATE_CART_PARAMS)
 {
@@ -258,7 +258,7 @@ void neogeo_bootleg_svcplusa_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_BOOTLEG_SAMSHO5B_CART = &device_creator<neogeo_bootleg_samsho5b_cart>;
 
-neogeo_bootleg_samsho5b_cart::neogeo_bootleg_samsho5b_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_SAMSHO5B_CART, "NEOGEO BOOT samsho5b Cart", tag, owner, clock, "boot_samsho5b_cart", __FILE__) {}
+neogeo_bootleg_samsho5b_cart::neogeo_bootleg_samsho5b_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_SAMSHO5B_CART, "NEOGEO BOOT samsho5b Cart", tag, owner, clock, "boot_samsho5b_cart", __FILE__) {}
 
 void neogeo_bootleg_samsho5b_cart::activate_cart(ACTIVATE_CART_PARAMS)
 {
@@ -281,7 +281,7 @@ void neogeo_bootleg_samsho5b_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_BOOTLEG_KOF97ORO_CART = &device_creator<neogeo_bootleg_kof97oro_cart>;
 
-neogeo_bootleg_kof97oro_cart::neogeo_bootleg_kof97oro_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_KOF97ORO_CART, "NEOGEO BOOT kof97oro Cart", tag, owner, clock, "boot_kof97oro_cart", __FILE__) {}
+neogeo_bootleg_kof97oro_cart::neogeo_bootleg_kof97oro_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_KOF97ORO_CART, "NEOGEO BOOT kof97oro Cart", tag, owner, clock, "boot_kof97oro_cart", __FILE__) {}
 
 void neogeo_bootleg_kof97oro_cart::activate_cart(ACTIVATE_CART_PARAMS)
 {
@@ -303,7 +303,7 @@ void neogeo_bootleg_kof97oro_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_BOOTLEG_LANS2004_CART = &device_creator<neogeo_bootleg_lans2004_cart>;
 
-neogeo_bootleg_lans2004_cart::neogeo_bootleg_lans2004_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_LANS2004_CART, "NEOGEO BOOT lans2004 Cart", tag, owner, clock, "boot_lans2004_cart", __FILE__) {}
+neogeo_bootleg_lans2004_cart::neogeo_bootleg_lans2004_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_LANS2004_CART, "NEOGEO BOOT lans2004 Cart", tag, owner, clock, "boot_lans2004_cart", __FILE__) {}
 
 void neogeo_bootleg_lans2004_cart::activate_cart(ACTIVATE_CART_PARAMS)
 {
@@ -326,7 +326,7 @@ void neogeo_bootleg_lans2004_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_BOOTLEG_KOF10TH_CART = &device_creator<neogeo_bootleg_kof10th_cart>;
 
-neogeo_bootleg_kof10th_cart::neogeo_bootleg_kof10th_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_KOF10TH_CART, "NEOGEO BOOT kof10th Cart", tag, owner, clock, "boot_kof10th_cart", __FILE__) {}
+neogeo_bootleg_kof10th_cart::neogeo_bootleg_kof10th_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_KOF10TH_CART, "NEOGEO BOOT kof10th Cart", tag, owner, clock, "boot_kof10th_cart", __FILE__) {}
 
 void neogeo_bootleg_kof10th_cart::activate_cart(ACTIVATE_CART_PARAMS)
 {
@@ -348,7 +348,7 @@ void neogeo_bootleg_kof10th_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_BOOTLEG_KOG_CART = &device_creator<neogeo_bootleg_kog_cart>;
 
-neogeo_bootleg_kog_cart::neogeo_bootleg_kog_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_KOG_CART, "NEOGEO BOOT kog Cart", tag, owner, clock, "boot_kog_cart", __FILE__),
+neogeo_bootleg_kog_cart::neogeo_bootleg_kog_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_KOG_CART, "NEOGEO BOOT kog Cart", tag, owner, clock, "boot_kog_cart", __FILE__),
 	m_kog_prot(*this, "kog_prot")
 {}
 

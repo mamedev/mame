@@ -24,7 +24,7 @@ class zs01_device : public device_t,
 {
 public:
 	// construction/destruction
-	zs01_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock );
+	zs01_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock );
 
 	// inline configuration helpers
 	static void static_set_ds2401_tag( device_t &device, const char *ds2401_tag ) { downcast<zs01_device &>( device ).m_ds2401_tag = ds2401_tag; }

@@ -52,7 +52,7 @@ const score7_cpu_device::op_handler score7_cpu_device::s_opcode16_table[8] =
 //  score7_cpu_device - constructor
 //-------------------------------------------------
 
-score7_cpu_device::score7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+score7_cpu_device::score7_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SCORE7, "S+core 7", tag, owner, clock, "score7", __FILE__),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0),
 		m_pc(0),
@@ -944,7 +944,7 @@ void score7_cpu_device::op_crform()
 			break;
 		default:
 			if ((GET_CR_OP(m_op) & 0xc0) == 0)
-				fatalerror("%s: unemulated Coprocessor 0x%x (PC=0x%08x)\n", tag(), GET_CR_OP(m_op) & 0x07, m_ppc);
+				fatalerror("%s: unemulated Coprocessor 0x%x (PC=0x%08x)\n", tag().c_str(), GET_CR_OP(m_op) & 0x07, m_ppc);
 			else
 				op_undef();
 	}
@@ -1339,11 +1339,11 @@ void score7_cpu_device::op_iform1b()
 
 void score7_cpu_device::op_undef()
 {
-	logerror("%s: undefined instruction 0x%x (PC=0x%08x)\n", tag(), m_op, m_ppc);
+	logerror("%s: undefined instruction 0x%x (PC=0x%08x)\n", tag().c_str(), m_op, m_ppc);
 	gen_exception(EXCEPTION_RI);
 }
 
 void score7_cpu_device::unemulated_op(const char * op)
 {
-	fatalerror("%s: unemulated %s (PC=0x%08x)\n", tag(), op, m_ppc);
+	fatalerror("%s: unemulated %s (PC=0x%08x)\n", tag().c_str(), op, m_ppc);
 }

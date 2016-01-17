@@ -41,17 +41,17 @@ const device_type CIRRUS_GD5428 = &device_creator<cirrus_gd5428_device>;
 const device_type CIRRUS_GD5430 = &device_creator<cirrus_gd5430_device>;
 
 
-cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: svga_device(mconfig, CIRRUS_GD5428, "Cirrus Logic GD5428", tag, owner, clock, "clgd5428", __FILE__)
 {
 }
 
-cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: svga_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-cirrus_gd5430_device::cirrus_gd5430_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cirrus_gd5430_device::cirrus_gd5430_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cirrus_gd5428_device(mconfig, CIRRUS_GD5430, "Cirrus Logic GD5430", tag, owner, clock, "clgd5430", __FILE__)
 {
 }

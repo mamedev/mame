@@ -19,7 +19,7 @@
 //  finder_base - constructor
 //-------------------------------------------------
 
-finder_base::finder_base(device_t &base, const char *tag)
+finder_base::finder_base(device_t &base, std::string tag)
 	: m_next(base.register_auto_finder(*this)),
 		m_base(base),
 		m_tag(tag)
@@ -51,7 +51,7 @@ void *finder_base::find_memregion(UINT8 width, size_t &length, bool required) co
 	if (region->bytewidth() != width)
 	{
 		if (required)
-			osd_printf_warning("Region '%s' found but is width %d, not %d as requested\n", m_tag, region->bitwidth(), width*8);
+			osd_printf_warning("Region '%s' found but is width %d, not %d as requested\n", m_tag.c_str(), region->bitwidth(), width*8);
 		return nullptr;
 	}
 
@@ -76,7 +76,7 @@ void *finder_base::find_memshare(UINT8 width, size_t &bytes, bool required)
 	if (width != 0 && share->bitwidth() != width)
 	{
 		if (required)
-			osd_printf_warning("Shared ptr '%s' found but is width %d, not %d as requested\n", m_tag, share->bitwidth(), width);
+			osd_printf_warning("Shared ptr '%s' found but is width %d, not %d as requested\n", m_tag.c_str(), share->bitwidth(), width);
 		return nullptr;
 	}
 
@@ -91,9 +91,9 @@ void *finder_base::find_memshare(UINT8 width, size_t &bytes, bool required)
 //  return true if it's ok
 //-------------------------------------------------
 
-bool finder_base::report_missing(bool found, const char *objname, bool required)
+bool finder_base::report_missing(bool found, std::string objname, bool required)
 {
-	if (required && strcmp(m_tag, FINDER_DUMMY_TAG)==0)
+	if (required && m_tag==FINDER_DUMMY_TAG)
 	{
 		osd_printf_error("Tag not defined for required device\n");
 		return false;
@@ -105,9 +105,9 @@ bool finder_base::report_missing(bool found, const char *objname, bool required)
 
 	// otherwise, report
 	if (required)
-		osd_printf_error("Required %s '%s' not found\n", objname, m_tag);
+		osd_printf_error("Required %s '%s' not found\n", objname.c_str(), m_tag.c_str());
 	else
-		osd_printf_verbose("Optional %s '%s' not found\n", objname, m_tag);
+		osd_printf_verbose("Optional %s '%s' not found\n", objname.c_str(), m_tag.c_str());
 	return !required;
 }
 

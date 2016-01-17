@@ -85,7 +85,7 @@ class eeprom_serial_base_device : public eeprom_base_device
 {
 protected:
 	// construction/destruction
-	eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
+	eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source);
 
 public:
 	// inline configuration helpers
@@ -178,7 +178,7 @@ class eeprom_serial_93cxx_device : public eeprom_serial_base_device
 {
 protected:
 	// construction/destruction
-	eeprom_serial_93cxx_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
+	eeprom_serial_93cxx_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source);
 
 public:
 	// read handlers
@@ -201,7 +201,7 @@ class eeprom_serial_er5911_device : public eeprom_serial_base_device
 {
 protected:
 	// construction/destruction
-	eeprom_serial_er5911_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
+	eeprom_serial_er5911_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source);
 
 public:
 	// read handlers
@@ -227,7 +227,7 @@ class eeprom_serial_x24c44_device : public eeprom_serial_base_device
 		//async store not implemented
 protected:
 	// construction/destruction
-	eeprom_serial_x24c44_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
+	eeprom_serial_x24c44_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source);
 
 public:
 	// read handlers
@@ -264,7 +264,7 @@ protected:
 class eeprom_serial_##_lowercase##_##_bits##bit_device : public eeprom_serial_##_baseclass##_device \
 { \
 public: \
-	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock); \
+	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock); \
 }; \
 extern const device_type EEPROM_SERIAL_##_uppercase##_##_bits##BIT;
 // standard 93CX6 class of 16-bit EEPROMs

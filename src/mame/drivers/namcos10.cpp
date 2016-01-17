@@ -274,7 +274,7 @@ Kono Tako                             10021 Ver.A   KC034A   8E, 8D
 class namcos10_state : public driver_device
 {
 public:
-	namcos10_state(const machine_config &mconfig, device_type type, const char *tag)
+	namcos10_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 

@@ -47,7 +47,7 @@ HSync - 15.510kHz
 class ichibanjyan_state : public driver_device
 {
 public:
-	ichibanjyan_state(const machine_config &mconfig, device_type type, const char *tag)
+	ichibanjyan_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }

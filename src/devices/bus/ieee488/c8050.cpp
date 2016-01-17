@@ -817,7 +817,7 @@ inline void c8050_t::update_ieee_signals()
 //  c8050_t - constructor
 //-------------------------------------------------
 
-c8050_t::c8050_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+c8050_t::c8050_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_ieee488_interface(mconfig, *this),
 	m_maincpu(*this, M6502_TAG),
@@ -836,7 +836,7 @@ c8050_t::c8050_t(const machine_config &mconfig, device_type type, const char *na
 {
 }
 
-c8050_t::c8050_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c8050_t::c8050_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C8050, "C8050", tag, owner, clock, "c8050", __FILE__),
 	device_ieee488_interface(mconfig, *this),
 	m_maincpu(*this, M6502_TAG),
@@ -860,7 +860,7 @@ c8050_t::c8050_t(const machine_config &mconfig, const char *tag, device_t *owner
 //  c8250_t - constructor
 //-------------------------------------------------
 
-c8250_t::c8250_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c8250_t::c8250_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	c8050_t(mconfig, C8250, "C8250", tag, owner, clock, "c8250", __FILE__) { }
 
 
@@ -868,7 +868,7 @@ c8250_t::c8250_t(const machine_config &mconfig, const char *tag, device_t *owner
 //  c8250lp_t - constructor
 //-------------------------------------------------
 
-c8250lp_t::c8250lp_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c8250lp_t::c8250lp_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	c8050_t(mconfig, C8250LP, "C8250LP", tag, owner, clock, "c8250lp", __FILE__) { }
 
 
@@ -876,7 +876,7 @@ c8250lp_t::c8250lp_t(const machine_config &mconfig, const char *tag, device_t *o
 //  sfd1001_t - constructor
 //-------------------------------------------------
 
-sfd1001_t::sfd1001_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sfd1001_t::sfd1001_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	c8050_t(mconfig, SFD1001, "SFD1001", tag, owner, clock, "sfd1001", __FILE__) { }
 
 

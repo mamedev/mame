@@ -71,8 +71,8 @@ class fixedfreq_device :  public device_t,
 {
 public:
 	// construction/destruction
-	fixedfreq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	fixedfreq_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	fixedfreq_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	fixedfreq_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// inline configuration helpers
 	static void set_minitor_clock(device_t &device, UINT32 clock) { downcast<fixedfreq_device &>(device).m_monitor_clock = clock; }

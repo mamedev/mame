@@ -15,7 +15,7 @@
 
 class m4510_device : public m65ce02_device {
 public:
-	m4510_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m4510_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static const disasm_entry disasm_entries[0x100];
 

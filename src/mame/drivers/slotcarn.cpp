@@ -35,7 +35,7 @@
 class slotcarn_state : public driver_device
 {
 public:
-	slotcarn_state(const machine_config &mconfig, device_type type, const char *tag)
+	slotcarn_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_backup_ram(*this, "backup_ram"),
 		m_ram_attr(*this, "raattr"),

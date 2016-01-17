@@ -50,8 +50,8 @@ class arm7_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	arm7_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, UINT8 archRev, UINT8 archFlags, endianness_t endianness = ENDIANNESS_LITTLE);
+	arm7_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	arm7_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, UINT8 archRev, UINT8 archFlags, endianness_t endianness = ENDIANNESS_LITTLE);
 
 protected:
 	// device-level overrides
@@ -489,7 +489,7 @@ class arm7_be_cpu_device : public arm7_cpu_device
 {
 public:
 	// construction/destruction
-	arm7_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	arm7_be_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 };
 
@@ -498,7 +498,7 @@ class arm7500_cpu_device : public arm7_cpu_device
 {
 public:
 	// construction/destruction
-	arm7500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	arm7500_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 };
 
@@ -507,7 +507,7 @@ class arm9_cpu_device : public arm7_cpu_device
 {
 public:
 	// construction/destruction
-	arm9_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	arm9_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 };
 
@@ -516,7 +516,7 @@ class arm920t_cpu_device : public arm7_cpu_device
 {
 public:
 	// construction/destruction
-	arm920t_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	arm920t_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 };
 
@@ -525,7 +525,7 @@ class pxa255_cpu_device : public arm7_cpu_device
 {
 public:
 	// construction/destruction
-	pxa255_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pxa255_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 };
 
@@ -534,7 +534,7 @@ class sa1110_cpu_device : public arm7_cpu_device
 {
 public:
 	// construction/destruction
-	sa1110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sa1110_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 };
 

@@ -28,7 +28,7 @@ class i4004_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	i4004_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	i4004_cpu_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
 
 	void set_test(UINT8 val);
 

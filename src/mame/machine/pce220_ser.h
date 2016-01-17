@@ -23,7 +23,7 @@ class pce220_serial_device :    public device_t,
 {
 public:
 	// construction/destruction
-	pce220_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pce220_serial_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~pce220_serial_device();
 
 	// image-level overrides

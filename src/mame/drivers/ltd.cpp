@@ -48,7 +48,7 @@ ToDo:
 class ltd_state : public genpin_class
 {
 public:
-	ltd_state(const machine_config &mconfig, device_type type, const char *tag)
+	ltd_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_ram(*this, "nvram")

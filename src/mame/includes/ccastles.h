@@ -12,7 +12,7 @@
 class ccastles_state : public driver_device
 {
 public:
-	ccastles_state(const machine_config &mconfig, device_type type, const char *tag)
+	ccastles_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_nvram_4b(*this, "nvram_4b"),

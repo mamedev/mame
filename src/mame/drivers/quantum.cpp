@@ -60,7 +60,7 @@ NOTE: The Atari 136002-125 PROM in the sets below wasn't dumped from an actual
 class quantum_state : public driver_device
 {
 public:
-	quantum_state(const machine_config &mconfig, device_type type, const char *tag)
+	quantum_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_avg(*this, "avg") { }

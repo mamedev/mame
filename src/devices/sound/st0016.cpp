@@ -24,7 +24,7 @@ const device_type ST0016 = &device_creator<st0016_device>;
 //  st0016_device - constructor
 //-------------------------------------------------
 
-st0016_device::st0016_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+st0016_device::st0016_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ST0016, "ST0016 (Audio)", tag, owner, clock, "st0016_audio", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),

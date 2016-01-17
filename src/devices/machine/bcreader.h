@@ -24,7 +24,7 @@ class barcode_reader_device : public device_t
 {
 public:
 	// construction/destruction
-	barcode_reader_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	barcode_reader_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void write_code(const char *barcode, int len);
 	int get_pending_code() { return m_new_code; }

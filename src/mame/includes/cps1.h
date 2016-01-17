@@ -97,7 +97,7 @@ struct CPS1config
 class cps_state : public driver_device
 {
 public:
-	cps_state(const machine_config &mconfig, device_type type, const char *tag)
+	cps_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_gfxram(*this, "gfxram"),

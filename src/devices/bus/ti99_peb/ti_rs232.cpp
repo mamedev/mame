@@ -116,7 +116,7 @@
 
 #define ESC 0x1b
 
-ti_rs232_pio_device::ti_rs232_pio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti_rs232_pio_device::ti_rs232_pio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 : ti_expansion_card_device(mconfig, TI99_RS232, "TI-99 RS232/PIO interface", tag, owner, clock, "ti99_rs232", __FILE__), m_piodev(nullptr), m_dsrrom(nullptr), m_pio_direction_in(false), m_pio_handshakeout(false), m_pio_handshakein(false), m_pio_spareout(false), m_pio_sparein(false), m_flag0(false), m_led(false), m_pio_out_buffer(0), m_pio_in_buffer(0), m_pio_readable(false), m_pio_writable(false), m_pio_write(false), m_ila(0)
 {
 }
@@ -125,13 +125,13 @@ ti_rs232_pio_device::ti_rs232_pio_device(const machine_config &mconfig, const ch
 /**************************************************************************/
 /* Ports */
 
-ti_rs232_attached_device::ti_rs232_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti_rs232_attached_device::ti_rs232_attached_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 : device_t(mconfig, TI99_RS232_DEV, "Serial attached device", tag, owner, clock, "ti_rs232_attached", __FILE__),
 	device_image_interface(mconfig, *this)
 {
 }
 
-ti_pio_attached_device::ti_pio_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti_pio_attached_device::ti_pio_attached_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 : device_t(mconfig, TI99_PIO_DEV, "Parallel attached device", tag, owner, clock, "ti_pio_attached", __FILE__),
 	device_image_interface(mconfig, *this)
 {
@@ -162,7 +162,7 @@ void ti_pio_attached_device::device_config_complete()
 */
 int ti_rs232_attached_device::get_index_from_tagname()
 {
-	const char *mytag = tag();
+	const char *mytag = tag().c_str();
 	int maxlen = strlen(mytag);
 	int i;
 	for (i=maxlen-1; i >=0; i--)

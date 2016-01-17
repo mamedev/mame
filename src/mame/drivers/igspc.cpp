@@ -49,7 +49,7 @@ can't be emulated without proper mb bios
 class speeddrv_state : public driver_device
 {
 public:
-	speeddrv_state(const machine_config &mconfig, device_type type, const char *tag)
+	speeddrv_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }

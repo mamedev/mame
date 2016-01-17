@@ -52,7 +52,7 @@ MM63.10N
 class chinsan_state : public driver_device
 {
 public:
-	chinsan_state(const machine_config &mconfig, device_type type, const char *tag)
+	chinsan_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_video(*this, "video"),
 		m_maincpu(*this, "maincpu"),

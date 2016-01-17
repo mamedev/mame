@@ -88,7 +88,7 @@ Notes:
 class calorie_state : public driver_device
 {
 public:
-	calorie_state(const machine_config &mconfig, device_type type, const char *tag)
+	calorie_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_fg_ram(*this, "fg_ram"),
 		m_sprites(*this, "sprites"),

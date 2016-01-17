@@ -4,7 +4,7 @@
 
 #include "machine/m20_kbd.h"
 
-m20_keyboard_device::m20_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
+m20_keyboard_device::m20_keyboard_device(const machine_config& mconfig, std::string tag, device_t* owner, UINT32 clock) :
 	serial_keyboard_device(mconfig, M20_KEYBOARD, "M20 Keyboard", tag, owner, 0, "m20_keyboard", __FILE__)
 {
 }

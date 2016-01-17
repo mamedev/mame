@@ -30,7 +30,7 @@
 class cubeqst_state : public driver_device
 {
 public:
-	cubeqst_state(const machine_config &mconfig, device_type type, const char *tag)
+	cubeqst_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc"),
 			m_rotatecpu(*this, "rotate_cpu"),

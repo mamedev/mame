@@ -14,7 +14,7 @@
 class mpu4plasma_state : public mpu4_state
 {
 public:
-	mpu4plasma_state(const machine_config &mconfig, device_type type, const char *tag)
+	mpu4plasma_state(const machine_config &mconfig, device_type type, std::string tag)
 		: mpu4_state(mconfig, type, tag),
 		m_plasmaram(*this, "plasmaram")
 	{

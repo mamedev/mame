@@ -13,8 +13,8 @@ class intv_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	intv_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	intv_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	intv_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	intv_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_rom04) override { return INTV_ROM16_READ(offset + 0x0400); }
@@ -44,7 +44,7 @@ class intv_ram_device : public intv_rom_device
 {
 public:
 	// construction/destruction
-	intv_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	intv_ram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_ram) override { return (int)m_ram[offset & (m_ram.size() - 1)]; }
@@ -57,7 +57,7 @@ class intv_gfact_device : public intv_rom_device
 {
 public:
 	// construction/destruction
-	intv_gfact_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	intv_gfact_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_ram) override { return (int)m_ram[offset & (m_ram.size() - 1)]; }
@@ -70,7 +70,7 @@ class intv_wsmlb_device : public intv_rom_device
 {
 public:
 	// construction/destruction
-	intv_wsmlb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	intv_wsmlb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

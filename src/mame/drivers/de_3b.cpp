@@ -16,7 +16,7 @@ extern const char layout_pinball[];
 class de_3b_state : public driver_device
 {
 public:
-	de_3b_state(const machine_config &mconfig, device_type type, const char *tag)
+	de_3b_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_decobsmt(*this, "decobsmt"),
 			m_dmdtype3(*this, "decodmd")

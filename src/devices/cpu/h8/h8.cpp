@@ -13,7 +13,7 @@
 #include "debugger.h"
 #include "h8.h"
 
-h8_device::h8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool mode_a16, address_map_delegate map_delegate) :
+h8_device::h8_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, bool mode_a16, address_map_delegate map_delegate) :
 	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	program_config("program", ENDIANNESS_BIG, 16, mode_a16 ? 16 : 24, 0, map_delegate),
 	io_config("io", ENDIANNESS_BIG, 16, 16, -1), program(nullptr), io(nullptr), direct(nullptr), PPC(0), NPC(0), PC(0), PIR(0), EXR(0), CCR(0), MAC(0), MACF(0),
@@ -592,17 +592,17 @@ void h8_device::internal(int cycles)
 
 void h8_device::illegal()
 {
-	throw emu_fatalerror("%s: Illegal instruction at address %x\n", tag(), PPC);
+	throw emu_fatalerror("%s: Illegal instruction at address %x\n", tag().c_str(), PPC);
 }
 
 int h8_device::trace_setup()
 {
-	throw emu_fatalerror("%s: Trace setup called but unimplemented.\n", tag());
+	throw emu_fatalerror("%s: Trace setup called but unimplemented.\n", tag().c_str());
 }
 
 int h8_device::trapa_setup()
 {
-	throw emu_fatalerror("%s: Trapa setup called but unimplemented.\n", tag());
+	throw emu_fatalerror("%s: Trapa setup called but unimplemented.\n", tag().c_str());
 }
 
 UINT8 h8_device::do_addx8(UINT8 v1, UINT8 v2)

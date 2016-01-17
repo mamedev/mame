@@ -45,7 +45,7 @@ PALETTE_INIT_MEMBER(huc6260_device, huc6260)
 const device_type HUC6260 = &device_creator<huc6260_device>;
 
 
-huc6260_device::huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+huc6260_device::huc6260_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	:   device_t(mconfig, HUC6260, "HuC6260 VCE", tag, owner, clock, "huc6260", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_next_pixel_data_cb(*this),

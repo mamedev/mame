@@ -73,10 +73,10 @@ public:
 	};
 
 
-	h8_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	h8_timer16_channel_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h8_timer16_channel_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
-	void set_info(int tgr_count, int tbr_count, const char *intc, int irq_base);
+	void set_info(int tgr_count, int tbr_count, std::string intc, int irq_base);
 
 	DECLARE_READ8_MEMBER(tcr_r);
 	DECLARE_WRITE8_MEMBER(tcr_w);
@@ -105,7 +105,8 @@ protected:
 	required_device<h8_device> cpu;
 	h8_timer16_channel_device *chained_timer;
 	h8_intc_device *intc;
-	const char *chain_tag, *intc_tag;
+	std::string chain_tag;
+	std::string intc_tag;
 	int interrupt[6];
 	UINT8 tier_mask;
 
@@ -132,10 +133,10 @@ protected:
 
 class h8h_timer16_channel_device : public h8_timer16_channel_device {
 public:
-	h8h_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8h_timer16_channel_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~h8h_timer16_channel_device();
 
-	void set_info(int tgr_count, int tbr_count, const char *intc, int irq_base);
+	void set_info(int tgr_count, int tbr_count, std::string intc, int irq_base);
 
 protected:
 	virtual void tcr_update() override;
@@ -146,12 +147,12 @@ protected:
 
 class h8s_timer16_channel_device : public h8_timer16_channel_device {
 public:
-	h8s_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8s_timer16_channel_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~h8s_timer16_channel_device();
 
-	void set_info(int tgr_count, UINT8 _tier_mask, const char *intc, int irq_base,
+	void set_info(int tgr_count, UINT8 _tier_mask, std::string intc, int irq_base,
 					int t0, int t1, int t2, int t3, int t4, int t5, int t6, int t7);
-	void set_chain(const char *chain_tag);
+	void set_chain(std::string chain_tag);
 
 protected:
 	int count_types[8];
@@ -164,7 +165,7 @@ protected:
 
 class h8_timer16_device : public device_t {
 public:
-	h8_timer16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_timer16_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void set_info(int timer_count, UINT8 default_tstr);
 

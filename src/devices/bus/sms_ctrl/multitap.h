@@ -28,7 +28,7 @@ class sms_multitap_device : public device_t,
 {
 public:
 	// construction/destruction
-	sms_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sms_multitap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ32_MEMBER(pixel_r);
 

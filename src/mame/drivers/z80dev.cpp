@@ -28,7 +28,7 @@ Press the up-arrow key to confirm data has been entered.
 class z80dev_state : public driver_device
 {
 public:
-	z80dev_state(const machine_config &mconfig, device_type type, const char *tag)
+	z80dev_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu")
 	{ }

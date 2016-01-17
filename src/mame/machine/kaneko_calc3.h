@@ -9,7 +9,7 @@
 class kaneko_calc3_device : public device_t
 {
 public:
-	kaneko_calc3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kaneko_calc3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE16_MEMBER(mcu_com0_w);
 	DECLARE_WRITE16_MEMBER(mcu_com1_w);

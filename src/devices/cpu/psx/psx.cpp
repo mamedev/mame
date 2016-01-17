@@ -1745,7 +1745,7 @@ ADDRESS_MAP_END
 //  psxcpu_device - constructor
 //-------------------------------------------------
 
-psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source ) :
+psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source ) :
 	cpu_device( mconfig, type, name, tag, owner, clock, shortname, source ),
 	m_program_config( "program", ENDIANNESS_LITTLE, 32, 32, 0, ADDRESS_MAP_NAME( psxcpu_internal_map ) ),
 	m_gpu_read_handler( *this ),
@@ -1759,32 +1759,32 @@ psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, c
 	m_disable_rom_berr = false;
 }
 
-cxd8530aq_device::cxd8530aq_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+cxd8530aq_device::cxd8530aq_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock )
 	: psxcpu_device( mconfig, CXD8661R, "CXD8530AQ", tag, owner, clock, "cxd8530aq", __FILE__ )
 {
 }
 
-cxd8530bq_device::cxd8530bq_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+cxd8530bq_device::cxd8530bq_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock )
 	: psxcpu_device( mconfig, CXD8661R, "CXD8530BQ", tag, owner, clock, "cxd8530bq", __FILE__ )
 {
 }
 
-cxd8530cq_device::cxd8530cq_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+cxd8530cq_device::cxd8530cq_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock )
 	: psxcpu_device( mconfig, CXD8661R, "CXD8530CQ", tag, owner, clock, "cxd8530cq", __FILE__ )
 {
 }
 
-cxd8661r_device::cxd8661r_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+cxd8661r_device::cxd8661r_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock )
 	: psxcpu_device( mconfig, CXD8661R, "CXD8661R", tag, owner, clock, "cxd8661r", __FILE__ )
 {
 }
 
-cxd8606bq_device::cxd8606bq_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+cxd8606bq_device::cxd8606bq_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock )
 	: psxcpu_device( mconfig, CXD8606BQ, "CXD8606BQ", tag, owner, clock, "cxd8606bq", __FILE__ )
 {
 }
 
-cxd8606cq_device::cxd8606cq_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+cxd8606cq_device::cxd8606cq_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock )
 	: psxcpu_device( mconfig, CXD8606CQ, "CXD8606CQ", tag, owner, clock, "cxd8606cq", __FILE__ )
 {
 }

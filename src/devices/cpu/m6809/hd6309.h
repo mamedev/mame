@@ -29,7 +29,7 @@ class hd6309_device : public m6809_base_device
 {
 public:
 	// construction/destruction
-	hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd6309_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

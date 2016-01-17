@@ -38,7 +38,7 @@
 class mw8080bw_state : public driver_device
 {
 public:
-	mw8080bw_state(const machine_config &mconfig, device_type type, const char *tag)
+	mw8080bw_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_mb14241(*this,"mb14241"),

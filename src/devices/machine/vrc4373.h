@@ -61,13 +61,13 @@
 
 class vrc4373_device : public pci_host_device {
 public:
-	vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vrc4373_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual void reset_all_mappings() override;
 	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
 							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;
 
-	void set_cpu_tag(const char *tag);
+	void set_cpu_tag(std::string tag);
 
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
@@ -103,7 +103,7 @@ protected:
 
 private:
 	mips3_device *m_cpu;
-	const char *cpu_tag;
+	std::string cpu_tag;
 
 	address_space_config m_mem_config, m_io_config;
 

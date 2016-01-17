@@ -177,7 +177,7 @@ ioport_constructor adam_fdc_device::device_input_ports() const
 //  adam_fdc_device - constructor
 //-------------------------------------------------
 
-adam_fdc_device::adam_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+adam_fdc_device::adam_fdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ADAM_FDC, "Adam FDC", tag, owner, clock, "adam_fdc", __FILE__),
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG),

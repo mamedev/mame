@@ -133,7 +133,7 @@ public:
 		TIMER_SOL20_BOOT
 	};
 
-	sol20_state(const machine_config &mconfig, device_type type, const char *tag)
+	sol20_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cass1(*this, "cassette")

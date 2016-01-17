@@ -98,7 +98,7 @@ class zx8302_device :  public device_t,
 {
 public:
 	// construction/destruction
-	zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	zx8302_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void set_rtc_clock(device_t &device, int rtc_clock) { downcast<zx8302_device &>(device).m_rtc_clock = rtc_clock; }
 	template<class _Object> static devcb_base &set_out_ipl1l_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_out_ipl1l_cb.set_callback(object); }

@@ -10,7 +10,7 @@
 extern const device_type SBP_PROT = &device_creator<sbp_prot_device>;
 
 
-sbp_prot_device::sbp_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sbp_prot_device::sbp_prot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SBP_PROT, "NeoGeo Protection (Super Bubble Pop)", tag, owner, clock, "sbp_prot", __FILE__),
 	m_mainrom(nullptr)
 {

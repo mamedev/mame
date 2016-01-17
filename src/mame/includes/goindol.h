@@ -9,7 +9,7 @@
 class goindol_state : public driver_device
 {
 public:
-	goindol_state(const machine_config &mconfig, device_type type, const char *tag)
+	goindol_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
 		m_fg_scrolly(*this, "fg_scrolly"),

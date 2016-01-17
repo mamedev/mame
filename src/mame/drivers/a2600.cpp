@@ -45,7 +45,7 @@ TODO:
 class a2600_state : public driver_device
 {
 public:
-	a2600_state(const machine_config &mconfig, device_type type, const char *tag)
+	a2600_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_riot_ram(*this, "riot_ram"),
 		m_joy1(*this, CONTROL1_TAG),

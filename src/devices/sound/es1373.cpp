@@ -22,15 +22,15 @@ DEVICE_ADDRESS_MAP_START(map, 32, es1373_device)
 	AM_RANGE(0x00, 0x3f) AM_READWRITE  (reg_r,  reg_w)
 ADDRESS_MAP_END
 
-es1373_device::es1373_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+es1373_device::es1373_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, ES1373, "Creative Labs Ensoniq AudioPCI97 ES1373", tag, owner, clock, "es1373", __FILE__),
 		device_sound_interface(mconfig, *this), m_stream(nullptr),
-		m_eslog(nullptr), m_tempCount(0), m_timer(nullptr), m_memory_space(nullptr), m_cpu_tag(nullptr), m_cpu(nullptr),
+		m_eslog(nullptr), m_tempCount(0), m_timer(nullptr), m_memory_space(nullptr), m_cpu(nullptr),
 		m_irq_num(-1)
 {
 }
 
-void es1373_device::set_irq_info(const char *tag, const int irq_num)
+void es1373_device::set_irq_info(std::string tag, const int irq_num)
 {
 	m_cpu_tag = tag;
 	m_irq_num = irq_num;
@@ -125,7 +125,7 @@ void es1373_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 void es1373_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	if (m_dac1.enable) {
-		logerror("%s: sound_stream_update DAC1 not implemented yet\n", tag());
+		logerror("%s: sound_stream_update DAC1 not implemented yet\n", tag().c_str());
 	}
 
 	if (m_dac2.enable) {
@@ -134,7 +134,7 @@ void es1373_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 	if (m_adc.enable) {
 		if (m_adc.format!=SCTRL_16BIT_MONO) {
-			logerror("%s: sound_stream_update Only SCTRL_16BIT_MONO recorded supported\n", tag());
+			logerror("%s: sound_stream_update Only SCTRL_16BIT_MONO recorded supported\n", tag().c_str());
 		} else {
 			for (int i=0; i<samples; i++) {
 				if (m_adc.buf_count<=m_adc.buf_size) {
@@ -314,7 +314,7 @@ UINT32 es1373_device::calc_size(const UINT8 &format)
 			return 4;
 			break;
 	}
-	logerror("%s: calc_size Invalid format = %X specified\n", tag(), format);
+	logerror("%s: calc_size Invalid format = %X specified\n", tag().c_str(), format);
 	return 0;
 }
 
@@ -432,7 +432,7 @@ WRITE32_MEMBER(es1373_device::reg_w)
 					}
 				}
 				if (0 && LOG_ES_REG)
-					logerror("%s: es1373_device::reg_w adc_int_en: %i dac1_int_en: %i dac2_int_en: %i\n", tag(), m_adc.int_en, m_dac1.int_en, m_dac2.int_en);
+					logerror("%s: es1373_device::reg_w adc_int_en: %i dac1_int_en: %i dac2_int_en: %i\n", tag().c_str(), m_adc.int_en, m_dac1.int_en, m_dac2.int_en);
 			break;
 		case ES_DAC2_CNT:
 				m_dac2.buf_count = 0;

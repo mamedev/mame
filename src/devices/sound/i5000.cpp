@@ -23,7 +23,7 @@
 // device type definition
 const device_type I5000_SND = &device_creator<i5000snd_device>;
 
-i5000snd_device::i5000snd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i5000snd_device::i5000snd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I5000_SND, "I5000", tag, owner, clock, "i5000snd", __FILE__),
 		device_sound_interface(mconfig, *this), m_stream(nullptr), m_rom_base(nullptr), m_rom_mask(0)
 {

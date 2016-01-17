@@ -87,11 +87,11 @@ protected:
 class sam6883_device : public device_t, public sam6883_friend_device
 {
 public:
-	sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sam6883_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_res_rd_callback(device_t &device, _Object object) { return downcast<sam6883_device &>(device).m_read_res.set_callback(object); }
 
-	static void configure_cpu(device_t &device, const char *tag, address_spacenum space)
+	static void configure_cpu(device_t &device, std::string tag, address_spacenum space)
 	{
 		sam6883_device &dev = downcast<sam6883_device &>(device);
 		dev.m_cpu_tag = tag;
@@ -169,7 +169,7 @@ private:
 		void point_specific_bank(const sam_bank *bank, UINT16 offset, UINT16 mask, memory_bank *&memory_bank, INT32 addrstart, INT32 addrend, bool is_write);
 	};
 
-	const char *        m_cpu_tag;
+	std::string         m_cpu_tag;
 	address_spacenum    m_cpu_space_ref;
 
 	// incidentals

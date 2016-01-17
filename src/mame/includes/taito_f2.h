@@ -25,7 +25,7 @@ public:
 		TIMER_TAITOF2_INTERRUPT6
 	};
 
-	taitof2_state(const machine_config &mconfig, device_type type, const char *tag)
+	taitof2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_sprite_extension(*this, "sprite_ext"),
 			m_spriteram(*this, "spriteram"),

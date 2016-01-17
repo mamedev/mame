@@ -7,7 +7,7 @@ const device_type H8_INTC  = &device_creator<h8_intc_device>;
 const device_type H8H_INTC = &device_creator<h8h_intc_device>;
 const device_type H8S_INTC = &device_creator<h8s_intc_device>;
 
-h8_intc_device::h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8_intc_device::h8_intc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, H8_INTC, "H8 INTC", tag, owner, clock, "h8_intc", __FILE__),
 	cpu(*this, DEVICE_SELF_OWNER), nmi_input(false), irq_input(0), ier(0), isr(0), iscr(0), icr_filter(0), ipr_filter(0)
 {
@@ -15,7 +15,7 @@ h8_intc_device::h8_intc_device(const machine_config &mconfig, const char *tag, d
 	irq_vector_nmi = 3;
 }
 
-h8_intc_device::h8_intc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+h8_intc_device::h8_intc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source), irq_vector_base(0), irq_vector_nmi(0),
 	cpu(*this, DEVICE_SELF_OWNER), nmi_input(false), irq_input(0), ier(0), isr(0), iscr(0), icr_filter(0), ipr_filter(0)
 {
@@ -46,7 +46,7 @@ void h8_intc_device::device_reset()
 int h8_intc_device::interrupt_taken(int vector)
 {
 	if(0)
-		logerror("%s: taking internal interrupt %d\n", tag(), vector);
+		logerror("%s: taking internal interrupt %d\n", tag().c_str(), vector);
 	pending_irqs[vector >> 5] &= ~(1 << (vector & 31));
 	if(vector >= irq_vector_base && vector < irq_vector_base + 8) {
 		int irq = vector - irq_vector_base;
@@ -64,7 +64,7 @@ int h8_intc_device::interrupt_taken(int vector)
 void h8_intc_device::internal_interrupt(int vector)
 {
 	if(0)
-		logerror("%s: internal interrupt %d\n", tag(), vector);
+		logerror("%s: internal interrupt %d\n", tag().c_str(), vector);
 	pending_irqs[vector >> 5] |= 1 << (vector & 31);
 	update_irq_state();
 }
@@ -110,13 +110,13 @@ READ8_MEMBER(h8_intc_device::ier_r)
 WRITE8_MEMBER(h8_intc_device::ier_w)
 {
 	ier = data;
-	logerror("%s: ier = %02x\n", tag(), data);
+	logerror("%s: ier = %02x\n", tag().c_str(), data);
 	update_irq_state();
 }
 
 void h8_intc_device::check_level_irqs(bool force_update)
 {
-	logerror("%s: irq_input=%02x\n", tag(), irq_input);
+	logerror("%s: irq_input=%02x\n", tag().c_str(), irq_input);
 	bool update = force_update;
 	for(int i=0; i<8; i++) {
 		unsigned char mask = 1 << i;
@@ -138,7 +138,7 @@ READ8_MEMBER(h8_intc_device::iscr_r)
 WRITE8_MEMBER(h8_intc_device::iscr_w)
 {
 	iscr = data;
-	logerror("%s: iscr = %02x\n", tag(), iscr);
+	logerror("%s: iscr = %02x\n", tag().c_str(), iscr);
 	update_irq_types();
 }
 
@@ -191,14 +191,14 @@ void h8_intc_device::get_priority(int vect, int &icr_pri, int &ipr_pri) const
 }
 
 
-h8h_intc_device::h8h_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8h_intc_device::h8h_intc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	h8_intc_device(mconfig, H8H_INTC, "H8H INTC", tag, owner, clock, "h8h_intc", __FILE__)
 {
 	irq_vector_base = 12;
 	irq_vector_nmi = 7;
 }
 
-h8h_intc_device::h8h_intc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+h8h_intc_device::h8h_intc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	h8_intc_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
@@ -223,7 +223,7 @@ READ8_MEMBER(h8h_intc_device::isr_r)
 WRITE8_MEMBER(h8h_intc_device::isr_w)
 {
 	isr &= data; // edge/level
-	logerror("%s: isr = %02x / %02x\n", tag(), data, isr);
+	logerror("%s: isr = %02x / %02x\n", tag().c_str(), data, isr);
 	check_level_irqs(true);
 }
 
@@ -235,7 +235,7 @@ READ8_MEMBER(h8h_intc_device::icr_r)
 WRITE8_MEMBER(h8h_intc_device::icr_w)
 {
 	icr = (icr & (0xff << (8*offset))) | (data << (8*offset));
-	logerror("%s: icr %d = %02x\n", tag(), offset, data);
+	logerror("%s: icr %d = %02x\n", tag().c_str(), offset, data);
 }
 
 READ8_MEMBER(h8h_intc_device::icrc_r)
@@ -256,7 +256,7 @@ READ8_MEMBER(h8h_intc_device::iscrh_r)
 WRITE8_MEMBER(h8h_intc_device::iscrh_w)
 {
 	iscr = (iscr & 0x00ff) | (data << 8);
-	logerror("%s: iscr = %04x\n", tag(), iscr);
+	logerror("%s: iscr = %04x\n", tag().c_str(), iscr);
 	update_irq_types();
 }
 
@@ -268,7 +268,7 @@ READ8_MEMBER(h8h_intc_device::iscrl_r)
 WRITE8_MEMBER(h8h_intc_device::iscrl_w)
 {
 	iscr = (iscr & 0xff00) | data;
-	logerror("%s: iscr = %04x\n", tag(), iscr);
+	logerror("%s: iscr = %04x\n", tag().c_str(), iscr);
 	update_irq_types();
 }
 
@@ -317,7 +317,7 @@ void h8h_intc_device::get_priority(int vect, int &icr_pri, int &ipr_pri) const
 	icr_pri = (icr >> (slot ^ 7)) & 1;
 }
 
-h8s_intc_device::h8s_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s_intc_device::h8s_intc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	h8h_intc_device(mconfig, H8S_INTC, "H8S INTC", tag, owner, clock, "h8s_intc", __FILE__)
 {
 	irq_vector_base = 16;
@@ -338,7 +338,7 @@ READ8_MEMBER(h8s_intc_device::ipr_r)
 WRITE8_MEMBER(h8s_intc_device::ipr_w)
 {
 	ipr[offset] = data;
-	logerror("%s: ipr %d = %02x\n", tag(), offset, data);
+	logerror("%s: ipr %d = %02x\n", tag().c_str(), offset, data);
 }
 
 READ8_MEMBER(h8s_intc_device::iprk_r)

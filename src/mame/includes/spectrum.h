@@ -84,7 +84,7 @@ enum
 class spectrum_state : public driver_device
 {
 public:
-	spectrum_state(const machine_config &mconfig, device_type type, const char *tag)
+	spectrum_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),

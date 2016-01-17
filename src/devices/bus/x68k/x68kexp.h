@@ -115,7 +115,7 @@ class x68k_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	x68k_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	x68k_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~x68k_expansion_slot_device();
 
 	template<class _Object> static devcb_base &set_out_irq2_callback(device_t &device, _Object object) { return downcast<x68k_expansion_slot_device &>(device).m_out_irq2_cb.set_callback(object); }

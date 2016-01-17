@@ -22,7 +22,7 @@ class msx_cart_konami : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_konami(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_konami(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -46,7 +46,7 @@ class msx_cart_konami_scc : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_konami_scc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_konami_scc(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -74,7 +74,7 @@ class msx_cart_gamemaster2 : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_gamemaster2(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_gamemaster2(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -99,7 +99,7 @@ class msx_cart_synthesizer : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_synthesizer(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_synthesizer(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -120,7 +120,7 @@ class msx_cart_konami_sound : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_konami_sound(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	msx_cart_konami_sound(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -155,7 +155,7 @@ private:
 class msx_cart_konami_sound_snatcher : public msx_cart_konami_sound
 {
 public:
-	msx_cart_konami_sound_snatcher(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_konami_sound_snatcher(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual void initialize_cartridge() override;
 };
@@ -164,7 +164,7 @@ public:
 class msx_cart_konami_sound_sdsnatcher : public msx_cart_konami_sound
 {
 public:
-	msx_cart_konami_sound_sdsnatcher(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_konami_sound_sdsnatcher(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual void initialize_cartridge() override;
 };
@@ -175,7 +175,7 @@ class msx_cart_keyboard_master : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_keyboard_master(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_keyboard_master(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

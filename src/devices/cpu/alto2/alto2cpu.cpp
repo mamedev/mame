@@ -137,7 +137,7 @@ ADDRESS_MAP_END
 //  alto2_cpu_device - constructor
 //-------------------------------------------------
 
-alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
+alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, std::string tag, device_t* owner, UINT32 clock) :
 	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2_cpu", __FILE__),
 	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 12, -2 ),
 	m_const_config("const", ENDIANNESS_BIG, 16,  8, -1 ),

@@ -116,7 +116,7 @@ class esrip_device : public cpu_device
 {
 public:
 	// construction/destruction
-	esrip_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	esrip_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
 	template<class _Object> static devcb_base &static_set_fdt_r_callback(device_t &device, _Object object) { return downcast<esrip_device &>(device).m_fdt_r.set_callback(object); }

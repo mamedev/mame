@@ -30,7 +30,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, ncr5380n_device)
 	AM_RANGE(0x7, 0x7) AM_READWRITE(resetparityirq_r, startdmainitrx_w)
 ADDRESS_MAP_END
 
-ncr5380n_device::ncr5380n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ncr5380n_device::ncr5380n_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: nscsi_device(mconfig, NCR5380N, "5380 SCSI (new)", tag, owner, clock, "ncr5380", __FILE__), tm(nullptr), status(0), istatus(0), m_mode(0),
 	m_outdata(0), m_busstatus(0), m_dmalatch(0), m_icommand(0), m_tcommand(0), clock_conv(0), sync_offset(0), sync_period(0), bus_id(0), select_timeout(0),
 	seq(0), tcount(0), mode(0), state(0), irq(false), drq(false),
@@ -129,7 +129,7 @@ void ncr5380n_device::scsi_ctrl_changed()
 	}
 
 	if(ctrl & S_RST) {
-		logerror("%s: scsi bus reset\n", tag());
+		logerror("%s: scsi bus reset\n", tag().c_str());
 		return;
 	}
 
@@ -148,7 +148,7 @@ void ncr5380n_device::step(bool timeout)
 
 	if(0)
 		printf("%s: state=%d.%d %s\n",
-					tag(), state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT,
+					tag().c_str(), state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT,
 					timeout ? "timeout" : "change");
 
 	if(mode == MODE_I && !(ctrl & S_BSY)) {
@@ -230,7 +230,7 @@ void ncr5380n_device::step(bool timeout)
 
 	default:
 		printf("%s: step() unexpected state %d.%d\n",
-					tag(),
+					tag().c_str(),
 					state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT);
 		exit(0);
 	}
@@ -312,7 +312,7 @@ WRITE8_MEMBER(ncr5380n_device::icmd_w)
 	// asserting to drive the data bus?
 	if ((data & IC_DBUS) && !(m_icommand & IC_DBUS))
 	{
-//      printf("%s: driving data bus with %02x\n", tag(), m_outdata);
+//      printf("%s: driving data bus with %02x\n", tag().c_str(), m_outdata);
 		scsi_bus->data_w(scsi_refid, m_outdata);
 		delay(2);
 	}
@@ -330,7 +330,7 @@ WRITE8_MEMBER(ncr5380n_device::icmd_w)
 			(data & IC_SEL ? S_SEL : 0) |
 			(data & IC_ATN ? S_ATN : 0);
 
-//      printf("%s: changing control lines %04x\n", tag(), newdata);
+//      printf("%s: changing control lines %04x\n", tag().c_str(), newdata);
 		scsi_bus->ctrl_w(scsi_refid, newdata, S_RST|S_ACK|S_BSY|S_SEL|S_ATN);
 	}
 
@@ -345,7 +345,7 @@ READ8_MEMBER(ncr5380n_device::mode_r)
 
 WRITE8_MEMBER(ncr5380n_device::mode_w)
 {
-//  printf("%s: mode_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
+//  printf("%s: mode_w %02x (%08x)\n", tag().c_str(), data, space.device().safe_pc());
 	// arbitration bit being set?
 	if ((data & MODE_ARBITRATE) && !(m_mode & MODE_ARBITRATE))
 	{
@@ -373,13 +373,13 @@ WRITE8_MEMBER(ncr5380n_device::mode_w)
 
 READ8_MEMBER(ncr5380n_device::command_r)
 {
-//  logerror("%s: command_r %02x (%08x)\n", tag(), m_tcommand, space.device().safe_pc());
+//  logerror("%s: command_r %02x (%08x)\n", tag().c_str(), m_tcommand, space.device().safe_pc());
 	return m_tcommand;
 }
 
 WRITE8_MEMBER(ncr5380n_device::command_w)
 {
-//  printf("%s: command_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
+//  printf("%s: command_w %02x (%08x)\n", tag().c_str(), data, space.device().safe_pc());
 	m_tcommand = data;
 
 	// recalculate phase match
@@ -423,7 +423,7 @@ READ8_MEMBER(ncr5380n_device::status_r)
 		(ctrl & S_INP ? ST_IO  : 0) |
 		(ctrl & S_SEL ? ST_SEL : 0);
 
-//  printf("%s: status_r %02x (%08x)\n", tag(), res, space.device().safe_pc());
+//  printf("%s: status_r %02x (%08x)\n", tag().c_str(), res, space.device().safe_pc());
 	return res;
 }
 
@@ -438,7 +438,7 @@ READ8_MEMBER(ncr5380n_device::busandstatus_r)
 		(ctrl & S_ATN ? BAS_ATN : 0) |
 		(ctrl & S_ACK ? BAS_ACK : 0);
 
-//  printf("%s: busandstatus_r %02x (%08x)\n", tag(), res, space.device().safe_pc());
+//  printf("%s: busandstatus_r %02x (%08x)\n", tag().c_str(), res, space.device().safe_pc());
 
 	return res;
 }

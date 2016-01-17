@@ -22,7 +22,7 @@ class segaxbd_state : public device_t
 {
 public:
 	// construction/destruction
-	segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segaxbd_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// compare/timer chip callbacks
 	void timer_ack_callback();
@@ -158,7 +158,7 @@ protected:
 class segaxbd_regular_state :  public segaxbd_state
 {
 public:
-	segaxbd_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segaxbd_regular_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -171,7 +171,7 @@ protected:
 class segaxbd_fd1094_state :  public segaxbd_state
 {
 public:
-	segaxbd_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segaxbd_fd1094_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -182,7 +182,7 @@ protected:
 class segaxbd_lastsurv_fd1094_state :  public segaxbd_state
 {
 public:
-	segaxbd_lastsurv_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segaxbd_lastsurv_fd1094_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -193,7 +193,7 @@ protected:
 class segaxbd_lastsurv_state :  public segaxbd_state
 {
 public:
-	segaxbd_lastsurv_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segaxbd_lastsurv_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -205,7 +205,7 @@ protected:
 class segaxbd_smgp_fd1094_state :  public segaxbd_state
 {
 public:
-	segaxbd_smgp_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segaxbd_smgp_fd1094_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -217,7 +217,7 @@ protected:
 class segaxbd_smgp_state :  public segaxbd_state
 {
 public:
-	segaxbd_smgp_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segaxbd_smgp_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -229,7 +229,7 @@ protected:
 class segaxbd_rascot_state :  public segaxbd_state
 {
 public:
-	segaxbd_rascot_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segaxbd_rascot_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;

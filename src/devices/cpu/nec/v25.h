@@ -32,7 +32,7 @@ class v25_common_device : public cpu_device
 {
 public:
 	// construction/destruction
-	v25_common_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, bool is_16bit, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type);
+	v25_common_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, bool is_16bit, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type);
 
 	// static configuration helpers
 	static void set_decryption_table(device_t &device, const UINT8 *decryption_table) { downcast<v25_common_device &>(device).m_v25v35_decryptiontable = decryption_table; }
@@ -440,14 +440,14 @@ union internalram
 class v25_device : public v25_common_device
 {
 public:
-	v25_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v25_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class v35_device : public v25_common_device
 {
 public:
-	v35_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v35_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

@@ -20,7 +20,7 @@
 class ata_mass_storage_device : public ata_hle_device
 {
 public:
-	ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
+	ata_mass_storage_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock,std::string shortname, std::string source);
 
 	UINT16 *identify_device_buffer() { return m_identify_buffer; }
 
@@ -87,8 +87,8 @@ class ide_hdd_device : public ata_mass_storage_device
 {
 public:
 	// construction/destruction
-	ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	ide_hdd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	ide_hdd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ide_hdd_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 protected:
 	// device-level overrides

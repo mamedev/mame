@@ -27,14 +27,14 @@ class device_delegate_helper
 {
 protected:
 	// constructor
-	device_delegate_helper(const char *devname) : m_device_name(devname) { }
+	device_delegate_helper(std::string devname) : m_device_name(devname) { }
 
 	// internal helpers
 	delegate_late_bind &bound_object(device_t &search_root);
-	static const char *safe_tag(device_t *object);
+	static std::string safe_tag(device_t *object);
 
 	// internal state
-	const char *m_device_name;
+	std::string m_device_name;
 };
 
 
@@ -50,7 +50,7 @@ class device_delegate : public delegate<_Signature>, device_delegate_helper
 
 public:
 	// provide the same constructors as the base class
-	device_delegate() : basetype(), device_delegate_helper(nullptr) { }
+	device_delegate() : basetype(), device_delegate_helper(std::string()) { }
 	device_delegate(const basetype &src) : basetype(src), device_delegate_helper(src.m_device_name) { }
 	device_delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object), device_delegate_helper(src.m_device_name) { }
 	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object), device_delegate_helper(safe_tag(dynamic_cast<device_t *>(object))) { }
@@ -61,13 +61,13 @@ public:
 	device_delegate &operator=(const thistype &src) { *static_cast<basetype *>(this) = src; m_device_name = src.m_device_name; return *this; }
 
 	// provide additional constructors that take a device name string
-	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, const char *devname) : basetype(funcptr, name, (_FunctionClass *)nullptr), device_delegate_helper(devname) { }
-	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, const char *devname, _FunctionClass *object) : basetype(funcptr, name, (_FunctionClass *)nullptr), device_delegate_helper(devname) { }
+	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, const char *devname) : basetype(funcptr, name, (_FunctionClass *)nullptr), device_delegate_helper(devname==nullptr ? std::string() : devname) { }
+	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, const char *devname, _FunctionClass *object) : basetype(funcptr, name, (_FunctionClass *)nullptr), device_delegate_helper(devname == nullptr ? std::string() : devname) { }
 #ifdef USE_STATIC_DELEGATE
-	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, const char *devname, _FunctionClass *object) : basetype(funcptr, name, (_FunctionClass *)nullptr), device_delegate_helper(devname) { }
-	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, const char *devname, _FunctionClass *object) : basetype(funcptr, name, (_FunctionClass *)nullptr), device_delegate_helper(devname) { }
-	device_delegate(typename basetype::template traits<device_t>::static_func_type funcptr, const char *name) : basetype(funcptr, name, (device_t *)nullptr), device_delegate_helper(nullptr) { }
-	device_delegate(typename basetype::template traits<device_t>::static_ref_func_type funcptr, const char *name) : basetype(funcptr, name, (device_t *)nullptr), device_delegate_helper(nullptr) { }
+	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, const char *devname, _FunctionClass *object) : basetype(funcptr, name, (_FunctionClass *)nullptr), device_delegate_helper(devname == nullptr ? std::string() : devname) { }
+	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, const char *devname, _FunctionClass *object) : basetype(funcptr, name, (_FunctionClass *)nullptr), device_delegate_helper(devname == nullptr ? std::string() : devname) { }
+	device_delegate(typename basetype::template traits<device_t>::static_func_type funcptr, const char *name) : basetype(funcptr, name, (device_t *)nullptr), device_delegate_helper(std::string()) { }
+	device_delegate(typename basetype::template traits<device_t>::static_ref_func_type funcptr, const char *name) : basetype(funcptr, name, (device_t *)nullptr), device_delegate_helper(std::string()) { }
 #endif
 
 	// and constructors that provide a search root
@@ -77,7 +77,7 @@ public:
 	void bind_relative_to(device_t &search_root) { assert(&search_root != nullptr); if (!basetype::isnull()) basetype::late_bind(bound_object(search_root)); }
 
 	// getter (for validation purposes)
-	const char *device_name() const { return m_device_name; }
+	std::string device_name() const { return m_device_name; }
 };
 
 

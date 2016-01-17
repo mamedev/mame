@@ -15,7 +15,7 @@
 class ac1_state : public driver_device
 {
 public:
-	ac1_state(const machine_config &mconfig, device_type type, const char *tag)
+	ac1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_cassette(*this, "cassette"),
 		m_maincpu(*this, "maincpu"),

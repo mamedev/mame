@@ -29,9 +29,9 @@ class ibm5160_mb_device : public device_t
 {
 public:
 	// construction/destruction
-	ibm5160_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ibm5160_mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
+	static void static_set_cputag(device_t &device, std::string tag);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -108,7 +108,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_page_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 
-	const char *m_cputag;
+	std::string m_cputag;
 
 private:
 	void pc_select_dma_channel(int channel, bool state);
@@ -128,7 +128,7 @@ class ibm5150_mb_device : public ibm5160_mb_device
 {
 public:
 	// construction/destruction
-	ibm5150_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ibm5150_mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -160,7 +160,7 @@ class ec1841_mb_device : public ibm5160_mb_device
 {
 public:
 	// construction/destruction
-	ec1841_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ec1841_mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -188,7 +188,7 @@ class pc_noppi_mb_device : public ibm5160_mb_device
 {
 public:
 	// construction/destruction
-	pc_noppi_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc_noppi_mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;

@@ -198,29 +198,29 @@ const device_type VC4000_ROM_RAM1K = &device_creator<vc4000_ram1k_device>;
 const device_type VC4000_ROM_CHESS2 = &device_creator<vc4000_chess2_device>;
 
 
-vc4000_rom_device::vc4000_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+vc4000_rom_device::vc4000_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_vc4000_cart_interface( mconfig, *this )
 {
 }
 
-vc4000_rom_device::vc4000_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vc4000_rom_device::vc4000_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, VC4000_ROM_STD, "VC 4000 Standard Carts", tag, owner, clock, "vc4000_rom", __FILE__),
 						device_vc4000_cart_interface( mconfig, *this )
 {
 }
 
-vc4000_rom4k_device::vc4000_rom4k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vc4000_rom4k_device::vc4000_rom4k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: vc4000_rom_device(mconfig, VC4000_ROM_ROM4K, "VC 4000 Carts w/4K ROM", tag, owner, clock, "vc4000_rom4k", __FILE__)
 {
 }
 
-vc4000_ram1k_device::vc4000_ram1k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vc4000_ram1k_device::vc4000_ram1k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: vc4000_rom_device(mconfig, VC4000_ROM_RAM1K, "VC 4000 Carts w/1K RAM", tag, owner, clock, "vc4000_ram1k", __FILE__)
 {
 }
 
-vc4000_chess2_device::vc4000_chess2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vc4000_chess2_device::vc4000_chess2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: vc4000_rom_device(mconfig, VC4000_ROM_CHESS2, "VC 4000 Chess II Cart", tag, owner, clock, "vc4000_chess2", __FILE__)
 {
 }

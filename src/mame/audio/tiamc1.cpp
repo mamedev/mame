@@ -57,7 +57,7 @@ const device_type TIAMC1 = &device_creator<tiamc1_sound_device>;
 //  tiamc1_sound_device - constructor
 //-------------------------------------------------
 
-tiamc1_sound_device::tiamc1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tiamc1_sound_device::tiamc1_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TIAMC1, "TIA-MC1 Audio Custom", tag, owner, clock, "tiamc1_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),

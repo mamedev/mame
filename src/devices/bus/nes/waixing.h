@@ -12,8 +12,8 @@ class nes_waixing_a_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_waixing_a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_waixing_a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_a_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_waixing_a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -37,7 +37,7 @@ class nes_waixing_a1_device : public nes_waixing_a_device
 {
 public:
 	// construction/destruction
-	nes_waixing_a1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_a1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual void chr_cb(int start, int bank, int source) override;
 };
@@ -49,7 +49,7 @@ class nes_waixing_b_device : public nes_waixing_a_device
 {
 public:
 	// construction/destruction
-	nes_waixing_b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void chr_cb(int start, int bank, int source) override;
@@ -62,7 +62,7 @@ class nes_waixing_c_device : public nes_waixing_a_device
 {
 public:
 	// construction/destruction
-	nes_waixing_c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_c_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void chr_cb(int start, int bank, int source) override;
@@ -75,7 +75,7 @@ class nes_waixing_d_device : public nes_waixing_a_device
 {
 public:
 	// construction/destruction
-	nes_waixing_d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_d_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void chr_cb(int start, int bank, int source) override;
@@ -88,7 +88,7 @@ class nes_waixing_e_device : public nes_waixing_a_device
 {
 public:
 	// construction/destruction
-	nes_waixing_e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_e_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void chr_cb(int start, int bank, int source) override;
@@ -101,7 +101,7 @@ class nes_waixing_f_device : public nes_waixing_a_device
 {
 public:
 	// construction/destruction
-	nes_waixing_f_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_f_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
@@ -120,7 +120,7 @@ class nes_waixing_g_device : public nes_waixing_a_device
 {
 public:
 	// construction/destruction
-	nes_waixing_g_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_g_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
@@ -139,8 +139,8 @@ class nes_waixing_h_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_waixing_h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_waixing_h_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_h_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_waixing_h_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
@@ -156,7 +156,7 @@ class nes_waixing_h1_device : public nes_waixing_h_device
 {
 public:
 	// construction/destruction
-	nes_waixing_h1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_h1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
@@ -171,7 +171,7 @@ class nes_waixing_i_device : public nes_waixing_a_device
 {
 public:
 	// construction/destruction
-	nes_waixing_i_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_i_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// still to emulate this variant
 };
@@ -183,7 +183,7 @@ class nes_waixing_j_device : public nes_waixing_a_device
 {
 public:
 	// construction/destruction
-	nes_waixing_j_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_j_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -203,7 +203,7 @@ class nes_waixing_sh2_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_waixing_sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_sh2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -223,7 +223,7 @@ class nes_waixing_sec_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_waixing_sec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_sec_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -244,7 +244,7 @@ class nes_waixing_sgz_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_waixing_sgz_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_sgz_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -267,7 +267,7 @@ class nes_waixing_sgzlz_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_waixing_sgzlz_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_sgzlz_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -286,7 +286,7 @@ class nes_waixing_ffv_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_waixing_ffv_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_ffv_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -305,7 +305,7 @@ class nes_waixing_wxzs_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_waixing_wxzs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_wxzs_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -321,7 +321,7 @@ class nes_waixing_dq8_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_waixing_dq8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_dq8_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -337,7 +337,7 @@ class nes_waixing_wxzs2_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_waixing_wxzs2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_wxzs2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -353,7 +353,7 @@ class nes_waixing_fs304_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_waixing_fs304_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_waixing_fs304_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

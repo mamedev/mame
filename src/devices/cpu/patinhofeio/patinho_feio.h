@@ -37,7 +37,7 @@ class patinho_feio_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	patinho_feio_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	patinho_feio_cpu_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
 
 	template<class _Object> static devcb_base &set_rc_read_callback(device_t &device, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_rc_read_cb.set_callback(object); }
 

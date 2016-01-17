@@ -46,7 +46,7 @@ Tomasz Slanina 20050225
 class vroulet_state : public driver_device
 {
 public:
-	vroulet_state(const machine_config &mconfig, device_type type, const char *tag)
+	vroulet_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),

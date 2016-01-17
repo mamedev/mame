@@ -4,7 +4,7 @@
 
 const device_type RS232_PORT = &device_creator<rs232_port_device>;
 
-rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+rs232_port_device::rs232_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, RS232_PORT, "RS232 Port", tag, owner, clock, "rs232", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_rxd(0),
@@ -21,7 +21,7 @@ rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *
 {
 }
 
-rs232_port_device::rs232_port_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+rs232_port_device::rs232_port_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_slot_interface(mconfig, *this),
 	m_rxd(0),

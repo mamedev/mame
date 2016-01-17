@@ -53,7 +53,7 @@ static ADDRESS_MAP_START(tmp91641_mem, AS_PROGRAM, 8, tlcs90_device )
 ADDRESS_MAP_END
 
 
-tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, address_map_constructor program_map)
+tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, address_map_constructor program_map)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, program_map)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
@@ -61,24 +61,24 @@ tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, co
 }
 
 
-tmp90840_device::tmp90840_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tmp90840_device::tmp90840_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tlcs90_device(mconfig, TMP90840, "TMP90840", tag, owner, clock, "tmp90840", __FILE__, ADDRESS_MAP_NAME(tmp90840_mem))
 {
 }
 
-tmp90841_device::tmp90841_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tmp90841_device::tmp90841_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tlcs90_device(mconfig, TMP90841, "TMP90841", tag, owner, clock, "tmp90841", __FILE__, ADDRESS_MAP_NAME(tmp90841_mem))
 {
 }
 
 
-tmp91640_device::tmp91640_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tmp91640_device::tmp91640_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tlcs90_device(mconfig, TMP91640, "TMP91640", tag, owner, clock, "tmp91640", __FILE__, ADDRESS_MAP_NAME(tmp91640_mem))
 {
 }
 
 
-tmp91641_device::tmp91641_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tmp91641_device::tmp91641_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tlcs90_device(mconfig, TMP91641, "TMP91641", tag, owner, clock, "tmp91641", __FILE__, ADDRESS_MAP_NAME(tmp91641_mem))
 {
 }

@@ -149,7 +149,7 @@ GND | 20
 class kenseim_state : public cps_state
 {
 public:
-	kenseim_state(const machine_config &mconfig, device_type type, const char *tag)
+	kenseim_state(const machine_config &mconfig, device_type type, std::string tag)
 		: cps_state(mconfig, type, tag),
 		m_to_68k_cmd_low(0),
 		m_to_68k_cmd_d9(0),

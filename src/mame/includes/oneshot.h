@@ -5,7 +5,7 @@
 class oneshot_state : public driver_device
 {
 public:
-	oneshot_state(const machine_config &mconfig, device_type type, const char *tag)
+	oneshot_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_sprites(*this, "sprites"),
 		m_bg_videoram(*this, "bg_videoram"),

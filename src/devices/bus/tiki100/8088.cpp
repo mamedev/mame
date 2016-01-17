@@ -91,7 +91,7 @@ machine_config_constructor tiki100_8088_t::device_mconfig_additions() const
 //  tiki100_8088_t - constructor
 //-------------------------------------------------
 
-tiki100_8088_t::tiki100_8088_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+tiki100_8088_t::tiki100_8088_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, TIKI100_8088, "TIKI-100 8/16", tag, owner, clock, "tiki100_8088", __FILE__),
 	device_tiki100bus_card_interface(mconfig, *this),
 	m_maincpu(*this, I8088_TAG),

@@ -7,18 +7,18 @@ const device_type H8_SCI = &device_creator<h8_sci_device>;
 
 const char *const h8_sci_device::state_names[] = { "idle", "start", "bit", "parity", "stop", "last-tick" };
 
-h8_sci_device::h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8_sci_device::h8_sci_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, H8_SCI, "H8 Serial Communications Interface", tag, owner, clock, "h8_sci", __FILE__),
 	cpu(*this, DEVICE_SELF_OWNER),
 	tx_cb(*this),
-	clk_cb(*this), intc(nullptr), intc_tag(nullptr), external_to_internal_ratio(0), internal_to_external_ratio(0), sync_timer(nullptr), eri_int(0), rxi_int(0), txi_int(0), tei_int(0),
+	clk_cb(*this), intc(nullptr), external_to_internal_ratio(0), internal_to_external_ratio(0), sync_timer(nullptr), eri_int(0), rxi_int(0), txi_int(0), tei_int(0),
 	tx_state(0), rx_state(0), tx_bit(0), rx_bit(0), clock_state(0), clock_mode(0), tx_parity(0), rx_parity(0), ext_clock_counter(0), clock_value(false), ext_clock_value(false), rx_value(false),
 	rdr(0), tdr(0), smr(0), scr(0), ssr(0), brr(0), rsr(0), tsr(0), clock_base(0), divider(0)
 {
 	external_clock_period = attotime::never;
 }
 
-void h8_sci_device::set_info(const char *_intc_tag,int eri, int rxi, int txi, int tei)
+void h8_sci_device::set_info(std::string _intc_tag,int eri, int rxi, int txi, int tei)
 {
 	intc_tag = _intc_tag;
 	eri_int = eri;
@@ -35,7 +35,7 @@ void h8_sci_device::set_external_clock_period(const attotime &period)
 WRITE8_MEMBER(h8_sci_device::smr_w)
 {
 	smr = data;
-	logerror("%s: smr_w %02x %s %c%c%c%s /%d (%06x)\n", tag(), data,
+	logerror("%s: smr_w %02x %s %c%c%c%s /%d (%06x)\n", tag().c_str(), data,
 				data & SMR_CA ? "sync" : "async",
 				data & SMR_CHR ? '7' : '8',
 				data & SMR_PE ? data & SMR_OE ? 'o' : 'e' : 'n',
@@ -48,20 +48,20 @@ WRITE8_MEMBER(h8_sci_device::smr_w)
 
 READ8_MEMBER(h8_sci_device::smr_r)
 {
-	logerror("%s: smr_r %02x (%06x)\n", tag(), smr, cpu->pc());
+	logerror("%s: smr_r %02x (%06x)\n", tag().c_str(), smr, cpu->pc());
 	return smr;
 }
 
 WRITE8_MEMBER(h8_sci_device::brr_w)
 {
 	brr = data;
-	logerror("%s: brr_w %02x (%06x)\n", tag(), data, cpu->pc());
+	logerror("%s: brr_w %02x (%06x)\n", tag().c_str(), data, cpu->pc());
 	clock_update();
 }
 
 READ8_MEMBER(h8_sci_device::brr_r)
 {
-	logerror("%s: brr_r %02x (%06x)\n", tag(), brr, cpu->pc());
+	logerror("%s: brr_r %02x (%06x)\n", tag().c_str(), brr, cpu->pc());
 	return brr;
 }
 
@@ -77,7 +77,7 @@ bool h8_sci_device::has_recv_error() const
 
 WRITE8_MEMBER(h8_sci_device::scr_w)
 {
-	logerror("%s: scr_w %02x%s%s%s%s%s%s clk=%d (%06x)\n", tag(), data,
+	logerror("%s: scr_w %02x%s%s%s%s%s%s clk=%d (%06x)\n", tag().c_str(), data,
 				data & SCR_TIE  ? " txi" : "",
 				data & SCR_RIE  ? " rxi" : "",
 				data & SCR_TE   ? " tx" : "",
@@ -110,19 +110,19 @@ WRITE8_MEMBER(h8_sci_device::scr_w)
 
 READ8_MEMBER(h8_sci_device::scr_r)
 {
-	logerror("%s: scr_r %02x (%06x)\n", tag(), scr, cpu->pc());
+	logerror("%s: scr_r %02x (%06x)\n", tag().c_str(), scr, cpu->pc());
 	return scr;
 }
 
 WRITE8_MEMBER(h8_sci_device::tdr_w)
 {
-	logerror("%s: tdr_w %02x (%06x)\n", tag(), data, cpu->pc());
+	logerror("%s: tdr_w %02x (%06x)\n", tag().c_str(), data, cpu->pc());
 	tdr = data;
 }
 
 READ8_MEMBER(h8_sci_device::tdr_r)
 {
-	logerror("%s: tdr_r %02x (%06x)\n", tag(), tdr, cpu->pc());
+	logerror("%s: tdr_r %02x (%06x)\n", tag().c_str(), tdr, cpu->pc());
 	return tdr;
 }
 
@@ -135,7 +135,7 @@ WRITE8_MEMBER(h8_sci_device::ssr_w)
 	if((ssr & SSR_TDRE) && !(data & SSR_TDRE))
 		ssr &= ~SSR_TEND;
 	ssr = ((ssr & ~SSR_MPBT) | (data & SSR_MPBT)) & (data | (SSR_TEND|SSR_MPB|SSR_MPBT));
-	logerror("%s: ssr_w %02x -> %02x (%06x)\n", tag(), data, ssr, cpu->pc());
+	logerror("%s: ssr_w %02x -> %02x (%06x)\n", tag().c_str(), data, ssr, cpu->pc());
 
 	if(tx_state == ST_IDLE && !(ssr & SSR_TDRE))
 		tx_start();
@@ -146,24 +146,24 @@ WRITE8_MEMBER(h8_sci_device::ssr_w)
 
 READ8_MEMBER(h8_sci_device::ssr_r)
 {
-	logerror("%s: ssr_r %02x (%06x)\n", tag(), ssr, cpu->pc());
+	logerror("%s: ssr_r %02x (%06x)\n", tag().c_str(), ssr, cpu->pc());
 	return ssr;
 }
 
 READ8_MEMBER(h8_sci_device::rdr_r)
 {
-	logerror("%s: rdr_r %02x (%06x)\n", tag(), rdr, cpu->pc());
+	logerror("%s: rdr_r %02x (%06x)\n", tag().c_str(), rdr, cpu->pc());
 	return rdr;
 }
 
 WRITE8_MEMBER(h8_sci_device::scmr_w)
 {
-	logerror("%s: scmr_w %02x (%06x)\n", tag(), data, cpu->pc());
+	logerror("%s: scmr_w %02x (%06x)\n", tag().c_str(), data, cpu->pc());
 }
 
 READ8_MEMBER(h8_sci_device::scmr_r)
 {
-	logerror("%s: scmr_r (%06x)\n", tag(), cpu->pc());
+	logerror("%s: scmr_r (%06x)\n", tag().c_str(), cpu->pc());
 	return 0x00;
 }
 
@@ -191,28 +191,28 @@ void h8_sci_device::clock_update()
 
 	switch(clock_mode) {
 	case CLKM_INTERNAL_ASYNC:
-		logerror("%s: clock internal at %d Hz, async, bitrate %d bps\n", tag(), int(cpu->clock() / divider), int(cpu->clock() / (divider*16)));
+		logerror("%s: clock internal at %d Hz, async, bitrate %d bps\n", tag().c_str(), int(cpu->clock() / divider), int(cpu->clock() / (divider*16)));
 		break;
 	case CLKM_INTERNAL_ASYNC_OUT:
-		logerror("%s: clock internal at %d Hz, async, bitrate %d bps, output\n", tag(), int(cpu->clock() / divider), int(cpu->clock() / (divider*16)));
+		logerror("%s: clock internal at %d Hz, async, bitrate %d bps, output\n", tag().c_str(), int(cpu->clock() / divider), int(cpu->clock() / (divider*16)));
 		break;
 	case CLKM_EXTERNAL_ASYNC:
 		if(!external_clock_period.is_never()) {
 			clock_mode = CLKM_EXTERNAL_RATE_ASYNC;
-			logerror("%s: clock external at %d Hz, async, bitrate %d bps\n", tag(), int(cpu->clock()*internal_to_external_ratio), int(cpu->clock()*internal_to_external_ratio/16));
+			logerror("%s: clock external at %d Hz, async, bitrate %d bps\n", tag().c_str(), int(cpu->clock()*internal_to_external_ratio), int(cpu->clock()*internal_to_external_ratio/16));
 		} else
-			logerror("%s: clock external, async\n", tag());
+			logerror("%s: clock external, async\n", tag().c_str());
 		break;
 	case CLKM_INTERNAL_SYNC_OUT:
-		logerror("%s: clock internal at %d Hz, sync, output\n", tag(), int(cpu->clock() / (divider*2)));
+		logerror("%s: clock internal at %d Hz, sync, output\n", tag().c_str(), int(cpu->clock() / (divider*2)));
 		break;
 
 	case CLKM_EXTERNAL_SYNC:
 		if(!external_clock_period.is_never()) {
 			clock_mode = CLKM_EXTERNAL_RATE_ASYNC;
-			logerror("%s: clock external at %d Hz, sync\n", tag(), int(cpu->clock()*internal_to_external_ratio));
+			logerror("%s: clock external at %d Hz, sync\n", tag().c_str(), int(cpu->clock()*internal_to_external_ratio));
 		} else
-			logerror("%s: clock external, sync\n", tag());
+			logerror("%s: clock external, sync\n", tag().c_str());
 		break;
 	}
 }
@@ -290,7 +290,7 @@ void h8_sci_device::device_timer(emu_timer &timer, device_timer_id id, int param
 WRITE_LINE_MEMBER(h8_sci_device::rx_w)
 {
 	rx_value = state;
-	logerror("%s: rx=%d\n", tag(), state);
+	logerror("%s: rx=%d\n", tag().c_str(), state);
 	if(!rx_value && !(clock_state & CLK_RX) && rx_state != ST_IDLE)
 		clock_start(CLK_RX);
 }
@@ -464,30 +464,30 @@ void h8_sci_device::clock_start(int mode)
 		case CLKM_INTERNAL_ASYNC:
 		case CLKM_INTERNAL_ASYNC_OUT:
 		case CLKM_INTERNAL_SYNC_OUT:
-			logerror("%s: Starting internal clock\n", tag());
+			logerror("%s: Starting internal clock\n", tag().c_str());
 			clock_base = cpu->total_cycles();
 			cpu->internal_update();
 			break;
 
 		case CLKM_EXTERNAL_RATE_ASYNC:
-			logerror("%s: Simulating external clock async\n", tag());
+			logerror("%s: Simulating external clock async\n", tag().c_str());
 			clock_base = UINT64(cpu->total_cycles()*internal_to_external_ratio);
 			cpu->internal_update();
 			break;
 
 		case CLKM_EXTERNAL_RATE_SYNC:
-			logerror("%s: Simulating external clock sync\n", tag());
+			logerror("%s: Simulating external clock sync\n", tag().c_str());
 			clock_base = UINT64(cpu->total_cycles()*2*internal_to_external_ratio);
 			cpu->internal_update();
 			break;
 
 		case CLKM_EXTERNAL_ASYNC:
-			logerror("%s: Waiting for external clock async\n", tag());
+			logerror("%s: Waiting for external clock async\n", tag().c_str());
 			ext_clock_counter = 15;
 			break;
 
 		case CLKM_EXTERNAL_SYNC:
-			logerror("%s: Waiting for external clock sync\n", tag());
+			logerror("%s: Waiting for external clock sync\n", tag().c_str());
 			break;
 		}
 	} else
@@ -505,7 +505,7 @@ void h8_sci_device::tx_start()
 	ssr |= SSR_TDRE;
 	tsr = tdr;
 	tx_parity = smr & SMR_OE ? 0 : 1;
-	logerror("%s: start transmit %02x\n", tag(), tsr);
+	logerror("%s: start transmit %02x\n", tag().c_str(), tsr);
 	if(scr & SCR_TIE)
 		intc->internal_interrupt(txi_int);
 	if(smr & SMR_CA) {
@@ -522,7 +522,7 @@ void h8_sci_device::tx_start()
 
 void h8_sci_device::tx_dropped_edge()
 {
-	logerror("%s: tx_dropped_edge state=%s bit=%d\n", tag(), state_names[tx_state], tx_bit);
+	logerror("%s: tx_dropped_edge state=%s bit=%d\n", tag().c_str(), state_names[tx_state], tx_bit);
 	switch(tx_state) {
 	case ST_START:
 		tx_cb(false);
@@ -587,7 +587,7 @@ void h8_sci_device::tx_dropped_edge()
 	default:
 		abort();
 	}
-	logerror("%s:             -> state=%s bit=%d\n", tag(), state_names[tx_state], tx_bit);
+	logerror("%s:             -> state=%s bit=%d\n", tag().c_str(), state_names[tx_state], tx_bit);
 }
 
 void h8_sci_device::rx_start()
@@ -595,7 +595,7 @@ void h8_sci_device::rx_start()
 	ssr |= SSR_TDRE;
 	rx_parity = smr & SMR_OE ? 0 : 1;
 	rsr = 0x00;
-	logerror("%s: start receive\n", tag());
+	logerror("%s: start receive\n", tag().c_str());
 	if(smr & SMR_CA) {
 		rx_state = ST_BIT;
 		rx_bit = 8;
@@ -613,13 +613,13 @@ void h8_sci_device::rx_done()
 	if(!(ssr & SSR_FER)) {
 		if((smr & SMR_PE) && rx_parity) {
 			ssr |= SSR_PER;
-			logerror("%s: Receive parity error\n", tag());
+			logerror("%s: Receive parity error\n", tag().c_str());
 		} else if(ssr & SSR_RDRF) {
 			ssr |= SSR_ORER;
-			logerror("%s: Receive overrun\n", tag());
+			logerror("%s: Receive overrun\n", tag().c_str());
 		} else {
 			ssr |= SSR_RDRF;
-			logerror("%s: Received %02x\n", tag(), rsr);
+			logerror("%s: Received %02x\n", tag().c_str(), rsr);
 			rdr = rsr;
 		}
 	}
@@ -639,7 +639,7 @@ void h8_sci_device::rx_done()
 
 void h8_sci_device::rx_raised_edge()
 {
-	logerror("%s: rx_raised_edge state=%s bit=%d\n", tag(), state_names[rx_state], rx_bit);
+	logerror("%s: rx_raised_edge state=%s bit=%d\n", tag().c_str(), state_names[rx_state], rx_bit);
 	switch(rx_state) {
 	case ST_START:
 		if(rx_value) {
@@ -690,5 +690,5 @@ void h8_sci_device::rx_raised_edge()
 	default:
 		abort();
 	}
-	logerror("%s:             -> state=%s, bit=%d\n", tag(), state_names[rx_state], rx_bit);
+	logerror("%s:             -> state=%s, bit=%d\n", tag().c_str(), state_names[rx_state], rx_bit);
 }

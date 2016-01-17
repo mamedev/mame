@@ -57,7 +57,7 @@ const UINT32 VIRTUAL_LEAD_OUT_TRACKS = LEAD_OUT_MIN_SIZE_IN_UM * 1000 / NOMINAL_
 //  laserdisc_device - constructor
 //-------------------------------------------------
 
-laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
@@ -296,7 +296,7 @@ void laserdisc_device::static_set_overlay_scale(device_t &device, float scalex, 
 //  configuration
 //-------------------------------------------------
 
-void laserdisc_device::static_set_overlay_palette(device_t &device, const char *tag)
+void laserdisc_device::static_set_overlay_palette(device_t &device, std::string tag)
 {
 	downcast<laserdisc_device &>(device).m_overlay_palette.set_tag(tag);
 }
@@ -737,7 +737,7 @@ void laserdisc_device::init_disc()
 	if (!m_getdisc_callback.isnull())
 		m_disc = m_getdisc_callback(*this);
 	else
-		m_disc = machine().rom_load().get_disk_handle(tag());
+		m_disc = machine().rom_load().get_disk_handle(tag().c_str());
 
 	// set default parameters
 	m_width = 720;
@@ -1156,7 +1156,7 @@ void laserdisc_device::config_load(config_type cfg_type, xml_data_node *parentno
 	for (xml_data_node *ldnode = xml_get_sibling(parentnode->child, "device"); ldnode != nullptr; ldnode = xml_get_sibling(ldnode->next, "device"))
 	{
 		const char *devtag = xml_get_attribute_string(ldnode, "tag", "");
-		if (strcmp(devtag, tag()) == 0)
+		if (strcmp(devtag, tag().c_str()) == 0)
 		{
 			// handle the overlay node
 			xml_data_node *overnode = xml_get_sibling(ldnode->child, "overlay");
@@ -1189,7 +1189,7 @@ void laserdisc_device::config_save(config_type cfg_type, xml_data_node *parentno
 	if (ldnode != nullptr)
 	{
 		// output the basics
-		xml_set_attribute(ldnode, "tag", tag());
+		xml_set_attribute(ldnode, "tag", tag().c_str());
 
 		// add an overlay node
 		xml_data_node *overnode = xml_add_child(ldnode, "overlay", nullptr);

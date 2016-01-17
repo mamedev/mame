@@ -29,7 +29,7 @@ class partner128_t : public device_t,
 {
 public:
 	// construction/destruction
-	partner128_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	partner128_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;

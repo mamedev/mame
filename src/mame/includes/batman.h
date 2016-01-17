@@ -13,7 +13,7 @@
 class batman_state : public atarigen_state
 {
 public:
-	batman_state(const machine_config &mconfig, device_type type, const char *tag)
+	batman_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atarigen_state(mconfig, type, tag),
 			m_jsa(*this, "jsa"),
 			m_vad(*this, "vad") { }

@@ -18,7 +18,7 @@
 class mini2440_state : public driver_device
 {
 public:
-	mini2440_state(const machine_config &mconfig, device_type type, const char *tag)
+	mini2440_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_s3c2440(*this, "s3c2440"),

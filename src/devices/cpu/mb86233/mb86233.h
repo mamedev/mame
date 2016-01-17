@@ -51,7 +51,7 @@ class mb86233_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	mb86233_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb86233_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_fifo_read_cb(device_t &device, _Object object) { return downcast<mb86233_cpu_device &>(device).m_fifo_read_cb.set_callback(object); }

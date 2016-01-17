@@ -92,8 +92,8 @@ class legacy_floppy_image_device :  public device_t,
 {
 public:
 	// construction/destruction
-	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	legacy_floppy_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	legacy_floppy_image_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	~legacy_floppy_image_device();
 
 	template<class _Object> static devcb_base &set_out_idx_func(device_t &device, _Object object) { return downcast<legacy_floppy_image_device &>(device).m_out_idx_func.set_callback(object); }

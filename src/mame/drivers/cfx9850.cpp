@@ -26,7 +26,7 @@ Debugging information:
 class cfx9850_state : public driver_device
 {
 public:
-	cfx9850_state(const machine_config &mconfig, device_type type, const char *tag)
+	cfx9850_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_display_ram(*this, "display_ram"),

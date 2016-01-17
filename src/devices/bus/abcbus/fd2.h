@@ -32,7 +32,7 @@ class abc_fd2_t :  public device_t,
 {
 public:
 	// construction/destruction
-	abc_fd2_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc_fd2_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;

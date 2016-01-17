@@ -105,7 +105,7 @@ Alien Crush & Pac_Land: dumps made from PC-Engine dumps of JP versions
 class uapce_state : public pce_common_state
 {
 public:
-	uapce_state(const machine_config &mconfig, device_type type, const char *tag)
+	uapce_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pce_common_state(mconfig, type, tag),
 		m_discrete(*this, "discrete") { }
 

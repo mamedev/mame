@@ -35,10 +35,10 @@ class k053260_device : public device_t,
 						public device_sound_interface
 {
 public:
-	k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k053260_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~k053260_device() { }
 
-	static void set_region_tag(device_t &device, const char *tag) { downcast<k053260_device &>(device).m_rgnoverride = tag; }
+	static void set_region_tag(device_t &device, std::string tag) { downcast<k053260_device &>(device).m_rgnoverride = tag; }
 
 	DECLARE_READ8_MEMBER( main_read );
 	DECLARE_WRITE8_MEMBER( main_write );
@@ -55,7 +55,7 @@ protected:
 
 private:
 	// configuration
-	const char *    m_rgnoverride;
+	std::string     m_rgnoverride;
 
 	sound_stream *  m_stream;
 	UINT8 *         m_rom;

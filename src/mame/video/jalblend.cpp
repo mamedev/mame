@@ -24,7 +24,7 @@
 
 const device_type JALECO_BLEND = &device_creator<jaleco_blend_device>;
 
-jaleco_blend_device::jaleco_blend_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+jaleco_blend_device::jaleco_blend_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, JALECO_BLEND, "Jaleco Blending Device", tag, owner, clock, "jaleco_blend", __FILE__),
 	m_table(nullptr)
 {

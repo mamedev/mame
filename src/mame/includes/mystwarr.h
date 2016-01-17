@@ -9,7 +9,7 @@
 class mystwarr_state : public konamigx_state
 {
 public:
-	mystwarr_state(const machine_config &mconfig, device_type type, const char *tag)
+	mystwarr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: konamigx_state(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_k053252(*this, "k053252"),

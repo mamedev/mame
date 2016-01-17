@@ -187,7 +187,7 @@ Not all regional versions are available for each Megatouch series
 class meritm_state : public driver_device
 {
 public:
-	meritm_state(const machine_config &mconfig, device_type type, const char *tag)
+	meritm_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_z80pio_0(*this, "z80pio_0"),
 			m_z80pio_1(*this, "z80pio_1"),

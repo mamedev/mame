@@ -30,8 +30,8 @@ class msx_slot_cartridge_device : public device_t
 {
 public:
 	// construction/destruction
-	msx_slot_cartridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	msx_slot_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_slot_cartridge_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	msx_slot_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<msx_slot_cartridge_device &>(device).m_irq_handler.set_callback(object); }
@@ -75,7 +75,7 @@ class msx_slot_yamaha_expansion_device : public msx_slot_cartridge_device
 {
 public:
 	// construction/destruction
-	msx_slot_yamaha_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_slot_yamaha_expansion_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual void device_start() override;
 	virtual void device_config_complete() override { update_names(MSX_SLOT_YAMAHA_EXPANSION, "cartridge60pin", "cart60p"); }

@@ -73,7 +73,7 @@ class nick_device :  public device_t,
 {
 public:
 	// construction/destruction
-	nick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nick_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_virq_wr_callback(device_t &device, _Object object) { return downcast<nick_device &>(device).m_write_virq.set_callback(object); }
 

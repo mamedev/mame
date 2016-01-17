@@ -17,7 +17,7 @@ class serial_mouse_device :
 		public device_serial_interface
 {
 public:
-	serial_mouse_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	serial_mouse_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -55,7 +55,7 @@ private:
 class microsoft_mouse_device : public serial_mouse_device
 {
 public:
-	microsoft_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	microsoft_mouse_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual WRITE_LINE_MEMBER(input_rts) override;
@@ -69,7 +69,7 @@ extern const device_type MSFT_SERIAL_MOUSE;
 class mouse_systems_mouse_device : public serial_mouse_device
 {
 public:
-	mouse_systems_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mouse_systems_mouse_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void set_frame() override { set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2); }

@@ -43,7 +43,7 @@ ToDo:
 class gp_2_state : public genpin_class
 {
 public:
-	gp_2_state(const machine_config &mconfig, device_type type, const char *tag)
+	gp_2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ctc(*this, "ctc")

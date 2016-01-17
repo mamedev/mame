@@ -310,7 +310,7 @@ void rom_load_manager::determine_bios_rom(device_t *device, const char *specbios
 		device->set_system_bios(default_no);
 	}
 	device->set_default_bios(default_no);
-	LOG(("For \"%s\" using System BIOS: %d\n", device->tag(), device->system_bios()));
+	LOG(("For \"%s\" using System BIOS: %d\n", device->tag().c_str(), device->system_bios()));
 }
 
 
@@ -1420,7 +1420,7 @@ void rom_load_manager::process_region_list()
 #endif
 
 				/* now process the entries in the region */
-				process_rom_entries(device->shortname(), region, region + 1, device, FALSE);
+				process_rom_entries(device->shortname().c_str(), region, region + 1, device, FALSE);
 			}
 			else if (ROMREGION_ISDISKDATA(region))
 				process_disk_entries(regiontag.c_str(), region, region + 1, nullptr);
@@ -1460,7 +1460,7 @@ rom_load_manager::rom_load_manager(running_machine &machine)
 			if (device->owner() == nullptr) {
 				specbios.assign(machine.options().bios());
 			} else {
-				specbios = machine.options().sub_value(device->owner()->tag()+1,"bios");
+				specbios = machine.options().sub_value(std::string(device->owner()->tag()).c_str()+1,"bios");
 				if (specbios.empty()) {
 					specbios = device->default_bios_tag();
 				}

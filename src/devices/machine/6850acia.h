@@ -28,7 +28,7 @@ class acia6850_device :  public device_t
 {
 public:
 	// construction/destruction
-	acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	acia6850_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<acia6850_device &>(device).m_txd_handler.set_callback(object); }
@@ -47,7 +47,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_txc );
 
 protected:
-	acia6850_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	acia6850_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// device-level overrides
 	virtual void device_start() override;

@@ -15,7 +15,7 @@
 class bfm_bda_t : public device_t
 {
 public:
-	bfm_bda_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bfm_bda_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
 	static void static_set_value(device_t &device, int val);

@@ -39,7 +39,7 @@
 const device_type N8X300 = &device_creator<n8x300_cpu_device>;
 
 
-n8x300_cpu_device::n8x300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+n8x300_cpu_device::n8x300_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, N8X300, "Signetics 8X300", tag, owner, clock, "8x300", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 14, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 9, 0)

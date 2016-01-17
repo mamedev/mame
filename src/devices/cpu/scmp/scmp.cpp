@@ -21,7 +21,7 @@ const device_type SCMP = &device_creator<scmp_device>;
 const device_type INS8060 = &device_creator<ins8060_device>;
 
 
-scmp_device::scmp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+scmp_device::scmp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SCMP, "INS 8050 SC/MP", tag, owner, clock, "ins8050", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0), m_AC(0), m_ER(0), m_SR(0), m_program(nullptr), m_direct(nullptr), m_icount(0)
 		, m_flag_out_func(*this)
@@ -34,7 +34,7 @@ scmp_device::scmp_device(const machine_config &mconfig, const char *tag, device_
 }
 
 
-scmp_device::scmp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+scmp_device::scmp_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0), m_AC(0), m_ER(0), m_SR(0), m_program(nullptr), m_direct(nullptr), m_icount(0)
 		, m_flag_out_func(*this)
@@ -47,7 +47,7 @@ scmp_device::scmp_device(const machine_config &mconfig, device_type type, const 
 }
 
 
-ins8060_device::ins8060_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ins8060_device::ins8060_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: scmp_device(mconfig, INS8060, "INS 8060 SC/MP II", tag, owner, clock, "ins8060", __FILE__)
 {
 }

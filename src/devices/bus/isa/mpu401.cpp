@@ -66,7 +66,7 @@ machine_config_constructor isa8_mpu401_device::device_mconfig_additions() const
 //  isa8_adlib_device - constructor
 //-------------------------------------------------
 
-isa8_mpu401_device::isa8_mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+isa8_mpu401_device::isa8_mpu401_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, ISA8_MPU401, "Roland MPU-401 MIDI Interface", tag, owner, clock, "isa_mpu401", __FILE__),
 		device_isa8_card_interface( mconfig, *this ),
 		m_mpu401(*this, MPU_CORE_TAG)

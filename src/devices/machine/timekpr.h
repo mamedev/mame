@@ -55,7 +55,7 @@ class timekeeper_device :   public device_t,
 {
 protected:
 	// construction/destruction
-	timekeeper_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	timekeeper_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 public:
 	DECLARE_WRITE8_MEMBER( write );
@@ -107,31 +107,31 @@ protected:
 class m48t02_device : public timekeeper_device
 {
 public:
-	m48t02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m48t02_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class m48t35_device : public timekeeper_device
 {
 public:
-	m48t35_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m48t35_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class m48t37_device : public timekeeper_device
 {
 public:
-	m48t37_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m48t37_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class m48t58_device : public timekeeper_device
 {
 public:
-	m48t58_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m48t58_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class mk48t08_device : public timekeeper_device
 {
 public:
-	mk48t08_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mk48t08_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 // device type definition

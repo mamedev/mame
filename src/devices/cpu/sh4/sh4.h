@@ -174,7 +174,7 @@ class sh34_base_device : public cpu_device
 {
 public:
 	// construction/destruction
-	sh34_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, endianness_t endianness, address_map_constructor internal);
+	sh34_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, endianness_t endianness, address_map_constructor internal);
 
 //#if SH4_USE_FASTRAM_OPTIMIZATION
 	void add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base);
@@ -714,7 +714,7 @@ class sh3_base_device : public sh34_base_device
 {
 public:
 	// construction/destruction
-	sh3_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, endianness_t endianness);
+	sh3_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, endianness_t endianness);
 
 	DECLARE_WRITE32_MEMBER( sh3_internal_w );
 	DECLARE_READ32_MEMBER( sh3_internal_r );
@@ -731,7 +731,7 @@ class sh4_base_device : public sh34_base_device
 {
 public:
 	// construction/destruction
-	sh4_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, endianness_t endianness);
+	sh4_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, endianness_t endianness);
 
 	DECLARE_WRITE32_MEMBER( sh4_internal_w );
 	DECLARE_READ32_MEMBER( sh4_internal_r );
@@ -747,14 +747,14 @@ protected:
 class sh3_device : public sh3_base_device
 {
 public:
-	sh3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sh3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class sh3be_device : public sh3_base_device
 {
 public:
-	sh3be_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sh3be_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void execute_run() override;
@@ -765,14 +765,14 @@ protected:
 class sh4_device : public sh4_base_device
 {
 public:
-	sh4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sh4_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class sh4be_device : public sh4_base_device
 {
 public:
-	sh4be_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sh4be_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void execute_run() override;

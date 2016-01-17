@@ -26,7 +26,7 @@
 
 class pc_fdc_family_device : public pc_fdc_interface {
 public:
-	pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	pc_fdc_family_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<pc_fdc_family_device &>(device).intrq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<pc_fdc_family_device &>(device).drq_cb.set_callback(object); }
@@ -64,7 +64,7 @@ protected:
 
 class pc_fdc_xt_device : public pc_fdc_family_device {
 public:
-	pc_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc_fdc_xt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 	WRITE8_MEMBER(dor_fifo_w);
@@ -72,7 +72,7 @@ public:
 
 class pc_fdc_at_device : public pc_fdc_family_device {
 public:
-	pc_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc_fdc_at_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 };

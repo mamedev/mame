@@ -86,7 +86,7 @@ machine_config_constructor cst_q_plus4_t::device_mconfig_additions() const
 //  cst_q_plus4_t - constructor
 //-------------------------------------------------
 
-cst_q_plus4_t::cst_q_plus4_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cst_q_plus4_t::cst_q_plus4_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CST_Q_PLUS4, "CST Q+4", tag, owner, clock, "ql_qplus4", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_exp1(*this, "exp1"),

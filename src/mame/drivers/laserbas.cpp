@@ -57,7 +57,7 @@ expected: 43 FB CC 9A D4 23 6C 01 3E  <- From ROM 4
 class laserbas_state : public driver_device
 {
 public:
-	laserbas_state(const machine_config &mconfig, device_type type, const char *tag)
+	laserbas_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_protram(*this, "protram"),
 		m_maincpu(*this, "maincpu") { }

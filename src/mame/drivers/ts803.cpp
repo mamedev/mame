@@ -61,7 +61,7 @@ PAGE SEL bit in PORT0 set to 1:
 class ts803_state : public driver_device
 {
 public:
-	ts803_state(const machine_config &mconfig, device_type type, const char *tag)
+	ts803_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")

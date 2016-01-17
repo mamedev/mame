@@ -60,7 +60,7 @@ class h6280_device : public cpu_device
 {
 public:
 	// construction/destruction
-	h6280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h6280_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// public interfaces
 	void set_irq_line(int irqline, int state);

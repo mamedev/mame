@@ -6,7 +6,7 @@
 class fortyl_state : public driver_device
 {
 public:
-	fortyl_state(const machine_config &mconfig, device_type type, const char *tag)
+	fortyl_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_video_ctrl(*this, "video_ctrl"),
@@ -43,6 +43,7 @@ public:
 	bitmap_ind16    *m_pixel_bitmap2;
 	int         m_pixram_sel;
 	bool		m_color_bank;
+	bool		m_screen_disable;
 	
 	/* sound-related */
 	int         m_sound_nmi_enable;

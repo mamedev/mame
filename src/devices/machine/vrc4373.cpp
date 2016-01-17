@@ -28,8 +28,8 @@ DEVICE_ADDRESS_MAP_START(target2_map, 32, vrc4373_device)
 	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(    target2_r,          target2_w)
 ADDRESS_MAP_END
 
-vrc4373_device::vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: pci_host_device(mconfig, VRC4373, "NEC VRC4373 System Controller", tag, owner, clock, "vrc4373", __FILE__), m_cpu_space(nullptr), m_cpu(nullptr), cpu_tag(nullptr),
+vrc4373_device::vrc4373_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+	: pci_host_device(mconfig, VRC4373, "NEC VRC4373 System Controller", tag, owner, clock, "vrc4373", __FILE__), m_cpu_space(nullptr), m_cpu(nullptr),
 		m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32),
 		m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32), m_ram_size(0), m_ram_base(0), m_simm_size(0), m_simm_base(0), m_pci1_laddr(0), m_pci2_laddr(0), m_pci_io_laddr(0), m_target1_laddr(0), m_target2_laddr(0)
 
@@ -96,13 +96,13 @@ void vrc4373_device::map_cpu_space()
 		m_cpu_space->install_ram(m_ram_base, m_ram_base+m_ram_size-1, &m_ram[0]);
 		m_cpu->add_fastram(m_ram_base, m_ram_size-1, FALSE, &m_ram[0]);
 		if (LOG_NILE)
-			logerror("%s: map_cpu_space ram_size=%08X ram_base=%08X\n", tag(),m_ram_size,m_ram_base);
+			logerror("%s: map_cpu_space ram_size=%08X ram_base=%08X\n", tag().c_str(),m_ram_size,m_ram_base);
 	}
 	if (m_cpu_regs[NREG_SIMM1]&0x8) {
 		m_cpu_space->install_ram(m_simm_base, m_simm_base+m_simm_size-1, &m_simm[0]);
 		//m_cpu->add_fastram(m_simm_base, m_simm_size-1, FALSE, &m_simm[0]);
 		if (LOG_NILE)
-			logerror("%s: map_cpu_space simm_size=%08X simm_base=%08X\n", tag(),m_simm_size,m_simm_base);
+			logerror("%s: map_cpu_space simm_size=%08X simm_base=%08X\n", tag().c_str(),m_simm_size,m_simm_base);
 	}
 
 	// PCI Master Window 1
@@ -113,7 +113,7 @@ void vrc4373_device::map_cpu_space()
 		m_cpu_space->install_read_handler(winStart, winEnd, 0, 0, read32_delegate(FUNC(vrc4373_device::master1_r), this));
 		m_cpu_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(vrc4373_device::master1_w), this));
 		if (LOG_NILE)
-			logerror("%s: map_cpu_space Master Window 1 start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_pci1_laddr);
+			logerror("%s: map_cpu_space Master Window 1 start=%08X end=%08X size=%08X laddr=%08X\n", tag().c_str(), winStart, winEnd, winSize,  m_pci1_laddr);
 	}
 	// PCI Master Window 2
 	if (m_cpu_regs[NREG_PCIMW2]&0x1000) {
@@ -123,7 +123,7 @@ void vrc4373_device::map_cpu_space()
 		m_cpu_space->install_read_handler(winStart, winEnd, 0, 0, read32_delegate(FUNC(vrc4373_device::master2_r), this));
 		m_cpu_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(vrc4373_device::master2_w), this));
 		if (LOG_NILE)
-			logerror("%s: map_cpu_space Master Window 2 start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_pci2_laddr);
+			logerror("%s: map_cpu_space Master Window 2 start=%08X end=%08X size=%08X laddr=%08X\n", tag().c_str(), winStart, winEnd, winSize,  m_pci2_laddr);
 	}
 	// PCI IO Window
 	if (m_cpu_regs[NREG_PCIMIOW]&0x1000) {
@@ -133,7 +133,7 @@ void vrc4373_device::map_cpu_space()
 		m_cpu_space->install_read_handler(winStart, winEnd, 0, 0, read32_delegate(FUNC(vrc4373_device::master_io_r), this));
 		m_cpu_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(vrc4373_device::master_io_w), this));
 		if (LOG_NILE)
-			logerror("%s: map_cpu_space IO Window start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_pci_io_laddr);
+			logerror("%s: map_cpu_space IO Window start=%08X end=%08X size=%08X laddr=%08X\n", tag().c_str(), winStart, winEnd, winSize,  m_pci_io_laddr);
 	}
 }
 
@@ -150,7 +150,7 @@ void vrc4373_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_
 		memory_space->install_read_handler(winStart, winEnd, 0, 0, read32_delegate(FUNC(vrc4373_device::target1_r), this));
 		memory_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(vrc4373_device::target1_w), this));
 		if (LOG_NILE)
-			logerror("%s: map_extra Target Window 1 start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_target1_laddr);
+			logerror("%s: map_extra Target Window 1 start=%08X end=%08X size=%08X laddr=%08X\n", tag().c_str(), winStart, winEnd, winSize,  m_target1_laddr);
 	}
 	// PCI Target Window 2
 	if (m_cpu_regs[NREG_PCITW2]&0x1000) {
@@ -160,7 +160,7 @@ void vrc4373_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_
 		memory_space->install_read_handler(winStart, winEnd, 0, 0, read32_delegate(FUNC(vrc4373_device::target2_r), this));
 		memory_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(vrc4373_device::target2_w), this));
 		if (LOG_NILE)
-			logerror("%s: map_extra Target Window 2 start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_target2_laddr);
+			logerror("%s: map_extra Target Window 2 start=%08X end=%08X size=%08X laddr=%08X\n", tag().c_str(), winStart, winEnd, winSize,  m_target2_laddr);
 	}
 }
 
@@ -169,10 +169,10 @@ void vrc4373_device::reset_all_mappings()
 	pci_device::reset_all_mappings();
 }
 
-void vrc4373_device::set_cpu_tag(const char *_cpu_tag)
+void vrc4373_device::set_cpu_tag(std::string _cpu_tag)
 {
 	if (LOG_NILE)
-		logerror("%s: set_cpu_tag\n", tag());
+		logerror("%s: set_cpu_tag\n", tag().c_str());
 	cpu_tag = _cpu_tag;
 }
 // PCI bus control

@@ -30,11 +30,11 @@ class segas24_tile : public device_t
 	friend class segas24_tile_config;
 
 public:
-	segas24_tile(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segas24_tile(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 	static void static_set_tile_mask(device_t &device, UINT16 tile_mask);
 
 	DECLARE_READ16_MEMBER(tile_r);
@@ -88,7 +88,7 @@ class segas24_sprite : public device_t
 	friend class segas24_sprite_config;
 
 public:
-	segas24_sprite(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segas24_sprite(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
@@ -108,7 +108,7 @@ class segas24_mixer : public device_t
 	friend class segas24_mixer_config;
 
 public:
-	segas24_mixer(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segas24_mixer(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);

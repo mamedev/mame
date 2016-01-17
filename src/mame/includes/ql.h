@@ -37,7 +37,7 @@
 class ql_state : public driver_device
 {
 public:
-	ql_state(const machine_config &mconfig, device_type type, const char *tag) :
+	ql_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, M68008_TAG),
 		m_ipc(*this, I8749_TAG),

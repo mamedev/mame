@@ -77,7 +77,7 @@ ioport_constructor nes_powerpad_device::device_input_ports() const
 //  nes_powerpad_device - constructor
 //-------------------------------------------------
 
-nes_powerpad_device::nes_powerpad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_powerpad_device::nes_powerpad_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 					device_t(mconfig, NES_POWERPAD, "Bandai Power Pad", tag, owner, clock, "nes_powerpad", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_ipt1(*this, "POWERPAD1"),

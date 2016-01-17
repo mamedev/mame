@@ -113,7 +113,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(chip_write) {}
 	virtual void speedup_addon_bios_access() {};
 
-	void rom_alloc(UINT32 size, const char *tag);
+	void rom_alloc(UINT32 size, std::string tag);
 	void nvram_alloc(UINT32 size);
 	void rtc_ram_alloc(UINT32 size);
 	void addon_bios_alloc(UINT32 size);
@@ -149,7 +149,7 @@ class base_sns_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	base_sns_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	base_sns_cart_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	virtual ~base_sns_cart_slot_device();
 
 	// device-level overrides
@@ -215,7 +215,7 @@ class sns_cart_slot_device :  public base_sns_cart_slot_device
 {
 public:
 	// construction/destruction
-	sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual const char *image_interface() const override { return "snes_cart"; }
 	virtual const char *file_extensions() const override { return "sfc"; }
 };
@@ -226,7 +226,7 @@ class sns_sufami_cart_slot_device :  public base_sns_cart_slot_device
 {
 public:
 	// construction/destruction
-	sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_sufami_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual const char *image_interface() const override { return "st_cart"; }
 	virtual const char *file_extensions() const override { return "st"; }
 	virtual bool must_be_loaded() const override { return 0; }
@@ -238,7 +238,7 @@ class sns_bsx_cart_slot_device :  public base_sns_cart_slot_device
 {
 public:
 	// construction/destruction
-	sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_bsx_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual const char *image_interface() const override { return "bspack"; }
 	virtual const char *file_extensions() const override { return "bs"; }
 	virtual bool must_be_loaded() const override { return 0; }

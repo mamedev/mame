@@ -17,7 +17,7 @@ class o2_chess_device : public o2_rom_device
 
 public:
 	// construction/destruction
-	o2_chess_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	o2_chess_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 private:
 	required_device<nsc800_device> m_cpu;

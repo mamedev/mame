@@ -23,9 +23,9 @@ extern const device_type SEGAPSG;
 class sn76496_base_device : public device_t, public device_sound_interface
 {
 public:
-	sn76496_base_device(const machine_config &mconfig, device_type type,  const char *name, const char *tag,
+	sn76496_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag,
 		int feedbackmask, int noisetap1, int noisetap2, bool negate, bool stereo, int clockdivider, int sega,
-		device_t *owner, UINT32 clock, const char *shortname, const char *source);
+		device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_ready_handler(device_t &device, _Object object) { return downcast<sn76496_base_device &>(device).m_ready_handler.set_callback(object); }
@@ -75,70 +75,70 @@ private:
 class sn76496_device : public sn76496_base_device
 {
 public:
-	sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sn76496_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 // U8106 not verified yet. todo: verify; (a custom marked sn76489? only used on mr. do and maybe other universal games)
 class u8106_device : public sn76496_base_device
 {
 public:
-	u8106_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	u8106_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 // Y2404 not verified yet. todo: verify; (don't be fooled by the Y, it's a TI chip, not Yamaha)
 class y2404_device : public sn76496_base_device
 {
 public:
-	y2404_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	y2404_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 // SN76489 not verified yet. todo: verify;
 class sn76489_device : public sn76496_base_device
 {
 public:
-	sn76489_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sn76489_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 // SN76489A: whitenoise verified, phase verified, periodic verified (by plgdavid)
 class sn76489a_device : public sn76496_base_device
 {
 public:
-	sn76489a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sn76489a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 // SN76494 not verified, (according to datasheet: same as sn76489a but without the /8 divider)
 class sn76494_device : public sn76496_base_device
 {
 public:
-	sn76494_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sn76494_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 // SN94624 whitenoise verified, phase verified, period verified; verified by PlgDavid
 class sn94624_device : public sn76496_base_device
 {
 public:
-	sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sn94624_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 // NCR7496 not verified; info from smspower wiki
 class ncr7496_device : public sn76496_base_device
 {
 public:
-	ncr7496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ncr7496_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 // Verified by Justin Kerk
 class gamegear_device : public sn76496_base_device
 {
 public:
-	gamegear_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gamegear_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 // todo: verify; from smspower wiki, assumed to have same invert as gamegear
 class segapsg_device : public sn76496_base_device
 {
 public:
-	segapsg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segapsg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 #endif /* __SN76496_H__ */

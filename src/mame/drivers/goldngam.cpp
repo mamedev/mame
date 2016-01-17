@@ -242,7 +242,7 @@
 class goldngam_state : public driver_device
 {
 public:
-	goldngam_state(const machine_config &mconfig, device_type type, const char *tag)
+	goldngam_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu") { }

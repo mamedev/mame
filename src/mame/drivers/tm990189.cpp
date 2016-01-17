@@ -76,7 +76,7 @@
 class tm990189_state : public driver_device
 {
 public:
-	tm990189_state(const machine_config &mconfig, device_type type, const char *tag)
+	tm990189_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_tms9980a(*this, "maincpu"),
 	m_speaker(*this, "speaker"),
@@ -429,7 +429,7 @@ class tm990_189_rs232_image_device :    public device_t,
 {
 public:
 	// construction/destruction
-	tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tm990_189_rs232_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_SERIAL; }
@@ -455,7 +455,7 @@ protected:
 
 const device_type TM990_189_RS232 = &device_creator<tm990_189_rs232_image_device>;
 
-tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TM990_189_RS232, "TM990/189 RS232 port", tag, owner, clock, "tm990_189_rs232_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {

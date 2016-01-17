@@ -15,7 +15,7 @@
 //  turrett_device - constructor
 //-------------------------------------------------
 
-turrett_device::turrett_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+turrett_device::turrett_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TURRETT, "Turret Tower Sound", tag, owner, clock, "ttsnd", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),

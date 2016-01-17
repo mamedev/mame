@@ -7,10 +7,10 @@
 class k007121_device : public device_t
 {
 public:
-	k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k007121_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~k007121_device() {}
 
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 
 	DECLARE_READ8_MEMBER( ctrlram_r );
 	DECLARE_WRITE8_MEMBER( ctrl_w );

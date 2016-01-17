@@ -203,7 +203,7 @@ WRITE8_MEMBER( y8950_device::write_port_w ) { write(space, 1, data); }
 
 const device_type Y8950 = &device_creator<y8950_device>;
 
-y8950_device::y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+y8950_device::y8950_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, Y8950, "Y8950", tag, owner, clock, "y8950", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),

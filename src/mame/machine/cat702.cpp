@@ -88,7 +88,7 @@
 
 const device_type CAT702 = &device_creator<cat702_device>;
 
-cat702_device::cat702_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cat702_device::cat702_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CAT702, "CAT702", tag, owner, clock, "cat702", __FILE__),
 	m_dataout_handler(*this)
 {

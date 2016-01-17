@@ -16,11 +16,9 @@
 const device_type I82439TX = &device_creator<i82439tx_device>;
 
 
-i82439tx_device::i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i82439tx_device::i82439tx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: northbridge_device(mconfig, I82439TX, "Intel 82439TX", tag, owner, clock, "i82439tx", __FILE__),
 	pci_device_interface( mconfig, *this ),
-	m_cpu_tag( nullptr ),
-	m_region_tag( nullptr ),
 	m_space(nullptr),
 	m_rom(nullptr)
 {

@@ -30,7 +30,7 @@
 class sb2m600_state : public driver_device
 {
 public:
-	sb2m600_state(const machine_config &mconfig, device_type type, const char *tag) :
+	sb2m600_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, M6502_TAG),
 		m_acia_0(*this, "acia_0"),
@@ -108,7 +108,7 @@ protected:
 class c1p_state : public sb2m600_state
 {
 public:
-	c1p_state(const machine_config &mconfig, device_type type, const char *tag) :
+	c1p_state(const machine_config &mconfig, device_type type, std::string tag) :
 		sb2m600_state(mconfig, type, tag),
 		m_beep(*this, "beeper")
 	{
@@ -126,7 +126,7 @@ public:
 class c1pmf_state : public c1p_state
 {
 public:
-	c1pmf_state(const machine_config &mconfig, device_type type, const char *tag) :
+	c1pmf_state(const machine_config &mconfig, device_type type, std::string tag) :
 		c1p_state(mconfig, type, tag),
 		m_floppy0(*this, "floppy0"),
 		m_floppy1(*this, "floppy1")
@@ -148,7 +148,7 @@ private:
 class uk101_state : public sb2m600_state
 {
 public:
-	uk101_state(const machine_config &mconfig, device_type type, const char *tag) :
+	uk101_state(const machine_config &mconfig, device_type type, std::string tag) :
 		sb2m600_state(mconfig, type, tag)
 	{
 	}

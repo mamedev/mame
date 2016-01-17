@@ -44,7 +44,7 @@ const rom_entry *mc1502_rom_device::device_rom_region() const
 //  mc1502_rom_device - constructor
 //-------------------------------------------------
 
-mc1502_rom_device::mc1502_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mc1502_rom_device::mc1502_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MC1502_ROM, "MC-1502 ROM cart", tag, owner, clock, "mc1502_rom", __FILE__),
 	device_isa8_card_interface( mconfig, *this )
 {

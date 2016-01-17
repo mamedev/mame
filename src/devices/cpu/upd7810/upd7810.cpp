@@ -381,7 +381,7 @@ const device_type UPD78C05 = &device_creator<upd78c05_device>;
 const device_type UPD78C06 = &device_creator<upd78c06_device>;
 
 
-upd7810_device::upd7810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd7810_device::upd7810_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, UPD7810, "uPD7810", tag, owner, clock, "upd7810", __FILE__)
 	, m_to_func(*this)
 	, m_co0_func(*this)
@@ -409,7 +409,7 @@ upd7810_device::upd7810_device(const machine_config &mconfig, const char *tag, d
 	m_op74 = s_op74;
 }
 
-upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_to_func(*this)
 	, m_co0_func(*this)
@@ -429,7 +429,7 @@ upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-upd7807_device::upd7807_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd7807_device::upd7807_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: upd7810_device(mconfig, UPD7807, "uPD7807", tag, owner, clock, "upd7807", __FILE__)
 {
 	m_opXX = s_opXX_7807;
@@ -442,7 +442,7 @@ upd7807_device::upd7807_device(const machine_config &mconfig, const char *tag, d
 	m_op74 = s_op74;
 }
 
-upd7801_device::upd7801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd7801_device::upd7801_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: upd7810_device(mconfig, UPD7801, "uPD7801", tag, owner, clock, "upd7801", __FILE__)
 {
 	m_op48 = s_op48_7801;
@@ -455,7 +455,7 @@ upd7801_device::upd7801_device(const machine_config &mconfig, const char *tag, d
 	m_opXX = s_opXX_7801;
 }
 
-upd78c05_device::upd78c05_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd78c05_device::upd78c05_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: upd7810_device(mconfig, UPD78C05, "uPD78C05", tag, owner, clock, "upd78c05", __FILE__)
 {
 	m_op48 = s_op48_78c05;
@@ -468,12 +468,12 @@ upd78c05_device::upd78c05_device(const machine_config &mconfig, const char *tag,
 	m_opXX = s_opXX_78c05;
 }
 
-upd78c05_device::upd78c05_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+upd78c05_device::upd78c05_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: upd7810_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-upd78c06_device::upd78c06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd78c06_device::upd78c06_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: upd78c05_device(mconfig, UPD78C06, "uPD78C06", tag, owner, clock, "upd78c06", __FILE__)
 {
 	m_op48 = s_op48_78c06;

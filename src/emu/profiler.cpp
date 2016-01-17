@@ -210,7 +210,7 @@ void real_profiler_state::update_text(running_machine &machine)
 
 			// and then the text
 			if (curtype >= PROFILER_DEVICE_FIRST && curtype <= PROFILER_DEVICE_MAX)
-				strcatprintf(m_text, "'%s'", iter.byindex(curtype - PROFILER_DEVICE_FIRST)->tag());
+				strcatprintf(m_text, "'%s'", iter.byindex(curtype - PROFILER_DEVICE_FIRST)->tag().c_str());
 			else
 				for (auto & name : names)
 					if (name.type == curtype)

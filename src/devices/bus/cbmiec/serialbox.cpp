@@ -93,7 +93,7 @@ machine_config_constructor serial_box_device::device_mconfig_additions() const
 //  serial_box_device - constructor
 //-------------------------------------------------
 
-serial_box_device::serial_box_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+serial_box_device::serial_box_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SERIAL_BOX, "Serial Box", tag, owner, clock, "serbox", __FILE__),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG)

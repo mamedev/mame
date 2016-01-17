@@ -28,7 +28,7 @@
 class deco156_state : public driver_device
 {
 public:
-	deco156_state(const machine_config &mconfig, device_type type, const char *tag)
+	deco156_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_deco_tilegen1(*this, "tilegen1"),
@@ -67,7 +67,7 @@ public:
 	virtual void video_start() override;
 	UINT32 screen_update_wcvol95(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
-	void descramble_sound( const char *tag );
+	void descramble_sound( std::string tag );
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 };
@@ -632,7 +632,7 @@ ROM_END
 
 /**********************************************************************************/
 
-void deco156_state::descramble_sound( const char *tag )
+void deco156_state::descramble_sound( std::string tag )
 {
 	UINT8 *rom = memregion(tag)->base();
 	int length = memregion(tag)->bytes();

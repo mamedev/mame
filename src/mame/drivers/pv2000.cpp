@@ -42,7 +42,7 @@ For BIOS CRC confirmation
 class pv2000_state : public driver_device
 {
 public:
-	pv2000_state(const machine_config &mconfig, device_type type, const char *tag)
+	pv2000_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cass(*this, "cassette"),

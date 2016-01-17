@@ -30,7 +30,7 @@ class plus4_sid_cartridge_device : public device_t,
 {
 public:
 	// construction/destruction
-	plus4_sid_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	plus4_sid_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;

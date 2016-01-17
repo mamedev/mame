@@ -56,7 +56,7 @@ machine_config_constructor x68k_scsiext_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( x68k_scsiext );
 }
 
-x68k_scsiext_device::x68k_scsiext_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+x68k_scsiext_device::x68k_scsiext_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, X68K_SCSIEXT, "Sharp CZ-6BS1 SCSI-1", tag, owner, clock, "x68k_cz6bs1", __FILE__),
 		device_x68k_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 		m_spc(*this, "mb89352")

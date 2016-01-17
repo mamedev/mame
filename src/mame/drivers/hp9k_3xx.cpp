@@ -57,7 +57,7 @@
 class hp9k3xx_state : public driver_device
 {
 public:
-	hp9k3xx_state(const machine_config &mconfig, device_type type, const char *tag)
+	hp9k3xx_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU_TAG),
 		m_vram16(*this, "vram16"),

@@ -12,7 +12,7 @@
 
 const device_type S11C_BG = &device_creator<s11c_bg_device>;
 
-s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+s11c_bg_device::s11c_bg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig,S11C_BG,"Williams System 11C Background Music",tag,owner,clock, "s11c_bg", __FILE__),
 		m_cpu(*this,"bgcpu"),
 		m_ym2151(*this,"ym2151"),
@@ -110,7 +110,7 @@ void s11c_bg_device::device_reset()
 	m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
 }
 
-void s11c_bg_device::static_set_gfxregion(device_t &device, const char *tag)
+void s11c_bg_device::static_set_gfxregion(device_t &device, std::string tag)
 {
 	s11c_bg_device &cpuboard = downcast<s11c_bg_device &>(device);
 	cpuboard.m_regiontag = tag;

@@ -56,7 +56,7 @@ const device_type ISA8_AGA = &device_creator<isa8_aga_device>;
 //  isa8_aga_device - constructor
 //-------------------------------------------------
 
-isa8_aga_device::isa8_aga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_aga_device::isa8_aga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t( mconfig, ISA8_AGA, "AGA", tag, owner, clock, "aga", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
 		m_palette(*this, "palette"),
@@ -78,7 +78,7 @@ isa8_aga_device::isa8_aga_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-isa8_aga_device::isa8_aga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+isa8_aga_device::isa8_aga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this),
 		m_palette(*this, "palette"),
@@ -164,7 +164,7 @@ const device_type ISA8_AGA_PC200 = &device_creator<isa8_aga_pc200_device>;
 //  isa8_aga_pc200_device - constructor
 //-------------------------------------------------
 
-isa8_aga_pc200_device::isa8_aga_pc200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_aga_pc200_device::isa8_aga_pc200_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		isa8_aga_device( mconfig, ISA8_AGA_PC200, "AGA PC200", tag, owner, clock, "aga_pc200", __FILE__),
 		m_port8(0),
 		m_portd(0),

@@ -65,7 +65,7 @@ class asc_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
-	asc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	asc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
 	static void static_set_type(device_t &device, int type);

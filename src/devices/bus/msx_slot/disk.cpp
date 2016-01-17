@@ -43,18 +43,13 @@ const device_type MSX_SLOT_DISK5 = &device_creator<msx_slot_disk5_device>;
 const device_type MSX_SLOT_DISK6 = &device_creator<msx_slot_disk6_device>;
 
 
-msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: msx_slot_rom_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_floppy0(nullptr)
 	, m_floppy1(nullptr)
 	, m_floppy2(nullptr)
 	, m_floppy3(nullptr)
 	, m_floppy(nullptr)
-	, m_fdc_tag(nullptr)
-	, m_floppy0_tag(nullptr)
-	, m_floppy1_tag(nullptr)
-	, m_floppy2_tag(nullptr)
-	, m_floppy3_tag(nullptr)
 {
 }
 
@@ -63,15 +58,15 @@ void msx_slot_disk_device::device_start()
 {
 	msx_slot_rom_device::device_start();
 
-	if (m_fdc_tag == nullptr)
+	if (m_fdc_tag.empty())
 	{
 		fatalerror("msx_slot_disk_device: no FDC tag specified\n");
 	}
 
-	m_floppy0 = m_floppy0_tag ? owner()->subdevice<floppy_connector>(m_floppy0_tag) : nullptr;
-	m_floppy1 = m_floppy1_tag ? owner()->subdevice<floppy_connector>(m_floppy1_tag) : nullptr;
-	m_floppy2 = m_floppy2_tag ? owner()->subdevice<floppy_connector>(m_floppy2_tag) : nullptr;
-	m_floppy3 = m_floppy3_tag ? owner()->subdevice<floppy_connector>(m_floppy3_tag) : nullptr;
+	m_floppy0 = !m_floppy0_tag.empty() ? owner()->subdevice<floppy_connector>(m_floppy0_tag) : nullptr;
+	m_floppy1 = !m_floppy1_tag.empty() ? owner()->subdevice<floppy_connector>(m_floppy1_tag) : nullptr;
+	m_floppy2 = !m_floppy2_tag.empty() ? owner()->subdevice<floppy_connector>(m_floppy2_tag) : nullptr;
+	m_floppy3 = !m_floppy3_tag.empty() ? owner()->subdevice<floppy_connector>(m_floppy3_tag) : nullptr;
 
 	if (m_floppy0 == nullptr && m_floppy1 == nullptr)
 	{
@@ -80,7 +75,7 @@ void msx_slot_disk_device::device_start()
 }
 
 
-msx_slot_wd_disk_device::msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+msx_slot_wd_disk_device::msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: msx_slot_disk_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_fdc(nullptr)
 {
@@ -95,12 +90,12 @@ void msx_slot_wd_disk_device::device_start()
 
 	if (m_fdc == nullptr)
 	{
-		fatalerror("msx_slot_wd_disk_device: Unable to find FDC with tag '%s'\n", m_fdc_tag);
+		fatalerror("msx_slot_wd_disk_device: Unable to find FDC with tag '%s'\n", m_fdc_tag.c_str());
 	}
 }
 
 
-msx_slot_tc8566_disk_device::msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+msx_slot_tc8566_disk_device::msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: msx_slot_disk_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_fdc(nullptr)
 {
@@ -115,13 +110,13 @@ void msx_slot_tc8566_disk_device::device_start()
 
 	if (m_fdc == nullptr)
 	{
-		fatalerror("msx_slot_tc8566_disk_device: Unable to find FDC with tag '%s'\n", m_fdc_tag);
+		fatalerror("msx_slot_tc8566_disk_device: Unable to find FDC with tag '%s'\n", m_fdc_tag.c_str());
 	}
 }
 
 
 
-msx_slot_disk1_device::msx_slot_disk1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_slot_disk1_device::msx_slot_disk1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK1, "MSX Internal floppy type 1", tag, owner, clock, "msx_slot_disk1", __FILE__)
 	, m_side_control(0)
 	, m_control(0)
@@ -284,7 +279,7 @@ WRITE8_MEMBER(msx_slot_disk1_device::write)
 }
 
 
-msx_slot_disk2_device::msx_slot_disk2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_slot_disk2_device::msx_slot_disk2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK2, "MSX Internal floppy type 2", tag, owner, clock, "msx_slot_disk2", __FILE__)
 	, m_control(0)
 {
@@ -423,7 +418,7 @@ WRITE8_MEMBER(msx_slot_disk2_device::write)
 
 
 
-msx_slot_disk3_device::msx_slot_disk3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_slot_disk3_device::msx_slot_disk3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: msx_slot_tc8566_disk_device(mconfig, MSX_SLOT_DISK3, "MSX Internal floppy type 3", tag, owner, clock, "msx_slot_disk3", __FILE__)
 {
 }
@@ -469,7 +464,7 @@ READ8_MEMBER(msx_slot_disk3_device::read)
 
 
 
-msx_slot_disk4_device::msx_slot_disk4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_slot_disk4_device::msx_slot_disk4_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: msx_slot_tc8566_disk_device(mconfig, MSX_SLOT_DISK4, "MSX Internal floppy type 4", tag, owner, clock, "msx_slot_disk4", __FILE__)
 {
 }
@@ -521,7 +516,7 @@ READ8_MEMBER(msx_slot_disk4_device::read)
 
 
 
-msx_slot_disk5_device::msx_slot_disk5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_slot_disk5_device::msx_slot_disk5_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK5, "MSX Internal floppy type 5", tag, owner, clock, "msx_slot_disk5", __FILE__)
 	, m_control(0)
 {
@@ -644,7 +639,7 @@ WRITE8_MEMBER(msx_slot_disk5_device::io_write)
 
 
 
-msx_slot_disk6_device::msx_slot_disk6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_slot_disk6_device::msx_slot_disk6_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK6, "MSX Internal floppy type 6", tag, owner, clock, "msx_slot_disk6", __FILE__)
 	, m_side_motor(0)
 	, m_drive_select0(0)

@@ -21,7 +21,7 @@ public:
 		P0, P1, P2
 	};
 
-	i8x9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	i8x9x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	void serial_w(UINT8 val);
 
@@ -84,12 +84,12 @@ private:
 
 class c8095_device : public i8x9x_device {
 public:
-	c8095_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c8095_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class p8098_device : public i8x9x_device {
 public:
-	p8098_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	p8098_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type C8095;

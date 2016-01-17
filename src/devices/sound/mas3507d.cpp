@@ -10,7 +10,7 @@
 // device type definition
 const device_type MAS3507D = &device_creator<mas3507d_device>;
 
-mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mas3507d_device::mas3507d_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MAS3507D, "MAS3507D", tag, owner, clock, "mas3507d", __FILE__),
 		device_sound_interface(mconfig, *this), i2c_bus_state(), i2c_bus_address(), i2c_scli(false), i2c_sclo(false), i2c_sdai(false), i2c_sdao(false),
 	i2c_bus_curbit(0), i2c_bus_curval(0), i2c_subdest(), i2c_command(), i2c_bytecount(0), i2c_io_bank(0), i2c_io_adr(0), i2c_io_count(0), i2c_io_val(0)

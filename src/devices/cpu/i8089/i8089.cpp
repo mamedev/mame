@@ -32,7 +32,7 @@ const device_type I8089 = &device_creator<i8089_device>;
 //  i8089_device - constructor
 //-------------------------------------------------
 
-i8089_device::i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+i8089_device::i8089_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	cpu_device(mconfig, I8089, "I8089", tag, owner, clock, "i8089", __FILE__),
 	m_icount(0),
 	m_ch1(*this, "1"),
@@ -269,13 +269,13 @@ void i8089_device::initialize()
 	// output some debug info
 	if (VERBOSE)
 	{
-		logerror("%s('%s'): ---- initializing ----\n", shortname(), basetag());
-		logerror("%s('%s'): %s system bus\n", shortname(), basetag(), sysbus_width() ? "16-bit" : "8-bit");
-		logerror("%s('%s'): system configuration block location: %06x\n", shortname(), basetag(), m_scb);
-		logerror("%s('%s'): %s remote bus\n", shortname(), basetag(), remotebus_width() ? "16-bit" : "8-bit");
-		logerror("%s('%s'): request/grant: %d\n", shortname(), basetag(), request_grant());
-		logerror("%s('%s'): is %s\n", shortname(), basetag(), m_master ? "master" : "slave");
-		logerror("%s('%s'): channel control block location: %06x\n", shortname(), basetag(), cb_address);
+		logerror("%s('%s'): ---- initializing ----\n", shortname().c_str(), basetag().c_str());
+		logerror("%s('%s'): %s system bus\n", shortname().c_str(), basetag().c_str(), sysbus_width() ? "16-bit" : "8-bit");
+		logerror("%s('%s'): system configuration block location: %06x\n", shortname().c_str(), basetag().c_str(), m_scb);
+		logerror("%s('%s'): %s remote bus\n", shortname().c_str(), basetag().c_str(), remotebus_width() ? "16-bit" : "8-bit");
+		logerror("%s('%s'): request/grant: %d\n", shortname().c_str(), basetag().c_str(), request_grant());
+		logerror("%s('%s'): is %s\n", shortname().c_str(), basetag().c_str(), m_master ? "master" : "slave");
+		logerror("%s('%s'): channel control block location: %06x\n", shortname().c_str(), basetag().c_str(), cb_address);
 	}
 }
 
@@ -356,7 +356,7 @@ void i8089_device::execute_run()
 WRITE_LINE_MEMBER( i8089_device::ca_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): ca_w: %u\n", shortname(), basetag(), state);
+		logerror("%s('%s'): ca_w: %u\n", shortname().c_str(), basetag().c_str(), state);
 
 	if (m_ca == 1 && state == 0)
 	{

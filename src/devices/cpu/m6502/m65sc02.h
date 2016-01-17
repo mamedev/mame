@@ -15,7 +15,7 @@
 
 class m65sc02_device : public r65c02_device {
 public:
-	m65sc02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m65sc02_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 enum {

@@ -2,7 +2,7 @@
 // copyright-holders:smf
 #include "legscsi.h"
 
-legacy_scsi_host_adapter::legacy_scsi_host_adapter(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+legacy_scsi_host_adapter::legacy_scsi_host_adapter(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_selected(0),
 	m_scsi_port(*this)
@@ -48,7 +48,7 @@ void legacy_scsi_host_adapter::send_command(UINT8 *data, int bytes)
 	}
 	else
 	{
-		logerror("%s: send_command unknown SCSI id %d\n", tag(), m_selected);
+		logerror("%s: send_command unknown SCSI id %d\n", tag().c_str(), m_selected);
 	}
 }
 
@@ -63,7 +63,7 @@ int legacy_scsi_host_adapter::get_length(void)
 	}
 	else
 	{
-		logerror("%s: get_length unknown SCSI id %d\n", tag(), m_selected);
+		logerror("%s: get_length unknown SCSI id %d\n", tag().c_str(), m_selected);
 		return 0;
 	}
 }
@@ -79,7 +79,7 @@ int legacy_scsi_host_adapter::get_phase(void)
 	}
 	else
 	{
-		logerror("%s: get_phase unknown SCSI id %d\n", tag(), m_selected);
+		logerror("%s: get_phase unknown SCSI id %d\n", tag().c_str(), m_selected);
 		return 0;
 	}
 }
@@ -93,7 +93,7 @@ void legacy_scsi_host_adapter::read_data(UINT8 *data, int bytes)
 	}
 	else
 	{
-		logerror("%s: read_data unknown SCSI id %d\n", tag(), m_selected);
+		logerror("%s: read_data unknown SCSI id %d\n", tag().c_str(), m_selected);
 	}
 }
 
@@ -106,7 +106,7 @@ void legacy_scsi_host_adapter::write_data(UINT8 *data, int bytes)
 	}
 	else
 	{
-		logerror("%s: write_data unknown SCSI id %d\n", tag(), m_selected);
+		logerror("%s: write_data unknown SCSI id %d\n", tag().c_str(), m_selected);
 	}
 }
 
@@ -125,7 +125,7 @@ UINT8 legacy_scsi_host_adapter::get_status()
 	}
 	else
 	{
-		logerror("%s: get_status unknown SCSI id %d\n", tag(), m_selected);
+		logerror("%s: get_status unknown SCSI id %d\n", tag().c_str(), m_selected);
 		return 0;
 	}
 }

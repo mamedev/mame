@@ -39,7 +39,7 @@ TODO:
 class rmhaihai_state : public driver_device
 {
 public:
-	rmhaihai_state(const machine_config &mconfig, device_type type, const char *tag)
+	rmhaihai_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),

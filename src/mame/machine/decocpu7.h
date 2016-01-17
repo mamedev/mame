@@ -6,7 +6,7 @@
 
 class deco_cpu7_device : public m6502_device {
 public:
-	deco_cpu7_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	deco_cpu7_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	class mi_decrypt : public mi_default_normal {

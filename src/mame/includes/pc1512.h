@@ -44,7 +44,7 @@
 class pc1512_state : public driver_device
 {
 public:
-	pc1512_state(const machine_config &mconfig, device_type type, const char *tag)
+	pc1512_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, I8086_TAG),
 			m_dmac(*this, I8237A5_TAG),
@@ -230,7 +230,7 @@ public:
 class pc1640_state : public pc1512_state
 {
 public:
-	pc1640_state(const machine_config &mconfig, device_type type, const char *tag)
+	pc1640_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pc1512_state(mconfig, type, tag),
 			m_sw(*this, "SW"),
 			m_opt(0)

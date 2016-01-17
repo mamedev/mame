@@ -12,7 +12,7 @@
 class gauntlet_state : public atarigen_state
 {
 public:
-	gauntlet_state(const machine_config &mconfig, device_type type, const char *tag)
+	gauntlet_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atarigen_state(mconfig, type, tag),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),

@@ -143,7 +143,7 @@ static void apply_char_overrides(int nb_char_overrides, const char_override_t ch
 
 const device_type VDT911 = &device_creator<vdt911_device>;
 
-vdt911_device::vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vdt911_device::vdt911_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VDT911, "911 VDT", tag, owner, clock, "vdt911", __FILE__),
 		m_beeper(*this, "beeper"),
 		m_gfxdecode(*this, "gfxdecode"),

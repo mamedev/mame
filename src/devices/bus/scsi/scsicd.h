@@ -17,8 +17,8 @@ class scsicd_device : public scsihle_device,
 {
 public:
 	// construction/destruction
-	scsicd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	scsicd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	scsicd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	scsicd_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 protected:

@@ -9,7 +9,7 @@
 class gundealr_state : public driver_device
 {
 public:
-	gundealr_state(const machine_config &mconfig, device_type type, const char *tag)
+	gundealr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_paletteram(*this, "paletteram"),
 		m_bg_videoram(*this, "bg_videoram"),

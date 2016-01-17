@@ -12,8 +12,8 @@ class nes_txrom_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_txrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_txrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_txrom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_txrom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override { mmc3_start(); }
@@ -56,7 +56,7 @@ class nes_hkrom_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_hkrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_hkrom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -81,7 +81,7 @@ class nes_txsrom_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_txsrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_txsrom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
@@ -98,7 +98,7 @@ class nes_tqrom_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_tqrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_tqrom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void set_chr( UINT8 chr, int chr_base, int chr_mask ) override;
@@ -111,7 +111,7 @@ class nes_qj_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_qj_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_qj_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual DECLARE_WRITE8_MEMBER(write_m) override;
@@ -125,7 +125,7 @@ class nes_zz_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_zz_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_zz_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual DECLARE_WRITE8_MEMBER(write_m) override;

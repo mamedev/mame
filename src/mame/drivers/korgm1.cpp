@@ -21,7 +21,7 @@
 class korgm1_state : public driver_device
 {
 public:
-	korgm1_state(const machine_config &mconfig, device_type type, const char *tag)
+	korgm1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }

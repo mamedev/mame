@@ -35,7 +35,7 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 class firetrk_state : public driver_device
 {
 public:
-	firetrk_state(const machine_config &mconfig, device_type type, const char *tag)
+	firetrk_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_discrete(*this, "discrete"),

@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu,R. Belmont,Zsolt Vasvari
 #pragma once
 /*
@@ -13,7 +13,7 @@ class s14001a_device : public device_t,
 									public device_sound_interface
 {
 public:
-	s14001a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s14001a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~s14001a_device() {}
 
 	int bsy_r();        /* read BUSY pin */

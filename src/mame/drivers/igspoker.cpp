@@ -76,7 +76,7 @@ FIX: PK Tetris have an input named AMUSE which I couldn't map.  Maybe it is
 class igspoker_state : public driver_device
 {
 public:
-	igspoker_state(const machine_config &mconfig, device_type type, const char *tag)
+	igspoker_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_bg_tile_ram(*this, "bg_tile_ram"),

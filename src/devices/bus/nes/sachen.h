@@ -12,7 +12,7 @@ class nes_sachen_sa009_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_sachen_sa009_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_sachen_sa009_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -28,7 +28,7 @@ class nes_sachen_sa0036_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_sachen_sa0036_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_sachen_sa0036_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -44,7 +44,7 @@ class nes_sachen_sa0037_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_sachen_sa0037_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_sachen_sa0037_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -60,7 +60,7 @@ class nes_sachen_sa72007_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_sachen_sa72007_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_sachen_sa72007_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -76,7 +76,7 @@ class nes_sachen_sa72008_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_sachen_sa72008_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_sachen_sa72008_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -92,7 +92,7 @@ class nes_sachen_tca01_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_sachen_tca01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_sachen_tca01_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -108,7 +108,7 @@ class nes_sachen_tcu01_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_sachen_tcu01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_sachen_tcu01_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -126,7 +126,7 @@ class nes_sachen_tcu02_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_sachen_tcu02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_sachen_tcu02_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -146,8 +146,8 @@ class nes_sachen_74x374_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_sachen_74x374_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_sachen_74x374_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_sachen_74x374_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_sachen_74x374_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -168,7 +168,7 @@ class nes_sachen_74x374_alt_device : public nes_sachen_74x374_device
 {
 public:
 	// construction/destruction
-	nes_sachen_74x374_alt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_sachen_74x374_alt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual DECLARE_READ8_MEMBER(read_l) override { return 0xff; }   // no read_l here
@@ -182,8 +182,8 @@ class nes_sachen_8259a_device : public nes_sachen_74x374_device
 {
 public:
 	// construction/destruction
-	nes_sachen_8259a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_sachen_8259a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_sachen_8259a_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_sachen_8259a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -204,7 +204,7 @@ class nes_sachen_8259b_device : public nes_sachen_8259a_device
 {
 public:
 	// construction/destruction
-	nes_sachen_8259b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_sachen_8259b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void chr_update() override;
@@ -217,7 +217,7 @@ class nes_sachen_8259c_device : public nes_sachen_8259a_device
 {
 public:
 	// construction/destruction
-	nes_sachen_8259c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_sachen_8259c_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void chr_update() override;
@@ -230,7 +230,7 @@ class nes_sachen_8259d_device : public nes_sachen_8259a_device
 {
 public:
 	// construction/destruction
-	nes_sachen_8259d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_sachen_8259d_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual void pcb_reset() override;
 

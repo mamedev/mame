@@ -2,7 +2,7 @@
 // copyright-holders:smf
 #include "linflash.h"
 
-linear_flash_pccard_device::linear_flash_pccard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source) :
+linear_flash_pccard_device::linear_flash_pccard_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock,std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_memory_interface(mconfig, *this),
 	device_slot_card_interface(mconfig, *this), m_space(nullptr)
@@ -47,7 +47,7 @@ static ADDRESS_MAP_START(linear_flash_pccard_16mb, AS_0, 16, linear_flash_pccard
 	AM_RANGE(0x00c00000, 0x00ffffff) AM_DEVREADWRITE8("4u", intelfsh8_device, read, write, 0xff00)
 ADDRESS_MAP_END
 
-linear_flash_pccard_16mb_device::linear_flash_pccard_16mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+linear_flash_pccard_16mb_device::linear_flash_pccard_16mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	linear_flash_pccard_device(mconfig, LINEAR_FLASH_PCCARD_16MB, "Linear Flash PCCARD (16MB)", tag, owner, clock, "linearflash16mb", __FILE__)
 {
 	m_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16,  26, 0, *ADDRESS_MAP_NAME( linear_flash_pccard_16mb ) );
@@ -92,7 +92,7 @@ static ADDRESS_MAP_START(linear_flash_pccard_32mb, AS_0, 16, linear_flash_pccard
 	AM_RANGE(0x01c00000, 0x01ffffff) AM_DEVREADWRITE8("8u", intelfsh8_device, read, write, 0xff00)
 ADDRESS_MAP_END
 
-linear_flash_pccard_32mb_device::linear_flash_pccard_32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+linear_flash_pccard_32mb_device::linear_flash_pccard_32mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	linear_flash_pccard_device(mconfig, LINEAR_FLASH_PCCARD_32MB, "Linear Flash PCCARD (32MB)", tag, owner, clock, "linearflash32mb", __FILE__)
 {
 	m_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16,  26, 0, *ADDRESS_MAP_NAME( linear_flash_pccard_32mb ) );
@@ -161,7 +161,7 @@ static ADDRESS_MAP_START(linear_flash_pccard_64mb, AS_0, 16, linear_flash_pccard
 	AM_RANGE(0x03c00000, 0x03ffffff) AM_DEVREADWRITE8("16u", intelfsh8_device, read, write, 0xff00)
 ADDRESS_MAP_END
 
-linear_flash_pccard_64mb_device::linear_flash_pccard_64mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+linear_flash_pccard_64mb_device::linear_flash_pccard_64mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	linear_flash_pccard_device(mconfig, LINEAR_FLASH_PCCARD_64MB, "Linear Flash PCCARD (64MB)", tag, owner, clock, "linearflash64mb", __FILE__)
 {
 	m_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16,  26, 0, *ADDRESS_MAP_NAME( linear_flash_pccard_64mb ) );

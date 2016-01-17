@@ -34,7 +34,7 @@ Test Paste:
 class junior_state : public driver_device
 {
 public:
-	junior_state(const machine_config &mconfig, device_type type, const char *tag)
+	junior_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_riot(*this, "riot")
 	,

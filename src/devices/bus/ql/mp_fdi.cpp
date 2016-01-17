@@ -48,7 +48,7 @@ const rom_entry *micro_peripherals_floppy_disk_interface_t::device_rom_region() 
 //  micro_peripherals_floppy_disk_interface_t - constructor
 //-------------------------------------------------
 
-micro_peripherals_floppy_disk_interface_t::micro_peripherals_floppy_disk_interface_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+micro_peripherals_floppy_disk_interface_t::micro_peripherals_floppy_disk_interface_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MICRO_PERIPHERALS_FLOPPY_DISK_INTERFACE, "Micro Peripherals Floppy Disk Interface", tag, owner, clock, "ql_mpfdi", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this)
 {

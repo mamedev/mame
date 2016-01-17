@@ -7,7 +7,7 @@
 class strataflash_device : public device_t, public device_nvram_interface
 {
 public:
-	strataflash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	strataflash_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// 8-bit access
 	DECLARE_READ8_MEMBER( read8 );

@@ -7,7 +7,7 @@
 class twin16_state : public driver_device
 {
 public:
-	twin16_state(const machine_config &mconfig, device_type type, const char *tag)
+	twin16_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
@@ -97,7 +97,7 @@ private:
 class fround_state : public twin16_state
 {
 public:
-	fround_state(const machine_config &mconfig, device_type type, const char *tag)
+	fround_state(const machine_config &mconfig, device_type type, std::string tag)
 		: twin16_state(mconfig, type, tag)
 	{}
 
@@ -116,7 +116,7 @@ private:
 class cuebrickj_state : public twin16_state
 {
 public:
-	cuebrickj_state(const machine_config &mconfig, device_type type, const char *tag)
+	cuebrickj_state(const machine_config &mconfig, device_type type, std::string tag)
 		: twin16_state(mconfig, type, tag)
 	{}
 

@@ -50,7 +50,7 @@ public:
 		TIMER_VIDEO_UPDATE
 	};
 
-	samcoupe_state(const machine_config &mconfig, device_type type, const char *tag)
+	samcoupe_state(const machine_config &mconfig, device_type type, std::string tag)
 			: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_speaker(*this, "speaker"),

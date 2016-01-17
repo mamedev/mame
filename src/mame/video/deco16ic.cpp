@@ -177,7 +177,7 @@ Rowscroll style:
 
 const device_type DECO16IC = &device_creator<deco16ic_device>;
 
-deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+deco16ic_device::deco16ic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO16IC, "DECO 55 / 56 / 74 / 141 IC", tag, owner, clock, "deco16ic", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_pf1_data(nullptr),
@@ -212,7 +212,7 @@ deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag,
 //  gfx decoder
 //-------------------------------------------------
 
-void deco16ic_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void deco16ic_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<deco16ic_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -949,7 +949,7 @@ void deco16ic_device::tilemap_12_combine_draw(screen_device &screen, bitmap_rgb3
 //  palette device
 //-------------------------------------------------
 
-void deco16ic_device::static_set_palette_tag(device_t &device, const char *tag)
+void deco16ic_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<deco16ic_device &>(device).m_palette.set_tag(tag);
 }

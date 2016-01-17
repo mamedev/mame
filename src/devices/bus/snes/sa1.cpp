@@ -85,7 +85,7 @@
 const device_type SNS_LOROM_SA1 = &device_creator<sns_sa1_device>;
 
 
-sns_sa1_device::sns_sa1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sns_sa1_device::sns_sa1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, SNS_LOROM_SA1, "SNES Cart + SA-1", tag, owner, clock, "sns_rom_sa1", __FILE__),
 						device_sns_cart_interface( mconfig, *this ),
 						m_sa1(*this, "sa1cpu"), m_sa1_ctrl(0), m_scpu_sie(0), m_sa1_reset(0), m_sa1_nmi(0), m_sa1_irq(0), m_scpu_ctrl(0), m_sa1_sie(0), m_irq_vector(0), m_nmi_vector(0), m_hcount(0), m_vcount(0), m_bank_c_hi(0), m_bank_c_rom(0), m_bank_d_hi(0), m_bank_d_rom(0), m_bank_e_hi(0), m_bank_e_rom(0), m_bank_f_hi(0), m_bank_f_rom(0), m_bwram_snes(0), m_bwram_sa1(0), m_bwram_sa1_source(0), m_bwram_sa1_format(0), m_bwram_write_snes(0), m_bwram_write_sa1(0), m_bwpa_sa1(0), m_iram_write_snes(0), m_iram_write_sa1(0), m_dma_ctrl(0), m_dma_ccparam(0), m_src_addr(0), m_dst_addr(0), m_dma_cnt(0), m_math_ctlr(0), m_math_overflow(0), m_math_a(0), m_math_b(0), m_math_res(0), m_vda(0), m_vbit(0), m_vlen(0), m_drm(0), m_scpu_flags(0), m_sa1_flags(0), m_hcr(0), m_vcr(0)

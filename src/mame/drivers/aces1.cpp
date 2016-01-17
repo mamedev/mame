@@ -37,7 +37,7 @@ JPM style Reel MCU? Certainly reel data seems to be muxed together in aweird way
 class aces1_state : public driver_device
 {
 public:
-	aces1_state(const machine_config &mconfig, device_type type, const char *tag)
+	aces1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_reel0(*this, "reel0"),

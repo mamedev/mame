@@ -51,7 +51,7 @@ const device_type DMV_K210 = &device_creator<dmv_k210_device>;
 //  dmv_k210_device - constructor
 //-------------------------------------------------
 
-dmv_k210_device::dmv_k210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dmv_k210_device::dmv_k210_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, DMV_K210, "K210 Centronics", tag, owner, clock, "dmv_k210", __FILE__),
 		device_dmvslot_interface( mconfig, *this ),
 		m_ppi(*this, "ppi8255"),

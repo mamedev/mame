@@ -13,7 +13,7 @@
 class liberatr_state : public atarigen_state
 {
 public:
-	liberatr_state(const machine_config &mconfig, device_type type, const char *tag)
+	liberatr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atarigen_state(mconfig, type, tag),
 			m_base_ram(*this, "base_ram"),
 			m_planet_frame(*this, "planet_frame"),

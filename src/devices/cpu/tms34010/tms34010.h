@@ -240,7 +240,7 @@ class tms340x0_device : public cpu_device,
 {
 public:
 	// construction/destruction
-	tms340x0_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
+	tms340x0_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname);
 
 	static void set_halt_on_reset(device_t &device, bool halt_on_reset) { downcast<tms340x0_device &>(device).m_halt_on_reset = halt_on_reset; }
 	static void set_pixel_clock(device_t &device, UINT32 pixclock) { downcast<tms340x0_device &>(device).m_pixclock = pixclock; }
@@ -1024,7 +1024,7 @@ protected:
 class tms34010_device : public tms340x0_device
 {
 public:
-	tms34010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms34010_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	/* Reads & writes to the 34010 I/O registers; place at 0xc0000000 */
 	virtual DECLARE_WRITE16_MEMBER( io_register_w ) override;
@@ -1041,7 +1041,7 @@ extern const device_type TMS34010;
 class tms34020_device : public tms340x0_device
 {
 public:
-	tms34020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms34020_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	/* Reads & writes to the 34010 I/O registers; place at 0xc0000000 */
 	virtual DECLARE_WRITE16_MEMBER( io_register_w ) override;

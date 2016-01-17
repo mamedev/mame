@@ -31,7 +31,7 @@
 class kongambl_state : public konamigx_state // with everything devicified there's probably not much point in inheriting the GX state.
 {
 public:
-	kongambl_state(const machine_config &mconfig, device_type type, const char *tag)
+	kongambl_state(const machine_config &mconfig, device_type type, std::string tag)
 		: konamigx_state(mconfig, type, tag),
 		m_vram(*this, "vram")
 		{ }

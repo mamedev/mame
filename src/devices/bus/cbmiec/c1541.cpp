@@ -999,7 +999,7 @@ inline void c1541_base_t::set_iec_data()
 //  c1541_base_t - constructor
 //-------------------------------------------------
 
-c1541_base_t:: c1541_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+c1541_base_t:: c1541_base_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_cbm_iec_interface(mconfig, *this),
 	device_c64_floppy_parallel_interface(mconfig, *this),
@@ -1020,7 +1020,7 @@ c1541_base_t:: c1541_base_t(const machine_config &mconfig, device_type type, con
 //  c1540_t - constructor
 //-------------------------------------------------
 
-c1540_t::c1540_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c1540_t::c1540_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: c1541_base_t(mconfig, C1540, "C1540", tag, owner, clock, "c1540", __FILE__) { }
 
 
@@ -1028,7 +1028,7 @@ c1540_t::c1540_t(const machine_config &mconfig, const char *tag, device_t *owner
 //  c1541_t - constructor
 //-------------------------------------------------
 
-c1541_t::c1541_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c1541_t::c1541_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: c1541_base_t(mconfig, C1541, "C1541", tag, owner, clock, "c1541", __FILE__) { }
 
 
@@ -1036,7 +1036,7 @@ c1541_t::c1541_t(const machine_config &mconfig, const char *tag, device_t *owner
 //  c1541c_t - constructor
 //-------------------------------------------------
 
-c1541c_t::c1541c_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c1541c_t::c1541c_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: c1541_base_t(mconfig, C1541C, "C1541C", tag, owner, clock, "c1541c", __FILE__) {  }
 
 
@@ -1044,7 +1044,7 @@ c1541c_t::c1541c_t(const machine_config &mconfig, const char *tag, device_t *own
 //  c1541ii_t - constructor
 //-------------------------------------------------
 
-c1541ii_t::c1541ii_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c1541ii_t::c1541ii_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: c1541_base_t(mconfig, C1541II, "C1541-II", tag, owner, clock, "c1541ii", __FILE__) {  }
 
 
@@ -1052,7 +1052,7 @@ c1541ii_t::c1541ii_t(const machine_config &mconfig, const char *tag, device_t *o
 //  sx1541_t - constructor
 //-------------------------------------------------
 
-sx1541_t::sx1541_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sx1541_t::sx1541_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: c1541_base_t(mconfig, SX1541, "SX1541", tag, owner, clock, "sx1541", __FILE__) { }
 
 
@@ -1060,7 +1060,7 @@ sx1541_t::sx1541_t(const machine_config &mconfig, const char *tag, device_t *own
 //  fsd1_t - constructor
 //-------------------------------------------------
 
-fsd1_t::fsd1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+fsd1_t::fsd1_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: c1541_base_t(mconfig, FSD1, "FSD-1", tag, owner, clock, "fsd1", __FILE__) { }
 
 
@@ -1068,7 +1068,7 @@ fsd1_t::fsd1_t(const machine_config &mconfig, const char *tag, device_t *owner, 
 //  fsd2_t - constructor
 //-------------------------------------------------
 
-fsd2_t::fsd2_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+fsd2_t::fsd2_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: c1541_base_t(mconfig, FSD2, "FSD-2", tag, owner, clock, "fsd2", __FILE__) { }
 
 
@@ -1076,7 +1076,7 @@ fsd2_t::fsd2_t(const machine_config &mconfig, const char *tag, device_t *owner, 
 //  csd1_t - constructor
 //-------------------------------------------------
 
-csd1_t::csd1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+csd1_t::csd1_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: c1541_base_t(mconfig, CSD1, "CSD-1", tag, owner, clock, "csd1", __FILE__) { }
 
 
@@ -1084,7 +1084,7 @@ csd1_t::csd1_t(const machine_config &mconfig, const char *tag, device_t *owner, 
 //  c1541_dolphin_dos_t - constructor
 //-------------------------------------------------
 
-c1541_dolphin_dos_t::c1541_dolphin_dos_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c1541_dolphin_dos_t::c1541_dolphin_dos_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: c1541_base_t(mconfig, C1541_DOLPHIN_DOS, "C1541 Dolphin-DOS 2.0", tag, owner, clock, "c1541dd", __FILE__) {  }
 
 
@@ -1092,7 +1092,7 @@ c1541_dolphin_dos_t::c1541_dolphin_dos_t(const machine_config &mconfig, const ch
 //  c1541_professional_dos_v1_t - constructor
 //-------------------------------------------------
 
-c1541_professional_dos_v1_t::c1541_professional_dos_v1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c1541_professional_dos_v1_t::c1541_professional_dos_v1_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: c1541_base_t(mconfig, C1541_PROFESSIONAL_DOS_V1, "C1541 Professional-DOS v1", tag, owner, clock, "c1541pd", __FILE__) {  }
 
 
@@ -1100,7 +1100,7 @@ c1541_professional_dos_v1_t::c1541_professional_dos_v1_t(const machine_config &m
 //  c1541_prologic_dos_classic_t - constructor
 //-------------------------------------------------
 
-c1541_prologic_dos_classic_t::c1541_prologic_dos_classic_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c1541_prologic_dos_classic_t::c1541_prologic_dos_classic_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: c1541_base_t(mconfig, C1541_PROLOGIC_DOS_CLASSIC, "C1541 ProLogic-DOS Classic", tag, owner, clock, "c1541pdc", __FILE__),
 		m_pia(*this, MC6821_TAG),
 		m_cent_data_out(*this, "cent_data_out"),
@@ -1113,7 +1113,7 @@ c1541_prologic_dos_classic_t::c1541_prologic_dos_classic_t(const machine_config 
 //  indus_gt_t - constructor
 //-------------------------------------------------
 
-indus_gt_t::indus_gt_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+indus_gt_t::indus_gt_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: c1541_base_t(mconfig, INDUS_GT, "Indus GT", tag, owner, clock, "indusgt", __FILE__) { }
 
 

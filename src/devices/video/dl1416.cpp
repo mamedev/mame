@@ -96,7 +96,7 @@ static const UINT16 dl1416t_segments[128] = {
     DEVICE INTERFACE
 *****************************************************************************/
 
-dl1416_device::dl1416_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+dl1416_device::dl1416_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_write_enable(FALSE),
 	m_chip_enable(FALSE),
@@ -165,7 +165,7 @@ void dl1416_device::device_reset()
 
 const device_type DL1416B = &device_creator<dl1416b_device>;
 
-dl1416b_device::dl1416b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dl1416b_device::dl1416b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: dl1416_device(mconfig, DL1416B, "DL1416B", tag, owner, clock, "dl1416b", __FILE__)
 {
 }
@@ -173,7 +173,7 @@ dl1416b_device::dl1416b_device(const machine_config &mconfig, const char *tag, d
 
 const device_type DL1416T = &device_creator<dl1416t_device>;
 
-dl1416t_device::dl1416t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dl1416t_device::dl1416t_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: dl1416_device(mconfig, DL1416T, "DL1416T", tag, owner, clock, "dl1416t", __FILE__)
 {
 }

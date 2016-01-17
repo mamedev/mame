@@ -20,7 +20,7 @@
 extern const device_type SEGA315_5881_CRYPT = &device_creator<sega_315_5881_crypt_device>;
 
 
-sega_315_5881_crypt_device::sega_315_5881_crypt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega_315_5881_crypt_device::sega_315_5881_crypt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGA315_5881_CRYPT, "Sega 315-5881 Encryption", tag, owner, clock, "sega315_5881", __FILE__)
 {
 }
@@ -52,7 +52,7 @@ void sega_315_5881_crypt_device::device_start()
 		key = strtoll(skey.c_str(), nullptr, 16);
 	else
 	{
-		logerror("%s: Warning: key not provided\n", tag());
+		logerror("%s: Warning: key not provided\n", tag().c_str());
 		key = 0;
 	}
 }

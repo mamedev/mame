@@ -13,7 +13,7 @@ class serial_printer_device : public device_t,
 	public device_rs232_port_interface
 {
 public:
-	serial_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	serial_printer_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { device_serial_interface::rx_w(state); }
 

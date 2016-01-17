@@ -41,8 +41,8 @@ class at45db041_device : public device_t,
 							public device_nvram_interface
 {
 public:
-	at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	at45db041_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	at45db041_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	at45db041_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	DECLARE_WRITE_LINE_MEMBER(cs_w);
 	DECLARE_WRITE_LINE_MEMBER(sck_w);
@@ -117,7 +117,7 @@ protected:
 class at45db081_device : public at45db041_device
 {
 public:
-	at45db081_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	at45db081_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual int num_pages() const override { return 4096; }
@@ -132,7 +132,7 @@ protected:
 class at45db161_device : public at45db041_device
 {
 public:
-	at45db161_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	at45db161_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual int num_pages() const override { return 4096; }

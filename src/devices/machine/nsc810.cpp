@@ -22,7 +22,7 @@
 
 const device_type NSC810 = &device_creator<nsc810_device>;
 
-nsc810_device::nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nsc810_device::nsc810_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, NSC810, "National Semiconductor NSC810", tag, owner, clock, "nsc810", __FILE__), m_portA_latch(0), m_portB_latch(0), m_portC_latch(0),
 	m_ddrA(0), m_ddrB(0), m_ddrC(0), m_mode(0), m_timer0(nullptr), m_timer1(nullptr), m_timer0_mode(0), m_timer1_mode(0), m_timer0_counter(0), m_timer1_counter(0),
 	m_timer0_base(0), m_timer1_base(0), m_timer0_running(false), m_timer1_running(false), m_timer0_clock(0), m_timer1_clock(0), m_ramselect(false),
@@ -88,7 +88,7 @@ void nsc810_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			{
 				m_timer0_out(ASSERT_LINE);
 				m_timer0_counter = m_timer0_base;
-				if(LOG) logerror("NSC810 '%s': Timer 0 output set\n",tag());
+				if(LOG) logerror("NSC810 '%s': Timer 0 output set\n", tag().c_str());
 			}
 		}
 		break;
@@ -100,7 +100,7 @@ void nsc810_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			{
 				m_timer1_out(ASSERT_LINE);
 				m_timer1_counter = m_timer1_base;
-				if(LOG) logerror("NSC810 '%s': Timer 1 output set\n",tag());
+				if(LOG) logerror("NSC810 '%s': Timer 1 output set\n", tag().c_str());
 			}
 		}
 		break;
@@ -123,17 +123,17 @@ READ8_MEMBER(nsc810_device::read)
 		case REG_PORTA:
 			res = m_portA_latch &= m_ddrA;
 			res |= (m_portA_r() & ~m_ddrA);
-			//if(LOG) logerror("NSC810 '%s': Port A data read %02x\n",tag(),res);
+			//if(LOG) logerror("NSC810 '%s': Port A data read %02x\n", tag().c_str(),res);
 			break;
 		case REG_PORTB:
 			res = m_portB_latch &= m_ddrB;
 			res |= (m_portB_r() & ~m_ddrB);
-			//if(LOG) logerror("NSC810 '%s': Port B data read %02x\n",tag(),res);
+			//if(LOG) logerror("NSC810 '%s': Port B data read %02x\n", tag().c_str(),res);
 			break;
 		case REG_PORTC:
 			res = m_portC_latch &= m_ddrC;
 			res |= (m_portC_r() & ~m_ddrC);
-			//if(LOG) logerror("NSC810 '%s': Port C data read %02x\n",tag(),res);
+			//if(LOG) logerror("NSC810 '%s': Port C data read %02x\n", tag().c_str(),res);
 			break;
 		case REG_MODE_TIMER0:
 			res = m_timer0_mode;
@@ -146,7 +146,7 @@ READ8_MEMBER(nsc810_device::read)
 			if((m_timer0_mode & 0x07) == 0x01 || (m_timer0_mode & 0x07) == 0x02)
 			{
 				m_timer0_out(CLEAR_LINE);
-				if(LOG) logerror("NSC810 '%s': Timer 0 output reset\n",tag());
+				if(LOG) logerror("NSC810 '%s': Timer 0 output reset\n", tag().c_str());
 			}
 			break;
 		case REG_TIMER0_HIGH:
@@ -154,7 +154,7 @@ READ8_MEMBER(nsc810_device::read)
 			if((m_timer0_mode & 0x07) == 0x01 || (m_timer0_mode & 0x07) == 0x02)
 			{
 				m_timer0_out(CLEAR_LINE);
-				if(LOG) logerror("NSC810 '%s': Timer 0 output reset\n",tag());
+				if(LOG) logerror("NSC810 '%s': Timer 0 output reset\n", tag().c_str());
 			}
 			break;
 		case REG_TIMER1_LOW:
@@ -162,7 +162,7 @@ READ8_MEMBER(nsc810_device::read)
 			if((m_timer1_mode & 0x07) == 0x01 || (m_timer1_mode & 0x07) == 0x02)
 			{
 				m_timer1_out(0);
-				if(LOG) logerror("NSC810 '%s': Timer 1 output reset\n",tag());
+				if(LOG) logerror("NSC810 '%s': Timer 1 output reset\n", tag().c_str());
 			}
 			break;
 		case REG_TIMER1_HIGH:
@@ -170,11 +170,11 @@ READ8_MEMBER(nsc810_device::read)
 			if((m_timer1_mode & 0x07) == 0x01 || (m_timer1_mode & 0x07) == 0x02)
 			{
 				m_timer1_out(0);
-				if(LOG) logerror("NSC810 '%s': Timer 1 output reset\n",tag());
+				if(LOG) logerror("NSC810 '%s': Timer 1 output reset\n", tag().c_str());
 			}
 			break;
 		default:
-			if(LOG) logerror("NSC810 '%s': unused port %02x read\n",tag(),offset);
+			if(LOG) logerror("NSC810 '%s': unused port %02x read\n", tag().c_str(),offset);
 		}
 	}
 	return res;
@@ -196,75 +196,75 @@ WRITE8_MEMBER(nsc810_device::write)
 		case REG_PORTA:
 			m_portA_latch = data & ~m_ddrA;
 			m_portA_w((0xff & ~m_ddrA) | (data & m_ddrA));
-			if(LOG) logerror("NSC810 '%s': Port A data write %02x\n",tag(),data);
+			if(LOG) logerror("NSC810 '%s': Port A data write %02x\n", tag().c_str(),data);
 			break;
 		case REG_PORTB:
 			m_portB_latch = data & ~m_ddrB;
 			m_portB_w((0xff & ~m_ddrB) | (data & m_ddrB));
-			if(LOG) logerror("NSC810 '%s': Port B data write %02x\n",tag(),data);
+			if(LOG) logerror("NSC810 '%s': Port B data write %02x\n", tag().c_str(),data);
 			break;
 		case REG_PORTC:
 			m_portC_latch = data & ~m_ddrC;
 			m_portC_w((0xff & ~m_ddrC) | (data & m_ddrC));
-			if(LOG) logerror("NSC810 '%s': Port C data write %02x\n",tag(),data);
+			if(LOG) logerror("NSC810 '%s': Port C data write %02x\n", tag().c_str(),data);
 			break;
 		case REG_DDRA:
 			m_ddrA = data;
-			if(LOG) logerror("NSC810 '%s': Port A direction write %02x\n",tag(),data);
+			if(LOG) logerror("NSC810 '%s': Port A direction write %02x\n", tag().c_str(),data);
 			break;
 		case REG_DDRB:
 			m_ddrB = data;
-			if(LOG) logerror("NSC810 '%s': Port B direction write %02x\n",tag(),data);
+			if(LOG) logerror("NSC810 '%s': Port B direction write %02x\n", tag().c_str(),data);
 			break;
 		case REG_DDRC:
 			m_ddrC = data;
-			if(LOG) logerror("NSC810 '%s': Port C direction write %02x\n",tag(),data);
+			if(LOG) logerror("NSC810 '%s': Port C direction write %02x\n", tag().c_str(),data);
 			break;
 		case REG_MODE_DEF:
-			if(LOG) logerror("NSC810 '%s': Mode Definition write %02x\n",tag(),data);
+			if(LOG) logerror("NSC810 '%s': Mode Definition write %02x\n", tag().c_str(),data);
 			break;
 		case REG_PORTA_BITCLR:
-			if(LOG) logerror("NSC810 '%s': Port A bit-clear write %02x\n",tag(),data);
+			if(LOG) logerror("NSC810 '%s': Port A bit-clear write %02x\n", tag().c_str(),data);
 			break;
 		case REG_PORTB_BITCLR:
-			if(LOG) logerror("NSC810 '%s': Port B bit-clear write %02x\n",tag(),data);
+			if(LOG) logerror("NSC810 '%s': Port B bit-clear write %02x\n", tag().c_str(),data);
 			break;
 		case REG_PORTC_BITCLR:
-			if(LOG) logerror("NSC810 '%s': Port C bit-clear write %02x\n",tag(),data);
+			if(LOG) logerror("NSC810 '%s': Port C bit-clear write %02x\n", tag().c_str(),data);
 			break;
 		case REG_PORTA_BITSET:
-			if(LOG) logerror("NSC810 '%s': Port A bit-set write %02x\n",tag(),data);
+			if(LOG) logerror("NSC810 '%s': Port A bit-set write %02x\n", tag().c_str(),data);
 			break;
 		case REG_PORTB_BITSET:
-			if(LOG) logerror("NSC810 '%s': Port B bit-set write %02x\n",tag(),data);
+			if(LOG) logerror("NSC810 '%s': Port B bit-set write %02x\n", tag().c_str(),data);
 			break;
 		case REG_PORTC_BITSET:
-			if(LOG) logerror("NSC810 '%s': Port C bit-set write %02x\n",tag(),data);
+			if(LOG) logerror("NSC810 '%s': Port C bit-set write %02x\n", tag().c_str(),data);
 			break;
 		case REG_TIMER0_LOW:
 			m_timer0_base = (m_timer0_base & 0xff00) | data;
 			m_timer0_counter = (m_timer0_counter & 0xff00) | data;
-			if(LOG) logerror("NSC810 '%s': Timer 0 low-byte write %02x (base=%04x)\n",tag(),data,m_timer0_base);
+			if(LOG) logerror("NSC810 '%s': Timer 0 low-byte write %02x (base=%04x)\n", tag().c_str(),data,m_timer0_base);
 			break;
 		case REG_TIMER0_HIGH:
 			m_timer0_base = (m_timer0_base & 0x00ff) | (data << 8);
 			m_timer0_counter = (m_timer0_counter & 0x00ff) | (data << 8);
-			if(LOG) logerror("NSC810 '%s': Timer 0 high-byte write %02x (base=%04x)\n",tag(),data,m_timer0_base);
+			if(LOG) logerror("NSC810 '%s': Timer 0 high-byte write %02x (base=%04x)\n", tag().c_str(),data,m_timer0_base);
 			break;
 		case REG_TIMER1_LOW:
 			m_timer1_base = (m_timer1_base & 0xff00) | data;
 			m_timer1_counter = (m_timer1_counter & 0xff00) | data;
-			if(LOG) logerror("NSC810 '%s': Timer 1 low-byte write %02x (base=%04x)\n",tag(),data,m_timer1_base);
+			if(LOG) logerror("NSC810 '%s': Timer 1 low-byte write %02x (base=%04x)\n", tag().c_str(),data,m_timer1_base);
 			break;
 		case REG_TIMER1_HIGH:
 			m_timer1_base = (m_timer1_base & 0x00ff) | (data << 8);
 			m_timer1_counter = (m_timer1_counter & 0x00ff) | (data << 8);
-			if(LOG) logerror("NSC810 '%s': Timer 1 high-byte write %02x (base=%04x)\n",tag(),data,m_timer1_base);
+			if(LOG) logerror("NSC810 '%s': Timer 1 high-byte write %02x (base=%04x)\n", tag().c_str(),data,m_timer1_base);
 			break;
 		case REG_TIMER0_STOP:
 			m_timer0_running = false;
 			m_timer0->reset();
-			if(LOG) logerror("NSC810 '%s': Timer 0 Stop write %02x\n",tag(),data);
+			if(LOG) logerror("NSC810 '%s': Timer 0 Stop write %02x\n", tag().c_str(),data);
 			break;
 		case REG_TIMER0_START:
 			if((m_timer0_mode & 0x07) != 0x00 && (m_timer0_mode & 0x07) != 0x07)
@@ -279,12 +279,12 @@ WRITE8_MEMBER(nsc810_device::write)
 						rate = m_timer0_clock;
 				m_timer0->adjust(attotime::zero,0,attotime::from_hz(rate));
 			}
-			if(LOG) logerror("NSC810 '%s': Timer 0 Start write %02x\n",tag(),data);
+			if(LOG) logerror("NSC810 '%s': Timer 0 Start write %02x\n", tag().c_str(),data);
 			break;
 		case REG_TIMER1_STOP:
 			m_timer1_running = false;
 			m_timer1->reset();
-			if(LOG) logerror("NSC810 '%s': Timer 1 Stop write %02x\n",tag(),data);
+			if(LOG) logerror("NSC810 '%s': Timer 1 Stop write %02x\n", tag().c_str(),data);
 			break;
 		case REG_TIMER1_START:
 			if((m_timer1_mode & 0x07) != 0x00 && (m_timer1_mode & 0x07) != 0x07)
@@ -297,18 +297,18 @@ WRITE8_MEMBER(nsc810_device::write)
 					rate = m_timer0_clock;
 				m_timer1->adjust(attotime::zero,0,attotime::from_hz(rate));
 			}
-			if(LOG) logerror("NSC810 '%s': Timer 1 Start write %02x\n",tag(),data);
+			if(LOG) logerror("NSC810 '%s': Timer 1 Start write %02x\n", tag().c_str(),data);
 			break;
 		case REG_MODE_TIMER0:
 			m_timer0_mode = data;
-			if(LOG) logerror("NSC810 '%s': Timer 0 Mode write %02x\n",tag(),data);
+			if(LOG) logerror("NSC810 '%s': Timer 0 Mode write %02x\n", tag().c_str(),data);
 			break;
 		case REG_MODE_TIMER1:
 			m_timer1_mode = data;
-			if(LOG) logerror("NSC810 '%s': Timer 1 Mode write %02x\n",tag(),data);
+			if(LOG) logerror("NSC810 '%s': Timer 1 Mode write %02x\n", tag().c_str(),data);
 			break;
 		default:
-			logerror("NSC810 '%s': Unused register %02x write %02x\n",tag(),offset,data);
+			logerror("NSC810 '%s': Unused register %02x write %02x\n", tag().c_str(),offset,data);
 		}
 	}
 }

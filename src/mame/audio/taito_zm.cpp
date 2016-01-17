@@ -37,7 +37,7 @@ const device_type TAITO_ZOOM = &device_creator<taito_zoom_device>;
 //  taito_zoom_device - constructor
 //-------------------------------------------------
 
-taito_zoom_device::taito_zoom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+taito_zoom_device::taito_zoom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TAITO_ZOOM, "Taito Zoom Sound System", tag, owner, clock, "taito_zoom", __FILE__),
 	m_soundcpu(*this, ":mn10200"),
 	m_zsg2(*this, ":zsg2"),

@@ -902,7 +902,7 @@ void k053247_device::zdrawgfxzoom32GP(
 
 const device_type K055673 = &device_creator<k055673_device>;
 
-k055673_device::k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k055673_device::k055673_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: k053247_device(mconfig, K055673, "K053246 & K055673 Sprite Generator", tag, owner, clock, "k055673", __FILE__)
 {
 }
@@ -1043,7 +1043,7 @@ void k055673_device::device_start()
 
 const device_type K053246 = &device_creator<k053247_device>;
 
-k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k053247_device::k053247_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053246, "K053246 & K053247 Sprite Generator", tag, owner, clock, "k053247", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_gfxdecode(*this),
@@ -1052,7 +1052,7 @@ k053247_device::k053247_device(const machine_config &mconfig, const char *tag, d
 	clear_all();
 }
 
-k053247_device::k053247_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+k053247_device::k053247_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
 		m_gfxdecode(*this),
@@ -1066,7 +1066,7 @@ k053247_device::k053247_device(const machine_config &mconfig, device_type type, 
 //  gfx decoder
 //-------------------------------------------------
 
-void k053247_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void k053247_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<k053247_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -1076,7 +1076,7 @@ void k053247_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 //  palette device
 //-------------------------------------------------
 
-void k053247_device::static_set_palette_tag(device_t &device, const char *tag)
+void k053247_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<k053247_device &>(device).m_palette.set_tag(tag);
 }
