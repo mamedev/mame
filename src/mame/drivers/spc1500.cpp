@@ -397,12 +397,10 @@ WRITE8_MEMBER( spc1500_state::portc_w)
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
 	m_vdg->set_clock(VDP_CLOCK/(BIT(data, 2) ? 48 : 24));
 	m_centronics->write_strobe(BIT(data, 7));
-//	m_double_mode = (!m_double_mode && m_p5bit && !BIT(data, 5)); // double access I/O mode
-	m_double_mode = (!m_p5bit && BIT(data, 5)); // double access I/O mode
-	if (m_double_mode)
-		printf("double access mode\n");
-	fflush(stdout);
+	if (!m_double_mode && !m_p5bit && BIT(data, 5))
+		m_double_mode = true; // double access I/O mode
 	m_p5bit = BIT(data, 5);
+#if 0	
 	if (m_x1compatible != BIT(data, 1))
 	{
 		UINT8 *mem_ipl = memregion("ipl")->base();		
@@ -420,6 +418,7 @@ WRITE8_MEMBER( spc1500_state::portc_w)
 		}
 		m_x1compatible = !m_x1compatible;
 	}
+#endif		
 	m_portc = data;
 }
 
@@ -559,6 +558,9 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	int i;
 	int j;
 	int h1, h2, h3;
+	if (!de)
+		return;
+//	UINT32  *p = &bitmap.pix32(y+vbp*1.5, hbp*1.5);
 	UINT32  *p = &bitmap.pix32(y);
 	
 	unsigned char cho[] ={1,1,1,1,1,1,1,1,0,0,1,1,1,3,5,5,0,0,5,3,3,5,5,5,0,0,3,3,5,1};
@@ -633,7 +635,7 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 		}
 		else
 		{
-			UINT8 fnt = m_font[(hs == 4 ? 0x1000 : (attr & (1<<6) ? 0x80<<4 : 0)) + (ascii<<4) + n];
+			UINT8 fnt = m_font[(hs == 4 ? 0x1000 : (attr & (1<<6) && !(attr & (1<<7)) ? 0x80<<4 : 0)) + (ascii<<4) + n];
 			if (ascii == 0 && (attr & 0x08) && inv)
 			{
 				fnt = 0xff;
@@ -749,11 +751,6 @@ WRITE8_MEMBER( spc1500_state::double_w)
 
 READ8_MEMBER( spc1500_state::io_r)
 {
-	if (m_double_mode)
-	{
-		printf("normal access mode\n");
-		fflush(stdout);
-	}
 	m_double_mode = false;
 	if (offset < 0x800)  {} else
 	if (offset < 0x900)  { return fdcx_r(space, offset); } else
