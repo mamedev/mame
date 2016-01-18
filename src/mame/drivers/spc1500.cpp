@@ -232,6 +232,7 @@ TODO:
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
 #include "formats/spc1000_cas.h"
+#include "formats/2d_dsk.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/upd765.h"
 #define VDP_CLOCK  XTAL_42_9545MHz
@@ -281,6 +282,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ramsel);
 	DECLARE_WRITE8_MEMBER(portb_w);
 	DECLARE_WRITE8_MEMBER(psgb_w);
+	DECLARE_READ8_MEMBER(portc_r);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(double_w);
@@ -302,6 +304,7 @@ private:
 	UINT16 m_page;
 	UINT8 m_pcg_char, m_pcg_attr, m_char_change, m_pcg_char0;
 	UINT16 m_pcg_offset[3];
+	UINT8 m_portc;
 	int m_char_count;
 	attotime m_time;
 	bool m_romsel;
@@ -309,6 +312,7 @@ private:
 	bool m_p5bit;
 	bool m_motor;
 	bool m_motor_toggle;
+	bool m_x1compatible;
 	UINT8 m_crtc_vreg[0x100];
 	bool m_centronics_busy;
 	virtual void machine_start() override;
@@ -383,13 +387,40 @@ WRITE8_MEMBER( spc1500_state::psgb_w)
 	m_motor = BIT(data, 7);
 }
 
+READ8_MEMBER( spc1500_state::portc_r)
+{
+	return m_portc;
+}
+
 WRITE8_MEMBER( spc1500_state::portc_w)
 {
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
-	m_centronics->write_strobe(BIT(data, 7));
-	m_double_mode = (!m_p5bit && BIT(data, 5)); // double access I/O mode
-	m_p5bit = BIT(data, 5);
 	m_vdg->set_clock(VDP_CLOCK/(BIT(data, 2) ? 48 : 24));
+	m_centronics->write_strobe(BIT(data, 7));
+//	m_double_mode = (!m_double_mode && m_p5bit && !BIT(data, 5)); // double access I/O mode
+	m_double_mode = (!m_p5bit && BIT(data, 5)); // double access I/O mode
+	if (m_double_mode)
+		printf("double access mode\n");
+	fflush(stdout);
+	m_p5bit = BIT(data, 5);
+	if (m_x1compatible != BIT(data, 1))
+	{
+		UINT8 *mem_ipl = memregion("ipl")->base();		
+		if (!BIT(data, 1))
+		{
+			mem_ipl[0x279] = 0x79;
+			mem_ipl[0x281] = 0x73;
+			printf("X1 compatible mode\n");
+		}
+		else
+		{
+			mem_ipl[0x279] = 0x59;
+			mem_ipl[0x281] = 0x53;
+			printf("SPC mode\n");
+		}
+		m_x1compatible = !m_x1compatible;
+	}
+	m_portc = data;
 }
 
 READ8_MEMBER( spc1500_state::portb_r)
@@ -625,7 +656,7 @@ WRITE8_MEMBER( spc1500_state::fdc_w )
 {
 	if (m_fd0)
 		m_fd0->mon_w(!BIT(data, 0));
-	m_fdc->tc_w(!BIT(data, 2));
+	m_fdc->tc_w(BIT(data, 3));
 //	printf("fdc_w(0x%02x, 0x%02x)\n", offset & 0xff, data); 
 }
 
@@ -718,6 +749,11 @@ WRITE8_MEMBER( spc1500_state::double_w)
 
 READ8_MEMBER( spc1500_state::io_r)
 {
+	if (m_double_mode)
+	{
+		printf("normal access mode\n");
+		fflush(stdout);
+	}
 	m_double_mode = false;
 	if (offset < 0x800)  {} else
 	if (offset < 0x900)  { return fdcx_r(space, offset); } else
@@ -730,6 +766,8 @@ READ8_MEMBER( spc1500_state::io_r)
 	if (offset < 0x1a00) { return keyboard_r(space, offset); } else
 	if (offset < 0x1b00) { return m_pio->read(space, offset); } else
 	if (offset < 0x1c00) { return m_sound->data_r(space, offset); } else
+	if (offset < 0x1e00) { romsel(space, offset, 0);} else
+	if (offset < 0x1f00) { ramsel(space, offset, 0);} else
 	if (offset < 0x2000) {} else
 	if (offset < 0x10000){ 
 		if (offset < 0x4000)
@@ -930,6 +968,7 @@ void spc1500_state::machine_start()
 	membank("bank4")->set_base(m_p_ram + 0x8000);	
 	m_timer = timer_alloc(0);
 	m_timer->adjust(attotime::zero);
+	memset(m_p_ram, 0x0, 0xffff);
 }
 
 void spc1500_state::machine_reset()
@@ -967,7 +1006,7 @@ READ8_MEMBER( spc1500_state::porta_r )
 }
 
 FLOPPY_FORMATS_MEMBER( spc1500_state::floppy_formats )
-	FLOPPY_DSK_FORMAT, FLOPPY_D88_FORMAT
+	FLOPPY_2D_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( spc1500_floppies )
@@ -1004,6 +1043,7 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_I8255_IN_PORTB_CB(READ8(spc1500_state, portb_r))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(spc1500_state, portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(spc1500_state, portc_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(spc1500_state, portc_r))
 	
 
 	/* sound hardware */
@@ -1022,11 +1062,11 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	
 	// floppy disk controller
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	//MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	// floppy drives
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", spc1500_floppies, "dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:2", spc1500_floppies, "dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", spc1500_floppies, "dd", spc1500_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:2", spc1500_floppies, "dd", spc1500_state::floppy_formats)
 	
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(spc1000_cassette_formats)
