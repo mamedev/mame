@@ -1529,7 +1529,7 @@ WRITE_LINE_MEMBER( tmsprom_device::enable_w )
 const device_type TMS5110 = &device_creator<tms5110_device>;
 
 tms5110_device::tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TMS5110, "TMS5110", tag, owner, clock, "tms5110", __FILE__),
+	: device_t(mconfig, TMS5110, "TMS5110", tag, owner, clock, "tms5110", __FILE__)
 	, device_sound_interface(mconfig, *this)
 	, m_table(*this, DEVICE_SELF)
 	, m_m0_cb(*this)

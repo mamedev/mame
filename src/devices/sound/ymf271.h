@@ -16,8 +16,7 @@
 #define MCFG_YMF271_EXT_WRITE_HANDLER(_devcb) \
 	devcb = &ymf271_device::set_ext_write_handler(*device, DEVCB_##_devcb);
 
-class ymf271_device : public device_t,
-									public device_sound_interface
+class ymf271_device : public device_t, public device_sound_interface
 {
 public:
 	ymf271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

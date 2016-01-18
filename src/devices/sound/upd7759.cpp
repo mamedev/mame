@@ -171,14 +171,13 @@ upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, 
 	, m_adpcm_state(0)
 	, m_adpcm_data(0)
 	, m_sample(0)
-	, m_rom_region(*this, DEVICE_SELF)
+	, m_rombase(*this, DEVICE_SELF)
 	, m_rom(nullptr)
-	, m_rombase(nullptr)
 	, m_romoffset(0)
 	, m_rommask(0)
 	, m_drqcallback(*this)
-{
-}
+	{
+	}
 
 const device_type UPD7759 = &device_creator<upd7759_device>;
 

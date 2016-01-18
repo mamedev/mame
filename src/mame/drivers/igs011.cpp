@@ -108,12 +108,11 @@ public:
 	optional_shared_ptr<UINT16> m_vbowl_trackball;
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
 
-	std::unique_ptr<UINT8[]> m_layer[8];
 	/* memory regions */
 	required_memory_region m_gfx_region;
 	optional_memory_region m_gfx2_region;
 
-	UINT8 *m_layer[8];
+	std::unique_ptr<UINT8[]> m_layer[8];
 	UINT16 m_priority;
 	UINT8 m_lhb2_pen_hi;
 	UINT16 m_igs_dips_sel;

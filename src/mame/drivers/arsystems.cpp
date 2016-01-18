@@ -67,8 +67,6 @@ public:
 	{
 	}
 
-	UINT8 m_coin_counter[2];
-
 	DECLARE_WRITE16_MEMBER(arcadia_multibios_change_game);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed_callback);

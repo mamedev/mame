@@ -25,9 +25,6 @@ public:
 	{
 	}
 
-	/* video-related */
-	n64_rdp *m_rdp;
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
