@@ -648,7 +648,7 @@ void cli_frontend::listslots(const char *gamename)
 		{
 			if (slot->fixed()) continue;
 			// output the line, up to the list of extensions
-			printf("%-13s%-10s   ", first ? drivlist.driver().name : "", std::string(slot->device().tag()).erase(0,1).c_str());
+			printf("%-13s%-10s   ", first ? drivlist.driver().name : "", std::string(slot->device().tag()).substr(1).c_str());
 
 			bool first_option = true;
 

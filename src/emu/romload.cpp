@@ -1460,7 +1460,7 @@ rom_load_manager::rom_load_manager(running_machine &machine)
 			if (device->owner() == nullptr) {
 				specbios.assign(machine.options().bios());
 			} else {
-				specbios = machine.options().sub_value(std::string(device->owner()->tag()).c_str()+1,"bios");
+				specbios = machine.options().sub_value(std::string(device->owner()->tag()).substr(1).c_str(),"bios");
 				if (specbios.empty()) {
 					specbios = device->default_bios_tag();
 				}

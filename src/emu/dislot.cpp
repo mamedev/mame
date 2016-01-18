@@ -65,8 +65,8 @@ device_t* device_slot_interface::get_card_device()
 {
 	std::string subtag;
 	device_t *dev = nullptr;
-	if (device().mconfig().options().exists(device().tag().c_str()+1))
-		subtag = device().mconfig().options().main_value(device().tag().c_str()+1);
+	if (device().mconfig().options().exists(device().tag().substr(1).c_str()))
+		subtag = device().mconfig().options().main_value(device().tag().substr(1).c_str());
 	else if (m_default_option != nullptr)
 		subtag.assign(m_default_option);
 	if (!subtag.empty()) {

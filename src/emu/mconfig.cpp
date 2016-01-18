@@ -40,9 +40,9 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	{
 		device_t &owner = slot->device();
 		std::string selval;
-		bool isdefault = (options.priority(owner.tag().c_str()+1)==OPTION_PRIORITY_DEFAULT);
-		if (is_selected_driver && options.exists(owner.tag().c_str()+1))
-			selval = options.main_value(owner.tag().c_str()+1);
+		bool isdefault = (options.priority(owner.tag().substr(1).c_str())==OPTION_PRIORITY_DEFAULT);
+		if (is_selected_driver && options.exists(owner.tag().substr(1).c_str()))
+			selval = options.main_value(owner.tag().substr(1).c_str());
 		else if (slot->default_option() != nullptr)
 			selval.assign(slot->default_option());
 
@@ -67,7 +67,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 					device_t::static_set_input_default(*new_dev, input_device_defaults);
 			}
 			else
-				throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval.c_str(), owner.tag().c_str()+1);
+				throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval.c_str(), owner.tag().substr(1).c_str());
 		}
 	}
 

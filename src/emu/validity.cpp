@@ -1042,7 +1042,7 @@ void validity_checker::build_output_prefix(std::string &str)
 
 	// if we have a current (non-root) device, indicate that
 	if (m_current_device != nullptr && m_current_device->owner() != nullptr)
-		str.append(m_current_device->name()).append(" device '").append(m_current_device->tag().c_str()+1).append("': ");
+		str.append(m_current_device->name()).append(" device '").append(m_current_device->tag().substr(1).c_str()).append("': ");
 
 	// if we have a current port, indicate that as well
 	if (m_current_ioport != nullptr)

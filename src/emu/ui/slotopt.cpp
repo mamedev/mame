@@ -29,7 +29,7 @@ device_slot_option *ui_menu_slot_devices::slot_get_current_option(device_slot_in
 	}
 	else
 	{
-		current = machine().options().main_value(slot->device().tag().c_str() + 1);
+		current = machine().options().main_value(slot->device().tag().substr(1).c_str());
 	}
 
 	return slot->option(current.c_str());
@@ -135,7 +135,7 @@ const char *ui_menu_slot_devices::slot_get_option(device_slot_interface *slot, i
 void ui_menu_slot_devices::set_slot_device(device_slot_interface *slot, const char *val)
 {
 	std::string error;
-	machine().options().set_value(slot->device().tag().c_str()+1, val, OPTION_PRIORITY_CMDLINE, error);
+	machine().options().set_value(slot->device().tag().substr(1).c_str(), val, OPTION_PRIORITY_CMDLINE, error);
 	assert(error.empty());
 }
 
@@ -166,7 +166,7 @@ void ui_menu_slot_devices::populate()
 				opt_name.append(" [internal]");
 		}
 
-		item_append(slot->device().tag().c_str() + 1, opt_name.c_str(), (slot->fixed() || slot_get_length(slot) == 0) ? 0 : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), (void *)slot);
+		item_append(slot->device().tag().substr(1).c_str(), opt_name.c_str(), (slot->fixed() || slot_get_length(slot) == 0) ? 0 : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), (void *)slot);
 	}
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 	item_append("Reset",  nullptr, 0, (void *)1);
