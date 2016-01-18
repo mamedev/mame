@@ -607,6 +607,7 @@ public:
 	DECLARE_READ8_MEMBER(vcc_ppi_portc_r);
 	DECLARE_WRITE8_MEMBER(vcc_ppi_portc_w);
 	DECLARE_WRITE8_MEMBER(cc10_ppi_porta_w);
+	DECLARE_READ8_MEMBER(vcc_speech_r);
 
 	// model VSC
 	void vsc_prepare_display();
@@ -648,6 +649,7 @@ void fidelz80base_state::machine_start()
 	m_led_select = 0;
 	m_led_data = 0;
 	m_7seg_data = 0;
+	m_speech_bank = 0;
 
 	// register for savestates
 	save_item(NAME(m_display_maxy));
@@ -663,6 +665,7 @@ void fidelz80base_state::machine_start()
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_7seg_data));
+	save_item(NAME(m_speech_bank));
 }
 
 void fidelz80base_state::machine_reset()
@@ -800,23 +803,34 @@ void fidelz80_state::vcc_prepare_display()
 	for (int i = 0; i < 4; i++)
 		m_display_segmask[i] = 0x7f;
 	
-	// note: d0 for extra leds
-	display_matrix(8, 4, m_7seg_data | (m_led_select << 7 & 0x80), m_led_select >> 2 & 0xf);
+	// data for the 4 7seg leds, bits are xABCDEFG, note: sel d0 for extra leds
+	UINT8 outdata = (BITSWAP8(m_7seg_data,7,0,1,2,3,4,5,6) & 0x7f) | (m_led_select << 7 & 0x80);
+	display_matrix(8, 4, outdata, m_led_select >> 2 & 0xf);
+}
+
+READ8_MEMBER(fidelz80_state::vcc_speech_r)
+{
+	return m_speech_rom[m_speech_bank << 12 | offset];
 }
 
 WRITE8_MEMBER(fidelz80_state::vcc_ppi_porta_w)
 {
-	// data for the 4 7seg leds, bits are xABCDEFG
-	m_7seg_data = BITSWAP8(data,7,0,1,2,3,4,5,6) & 0x7f;
+	// d6: language latch data
+	// d7: language latch clock, latch speech ROM A12 on rising edge
+	if (~m_7seg_data & data & 0x80)
+	{
+		m_speech->force_update(); // update stream to now
+		m_speech_bank = data >> 6 & 1;
+	}
+
+	// d0-d6: digit segment data
+	m_7seg_data = data;
 	vcc_prepare_display();
 	
 	// d0-d5: TSI A0-A5
 	// d7: TSI START line
 	m_speech->reg_w(data & 0x3f);
 	m_speech->rst_w(data >> 7 & 1);
-	
-	// d6: language latch data
-	// d7: language latch clock
 }
 
 READ8_MEMBER(fidelz80_state::vcc_ppi_portb_r)
@@ -828,16 +842,16 @@ READ8_MEMBER(fidelz80_state::vcc_ppi_portb_r)
 WRITE8_MEMBER(fidelz80_state::vcc_ppi_portb_w)
 {
 	// d0,d2-d5: digit/led select
+	// _d6: enable language switches
 	m_led_select = data;
 	vcc_prepare_display();
-
-	// _d6: enable language switches (TODO)
 }
 
 READ8_MEMBER(fidelz80_state::vcc_ppi_portc_r)
 {
-	// d0-d3: multiplexed inputs (inverted)
-	return ~read_inputs(4) & 0xf;
+	// d0-d3: multiplexed inputs (inverted), also language switches
+	UINT8 lan = (~m_led_select & 0x40) ? m_inp_matrix[4]->read() : 0;
+	return ~(lan | read_inputs(4)) & 0xf;
 }
 
 WRITE8_MEMBER(fidelz80_state::vcc_ppi_portc_w)
@@ -851,7 +865,7 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_portc_w)
 WRITE8_MEMBER(fidelz80_state::cc10_ppi_porta_w)
 {
 	// d0-d6: digit segment data (same as VCC)
-	m_7seg_data = BITSWAP8(data,7,0,1,2,3,4,5,6) & 0x7f;
+	m_7seg_data = data;
 	vcc_prepare_display();
 
 	// d7: beeper output
@@ -1205,10 +1219,18 @@ static INPUT_PORTS_START( fidelz80 )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("D4") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_D)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_H)
 
+	PORT_START("IN.4") // TODO: hardcode this
+	PORT_CONFNAME( 0x0f, 0x00, "Language" )
+	PORT_CONFSETTING( 0x00, "English" )
+	PORT_CONFSETTING( 0x01, "French" )
+	PORT_CONFSETTING( 0x02, "Spanish" )
+	PORT_CONFSETTING( 0x04, "German" )
+	PORT_CONFSETTING( 0x08, "Special" )
+
 	PORT_START("RESET") // is not on matrix IN.0 d0
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, fidelz80_state, reset_button, 0)
 
-	PORT_START("LEVEL") // cc10 only
+	PORT_START("LEVEL") // cc10 only, TODO: hardcode this
 	PORT_CONFNAME( 0x80, 0x00, "Number of levels" )
 	PORT_CONFSETTING( 0x00, "10" )
 	PORT_CONFSETTING( 0x80, "3" )
@@ -1418,6 +1440,7 @@ static MACHINE_CONFIG_START( vcc, fidelz80_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
+	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidelz80_state, vcc_speech_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1493,6 +1516,7 @@ ROM_START( vcc )
 
 	ROM_REGION( 0x2000, "speech", 0 )
 	ROM_LOAD("vcc-engl.bin", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) ) // at location c4?
+	ROM_RELOAD(              0x1000, 0x1000)
 ROM_END
 
 ROM_START( vccg )
@@ -1531,7 +1555,7 @@ ROM_START( uvc )
 	ROM_LOAD("101-64017.b3", 0x0000, 0x2000, CRC(f1133abf) SHA1(09dd85051c4e7d364d43507c1cfea5c2d08d37f4) ) // "MOS // 101-64017 // 3880"
 	ROM_LOAD("101-32010.a1", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) ) // "NEC P9Z021 // D2332C 228 // 101-32010", == vcc3.bin on vcc
 
-	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_REGION( 0x1000, "speech", 0 )
 	ROM_LOAD("101-32107.c4", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) ) // "NEC P9Y019 // D2332C 229 // 101-32107", == vcc-engl.bin on vcc
 ROM_END
 
@@ -1543,7 +1567,7 @@ ROM_START( vsc )
 	ROM_LOAD("101-32024.bin", 0x4000, 0x1000, CRC(2a078676) SHA1(db2f0aba7e8ac0f84a17bae7155210cdf0813afb) )
 	ROM_RELOAD(               0x5000, 0x1000 )
 
-	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_REGION( 0x1000, "speech", 0 )
 	ROM_LOAD("101-32107.bin", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) )
 ROM_END
 
@@ -1558,7 +1582,7 @@ ROM_START( vbrc ) // AKA model 7002
 	ROM_REGION( 0x1000, "mcu", 0 )
 	ROM_LOAD("100-1009.a3", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a) )
 
-	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_REGION( 0x1000, "speech", 0 )
 	ROM_LOAD("101-32118.i2", 0x0000, 0x1000, CRC(a0b8bb8f) SHA1(f56852108928d5c6caccfc8166fa347d6760a740) )
 ROM_END
 
@@ -1572,7 +1596,7 @@ ROM_START( bridgec3 ) // 510-1016 Rev.1 PCB has neither locations nor ic labels,
 	ROM_REGION( 0x1000, "mcu", 0 )
 	ROM_LOAD("100-1009.a3", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a) ) // "NEC P07021-027 || D8041C 563 100-1009"
 
-	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_REGION( 0x1000, "speech", 0 )
 	ROM_LOAD("101-32118.i2", 0x0000, 0x1000, CRC(a0b8bb8f) SHA1(f56852108928d5c6caccfc8166fa347d6760a740) ) // "ea 101-32118 || (C) 1980 || EA 8332A247-4 || 8034"
 ROM_END
 

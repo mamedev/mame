@@ -521,13 +521,18 @@ void s14001a_device::s14001a_clock() /* called once per clock */
 UINT8 s14001a_device::readmem(UINT16 offset)
 {
 	offset &= 0xfff; // 11-bit internal
-	return ((m_ext_read_handler.isnull()) ? m_ext_read_handler(offset) : m_SpeechRom[offset]);
+	return ((m_ext_read_handler.isnull()) ? m_SpeechRom[offset & (m_SpeechRom.bytes() - 1)] : m_ext_read_handler(offset));
 }
 
 
 /**************************************************************************
    MAME glue code
  **************************************************************************/
+
+void s14001a_device::force_update()
+{
+	m_stream->update();
+}
 
 int s14001a_device::bsy_r()
 {
@@ -594,8 +599,8 @@ void s14001a_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() ? clock() : machine().sample_rate());
 
 	// resolve callbacks
-	m_ext_read_handler.resolve_safe(0);
-	m_bsy_handler.resolve_safe();
+	m_ext_read_handler.resolve();
+	m_bsy_handler.resolve();
 
 	save_item(NAME(m_WordInput));
 	save_item(NAME(m_LatchedWord));

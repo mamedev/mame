@@ -31,6 +31,7 @@ public:
 	void rst_w(int data);     /* write to RESET pin */
 	void set_clock(int clock);     /* set VSU-1000 clock */
 	void set_volume(int volume);    /* set VSU-1000 volume control */
+	void force_update();
 
 protected:
 	// device-level overrides

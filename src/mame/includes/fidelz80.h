@@ -27,6 +27,7 @@ public:
 		m_i8243(*this, "i8243"),
 		m_inp_matrix(*this, "IN"),
 		m_speech(*this, "speech"),
+		m_speech_rom(*this, "speech"),
 		m_speaker(*this, "speaker"),
 		m_display_wait(33),
 		m_display_maxy(1),
@@ -41,6 +42,7 @@ public:
 	optional_device<i8243_device> m_i8243;
 	optional_ioport_array<10> m_inp_matrix; // max 10
 	optional_device<s14001a_device> m_speech;
+	optional_region_ptr<UINT8> m_speech_rom;
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
@@ -48,6 +50,7 @@ public:
 	UINT16 m_led_select;             // 5 bit selects for 7 seg leds and for common other leds, bits are (7seg leds are 0 1 2 3, common other leds are C) 0bxx3210xc
 	UINT16 m_7seg_data;            // data for seg leds
 	UINT16 m_led_data;
+	UINT8 m_speech_bank;
 
 	UINT16 read_inputs(int columns);
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
