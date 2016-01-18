@@ -73,7 +73,7 @@ PB.3 - digit 1, top dot (W)
 PB.4 - digit 2 (W)
 PB.5 - digit 3 (W)
 PB.6 - enable language switches (W, see below)
-PB.7 - TSI DONE line (R)
+PB.7 - TSI BSY line (R)
 
 (button rows pulled up to 5V through 2.2K resistors)
 PC.0 - button row 0, German language jumper (R)
@@ -335,7 +335,7 @@ PA7 - 7seg segments D
 PB0 - A12 on speech ROM (if used... not used on this model, ROM is 4K)
 PB1 - START line on S14001A
 PB2 - white wire
-PB3 - DONE line from S14001A
+PB3 - BSY line from S14001A
 PB4 - Tone line (toggle to make a tone in the speaker)
 PB5 - button column I
 PB6 - selection jumper (resistor to 5V)
@@ -562,7 +562,7 @@ PB.0 - button column I
 PB.1 - button row 9
 PB.2 - Tone line (toggle to make tone in the speaker)
 PB.3 - violet wire
-PB.4 - white wire (and TSI done line)
+PB.4 - white wire (and TSI BSY line)
 PB.5 - selection jumper input (see below)
 PB.6 - TSI start line
 PB.7 - TSI ROM D0 line
@@ -812,7 +812,6 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_porta_w)
 	
 	// d0-d5: TSI A0-A5
 	// d7: TSI START line
-	m_speech->set_volume(15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
 	m_speech->reg_w(data & 0x3f);
 	m_speech->rst_w(data >> 7 & 1);
 	
@@ -822,7 +821,7 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_porta_w)
 
 READ8_MEMBER(fidelz80_state::vcc_ppi_portb_r)
 {
-	// d7: TSI DONE line
+	// d7: TSI BSY line
 	return (m_speech->bsy_r()) ? 0x80 : 0x00;
 }
 
@@ -922,7 +921,7 @@ READ8_MEMBER(fidelz80_state::vsc_pio_portb_r)
 {
 	UINT8 ret = 0;
 	
-	// d4: TSI DONE line
+	// d4: TSI BSY line
 	ret |= (m_speech->bsy_r()) ? 0 : 0x10;
 	
 	return ret;
@@ -937,7 +936,6 @@ WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 	m_speaker->level_w(data >> 2 & 1);
 
 	// d6: TSI START line
-	m_speech->set_volume(15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
 	m_speech->rst_w(data >> 6 & 1);
 }
 
@@ -1081,8 +1079,7 @@ READ8_MEMBER(fidelz80_state::mcu_status_r)
 
 WRITE8_MEMBER(fidelz80_state::bridgec_speech_w)
 {
-	// todo: HALT THE z80 here, and set up a callback to poll the s14001a DONE line to resume z80
-	m_speech->set_volume(15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
+	// todo: HALT THE z80 here, and set up a callback to poll the s14001a BSY line to resume z80
 	m_speech->reg_w(data & 0x3f);
 	m_speech->rst_w(BIT(data, 7));
 }

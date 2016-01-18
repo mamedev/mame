@@ -98,7 +98,6 @@ WRITE8_MEMBER(wolfpack_state::wolfpack_word_w)
 
 WRITE8_MEMBER(wolfpack_state::wolfpack_start_speech_w)
 {
-	m_s14001a->set_volume(15); /* hack, should be executed just once during game init, or defaulted to this in the s14001a core */
 	m_s14001a->rst_w(data&1);
 }
 

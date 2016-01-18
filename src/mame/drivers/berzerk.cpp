@@ -334,6 +334,7 @@ void berzerk_state::machine_start()
 {
 	create_irq_timer();
 	create_nmi_timer();
+	m_s14001a->set_volume(0);
 
 	/* register for state saving */
 	save_item(NAME(m_magicram_control));

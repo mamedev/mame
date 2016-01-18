@@ -78,6 +78,7 @@ private:
 	UINT8 m_digit;
 	UINT8 m_counter;
 	UINT8 m_segment[5];
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<m6800_cpu_device> m_maincpu;
 	optional_device<s14001a_device> m_s14001a;
@@ -532,6 +533,11 @@ WRITE8_MEMBER( st_mp200_state::u11_b_w )
 				break;
 		}
 	}
+}
+
+void st_mp200_state::machine_start()
+{
+	m_s14001a->set_volume(0);
 }
 
 void st_mp200_state::machine_reset()

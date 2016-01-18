@@ -571,26 +571,7 @@ s14001a_device::s14001a_device(const machine_config &mconfig, std::string tag, d
 		m_SpeechRom(*this, DEVICE_SELF),
 		m_stream(nullptr),
 		m_bsy_handler(*this),
-		m_ext_read_handler(*this),
-		m_WordInput(0),
-		m_LatchedWord(0),
-		m_SyllableAddress(0),
-		m_PhoneAddress(0),
-		m_PlayParams(0),
-		m_PhoneOffset(0),
-		m_LengthCounter(0),
-		m_RepeatCounter(0),
-		m_OutputCounter(0),
-		m_machineState(0),
-		m_nextstate(0),
-		m_laststate(0),
-		m_resetState(0),
-		m_oddeven(0),
-		m_GlobalSilenceState(1),
-		m_OldDelta(0x02),
-		m_DACOutput(SILENCE),
-		m_audioout(0),
-		m_VSU1000_amp(0)
+		m_ext_read_handler(*this)
 {
 }
 
@@ -603,6 +584,7 @@ void s14001a_device::device_start()
 	m_GlobalSilenceState = 1;
 	m_OldDelta = 0x02;
 	m_DACOutput = SILENCE;
+	m_VSU1000_amp = 15;
 
 	for (int i = 0; i < 8; i++)
 	{
