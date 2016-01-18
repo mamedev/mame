@@ -621,16 +621,12 @@ public:
 	DECLARE_WRITE8_MEMBER(vsc_pio_portb_w);
 
 	// model 7014 and VBC
-	DECLARE_WRITE8_MEMBER(bridgec_speech_w);
+	void vbrc_prepare_display();
+	DECLARE_WRITE8_MEMBER(vbrc_speech_w);
 	DECLARE_WRITE8_MEMBER(kp_matrix_w);
-	DECLARE_READ8_MEMBER(unknown_r);
-	DECLARE_READ8_MEMBER(unknown2_r);
-	DECLARE_READ8_MEMBER(exp_i8243_p2_r);
-	DECLARE_WRITE8_MEMBER(exp_i8243_p2_w);
-	DECLARE_WRITE8_MEMBER(mcu_data_w);
-	DECLARE_WRITE8_MEMBER(mcu_command_w);
-	DECLARE_READ8_MEMBER(mcu_data_r);
-	DECLARE_READ8_MEMBER(mcu_status_r);
+	DECLARE_READ8_MEMBER(vbrc_scanner_r);
+	DECLARE_READ8_MEMBER(vbrc_unknown_r);
+	DECLARE_READ8_MEMBER(vbrc_input_r);
 	DECLARE_WRITE8_MEMBER(digit_w);
 };
 
@@ -786,7 +782,7 @@ INPUT_CHANGED_MEMBER(fidelz80base_state::reset_button)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 	
 	if (m_mcu)
-		m_mcu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+		m_mcu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -803,8 +799,8 @@ void fidelz80_state::vcc_prepare_display()
 	for (int i = 0; i < 4; i++)
 		m_display_segmask[i] = 0x7f;
 	
-	// data for the 4 7seg leds, bits are xABCDEFG, note: sel d0 for extra leds
-	UINT8 outdata = (BITSWAP8(m_7seg_data,7,0,1,2,3,4,5,6) & 0x7f) | (m_led_select << 7 & 0x80);
+	// note: sel d0 for extra leds
+	UINT8 outdata = (m_7seg_data & 0x7f) | (m_led_select << 7 & 0x80);
 	display_matrix(8, 4, outdata, m_led_select >> 2 & 0xf);
 }
 
@@ -815,22 +811,22 @@ READ8_MEMBER(fidelz80_state::vcc_speech_r)
 
 WRITE8_MEMBER(fidelz80_state::vcc_ppi_porta_w)
 {
-	// d6: language latch data
-	// d7: language latch clock, latch speech ROM A12 on rising edge
-	if (~m_7seg_data & data & 0x80)
-	{
-		m_speech->force_update(); // update stream to now
-		m_speech_bank = data >> 6 & 1;
-	}
-
-	// d0-d6: digit segment data
-	m_7seg_data = data;
+	// d0-d6: digit segment data, bits are xABCDEFG
+	m_7seg_data = BITSWAP8(data,7,0,1,2,3,4,5,6);
 	vcc_prepare_display();
-	
+
 	// d0-d5: TSI A0-A5
 	// d7: TSI START line
 	m_speech->reg_w(data & 0x3f);
 	m_speech->rst_w(data >> 7 & 1);
+
+	// d6: language latch data
+	// d7: language latch clock (latch on high)
+	if (data & 0x80)
+	{
+		m_speech->force_update(); // update stream to now
+		m_speech_bank = data >> 6 & 1;
+	}
 }
 
 READ8_MEMBER(fidelz80_state::vcc_ppi_portb_r)
@@ -860,12 +856,12 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_portc_w)
 	m_inp_mux = ~data >> 4 & 0xf;
 }
 
-// CC10-specific (no speech roms, 1-bit beeper instead)
+// CC10-specific (no speech chip, 1-bit beeper instead)
 
 WRITE8_MEMBER(fidelz80_state::cc10_ppi_porta_w)
 {
 	// d0-d6: digit segment data (same as VCC)
-	m_7seg_data = data;
+	m_7seg_data = BITSWAP8(data,7,0,1,2,3,4,5,6);
 	vcc_prepare_display();
 
 	// d7: beeper output
@@ -927,7 +923,7 @@ WRITE8_MEMBER(fidelz80_state::vsc_ppi_portc_w)
 
 READ8_MEMBER(fidelz80_state::vsc_pio_porta_r)
 {
-	// multiplexed inputs
+	// d0-d7: multiplexed inputs
 	return read_inputs(10);
 }
 
@@ -958,28 +954,23 @@ WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
     I8243 I/O Expander Device, for VBRC
 ******************************************************************************/
 
+void fidelz80_state::vbrc_prepare_display()
+{
+	// 14seg led segments, d15 is extra led, d14 is unused (tone on prototype?)
+	UINT16 outdata = BITSWAP16(m_7seg_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
+	for (int i = 0; i < 8; i++)
+		m_display_segmask[i] = 0x3fff;
+
+	display_matrix(16, 8, outdata, m_led_select);
+
+
+}
+
 WRITE8_MEMBER(fidelz80_state::digit_w)
 {
-//	if (m_digit_line_status[offset])
-//		return;
-
-//	m_digit_line_status[offset&3] = 1;
-
-	switch (offset)
-	{
-	case 0:
-		m_7seg_data = (m_7seg_data&(~0x000f)) | ((data<<0)&0x000f);
-		break;
-	case 1:
-		m_7seg_data = (m_7seg_data&(~0x00f0)) | ((data<<4)&0x00f0);
-		break;
-	case 2:
-		m_7seg_data = (m_7seg_data&(~0x0f00)) | ((data<<8)&0x0f00);
-		break;
-	case 3:
-		m_7seg_data = (m_7seg_data&(~0xf000)) | ((data<<12)&0xf000);
-		break;
-	}
+	// P4-P7: digit segment data
+	m_7seg_data = (m_7seg_data & ~(0xf << (4*offset))) | ((data & 0xf) << (4*offset));
+	vbrc_prepare_display();
 }
 
 
@@ -989,113 +980,26 @@ WRITE8_MEMBER(fidelz80_state::digit_w)
 
 WRITE8_MEMBER(fidelz80_state::kp_matrix_w)
 {
-	UINT16 out_data = BITSWAP16(m_7seg_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
-	UINT16 out_digit = out_data & 0x3fff;
-	UINT8 out_led = BIT(out_data, 15) ? 0 : 1;
-
-	// output the digit before update the matrix
-	if (m_inp_mux & 0x01)
-	{
-		output().set_digit_value(1, out_digit);
-		output().set_led_value(8, out_led);
-	}
-	if (m_inp_mux & 0x02)
-	{
-		output().set_digit_value(2, out_digit);
-		output().set_led_value(7, out_led);
-	}
-	if (m_inp_mux & 0x04)
-	{
-		output().set_digit_value(3, out_digit);
-		output().set_led_value(6, out_led);
-	}
-	if (m_inp_mux & 0x08)
-	{
-		output().set_digit_value(4, out_digit);
-		output().set_led_value(5, out_led);
-	}
-	if (m_inp_mux & 0x10)
-	{
-		output().set_digit_value(5, out_digit);
-		output().set_led_value(4, out_led);
-	}
-	if (m_inp_mux & 0x20)
-	{
-		output().set_digit_value(6, out_digit);
-		output().set_led_value(3, out_led);
-	}
-	if (m_inp_mux & 0x40)
-	{
-		output().set_digit_value(7, out_digit);
-		output().set_led_value(2, out_led);
-	}
-	if (m_inp_mux & 0x80)
-	{
-		output().set_digit_value(8, out_digit);
-		output().set_led_value(1, out_led);
-	}
-
-//	memset(m_digit_line_status, 0, sizeof(m_digit_line_status));
-
-	m_inp_mux = data;
+	// d0-d7: select digits, input mux
+	m_inp_mux = m_led_select = data;
+	vbrc_prepare_display();
 }
 
-READ8_MEMBER(fidelz80_state::exp_i8243_p2_r)
+READ8_MEMBER(fidelz80_state::vbrc_input_r)
 {
-	UINT8 inp = 0xff;
-
-	for (int i = 0; i < 4; i++)
-		if (m_inp_mux >> i & 1)
-			inp &= m_inp_matrix[i]->read();
-
-	return (m_i8243->i8243_p2_r(space, offset)&0x0f) | (inp<<4&0xf0);
+	// d0-d3: I8243 P2
+	// d4-d7: multiplexed inputs (inverted)
+	return (m_i8243->i8243_p2_r(space, offset) & 0x0f) | (read_inputs(8) << 4 ^ 0xf0);
 }
 
-WRITE8_MEMBER(fidelz80_state::exp_i8243_p2_w)
-{
-	m_i8243->i8243_p2_w(space, offset, data&0x0f);
-}
-
-// probably related to the card scanner
-READ8_MEMBER(fidelz80_state::unknown_r)
+READ8_MEMBER(fidelz80_state::vbrc_scanner_r)
 {
 	return 0;
 }
 
-READ8_MEMBER(fidelz80_state::unknown2_r)
+READ8_MEMBER(fidelz80_state::vbrc_unknown_r)
 {
-	return machine().rand();
-}
-
-/******************************************************************************
-    basic machine
-******************************************************************************/
-
-WRITE8_MEMBER(fidelz80_state::mcu_data_w)
-{
-	m_mcu->upi41_master_w(space, 0, data);
-}
-
-WRITE8_MEMBER(fidelz80_state::mcu_command_w)
-{
-	m_mcu->upi41_master_w(space, 1, data);
-}
-
-READ8_MEMBER(fidelz80_state::mcu_data_r)
-{
-	return m_mcu->upi41_master_r(space, 0);
-}
-
-READ8_MEMBER(fidelz80_state::mcu_status_r)
-{
-	return m_mcu->upi41_master_r(space, 1);
-}
-
-WRITE8_MEMBER(fidelz80_state::bridgec_speech_w)
-{
-	// todo: HALT THE z80 here, and set up a callback to poll the s14001a BSY line to resume z80
-	m_speech->reg_w(data & 0x3f);
-	m_speech->rst_w(BIT(data, 7));
+	return rand() & 1;
 }
 
 
@@ -1122,8 +1026,8 @@ static ADDRESS_MAP_START( vcc_map, AS_PROGRAM, 8, fidelz80_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vcc_io, AS_IO, 8, fidelz80_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0xfc) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
+	ADDRESS_MAP_GLOBAL_MASK(0x03)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -1131,7 +1035,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vsc_map, AS_PROGRAM, 8, fidelz80_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x4fff) AM_ROM AM_MIRROR(0x1000)
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_MIRROR(0x1c00)
 ADDRESS_MAP_END
 
@@ -1156,36 +1061,46 @@ WRITE8_MEMBER(fidelz80_state::vsc_io_trampoline_w)
 }
 
 static ADDRESS_MAP_START( vsc_io, AS_IO, 8, fidelz80_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f) AM_MIRROR(0xf0) AM_READWRITE(vsc_io_trampoline_r, vsc_io_trampoline_w)
+	ADDRESS_MAP_GLOBAL_MASK(0x0f)
+	AM_RANGE(0x00, 0x0f) AM_READWRITE(vsc_io_trampoline_r, vsc_io_trampoline_w)
 ADDRESS_MAP_END
 
 
 // VBRC
 
+WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
+{
+	//printf("%X ",data);
+	
+	// todo: HALT THE z80 here, and set up a callback to poll the s14001a BSY line to resume z80
+	m_speech->reg_w(data & 0x1f);
+	m_speech->rst_w(1);
+	m_speech->rst_w(0);
+	
+	//m_speech->rst_w(BIT(data, 7));
+}
+
 static ADDRESS_MAP_START( vbrc_main_map, AS_PROGRAM, 8, fidelz80_state )
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(bridgec_speech_w) AM_MIRROR(0x1fff) // write to speech chip, halts cpu
-	AM_IMPORT_FROM( vsc_map )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_MIRROR(0x1c00)
+	AM_RANGE(0xe000, 0xffff) AM_WRITE(vbrc_speech_w) AM_MIRROR(0x1fff)
 ADDRESS_MAP_END
 
 
 
 static ADDRESS_MAP_START( vbrc_main_io, AS_IO, 8, fidelz80_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(mcu_data_r, mcu_data_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(mcu_status_r, mcu_command_w)
+	ADDRESS_MAP_GLOBAL_MASK(0x01)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("mcu", i8041_device, upi41_master_r, upi41_master_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vbrc_mcu_map, AS_IO, 8, fidelz80_state )
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(kp_matrix_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(exp_i8243_p2_r, exp_i8243_p2_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(vbrc_input_r) AM_DEVWRITE("i8243", i8243_device, i8243_p2_w)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("i8243", i8243_device, i8243_prog_w)
-
-	// related to the card scanner, probably clock and data optical
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(unknown_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(unknown2_r)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(vbrc_scanner_r)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(vbrc_unknown_r)
 ADDRESS_MAP_END
 
 
@@ -1477,12 +1392,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( bridgec, fidelz80_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz/2) // 2.5MHz
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz/2)
 	MCFG_CPU_PROGRAM_MAP(vbrc_main_map)
 	MCFG_CPU_IO_MAP(vbrc_main_io)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("mcu", I8041, XTAL_5MHz) // 5MHz
+	MCFG_CPU_ADD("mcu", I8041, XTAL_5MHz) // or XTAL_5MHz/4?
 	MCFG_CPU_IO_MAP(vbrc_mcu_map)
 
 	MCFG_I8243_ADD("i8243", NOOP, WRITE8(fidelz80_state, digit_w))
@@ -1493,7 +1408,7 @@ static MACHINE_CONFIG_START( bridgec, fidelz80_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -1503,13 +1418,13 @@ MACHINE_CONFIG_END
 ******************************************************************************/
 
 ROM_START( cc10 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cc10.bin", 0x0000, 0x1000, CRC(bb9e6055) SHA1(18276e57cf56465a6352239781a828c5f3d5ba63) )
 ROM_END
 
 
 ROM_START( vcc )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257bb5ab) SHA1(f7589225bb8e5f3eac55f23e2bd526be780b38b5) ) // 32014.VCC??? at location b3?
 	ROM_LOAD("vcc2.bin", 0x1000, 0x1000, CRC(f33095e7) SHA1(692fcab1b88c910b74d04fe4d0660367aee3f4f0) ) // at location a2?
 	ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) ) // at location a1?
@@ -1520,7 +1435,7 @@ ROM_START( vcc )
 ROM_END
 
 ROM_START( vccg )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257bb5ab) SHA1(f7589225bb8e5f3eac55f23e2bd526be780b38b5) ) // 32014.VCC??? at location b3?
 	ROM_LOAD("vcc2.bin", 0x1000, 0x1000, CRC(f33095e7) SHA1(692fcab1b88c910b74d04fe4d0660367aee3f4f0) ) // at location a2?
 	ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) ) // at location a1?
@@ -1530,7 +1445,7 @@ ROM_START( vccg )
 ROM_END
 
 ROM_START( vccfr )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257bb5ab) SHA1(f7589225bb8e5f3eac55f23e2bd526be780b38b5) ) // 32014.VCC??? at location b3?
 	ROM_LOAD("vcc2.bin", 0x1000, 0x1000, CRC(f33095e7) SHA1(692fcab1b88c910b74d04fe4d0660367aee3f4f0) ) // at location a2?
 	ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) ) // at location a1?
@@ -1540,7 +1455,7 @@ ROM_START( vccfr )
 ROM_END
 
 ROM_START( vccsp )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257bb5ab) SHA1(f7589225bb8e5f3eac55f23e2bd526be780b38b5) ) // 32014.VCC??? at location b3?
 	ROM_LOAD("vcc2.bin", 0x1000, 0x1000, CRC(f33095e7) SHA1(692fcab1b88c910b74d04fe4d0660367aee3f4f0) ) // at location a2?
 	ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) ) // at location a1?
@@ -1551,7 +1466,7 @@ ROM_END
 
 
 ROM_START( uvc )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-64017.b3", 0x0000, 0x2000, CRC(f1133abf) SHA1(09dd85051c4e7d364d43507c1cfea5c2d08d37f4) ) // "MOS // 101-64017 // 3880"
 	ROM_LOAD("101-32010.a1", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) ) // "NEC P9Z021 // D2332C 228 // 101-32010", == vcc3.bin on vcc
 
@@ -1561,11 +1476,10 @@ ROM_END
 
 
 ROM_START( vsc )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-64108.bin", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626) )
 	ROM_LOAD("101-64109.bin", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
 	ROM_LOAD("101-32024.bin", 0x4000, 0x1000, CRC(2a078676) SHA1(db2f0aba7e8ac0f84a17bae7155210cdf0813afb) )
-	ROM_RELOAD(               0x5000, 0x1000 )
 
 	ROM_REGION( 0x1000, "speech", 0 )
 	ROM_LOAD("101-32107.bin", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) )
@@ -1573,7 +1487,7 @@ ROM_END
 
 
 ROM_START( vbrc ) // AKA model 7002
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	// nec 2364 mask roms; pin 27 (PGM, probably NC here due to mask roms) goes to the pcb
 	ROM_LOAD("101-64108.g3", 0x0000, 0x2000, CRC(08472223) SHA1(859865b13c908dbb474333263dc60f6a32461141) )
 	ROM_LOAD("101-64109.f3", 0x2000, 0x2000, CRC(320afa0f) SHA1(90edfe0ac19b108d232cda376b03a3a24befad4c) )
@@ -1587,7 +1501,7 @@ ROM_START( vbrc ) // AKA model 7002
 ROM_END
 
 ROM_START( bridgec3 ) // 510-1016 Rev.1 PCB has neither locations nor ic labels, so I declare the big heatsink is at C1, numbers count on the shorter length of pcb
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	// TMM2764AD-20 EPROMS with tiny hole-punch sized colored stickers (mostly) covering the quartz windows. pin 27 (PGM) is tied to vcc with small rework wires and does not connect to pcb.
 	ROM_LOAD("7014_white.g3", 0x0000, 0x2000, CRC(eb1620ef) SHA1(987a9abc8c685f1a68678ea4ee65ec4a99419179) ) // white sticker
 	ROM_LOAD("7014_red.f3", 0x2000, 0x2000, CRC(74af0019) SHA1(8dc05950c254ca050b95b93e5d0cf48f913a6d49) ) // red sticker
