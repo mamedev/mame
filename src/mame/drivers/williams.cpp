@@ -1,10 +1,8 @@
-// license:???
-// copyright-holders:Michael Soderstrom, Marc LaFontaine, Aaron Giles
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /***************************************************************************
 
     Williams 6809 system
-
-    driver by Michael Soderstrom, Marc LaFontaine, Aaron Giles
 
     Games supported:
         * Defender
