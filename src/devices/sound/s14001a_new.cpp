@@ -33,7 +33,6 @@ void s14001a_new_device::device_start()
 	m_bsy_handler.resolve();
 	
 	m_uOutputP1 = m_uOutputP2 = 7;
-	//m_uPrintLevel = 10;
 }
 
 
@@ -46,38 +45,40 @@ void s14001a_new_device::sound_stream_update(sound_stream &stream, stream_sample
 	for (int i = 0; i < samples; i++)
 	{
 		Clock();
-		outputs[0][i] = ((((INT16)GetOutput())-7)<<10)*15;
+		INT16 sample = INT16(m_uOutputP2) - 7;
+		outputs[0][i] = sample * 0x4000;
 	}
 }
 
 
-UINT8 s14001a_new_device::readmem(UINT16 offset, bool phase)
-{
-	offset &= 0xfff; // 11-bit internal
-	return ((m_ext_read_handler.isnull()) ? m_SpeechRom[offset & (m_SpeechRom.bytes() - 1)] : m_ext_read_handler(offset));
-}
 
 void s14001a_new_device::force_update()
 {
 	m_stream->update();
 }
 
-int s14001a_new_device::bsy_r()
+READ_LINE_MEMBER(s14001a_new_device::romclock_r)
 {
 	m_stream->update();
-	return (GetBusy()) ? 1 : 0;
+	return (m_bPhase1) ? 1 : 0;
 }
 
-void s14001a_new_device::reg_w(int data)
+READ_LINE_MEMBER(s14001a_new_device::busy_r)
 {
 	m_stream->update();
-	SetWord(data);
+	return (m_bBusyP1) ? 1 : 0;
 }
 
-void s14001a_new_device::rst_w(int data)
+WRITE8_MEMBER(s14001a_new_device::data_w)
 {
 	m_stream->update();
-	SetStart(data != 0);
+	m_uWord = data & 0x3f; // C0-C5
+}
+
+WRITE_LINE_MEMBER(s14001a_new_device::start_w)
+{
+	m_stream->update();
+	m_bStart = (state != 0);
 	if (m_bStart) m_uStateP1 = WORDWAIT;
 }
 
@@ -90,6 +91,11 @@ void s14001a_new_device::set_clock(int clock)
 
 
 
+UINT8 s14001a_new_device::readmem(UINT16 offset, bool phase)
+{
+	offset &= 0xfff; // 11-bit internal
+	return ((m_ext_read_handler.isnull()) ? m_SpeechRom[offset & (m_SpeechRom.bytes() - 1)] : m_ext_read_handler(offset));
+}
 
 bool s14001a_new_device::Clock()
 {
@@ -136,27 +142,30 @@ bool s14001a_new_device::Clock()
 	// logic done during phase 1
 	switch (m_uStateP1)
 	{
-	// 0
 	case IDLE:
-		m_bBusyP1 = false;
 		m_uOutputP1 = 7;
 		if (m_bStart) m_uStateP1 = WORDWAIT;
+
+		if (m_bBusyP1 && !m_bsy_handler.isnull())
+			m_bsy_handler(0);
+		m_bBusyP1 = false;
 		break;
 
-	// 1
 	case WORDWAIT:
 		// the delta address register latches the word number into bits 03 to 08
 		// all other bits forced to 0.  04 to 08 makes a multiply by two.
 		m_uDAR13To05P1 = (m_uWord&0x3C)>>2;
 		m_uDAR04To00P1 = (m_uWord&0x03)<<3;
 		m_RomAddrP1 = (m_uDAR13To05P1<<3)|(m_uDAR04To00P1>>2); // remove lower two bits
-		m_bBusyP1 = true;
 		m_uOutputP1 = 7;
 		if (m_bStart) m_uStateP1 = WORDWAIT;
 		else          m_uStateP1 = CWARMSB;
+
+		if (!m_bBusyP1 && !m_bsy_handler.isnull())
+			m_bsy_handler(1);
+		m_bBusyP1 = true;
 		break;
 
-	// 2
 	case CWARMSB:
 		if (m_uPrintLevel >= 1)
 			printf("\n speaking word %02x",m_uWord);
@@ -173,7 +182,6 @@ bool s14001a_new_device::Clock()
 		else          m_uStateP1 = CWARLSB;
 		break;
 
-	// 3
 	case CWARLSB:
 		m_uCWARP1   = m_uCWARP2|(readmem(m_uRomAddrP2,m_bPhase1)>>4); // setup in previous state
 		m_RomAddrP1 = m_uCWARP1;
@@ -183,7 +191,6 @@ bool s14001a_new_device::Clock()
 		else          m_uStateP1 = DARMSB;
 		break;
 
-	// 4
 	case DARMSB:
 		m_uDAR13To05P1 = readmem(m_uRomAddrP2,m_bPhase1)<<1; // 9 bit counter, 8 MSBs from ROM, lsb zeroed
 		m_uDAR04To00P1 = 0;
@@ -196,7 +203,6 @@ bool s14001a_new_device::Clock()
 		else          m_uStateP1 = CTRLBITS;
 		break;
 
-	// 5
 	case CTRLBITS:
 		m_bStopP1    = readmem(m_uRomAddrP2,m_bPhase1)&0x80? true: false;
 		m_bVoicedP1  = readmem(m_uRomAddrP2,m_bPhase1)&0x40? true: false;
@@ -216,7 +222,6 @@ bool s14001a_new_device::Clock()
 
 		break;
 
-	// 6
 	case PLAY:
 	{
 		// statistics
@@ -306,7 +311,6 @@ bool s14001a_new_device::Clock()
 		break;
 	}
 
-	// 7
 	case DELAY:
 		m_uOutputP1 = 7;
 		if (m_bStart) m_uStateP1 = WORDWAIT;
@@ -351,7 +355,7 @@ void s14001a_new_device::CalculateIncrement(bool bVoicedP2, UINT8 uPPQtrP2, bool
 	{
 		uDeltaOldP2 = 0x02;
 	}
-	static UINT8 uIncrements[4][4] =
+	static const UINT8 uIncrements[4][4] =
 	{
 	//    00  01  10  11
 		{ 3,  3,  1,  1,}, // 00

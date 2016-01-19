@@ -817,8 +817,8 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_porta_w)
 
 	// d0-d5: TSI A0-A5
 	// d7: TSI START line
-	m_speech->reg_w(data & 0x3f);
-	m_speech->rst_w(data >> 7 & 1);
+	m_speech->data_w(space, 0, data & 0x3f);
+	m_speech->start_w(data >> 7 & 1);
 
 	// d6: language latch data
 	// d7: language latch clock (latch on high)
@@ -832,7 +832,7 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_porta_w)
 READ8_MEMBER(fidelz80_state::vcc_ppi_portb_r)
 {
 	// d7: TSI BSY line
-	return (m_speech->bsy_r()) ? 0x80 : 0x00;
+	return (m_speech->busy_r()) ? 0x80 : 0x00;
 }
 
 WRITE8_MEMBER(fidelz80_state::vcc_ppi_portb_w)
@@ -893,7 +893,7 @@ void fidelz80_state::vsc_prepare_display()
 WRITE8_MEMBER(fidelz80_state::vsc_ppi_porta_w)
 {
 	// d0-d5: TSI A0-A5
-	m_speech->reg_w(data & 0x3f);
+	m_speech->data_w(space, 0, data & 0x3f);
 
 	// d0-d7: data for the 4 7seg leds, bits are HGCBAFED (H is extra led)
 	m_7seg_data = BITSWAP8(data,7,6,2,1,0,5,4,3);
@@ -932,7 +932,7 @@ READ8_MEMBER(fidelz80_state::vsc_pio_portb_r)
 	UINT8 ret = 0;
 	
 	// d4: TSI BSY line
-	ret |= (m_speech->bsy_r()) ? 0 : 0x10;
+	ret |= (m_speech->busy_r()) ? 0 : 0x10;
 	
 	return ret;
 }
@@ -946,7 +946,7 @@ WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 	m_speaker->level_w(data >> 2 & 1);
 
 	// d6: TSI START line
-	m_speech->rst_w(data >> 6 & 1);
+	m_speech->start_w(data >> 6 & 1);
 }
 
 
@@ -1073,11 +1073,11 @@ WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
 	//printf("%X ",data);
 	
 	// todo: HALT THE z80 here, and set up a callback to poll the s14001a BSY line to resume z80
-	m_speech->reg_w(data & 0x1f);
-	m_speech->rst_w(1);
-	m_speech->rst_w(0);
+	m_speech->data_w(space, 0, data & 0x3f);
+	m_speech->start_w(1);
+	m_speech->start_w(0);
 	
-	//m_speech->rst_w(BIT(data, 7));
+	//m_speech->start_w(BIT(data, 7));
 }
 
 static ADDRESS_MAP_START( vbrc_main_map, AS_PROGRAM, 8, fidelz80_state )

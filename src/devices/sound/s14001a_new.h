@@ -22,30 +22,11 @@ public:
 	template<class _Object> static devcb_base &set_bsy_handler(device_t &device, _Object object) { return downcast<s14001a_new_device &>(device).m_bsy_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_ext_read_handler(device_t &device, _Object object) { return downcast<s14001a_new_device &>(device).m_ext_read_handler.set_callback(object); }
 
-	bool Clock(); // called once to toggle external clock twice
-
-	// output pin data
-	UINT16 GetRomAddr() { return m_uRomAddrP2; }
-	UINT8 GetOutput() { return m_uOutputP2; }
-	bool GetAddressRead() { return m_bPhase1; }
-	bool GetBusy() { return m_bBusyP1; }
-
-	// input pin data
-	void SetStart(bool bStart) { m_bStart = bStart; }
-	void SetWord(UINT8 uWord) { m_uWord = uWord; }
-
-	// emulator helper functions
-	UINT8 Mux8To2(bool bVoicedP2, UINT8 uPPQtrP2, UINT8 uDeltaAdrP2, UINT8 uRomDataP2);
-	void CalculateIncrement(bool bVoicedP2, UINT8 uPPQtrP2, bool bPPQStartP2, UINT8 uDeltaP2, UINT8 uDeltaOldP2, UINT8 &uDeltaOldP1, UINT8 &uIncrementP2, bool &bAddP2);
-	UINT8 CalculateOutput(bool bVoicedP2, bool bXSilenceP2, UINT8 uPPQtrP2, bool bPPQStartP2, UINT8 uLOutputP2, UINT8 uIncrementP2, bool bAddP2);
-	void ClearStatistics();
-	void GetStatistics(UINT32 &uNPitchPeriods, UINT32 &uNVoiced, UINT32 uNControlWords);
-	void SetPrintLevel(UINT32 uPrintLevel) { m_uPrintLevel = uPrintLevel; }
-
-
-	int bsy_r();        /* read BUSY pin */
-	void reg_w(int data);     /* write to input latch */
-	void rst_w(int data);     /* write to RESET pin */
+	DECLARE_READ_LINE_MEMBER(busy_r);
+	DECLARE_READ_LINE_MEMBER(romclock_r);
+	DECLARE_WRITE_LINE_MEMBER(start_w);
+	DECLARE_WRITE8_MEMBER(data_w);
+	
 	void set_clock(int clock);     /* set VSU-1000 clock */
 //	void set_volume(int volume);    /* set VSU-1000 volume control */
 	void force_update();
@@ -58,7 +39,6 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
-	// internal state
 	required_region_ptr<UINT8> m_SpeechRom;
 	sound_stream * m_stream;
 
@@ -66,7 +46,17 @@ private:
 	devcb_read8 m_ext_read_handler;
 
 	UINT8 readmem(UINT16 offset, bool phase);
+	bool Clock(); // called once to toggle external clock twice
 
+	// emulator helper functions
+	UINT8 Mux8To2(bool bVoicedP2, UINT8 uPPQtrP2, UINT8 uDeltaAdrP2, UINT8 uRomDataP2);
+	void CalculateIncrement(bool bVoicedP2, UINT8 uPPQtrP2, bool bPPQStartP2, UINT8 uDeltaP2, UINT8 uDeltaOldP2, UINT8 &uDeltaOldP1, UINT8 &uIncrementP2, bool &bAddP2);
+	UINT8 CalculateOutput(bool bVoicedP2, bool bXSilenceP2, UINT8 uPPQtrP2, bool bPPQStartP2, UINT8 uLOutputP2, UINT8 uIncrementP2, bool bAddP2);
+	void ClearStatistics();
+	void GetStatistics(UINT32 &uNPitchPeriods, UINT32 &uNVoiced, UINT32 uNControlWords);
+	void SetPrintLevel(UINT32 uPrintLevel) { m_uPrintLevel = uPrintLevel; }
+
+	// internal state
 	bool m_bPhase1; // 1 bit internal clock
 
 	enum states
