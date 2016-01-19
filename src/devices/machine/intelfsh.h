@@ -78,6 +78,9 @@
 #define MCFG_INTEL_TE28F160_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, INTEL_TE28F160, 0)
 
+#define MCFG_INTEL_TE28F320_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, INTEL_TE28F320, 0)
+
 #define MCFG_SHARP_UNK128MBIT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SHARP_UNK128MBIT, 0)
 
@@ -135,6 +138,7 @@ public:
 		FLASH_SHARP_LH28F400 = 0x1000,
 		FLASH_INTEL_E28F400B,
 		FLASH_INTEL_TE28F160,
+		FLASH_INTEL_TE28F320,
 		FLASH_SHARP_UNK128MBIT,
 		FLASH_INTEL_28F320J3D,
 		FLASH_INTEL_28F320J5,
@@ -362,6 +366,12 @@ public:
 	intel_te28f160_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
+class intel_te28f320_device : public intelfsh16_device
+{
+public:
+	intel_te28f320_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+};
+
 class intel_e28f400b_device : public intelfsh16_device
 {
 public:
@@ -419,6 +429,7 @@ extern const device_type SST_39VF020;
 extern const device_type SHARP_LH28F400;
 extern const device_type INTEL_E28F008SA;
 extern const device_type INTEL_TE28F160;
+extern const device_type INTEL_TE28F320;
 extern const device_type SHARP_UNK128MBIT;
 extern const device_type INTEL_28F320J3D;
 extern const device_type INTEL_28F320J5;

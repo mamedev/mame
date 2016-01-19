@@ -103,6 +103,7 @@ const device_type SST_39VF020 = &device_creator<sst_39vf020_device>;
 const device_type SHARP_LH28F400 = &device_creator<sharp_lh28f400_device>;
 const device_type INTEL_E28F008SA = &device_creator<intel_e28f008sa_device>;
 const device_type INTEL_TE28F160 = &device_creator<intel_te28f160_device>;
+const device_type INTEL_TE28F320 = &device_creator<intel_te28f320_device>;
 const device_type SHARP_UNK128MBIT = &device_creator<sharp_unk128mbit_device>;
 const device_type INTEL_28F320J3D = &device_creator<intel_28f320j3d_device>;
 const device_type INTEL_28F320J5 = &device_creator<intel_28f320j5_device>;
@@ -327,6 +328,13 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_device_id = 0xd0;
 		map = ADDRESS_MAP_NAME( memory_map16_16Mb );
 		break;
+	case FLASH_INTEL_TE28F320:
+		m_bits = 16;
+		m_size = 0x400000;
+		m_maker_id = MFG_INTEL;
+		m_device_id = 0x8896;
+		map = ADDRESS_MAP_NAME( memory_map16_32Mb );
+		break;
 	case FLASH_SHARP_UNK128MBIT:
 		m_bits = 16;
 		m_size = 0x800000;
@@ -459,6 +467,9 @@ sharp_lh28f400_device::sharp_lh28f400_device(const machine_config &mconfig, std:
 
 intel_te28f160_device::intel_te28f160_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh16_device(mconfig, INTEL_TE28F160, "Intel TE28F160 Flash", tag, owner, clock, FLASH_INTEL_TE28F160, "intel_te28f160", __FILE__) { }
+
+intel_te28f320_device::intel_te28f320_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+	: intelfsh16_device(mconfig, INTEL_TE28F320, "Intel TE28F320 Flash", tag, owner, clock, FLASH_INTEL_TE28F320, "intel_te28f320", __FILE__) { }
 
 intel_e28f400b_device::intel_e28f400b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: intelfsh16_device(mconfig, INTEL_E28F400B, "Intel E28F400B Flash", tag, owner, clock, FLASH_INTEL_E28F400B, "intel_e28f400b", __FILE__) { }
