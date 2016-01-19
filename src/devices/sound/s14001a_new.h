@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
-// copyright-holders:Ed Bernard
+// copyright-holders:Ed Bernard, Jonathan Gevaryahu, hap
+// thanks-to:Kevin Horton
+/*
+    SSi TSI S14001A speech IC emulator
+*/
 
 #ifndef __S14001A_H__
 #define __S14001A_H__
@@ -104,8 +108,8 @@ private:
 
 	// derived signals
 	bool m_bDAR04To00CarryP2;
-	bool m_bPPQCarryP2; 
-	bool m_bRepeatCarryP2; 
+	bool m_bPPQCarryP2;
+	bool m_bRepeatCarryP2;
 	bool m_bLengthCarryP2;
 	UINT16 m_RomAddrP1;         // rom address
 
