@@ -50,6 +50,17 @@ timer_device::timer_device(const machine_config &mconfig, std::string tag, devic
 
 
 //-------------------------------------------------
+//  static_configure_generic_empty - configuration
+//  helper to set up a generic timer
+//-------------------------------------------------
+
+void timer_device::static_configure_generic_empty(device_t &device)
+{
+	timer_device &timer = downcast<timer_device &>(device);
+	timer.m_type = TIMER_TYPE_GENERIC;
+}
+
+//-------------------------------------------------
 //  static_configure_generic - configuration
 //  helper to set up a generic timer
 //-------------------------------------------------

@@ -32,7 +32,7 @@
 
 #define MCFG_TIMER_ADD_NONE(_tag) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_generic(*device, timer_device_expired_delegate());
+	timer_device::static_configure_generic_empty(*device);
 #define MCFG_TIMER_DRIVER_ADD(_tag, _class, _callback) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
 	timer_device::static_configure_generic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, NULL, (_class *)0));
@@ -85,6 +85,7 @@ public:
 
 	// inline configuration helpers
 	static void static_configure_generic(device_t &device, timer_device_expired_delegate callback);
+	static void static_configure_generic_empty(device_t &device);
 	static void static_configure_periodic(device_t &device, timer_device_expired_delegate callback, const attotime &period);
 	static void static_configure_scanline(device_t &device, timer_device_expired_delegate callback, std::string screen, int first_vpos, int increment);
 	static void static_set_callback(device_t &device, timer_device_expired_delegate callback);
