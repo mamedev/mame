@@ -7,11 +7,6 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/mcs48/mcs48.h"
-#include "machine/i8255.h"
-#include "machine/i8243.h"
-#include "machine/z80pio.h"
 #include "sound/speaker.h"
 #include "sound/s14001a_new.h"
 
@@ -21,10 +16,6 @@ public:
 	fidelz80base_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_mcu(*this, "mcu"),
-		m_z80pio(*this, "z80pio"),
-		m_ppi8255(*this, "ppi8255"),
-		m_i8243(*this, "i8243"),
 		m_inp_matrix(*this, "IN"),
 		m_speech(*this, "speech"),
 		m_speech_rom(*this, "speech"),
@@ -36,10 +27,6 @@ public:
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	optional_device<i8041_device> m_mcu;
-	optional_device<z80pio_device> m_z80pio;
-	optional_device<i8255_device> m_ppi8255;
-	optional_device<i8243_device> m_i8243;
 	optional_ioport_array<10> m_inp_matrix; // max 10
 	optional_device<s14001a_new_device> m_speech;
 	optional_region_ptr<UINT8> m_speech_rom;
@@ -53,7 +40,6 @@ public:
 	UINT8 m_speech_bank;
 
 	UINT16 read_inputs(int columns);
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)

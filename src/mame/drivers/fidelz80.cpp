@@ -1,19 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco,hap
 /******************************************************************************
-*
-*  Fidelity Electronics Z80 based board driver
-*
-*  All detailed RE work done by Kevin 'kevtris' Horton
-*
-*  TODO:
-*  * Figure out why it says the first speech line twice; it shouldn't?
-*    It sometimes does this on Voice Sensory Chess Challenger real hardware.
-*    It can also be heard on Advanced Talking Chess Challenger real hardware, but not the whole line:
-*    "I I am Fidelity's chess challenger", instead.
-*  * Get rom locations from pcb (done for UVC, VCC is probably similar)
-*  * correctly hook up VBRC speech so that the z80 is halted while words are being spoken
-*
+ 
+    Fidelity Electronics Z80 based board driver
+
+    All detailed RE work done by Kevin 'kevtris' Horton
+
+    TODO:
+    - Figure out why it says the first speech line twice; it shouldn't?
+      It sometimes does this on Voice Sensory Chess Challenger real hardware.
+      It can also be heard on Advanced Talking Chess Challenger real hardware, but not the whole line:
+      "I I am Fidelity's chess challenger", instead.
+    - Get rom locations from pcb (done for UVC, VCC is probably similar)
+    - correctly hook up VBRC speech so that the z80 is halted while words are being spoken
+
 ***********************************************************************
 
 Talking Chess Challenger (VCC)
@@ -296,7 +296,7 @@ A detailed description of the hardware can be found also in the patent 4,373,719
 
 ******************************************************************************
 
-Sensory Chess Challenger champion (6502 based)
+Sensory Chess Challenger champion (6502 based -> fidel6502.cpp driver)
 ---------------------------------
 
 Memory map:
@@ -583,6 +583,13 @@ expect that the software reads these once on startup only.
 
 ******************************************************************************/
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "cpu/mcs48/mcs48.h"
+#include "machine/i8255.h"
+#include "machine/i8243.h"
+#include "machine/z80pio.h"
+
 #include "includes/fidelz80.h"
 
 // internal artwork
@@ -596,8 +603,20 @@ class fidelz80_state : public fidelz80base_state
 {
 public:
 	fidelz80_state(const machine_config &mconfig, device_type type, std::string tag)
-		: fidelz80base_state(mconfig, type, tag)
+		: fidelz80base_state(mconfig, type, tag),
+		m_mcu(*this, "mcu"),
+		m_z80pio(*this, "z80pio"),
+		m_ppi8255(*this, "ppi8255"),
+		m_i8243(*this, "i8243")
 	{ }
+
+	// devices/pointers
+	optional_device<i8041_device> m_mcu;
+	optional_device<z80pio_device> m_z80pio;
+	optional_device<i8255_device> m_ppi8255;
+	optional_device<i8243_device> m_i8243;
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 	// model VCC/UVC
 	void vcc_prepare_display();
@@ -774,15 +793,6 @@ UINT16 fidelz80base_state::read_inputs(int columns)
 			ret |= m_inp_matrix[i]->read();
 
 	return ret;
-}
-
-INPUT_CHANGED_MEMBER(fidelz80base_state::reset_button)
-{
-	// when RE button is directly wired to RESET pin(s)
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-	
-	if (m_mcu)
-		m_mcu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1108,6 +1118,15 @@ ADDRESS_MAP_END
 /******************************************************************************
     Input Ports
 ******************************************************************************/
+
+INPUT_CHANGED_MEMBER(fidelz80_state::reset_button)
+{
+	// when RE button is directly wired to RESET pin(s)
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+	
+	if (m_mcu)
+		m_mcu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
 static INPUT_PORTS_START( fidelz80 )
 	PORT_START("IN.0")

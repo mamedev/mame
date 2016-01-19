@@ -1,43 +1,42 @@
 // license:BSD-3-Clause
-// copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco
+// copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco,hap
 /******************************************************************************
-
-WIP: plan to move to main fidelity chess driver^Z^Z^Z^Z - move magnet board sensor games to this driver
-
-
-
-
-    Fidelity Champion Chess Challenger (model CSC)
+ 
+    Fidelity Electronics 6502 based board driver
 
     See drivers/fidelz80.cpp for hardware description
 
     TODO:
     - speech doesn't work
-    - make a better artwork
 
 ******************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/z80/z80.h"
 #include "machine/6821pia.h"
-#include "sound/s14001a_new.h"
+#include "machine/i8255.h"
+#include "machine/z80pio.h"
+
+#include "includes/fidelz80.h"
+
+
 
 // same layout of Sensory Chess Challenger
 //extern const char layout_vsc[];
 
-class csc_state : public driver_device
+class fidel6502_state : public fidelz80base_state
 {
 public:
-	csc_state(const machine_config &mconfig, device_type type, std::string tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_speech(*this, "speech")
+	fidel6502_state(const machine_config &mconfig, device_type type, std::string tag)
+		: fidelz80base_state(mconfig, type, tag),
+		m_z80pio(*this, "z80pio"),
+		m_ppi8255(*this, "ppi8255")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<s14001a_new_device> m_speech;
-
-	virtual void machine_start() override;
+	// devices/pointers
+	optional_device<z80pio_device> m_z80pio;
+	optional_device<i8255_device> m_ppi8255;
 
 	UINT16 input_read(int index);
 	DECLARE_WRITE8_MEMBER( pia0_pa_w );
@@ -54,10 +53,16 @@ public:
 
 	UINT8 m_selector;
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
+
+protected:
+	virtual void machine_start() override;
 };
 
 
-UINT16 csc_state::input_read(int index)
+
+
+
+UINT16 fidel6502_state::input_read(int index)
 {
 	static const char *const col_tag[] =
 	{
@@ -69,7 +74,7 @@ UINT16 csc_state::input_read(int index)
 }
 
 
-WRITE8_MEMBER( csc_state::pia0_pa_w )
+WRITE8_MEMBER( fidel6502_state::pia0_pa_w )
 {
 	UINT8 out_digit = BITSWAP8(data,0,1,5,6,7,2,3,4 );
 
@@ -98,12 +103,12 @@ WRITE8_MEMBER( csc_state::pia0_pa_w )
 	m_selector |= 0x80;
 }
 
-WRITE8_MEMBER( csc_state::pia0_pb_w )
+WRITE8_MEMBER( fidel6502_state::pia0_pb_w )
 {
 //  m_speech->start_w(BIT(data, 1));
 }
 
-READ8_MEMBER( csc_state::pia0_pb_r )
+READ8_MEMBER( fidel6502_state::pia0_pb_r )
 {
 	UINT8 data = 0x04;
 
@@ -117,16 +122,16 @@ READ8_MEMBER( csc_state::pia0_pb_r )
 	return data;
 }
 
-WRITE_LINE_MEMBER( csc_state::pia0_ca2_w )
+WRITE_LINE_MEMBER( fidel6502_state::pia0_ca2_w )
 {
 }
 
-WRITE8_MEMBER( csc_state::pia1_pa_w )
+WRITE8_MEMBER( fidel6502_state::pia1_pa_w )
 {
 	m_selector = (m_selector & 0x0c) | ((data>>6) & 0x03);
 }
 
-WRITE8_MEMBER( csc_state::pia1_pb_w )
+WRITE8_MEMBER( fidel6502_state::pia1_pb_w )
 {
 	static const char *const row_tag[] =
 	{
@@ -139,7 +144,7 @@ WRITE8_MEMBER( csc_state::pia1_pb_w )
 			output().set_indexed_value(row_tag[m_selector], i+1, BIT(data, 7-i));
 }
 
-READ8_MEMBER( csc_state::pia1_pa_r )
+READ8_MEMBER( fidel6502_state::pia1_pa_r )
 {
 	UINT8 data = 0xff;
 
@@ -149,17 +154,17 @@ READ8_MEMBER( csc_state::pia1_pa_r )
 	return data & 0x3f;
 }
 
-WRITE_LINE_MEMBER( csc_state::pia1_ca2_w )
+WRITE_LINE_MEMBER( fidel6502_state::pia1_ca2_w )
 {
 	m_selector = (m_selector & 0x07) | (state ? 8 : 0);
 }
 
-WRITE_LINE_MEMBER( csc_state::pia1_cb2_w )
+WRITE_LINE_MEMBER( fidel6502_state::pia1_cb2_w )
 {
 	m_selector = (m_selector & 0x0b) | (state ? 4 : 0);
 }
 
-READ_LINE_MEMBER( csc_state::pia1_ca1_r )
+READ_LINE_MEMBER( fidel6502_state::pia1_ca1_r )
 {
 	int data = 0x01;
 
@@ -169,7 +174,7 @@ READ_LINE_MEMBER( csc_state::pia1_ca1_r )
 	return data;
 }
 
-READ_LINE_MEMBER( csc_state::pia1_cb1_r )
+READ_LINE_MEMBER( fidel6502_state::pia1_cb1_r )
 {
 	int data = 0x01;
 
@@ -180,13 +185,13 @@ READ_LINE_MEMBER( csc_state::pia1_cb1_r )
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(csc_state::irq_timer)
+TIMER_DEVICE_CALLBACK_MEMBER(fidel6502_state::irq_timer)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 }
 
 /* Address maps */
-static ADDRESS_MAP_START(csc_mem, AS_PROGRAM, 8, csc_state)
+static ADDRESS_MAP_START(csc_mem, AS_PROGRAM, 8, fidel6502_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff) AM_RAM AM_MIRROR(0x4000)  //2K RAM
 	AM_RANGE( 0x0800, 0x0bff) AM_RAM AM_MIRROR(0x4400)  //1K RAM
@@ -300,35 +305,36 @@ static INPUT_PORTS_START( csc )
 INPUT_PORTS_END
 
 
-void csc_state::machine_start()
+void fidel6502_state::machine_start()
 {
+	fidelz80base_state::machine_start();
 	save_item(NAME(m_selector));
 }
 
 /* Machine driver */
-static MACHINE_CONFIG_START( csc, csc_state )
+static MACHINE_CONFIG_START( csc, fidel6502_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 3900000/2)
 	MCFG_CPU_PROGRAM_MAP(csc_mem)
 
 	//MCFG_DEFAULT_LAYOUT(layout_vsc)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", csc_state, irq_timer, attotime::from_hz(38400/64))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", fidel6502_state, irq_timer, attotime::from_hz(38400/64))
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(csc_state, pia0_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(csc_state, pia0_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(csc_state, pia0_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(csc_state, pia0_ca2_w))
+	MCFG_PIA_READPB_HANDLER(READ8(fidel6502_state, pia0_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(fidel6502_state, pia0_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(fidel6502_state, pia0_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(fidel6502_state, pia0_ca2_w))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(csc_state, pia1_pa_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(csc_state, pia1_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(csc_state, pia1_cb1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(csc_state, pia1_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(csc_state, pia1_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(csc_state, pia1_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(csc_state, pia1_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(fidel6502_state, pia1_pa_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(fidel6502_state, pia1_ca1_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(fidel6502_state, pia1_cb1_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(fidel6502_state, pia1_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(fidel6502_state, pia1_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(fidel6502_state, pia1_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(fidel6502_state, pia1_cb2_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
