@@ -15,7 +15,7 @@
 #include "audio/exidy.h"
 #include "machine/74181.h"
 #include "machine/nvram.h"
-#include "sound/s14001a.h"
+#include "sound/s14001a_new.h"
 #include "video/resnet.h"
 
 
@@ -35,7 +35,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<s14001a_device> m_s14001a;
+	required_device<s14001a_new_device> m_s14001a;
 	required_device<ttl74181_device> m_ls181_10c;
 	required_device<ttl74181_device> m_ls181_12c;
 	required_device<exidy_sound_device> m_custom;
@@ -523,27 +523,23 @@ WRITE8_MEMBER(berzerk_state::audio_w)
 		{
 		/* write data to the S14001 */
 		case 0:
-			/* only if not busy */
-			if (!m_s14001a->bsy_r())
-			{
-				m_s14001a->reg_w(data & 0x3f);
+			m_s14001a->data_w(space, 0, data & 0x3f);
 
-				/* clock the chip -- via a 555 timer */
-				m_s14001a->rst_w(1);
-				m_s14001a->rst_w(0);
-			}
+			/* clock the chip -- via a 555 timer */
+			m_s14001a->start_w(1);
+			m_s14001a->start_w(0);
 
 			break;
 
 		case 1:
 		{
 			/* volume */
-			m_s14001a->set_volume(((data & 0x38) >> 3) + 1);
+			m_s14001a->force_update();
+			m_s14001a->set_output_gain(0, ((data >> 3 & 0xf) + 1) / 16.0);
 
 			/* clock control - the first LS161 divides the clock by 9 to 16, the 2nd by 8,
 			   giving a final clock from 19.5kHz to 34.7kHz */
 			int clock_divisor = 16 - (data & 0x07);
-
 			m_s14001a->set_clock(S14001_CLOCK / clock_divisor / 8);
 			break;
 		}
@@ -572,7 +568,7 @@ READ8_MEMBER(berzerk_state::audio_r)
 	{
 	/* offset 4 reads from the S14001A */
 	case 4:
-		return (!m_s14001a->bsy_r()) ? 0x40 : 0x00;
+		return (m_s14001a->busy_r()) ? 0xc0 : 0x40;
 	/* offset 6 is open bus */
 	case 6:
 		logerror("attempted read from berzerk audio reg 6 (sfxctrl)!\n");
@@ -1124,10 +1120,10 @@ static MACHINE_CONFIG_START( berzerk, berzerk_state )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("speech", S14001A, S14001_CLOCK/16/8) /* placeholder - the clock is software controllable */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("speech", S14001A_NEW, S14001_CLOCK/16/8) /* placeholder - the clock is software controllable */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_ADD("exidy", EXIDY, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
 
