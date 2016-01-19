@@ -13,7 +13,7 @@
 #include "machine/i8243.h"
 #include "machine/z80pio.h"
 #include "sound/speaker.h"
-#include "sound/s14001a.h"
+#include "sound/s14001a_new.h"
 
 class fidelz80base_state : public driver_device
 {
@@ -41,7 +41,7 @@ public:
 	optional_device<i8255_device> m_ppi8255;
 	optional_device<i8243_device> m_i8243;
 	optional_ioport_array<10> m_inp_matrix; // max 10
-	optional_device<s14001a_device> m_speech;
+	optional_device<s14001a_new_device> m_speech;
 	optional_region_ptr<UINT8> m_speech_rom;
 	optional_device<speaker_sound_device> m_speaker;
 

@@ -20,7 +20,7 @@ WIP: plan to move to main fidelity chess driver^Z^Z^Z^Z - move magnet board sens
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
-#include "sound/s14001a.h"
+#include "sound/s14001a_new.h"
 
 // same layout of Sensory Chess Challenger
 //extern const char layout_vsc[];
@@ -35,7 +35,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<s14001a_device> m_speech;
+	required_device<s14001a_new_device> m_speech;
 
 	virtual void machine_start() override;
 
@@ -325,7 +325,7 @@ static MACHINE_CONFIG_START( csc, csc_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speech", S14001A, 25000) // around 25khz
+	MCFG_SOUND_ADD("speech", S14001A_NEW, 25000) // around 25khz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
