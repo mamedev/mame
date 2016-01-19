@@ -22,14 +22,13 @@ public:
 	template<class _Object> static devcb_base &set_bsy_handler(device_t &device, _Object object) { return downcast<s14001a_new_device &>(device).m_bsy_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_ext_read_handler(device_t &device, _Object object) { return downcast<s14001a_new_device &>(device).m_ext_read_handler.set_callback(object); }
 
-	DECLARE_READ_LINE_MEMBER(busy_r);
-	DECLARE_READ_LINE_MEMBER(romclock_r);
-	DECLARE_WRITE_LINE_MEMBER(start_w);
-	DECLARE_WRITE8_MEMBER(data_w);
+	DECLARE_READ_LINE_MEMBER(busy_r);   // /BUSY (pin 40)
+	DECLARE_READ_LINE_MEMBER(romen_r);  // ROM /EN (pin 9)
+	DECLARE_WRITE_LINE_MEMBER(start_w); // START (pin 10)
+	DECLARE_WRITE8_MEMBER(data_w);      // 6-bit word
 	
-	void set_clock(int clock);     /* set VSU-1000 clock */
-//	void set_volume(int volume);    /* set VSU-1000 volume control */
-	void force_update();
+	void set_clock(UINT32 clock);       // set new CLK frequency
+	void force_update();                // update stream, eg. before external ROM bankswitch
 
 protected:
 	// device-level overrides

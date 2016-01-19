@@ -24,6 +24,8 @@ s14001a_new_device::s14001a_new_device(const machine_config &mconfig, std::strin
 //  device_start - device-specific startup
 //-------------------------------------------------
 
+ALLOW_SAVE_TYPE(s14001a_new_device::states); // allow save_item on a non-fundamental type
+
 void s14001a_new_device::device_start()
 {
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() ? clock() : machine().sample_rate());
@@ -32,7 +34,51 @@ void s14001a_new_device::device_start()
 	m_ext_read_handler.resolve();
 	m_bsy_handler.resolve();
 	
+	// note: zerofill is done already by MAME core
+	ClearStatistics();
 	m_uOutputP1 = m_uOutputP2 = 7;
+	
+	// register for savestates
+	save_item(NAME(m_bPhase1));
+	save_item(NAME(m_uStateP1));
+	save_item(NAME(m_uStateP2));
+	save_item(NAME(m_uDAR13To05P1));
+	save_item(NAME(m_uDAR13To05P2));
+	save_item(NAME(m_uDAR04To00P1));
+	save_item(NAME(m_uDAR04To00P2));
+	save_item(NAME(m_uCWARP1));
+	save_item(NAME(m_uCWARP2));
+
+	save_item(NAME(m_bStopP1));
+	save_item(NAME(m_bStopP2));
+	save_item(NAME(m_bVoicedP1));
+	save_item(NAME(m_bVoicedP2));
+	save_item(NAME(m_bSilenceP1));
+	save_item(NAME(m_bSilenceP2));
+	save_item(NAME(m_uLengthP1));
+	save_item(NAME(m_uLengthP2));
+	save_item(NAME(m_uXRepeatP1));
+	save_item(NAME(m_uXRepeatP2));
+	save_item(NAME(m_uDeltaOldP1));
+	save_item(NAME(m_uDeltaOldP2));
+	save_item(NAME(m_uOutputP1));
+
+	save_item(NAME(m_bDAR04To00CarryP2));
+	save_item(NAME(m_bPPQCarryP2)); 
+	save_item(NAME(m_bRepeatCarryP2)); 
+	save_item(NAME(m_bLengthCarryP2));
+	save_item(NAME(m_RomAddrP1));
+
+	save_item(NAME(m_uOutputP2));
+	save_item(NAME(m_uRomAddrP2));
+	save_item(NAME(m_bBusyP1));
+	save_item(NAME(m_bStart));
+	save_item(NAME(m_uWord));
+
+	save_item(NAME(m_uNPitchPeriods));
+	save_item(NAME(m_uNVoiced));
+	save_item(NAME(m_uNControlWords));
+	save_item(NAME(m_uPrintLevel));
 }
 
 
@@ -45,19 +91,22 @@ void s14001a_new_device::sound_stream_update(sound_stream &stream, stream_sample
 	for (int i = 0; i < samples; i++)
 	{
 		Clock();
-		INT16 sample = INT16(m_uOutputP2) - 7;
-		outputs[0][i] = sample * 0x4000;
+		INT16 sample = m_uOutputP2 - 7; // range -7..8
+		outputs[0][i] = sample * 0xf00;
 	}
 }
 
 
+/**************************************************************************
+    External interface
+**************************************************************************/
 
 void s14001a_new_device::force_update()
 {
 	m_stream->update();
 }
 
-READ_LINE_MEMBER(s14001a_new_device::romclock_r)
+READ_LINE_MEMBER(s14001a_new_device::romen_r)
 {
 	m_stream->update();
 	return (m_bPhase1) ? 1 : 0;
@@ -82,14 +131,16 @@ WRITE_LINE_MEMBER(s14001a_new_device::start_w)
 	if (m_bStart) m_uStateP1 = WORDWAIT;
 }
 
-void s14001a_new_device::set_clock(int clock)
+void s14001a_new_device::set_clock(UINT32 clock)
 {
 	m_stream->update();
 	m_stream->set_sample_rate(clock);
 }
 
 
-
+/**************************************************************************
+    Device emulation
+**************************************************************************/
 
 UINT8 s14001a_new_device::readmem(UINT16 offset, bool phase)
 {
