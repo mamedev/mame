@@ -8,7 +8,7 @@
       Hold down the SHIFT key and press and release the BREAK key.
 -->
 
-<softwarelist name="bbc_68000_flop" description="68000 Co-Processor Discs">
+<softwarelist name="bbc_flop_68000" description="68000 Co-Processor Discs">
 
 	<software name="casper" supported="no">
 		<description>Casper Support Discs</description>

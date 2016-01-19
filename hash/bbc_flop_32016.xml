@@ -8,7 +8,7 @@
       Hold down the SHIFT key and press and release the BREAK key.
 -->
 
-<softwarelist name="bbc_32016_flop" description="32016 Co-Processor Discs">
+<softwarelist name="bbc_flop_32016" description="32016 Co-Processor Discs">
 
 	<software name="panos11" cloneof="panos14" supported="no">
 		<description>PanOS Version 1.10 System Disks</description>

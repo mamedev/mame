@@ -12,7 +12,7 @@
       To start/stop the tape you must use the MESS menus, so you'll have to turn full keyboard mode off with Scroll Lock, then navigate the menus, turning Scroll Lock back on when you're finished.
 -->
 
-<softwarelist name="bbcb_de_cass" description="BBC Micro Model B (German) cassettes">
+<softwarelist name="bbcb_cass_de" description="BBC Micro Model B (German) cassettes">
 
 	<!-- Games -->
 

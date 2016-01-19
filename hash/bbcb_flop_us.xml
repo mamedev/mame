@@ -8,7 +8,7 @@
       Hold down the SHIFT key and press and release the BREAK key.
 -->
 
-<softwarelist name="bbcb_us_flop" description="BBC Micro Model B (US) disks">
+<softwarelist name="bbcb_flop_us" description="BBC Micro Model B (US) disks">
 
 	<software name="intrutil">
 		<description>Introductory and Utilities Disk</description>
