@@ -1,10 +1,9 @@
-// license:???
-// copyright-holders:Kenneth Lin
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
+// thanks-to:Kenneth Lin (original driver author)
 /***************************************************************************
 
   video.c
-
-  Written by Kenneth Lin (kenneth_lin@ai.vancouver.bc.ca)
 
   Functions to emulate the video hardware of the machine.
 
