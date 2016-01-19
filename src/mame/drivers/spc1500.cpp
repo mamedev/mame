@@ -382,6 +382,10 @@ WRITE8_MEMBER( spc1500_state::psgb_w)
 	if (m_motor && !BIT(data, 7) && (elapsed_time > 100))
 	{
 		m_cass->change_state((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		if ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED)
+			machine().video().set_throttle_rate(1.0);
+		else
+			machine().video().set_throttle_rate(100.0);
 		m_timer->reset();
 	}
 	m_motor = BIT(data, 7);
@@ -397,7 +401,7 @@ WRITE8_MEMBER( spc1500_state::portc_w)
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
 	m_vdg->set_clock(VDP_CLOCK/(BIT(data, 2) ? 48 : 24));
 	m_centronics->write_strobe(BIT(data, 7));
-	if (!m_double_mode && (m_p5bit != BIT(data, 5)))
+	if (!m_double_mode && (m_p5bit && !BIT(data, 5)))
 		m_double_mode = true; // double access I/O mode
 	m_p5bit = BIT(data, 5);
 #if 0	
@@ -558,8 +562,6 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	int i;
 	int j;
 	int h1, h2, h3;
-	if (!de)
-		return;
 //	UINT32  *p = &bitmap.pix32(y+vbp*1.5, hbp*1.5);
 	UINT32  *p = &bitmap.pix32(y);
 	
@@ -1067,7 +1069,7 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(spc1000_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_MUTED | CASSETTE_MOTOR_DISABLED)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_SPEAKER_MUTED | CASSETTE_MOTOR_DISABLED)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "spc1500_cass")
 
