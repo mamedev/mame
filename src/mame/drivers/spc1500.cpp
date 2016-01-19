@@ -397,7 +397,7 @@ WRITE8_MEMBER( spc1500_state::portc_w)
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
 	m_vdg->set_clock(VDP_CLOCK/(BIT(data, 2) ? 48 : 24));
 	m_centronics->write_strobe(BIT(data, 7));
-	if (!m_double_mode && !m_p5bit && BIT(data, 5))
+	if (!m_double_mode && (m_p5bit != BIT(data, 5)))
 		m_double_mode = true; // double access I/O mode
 	m_p5bit = BIT(data, 5);
 #if 0	

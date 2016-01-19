@@ -33,6 +33,7 @@ SOUNDS["AY8910"] = true
 SOUNDS["WAVE"] = true
 SOUNDS["BEEP"] = true
 SOUNDS["SPEAKER"] = true
+SOUNDS["YM2151"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -54,6 +55,12 @@ MACHINES["E05A30"] = true
 MACHINES["UPD765"] = true
 MACHINES["EEPROMDEV"] = true
 MACHINES["STEPPERS"] = true
+MACHINES["WD_FDC"] = true
+MACHINES["Z80CTC"] = true
+MACHINES["Z80DART"] = true
+MACHINES["Z80PIO"] = true 
+MACHINES["Z80SIO"] = true 
+MACHINES["Z80DMA"] = true 
 
 --------------------------------------------------
 -- specify available bus cores
@@ -61,6 +68,7 @@ MACHINES["STEPPERS"] = true
 
 BUSES["CENTRONICS"] = true
 BUSES["SPC1000"] = true
+BUSES["GENERIC"] = true
 
 --------------------------------------------------
 -- This is the list of files that are necessary
@@ -84,11 +92,14 @@ function createProjects_mame_kr(_target, _subtarget)
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
 		GEN_DIR  .. "mame/layout",
-	}
+	} 
 
 files{
 	MAME_DIR .. "src/mame/drivers/spc1000.cpp",
 	MAME_DIR .. "src/mame/drivers/spc1500.cpp",
+	MAME_DIR .. "src/mame/drivers/x1.cpp",
+	MAME_DIR .. "src/mame/includes/x1.h",
+	MAME_DIR .. "src/mame/machine/x1.cpp",	
 }
 end
 
