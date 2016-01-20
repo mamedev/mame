@@ -76,7 +76,7 @@ TODO:
 class caswin_state : public driver_device
 {
 public:
-	caswin_state(const machine_config &mconfig, device_type type, const char *tag)
+	caswin_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_sc0_vram(*this, "sc0_vram"),
 		m_sc0_attr(*this, "sc0_attr"),
@@ -94,7 +94,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vvillage_output_w);
 	DECLARE_WRITE8_MEMBER(vvillage_lamps_w);
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(caswin);
 	UINT32 screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -163,11 +163,11 @@ READ8_MEMBER(caswin_state::vvillage_rng_r)
 
 WRITE8_MEMBER(caswin_state::vvillage_output_w)
 {
-	coin_counter_w(machine(), 0,data & 1);
-	coin_counter_w(machine(), 1,data & 1);
+	machine().bookkeeping().coin_counter_w(0,data & 1);
+	machine().bookkeeping().coin_counter_w(1,data & 1);
 	// data & 4 payout counter
-	coin_lockout_w(machine(), 0,data & 0x20);
-	coin_lockout_w(machine(), 1,data & 0x20);
+	machine().bookkeeping().coin_lockout_w(0,data & 0x20);
+	machine().bookkeeping().coin_lockout_w(1,data & 0x20);
 }
 
 WRITE8_MEMBER(caswin_state::vvillage_lamps_w)
@@ -179,11 +179,11 @@ WRITE8_MEMBER(caswin_state::vvillage_lamps_w)
 	---- --x- lamp button 2
 	---- ---x lamp button 1
 	*/
-	set_led_status(machine(), 0, data & 0x01);
-	set_led_status(machine(), 1, data & 0x02);
-	set_led_status(machine(), 2, data & 0x04);
-	set_led_status(machine(), 3, data & 0x08);
-	set_led_status(machine(), 4, data & 0x10);
+	output().set_led_value(0, data & 0x01);
+	output().set_led_value(1, data & 0x02);
+	output().set_led_value(2, data & 0x04);
+	output().set_led_value(3, data & 0x08);
+	output().set_led_value(4, data & 0x10);
 }
 
 static ADDRESS_MAP_START( vvillage_mem, AS_PROGRAM, 8, caswin_state )

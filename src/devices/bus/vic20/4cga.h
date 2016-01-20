@@ -28,10 +28,10 @@ class c64_4cga_device : public device_t,
 {
 public:
 	// construction/destruction
-	c64_4cga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c64_4cga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_WRITE_LINE_MEMBER(write_joy3_0) { if (state) m_joy3 |= 1; else m_joy3 &= ~1; update_output(); }
 	DECLARE_WRITE_LINE_MEMBER(write_joy3_1) { if (state) m_joy3 |= 2; else m_joy3 &= ~2; update_output(); }
@@ -45,10 +45,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_pet_user_port_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( input_l );
+	virtual DECLARE_WRITE_LINE_MEMBER( input_l ) override;
 
 private:
 	void update_output();

@@ -438,11 +438,11 @@ static const UINT32 MAP_SUBINT_TO_INT[11] =
 class s3c2410_device : public device_t
 {
 public:
-	s3c2410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s3c2410_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~s3c2410_device();
 
 	// static configuration
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 	template<class _Object> static devcb_base &set_core_pin_r_callback(device_t &device, _Object object) { return downcast<s3c2410_device &>(device).m_pin_r_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_core_pin_w_callback(device_t &device, _Object object) { return downcast<s3c2410_device &>(device).m_pin_w_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_gpio_port_r_callback(device_t &device, _Object object) { return downcast<s3c2410_device &>(device).m_port_r_cb.set_callback(object); }
@@ -461,8 +461,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( frnb_w );
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 private:
 	// internal state
 	required_device<palette_device> m_palette;
@@ -935,7 +935,7 @@ public:
 	{
 		s3c24xx_lcd_regs_t regs;
 		emu_timer *timer;
-		bitmap_rgb32 *bitmap[2];
+		std::unique_ptr<bitmap_rgb32> bitmap[2];
 		UINT32 vramaddr_cur;
 		UINT32 vramaddr_max;
 		UINT32 offsize;

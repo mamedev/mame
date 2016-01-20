@@ -25,12 +25,12 @@
 class teleprinter_device : public generic_terminal_device
 {
 public:
-	teleprinter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	teleprinter_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	UINT32 tp_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 protected:
-	virtual void term_write(UINT8 data);
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void term_write(UINT8 data) override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 private:
 	void scroll_line();
 	void write_char(UINT8 data);

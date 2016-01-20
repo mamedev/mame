@@ -16,14 +16,14 @@ Control Data Corporation CDC 721 Terminal (Viking)
 class cdc721_state : public driver_device
 {
 public:
-	cdc721_state(const machine_config &mconfig, device_type type, const char *tag)
+	cdc721_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 	, m_p_videoram(*this, "videoram")
 	, m_maincpu(*this, "maincpu")
 	{ }
 
 public:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(cdc721);
 	const UINT8 *m_p_chargen;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -30,8 +30,8 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_d008_w)
 	m_paddle_select = data & 0x04;
 
 	/* bit 3 is coin lockout (but not the service coin) */
-	coin_lockout_w(machine(), 0, !(data & 0x08));
-	coin_lockout_w(machine(), 1, !(data & 0x08));
+	machine().bookkeeping().coin_lockout_w(0, !(data & 0x08));
+	machine().bookkeeping().coin_lockout_w(1, !(data & 0x08));
 
 	/* bit 4 is unknown */
 
@@ -59,7 +59,7 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_d008_w)
 	 leaving the tilt screen (as the MCU is now out of sync with main CPU
 	 which resets itself).  This bit is the likely candidate as it is flipped
 	 early in bootup just prior to accessing the MCU for the first time. */
-	if (m_mcu != NULL)  // Bootlegs don't have the MCU but still set this bit
+	if (m_mcu != nullptr)  // Bootlegs don't have the MCU but still set this bit
 		m_mcu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -136,8 +136,8 @@ WRITE8_MEMBER(arkanoid_state::tetrsark_d008_w)
 	}
 
 	/* bit 7 is coin lockout (but not the service coin) */
-	coin_lockout_w(machine(), 0, !(data & 0x80));
-	coin_lockout_w(machine(), 1, !(data & 0x80));
+	machine().bookkeeping().coin_lockout_w(0, !(data & 0x80));
+	machine().bookkeeping().coin_lockout_w(1, !(data & 0x80));
 }
 
 

@@ -93,7 +93,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 class cshooter_state : public driver_device
 {
 public:
-	cshooter_state(const machine_config &mconfig, device_type type, const char *tag)
+	cshooter_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_seibu_sound(*this, "seibu_sound"),
@@ -131,7 +131,7 @@ public:
 	DECLARE_DRIVER_INIT(cshootere);
 	DECLARE_DRIVER_INIT(cshooter);
 	TILE_GET_INFO_MEMBER(get_cstx_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cshooter);
 	DECLARE_MACHINE_RESET(cshooter);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

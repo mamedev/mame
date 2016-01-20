@@ -10,7 +10,7 @@
 class kchamp_state : public driver_device
 {
 public:
-	kchamp_state(const machine_config &mconfig, device_type type, const char *tag)
+	kchamp_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -52,8 +52,8 @@ public:
 	DECLARE_DRIVER_INIT(kchampvs);
 	DECLARE_DRIVER_INIT(kchampvs2);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(kchamp);
 	DECLARE_MACHINE_START(kchampvs);
 	DECLARE_MACHINE_START(kchamp);

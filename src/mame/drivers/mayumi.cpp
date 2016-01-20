@@ -20,7 +20,7 @@
 class mayumi_state : public driver_device
 {
 public:
-	mayumi_state(const machine_config &mconfig, device_type type, const char *tag)
+	mayumi_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_i8255(*this, "i8255"),
@@ -45,9 +45,9 @@ public:
 	DECLARE_READ8_MEMBER(key_matrix_1p_r);
 	DECLARE_READ8_MEMBER(key_matrix_2p_r);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_mayumi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mayumi_interrupt);
 	required_device<cpu_device> m_maincpu;

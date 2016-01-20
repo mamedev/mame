@@ -22,7 +22,7 @@ driver by Barry Rodewald
 class rotaryf_state : public driver_device
 {
 public:
-	rotaryf_state(const machine_config &mconfig, device_type type, const char *tag)
+	rotaryf_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_samples(*this, "samples"),
@@ -43,7 +43,7 @@ public:
 	bool m_flipscreen;
 	UINT8 m_last;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -63,7 +63,7 @@ static const char *const rotaryf_sample_names[] =
 	"7",        /* fleet move 4 */
 	"8",        /* UFO/saucer hit */
 	"9",        /* bonus base */
-	0
+	nullptr
 };
 
 

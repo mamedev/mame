@@ -472,16 +472,16 @@ void psion_state::machine_start()
 
 	if (m_ram_bank_count)
 	{
-		m_paged_ram = auto_alloc_array(machine(), UINT8, m_ram_bank_count * 0x4000);
-		memset(m_paged_ram, 0, sizeof(UINT8) * (m_ram_bank_count * 0x4000));
-		membank("rambank")->configure_entries(0, m_ram_bank_count, m_paged_ram, 0x4000);
+		m_paged_ram = std::make_unique<UINT8[]>(m_ram_bank_count * 0x4000);
+		memset(m_paged_ram.get(), 0, sizeof(UINT8) * (m_ram_bank_count * 0x4000));
+		membank("rambank")->configure_entries(0, m_ram_bank_count, m_paged_ram.get(), 0x4000);
 		membank("rambank")->set_entry(0);
 	}
 
 	m_nvram1->set_base(m_sys_register, 0xc0);
 	m_nvram2->set_base(m_ram, m_ram.bytes());
 	if (m_nvram3)
-		m_nvram3->set_base(m_paged_ram, m_ram_bank_count * 0x4000);
+		m_nvram3->set_base(m_paged_ram.get(), m_ram_bank_count * 0x4000);
 
 	save_item(NAME(m_kb_counter));
 	save_item(NAME(m_enable_nmi));
@@ -494,7 +494,7 @@ void psion_state::machine_start()
 	save_item(NAME(m_port2));
 	save_item(NAME(m_port6_ddr));
 	save_item(NAME(m_port6));
-	save_pointer(NAME(m_paged_ram), m_ram_bank_count * 0x4000);
+	save_pointer(NAME(m_paged_ram.get()), m_ram_bank_count * 0x4000);
 }
 
 void psion_state::machine_reset()

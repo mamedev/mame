@@ -11,7 +11,7 @@
 class europc_pc_state : public driver_device
 {
 public:
-	europc_pc_state(const machine_config &mconfig, device_type type, const char *tag) :
+	europc_pc_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mb(*this, "mb"),
@@ -47,7 +47,7 @@ public:
 	int m_rtc_reg;
 	int m_rtc_state;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	emu_timer* m_rtc_timer;
 
 	enum

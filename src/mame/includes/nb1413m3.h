@@ -126,7 +126,7 @@ enum {
 class nb1413m3_device : public device_t
 {
 public:
-	nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nb1413m3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~nb1413m3_device() {}
 
 	// (static) configuration helpers
@@ -168,9 +168,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 

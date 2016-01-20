@@ -14,7 +14,7 @@
 class jailbrek_state : public driver_device
 {
 public:
-	jailbrek_state(const machine_config &mconfig, device_type type, const char *tag)
+	jailbrek_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
@@ -52,9 +52,9 @@ public:
 	DECLARE_WRITE8_MEMBER(jailbrek_speech_w);
 	DECLARE_DRIVER_INIT(jailbrek);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jailbrek);
 	UINT32 screen_update_jailbrek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jb_interrupt);

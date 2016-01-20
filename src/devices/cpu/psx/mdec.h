@@ -24,7 +24,7 @@ extern const device_type PSX_MDEC;
 class psxmdec_device : public device_t
 {
 public:
-	psxmdec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	psxmdec_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
@@ -33,9 +33,9 @@ public:
 	void dma_read( UINT32 *ram, UINT32 n_address, INT32 n_size );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 private:
 	void mdec_cos_precalc();

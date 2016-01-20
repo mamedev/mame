@@ -42,7 +42,7 @@
 class dacholer_state : public driver_device
 {
 public:
-	dacholer_state(const machine_config &mconfig, device_type type, const char *tag)
+	dacholer_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_audiocpu(*this,"audiocpu"),
@@ -94,9 +94,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(snd_ack_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(dacholer);
 	UINT32 screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_irq);
@@ -208,11 +208,11 @@ WRITE8_MEMBER(dacholer_state::bg_bank_w)
 
 WRITE8_MEMBER(dacholer_state::coins_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 
-	set_led_status(machine(), 0, data & 4);
-	set_led_status(machine(), 1, data & 8);
+	output().set_led_value(0, data & 4);
+	output().set_led_value(1, data & 8);
 }
 
 WRITE8_MEMBER(dacholer_state::snd_w)
@@ -615,7 +615,7 @@ PALETTE_INIT_MEMBER(dacholer_state, dacholer)
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 0,
 			2, resistances_b,  weights_b,  0, 0,
-			0, 0, 0, 0, 0);
+			0, nullptr, nullptr, 0, 0);
 
 	for (i = 0;i < palette.entries(); i++)
 	{

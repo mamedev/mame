@@ -11,7 +11,7 @@
 class atetris_state : public driver_device
 {
 public:
-	atetris_state(const machine_config &mconfig, device_type type, const char *tag)
+	atetris_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -44,9 +44,9 @@ public:
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_DRIVER_INIT(atetris);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_gen);
 	void reset_bank();

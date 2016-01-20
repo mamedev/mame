@@ -42,7 +42,7 @@ to be a save command.
 class cm1800_state : public driver_device
 {
 public:
-	cm1800_state(const machine_config &mconfig, device_type type, const char *tag)
+	cm1800_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_terminal(*this, TERMINAL_TAG) ,
 		m_maincpu(*this, "maincpu")
@@ -55,7 +55,7 @@ public:
 	UINT8 m_term_data;
 
 	required_device<generic_terminal_device> m_terminal;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 

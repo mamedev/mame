@@ -749,7 +749,7 @@ WRITE8_MEMBER(itech8_state::pia_portb_out)
 	/* bit 6 controls the diagnostic sound LED */
 	m_pia_portb_data = data;
 	m_ticket->write(space, 0, (data & 0x10) << 3);
-	coin_counter_w(machine(), 0, (data & 0x20) >> 5);
+	machine().bookkeeping().coin_counter_w(0, (data & 0x20) >> 5);
 }
 
 
@@ -763,7 +763,7 @@ WRITE8_MEMBER(itech8_state::ym2203_portb_out)
 	/* bit 7 controls the ticket dispenser */
 	m_pia_portb_data = data;
 	m_ticket->write(machine().driver_data()->generic_space(), 0, data & 0x80);
-	coin_counter_w(machine(), 0, (data & 0x20) >> 5);
+	machine().bookkeeping().coin_counter_w(0, (data & 0x20) >> 5);
 }
 
 
@@ -1093,8 +1093,8 @@ INPUT_PORTS_END
 
 CUSTOM_INPUT_MEMBER(itech8_state::gtg_mux)
 {
-	const char *tag1 = (const char *)param;
-	const char *tag2 = tag1 + strlen(tag1) + 1;
+	const char * tag1 = (const char *)param;
+	const char * tag2 = tag1 + strlen(tag1) + 1;
 	return ioport(tag1)->read() & ioport(tag2)->read();
 }
 
@@ -2537,7 +2537,7 @@ ROM_START( ninclown )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "prog1", 0x00000, 0x20000, CRC(fabfdcd2) SHA1(7a9852838cf7772d8f8f956b03823c4222520a5a) )
 	ROM_LOAD16_BYTE( "prog0", 0x00001, 0x20000, CRC(eca63db5) SHA1(b86d75ee81e155a21de18c2e0fa898f15d61560d) )
-	ROM_COPY(    "maincpu", 0x00000, 0x40000, 0x40000 )
+	ROM_COPY(    "maincpu", 0x0000, 0x40000, 0x40000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "nc-snd", 0x08000, 0x8000, CRC(f9d5b4e1) SHA1(e5c3774db349b60baf11baecf55ac432871e612c) )

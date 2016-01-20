@@ -14,7 +14,7 @@
 class sgi_mc_device : public device_t
 {
 public:
-	sgi_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sgi_mc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~sgi_mc_device() {}
 
 DECLARE_READ32_MEMBER(read);
@@ -22,7 +22,7 @@ DECLARE_WRITE32_MEMBER(write);
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	// internal state

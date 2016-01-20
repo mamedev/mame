@@ -15,7 +15,7 @@
 emu_fatalerror::emu_fatalerror(const char *format, ...)
 : code(0)
 {
-	if (format == NULL)
+	if (format == nullptr)
 	{
 		text[0] = '\0';
 	}
@@ -32,7 +32,7 @@ emu_fatalerror::emu_fatalerror(const char *format, ...)
 emu_fatalerror::emu_fatalerror(const char *format, va_list ap)
 : code(0)
 {
-	if (format == NULL)
+	if (format == nullptr)
 	{
 		text[0] = '\0';
 	}
@@ -46,7 +46,7 @@ emu_fatalerror::emu_fatalerror(const char *format, va_list ap)
 emu_fatalerror::emu_fatalerror(int _exitcode, const char *format, ...)
 : code(_exitcode)
 {
-	if (format == NULL)
+	if (format == nullptr)
 	{
 		text[0] = '\0';
 	}
@@ -62,7 +62,7 @@ emu_fatalerror::emu_fatalerror(int _exitcode, const char *format, ...)
 emu_fatalerror::emu_fatalerror(int _exitcode, const char *format, va_list ap)
 : code(_exitcode)
 {
-	if (format == NULL)
+	if (format == nullptr)
 	{
 		text[0] = '\0';
 	}
@@ -82,7 +82,7 @@ void report_bad_cast(const std::type_info &src_type, const std::type_info &dst_t
 void report_bad_device_cast(const device_t *dev, const std::type_info &src_type, const std::type_info &dst_type)
 {
 	throw emu_fatalerror("Error: bad downcast<> or device<>.  Tried to convert the device %s (%s) of type %s to a %s, which are incompatible.\n",
-			dev->tag(), dev->name(), src_type.name(), dst_type.name());
+			dev->tag().c_str(), dev->name().c_str(), src_type.name(), dst_type.name());
 }
 
 void fatalerror(const char *format, ...)

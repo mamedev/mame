@@ -45,7 +45,7 @@ machine_config_constructor cr511b_device::device_mconfig_additions() const
 //  cr511b_device - constructor
 //-------------------------------------------------
 
-cr511b_device::cr511b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cr511b_device::cr511b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CR511B, "CR-511-B CD-ROM drive", tag, owner, clock, "cr511b", __FILE__),
 	m_cdrom(*this, "cdrom"),
 	m_cdda(*this, "cdda"),
@@ -55,7 +55,7 @@ cr511b_device::cr511b_device(const machine_config &mconfig, const char *tag, dev
 	m_dten_handler(*this),
 	m_scor_handler(*this),
 	m_xaen_handler(*this),
-	m_frame_timer(NULL),
+	m_frame_timer(nullptr),
 	//m_motor(false),
 	m_enabled(-1),
 	m_cmd(-1)
@@ -76,7 +76,7 @@ void cr511b_device::device_start()
 	m_scor_handler.resolve_safe();
 	m_xaen_handler.resolve_safe();
 
-	m_frame_timer = timer_alloc(0, NULL);
+	m_frame_timer = timer_alloc(0, nullptr);
 	m_frame_timer->adjust(attotime::never);
 }
 

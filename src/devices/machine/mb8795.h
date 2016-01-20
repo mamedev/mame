@@ -24,7 +24,7 @@ class mb8795_device :   public device_t,
 						public device_network_interface
 {
 public:
-	mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb8795_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_tx_irq_wr_callback(device_t &device, _Object object) { return downcast<mb8795_device &>(device).irq_tx_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_rx_irq_wr_callback(device_t &device, _Object object) { return downcast<mb8795_device &>(device).irq_rx_cb.set_callback(object); }
@@ -54,11 +54,11 @@ public:
 	void rx_dma_r(UINT8 &data, bool &eof);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual void recv_cb(UINT8 *buf, int len);
+	virtual void recv_cb(UINT8 *buf, int len) override;
 
 private:
 	enum { TIMER_TX, TIMER_RX };

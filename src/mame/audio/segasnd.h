@@ -12,7 +12,7 @@ class speech_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	speech_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	speech_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~speech_sound_device() {}
 
 	DECLARE_WRITE8_MEMBER( data_w );
@@ -29,10 +29,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	// internal state
@@ -115,8 +115,8 @@ class usb_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	usb_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	usb_sound_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	usb_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~usb_sound_device() {}
 	required_device<i8035_device> m_ourcpu;                 /* CPU index of the 8035 */
 
@@ -137,12 +137,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	// internal state
@@ -176,12 +176,12 @@ extern const device_type SEGAUSB;
 class usb_rom_sound_device : public usb_sound_device
 {
 public:
-	usb_rom_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	usb_rom_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~usb_rom_sound_device() {}
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 extern const device_type SEGAUSBROM;

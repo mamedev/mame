@@ -46,7 +46,7 @@
 class gb_state : public driver_device
 {
 public:
-	gb_state(const machine_config &mconfig, device_type type, const char *tag)
+	gb_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_cartslot(*this, "gbslot"),
 		m_maincpu(*this, "maincpu"),
@@ -130,22 +130,20 @@ protected:
 	void gb_timer_check_irq();
 	void gb_init();
 	void gb_init_regs();
-	void gb_video_reset(int mode);
-	void gb_video_start(int mode);
 
 	void save_gb_base();
 	void save_gbc_only();
 	void save_sgb_only();
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 
 class megaduck_state : public gb_state
 {
 public:
-	megaduck_state(const machine_config &mconfig, device_type type, const char *tag)
+	megaduck_state(const machine_config &mconfig, device_type type, std::string tag)
 		: gb_state(mconfig, type, tag)
 		, m_cartslot(*this, "duckslot")
 	{ }

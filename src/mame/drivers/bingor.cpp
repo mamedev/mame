@@ -448,14 +448,14 @@
 class bingor_state : public driver_device
 {
 public:
-	bingor_state(const machine_config &mconfig, device_type type, const char *tag)
+	bingor_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_blit_ram(*this, "blit_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette")  { }
 
 	required_shared_ptr<UINT16> m_blit_ram;
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_bingor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(unk_irq);

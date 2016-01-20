@@ -7,7 +7,7 @@
 class drgnmst_state : public driver_device
 {
 public:
-	drgnmst_state(const machine_config &mconfig, device_type type, const char *tag)
+	drgnmst_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_vidregs(*this, "vidregs"),
 		m_fg_videoram(*this, "fg_videoram"),
@@ -69,9 +69,9 @@ public:
 	TILEMAP_MAPPER_MEMBER(drgnmst_fg_tilemap_scan_cols);
 	TILEMAP_MAPPER_MEMBER(drgnmst_md_tilemap_scan_cols);
 	TILEMAP_MAPPER_MEMBER(drgnmst_bg_tilemap_scan_cols);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_drgnmst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
 	UINT8 drgnmst_asciitohex( UINT8 data );

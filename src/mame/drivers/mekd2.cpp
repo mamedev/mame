@@ -92,7 +92,7 @@ public:
 		TIMER_TRACE
 	};
 
-	mekd2_state(const machine_config &mconfig, device_type type, const char *tag)
+	mekd2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pia_s(*this, "pia_s"),
@@ -112,7 +112,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_p);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	UINT8 m_cass_data[4];
@@ -282,7 +282,7 @@ WRITE8_MEMBER( mekd2_state::mekd2_digit_w )
 		for (i = 0; i < 6; i++)
 		{
 			if (BIT(data, i))
-				output_set_digit_value(i, ~m_segment & 0x7f);
+				output().set_digit_value(i, ~m_segment & 0x7f);
 		}
 	}
 	m_digit = data;

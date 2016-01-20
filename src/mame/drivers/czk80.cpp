@@ -54,7 +54,7 @@ I/O ports: These ranges are what is guessed
 class czk80_state : public driver_device
 {
 public:
-	czk80_state(const machine_config &mconfig, device_type type, const char *tag)
+	czk80_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG),
@@ -133,7 +133,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ "z80pio" },
 	{ "z80dart" },
 	{ "z80ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 /* Z80-CTC Interface */

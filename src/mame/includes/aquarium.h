@@ -6,7 +6,7 @@
 class aquarium_state : public driver_device
 {
 public:
-	aquarium_state(const machine_config &mconfig, device_type type, const char *tag)
+	aquarium_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_mid_videoram(*this, "mid_videoram"),
 		m_bak_videoram(*this, "bak_videoram"),
@@ -17,7 +17,9 @@ public:
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_sprgen(*this, "spritegen"){ }
+		m_sprgen(*this, "spritegen"),
+		m_screen(*this, "screen")
+		{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_mid_videoram;
@@ -48,16 +50,18 @@ public:
 	TILE_GET_INFO_MEMBER(get_aquarium_txt_tile_info);
 	TILE_GET_INFO_MEMBER(get_aquarium_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_aquarium_bak_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_aquarium(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
 	UINT8 aquarium_snd_bitswap( UINT8 scrambled_data );
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<excellent_spr_device> m_sprgen;
+	required_device<screen_device> m_screen;
 
+	void mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_mask, int priority_value);
+	bitmap_ind16 m_temp_sprite_bitmap;
 };

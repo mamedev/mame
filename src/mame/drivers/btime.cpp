@@ -1142,8 +1142,8 @@ static GFXDECODE_START( zoar )
 GFXDECODE_END
 
 static GFXDECODE_START( disco )
-	GFXDECODE_ENTRY( NULL, 0, disco_tile8layout,  0, 4 ) /* char set #1 */
-	GFXDECODE_ENTRY( NULL, 0, disco_tile16layout, 0, 4 ) /* sprites */
+	GFXDECODE_ENTRY( nullptr, 0, disco_tile8layout,  0, 4 ) /* char set #1 */
+	GFXDECODE_ENTRY( nullptr, 0, disco_tile16layout, 0, 4 ) /* sprites */
 GFXDECODE_END
 
 /***************************************************************************

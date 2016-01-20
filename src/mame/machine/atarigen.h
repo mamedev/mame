@@ -111,7 +111,7 @@ class atari_sound_comm_device :  public device_t
 {
 public:
 	// construction/destruction
-	atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atari_sound_comm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	static void static_set_sound_cpu(device_t &device, const char *cputag);
@@ -145,9 +145,9 @@ protected:
 	void delayed_6502_write(int data);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// timer IDs
@@ -184,7 +184,7 @@ class atari_vad_device :    public device_t,
 {
 public:
 	// construction/destruction
-	atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atari_vad_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &static_set_scanline_int_cb(device_t &device, _Object object) { return downcast<atari_vad_device &>(device).m_scanline_int_cb.set_callback(object); }
@@ -208,9 +208,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// timer IDs
@@ -265,7 +265,7 @@ class atari_eeprom_device : public device_t
 {
 protected:
 	// construction/destruction
-	atari_eeprom_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
+	atari_eeprom_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source);
 
 public:
 	// unlock controls
@@ -282,8 +282,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// internal state
 	required_device<eeprom_parallel_28xx_device> m_eeprom;
@@ -296,22 +296,22 @@ class atari_eeprom_2804_device : public atari_eeprom_device
 {
 public:
 	// construction/destruction
-	atari_eeprom_2804_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atari_eeprom_2804_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class atari_eeprom_2816_device : public atari_eeprom_device
 {
 public:
 	// construction/destruction
-	atari_eeprom_2816_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atari_eeprom_2816_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 
@@ -332,13 +332,13 @@ class atarigen_state : public driver_device
 {
 public:
 	// construction/destruction
-	atarigen_state(const machine_config &mconfig, device_type type, const char *tag);
+	atarigen_state(const machine_config &mconfig, device_type type, std::string tag);
 
 	// users must call through to these
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void device_post_load();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_post_load() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// callbacks provided by the derived class
 	virtual void update_interrupts() = 0;

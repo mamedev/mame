@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 class sprint4_state : public driver_device
 {
@@ -8,7 +8,7 @@ public:
 		TIMER_NMI
 	};
 
-	sprint4_state(const machine_config &mconfig, device_type type, const char *tag)
+	sprint4_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -35,7 +35,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sprint4_collision_reset_w);
 	DECLARE_WRITE8_MEMBER(sprint4_da_latch_w);
 	DECLARE_WRITE8_MEMBER(sprint4_lamp_w);
-	DECLARE_WRITE8_MEMBER(sprint4_lockout_w);
 	DECLARE_WRITE8_MEMBER(sprint4_video_ram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_lever);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_wheel);
@@ -47,8 +46,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sprint4_bang_w);
 	DECLARE_WRITE8_MEMBER(sprint4_attract_w);
 	TILE_GET_INFO_MEMBER(sprint4_tile_info);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sprint4);
 	UINT32 screen_update_sprint4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sprint4(screen_device &screen, bool state);
@@ -60,5 +59,5 @@ public:
 	required_device<palette_device> m_palette;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

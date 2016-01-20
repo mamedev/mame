@@ -470,7 +470,7 @@ UINT32 atarisy1_state::screen_update_atarisy1(screen_device &screen, bitmap_ind1
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap.pix16(y);
@@ -608,7 +608,7 @@ int atarisy1_state::get_bank(UINT8 prom1, UINT8 prom2, int bpp)
 
 	/* don't have one? let's make it ... first find any empty slot */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (m_gfxdecode->gfx(gfx_index) == NULL)
+		if (m_gfxdecode->gfx(gfx_index) == nullptr)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
@@ -617,15 +617,15 @@ int atarisy1_state::get_bank(UINT8 prom1, UINT8 prom2, int bpp)
 	switch (bpp)
 	{
 	case 4:
-		m_gfxdecode->set_gfx(gfx_index,global_alloc(gfx_element(m_palette, objlayout_4bpp, srcdata, 0, 0x40, 256)));
+		m_gfxdecode->set_gfx(gfx_index,std::make_unique<gfx_element>(m_palette, objlayout_4bpp, srcdata, 0, 0x40, 256));
 		break;
 
 	case 5:
-		m_gfxdecode->set_gfx(gfx_index,global_alloc(gfx_element(m_palette, objlayout_5bpp, srcdata, 0, 0x40, 256)));
+		m_gfxdecode->set_gfx(gfx_index,std::make_unique<gfx_element>(m_palette, objlayout_5bpp, srcdata, 0, 0x40, 256));
 		break;
 
 	case 6:
-		m_gfxdecode->set_gfx(gfx_index,global_alloc(gfx_element(m_palette, objlayout_6bpp, srcdata, 0, 0x40, 256)));
+		m_gfxdecode->set_gfx(gfx_index,std::make_unique<gfx_element>(m_palette, objlayout_6bpp, srcdata, 0, 0x40, 256));
 		break;
 
 	default:

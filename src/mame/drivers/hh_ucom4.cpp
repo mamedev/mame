@@ -142,7 +142,7 @@ void hh_ucom4_state::display_update()
 		if (m_display_cache[y] != active_state[y])
 		{
 			if (m_display_segmask[y] != 0)
-				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
+				output().set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
 			for (int x = 0; x <= m_display_maxx; x++)
@@ -162,8 +162,8 @@ void hh_ucom4_state::display_update()
 					sprintf(buf1, "lamp%d", y * mul + x);
 					sprintf(buf2, "%d.%d", y, x);
 				}
-				output_set_value(buf1, state);
-				output_set_value(buf2, state);
+				output().set_value(buf1, state);
+				output().set_value(buf2, state);
 			}
 		}
 
@@ -244,7 +244,7 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
 class ufombs_state : public hh_ucom4_state
 {
 public:
-	ufombs_state(const machine_config &mconfig, device_type type, const char *tag)
+	ufombs_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -323,8 +323,6 @@ static MACHINE_CONFIG_START( ufombs, ufombs_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -356,7 +354,7 @@ MACHINE_CONFIG_END
 class ssfball_state : public hh_ucom4_state
 {
 public:
-	ssfball_state(const machine_config &mconfig, device_type type, const char *tag)
+	ssfball_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -465,8 +463,6 @@ static MACHINE_CONFIG_START( ssfball, ssfball_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -496,7 +492,7 @@ MACHINE_CONFIG_END
 class bmsoccer_state : public hh_ucom4_state
 {
 public:
-	bmsoccer_state(const machine_config &mconfig, device_type type, const char *tag)
+	bmsoccer_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -592,8 +588,6 @@ static MACHINE_CONFIG_START( bmsoccer, bmsoccer_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -618,7 +612,7 @@ MACHINE_CONFIG_END
 class bmsafari_state : public hh_ucom4_state
 {
 public:
-	bmsafari_state(const machine_config &mconfig, device_type type, const char *tag)
+	bmsafari_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -698,8 +692,6 @@ static MACHINE_CONFIG_START( bmsafari, bmsafari_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -727,7 +719,7 @@ MACHINE_CONFIG_END
 class splasfgt_state : public hh_ucom4_state
 {
 public:
-	splasfgt_state(const machine_config &mconfig, device_type type, const char *tag)
+	splasfgt_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -849,8 +841,6 @@ static MACHINE_CONFIG_START( splasfgt, splasfgt_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -880,7 +870,7 @@ MACHINE_CONFIG_END
 class bcclimbr_state : public hh_ucom4_state
 {
 public:
-	bcclimbr_state(const machine_config &mconfig, device_type type, const char *tag)
+	bcclimbr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -952,8 +942,6 @@ static MACHINE_CONFIG_START( bcclimbr, bcclimbr_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -984,7 +972,7 @@ MACHINE_CONFIG_END
 class tactix_state : public hh_ucom4_state
 {
 public:
-	tactix_state(const machine_config &mconfig, device_type type, const char *tag)
+	tactix_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -1071,8 +1059,6 @@ static MACHINE_CONFIG_START( tactix, tactix_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tactix)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1101,7 +1087,7 @@ MACHINE_CONFIG_END
 class invspace_state : public hh_ucom4_state
 {
 public:
-	invspace_state(const machine_config &mconfig, device_type type, const char *tag)
+	invspace_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -1172,8 +1158,6 @@ static MACHINE_CONFIG_START( invspace, invspace_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1202,7 +1186,7 @@ MACHINE_CONFIG_END
 class efball_state : public hh_ucom4_state
 {
 public:
-	efball_state(const machine_config &mconfig, device_type type, const char *tag)
+	efball_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -1283,8 +1267,6 @@ static MACHINE_CONFIG_START( efball, efball_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_efball)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1315,7 +1297,7 @@ MACHINE_CONFIG_END
 class galaxy2_state : public hh_ucom4_state
 {
 public:
-	galaxy2_state(const machine_config &mconfig, device_type type, const char *tag)
+	galaxy2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -1386,8 +1368,6 @@ static MACHINE_CONFIG_START( galaxy2, galaxy2_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1417,7 +1397,7 @@ MACHINE_CONFIG_END
 class astrocmd_state : public hh_ucom4_state
 {
 public:
-	astrocmd_state(const machine_config &mconfig, device_type type, const char *tag)
+	astrocmd_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -1495,8 +1475,6 @@ static MACHINE_CONFIG_START( astrocmd, astrocmd_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1526,7 +1504,7 @@ MACHINE_CONFIG_END
 class edracula_state : public hh_ucom4_state
 {
 public:
-	edracula_state(const machine_config &mconfig, device_type type, const char *tag)
+	edracula_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -1590,8 +1568,6 @@ static MACHINE_CONFIG_START( edracula, edracula_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1616,7 +1592,7 @@ MACHINE_CONFIG_END
 class mvbfree_state : public hh_ucom4_state
 {
 public:
-	mvbfree_state(const machine_config &mconfig, device_type type, const char *tag)
+	mvbfree_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -1697,8 +1673,6 @@ static MACHINE_CONFIG_START( mvbfree, mvbfree_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_mvbfree)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1727,7 +1701,7 @@ MACHINE_CONFIG_END
 class tccombat_state : public hh_ucom4_state
 {
 public:
-	tccombat_state(const machine_config &mconfig, device_type type, const char *tag)
+	tccombat_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -1794,8 +1768,6 @@ static MACHINE_CONFIG_START( tccombat, tccombat_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1826,7 +1798,7 @@ MACHINE_CONFIG_END
 class tmtennis_state : public hh_ucom4_state
 {
 public:
-	tmtennis_state(const machine_config &mconfig, device_type type, const char *tag)
+	tmtennis_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -1839,7 +1811,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch);
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 // handlers
@@ -1952,8 +1924,6 @@ static MACHINE_CONFIG_START( tmtennis, tmtennis_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1988,7 +1958,7 @@ MACHINE_CONFIG_END
 class tmpacman_state : public hh_ucom4_state
 {
 public:
-	tmpacman_state(const machine_config &mconfig, device_type type, const char *tag)
+	tmpacman_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -2060,8 +2030,6 @@ static MACHINE_CONFIG_START( tmpacman, tmpacman_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -2092,7 +2060,7 @@ MACHINE_CONFIG_END
 class tmscramb_state : public hh_ucom4_state
 {
 public:
-	tmscramb_state(const machine_config &mconfig, device_type type, const char *tag)
+	tmscramb_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -2162,8 +2130,6 @@ static MACHINE_CONFIG_START( tmscramb, tmscramb_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -2193,7 +2159,7 @@ MACHINE_CONFIG_END
 class tcaveman_state : public hh_ucom4_state
 {
 public:
-	tcaveman_state(const machine_config &mconfig, device_type type, const char *tag)
+	tcaveman_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -2260,8 +2226,6 @@ static MACHINE_CONFIG_START( tcaveman, tcaveman_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -2292,7 +2256,7 @@ MACHINE_CONFIG_END
 class alnchase_state : public hh_ucom4_state
 {
 public:
-	alnchase_state(const machine_config &mconfig, device_type type, const char *tag)
+	alnchase_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -2391,8 +2355,6 @@ static MACHINE_CONFIG_START( alnchase, alnchase_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

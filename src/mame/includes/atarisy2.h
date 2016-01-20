@@ -15,7 +15,7 @@
 class atarisy2_state : public atarigen_state
 {
 public:
-	atarisy2_state(const machine_config &mconfig, device_type type, const char *tag)
+	atarisy2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atarigen_state(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
@@ -68,10 +68,10 @@ public:
 
 	UINT16          m_vram[0x8000/2];
 
-	virtual void device_post_load();
+	virtual void device_post_load() override;
 
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(int0_ack_w);
 	DECLARE_WRITE16_MEMBER(int1_ack_w);
 	DECLARE_WRITE16_MEMBER(int_enable_w);

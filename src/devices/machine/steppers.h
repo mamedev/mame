@@ -101,7 +101,7 @@ extern const device_type STEPPER;
 class stepper_device : public device_t
 {
 public:
-	stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	stepper_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_optic_handler(device_t &device, _Object object) { return downcast<stepper_device &>(device).m_optic_cb.set_callback(object); }
 
@@ -154,8 +154,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	UINT8 m_pattern;      /* coil pattern */

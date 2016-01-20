@@ -65,7 +65,7 @@
 class abc80_state : public driver_device
 {
 public:
-	abc80_state(const machine_config &mconfig, device_type type, const char *tag) :
+	abc80_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_pio(*this, Z80PIO_TAG),
@@ -124,11 +124,11 @@ public:
 		HEAD = 0xfe20
 	};
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect);

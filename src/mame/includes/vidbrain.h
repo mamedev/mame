@@ -25,7 +25,7 @@
 class vidbrain_state : public driver_device
 {
 public:
-	vidbrain_state(const machine_config &mconfig, device_type type, const char *tag)
+	vidbrain_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, F3850_TAG),
 			m_smi(*this, F3853_TAG),
@@ -78,9 +78,9 @@ public:
 	required_ioport m_joy4_x;
 	required_ioport m_joy4_y;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	enum
 	{

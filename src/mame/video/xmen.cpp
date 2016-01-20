@@ -53,8 +53,8 @@ VIDEO_START_MEMBER(xmen_state,xmen6p)
 {
 	m_k053246->k053247_get_ram( &m_k053247_ram);
 
-	m_screen_left  = auto_bitmap_ind16_alloc(machine(), 64 * 8, 32 * 8);
-	m_screen_right = auto_bitmap_ind16_alloc(machine(), 64 * 8, 32 * 8);
+	m_screen_left  = std::make_unique<bitmap_ind16>(64 * 8, 32 * 8);
+	m_screen_right = std::make_unique<bitmap_ind16>(64 * 8, 32 * 8);
 
 	save_item(NAME(*m_screen_left));
 	save_item(NAME(*m_screen_right));
@@ -168,7 +168,7 @@ void xmen_state::screen_eof_xmen6p(screen_device &screen, bool state)
 			}
 
 
-			renderbitmap = m_screen_right;
+			renderbitmap = m_screen_right.get();
 		}
 		else
 		{
@@ -187,7 +187,7 @@ void xmen_state::screen_eof_xmen6p(screen_device &screen, bool state)
 			}
 
 
-			renderbitmap = m_screen_left;
+			renderbitmap = m_screen_left.get();
 		}
 
 

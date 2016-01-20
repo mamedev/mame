@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Lee Taylor, John Clegg
+// license:BSD-3-Clause
+// copyright-holders:Lee Taylor
+// thanks-to:John Clegg
 /***************************************************************************
 
     Irem M58 hardware
@@ -181,7 +182,7 @@ void m58_state::video_start()
 	m_bg_tilemap->set_scrolldx(visarea.min_x, width - (visarea.max_x + 1));
 	m_bg_tilemap->set_scrolldy(visarea.min_y - 8, height + 16 - (visarea.max_y + 1));
 
-	//m_scroll_panel_bitmap = auto_bitmap_ind16_alloc(machine(), SCROLL_PANEL_WIDTH, height);
+	//m_scroll_panel_bitmap = std::make_unique<bitmap_ind16>(SCROLL_PANEL_WIDTH, height);
 	m_screen->register_screen_bitmap(m_scroll_panel_bitmap);
 	save_item(NAME(m_scroll_panel_bitmap));
 }
@@ -199,8 +200,8 @@ WRITE8_MEMBER(m58_state::flipscreen_w)
 	/* screen flip is handled both by software and hardware */
 	flip_screen_set((data & 0x01) ^ (~ioport("DSW2")->read() & 0x01));
 
-	coin_counter_w(machine(), 0, data & 0x02);
-	coin_counter_w(machine(), 1, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, data & 0x02);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 }
 
 

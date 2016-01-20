@@ -137,7 +137,7 @@ Notes:
 class konamigv_state : public driver_device
 {
 public:
-	konamigv_state(const machine_config &mconfig, device_type type, const char *tag)
+	konamigv_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_am53cf96(*this, "am53cf96"),
 		m_maincpu(*this, "maincpu")
@@ -157,7 +157,7 @@ public:
 	void scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 
 protected:
-	virtual void driver_start();
+	virtual void driver_start() override;
 
 private:
 	required_device<am53cf96_device> m_am53cf96;

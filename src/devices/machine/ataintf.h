@@ -26,13 +26,13 @@ class ata_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ata_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	ata_device_interface *dev() { return m_dev; }
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 private:
 	ata_device_interface *m_dev;
@@ -77,8 +77,8 @@ SLOT_INTERFACE_EXTERN(ata_devices);
 class ata_interface_device : public device_t
 {
 public:
-	ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	ata_interface_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	ata_interface_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ata_interface_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_irq_handler.set_callback(object); }
@@ -95,8 +95,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	virtual void set_irq(int state);
 	virtual void set_dmarq(int state);

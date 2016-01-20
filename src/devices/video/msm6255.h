@@ -27,7 +27,7 @@ class msm6255_device :  public device_t,
 {
 public:
 	// construction/destruction
-	msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msm6255_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8);
 
@@ -41,11 +41,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 private:
 	// registers

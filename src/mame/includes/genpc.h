@@ -29,17 +29,17 @@ class ibm5160_mb_device : public device_t
 {
 public:
 	// construction/destruction
-	ibm5160_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ibm5160_mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
+	static void static_set_cputag(device_t &device, std::string tag);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler);
 public:
@@ -108,7 +108,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_page_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 
-	const char *m_cputag;
+	std::string m_cputag;
 
 private:
 	void pc_select_dma_channel(int channel, bool state);
@@ -128,23 +128,23 @@ class ibm5150_mb_device : public ibm5160_mb_device
 {
 public:
 	// construction/destruction
-	ibm5150_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ibm5150_mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w ) override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	required_device<cassette_image_device>  m_cassette;
 public:
-	virtual DECLARE_READ8_MEMBER ( pc_ppi_porta_r );
-	virtual DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
-	virtual DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
+	virtual DECLARE_READ8_MEMBER ( pc_ppi_porta_r ) override;
+	virtual DECLARE_READ8_MEMBER ( pc_ppi_portc_r ) override;
+	virtual DECLARE_WRITE8_MEMBER( pc_ppi_portb_w ) override;
 };
 
 
@@ -160,22 +160,22 @@ class ec1841_mb_device : public ibm5160_mb_device
 {
 public:
 	// construction/destruction
-	ec1841_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ec1841_mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 public:
-	virtual DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
-	virtual DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
+	virtual DECLARE_READ8_MEMBER ( pc_ppi_portc_r ) override;
+	virtual DECLARE_WRITE8_MEMBER( pc_ppi_portb_w ) override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w ) override;
 };
 
 extern const device_type EC1841_MOTHERBOARD;
@@ -188,13 +188,13 @@ class pc_noppi_mb_device : public ibm5160_mb_device
 {
 public:
 	// construction/destruction
-	pc_noppi_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc_noppi_mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 protected:
 	// device-level overrides
-	void device_start();
+	void device_start() override;
 };
 
 extern const device_type PCNOPPI_MOTHERBOARD;

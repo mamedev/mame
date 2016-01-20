@@ -29,7 +29,7 @@
 class concept_state : public driver_device
 {
 public:
-	concept_state(const machine_config &mconfig, device_type type, const char *tag)
+	concept_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_acia0(*this, ACIA_0_TAG),
@@ -54,9 +54,9 @@ public:
 	UINT8 m_clock_address;
 	DECLARE_READ16_MEMBER(concept_io_r);
 	DECLARE_WRITE16_MEMBER(concept_io_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_concept(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(via_in_a);

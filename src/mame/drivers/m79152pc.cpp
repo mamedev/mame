@@ -16,7 +16,7 @@
 class m79152pc_state : public driver_device
 {
 public:
-	m79152pc_state(const machine_config &mconfig, device_type type, const char *tag)
+	m79152pc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "p_videoram"),
 		m_p_attributes(*this, "p_attributes"),
@@ -25,8 +25,8 @@ public:
 	UINT8 *m_p_chargen;
 	required_shared_ptr<UINT8> m_p_videoram;
 	required_shared_ptr<UINT8> m_p_attributes;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };

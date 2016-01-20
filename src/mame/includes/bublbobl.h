@@ -10,7 +10,7 @@ public:
 		TIMER_M68705_IRQ_ACK
 	};
 
-	bublbobl_state(const machine_config &mconfig, device_type type, const char *tag)
+	bublbobl_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_objectram(*this, "objectram"),
@@ -130,5 +130,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

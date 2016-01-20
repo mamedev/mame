@@ -37,7 +37,7 @@
 class ql_state : public driver_device
 {
 public:
-	ql_state(const machine_config &mconfig, device_type type, const char *tag) :
+	ql_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, M68008_TAG),
 		m_ipc(*this, I8749_TAG),
@@ -99,8 +99,8 @@ public:
 	required_ioport m_joy1;
 	required_ioport m_config;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -111,8 +111,6 @@ public:
 	DECLARE_READ8_MEMBER( ipc_port2_r );
 	DECLARE_READ8_MEMBER( ipc_t1_r );
 	DECLARE_READ8_MEMBER( ipc_bus_r );
-	DECLARE_READ8_MEMBER( ql_ram_r );
-	DECLARE_WRITE8_MEMBER( ql_ram_w );
 	DECLARE_WRITE_LINE_MEMBER( ql_baudx4_w );
 	DECLARE_WRITE_LINE_MEMBER( ql_comdata_w );
 	DECLARE_WRITE_LINE_MEMBER( zx8302_mdselck_w );

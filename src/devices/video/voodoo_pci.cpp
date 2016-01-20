@@ -71,13 +71,13 @@ DEVICE_ADDRESS_MAP_START(io_map, 32, voodoo_pci_device)
 	AM_RANGE(0x000, 0x0ff) AM_DEVREADWRITE("voodoo", voodoo_banshee_device, banshee_io_r, banshee_io_w)
 ADDRESS_MAP_END
 
-voodoo_pci_device::voodoo_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+voodoo_pci_device::voodoo_pci_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, VOODOO_PCI, "Voodoo PCI", tag, owner, clock, "voodoo_pci", __FILE__),
 		m_voodoo(*this, "voodoo"), m_fbmem(2), m_tmumem0(0), m_tmumem1(0)
 {
 }
 
-void voodoo_pci_device::set_cpu_tag(const char *_cpu_tag)
+void voodoo_pci_device::set_cpu_tag(std::string _cpu_tag)
 {
 	m_cpu_tag = _cpu_tag;
 }
@@ -122,7 +122,7 @@ void voodoo_pci_device::device_reset()
 void voodoo_pci_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
 									UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
 {
-	logerror("%s: map_extra\n", this->tag());
+	logerror("%s: map_extra\n", this->tag().c_str());
 	// Really awkward way of getting vga address space mapped
 	// Should really be dependent on voodoo VGAINIT0 bit 8 and IO base + 0xc3 bit 0
 	if (1) {
@@ -146,7 +146,7 @@ void voodoo_pci_device::map_extra(UINT64 memory_window_start, UINT64 memory_wind
 		start = (start & 0xFFFF0000) + 0x300;
 		UINT64 end = (start & 0xFFFF0000) + 0x3ef;
 		space->install_device_delegate(start, end, *this, bi.map);
-		logerror("%s: map %s at %0*x-%0*x\n", this->tag(), bi.map.name(), bi.flags & M_IO ? 4 : 8, UINT32(start), bi.flags & M_IO ? 4 : 8, UINT32(end));
+		logerror("%s: map %s at %0*x-%0*x\n", this->tag().c_str(), bi.map.name(), bi.flags & M_IO ? 4 : 8, UINT32(start), bi.flags & M_IO ? 4 : 8, UINT32(end));
 	}
 
 }

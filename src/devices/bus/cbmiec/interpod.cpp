@@ -130,7 +130,7 @@ static MACHINE_CONFIG_FRAGMENT( interpod )
 	MCFG_DEVICE_ADD(R6532_TAG, MOS6532n, 1000000)
 	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
 
-	MCFG_CBM_IEEE488_ADD(NULL)
+	MCFG_CBM_IEEE488_ADD(nullptr)
 MACHINE_CONFIG_END
 
 
@@ -153,7 +153,7 @@ machine_config_constructor interpod_device::device_mconfig_additions() const
 //  interpod_device - constructor
 //-------------------------------------------------
 
-interpod_device::interpod_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+interpod_device::interpod_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, INTERPOD, "Interpod", tag, owner, clock, "interpod", __FILE__),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, R6502_TAG),

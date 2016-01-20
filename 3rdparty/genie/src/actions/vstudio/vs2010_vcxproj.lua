@@ -264,7 +264,7 @@
 	--
 		local debug_info = ''
 		if cfg.flags.Symbols then
-			if cfg.platform == "x64"
+			if (action.vstudio.supports64bitEditContinue == false and cfg.platform == "x64")
 				or cfg.flags.Managed
 				or premake.config.isoptimizedbuild(cfg.flags)
 				or cfg.flags.NoEditAndContinue
@@ -723,7 +723,7 @@
 			t = ' DefaultTargets="' .. targets .. '"'
 		end
 
-		_p('<Project%s ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">', t)
+		_p('<Project%s ToolsVersion="%s" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">', t, action.vstudio.toolsVersion)
 	end
 
 

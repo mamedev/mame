@@ -50,7 +50,7 @@
 class dlair_state : public driver_device
 {
 public:
-	dlair_state(const machine_config &mconfig, device_type type, const char *tag) :
+	dlair_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
@@ -74,22 +74,22 @@ public:
 
 	void laserdisc_data_w(UINT8 data)
 	{
-		if (m_ldv1000 != NULL) m_ldv1000->data_w(data);
-		if (m_pr7820 != NULL) m_pr7820->data_w(data);
-		if (m_22vp932 != NULL) m_22vp932->data_w(data);
+		if (m_ldv1000 != nullptr) m_ldv1000->data_w(data);
+		if (m_pr7820 != nullptr) m_pr7820->data_w(data);
+		if (m_22vp932 != nullptr) m_22vp932->data_w(data);
 	}
 
 	void laserdisc_enter_w(UINT8 data)
 	{
-		if (m_pr7820 != NULL) m_pr7820->enter_w(data);
-		if (m_22vp932 != NULL) m_22vp932->enter_w(data);
+		if (m_pr7820 != nullptr) m_pr7820->enter_w(data);
+		if (m_22vp932 != nullptr) m_22vp932->enter_w(data);
 	}
 
 	UINT8 laserdisc_data_r()
 	{
-		if (m_ldv1000 != NULL) return m_ldv1000->status_r();
-		if (m_pr7820 != NULL) return m_pr7820->data_r();
-		if (m_22vp932 != NULL) return m_22vp932->data_r();
+		if (m_ldv1000 != nullptr) return m_ldv1000->status_r();
+		if (m_pr7820 != nullptr) return m_pr7820->data_r();
+		if (m_22vp932 != nullptr) return m_22vp932->data_r();
 		return 0;
 	}
 
@@ -100,14 +100,14 @@ public:
 
 	UINT8 laserdisc_status_r()
 	{
-		if (m_ldv1000 != NULL) return m_ldv1000->status_strobe_r();
+		if (m_ldv1000 != nullptr) return m_ldv1000->status_strobe_r();
 		return CLEAR_LINE;
 	}
 
 	UINT8 laserdisc_ready_r()
 	{
-		if (m_ldv1000 != NULL) return m_ldv1000->command_strobe_r();
-		if (m_pr7820 != NULL) return m_pr7820->ready_r();
+		if (m_ldv1000 != nullptr) return m_ldv1000->command_strobe_r();
+		if (m_pr7820 != nullptr) return m_pr7820->ready_r();
 		return CLEAR_LINE;
 	}
 
@@ -173,7 +173,7 @@ static const z80_daisy_config dleuro_daisy_chain[] =
 {
 	{ "sio" },
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 
@@ -265,7 +265,7 @@ WRITE8_MEMBER(dlair_state::misc_w)
 	UINT8 diff = data ^ m_last_misc;
 	m_last_misc = data;
 
-	coin_counter_w(machine(), 0, (~data >> 4) & 1);
+	machine().bookkeeping().coin_counter_w(0, (~data >> 4) & 1);
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))
@@ -291,8 +291,8 @@ WRITE8_MEMBER(dlair_state::dleuro_misc_w)
 	UINT8 diff = data ^ m_last_misc;
 	m_last_misc = data;
 
-	coin_counter_w(machine(), 1, (~data >> 3) & 1);
-	coin_counter_w(machine(), 0, (~data >> 4) & 1);
+	machine().bookkeeping().coin_counter_w(1, (~data >> 3) & 1);
+	machine().bookkeeping().coin_counter_w(0, (~data >> 4) & 1);
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))
@@ -305,13 +305,13 @@ WRITE8_MEMBER(dlair_state::dleuro_misc_w)
 
 WRITE8_MEMBER(dlair_state::led_den1_w)
 {
-	output_set_digit_value(0 + (offset & 7), led_map[data & 0x0f]);
+	output().set_digit_value(0 + (offset & 7), led_map[data & 0x0f]);
 }
 
 
 WRITE8_MEMBER(dlair_state::led_den2_w)
 {
-	output_set_digit_value(8 + (offset & 7), led_map[data & 0x0f]);
+	output().set_digit_value(8 + (offset & 7), led_map[data & 0x0f]);
 }
 
 

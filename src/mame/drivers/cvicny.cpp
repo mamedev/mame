@@ -39,7 +39,7 @@
 class cvicny_state : public driver_device
 {
 public:
-	cvicny_state(const machine_config &mconfig, device_type type, const char *tag)
+	cvicny_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_digit_last(0)
@@ -56,7 +56,7 @@ public:
 WRITE8_MEMBER( cvicny_state::segment_w ) // output segments on the selected digit
 {
 	if (m_digit != m_digit_last)
-		output_set_digit_value(m_digit, data);
+		output().set_digit_value(m_digit, data);
 
 	m_digit_last = m_digit;
 }

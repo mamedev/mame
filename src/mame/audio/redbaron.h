@@ -10,19 +10,19 @@ class redbaron_sound_device : public device_t,
 								public device_sound_interface
 {
 public:
-	redbaron_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	redbaron_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER( sounds_w );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
-	INT16 *m_vol_lookup;
+	std::unique_ptr<INT16[]> m_vol_lookup;
 
 	INT16 m_vol_crash[16];
 

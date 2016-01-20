@@ -26,7 +26,7 @@ const device_type WS_ROM_SRAM = &device_creator<ws_rom_sram_device>;
 const device_type WS_ROM_EEPROM = &device_creator<ws_rom_eeprom_device>;
 
 
-ws_rom_device::ws_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+ws_rom_device::ws_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_ws_cart_interface(mconfig, *this),
 	m_base20(0),
@@ -45,7 +45,7 @@ ws_rom_device::ws_rom_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-ws_rom_device::ws_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ws_rom_device::ws_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, WS_ROM_STD, "Wonderswan Standard Carts", tag, owner, clock, "ws_rom", __FILE__),
 						device_ws_cart_interface( mconfig, *this ), m_base20(0),
 	m_base30(0),
@@ -63,13 +63,13 @@ ws_rom_device::ws_rom_device(const machine_config &mconfig, const char *tag, dev
 				{
 }
 
-ws_rom_sram_device::ws_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ws_rom_sram_device::ws_rom_sram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: ws_rom_device(mconfig, WS_ROM_SRAM, "Wonderswan Carts w/SRAM", tag, owner, clock, "ws_sram", __FILE__), m_nvram_base(0)
 				{
 }
 
 
-ws_rom_eeprom_device::ws_rom_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ws_rom_eeprom_device::ws_rom_eeprom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: ws_rom_device(mconfig, WS_ROM_EEPROM, "Wonderswan Carts w/EEPROM", tag, owner, clock, "ws_eeprom", __FILE__), m_eeprom_mode(0),
 	m_eeprom_address(0), m_eeprom_command(0), m_eeprom_start(0), m_eeprom_write_enabled(0)
 				{

@@ -52,7 +52,7 @@ Limit for help/undo (matta):
 class othello_state : public driver_device
 {
 public:
-	othello_state(const machine_config &mconfig, device_type type, const char *tag)
+	othello_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -101,8 +101,8 @@ public:
 	DECLARE_READ8_MEMBER(n7751_t1_r);
 	DECLARE_WRITE8_MEMBER(n7751_p2_w);
 	DECLARE_WRITE8_MEMBER(n7751_rom_control_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(othello);
 	MC6845_UPDATE_ROW(crtc_update_row);
 };

@@ -3,7 +3,7 @@
 class popeye_state : public driver_device
 {
 public:
-	popeye_state(const machine_config &mconfig, device_type type, const char *tag)
+	popeye_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_background_pos(*this, "background_pos"),
 		m_palettebank(*this, "palettebank"),
@@ -23,8 +23,8 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-	UINT8 *m_bitmapram;
-	bitmap_ind16 *m_tmpbitmap2;
+	std::unique_ptr<UINT8[]> m_bitmapram;
+	std::unique_ptr<bitmap_ind16> m_tmpbitmap2;
 	UINT8 m_invertmask;
 	UINT8 m_bitmap_type;
 	tilemap_t *m_fg_tilemap;
@@ -42,7 +42,7 @@ public:
 	DECLARE_DRIVER_INIT(skyskipr);
 	DECLARE_DRIVER_INIT(popeye);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(popeye);
 	DECLARE_VIDEO_START(popeye);
 	DECLARE_PALETTE_INIT(popeyebl);

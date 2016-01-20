@@ -51,7 +51,7 @@ Note: this is quite clearly a 'Korean bootleg' of Shisensho - Joshiryo-Hen / Mat
 class onetwo_state : public driver_device
 {
 public:
-	onetwo_state(const machine_config &mconfig, device_type type, const char *tag)
+	onetwo_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_paletteram(*this, "paletteram"),
 		m_paletteram2(*this, "paletteram2"),
@@ -82,8 +82,8 @@ public:
 	DECLARE_WRITE8_MEMBER(palette1_w);
 	DECLARE_WRITE8_MEMBER(palette2_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update_onetwo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_color(int offset);
 };
@@ -137,8 +137,8 @@ WRITE8_MEMBER(onetwo_state::onetwo_cpubank_w)
 WRITE8_MEMBER(onetwo_state::onetwo_coin_counters_w)
 {
 	machine().watchdog_reset();
-	coin_counter_w(machine(), 0, BIT(data, 1));
-	coin_counter_w(machine(), 1, BIT(data, 2));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
 }
 
 WRITE8_MEMBER(onetwo_state::onetwo_soundlatch_w)

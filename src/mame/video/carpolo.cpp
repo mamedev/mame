@@ -145,13 +145,13 @@ PALETTE_INIT_MEMBER(carpolo_state, carpolo)
 
 void carpolo_state::video_start()
 {
-	m_sprite_sprite_collision_bitmap1 = auto_bitmap_ind16_alloc(machine(), SPRITE_WIDTH*2, SPRITE_HEIGHT*2);
-	m_sprite_sprite_collision_bitmap2 = auto_bitmap_ind16_alloc(machine(), SPRITE_WIDTH*2, SPRITE_HEIGHT*2);
+	m_sprite_sprite_collision_bitmap1 = std::make_unique<bitmap_ind16>(SPRITE_WIDTH*2, SPRITE_HEIGHT*2);
+	m_sprite_sprite_collision_bitmap2 = std::make_unique<bitmap_ind16>(SPRITE_WIDTH*2, SPRITE_HEIGHT*2);
 
-	m_sprite_goal_collision_bitmap1 = auto_bitmap_ind16_alloc(machine(), SPRITE_WIDTH+GOAL_WIDTH, SPRITE_HEIGHT+GOAL_HEIGHT);
-	m_sprite_goal_collision_bitmap2 = auto_bitmap_ind16_alloc(machine(), SPRITE_WIDTH+GOAL_WIDTH, SPRITE_HEIGHT+GOAL_HEIGHT);
+	m_sprite_goal_collision_bitmap1 = std::make_unique<bitmap_ind16>(SPRITE_WIDTH+GOAL_WIDTH, SPRITE_HEIGHT+GOAL_HEIGHT);
+	m_sprite_goal_collision_bitmap2 = std::make_unique<bitmap_ind16>(SPRITE_WIDTH+GOAL_WIDTH, SPRITE_HEIGHT+GOAL_HEIGHT);
 
-	m_sprite_border_collision_bitmap = auto_bitmap_ind16_alloc(machine(), SPRITE_WIDTH, SPRITE_HEIGHT);
+	m_sprite_border_collision_bitmap = std::make_unique<bitmap_ind16>(SPRITE_WIDTH, SPRITE_HEIGHT);
 
 	save_item(NAME(*m_sprite_sprite_collision_bitmap1));
 	save_item(NAME(*m_sprite_sprite_collision_bitmap2));

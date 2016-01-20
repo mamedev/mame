@@ -42,7 +42,7 @@ ioport_constructor cpc_transtape_device::device_input_ports() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_transtape_device::cpc_transtape_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cpc_transtape_device::cpc_transtape_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CPC_TRANSTAPE, "HM Transtape", tag, owner, clock, "cpc_transtape", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr), m_cpu(nullptr), m_space(nullptr), m_ram(nullptr),
 	m_rom_active(false),
@@ -61,7 +61,7 @@ void cpc_transtape_device::device_start()
 	m_cpu = static_cast<cpu_device*>(machine().device("maincpu"));
 	m_space = &m_cpu->space(AS_IO);
 
-	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
+	m_ram = make_unique_clear<UINT8[]>(0x2000);
 
 	m_space->install_write_handler(0xfbf0,0xfbf0,0,0,write8_delegate(FUNC(cpc_transtape_device::output_w),this));
 	m_space->install_read_handler(0xfbff,0xfbff,0,0,read8_delegate(FUNC(cpc_transtape_device::input_r),this));
@@ -88,10 +88,10 @@ void cpc_transtape_device::map_enable()
 	}
 	if(m_output & 0x01)  // RAM enable
 	{
-		membank(":bank7")->set_base(m_ram);
-		membank(":bank15")->set_base(m_ram);
-		membank(":bank8")->set_base(m_ram);  // repeats in second 8kB
-		membank(":bank16")->set_base(m_ram); 
+		membank(":bank7")->set_base(m_ram.get());
+		membank(":bank15")->set_base(m_ram.get());
+		membank(":bank8")->set_base(m_ram.get());  // repeats in second 8kB
+		membank(":bank16")->set_base(m_ram.get());
 	}
 }
 
@@ -136,5 +136,3 @@ void cpc_transtape_device::set_mapping(UINT8 type)
 		return;
 	map_enable();
 }
-
-

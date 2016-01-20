@@ -423,12 +423,12 @@ WRITE_LINE_MEMBER(lockon_state::ym2203_irq)
 
 WRITE8_MEMBER(lockon_state::ym2203_out_b)
 {
-	coin_counter_w(machine(), 0, data & 0x80);
-	coin_counter_w(machine(), 1, data & 0x40);
-	coin_counter_w(machine(), 2, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, data & 0x80);
+	machine().bookkeeping().coin_counter_w(1, data & 0x40);
+	machine().bookkeeping().coin_counter_w(2, data & 0x20);
 
 	/* 'Lock-On' lamp */
-	set_led_status(machine(), 1, !(data & 0x10));
+	output().set_led_value(1, !(data & 0x10));
 }
 
 /*************************************

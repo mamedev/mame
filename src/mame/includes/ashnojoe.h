@@ -10,7 +10,7 @@
 class ashnojoe_state : public driver_device
 {
 public:
-	ashnojoe_state(const machine_config &mconfig, device_type type, const char *tag)
+	ashnojoe_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_tileram_3(*this, "tileram_3"),
 		m_tileram_4(*this, "tileram_4"),
@@ -76,9 +76,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_joe_tile_info_5);
 	TILE_GET_INFO_MEMBER(get_joe_tile_info_6);
 	TILE_GET_INFO_MEMBER(get_joe_tile_info_7);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_ashnojoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(ym2203_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(ashnojoe_vclk_cb);

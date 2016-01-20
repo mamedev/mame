@@ -28,7 +28,7 @@ class k051316_device : public device_t,
 						public device_gfx_interface
 {
 public:
-	k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k051316_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~k051316_device() {}
 
 	static const gfx_layout charlayout4;
@@ -75,8 +75,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state

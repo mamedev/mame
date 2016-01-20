@@ -22,7 +22,7 @@
 class berzerk_state : public driver_device
 {
 public:
-	berzerk_state(const machine_config &mconfig, device_type type, const char *tag)
+	berzerk_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_s14001a(*this, "speech"),
@@ -73,10 +73,10 @@ public:
 	DECLARE_READ8_MEMBER(moonwarp_p2_r);
 
 	DECLARE_DRIVER_INIT(moonwarp);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void sound_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void sound_reset() override;
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -124,7 +124,7 @@ static const UINT8 nmi_trigger_v256s [NMIS_PER_FRAME] = { 0x00, 0x00, 0x00, 0x00
 
 READ8_MEMBER(berzerk_state::led_on_r)
 {
-	set_led_status(machine(), 0, 1);
+	output().set_led_value(0, 1);
 
 	return 0;
 }
@@ -132,13 +132,13 @@ READ8_MEMBER(berzerk_state::led_on_r)
 
 WRITE8_MEMBER(berzerk_state::led_on_w)
 {
-	set_led_status(machine(), 0, 1);
+	output().set_led_value(0, 1);
 }
 
 
 READ8_MEMBER(berzerk_state::led_off_r)
 {
-	set_led_status(machine(), 0, 0);
+	output().set_led_value(0, 0);
 
 	return 0;
 }
@@ -146,7 +146,7 @@ READ8_MEMBER(berzerk_state::led_off_r)
 
 WRITE8_MEMBER(berzerk_state::led_off_w)
 {
-	set_led_status(machine(), 0, 0);
+	output().set_led_value(0, 0);
 }
 
 
@@ -334,6 +334,7 @@ void berzerk_state::machine_start()
 {
 	create_irq_timer();
 	create_nmi_timer();
+	m_s14001a->set_volume(0);
 
 	/* register for state saving */
 	save_item(NAME(m_magicram_control));
@@ -355,7 +356,7 @@ void berzerk_state::machine_reset()
 {
 	m_irq_enabled = 0;
 	m_nmi_enabled = 0;
-	set_led_status(machine(), 0, 0);
+	output().set_led_value(0, 0);
 	m_magicram_control = 0;
 
 	start_irq_timer();
@@ -441,7 +442,7 @@ READ8_MEMBER(berzerk_state::intercept_v256_r)
 void berzerk_state::get_pens(rgb_t *pens)
 {
 	static const int resistances_wg[] = { 750, 0 };
-	static const int resistances_el[] = { 1.0 / ((1.0 / 750.0) + (1.0 / 360.0)), 0 };
+	static const int resistances_el[] = { static_cast<int>(1.0 / ((1.0 / 750.0) + (1.0 / 360.0))), 0 };
 
 	int color;
 	double color_weights[2];

@@ -112,7 +112,7 @@ WRITE8_MEMBER( aussiebyte_state::port15_w )
 7 Enable write precompensation on WD2797 controller. */
 WRITE8_MEMBER( aussiebyte_state::port16_w )
 {
-	floppy_image_device *m_floppy = NULL;
+	floppy_image_device *m_floppy = nullptr;
 	if ((data & 15) == 0)
 		m_floppy = m_floppy0->get_device();
 	else
@@ -330,7 +330,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ "sio2" },
 	{ "pio1" },
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 

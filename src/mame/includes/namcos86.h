@@ -5,7 +5,7 @@
 class namcos86_state : public driver_device
 {
 public:
-	namcos86_state(const machine_config &mconfig, device_type type, const char *tag)
+	namcos86_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_cpu1(*this, "cpu1"),
 		m_cpu2(*this, "cpu2"),
@@ -64,8 +64,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info3);
 
 	DECLARE_DRIVER_INIT(namco86);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(namcos86);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

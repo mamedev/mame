@@ -116,7 +116,7 @@ class hmcs40_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	hmcs40_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int family, UINT16 polarity, int stack_levels, int pcwidth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	hmcs40_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, int family, UINT16 polarity, int stack_levels, int pcwidth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, -1, program)
 		, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
@@ -156,26 +156,26 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 4); } // "
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 2; }
-	virtual UINT32 execute_input_lines() const { return 2+1; } // 3rd one is internal
-	virtual void execute_set_input(int line, int state);
-	virtual void execute_run();
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 4); } // "
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 2; }
+	virtual UINT32 execute_input_lines() const override { return 2+1; } // 3rd one is internal
+	virtual void execute_set_input(int line, int state) override;
+	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : NULL); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : nullptr); }
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -349,109 +349,109 @@ protected:
 class hmcs43_cpu_device : public hmcs40_cpu_device
 {
 public:
-	hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname);
+	hmcs43_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT16 polarity, std::string shortname);
 
 protected:
 	// overrides
-	virtual UINT8 read_r(int index);
-	virtual void write_r(int index, UINT8 data);
-	virtual int read_d(int index);
+	virtual UINT8 read_r(int index) override;
+	virtual void write_r(int index, UINT8 data) override;
+	virtual int read_d(int index) override;
 };
 
 class hd38750_device : public hmcs43_cpu_device
 {
 public:
-	hd38750_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd38750_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class hd38755_device : public hmcs43_cpu_device
 {
 public:
-	hd38755_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd38755_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class hd44750_device : public hmcs43_cpu_device
 {
 public:
-	hd44750_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd44750_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class hd44758_device : public hmcs43_cpu_device
 {
 public:
-	hd44758_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd44758_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class hmcs44_cpu_device : public hmcs40_cpu_device
 {
 public:
-	hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname);
+	hmcs44_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT16 polarity, std::string shortname);
 
 protected:
 	// overrides
-	virtual UINT8 read_r(int index);
-	virtual void write_r(int index, UINT8 data);
+	virtual UINT8 read_r(int index) override;
+	virtual void write_r(int index, UINT8 data) override;
 };
 
 class hd38800_device : public hmcs44_cpu_device
 {
 public:
-	hd38800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd38800_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class hd38805_device : public hmcs44_cpu_device
 {
 public:
-	hd38805_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd38805_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class hd44801_device : public hmcs44_cpu_device
 {
 public:
-	hd44801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd44801_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class hd44808_device : public hmcs44_cpu_device
 {
 public:
-	hd44808_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd44808_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class hmcs45_cpu_device : public hmcs40_cpu_device
 {
 public:
-	hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname);
+	hmcs45_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT16 polarity, std::string shortname);
 
 protected:
 	// overrides
-	virtual UINT8 read_r(int index);
-	virtual void write_r(int index, UINT8 data);
+	virtual UINT8 read_r(int index) override;
+	virtual void write_r(int index, UINT8 data) override;
 };
 
 class hd38820_device : public hmcs45_cpu_device
 {
 public:
-	hd38820_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd38820_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class hd38825_device : public hmcs45_cpu_device
 {
 public:
-	hd38825_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd38825_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class hd44820_device : public hmcs45_cpu_device
 {
 public:
-	hd44820_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd44820_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class hd44828_device : public hmcs45_cpu_device
 {
 public:
-	hd44828_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd44828_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

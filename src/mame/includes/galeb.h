@@ -13,7 +13,7 @@
 class galeb_state : public driver_device
 {
 public:
-	galeb_state(const machine_config &mconfig, device_type type, const char *tag)
+	galeb_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
@@ -22,7 +22,7 @@ public:
 
 	required_shared_ptr<UINT8> m_video_ram;
 	DECLARE_READ8_MEMBER(galeb_keyboard_r);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_galeb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

@@ -410,13 +410,13 @@ WRITE8_MEMBER(gatron_state::output_port_0_w)
   .x.. .... --> Change Card / Take / Low.
 
 */
-	output_set_lamp_value(0, (data) & 1);       /* hold3 lamp */
-	output_set_lamp_value(1, (data >> 1) & 1);  /* hold4 lamp */
-	output_set_lamp_value(2, (data >> 2) & 1);  /* hold5 lamp */
-	output_set_lamp_value(3, (data >> 3) & 1);  /* ante/bet lamp */
-	output_set_lamp_value(4, (data >> 4) & 1);  /* start lamp */
-	output_set_lamp_value(5, (data >> 5) & 1);  /* deal/hit lamp */
-	output_set_lamp_value(6, (data >> 6) & 1);  /* stand/fbdraw lamp */
+	output().set_lamp_value(0, (data) & 1);       /* hold3 lamp */
+	output().set_lamp_value(1, (data >> 1) & 1);  /* hold4 lamp */
+	output().set_lamp_value(2, (data >> 2) & 1);  /* hold5 lamp */
+	output().set_lamp_value(3, (data >> 3) & 1);  /* ante/bet lamp */
+	output().set_lamp_value(4, (data >> 4) & 1);  /* start lamp */
+	output().set_lamp_value(5, (data >> 5) & 1);  /* deal/hit lamp */
+	output().set_lamp_value(6, (data >> 6) & 1);  /* stand/fbdraw lamp */
 }
 
 
@@ -435,8 +435,8 @@ WRITE8_MEMBER(gatron_state::output_port_1_w)
   x... .... --> Inverted pulse. Related to counters.
 
 */
-	output_set_lamp_value(7, (data) & 1);       /* hold2 lamp */
-	output_set_lamp_value(8, (data >> 1) & 1);  /* hold1 lamp */
+	output().set_lamp_value(7, (data) & 1);       /* hold2 lamp */
+	output().set_lamp_value(8, (data >> 1) & 1);  /* hold1 lamp */
 }
 
 /*************************

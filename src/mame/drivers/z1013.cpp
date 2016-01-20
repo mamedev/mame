@@ -60,7 +60,7 @@ Due to no input checking, misuse of commands can crash the system.
 class z1013_state : public driver_device
 {
 public:
-	z1013_state(const machine_config &mconfig, device_type type, const char *tag)
+	z1013_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_cass(*this, "cassette"),
@@ -76,8 +76,8 @@ public:
 	const UINT8 *m_p_chargen;
 	UINT8 m_keyboard_line;
 	bool m_keyboard_part;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( z1013 );
 };

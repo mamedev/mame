@@ -80,7 +80,7 @@ const rom_entry *a2bus_corvfdc02_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_corvfdc02_device::a2bus_corvfdc02_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_corvfdc02_device::a2bus_corvfdc02_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_fdc(*this, FDC02_FDC_TAG),
@@ -91,7 +91,7 @@ a2bus_corvfdc02_device::a2bus_corvfdc02_device(const machine_config &mconfig, de
 {
 }
 
-a2bus_corvfdc02_device::a2bus_corvfdc02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_corvfdc02_device::a2bus_corvfdc02_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, A2BUS_CORVFDC02, "Corvus Systems Buffered Floppy Controller", tag, owner, clock, "crvfdc02", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_fdc(*this, FDC02_FDC_TAG),
@@ -178,7 +178,7 @@ UINT8 a2bus_corvfdc02_device::read_c0nx(address_space &space, UINT8 offset)
 
 void a2bus_corvfdc02_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	switch (offset)
 	{
@@ -208,16 +208,16 @@ void a2bus_corvfdc02_device::write_c0nx(address_space &space, UINT8 offset, UINT
 				switch (data & 3)
 				{
 					case 0:
-						floppy = m_con1 ? m_con1->get_device() : 0;
+						floppy = m_con1 ? m_con1->get_device() : nullptr;
 						break;
 					case 1:
-						floppy = m_con2 ? m_con2->get_device() : 0;
+						floppy = m_con2 ? m_con2->get_device() : nullptr;
 						break;
 					case 2:
-						floppy = m_con3 ? m_con3->get_device() : 0;
+						floppy = m_con3 ? m_con3->get_device() : nullptr;
 						break;
 					case 3:
-						floppy = m_con4 ? m_con4->get_device() : 0;
+						floppy = m_con4 ? m_con4->get_device() : nullptr;
 						break;
 				}
 
@@ -230,7 +230,7 @@ void a2bus_corvfdc02_device::write_c0nx(address_space &space, UINT8 offset, UINT
 				}
 			}
 
-			if (m_curfloppy != NULL)
+			if (m_curfloppy != nullptr)
 			{
 				// motor control (active low)
 				m_curfloppy->mon_w((data & 8) ? 1 : 0);

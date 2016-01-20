@@ -96,7 +96,7 @@ There are more!
 
 const device_type KANEKO_TMAP = &device_creator<kaneko_view2_tilemap_device>;
 
-kaneko_view2_tilemap_device::kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+kaneko_view2_tilemap_device::kaneko_view2_tilemap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, KANEKO_TMAP, "Kaneko VIEW2 Tilemaps", tag, owner, clock, "kaneko_view2_tilemap", __FILE__),
 	m_gfxdecode(*this)
 {
@@ -108,7 +108,7 @@ kaneko_view2_tilemap_device::kaneko_view2_tilemap_device(const machine_config &m
 //  gfx decoder
 //-------------------------------------------------
 
-void kaneko_view2_tilemap_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void kaneko_view2_tilemap_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<kaneko_view2_tilemap_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -151,11 +151,11 @@ void kaneko_view2_tilemap_device::device_start()
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_vram[0] = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x1000/2);
-	m_vram[1] = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x1000/2);
-	m_vscroll[0] = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x1000/2);
-	m_vscroll[1] = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x1000/2);
-	m_regs = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x20/2);
+	m_vram[0] = make_unique_clear<UINT16[]>(0x1000/2);
+	m_vram[1] = make_unique_clear<UINT16[]>(0x1000/2);
+	m_vscroll[0] = make_unique_clear<UINT16[]>(0x1000/2);
+	m_vscroll[1] = make_unique_clear<UINT16[]>(0x1000/2);
+	m_regs = make_unique_clear<UINT16[]>(0x20/2);
 
 	m_tmap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(kaneko_view2_tilemap_device::get_tile_info_0),this), TILEMAP_SCAN_ROWS,
 											16,16, 0x20,0x20    );
@@ -175,11 +175,11 @@ void kaneko_view2_tilemap_device::device_start()
 	m_tmap[0]->set_scrolldy(-m_dy,      m_ydim + m_dy -1 );
 	m_tmap[1]->set_scrolldy(-m_dy,      m_ydim + m_dy -1 );
 
-	save_pointer(NAME(m_vram[0]), 0x1000/2);
-	save_pointer(NAME(m_vram[1]), 0x1000/2);
-	save_pointer(NAME(m_vscroll[0]), 0x1000/2);
-	save_pointer(NAME(m_vscroll[1]), 0x1000/2);
-	save_pointer(NAME(m_regs), 0x20/2);
+	save_pointer(NAME(m_vram[0].get()), 0x1000/2);
+	save_pointer(NAME(m_vram[1].get()), 0x1000/2);
+	save_pointer(NAME(m_vscroll[0].get()), 0x1000/2);
+	save_pointer(NAME(m_vscroll[1].get()), 0x1000/2);
+	save_pointer(NAME(m_regs.get()), 0x20/2);
 	save_item(NAME(m_vram_tile_addition[0]));
 	save_item(NAME(m_vram_tile_addition[1]));
 }

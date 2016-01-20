@@ -28,12 +28,12 @@ class c1526_base_t :  public device_t
 {
 public:
 	// construction/destruction
-	c1526_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	c1526_base_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 
@@ -44,18 +44,18 @@ class c1526_t :  public c1526_base_t,
 {
 public:
 	// construction/destruction
-	c1526_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1526_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
 protected:
 	// device_cbm_iec_interface overrides
-	void cbm_iec_atn(int state);
-	void cbm_iec_data(int state);
-	void cbm_iec_reset(int state);
+	void cbm_iec_atn(int state) override;
+	void cbm_iec_data(int state) override;
+	void cbm_iec_reset(int state) override;
 };
 
 
@@ -66,17 +66,17 @@ class c4023_t :  public c1526_base_t,
 {
 public:
 	// construction/destruction
-	c4023_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c4023_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
 protected:
 	// device_ieee488_interface overrides
-	virtual void ieee488_atn(int state);
-	virtual void ieee488_ifc(int state);
+	virtual void ieee488_atn(int state) override;
+	virtual void ieee488_ifc(int state) override;
 };
 
 

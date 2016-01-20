@@ -822,7 +822,7 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(tandy2k_state, rxrdy_w))
 	MCFG_I8251_TXRDY_HANDLER(WRITELINE(tandy2k_state, txrdy_w))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_dsr))
 	// TODO pin 15 external transmit clock

@@ -38,15 +38,15 @@ static int parse_options(int argc, char *argv[], int minunnamed, int maxunnamed,
 	int i;
 	int lastunnamed = 0;
 	char *s;
-	char *name = NULL;
-	char *value = NULL;
+	char *name = nullptr;
+	char *value = nullptr;
 	optreserr_t oerr;
 	static char buf[256];
 
 	if (filter)
-		*filter = NULL;
+		*filter = nullptr;
 	if (fork)
-		*fork = NULL;
+		*fork = nullptr;
 
 	for (i = 0; i < argc; i++)
 	{
@@ -177,9 +177,9 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	imgtoolerr_t err;
 	int total_count, total_size, freespace_err;
 	UINT64 freespace;
-	imgtool_image *image = NULL;
-	imgtool_partition *partition = NULL;
-	imgtool_directory *imgenum = NULL;
+	imgtool_image *image = nullptr;
+	imgtool_partition *partition = nullptr;
+	imgtool_directory *imgenum = nullptr;
 	imgtool_dirent ent;
 	char buf[512];
 	char last_modified[19];
@@ -196,7 +196,7 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	if (err)
 		goto done;
 
-	path = argc > 2 ? argv[2] : NULL;
+	path = argc > 2 ? argv[2] : nullptr;
 
 	err = imgtool_directory_open(partition, path, &imgenum);
 	if (err)
@@ -260,7 +260,7 @@ done:
 	if (image)
 		imgtool_image_close(image);
 	if (err)
-		reporterror(err, c, argv[0], argv[1], NULL, NULL, NULL);
+		reporterror(err, c, argv[0], argv[1], nullptr, nullptr, nullptr);
 	return err ? -1 : 0;
 }
 
@@ -269,8 +269,8 @@ done:
 static int cmd_get(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
-	imgtool_image *image = NULL;
-	imgtool_partition *partition = NULL;
+	imgtool_image *image = nullptr;
+	imgtool_partition *partition = nullptr;
 	const char *filename;
 	char *new_filename;
 	int unnamedargs = 0;
@@ -288,11 +288,11 @@ static int cmd_get(const struct command *c, int argc, char *argv[])
 
 	filename = interpret_filename(argv[2]);
 
-	unnamedargs = parse_options(argc, argv, 3, 4, NULL, &filter, &fork);
+	unnamedargs = parse_options(argc, argv, 3, 4, nullptr, &filter, &fork);
 	if (unnamedargs < 0)
 		goto done;
 
-	new_filename = (unnamedargs == 4) ? argv[3] : NULL;
+	new_filename = (unnamedargs == 4) ? argv[3] : nullptr;
 
 	err = imgtool_partition_get_file(partition, filename, fork, new_filename, filter);
 	if (err)
@@ -302,7 +302,7 @@ static int cmd_get(const struct command *c, int argc, char *argv[])
 
 done:
 	if (err)
-		reporterror(err, c, argv[0], argv[1], argv[2], argv[3], NULL);
+		reporterror(err, c, argv[0], argv[1], argv[2], argv[3], nullptr);
 	if (partition)
 		imgtool_partition_close(partition);
 	if (image)
@@ -316,13 +316,13 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	int i;
-	imgtool_image *image = NULL;
-	imgtool_partition *partition = NULL;
-	const char *filename = NULL;
+	imgtool_image *image = nullptr;
+	imgtool_partition *partition = nullptr;
+	const char *filename = nullptr;
 	int unnamedargs;
 	filter_getinfoproc filter;
 	const imgtool_module *module;
-	option_resolution *resolution = NULL;
+	option_resolution *resolution = nullptr;
 	const char *fork;
 	const char *new_filename;
 	char **filename_list;
@@ -394,7 +394,7 @@ done:
 	if (resolution)
 		option_resolution_close(resolution);
 	if (err)
-		reporterror(err, c, argv[0], argv[1], filename, NULL, resolution);
+		reporterror(err, c, argv[0], argv[1], filename, nullptr, resolution);
 	return err ? -1 : 0;
 }
 
@@ -403,13 +403,13 @@ done:
 static int cmd_getall(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
-	imgtool_image *image = NULL;
-	imgtool_partition *partition = NULL;
-	imgtool_directory *imgenum = NULL;
+	imgtool_image *image = nullptr;
+	imgtool_partition *partition = nullptr;
+	imgtool_directory *imgenum = nullptr;
 	imgtool_dirent ent;
 	filter_getinfoproc filter;
 	int unnamedargs;
-	const char *path = NULL;
+	const char *path = nullptr;
 	int arg;
 	int partition_index = 0;
 
@@ -427,7 +427,7 @@ static int cmd_getall(const struct command *c, int argc, char *argv[])
 		path = argv[arg++];
 	}
 
-	unnamedargs = parse_options(argc, argv, arg, arg, NULL, &filter, NULL);
+	unnamedargs = parse_options(argc, argv, arg, arg, nullptr, &filter, nullptr);
 	if (unnamedargs < 0)
 		goto done;
 
@@ -441,7 +441,7 @@ static int cmd_getall(const struct command *c, int argc, char *argv[])
 	{
 		fprintf(stdout, "Retrieving %s (%u bytes)\n", ent.filename, (unsigned int) ent.filesize);
 
-		err = imgtool_partition_get_file(partition, ent.filename, NULL, NULL, filter);
+		err = imgtool_partition_get_file(partition, ent.filename, nullptr, nullptr, filter);
 		if (err)
 			goto done;
 	}
@@ -454,7 +454,7 @@ done:
 	if (image)
 		imgtool_image_close(image);
 	if (err)
-		reporterror(err, c, argv[0], argv[1], NULL, NULL, NULL);
+		reporterror(err, c, argv[0], argv[1], nullptr, nullptr, nullptr);
 	return err ? -1 : 0;
 }
 
@@ -463,8 +463,8 @@ done:
 static int cmd_del(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
-	imgtool_image *image = NULL;
-	imgtool_partition *partition = NULL;
+	imgtool_image *image = nullptr;
+	imgtool_partition *partition = nullptr;
 	int partition_index = 0;
 
 	err = imgtool_image_open_byname(argv[0], argv[1], OSD_FOPEN_RW, &image);
@@ -485,7 +485,7 @@ done:
 	if (image)
 		imgtool_image_close(image);
 	if (err)
-		reporterror(err, c, argv[0], argv[1], argv[2], NULL, NULL);
+		reporterror(err, c, argv[0], argv[1], argv[2], nullptr, nullptr);
 	return err ? -1 : 0;
 }
 
@@ -494,8 +494,8 @@ done:
 static int cmd_mkdir(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
-	imgtool_image *image = NULL;
-	imgtool_partition *partition = NULL;
+	imgtool_image *image = nullptr;
+	imgtool_partition *partition = nullptr;
 	int partition_index = 0;
 
 	err = imgtool_image_open_byname(argv[0], argv[1], OSD_FOPEN_RW, &image);
@@ -516,7 +516,7 @@ done:
 	if (image)
 		imgtool_image_close(image);
 	if (err)
-		reporterror(err, c, argv[0], argv[1], argv[2], NULL, NULL);
+		reporterror(err, c, argv[0], argv[1], argv[2], nullptr, nullptr);
 	return err ? -1 : 0;
 }
 
@@ -525,8 +525,8 @@ done:
 static int cmd_rmdir(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
-	imgtool_image *image = NULL;
-	imgtool_partition *partition = NULL;
+	imgtool_image *image = nullptr;
+	imgtool_partition *partition = nullptr;
 	int partition_index = 0;
 
 	err = imgtool_image_open_byname(argv[0], argv[1], OSD_FOPEN_RW, &image);
@@ -547,7 +547,7 @@ done:
 	if (image)
 		imgtool_image_close(image);
 	if (err)
-		reporterror(err, c, argv[0], argv[1], argv[2], NULL, NULL);
+		reporterror(err, c, argv[0], argv[1], argv[2], nullptr, nullptr);
 	return err ? -1 : 0;
 }
 
@@ -571,7 +571,7 @@ static int cmd_identify(const struct command *c, int argc, char *argv[])
 	return 0;
 
 error:
-	reporterror(err, c, NULL, argv[0], NULL, NULL, 0);
+	reporterror(err, c, nullptr, argv[0], nullptr, nullptr, nullptr);
 	return -1;
 }
 
@@ -582,7 +582,7 @@ static int cmd_create(const struct command *c, int argc, char *argv[])
 	imgtoolerr_t err;
 	int unnamedargs;
 	const imgtool_module *module;
-	option_resolution *resolution = NULL;
+	option_resolution *resolution = nullptr;
 
 	module = imgtool_find_module(argv[0]);
 	if (!module)
@@ -601,11 +601,11 @@ static int cmd_create(const struct command *c, int argc, char *argv[])
 		}
 	}
 
-	unnamedargs = parse_options(argc, argv, 2, 3, resolution, NULL, NULL);
+	unnamedargs = parse_options(argc, argv, 2, 3, resolution, nullptr, nullptr);
 	if (unnamedargs < 0)
 		return -1;
 
-	err = imgtool_image_create(module, argv[1], resolution, NULL);
+	err = imgtool_image_create(module, argv[1], resolution, nullptr);
 	if (err)
 		goto error;
 
@@ -616,7 +616,7 @@ static int cmd_create(const struct command *c, int argc, char *argv[])
 error:
 	if (resolution)
 		option_resolution_close(resolution);
-	reporterror(err, c, argv[0], argv[1], NULL, NULL, 0);
+	reporterror(err, c, argv[0], argv[1], nullptr, nullptr, nullptr);
 	return -1;
 }
 
@@ -626,7 +626,7 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
 	imgtool_image *img;
-	imgtool_stream *stream = NULL;
+	imgtool_stream *stream = nullptr;
 	dynamic_buffer buffer;
 	UINT32 size, track, head, sector;
 
@@ -663,7 +663,7 @@ done:
 	if (stream)
 		stream_close(stream);
 	if (err)
-		reporterror(err, c, argv[0], argv[1], NULL, NULL, 0);
+		reporterror(err, c, argv[0], argv[1], nullptr, nullptr, nullptr);
 	return err ? -1 : 0;
 }
 
@@ -673,7 +673,7 @@ static int cmd_writesector(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
 	imgtool_image *img;
-	imgtool_stream *stream = NULL;
+	imgtool_stream *stream = nullptr;
 	dynamic_buffer buffer;
 	UINT32 size, track, head, sector;
 
@@ -707,7 +707,7 @@ done:
 	if (stream)
 		stream_close(stream);
 	if (err)
-		reporterror(err, c, argv[0], argv[1], NULL, NULL, 0);
+		reporterror(err, c, argv[0], argv[1], nullptr, nullptr, nullptr);
 	return err ? -1 : 0;
 }
 
@@ -719,7 +719,7 @@ static int cmd_listformats(const struct command *c, int argc, char *argv[])
 
 	fprintf(stdout, "Image formats supported by imgtool:\n\n");
 
-	mod = imgtool_find_module(NULL);
+	mod = imgtool_find_module(nullptr);
 	while(mod)
 	{
 		fprintf(stdout, "  %-25s%s\n", mod->name, mod->description);
@@ -865,7 +865,7 @@ static int cmd_listdriveroptions(const struct command *c, int argc, char *argv[]
 	return 0;
 
 error:
-	reporterror((imgtoolerr_t)(IMGTOOLERR_MODULENOTFOUND|IMGTOOLERR_SRC_MODULE), c, argv[0], NULL, NULL, NULL, NULL);
+	reporterror((imgtoolerr_t)(IMGTOOLERR_MODULENOTFOUND|IMGTOOLERR_SRC_MODULE), c, argv[0], nullptr, nullptr, nullptr, nullptr);
 	return -1;
 }
 
@@ -886,8 +886,8 @@ static const struct command cmds[] =
 	{ "readsector",         cmd_readsector,         "<format> <imagename> <track> <head> <sector> <filename>", 6, 6, 0 },
 	{ "writesector",        cmd_writesector,        "<format> <imagename> <track> <head> <sector> <filename>", 6, 6, 0 },
 	{ "identify",           cmd_identify,           "<imagename>", 1, 1 },
-	{ "listformats",        cmd_listformats,        NULL, 0, 0, 0 },
-	{ "listfilters",        cmd_listfilters,        NULL, 0, 0, 0 },
+	{ "listformats",        cmd_listformats,        nullptr, 0, 0, 0 },
+	{ "listfilters",        cmd_listfilters,        nullptr, 0, 0, 0 },
 	{ "listdriveroptions",  cmd_listdriveroptions, "<format>", 1, 1, 0 }
 };
 
@@ -918,7 +918,7 @@ int CLIB_DECL main(int argc, char *argv[])
 					goto cmderror;
 
 				/* initialize the imgtool core */
-				imgtool_init(TRUE, NULL);
+				imgtool_init(TRUE, nullptr);
 
 				if (c->lastargrepeats && (argc > c->maxargs))
 				{

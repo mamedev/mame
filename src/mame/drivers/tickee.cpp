@@ -40,7 +40,7 @@ public:
 		TIMER_SETUP_GUN_INTERRUPTS
 	};
 
-	tickee_state(const machine_config &mconfig, device_type type, const char *tag)
+	tickee_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
@@ -87,7 +87,7 @@ public:
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(rapidfir_scanline_update);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

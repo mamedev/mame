@@ -131,7 +131,7 @@ void lordgun_state::video_start()
 
 	// Buffer bitmaps for 4 tilemaps (0-3) + sprites (4)
 	for (i = 0; i < 5; i++)
-		m_bitmaps[i] = auto_bitmap_ind16_alloc(machine(), w, h);
+		m_bitmaps[i] = std::make_unique<bitmap_ind16>(w, h);
 }
 
 /***************************************************************************

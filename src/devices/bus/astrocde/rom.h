@@ -13,15 +13,15 @@ class astrocade_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	astrocade_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	astrocade_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	astrocade_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	astrocade_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start() {}
-	virtual void device_reset() {}
+	virtual void device_start() override {}
+	virtual void device_reset() override {}
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 };
 
 // ======================> astrocade_rom_256k_device
@@ -30,13 +30,13 @@ class astrocade_rom_256k_device : public astrocade_rom_device
 {
 public:
 	// construction/destruction
-	astrocade_rom_256k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	astrocade_rom_256k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 
 private:
 	UINT8 m_base_bank;
@@ -48,13 +48,13 @@ class astrocade_rom_512k_device : public astrocade_rom_device
 {
 public:
 	// construction/destruction
-	astrocade_rom_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	astrocade_rom_512k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 
 private:
 	UINT8 m_base_bank;

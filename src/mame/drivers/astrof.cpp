@@ -106,7 +106,7 @@ INPUT_CHANGED_MEMBER(astrof_state::coin_inserted)
 {
 	/* coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
-	coin_counter_w(machine(), 0, newval);
+	machine().bookkeeping().coin_counter_w(0, newval);
 }
 
 
@@ -170,8 +170,8 @@ CUSTOM_INPUT_MEMBER(astrof_state::tomahawk_controls_r)
 void astrof_state::video_start()
 {
 	/* allocate the color RAM -- half the size of the video RAM as A0 is not connected */
-	m_colorram = auto_alloc_array(machine(), UINT8, m_videoram.bytes() / 2);
-	save_pointer(NAME(m_colorram), m_videoram.bytes() / 2);
+	m_colorram = std::make_unique<UINT8[]>(m_videoram.bytes() / 2);
+	save_pointer(NAME(m_colorram.get()), m_videoram.bytes() / 2);
 }
 
 

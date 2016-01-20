@@ -26,7 +26,7 @@ class cgenie_printer_device : public device_t, public device_parallel_interface
 {
 public:
 	// construction/destruction
-	cgenie_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cgenie_printer_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER(busy_w);
 	DECLARE_WRITE_LINE_MEMBER(perror_w);
@@ -34,13 +34,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fault_w);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void pa_w(UINT8 data);
-	virtual UINT8 pb_r();
-	virtual void pb_w(UINT8 data);
+	virtual void pa_w(UINT8 data) override;
+	virtual UINT8 pb_r() override;
+	virtual void pb_w(UINT8 data) override;
 
 private:
 	required_device<centronics_device> m_centronics;

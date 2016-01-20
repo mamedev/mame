@@ -275,7 +275,7 @@ void nbmj8891_state::vramflip(int vram)
 
 	if (m_flipscreen == m_flipscreen_old) return;
 
-	vidram = vram ? m_videoram1 : m_videoram0;
+	vidram = vram ? m_videoram1.get() : m_videoram0.get();
 
 	for (y = 0; y < (height / 2); y++)
 	{
@@ -488,10 +488,10 @@ VIDEO_START_MEMBER(nbmj8891_state,_1layer)
 
 	m_blitter_timer = timer_alloc(TIMER_BLITTER);
 	m_screen->register_screen_bitmap(m_tmpbitmap0);
-	m_videoram0 = auto_alloc_array(machine(), UINT8, width * height);
-	m_palette_ptr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_clut = auto_alloc_array(machine(), UINT8, 0x800);
-	memset(m_videoram0, 0xff, (width * height * sizeof(char)));
+	m_videoram0 = std::make_unique<UINT8[]>(width * height);
+	m_palette_ptr = std::make_unique<UINT8[]>(0x200);
+	m_clut = std::make_unique<UINT8[]>(0x800);
+	memset(m_videoram0.get(), 0xff, (width * height * sizeof(char)));
 	m_gfxdraw_mode = 0;
 	m_screen_refresh = 1;
 
@@ -513,17 +513,17 @@ void nbmj8891_state::video_start()
 	m_blitter_timer = timer_alloc(TIMER_BLITTER);
 	m_screen->register_screen_bitmap(m_tmpbitmap0);
 	m_screen->register_screen_bitmap(m_tmpbitmap1);
-	m_videoram0 = auto_alloc_array(machine(), UINT8, width * height);
-	m_videoram1 = auto_alloc_array(machine(), UINT8, width * height);
-	m_palette_ptr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_clut = auto_alloc_array(machine(), UINT8, 0x800);
-	memset(m_videoram0, 0xff, (width * height * sizeof(UINT8)));
-	memset(m_videoram1, 0xff, (width * height * sizeof(UINT8)));
+	m_videoram0 = std::make_unique<UINT8[]>(width * height);
+	m_videoram1 = std::make_unique<UINT8[]>(width * height);
+	m_palette_ptr = std::make_unique<UINT8[]>(0x200);
+	m_clut = std::make_unique<UINT8[]>(0x800);
+	memset(m_videoram0.get(), 0xff, (width * height * sizeof(UINT8)));
+	memset(m_videoram1.get(), 0xff, (width * height * sizeof(UINT8)));
 	m_gfxdraw_mode = 1;
 	m_screen_refresh = 1;
 
 	common_save_state();
-	save_pointer(NAME(m_videoram1), width * height);
+	save_pointer(NAME(m_videoram1.get()), width * height);
 }
 
 void nbmj8891_state::common_save_state()
@@ -542,9 +542,9 @@ void nbmj8891_state::common_save_state()
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_clutsel));
 	save_item(NAME(m_gfxdraw_mode));
-	save_pointer(NAME(m_videoram0), m_screen->width() * m_screen->height());
-	save_pointer(NAME(m_palette_ptr), 0x200);
-	save_pointer(NAME(m_clut), 0x800);
+	save_pointer(NAME(m_videoram0.get()), m_screen->width() * m_screen->height());
+	save_pointer(NAME(m_palette_ptr.get()), 0x200);
+	save_pointer(NAME(m_clut.get()), 0x800);
 	save_item(NAME(m_flipscreen_old));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(nbmj8891_state::postload), this));
@@ -587,11 +587,11 @@ UINT32 nbmj8891_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 		if (m_gfxdraw_mode)
 		{
-			copyscrollbitmap      (bitmap, m_tmpbitmap0, 0, 0, 0, 0, cliprect);
-			copyscrollbitmap_trans(bitmap, m_tmpbitmap1, 0, 0, 1, &scrolly, cliprect, 0xff);
+			copyscrollbitmap      (bitmap, m_tmpbitmap0, 0, nullptr, 0, nullptr, cliprect);
+			copyscrollbitmap_trans(bitmap, m_tmpbitmap1, 0, nullptr, 1, &scrolly, cliprect, 0xff);
 		}
 		else
-			copyscrollbitmap(bitmap, m_tmpbitmap0, 0, 0, 1, &scrolly, cliprect);
+			copyscrollbitmap(bitmap, m_tmpbitmap0, 0, nullptr, 1, &scrolly, cliprect);
 	}
 	else
 		bitmap.fill(0xff);

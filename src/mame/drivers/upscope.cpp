@@ -35,7 +35,7 @@
 class upscope_state : public amiga_state
 {
 public:
-	upscope_state(const machine_config &mconfig, device_type type, const char *tag)
+	upscope_state(const machine_config &mconfig, device_type type, std::string tag)
 		: amiga_state(mconfig, type, tag),
 	m_prev_cia1_porta(0xff),
 	m_parallel_data(0xff)
@@ -55,7 +55,7 @@ public:
 	DECLARE_DRIVER_INIT(upscope);
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 
@@ -148,7 +148,7 @@ WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
 
 				case 0x02:
 					/* coin counter */
-					coin_counter_w(machine(), 0, data & 1);
+					machine().bookkeeping().coin_counter_w(0, data & 1);
 					break;
 
 				case 0x03:
@@ -317,7 +317,7 @@ MACHINE_CONFIG_END
 ROM_START( upscope )
 	ROM_REGION(0x80000, "kickstart", 0)
 	ROM_LOAD16_WORD_SWAP("315093-01.u2", 0x00000, 0x40000, CRC(a6ce1636) SHA1(11f9e62cf299f72184835b7b2a70a16333fc0d88))
-	ROM_COPY("kickstart", 0x00000, 0x40000, 0x40000)
+	ROM_COPY("kickstart", 0x000000, 0x40000, 0x40000)
 
 	ROM_REGION(0x080000, "user2", 0)
 	ROM_LOAD16_BYTE( "upscope.u5",   0x000000, 0x008000, CRC(c109912e) SHA1(dcac9522e3c4818b2a02212b9173540fcf4bd463) )

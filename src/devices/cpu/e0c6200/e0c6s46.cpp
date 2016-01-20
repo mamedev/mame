@@ -45,15 +45,15 @@ ADDRESS_MAP_END
 
 
 // device definitions
-e0c6s46_device::e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e0c6s46_device::e0c6s46_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: e0c6200_cpu_device(mconfig, E0C6S46, "E0C6S46", tag, owner, clock, ADDRESS_MAP_NAME(e0c6s46_program), ADDRESS_MAP_NAME(e0c6s46_data), "e0c6s46", __FILE__)
 	, m_vram1(*this, "vram1")
 	, m_vram2(*this, "vram2"), m_osc(0), m_svd(0), m_lcd_control(0), m_lcd_contrast(0)
-	  , m_pixel_update_handler(nullptr)
+		, m_pixel_update_handler(nullptr)
 	, m_write_r0(*this), m_write_r1(*this), m_write_r2(*this), m_write_r3(*this), m_write_r4(*this)
 	, m_read_p0(*this), m_read_p1(*this), m_read_p2(*this), m_read_p3(*this)
-	, m_write_p0(*this), m_write_p1(*this), m_write_p2(*this), m_write_p3(*this), m_r_dir(0), m_p_dir(0), m_p_pullup(0), m_dfk0(0), m_256_src_pulse(0), m_core_256_handle(nullptr), 
-	m_watchdog_count(0), m_clktimer_count(0), m_stopwatch_on(0), m_swl_cur_pulse(0), m_swl_slice(0), m_swl_count(0), m_swh_count(0), m_prgtimer_select(0), m_prgtimer_on(0), m_prgtimer_src_pulse(0), 
+	, m_write_p0(*this), m_write_p1(*this), m_write_p2(*this), m_write_p3(*this), m_r_dir(0), m_p_dir(0), m_p_pullup(0), m_dfk0(0), m_256_src_pulse(0), m_core_256_handle(nullptr),
+	m_watchdog_count(0), m_clktimer_count(0), m_stopwatch_on(0), m_swl_cur_pulse(0), m_swl_slice(0), m_swl_count(0), m_swh_count(0), m_prgtimer_select(0), m_prgtimer_on(0), m_prgtimer_src_pulse(0),
 	m_prgtimer_cur_pulse(0), m_prgtimer_count(0), m_prgtimer_reload(0), m_prgtimer_handle(nullptr), m_bz_43_on(0), m_bz_freq(0), m_bz_envelope(0), m_bz_duty_ratio(0), m_bz_1shot_on(0), m_bz_1shot_running(false), m_bz_1shot_count(0), m_bz_pulse(0), m_buzzer_handle(nullptr)
 { }
 
@@ -405,7 +405,7 @@ void e0c6s46_device::clock_watchdog()
 	// initial reset after 3 to 4 seconds
 	if (++m_watchdog_count == 4)
 	{
-		logerror("%s watchdog reset\n", tag());
+		logerror("%s watchdog reset\n", tag().c_str());
 		m_watchdog_count = 0;
 		device_reset();
 	}
@@ -601,7 +601,7 @@ UINT32 e0c6s46_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				int seg = offset / 2;
 				int com = bank * 8 + (offset & 1) * 4 + c;
 
-				if (m_pixel_update_handler != NULL)
+				if (m_pixel_update_handler != nullptr)
 					m_pixel_update_handler(*this, bitmap, cliprect, m_lcd_contrast, seg, com, pixel);
 				else if (cliprect.contains(seg, com))
 					bitmap.pix16(com, seg) = pixel;
@@ -705,7 +705,7 @@ READ8_MEMBER(e0c6s46_device::io_r)
 
 		default:
 			if (!space.debugger_access())
-				logerror("%s unknown io_r from $0F%02X at $%04X\n", tag(), offset, m_prev_pc);
+				logerror("%s unknown io_r from $0F%02X at $%04X\n", tag().c_str(), offset, m_prev_pc);
 			break;
 	}
 
@@ -773,7 +773,7 @@ WRITE8_MEMBER(e0c6s46_device::io_w)
 			// d2: OSC3 on (high freq)
 			// d3: clock source OSC1 or OSC3
 			if (data & 8)
-				logerror("%s io_w selected OSC3! PC=$%04X\n", tag(), m_prev_pc);
+				logerror("%s io_w selected OSC3! PC=$%04X\n", tag().c_str(), m_prev_pc);
 			m_osc = data;
 			break;
 
@@ -876,7 +876,7 @@ WRITE8_MEMBER(e0c6s46_device::io_w)
 			// d2: reset envelope
 			// d3: trigger one-shot buzzer
 			if (data & 1)
-				logerror("%s io_w enabled envelope, PC=$%04X\n", tag(), m_prev_pc);
+				logerror("%s io_w enabled envelope, PC=$%04X\n", tag().c_str(), m_prev_pc);
 			m_bz_envelope = data & 3;
 			m_bz_1shot_on |= data & 8;
 			break;
@@ -889,7 +889,7 @@ WRITE8_MEMBER(e0c6s46_device::io_w)
 
 		default:
 			if (machine().phase() > MACHINE_PHASE_RESET)
-				logerror("%s unknown io_w $%X to $0F%02X at $%04X\n", tag(), data, offset, m_prev_pc);
+				logerror("%s unknown io_w $%X to $0F%02X at $%04X\n", tag().c_str(), data, offset, m_prev_pc);
 			break;
 	}
 }

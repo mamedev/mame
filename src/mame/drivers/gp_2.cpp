@@ -43,7 +43,7 @@ ToDo:
 class gp_2_state : public genpin_class
 {
 public:
-	gp_2_state(const machine_config &mconfig, device_type type, const char *tag)
+	gp_2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ctc(*this, "ctc")
@@ -67,7 +67,7 @@ private:
 	UINT8 m_u14;
 	UINT8 m_digit;
 	UINT8 m_segment[16];
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_ioport m_io_dsw0;
@@ -536,17 +536,17 @@ WRITE8_MEMBER( gp_2_state::porta_w )
 	else
 	if (m_u14 == 7)
 	{
-		output_set_digit_value(m_digit, patterns[m_segment[7]]);
-		output_set_digit_value(m_digit+8, patterns[m_segment[8]]);
-		output_set_digit_value(m_digit+16, patterns[m_segment[9]]);
-		output_set_digit_value(m_digit+24, patterns[m_segment[10]]);
-		output_set_digit_value(m_digit+32, patterns[m_segment[11]]);
+		output().set_digit_value(m_digit, patterns[m_segment[7]]);
+		output().set_digit_value(m_digit+8, patterns[m_segment[8]]);
+		output().set_digit_value(m_digit+16, patterns[m_segment[9]]);
+		output().set_digit_value(m_digit+24, patterns[m_segment[10]]);
+		output().set_digit_value(m_digit+32, patterns[m_segment[11]]);
 	}
 }
 
 WRITE8_MEMBER( gp_2_state::portc_w )
 {
-	output_set_value("led0", !BIT(data, 3));
+	output().set_value("led0", !BIT(data, 3));
 	m_digit = data & 7;
 }
 
@@ -566,7 +566,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( gp_2_state::zero_timer )
 static const z80_daisy_config daisy_chain[] =
 {
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 static MACHINE_CONFIG_START( gp_2, gp_2_state )

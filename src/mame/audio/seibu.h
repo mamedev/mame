@@ -43,7 +43,7 @@ ADDRESS_MAP_EXTERN(seibu3_adpcm_sound_map, 8);
 class seibu_sound_device : public device_t
 {
 public:
-	seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	seibu_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~seibu_sound_device() {}
 
 	DECLARE_READ16_MEMBER( main_word_r );
@@ -67,12 +67,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	private:
 	int m_encryption_mode;
-	UINT8 *m_decrypted_opcodes;
+	std::unique_ptr<UINT8[]> m_decrypted_opcodes;
 
 	// internal state
 	device_t *m_sound_cpu;
@@ -102,10 +102,10 @@ class seibu_adpcm_device : public device_t,
 									public device_sound_interface
 {
 public:
-	seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	seibu_adpcm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~seibu_adpcm_device() {}
 
-	static void set_adpcm_rom_tag(device_t &device, const char *tag) { downcast<seibu_adpcm_device &>(device).m_rom_tag = tag; }
+	static void set_adpcm_rom_tag(device_t &device, std::string tag) { downcast<seibu_adpcm_device &>(device).m_rom_tag = tag; }
 
 	void decrypt(const char *region);
 	DECLARE_WRITE8_MEMBER( adr_w );
@@ -113,10 +113,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	private:
 	// internal state
@@ -126,7 +126,7 @@ protected:
 	UINT32 m_end;
 	UINT8 m_nibble;
 	UINT8 m_playing;
-	const char *m_rom_tag;
+	std::string m_rom_tag;
 	UINT8 *m_base;
 };
 

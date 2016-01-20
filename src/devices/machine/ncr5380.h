@@ -41,7 +41,7 @@ class ncr5380_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
-	ncr5380_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ncr5380_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<ncr5380_device &>(device).m_irq_cb.set_callback(object); }
 
@@ -51,9 +51,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_stop();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_stop() override;
 
 private:
 	UINT8 m_5380_Registers[8];

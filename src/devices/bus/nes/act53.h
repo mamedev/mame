@@ -12,14 +12,14 @@ class nes_action53_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_action53_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_action53_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual void device_start() override;
+	virtual DECLARE_WRITE8_MEMBER(write_l) override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 private:
 	void update_prg();

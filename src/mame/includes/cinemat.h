@@ -13,7 +13,7 @@
 class cinemat_state : public driver_device
 {
 public:
-	cinemat_state(const machine_config &mconfig, device_type type, const char *tag)
+	cinemat_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ay1(*this, "ay1"),
@@ -76,10 +76,10 @@ public:
 	DECLARE_DRIVER_INIT(tailg);
 	DECLARE_DRIVER_INIT(sundance);
 	DECLARE_DRIVER_INIT(qb3);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void sound_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void sound_start() override;
+	virtual void video_start() override;
 	DECLARE_SOUND_RESET(spacewar);
 	DECLARE_SOUND_RESET(barrier);
 	DECLARE_SOUND_RESET(speedfrk);

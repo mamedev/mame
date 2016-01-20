@@ -34,7 +34,7 @@
 class limenko_state : public driver_device
 {
 public:
-	limenko_state(const machine_config &mconfig, device_type type, const char *tag)
+	limenko_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
@@ -104,7 +104,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,int priority);
 	void draw_sprites(UINT32 *sprites, const rectangle &cliprect, int count);
@@ -117,7 +117,7 @@ public:
 
 WRITE32_MEMBER(limenko_state::limenko_coincounter_w)
 {
-	coin_counter_w(machine(),0,data & 0x10000);
+	machine().bookkeeping().coin_counter_w(0,data & 0x10000);
 }
 
 

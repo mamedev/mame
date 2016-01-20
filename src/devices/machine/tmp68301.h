@@ -25,7 +25,7 @@ class tmp68301_device : public device_t,
 						public device_memory_interface
 {
 public:
-	tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tmp68301_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~tmp68301_device() {}
 
 	template<class _Object> static devcb_base &set_in_parallel_callback(device_t &device, _Object object) { return downcast<tmp68301_device &>(device).m_in_parallel_cb.set_callback(object); }
@@ -54,9 +54,9 @@ public:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 private:
 	devcb_read16         m_in_parallel_cb;

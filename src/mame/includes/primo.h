@@ -20,7 +20,7 @@
 class primo_state : public driver_device
 {
 public:
-	primo_state(const machine_config &mconfig, device_type type, const char *tag)
+	primo_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_iec(*this, CBM_IEC_TAG),
@@ -51,8 +51,8 @@ public:
 	DECLARE_DRIVER_INIT(primo48);
 	DECLARE_DRIVER_INIT(primo64);
 	DECLARE_DRIVER_INIT(primo32);
-	virtual void machine_reset();
-	virtual void machine_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(primob);
 	UINT32 screen_update_primo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(primo_vblank_interrupt);

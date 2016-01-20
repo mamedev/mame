@@ -27,15 +27,15 @@
 class photon_state : public pk8000_base_state
 {
 public:
-	photon_state(const machine_config &mconfig, device_type type, const char *tag)
+	photon_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pk8000_base_state(mconfig, type, tag),
 		m_speaker(*this, "speaker") { }
 
 	DECLARE_WRITE8_MEMBER(pk8000_80_porta_w);
 	DECLARE_READ8_MEMBER(pk8000_80_portb_r);
 	DECLARE_WRITE8_MEMBER(pk8000_80_portc_w);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_photon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pk8000_interrupt);
 	IRQ_CALLBACK_MEMBER(pk8000_irq_callback);

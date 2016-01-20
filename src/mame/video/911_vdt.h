@@ -37,7 +37,7 @@ enum vdt911_model_t
 class vdt911_device : public device_t
 {
 public:
-	vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vdt911_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(cru_r);
 	DECLARE_WRITE8_MEMBER(cru_w);
@@ -58,14 +58,14 @@ public:
 
 protected:
 	// device-level overrides
-	void device_config_complete();
-	void device_start();
-	void device_reset();
+	void device_config_complete() override;
+	void device_start() override;
+	void device_reset() override;
 
-	machine_config_constructor device_mconfig_additions() const;
-	ioport_constructor device_input_ports() const;
+	machine_config_constructor device_mconfig_additions() const override;
+	ioport_constructor device_input_ports() const override;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	void refresh(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y);

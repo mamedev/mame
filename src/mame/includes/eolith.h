@@ -7,7 +7,7 @@
 class eolith_state : public driver_device
 {
 public:
-	eolith_state(const machine_config &mconfig, device_type type, const char *tag)
+	eolith_state(const machine_config &mconfig, device_type type, std::string tag)
 		:   driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_soundcpu(*this, "soundcpu"),
@@ -41,7 +41,7 @@ public:
 
 	int m_coin_counter_bit;
 	int m_buffer;
-	UINT32 *m_vram;
+	std::unique_ptr<UINT32[]> m_vram;
 
 	UINT8 m_sound_data;
 

@@ -39,12 +39,12 @@ extern const device_type GROM;
 class ti99_grom_device : public bus8z_device, ti99grom_config
 {
 public:
-	ti99_grom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti99_grom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<ti99_grom_device &>(device).m_gromready.set_callback(object); }
 
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 
 private:
 	// Is this a GRAM (never seen actually, but obviously planned)
@@ -95,9 +95,9 @@ private:
 	// CPU into wait state mode. A timer is set to raise READY again.
 	void clear_ready();
 
-	virtual void device_start(void);
-	virtual void device_reset(void);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start(void) override;
+	virtual void device_reset(void) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

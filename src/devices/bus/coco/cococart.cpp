@@ -35,7 +35,7 @@ const device_type COCOCART_SLOT = &device_creator<cococart_slot_device>;
 //-------------------------------------------------
 //  cococart_slot_device - constructor
 //-------------------------------------------------
-cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cococart_slot_device::cococart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, COCOCART_SLOT, "CoCo Cartridge Slot", tag, owner, clock, "cococart_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this),
@@ -160,7 +160,7 @@ WRITE8_MEMBER(cococart_slot_device::write)
 
 static const char *line_value_string(cococart_line_value value)
 {
-	const char *s = NULL;
+	const char *s;
 	switch(value)
 	{
 		case COCOCART_LINE_VALUE_CLEAR:
@@ -299,9 +299,9 @@ void cococart_slot_device::cart_set_line(cococart_line line, cococart_line_value
 
 UINT8* cococart_slot_device::get_cart_base()
 {
-	if (m_cart != NULL)
+	if (m_cart != nullptr)
 		return m_cart->get_cart_base();
-	return NULL;
+	return nullptr;
 }
 
 
@@ -312,7 +312,7 @@ UINT8* cococart_slot_device::get_cart_base()
 
 void cococart_slot_device::set_cart_base_update(cococart_base_update_delegate update)
 {
-	if (m_cart != NULL)
+	if (m_cart != nullptr)
 		m_cart->set_cart_base_update(update);
 }
 
@@ -326,8 +326,8 @@ bool cococart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		offs_t read_length = 0;
-		if (software_entry() == NULL)
+		offs_t read_length;
+		if (software_entry() == nullptr)
 		{
 			read_length = fread(m_cart->get_cart_base(), 0x8000);
 		}
@@ -354,7 +354,7 @@ bool cococart_slot_device::call_load()
 
 bool cococart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry );
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
@@ -364,9 +364,9 @@ bool cococart_slot_device::call_softlist_load(software_list_device &swlist, cons
 //  get_default_card_software
 //-------------------------------------------------
 
-void cococart_slot_device::get_default_card_software(std::string &result)
+std::string cococart_slot_device::get_default_card_software()
 {
-	software_get_default_slot(result, "pak");
+	return software_get_default_slot("pak");
 }
 
 
@@ -424,7 +424,7 @@ WRITE8_MEMBER(device_cococart_interface::write)
 
 UINT8* device_cococart_interface::get_cart_base()
 {
-	return NULL;
+	return nullptr;
 }
 
 

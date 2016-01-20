@@ -333,24 +333,24 @@ WRITE8_MEMBER(bwidow_state::bwidow_misc_w)
 	*/
 
 	if (data == m_lastdata) return;
-	set_led_status(machine(), 0,~data & 0x10);
-	set_led_status(machine(), 1,~data & 0x20);
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	output().set_led_value(0,~data & 0x10);
+	output().set_led_value(1,~data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 	m_lastdata = data;
 }
 
 WRITE8_MEMBER(bwidow_state::spacduel_coin_counter_w)
 {
 	if (data == m_lastdata) return;
-	set_led_status(machine(), 0, !BIT(data,5)); // start lamp
-	set_led_status(machine(), 1, !BIT(data,4)); // select lamp
-	coin_lockout_w(machine(), 0, !BIT(data,3));
-	coin_lockout_w(machine(), 1, !BIT(data,3));
-	coin_lockout_w(machine(), 2, !BIT(data,3));
-	coin_counter_w(machine(), 0, BIT(data,0));
-	coin_counter_w(machine(), 1, BIT(data,1));
-	coin_counter_w(machine(), 2, BIT(data,2));
+	output().set_led_value(0, !BIT(data,5)); // start lamp
+	output().set_led_value(1, !BIT(data,4)); // select lamp
+	machine().bookkeeping().coin_lockout_w(0, !BIT(data,3));
+	machine().bookkeeping().coin_lockout_w(1, !BIT(data,3));
+	machine().bookkeeping().coin_lockout_w(2, !BIT(data,3));
+	machine().bookkeeping().coin_counter_w(0, BIT(data,0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data,1));
+	machine().bookkeeping().coin_counter_w(2, BIT(data,2));
 	m_lastdata = data;
 }
 
@@ -745,7 +745,7 @@ static MACHINE_CONFIG_START( bwidow, bwidow_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 480, 0, 440)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_DEVICE_ADD("avg", AVG, MASTER_CLOCK)
+	MCFG_DEVICE_ADD("avg", AVG, 0)
 	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
@@ -1062,8 +1062,8 @@ ROM_END
 GAME( 1980, spacduel, 0,        spacduel, spacduel, driver_device, 0, ROT0, "Atari", "Space Duel (version 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacduel1,spacduel, spacduel, spacduel, driver_device, 0, ROT0, "Atari", "Space Duel (version 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacduel0,spacduel, spacduel, spacduel, driver_device, 0, ROT0, "Atari", "Space Duel (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bwidow,   0,        bwidow,   bwidow,   driver_device, 0, ROT0, "Atari", "Black Widow", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bwidowp,  bwidow,   bwidowp,  bwidow,   driver_device, 0, ROT0, "Atari", "Black Widow (prototype)", MACHINE_NOT_WORKING )
+GAME( 1982, bwidow,   0,        bwidow,   bwidow, driver_device,   0, ROT0, "Atari", "Black Widow", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bwidowp,  bwidow,   bwidowp,  bwidow, driver_device,   0, ROT0, "Atari", "Black Widow (prototype)", MACHINE_NOT_WORKING )
 GAME( 1982, gravitar, 0,        gravitar, gravitar, driver_device, 0, ROT0, "Atari", "Gravitar (version 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, gravitar2,gravitar, gravitar, gravitar, driver_device, 0, ROT0, "Atari", "Gravitar (version 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, gravitar1,gravitar, gravitar, gravitar, driver_device, 0, ROT0, "Atari", "Gravitar (version 1)", MACHINE_SUPPORTS_SAVE )

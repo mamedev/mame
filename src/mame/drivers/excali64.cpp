@@ -50,7 +50,7 @@ ToDo:
 class excali64_state : public driver_device
 {
 public:
-	excali64_state(const machine_config &mconfig, device_type type, const char *tag)
+	excali64_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
@@ -249,7 +249,7 @@ READ8_MEMBER( excali64_state::porte8_r )
 
 WRITE8_MEMBER( excali64_state::porte4_w )
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 	if (BIT(data, 0))
 		floppy = m_floppy0->get_device();
 

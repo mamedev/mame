@@ -3,7 +3,7 @@
 class lvcards_state : public driver_device
 {
 public:
-	lvcards_state(const machine_config &mconfig, device_type type, const char *tag)
+	lvcards_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -22,7 +22,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lvcards_videoram_w);
 	DECLARE_WRITE8_MEMBER(lvcards_colorram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(lvcards);
 	DECLARE_MACHINE_START(lvpoker);
 	DECLARE_MACHINE_RESET(lvpoker);

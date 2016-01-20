@@ -645,7 +645,7 @@ static void set_ea(address_space &space, int ea)
 	mario_state *state = space.machine().driver_data<mario_state>();
 	//printf("ea: %d\n", ea);
 	//machine.device("audiocpu")->execute().set_input_line(MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
-	if (state->m_eabank != NULL)
+	if (state->m_eabank != nullptr)
 		state->membank(state->m_eabank)->set_entry(ea);
 }
 
@@ -667,8 +667,8 @@ void mario_state::sound_start()
 	SND[0x1001] = 0x01;
 #endif
 
-	m_eabank = NULL;
-	if (audiocpu != NULL && audiocpu->type() != Z80)
+	m_eabank = nullptr;
+	if (audiocpu != nullptr && audiocpu->type() != Z80)
 	{
 		m_eabank = "bank1";
 		audiocpu->memory().space(AS_PROGRAM).install_read_bank(0x000, 0x7ff, "bank1");

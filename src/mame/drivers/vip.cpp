@@ -459,7 +459,7 @@ READ_LINE_MEMBER( vip_state::ef1_r )
 
 READ_LINE_MEMBER( vip_state::ef2_r )
 {
-	set_led_status(machine(), LED_TAPE, m_cassette->input() > 0);
+	output().set_led_value(LED_TAPE, m_cassette->input() > 0);
 
 	return (m_cassette->input() < 0) ? ASSERT_LINE : CLEAR_LINE;
 }
@@ -480,7 +480,7 @@ WRITE_LINE_MEMBER( vip_state::q_w )
 	m_beeper->write(machine().driver_data()->generic_space(), NODE_01, state);
 
 	// Q led
-	set_led_status(machine(), LED_Q, state);
+	output().set_led_value(LED_Q, state);
 
 	// tape output
 	m_cassette->output(state ? 1.0 : -1.0);
@@ -617,7 +617,7 @@ void vip_state::machine_start()
 	}
 
 	// turn on power LED
-	set_led_status(machine(), LED_POWER, 1);
+	output().set_led_value(LED_POWER, 1);
 
 	// reset sound
 	m_beeper->write(machine().driver_data()->generic_space(), NODE_01, 0);
@@ -663,7 +663,7 @@ void vip_state::machine_reset()
 QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 {
 	UINT8 *ram = m_ram->pointer();
-	UINT8 *chip8_ptr = NULL;
+	UINT8 *chip8_ptr = nullptr;
 	int chip8_size = 0;
 	int size = image.length();
 
@@ -738,8 +738,8 @@ static MACHINE_CONFIG_START( vip, vip_state )
 	MCFG_DISCRETE_INTF(vip)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_VIP_BYTEIO_PORT_ADD(VIP_BYTEIO_PORT_TAG, vip_byteio_cards, NULL, WRITELINE(vip_state, byteio_inst_w))
-	MCFG_VIP_EXPANSION_SLOT_ADD(VIP_EXPANSION_SLOT_TAG, XTAL_3_52128MHz/2, vip_expansion_cards, NULL)
+	MCFG_VIP_BYTEIO_PORT_ADD(VIP_BYTEIO_PORT_TAG, vip_byteio_cards, nullptr, WRITELINE(vip_state, byteio_inst_w))
+	MCFG_VIP_EXPANSION_SLOT_ADD(VIP_EXPANSION_SLOT_TAG, XTAL_3_52128MHz/2, vip_expansion_cards, nullptr)
 	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vip_state, exp_int_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vip_state, exp_dma_out_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(vip_state, exp_dma_in_w))

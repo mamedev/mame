@@ -38,7 +38,7 @@
 class mb8421_device : public device_t
 {
 public:
-	mb8421_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb8421_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_intl_handler(device_t &device, _Object object) { return downcast<mb8421_device &>(device).m_intl_handler.set_callback(object); }
@@ -54,8 +54,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	UINT8 m_ram[0x800];

@@ -21,7 +21,7 @@ public:
 		TIMER_WGP_CPUB_INTERRUPT6
 	};
 
-	wgp_state(const machine_config &mconfig, device_type type, const char *tag)
+	wgp_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_spritemap(*this, "spritemap"),
 		m_spriteram(*this, "spriteram"),
@@ -93,9 +93,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_piv0_tile_info);
 	TILE_GET_INFO_MEMBER(get_piv1_tile_info);
 	TILE_GET_INFO_MEMBER(get_piv2_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(wgp2);
 	UINT32 screen_update_wgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(wgp_cpub_interrupt);
@@ -108,5 +108,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

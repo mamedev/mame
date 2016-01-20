@@ -266,7 +266,7 @@ static int instruction_hook(device_t &device, offs_t curpc)
 
 	addr_ptr = (UINT8*)space.get_read_ptr(curpc);
 
-	if ((addr_ptr !=NULL) && (addr_ptr[0]==0xCD))
+	if ((addr_ptr !=nullptr) && (addr_ptr[0]==0xCD))
 	{
 		if(DEBUG_SET_STATE(DECODE_BIOS) && (addr_ptr[1]==0xF0))
 		{
@@ -293,7 +293,7 @@ static void decode_subbios(device_t *device,offs_t pc, UINT8 raw_flag)
 	char    drv_str[80];
 	char    func_str[80];
 
-	void (*dump_dssi)(device_t *,UINT16, UINT16 ,UINT8) = NULL;
+	void (*dump_dssi)(device_t *,UINT16, UINT16 ,UINT8) = nullptr;
 
 	device_t *cpu = device->machine().device(MAINCPU_TAG);
 
@@ -614,14 +614,14 @@ static void decode_subbios(device_t *device,offs_t pc, UINT8 raw_flag)
 
 	if(raw_flag)
 	{
-		if(dump_dssi!=NULL)
+		if(dump_dssi!=nullptr)
 			dump_dssi(device,ds,si,raw_flag);
 	}
 	else
 	{
 		device->logerror("Type=%s, Driver=%s, Function=%s\n",type_str,drv_str,func_str);
 
-		if(dump_dssi!=NULL)
+		if(dump_dssi!=nullptr)
 			dump_dssi(device,ds,si,raw_flag);
 		device->logerror("=======================================================================\n");
 	}
@@ -937,8 +937,8 @@ void rmnimbus_state::nimbus_bank_memory()
 	}
 
 	map_blocks[0]  = ram;
-	map_blocks[1]  = (ramblocks[ramblock][1].blocksize==0) ? NULL : &ram[ramblocks[ramblock][1].blockbase*1024];
-	map_blocks[2]  = (ramblocks[ramblock][2].blocksize==0) ? NULL : &ram[ramblocks[ramblock][2].blockbase*1024];
+	map_blocks[1]  = (ramblocks[ramblock][1].blocksize==0) ? nullptr : &ram[ramblocks[ramblock][1].blockbase*1024];
+	map_blocks[2]  = (ramblocks[ramblock][2].blocksize==0) ? nullptr : &ram[ramblocks[ramblock][2].blockbase*1024];
 
 	//if(LOG_RAM) logerror("\n\nmcu_reg080=%02X, ramblock=%d, map_blocks[0]=%X, map_blocks[1]=%X, map_blocks[2]=%X\n",m_mcu_reg080,ramblock,(int)map_blocks[0],(int)map_blocks[1],(int)map_blocks[2]);
 
@@ -960,7 +960,7 @@ void rmnimbus_state::nimbus_bank_memory()
 		if(LOG_RAM) logerror("mapped %s",bank);
 
 		if((map_blockno>-1) && (block_ofs < ramblocks[ramblock][map_blockno].blocksize) &&
-			(map_blocks[map_blockno]!=NULL))
+			(map_blocks[map_blockno]!=nullptr))
 		{
 			map_base=(ramsel==0x07) ? map_blocks[map_blockno] : &map_blocks[map_blockno][block_ofs*1024];
 

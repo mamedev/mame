@@ -47,7 +47,7 @@ void taitosj_state::machine_reset()
 	m_zaccept = 1;
 	m_zready = 0;
 	m_busreq = 0;
-	if (m_mcu != NULL)
+	if (m_mcu != nullptr)
 		m_mcu->set_input_line(0, CLEAR_LINE);
 
 	m_spacecr_prot_value = 0;
@@ -56,7 +56,7 @@ void taitosj_state::machine_reset()
 
 WRITE8_MEMBER(taitosj_state::taitosj_bankswitch_w)
 {
-	coin_lockout_global_w(machine(), ~data & 1);
+	machine().bookkeeping().coin_lockout_global_w(~data & 1);
 
 	if(data & 0x80) membank("bank1")->set_entry(1);
 	else membank("bank1")->set_entry(0);

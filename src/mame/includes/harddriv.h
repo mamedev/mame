@@ -44,7 +44,7 @@ class harddriv_state :  public device_t
 	/* public device_video_interface */
 {
 public:
-	harddriv_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	harddriv_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 
 	required_device<cpu_device> m_maincpu;
@@ -430,15 +430,15 @@ public:
 	optional_device<atari_slapstic_device> m_slapstic_device;
 protected:
 	//virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 class harddriv_sound_board_device :  public device_t
 {
 public:
 	// construction/destruction
-	harddriv_sound_board_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	harddriv_sound_board_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~harddriv_sound_board_device() {}
 
 	DECLARE_READ16_MEMBER(hd68k_snd_data_r);
@@ -472,9 +472,9 @@ public:
 	DECLARE_READ16_MEMBER(hdsnddsp_compare_r);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	required_device<cpu_device> m_soundcpu;
@@ -506,11 +506,11 @@ private:
 class harddriv_board_device_state :  public harddriv_state
 {
 public:
-	harddriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	harddriv_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 
@@ -519,11 +519,11 @@ protected:
 class harddrivc_board_device_state :  public harddriv_state
 {
 public:
-	harddrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	harddrivc_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 
@@ -532,23 +532,23 @@ protected:
 class racedriv_board_device_state :  public harddriv_state
 {
 public:
-	racedriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	racedriv_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 
 class racedrivb1_board_device_state :  public racedriv_board_device_state
 {
 public:
-	racedrivb1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	racedrivb1_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		racedriv_board_device_state(mconfig, tag, owner, clock)
 		{};
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 /* Race Drivin' Compact */
@@ -556,33 +556,33 @@ protected:
 class racedrivc_board_device_state :  public harddriv_state
 {
 public:
-	racedrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	racedrivc_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 
 class racedrivc1_board_device_state :  public racedrivc_board_device_state
 {
 public:
-	racedrivc1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	racedrivc1_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		racedrivc_board_device_state(mconfig, tag, owner, clock)
 		{};
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class racedrivc_panorama_side_board_device_state :  public racedrivc_board_device_state
 {
 public:
-	racedrivc_panorama_side_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	racedrivc_panorama_side_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		racedrivc_board_device_state(mconfig, tag, owner, clock)
 		{};
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 };
 
 
@@ -591,11 +591,11 @@ protected:
 class stunrun_board_device_state :  public harddriv_state
 {
 public:
-	stunrun_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	stunrun_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 
@@ -604,34 +604,34 @@ protected:
 class steeltal_board_device_state :  public harddriv_state
 {
 public:
-	steeltal_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	steeltal_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 
 class steeltal1_board_device_state :  public steeltal_board_device_state
 {
 public:
-	steeltal1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	steeltal1_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		steeltal_board_device_state(mconfig, tag, owner, clock)
 		{};
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class steeltalp_board_device_state :  public steeltal_board_device_state
 {
 public:
-	steeltalp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	steeltalp_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		steeltal_board_device_state(mconfig, tag, owner, clock)
 		{};
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -641,11 +641,11 @@ protected:
 class strtdriv_board_device_state :  public harddriv_state
 {
 public:
-	strtdriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	strtdriv_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 
@@ -654,21 +654,21 @@ protected:
 class hdrivair_board_device_state :  public harddriv_state
 {
 public:
-	hdrivair_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hdrivair_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 
 class hdrivairp_board_device_state :  public hdrivair_board_device_state
 {
 public:
-	hdrivairp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	hdrivairp_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		hdrivair_board_device_state(mconfig, tag, owner, clock)
 		{};
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };

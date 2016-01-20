@@ -17,7 +17,7 @@
 
 const device_type SEGA8_ROM_MGEAR = &device_creator<sega8_mgear_device>;
 
-sega8_mgear_device::sega8_mgear_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega8_mgear_device::sega8_mgear_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: sega8_rom_device(mconfig, SEGA8_ROM_MGEAR, "Master Gear Adapter", tag, owner, clock, "sega8_mgear", __FILE__),
 						m_subslot(*this, "subslot")
 {
@@ -37,7 +37,7 @@ void sega8_mgear_device::device_reset()
  -------------------------------------------------*/
 
 static MACHINE_CONFIG_FRAGMENT( sub_slot )
-	MCFG_SMS_CARTRIDGE_ADD("subslot", sms_cart, NULL)
+	MCFG_SMS_CARTRIDGE_ADD("subslot", sms_cart, nullptr)
 MACHINE_CONFIG_END
 
 machine_config_constructor sega8_mgear_device::device_mconfig_additions() const

@@ -68,7 +68,7 @@ class emu_timer
 public:
 	// getters
 	emu_timer *next() const { return m_next; }
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+	running_machine &machine() const { assert(m_machine != nullptr); return *m_machine; }
 	bool enabled() const { return m_enabled; }
 	int param() const { return m_param; }
 	void *ptr() const { return m_ptr; }
@@ -138,22 +138,22 @@ public:
 	void suspend_resume_changed() { m_suspend_changes_pending = true; }
 
 	// timers, specified by callback/name
-	emu_timer *timer_alloc(timer_expired_delegate callback, void *ptr = NULL);
-	void timer_set(const attotime &duration, timer_expired_delegate callback, int param = 0, void *ptr = NULL);
-	void timer_pulse(const attotime &period, timer_expired_delegate callback, int param = 0, void *ptr = NULL);
-	void synchronize(timer_expired_delegate callback = timer_expired_delegate(), int param = 0, void *ptr = NULL) { timer_set(attotime::zero, callback, param, ptr); }
+	emu_timer *timer_alloc(timer_expired_delegate callback, void *ptr = nullptr);
+	void timer_set(const attotime &duration, timer_expired_delegate callback, int param = 0, void *ptr = nullptr);
+	void timer_pulse(const attotime &period, timer_expired_delegate callback, int param = 0, void *ptr = nullptr);
+	void synchronize(timer_expired_delegate callback = timer_expired_delegate(), int param = 0, void *ptr = nullptr) { timer_set(attotime::zero, callback, param, ptr); }
 
 	// timers with old-skool callbacks
 #ifdef USE_STATIC_DELEGATE
-	emu_timer *timer_alloc(timer_expired_func callback, const char *name, void *ptr = NULL) { return timer_alloc(timer_expired_delegate(callback, name, &machine()), ptr); }
-	void timer_set(const attotime &duration, timer_expired_func callback, const char *name, int param = 0, void *ptr = NULL) { timer_set(duration, timer_expired_delegate(callback, name, &machine()), param, ptr); }
-	void timer_pulse(const attotime &period, timer_expired_func callback, const char *name, int param = 0, void *ptr = NULL) { timer_pulse(period, timer_expired_delegate(callback, name, &machine()), param, ptr); }
-	void synchronize(timer_expired_func callback, const char *name = NULL, int param = 0, void *ptr = NULL) { timer_set(attotime::zero, callback, name, param, ptr); }
+	emu_timer *timer_alloc(timer_expired_func callback, const char *name, void *ptr = nullptr) { return timer_alloc(timer_expired_delegate(callback, name, &machine()), ptr); }
+	void timer_set(const attotime &duration, timer_expired_func callback, const char *name, int param = 0, void *ptr = nullptr) { timer_set(duration, timer_expired_delegate(callback, name, &machine()), param, ptr); }
+	void timer_pulse(const attotime &period, timer_expired_func callback, const char *name, int param = 0, void *ptr = nullptr) { timer_pulse(period, timer_expired_delegate(callback, name, &machine()), param, ptr); }
+	void synchronize(timer_expired_func callback, const char *name = nullptr, int param = 0, void *ptr = nullptr) { timer_set(attotime::zero, callback, name, param, ptr); }
 #endif
 
 	// timers, specified by device/id; generally devices should use the device_t methods instead
-	emu_timer *timer_alloc(device_t &device, device_timer_id id = 0, void *ptr = NULL);
-	void timer_set(const attotime &duration, device_t &device, device_timer_id id = 0, int param = 0, void *ptr = NULL);
+	emu_timer *timer_alloc(device_t &device, device_timer_id id = 0, void *ptr = nullptr);
+	void timer_set(const attotime &duration, device_t &device, device_timer_id id = 0, int param = 0, void *ptr = nullptr);
 
 	// debugging
 	void dump_timers() const;

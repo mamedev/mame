@@ -187,7 +187,7 @@
 class cocoloco_state : public driver_device
 {
 public:
-	cocoloco_state(const machine_config &mconfig, device_type type, const char *tag)
+	cocoloco_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette") { }
@@ -195,7 +195,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 
-	UINT8 *m_videoram;
+	std::unique_ptr<UINT8[]> m_videoram;
 	UINT8 m_videobank;
 
 	DECLARE_READ8_MEMBER(vram_r);
@@ -206,7 +206,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cocoloco);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -290,9 +290,9 @@ PALETTE_INIT_MEMBER(cocoloco_state, cocoloco)
 
 void cocoloco_state::video_start()
 {
-	m_videoram = auto_alloc_array(machine(), UINT8, 0x2000 * 8);
+	m_videoram = std::make_unique<UINT8[]>(0x2000 * 8);
 
-	save_pointer(NAME(m_videoram), 0x2000 * 8);
+	save_pointer(NAME(m_videoram.get()), 0x2000 * 8);
 	save_item(NAME(m_videobank));
 }
 
@@ -367,7 +367,7 @@ WRITE8_MEMBER( cocoloco_state::coincounter_w )
     They explain in a sheet that the coin in for 50 pesetas
     behaves like 2x 25 pesetas (1 duro) coins, so has sense.
 */
-	coin_counter_w(machine(), 0, data & 0x08);
+	machine().bookkeeping().coin_counter_w(0, data & 0x08);
 }
 
 

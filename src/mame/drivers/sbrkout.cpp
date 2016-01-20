@@ -44,7 +44,7 @@
 class sbrkout_state : public driver_device
 {
 public:
-	sbrkout_state(const machine_config &mconfig, device_type type, const char *tag)
+	sbrkout_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -74,9 +74,9 @@ public:
 	DECLARE_READ8_MEMBER(sync2_r);
 	DECLARE_WRITE8_MEMBER(sbrkout_videoram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_sbrkout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	TIMER_CALLBACK_MEMBER(pot_trigger_callback);
@@ -282,29 +282,29 @@ WRITE8_MEMBER(sbrkout_state::pot_mask2_w)
 
 WRITE8_MEMBER(sbrkout_state::start_1_led_w)
 {
-	output_set_led_value(0, offset & 1);
+	output().set_led_value(0, offset & 1);
 }
 
 
 WRITE8_MEMBER(sbrkout_state::start_2_led_w)
 {
-	output_set_led_value(1, offset & 1);
+	output().set_led_value(1, offset & 1);
 }
 
 
 WRITE8_MEMBER(sbrkout_state::serve_led_w)
 {
-	output_set_led_value(0, ~offset & 1);
+	output().set_led_value(0, ~offset & 1);
 }
 
 WRITE8_MEMBER(sbrkout_state::serve_2_led_w)
 {
-	output_set_led_value(1, ~offset & 1);
+	output().set_led_value(1, ~offset & 1);
 }
 
 WRITE8_MEMBER(sbrkout_state::coincount_w)
 {
-	coin_counter_w(machine(), 0, offset & 1);
+	machine().bookkeeping().coin_counter_w(0, offset & 1);
 }
 
 

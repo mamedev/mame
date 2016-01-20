@@ -303,7 +303,7 @@ const device_type ISA16_3C505 = &device_creator<threecom3c505_device> ;
 // threecom3c505_device - constructor
 //-------------------------------------------------
 
-threecom3c505_device::threecom3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+threecom3c505_device::threecom3c505_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ISA16_3C505, "3Com 3C505 Network Adaptor", tag, owner, clock, "3c505", __FILE__),
 	device_network_interface(mconfig, *this, 10.0f),
 	device_isa16_card_interface(mconfig, *this),
@@ -313,7 +313,7 @@ threecom3c505_device::threecom3c505_device(const machine_config &mconfig, const 
 {
 }
 
-threecom3c505_device::threecom3c505_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
+threecom3c505_device::threecom3c505_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, "3Com 3C505 Network Adaptor", tag, owner, clock, "3c505", __FILE__),
 	device_network_interface(mconfig, *this, 10.0f),
 	device_isa16_card_interface(mconfig, *this),
@@ -350,7 +350,7 @@ void threecom3c505_device::device_start()
 	m_tx_data_buffer.start(this, ETH_BUFFER_SIZE);
 	m_program_buffer.start(this, PGM_BUFFER_SIZE);
 
-	m_do_command_timer = timer_alloc(0, NULL);
+	m_do_command_timer = timer_alloc(0, nullptr);
 }
 
 //-------------------------------------------------
@@ -430,10 +430,10 @@ const char *threecom3c505_device::cpu_context()
 	int ms = (t % osd_ticks_per_second()) / 1000;
 
 	/* if we have an executing CPU, output data */
-	if (cpu != NULL)
+	if (cpu != nullptr)
 	{
-		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag(),
-				cpu->safe_pcbase(), tag());
+		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag().c_str(),
+				cpu->safe_pcbase(), tag().c_str());
 	}
 	else
 	{

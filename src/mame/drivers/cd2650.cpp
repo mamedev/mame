@@ -41,7 +41,7 @@ TODO
 class cd2650_state : public driver_device
 {
 public:
-	cd2650_state(const machine_config &mconfig, device_type type, const char *tag)
+	cd2650_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -62,8 +62,8 @@ public:
 
 private:
 	UINT8 m_term_data;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;
 	required_device<cassette_image_device> m_cass;

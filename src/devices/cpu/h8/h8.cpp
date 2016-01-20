@@ -13,10 +13,10 @@
 #include "debugger.h"
 #include "h8.h"
 
-h8_device::h8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool mode_a16, address_map_delegate map_delegate) :
+h8_device::h8_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, bool mode_a16, address_map_delegate map_delegate) :
 	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	program_config("program", ENDIANNESS_BIG, 16, mode_a16 ? 16 : 24, 0, map_delegate),
-	io_config("io", ENDIANNESS_BIG, 16, 16, -1), program(nullptr), io(nullptr), direct(nullptr), PPC(0), NPC(0), PC(0), PIR(0), EXR(0), CCR(0), MAC(0), MACF(0), 
+	io_config("io", ENDIANNESS_BIG, 16, 16, -1), program(nullptr), io(nullptr), direct(nullptr), PPC(0), NPC(0), PC(0), PIR(0), EXR(0), CCR(0), MAC(0), MACF(0),
 	TMP1(0), TMP2(0), TMPR(0), inst_state(0), inst_substate(0), icount(0), bcount(0), irq_vector(0), taken_irq_vector(0), irq_level(0), taken_irq_level(0), irq_required(false), irq_nmi(false)
 {
 	supports_advanced = false;
@@ -189,7 +189,7 @@ const address_space_config *h8_device::memory_space_config(address_spacenum spac
 {
 	return
 		spacenum == AS_PROGRAM ? &program_config :
-		spacenum == AS_IO ? &io_config : NULL;
+		spacenum == AS_IO ? &io_config : nullptr;
 }
 
 
@@ -216,7 +216,7 @@ void h8_device::state_export(const device_state_entry &entry)
 {
 }
 
-void h8_device::state_string_export(const device_state_entry &entry, std::string &str)
+void h8_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch(entry.index()) {
 	case STATE_GENFLAGS:
@@ -592,17 +592,17 @@ void h8_device::internal(int cycles)
 
 void h8_device::illegal()
 {
-	throw emu_fatalerror("%s: Illegal instruction at address %x\n", tag(), PPC);
+	throw emu_fatalerror("%s: Illegal instruction at address %x\n", tag().c_str(), PPC);
 }
 
 int h8_device::trace_setup()
 {
-	throw emu_fatalerror("%s: Trace setup called but unimplemented.\n", tag());
+	throw emu_fatalerror("%s: Trace setup called but unimplemented.\n", tag().c_str());
 }
 
 int h8_device::trapa_setup()
 {
-	throw emu_fatalerror("%s: Trapa setup called but unimplemented.\n", tag());
+	throw emu_fatalerror("%s: Trapa setup called but unimplemented.\n", tag().c_str());
 }
 
 UINT8 h8_device::do_addx8(UINT8 v1, UINT8 v2)

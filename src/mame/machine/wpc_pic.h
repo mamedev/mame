@@ -12,7 +12,7 @@
 class wpc_pic_device : public device_t
 {
 public:
-	wpc_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wpc_pic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~wpc_pic_device();
 
 	DECLARE_READ8_MEMBER(read);
@@ -26,8 +26,8 @@ protected:
 	UINT8 mem[16], chk[3], curcmd, scrambler, count, chk_count, cmpchk[3];
 	const char *serial;
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void serial_to_pic();
 	void check_game_id();

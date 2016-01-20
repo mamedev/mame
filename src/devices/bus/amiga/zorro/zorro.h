@@ -228,19 +228,19 @@ class zorro_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	zorro_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	zorro_slot_device(const machine_config &mconfig, device_type type, const char *name,
-		const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	zorro_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	zorro_slot_device(const machine_config &mconfig, device_type type, std::string name,
+		std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// inline configuration
-	static void set_zorro_slot(device_t &device, device_t *owner, const char *zorro_tag);
+	static void set_zorro_slot(device_t &device, device_t *owner, std::string zorro_tag);
 
 protected:
 	// configuration
-	const char *m_zorro_tag;
+	std::string m_zorro_tag;
 };
 
 // device type definition
@@ -252,11 +252,11 @@ class zorro_device : public device_t
 {
 public:
 	// construction/destruction
-	zorro_device(const machine_config &mconfig, device_type type, const char *name,
-		const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	zorro_device(const machine_config &mconfig, device_type type, std::string name,
+		std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// static configuration helpers
-	static void set_cputag(device_t &device, const char *tag);
+	static void set_cputag(device_t &device, std::string tag);
 
 	template<class _Object> static devcb_base &set_int2_handler(device_t &device, _Object object)
 		{ return downcast<zorro_device &>(device).m_int2_handler.set_callback(object); }
@@ -282,10 +282,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
-	const char *m_cputag;
+	std::string m_cputag;
 
 	devcb_write_line m_ovr_handler;
 	devcb_write_line m_int2_handler;
@@ -298,26 +298,26 @@ class exp_slot_device : public zorro_device
 {
 public:
 	// construction/destruction
-	exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	exp_slot_device(const machine_config &mconfig, device_type type, const char *name,
-		const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	exp_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	exp_slot_device(const machine_config &mconfig, device_type type, std::string name,
+		std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	template<class _Object> static devcb_base &set_ipl_handler(device_t &device, _Object object)
 		{ return downcast<exp_slot_device &>(device).m_ipl_handler.set_callback(object); }
 
 	// the expansion slot can only have a single card
-	virtual void add_card(device_zorro_card_interface *card);
+	virtual void add_card(device_zorro_card_interface *card) override;
 
 	// interface (from slot device)
 	void ipl_w(int interrupt);
 
 	// interface (from host)
-	virtual void fc_w(int code);
+	virtual void fc_w(int code) override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	devcb_write8 m_ipl_handler;
@@ -334,9 +334,9 @@ class zorro2_device : public zorro_device
 {
 public:
 	// construction/destruction
-	zorro2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	zorro2_device(const machine_config &mconfig, device_type type, const char *name,
-		const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	zorro2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	zorro2_device(const machine_config &mconfig, device_type type, std::string name,
+		std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	~zorro2_device();
 
 	template<class _Object> static devcb_base &set_eint1_handler(device_t &device, _Object object)
@@ -349,10 +349,10 @@ public:
 		{ return downcast<zorro2_device &>(device).m_eint7_handler.set_callback(object); }
 
 	// the zorro2 bus supports multiple cards
-	virtual void add_card(device_zorro_card_interface *card);
+	virtual void add_card(device_zorro_card_interface *card) override;
 
 	// interface (from slot device)
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgout_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( cfgout_w ) override;
 
 	DECLARE_WRITE_LINE_MEMBER( eint1_w );
 	DECLARE_WRITE_LINE_MEMBER( eint4_w );
@@ -360,12 +360,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( eint7_w );
 
 	// interface (from host)
-	virtual void fc_w(int code);
+	virtual void fc_w(int code) override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	devcb_write_line m_eint1_handler;
@@ -416,7 +416,7 @@ public:
 	device_exp_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_exp_card_interface();
 
-	virtual void set_zorro_device();
+	virtual void set_zorro_device() override;
 
 protected:
 	exp_slot_device *m_slot;
@@ -431,7 +431,7 @@ public:
 	device_zorro2_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_zorro2_card_interface();
 
-	virtual void set_zorro_device();
+	virtual void set_zorro_device() override;
 
 	device_zorro2_card_interface *next() const { return m_next; }
 	device_zorro2_card_interface *m_next;

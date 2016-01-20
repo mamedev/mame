@@ -38,10 +38,10 @@ class ramdac_device :   public device_t,
 {
 public:
 	// construction/destruction
-	ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ramdac_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 	static void set_split_read(device_t &device, int split) { downcast<ramdac_device &>(device).m_split_read_reg = split; }
 
 	// I/O operations
@@ -56,13 +56,13 @@ public:
 	DECLARE_WRITE8_MEMBER( ramdac_rgb666_w );
 	DECLARE_WRITE8_MEMBER( ramdac_rgb888_w );
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	inline UINT8 readbyte(offs_t address);
 	inline void writebyte(offs_t address, UINT8 data);
 	inline void reg_increment(UINT8 inc_type);
@@ -71,7 +71,7 @@ private:
 	UINT8 m_pal_index[2];
 	UINT8 m_pal_mask;
 	UINT8 m_int_index[2];
-	UINT8 *m_palram;
+	std::unique_ptr<UINT8[]> m_palram;
 
 	const address_space_config      m_space_config;
 	required_device<palette_device> m_palette;

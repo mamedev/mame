@@ -23,7 +23,7 @@
 class odyssey2_state : public driver_device
 {
 public:
-	odyssey2_state(const machine_config &mconfig, device_type type, const char *tag)
+	odyssey2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_i8244(*this, "i8244"),
@@ -49,8 +49,8 @@ public:
 	DECLARE_WRITE8_MEMBER(p2_write);
 	DECLARE_READ8_MEMBER(t1_read);
 	DECLARE_DRIVER_INIT(odyssey2);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(odyssey2);
 	UINT32 screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(irq_callback);
@@ -75,7 +75,7 @@ protected:
 class g7400_state : public odyssey2_state
 {
 public:
-	g7400_state(const machine_config &mconfig, device_type type, const char *tag)
+	g7400_state(const machine_config &mconfig, device_type type, std::string tag)
 		: odyssey2_state(mconfig, type, tag)
 		, m_i8243(*this, "i8243")
 		, m_ef9340_1(*this, "ef9340_1")
@@ -85,8 +85,8 @@ public:
 	required_device<ef9340_1_device> m_ef9340_1;
 
 	DECLARE_PALETTE_INIT(g7400);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(p2_write);
 	DECLARE_READ8_MEMBER(io_read);
 	DECLARE_WRITE8_MEMBER(io_write);
@@ -665,7 +665,7 @@ GFXDECODE_END
 
 
 static MACHINE_CONFIG_FRAGMENT( odyssey2_cartslot )
-	MCFG_O2_CARTRIDGE_ADD("cartslot", o2_cart, NULL)
+	MCFG_O2_CARTRIDGE_ADD("cartslot", o2_cart, nullptr)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","odyssey2")
 MACHINE_CONFIG_END

@@ -36,8 +36,8 @@ class vector_device : public device_t, public device_video_interface
 {
 public:
 	// construction/destruction
-	vector_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	vector_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	vector_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	vector_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void clear_list();
@@ -58,14 +58,14 @@ public:
 	float get_beam_intensity_weight();
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	static float m_flicker;
 	static float m_beam_width_min;
 	static float m_beam_width_max;
 	static float m_beam_intensity_weight;
-	point *m_vector_list;
+	std::unique_ptr<point[]> m_vector_list;
 	static int m_vector_index;
 	int m_min_intensity;
 	int m_max_intensity;

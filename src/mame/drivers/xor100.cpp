@@ -214,7 +214,7 @@ WRITE8_MEMBER( xor100_state::fdc_dcont_w )
 	*/
 
 	// drive select
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) floppy = m_floppy1->get_device();
@@ -523,7 +523,7 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_A_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_A_TAG, i8251_device, write_dsr))
 
@@ -535,6 +535,7 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_B_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_B_TAG, i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(I8251_B_TAG, i8251_device, write_cts))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_DEVICE_ADD(COM5016_TAG, COM8116, XTAL_5_0688MHz)
@@ -555,8 +556,8 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	MCFG_FD1795_ADD(WD1795_TAG, XTAL_8MHz/4)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":0", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":1", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":2", xor100_floppies, NULL,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":3", xor100_floppies, NULL,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":2", xor100_floppies, nullptr,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":3", xor100_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(I8255A_TAG, i8255_device, pc4_w))
@@ -568,16 +569,16 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	// S-100
 	MCFG_S100_BUS_ADD()
 	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_WAIT))
-	MCFG_S100_SLOT_ADD("s100_1", xor100_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD("s100_2", xor100_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD("s100_3", xor100_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD("s100_4", xor100_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD("s100_5", xor100_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD("s100_6", xor100_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD("s100_7", xor100_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD("s100_8", xor100_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD("s100_9", xor100_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD("s100_10", xor100_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD("s100_1", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100_2", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100_3", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100_4", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100_5", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100_6", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100_7", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100_8", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100_9", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100_10", xor100_s100_cards, nullptr)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

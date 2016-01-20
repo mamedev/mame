@@ -44,7 +44,7 @@ Exidy discrete hardware games
 class exidyttl_state : public driver_device
 {
 public:
-	exidyttl_state(const machine_config &mconfig, device_type type, const char *tag)
+	exidyttl_state(const machine_config &mconfig, device_type type, std::string tag)
 	: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_video(*this, "fixfreq")
@@ -58,10 +58,10 @@ public:
 protected:
 
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 private:
 

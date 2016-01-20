@@ -7,7 +7,7 @@
 class darkseal_state : public driver_device
 {
 public:
-	darkseal_state(const machine_config &mconfig, device_type type, const char *tag)
+	darkseal_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -44,7 +44,7 @@ public:
 	DECLARE_WRITE16_MEMBER(palette_24bit_b_w);
 
 	DECLARE_DRIVER_INIT(darkseal);
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_24bitcol(int offset);

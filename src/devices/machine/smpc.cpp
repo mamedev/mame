@@ -214,15 +214,15 @@ TIMER_CALLBACK_MEMBER( saturn_state::smpc_cd_enable )
 void saturn_state::smpc_system_reset()
 {
 	/*Only backup ram and SMPC ram are retained after that this command is issued.*/
-	memset(m_scu_regs ,0x00,0x000100);
-	memset(m_scsp_regs,0x00,0x001000);
+	memset(m_scu_regs.get() ,0x00,0x000100);
+	memset(m_scsp_regs.get(),0x00,0x001000);
 	memset(m_sound_ram,0x00,0x080000);
 	memset(m_workram_h,0x00,0x100000);
 	memset(m_workram_l,0x00,0x100000);
-	memset(m_vdp2_regs,0x00,0x040000);
-	memset(m_vdp2_vram,0x00,0x100000);
-	memset(m_vdp2_cram,0x00,0x080000);
-	memset(m_vdp1_vram,0x00,0x100000);
+	memset(m_vdp2_regs.get(),0x00,0x040000);
+	memset(m_vdp2_vram.get(),0x00,0x100000);
+	memset(m_vdp2_cram.get(),0x00,0x080000);
+	memset(m_vdp1_vram.get(),0x00,0x100000);
 	//A-Bus
 
 	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
@@ -763,7 +763,7 @@ void saturn_state::smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_s
 			machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(saturn_state::smpc_nmi_set),this),data & 1);
 			break;
 		default:
-			printf ("cpu '%s' (PC=%08X) SMPC: undocumented Command %02x\n", space.device().tag(), space.device().safe_pc(), data);
+			printf ("cpu '%s' (PC=%08X) SMPC: undocumented Command %02x\n", space.device().tag().c_str(), space.device().safe_pc(), data);
 	}
 }
 
@@ -1006,7 +1006,7 @@ READ8_MEMBER( saturn_state::saturn_SMPC_r )
 		}
 	}
 
-	if (LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", space.device().tag(), space.device().safe_pc(), offset, offset>>1, return_data);
+	if (LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", space.device().tag().c_str(), space.device().safe_pc(), offset, offset>>1, return_data);
 
 	return return_data;
 }

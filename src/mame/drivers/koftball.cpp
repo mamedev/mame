@@ -40,7 +40,7 @@ ft5_v6_c4.u58 /
 class koftball_state : public driver_device
 {
 public:
-	koftball_state(const machine_config &mconfig, device_type type, const char *tag)
+	koftball_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_main_ram(*this, "main_ram"),
@@ -67,7 +67,7 @@ public:
 	DECLARE_DRIVER_INIT(koftball);
 	TILE_GET_INFO_MEMBER(get_t1_tile_info);
 	TILE_GET_INFO_MEMBER(get_t2_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_koftball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bmc_interrupt);
 };

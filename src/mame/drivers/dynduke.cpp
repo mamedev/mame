@@ -330,7 +330,7 @@ ROM_START( dynduke )
 	ROM_REGION( 0x20000*2, "audiocpu", 0 ) /* sound Z80 */
 	ROM_LOAD( "8.w8",        0x000000, 0x08000, CRC(3c29480b) SHA1(031a0b808df32b5ae4f722c9e9f69554d30505c1) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "9.5k",   0x000000, 0x04000, CRC(f2bc9af4) SHA1(9092ebe9dced243c3a7f63198a1180143dd42cea) ) /* chars */
@@ -378,7 +378,7 @@ ROM_START( dyndukea )
 	ROM_REGION( 0x20000*2, "audiocpu", 0 ) /* sound Z80 */
 	ROM_LOAD( "8.w8",        0x000000, 0x08000, CRC(3c29480b) SHA1(031a0b808df32b5ae4f722c9e9f69554d30505c1) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "9.5k",   0x000000, 0x04000, CRC(f2bc9af4) SHA1(9092ebe9dced243c3a7f63198a1180143dd42cea) ) /* chars */
@@ -426,7 +426,7 @@ ROM_START( dyndukej )
 	ROM_REGION( 0x20000*2, "audiocpu", 0 ) /* sound Z80 */
 	ROM_LOAD( "8.w8",        0x000000, 0x08000, CRC(3c29480b) SHA1(031a0b808df32b5ae4f722c9e9f69554d30505c1) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "9.5k",   0x000000, 0x04000, CRC(f2bc9af4) SHA1(9092ebe9dced243c3a7f63198a1180143dd42cea) ) /* chars */
@@ -474,7 +474,7 @@ ROM_START( dyndukeu )
 	ROM_REGION( 0x20000*2, "audiocpu", 0 ) /* sound Z80 */
 	ROM_LOAD( "8.w8",        0x000000, 0x08000, CRC(3c29480b) SHA1(031a0b808df32b5ae4f722c9e9f69554d30505c1) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "9.5k",   0x000000, 0x04000, CRC(f2bc9af4) SHA1(9092ebe9dced243c3a7f63198a1180143dd42cea) ) /* chars */
@@ -522,7 +522,7 @@ ROM_START( dbldynj )
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound Z80 */
 	ROM_LOAD( "8x.w8",       0x000000, 0x08000, CRC(f4066081) SHA1(0e5246f4f5513be11e6ed3ea26aada7e0a17a448) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "9x.5k",   0x000000, 0x04000, CRC(913709e3) SHA1(a469043a09718409f7af835f7c045baedad92061) ) /* chars */
@@ -570,7 +570,7 @@ ROM_START( dbldynu )
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound Z80 */
 	ROM_LOAD( "8x.w8",       0x000000, 0x08000, CRC(f4066081) SHA1(0e5246f4f5513be11e6ed3ea26aada7e0a17a448) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "9x.5k",   0x000000, 0x04000, CRC(913709e3) SHA1(a469043a09718409f7af835f7c045baedad92061) ) /* chars */

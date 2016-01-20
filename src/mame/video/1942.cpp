@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Paul Leaman, Couriersud
 /***************************************************************************
 
@@ -204,7 +204,7 @@ WRITE8_MEMBER(_1942_state::c1942_c804_w)
 	   bit 4: cpu B reset
 	   bit 0: coin counter */
 
-	coin_counter_w(machine(), 0,data & 0x01);
+	machine().bookkeeping().coin_counter_w(0,data & 0x01);
 
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 

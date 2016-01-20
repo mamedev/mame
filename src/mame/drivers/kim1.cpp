@@ -107,7 +107,7 @@ Test Paste:
 class kim1_state : public driver_device
 {
 public:
-	kim1_state(const machine_config &mconfig, device_type type, const char *tag)
+	kim1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_riot2(*this, "miot_u2"),
@@ -128,8 +128,8 @@ public:
 	UINT8 m_311_output;
 	UINT32 m_cassette_high_count;
 	UINT8 m_led_time[6];
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(kim1_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(kim1_cassette_input);
 	TIMER_DEVICE_CALLBACK_MEMBER(kim1_update_leds);
@@ -236,7 +236,7 @@ WRITE8_MEMBER( kim1_state::kim1_u2_write_a )
 	{
 		if ( data & 0x80 )
 		{
-			output_set_digit_value( idx-4, data & 0x7f );
+			output().set_digit_value( idx-4, data & 0x7f );
 			m_led_time[idx - 4] = 15;
 		}
 	}
@@ -290,7 +290,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_update_leds)
 		if ( m_led_time[i] )
 			m_led_time[i]--;
 		else
-			output_set_digit_value( i, 0 );
+			output().set_digit_value( i, 0 );
 	}
 }
 

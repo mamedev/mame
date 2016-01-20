@@ -22,14 +22,14 @@ class rtc65271_device : public device_t,
 {
 public:
 	// construction/destruction
-	rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rtc65271_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
 public:
 
 	template<class _Object> static devcb_base &set_interrupt_callback(device_t &device, _Object object) { return downcast<rtc65271_device &>(device).m_interrupt_cb.set_callback(object); }

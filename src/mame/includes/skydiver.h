@@ -24,7 +24,7 @@
 class skydiver_state : public driver_device
 {
 public:
-	skydiver_state(const machine_config &mconfig, device_type type, const char *tag)
+	skydiver_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_discrete(*this, "discrete"),
@@ -61,8 +61,8 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(skydiver);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

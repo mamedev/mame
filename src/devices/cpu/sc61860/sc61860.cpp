@@ -49,7 +49,7 @@
 const device_type SC61860 = &device_creator<sc61860_device>;
 
 
-sc61860_device::sc61860_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sc61860_device::sc61860_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SC61860, "SC61860", tag, owner, clock, "sc61860", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_reset(*this)
@@ -171,7 +171,7 @@ void sc61860_device::device_start()
 }
 
 
-void sc61860_device::state_string_export(const device_state_entry &entry, std::string &str)
+void sc61860_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

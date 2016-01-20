@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 /***************************************************************************
 
@@ -98,20 +98,19 @@ WRITE8_MEMBER(wolfpack_state::wolfpack_word_w)
 
 WRITE8_MEMBER(wolfpack_state::wolfpack_start_speech_w)
 {
-	m_s14001a->set_volume(15); /* hack, should be executed just once during game init, or defaulted to this in the s14001a core */
 	m_s14001a->rst_w(data&1);
 }
 
 
 WRITE8_MEMBER(wolfpack_state::wolfpack_attract_w)
 {
-	coin_lockout_global_w(machine(), !(data & 1));
+	machine().bookkeeping().coin_lockout_global_w(!(data & 1));
 }
 
 
 WRITE8_MEMBER(wolfpack_state::wolfpack_credit_w)
 {
-	set_led_status(machine(), 0, !(data & 1));
+	output().set_led_value(0, !(data & 1));
 }
 
 
@@ -163,7 +162,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wolfpack )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state,wolfpack_dial_r, (void *)0)    /* dial connects here */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state,wolfpack_dial_r, (void *)nullptr)    /* dial connects here */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state,wolfpack_dial_r, (void *)1)    /* dial connects here */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -241,7 +240,7 @@ static const gfx_layout ship_layout =
 	},
 	0x800,
 	ship_layout_xoffset,
-	NULL
+	nullptr
 };
 
 static const UINT32 pt_layout_xoffset[64] =
@@ -266,7 +265,7 @@ static const gfx_layout pt_layout =
 	{ 0x000, 0x040, 0x080, 0x0c0, 0x100, 0x140, 0x180, 0x1c0 },
 	0x200,
 	pt_layout_xoffset,
-	NULL
+	nullptr
 };
 
 

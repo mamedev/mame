@@ -2,7 +2,7 @@
 // copyright-holders:smf,Carl
 #include "null_modem.h"
 
-null_modem_device::null_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+null_modem_device::null_modem_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NULL_MODEM, "Null Modem", tag, owner, clock, "null_modem", __FILE__),
 	device_serial_interface(mconfig, *this),
 	device_rs232_port_interface(mconfig, *this),
@@ -14,8 +14,8 @@ null_modem_device::null_modem_device(const machine_config &mconfig, const char *
 	m_rs232_parity(*this, "RS232_PARITY"),
 	m_rs232_stopbits(*this, "RS232_STOPBITS"),
 	m_input_count(0),
-	m_input_index(0), 
-	m_timer_poll(NULL)
+	m_input_index(0),
+	m_timer_poll(nullptr)
 {
 }
 

@@ -32,17 +32,17 @@ class nubus_image_device :
 {
 public:
 		// construction/destruction
-		nubus_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-		nubus_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+		nubus_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+		nubus_image_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
-		virtual const rom_entry *device_rom_region() const;
+		virtual machine_config_constructor device_mconfig_additions() const override;
+		virtual const rom_entry *device_rom_region() const override;
 
 protected:
 		// device-level overrides
-		virtual void device_start();
-		virtual void device_reset();
+		virtual void device_start() override;
+		virtual void device_reset() override;
 
 		DECLARE_READ32_MEMBER(image_status_r);
 		DECLARE_WRITE32_MEMBER(image_status_w);

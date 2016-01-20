@@ -518,7 +518,7 @@ SLOT_INTERFACE_END
 static const z80_daisy_config m5_daisy_chain[] =
 {
 	{ Z80CTC_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 

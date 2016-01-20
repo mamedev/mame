@@ -50,7 +50,7 @@ I dumped it with this configuration. In case I'll redump it desoldering pin 16 f
 class egghunt_state : public driver_device
 {
 public:
-	egghunt_state(const machine_config &mconfig, device_type type, const char *tag)
+	egghunt_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_audiocpu(*this, "audiocpu"),
 		m_atram(*this, "atram"),
@@ -83,9 +83,9 @@ public:
 	DECLARE_READ8_MEMBER(egghunt_okibanking_r);
 	DECLARE_WRITE8_MEMBER(egghunt_okibanking_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_egghunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;

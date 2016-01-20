@@ -43,7 +43,7 @@ public:
 		TIMER_LIGHTGUN_TICK
 	};
 
-	sg1000_state(const machine_config &mconfig, device_type type, const char *tag)
+	sg1000_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_ram(*this, RAM_TAG),
@@ -56,7 +56,7 @@ public:
 	required_memory_region m_rom;
 	optional_device<sega8_cart_slot_device> m_cart;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( joysel_r );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
@@ -73,7 +73,7 @@ public:
 class sc3000_state : public sg1000_state
 {
 public:
-	sc3000_state(const machine_config &mconfig, device_type type, const char *tag)
+	sc3000_state(const machine_config &mconfig, device_type type, std::string tag)
 		: sg1000_state(mconfig, type, tag),
 			m_cassette(*this, "cassette"),
 			m_pa0(*this, "PA0"),
@@ -112,7 +112,7 @@ public:
 	required_ioport m_pb6;
 	required_ioport m_pb7;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( ppi_pa_r );
 	DECLARE_READ8_MEMBER( ppi_pb_r );
@@ -124,7 +124,7 @@ public:
 class sf7000_state : public sc3000_state
 {
 public:
-	sf7000_state(const machine_config &mconfig, device_type type, const char *tag)
+	sf7000_state(const machine_config &mconfig, device_type type, std::string tag)
 		: sc3000_state(mconfig, type, tag),
 			m_fdc(*this, UPD765_TAG),
 			m_centronics(*this, CENTRONICS_TAG),
@@ -135,8 +135,8 @@ public:
 	required_device<centronics_device> m_centronics;
 	required_device<floppy_image_device> m_floppy0;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );

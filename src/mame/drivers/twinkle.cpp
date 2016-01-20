@@ -247,7 +247,7 @@ Notes:
 class twinkle_state : public driver_device
 {
 public:
-	twinkle_state(const machine_config &mconfig, device_type type, const char *tag)
+	twinkle_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_am53cf96(*this, "am53cf96"),
 		m_ata(*this, "ata"),
@@ -493,24 +493,24 @@ WRITE8_MEMBER(twinkle_state::twinkle_io_w)
 			case 0x6f:
 			case 0x77:
 			case 0x7f:
-				output_set_indexed_value( "led", ( m_io_offset - 7 ) / 8, asciicharset[ ( data ^ 0xff ) & 0x7f ] );
+				output().set_indexed_value( "led", ( m_io_offset - 7 ) / 8, asciicharset[ ( data ^ 0xff ) & 0x7f ] );
 				break;
 
 			case 0x87:
-				output_set_indexed_value( "spotlight", 0, ( ~data >> 3 ) & 1 );
-				output_set_indexed_value( "spotlight", 1, ( ~data >> 2 ) & 1 );
-				output_set_indexed_value( "spotlight", 2, ( ~data >> 1 ) & 1 );
-				output_set_indexed_value( "spotlight", 3, ( ~data >> 0 ) & 1 );
-				output_set_indexed_value( "spotlight", 4, ( ~data >> 4 ) & 1 );
-				output_set_indexed_value( "spotlight", 5, ( ~data >> 5 ) & 1 );
-				output_set_indexed_value( "spotlight", 6, ( ~data >> 6 ) & 1 );
-				output_set_indexed_value( "spotlight", 7, ( ~data >> 7 ) & 1 );
+				output().set_indexed_value( "spotlight", 0, ( ~data >> 3 ) & 1 );
+				output().set_indexed_value( "spotlight", 1, ( ~data >> 2 ) & 1 );
+				output().set_indexed_value( "spotlight", 2, ( ~data >> 1 ) & 1 );
+				output().set_indexed_value( "spotlight", 3, ( ~data >> 0 ) & 1 );
+				output().set_indexed_value( "spotlight", 4, ( ~data >> 4 ) & 1 );
+				output().set_indexed_value( "spotlight", 5, ( ~data >> 5 ) & 1 );
+				output().set_indexed_value( "spotlight", 6, ( ~data >> 6 ) & 1 );
+				output().set_indexed_value( "spotlight", 7, ( ~data >> 7 ) & 1 );
 				break;
 
 			case 0x8f:
-				output_set_value( "neonlamp", ( ~data >> 0 ) & 1 );
-				output_set_value( "unknown1", ( ~data >> 1 ) & 1 );
-				output_set_value( "unknown2", ( ~data >> 2 ) & 1 );
+				output().set_value( "neonlamp", ( ~data >> 0 ) & 1 );
+				output().set_value( "unknown1", ( ~data >> 1 ) & 1 );
+				output().set_value( "unknown2", ( ~data >> 2 ) & 1 );
 
 				if( ( data & 0xf8 ) != 0xf8 )
 				{
@@ -956,7 +956,7 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	MCFG_LEGACY_SCSI_PORT("scsi")
 	MCFG_AM53CF96_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(twinkle_state, spu_ata_irq))
 	MCFG_ATA_INTERFACE_DMARQ_HANDLER(WRITELINE(twinkle_state, spu_ata_dmarq))
 

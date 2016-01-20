@@ -43,8 +43,8 @@ static MACHINE_CONFIG_FRAGMENT( nascom_fdc )
 
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:0", nascom_floppies, "55f", nascom_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:1", nascom_floppies, "55f", nascom_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:2", nascom_floppies, NULL,  nascom_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:3", nascom_floppies, NULL,  nascom_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1793:2", nascom_floppies, nullptr,  nascom_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1793:3", nascom_floppies, nullptr,  nascom_fdc_device::floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("floppy_list", "nascom_flop")
 MACHINE_CONFIG_END
@@ -63,7 +63,7 @@ machine_config_constructor nascom_fdc_device::device_mconfig_additions() const
 //  wordpro_device - constructor
 //-------------------------------------------------
 
-nascom_fdc_device::nascom_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nascom_fdc_device::nascom_fdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, NASCOM_FDC, "Nascom Floppy Disc Controller", tag, owner, clock, "nascom_fdc", __FILE__),
 	device_nasbus_card_interface(mconfig, *this),
 	m_fdc(*this, "fd1793"),
@@ -71,8 +71,8 @@ nascom_fdc_device::nascom_fdc_device(const machine_config &mconfig, const char *
 	m_floppy1(*this, "fd1793:1"),
 	m_floppy2(*this, "fd1793:2"),
 	m_floppy3(*this, "fd1793:3"),
-	m_floppy(NULL),
-	m_motor(NULL),
+	m_floppy(nullptr),
+	m_motor(nullptr),
 	m_select(0)
 {
 }
@@ -165,7 +165,7 @@ WRITE8_MEMBER( nascom_fdc_device::select_w )
 	if (VERBOSE)
 		logerror("nascom_fdc_device::select_w: 0x%02x\n", data);
 
-	m_floppy = NULL;
+	m_floppy = nullptr;
 
 	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();

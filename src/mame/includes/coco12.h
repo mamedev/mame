@@ -36,7 +36,7 @@
 class coco12_state : public coco_state
 {
 public:
-	coco12_state(const machine_config &mconfig, device_type type, const char *tag)
+	coco12_state(const machine_config &mconfig, device_type type, std::string tag)
 	: coco_state(mconfig, type, tag),
 		m_sam(*this, SAM_TAG),
 		m_vdg(*this, VDG_TAG)
@@ -52,11 +52,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( horizontal_sync );
 	DECLARE_WRITE_LINE_MEMBER( field_sync );
 protected:
-	virtual void device_start();
-	virtual void update_cart_base(UINT8 *cart_base);
+	virtual void device_start() override;
+	virtual void update_cart_base(UINT8 *cart_base) override;
 
 	/* PIA1 */
-	virtual void pia1_pb_changed(UINT8 data);
+	virtual void pia1_pb_changed(UINT8 data) override;
 
 private:
 

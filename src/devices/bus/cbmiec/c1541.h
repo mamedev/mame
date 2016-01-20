@@ -42,11 +42,11 @@ class c1541_base_t :  public device_t,
 {
 public:
 	// construction/destruction
-	c1541_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	c1541_base_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
 	virtual DECLARE_READ8_MEMBER( via0_pa_r );
@@ -64,16 +64,16 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_cbm_iec_interface overrides
-	virtual void cbm_iec_atn(int state);
-	virtual void cbm_iec_reset(int state);
+	virtual void cbm_iec_atn(int state) override;
+	virtual void cbm_iec_reset(int state) override;
 
 	// device_c64_floppy_parallel_interface overrides
-	virtual void parallel_data_w(UINT8 data);
-	virtual void parallel_strobe_w(int state);
+	virtual void parallel_data_w(UINT8 data) override;
+	virtual void parallel_strobe_w(int state) override;
 
 	enum
 	{
@@ -105,10 +105,10 @@ class c1540_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	c1540_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1540_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -118,10 +118,10 @@ class c1541_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	c1541_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1541_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -131,14 +131,14 @@ class c1541c_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	c1541c_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1541c_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// not really public
-	virtual DECLARE_READ8_MEMBER( via0_pa_r );
+	virtual DECLARE_READ8_MEMBER( via0_pa_r ) override;
 };
 
 
@@ -148,10 +148,10 @@ class c1541ii_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	c1541ii_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1541ii_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -161,10 +161,10 @@ class sx1541_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	sx1541_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sx1541_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -174,10 +174,10 @@ class fsd1_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	fsd1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fsd1_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -187,13 +187,13 @@ class fsd2_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	fsd2_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fsd2_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -203,10 +203,10 @@ class csd1_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	csd1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	csd1_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -216,11 +216,11 @@ class c1541_dolphin_dos_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	c1541_dolphin_dos_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1541_dolphin_dos_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 
@@ -230,11 +230,11 @@ class c1541_professional_dos_v1_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	c1541_professional_dos_v1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1541_professional_dos_v1_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 
@@ -244,11 +244,11 @@ class c1541_prologic_dos_classic_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	c1541_prologic_dos_classic_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1541_prologic_dos_classic_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// not really public
 	DECLARE_READ8_MEMBER( read );
@@ -274,10 +274,10 @@ class indus_gt_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	indus_gt_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	indus_gt_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 

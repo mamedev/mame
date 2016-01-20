@@ -76,7 +76,7 @@ ADDRESS_MAP_END
 //  namco_c45_road_device -- constructor
 //-------------------------------------------------
 
-namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NAMCO_C45_ROAD, "Namco C45 Road", tag, owner, clock, "namco_c45_road", __FILE__),
 		device_gfx_interface(mconfig, *this, gfxinfo),
 		device_memory_interface(mconfig, *this),
@@ -202,7 +202,7 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 				int pen = source_gfx[sourcex >> 16];
 				if (m_palette->pen_indirect(pen) != m_transparent_color)
 				{
-					if (m_clut != NULL)
+					if (m_clut != nullptr)
 						pen = (pen & ~0xff) | m_clut[pen & 0xff];
 					dest[screenx] = pen;
 				}
@@ -215,7 +215,7 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 			while (numpixels-- > 0)
 			{
 				int pen = source_gfx[sourcex >> 16];
-				if (m_clut != NULL)
+				if (m_clut != nullptr)
 					pen = (pen & ~0xff) | m_clut[pen & 0xff];
 				dest[screenx++] = pen;
 				sourcex += dsourcex;
@@ -246,7 +246,7 @@ void namco_c45_road_device::device_start()
 
 const address_space_config *namco_c45_road_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 

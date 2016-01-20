@@ -93,7 +93,7 @@ enum
 class dkong_state : public driver_device
 {
 public:
-	dkong_state(const machine_config &mconfig, device_type type, const char *tag)
+	dkong_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
@@ -140,6 +140,7 @@ public:
 	UINT8               m_hardware_type;
 	UINT8               m_nmi_mask;
 
+	std::unique_ptr<UINT8[]> m_decrypted;
 	/* sound state */
 	const UINT8       *m_snd_rom;
 

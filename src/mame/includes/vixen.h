@@ -26,7 +26,7 @@
 class vixen_state : public driver_device
 {
 public:
-	vixen_state(const machine_config &mconfig, device_type type, const char *tag)
+	vixen_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z8400A_TAG),
 			m_fdc(*this, FDC1797_TAG),
@@ -95,10 +95,10 @@ private:
 
 	address_space *m_program;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	void update_interrupt();
 

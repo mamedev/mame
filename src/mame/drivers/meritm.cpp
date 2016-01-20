@@ -187,7 +187,7 @@ Not all regional versions are available for each Megatouch series
 class meritm_state : public driver_device
 {
 public:
-	meritm_state(const machine_config &mconfig, device_type type, const char *tag)
+	meritm_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_z80pio_0(*this, "z80pio_0"),
 			m_z80pio_1(*this, "z80pio_1"),
@@ -205,7 +205,7 @@ public:
 			m_region_extra(*this, "extra")
 	{ }
 
-	UINT8* m_ram;
+	std::unique_ptr<UINT8[]> m_ram;
 	required_device<z80pio_device> m_z80pio_0;
 	required_device<z80pio_device> m_z80pio_1;
 	int m_vint;
@@ -239,8 +239,8 @@ public:
 	DECLARE_WRITE8_MEMBER(meritm_io_pio_port_a_w);
 	DECLARE_WRITE8_MEMBER(meritm_io_pio_port_b_w);
 	DECLARE_DRIVER_INIT(megat3te);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(meritm_crt250_questions);
 	DECLARE_MACHINE_START(meritm_crt250_crt252_crt258);
 	DECLARE_MACHINE_START(meritm_crt260);
@@ -864,13 +864,13 @@ READ8_MEMBER(meritm_state::meritm_8255_port_c_r)
 WRITE8_MEMBER(meritm_state::meritm_crt250_port_b_w)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,0), BIT(data,1), BIT(data,2), BIT(data,3), BIT(data,4), BIT(data,5), BIT(data,6) );
-	output_set_value("P1 DISC 1 LAMP", !BIT(data,0));
-	output_set_value("P1 DISC 2 LAMP", !BIT(data,1));
-	output_set_value("P1 DISC 3 LAMP", !BIT(data,2));
-	output_set_value("P1 DISC 4 LAMP", !BIT(data,3));
-	output_set_value("P1 DISC 5 LAMP", !BIT(data,4));
-	output_set_value("P1 PLAY LAMP", !BIT(data,5));
-	output_set_value("P1 CANCEL LAMP", !BIT(data,6));
+	output().set_value("P1 DISC 1 LAMP", !BIT(data,0));
+	output().set_value("P1 DISC 2 LAMP", !BIT(data,1));
+	output().set_value("P1 DISC 3 LAMP", !BIT(data,2));
+	output().set_value("P1 DISC 4 LAMP", !BIT(data,3));
+	output().set_value("P1 DISC 5 LAMP", !BIT(data,4));
+	output().set_value("P1 PLAY LAMP", !BIT(data,5));
+	output().set_value("P1 CANCEL LAMP", !BIT(data,6));
 }
 
 /*************************************
@@ -1018,7 +1018,7 @@ static const z80_daisy_config meritm_daisy_chain[] =
 {
 	{ "z80pio_0" },
 	{ "z80pio_1" },
-	{ NULL }
+	{ nullptr }
 };
 
 MACHINE_START_MEMBER(meritm_state,merit_common)
@@ -1052,19 +1052,19 @@ MACHINE_START_MEMBER(meritm_state,meritm_crt250_crt252_crt258)
 
 MACHINE_START_MEMBER(meritm_state,meritm_crt260)
 {
-	m_ram = auto_alloc_array(machine(), UINT8,  0x8000 );
-	machine().device<nvram_device>("nvram")->set_base(m_ram, 0x8000);
-	memset(m_ram, 0x00, 0x8000);
+	m_ram = std::make_unique<UINT8[]>( 0x8000 );
+	machine().device<nvram_device>("nvram")->set_base(m_ram.get(), 0x8000);
+	memset(m_ram.get(), 0x00, 0x8000);
 	m_bank1->configure_entries(0, 128, m_region_maincpu->base(), 0x8000);
 	m_bank2->configure_entries(0, 128, m_region_maincpu->base(), 0x8000);
-	m_bank3->configure_entries(0, 4, m_ram, 0x2000);
+	m_bank3->configure_entries(0, 4, m_ram.get(), 0x2000);
 	m_bank = 0xff;
 	m_psd_a15 = 0;
 	meritm_switch_banks();
 	MACHINE_START_CALL_MEMBER(merit_common);
 	save_item(NAME(m_bank));
 	save_item(NAME(m_psd_a15));
-	save_pointer(NAME(m_ram), 0x8000);
+	save_pointer(NAME(m_ram.get()), 0x8000);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_start_tick)

@@ -195,24 +195,24 @@ void enveEmuResetOperator(sidOperator* pVoice)
 	pVoice->enveShortAttackCount = 0;
 }
 
-INLINE UINT16 enveEmuStartAttack(sidOperator*);
-INLINE UINT16 enveEmuStartDecay(sidOperator*);
-INLINE UINT16 enveEmuStartRelease(sidOperator*);
-INLINE UINT16 enveEmuAlterAttack(sidOperator*);
-INLINE UINT16 enveEmuAlterDecay(sidOperator*);
-INLINE UINT16 enveEmuAlterSustain(sidOperator*);
-INLINE UINT16 enveEmuAlterSustainDecay(sidOperator*);
-INLINE UINT16 enveEmuAlterRelease(sidOperator*);
-INLINE UINT16 enveEmuAttack(sidOperator*);
-INLINE UINT16 enveEmuDecay(sidOperator*);
-INLINE UINT16 enveEmuSustain(sidOperator*);
-INLINE UINT16 enveEmuSustainDecay(sidOperator*);
-INLINE UINT16 enveEmuRelease(sidOperator*);
-INLINE UINT16 enveEmuMute(sidOperator*);
+static inline UINT16 enveEmuStartAttack(sidOperator*);
+static inline UINT16 enveEmuStartDecay(sidOperator*);
+static inline UINT16 enveEmuStartRelease(sidOperator*);
+static inline UINT16 enveEmuAlterAttack(sidOperator*);
+static inline UINT16 enveEmuAlterDecay(sidOperator*);
+static inline UINT16 enveEmuAlterSustain(sidOperator*);
+static inline UINT16 enveEmuAlterSustainDecay(sidOperator*);
+static inline UINT16 enveEmuAlterRelease(sidOperator*);
+static inline UINT16 enveEmuAttack(sidOperator*);
+static inline UINT16 enveEmuDecay(sidOperator*);
+static inline UINT16 enveEmuSustain(sidOperator*);
+static inline UINT16 enveEmuSustainDecay(sidOperator*);
+static inline UINT16 enveEmuRelease(sidOperator*);
+static inline UINT16 enveEmuMute(sidOperator*);
 
-INLINE UINT16 enveEmuStartShortAttack(sidOperator*);
-INLINE UINT16 enveEmuAlterShortAttack(sidOperator*);
-INLINE UINT16 enveEmuShortAttack(sidOperator*);
+static inline UINT16 enveEmuStartShortAttack(sidOperator*);
+static inline UINT16 enveEmuAlterShortAttack(sidOperator*);
+static inline UINT16 enveEmuShortAttack(sidOperator*);
 
 
 const ptr2sidUwordFunc enveModeTable[] =
@@ -240,7 +240,7 @@ const ptr2sidUwordFunc enveModeTable[] =
 /* */
 /* ADSRctrl is (index*2) to enveModeTable[], because of KEY-bit. */
 
-INLINE void enveEmuEnveAdvance(sidOperator* pVoice)
+static inline void enveEmuEnveAdvance(sidOperator* pVoice)
 {
 #ifdef SID_FPUENVE
 	pVoice->fenveStep += pVoice->fenveStepAdd;
@@ -258,7 +258,7 @@ INLINE void enveEmuEnveAdvance(sidOperator* pVoice)
 /* */
 
 /* Only used in the beginning. */
-INLINE UINT16 enveEmuMute(sidOperator* pVoice)
+static inline UINT16 enveEmuMute(sidOperator* pVoice)
 {
 	return 0;
 }
@@ -267,7 +267,7 @@ INLINE UINT16 enveEmuMute(sidOperator* pVoice)
 /* Release */
 /* */
 
-INLINE UINT16 enveEmuRelease(sidOperator* pVoice)
+static inline UINT16 enveEmuRelease(sidOperator* pVoice)
 {
 #ifdef SID_FPUENVE
 	pVoice->enveStep = (UINT16)pVoice->fenveStep;
@@ -293,7 +293,7 @@ INLINE UINT16 enveEmuRelease(sidOperator* pVoice)
 	}
 }
 
-INLINE UINT16 enveEmuAlterRelease(sidOperator* pVoice)
+static inline UINT16 enveEmuAlterRelease(sidOperator* pVoice)
 {
 	UINT8 release = pVoice->SIDSR & 0x0F;
 #ifdef SID_FPUENVE
@@ -308,7 +308,7 @@ INLINE UINT16 enveEmuAlterRelease(sidOperator* pVoice)
 	return enveEmuRelease(pVoice);
 }
 
-INLINE UINT16 enveEmuStartRelease(sidOperator* pVoice)
+static inline UINT16 enveEmuStartRelease(sidOperator* pVoice)
 {
 	pVoice->ADSRctrl = ENVE_RELEASE;
 #ifdef SID_FPUENVE
@@ -327,12 +327,12 @@ INLINE UINT16 enveEmuStartRelease(sidOperator* pVoice)
 /* Sustain */
 /* */
 
-INLINE UINT16 enveEmuSustain(sidOperator* pVoice)
+static inline UINT16 enveEmuSustain(sidOperator* pVoice)
 {
 	return masterAmplModTable[pVoice->sid->masterVolumeAmplIndex+pVoice->enveVol];
 }
 
-INLINE UINT16 enveEmuSustainDecay(sidOperator* pVoice)
+static inline UINT16 enveEmuSustainDecay(sidOperator* pVoice)
 {
 #ifdef SID_FPUENVE
 	pVoice->enveStep = (UINT16)pVoice->fenveStep;
@@ -368,7 +368,7 @@ INLINE UINT16 enveEmuSustainDecay(sidOperator* pVoice)
 }
 
 /* This is the same as enveEmuStartSustainDecay(). */
-INLINE UINT16 enveEmuAlterSustainDecay(sidOperator* pVoice)
+static inline UINT16 enveEmuAlterSustainDecay(sidOperator* pVoice)
 {
 	UINT8 decay = pVoice->SIDAD & 0x0F ;
 #ifdef SID_FPUENVE
@@ -384,7 +384,7 @@ INLINE UINT16 enveEmuAlterSustainDecay(sidOperator* pVoice)
 }
 
 /* This is the same as enveEmuStartSustain(). */
-INLINE UINT16 enveEmuAlterSustain(sidOperator* pVoice)
+static inline UINT16 enveEmuAlterSustain(sidOperator* pVoice)
 {
 	if ( pVoice->enveVol > pVoice->enveSusVol )
 	{
@@ -404,7 +404,7 @@ INLINE UINT16 enveEmuAlterSustain(sidOperator* pVoice)
 /* Decay */
 /* */
 
-INLINE UINT16 enveEmuDecay(sidOperator* pVoice)
+static inline UINT16 enveEmuDecay(sidOperator* pVoice)
 {
 #ifdef SID_FPUENVE
 	pVoice->enveStep = (UINT16)pVoice->fenveStep;
@@ -439,7 +439,7 @@ INLINE UINT16 enveEmuDecay(sidOperator* pVoice)
 	}
 }
 
-INLINE UINT16 enveEmuAlterDecay(sidOperator* pVoice)
+static inline UINT16 enveEmuAlterDecay(sidOperator* pVoice)
 {
 	UINT8 decay = pVoice->SIDAD & 0x0F ;
 #ifdef SID_FPUENVE
@@ -454,7 +454,7 @@ INLINE UINT16 enveEmuAlterDecay(sidOperator* pVoice)
 	return enveEmuDecay(pVoice);
 }
 
-INLINE UINT16 enveEmuStartDecay(sidOperator* pVoice)
+static inline UINT16 enveEmuStartDecay(sidOperator* pVoice)
 {
 	pVoice->ADSRctrl = ENVE_DECAY;
 #ifdef SID_FPUENVE
@@ -471,7 +471,7 @@ INLINE UINT16 enveEmuStartDecay(sidOperator* pVoice)
 /* Attack */
 /* */
 
-INLINE UINT16 enveEmuAttack(sidOperator* pVoice)
+static inline UINT16 enveEmuAttack(sidOperator* pVoice)
 {
 #ifdef SID_FPUENVE
 	pVoice->enveStep = (UINT16)pVoice->fenveStep;
@@ -494,7 +494,7 @@ INLINE UINT16 enveEmuAttack(sidOperator* pVoice)
 	}
 }
 
-INLINE UINT16 enveEmuAlterAttack(sidOperator* pVoice)
+static inline UINT16 enveEmuAlterAttack(sidOperator* pVoice)
 {
 	UINT8 attack = pVoice->SIDAD >> 4;
 #ifdef SID_FPUENVE
@@ -509,7 +509,7 @@ INLINE UINT16 enveEmuAlterAttack(sidOperator* pVoice)
 	return enveEmuAttack(pVoice);
 }
 
-INLINE UINT16 enveEmuStartAttack(sidOperator* pVoice)
+static inline UINT16 enveEmuStartAttack(sidOperator* pVoice)
 {
 	pVoice->ADSRctrl = ENVE_ATTACK;
 #ifdef SID_FPUENVE
@@ -531,7 +531,7 @@ INLINE UINT16 enveEmuStartAttack(sidOperator* pVoice)
 /*#include <iostream.h> */
 /*#include <iomanip.h> */
 
-INLINE UINT16 enveEmuShortAttack(sidOperator* pVoice)
+static inline UINT16 enveEmuShortAttack(sidOperator* pVoice)
 {
 #ifdef SID_FPUENVE
 	pVoice->enveStep = (UINT16)pVoice->fenveStep;
@@ -556,7 +556,7 @@ INLINE UINT16 enveEmuShortAttack(sidOperator* pVoice)
 	return masterAmplModTable[ pVoice->sid->masterVolumeAmplIndex + pVoice->enveVol ];
 }
 
-INLINE UINT16 enveEmuAlterShortAttack(sidOperator* pVoice)
+static inline UINT16 enveEmuAlterShortAttack(sidOperator* pVoice)
 {
 	UINT8 attack = pVoice->SIDAD >> 4;
 #ifdef SID_FPUENVE
@@ -571,7 +571,7 @@ INLINE UINT16 enveEmuAlterShortAttack(sidOperator* pVoice)
 	return enveEmuShortAttack(pVoice);
 }
 
-INLINE UINT16 enveEmuStartShortAttack(sidOperator* pVoice)
+static inline UINT16 enveEmuStartShortAttack(sidOperator* pVoice)
 {
 	pVoice->ADSRctrl = ENVE_SHORTATTACK;
 #ifdef SID_FPUENVE

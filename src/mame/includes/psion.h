@@ -23,7 +23,7 @@
 class psion_state : public driver_device
 {
 public:
-	psion_state(const machine_config &mconfig, device_type type, const char *tag)
+	psion_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_lcdc(*this, "hd44780"),
@@ -60,14 +60,14 @@ public:
 
 	// RAM/ROM banks
 	required_shared_ptr<UINT8> m_ram;
-	UINT8 *m_paged_ram;
+	std::unique_ptr<UINT8[]> m_paged_ram;
 	UINT8 m_rom_bank;
 	UINT8 m_ram_bank;
 	UINT8 m_ram_bank_count;
 	UINT8 m_rom_bank_count;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	UINT8 kb_read();
@@ -88,11 +88,11 @@ public:
 class psion1_state : public psion_state
 {
 public:
-	psion1_state(const machine_config &mconfig, device_type type, const char *tag)
+	psion1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: psion_state(mconfig, type, tag)
 		{ }
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( reset_kb_counter_r );
 	DECLARE_READ8_MEMBER( inc_kb_counter_r );

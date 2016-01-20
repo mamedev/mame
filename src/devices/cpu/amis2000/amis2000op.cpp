@@ -204,7 +204,7 @@ void amis2000_base_device::op_inp()
 void amis2000_base_device::op_out()
 {
 	// OUT: pulse output ACC and RAM to D-pins
-	logerror("%s unknown opcode $%02X at $%04X\n", tag(), m_op, m_pc);
+	logerror("%s unknown opcode $%02X at $%04X\n", tag().c_str(), m_op, m_pc);
 }
 
 void amis2000_base_device::op_disb()
@@ -222,7 +222,7 @@ void amis2000_base_device::op_disn()
 		// 0-F digits in bit order [DP]abcdefg
 		0x7e, 0x30, 0x6d, 0x79, 0x33, 0x5b, 0x5f, 0x70, 0x7f, 0x7b, 0x77, 0x1f, 0x4e, 0x3d, 0x4f, 0x47
 	};
-	const UINT8 *ptr = (m_7seg_table != NULL) ? m_7seg_table : lut_segment_decoder;
+	const UINT8 *ptr = (m_7seg_table != nullptr) ? m_7seg_table : lut_segment_decoder;
 	m_d = ptr[m_acc] | (m_carry ? 0x80 : 0x00);
 	d_latch_out(true);
 }
@@ -356,7 +356,7 @@ void amis2000_base_device::op_nop()
 void amis2000_base_device::op_halt()
 {
 	// HALT: debugger breakpoint for devkit-use
-	logerror("%s unknown opcode $%02X at $%04X\n", tag(), m_op, m_pc);
+	logerror("%s unknown opcode $%02X at $%04X\n", tag().c_str(), m_op, m_pc);
 }
 
 
@@ -402,7 +402,7 @@ void amis2000_base_device::op_sam()
 void amis2000_base_device::op_sos()
 {
 	// SOS: skip next on SF(timer output), clear SF
-	logerror("%s unknown opcode $%02X at $%04X\n", tag(), m_op, m_pc);
+	logerror("%s unknown opcode $%02X at $%04X\n", tag().c_str(), m_op, m_pc);
 }
 
 void amis2000_base_device::op_tf1()

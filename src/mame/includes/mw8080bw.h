@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Michael Strutts, Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni,Lee Taylor, Valerio Verrando, Marco Cassili, Zsolt Vasvari
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni,Lee Taylor, Valerio Verrando, Zsolt Vasvari
+// thanks-to:Michael Strutts, Marco Cassili
 /***************************************************************************
 
     Midway 8080-based black and white hardware
@@ -37,7 +38,7 @@
 class mw8080bw_state : public driver_device
 {
 public:
-	mw8080bw_state(const machine_config &mconfig, device_type type, const char *tag)
+	mw8080bw_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_mb14241(*this,"mb14241"),
@@ -195,11 +196,7 @@ public:
 	void mw8080bw_create_interrupt_timer(  );
 	void mw8080bw_start_interrupt_timer(  );
 	UINT8 tornbase_get_cabinet_type();
-	UINT8 spcenctr_get_trench_width();
-	UINT8 spcenctr_get_trench_center();
-	UINT8 spcenctr_get_trench_slope(UINT8 addr );
 	int invaders_is_cabinet_cocktail();
-	UINT32 invad2ct_coin_input_r(void *param);
 };
 
 

@@ -1123,17 +1123,17 @@ void snes_state::machine_reset()
 	snes_init_ram();
 
 	/* init DMA regs to be 0xff */
-	for (int i = 0; i < 8; i++)
+	for (auto & elem : m_dma_channel)
 	{
-		m_dma_channel[i].dmap = 0xff;
-		m_dma_channel[i].dest_addr = 0xff;
-		m_dma_channel[i].src_addr = 0xffff;
-		m_dma_channel[i].bank = 0xff;
-		m_dma_channel[i].trans_size = 0xffff;
-		m_dma_channel[i].ibank = 0xff;
-		m_dma_channel[i].hdma_addr = 0xffff;
-		m_dma_channel[i].hdma_line_counter = 0xff;
-		m_dma_channel[i].unk = 0xff;
+		elem.dmap = 0xff;
+		elem.dest_addr = 0xff;
+		elem.src_addr = 0xffff;
+		elem.bank = 0xff;
+		elem.trans_size = 0xffff;
+		elem.ibank = 0xff;
+		elem.hdma_addr = 0xffff;
+		elem.hdma_line_counter = 0xff;
+		elem.unk = 0xff;
 	}
 
 	/* Set STAT78 to NTSC or PAL */
@@ -1187,7 +1187,7 @@ DRIVER_INIT_MEMBER(snes_state,snes)
 		if (nvram_size > 0x40000)
 			nvram_size = 0x40000;
 
-		m_cart.m_nvram = auto_alloc_array_clear(machine(), UINT8, nvram_size);
+		m_cart.m_nvram = make_unique_clear<UINT8[]>(nvram_size);
 		m_cart.m_nvram_size = nvram_size;
 	}
 
@@ -1208,7 +1208,7 @@ DRIVER_INIT_MEMBER(snes_state,snes_hirom)
 		if (nvram_size > 0x40000)
 			nvram_size = 0x40000;
 
-		m_cart.m_nvram = auto_alloc_array_clear(machine(), UINT8, nvram_size);
+		m_cart.m_nvram = make_unique_clear<UINT8[]>(nvram_size);
 		m_cart.m_nvram_size = nvram_size;
 	}
 

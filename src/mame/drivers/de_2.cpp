@@ -41,7 +41,7 @@
 class de_2_state : public genpin_class
 {
 public:
-	de_2_state(const machine_config &mconfig, device_type type, const char *tag)
+	de_2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag),
 			m_ym2151(*this, "ym2151"),
 			m_audiocpu(*this, "audiocpu"),
@@ -77,13 +77,10 @@ public:
 	DECLARE_WRITE8_MEMBER(lamp1_w) { };
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_WRITE8_MEMBER(sol2_w) { }; // solenoids 8-15
 	DECLARE_WRITE8_MEMBER(sol3_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
 	DECLARE_READ8_MEMBER(sound_latch_r);
 	DECLARE_WRITE8_MEMBER(sample_bank_w);
@@ -276,7 +273,7 @@ WRITE8_MEMBER( de_2_state::dig0_w )
 	data &= 0x7f;
 	m_strobe = data & 15;
 	m_diag = (data & 0x70) >> 4;
-	output_set_digit_value(60, patterns[data>>4]); // diag digit
+	output().set_digit_value(60, patterns[data>>4]); // diag digit
 	m_segment1 = 0;
 	m_segment2 = 0;
 }
@@ -287,7 +284,7 @@ WRITE8_MEMBER( de_2_state::dig1_w )
 	m_segment2 |= 0x30000;
 	if ((m_segment2 & 0x70000) == 0x30000)
 	{
-		output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
 		m_segment2 |= 0x40000;
 	}
 }
@@ -298,7 +295,7 @@ WRITE8_MEMBER( de_2_state::type2alpha3_dig1_w )
 	m_segment2 |= 0x20000;
 	if ((m_segment2 & 0x70000) == 0x30000)
 	{
-		output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
 		m_segment2 |= 0x40000;
 	}
 }
@@ -309,7 +306,7 @@ WRITE8_MEMBER( de_2_state::alpha3_dig1_w )
 	m_segment2 |= 0x20000;
 	if ((m_segment2 & 0x70000) == 0x30000)
 	{
-		output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		m_segment2 |= 0x40000;
 	}
 }
@@ -331,7 +328,7 @@ WRITE8_MEMBER( de_2_state::pia2c_pa_w )
 	m_segment1 |= 0x10000;
 	if ((m_segment1 & 0x70000) == 0x30000)
 	{
-		output_set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		m_segment1 |= 0x40000;
 	}
 }
@@ -342,7 +339,7 @@ WRITE8_MEMBER( de_2_state::pia2c_pb_w )
 	m_segment1 |= 0x20000;
 	if ((m_segment1 & 0x70000) == 0x30000)
 	{
-		output_set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		m_segment1 |= 0x40000;
 	}
 }
@@ -382,7 +379,7 @@ WRITE8_MEMBER( de_2_state::type2alpha3_pia34_pa_w )
 	m_segment2 |= 0x10000;
 	if ((m_segment2 & 0x70000) == 0x30000)
 	{
-		output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		m_segment2 |= 0x40000;
 	}
 }
@@ -393,7 +390,7 @@ WRITE8_MEMBER( de_2_state::alpha3_pia34_pa_w )
 	m_segment2 |= 0x10000;
 	if ((m_segment2 & 0x70000) == 0x30000)
 	{
-		output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
 		m_segment2 |= 0x40000;
 	}
 }

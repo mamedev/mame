@@ -209,7 +209,7 @@ UINT32 pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 &b
 	else
 		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 
-	if( m_spriteram != NULL )
+	if( m_spriteram != nullptr )
 	{
 		UINT8 *spriteram = m_spriteram;
 		UINT8 *spriteram_2 = m_spriteram2;

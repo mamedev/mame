@@ -86,7 +86,7 @@ Bprom dump by f205v
 class stuntair_state : public driver_device
 {
 public:
-	stuntair_state(const machine_config &mconfig, device_type type, const char *tag)
+	stuntair_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -128,9 +128,9 @@ public:
 	DECLARE_WRITE8_MEMBER(stuntair_sound_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
 	INTERRUPT_GEN_MEMBER(stuntair_irq);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(stuntair);
@@ -292,8 +292,8 @@ WRITE8_MEMBER(stuntair_state::stuntair_nmienable_w)
 WRITE8_MEMBER(stuntair_state::stuntair_coin_w)
 {
 	// lower 2 bits are coin counters, excluding 1st coin(?)
-	coin_counter_w(machine(), 0, data >> 0 & 1);
-	coin_counter_w(machine(), 1, data >> 1 & 1);
+	machine().bookkeeping().coin_counter_w(0, data >> 0 & 1);
+	machine().bookkeeping().coin_counter_w(1, data >> 1 & 1);
 
 	// other bits: unknown
 	if (data & 0xfc)

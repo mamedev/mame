@@ -207,7 +207,7 @@
 class _4enlinea_state : public driver_device
 {
 public:
-	_4enlinea_state(const machine_config &mconfig, device_type type, const char *tag)
+	_4enlinea_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_ay(*this, "aysnd"),
 		m_maincpu(*this, "maincpu")
@@ -228,8 +228,8 @@ public:
 	UINT8 m_serial_flags;
 	UINT8 m_serial_data[2];
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 
 };
@@ -244,22 +244,22 @@ class isa8_cga_4enlinea_device : public isa8_cga_device
 {
 public:
 	// construction/destruction
-	isa8_cga_4enlinea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_cga_4enlinea_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( _4enlinea_io_read );
 	DECLARE_WRITE8_MEMBER( _4enlinea_mode_control_w );
-	virtual void device_start();
-	virtual const rom_entry *device_rom_region() const;
+	virtual void device_start() override;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 const rom_entry *isa8_cga_4enlinea_device::device_rom_region() const
 {
-	return NULL;
+	return nullptr;
 }
 
 const device_type ISA8_CGA_4ENLINEA = &device_creator<isa8_cga_4enlinea_device>;
 
-isa8_cga_4enlinea_device::isa8_cga_4enlinea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_cga_4enlinea_device::isa8_cga_4enlinea_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		isa8_cga_device( mconfig, ISA8_CGA_4ENLINEA, "ISA8_CGA_4ENLINEA", tag, owner, clock, "4enlinea_cga", __FILE__)
 {
 }
@@ -290,7 +290,7 @@ WRITE8_MEMBER( isa8_cga_4enlinea_device::_4enlinea_mode_control_w )
 
 void isa8_cga_4enlinea_device::device_start()
 {
-	if (m_palette != NULL && !m_palette->started())
+	if (m_palette != nullptr && !m_palette->started())
 		throw device_missing_dependencies();
 
 	set_isa_device();

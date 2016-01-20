@@ -33,7 +33,7 @@
 
 	if (action == @selector(showChunkSize:))
 	{
-		[item setState:((tag == memview->bytes_per_chunk()) ? NSOnState : NSOffState)];
+		[item setState:((tag == memview->get_data_format()) ? NSOnState : NSOffState)];
 		return YES;
 	}
 	else if (action == @selector(showPhysicalAddresses:))
@@ -171,7 +171,7 @@
 
 
 - (IBAction)showChunkSize:(id)sender {
-	downcast<debug_view_memory *>(view)->set_bytes_per_chunk([sender tag]);
+	downcast<debug_view_memory *>(view)->set_data_format([sender tag]);
 }
 
 
@@ -208,6 +208,27 @@
 		[chunkItem setTag:tag];
 	}
 
+	NSMenuItem	*chunkItem = [menu insertItemWithTitle:@"32-bit floats"
+		action:@selector(showChunkSize:)
+		keyEquivalent:@"F"
+		atIndex:index++];
+	[chunkItem setTarget:self];
+	[chunkItem setTag:9];
+	
+	NSMenuItem *chunkItem2 = [menu insertItemWithTitle:@"64-bit floats"
+		action:@selector(showChunkSize:)
+		keyEquivalent:@"D"
+		atIndex:index++];
+	[chunkItem2 setTarget:self];
+	[chunkItem2 setTag:10];
+
+	NSMenuItem *chunkItem3 = [menu insertItemWithTitle:@"80-bit floats"
+		action:@selector(showChunkSize:)
+		keyEquivalent:@"E"
+		atIndex:index++];
+	[chunkItem3 setTarget:self];
+	[chunkItem3 setTag:11];
+	
 	[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];
 
 	NSMenuItem *logicalItem = [menu insertItemWithTitle:@"Logical Addresses"

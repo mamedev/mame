@@ -100,8 +100,8 @@ INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 			case 4: m_gear[i] = 3; break;
 			case 8: m_gear[i] = 4; break;
 			}
-			output_set_value("P1gear", m_gear[0]);
-			output_set_value("P2gear", m_gear[1]);
+			output().set_value("P1gear", m_gear[0]);
+			output().set_value("P2gear", m_gear[1]);
 		}
 	}
 
@@ -239,20 +239,20 @@ WRITE8_MEMBER(sprint2_state::sprint2_skid2_w)
 
 WRITE8_MEMBER(sprint2_state::sprint2_lamp1_w)
 {
-	set_led_status(machine(), 0, offset & 1);
+	output().set_led_value(0, offset & 1);
 }
 WRITE8_MEMBER(sprint2_state::sprint2_lamp2_w)
 {
-	set_led_status(machine(), 1, offset & 1);
+	output().set_led_value(1, offset & 1);
 }
 
 WRITE8_MEMBER(sprint2_state::dominos4_lamp3_w)
 {
-	set_led_status(machine(), 2, offset & 1);
+	output().set_led_value(2, offset & 1);
 }
 WRITE8_MEMBER(sprint2_state::dominos4_lamp4_w)
 {
-	set_led_status(machine(), 3, offset & 1);
+	output().set_led_value(3, offset & 1);
 }
 
 static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8, sprint2_state )
@@ -682,7 +682,7 @@ ROM_START( dominos )
 	ROM_LOAD_NIB_LOW ( "7440-01.r4",   0x0000, 0x0200, CRC(957dd8df) SHA1(280457392f40cd66eae34d2fcdbd4d2142793402) )
 
 	ROM_REGION( 0x200, "gfx2", 0 ) /* sprites, not used */
-	ROM_FILL( 0x0000, 0x0200, 0 )
+	ROM_FILL( 0x0000, 0x0200, 0x00 )
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "6400-01.m2", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )  /* SYNC */
@@ -705,7 +705,7 @@ ROM_START( dominos4 ) // built from original Atari source code
 	ROM_LOAD_NIB_LOW ( "007765-01.r4",   0x0000, 0x0200, CRC(6e4e6c75) SHA1(0fc77fecaa73eac57baf778bc51387c75883aad4) )
 
 	ROM_REGION( 0x200, "gfx2", 0 ) /* sprites, not used */
-	ROM_FILL( 0x0000, 0x0200, 0 )
+	ROM_FILL( 0x0000, 0x0200, 0x00 )
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "6400-01.m2", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )  /* SYNC */

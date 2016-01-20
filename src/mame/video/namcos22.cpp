@@ -52,7 +52,7 @@ namcos22_renderer::namcos22_renderer(namcos22_state &state)
 void namcos22_renderer::reset()
 {
 	memset(&m_scenenode_root, 0, sizeof(m_scenenode_root));
-	m_scenenode_cur = NULL;
+	m_scenenode_cur = nullptr;
 
 	m_clipx = 320;
 	m_clipy = 240;
@@ -93,9 +93,9 @@ void namcos22_renderer::renderscanline_uvi_full(INT32 scanline, const extent_t &
 	UINT32 *dest = &extra.destbase->pix32(scanline);
 	UINT8 *primap = &extra.primap->pix8(scanline);
 	UINT16 *ttmap = m_state.m_texture_tilemap;
-	UINT8 *ttattr = m_state.m_texture_tileattr;
+	UINT8 *ttattr = m_state.m_texture_tileattr.get();
 	UINT8 *ttdata = m_state.m_texture_tiledata;
-	UINT8 *tt_ayx_to_pixel = m_state.m_texture_ayx_to_pixel;
+	UINT8 *tt_ayx_to_pixel = m_state.m_texture_ayx_to_pixel.get();
 
 	if (extra.cmode & 4)
 	{
@@ -459,7 +459,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 				{
 					extra.zfog_enabled = 1;
 					extra.cz_sdelta = delta;
-					extra.czram = m_state.m_recalc_czram[cztype];
+					extra.czram = m_state.m_recalc_czram[cztype].get();
 				}
 			}
 		}
@@ -649,7 +649,7 @@ struct namcos22_scenenode *namcos22_renderer::alloc_scenenode(running_machine &m
 struct namcos22_scenenode *namcos22_renderer::new_scenenode(running_machine &machine, UINT32 zsort, namcos22_scenenode_type type)
 {
 	struct namcos22_scenenode *node = &m_scenenode_root;
-	struct namcos22_scenenode *prev = NULL;
+	struct namcos22_scenenode *prev = nullptr;
 	int hash = 0;
 
 	for (int i = 0; i < 24; i += NAMCOS22_RADIX_BITS)
@@ -728,7 +728,7 @@ void namcos22_renderer::render_scene(screen_device &screen, bitmap_rgb32 &bitmap
 	for (int i = NAMCOS22_RADIX_BUCKETS - 1; i >= 0; i--)
 	{
 		render_scene_nodes(screen, bitmap, node->data.nonleaf.next[i]);
-		node->data.nonleaf.next[i] = NULL;
+		node->data.nonleaf.next[i] = nullptr;
 	}
 
 	m_clipx = 320;
@@ -2361,23 +2361,23 @@ UINT32 namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rgb3
 
 void namcos22_state::init_tables()
 {
-	m_dirtypal = auto_alloc_array(machine(), UINT8, 0x8000/4);
-	memset(m_dirtypal, 1, 0x8000/4);
+	m_dirtypal = std::make_unique<UINT8[]>(0x8000/4);
+	memset(m_dirtypal.get(), 1, 0x8000/4);
 	memset(m_paletteram, 0, 0x8000);
 
 	memset(m_polygonram, 0xcc, m_polygonram.bytes());
 
 	// init spotram (super22 only)
 	if (m_is_ss22)
-		m_spotram = auto_alloc_array_clear(machine(), UINT16, SPOTRAM_SIZE);
+		m_spotram = make_unique_clear<UINT16[]>(SPOTRAM_SIZE);
 
 	// init czram tables (super22 only)
 	if (m_is_ss22)
 	{
 		for (int table = 0; table < 4; table++)
 		{
-			m_banked_czram[table] = auto_alloc_array_clear(machine(), UINT16, 0x100);
-			m_recalc_czram[table] = auto_alloc_array_clear(machine(), UINT8, 0x2000);
+			m_banked_czram[table] = make_unique_clear<UINT16[]>(0x100);
+			m_recalc_czram[table] = make_unique_clear<UINT8[]>(0x2000);
 			m_cz_was_written[table] = 1;
 		}
 	}
@@ -2393,7 +2393,7 @@ void namcos22_state::init_tables()
 		m_pointrom[i] = signed24(pointrom_high[i] << 16 | pointrom_mid[i] << 8 | pointrom_low[i]);
 	}
 
-	m_pointram = auto_alloc_array_clear(machine(), UINT32, 0x20000);
+	m_pointram = make_unique_clear<UINT32[]>(0x20000);
 
 	// force all texture tiles to be decoded now
 	for (int i = 0; i < m_gfxdecode->gfx(1)->elements(); i++)
@@ -2401,11 +2401,11 @@ void namcos22_state::init_tables()
 
 	m_texture_tilemap = (UINT16 *)memregion("textilemap")->base();
 	m_texture_tiledata = (UINT8 *)m_gfxdecode->gfx(1)->get_data(0);
-	m_texture_tileattr = auto_alloc_array(machine(), UINT8, 0x080000*2);
+	m_texture_tileattr = std::make_unique<UINT8[]>(0x080000*2);
 
 	// unpack textures
 	UINT8 *packed_tileattr = 0x200000 + (UINT8 *)memregion("textilemap")->base();
-	UINT8 *unpacked_tileattr = m_texture_tileattr;
+	UINT8 *unpacked_tileattr = m_texture_tileattr.get();
 	for (int i = 0; i < 0x80000; i++)
 	{
 		*unpacked_tileattr++ = (*packed_tileattr) >> 4;
@@ -2414,7 +2414,7 @@ void namcos22_state::init_tables()
 	}
 
 	// make attr/y/x lookup table
-	m_texture_ayx_to_pixel = auto_alloc_array(machine(), UINT8, 16*16*16);
+	m_texture_ayx_to_pixel = std::make_unique<UINT8[]>(16*16*16);
 	for (int attr = 0; attr < 16; attr++)
 	{
 		for (int y = 0; y < 16; y++)
@@ -2470,10 +2470,10 @@ void namcos22_state::init_tables()
 
 void namcos22_state::video_start()
 {
-	m_is_ss22 = (m_iomcu == NULL);
+	m_is_ss22 = (m_iomcu == nullptr);
 	init_tables();
 
-	m_mix_bitmap = auto_bitmap_ind16_alloc(machine(), 640, 480);
+	m_mix_bitmap = std::make_unique<bitmap_ind16>(640, 480);
 	m_bgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos22_state::get_text_tile_info), this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_bgtilemap->set_transparent_pen(0xf);
 

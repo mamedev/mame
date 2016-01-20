@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Mike Coates, Peter J.C.Clare
+// copyright-holders:Peter J.C.Clare
 /*****************************************************************************/
 /*                                                                           */
 /*                    (C) Copyright       Peter J.C.Clare                    */
@@ -92,7 +92,7 @@ static const char *const carnival_sample_names[] =
 	"pipehit",
 	"ranking",
 	"rifle",
-	0
+	nullptr
 };
 
 /* sample IDs - must match sample file name table above */

@@ -40,7 +40,7 @@ voice.rom - VOICE ROM
 class good_state : public driver_device
 {
 public:
-	good_state(const machine_config &mconfig, device_type type, const char *tag)
+	good_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_fg_tilemapram(*this, "fg_tilemapram"),
 		m_bg_tilemapram(*this, "bg_tilemapram"),
@@ -59,7 +59,7 @@ public:
 	DECLARE_WRITE16_MEMBER(bg_tilemapram_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

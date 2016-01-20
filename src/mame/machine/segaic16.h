@@ -51,7 +51,7 @@ class sega_16bit_common_base : public driver_device
 {
 public:
 	// construction/destruction
-	sega_16bit_common_base(const machine_config &mconfig, device_type type, const char *tag);
+	sega_16bit_common_base(const machine_config &mconfig, device_type type, std::string tag);
 
 	// open bus read helpers
 	DECLARE_READ16_MEMBER( open_bus_r );
@@ -89,7 +89,7 @@ public:
 	typedef device_delegate<void (UINT8)> sound_write_delegate;
 
 	// construction/destruction
-	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_315_5195_mapper_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	static void static_set_cputag(device_t &device, const char *cpu);
@@ -110,8 +110,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal region struct
@@ -135,12 +135,12 @@ private:
 		// configuration
 		void set_decrypt(fd1089_base_device *fd1089);
 		void set_decrypt(fd1094_device *fd1094);
-		void clear() { set(NULL, NULL, 0, 0, ~0, NULL); }
+		void clear() { set(nullptr, nullptr, 0, 0, ~0, nullptr); }
 		void set(memory_bank *bank, memory_bank *decrypted_bank, offs_t start, offs_t end, offs_t rgnoffs, UINT8 *src);
 
 		// updating
 		void update();
-		void reset() { m_fd1089_decrypted.clear(); if (m_fd1094_cache != NULL) m_fd1094_cache->reset(); }
+		void reset() { m_fd1089_decrypted.clear(); if (m_fd1094_cache != nullptr) m_fd1094_cache->reset(); }
 
 	private:
 		// internal state
@@ -152,7 +152,7 @@ private:
 		UINT8 *                 m_srcptr;
 		fd1089_base_device *    m_fd1089;
 		std::vector<UINT16>   m_fd1089_decrypted;
-		auto_pointer<fd1094_decryption_cache> m_fd1094_cache;
+		std::unique_ptr<fd1094_decryption_cache> m_fd1094_cache;
 	};
 
 	// internal helpers
@@ -182,7 +182,7 @@ class sega_315_5248_multiplier_device : public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_315_5248_multiplier_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// public interface
 	DECLARE_READ16_MEMBER( read );
@@ -190,8 +190,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
@@ -205,7 +205,7 @@ class sega_315_5249_divider_device : public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_315_5249_divider_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// public interface
 	DECLARE_READ16_MEMBER( read );
@@ -213,8 +213,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal helpers
@@ -234,7 +234,7 @@ public:
 	typedef device_delegate<void ()> timer_ack_delegate;
 
 	// construction/destruction
-	sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_315_5250_compare_timer_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	static void static_set_timer_ack(device_t &device, timer_ack_delegate callback);
@@ -247,8 +247,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal helpers

@@ -99,7 +99,7 @@
 class skylncr_state : public driver_device
 {
 public:
-	skylncr_state(const machine_config &mconfig, device_type type, const char *tag)
+	skylncr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -161,7 +161,6 @@ public:
 	DECLARE_WRITE8_MEMBER(reelscroll4_w);
 	DECLARE_WRITE8_MEMBER(skylncr_coin_w);
 	DECLARE_READ8_MEMBER(ret_ff);
-	DECLARE_READ8_MEMBER(ret_00);
 	DECLARE_WRITE8_MEMBER(skylncr_nmi_enable_w);
 	DECLARE_DRIVER_INIT(skylncr);
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -169,7 +168,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_reel_2_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_3_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_4_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(skylncr_vblank_interrupt);
 	required_device<cpu_device> m_maincpu;
@@ -407,7 +406,7 @@ WRITE8_MEMBER(skylncr_state::reelscroll4_w)
 
 WRITE8_MEMBER(skylncr_state::skylncr_coin_w)
 {
-	coin_counter_w(machine(), 0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 }
 
 READ8_MEMBER(skylncr_state::ret_ff)

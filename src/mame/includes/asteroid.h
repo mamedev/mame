@@ -12,7 +12,7 @@
 class asteroid_state : public driver_device
 {
 public:
-	asteroid_state(const machine_config &mconfig, device_type type, const char *tag)
+	asteroid_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dvg(*this, "dvg"),
@@ -55,8 +55,8 @@ public:
 	DECLARE_DRIVER_INIT(asterock);
 	DECLARE_DRIVER_INIT(asteroidb);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 /*----------- defined in audio/asteroid.c -----------*/

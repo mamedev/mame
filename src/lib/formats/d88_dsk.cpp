@@ -319,7 +319,7 @@ FLOPPY_IDENTIFY(d88_dsk_identify)
 {
 	UINT32 size;
 
-	d88_get_header(floppy,&size,NULL,NULL,NULL);
+	d88_get_header(floppy,&size,nullptr,nullptr,nullptr);
 
 	if(floppy_image_size(floppy) == size)
 	{
@@ -517,7 +517,7 @@ bool d88_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 					sdatapos += size;
 
 				} else
-					sects[i].data    = NULL;
+					sects[i].data    = nullptr;
 			}
 
 			build_pc_track_mfm(track, head, image, cell_count, sector_count, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));

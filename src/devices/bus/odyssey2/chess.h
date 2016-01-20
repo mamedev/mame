@@ -12,12 +12,12 @@
 
 class o2_chess_device : public o2_rom_device
 {
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 //  virtual const rom_entry *device_rom_region() const;
 
 public:
 	// construction/destruction
-	o2_chess_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	o2_chess_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 private:
 	required_device<nsc800_device> m_cpu;

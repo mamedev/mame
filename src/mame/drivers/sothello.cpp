@@ -47,7 +47,7 @@ OSC  : 8.0000MHz(X1)   21.477 MHz(X2)   384kHz(X3)
 class sothello_state : public driver_device
 {
 public:
-	sothello_state(const machine_config &mconfig, device_type type, const char *tag)
+	sothello_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_v9938(*this, "v9938") ,
 		m_maincpu(*this, "maincpu"),
@@ -76,8 +76,8 @@ public:
 	DECLARE_READ8_MEMBER(subcpu_status_r);
 	DECLARE_WRITE8_MEMBER(msm_cfg_w);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(subcpu_suspend);
 	TIMER_CALLBACK_MEMBER(subcpu_resume);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);

@@ -5,7 +5,7 @@
 class naughtyb_state : public driver_device
 {
 public:
-	naughtyb_state(const machine_config &mconfig, device_type type, const char *tag)
+	naughtyb_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_naughtyb_custom(*this, "naughtyb_custom"),
@@ -50,7 +50,7 @@ public:
 
 	DECLARE_DRIVER_INIT(trvmstr);
 	DECLARE_DRIVER_INIT(popflame);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(naughtyb);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

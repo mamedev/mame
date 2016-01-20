@@ -6,14 +6,14 @@
 const device_type MSX_CART_CROSSBLAIM = &device_creator<msx_cart_crossblaim>;
 
 
-msx_cart_crossblaim::msx_cart_crossblaim(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_crossblaim::msx_cart_crossblaim(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_CROSSBLAIM, "MSX Cartridge - Cross Blaim", tag, owner, clock, "msx_cart_crossblaim", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_selected_bank(1)
 {
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_bank_base)
 	{
-		m_bank_base[i] = NULL;
+		elem = nullptr;
 	}
 }
 
@@ -28,9 +28,9 @@ void msx_cart_crossblaim::device_start()
 
 void msx_cart_crossblaim::setup_bank()
 {
-	m_bank_base[0] = ( m_selected_bank & 2 ) ? NULL : get_rom_base() + ( m_selected_bank & 0x03 ) * 0x4000;
+	m_bank_base[0] = ( m_selected_bank & 2 ) ? nullptr : get_rom_base() + ( m_selected_bank & 0x03 ) * 0x4000;
 	m_bank_base[2] = get_rom_base() + ( m_selected_bank & 0x03 ) * 0x4000;
-	m_bank_base[3] = ( m_selected_bank & 2 ) ? NULL : get_rom_base() + ( m_selected_bank & 0x03 ) * 0x4000;
+	m_bank_base[3] = ( m_selected_bank & 2 ) ? nullptr : get_rom_base() + ( m_selected_bank & 0x03 ) * 0x4000;
 }
 
 
@@ -62,7 +62,7 @@ READ8_MEMBER(msx_cart_crossblaim::read_cart)
 {
 	UINT8 *bank_base = m_bank_base[offset >> 14];
 
-	if (bank_base != NULL)
+	if (bank_base != nullptr)
 	{
 		return bank_base[offset & 0x3fff];
 	}

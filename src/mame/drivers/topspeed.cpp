@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Graves
+// thanks-to:Richard Bush
 /***************+************************************************************
 
 Top Speed / Full Throttle    (c) Taito 1987
@@ -206,7 +207,7 @@ READ8_MEMBER(topspeed_state::input_bypass_r)
 CUSTOM_INPUT_MEMBER(topspeed_state::pedal_r)
 {
 	static const UINT8 retval[8] = { 0,1,3,2,6,7,5,4 };
-	const char *tag = (const char *)param;
+	std::string tag = (const char *)param;
 	return retval[read_safe(ioport(tag), 0) & 7];
 }
 
@@ -313,7 +314,7 @@ WRITE8_MEMBER(topspeed_state::msm5205_command_w)
 WRITE8_MEMBER(topspeed_state::volume_w)
 {
 	// The volume is controlled by two Taito TC0060DCA hybrid volume modules
-	filter_volume_device *filter = NULL;
+	filter_volume_device *filter = nullptr;
 
 	switch (offset)
 	{

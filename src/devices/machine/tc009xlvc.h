@@ -17,11 +17,11 @@ class tc0091lvc_device : public device_t,
 							public device_memory_interface
 {
 public:
-	tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tc0091lvc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 
 	DECLARE_READ8_MEMBER( vregs_r );
 	DECLARE_WRITE8_MEMBER( vregs_w );
@@ -42,9 +42,6 @@ public:
 	DECLARE_WRITE8_MEMBER( tc0091lvc_spr_w );
 	DECLARE_READ8_MEMBER( tc0091lvc_tvram_r );
 	DECLARE_WRITE8_MEMBER( tc0091lvc_tvram_w );
-
-	DECLARE_WRITE8_MEMBER( tc0091lvc_bg0_scroll_w );
-	DECLARE_WRITE8_MEMBER( tc0091lvc_bg1_scroll_w );
 
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
@@ -76,11 +73,11 @@ public:
 	void screen_eof(void);
 
 protected:
-	virtual void device_config_complete();
-	virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual void device_config_complete() override;
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 	address_space_config        m_space_config;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

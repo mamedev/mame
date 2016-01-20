@@ -28,7 +28,7 @@ Note:
 class c65_state : public driver_device
 {
 public:
-	c65_state(const machine_config &mconfig, device_type type, const char *tag)
+	c65_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_cia0(*this, "cia_0"),
@@ -87,10 +87,10 @@ public:
 	INTERRUPT_GEN_MEMBER(vic3_vblank_irq);
 protected:
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 private:
 	UINT8 m_VIC2_IRQPend, m_VIC2_IRQMask;
 	/* 0x20: border color (TODO: different thread?) */

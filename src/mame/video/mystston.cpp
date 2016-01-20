@@ -81,7 +81,7 @@ void mystston_state::set_palette()
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 4700,
 			2, resistances_b,  weights_b,  0, 4700,
-			0, 0, 0, 0, 0);
+			0, nullptr, nullptr, 0, 0);
 
 	for (i = 0; i < 0x40; i++)
 	{
@@ -133,8 +133,8 @@ WRITE8_MEMBER(mystston_state::mystston_video_control_w)
 	/* D3 - unused */
 
 	/* D4-D5 - coin counters in flipped order */
-	coin_counter_w(machine(), 0, data & 0x20);
-	coin_counter_w(machine(), 1, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, data & 0x20);
+	machine().bookkeeping().coin_counter_w(1, data & 0x10);
 
 	/* D6 - unused */
 	/* D7 - screen flip */

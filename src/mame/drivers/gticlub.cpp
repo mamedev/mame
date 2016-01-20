@@ -242,7 +242,7 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 class gticlub_state : public driver_device
 {
 public:
-	gticlub_state(const machine_config &mconfig, device_type type, const char *tag)
+	gticlub_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -332,8 +332,8 @@ private:
 
 	UINT8 m_gticlub_led_reg[2];
 	emu_timer *m_sound_irq_timer;
-	UINT32 *m_sharc_dataram_0;
-	UINT32 *m_sharc_dataram_1;
+	std::unique_ptr<UINT32[]> m_sharc_dataram_0;
+	std::unique_ptr<UINT32[]> m_sharc_dataram_1;
 };
 
 
@@ -908,7 +908,7 @@ UINT32 gticlub_state::screen_update_hangplt(screen_device &screen, bitmap_rgb32 
 {
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	if (strcmp(screen.tag(), ":lscreen") == 0)
+	if (screen.tag()==":lscreen")
 	{
 		device_t *voodoo = machine().device("voodoo0");
 
@@ -918,7 +918,7 @@ UINT32 gticlub_state::screen_update_hangplt(screen_device &screen, bitmap_rgb32 
 
 		m_k001604_1->draw_front_layer(screen, bitmap, cliprect);
 	}
-	else if (strcmp(screen.tag(), ":rscreen") == 0)
+	else if (screen.tag()==":rscreen")
 	{
 		device_t *voodoo = machine().device("voodoo1");
 
@@ -1416,15 +1416,15 @@ ROM_END
 
 DRIVER_INIT_MEMBER(gticlub_state,gticlub)
 {
-	m_sharc_dataram_0 = auto_alloc_array(machine(), UINT32, 0x100000/4);
+	m_sharc_dataram_0 = std::make_unique<UINT32[]>(0x100000/4);
 }
 
 void gticlub_state::init_hangplt_common()
 {
 	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
 	m_konppc->set_cgboard_texture_bank(1, "bank6", memregion("user5")->base());
-	m_sharc_dataram_0 = auto_alloc_array(machine(), UINT32, 0x100000/4);
-	m_sharc_dataram_1 = auto_alloc_array(machine(), UINT32, 0x100000/4);
+	m_sharc_dataram_0 = std::make_unique<UINT32[]>(0x100000/4);
+	m_sharc_dataram_1 = std::make_unique<UINT32[]>(0x100000/4);
 }
 
 DRIVER_INIT_MEMBER(gticlub_state,hangplt)

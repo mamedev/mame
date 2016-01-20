@@ -25,7 +25,7 @@
 class mb87078_device : public device_t
 {
 public:
-	mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb87078_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~mb87078_device() {}
 
 	template<class _Object> static devcb_base &set_gain_changed_callback(device_t &device, _Object object) { return downcast<mb87078_device &>(device).m_gain_changed_cb.set_callback(object); }
@@ -50,8 +50,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state

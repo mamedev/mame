@@ -58,11 +58,11 @@ class pc9801_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	pc9801_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc9801_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 //private:
 //  device_pc9801_slot_card_interface *m_card;
 

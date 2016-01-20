@@ -21,7 +21,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * いっしょにうたおう! ドラえもん わくわくカラオケ - Issho ni Utaou! Doraemon Wakuwaku Karaoke (Sega Toys - 1999xxxx - HPC-6073)
 * クッキングピコ セット - Cooking Pico Set (Sega Toys - 1999xxxx - HPC-6076)
 * パソコン接続キット ピコタウンにでかけよう! - Pasokon Setsuzoku Kit PicoTown ni Dekakeyou! (Sega Toys - 20010601 - HPC-6097)
-* トミカ・ピコ レスキューパーキング きんきゅうしゅつどう! はたらくのりもの <初回･トミカ付属> - Tomica Pico Rescue Parking Kinkyuushutsudou! Hataraku Norimono ~Shokai-Tomica Fuzoku~ (Sega Toys - 200207xx - HPC-6114)
 * 学研 ピコで学習 1年生 - Gakken Pico de Gakushuu 1-nensei (Sega Toys - ???? - HPC-????)
 * McDonald's マクドナルドであそぼ!<10th> - McDonald's - McDonald de Asobo! ~10th Anniversary Edition~ (Sega Toys - 200306xx - HPC-6125) [reprint HPC-6079]
 * ドラえもん のびたの まちなか ドキドキ たんけん!<10th> - Doraemon - Nobita no Machinaka Dokidoki Tanken! ~10th Anniversary Edition~ (Sega Toys - 200308xx - HPC-6126) [reprint HPC-6009]
@@ -49,7 +48,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * はじめまシリーズ4 学研のおべんきょうソフト たしざん ひきざん - Hajimema Series 4 - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1998xxxx - T-169070)
 * くもんの すくすくれっすん はじめてのひらがな - Kumon no Sukusuku Ressun Hajimete no Hiragana (Kumon - 20020124 - T-300020)
 * 左脳開発シリーズ2 数量・計算 - Sanou Kaihatsu Series 2 Suuryou - Keisan (Imagineer - 19951002 - T-150230)
-* 平成教育委員会Jr. めざせ優等生 - Heisei Kyouikuiinkai Jr. Mezase Yuutousei (Imagineer - 19951201 - T-150270)
 * 左脳開発シリーズ 探索・感性・記憶 - Sanou Kaihatsu Series Tansaku-Kansei-Kioku (Imagineer - Existence unconfirmed!)
 
 
@@ -1811,6 +1809,18 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 			<feature name="ic1" value="MPR-17860 J21" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-17860 j21.ic1" size="1048576" crc="cb3f7654" sha1="9ba109e6eda70e0a5d0885f746e22574c33b81f1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heiseiky">
+		<description>Heisei Kyouiku Iinkai Jr. Mezase Yuutousei (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<part name="cart" interface="pico_cart">
+		<feature name="pcb" value="171-6882A" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18565-t.ic1" size="524288" crc="8ba23bbe" sha1="85e6ed98f5e7bfa04c1b099bba79ddd34ccdd40e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4614,6 +4624,17 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="u4" value="HC245" />
 			<dataarea name="rom" size="2097152">
 				<rom name="9k0-0023a-mx.u1" size="2097152" crc="a1ace3b8" sha1="57c3da145e97ffd94397c2c265efd05ae4e43dd9" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomicarp">
+		<description>Tomica Pico Rescue Parking ~Shokai-Tomica Fuzoku~ (Jpn)</description>
+		<year>2002</year>
+		<publisher>Sega Toys</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="9v1-0014ar2" size="2097152" crc="3e53c515" sha1="fff0d70882c10adab3065bebe4ce07aee690f674" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>

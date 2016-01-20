@@ -9,7 +9,7 @@
 class mystwarr_state : public konamigx_state
 {
 public:
-	mystwarr_state(const machine_config &mconfig, device_type type, const char *tag)
+	mystwarr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: konamigx_state(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_k053252(*this, "k053252"),
@@ -25,6 +25,7 @@ public:
 	required_device<k055673_device> m_k055673;
 	required_shared_ptr<UINT16> m_gx_workram;
 	optional_shared_ptr<UINT16> m_spriteram;
+	std::unique_ptr<UINT8[]> m_decoded;
 
 	UINT8 m_mw_irq_control;
 	int m_cur_sound_region;

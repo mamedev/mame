@@ -37,7 +37,7 @@ Looking at the code of the cartridges it seems there is:
 class sv8000_state : public driver_device
 {
 public:
-	sv8000_state(const machine_config &mconfig, device_type type, const char *tag)
+	sv8000_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_s68047p(*this, "s68047p")
@@ -66,8 +66,8 @@ public:
 	DECLARE_READ8_MEMBER( mc6847_videoram_r );
 
 private:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<s68047_device> m_s68047p;

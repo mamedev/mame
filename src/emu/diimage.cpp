@@ -17,6 +17,7 @@
 #include "ui/imgcntrl.h"
 #include "softlist.h"
 #include "image.h"
+#include "formats/ioprocs.h"
 
 //**************************************************************************
 //  DEVICE CONFIG IMAGE INTERFACE
@@ -56,17 +57,17 @@ const image_device_type_info device_image_interface::m_device_info_array[] =
 device_image_interface::device_image_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "image"),
 		m_err(),
-		m_file(NULL),
-		m_mame_file(NULL),
-		m_software_info_ptr(NULL),
-		m_software_part_ptr(NULL), 
-	    m_supported(0),
+		m_file(nullptr),
+		m_mame_file(nullptr),
+		m_software_info_ptr(nullptr),
+		m_software_part_ptr(nullptr),
+		m_supported(0),
 		m_readonly(false),
-		m_created(false), 
-	    m_init_phase(false), 
-	    m_from_swlist(false), 
-	    m_create_format(0), 
-	    m_create_args(NULL),
+		m_created(false),
+		m_init_phase(false),
+		m_from_swlist(false),
+		m_create_format(0),
+		m_create_args(nullptr),
 		m_is_loading(FALSE)
 {
 }
@@ -93,7 +94,7 @@ const image_device_type_info *device_image_interface::find_device_type(iodevice_
 		if (m_device_info_array[i].m_type == type)
 			return &m_device_info_array[i];
 	}
-	return NULL;
+	return nullptr;
 }
 
 //-------------------------------------------------
@@ -103,7 +104,7 @@ const image_device_type_info *device_image_interface::find_device_type(iodevice_
 const char *device_image_interface::device_typename(iodevice_t type)
 {
 	const image_device_type_info *info = find_device_type(type);
-	return (info != NULL) ? info->m_name : NULL;
+	return (info != nullptr) ? info->m_name : nullptr;
 }
 
 //-------------------------------------------------
@@ -114,7 +115,7 @@ const char *device_image_interface::device_typename(iodevice_t type)
 const char *device_image_interface::device_brieftypename(iodevice_t type)
 {
 	const image_device_type_info *info = find_device_type(type);
-	return (info != NULL) ? info->m_shortname : NULL;
+	return (info != nullptr) ? info->m_shortname : nullptr;
 }
 
 //-------------------------------------------------
@@ -200,10 +201,10 @@ image_error_t device_image_interface::set_image_filename(const char *filename)
 
 const image_device_format *device_image_interface::device_get_named_creatable_format(const char *format_name)
 {
-	for (const image_device_format *format = m_formatlist.first(); format != NULL; format = format->next())
+	for (const image_device_format *format = m_formatlist.first(); format != nullptr; format = format->next())
 		if (strcmp(format->name(), format_name) == 0)
 			return format;
-	return NULL;
+	return nullptr;
 }
 
 /****************************************************************************
@@ -257,7 +258,7 @@ void device_image_interface::seterror(image_error_t err, const char *message)
 {
 	clear_error();
 	m_err = err;
-	if (message != NULL)
+	if (message != nullptr)
 	{
 		m_err_message = message;
 	}
@@ -304,9 +305,9 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 	bool done = FALSE;
 
 	directory = osd_opendir(m_working_directory.c_str());
-	if (directory != NULL)
+	if (directory != nullptr)
 	{
-		while(!done && (entry = osd_readdir(directory)) != NULL)
+		while(!done && (entry = osd_readdir(directory)) != nullptr)
 		{
 			if (!core_stricmp(subdir, entry->name))
 			{
@@ -331,7 +332,7 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 
 void device_image_interface::setup_working_directory()
 {
-	char *dst = NULL;
+	char *dst = nullptr;
 
 	osd_get_full_path(&dst,".");
 	/* first set up the working directory to be the starting directory */
@@ -370,14 +371,14 @@ const char * device_image_interface::working_directory()
     get_software_region
 -------------------------------------------------*/
 
-UINT8 *device_image_interface::get_software_region(const char *tag)
+UINT8 *device_image_interface::get_software_region(std::string tag)
 {
 	char full_tag[256];
 
-	if ( m_software_info_ptr == NULL || m_software_part_ptr == NULL )
-		return NULL;
+	if ( m_software_info_ptr == nullptr || m_software_part_ptr == nullptr )
+		return nullptr;
 
-	sprintf( full_tag, "%s:%s", device().tag(), tag );
+	sprintf( full_tag, "%s:%s", device().tag().c_str(), tag.c_str() );
 	return device().machine().root_device().memregion( full_tag )->base();
 }
 
@@ -386,11 +387,11 @@ UINT8 *device_image_interface::get_software_region(const char *tag)
     image_get_software_region_length
 -------------------------------------------------*/
 
-UINT32 device_image_interface::get_software_region_length(const char *tag)
+UINT32 device_image_interface::get_software_region_length(std::string tag)
 {
 	char full_tag[256];
 
-	sprintf( full_tag, "%s:%s", device().tag(), tag );
+	sprintf( full_tag, "%s:%s", device().tag().c_str(), tag.c_str() );
 	return device().machine().root_device().memregion( full_tag )->bytes();
 }
 
@@ -401,7 +402,7 @@ UINT32 device_image_interface::get_software_region_length(const char *tag)
 
 const char *device_image_interface::get_feature(const char *feature_name)
 {
-	return (m_software_part_ptr == NULL) ? NULL : m_software_part_ptr->feature(feature_name);
+	return (m_software_part_ptr == nullptr) ? nullptr : m_software_part_ptr->feature(feature_name);
 }
 
 
@@ -409,7 +410,7 @@ const char *device_image_interface::get_feature(const char *feature_name)
 //  load_software_region -
 //-------------------------------------------------
 
-bool device_image_interface::load_software_region(const char *tag, optional_shared_ptr<UINT8> &ptr)
+bool device_image_interface::load_software_region(std::string tag, optional_shared_ptr<UINT8> &ptr)
 {
 	size_t size = get_software_region_length(tag);
 
@@ -508,14 +509,39 @@ UINT32 device_image_interface::crc()
 -------------------------------------------------*/
 void device_image_interface::battery_load(void *buffer, int length, int fill)
 {
+	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+
+	file_error filerr;
+	int bytes_read = 0;
 	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
-	image_battery_load_by_name(device().machine().options(), fname.c_str(), buffer, length, fill);
+
+	/* try to open the battery file and read it in, if possible */
+	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_READ);
+	filerr = file.open(fname.c_str());
+	if (filerr == FILERR_NONE)
+		bytes_read = file.read(buffer, length);
+
+	/* fill remaining bytes (if necessary) */
+	memset(((char *)buffer) + bytes_read, fill, length - bytes_read);
 }
 
 void device_image_interface::battery_load(void *buffer, int length, void *def_buffer)
 {
+	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+
+	file_error filerr;
+	int bytes_read = 0;
 	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
-	image_battery_load_by_name(device().machine().options(), fname.c_str(), buffer, length, def_buffer);
+
+	/* try to open the battery file and read it in, if possible */
+	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_READ);
+	filerr = file.open(fname.c_str());
+	if (filerr == FILERR_NONE)
+		bytes_read = file.read(buffer, length);
+
+	/* if no file was present, copy the default battery */
+	if (bytes_read == 0 && def_buffer)
+		memcpy((char *)buffer, (char *)def_buffer, length);
 }
 
 /*-------------------------------------------------
@@ -526,9 +552,14 @@ void device_image_interface::battery_load(void *buffer, int length, void *def_bu
 -------------------------------------------------*/
 void device_image_interface::battery_save(const void *buffer, int length)
 {
+	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
 	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
 
-	image_battery_save_by_name(device().machine().options(), fname.c_str(), buffer, length);
+	/* try to open the battery file and write it out, if possible */
+	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	file_error filerr = file.open(fname.c_str());
+	if (filerr == FILERR_NONE)
+		file.write(buffer, length);
 }
 
 //-------------------------------------------------
@@ -546,14 +577,14 @@ bool device_image_interface::uses_file_extension(const char *file_extension) con
 	/* find the extensions */
 	std::string extensions(file_extensions());
 	char *ext = strtok((char*)extensions.c_str(),",");
-	while (ext != NULL)
+	while (ext != nullptr)
 	{
 		if (!core_stricmp(ext, file_extension))
 		{
 			result = TRUE;
 			break;
 		}
-		ext = strtok (NULL, ",");
+		ext = strtok (nullptr, ",");
 	}
 	return result;
 }
@@ -569,7 +600,7 @@ bool device_image_interface::uses_file_extension(const char *file_extension) con
 
 bool device_image_interface::is_loaded()
 {
-	return (m_file != NULL);
+	return (m_file != nullptr);
 }
 
 /*-------------------------------------------------
@@ -711,9 +742,8 @@ void device_image_interface::determine_open_plan(int is_create, UINT32 *open_pla
 
 static void dump_wrong_and_correct_checksums(const hash_collection &hashes, const hash_collection &acthashes)
 {
-	std::string tempstr;
-	osd_printf_error("    EXPECTED: %s\n", hashes.macro_string(tempstr));
-	osd_printf_error("       FOUND: %s\n", acthashes.macro_string(tempstr));
+	osd_printf_error("    EXPECTED: %s\n", hashes.macro_string().c_str());
+	osd_printf_error("       FOUND: %s\n", acthashes.macro_string().c_str());
 }
 
 /*-------------------------------------------------
@@ -724,7 +754,7 @@ static void dump_wrong_and_correct_checksums(const hash_collection &hashes, cons
 static int verify_length_and_hash(emu_file *file, const char *name, UINT32 explength, const hash_collection &hashes)
 {
 	int retVal = 0;
-	if (file==NULL) return 0;
+	if (file==nullptr) return 0;
 
 	/* verify length */
 	UINT32 actlength = file->size();
@@ -735,8 +765,7 @@ static int verify_length_and_hash(emu_file *file, const char *name, UINT32 exple
 	}
 
 	/* If there is no good dump known, write it */
-	std::string tempstr;
-	hash_collection &acthashes = file->hashes(hashes.hash_types(tempstr));
+	hash_collection &acthashes = file->hashes(hashes.hash_types().c_str());
 	if (hashes.flag(hash_collection::FLAG_NO_DUMP))
 	{
 		osd_printf_error("%s NO GOOD DUMP KNOWN\n", name);
@@ -767,7 +796,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 	const rom_entry *region;
 	bool retVal = FALSE;
 	int warningcount = 0;
-	for (region = start; region != NULL; region = rom_next_region(region))
+	for (region = start; region != nullptr; region = rom_next_region(region))
 	{
 		/* loop until we hit the end of this region */
 		const rom_entry *romp = region + 1;
@@ -782,7 +811,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				bool has_crc = hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
 
 				software_info *swinfo = swlist.find(swname);
-				if (swinfo == NULL)
+				if (swinfo == nullptr)
 					return false;
 
 				UINT32 supported = swinfo->supported();
@@ -795,11 +824,11 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				// " swlist % clonename % parentname "
 				// below, we have the code to split the elements and to create paths to load from
 
-				while (swinfo != NULL)
+				while (swinfo != nullptr)
 				{
 					locationtag.append(swinfo->shortname()).append(breakstr);
 					const char *parentname = swinfo->parentname();
-					swinfo = (parentname != NULL) ? swlist.find(parentname) : NULL;
+					swinfo = (parentname != nullptr) ? swlist.find(parentname) : nullptr;
 				}
 				// strip the final '%'
 				locationtag.erase(locationtag.length() - 1, 1);
@@ -831,19 +860,19 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				// - if we are not using lists, we have regiontag only;
 				// - if we are using lists, we have: list/clonename, list/parentname, clonename, parentname
 				// try to load from list/setname
-				if ((m_mame_file == NULL) && (tag2.c_str() != NULL))
-					filerr = common_process_file(device().machine().options(), tag2.c_str(), has_crc, crc, romp, &m_mame_file);
+				if ((m_mame_file == nullptr) && (tag2.c_str() != nullptr))
+					m_mame_file = common_process_file(device().machine().options(), tag2.c_str(), has_crc, crc, romp, filerr);
 				// try to load from list/parentname
-				if ((m_mame_file == NULL) && (tag3.c_str() != NULL))
-					filerr = common_process_file(device().machine().options(), tag3.c_str(), has_crc, crc, romp, &m_mame_file);
+				if ((m_mame_file == nullptr) && (tag3.c_str() != nullptr))
+					m_mame_file = common_process_file(device().machine().options(), tag3.c_str(), has_crc, crc, romp, filerr);
 				// try to load from setname
-				if ((m_mame_file == NULL) && (tag4.c_str() != NULL))
-					filerr = common_process_file(device().machine().options(), tag4.c_str(), has_crc, crc, romp, &m_mame_file);
+				if ((m_mame_file == nullptr) && (tag4.c_str() != nullptr))
+					m_mame_file = common_process_file(device().machine().options(), tag4.c_str(), has_crc, crc, romp, filerr);
 				// try to load from parentname
-				if ((m_mame_file == NULL) && (tag5.c_str() != NULL))
-					filerr = common_process_file(device().machine().options(), tag5.c_str(), has_crc, crc, romp, &m_mame_file);
+				if ((m_mame_file == nullptr) && (tag5.c_str() != nullptr))
+					m_mame_file = common_process_file(device().machine().options(), tag5.c_str(), has_crc, crc, romp, filerr);
 
-				warningcount += verify_length_and_hash(m_mame_file,ROM_GETNAME(romp),ROM_GETLENGTH(romp),hash_collection(ROM_GETHASHDATA(romp)));
+				warningcount += verify_length_and_hash(m_mame_file.get(),ROM_GETNAME(romp),ROM_GETLENGTH(romp),hash_collection(ROM_GETHASHDATA(romp)));
 
 				if (filerr == FILERR_NONE)
 				{
@@ -939,7 +968,7 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 		if ( m_software_info_ptr )
 		{
 			// sanitize
-			if (m_software_info_ptr->longname() == NULL || m_software_info_ptr->publisher() == NULL || m_software_info_ptr->year() == NULL)
+			if (m_software_info_ptr->longname() == nullptr || m_software_info_ptr->publisher() == nullptr || m_software_info_ptr->year() == nullptr)
 				fatalerror("Each entry in an XML list must have all of the following fields: description, publisher, year!\n");
 
 			// store
@@ -1009,7 +1038,7 @@ done:
 
 bool device_image_interface::load(const char *path)
 {
-	return load_internal(path, FALSE, 0, NULL, FALSE);
+	return load_internal(path, FALSE, 0, nullptr, FALSE);
 }
 
 /*-------------------------------------------------
@@ -1022,9 +1051,9 @@ bool device_image_interface::open_image_file(emu_options &options)
 	if (*path != 0)
 	{
 		set_init_phase();
-		if (load_internal(path, FALSE, 0, NULL, TRUE)==IMAGE_INIT_PASS)
+		if (load_internal(path, FALSE, 0, nullptr, TRUE)==IMAGE_INIT_PASS)
 		{
-			if (software_entry()==NULL) return true;
+			if (software_entry()==nullptr) return true;
 		}
 	}
 	return false;
@@ -1065,7 +1094,7 @@ bool device_image_interface::finish_load()
 	}
 	m_is_loading = FALSE;
 	m_create_format = 0;
-	m_create_args = NULL;
+	m_create_args = nullptr;
 	m_init_phase = FALSE;
 	return err;
 }
@@ -1076,7 +1105,7 @@ bool device_image_interface::finish_load()
 
 bool device_image_interface::create(const char *path, const image_device_format *create_format, option_resolution *create_args)
 {
-	int format_index = (create_format != NULL) ? m_formatlist.indexof(*create_format) : 0;
+	int format_index = (create_format != nullptr) ? m_formatlist.indexof(*create_format) : 0;
 	return load_internal(path, TRUE, format_index, create_args, FALSE);
 }
 
@@ -1090,14 +1119,13 @@ void device_image_interface::clear()
 {
 	if (m_mame_file)
 	{
-		global_free(m_mame_file);
-		m_mame_file = NULL;
-		m_file = NULL;
+		m_mame_file = nullptr;
+		m_file = nullptr;
 	} else {
 		if (m_file)
 		{
 			core_fclose(m_file);
-			m_file = NULL;
+			m_file = nullptr;
 		}
 	}
 
@@ -1113,8 +1141,8 @@ void device_image_interface::clear()
 	m_filetype.clear();
 
 	m_full_software_name.clear();
-	m_software_info_ptr = NULL;
-	m_software_part_ptr = NULL;
+	m_software_info_ptr = nullptr;
+	m_software_part_ptr = nullptr;
 	m_software_list_name.clear();
 }
 
@@ -1141,15 +1169,15 @@ void device_image_interface::update_names(const device_type device_type, const c
 	image_interface_iterator iter(device().mconfig().root_device());
 	int count = 0;
 	int index = -1;
-	for (const device_image_interface *image = iter.first(); image != NULL; image = iter.next())
+	for (const device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
 	{
 		if (this == image)
 			index = count;
-		if ((image->image_type() == image_type() && device_type==NULL) || (device_type==image->device().type()))
+		if ((image->image_type() == image_type() && device_type==nullptr) || (device_type==image->device().type()))
 			count++;
 	}
-	const char *inst_name = (device_type!=NULL) ? inst : device_typename(image_type());
-	const char *brief_name = (device_type!=NULL) ? brief : device_brieftypename(image_type());
+	const char *inst_name = (device_type!=nullptr) ? inst : device_typename(image_type());
+	const char *brief_name = (device_type!=nullptr) ? brief : device_brieftypename(image_type());
 	if (count > 1)
 	{
 		strprintf(m_instance_name,"%s%d", inst_name, index + 1);
@@ -1187,7 +1215,7 @@ void device_image_interface::software_name_split(const char *swlist_swname, std:
 
 	// if no colon, this is the swname by itself
 	const char *split1 = strchr(swlist_swname, ':');
-	if (split1 == NULL)
+	if (split1 == nullptr)
 	{
 		swname.assign(swlist_swname);
 		return;
@@ -1195,7 +1223,7 @@ void device_image_interface::software_name_split(const char *swlist_swname, std:
 
 	// if one colon, it is the swname and swpart alone
 	const char *split2 = strchr(split1 + 1, ':');
-	if (split2 == NULL)
+	if (split2 == nullptr)
 	{
 		swname.assign(swlist_swname, split1 - swlist_swname);
 		swpart.assign(split1 + 1);
@@ -1209,28 +1237,28 @@ void device_image_interface::software_name_split(const char *swlist_swname, std:
 }
 
 
-software_part *device_image_interface::find_software_item(const char *path, bool restrict_to_interface)
+software_part *device_image_interface::find_software_item(const char *path, bool restrict_to_interface) const
 {
 	// split full software name into software list name and short software name
 	std::string swlist_name, swinfo_name, swpart_name;
 	software_name_split(path, swlist_name, swinfo_name, swpart_name);
 
 	// determine interface
-	const char *interface = NULL;
+	const char *interface = nullptr;
 	if (restrict_to_interface)
 		interface = image_interface();
 
 	// find the software list if explicitly specified
 	software_list_device_iterator deviter(device().mconfig().root_device());
-	for (software_list_device *swlistdev = deviter.first(); swlistdev != NULL; swlistdev = deviter.next())
+	for (software_list_device *swlistdev = deviter.first(); swlistdev != nullptr; swlistdev = deviter.next())
 	{
 		if (swlist_name.compare(swlistdev->list_name())==0 || !(swlist_name.length() > 0))
 		{
 			software_info *info = swlistdev->find(swinfo_name.c_str());
-			if (info != NULL)
+			if (info != nullptr)
 			{
 				software_part *part = info->find_part(swpart_name.c_str(), interface);
-				if (part != NULL)
+				if (part != nullptr)
 					return part;
 			}
 		}
@@ -1242,17 +1270,17 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 			// since the function cannot distinguish between this and the case
 			// path = swinfo_name:swpart_name
 			software_info *info = swlistdev->find(swpart_name.c_str());
-			if (info != NULL)
+			if (info != nullptr)
 			{
-				software_part *part = info->find_part(NULL, interface);
-				if (part != NULL)
+				software_part *part = info->find_part(nullptr, interface);
+				if (part != nullptr)
 					return part;
 			}
 		}
 	}
 
 	// if explicitly specified and not found, just error here
-	return NULL;
+	return nullptr;
 }
 
 
@@ -1273,7 +1301,7 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 {
 	// if no match has been found, we suggest similar shortnames
 	swpart = find_software_item(path, true);
-	if (swpart == NULL)
+	if (swpart == nullptr)
 	{
 		software_list_device::display_matches(device().machine().config(), image_interface(), path);
 		return false;
@@ -1292,22 +1320,22 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 
 	// check requirements and load those images
 	const char *requirement = swpart->feature("requirement");
-	if (requirement != NULL)
+	if (requirement != nullptr)
 	{
 		software_part *req_swpart = find_software_item(requirement, false);
-		if (req_swpart != NULL)
+		if (req_swpart != nullptr)
 		{
 			image_interface_iterator imgiter(device().machine().root_device());
-			for (device_image_interface *req_image = imgiter.first(); req_image != NULL; req_image = imgiter.next())
+			for (device_image_interface *req_image = imgiter.first(); req_image != nullptr; req_image = imgiter.next())
 			{
 				const char *interface = req_image->image_interface();
-				if (interface != NULL)
+				if (interface != nullptr)
 				{
 					if (req_swpart->matches_interface(interface))
 					{
 						const char *option = device().mconfig().options().value(req_image->brief_instance_name());
 						// mount only if not already mounted
-						if (strlen(option) == 0 && !req_image->filename())
+						if (*option == '\0' && !req_image->filename())
 						{
 							req_image->set_init_phase();
 							req_image->load(requirement);
@@ -1325,21 +1353,22 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 //  software_get_default_slot
 //-------------------------------------------------
 
-void device_image_interface::software_get_default_slot(std::string &result, const char *default_card_slot)
+std::string device_image_interface::software_get_default_slot(const char *default_card_slot) const
 {
 	const char *path = device().mconfig().options().value(instance_name());
-	result.clear();
-	if (strlen(path) > 0)
+	std::string result;
+	if (*path != '\0')
 	{
 		result.assign(default_card_slot);
 		software_part *swpart = find_software_item(path, true);
-		if (swpart != NULL)
+		if (swpart != nullptr)
 		{
 			const char *slot = swpart->feature("slot");
-			if (slot != NULL)
+			if (slot != nullptr)
 				result.assign(slot);
 		}
 	}
+	return result;
 }
 
 /*-------------------------------------------------
@@ -1349,5 +1378,43 @@ void device_image_interface::software_get_default_slot(std::string &result, cons
 
 ui_menu *device_image_interface::get_selection_menu(running_machine &machine, render_container *container)
 {
-	return auto_alloc_clear(machine, ui_menu_control_device_image(machine, container, this));
+	return auto_alloc_clear(machine, <ui_menu_control_device_image>(machine, container, this));
 }
+
+/* ----------------------------------------------------------------------- */
+
+static int image_fseek_thunk(void *file, INT64 offset, int whence)
+{
+	device_image_interface *image = (device_image_interface *) file;
+	return image->fseek(offset, whence);
+}
+
+static size_t image_fread_thunk(void *file, void *buffer, size_t length)
+{
+	device_image_interface *image = (device_image_interface *) file;
+	return image->fread(buffer, length);
+}
+
+static size_t image_fwrite_thunk(void *file, const void *buffer, size_t length)
+{
+	device_image_interface *image = (device_image_interface *) file;
+	return image->fwrite(buffer, length);
+}
+
+static UINT64 image_fsize_thunk(void *file)
+{
+	device_image_interface *image = (device_image_interface *) file;
+	return image->length();
+}
+
+/* ----------------------------------------------------------------------- */
+
+struct io_procs image_ioprocs =
+{
+	nullptr,
+	image_fseek_thunk,
+	image_fread_thunk,
+	image_fwrite_thunk,
+	image_fsize_thunk
+};
+

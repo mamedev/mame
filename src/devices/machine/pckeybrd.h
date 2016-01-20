@@ -19,8 +19,8 @@
 class pc_keyboard_device : public device_t
 {
 public:
-	pc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	pc_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	pc_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pc_keyboard_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE_LINE_MEMBER(enable);
@@ -37,9 +37,9 @@ public:
 
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void queue_insert(UINT8 data);
 	void clear_buffer(void);
 
@@ -83,7 +83,7 @@ private:
 class at_keyboard_device : public pc_keyboard_device
 {
 public:
-	at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	at_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -91,12 +91,12 @@ public:
 		{ downcast<at_keyboard_device &>(device).m_scan_code_set = default_set; downcast<at_keyboard_device &>(device).m_type = type; }
 
 protected:
-	virtual void device_reset();
-	virtual void device_start();
+	virtual void device_reset() override;
+	virtual void device_start() override;
 
 private:
-	virtual void standard_scancode_insert(int our_code, int pressed);
-	virtual void extended_scancode_insert(int code, int pressed);
+	virtual void standard_scancode_insert(int our_code, int pressed) override;
+	virtual void extended_scancode_insert(int code, int pressed) override;
 	void helper(const char *codes);
 	void clear_buffer_and_acknowledge(void);
 

@@ -25,8 +25,8 @@
 
 class h8s2655_device : public h8s2600_device {
 public:
-	h8s2655_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	h8s2655_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8s2655_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	h8s2655_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(syscr_r);
 	DECLARE_WRITE8_MEMBER(syscr_w);
@@ -62,24 +62,24 @@ protected:
 
 	UINT8 syscr;
 
-	virtual bool exr_in_stack() const;
-	virtual void update_irq_filter();
-	virtual void interrupt_taken();
-	virtual int trace_setup();
-	virtual int trapa_setup();
-	virtual void irq_setup();
-	virtual void internal_update(UINT64 current_time);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual bool exr_in_stack() const override;
+	virtual void update_irq_filter() override;
+	virtual void interrupt_taken() override;
+	virtual int trace_setup() override;
+	virtual int trapa_setup() override;
+	virtual void irq_setup() override;
+	virtual void internal_update(UINT64 current_time) override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 	DECLARE_ADDRESS_MAP(map, 16);
 
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 };
 
 class h8s2653_device : public h8s2655_device {
 public:
-	h8s2653_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8s2653_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type H8S2655;

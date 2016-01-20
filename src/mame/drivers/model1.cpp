@@ -665,18 +665,18 @@ WRITE16_MEMBER(model1_state::io_w)
 		// lamp and coinmeters
 		// 0x01 = COIN METER 1
 		// 0x02 = COIN METER 2
-		set_led_status(machine(), 0, data & 0x4);   // START (1)
-		set_led_status(machine(), 1, data & 0x8);   // VIEW1 (START2 - VF)
-		set_led_status(machine(), 2, data & 0x10);  // VIEW2 (VIEW - SWA)
-		set_led_status(machine(), 3, data & 0x20);  // VIEW3
-		set_led_status(machine(), 4, data & 0x40);  // VIEW4
-		set_led_status(machine(), 5, data & 0x80);  // RACE LEADER
+		output().set_led_value(0, data & 0x4);   // START (1)
+		output().set_led_value(1, data & 0x8);   // VIEW1 (START2 - VF)
+		output().set_led_value(2, data & 0x10);  // VIEW2 (VIEW - SWA)
+		output().set_led_value(3, data & 0x20);  // VIEW3
+		output().set_led_value(4, data & 0x40);  // VIEW4
+		output().set_led_value(5, data & 0x80);  // RACE LEADER
 		m_lamp_state = data;
-		output_set_digit_value(1, data);
+		output().set_digit_value(1, data);
 		return;
 	} else if (offset == 0x11) {
 		// drive board commands
-		output_set_digit_value(0, data);
+		output().set_digit_value(0, data);
 		return;
 	}
 	logerror("IOW: %02x %02x\n", offset, data);
@@ -750,7 +750,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 
 		m_m1audio->check_fifo_irq();
 
-		if (m_m1comm != NULL)
+		if (m_m1comm != nullptr)
 			m_m1comm->check_vint_irq();
 	}
 }
@@ -869,7 +869,7 @@ WRITE16_MEMBER(model1_state::snd_latch_to_68k_w)
 		m_snd_cmd_state = 0;
 	}
 
-	if (m_dsbz80 != NULL)
+	if (m_dsbz80 != nullptr)
 	{
 //      printf("%d: %02x (last %02x)\n", m_snd_cmd_state, data, m_last_snd_cmd);
 		// HACK: on h/w, who filters out commands the DSB shouldn't see?  Need a wiring diagram.

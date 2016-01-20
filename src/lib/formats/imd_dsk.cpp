@@ -155,7 +155,7 @@ static floperr_t imd_expand_file(floppy_image_legacy *floppy , UINT64 offset , s
 		return FLOPPY_ERROR_SUCCESS;
 	}
 
-	UINT8 *buffer = global_alloc_array(UINT8 , size_after_off);
+	auto buffer = global_alloc_array(UINT8 , size_after_off);
 
 	// Read the part of file after offset
 	floppy_image_read(floppy , buffer , offset , size_after_off);
@@ -225,7 +225,7 @@ static floperr_t imd_write_indexed_sector(floppy_image_legacy *floppy, int head,
 static floperr_t imd_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
 	floperr_t err;
-	err = get_offset(floppy, head, track, sector, FALSE, NULL);
+	err = get_offset(floppy, head, track, sector, FALSE, nullptr);
 	if (err)
 		return err;
 
@@ -427,7 +427,7 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	io_generic_read(io, &img[0], 0, size);
 
 	UINT64 pos;
-	for(pos=0; pos < size && img[pos] != 0x1a; pos++);
+	for(pos=0; pos < size && img[pos] != 0x1a; pos++) {};
 	pos++;
 
 	if(pos >= size)
@@ -453,10 +453,10 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 		const UINT8 *snum = &img[pos];
 		pos += sector_count;
-		const UINT8 *tnum = head & 0x80 ? &img[pos] : NULL;
+		const UINT8 *tnum = head & 0x80 ? &img[pos] : nullptr;
 		if(tnum)
 			pos += sector_count;
-		const UINT8 *hnum = head & 0x40 ? &img[pos] : NULL;
+		const UINT8 *hnum = head & 0x40 ? &img[pos] : nullptr;
 		if(hnum)
 			pos += sector_count;
 
@@ -475,7 +475,7 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			sects[i].actual_size = actual_size;
 
 			if(stype == 0 || stype > 8) {
-				sects[i].data = NULL;
+				sects[i].data = nullptr;
 
 			} else {
 				sects[i].deleted = stype == 3 || stype == 4 || stype == 7 || stype == 8;

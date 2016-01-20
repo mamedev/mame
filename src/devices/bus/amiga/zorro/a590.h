@@ -29,12 +29,12 @@ class dmac_hdc_device : public device_t
 {
 public:
 	// construction/destruction
-	dmac_hdc_device(const machine_config &mconfig, device_type type, const char *tag,
-		device_t *owner, UINT32 clock, const char *name, const char *shortname);
+	dmac_hdc_device(const machine_config &mconfig, device_type type, std::string tag,
+		device_t *owner, UINT32 clock, std::string name, std::string shortname);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
 	DECLARE_READ8_MEMBER( dmac_scsi_r );
 	DECLARE_WRITE8_MEMBER( dmac_scsi_w );
@@ -44,8 +44,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// to slot
 	virtual void cfgout_w(int state) = 0;
@@ -71,23 +71,23 @@ class a590_device : public dmac_hdc_device, public device_exp_card_interface
 {
 public:
 	// construction/destruction
-	a590_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a590_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// output to slot
-	virtual void cfgout_w(int state) { m_slot->cfgout_w(state); }
-	virtual void int2_w(int state) { m_slot->int2_w(state); }
-	virtual void int6_w(int state) { m_slot->int6_w(state); }
+	virtual void cfgout_w(int state) override { m_slot->cfgout_w(state); }
+	virtual void int2_w(int state) override { m_slot->int2_w(state); }
+	virtual void int6_w(int state) override { m_slot->int6_w(state); }
 
 	// input from slot
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w ) override;
 
 private:
 	required_ioport m_dips;
@@ -102,22 +102,22 @@ class a2091_device : public dmac_hdc_device, public device_zorro2_card_interface
 {
 public:
 	// construction/destruction
-	a2091_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a2091_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// output to slot
-	virtual void cfgout_w(int state) { m_slot->cfgout_w(state); }
-	virtual void int2_w(int state) { m_slot->int2_w(state); }
-	virtual void int6_w(int state) { m_slot->int6_w(state); }
+	virtual void cfgout_w(int state) override { m_slot->cfgout_w(state); }
+	virtual void int2_w(int state) override { m_slot->int2_w(state); }
+	virtual void int6_w(int state) override { m_slot->int6_w(state); }
 
 	// input from slot
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w ) override;
 
 private:
 	required_ioport m_jp1;

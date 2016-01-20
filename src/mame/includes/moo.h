@@ -18,7 +18,7 @@
 class moo_state : public driver_device
 {
 public:
-	moo_state(const machine_config &mconfig, device_type type, const char *tag)
+	moo_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_workram(*this, "workram"),
 		m_spriteram(*this, "spriteram"),
@@ -70,8 +70,6 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
 	DECLARE_READ16_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_READ16_MEMBER(K053247_scattered_word_r);
-	DECLARE_WRITE16_MEMBER(K053247_scattered_word_w);
 	DECLARE_WRITE16_MEMBER(moo_prot_w);
 	DECLARE_WRITE16_MEMBER(moobl_oki_bank_w);
 	DECLARE_MACHINE_START(moo);

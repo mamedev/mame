@@ -73,29 +73,27 @@ const device_type VT100_VIDEO = &device_creator<vt100_video_device>;
 const device_type RAINBOW_VIDEO = &device_creator<rainbow_video_device>;
 
 
-vt100_video_device::vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+vt100_video_device::vt100_video_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 : device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 device_video_interface(mconfig, *this),
 m_read_ram(*this),
 m_write_clear_video_interrupt(*this),
-m_char_rom_tag(""),
 m_palette(*this, "palette")
 {
 }
 
 
-vt100_video_device::vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vt100_video_device::vt100_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 : device_t(mconfig, VT100_VIDEO, "VT100 Video", tag, owner, clock, "vt100_video", __FILE__),
 device_video_interface(mconfig, *this),
 m_read_ram(*this),
 m_write_clear_video_interrupt(*this),
-m_char_rom_tag(""),
 m_palette(*this, "palette")
 {
 }
 
 
-rainbow_video_device::rainbow_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rainbow_video_device::rainbow_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 : vt100_video_device(mconfig, RAINBOW_VIDEO, "Rainbow Video", tag, owner, clock, "rainbow_video", __FILE__)
 {
 }
@@ -112,7 +110,7 @@ void vt100_video_device::device_start()
 	m_write_clear_video_interrupt.resolve_safe();
 
 	m_gfx = machine().root_device().memregion(m_char_rom_tag)->base();
-	assert(m_gfx != NULL);
+	assert(m_gfx != nullptr);
 
 	// LBA7 is scan line frequency update
 	machine().scheduler().timer_pulse(attotime::from_nsec(31778), timer_expired_delegate(FUNC(vt100_video_device::lba7_change), this));
@@ -247,7 +245,7 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 	if (data == 0)
 	{
 		UINT8 *rom = machine().root_device().memregion("maincpu")->base();
-		if (rom != NULL)
+		if (rom != nullptr)
 		{
 			UINT32 PC = space.device().safe_pc();
 			if ((rom[ PC - 1] == 0xe6) &&

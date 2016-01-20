@@ -138,7 +138,7 @@ class laserdisc_device :    public device_t,
 {
 protected:
 	// construction/destruction
-	laserdisc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	laserdisc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	virtual ~laserdisc_device();
 
 public:
@@ -169,7 +169,7 @@ public:
 	static void static_set_overlay_clip(device_t &device, INT32 minx, INT32 maxx, INT32 miny, INT32 maxy);
 	static void static_set_overlay_position(device_t &device, float posx, float posy);
 	static void static_set_overlay_scale(device_t &device, float scalex, float scaley);
-	static void static_set_overlay_palette(device_t &device, const char *tag);
+	static void static_set_overlay_palette(device_t &device, std::string tag);
 
 protected:
 	// timer IDs
@@ -237,14 +237,14 @@ protected:
 	virtual void player_overlay(bitmap_yuy16 &bitmap) = 0;
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_stop();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_validity_check(validity_checker &valid) const;
+	virtual void device_start() override;
+	virtual void device_stop() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_validity_check(validity_checker &valid) const override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// subclass helpers
 	void set_audio_squelch(bool squelchleft, bool squelchright) { m_stream->update(); m_audiosquelch = (squelchleft ? 1 : 0) | (squelchright ? 2 : 0); }
@@ -284,8 +284,8 @@ private:
 	void read_track_data();
 	static void *read_async_static(void *param, int threadid);
 	void process_track_data();
-	void config_load(int config_type, xml_data_node *parentnode);
-	void config_save(int config_type, xml_data_node *parentnode);
+	void config_load(config_type cfg_type, xml_data_node *parentnode);
+	void config_save(config_type cfg_type, xml_data_node *parentnode);
 
 	// configuration
 	laserdisc_get_disc_delegate m_getdisc_callback;

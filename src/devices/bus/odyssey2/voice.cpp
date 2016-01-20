@@ -23,7 +23,7 @@
 const device_type O2_ROM_VOICE = &device_creator<o2_voice_device>;
 
 
-o2_voice_device::o2_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+o2_voice_device::o2_voice_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: o2_rom_device(mconfig, O2_ROM_VOICE, "Odyssey 2 The Voice Passthrough Cart", tag, owner, clock, "o2_voice", __FILE__),
 					m_speech(*this, "sp0256_speech"),
 					m_subslot(*this, "subslot"),
@@ -49,7 +49,7 @@ static MACHINE_CONFIG_FRAGMENT( o2voice )
 	// The Voice uses a speaker with its own volume control so the relative volumes to use are subjective, these sound good
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_O2_CARTRIDGE_ADD("subslot", o2_cart, NULL)
+	MCFG_O2_CARTRIDGE_ADD("subslot", o2_cart, nullptr)
 MACHINE_CONFIG_END
 
 

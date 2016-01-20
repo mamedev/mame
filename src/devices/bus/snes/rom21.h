@@ -13,16 +13,16 @@ class sns_rom21_device : public device_t,
 {
 public:
 	// construction/destruction
-	sns_rom21_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	sns_rom21_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom21_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	sns_rom21_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_h);
+	virtual DECLARE_READ8_MEMBER(read_l) override;
+	virtual DECLARE_READ8_MEMBER(read_h) override;
 };
 
 // ======================> sns_rom21_srtc_device
@@ -31,15 +31,15 @@ class sns_rom21_srtc_device : public sns_rom21_device
 {
 public:
 	// construction/destruction
-	sns_rom21_srtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom21_srtc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read);
-	virtual DECLARE_WRITE8_MEMBER(chip_write);
+	virtual DECLARE_READ8_MEMBER(chip_read) override;
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
 
 	// S-RTC specific variables
 	enum

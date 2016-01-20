@@ -124,12 +124,12 @@ const device_type R3081 = &device_creator<r3081_device>;
 //  r3000_device - constructor
 //-------------------------------------------------
 
-r3000_device::r3000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, chip_type chiptype, const char *shortname, const char *source)
+r3000_device::r3000_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, chip_type chiptype, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config_be("program", ENDIANNESS_BIG, 32, 29),
 		m_program_config_le("program", ENDIANNESS_LITTLE, 32, 29),
-		m_program(NULL),
-		m_direct(NULL),
+		m_program(nullptr),
+		m_direct(nullptr),
 		m_chip_type(chiptype),
 		m_hasfpu(false),
 		m_endianness(ENDIANNESS_BIG),
@@ -169,7 +169,7 @@ r3000_device::~r3000_device()
 //  r3041_device - constructor
 //-------------------------------------------------
 
-r3041_device::r3041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+r3041_device::r3041_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: r3000_device(mconfig, R3041, "R3041", tag, owner, clock, CHIP_TYPE_R3041, "r3041", __FILE__) { }
 
 
@@ -177,7 +177,7 @@ r3041_device::r3041_device(const machine_config &mconfig, const char *tag, devic
 //  r3051_device - constructor
 //-------------------------------------------------
 
-r3051_device::r3051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+r3051_device::r3051_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: r3000_device(mconfig, R3051, "R3051", tag, owner, clock, CHIP_TYPE_R3051, "r3051", __FILE__) { }
 
 
@@ -185,7 +185,7 @@ r3051_device::r3051_device(const machine_config &mconfig, const char *tag, devic
 //  r3052_device - constructor
 //-------------------------------------------------
 
-r3052_device::r3052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+r3052_device::r3052_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: r3000_device(mconfig, R3052, "R3052", tag, owner, clock, CHIP_TYPE_R3052, "r3052", __FILE__) { }
 
 
@@ -193,7 +193,7 @@ r3052_device::r3052_device(const machine_config &mconfig, const char *tag, devic
 //  r3071_device - constructor
 //-------------------------------------------------
 
-r3071_device::r3071_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+r3071_device::r3071_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: r3000_device(mconfig, R3071, "R3071", tag, owner, clock, CHIP_TYPE_R3071, "r3071", __FILE__) { }
 
 
@@ -201,7 +201,7 @@ r3071_device::r3071_device(const machine_config &mconfig, const char *tag, devic
 //  r3081_device - constructor
 //-------------------------------------------------
 
-r3081_device::r3081_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+r3081_device::r3081_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: r3000_device(mconfig, R3081, "R3081", tag, owner, clock, CHIP_TYPE_R3081, "r3081", __FILE__) { }
 
 
@@ -399,7 +399,7 @@ const address_space_config *r3000_device::memory_space_config(address_spacenum s
 	if (spacenum == AS_PROGRAM)
 		return (m_endianness == ENDIANNESS_BIG) ? &m_program_config_be : &m_program_config_le;
 	else
-		return NULL;
+		return nullptr;
 }
 
 
@@ -443,7 +443,7 @@ void r3000_device::state_export(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void r3000_device::state_string_export(const device_state_entry &entry, std::string &str)
+void r3000_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

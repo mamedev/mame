@@ -24,19 +24,19 @@ extern const device_type SWIM;
 class swim_device : public applefdc_base_device
 {
 public:
-	swim_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	swim_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// read/write
-	virtual UINT8 read(UINT8 offset);
-	virtual void write(UINT8 offset, UINT8 data);
+	virtual UINT8 read(UINT8 offset) override;
+	virtual void write(UINT8 offset, UINT8 data) override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// other overrides
-	virtual void iwm_modereg_w(UINT8 data);
+	virtual void iwm_modereg_w(UINT8 data) override;
 
 private:
 	UINT8       m_swim_mode;

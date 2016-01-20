@@ -44,8 +44,8 @@ void speedbal_state::machine_start()
 
 WRITE8_MEMBER(speedbal_state::coincounter_w)
 {
-	coin_counter_w(machine(), 0, data & 0x80);
-	coin_counter_w(machine(), 1, data & 0x40);
+	machine().bookkeeping().coin_counter_w(0, data & 0x80);
+	machine().bookkeeping().coin_counter_w(1, data & 0x40);
 	flip_screen_set(data & 8); // also changes data & 0x10 at the same time too (flipx and flipy?)
 	/* unknown: (data & 0x10) and (data & 4) */
 }
@@ -94,9 +94,9 @@ WRITE8_MEMBER(speedbal_state::leds_output_block)
 	// The shift register is 28 bits, led block number is in the upper bits
 	// and the other 3 bytes in it go to each 7seg led of the current block.
 	int block = m_leds_shiftreg >> 24 & 7;
-	output_set_digit_value(10 * block + 0, ~m_leds_shiftreg >> 0 & 0xff);
-	output_set_digit_value(10 * block + 1, ~m_leds_shiftreg >> 8 & 0xff);
-	output_set_digit_value(10 * block + 2, ~m_leds_shiftreg >> 16 & 0xff);
+	output().set_digit_value(10 * block + 0, ~m_leds_shiftreg >> 0 & 0xff);
+	output().set_digit_value(10 * block + 1, ~m_leds_shiftreg >> 8 & 0xff);
+	output().set_digit_value(10 * block + 2, ~m_leds_shiftreg >> 16 & 0xff);
 }
 
 WRITE8_MEMBER(speedbal_state::leds_start_block)

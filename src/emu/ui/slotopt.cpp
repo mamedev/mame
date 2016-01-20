@@ -21,18 +21,18 @@
 -------------------------------------------------*/
 device_slot_option *ui_menu_slot_devices::slot_get_current_option(device_slot_interface *slot)
 {
-	const char *current;
+	std::string current;
 	if (slot->fixed())
 	{
-		current = slot->default_option();
+		if (slot->default_option() == nullptr) return nullptr;
+		current.assign(slot->default_option());
 	}
 	else
 	{
-		std::string temp;
-		current = machine().options().main_value(temp, slot->device().tag() + 1);
+		current = machine().options().main_value(slot->device().tag().substr(1).c_str());
 	}
 
-	return slot->option(current);
+	return slot->option(current.c_str());
 }
 
 /*-------------------------------------------------
@@ -42,10 +42,10 @@ int ui_menu_slot_devices::slot_get_current_index(device_slot_interface *slot)
 {
 	const device_slot_option *current = slot_get_current_option(slot);
 
-	if (current != NULL)
+	if (current != nullptr)
 	{
 		int val = 0;
-		for (const device_slot_option *option = slot->first_option(); option != NULL; option = option->next())
+		for (const device_slot_option *option = slot->first_option(); option != nullptr; option = option->next())
 		{
 			if (option == current)
 				return val;
@@ -64,7 +64,7 @@ int ui_menu_slot_devices::slot_get_current_index(device_slot_interface *slot)
 int ui_menu_slot_devices::slot_get_length(device_slot_interface *slot)
 {
 	int val = 0;
-	for (const device_slot_option *option = slot->first_option(); option != NULL; option = option->next())
+	for (const device_slot_option *option = slot->first_option(); option != nullptr; option = option->next())
 		if (option->selectable())
 			val++;
 
@@ -113,7 +113,7 @@ const char *ui_menu_slot_devices::slot_get_option(device_slot_interface *slot, i
 	if (index >= 0)
 	{
 		int val = 0;
-		for (const device_slot_option *option = slot->first_option(); option != NULL; option = option->next())
+		for (const device_slot_option *option = slot->first_option(); option != nullptr; option = option->next())
 		{
 			if (val == index)
 				return option->name();
@@ -135,7 +135,7 @@ const char *ui_menu_slot_devices::slot_get_option(device_slot_interface *slot, i
 void ui_menu_slot_devices::set_slot_device(device_slot_interface *slot, const char *val)
 {
 	std::string error;
-	machine().options().set_value(slot->device().tag()+1, val, OPTION_PRIORITY_CMDLINE, error);
+	machine().options().set_value(slot->device().tag().substr(1).c_str(), val, OPTION_PRIORITY_CMDLINE, error);
 	assert(error.empty());
 }
 
@@ -152,12 +152,12 @@ void ui_menu_slot_devices::populate()
 {
 	/* cycle through all devices for this system */
 	slot_interface_iterator iter(machine().root_device());
-	for (device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
+	for (device_slot_interface *slot = iter.first(); slot != nullptr; slot = iter.next())
 	{
 		/* record the menu item */
 		const device_slot_option *option = slot_get_current_option(slot);
 		std::string opt_name;
-		if (option == NULL)
+		if (option == nullptr)
 			opt_name.assign("------");
 		else
 		{
@@ -166,10 +166,10 @@ void ui_menu_slot_devices::populate()
 				opt_name.append(" [internal]");
 		}
 
-		item_append(slot->device().tag() + 1, opt_name.c_str(), (slot->fixed() || slot_get_length(slot) == 0) ? 0 : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), (void *)slot);
+		item_append(slot->device().tag().substr(1).c_str(), opt_name.c_str(), (slot->fixed() || slot_get_length(slot) == 0) ? 0 : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), (void *)slot);
 	}
-	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-	item_append("Reset",  NULL, 0, (void *)1);
+	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append("Reset",  nullptr, 0, (void *)1);
 }
 
 ui_menu_slot_devices::~ui_menu_slot_devices()
@@ -185,7 +185,7 @@ void ui_menu_slot_devices::handle()
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
 
-	if (menu_event != NULL && menu_event->itemref != NULL)
+	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		if ((FPTR)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
 		{
@@ -204,7 +204,7 @@ void ui_menu_slot_devices::handle()
 			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;
 			device_slot_option *option = slot_get_current_option(slot);
 			if (option)
-				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_device_config(machine(), container, slot, option)));
+				ui_menu::stack_push(auto_alloc_clear(machine(), <ui_menu_device_config>(machine(), container, slot, option)));
 		}
 	}
 }

@@ -27,7 +27,7 @@ ToDo:
 class st_mp200_state : public genpin_class
 {
 public:
-	st_mp200_state(const machine_config &mconfig, device_type type, const char *tag)
+	st_mp200_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_s14001a(*this, "speech")
@@ -78,7 +78,8 @@ private:
 	UINT8 m_digit;
 	UINT8 m_counter;
 	UINT8 m_segment[5];
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<m6800_cpu_device> m_maincpu;
 	optional_device<s14001a_device> m_s14001a;
 	required_device<pia6821_device> m_pia_u10;
@@ -331,7 +332,7 @@ WRITE_LINE_MEMBER( st_mp200_state::u10_cb2_w )
 
 WRITE_LINE_MEMBER( st_mp200_state::u11_ca2_w )
 {
-	output_set_value("led0", !state);
+	output().set_value("led0", !state);
 
 	if ((m_su) & (state))
 	{
@@ -439,42 +440,42 @@ WRITE8_MEMBER( st_mp200_state::u11_a_w )
 	if (!m_u10_ca2)
 	{
 		if (m_7d && BIT(data, 1))
-        {
-            m_digit = 6;
-        }
+		{
+			m_digit = 6;
+		}
 		else if BIT(data, 2)
-        {
+		{
 			m_digit = 5;
-        }
+		}
 		else if BIT(data, 3)
-        {
+		{
 			m_digit = 4;
-        }
+		}
 		else if BIT(data, 4)
-        {
+		{
 			m_digit = 3;
-        }
+		}
 		else if BIT(data, 5)
-        {
+		{
 			m_digit = 2;
-        }
+		}
 		else if BIT(data, 6)
-        {
+		{
 			m_digit = 1;
-        }
+		}
 		else if BIT(data, 7)
-        {
+		{
 			m_digit = 0;
-        }
+		}
 
 		if (BIT(data, 0) && (m_counter > 8))
 		{
 			static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
-			output_set_digit_value(m_digit, patterns[m_segment[0]]);
-			output_set_digit_value(10+m_digit, patterns[m_segment[1]]);
-			output_set_digit_value(20+m_digit, patterns[m_segment[2]]);
-			output_set_digit_value(30+m_digit, patterns[m_segment[3]]);
-			output_set_digit_value(40+m_digit, patterns[m_segment[4]]);
+			output().set_digit_value(m_digit, patterns[m_segment[0]]);
+			output().set_digit_value(10+m_digit, patterns[m_segment[1]]);
+			output().set_digit_value(20+m_digit, patterns[m_segment[2]]);
+			output().set_digit_value(30+m_digit, patterns[m_segment[3]]);
+			output().set_digit_value(40+m_digit, patterns[m_segment[4]]);
 		}
 	}
 }
@@ -532,6 +533,11 @@ WRITE8_MEMBER( st_mp200_state::u11_b_w )
 				break;
 		}
 	}
+}
+
+void st_mp200_state::machine_start()
+{
+	m_s14001a->set_volume(0);
 }
 
 void st_mp200_state::machine_reset()

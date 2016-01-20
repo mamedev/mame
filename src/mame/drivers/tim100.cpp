@@ -17,7 +17,7 @@
 class tim100_state : public driver_device
 {
 public:
-	tim100_state(const machine_config &mconfig, device_type type, const char *tag)
+	tim100_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_palette(*this, "palette")
@@ -25,8 +25,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
 private:

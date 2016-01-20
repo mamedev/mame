@@ -1,11 +1,11 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 #include "sound/discrete.h"
 
 class skyraid_state : public driver_device
 {
 public:
-	skyraid_state(const machine_config &mconfig, device_type type, const char *tag)
+	skyraid_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_pos_ram(*this, "pos_ram"),
 		m_alpha_num_ram(*this, "alpha_num_ram"),
@@ -29,7 +29,7 @@ public:
 	DECLARE_WRITE8_MEMBER(skyraid_range_w);
 	DECLARE_WRITE8_MEMBER(skyraid_offset_w);
 	DECLARE_WRITE8_MEMBER(skyraid_scroll_w);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(skyraid);
 	UINT32 screen_update_skyraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(skyraid_sound_w);

@@ -161,7 +161,7 @@ void ym2610_device::device_start()
 	name.append(".deltat");
 	pcmbufb = (void *)(machine().root_device().memregion(name.c_str())->base());
 	pcmsizeb = machine().root_device().memregion(name.c_str())->bytes();
-	if (pcmbufb == NULL || pcmsizeb == 0)
+	if (pcmbufb == nullptr || pcmsizeb == 0)
 	{
 		pcmbufb = pcmbufa;
 		pcmsizeb = pcmsizea;
@@ -171,7 +171,7 @@ void ym2610_device::device_start()
 	m_chip = ym2610_init(this,this,clock(),rate,
 					pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
 					timer_handler,IRQHandler,&psgintf);
-	assert_always(m_chip != NULL, "Error creating YM2610 chip");
+	assert_always(m_chip != nullptr, "Error creating YM2610 chip");
 }
 
 //-------------------------------------------------
@@ -206,13 +206,13 @@ WRITE8_MEMBER( ym2610_device::write )
 
 const device_type YM2610 = &device_creator<ym2610_device>;
 
-ym2610_device::ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ym2610_device::ym2610_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: ay8910_device(mconfig, YM2610, "YM2610", tag, owner, clock, PSG_TYPE_YM, 1, 0, "ym2610", __FILE__),
 		m_irq_handler(*this)
 {
 }
 
-ym2610_device::ym2610_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+ym2610_device::ym2610_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: ay8910_device(mconfig, type, name, tag, owner, clock, PSG_TYPE_YM, 1, 0, shortname, source),
 		m_irq_handler(*this)
 {
@@ -220,7 +220,7 @@ ym2610_device::ym2610_device(const machine_config &mconfig, device_type type, co
 
 const device_type YM2610B = &device_creator<ym2610b_device>;
 
-ym2610b_device::ym2610b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ym2610b_device::ym2610b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: ym2610_device(mconfig, YM2610B, "YM2610B", tag, owner, clock, "ym2610b", __FILE__)
 {
 }

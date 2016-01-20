@@ -55,7 +55,7 @@ class dmvcart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	dmvcart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmvcart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~dmvcart_slot_device();
 
 	template<class _Object> static devcb_base &set_prog_read_callback(device_t &device, _Object object) { return downcast<dmvcart_slot_device &>(device).m_prog_read_cb.set_callback(object); }
@@ -65,7 +65,7 @@ public:
 	template<class _Object> static devcb_base &set_out_thold_callback(device_t &device, _Object object) { return downcast<dmvcart_slot_device &>(device).m_out_thold_cb.set_callback(object); }
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// reading and writing
 	virtual bool read(offs_t offset, UINT8 &data);

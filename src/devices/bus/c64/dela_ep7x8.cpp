@@ -22,19 +22,19 @@ const device_type C64_DELA_EP7X8 = &device_creator<c64_dela_ep7x8_cartridge_devi
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_dela_ep7x8 )
-	MCFG_GENERIC_SOCKET_ADD("rom1", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom1", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom2", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom2", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom3", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom3", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom4", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom4", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom5", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom5", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom6", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom6", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom7", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom7", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 MACHINE_CONFIG_END
 
@@ -58,7 +58,7 @@ machine_config_constructor c64_dela_ep7x8_cartridge_device::device_mconfig_addit
 //  c64_dela_ep7x8_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_dela_ep7x8_cartridge_device::c64_dela_ep7x8_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c64_dela_ep7x8_cartridge_device::c64_dela_ep7x8_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_DELA_EP7X8, "C64 Dela 7x8KB EPROM cartridge", tag, owner, clock, "ep7x8", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_eprom1(*this, "rom1"),

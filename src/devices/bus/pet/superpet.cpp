@@ -79,7 +79,7 @@ static MACHINE_CONFIG_FRAGMENT( superpet )
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(superpet_device, acia_irq_w))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_rxd))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_dcd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_dsr))
@@ -174,7 +174,7 @@ inline bool superpet_device::is_ram_writable()
 //  superpet_device - constructor
 //-------------------------------------------------
 
-superpet_device::superpet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+superpet_device::superpet_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SUPERPET, "SuperPET", tag, owner, clock, "pet_superpet", __FILE__),
 	device_pet_expansion_card_interface(mconfig, *this),
 	m_maincpu(*this, M6809_TAG),

@@ -27,7 +27,7 @@ const device_type O2_CART_SLOT = &device_creator<o2_cart_slot_device>;
 
 device_o2_cart_interface::device_o2_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
+		m_rom(nullptr),
 		m_rom_size(0)
 {
 }
@@ -45,9 +45,9 @@ device_o2_cart_interface::~device_o2_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_o2_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_o2_cart_interface::rom_alloc(UINT32 size, std::string tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = device().machine().memory().region_alloc(std::string(tag).append(O2SLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
@@ -72,7 +72,7 @@ void device_o2_cart_interface::ram_alloc(UINT32 size)
 //-------------------------------------------------
 //  o2_cart_slot_device - constructor
 //-------------------------------------------------
-o2_cart_slot_device::o2_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+o2_cart_slot_device::o2_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, O2_CART_SLOT, "Odyssey 2 Cartridge Slot", tag, owner, clock, "o2_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -133,10 +133,10 @@ static const o2_slot slot_list[] =
 
 static int o2_get_pcb_id(const char *slot)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(slot_list[i].slot_option, slot))
-			return slot_list[i].pcb_id;
+		if (!core_stricmp(elem.slot_option, slot))
+			return elem.pcb_id;
 	}
 
 	return 0;
@@ -144,10 +144,10 @@ static int o2_get_pcb_id(const char *slot)
 
 static const char *o2_get_slot(int type)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (slot_list[i].pcb_id == type)
-			return slot_list[i].slot_option;
+		if (elem.pcb_id == type)
+			return elem.slot_option;
 	}
 
 	return "o2_rom";
@@ -162,15 +162,15 @@ bool o2_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 size = (software_entry() == NULL) ? length() : get_software_region_length("rom");
+		UINT32 size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
 		m_cart->rom_alloc(size, tag());
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 			fread(m_cart->get_rom_base(), size);
 		else
 			memcpy(m_cart->get_rom_base(), get_software_region("rom"), size);
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			m_type = O2_STD;
 			if (size == 12288)
@@ -200,7 +200,7 @@ bool o2_cart_slot_device::call_load()
 
 bool o2_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 	return TRUE;
 }
 
@@ -209,11 +209,11 @@ bool o2_cart_slot_device::call_softlist_load(software_list_device &swlist, const
  get default card software
  -------------------------------------------------*/
 
-void o2_cart_slot_device::get_default_card_software(std::string &result)
+std::string o2_cart_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "o2_rom";
+		const char *slot_string;
 		UINT32 size = core_fsize(m_file);
 		int type = O2_STD;
 
@@ -227,11 +227,10 @@ void o2_cart_slot_device::get_default_card_software(std::string &result)
 		//printf("type: %s\n", slot_string);
 		clear();
 
-		result.assign(slot_string);
-		return;
+		return std::string(slot_string);
 	}
 
-	software_get_default_slot(result, "o2_rom");
+	return software_get_default_slot("o2_rom");
 }
 
 /*-------------------------------------------------

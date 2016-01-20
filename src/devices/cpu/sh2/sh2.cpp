@@ -169,28 +169,28 @@ static ADDRESS_MAP_START( sh7032_map, AS_PROGRAM, 32, sh1_device )
 	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7032_r,sh7032_w,0xffffffff) // SH-7032H internal i/o
 ADDRESS_MAP_END
 
-sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sh2_device::sh2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SH2, "SH-2", tag, owner, clock, "sh2", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(sh7604_map))
 	, m_decrypted_program_config("decrypted_opcodes", ENDIANNESS_BIG, 32, 32, 0)
 	, m_is_slave(0)
 	, m_cpu_type(CPU_TYPE_SH2)
 	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
-	, m_drcuml(NULL)
+	, m_drcuml(nullptr)
 //  , m_drcuml(*this, m_cache, 0, 1, 32, 1)
-	, m_drcfe(NULL)
+	, m_drcfe(nullptr)
 	, m_drcoptions(0)
-	, m_sh2_state(NULL)
-	, m_entry(NULL)
-	, m_read8(NULL)
-	, m_write8(NULL)
-	, m_read16(NULL)
-	, m_write16(NULL)
-	, m_read32(NULL)
-	, m_write32(NULL)
-	, m_interrupt(NULL)
-	, m_nocode(NULL)
-	, m_out_of_cycles(NULL)
+	, m_sh2_state(nullptr)
+	, m_entry(nullptr)
+	, m_read8(nullptr)
+	, m_write8(nullptr)
+	, m_read16(nullptr)
+	, m_write16(nullptr)
+	, m_read32(nullptr)
+	, m_write32(nullptr)
+	, m_interrupt(nullptr)
+	, m_nocode(nullptr)
+	, m_out_of_cycles(nullptr)
 	, m_debugger_temp(0)
 {
 	m_isdrc = (mconfig.options().drc() && !mconfig.m_force_no_drc) ? true : false;
@@ -199,46 +199,41 @@ sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t 
 
 void sh2_device::device_stop()
 {
-	/* clean up the DRC */
-	if ( m_drcuml )
-	{
-		auto_free(machine(), m_drcuml);
-	}
 }
 
 
-sh2_device::sh2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type, address_map_constructor internal_map, int addrlines )
+sh2_device::sh2_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int cpu_type, address_map_constructor internal_map, int addrlines )
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 32, addrlines, 0, internal_map)
 	, m_decrypted_program_config("decrypted_opcodes", ENDIANNESS_BIG, 32, addrlines, 0)
 	, m_is_slave(0)
 	, m_cpu_type(cpu_type)
 	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
-	, m_drcuml(NULL)
+	, m_drcuml(nullptr)
 //  , m_drcuml(*this, m_cache, 0, 1, 32, 1)
-	, m_drcfe(NULL)
+	, m_drcfe(nullptr)
 	, m_drcoptions(0)
-	, m_sh2_state(NULL)
-	, m_entry(NULL)
-	, m_read8(NULL)
-	, m_write8(NULL)
-	, m_read16(NULL)
-	, m_write16(NULL)
-	, m_read32(NULL)
-	, m_write32(NULL)
-	, m_interrupt(NULL)
-	, m_nocode(NULL)
-	, m_out_of_cycles(NULL)
+	, m_sh2_state(nullptr)
+	, m_entry(nullptr)
+	, m_read8(nullptr)
+	, m_write8(nullptr)
+	, m_read16(nullptr)
+	, m_write16(nullptr)
+	, m_read32(nullptr)
+	, m_write32(nullptr)
+	, m_interrupt(nullptr)
+	, m_nocode(nullptr)
+	, m_out_of_cycles(nullptr)
 {
 	m_isdrc = (mconfig.options().drc() && !mconfig.m_force_no_drc) ? true : false;
 }
 
-sh2a_device::sh2a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sh2a_device::sh2a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: sh2_device(mconfig, SH1, "SH-2A", tag, owner, clock, "sh2a", __FILE__, CPU_TYPE_SH2, ADDRESS_MAP_NAME(sh7021_map), 28 )
 {
 }
 
-sh1_device::sh1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sh1_device::sh1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: sh2_device(mconfig, SH1, "SH-1", tag, owner, clock, "sh1", __FILE__, CPU_TYPE_SH1, ADDRESS_MAP_NAME(sh7032_map), 28 )
 {
 }
@@ -248,8 +243,8 @@ const address_space_config *sh2_device::memory_space_config(address_spacenum spa
 	switch(spacenum)
 	{
 	case AS_PROGRAM:           return &m_program_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_program_config : NULL;
-	default:                   return NULL;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_program_config : nullptr;
+	default:                   return nullptr;
 	}
 }
 
@@ -943,7 +938,7 @@ void sh2_device::EXTUW(UINT32 m, UINT32 n)
 /*  ILLEGAL */
 void sh2_device::ILLEGAL()
 {
-	logerror("SH2.%s: Illegal opcode at %08x\n", tag(), m_sh2_state->pc - 2);
+	logerror("SH2.%s: Illegal opcode at %08x\n", tag().c_str(), m_sh2_state->pc - 2);
 	m_sh2_state->r[15] -= 4;
 	WL( m_sh2_state->r[15], m_sh2_state->sr );     /* push SR onto stack */
 	m_sh2_state->r[15] -= 4;
@@ -2536,7 +2531,7 @@ void sh2_device::device_start()
 
 	/* initialize the UML generator */
 	UINT32 flags = 0;
-	m_drcuml = auto_alloc(machine(), drcuml_state(*this, m_cache, flags, 1, 32, 1));
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 1, 32, 1);
 
 	/* add symbols for our stuff */
 	m_drcuml->symbol_add(&m_sh2_state->pc, sizeof(m_sh2_state->pc), "pc");
@@ -2555,7 +2550,7 @@ void sh2_device::device_start()
 	m_drcuml->symbol_add(&m_sh2_state->mach, sizeof(m_sh2_state->macl), "mach");
 
 	/* initialize the front-end helper */
-	m_drcfe = auto_alloc(machine(), sh2_frontend(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
+	m_drcfe = std::make_unique<sh2_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 
 	/* compute the register parameters */
 	for (int regnum = 0; regnum < 16; regnum++)
@@ -2588,7 +2583,7 @@ void sh2_device::device_start()
 }
 
 
-void sh2_device::state_string_export(const device_state_entry &entry, std::string &str)
+void sh2_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -2641,11 +2636,11 @@ void sh2_device::execute_set_input(int irqline, int state)
 
 		if( state == CLEAR_LINE )
 		{
-			LOG(("SH-2 '%s' cleared nmi\n", tag()));
+			LOG(("SH-2 '%s' cleared nmi\n", tag().c_str()));
 		}
 		else
 		{
-			LOG(("SH-2 '%s' assert nmi\n", tag()));
+			LOG(("SH-2 '%s' assert nmi\n", tag().c_str()));
 
 			sh2_exception("Set IRQ line", 16);
 
@@ -2661,12 +2656,12 @@ void sh2_device::execute_set_input(int irqline, int state)
 
 		if( state == CLEAR_LINE )
 		{
-			LOG(("SH-2 '%s' cleared irq #%d\n", tag(), irqline));
+			LOG(("SH-2 '%s' cleared irq #%d\n", tag().c_str(), irqline));
 			m_sh2_state->pending_irq &= ~(1 << irqline);
 		}
 		else
 		{
-			LOG(("SH-2 '%s' assert irq #%d\n", tag(), irqline));
+			LOG(("SH-2 '%s' assert irq #%d\n", tag().c_str(), irqline));
 			m_sh2_state->pending_irq |= 1 << irqline;
 			if (m_isdrc)
 			{

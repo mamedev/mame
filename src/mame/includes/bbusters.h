@@ -5,7 +5,7 @@
 class bbusters_state : public driver_device
 {
 public:
-	bbusters_state(const machine_config &mconfig, device_type type, const char *tag)
+	bbusters_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -60,7 +60,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_VIDEO_START(bbuster);
 	DECLARE_VIDEO_START(mechatt);
 

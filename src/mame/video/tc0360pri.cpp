@@ -45,7 +45,7 @@ each one of them can declare to have four different priority levels.
 
 const device_type TC0360PRI = &device_creator<tc0360pri_device>;
 
-tc0360pri_device::tc0360pri_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc0360pri_device::tc0360pri_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0360PRI, "Taito TC0360PRI", tag, owner, clock, "tc0360pri", __FILE__)
 {
 }
@@ -65,8 +65,8 @@ void tc0360pri_device::device_start()
 
 void tc0360pri_device::device_reset()
 {
-	for (int i = 0; i < 16; i++)
-		m_regs[i] = 0;
+	for (auto & elem : m_regs)
+		elem = 0;
 }
 
 

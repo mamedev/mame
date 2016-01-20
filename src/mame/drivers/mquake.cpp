@@ -45,7 +45,7 @@
 class mquake_state : public amiga_state
 {
 public:
-	mquake_state(const machine_config &mconfig, device_type type, const char *tag)
+	mquake_state(const machine_config &mconfig, device_type type, std::string tag)
 	: amiga_state(mconfig, type, tag),
 	m_es5503(*this, "es5503"),
 	m_es5503_rom(*this, "es5503")

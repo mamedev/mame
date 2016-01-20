@@ -33,7 +33,7 @@ const device_type GAYLE = &device_creator<gayle_device>;
 //  gayle_device - constructor
 //-------------------------------------------------
 
-gayle_device::gayle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+gayle_device::gayle_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, GAYLE, "GAYLE", tag, owner, clock, "gayle", __FILE__),
 	m_int2_w(*this),
 	m_cs0_read(*this),
@@ -188,7 +188,7 @@ WRITE_LINE_MEMBER( gayle_device::ide_interrupt_w )
 
 READ16_MEMBER( gayle_device::gayle_id_r )
 {
-	UINT16 data = 0xffff;
+	UINT16 data;
 
 	if (ACCESSING_BITS_8_15)
 		data = ((m_gayle_id << m_gayle_id_count++) & 0x80) << 8;

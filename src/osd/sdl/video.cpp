@@ -336,7 +336,7 @@ void sdl_monitor_info::add_primary_monitor(void *data)
 	osd_monitor_info **tailptr = &sdl_monitor_info::list;
 
 	// allocate a new monitor info
-	osd_monitor_info *monitor = global_alloc_clear(sdl_monitor_info(0, "", 1.0f));
+	osd_monitor_info *monitor = global_alloc_clear<sdl_monitor_info>(0, "", 1.0f);
 
 	//monitor->refresh();
 	// guess the aspect ratio assuming square pixels
@@ -413,7 +413,7 @@ void sdl_monitor_info::init()
 
 			// allocate a new monitor info
 
-			monitor = global_alloc_clear(sdl_monitor_info(i, temp, 1.0f));
+			monitor = global_alloc_clear<sdl_monitor_info>(i, temp, 1.0f);
 
 			osd_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->devicename(),
 					monitor->position_size().width(), monitor->position_size().height());
@@ -509,7 +509,7 @@ static void check_osd_inputs(running_machine &machine)
 	sdl_window_info *window = sdlinput_get_focus_window();
 
 	// check for toggling fullscreen mode
-	if (ui_input_pressed(machine, IPT_OSD_1))
+	if (machine.ui_input().pressed(IPT_OSD_1))
 	{
 		sdl_window_info *curwin = sdl_window_list;
 
@@ -520,14 +520,14 @@ static void check_osd_inputs(running_machine &machine)
 		}
 	}
 
-	if (ui_input_pressed(machine, IPT_OSD_2))
+	if (machine.ui_input().pressed(IPT_OSD_2))
 	{
 		//FIXME: on a per window basis
 		video_config.fullstretch = !video_config.fullstretch;
 		machine.ui().popup_time(1, "Uneven stretch %s", video_config.fullstretch? "enabled":"disabled");
 	}
 
-	if (ui_input_pressed(machine, IPT_OSD_4))
+	if (machine.ui_input().pressed(IPT_OSD_4))
 	{
 		//FIXME: on a per window basis
 		video_config.keepaspect = !video_config.keepaspect;
@@ -536,17 +536,17 @@ static void check_osd_inputs(running_machine &machine)
 
 	#if (USE_OPENGL || SDLMAME_SDL2)
 		//FIXME: on a per window basis
-		if (ui_input_pressed(machine, IPT_OSD_5))
+		if (machine.ui_input().pressed(IPT_OSD_5))
 		{
 			video_config.filter = !video_config.filter;
 			machine.ui().popup_time(1, "Filter %s", video_config.filter? "enabled":"disabled");
 		}
 	#endif
 
-	if (ui_input_pressed(machine, IPT_OSD_6))
+	if (machine.ui_input().pressed(IPT_OSD_6))
 		window->modify_prescale(-1);
 
-	if (ui_input_pressed(machine, IPT_OSD_7))
+	if (machine.ui_input().pressed(IPT_OSD_7))
 		window->modify_prescale(1);
 }
 

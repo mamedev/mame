@@ -45,7 +45,7 @@ PALETTE_INIT_MEMBER(huc6260_device, huc6260)
 const device_type HUC6260 = &device_creator<huc6260_device>;
 
 
-huc6260_device::huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+huc6260_device::huc6260_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	:   device_t(mconfig, HUC6260, "HuC6260 VCE", tag, owner, clock, "huc6260", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_next_pixel_data_cb(*this),
@@ -253,7 +253,7 @@ WRITE8_MEMBER( huc6260_device::write )
 void huc6260_device::device_start()
 {
 	m_timer = timer_alloc();
-	m_bmp = auto_bitmap_ind16_alloc( machine(), HUC6260_WPF, HUC6260_LPF );
+	m_bmp = std::make_unique<bitmap_ind16>(HUC6260_WPF, HUC6260_LPF );
 
 	/* Resolve callbacks */
 	m_hsync_changed_cb.resolve();

@@ -43,7 +43,7 @@ void retofinv_state::machine_start()
 	save_item(NAME(m_sub_irq_mask));
 	save_item(NAME(m_cpu2_m6000));
 
-	if (m_68705 != NULL) // only for the parent (with MCU)
+	if (m_68705 != nullptr) // only for the parent (with MCU)
 	{
 		save_item(NAME(m_from_main));
 		save_item(NAME(m_from_mcu));
@@ -74,7 +74,7 @@ WRITE8_MEMBER(retofinv_state::cpu2_reset_w)
 WRITE8_MEMBER(retofinv_state::mcu_reset_w)
 {
 	/* the bootlegs don't have a MCU, so make sure it's there before trying to reset it */
-	if (m_68705 != NULL)
+	if (m_68705 != nullptr)
 		m_68705->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -110,12 +110,12 @@ WRITE8_MEMBER(retofinv_state::irq1_ack_w)
 
 WRITE8_MEMBER(retofinv_state::coincounter_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
 WRITE8_MEMBER(retofinv_state::coinlockout_w)
 {
-	coin_lockout_w(machine(), 0,~data & 1);
+	machine().bookkeeping().coin_lockout_w(0,~data & 1);
 }
 
 

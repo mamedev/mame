@@ -254,7 +254,7 @@ public:
 		IQ128_NO_CART       = 0x03
 	};
 
-	geniusiq_state(const machine_config &mconfig, device_type type, const char *tag)
+	geniusiq_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
@@ -270,8 +270,8 @@ public:
 	required_shared_ptr<UINT16> m_vram;
 	required_shared_ptr<UINT16> m_mouse_gfx;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(geniusiq);
 	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -312,7 +312,7 @@ private:
 class gl8008cx_state : public driver_device
 {
 public:
-	gl8008cx_state(const machine_config &mconfig, device_type type, const char *tag)
+	gl8008cx_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }
@@ -770,7 +770,7 @@ DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state,iq128_cart)
 
 	m_cart_state = IQ128_ROM_CART;
 
-	if (image.software_entry() != NULL)
+	if (image.software_entry() != nullptr)
 	{
 		const char *pcb_type = image.get_feature("pcb_type");
 		if (pcb_type)

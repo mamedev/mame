@@ -73,7 +73,7 @@ class nick_device :  public device_t,
 {
 public:
 	// construction/destruction
-	nick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nick_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_virq_wr_callback(device_t &device, _Object object) { return downcast<nick_device &>(device).m_write_virq.set_callback(object); }
 
@@ -84,12 +84,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	DECLARE_READ8_MEMBER( vram_r );
 	DECLARE_WRITE8_MEMBER( vram_w );
@@ -108,7 +108,6 @@ private:
 
 	void write_pixel(int ci);
 	void calc_visible_clocks(int width);
-	void init();
 	void write_border(int clocks);
 	void do_left_margin();
 	void do_right_margin();
@@ -130,8 +129,6 @@ private:
 	void reload_lpt();
 	void do_line();
 
-	/* horizontal position */
-	UINT8 horizontal_clock;
 	/* current scanline within LPT */
 	UINT8 m_scanline_count;
 

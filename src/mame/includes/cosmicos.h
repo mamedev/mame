@@ -41,7 +41,7 @@ enum
 class cosmicos_state : public driver_device
 {
 public:
-	cosmicos_state(const machine_config &mconfig, device_type type, const char *tag)
+	cosmicos_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
 			m_cti(*this, CDP1864_TAG),
@@ -74,8 +74,8 @@ public:
 	required_ioport m_special;
 	required_ioport m_buttons;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

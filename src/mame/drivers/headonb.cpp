@@ -35,7 +35,7 @@ Other outs:
 class headonb_state : public driver_device
 {
 public:
-	headonb_state(const machine_config &mconfig, device_type type, const char *tag)
+	headonb_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -50,7 +50,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(video_ram_w);
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

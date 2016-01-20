@@ -12,7 +12,7 @@
 class esd16_state : public driver_device
 {
 public:
-	esd16_state(const machine_config &mconfig, device_type type, const char *tag)
+	esd16_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_vram_0(*this, "vram_0"),
 		m_vram_1(*this, "vram_1"),
@@ -68,9 +68,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_0_16x16);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_1_16x16);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_hedpanic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECOSPR_PRIORITY_CB_MEMBER(hedpanic_pri_callback);
 };

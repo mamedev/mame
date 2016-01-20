@@ -8,7 +8,7 @@
 const device_type PCD_VIDEO = &device_creator<pcd_video_device>;
 const device_type PCX_VIDEO = &device_creator<pcx_video_device>;
 
-pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_maincpu(*this, ":maincpu"),
 	m_mcu(*this, "graphics"),
@@ -19,7 +19,7 @@ pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type 
 {
 }
 
-pcd_video_device::pcd_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pcd_video_device::pcd_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	pcdx_video_device(mconfig, PCD_VIDEO, "Siemens PC-D Video", tag, owner, clock, "pcd_video", __FILE__),
 	m_mouse_btn(*this, "MOUSE"),
 	m_mouse_x(*this, "MOUSEX"),
@@ -29,7 +29,7 @@ pcd_video_device::pcd_video_device(const machine_config &mconfig, const char *ta
 {
 }
 
-pcx_video_device::pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pcx_video_device::pcx_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	pcdx_video_device(mconfig, PCX_VIDEO, "Siemens PC-X Video", tag, owner, clock, "pcx_video", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_vram(4*1024),
@@ -410,7 +410,7 @@ void pcd_video_device::device_start()
 {
 	m_maincpu->space(AS_IO).install_readwrite_handler(0xfb00, 0xfb01, 0, 0, read8_delegate(FUNC(pcdx_video_device::detect_r), this), write8_delegate(FUNC(pcdx_video_device::detect_w), this), 0xff00);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0000, 0xf7fff, 0, 0, read8_delegate(FUNC(pcd_video_device::vram_r), this), write8_delegate(FUNC(pcd_video_device::vram_w), this), 0xffff);
-	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, pcd_charlayout, &m_charram[0], 0, 1, 0)));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, pcd_charlayout, &m_charram[0], 0, 1, 0));
 }
 
 void pcd_video_device::device_reset()

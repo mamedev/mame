@@ -313,7 +313,7 @@ UINT32 gaiden_state::screen_update_raiga(screen_device &screen, bitmap_rgb32 &bi
 	m_background->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
 	m_foreground->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
 
-	m_mixer->mix_bitmaps(screen, bitmap, cliprect, m_palette, &m_tile_bitmap_bg, &m_tile_bitmap_fg, (bitmap_ind16*)0, &m_sprite_bitmap);
+	m_mixer->mix_bitmaps(screen, bitmap, cliprect, m_palette, &m_tile_bitmap_bg, &m_tile_bitmap_fg, (bitmap_ind16*)nullptr, &m_sprite_bitmap);
 
 	// todo, this should go through the mixer!
 	m_text_layer->draw(screen, bitmap, cliprect, 0, 0);

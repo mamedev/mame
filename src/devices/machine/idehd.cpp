@@ -21,7 +21,7 @@
 #define TIME_FULL_STROKE_SEEK               (attotime::from_usec(13000))
 #define TIME_AVERAGE_ROTATIONAL_LATENCY     (attotime::from_usec(1300))
 
-ata_mass_storage_device::ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source)
+ata_mass_storage_device::ata_mass_storage_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock,std::string shortname, std::string source)
 	: ata_hle_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_can_identify_device(0),
 	m_num_cylinders(0),
@@ -60,7 +60,7 @@ static void swap_strncpy(UINT16 *dst, const char *src, int field_size_in_words)
 {
 	for (int i = 0; i < field_size_in_words; i++)
 	{
-		UINT16 d = 0;
+		UINT16 d;
 
 		if (*src)
 		{
@@ -199,8 +199,8 @@ void ata_mass_storage_device::soft_reset()
 	m_cur_lba = 0;
 	m_status |= IDE_STATUS_DSC;
 
-	m_master_password_enable = (m_master_password != NULL);
-	m_user_password_enable = (m_user_password != NULL);
+	m_master_password_enable = (m_master_password != nullptr);
+	m_user_password_enable = (m_user_password != nullptr);
 }
 
 void ata_mass_storage_device::perform_diagnostic()
@@ -404,7 +404,7 @@ void ata_mass_storage_device::fill_buffer()
 
 void ata_mass_storage_device::finished_read()
 {
-	int lba = lba_address(), count = 0;
+	int lba = lba_address(), count;
 
 	set_dasp(CLEAR_LINE);
 
@@ -506,6 +506,10 @@ void ata_mass_storage_device::process_buffer()
 		if (m_master_password_enable || m_user_password_enable)
 			security_error();
 	}
+	else if (m_command == IDE_COMMAND_SECURITY_DISABLE_PASSWORD)
+	{
+		LOGPRINT(("IDE Done unimplemented SECURITY_DISABLE_PASSWORD command\n"));
+	}
 	else
 	{
 		set_dasp(ASSERT_LINE);
@@ -534,7 +538,7 @@ void ata_mass_storage_device::process_buffer()
 
 void ata_mass_storage_device::finished_write()
 {
-	int lba = lba_address(), count = 0;
+	int lba = lba_address(), count;
 
 	set_dasp(CLEAR_LINE);
 
@@ -685,6 +689,15 @@ void ata_mass_storage_device::process_command()
 		set_irq(ASSERT_LINE);
 		break;
 
+	case IDE_COMMAND_SECURITY_DISABLE_PASSWORD:
+		LOGPRINT(("IDE Unimplemented SECURITY DISABLE PASSWORD command\n"));
+
+		/* mark the buffer ready */
+		m_status |= IDE_STATUS_DRQ;
+
+		set_irq(ASSERT_LINE);
+		break;
+
 	case IDE_COMMAND_IDENTIFY_DEVICE:
 		LOGPRINT(("IDE Identify device\n"));
 
@@ -748,13 +761,13 @@ const device_type IDE_HARDDISK = &device_creator<ide_hdd_device>;
 //  ide_hdd_device - constructor
 //-------------------------------------------------
 
-ide_hdd_device::ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ide_hdd_device::ide_hdd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: ata_mass_storage_device(mconfig, IDE_HARDDISK, "IDE Hard Disk", tag, owner, clock, "hdd", __FILE__),
 	m_image(*this, "image")
 {
 }
 
-ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: ata_mass_storage_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_image(*this, "image")
 {
@@ -777,7 +790,7 @@ void ide_hdd_device::device_reset()
 	m_handle = m_image->get_chd_file();
 	m_disk = m_image->get_hard_disk_file();
 
-	if (m_disk != NULL && !m_can_identify_device)
+	if (m_disk != nullptr && !m_can_identify_device)
 	{
 		const hard_disk_info *hdinfo = hard_disk_get_info(m_disk);
 		if (hdinfo->sectorbytes == IDE_DISK_SECTOR_SIZE)

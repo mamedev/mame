@@ -282,7 +282,7 @@ const device_type ALPHA_8201 = &device_creator<alpha_8201_device>;
 //  alpha_8201_device - constructor
 //-------------------------------------------------
 
-alpha_8201_device::alpha_8201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+alpha_8201_device::alpha_8201_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ALPHA_8201, "ALPHA-8201", tag, owner, clock, "alpha8201", __FILE__),
 	m_mcu(*this, "mcu")
 {
@@ -295,8 +295,8 @@ alpha_8201_device::alpha_8201_device(const machine_config &mconfig, const char *
 
 void alpha_8201_device::device_start()
 {
-	m_shared_ram = auto_alloc_array_clear(machine(), UINT8, 0x400);
-	
+	m_shared_ram = make_unique_clear<UINT8[]>(0x400);
+
 	// zerofill
 	m_bus = 0;
 	m_mcu_address = 0;
@@ -304,7 +304,7 @@ void alpha_8201_device::device_start()
 	memset(m_mcu_r, 0, sizeof(m_mcu_r));
 
 	// register for savestates
-	save_pointer(NAME(m_shared_ram), 0x400);
+	save_pointer(NAME(m_shared_ram.get()), 0x400);
 	save_item(NAME(m_bus));
 	save_item(NAME(m_mcu_address));
 	save_item(NAME(m_mcu_d));
@@ -365,12 +365,12 @@ void alpha_8201_device::mcu_update_address()
 READ8_MEMBER(alpha_8201_device::mcu_data_r)
 {
 	UINT8 ret = 0;
-	
+
 	if (m_bus && ~m_mcu_d & 4)
 		ret = m_shared_ram[m_mcu_address];
 	else
-		logerror("%s: MCU side invalid read\n", tag());
-	
+		logerror("%s: MCU side invalid read\n", tag().c_str());
+
 	if (offset == HMCS40_PORT_R0X)
 		ret >>= 4;
 	return ret & 0xf;

@@ -35,23 +35,15 @@
 class kl5c80a12_device : public z80_device
 {
 public:
-	kl5c80a12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32);
+	kl5c80a12_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32);
 
 	// static configuration helpers
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
-
-
-private:
-	// devices/pointers
-
-	// internal state
-
-	// callbacks
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 

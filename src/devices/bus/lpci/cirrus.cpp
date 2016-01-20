@@ -83,7 +83,7 @@ const device_type CIRRUS = &device_creator<cirrus_device>;
 //  cirrus_device - constructor
 //-------------------------------------------------
 
-cirrus_device::cirrus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cirrus_device::cirrus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, CIRRUS, "CIRRUS", tag, owner, clock, "cirrus", __FILE__),
 		pci_device_interface( mconfig, *this )
 {

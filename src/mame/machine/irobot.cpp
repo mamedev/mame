@@ -140,8 +140,8 @@ WRITE8_MEMBER(irobot_state::irobot_rom_banksel_w)
 			membank("bank1")->set_base(&RAM[0x1A000]);
 			break;
 	}
-	set_led_status(machine(), 0,data & 0x10);
-	set_led_status(machine(), 1,data & 0x20);
+	output().set_led_value(0,data & 0x10);
+	output().set_led_value(1,data & 0x20);
 }
 
 TIMER_CALLBACK_MEMBER(irobot_state::scanline_callback)

@@ -77,7 +77,7 @@ protected:
 	};
 
 	// construction/destruction
-	r3000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, chip_type chiptype, const char *shortname, const char *source);
+	r3000_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, chip_type chiptype, std::string shortname, std::string source);
 	virtual ~r3000_device();
 
 public:
@@ -109,29 +109,29 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const;
-	virtual UINT32 execute_max_cycles() const;
-	virtual UINT32 execute_input_lines() const;
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override;
+	virtual UINT32 execute_max_cycles() const override;
+	virtual UINT32 execute_input_lines() const override;
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_export(const device_state_entry &entry);
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const;
-	virtual UINT32 disasm_max_opcode_bytes() const;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override;
+	virtual UINT32 disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// memory accessors
 	struct r3000_data_accessors
@@ -268,7 +268,7 @@ protected:
 class r3041_device : public r3000_device
 {
 public:
-	r3041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	r3041_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -277,7 +277,7 @@ public:
 class r3051_device : public r3000_device
 {
 public:
-	r3051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	r3051_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -286,7 +286,7 @@ public:
 class r3052_device : public r3000_device
 {
 public:
-	r3052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	r3052_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -295,7 +295,7 @@ public:
 class r3071_device : public r3000_device
 {
 public:
-	r3071_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	r3071_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -304,7 +304,7 @@ public:
 class r3081_device : public r3000_device
 {
 public:
-	r3081_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	r3081_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

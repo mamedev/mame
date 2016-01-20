@@ -95,7 +95,7 @@ static const z80_daisy_config wangpc_rtc_daisy_chain[] =
 	{ Z80SIO_TAG },
 	{ Z80CTC_0_TAG },
 	{ Z80CTC_1_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 //-------------------------------------------------
@@ -185,7 +185,7 @@ ioport_constructor wangpc_rtc_device::device_input_ports() const
 //  wangpc_rtc_device - constructor
 //-------------------------------------------------
 
-wangpc_rtc_device::wangpc_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+wangpc_rtc_device::wangpc_rtc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, WANGPC_RTC, "Wang PC-PM040-B", tag, owner, clock, "wangpc_rtc", __FILE__),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),

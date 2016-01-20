@@ -115,7 +115,7 @@ WRITE8_MEMBER( mbee_state::fdc_motor_w )
     d2 side (1=side 1)
     d1..d0 drive select (0 to 3) */
 
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 	floppy = m_floppy0->get_device();
 	floppy->mon_w(0); // motor on always
 	floppy = m_floppy1->get_device();

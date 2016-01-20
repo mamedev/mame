@@ -86,8 +86,8 @@ class pit68230_device :  public device_t, public device_execute_interface
 {
 public:
 // construction/destruction
-pit68230_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
-pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+pit68230_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source);
+pit68230_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 template<class _Object> static devcb_base &set_pa_wr_callback (device_t &device, _Object object)
 {
 		return downcast<pit68230_device &>(device).m_write_pa.set_callback (object);
@@ -105,10 +105,10 @@ void portb_setbit (UINT8 bit, UINT8 state);
 
 protected:
 // device-level overrides
-virtual void device_start ();
-virtual void device_reset ();
-virtual void device_timer (emu_timer &timer, device_timer_id id, int param, void *ptr);
-virtual void execute_run ();
+virtual void device_start () override;
+virtual void device_reset () override;
+virtual void device_timer (emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+virtual void execute_run () override;
 int m_icount;
 devcb_write8 m_write_pa;
 devcb_write_line m_write_h2;

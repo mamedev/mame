@@ -46,7 +46,7 @@ const rom_entry *opd_basic_master_t::device_rom_region() const
 //  opd_basic_master_t - constructor
 //-------------------------------------------------
 
-opd_basic_master_t::opd_basic_master_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+opd_basic_master_t::opd_basic_master_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, OPD_BASIC_MASTER, "OPD Basic Master", tag, owner, clock, "ql_opdbm", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this)
 {

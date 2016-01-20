@@ -93,7 +93,7 @@ struct prot_t {
 class quizpun2_state : public driver_device
 {
 public:
-	quizpun2_state(const machine_config &mconfig, device_type type, const char *tag)
+	quizpun2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_fg_ram(*this, "fg_ram"),
 		m_bg_ram(*this, "bg_ram"),
@@ -116,8 +116,8 @@ public:
 	DECLARE_WRITE8_MEMBER(quizpun2_soundlatch_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_quizpun2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

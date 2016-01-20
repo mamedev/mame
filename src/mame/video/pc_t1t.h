@@ -34,7 +34,7 @@ class pc_t1t_device :  public device_t,
 {
 public:
 	// construction/destruction
-	pc_t1t_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	pc_t1t_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	DECLARE_PALETTE_INIT( pcjr );
 
@@ -88,7 +88,7 @@ class pcvideo_t1000_device :  public pc_t1t_device
 {
 public:
 	// construction/destruction
-	pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pcvideo_t1000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( videoram_r );
@@ -96,8 +96,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( t1000_vsync_changed );
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 
 private:
 	UINT8 *m_t1_displayram;
@@ -116,20 +116,20 @@ class pcvideo_pcjr_device :  public pc_t1t_device
 {
 public:
 	// construction/destruction
-	pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pcvideo_pcjr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( pcjr_vsync_changed );
 
 	UINT8   *m_jxkanji;
 
-	virtual MC6845_UPDATE_ROW( crtc_update_row );
+	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 	MC6845_UPDATE_ROW( pcjx_text_update_row );
 	MC6845_UPDATE_ROW( pcjr_gfx_2bpp_high_update_row );
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 
 private:
 	void pc_pcjr_mode_switch();

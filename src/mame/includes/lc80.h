@@ -23,7 +23,7 @@
 class lc80_state : public driver_device
 {
 public:
-	lc80_state(const machine_config &mconfig, device_type type, const char *tag)
+	lc80_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_pio2(*this, Z80PIO2_TAG),
@@ -46,7 +46,7 @@ public:
 	required_ioport m_y2;
 	required_ioport m_y3;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );

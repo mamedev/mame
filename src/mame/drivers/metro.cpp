@@ -450,8 +450,8 @@ WRITE16_MEMBER(metro_state::metro_coin_lockout_1word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//      coin_lockout_w(machine(), 0, data & 1);
-//      coin_lockout_w(machine(), 1, data & 2);
+//      machine().bookkeeping().coin_lockout_w(0, data & 1);
+//      machine().bookkeeping().coin_lockout_w(1, data & 2);
 	}
 	if (data & ~3)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
 }
@@ -459,7 +459,7 @@ WRITE16_MEMBER(metro_state::metro_coin_lockout_1word_w)
 
 WRITE16_MEMBER(metro_state::metro_coin_lockout_4words_w)
 {
-//  coin_lockout_w(machine(), (offset >> 1) & 1, offset & 1);
+//  machine().bookkeeping().coin_lockout_w((offset >> 1) & 1, offset & 1);
 	if (data & ~1)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
 }
 
@@ -1714,7 +1714,7 @@ ADDRESS_MAP_END
 
 class puzzlet_io_device : public device_t {
 public:
-	puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	puzzlet_io_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( clk_w );
@@ -1722,8 +1722,8 @@ public:
 	template<class _Object> static devcb_base &set_data_cb(device_t &device, _Object object) { return downcast<puzzlet_io_device &>(device).data_cb.set_callback(object); }
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	devcb_write_line data_cb;
@@ -1736,7 +1736,7 @@ private:
 const device_type PUZZLET_IO = &device_creator<puzzlet_io_device>;
 
 
-puzzlet_io_device::puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+puzzlet_io_device::puzzlet_io_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PUZZLET_IO, "Puzzlet Coin/Start I/O", tag, owner, clock, "puzzlet_io", __FILE__),
 		data_cb(*this),
 		port(*this, ":IN0")
@@ -1879,10 +1879,10 @@ WRITE8_MEMBER(metro_state::vmetal_control_w)
 {
 	/* Lower nibble is the coin control bits shown in
 	   service mode, but in game mode they're different */
-	coin_counter_w(machine(), 0, data & 0x04);
-	coin_counter_w(machine(), 1, data & 0x08);  /* 2nd coin schute activates coin 0 counter in game mode?? */
-//  coin_lockout_w(machine(), 0, data & 0x01);  /* always on in game mode?? */
-	coin_lockout_w(machine(), 1, data & 0x02);  /* never activated in game mode?? */
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);  /* 2nd coin schute activates coin 0 counter in game mode?? */
+//  machine().bookkeeping().coin_lockout_w(0, data & 0x01);  /* always on in game mode?? */
+	machine().bookkeeping().coin_lockout_w(1, data & 0x02);  /* never activated in game mode?? */
 
 	if ((data & 0x40) == 0)
 		m_essnd->reset();
@@ -5036,7 +5036,7 @@ VG460-(A)
 |SW2          361A06    361A04           |---| |
 |             361A07    361A05                 |
 |----------------------------------------------|
-Notes: 
+Notes:
            * - Not populated
        68000 - Clock input 12.000MHz [24/2]
       D78C10 - NEC D78C10 8-bit CPU with A/D Converter. Clock input 12.000MHz [24/2]
@@ -5059,9 +5059,9 @@ Notes:
       M54532 - Mitsubishi M54532P Quad 1.5A Darlington Transistor Array with Clamp Diode
       MM1035 - Mitsumi System Reset IC with Built-in Watchdog Timer (==Fujitsu MB3773)
       TA7222 - Toshiba TA7222 5.8w Audio Power Amplifier
-       HSync - 14.9505kHz 
+       HSync - 14.9505kHz
        VSync - 57.1556Hz
-     
+
 ***************************************************************************/
 
 ROM_START( karatour )

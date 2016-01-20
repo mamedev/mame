@@ -38,7 +38,7 @@ class dp8390_device : public device_t,
 {
 public:
 	// construction/destruction
-	dp8390_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, float bandwidth, const char *shortname, const char *source);
+	dp8390_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, float bandwidth, std::string shortname, std::string source);
 
 	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_breq_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_breq_cb.set_callback(object); }
@@ -49,12 +49,12 @@ public:
 	DECLARE_READ16_MEMBER( dp8390_r );
 	DECLARE_WRITE_LINE_MEMBER( dp8390_cs );
 	DECLARE_WRITE_LINE_MEMBER( dp8390_reset );
-	void recv_cb(UINT8 *buf, int len);
+	void recv_cb(UINT8 *buf, int len) override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	int m_type;
 
@@ -72,7 +72,6 @@ private:
 	void set_cr(UINT8 newcr);
 	void check_dma_complete();
 	void do_tx();
-	bool mcast_ck(const UINT8 *buf, int len);
 	void check_irq() { m_irq_cb((m_regs.imr & m_regs.isr & 0x7f)?ASSERT_LINE:CLEAR_LINE); }
 	void recv_overflow();
 	void stop();
@@ -131,13 +130,13 @@ private:
 class rtl8019a_device : public dp8390_device
 {
 public:
-	rtl8019a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rtl8019a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class dp8390d_device : public dp8390_device
 {
 public:
-	dp8390d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dp8390d_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 // device type definition

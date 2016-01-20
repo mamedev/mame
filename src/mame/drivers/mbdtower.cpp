@@ -2,7 +2,7 @@
 // copyright-holders:hap, Sean Riddle
 /***************************************************************************
 
-  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.c) **
+  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.cpp) **
 
   Milton Bradley Dark Tower
   * TMS1400NLL MP7332-N1.U1(Rev. B) or MP7332-N2LL(Rev. C), die labeled MP7332
@@ -28,7 +28,7 @@
 class mbdtower_state : public hh_tms1k_state
 {
 public:
-	mbdtower_state(const machine_config &mconfig, device_type type, const char *tag)
+	mbdtower_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -48,7 +48,7 @@ public:
 	DECLARE_READ8_MEMBER(read_k);
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 
@@ -107,7 +107,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mbdtower_state::motor_sim_tick)
 
 	// on change, output info
 	if (m_motor_pos != m_motor_pos_prev)
-		output_set_value("motor_pos", 100 * (m_motor_pos / (float)0x80));
+		output().set_value("motor_pos", 100 * (m_motor_pos / (float)0x80));
 
 	/* 3 display cards per hole, like this:
 
@@ -119,7 +119,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mbdtower_state::motor_sim_tick)
 	*/
 	int card_pos = m_motor_pos >> 4 & 7;
 	if (card_pos != (m_motor_pos_prev >> 4 & 7))
-		output_set_value("card_pos", card_pos);
+		output().set_value("card_pos", card_pos);
 
 	m_motor_pos_prev = m_motor_pos;
 }
@@ -139,7 +139,7 @@ WRITE16_MEMBER(mbdtower_state::write_r)
 
 	// R9: motor on
 	if ((m_r ^ data) & 0x200)
-		output_set_value("motor_on", data >> 9 & 1);
+		output().set_value("motor_on", data >> 9 & 1);
 	if (data & 0x200)
 		m_motor_on = true;
 
@@ -254,8 +254,6 @@ static MACHINE_CONFIG_START( mbdtower, mbdtower_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tower_motor", mbdtower_state, motor_sim_tick, attotime::from_msec(3500/0x80)) // ~3.5sec for a full rotation
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_mbdtower)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

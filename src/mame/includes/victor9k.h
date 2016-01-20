@@ -51,7 +51,7 @@
 class victor9k_state : public driver_device
 {
 public:
-	victor9k_state(const machine_config &mconfig, device_type type, const char *tag) :
+	victor9k_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, I8088_TAG),
 		m_ieee488(*this, IEEE488_TAG),
@@ -103,8 +103,8 @@ public:
 	required_memory_region m_rom;
 	required_shared_ptr<UINT8> m_video_ram;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER( via1_pa_w );
 	DECLARE_WRITE_LINE_MEMBER( write_nfrd );

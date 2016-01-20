@@ -382,7 +382,7 @@ WRITE8_MEMBER( cuda_device::pram_w )
 //  cuda_device - constructor
 //-------------------------------------------------
 
-cuda_device::cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cuda_device::cuda_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CUDA, "Apple Cuda", tag, owner, clock, "cuda", __FILE__),
 	device_nvram_interface(mconfig, *this),
 	write_reset(*this),
@@ -415,8 +415,8 @@ void cuda_device::device_start()
 	write_via_clock.resolve_safe();
 	write_via_data.resolve_safe();
 
-	m_timer = timer_alloc(0, NULL);
-	m_prog_timer = timer_alloc(1, NULL);
+	m_timer = timer_alloc(0, nullptr);
+	m_prog_timer = timer_alloc(1, nullptr);
 	save_item(NAME(ddrs[0]));
 	save_item(NAME(ddrs[1]));
 	save_item(NAME(ddrs[2]));

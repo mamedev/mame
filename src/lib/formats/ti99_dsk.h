@@ -19,9 +19,9 @@
 class ti99_floppy_format : public floppy_image_format_t
 {
 public:
-	bool supports_save() const { return true; }
-	bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
-	bool save(io_generic *io, floppy_image *image);
+	bool supports_save() const override { return true; }
+	bool load(io_generic *io, UINT32 form_factor, floppy_image *image) override;
+	bool save(io_generic *io, floppy_image *image) override;
 
 protected:
 	int decode_bitstream(const UINT8 *bitstream, UINT8 *trackdata, int *sector, int cell_count, int encoding, UINT8 gapbytes, int track_size);
@@ -35,7 +35,6 @@ protected:
 	virtual void write_track(io_generic *io, UINT8 *trackdata, int *sector, int track, int head, int maxsect, int maxtrack, int numbytes) =0;
 
 	int get_encoding(int cell_size);
-	int get_track_size(int cell_size);
 
 	void generate_track_fm(int track, int head, int cell_size, UINT8* trackdata, floppy_image *image);
 	void generate_track_mfm(int track, int head, int cell_size, UINT8* trackdata, floppy_image *image);
@@ -52,19 +51,19 @@ protected:
 class ti99_sdf_format : public ti99_floppy_format
 {
 public:
-	int identify(io_generic *io, UINT32 form_factor);
-	const char *name() const;
-	const char *description() const;
-	const char *extensions() const;
+	int identify(io_generic *io, UINT32 form_factor) override;
+	const char *name() const override;
+	const char *description() const override;
+	const char *extensions() const override;
 
 private:
-	void determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads);
-	int get_track_size(int cell_size, int sector_count);
-	void write_track(io_generic *io, UINT8 *trackdata, int *sector, int track, int head, int maxsect, int maxtrack, int numbytes);
-	void load_track(io_generic *io, UINT8 *trackdata, int head, int track, int sectorcount, int trackcount, int cellsize);
+	void determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads) override;
+	int get_track_size(int cell_size, int sector_count) override;
+	void write_track(io_generic *io, UINT8 *trackdata, int *sector, int track, int head, int maxsect, int maxtrack, int numbytes) override;
+	void load_track(io_generic *io, UINT8 *trackdata, int head, int track, int sectorcount, int trackcount, int cellsize) override;
 
 	// This format supports single-sided images
-	int min_heads() { return 1; }
+	int min_heads() override { return 1; }
 
 	struct ti99vib
 	{
@@ -91,19 +90,19 @@ extern const floppy_format_type FLOPPY_TI99_SDF_FORMAT;
 class ti99_tdf_format : public ti99_floppy_format
 {
 public:
-	int identify(io_generic *io, UINT32 form_factor);
-	const char *name() const;
-	const char *description() const;
-	const char *extensions() const;
+	int identify(io_generic *io, UINT32 form_factor) override;
+	const char *name() const override;
+	const char *description() const override;
+	const char *extensions() const override;
 
 private:
-	void determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads);
-	void load_track(io_generic *io, UINT8 *trackdata, int head, int track, int sectorcount, int trackcount, int cellsize);
-	void write_track(io_generic *io, UINT8 *trackdata, int *sector, int track, int head, int maxsect, int maxtrack, int numbytes);
-	int get_track_size(int cell_size, int sector_count);
+	void determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads) override;
+	void load_track(io_generic *io, UINT8 *trackdata, int head, int track, int sectorcount, int trackcount, int cellsize) override;
+	void write_track(io_generic *io, UINT8 *trackdata, int *sector, int track, int head, int maxsect, int maxtrack, int numbytes) override;
+	int get_track_size(int cell_size, int sector_count) override;
 
 	// This format only supports double-sided images
-	int min_heads() { return 2; }
+	int min_heads() override { return 2; }
 };
 
 extern const floppy_format_type FLOPPY_TI99_TDF_FORMAT;

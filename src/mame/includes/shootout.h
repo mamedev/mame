@@ -3,7 +3,7 @@
 class shootout_state : public driver_device
 {
 public:
-	shootout_state(const machine_config &mconfig, device_type type, const char *tag)
+	shootout_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -36,7 +36,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 	DECLARE_DRIVER_INIT(shootout);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(shootout);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

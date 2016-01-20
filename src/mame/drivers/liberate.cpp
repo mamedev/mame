@@ -953,7 +953,7 @@ ROM_START( prosport )
 	ROM_LOAD( "ic45ar17.bin",   0x01000, 0x1000, CRC(5f1c621e) SHA1(29ce85d3d5da5ee16bb67644b0555ab9bce52d05) )
 
 	ROM_REGION(0x02000, "user1", 0 )
-	ROM_COPY( "gfx2", 0x0000, 0x0000, 0x2000 )
+	ROM_COPY( "gfx2", 0x00000, 0x0000, 0x2000 )
 ROM_END
 
 ROM_START( prosporta )
@@ -1015,7 +1015,7 @@ ROM_START( prosporta )
 	ROM_LOAD( "ar17.45",   0x01000, 0x1000, CRC(5f1c621e) SHA1(29ce85d3d5da5ee16bb67644b0555ab9bce52d05) )
 
 	ROM_REGION(0x02000, "user1", 0 )
-	ROM_COPY( "gfx2", 0x0000, 0x0000, 0x2000 )
+	ROM_COPY( "gfx2", 0x00000, 0x0000, 0x2000 )
 ROM_END
 
 ROM_START( boomrang )

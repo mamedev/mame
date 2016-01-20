@@ -27,7 +27,7 @@
 class tattack_state : public driver_device
 {
 public:
-	tattack_state(const machine_config &mconfig, device_type type, const char *tag)
+	tattack_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -39,7 +39,7 @@ public:
 	tilemap_t *m_tmap;
 	DECLARE_DRIVER_INIT(tattack);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(tattack);
 	UINT32 screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;

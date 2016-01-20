@@ -76,7 +76,7 @@ ioport_constructor partner128_t::device_input_ports() const
 //  partner128_t - constructor
 //-------------------------------------------------
 
-partner128_t::partner128_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+partner128_t::partner128_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C128_PARTNER, "PARTNER 128", tag, owner, clock, "c128_partner", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	//device_vcs_control_port_interface(mconfig, *this),

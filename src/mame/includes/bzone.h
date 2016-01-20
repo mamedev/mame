@@ -16,7 +16,7 @@
 class bzone_state : public driver_device
 {
 public:
-	bzone_state(const machine_config &mconfig, device_type type, const char *tag)
+	bzone_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mathbox(*this, "mathbox"),
@@ -38,7 +38,7 @@ public:
 	DECLARE_READ8_MEMBER(redbaron_joy_r);
 	DECLARE_WRITE8_MEMBER(redbaron_joysound_w);
 	DECLARE_DRIVER_INIT(bradley);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_MACHINE_START(redbaron);
 	INTERRUPT_GEN_MEMBER(bzone_interrupt);
 	DECLARE_WRITE8_MEMBER(bzone_sounds_w);

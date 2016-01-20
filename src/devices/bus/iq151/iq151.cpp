@@ -53,7 +53,7 @@ device_iq151cart_interface::~device_iq151cart_interface()
 //-------------------------------------------------
 //  iq151cart_slot_device - constructor
 //-------------------------------------------------
-iq151cart_slot_device::iq151cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+iq151cart_slot_device::iq151cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, IQ151CART_SLOT, "IQ151 cartridge slot", tag, owner, clock, "iq151cart_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this),
@@ -167,12 +167,12 @@ bool iq151cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		offs_t read_length = 0;
+		offs_t read_length;
 		UINT8 *cart_base = m_cart->get_cart_base();
 
-		if (cart_base != NULL)
+		if (cart_base != nullptr)
 		{
-			if (software_entry() == NULL)
+			if (software_entry() == nullptr)
 			{
 				read_length = length();
 				fread(m_cart->get_cart_base(), read_length);
@@ -196,7 +196,7 @@ bool iq151cart_slot_device::call_load()
 
 bool iq151cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry );
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
@@ -204,7 +204,7 @@ bool iq151cart_slot_device::call_softlist_load(software_list_device &swlist, con
     get default card software
 -------------------------------------------------*/
 
-void iq151cart_slot_device::get_default_card_software(std::string &result)
+std::string iq151cart_slot_device::get_default_card_software()
 {
-	software_get_default_slot(result, "basic6");
+	return software_get_default_slot("basic6");
 }

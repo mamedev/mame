@@ -373,7 +373,7 @@ CPU_DISASSEMBLE( pps4 )
 	unsigned PC = pc;
 	UINT8 op = OP(pc++);
 	UINT32 tok = table[op];
-	char *dst = 0;
+	char *dst = nullptr;
 
 	if (0 == (tok & t_MASK)) {
 		sprintf(buffer, "%s", token_str[tok & t_MASK]);

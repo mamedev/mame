@@ -15,7 +15,7 @@ class nsc810_device :  public device_t
 {
 public:
 	// construction/destruction
-	nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nsc810_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_portA_read_callback(device_t &device, _Object object) { return downcast<nsc810_device &>(device).m_portA_r.set_callback(object); }
 	template<class _Object> static devcb_base &set_portB_read_callback(device_t &device, _Object object) { return downcast<nsc810_device &>(device).m_portB_r.set_callback(object); }
@@ -33,9 +33,9 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	UINT8 m_portA_latch;

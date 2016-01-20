@@ -24,17 +24,17 @@ class pet_userport_cb2_sound_device : public device_t,
 {
 public:
 	// construction/destruction
-	pet_userport_cb2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pet_userport_cb2_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_m );
+	virtual DECLARE_WRITE_LINE_MEMBER( input_m ) override;
 
 	required_device<dac_device> m_dac;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 

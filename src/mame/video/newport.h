@@ -113,7 +113,7 @@ struct CMAP_t
 class newport_video_device : public device_t
 {
 public:
-	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	newport_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~newport_video_device() {}
 
 
@@ -124,9 +124,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
@@ -146,7 +146,7 @@ private:
 	XMAP_t m_XMAP0;
 	XMAP_t m_XMAP1;
 	REX3_t m_REX3;
-	UINT32 *m_base;
+	std::unique_ptr<UINT32[]> m_base;
 	UINT8  m_nDrawGreen;
 	CMAP_t m_CMAP0;
 };

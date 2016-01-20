@@ -101,13 +101,13 @@ public:
 	renderer(osd_window *window);
 	virtual ~renderer();
 
-	virtual int create();
-	virtual render_primitive_list *get_primitives();
-	virtual int draw(const int update);
-	virtual void save();
-	virtual void record();
-	virtual void toggle_fsfx();
-	virtual void destroy();
+	virtual int create() override;
+	virtual render_primitive_list *get_primitives() override;
+	virtual int draw(const int update) override;
+	virtual void save() override;
+	virtual void record() override;
+	virtual void toggle_fsfx() override;
+	virtual void destroy() override;
 
 	int                     initialize();
 

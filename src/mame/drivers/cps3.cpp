@@ -771,19 +771,13 @@ void cps3_state::cps3_decrypt_bios()
 
 void cps3_state::init_common(void)
 {
-	/* just some NOPs for the game to execute if it crashes and starts executing unmapped addresses
-	 - this prevents MAME from crashing */
-	m_nops = auto_alloc(machine(), UINT32);
-	m_nops[0] = 0x00090009;
-
 	// flash roms
-	std::string tempstr;
 	for (int simmnum = 0; simmnum < 7; simmnum++)
 		for (int chipnum = 0; chipnum < 8; chipnum++)
-			m_simm[simmnum][chipnum] = machine().device<fujitsu_29f016a_device>(strformat(tempstr,"simm%d.%d", simmnum + 1, chipnum).c_str());
+			m_simm[simmnum][chipnum] = machine().device<fujitsu_29f016a_device>(strformat("simm%d.%d", simmnum + 1, chipnum).c_str());
 
-	m_eeprom = auto_alloc_array(machine(), UINT32, 0x400/4);
-	machine().device<nvram_device>("eeprom")->set_base(m_eeprom, 0x400);
+	m_eeprom = std::make_unique<UINT32[]>(0x400/4);
+	machine().device<nvram_device>("eeprom")->set_base(m_eeprom.get(), 0x400);
 }
 
 
@@ -894,27 +888,27 @@ void cps3_state::cps3_set_mame_colours(int colournum, UINT16 data, UINT32 fadeva
 
 void cps3_state::video_start()
 {
-	m_ss_ram       = auto_alloc_array(machine(), UINT32, 0x10000/4);
-	memset(m_ss_ram, 0x00, 0x10000);
-	save_pointer(NAME(m_ss_ram), 0x10000/4);
+	m_ss_ram       = std::make_unique<UINT32[]>(0x10000/4);
+	memset(m_ss_ram.get(), 0x00, 0x10000);
+	save_pointer(NAME(m_ss_ram.get()), 0x10000/4);
 
-	m_char_ram = auto_alloc_array(machine(), UINT32, 0x800000/4);
-	memset(m_char_ram, 0x00, 0x800000);
-	save_pointer(NAME(m_char_ram), 0x800000 /4);
+	m_char_ram = std::make_unique<UINT32[]>(0x800000/4);
+	memset(m_char_ram.get(), 0x00, 0x800000);
+	save_pointer(NAME(m_char_ram.get()), 0x800000 /4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, cps3_tiles8x8_layout, (UINT8 *)m_ss_ram, 0, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, cps3_tiles8x8_layout, (UINT8 *)m_ss_ram.get(), 0, m_palette->entries() / 16, 0));
 
 	//decode_ssram();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(1, global_alloc(gfx_element(m_palette, cps3_tiles16x16_layout, (UINT8 *)m_char_ram, 0, m_palette->entries() / 64, 0)));
+	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(m_palette, cps3_tiles16x16_layout, (UINT8 *)m_char_ram.get(), 0, m_palette->entries() / 64, 0));
 	m_gfxdecode->gfx(1)->set_granularity(64);
 
 	//decode_charram();
 
-	m_mame_colours = auto_alloc_array(machine(), UINT32, 0x80000/4);
-	memset(m_mame_colours, 0x00, 0x80000);
+	m_mame_colours = std::make_unique<UINT32[]>(0x80000/4);
+	memset(m_mame_colours.get(), 0x00, 0x80000);
 
 	m_screenwidth = 384;
 
@@ -1003,7 +997,7 @@ void cps3_state::cps3_draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rg
 			if (!bpp) m_gfxdecode->gfx(1)->set_granularity(256);
 			else m_gfxdecode->gfx(1)->set_granularity(64);
 
-			cps3_drawgfxzoom(bitmap,clip,m_gfxdecode->gfx(1),tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, NULL, 0);
+			cps3_drawgfxzoom(bitmap,clip,m_gfxdecode->gfx(1),tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, nullptr, 0);
 		}
 	}
 }
@@ -1243,11 +1237,11 @@ UINT32 cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitma
 
 									if (global_alpha || alpha)
 									{
-										cps3_drawgfxzoom(m_renderbuffer_bitmap,m_renderbuffer_clip,m_gfxdecode->gfx(1),realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(m_renderbuffer_bitmap,m_renderbuffer_clip,m_gfxdecode->gfx(1),realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, nullptr, 0);
 									}
 									else
 									{
-										cps3_drawgfxzoom(m_renderbuffer_bitmap,m_renderbuffer_clip,m_gfxdecode->gfx(1),realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(m_renderbuffer_bitmap,m_renderbuffer_clip,m_gfxdecode->gfx(1),realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, nullptr, 0);
 									}
 									count++;
 								}
@@ -1313,7 +1307,7 @@ UINT32 cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitma
 				pal += m_ss_pal_base << 5;
 				tile+=0x200;
 
-				cps3_drawgfxzoom(bitmap, cliprect, m_gfxdecode->gfx(0),tile,pal,flipx,flipy,x*8,y*8,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,NULL,0);
+				cps3_drawgfxzoom(bitmap, cliprect, m_gfxdecode->gfx(0),tile,pal,flipx,flipy,x*8,y*8,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,nullptr,0);
 				count++;
 			}
 		}
@@ -1403,29 +1397,29 @@ READ32_MEMBER(cps3_state::cps3_gfxflash_r)
 
 	fujitsu_29f016a_device *chip0 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) & ~1];
 	fujitsu_29f016a_device *chip1 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) |  1];
-	if (chip0 == NULL || chip1 == NULL)
+	if (chip0 == nullptr || chip1 == nullptr)
 		return 0xffffffff;
 
 	if(DEBUG_PRINTF) printf("gfxflash_r\n");
 
 	if (ACCESSING_BITS_24_31)   // GFX Flash 1
 	{
-		logerror("read GFX flash chip %s addr %02x\n", chip0->tag(), (offset<<1));
+		logerror("read GFX flash chip %s addr %02x\n", chip0->tag().c_str(), (offset<<1));
 		result |= chip0->read( (offset<<1) ) << 24;
 	}
 	if (ACCESSING_BITS_16_23)   // GFX Flash 2
 	{
-		logerror("read GFX flash chip %s addr %02x\n", chip1->tag(), (offset<<1));
+		logerror("read GFX flash chip %s addr %02x\n", chip1->tag().c_str(), (offset<<1));
 		result |= chip1->read( (offset<<1) ) << 16;
 	}
 	if (ACCESSING_BITS_8_15)    // GFX Flash 1
 	{
-		logerror("read GFX flash chip %s addr %02x\n", chip0->tag(), (offset<<1)+1);
+		logerror("read GFX flash chip %s addr %02x\n", chip0->tag().c_str(), (offset<<1)+1);
 		result |= chip0->read( (offset<<1)+0x1 ) << 8;
 	}
 	if (ACCESSING_BITS_0_7) // GFX Flash 2
 	{
-		logerror("read GFX flash chip %s addr %02x\n", chip1->tag(), (offset<<1)+1);
+		logerror("read GFX flash chip %s addr %02x\n", chip1->tag().c_str(), (offset<<1)+1);
 		result |= chip1->read( (offset<<1)+0x1 ) << 0;
 	}
 
@@ -1441,7 +1435,7 @@ WRITE32_MEMBER(cps3_state::cps3_gfxflash_w)
 
 	fujitsu_29f016a_device *chip0 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) & ~1];
 	fujitsu_29f016a_device *chip1 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) |  1];
-	if (chip0 == NULL || chip1 == NULL)
+	if (chip0 == nullptr || chip1 == nullptr)
 		return;
 
 //  if(DEBUG_PRINTF) printf("cps3_gfxflash_w %08x %08x %08x\n", offset *2, data, mem_mask);
@@ -1450,19 +1444,19 @@ WRITE32_MEMBER(cps3_state::cps3_gfxflash_w)
 	if (ACCESSING_BITS_24_31)   // GFX Flash 1
 	{
 		command = (data >> 24) & 0xff;
-		logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip0->tag(), (offset<<1), command);
+		logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip0->tag().c_str(), (offset<<1), command);
 		chip0->write( (offset<<1), command);
 	}
 	if (ACCESSING_BITS_16_23)   // GFX Flash 2
 	{
 		command = (data >> 16) & 0xff;
-		logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip1->tag(), (offset<<1), command);
+		logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip1->tag().c_str(), (offset<<1), command);
 		chip1->write( (offset<<1), command);
 	}
 	if (ACCESSING_BITS_8_15)    // GFX Flash 1
 	{
 		command = (data >> 8) & 0xff;
-		logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip0->tag(), (offset<<1)+1, command);
+		logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip0->tag().c_str(), (offset<<1)+1, command);
 		chip0->write( (offset<<1)+0x1, command);
 	}
 	if (ACCESSING_BITS_0_7) // GFX Flash 2
@@ -1496,7 +1490,7 @@ UINT32 cps3_state::cps3_flashmain_r(address_space &space, int which, UINT32 offs
 {
 	UINT32 result = 0;
 
-	if (m_simm[which][0] == NULL || m_simm[which][1] == NULL || m_simm[which][2] == NULL || m_simm[which][3] == NULL)
+	if (m_simm[which][0] == nullptr || m_simm[which][1] == nullptr || m_simm[which][2] == nullptr || m_simm[which][3] == nullptr)
 		return 0xffffffff;
 
 	if (ACCESSING_BITS_24_31)   // Flash 1
@@ -1551,31 +1545,31 @@ void cps3_state::cps3_flashmain_w(int which, UINT32 offset, UINT32 data, UINT32 
 {
 	int command;
 
-	if (m_simm[which][0] == NULL || m_simm[which][1] == NULL || m_simm[which][2] == NULL || m_simm[which][3] == NULL)
+	if (m_simm[which][0] == nullptr || m_simm[which][1] == nullptr || m_simm[which][2] == nullptr || m_simm[which][3] == nullptr)
 		return;
 
 	if (ACCESSING_BITS_24_31)   // Flash 1
 	{
 		command = (data >> 24) & 0xff;
-		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][0]->tag(), offset, command);
+		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][0]->tag().c_str(), offset, command);
 		m_simm[which][0]->write(offset, command);
 	}
 	if (ACCESSING_BITS_16_23)   // Flash 2
 	{
 		command = (data >> 16) & 0xff;
-		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][1]->tag(), offset, command);
+		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][1]->tag().c_str(), offset, command);
 		m_simm[which][1]->write(offset, command);
 	}
 	if (ACCESSING_BITS_8_15)    // Flash 2
 	{
 		command = (data >> 8) & 0xff;
-		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][2]->tag(), offset, command);
+		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][2]->tag().c_str(), offset, command);
 		m_simm[which][2]->write(offset, command);
 	}
 	if (ACCESSING_BITS_0_7) // Flash 2
 	{
 		command = (data >> 0) & 0xff;
-		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][3]->tag(), offset, command);
+		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][3]->tag().c_str(), offset, command);
 		m_simm[which][3]->write(offset, command);
 	}
 
@@ -1835,7 +1829,7 @@ WRITE32_MEMBER(cps3_state::cps3_palettedma_w)
 
 UINT32 cps3_state::process_byte( UINT8 real_byte, UINT32 destination, int max_length )
 {
-	UINT8* dest       = (UINT8*)m_char_ram;
+	UINT8* dest       = (UINT8*)m_char_ram.get();
 
 	//printf("process byte for destination %08x\n", destination);
 
@@ -1930,7 +1924,7 @@ void cps3_state::cps3_do_char_dma( UINT32 real_source, UINT32 real_destination, 
 
 UINT32 cps3_state::ProcessByte8(UINT8 b,UINT32 dst_offset)
 {
-	UINT8* destRAM = (UINT8*)m_char_ram;
+	UINT8* destRAM = (UINT8*)m_char_ram.get();
 	int l=0;
 
 	if(m_lastb==m_lastb2) //rle
@@ -2324,7 +2318,7 @@ void cps3_state::copy_from_nvram()
 	romdata  += 0x800000/4;
 	romdata2 += 0x800000/4;
 
-	if (m_simm[1][0] != NULL)
+	if (m_simm[1][0] != nullptr)
 		for (i=0;i<0x800000;i+=4)
 		{
 			UINT32 data;
@@ -2349,9 +2343,9 @@ void cps3_state::copy_from_nvram()
 
 			fujitsu_29f016a_device *flash0 = m_simm[2 + flashnum/8][flashnum % 8 + 0];
 			fujitsu_29f016a_device *flash1 = m_simm[2 + flashnum/8][flashnum % 8 + 1];
-			if (flash0 == NULL || flash1 == NULL)
+			if (flash0 == nullptr || flash1 == nullptr)
 				continue;
-			if (flash0 != NULL && flash1 != NULL)
+			if (flash0 != nullptr && flash1 != nullptr)
 			{
 				for (i=0;i<0x200000;i+=2)
 				{
@@ -3651,10 +3645,18 @@ ROM_START( cps3boot ) // for cart with standard SH2
 	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
-	DISK_IMAGE_READONLY( "no-battery_multi-game_bootleg_cd_for_hd6417095_sh2", 0, SHA1(6057cc3ec7991c0c00a7ab9da6ac2f92c9fb1aed) )
+	DISK_IMAGE_READONLY( "UniCD-CPS3_for_standard_SH2_V4", 0, SHA1(099c52bd38753f0f4876243e7aa87ca482a2dcb7) )
 ROM_END
 
 ROM_START( cps3booto ) // for cart with standard SH2
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
+
+	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_IMAGE_READONLY( "no-battery_multi-game_bootleg_cd_for_hd6417095_sh2", 0, SHA1(6057cc3ec7991c0c00a7ab9da6ac2f92c9fb1aed) )
+ROM_END
+
+ROM_START( cps3booto2 ) // for cart with standard SH2
 	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
 	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
 
@@ -3683,11 +3685,19 @@ ROM_START( cps3boota ) // for cart with dead custom SH2 (or 2nd Impact CPU which
 	ROM_LOAD( "no-battery_bios_29f400_for_dead_security_cart.u2", 0x000000, 0x080000, CRC(0fd56fb3) SHA1(5a8bffc07eb7da73cf4bca6718df72e471296bfd) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_IMAGE_READONLY( "UniCD-CPS3_for_custom_SH2_V5", 0, SHA1(50a5b2845d3dd3de3bce15c4f1b58500db80cabe) )
+ROM_END
+
+ROM_START( cps3bootao ) // for cart with dead custom SH2 (or 2nd Impact CPU which is the same as a dead one)
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "no-battery_bios_29f400_for_dead_security_cart.u2", 0x000000, 0x080000, CRC(0fd56fb3) SHA1(5a8bffc07eb7da73cf4bca6718df72e471296bfd) )
+
+	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
 	DISK_IMAGE_READONLY( "no-battery_multi-game_bootleg_cd_for_dead_security_cart", 0, SHA1(1ede2f1ba197ee787208358a13eae7185a5ae3b2) )
 ROM_END
 
 
-ROM_START( cps3bootoa ) // for cart with dead custom SH2 (or 2nd Impact CPU which is the same as a dead one)
+ROM_START( cps3bootao2 ) // for cart with dead custom SH2 (or 2nd Impact CPU which is the same as a dead one)
 	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
 	ROM_LOAD( "no-battery_bios_29f400_for_dead_security_cart.u2", 0x000000, 0x080000, CRC(0fd56fb3) SHA1(5a8bffc07eb7da73cf4bca6718df72e471296bfd) )
 
@@ -3914,12 +3924,17 @@ GAME( 1999, jojobanr1, jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0
 GAME( 1999, jojobaner1,jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
 
 // bootlegs, hold START1 during bootup to change games
-GAME( 1999, cps3boot,  0,        sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, cps3boota, cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart", MACHINE_IMPERFECT_GRAPHICS )
+
+// newest revision, fixes some issues with Warzard decryption.
+GAME( 1999, cps3boot,   0,        sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (V4)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3boota,  cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (V5)", MACHINE_IMPERFECT_GRAPHICS )
+
+GAME( 1999, cps3booto,  cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (older)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3bootao, cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (older)", MACHINE_IMPERFECT_GRAPHICS )
 // this doesn't play 2nd Impact despite it being listed.  2nd Impact uses separate data/code encryption and can't be decrypted cleanly for a standard SH2.  Selecting it just flashes in a copy of 3rd Strike with the 2nd Impact loading screen
-GAME( 1999, cps3booto,  cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (older) (New Generation, 3rd Strike, JoJo's Venture, JoJo's Bizarre Adventure and Red Earth only)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3booto2, cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (oldest) (New Generation, 3rd Strike, JoJo's Venture, JoJo's Bizarre Adventure and Red Earth only)", MACHINE_IMPERFECT_GRAPHICS )
 // this does not play Red Earth or the 2 Jojo games.  New Generation and 3rd Strike have been heavily modified to work with the separate code/data encryption a dead cart / 2nd Impact cart has.  Selecting the other games will give an 'invalid CD' message.
-GAME( 1999, cps3bootoa, cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (older) (New Generation, 2nd Impact and 3rd Strike only)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3bootao2, cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (oldest) (New Generation, 2nd Impact and 3rd Strike only)", MACHINE_IMPERFECT_GRAPHICS )
 // these are test bootleg CDs for running 2nd Impact on a standard SH2
 GAME( 1999, cps3bs32,  cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, V3)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, cps3bs32a, cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, older)", MACHINE_IMPERFECT_GRAPHICS ) // older / buggier hack

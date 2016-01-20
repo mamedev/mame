@@ -38,7 +38,7 @@ WRITE16_MEMBER(xmen_state::eeprom_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = coin counter */
-		coin_counter_w(machine(), 0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
 
 		/* bit 2 is data */
 		/* bit 3 is clock (active high) */

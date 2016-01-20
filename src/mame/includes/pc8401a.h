@@ -35,7 +35,7 @@
 class pc8401a_state : public driver_device
 {
 public:
-	pc8401a_state(const machine_config &mconfig, device_type type, const char *tag)
+	pc8401a_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_rtc(*this, UPD1990A_TAG),
@@ -64,8 +64,8 @@ public:
 
 	memory_region *m_cart_rom;
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	DECLARE_WRITE8_MEMBER( mmr_w );
 	DECLARE_READ8_MEMBER( mmr_r );
@@ -99,11 +99,11 @@ public:
 class pc8500_state : public pc8401a_state
 {
 public:
-	pc8500_state(const machine_config &mconfig, device_type type, const char *tag)
+	pc8500_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pc8401a_state(mconfig, type, tag)
 	{ }
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 

@@ -12,7 +12,7 @@
 class astrof_state : public driver_device
 {
 public:
-	astrof_state(const machine_config &mconfig, device_type type, const char *tag)
+	astrof_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_astrof_color(*this, "astrof_color"),
@@ -25,7 +25,7 @@ public:
 	/* video-related */
 	required_shared_ptr<UINT8> m_videoram;
 
-	UINT8 *    m_colorram;
+	std::unique_ptr<UINT8[]>    m_colorram;
 	required_shared_ptr<UINT8> m_astrof_color;
 	optional_shared_ptr<UINT8> m_tomahawk_protection;
 
@@ -71,7 +71,7 @@ public:
 	DECLARE_DRIVER_INIT(abattle);
 	DECLARE_DRIVER_INIT(sstarbtl);
 	DECLARE_DRIVER_INIT(acombat3);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(astrof);
 	DECLARE_MACHINE_START(abattle);
 	DECLARE_MACHINE_RESET(abattle);

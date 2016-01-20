@@ -30,7 +30,7 @@ ToDo:
 class atari_s2_state : public genpin_class
 {
 public:
-	atari_s2_state(const machine_config &mconfig, device_type type, const char *tag)
+	atari_s2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_dac(*this, "dac")
@@ -55,7 +55,7 @@ private:
 	UINT8 m_t_c;
 	UINT8 m_segment[7];
 	UINT8 *m_p_prom;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
 	required_device<dac_device> m_dac1;
@@ -350,7 +350,7 @@ WRITE8_MEMBER( atari_s2_state::display_w )
 	{
 		data &= 7;
 		for (UINT8 i = 0; i < 7; i++)
-			output_set_digit_value(i * 10 + data, m_segment[i]);
+			output().set_digit_value(i * 10 + data, m_segment[i]);
 	}
 }
 

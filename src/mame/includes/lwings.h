@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Paul Leaman
 #include "video/bufsprite.h"
 #include "sound/msm5205.h"
@@ -6,7 +6,7 @@
 class lwings_state : public driver_device
 {
 public:
-	lwings_state(const machine_config &mconfig, device_type type, const char *tag)
+	lwings_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_spriteram(*this, "spriteram") ,
 		m_fgvideoram(*this, "fgvideoram"),
@@ -59,9 +59,9 @@ public:
 	TILE_GET_INFO_MEMBER(lwings_get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(trojan_get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_DRIVER_INIT(avengersb);
 	DECLARE_VIDEO_START(trojan);
 	DECLARE_VIDEO_START(avengers);

@@ -24,7 +24,7 @@ Magic Sticks:
 class powerbal_state : public playmark_state
 {
 public:
-	powerbal_state(const machine_config &mconfig, device_type type, const char *tag)
+	powerbal_state(const machine_config &mconfig, device_type type, std::string tag)
 		: playmark_state(mconfig, type, tag),
 			m_eeprom(*this, "eeprom") { }
 
@@ -53,7 +53,7 @@ WRITE16_MEMBER(powerbal_state::magicstk_coin_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0, data & 0x20);
+		machine().bookkeeping().coin_counter_w(0, data & 0x20);
 
 		m_eeprom->cs_write((data & 8) ? ASSERT_LINE : CLEAR_LINE);
 		m_eeprom->di_write((data & 2) >> 1);
@@ -626,8 +626,8 @@ ROM_START( powerbal )
 	ROM_LOAD( "1.u16",        0x00000, 0x40000, CRC(12776dbc) SHA1(9ab9930fd581296642834d2cb4ba65264a588af3) )
 	ROM_CONTINUE(             0x60000, 0x20000 )
 	ROM_CONTINUE(             0xa0000, 0x20000 )
-	ROM_COPY( "oki",  0x00000, 0x40000, 0x20000)
-	ROM_COPY( "oki",  0x00000, 0x80000, 0x20000)
+	ROM_COPY( "oki",  0x000000, 0x40000, 0x20000)
+	ROM_COPY( "oki",  0x000000, 0x80000, 0x20000)
 
 	ROM_REGION( 0x1200, "plds", 0 )
 	ROM_LOAD( "palce16v8h.u102",  0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */

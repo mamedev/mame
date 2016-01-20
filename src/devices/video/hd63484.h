@@ -26,7 +26,7 @@
 class hd63484_device : public device_t
 {
 public:
-	hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd63484_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~hd63484_device() {}
 
 	DECLARE_READ16_MEMBER( status_r );
@@ -41,12 +41,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
-	UINT16 *   m_ram;
+	std::unique_ptr<UINT16[]>   m_ram;
 	UINT16 m_reg[256/2];
 
 	int          m_fifo_counter;

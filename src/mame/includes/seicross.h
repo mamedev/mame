@@ -5,7 +5,7 @@
 class seicross_state : public driver_device
 {
 public:
-	seicross_state(const machine_config &mconfig, device_type type, const char *tag)
+	seicross_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
@@ -45,9 +45,9 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(seicross);
 	DECLARE_DRIVER_INIT(friskytb);
 

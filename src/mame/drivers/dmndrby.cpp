@@ -61,7 +61,7 @@ DD10 DD14  DD18     H5            DD21
 class dmndrby_state : public driver_device
 {
 public:
-	dmndrby_state(const machine_config &mconfig, device_type type, const char *tag)
+	dmndrby_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_scroll_ram(*this, "scroll_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
@@ -84,7 +84,7 @@ public:
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(output_w);
 	TILE_GET_INFO_MEMBER(get_dmndrby_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(dmndrby);
 	UINT32 screen_update_dderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(dderby_irq);

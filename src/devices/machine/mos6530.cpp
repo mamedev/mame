@@ -40,7 +40,7 @@ enum
 
 const device_type MOS6530 = &device_creator<mos6530_device>;
 
-mos6530_device::mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos6530_device::mos6530_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MOS6530, "MOS6530 RRIOT", tag, owner, clock, "mos6530", __FILE__),
 		m_in_pa_cb(*this),
 		m_out_pa_cb(*this),
@@ -259,7 +259,7 @@ WRITE8_MEMBER( mos6530_device::write )
 
 READ8_MEMBER( mos6530_device::read )
 {
-	UINT8 val = 0;
+	UINT8 val;
 
 	/* if A2 == 1 and A0 == 1, we are reading interrupt flags */
 	if ((offset & 0x05) == 0x05)

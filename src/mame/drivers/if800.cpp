@@ -16,7 +16,7 @@
 class if800_state : public driver_device
 {
 public:
-	if800_state(const machine_config &mconfig, device_type type, const char *tag)
+	if800_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_hgdc(*this, "upd7220"),
 		m_video_ram(*this, "video_ram"),
@@ -26,8 +26,8 @@ public:
 	required_device<upd7220_device> m_hgdc;
 
 	required_shared_ptr<UINT16> m_video_ram;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );

@@ -42,7 +42,7 @@
 class pic8259_device : public device_t
 {
 public:
-	pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pic8259_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &static_set_out_int_callback(device_t &device, _Object object) { return downcast<pic8259_device &>(device).m_out_int_func.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_sp_en_callback(device_t &device, _Object object) { return downcast<pic8259_device &>(device).m_sp_en_func.set_callback(object); }
@@ -68,9 +68,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	static const device_timer_id TIMER_CHECK_IRQ = 0;

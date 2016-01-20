@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 /***************************************************************************
 
@@ -31,7 +31,7 @@ public:
 		TIMER_PERIODIC
 	};
 
-	boxer_state(const machine_config &mconfig, device_type type, const char *tag)
+	boxer_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_tile_ram(*this, "tile_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
@@ -62,8 +62,8 @@ public:
 	DECLARE_WRITE8_MEMBER(boxer_irq_reset_w);
 	DECLARE_WRITE8_MEMBER(boxer_crowd_w);
 	DECLARE_WRITE8_MEMBER(boxer_led_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(boxer);
 	UINT32 screen_update_boxer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(pot_interrupt);
@@ -71,7 +71,7 @@ public:
 	void draw_boxer( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 /*************************************
@@ -316,14 +316,14 @@ WRITE8_MEMBER(boxer_state::boxer_crowd_w)
 	/* BIT2 => CROWD-2 */
 	/* BIT3 => CROWD-3 */
 
-	coin_lockout_global_w(machine(), data & 1);
+	machine().bookkeeping().coin_lockout_global_w(data & 1);
 }
 
 
 WRITE8_MEMBER(boxer_state::boxer_led_w)
 {
-	set_led_status(machine(), 1, !(data & 1));
-	set_led_status(machine(), 0, !(data & 2));
+	output().set_led_value(1, !(data & 1));
+	output().set_led_value(0, !(data & 2));
 }
 
 

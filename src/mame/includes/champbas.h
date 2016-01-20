@@ -13,7 +13,7 @@
 class champbas_state : public driver_device
 {
 public:
-	champbas_state(const machine_config &mconfig, device_type type, const char *tag)
+	champbas_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -82,6 +82,6 @@ public:
 	void champbas_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void exctsccr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };

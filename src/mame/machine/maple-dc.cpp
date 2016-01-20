@@ -28,14 +28,14 @@ void maple_dc_device::static_set_irq_cb(device_t &device, void (*irq_cb)(running
 	maple_dc.irq_cb = irq_cb;
 }
 
-maple_dc_device::maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+maple_dc_device::maple_dc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MAPLE_DC, "Dreamcast Maple Bus", tag, owner, clock, "maple_dc", __FILE__)
 {
 	// Do not move that in device_start or there will be a race
 	// condition with the maple devices call to register_port.
 	memset(devices, 0, sizeof(devices));
-	cpu = 0;
-	irq_cb = 0;
+	cpu = nullptr;
+	irq_cb = nullptr;
 }
 
 void maple_dc_device::register_port(int port, maple_device *device)

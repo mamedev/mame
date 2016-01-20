@@ -14,7 +14,7 @@
 class redalert_state : public driver_device
 {
 public:
-	redalert_state(const machine_config &mconfig, device_type type, const char *tag)
+	redalert_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_bitmap_videoram(*this, "bitmap_videoram"),
 		m_charmap_videoram(*this, "charram"),
@@ -38,7 +38,7 @@ public:
 	optional_device<hc55516_device> m_cvsd;
 	required_device<screen_device> m_screen;
 
-	UINT8 *m_bitmap_colorram;
+	std::unique_ptr<UINT8[]> m_bitmap_colorram;
 	UINT8 m_control_xor;
 	DECLARE_READ8_MEMBER(redalert_interrupt_clear_r);
 	DECLARE_WRITE8_MEMBER(redalert_interrupt_clear_w);

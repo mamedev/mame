@@ -17,13 +17,13 @@
 class mk14_state : public driver_device
 {
 public:
-	mk14_state(const machine_config &mconfig, device_type type, const char *tag)
+	mk14_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(display_w);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -60,7 +60,7 @@ READ8_MEMBER( mk14_state::keyboard_r )
 WRITE8_MEMBER( mk14_state::display_w )
 {
 	if (offset < 8 )
-		output_set_digit_value(offset, data);
+		output().set_digit_value(offset, data);
 	else
 	{
 		//logerror("write %02x to %02x\n",data,offset);

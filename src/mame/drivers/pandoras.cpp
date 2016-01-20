@@ -67,9 +67,9 @@ WRITE8_MEMBER(pandoras_state::pandoras_int_control_w)
 					m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 				m_irq_enable_a = data;
 				break;
-		case 0x02:  coin_counter_w(machine(), 0,data & 0x01);
+		case 0x02:  machine().bookkeeping().coin_counter_w(0,data & 0x01);
 				break;
-		case 0x03:  coin_counter_w(machine(), 1,data & 0x01);
+		case 0x03:  machine().bookkeeping().coin_counter_w(1,data & 0x01);
 				break;
 		case 0x05:  pandoras_flipscreen_w(space, 0, data);
 				break;

@@ -12,15 +12,15 @@ class nes_namcot3433_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_namcot3433_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_namcot3433_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_namcot3433_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_namcot3433_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(dxrom_write);
-	virtual DECLARE_WRITE8_MEMBER(write_h) { dxrom_write(space, offset, data, mem_mask); }
+	virtual DECLARE_WRITE8_MEMBER(write_h) override { dxrom_write(space, offset, data, mem_mask); }
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 private:
 	UINT8 m_latch;
@@ -33,13 +33,13 @@ class nes_namcot3446_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_namcot3446_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_namcot3446_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual void device_start() override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 private:
 	UINT8 m_latch;
@@ -52,13 +52,13 @@ class nes_namcot3425_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_namcot3425_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_namcot3425_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual void device_start() override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 private:
 	UINT8 m_latch;
@@ -72,20 +72,20 @@ class nes_namcot340_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_namcot340_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_namcot340_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_namcot340_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_namcot340_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual DECLARE_READ8_MEMBER(n340_loread);
 	virtual DECLARE_WRITE8_MEMBER(n340_lowrite);
 	virtual DECLARE_WRITE8_MEMBER(n340_hiwrite);
-	virtual DECLARE_READ8_MEMBER(read_l) { return n340_loread(space, offset, mem_mask); }
-	virtual DECLARE_WRITE8_MEMBER(write_l) { n340_lowrite(space, offset, data, mem_mask); }
-	virtual DECLARE_WRITE8_MEMBER(write_h) { n340_hiwrite(space, offset, data, mem_mask); }
+	virtual DECLARE_READ8_MEMBER(read_l) override { return n340_loread(space, offset, mem_mask); }
+	virtual DECLARE_WRITE8_MEMBER(write_l) override { n340_lowrite(space, offset, data, mem_mask); }
+	virtual DECLARE_WRITE8_MEMBER(write_h) override { n340_hiwrite(space, offset, data, mem_mask); }
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
 	UINT16 m_irq_count;
@@ -106,15 +106,15 @@ class nes_namcot175_device : public nes_namcot340_device
 {
 public:
 	// construction/destruction
-	nes_namcot175_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_namcot175_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_READ8_MEMBER(read_m);
-	virtual DECLARE_WRITE8_MEMBER(write_m);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual void device_start() override;
+	virtual DECLARE_READ8_MEMBER(read_m) override;
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 private:
 	UINT8 m_wram_protect;
@@ -127,21 +127,21 @@ class nes_namcot163_device : public nes_namcot340_device
 {
 public:
 	// construction/destruction
-	nes_namcot163_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_namcot163_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_m);
-	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_m);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual void device_start() override;
+	virtual DECLARE_READ8_MEMBER(read_l) override;
+	virtual DECLARE_READ8_MEMBER(read_m) override;
+	virtual DECLARE_WRITE8_MEMBER(write_l) override;
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	// we have to overwrite these to allow CIRAM to be used for VRAM, even if it's not clear which game(s) use this
-	virtual DECLARE_READ8_MEMBER(chr_r);
-	virtual DECLARE_WRITE8_MEMBER(chr_w);
+	virtual DECLARE_READ8_MEMBER(chr_r) override;
+	virtual DECLARE_WRITE8_MEMBER(chr_w) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 private:
 	void set_mirror(UINT8 page, UINT8 data);

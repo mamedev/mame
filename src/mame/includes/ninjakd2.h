@@ -11,7 +11,7 @@
 class ninjakd2_state : public driver_device
 {
 public:
-	ninjakd2_state(const machine_config &mconfig, device_type type, const char *tag)
+	ninjakd2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_soundcpu(*this, "soundcpu"),
@@ -54,9 +54,9 @@ public:
 	UINT8 m_robokid_bg0_bank;
 	UINT8 m_robokid_bg1_bank;
 	UINT8 m_robokid_bg2_bank;
-	UINT8* m_robokid_bg0_videoram;
-	UINT8* m_robokid_bg1_videoram;
-	UINT8* m_robokid_bg2_videoram;
+	std::unique_ptr<UINT8[]> m_robokid_bg0_videoram;
+	std::unique_ptr<UINT8[]> m_robokid_bg1_videoram;
+	std::unique_ptr<UINT8[]> m_robokid_bg2_videoram;
 	UINT8 m_rom_bank_mask;
 
 	void omegaf_io_protection_start();
@@ -100,9 +100,9 @@ public:
 	TILE_GET_INFO_MEMBER(robokid_get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(robokid_get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(robokid_get_bg2_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(mnight);
 	DECLARE_VIDEO_START(arkarea);
 	DECLARE_VIDEO_START(robokid);

@@ -45,7 +45,7 @@ const device_type ASC = &device_creator<asc_device>;
 //  asc_device - constructor
 //-------------------------------------------------
 
-asc_device::asc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+asc_device::asc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ASC, "ASC", tag, owner, clock, "asc", __FILE__),
 		device_sound_interface(mconfig, *this),
 		write_irq(*this),
@@ -76,7 +76,7 @@ void asc_device::device_start()
 
 	memset(m_regs, 0, sizeof(m_regs));
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 
 	save_item(NAME(m_fifo_a_rdptr));
 	save_item(NAME(m_fifo_b_rdptr));

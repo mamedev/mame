@@ -54,7 +54,7 @@
 class cbm2_state : public driver_device
 {
 public:
-	cbm2_state(const machine_config &mconfig, device_type type, const char *tag)
+	cbm2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M6509_TAG),
 			m_pla1(*this, PLA1_TAG),
@@ -158,7 +158,7 @@ public:
 	required_ioport m_pb7;
 	required_ioport m_lock;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	DECLARE_MACHINE_START( cbm2 );
 	DECLARE_MACHINE_START( cbm2_ntsc );
@@ -201,8 +201,6 @@ public:
 	DECLARE_READ8_MEMBER( cia_pa_r );
 	DECLARE_WRITE8_MEMBER( cia_pa_w );
 	DECLARE_READ8_MEMBER( cia_pb_r );
-
-	DECLARE_WRITE_LINE_MEMBER( tape_read_w );
 
 	DECLARE_READ8_MEMBER( ext_tpi_pb_r );
 	DECLARE_WRITE8_MEMBER( ext_tpi_pb_w );
@@ -249,12 +247,12 @@ public:
 class cbm2hp_state : public cbm2_state
 {
 public:
-	cbm2hp_state(const machine_config &mconfig, device_type type, const char *tag)
+	cbm2hp_state(const machine_config &mconfig, device_type type, std::string tag)
 		: cbm2_state(mconfig, type, tag)
 	{ }
 
 	virtual void read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
-		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4);
+		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4) override;
 
 	DECLARE_READ8_MEMBER( tpi2_pc_r );
 };
@@ -263,7 +261,7 @@ public:
 class p500_state : public cbm2_state
 {
 public:
-	p500_state(const machine_config &mconfig, device_type type, const char *tag)
+	p500_state(const machine_config &mconfig, device_type type, std::string tag)
 		: cbm2_state(mconfig, type, tag),
 			m_pla2(*this, PLA2_TAG),
 			m_vic(*this, MOS6569_TAG),

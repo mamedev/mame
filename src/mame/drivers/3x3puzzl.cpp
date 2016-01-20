@@ -49,7 +49,7 @@ Notes:
 class _3x3puzzle_state : public driver_device
 {
 public:
-	_3x3puzzle_state(const machine_config &mconfig, device_type type, const char *tag)
+	_3x3puzzle_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_videoram1(*this, "videoram1"),
 			m_videoram2(*this, "videoram2"),
@@ -95,9 +95,9 @@ public:
 	DECLARE_WRITE16_MEMBER(tilemap1_scrolly_w);
 
 protected:
-	virtual void video_start();
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void video_start() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 

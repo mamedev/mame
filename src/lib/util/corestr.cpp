@@ -114,11 +114,11 @@ int core_strwildcmp(const char *sp1, const char *sp2)
 
 char *core_strdup(const char *str)
 {
-	char *cpy = NULL;
-	if (str != NULL)
+	char *cpy = nullptr;
+	if (str != nullptr)
 	{
 		cpy = (char *)osd_malloc_array(strlen(str) + 1);
-		if (cpy != NULL)
+		if (cpy != nullptr)
 			strcpy(cpy, str);
 	}
 	return cpy;
@@ -217,14 +217,13 @@ int strprintf(std::string &str, const char *format, ...)
 	return retVal;
 }
 
-std::string strformat(std::string &str, const char *format, ...)
+std::string strformat(const char *format, ...)
 {
 	std::string retVal;
 	va_list ap;
 	va_start(ap, format);
-	strvprintf(str, format, ap);
+	strvprintf(retVal, format, ap);
 	va_end(ap);
-	retVal.assign(str);
 	return retVal;
 }
 
@@ -261,18 +260,18 @@ void strdelchr(std::string& str, char chr)
 
 void strreplacechr(std::string& str, char ch, char newch)
 {
-	for (size_t i = 0; i < str.length(); i++)
+	for (auto & elem : str)
 	{
-		if (str[i] == ch) str[i] = newch;
+		if (elem == ch) elem = newch;
 	}
 }
 
 std::string strtrimspace(std::string& str)
 {
 	int start = 0;
-	for (size_t i = 0; i < str.length(); i++)
+	for (auto & elem : str)
 	{
-		if (!isspace(UINT8(str[i])))  break;
+		if (!isspace(UINT8(elem)))  break;
 		start++;
 	}
 	int end = str.length();

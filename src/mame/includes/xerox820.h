@@ -44,7 +44,7 @@
 class xerox820_state : public driver_device
 {
 public:
-	xerox820_state(const machine_config &mconfig, device_type type, const char *tag) :
+	xerox820_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_kbpio(*this, Z80PIO_KB_TAG),
@@ -65,8 +65,8 @@ public:
 		m_400_460(0)
 	{ }
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -91,8 +91,6 @@ public:
 	DECLARE_READ8_MEMBER( kbpio_pa_r );
 	DECLARE_WRITE8_MEMBER( kbpio_pa_w );
 	DECLARE_READ8_MEMBER( kbpio_pb_r );
-	DECLARE_WRITE_LINE_MEMBER( intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( drq_w );
 	DECLARE_WRITE_LINE_MEMBER( fr_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
@@ -120,14 +118,14 @@ public:
 class bigboard_state : public xerox820_state
 {
 public:
-	bigboard_state(const machine_config &mconfig, device_type type, const char *tag)
+	bigboard_state(const machine_config &mconfig, device_type type, std::string tag)
 		: xerox820_state(mconfig, type, tag),
 			m_beeper(*this, "beeper")
 	{ }
 
 	required_device<beep_device> m_beeper;
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER( kbpio_pa_w );
 
@@ -139,7 +137,7 @@ public:
 class xerox820ii_state : public xerox820_state
 {
 public:
-	xerox820ii_state(const machine_config &mconfig, device_type type, const char *tag) :
+	xerox820ii_state(const machine_config &mconfig, device_type type, std::string tag) :
 		xerox820_state(mconfig, type, tag),
 		m_speaker(*this, "speaker"),
 		m_sasibus(*this, SASIBUS_TAG)
@@ -149,7 +147,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<SCSI_PORT_DEVICE> m_sasibus;
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER( bell_w );
 	DECLARE_WRITE8_MEMBER( slden_w );
@@ -160,7 +158,7 @@ public:
 	DECLARE_WRITE8_MEMBER( rdpio_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( rdpio_pardy_w );
 
-	void bankswitch(int bank);
+	void bankswitch(int bank) override;
 };
 
 #endif

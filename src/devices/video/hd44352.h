@@ -27,7 +27,7 @@ class hd44352_device :
 {
 public:
 	// construction/destruction
-	hd44352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd44352_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_on_callback(device_t &device, _Object object) { return downcast<hd44352_device &>(device).m_on_cb.set_callback(object); }
 
@@ -40,10 +40,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_validity_check(validity_checker &valid) const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:
 	UINT8 compute_newval(UINT8 type, UINT8 oldval, UINT8 newval);

@@ -21,20 +21,19 @@
 
 class msm6222b_device : public device_t {
 public:
-	msm6222b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	msm6222b_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	msm6222b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	msm6222b_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	void control_w(UINT8 data);
 	UINT8 control_r();
 	void data_w(UINT8 data);
-	UINT8 data_r();
 
 	// Character n bits are at bytes n*16..n*16+7 when 8-high, +10 when 11-high.  Only the low 5 bits are used.
 	// In one line mode n = 0..79.  In two line mode first line is 0..39 and second is 40..79.
 	const UINT8 *render();
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	UINT8 cgram[8*8];
@@ -51,10 +50,10 @@ private:
 
 class msm6222b_01_device : public msm6222b_device {
 public:
-	msm6222b_01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msm6222b_01_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 extern const device_type MSM6222B;

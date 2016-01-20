@@ -143,7 +143,7 @@ static INT32 slider_crossoffset(running_machine &machine, void *arg, std::string
 //  character a possible line break?
 //-------------------------------------------------
 
-INLINE int is_breakable_char(unicode_char ch)
+static inline int is_breakable_char(unicode_char ch)
 {
 	// regular spaces and hyphens are breakable
 	if (ch == ' ' || ch == '-')
@@ -231,8 +231,8 @@ ui_manager::ui_manager(running_machine &machine)
 	ui_gfx_init(machine);
 
 	// reset instance variables
-	m_font = NULL;
-	m_handler_callback = NULL;
+	m_font = nullptr;
+	m_handler_callback = nullptr;
 	m_handler_param = 0;
 	m_single_step = false;
 	m_showfps = false;
@@ -240,11 +240,11 @@ ui_manager::ui_manager(running_machine &machine)
 	m_show_profiler = false;
 	m_popup_text_end = 0;
 	m_use_natural_keyboard = false;
-	m_mouse_arrow_texture = NULL;
+	m_mouse_arrow_texture = nullptr;
 
 	// more initialization
 	set_handler(handler_messagebox, 0);
-	m_non_char_keys_down = auto_alloc_array(machine, UINT8, (ARRAY_LENGTH(non_char_keys) + 7) / 8);
+	m_non_char_keys_down = std::make_unique<UINT8[]>((ARRAY_LENGTH(non_char_keys) + 7) / 8);
 	m_mouse_show = machine.system().flags & MACHINE_CLICKABLE_ARTWORK ? true : false;
 
 	// request a callback upon exiting
@@ -268,13 +268,13 @@ void ui_manager::exit()
 {
 	// free the mouse texture
 	machine().render().texture_free(m_mouse_arrow_texture);
-	m_mouse_arrow_texture = NULL;
+	m_mouse_arrow_texture = nullptr;
 
 	// free the font
-	if (m_font != NULL)
+	if (m_font != nullptr)
 	{
 		machine().render().font_free(m_font);
-		m_font = NULL;
+		m_font = nullptr;
 	}
 }
 
@@ -358,7 +358,7 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 				break;
 
 			case 3:
-				if (show_mandatory_fileman && image_mandatory_scan(machine(), messagebox_text).length() > 0)
+				if (show_mandatory_fileman && machine().image().mandatory_scan(messagebox_text).length() > 0)
 				{
 					std::string warning;
 					warning.assign("This driver requires images to be loaded in the following device(s): ").append(messagebox_text.substr(0, messagebox_text.length() - 2));
@@ -438,7 +438,7 @@ void ui_manager::update_and_render(render_container *container)
 		machine().cheat().render_text(*container);
 
 	// call the current UI handler
-	assert(m_handler_callback != NULL);
+	assert(m_handler_callback != nullptr);
 	m_handler_param = (*m_handler_callback)(machine(), container, m_handler_param);
 
 	// display any popup messages
@@ -451,9 +451,9 @@ void ui_manager::update_and_render(render_container *container)
 	{
 		INT32 mouse_target_x, mouse_target_y;
 		bool mouse_button;
-		render_target *mouse_target = ui_input_find_mouse(machine(), &mouse_target_x, &mouse_target_y, &mouse_button);
+		render_target *mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
 
-		if (mouse_target != NULL)
+		if (mouse_target != nullptr)
 		{
 			float mouse_y=-1,mouse_x=-1;
 			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y)) {
@@ -475,7 +475,7 @@ void ui_manager::update_and_render(render_container *container)
 render_font *ui_manager::get_font()
 {
 	// allocate the font and messagebox string
-	if (m_font == NULL)
+	if (m_font == nullptr)
 		m_font = machine().render().font_alloc(machine().options().ui_font());
 	return m_font;
 }
@@ -582,7 +582,7 @@ void ui_manager::draw_outlined_box(render_container *container, float x0, float 
 
 void ui_manager::draw_text(render_container *container, const char *buf, float x, float y)
 {
-	draw_text_full(container, buf, x, y, 1.0f - x, JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+	draw_text_full(container, buf, x, y, 1.0f - x, JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
 
@@ -612,7 +612,7 @@ void ui_manager::draw_text_full(render_container *container, const char *origs, 
 	// loop over lines
 	while (*s != 0)
 	{
-		const char *lastbreak = NULL;
+		const char *lastbreak = nullptr;
 		int line_justify = justify;
 		unicode_char schar;
 		int scharcount;
@@ -679,7 +679,7 @@ void ui_manager::draw_text_full(render_container *container, const char *origs, 
 			if (wrap == WRAP_WORD)
 			{
 				// if we hit a break, back up to there with the appropriate width
-				if (lastbreak != NULL)
+				if (lastbreak != nullptr)
 				{
 					s = lastbreak;
 					curwidth = lastbreak_width;
@@ -844,7 +844,7 @@ void ui_manager::draw_text_box(render_container *container, const char *text, in
 						target_x + target_width + UI_BOX_LR_BORDER,
 						target_y + target_height + UI_BOX_TB_BORDER, backcolor);
 	draw_text_full(container, text, target_x, target_y, target_width + 0.00001f,
-				justify, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+				justify, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
 
@@ -1024,11 +1024,11 @@ std::string &ui_manager::warnings_string(std::string &str)
 	str.clear();
 
 	// if no warnings, nothing to return
-	if (rom_load_warnings(machine()) == 0 && rom_load_knownbad(machine()) == 0 && !(machine().system().flags & WARNING_FLAGS) && software_load_warnings_message(machine()).length() == 0)
+	if (machine().rom_load().warnings() == 0 && machine().rom_load().knownbad() == 0 && !(machine().system().flags & WARNING_FLAGS) && machine().rom_load().software_load_warnings_message().length() == 0)
 		return str;
 
 	// add a warning if any ROMs were loaded with warnings
-	if (rom_load_warnings(machine()) > 0)
+	if (machine().rom_load().warnings() > 0)
 	{
 		str.append("One or more ROMs/CHDs for this ");
 		str.append(emulator_info::get_gamenoun());
@@ -1039,20 +1039,20 @@ std::string &ui_manager::warnings_string(std::string &str)
 			str.append("\n");
 	}
 
-	if (software_load_warnings_message(machine()).length()>0) {
-		str.append(software_load_warnings_message(machine()));
+	if (machine().rom_load().software_load_warnings_message().length()>0) {
+		str.append(machine().rom_load().software_load_warnings_message());
 		if (machine().system().flags & WARNING_FLAGS)
 			str.append("\n");
 	}
 	// if we have at least one warning flag, print the general header
-	if ((machine().system().flags & WARNING_FLAGS) || rom_load_knownbad(machine()) > 0)
+	if ((machine().system().flags & WARNING_FLAGS) || machine().rom_load().knownbad() > 0)
 	{
 		str.append("There are known problems with this ");
 		str.append(emulator_info::get_gamenoun());
 		str.append("\n\n");
 
 		// add a warning if any ROMs are flagged BAD_DUMP/NO_DUMP
-		if (rom_load_knownbad(machine()) > 0) {
+		if (machine().rom_load().knownbad() > 0) {
 			str.append("One or more ROMs/CHDs for this ");
 			str.append(emulator_info::get_gamenoun());
 			str.append(" have not been correctly dumped.\n");
@@ -1153,34 +1153,33 @@ std::string &ui_manager::warnings_string(std::string &str)
 std::string &ui_manager::game_info_astring(std::string &str)
 {
 	// print description, manufacturer, and CPU:
-	std::string tempstr;
-	strprintf(str, "%s\n%s %s\nDriver: %s\n\nCPU:\n", machine().system().description, machine().system().year, machine().system().manufacturer, core_filename_extract_base(tempstr, machine().system().source_file).c_str());
+	strprintf(str, "%s\n%s %s\nDriver: %s\n\nCPU:\n", machine().system().description, machine().system().year, machine().system().manufacturer, core_filename_extract_base(machine().system().source_file).c_str());
 
 	// loop over all CPUs
 	execute_interface_iterator execiter(machine().root_device());
-	tagmap_t<UINT8> exectags;
-	for (device_execute_interface *exec = execiter.first(); exec != NULL; exec = execiter.next())
+	std::unordered_set<std::string> exectags;
+	for (device_execute_interface *exec = execiter.first(); exec != nullptr; exec = execiter.next())
 	{
-		if (exectags.add(exec->device().tag(), 1, FALSE) == TMERR_DUPLICATE)
+		if (!exectags.insert(exec->device().tag()).second)
 			continue;
 		// get cpu specific clock that takes internal multiplier/dividers into account
 		int clock = exec->device().clock();
 
 		// count how many identical CPUs we have
 		int count = 1;
-		const char *name = exec->device().name();
+		std::string name = exec->device().name();
 		execute_interface_iterator execinneriter(machine().root_device());
-		for (device_execute_interface *scan = execinneriter.first(); scan != NULL; scan = execinneriter.next())
+		for (device_execute_interface *scan = execinneriter.first(); scan != nullptr; scan = execinneriter.next())
 		{
-			if (exec->device().type() == scan->device().type() && strcmp(name, scan->device().name()) == 0 && exec->device().clock() == scan->device().clock())
-				if (exectags.add(scan->device().tag(), 1, FALSE) != TMERR_DUPLICATE)
+			if (exec->device().type() == scan->device().type() && name==scan->device().name() && exec->device().clock() == scan->device().clock())
+				if (exectags.insert(scan->device().tag()).second)
 					count++;
 		}
 
 		// if more than one, prepend a #x in front of the CPU name
 		if (count > 1)
 			strcatprintf(str, "%d" UTF8_MULTIPLY, count);
-		str.append(name);
+		str += name;
 
 		// display clock in kHz or MHz
 		if (clock >= 1000000)
@@ -1191,11 +1190,11 @@ std::string &ui_manager::game_info_astring(std::string &str)
 
 	// loop over all sound chips
 	sound_interface_iterator snditer(machine().root_device());
-	tagmap_t<UINT8> soundtags;
+	std::unordered_set<std::string> soundtags;
 	bool found_sound = false;
-	for (device_sound_interface *sound = snditer.first(); sound != NULL; sound = snditer.next())
+	for (device_sound_interface *sound = snditer.first(); sound != nullptr; sound = snditer.next())
 	{
-		if (soundtags.add(sound->device().tag(), 1, FALSE) == TMERR_DUPLICATE)
+		if (!soundtags.insert(sound->device().tag()).second)
 			continue;
 
 		// append the Sound: string
@@ -1206,10 +1205,10 @@ std::string &ui_manager::game_info_astring(std::string &str)
 		// count how many identical sound chips we have
 		int count = 1;
 		sound_interface_iterator sndinneriter(machine().root_device());
-		for (device_sound_interface *scan = sndinneriter.first(); scan != NULL; scan = sndinneriter.next())
+		for (device_sound_interface *scan = sndinneriter.first(); scan != nullptr; scan = sndinneriter.next())
 		{
 			if (sound->device().type() == scan->device().type() && sound->device().clock() == scan->device().clock())
-				if (soundtags.add(scan->device().tag(), 1, FALSE) != TMERR_DUPLICATE)
+				if (soundtags.insert(scan->device().tag()).second)
 					count++;
 		}
 		// if more than one, prepend a #x in front of the CPU name
@@ -1235,7 +1234,7 @@ std::string &ui_manager::game_info_astring(std::string &str)
 		str.append("None\n");
 	else
 	{
-		for (screen_device *screen = scriter.first(); screen != NULL; screen = scriter.next())
+		for (screen_device *screen = scriter.first(); screen != nullptr; screen = scriter.next())
 		{
 			if (scrcount > 1)
 			{
@@ -1289,15 +1288,15 @@ UINT32 ui_manager::handler_messagebox_ok(running_machine &machine, render_contai
 	machine.ui().draw_text_box(container, messagebox_text.c_str(), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
 	// an 'O' or left joystick kicks us to the next state
-	if (state == 0 && (machine.input().code_pressed_once(KEYCODE_O) || ui_input_pressed(machine, IPT_UI_LEFT)))
+	if (state == 0 && (machine.input().code_pressed_once(KEYCODE_O) || machine.ui_input().pressed(IPT_UI_LEFT)))
 		state++;
 
 	// a 'K' or right joystick exits the state
-	else if (state == 1 && (machine.input().code_pressed_once(KEYCODE_K) || ui_input_pressed(machine, IPT_UI_RIGHT)))
+	else if (state == 1 && (machine.input().code_pressed_once(KEYCODE_K) || machine.ui_input().pressed(IPT_UI_RIGHT)))
 		state = UI_HANDLER_CANCEL;
 
 	// if the user cancels, exit out completely
-	else if (ui_input_pressed(machine, IPT_UI_CANCEL))
+	else if (machine.ui_input().pressed(IPT_UI_CANCEL))
 	{
 		machine.schedule_exit();
 		state = UI_HANDLER_CANCEL;
@@ -1319,7 +1318,7 @@ UINT32 ui_manager::handler_messagebox_anykey(running_machine &machine, render_co
 	machine.ui().draw_text_box(container, messagebox_text.c_str(), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
 	// if the user cancels, exit out completely
-	if (ui_input_pressed(machine, IPT_UI_CANCEL))
+	if (machine.ui_input().pressed(IPT_UI_CANCEL))
 	{
 		machine.schedule_exit();
 		state = UI_HANDLER_CANCEL;
@@ -1348,7 +1347,7 @@ void ui_manager::process_natural_keyboard()
 	UINT8 key_down_mask;
 
 	// loop while we have interesting events
-	while (ui_input_pop_event(machine(), &event))
+	while (machine().ui_input().pop_event(&event))
 	{
 		// if this was a UI_EVENT_CHAR event, post it
 		if (event.event_type == UI_EVENT_CHAR)
@@ -1430,11 +1429,11 @@ bool ui_manager::can_paste()
 	char *text = osd_get_clipboard_text();
 
 	// free the string if allocated
-	if (text != NULL)
+	if (text != nullptr)
 		osd_free(text);
 
 	// did we have text?
-	return text != NULL;
+	return text != nullptr;
 }
 
 
@@ -1448,7 +1447,7 @@ void ui_manager::paste()
 	char *text = osd_get_clipboard_text();
 
 	// was a result returned?
-	if (text != NULL)
+	if (text != nullptr)
 	{
 		// post the text
 		machine().ioport().natkeyboard().post_utf8(text);
@@ -1470,7 +1469,7 @@ void ui_manager::image_handler_ingame()
 	if (machine().phase() == MACHINE_PHASE_RUNNING)
 	{
 		image_interface_iterator iter(machine().root_device());
-		for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
+		for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
 			image->call_display();
 	}
 }
@@ -1489,15 +1488,15 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	if (machine.ui().show_fps_counter())
 	{
 		std::string tempstring;
-		machine.ui().draw_text_full(container, machine.video().speed_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
-					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+		machine.ui().draw_text_full(container, machine.video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
+					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, nullptr, nullptr);
 	}
 
 	// draw the profiler if visible
 	if (machine.ui().show_profiler())
 	{
 		const char *text = g_profiler.text(machine);
-		machine.ui().draw_text_full(container, text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+		machine.ui().draw_text_full(container, text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, nullptr, nullptr);
 	}
 
 	// if we're single-stepping, pause now
@@ -1514,7 +1513,7 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	if (machine.ioport().has_keyboard())
 	{
 		// are we toggling the UI with ScrLk?
-		if (ui_input_pressed(machine, IPT_UI_TOGGLE_UI))
+		if (machine.ui_input().pressed(IPT_UI_TOGGLE_UI))
 		{
 			// toggle the UI
 			machine.set_ui_active(!machine.ui_active());
@@ -1550,7 +1549,7 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	if (!ui_disabled)
 	{
 		// paste command
-		if (ui_input_pressed(machine, IPT_UI_PASTE))
+		if (machine.ui_input().pressed(IPT_UI_PASTE))
 			machine.ui().paste();
 	}
 
@@ -1558,28 +1557,28 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 
 	if (ui_disabled) return ui_disabled;
 
-	if (ui_input_pressed(machine, IPT_UI_CANCEL))
+	if (machine.ui_input().pressed(IPT_UI_CANCEL))
 	{
 		machine.ui().request_quit();
 		return 0;
 	}
 
 	// turn on menus if requested
-	if (ui_input_pressed(machine, IPT_UI_CONFIGURE))
+	if (machine.ui_input().pressed(IPT_UI_CONFIGURE))
 		return machine.ui().set_handler(ui_menu::ui_handler, 0);
 
 	// if the on-screen display isn't up and the user has toggled it, turn it on
-	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0 && ui_input_pressed(machine, IPT_UI_ON_SCREEN_DISPLAY))
+	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0 && machine.ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
 		return machine.ui().set_handler(ui_menu_sliders::ui_handler, 1);
 
 	// handle a reset request
-	if (ui_input_pressed(machine, IPT_UI_RESET_MACHINE))
+	if (machine.ui_input().pressed(IPT_UI_RESET_MACHINE))
 		machine.schedule_hard_reset();
-	if (ui_input_pressed(machine, IPT_UI_SOFT_RESET))
+	if (machine.ui_input().pressed(IPT_UI_SOFT_RESET))
 		machine.schedule_soft_reset();
 
 	// handle a request to display graphics/palette
-	if (ui_input_pressed(machine, IPT_UI_SHOW_GFX))
+	if (machine.ui_input().pressed(IPT_UI_SHOW_GFX))
 	{
 		if (!is_paused)
 			machine.pause();
@@ -1587,19 +1586,19 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	}
 
 	// handle a tape control key
-	if (ui_input_pressed(machine, IPT_UI_TAPE_START))
+	if (machine.ui_input().pressed(IPT_UI_TAPE_START))
 	{
 		cassette_device_iterator cassiter(machine.root_device());
-		for (cassette_image_device *cass = cassiter.first(); cass != NULL; cass = cassiter.next())
+		for (cassette_image_device *cass = cassiter.first(); cass != nullptr; cass = cassiter.next())
 		{
 			cass->change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
 			return 0;
 		}
 	}
-	if (ui_input_pressed(machine, IPT_UI_TAPE_STOP))
+	if (machine.ui_input().pressed(IPT_UI_TAPE_STOP))
 	{
 		cassette_device_iterator cassiter(machine.root_device());
-		for (cassette_image_device *cass = cassiter.first(); cass != NULL; cass = cassiter.next())
+		for (cassette_image_device *cass = cassiter.first(); cass != nullptr; cass = cassiter.next())
 		{
 			cass->change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
 			return 0;
@@ -1607,25 +1606,25 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	}
 
 	// handle a save state request
-	if (ui_input_pressed(machine, IPT_UI_SAVE_STATE))
+	if (machine.ui_input().pressed(IPT_UI_SAVE_STATE))
 	{
 		machine.pause();
 		return machine.ui().set_handler(handler_load_save, LOADSAVE_SAVE);
 	}
 
 	// handle a load state request
-	if (ui_input_pressed(machine, IPT_UI_LOAD_STATE))
+	if (machine.ui_input().pressed(IPT_UI_LOAD_STATE))
 	{
 		machine.pause();
 		return machine.ui().set_handler(handler_load_save, LOADSAVE_LOAD);
 	}
 
 	// handle a save snapshot request
-	if (ui_input_pressed(machine, IPT_UI_SNAPSHOT))
+	if (machine.ui_input().pressed(IPT_UI_SNAPSHOT))
 		machine.video().save_active_screen_snapshots();
 
 	// toggle pause
-	if (ui_input_pressed(machine, IPT_UI_PAUSE))
+	if (machine.ui_input().pressed(IPT_UI_PAUSE))
 	{
 		// with a shift key, it is single step
 		if (is_paused && (machine.input().code_pressed(KEYCODE_LSHIFT) || machine.input().code_pressed(KEYCODE_RSHIFT)))
@@ -1638,31 +1637,31 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	}
 
 	// handle a toggle cheats request
-	if (ui_input_pressed(machine, IPT_UI_TOGGLE_CHEAT))
+	if (machine.ui_input().pressed(IPT_UI_TOGGLE_CHEAT))
 		machine.cheat().set_enable(!machine.cheat().enabled());
 
 	// toggle movie recording
-	if (ui_input_pressed(machine, IPT_UI_RECORD_MOVIE))
+	if (machine.ui_input().pressed(IPT_UI_RECORD_MOVIE))
 		machine.video().toggle_record_movie();
 
 	// toggle profiler display
-	if (ui_input_pressed(machine, IPT_UI_SHOW_PROFILER))
+	if (machine.ui_input().pressed(IPT_UI_SHOW_PROFILER))
 		machine.ui().set_show_profiler(!machine.ui().show_profiler());
 
 	// toggle FPS display
-	if (ui_input_pressed(machine, IPT_UI_SHOW_FPS))
+	if (machine.ui_input().pressed(IPT_UI_SHOW_FPS))
 		machine.ui().set_show_fps(!machine.ui().show_fps());
 
 	// increment frameskip?
-	if (ui_input_pressed(machine, IPT_UI_FRAMESKIP_INC))
+	if (machine.ui_input().pressed(IPT_UI_FRAMESKIP_INC))
 		machine.ui().increase_frameskip();
 
 	// decrement frameskip?
-	if (ui_input_pressed(machine, IPT_UI_FRAMESKIP_DEC))
+	if (machine.ui_input().pressed(IPT_UI_FRAMESKIP_DEC))
 		machine.ui().decrease_frameskip();
 
 	// toggle throttle?
-	if (ui_input_pressed(machine, IPT_UI_THROTTLE))
+	if (machine.ui_input().pressed(IPT_UI_THROTTLE))
 		machine.video().toggle_throttle();
 
 	// check for fast forward
@@ -1699,7 +1698,7 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 		machine.ui().draw_message_window(container, "Select position to load from");
 
 	// check for cancel key
-	if (ui_input_pressed(machine, IPT_UI_CANCEL))
+	if (machine.ui_input().pressed(IPT_UI_CANCEL))
 	{
 		// display a popup indicating things were cancelled
 		if (state == LOADSAVE_SAVE)
@@ -1767,17 +1766,13 @@ void ui_manager::request_quit()
 UINT32 ui_manager::handler_confirm_quit(running_machine &machine, render_container *container, UINT32 state)
 {
 	// get the text for 'UI Select'
-	std::string ui_select_text;
-	machine.input().seq_name(ui_select_text, machine.ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD));
+	std::string ui_select_text = machine.input().seq_name(machine.ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD));
 
 	// get the text for 'UI Cancel'
-	std::string ui_cancel_text;
-	machine.input().seq_name(ui_cancel_text, machine.ioport().type_seq(IPT_UI_CANCEL, 0, SEQ_TYPE_STANDARD));
+	std::string ui_cancel_text = machine.input().seq_name(machine.ioport().type_seq(IPT_UI_CANCEL, 0, SEQ_TYPE_STANDARD));
 
 	// assemble the quit message
-	std::string quit_message;
-	strprintf(quit_message,
-		"Are you sure you want to quit?\n\n"
+	std::string quit_message = strformat("Are you sure you want to quit?\n\n"
 		"Press ''%s'' to quit,\n"
 		"Press ''%s'' to return to emulation.",
 		ui_select_text.c_str(),
@@ -1787,11 +1782,11 @@ UINT32 ui_manager::handler_confirm_quit(running_machine &machine, render_contain
 	machine.pause();
 
 	// if the user press ENTER, quit the game
-	if (ui_input_pressed(machine, IPT_UI_SELECT))
+	if (machine.ui_input().pressed(IPT_UI_SELECT))
 		machine.schedule_exit();
 
 	// if the user press ESC, just continue
-	else if (ui_input_pressed(machine, IPT_UI_CANCEL))
+	else if (machine.ui_input().pressed(IPT_UI_CANCEL))
 	{
 		machine.resume();
 		state = UI_HANDLER_CANCEL;
@@ -1845,13 +1840,13 @@ static slider_state *slider_init(running_machine &machine)
 {
 	ioport_field *field;
 	ioport_port *port;
-	slider_state *listhead = NULL;
+	slider_state *listhead = nullptr;
 	slider_state **tailptr = &listhead;
 	std::string str;
 	int item;
 
 	// add overall volume
-	*tailptr = slider_alloc(machine, "Master Volume", -32, 0, 0, 1, slider_volume, NULL);
+	*tailptr = slider_alloc(machine, "Master Volume", -32, 0, 0, 1, slider_volume, nullptr);
 	tailptr = &(*tailptr)->next;
 
 	// add per-channel volume
@@ -1868,8 +1863,8 @@ static slider_state *slider_init(running_machine &machine)
 	}
 
 	// add analog adjusters
-	for (port = machine.ioport().first_port(); port != NULL; port = port->next())
-		for (field = port->first_field(); field != NULL; field = field->next())
+	for (port = machine.ioport().first_port(); port != nullptr; port = port->next())
+		for (field = port->first_field(); field != nullptr; field = field->next())
 			if (field->type() == IPT_ADJUSTER)
 			{
 				void *param = (void *)field;
@@ -1881,10 +1876,10 @@ static slider_state *slider_init(running_machine &machine)
 	if (machine.options().cheat())
 	{
 		execute_interface_iterator iter(machine.root_device());
-		for (device_execute_interface *exec = iter.first(); exec != NULL; exec = iter.next())
+		for (device_execute_interface *exec = iter.first(); exec != nullptr; exec = iter.next())
 		{
 			void *param = (void *)&exec->device();
-			strprintf(str, "Overclock CPU %s", exec->device().tag());
+			strprintf(str, "Overclock CPU %s", exec->device().tag().c_str());
 			*tailptr = slider_alloc(machine, str.c_str(), 10, 1000, 2000, 1, slider_overclock, param);
 			tailptr = &(*tailptr)->next;
 		}
@@ -1892,7 +1887,7 @@ static slider_state *slider_init(running_machine &machine)
 
 	// add screen parameters
 	screen_device_iterator scriter(machine.root_device());
-	for (screen_device *screen = scriter.first(); screen != NULL; screen = scriter.next())
+	for (screen_device *screen = scriter.first(); screen != nullptr; screen = scriter.next())
 	{
 		int defxscale = floor(screen->xscale() * 1000.0f + 0.5f);
 		int defyscale = floor(screen->yscale() * 1000.0f + 0.5f);
@@ -1935,7 +1930,7 @@ static slider_state *slider_init(running_machine &machine)
 	}
 
 	laserdisc_device_iterator lditer(machine.root_device());
-	for (laserdisc_device *laserdisc = lditer.first(); laserdisc != NULL; laserdisc = lditer.next())
+	for (laserdisc_device *laserdisc = lditer.first(); laserdisc != nullptr; laserdisc = lditer.next())
 		if (laserdisc->overlay_configured())
 		{
 			laserdisc_overlay_config config;
@@ -1947,39 +1942,39 @@ static slider_state *slider_init(running_machine &machine)
 			void *param = (void *)laserdisc;
 
 			// add scale and offset controls per-overlay
-			strprintf(str,"Laserdisc '%s' Horiz Stretch", laserdisc->tag());
+			strprintf(str,"Laserdisc '%s' Horiz Stretch", laserdisc->tag().c_str());
 			*tailptr = slider_alloc(machine, str.c_str(), 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_overxscale, param);
 			tailptr = &(*tailptr)->next;
-			strprintf(str,"Laserdisc '%s' Horiz Position", laserdisc->tag());
+			strprintf(str,"Laserdisc '%s' Horiz Position", laserdisc->tag().c_str());
 			*tailptr = slider_alloc(machine, str.c_str(), -500, defxoffset, 500, 2, slider_overxoffset, param);
 			tailptr = &(*tailptr)->next;
-			strprintf(str,"Laserdisc '%s' Vert Stretch", laserdisc->tag());
+			strprintf(str,"Laserdisc '%s' Vert Stretch", laserdisc->tag().c_str());
 			*tailptr = slider_alloc(machine, str.c_str(), 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_overyscale, param);
 			tailptr = &(*tailptr)->next;
-			strprintf(str,"Laserdisc '%s' Vert Position", laserdisc->tag());
+			strprintf(str,"Laserdisc '%s' Vert Position", laserdisc->tag().c_str());
 			*tailptr = slider_alloc(machine, str.c_str(), -500, defyoffset, 500, 2, slider_overyoffset, param);
 			tailptr = &(*tailptr)->next;
 		}
 
-	for (screen_device *screen = scriter.first(); screen != NULL; screen = scriter.next())
+	for (screen_device *screen = scriter.first(); screen != nullptr; screen = scriter.next())
 		if (screen->screen_type() == SCREEN_TYPE_VECTOR)
 		{
 			// add vector control
-			*tailptr = slider_alloc(machine, "Vector Flicker", 0, 0, 1000, 10, slider_flicker, NULL);
+			*tailptr = slider_alloc(machine, "Vector Flicker", 0, 0, 1000, 10, slider_flicker, nullptr);
 			tailptr = &(*tailptr)->next;
-			*tailptr = slider_alloc(machine, "Beam Width Minimum", 1, 100, 1000, 1, slider_beam_width_min, NULL);
+			*tailptr = slider_alloc(machine, "Beam Width Minimum", 1, 100, 1000, 1, slider_beam_width_min, nullptr);
 			tailptr = &(*tailptr)->next;
-			*tailptr = slider_alloc(machine, "Beam Width Maximum", 1, 100, 1000, 1, slider_beam_width_max, NULL);
+			*tailptr = slider_alloc(machine, "Beam Width Maximum", 1, 100, 1000, 1, slider_beam_width_max, nullptr);
 			tailptr = &(*tailptr)->next;
-			*tailptr = slider_alloc(machine, "Beam Intensity Weight", -1000, 0, 1000, 10, slider_beam_intensity_weight, NULL);
+			*tailptr = slider_alloc(machine, "Beam Intensity Weight", -1000, 0, 1000, 10, slider_beam_intensity_weight, nullptr);
 			tailptr = &(*tailptr)->next;
 			break;
 		}
 
 #ifdef MAME_DEBUG
 	// add crosshair adjusters
-	for (port = machine.ioport().first_port(); port != NULL; port = port->next())
-		for (field = port->first_field(); field != NULL; field = field->next())
+	for (port = machine.ioport().first_port(); port != nullptr; port = port->next())
+		for (field = port->first_field(); field != nullptr; field = field->next())
 			if (field->crosshair_axis() != CROSSHAIR_AXIS_NONE && field->player() == 0)
 			{
 				void *param = (void *)field;
@@ -2004,7 +1999,7 @@ static INT32 slider_volume(running_machine &machine, void *arg, std::string *str
 {
 	if (newval != SLIDER_NOCHANGE)
 		machine.sound().set_attenuation(newval);
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%3ddB", machine.sound().attenuation());
 	return machine.sound().attenuation();
 }
@@ -2026,7 +2021,7 @@ static INT32 slider_mixervol(running_machine &machine, void *arg, std::string *s
 		if (newval > curval && (newval - curval) <= 4) newval += 4; // round up on increment
 		info.stream->set_user_gain(info.inputnum, (float)newval * 0.001f);
 	}
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%4.2f", (double) info.stream->user_gain(info.inputnum));
 	return floorf(info.stream->user_gain(info.inputnum) * 1000.0f + 0.5f);
 }
@@ -2048,7 +2043,7 @@ static INT32 slider_adjuster(running_machine &machine, void *arg, std::string *s
 		settings.value = newval;
 		field->set_user_settings(settings);
 	}
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%d%%", settings.value);
 	return settings.value;
 }
@@ -2064,7 +2059,7 @@ static INT32 slider_overclock(running_machine &machine, void *arg, std::string *
 	device_t *cpu = (device_t *)arg;
 	if (newval != SLIDER_NOCHANGE)
 		cpu->set_clock_scale((float)newval * 0.001f);
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%3.0f%%", floor(cpu->clock_scale() * 100.0 + 0.5));
 	return floor(cpu->clock_scale() * 1000.0 + 0.5);
 }
@@ -2087,7 +2082,7 @@ static INT32 slider_refresh(running_machine &machine, void *arg, std::string *st
 		const rectangle &visarea = screen->visible_area();
 		screen->configure(width, height, visarea, HZ_TO_ATTOSECONDS(defrefresh + (double)newval * 0.001));
 	}
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%.3ffps", ATTOSECONDS_TO_HZ(machine.first_screen()->frame_period().attoseconds()));
 	refresh = ATTOSECONDS_TO_HZ(machine.first_screen()->frame_period().attoseconds());
 	return floor((refresh - defrefresh) * 1000.0 + 0.5);
@@ -2110,7 +2105,7 @@ static INT32 slider_brightness(running_machine &machine, void *arg, std::string 
 		settings.m_brightness = (float)newval * 0.001f;
 		screen->container().set_user_settings(settings);
 	}
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%.3f", (double) settings.m_brightness);
 	return floor(settings.m_brightness * 1000.0f + 0.5f);
 }
@@ -2132,7 +2127,7 @@ static INT32 slider_contrast(running_machine &machine, void *arg, std::string *s
 		settings.m_contrast = (float)newval * 0.001f;
 		screen->container().set_user_settings(settings);
 	}
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%.3f", (double) settings.m_contrast);
 	return floor(settings.m_contrast * 1000.0f + 0.5f);
 }
@@ -2153,7 +2148,7 @@ static INT32 slider_gamma(running_machine &machine, void *arg, std::string *str,
 		settings.m_gamma = (float)newval * 0.001f;
 		screen->container().set_user_settings(settings);
 	}
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%.3f", (double) settings.m_gamma);
 	return floor(settings.m_gamma * 1000.0f + 0.5f);
 }
@@ -2175,7 +2170,7 @@ static INT32 slider_xscale(running_machine &machine, void *arg, std::string *str
 		settings.m_xscale = (float)newval * 0.001f;
 		screen->container().set_user_settings(settings);
 	}
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%.3f", (double) settings.m_xscale);
 	return floor(settings.m_xscale * 1000.0f + 0.5f);
 }
@@ -2197,7 +2192,7 @@ static INT32 slider_yscale(running_machine &machine, void *arg, std::string *str
 		settings.m_yscale = (float)newval * 0.001f;
 		screen->container().set_user_settings(settings);
 	}
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%.3f", (double) settings.m_yscale);
 	return floor(settings.m_yscale * 1000.0f + 0.5f);
 }
@@ -2219,7 +2214,7 @@ static INT32 slider_xoffset(running_machine &machine, void *arg, std::string *st
 		settings.m_xoffset = (float)newval * 0.001f;
 		screen->container().set_user_settings(settings);
 	}
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%.3f", (double) settings.m_xoffset);
 	return floor(settings.m_xoffset * 1000.0f + 0.5f);
 }
@@ -2241,7 +2236,7 @@ static INT32 slider_yoffset(running_machine &machine, void *arg, std::string *st
 		settings.m_yoffset = (float)newval * 0.001f;
 		screen->container().set_user_settings(settings);
 	}
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%.3f",  (double) settings.m_yoffset);
 	return floor(settings.m_yoffset * 1000.0f + 0.5f);
 }
@@ -2263,7 +2258,7 @@ static INT32 slider_overxscale(running_machine &machine, void *arg, std::string 
 		settings.m_overscalex = (float)newval * 0.001f;
 		laserdisc->set_overlay_config(settings);
 	}
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%.3f", (double) settings.m_overscalex);
 	return floor(settings.m_overscalex * 1000.0f + 0.5f);
 }
@@ -2285,7 +2280,7 @@ static INT32 slider_overyscale(running_machine &machine, void *arg, std::string 
 		settings.m_overscaley = (float)newval * 0.001f;
 		laserdisc->set_overlay_config(settings);
 	}
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%.3f", (double) settings.m_overscaley);
 	return floor(settings.m_overscaley * 1000.0f + 0.5f);
 }
@@ -2307,7 +2302,7 @@ static INT32 slider_overxoffset(running_machine &machine, void *arg, std::string
 		settings.m_overposx = (float)newval * 0.001f;
 		laserdisc->set_overlay_config(settings);
 	}
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%.3f", (double) settings.m_overposx);
 	return floor(settings.m_overposx * 1000.0f + 0.5f);
 }
@@ -2329,7 +2324,7 @@ static INT32 slider_overyoffset(running_machine &machine, void *arg, std::string
 		settings.m_overposy = (float)newval * 0.001f;
 		laserdisc->set_overlay_config(settings);
 	}
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%.3f", (double) settings.m_overposy);
 	return floor(settings.m_overposy * 1000.0f + 0.5f);
 }
@@ -2342,10 +2337,10 @@ static INT32 slider_overyoffset(running_machine &machine, void *arg, std::string
 
 static INT32 slider_flicker(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
-	vector_device *vector = NULL;
+	vector_device *vector = nullptr;
 	if (newval != SLIDER_NOCHANGE)
 		vector->set_flicker((float)newval * 0.001f);
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%1.2f", (double) vector->get_flicker());
 	return floor(vector->get_flicker() * 1000.0f + 0.5f);
 }
@@ -2358,10 +2353,10 @@ static INT32 slider_flicker(running_machine &machine, void *arg, std::string *st
 
 static INT32 slider_beam_width_min(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
-	vector_device *vector = NULL;
+	vector_device *vector = nullptr;
 	if (newval != SLIDER_NOCHANGE)
 		vector->set_beam_width_min(MIN((float)newval * 0.01f, vector->get_beam_width_max()));
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%1.2f", (double) vector->get_beam_width_min());
 	return floor(vector->get_beam_width_min() * 100.0f + 0.5f);
 }
@@ -2374,10 +2369,10 @@ static INT32 slider_beam_width_min(running_machine &machine, void *arg, std::str
 
 static INT32 slider_beam_width_max(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
-	vector_device *vector = NULL;
+	vector_device *vector = nullptr;
 	if (newval != SLIDER_NOCHANGE)
 		vector->set_beam_width_max(MAX((float)newval * 0.01f, vector->get_beam_width_min()));
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%1.2f", (double) vector->get_beam_width_max());
 	return floor(vector->get_beam_width_max() * 100.0f + 0.5f);
 }
@@ -2390,10 +2385,10 @@ static INT32 slider_beam_width_max(running_machine &machine, void *arg, std::str
 
 static INT32 slider_beam_intensity_weight(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
-	vector_device *vector = NULL;
+	vector_device *vector = nullptr;
 	if (newval != SLIDER_NOCHANGE)
 		vector->set_beam_intensity_weight((float)newval * 0.001f);
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%1.2f", (double) vector->get_beam_intensity_weight());
 	return floor(vector->get_beam_intensity_weight() * 1000.0f + 0.5f);
 }
@@ -2411,7 +2406,7 @@ static char *slider_get_screen_desc(screen_device &screen)
 	static char descbuf[256];
 
 	if (scrcount > 1)
-		sprintf(descbuf, "Screen '%s'", screen.tag());
+		sprintf(descbuf, "Screen '%s'", screen.tag().c_str());
 	else
 		strcpy(descbuf, "Screen");
 
@@ -2430,7 +2425,7 @@ static INT32 slider_crossscale(running_machine &machine, void *arg, std::string 
 
 	if (newval != SLIDER_NOCHANGE)
 		field->set_crosshair_scale(float(newval) * 0.001);
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%s %s %1.3f", "Crosshair Scale", (field->crosshair_axis() == CROSSHAIR_AXIS_X) ? "X" : "Y", float(newval) * 0.001f);
 	return floor(field->crosshair_scale() * 1000.0f + 0.5f);
 }
@@ -2449,7 +2444,7 @@ static INT32 slider_crossoffset(running_machine &machine, void *arg, std::string
 
 	if (newval != SLIDER_NOCHANGE)
 		field->set_crosshair_offset(float(newval) * 0.001f);
-	if (str != NULL)
+	if (str != nullptr)
 		strprintf(*str,"%s %s %1.3f", "Crosshair Offset", (field->crosshair_axis() == CROSSHAIR_AXIS_X) ? "X" : "Y", float(newval) * 0.001f);
 	return field->crosshair_offset();
 }

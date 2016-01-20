@@ -50,7 +50,7 @@
 class beta_state : public driver_device
 {
 public:
-	beta_state(const machine_config &mconfig, device_type type, const char *tag)
+	beta_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, M6502_TAG),
 		m_speaker(*this, "speaker"),
@@ -69,7 +69,7 @@ public:
 	required_ioport m_q8;
 	required_ioport m_q9;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( riot_pa_r );
 	DECLARE_WRITE8_MEMBER( riot_pa_w );
@@ -155,7 +155,7 @@ TIMER_CALLBACK_MEMBER(beta_state::led_refresh)
 {
 	if (m_ls145_p < 6)
 	{
-		output_set_digit_value(m_ls145_p, m_segment);
+		output().set_digit_value(m_ls145_p, m_segment);
 	}
 }
 
@@ -253,10 +253,10 @@ WRITE8_MEMBER( beta_state::riot_pb_w )
 	m_speaker->level_w(!BIT(data, 4));
 
 	/* address led */
-	output_set_led_value(0, BIT(data, 5));
+	output().set_led_value(0, BIT(data, 5));
 
 	/* data led */
-	output_set_led_value(1, !BIT(data, 5));
+	output().set_led_value(1, !BIT(data, 5));
 
 	/* EPROM address shift */
 	if (!BIT(m_old_data, 5) && BIT(data, 5))
@@ -300,7 +300,7 @@ DEVICE_IMAGE_LOAD_MEMBER( beta_state, beta_eprom )
 
 DEVICE_IMAGE_UNLOAD_MEMBER( beta_state, beta_eprom )
 {
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 		image.fwrite(&m_eprom_rom[0], 0x800);
 }
 
@@ -355,7 +355,7 @@ static MACHINE_CONFIG_START( beta, beta_state )
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 
 	/* EPROM socket */
-	MCFG_GENERIC_CARTSLOT_ADD(EPROM_TAG, generic_plain_slot, NULL)
+	MCFG_GENERIC_CARTSLOT_ADD(EPROM_TAG, generic_plain_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(beta_state, beta_eprom)
 	MCFG_GENERIC_UNLOAD(beta_state, beta_eprom)

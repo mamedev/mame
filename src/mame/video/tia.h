@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Wilbert Pol,Stefan Jokisch
 #ifndef _VIDEO_TIA_H_
 #define _VIDEO_TIA_H_
@@ -61,11 +61,11 @@ public:
 
 protected:
 	// construction/destruction
-	tia_video_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock);
+	tia_video_device(const machine_config &mconfig, device_type type, std::string name, std::string shortname, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void draw_sprite_helper(UINT8* p, UINT8 *col, struct player_gfx *gfx, UINT8 GRP, UINT8 COLUP, UINT8 REFP);
 	void draw_missile_helper(UINT8* p, UINT8* col, int horz, int skipdelay, int latch, int start, UINT8 RESMP, UINT8 ENAM, UINT8 NUSIZ, UINT8 COLUM);
@@ -198,7 +198,7 @@ private:
 	UINT8 REFLECT;      /* Should playfield be reflected or not */
 	UINT8 NUSIZx_changed;
 
-	bitmap_ind16 *helper[3];
+	std::unique_ptr<bitmap_ind16> helper[3];
 
 	UINT16 screen_height;
 
@@ -208,23 +208,23 @@ private:
 class tia_pal_video_device : public tia_video_device
 {
 public:
-	tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tia_pal_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_PALETTE_INIT(tia_pal);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class tia_ntsc_video_device : public tia_video_device
 {
 public:
-	tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tia_ntsc_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_PALETTE_INIT(tia_ntsc);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 

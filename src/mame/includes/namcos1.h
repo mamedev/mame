@@ -8,7 +8,7 @@
 class namcos1_state : public driver_device
 {
 public:
-	namcos1_state(const machine_config &mconfig, device_type type, const char *tag)
+	namcos1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
@@ -123,9 +123,9 @@ public:
 	DECLARE_DRIVER_INIT(ws89);
 	DECLARE_DRIVER_INIT(dspirit);
 	DECLARE_DRIVER_INIT(pistoldm);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	void driver_init();
 
 	TILE_GET_INFO_MEMBER(bg_get_info0);

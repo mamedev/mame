@@ -16,7 +16,7 @@ public:
 		TIMER_IRQ_OFF
 	};
 
-	artmagic_state(const machine_config &mconfig, device_type type, const char *tag)
+	artmagic_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
@@ -72,9 +72,9 @@ public:
 	DECLARE_DRIVER_INIT(cheesech);
 	DECLARE_DRIVER_INIT(ultennis);
 	DECLARE_DRIVER_INIT(stonebal);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	void decrypt_cheesech();
 	void decrypt_ultennis();
 	void execute_blit();
@@ -82,5 +82,5 @@ public:
 	inline UINT16 *address_to_vram(offs_t *address);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

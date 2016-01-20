@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Grull Osgo
 /************************************************************************************
 
@@ -42,10 +42,10 @@ Additional CD-ROM games: "99 Bottles of Beer"
 class gammagic_state : public pcat_base_state
 {
 public:
-	gammagic_state(const machine_config &mconfig, device_type type, const char *tag)
+	gammagic_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pcat_base_state(mconfig, type, tag) { }
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 // Memory is mostly handled by the chipset

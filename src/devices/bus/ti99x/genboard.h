@@ -29,14 +29,14 @@ extern const device_type GENEVE_MAPPER;
 class geneve_mouse_device : public device_t
 {
 public:
-	geneve_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	geneve_mouse_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	void poll();
 	line_state  left_button();  // left button is not connected to the V9938 but to a TMS9901 pin
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	v9938_device*   m_v9938;
@@ -57,7 +57,7 @@ private:
 class geneve_keyboard_device : public device_t
 {
 public:
-	geneve_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	geneve_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	DECLARE_WRITE_LINE_MEMBER( reset_line );
 	DECLARE_WRITE_LINE_MEMBER( send_scancodes );
 	DECLARE_WRITE_LINE_MEMBER( clock_control );
@@ -66,11 +66,11 @@ public:
 	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object) { return downcast<geneve_keyboard_device &>(device).m_interrupt.set_callback(object); }
 
 protected:
-	void               device_start();
-	void               device_reset();
-	ioport_constructor device_input_ports() const;
+	void               device_start() override;
+	void               device_reset() override;
+	ioport_constructor device_input_ports() const override;
 	devcb_write_line  m_interrupt;    // Keyboard interrupt to console
-	void               device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void               device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	void    post_in_key_queue(int keycode);
@@ -109,7 +109,7 @@ private:
 class geneve_mapper_device : public device_t
 {
 public:
-	geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	geneve_mapper_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	void set_geneve_mode(bool geneve);
 	void set_direct_mode(bool direct);
 	void set_cartridge_size(int size);
@@ -134,8 +134,8 @@ public:
 	template<class _Object> static devcb_base &static_set_ready_callback(device_t &device, _Object object) {  return downcast<geneve_mapper_device &>(device).m_ready.set_callback(object); }
 
 protected:
-	void    device_start();
-	void    device_reset();
+	void    device_start() override;
+	void    device_reset() override;
 
 private:
 	// GROM simulation

@@ -1,9 +1,10 @@
-// license:???
-// copyright-holders:Lee Taylor, John Clegg
+// license:BSD-3-Clause
+// copyright-holders:Lee Taylor
+// thanks-to:John Clegg
 class m58_state : public driver_device
 {
 public:
-	m58_state(const machine_config &mconfig, device_type type, const char *tag)
+	m58_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -39,7 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 
 	DECLARE_DRIVER_INIT(yard85);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(m58);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

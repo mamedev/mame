@@ -94,7 +94,7 @@ ToDo:
 class pencil2_state : public driver_device
 {
 public:
-	pencil2_state(const machine_config &mconfig, device_type type, const char *tag)
+	pencil2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_centronics(*this, "centronics")
@@ -112,7 +112,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(printer_ready_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(printer_ack_r);
 private:
-	virtual void machine_start();
+	virtual void machine_start() override;
 	int m_centronics_busy;
 	int m_centronics_ack;
 	bool m_cass_state;

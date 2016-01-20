@@ -26,7 +26,7 @@
 class jr100_state : public driver_device
 {
 public:
-	jr100_state(const machine_config &mconfig, device_type type, const char *tag)
+	jr100_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
 		m_pcg(*this, "pcg"),
@@ -56,9 +56,9 @@ public:
 	UINT16 m_t1latch;
 	UINT8 m_beep_en;
 	DECLARE_WRITE8_MEMBER(jr100_via_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_tick);
 	DECLARE_READ8_MEMBER(jr100_via_read_b);

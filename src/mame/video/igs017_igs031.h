@@ -20,7 +20,7 @@ class igs017_igs031_device : public device_t,
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 public:
-	igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	igs017_igs031_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 
 	static void set_palette_scramble_cb(device_t &device,igs017_igs031_palette_scramble_delegate newtilecb);
@@ -49,7 +49,7 @@ public:
 	UINT8 m_video_disable;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
-	UINT8 *m_sprites_gfx;
+	std::unique_ptr<UINT8[]> m_sprites_gfx;
 	int m_sprites_gfx_size;
 
 	int get_nmi_enable() { return m_nmi_enable; }
@@ -85,10 +85,10 @@ public:
 	virtual void video_start();
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	address_space_config        m_space_config;
 

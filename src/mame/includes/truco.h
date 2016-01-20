@@ -5,7 +5,7 @@
 class truco_state : public driver_device
 {
 public:
-	truco_state(const machine_config &mconfig, device_type type, const char *tag)
+	truco_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
@@ -26,8 +26,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia_irqa_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_irqb_w);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(truco);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

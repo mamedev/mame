@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Yves
 /*     vlc.c
 Multi-games from VLC Nevada 1995
@@ -151,7 +151,7 @@ nevada TYPE2 :  64       45      51       06       32      02        31     31  
 class nevada_state : public driver_device
 {
 public:
-	nevada_state(const machine_config &mconfig, device_type type, const char *tag)
+	nevada_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_duart18_68681(*this, "duart18_68681"),
 		m_duart39_68681(*this, "duart39_68681"),
@@ -183,7 +183,7 @@ public:
 
 	UINT16* m_videoram;
 	tilemap_t *m_bg_tilemap;
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_nevada(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(nevada);
 

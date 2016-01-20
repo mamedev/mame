@@ -9,7 +9,7 @@ void othunder_state::video_start()
 	/* Up to $800/8 big sprites, requires 0x100 * sizeof(*spritelist)
 	   Multiply this by 32 to give room for the number of small sprites,
 	   which are what actually get put in the structure. */
-	m_spritelist = auto_alloc_array(machine(), struct othunder_tempsprite, 0x2000);
+	m_spritelist = std::make_unique<othunder_tempsprite[]>(0x2000);
 }
 
 
@@ -77,7 +77,7 @@ void othunder_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
-	struct othunder_tempsprite *sprite_ptr = m_spritelist;
+	struct othunder_tempsprite *sprite_ptr = m_spritelist.get();
 
 	for (offs = (m_spriteram.bytes() / 2) - 4; offs >= 0; offs -= 4)
 	{
@@ -180,7 +180,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 
 	/* this happens only if primsks != NULL */
-	while (sprite_ptr != m_spritelist)
+	while (sprite_ptr != m_spritelist.get())
 	{
 		sprite_ptr--;
 

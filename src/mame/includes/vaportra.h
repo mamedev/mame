@@ -13,7 +13,7 @@
 class vaportra_state : public driver_device
 {
 public:
-	vaportra_state(const machine_config &mconfig, device_type type, const char *tag)
+	vaportra_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -48,8 +48,8 @@ public:
 	DECLARE_WRITE16_MEMBER(vaportra_palette_24bit_b_w);
 
 	DECLARE_DRIVER_INIT(vaportra);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	UINT32 screen_update_vaportra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_24bitcol( int offset );

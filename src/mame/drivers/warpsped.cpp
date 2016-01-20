@@ -91,7 +91,7 @@ L10, L15, L18 and G18 all read the same
 class warpspeed_state : public driver_device
 {
 public:
-	warpspeed_state(const machine_config &mconfig, device_type type, const char *tag)
+	warpspeed_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -114,7 +114,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_starfield_tile_info);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(warpspeed);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

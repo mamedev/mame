@@ -69,7 +69,7 @@ public:
 	typedef delegate<void (UINT8)> state_change_delegate;
 
 	// construction/destruction
-	fd1094_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fd1094_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// explicit decryption helpers
 	void decrypt(offs_t baseaddr, UINT32 size, offs_t regionoffs, UINT16 *opcodesptr, UINT8 state) { decrypt(baseaddr, size, m_srcbase + regionoffs/2, opcodesptr, state); }
@@ -91,8 +91,8 @@ protected:
 	required_memory_bank m_decrypted_opcodes_bank;
 
 	// device overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void device_postload();
 
 	// internal helpers

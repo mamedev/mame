@@ -7,7 +7,7 @@
 class n8080_state : public driver_device
 {
 public:
-	n8080_state(const machine_config &mconfig, device_type type, const char *tag)
+	n8080_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -75,7 +75,7 @@ public:
 	DECLARE_WRITE8_MEMBER(helifire_sound_ctrl_w);
 	DECLARE_WRITE_LINE_MEMBER(n8080_inte_callback);
 	DECLARE_WRITE8_MEMBER(n8080_status_callback);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(spacefev);
 	DECLARE_VIDEO_START(spacefev);
 	DECLARE_PALETTE_INIT(n8080);

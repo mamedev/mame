@@ -99,7 +99,7 @@ public:
 		TIMER_BEEP_OFF
 	};
 
-	amust_state(const machine_config &mconfig, device_type type, const char *tag)
+	amust_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
@@ -136,7 +136,7 @@ private:
 	UINT8 m_port08;
 	UINT8 m_port0a;
 	UINT8 m_term_data;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;
 	required_device<upd765a_device> m_fdc;

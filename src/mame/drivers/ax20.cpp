@@ -23,7 +23,7 @@
 class ax20_state : public driver_device
 {
 public:
-	ax20_state(const machine_config &mconfig, device_type type, const char *tag)
+	ax20_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_p_vram(*this, "p_vram"),
@@ -37,7 +37,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<i8272a_device> m_fdc;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(unk_r);

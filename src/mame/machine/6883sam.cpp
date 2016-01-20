@@ -70,9 +70,8 @@ const device_type SAM6883 = &device_creator<sam6883_device>;
 //  ctor
 //-------------------------------------------------
 
-sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sam6883_device::sam6883_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SAM6883, "SAM6883", tag, owner, clock, "sam6883", __FILE__),
-		m_cpu_tag(NULL),
 		m_cpu_space_ref(AS_PROGRAM),
 		m_read_res(*this),
 		m_space_0000(*this),
@@ -85,7 +84,6 @@ sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, d
 		m_space_FF60(*this),
 		m_space_FFE0(*this)
 {
-	memset(m_banks, '\0', sizeof(m_banks));
 }
 
 
@@ -133,7 +131,7 @@ void sam6883_device::configure_bank(int bank, UINT8 *memory, UINT32 memory_size,
 
 void sam6883_device::configure_bank(int bank, read8_delegate rhandler, write8_delegate whandler)
 {
-	configure_bank(bank, NULL, 0, false, rhandler, whandler);
+	configure_bank(bank, nullptr, 0, false, rhandler, whandler);
 }
 
 
@@ -454,8 +452,8 @@ template<UINT16 _addrstart, UINT16 _addrend>
 sam6883_device::sam_space<_addrstart, _addrend>::sam_space(sam6883_device &owner)
 	: m_owner(owner)
 {
-	m_read_bank = NULL;
-	m_write_bank = NULL;
+	m_read_bank = nullptr;
+	m_write_bank = nullptr;
 	m_mask = 0;
 }
 
@@ -468,7 +466,7 @@ sam6883_device::sam_space<_addrstart, _addrend>::sam_space(sam6883_device &owner
 template<UINT16 _addrstart, UINT16 _addrend>
 address_space &sam6883_device::sam_space<_addrstart, _addrend>::cpu_space() const
 {
-	assert(m_owner.m_cpu_space != NULL);
+	assert(m_owner.m_cpu_space != nullptr);
 	return *m_owner.m_cpu_space;
 }
 
@@ -506,7 +504,7 @@ void sam6883_device::sam_space<_addrstart, _addrend>::point_specific_bank(const 
 {
 	char buffer[16];
 
-	if (bank->m_memory != NULL)
+	if (bank->m_memory != nullptr)
 	{
 		// normalize offset
 		if (mask != 0)
@@ -530,7 +528,7 @@ void sam6883_device::sam_space<_addrstart, _addrend>::point_specific_bank(const 
 		}
 
 		// point the bank
-		if (memory_bank != NULL)
+		if (memory_bank != nullptr)
 		{
 			if (is_write && bank->m_memory_read_only)
 				memory_bank->set_base(m_owner.m_dummy);

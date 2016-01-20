@@ -67,9 +67,9 @@ void alto2_cpu_device::activate_curt()
 /** @brief initialize the cursor task F1 and F2 functions */
 void alto2_cpu_device::init_curt(int task)
 {
-	set_f1(task, f1_block,              &alto2_cpu_device::f1_early_curt_block, 0);
-	set_f2(task, f2_curt_load_xpreg,    0, &alto2_cpu_device::f2_late_load_xpreg);
-	set_f2(task, f2_curt_load_csr,      0, &alto2_cpu_device::f2_late_load_csr);
+	set_f1(task, f1_block,              &alto2_cpu_device::f1_early_curt_block, nullptr);
+	set_f2(task, f2_curt_load_xpreg,    nullptr, &alto2_cpu_device::f2_late_load_xpreg);
+	set_f2(task, f2_curt_load_csr,      nullptr, &alto2_cpu_device::f2_late_load_csr);
 	m_active_callback[task] = &alto2_cpu_device::activate_curt;
 }
 

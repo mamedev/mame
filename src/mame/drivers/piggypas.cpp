@@ -20,14 +20,14 @@ game details unknown
 class piggypas_state : public driver_device
 {
 public:
-	piggypas_state(const machine_config &mconfig, device_type type, const char *tag)
+	piggypas_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ticket(*this, "ticket")
 	{ }
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(mcs51_tx_callback);
 	DECLARE_INPUT_CHANGED_MEMBER(ball_sensor);
@@ -53,7 +53,7 @@ WRITE8_MEMBER(piggypas_state::ctrl_w)
 
 WRITE8_MEMBER(piggypas_state::mcs51_tx_callback)
 {
-	output_set_digit_value(m_digit_idx++, BITSWAP8(data,7,6,4,3,2,1,0,5) & 0x7f);
+	output().set_digit_value(m_digit_idx++, BITSWAP8(data,7,6,4,3,2,1,0,5) & 0x7f);
 }
 
 static ADDRESS_MAP_START( piggypas_map, AS_PROGRAM, 8, piggypas_state )

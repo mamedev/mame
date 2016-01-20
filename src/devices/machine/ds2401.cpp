@@ -22,14 +22,14 @@ inline void ds2401_device::verboselog(int n_level, const char *s_fmt, ...)
 		va_start(v, s_fmt);
 		vsprintf(buf, s_fmt, v);
 		va_end(v);
-		logerror("ds2401 %s %s: %s", tag(), machine().describe_context(), buf);
+		logerror("ds2401 %s %s: %s", tag().c_str(), machine().describe_context(), buf);
 	}
 }
 
 // device type definition
 const device_type DS2401 = &device_creator<ds2401_device>;
 
-ds2401_device::ds2401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ds2401_device::ds2401_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DS2401, "DS2401", tag, owner, clock, "ds2401", __FILE__), m_state(0), m_bit(0), m_shift(0), m_byte(0), m_rx(false), m_tx(false), m_timer_main(nullptr), m_timer_reset(nullptr)
 {
 }
@@ -73,11 +73,11 @@ void ds2401_device::device_reset()
 			return;
 		}
 
-		logerror("ds2401 %s: Wrong region length for id data, expected 0x%x, got 0x%x\n", tag(), SIZE_DATA, m_region->bytes());
+		logerror("ds2401 %s: Wrong region length for id data, expected 0x%x, got 0x%x\n", tag().c_str(), SIZE_DATA, m_region->bytes());
 	}
 	else
 	{
-		logerror("ds2401 %s: Warning, no id provided, answer will be all zeroes.\n", tag());
+		logerror("ds2401 %s: Warning, no id provided, answer will be all zeroes.\n", tag().c_str());
 	}
 
 	memset(m_data, 0, SIZE_DATA);

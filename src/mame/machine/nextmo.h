@@ -12,7 +12,7 @@
 class nextmo_device : public device_t
 {
 public:
-	nextmo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nextmo_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<nextmo_device &>(device).irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<nextmo_device &>(device).drq_cb.set_callback(object); }
@@ -42,8 +42,8 @@ public:
 	void dma_w(UINT8 data);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	UINT8 sector[0x510];

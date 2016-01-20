@@ -109,7 +109,7 @@ static MACHINE_CONFIG_FRAGMENT( vic1112 )
 	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, eoi_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(vic1112_device, via1_irq_w))
 
-	MCFG_CBM_IEEE488_ADD(NULL)
+	MCFG_CBM_IEEE488_ADD(nullptr)
 	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE(M6522_1_TAG, via6522_device, write_cb1))
 MACHINE_CONFIG_END
 
@@ -134,7 +134,7 @@ machine_config_constructor vic1112_device::device_mconfig_additions() const
 //  vic1112_device - constructor
 //-------------------------------------------------
 
-vic1112_device::vic1112_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vic1112_device::vic1112_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VIC1112, "VIC1112", tag, owner, clock, "vic1112", __FILE__),
 		device_vic20_expansion_card_interface(mconfig, *this),
 		m_via0(*this, M6522_0_TAG),

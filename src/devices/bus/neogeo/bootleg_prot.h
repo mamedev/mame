@@ -18,7 +18,7 @@ class ngbootleg_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	ngbootleg_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ngbootleg_prot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void neogeo_bootleg_cx_decrypt(UINT8*sprrom, UINT32 sprrom_size);
 	void neogeo_bootleg_sx_decrypt(UINT8* fixed, UINT32 fixed_size, int value);
@@ -85,14 +85,8 @@ public:
 	UINT16 m_cartridge_ram2[0x10000];
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-
-
-
-private:
-
-
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 #endif

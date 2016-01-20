@@ -41,7 +41,7 @@ class epson_sio_device : public device_t,
 {
 public:
 	// construction/destruction
-	epson_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	epson_sio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~epson_sio_device();
 
 	// callbacks
@@ -58,8 +58,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	device_epson_sio_interface *m_cart;
 

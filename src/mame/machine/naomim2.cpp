@@ -12,9 +12,9 @@ Naomi cartridge type M2/3 mapping
 NAOMI_ROM_OFFSET bit29: ROM size/mapping selection, 0 - 4MB ROM mode, 1 - 8MB ROM mode
 
 bit28: Bank selection.
-	in the case of flash-based 171-7885A ROM boards two of them can be stacked at once
-	onto main board. each must be configured as Bank 0 or 1 via some (currently unknown) jumper.
-	this bit selects which one ROM board will be accessed.
+    in the case of flash-based 171-7885A ROM boards two of them can be stacked at once
+    onto main board. each must be configured as Bank 0 or 1 via some (currently unknown) jumper.
+    this bit selects which one ROM board will be accessed.
 
 note: if ROM is not mounted its area readed as 0xFF
 
@@ -111,7 +111,7 @@ note: if ROM is not mounted its area readed as 0xFF
 
 const device_type NAOMI_M2_BOARD = &device_creator<naomi_m2_board>;
 
-naomi_m2_board::naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+naomi_m2_board::naomi_m2_board(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: naomi_board(mconfig, NAOMI_M2_BOARD, "Sega NAOMI M2 Board", tag, owner, clock, "naomi_m2_board", __FILE__),
 	m_cryptdevice(*this, "segam2crypt")
 {
@@ -121,17 +121,17 @@ void naomi_m2_board::device_start()
 {
 	naomi_board::device_start();
 
-	ram = auto_alloc_array(machine(), UINT8, RAM_SIZE);
+	ram = std::make_unique<UINT8[]>(RAM_SIZE);
 
 	save_item(NAME(rom_cur_address));
-	save_pointer(NAME(ram), RAM_SIZE);
+	save_pointer(NAME(ram.get()), RAM_SIZE);
 }
 
 void naomi_m2_board::device_reset()
 {
 	naomi_board::device_reset();
 
-	memset(ram, 0, RAM_SIZE);
+	memset(ram.get(), 0, RAM_SIZE);
 
 	rom_cur_address = 0;
 }

@@ -42,7 +42,7 @@ device_comx_expansion_card_interface::device_comx_expansion_card_interface(const
 //  comx_expansion_slot_device - constructor
 //-------------------------------------------------
 
-comx_expansion_slot_device::comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+comx_expansion_slot_device::comx_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COMX_EXPANSION_SLOT, "COMX-35 expansion slot", tag, owner, clock, "comx_expansion_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_write_irq(*this), m_card(nullptr)
@@ -71,7 +71,7 @@ UINT8 comx_expansion_slot_device::mrd_r(address_space &space, offs_t offset, int
 {
 	UINT8 data = 0;
 
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		data = m_card->comx_mrd_r(space, offset, extrom);
 	}
@@ -86,7 +86,7 @@ UINT8 comx_expansion_slot_device::mrd_r(address_space &space, offs_t offset, int
 
 void comx_expansion_slot_device::mwr_w(address_space &space, offs_t offset, UINT8 data)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		m_card->comx_mwr_w(space, offset, data);
 	}
@@ -101,7 +101,7 @@ UINT8 comx_expansion_slot_device::io_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
 
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		data = m_card->comx_io_r(space, offset);
 	}
@@ -116,7 +116,7 @@ UINT8 comx_expansion_slot_device::io_r(address_space &space, offs_t offset)
 
 void comx_expansion_slot_device::io_w(address_space &space, offs_t offset, UINT8 data)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		m_card->comx_io_w(space, offset, data);
 	}
@@ -129,7 +129,7 @@ void comx_expansion_slot_device::io_w(address_space &space, offs_t offset, UINT8
 
 WRITE_LINE_MEMBER( comx_expansion_slot_device::ds_w )
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		m_card->comx_ds_w(state);
 	}
@@ -142,7 +142,7 @@ WRITE_LINE_MEMBER( comx_expansion_slot_device::ds_w )
 
 WRITE_LINE_MEMBER( comx_expansion_slot_device::q_w )
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		m_card->comx_q_w(state);
 	}
@@ -152,7 +152,7 @@ READ_LINE_MEMBER( comx_expansion_slot_device::ef4_r )
 {
 	int state = CLEAR_LINE;
 
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		state = m_card->comx_ef4_r();
 	}

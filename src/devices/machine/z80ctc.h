@@ -58,7 +58,7 @@ class z80ctc_device :   public device_t,
 {
 public:
 	// construction/destruction
-	z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80ctc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_intr_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_intr_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_zc0_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_zc0_cb.set_callback(object); }
@@ -77,13 +77,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// z80daisy_interface overrides
-	virtual int z80daisy_irq_state();
-	virtual int z80daisy_irq_ack();
-	virtual void z80daisy_irq_reti();
+	virtual int z80daisy_irq_state() override;
+	virtual int z80daisy_irq_ack() override;
+	virtual void z80daisy_irq_reti() override;
 
 private:
 	// internal helpers

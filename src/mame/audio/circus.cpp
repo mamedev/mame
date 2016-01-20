@@ -10,14 +10,14 @@ const char *const circus_sample_names[] =
 	"pop",
 	"miss",
 	"bounce",
-	0
+	nullptr
 };
 
 const char *const crash_sample_names[] =
 {
 	"*crash",
 	"crash",
-	0
+	nullptr
 };
 
 const char *const ripcord_sample_names[] =
@@ -27,7 +27,7 @@ const char *const ripcord_sample_names[] =
 	"scream",
 	"chute",
 	"whistle",
-	0
+	nullptr
 };
 
 const char *const robotbwl_sample_names[] =
@@ -38,7 +38,7 @@ const char *const robotbwl_sample_names[] =
 	"balldrop",
 	"demerit",
 	"reward",
-	0
+	nullptr
 };
 
 

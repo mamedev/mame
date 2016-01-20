@@ -32,7 +32,7 @@ static const UINT32 pkmask3[18] =
 	0xfffff000, 0xffffff00, 0xfffffff0, 0xffffffff,
 };
 
-INLINE double fx80_to_double(floatx80 fx)
+static inline double fx80_to_double(floatx80 fx)
 {
 	UINT64 d;
 	double *foo;
@@ -44,7 +44,7 @@ INLINE double fx80_to_double(floatx80 fx)
 	return *foo;
 }
 
-INLINE floatx80 double_to_fx80(double in)
+static inline floatx80 double_to_fx80(double in)
 {
 	UINT64 *d;
 
@@ -53,7 +53,7 @@ INLINE floatx80 double_to_fx80(double in)
 	return float64_to_floatx80(*d);
 }
 
-INLINE floatx80 load_extended_float80(m68000_base_device *m68k, UINT32 ea)
+static inline floatx80 load_extended_float80(m68000_base_device *m68k, UINT32 ea)
 {
 	UINT32 d1,d2;
 	UINT16 d3;
@@ -69,7 +69,7 @@ INLINE floatx80 load_extended_float80(m68000_base_device *m68k, UINT32 ea)
 	return fp;
 }
 
-INLINE void store_extended_float80(m68000_base_device *m68k, UINT32 ea, floatx80 fpr)
+static inline void store_extended_float80(m68000_base_device *m68k, UINT32 ea, floatx80 fpr)
 {
 	m68ki_write_16(m68k, ea+0, fpr.high);
 	m68ki_write_16(m68k, ea+2, 0);
@@ -77,7 +77,7 @@ INLINE void store_extended_float80(m68000_base_device *m68k, UINT32 ea, floatx80
 	m68ki_write_32(m68k, ea+8, fpr.low&0xffffffff);
 }
 
-INLINE floatx80 load_pack_float80(m68000_base_device *m68k, UINT32 ea)
+static inline floatx80 load_pack_float80(m68000_base_device *m68k, UINT32 ea)
 {
 	UINT32 dw1, dw2, dw3;
 	floatx80 result;
@@ -128,7 +128,7 @@ INLINE floatx80 load_pack_float80(m68000_base_device *m68k, UINT32 ea)
 	return result;
 }
 
-INLINE void store_pack_float80(m68000_base_device *m68k, UINT32 ea, int k, floatx80 fpr)
+static inline void store_pack_float80(m68000_base_device *m68k, UINT32 ea, int k, floatx80 fpr)
 {
 	UINT32 dw1, dw2, dw3;
 	char str[128], *ch;
@@ -260,7 +260,7 @@ INLINE void store_pack_float80(m68000_base_device *m68k, UINT32 ea, int k, float
 	m68ki_write_32(m68k, ea+8, dw3);
 }
 
-INLINE void SET_CONDITION_CODES(m68000_base_device *m68k, floatx80 reg)
+static inline void SET_CONDITION_CODES(m68000_base_device *m68k, floatx80 reg)
 {
 //  UINT64 *regi;
 
@@ -293,7 +293,7 @@ INLINE void SET_CONDITION_CODES(m68000_base_device *m68k, floatx80 reg)
 	}
 }
 
-INLINE int TEST_CONDITION(m68000_base_device *m68k, int condition)
+static inline int TEST_CONDITION(m68000_base_device *m68k, int condition)
 {
 	int n = (REG_FPSR(m68k) & FPCC_N) != 0;
 	int z = (REG_FPSR(m68k) & FPCC_Z) != 0;
@@ -1681,7 +1681,7 @@ static void fmove_fpcr(m68000_base_device *m68k, UINT16 w2)
 		int rnd = (REG_FPCR(m68k) >> 4) & 3;
 		int prec = (REG_FPCR(m68k) >> 6) & 3;
 
-		m68k->logerror("m68k_fpsp:fmove_fpcr fpcr=%04x prec=%d rnd=%d\n", REG_FPCR(m68k), prec, rnd);
+//      m68k->logerror("m68k_fpsp:fmove_fpcr fpcr=%04x prec=%d rnd=%d\n", REG_FPCR(m68k), prec, rnd);
 
 #ifdef FLOATX80
 		switch (prec)

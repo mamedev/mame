@@ -38,7 +38,7 @@
 class dragon_alpha_state : public dragon64_state
 {
 public:
-	dragon_alpha_state(const machine_config &mconfig, device_type type, const char *tag)
+	dragon_alpha_state(const machine_config &mconfig, device_type type, std::string tag)
 	: dragon64_state(mconfig, type, tag),
 		m_pia_2(*this, PIA2_TAG),
 		m_ay8912(*this, AY8912_TAG),
@@ -76,15 +76,15 @@ public:
 
 protected:
 	/* driver overrides */
-	virtual void device_start(void);
-	virtual void device_reset(void);
+	virtual void device_start(void) override;
+	virtual void device_reset(void) override;
 
 	/* interrupts */
-	virtual bool firq_get_line(void);
+	virtual bool firq_get_line(void) override;
 
 	/* PIA1 */
-	virtual DECLARE_READ8_MEMBER( ff20_read );
-	virtual DECLARE_WRITE8_MEMBER( ff20_write );
+	virtual DECLARE_READ8_MEMBER( ff20_read ) override;
+	virtual DECLARE_WRITE8_MEMBER( ff20_write ) override;
 
 private:
 	UINT8 m_just_reset;

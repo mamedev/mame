@@ -13,13 +13,13 @@ class nes_jf11_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_jf11_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_jf11_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_WRITE8_MEMBER(write_m);
+	virtual void device_start() override;
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -29,14 +29,14 @@ class nes_jf13_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_jf13_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_jf13_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual DECLARE_WRITE8_MEMBER(write_m);
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 private:
 	required_device<samples_device> m_samples;
@@ -49,13 +49,13 @@ class nes_jf16_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_jf16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_jf16_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual void device_start() override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -65,14 +65,14 @@ class nes_jf17_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_jf17_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_jf17_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_jf17_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_jf17_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual void device_start() override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
 	UINT8 m_latch;
@@ -85,10 +85,10 @@ class nes_jf17_adpcm_device : public nes_jf17_device
 {
 public:
 	// construction/destruction
-	nes_jf17_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_jf17_adpcm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 private:
 	required_device<samples_device> m_samples;
@@ -101,14 +101,14 @@ class nes_jf19_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_jf19_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_jf19_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_jf19_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_jf19_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual void device_start() override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -118,10 +118,10 @@ class nes_jf19_adpcm_device : public nes_jf19_device
 {
 public:
 	// construction/destruction
-	nes_jf19_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_jf19_adpcm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 private:
 	required_device<samples_device> m_samples;
@@ -134,16 +134,16 @@ class nes_ss88006_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_ss88006_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_ss88006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_ss88006_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_ss88006_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual DECLARE_WRITE8_MEMBER(ss88006_write);
-	virtual DECLARE_WRITE8_MEMBER(write_h) { ss88006_write(space, offset, data, mem_mask); }
+	virtual DECLARE_WRITE8_MEMBER(write_h) override { ss88006_write(space, offset, data, mem_mask); }
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
 	UINT16 m_irq_count, m_irq_count_latch;
@@ -166,7 +166,7 @@ class nes_ss88006_adpcm_device : public nes_ss88006_device
 {
 public:
 	// construction/destruction
-	nes_ss88006_adpcm_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	nes_ss88006_adpcm_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// device-level overrides
 	void ss88006_adpcm_write(address_space &space, offs_t offset, UINT8 data, samples_device *dev);
@@ -179,13 +179,13 @@ class nes_jf23_device : public nes_ss88006_adpcm_device
 {
 public:
 	// construction/destruction
-	nes_jf23_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_jf23_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	required_device<samples_device> m_samples;
-	virtual DECLARE_WRITE8_MEMBER(write_h) { ss88006_adpcm_write(space, offset, data, m_samples); }
+	virtual DECLARE_WRITE8_MEMBER(write_h) override { ss88006_adpcm_write(space, offset, data, m_samples); }
 };
 
 
@@ -195,13 +195,13 @@ class nes_jf24_device : public nes_ss88006_adpcm_device
 {
 public:
 	// construction/destruction
-	nes_jf24_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_jf24_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	required_device<samples_device> m_samples;
-	virtual DECLARE_WRITE8_MEMBER(write_h) { ss88006_adpcm_write(space, offset, data, m_samples); }
+	virtual DECLARE_WRITE8_MEMBER(write_h) override { ss88006_adpcm_write(space, offset, data, m_samples); }
 };
 
 
@@ -211,13 +211,13 @@ class nes_jf29_device : public nes_ss88006_adpcm_device
 {
 public:
 	// construction/destruction
-	nes_jf29_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_jf29_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	required_device<samples_device> m_samples;
-	virtual DECLARE_WRITE8_MEMBER(write_h) { ss88006_adpcm_write(space, offset, data, m_samples); }
+	virtual DECLARE_WRITE8_MEMBER(write_h) override { ss88006_adpcm_write(space, offset, data, m_samples); }
 };
 
 
@@ -227,13 +227,13 @@ class nes_jf33_device : public nes_ss88006_adpcm_device
 {
 public:
 	// construction/destruction
-	nes_jf33_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_jf33_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	required_device<samples_device> m_samples;
-	virtual DECLARE_WRITE8_MEMBER(write_h) { ss88006_adpcm_write(space, offset, data, m_samples); }
+	virtual DECLARE_WRITE8_MEMBER(write_h) override { ss88006_adpcm_write(space, offset, data, m_samples); }
 };
 
 

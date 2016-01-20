@@ -1225,6 +1225,7 @@ static MACHINE_CONFIG_START( legionna, legionna_state )
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", legionna)
@@ -1261,6 +1262,7 @@ static MACHINE_CONFIG_START( heatbrl, legionna_state )
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
 
 
@@ -1293,14 +1295,15 @@ static MACHINE_CONFIG_START( godzilla, legionna_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 //  MCFG_SCREEN_SIZE(42*8, 36*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_RAW_PARAMS(14318180/2,455,0,320,258,0,224) // ~61 Hz
+	MCFG_SCREEN_RAW_PARAMS(14318180/2,455,0,320,258,0,224) // ~61 Hz, 15.734 kHz
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_godzilla)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
-
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_BASE_CB(WRITE16(legionna_state, tile_scroll_base_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", heatbrl)
 
@@ -1339,6 +1342,7 @@ static MACHINE_CONFIG_START( denjinmk, legionna_state )
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
 
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
@@ -1374,6 +1378,7 @@ static MACHINE_CONFIG_START( grainbow, legionna_state )
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
 
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", grainbow)
@@ -1412,6 +1417,7 @@ static MACHINE_CONFIG_START( cupsoc, legionna_state )
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
 
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cupsoc)
@@ -1460,7 +1466,7 @@ static MACHINE_CONFIG_START( cupsocbl, legionna_state )
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
-
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", heatbrl_csb)
 
@@ -1492,7 +1498,7 @@ ROM_START( legionna )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "6.u1110",     0x000000, 0x08000, CRC(fe7b8d06) SHA1(1e5b52ea4b4042940e2ee2db75c7c0f24973422a) )
 	ROM_CONTINUE(            0x010000, 0x08000 )    /* banked stuff */
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "user1", 0 ) /* load the tiles here so we can split them up into the required regions by hand */
 	ROM_LOAD16_BYTE( "7.u077", 0x000000, 0x10000, CRC(88e26809) SHA1(40ee55d3b5329b6f657e0621d93c4caf6a035fdf) )
@@ -1540,7 +1546,7 @@ ROM_START( legionnau )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "6.u1110",     0x000000, 0x08000, CRC(fe7b8d06) SHA1(1e5b52ea4b4042940e2ee2db75c7c0f24973422a) )
 	ROM_CONTINUE(            0x010000, 0x08000 )    /* banked stuff */
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "user1", 0 ) /* load the tiles here so we can split them up into the required regions by hand */
 	ROM_LOAD16_BYTE( "7.u077", 0x000000, 0x10000, CRC(88e26809) SHA1(40ee55d3b5329b6f657e0621d93c4caf6a035fdf) )
@@ -1588,7 +1594,7 @@ ROM_START( heatbrl )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "barrel_7.u1110", 0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
 	ROM_CONTINUE(               0x10000, 0x08000 )  /* banked stuff */
-	ROM_COPY( "audiocpu", 0,    0x18000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000,    0x18000, 0x08000 )
 
 	ROM_REGION( 0x020000, "char", 0 )   /* chars */
 	ROM_LOAD16_BYTE( "barrel_6.u077", 0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )
@@ -1630,7 +1636,7 @@ ROM_START( heatbrl2 )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "barrel_7.u1110", 0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
 	ROM_CONTINUE(               0x10000, 0x08000 )  /* banked stuff */
-	ROM_COPY( "audiocpu", 0,    0x18000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000,    0x18000, 0x08000 )
 
 	ROM_REGION( 0x020000, "char", 0 )   /* chars */
 	ROM_LOAD16_BYTE( "barrel_6.u077", 0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )
@@ -1672,7 +1678,7 @@ ROM_START( heatbrlo )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "barrel_7.u1110", 0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
 	ROM_CONTINUE(               0x10000, 0x08000 )  /* banked stuff */
-	ROM_COPY( "audiocpu", 0,    0x18000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000,    0x18000, 0x08000 )
 
 	ROM_REGION( 0x020000, "char", 0 )   /* chars */
 	ROM_LOAD16_BYTE( "barrel_6.u077", 0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )
@@ -1718,7 +1724,7 @@ ROM_START( heatbrlu )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "barrel_7.u1110", 0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
 	ROM_CONTINUE(               0x10000, 0x08000 )  /* banked stuff */
-	ROM_COPY( "audiocpu", 0,    0x18000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000,    0x18000, 0x08000 )
 
 	ROM_REGION( 0x020000, "char", 0 )   /* chars */
 	ROM_LOAD16_BYTE( "barrel_6.u077", 0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )
@@ -1763,7 +1769,7 @@ ROM_START( heatbrle )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "barrel_7.u1110", 0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
 	ROM_CONTINUE(               0x10000, 0x08000 )  /* banked stuff */
-	ROM_COPY( "audiocpu", 0,    0x18000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000,    0x18000, 0x08000 )
 
 	ROM_REGION( 0x020000, "char", 0 )   /* chars */
 	ROM_LOAD16_BYTE( "barrel_6.u077", 0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )
@@ -1855,7 +1861,7 @@ ROM_START( godzilla )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "8.016",        0x000000, 0x08000, CRC(4ab76e43) SHA1(40c34fade03161c4b50f9f6a2ae61078b8d8ea6d) )
 	ROM_CONTINUE(             0x010000, 0x08000 )   /* banked stuff */
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "char", 0 )
 	ROM_LOAD16_BYTE( "11.620",       0x000000, 0x010000, CRC(58e0e41f) SHA1(563c633eb3d4df41e467c93957c74b540a0ae43c) )
@@ -1973,7 +1979,7 @@ ROM_START( denjinmk )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "rom5.016",        0x000000, 0x08000, CRC(7fe7e352) SHA1(1ceae22186751ca91dfffab7bd11f275e693451f) )
 	ROM_CONTINUE(             0x010000, 0x08000 )   /* banked stuff */
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "char", 0 )
 	ROM_LOAD16_BYTE( "rom7.620",       0x000000, 0x010000, CRC(e1f759b1) SHA1(ddc60e78e7791a59c59403dd4089b3f6e1ecf8cb) )
@@ -1995,7 +2001,7 @@ ROM_START( denjinmk )
 	ROM_LOAD( "bg-3-ab.619",      0x000000, 0x100000,  CRC(de7366ee) SHA1(0c3969d15f3cd963e579d4164b6e0a6b4012c9c6) )
 
 	ROM_REGION( 0x100000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx4", 0x00000, 0x00000, 0x100000 )
+	ROM_COPY( "gfx4", 0x000000, 0x00000, 0x100000 )
 
 	ROM_REGION( 0x080000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "rom6.922",      0x000000, 0x040000, CRC(09e13213) SHA1(9500e057104c6b83da0467938e46d9efa2f49f4c) )
@@ -2069,7 +2075,7 @@ ROM_START( grainbow )
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rb-s.016",     0x000000, 0x08000, CRC(8439bf5b) SHA1(089009b91768d64edef6639e7694723d2d1c46ff) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "char", 0 )
 	ROM_LOAD16_BYTE( "rb-f1.620",    0x000000, 0x010000, CRC(792c403d) SHA1(3c606af696fe8f3d6edefdab3940bd5eb341bca9) )
@@ -2109,7 +2115,7 @@ ROM_START( cupsoc )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "seibu7.8a",   0x000000, 0x08000, CRC(f63329f9) SHA1(51736de48efc14415cfdf169b43623d4c95fde2b) )
 	ROM_CONTINUE(            0x010000, 0x08000 )    /* banked stuff */
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "char", 0 )
 	ROM_LOAD16_BYTE( "scc_06.bin", 0x000000, 0x010000, CRC(f1a18ec6) SHA1(43f8ec3fc541b8dc2a17533329dd3448afadcb3b) )
@@ -2127,7 +2133,7 @@ ROM_START( cupsoc )
 	ROM_LOAD( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
 	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
+	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "seibu8.7a", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2146,7 +2152,7 @@ ROM_START( cupsoca )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "seibu7.8a",   0x000000, 0x08000, CRC(f63329f9) SHA1(51736de48efc14415cfdf169b43623d4c95fde2b) )
 	ROM_CONTINUE(            0x010000, 0x08000 )    /* banked stuff */
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "char", 0 )
 	ROM_LOAD16_BYTE( "soca_6.bin", 0x000000, 0x010000, CRC(a9e15910) SHA1(305541b16a87d0e38871240fa2e111bb9332e93c) )
@@ -2164,7 +2170,7 @@ ROM_START( cupsoca )
 	ROM_LOAD( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
 	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
+	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "seibu8.7a", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2183,7 +2189,7 @@ ROM_START( cupsocb )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "seibu7.8a",   0x000000, 0x08000, CRC(f63329f9) SHA1(51736de48efc14415cfdf169b43623d4c95fde2b) )
 	ROM_CONTINUE(            0x010000, 0x08000 )    /* banked stuff */
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "char", 0 )
 	ROM_LOAD16_BYTE( "soca_6.bin", 0x000000, 0x010000, CRC(a9e15910) SHA1(305541b16a87d0e38871240fa2e111bb9332e93c) )
@@ -2201,7 +2207,7 @@ ROM_START( cupsocb )
 	ROM_LOAD( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
 	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
+	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "seibu8.7a", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2220,7 +2226,7 @@ ROM_START( cupsocs )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "seibu7.8a",   0x000000, 0x08000, CRC(f63329f9) SHA1(51736de48efc14415cfdf169b43623d4c95fde2b) )
 	ROM_CONTINUE(            0x010000, 0x08000 )    /* banked stuff */
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "char", 0 )
 	ROM_LOAD16_BYTE( "6_7x.bin", 0x000000, 0x010000, CRC(7981366e) SHA1(b859bf23c5ae466f4020958a06935192fa68ee8d) )
@@ -2238,7 +2244,7 @@ ROM_START( cupsocs )
 	ROM_LOAD( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
 	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
+	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "8_7a.bin", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2259,7 +2265,7 @@ ROM_START( cupsocs2 )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "seibu7.8a",   0x000000, 0x08000, CRC(f63329f9) SHA1(51736de48efc14415cfdf169b43623d4c95fde2b) )
 	ROM_CONTINUE(            0x010000, 0x08000 )    /* banked stuff */
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "char", 0 )
 	ROM_LOAD16_BYTE( "seibu6.7x", 0x000000, 0x010000, CRC(21c1e1b8) SHA1(30928c8ef98bf32ba0bf795ddadba1c95fcffe9d) )
@@ -2277,7 +2283,7 @@ ROM_START( cupsocs2 )
 	ROM_LOAD( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
 	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
+	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "seibu8.7a", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2296,7 +2302,7 @@ ROM_START( olysoc92 )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "seibu7.8a",   0x000000, 0x08000, CRC(f63329f9) SHA1(51736de48efc14415cfdf169b43623d4c95fde2b) )
 	ROM_CONTINUE(            0x010000, 0x08000 )    /* banked stuff */
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "char", 0 )
 	ROM_LOAD16_BYTE( "seibu6.7x", 0x000000, 0x010000, CRC(21c1e1b8) SHA1(30928c8ef98bf32ba0bf795ddadba1c95fcffe9d) )
@@ -2314,7 +2320,7 @@ ROM_START( olysoc92 )
 	ROM_LOAD( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
 	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
+	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "seibu8.7a", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2333,7 +2339,7 @@ ROM_START( olysoc92a )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "seibu7.8a",   0x000000, 0x08000, CRC(f63329f9) SHA1(51736de48efc14415cfdf169b43623d4c95fde2b) )
 	ROM_CONTINUE(            0x010000, 0x08000 )    /* banked stuff */
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "char", 0 )
 	ROM_LOAD16_BYTE( "6_7x.bin", 0x000000, 0x010000, CRC(7981366e) SHA1(b859bf23c5ae466f4020958a06935192fa68ee8d) )
@@ -2351,7 +2357,7 @@ ROM_START( olysoc92a )
 	ROM_LOAD( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
 	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
+	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "seibu8.7a", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2371,7 +2377,7 @@ ROM_START( olysoc92b )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "7",   0x000000, 0x08000, CRC(f63329f9) SHA1(51736de48efc14415cfdf169b43623d4c95fde2b) )
 	ROM_CONTINUE(            0x010000, 0x08000 )    /* banked stuff */
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "char", 0 )
 	ROM_LOAD16_BYTE( "6", 0x000000, 0x010000, CRC(7edb1700) SHA1(db30c01fc0e5b9f3c2d6139f89ec88936bc75b38) )
@@ -2389,7 +2395,7 @@ ROM_START( olysoc92b )
 	ROM_LOAD( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
 	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
+	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "8", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2440,7 +2446,7 @@ ROM_START( cupsocsb )
 	ROM_REGION( 0x200000, "sprite", ROMREGION_INVERT ) /* bootleg sprite gfx */
 	ROM_LOAD( "sc_07.bin", 0x000000, 0x080000, CRC(dcb29d01) SHA1(72b4234622605f0ab03f21fdb6a61c6dac36000d) )
 	ROM_LOAD( "sc_06.bin", 0x080000, 0x080000, CRC(2dc70e05) SHA1(f1d0beb8428a7e1d7c7818e6719abdc543b2fa80) )
-	ROM_COPY( "sprite", 0x00000, 0x100000, 0x100000 )
+	ROM_COPY( "sprite", 0x000000, 0x100000, 0x100000 )
 
 	ROM_REGION( 0x200000, "test1", 0 ) /* bootleg tile gfx */
 	ROM_LOAD16_BYTE( "sc_09.bin", 0x000000, 0x080000, CRC(695b6342) SHA1(dfccb43789021ba2568b9284ae61e64f7f89b152) )
@@ -2456,13 +2462,13 @@ ROM_START( cupsocsb )
 	ROM_COPY( "test1", 0x100000, 0x80000, 0x080000 )
 
 	ROM_REGION( 0x100000, "gfx4", ROMREGION_INVERT )    /* not used */
-	ROM_COPY("gfx3",0x00000,0x00000,0x100000)
+	ROM_COPY("gfx3",0x000000,0x00000,0x100000)
 
 	ROM_REGION( 0x080000, "gfx5", ROMREGION_INVERT )    /* BK3 tiles */
 	ROM_COPY( "test1", 0x180000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x080000, "gfx6", ROMREGION_INVERT )    /* LBK tiles */
-	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
+	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x100000, "adpcm", ROMREGION_ERASEFF )  /* ADPCM samples */
 	ROM_LOAD( "sc_02.bin",    0x000000, 0x020000, CRC(a70d4f03) SHA1(c2482e624c8a828a94206a36d10c1021ad8ca1d0) )
@@ -2515,7 +2521,7 @@ ROM_START( cupsocsb2 )
 	ROM_COPY( "test1", 0x080000, 0x00000, 0x020000 )
 
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT )    /* MBK tiles */
-	ROM_COPY( "test1", 0x000000, 0x00000, 0x080000 )
+	ROM_COPY( "test1", 0x00000, 0x00000, 0x080000 )
 	ROM_COPY( "test1", 0x100000, 0x80000, 0x080000 )
 
 	ROM_REGION( 0x100000, "gfx4", ROMREGION_INVERT )    /* not used */
@@ -2577,7 +2583,7 @@ ROM_START( cupsocsb3 )
 	ROM_COPY( "test1", 0x080000, 0x00000, 0x020000 )
 
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT )    /* MBK tiles */
-	ROM_COPY( "test1", 0x000000, 0x00000, 0x080000 )
+	ROM_COPY( "test1", 0x00000, 0x00000, 0x080000 )
 	ROM_COPY( "test1", 0x100000, 0x80000, 0x080000 )
 
 	ROM_REGION( 0x100000, "gfx4", ROMREGION_INVERT )    /* not used */

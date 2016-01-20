@@ -33,8 +33,8 @@ WRITE8_MEMBER(simpsons_state::simpsons_eeprom_w)
 WRITE8_MEMBER(simpsons_state::simpsons_coin_counter_w)
 {
 	/* bit 0,1 coin counters */
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 	/* bit 2 selects mono or stereo sound */
 	/* bit 3 = enable char ROM reading through the video RAM */
 	m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
@@ -63,7 +63,7 @@ WRITE8_MEMBER( simpsons_state::banking_callback )
 
 void simpsons_state::machine_start()
 {
-	m_spriteram = auto_alloc_array_clear(machine(), UINT16, 0x1000 / 2);
+	m_spriteram = make_unique_clear<UINT16[]>(0x1000 / 2);
 
 	membank("bank1")->configure_entries(0, 64, memregion("maincpu")->base(), 0x2000);
 
@@ -74,7 +74,7 @@ void simpsons_state::machine_start()
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_layerpri));
-	save_pointer(NAME(m_spriteram), 0x1000 / 2);
+	save_pointer(NAME(m_spriteram.get()), 0x1000 / 2);
 }
 
 void simpsons_state::machine_reset()

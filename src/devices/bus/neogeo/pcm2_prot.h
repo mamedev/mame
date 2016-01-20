@@ -17,20 +17,14 @@ class pcm2_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	pcm2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pcm2_prot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void neo_pcm2_snk_1999(UINT8* ymrom, UINT32 ymsize, int value);
 	void neo_pcm2_swap(UINT8* ymrom, UINT32 ymsize, int value);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-
-
-
-private:
-
-
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 #endif

@@ -111,7 +111,7 @@ WRITE8_MEMBER(m79amb_state::m79amb_8002_w)
 {
 	/* D1 may also be watchdog reset */
 	/* port goes to 0x7f to turn on explosion lamp */
-	output_set_value("EXP_LAMP", data ? 1 : 0);
+	output().set_value("EXP_LAMP", data ? 1 : 0);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, m79amb_state )

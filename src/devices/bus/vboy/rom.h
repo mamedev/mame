@@ -13,14 +13,14 @@ class vboy_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	vboy_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	vboy_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vboy_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	vboy_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start() {}
+	virtual void device_start() override {}
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_cart);
+	virtual DECLARE_READ32_MEMBER(read_cart) override;
 };
 
 // ======================> vboy_eeprom_device
@@ -29,11 +29,11 @@ class vboy_eeprom_device : public vboy_rom_device
 {
 public:
 	// construction/destruction
-	vboy_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vboy_eeprom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_eeprom);
-	virtual DECLARE_WRITE32_MEMBER(write_eeprom);
+	virtual DECLARE_READ32_MEMBER(read_eeprom) override;
+	virtual DECLARE_WRITE32_MEMBER(write_eeprom) override;
 };
 
 

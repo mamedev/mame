@@ -85,7 +85,7 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 class kingdrby_state : public driver_device
 {
 public:
-	kingdrby_state(const machine_config &mconfig, device_type type, const char *tag)
+	kingdrby_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_attr(*this, "attr"),
@@ -118,7 +118,7 @@ public:
 	DECLARE_WRITE8_MEMBER(outportb_w);
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(kingdrby);
 	DECLARE_PALETTE_INIT(kingdrbb);
 	UINT32 screen_update_kingdrby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -391,8 +391,8 @@ WRITE8_MEMBER(kingdrby_state::led_array_w)
 	they goes from 0 to 5, to indicate the number.
 	If one player bets something, the other led will toggle between p1 and p2 bets.
 	*/
-	output_set_digit_value(0xf + offset, led_map[(data & 0xf0) >> 4]);
-	output_set_digit_value(0x0 + offset, led_map[(data & 0x0f) >> 0]);
+	output().set_digit_value(0xf + offset, led_map[(data & 0xf0) >> 4]);
+	output().set_digit_value(0x0 + offset, led_map[(data & 0x0f) >> 0]);
 
 }
 

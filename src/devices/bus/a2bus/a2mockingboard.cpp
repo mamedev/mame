@@ -120,7 +120,7 @@ machine_config_constructor a2bus_echoplus_device::device_mconfig_additions() con
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_ayboard_device::a2bus_ayboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_ayboard_device::a2bus_ayboard_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_via1(*this, VIA1_TAG),
@@ -132,21 +132,21 @@ a2bus_ayboard_device::a2bus_ayboard_device(const machine_config &mconfig, device
 {
 }
 
-a2bus_mockingboard_device::a2bus_mockingboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_mockingboard_device::a2bus_mockingboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	a2bus_ayboard_device(mconfig, A2BUS_MOCKINGBOARD, "Sweet Micro Systems Mockingboard", tag, owner, clock, "a2mockbd", __FILE__)
 {
 	m_isPhasor = false;
 	m_PhasorNative = false;
 }
 
-a2bus_phasor_device::a2bus_phasor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_phasor_device::a2bus_phasor_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	a2bus_ayboard_device(mconfig, A2BUS_PHASOR, "Applied Engineering Phasor", tag, owner, clock, "a2phasor", __FILE__)
 {
 	m_isPhasor = true;
 	m_PhasorNative = false;
 }
 
-a2bus_echoplus_device::a2bus_echoplus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_echoplus_device::a2bus_echoplus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	a2bus_ayboard_device(mconfig, A2BUS_ECHOPLUS, "Street Electronics Echo Plus", tag, owner, clock, "a2echop", __FILE__),
 	m_tms(*this, E2P_TMS_TAG)
 {

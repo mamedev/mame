@@ -10,11 +10,11 @@
 #define DEBUG_WRTRAM        0       //!< define to 1 to printf disassembled CRAM writes
 
 //! direct read access to the microcode CRAM
-#define RD_CRAM(addr) (*reinterpret_cast<UINT32 *>(m_ucode_cram + addr * 4))
+#define RD_CRAM(addr) (*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + addr * 4))
 
 //! direct write access to the microcode CRAM
 #define WR_CRAM(addr,data) do { \
-	*reinterpret_cast<UINT32 *>(m_ucode_cram + addr * 4) = data; \
+	*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + addr * 4) = data; \
 } while (0)
 
 /**
@@ -411,16 +411,16 @@ void alto2_cpu_device::init_ram(int task)
 {
 	m_ram_related[task] = true;
 
-	set_bs(task, bs_ram_read_slocation, &alto2_cpu_device::bs_early_read_sreg, 0);
+	set_bs(task, bs_ram_read_slocation, &alto2_cpu_device::bs_early_read_sreg, nullptr);
 	set_bs(task, bs_ram_load_slocation, &alto2_cpu_device::bs_early_load_sreg, &alto2_cpu_device::bs_late_load_sreg);
 
-	set_f1(task, f1_ram_swmode,         0, &alto2_cpu_device::f1_late_swmode);
-	set_f1(task, f1_ram_wrtram,         0, &alto2_cpu_device::f1_late_wrtram);
-	set_f1(task, f1_ram_rdram,          0, &alto2_cpu_device::f1_late_rdram);
+	set_f1(task, f1_ram_swmode,         nullptr, &alto2_cpu_device::f1_late_swmode);
+	set_f1(task, f1_ram_wrtram,         nullptr, &alto2_cpu_device::f1_late_wrtram);
+	set_f1(task, f1_ram_rdram,          nullptr, &alto2_cpu_device::f1_late_rdram);
 #if (ALTO2_UCODE_RAM_PAGES == 3)
 	set_f1(task, f1_ram_load_rmr,       0, &alto2_cpu_device::f1_late_load_rmr);
 #else   // ALTO2_UCODE_RAM_PAGES != 3
-	set_f1(task, f1_ram_load_srb,       0, &alto2_cpu_device::f1_late_load_srb);
+	set_f1(task, f1_ram_load_srb,       nullptr, &alto2_cpu_device::f1_late_load_srb);
 #endif
 }
 

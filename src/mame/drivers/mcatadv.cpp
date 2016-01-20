@@ -157,10 +157,10 @@ WRITE16_MEMBER(mcatadv_state::mcat_coin_w)
 {
 	if(ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0, data & 0x1000);
-		coin_counter_w(machine(), 1, data & 0x2000);
-		coin_lockout_w(machine(), 0, ~data & 0x4000);
-		coin_lockout_w(machine(), 1, ~data & 0x8000);
+		machine().bookkeeping().coin_counter_w(0, data & 0x1000);
+		machine().bookkeeping().coin_counter_w(1, data & 0x2000);
+		machine().bookkeeping().coin_lockout_w(0, ~data & 0x4000);
+		machine().bookkeeping().coin_lockout_w(1, ~data & 0x8000);
 	}
 }
 #endif
@@ -482,10 +482,10 @@ static MACHINE_CONFIG_DERIVED( nost, mcatadv )
 	MCFG_DEVICE_REMOVE("rspeaker")
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL_16MHz/2) /* verified on pcb */
-        MCFG_YM2610_IRQ_HANDLER(WRITELINE(mcatadv_state, sound_irq))
-        MCFG_SOUND_ROUTE(0, "mono", 0.2)
-        MCFG_SOUND_ROUTE(1, "mono", 0.5)
-        MCFG_SOUND_ROUTE(2, "mono", 0.5)
+		MCFG_YM2610_IRQ_HANDLER(WRITELINE(mcatadv_state, sound_irq))
+		MCFG_SOUND_ROUTE(0, "mono", 0.2)
+		MCFG_SOUND_ROUTE(1, "mono", 0.5)
+		MCFG_SOUND_ROUTE(2, "mono", 0.5)
 MACHINE_CONFIG_END
 
 

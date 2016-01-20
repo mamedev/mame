@@ -31,7 +31,7 @@ enum
 const device_type PCVIDEO_T1000 = &device_creator<pcvideo_t1000_device>;
 const device_type PCVIDEO_PCJR = &device_creator<pcvideo_pcjr_device>;
 
-pc_t1t_device::pc_t1t_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+pc_t1t_device::pc_t1t_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_video_interface(mconfig, *this),
 	m_mc6845(*this, T1000_MC6845_NAME),
@@ -40,8 +40,8 @@ pc_t1t_device::pc_t1t_device(const machine_config &mconfig, device_type type, co
 	m_status(0),
 	m_bank(0),
 	m_pc_framecnt(0),
-	m_displayram(NULL),
-	m_chr_gen(NULL),
+	m_displayram(nullptr),
+	m_chr_gen(nullptr),
 	m_chr_size(0),
 	m_ra_offset(0),
 	m_address_data_ff(0),
@@ -53,15 +53,15 @@ pc_t1t_device::pc_t1t_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-pcvideo_t1000_device::pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pcvideo_t1000_device::pcvideo_t1000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pc_t1t_device(mconfig, PCVIDEO_T1000, "Tandy 1000 Graphics Adapter", tag, owner, clock, "tandy_1000_graphics_adapter", __FILE__),
-	m_t1_displayram(NULL)
+	m_t1_displayram(nullptr)
 {
 }
 
-pcvideo_pcjr_device::pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pcvideo_pcjr_device::pcvideo_pcjr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pc_t1t_device(mconfig, PCVIDEO_PCJR, "PC Jr Graphics Adapter", tag, owner, clock, "pcjr_graphics_adapter", __FILE__),
-	m_jxkanji(NULL)
+	m_jxkanji(nullptr)
 {
 }
 
@@ -85,7 +85,7 @@ void pcvideo_pcjr_device::device_start()
 	if(!strncmp(machine().system().name, "ibmpcjx", 7))
 		m_jxkanji = machine().root_device().memregion("kanji")->base();
 	else
-		m_jxkanji = NULL;
+		m_jxkanji = nullptr;
 }
 
 

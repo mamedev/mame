@@ -45,7 +45,7 @@ enum
 class z88_state : public driver_device
 {
 public:
-	z88_state(const machine_config &mconfig, device_type type, const char *tag)
+	z88_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_ram(*this, RAM_TAG),
@@ -56,8 +56,8 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_READ8_MEMBER(kb_r);
 	UPD65031_MEMORY_UPDATE(bankswitch_update);
 	UPD65031_SCREEN_UPDATE(lcd_update);

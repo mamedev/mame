@@ -258,8 +258,8 @@ VIDEO_START_MEMBER(combatsc_state,combatsc)
 	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_textlayer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_text_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_spriteram[0] = auto_alloc_array_clear(machine(), UINT8, 0x800);
-	m_spriteram[1] = auto_alloc_array_clear(machine(), UINT8, 0x800);
+	m_spriteram[0] = make_unique_clear<UINT8[]>(0x800);
+	m_spriteram[1] = make_unique_clear<UINT8[]>(0x800);
 
 	m_bg_tilemap[0]->set_transparent_pen(0);
 	m_bg_tilemap[1]->set_transparent_pen(0);
@@ -267,8 +267,8 @@ VIDEO_START_MEMBER(combatsc_state,combatsc)
 
 	m_textlayer->set_scroll_rows(32);
 
-	save_pointer(NAME(m_spriteram[0]), 0x800);
-	save_pointer(NAME(m_spriteram[1]), 0x800);
+	save_pointer(NAME(m_spriteram[0].get()), 0x800);
+	save_pointer(NAME(m_spriteram[1].get()), 0x800);
 }
 
 VIDEO_START_MEMBER(combatsc_state,combatscb)
@@ -277,8 +277,8 @@ VIDEO_START_MEMBER(combatsc_state,combatscb)
 	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_textlayer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_text_info_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_spriteram[0] = auto_alloc_array_clear(machine(), UINT8, 0x800);
-	m_spriteram[1] = auto_alloc_array_clear(machine(), UINT8, 0x800);
+	m_spriteram[0] = make_unique_clear<UINT8[]>(0x800);
+	m_spriteram[1] = make_unique_clear<UINT8[]>(0x800);
 
 	m_bg_tilemap[0]->set_transparent_pen(0);
 	m_bg_tilemap[1]->set_transparent_pen(0);
@@ -287,8 +287,8 @@ VIDEO_START_MEMBER(combatsc_state,combatscb)
 	m_bg_tilemap[0]->set_scroll_rows(32);
 	m_bg_tilemap[1]->set_scroll_rows(32);
 
-	save_pointer(NAME(m_spriteram[0]), 0x800);
-	save_pointer(NAME(m_spriteram[1]), 0x800);
+	save_pointer(NAME(m_spriteram[0].get()), 0x800);
+	save_pointer(NAME(m_spriteram[1].get()), 0x800);
 }
 
 /***************************************************************************
@@ -330,9 +330,9 @@ WRITE8_MEMBER(combatsc_state::combatsc_pf_control_w)
 	if (offset == 3)
 	{
 		if (data & 0x08)
-			memcpy(m_spriteram[m_video_circuit], m_page[m_video_circuit] + 0x1000, 0x800);
+			memcpy(m_spriteram[m_video_circuit].get(), m_page[m_video_circuit] + 0x1000, 0x800);
 		else
-			memcpy(m_spriteram[m_video_circuit], m_page[m_video_circuit] + 0x1800, 0x800);
+			memcpy(m_spriteram[m_video_circuit].get(), m_page[m_video_circuit] + 0x1800, 0x800);
 	}
 }
 
@@ -406,8 +406,8 @@ UINT32 combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_ind1
 		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 1, 2);
 
 		/* we use the priority buffer so sprites are drawn front to back */
-		draw_sprites(bitmap, cliprect, m_spriteram[1], 1, screen.priority(), 0x0f00);
-		draw_sprites(bitmap, cliprect, m_spriteram[0], 0, screen.priority(), 0x4444);
+		draw_sprites(bitmap, cliprect, m_spriteram[1].get(), 1, screen.priority(), 0x0f00);
+		draw_sprites(bitmap, cliprect, m_spriteram[0].get(), 0, screen.priority(), 0x4444);
 	}
 	else
 	{
@@ -417,8 +417,8 @@ UINT32 combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_ind1
 		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 8);
 
 		/* we use the priority buffer so sprites are drawn front to back */
-		draw_sprites(bitmap, cliprect, m_spriteram[1], 1, screen.priority(), 0x0f00);
-		draw_sprites(bitmap, cliprect, m_spriteram[0], 0, screen.priority(), 0x4444);
+		draw_sprites(bitmap, cliprect, m_spriteram[1].get(), 1, screen.priority(), 0x0f00);
+		draw_sprites(bitmap, cliprect, m_spriteram[0].get(), 0, screen.priority(), 0x4444);
 	}
 
 	if (m_k007121_1->ctrlram_r(space, 1) & 0x08)

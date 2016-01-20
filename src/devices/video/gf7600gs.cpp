@@ -13,7 +13,7 @@ ADDRESS_MAP_END
 DEVICE_ADDRESS_MAP_START(map3, 32, geforce_7600gs_device)
 ADDRESS_MAP_END
 
-geforce_7600gs_device::geforce_7600gs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+geforce_7600gs_device::geforce_7600gs_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, GEFORCE_7600GS, "NVidia GeForce 7600GS", tag, owner, clock, "geforce_7600gs", __FILE__)
 {
 }

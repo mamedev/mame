@@ -23,7 +23,7 @@ etc.
 class ltcasino_state : public driver_device
 {
 public:
-	ltcasino_state(const machine_config &mconfig, device_type type, const char *tag)
+	ltcasino_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_tile_num_ram(*this, "tile_nuram"),
 		m_tile_atr_ram(*this, "tile_atr_ram"),
@@ -37,7 +37,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ltcasino_tile_atr_w);
 	DECLARE_DRIVER_INIT(mv4in1);
 	TILE_GET_INFO_MEMBER(get_ltcasino_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_ltcasino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

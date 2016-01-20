@@ -29,8 +29,8 @@ INTERRUPT_GEN_MEMBER(flkatck_state::flkatck_interrupt)
 WRITE8_MEMBER(flkatck_state::flkatck_bankswitch_w)
 {
 	/* bits 3-4: coin counters */
-	coin_counter_w(machine(), 0, data & 0x08);
-	coin_counter_w(machine(), 1, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, data & 0x08);
+	machine().bookkeeping().coin_counter_w(1, data & 0x10);
 
 	/* bits 0-1: bank # */
 	if ((data & 0x03) != 0x03)  /* for safety */

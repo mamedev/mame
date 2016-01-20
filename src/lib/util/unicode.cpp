@@ -34,7 +34,7 @@ int uchar_from_utf8(unicode_char *uchar, const char *utf8char, size_t count)
 	char auxchar;
 
 	/* validate parameters */
-	if (utf8char == NULL || count == 0)
+	if (utf8char == nullptr || count == 0)
 		return 0;
 
 	/* start with the first byte */
@@ -127,7 +127,7 @@ int uchar_from_utf16(unicode_char *uchar, const utf16_char *utf16char, size_t co
 	int rc = -1;
 
 	/* validate parameters */
-	if (utf16char == NULL || count == 0)
+	if (utf16char == nullptr || count == 0)
 		return 0;
 
 	/* handle the two-byte case */

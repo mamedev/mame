@@ -13,18 +13,18 @@
 const device_type MSX_SLOT_SONY08 = &device_creator<msx_slot_sony08_device>;
 
 
-msx_slot_sony08_device::msx_slot_sony08_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_slot_sony08_device::msx_slot_sony08_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_SLOT_SONY08, "MSX Internal SONY08", tag, owner, clock, "msx_slot_sony08", __FILE__)
 	, msx_internal_slot_interface()
 	, m_nvram(*this, "nvram")
-	, m_region(NULL)
+	, m_region(nullptr)
 	, m_region_offset(0)
-	, m_rom(NULL)
+	, m_rom(nullptr)
 {
 	for (int i = 0; i < 8; i++)
 	{
 		m_selected_bank[i] = 0;
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 	memset(m_sram, 0, sizeof(m_sram));
 }
@@ -52,14 +52,14 @@ void msx_slot_sony08_device::set_rom_start(device_t &device, const char *region,
 
 void msx_slot_sony08_device::device_start()
 {
-	assert(m_region != NULL );
+	assert(m_region != nullptr );
 
 	memory_region *m_rom_region = owner()->memregion(m_region);
 
 	// Sanity checks
-	if (m_rom_region == NULL )
+	if (m_rom_region == nullptr )
 	{
-		fatalerror("Rom slot '%s': Unable to find memory region '%s'\n", tag(), m_region);
+		fatalerror("Rom slot '%s': Unable to find memory region '%s'\n", tag().c_str(), m_region);
 	}
 	if (m_rom_region->bytes() < m_region_offset + 0x100000)
 	{
@@ -102,8 +102,8 @@ void msx_slot_sony08_device::map_bank(int bank)
 		}
 		else
 		{
-			m_bank_base[0] = NULL;
-			m_bank_base[1] = NULL;
+			m_bank_base[0] = nullptr;
+			m_bank_base[1] = nullptr;
 		}
 	}
 }
@@ -144,7 +144,7 @@ WRITE8_MEMBER(msx_slot_sony08_device::write)
 {
 	if (offset < 0x4000)
 	{
-		if (m_bank_base[0] != NULL)
+		if (m_bank_base[0] != nullptr)
 		{
 			m_sram[offset & 0x3fff] = data;
 			return;

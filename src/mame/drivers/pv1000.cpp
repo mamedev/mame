@@ -17,17 +17,17 @@ class pv1000_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pv1000_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER(voice_w);
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 
@@ -46,7 +46,7 @@ extern const device_type PV1000;
 
 const device_type PV1000 = &device_creator<pv1000_sound_device>;
 
-pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, PV1000, "NEC D65010G031", tag, owner, clock, "pv1000_sound", __FILE__),
 					device_sound_interface(mconfig, *this)
 {
@@ -142,7 +142,7 @@ void pv1000_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 class pv1000_state : public driver_device
 {
 public:
-	pv1000_state(const machine_config &mconfig, device_type type, const char *tag)
+	pv1000_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "pv1000_sound"),
@@ -173,8 +173,8 @@ public:
 	required_device<pv1000_sound_device> m_sound;
 	required_device<generic_slot_device> m_cart;
 	required_shared_ptr<UINT8> m_p_videoram;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(d65010_irq_on_cb);
 	TIMER_CALLBACK_MEMBER(d65010_irq_off_cb);

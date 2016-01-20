@@ -60,7 +60,7 @@ SLOT_INTERFACE_END
 static const z80_daisy_config kc_d004_daisy_chain[] =
 {
 	{ Z80CTC_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 static MACHINE_CONFIG_FRAGMENT(kc_d004)
@@ -89,7 +89,7 @@ static MACHINE_CONFIG_FRAGMENT(kc_d004_gide)
 	MCFG_CPU_MODIFY(Z80_TAG)
 	MCFG_CPU_IO_MAP(kc_d004_gide_io)
 
-	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", nullptr, false)
 MACHINE_CONFIG_END
 
 
@@ -128,7 +128,7 @@ const device_type KC_D004_GIDE = &device_creator<kc_d004_gide_device>;
 //  kc_d004_device - constructor
 //-------------------------------------------------
 
-kc_d004_device::kc_d004_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+kc_d004_device::kc_d004_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, KC_D004, "D004 Floppy Disk Interface", tag, owner, clock, "kc_d004", __FILE__),
 		device_kcexp_interface( mconfig, *this ),
 		m_cpu(*this, Z80_TAG),
@@ -141,7 +141,7 @@ kc_d004_device::kc_d004_device(const machine_config &mconfig, const char *tag, d
 	{
 }
 
-kc_d004_device::kc_d004_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+kc_d004_device::kc_d004_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_kcexp_interface( mconfig, *this ),
 		m_cpu(*this, Z80_TAG),
@@ -353,7 +353,7 @@ WRITE8_MEMBER(kc_d004_device::fdd_select_w)
 	else if (data & 0x08)
 		m_floppy = m_floppy3->get_device();
 	else
-		m_floppy = NULL;
+		m_floppy = nullptr;
 
 	if (m_floppy)
 		m_floppy->mon_w(0);
@@ -382,7 +382,7 @@ WRITE_LINE_MEMBER(kc_d004_device::fdc_irq)
 //  kc_d004_gide_device - constructor
 //-------------------------------------------------
 
-kc_d004_gide_device::kc_d004_gide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+kc_d004_gide_device::kc_d004_gide_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: kc_d004_device(mconfig, KC_D004, "D004 Floppy Disk + GIDE Interface", tag, owner, clock, "kc_d004gide", __FILE__),
 		m_ata(*this, ATA_TAG), m_ata_data(0), m_lh(0)
 	{
@@ -433,7 +433,7 @@ READ8_MEMBER(kc_d004_gide_device::gide_r)
 		UINT8 rtc_addr = (offset >> 8) & 0x0f;
 
 		// TODO RTC-72421
-		logerror("GIDE %s read RTC 0x%02x\n", tag(), rtc_addr);
+		logerror("GIDE %s read RTC 0x%02x\n", tag().c_str(), rtc_addr);
 		data = 0;
 	}
 	else
@@ -481,7 +481,7 @@ WRITE8_MEMBER(kc_d004_gide_device::gide_w)
 		UINT8 rtc_addr = (offset >> 8) & 0x0f;
 
 		// TODO RTC-72421
-		logerror("GIDE %s wrire RTC 0x%02x 0x%02x\n", tag(), rtc_addr, data);
+		logerror("GIDE %s wrire RTC 0x%02x 0x%02x\n", tag().c_str(), rtc_addr, data);
 	}
 	else
 	{

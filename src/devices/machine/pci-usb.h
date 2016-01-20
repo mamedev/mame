@@ -13,11 +13,11 @@
 
 class usb_uhci_device : public pci_device {
 public:
-	usb_uhci_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	usb_uhci_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	DECLARE_ADDRESS_MAP(map, 32);
@@ -25,11 +25,11 @@ private:
 
 class usb_ehci_device : public pci_device {
 public:
-	usb_ehci_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	usb_ehci_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	DECLARE_ADDRESS_MAP(map, 32);

@@ -99,7 +99,7 @@ void xxx_cpu_device::execute_set_input(int irqline, int state)
 }
 #endif
 
-xxx_cpu_device::xxx_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+xxx_cpu_device::xxx_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, XXX, "XXX", tag, owner, clock, "xxx", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 32, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 8, 32, 0)
@@ -107,7 +107,7 @@ xxx_cpu_device::xxx_cpu_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-void xxx_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void xxx_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

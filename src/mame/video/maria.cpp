@@ -58,7 +58,7 @@ const device_type ATARI_MARIA = &device_creator<atari_maria_device>;
 
 
 
-atari_maria_device::atari_maria_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atari_maria_device::atari_maria_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, ATARI_MARIA, "Atari MARIA", tag, owner, clock, "atari_maria", __FILE__)
 {
 }
@@ -93,12 +93,12 @@ void atari_maria_device::device_start()
 
 void atari_maria_device::device_reset()
 {
-	for (int i = 0; i < 32; i++)
-		m_maria_palette[i] = 0;
+	for (auto & elem : m_maria_palette)
+		elem = 0;
 
-	for (int i = 0; i < 2; i++)
+	for (auto & elem : m_line_ram)
 		for (int j = 0; j < 160; j++)
-			m_line_ram[i][j] = 0;
+			elem[j] = 0;
 
 	m_active_buffer = 0;
 

@@ -519,7 +519,8 @@ ROM_START( nkdodge )
 	ROM_LOAD( "22j5-0.33",    0x08000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* I/O mcu */
-	ROM_LOAD( "63701.bin",    0xc000, 0x4000, NO_DUMP ) /* missing */
+	/* Not hooked up yet, we need to add HD63701Y0 support to the hd63701 core (with extra io ports, serial ports, and timers). */
+	ROM_LOAD( "22ja-0.162",   0x0c000, 0x04000, CRC(7162a97b) SHA1(d6d4ee025e73a340428345f08711cd32f9169a8c) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) /* text */
 	ROM_LOAD( "tj22j4-0.121",    0x00000, 0x20000, CRC(d2922b3f) SHA1(30ad37f8355c732b545017c2fc56879256b650be) )
@@ -549,7 +550,7 @@ ROM_START( nkdodgeb )
 	ROM_LOAD( "22j5-0.33",    0x08000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* I/O mcu */
-	ROM_LOAD( "63701.bin",    0xc000, 0x4000, NO_DUMP ) /* missing */
+	ROM_LOAD( "63701.bin",    0xc000, 0x4000, NO_DUMP ) /* missing; does this bootleg board use an i/o mcu at all? */
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) /* text */
 	ROM_LOAD( "10.bin",       0x00000, 0x10000, CRC(442326fd) SHA1(e0e9e1dfdca3edd6e2522f55c191b40b81b8eaff) )

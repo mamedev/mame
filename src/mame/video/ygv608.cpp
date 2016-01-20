@@ -51,14 +51,14 @@
 
 const device_type YGV608 = &device_creator<ygv608_device>;
 
-ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+ygv608_device::ygv608_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock )
 	: device_t(mconfig, YGV608, "YGV608 VDP", tag, owner, clock, "ygv608", __FILE__),
 	m_gfxdecode(*this),
 	m_palette(*this)
 {
 }
 
-void ygv608_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void ygv608_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<ygv608_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -68,7 +68,7 @@ void ygv608_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 //  palette device
 //-------------------------------------------------
 
-void ygv608_device::static_set_palette_tag(device_t &device, const char *tag)
+void ygv608_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<ygv608_device &>(device).m_palette.set_tag(tag);
 }
@@ -562,8 +562,8 @@ void ygv608_device::device_start()
 	m_tilemap_B_cache_16[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 64,32);
 	m_tilemap_B_cache_16[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,64);
 
-	m_tilemap_A = NULL;
-	m_tilemap_B = NULL;
+	m_tilemap_A = nullptr;
+	m_tilemap_B = nullptr;
 
 	register_state_save();
 }

@@ -14,7 +14,7 @@
 class igrosoft_gamble_state : public driver_device
 {
 public:
-	igrosoft_gamble_state(const machine_config &mconfig, device_type type, const char *tag)
+	igrosoft_gamble_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_m48t35(*this, "m48t35" ),
@@ -82,9 +82,9 @@ public:
 	DECLARE_DRIVER_INIT(crzmon2ent);
 	TILE_GET_INFO_MEMBER(get_igrosoft_gamble_tile_info);
 	TILE_GET_INFO_MEMBER(get_igrosoft_gamble_reel_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_igrosoft_gamble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<timekeeper_device> m_m48t35;

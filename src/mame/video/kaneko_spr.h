@@ -31,10 +31,10 @@ class kaneko16_sprite_device : public device_t,
 								public device_video_interface
 {
 public:
-	kaneko16_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock,  device_type type);
+	kaneko16_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock,  device_type type);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
 	static void set_fliptype(device_t &device, int fliptype);
 	static void set_offsets(device_t &device, int xoffs, int yoffs);
 	static void set_priorities(device_t &device, int pri0, int pri1, int pri2, int pri3);
@@ -56,8 +56,8 @@ public:
 	DECLARE_WRITE16_MEMBER(kaneko16_sprites_regs_w);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 
 	// flip latching (set when declaring device in MCFG )  probably needs figuring out properly, only brapboys wants it?
@@ -79,9 +79,9 @@ private:
 	// registers
 	UINT16 m_sprite_flipx;
 	UINT16 m_sprite_flipy;
-	UINT16* m_sprites_regs;
+	std::unique_ptr<UINT16[]> m_sprites_regs;
 
-	struct kan_tempsprite *m_first_sprite;
+	std::unique_ptr<struct kan_tempsprite[]> m_first_sprite;
 	int m_keep_sprites;
 	bitmap_ind16 m_sprites_bitmap;
 
@@ -113,9 +113,9 @@ private:
 class kaneko_vu002_sprite_device : public kaneko16_sprite_device
 {
 public:
-	kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void get_sprite_attributes(struct kan_tempsprite *s, UINT16 attr);
-	int get_sprite_type(void){ return 0; };
+	kaneko_vu002_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	void get_sprite_attributes(struct kan_tempsprite *s, UINT16 attr) override;
+	int get_sprite_type(void) override{ return 0; };
 };
 
 extern const device_type KANEKO_VU002_SPRITE;
@@ -123,9 +123,9 @@ extern const device_type KANEKO_VU002_SPRITE;
 class kaneko_kc002_sprite_device : public kaneko16_sprite_device
 {
 public:
-	kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void get_sprite_attributes(struct kan_tempsprite *s, UINT16 attr);
-	int get_sprite_type(void){ return 1; };
+	kaneko_kc002_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	void get_sprite_attributes(struct kan_tempsprite *s, UINT16 attr) override;
+	int get_sprite_type(void) override{ return 1; };
 };
 
 extern const device_type KANEKO_KC002_SPRITE;

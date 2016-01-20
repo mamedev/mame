@@ -643,7 +643,7 @@ GFXDECODE_END
 static const z80_daisy_config super80_daisy_chain[] =
 {
 	{ "z80pio" },
-	{ NULL }
+	{ nullptr }
 };
 
 //-------------------------------------------------

@@ -1,7 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
-#define NO_MEM_TRACKING
-
 #include "deviceswindow.h"
 #include "deviceinformationwindow.h"
 
@@ -21,8 +19,8 @@ QVariant DevicesWindowModel::data(const QModelIndex &index, int role) const
 
 	device_t *dev = static_cast<device_t *>(index.internalPointer());
 	switch(index.column()) {
-	case 0: return dev == &m_machine->root_device() ? QString("<root>") : QString(dev->basetag());
-	case 1: return QString(dev->name());
+	case 0: return dev == &m_machine->root_device() ? QString("<root>") : QString(dev->basetag().c_str());
+	case 1: return QString(dev->name().c_str());
 	}
 
 	return QVariant();
@@ -128,8 +126,8 @@ DevicesWindow::DevicesWindow(running_machine* machine, QWidget* parent) :
 	m_devices_view->setModel(&m_devices_model);
 	m_devices_view->expandAll();
 	m_devices_view->resizeColumnToContents(0);
-	connect(m_devices_view->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &,const QModelIndex &)), this, SLOT(currentRowChanged(const QModelIndex &,const QModelIndex &)));
-	connect(m_devices_view, SIGNAL(activated(const QModelIndex &)), this, SLOT(activated(const QModelIndex &)));
+	connect(m_devices_view->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &DevicesWindow::currentRowChanged);
+	connect(m_devices_view, &QTreeView::activated, this, &DevicesWindow::activated);
 	setCentralWidget(m_devices_view);
 }
 

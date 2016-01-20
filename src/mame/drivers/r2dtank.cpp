@@ -52,7 +52,7 @@ RAM = 4116 (x11)
 class r2dtank_state : public driver_device
 {
 public:
-	r2dtank_state(const machine_config &mconfig, device_type type, const char *tag)
+	r2dtank_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -78,7 +78,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
 	DECLARE_WRITE8_MEMBER(pia_comp_w);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_WRITE8_MEMBER(ttl74123_output_changed);
 
 	MC6845_UPDATE_ROW(crtc_update_row);

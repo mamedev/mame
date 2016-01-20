@@ -92,7 +92,7 @@ class tms1xxx_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tms1xxx_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	tms1xxx_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_BIG, byte_bits > 8 ? 16 : 8, prgwidth, 0, program)
 		, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
@@ -105,7 +105,7 @@ public:
 		, m_pc_bits(pc_bits)
 		, m_byte_bits(byte_bits)
 		, m_x_bits(x_bits)
-		, m_output_pla_table(NULL)
+		, m_output_pla_table(nullptr)
 		, m_read_k(*this)
 		, m_write_o(*this)
 		, m_write_r(*this)
@@ -121,23 +121,24 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 6; }
-	virtual UINT32 execute_input_lines() const { return 1; }
-	virtual void execute_run();
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 6; }
+	virtual UINT32 execute_input_lines() const override { return 1; }
+	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : NULL); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : nullptr); }
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 1; }
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 1; }
 
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	// device_state_interface overrides
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	void next_pc();
 
@@ -249,158 +250,172 @@ protected:
 class tms1000_cpu_device : public tms1xxx_cpu_device
 {
 public:
-	tms1000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms1000_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
+	tms1000_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms1000_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source);
 
 protected:
 	// overrides
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 };
 
 class tms1070_cpu_device : public tms1000_cpu_device
 {
 public:
-	tms1070_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1070_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class tms1040_cpu_device : public tms1000_cpu_device
 {
 public:
-	tms1040_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1040_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms1200_cpu_device : public tms1000_cpu_device
 {
 public:
-	tms1200_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1200_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms1100_cpu_device : public tms1000_cpu_device
 {
 public:
-	tms1100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms1100_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
+	tms1100_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms1100_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source);
 
 protected:
 	// overrides
-	virtual void device_reset();
+	virtual void device_reset() override;
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual void op_setr();
-	virtual void op_rstr();
+	virtual void op_setr() override;
+	virtual void op_rstr() override;
 };
 
 class tms1170_cpu_device : public tms1100_cpu_device
 {
 public:
-	tms1170_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1170_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class tms1300_cpu_device : public tms1100_cpu_device
 {
 public:
-	tms1300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1300_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class tms1370_cpu_device : public tms1100_cpu_device
 {
 public:
-	tms1370_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1370_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms1400_cpu_device : public tms1100_cpu_device
 {
 public:
-	tms1400_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms1400_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
+	tms1400_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms1400_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source);
 
 protected:
 	// overrides
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void op_br();
-	virtual void op_call();
-	virtual void op_retn();
+	virtual void op_br() override;
+	virtual void op_call() override;
+	virtual void op_retn() override;
 
-	virtual void op_setr() { tms1xxx_cpu_device::op_setr(); } // no anomaly with MSB of X register
-	virtual void op_rstr() { tms1xxx_cpu_device::op_rstr(); } // "
+	virtual void op_setr() override { tms1xxx_cpu_device::op_setr(); } // no anomaly with MSB of X register
+	virtual void op_rstr() override { tms1xxx_cpu_device::op_rstr(); } // "
 };
 
 class tms1470_cpu_device : public tms1400_cpu_device
 {
 public:
-	tms1470_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1470_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms1600_cpu_device : public tms1400_cpu_device
 {
 public:
-	tms1600_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms1600_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
+	tms1600_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms1600_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source);
 };
 
 class tms1670_cpu_device : public tms1600_cpu_device
 {
 public:
-	tms1670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1670_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms0970_cpu_device : public tms1000_cpu_device
 {
 public:
-	tms0970_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms0970_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
+	tms0970_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms0970_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source);
 
 protected:
 	// overrides
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void write_o_output(UINT8 index);
+	virtual void write_o_output(UINT8 index) override;
 
-	virtual void op_setr();
-	virtual void op_tdo();
+	virtual void op_setr() override;
+	virtual void op_tdo() override;
+};
+
+class tms0950_cpu_device : public tms0970_cpu_device
+{
+public:
+	tms0950_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+
+protected:
+	// overrides
+	virtual void device_reset() override { tms1000_cpu_device::device_reset(); }
+	virtual machine_config_constructor device_mconfig_additions() const override;
+
+	virtual void op_rstr() override { ; } // assume it has no RSTR or CLO
+	virtual void op_clo() override { ; } // "
 };
 
 class tms1990_cpu_device : public tms0970_cpu_device
 {
 public:
-	tms1990_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1990_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms0980_cpu_device : public tms0970_cpu_device
 {
 public:
-	tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms0980_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
+	tms0980_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms0980_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source);
 
 protected:
 	// overrides
-	virtual void device_reset();
+	virtual void device_reset() override;
 
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT8 read_k_input();
-	virtual void set_cki_bus();
-	virtual void read_opcode();
+	virtual UINT8 read_k_input() override;
+	virtual void set_cki_bus() override;
+	virtual void read_opcode() override;
 
-	virtual void op_comx();
+	virtual void op_comx() override;
 
 	UINT32 decode_micro(UINT8 sel);
 };
@@ -408,24 +423,24 @@ protected:
 class tms1980_cpu_device : public tms0980_cpu_device
 {
 public:
-	tms1980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1980_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void write_o_output(UINT8 index) { tms1xxx_cpu_device::write_o_output(index); }
-	virtual UINT8 read_k_input() { return tms1xxx_cpu_device::read_k_input(); }
+	virtual void write_o_output(UINT8 index) override { tms1xxx_cpu_device::write_o_output(index); }
+	virtual UINT8 read_k_input() override { return tms1xxx_cpu_device::read_k_input(); }
 
-	virtual void op_setr() { tms1xxx_cpu_device::op_setr(); }
-	virtual void op_tdo();
+	virtual void op_setr() override { tms1xxx_cpu_device::op_setr(); }
+	virtual void op_tdo() override;
 };
 
 
 class tms0270_cpu_device : public tms0980_cpu_device
 {
 public:
-	tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms0270_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_read_ctl_callback(device_t &device, _Object object) { return downcast<tms0270_cpu_device &>(device).m_read_ctl.set_callback(object); }
@@ -434,18 +449,18 @@ public:
 
 protected:
 	// overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void write_o_output(UINT8 index) { tms1xxx_cpu_device::write_o_output(index); }
-	virtual UINT8 read_k_input();
-	virtual void dynamic_output();
+	virtual void write_o_output(UINT8 index) override { tms1xxx_cpu_device::write_o_output(index); }
+	virtual UINT8 read_k_input() override;
+	virtual void dynamic_output() override;
 
-	virtual void op_setr();
-	virtual void op_rstr();
-	virtual void op_tdo();
+	virtual void op_setr() override;
+	virtual void op_rstr() override;
+	virtual void op_tdo() override;
 
 private:
 	// state specific to interface with TMS5100
@@ -478,6 +493,7 @@ extern const device_type TMS1400;
 extern const device_type TMS1470;
 extern const device_type TMS1600;
 extern const device_type TMS1670;
+extern const device_type TMS0950;
 extern const device_type TMS0970;
 extern const device_type TMS1990;
 extern const device_type TMS0980;

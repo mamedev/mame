@@ -30,7 +30,7 @@ class isa8_ibm_mfc_device : public device_t,
 {
 public:
 	// Construction/destruction
-	isa8_ibm_mfc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_ibm_mfc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( ppi0_i_a );
 	DECLARE_WRITE8_MEMBER( ppi0_o_b );
@@ -54,13 +54,13 @@ public:
 
 protected:
 	// Device-level overrides
-	virtual void                    device_start();
-	virtual void                    device_reset();
+	virtual void                    device_start() override;
+	virtual void                    device_reset() override;
 
-	virtual machine_config_constructor  device_mconfig_additions() const;
-	virtual ioport_constructor          device_input_ports() const;
+	virtual machine_config_constructor  device_mconfig_additions() const override;
+	virtual ioport_constructor          device_input_ports() const override;
 
-	virtual const rom_entry*        device_rom_region() const;
+	virtual const rom_entry*        device_rom_region() const override;
 
 private:
 	void                            set_z80_interrupt(int src, int state);

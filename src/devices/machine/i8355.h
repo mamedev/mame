@@ -73,7 +73,7 @@ class i8355_device :    public device_t,
 {
 public:
 	// construction/destruction
-	i8355_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8355_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_in_pa_callback(device_t &device, _Object object) { return downcast<i8355_device &>(device).m_in_pa_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_pa_callback(device_t &device, _Object object) { return downcast<i8355_device &>(device).m_out_pa_cb.set_callback(object); }
@@ -84,15 +84,14 @@ public:
 	DECLARE_WRITE8_MEMBER( io_w );
 
 	DECLARE_READ8_MEMBER( memory_r );
-	DECLARE_WRITE8_MEMBER( memory_w );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	inline UINT8 read_port(int port);
 	inline void write_port(int port, UINT8 data);

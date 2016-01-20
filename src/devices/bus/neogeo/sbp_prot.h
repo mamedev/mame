@@ -17,7 +17,7 @@ class sbp_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	sbp_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sbp_prot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 
 	UINT8* m_mainrom;
@@ -27,14 +27,8 @@ public:
 	DECLARE_READ16_MEMBER(sbp_lowerrom_r);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-
-
-
-private:
-
-
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 #endif

@@ -18,16 +18,16 @@ class msx_slot_sony08_device : public device_t,
 							public msx_internal_slot_interface
 {
 public:
-	msx_slot_sony08_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_slot_sony08_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	static void set_rom_start(device_t &device, const char *region, UINT32 offset);
 
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 	void restore_banks();
 

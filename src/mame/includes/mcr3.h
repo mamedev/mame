@@ -3,7 +3,7 @@
 class mcr3_state : public mcr_state
 {
 public:
-	mcr3_state(const machine_config &mconfig, device_type type, const char *tag)
+	mcr3_state(const machine_config &mconfig, device_type type, std::string tag)
 		: mcr_state(mconfig, type, tag),
 			m_spyhunt_alpharam(*this, "spyhunt_alpha"),
 		m_screen(*this, "screen") { }
@@ -59,7 +59,6 @@ public:
 	DECLARE_DRIVER_INIT(spyhunt);
 	DECLARE_DRIVER_INIT(spyhuntpr);
 	DECLARE_DRIVER_INIT(sarge);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(mcrmono_get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(spyhunt_bg_scan);
 	TILE_GET_INFO_MEMBER(spyhunt_get_bg_tile_info);

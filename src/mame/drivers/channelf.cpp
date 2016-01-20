@@ -198,7 +198,7 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( channelf_cart )
 	/* cartridge */
-	MCFG_CHANNELF_CARTRIDGE_ADD("cartslot", cf_cart, NULL)
+	MCFG_CHANNELF_CARTRIDGE_ADD("cartslot", cf_cart, nullptr)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","channelf")

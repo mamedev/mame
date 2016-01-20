@@ -19,7 +19,7 @@
 class vcs80_state : public driver_device
 {
 public:
-	vcs80_state(const machine_config &mconfig, device_type type, const char *tag)
+	vcs80_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_pio(*this, Z80PIO_TAG),
@@ -34,7 +34,7 @@ public:
 	required_ioport m_y1;
 	required_ioport m_y2;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( pio_r );
 	DECLARE_WRITE8_MEMBER( pio_w );

@@ -31,7 +31,7 @@
 class dl1416_device : public device_t
 {
 public:
-	dl1416_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	dl1416_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	~dl1416_device() {}
 
 	template<class _Object> static devcb_base &set_update_handler(device_t &device, _Object object) { return downcast<dl1416_device &>(device).m_update.set_callback(object); }
@@ -44,8 +44,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
@@ -61,7 +61,7 @@ private:
 class dl1416b_device : public dl1416_device
 {
 public:
-	dl1416b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dl1416b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type DL1416B;
@@ -69,7 +69,7 @@ extern const device_type DL1416B;
 class dl1416t_device : public dl1416_device
 {
 public:
-	dl1416t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dl1416t_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type DL1416T;

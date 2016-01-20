@@ -164,10 +164,10 @@ DEVICE_ADDRESS_MAP_START(submap, 16, aw_rom_board)
 	AM_RANGE(0x40, 0x41) AM_READWRITE(pio_r, pio_w)
 ADDRESS_MAP_END
 
-aw_rom_board::aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+aw_rom_board::aw_rom_board(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: naomi_g1_device(mconfig, AW_ROM_BOARD, "Sammy Atomiswave ROM Board", tag, owner, clock, "aw_rom_board", __FILE__)
 {
-	keyregion = 0;
+	keyregion = nullptr;
 }
 
 void aw_rom_board::static_set_keyregion(device_t &device, const char *_keyregion)
@@ -256,7 +256,7 @@ UINT16 aw_rom_board::decrypt(UINT16 cipherText, UINT32 address, const UINT32 key
 void aw_rom_board::set_key()
 {
 	if(!m_region)
-		throw emu_fatalerror("AW-ROM-BOARD: region %s is missing\n", tag());
+		throw emu_fatalerror("AW-ROM-BOARD: region %s is missing\n", tag().c_str());
 
 	if(!keyregion)
 		return;
@@ -307,7 +307,6 @@ READ16_MEMBER(aw_rom_board::pio_r)
 	if (roffset >= (mpr_offset / 2))
 		roffset += mpr_bank * 0x4000000;
 	UINT16 retval = (m_region->bytes() > roffset) ? m_region->u16(roffset) : 0;
-	epr_offset++;
 	return retval;
 }
 
@@ -316,7 +315,6 @@ WRITE16_MEMBER(aw_rom_board::pio_w)
 	// write to ROM board address space, including FlashROM programming using CFI (TODO)
 	if (epr_offset == 0x7fffff)
 		mpr_bank = data & 3;
-	epr_offset++;
 }
 
 WRITE16_MEMBER(aw_rom_board::epr_offsetl_w)
@@ -389,7 +387,7 @@ void aw_rom_board::dma_get_position(UINT8 *&base, UINT32 &limit, bool to_mainram
 {
 	if(!to_mainram) {
 		limit = 0;
-		base = 0;
+		base = nullptr;
 		return;
 	}
 

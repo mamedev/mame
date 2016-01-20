@@ -48,7 +48,7 @@
 class ipc_state : public driver_device
 {
 public:
-	ipc_state(const machine_config &mconfig, device_type type, const char *tag)
+	ipc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG)
@@ -62,7 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 *m_ram;
 	UINT8 m_term_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 READ8_MEMBER( ipc_state::ipc_f4_r )

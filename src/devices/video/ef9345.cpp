@@ -39,7 +39,7 @@ ADDRESS_MAP_END
 
 const address_space_config *ef9345_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 //**************************************************************************
@@ -96,11 +96,11 @@ inline void ef9345_device::inc_y(UINT8 r)
 //  ef9345_device - constructor
 //-------------------------------------------------
 
-ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ef9345_device::ef9345_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, EF9345, "EF9345", tag, owner, clock, "ef9345", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(ef9345)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(ef9345)),
 	m_palette(*this)
 {
 }
@@ -110,7 +110,7 @@ ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, dev
 //  palette device
 //-------------------------------------------------
 
-void ef9345_device::static_set_palette_tag(device_t &device, const char *tag)
+void ef9345_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<ef9345_device &>(device).m_palette.set_tag(tag);
 }

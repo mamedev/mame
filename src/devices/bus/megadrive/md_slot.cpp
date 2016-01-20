@@ -65,7 +65,7 @@ const device_type COPERA_CART_SLOT = &device_creator<copera_cart_slot_device>;
 
 device_md_cart_interface::device_md_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device), m_nvram_start(0), m_nvram_end(0), m_nvram_active(0), m_nvram_readonly(0), m_nvram_handlers_installed(0),
-		m_rom(NULL),
+		m_rom(nullptr),
 		m_rom_size(0)
 {
 }
@@ -83,9 +83,9 @@ device_md_cart_interface::~device_md_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_md_cart_interface::rom_alloc(size_t size, const char *tag)
+void device_md_cart_interface::rom_alloc(size_t size, std::string tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = (UINT16 *)device().machine().memory().region_alloc(std::string(tag).append(MDSLOT_ROM_REGION_TAG).c_str(), size, 2, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
@@ -160,7 +160,7 @@ UINT32 device_md_cart_interface::get_padded_size(UINT32 size)
 //-------------------------------------------------
 //  base_md_cart_slot_device - constructor
 //-------------------------------------------------
-base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 						device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -169,17 +169,17 @@ base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig
 {
 }
 
-md_cart_slot_device::md_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+md_cart_slot_device::md_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						base_md_cart_slot_device(mconfig, MD_CART_SLOT, "MD Cartridge Slot", tag, owner, clock, "md_cart_slot", __FILE__)
 {
 }
 
-pico_cart_slot_device::pico_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pico_cart_slot_device::pico_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						base_md_cart_slot_device(mconfig, PICO_CART_SLOT, "Pico Cartridge Slot", tag, owner, clock, "pico_cart_slot", __FILE__)
 {
 }
 
-copera_cart_slot_device::copera_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+copera_cart_slot_device::copera_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						base_md_cart_slot_device(mconfig, COPERA_CART_SLOT, "Copera Cartridge Slot", tag, owner, clock, "copera_cart_slot", __FILE__)
 {
 }
@@ -289,10 +289,10 @@ static const md_slot slot_list[] =
 
 static int md_get_pcb_id(const char *slot)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(slot_list[i].slot_option, slot))
-			return slot_list[i].pcb_id;
+		if (!core_stricmp(elem.slot_option, slot))
+			return elem.pcb_id;
 	}
 
 	return SEGA_STD;
@@ -300,10 +300,10 @@ static int md_get_pcb_id(const char *slot)
 
 static const char *md_get_slot(int type)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (slot_list[i].pcb_id == type)
-			return slot_list[i].slot_option;
+		if (elem.pcb_id == type)
+			return elem.slot_option;
 	}
 
 	return "rom";
@@ -329,7 +329,7 @@ bool base_md_cart_slot_device::call_load()
 		// STEP 1: load the file image and keep a copy for later banking
 		// STEP 2: identify the cart type
 		// The two steps are carried out differently if we are loading from a list or not
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 			res = load_nonlist();
 		else
 			res = load_list();
@@ -378,7 +378,7 @@ int base_md_cart_slot_device::load_list()
 	if (length > get_software_region_length("rom"))
 		memset(ROM + get_software_region_length("rom")/2, 0xffff, (length - get_software_region_length("rom"))/2);
 
-	if ((slot_name = get_feature("slot")) == NULL)
+	if ((slot_name = get_feature("slot")) == nullptr)
 		m_type = SEGA_STD;
 	else
 		m_type = md_get_pcb_id(slot_name);
@@ -677,7 +677,7 @@ void base_md_cart_slot_device::setup_nvram()
 
 bool base_md_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 	return TRUE;
 }
 
@@ -900,11 +900,11 @@ int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
  get default card software
  -------------------------------------------------*/
 
-void base_md_cart_slot_device::get_default_card_software(std::string &result)
+std::string base_md_cart_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "rom";
+		const char *slot_string;
 		UINT32 len = core_fsize(m_file), offset = 0;
 		dynamic_buffer rom(len);
 		int type;
@@ -919,10 +919,10 @@ void base_md_cart_slot_device::get_default_card_software(std::string &result)
 
 		clear();
 
-		result.assign(slot_string);
+		return std::string(slot_string);
 	}
 	else
-		software_get_default_slot(result, "rom");
+		return software_get_default_slot("rom");
 }
 
 
@@ -995,7 +995,7 @@ void base_md_cart_slot_device::file_logging(UINT8 *ROM8, UINT32 rom_len, UINT32 
 	logerror("FILE DETAILS\n");
 	logerror("============\n");
 	logerror("Name: %s\n", basename());
-	logerror("File Size: 0x%08x\n", (software_entry() == NULL) ? (int)length() : (int)get_software_region_length("rom"));
+	logerror("File Size: 0x%08x\n", (software_entry() == nullptr) ? (int)length() : (int)get_software_region_length("rom"));
 	logerror("Detected type: %s\n", md_get_slot(m_type));
 	logerror("ROM (Allocated) Size: 0x%X\n", rom_len);
 	logerror("NVRAM: %s\n", nvram_len ? "Yes" : "No");

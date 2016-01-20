@@ -31,7 +31,7 @@ WRITE8_MEMBER( xxx_state::kbd_put )
 ***************************************************************************/
 
 
-generic_keyboard_device::generic_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+generic_keyboard_device::generic_keyboard_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_io_kbd0(*this, "TERM_LINE0"),
 	m_io_kbd1(*this, "TERM_LINE1"),
@@ -43,15 +43,15 @@ generic_keyboard_device::generic_keyboard_device(const machine_config &mconfig, 
 	m_io_kbd7(*this, "TERM_LINE7"),
 	m_io_kbd8(*this, "TERM_LINE8"),
 	m_io_kbd9(*this, "TERM_LINE9"),
-	m_io_kbdc(*this, "TERM_LINEC"), 
-	m_timer(NULL), 
-	m_last_code(0), 
+	m_io_kbdc(*this, "TERM_LINEC"),
+	m_timer(nullptr),
+	m_last_code(0),
 	m_scan_line(0),
 	m_keyboard_cb(*this)
 {
 }
 
-generic_keyboard_device::generic_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+generic_keyboard_device::generic_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GENERIC_KEYBOARD, "Generic Keyboard", tag, owner, clock, "generic_keyboard", __FILE__),
 	m_io_kbd0(*this, "TERM_LINE0"),
 	m_io_kbd1(*this, "TERM_LINE1"),
@@ -64,7 +64,7 @@ generic_keyboard_device::generic_keyboard_device(const machine_config &mconfig, 
 	m_io_kbd8(*this, "TERM_LINE8"),
 	m_io_kbd9(*this, "TERM_LINE9"),
 	m_io_kbdc(*this, "TERM_LINEC"),
-	m_timer(NULL),
+	m_timer(nullptr),
 	m_last_code(0),
 	m_scan_line(0),
 	m_keyboard_cb(*this)

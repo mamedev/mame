@@ -36,7 +36,7 @@ should be 312, but 312 = 39*8 so it doesn't look right because a divider by 39 i
 
 const device_type SP0250 = &device_creator<sp0250_device>;
 
-sp0250_device::sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sp0250_device::sp0250_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SP0250, "SP0250", tag, owner, clock, "sp0250", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_amp(0),
@@ -46,22 +46,22 @@ sp0250_device::sp0250_device(const machine_config &mconfig, const char *tag, dev
 		m_rcount(0),
 		m_playing(0),
 		m_RNG(0),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_voiced(0),
 		m_fifo_pos(0),
 		m_drq(*this)
 {
-	for (int i = 0; i < 15; i++)
+	for (auto & elem : m_fifo)
 	{
-		m_fifo[i] = 0;
+		elem = 0;
 	}
 
-	for (int i = 0; i < 6; i++)
+	for (auto & elem : m_filter)
 	{
-		m_filter[i].F = 0;
-		m_filter[i].B = 0;
-		m_filter[i].z1 = 0;
-		m_filter[i].z2 = 0;
+		elem.F = 0;
+		elem.B = 0;
+		elem.z1 = 0;
+		elem.z2 = 0;
 	}
 }
 

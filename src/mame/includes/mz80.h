@@ -20,7 +20,7 @@
 class mz80_state : public driver_device
 {
 public:
-	mz80_state(const machine_config &mconfig, device_type type, const char *tag)
+	mz80_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pit(*this, "pit8253"),
@@ -53,8 +53,8 @@ public:
 	const UINT8 *m_p_chargen;
 	required_shared_ptr<UINT8> m_p_videoram;
 	DECLARE_DRIVER_INIT(mz80k);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_mz80k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mz80kj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mz80a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

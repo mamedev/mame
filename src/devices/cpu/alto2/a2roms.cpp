@@ -50,7 +50,7 @@ static UINT32 log2_u32(UINT32 val)
  */
 static UINT32 map_lines(const UINT8 *map, int lines, UINT32 val)
 {
-	if (NULL == map)
+	if (nullptr == map)
 		return val;
 
 	UINT32 res = 0;
@@ -105,7 +105,7 @@ static void write_type_and_xor(void *base, int type, UINT32 addr, UINT32 dand, U
  */
 UINT8* prom_load(running_machine& machine, const prom_load_t* prom, const UINT8* src, int pages, int segments)
 {
-	void* array = 0;
+	void* array = nullptr;
 	size_t type = prom->type;
 	size_t size = prom->size;
 #if DEBUG_PROM_LOAD

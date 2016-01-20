@@ -139,7 +139,7 @@
 	NSScrollView		*contentScroll;
 
 	if (!(self = [super initWithMachine:m
-								  title:[NSString stringWithFormat:@"Device %s", d.tag()]
+								  title:[NSString stringWithFormat:@"Device %s", d.tag().c_str()]
 								console:c]))
 	{
 		return nil;
@@ -153,15 +153,15 @@
 	// add the stuff that's always present
 	[self addLabel:@"Tag:"
 		 withWidth:100
-		  andField:[NSString stringWithUTF8String:device->tag()]
+		  andField:[NSString stringWithUTF8String:device->tag().c_str()]
 			toView:contentView];
 	[self addLabel:@"Name:"
 		 withWidth:100
-		  andField:[NSString stringWithUTF8String:device->name()]
+		  andField:[NSString stringWithUTF8String:device->name().c_str()]
 			toView:contentView];
 	[self addLabel:@"Shortname:"
 		 withWidth:100
-		  andField:[NSString stringWithUTF8String:device->shortname()]
+		  andField:[NSString stringWithUTF8String:device->shortname().c_str()]
 			toView:contentView];
 
 	// add interfaces if present

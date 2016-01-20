@@ -8,12 +8,12 @@ class k037122_device : public device_t,
 						public device_video_interface
 {
 public:
-	k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k037122_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~k037122_device() {}
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 	static void static_set_gfx_index(device_t &device, int index) { downcast<k037122_device &>(device).m_gfx_index = index; }
 
 	void tile_draw( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
@@ -26,16 +26,16 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
 	tilemap_t     *m_layer[2];
 
-	UINT32 *       m_tile_ram;
-	UINT32 *       m_char_ram;
-	UINT32 *       m_reg;
+	std::unique_ptr<UINT32[]>       m_tile_ram;
+	std::unique_ptr<UINT32[]>       m_char_ram;
+	std::unique_ptr<UINT32[]>       m_reg;
 
 	int            m_gfx_index;
 	required_device<gfxdecode_device> m_gfxdecode;

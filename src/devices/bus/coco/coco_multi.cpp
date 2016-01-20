@@ -104,15 +104,15 @@ WRITE_LINE_MEMBER(coco_multipak_device::multi_halt_w)
 }
 
 static MACHINE_CONFIG_FRAGMENT(coco_multi)
-	MCFG_COCO_CARTRIDGE_ADD(SLOT1_TAG, coco_cart_slot1_3, NULL)
+	MCFG_COCO_CARTRIDGE_ADD(SLOT1_TAG, coco_cart_slot1_3, nullptr)
 	MCFG_COCO_CARTRIDGE_CART_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_cart_w))
 	MCFG_COCO_CARTRIDGE_NMI_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_nmi_w))
 	MCFG_COCO_CARTRIDGE_HALT_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_halt_w))
-	MCFG_COCO_CARTRIDGE_ADD(SLOT2_TAG, coco_cart_slot1_3, NULL)
+	MCFG_COCO_CARTRIDGE_ADD(SLOT2_TAG, coco_cart_slot1_3, nullptr)
 	MCFG_COCO_CARTRIDGE_CART_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_cart_w))
 	MCFG_COCO_CARTRIDGE_NMI_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_nmi_w))
 	MCFG_COCO_CARTRIDGE_HALT_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_halt_w))
-	MCFG_COCO_CARTRIDGE_ADD(SLOT3_TAG, coco_cart_slot1_3, NULL)
+	MCFG_COCO_CARTRIDGE_ADD(SLOT3_TAG, coco_cart_slot1_3, nullptr)
 	MCFG_COCO_CARTRIDGE_CART_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_cart_w))
 	MCFG_COCO_CARTRIDGE_NMI_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_nmi_w))
 	MCFG_COCO_CARTRIDGE_HALT_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_halt_w))
@@ -138,7 +138,7 @@ const device_type COCO_MULTIPAK = &device_creator<coco_multipak_device>;
 //  coco_multipak_device - constructor
 //-------------------------------------------------
 
-coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+coco_multipak_device::coco_multipak_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, COCO_MULTIPAK, "CoCo Multi-Pak Interface", tag, owner, clock, "coco_multipak", __FILE__),
 		device_cococart_interface( mconfig, *this ), m_owner(nullptr), m_select(0)
 	{

@@ -30,7 +30,7 @@ imgtool_library *imgtool_library_create(void)
 	object_pool *pool;
 
 	/* create a memory pool */
-	pool = pool_alloc_lib(NULL);
+	pool = pool_alloc_lib(nullptr);
 	if (!pool)
 		goto error;
 
@@ -48,7 +48,7 @@ imgtool_library *imgtool_library_create(void)
 error:
 	if (pool)
 		pool_free_lib(pool);
-	return NULL;
+	return nullptr;
 }
 
 
@@ -162,12 +162,12 @@ const imgtool_module *imgtool_library_unlink(imgtool_library *library,
 			next = m->next ? &m->next->previous : &library->last;
 			*previous = m->next;
 			*next = m->previous;
-			m->previous = NULL;
-			m->next = NULL;
+			m->previous = nullptr;
+			m->next = nullptr;
 			return m;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -278,5 +278,5 @@ char *imgtool_library_strdup(imgtool_library *library, const char *s)
 
 char *imgtool_library_strdup_allow_null(imgtool_library *library, const char *s)
 {
-	return s ? imgtool_library_strdup(library, s) : NULL;
+	return s ? imgtool_library_strdup(library, s) : nullptr;
 }

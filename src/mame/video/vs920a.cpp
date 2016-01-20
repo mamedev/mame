@@ -32,9 +32,9 @@ t=tile, p=palette
 
 const device_type VS920A = &device_creator<vs920a_text_tilemap_device>;
 
-vs920a_text_tilemap_device::vs920a_text_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vs920a_text_tilemap_device::vs920a_text_tilemap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VS920A, "VS920A Text Tilemap", tag, owner, clock, "vs920a", __FILE__),
-	m_vram(NULL),
+	m_vram(nullptr),
 	m_pal_base(0),
 	m_gfx_region(0),
 	m_gfxdecode(*this)
@@ -48,8 +48,8 @@ void vs920a_text_tilemap_device::device_start()
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_vram = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x1000/2);
-	save_pointer(NAME(m_vram), 0x1000/2);
+	m_vram = make_unique_clear<UINT16[]>(0x1000/2);
+	save_pointer(NAME(m_vram.get()), 0x1000/2);
 	save_item(NAME(m_pal_base));
 
 
@@ -68,7 +68,7 @@ void vs920a_text_tilemap_device::set_gfx_region(device_t &device, int gfxregion)
 	dev.m_gfx_region = gfxregion;
 }
 
-void vs920a_text_tilemap_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void vs920a_text_tilemap_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<vs920a_text_tilemap_device &>(device).m_gfxdecode.set_tag(tag);
 }

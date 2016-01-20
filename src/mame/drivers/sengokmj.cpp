@@ -64,7 +64,7 @@ RSSENGO2.72   chr.
 class sengokmj_state : public driver_device
 {
 public:
-	sengokmj_state(const machine_config &mconfig, device_type type, const char *tag)
+	sengokmj_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -113,8 +113,8 @@ public:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -371,9 +371,9 @@ WRITE16_MEMBER(sengokmj_state::out_w)
 	/* ---- ---- ---- -x-- Coin counter (done AFTER you press start)*/
 	/* ---- ---- ---- --x- Cash enable (lockout)*/
 	/* ---- ---- ---- ---x Hopper 10 */
-	coin_lockout_w(machine(), 0,~data & 2);
-	coin_lockout_w(machine(), 1,~data & 2);
-	coin_counter_w(machine(), 0,data & 4);
+	machine().bookkeeping().coin_lockout_w(0,~data & 2);
+	machine().bookkeeping().coin_lockout_w(1,~data & 2);
+	machine().bookkeeping().coin_counter_w(0,data & 4);
 	m_hopper_io = ((data & 1)<<6);
 //  popmessage("%02x",m_hopper_io);
 }
@@ -612,7 +612,7 @@ ROM_START( sengokmj )
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "mah1-2-1.013", 0x000000, 0x08000, CRC(6a4f31b8) SHA1(5e1d7ed299c1fd65c7a43faa02831220f4251733) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0,     0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000,     0x018000, 0x08000 )
 
 	ROM_REGION( 0x100000, "spr_gfx", 0 ) /*Sprites gfx rom*/
 	ROM_LOAD( "rssengo2.72", 0x00000, 0x100000, CRC(fb215ff8) SHA1(f98c0a53ad9b97d209dd1f85c994fc17ec585bd7) )

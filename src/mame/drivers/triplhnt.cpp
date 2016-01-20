@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 /***************************************************************************
 
@@ -60,10 +60,10 @@ void triplhnt_state::triplhnt_update_misc(address_space &space, int offset)
 	m_sprite_zoom = (m_misc_flags >> 4) & 1;
 	m_sprite_bank = (m_misc_flags >> 7) & 1;
 
-	set_led_status(machine(), 0, m_misc_flags & 0x02);
+	output().set_led_value(0, m_misc_flags & 0x02);
 
-	coin_lockout_w(machine(), 0, !(m_misc_flags & 0x08));
-	coin_lockout_w(machine(), 1, !(m_misc_flags & 0x08));
+	machine().bookkeeping().coin_lockout_w(0, !(m_misc_flags & 0x08));
+	machine().bookkeeping().coin_lockout_w(1, !(m_misc_flags & 0x08));
 
 	m_discrete->write(space, TRIPLHNT_SCREECH_EN, m_misc_flags & 0x04); // screech
 	m_discrete->write(space, TRIPLHNT_LAMP_EN, m_misc_flags & 0x02);    // Lamp is used to reset noise

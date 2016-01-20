@@ -17,7 +17,7 @@
 class cninja_state : public driver_device
 {
 public:
-	cninja_state(const machine_config &mconfig, device_type type, const char *tag)
+	cninja_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -82,8 +82,8 @@ public:
 	DECLARE_DRIVER_INIT(stoneage);
 	DECLARE_DRIVER_INIT(mutantf);
 	DECLARE_DRIVER_INIT(cninja);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(stoneage);
 	DECLARE_VIDEO_START(mutantf);
 	UINT32 screen_update_cninja(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

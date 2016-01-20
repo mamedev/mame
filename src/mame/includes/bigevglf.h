@@ -5,7 +5,7 @@
 class bigevglf_state : public driver_device
 {
 public:
-	bigevglf_state(const machine_config &mconfig, device_type type, const char *tag)
+	bigevglf_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_paletteram(*this, "paletteram"),
 		m_spriteram1(*this, "spriteram1"),
@@ -25,7 +25,7 @@ public:
 
 	/* video-related */
 	bitmap_ind16 m_tmp_bitmap[4];
-	UINT8    *m_vidram;
+	std::unique_ptr<UINT8[]>    m_vidram;
 	UINT32   m_vidram_bank;
 	UINT32   m_plane_selected;
 	UINT32   m_plane_visible;
@@ -96,9 +96,9 @@ public:
 	DECLARE_WRITE8_MEMBER(bigevglf_vidram_w);
 	DECLARE_READ8_MEMBER(bigevglf_vidram_r);
 	DECLARE_DRIVER_INIT(bigevglf);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_bigevglf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(from_sound_latch_callback);
 	TIMER_CALLBACK_MEMBER(nmi_callback);

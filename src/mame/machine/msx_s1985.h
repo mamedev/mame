@@ -17,12 +17,12 @@ extern const device_type MSX_S1985;
 class msx_s1985_device : public msx_switched_device
 {
 public:
-	msx_s1985_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_s1985_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual UINT8 get_id();
+	virtual UINT8 get_id() override;
 
-	virtual DECLARE_READ8_MEMBER(io_read);
-	virtual DECLARE_WRITE8_MEMBER(io_write);
+	virtual DECLARE_READ8_MEMBER(io_read) override;
+	virtual DECLARE_WRITE8_MEMBER(io_write) override;
 
 private:
 	UINT8 m_6_1;

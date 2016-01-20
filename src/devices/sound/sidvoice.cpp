@@ -23,7 +23,7 @@ static const UINT8* waveform70;
 	static UINT8 noiseTableLSB[1<<8];
 #endif
 
-static INT8* ampMod1x8;
+static std::unique_ptr<INT8[]> ampMod1x8;
 
 static const UINT32 noiseSeed = 0x7ffff8;
 
@@ -35,7 +35,7 @@ void sidInitMixerEngine(running_machine &machine)
 	/* 8-bit volume modulation tables. */
 	float filterAmpl = 0.7f;
 
-	ampMod1x8=auto_alloc_array(machine, INT8, 256*256);
+	ampMod1x8=std::make_unique<INT8[]>(256*256);
 
 	uk = 0;
 	for ( si = 0; si < 256; si++ )
@@ -48,7 +48,7 @@ void sidInitMixerEngine(running_machine &machine)
 
 }
 
-INLINE void waveAdvance(sidOperator* pVoice)
+static inline void waveAdvance(sidOperator* pVoice)
 {
 #if defined(DIRECT_FIXPOINT)
 	pVoice->waveStep.l += pVoice->waveStepAdd.l;
@@ -62,7 +62,7 @@ INLINE void waveAdvance(sidOperator* pVoice)
 #endif
 }
 
-INLINE void noiseAdvance(sidOperator* pVoice)
+static inline void noiseAdvance(sidOperator* pVoice)
 {
 	pVoice->noiseStep += pVoice->noiseStepAdd;
 	if (pVoice->noiseStep >= (1L<<20))
@@ -90,7 +90,7 @@ INLINE void noiseAdvance(sidOperator* pVoice)
 	}
 }
 
-INLINE void noiseAdvanceHp(sidOperator* pVoice)
+static inline void noiseAdvanceHp(sidOperator* pVoice)
 {
 	UINT32 tmp = pVoice->noiseStepAdd;
 	while (tmp >= (1L<<20))
@@ -274,7 +274,7 @@ static void sidMode74(sidOperator* pVoice)  {
 /* */
 /* */
 
-INLINE void waveCalcCycleLen(sidOperator* pVoice)
+static inline void waveCalcCycleLen(sidOperator* pVoice)
 {
 #if defined(DIRECT_FIXPOINT)
 	pVoice->cycleAddLen.w[HI] = 0;
@@ -300,9 +300,9 @@ INLINE void waveCalcCycleLen(sidOperator* pVoice)
 /*  else */
 	{
 #if defined(DIRECT_FIXPOINT)
-		register UINT16 diff = pVoice->cycleLenCount - pVoice->cycleLen.w[HI];
+		UINT16 diff = pVoice->cycleLenCount - pVoice->cycleLen.w[HI];
 #else
-		register UINT16 diff = pVoice->cycleLenCount - pVoice->cycleLen;
+		UINT16 diff = pVoice->cycleLenCount - pVoice->cycleLen;
 #endif
 		if ( pVoice->wavePre[diff].len != pVoice->cycleLenCount )
 		{
@@ -326,7 +326,7 @@ INLINE void waveCalcCycleLen(sidOperator* pVoice)
 	}  /* see above (opening bracket) */
 }
 
-INLINE void waveCalcFilter(sidOperator* pVoice)
+static inline void waveCalcFilter(sidOperator* pVoice)
 {
 	if ( pVoice->filtEnabled )
 	{

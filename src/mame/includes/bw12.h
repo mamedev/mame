@@ -38,7 +38,7 @@
 class bw12_state : public driver_device
 {
 public:
-	bw12_state(const machine_config &mconfig, device_type type, const char *tag)
+	bw12_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_pia(*this, PIA6821_TAG),
@@ -77,8 +77,8 @@ public:
 	required_shared_ptr<UINT8> m_video_ram;
 	required_ioport m_modifiers;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void bankswitch();
 	void floppy_motor_off();

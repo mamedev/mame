@@ -42,8 +42,8 @@ class i8251_device :  public device_t,
 {
 public:
 	// construction/destruction
-	i8251_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
-	i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8251_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname);
+	i8251_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_txd_handler.set_callback(object); }
@@ -83,25 +83,25 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void update_rx_ready();
 	void update_tx_ready();
 	void update_tx_empty();
 	void transmit_clock();
 	void receive_clock();
-        bool is_tx_enabled(void) const;
-        void check_for_tx_start(void);
-        void start_tx(void);
+		bool is_tx_enabled(void) const;
+		void check_for_tx_start(void);
+		void start_tx(void);
 
 
 	enum
 	{
 		I8251_EXPECTING_MODE = 0x01,
 		I8251_EXPECTING_SYNC_BYTE = 0x02,
-                I8251_DELAYED_TX_EN = 0x04
+				I8251_DELAYED_TX_EN = 0x04
 	};
 
 private:
@@ -138,7 +138,7 @@ private:
 
 	/* data being received */
 	UINT8 m_rx_data;
-        /* tx buffer */
+		/* tx buffer */
 	UINT8 m_tx_data;
 };
 
@@ -146,7 +146,7 @@ class v53_scu_device :  public i8251_device
 {
 public:
 	// construction/destruction
-	v53_scu_device(const machine_config &mconfig,  const char *tag, device_t *owner, UINT32 clock);
+	v53_scu_device(const machine_config &mconfig,  std::string tag, device_t *owner, UINT32 clock);
 };
 
 

@@ -146,13 +146,13 @@ WRITE8_MEMBER(videopin_state::led_w)
 		{ "LED19", "LED14", "LED12", "-" }
 	};
 
-	output_set_value(matrix[i][0], (data >> 0) & 1);
-	output_set_value(matrix[i][1], (data >> 1) & 1);
-	output_set_value(matrix[i][2], (data >> 2) & 1);
-	output_set_value(matrix[i][3], (data >> 3) & 1);
+	output().set_value(matrix[i][0], (data >> 0) & 1);
+	output().set_value(matrix[i][1], (data >> 1) & 1);
+	output().set_value(matrix[i][2], (data >> 2) & 1);
+	output().set_value(matrix[i][3], (data >> 3) & 1);
 
 	if (i == 7)
-		set_led_status(machine(), 0, data & 8);   /* start button */
+		output().set_led_value(0, data & 8);   /* start button */
 
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -174,7 +174,7 @@ WRITE8_MEMBER(videopin_state::out1_w)
 	if (m_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
-	coin_lockout_global_w(machine(), ~data & 0x08);
+	machine().bookkeeping().coin_lockout_global_w(~data & 0x08);
 
 	/* Convert octave data to divide value and write to sound */
 	m_discrete->write(space, VIDEOPIN_OCTAVE_DATA, (0x01 << (~data & 0x07)) & 0xfe);
@@ -192,7 +192,7 @@ WRITE8_MEMBER(videopin_state::out2_w)
 	/* D6 => BELL      */
 	/* D7 => ATTRACT   */
 
-	coin_counter_w(machine(), 0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 
 	m_discrete->write(space, VIDEOPIN_BELL_EN, data & 0x40); // Bell
 	m_discrete->write(space, VIDEOPIN_BONG_EN, data & 0x20); // Bong

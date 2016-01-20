@@ -27,7 +27,7 @@
 class icatel_state : public driver_device
 {
 public:
-	icatel_state(const machine_config &mconfig, device_type type, const char *tag)
+	icatel_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_lcdc(*this, "hd44780")
@@ -57,8 +57,8 @@ public:
 	DECLARE_PALETTE_INIT(icatel);
 
 private:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 };

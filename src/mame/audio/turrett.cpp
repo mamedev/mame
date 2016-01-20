@@ -15,11 +15,11 @@
 //  turrett_device - constructor
 //-------------------------------------------------
 
-turrett_device::turrett_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+turrett_device::turrett_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TURRETT, "Turret Tower Sound", tag, owner, clock, "ttsnd", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
-		m_space_config("ttsound", ENDIANNESS_LITTLE, 16, 28, 0, NULL)
+		m_space_config("ttsound", ENDIANNESS_LITTLE, 16, 28, 0, nullptr)
 {
 }
 
@@ -30,7 +30,7 @@ turrett_device::turrett_device(const machine_config &mconfig, const char *tag, d
 
 const address_space_config *turrett_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 
@@ -69,8 +69,8 @@ void turrett_device::device_start()
 
 void turrett_device::device_reset()
 {
-	for (int ch = 0; ch < SOUND_CHANNELS; ++ch)
-		m_channels[ch].m_playing = false;
+	for (auto & elem : m_channels)
+		elem.m_playing = false;
 }
 
 

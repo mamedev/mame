@@ -5,7 +5,7 @@
 class oneshot_state : public driver_device
 {
 public:
-	oneshot_state(const machine_config &mconfig, device_type type, const char *tag)
+	oneshot_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_sprites(*this, "sprites"),
 		m_bg_videoram(*this, "bg_videoram"),
@@ -52,9 +52,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_oneshot_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_oneshot_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_oneshot_fg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_oneshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_maddonna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_crosshairs( bitmap_ind16 &bitmap, const rectangle &cliprect );

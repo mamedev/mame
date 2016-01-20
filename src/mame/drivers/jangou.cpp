@@ -40,7 +40,7 @@ $c088-$c095 player tiles
 class jangou_state : public driver_device
 {
 public:
-	jangou_state(const machine_config &mconfig, device_type type, const char *tag)
+	jangou_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_cpu_0(*this, "cpu0"),
 		m_cpu_1(*this, "cpu1"),
@@ -92,9 +92,9 @@ public:
 	DECLARE_READ8_MEMBER(input_system_r);
 	DECLARE_DRIVER_INIT(jngolady);
 	DECLARE_DRIVER_INIT(luckygrl);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jangou);
 	DECLARE_MACHINE_START(jngolady);
 	DECLARE_MACHINE_RESET(jngolady);
@@ -127,7 +127,7 @@ PALETTE_INIT_MEMBER(jangou_state, jangou)
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 0,
 			2, resistances_b,  weights_b,  0, 0,
-			0, 0, 0, 0, 0);
+			0, nullptr, nullptr, 0, 0);
 
 	for (i = 0;i < palette.entries(); i++)
 	{
@@ -290,9 +290,9 @@ WRITE8_MEMBER(jangou_state::output_w)
 	---- ---x coin counter
 	*/
 //  printf("%02x\n", data);
-	coin_counter_w(machine(), 0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 //  flip_screen_set(data & 0x04);
-//  coin_lockout_w(machine(), 0, ~data & 0x20);
+//  machine().bookkeeping().coin_lockout_w(0, ~data & 0x20);
 }
 
 READ8_MEMBER(jangou_state::input_mux_r)

@@ -23,7 +23,7 @@ const device_type SEGA8_ROM_CARDCATCH = &device_creator<sega8_cardcatch_device>;
 
 
 
-sega8_cardcatch_device::sega8_cardcatch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega8_cardcatch_device::sega8_cardcatch_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: sega8_rom_device(mconfig, SEGA8_ROM_CARDCATCH, "SG-1000 Card Catcher Cart", tag, owner, clock, "sega8_ccatch", __FILE__),
 						m_card(*this, "cardslot")
 {
@@ -54,7 +54,7 @@ static SLOT_INTERFACE_START(sg1000_card)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( sub_slot )
-	MCFG_SG1000_CARD_ADD("cardslot", sg1000_card, NULL)
+	MCFG_SG1000_CARD_ADD("cardslot", sg1000_card, nullptr)
 MACHINE_CONFIG_END
 
 machine_config_constructor sega8_cardcatch_device::device_mconfig_additions() const

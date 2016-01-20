@@ -33,14 +33,14 @@ struct genesis_z80_vars
 	int z80_is_reset;
 	int z80_has_bus;
 	UINT32 z80_bank_addr;
-	UINT8* z80_prgram;
+	std::unique_ptr<UINT8[]> z80_prgram;
 };
 
 
 class md_base_state : public driver_device
 {
 public:
-	md_base_state(const machine_config &mconfig, device_type type, const char *tag)
+	md_base_state(const machine_config &mconfig, device_type type, std::string tag)
 	: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_z80snd(*this,"genesis_snd_z80"),
@@ -55,6 +55,7 @@ public:
 	required_device<sega315_5313_device> m_vdp;
 	required_device<sn76496_base_device> m_snsnd;
 	optional_shared_ptr<UINT16> m_megadrive_ram;
+
 
 	ioport_port *m_io_reset;
 	ioport_port *m_io_pad_3b[4];
@@ -134,7 +135,7 @@ public:
 class md_boot_state : public md_base_state
 {
 public:
-	md_boot_state(const machine_config &mconfig, device_type type, const char *tag)
+	md_boot_state(const machine_config &mconfig, device_type type, std::string tag)
 	: md_base_state(mconfig, type, tag) { m_protcount = 0;}
 
 	// bootleg specific

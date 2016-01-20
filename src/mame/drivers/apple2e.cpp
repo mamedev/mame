@@ -192,7 +192,7 @@ Address bus A0-A11 is Y0-Y11
 class apple2e_state : public driver_device
 {
 public:
-	apple2e_state(const machine_config &mconfig, device_type type, const char *tag)
+	apple2e_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, A2_CPU_TAG),
 		m_ram(*this, RAM_TAG),
@@ -265,8 +265,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_PALETTE_INIT(apple2);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -314,6 +314,8 @@ public:
 	DECLARE_READ8_MEMBER(c400_int_bank_r);
 	DECLARE_WRITE8_MEMBER(c400_w);
 	DECLARE_READ8_MEMBER(c800_r);
+	DECLARE_READ8_MEMBER(c800_int_r);
+	DECLARE_READ8_MEMBER(c800_b2_int_r);
 	DECLARE_WRITE8_MEMBER(c800_w);
 	DECLARE_READ8_MEMBER(inh_r);
 	DECLARE_WRITE8_MEMBER(inh_w);
@@ -593,7 +595,7 @@ void apple2e_state::machine_start()
 	else    // no expansion
 	{
 		m_exp_addrmask = 0;
-		m_exp_ram = NULL;
+		m_exp_ram = nullptr;
 	}
 
 	// precalculate joystick time constants
@@ -607,8 +609,8 @@ void apple2e_state::machine_start()
 	}
 
 	// and aux slot device if any
-	m_aux_ptr = NULL;
-	m_aux_bank_ptr = NULL;
+	m_aux_ptr = nullptr;
+	m_aux_bank_ptr = nullptr;
 	if (m_a2eauxslot)
 	{
 		m_auxslotdevice = m_a2eauxslot->get_a2eauxslot_card();
@@ -620,7 +622,7 @@ void apple2e_state::machine_start()
 	}
 	else    // IIc has 128K right on the motherboard
 	{
-		m_auxslotdevice = NULL;
+		m_auxslotdevice = nullptr;
 
 		if (m_ram_size >= (128*1024))
 		{
@@ -1853,7 +1855,7 @@ READ8_MEMBER(apple2e_state::c080_r)
 		}
 		else
 		{
-			if (m_slotdevice[slot] != NULL)
+			if (m_slotdevice[slot] != nullptr)
 			{
 				return m_slotdevice[slot]->read_c0nx(space, offset % 0x10);
 			}
@@ -1876,7 +1878,7 @@ WRITE8_MEMBER(apple2e_state::c080_w)
 	}
 	else
 	{
-		if (m_slotdevice[slot] != NULL)
+		if (m_slotdevice[slot] != nullptr)
 		{
 			m_slotdevice[slot]->write_c0nx(space, offset % 0x10, data);
 		}
@@ -1887,7 +1889,7 @@ UINT8 apple2e_state::read_slot_rom(address_space &space, int slotbias, int offse
 {
 	int slotnum = ((offset>>8) & 0xf) + slotbias;
 
-	if (m_slotdevice[slotnum] != NULL)
+	if (m_slotdevice[slotnum] != nullptr)
 	{
 		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && (!space.debugger_access()))
 		{
@@ -1905,7 +1907,7 @@ void apple2e_state::write_slot_rom(address_space &space, int slotbias, int offse
 {
 	int slotnum = ((offset>>8) & 0xf) + slotbias;
 
-	if (m_slotdevice[slotnum] != NULL)
+	if (m_slotdevice[slotnum] != nullptr)
 	{
 		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && (!space.debugger_access()))
 		{
@@ -1955,12 +1957,46 @@ READ8_MEMBER(apple2e_state::c800_r)
 		return 0xff;
 	}
 
-	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != NULL))
+	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
 		return m_slotdevice[m_cnxx_slot]->read_c800(space, offset&0xfff);
 	}
 
 	return read_floatingbus();
+}
+
+READ8_MEMBER(apple2e_state::c800_int_r)
+{
+	if ((m_isiicplus) && (offset >= 0x600))
+	{
+		return m_iicplus_ce00[offset-0x600];
+	}
+
+	if (offset == 0x7ff)
+	{
+		m_cnxx_slot = CNXX_UNCLAIMED;
+		update_slotrom_banks();
+		return 0xff;
+	}
+
+	return m_rom_ptr[0x800 + offset];
+}
+
+READ8_MEMBER(apple2e_state::c800_b2_int_r)
+{
+	if ((m_isiicplus) && (offset >= 0x600))
+	{
+		return m_iicplus_ce00[offset-0x600];
+	}
+
+	if (offset == 0x7ff)
+	{
+		m_cnxx_slot = CNXX_UNCLAIMED;
+		update_slotrom_banks();
+		return 0xff;
+	}
+
+	return m_rom_ptr[0x4800 + offset];
 }
 
 WRITE8_MEMBER(apple2e_state::c800_w)
@@ -1978,7 +2014,7 @@ WRITE8_MEMBER(apple2e_state::c800_w)
 		return;
 	}
 
-	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != NULL))
+	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
 		m_slotdevice[m_cnxx_slot]->write_c800(space, offset&0xfff, data);
 	}
@@ -2385,8 +2421,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c800bank_map, AS_PROGRAM, 8, apple2e_state )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(c800_r, c800_w)
-	AM_RANGE(0x0800, 0x0fff) AM_ROM AM_REGION("maincpu", 0x800)
-	AM_RANGE(0x1000, 0x17ff) AM_ROM AM_REGION("maincpu", 0x4800)
+	AM_RANGE(0x0800, 0x0fff) AM_READWRITE(c800_int_r, c800_w)
+	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(c800_b2_int_r, c800_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( inhbank_map, AS_PROGRAM, 8, apple2e_state )
@@ -3174,13 +3210,13 @@ static MACHINE_CONFIG_START( apple2e, apple2e_state )
 	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(apple2e_state, a2bus_irq_w))
 	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(apple2e_state, a2bus_nmi_w))
 	MCFG_A2BUS_OUT_INH_CB(WRITELINE(apple2e_state, a2bus_inh_w))
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple2_cards, NULL)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple2_cards, NULL)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple2_cards, nullptr)
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple2_cards, nullptr)
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple2_cards, nullptr)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl4", apple2_cards, "mockingboard")
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl5", apple2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl5", apple2_cards, nullptr)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl6", apple2_cards, "diskiing")
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, nullptr)
 
 	MCFG_DEVICE_ADD(A2_AUXSLOT_TAG, A2EAUXSLOT, 0)
 	MCFG_A2EAUXSLOT_CPU("maincpu")
@@ -3241,13 +3277,13 @@ static MACHINE_CONFIG_DERIVED( apple2c, apple2ee )
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)   // matches SSC so modem software is compatible
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("modem", rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(PRINTER_PORT_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(PRINTER_PORT_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(IIC_ACIA1_TAG, mos6551_device, write_rxd))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(IIC_ACIA1_TAG, mos6551_device, write_dcd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(IIC_ACIA1_TAG, mos6551_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(IIC_ACIA1_TAG, mos6551_device, write_cts))
 
-	MCFG_RS232_PORT_ADD(MODEM_PORT_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(MODEM_PORT_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(IIC_ACIA2_TAG, mos6551_device, write_rxd))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(IIC_ACIA2_TAG, mos6551_device, write_dcd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(IIC_ACIA2_TAG, mos6551_device, write_dsr))
@@ -3335,9 +3371,9 @@ static MACHINE_CONFIG_DERIVED( laser128, apple2c )
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl2", A2BUS_LASER128, NULL)
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl3", A2BUS_LASER128, NULL)
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl4", A2BUS_LASER128, NULL)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl5", apple2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl5", apple2_cards, nullptr)
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_LASER128, NULL)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, nullptr)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")

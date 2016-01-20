@@ -52,7 +52,7 @@ class gg_ext_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	gg_ext_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gg_ext_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~gg_ext_port_device();
 
 	// static configuration helpers
@@ -84,7 +84,7 @@ public:
 
 //protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	device_gg_ext_port_interface *m_device;
 

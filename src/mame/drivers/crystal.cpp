@@ -116,6 +116,71 @@ Notes:
       3x Intel E28F128J3A 128MBit surface mounted FlashROMs (TSOP56, labelled 'BREZZASOFT BCSV0004Fxx', xx=01, 02, 03)
          Note: there are 8 spaces total for FlashROMs. Only U1, U2 & U3 are populated in this cart.
 
+
+
+P's Attack (c) 2004 Uniana Co., Ltd
+
++----------1||||---1|||||--1|||||---------------------------+
+|VOL       TICKET  GUN_1P  GUN_2P                 +---------|
+|                                                 |         |
++-+                                               |  256MB  |
+  |       CC-DAC                                  | Compact |
++-+                                  EMUL*        |  Flash  |
+|                                                 |         |
+|J          +---+                                 +---------|
+|A          |   |                                           |
+|M          | R |   25.1750MHz              +--------------+|
+|M          | A |                           |     42Pin*   ||
+|A          | M |                           +--------------+|
+|           |   |                           +--------------+|
+|C          +---+       +------------+      |     SYS      ||
+|O                      |            |      +--------------+|
+|N          +---+       |            |                      |
+|N          |   |       |VRenderZERO+|                      |
+|E SERVICE  | R |       | MagicEyes  |  +-------+    62256* |
+|C          | A |       |            |  |  RAM  |           |
+|T TEST     | M |       |            |  +-------+    62256* |
+|O          |   |       +------------+                      |
+|R RESET    +---+                                           |
+|                                   14.31818MHz             |
++-+                                                         |
+  |                                EEPROM                   |
++-+                GAL                                 DSW  |
+|                                                           |
+|  VGA                           PIC               BAT3.6V* |
++-----------------------------------------------------------+
+
+* denotes unpopulated device
+
+RAM are Samsung K4S641632H-TC75
+VGA is a standard PC 15 pin VGA connection
+DSW is 2 switch dipswitch (switches 3-8 are unpopulated)
+PIC is a Microchip PIC16C711-041/P (silkscreened on the PCB as COSTOM)
+SYS is a ST M27C160 EPROM (silkscreened on the PCB as SYSTEM_ROM_32M)
+GAL is a GAL16V8B (not dumped)
+EMUL is an unpopulated 8 pin connector
+EEPROM is a 93C86 16K 5.0v Serial EEPROM (2048x8-bit or 1024x16-bit)
+CC-DAC is a TDA1311A Stereo Continuous Calibration DAC
+
+TICKET is a 5 pin connector:
+
+  1| +12v
+  2| IN
+  3| OUT
+  4| GND
+  5| LED
+
+GUN_xP are 6 pin gun connectors (pins 1-4 match the UNICO sytle guns):
+
+  1| GND
+  2| SW
+  3| +5v
+  4| SENS
+  5| SOL
+  6| GND
+
+
+
 */
 
 #include "emu.h"
@@ -130,7 +195,7 @@ Notes:
 class crystal_state : public driver_device
 {
 public:
-	crystal_state(const machine_config &mconfig, device_type type, const char *tag)
+	crystal_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_sysregs(*this, "sysregs"),
 		m_workram(*this, "workram"),
@@ -140,7 +205,9 @@ public:
 		m_reset_patch(*this, "reset_patch"),
 		m_maincpu(*this, "maincpu"),
 		m_vr0(*this, "vr0"),
-		m_ds1302(*this, "rtc") { }
+		m_ds1302(*this, "rtc"),
+		m_screen(*this, "screen")
+		{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT32> m_sysregs;
@@ -155,6 +222,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<vr0video_device> m_vr0;
 	required_device<ds1302_device> m_ds1302;
+	required_device<screen_device> m_screen;
 
 #ifdef IDLE_LOOP_SPEEDUP
 	UINT8     m_FlipCntRead;
@@ -196,13 +264,14 @@ public:
 	DECLARE_DRIVER_INIT(crysking);
 	DECLARE_DRIVER_INIT(evosocc);
 	DECLARE_DRIVER_INIT(donghaer);
+	DECLARE_DRIVER_INIT(psattack);
 
 	DECLARE_READ32_MEMBER(trivrus_input_r);
 	DECLARE_WRITE32_MEMBER(trivrus_input_w);
 	UINT8 m_trivrus_input;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_crystal(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(crystal_interrupt);
@@ -215,6 +284,8 @@ public:
 	void PatchReset(  );
 	UINT16 GetVidReg( address_space &space, UINT16 reg );
 	void SetVidReg( address_space &space, UINT16 reg, UINT16 val );
+
+
 };
 
 void crystal_state::IntReq( int num )
@@ -536,12 +607,12 @@ READ32_MEMBER(crystal_state::trivrus_input_r)
 {
 	switch (m_trivrus_input)
 	{
-		case 1:	return ioport("IN1")->read();
-		case 2:	return ioport("IN2")->read();
-		case 3:	return ioport("IN3")->read();
-		case 4:	return ioport("IN4")->read();
-		case 5:	return ioport("IN5")->read();
-		case 6:	return ioport("DSW")->read();
+		case 1: return ioport("IN1")->read();
+		case 2: return ioport("IN2")->read();
+		case 3: return ioport("IN3")->read();
+		case 4: return ioport("IN4")->read();
+		case 5: return ioport("IN5")->read();
+		case 6: return ioport("DSW")->read();
 	}
 	logerror("%s: unknown input %02x read\n", machine().describe_context(), m_trivrus_input);
 	return 0xffffffff;
@@ -556,14 +627,14 @@ WRITE32_MEMBER(crystal_state::trivrus_input_w)
 static ADDRESS_MAP_START( trivrus_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_WRITENOP
 
-//	0x01280000 & 0x0000ffff (written at boot)
+//  0x01280000 & 0x0000ffff (written at boot)
 	AM_RANGE(0x01500000, 0x01500003) AM_READWRITE(trivrus_input_r, trivrus_input_w)
-//	0x01500010 & 0x000000ff = sec
-//	0x01500010 & 0x00ff0000 = min
-//	0x01500014 & 0x000000ff = hour
-//	0x01500014 & 0x00ff0000 = day
-//	0x01500018 & 0x000000ff = month
-//	0x0150001c & 0x000000ff = year - 2000
+//  0x01500010 & 0x000000ff = sec
+//  0x01500010 & 0x00ff0000 = min
+//  0x01500014 & 0x000000ff = hour
+//  0x01500014 & 0x00ff0000 = day
+//  0x01500018 & 0x000000ff = month
+//  0x0150001c & 0x000000ff = year - 2000
 	AM_RANGE(0x01600000, 0x01607fff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0x01801400, 0x01801403) AM_READWRITE(Timer0_r, Timer0_w)
@@ -589,7 +660,7 @@ static ADDRESS_MAP_START( trivrus_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
 	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
 
-//	AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
+//  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
 
 ADDRESS_MAP_END
 
@@ -722,6 +793,24 @@ void crystal_state::SetVidReg( address_space &space, UINT16 reg, UINT16 val )
 
 UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	int xres = 320;
+	int yres = 240;
+
+	// probably more registers around here control height / interlace enable etc.
+	// 0x341c looks like height, but doesn't change for interlace mode.
+	xres = m_sysregs[0x340c / 4]+1;
+	if (xres > 640) xres = 640;
+
+	// force double height if 640 wide (probably a reg for this)
+	if (xres == 640) yres = 480;
+
+
+	rectangle visarea;
+	visarea.set(0, xres-1, 0, yres-1);
+	m_screen->configure(xres, yres, visarea, m_screen->frame_period().attoseconds() );
+
+
+
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int DoFlip;
 
@@ -908,18 +997,19 @@ static INPUT_PORTS_START(officeye)
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Blue") // BLUE
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	//PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_START2 ) // where is start2?
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Red")  // RED
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 Red")
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Green")  // GREEN
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 Green")
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Blue") // BLUE
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Blue")
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_START2 ) // where is start3?
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P3_P4")
@@ -1005,10 +1095,10 @@ static INPUT_PORTS_START(trivrus)
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN5")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_SERVICE1 )	// Free Game
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_SERVICE1 ) // Free Game
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )	// Setup
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   // Setup
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1021,7 +1111,7 @@ static INPUT_PORTS_START(trivrus)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "Serial?" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )		// hangs at boot
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )       // hangs at boot
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1056,8 +1146,8 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(crystal_state, screen_update_crystal)
 	MCFG_SCREEN_VBLANK_DRIVER(crystal_state, screen_eof_crystal)
 	MCFG_SCREEN_PALETTE("palette")
@@ -1077,24 +1167,10 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-/*
-    Top blade screen is 32 pixels wider
-*/
-static MACHINE_CONFIG_DERIVED( topbladv, crystal )
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(320+32, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319+32, 0, 239)
-
-MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( trivrus, crystal )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trivrus_mem)
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 MACHINE_CONFIG_END
 
 
@@ -1183,6 +1259,35 @@ ROM_START( trivrus )
 
 	ROM_REGION( 0x1000000, "user2", ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
+
+ROM_START( psattack )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD("5.sys",  0x000000, 0x200000, CRC(f09878e4) SHA1(25b8dbac47d3911615c8874746e420ece13e7181) )
+
+	ROM_REGION( 0x4010, "pic16c711", 0 )
+	ROM_LOAD("16c711.pic",  0x0000, 0x137b, CRC(617d8292) SHA1(d32d6054ce9db2e31efaf41015afcc78ed32f6aa) ) // raw dump
+	ROM_LOAD("16c711.bin",  0x0000, 0x4010, CRC(b316693f) SHA1(eba1f75043bd415268eedfdb95c475e73c14ff86) ) // converted to binary
+
+	DISK_REGION( "cfcard" )
+	DISK_IMAGE_READONLY( "psattack", 0, SHA1(e99cd0dafc33ec13bf56061f81dc7c0a181594ee) )
+
+	// keep driver happy
+	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF )
+ROM_END
+
+ROM_START( ddz )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD("ddz.001.rom",  0x000000, 0x400000, CRC(b379f823) SHA1(531885b35d668d22c75a9759994f4aca6eacb046) )
+	ROM_LOAD("ddz.002.rom",  0x000000, 0x400000, CRC(285c744d) SHA1(2f8bc70825e55e3114015cb263e786df35cde275) )
+	ROM_LOAD("ddz.003.rom",  0x000000, 0x400000, CRC(61c9b5c9) SHA1(0438417398403456a1c49408881797a94aa86f49) )
+
+	// keep driver happy
+	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF )
+ROM_END
+
+
 
 
 DRIVER_INIT_MEMBER(crystal_state,crysking)
@@ -1302,11 +1407,19 @@ DRIVER_INIT_MEMBER(crystal_state, donghaer)
 	Rom[WORD_XOR_LE(0x19C72 / 2)] = 0x9001; // PUSH %R0
 }
 
+DRIVER_INIT_MEMBER(crystal_state,psattack)
+{
+}
+
 
 GAME( 2001, crysbios,        0, crystal,  crystal, driver_device,         0, ROT0, "BrezzaSoft",          "Crystal System BIOS",                  MACHINE_IS_BIOS_ROOT )
 GAME( 2001, crysking, crysbios, crystal,  crystal, crystal_state,  crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings",                 0 )
 GAME( 2001, evosocc,  crysbios, crystal,  crystal, crystal_state,  evosocc,  ROT0, "Evoga",               "Evolution Soccer",                     0 )
-GAME( 2003, topbladv, crysbios, topbladv, crystal, crystal_state,  topbladv, ROT0, "SonoKong / Expotato", "Top Blade V",                          0 )
+GAME( 2003, topbladv, crysbios, crystal,  crystal, crystal_state,  topbladv, ROT0, "SonoKong / Expotato", "Top Blade V",                          0 )
 GAME( 2001, officeye,        0, crystal,  officeye,crystal_state,  officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING ) // still has some instability issues
 GAME( 2001, donghaer,        0, crystal,  crystal, crystal_state,  donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",              MACHINE_NOT_WORKING )
 GAME( 2009, trivrus,         0, trivrus,  trivrus, driver_device,         0, ROT0, "AGT",                 "Trivia R Us (v1.07)",                  0 )
+// has a CF card instead of flash roms
+GAME( 2004, psattack, 0, crystal, crystal, crystal_state, psattack, ROT0, "Uniana", "P's Attack", MACHINE_IS_SKELETON )
+// looks like the same kind of hw from strings in the ROM, but scrambled / encrypted?
+GAME( 200?, ddz,    0,  crystal, crystal, driver_device, 0, ROT0, "IGS?", "Dou Di Zhu", MACHINE_IS_SKELETON )

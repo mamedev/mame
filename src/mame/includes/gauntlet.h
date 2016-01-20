@@ -12,7 +12,7 @@
 class gauntlet_state : public atarigen_state
 {
 public:
-	gauntlet_state(const machine_config &mconfig, device_type type, const char *tag)
+	gauntlet_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atarigen_state(mconfig, type, tag),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
@@ -26,8 +26,8 @@ public:
 	UINT8           m_vindctr2_screen_refresh;
 	UINT8           m_playfield_tile_bank;
 	UINT8           m_playfield_color_bank;
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(sound_reset_w);
 	DECLARE_READ8_MEMBER(switch_6502_r);
 	DECLARE_WRITE8_MEMBER(sound_ctl_w);

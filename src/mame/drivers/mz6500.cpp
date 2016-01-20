@@ -16,7 +16,7 @@
 class mz6500_state : public driver_device
 {
 public:
-	mz6500_state(const machine_config &mconfig, device_type type, const char *tag)
+	mz6500_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_hgdc(*this, "upd7220"),
 		m_fdc(*this, "upd765"),
@@ -31,8 +31,8 @@ public:
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);
 	required_shared_ptr<UINT16> m_video_ram;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );

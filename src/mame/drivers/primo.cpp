@@ -274,12 +274,12 @@ static MACHINE_CONFIG_START( primoa32, primo_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
 
 	/* floppy from serial bus */
-	MCFG_CBM_IEC_ADD(NULL)
+	MCFG_CBM_IEC_ADD(nullptr)
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, NULL)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot2", generic_plain_slot, NULL)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot2", generic_plain_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 MACHINE_CONFIG_END
 

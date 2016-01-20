@@ -9,11 +9,11 @@
 class k001006_device : public device_t
 {
 public:
-	k001006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k001006_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~k001006_device() {}
 
 	// static configuration
-	static void set_gfx_region(device_t &device, const char *tag) { downcast<k001006_device &>(device).m_gfx_region = tag; }
+	static void set_gfx_region(device_t &device, std::string tag) { downcast<k001006_device &>(device).m_gfx_region = tag; }
 	static void set_tex_layout(device_t &device, int layout) { downcast<k001006_device &>(device).m_tex_layout = layout; }
 
 	UINT32 fetch_texel(int page, int pal_index, int u, int v);
@@ -24,22 +24,22 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
-	UINT16 *     m_pal_ram;
-	UINT16 *     m_unknown_ram;
+	std::unique_ptr<UINT16[]>      m_pal_ram;
+	std::unique_ptr<UINT16[]>     m_unknown_ram;
 	UINT32       m_addr;
 	int          m_device_sel;
 
-	UINT8 *      m_texrom;
+	std::unique_ptr<UINT8[]>     m_texrom;
 
-	UINT32 *     m_palette;
+	std::unique_ptr<UINT32[]>     m_palette;
 
-	const char * m_gfx_region;
+	std::string  m_gfx_region;
 	UINT8 *      m_gfxrom;
 	//int m_tex_width;
 	//int m_tex_height;

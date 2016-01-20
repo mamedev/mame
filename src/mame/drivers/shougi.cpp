@@ -87,7 +87,7 @@ PROM  : Type MB7051
 class shougi_state : public driver_device
 {
 public:
-	shougi_state(const machine_config &mconfig, device_type type, const char *tag)
+	shougi_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
@@ -114,8 +114,8 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 
@@ -270,7 +270,7 @@ WRITE8_MEMBER(shougi_state::control_w)
 			// 7: nothing? connected to +5v via resistor
 			break;
 	}
-	
+
 	m_control[offset] = data;
 }
 

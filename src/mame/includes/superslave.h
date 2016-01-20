@@ -28,7 +28,7 @@
 class superslave_state : public driver_device
 {
 public:
-	superslave_state(const machine_config &mconfig, device_type type, const char *tag)
+	superslave_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_dart0(*this, Z80DART_0_TAG),
@@ -55,8 +55,8 @@ public:
 	required_device<rs232_port_device> m_rs232d;
 	required_memory_region m_rom;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

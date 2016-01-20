@@ -120,7 +120,7 @@ WRITE8_MEMBER(bagman_state::ls259_w)
 
 WRITE8_MEMBER(bagman_state::coincounter_w)
 {
-	coin_counter_w(machine(), offset,data);
+	machine().bookkeeping().coin_counter_w(offset,data);
 }
 
 WRITE8_MEMBER(bagman_state::irq_mask_w)
@@ -622,11 +622,11 @@ ROM_START( bagman )
 	ROM_LOAD( "c1_b01.bin",   0x0000, 0x1000, CRC(705193b2) SHA1(ca9cfd05f9195c2a38e8854012de51b6ee6bb403) )
 	ROM_LOAD( "f1_b03s.bin",  0x1000, 0x1000, CRC(dba1eda7) SHA1(26d877028b3a31dd671f9e667316c8a14780ca73) )
 
-	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "p3.bin",       0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
 	ROM_LOAD( "r3.bin",       0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
-	ROM_REGION( 0x0060, "5110ctrl", 0)
+	ROM_REGION( 0x0020, "5110ctrl", 0)
 	ROM_LOAD( "r6.bin",       0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) /*state machine driving TMS5110*/
 
 	ROM_REGION( 0x2000, "tmsprom", 0 ) /* data for the TMS5110 speech chip */
@@ -651,11 +651,11 @@ ROM_START( bagnard )
 	ROM_LOAD( "bagnard.001",  0x0000, 0x1000, CRC(060b044c) SHA1(3121f07adb661663a2303085eea1b662968f8f98) )
 	ROM_LOAD( "bagnard.003",  0x1000, 0x1000, CRC(8043bc1a) SHA1(bd2f3dfe26cf8d987d9ecaa41eac4bdc4e16a692) )
 
-	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "p3.bin",       0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
 	ROM_LOAD( "r3.bin",       0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
-	ROM_REGION( 0x0060, "5110ctrl", 0)
+	ROM_REGION( 0x0020, "5110ctrl", 0)
 	ROM_LOAD( "r6.bin",       0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) /*state machine driving TMS5110*/
 
 	ROM_REGION( 0x2000, "tmsprom", 0 ) /* data for the TMS5110 speech chip */
@@ -680,11 +680,11 @@ ROM_START( bagnarda )
 	ROM_LOAD( "bagman.001",   0x0000, 0x1000, CRC(1eb56acd) SHA1(f75f6709006e78417999d423d2078ed80eae73a2) )
 	ROM_LOAD( "bagman.003",   0x1000, 0x1000, CRC(0ad82a39) SHA1(30ac0ff5bc63934c3eb572c7c13df324757e5e44) )
 
-	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "p3.bin",       0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
 	ROM_LOAD( "r3.bin",       0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
-	ROM_REGION( 0x0060, "5110ctrl", 0)
+	ROM_REGION( 0x0020, "5110ctrl", 0)
 	ROM_LOAD( "r6.bin",       0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) /*state machine driving TMS5110*/
 
 	ROM_REGION( 0x2000, "tmsprom", 0 ) /* data for the TMS5110 speech chip */
@@ -709,11 +709,11 @@ ROM_START( bagnardi ) // based on bagnard set with mods for license text
 	ROM_LOAD( "bagnardi_01.c1",  0x0000, 0x1000, CRC(060b044c) SHA1(3121f07adb661663a2303085eea1b662968f8f98) ) // == bagnard.001
 	ROM_LOAD( "bagnardi_03.f1",  0x1000, 0x1000, CRC(8043bc1a) SHA1(bd2f3dfe26cf8d987d9ecaa41eac4bdc4e16a692) ) // == bagnard.003
 
-	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "p3.bin",       0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
 	ROM_LOAD( "r3.bin",       0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
-	ROM_REGION( 0x0060, "5110ctrl", 0)
+	ROM_REGION( 0x0020, "5110ctrl", 0)
 	ROM_LOAD( "r6.bin",       0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) /*state machine driving TMS5110*/
 
 	ROM_REGION( 0x2000, "tmsprom", 0 ) /* data for the TMS5110 speech chip */
@@ -739,11 +739,11 @@ ROM_START( bagmans )
 	ROM_LOAD( "a2_1c.bin",    0x0000, 0x1000, CRC(f3e11bd7) SHA1(43ee00ff777008c89f619eb183e7c5e63f6c7694) )
 	ROM_LOAD( "a2_1f.bin",    0x1000, 0x1000, CRC(d0f7105b) SHA1(fb382703850a4ded567706e02ebb7f3e22531b7c) )
 
-	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "p3.bin",       0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
 	ROM_LOAD( "r3.bin",       0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
-	ROM_REGION( 0x0060, "5110ctrl", 0)
+	ROM_REGION( 0x0020, "5110ctrl", 0)
 	ROM_LOAD( "r6.bin",       0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) /*state machine driving TMS5110*/
 
 	ROM_REGION( 0x2000, "tmsprom", 0 ) /* data for the TMS5110 speech chip */
@@ -768,11 +768,11 @@ ROM_START( bagmans2 )
 	ROM_LOAD( "a2_1c.bin",    0x0000, 0x1000, CRC(f3e11bd7) SHA1(43ee00ff777008c89f619eb183e7c5e63f6c7694) )
 	ROM_LOAD( "a2_1f.bin",    0x1000, 0x1000, CRC(d0f7105b) SHA1(fb382703850a4ded567706e02ebb7f3e22531b7c) )
 
-	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "p3.bin",       0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
 	ROM_LOAD( "r3.bin",       0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
-	ROM_REGION( 0x0060, "5110ctrl", 0)
+	ROM_REGION( 0x0020, "5110ctrl", 0)
 	ROM_LOAD( "r6.bin",       0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) /*state machine driving TMS5110*/
 
 	ROM_REGION( 0x2000, "tmsprom", 0 ) /* data for the TMS5110 speech chip */
@@ -809,11 +809,11 @@ ROM_START( sbagman )
 	ROM_LOAD( "1.1c",         0x0000, 0x1000, CRC(a046ff44) SHA1(af319cfb74e5efe435c26e971de13bd390f4b378) )
 	ROM_LOAD( "3.1f",         0x1000, 0x1000, CRC(a4422da4) SHA1(3aa55ca8c99566c1c9eb097b6d645c4216e09dfb) )
 
-	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "p3.bin",       0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
 	ROM_LOAD( "r3.bin",       0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
-	ROM_REGION( 0x0060, "5110ctrl", 0)
+	ROM_REGION( 0x0020, "5110ctrl", 0)
 	ROM_LOAD( "r6.bin",       0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) /*state machine driving TMS5110*/
 
 	ROM_REGION( 0x2000, "tmsprom", 0 ) /* data for the TMS5110 speech chip */
@@ -848,11 +848,11 @@ ROM_START( sbagmans )
 	ROM_LOAD( "sbag_1c.bin",  0x0000, 0x1000, CRC(262f870a) SHA1(90877b869a7e927cfa4f9729ec3d6eac3a95dc8f) )
 	ROM_LOAD( "sbag_1f.bin",  0x1000, 0x1000, CRC(350ed0fb) SHA1(c7804e9618ebc88a1e3684a92a98d9a181441a1f) )
 
-	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "p3.bin",       0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
 	ROM_LOAD( "r3.bin",       0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
-	ROM_REGION( 0x0060, "5110ctrl", 0)
+	ROM_REGION( 0x0020, "5110ctrl", 0)
 	ROM_LOAD( "r6.bin",       0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) /*state machine driving TMS5110*/
 
 	ROM_REGION( 0x2000, "tmsprom", 0 ) /* data for the TMS5110 speech chip */

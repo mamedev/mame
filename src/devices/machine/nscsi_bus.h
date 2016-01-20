@@ -17,7 +17,7 @@ class nscsi_device;
 class nscsi_bus_device : public device_t
 {
 public:
-	nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nscsi_bus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void ctrl_w(int refid, UINT32 lines, UINT32 mask);
 	void data_w(int refid, UINT32 lines);
@@ -27,9 +27,9 @@ public:
 	UINT32 data_r() const;
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_config_complete() override;
 
 private:
 	struct dev_t {
@@ -51,13 +51,13 @@ class nscsi_connector: public device_t,
 						public device_slot_interface
 {
 public:
-	nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nscsi_connector(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~nscsi_connector();
 
 	nscsi_device *get_device();
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class nscsi_device : public device_t,
@@ -86,7 +86,7 @@ public:
 		S_PHASE_MASK     = S_MSG|S_CTL|S_INP
 	};
 
-	nscsi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	nscsi_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	void connect_to_bus(nscsi_bus_device *bus, int refid, int default_scsi_id);
 	virtual void scsi_ctrl_changed();
@@ -95,15 +95,15 @@ protected:
 	int scsi_refid;
 	nscsi_bus_device *scsi_bus;
 
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class nscsi_full_device : public nscsi_device
 {
 public:
-	nscsi_full_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	nscsi_full_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
-	virtual void scsi_ctrl_changed();
+	virtual void scsi_ctrl_changed() override;
 protected:
 	enum { SCSI_TIMER = 100 };
 
@@ -276,9 +276,9 @@ protected:
 	int scsi_cmdsize;
 	UINT8 scsi_identify;
 
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void scsi_message();
 	virtual void scsi_command();

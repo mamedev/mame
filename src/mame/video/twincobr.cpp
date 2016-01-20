@@ -93,15 +93,15 @@ VIDEO_START_MEMBER(twincobr_state,toaplan0)
 
 	twincobr_create_tilemaps();
 
-	m_txvideoram16 = auto_alloc_array_clear(machine(), UINT16, m_txvideoram_size);
-	m_fgvideoram16 = auto_alloc_array_clear(machine(), UINT16, m_fgvideoram_size);
-	m_bgvideoram16 = auto_alloc_array_clear(machine(), UINT16, m_bgvideoram_size);
+	m_txvideoram16 = make_unique_clear<UINT16[]>(m_txvideoram_size);
+	m_fgvideoram16 = make_unique_clear<UINT16[]>(m_fgvideoram_size);
+	m_bgvideoram16 = make_unique_clear<UINT16[]>(m_bgvideoram_size);
 
 	m_display_on = 0;
 
-	save_pointer(NAME(m_txvideoram16), m_txvideoram_size);
-	save_pointer(NAME(m_fgvideoram16), m_fgvideoram_size);
-	save_pointer(NAME(m_bgvideoram16), m_bgvideoram_size);
+	save_pointer(NAME(m_txvideoram16.get()), m_txvideoram_size);
+	save_pointer(NAME(m_fgvideoram16.get()), m_fgvideoram_size);
+	save_pointer(NAME(m_bgvideoram16.get()), m_bgvideoram_size);
 	save_item(NAME(m_txoffs));
 	save_item(NAME(m_fgoffs));
 	save_item(NAME(m_bgoffs));
@@ -356,7 +356,7 @@ UINT32 twincobr_state::screen_update_toaplan0(screen_device &screen, bitmap_ind1
 
 	UINT16 *buffered_spriteram16;
 	UINT32 bytes;
-	if (m_spriteram16 != NULL)
+	if (m_spriteram16 != nullptr)
 	{
 		buffered_spriteram16 = m_spriteram16->buffer();
 		bytes = m_spriteram16->bytes();

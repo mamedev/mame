@@ -298,7 +298,7 @@ CUSTOM_INPUT_MEMBER(exidy440_state::hitnmiss_button1_r)
 void exidy440_state::exidy440_bank_select(UINT8 bank)
 {
 	/* for the showdown case, bank 0 is a PLD */
-	if (m_showdown_bank_data[0] != NULL)
+	if (m_showdown_bank_data[0] != nullptr)
 	{
 		if (bank == 0 && m_bank != 0)
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x7fff, read8_delegate(FUNC(exidy440_state::showdown_bank0_r),this));
@@ -375,7 +375,7 @@ WRITE8_MEMBER(exidy440_state::exidy440_input_port_3_w)
 
 WRITE8_MEMBER(exidy440_state::exidy440_coin_counter_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
 
@@ -1994,7 +1994,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(exidy440_state,exidy440)
 {
-	m_showdown_bank_data[0] = m_showdown_bank_data[1] = NULL;
+	m_showdown_bank_data[0] = m_showdown_bank_data[1] = nullptr;
 }
 
 

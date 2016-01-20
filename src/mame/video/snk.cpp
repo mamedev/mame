@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Marco Cassili,Ernesto Corvi,Tim Lindquist,Carlos A. Lozano,Bryan McPhail,Jarek Parchanski,Nicola Salmoria,Tomasz Slanina,Phil Stroffolino,Acho A. Tang,Victor Trucco
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi,Tim Lindquist,Carlos A. Lozano,Bryan McPhail,Jarek Parchanski,Nicola Salmoria,Tomasz Slanina,Phil Stroffolino,Acho A. Tang,Victor Trucco
+// thanks-to:Marco Cassili
 #include "emu.h"
 #include "includes/snk.h"
 

@@ -26,12 +26,15 @@
 #define MCFG_K053252_OFFSETS(_offsx, _offsy) \
 	k053252_device::set_offsets(*device, _offsx, _offsy);
 
+#define MCFG_K053252_SET_SLAVE_SCREEN(_tag) \
+	k053252_device::static_set_slave_screen(*device, _tag);
+
 
 class k053252_device : public device_t,
 						public device_video_interface
 {
 public:
-	k053252_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k053252_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~k053252_device() {}
 
 	template<class _Object> static devcb_base &set_int1_en_callback(device_t &device, _Object object) { return downcast<k053252_device &>(device).m_int1_en_cb.set_callback(object); }
@@ -46,10 +49,16 @@ public:
 
 	void res_change();
 
+
+	static void static_set_slave_screen(device_t &device, std::string tag);
+
+
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_clock_changed() override { reset_internal_state(); }
+	void reset_internal_state();
 
 	private:
 	// internal state
@@ -65,6 +74,10 @@ protected:
 //  devcb_write8       m_int_time_cb;
 	int                m_offsx;
 	int                m_offsy;
+
+	std::string     m_slave_screen_tag;
+	screen_device * m_slave_screen;
+
 };
 
 extern const device_type K053252;

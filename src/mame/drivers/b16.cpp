@@ -23,7 +23,7 @@
 class b16_state : public driver_device
 {
 public:
-	b16_state(const machine_config &mconfig, device_type type, const char *tag)
+	b16_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_dma8237(*this, "8237dma"),
@@ -44,13 +44,13 @@ public:
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	mc6845_device *m_mc6845;
 	required_device<am9517a_device> m_dma8237;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

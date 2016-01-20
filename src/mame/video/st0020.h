@@ -6,11 +6,11 @@
 class st0020_device : public device_t
 {
 public:
-	st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	st0020_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 	static void set_is_st0032(device_t &device, int is_st0032);
 	static void set_is_jclub2o(device_t &device, int is_jclub2o);
 
@@ -33,15 +33,15 @@ public:
 	DECLARE_WRITE16_MEMBER(st0020_sprram_w);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 
 	int m_st0020_gfxram_bank;
-	UINT16* m_st0020_gfxram;
-	UINT16* m_st0020_spriteram;
-	UINT16* m_st0020_blitram;
+	std::unique_ptr<UINT16[]> m_st0020_gfxram;
+	std::unique_ptr<UINT16[]> m_st0020_spriteram;
+	std::unique_ptr<UINT16[]> m_st0020_blitram;
 	void st0020_draw_zooming_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	DECLARE_READ16_MEMBER(st0020_blit_r);
 	DECLARE_WRITE16_MEMBER(st0020_blit_w);

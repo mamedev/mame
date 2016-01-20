@@ -56,7 +56,7 @@ enum
 class tms9901_device : public device_t
 {
 public:
-	tms9901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms9901_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void set_single_int(int pin_number, int state);
 
@@ -87,13 +87,13 @@ public:
 private:
 	static const device_timer_id DECREMENTER = 0;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void timer_reload(void);
 	void field_interrupts(void);
 
-	void device_start(void);
-	void device_stop(void);
-	void device_reset(void);
+	void device_start(void) override;
+	void device_stop(void) override;
+	void device_reset(void) override;
 
 	// State of the INT1-INT15 lines (must be inverted when queried)
 	// Note that the levels must also be delivered when reading the pins, which

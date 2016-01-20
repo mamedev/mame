@@ -6,18 +6,18 @@
 const device_type MSX_CART_MAJUTSUSHI = &device_creator<msx_cart_majutsushi>;
 
 
-msx_cart_majutsushi::msx_cart_majutsushi(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_majutsushi::msx_cart_majutsushi(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_MAJUTSUSHI, "MSX Cartridge - Majutsushi", tag, owner, clock, "msx_cart_majutsushi", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_dac(*this, "dac")
 {
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_selected_bank)
 	{
-		m_selected_bank[i] = 0;
+		elem = 0;
 	}
-	for (int i = 0; i < 8; i++)
+	for (auto & elem : m_bank_base)
 	{
-		m_bank_base[i] = NULL;
+		elem = nullptr;
 	}
 }
 

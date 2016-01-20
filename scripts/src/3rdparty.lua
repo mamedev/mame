@@ -37,7 +37,7 @@ end
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 		}
 	configuration { }
-		
+
 	files {
 		MAME_DIR .. "3rdparty/expat/lib/xmlparse.c",
 		MAME_DIR .. "3rdparty/expat/lib/xmlrole.c",
@@ -57,6 +57,16 @@ if _OPTIONS["with-bundled-zlib"] then
 project "zlib"
 	uuid "3d78bd2a-2bd0-4449-8087-42ddfaef7ec9"
 	kind "StaticLib"
+
+	local version = str_to_version(_OPTIONS["gcc_version"])
+	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs")) then
+		configuration { "gmake" }
+		if (version >= 30700) then
+			buildoptions {
+				"-Wno-shift-negative-value",
+			}
+		end
+	end
 
 	configuration { "vs*" }
 		buildoptions {
@@ -107,7 +117,7 @@ end
 --------------------------------------------------
 -- SoftFloat library objects
 --------------------------------------------------
-	
+
 project "softfloat"
 	uuid "04fbf89e-4761-4cf2-8a12-64500cf0c5c5"
 	kind "StaticLib"
@@ -119,11 +129,19 @@ project "softfloat"
 	includedirs {
 		MAME_DIR .. "src/osd",
 	}
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+			"/wd4146", -- warning C4146: unary minus operator applied to unsigned type, result still unsigned
+			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch
+		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
 			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
 		}
-end	
+end
+	configuration { }
+
 	files {
 		MAME_DIR .. "3rdparty/softfloat/softfloat.c",
 		MAME_DIR .. "3rdparty/softfloat/fsincos.c",
@@ -141,7 +159,7 @@ project "jpeg"
 
 	configuration { "vs*" }
 		buildoptions {
-			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter	
+			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
 			"/wd4127", -- warning C4127: conditional expression is constant
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 		}
@@ -149,7 +167,7 @@ if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
 			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
 		}
-end	
+end
 
 	configuration { }
 
@@ -220,7 +238,7 @@ project "flac"
 		buildoptions {
 			"/wd4127", -- warning C4127: conditional expression is constant
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
-			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter	
+			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
 			"/wd4702", -- warning C4702: unreachable code
 		}
 if _OPTIONS["vs"]=="intel-15" then
@@ -231,7 +249,12 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd188",  			-- error #188: enumerated type mixed with another type
 			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
 		}
-end	
+end
+
+	configuration { "mingw-clang" }
+		buildoptions {
+			"-include stdint.h"
+		}
 
 	configuration { "vs2015" }
 		buildoptions {
@@ -310,7 +333,7 @@ end
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 			"/wd4457", -- warning C4457: declaration of 'xxx' hides function parameter
 		}
-		
+
 	configuration { }
 		defines {
 			"_7ZIP_PPMD_SUPPPORT",
@@ -348,13 +371,18 @@ project "lua"
 	kind "StaticLib"
 
 	-- uncomment the options below to
-	-- compile using c++. Do the same 
+	-- compile using c++. Do the same
 	-- in lsqlite3.
 	-- In addition comment out the "extern "C""
 	-- in lua.hpp and do the same in luaengine.c line 47
 	--options {
 	--	"ForceCPP",
 	--}
+
+	configuration { "gmake" }
+		buildoptions_c {
+			"-Wno-bad-function-cast"
+		}
 
 	configuration { "vs*" }
 		buildoptions {
@@ -381,7 +409,7 @@ end
 			"LUA_32BITS",
 		}
 	end
-	
+
 	configuration { }
 
 	includedirs {
@@ -432,7 +460,7 @@ end
 --------------------------------------------------
 -- sqlite3 lua library objects
 --------------------------------------------------
-	
+
 project "lsqlite3"
 	uuid "1d84edab-94cf-48fb-83ee-b75bc697660e"
 	kind "StaticLib"
@@ -465,32 +493,6 @@ project "lsqlite3"
 	}
 
 --------------------------------------------------
--- jsoncpp library objects
---------------------------------------------------
-
-project "jsoncpp"
-	uuid "ae023ff3-d712-4e54-adc5-3b56a148650f"
-	kind "StaticLib"
-
-	configuration { "vs2015" }
-		buildoptions {
-			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
-	}
-	
-	configuration { }
-
-	includedirs {
-		MAME_DIR .. "3rdparty/jsoncpp/include",
-	}
-
-	files {
-		MAME_DIR .. "3rdparty/jsoncpp/src/lib_json/json_reader.cpp",
-		MAME_DIR .. "3rdparty/jsoncpp/src/lib_json/json_value.cpp",
-		MAME_DIR .. "3rdparty/jsoncpp/src/lib_json/json_writer.cpp",
-		
-	}
-
---------------------------------------------------
 -- SQLite3 library objects
 --------------------------------------------------
 
@@ -518,14 +520,14 @@ end
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 		}
-	
-	
+
+
 	configuration { "gmake" }
 		buildoptions_c {
 			"-Wno-bad-function-cast",
 			"-Wno-undef",
 		}
-	
+
 	local version = str_to_version(_OPTIONS["gcc_version"])
 	if _OPTIONS["gcc"]~=nil and not string.find(_OPTIONS["gcc"], "clang") then
 		if (version >= 40800) then
@@ -559,7 +561,7 @@ project "portmidi"
 		MAME_DIR .. "3rdparty/portmidi/pm_common",
 		MAME_DIR .. "3rdparty/portmidi/porttime",
 	}
-		
+
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
@@ -580,7 +582,7 @@ end
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 		}
-	
+
 	configuration { "linux*" }
 		defines {
 			"PMALSA=1",
@@ -632,11 +634,11 @@ links {
 	"portmidi",
 }
 end
-end	
+end
 --------------------------------------------------
 -- BGFX library objects
 --------------------------------------------------
-	
+
 if (USE_BGFX == 1) then
 project "bgfx"
 	uuid "d3e7e119-35cf-4f4f-aba0-d3bdcd1b879a"
@@ -647,7 +649,7 @@ project "bgfx"
 			"/wd4324", -- warning C4324: 'xxx' : structure was padded due to __declspec(align())
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 			"/wd4611", -- warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
-			"/wd4310", -- warning C4310: cast truncates constant value			
+			"/wd4310", -- warning C4310: cast truncates constant value
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
@@ -658,7 +660,7 @@ if _OPTIONS["vs"]=="intel-15" then
 end
 	configuration { }
 
-	includedirs {		
+	includedirs {
 		MAME_DIR .. "3rdparty/bgfx/include",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty",
 		MAME_DIR .. "3rdparty/bx/include",
@@ -674,17 +676,12 @@ end
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/mingw",
 		}
-if _OPTIONS["CPP11"]~="1" then		
-		defines {
-			"nullptr=NULL" -- not used but needed for C++11 code
-		}
-end
 
 	configuration { "osx*" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/osx",
 		}
-		
+
 	configuration { "freebsd" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
@@ -696,11 +693,11 @@ end
 		}
 
 	configuration { "gmake" }
-		buildoptions {		
+		buildoptions {
 			"-Wno-uninitialized",
 			"-Wno-unused-function",
 		}
-			
+
 	configuration { }
 
 	if _OPTIONS["targetos"]=="windows" then
@@ -709,10 +706,20 @@ end
 			buildoptions {
 				"-Wno-unknown-attributes",
 				"-Wno-missing-braces",
+				"-Wno-int-to-pointer-cast",
 			}
 		end
 	end
-	
+
+	if _OPTIONS["targetos"]=="macosx" then
+		local version = str_to_version(_OPTIONS["gcc_version"])
+		if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+			buildoptions {
+				"-Wno-switch",
+			}
+		end
+	end
+
 	defines {
 		"__STDC_LIMIT_MACROS",
 		"__STDC_FORMAT_MACROS",
@@ -745,7 +752,7 @@ end
 		MAME_DIR .. "3rdparty/bgfx/examples/common/font/text_buffer_manager.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/font/text_metrics.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/font/utf8.cpp",
-		--MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
+		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg_bgfx.cpp",
 	}
@@ -769,7 +776,7 @@ project "portaudio"
 
 	configuration { "vs*" }
 		buildoptions {
-			"/wd4245", -- warning C4245: 'conversion' : conversion from 'type1' to 'type2', signed/unsigned mismatch			
+			"/wd4245", -- warning C4245: 'conversion' : conversion from 'type1' to 'type2', signed/unsigned mismatch
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
 			"/wd4389", -- warning C4389: 'operator' : signed/unsigned mismatch
@@ -801,7 +808,7 @@ end
 			"-Wno-unknown-pragmas",
 		}
 
-	local version = str_to_version(_OPTIONS["gcc_version"])	
+	local version = str_to_version(_OPTIONS["gcc_version"])
 	if (_OPTIONS["gcc"]~=nil) then
 		if string.find(_OPTIONS["gcc"], "clang") then
 			buildoptions_c {
@@ -826,7 +833,7 @@ end
 			"/wd4204", -- warning C4204: nonstandard extension used : non-constant aggregate initializer
 			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
 		}
-		
+
 	configuration { }
 
 	includedirs {
@@ -852,13 +859,13 @@ end
 			"PA_USE_DS=1",
 			"PA_USE_WDMKS=1",
 			"PA_USE_WMME=1",
-		}	
+		}
 		includedirs {
 			MAME_DIR .. "3rdparty/portaudio/src/os/win",
 		}
 
-		configuration { }			
-		files {	
+		configuration { }
+		files {
 			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_util.c",
 			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_waveformat.c",
 			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_hostapis.c",
@@ -870,47 +877,47 @@ end
 			MAME_DIR .. "3rdparty/portaudio/src/common/pa_ringbuffer.c",
 			MAME_DIR .. "3rdparty/portaudio/src/hostapi/wmme/pa_win_wmme.c",
 		}
-		
+
 	end
 	if _OPTIONS["targetos"]=="linux" then
 		defines {
 			"PA_USE_ALSA=1",
 			"PA_USE_OSS=1",
 			"HAVE_LINUX_SOUNDCARD_H",
-		}	
+		}
 		includedirs {
 			MAME_DIR .. "3rdparty/portaudio/src/os/unix",
 		}
-		files {	
+		files {
 			MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_hostapis.c",
 			MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_util.c",
 			MAME_DIR .. "3rdparty/portaudio/src/hostapi/alsa/pa_linux_alsa.c",
 			MAME_DIR .. "3rdparty/portaudio/src/hostapi/oss/pa_unix_oss.c",
-		}		
+		}
 	end
 	if _OPTIONS["targetos"]=="macosx" then
 		defines {
 			"PA_USE_COREAUDIO=1",
-		}	
+		}
 		includedirs {
 			MAME_DIR .. "3rdparty/portaudio/src/os/unix",
 		}
-		files {	
+		files {
 			MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_hostapis.c",
 			MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_util.c",
 			MAME_DIR .. "3rdparty/portaudio/src/hostapi/coreaudio/pa_mac_core.c",
 			MAME_DIR .. "3rdparty/portaudio/src/hostapi/coreaudio/pa_mac_core_utilities.c",
 			MAME_DIR .. "3rdparty/portaudio/src/hostapi/coreaudio/pa_mac_core_blocking.c",
 			MAME_DIR .. "3rdparty/portaudio/src/common/pa_ringbuffer.c",
-		}		
+		}
 	end
-	
+
 else
 links {
 	"portaudio",
 }
 end
-		
+
 --------------------------------------------------
 -- GoogleTest library objects
 --------------------------------------------------
@@ -925,6 +932,11 @@ project "gtest"
 			"-Wno-unused-variable",
 		}
 
+	configuration { "mingw-clang" }
+		buildoptions {
+			"-O0", -- crash of compiler when doing optimization
+		}
+
 	configuration { "vs*" }
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
@@ -937,7 +949,7 @@ end
 	includedirs {
 		MAME_DIR .. "3rdparty/googletest/googletest/include",
 		MAME_DIR .. "3rdparty/googletest/googletest",
-	}	
-	files {		
+	}
+	files {
 		MAME_DIR .. "3rdparty/googletest/googletest/src/gtest-all.cc",
 	}

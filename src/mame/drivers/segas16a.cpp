@@ -181,8 +181,8 @@ WRITE8_MEMBER( segas16a_state::misc_control_w )
 	// bits 2 & 3: control the lamps, allowing for overrides
 	if (((m_video_control ^ data) & 0x0c) && !m_lamp_changed_w.isnull())
 		m_lamp_changed_w(m_video_control ^ data, data);
-	set_led_status(machine(), 1, data & 0x08);
-	set_led_status(machine(), 0, data & 0x04);
+	output().set_led_value(1, data & 0x08);
+	output().set_led_value(0, data & 0x04);
 
 	m_video_control = data;
 
@@ -191,15 +191,15 @@ WRITE8_MEMBER( segas16a_state::misc_control_w )
 	m_sprites->set_flip(data & 0x80);
 
 	// bit 6: set 8751 interrupt line
-	if (m_mcu != NULL)
+	if (m_mcu != nullptr)
 		m_mcu->set_input_line(MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	// bit 4: enable display
 	m_segaic16vid->set_display_enable(data & 0x10);
 
 	// bits 0 & 1: update coin counters
-	coin_counter_w(machine(), 1, data & 0x02);
-	coin_counter_w(machine(), 0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
 
@@ -636,7 +636,7 @@ void segas16a_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		case TID_INIT_I8751:
 			if (!m_i8751_vblank_hook.isnull())
 				m_mcu->suspend(SUSPEND_REASON_DISABLE, 1);
-			else if (m_mcu != NULL)
+			else if (m_mcu != nullptr)
 				machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
 			break;
 

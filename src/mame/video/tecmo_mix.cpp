@@ -7,7 +7,7 @@
 
 const device_type TECMO_MIXER = &device_creator<tecmo_mix_device>;
 
-tecmo_mix_device::tecmo_mix_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tecmo_mix_device::tecmo_mix_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TECMO_MIXER, "Tecmo 16-bit Mixer", tag, owner, clock, "tecmo_mix", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_sprpri_shift(0),
@@ -235,6 +235,8 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 					{
 						dd[x] = paldata[sprpixel + m_spregular_comp];
 						//dd[x] = rand();
+						// the bad tiles on the wildfang map (shown between levels) are drawn here.. why? looks like they should be transparent?
+						// most wildfang sprites use this and are fine, so what's going wrong?
 					}
 				}
 

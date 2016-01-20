@@ -18,7 +18,7 @@
 
 const device_type UPD7002 = &device_creator<upd7002_device>;
 
-upd7002_device::upd7002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd7002_device::upd7002_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, UPD7002, "uPD7002", tag, owner, clock, "upd7002", __FILE__), m_status(0), m_data1(0), m_data0(0), m_digitalvalue(0), m_conversion_counter(0)
 {
 }

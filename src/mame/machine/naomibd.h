@@ -12,7 +12,7 @@
 class naomi_board : public naomi_g1_device
 {
 public:
-	naomi_board(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	naomi_board(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	static void static_set_eeprom_tag(device_t &device, const char *_eeprom_tag, const char *_actel_tag);
 
@@ -33,11 +33,11 @@ public:
 	DECLARE_READ16_MEMBER( default_r);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void dma_get_position(UINT8 *&base, UINT32 &limit, bool to_mainram);
-	virtual void dma_advance(UINT32 size);
+	virtual void dma_get_position(UINT8 *&base, UINT32 &limit, bool to_mainram) override;
+	virtual void dma_advance(UINT32 size) override;
 
 	// To be defined in the underlying class
 	virtual void board_setup_address(UINT32 address, bool is_dma) = 0;

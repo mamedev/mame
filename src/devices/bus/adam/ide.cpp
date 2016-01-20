@@ -61,7 +61,7 @@ const rom_entry *powermate_ide_device::device_rom_region() const
 //  MACHINE_CONFIG_FRAGMENT( adam_ata )
 //-------------------------------------------------
 static MACHINE_CONFIG_FRAGMENT( adam_ata )
-	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", nullptr, false)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
@@ -88,7 +88,7 @@ machine_config_constructor powermate_ide_device::device_mconfig_additions() cons
 //  powermate_ide_device - constructor
 //-------------------------------------------------
 
-powermate_ide_device::powermate_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+powermate_ide_device::powermate_ide_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ADAM_IDE, "Powermate HP IDE", tag, owner, clock, "adam_ide", __FILE__),
 		device_adam_expansion_slot_card_interface(mconfig, *this),
 		m_ata(*this, ATA_TAG),

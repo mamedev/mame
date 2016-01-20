@@ -167,7 +167,7 @@ static const int word_length[4] = { 5, 6, 7, 8 };
 
 const device_type MC6854 = &device_creator<mc6854_device>;
 
-mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mc6854_device::mc6854_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MC6854, "MC6854 ADLC", tag, owner, clock, "mc6854", __FILE__),
 	m_out_irq_cb(*this),
 	m_out_txd_cb(*this),
@@ -183,7 +183,7 @@ mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, dev
 	m_dcd(0),
 	m_tstate(0),
 	m_tones(0),
-	m_ttimer(NULL),
+	m_ttimer(nullptr),
 	m_rstate(0),
 	m_rreg(0),
 	m_rones(0),
@@ -197,9 +197,9 @@ mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, dev
 		m_rfifo[i] = 0;
 	}
 
-	for (int i = 0; i < MAX_FRAME_LENGTH; i++)
+	for (auto & elem : m_frame)
 	{
-		m_frame[i] = 0;
+		elem = 0;
 	}
 }
 

@@ -89,7 +89,7 @@ machine_config_constructor nes_hori4p_device::device_mconfig_additions() const
 //  nes_horitwin_device - constructor
 //-------------------------------------------------
 
-nes_horitwin_device::nes_horitwin_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_horitwin_device::nes_horitwin_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 					device_t(mconfig, NES_HORITWIN, "Hori Twin Adapter", tag, owner, clock, "nes_horitwin", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_port1(*this, "port1"),
@@ -97,7 +97,7 @@ nes_horitwin_device::nes_horitwin_device(const machine_config &mconfig, const ch
 {
 }
 
-nes_hori4p_device::nes_hori4p_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_hori4p_device::nes_hori4p_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 					device_t(mconfig, NES_HORI4P, "Hori 4P Adapter", tag, owner, clock, "nes_hori4p", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_port1(*this, "port1"),

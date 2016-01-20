@@ -488,7 +488,7 @@ static UINT32 apple35_get_offset(floppy_image_legacy *floppy, int head, int trac
 static floperr_t apple35_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	UINT32 data_offset;
-	data_offset = apple35_get_offset(floppy, head, track, sector, NULL);
+	data_offset = apple35_get_offset(floppy, head, track, sector, nullptr);
 	if (data_offset == ~0)
 	{
 		return FLOPPY_ERROR_SEEKERROR;
@@ -503,7 +503,7 @@ static floperr_t apple35_write_sector(floppy_image_legacy *floppy, int head, int
 {
 	UINT32 data_offset;
 
-	data_offset = apple35_get_offset(floppy, head, track, sector, NULL);
+	data_offset = apple35_get_offset(floppy, head, track, sector, nullptr);
 	if (data_offset == ~0)
 		return FLOPPY_ERROR_SEEKERROR;
 	floppy_image_write(floppy, buffer, data_offset, buflen);
@@ -976,7 +976,7 @@ static floperr_t apple35_diskcopy_headerdecode(floppy_image_legacy *floppy, UINT
 
 static FLOPPY_IDENTIFY(apple35_diskcopy_identify)
 {
-	*vote = apple35_diskcopy_headerdecode(floppy, NULL, NULL, NULL, NULL, NULL, NULL) ? 0 : 100;
+	*vote = apple35_diskcopy_headerdecode(floppy, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr) ? 0 : 100;
 	return FLOPPY_ERROR_SUCCESS;
 }
 
@@ -1121,7 +1121,7 @@ static floperr_t apple35_2img_decode(floppy_image_legacy *floppy, UINT32 *image_
 
 static FLOPPY_IDENTIFY(apple35_2img_identify)
 {
-	*vote = apple35_2img_decode(floppy, NULL, NULL, NULL) ? 0 : 100;
+	*vote = apple35_2img_decode(floppy, nullptr, nullptr, nullptr) ? 0 : 100;
 	return FLOPPY_ERROR_SUCCESS;
 }
 
@@ -1175,12 +1175,12 @@ static FLOPPY_CONSTRUCT(apple35_2img_construct)
 
 
 LEGACY_FLOPPY_OPTIONS_START( apple35_mac )
-	LEGACY_FLOPPY_OPTION( apple35_raw, "dsk,img,image", "Apple raw 3.5\" disk image",   apple35_raw_identify,       apple35_raw_construct, NULL,
+	LEGACY_FLOPPY_OPTION( apple35_raw, "dsk,img,image", "Apple raw 3.5\" disk image",   apple35_raw_identify,       apple35_raw_construct, nullptr,
 		HEADS([1]-2)
 		TRACKS([80])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([0]))
-	LEGACY_FLOPPY_OPTION( apple35_dc, "dc,dc42,dsk,img,image",  "Apple DiskCopy disk image",    apple35_diskcopy_identify,  apple35_diskcopy_construct, NULL,
+	LEGACY_FLOPPY_OPTION( apple35_dc, "dc,dc42,dsk,img,image",  "Apple DiskCopy disk image",    apple35_diskcopy_identify,  apple35_diskcopy_construct, nullptr,
 		HEADS([1]-2)
 		TRACKS([80])
 		SECTOR_LENGTH([512])
@@ -1188,17 +1188,17 @@ LEGACY_FLOPPY_OPTIONS_START( apple35_mac )
 LEGACY_FLOPPY_OPTIONS_END
 
 LEGACY_FLOPPY_OPTIONS_START( apple35_iigs )
-	LEGACY_FLOPPY_OPTION( apple35_raw, "dsk,img,image,po", "Apple raw 3.5\" disk image",   apple35_raw_identify,       apple35_raw_construct, NULL,
+	LEGACY_FLOPPY_OPTION( apple35_raw, "dsk,img,image,po", "Apple raw 3.5\" disk image",   apple35_raw_identify,       apple35_raw_construct, nullptr,
 		HEADS([1]-2)
 		TRACKS([80])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([0]))
-	LEGACY_FLOPPY_OPTION( apple35_dc, "dc,dsk,img,image",   "Apple DiskCopy disk image",    apple35_diskcopy_identify,  apple35_diskcopy_construct, NULL,
+	LEGACY_FLOPPY_OPTION( apple35_dc, "dc,dsk,img,image",   "Apple DiskCopy disk image",    apple35_diskcopy_identify,  apple35_diskcopy_construct, nullptr,
 		HEADS([1]-2)
 		TRACKS([80])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([0]))
-	LEGACY_FLOPPY_OPTION( apple35_2img, "2img,2mg",     "Apple ][gs 2IMG disk image",   apple35_2img_identify,      apple35_2img_construct, NULL,
+	LEGACY_FLOPPY_OPTION( apple35_2img, "2img,2mg",     "Apple ][gs 2IMG disk image",   apple35_2img_identify,      apple35_2img_construct, nullptr,
 		HEADS([1]-2)
 		TRACKS([80])
 		SECTOR_LENGTH([512])
@@ -1410,8 +1410,8 @@ bool dc42_format::save(io_generic *io, floppy_image *image)
 
 				if(hb == 4) {
 					UINT8 h[7];
-					for(int i=0; i<7; i++)
-						h[i] = gb(buf, ts, pos, wrap);
+					for(auto & elem : h)
+						elem = gb(buf, ts, pos, wrap);
 					UINT8 v2 = gcr6bw_tb[h[2]];
 					UINT8 v3 = gcr6bw_tb[h[3]];
 					UINT8 tr = gcr6bw_tb[h[0]] | (v2 & 1 ? 0x40 : 0x00);

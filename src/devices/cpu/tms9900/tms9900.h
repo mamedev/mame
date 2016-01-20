@@ -42,9 +42,9 @@ static const char opname[][5] =
 class tms99xx_device : public cpu_device
 {
 public:
-	tms99xx_device(const machine_config &mconfig, device_type type,  const char *name,
-				const char *tag, int databus_width, int prg_addr_bits, int cru_addr_bits,
-				device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	tms99xx_device(const machine_config &mconfig, device_type type, std::string name,
+				std::string tag, int databus_width, int prg_addr_bits, int cru_addr_bits,
+				device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	~tms99xx_device();
 
@@ -67,25 +67,25 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void        device_start();
-	virtual void        device_stop();
-	virtual void        device_reset();
+	virtual void        device_start() override;
+	virtual void        device_stop() override;
+	virtual void        device_reset() override;
 
 	virtual void        resolve_lines();
 
 	// device_execute_interface overrides
-	virtual UINT32      execute_min_cycles() const;
-	virtual UINT32      execute_max_cycles() const;
-	virtual UINT32      execute_input_lines() const;
-	virtual void        execute_set_input(int irqline, int state);
-	virtual void        execute_run();
+	virtual UINT32      execute_min_cycles() const override;
+	virtual UINT32      execute_max_cycles() const override;
+	virtual UINT32      execute_input_lines() const override;
+	virtual void        execute_set_input(int irqline, int state) override;
+	virtual void        execute_run() override;
 
 	// device_disasm_interface overrides
-	virtual UINT32      disasm_min_opcode_bytes() const;
-	virtual UINT32      disasm_max_opcode_bytes() const;
-	virtual offs_t      disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32      disasm_min_opcode_bytes() const override;
+	virtual UINT32      disasm_max_opcode_bytes() const override;
+	virtual offs_t      disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	const address_space_config* memory_space_config(address_spacenum spacenum) const;
+	const address_space_config* memory_space_config(address_spacenum spacenum) const override;
 
 	// Let these methods be overloaded by the TMS9980.
 	virtual void        mem_read(void);
@@ -224,9 +224,9 @@ private:
 	// State / debug management
 	UINT16  m_state_any;
 	static const char* s_statename[];
-	void    state_import(const device_state_entry &entry);
-	void    state_export(const device_state_entry &entry);
-	void    state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// Interrupt handling
 	void service_interrupt();
@@ -301,7 +301,7 @@ private:
 	void    alu_abs(void);
 	void    alu_x(void);
 	void    alu_b(void);
-	void    alu_bl(void);
+	//void    alu_bl(void);
 	void    alu_blwp(void);
 	void    alu_ldcr(void);
 	void    alu_stcr(void);
@@ -393,7 +393,7 @@ private:
 class tms9900_device : public tms99xx_device
 {
 public:
-	tms9900_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms9900_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

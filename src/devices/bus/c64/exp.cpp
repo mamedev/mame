@@ -56,7 +56,7 @@ device_c64_expansion_card_interface::~device_c64_expansion_card_interface()
 //  c64_expansion_slot_device - constructor
 //-------------------------------------------------
 
-c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, C64_EXPANSION_SLOT, "C64 expansion port", tag, owner, clock, "c64_expansion_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this),
@@ -117,9 +117,9 @@ bool c64_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
-		size_t size = 0;
+		size_t size;
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			size = length();
 
@@ -155,8 +155,8 @@ bool c64_expansion_slot_device::call_load()
 
 				if (cbm_crt_read_header(m_file, &roml_size, &romh_size, &exrom, &game))
 				{
-					UINT8 *roml = NULL;
-					UINT8 *romh = NULL;
+					UINT8 *roml = nullptr;
+					UINT8 *romh = nullptr;
 
 					m_card->m_roml.allocate(roml_size);
 					m_card->m_romh.allocate(romh_size);
@@ -191,8 +191,8 @@ bool c64_expansion_slot_device::call_load()
 				load_software_region("romh", m_card->m_romh);
 				load_software_region("nvram", m_card->m_nvram);
 
-				if (get_feature("exrom") != NULL) m_card->m_exrom = atol(get_feature("exrom"));
-				if (get_feature("game") != NULL) m_card->m_game = atol(get_feature("game"));
+				if (get_feature("exrom") != nullptr) m_card->m_exrom = atol(get_feature("exrom"));
+				if (get_feature("game") != nullptr) m_card->m_game = atol(get_feature("game"));
 			}
 		}
 	}
@@ -207,7 +207,7 @@ bool c64_expansion_slot_device::call_load()
 
 bool c64_expansion_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 
 	return true;
 }
@@ -217,20 +217,17 @@ bool c64_expansion_slot_device::call_softlist_load(software_list_device &swlist,
 //  get_default_card_software -
 //-------------------------------------------------
 
-void c64_expansion_slot_device::get_default_card_software(std::string &result)
+std::string c64_expansion_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
 		if (!core_stricmp(filetype(), "crt"))
-		{
-			cbm_crt_get_card(result, m_file);
-			return;
-		}
+			return cbm_crt_get_card(m_file);
 
 		clear();
 	}
 
-	software_get_default_slot(result, "standard");
+	return software_get_default_slot("standard");
 }
 
 
@@ -240,7 +237,7 @@ void c64_expansion_slot_device::get_default_card_software(std::string &result)
 
 UINT8 c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		data = m_card->c64_cd_r(space, offset, data, sphi2, ba, roml, romh, io1, io2);
 	}
@@ -255,7 +252,7 @@ UINT8 c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8
 
 void c64_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		m_card->c64_cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);
 	}
@@ -272,7 +269,7 @@ int c64_expansion_slot_device::game_r(offs_t offset, int sphi2, int ba, int rw, 
 
 	m_hiram = hiram;
 
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		state = m_card->c64_game_r(offset, sphi2, ba, rw);
 	}
@@ -291,7 +288,7 @@ int c64_expansion_slot_device::exrom_r(offs_t offset, int sphi2, int ba, int rw,
 
 	m_hiram = hiram;
 
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		state = m_card->c64_exrom_r(offset, sphi2, ba, rw);
 	}

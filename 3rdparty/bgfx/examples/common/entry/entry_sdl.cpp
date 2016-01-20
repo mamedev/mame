@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "entry_p.h"
@@ -142,7 +142,7 @@ namespace entry
 			return NULL;
 		}
 
-#	if BX_PLATFORM_LINUX || BX_PLATFORM_FREEBSD
+#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
 		return (void*)wmi.info.x11.window;
 #	elif BX_PLATFORM_OSX
 		return wmi.info.cocoa.window;

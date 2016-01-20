@@ -38,7 +38,7 @@ http://www.dragons-lair-project.com/tech/pages/dl2.asp
 class dlair2_state : public driver_device
 {
 public:
-	dlair2_state(const machine_config &mconfig, device_type type, const char *tag)
+	dlair2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"){ }
 
@@ -53,10 +53,10 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 };
 
 void dlair2_state::video_start()

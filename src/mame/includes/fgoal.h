@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 #include "machine/mb14241.h"
 
@@ -10,7 +10,7 @@ public:
 		TIMER_INTERRUPT
 	};
 
-	fgoal_state(const machine_config &mconfig, device_type type, const char *tag)
+	fgoal_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mb14241(*this, "mb14241"),
@@ -63,9 +63,9 @@ public:
 
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(fgoal);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -73,5 +73,5 @@ public:
 	unsigned video_ram_address( );
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

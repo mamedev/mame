@@ -21,7 +21,7 @@
 
 const device_type INTV_ROM_VOICE = &device_creator<intv_voice_device>;
 
-intv_voice_device::intv_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+intv_voice_device::intv_voice_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 				: intv_rom_device(mconfig, INTV_ROM_VOICE, "Intellivision Intellivoice Expansion", tag, owner, clock, "intv_voice", __FILE__),
 				m_speech(*this, "sp0256_speech"),
 				m_subslot(*this, "subslot"),
@@ -75,7 +75,7 @@ static MACHINE_CONFIG_FRAGMENT( intellivoice )
 	/* The Intellivoice uses a speaker with its own volume control so the relative volumes to use are subjective */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono_voice", 1.00)
 
-	MCFG_INTV_CARTRIDGE_ADD("subslot", intv_cart, NULL)
+	MCFG_INTV_CARTRIDGE_ADD("subslot", intv_cart, nullptr)
 MACHINE_CONFIG_END
 
 

@@ -86,7 +86,7 @@ void dump_decrypted(running_machine& machine, UINT8* decrypt)
 void subsino_decrypt(running_machine& machine, void (*bitswaps)(UINT8 *decrypt, int i), const UINT8 *xors, int size)
 {
 	int i;
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
+	std::unique_ptr<UINT8[]> decrypt = std::make_unique<UINT8[]>(0x10000);
 	UINT8* region = machine.root_device().memregion("maincpu")->base();
 
 	for (i=0;i<0x10000;i++)
@@ -94,7 +94,7 @@ void subsino_decrypt(running_machine& machine, void (*bitswaps)(UINT8 *decrypt, 
 		if (i<size)
 		{
 			decrypt[i] = region[i]^xors[i&7];
-			bitswaps(decrypt, i);
+			bitswaps(decrypt.get(), i);
 		}
 		else
 		{
@@ -102,5 +102,5 @@ void subsino_decrypt(running_machine& machine, void (*bitswaps)(UINT8 *decrypt, 
 		}
 	}
 //  dump_decrypted(machine, decrypt);
-	memcpy(region, decrypt, 0x10000);
+	memcpy(region, decrypt.get(), 0x10000);
 }

@@ -257,8 +257,8 @@ WRITE8_MEMBER(pmd85_state::pmd85_ppi_0_portb_w)
 WRITE8_MEMBER(pmd85_state::pmd85_ppi_0_portc_w)
 {
 	m_ppi_port_outputs[0][2] = data;
-	set_led_status(machine(), PMD85_LED_2, (data & 0x08) ? 1 : 0);
-	set_led_status(machine(), PMD85_LED_3, (data & 0x04) ? 1 : 0);
+	output().set_led_value(PMD85_LED_2, (data & 0x08) ? 1 : 0);
+	output().set_led_value(PMD85_LED_3, (data & 0x04) ? 1 : 0);
 }
 
 /*******************************************************************************
@@ -290,8 +290,8 @@ READ8_MEMBER(pmd85_state::mato_ppi_0_portc_r)
 WRITE8_MEMBER(pmd85_state::mato_ppi_0_portc_w)
 {
 	m_ppi_port_outputs[0][2] = data;
-	set_led_status(machine(), PMD85_LED_2, BIT(data, 3));
-	set_led_status(machine(), PMD85_LED_3, BIT(data, 2));
+	output().set_led_value(PMD85_LED_2, BIT(data, 3));
+	output().set_led_value(PMD85_LED_3, BIT(data, 2));
 }
 
 /*******************************************************************************
@@ -402,7 +402,7 @@ WRITE8_MEMBER(pmd85_state::pmd85_ppi_2_portc_w)
 
 READ8_MEMBER(pmd85_state::pmd85_ppi_3_porta_r)
 {
-	if (memregion("user1")->base() != NULL)
+	if (memregion("user1")->base() != nullptr)
 		return memregion("user1")->base()[m_ppi_port_outputs[3][1] | (m_ppi_port_outputs[3][2] << 8)];
 	else
 		return 0;
@@ -797,7 +797,7 @@ DRIVER_INIT_MEMBER(pmd85_state,mato)
 	}
 	for ( int i = 9; i < 16; i++ )
 	{
-		m_io_port[i] = NULL;
+		m_io_port[i] = nullptr;
 	}
 }
 

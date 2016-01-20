@@ -36,7 +36,7 @@
 class mstation_state : public driver_device
 {
 public:
-	mstation_state(const machine_config &mconfig, device_type type, const char *tag)
+	mstation_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_ram(*this, RAM_TAG)
@@ -89,8 +89,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( rtc_irq );
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(mstation);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_1hz_timer);

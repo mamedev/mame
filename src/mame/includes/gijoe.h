@@ -14,7 +14,7 @@
 class gijoe_state : public driver_device
 {
 public:
-	gijoe_state(const machine_config &mconfig, device_type type, const char *tag)
+	gijoe_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_workram(*this, "workram"),
@@ -55,9 +55,9 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_cmd_w);
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
 	DECLARE_READ16_MEMBER(sound_status_r);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_gijoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gijoe_interrupt);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);

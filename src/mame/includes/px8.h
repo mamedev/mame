@@ -31,7 +31,7 @@
 class px8_state : public driver_device
 {
 public:
-	px8_state(const machine_config &mconfig, device_type type, const char *tag)
+	px8_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, UPD70008_TAG),
 			m_cassette(*this, "cassette"),
@@ -44,8 +44,8 @@ public:
 	/* video state */
 	required_shared_ptr<UINT8> m_video_ram;         /* LCD video RAM */
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -81,7 +81,6 @@ public:
 	/* keyboard state */
 	int m_ksc;              /* keyboard scan column */
 	DECLARE_PALETTE_INIT(px8);
-	UINT32 screen_update_px8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 #endif

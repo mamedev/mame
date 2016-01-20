@@ -630,20 +630,20 @@ DRIVER_INIT_MEMBER(esripsys_state,esripsys)
 {
 	UINT8 *rom = memregion("sound_data")->base();
 
-	m_fdt_a = auto_alloc_array(machine(), UINT8, FDT_RAM_SIZE);
-	m_fdt_b = auto_alloc_array(machine(), UINT8, FDT_RAM_SIZE);
-	m_cmos_ram = auto_alloc_array(machine(), UINT8, CMOS_RAM_SIZE);
+	m_fdt_a = std::make_unique<UINT8[]>(FDT_RAM_SIZE);
+	m_fdt_b = std::make_unique<UINT8[]>(FDT_RAM_SIZE);
+	m_cmos_ram = std::make_unique<UINT8[]>(CMOS_RAM_SIZE);
 
-	machine().device<nvram_device>("nvram")->set_base(m_cmos_ram, CMOS_RAM_SIZE);
+	machine().device<nvram_device>("nvram")->set_base(m_cmos_ram.get(), CMOS_RAM_SIZE);
 
 	membank("bank2")->set_base(&rom[0x0000]);
 	membank("bank3")->set_base(&rom[0x4000]);
 	membank("bank4")->set_base(&rom[0x8000]);
 
 	/* Register stuff for state saving */
-	save_pointer(NAME(m_fdt_a), FDT_RAM_SIZE);
-	save_pointer(NAME(m_fdt_b), FDT_RAM_SIZE);
-	save_pointer(NAME(m_cmos_ram), CMOS_RAM_SIZE);
+	save_pointer(NAME(m_fdt_a.get()), FDT_RAM_SIZE);
+	save_pointer(NAME(m_fdt_b.get()), FDT_RAM_SIZE);
+	save_pointer(NAME(m_cmos_ram.get()), CMOS_RAM_SIZE);
 
 	save_item(NAME(m_g_iodata));
 	save_item(NAME(m_g_ioaddr));

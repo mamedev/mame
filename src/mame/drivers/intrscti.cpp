@@ -20,7 +20,7 @@ I've not had a chance to wire up the board yet, but it might be possible to writ
 class intrscti_state : public driver_device
 {
 public:
-	intrscti_state(const machine_config &mconfig, device_type type, const char *tag)
+	intrscti_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_subcpu(*this,"subcpu"),
@@ -36,7 +36,7 @@ public:
 	required_device<palette_device> m_palette;
 
 	DECLARE_DRIVER_INIT(intrscti);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_intrscti(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 

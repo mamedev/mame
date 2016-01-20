@@ -11,7 +11,7 @@
 class timeplt_state : public driver_device
 {
 public:
-	timeplt_state(const machine_config &mconfig, device_type type, const char *tag)
+	timeplt_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tc8830f(*this, "tc8830f"),
@@ -64,9 +64,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_chkun_tile_info);
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(timeplt);
 	DECLARE_VIDEO_START(chkun);
 	DECLARE_VIDEO_START(psurge);

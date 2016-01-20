@@ -12,7 +12,7 @@
 class cbuster_state : public driver_device
 {
 public:
-	cbuster_state(const machine_config &mconfig, device_type type, const char *tag)
+	cbuster_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
@@ -52,9 +52,9 @@ public:
 	DECLARE_WRITE16_MEMBER(twocrude_control_w);
 	DECLARE_READ16_MEMBER(twocrude_control_r);
 	DECLARE_DRIVER_INIT(twocrude);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_twocrude(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 };

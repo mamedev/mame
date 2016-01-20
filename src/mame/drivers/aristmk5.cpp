@@ -178,7 +178,7 @@
 class aristmk5_state : public archimedes_state
 {
 public:
-	aristmk5_state(const machine_config &mconfig, device_type type, const char *tag)
+	aristmk5_state(const machine_config &mconfig, device_type type, std::string tag)
 		: archimedes_state(mconfig, type, tag) { }
 
 	emu_timer *m_mk5_2KHz_timer;
@@ -192,8 +192,8 @@ public:
 	DECLARE_READ32_MEMBER(Ns5r50);
 	DECLARE_WRITE32_MEMBER(sram_banksel_w);
 	DECLARE_DRIVER_INIT(aristmk5);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(mk5_VSYNC_callback);
 	TIMER_CALLBACK_MEMBER(mk5_2KHz_callback);
 };
@@ -513,7 +513,7 @@ void aristmk5_state::machine_reset()
 
 		PRG = memregion(rom_region[op_mode & 3])->base();
 
-		if(PRG!=NULL)
+		if(PRG!=nullptr)
 
 		for(i=0;i<0x400000;i++)
 			ROM[i] = PRG[i];

@@ -44,7 +44,7 @@ class fmscsi_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
-	fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fmscsi_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<fmscsi_device &>(device).m_irq_handler.set_callback(object); }
@@ -67,9 +67,9 @@ public:
 
 protected:
 	// device-level overrides (none are required, but these are common)
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// internal device state goes here

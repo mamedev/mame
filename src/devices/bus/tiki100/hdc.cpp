@@ -63,7 +63,7 @@ machine_config_constructor tiki100_hdc_t::device_mconfig_additions() const
 //  tiki100_hdc_t - constructor
 //-------------------------------------------------
 
-tiki100_hdc_t::tiki100_hdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+tiki100_hdc_t::tiki100_hdc_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, TIKI100_HDC, "TIKI-100 Winchester controller", tag, owner, clock, "tiki100_hdc", __FILE__),
 	device_tiki100bus_card_interface(mconfig, *this),
 	m_hdc(*this, WD1010_TAG)

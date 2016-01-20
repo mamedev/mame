@@ -22,7 +22,7 @@
 class decodmd_type1_device : public device_t
 {
 public:
-	decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	decodmd_type1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	required_device<cpu_device> m_cpu;
 	required_memory_bank m_rombank1;
 	required_memory_bank m_rombank2;
@@ -31,7 +31,6 @@ public:
 
 	UINT32 screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 
-	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_READ8_MEMBER(latch_r);
 	DECLARE_WRITE8_MEMBER(data_w);
 	DECLARE_READ8_MEMBER(busy_r);
@@ -43,12 +42,12 @@ public:
 	DECLARE_WRITE8_MEMBER(dmd_port_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(dmd_nmi);
 
-	static void static_set_gfxregion(device_t &device, const char *tag);
+	static void static_set_gfxregion(device_t &device, std::string tag);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	UINT8 m_latch;
@@ -69,7 +68,7 @@ private:
 	UINT32 m_pixels[0x200];
 	UINT8 m_busy_lines;
 	UINT32 m_prevrow;
-	const char* m_gfxtag;
+	std::string m_gfxtag;
 
 	void output_data();
 	void set_busy(UINT8 input, UINT8 val);

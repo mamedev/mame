@@ -3,7 +3,7 @@
 
 #include "scsi.h"
 
-SCSI_PORT_DEVICE::SCSI_PORT_DEVICE(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+SCSI_PORT_DEVICE::SCSI_PORT_DEVICE(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SCSI_PORT, "SCSI Port", tag, owner, clock, "scsi", __FILE__),
 	m_bsy_handler(*this),
 	m_sel_handler(*this),
@@ -21,7 +21,7 @@ SCSI_PORT_DEVICE::SCSI_PORT_DEVICE(const machine_config &mconfig, const char *ta
 	m_data4_handler(*this),
 	m_data5_handler(*this),
 	m_data6_handler(*this),
-	m_data7_handler(*this), 
+	m_data7_handler(*this),
 	m_device_count(0),
 	m_bsy_in(0),
 	m_sel_in(0),
@@ -29,7 +29,7 @@ SCSI_PORT_DEVICE::SCSI_PORT_DEVICE(const machine_config &mconfig, const char *ta
 	m_io_in(0),
 	m_msg_in(0),
 	m_req_in(0),
-	m_ack_in(0), 
+	m_ack_in(0),
 	m_atn_in(0),
 	m_rst_in(0),
 	m_data0_in(0),
@@ -46,7 +46,7 @@ SCSI_PORT_DEVICE::SCSI_PORT_DEVICE(const machine_config &mconfig, const char *ta
 	m_io_out(0),
 	m_msg_out(0),
 	m_req_out(0),
-	m_ack_out(0), 
+	m_ack_out(0),
 	m_atn_out(0),
 	m_rst_out(0),
 	m_data0_out(0),
@@ -95,7 +95,7 @@ void SCSI_PORT_DEVICE::device_start()
 		SCSI_PORT_SLOT_device *slot = subdevice<SCSI_PORT_SLOT_device>(deviceName[i]);
 		m_slot[i] = slot;
 
-		if (slot != NULL)
+		if (slot != nullptr)
 			m_device_count = i + 1;
 	}
 
@@ -153,7 +153,7 @@ void SCSI_PORT_DEVICE::update_bsy()
 		for (int i = 0; i < m_device_count; i++)
 		{
 			scsi_port_interface *dev = m_slot[i]->dev();
-			if (dev != NULL)
+			if (dev != nullptr)
 				dev->input_bsy(bsy);
 		}
 	}
@@ -175,7 +175,7 @@ void SCSI_PORT_DEVICE::update_sel()
 		for (int i = 0; i < m_device_count; i++)
 		{
 			scsi_port_interface *dev = m_slot[i]->dev();
-			if (dev != NULL)
+			if (dev != nullptr)
 				dev->input_sel(sel);
 		}
 	}
@@ -197,7 +197,7 @@ void SCSI_PORT_DEVICE::update_cd()
 		for (int i = 0; i < m_device_count; i++)
 		{
 			scsi_port_interface *dev = m_slot[i]->dev();
-			if (dev != NULL)
+			if (dev != nullptr)
 				dev->input_cd(cd);
 		}
 	}
@@ -219,7 +219,7 @@ void SCSI_PORT_DEVICE::update_io()
 		for (int i = 0; i < m_device_count; i++)
 		{
 			scsi_port_interface *dev = m_slot[i]->dev();
-			if (dev != NULL)
+			if (dev != nullptr)
 				dev->input_io(io);
 		}
 	}
@@ -241,7 +241,7 @@ void SCSI_PORT_DEVICE::update_msg()
 		for (int i = 0; i < m_device_count; i++)
 		{
 			scsi_port_interface *dev = m_slot[i]->dev();
-			if (dev != NULL)
+			if (dev != nullptr)
 				dev->input_msg(msg);
 		}
 	}
@@ -263,7 +263,7 @@ void SCSI_PORT_DEVICE::update_req()
 		for (int i = 0; i < m_device_count; i++)
 		{
 			scsi_port_interface *dev = m_slot[i]->dev();
-			if (dev != NULL)
+			if (dev != nullptr)
 				dev->input_req(req);
 		}
 	}
@@ -285,7 +285,7 @@ void SCSI_PORT_DEVICE::update_ack()
 		for (int i = 0; i < m_device_count; i++)
 		{
 			scsi_port_interface *dev = m_slot[i]->dev();
-			if (dev != NULL)
+			if (dev != nullptr)
 				dev->input_ack(ack);
 		}
 	}
@@ -307,7 +307,7 @@ void SCSI_PORT_DEVICE::update_atn()
 		for (int i = 0; i < m_device_count; i++)
 		{
 			scsi_port_interface *dev = m_slot[i]->dev();
-			if (dev != NULL)
+			if (dev != nullptr)
 				dev->input_atn(atn);
 		}
 	}
@@ -329,7 +329,7 @@ void SCSI_PORT_DEVICE::update_rst()
 		for (int i = 0; i < m_device_count; i++)
 		{
 			scsi_port_interface *dev = m_slot[i]->dev();
-			if (dev != NULL)
+			if (dev != nullptr)
 				dev->input_rst(rst);
 		}
 	}
@@ -351,7 +351,7 @@ void SCSI_PORT_DEVICE::update_data0()
 		for (int i = 0; i < m_device_count; i++)
 		{
 			scsi_port_interface *dev = m_slot[i]->dev();
-			if (dev != NULL)
+			if (dev != nullptr)
 				dev->input_data0(data0);
 		}
 	}
@@ -373,7 +373,7 @@ void SCSI_PORT_DEVICE::update_data1()
 		for (int i = 0; i < m_device_count; i++)
 		{
 			scsi_port_interface *dev = m_slot[i]->dev();
-			if (dev != NULL)
+			if (dev != nullptr)
 				dev->input_data1(data1);
 		}
 	}
@@ -395,7 +395,7 @@ void SCSI_PORT_DEVICE::update_data2()
 		for (int i = 0; i < m_device_count; i++)
 		{
 			scsi_port_interface *dev = m_slot[i]->dev();
-			if (dev != NULL)
+			if (dev != nullptr)
 				dev->input_data2(data2);
 		}
 	}
@@ -417,7 +417,7 @@ void SCSI_PORT_DEVICE::update_data3()
 		for (int i = 0; i < m_device_count; i++)
 		{
 			scsi_port_interface *dev = m_slot[i]->dev();
-			if (dev != NULL)
+			if (dev != nullptr)
 				dev->input_data3(data3);
 		}
 	}
@@ -439,7 +439,7 @@ void SCSI_PORT_DEVICE::update_data4()
 		for (int i = 0; i < m_device_count; i++)
 		{
 			scsi_port_interface *dev = m_slot[i]->dev();
-			if (dev != NULL)
+			if (dev != nullptr)
 				dev->input_data4(data4);
 		}
 	}
@@ -461,7 +461,7 @@ void SCSI_PORT_DEVICE::update_data5()
 		for (int i = 0; i < m_device_count; i++)
 		{
 			scsi_port_interface *dev = m_slot[i]->dev();
-			if (dev != NULL)
+			if (dev != nullptr)
 				dev->input_data5(data5);
 		}
 	}
@@ -483,7 +483,7 @@ void SCSI_PORT_DEVICE::update_data6()
 		for (int i = 0; i < m_device_count; i++)
 		{
 			scsi_port_interface *dev = m_slot[i]->dev();
-			if (dev != NULL)
+			if (dev != nullptr)
 				dev->input_data6(data6);
 		}
 	}
@@ -505,7 +505,7 @@ void SCSI_PORT_DEVICE::update_data7()
 		for (int i = 0; i < m_device_count; i++)
 		{
 			scsi_port_interface *dev = m_slot[i]->dev();
-			if (dev != NULL)
+			if (dev != nullptr)
 				dev->input_data7(data7);
 		}
 	}
@@ -666,10 +666,10 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data7 )
 
 const device_type SCSI_PORT = &device_creator<SCSI_PORT_DEVICE>;
 
-SCSI_PORT_SLOT_device::SCSI_PORT_SLOT_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+SCSI_PORT_SLOT_device::SCSI_PORT_SLOT_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SCSI_PORT_SLOT, "SCSI Connector", tag, owner, clock, "scsi_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
-	m_dev(NULL),
+	m_dev(nullptr),
 	m_bsy(0),
 	m_sel(0),
 	m_cd(0),

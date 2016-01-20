@@ -3,8 +3,6 @@
 #ifndef __DEBUG_QT_DEVICE_INFORMATION_WINDOW_H__
 #define __DEBUG_QT_DEVICE_INFORMATION_WINDOW_H__
 
-#include <QtGui/QtGui>
-
 #include "windowqt.h"
 
 //============================================================
@@ -18,7 +16,7 @@ public:
 	DeviceInformationWindow(running_machine* machine, device_t* device = NULL, QWidget* parent=NULL);
 	virtual ~DeviceInformationWindow();
 
-	void set_device(const char *tag);
+	void set_device(std::string tag);
 	const char *device_tag() const;
 
 private:

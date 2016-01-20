@@ -27,7 +27,7 @@
 class fcombat_state : public driver_device
 {
 public:
-	fcombat_state(const machine_config &mconfig, device_type type, const char *tag)
+	fcombat_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -70,9 +70,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_DRIVER_INIT(fcombat);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(fcombat);
 	UINT32 screen_update_fcombat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

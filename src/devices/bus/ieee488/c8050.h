@@ -32,13 +32,13 @@ class c8050_t :  public device_t,
 {
 public:
 	// construction/destruction
-	c8050_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	c8050_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c8050_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	c8050_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_READ8_MEMBER( dio_r );
 	DECLARE_WRITE8_MEMBER( dio_w );
@@ -47,19 +47,17 @@ public:
 	DECLARE_READ8_MEMBER( riot1_pb_r );
 	DECLARE_WRITE8_MEMBER( riot1_pb_w );
 	DECLARE_WRITE8_MEMBER( via_pb_w );
-	DECLARE_READ8_MEMBER( pi_r );
-	DECLARE_WRITE8_MEMBER( pi_w );
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_ieee488_interface overrides
-	virtual void ieee488_atn(int state);
-	virtual void ieee488_ifc(int state);
+	virtual void ieee488_atn(int state) override;
+	virtual void ieee488_ifc(int state) override;
 
 	inline void update_ieee_signals();
 
@@ -88,10 +86,10 @@ class c8250_t :  public c8050_t
 {
 public:
 	// construction/destruction
-	c8250_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c8250_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
@@ -103,11 +101,11 @@ class c8250lp_t :  public c8050_t
 {
 public:
 	// construction/destruction
-	c8250lp_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c8250lp_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
@@ -119,11 +117,11 @@ class sfd1001_t :  public c8050_t
 {
 public:
 	// construction/destruction
-	sfd1001_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sfd1001_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };

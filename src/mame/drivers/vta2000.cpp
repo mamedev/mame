@@ -25,7 +25,7 @@ Note: port 0 bit 4 is NOT a speaker bit. See code at 027B.
 class vta2000_state : public driver_device
 {
 public:
-	vta2000_state(const machine_config &mconfig, device_type type, const char *tag)
+	vta2000_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
@@ -36,8 +36,8 @@ public:
 	required_shared_ptr<UINT8> m_p_videoram;
 	DECLARE_PALETTE_INIT(vta2000);
 private:
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 };
 

@@ -40,7 +40,7 @@ Notes:
 class pmi80_state : public driver_device
 {
 public:
-	pmi80_state(const machine_config &mconfig, device_type type, const char *tag)
+	pmi80_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_ledready(0)
 		, m_maincpu(*this, "maincpu")
@@ -52,7 +52,7 @@ public:
 private:
 	UINT8 m_keyrow;
 	bool m_ledready;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -75,7 +75,7 @@ WRITE8_MEMBER( pmi80_state::leds_w )
 	if (m_ledready)
 	{
 		m_ledready = FALSE;
-		output_set_digit_value(m_keyrow^0xff, data^0xff);
+		output().set_digit_value(m_keyrow^0xff, data^0xff);
 	}
 }
 

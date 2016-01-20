@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef BGFX_RENDERER_D3D_H_HEADER_GUARD
@@ -104,6 +104,11 @@ namespace bgfx
 		{
 			invalidate(_key);
 			m_hashMap.insert(stl::make_pair(_key, _value) );
+			BX_CHECK(isGraphicsDebuggerPresent()
+				|| 1 == getRefCount(_value), "Interface ref count %d, hash %" PRIx64 "."
+				, getRefCount(_value)
+				, _key
+				);
 		}
 
 		Ty* find(uint64_t _key)

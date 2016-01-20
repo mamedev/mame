@@ -61,7 +61,7 @@ While in 'space' mode, press a letter to increment CLP, or shift-delete
 class mod8_state : public driver_device
 {
 public:
-	mod8_state(const machine_config &mconfig, device_type type, const char *tag)
+	mod8_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_teleprinter(*this, TELEPRINTER_TAG)
 		, m_maincpu(*this, "maincpu")
@@ -76,7 +76,7 @@ private:
 	UINT16 m_tty_data;
 	UINT8 m_tty_key_data;
 	int m_tty_cnt;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<teleprinter_device> m_teleprinter;
 	required_device<cpu_device> m_maincpu;
 };

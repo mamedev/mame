@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Paul Leaman
 /***************************************************************************
 
@@ -463,7 +463,7 @@ The games seem to use them to mark platforms, kill zones and no-go areas.
 #define CPS_B_14     0x1e,0x0404,          __not_applicable__,          0x12,{0x14,0x16,0x18,0x1a},0x1c, {0x08,0x20,0x10,0x00,0x00}
 #define CPS_B_15     0x0e,0x0405,          __not_applicable__,          0x02,{0x04,0x06,0x08,0x0a},0x0c, {0x04,0x02,0x20,0x00,0x00}
 #define CPS_B_16     0x00,0x0406,          __not_applicable__,          0x0c,{0x0a,0x08,0x06,0x04},0x02, {0x10,0x0a,0x0a,0x00,0x00}
-#define CPS_B_17     0x08,0x0407,          __not_applicable__,          0x14,{0x12,0x10,0x0e,0x0c},0x0a, {0x08,0x10,0x02,0x00,0x00}
+#define CPS_B_17     0x08,0x0407,          __not_applicable__,          0x14,{0x12,0x10,0x0e,0x0c},0x0a, {0x08,0x14,0x02,0x00,0x00}   // the sf2 -> strider conversion needs 0x04 for the 2nd layer enable on one level, gfx confirmed to appear on the PCB, register at the time is 0x8e, so 0x10 is not set.
 #define CPS_B_18     0x10,0x0408,          __not_applicable__,          0x1c,{0x1a,0x18,0x16,0x14},0x12, {0x10,0x08,0x02,0x00,0x00}
 #define CPS_B_21_DEF 0x32,  -1,   0x00,0x02,0x04,0x06, 0x08, -1,  -1,   0x26,{0x28,0x2a,0x2c,0x2e},0x30, {0x02,0x04,0x08,0x30,0x30} // pang3 sets layer enable to 0x26 on startup
 #define CPS_B_21_BT1 0x32,0x0800, 0x0e,0x0c,0x0a,0x08, 0x06,0x04,0x02,  0x28,{0x26,0x24,0x22,0x20},0x30, {0x20,0x04,0x08,0x12,0x12}
@@ -1402,6 +1402,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"daimakair",   CPS_B_21_DEF, mapper_DAM63B },  // equivalent to DM620, also CPS_B_21_DEF is equivalent to CPS_B_01
 	{"strider",     CPS_B_01,     mapper_ST24M1 },
 	{"striderua",   CPS_B_01,     mapper_ST24M1 },  // wrong, this set uses ST24B2, still not dumped
+	{"strideruc",   CPS_B_17,     mapper_ST24M1 },  // wrong?
 	{"striderj",    CPS_B_01,     mapper_ST22B },   // equivalent to ST24M1
 	{"striderjr",   CPS_B_21_DEF, mapper_ST24M1 },  // wrong, this set uses STH63B, still not dumped
 	{"dynwar",      CPS_B_02,     mapper_TK22B },   // wrong, this set uses TK24B1, dumped but equations still not added
@@ -1517,6 +1518,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2v004",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2acc",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2ceblp",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2cebltw",   CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2acca",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2accp2",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2amf",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 }, // probably wrong but this set is not completely dumped anyway
@@ -1531,6 +1533,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2m7",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m8",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2m9",       CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2m10",      HACK_B_1,     mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2dongb",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2yyc",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2koryu",    CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
@@ -1603,7 +1606,7 @@ static const struct CPS1config cps1_config_table[]=
 
 	{"kenseim",     CPS_B_21_DEF, mapper_KNM10B },  // wrong, need to convert equations from PAL
 
-	{0}     /* End of table */
+	{nullptr}     /* End of table */
 };
 
 
@@ -1817,15 +1820,15 @@ WRITE16_MEMBER(cps_state::cps1_cps_b_w)
 		{
 			if (m_game_config->cpsb_value == 0x0402)    // Mercs (CN2 connector)
 			{
-				coin_lockout_w(machine(), 2, ~data & 0x01);
-				set_led_status(machine(), 0, data & 0x02);
-				set_led_status(machine(), 1, data & 0x04);
-				set_led_status(machine(), 2, data & 0x08);
+				machine().bookkeeping().coin_lockout_w(2, ~data & 0x01);
+				output().set_led_value(0, data & 0x02);
+				output().set_led_value(1, data & 0x04);
+				output().set_led_value(2, data & 0x08);
 			}
 			else    // kod, captcomm, knights
 			{
-				coin_lockout_w(machine(), 2, ~data & 0x02);
-				coin_lockout_w(machine(), 3, ~data & 0x08);
+				machine().bookkeeping().coin_lockout_w(2, ~data & 0x02);
+				machine().bookkeeping().coin_lockout_w(3, ~data & 0x08);
 			}
 		}
 	}
@@ -2221,10 +2224,10 @@ VIDEO_START_MEMBER(cps_state,cps)
 	for (i = 0; i < cps1_palette_entries * 16; i++)
 		m_palette->set_pen_color(i, rgb_t(0,0,0));
 
-	m_buffered_obj = auto_alloc_array_clear(machine(), UINT16, m_obj_size / 2);
+	m_buffered_obj = make_unique_clear<UINT16[]>(m_obj_size / 2);
 
 	if (m_cps_version == 2)
-		m_cps2_buffered_obj = auto_alloc_array_clear(machine(), UINT16, m_cps2_obj_size / 2);
+		m_cps2_buffered_obj = make_unique_clear<UINT16[]>(m_cps2_obj_size / 2);
 
 	/* clear RAM regions */
 	memset(m_gfxram, 0, m_gfxram.bytes());   /* Clear GFX RAM */
@@ -2249,11 +2252,11 @@ VIDEO_START_MEMBER(cps_state,cps)
 
 
 	/* Set up old base */
-	m_scroll1 = NULL;
-	m_scroll2 = NULL;
-	m_scroll3 = NULL;
-	m_obj = NULL;
-	m_other = NULL;
+	m_scroll1 = nullptr;
+	m_scroll2 = nullptr;
+	m_scroll3 = nullptr;
+	m_obj = nullptr;
+	m_other = nullptr;
 	cps1_get_video_base();   /* Calculate base pointers */
 	cps1_get_video_base();   /* Calculate old base pointers */
 
@@ -2279,11 +2282,11 @@ VIDEO_START_MEMBER(cps_state,cps)
 	save_item(NAME(m_pri_ctrl));
 	save_item(NAME(m_objram_bank));
 
-	save_pointer(NAME(m_buffered_obj), m_obj_size / 2);
+	save_pointer(NAME(m_buffered_obj.get()), m_obj_size / 2);
 	if (m_cps_version == 2)
 	{
 		save_item(NAME(m_cps2_last_sprite_offset));
-		save_pointer(NAME(m_cps2_buffered_obj), m_cps2_obj_size / 2);
+		save_pointer(NAME(m_cps2_buffered_obj.get()), m_cps2_obj_size / 2);
 	}
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(cps_state::cps1_get_video_base), this));
@@ -2442,7 +2445,7 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 
 
 	int i, baseadd;
-	UINT16 *base = m_buffered_obj;
+	UINT16 *base = m_buffered_obj.get();
 
 	/* some sf2 hacks draw the sprites in reverse order */
 	if ((m_game_config->bootleg_kludge == 1) || (m_game_config->bootleg_kludge == 2) || (m_game_config->bootleg_kludge == 3))
@@ -2635,7 +2638,7 @@ UINT16 *cps_state::cps2_objbase()
 void cps_state::cps2_find_last_sprite()    /* Find the offset of last sprite */
 {
 	int offset = 0;
-	UINT16 *base = m_cps2_buffered_obj;
+	UINT16 *base = m_cps2_buffered_obj.get();
 
 	/* Locate the end of table marker */
 	while (offset < m_cps2_obj_size / 2)
@@ -2674,7 +2677,7 @@ void cps_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 }
 
 	int i;
-	UINT16 *base = m_cps2_buffered_obj;
+	UINT16 *base = m_cps2_buffered_obj.get();
 	int xoffs = 64 - m_output[CPS2_OBJ_XOFFS /2];
 	int yoffs = 16 - m_output[CPS2_OBJ_YOFFS /2];
 
@@ -3064,7 +3067,7 @@ void cps_state::screen_eof_cps1(screen_device &screen, bool state)
 		if (m_cps_version == 1)
 		{
 			/* CPS1 sprites have to be delayed one frame */
-			memcpy(m_buffered_obj, m_obj, m_obj_size);
+			memcpy(m_buffered_obj.get(), m_obj, m_obj_size);
 		}
 	}
 }
@@ -3077,5 +3080,5 @@ void cps_state::cps2_set_sprite_priorities()
 void cps_state::cps2_objram_latch()
 {
 	cps2_set_sprite_priorities();
-	memcpy(m_cps2_buffered_obj, cps2_objbase(), m_cps2_obj_size);
+	memcpy(m_cps2_buffered_obj.get(), cps2_objbase(), m_cps2_obj_size);
 }

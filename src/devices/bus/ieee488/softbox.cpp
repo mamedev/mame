@@ -212,9 +212,9 @@ WRITE8_MEMBER( softbox_device::ppi1_pc_w )
 
 	*/
 
-	output_set_led_value(LED_A, !BIT(data, 0));
-	output_set_led_value(LED_B, !BIT(data, 1));
-	output_set_led_value(LED_READY, !BIT(data, 2));
+	machine().output().set_led_value(LED_A, !BIT(data, 0));
+	machine().output().set_led_value(LED_B, !BIT(data, 1));
+	machine().output().set_led_value(LED_READY, !BIT(data, 2));
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -243,7 +243,7 @@ static MACHINE_CONFIG_FRAGMENT( softbox )
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
@@ -326,7 +326,7 @@ ioport_constructor softbox_device::device_input_ports() const
 //  softbox_device - constructor
 //-------------------------------------------------
 
-softbox_device::softbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+softbox_device::softbox_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SOFTBOX, "PET SoftBox", tag, owner, clock, "pet_softbox", __FILE__),
 		device_ieee488_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),

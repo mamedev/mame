@@ -29,7 +29,7 @@
 class swtpc09_state : public driver_device
 {
 public:
-	swtpc09_state(const machine_config &mconfig, device_type type, const char *tag)
+	swtpc09_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_pia(*this, "pia"),
@@ -79,15 +79,12 @@ public:
 	DECLARE_READ8_MEMBER( dmf3_via_read_porta );
 	DECLARE_READ8_MEMBER( dmf3_via_read_portb );
 	DECLARE_WRITE8_MEMBER( dmf3_via_write_porta );
-	DECLARE_WRITE_LINE_MEMBER( dmf3_via_write_ca1 );
 	DECLARE_WRITE_LINE_MEMBER( dmf3_via_irq );
 
 	DECLARE_READ8_MEMBER(piaide_a_r);
 	DECLARE_READ8_MEMBER(piaide_b_r);
 	DECLARE_WRITE8_MEMBER(piaide_a_w);
 	DECLARE_WRITE8_MEMBER(piaide_b_w);
-
-	DECLARE_WRITE8_MEMBER(swtpc09_kbd_put);
 
 	DECLARE_READ8_MEMBER ( dmf2_dma_address_reg_r );
 	DECLARE_WRITE8_MEMBER ( dmf2_dma_address_reg_w );

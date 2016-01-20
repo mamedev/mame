@@ -59,7 +59,7 @@ bool win_check_socket_path(const char *path)
 {
 	if (strlen(winfile_socket_identifier) > 0 &&
 		strncmp(path, winfile_socket_identifier, strlen(winfile_socket_identifier)) == 0 &&
-		strchr(path, ':') != NULL) return true;
+		strchr(path, ':') != nullptr) return true;
 	return false;
 }
 
@@ -105,7 +105,7 @@ file_error win_open_socket(const char *path, UINT32 openflags, osd_file **file, 
 		}
 
 		// mark socket as "listening"
-		(*file)->handle = 0;
+		(*file)->handle = nullptr;
 		*filesize = 0;
 		return FILERR_NONE;
 	}
@@ -131,7 +131,7 @@ file_error win_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 c
 	FD_SET(file->socket, &readfds);
 	timeout.tv_sec = timeout.tv_usec = 0;
 
-	if (select(file->socket + 1, &readfds, NULL, NULL, &timeout) < 0)
+	if (select(file->socket + 1, &readfds, nullptr, nullptr, &timeout) < 0)
 	{
 		sprintf(line, "win_read_socket : %s : %d ", __FILE__,  __LINE__);
 		perror(line);
@@ -148,7 +148,7 @@ file_error win_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 c
 		{
 			// listening socket
 			SOCKET AcceptSocket;
-			AcceptSocket = accept(file->socket, NULL, NULL);
+			AcceptSocket = accept(file->socket, nullptr, nullptr);
 			if (AcceptSocket == INVALID_SOCKET)
 			{
 				return FILERR_FAILURE;
@@ -156,7 +156,7 @@ file_error win_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 c
 			closesocket(file->socket);
 			file->socket = AcceptSocket;
 			file->handle = INVALID_HANDLE_VALUE;
-			if (actual != NULL )
+			if (actual != nullptr )
 			{
 				*actual = 0;
 			}
@@ -174,7 +174,7 @@ file_error win_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 c
 		return win_error_to_mame_file_error(GetLastError());
 	}
 
-	if (actual != NULL )
+	if (actual != nullptr )
 	{
 		*actual = result;
 	}
@@ -190,7 +190,7 @@ file_error win_write_socket(osd_file *file, const void *buffer, UINT64 offset, U
 		return win_error_to_mame_file_error(GetLastError());
 	}
 
-	if (actual != NULL )
+	if (actual != nullptr )
 	{
 		*actual = result;
 	}

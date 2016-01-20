@@ -199,7 +199,7 @@ ioport_constructor epson_lx800_t::device_input_ports() const
 //  epson_lx800_t - constructor
 //-------------------------------------------------
 
-epson_lx800_t::epson_lx800_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+epson_lx800_t::epson_lx800_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, EPSON_LX800, "Epson LX-800", tag, owner, clock, "lx800", __FILE__),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
@@ -207,7 +207,7 @@ epson_lx800_t::epson_lx800_t(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-epson_lx800_t::epson_lx800_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+epson_lx800_t::epson_lx800_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
@@ -295,7 +295,7 @@ WRITE8_MEMBER( epson_lx800_t::portc_w )
 	logerror("%s: lx800_portc_w(%02x): %02x\n", machine().describe_context(), offset, data);
 	logerror("--> err: %d, ack: %d, fire: %d, buzzer: %d\n", BIT(data, 4), BIT(data, 5), BIT(data, 6), BIT(data, 7));
 
-	output_set_value("online_led", !BIT(data, 2));
+	machine().output().set_value("online_led", !BIT(data, 2));
 	m_beep->set_state(!BIT(data, 7));
 }
 
@@ -348,7 +348,7 @@ WRITE_LINE_MEMBER( epson_lx800_t::centronics_pe_w )
 WRITE_LINE_MEMBER( epson_lx800_t::paperempty_led_w )
 {
 	logerror("setting paperout led: %d\n", state);
-	output_set_value("paperout_led", state);
+	machine().output().set_value("paperout_led", state);
 }
 
 WRITE_LINE_MEMBER( epson_lx800_t::reset_w )

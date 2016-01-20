@@ -151,7 +151,7 @@
 class replicator_state : public driver_device
 {
 public:
-	replicator_state(const machine_config &mconfig, device_type type, const char *tag)
+	replicator_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_lcdc(*this, "hd44780"),
@@ -159,7 +159,7 @@ public:
 	{
 	}
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	UINT8 m_port_a;
 	UINT8 m_port_b;
@@ -182,7 +182,7 @@ public:
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
 	DECLARE_DRIVER_INIT(replicator);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(replicator);
 };
 

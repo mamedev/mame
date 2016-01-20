@@ -2,10 +2,10 @@
 // copyright-holders:smf
 #include "keyboard.h"
 
-serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: generic_keyboard_device(mconfig, SERIAL_KEYBOARD, "Serial Keyboard", tag, owner, clock, "serial_keyboard", __FILE__),
 	device_serial_interface(mconfig, *this),
-	device_rs232_port_interface(mconfig, *this), 
+	device_rs232_port_interface(mconfig, *this),
 	m_curr_key(0),
 	m_key_valid(false),
 	m_rs232_txbaud(*this, "RS232_TXBAUD"),
@@ -16,10 +16,10 @@ serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, co
 {
 }
 
-serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: generic_keyboard_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_serial_interface(mconfig, *this),
-	device_rs232_port_interface(mconfig, *this), 
+	device_rs232_port_interface(mconfig, *this),
 	m_curr_key(0),
 	m_key_valid(false),
 	m_rs232_txbaud(*this, "RS232_TXBAUD"),

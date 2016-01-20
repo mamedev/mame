@@ -27,7 +27,7 @@ const device_type M6M80011AP = &device_creator<m6m80011ap_device>;
 //  m6m80011ap_device - constructor
 //-------------------------------------------------
 
-m6m80011ap_device::m6m80011ap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m6m80011ap_device::m6m80011ap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, M6M80011AP, "M6M80011AP EEPROM", tag, owner, clock, "m6m80011ap", __FILE__),
 		device_nvram_interface(mconfig, *this), m_latch(0), m_reset_line(0), m_cmd_stream_pos(0), m_current_cmd(0), m_read_latch(0), m_current_addr(0), m_eeprom_we(0), m_eeprom_state()
 {
@@ -68,8 +68,8 @@ void m6m80011ap_device::device_reset()
 
 void m6m80011ap_device::nvram_default()
 {
-	for (offs_t offs = 0; offs < 0x80; offs++)
-		m_eeprom_data[offs] = 0xffff;
+	for (auto & elem : m_eeprom_data)
+		elem = 0xffff;
 }
 
 

@@ -28,7 +28,7 @@
 class adam_state : public driver_device
 {
 public:
-	adam_state(const machine_config &mconfig, device_type type, const char *tag) :
+	adam_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_netcpu(*this, M6801_TAG),
@@ -67,8 +67,8 @@ public:
 	required_memory_region m_boot_rom;
 	required_memory_region m_os7_rom;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( mreq_r );
 	DECLARE_WRITE8_MEMBER( mreq_w );

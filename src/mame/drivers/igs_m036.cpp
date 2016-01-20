@@ -66,7 +66,7 @@ check more info and photo from cjdh2.zip!!!
 class igs_m036_state : public driver_device
 {
 public:
-	igs_m036_state(const machine_config &mconfig, device_type type, const char *tag)
+	igs_m036_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 

@@ -30,7 +30,7 @@ const device_type I8212 = &device_creator<i8212_device>;
 //  i8212_device - constructor
 //-------------------------------------------------
 
-i8212_device::i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+i8212_device::i8212_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, I8212, "I8212", tag, owner, clock, "i8212", __FILE__),
 	m_write_irq(*this),
 	m_read_di(*this),
@@ -84,7 +84,7 @@ READ8_MEMBER( i8212_device::read )
 	// clear interrupt line
 	m_write_irq(CLEAR_LINE);
 
-	if (LOG) logerror("I8212 '%s' INT: %u\n", tag(), CLEAR_LINE);
+	if (LOG) logerror("I8212 '%s' INT: %u\n", tag().c_str(), CLEAR_LINE);
 
 	return m_data;
 }
@@ -110,7 +110,7 @@ WRITE8_MEMBER( i8212_device::write )
 
 WRITE_LINE_MEMBER( i8212_device::md_w )
 {
-	if (LOG) logerror("I8212 '%s' Mode: %s\n", tag(), state ? "output" : "input");
+	if (LOG) logerror("I8212 '%s' Mode: %s\n", tag().c_str(), state ? "output" : "input");
 
 	m_md = state;
 }
@@ -122,7 +122,7 @@ WRITE_LINE_MEMBER( i8212_device::md_w )
 
 WRITE_LINE_MEMBER( i8212_device::stb_w )
 {
-	if (LOG) logerror("I8212 '%s' STB: %u\n", tag(), state);
+	if (LOG) logerror("I8212 '%s' STB: %u\n", tag().c_str(), state);
 
 	if (m_md == I8212_MODE_INPUT)
 	{
@@ -134,7 +134,7 @@ WRITE_LINE_MEMBER( i8212_device::stb_w )
 			// assert interrupt line
 			m_write_irq(ASSERT_LINE);
 
-			if (LOG) logerror("I8212 '%s' INT: %u\n", tag(), ASSERT_LINE);
+			if (LOG) logerror("I8212 '%s' INT: %u\n", tag().c_str(), ASSERT_LINE);
 		}
 	}
 

@@ -21,7 +21,7 @@
 class pc_lpt_device : public device_t
 {
 public:
-	pc_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc_lpt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<pc_lpt_device &>(device).m_irq_handler.set_callback(object); }
@@ -40,9 +40,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	void update_irq();

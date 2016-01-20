@@ -9,7 +9,7 @@
 class bingo_state : public driver_device
 {
 public:
-	bingo_state(const machine_config &mconfig, device_type type, const char *tag)
+	bingo_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }
@@ -20,7 +20,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 public:
 	DECLARE_DRIVER_INIT(bingo);
 };
@@ -52,7 +52,7 @@ MACHINE_CONFIG_END
 class seeben_state : public driver_device
 {
 public:
-	seeben_state(const machine_config &mconfig, device_type type, const char *tag)
+	seeben_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }
@@ -63,7 +63,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 public:
 	DECLARE_DRIVER_INIT(seeben);
 };
@@ -92,7 +92,7 @@ MACHINE_CONFIG_END
 class splin_state : public driver_device
 {
 public:
-	splin_state(const machine_config &mconfig, device_type type, const char *tag)
+	splin_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }
@@ -103,7 +103,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 public:
 	DECLARE_DRIVER_INIT(splin);
 };

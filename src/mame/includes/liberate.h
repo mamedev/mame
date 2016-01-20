@@ -3,7 +3,7 @@
 class liberate_state : public driver_device
 {
 public:
-	liberate_state(const machine_config &mconfig, device_type type, const char *tag)
+	liberate_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_bg_vram(*this, "bg_vram"),
 		m_colorram(*this, "colorram"),
@@ -23,7 +23,7 @@ public:
 	optional_shared_ptr<UINT8> m_scratchram;
 
 	UINT8 *m_fg_gfx;   /* prosoccr */
-	UINT8 *m_charram;   /* prosoccr */
+	std::unique_ptr<UINT8[]> m_charram;   /* prosoccr */
 	UINT8 m_io_ram[16];
 
 	int m_bank;
@@ -77,8 +77,6 @@ public:
 	UINT32 screen_update_boomrang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_prosoccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(deco16_interrupt);
-	INTERRUPT_GEN_MEMBER(prosport_interrupt);
-	void debug_print(bitmap_ind16 &bitmap);
 	void liberate_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void prosport_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void boomrang_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );

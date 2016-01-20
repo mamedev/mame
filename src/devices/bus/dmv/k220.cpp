@@ -132,7 +132,7 @@ const device_type DMV_K220 = &device_creator<dmv_k220_device>;
 //  dmv_k220_device - constructor
 //-------------------------------------------------
 
-dmv_k220_device::dmv_k220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dmv_k220_device::dmv_k220_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, DMV_K220, "K220 diagnostic", tag, owner, clock, "dmv_k220", __FILE__),
 		device_dmvslot_interface( mconfig, *this ),
 		m_pit(*this, "pit8253"),
@@ -236,8 +236,8 @@ WRITE8_MEMBER( dmv_k220_device::porta_w )
 	// 74LS247 BCD-to-Seven-Segment Decoder
 	static UINT8 bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 };
 
-	output_set_digit_value(0, bcd2hex[(data >> 4) & 0x0f]);
-	output_set_digit_value(1, bcd2hex[data & 0x0f]);
+	machine().output().set_digit_value(0, bcd2hex[(data >> 4) & 0x0f]);
+	machine().output().set_digit_value(1, bcd2hex[data & 0x0f]);
 }
 
 

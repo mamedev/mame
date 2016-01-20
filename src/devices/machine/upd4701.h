@@ -18,7 +18,7 @@
 class upd4701_device : public device_t
 {
 public:
-	upd4701_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd4701_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void x_add( INT16 data );
 	void y_add( INT16 data );
@@ -36,9 +36,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 private:
 	// internal state
 	int m_cs;

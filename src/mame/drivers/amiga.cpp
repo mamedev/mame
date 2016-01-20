@@ -32,7 +32,7 @@
 class a1000_state : public amiga_state
 {
 public:
-	a1000_state(const machine_config &mconfig, device_type type, const char *tag) :
+	a1000_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_bootrom(*this, "bootrom"),
 	m_wom(*this, "wom")
@@ -44,8 +44,8 @@ public:
 	DECLARE_WRITE16_MEMBER( write_protect_w );
 
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<address_map_bank_device> m_bootrom;
@@ -56,7 +56,7 @@ private:
 class a2000_state : public amiga_state
 {
 public:
-	a2000_state(const machine_config &mconfig, device_type type, const char *tag) :
+	a2000_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_rtc(*this, "u65"),
 	m_zorro(*this, ZORROBUS_TAG),
@@ -74,11 +74,11 @@ public:
 	DECLARE_WRITE16_MEMBER( clock_w );
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	// amiga_state overrides
-	virtual bool int2_pending();
-	virtual bool int6_pending();
+	virtual bool int2_pending() override;
+	virtual bool int6_pending() override;
 
 private:
 	// devices
@@ -93,7 +93,7 @@ private:
 class a500_state : public amiga_state
 {
 public:
-	a500_state(const machine_config &mconfig, device_type type, const char *tag) :
+	a500_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_side(*this, EXP_SLOT_TAG),
 	m_side_int2(0),
@@ -104,11 +104,11 @@ public:
 	DECLARE_DRIVER_INIT( ntsc );
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	// amiga_state overrides
-	virtual bool int2_pending();
-	virtual bool int6_pending();
+	virtual bool int2_pending() override;
+	virtual bool int6_pending() override;
 
 private:
 	// devices
@@ -122,7 +122,7 @@ private:
 class cdtv_state : public amiga_state
 {
 public:
-	cdtv_state(const machine_config &mconfig, device_type type, const char *tag) :
+	cdtv_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_rtc(*this, "u61"),
 	m_dmac(*this, "u36"),
@@ -149,11 +149,11 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	// amiga_state overrides
-	virtual bool int2_pending();
-	virtual bool int6_pending();
+	virtual bool int2_pending() override;
+	virtual bool int6_pending() override;
 
 private:
 	// devices
@@ -170,7 +170,7 @@ private:
 class a3000_state : public amiga_state
 {
 public:
-	a3000_state(const machine_config &mconfig, device_type type, const char *tag) :
+	a3000_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag)
 	{ }
 
@@ -190,7 +190,7 @@ private:
 class a500p_state : public amiga_state
 {
 public:
-	a500p_state(const machine_config &mconfig, device_type type, const char *tag) :
+	a500p_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_rtc(*this, "u9"),
 	m_side(*this, EXP_SLOT_TAG),
@@ -205,11 +205,11 @@ public:
 	DECLARE_DRIVER_INIT( ntsc );
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	// amiga_state overrides
-	virtual bool int2_pending();
-	virtual bool int6_pending();
+	virtual bool int2_pending() override;
+	virtual bool int6_pending() override;
 
 private:
 	// devices
@@ -224,7 +224,7 @@ private:
 class a600_state : public amiga_state
 {
 public:
-	a600_state(const machine_config &mconfig, device_type type, const char *tag) :
+	a600_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_gayle_int2(0)
 	{ }
@@ -237,7 +237,7 @@ public:
 	static const UINT8 GAYLE_ID = 0xd0;
 
 protected:
-	virtual bool int2_pending();
+	virtual bool int2_pending() override;
 
 private:
 	int m_gayle_int2;
@@ -246,7 +246,7 @@ private:
 class a1200_state : public amiga_state
 {
 public:
-	a1200_state(const machine_config &mconfig, device_type type, const char *tag) :
+	a1200_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_gayle_int2(0)
 	{ }
@@ -259,7 +259,7 @@ public:
 	static const UINT8 GAYLE_ID = 0xd1;
 
 protected:
-	virtual bool int2_pending();
+	virtual bool int2_pending() override;
 
 private:
 	int m_gayle_int2;
@@ -268,7 +268,7 @@ private:
 class a4000_state : public amiga_state
 {
 public:
-	a4000_state(const machine_config &mconfig, device_type type, const char *tag) :
+	a4000_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_ata(*this, "ata"),
 	m_ramsey_config(0),
@@ -304,7 +304,7 @@ private:
 class cd32_state : public amiga_state
 {
 public:
-	cd32_state(const machine_config &mconfig, device_type type, const char *tag) :
+	cd32_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_p1_port(*this, "p1_cd32_buttons"),
 	m_p2_port(*this, "p2_cd32_buttons"),
@@ -328,7 +328,7 @@ public:
 
 protected:
 	// amiga_state overrides
-	virtual void potgo_w(UINT16 data);
+	virtual void potgo_w(UINT16 data) override;
 
 private:
 	required_device<cdda_device> m_cdda;
@@ -909,7 +909,7 @@ WRITE8_MEMBER( cd32_state::akiko_cia_0_port_a_write )
 	m_cdda->set_output_gain(0, BIT(data, 0) ? 0.0 : 1.0);
 
 	// bit 1, power led
-	set_led_status(machine(), 0, BIT(data, 1) ? 0 : 1);
+	output().set_led_value(0, BIT(data, 1) ? 0 : 1);
 
 	handle_cd32_joystick_cia(machine(), data, m_cia_0->read(space, 2));
 }
@@ -1329,12 +1329,12 @@ static MACHINE_CONFIG_START( amiga_base, amiga_state )
 	// floppy drives
 	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_PAL)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amiga_floppies, "35dd", amiga_fdc::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amiga_floppies, 0, amiga_fdc::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", amiga_floppies, 0, amiga_fdc::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", amiga_floppies, 0, amiga_fdc::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amiga_floppies, nullptr, amiga_fdc::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", amiga_floppies, nullptr, amiga_fdc::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", amiga_floppies, nullptr, amiga_fdc::floppy_formats)
 
 	// rs232
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(amiga_state, rs232_rx_w))
 	MCFG_RS232_DCD_HANDLER(WRITELINE(amiga_state, rs232_dcd_w))
 	MCFG_RS232_DSR_HANDLER(WRITELINE(amiga_state, rs232_dsr_w))
@@ -1414,17 +1414,17 @@ static MACHINE_CONFIG_DERIVED_CLASS( a2000, amiga_base, a2000_state )
 	MCFG_DEVICE_ADD("u65", MSM6242, XTAL_32_768kHz)
 
 	// cpu slot
-	MCFG_EXPANSION_SLOT_ADD("maincpu", a2000_expansion_cards, NULL)
+	MCFG_EXPANSION_SLOT_ADD("maincpu", a2000_expansion_cards, nullptr)
 
 	// zorro slots
 	MCFG_ZORRO2_ADD("maincpu")
 	MCFG_ZORRO2_INT2_HANDLER(WRITELINE(a2000_state, zorro2_int2_w))
 	MCFG_ZORRO2_INT6_HANDLER(WRITELINE(a2000_state, zorro2_int6_w))
-	MCFG_ZORRO2_SLOT_ADD("zorro1", zorro2_cards, NULL)
-	MCFG_ZORRO2_SLOT_ADD("zorro2", zorro2_cards, NULL)
-	MCFG_ZORRO2_SLOT_ADD("zorro3", zorro2_cards, NULL)
-	MCFG_ZORRO2_SLOT_ADD("zorro4", zorro2_cards, NULL)
-	MCFG_ZORRO2_SLOT_ADD("zorro5", zorro2_cards, NULL)
+	MCFG_ZORRO2_SLOT_ADD("zorro1", zorro2_cards, nullptr)
+	MCFG_ZORRO2_SLOT_ADD("zorro2", zorro2_cards, nullptr)
+	MCFG_ZORRO2_SLOT_ADD("zorro3", zorro2_cards, nullptr)
+	MCFG_ZORRO2_SLOT_ADD("zorro4", zorro2_cards, nullptr)
+	MCFG_ZORRO2_SLOT_ADD("zorro5", zorro2_cards, nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( a2000n, a2000, a2000_state )
@@ -1456,7 +1456,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a500, amiga_base, a500_state )
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
 
 	// cpu slot
-	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, NULL)
+	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( a500n, a500, a500_state )
@@ -1594,7 +1594,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a500p, amiga_base, a500p_state )
 	MCFG_DEVICE_ADD("u9", MSM6242, XTAL_32_768kHz)
 
 	// cpu slot
-	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, NULL)
+	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( a500pn, a500p, a500p_state )
@@ -1631,7 +1631,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a600, amiga_base, a600_state )
 	MCFG_GAYLE_CS1_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read_cs1))
 	MCFG_GAYLE_CS1_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write_cs1))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("gayle", gayle_device, ide_interrupt_w))
 
 	// todo: pcmcia
@@ -1668,6 +1668,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a1200, amiga_base, a1200_state )
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
+	MCFG_SCREEN_NO_PALETTE
 
 	MCFG_DEVICE_REMOVE("palette")
 
@@ -1680,7 +1681,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a1200, amiga_base, a1200_state )
 	MCFG_GAYLE_CS1_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read_cs1))
 	MCFG_GAYLE_CS1_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write_cs1))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("gayle", gayle_device, ide_interrupt_w))
 
 	// todo: pcmcia
@@ -1695,6 +1696,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a1200n, a1200, a1200_state )
 	MCFG_FRAGMENT_ADD(ntsc_video)
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
+	MCFG_SCREEN_NO_PALETTE
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
 	MCFG_DEVICE_MODIFY("cia_0")
@@ -1719,6 +1721,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a4000, amiga_base, a4000_state )
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
+	MCFG_SCREEN_NO_PALETTE
 
 	MCFG_DEVICE_REMOVE("palette")
 
@@ -1728,7 +1731,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a4000, amiga_base, a4000_state )
 	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
 
 	// ide
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(a4000_state, ide_interrupt_w))
 
 	// todo: zorro3
@@ -1739,6 +1742,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a4000n, a4000, a4000_state )
 	MCFG_FRAGMENT_ADD(ntsc_video)
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
+	MCFG_SCREEN_NO_PALETTE
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
 	MCFG_DEVICE_MODIFY("cia_0")
@@ -1763,6 +1767,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a400030n, a400030, a4000_state )
 	MCFG_FRAGMENT_ADD(ntsc_video)
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
+	MCFG_SCREEN_NO_PALETTE
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
 	MCFG_DEVICE_MODIFY("cia_0")
@@ -1796,6 +1801,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( cd32, amiga_base, cd32_state )
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
+	MCFG_SCREEN_NO_PALETTE
 
 	MCFG_DEVICE_REMOVE("palette")
 
@@ -1822,6 +1828,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( cd32n, cd32, cd32_state )
 	MCFG_FRAGMENT_ADD(ntsc_video)
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
+	MCFG_SCREEN_NO_PALETTE
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
 	MCFG_DEVICE_MODIFY("cia_0")
@@ -1846,6 +1853,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a4000tn, a4000, a4000_state )
 	MCFG_FRAGMENT_ADD(ntsc_video)
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
+	MCFG_SCREEN_NO_PALETTE
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
 	MCFG_DEVICE_MODIFY("cia_0")

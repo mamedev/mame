@@ -11,11 +11,11 @@ typedef device_delegate<int (UINT16 code, UINT8 color)> gfxbank_cb_delegate;
 class seta001_device : public device_t
 {
 public:
-	seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	seta001_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 	static void set_gfxbank_callback(device_t &device, gfxbank_cb_delegate callback) { downcast<seta001_device &>(device).m_gfxbank_cb = callback; }
 
 	DECLARE_WRITE8_MEMBER( spritebgflag_w8 );
@@ -55,8 +55,8 @@ public:
 	int is_flipped() { return ((m_spritectrl[ 0 ] & 0x40) >> 6); };
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 

@@ -9,18 +9,18 @@
 class mt735_state : public driver_device
 {
 public:
-	mt735_state(const machine_config &mconfig, device_type type, const char *tag);
+	mt735_state(const machine_config &mconfig, device_type type, std::string tag);
 
 	required_device<m68000_device> m_cpu;
 
 	DECLARE_READ8_MEMBER(p4_r);
 	DECLARE_READ8_MEMBER(p5_r);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
-mt735_state::mt735_state(const machine_config &mconfig, device_type type, const char *tag) :
+mt735_state::mt735_state(const machine_config &mconfig, device_type type, std::string tag) :
 	driver_device(mconfig, type, tag),
 	m_cpu(*this, "maincpu")
 {

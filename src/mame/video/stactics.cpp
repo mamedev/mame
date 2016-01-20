@@ -291,10 +291,10 @@ void stactics_state::set_indicator_leds(int data, const char *output_name, int b
 	data = to_7seg[~data & 0x0f];
 
 	/* set the 4 LEDs */
-	output_set_indexed_value(output_name, base_index + 0, (data >> 2) & 0x01);
-	output_set_indexed_value(output_name, base_index + 1, (data >> 6) & 0x01);
-	output_set_indexed_value(output_name, base_index + 2, (data >> 5) & 0x01);
-	output_set_indexed_value(output_name, base_index + 3, (data >> 4) & 0x01);
+	output().set_indexed_value(output_name, base_index + 0, (data >> 2) & 0x01);
+	output().set_indexed_value(output_name, base_index + 1, (data >> 6) & 0x01);
+	output().set_indexed_value(output_name, base_index + 2, (data >> 5) & 0x01);
+	output().set_indexed_value(output_name, base_index + 3, (data >> 4) & 0x01);
 }
 
 
@@ -304,13 +304,13 @@ void stactics_state::update_artwork()
 	UINT8 *beam_region = memregion("user1")->base();
 
 	/* set the lamps first */
-	output_set_indexed_value("base_lamp", 4, m_lamps[0] & 0x01);
-	output_set_indexed_value("base_lamp", 3, m_lamps[1] & 0x01);
-	output_set_indexed_value("base_lamp", 2, m_lamps[2] & 0x01);
-	output_set_indexed_value("base_lamp", 1, m_lamps[3] & 0x01);
-	output_set_indexed_value("base_lamp", 0, m_lamps[4] & 0x01);
-	output_set_value("start_lamp",   m_lamps[5] & 0x01);
-	output_set_value("barrier_lamp", m_lamps[6] & 0x01);  /* this needs to flash on/off, not implemented */
+	output().set_indexed_value("base_lamp", 4, m_lamps[0] & 0x01);
+	output().set_indexed_value("base_lamp", 3, m_lamps[1] & 0x01);
+	output().set_indexed_value("base_lamp", 2, m_lamps[2] & 0x01);
+	output().set_indexed_value("base_lamp", 1, m_lamps[3] & 0x01);
+	output().set_indexed_value("base_lamp", 0, m_lamps[4] & 0x01);
+	output().set_value("start_lamp",   m_lamps[5] & 0x01);
+	output().set_value("barrier_lamp", m_lamps[6] & 0x01);  /* this needs to flash on/off, not implemented */
 
 	/* laser beam - loop for each LED */
 	for (i = 0; i < 0x40; i++)
@@ -319,16 +319,16 @@ void stactics_state::update_artwork()
 		UINT8 beam_data = beam_region[beam_data_offs];
 		int on = (beam_data >> (i & 0x07)) & 0x01;
 
-		output_set_indexed_value("beam_led_left", i, on);
-		output_set_indexed_value("beam_led_right", i, on);
+		output().set_indexed_value("beam_led_left", i, on);
+		output().set_indexed_value("beam_led_right", i, on);
 	}
 
 	/* sight LED */
-	output_set_value("sight_led", *m_motor_on & 0x01);
+	output().set_value("sight_led", *m_motor_on & 0x01);
 
 	/* score display */
 	for (i = 0x01; i < 0x07; i++)
-		output_set_digit_value(i - 1, to_7seg[~m_display_buffer[i] & 0x0f]);
+		output().set_digit_value(i - 1, to_7seg[~m_display_buffer[i] & 0x0f]);
 
 	/* credits indicator */
 	set_indicator_leds(m_display_buffer[0x07], "credit_led", 0x00);

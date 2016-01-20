@@ -105,7 +105,7 @@ WRITE16_MEMBER(nemesis_state::gx400_irq1_enable_word_w)
 		m_irq1_on = data & 0x0001;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_w(machine(), 1, data & 0x0100);
+		machine().bookkeeping().coin_lockout_w(1, data & 0x0100);
 }
 
 WRITE16_MEMBER(nemesis_state::gx400_irq2_enable_word_w)
@@ -114,7 +114,7 @@ WRITE16_MEMBER(nemesis_state::gx400_irq2_enable_word_w)
 		m_irq2_on = data & 0x0001;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_w(machine(), 0, data & 0x0100);
+		machine().bookkeeping().coin_lockout_w(0, data & 0x0100);
 }
 
 WRITE16_MEMBER(nemesis_state::gx400_irq4_enable_word_w)
@@ -129,7 +129,7 @@ WRITE16_MEMBER(nemesis_state::nemesis_irq_enable_word_w)
 		m_irq_on = data & 0xff;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_global_w(machine(), data & 0x0100);
+		machine().bookkeeping().coin_lockout_global_w(data & 0x0100);
 }
 
 WRITE16_MEMBER(nemesis_state::konamigt_irq_enable_word_w)
@@ -138,7 +138,7 @@ WRITE16_MEMBER(nemesis_state::konamigt_irq_enable_word_w)
 		m_irq_on = data & 0xff;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_w(machine(), 1, data & 0x0100);
+		machine().bookkeeping().coin_lockout_w(1, data & 0x0100);
 }
 
 WRITE16_MEMBER(nemesis_state::konamigt_irq2_enable_word_w)
@@ -147,7 +147,7 @@ WRITE16_MEMBER(nemesis_state::konamigt_irq2_enable_word_w)
 		m_irq2_on = data & 0xff;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_w(machine(), 0, data & 0x0100);
+		machine().bookkeeping().coin_lockout_w(0, data & 0x0100);
 }
 
 
@@ -246,7 +246,7 @@ READ8_MEMBER(nemesis_state::nemesis_portA_r)
 
 	res |= 0xd0;
 
-	if (m_vlm != NULL && m_vlm->bsy())
+	if (m_vlm != nullptr && m_vlm->bsy())
 		res |= 0x20;
 
 	return res;
@@ -1450,7 +1450,7 @@ void nemesis_state::machine_start()
 	save_item(NAME(m_irq_port_last));
 
 	/* gx400 voice data is not in a ROM but in sound RAM at $8000 */
-	if (m_vlm != NULL && memregion("vlm")->bytes() == 0x800)
+	if (m_vlm != nullptr && memregion("vlm")->bytes() == 0x800)
 		m_vlm->set_rom(m_voiceram);
 }
 

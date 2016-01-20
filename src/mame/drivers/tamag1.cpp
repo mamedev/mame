@@ -18,7 +18,7 @@
 class tamag1_state : public driver_device
 {
 public:
-	tamag1_state(const machine_config &mconfig, device_type type, const char *tag)
+	tamag1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker")
@@ -63,14 +63,14 @@ static E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
 
 	// they are on pin SEG8(x=35) + COM0-3, pin SEG28(x=36) + COM12-15
 	if (x == 35 && y < 4)
-		output_set_lamp_value(y, state);
+		device.machine().output().set_lamp_value(y, state);
 	else if (x == 36 && y >= 12)
-		output_set_lamp_value(y-8, state);
+		device.machine().output().set_lamp_value(y-8, state);
 
 	// output for svg2lay
 	char buf[0x10];
 	sprintf(buf, "%d.%d", y, x);
-	output_set_value(buf, state);
+	device.machine().output().set_value(buf, state);
 }
 
 PALETTE_INIT_MEMBER(tamag1_state, tama)

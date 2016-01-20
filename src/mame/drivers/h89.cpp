@@ -28,7 +28,7 @@
 class h89_state : public driver_device
 {
 public:
-	h89_state(const machine_config &mconfig, device_type type, const char *tag)
+	h89_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu")
 	{
@@ -39,7 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER( port_f2_w );
 
 	UINT8 m_port_f2;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(h89_irq_timer);
 };
 

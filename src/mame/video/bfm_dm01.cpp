@@ -53,7 +53,7 @@ Standard dm01 memorymap
 
 const device_type BF_DM01 = &device_creator<bfmdm01_device>;
 
-bfmdm01_device::bfmdm01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+bfmdm01_device::bfmdm01_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, BF_DM01, "BFM Dotmatrix 01", tag, owner, clock, "bfm_dm01", __FILE__),
 	m_data_avail(0),
 	m_control(0),
@@ -62,11 +62,11 @@ bfmdm01_device::bfmdm01_device(const machine_config &mconfig, const char *tag, d
 	m_comdata(0),
 	m_busy_cb(*this)
 {
-	for (int i = 0; i < 65; i++)
-	m_segbuffer[i] = 0;
+	for (auto & elem : m_segbuffer)
+	elem = 0;
 
-	for (int i = 0; i < DM_BYTESPERROW; i++)
-	m_scanline[i] = 0;
+	for (auto & elem : m_scanline)
+	elem = 0;
 }
 
 //-------------------------------------------------
@@ -190,7 +190,7 @@ WRITE8_MEMBER( bfmdm01_device::mux_w )
 
 			for (int pos=0;pos<65;pos++)
 			{
-				output_set_indexed_value("dotmatrix", pos +(65*row), m_segbuffer[(pos)]);
+				machine().output().set_indexed_value("dotmatrix", pos +(65*row), m_segbuffer[(pos)]);
 			}
 		}
 	}

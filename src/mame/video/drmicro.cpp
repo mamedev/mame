@@ -102,8 +102,8 @@ PALETTE_INIT_MEMBER(drmicro_state, drmicro)
 
 void drmicro_state::video_start()
 {
-	m_videoram = auto_alloc_array(machine(), UINT8, 0x1000);
-	save_pointer(NAME(m_videoram), 0x1000);
+	m_videoram = std::make_unique<UINT8[]>(0x1000);
+	save_pointer(NAME(m_videoram.get()), 0x1000);
 
 	m_bg1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(drmicro_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(drmicro_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);

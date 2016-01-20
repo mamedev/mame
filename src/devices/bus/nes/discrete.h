@@ -12,13 +12,13 @@ class nes_74x161x161x32_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_74x161x161x32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_74x161x161x32_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual void device_start() override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -28,13 +28,13 @@ class nes_74x139x74_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_74x139x74_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_74x139x74_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_WRITE8_MEMBER(write_m);
+	virtual void device_start() override;
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -44,13 +44,13 @@ class nes_74x377_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_74x377_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_74x377_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual void device_start() override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -60,13 +60,13 @@ class nes_74x161x138_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_74x161x138_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_74x161x138_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_WRITE8_MEMBER(write_m);
+	virtual void device_start() override;
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 

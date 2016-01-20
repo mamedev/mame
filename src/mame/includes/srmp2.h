@@ -14,7 +14,7 @@ struct iox_t
 class srmp2_state : public driver_device
 {
 public:
-	srmp2_state(const machine_config &mconfig, device_type type, const char *tag)
+	srmp2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_seta001(*this, "spritegen"),
@@ -61,7 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(srmp3_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(srmp3_adpcm_code_w);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_MACHINE_START(srmp2);
 	DECLARE_PALETTE_INIT(srmp2);
 	DECLARE_MACHINE_START(srmp3);

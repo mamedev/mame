@@ -12,7 +12,7 @@
 class relief_state : public atarigen_state
 {
 public:
-	relief_state(const machine_config &mconfig, device_type type, const char *tag)
+	relief_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atarigen_state(mconfig, type, tag),
 			m_vad(*this, "vad"),
 			m_okibank(*this, "okibank")
@@ -24,7 +24,7 @@ public:
 	UINT8           m_ym2413_volume;
 	UINT8           m_overall_volume;
 	UINT8           m_adpcm_bank;
-	virtual void update_interrupts();
+	virtual void update_interrupts() override;
 	DECLARE_READ16_MEMBER(special_port2_r);
 	DECLARE_WRITE16_MEMBER(audio_control_w);
 	DECLARE_WRITE16_MEMBER(audio_volume_w);

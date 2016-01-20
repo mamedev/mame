@@ -44,8 +44,8 @@ UINT32 malzak_state::screen_update_malzak(screen_device &screen, bitmap_rgb32 &b
 		}
 
 	/* update the S2636 chips */
-	bitmap_ind16 &s2636_0_bitmap = m_s2636_0->update(cliprect);
-	bitmap_ind16 &s2636_1_bitmap = m_s2636_1->update(cliprect);
+	bitmap_ind16 const &s2636_0_bitmap = m_s2636_0->update(cliprect);
+	bitmap_ind16 const &s2636_1_bitmap = m_s2636_1->update(cliprect);
 
 	/* copy the S2636 images into the main bitmap */
 	{

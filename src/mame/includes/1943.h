@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Paul Leaman
 /***************************************************************************
 
@@ -9,7 +9,7 @@
 class _1943_state : public driver_device
 {
 public:
-	_1943_state(const machine_config &mconfig, device_type type, const char *tag)
+	_1943_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),
@@ -57,9 +57,9 @@ public:
 	TILE_GET_INFO_MEMBER(c1943_get_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(c1943_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(c1943_get_fg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(1943);
 	UINT32 screen_update_1943(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );

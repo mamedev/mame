@@ -12,7 +12,7 @@
 class badlands_state : public atarigen_state
 {
 public:
-	badlands_state(const machine_config &mconfig, device_type type, const char *tag)
+	badlands_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atarigen_state(mconfig, type, tag),
 			m_playfield_tilemap(*this, "playfield"),
 			m_mob(*this, "mob") { }
@@ -26,8 +26,8 @@ public:
 	UINT8 *         m_bank_source_data;
 
 	UINT8           m_playfield_tile_bank;
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_READ16_MEMBER(sound_busy_r);
 	DECLARE_READ16_MEMBER(pedal_0_r);
 	DECLARE_READ16_MEMBER(pedal_1_r);

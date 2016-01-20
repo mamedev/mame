@@ -36,7 +36,7 @@ WRITE16_MEMBER(namcos21_state::winrun_gpu_register_w)
 
 WRITE16_MEMBER(namcos21_state::winrun_gpu_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	int color = data>>8;
 	int mask  = data&0xff;
 	int i;
@@ -51,17 +51,17 @@ WRITE16_MEMBER(namcos21_state::winrun_gpu_videoram_w)
 
 READ16_MEMBER(namcos21_state::winrun_gpu_videoram_r)
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	return videoram[offset]<<8;
 }
 
 void namcos21_state::allocate_poly_framebuffer()
 {
-	m_mpPolyFrameBufferZ     = auto_alloc_array(machine(), UINT16, FRAMEBUFFER_SIZE_IN_BYTES/2 );
-	m_mpPolyFrameBufferPens  = auto_alloc_array(machine(), UINT16, FRAMEBUFFER_SIZE_IN_BYTES/2 );
+	m_mpPolyFrameBufferZ     = std::make_unique<UINT16[]>(FRAMEBUFFER_SIZE_IN_BYTES/2 );
+	m_mpPolyFrameBufferPens  = std::make_unique<UINT16[]>(FRAMEBUFFER_SIZE_IN_BYTES/2 );
 
-	m_mpPolyFrameBufferZ2    = auto_alloc_array(machine(), UINT16, FRAMEBUFFER_SIZE_IN_BYTES/2 );
-	m_mpPolyFrameBufferPens2 = auto_alloc_array(machine(), UINT16, FRAMEBUFFER_SIZE_IN_BYTES/2 );
+	m_mpPolyFrameBufferZ2    = std::make_unique<UINT16[]>(FRAMEBUFFER_SIZE_IN_BYTES/2 );
+	m_mpPolyFrameBufferPens2 = std::make_unique<UINT16[]>(FRAMEBUFFER_SIZE_IN_BYTES/2 );
 
 	clear_poly_framebuffer();
 	clear_poly_framebuffer();
@@ -69,16 +69,10 @@ void namcos21_state::allocate_poly_framebuffer()
 
 void namcos21_state::clear_poly_framebuffer()
 {
-	UINT16 *temp2;
-
 	/* swap work and visible framebuffers */
-	temp2 = m_mpPolyFrameBufferZ;
-	m_mpPolyFrameBufferZ = m_mpPolyFrameBufferZ2;
-	m_mpPolyFrameBufferZ2 = temp2;
+	m_mpPolyFrameBufferZ.swap(m_mpPolyFrameBufferZ2);
 
-	temp2 = m_mpPolyFrameBufferPens;
-	m_mpPolyFrameBufferPens = m_mpPolyFrameBufferPens2;
-	m_mpPolyFrameBufferPens2 = temp2;
+	m_mpPolyFrameBufferPens.swap(m_mpPolyFrameBufferPens2);
 
 	/* wipe work zbuffer */
 	for( int i = 0; i < NAMCOS21_POLY_FRAME_WIDTH*NAMCOS21_POLY_FRAME_HEIGHT; i++ )
@@ -94,8 +88,8 @@ void namcos21_state::copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, const r
 	for( sy=clip.min_y; sy<=clip.max_y; sy++ )
 	{
 		UINT16 *dest = &bitmap.pix16(sy);
-		const UINT16 *pPen = m_mpPolyFrameBufferPens2+NAMCOS21_POLY_FRAME_WIDTH*sy;
-		const UINT16 *pZ = m_mpPolyFrameBufferZ2+NAMCOS21_POLY_FRAME_WIDTH*sy;
+		const UINT16 *pPen = m_mpPolyFrameBufferPens2.get()+NAMCOS21_POLY_FRAME_WIDTH*sy;
+		const UINT16 *pZ = m_mpPolyFrameBufferZ2.get()+NAMCOS21_POLY_FRAME_WIDTH*sy;
 		int sx;
 		for( sx=clip.min_x; sx<=clip.max_x; sx++ )
 		{
@@ -113,7 +107,7 @@ VIDEO_START_MEMBER(namcos21_state,namcos21)
 {
 	if( m_gametype == NAMCOS21_WINRUN91 )
 	{
-		m_videoram = auto_alloc_array(machine(), UINT8, 0x80000);
+		m_videoram = std::make_unique<UINT8[]>(0x80000);
 	}
 	allocate_poly_framebuffer();
 	c355_obj_init(
@@ -143,7 +137,7 @@ VIDEO_START_MEMBER(namcos21_state,namcos21)
 
 UINT32 namcos21_state::screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	int pivot = 3;
 	int pri;
 	bitmap.fill(0xff, cliprect );
@@ -217,8 +211,8 @@ void namcos21_state::renderscanline_flat(const edge *e1, const edge *e2, int sy,
 	}
 
 	{
-		UINT16 *pDest = m_mpPolyFrameBufferPens + sy*NAMCOS21_POLY_FRAME_WIDTH;
-		UINT16 *pZBuf = m_mpPolyFrameBufferZ    + sy*NAMCOS21_POLY_FRAME_WIDTH;
+		UINT16 *pDest = m_mpPolyFrameBufferPens.get() + sy*NAMCOS21_POLY_FRAME_WIDTH;
+		UINT16 *pZBuf = m_mpPolyFrameBufferZ.get()    + sy*NAMCOS21_POLY_FRAME_WIDTH;
 		int x0 = (int)e1->x;
 		int x1 = (int)e2->x;
 		int w = x1-x0;

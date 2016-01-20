@@ -16,15 +16,15 @@ class fdc37c665gt_device : public device_t
 {
 public:
 	// construction/destruction
-	fdc37c665gt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fdc37c665gt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	required_device<ns16550_device> m_uart1;

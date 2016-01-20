@@ -1414,7 +1414,7 @@ Note:
 class zaurus_state : public driver_device
 {
 public:
-	zaurus_state(const machine_config &mconfig, device_type type, const char *tag)
+	zaurus_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_ram(*this, "ram")
@@ -1444,15 +1444,15 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 };
 
 #define VERBOSE_LEVEL ( 5 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char* s_fmt, ... )
+static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char* s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{

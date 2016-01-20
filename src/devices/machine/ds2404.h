@@ -49,7 +49,7 @@ class ds2404_device :  public device_t,
 {
 public:
 	// construction/destruction
-	ds2404_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ds2404_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
 	static void static_set_ref_year(device_t &device, UINT32 m_ref_year);
@@ -68,17 +68,17 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset() { }
-	virtual void device_post_load() { }
-	virtual void device_clock_changed() { }
+	virtual void device_start() override;
+	virtual void device_reset() override { }
+	virtual void device_post_load() override { }
+	virtual void device_clock_changed() override { }
 
 	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 

@@ -15,7 +15,7 @@ overriden if more than one controller is used */
 class ti990_hdc_device : public device_t
 {
 public:
-	ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti990_hdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object) { return downcast<ti990_hdc_device &>(device).m_interrupt_callback.set_callback(object); }
 
@@ -26,8 +26,8 @@ public:
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hd );
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	int get_id_from_device( device_t *device );
 

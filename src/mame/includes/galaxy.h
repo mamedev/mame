@@ -17,7 +17,7 @@
 class galaxy_state : public driver_device
 {
 public:
-	galaxy_state(const machine_config &mconfig, device_type type, const char *tag)
+	galaxy_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
@@ -36,7 +36,7 @@ public:
 	DECLARE_WRITE8_MEMBER(galaxy_latch_w);
 	DECLARE_DRIVER_INIT(galaxy);
 	DECLARE_DRIVER_INIT(galaxyp);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(galaxy);
 	DECLARE_MACHINE_RESET(galaxyp);
 	UINT32 screen_update_galaxy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -50,36 +50,43 @@ is "Treasure Fall" (despite the cart label is "Treasure Hall").
 
 Dumped games:
 
-2000 Animal Catch       https://youtu.be/U4L5EwWbxqw
-2000 Itazura Monkey     https://youtu.be/GHxiqUQRpV8
-2000 Pye-nage Taikai    https://youtu.be/oL2OIbrv-KI
-2000 Taihou de Doboon   https://youtu.be/loPP3jt0Ob0
-2001 Hae Hae Ka Ka Ka   https://youtu.be/37IxYCg0tic
+2000 Animal Catch                 https://youtu.be/U4L5EwWbxqw
+2000 Itazura Monkey               https://youtu.be/GHxiqUQRpV8
+2000 Pye-nage Taikai              https://youtu.be/oL2OIbrv-KI
+2000 Taihou de Doboon             https://youtu.be/loPP3jt0Ob0
+2001 Hae Hae Ka Ka Ka             https://youtu.be/37IxYCg0tic
 
-Games with the same cabinet which might be on the same hardware:
+Games with the same cabinet, or in the Treasure Fall series, which might be on the same hardware:
 
-1999 Shatekids
-1999 Otakara Locomo
-1999 Dokidoki Kingyosukui
-2000 Otoshicha Ottotto
+1999 Shatekids                    https://youtu.be/aWzYlvm6uIs
+1999 Otakara Locomo               https://youtu.be/J0NwMWO3SdY
+1999 Dokidoki Kingyosukui         https://youtu.be/Z0tOjG_tteU
+2000 Otoshicha Ottotto            https://youtu.be/AybhPHTFvMo
 2000 Go Go Cowboy
 2001 Mushitori Meijin
-2001 Morino Dodgeball Senshuken
-2001 Waiwai Wanage
-2001 Zarigani Tsuri
-2001 Kotekitai Slot
-2002 Shateki Yokochou
+2001 Morino Dodgeball Senshuken   https://youtu.be/k98KIRjTYbY
+2001 Waiwai Wanage                https://youtu.be/4GmwPTk_Er4
+2001 Zarigani Tsuri               https://youtu.be/NppRdebkUaQ
+2001 Kotekitai Slot               https://youtu.be/IohrnGIma4A
+2002 Shateki Yokochou             https://youtu.be/LPZLWP1x5o8
 2002 Ipponzuri Slot
-2002 Karateman
+2002 Karateman                    https://youtu.be/EIrVHEAv3Sc
 2002 One-touchable
+2002 Perfect Goal (screenless)    https://youtu.be/ilneyp-8dBI
 2003 Gun Kids
-2003 Kurukuru Train
+2003 Kurukuru Train               https://youtu.be/Ef7TQX4C9fA
+2003 Safari Kingdom (screenless)
 2003 Zakuzaku Kaizokudan
 2004 Animal Punch
-2004 Dotabata Zaurus
-2004 Ninchuu Densetsu
+2004 Dotabata Zaurus              https://youtu.be/Gxt6klOYZ9A
+2004 Excite Hockey (screenless)
+2004 Fishing Battle (screenless)
+2004 Home Run Derby (screenless)
+2004 Ninchuu Densetsu             https://youtu.be/_ifev_CJROs
+2004 Outer Space (screenless)
+2004 Pretty Witch Pointe          https://youtu.be/lYAwfHyywfA
 
-from:
+Original list from:
 http://www.tsc-acnet.com/index.php?sort=8&action=cataloglist&s=1&mode=3&genre_id=40&freeword=%25A5%25B5%25A5%25DF%25A1%25BC
 
 --------------------------------------------------------------------------------------
@@ -114,7 +121,7 @@ Notes:
 class sigmab98_state : public driver_device
 {
 public:
-	sigmab98_state(const machine_config &mconfig, device_type type, const char *tag)
+	sigmab98_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_buffered_spriteram(*this, "spriteram"),
@@ -140,7 +147,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	bitmap_ind16 *m_sprite_bitmap;
+	std::unique_ptr<bitmap_ind16> m_sprite_bitmap;
 
 	UINT8 m_reg;
 	UINT8 m_rombank;
@@ -167,8 +174,6 @@ public:
 	DECLARE_WRITE8_MEMBER(dodghero_regs2_w);
 	DECLARE_READ8_MEMBER(dodghero_regs2_r);
 
-	DECLARE_WRITE8_MEMBER(dashhero_regs_w);
-	DECLARE_READ8_MEMBER(dashhero_regs_r);
 	DECLARE_WRITE8_MEMBER(dashhero_regs2_w);
 	DECLARE_READ8_MEMBER(dashhero_regs2_r);
 
@@ -239,7 +244,7 @@ public:
 	DECLARE_MACHINE_RESET(sigmab98);
 	DECLARE_MACHINE_RESET(sammymdl);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sammymdl(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(sigmab98_vblank_interrupt);
@@ -256,7 +261,7 @@ public:
 
 void sigmab98_state::video_start()
 {
-	m_sprite_bitmap = auto_bitmap_ind16_alloc(machine(), 512, 512);
+	m_sprite_bitmap = std::make_unique<bitmap_ind16>(512, 512);
 }
 
 /***************************************************************************
@@ -842,7 +847,7 @@ WRITE8_MEMBER(sigmab98_state::eeprom_w)
 // 10 led?
 WRITE8_MEMBER(sigmab98_state::c4_w)
 {
-	set_led_status(machine(), 0, (data & 0x10));
+	output().set_led_value(0, (data & 0x10));
 
 	m_c4 = data;
 	show_outputs();
@@ -856,15 +861,15 @@ WRITE8_MEMBER(sigmab98_state::c4_w)
 // 20 led? (starts blinking after coin in)
 WRITE8_MEMBER(sigmab98_state::c6_w)
 {
-	coin_lockout_w(machine(), 0, (~data) & 0x02);
+	machine().bookkeeping().coin_lockout_w(0, (~data) & 0x02);
 
-	coin_counter_w(machine(), 0,   data  & 0x04);
+	machine().bookkeeping().coin_counter_w(0,   data  & 0x04);
 
 	if ((data & 0x08) && !(m_c6 & 0x08))
 		m_buffered_spriteram->copy();
 
-	set_led_status(machine(), 1,   data  & 0x10);
-	set_led_status(machine(), 2,   data  & 0x20);
+	output().set_led_value(1,   data  & 0x10);
+	output().set_led_value(2,   data  & 0x20);
 
 	m_c6 = data;
 	show_outputs();
@@ -1154,13 +1159,13 @@ void sigmab98_state::show_3_outputs()
 // Port 31
 WRITE8_MEMBER(sigmab98_state::sammymdl_coin_w)
 {
-	coin_counter_w(machine(), 0,   data  & 0x01 );  // coin1 in
-	coin_counter_w(machine(), 1,   data  & 0x02 );  // coin2 in
-	coin_counter_w(machine(), 2,   data  & 0x04 );  // medal in
+	machine().bookkeeping().coin_counter_w(0,   data  & 0x01 );  // coin1 in
+	machine().bookkeeping().coin_counter_w(1,   data  & 0x02 );  // coin2 in
+	machine().bookkeeping().coin_counter_w(2,   data  & 0x04 );  // medal in
 
-//  coin_lockout_w(machine(), 1, (~data) & 0x08 ); // coin2 lockout?
-//  coin_lockout_w(machine(), 0, (~data) & 0x10 ); // coin1 lockout
-//  coin_lockout_w(machine(), 2, (~data) & 0x20 ); // medal lockout?
+//  machine().bookkeeping().coin_lockout_w(1, (~data) & 0x08 ); // coin2 lockout?
+//  machine().bookkeeping().coin_lockout_w(0, (~data) & 0x10 ); // coin1 lockout
+//  machine().bookkeeping().coin_lockout_w(2, (~data) & 0x20 ); // medal lockout?
 
 	m_out[0] = data;
 	show_3_outputs();
@@ -1169,7 +1174,7 @@ WRITE8_MEMBER(sigmab98_state::sammymdl_coin_w)
 // Port 32
 WRITE8_MEMBER(sigmab98_state::sammymdl_leds_w)
 {
-	set_led_status(machine(), 0,    data & 0x01);   // button
+	output().set_led_value(0,    data & 0x01);   // button
 
 	m_out[1] = data;
 	show_3_outputs();
@@ -1429,14 +1434,14 @@ WRITE8_MEMBER(sigmab98_state::haekaka_b000_w)
 WRITE8_MEMBER(sigmab98_state::haekaka_leds_w)
 {
 	// All used
-	set_led_status(machine(), 0,    data & 0x01);
-	set_led_status(machine(), 1,    data & 0x02);
-	set_led_status(machine(), 2,    data & 0x04);
-	set_led_status(machine(), 3,    data & 0x08);
-	set_led_status(machine(), 4,    data & 0x10);
-	set_led_status(machine(), 5,    data & 0x20);
-	set_led_status(machine(), 6,    data & 0x40);
-	set_led_status(machine(), 7,    data & 0x80);
+	output().set_led_value(0,    data & 0x01);
+	output().set_led_value(1,    data & 0x02);
+	output().set_led_value(2,    data & 0x04);
+	output().set_led_value(3,    data & 0x08);
+	output().set_led_value(4,    data & 0x10);
+	output().set_led_value(5,    data & 0x20);
+	output().set_led_value(6,    data & 0x40);
+	output().set_led_value(7,    data & 0x80);
 
 	m_out[1] = data;
 	show_3_outputs();
@@ -1444,7 +1449,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_leds_w)
 
 WRITE8_MEMBER(sigmab98_state::haekaka_coin_w)
 {
-	coin_counter_w(machine(), 0,   data & 0x01 );   // medal out
+	machine().bookkeeping().coin_counter_w(0,   data & 0x01 );   // medal out
 //                                 data & 0x02 ?
 //                                 data & 0x04 ?
 //                                 data & 0x10 ?
@@ -2699,7 +2704,7 @@ ROM_START( sammymdl )
 	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
-	ROM_COPY( "mainbios", 0x0000, 0x0000, 0x40000 )
+	ROM_COPY( "mainbios", 0x000000, 0x0000, 0x40000 )
 
 	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASEFF )
 ROM_END

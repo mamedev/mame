@@ -92,7 +92,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( osborne1_io, AS_IO, 8, osborne1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0xff ) AM_WRITE(bankswitch_w)
+	AM_RANGE( 0x00, 0x03 ) AM_MIRROR( 0xfc ) AM_WRITE(bankswitch_w)
 ADDRESS_MAP_END
 
 
@@ -278,7 +278,7 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(osborne1_state, serial_acia_irq_func))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_dcd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))

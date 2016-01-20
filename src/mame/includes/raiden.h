@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Oliver Bergmann, Bryan McPhail, Randy Mongenel
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /*******************************************************************************
 
     Seibu Raiden hardware
@@ -12,7 +12,7 @@
 class raiden_state : public driver_device
 {
 public:
-	raiden_state(const machine_config &mconfig, device_type type, const char *tag)
+	raiden_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_seibu_sound(*this, "seibu_sound"),
@@ -63,7 +63,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(raidenb);
 
 	UINT32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *scrollregs);

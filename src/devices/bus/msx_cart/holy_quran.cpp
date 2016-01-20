@@ -7,7 +7,7 @@
 const device_type MSX_CART_HOLY_QURAN = &device_creator<msx_cart_holy_quran>;
 
 
-msx_cart_holy_quran::msx_cart_holy_quran(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_holy_quran::msx_cart_holy_quran(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_HOLY_QURAN, "MSX Cartridge - Holy Quran", tag, owner, clock, "msx_cart_holy_quran", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_decrypt(false)
@@ -15,7 +15,7 @@ msx_cart_holy_quran::msx_cart_holy_quran(const machine_config &mconfig, const ch
 	for (int i = 0; i < 4; i++)
 	{
 		m_selected_bank[i] = 0;
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 
 	/* protection uses a simple rotation on databus, some lines inverted:
@@ -50,9 +50,9 @@ void msx_cart_holy_quran::restore_banks()
 
 void msx_cart_holy_quran::device_reset()
 {
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_selected_bank)
 	{
-		m_selected_bank[i] = 0;
+		elem = 0;
 	}
 }
 

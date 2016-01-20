@@ -52,7 +52,6 @@ static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *temp
 
 namespace d3d
 {
-
 //============================================================
 //  PROTOTYPES
 //============================================================
@@ -72,12 +71,12 @@ static direct3dx9_loadeffect_ptr g_load_effect = NULL;
 //  shader manager constructor
 //============================================================
 
-shaders::shaders() : 
-	d3dintf(NULL), machine(NULL), d3d(NULL), num_screens(0), curr_screen(0), curr_frame(0), write_ini(false), read_ini(false), hlsl_prescale_x(0), hlsl_prescale_y(0), bloom_count(0), 
+shaders::shaders() :
+	d3dintf(NULL), machine(NULL), d3d(NULL), num_screens(0), curr_screen(0), curr_frame(0), write_ini(false), read_ini(false), hlsl_prescale_x(0), hlsl_prescale_y(0), bloom_count(0),
 	vecbuf_type(), vecbuf_index(0), vecbuf_count(0), avi_output_file(NULL), avi_frame(0), avi_copy_surface(NULL), avi_copy_texture(NULL), avi_final_target(NULL), avi_final_texture(NULL),
-	black_surface(NULL), black_texture(NULL), render_snap(false), snap_rendered(false), snap_copy_target(NULL), snap_copy_texture(NULL), snap_target(NULL), snap_texture(NULL), 
+	black_surface(NULL), black_texture(NULL), render_snap(false), snap_rendered(false), snap_copy_target(NULL), snap_copy_texture(NULL), snap_target(NULL), snap_texture(NULL),
 	snap_width(0), snap_height(0), lines_pending(false), backbuffer(NULL), curr_effect(NULL), default_effect(NULL), prescale_effect(NULL), post_effect(NULL), distortion_effect(NULL),
-	focus_effect(NULL), phosphor_effect(NULL), deconverge_effect(NULL), color_effect(NULL), yiq_encode_effect(NULL), yiq_decode_effect(NULL), bloom_effect(NULL), 
+	focus_effect(NULL), phosphor_effect(NULL), deconverge_effect(NULL), color_effect(NULL), yiq_encode_effect(NULL), yiq_decode_effect(NULL), bloom_effect(NULL),
 	downsample_effect(NULL), vector_effect(NULL), fsfx_vertices(NULL), curr_texture(NULL), curr_render_target(NULL), curr_poly(NULL)
 {
 	master_enable = false;
@@ -101,12 +100,6 @@ shaders::shaders() :
 
 shaders::~shaders()
 {
-	if (options != NULL)
-	{
-		last_options = *options;
-	}
-	options = NULL;
-
 	cache_target *currcache = cachehead;
 	while(cachehead != NULL)
 	{
@@ -654,11 +647,6 @@ void shaders::set_texture(texture_info *texture)
 
 void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *renderer)
 {
-	if (&machine->system() == &GAME_NAME(___empty))
-	{
-		return;
-	}
-
 	if (!d3dintf->post_fx_available)
 	{
 		return;
@@ -669,6 +657,7 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 	{
 		printf("Direct3D: Unable to find D3DXCreateEffectFromFileW\n");
 		d3dintf->post_fx_available = false;
+
 		return;
 	}
 
@@ -676,6 +665,12 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 	this->machine = machine;
 	this->d3d = renderer;
 	this->options = renderer->get_shaders_options();
+
+	// check if no driver loaded (not all settings might be loaded yet)
+	if (&machine->system() == &GAME_NAME(___empty))
+	{
+		return;
+	}
 
 	windows_options &winoptions = downcast<windows_options &>(machine->options());
 
@@ -693,6 +688,7 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 	if (!options->params_init)
 	{
 		strncpy(options->shadow_mask_texture, winoptions.screen_shadow_mask_texture(), sizeof(options->shadow_mask_texture));
+		options->shadow_mask_tile_mode = winoptions.screen_shadow_mask_tile_mode();
 		options->shadow_mask_alpha = winoptions.screen_shadow_mask_alpha();
 		options->shadow_mask_count_x = winoptions.screen_shadow_mask_count_x();
 		options->shadow_mask_count_y = winoptions.screen_shadow_mask_count_y();
@@ -739,6 +735,7 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 		options->yiq_phase_count = winoptions.screen_yiq_phase_count();
 		options->vector_length_scale = winoptions.screen_vector_length_scale();
 		options->vector_length_ratio = winoptions.screen_vector_length_ratio();
+		options->bloom_blend_mode = winoptions.screen_bloom_blend_mode();
 		options->bloom_scale = winoptions.screen_bloom_scale();
 		get_vector(winoptions.screen_bloom_overdrive(), 3, options->bloom_overdrive, TRUE);
 		options->bloom_level0_weight = winoptions.screen_bloom_lvl0_weight();
@@ -847,6 +844,11 @@ int shaders::create_resources(bool reset)
 	if (!master_enable || !d3dintf->post_fx_available)
 	{
 		return 0;
+	}
+
+	if (last_options.params_init)
+	{
+		options = &last_options;
 	}
 
 	HRESULT result = (*d3dintf->device.get_render_target)(d3d->get_device(), 0, &backbuffer);
@@ -968,7 +970,6 @@ int shaders::create_resources(bool reset)
 	color_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 	color_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
 
-	color_effect->add_uniform("YIQEnable", uniform::UT_FLOAT, uniform::CU_NTSC_ENABLE);
 	color_effect->add_uniform("RedRatios", uniform::UT_VEC3, uniform::CU_COLOR_RED_RATIOS);
 	color_effect->add_uniform("GrnRatios", uniform::UT_VEC3, uniform::CU_COLOR_GRN_RATIOS);
 	color_effect->add_uniform("BluRatios", uniform::UT_VEC3, uniform::CU_COLOR_BLU_RATIOS);
@@ -988,7 +989,11 @@ int shaders::create_resources(bool reset)
 
 	focus_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 	focus_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
+	focus_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
+	focus_effect->add_uniform("QuadDims", uniform::UT_VEC2, uniform::CU_QUAD_DIMS);
 	focus_effect->add_uniform("Defocus", uniform::UT_VEC2, uniform::CU_FOCUS_SIZE);
+	focus_effect->add_uniform("OrientationSwapXY", uniform::UT_BOOL, uniform::CU_ORIENTATION_SWAP);
+	focus_effect->add_uniform("RotationSwapXY", uniform::UT_BOOL, uniform::CU_ROTATION_SWAP);
 
 	phosphor_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 	phosphor_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
@@ -1025,6 +1030,10 @@ int shaders::create_resources(bool reset)
 	post_effect->add_uniform("Power", uniform::UT_VEC3, uniform::CU_POST_POWER);
 	post_effect->add_uniform("Floor", uniform::UT_VEC3, uniform::CU_POST_FLOOR);
 
+	post_effect->add_uniform("OrientationSwapXY", uniform::UT_BOOL, uniform::CU_ORIENTATION_SWAP);
+	post_effect->add_uniform("RotationSwapXY", uniform::UT_BOOL, uniform::CU_ROTATION_SWAP);
+	post_effect->add_uniform("RotationType", uniform::UT_INT, uniform::CU_ROTATION_TYPE);
+
 	distortion_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 	distortion_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
 	distortion_effect->add_uniform("QuadDims", uniform::UT_VEC2, uniform::CU_QUAD_DIMS);
@@ -1034,6 +1043,10 @@ int shaders::create_resources(bool reset)
 	distortion_effect->add_uniform("RoundCornerAmount", uniform::UT_FLOAT, uniform::CU_POST_ROUND_CORNER);
 	distortion_effect->add_uniform("SmoothBorderAmount", uniform::UT_FLOAT, uniform::CU_POST_SMOOTH_BORDER);
 	distortion_effect->add_uniform("ReflectionAmount", uniform::UT_FLOAT, uniform::CU_POST_REFLECTION);
+
+	distortion_effect->add_uniform("OrientationSwapXY", uniform::UT_BOOL, uniform::CU_ORIENTATION_SWAP);
+	distortion_effect->add_uniform("RotationSwapXY", uniform::UT_BOOL, uniform::CU_ROTATION_SWAP);
+	distortion_effect->add_uniform("RotationType", uniform::UT_INT, uniform::CU_ROTATION_TYPE);
 
 	vector_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 
@@ -1268,6 +1281,46 @@ int shaders::ntsc_pass(render_target *rt, int source_index, poly_info *poly, int
 	return next_index;
 }
 
+rgb_t shaders::apply_color_convolution(rgb_t color)
+{
+	// this function uses the same algorithm as the color convolution shader pass
+
+	float r = static_cast<float>(color.r()) / 255.0f;
+	float g = static_cast<float>(color.g()) / 255.0f;
+	float b = static_cast<float>(color.b()) / 255.0f;
+
+	float *rRatio = options->red_ratio;
+	float *gRatio = options->grn_ratio;
+	float *bRatio = options->blu_ratio;
+	float *offset = options->offset;
+	float *scale = options->scale;
+	float saturation = options->saturation;
+
+	// RGB Tint & Shift
+	float rShifted = r * rRatio[0] + g * rRatio[1] + b * rRatio[2];
+	float gShifted = r * gRatio[0] + g * gRatio[1] + b * gRatio[2];
+	float bShifted = r * bRatio[0] + g * bRatio[1] + b * bRatio[2];
+
+	// RGB Scale & Offset
+	r = rShifted * scale[0] + offset[0];
+	g = gShifted * scale[1] + offset[1];
+	b = bShifted * scale[2] + offset[2];
+
+	// Saturation
+	float grayscale[3] = { 0.299f, 0.587f, 0.114f };
+	float luma = r * grayscale[0] + g * grayscale[1] + b * grayscale[2];
+	float chroma[3] = { r - luma, g - luma, b - luma };
+
+	r = chroma[0] * saturation + luma;
+	g = chroma[1] * saturation + luma;
+	b = chroma[2] * saturation + luma;
+
+	return rgb_t(
+		MAX(0, MIN(255, static_cast<int>(r * 255.0f))),
+		MAX(0, MIN(255, static_cast<int>(g * 255.0f))),
+		MAX(0, MIN(255, static_cast<int>(b * 255.0f))));
+}
+
 int shaders::color_convolution_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
@@ -1366,22 +1419,7 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	texture_info *texture = poly->get_texture();
 
 	bool prepare_vector =
-		(machine->first_screen()->screen_type() &  SCREEN_TYPE_VECTOR) == SCREEN_TYPE_VECTOR;
-	bool prepare_raster =
-		(machine->first_screen()->screen_type() &  SCREEN_TYPE_RASTER) == SCREEN_TYPE_RASTER;
-	bool orientation_swap_xy =
-		(d3d->window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
-	bool rotation_swap_xy =
-		(d3d->window().target()->orientation() & ROT90) == ROT90 ||
-		(d3d->window().target()->orientation() & ROT270) == ROT270;
-	int rotation_type =
-		(d3d->window().target()->orientation() & ROT90) == ROT90
-			? 1
-			: (d3d->window().target()->orientation() & ROT180) == ROT180
-				? 2
-				: (d3d->window().target()->orientation() & ROT270) == ROT270
-					? 3
-					: 0;
+		machine->first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
 
 	screen_device_iterator screen_iterator(machine->root_device());
 	screen_device *screen = screen_iterator.first();
@@ -1399,19 +1437,26 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	float screen_scale[2] = { xscale, yscale };
 	float screen_offset[2] = { xoffset, yoffset };
 
+	rgb_t back_color_rgb = machine->first_screen()->palette() == NULL
+		? rgb_t(0, 0, 0)
+		: machine->first_screen()->palette()->palette()->entry_color(0);
+	back_color_rgb = apply_color_convolution(back_color_rgb);
+	float back_color[3] = {
+		static_cast<float>(back_color_rgb.r()) / 255.0f,
+		static_cast<float>(back_color_rgb.g()) / 255.0f,
+		static_cast<float>(back_color_rgb.b()) / 255.0f };
+
 	curr_effect = post_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("ShadowTexture", shadow_texture == NULL ? NULL : shadow_texture->get_finaltex());
+	curr_effect->set_int("ShadowTileMode", options->shadow_mask_tile_mode);
 	curr_effect->set_texture("DiffuseTexture", rt->prescale_texture[next_index]);
+	curr_effect->set_vector("BackColor", 3, back_color);
 	curr_effect->set_vector("ScreenScale", 2, screen_scale);
 	curr_effect->set_vector("ScreenOffset", 2, screen_offset);
 	curr_effect->set_float("ScanlineOffset", texture->get_cur_frame() == 0 ? 0.0f : options->scanline_offset);
-	curr_effect->set_bool("OrientationSwapXY", orientation_swap_xy);
-	curr_effect->set_bool("RotationSwapXY", rotation_swap_xy);
-	curr_effect->set_int("RotationType", rotation_type); // backward compatibility
 	curr_effect->set_bool("PrepareBloom", prepare_bloom);
 	curr_effect->set_bool("PrepareVector", prepare_vector);
-	curr_effect->set_bool("PrepareRaster", prepare_raster);
 
 	next_index = rt->next_index(next_index);
 	blit(prepare_bloom ? rt->native_target[next_index] : rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
@@ -1424,7 +1469,7 @@ int shaders::downsample_pass(render_target *rt, int source_index, poly_info *pol
 	int next_index = source_index;
 
 	bool prepare_vector =
-		(machine->first_screen()->screen_type() &  SCREEN_TYPE_VECTOR) == SCREEN_TYPE_VECTOR;
+		machine->first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
 	float bloom_rescale = options->bloom_scale;
 
 	// skip downsample if no influencing settings
@@ -1482,20 +1527,20 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 
 	float weight0123[4] = {
 		options->bloom_level0_weight,
-		options->bloom_level1_weight * bloom_rescale,
-		options->bloom_level2_weight * bloom_rescale,
-		options->bloom_level3_weight * bloom_rescale
+		options->bloom_level1_weight,
+		options->bloom_level2_weight,
+		options->bloom_level3_weight
 	};
 	float weight4567[4] = {
-		options->bloom_level4_weight * bloom_rescale,
-		options->bloom_level5_weight * bloom_rescale,
-		options->bloom_level6_weight * bloom_rescale,
-		options->bloom_level7_weight * bloom_rescale
+		options->bloom_level4_weight,
+		options->bloom_level5_weight,
+		options->bloom_level6_weight,
+		options->bloom_level7_weight
 	};
 	float weight89A[3]  = {
-		options->bloom_level8_weight * bloom_rescale,
-		options->bloom_level9_weight * bloom_rescale,
-		options->bloom_level10_weight * bloom_rescale
+		options->bloom_level8_weight,
+		options->bloom_level9_weight,
+		options->bloom_level10_weight
 	};
 	curr_effect->set_vector("Level0123Weight", 4, weight0123);
 	curr_effect->set_vector("Level4567Weight", 4, weight4567);
@@ -1507,7 +1552,9 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 	curr_effect->set_vector("Level89Size", 4, bloom_dims[8]);
 	curr_effect->set_vector("LevelASize", 2, bloom_dims[10]);
 
-	curr_effect->set_vector("OverdriveWeight", 3, options->bloom_overdrive);
+	curr_effect->set_int("BloomBlendMode", options->bloom_blend_mode);
+	curr_effect->set_float("BloomScale", bloom_rescale);
+	curr_effect->set_vector("BloomOverdrive", 3, options->bloom_overdrive);
 
 	curr_effect->set_texture("DiffuseA", rt->prescale_texture[next_index]);
 
@@ -1563,26 +1610,9 @@ int shaders::distortion_pass(render_target *rt, int source_index, poly_info *pol
 		return next_index;
 	}
 
-	bool orientation_swap_xy =
-		(d3d->window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
-	bool rotation_swap_xy =
-		(d3d->window().target()->orientation() & ROT90) == ROT90 ||
-		(d3d->window().target()->orientation() & ROT270) == ROT270;
-	int rotation_type =
-		(d3d->window().target()->orientation() & ROT90) == ROT90
-			? 1
-			: (d3d->window().target()->orientation() & ROT180) == ROT180
-				? 2
-				: (d3d->window().target()->orientation() & ROT270) == ROT270
-					? 3
-					: 0;
-
 	curr_effect = distortion_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("DiffuseTexture", rt->prescale_texture[next_index]);
-	curr_effect->set_bool("OrientationSwapXY", orientation_swap_xy);
-	curr_effect->set_bool("RotationSwapXY", rotation_swap_xy);
-	curr_effect->set_int("RotationType", rotation_type);
 
 	next_index = rt->next_index(next_index);
 	blit(rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
@@ -1629,7 +1659,7 @@ int shaders::screen_pass(render_target *rt, int source_index, poly_info *poly, i
 	int next_index = source_index;
 
 	bool prepare_vector =
-		(machine->first_screen()->screen_type() &  SCREEN_TYPE_VECTOR) == SCREEN_TYPE_VECTOR;
+		machine->first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
 
 	curr_effect = default_effect;
 	curr_effect->update_uniforms();
@@ -1766,7 +1796,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		int next_index = 0;
 
 		next_index = vector_buffer_pass(rt, next_index, poly, vertnum);
-		next_index = defocus_pass(rt, next_index, poly, vertnum);
+		next_index = defocus_pass(rt, next_index, poly, vertnum); // 1st pass
+		next_index = defocus_pass(rt, next_index, poly, vertnum); // 2nd pass
 		next_index = phosphor_pass(rt, ct, next_index, poly, vertnum);
 
 		// create bloom textures
@@ -1833,7 +1864,7 @@ bool shaders::register_prescaled_texture(texture_info *texture)
 //============================================================
 bool shaders::add_cache_target(renderer* d3d, texture_info* info, int width, int height, int xprescale, int yprescale, int screen_index)
 {
-	cache_target* target = (cache_target*)global_alloc_clear(cache_target);
+	cache_target* target = (cache_target*)global_alloc_clear<cache_target>();
 
 	if (!target->init(d3d, d3dintf, width, height, xprescale, yprescale))
 	{
@@ -1914,7 +1945,7 @@ bool shaders::add_render_target(renderer* d3d, texture_info* info, int width, in
 		}
 	}
 
-	render_target* target = (render_target*)global_alloc_clear(render_target);
+	render_target* target = (render_target*)global_alloc_clear<render_target>();
 
 	if (!target->init(d3d, d3dintf, width, height, xprescale, yprescale))
 	{
@@ -2038,6 +2069,12 @@ void shaders::delete_resources(bool reset)
 	if (!master_enable || !d3dintf->post_fx_available)
 	{
 		return;
+	}
+
+	if (options != NULL)
+	{
+		last_options = *options;
+		options = NULL;
 	}
 
 	initialized = false;
@@ -2239,8 +2276,25 @@ static INT32 slider_set(float *option, float scale, const char *fmt, std::string
 	return floor(*option / scale + 0.5f);
 }
 
+static INT32 slider_shadow_mask_tile_mode(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	hlsl_options *options = (hlsl_options*)arg;
+	if (newval != SLIDER_NOCHANGE)
+	{
+		options->shadow_mask_tile_mode = newval;
+	}
+	if (str != NULL)
+	{
+		strprintf(*str, "%s", options->shadow_mask_tile_mode == 0 ? "Screen" : "Source");
+	}
+	options->params_dirty = true;
+
+	return options->shadow_mask_tile_mode;
+}
+
 static INT32 slider_shadow_mask_alpha(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->shadow_mask_alpha), 0.01f, "%2.2f", str, newval);
 }
 
@@ -2612,6 +2666,22 @@ static INT32 slider_vector_length_max(running_machine &machine, void *arg, std::
 	return slider_set(&(((hlsl_options*)arg)->vector_length_ratio), 1.0f, "%4f", str, newval);
 }
 
+static INT32 slider_bloom_blend_mode(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	hlsl_options *options = (hlsl_options*)arg;
+	if (newval != SLIDER_NOCHANGE)
+	{
+		options->bloom_blend_mode = newval;
+	}
+	if (str != NULL)
+	{
+		strprintf(*str, "%s", options->bloom_blend_mode == 0 ? "Addition" : "Darken");
+	}
+	options->params_dirty = true;
+
+	return options->bloom_blend_mode;
+}
+
 static INT32 slider_bloom_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
 	((hlsl_options*)arg)->params_dirty = true;
@@ -2708,6 +2778,7 @@ shaders::slider_desc shaders::s_sliders[] =
 {
 	{ "Vector Length Attenuation",           0,    50,   100, 1, 2, slider_vector_attenuation },
 	{ "Vector Attenuation Length Limit",     1,   500,  1000, 1, 2, slider_vector_length_max },
+	{ "Shadow Mask Tile Mode",               0,     0,     1, 1, 7, slider_shadow_mask_tile_mode },
 	{ "Shadow Mask Darkness",                0,     0,   100, 1, 7, slider_shadow_mask_alpha },
 	{ "Shadow Mask X Count",                 1,     1,  1024, 1, 7, slider_shadow_mask_x_count },
 	{ "Shadow Mask Y Count",                 1,     1,  1024, 1, 7, slider_shadow_mask_y_count },
@@ -2720,26 +2791,26 @@ shaders::slider_desc shaders::s_sliders[] =
 	{ "Screen Smooth Border",                0,     0,   100, 1, 7, slider_smooth_border },
 	{ "Screen Reflection",                   0,     0,   100, 1, 7, slider_reflection },
 	{ "Image Vignetting",                    0,     0,   100, 1, 7, slider_vignetting },
-	{ "Scanline Darkness",                   0,     0,   100, 1, 1, slider_scanline_alpha },
-	{ "Scanline Screen Height",              1,    20,    80, 1, 1, slider_scanline_scale },
-	{ "Scanline Indiv. Height",              1,    20,    80, 1, 1, slider_scanline_height },
-	{ "Scanline Brightness",                 0,    20,    40, 1, 1, slider_scanline_bright_scale },
-	{ "Scanline Brightness Overdrive",       0,     0,    20, 1, 1, slider_scanline_bright_offset },
-	{ "Scanline Jitter",                     0,     0,    40, 1, 1, slider_scanline_offset },
-	{ "Defocus X",                           0,     0,    64, 1, 3, slider_defocus_x },
-	{ "Defocus Y",                           0,     0,    64, 1, 3, slider_defocus_y },
-	{ "Red Position Offset X",           -1500,     0,  1500, 1, 3, slider_red_converge_x },
-	{ "Red Position Offset Y",           -1500,     0,  1500, 1, 3, slider_red_converge_y },
-	{ "Green Position Offset X",         -1500,     0,  1500, 1, 3, slider_green_converge_x },
-	{ "Green Position Offset Y",         -1500,     0,  1500, 1, 3, slider_green_converge_y },
-	{ "Blue Position Offset X",          -1500,     0,  1500, 1, 3, slider_blue_converge_x },
-	{ "Blue Position Offset Y",          -1500,     0,  1500, 1, 3, slider_blue_converge_y },
-	{ "Red Convergence X",               -1500,     0,  1500, 1, 3, slider_red_radial_converge_x },
-	{ "Red Convergence Y",               -1500,     0,  1500, 1, 3, slider_red_radial_converge_y },
-	{ "Green Convergence X",             -1500,     0,  1500, 1, 3, slider_green_radial_converge_x },
-	{ "Green Convergence Y",             -1500,     0,  1500, 1, 3, slider_green_radial_converge_y },
-	{ "Blue Convergence X",              -1500,     0,  1500, 1, 3, slider_blue_radial_converge_x },
-	{ "Blue Convergence Y",              -1500,     0,  1500, 1, 3, slider_blue_radial_converge_y },
+	{ "Scanline Darkness",                   0,     0,   100, 1, 5, slider_scanline_alpha },
+	{ "Scanline Screen Height",              1,    20,    80, 1, 5, slider_scanline_scale },
+	{ "Scanline Indiv. Height",              1,    20,    80, 1, 5, slider_scanline_height },
+	{ "Scanline Brightness",                 0,    20,    40, 1, 5, slider_scanline_bright_scale },
+	{ "Scanline Brightness Overdrive",       0,     0,    20, 1, 5, slider_scanline_bright_offset },
+	{ "Scanline Jitter",                     0,     0,    40, 1, 5, slider_scanline_offset },
+	{ "Defocus X",                           0,     0,    20, 1, 7, slider_defocus_x },
+	{ "Defocus Y",                           0,     0,    20, 1, 7, slider_defocus_y },
+	{ "Red Position Offset X",           -1500,     0,  1500, 1, 7, slider_red_converge_x },
+	{ "Red Position Offset Y",           -1500,     0,  1500, 1, 7, slider_red_converge_y },
+	{ "Green Position Offset X",         -1500,     0,  1500, 1, 7, slider_green_converge_x },
+	{ "Green Position Offset Y",         -1500,     0,  1500, 1, 7, slider_green_converge_y },
+	{ "Blue Position Offset X",          -1500,     0,  1500, 1, 7, slider_blue_converge_x },
+	{ "Blue Position Offset Y",          -1500,     0,  1500, 1, 7, slider_blue_converge_y },
+	{ "Red Convergence X",               -1500,     0,  1500, 1, 7, slider_red_radial_converge_x },
+	{ "Red Convergence Y",               -1500,     0,  1500, 1, 7, slider_red_radial_converge_y },
+	{ "Green Convergence X",             -1500,     0,  1500, 1, 7, slider_green_radial_converge_x },
+	{ "Green Convergence Y",             -1500,     0,  1500, 1, 7, slider_green_radial_converge_y },
+	{ "Blue Convergence X",              -1500,     0,  1500, 1, 7, slider_blue_radial_converge_x },
+	{ "Blue Convergence Y",              -1500,     0,  1500, 1, 7, slider_blue_radial_converge_y },
 	{ "Red Output from Red Input",        -400,     0,   400, 5, 7, slider_red_from_r },
 	{ "Red Output from Green Input",      -400,     0,   400, 5, 7, slider_red_from_g },
 	{ "Red Output from Blue Input",       -400,     0,   400, 5, 7, slider_red_from_b },
@@ -2765,6 +2836,7 @@ shaders::slider_desc shaders::s_sliders[] =
 	{ "Red Phosphor Life",                   0,     0,   100, 1, 7, slider_red_phosphor_life },
 	{ "Green Phosphor Life",                 0,     0,   100, 1, 7, slider_green_phosphor_life },
 	{ "Blue Phosphor Life",                  0,     0,   100, 1, 7, slider_blue_phosphor_life },
+	{ "Bloom Blend Mode",                    0,     0,     1, 1, 7, slider_bloom_blend_mode },
 	{ "Bloom Scale",                         0,     0,  2000, 5, 7, slider_bloom_scale },
 	{ "Bloom Red Overdrive",                 0,     0,  2000, 5, 7, slider_bloom_red_overdrive },
 	{ "Bloom Green Overdrive",               0,     0,  2000, 5, 7, slider_bloom_green_overdrive },
@@ -2828,6 +2900,7 @@ uniform::uniform(effect *shader, const char *name, uniform_type type, int id)
 	m_next = NULL;
 	m_handle = m_shader->get_parameter(NULL, name);
 	m_ival = 0;
+	m_bval = false;
 	memset(m_vec, 0, sizeof(float) * 4);
 	m_mval = NULL;
 	m_texture = NULL;
@@ -2835,6 +2908,7 @@ uniform::uniform(effect *shader, const char *name, uniform_type type, int id)
 
 	switch (type)
 	{
+		case UT_BOOL:
 		case UT_INT:
 		case UT_FLOAT:
 		case UT_MATRIX:
@@ -2901,7 +2975,7 @@ void uniform::update()
 			}
 			else
 			{
-				float targetdims[2] = { shadersys->curr_render_target->target_width, shadersys->curr_render_target->target_height };
+				float targetdims[2] = { static_cast<float>(shadersys->curr_render_target->target_width), static_cast<float>(shadersys->curr_render_target->target_height) };
 				m_shader->set_vector("TargetDims", 2, targetdims);
 			}
 			break;
@@ -2911,6 +2985,33 @@ void uniform::update()
 			float quaddims[2] = { shadersys->curr_poly->get_prim_width(), shadersys->curr_poly->get_prim_height() };
 			m_shader->set_vector("QuadDims", 2, quaddims);
 			break;
+		}
+
+		case CU_ORIENTATION_SWAP:
+		{
+			bool orientation_swap_xy =
+				(d3d->window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
+			m_shader->set_bool("OrientationSwapXY", orientation_swap_xy);
+
+		}
+		case CU_ROTATION_SWAP:
+		{
+			bool rotation_swap_xy =
+				(d3d->window().target()->orientation() & ROT90) == ROT90 ||
+				(d3d->window().target()->orientation() & ROT270) == ROT270;
+			m_shader->set_bool("RotationSwapXY", rotation_swap_xy);
+		}
+		case CU_ROTATION_TYPE:
+		{
+			int rotation_type =
+				(d3d->window().target()->orientation() & ROT90) == ROT90
+					? 1
+					: (d3d->window().target()->orientation() & ROT180) == ROT180
+						? 2
+						: (d3d->window().target()->orientation() & ROT270) == ROT270
+							? 3
+							: 0;
+			m_shader->set_int("RotationType", rotation_type);
 		}
 
 		case CU_NTSC_CCFREQ:
@@ -3007,7 +3108,7 @@ void uniform::update()
 			break;
 		case CU_POST_SHADOW_COUNT:
 		{
-			float shadowcount[2] = { options->shadow_mask_count_x, options->shadow_mask_count_y };
+			float shadowcount[2] = { static_cast<float>(options->shadow_mask_count_x), static_cast<float>(options->shadow_mask_count_y) };
 			m_shader->set_vector("ShadowCount", 2, shadowcount);
 			break;
 		}
@@ -3117,6 +3218,11 @@ void uniform::set(int x)
 	m_ival = x;
 }
 
+void uniform::set(bool x)
+{
+	m_bval = x;
+}
+
 void uniform::set(matrix *mat)
 {
 	m_mval = mat;
@@ -3131,6 +3237,9 @@ void uniform::upload()
 {
 	switch (m_type)
 	{
+		case UT_BOOL:
+			m_shader->set_bool(m_handle, m_bval);
+			break;
 		case UT_INT:
 			m_shader->set_int(m_handle, m_ival);
 			break;

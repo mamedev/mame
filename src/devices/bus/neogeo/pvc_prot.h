@@ -18,7 +18,7 @@ class pvc_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	pvc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pvc_prot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void pvc_write_unpack_color();
 	void pvc_write_pack_color();
@@ -37,14 +37,8 @@ public:
 	void kof2003h_decrypt_68k(UINT8* rom, UINT32 size);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-
-
-
-private:
-
-
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 #endif

@@ -62,7 +62,7 @@ class gottlieb_sound_r0_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	gottlieb_sound_r0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gottlieb_sound_r0_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// read/write
 	DECLARE_WRITE8_MEMBER( write );
@@ -73,9 +73,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
 
 private:
 	// devices
@@ -93,8 +93,8 @@ class gottlieb_sound_r1_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, bool populate_votrax);
+	gottlieb_sound_r1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gottlieb_sound_r1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock, bool populate_votrax);
 
 	// read/write
 	DECLARE_WRITE8_MEMBER( write );
@@ -108,9 +108,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
 
 private:
 	// devices
@@ -125,7 +125,7 @@ private:
 
 #if USE_FAKE_VOTRAX
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 private:
 	void fake_votrax_data_w(UINT8 data);
 	void trigger_sample(UINT8 data);
@@ -142,12 +142,12 @@ class gottlieb_sound_r1_with_votrax_device : public gottlieb_sound_r1_device
 {
 public:
 	// construction/destruction
-	gottlieb_sound_r1_with_votrax_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gottlieb_sound_r1_with_votrax_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 };
 
 
@@ -158,7 +158,7 @@ class gottlieb_sound_r2_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	gottlieb_sound_r2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gottlieb_sound_r2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	static void static_enable_cobram3_mods(device_t &device);
@@ -179,10 +179,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
-	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// internal helpers

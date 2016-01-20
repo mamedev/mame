@@ -889,7 +889,7 @@ void thomson_state::thom_floppy_active( int write )
 	/* update icon */
 	fnew = FLOP_STATE;
 	if ( fold != fnew )
-		output_set_value( "floppy", fnew );
+		output().set_value( "floppy", fnew );
 }
 
 
@@ -994,7 +994,7 @@ UINT32 thomson_state::screen_update_thom(screen_device &screen, bitmap_ind16 &bi
 	ypos = m_thom_bheight /* * scale */;
 	for ( y = 0; y < 200; v += xwidth, y++ , ypos ++ /* += scale */ )
 	{
-		draw_scanline16( bitmap, xbleft, ypos, xwidth, v, NULL );
+		draw_scanline16( bitmap, xbleft, ypos, xwidth, v, nullptr );
 #if 0
 		if ( thom_hires )
 			draw_scanline16( bitmap, xbleft, ypos+1, xwidth, v, NULL );
@@ -1040,7 +1040,7 @@ void thomson_state::thom_vblank( screen_device &screen, bool state )
 			m_thom_floppy_rcount--;
 		fnew = FLOP_STATE;
 		if ( fnew != fold )
-			output_set_value( "floppy", fnew );
+			output().set_value( "floppy", fnew );
 
 		/* prepare state for next frame */
 		for ( i = 0; i <= THOM_TOTAL_HEIGHT; i++ )
@@ -1159,18 +1159,18 @@ VIDEO_START_MEMBER( thomson_state, thom )
 	m_thom_floppy_wcount = 0;
 	save_item(NAME(m_thom_floppy_wcount));
 	save_item(NAME(m_thom_floppy_rcount));
-	output_set_value( "floppy", 0 );
+	output().set_value( "floppy", 0 );
 
 	m_thom_video_timer = machine().scheduler().timer_alloc(FUNC_NULL);
 
 	m_thom_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::thom_scanline_start),this));
 
 	m_thom_lightpen_nb = 0;
-	m_thom_lightpen_cb = NULL;
+	m_thom_lightpen_cb = nullptr;
 	m_thom_lightpen_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::thom_lightpen_step),this));
 	save_item(NAME(m_thom_lightpen_nb));
 
-	m_thom_init_cb = NULL;
+	m_thom_init_cb = nullptr;
 	m_thom_init_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::thom_set_init),this));
 
 	save_item(NAME(m_thom_bwidth));

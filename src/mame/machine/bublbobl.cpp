@@ -25,7 +25,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_bankswitch_w)
 	m_slave->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 5 resets mcu */
-	if (m_mcu != NULL) // only if we have a MCU
+	if (m_mcu != nullptr) // only if we have a MCU
 		m_mcu->set_input_line(INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 6 enables display */
@@ -201,7 +201,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port1_w)
 	//logerror("%04x: 6801U4 port 1 write %02x\n", space.device().safe_pc(), data);
 
 	// bit 4: coin lockout
-	coin_lockout_global_w(machine(), ~data & 0x10);
+	machine().bookkeeping().coin_lockout_global_w(~data & 0x10);
 
 	// bit 5: select 1-way or 2-way coin counter
 

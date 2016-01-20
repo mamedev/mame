@@ -32,7 +32,7 @@ class joyport_device;
 class joyport_attached_device : public device_t
 {
 public:
-	joyport_attached_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	joyport_attached_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_joyport(nullptr)
 { }
 
@@ -41,7 +41,7 @@ public:
 	virtual void pulse_clock() { };
 
 protected:
-	virtual void device_config_complete();
+	virtual void device_config_complete() override;
 	joyport_device* m_joyport;
 };
 
@@ -51,7 +51,7 @@ protected:
 class joyport_device : public device_t, public device_slot_interface
 {
 public:
-	joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	joyport_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	UINT8   read_port();
 	void    write_port(int data);
 	void    set_interrupt(int state);
@@ -60,8 +60,8 @@ public:
 	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object) { return downcast<joyport_device &>(device).m_interrupt.set_callback(object); }
 
 protected:
-	void device_start();
-	void device_config_complete();
+	void device_start() override;
+	void device_config_complete() override;
 
 private:
 	devcb_write_line           m_interrupt;

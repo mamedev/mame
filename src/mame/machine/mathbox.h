@@ -19,7 +19,7 @@
 class mathbox_device : public device_t
 {
 public:
-	mathbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mathbox_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER( go_w );
 	DECLARE_READ8_MEMBER( status_r );
@@ -28,9 +28,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	private:
 	// internal state

@@ -18,7 +18,7 @@
 class asic65_device : public device_t
 {
 public:
-	asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	asic65_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// (static) configuration helpers
 	static void set_type(device_t &device, int type) { downcast<asic65_device &>(device).m_asic65_type = type; }
@@ -28,7 +28,6 @@ public:
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_READ16_MEMBER( io_r );
 
-	TIMER_CALLBACK_MEMBER( m68k_asic65_deferred_w );
 	WRITE16_MEMBER( m68k_w );
 	READ16_MEMBER( m68k_r );
 	WRITE16_MEMBER( stat_w );
@@ -42,11 +41,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	UINT8   m_asic65_type;

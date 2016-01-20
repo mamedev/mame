@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli,Grazvydas Ignotas
 /*
  * Samsung SSP1601 DSP emulator
@@ -192,7 +192,7 @@
 const device_type SSP1601 = &device_creator<ssp1601_device>;
 
 
-ssp1601_device::ssp1601_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ssp1601_device::ssp1601_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SSP1601, "SSP1601", tag, owner, clock, "ssp1601", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_io_config("io", ENDIANNESS_BIG, 16, 4, 0)
@@ -347,7 +347,7 @@ UINT32 ssp1601_device::ptr1_read_(int ri, int isj2, int modi3)
 {
 	//int t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
 	UINT32 mask, add = 0, t = ri | isj2 | modi3;
-	unsigned char *rp = NULL;
+	unsigned char *rp = nullptr;
 	switch (t)
 	{
 		// mod=0 (00)
@@ -451,7 +451,7 @@ void ssp1601_device::ptr1_write(int op, UINT32 d)
 
 UINT32 ssp1601_device::ptr2_read(int op)
 {
-	int mv = 0, t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
+	int mv, t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
 	switch (t)
 	{
 		// mod=0 (00)
@@ -504,9 +504,9 @@ void ssp1601_device::device_start()
 		m_r[i] = 0;
 	}
 	memset( m_RAM, 0, sizeof(m_RAM));
-	for ( int i = 0; i < 6; i++ )
+	for (auto & elem : m_stack)
 	{
-		m_stack[i] = 0;
+		elem = 0;
 	}
 	m_ppc.d = 0;
 	m_g_cycles = 0;
@@ -547,7 +547,7 @@ void ssp1601_device::device_start()
 }
 
 
-void ssp1601_device::state_string_export(const device_state_entry &entry, std::string &str)
+void ssp1601_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

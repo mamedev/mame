@@ -50,7 +50,7 @@ class nmc9306_device :  public device_t,
 {
 public:
 	// construction/destruction
-	nmc9306_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nmc9306_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER( cs_w );
 	DECLARE_WRITE_LINE_MEMBER( sk_w );
@@ -59,12 +59,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
 
 private:
 	inline UINT16 read(offs_t offset);

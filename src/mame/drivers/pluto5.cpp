@@ -183,13 +183,13 @@
 class pluto5_state : public driver_device
 {
 public:
-	pluto5_state(const machine_config &mconfig, device_type type, const char *tag)
+	pluto5_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }
 
 	UINT32* m_cpuregion;
-	UINT32* m_mainram;
+	std::unique_ptr<UINT32[]> m_mainram;
 
 	DECLARE_READ32_MEMBER(pluto5_mem_r);
 	DECLARE_WRITE32_MEMBER(pluto5_mem_w);
@@ -200,7 +200,7 @@ protected:
 	required_device<m68340cpu_device> m_maincpu;
 public:
 	DECLARE_DRIVER_INIT(hb);
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 READ32_MEMBER(pluto5_state::pluto5_mem_r)
@@ -246,7 +246,7 @@ INPUT_PORTS_END
 void pluto5_state::machine_start()
 {
 	m_cpuregion = (UINT32*)memregion( "maincpu" )->base();
-	m_mainram = (UINT32*)auto_alloc_array_clear(machine(), UINT32, 0x10000);
+	m_mainram = make_unique_clear<UINT32[]>(0x10000);
 
 }
 

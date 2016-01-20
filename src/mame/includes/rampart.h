@@ -13,7 +13,7 @@
 class rampart_state : public atarigen_state
 {
 public:
-	rampart_state(const machine_config &mconfig, device_type type, const char *tag)
+	rampart_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atarigen_state(mconfig, type, tag),
 			m_mob(*this, "mob"),
 			m_oki(*this, "oki"),
@@ -24,8 +24,8 @@ public:
 
 	required_shared_ptr<UINT16> m_bitmap;
 
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(latch_w);
 	DECLARE_DRIVER_INIT(rampart);
 	DECLARE_MACHINE_START(rampart);

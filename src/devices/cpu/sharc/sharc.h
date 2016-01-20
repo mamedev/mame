@@ -79,7 +79,7 @@ class adsp21062_device : public cpu_device
 {
 public:
 	// construction/destruction
-	adsp21062_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	adsp21062_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
 
 	// static configuration helpers
 	static void set_boot_mode(device_t &device, const SHARC_BOOT_MODE boot_mode) { downcast<adsp21062_device &>(device).m_boot_mode = boot_mode; }
@@ -93,25 +93,25 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 8; }
-	virtual UINT32 execute_max_cycles() const { return 8; }
-	virtual UINT32 execute_input_lines() const { return 32; }
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override { return 8; }
+	virtual UINT32 execute_max_cycles() const override { return 8; }
+	virtual UINT32 execute_input_lines() const override { return 32; }
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : NULL ); }
-	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value);
-	virtual bool memory_readop(offs_t offset, int size, UINT64 &value);
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ); }
+	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value) override;
+	virtual bool memory_readop(offs_t offset, int size, UINT64 &value) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 40; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 40; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 private:
 	address_space_config m_program_config;

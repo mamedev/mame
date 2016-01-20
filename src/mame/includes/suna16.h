@@ -5,7 +5,7 @@
 class suna16_state : public driver_device
 {
 public:
-	suna16_state(const machine_config &mconfig, device_type type, const char *tag)
+	suna16_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_dac1(*this, "dac1"),
@@ -39,7 +39,7 @@ public:
 	optional_memory_bank m_bank2;
 
 
-	UINT16 *m_paletteram;
+	std::unique_ptr<UINT16[]> m_paletteram;
 	int m_color_bank;
 	UINT8 m_prot;
 
@@ -74,7 +74,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(bssoccer_interrupt);
 
 	DECLARE_DRIVER_INIT(uballoon);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(bestbest);
 	DECLARE_MACHINE_START(bssoccer);
 	DECLARE_MACHINE_START(uballoon);

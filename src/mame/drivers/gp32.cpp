@@ -25,7 +25,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
+static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
 {
 	if (VERBOSE_LEVEL >= n_level)
 	{
@@ -1614,8 +1614,8 @@ void gp32_state::s3c240x_machine_start()
 	m_s3c240x_iic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iic_timer_exp),this), (void *)(FPTR)0);
 	m_s3c240x_iis_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iis_timer_exp),this), (void *)(FPTR)0);
 	m_s3c240x_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_lcd_timer_exp),this), (void *)(FPTR)0);
-	m_eeprom_data = auto_alloc_array( machine(), UINT8, 0x2000);
-	m_nvram->set_base(m_eeprom_data, 0x2000);
+	m_eeprom_data = std::make_unique<UINT8[]>(0x2000);
+	m_nvram->set_base(m_eeprom_data.get(), 0x2000);
 	smc_init();
 	i2s_init();
 }

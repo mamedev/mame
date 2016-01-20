@@ -61,14 +61,14 @@ class k053247_device : public device_t,
 						public device_video_interface
 {
 public:
-	k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	k053247_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	k053247_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	k053247_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	~k053247_device() { }
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 	static void set_k053247_callback(device_t &device, k053247_cb_delegate callback) { downcast<k053247_device &>(device).m_k053247_cb = callback; }
 	static void set_config(device_t &device, const char *gfx_reg, int gfx_num, int bpp, int dx, int dy)
 	{
@@ -110,7 +110,7 @@ public:
 
 	DECLARE_READ16_MEMBER( k053246_reg_word_r );    // OBJSET1
 
-	UINT16    *m_ram;
+	std::unique_ptr<UINT16[]>    m_ram;
 
 	gfx_element *m_gfx;
 
@@ -266,7 +266,7 @@ public:
 				pri,
 				zcode, alpha, drawmode,
 				gx_objzbuf, gx_shdzbuf,
-				0,0
+				0,nullptr
 				);
 
 		}
@@ -308,7 +308,7 @@ public:
 				nozoom,
 				0,
 				0, 0, 0,
-				0, 0,
+				nullptr, nullptr,
 				primask,whichtable
 				);
 
@@ -474,8 +474,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 private:
 
 
@@ -486,12 +486,12 @@ extern const device_type K053246;
 class k055673_device : public k053247_device
 {
 public:
-	k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k055673_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~k055673_device() { }
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 //  virtual void device_reset();
 private:
 

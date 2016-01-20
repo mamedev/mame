@@ -19,7 +19,7 @@ TODO:
 class albazc_state : public driver_device
 {
 public:
-	albazc_state(const machine_config &mconfig, device_type type, const char *tag)
+	albazc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram1(*this, "spriteram1"),
 		m_spriteram2(*this, "spriteram2"),
@@ -37,7 +37,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hanaroku_out_1_w);
 	DECLARE_WRITE8_MEMBER(hanaroku_out_2_w);
 	DECLARE_WRITE8_MEMBER(albazc_vregs_w);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(albazc);
 	UINT32 screen_update_hanaroku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -118,11 +118,11 @@ WRITE8_MEMBER(albazc_state::hanaroku_out_0_w)
 	     7      meter5 (start)
 	*/
 
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
-	coin_counter_w(machine(), 2, data & 0x04);
-	coin_counter_w(machine(), 3, data & 0x08);
-	coin_counter_w(machine(), 4, data & 0x80);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(2, data & 0x04);
+	machine().bookkeeping().coin_counter_w(3, data & 0x08);
+	machine().bookkeeping().coin_counter_w(4, data & 0x80);
 }
 
 WRITE8_MEMBER(albazc_state::hanaroku_out_1_w)

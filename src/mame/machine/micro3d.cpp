@@ -214,7 +214,7 @@ READ32_MEMBER(micro3d_state::micro3d_scc_r)
  *
  *************************************/
 
-INLINE INT64 dot_product(micro3d_vtx *v1, micro3d_vtx *v2)
+static inline INT64 dot_product(micro3d_vtx *v1, micro3d_vtx *v2)
 {
 	INT64 result = ((INT64)v1->x * (INT64)v2->x) +
 					((INT64)v1->y * (INT64)v2->y) +
@@ -222,7 +222,7 @@ INLINE INT64 dot_product(micro3d_vtx *v1, micro3d_vtx *v2)
 	return result;
 }
 
-INLINE INT64 normalised_multiply(INT32 a, INT32 b)
+static inline INT64 normalised_multiply(INT32 a, INT32 b)
 {
 	INT64 result;
 

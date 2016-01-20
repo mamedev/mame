@@ -39,7 +39,7 @@ public:
 		TIMER_INTERRUPT
 	};
 
-	tugboat_state(const machine_config &mconfig, device_type type, const char *tag)
+	tugboat_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -67,9 +67,9 @@ public:
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 
-	virtual void machine_start();
-	virtual void video_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void video_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(tugboat);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -77,7 +77,7 @@ public:
 		int addr,int gfx0,int gfx1,int transparency);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

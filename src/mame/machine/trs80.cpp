@@ -503,7 +503,7 @@ WRITE8_MEMBER( trs80_state::trs80m4_ec_w )
     d0 1=select drive 0 */
 WRITE8_MEMBER( trs80_state::trs80m4_f4_w )
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) floppy = m_floppy1->get_device();
@@ -731,7 +731,7 @@ READ8_MEMBER( trs80_state::trs80_irq_status_r )
 
 WRITE8_MEMBER( trs80_state::trs80_motor_w )
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) floppy = m_floppy1->get_device();

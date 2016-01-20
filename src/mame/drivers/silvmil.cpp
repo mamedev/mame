@@ -34,7 +34,7 @@ Very likely to be 'whatever crystals we had on hand which were close enough for 
 class silvmil_state : public driver_device
 {
 public:
-	silvmil_state(const machine_config &mconfig, device_type type, const char *tag)
+	silvmil_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_gfxdecode(*this, "gfxdecode"),
@@ -122,9 +122,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(deco16_scan_rows);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tumblepb_gfx1_rearrange();
 };

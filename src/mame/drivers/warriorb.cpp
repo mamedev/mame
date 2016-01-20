@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Graves
+// thanks-to:Richard Bush
 /***************************************************************************
 
 Taito Dual Screen Games
@@ -183,7 +184,7 @@ READ16_MEMBER(warriorb_state::sound_r)
 
 WRITE8_MEMBER(warriorb_state::pancontrol)
 {
-	filter_volume_device *flt = NULL;
+	filter_volume_device *flt = nullptr;
 	offset &= 3;
 
 	switch (offset)
@@ -623,7 +624,7 @@ ROM_START( sagaia )
 	ROM_LOAD32_BYTE( "c07-07.26", 0x00003, 0x80000, CRC(fd9f9e74) SHA1(e89beb5cac844fe16662465b0c76337692591aae) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_COPY( "gfx1", 0x000000, 0x000000, 0x100000 )    /* SCr(screen 2) */
+	ROM_COPY( "gfx1", 0x00000, 0x000000, 0x100000 )    /* SCr(screen 2) */
 
 /* The actual board duplicates the SCR gfx roms for the 2nd TC0100SCN */
 //  ROM_LOAD( "c07-03.47", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) )
@@ -668,7 +669,7 @@ ROM_START( darius2d )
 	ROM_LOAD32_BYTE( "c07-07.26", 0x00003, 0x80000, CRC(fd9f9e74) SHA1(e89beb5cac844fe16662465b0c76337692591aae) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_COPY( "gfx1", 0x000000, 0x000000, 0x100000 )    /* SCr(screen 2) */
+	ROM_COPY( "gfx1", 0x00000, 0x000000, 0x100000 )    /* SCr(screen 2) */
 
 /* The actual board duplicates the SCR gfx roms for the 2nd TC0100SCN */
 //  ROM_LOAD( "c07-03.47", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) )
@@ -713,7 +714,7 @@ ROM_START( darius2do )
 	ROM_LOAD32_BYTE( "c07-07.26", 0x00003, 0x80000, CRC(fd9f9e74) SHA1(e89beb5cac844fe16662465b0c76337692591aae) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_COPY( "gfx1", 0x000000, 0x000000, 0x100000 )    /* SCr(screen 2) */
+	ROM_COPY( "gfx1", 0x00000, 0x000000, 0x100000 )    /* SCr(screen 2) */
 
 /* The actual board duplicates the SCR gfx roms for the 2nd TC0100SCN */
 //  ROM_LOAD( "c07-03.47", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) )

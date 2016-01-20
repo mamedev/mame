@@ -7,7 +7,7 @@
 class phoenix_state : public driver_device
 {
 public:
-	phoenix_state(const machine_config &mconfig, device_type type, const char *tag)
+	phoenix_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_pleiads_custom(*this, "pleiads_custom"),
@@ -16,7 +16,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<pleiads_sound_device> m_pleiads_custom;
 	required_device<gfxdecode_device> m_gfxdecode;
-	UINT8 *m_videoram_pg[2];
+	std::unique_ptr<UINT8[]> m_videoram_pg[2];
 	UINT8 m_videoram_pg_index;
 	UINT8 m_palette_bank;
 	UINT8 m_cocktail_mode;
@@ -83,7 +83,7 @@ class phoenix_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	phoenix_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~phoenix_sound_device() {}
 
 	DECLARE_WRITE8_MEMBER( control_a_w );
@@ -91,11 +91,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 private:
 	// internal state
 	struct c_state      m_c24_state;
@@ -103,7 +103,7 @@ private:
 	struct n_state      m_noise_state;
 	UINT8               m_sound_latch_a;
 	sound_stream *      m_channel;
-	UINT32 *                m_poly18;
+	std::unique_ptr<UINT32[]>                m_poly18;
 	discrete_device *m_discrete;
 	tms36xx_device *m_tms;
 

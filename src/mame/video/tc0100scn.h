@@ -6,12 +6,12 @@
 class tc0100scn_device : public device_t
 {
 public:
-	tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tc0100scn_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~tc0100scn_device() {}
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 	static void set_gfx_region(device_t &device, int gfxregion) { downcast<tc0100scn_device &>(device).m_gfxnum = gfxregion; }
 	static void set_tx_region(device_t &device, int txregion) { downcast<tc0100scn_device &>(device).m_txnum = txregion; }
 	static void set_multiscr_xoffs(device_t &device, int xoffs) { downcast<tc0100scn_device &>(device).m_multiscrn_xoffs = xoffs; }
@@ -69,14 +69,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
 	UINT16       m_ctrl[8];
 
-	UINT16 *     m_ram;
+	std::unique_ptr<UINT16[]>    m_ram;
 	UINT16 *     m_bg_ram;
 	UINT16 *     m_fg_ram;
 	UINT16 *     m_tx_ram;

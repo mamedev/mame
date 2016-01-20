@@ -20,7 +20,7 @@
 class poker72_state : public driver_device
 {
 public:
-	poker72_state(const machine_config &mconfig, device_type type, const char *tag)
+	poker72_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_pal(*this, "pal"),
@@ -35,8 +35,8 @@ public:
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_WRITE8_MEMBER(tile_bank_w);
 	DECLARE_DRIVER_INIT(poker72);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(poker72);
 	UINT32 screen_update_poker72(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;

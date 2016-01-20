@@ -423,7 +423,7 @@ struct widget_data
 class seattle_state : public driver_device
 {
 public:
-	seattle_state(const machine_config &mconfig, device_type type, const char *tag)
+	seattle_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_nvram(*this, "nvram") ,
 		m_rambase(*this, "rambase"),
@@ -510,8 +510,8 @@ public:
 	DECLARE_DRIVER_INIT(wg3dh);
 	DECLARE_DRIVER_INIT(mace);
 	DECLARE_DRIVER_INIT(blitz99);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_seattle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(galileo_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
@@ -611,12 +611,12 @@ void seattle_state::machine_reset()
 	m_cpu_stalled_on_voodoo = FALSE;
 
 	/* reset either the DCS2 board or the CAGE board */
-	if (machine().device("dcs") != NULL)
+	if (machine().device("dcs") != nullptr)
 	{
 		m_dcs->reset_w(1);
 		m_dcs->reset_w(0);
 	}
-	else if (machine().device("cage") != NULL)
+	else if (machine().device("cage") != nullptr)
 	{
 		m_cage->control_w(0);
 		m_cage->control_w(3);
@@ -2518,7 +2518,7 @@ static MACHINE_CONFIG_START( seattle_common, seattle_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
+	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(seattle_state, ide_interrupt))
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE("maincpu", AS_PROGRAM)
 
@@ -2851,8 +2851,20 @@ ROM_START( calspeeda )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version 1.2 (2/18/98) */
 	ROM_LOAD( "caspd1_2.u32", 0x000000, 0x80000, CRC(0a235e4e) SHA1(b352f10fad786260b58bd344b5002b6ea7aaf76d) )
 
-	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+	// it actually asks you to replace this with the original rom after the upgrade is complete, which is weird because this is a perfectly valid newer revision of the boot code, but probably explains why the parent set was still on 1.2
+	ROM_LOAD( "Cal speed update  U32 boot ver, 1,4 5EF6", 0x000000, 0x80000, CRC(fd627637) SHA1(b0c2847cbecfc00344e402386d13240d55a0814e) ) // boot code 1.4 Apr 17 1998 21:18:31
 
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS( 0, "noupdate",       "No Update Rom" )
+
+	ROM_SYSTEM_BIOS( 1, "up16_1",       "Disk Update 1.0x to 2.1a (1.25) Step 1 of 3" )
+	ROMX_LOAD("eprom #1 2.1A 90A7", 0x000000, 0x100000, CRC(bc0f373e) SHA1(bf53f1953ccab8da9ce784e4d20dd2ec0d0eff6a), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 2, "up16_2",       "Disk Update 1.0x to 2.1a (1.25) Step 2 of 3" )
+	ROMX_LOAD("eprom #2 2.1A 9F84", 0x000000, 0x100000, CRC(5782da30) SHA1(eaeea3655bc9c1cedefdfb0088d4716584788669), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS( 3, "up16_3",       "Disk Update 1.0x to 2.1a (1.25) Step 3 of 3" )
+	ROMX_LOAD("eprom #3 2.1A 3286", 0x000000, 0x100000, CRC(e7d8c88f) SHA1(06c11241ac439527b361826784aef4c58689892e), ROM_BIOS(4))
+
+		
 	DISK_REGION( "ide:0:hdd:image" )    /* Release version 1.0r8a (4/10/98) (Guts 4/10/98, Main 4/10/98) */
 	DISK_IMAGE( "cs_10r8a", 0, SHA1(ba4e7589740e0647938c81c5082bb71d8826bad4) )
 

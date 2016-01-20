@@ -152,7 +152,7 @@ bool ppc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			{
 				CR_BIT_USED(desc, G_BI(op));
 				// branch folding
-				if (prev == NULL || prev->regout[2] == 0)
+				if (prev == nullptr || prev->regout[2] == 0)
 					desc.cycles = 0;
 			}
 			if (!(G_BO(op) & 0x04))
@@ -372,7 +372,7 @@ bool ppc_frontend::describe_13(UINT32 op, opcode_desc &desc, const opcode_desc *
 			CR_USED(desc, G_CRFS(op));
 			CR_MODIFIED(desc, G_CRFD(op));
 			// CR logical folding
-			if (prev == NULL || prev->regout[2] == 0)
+			if (prev == nullptr || prev->regout[2] == 0)
 				desc.cycles = 0;
 			return true;
 
@@ -406,7 +406,7 @@ bool ppc_frontend::describe_13(UINT32 op, opcode_desc &desc, const opcode_desc *
 			CR_BIT_USED(desc, G_CRBB(op));
 			CR_BIT_MODIFIED(desc, G_CRBD(op));
 			// CR logical folding
-			if (prev == NULL || prev->regout[2] == 0)
+			if (prev == nullptr || prev->regout[2] == 0)
 				desc.cycles = 0;
 			return true;
 

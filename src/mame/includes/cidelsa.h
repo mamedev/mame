@@ -44,7 +44,7 @@ public:
 		TIMER_SET_CPU_MODE
 	};
 
-	cidelsa_state(const machine_config &mconfig, device_type type, const char *tag)
+	cidelsa_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
 			m_vis(*this, CDP1869_TAG)
@@ -53,10 +53,10 @@ public:
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1869_device> m_vis;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	DECLARE_WRITE8_MEMBER( cdp1869_w );
 	DECLARE_WRITE8_MEMBER( destryer_out1_w );
@@ -80,24 +80,24 @@ public:
 	int m_cdp1869_pcb;
 
 	UINT8 *m_pageram;
-	UINT8 *m_pcbram;
-	UINT8 *m_charram;
+	std::unique_ptr<UINT8[]> m_pcbram;
+	std::unique_ptr<UINT8[]> m_charram;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 class draco_state : public cidelsa_state
 {
 public:
-	draco_state(const machine_config &mconfig, device_type type, const char *tag)
+	draco_state(const machine_config &mconfig, device_type type, std::string tag)
 		: cidelsa_state(mconfig, type, tag),
 			m_psg(*this, AY8910_TAG)
 	{ }
 
 	required_device<ay8910_device> m_psg;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( sound_in_r );
 	DECLARE_READ8_MEMBER( psg_r );

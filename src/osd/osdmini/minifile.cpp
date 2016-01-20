@@ -35,7 +35,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 
 	// open the file
 	fileptr = fopen(path, mode);
-	if (fileptr == NULL)
+	if (fileptr == nullptr)
 		return FILERR_NOT_FOUND;
 
 	// store the file pointer directly as an osd_file
@@ -75,7 +75,7 @@ file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 length, 
 
 	// perform the read
 	count = fread(buffer, 1, length, (FILE *)file);
-	if (actual != NULL)
+	if (actual != nullptr)
 		*actual = count;
 
 	return FILERR_NONE;
@@ -95,7 +95,7 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 l
 
 	// perform the write
 	count = fwrite(buffer, 1, length, (FILE *)file);
-	if (actual != NULL)
+	if (actual != nullptr)
 		*actual = count;
 
 	return FILERR_NONE;
@@ -169,7 +169,7 @@ int osd_uchar_from_osdchar(UINT32 /* unicode_char */ *uchar, const char *osdchar
 
 osd_directory_entry *osd_stat(const char *path)
 {
-	osd_directory_entry *result = NULL;
+	osd_directory_entry *result = nullptr;
 
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
@@ -180,7 +180,7 @@ osd_directory_entry *osd_stat(const char *path)
 	result->size = 0;
 
 	FILE *f = fopen(path, "rb");
-	if (f != NULL)
+	if (f != nullptr)
 	{
 		fseek(f, 0, SEEK_END);
 		result->type = ENTTYPE_FILE;
@@ -199,11 +199,11 @@ file_error osd_get_full_path(char **dst, const char *path)
 {
 	// derive the full path of the file in an allocated string
 	// for now just fake it since we don't presume any underlying file system
-	*dst = NULL;
-	if (path != NULL)
+	*dst = nullptr;
+	if (path != nullptr)
 	{
 		*dst = (char *)osd_malloc_array(strlen(path) + 1);
-		if (*dst != NULL)
+		if (*dst != nullptr)
 			strcpy(*dst, path);
 	}
 
@@ -218,5 +218,5 @@ file_error osd_get_full_path(char **dst, const char *path)
 const char *osd_get_volume_name(int idx)
 {
 	// we don't expose volumes
-	return NULL;
+	return nullptr;
 }

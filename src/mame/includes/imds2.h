@@ -22,7 +22,7 @@
 class imds2_state : public driver_device
 {
 	public:
-	imds2_state(const machine_config &mconfig, device_type type, const char *tag);
+	imds2_state(const machine_config &mconfig, device_type type, std::string tag);
 
 	DECLARE_READ8_MEMBER(ipc_mem_read);
 	DECLARE_WRITE8_MEMBER(ipc_mem_write);
@@ -68,18 +68,18 @@ class imds2_state : public driver_device
 
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
-	virtual void driver_start();
-	virtual void machine_start();
-	virtual void video_start();
-	virtual void machine_reset();
+	virtual void driver_start() override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
+	virtual void machine_reset() override;
 
 	private:
 	required_device<i8085a_cpu_device> m_ipccpu;
 	required_device<pic8259_device> m_ipcsyspic;
 	required_device<pic8259_device> m_ipclocpic;
 	required_device<pit8253_device> m_ipctimer;
-        required_device<i8251_device> m_ipcusart0;
-        required_device<i8251_device> m_ipcusart1;
+		required_device<i8251_device> m_ipcusart0;
+		required_device<i8251_device> m_ipcusart1;
 	required_device<rs232_port_device> m_serial0;
 	required_device<rs232_port_device> m_serial1;
 	required_device<i8080a_cpu_device> m_ioccpu;

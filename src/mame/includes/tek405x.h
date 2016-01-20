@@ -34,7 +34,7 @@
 class tek4051_state : public driver_device
 {
 public:
-	tek4051_state(const machine_config &mconfig, device_type type, const char *tag) :
+	tek4051_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, MC6800_TAG),
 		m_gpib_pia(*this, MC6820_GPIB_TAG),
@@ -64,9 +64,9 @@ public:
 	required_memory_region m_bscom_rom;
 	required_ioport m_special;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	void bankswitch(UINT8 data);
 	void update_irq();
@@ -145,7 +145,7 @@ public:
 class tek4052_state : public driver_device
 {
 public:
-	tek4052_state(const machine_config &mconfig, device_type type, const char *tag)
+	tek4052_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, AM2901A_TAG),
 			m_ram(*this, RAM_TAG)
@@ -154,9 +154,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 };
 
 #endif

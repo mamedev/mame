@@ -245,7 +245,7 @@ device_cbm_iec_interface::~device_cbm_iec_interface()
 //  cbm_iec_slot_device - constructor
 //-------------------------------------------------
 
-cbm_iec_slot_device::cbm_iec_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cbm_iec_slot_device::cbm_iec_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, CBM_IEC_SLOT, "CBM IEC slot", tag, owner, clock, "cbm_iec_slot", __FILE__),
 		device_slot_interface(mconfig, *this), m_address(0)
 {
@@ -258,12 +258,12 @@ cbm_iec_slot_device::cbm_iec_slot_device(const machine_config &mconfig, const ch
 
 void cbm_iec_slot_device::device_start()
 {
-	cbm_iec_device* bus = NULL;
+	cbm_iec_device* bus = nullptr;
 
-	for (device_t *device = owner(); device != NULL; device = device->owner())
+	for (device_t *device = owner(); device != nullptr; device = device->owner())
 	{
 		bus = device->subdevice<cbm_iec_device>(CBM_IEC_TAG);
-		if (bus != NULL) break;
+		if (bus != nullptr) break;
 	}
 
 	assert(bus);
@@ -282,7 +282,7 @@ void cbm_iec_slot_device::device_start()
 //  cbm_iec_device - constructor
 //-------------------------------------------------
 
-cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cbm_iec_device::cbm_iec_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CBM_IEC, "CBM IEC bus", tag, owner, clock, "cbm_iec", __FILE__),
 		m_write_srq(*this),
 		m_write_atn(*this),
@@ -290,9 +290,9 @@ cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, d
 		m_write_data(*this),
 		m_write_reset(*this)
 {
-	for (int i = 0; i < SIGNAL_COUNT; i++)
+	for (auto & elem : m_line)
 	{
-		m_line[i] = 1;
+		elem = 1;
 	}
 }
 
@@ -339,7 +339,7 @@ void cbm_iec_device::device_stop()
 
 void cbm_iec_device::add_device(cbm_iec_slot_device *slot, device_t *target)
 {
-	daisy_entry *entry = global_alloc(daisy_entry(target));
+	auto entry = global_alloc(daisy_entry(target));
 
 	entry->m_interface->m_slot = slot;
 	entry->m_interface->m_bus = this;
@@ -353,13 +353,13 @@ void cbm_iec_device::add_device(cbm_iec_slot_device *slot, device_t *target)
 //-------------------------------------------------
 
 cbm_iec_device::daisy_entry::daisy_entry(device_t *device)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_device(device),
-		m_interface(NULL)
+		m_interface(nullptr)
 {
-	for (int i = 0; i < SIGNAL_COUNT; i++)
+	for (auto & elem : m_line)
 	{
-		m_line[i] = 1;
+		elem = 1;
 	}
 
 	device->interface(m_interface);
@@ -378,7 +378,7 @@ void cbm_iec_device::set_signal(device_t *device, int signal, int state)
 	{
 		if (m_line[signal] != state)
 		{
-			if (LOG) logerror("CBM IEC: '%s' %s %u\n", tag(), SIGNAL_NAME[signal], state);
+			if (LOG) logerror("CBM IEC: '%s' %s %u\n", tag().c_str(), SIGNAL_NAME[signal], state);
 			m_line[signal] = state;
 			changed = true;
 		}
@@ -389,11 +389,11 @@ void cbm_iec_device::set_signal(device_t *device, int signal, int state)
 
 		while (entry)
 		{
-			if (!strcmp(entry->m_device->tag(), device->tag()))
+			if (entry->m_device->tag()==device->tag())
 			{
 				if (entry->m_line[signal] != state)
 				{
-					if (LOG) logerror("CBM IEC: '%s' %s %u\n", device->tag(), SIGNAL_NAME[signal], state);
+					if (LOG) logerror("CBM IEC: '%s' %s %u\n", device->tag().c_str(), SIGNAL_NAME[signal], state);
 					entry->m_line[signal] = state;
 					changed = true;
 				}

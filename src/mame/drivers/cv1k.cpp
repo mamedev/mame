@@ -185,7 +185,7 @@ Blitter Timing
 class cv1k_state : public driver_device
 {
 public:
-	cv1k_state(const machine_config &mconfig, device_type type, const char *tag)
+	cv1k_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_blitter(*this, "blitter"),
@@ -215,7 +215,7 @@ public:
 
 	UINT32 screen_update_cv1k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	/* game specific */
 	DECLARE_READ64_MEMBER(cv1k_speedup_r);

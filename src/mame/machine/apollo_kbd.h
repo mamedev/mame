@@ -47,7 +47,7 @@ class apollo_kbd_device :   public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
-	apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apollo_kbd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_tx_cb(device_t &device, _Object object) { return downcast<apollo_kbd_device &>(device).m_tx_w.set_callback(object); }
 	template<class _Object> static devcb_base &set_german_cb(device_t &device, _Object object) { return downcast<apollo_kbd_device &>(device).m_german_r.set_callback(object); }
@@ -57,14 +57,14 @@ public:
 
 private:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// serial overrides
-	virtual void rcv_complete();    // Rx completed receiving byte
-	virtual void tra_complete();    // Tx completed sending byte
-	virtual void tra_callback();    // Tx send bit
+	virtual void rcv_complete() override;    // Rx completed receiving byte
+	virtual void tra_complete() override;    // Tx completed sending byte
+	virtual void tra_callback() override;    // Tx send bit
 	void input_callback(UINT8 state);
 
 	TIMER_CALLBACK_MEMBER( kbd_scan_timer );
@@ -76,14 +76,11 @@ private:
 	int keyboard_is_german();
 
 	void set_mode(UINT16 mode);
-	void putchar(const UINT8 data);
 	void putdata(const UINT8 *data, int data_length);
 	void putstring(const char *data);
 
 	int push_scancode( UINT8 code, UINT8 repeat);
 	void scan_keyboard();
-	void poll_callback();
-	static TIMER_CALLBACK( static_poll_callback );
 
 	// the keyboard beeper
 	class beeper

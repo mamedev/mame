@@ -74,7 +74,7 @@
 
 READ8_MEMBER(malzak_state::fake_VRLE_r)
 {
-	return (m_s2636_0->work_ram_r(space, 0xcb) & 0x3f) + (m_screen->vblank() * 0x40);
+	return (m_s2636_0->read_data(space, 0xcb) & 0x3f) + (m_screen->vblank() ? 0x40 : 0x00);
 }
 
 READ8_MEMBER(malzak_state::s2636_portA_r)
@@ -106,8 +106,8 @@ static ADDRESS_MAP_START( malzak_map, AS_PROGRAM, 8, malzak_state )
 	AM_RANGE(0x1200, 0x12ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1300, 0x13ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x14cb, 0x14cb) AM_MIRROR(0x6000) AM_READ(fake_VRLE_r)
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_device, work_ram_r, work_ram_w)
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_device, work_ram_r, work_ram_w)
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_device, read_data, write_data)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_device, read_data, write_data)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_RAM_WRITE(malzak_playfield_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("videoram")
@@ -127,8 +127,8 @@ static ADDRESS_MAP_START( malzak2_map, AS_PROGRAM, 8, malzak_state )
 	AM_RANGE(0x1300, 0x13ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x14cb, 0x14cb) AM_MIRROR(0x6000) AM_READ(fake_VRLE_r)
 	AM_RANGE(0x14cc, 0x14cc) AM_MIRROR(0x6000) AM_READ(s2636_portA_r)
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_device, work_ram_r, work_ram_w)
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_device, work_ram_r, work_ram_w)
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_device, read_data, write_data)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_device, read_data, write_data)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_RAM_WRITE(malzak_playfield_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1800, 0x1fff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("videoram")
@@ -317,12 +317,10 @@ static MACHINE_CONFIG_START( malzak, malzak_state )
 	MCFG_PALETTE_INIT_OWNER(malzak_state, malzak)
 
 	MCFG_DEVICE_ADD("s2636_0", S2636, 0)
-	MCFG_S2636_WORKRAM_SIZE(0x100)
 	MCFG_S2636_OFFSETS(0, -16)  // -8, -16
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_DEVICE_ADD("s2636_1", S2636, 0)
-	MCFG_S2636_WORKRAM_SIZE(0x100)
 	MCFG_S2636_OFFSETS(0, -16)  // -9, -16
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

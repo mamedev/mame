@@ -12,7 +12,7 @@
 class karnov_state : public driver_device
 {
 public:
-	karnov_state(const machine_config &mconfig, device_type type, const char *tag)
+	karnov_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -39,7 +39,7 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	bitmap_ind16    *m_bitmap_f;
+	std::unique_ptr<bitmap_ind16> m_bitmap_f;
 	tilemap_t     *m_fix_tilemap;
 	int         m_flipscreen;
 	UINT16      m_scroll[2];
@@ -65,8 +65,8 @@ public:
 	DECLARE_DRIVER_INIT(chelnovj);
 	DECLARE_DRIVER_INIT(chelnov);
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(karnov);
 	DECLARE_VIDEO_START(karnov);
 	DECLARE_VIDEO_START(wndrplnt);

@@ -60,7 +60,7 @@ http://www.tilt.it/deb/i-midcoin.html
 class midcoin24cdjuke_state : public driver_device
 {
 public:
-	midcoin24cdjuke_state(const machine_config &mconfig, device_type type, const char *tag)
+	midcoin24cdjuke_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_io_row0(*this, "ROW0"),
@@ -77,8 +77,8 @@ public:
 	required_ioport m_io_row3;
 	required_region_ptr<UINT16> m_charset;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER(kb_row_r);
 	DECLARE_WRITE8_MEMBER(kb_col_w);
@@ -118,7 +118,7 @@ WRITE8_MEMBER(midcoin24cdjuke_state::digit_w)
 
 	char_data = BITSWAP16(char_data, 13,11,9,15,14,10,12,8,7,6,5,4,3,2,1,0);
 
-	output_set_digit_value(offset, char_data ^ 0xffff);
+	output().set_digit_value(offset, char_data ^ 0xffff);
 }
 
 

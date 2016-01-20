@@ -38,7 +38,7 @@
     - h4th and tree4th need their address maps worked out (eg, the stack is set to FB80)
     - lambda/pow3000 joystick, connected in parallel with the 4,R,F,7,U keys, but the directions are unknown.
     - Many games don't work.
-
+    - sets z80, lambda. pc8300, pow3000 all fail to show text.
 
 ****************************************************************************/
 
@@ -473,13 +473,13 @@ ROM_END
 
 /* Game Drivers */
 
-COMP( 1980, zx80,       0,      0,      zx80,       zx80,    zx_state,    zx,     "Sinclair Research Ltd",    "ZX-80",               MACHINE_NO_SOUND )
+COMP( 1980, zx80,       0,      0,      zx80,       zx80,    zx_state,    zx,     "Sinclair Research Ltd",    "ZX-80",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1981, zx81,       0,      0,      zx81,       zx81,    zx_state,    zx,     "Sinclair Research Ltd",    "ZX-81",               MACHINE_NO_SOUND )
 COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,    zx_state,    zx,     "Timex Sinclair",           "Timex Sinclair 1000", MACHINE_NO_SOUND )
 COMP( 1983, ts1500,     zx81,   0,      ts1500,     zx81,    zx_state,    zx,     "Timex Sinclair",           "Timex Sinclair 1500", MACHINE_NO_SOUND )
 COMP( 1983, tk85,       zx81,   0,      ts1000,     zx81,    zx_state,    zx,     "Microdigital",             "TK85",                MACHINE_NO_SOUND )
 COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,    zx_state,    zx,     "Ritas do Brasil Ltda",     "Ringo 470",           MACHINE_NO_SOUND )
-COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300,  zx_state,    zx,     "Your Computer",            "PC8300",              0 )
-COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000, zx_state,    zx,     "Creon Enterprises",        "Power 3000",          0 )
-COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000, zx_state,    zx,     "Lambda Electronics Ltd",   "Lambda 8300",         0 )
+COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300,  zx_state,    zx,     "Your Computer",            "PC8300",              MACHINE_NOT_WORKING )
+COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000, zx_state,    zx,     "Creon Enterprises",        "Power 3000",          MACHINE_NOT_WORKING )
+COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000, zx_state,    zx,     "Lambda Electronics Ltd",   "Lambda 8300",         MACHINE_NOT_WORKING )
 COMP( 1997, zx97,       zx81,   0,      zx81,       zx81,    zx_state,    zx,     "Wilf Rigter",              "ZX97", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNOFFICIAL )

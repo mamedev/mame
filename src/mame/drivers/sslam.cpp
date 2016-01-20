@@ -755,102 +755,33 @@ static MACHINE_CONFIG_START( powerbls, sslam_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-/* maybe one dump is bad .. which? -> 2nd set was verified good from 2 pcbs */
 
-ROM_START( sslam )
+
+#define ROM_RELOAD_SSLAM(base) \
+	ROM_RELOAD ( base+0x000000, 0x80000 ) \
+	ROM_RELOAD ( base+0x100000, 0x80000 ) \
+	ROM_RELOAD ( base+0x200000, 0x80000 ) \
+	ROM_RELOAD ( base+0x300000, 0x80000 ) \
+	ROM_RELOAD ( base+0x400000, 0x80000 ) \
+	ROM_RELOAD ( base+0x500000, 0x80000 ) \
+	ROM_RELOAD ( base+0x600000, 0x80000 ) \
+	ROM_RELOAD ( base+0x700000, 0x80000 ) \
+	ROM_RELOAD ( base+0x800000, 0x80000 ) \
+	ROM_RELOAD ( base+0x900000, 0x80000 ) \
+	ROM_RELOAD ( base+0xa00000, 0x80000 ) \
+	ROM_RELOAD ( base+0xb00000, 0x80000 ) \
+	ROM_RELOAD ( base+0xc00000, 0x80000 ) \
+	ROM_RELOAD ( base+0xd00000, 0x80000 ) \
+	ROM_RELOAD ( base+0xe00000, 0x80000 )
+
+
+
+ROM_START( sslam ) // verified on 2 PCBs
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "2.u67", 0x00000, 0x80000, CRC(1ce52917) SHA1(b9b1d14ea44c248ce6e615c5c553c0d485c1302b) )
-	ROM_RELOAD ( 0x100000, 0x80000 )
-	ROM_RELOAD ( 0x200000, 0x80000 )
-	ROM_RELOAD ( 0x300000, 0x80000 )
-	ROM_RELOAD ( 0x400000, 0x80000 )
-	ROM_RELOAD ( 0x500000, 0x80000 )
-	ROM_RELOAD ( 0x600000, 0x80000 )
-	ROM_RELOAD ( 0x700000, 0x80000 )
-	ROM_RELOAD ( 0x800000, 0x80000 )
-	ROM_RELOAD ( 0x900000, 0x80000 )
-	ROM_RELOAD ( 0xa00000, 0x80000 )
-	ROM_RELOAD ( 0xb00000, 0x80000 )
-	ROM_RELOAD ( 0xc00000, 0x80000 )
-	ROM_RELOAD ( 0xd00000, 0x80000 )
-	ROM_RELOAD ( 0xe00000, 0x80000 )
-	ROM_RELOAD ( 0xf00000, 0x80000 )
-	ROM_LOAD16_BYTE( "it_22.bin", 0x00001, 0x80000, CRC(51c56828) SHA1(d71d64b0268c156456bed64b4c13b98181fa3e0f) )
-	ROM_RELOAD ( 0x100001, 0x80000 )
-	ROM_RELOAD ( 0x200001, 0x80000 )
-	ROM_RELOAD ( 0x300001, 0x80000 )
-	ROM_RELOAD ( 0x400001, 0x80000 )
-	ROM_RELOAD ( 0x500001, 0x80000 )
-	ROM_RELOAD ( 0x600001, 0x80000 )
-	ROM_RELOAD ( 0x700001, 0x80000 )
-	ROM_RELOAD ( 0x800001, 0x80000 )
-	ROM_RELOAD ( 0x900001, 0x80000 )
-	ROM_RELOAD ( 0xa00001, 0x80000 )
-	ROM_RELOAD ( 0xb00001, 0x80000 )
-	ROM_RELOAD ( 0xc00001, 0x80000 )
-	ROM_RELOAD ( 0xd00001, 0x80000 )
-	ROM_RELOAD ( 0xe00001, 0x80000 )
-	ROM_RELOAD ( 0xf00001, 0x80000 )
-
-	ROM_REGION( 0x1000, "audiocpu", 0 )
-	ROM_LOAD( "s87c751.bin",  0x0000, 0x0800, NO_DUMP )
-
-	ROM_REGION( 0x200000, "gfx1", 0  ) /* Bg */
-	ROM_LOAD( "7.u45",     0x000000, 0x80000, CRC(64ecdde9) SHA1(576ba1169d90970622249e532baa4209bf12de5a) )
-	ROM_LOAD( "6.u39",     0x080000, 0x80000, CRC(6928065c) SHA1(ad5b1889bebf0358df0295d6041b798ac53ac625) )
-	ROM_LOAD( "5.u42",     0x100000, 0x80000, CRC(8d18bdc6) SHA1(cacc4f475f85438a00ead4911730202e995983a7) )
-	ROM_LOAD( "4.u36",     0x180000, 0x80000, CRC(8e15fb9d) SHA1(47917d8aac1bce2e15f36904f5c2534e5b80236b) )
-
-	ROM_REGION( 0x200000, "gfx2", 0  ) /* Sprites */
-	ROM_LOAD( "8.u83",     0x000000, 0x80000, CRC(19bb89dd) SHA1(c2a0c32d350a193d366b5086502998281fd0bec4) )
-	ROM_LOAD( "9.u84",     0x080000, 0x80000, CRC(d50d86c7) SHA1(7ecbcc03851a8174610f7f5ad889e40543da928e) )
-	ROM_LOAD( "10.u85",    0x100000, 0x80000, CRC(681b8ac8) SHA1(ebfeffc091f53af246311574b9c5d83d2716a7be) )
-	ROM_LOAD( "11.u86",    0x180000, 0x80000, CRC(e41f89e3) SHA1(e4b39411a4cea6aa6c01564f74bb8e432d382a73) )
-
-	/* $00000-$20000 stays the same in all sound banks, */
-	/* the second half of the bank is the area that gets switched */
-	ROM_REGION( 0xc0000, "oki", 0 ) /* OKI Samples */
-	ROM_LOAD( "3.u13",       0x00000, 0x40000, CRC(d0a9245f) SHA1(2e840cdd7bdfe7c6f986daf88576de0559597499) )
-	ROM_CONTINUE(            0x60000, 0x20000 )
-	ROM_CONTINUE(            0xa0000, 0x20000 )
-	ROM_COPY( "oki", 0x00000, 0x40000, 0x20000)
-	ROM_COPY( "oki", 0x00000, 0x80000, 0x20000)
-ROM_END
-
-ROM_START( sslama )
-	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "2.u67", 0x00000, 0x80000, CRC(1ce52917) SHA1(b9b1d14ea44c248ce6e615c5c553c0d485c1302b) )
-	ROM_RELOAD ( 0x100000, 0x80000 )
-	ROM_RELOAD ( 0x200000, 0x80000 )
-	ROM_RELOAD ( 0x300000, 0x80000 )
-	ROM_RELOAD ( 0x400000, 0x80000 )
-	ROM_RELOAD ( 0x500000, 0x80000 )
-	ROM_RELOAD ( 0x600000, 0x80000 )
-	ROM_RELOAD ( 0x700000, 0x80000 )
-	ROM_RELOAD ( 0x800000, 0x80000 )
-	ROM_RELOAD ( 0x900000, 0x80000 )
-	ROM_RELOAD ( 0xa00000, 0x80000 )
-	ROM_RELOAD ( 0xb00000, 0x80000 )
-	ROM_RELOAD ( 0xc00000, 0x80000 )
-	ROM_RELOAD ( 0xd00000, 0x80000 )
-	ROM_RELOAD ( 0xe00000, 0x80000 )
-	ROM_RELOAD ( 0xf00000, 0x80000 )
+	ROM_RELOAD_SSLAM(0x100000)
 	ROM_LOAD16_BYTE( "1.u56", 0x00001, 0x80000,  CRC(59bec8ae) SHA1(2d53213a1d335184384b2138d18d496b602dc3fb) )
-	ROM_RELOAD ( 0x100001, 0x80000 )
-	ROM_RELOAD ( 0x200001, 0x80000 )
-	ROM_RELOAD ( 0x300001, 0x80000 )
-	ROM_RELOAD ( 0x400001, 0x80000 )
-	ROM_RELOAD ( 0x500001, 0x80000 )
-	ROM_RELOAD ( 0x600001, 0x80000 )
-	ROM_RELOAD ( 0x700001, 0x80000 )
-	ROM_RELOAD ( 0x800001, 0x80000 )
-	ROM_RELOAD ( 0x900001, 0x80000 )
-	ROM_RELOAD ( 0xa00001, 0x80000 )
-	ROM_RELOAD ( 0xb00001, 0x80000 )
-	ROM_RELOAD ( 0xc00001, 0x80000 )
-	ROM_RELOAD ( 0xd00001, 0x80000 )
-	ROM_RELOAD ( 0xe00001, 0x80000 )
-	ROM_RELOAD ( 0xf00001, 0x80000 )
+	ROM_RELOAD_SSLAM(0x100001)
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "s87c751.bin",  0x0000, 0x0800, NO_DUMP )
@@ -873,9 +804,79 @@ ROM_START( sslama )
 	ROM_LOAD( "3.u13",       0x00000, 0x40000, CRC(d0a9245f) SHA1(2e840cdd7bdfe7c6f986daf88576de0559597499) )
 	ROM_CONTINUE(            0x60000, 0x20000 )
 	ROM_CONTINUE(            0xa0000, 0x20000 )
-	ROM_COPY( "oki", 0x00000, 0x40000, 0x20000)
-	ROM_COPY( "oki", 0x00000, 0x80000, 0x20000)
+	ROM_COPY( "oki", 0x00000,0x40000, 0x20000)
+	ROM_COPY( "oki", 0x00000,0x80000, 0x20000)
 ROM_END
+
+ROM_START( sslama ) // this might be a bad dump, the ONLY difference vs. the parent set is the initial stack pointer (0xff0000 in this vs 0x010000 in the other sets)
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "2.u67", 0x00000, 0x80000, CRC(1ce52917) SHA1(b9b1d14ea44c248ce6e615c5c553c0d485c1302b) )
+	ROM_RELOAD_SSLAM(0x100000)
+	ROM_LOAD16_BYTE( "it_22.bin", 0x00001, 0x80000, CRC(51c56828) SHA1(d71d64b0268c156456bed64b4c13b98181fa3e0f) )
+	ROM_RELOAD_SSLAM(0x100001)
+
+
+	ROM_REGION( 0x1000, "audiocpu", 0 )
+	ROM_LOAD( "s87c751.bin",  0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x200000, "gfx1", 0  ) /* Bg */
+	ROM_LOAD( "7.u45",     0x000000, 0x80000, CRC(64ecdde9) SHA1(576ba1169d90970622249e532baa4209bf12de5a) )
+	ROM_LOAD( "6.u39",     0x080000, 0x80000, CRC(6928065c) SHA1(ad5b1889bebf0358df0295d6041b798ac53ac625) )
+	ROM_LOAD( "5.u42",     0x100000, 0x80000, CRC(8d18bdc6) SHA1(cacc4f475f85438a00ead4911730202e995983a7) )
+	ROM_LOAD( "4.u36",     0x180000, 0x80000, CRC(8e15fb9d) SHA1(47917d8aac1bce2e15f36904f5c2534e5b80236b) )
+
+	ROM_REGION( 0x200000, "gfx2", 0  ) /* Sprites */
+	ROM_LOAD( "8.u83",     0x000000, 0x80000, CRC(19bb89dd) SHA1(c2a0c32d350a193d366b5086502998281fd0bec4) )
+	ROM_LOAD( "9.u84",     0x080000, 0x80000, CRC(d50d86c7) SHA1(7ecbcc03851a8174610f7f5ad889e40543da928e) )
+	ROM_LOAD( "10.u85",    0x100000, 0x80000, CRC(681b8ac8) SHA1(ebfeffc091f53af246311574b9c5d83d2716a7be) )
+	ROM_LOAD( "11.u86",    0x180000, 0x80000, CRC(e41f89e3) SHA1(e4b39411a4cea6aa6c01564f74bb8e432d382a73) )
+
+	/* $00000-$20000 stays the same in all sound banks, */
+	/* the second half of the bank is the area that gets switched */
+	ROM_REGION( 0xc0000, "oki", 0 ) /* OKI Samples */
+	ROM_LOAD( "3.u13",       0x00000, 0x40000, CRC(d0a9245f) SHA1(2e840cdd7bdfe7c6f986daf88576de0559597499) )
+	ROM_CONTINUE(            0x60000, 0x20000 )
+	ROM_CONTINUE(            0xa0000, 0x20000 )
+	ROM_COPY( "oki", 0x00000,0x40000, 0x20000)
+	ROM_COPY( "oki", 0x00000,0x80000, 0x20000)
+ROM_END
+
+// prg roms on this had hand drawn labels (including playmark logo)
+// other labels seem to be that of the powerbals set below, but with sslam content, maybe it was
+// factory converted to powerbals at one time, then back again?
+// there are quite a lot of changes from the above sets.
+ROM_START( sslamb )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "21.u67", 0x00000, 0x80000, CRC(a7c57d58) SHA1(28964c30a12bf7b236fd10bd3b1da341b54f4b7c) )
+	ROM_RELOAD_SSLAM(0x100000)
+	ROM_LOAD16_BYTE( "22.u68", 0x00001, 0x80000,  CRC(782ecd53) SHA1(27a712a4f9d031b1bff7618f60ee6cf7a5241aa1) )
+	ROM_RELOAD_SSLAM(0x100001)
+
+	ROM_REGION( 0x1000, "audiocpu", 0 )
+	ROM_LOAD( "s87c751.bin",  0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x200000, "gfx1", 0  ) /* Bg */
+	ROM_LOAD( "7.u45",     0x000000, 0x80000, CRC(64ecdde9) SHA1(576ba1169d90970622249e532baa4209bf12de5a) ) // 26.u45
+	ROM_LOAD( "6.u39",     0x080000, 0x80000, CRC(6928065c) SHA1(ad5b1889bebf0358df0295d6041b798ac53ac625) ) // 25.u39
+	ROM_LOAD( "5.u42",     0x100000, 0x80000, CRC(8d18bdc6) SHA1(cacc4f475f85438a00ead4911730202e995983a7) ) // 24.u42
+	ROM_LOAD( "4.u36",     0x180000, 0x80000, CRC(8e15fb9d) SHA1(47917d8aac1bce2e15f36904f5c2534e5b80236b) ) // 23.u36
+
+	ROM_REGION( 0x200000, "gfx2", 0  ) /* Sprites */
+	ROM_LOAD( "8.u83",     0x000000, 0x80000, CRC(19bb89dd) SHA1(c2a0c32d350a193d366b5086502998281fd0bec4) ) // 27.u83
+	ROM_LOAD( "9.u84",     0x080000, 0x80000, CRC(d50d86c7) SHA1(7ecbcc03851a8174610f7f5ad889e40543da928e) ) // 28.u84
+	ROM_LOAD( "10.u85",    0x100000, 0x80000, CRC(681b8ac8) SHA1(ebfeffc091f53af246311574b9c5d83d2716a7be) ) // 29.u85
+	ROM_LOAD( "11.u86",    0x180000, 0x80000, CRC(e41f89e3) SHA1(e4b39411a4cea6aa6c01564f74bb8e432d382a73) ) // 30.u86
+
+	/* $00000-$20000 stays the same in all sound banks, */
+	/* the second half of the bank is the area that gets switched */
+	ROM_REGION( 0xc0000, "oki", 0 ) /* OKI Samples */
+	ROM_LOAD( "3.u13",       0x00000, 0x40000, CRC(d0a9245f) SHA1(2e840cdd7bdfe7c6f986daf88576de0559597499) ) // 20.io13
+	ROM_CONTINUE(            0x60000, 0x20000 )
+	ROM_CONTINUE(            0xa0000, 0x20000 )
+	ROM_COPY( "oki", 0x00000,0x40000, 0x20000)
+	ROM_COPY( "oki", 0x00000,0x80000, 0x20000)
+ROM_END
+
 
 // it's a conversion for a sslam pcb
 ROM_START( powerbals )
@@ -904,8 +905,8 @@ ROM_START( powerbals )
 	ROM_LOAD( "20.i013",     0x00000, 0x40000, CRC(12776dbc) SHA1(9ab9930fd581296642834d2cb4ba65264a588af3) )
 	ROM_CONTINUE(            0x60000, 0x20000 )
 	ROM_CONTINUE(            0xa0000, 0x20000 )
-	ROM_COPY( "oki", 0x00000, 0x40000, 0x20000)
-	ROM_COPY( "oki", 0x00000, 0x80000, 0x20000)
+	ROM_COPY( "oki", 0x00000,0x40000, 0x20000)
+	ROM_COPY( "oki", 0x00000,0x80000, 0x20000)
 ROM_END
 
 DRIVER_INIT_MEMBER(sslam_state,sslam)
@@ -932,4 +933,5 @@ DRIVER_INIT_MEMBER(sslam_state,powerbls)
 
 GAME( 1993, sslam,    0,        sslam,    sslam, sslam_state,    sslam,    ROT0, "Playmark", "Super Slam (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, sslama,   sslam,    sslam,    sslam, sslam_state,    sslam,    ROT0, "Playmark", "Super Slam (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sslamb,   sslam,    sslam,    sslam, sslam_state,    sslam,    ROT0, "Playmark", "Super Slam (set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, powerbals,powerbal, powerbls, powerbls, sslam_state, powerbls, ROT0, "Playmark", "Power Balls (Super Slam conversion)", MACHINE_SUPPORTS_SAVE )

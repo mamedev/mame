@@ -18,7 +18,7 @@ class sega_315_5881_crypt_device :  public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5881_crypt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_315_5881_crypt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 
 	UINT16 do_decrypt(UINT8 *&base);
@@ -35,8 +35,8 @@ public:
 	}
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 
@@ -48,7 +48,9 @@ private:
 
 	UINT32 key;
 
-	UINT8 *buffer, *line_buffer, *line_buffer_prev;
+	std::unique_ptr<UINT8[]> buffer;
+	std::unique_ptr<UINT8[]> line_buffer;
+	std::unique_ptr<UINT8[]> line_buffer_prev;
 	UINT32 prot_cur_address;
 	UINT16 subkey, dec_hist;
 	UINT32 dec_header;

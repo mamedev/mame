@@ -177,13 +177,13 @@ ioport_constructor adam_fdc_device::device_input_ports() const
 //  adam_fdc_device - constructor
 //-------------------------------------------------
 
-adam_fdc_device::adam_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+adam_fdc_device::adam_fdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ADAM_FDC, "Adam FDC", tag, owner, clock, "adam_fdc", __FILE__),
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG),
 		m_fdc(*this, WD2793_TAG),
 		m_floppy0(*this, WD2793_TAG":0:525ssdd"),
-		m_floppy(NULL),
+		m_floppy(nullptr),
 		m_ram(*this, "ram"),
 		m_sw3(*this, "SW3")
 {
@@ -289,7 +289,7 @@ WRITE8_MEMBER( adam_fdc_device::p1_w )
 	m_fdc->dden_w(BIT(data, 3));
 
 	// drive select
-	m_floppy = NULL;
+	m_floppy = nullptr;
 
 	if (BIT(data, 5))
 	{

@@ -102,8 +102,8 @@ private:
 	class _mod : public osd_module { \
 	public: \
 		_mod () : osd_module(_type, _name) { } \
-		int init(const osd_options &options) { return -1; } \
-		bool probe() { return false; } \
+		virtual int init(const osd_options &options) override { return -1; } \
+		virtual bool probe() override { return false; } \
 	};
 
 #endif  /* __OSDMODULE_H__ */

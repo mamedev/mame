@@ -370,7 +370,7 @@ int render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_qu
 	{
 		float frac = (clip->y0 - bounds->y0) / (bounds->y1 - bounds->y0);
 		bounds->y0 = clip->y0;
-		if (texcoords != NULL)
+		if (texcoords != nullptr)
 		{
 			texcoords->tl.u += (texcoords->bl.u - texcoords->tl.u) * frac;
 			texcoords->tl.v += (texcoords->bl.v - texcoords->tl.v) * frac;
@@ -384,7 +384,7 @@ int render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_qu
 	{
 		float frac = (bounds->y1 - clip->y1) / (bounds->y1 - bounds->y0);
 		bounds->y1 = clip->y1;
-		if (texcoords != NULL)
+		if (texcoords != nullptr)
 		{
 			texcoords->bl.u -= (texcoords->bl.u - texcoords->tl.u) * frac;
 			texcoords->bl.v -= (texcoords->bl.v - texcoords->tl.v) * frac;
@@ -398,7 +398,7 @@ int render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_qu
 	{
 		float frac = (clip->x0 - bounds->x0) / (bounds->x1 - bounds->x0);
 		bounds->x0 = clip->x0;
-		if (texcoords != NULL)
+		if (texcoords != nullptr)
 		{
 			texcoords->tl.u += (texcoords->tr.u - texcoords->tl.u) * frac;
 			texcoords->tl.v += (texcoords->tr.v - texcoords->tl.v) * frac;
@@ -412,7 +412,7 @@ int render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_qu
 	{
 		float frac = (bounds->x1 - clip->x1) / (bounds->x1 - bounds->x0);
 		bounds->x1 = clip->x1;
-		if (texcoords != NULL)
+		if (texcoords != nullptr)
 		{
 			texcoords->tr.u -= (texcoords->tr.u - texcoords->tl.u) * frac;
 			texcoords->tr.v -= (texcoords->tr.v - texcoords->tl.v) * frac;
@@ -536,7 +536,7 @@ bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 
 	// open the file
 	std::string fname;
-	if (dirname == NULL)
+	if (dirname == nullptr)
 		fname.assign(filename);
 	else
 		fname.assign(dirname).append(PATH_SEPARATOR).append(filename);

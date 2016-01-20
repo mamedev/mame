@@ -157,7 +157,7 @@ Dumped by Chack'n
 class ssingles_state : public driver_device
 {
 public:
-	ssingles_state(const machine_config &mconfig, device_type type, const char *tag)
+	ssingles_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
@@ -176,7 +176,7 @@ public:
 	DECLARE_WRITE8_MEMBER(atamanot_prot_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(controls_r);
 	DECLARE_DRIVER_INIT(ssingles);
-	virtual void video_start();
+	virtual void video_start() override;
 	INTERRUPT_GEN_MEMBER(atamanot_irq);
 	MC6845_UPDATE_ROW(ssingles_update_row);
 	MC6845_UPDATE_ROW(atamanot_update_row);

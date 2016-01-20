@@ -25,7 +25,7 @@
 class x1twin_state : public x1_state
 {
 	public:
-		x1twin_state(const machine_config &mconfig, device_type type, const char *tag)
+		x1twin_state(const machine_config &mconfig, device_type type, std::string tag)
 		: x1_state(mconfig, type, tag)
 	{ }
 	UINT32 screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -391,7 +391,7 @@ static const z80_daisy_config x1_daisy[] =
 {
 	{ "x1kb" },
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 static SLOT_INTERFACE_START( x1_floppies )

@@ -175,7 +175,7 @@ const char info_xml_creator::s_dtd_string[] =
 //-------------------------------------------------
 
 info_xml_creator::info_xml_creator(driver_enumerator &drivlist)
-	: m_output(NULL),
+	: m_output(nullptr),
 		m_drivlist(drivlist),
 		m_lookup_options(m_drivlist.options())
 {
@@ -242,7 +242,7 @@ void info_xml_creator::output_one()
 	ioport_list portlist;
 	std::string errors;
 	device_iterator iter(config.root_device());
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 		portlist.append(*device, errors);
 
 	// print the header and the game name
@@ -251,9 +251,9 @@ void info_xml_creator::output_one()
 
 	// strip away any path information from the source_file and output it
 	const char *start = strrchr(driver.source_file, '/');
-	if (start == NULL)
+	if (start == nullptr)
 		start = strrchr(driver.source_file, '\\');
-	if (start == NULL)
+	if (start == nullptr)
 		start = driver.source_file - 1;
 	fprintf(m_output, " sourcefile=\"%s\"", xml_normalize_string(start + 1));
 
@@ -277,15 +277,15 @@ void info_xml_creator::output_one()
 	fprintf(m_output, ">\n");
 
 	// output game description
-	if (driver.description != NULL)
+	if (driver.description != nullptr)
 		fprintf(m_output, "\t\t<description>%s</description>\n", xml_normalize_string(driver.description));
 
 	// print the year only if is a number or another allowed character (? or +)
-	if (driver.year != NULL && strspn(driver.year, "0123456789?+") == strlen(driver.year))
+	if (driver.year != nullptr && strspn(driver.year, "0123456789?+") == strlen(driver.year))
 		fprintf(m_output, "\t\t<year>%s</year>\n", xml_normalize_string(driver.year));
 
 	// print the manufacturer information
-	if (driver.manufacturer != NULL)
+	if (driver.manufacturer != nullptr)
 		fprintf(m_output, "\t\t<manufacturer>%s</manufacturer>\n", xml_normalize_string(driver.manufacturer));
 
 	// now print various additional information
@@ -322,17 +322,17 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 	bool has_speaker = FALSE, has_input = FALSE;
 	// check if the device adds speakers to the system
 	sound_interface_iterator snditer(device);
-	if (snditer.first() != NULL)
+	if (snditer.first() != nullptr)
 		has_speaker = TRUE;
 	// generate input list
 	ioport_list portlist;
 	std::string errors;
 	device_iterator iptiter(device);
-	for (device_t *dev = iptiter.first(); dev != NULL; dev = iptiter.next())
+	for (device_t *dev = iptiter.first(); dev != nullptr; dev = iptiter.next())
 		portlist.append(*dev, errors);
 	// check if the device adds player inputs (other than dsw and configs) to the system
-	for (ioport_port *port = portlist.first(); port != NULL; port = port->next())
-		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+	for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
+		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 			if (field->type() >= IPT_START1 && field->type() < IPT_UI_FIRST)
 			{
 				has_input = TRUE;
@@ -341,7 +341,7 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 
 	// start to output info
 	fprintf(m_output, "\t<%s", emulator_info::get_xml_top());
-	fprintf(m_output, " name=\"%s\"", xml_normalize_string(device.shortname()));
+	fprintf(m_output, " name=\"%s\"", xml_normalize_string(device.shortname().c_str()));
 	std::string src(device.source());
 	strreplace(src,"../", "");
 	fprintf(m_output, " sourcefile=\"%s\"", xml_normalize_string(src.c_str()));
@@ -349,12 +349,12 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 	fprintf(m_output, " runnable=\"no\"");
 	output_sampleof();
 	fprintf(m_output, ">\n");
-	fprintf(m_output, "\t\t<description>%s</description>\n", xml_normalize_string(device.name()));
+	fprintf(m_output, "\t\t<description>%s</description>\n", xml_normalize_string(device.name().c_str()));
 
 	output_rom(device);
 
 	samples_device *samples = dynamic_cast<samples_device*>(&device);
-	if (samples==NULL) output_sample(device); // ignore samples_device itself
+	if (samples==nullptr) output_sample(device); // ignore samples_device itself
 
 	output_chips(device, devtag);
 	output_display(device, devtag);
@@ -383,31 +383,29 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 //  directly to a driver as device or sub-device)
 //-------------------------------------------------
 
-typedef tagmap_t<FPTR> slot_map;
-
 void info_xml_creator::output_devices()
 {
 	m_drivlist.reset();
-	slot_map shortnames;
+	std::unordered_set<std::string> shortnames;
 
 	while (m_drivlist.next())
 	{
 		// first, run through devices with roms which belongs to the default configuration
 		device_iterator deviter(m_drivlist.config().root_device());
-		for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+		for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
 		{
-			if (device->owner() != NULL && device->shortname()!= NULL && strlen(device->shortname())!=0)
+			if (device->owner() != nullptr && !device->shortname().empty())
 			{
-				if (shortnames.add(device->shortname(), 0, FALSE) != TMERR_DUPLICATE)
-					output_one_device(*device, device->tag());
+				if (shortnames.insert(device->shortname()).second)
+					output_one_device(*device, device->tag().c_str());
 			}
 		}
 
 		// then, run through slot devices
 		slot_interface_iterator iter(m_drivlist.config().root_device());
-		for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
+		for (const device_slot_interface *slot = iter.first(); slot != nullptr; slot = iter.next())
 		{
-			for (const device_slot_option *option = slot->first_option(); option != NULL; option = option->next())
+			for (const device_slot_option *option = slot->first_option(); option != nullptr; option = option->next())
 			{
 				std::string temptag("_");
 				temptag.append(option->name());
@@ -415,21 +413,21 @@ void info_xml_creator::output_devices()
 
 				// notify this device and all its subdevices that they are now configured
 				device_iterator subiter(*dev);
-				for (device_t *device = subiter.first(); device != NULL; device = subiter.next())
+				for (device_t *device = subiter.first(); device != nullptr; device = subiter.next())
 					if (!device->configured())
 						device->config_complete();
 
-				if (shortnames.add(dev->shortname(), 0, FALSE) != TMERR_DUPLICATE)
+				if (shortnames.insert(dev->shortname()).second)
 					output_one_device(*dev, temptag.c_str());
 
 				// also, check for subdevices with ROMs (a few devices are missed otherwise, e.g. MPU401)
 				device_iterator deviter2(*dev);
-				for (device_t *device = deviter2.first(); device != NULL; device = deviter2.next())
+				for (device_t *device = deviter2.first(); device != nullptr; device = deviter2.next())
 				{
-					if (device->owner() == dev && device->shortname()!= NULL && strlen(device->shortname())!=0)
+					if (device->owner() == dev && !device->shortname().empty())
 					{
-						if (shortnames.add(device->shortname(), 0, FALSE) != TMERR_DUPLICATE)
-							output_one_device(*device, device->tag());
+						if (shortnames.insert(device->shortname()).second)
+							output_one_device(*device, device->tag().c_str());
 					}
 				}
 
@@ -448,9 +446,9 @@ void info_xml_creator::output_devices()
 void info_xml_creator::output_device_roms()
 {
 	device_iterator deviter(m_drivlist.config().root_device());
-	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
-		if (device->owner() != NULL && device->shortname()!= NULL && strlen(device->shortname())!=0)
-			fprintf(m_output, "\t\t<device_ref name=\"%s\"/>\n", xml_normalize_string(device->shortname()));
+	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
+		if (device->owner() != nullptr && !device->shortname().empty())
+			fprintf(m_output, "\t\t<device_ref name=\"%s\"/>\n", xml_normalize_string(device->shortname().c_str()));
 }
 
 
@@ -463,10 +461,10 @@ void info_xml_creator::output_sampleof()
 {
 	// iterate over sample devices
 	samples_device_iterator iter(m_drivlist.config().root_device());
-	for (samples_device *device = iter.first(); device != NULL; device = iter.next())
+	for (samples_device *device = iter.first(); device != nullptr; device = iter.next())
 	{
 		samples_iterator sampiter(*device);
-		if (sampiter.altbasename() != NULL)
+		if (sampiter.altbasename() != nullptr)
 		{
 			fprintf(m_output, " sampleof=\"%s\"", xml_normalize_string(sampiter.altbasename()));
 
@@ -485,7 +483,7 @@ void info_xml_creator::output_sampleof()
 void info_xml_creator::output_bios()
 {
 	// skip if no ROMs
-	if (m_drivlist.driver().rom == NULL)
+	if (m_drivlist.driver().rom == nullptr)
 		return;
 
 	// iterate over ROM entries and look for BIOSes
@@ -512,7 +510,7 @@ void info_xml_creator::output_rom(device_t &device)
 {
 	// iterate over 3 different ROM "types": BIOS, ROMs, DISKs
 	for (int rom_type = 0; rom_type < 3; rom_type++)
-		for (const rom_entry *region = rom_first_region(device); region != NULL; region = rom_next_region(region))
+		for (const rom_entry *region = rom_first_region(device); region != nullptr; region = rom_next_region(region))
 		{
 			bool is_disk = ROMREGION_ISDISKDATA(region);
 
@@ -521,12 +519,12 @@ void info_xml_creator::output_rom(device_t &device)
 				continue;
 
 			// iterate through ROM entries
-			for (const rom_entry *rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
+			for (const rom_entry *rom = rom_first_file(region); rom != nullptr; rom = rom_next_file(rom))
 			{
 				bool is_bios = ROM_GETBIOSFLAGS(rom);
 				const char *name = ROM_GETNAME(rom);
 				int offset = ROM_GETOFFSET(rom);
-				const char *merge_name = NULL;
+				const char *merge_name = nullptr;
 				char bios_name[100];
 
 				// BIOS ROMs only apply to bioses
@@ -538,7 +536,7 @@ void info_xml_creator::output_rom(device_t &device)
 				if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
 					merge_name = get_merge_name(hashes);
 				if (&device != &m_drivlist.config().root_device())
-					merge_name = NULL;
+					merge_name = nullptr;
 				// scan for a BIOS name
 				bios_name[0] = 0;
 				if (!is_disk && is_bios)
@@ -561,9 +559,9 @@ void info_xml_creator::output_rom(device_t &device)
 					output.append("\t\t<disk");
 
 				// add name, merge, bios, and size tags */
-				if (name != NULL && name[0] != 0)
+				if (name != nullptr && name[0] != 0)
 					strcatprintf(output," name=\"%s\"", xml_normalize_string(name));
-				if (merge_name != NULL)
+				if (merge_name != nullptr)
 					strcatprintf(output," merge=\"%s\"", xml_normalize_string(merge_name));
 				if (bios_name[0] != 0)
 					strcatprintf(output," bios=\"%s\"", xml_normalize_string(bios_name));
@@ -574,8 +572,7 @@ void info_xml_creator::output_rom(device_t &device)
 				if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
 				{
 					// iterate over hash function types and print m_output their values
-					std::string tempstr;
-					strcatprintf(output," %s", hashes.attribute_string(tempstr));
+					output.append(" ").append(hashes.attribute_string());
 				}
 				else
 					output.append(" status=\"nodump\"");
@@ -615,14 +612,14 @@ void info_xml_creator::output_sample(device_t &device)
 {
 	// iterate over sample devices
 	samples_device_iterator sampiter(device);
-	for (samples_device *samples = sampiter.first(); samples != NULL; samples = sampiter.next())
+	for (samples_device *samples = sampiter.first(); samples != nullptr; samples = sampiter.next())
 	{
 		samples_iterator iter(*samples);
-		tagmap_t<int> already_printed;
-		for (const char *samplename = iter.first(); samplename != NULL; samplename = iter.next())
+		std::unordered_set<std::string> already_printed;
+		for (const char *samplename = iter.first(); samplename != nullptr; samplename = iter.next())
 		{
 			// filter out duplicates
-			if (already_printed.add(samplename, 1) == TMERR_DUPLICATE)
+			if (!already_printed.insert(samplename).second)
 				continue;
 
 			// output the sample name
@@ -641,9 +638,9 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 {
 	// iterate over executable devices
 	execute_interface_iterator execiter(device);
-	for (device_execute_interface *exec = execiter.first(); exec != NULL; exec = execiter.next())
+	for (device_execute_interface *exec = execiter.first(); exec != nullptr; exec = execiter.next())
 	{
-		if (strcmp(exec->device().tag(), device.tag()))
+		if (exec->device().tag() != device.tag())
 		{
 			std::string newtag(exec->device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
@@ -651,7 +648,7 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 			fprintf(m_output, "\t\t<chip");
 			fprintf(m_output, " type=\"cpu\"");
 			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag.c_str()));
-			fprintf(m_output, " name=\"%s\"", xml_normalize_string(exec->device().name()));
+			fprintf(m_output, " name=\"%s\"", xml_normalize_string(exec->device().name().c_str()));
 			fprintf(m_output, " clock=\"%d\"", exec->device().clock());
 			fprintf(m_output, "/>\n");
 		}
@@ -659,9 +656,9 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 
 	// iterate over sound devices
 	sound_interface_iterator sounditer(device);
-	for (device_sound_interface *sound = sounditer.first(); sound != NULL; sound = sounditer.next())
+	for (device_sound_interface *sound = sounditer.first(); sound != nullptr; sound = sounditer.next())
 	{
-		if (strcmp(sound->device().tag(), device.tag()))
+		if (sound->device().tag() != device.tag())
 		{
 			std::string newtag(sound->device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
@@ -669,7 +666,7 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 			fprintf(m_output, "\t\t<chip");
 			fprintf(m_output, " type=\"audio\"");
 			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag.c_str()));
-			fprintf(m_output, " name=\"%s\"", xml_normalize_string(sound->device().name()));
+			fprintf(m_output, " name=\"%s\"", xml_normalize_string(sound->device().name().c_str()));
 			if (sound->device().clock() != 0)
 				fprintf(m_output, " clock=\"%d\"", sound->device().clock());
 			fprintf(m_output, "/>\n");
@@ -687,9 +684,9 @@ void info_xml_creator::output_display(device_t &device, const char *root_tag)
 {
 	// iterate over screens
 	screen_device_iterator iter(device);
-	for (const screen_device *screendev = iter.first(); screendev != NULL; screendev = iter.next())
+	for (const screen_device *screendev = iter.first(); screendev != nullptr; screendev = iter.next())
 	{
-		if (strcmp(screendev->tag(), device.tag()))
+		if (screendev->tag() != device.tag())
 		{
 			std::string newtag(screendev->tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
@@ -777,7 +774,7 @@ void info_xml_creator::output_sound(device_t &device)
 
 	// if we have no sound, zero m_output the speaker count
 	sound_interface_iterator snditer(device);
-	if (snditer.first() == NULL)
+	if (snditer.first() == nullptr)
 		speakers = 0;
 
 	fprintf(m_output, "\t\t<sound channels=\"%d\"/>\n", speakers);
@@ -841,8 +838,8 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 	bool gambling = false;
 
 	// iterate over the ports
-	for (ioport_port *port = portlist.first(); port != NULL; port = port->next())
-		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+	for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
+		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 		{
 			int analogtype = -1;
 
@@ -1046,20 +1043,20 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 	}
 
 	// output analog types
-	for (int type = 0; type < ANALOG_TYPE_COUNT; type++)
-		if (control_info[type].type != NULL)
+	for (auto & elem : control_info)
+		if (elem.type != nullptr)
 		{
-			fprintf(m_output, "\t\t\t<control type=\"%s\"", xml_normalize_string(control_info[type].type));
-			if (control_info[type].min != 0 || control_info[type].max != 0)
+			fprintf(m_output, "\t\t\t<control type=\"%s\"", xml_normalize_string(elem.type));
+			if (elem.min != 0 || elem.max != 0)
 			{
-				fprintf(m_output, " minimum=\"%d\"", control_info[type].min);
-				fprintf(m_output, " maximum=\"%d\"", control_info[type].max);
+				fprintf(m_output, " minimum=\"%d\"", elem.min);
+				fprintf(m_output, " maximum=\"%d\"", elem.max);
 			}
-			if (control_info[type].sensitivity != 0)
-				fprintf(m_output, " sensitivity=\"%d\"", control_info[type].sensitivity);
-			if (control_info[type].keydelta != 0)
-				fprintf(m_output, " keydelta=\"%d\"", control_info[type].keydelta);
-			if (control_info[type].reverse)
+			if (elem.sensitivity != 0)
+				fprintf(m_output, " sensitivity=\"%d\"", elem.sensitivity);
+			if (elem.keydelta != 0)
+				fprintf(m_output, " keydelta=\"%d\"", elem.keydelta);
+			if (elem.reverse)
 				fprintf(m_output, " reverse=\"yes\"");
 
 			fprintf(m_output, "/>\n");
@@ -1091,8 +1088,8 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 void info_xml_creator::output_switches(const ioport_list &portlist, const char *root_tag, int type, const char *outertag, const char *innertag)
 {
 	// iterate looking for DIP switches
-	for (ioport_port *port = portlist.first(); port != NULL; port = port->next())
-		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+	for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
+		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 			if (field->type() == type)
 			{
 				std::string output;
@@ -1106,7 +1103,7 @@ void info_xml_creator::output_switches(const ioport_list &portlist, const char *
 				strcatprintf(output,"\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name.c_str(), normalized_newtag.c_str(), field->mask());
 
 				// loop over settings
-				for (ioport_setting *setting = field->first_setting(); setting != NULL; setting = setting->next())
+				for (ioport_setting *setting = field->first_setting(); setting != nullptr; setting = setting->next())
 				{
 					strcatprintf(output,"\t\t\t<%s name=\"%s\" value=\"%u\"%s/>\n", innertag, xml_normalize_string(setting->name()), setting->value(), setting->value() == field->defvalue() ? " default=\"yes\"" : "");
 				}
@@ -1125,10 +1122,10 @@ void info_xml_creator::output_switches(const ioport_list &portlist, const char *
 void info_xml_creator::output_ports(const ioport_list &portlist)
 {
 	// cycle through ports
-	for (ioport_port *port = portlist.first(); port != NULL; port = port->next())
+	for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
 	{
-		fprintf(m_output,"\t\t<port tag=\"%s\">\n",port->tag());
-		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+		fprintf(m_output,"\t\t<port tag=\"%s\">\n",port->tag().c_str());
+		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 		{
 			if(field->is_analog())
 				fprintf(m_output,"\t\t\t<analog mask=\"%u\"/>\n",field->mask());
@@ -1147,8 +1144,8 @@ void info_xml_creator::output_ports(const ioport_list &portlist)
 void info_xml_creator::output_adjusters(const ioport_list &portlist)
 {
 	// iterate looking for Adjusters
-	for (ioport_port *port = portlist.first(); port != NULL; port = port->next())
-		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+	for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
+		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 			if (field->type() == IPT_ADJUSTER)
 				fprintf(m_output, "\t\t<adjuster name=\"%s\" default=\"%d\"/>\n", xml_normalize_string(field->name()), field->defvalue());
 }
@@ -1224,9 +1221,9 @@ void info_xml_creator::output_driver()
 void info_xml_creator::output_images(device_t &device, const char *root_tag)
 {
 	image_interface_iterator iter(device);
-	for (const device_image_interface *imagedev = iter.first(); imagedev != NULL; imagedev = iter.next())
+	for (const device_image_interface *imagedev = iter.first(); imagedev != nullptr; imagedev = iter.next())
 	{
-		if (strcmp(imagedev->device().tag(), device.tag()))
+		if (imagedev->device().tag() != device.tag())
 		{
 			std::string newtag(imagedev->device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
@@ -1235,7 +1232,7 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 			fprintf(m_output, "\t\t<device type=\"%s\"", xml_normalize_string(imagedev->image_type_name()));
 
 			// does this device have a tag?
-			if (imagedev->device().tag())
+			if (!imagedev->device().tag().empty())
 				fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag.c_str()));
 
 			// is this device mandatory?
@@ -1259,12 +1256,12 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 			std::string extensions(imagedev->file_extensions());
 
 			char *ext = strtok((char *)extensions.c_str(), ",");
-			while (ext != NULL)
+			while (ext != nullptr)
 			{
 				fprintf(m_output, "\t\t\t<extension");
 				fprintf(m_output, " name=\"%s\"", xml_normalize_string(ext));
 				fprintf(m_output, "/>\n");
-				ext = strtok(NULL, ",");
+				ext = strtok(nullptr, ",");
 			}
 
 			fprintf(m_output, "\t\t</device>\n");
@@ -1280,11 +1277,11 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 {
 	slot_interface_iterator iter(device);
-	for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
+	for (const device_slot_interface *slot = iter.first(); slot != nullptr; slot = iter.next())
 	{
 		if (slot->fixed()) continue;    // or shall we list these as non-configurable?
 
-		if (strcmp(slot->device().tag(), device.tag()))
+		if (slot->device().tag()!=device.tag())
 		{
 			std::string newtag(slot->device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
@@ -1297,7 +1294,7 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 			 fprintf(m_output, " interface=\"%s\"", xml_normalize_string(slot->slot_interface()));
 			 */
 
-			for (const device_slot_option *option = slot->first_option(); option != NULL; option = option->next())
+			for (const device_slot_option *option = slot->first_option(); option != nullptr; option = option->next())
 			{
 				if (option->selectable())
 				{
@@ -1307,12 +1304,9 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 
 					fprintf(m_output, "\t\t\t<slotoption");
 					fprintf(m_output, " name=\"%s\"", xml_normalize_string(option->name()));
-					fprintf(m_output, " devname=\"%s\"", xml_normalize_string(dev->shortname()));
-					if (slot->default_option())
-					{
-						if (strcmp(slot->default_option(),option->name())==0)
-							fprintf(m_output, " default=\"yes\"");
-					}
+					fprintf(m_output, " devname=\"%s\"", xml_normalize_string(dev->shortname().c_str()));
+					if (slot->default_option() != nullptr && strcmp(slot->default_option(),option->name())==0)
+						fprintf(m_output, " default=\"yes\"");
 					fprintf(m_output, "/>\n");
 					const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), "dummy");
 				}
@@ -1332,7 +1326,7 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 void info_xml_creator::output_software_list()
 {
 	software_list_device_iterator iter(m_drivlist.config().root_device());
-	for (const software_list_device *swlist = iter.first(); swlist != NULL; swlist = iter.next())
+	for (const software_list_device *swlist = iter.first(); swlist != nullptr; swlist = iter.next())
 	{
 		fprintf(m_output, "\t\t<softwarelist name=\"%s\" ", swlist->list_name());
 		fprintf(m_output, "status=\"%s\" ", (swlist->list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM) ? "original" : "compatible");
@@ -1353,11 +1347,11 @@ void info_xml_creator::output_software_list()
 void info_xml_creator::output_ramoptions()
 {
 	ram_device_iterator iter(m_drivlist.config().root_device());
-	for (const ram_device *ram = iter.first(); ram != NULL; ram = iter.next())
+	for (const ram_device *ram = iter.first(); ram != nullptr; ram = iter.next())
 	{
 		fprintf(m_output, "\t\t<ramoption default=\"1\">%u</ramoption>\n", ram->default_size());
 
-		if (ram->extra_options() != NULL)
+		if (ram->extra_options() != nullptr)
 		{
 			std::string options(ram->extra_options());
 			for (int start = 0, end = options.find_first_of(',');; start = end + 1, end = options.find_first_of(',', start))
@@ -1381,13 +1375,13 @@ void info_xml_creator::output_ramoptions()
 const char *info_xml_creator::get_merge_name(const hash_collection &romhashes)
 {
 	// walk the parent chain
-	const char *merge_name = NULL;
+	const char *merge_name = nullptr;
 	for (int clone_of = m_drivlist.find(m_drivlist.driver().parent); clone_of != -1; clone_of = m_drivlist.find(m_drivlist.driver(clone_of).parent))
 	{
 		// look in the parent's ROMs
 		device_t *device = &m_drivlist.config(clone_of, m_lookup_options).root_device();
-		for (const rom_entry *pregion = rom_first_region(*device); pregion != NULL; pregion = rom_next_region(pregion))
-			for (const rom_entry *prom = rom_first_file(pregion); prom != NULL; prom = rom_next_file(prom))
+		for (const rom_entry *pregion = rom_first_region(*device); pregion != nullptr; pregion = rom_next_region(pregion))
+			for (const rom_entry *prom = rom_first_file(pregion); prom != nullptr; prom = rom_next_file(prom))
 			{
 				hash_collection phashes(ROM_GETHASHDATA(prom));
 				if (!phashes.flag(hash_collection::FLAG_NO_DUMP) && romhashes == phashes)

@@ -18,7 +18,7 @@
 class microdec_state : public driver_device
 {
 public:
-	microdec_state(const machine_config &mconfig, device_type type, const char *tag)
+	microdec_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_terminal(*this, TERMINAL_TAG),
 		m_maincpu(*this, "maincpu")
@@ -30,8 +30,8 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 private:
 	UINT8 m_term_data;
-	virtual void machine_reset();
-	virtual void machine_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<cpu_device> m_maincpu;
 };

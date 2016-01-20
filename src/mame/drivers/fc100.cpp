@@ -49,7 +49,7 @@ TODO:
 class fc100_state : public driver_device
 {
 public:
-	fc100_state(const machine_config &mconfig, device_type type, const char *tag)
+	fc100_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_vdg(*this, "vdg")
@@ -79,11 +79,11 @@ public:
 
 	MC6847_GET_CHARROM_MEMBER(get_char_rom)
 	{
-		return m_p_chargen[ch * 16 + line];
+		return m_p_chargen[(ch * 16 + line) & 0xfff];
 	}
 private:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	// graphics signals
 	UINT8 m_ag;

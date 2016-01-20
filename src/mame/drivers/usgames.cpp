@@ -45,11 +45,11 @@ WRITE8_MEMBER(usgames_state::rombank_w)
 WRITE8_MEMBER(usgames_state::lamps1_w)
 {
 	/* button lamps */
-	set_led_status(machine(), 0,data & 0x01);
-	set_led_status(machine(), 1,data & 0x02);
-	set_led_status(machine(), 2,data & 0x04);
-	set_led_status(machine(), 3,data & 0x08);
-	set_led_status(machine(), 4,data & 0x10);
+	output().set_led_value(0,data & 0x01);
+	output().set_led_value(1,data & 0x02);
+	output().set_led_value(2,data & 0x04);
+	output().set_led_value(3,data & 0x08);
+	output().set_led_value(4,data & 0x10);
 
 	/* bit 5 toggles all the time - extra lamp? */
 }
@@ -209,7 +209,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( usgames )
-	GFXDECODE_ENTRY( NULL, 0x2800, charlayout, 0, 256 )
+	GFXDECODE_ENTRY( nullptr, 0x2800, charlayout, 0, 256 )
 GFXDECODE_END
 
 

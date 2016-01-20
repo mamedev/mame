@@ -13,7 +13,7 @@
 class offtwall_state : public atarigen_state
 {
 public:
-	offtwall_state(const machine_config &mconfig, device_type type, const char *tag)
+	offtwall_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atarigen_state(mconfig, type, tag),
 			m_jsa(*this, "jsa"),
 			m_vad(*this, "vad"),
@@ -28,7 +28,7 @@ public:
 
 	UINT16 *m_spritecache_count;
 	UINT16 *m_unknown_verify_base;
-	virtual void update_interrupts();
+	virtual void update_interrupts() override;
 	DECLARE_WRITE16_MEMBER(io_latch_w);
 	DECLARE_READ16_MEMBER(bankswitch_r);
 	DECLARE_READ16_MEMBER(bankrom_r);

@@ -188,7 +188,7 @@ WRITE8_MEMBER( abc_fd2_t::pio_pb_w )
 
 	*/
 
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) floppy = m_floppy1->get_device();
@@ -212,7 +212,7 @@ WRITE8_MEMBER( abc_fd2_t::pio_pb_w )
 static const z80_daisy_config daisy_chain[] =
 {
 	{ Z80PIO_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 
@@ -276,7 +276,7 @@ machine_config_constructor abc_fd2_t::device_mconfig_additions() const
 //  abc_fd2_t - constructor
 //-------------------------------------------------
 
-abc_fd2_t::abc_fd2_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+abc_fd2_t::abc_fd2_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ABC_FD2, "ABC FD2", tag, owner, clock, "abc_fd2", __FILE__),
 	device_abcbus_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),

@@ -31,7 +31,7 @@ http://mamedev.emulab.it/haze/reference/sawatte/cartridge_example.jpg
 class sawatte_state : public driver_device
 {
 public:
-	sawatte_state(const machine_config &mconfig, device_type type, const char *tag)
+	sawatte_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 	{ }
 
@@ -51,4 +51,4 @@ ROM_START( sawatte )
 ROM_END
 
 
-GAME( 1996?, sawatte,    0,       sawatte,  sawatte, driver_device,  0,  ROT0,  "Sega",    "Sawatte",          MACHINE_IS_SKELETON )
+CONS( 1996?, sawatte, 0, 0, sawatte,  sawatte, driver_device,  0, "Sega", "Sawatte", MACHINE_IS_SKELETON )

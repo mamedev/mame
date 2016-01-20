@@ -23,7 +23,7 @@
 class bbcbc_state : public driver_device
 {
 public:
-	bbcbc_state(const machine_config &mconfig, device_type type, const char *tag)
+	bbcbc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot")
@@ -31,8 +31,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(tms_interrupt);
 };
 
@@ -112,7 +112,7 @@ WRITE_LINE_MEMBER(bbcbc_state::tms_interrupt)
 static const z80_daisy_config bbcbc_daisy_chain[] =
 {
 	{ "z80pio" },
-	{ NULL }
+	{ nullptr }
 };
 
 

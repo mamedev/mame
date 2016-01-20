@@ -97,7 +97,7 @@ static const z80_daisy_config z80_daisy_chain[] =
 	{ Z80PIO_0_TAG },
 	{ Z80CTC_TAG },
 	{ Z80PIO_2_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 
@@ -445,7 +445,7 @@ ioport_constructor imi5000h_device::device_input_ports() const
 //  imi5000h_device - constructor
 //-------------------------------------------------
 
-imi5000h_device::imi5000h_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+imi5000h_device::imi5000h_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, IMI5000H, "IMI 5000H", tag, owner, clock, "imi5000h", __FILE__),
 	device_imi7000_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),

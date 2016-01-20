@@ -48,7 +48,7 @@ const device_type IQ151_DISC2 = &device_creator<iq151_disc2_device>;
 //  iq151_disc2_device - constructor
 //-------------------------------------------------
 
-iq151_disc2_device::iq151_disc2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iq151_disc2_device::iq151_disc2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, IQ151_DISC2, "IQ151 Disc2", tag, owner, clock, "iq151_disc2", __FILE__),
 		device_iq151cart_interface( mconfig, *this ),
 		m_fdc(*this, "fdc"), m_rom(nullptr), m_rom_enabled(false)
@@ -111,7 +111,7 @@ void iq151_disc2_device::read(offs_t offset, UINT8 &data)
 void iq151_disc2_device::io_read(offs_t offset, UINT8 &data)
 {
 	/* This is gross */
-	address_space *space = NULL;
+	address_space *space = nullptr;
 	if (offset == 0xaa)
 		data = m_fdc->msr_r(*space, 0, 0xff);
 	else if (offset == 0xab)
@@ -124,7 +124,7 @@ void iq151_disc2_device::io_read(offs_t offset, UINT8 &data)
 
 void iq151_disc2_device::io_write(offs_t offset, UINT8 data)
 {
-	address_space *space = NULL;
+	address_space *space = nullptr;
 	if (offset == 0xab)
 		m_fdc->fifo_w(*space, 0, data, 0xff);
 	else if (offset == 0xac)

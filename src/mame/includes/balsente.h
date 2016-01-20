@@ -31,7 +31,7 @@
 class balsente_state : public driver_device
 {
 public:
-	balsente_state(const machine_config &mconfig, device_type type, const char *tag)
+	balsente_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_scanline_timer(*this, "scan_timer"),
 			m_counter_0_timer(*this, "8253_0_timer"),
@@ -197,9 +197,9 @@ public:
 	DECLARE_DRIVER_INIT(minigolf2);
 	DECLARE_DRIVER_INIT(nametune);
 	DECLARE_DRIVER_INIT(gghost);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_balsente(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(balsente_update_analog_inputs);
 	TIMER_CALLBACK_MEMBER(irq_off);

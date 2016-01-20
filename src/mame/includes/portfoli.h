@@ -30,7 +30,7 @@
 class portfolio_state : public driver_device
 {
 public:
-	portfolio_state(const machine_config &mconfig, device_type type, const char *tag)
+	portfolio_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M80C88A_TAG),
 			m_lcdc(*this, HD61830_TAG),
@@ -71,8 +71,8 @@ public:
 	required_ioport m_y7;
 	required_ioport m_battery;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void check_interrupt();
 	void trigger_interrupt(int level);

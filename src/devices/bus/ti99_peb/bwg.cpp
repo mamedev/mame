@@ -84,7 +84,7 @@
     Modern implementation
 */
 
-snug_bwg_device::snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+snug_bwg_device::snug_bwg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 			: ti_expansion_card_device(mconfig, TI99_BWG, "SNUG BwG Floppy Controller", tag, owner, clock, "ti99_bwg", __FILE__), m_DRQ(), m_IRQ(), m_dip1(0), m_dip2(0), m_dip34(0), m_ram_page(0), m_rom_page(0), m_WAITena(false), m_inDsrArea(false), m_WDsel(false), m_WDsel0(false), m_RTCsel(false), m_lastK(false), m_dataregLB(false), m_rtc_enabled(false), m_MOTOR_ON(), m_lastval(0), m_address(0), m_DSEL(0), m_SIDSEL(), m_motor_on_timer(nullptr), m_dsrrom(nullptr), m_buffer_ram(nullptr), m_current_floppy(nullptr),
 				m_wd1773(*this, FDC_TAG),
 				m_clock(*this, CLOCK_TAG), m_debug_dataout(false)
@@ -338,17 +338,17 @@ WRITE8_MEMBER(snug_bwg_device::write)
 */
 READ8Z_MEMBER(snug_bwg_device::crureadz)
 {
-	UINT8 reply = 0;
+	UINT8 reply;
 
 	if ((offset & 0xff00)==m_cru_base)
 	{
 		if ((offset & 0x00ff)==0)
 		{
 			// Check what drives are not connected
-			reply = ((m_floppy[0] != NULL)? 0 : 0x02)       // DSK1
-					| ((m_floppy[1] != NULL)? 0 : 0x04) // DSK2
-					| ((m_floppy[2] != NULL)? 0 : 0x08) // DSK3
-					| ((m_floppy[3] != NULL)? 0 : 0x01);    // DSK4
+			reply = ((m_floppy[0] != nullptr)? 0 : 0x02)       // DSK1
+					| ((m_floppy[1] != nullptr)? 0 : 0x04) // DSK2
+					| ((m_floppy[2] != nullptr)? 0 : 0x08) // DSK3
+					| ((m_floppy[3] != nullptr)? 0 : 0x01);    // DSK4
 
 			// DIP switches for step and date/time display
 			if (m_dip1 != 0) reply |= 0x10;
@@ -425,7 +425,7 @@ WRITE8_MEMBER(snug_bwg_device::cruwrite)
 			// Select side of disk (bit 7)
 			m_SIDSEL = (data==1)? ASSERT_LINE : CLEAR_LINE;
 			if (TRACE_CRU) logerror("bwg: set side (bit 7) = %d\n", data);
-			if (m_current_floppy != NULL) m_current_floppy->ss_w(data);
+			if (m_current_floppy != nullptr) m_current_floppy->ss_w(data);
 			break;
 
 		case 8:
@@ -509,7 +509,7 @@ void snug_bwg_device::set_drive()
 	}
 	else
 	{
-		m_current_floppy = NULL;
+		m_current_floppy = nullptr;
 		if (TRACE_CRU) logerror("bwg: All drives deselected\n");
 	}
 	m_wd1773->set_floppy(m_current_floppy);
@@ -547,8 +547,8 @@ void snug_bwg_device::set_floppy_motors_running(bool run)
 	m_wd1773->set_force_ready(run);
 
 	// Set all motors
-	for (int i=0; i < 4; i++)
-		if (m_floppy[i] != NULL) m_floppy[i]->mon_w((run)? 0 : 1);
+	for (auto & elem : m_floppy)
+		if (elem != nullptr) elem->mon_w((run)? 0 : 1);
 
 	// The motor-on line also connects to the wait state logic
 	operate_ready_line();
@@ -603,8 +603,8 @@ void snug_bwg_device::device_reset()
 
 	for (int i=0; i < 4; i++)
 	{
-		if (m_floppy[i] != NULL)
-			logerror("bwg: Connector %d with %s\n", i, m_floppy[i]->name());
+		if (m_floppy[i] != nullptr)
+			logerror("bwg: Connector %d with %s\n", i, m_floppy[i]->name().c_str());
 		else
 			logerror("bwg: Connector %d has no floppy attached\n", i);
 	}
@@ -621,14 +621,14 @@ void snug_bwg_device::device_reset()
 
 void snug_bwg_device::device_config_complete()
 {
-	for (int i=0; i < 4; i++)
-		m_floppy[i] = NULL;
+	for (auto & elem : m_floppy)
+		elem = nullptr;
 
 	// Seems to be null when doing a "-listslots"
-	if (subdevice("0")!=NULL) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->first_subdevice());
-	if (subdevice("1")!=NULL) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("1")->first_subdevice());
-	if (subdevice("2")!=NULL) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->first_subdevice());
-	if (subdevice("3")!=NULL) m_floppy[3] = static_cast<floppy_image_device*>(subdevice("3")->first_subdevice());
+	if (subdevice("0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->first_subdevice());
+	if (subdevice("1")!=nullptr) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("1")->first_subdevice());
+	if (subdevice("2")!=nullptr) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->first_subdevice());
+	if (subdevice("3")!=nullptr) m_floppy[3] = static_cast<floppy_image_device*>(subdevice("3")->first_subdevice());
 }
 
 INPUT_PORTS_START( bwg_fdc )
@@ -674,9 +674,9 @@ MACHINE_CONFIG_FRAGMENT( bwg_fdc )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("1", bwg_floppies, "525dd", snug_bwg_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("2", bwg_floppies, NULL, snug_bwg_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("2", bwg_floppies, nullptr, snug_bwg_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("3", bwg_floppies, NULL, snug_bwg_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("3", bwg_floppies, nullptr, snug_bwg_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 

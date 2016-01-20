@@ -44,10 +44,10 @@ static const int m_mmc5_attrib[4] = {0x00, 0x55, 0xaa, 0xff};
 const device_type NES_EXROM = &device_creator<nes_exrom_device>;
 
 
-nes_exrom_device::nes_exrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_EXROM, "NES Cart ExROM (MMC-5) PCB", tag, owner, clock, "nes_exrom", __FILE__), m_irq_count(0), 
+nes_exrom_device::nes_exrom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+					: nes_nrom_device(mconfig, NES_EXROM, "NES Cart ExROM (MMC-5) PCB", tag, owner, clock, "nes_exrom", __FILE__), m_irq_count(0),
 	m_irq_status(0), m_irq_enable(0), m_mult1(0), m_mult2(0), m_mmc5_scanline(0), m_vrom_page_a(0), m_vrom_page_b(0), m_floodtile(0), m_floodattr(0),
-	m_prg_mode(0), m_chr_mode(0), m_wram_protect_1(0), m_wram_protect_2(0), m_exram_control(0), m_wram_base(0), m_last_chr(0), m_ex1_chr(0), 
+	m_prg_mode(0), m_chr_mode(0), m_wram_protect_1(0), m_wram_protect_2(0), m_exram_control(0), m_wram_base(0), m_last_chr(0), m_ex1_chr(0),
 	m_split_chr(0), m_ex1_bank(0), m_high_chr(0), m_split_scr(0), m_split_rev(0), m_split_ctrl(0), m_split_yst(0), m_split_bank(0), m_vcount(0)
 				{
 }
@@ -122,8 +122,8 @@ void nes_exrom_device::pcb_reset()
 	m_ex1_bank = 0;
 	m_vcount = 0;
 
-	for (int i = 0; i < 12; i++)
-		m_vrom_bank[i] = 0x3ff;
+	for (auto & elem : m_vrom_bank)
+		elem = 0x3ff;
 
 	m_prg_regs[0] = 0xfc;
 	m_prg_regs[1] = 0xfd;
@@ -468,8 +468,8 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 
 	if ((offset >= 0x1000) && (offset <= 0x1015))
 	{
-		// SOUND
-		nesapu_device *m_sound = machine().device<nesapu_device>("maincpu::nessound");
+		// SOUND (this is a hack, it should have extra channels, not pass to the existing APU!!!)
+		nesapu_device *m_sound = machine().device<nesapu_device>("maincpu:nesapu");
 		m_sound->write(space, offset & 0x1f, data);
 		return;
 	}

@@ -3,7 +3,7 @@
 class tetrisp2_state : public driver_device
 {
 public:
-	tetrisp2_state(const machine_config &mconfig, device_type type, const char *tag)
+	tetrisp2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
@@ -45,7 +45,7 @@ public:
 	required_shared_ptr<UINT16> m_scroll_fg;
 	required_shared_ptr<UINT16> m_scroll_bg;
 	required_shared_ptr<UINT16> m_rotregs;
-	UINT8 *m_priority;
+	std::unique_ptr<UINT8[]> m_priority;
 	optional_shared_ptr<UINT16> m_rocknms_sub_priority;
 	optional_shared_ptr<UINT16> m_rocknms_sub_vram_rot;
 	optional_shared_ptr<UINT16> m_rocknms_sub_vram_fg;
@@ -138,7 +138,7 @@ public:
 class stepstag_state : public tetrisp2_state
 {
 public:
-	stepstag_state(const machine_config &mconfig, device_type type, const char *tag)
+	stepstag_state(const machine_config &mconfig, device_type type, std::string tag)
 		: tetrisp2_state(mconfig, type, tag),
 			m_spriteram3(*this, "spriteram3") { }
 

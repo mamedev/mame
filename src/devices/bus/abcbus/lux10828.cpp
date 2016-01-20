@@ -290,7 +290,7 @@ WRITE8_MEMBER( luxor_55_10828_device::pio_pb_w )
 static const z80_daisy_config daisy_chain[] =
 {
 	{ Z80PIO_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 static SLOT_INTERFACE_START( abc_floppies )
@@ -403,7 +403,7 @@ ioport_constructor luxor_55_10828_device::device_input_ports() const
 //  luxor_55_10828_device - constructor
 //-------------------------------------------------
 
-luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, LUXOR_55_10828, "Luxor 55 10828", tag, owner, clock, "lux10828", __FILE__),
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),
@@ -592,7 +592,7 @@ WRITE8_MEMBER( luxor_55_10828_device::ctrl_w )
 	m_sel0 = BIT(data, 0);
 	m_sel1 = BIT(data, 1);
 
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) floppy = m_floppy1->get_device();

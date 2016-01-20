@@ -25,7 +25,7 @@ class k054338_device : public device_t,
 						public device_video_interface
 {
 public:
-	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k054338_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~k054338_device() {}
 
 	// static configuration
@@ -47,8 +47,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state

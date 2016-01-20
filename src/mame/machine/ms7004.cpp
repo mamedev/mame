@@ -354,7 +354,7 @@ ioport_constructor ms7004_device::device_input_ports() const
 //  ms7004_device - constructor
 //-------------------------------------------------
 
-ms7004_device::ms7004_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ms7004_device::ms7004_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MS7004, "MS7004 keyboard", tag, owner, clock, "ms7004", __FILE__),
 	m_maincpu(*this, MS7004_CPU_TAG),
 	m_speaker(*this, MS7004_SPK_TAG),
@@ -416,7 +416,7 @@ WRITE8_MEMBER( ms7004_device::p1_w )
 	    6
 	    7       Serial TX
 	*/
-	DBG_LOG(2,0,( "%s: p1_w %02x = send %d\n", tag(), data, BIT(data, 7)));
+	DBG_LOG(2,0,( "%s: p1_w %02x = send %d\n", tag().c_str(), data, BIT(data, 7)));
 
 	m_p1 = data;
 	m_tx_handler(BIT(data, 7));
@@ -441,7 +441,7 @@ WRITE8_MEMBER( ms7004_device::p2_w )
 	    6       LED "Caps"
 	    7       LED "Hold"
 	*/
-	DBG_LOG(2,0,( "%s: p2_w %02x = col %d\n", tag(), data, data&15));
+	DBG_LOG(2,0,( "%s: p2_w %02x = col %d\n", tag().c_str(), data, data&15));
 
 	m_p2 = data;
 	m_i8243->i8243_p2_w(space, offset, data);
@@ -457,7 +457,7 @@ WRITE8_MEMBER( ms7004_device::i8243_port_w )
 	int sense = 0;
 
 	DBG_LOG(2,0,( "%s: 8243 port %d data %02xH\n",
-		tag(), offset + 4, data));
+		tag().c_str(), offset + 4, data));
 
 	if (data) {
 		switch(offset << 4 | data) {
@@ -481,7 +481,7 @@ WRITE8_MEMBER( ms7004_device::i8243_port_w )
 		m_keylatch = BIT(sense, (m_p1 & 7));
 		if (m_keylatch)
 		DBG_LOG(1,0,( "%s: row %d col %02x t1 %d\n",
-			tag(), (m_p1 & 7), (offset << 4 | data), m_keylatch));
+			tag().c_str(), (m_p1 & 7), (offset << 4 | data), m_keylatch));
 	}
 }
 

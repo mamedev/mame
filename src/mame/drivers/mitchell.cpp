@@ -20,6 +20,55 @@
 
 
 ******************************************************************************
+Pang
+Mitchell, 1989
+
+PCB Layout
+----------
+
+89125-A-2
+|------------------------------------------------------------------|
+|HA13001   PW_01.1D PWJ_02.1E PWJ_04.1G          PWJ_09.1K         |
+|  VOL VOL  M6295   PW_03.2E  PW_05.2G           PWJ_10.2K         |
+|  LM324                                                           |
+|             YM2413      CM^81300               |------|          |
+|                                                |86S105|          |
+|J  TD62064                                      |      |  BUNRAKU |
+|A                                               |------|          |
+|M                           4364                             16MHz|
+|M                                                                 |
+|A       5814                                          DL-010D-103 |
+|                            4016                                  |
+|        5814                                                      |
+|                                                                  |
+|                            PAL16L8      PWE_06.11H               |
+|                            'POKER'      PWE_07.13H               |
+|                                                      KABUKI      |
+|TEST_SW  93C46              DL-020F-108U          HM6264   BATTERY|
+|------------------------------------------------------------------|
+Notes:
+       KABUKI - Custom encrypted Z80 marked 'VC5006-0001 KABUKI DL-030P-110V KOREA' (DIP40)
+      BUNRAKU - Custom chip marked 'BUNRAKU DL-050-115V' (QFP60)
+       86S105 - Custom chip marked 'something(scratched) 86S105 RJ5C39 8M2 76' (PLCC84)
+ DL-020F-108U - Custom chip marked 'DL-020F-108U' (SDIP64)
+  DL-010D-103 - Custom chip marked 'DL-010D-103' (SDIP64)
+     CM^81300 - Custom chip marked 'CM^81300' (SDIP28, ^ is a triangle symbol)
+        POKER - PAL16L8 marked 'POKER' (DIP20)
+         4364 - 8kx8 SRAM (DIP28)
+         4016 - 2kx8 SRAM (DIP24)
+         5814 - 2kx8 SRAM (DIP24)
+       HM6264 - 8kx8 SRAM, battery-backed (DIP28)
+        93C46 - AKM-J 93C46 128 bytes EEPROM (DIP8)
+        LM324 - Texas Instruments LM324 Low Power Quad Operational Amplifier
+      HA13001 - Hitachi HA13001 5.5W Dual / 17.5W BTL Audio Power Amplifier
+      TD62064 - Toshiba TD62064 4 Channel High-Current Darlington Sink Driver
+          Z80 - 8.000MHz [16/2]
+       YM2413 - 4.000MHz [16/4]
+        M6295 - 1.000MHz [16/16]
+        VSync - 57.4450Hz
+        HSync - 15.16452Hz
+******************************************************************************
+
  Monsters World (c)1994 TCH
 
  Monsters World is basically a bootleg of Mitchell's Super Pang
@@ -2132,7 +2181,7 @@ DRIVER_INIT_MEMBER(mitchell_state,pangb)
 {
 	m_input_type = 0;
 	bootleg_decode();
-	if (m_nvram != NULL)
+	if (m_nvram != nullptr)
 		m_nvram->set_base(&m_dummy_nvram, sizeof(m_dummy_nvram));   /* for pangba */
 }
 DRIVER_INIT_MEMBER(mitchell_state,cworld)

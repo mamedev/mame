@@ -101,7 +101,7 @@ class pet_user_port_device : public device_t,
 	friend class device_pet_user_port_interface;
 
 public:
-	pet_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pet_user_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_2_handler(device_t &device, _Object object) { return downcast<pet_user_port_device &>(device).m_2_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_3_handler(device_t &device, _Object object) { return downcast<pet_user_port_device &>(device).m_3_handler.set_callback(object); }
@@ -145,8 +145,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 
 	devcb_write_line m_2_handler;
 	devcb_write_line m_3_handler;

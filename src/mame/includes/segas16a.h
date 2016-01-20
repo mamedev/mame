@@ -25,7 +25,7 @@ class segas16a_state : public sega_16bit_common_base
 {
 public:
 	// construction/destruction
-	segas16a_state(const machine_config &mconfig, device_type type, const char *tag)
+	segas16a_state(const machine_config &mconfig, device_type type, std::string tag)
 		: sega_16bit_common_base(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_soundcpu(*this, "soundcpu"),
@@ -107,9 +107,9 @@ protected:
 	};
 
 	// driver overrides
-	virtual void video_start();
-	virtual void machine_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void video_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// I8751 simulations
 	void dumpmtmt_i8751_sim();

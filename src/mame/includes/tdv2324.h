@@ -47,7 +47,7 @@
 class tdv2324_state : public driver_device
 {
 public:
-	tdv2324_state(const machine_config &mconfig, device_type type, const char *tag)
+	tdv2324_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, P8085AH_0_TAG),
 			m_subcpu(*this, P8085AH_1_TAG),
@@ -69,7 +69,7 @@ public:
 	required_device<pit8253_device> m_pit1;
 	required_device<tms9927_device> m_tms;
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( tdv2324_main_io_30 );

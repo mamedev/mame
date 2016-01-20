@@ -38,7 +38,7 @@ There is a 4MHz crystal connected to the 9513.
 class seattle_comp_state : public driver_device
 {
 public:
-	seattle_comp_state(const machine_config &mconfig, device_type type, const char *tag)
+	seattle_comp_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG)
@@ -49,7 +49,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 private:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	UINT8 m_term_data;

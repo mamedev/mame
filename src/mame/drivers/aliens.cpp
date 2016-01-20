@@ -20,8 +20,8 @@ Preliminary driver by:
 WRITE8_MEMBER(aliens_state::aliens_coin_counter_w)
 {
 	/* bits 0-1 = coin counters */
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 	/* bit 5 = select work RAM or palette */
 	m_bank0000->set_bank((data & 0x20) >> 5);
@@ -147,7 +147,7 @@ static INPUT_PORTS_START( aliens )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW3:2" )        /* Listed as "Unused" */
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" )        /* Listed as "Unused" */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )

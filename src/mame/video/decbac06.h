@@ -15,14 +15,15 @@
 class deco_bac06_device : public device_t
 {
 public:
-	deco_bac06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	deco_bac06_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
 	static void set_gfx_region_wide(device_t &device, int region8x8, int region16x16, int wide);
 
-	UINT16* m_pf_data;
-	UINT16* m_pf_rowscroll, *m_pf_colscroll;
+	std::unique_ptr<UINT16[]> m_pf_data;
+	std::unique_ptr<UINT16[]> m_pf_rowscroll;
+	std::unique_ptr<UINT16[]> m_pf_colscroll;
 
 	tilemap_t* m_pf8x8_tilemap[3];
 	tilemap_t* m_pf16x16_tilemap[3];
@@ -115,8 +116,8 @@ public:
 	DECLARE_WRITE8_MEMBER( pf_rowscroll_8bit_swap_w );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	UINT8 m_gfxregion8x8;
 	UINT8 m_gfxregion16x16;

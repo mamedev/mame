@@ -13,7 +13,7 @@
 
 const device_type WPCSND = &device_creator<wpcsnd_device>;
 
-wpcsnd_device::wpcsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+wpcsnd_device::wpcsnd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig,WPCSND,"Williams WPC Sound",tag,owner,clock, "wpcsnd", __FILE__),
 		m_cpu(*this,"bgcpu"),
 		m_ym2151(*this,"ym2151"),
@@ -107,7 +107,7 @@ void wpcsnd_device::device_reset()
 	m_reply_available = false;
 }
 
-void wpcsnd_device::static_set_gfxregion(device_t &device, const char *tag)
+void wpcsnd_device::static_set_gfxregion(device_t &device, std::string tag)
 {
 	wpcsnd_device &cpuboard = downcast<wpcsnd_device &>(device);
 	cpuboard.m_regiontag = tag;

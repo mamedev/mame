@@ -8,7 +8,7 @@
 class scramble_state : public galaxold_state
 {
 public:
-	scramble_state(const machine_config &mconfig, device_type type, const char *tag)
+	scramble_state(const machine_config &mconfig, device_type type, std::string tag)
 		: galaxold_state(mconfig, type, tag),
 		m_konami_7474(*this, "konami_7474"),
 		m_ppi8255_0(*this, "ppi8255_0"),
@@ -33,8 +33,8 @@ public:
 	UINT8 m_harem_decrypt_bit;
 	UINT8 m_harem_decrypt_clk;
 	UINT8 m_harem_decrypt_count;
-	UINT8 *m_harem_decrypted_data;
-	UINT8 *m_harem_decrypted_opcodes;
+	std::unique_ptr<UINT8[]> m_harem_decrypted_data;
+	std::unique_ptr<UINT8[]> m_harem_decrypted_opcodes;
 
 	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_custom_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ckongs_coinage_r);

@@ -9,7 +9,7 @@
 class yunsun16_state : public driver_device
 {
 public:
-	yunsun16_state(const machine_config &mconfig, device_type type, const char *tag)
+	yunsun16_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -54,9 +54,9 @@ public:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_pages);
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_yunsun16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

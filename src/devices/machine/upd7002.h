@@ -31,7 +31,7 @@ typedef device_delegate<void (int data)> upd7002_eoc_delegate;
 class upd7002_device : public device_t
 {
 public:
-	upd7002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd7002_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~upd7002_device() {}
 
 	static void set_get_analogue_callback(device_t &device, upd7002_get_analogue_delegate callback) { downcast<upd7002_device &>(device).m_get_analogue_cb = callback; }
@@ -43,9 +43,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// internal state

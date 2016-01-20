@@ -19,7 +19,7 @@
 class xtheball_state : public driver_device
 {
 public:
-	xtheball_state(const machine_config &mconfig, device_type type, const char *tag)
+	xtheball_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_tlc34076(*this, "tlc34076"),
@@ -43,7 +43,7 @@ public:
 	DECLARE_READ16_MEMBER(analogx_r);
 	DECLARE_READ16_MEMBER(analogy_watchdog_r);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
@@ -156,7 +156,7 @@ WRITE16_MEMBER(xtheball_state::bit_controls_w)
 					break;
 
 				case 8:
-					set_led_status(machine(), 0, data & 1);
+					output().set_led_value(0, data & 1);
 					break;
 			}
 		}

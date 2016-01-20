@@ -159,8 +159,8 @@ WRITE8_MEMBER(m57_state::m57_flipscreen_w)
 	m_flipscreen = (data & 0x01) ^ (~ioport("DSW2")->read() & 0x01);
 	m_bg_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	coin_counter_w(machine(), 0,data & 0x02);
-	coin_counter_w(machine(), 1,data & 0x20);
+	machine().bookkeeping().coin_counter_w(0,data & 0x02);
+	machine().bookkeeping().coin_counter_w(1,data & 0x20);
 }
 
 

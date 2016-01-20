@@ -70,7 +70,7 @@
 class abc800_state : public driver_device
 {
 public:
-	abc800_state(const machine_config &mconfig, device_type type, const char *tag) :
+	abc800_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_ctc(*this, Z80CTC_TAG),
@@ -109,21 +109,17 @@ public:
 		TIMER_ID_CASSETTE
 	};
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	void bankswitch();
 	void clock_cassette(int state);
 
 	DECLARE_READ8_MEMBER( pling_r );
-	DECLARE_READ8_MEMBER( keyboard_col_r );
-	DECLARE_WRITE8_MEMBER( keyboard_row_w );
-	DECLARE_WRITE8_MEMBER( keyboard_ctrl_w );
-	DECLARE_READ8_MEMBER( keyboard_t1_r );
 	DECLARE_WRITE8_MEMBER( hrs_w );
 	DECLARE_WRITE8_MEMBER( hrc_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
@@ -164,7 +160,7 @@ public:
 class abc800m_state : public abc800_state
 {
 public:
-	abc800m_state(const machine_config &mconfig, device_type type, const char *tag) :
+	abc800m_state(const machine_config &mconfig, device_type type, std::string tag) :
 		abc800_state(mconfig, type, tag),
 		m_crtc(*this, MC6845_TAG),
 		m_palette(*this, "palette"),
@@ -193,7 +189,7 @@ public:
 class abc800c_state : public abc800_state
 {
 public:
-	abc800c_state(const machine_config &mconfig, device_type type, const char *tag) :
+	abc800c_state(const machine_config &mconfig, device_type type, std::string tag) :
 		abc800_state(mconfig, type, tag),
 		m_trom(*this, SAA5052_TAG),
 		m_palette(*this, "palette"),
@@ -222,7 +218,7 @@ public:
 class abc802_state : public abc800_state
 {
 public:
-	abc802_state(const machine_config &mconfig, device_type type, const char *tag) :
+	abc802_state(const machine_config &mconfig, device_type type, std::string tag) :
 		abc800_state(mconfig, type, tag),
 		m_crtc(*this, MC6845_TAG),
 		m_palette(*this, "palette"),
@@ -236,10 +232,10 @@ public:
 	required_ioport m_config;
 
 	DECLARE_DRIVER_INIT(driver_init);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void bankswitch();
@@ -266,7 +262,7 @@ public:
 class abc806_state : public abc800_state
 {
 public:
-	abc806_state(const machine_config &mconfig, device_type type, const char *tag) :
+	abc806_state(const machine_config &mconfig, device_type type, std::string tag) :
 		abc800_state(mconfig, type, tag),
 		m_crtc(*this, MC6845_TAG),
 		m_palette(*this, "palette"),
@@ -286,10 +282,10 @@ public:
 	optional_shared_ptr<UINT8> m_attr_ram;
 
 	DECLARE_DRIVER_INIT(driver_init);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void bankswitch();

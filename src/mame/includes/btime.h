@@ -9,7 +9,7 @@
 class btime_state : public driver_device
 {
 public:
-	btime_state(const machine_config &mconfig, device_type type, const char *tag)
+	btime_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_rambase(*this, "rambase"),
 		m_videoram(*this, "videoram"),
@@ -39,7 +39,7 @@ public:
 	optional_shared_ptr<UINT8> m_audio_rambase;
 
 	/* video-related */
-	bitmap_ind16 *m_background_bitmap;
+	std::unique_ptr<bitmap_ind16> m_background_bitmap;
 	UINT8    m_btime_palette;
 	UINT8    m_bnj_scroll1;
 	UINT8    m_bnj_scroll2;
@@ -64,12 +64,6 @@ public:
 	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE8_MEMBER(audio_nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(lnc_w);
-	DECLARE_WRITE8_MEMBER(mmonkey_w);
-	DECLARE_WRITE8_MEMBER(btime_w);
-	DECLARE_WRITE8_MEMBER(tisland_w);
-	DECLARE_WRITE8_MEMBER(zoar_w);
-	DECLARE_WRITE8_MEMBER(disco_w);
 	DECLARE_WRITE8_MEMBER(audio_command_w);
 	DECLARE_READ8_MEMBER(audio_command_r);
 	DECLARE_READ8_MEMBER(zoar_dsw1_read);

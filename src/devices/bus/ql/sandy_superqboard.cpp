@@ -104,7 +104,7 @@ WRITE_LINE_MEMBER( sandy_superqboard_t::busy_w )
 static MACHINE_CONFIG_FRAGMENT( sandy_superqboard )
 	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, XTAL_16MHz/2)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", sandy_superqboard_floppies, "35hd", sandy_superqboard_t::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", sandy_superqboard_floppies, NULL, sandy_superqboard_t::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", sandy_superqboard_floppies, nullptr, sandy_superqboard_t::floppy_formats)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(sandy_superqboard_t, busy_w))
@@ -171,10 +171,10 @@ INPUT_CHANGED_MEMBER( sandy_superqboard_t::mouse_y_changed )
 
 INPUT_PORTS_START( sandy_superqmouse )
 	PORT_START("mouse_x")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_CHANGED_MEMBER(DEVICE_SELF, sandy_superqboard_t, mouse_x_changed, 0)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_CHANGED_MEMBER(DEVICE_SELF, sandy_superqboard_t, mouse_x_changed, nullptr)
 
 	PORT_START("mouse_y")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_CHANGED_MEMBER(DEVICE_SELF, sandy_superqboard_t, mouse_y_changed, 0)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_CHANGED_MEMBER(DEVICE_SELF, sandy_superqboard_t, mouse_y_changed, nullptr)
 
 	PORT_START("mouse_buttons")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Middle Mouse Button") PORT_CODE(MOUSECODE_BUTTON3)
@@ -212,7 +212,7 @@ ioport_constructor sandy_superqmouse_512k_t::device_input_ports() const
 //  sandy_superqboard_t - constructor
 //-------------------------------------------------
 
-sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SANDY_SUPERQBOARD, "Sandy SuperQBoard 256K", tag, owner, clock, "ql_sqboard256", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1772_TAG),
@@ -230,7 +230,7 @@ sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, const ch
 {
 }
 
-sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int ram_size) :
+sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int ram_size) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1772_TAG),
@@ -248,13 +248,13 @@ sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, device_t
 {
 }
 
-sandy_superqboard_512k_t::sandy_superqboard_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sandy_superqboard_512k_t::sandy_superqboard_512k_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: sandy_superqboard_t(mconfig, SANDY_SUPERQBOARD_512K, "Sandy SuperQBoard 512K", tag, owner, clock, "ql_sqboard512", __FILE__, 512*1024) { }
 
-sandy_superqmouse_t::sandy_superqmouse_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sandy_superqmouse_t::sandy_superqmouse_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: sandy_superqboard_t(mconfig, SANDY_SUPERQMOUSE, "Sandy SuperQMouse", tag, owner, clock, "ql_sqmouse", __FILE__, 256*1024) { }
 
-sandy_superqmouse_512k_t::sandy_superqmouse_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sandy_superqmouse_512k_t::sandy_superqmouse_512k_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: sandy_superqboard_t(mconfig, SANDY_SUPERQMOUSE_512K, "Sandy SuperQMouse 512K", tag, owner, clock, "ql_sqmouse512", __FILE__, 512*1024) { }
 
 
@@ -281,7 +281,7 @@ void sandy_superqboard_t::device_start()
 void sandy_superqboard_t::device_reset()
 {
 	m_fdc->reset();
-	m_fdc->set_floppy(NULL);
+	m_fdc->set_floppy(nullptr);
 	m_fdc->dden_w(0);
 
 	m_latch->write(0);
@@ -388,7 +388,7 @@ void sandy_superqboard_t::write(address_space &space, offs_t offset, UINT8 data)
 
 				*/
 
-				floppy_image_device *floppy = NULL;
+				floppy_image_device *floppy = nullptr;
 
 				if (BIT(data, 1))
 				{

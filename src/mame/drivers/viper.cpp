@@ -373,10 +373,11 @@ static timer_device *ds2430_bit_timer;
 class viper_state : public driver_device
 {
 public:
-	viper_state(const machine_config &mconfig, device_type type, const char *tag)
+	viper_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ata(*this, "ata")
+		m_ata(*this, "ata"),
+		m_voodoo(*this, "voodoo")
 	{
 	}
 
@@ -415,13 +416,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank);
 	DECLARE_DRIVER_INIT(viper);
 	DECLARE_DRIVER_INIT(vipercf);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(viper_vblank);
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
-	const char* epic_get_register_name(UINT32 reg);
 	void epic_update_interrupts();
 	void mpc8240_interrupt(int irq);
 	void mpc8240_epic_init();
@@ -430,6 +430,7 @@ public:
 	void DS2430_w(int bit);
 	required_device<ppc_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
+	required_device<voodoo_3_device> m_voodoo;
 };
 
 UINT32 viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -440,7 +441,7 @@ UINT32 viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bit
 
 UINT32 m_mpc8240_regs[256/4];
 
-INLINE UINT64 read64le_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, UINT64 mem_mask)
+static inline UINT64 read64le_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if (ACCESSING_BITS_0_31)
@@ -451,7 +452,7 @@ INLINE UINT64 read64le_with_32le_device_handler(read32_delegate handler, address
 }
 
 
-INLINE void write64le_with_32le_device_handler(write32_delegate handler, address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
+static inline void write64le_with_32le_device_handler(write32_delegate handler, address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if (ACCESSING_BITS_0_31)
 		handler(space, offset * 2 + 0, data >> 0, mem_mask >> 0);
@@ -459,7 +460,7 @@ INLINE void write64le_with_32le_device_handler(write32_delegate handler, address
 		handler(space, offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
 
-INLINE UINT64 read64be_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, UINT64 mem_mask)
+static inline UINT64 read64be_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result;
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
@@ -468,7 +469,7 @@ INLINE UINT64 read64be_with_32le_device_handler(read32_delegate handler, address
 }
 
 
-INLINE void write64be_with_32le_device_handler(write32_delegate handler,  address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
+static inline void write64be_with_32le_device_handler(write32_delegate handler,  address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	data = FLIPENDIAN_INT64(data);
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
@@ -1659,41 +1660,35 @@ static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, i
 
 READ64_MEMBER(viper_state::voodoo3_io_r)
 {
-	voodoo_banshee_device *device = machine().device<voodoo_banshee_device>("voodoo");
-	return read64be_with_32le_device_handler(read32_delegate(FUNC(voodoo_banshee_device::banshee_io_r), device), space, offset, mem_mask);
+	return read64be_with_32le_device_handler(read32_delegate(FUNC(voodoo_3_device::banshee_io_r), &(*m_voodoo)), space, offset, mem_mask);
 }
 WRITE64_MEMBER(viper_state::voodoo3_io_w)
 {
 //  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, space.device().safe_pc());
 
-	voodoo_banshee_device *device = machine().device<voodoo_banshee_device>("voodoo");
-	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_banshee_device::banshee_io_w), device), space, offset, data, mem_mask);
+	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_io_w), &(*m_voodoo)), space, offset, data, mem_mask);
 }
 
 READ64_MEMBER(viper_state::voodoo3_r)
 {
-	voodoo_banshee_device *device = machine().device<voodoo_banshee_device>("voodoo");
-	return read64be_with_32le_device_handler(read32_delegate(FUNC(voodoo_banshee_device::banshee_r), device), space, offset, mem_mask);
+	return read64be_with_32le_device_handler(read32_delegate(FUNC(voodoo_3_device::banshee_r), &(*m_voodoo)), space, offset, mem_mask);
 }
 WRITE64_MEMBER(viper_state::voodoo3_w)
 {
 //  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, space.device().safe_pc());
 
-	voodoo_banshee_device *device = machine().device<voodoo_banshee_device>("voodoo");
-	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_banshee_device::banshee_w), device), space, offset, data, mem_mask);
+	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_w), &(*m_voodoo)), space, offset, data, mem_mask);
 }
 
 READ64_MEMBER(viper_state::voodoo3_lfb_r)
 {
-	voodoo_banshee_device *device = machine().device<voodoo_banshee_device>("voodoo");
-	return read64be_with_32le_device_handler(read32_delegate(FUNC(voodoo_banshee_device::banshee_fb_r), device), space, offset, mem_mask);
+	return read64be_with_32le_device_handler(read32_delegate(FUNC(voodoo_3_device::banshee_fb_r), &(*m_voodoo)), space, offset, mem_mask);
 }
 WRITE64_MEMBER(viper_state::voodoo3_lfb_w)
 {
 //  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, space.device().safe_pc());
 
-	voodoo_banshee_device *device = machine().device<voodoo_banshee_device>("voodoo");
-	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_banshee_device::banshee_fb_w), device), space, offset, data, mem_mask);
+	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_fb_w), &(*m_voodoo)), space, offset, data, mem_mask);
 }
 
 
@@ -2100,7 +2095,7 @@ static MACHINE_CONFIG_START( viper, viper_state )
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, "mpc8240", mpc8240_pci_r, mpc8240_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(12, "voodoo", voodoo3_pci_r, voodoo3_pci_w)
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 
 	MCFG_DEVICE_ADD("voodoo", VOODOO_3, STD_VOODOO_3_CLOCK)
 	MCFG_VOODOO_FBMEM(8)
@@ -2503,6 +2498,18 @@ ROM_START(wcombatk) //*
 	DISK_IMAGE( "c22c02", 0, BAD_DUMP SHA1(8bd1dfbf926ad5b28fa7dafd7e31c475325ec569) )
 ROM_END
 
+ROM_START(wcombatu) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("Warzaid u39 c22d02", 0x00000, 0x2000, CRC(71744990) SHA1(19ed07572f183e7b3a712704ebddf7a848c48a78) )
+
+	DISK_REGION( "ata:0:hdd:image" )
+	// CHD image provided had evidence of being altered by Windows, probably was put in a Windows machine without write protection hardware (bad idea)
+	// label was the same as this, so this should be a clean and correct version.
+	DISK_IMAGE( "c22d02", 0, SHA1(69a24c9e36b073021d55bec27d89fcc0254a60cc) ) // chs 978,8,3
+ROM_END
+
 ROM_START(wcombatj) //*
 	VIPER_BIOS
 
@@ -2635,8 +2642,9 @@ GAME(2001, thrild2a,  thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Ko
 GAME(2001, thrild2c,  thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, tsurugi,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, tsurugij,  tsurugi,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver JAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, wcombat,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver UAA?)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, wcombatk,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver KBC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, wcombat,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, wcombatk,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver KBC:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, wcombatu,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat / Warzaid (ver UCD:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, wcombatj,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, xtrial,    kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Xtrial Racing (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 

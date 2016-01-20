@@ -93,7 +93,7 @@ There are some unmapped writes past the end of text ram too
 class blackt96_state : public driver_device
 {
 public:
-	blackt96_state(const machine_config &mconfig, device_type type, const char *tag)
+	blackt96_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_tilemapram(*this, "tilemapram"),
 		m_spriteram0(*this, "spriteram0"),
@@ -152,7 +152,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg5_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg6_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg7_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_strip(bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int column);
 	void draw_page(bitmap_ind16 &bitmap, const rectangle &cliprect, int page);

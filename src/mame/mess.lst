@@ -77,6 +77,7 @@ smssdisp  // Sega Master System Store Display Unit
 megadrij  // 1988 Sega Mega Drive (Japan)
 genesis   // 1989 Sega Genesis (USA)
 megadriv  // 1990 Sega Mega Drive (Europe)
+genesis_tmss //
 pico      // 1994 Sega Pico (Europe)
 picou    // 1994 Sega Pico (USA)
 picoj    // 1993 Sega Pico (Japan)
@@ -115,9 +116,11 @@ dcjp      // 1998 Sega Dreamcast (Japan)
 dc  // 1999 Sega Dreamcast (USA)
 dceu      // 1999 Sega Dreamcast (Europe)
 dcdev    // 1998 Sega HKT-0120 Sega Dreamcast Development Box
-dcprt    // 1998 Sega Katana Set 5 Prototype
 
 svmu     // 1998 Sega Visual Memory Unit
+
+// Sequential Circuits
+prpht600	// 1983 Sequential Circuits
 
 // Sony
 psj    // 1994 Sony PlayStation (Japan)
@@ -259,6 +262,7 @@ telngtcs
 krvnjvtv
 oc2000
 mpt05
+h21     // TRQ Video Computer H-21
 
 
 // Game Park
@@ -324,7 +328,10 @@ neocdz  // NeoGeo CDZ
 neocdzj //
 
 // Philips
-cdimono1  // Philips CD-i (Mono-I board)
+cdimono1  // Philips CD-i model 200 (Mono-I board, PAL)
+cdimono2  // Philips CD-i model 220 (Mono-II board, NTSC)
+cdi910 //
+cdi490a //
 
 // Yamaha
 mu100   // 1997 MU-100
@@ -341,12 +348,16 @@ sc55    // 1991 Sound Canvas SC-55
 
 // Acorn
 acrnsys1  // 1979 Acorn System 1 (Microcomputer Kit)
+a6809
 atom      // 1979 Acorn Atom
 atomeb    // 1979 Acorn Atom
 atombb    // 1979 Acorn Atom
 //prophet2
 bbca      // 1981 BBC Micro Model A
 bbcb      // 1981 BBC Micro Model B w/8271 FDC
+torchf    // 1982 Torch CF240
+torchh10  // 1982 Torch CH240/10
+torchh21  // 1982 Torch CH240/21
 bbcb_de   // 1982 BBC Micro Model B (German)
 bbcb_us   // 1983 BBC Micro Model B (US)
 electron  // 1983 Acorn Electron
@@ -372,7 +383,6 @@ a3010     // 1988 Acorn Archimedes 3010
 a3020     // 1988 Acorn Archimedes 3020
 a7000     // 1995 Acorn Archimedes 7000
 a7000p    // 1997 Acorn Archimedes 7000+
-a6809
 rpc600
 rpc700
 sarpc
@@ -1021,9 +1031,10 @@ zslc3000 // Sharp Zaurus SL-C3000 "Spitz"
 zslc1000 // Sharp Zaurus SL-C1000 "Akita"
 
 // Silicon Graphics
-sgi_ip2 // IP2: IRIS 2x00, 68020, 16MHz
+sgi_ip2 // IP2: IRIS 3xx0, 68020, 16MHz
 sgi_ip6   // IP6: 4D/PI, R2000, 20MHz
-ip204415  // IP20: Indigo 1, R4400, 150MHz
+indigo3k  // IP12: Indigo 1, R3000, 33MHz
+indigo4k  // IP20: Indigo 1, R4400, 150MHz
 ip225015  // IP22: Indy, R5000, 150MHz
 ip224613    // IP22: Indy, R4600, 133MHz
 ip244415    // IP24: Indigo 2, R4400, 150MHz
@@ -1281,6 +1292,7 @@ iq128    // 1997 Genius IQ 128 (Germany)
 iqtv512 // IQ TV512 (Germany)
 pc1000 // 1988 PreComputer 1000
 misterx // 1988 (Yeno) MisterX
+ordisava // 1988 Ordisavant (France)
 pc2000 // 1993 PreComputer 2000
 gl2000 // 1993 Genius Leader 2000
 gl2000p // 1993 Genius Leader 2000 Plus
@@ -1302,6 +1314,8 @@ gwnf     // Genius Winner Notebook Fun (Germany)
 gl6000sl // Genius Leader 6000SL (Germany)
 gl7007sl // Genius Leader 7007SL (Germany)
 glcolor  // Genius Leader Color (Germany)
+snotec   // Bandai Super Note Club (Japan)
+snotecex // Bandai Super Note Club EX (Japan)
 glmcolor // Genius Leader Magic Color (Germany)
 glscolor // Genius Leader Super Color (Germany)
 gjrstar3 // Genius Junior Redstar 3 (Germany)
@@ -1773,6 +1787,9 @@ tmc600s2
 //osc1000b
 nano
 
+// Escola Politecnica da USP (Brazil)
+patinho // 1972 Patinho Feio
+
 // MIT
 tx0_64kw  // April 1956 MIT TX-0 (64kw RAM)
 tx0_8kw   // 1962 MIT TX-0 (8kw RAM)
@@ -1992,8 +2009,9 @@ pcm   // PC/M Mugler
 pecom32
 pecom64
 
-// Samsung SPC-1000
+// Samsung Electronics
 spc1000
+spc1500
 
 // PolyMorphic Systems
 poly88
@@ -2015,6 +2033,8 @@ newbrainmd
 // Nokia Data
 mm1m6
 mm1m7
+
+noki3310
 
 // Nuova Elettronica
 z80ne    // 1980 - Z80NE
@@ -2092,6 +2112,7 @@ swtpc09d3 // S09, DMF3 Floppy UNIBUG U3 rom - UniFLEX U3
 imds2 // Intellec MDS series-II
 
 //***************Games******************************************************
+
 // Computer Electronic
 ccmk1      // Chess Champion MK I
 // Quelle International
@@ -2107,6 +2128,19 @@ sexpertb // 1988 Novag Expert B Chess Computer
 sfortec  // 1989 Novag Super Forte C Chess Computer
 sexpertc // 1989 Novag Super Expert C Chess Computer
 diablo68 // 1991 Novag Diablo 68000 Chess Computer
+
+// Fidelity
+cc10
+vcc
+vccg
+vccfr
+vccsp
+uvc
+bridgec3
+vbrc
+vsc
+csc
+fexcelv
 
 // Hegener & Glaser Munich
 //mephisto  // Mephisto 1 - roms needed - not in driver
@@ -2240,6 +2274,7 @@ elecdet     // Ideal
 starwbc     // Kenner
 starwbcp    // Kenner (patent)
 astro       // Kosmos
+mdndclab    // Mattel
 comp4       // Milton Bradley
 simon       // Milton Bradley
 ssimon      // Milton Bradley
@@ -2253,21 +2288,40 @@ splitsec    // Parker Bros
 mmerlin     // Parker Bros
 tandy12     // Tandy Radio Shack
 tbreakup    // Tomy
+phpball     // Tomy
 
 // hh_tms1k derivatives
 elecbowl    // Marx
 mbdtower    // Milton Bradley
 
-// hh_tms1k tispeak.c
+// hh_tms1k ticalc1x.cpp
+tisr16
+tisr16ii
+ti1250
+ti125076
+ti1270
+ti1000
+ti30
+tiprog
+tibusan
+wizatron
+lilprof
+lilprof78
+dataman
+
+// hh_tms1k tispeak.cpp
 snspell
 snspellp
-snspella
-snspellb
+snspellua
+snspellub
 snspelluk
 snspelluka
 snspelljp
 snspellfr
 snspellit
+snspellc
+snspellca
+snspellcuk
 snmath
 snmathp
 snread
@@ -2278,18 +2332,9 @@ tntellfr
 tntellp
 vocaid
 
-// hh_tms1k ticalc1x.c
-tisr16
-tisr16ii
-ti1270
-ti1000
-ti30
-tiprog
-tibusan1
-wizatron
-lilprof
-lilprof78
-dataman
+// hh_tms1k tispellb.cpp
+spellb
+mrchalgr
 
 // hh_ucom4
 ufombs      // Bambino
@@ -2327,7 +2372,7 @@ wildfire    // Parker Bros
 
 ssem // Manchester Small-Scale Experimental Machine, "Baby"
 craft // Craft, by [lft]
-
+r9751 // ROLM 9751 phone system
 
 //********** To sort (mostly skeleton drivers) *****************************
 
@@ -2343,6 +2388,7 @@ c80
 ds348 //Sigtron Daruma
 mc1000
 d6809
+mp68a
 mk85
 mk90
 elwro800
@@ -2518,11 +2564,6 @@ dms5000
 dms86
 codata
 rvoicepc
-vcc
-uvc
-bridgec3
-vbrc
-vsc
 victor9k
 phc25
 phc25j
@@ -2578,7 +2619,6 @@ czk80
 c10
 k8915
 mes
-cc10
 systec
 p112
 selz80
@@ -2599,6 +2639,7 @@ tek4052a
 //tek4054
 tek4107a
 tek4109a
+tekxp330
 phunsy
 ob68k1a
 vta2000
@@ -2656,7 +2697,6 @@ cvicny
 pc486mu
 mstation
 mbc200
-csc
 chesstrv
 alphatro
 ax20
@@ -2752,6 +2792,7 @@ tecnbras
 minicom
 mcom4_02
 gameking
+gamekin3
 leapster
 leapstertv
 excali64
@@ -2767,3 +2808,15 @@ micral
 rd100
 proteus3
 unichamp
+st1700h
+st1701
+st1702
+st1703
+st1704
+st1705
+st1706
+st1707
+st1708
+st1714
+sanfuze2
+marywu

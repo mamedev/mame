@@ -26,7 +26,7 @@ class inder_vid_device :  public device_t
 {
 public:
 	// construction/destruction
-	inder_vid_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	inder_vid_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	required_shared_ptr<UINT16> m_vram;
 	required_device<palette_device> m_palette;
@@ -40,9 +40,9 @@ public:
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 };

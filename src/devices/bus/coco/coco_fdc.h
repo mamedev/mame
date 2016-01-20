@@ -34,16 +34,16 @@ class coco_fdc_device :
 {
 public:
 		// construction/destruction
-		coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-		coco_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+		coco_fdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+		coco_fdc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 		DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
-		virtual const rom_entry *device_rom_region() const;
+		virtual machine_config_constructor device_mconfig_additions() const override;
+		virtual const rom_entry *device_rom_region() const override;
 
-		virtual UINT8* get_cart_base();
+		virtual UINT8* get_cart_base() override;
 
 		virtual void update_lines();
 		virtual void dskreg_w(UINT8 data);
@@ -55,9 +55,9 @@ public:
 		DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 protected:
 		// device-level overrides
-		virtual void device_start();
-		virtual DECLARE_READ8_MEMBER(read);
-		virtual DECLARE_WRITE8_MEMBER(write);
+		virtual void device_start() override;
+		virtual DECLARE_READ8_MEMBER(read) override;
+		virtual DECLARE_WRITE8_MEMBER(write) override;
 
 		coco_rtc_type_t real_time_clock();
 
@@ -89,10 +89,10 @@ class coco_fdc_v11_device :
 {
 public:
 		// construction/destruction
-		coco_fdc_v11_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		coco_fdc_v11_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
-		virtual const rom_entry *device_rom_region() const;
+		virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -106,10 +106,10 @@ class coco3_hdb1_device :
 {
 public:
 		// construction/destruction
-		coco3_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		coco3_hdb1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
-		virtual const rom_entry *device_rom_region() const;
+		virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -123,10 +123,10 @@ class cp400_fdc_device :
 {
 public:
 		// construction/destruction
-		cp400_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		cp400_fdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
-		virtual const rom_entry *device_rom_region() const;
+		virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -140,20 +140,19 @@ class dragon_fdc_device :
 {
 public:
 		// construction/destruction
-		dragon_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-		dragon_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+		dragon_fdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+		dragon_fdc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
-		virtual const rom_entry *device_rom_region() const;
-		virtual void update_lines();
-		virtual void dskreg_w(UINT8 data);
+		virtual machine_config_constructor device_mconfig_additions() const override;
+		virtual const rom_entry *device_rom_region() const override;
+		virtual void update_lines() override;
+		virtual void dskreg_w(UINT8 data) override;
 protected:
 		// device-level overrides
-		virtual void device_start();
-		virtual DECLARE_READ8_MEMBER(read);
-		virtual DECLARE_WRITE8_MEMBER(write);
-private:
+		virtual void device_start() override;
+		virtual DECLARE_READ8_MEMBER(read) override;
+		virtual DECLARE_WRITE8_MEMBER(write) override;
 };
 
 
@@ -167,10 +166,10 @@ class sdtandy_fdc_device :
 {
 public:
 		// construction/destruction
-		sdtandy_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		sdtandy_fdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
-		virtual const rom_entry *device_rom_region() const;
+		virtual const rom_entry *device_rom_region() const override;
 };
 
 

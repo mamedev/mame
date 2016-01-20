@@ -47,7 +47,7 @@ To Do:
 class sbrain_state : public driver_device
 {
 public:
-	sbrain_state(const machine_config &mconfig, device_type type, const char *tag) :
+	sbrain_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -153,7 +153,7 @@ WRITE8_MEMBER( sbrain_state::port08_w )
 {
 	m_port08 = data | 0xc0;
 
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 	if (BIT(m_port08, 1)) floppy = m_floppy0->get_device();
 	if (BIT(m_port08, 2)) floppy = m_floppy1->get_device();
 

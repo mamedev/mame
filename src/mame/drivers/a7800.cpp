@@ -112,7 +112,7 @@
 class a7800_state : public driver_device
 {
 public:
-	a7800_state(const machine_config &mconfig, device_type type, const char *tag)
+	a7800_state(const machine_config &mconfig, device_type type, std::string tag)
 	: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_tia(*this, "tia"),
@@ -135,15 +135,12 @@ public:
 	int m_bios_enabled;
 
 	DECLARE_READ8_MEMBER(bios_or_cart_r);
-	DECLARE_WRITE8_MEMBER(ram0_w);
 	DECLARE_READ8_MEMBER(tia_r);
 	DECLARE_WRITE8_MEMBER(tia_w);
-	DECLARE_READ8_MEMBER(maria_r);
-	DECLARE_WRITE8_MEMBER(maria_w);
 	DECLARE_DRIVER_INIT(a7800_pal);
 	DECLARE_DRIVER_INIT(a7800_ntsc);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(a7800);
 	DECLARE_PALETTE_INIT(a7800p);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
@@ -284,7 +281,7 @@ static ADDRESS_MAP_START( a7800_mem, AS_PROGRAM, 8, a7800_state )
 	AM_RANGE(0x0020, 0x003f) AM_MIRROR(0x300) AM_DEVREADWRITE("maria", atari_maria_device, read, write)
 	AM_RANGE(0x0040, 0x00ff) AM_RAMBANK("zpmirror") // mirror of 0x2040-0x20ff, for zero page
 	AM_RANGE(0x0140, 0x01ff) AM_RAMBANK("spmirror") // mirror of 0x2140-0x21ff, for stack page
-	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x60) AM_DEVICE("riot", mos6532_t, io_map)
+	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x160) AM_DEVICE("riot", mos6532_t, io_map)
 	AM_RANGE(0x0480, 0x04ff) AM_MIRROR(0x100) AM_DEVICE("riot", mos6532_t, ram_map)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("6116_1")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("6116_2")
@@ -1381,7 +1378,7 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 	MCFG_MOS6530n_IN_PB_CB(READ8(a7800_state, riot_console_button_r))
 	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a7800_state, riot_button_pullup_w))
 
-	MCFG_A78_CARTRIDGE_ADD("cartslot", a7800_cart, NULL)
+	MCFG_A78_CARTRIDGE_ADD("cartslot", a7800_cart, nullptr)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","a7800")

@@ -24,7 +24,7 @@ class mas3507d_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
-	mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mas3507d_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	int i2c_scl_r();
 	int i2c_sda_r();
@@ -32,9 +32,9 @@ public:
 	void i2c_sda_w(bool line);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	enum { IDLE, STARTED, NAK, ACK, ACK2 } i2c_bus_state;

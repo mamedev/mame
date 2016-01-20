@@ -105,7 +105,7 @@ const rom_entry *abc1600_mac_device::device_rom_region() const
 //  abc1600_mac_device - constructor
 //-------------------------------------------------
 
-abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ABC1600_MAC, "ABC 1600 MAC", tag, owner, clock, "abc1600mac", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, *ADDRESS_MAP_NAME(program_map)),
@@ -125,7 +125,7 @@ void abc1600_mac_device::device_start()
 {
 	// get the CPU device
 	m_cpu = machine().device<m68000_base_device>(m_cpu_tag);
-	assert(m_cpu != NULL);
+	assert(m_cpu != nullptr);
 
 	// allocate memory
 	m_segment_ram.allocate(0x400);
@@ -160,7 +160,7 @@ void abc1600_mac_device::device_reset()
 
 const address_space_config *abc1600_mac_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_PROGRAM) ? &m_space_config : NULL;
+	return (spacenum == AS_PROGRAM) ? &m_space_config : nullptr;
 }
 
 

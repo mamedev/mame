@@ -27,7 +27,7 @@
 class imsai_state : public driver_device
 {
 public:
-	imsai_state(const machine_config &mconfig, device_type type, const char *tag)
+	imsai_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG),
@@ -44,7 +44,7 @@ public:
 
 private:
 	UINT8 m_term_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<i8251_device> m_uart;

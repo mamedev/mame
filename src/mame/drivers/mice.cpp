@@ -25,7 +25,7 @@ The connection to the outside world is via RS232 to a terminal.
 class mice_state : public driver_device
 {
 public:
-	mice_state(const machine_config &mconfig, device_type type, const char *tag)
+	mice_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG)
@@ -38,7 +38,7 @@ public:
 	DECLARE_READ8_MEMBER(port51_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 

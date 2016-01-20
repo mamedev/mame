@@ -69,7 +69,7 @@ LEGACY_FLOPPY_OPTIONS_START( nes_only )
 		"NES floppy disk image",
 		nes_dsk_identify,
 		nes_dsk_construct,
-		NULL,
-		NULL
+		nullptr,
+		nullptr
 	)
 LEGACY_FLOPPY_OPTIONS_END0

@@ -22,7 +22,7 @@ public:
 		TIMER_RAISE_IRQ
 	};
 
-	toaplan2_state(const machine_config &mconfig, device_type type, const char *tag)
+	toaplan2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_shared_ram(*this, "shared_ram"),
 		m_shared_ram16(*this, "shared_ram16"),
@@ -151,7 +151,6 @@ public:
 	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq2);
 	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq4);
 	INTERRUPT_GEN_MEMBER(bbakraid_snd_interrupt);
-	TIMER_CALLBACK_MEMBER(toaplan2_raise_irq);
 	void truxton2_postload();
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
 	void toaplan2_vblank_irq(int irq_line);
@@ -162,5 +161,5 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(toaplan2_reset);
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

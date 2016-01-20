@@ -521,7 +521,7 @@ ROM_START( bloodbro )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "bb_07.u1016.6a",   0x000000, 0x08000, CRC(411b94e8) SHA1(6968441f64212c0935afeca68f07deaadf86d614) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) ) /* characters */
@@ -547,7 +547,7 @@ ROM_START( bloodbroa )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "bb_07.u1016.6a",   0x000000, 0x08000, CRC(411b94e8) SHA1(6968441f64212c0935afeca68f07deaadf86d614) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) ) /* characters */
@@ -573,7 +573,7 @@ ROM_START( bloodbrob )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "bb_07.u1016.6a",   0x000000, 0x08000, CRC(411b94e8) SHA1(6968441f64212c0935afeca68f07deaadf86d614) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) ) /* characters */
@@ -600,7 +600,7 @@ ROM_START( weststry )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for sound cpu code */
 	ROM_LOAD( "ws17.bin",    0x000000, 0x08000, CRC(e00a8f09) SHA1(e7247ce0ab99d0726f31dee5de5ba33f4ebd183e) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) // first half of these is blank
 	ROM_LOAD( "ws09.bin", 0x00000, 0x08000, CRC(f05b2b3e) SHA1(6570d795d68655ace9668f32dc0bf5c2d2372411) )  /* characters */
@@ -646,7 +646,7 @@ ROM_START( skysmash )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "rom2",        0x000000, 0x08000, CRC(75b194cf) SHA1(6aaf36cdab06c0aa5328f5176557387a5d3f7d26) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "rom3", 0x00000, 0x10000, CRC(fbb241be) SHA1(cd94c328891538bbd8c062d90a47ddf3d7d05bb0) )  /* characters */

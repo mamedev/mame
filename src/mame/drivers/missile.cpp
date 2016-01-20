@@ -357,7 +357,7 @@ Super Missile Attack Board Layout
 class missile_state : public driver_device
 {
 public:
-	missile_state(const machine_config &mconfig, device_type type, const char *tag)
+	missile_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_videoram(*this, "videoram"),
@@ -400,11 +400,10 @@ public:
 	DECLARE_WRITE8_MEMBER(missile_w);
 	DECLARE_READ8_MEMBER(missile_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
-	DECLARE_DIRECT_UPDATE_MEMBER(missile_direct_handler);
 	DECLARE_DRIVER_INIT(missilem);
 	DECLARE_DRIVER_INIT(suprmatk);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	inline int scanline_to_v(int scanline);
@@ -671,7 +670,7 @@ UINT32 missile_state::screen_update_missile(screen_device &screen, bitmap_ind16 
 
 		int effy = m_flipscreen ? ((256+24 - y) & 0xff) : y;
 		UINT8 *src = &videoram[effy * 64];
-		UINT8 *src3 = NULL;
+		UINT8 *src3 = nullptr;
 
 		/* compute the base of the 3rd pixel row */
 		if (effy >= 224)
@@ -684,7 +683,7 @@ UINT32 missile_state::screen_update_missile(screen_device &screen, bitmap_ind16 
 			pix = ((pix >> 2) & 4) | ((pix << 1) & 2);
 
 			/* if we're in the lower region, get the 3rd bit */
-			if (src3 != NULL)
+			if (src3 != nullptr)
 				pix |= (src3[(x / 8) * 2] >> (x & 7)) & 1;
 
 			dst[x] = pix;
@@ -729,11 +728,11 @@ WRITE8_MEMBER(missile_state::missile_w)
 	else if (offset < 0x4900)
 	{
 		m_flipscreen = ~data & 0x40;
-		coin_counter_w(machine(), 0, data & 0x20);
-		coin_counter_w(machine(), 1, data & 0x10);
-		coin_counter_w(machine(), 2, data & 0x08);
-		set_led_status(machine(), 1, ~data & 0x04);
-		set_led_status(machine(), 0, ~data & 0x02);
+		machine().bookkeeping().coin_counter_w(0, data & 0x20);
+		machine().bookkeeping().coin_counter_w(1, data & 0x10);
+		machine().bookkeeping().coin_counter_w(2, data & 0x08);
+		output().set_led_value(1, ~data & 0x04);
+		output().set_led_value(0, ~data & 0x02);
 		m_ctrld = data & 1;
 	}
 

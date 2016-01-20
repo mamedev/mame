@@ -6,13 +6,6 @@
 #define X_OFFSET 96
 #define Y_OFFSET 60
 
-struct polyVert
-{
-	float x;
-	float y;
-	float z;
-};
-
 
 galastrm_renderer::galastrm_renderer(galastrm_state& state)
 	: poly_manager<float, gs_poly_data, 2, 10000>(state.machine())
@@ -26,9 +19,9 @@ galastrm_renderer::galastrm_renderer(galastrm_state& state)
 
 void galastrm_state::video_start()
 {
-	m_spritelist = auto_alloc_array(machine(), struct gs_tempsprite, 0x4000);
+	m_spritelist = std::make_unique<gs_tempsprite[]>(0x4000);
 
-	m_poly = auto_alloc(machine(), galastrm_renderer(*this));
+	m_poly = std::make_unique<galastrm_renderer>(*this);
 
 	m_screen->register_screen_bitmap(m_tmpbitmaps);
 	m_screen->register_screen_bitmap(m_poly->screenbits());
@@ -94,7 +87,7 @@ void galastrm_state::draw_sprites_pre(int x_offs, int y_offs)
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
-	m_sprite_ptr_pre = m_spritelist;
+	m_sprite_ptr_pre = m_spritelist.get();
 
 	for (offs = (m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
 	{
@@ -191,7 +184,7 @@ void galastrm_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 {
 	struct gs_tempsprite *sprite_ptr = m_sprite_ptr_pre;
 
-	while (sprite_ptr != m_spritelist)
+	while (sprite_ptr != m_spritelist.get())
 	{
 		sprite_ptr--;
 
@@ -231,6 +224,13 @@ void galastrm_renderer::tc0610_draw_scanline(INT32 scanline, const extent_t& ext
 
 void galastrm_renderer::tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectangle &clip)
 {
+	struct polyVert
+	{
+		float x;
+		float y;
+//      float z;
+	} tmpz[4];
+
 	vertex_t vert[4];
 	int rsx = m_state.m_tc0610_ctrl_reg[1][0];
 	int rsy = m_state.m_tc0610_ctrl_reg[1][1];
@@ -372,19 +372,19 @@ void galastrm_renderer::tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectan
 	}
 
 	{
-		polyVert tmpz[4];
+//      polyVert tmpz[4];
 		tmpz[0].x = ((float)(-zx)  * zcs) - ((float)(-zy)  * zsn);
 		tmpz[0].y = ((float)(-zx)  * zsn) + ((float)(-zy)  * zcs);
-		tmpz[0].z = 0.0;
+//      tmpz[0].z = 0.0;
 		tmpz[1].x = ((float)(-zx)  * zcs) - ((float)(zy-1) * zsn);
 		tmpz[1].y = ((float)(-zx)  * zsn) + ((float)(zy-1) * zcs);
-		tmpz[1].z = 0.0;
+//      tmpz[1].z = 0.0;
 		tmpz[2].x = ((float)(zx-1) * zcs) - ((float)(zy-1) * zsn);
 		tmpz[2].y = ((float)(zx-1) * zsn) + ((float)(zy-1) * zcs);
-		tmpz[2].z = 0.0;
+//      tmpz[2].z = 0.0;
 		tmpz[3].x = ((float)(zx-1) * zcs) - ((float)(-zy)  * zsn);
 		tmpz[3].y = ((float)(zx-1) * zsn) + ((float)(-zy)  * zcs);
-		tmpz[3].z = 0.0;
+//      tmpz[3].z = 0.0;
 
 		vert[0].x = tmpz[0].x + (float)(lx / 2);
 		vert[0].y = tmpz[0].y + (float)(ly / 2);

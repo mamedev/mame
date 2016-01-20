@@ -38,11 +38,11 @@ const device_type MEGADUCK_CART_SLOT = &device_creator<megaduck_cart_slot_device
 
 device_gb_cart_interface::device_gb_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-	  m_rom(NULL),
-	  m_rom_size(0), m_ram_bank(0), m_latch_bank(0), m_latch_bank2(0),
-	  has_rumble(false),
-	  has_timer(false),
-	  has_battery(false)
+		m_rom(nullptr),
+		m_rom_size(0), m_ram_bank(0), m_latch_bank(0), m_latch_bank2(0),
+		has_rumble(false),
+		has_timer(false),
+		has_battery(false)
 {
 }
 
@@ -59,9 +59,9 @@ device_gb_cart_interface::~device_gb_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_gb_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_gb_cart_interface::rom_alloc(UINT32 size, std::string tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = device().machine().memory().region_alloc(std::string(tag).append(GBSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
@@ -137,7 +137,7 @@ void device_gb_cart_interface::ram_map_setup(UINT8 banks)
 //-------------------------------------------------
 //  base_gb_cart_slot_device - constructor
 //-------------------------------------------------
-base_gb_cart_slot_device::base_gb_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+base_gb_cart_slot_device::base_gb_cart_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 						device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -146,12 +146,12 @@ base_gb_cart_slot_device::base_gb_cart_slot_device(const machine_config &mconfig
 {
 }
 
-gb_cart_slot_device::gb_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+gb_cart_slot_device::gb_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						base_gb_cart_slot_device(mconfig, GB_CART_SLOT, "Game Boy Cartridge Slot", tag, owner, clock, "gb_cart_slot", __FILE__)
 {
 }
 
-megaduck_cart_slot_device::megaduck_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+megaduck_cart_slot_device::megaduck_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						base_gb_cart_slot_device(mconfig, MEGADUCK_CART_SLOT, "Megaduck Cartridge Slot", tag, owner, clock, "megaduck_cart_slot", __FILE__)
 {
 }
@@ -232,10 +232,10 @@ static const gb_slot slot_list[] =
 
 static int gb_get_pcb_id(const char *slot)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(slot_list[i].slot_option, slot))
-			return slot_list[i].pcb_id;
+		if (!core_stricmp(elem.slot_option, slot))
+			return elem.pcb_id;
 	}
 
 	return 0;
@@ -243,10 +243,10 @@ static int gb_get_pcb_id(const char *slot)
 
 static const char *gb_get_slot(int type)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (slot_list[i].pcb_id == type)
-			return slot_list[i].slot_option;
+		if (elem.pcb_id == type)
+			return elem.slot_option;
 	}
 
 	return "rom";
@@ -262,13 +262,13 @@ bool base_gb_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 offset = 0;
-		UINT32 len = (software_entry() == NULL) ? length() : get_software_region_length("rom");
+		UINT32 offset;
+		UINT32 len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
 		UINT8 *ROM;
 		int rambanks = 0;
 
 		// From fullpath, check for presence of a header and skip it + check filesize is valid
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			if ((len % 0x4000) == 512)
 			{
@@ -288,7 +288,7 @@ bool base_gb_cart_slot_device::call_load()
 		m_cart->rom_alloc(len, tag());
 		ROM = m_cart->get_rom_base();
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 			fread(ROM, len);
 		else
 			memcpy(ROM, get_software_region("rom"), len);
@@ -298,7 +298,7 @@ bool base_gb_cart_slot_device::call_load()
 		if (get_mmm01_candidate(ROM, len))
 			offset = len - 0x8000;
 
-		if (software_entry() != NULL)
+		if (software_entry() != nullptr)
 			m_type = gb_get_pcb_id(get_feature("slot") ? get_feature("slot") : "rom");
 		else
 			m_type = get_cart_type(ROM + offset, len - offset);
@@ -312,7 +312,7 @@ bool base_gb_cart_slot_device::call_load()
 			m_cart->set_additional_wirings(0x0f, -1);
 
 		// setup RAM/NVRAM/RTC/RUMBLE
-		if (software_entry() != NULL)
+		if (software_entry() != nullptr)
 		{
 			// from softlist we only rely on xml
 			if (get_software_region("ram"))
@@ -413,11 +413,11 @@ bool megaduck_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 len = (software_entry() == NULL) ? length() : get_software_region_length("rom");
+		UINT32 len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
 
 		m_cart->rom_alloc(len, tag());
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 			fread(m_cart->get_rom_base(), len);
 		else
 			memcpy(m_cart->get_rom_base(), get_software_region("rom"), len);
@@ -457,7 +457,7 @@ void base_gb_cart_slot_device::setup_ram(UINT8 banks)
 
 bool base_gb_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 	return true;
 }
 
@@ -600,11 +600,11 @@ int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
  get default card software
  -------------------------------------------------*/
 
-void base_gb_cart_slot_device::get_default_card_software(std::string &result)
+std::string base_gb_cart_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "rom";
+		const char *slot_string;
 		UINT32 len = core_fsize(m_file), offset = 0;
 		dynamic_buffer rom(len);
 		int type;
@@ -623,23 +623,19 @@ void base_gb_cart_slot_device::get_default_card_software(std::string &result)
 		//printf("type: %s\n", slot_string);
 		clear();
 
-		result.assign(slot_string);
-		return;
+		return std::string(slot_string);
 	}
 
-	software_get_default_slot(result, "rom");
+	return software_get_default_slot("rom");
 }
 
 
-void megaduck_cart_slot_device::get_default_card_software(std::string &result)
+std::string megaduck_cart_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
-	{
-		result.assign("rom");
-		return;
-	}
+		return std::string("rom");
 
-	software_get_default_slot(result, "rom");
+	return software_get_default_slot("rom");
 }
 
 
@@ -788,12 +784,12 @@ void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 		{0x5301, "American Sammy"},
 		{0x4701, "Spectrum Holobyte"},
 		{0x1801, "Hudson Soft"},
-		{0x0000, NULL}
+		{0x0000, nullptr}
 	};
 	static const int ramsize[8] = { 0, 2, 8, 32, 128, 64, 0, 0 };
 
 	char soft[17];
-	UINT32 tmp = 0;
+	UINT32 tmp;
 	int csum = 0, i = 0;
 	int rom_banks;
 

@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    ui/imgcntrl.c
+    ui/imgcntrl.cpp
 
     MESS's clunky built-in file manager
 
@@ -28,17 +28,17 @@
 //-------------------------------------------------
 
 ui_menu_control_device_image::ui_menu_control_device_image(running_machine &machine, render_container *container, device_image_interface *_image)
-	: ui_menu(machine, container), 
-	  submenu_result(0), 
-	  create_ok(false), 
-	  create_confirmed(false)
+	: ui_menu(machine, container),
+		submenu_result(0),
+		create_ok(false),
+		create_confirmed(false)
 {
 	image = _image;
 
-	sld = 0;
+	sld = nullptr;
 	if (image->software_list_name()) {
 		software_list_device_iterator iter(machine.config().root_device());
-		for (software_list_device *swlist = iter.first(); swlist != NULL; swlist = iter.next())
+		for (software_list_device *swlist = iter.first(); swlist != nullptr; swlist = iter.next())
 		{
 			if (strcmp(swlist->list_name(),image->software_list_name())==0) sld = swlist;
 		}
@@ -64,7 +64,7 @@ ui_menu_control_device_image::ui_menu_control_device_image(running_machine &mach
 			current_directory.assign(image->working_directory());
 
 		/* check to see if the path exists; if not clear it */
-		if (zippath_opendir(current_directory.c_str(), NULL) != FILERR_NONE)
+		if (zippath_opendir(current_directory.c_str(), nullptr) != FILERR_NONE)
 			current_directory.clear();
 	}
 }
@@ -94,7 +94,7 @@ void ui_menu_control_device_image::test_create(bool &can_create, bool &need_conf
 
 	/* does a file or a directory exist at the path */
 	entry = osd_stat(path.c_str());
-	file_type = (entry != NULL) ? entry->type : ENTTYPE_NONE;
+	file_type = (entry != nullptr) ? entry->type : ENTTYPE_NONE;
 
 	switch(file_type)
 	{
@@ -124,7 +124,7 @@ void ui_menu_control_device_image::test_create(bool &can_create, bool &need_conf
 			break;
 	}
 
-	if (entry != NULL)
+	if (entry != nullptr)
 		osd_free(entry);
 }
 
@@ -146,7 +146,7 @@ void ui_menu_control_device_image::load_software_part()
 		hook_load(temp_name, true);
 	else
 	{
-		machine().popmessage("The selected game is missing one or more required ROM or CHD images. Please select a different game.");
+		machine().popmessage("The software selected is missing one or more required ROM or CHD images. Please select a different one.");
 		state = SELECT_SOFTLIST;
 	}
 }
@@ -183,27 +183,27 @@ void ui_menu_control_device_image::handle()
 	case START_FILE: {
 		bool can_create = false;
 		if(image->is_creatable()) {
-			zippath_directory *directory = NULL;
+			zippath_directory *directory = nullptr;
 			file_error err = zippath_opendir(current_directory.c_str(), &directory);
 			can_create = err == FILERR_NONE && !zippath_is_zip(directory);
 			if(directory)
 				zippath_closedir(directory);
 		}
 		submenu_result = -1;
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_selector(machine(), container, image, current_directory, current_file, true, image->image_interface()!=NULL, can_create, &submenu_result)));
+		ui_menu::stack_push(auto_alloc_clear(machine(), <ui_menu_file_selector>(machine(), container, image, current_directory, current_file, true, image->image_interface()!=nullptr, can_create, &submenu_result)));
 		state = SELECT_FILE;
 		break;
 	}
 
 	case START_SOFTLIST:
-		sld = 0;
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software(machine(), container, image->image_interface(), &sld)));
+		sld = nullptr;
+		ui_menu::stack_push(auto_alloc_clear(machine(), <ui_menu_software>(machine(), container, image->image_interface(), &sld)));
 		state = SELECT_SOFTLIST;
 		break;
 
 	case START_OTHER_PART: {
 		submenu_result = -1;
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_parts(machine(), container, swi, swp->interface(), &swp, true, &submenu_result)));
+		ui_menu::stack_push(auto_alloc_clear(machine(), <ui_menu_software_parts>(machine(), container, swi, swp->interface(), &swp, true, &submenu_result)));
 		state = SELECT_OTHER_PART;
 		break;
 	}
@@ -214,7 +214,7 @@ void ui_menu_control_device_image::handle()
 			break;
 		}
 		software_info_name = "";
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_list(machine(), container, sld, image->image_interface(), software_info_name)));
+		ui_menu::stack_push(auto_alloc_clear(machine(), <ui_menu_software_list>(machine(), container, sld, image->image_interface(), software_info_name)));
 		state = SELECT_PARTLIST;
 		break;
 
@@ -225,8 +225,8 @@ void ui_menu_control_device_image::handle()
 		else if(swi->has_multiple_parts(image->image_interface()))
 		{
 			submenu_result = -1;
-			swp = 0;
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_parts(machine(), container, swi, image->image_interface(), &swp, false, &submenu_result)));
+			swp = nullptr;
+			ui_menu::stack_push(auto_alloc_clear(machine(), <ui_menu_software_parts>(machine(), container, swi, image->image_interface(), &swp, false, &submenu_result)));
 			state = SELECT_ONE_PART;
 		}
 		else
@@ -290,7 +290,7 @@ void ui_menu_control_device_image::handle()
 			break;
 
 		case ui_menu_file_selector::R_CREATE:
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_create(machine(), container, image, current_directory, current_file, &create_ok)));
+			ui_menu::stack_push(auto_alloc_clear(machine(), <ui_menu_file_create>(machine(), container, image, current_directory, current_file, &create_ok)));
 			state = CHECK_CREATE;
 			break;
 
@@ -310,7 +310,7 @@ void ui_menu_control_device_image::handle()
 		test_create(can_create, need_confirm);
 		if(can_create) {
 			if(need_confirm) {
-				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_confirm_save_as(machine(), container, &create_confirmed)));
+				ui_menu::stack_push(auto_alloc_clear(machine(), <ui_menu_confirm_save_as>(machine(), container, &create_confirmed)));
 				state = CREATE_CONFIRM;
 			} else {
 				state = DO_CREATE;
@@ -336,7 +336,7 @@ void ui_menu_control_device_image::handle()
 	case DO_CREATE: {
 		std::string path;
 		zippath_combine(path, current_directory.c_str(), current_file.c_str());
-		int err = image->create(path.c_str(), 0, NULL);
+		int err = image->create(path.c_str(), nullptr, nullptr);
 		if (err != 0)
 			machine().popmessage("Error: %s", image->error());
 		ui_menu::stack_pop(machine());

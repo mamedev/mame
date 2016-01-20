@@ -212,7 +212,7 @@ protected:
 	};
 
 	// construction/destruction
-	adsp21xx_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 chiptype, const char *shortname, const char *source);
+	adsp21xx_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, std::string shortname, std::string source);
 	virtual ~adsp21xx_device();
 
 public:
@@ -226,23 +226,23 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const;
-	virtual UINT32 execute_max_cycles() const;
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override;
+	virtual UINT32 execute_max_cycles() const override;
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const;
-	virtual UINT32 disasm_max_opcode_bytes() const;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override;
+	virtual UINT32 disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// helpers
 	void create_tables();
@@ -483,18 +483,18 @@ class adsp2100_device : public adsp21xx_device
 {
 public:
 	// construction/destruction
-	adsp2100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adsp2100_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device_execute_interface overrides
-	virtual UINT32 execute_input_lines() const;
+	virtual UINT32 execute_input_lines() const override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// interrupts
-	virtual bool generate_irq(int which, int indx);
-	virtual void check_irqs();
+	virtual bool generate_irq(int which, int indx) override;
+	virtual void check_irqs() override;
 };
 
 
@@ -504,20 +504,20 @@ class adsp2101_device : public adsp21xx_device
 {
 public:
 	// construction/destruction
-	adsp2101_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adsp2101_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	adsp2101_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 chiptype, const char *shortname, const char *source);
+	adsp2101_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, std::string shortname, std::string source);
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_input_lines() const;
+	virtual UINT32 execute_input_lines() const override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// interrupts
-	virtual bool generate_irq(int which, int indx);
-	virtual void check_irqs();
+	virtual bool generate_irq(int which, int indx) override;
+	virtual void check_irqs() override;
 };
 
 
@@ -527,18 +527,18 @@ class adsp2181_device : public adsp21xx_device
 {
 public:
 	// construction/destruction
-	adsp2181_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adsp2181_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device_execute_interface overrides
-	virtual UINT32 execute_input_lines() const;
+	virtual UINT32 execute_input_lines() const override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// interrupts
-	virtual bool generate_irq(int which, int indx);
-	virtual void check_irqs();
+	virtual bool generate_irq(int which, int indx) override;
+	virtual void check_irqs() override;
 
 	// address spaces
 	const address_space_config      m_io_config;
@@ -557,19 +557,19 @@ public:
 class adsp2104_device : public adsp2101_device
 {
 public:
-	adsp2104_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adsp2104_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class adsp2105_device : public adsp2101_device
 {
 public:
-	adsp2105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adsp2105_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class adsp2115_device : public adsp2101_device
 {
 public:
-	adsp2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adsp2115_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

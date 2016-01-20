@@ -38,7 +38,7 @@
 class tvc_state : public driver_device
 {
 public:
-	tvc_state(const machine_config &mconfig, device_type type, const char *tag)
+	tvc_state(const machine_config &mconfig, device_type type, std::string tag)
 	: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_ram(*this, RAM_TAG),
@@ -65,8 +65,8 @@ public:
 	memory_region *m_ext;
 	memory_region *m_vram;
 
-	void machine_start();
-	void machine_reset();
+	void machine_start() override;
+	void machine_reset() override;
 
 	void set_mem_page(UINT8 data);
 	DECLARE_WRITE8_MEMBER(bank_w);
@@ -801,19 +801,19 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 
 	/* expansion interface */
 	MCFG_DEVICE_ADD("exp1", TVCEXP_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , nullptr, false)
 	MCFG_TVCEXP_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
 	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_DEVICE_ADD("exp2", TVCEXP_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , nullptr, false)
 	MCFG_TVCEXP_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
 	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_DEVICE_ADD("exp3", TVCEXP_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , nullptr, false)
 	MCFG_TVCEXP_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
 	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_DEVICE_ADD("exp4", TVCEXP_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , nullptr, false)
 	MCFG_TVCEXP_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
 	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 

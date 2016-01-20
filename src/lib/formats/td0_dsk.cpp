@@ -298,7 +298,7 @@ static floperr_t td0_read_indexed_sector(floppy_image_legacy *floppy, int head, 
 static floperr_t td0_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
 	floperr_t err;
-	err = get_offset(floppy, head, track, sector, FALSE, NULL);
+	err = get_offset(floppy, head, track, sector, FALSE, nullptr);
 	if (err)
 		return err;
 
@@ -510,7 +510,7 @@ void td0dsk_t::reconst()
 	for (i = 0, j = N_CHAR; j < T; i += 2, j++) {
 		k = i + 1;
 		f = freq[j] = freq[i] + freq[k];
-		for (k = j - 1; f < freq[k]; k--);
+		for (k = j - 1; f < freq[k]; k--) {};
 		k++;
 		l = (j - k) * 2;
 
@@ -550,7 +550,7 @@ void td0dsk_t::update(int c)
 
 		/* swap nodes to keep the tree freq-ordered */
 		if (k > freq[l = c + 1]) {
-			while (k > freq[++l]);
+			while (k > freq[++l]) {};
 			l--;
 			freq[c] = freq[l];
 			freq[l] = k;
@@ -699,7 +699,7 @@ FLOPPY_CONSTRUCT( td0_dsk_construct )
 		return FLOPPY_ERROR_OUTOFMEMORY;
 
 	tag->data = (UINT8*)malloc(floppy_image_size(floppy));
-	if (tag->data==NULL) {
+	if (tag->data==nullptr) {
 		return FLOPPY_ERROR_OUTOFMEMORY;
 	}
 	floppy_image_read(floppy, tag->data, 0, floppy_image_size(floppy));
@@ -720,7 +720,7 @@ FLOPPY_CONSTRUCT( td0_dsk_construct )
 		memcpy(obuf,tag->data,12);
 		free(tag->data);
 		tag->data = (UINT8*)malloc(size+12);
-		if (tag->data==NULL) {
+		if (tag->data==nullptr) {
 			return FLOPPY_ERROR_OUTOFMEMORY;
 		}
 		memcpy(tag->data,obuf,12);
@@ -786,7 +786,7 @@ FLOPPY_DESTRUCT( td0_dsk_destruct )
 {
 	struct td0dsk_tag *tag = get_tag(floppy);
 	free(tag->data);
-	tag->data = NULL;
+	tag->data = nullptr;
 	return FLOPPY_ERROR_SUCCESS;
 }
 
@@ -999,7 +999,7 @@ bool td0_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				sdatapos += size;
 			}
 			else
-				sects[i].data = NULL;
+				sects[i].data = nullptr;
 		}
 		track_count = track;
 

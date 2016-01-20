@@ -785,7 +785,7 @@ WRITE16_MEMBER( segas24_state::mlatch_w )
 		int i;
 		UINT8 mxor = 0;
 		if(!mlatch_table) {
-			logerror("Protection: magic latch accessed but no table loaded (%s:%x)\n", space.device().tag(), space.device().safe_pc());
+			logerror("Protection: magic latch accessed but no table loaded (%s:%x)\n", space.device().tag().c_str(), space.device().safe_pc());
 			return;
 		}
 
@@ -796,9 +796,9 @@ WRITE16_MEMBER( segas24_state::mlatch_w )
 				if(mlatch & (1<<i))
 					mxor |= 1 << mlatch_table[i];
 			mlatch = data ^ mxor;
-			logerror("Magic latching %02x ^ %02x as %02x (%s:%x)\n", data & 0xff, mxor, mlatch, space.device().tag(), space.device().safe_pc());
+			logerror("Magic latching %02x ^ %02x as %02x (%s:%x)\n", data & 0xff, mxor, mlatch, space.device().tag().c_str(), space.device().safe_pc());
 		} else {
-			logerror("Magic latch reset (%s:%x)\n", space.device().tag(), space.device().safe_pc());
+			logerror("Magic latch reset (%s:%x)\n", space.device().tag().c_str(), space.device().safe_pc());
 			mlatch = 0x00;
 		}
 	}
@@ -1047,7 +1047,7 @@ READ16_MEMBER ( segas24_state::sys16_io_r )
 		case 0xf:
 			return io_dir;
 		default:
-			logerror("IO control read %02x (%s:%x)\n", offset, space.device().tag(), space.device().safe_pc());
+			logerror("IO control read %02x (%s:%x)\n", offset, space.device().tag().c_str(), space.device().safe_pc());
 			return 0xff;
 		}
 	} else
@@ -1059,7 +1059,7 @@ WRITE16_MEMBER( segas24_state::sys16_io_w )
 	if(ACCESSING_BITS_0_7) {
 		if(offset < 8) {
 			if(!(io_dir & (1 << offset))) {
-				logerror("IO port write on input-only port (%d, [%02x], %02x, %s:%x)\n", offset, io_dir, data & 0xff, space.device().tag(), space.device().safe_pc());
+				logerror("IO port write on input-only port (%d, [%02x], %02x, %s:%x)\n", offset, io_dir, data & 0xff, space.device().tag().c_str(), space.device().safe_pc());
 				return;
 			}
 			(this->*io_w)(offset, data);
@@ -1073,7 +1073,7 @@ WRITE16_MEMBER( segas24_state::sys16_io_w )
 				io_dir = data;
 				break;
 			default:
-				logerror("IO control write %02x, %02x (%s:%x)\n", offset, data & 0xff, space.device().tag(), space.device().safe_pc());
+				logerror("IO control write %02x, %02x (%s:%x)\n", offset, data & 0xff, space.device().tag().c_str(), space.device().safe_pc());
 			}
 		}
 	}
@@ -2374,7 +2374,7 @@ DRIVER_INIT_MEMBER(segas24_state,hotrod)
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
-	mlatch_table = 0;
+	mlatch_table = nullptr;
 
 	// Sector  Size
 	// 1       8192
@@ -2409,7 +2409,7 @@ DRIVER_INIT_MEMBER(segas24_state,sspirits)
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
-	mlatch_table = 0;
+	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
@@ -2417,7 +2417,7 @@ DRIVER_INIT_MEMBER(segas24_state,sspiritj)
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
-	mlatch_table = 0;
+	mlatch_table = nullptr;
 	track_size = 0x2f00;
 }
 
@@ -2434,7 +2434,7 @@ DRIVER_INIT_MEMBER(segas24_state,sgmast)
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
-	mlatch_table = 0;
+	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
@@ -2442,7 +2442,7 @@ DRIVER_INIT_MEMBER(segas24_state,qsww)
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
-	mlatch_table = 0;
+	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
@@ -2450,7 +2450,7 @@ DRIVER_INIT_MEMBER(segas24_state,gground)
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
-	mlatch_table = 0;
+	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
@@ -2458,7 +2458,7 @@ DRIVER_INIT_MEMBER(segas24_state,crkdown)
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
-	mlatch_table = 0;
+	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
@@ -2466,7 +2466,7 @@ DRIVER_INIT_MEMBER(segas24_state,roughrac)
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
-	mlatch_table = 0;
+	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 

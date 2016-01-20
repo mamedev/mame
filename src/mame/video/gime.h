@@ -58,9 +58,9 @@ public:
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_firq_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_firq.set_callback(object); }
 	template<class _Object> static devcb_base &set_floating_bus_rd_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_read_floating_bus.set_callback(object); }
-	static void set_maincpu_tag(device_t &device, const char *tag) { downcast<gime_base_device &>(device).m_maincpu_tag = tag; }
-	static void set_ram_tag(device_t &device, const char *tag) { downcast<gime_base_device &>(device).m_ram_tag = tag; }
-	static void set_ext_tag(device_t &device, const char *tag) { downcast<gime_base_device &>(device).m_ext_tag = tag; }
+	static void set_maincpu_tag(device_t &device, std::string tag) { downcast<gime_base_device &>(device).m_maincpu_tag = tag; }
+	static void set_ram_tag(device_t &device, std::string tag) { downcast<gime_base_device &>(device).m_ram_tag = tag; }
+	static void set_ext_tag(device_t &device, std::string tag) { downcast<gime_base_device &>(device).m_ext_tag = tag; }
 
 	// read/write
 	DECLARE_READ8_MEMBER( read ) { return read(offset); }
@@ -91,23 +91,23 @@ public:
 	void set_il2(bool value) { set_interrupt_value(INTERRUPT_EI2, value); }
 
 protected:
-	gime_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, const char *shortname, const char *source);
+	gime_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, std::string shortname, std::string source);
 
 	// device-level overrides
-	virtual void device_start(void);
-	virtual void device_reset(void);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_pre_save(void);
-	virtual void device_post_load(void);
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start(void) override;
+	virtual void device_reset(void) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_pre_save(void) override;
+	virtual void device_post_load(void) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// other overrides
-	virtual void new_frame(void);
-	virtual void horizontal_sync_changed(bool line);
-	virtual void enter_bottom_border(void);
-	virtual void record_border_scanline(UINT16 physical_scanline);
-	virtual void record_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline);
-	virtual void record_partial_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline, INT32 start_clock, INT32 end_clock);
+	virtual void new_frame(void) override;
+	virtual void horizontal_sync_changed(bool line) override;
+	virtual void enter_bottom_border(void) override;
+	virtual void record_border_scanline(UINT16 physical_scanline) override;
+	virtual void record_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline) override;
+	virtual void record_partial_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline, INT32 start_clock, INT32 end_clock) override;
 
 private:
 	typedef mc6847_friend_device super;
@@ -202,9 +202,9 @@ private:
 	pixel_t                     m_rgb_palette[64];
 	UINT8                       m_dummy_bank[0x2000];
 
-	const char *m_maincpu_tag;  /* tag of main CPU */
-	const char *m_ram_tag;      /* tag of RAM device */
-	const char *m_ext_tag;      /* tag of expansion device */
+	std::string m_maincpu_tag;  /* tag of main CPU */
+	std::string m_ram_tag;      /* tag of RAM device */
+	std::string m_ext_tag;      /* tag of expansion device */
 
 	// timer constants
 	static const device_timer_id TIMER_FRAME = 0;
@@ -270,7 +270,6 @@ private:
 	UINT32 get_data_mc6847(UINT32 video_position, UINT8 *data, UINT8 *mode);
 	UINT32 get_data_without_attributes(UINT32 video_position, UINT8 *data, UINT8 *mode);
 	UINT32 get_data_with_attributes(UINT32 video_position, UINT8 *data, UINT8 *mode);
-	bool is_blinking(void);
 
 	// template function for doing video update collection
 	template<UINT8 xres, get_data_func get_data, bool record_mode>
@@ -296,13 +295,13 @@ private:
 class gime_ntsc_device : public gime_base_device
 {
 public:
-	gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gime_ntsc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class gime_pal_device : public gime_base_device
 {
 public:
-	gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gime_pal_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type GIME_NTSC;

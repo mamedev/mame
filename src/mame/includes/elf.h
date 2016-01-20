@@ -26,7 +26,7 @@
 class elf2_state : public driver_device
 {
 public:
-	elf2_state(const machine_config &mconfig, device_type type, const char *tag)
+	elf2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
 			m_vdc(*this, CDP1861_TAG),
@@ -47,7 +47,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_ioport m_special;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( dispon_r );
 	DECLARE_READ8_MEMBER( data_r );

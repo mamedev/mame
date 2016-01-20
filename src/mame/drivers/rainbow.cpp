@@ -258,7 +258,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 class rainbow_state : public driver_device
 {
 public:
-	rainbow_state(const machine_config &mconfig, device_type type, const char *tag) :
+	rainbow_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 
 #ifdef KEYBOARD_WORKAROUND
@@ -377,7 +377,7 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 private:
 	enum
@@ -461,7 +461,7 @@ private:
 	UINT8 m_z80_mailbox, m_8088_mailbox;
 
 	void update_kbd_irq();
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	int m_unit;
 	floppy_image_device *m_floppy;
@@ -875,13 +875,13 @@ void rainbow_state::machine_reset()
 		hard_disk_file *local_hard_disk;
 		local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
 
-		output_set_value("led1", 0);
+		output().set_value("led1", 0);
 		if (local_hard_disk)
 		{
 			hard_disk_info *info;
 			if ( (info = hard_disk_get_info(local_hard_disk)) )
 			{
-				output_set_value("led1", 1);
+				output().set_value("led1", 1);
 
 				UINT32 max_sector = (info->cylinders) * (info->heads) * (info->sectors);
 				printf("\n%u MB HARD DISK: HEADS (1..8 OK) = %d / CYL. (151..1024 OK) = %d / SPT. (16 OK) = %d / SECTOR_BYTES (128..1024 OK) = %d\n", max_sector * 512 / 1000000,
@@ -893,7 +893,7 @@ void rainbow_state::machine_reset()
 	//  *********** FLOPPY DISK CONTROLLER
 	m_unit = INVALID_DRIVE;
 	m_fdc->reset();
-	m_fdc->set_floppy(NULL);
+	m_fdc->set_floppy(nullptr);
 	m_fdc->dden_w(0);
 
 	m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -910,19 +910,19 @@ void rainbow_state::machine_reset()
 	m_irq_high = 0;
 
 	// RESET ALL LEDs
-	output_set_value("led1", 1);
-	output_set_value("led2", 1);
-	output_set_value("led3", 1);
-	output_set_value("led4", 1);
-	output_set_value("led5", 1);
-	output_set_value("led6", 1);
-	output_set_value("led7", 1);
+	output().set_value("led1", 1);
+	output().set_value("led2", 1);
+	output().set_value("led3", 1);
+	output().set_value("led4", 1);
+	output().set_value("led5", 1);
+	output().set_value("led6", 1);
+	output().set_value("led7", 1);
 
 	// GREEN KEYBOARD LEDs (1 = on, 0 = off):
-	output_set_value("led_wait", 0);    // led8
-	output_set_value("led_compose", 0); // led9
-	output_set_value("led_lock", 0);    // led10
-	output_set_value("led_hold", 0);    // led11
+	output().set_value("led_wait", 0);    // led8
+	output().set_value("led_compose", 0); // led9
+	output().set_value("led_lock", 0);    // led10
+	output().set_value("led_hold", 0);    // led11
 
 	m_irq_mask = 0;
 }
@@ -1150,19 +1150,19 @@ hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 	m_hdc_drive_ready = false;
 
 	if (m_inp5->read() != 0x01) // ...PRESENT?
-		return NULL;
+		return nullptr;
 
 	if (drv != 0)
-		return NULL;
+		return nullptr;
 
-	harddisk_image_device *img = NULL;
+	harddisk_image_device *img = nullptr;
 	img = dynamic_cast<harddisk_image_device *>(machine().device(subtag("harddisk1").c_str()));
 
 	if (!img)
-		return NULL;
+		return nullptr;
 
 	if (!img->exists())
-		return NULL;
+		return nullptr;
 
 	hard_disk_file *file = img->get_hard_disk_file();
 	hard_disk_info *info = hard_disk_get_info(file);
@@ -1184,14 +1184,14 @@ hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 			info->heads, info->cylinders, info->sectors, info->sectorbytes);
 
 		printf("\n <<< === REJECTED = (SANITY CHECK FAILED) === >>> \n");
-		return NULL;
+		return nullptr;
 	}
 }
 
 // LBA sector from CHS
 static UINT32 get_and_print_lbasector(device_t *device,hard_disk_info *info, UINT16 cylinder, UINT8 head, UINT8 sector_number)
 {
-	if (info == NULL)
+	if (info == nullptr)
 		return 0;
 
 	// LBA_ADDRESS = (C * HEADS + H) * NUMBER_SECTORS + (S - 1)
@@ -1220,7 +1220,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
 			read_status = 2;
 
 			logerror("\nTRYING TO READ");
-			output_set_value("led1", 0);
+			output().set_value("led1", 0);
 
 			int hi = (m_hdc->read(space(AS_PROGRAM), 0x05)) & 0x07;
 			UINT16 cylinder = (m_hdc->read(space(AS_PROGRAM), 0x04)) | (hi << 8);
@@ -1237,7 +1237,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
 				if ( (info = hard_disk_get_info(local_hard_disk)) )
 				{
 					read_status = 4;
-					output_set_value("led1", 1);
+					output().set_value("led1", 1);
 
 					// Pointer to info + C + H + S
 					UINT32 lbasector = get_and_print_lbasector(this, info, cylinder, SDH & 0x07, sector_number);
@@ -1293,10 +1293,10 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_write_sector)
 		&& (drv == 0)
 		)
 	{
-		output_set_value("led1", 0);  // (1 = OFF ) =HARD DISK ACTIVITY =
+		output().set_value("led1", 0);  // (1 = OFF ) =HARD DISK ACTIVITY =
 		MOTOR_DISABLE_counter = 20;
 
-		if (rainbow_hdc_file(0) != NULL)
+		if (rainbow_hdc_file(0) != nullptr)
 		{
 			success = do_write_sector();
 			if (success < 88)
@@ -1330,7 +1330,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_write_sector)
 int rainbow_state::do_write_sector()
 {
 	int feedback = 0; // no error
-	output_set_value("led1", 0); // ON
+	output().set_value("led1", 0); // ON
 
 	hard_disk_file *local_hard_disk;
 	local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
@@ -1342,7 +1342,7 @@ int rainbow_state::do_write_sector()
 		{
 			feedback = 10;
 			logerror("\n* TRYING TO WRITE * ");
-			output_set_value("led1", 1); // OFF
+			output().set_value("led1", 1); // OFF
 
 			UINT8 SDH = (m_hdc->read(space(AS_PROGRAM), 0x06));
 
@@ -1428,7 +1428,7 @@ READ8_MEMBER(rainbow_state::hd_status_68_r)
 {
 	// (*) Bits 5-7 : HARD WIRED IDENTIFICATION BITS, bits 5+7 = 1 and bit 6 = 0  (= 101 f?r RD51 module)
 	int data = 0xe0; // 111 gives DRIVE NOT READY (when W is pressed on boot screen)
-	if ((m_inp5->read() == 0x01) && (rainbow_hdc_file(0) != NULL))
+	if ((m_inp5->read() == 0x01) && (rainbow_hdc_file(0) != nullptr))
 		data = 0xa0; // A0 : OK, DRIVE IS READY (!)
 
 	int my_offset = 0x07;
@@ -1498,7 +1498,7 @@ WRITE8_MEMBER(rainbow_state::hd_status_68_w)
 	{
 		logerror(">> HARD DISC * SET BUFFER READY * <<\n");
 
-		output_set_value("led1", 0);  // 1 = OFF (One of the CPU LEDs as DRIVE LED) = HARD DISK ACTIVITY =
+		output().set_value("led1", 0);  // 1 = OFF (One of the CPU LEDs as DRIVE LED) = HARD DISK ACTIVITY =
 		MOTOR_DISABLE_counter = 20;
 
 		m_hdc->buffer_ready(true);
@@ -1579,7 +1579,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_step)
 {
 	m_hdc_step_latch = true;
 
-	output_set_value("led1", 0);  // 1 = OFF (One of the CPU LEDs as DRIVE LED)  = HARD DISK ACTIVITY =
+	output().set_value("led1", 0);  // 1 = OFF (One of the CPU LEDs as DRIVE LED)  = HARD DISK ACTIVITY =
 	MOTOR_DISABLE_counter = 20;
 }
 
@@ -1729,10 +1729,10 @@ WRITE8_MEMBER(rainbow_state::comm_control_w)
 	D6 -D5-D4-D3  <- INTERNAL LED NUMBER (DEC PDF)
 	-4--5--6--7-  <- NUMBERS EMBOSSED ON BACK OF PLASTIC HOUSING (see error chart)
 	*/
-	output_set_value("led4", BIT(data, 5)); // LED "D6"
-	output_set_value("led5", BIT(data, 7)); // LED "D5"
-	output_set_value("led6", BIT(data, 6)); // LED "D4"
-	output_set_value("led7", BIT(data, 4)); // LED "D3"
+	output().set_value("led4", BIT(data, 5)); // LED "D6"
+	output().set_value("led5", BIT(data, 7)); // LED "D5"
+	output().set_value("led6", BIT(data, 6)); // LED "D4"
+	output().set_value("led7", BIT(data, 4)); // LED "D3"
 
 	//  printf("%02x to COMM.CONTROL REGISTER\n", data);
 }
@@ -1800,9 +1800,9 @@ WRITE8_MEMBER(rainbow_state::z80_diskdiag_write_w)
 	D11 D10 -D9 <- INTERNAL LED NUMBER (see PDF)
 	-1 --2-- 3  <- NUMBERS EMBOSSED ON BACK OF PLASTIC HOUSING (see error chart)
 	*/
-	output_set_value("led1", BIT(data, 4)); // LED "D11"
-	output_set_value("led2", BIT(data, 5)); // LED "D10"
-	output_set_value("led3", BIT(data, 6)); // LED "D9"
+	output().set_value("led1", BIT(data, 4)); // LED "D11"
+	output().set_value("led2", BIT(data, 5)); // LED "D10"
+	output().set_value("led3", BIT(data, 6)); // LED "D9"
 
 	m_zflip = false;
 }
@@ -1927,8 +1927,8 @@ READ8_MEMBER(rainbow_state::z80_diskstatus_r)
 		// Print HEX track number
 		static UINT8 bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 };
 		// 0...9 ,A (0x77), b (0x7c), C (0x39) , d (0x5e), E (0x79), F (0x71)
-		output_set_digit_value(0, bcd2hex[(track >> 4) & 0x0f]);
-		output_set_digit_value(1, bcd2hex[(track - ((track >> 4) << 4)) & 0x0f]);
+		output().set_digit_value(0, bcd2hex[(track >> 4) & 0x0f]);
+		output().set_digit_value(1, bcd2hex[(track - ((track >> 4) << 4)) & 0x0f]);
 	}
 
 	// D2: TG43 L :  0 = INDICATES TRACK > 43 SIGNAL FROM FDC TO DISK DRIVE.
@@ -1955,7 +1955,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 	else
 		drive = data & 3;
 
-	floppy_connector *con = NULL;
+	floppy_connector *con = nullptr;
 	if (drive < MAX_FLOPPIES)
 		con = machine().device<floppy_connector>(names[drive]);
 
@@ -1971,15 +1971,15 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 	{
 		printf("(m_unit = %i)   ** SELECTED DRIVE ** INVALID. (selected drive = %i)\n", m_unit, selected_drive);
 		m_unit = INVALID_DRIVE;
-		m_floppy = NULL;
+		m_floppy = nullptr;
 	}
 
-	if (m_floppy != NULL)
+	if (m_floppy != nullptr)
 	{
 		m_fdc->set_floppy(m_floppy);  // Sets new  _image device_
 		if (!m_floppy->exists())
 		{
-			m_floppy = NULL;
+			m_floppy = nullptr;
 			printf("(m_unit = %i) SELECTED IMAGE *** DOES NOT EXIST *** (selected drive = %i)\n", m_unit, selected_drive);
 			selected_drive = INVALID_DRIVE;
 			//m_unit = INVALID_DRIVE;
@@ -1991,11 +1991,11 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 		}
 	}
 
-	output_set_value("driveled0", (selected_drive == 0) ? 1 : 0);
-	output_set_value("driveled1", (selected_drive == 1) ? 1 : 0);
+	output().set_value("driveled0", (selected_drive == 0) ? 1 : 0);
+	output().set_value("driveled1", (selected_drive == 1) ? 1 : 0);
 
-	output_set_value("driveled2", (selected_drive == 2) ? 1 : 0);
-	output_set_value("driveled3", (selected_drive == 3) ? 1 : 0);
+	output().set_value("driveled2", (selected_drive == 2) ? 1 : 0);
+	output().set_value("driveled3", (selected_drive == 3) ? 1 : 0);
 
 	if (selected_drive < 4)
 	{
@@ -2224,12 +2224,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::motor_tick)
 
 	if (MOTOR_DISABLE_counter < 2)
 	{
-		output_set_value("driveled0", 0); // DRIVE 0 (A)
-		output_set_value("driveled1", 0); // DRIVE 1 (B)
-		output_set_value("driveled2", 0); // DRIVE 2 (C)
-		output_set_value("driveled3", 0); // DRIVE 3 (D)
+		output().set_value("driveled0", 0); // DRIVE 0 (A)
+		output().set_value("driveled1", 0); // DRIVE 1 (B)
+		output().set_value("driveled2", 0); // DRIVE 2 (C)
+		output().set_value("driveled3", 0); // DRIVE 3 (D)
 
-		output_set_value("led1", 1);  // 1 = OFF (One of the CPU LEDs as DRIVE LED)
+		output().set_value("led1", 1);  // 1 = OFF (One of the CPU LEDs as DRIVE LED)
 	}
 
 	if (m_crtc->MHFU(1)) // MHFU * flag * enabled ?

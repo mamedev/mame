@@ -27,7 +27,7 @@ OKI M6295 sound ROM dump is bad.
 class missb2_state : public bublbobl_state
 {
 public:
-	missb2_state(const machine_config &mconfig, device_type type, const char *tag)
+	missb2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: bublbobl_state(mconfig, type, tag),
 			m_bgvram(*this, "bgvram"),
 			m_bgpalette(*this, "bgpalette")
@@ -332,7 +332,7 @@ static const gfx_layout bglayout =
 	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128, 8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
 	256*128,
 	bglayout_xoffset,
-	NULL
+	nullptr
 };
 
 static const UINT32 bglayout_xoffset_alt[256] =
@@ -386,7 +386,7 @@ static const gfx_layout bglayout_alt =
 	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128, 8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
 	256*128,
 	bglayout_xoffset_alt,
-	NULL
+	nullptr
 };
 
 

@@ -5,10 +5,10 @@
 class kaneko_view2_tilemap_device : public device_t
 {
 public:
-	kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kaneko_view2_tilemap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
 	static void set_gfx_region(device_t &device, int region);
 	static void set_offset(device_t &device, int dx, int dy, int xdim, int ydim);
 	static void set_invert_flip(device_t &device, int invert_flip); // for fantasia (bootleg)
@@ -18,9 +18,9 @@ public:
 	int m_dx, m_dy, m_xdim, m_ydim;
 	int m_invert_flip;
 
-	UINT16* m_vram[2];
-	UINT16* m_vscroll[2];
-	UINT16* m_regs;
+	std::unique_ptr<UINT16[]> m_vram[2];
+	std::unique_ptr<UINT16[]> m_vscroll[2];
+	std::unique_ptr<UINT16[]> m_regs;
 	tilemap_t* m_tmap[2];
 	UINT16 m_vram_tile_addition[2]; // galsnew
 
@@ -68,8 +68,8 @@ public:
 
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	TILE_GET_INFO_MEMBER(get_tile_info_0);

@@ -44,7 +44,7 @@
 class pc1512_state : public driver_device
 {
 public:
-	pc1512_state(const machine_config &mconfig, device_type type, const char *tag)
+	pc1512_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, I8086_TAG),
 			m_dmac(*this, I8237A5_TAG),
@@ -105,10 +105,10 @@ public:
 	optional_shared_ptr<UINT8> m_video_ram;
 	required_ioport m_lk;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -117,7 +117,6 @@ public:
 	void update_fdc_drq();
 	void update_fdc_tc();
 	void update_ack();
-	void set_fdc_dsr(UINT8 data);
 	int get_display_mode(UINT8 mode);
 	offs_t get_char_rom_offset();
 	int get_color(UINT8 data);
@@ -135,15 +134,12 @@ public:
 	DECLARE_WRITE8_MEMBER( nmi_mask_w );
 	DECLARE_READ8_MEMBER( printer_r );
 	DECLARE_WRITE8_MEMBER( printer_w );
-	DECLARE_READ8_MEMBER( fdc_r );
-	DECLARE_WRITE8_MEMBER( fdc_w );
 	DECLARE_READ8_MEMBER( vdu_r );
 	DECLARE_WRITE8_MEMBER( vdu_w );
 	DECLARE_WRITE_LINE_MEMBER( kbdata_w );
 	DECLARE_WRITE_LINE_MEMBER( kbclk_w );
 	DECLARE_WRITE_LINE_MEMBER( pit1_w );
 	DECLARE_WRITE_LINE_MEMBER( pit2_w );
-	DECLARE_WRITE_LINE_MEMBER( ack_w );
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	DECLARE_WRITE_LINE_MEMBER( eop_w );
 	DECLARE_READ8_MEMBER( memr_r );
@@ -234,14 +230,14 @@ public:
 class pc1640_state : public pc1512_state
 {
 public:
-	pc1640_state(const machine_config &mconfig, device_type type, const char *tag)
+	pc1640_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pc1512_state(mconfig, type, tag),
 			m_sw(*this, "SW"),
 			m_opt(0)
 	{ }
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_READ8_MEMBER( printer_r );

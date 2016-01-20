@@ -53,7 +53,7 @@ class ticket_dispenser_device : public device_t
 {
 public:
 	// construction/destruction
-	ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ticket_dispenser_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~ticket_dispenser_device();
 
 	// inline configuration helpers
@@ -67,9 +67,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() ATTR_COLD;
-	virtual void device_reset() ATTR_COLD;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// configuration state
 	UINT8 m_motor_sense;

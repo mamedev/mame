@@ -21,7 +21,7 @@ void ATTR_PRINTF(2,3) GTELOG( UINT32 pc, const char *a, ...)
 	logerror( "%08x: GTE: %s\n", pc, s_text );
 }
 #else
-INLINE void ATTR_PRINTF(2,3) GTELOG( UINT32 pc, const char *a, ...) {}
+static inline void ATTR_PRINTF(2,3) GTELOG( UINT32 pc, const char *a, ...) {}
 #endif
 
 
@@ -278,7 +278,7 @@ void gte::setcp2cr( UINT32 pc, int reg, UINT32 value )
 	m_cp2cr[ reg ].d = value;
 }
 
-INLINE INT64 gte_shift( INT64 a, int sf )
+static inline INT64 gte_shift( INT64 a, int sf )
 {
 	if( sf > 0 )
 	{
@@ -307,7 +307,7 @@ INT32 gte::BOUNDS( int44 value, int max_flag, int min_flag )
 	return gte_shift( value.value(), m_sf );
 }
 
-INLINE UINT32 gte_divide( UINT16 numerator, UINT16 denominator )
+static inline UINT32 gte_divide( UINT16 numerator, UINT16 denominator )
 {
 	if( numerator < ( denominator * 2 ) )
 	{

@@ -106,7 +106,7 @@ WRITE8_MEMBER(tutankhm_state::sound_mute_w)
 
 WRITE8_MEMBER(tutankhm_state::tutankhm_coin_counter_w)
 {
-	coin_counter_w(machine(), offset ^ 1, data);
+	machine().bookkeeping().coin_counter_w(offset ^ 1, data);
 }
 
 

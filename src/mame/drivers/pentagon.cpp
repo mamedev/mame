@@ -19,7 +19,7 @@ public:
 		TIMER_IRQ_ON,
 		TIMER_IRQ_OFF
 	};
-	pentagon_state(const machine_config &mconfig, device_type type, const char *tag)
+	pentagon_state(const machine_config &mconfig, device_type type, std::string tag)
 		: spectrum_state(mconfig, type, tag)
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
@@ -42,7 +42,7 @@ protected:
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
 	required_device<beta_disk_device> m_beta;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 private:
 	UINT8 *m_p_ram;
 	void pentagon_update_memory();

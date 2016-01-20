@@ -53,7 +53,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_30xx) {}
 	virtual DECLARE_WRITE8_MEMBER(write_40xx) {}
 
-	void rom_alloc(UINT32 size, const char *tag);
+	void rom_alloc(UINT32 size, std::string tag);
 	void ram_alloc(UINT32 size);
 	void nvram_alloc(UINT32 size);
 	UINT8* get_rom_base() { return m_rom; }
@@ -86,35 +86,34 @@ class a78_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a78_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~a78_cart_slot_device();
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 	// image-level overrides
-	virtual bool call_load();
-	virtual void call_unload();
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
+	virtual bool call_load() override;
+	virtual void call_unload() override;
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
 
 	int get_cart_type() { return m_type; };
-	int identify_cart_type(UINT8 *ROM, UINT32 len);
-	bool has_cart() { return m_cart != NULL; }
+	bool has_cart() { return m_cart != nullptr; }
 
-	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 0; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 1; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
-	virtual const char *image_interface() const { return "a7800_cart"; }
-	virtual const char *file_extensions() const { return "bin,a78"; }
-	virtual device_image_partialhash_func get_partial_hash() const { return &a78_partialhash; }
+	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 0; }
+	virtual bool is_creatable() const override { return 0; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 1; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
+	virtual const char *image_interface() const override { return "a7800_cart"; }
+	virtual const char *file_extensions() const override { return "bin,a78"; }
+	virtual device_image_partialhash_func get_partial_hash() const override { return &a78_partialhash; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result);
+	virtual std::string get_default_card_software() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_04xx);
@@ -129,7 +128,6 @@ public:
 private:
 	device_a78_cart_interface*       m_cart;
 	int m_type;
-	int m_stick_type;
 
 	int verify_header(char *header);
 	int validate_header(int head, bool log);

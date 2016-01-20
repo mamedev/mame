@@ -9,7 +9,7 @@
 class ohmygod_state : public driver_device
 {
 public:
-	ohmygod_state(const machine_config &mconfig, device_type type, const char *tag)
+	ohmygod_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -39,9 +39,9 @@ public:
 	DECLARE_DRIVER_INIT(ohmygod);
 	DECLARE_DRIVER_INIT(naname);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_ohmygod(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;

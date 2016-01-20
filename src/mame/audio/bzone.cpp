@@ -317,7 +317,7 @@ static DISCRETE_SOUND_START(bzone)
 		BZ_R12, BZ_R13, BZ_R14, BZ_R15, BZ_R32,
 		BZ_C21,
 		22,                                         /* B+ of op-amp */
-		NULL)
+		nullptr)
 
 	/************************************************/
 	/* Explosion                                    */
@@ -331,7 +331,7 @@ static DISCRETE_SOUND_START(bzone)
 		BZ_R19, BZ_R18, BZ_R17, BZ_R16, BZ_R33,
 		BZ_C22,
 		22,                                         /* B+ of op-amp */
-		NULL)
+		nullptr)
 	/************************************************/
 	/* Engine                                       */
 	/************************************************/
@@ -389,7 +389,7 @@ WRITE8_MEMBER(bzone_state::bzone_sounds_w)
 {
 	m_discrete->write(space, BZ_INPUT, data);
 
-	output_set_value("startled", (data >> 6) & 1);
+	output().set_value("startled", (data >> 6) & 1);
 	machine().sound().system_enable(data & 0x20);
 }
 

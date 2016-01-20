@@ -107,7 +107,7 @@ static MACHINE_CONFIG_FRAGMENT( tf20 )
 	MCFG_FLOPPY_DRIVE_ADD("5a:1", tf20_floppies, "sd320", floppy_image_device::default_floppy_formats)
 
 	// serial interface to another device
-	MCFG_EPSON_SIO_ADD("sio", NULL)
+	MCFG_EPSON_SIO_ADD("sio", nullptr)
 	MCFG_EPSON_SIO_RX(DEVWRITELINE(DEVICE_SELF, epson_tf20_device, rxc_w))
 	MCFG_EPSON_SIO_PIN(DEVWRITELINE(DEVICE_SELF, epson_tf20_device, pinc_w))
 MACHINE_CONFIG_END
@@ -126,7 +126,7 @@ machine_config_constructor epson_tf20_device::device_mconfig_additions() const
 //  epson_tf20_device - constructor
 //-------------------------------------------------
 
-epson_tf20_device::epson_tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+epson_tf20_device::epson_tf20_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, EPSON_TF20, "EPSON TF-20 Dual Floppy Disk Drive", tag, owner, clock, "epson_tf20", __FILE__),
 	device_epson_sio_interface(mconfig, *this),
 	m_cpu(*this, "19b"),
@@ -149,8 +149,8 @@ void epson_tf20_device::device_start()
 	if (!m_ram->started())
 		throw device_missing_dependencies();
 
-	m_timer_serial = timer_alloc(0, NULL);
-	m_timer_tc = timer_alloc(1, NULL);
+	m_timer_serial = timer_alloc(0, nullptr);
+	m_timer_tc = timer_alloc(1, nullptr);
 
 	m_fd0 = subdevice<floppy_connector>("5a:0")->get_device();
 	m_fd1 = subdevice<floppy_connector>("5a:1")->get_device();
@@ -197,7 +197,7 @@ void epson_tf20_device::device_timer(emu_timer &timer, device_timer_id id, int p
 		break;
 
 	case 1:
-		logerror("%s: tc off\n", tag());
+		logerror("%s: tc off\n", tag().c_str());
 		m_fdc->tc_w(false);
 		break;
 	}

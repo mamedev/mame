@@ -28,7 +28,7 @@ class namco_c117_device :
 {
 public:
 	//construction/destruction
-	namco_c117_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_c117_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration
 	static void set_cpu_tags(device_t &device, const char *maintag, const char *subtag);
@@ -46,11 +46,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 private:
 	// internal helpers

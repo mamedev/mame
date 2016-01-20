@@ -179,7 +179,7 @@ ROM_END
 //  pioneer_pr8210_device - constructor
 //-------------------------------------------------
 
-pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: laserdisc_device(mconfig, PIONEER_PR8210, "Pioneer PR-8210", tag, owner, clock, "pr8210", __FILE__),
 		m_control(0),
 		m_lastcommand(0),
@@ -195,7 +195,7 @@ pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, cons
 {
 }
 
-pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: laserdisc_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_control(0),
 		m_lastcommand(0),
@@ -563,18 +563,18 @@ WRITE8_MEMBER( pioneer_pr8210_device::i8049_pia_w )
 		case 0x60:
 
 			// these 4 are direct-connect
-			output_set_value("pr8210_audio1", (data & 0x01) != 0);
-			output_set_value("pr8210_audio2", (data & 0x02) != 0);
-			output_set_value("pr8210_clv", (data & 0x04) != 0);
-			output_set_value("pr8210_cav", (data & 0x08) != 0);
+			machine().output().set_value("pr8210_audio1", (data & 0x01) != 0);
+			machine().output().set_value("pr8210_audio2", (data & 0x02) != 0);
+			machine().output().set_value("pr8210_clv", (data & 0x04) != 0);
+			machine().output().set_value("pr8210_cav", (data & 0x08) != 0);
 
 			// remaining 3 bits select one of 5 LEDs via a mux
 			value = ((data & 0x40) >> 6) | ((data & 0x20) >> 4) | ((data & 0x10) >> 2);
-			output_set_value("pr8210_srev", (value == 0));
-			output_set_value("pr8210_sfwd", (value == 1));
-			output_set_value("pr8210_play", (value == 2));
-			output_set_value("pr8210_step", (value == 3));
-			output_set_value("pr8210_pause", (value == 4));
+			machine().output().set_value("pr8210_srev", (value == 0));
+			machine().output().set_value("pr8210_sfwd", (value == 1));
+			machine().output().set_value("pr8210_play", (value == 2));
+			machine().output().set_value("pr8210_step", (value == 3));
+			machine().output().set_value("pr8210_pause", (value == 4));
 
 			m_pia.portb = data;
 			update_audio_squelch();
@@ -724,7 +724,7 @@ WRITE8_MEMBER( pioneer_pr8210_device::i8049_port2_w )
 	m_i8049_cpu->set_input_line(MCS48_INPUT_IRQ, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	// standby LED is set accordingl to bit 4
-	output_set_value("pr8210_standby", (data & 0x10) != 0);
+	machine().output().set_value("pr8210_standby", (data & 0x10) != 0);
 }
 
 
@@ -889,7 +889,7 @@ ROM_END
 // simutrek_special_device - constructor
 //-------------------------------------------------
 
-simutrek_special_device::simutrek_special_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+simutrek_special_device::simutrek_special_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: pioneer_pr8210_device(mconfig, SIMUTREK_SPECIAL, "Simutrek Modified PR-8210", tag, owner, clock, "simutrek", __FILE__),
 		m_i8748_cpu(*this, "simutrek"),
 		m_audio_squelch(0),

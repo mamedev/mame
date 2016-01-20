@@ -28,7 +28,7 @@ TODO:
 class toratora_state : public driver_device
 {
 public:
-	toratora_state(const machine_config &mconfig, device_type type, const char *tag)
+	toratora_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -65,8 +65,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sn2_port_a_u2_u3_w);
 	DECLARE_WRITE8_MEMBER(sn2_port_b_u2_u3_w);
 	DECLARE_WRITE_LINE_MEMBER(sn2_ca2_u2_u3_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(toratora_timer);
 };
@@ -138,9 +138,9 @@ WRITE8_MEMBER(toratora_state::clear_tv_w)
 WRITE8_MEMBER(toratora_state::port_b_u1_w)
 {
 	if (m_pia_u1->port_b_z_mask() & 0x20)
-		coin_counter_w(machine(), 0, 1);
+		machine().bookkeeping().coin_counter_w(0, 1);
 	else
-		coin_counter_w(machine(), 0, data & 0x20);
+		machine().bookkeeping().coin_counter_w(0, data & 0x20);
 }
 
 

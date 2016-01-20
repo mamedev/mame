@@ -25,17 +25,17 @@ void ui_menu_cheat::handle()
 	const ui_menu_event *menu_event = process(UI_MENU_PROCESS_LR_REPEAT);
 
 	/* handle events */
-	if (menu_event != NULL && menu_event->itemref != NULL)
+	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		bool changed = false;
 
 		/* clear cheat comment on any movement or keypress */
-		machine().popmessage(NULL);
+		machine().popmessage(nullptr);
 
 		/* handle reset all + reset all cheats for reload all option */
 		if ((FPTR)menu_event->itemref < 3 && menu_event->iptkey == IPT_UI_SELECT)
 		{
-			for (cheat_entry *curcheat = machine().cheat().first(); curcheat != NULL; curcheat = curcheat->next())
+			for (cheat_entry *curcheat = machine().cheat().first(); curcheat != nullptr; curcheat = curcheat->next())
 				if (curcheat->select_default_state())
 					changed = true;
 		}
@@ -73,7 +73,7 @@ void ui_menu_cheat::handle()
 				case IPT_UI_UP:
 				case IPT_UI_DOWN:
 					string = curcheat->comment();
-					if (string != NULL && string[0] != 0)
+					if (string != nullptr && string[0] != 0)
 						machine().popmessage("Cheat Comment:\n%s", string);
 					break;
 			}
@@ -110,7 +110,7 @@ void ui_menu_cheat::populate()
 	/* iterate over cheats */
 	std::string text;
 	std::string subtext;
-	for (cheat_entry *curcheat = machine().cheat().first(); curcheat != NULL; curcheat = curcheat->next())
+	for (cheat_entry *curcheat = machine().cheat().first(); curcheat != nullptr; curcheat = curcheat->next())
 	{
 		UINT32 flags;
 		curcheat->menu_text(text, subtext, flags);
@@ -118,13 +118,13 @@ void ui_menu_cheat::populate()
 	}
 
 	/* add a separator */
-	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 
 	/* add a reset all option */
-	item_append("Reset All", NULL, 0, (void *)1);
+	item_append("Reset All", nullptr, 0, (void *)1);
 
 	/* add a reload all cheats option */
-	item_append("Reload All", NULL, 0, (void *)2);
+	item_append("Reload All", nullptr, 0, (void *)2);
 }
 
 ui_menu_cheat::~ui_menu_cheat()

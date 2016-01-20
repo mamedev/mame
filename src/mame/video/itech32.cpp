@@ -168,8 +168,8 @@ void itech32_state::video_start()
 	int i;
 
 	/* allocate memory */
-	m_videoram = auto_alloc_array(machine(), UINT16, VRAM_WIDTH * (m_vram_height + 16) * 2);
-	memset(m_videoram, 0xff, VRAM_WIDTH * (m_vram_height + 16) * 2 * 2);
+	m_videoram = std::make_unique<UINT16[]>(VRAM_WIDTH * (m_vram_height + 16) * 2);
+	memset(m_videoram.get(), 0xff, VRAM_WIDTH * (m_vram_height + 16) * 2 * 2);
 
 	/* videoplane[0] is the foreground; videoplane[1] is the background */
 	m_videoplane[0] = &m_videoram[0 * VRAM_WIDTH * (m_vram_height + 16) + 8 * VRAM_WIDTH];
@@ -321,14 +321,14 @@ WRITE16_MEMBER(itech32_state::bloodstm_paletteram_w)
  *
  *************************************/
 
-void itech32_state::logblit(const char *tag)
+void itech32_state::logblit(std::string tag)
 {
 	if (!machine().input().code_pressed(KEYCODE_L))
 		return;
 	if (m_is_drivedge && VIDEO_TRANSFER_FLAGS == 0x5490)
 	{
 		/* polygon drawing */
-		logerror("%s: e=%d%d f=%04x s=(%03x-%03x,%03x) w=%03x h=%03x b=%02x%04x c=%02x%02x ss=%04x,%04x ds=%04x,%04x ls=%04x%04x rs=%04x%04x u80=%04x", tag,
+		logerror("%s: e=%d%d f=%04x s=(%03x-%03x,%03x) w=%03x h=%03x b=%02x%04x c=%02x%02x ss=%04x,%04x ds=%04x,%04x ls=%04x%04x rs=%04x%04x u80=%04x", tag.c_str(),
 			m_enable_latch[0], m_enable_latch[1],
 			VIDEO_TRANSFER_FLAGS,
 			VIDEO_TRANSFER_X, VIDEO_RIGHTCLIP, VIDEO_TRANSFER_Y, VIDEO_TRANSFER_WIDTH, VIDEO_TRANSFER_HEIGHT,
@@ -344,7 +344,7 @@ void itech32_state::logblit(const char *tag)
 		m_video[0x1a/2] == 0x000 && m_video[0x1c/2] == 0x100 &&
 		m_video[0x1e/2] == 0x000 && m_video[0x20/2] == 0x000)
 	{
-		logerror("%s: e=%d%d f=%04x c=%02x%02x %02x%04x -> (%03x,%03x) %3dx%3dc=(%03x,%03x)-(%03x,%03x)", tag,
+		logerror("%s: e=%d%d f=%04x c=%02x%02x %02x%04x -> (%03x,%03x) %3dx%3dc=(%03x,%03x)-(%03x,%03x)", tag.c_str(),
 				m_enable_latch[0], m_enable_latch[1],
 				VIDEO_TRANSFER_FLAGS,
 				m_color_latch[0] >> 8, m_color_latch[1] >> 8,
@@ -355,7 +355,7 @@ void itech32_state::logblit(const char *tag)
 	}
 	else
 	{
-		logerror("%s: e=%d%d f=%04x c=%02x%02x %02x%04x -> (%03x,%03x) %3dx%3d c=(%03x,%03x)-(%03x,%03x) s=%04x %04x %04x %04x %04x %04x", tag,
+		logerror("%s: e=%d%d f=%04x c=%02x%02x %02x%04x -> (%03x,%03x) %3dx%3d c=(%03x,%03x)-(%03x,%03x) s=%04x %04x %04x %04x %04x %04x", tag.c_str(),
 				m_enable_latch[0], m_enable_latch[1],
 				VIDEO_TRANSFER_FLAGS,
 				m_color_latch[0] >> 8, m_color_latch[1] >> 8,
@@ -1169,8 +1169,8 @@ void itech32_state::handle_video_command()
 			}
 			else
 			{
-				if (m_enable_latch[0]) shiftreg_clear(m_videoplane[0], NULL);
-				if (m_enable_latch[1]) shiftreg_clear(m_videoplane[1], NULL);
+				if (m_enable_latch[0]) shiftreg_clear(m_videoplane[0], nullptr);
+				if (m_enable_latch[1]) shiftreg_clear(m_videoplane[1], nullptr);
 			}
 
 			g_profiler.stop();
@@ -1386,12 +1386,12 @@ UINT32 itech32_state::screen_update_itech32(screen_device &screen, bitmap_ind16 
 			}
 
 			/* draw from the buffer */
-			draw_scanline16(bitmap, cliprect.min_x, y, cliprect.width(), &scanline[cliprect.min_x], NULL);
+			draw_scanline16(bitmap, cliprect.min_x, y, cliprect.width(), &scanline[cliprect.min_x], nullptr);
 		}
 
 		/* otherwise, draw directly from VRAM */
 		else
-			draw_scanline16(bitmap, cliprect.min_x, y, cliprect.width(), &src1[cliprect.min_x], NULL);
+			draw_scanline16(bitmap, cliprect.min_x, y, cliprect.width(), &src1[cliprect.min_x], nullptr);
 	}
 	return 0;
 }

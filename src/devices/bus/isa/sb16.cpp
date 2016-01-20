@@ -678,14 +678,14 @@ WRITE8_MEMBER( sb16_lle_device::mpu401_w )
 
 }
 
-sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sb16_lle_device::sb16_lle_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ISA16_SB16, "SoundBlaster 16 Audio Adapter LLE", tag, owner, clock, "sb16", __FILE__),
 	device_isa16_card_interface(mconfig, *this),
 	m_dacl(*this, "dacl"),
 	m_dacr(*this, "dacr"),
 	m_joy(*this, "pc_joy"),
-	m_cpu(*this, "sb16_cpu"), m_data_in(false), m_in_byte(0), m_data_out(false), m_out_byte(0), m_freq(0), m_mode(0), m_dac_fifo_ctrl(0), m_adc_fifo_ctrl(0), m_ctrl8(0), m_ctrl16(0), m_mpu_byte(0), 
-	m_dma8_len(0), m_dma16_len(0), m_dma8_cnt(0), m_dma16_cnt(0), m_adc_fifo_head(0), m_adc_fifo_tail(0), m_dac_fifo_head(0), m_dac_fifo_tail(0), m_adc_r(false), m_dac_r(false), m_adc_h(false), 
+	m_cpu(*this, "sb16_cpu"), m_data_in(false), m_in_byte(0), m_data_out(false), m_out_byte(0), m_freq(0), m_mode(0), m_dac_fifo_ctrl(0), m_adc_fifo_ctrl(0), m_ctrl8(0), m_ctrl16(0), m_mpu_byte(0),
+	m_dma8_len(0), m_dma16_len(0), m_dma8_cnt(0), m_dma16_cnt(0), m_adc_fifo_head(0), m_adc_fifo_tail(0), m_dac_fifo_head(0), m_dac_fifo_tail(0), m_adc_r(false), m_dac_r(false), m_adc_h(false),
 	m_dac_h(false), m_irq8(false), m_irq16(false), m_irq_midi(false), m_dma8_done(false), m_dma16_done(false), m_timer(nullptr)
 {
 }

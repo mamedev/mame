@@ -41,7 +41,7 @@ struct lcd_t
 class ssystem3_state : public driver_device
 {
 public:
-	ssystem3_state(const machine_config &mconfig, device_type type, const char *tag)
+	ssystem3_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_palette(*this, "palette")
@@ -51,7 +51,7 @@ public:
 	{ }
 
 	DECLARE_DRIVER_INIT(ssystem3);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ssystem3);
 	UINT32 screen_update_ssystem3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(ssystem3_via_write_a);
@@ -69,7 +69,7 @@ public:
 
 private:
 	UINT8 m_porta;
-	UINT8 *m_videoram;
+	std::unique_ptr<UINT8[]> m_videoram;
 	playfield_t m_playfield;
 	lcd_t m_lcd;
 

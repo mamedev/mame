@@ -84,7 +84,7 @@ ROMS: All ROM labels say only "PROM" and a number.
 class pturn_state : public driver_device
 {
 public:
-	pturn_state(const machine_config &mconfig, device_type type, const char *tag)
+	pturn_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -120,16 +120,14 @@ public:
 	DECLARE_WRITE8_MEMBER(bgbank_w);
 	DECLARE_WRITE8_MEMBER(flip_w);
 	DECLARE_READ8_MEMBER(custom_r);
-	DECLARE_READ8_MEMBER(protection_r);
-	DECLARE_READ8_MEMBER(protection2_r);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	DECLARE_DRIVER_INIT(pturn);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -52,7 +52,7 @@ public:
 	: poption(ashort, along, help, true, parent), m_val(defval)
 	{}
 
-	virtual int parse(pstring argument) { m_val = argument; return 0; }
+	virtual int parse(pstring argument) override { m_val = argument; return 0; }
 
 	pstring operator ()() { return m_val; }
 private:
@@ -66,7 +66,7 @@ public:
 	: poption(ashort, along, help, true, parent), m_val(defval), m_limit(limit, ":")
 	{}
 
-	virtual int parse(pstring argument)
+	virtual int parse(pstring argument) override
 	{
 		if (m_limit.contains(argument))
 		{
@@ -90,7 +90,7 @@ public:
 	: poption(ashort, along, help, false, parent), m_val(false)
 	{}
 
-	virtual int parse(ATTR_UNUSED pstring argument) { m_val = true; return 0; }
+	virtual int parse(ATTR_UNUSED pstring argument) override { m_val = true; return 0; }
 
 	bool operator ()() { return m_val; }
 private:
@@ -104,7 +104,7 @@ public:
 	: poption(ashort, along, help, true, parent), m_val(defval)
 	{}
 
-	virtual int parse(pstring argument)
+	virtual int parse(pstring argument) override
 	{
 		bool err = false;
 		m_val = argument.as_double(&err);

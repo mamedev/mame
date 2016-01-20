@@ -20,7 +20,7 @@
 class tsispch_state : public driver_device
 {
 public:
-	tsispch_state(const machine_config &mconfig, device_type type, const char *tag)
+	tsispch_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dsp(*this, "dsp"),
@@ -38,7 +38,7 @@ public:
 
 	UINT8 m_paramReg;           // status leds and resets and etc
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(i8251_rxd);
 	DECLARE_READ8_MEMBER(dsw_r);
 	DECLARE_WRITE8_MEMBER(peripheral_w);

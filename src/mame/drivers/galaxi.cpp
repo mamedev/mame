@@ -50,7 +50,7 @@ Notes:
 class galaxi_state : public driver_device
 {
 public:
-	galaxi_state(const machine_config &mconfig, device_type type, const char *tag)
+	galaxi_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_bg1_ram(*this, "bg1_ram"),
 		m_bg2_ram(*this, "bg2_ram"),
@@ -96,9 +96,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg4_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_galaxi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void show_out(  );
 	required_device<cpu_device> m_maincpu;
@@ -257,18 +257,18 @@ WRITE16_MEMBER(galaxi_state::galaxi_500004_w)
 	    -x-- ----  Payout.
 
 	*/
-		output_set_lamp_value(1, (data & 1));           /* Lamp 1 - HOLD 1 */
-		output_set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - HOLD 2 */
-		output_set_lamp_value(3, (data >> 2) & 1);      /* Lamp 3 - HOLD 3 */
-		output_set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
-		output_set_lamp_value(5, (data >> 4) & 1);      /* Lamp 5 - HOLD 5 */
-		output_set_lamp_value(6, (data >> 5) & 1);      /* Lamp 6 - START  */
+		output().set_lamp_value(1, (data & 1));           /* Lamp 1 - HOLD 1 */
+		output().set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - HOLD 2 */
+		output().set_lamp_value(3, (data >> 2) & 1);      /* Lamp 3 - HOLD 3 */
+		output().set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
+		output().set_lamp_value(5, (data >> 4) & 1);      /* Lamp 5 - HOLD 5 */
+		output().set_lamp_value(6, (data >> 5) & 1);      /* Lamp 6 - START  */
 	}
 	if (ACCESSING_BITS_8_15)
 	{
 		m_ticket = data & 0x0100;
 		m_hopper = data & 0x1000;
-		coin_counter_w(machine(), 0, data & 0x2000);    // coins
+		machine().bookkeeping().coin_counter_w(0, data & 0x2000);    // coins
 	}
 
 	COMBINE_DATA(&m_out[2]);
@@ -322,11 +322,11 @@ static INPUT_PORTS_START( galaxi )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state,hopper_r, (void *)0 )   // hopper sensor
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state,hopper_r, (void *)nullptr )   // hopper sensor
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(5)   // coin a
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(5)   // coin b (token)
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_COIN3 )   // pin 25LC
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state,ticket_r, (void *)0 )  // ticket sensor
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state,ticket_r, (void *)nullptr )  // ticket sensor
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // hopper out (pin 14LS)
 	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_HIGH )    // test
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // (pin 26LC)
@@ -342,11 +342,11 @@ static INPUT_PORTS_START( magjoker )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state,hopper_r, (void *)0 )   // hopper sensor
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state,hopper_r, (void *)nullptr )   // hopper sensor
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(5)   // coin a
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(5)   // coin b (token)
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Hopper Refill") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state,ticket_r, (void *)0 )  // ticket sensor
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state,ticket_r, (void *)nullptr )  // ticket sensor
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // hopper out (pin 14LS)
 	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_HIGH )    // test
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYOUT )   // (pin 26LC)

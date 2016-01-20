@@ -25,7 +25,7 @@
 class tmc600_state : public driver_device
 {
 public:
-	tmc600_state(const machine_config &mconfig, device_type type, const char *tag)
+	tmc600_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
 			m_vis(*this, CDP1869_TAG),
@@ -64,9 +64,9 @@ public:
 	required_ioport m_y6;
 	required_ioport m_y7;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	DECLARE_WRITE8_MEMBER( keyboard_latch_w );
 	DECLARE_WRITE8_MEMBER( vismac_register_w );

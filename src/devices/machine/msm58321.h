@@ -59,7 +59,7 @@ class msm58321_device : public device_t,
 {
 public:
 	// construction/destruction
-	msm58321_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msm58321_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_d0_handler(device_t &device, _Object object) { return downcast<msm58321_device &>(device).m_d0_handler.set_callback(object); }
@@ -84,17 +84,17 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_rtc_interface overrides
-	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second);
-	virtual bool rtc_feature_y2k() { return m_year0 != 0; }
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
+	virtual bool rtc_feature_y2k() override { return m_year0 != 0; }
 
 	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
 
 private:
 	static const device_timer_id TIMER_CLOCK = 0;

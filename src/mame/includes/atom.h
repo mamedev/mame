@@ -41,7 +41,7 @@
 class atom_state : public driver_device
 {
 public:
-	atom_state(const machine_config &mconfig, device_type type, const char *tag)
+	atom_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, SY6502_TAG),
 			m_vdg(*this, MC6847_TAG),
@@ -85,10 +85,7 @@ public:
 	required_ioport m_y10;
 	required_ioport m_rpt;
 
-	virtual void machine_start();
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void bankswitch();
+	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER( ppi_pa_w );
 	DECLARE_READ8_MEMBER( ppi_pb_r );
@@ -123,14 +120,14 @@ public:
 class atomeb_state : public atom_state
 {
 public:
-	atomeb_state(const machine_config &mconfig, device_type type, const char *tag)
+	atomeb_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atom_state(mconfig, type, tag),
 		m_e0(*this, "rom_e0"),
 		m_e1(*this, "rom_e1")
 	{
 	}
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(eprom_r);
 	DECLARE_WRITE8_MEMBER(eprom_w);

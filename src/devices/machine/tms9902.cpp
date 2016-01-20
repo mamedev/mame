@@ -60,7 +60,7 @@ enum
 /*
     Constructor
 */
-tms9902_device::tms9902_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms9902_device::tms9902_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS9902, "TMS9902 ACC", tag, owner, clock, "tms9902", __FILE__),
 		m_int_cb(*this),
 		m_rcv_cb(*this),
@@ -813,7 +813,7 @@ void tms9902_device::device_stop()
 	if (m_dectimer)
 	{
 		m_dectimer->reset();
-		m_dectimer = NULL;
+		m_dectimer = nullptr;
 	}
 }
 

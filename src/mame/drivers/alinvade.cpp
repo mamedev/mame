@@ -27,7 +27,7 @@
 class alinvade_state : public driver_device
 {
 public:
-	alinvade_state(const machine_config &mconfig, device_type type, const char *tag)
+	alinvade_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_videoram(*this, "videoram")
@@ -44,8 +44,8 @@ public:
 private:
 	UINT8 m_irqmask;
 	UINT8 m_irqff;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_videoram;
 	required_device<discrete_device> m_discrete;

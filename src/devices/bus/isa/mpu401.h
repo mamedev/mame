@@ -21,7 +21,7 @@ class isa8_mpu401_device :
 {
 public:
 		// construction/destruction
-		isa8_mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		isa8_mpu401_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 		required_device<mpu401_device> m_mpu401;
 
@@ -31,12 +31,9 @@ public:
 		// optional information overrides
 protected:
 		// device-level overrides
-		virtual void device_start();
-		virtual void device_reset();
-		virtual machine_config_constructor device_mconfig_additions() const;
-
-private:
-		// internal state
+		virtual void device_start() override;
+		virtual void device_reset() override;
+		virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 

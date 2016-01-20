@@ -60,17 +60,17 @@ class rf5c68_device : public device_t,
 						public device_sound_interface
 {
 public:
-	rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rf5c68_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~rf5c68_device() { }
 
 	static void set_end_callback(device_t &device, rf5c68_sample_end_cb_delegate callback) { downcast<rf5c68_device &>(device).m_sample_end_cb = callback; }
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
 	DECLARE_READ8_MEMBER( rf5c68_r );

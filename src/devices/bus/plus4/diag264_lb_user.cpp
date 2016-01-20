@@ -26,7 +26,7 @@ const device_type DIAG264_USER_PORT_LOOPBACK = &device_creator<diag264_user_port
 //  diag264_user_port_loopback_device - constructor
 //-------------------------------------------------
 
-diag264_user_port_loopback_device::diag264_user_port_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+diag264_user_port_loopback_device::diag264_user_port_loopback_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DIAG264_USER_PORT_LOOPBACK, "Diag264 User Port Loopback", tag, owner, clock, "diag264_user_port_loopback", __FILE__),
 	device_pet_user_port_interface(mconfig, *this)
 {

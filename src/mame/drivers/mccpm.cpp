@@ -62,7 +62,7 @@ PIO A-Data 0F4h, A-Command 0F5h, B-Data 0F6h, B-Command 0F7h
 class mccpm_state : public driver_device
 {
 public:
-	mccpm_state(const machine_config &mconfig, device_type type, const char *tag)
+	mccpm_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG),
@@ -77,7 +77,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	required_shared_ptr<UINT8> m_p_ram;
 	UINT8 m_term_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 

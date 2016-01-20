@@ -137,22 +137,22 @@ class ppu2c0x_device :  public device_t,
 {
 public:
 	// construction/destruction
-	ppu2c0x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	ppu2c0x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( palette_read );
 	DECLARE_WRITE8_MEMBER( palette_write );
 
-	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_config_complete() override;
 	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 	// address space configurations
 	const address_space_config      m_space_config;
 
-	static void set_cpu_tag(device_t &device, const char *tag) { downcast<ppu2c0x_device &>(device).m_cpu.set_tag(tag); }
+	static void set_cpu_tag(device_t &device, std::string tag) { downcast<ppu2c0x_device &>(device).m_cpu.set_tag(tag); }
 	static void set_color_base(device_t &device, int colorbase) { downcast<ppu2c0x_device &>(device).m_color_base = colorbase; }
 	static void set_nmi_delegate(device_t &device, ppu2c0x_nmi_delegate cb);
 
@@ -188,10 +188,10 @@ public:
 
 	required_device<cpu_device> m_cpu;
 
-	bitmap_ind16                *m_bitmap;          /* target bitmap */
-	UINT8                       *m_spriteram;           /* sprite ram */
-	pen_t                       *m_colortable;          /* color table modified at run time */
-	pen_t                       *m_colortable_mono;     /* monochromatic color table modified at run time */
+	std::unique_ptr<bitmap_ind16>                m_bitmap;          /* target bitmap */
+	std::unique_ptr<UINT8[]>    m_spriteram;           /* sprite ram */
+	std::unique_ptr<pen_t[]>    m_colortable;          /* color table modified at run time */
+	std::unique_ptr<pen_t[]>    m_colortable_mono;     /* monochromatic color table modified at run time */
 	int                         m_scanline;         /* scanline count */
 	ppu2c0x_scanline_delegate   m_scanline_callback_proc;   /* optional scanline callback */
 	ppu2c0x_hblank_delegate     m_hblank_callback_proc; /* optional hblank callback */
@@ -243,42 +243,42 @@ private:
 
 class ppu2c02_device : public ppu2c0x_device {
 public:
-	ppu2c02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ppu2c02_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class ppu2c03b_device : public ppu2c0x_device {
 public:
-	ppu2c03b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ppu2c03b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class ppu2c04_device : public ppu2c0x_device {
 public:
-	ppu2c04_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ppu2c04_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class ppu2c07_device : public ppu2c0x_device {
 public:
-	ppu2c07_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ppu2c07_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class ppu2c05_01_device : public ppu2c0x_device {
 public:
-	ppu2c05_01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ppu2c05_01_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class ppu2c05_02_device : public ppu2c0x_device {
 public:
-	ppu2c05_02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ppu2c05_02_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class ppu2c05_03_device : public ppu2c0x_device {
 public:
-	ppu2c05_03_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ppu2c05_03_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class ppu2c05_04_device : public ppu2c0x_device {
 public:
-	ppu2c05_04_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ppu2c05_04_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

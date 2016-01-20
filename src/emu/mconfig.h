@@ -51,11 +51,11 @@ public:
 
 	// getters
 	const game_driver &gamedrv() const { return m_gamedrv; }
-	device_t &root_device() const { assert(m_root_device != NULL); return *m_root_device; }
+	device_t &root_device() const { assert(m_root_device != nullptr); return *m_root_device; }
 	screen_device *first_screen() const;
 	emu_options &options() const { return m_options; }
-	inline device_t *device(const char *tag) const { return root_device().subdevice(tag); }
-	template<class _DeviceClass> inline _DeviceClass *device(const char *tag) const { return downcast<_DeviceClass *>(device(tag)); }
+	inline device_t *device(std::string tag) const { return root_device().subdevice(tag); }
+	template<class _DeviceClass> inline _DeviceClass *device(std::string tag) const { return downcast<_DeviceClass *>(device(tag)); }
 
 	// public state
 	attotime                m_minimum_quantum;          // minimum scheduling quantum
@@ -68,16 +68,16 @@ public:
 	const char *            m_default_layout;           // default layout for this machine
 
 	// helpers during configuration; not for general use
-	device_t *device_add(device_t *owner, const char *tag, device_type type, UINT32 clock);
-	device_t *device_replace(device_t *owner, const char *tag, device_type type, UINT32 clock);
-	device_t *device_remove(device_t *owner, const char *tag);
-	device_t *device_find(device_t *owner, const char *tag);
+	device_t *device_add(device_t *owner, std::string tag, device_type type, UINT32 clock);
+	device_t *device_replace(device_t *owner, std::string tag, device_type type, UINT32 clock);
+	device_t *device_remove(device_t *owner, std::string tag);
+	device_t *device_find(device_t *owner, std::string tag);
 
 private:
 	// internal state
 	const game_driver &     m_gamedrv;
 	emu_options &           m_options;
-	auto_pointer<device_t>  m_root_device;
+	std::unique_ptr<device_t>  m_root_device;
 };
 
 

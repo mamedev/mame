@@ -5,7 +5,7 @@
 class zac2650_state : public driver_device
 {
 public:
-	zac2650_state(const machine_config &mconfig, device_type type, const char *tag)
+	zac2650_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_s2636(*this, "s2636"),
@@ -38,7 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER(zac_s2636_w);
 	DECLARE_READ8_MEMBER(tinvader_port_0_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(zac2650);
 	UINT32 screen_update_tinvader(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int SpriteCollision(int first,int second);

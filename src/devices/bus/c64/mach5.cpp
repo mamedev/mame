@@ -51,7 +51,7 @@ ioport_constructor c64_mach5_cartridge_device::device_input_ports() const
 //  c64_mach5_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_mach5_cartridge_device::c64_mach5_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c64_mach5_cartridge_device::c64_mach5_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_MACH5, "C64 MACH5 cartridge", tag, owner, clock, "c64_mach5", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_s1(*this, "S1"), m_c128(false)

@@ -25,7 +25,7 @@
 class jr200_state : public driver_device
 {
 public:
-	jr200_state(const machine_config &mconfig, device_type type, const char *tag)
+	jr200_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_cram(*this, "cram"),
@@ -67,9 +67,9 @@ public:
 	DECLARE_WRITE8_MEMBER(jr200_border_col_w);
 	DECLARE_READ8_MEMBER(mn1271_io_r);
 	DECLARE_WRITE8_MEMBER(mn1271_io_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_jr200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_d_callback);
 

@@ -92,7 +92,7 @@ enum
 #define MCFG_DEVICE_VBLANK_INT_DEVICE(_tag, _devtag, _class, _func) \
 	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)0), _tag);
 #define MCFG_DEVICE_VBLANK_INT_REMOVE()  \
-	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(), NULL);
+	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(), "");
 #define MCFG_DEVICE_PERIODIC_INT_DRIVER(_class, _func, _rate) \
 	device_execute_interface::static_set_periodic_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0), attotime::from_hz(_rate));
 #define MCFG_DEVICE_PERIODIC_INT_DEVICE(_devtag, _class, _func, _rate) \
@@ -150,12 +150,12 @@ public:
 
 	// static inline configuration helpers
 	static void static_set_disable(device_t &device);
-	static void static_set_vblank_int(device_t &device, device_interrupt_delegate function, const char *tag, int rate = 0);
+	static void static_set_vblank_int(device_t &device, device_interrupt_delegate function, std::string tag, int rate = 0);
 	static void static_set_periodic_int(device_t &device, device_interrupt_delegate function, const attotime &rate);
 	static void static_set_irq_acknowledge_callback(device_t &device, device_irq_acknowledge_delegate callback);
 
 	// execution management
-	device_scheduler &scheduler() const { assert(m_scheduler != NULL); return *m_scheduler; }
+	device_scheduler &scheduler() const { assert(m_scheduler != nullptr); return *m_scheduler; }
 	bool executing() const;
 	INT32 cycles_remaining() const;
 	void eat_cycles(int cycles);
@@ -211,12 +211,12 @@ protected:
 	virtual void execute_set_input(int linenum, int state);
 
 	// interface-level overrides
-	virtual void interface_validity_check(validity_checker &valid) const;
-	virtual void interface_pre_start();
-	virtual void interface_post_start();
-	virtual void interface_pre_reset();
-	virtual void interface_post_reset();
-	virtual void interface_clock_changed();
+	virtual void interface_validity_check(validity_checker &valid) const override;
+	virtual void interface_pre_start() override;
+	virtual void interface_post_start() override;
+	virtual void interface_pre_reset() override;
+	virtual void interface_post_reset() override;
+	virtual void interface_clock_changed() override;
 
 	// for use by devcpu for now...
 	IRQ_CALLBACK_MEMBER(standard_irq_callback_member);
@@ -257,7 +257,7 @@ protected:
 	// configuration
 	bool                    m_disabled;                 // disabled from executing?
 	device_interrupt_delegate m_vblank_interrupt;       // for interrupts tied to VBLANK
-	const char *            m_vblank_interrupt_screen;  // the screen that causes the VBLANK interrupt
+	std::string               m_vblank_interrupt_screen;  // the screen that causes the VBLANK interrupt
 	device_interrupt_delegate m_timed_interrupt;        // for interrupts not tied to VBLANK
 	attotime                m_timed_interrupt_period;   // period for periodic interrupts
 	bool                    m_is_octal;                 // to determine if messages/debugger will show octal or hex

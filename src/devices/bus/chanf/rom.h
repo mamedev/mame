@@ -13,12 +13,12 @@ class chanf_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	chanf_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	chanf_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	chanf_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	chanf_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start() {}
-	virtual void device_reset() {}
+	virtual void device_start() override {}
+	virtual void device_reset() override {}
 
 	UINT8 common_read_2102(UINT32 offset);
 	UINT8 common_read_3853(UINT32 offset);
@@ -26,7 +26,7 @@ public:
 	void common_write_3853(UINT32 offset, UINT8 data);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 
 
 protected:
@@ -42,15 +42,15 @@ class chanf_maze_device : public chanf_rom_device
 {
 public:
 	// construction/destruction
-	chanf_maze_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	chanf_maze_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_ram) { return common_read_2102(offset); }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) { common_write_2102(offset, data); }
+	virtual DECLARE_READ8_MEMBER(read_ram) override { return common_read_2102(offset); }
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override { common_write_2102(offset, data); }
 };
 
 
@@ -60,15 +60,15 @@ class chanf_hangman_device : public chanf_rom_device
 {
 public:
 	// construction/destruction
-	chanf_hangman_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	chanf_hangman_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_ram) { return common_read_2102(offset); }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) { common_write_2102(offset, data); }
+	virtual DECLARE_READ8_MEMBER(read_ram) override { return common_read_2102(offset); }
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override { common_write_2102(offset, data); }
 };
 
 
@@ -78,11 +78,11 @@ class chanf_chess_device : public chanf_rom_device
 {
 public:
 	// construction/destruction
-	chanf_chess_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	chanf_chess_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_ram) { return common_read_3853(offset); }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) { common_write_3853(offset, data); }
+	virtual DECLARE_READ8_MEMBER(read_ram) override { return common_read_3853(offset); }
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override { common_write_3853(offset, data); }
 };
 
 
@@ -92,17 +92,17 @@ class chanf_multi_old_device : public chanf_rom_device
 {
 public:
 	// construction/destruction
-	chanf_multi_old_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	chanf_multi_old_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_READ8_MEMBER(read_ram) { return common_read_3853(offset); }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) { common_write_3853(offset, data); }
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_READ8_MEMBER(read_ram) override { return common_read_3853(offset); }
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override { common_write_3853(offset, data); }
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 
 private:
 	int m_base_bank;
@@ -115,17 +115,17 @@ class chanf_multi_final_device : public chanf_rom_device
 {
 public:
 	// construction/destruction
-	chanf_multi_final_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	chanf_multi_final_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_READ8_MEMBER(read_ram) { return common_read_3853(offset); }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) { common_write_3853(offset, data); }
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_READ8_MEMBER(read_ram) override { return common_read_3853(offset); }
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override { common_write_3853(offset, data); }
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 
 private:
 	int m_base_bank, m_half_bank;

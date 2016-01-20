@@ -345,13 +345,13 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( pce, pce_common )
-	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, NULL)
+	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pce")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( tg16, pce_common )
-	MCFG_TG16_CARTRIDGE_ADD("cartslot", pce_cart, NULL)
+	MCFG_TG16_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","tg16")
 MACHINE_CONFIG_END
 
@@ -403,7 +403,7 @@ static MACHINE_CONFIG_START( sgx, pce_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, NULL)
+	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sgx")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pce_list","pce")
 

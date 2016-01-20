@@ -26,7 +26,7 @@ TODO:
 class jackpool_state : public driver_device
 {
 public:
-	jackpool_state(const machine_config &mconfig, device_type type, const char *tag)
+	jackpool_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_io(*this, "io"),
@@ -42,7 +42,7 @@ public:
 	DECLARE_READ16_MEMBER(jackpool_io_r);
 	DECLARE_WRITE16_MEMBER(jackpool_io_w);
 	DECLARE_DRIVER_INIT(jackpool);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jackpool_interrupt);
 	required_device<cpu_device> m_maincpu;

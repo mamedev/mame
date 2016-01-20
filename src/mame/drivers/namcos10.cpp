@@ -274,7 +274,7 @@ Kono Tako                             10021 Ver.A   KC034A   8E, 8D
 class namcos10_state : public driver_device
 {
 public:
-	namcos10_state(const machine_config &mconfig, device_type type, const char *tag)
+	namcos10_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
@@ -572,7 +572,7 @@ ADDRESS_MAP_END
 WRITE16_MEMBER(namcos10_state::crypto_switch_w)
 {
 	printf("crypto_switch_w: %04x\n", data);
-	if (decrypter == 0)
+	if (decrypter == nullptr)
 		return;
 
 	if (BIT(data, 15) != 0)
@@ -633,7 +633,7 @@ READ16_MEMBER( namcos10_state::nand_data_r )
 /*  printf( "data<-%08x (%08x)\n", data, nand_address ); */
 	nand_address++;
 
-	if (decrypter == 0)
+	if (decrypter == nullptr)
 		return data;
 
 	if (decrypter->is_active())
@@ -702,7 +702,7 @@ static void decrypt_bios( running_machine &machine, const char *regionName, int 
 
 DRIVER_INIT_MEMBER(namcos10_state,mrdrilr2)
 {
-	int regSize = machine().root_device().memregion("user2")->bytes();
+	int regSize = machine().root_device().memregion("maincpu:rom")->bytes();
 	decrypt_bios(machine(), "maincpu:rom", 0, regSize, 0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3);
 }
 

@@ -122,7 +122,7 @@ ioport_constructor sa1403d_device::device_input_ports() const
 //  sa1403d_device - constructor
 //-------------------------------------------------
 
-sa1403d_device::sa1403d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sa1403d_device::sa1403d_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: scsihd_device(mconfig, SA1403D, "Shugart SA1403D", tag, owner, clock, "sa1403d", __FILE__)
 {
 }

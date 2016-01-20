@@ -151,7 +151,7 @@ READ_LINE_MEMBER( elf2_state::ef4_r )
 
 WRITE_LINE_MEMBER( elf2_state::q_w )
 {
-	output_set_led_value(0, state);
+	output().set_led_value(0, state);
 }
 
 READ8_MEMBER( elf2_state::dma_r )

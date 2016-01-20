@@ -266,13 +266,13 @@ WRITE8_MEMBER( c8280_t::riot1_pb_w )
 	*/
 
 	// activity led 1
-	output_set_led_value(LED_ACT1, BIT(data, 3));
+	machine().output().set_led_value(LED_ACT1, BIT(data, 3));
 
 	// activity led 0
-	output_set_led_value(LED_ACT0, BIT(data, 4));
+	machine().output().set_led_value(LED_ACT0, BIT(data, 4));
 
 	// error led
-	output_set_led_value(LED_ERR, BIT(data, 5));
+	machine().output().set_led_value(LED_ERR, BIT(data, 5));
 }
 
 static SLOT_INTERFACE_START( c8280_floppies )
@@ -382,7 +382,7 @@ inline void c8280_t::update_ieee_signals()
 //  c8280_t - constructor
 //-------------------------------------------------
 
-c8280_t::c8280_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c8280_t::c8280_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C8280, "C8280", tag, owner, clock, "c8280", __FILE__),
 	device_ieee488_interface(mconfig, *this),
 	m_maincpu(*this, M6502_DOS_TAG),
@@ -436,7 +436,7 @@ void c8280_t::device_reset()
 	m_riot1->pa7_w(1);
 
 	m_fk5 = 0;
-	m_floppy = NULL;
+	m_floppy = nullptr;
 	m_fdc->set_floppy(m_floppy);
 	m_fdc->dden_w(0);
 }
@@ -513,7 +513,7 @@ WRITE8_MEMBER( c8280_t::fk5_w )
 	m_fk5 = data & 0x27;
 
 	// drive select
-	m_floppy = NULL;
+	m_floppy = nullptr;
 
 	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();

@@ -123,7 +123,7 @@ const device_type ATARI_MOTION_OBJECTS = &device_creator<atari_motion_objects_de
 //  atari_motion_objects_device - constructor
 //-------------------------------------------------
 
-atari_motion_objects_device::atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atari_motion_objects_device::atari_motion_objects_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: sprite16_device_ind16(mconfig, ATARI_MOTION_OBJECTS, "Atari Motion Objects", tag, owner, "atarimo", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_tilewidth(0),
@@ -145,7 +145,7 @@ atari_motion_objects_device::atari_motion_objects_device(const machine_config &m
 		m_xscroll(0),
 		m_yscroll(0),
 		m_slipram(*this, "slip"),
-		m_activelast(NULL),
+		m_activelast(nullptr),
 		m_last_xpos(0),
 		m_next_xpos(0),
 		m_gfxdecode(*this)
@@ -157,7 +157,7 @@ atari_motion_objects_device::atari_motion_objects_device(const machine_config &m
 //  gfx decoder
 //-------------------------------------------------
 
-void atari_motion_objects_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void atari_motion_objects_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<atari_motion_objects_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -282,7 +282,7 @@ void atari_motion_objects_device::device_start()
 
 	// verify configuration
 	gfx_element *gfx = m_gfxdecode->gfx(m_gfxindex);
-	if (gfx == NULL)
+	if (gfx == nullptr)
 		throw emu_fatalerror("No gfxelement #%d!", m_gfxindex);
 
 	// determine the masks

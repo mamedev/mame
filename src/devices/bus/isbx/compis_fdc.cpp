@@ -80,7 +80,7 @@ machine_config_constructor compis_fdc_device::device_mconfig_additions() const
 //  compis_fdc_device - constructor
 //-------------------------------------------------
 
-compis_fdc_device::compis_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+compis_fdc_device::compis_fdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COMPIS_FDC, "Compis FDC", tag, owner, clock, "compis_fdc", __FILE__),
 	device_isbx_card_interface(mconfig, *this),
 	m_fdc(*this, I8272_TAG),

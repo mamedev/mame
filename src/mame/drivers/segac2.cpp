@@ -97,7 +97,7 @@ typedef device_delegate<int (int in)> segac2_prot_delegate;
 class segac2_state : public md_base_state
 {
 public:
-	segac2_state(const machine_config &mconfig, device_type type, const char *tag)
+	segac2_state(const machine_config &mconfig, device_type type, std::string tag)
 	: md_base_state(mconfig, type, tag),
 	m_paletteram(*this, "paletteram"),
 	m_upd7759(*this, "upd"),
@@ -277,7 +277,7 @@ MACHINE_RESET_MEMBER(segac2_state,segac2)
 WRITE16_MEMBER(segac2_state::segac2_upd7759_w)
 {
 	/* make sure we have a UPD chip */
-	if (m_upd7759 == NULL)
+	if (m_upd7759 == nullptr)
 		return;
 
 	/* only works if we're accessing the low byte */
@@ -415,7 +415,7 @@ READ8_MEMBER(segac2_state::io_portc_r)
 {
 	// D7 : From MB3773P pin 1. (/RESET output)
 	// D6 : From uPD7759 pin 18. (/BUSY output)
-	int busy = (m_upd7759 != NULL) ? (m_upd7759->busy_r() << 6) : 0x40;
+	int busy = (m_upd7759 != nullptr) ? (m_upd7759->busy_r() << 6) : 0x40;
 	return 0xbf | busy;
 }
 
@@ -431,10 +431,10 @@ WRITE8_MEMBER(segac2_state::io_portd_w)
 	 D1 : To CN1 pin J. (Coin meter 2)
 	 D0 : To CN1 pin 8. (Coin meter 1)
 	*/
-	//coin_lockout_w(space.machine(), 1, data & 0x08);
-	//coin_lockout_w(space.machine(), 0, data & 0x04);
-	coin_counter_w(space.machine(), 1, data & 0x02);
-	coin_counter_w(space.machine(), 0, data & 0x01);
+	//space.machine().bookkeeping().coin_lockout_w(1, data & 0x08);
+	//space.machine().bookkeeping().coin_lockout_w(0, data & 0x04);
+	space.machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	space.machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
 WRITE8_MEMBER(segac2_state::io_porth_w)
@@ -569,8 +569,8 @@ WRITE8_MEMBER(segac2_state::counter_timer_w)
 			break;
 
 		case 0x10:  /* coin counter */
-//          coin_counter_w(space.machine(), 0,1);
-//          coin_counter_w(space.machine(), 0,0);
+//          space.machine().bookkeeping().coin_counter_w(0,1);
+//          space.machine().bookkeeping().coin_counter_w(0,0);
 			break;
 
 		case 0x12:  /* set coinage info -- followed by two 4-bit values */
@@ -1385,7 +1385,7 @@ UINT32 segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb3
 		UINT32* desty = &bitmap.pix32(y, 0);
 		UINT16* srcy;
 
-		srcy = m_vdp->m_render_line_raw;
+		srcy = m_vdp->m_render_line_raw.get();
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
@@ -1981,7 +1981,7 @@ void segac2_state::segac2_common_init(segac2_prot_delegate prot_func)
 	DRIVER_INIT_CALL(megadriv_c2);
 	m_prot_func = prot_func;
 
-	if (m_upd7759 != NULL)
+	if (m_upd7759 != nullptr)
 		m_maincpu->space(AS_PROGRAM).install_write_handler(0x880000, 0x880001, 0, 0x13fefe, write16_delegate(FUNC(segac2_state::segac2_upd7759_w),this));
 }
 

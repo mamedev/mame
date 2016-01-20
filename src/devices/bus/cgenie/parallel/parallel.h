@@ -46,7 +46,7 @@ class parallel_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	parallel_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~parallel_slot_device();
 
 	// IOA
@@ -59,12 +59,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	device_parallel_interface *m_cart;
-
-private:
 };
 
 // class representing interface-specific live parallel device

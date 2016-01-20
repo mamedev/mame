@@ -264,7 +264,7 @@ WRITE8_MEMBER( xerox820_state::kbpio_pa_w )
 	*/
 
 	/* drive select */
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) floppy = m_floppy1->get_device();
@@ -371,7 +371,7 @@ static const z80_daisy_config xerox820_daisy_chain[] =
 	{ Z80PIO_KB_TAG },
 	{ Z80PIO_GP_TAG },
 	{ Z80CTC_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 /* WD1771 Interface */
@@ -586,10 +586,10 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio0_device, rxa_w))
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio0_device, rxb_w))
 
 	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, XTAL_5_0688MHz)
@@ -673,10 +673,10 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio0_device, rxa_w))
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio0_device, rxb_w))
 
 	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, XTAL_5_0688MHz)

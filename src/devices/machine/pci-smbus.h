@@ -10,7 +10,7 @@
 
 class smbus_device : public pci_device {
 public:
-	smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	smbus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER  (hst_sts_r);
 	DECLARE_WRITE8_MEMBER (hst_sts_w);
@@ -49,8 +49,8 @@ public:
 	DECLARE_READ8_MEMBER  (notify_dhigh_r);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	DECLARE_ADDRESS_MAP(map, 32);

@@ -370,7 +370,7 @@ ioport_constructor wangpc_keyboard_device::device_input_ports() const
 //  wangpc_keyboard_device - constructor
 //-------------------------------------------------
 
-wangpc_keyboard_device::wangpc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+wangpc_keyboard_device::wangpc_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WANGPC_KEYBOARD, "Wang PC Keyboard", tag, owner, clock, "wangpckb", __FILE__),
 		device_serial_interface(mconfig, *this),
 		m_maincpu(*this, I8051_TAG),
@@ -524,7 +524,7 @@ WRITE8_MEMBER( wangpc_keyboard_device::kb_p1_w )
 
 	for (int i = 0; i < 6; i++)
 	{
-		output_set_led_value(i, !BIT(data, i));
+		machine().output().set_led_value(i, !BIT(data, i));
 	}
 
 	if (LOG) logerror("P1 %02x\n", data);

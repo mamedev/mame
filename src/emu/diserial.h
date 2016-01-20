@@ -122,7 +122,7 @@ protected:
 	virtual void rcv_complete() { }
 
 	// interface-level overrides
-	virtual void interface_pre_start();
+	virtual void interface_pre_start() override;
 
 	// Must be called from device_timer in the underlying device
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

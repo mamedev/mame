@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 /***************************************************************************
 
@@ -13,7 +13,7 @@
 class embargo_state : public driver_device
 {
 public:
-	embargo_state(const machine_config &mconfig, device_type type, const char *tag)
+	embargo_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu") { }
@@ -30,8 +30,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port_1_w);
 	DECLARE_WRITE8_MEMBER(port_2_w);
 	DECLARE_WRITE8_MEMBER(input_select_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_embargo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };

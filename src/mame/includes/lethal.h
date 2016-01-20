@@ -16,7 +16,7 @@
 class lethal_state : public driver_device
 {
 public:
-	lethal_state(const machine_config &mconfig, device_type type, const char *tag)
+	lethal_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
@@ -49,9 +49,9 @@ public:
 	DECLARE_READ8_MEMBER(guns_r);
 	DECLARE_READ8_MEMBER(gunsaux_r);
 	DECLARE_WRITE8_MEMBER(lethalen_palette_control);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lethalen_interrupt);
 	K05324X_CB_MEMBER(sprite_callback);

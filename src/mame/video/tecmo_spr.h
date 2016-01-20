@@ -7,7 +7,7 @@
 class tecmo_spr_device : public device_t
 {
 public:
-	tecmo_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tecmo_spr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	static void set_gfx_region(device_t &device, int gfxregion);
 	static void set_bootleg(device_t &device, int bootleg);
 	static void set_yoffset(device_t &device, int bootleg);
@@ -25,8 +25,8 @@ public:
 	void tbowl_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfxdecode_device *gfxdecode, int xscroll, UINT8* spriteram);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	UINT8 m_gfxregion;
 	int m_bootleg; // for Gals Pinball / Hot Pinball

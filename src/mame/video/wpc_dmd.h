@@ -15,7 +15,7 @@
 class wpc_dmd_device : public device_t
 {
 public:
-	wpc_dmd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wpc_dmd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~wpc_dmd_device();
 
 	DECLARE_ADDRESS_MAP(registers, 8);
@@ -41,9 +41,9 @@ protected:
 	UINT8 cur_scanline, visible_page, firq_scanline;
 	std::vector<UINT8> ram, screen_buffer, bitcounts;
 
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 extern const device_type WPC_DMD;

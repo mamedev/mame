@@ -15,7 +15,7 @@
 class equites_state : public driver_device
 {
 public:
-	equites_state(const machine_config &mconfig, device_type type, const char *tag)
+	equites_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -36,7 +36,7 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg_videoram;
-	UINT8 *m_fg_videoram;    // 8bits
+	std::unique_ptr<UINT8[]> m_fg_videoram;    // 8bits
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_spriteram_2;
 	optional_shared_ptr<UINT8> m_mcuram;
@@ -127,6 +127,6 @@ public:
 	void unpack_block(const char *region, int offset, int size);
 	void unpack_region(const char *region);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };

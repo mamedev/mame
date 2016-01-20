@@ -62,7 +62,7 @@ class midway_ssio_device :  public device_t,
 {
 public:
 	// construction/destruction
-	midway_ssio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	midway_ssio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// read/write
 	DECLARE_READ8_MEMBER(read);
@@ -87,12 +87,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// internal helpers
@@ -128,7 +128,7 @@ class midway_chip_squeak_deluxe_device :    public device_t,
 {
 public:
 	// construction/destruction
-	midway_chip_squeak_deluxe_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	midway_chip_squeak_deluxe_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// read/write
 	DECLARE_READ8_MEMBER(read);
@@ -144,10 +144,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// devices
@@ -168,7 +168,7 @@ class midway_sounds_good_device :   public device_t,
 {
 public:
 	// construction/destruction
-	midway_sounds_good_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	midway_sounds_good_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// read/write
 	DECLARE_READ8_MEMBER(read);
@@ -182,10 +182,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// devices
@@ -206,7 +206,7 @@ class midway_turbo_chip_squeak_device : public device_t,
 {
 public:
 	// construction/destruction
-	midway_turbo_chip_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	midway_turbo_chip_squeak_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// read/write
 	DECLARE_READ8_MEMBER(read);
@@ -220,10 +220,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// devices
@@ -244,7 +244,7 @@ class midway_squawk_n_talk_device : public device_t,
 {
 public:
 	// construction/destruction
-	midway_squawk_n_talk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	midway_squawk_n_talk_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// read/write
 	DECLARE_WRITE8_MEMBER(write);
@@ -259,10 +259,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// devices

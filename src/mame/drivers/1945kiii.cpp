@@ -52,7 +52,7 @@ Notes:
 class k3_state : public driver_device
 {
 public:
-	k3_state(const machine_config &mconfig, device_type type, const char *tag)
+	k3_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_oki1(*this, "oki1"),
 			m_oki2(*this, "oki2") ,
@@ -79,8 +79,8 @@ public:
 	DECLARE_WRITE16_MEMBER(k3_scrolly_w);
 	DECLARE_WRITE16_MEMBER(k3_soundbanks_w);
 	TILE_GET_INFO_MEMBER(get_k3_bg_tile_info);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;

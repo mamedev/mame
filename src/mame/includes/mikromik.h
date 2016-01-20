@@ -35,7 +35,7 @@
 class mm1_state : public driver_device
 {
 public:
-	mm1_state(const machine_config &mconfig, device_type type, const char *tag) :
+	mm1_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, I8085A_TAG),
 		m_iop(*this, I8212_TAG),
@@ -83,8 +83,8 @@ public:
 	required_memory_region m_char_rom;
 	required_shared_ptr<UINT16> m_video_ram;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -104,8 +104,6 @@ public:
 	DECLARE_READ_LINE_MEMBER( dsra_r );
 
 	void update_tc();
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
 
 	int m_a8;
 
@@ -127,6 +125,7 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
+	DECLARE_PALETTE_INIT( mm1 );
 };
 
 

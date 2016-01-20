@@ -3,7 +3,7 @@
 class snookr10_state : public driver_device
 {
 public:
-	snookr10_state(const machine_config &mconfig, device_type type, const char *tag)
+	snookr10_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -30,7 +30,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(apple10_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(crystalc_get_bg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(snookr10);
 	DECLARE_VIDEO_START(apple10);
 	DECLARE_VIDEO_START(crystalc);

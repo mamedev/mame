@@ -48,7 +48,7 @@ public:
 		TIMER_GALASTRM_INTERRUPT6
 	};
 
-	galastrm_state(const machine_config &mconfig, device_type type, const char *tag)
+	galastrm_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this,"ram"),
 		m_spriteram(*this,"spriteram") ,
@@ -78,10 +78,10 @@ public:
 	int m_tc0610_1_addr;
 	UINT32 m_mem[2];
 	INT16 m_tc0610_ctrl_reg[2][8];
-	struct gs_tempsprite *m_spritelist;
+	std::unique_ptr<gs_tempsprite[]> m_spritelist;
 	struct gs_tempsprite *m_sprite_ptr_pre;
 	bitmap_ind16 m_tmpbitmaps;
-	galastrm_renderer *m_poly;
+	std::unique_ptr<galastrm_renderer> m_poly;
 
 	int m_rsxb;
 	int m_rsyb;
@@ -96,13 +96,12 @@ public:
 	DECLARE_WRITE32_MEMBER(galastrm_adstick_ctrl_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galastrm_interrupt);
 	void draw_sprites_pre(int x_offs, int y_offs);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int priority);
-	void tc0610_rotate_draw(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, const rectangle &clip);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

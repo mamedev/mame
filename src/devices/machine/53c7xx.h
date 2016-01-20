@@ -72,7 +72,7 @@ class ncr53c7xx_device : public nscsi_device,
 {
 public:
 	// construction/destruction
-	ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ncr53c7xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ncr53c7xx_device &>(device).m_irq_handler.set_callback(object); }
@@ -85,10 +85,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void execute_run();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void execute_run() override;
 
 	int m_icount;
 
@@ -137,7 +137,7 @@ private:
 	void update_irqs();
 	void set_scsi_state(int state);
 	void delay(const attotime &delay);
-	void scsi_ctrl_changed();
+	void scsi_ctrl_changed() override;
 	void send_byte();
 	void recv_byte();
 	void step(bool timeout);

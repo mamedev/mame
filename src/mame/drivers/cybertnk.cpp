@@ -179,7 +179,7 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 class cybertnk_state : public driver_device
 {
 public:
-	cybertnk_state(const machine_config &mconfig, device_type type, const char *tag)
+	cybertnk_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -227,7 +227,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tilemap0_tile_info);
 	TILE_GET_INFO_MEMBER(get_tilemap1_tile_info);
 	TILE_GET_INFO_MEMBER(get_tilemap2_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift, int pri);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift);
 	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift);

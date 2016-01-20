@@ -53,7 +53,7 @@ ioport_constructor vcs_keypad_device::device_input_ports() const
 //  vcs_keypad_device - constructor
 //-------------------------------------------------
 
-vcs_keypad_device::vcs_keypad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+vcs_keypad_device::vcs_keypad_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VCS_KEYPAD, "Atari / CBM Keypad", tag, owner, clock, "vcs_keypad", __FILE__),
 	device_vcs_control_port_interface(mconfig, *this),
 	m_keypad(*this, "KEYPAD"), m_column(0)

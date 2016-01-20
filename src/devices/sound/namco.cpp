@@ -35,15 +35,15 @@ const device_type NAMCO = &device_creator<namco_device>;
 const device_type NAMCO_15XX = &device_creator<namco_15xx_device>;
 const device_type NAMCO_CUS30 = &device_creator<namco_cus30_device>;
 
-namco_audio_device::namco_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+namco_audio_device::namco_audio_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_last_channel(NULL),
-		m_soundregs(NULL),
-		m_wavedata(NULL),
+		m_last_channel(nullptr),
+		m_soundregs(nullptr),
+		m_wavedata(nullptr),
 		m_wave_size(0),
 		m_sound_enable(0),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_namco_clock(0),
 		m_sample_rate(0),
 		m_f_fracbits(0),
@@ -52,17 +52,17 @@ namco_audio_device::namco_audio_device(const machine_config &mconfig, device_typ
 {
 }
 
-namco_device::namco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+namco_device::namco_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: namco_audio_device(mconfig, NAMCO, "Namco", tag, owner, clock, "namco", __FILE__)
 {
 }
 
-namco_15xx_device::namco_15xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+namco_15xx_device::namco_15xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	:namco_audio_device(mconfig, NAMCO_15XX, "Namco 15XX", tag, owner, clock, "namco_15xx", __FILE__)
 {
 }
 
-namco_cus30_device::namco_cus30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+namco_cus30_device::namco_cus30_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: namco_audio_device(mconfig, NAMCO_CUS30, "Namco CUS30", tag, owner, clock, "namco_cus30", __FILE__)
 {
 }
@@ -109,7 +109,7 @@ void namco_audio_device::device_start()
 	/* register with the save state system */
 	save_pointer(NAME(m_soundregs), 0x400);
 
-	if (region() == NULL)
+	if (region() == nullptr)
 		save_pointer(NAME(m_wavedata), 0x400);
 
 	save_item(NAME(m_voices));
@@ -182,10 +182,10 @@ void namco_audio_device::build_decoded_waveform(UINT8 *rgnbase)
 	int offset;
 	int v;
 
-	m_wavedata = (rgnbase != NULL) ? rgnbase : auto_alloc_array_clear(machine(), UINT8, 0x400);
+	m_wavedata = (rgnbase != nullptr) ? rgnbase : auto_alloc_array_clear(machine(), UINT8, 0x400);
 
 	/* 20pacgal has waves in RAM but old sound system */
-	if (rgnbase == NULL && m_voices != 3)
+	if (rgnbase == nullptr && m_voices != 3)
 	{
 		m_wave_size = 1;
 		size = 32 * 16;     /* 32 samples, 16 waveforms */

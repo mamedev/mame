@@ -64,7 +64,7 @@
 class p8k_state : public driver_device
 {
 public:
-	p8k_state(const machine_config &mconfig, device_type type, const char *tag)
+	p8k_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG)
@@ -88,7 +88,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_WRITE_LINE_MEMBER( p8k_daisy_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( p8k_dma_irq_w );
@@ -262,7 +262,7 @@ static const z80_daisy_config p8k_daisy_chain[] =
 	{ "z80pio_0" },
 	{ "z80pio_1" },
 	{ "z80ctc_1" },
-	{ NULL }
+	{ nullptr }
 };
 
 /* Intel 8272 Interface */
@@ -431,7 +431,7 @@ static const z80_daisy_config p8k_16_daisy_chain[] =
 	{ "z80pio_0" },
 	{ "z80pio_1" },
 	{ "z80pio_2" },
-	{ NULL }
+	{ nullptr }
 };
 
 

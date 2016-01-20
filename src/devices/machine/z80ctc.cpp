@@ -78,14 +78,14 @@ const device_type Z80CTC = &device_creator<z80ctc_device>;
 //  z80ctc_device - constructor
 //-------------------------------------------------
 
-z80ctc_device::z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z80ctc_device::z80ctc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, Z80CTC, "Z80 CTC", tag, owner, clock, "z80ctc", __FILE__),
 		device_z80daisy_interface(mconfig, *this),
 		m_intr_cb(*this),
 		m_zc0_cb(*this),
 		m_zc1_cb(*this),
 		m_zc2_cb(*this),
-		m_zc3_cb(*this), 
+		m_zc3_cb(*this),
 		m_vector(0)
 {
 }
@@ -183,10 +183,8 @@ int z80ctc_device::z80daisy_irq_state()
 
 	// loop over all channels
 	int state = 0;
-	for (int ch = 0; ch < 4; ch++)
+	for (auto & channel : m_channel)
 	{
-		ctc_channel &channel = m_channel[ch];
-
 		// if we're servicing a request, don't indicate more interrupts
 		if (channel.m_int_state & Z80_DAISY_IEO)
 		{
@@ -284,13 +282,13 @@ void z80ctc_device::interrupt_check()
 //-------------------------------------------------
 
 z80ctc_device::ctc_channel::ctc_channel()
-	: m_device(NULL), 
-		m_index(0), 
+	: m_device(nullptr),
+		m_index(0),
 		m_mode(0),
 		m_tconst(0),
 		m_down(0),
 		m_extclk(0),
-		m_timer(NULL),
+		m_timer(nullptr),
 		m_int_state(0)
 {
 }
@@ -369,7 +367,7 @@ UINT8 z80ctc_device::ctc_channel::read()
 
 		VPRINTF_CHANNEL(("CTC clock %f\n",ATTOSECONDS_TO_HZ(period.attoseconds())));
 
-		if (m_timer != NULL)
+		if (m_timer != nullptr)
 			return ((int)(m_timer->remaining().as_double() / period.as_double()) + 1) & 0xff;
 		else
 			return 0;

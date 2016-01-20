@@ -22,16 +22,16 @@ class msx_cart_konami : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_konami(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_konami(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 
 	void restore_banks();
 
@@ -46,17 +46,17 @@ class msx_cart_konami_scc : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_konami_scc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_konami_scc(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 
 	void restore_banks();
 
@@ -74,16 +74,16 @@ class msx_cart_gamemaster2 : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_gamemaster2(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_gamemaster2(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 
 	void restore_banks();
 
@@ -99,16 +99,16 @@ class msx_cart_synthesizer : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_synthesizer(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_synthesizer(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 
 private:
 	UINT8 *m_bank_base;
@@ -120,17 +120,17 @@ class msx_cart_konami_sound : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_konami_sound(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	msx_cart_konami_sound(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 
 	void restore_banks();
 
@@ -155,18 +155,18 @@ private:
 class msx_cart_konami_sound_snatcher : public msx_cart_konami_sound
 {
 public:
-	msx_cart_konami_sound_snatcher(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_konami_sound_snatcher(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 };
 
 
 class msx_cart_konami_sound_sdsnatcher : public msx_cart_konami_sound
 {
 public:
-	msx_cart_konami_sound_sdsnatcher(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_konami_sound_sdsnatcher(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 };
 
 
@@ -175,15 +175,15 @@ class msx_cart_keyboard_master : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_keyboard_master(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_keyboard_master(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
 
 	DECLARE_WRITE8_MEMBER(io_20_w);
 	DECLARE_READ8_MEMBER(io_00_r);

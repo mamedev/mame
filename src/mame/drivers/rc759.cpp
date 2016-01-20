@@ -32,7 +32,7 @@
 class rc759_state : public driver_device
 {
 public:
-	rc759_state(const machine_config &mconfig, device_type type, const char *tag) :
+	rc759_state(const machine_config &mconfig, device_type type, std::string tag) :
 	driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_pic(*this, "pic"),
@@ -101,8 +101,8 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<i80186_cpu_device> m_maincpu;
@@ -577,7 +577,7 @@ static MACHINE_CONFIG_START( rc759, rc759_state )
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(rc759_state, centronics_select_w))
 
 	// isbx slot
-	MCFG_ISBX_SLOT_ADD("isbx", 0, isbx_cards, NULL)
+	MCFG_ISBX_SLOT_ADD("isbx", 0, isbx_cards, nullptr)
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, int1_w))
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, int3_w))
 	MCFG_ISBX_SLOT_MDRQT_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq0_w))

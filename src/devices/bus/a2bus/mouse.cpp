@@ -172,21 +172,21 @@ const rom_entry *a2bus_mouse_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_pia(*this, MOUSE_PIA_TAG),
 	m_mcu(*this, MOUSE_MCU_TAG),
 	m_mouseb(*this, MOUSE_BUTTON_TAG),
 	m_mousex(*this, MOUSE_XAXIS_TAG),
-	m_mousey(*this, MOUSE_YAXIS_TAG), m_rom(nullptr), m_ddr_a(0), m_ddr_b(0), m_ddr_c(0), m_port_a_out(0), m_port_b_out(0), m_port_c_out(0), m_port_a_in(0), m_port_b_in(0), 
+	m_mousey(*this, MOUSE_YAXIS_TAG), m_rom(nullptr), m_ddr_a(0), m_ddr_b(0), m_ddr_c(0), m_port_a_out(0), m_port_b_out(0), m_port_c_out(0), m_port_a_in(0), m_port_b_in(0),
 	m_port_c_in(0), m_timer_cnt(0), m_timer_ctl(0), m_mask_option(0), last_mx(0), last_my(0), count_x(0), count_y(0), m_timer(nullptr), m_read_timer(nullptr)
 {
 	m_started = false;
 	m_rom_bank = 0;
 }
 
-a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, A2BUS_MOUSE, "Apple II Mouse Card", tag, owner, clock, "a2mouse", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_pia(*this, MOUSE_PIA_TAG),
@@ -211,8 +211,8 @@ void a2bus_mouse_device::device_start()
 	m_rom = device().machine().root_device().memregion(this->subtag(MOUSE_ROM_REGION).c_str())->base();
 
 	// allocate two timers: one for the 68705, one for the quadrature magic
-	m_timer = timer_alloc(TIMER_68705, NULL);
-	m_read_timer = timer_alloc(TIMER_QUADRATURE, NULL);
+	m_timer = timer_alloc(TIMER_68705, nullptr);
+	m_read_timer = timer_alloc(TIMER_QUADRATURE, nullptr);
 	m_timer->adjust(attotime::never, TIMER_68705);
 	m_read_timer->adjust(attotime::never, TIMER_QUADRATURE);
 

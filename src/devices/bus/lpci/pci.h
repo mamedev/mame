@@ -27,20 +27,19 @@ public:
 
 	virtual UINT32 pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask) = 0;
 	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask) = 0;
-private:
 };
 
 class pci_connector: public device_t,
 						public device_slot_interface
 {
 public:
-	pci_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pci_connector(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~pci_connector();
 
 	pci_device_interface *get_device();
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type PCI_CONNECTOR;
@@ -51,7 +50,7 @@ class pci_bus_device :  public device_t
 {
 public:
 	// construction/destruction
-	pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pci_bus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );
@@ -61,7 +60,7 @@ public:
 
 	void set_busnum(int busnum) { m_busnum = busnum; }
 	void set_father(const char *father) { m_father = father; }
-	void set_device(int num, const char *tag) {
+	void set_device(int num, std::string tag) {
 		m_devtag[num] = tag; }
 
 	pci_bus_device *pci_search_bustree(int busnum, int devicenum, pci_bus_device *pcibus);
@@ -69,14 +68,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 private:
 	UINT8               m_busnum;
 
-	const char *        m_devtag[32];
+	std::string           m_devtag[32];
 	pci_device_interface *m_device[32];
 
 	const char *        m_father;

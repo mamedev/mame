@@ -71,7 +71,7 @@ uniform float Prescale;
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
-	
+
 	float2 invDims = 1.0f / SourceDims;
 	float2 Ratios = SourceRect;
 	Output.Position = float4(Input.Position.xyz, 1.0f);
@@ -92,7 +92,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 	Output.CoordX = ((((TexCoord.x / Ratios.x) - 0.5f)) * (1.0f + RadialConvergeX / SourceDims.x) + 0.5f) * Ratios.x + ConvergeX * invDims.x;
 	Output.CoordY = ((((TexCoord.y / Ratios.y) - 0.5f)) * (1.0f + RadialConvergeY / SourceDims.y) + 0.5f) * Ratios.y + ConvergeY * invDims.y;
-	Output.TexCoord = TexCoord;	
+	Output.TexCoord = TexCoord;
 
 	return Output;
 }
@@ -103,11 +103,11 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float Alpha = tex2D(DiffuseSampler, Input.TexCoord).a;	
+	float Alpha = tex2D(DiffuseSampler, Input.TexCoord).a;
 	float RedTexel = tex2D(DiffuseSampler, float2(Input.CoordX.x, Input.CoordY.x)).r;
 	float GrnTexel = tex2D(DiffuseSampler, float2(Input.CoordX.y, Input.CoordY.y)).g;
 	float BluTexel = tex2D(DiffuseSampler, float2(Input.CoordX.z, Input.CoordY.z)).b;
-	
+
 	return float4(RedTexel, GrnTexel, BluTexel, Alpha);
 }
 

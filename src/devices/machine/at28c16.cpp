@@ -39,7 +39,7 @@ const device_type AT28C16 = &device_creator<at28c16_device>;
 //  at28c16_device - constructor
 //-------------------------------------------------
 
-at28c16_device::at28c16_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+at28c16_device::at28c16_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock )
 	: device_t(mconfig, AT28C16, "AT28C16", tag, owner, clock, "at28c16", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
@@ -79,7 +79,7 @@ void at28c16_device::device_validity_check(validity_checker &valid) const
 
 const address_space_config *at28c16_device::memory_space_config( address_spacenum spacenum ) const
 {
-	return ( spacenum == 0 ) ? &m_space_config : NULL;
+	return ( spacenum == 0 ) ? &m_space_config : nullptr;
 }
 
 
@@ -120,16 +120,16 @@ void at28c16_device::nvram_default()
 	}
 
 	/* populate from a memory region if present */
-	if( m_region != NULL )
+	if( m_region != nullptr )
 	{
 		if( m_region->bytes() != AT28C16_DATA_BYTES )
 		{
-			fatalerror( "at28c16 region '%s' wrong size (expected size = 0x%X)\n", tag(), AT28C16_DATA_BYTES );
+			fatalerror( "at28c16 region '%s' wrong size (expected size = 0x%X)\n", tag().c_str(), AT28C16_DATA_BYTES );
 		}
 
 		if( m_region->bytewidth() != 1 )
 		{
-			fatalerror( "at28c16 region '%s' needs to be an 8-bit region\n", tag() );
+			fatalerror( "at28c16 region '%s' needs to be an 8-bit region\n", tag().c_str() );
 		}
 
 		UINT8 *default_data = m_region->base();

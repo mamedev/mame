@@ -174,7 +174,7 @@ class sh34_base_device : public cpu_device
 {
 public:
 	// construction/destruction
-	sh34_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, endianness_t endianness, address_map_constructor internal);
+	sh34_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, endianness_t endianness, address_map_constructor internal);
 
 //#if SH4_USE_FASTRAM_OPTIMIZATION
 	void add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base);
@@ -204,28 +204,28 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 4; }
-	virtual UINT32 execute_input_lines() const { return 5; }
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 4; }
+	virtual UINT32 execute_input_lines() const override { return 5; }
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_IO) ? &m_io_config : NULL); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_IO) ? &m_io_config : nullptr); }
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_export(const device_state_entry &entry);
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 protected:
 	address_space_config m_program_config;
@@ -714,7 +714,7 @@ class sh3_base_device : public sh34_base_device
 {
 public:
 	// construction/destruction
-	sh3_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, endianness_t endianness);
+	sh3_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, endianness_t endianness);
 
 	DECLARE_WRITE32_MEMBER( sh3_internal_w );
 	DECLARE_READ32_MEMBER( sh3_internal_r );
@@ -723,7 +723,7 @@ public:
 	DECLARE_READ32_MEMBER( sh3_internal_high_r );
 
 protected:
-	virtual void device_reset();
+	virtual void device_reset() override;
 };
 
 
@@ -731,7 +731,7 @@ class sh4_base_device : public sh34_base_device
 {
 public:
 	// construction/destruction
-	sh4_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, endianness_t endianness);
+	sh4_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, endianness_t endianness);
 
 	DECLARE_WRITE32_MEMBER( sh4_internal_w );
 	DECLARE_READ32_MEMBER( sh4_internal_r );
@@ -740,43 +740,43 @@ public:
 	DECLARE_WRITE64_MEMBER( sh4_tlb_w );
 
 protected:
-	virtual void device_reset();
+	virtual void device_reset() override;
 };
 
 
 class sh3_device : public sh3_base_device
 {
 public:
-	sh3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sh3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class sh3be_device : public sh3_base_device
 {
 public:
-	sh3be_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sh3be_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void execute_run();
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual void execute_run() override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 };
 
 
 class sh4_device : public sh4_base_device
 {
 public:
-	sh4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sh4_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class sh4be_device : public sh4_base_device
 {
 public:
-	sh4be_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sh4be_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void execute_run();
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual void execute_run() override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 };
 
 

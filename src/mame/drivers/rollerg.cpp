@@ -24,8 +24,8 @@ WRITE8_MEMBER(rollerg_state::rollerg_0010_w)
 	logerror("%04x: write %02x to 0010\n",space.device().safe_pc(), data);
 
 	/* bits 0/1 are coin counters */
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 	/* bit 2 enables 051316 ROM reading */
 	m_readzoomroms = data & 0x04;

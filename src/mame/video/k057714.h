@@ -8,7 +8,7 @@
 class k057714_device : public device_t
 {
 public:
-	k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k057714_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	template<class _Object> static devcb_base &static_set_irq_callback(device_t &device, _Object object) { return downcast<k057714_device &>(device).m_irq.set_callback(object); }
 
 	int draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -25,9 +25,9 @@ public:
 	};
 
 protected:
-	virtual void device_start();
-	virtual void device_stop();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_stop() override;
+	virtual void device_reset() override;
 
 private:
 	void execute_command(UINT32 *cmd);
@@ -37,7 +37,7 @@ private:
 	void draw_character(UINT32 *cmd);
 	void fb_config(UINT32 *cmd);
 
-	UINT32 *m_vram;
+	std::unique_ptr<UINT32[]> m_vram;
 	UINT32 m_vram_read_addr;
 	UINT32 m_vram_fifo0_addr;
 	UINT32 m_vram_fifo1_addr;

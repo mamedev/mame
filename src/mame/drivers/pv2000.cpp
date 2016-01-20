@@ -42,7 +42,7 @@ For BIOS CRC confirmation
 class pv2000_state : public driver_device
 {
 public:
-	pv2000_state(const machine_config &mconfig, device_type type, const char *tag)
+	pv2000_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cass(*this, "cassette"),
@@ -65,8 +65,8 @@ public:
 	UINT8 m_key_pressed;
 	UINT8 m_keyb_column;
 	UINT8 m_cass_conf;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pv2000_cart);
 };
 

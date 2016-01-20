@@ -874,10 +874,10 @@ WRITE8_MEMBER(lucky74_state::lamps_a_w)
     ---- xx--  BIG + SMALL (need to be individualized)
 */
 
-	output_set_lamp_value(8, (data >> 0) & 1);      /* D-UP */
-	output_set_lamp_value(9, (data >> 1) & 1);      /* TAKE SCORE */
-	output_set_lamp_value(10, (data >> 2) & 1);     /* BIG */
-	output_set_lamp_value(11, (data >> 3) & 1);     /* SMALL */
+	output().set_lamp_value(8, (data >> 0) & 1);      /* D-UP */
+	output().set_lamp_value(9, (data >> 1) & 1);      /* TAKE SCORE */
+	output().set_lamp_value(10, (data >> 2) & 1);     /* BIG */
+	output().set_lamp_value(11, (data >> 3) & 1);     /* SMALL */
 }
 
 WRITE8_MEMBER(lucky74_state::lamps_b_w)
@@ -894,14 +894,14 @@ WRITE8_MEMBER(lucky74_state::lamps_b_w)
     x--- ----  CANCEL (should lit start too?)
 */
 
-	output_set_lamp_value(0, (data >> 0) & 1);                      /* HOLD1 */
-	output_set_lamp_value(1, (data >> 1) & 1);                      /* HOLD2 */
-	output_set_lamp_value(2, (data >> 2) & 1);                      /* HOLD3 */
-	output_set_lamp_value(3, (data >> 3) & 1);                      /* HOLD4 */
-	output_set_lamp_value(4, (data >> 4) & 1);                      /* HOLD5 */
-	output_set_lamp_value(5, (data >> 5) & 1);                      /* BET */
-	output_set_lamp_value(6, ((data >> 6) & 1)|((data >> 7) & 1));  /* START */
-	output_set_lamp_value(7, (data >> 7) & 1);                      /* CANCEL */
+	output().set_lamp_value(0, (data >> 0) & 1);                      /* HOLD1 */
+	output().set_lamp_value(1, (data >> 1) & 1);                      /* HOLD2 */
+	output().set_lamp_value(2, (data >> 2) & 1);                      /* HOLD3 */
+	output().set_lamp_value(3, (data >> 3) & 1);                      /* HOLD4 */
+	output().set_lamp_value(4, (data >> 4) & 1);                      /* HOLD5 */
+	output().set_lamp_value(5, (data >> 5) & 1);                      /* BET */
+	output().set_lamp_value(6, ((data >> 6) & 1)|((data >> 7) & 1));  /* START */
+	output().set_lamp_value(7, (data >> 7) & 1);                      /* CANCEL */
 }
 
 

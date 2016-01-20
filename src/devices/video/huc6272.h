@@ -32,7 +32,7 @@ class huc6272_device :  public device_t,
 {
 public:
 	// construction/destruction
-	huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	huc6272_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// I/O operations
 	DECLARE_WRITE32_MEMBER( write );
@@ -41,10 +41,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 private:
 	inline UINT32 read_dword(offs_t address);

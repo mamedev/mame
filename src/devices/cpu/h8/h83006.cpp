@@ -7,7 +7,7 @@ const device_type H83006 = &device_creator<h83006_device>;
 const device_type H83007 = &device_creator<h83007_device>;
 
 
-h83006_device::h83006_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+h83006_device::h83006_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	h8h_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(h83006_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -32,7 +32,7 @@ h83006_device::h83006_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-h83006_device::h83006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h83006_device::h83006_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	h8h_device(mconfig, H83006, "H8/3006", tag, owner, clock, "h83006", __FILE__, address_map_delegate(FUNC(h83006_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -59,7 +59,7 @@ h83006_device::h83006_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-h83007_device::h83007_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h83007_device::h83007_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	h83006_device(mconfig, H83007, "H8/3007", tag, owner, clock, "h83007", __FILE__)
 {
 	ram_start = 0xffef20;
@@ -267,5 +267,5 @@ WRITE8_MEMBER(h83006_device::syscr_w)
 {
 	syscr = data;
 	update_irq_filter();
-	logerror("%s: syscr = %02x\n", tag(), data);
+	logerror("%s: syscr = %02x\n", tag().c_str(), data);
 }

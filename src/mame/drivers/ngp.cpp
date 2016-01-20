@@ -126,7 +126,7 @@ enum flash_state
 class ngp_state : public driver_device, public device_nvram_interface
 {
 public:
-	ngp_state(const machine_config &mconfig, device_type type, const char *tag)
+	ngp_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		device_nvram_interface(mconfig, *this),
 		m_tlcs900(*this, "maincpu"),
@@ -143,17 +143,17 @@ public:
 		{
 			m_flash_chip[0].present = 0;
 			m_flash_chip[0].state = F_READ;
-			m_flash_chip[0].data = NULL;
+			m_flash_chip[0].data = nullptr;
 
 			m_flash_chip[1].present = 0;
 			m_flash_chip[1].state = F_READ;
-			m_flash_chip[1].data = NULL;
+			m_flash_chip[1].data = nullptr;
 
 			m_nvram_loaded = false;
 		}
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	UINT8 m_io_reg[0x40];
 	UINT8 m_old_to3;
@@ -206,9 +206,9 @@ protected:
 	required_ioport m_io_controls;
 	required_ioport m_io_power;
 
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
 	required_device<cpu_device> m_maincpu;
 };
 

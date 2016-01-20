@@ -24,7 +24,7 @@
 const device_type A1BUS_CFFA = &device_creator<a1bus_cffa_device>;
 
 MACHINE_CONFIG_FRAGMENT( cffa )
-	MCFG_ATA_INTERFACE_ADD(CFFA_ATA_TAG, ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD(CFFA_ATA_TAG, ata_devices, "hdd", nullptr, false)
 MACHINE_CONFIG_END
 
 ROM_START( cffa )
@@ -51,14 +51,14 @@ const rom_entry *a1bus_cffa_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, A1BUS_CFFA, "CFFA Compact Flash for Apple I", tag, owner, clock, "cffa1", __FILE__),
 		device_a1bus_card_interface(mconfig, *this),
 		m_ata(*this, CFFA_ATA_TAG), m_rom(nullptr), m_lastdata(0), m_writeprotect(false)
 {
 }
 
-a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_a1bus_card_interface(mconfig, *this),
 		m_ata(*this, CFFA_ATA_TAG), m_rom(nullptr), m_lastdata(0), m_writeprotect(false)

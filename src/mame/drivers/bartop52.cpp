@@ -28,13 +28,13 @@
 class bartop52_state : public atari_common_state
 {
 public:
-	bartop52_state(const machine_config &mconfig, device_type type, const char *tag)
+	bartop52_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atari_common_state(mconfig, type, tag)
 		{ }
 
 	TIMER_DEVICE_CALLBACK_MEMBER( bartop_interrupt );
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 };
 

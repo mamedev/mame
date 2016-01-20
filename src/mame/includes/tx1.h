@@ -99,7 +99,7 @@ struct vregs_t
 class tx1_state : public driver_device
 {
 public:
-	tx1_state(const machine_config &mconfig, device_type type, const char *tag)
+	tx1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "main_cpu"),
 			m_mathcpu(*this, "math_cpu"),
@@ -146,10 +146,10 @@ public:
 	sn74s516_t m_sn74s516;
 
 	vregs_t m_vregs;
-	UINT8 *m_chr_bmp;
-	UINT8 *m_obj_bmp;
-	UINT8 *m_rod_bmp;
-	bitmap_ind16 *m_bitmap;
+	std::unique_ptr<UINT8[]> m_chr_bmp;
+	std::unique_ptr<UINT8[]> m_obj_bmp;
+	std::unique_ptr<UINT8[]> m_rod_bmp;
+	std::unique_ptr<bitmap_ind16> m_bitmap;
 
 	bool m_needs_update;
 
@@ -255,8 +255,8 @@ class tx1_sound_device : public device_t,
 							public device_sound_interface
 {
 public:
-	tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tx1_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	tx1_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tx1_sound_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	~tx1_sound_device() {}
 
 	DECLARE_READ8_MEMBER( pit8253_r );
@@ -266,12 +266,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// internal state
 	sound_stream *m_stream;
@@ -312,7 +312,7 @@ extern const device_type TX1;
 class buggyboy_sound_device : public tx1_sound_device
 {
 public:
-	buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	buggyboy_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER( ym1_a_w );
 	DECLARE_WRITE8_MEMBER( ym2_a_w );
@@ -320,12 +320,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	// internal state

@@ -13,7 +13,7 @@
 class ultraman_state : public driver_device
 {
 public:
-	ultraman_state(const machine_config &mconfig, device_type type, const char *tag)
+	ultraman_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -36,8 +36,8 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_cmd_w);
 	DECLARE_WRITE16_MEMBER(sound_irq_trigger_w);
 	DECLARE_WRITE16_MEMBER(ultraman_gfxctrl_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_ultraman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);

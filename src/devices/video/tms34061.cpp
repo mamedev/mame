@@ -29,7 +29,7 @@
 
 const device_type TMS34061 = &device_creator<tms34061_device>;
 
-tms34061_device::tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms34061_device::tms34061_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS34061, "TMS34061 VSC", tag, owner, clock, "tms34061", __FILE__),
 	device_video_interface(mconfig, *this),
 	m_rowshift(0),
@@ -38,11 +38,11 @@ tms34061_device::tms34061_device(const machine_config &mconfig, const char *tag,
 	m_xmask(0),
 	m_yshift(0),
 	m_vrammask(0),
-	m_vram(NULL),
-	m_latchram(NULL),
+	m_vram(nullptr),
+	m_latchram(nullptr),
 	m_latchdata(0),
-	m_shiftreg(NULL),
-	m_timer(NULL)
+	m_shiftreg(nullptr),
+	m_timer(nullptr)
 {
 	memset(m_regs, 0, sizeof(m_regs));
 	memset(&m_display, 0, sizeof(m_display));

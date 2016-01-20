@@ -10,7 +10,7 @@ READ32_MEMBER( m68340cpu_device::m68340_internal_timer_r )
 {
 	m68340cpu_device *m68k = this;
 	m68340_timer* timer = m68k->m68340TIMER;
-	assert(timer != NULL);
+	assert(timer != nullptr);
 
 	if (timer)
 	{
@@ -25,7 +25,7 @@ WRITE32_MEMBER( m68340cpu_device::m68340_internal_timer_w )
 {
 	m68340cpu_device *m68k = this;
 	m68340_timer* timer = m68k->m68340TIMER;
-	assert(timer != NULL);
+	assert(timer != nullptr);
 
 	if (timer)
 	{

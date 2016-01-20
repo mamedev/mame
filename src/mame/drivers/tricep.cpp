@@ -17,7 +17,7 @@
 class tricep_state : public driver_device
 {
 public:
-	tricep_state(const machine_config &mconfig, device_type type, const char *tag)
+	tricep_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_terminal(*this, TERMINAL_TAG)
@@ -30,7 +30,7 @@ public:
 	DECLARE_WRITE16_MEMBER(tricep_terminal_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	required_shared_ptr<UINT16> m_p_ram;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 

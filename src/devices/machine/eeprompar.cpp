@@ -51,8 +51,8 @@
 //  eeprom_parallel_base_device - constructor
 //-------------------------------------------------
 
-eeprom_parallel_base_device::eeprom_parallel_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
-	: eeprom_base_device(mconfig, devtype, name, tag, owner, shortname, file)
+eeprom_parallel_base_device::eeprom_parallel_base_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source)
+	: eeprom_base_device(mconfig, devtype, name, tag, owner, shortname, source)
 {
 }
 
@@ -88,8 +88,8 @@ void eeprom_parallel_base_device::device_reset()
 //  eeprom_parallel_28xx_device - constructor
 //-------------------------------------------------
 
-eeprom_parallel_28xx_device::eeprom_parallel_28xx_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
-	: eeprom_parallel_base_device(mconfig, devtype, name, tag, owner, shortname, file)
+eeprom_parallel_28xx_device::eeprom_parallel_28xx_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source)
+	: eeprom_parallel_base_device(mconfig, devtype, name, tag, owner, shortname, source)
 {
 }
 
@@ -116,7 +116,7 @@ READ8_MEMBER(eeprom_parallel_28xx_device::read)
 
 // macro for defining a new device class
 #define DEFINE_PARALLEL_EEPROM_DEVICE(_baseclass, _lowercase, _uppercase, _bits, _cells) \
-eeprom_parallel_##_lowercase##_device::eeprom_parallel_##_lowercase##_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) \
+eeprom_parallel_##_lowercase##_device::eeprom_parallel_##_lowercase##_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) \
 	: eeprom_parallel_##_baseclass##_device(mconfig, EEPROM_PARALLEL_##_uppercase, "Parallel EEPROM " #_uppercase " (" #_cells "x" #_bits ")", tag, owner, #_lowercase, __FILE__) \
 { \
 	static_set_size(*this, _cells, _bits); \

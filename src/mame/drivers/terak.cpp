@@ -14,7 +14,7 @@
 class terak_state : public driver_device
 {
 public:
-	terak_state(const machine_config &mconfig, device_type type, const char *tag)
+	terak_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
@@ -25,8 +25,8 @@ public:
 	UINT8 m_unit;
 	UINT8 m_cmd;
 	UINT16 m_data;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_terak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };

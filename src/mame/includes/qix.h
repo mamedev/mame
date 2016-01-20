@@ -24,7 +24,7 @@
 class qix_state : public driver_device
 {
 public:
-	qix_state(const machine_config &mconfig, device_type type, const char *tag)
+	qix_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -114,7 +114,7 @@ public:
 	DECLARE_DRIVER_INIT(slither);
 	DECLARE_DRIVER_INIT(zookeep);
 	DECLARE_DRIVER_INIT(kram3);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(qixmcu);
 	DECLARE_VIDEO_START(qix);
 	TIMER_CALLBACK_MEMBER(pia_w_callback);

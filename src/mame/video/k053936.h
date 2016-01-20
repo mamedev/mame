@@ -19,7 +19,7 @@ void K053936GP_0_zoom_draw(running_machine &machine, bitmap_rgb32 &bitmap, const
 class k053936_device : public device_t
 {
 public:
-	k053936_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k053936_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~k053936_device() {}
 
 	// static configuration
@@ -41,13 +41,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
-	UINT16    *m_ctrl;
-	UINT16    *m_linectrl;
+	std::unique_ptr<UINT16[]>    m_ctrl;
+	std::unique_ptr<UINT16[]>    m_linectrl;
 	int       m_wrap, m_xoff, m_yoff;
 };
 

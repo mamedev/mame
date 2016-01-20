@@ -18,7 +18,7 @@ public:
 
 	typedef delegate<void (UINT32 main_adr, void *dma_ptr, UINT32 length, UINT32 size, bool to_mainram)> dma_cb;
 
-	naomi_g1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	naomi_g1_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	template<class _cb> void set_irq_cb(_cb cb) { irq_cb.set_callback(cb); }
 	void set_dma_cb(dma_cb _cb) { _dma_cb = _cb; }
 
@@ -53,9 +53,9 @@ public:
 protected:
 	enum { G1_TIMER_ID = 0x42 };
 
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void dma_get_position(UINT8 *&base, UINT32 &limit, bool to_maincpu) = 0;
 	virtual void dma_advance(UINT32 size) = 0;

@@ -92,7 +92,7 @@
 
 const device_type UPD71071 = &device_creator<upd71071_device>;
 
-upd71071_device::upd71071_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd71071_device::upd71071_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, UPD71071, "NEC uPD71071", tag, owner, clock, "upd71071", __FILE__),
 				m_upd_clock(0),
 				m_out_hreq_cb(*this),
@@ -133,9 +133,9 @@ void upd71071_device::device_start()
 	m_out_dack_1_cb.resolve_safe();
 	m_out_dack_2_cb.resolve_safe();
 	m_out_dack_3_cb.resolve_safe();
-	for (int x = 0; x < 4; x++)
+	for (auto & elem : m_timer)
 	{
-		m_timer[x] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd71071_device::dma_transfer_timer),this));
+		elem = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd71071_device::dma_transfer_timer),this));
 	}
 	m_selected_channel = 0;
 

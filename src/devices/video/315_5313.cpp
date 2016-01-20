@@ -14,16 +14,16 @@
 
 const device_type SEGA315_5313 = &device_creator<sega315_5313_device>;
 
-sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sega315_5124_device(mconfig, SEGA315_5313, "Sega 315-5313 Megadrive VDP", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega315_5313", __FILE__), m_render_bitmap(nullptr), 
+sega315_5313_device::sega315_5313_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+	: sega315_5124_device(mconfig, SEGA315_5313, "Sega 315-5313 Megadrive VDP", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega315_5313", __FILE__), m_render_bitmap(nullptr),
 	m_render_line(nullptr), m_render_line_raw(nullptr), m_megadriv_scanline_timer(nullptr),
 	m_sndirqline_callback(*this),
 	m_lv6irqline_callback(*this),
-	m_lv4irqline_callback(*this), m_command_pending(0), m_command_part1(0), m_command_part2(0), m_vdp_code(0), m_vdp_address(0), m_vram_fill_pending(0), m_vram_fill_length(0), m_irq4counter(0), 
-	m_imode_odd_frame(0), m_sprite_collision(0), m_irq6_pending(0), m_irq4_pending(0), m_scanline_counter(0), m_vblank_flag(0), m_imode(0), m_visible_scanlines(0), m_irq6_scanline(0), 
+	m_lv4irqline_callback(*this), m_command_pending(0), m_command_part1(0), m_command_part2(0), m_vdp_code(0), m_vdp_address(0), m_vram_fill_pending(0), m_vram_fill_length(0), m_irq4counter(0),
+	m_imode_odd_frame(0), m_sprite_collision(0), m_irq6_pending(0), m_irq4_pending(0), m_scanline_counter(0), m_vblank_flag(0), m_imode(0), m_visible_scanlines(0), m_irq6_scanline(0),
 	m_z80irq_scanline(0), m_total_scanlines(0), m_base_total_scanlines(0), m_framerate(0), m_vdp_pal(0), m_use_cram(0),
-	m_dma_delay(0), m_regs(nullptr), m_vram(nullptr), m_cram(nullptr), m_vsram(nullptr), m_internal_sprite_attribute_table(nullptr), m_irq6_on_timer(nullptr), m_irq4_on_timer(nullptr), 
-	m_render_timer(nullptr), m_sprite_renderline(nullptr), m_highpri_renderline(nullptr), m_video_renderline(nullptr), m_palette_lookup(nullptr), m_palette_lookup_sprite(nullptr), 
+	m_dma_delay(0), m_regs(nullptr), m_vram(nullptr), m_cram(nullptr), m_vsram(nullptr), m_internal_sprite_attribute_table(nullptr), m_irq6_on_timer(nullptr), m_irq4_on_timer(nullptr),
+	m_render_timer(nullptr), m_sprite_renderline(nullptr), m_highpri_renderline(nullptr), m_video_renderline(nullptr), m_palette_lookup(nullptr), m_palette_lookup_sprite(nullptr),
 	m_palette_lookup_shadow(nullptr), m_palette_lookup_highlight(nullptr), m_space68k(nullptr), m_cpu68k(nullptr)
 {
 	m_use_alt_timing = 0;
@@ -35,7 +35,7 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const ch
 //  palette device
 //-------------------------------------------------
 
-void sega315_5313_device::static_set_palette_tag(device_t &device, const char *tag)
+void sega315_5313_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<sega315_5313_device &>(device).m_palette.set_tag(tag);
 }
@@ -113,24 +113,24 @@ void sega315_5313_device::device_start()
 	m_32x_interrupt_func.bind_relative_to(*owner());
 	m_32x_scanline_helper_func.bind_relative_to(*owner());
 
-	m_vram  = auto_alloc_array(machine(), UINT16, 0x10000/2);
-	m_cram  = auto_alloc_array(machine(), UINT16, 0x80/2);
-	m_vsram = auto_alloc_array(machine(), UINT16, 0x80/2);
-	m_regs = auto_alloc_array(machine(), UINT16, 0x40/2);
-	m_internal_sprite_attribute_table = auto_alloc_array(machine(), UINT16, 0x400/2);
+	m_vram  = std::make_unique<UINT16[]>(0x10000/2);
+	m_cram  = std::make_unique<UINT16[]>(0x80/2);
+	m_vsram = std::make_unique<UINT16[]>(0x80/2);
+	m_regs = std::make_unique<UINT16[]>(0x40/2);
+	m_internal_sprite_attribute_table = std::make_unique<UINT16[]>(0x400/2);
 
-	memset(m_vram, 0x00, 0x10000);
-	memset(m_cram, 0x00, 0x80);
-	memset(m_vsram, 0x00, 0x80);
-	memset(m_regs, 0x00, 0x40);
-	memset(m_internal_sprite_attribute_table, 0x00, 0x400);
+	memset(m_vram.get(), 0x00, 0x10000);
+	memset(m_cram.get(), 0x00, 0x80);
+	memset(m_vsram.get(), 0x00, 0x80);
+	memset(m_regs.get(), 0x00, 0x40);
+	memset(m_internal_sprite_attribute_table.get(), 0x00, 0x400);
 
 
-	save_pointer(NAME(m_vram), 0x10000/2);
-	save_pointer(NAME(m_cram), 0x80/2);
-	save_pointer(NAME(m_vsram), 0x80/2);
-	save_pointer(NAME(m_regs), 0x40/2);
-	save_pointer(NAME(m_internal_sprite_attribute_table), 0x400/2);
+	save_pointer(NAME(m_vram.get()), 0x10000/2);
+	save_pointer(NAME(m_cram.get()), 0x80/2);
+	save_pointer(NAME(m_vsram.get()), 0x80/2);
+	save_pointer(NAME(m_regs.get()), 0x40/2);
+	save_pointer(NAME(m_internal_sprite_attribute_table.get()), 0x400/2);
 
 	save_item(NAME(m_command_pending));
 	save_item(NAME(m_command_part1));
@@ -152,42 +152,42 @@ void sega315_5313_device::device_start()
 	save_item(NAME(m_vblank_flag));
 	save_item(NAME(m_total_scanlines));
 
-	m_sprite_renderline = auto_alloc_array(machine(), UINT8, 1024);
-	m_highpri_renderline = auto_alloc_array(machine(), UINT8, 320);
-	m_video_renderline = auto_alloc_array(machine(), UINT32, 320);
+	m_sprite_renderline = std::make_unique<UINT8[]>(1024);
+	m_highpri_renderline = std::make_unique<UINT8[]>(320);
+	m_video_renderline = std::make_unique<UINT32[]>(320);
 
-	m_palette_lookup = auto_alloc_array(machine(), UINT16, 0x40);
-	m_palette_lookup_sprite = auto_alloc_array(machine(), UINT16, 0x40);
+	m_palette_lookup = std::make_unique<UINT16[]>(0x40);
+	m_palette_lookup_sprite = std::make_unique<UINT16[]>(0x40);
 
-	m_palette_lookup_shadow = auto_alloc_array(machine(), UINT16, 0x40);
-	m_palette_lookup_highlight = auto_alloc_array(machine(), UINT16, 0x40);
+	m_palette_lookup_shadow = std::make_unique<UINT16[]>(0x40);
+	m_palette_lookup_highlight = std::make_unique<UINT16[]>(0x40);
 
-	memset(m_palette_lookup,0x00,0x40*2);
-	memset(m_palette_lookup_sprite,0x00,0x40*2);
+	memset(m_palette_lookup.get(),0x00,0x40*2);
+	memset(m_palette_lookup_sprite.get(),0x00,0x40*2);
 
-	memset(m_palette_lookup_shadow,0x00,0x40*2);
-	memset(m_palette_lookup_highlight,0x00,0x40*2);
+	memset(m_palette_lookup_shadow.get(),0x00,0x40*2);
+	memset(m_palette_lookup_highlight.get(),0x00,0x40*2);
 
 
 	if (!m_use_alt_timing)
-		m_render_bitmap = auto_bitmap_ind16_alloc(machine(), 320, 512); // allocate maximum sizes we're going to use, it's safer.
+		m_render_bitmap = std::make_unique<bitmap_ind16>(320, 512); // allocate maximum sizes we're going to use, it's safer.
 	else
-		m_render_line = auto_alloc_array(machine(), UINT16, 320);
+		m_render_line = std::make_unique<UINT16[]>(320);
 
-	m_render_line_raw = auto_alloc_array(machine(), UINT16, 320);
+	m_render_line_raw = std::make_unique<UINT16[]>(320);
 
 	// FIXME: are these all needed? I'm pretty sure some of these (most?) are just helpers which don't need to be saved,
 	// but better safe than sorry...
-	save_pointer(NAME(m_sprite_renderline), 1024);
-	save_pointer(NAME(m_highpri_renderline), 320);
-	save_pointer(NAME(m_video_renderline), 320/4);
-	save_pointer(NAME(m_palette_lookup), 0x40);
-	save_pointer(NAME(m_palette_lookup_sprite), 0x40);
-	save_pointer(NAME(m_palette_lookup_shadow), 0x40);
-	save_pointer(NAME(m_palette_lookup_highlight), 0x40);
-	save_pointer(NAME(m_render_line_raw), 320/2);
+	save_pointer(NAME(m_sprite_renderline.get()), 1024);
+	save_pointer(NAME(m_highpri_renderline.get()), 320);
+	save_pointer(NAME(m_video_renderline.get()), 320/4);
+	save_pointer(NAME(m_palette_lookup.get()), 0x40);
+	save_pointer(NAME(m_palette_lookup_sprite.get()), 0x40);
+	save_pointer(NAME(m_palette_lookup_shadow.get()), 0x40);
+	save_pointer(NAME(m_palette_lookup_highlight.get()), 0x40);
+	save_pointer(NAME(m_render_line_raw.get()), 320/2);
 	if (m_use_alt_timing)
-		save_pointer(NAME(m_render_line), 320/2);
+		save_pointer(NAME(m_render_line.get()), 320/2);
 
 	m_irq6_on_timer = machine().scheduler().timer_alloc(FUNC(irq6_on_timer_callback), (void*)this);
 	m_irq4_on_timer = machine().scheduler().timer_alloc(FUNC(irq4_on_timer_callback), (void*)this);
@@ -1310,7 +1310,7 @@ void sega315_5313_device::render_spriteline_to_spritebuffer(int scanline)
 
 
 	/* Clear our Render Buffer */
-	memset(m_sprite_renderline, 0, 1024);
+	memset(m_sprite_renderline.get(), 0, 1024);
 
 
 	{
@@ -1319,7 +1319,7 @@ void sega315_5313_device::render_spriteline_to_spritebuffer(int scanline)
 		int drawypos;
 		int /*drawwidth,*/ drawheight;
 		int spritemask = 0;
-		UINT8 height,width=0,link=0,xflip,yflip,colour,pri;
+		UINT8 height,width,link,xflip,yflip,colour,pri;
 
 		/* Get Sprite Attribs */
 		spritenum = 0;
@@ -1506,7 +1506,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 	int x;
 	int window_hsize=0;
 	int window_vsize=0;
-	int window_is_bugged = 0;
+	int window_is_bugged;
 	int non_window_firstcol;
 	int non_window_lastcol;
 	int screenheight = MEGADRIVE_REG01_240_LINE?240:224;
@@ -1517,7 +1517,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 		m_video_renderline[x]=MEGADRIVE_REG07_BGCOLOUR | 0x20000; // mark as BG
 	}
 
-	memset(m_highpri_renderline, 0, 320);
+	memset(m_highpri_renderline.get(), 0, 320);
 
 	/* is this line enabled? */
 	if (!MEGADRIVE_REG01_DISP_ENABLE)
@@ -2518,7 +2518,7 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 
 	}
 	else
-		lineptr = m_render_line;
+		lineptr = m_render_line.get();
 
 	for (int x = 0; x < 320; x++)
 	{

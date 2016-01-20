@@ -73,7 +73,7 @@
 class a310_state : public archimedes_state
 {
 public:
-	a310_state(const machine_config &mconfig, device_type type, const char *tag)
+	a310_state(const machine_config &mconfig, device_type type, std::string tag)
 		: archimedes_state(mconfig, type, tag)
 		, m_physram(*this, "physicalram")
 		, m_ram(*this, RAM_TAG)
@@ -86,8 +86,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(a310_wd177x_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(a310_wd177x_drq_w);
 	DECLARE_DRIVER_INIT(a310);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 

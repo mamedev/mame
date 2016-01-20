@@ -20,7 +20,7 @@
 class cultures_state : public driver_device
 {
 public:
-	cultures_state(const machine_config &mconfig, device_type type, const char *tag)
+	cultures_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -71,9 +71,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cultures_interrupt);
 };
@@ -177,7 +177,7 @@ WRITE8_MEMBER(cultures_state::bg_bank_w)
 		m_bg2_bank = (data & 0xc) >> 2;
 		m_bg2_tilemap->mark_all_dirty();
 	}
-	coin_counter_w(machine(), 0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 }
 
 

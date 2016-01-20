@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -98,7 +98,7 @@ namespace bgfx
 
 } // namespace bgfx
 
-#elif BX_PLATFORM_FREEBSD || BX_PLATFORM_LINUX || BX_PLATFORM_RPI
+#elif BX_PLATFORM_BSD || BX_PLATFORM_LINUX || BX_PLATFORM_RPI
 
 namespace bgfx
 {
@@ -203,7 +203,7 @@ namespace bgfx
 		}
 
 		PlatformData pd;
-#	if BX_PLATFORM_LINUX || BX_PLATFORM_FREEBSD
+#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
 		pd.ndt          = wmi.info.x11.display;
 		pd.nwh          = (void*)(uintptr_t)wmi.info.x11.window;
 #	elif BX_PLATFORM_OSX
@@ -227,7 +227,7 @@ namespace bgfx
 // If GLFW/glfw3.h is included before bgfxplatform.h we can enable GLFW3
 // window interop convenience code.
 
-#	if BX_PLATFORM_LINUX || BX_PLATFORM_FREEBSD
+#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
 #		define GLFW_EXPOSE_NATIVE_X11
 #		define GLFW_EXPOSE_NATIVE_GLX
 #	elif BX_PLATFORM_OSX
@@ -244,7 +244,7 @@ namespace bgfx
 	inline void glfwSetWindow(GLFWwindow* _window)
 	{
 		PlatformData pd;
-#	if BX_PLATFORM_LINUX || BX_PLATFORM_FREEBSD
+#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
 		pd.ndt          = glfwGetX11Display();
 		pd.nwh          = (void*)(uintptr_t)glfwGetX11Window(_window);
 		pd.context      = glfwGetGLXContext(_window);

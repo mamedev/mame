@@ -43,19 +43,19 @@ public:
 	virtual ~device_video_interface();
 
 	// static configuration
-	static void static_set_screen(device_t &device, const char *tag);
+	static void static_set_screen(device_t &device, std::string tag);
 
 	// getters
 	screen_device &screen() const { return *m_screen; }
 
 protected:
 	// optional operation overrides
-	virtual void interface_validity_check(validity_checker &valid) const;
-	virtual void interface_pre_start();
+	virtual void interface_validity_check(validity_checker &valid) const override;
+	virtual void interface_pre_start() override;
 
 	// configuration state
 	bool            m_screen_required;          // is a screen required?
-	const char *    m_screen_tag;               // configured tag for the target screen
+	std::string     m_screen_tag;               // configured tag for the target screen
 
 	// internal state
 	screen_device * m_screen;                   // pointer to the screen device

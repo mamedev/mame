@@ -9,7 +9,7 @@
 class brkthru_state : public driver_device
 {
 public:
-	brkthru_state(const machine_config &mconfig, device_type type, const char *tag)
+	brkthru_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_videoram(*this, "videoram"),
@@ -49,12 +49,11 @@ public:
 	DECLARE_DRIVER_INIT(brkthru);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(brkthru);
 	UINT32 screen_update_brkthru(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	void show_register( bitmap_ind16 &bitmap, int x, int y, UINT32 data );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int prio );
 };

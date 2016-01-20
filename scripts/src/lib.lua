@@ -13,6 +13,8 @@ project "utils"
 	uuid "22489ad0-4cb2-4d91-ad81-24b0d80ca30a"
 	kind (LIBTYPE)
 
+	addprojectflags()
+
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/lib/util",
@@ -46,7 +48,6 @@ project "utils"
 		MAME_DIR .. "src/lib/util/chdcd.h",
 		MAME_DIR .. "src/lib/util/chdcodec.cpp",
 		MAME_DIR .. "src/lib/util/chdcodec.h",
-		MAME_DIR .. "src/lib/util/corealloc.cpp",
 		MAME_DIR .. "src/lib/util/corealloc.h",
 		MAME_DIR .. "src/lib/util/corefile.cpp",
 		MAME_DIR .. "src/lib/util/corefile.h",
@@ -84,7 +85,6 @@ project "utils"
 		MAME_DIR .. "src/lib/util/pool.h",
 		MAME_DIR .. "src/lib/util/sha1.cpp",
 		MAME_DIR .. "src/lib/util/sha1.h",
-		MAME_DIR .. "src/lib/util/tagmap.cpp",
 		MAME_DIR .. "src/lib/util/tagmap.h",
 		MAME_DIR .. "src/lib/util/unicode.cpp",
 		MAME_DIR .. "src/lib/util/unicode.h",
@@ -104,6 +104,8 @@ project "utils"
 project "formats"
 	uuid "f69636b1-fcce-45ce-b09a-113e371a2d7a"
 	kind (LIBTYPE)
+
+	addprojectflags()
 
 	options {
 		"ArchiveSplit",

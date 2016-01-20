@@ -26,7 +26,7 @@
 class tmc1800_base_state : public driver_device
 {
 public:
-	tmc1800_base_state(const machine_config &mconfig, device_type type, const char *tag)
+	tmc1800_base_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
 			m_cassette(*this, "cassette"),
@@ -55,15 +55,15 @@ public:
 		TIMER_SETUP_BEEP
 	};
 
-	tmc1800_state(const machine_config &mconfig, device_type type, const char *tag)
+	tmc1800_state(const machine_config &mconfig, device_type type, std::string tag)
 		: tmc1800_base_state(mconfig, type, tag),
 			m_vdc(*this, CDP1861_TAG)
 	{ }
 
 	required_device<cdp1861_device> m_vdc;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER( keylatch_w );
 	DECLARE_READ8_MEMBER( dispon_r );
@@ -78,19 +78,19 @@ public:
 	DECLARE_DRIVER_INIT(tmc1800);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 class osc1000b_state : public tmc1800_base_state
 {
 public:
-	osc1000b_state(const machine_config &mconfig, device_type type, const char *tag)
+	osc1000b_state(const machine_config &mconfig, device_type type, std::string tag)
 		: tmc1800_base_state(mconfig, type, tag)
 	{ }
 
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -107,7 +107,7 @@ public:
 class tmc2000_state : public tmc1800_base_state
 {
 public:
-	tmc2000_state(const machine_config &mconfig, device_type type, const char *tag)
+	tmc2000_state(const machine_config &mconfig, device_type type, std::string tag)
 		: tmc1800_base_state(mconfig, type, tag),
 			m_cti(*this, CDP1864_TAG),
 			m_colorram(*this, "color_ram"),
@@ -132,8 +132,8 @@ public:
 	required_ioport m_y6;
 	required_ioport m_y7;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER( keylatch_w );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
@@ -164,7 +164,7 @@ public:
 class nano_state : public tmc1800_base_state
 {
 public:
-	nano_state(const machine_config &mconfig, device_type type, const char *tag)
+	nano_state(const machine_config &mconfig, device_type type, std::string tag)
 		: tmc1800_base_state(mconfig, type, tag),
 			m_cti(*this, CDP1864_TAG),
 			m_ny0(*this, "NY0"),
@@ -177,9 +177,9 @@ public:
 	required_ioport m_ny1;
 	required_ioport m_monitor;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	enum
 	{

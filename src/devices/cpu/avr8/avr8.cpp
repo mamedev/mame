@@ -66,7 +66,7 @@
 #define ENABLE_VERBOSE_LOG (0)
 
 #if ENABLE_VERBOSE_LOG
-INLINE void ATTR_PRINTF(3,4) verboselog(UINT16 pc, int n_level, const char *s_fmt, ...)
+static inline void ATTR_PRINTF(3,4) verboselog(UINT16 pc, int n_level, const char *s_fmt, ...)
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -596,7 +596,7 @@ ADDRESS_MAP_END
 //  atmega88_device - constructor
 //-------------------------------------------------
 
-atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atmega88_device::atmega88_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: avr8_device(mconfig, "ATMEGA88", tag, owner, clock, ATMEGA88, 0x0fff, ADDRESS_MAP_NAME(atmega88_internal_map), CPU_TYPE_ATMEGA88, "atmega88", __FILE__)
 {
 }
@@ -605,7 +605,7 @@ atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag,
 //  atmega644_device - constructor
 //-------------------------------------------------
 
-atmega644_device::atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atmega644_device::atmega644_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: avr8_device(mconfig, "ATMEGA644", tag, owner, clock, ATMEGA644, 0xffff, ADDRESS_MAP_NAME(atmega644_internal_map), CPU_TYPE_ATMEGA644, "atmega644", __FILE__)
 {
 }
@@ -614,7 +614,7 @@ atmega644_device::atmega644_device(const machine_config &mconfig, const char *ta
 //  atmega1280_device - constructor
 //-------------------------------------------------
 
-atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atmega1280_device::atmega1280_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: avr8_device(mconfig, "ATMEGA1280", tag, owner, clock, ATMEGA1280, 0x1ffff, ADDRESS_MAP_NAME(atmega1280_internal_map), CPU_TYPE_ATMEGA1280, "atmega1280", __FILE__)
 {
 }
@@ -623,7 +623,7 @@ atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *
 //  atmega2560_device - constructor
 //-------------------------------------------------
 
-atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atmega2560_device::atmega2560_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: avr8_device(mconfig, "ATMEGA2560", tag, owner, clock, ATMEGA2560, 0x1ffff, ADDRESS_MAP_NAME(atmega2560_internal_map), CPU_TYPE_ATMEGA2560, "atmega2560", __FILE__)
 {
 }
@@ -632,14 +632,13 @@ atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *
 //  avr8_device - constructor
 //-------------------------------------------------
 
-avr8_device::avr8_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, UINT32 addr_mask, address_map_constructor internal_map, UINT8 cpu_type, const char *shortname, const char *source)
+avr8_device::avr8_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock, const device_type type, UINT32 addr_mask, address_map_constructor internal_map, UINT8 cpu_type, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_shifted_pc(0),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 22),
 		m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0, internal_map),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 4),
-		m_eeprom_tag(NULL),
-		m_eeprom(NULL),
+		m_eeprom(nullptr),
 		m_cpu_type(cpu_type),
 		m_lfuses(0x62),
 		m_hfuses(0x99),
@@ -855,9 +854,9 @@ void avr8_device::device_reset()
 	logerror("AVR Boot loader section size: %d words\n", m_boot_size);
 	}
 
-	for (int i = 0; i < 0x200; i++)
+	for (auto & elem : m_r)
 	{
-		m_r[i] = 0;
+		elem = 0;
 	}
 
 	m_spi_active = false;
@@ -896,7 +895,7 @@ const address_space_config *avr8_device::memory_space_config(address_spacenum sp
 	{
 		return &m_io_config;
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -905,7 +904,7 @@ const address_space_config *avr8_device::memory_space_config(address_spacenum sp
 //  for the debugger
 //-------------------------------------------------
 
-void avr8_device::state_string_export(const device_state_entry &entry, std::string &str)
+void avr8_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -1315,8 +1314,8 @@ void avr8_device::timer1_tick()
 	// Cache things in array form to avoid a compare+branch inside a potentially high-frequency timer
 	//UINT8 compare_mode[2] = { (m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1A_MASK) >> AVR8_TCCR1A_COM1A_SHIFT,
 								//(m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1B_MASK) >> AVR8_TCCR1A_COM1B_SHIFT };
-	UINT16 ocr1[2] = { (m_r[AVR8_REGIDX_OCR1AH] << 8) | m_r[AVR8_REGIDX_OCR1AL],
-						(m_r[AVR8_REGIDX_OCR1BH] << 8) | m_r[AVR8_REGIDX_OCR1BL] };
+	UINT16 ocr1[2] = { static_cast<UINT16>((m_r[AVR8_REGIDX_OCR1AH] << 8) | m_r[AVR8_REGIDX_OCR1AL]),
+						static_cast<UINT16>((m_r[AVR8_REGIDX_OCR1BH] << 8) | m_r[AVR8_REGIDX_OCR1BL]) };
 	UINT8 ocf1[2] = { (1 << AVR8_TIFR1_OCF1A_SHIFT), (1 << AVR8_TIFR1_OCF1B_SHIFT) };
 	UINT8 int1[2] = { AVR8_INTIDX_OCF1A, AVR8_INTIDX_OCF1B };
 	INT32 increment = m_timer_increment[1];
@@ -1711,8 +1710,8 @@ void avr8_device::timer4_tick()
 	// Cache things in array form to avoid a compare+branch inside a potentially high-frequency timer
 	//UINT8 compare_mode[2] = { (m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1A_MASK) >> AVR8_TCCR1A_COM1A_SHIFT,
 								//(m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1B_MASK) >> AVR8_TCCR1A_COM1B_SHIFT };
-	UINT16 ocr4[2] = { (m_r[AVR8_REGIDX_OCR4AH] << 8) | m_r[AVR8_REGIDX_OCR4AL],
-						(m_r[AVR8_REGIDX_OCR4BH] << 8) | m_r[AVR8_REGIDX_OCR4BL] };
+	UINT16 ocr4[2] = { static_cast<UINT16>((m_r[AVR8_REGIDX_OCR4AH] << 8) | m_r[AVR8_REGIDX_OCR4AL]),
+						static_cast<UINT16>((m_r[AVR8_REGIDX_OCR4BH] << 8) | m_r[AVR8_REGIDX_OCR4BL]) };
 //TODO  UINT8 ocf4[2] = { (1 << AVR8_TIFR4_OCF4A_SHIFT), (1 << AVR8_TIFR4_OCF4B_SHIFT) };
 //TODO  UINT8 int4[2] = { AVR8_INTIDX_OCF4A, AVR8_INTIDX_OCF4B };
 	INT32 increment = m_timer_increment[4];
@@ -2973,15 +2972,15 @@ void avr8_device::execute_set_input(int inputnum, int state)
 
 void avr8_device::execute_run()
 {
-	UINT32 op = 0;
-	INT32 offs = 0;
-	UINT8 rd = 0;
-	UINT8 rr = 0;
-	UINT8 res = 0;
-	UINT16 pd = 0;
-	UINT32 pd32 = 0;
-	INT16 sd = 0;
-	INT32 opcycles = 1;
+	UINT32 op;
+	INT32 offs;
+	UINT8 rd;
+	UINT8 rr;
+	UINT8 res;
+	UINT16 pd;
+	UINT32 pd32;
+	INT16 sd;
+	INT32 opcycles;
 
 	while (m_icount > 0)
 	{

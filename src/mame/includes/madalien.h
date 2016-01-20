@@ -17,7 +17,7 @@
 class madalien_state : public driver_device
 {
 public:
-	madalien_state(const machine_config &mconfig, device_type type, const char *tag)
+	madalien_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_charram(*this, "charram"),
@@ -49,7 +49,7 @@ public:
 	tilemap_t *m_tilemap_fg;
 	tilemap_t *m_tilemap_edge1[4];
 	tilemap_t *m_tilemap_edge2[4];
-	bitmap_ind16 *m_headlight_bitmap;
+	std::unique_ptr<bitmap_ind16> m_headlight_bitmap;
 	DECLARE_READ8_MEMBER(shift_r);
 	DECLARE_READ8_MEMBER(shift_rev_r);
 	DECLARE_WRITE8_MEMBER(madalien_output_w);

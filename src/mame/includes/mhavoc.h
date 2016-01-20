@@ -20,7 +20,7 @@
 class mhavoc_state : public driver_device
 {
 public:
-	mhavoc_state(const machine_config &mconfig, device_type type, const char *tag)
+	mhavoc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_zram0(*this, "zram0"),
 		m_zram1(*this, "zram1"),
@@ -68,8 +68,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(alpha_xmtd_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
 	DECLARE_DRIVER_INIT(mhavocrv);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(delayed_gamma_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(mhavoc_cpu_irq_clock);
 };

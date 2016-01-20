@@ -78,7 +78,7 @@ struct towns_video_controller
 class towns_state : public driver_device
 {
 	public:
-	towns_state(const machine_config &mconfig, device_type type, const char *tag)
+	towns_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_speaker(*this, "speaker"),
@@ -146,12 +146,12 @@ class towns_state : public driver_device
 	UINT32 m_towns_ankcg_enable;
 	UINT32 m_towns_mainmem_enable;
 	UINT32 m_towns_ram_enable;
-	UINT32* m_towns_vram;
-	UINT8* m_towns_gfxvram;
-	UINT8* m_towns_txtvram;
+	std::unique_ptr<UINT32[]> m_towns_vram;
+	std::unique_ptr<UINT8[]> m_towns_gfxvram;
+	std::unique_ptr<UINT8[]> m_towns_txtvram;
 	int m_towns_selected_drive;
 	UINT8 m_towns_fdc_irq6mask;
-	UINT8* m_towns_serial_rom;
+	std::unique_ptr<UINT8[]> m_towns_serial_rom;
 	int m_towns_srom_position;
 	UINT8 m_towns_srom_clk;
 	UINT8 m_towns_srom_reset;
@@ -200,12 +200,12 @@ class towns_state : public driver_device
 	optional_shared_ptr<UINT32> m_nvram;
 	optional_shared_ptr<UINT16> m_nvram16;
 
-	virtual void driver_start();
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void driver_start() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	DECLARE_READ8_MEMBER(towns_system_r);
 	DECLARE_WRITE8_MEMBER(towns_system_w);
@@ -229,8 +229,6 @@ class towns_state : public driver_device
 	DECLARE_WRITE8_MEMBER(towns_sound_ctrl_w);
 	DECLARE_READ8_MEMBER(towns_padport_r);
 	DECLARE_WRITE8_MEMBER(towns_pad_mask_w);
-	DECLARE_READ8_MEMBER(towns_cmos8_r);
-	DECLARE_WRITE8_MEMBER(towns_cmos8_w);
 	DECLARE_READ8_MEMBER(towns_cmos_low_r);
 	DECLARE_WRITE8_MEMBER(towns_cmos_low_w);
 	DECLARE_READ8_MEMBER(towns_cmos_r);
@@ -282,7 +280,6 @@ class towns_state : public driver_device
 	void kb_sendcode(UINT8 scancode, int release);
 	UINT8 speaker_get_spk();
 	void speaker_set_spkrdata(UINT8 data);
-	void speaker_set_input(UINT8 data);
 	UINT8 towns_cdrom_read_byte_software();
 
 	required_ioport m_ctrltype;
@@ -366,7 +363,7 @@ public:
 class towns16_state : public towns_state
 {
 	public:
-	towns16_state(const machine_config &mconfig, device_type type, const char *tag)
+	towns16_state(const machine_config &mconfig, device_type type, std::string tag)
 		: towns_state(mconfig, type, tag)
 	{ }
 };
@@ -374,11 +371,11 @@ class towns16_state : public towns_state
 class marty_state : public towns_state
 {
 	public:
-	marty_state(const machine_config &mconfig, device_type type, const char *tag)
+	marty_state(const machine_config &mconfig, device_type type, std::string tag)
 		: towns_state(mconfig, type, tag)
 	{ }
 
-	virtual void driver_start();
+	virtual void driver_start() override;
 };
 
 #endif /*FMTOWNS_H_*/

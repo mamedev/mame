@@ -42,7 +42,7 @@ public:
 	template<class _Object> static devcb_base &set_dataout_handler(device_t &device, _Object object) { return downcast<mackbd_device &>(device).m_dataout_handler.set_callback(object); }
 
 	// construction/destruction
-	mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mackbd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(p0_r);
 	DECLARE_WRITE8_MEMBER(p0_w);
@@ -56,11 +56,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry *device_rom_region() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	required_device<cpu_device> m_maincpu;
 

@@ -13,15 +13,15 @@
 class pcd_keyboard_device :  public device_t
 {
 public:
-	pcd_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pcd_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_out_tx_handler(device_t &device, _Object object) { return downcast<pcd_keyboard_device &>(device).m_out_tx_handler.set_callback(object); }
 
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
-	void device_start();
+	void device_start() override;
 
 	DECLARE_READ8_MEMBER( bus_r );
 	DECLARE_READ8_MEMBER( p1_r );

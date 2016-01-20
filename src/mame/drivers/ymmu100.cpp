@@ -153,7 +153,7 @@ public:
 		P2_LCD_ENABLE = 0x04
 	};
 
-	mu100_state(const machine_config &mconfig, device_type type, const char *tag)
+	mu100_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_lcd(*this, "lcd"),
@@ -193,16 +193,16 @@ public:
 
 	float lightlevel(const UINT8 *src, const UINT8 *render);
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 class mu100r_state : public mu100_state {
 public:
-	mu100r_state(const machine_config &mconfig, device_type type, const char *tag)
+	mu100r_state(const machine_config &mconfig, device_type type, std::string tag)
 		: mu100_state(mconfig, type, tag)
 	{ }
 
-	virtual DECLARE_READ16_MEMBER(adc7_r);
+	virtual DECLARE_READ16_MEMBER(adc7_r) override;
 };
 
 #include "../drivers/ymmu100.inc"

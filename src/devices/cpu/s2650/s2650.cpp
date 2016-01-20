@@ -31,13 +31,14 @@
 const device_type S2650 = &device_creator<s2650_device>;
 
 
-s2650_device::s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+s2650_device::s2650_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, S2650, "S2650", tag, owner, clock, "s2650", __FILE__ )
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 15)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 9)
-	, m_flag_handler(*this), m_ppc(0), m_page(0), m_iar(0), m_ea(0), m_psl(0), m_psu(0), m_r(0)
-	  , m_halt(0), m_ir(0), m_irq_state(0), m_icount(0), m_program(nullptr), m_direct(nullptr), m_io(nullptr)
-	  , m_debugger_temp(0)
+	, m_flag_handler(*this), m_intack_handler(*this)
+	, m_ppc(0), m_page(0), m_iar(0), m_ea(0), m_psl(0), m_psu(0), m_r(0)
+	, m_halt(0), m_ir(0), m_irq_state(0), m_icount(0), m_program(nullptr), m_direct(nullptr), m_io(nullptr)
+	, m_debugger_temp(0)
 {
 	memset(m_reg, 0x00, sizeof(m_reg));
 }
@@ -183,6 +184,10 @@ inline int s2650_device::check_irq_line()
 				m_iar = (m_iar + 1) & PMSK;
 			}
 			vector = standard_irq_callback(0) & 0xff;
+
+			/* Say hi */
+			m_intack_handler(true);
+
 			/* build effective address within first 8K page */
 			m_ea = S2650_relative[vector] & PMSK;
 			if (vector & 0x80)      /* indirect bit set ? */
@@ -786,6 +791,7 @@ static void BRA_EA(void) _BRA_EA()
 void s2650_device::device_start()
 {
 	m_flag_handler.resolve_safe();
+	m_intack_handler.resolve_safe();
 
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
@@ -870,7 +876,7 @@ void s2650_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void s2650_device::state_string_export(const device_state_entry &entry, std::string &str)
+void s2650_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

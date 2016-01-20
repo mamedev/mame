@@ -21,14 +21,14 @@ class arcadia_sound_device : public device_t,
 {
 public:
 	// construction/destruction
-	arcadia_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	arcadia_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER(write);
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	sound_stream *m_channel;
 	UINT8 m_reg[3];

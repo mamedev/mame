@@ -477,7 +477,7 @@ void wgp_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const
                        CUSTOM DRAW
 *********************************************************/
 
-INLINE void bryan2_drawscanline( bitmap_ind16 &bitmap, int x, int y, int length,
+static inline void bryan2_drawscanline( bitmap_ind16 &bitmap, int x, int y, int length,
 		const UINT16 *src, int transparent, UINT32 orient, bitmap_ind8 &priority, int pri )
 {
 	UINT16 *dsti = &bitmap.pix16(y, x);

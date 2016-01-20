@@ -39,11 +39,11 @@
 class amico2k_state : public driver_device
 {
 public:
-	amico2k_state(const machine_config &mconfig, device_type type, const char *tag)
+	amico2k_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
-	void machine_start();
+	void machine_start() override;
 
 	DECLARE_READ8_MEMBER( ppi_pa_r );
 	DECLARE_WRITE8_MEMBER( ppi_pa_w );
@@ -106,7 +106,7 @@ TIMER_CALLBACK_MEMBER(amico2k_state::led_refresh)
 {
 	if (m_ls145_p > 3)
 	{
-		output_set_digit_value(m_ls145_p - 4, m_segment);
+		output().set_digit_value(m_ls145_p - 4, m_segment);
 	}
 }
 

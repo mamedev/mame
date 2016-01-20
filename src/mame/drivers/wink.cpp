@@ -1,9 +1,8 @@
-// license:???
-// copyright-holders:HIGHWAYMAN, Nicola Salmoria, Pierpaolo Prazzoli
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Pierpaolo Prazzoli
+// thanks-to:HIGHWAYMAN
 /*
     Wink    -   (c) 1985 Midcoin
-
-    driver by HIGHWAYMAN, Nicola Salmoria, Pierpaolo Prazzoli
 
     TODO:
     - better interrupts?
@@ -22,7 +21,7 @@
 class wink_state : public driver_device
 {
 public:
-	wink_state(const machine_config &mconfig, device_type type, const char *tag)
+	wink_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -53,9 +52,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	DECLARE_DRIVER_INIT(wink);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	UINT32 screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -110,7 +109,7 @@ WRITE8_MEMBER(wink_state::tile_banking_w)
 
 WRITE8_MEMBER(wink_state::wink_coin_counter_w)
 {
-	coin_counter_w(machine(), offset,data & 1);
+	machine().bookkeeping().coin_counter_w(offset,data & 1);
 }
 
 READ8_MEMBER(wink_state::analog_port_r)

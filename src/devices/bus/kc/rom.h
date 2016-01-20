@@ -20,23 +20,23 @@ class kc_8k_device :
 {
 public:
 	// construction/destruction
-	kc_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	kc_8k_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	kc_8k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	kc_8k_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// optional information overrides
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual const rom_entry *device_rom_region() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const rom_entry *device_rom_region() const override;
 
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() { return 0xfb; }
-	virtual void control_w(UINT8 data);
-	virtual void read(offs_t offset, UINT8 &data);
-	virtual UINT8* get_cart_base();
-	virtual DECLARE_WRITE_LINE_MEMBER( mei_w );
+	virtual UINT8 module_id_r() override { return 0xfb; }
+	virtual void control_w(UINT8 data) override;
+	virtual void read(offs_t offset, UINT8 &data) override;
+	virtual UINT8* get_cart_base() override;
+	virtual DECLARE_WRITE_LINE_MEMBER( mei_w ) override;
 
 protected:
 	kcexp_slot_device *m_slot;
@@ -56,13 +56,13 @@ class kc_m006_device :
 {
 public:
 	// construction/destruction
-	kc_m006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kc_m006_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() { return 0xfc; }
-	virtual void control_w(UINT8 data);
-	virtual void read(offs_t offset, UINT8 &data);
+	virtual UINT8 module_id_r() override { return 0xfc; }
+	virtual void control_w(UINT8 data) override;
+	virtual void read(offs_t offset, UINT8 &data) override;
 };
 
 
@@ -73,16 +73,16 @@ class kc_m033_device :
 {
 public:
 	// construction/destruction
-	kc_m033_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kc_m033_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
-	virtual void device_reset();
+	virtual void device_reset() override;
 
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() { return 0x01; }
-	virtual void control_w(UINT8 data);
-	virtual void read(offs_t offset, UINT8 &data);
+	virtual UINT8 module_id_r() override { return 0x01; }
+	virtual void control_w(UINT8 data) override;
+	virtual void read(offs_t offset, UINT8 &data) override;
 
 private:
 	// internal state

@@ -22,14 +22,14 @@ inline void ATTR_PRINTF( 3, 4 ) ds1204_device::verboselog( int n_level, const ch
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: ds1204(%s) %s", machine().describe_context(), tag(), buf );
+		logerror( "%s: ds1204(%s) %s", machine().describe_context(), tag().c_str(), buf );
 	}
 }
 
 // device type definition
 const device_type DS1204 = &device_creator<ds1204_device>;
 
-ds1204_device::ds1204_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+ds1204_device::ds1204_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock )
 	: device_t( mconfig, DS1204, "DS1204", tag, owner, clock, "ds1204", __FILE__ ),
 	device_nvram_interface(mconfig, *this),
 	m_rst( 0 ),
@@ -71,11 +71,11 @@ void ds1204_device::nvram_default()
 
 	if( !m_region )
 	{
-		logerror( "ds1204(%s) region not found\n", tag() );
+		logerror( "ds1204(%s) region not found\n", tag().c_str() );
 	}
 	else if( m_region->bytes() != expected_bytes )
 	{
-		logerror( "ds1204(%s) region length 0x%x expected 0x%x\n", tag(), m_region->bytes(), expected_bytes );
+		logerror( "ds1204(%s) region length 0x%x expected 0x%x\n", tag().c_str(), m_region->bytes(), expected_bytes );
 	}
 	else
 	{

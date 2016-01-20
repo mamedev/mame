@@ -43,8 +43,8 @@ public:
 	model3_renderer(model3_state &state, int width, int height)
 		: poly_manager<float, model3_polydata, 6, 50000>(state.machine())
 	{
-		m_fb = auto_bitmap_rgb32_alloc(state.machine(), width, height);
-		m_zb = auto_bitmap_ind32_alloc(state.machine(), width, height);
+		m_fb = std::make_unique<bitmap_rgb32>(width, height);
+		m_zb = std::make_unique<bitmap_ind32>(width, height);
 	}
 
 	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -62,8 +62,8 @@ public:
 	void wait_for_polys();
 
 private:
-	bitmap_rgb32 *m_fb;
-	bitmap_ind32 *m_zb;
+	std::unique_ptr<bitmap_rgb32> m_fb;
+	std::unique_ptr<bitmap_ind32> m_zb;
 };
 
 
@@ -179,21 +179,21 @@ void model3_state::video_start()
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_state::model3_exit), this));
 
-	m_m3_char_ram = auto_alloc_array_clear(machine(), UINT64, 0x100000/8);
-	m_m3_tile_ram = auto_alloc_array_clear(machine(), UINT64, 0x8000/8);
+	m_m3_char_ram = make_unique_clear<UINT64[]>(0x100000/8);
+	m_m3_tile_ram = make_unique_clear<UINT64[]>(0x8000/8);
 
-	m_texture_fifo = auto_alloc_array_clear(machine(), UINT32, 0x100000/4);
+	m_texture_fifo = make_unique_clear<UINT32[]>(0x100000/4);
 
 	/* 2x 4MB texture sheets */
-	m_texture_ram[0] = auto_alloc_array(machine(), UINT16, 0x400000/2);
-	m_texture_ram[1] = auto_alloc_array(machine(), UINT16, 0x400000/2);
+	m_texture_ram[0] = std::make_unique<UINT16[]>(0x400000/2);
+	m_texture_ram[1] = std::make_unique<UINT16[]>(0x400000/2);
 
 	/* 1MB Display List RAM */
-	m_display_list_ram = auto_alloc_array_clear(machine(), UINT32, 0x100000/4);
+	m_display_list_ram = make_unique_clear<UINT32[]>(0x100000/4);
 	/* 4MB for nodes (< Step 2.0 have only 2MB) */
-	m_culling_ram = auto_alloc_array_clear(machine(), UINT32, 0x400000/4);
+	m_culling_ram = make_unique_clear<UINT32[]>(0x400000/4);
 	/* 4MB Polygon RAM */
-	m_polygon_ram = auto_alloc_array_clear(machine(), UINT32, 0x400000/4);
+	m_polygon_ram = make_unique_clear<UINT32[]>(0x400000/4);
 
 	m_vid_reg0 = 0;
 
@@ -207,10 +207,10 @@ void model3_state::video_start()
 	m_layer8[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer3_8bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	// 4-bit tiles
-	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, char4_layout, (UINT8*)m_m3_char_ram, 0, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, char4_layout, (UINT8*)m_m3_char_ram.get(), 0, m_palette->entries() / 16, 0));
 
 	// 8-bit tiles
-	m_gfxdecode->set_gfx(1, global_alloc(gfx_element(m_palette, char8_layout, (UINT8*)m_m3_char_ram, 0, m_palette->entries() / 256, 0)));
+	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(m_palette, char8_layout, (UINT8*)m_m3_char_ram.get(), 0, m_palette->entries() / 256, 0));
 
 	init_matrix_stack();
 }
@@ -548,7 +548,7 @@ void model3_state::invalidate_texture(int page, int texx, int texy, int texwidth
 
 	for (int y = 0; y < htiles; y++)
 		for (int x = 0; x < wtiles; x++)
-			while (m_texcache[page][texy + y][texx + x] != NULL)
+			while (m_texcache[page][texy + y][texx + x] != nullptr)
 			{
 				cached_texture *freeme = m_texcache[page][texy + y][texx + x];
 				m_texcache[page][texy + y][texx + x] = freeme->next;
@@ -565,7 +565,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 	int x, y;
 
 	/* if we have one already, validate it */
-	for (tex = m_texcache[page][texy][texx]; tex != NULL; tex = tex->next)
+	for (tex = m_texcache[page][texy][texx]; tex != nullptr; tex = tex->next)
 		if (tex->width == texwidth && tex->height == texheight && tex->format == format)
 			return tex;
 
@@ -1312,7 +1312,7 @@ WRITE64_MEMBER(model3_state::real3d_cmd_w)
 /*****************************************************************************/
 /* matrix and vector operations */
 
-INLINE float dot_product3(VECTOR3 a, VECTOR3 b)
+static inline float dot_product3(VECTOR3 a, VECTOR3 b)
 {
 	return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2]);
 }
@@ -1446,7 +1446,7 @@ m3_triangle *model3_state::push_triangle(bool alpha)
 
 		if (m_tri_buffer_ptr >= TRI_BUFFER_SIZE)
 		{
-			return NULL;
+			return nullptr;
 			//fatalerror("push_triangle: tri buffer max exceeded");
 		}
 
@@ -1459,7 +1459,7 @@ m3_triangle *model3_state::push_triangle(bool alpha)
 
 		if (m_tri_alpha_buffer_ptr >= TRI_ALPHA_BUFFER_SIZE)
 		{
-			return NULL;
+			return nullptr;
 			//fatalerror("push_triangle: tri alpha buffer max exceeded");
 		}
 
@@ -1712,7 +1712,7 @@ void model3_state::draw_model(UINT32 addr)
 			}
 			else
 			{
-				texture = NULL;
+				texture = nullptr;
 			}
 
 			for (i=2; i < num_vertices; i++)

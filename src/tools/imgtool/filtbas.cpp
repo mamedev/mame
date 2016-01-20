@@ -83,15 +83,15 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 	const char *token;
 
 	/* open a memory stream */
-	mem_stream = stream_open_mem(NULL, 0);
-	if (mem_stream == NULL)
+	mem_stream = stream_open_mem(nullptr, 0);
+	if (mem_stream == nullptr)
 	{
 		err = IMGTOOLERR_OUTOFMEMORY;
 		goto done;
 	}
 
 	/* read actual file */
-	err = imgtool_partition_read_file(partition, filename, fork, mem_stream, NULL);
+	err = imgtool_partition_read_file(partition, filename, fork, mem_stream, nullptr);
 	if (err)
 		goto done;
 
@@ -126,7 +126,7 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 
 			if ((b & 0x80) && (!in_string))
 			{
-				token = NULL;
+				token = nullptr;
 
 				for (i = 0; i < tokens->num_entries; i++)
 				{
@@ -161,7 +161,7 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 	}
 
 done:
-	if (mem_stream != NULL)
+	if (mem_stream != nullptr)
 		stream_close(mem_stream);
 	return err;
 }
@@ -193,8 +193,8 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 	UINT16 address;
 
 	/* open a memory stream */
-	mem_stream = stream_open_mem(NULL, 0);
-	if (mem_stream == NULL)
+	mem_stream = stream_open_mem(nullptr, 0);
+	if (mem_stream == nullptr)
 	{
 		err = IMGTOOLERR_OUTOFMEMORY;
 		goto done;
@@ -272,7 +272,7 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 			/* read until end of line */
 			while(buf[pos] != '\0')
 			{
-				token = NULL;
+				token = nullptr;
 				token_shift = 0;
 				token_value = 0;
 
@@ -283,10 +283,10 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 				}
 				else if (!in_quotes)
 				{
-					for (i = 0; (token == NULL) && (i < tokens->num_entries); i++)
+					for (i = 0; (token == nullptr) && (i < tokens->num_entries); i++)
 					{
 						token_table = &tokens->entries[i];
-						for (j = 0; (token == NULL) && (j < token_table->num_tokens); j++)
+						for (j = 0; (token == nullptr) && (j < token_table->num_tokens); j++)
 						{
 							if (!strncmp(&buf[pos], token_table->tokens[j], strlen(token_table->tokens[j])))
 							{
@@ -300,7 +300,7 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 				}
 
 				/* did we find a token? */
-				if (token != NULL)
+				if (token != nullptr)
 				{
 					/* emit the token */
 					if (token_shift != 0)
@@ -343,12 +343,12 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 	}
 
 	/* write actual file */
-	err = imgtool_partition_write_file(partition, filename, fork, mem_stream, opts, NULL);
+	err = imgtool_partition_write_file(partition, filename, fork, mem_stream, opts, nullptr);
 	if (err)
 		goto done;
 
 done:
-	if (mem_stream != NULL)
+	if (mem_stream != nullptr)
 		stream_close(mem_stream);
 	return err;
 }
@@ -684,7 +684,7 @@ static const char *const vzbas[] =
 	"RESET",    /* 0x82 */
 	"SET",      /* 0x83 */
 	"CLS",      /* 0x84 */
-	NULL,       /* 0x85 */
+	nullptr,       /* 0x85 */
 	"RANDOM",   /* 0x86 */
 	"NEXT",     /* 0x87 */
 	"DATA",     /* 0x88 */
@@ -713,21 +713,21 @@ static const char *const vzbas[] =
 	"RESUME",   /* 0x9f */
 	"OUT",      /* 0xa0 */
 	"IN",       /* 0xa1 */
-	NULL,       /* 0xa2 */
-	NULL,       /* 0xa3 */
-	NULL,       /* 0xa4 */
-	NULL,       /* 0xa5 */
-	NULL,       /* 0xa6 */
-	NULL,       /* 0xa7 */
-	NULL,       /* 0xa8 */
-	NULL,       /* 0xa9 */
-	NULL,       /* 0xaa */
-	NULL,       /* 0xab */
-	NULL,       /* 0xac */
-	NULL,       /* 0xad */
+	nullptr,       /* 0xa2 */
+	nullptr,       /* 0xa3 */
+	nullptr,       /* 0xa4 */
+	nullptr,       /* 0xa5 */
+	nullptr,       /* 0xa6 */
+	nullptr,       /* 0xa7 */
+	nullptr,       /* 0xa8 */
+	nullptr,       /* 0xa9 */
+	nullptr,       /* 0xaa */
+	nullptr,       /* 0xab */
+	nullptr,       /* 0xac */
+	nullptr,       /* 0xad */
 	"(RESET)",  /* 0xae */
 	"LPRINT",   /* 0xaf */
-	NULL,       /* 0xb0 */
+	nullptr,       /* 0xb0 */
 	"POKE",     /* 0xb1 */
 	"PRINT",    /* 0xb2 */
 	"CONT",     /* 0xb3 */
@@ -741,16 +741,16 @@ static const char *const vzbas[] =
 	"NEW",      /* 0xbb */
 	"TAB(",     /* 0xbc */
 	"TO",       /* 0xbd */
-	NULL,       /* 0xbe */
+	nullptr,       /* 0xbe */
 	"USING",    /* 0xbf */
 	"VARPTR",   /* 0xc0 */
 	"USR",      /* 0xc1 */
 	"ERL",      /* 0xc2 */
 	"ERR",      /* 0xc3 */
 	"STRING$",  /* 0xc4 */
-	NULL,       /* 0xc5 */
+	nullptr,       /* 0xc5 */
 	"POINT",    /* 0xc6 */
-	NULL,       /* 0xc7 */
+	nullptr,       /* 0xc7 */
 	"MEM",      /* 0xc8 */
 	"INKEY$",   /* 0xc9 */
 	"THEN",     /* 0xca */
@@ -781,15 +781,15 @@ static const char *const vzbas[] =
 	"TAN",      /* 0xe3 */
 	"ATN",      /* 0xe4 */
 	"PEEK",     /* 0xe5 */
-	NULL,       /* 0xe6 */
-	NULL,       /* 0xe7 */
-	NULL,       /* 0xe8 */
-	NULL,       /* 0xe9 */
-	NULL,       /* 0xea */
-	NULL,       /* 0xeb */
-	NULL,       /* 0xec */
-	NULL,       /* 0xed */
-	NULL,       /* 0xee */
+	nullptr,       /* 0xe6 */
+	nullptr,       /* 0xe7 */
+	nullptr,       /* 0xe8 */
+	nullptr,       /* 0xe9 */
+	nullptr,       /* 0xea */
+	nullptr,       /* 0xeb */
+	nullptr,       /* 0xec */
+	nullptr,       /* 0xed */
+	nullptr,       /* 0xee */
 	"CINT",     /* 0xef */
 	"CSNG",     /* 0xf0 */
 	"CDBL",     /* 0xf1 */
@@ -802,11 +802,11 @@ static const char *const vzbas[] =
 	"LEFT$",    /* 0xf8 */
 	"RIGHT$",   /* 0xf9 */
 	"MID$",     /* 0xfa */
-	NULL,       /* 0xfb */
-	NULL,       /* 0xfc */
-	NULL,       /* 0xfd */
-	NULL,       /* 0xfe */
-	NULL        /* 0xff */
+	nullptr,       /* 0xfb */
+	nullptr,       /* 0xfc */
+	nullptr,       /* 0xfd */
+	nullptr,       /* 0xfe */
+	nullptr        /* 0xff */
 };
 
 static const char *const bml3bas_statements[] =

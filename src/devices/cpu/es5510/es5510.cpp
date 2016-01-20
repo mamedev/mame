@@ -34,7 +34,7 @@ static inline INT64 SX64(INT64 x) { return (x & S64(0x0000800000000000)) ? x | S
 #define VERBOSE_EXEC 0
 
 #if VERBOSE
-INLINE void ATTR_PRINTF(1,2) log_to_stderr(const char *format, ...) {
+static inline void ATTR_PRINTF(1,2) log_to_stderr(const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
 	vfprintf(stderr, format, ap);
@@ -126,7 +126,7 @@ inline static INT32 asl(INT32 value, int shift, UINT8 &flags) {
 	return saturate(result, flags, signBefore != 0);
 }
 
-es5510_device::es5510_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+es5510_device::es5510_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 : cpu_device(mconfig, ES5510, "ES5510", tag, owner, clock, "es5510", __FILE__)
 {
 	// Initialize ESP to mostly zeroed, configured for 64k samples of delay line memory, running (not halted)
@@ -207,7 +207,7 @@ static inline const char * REGNAME(UINT8 r) {
 	case 254: return "MAX";
 	case 255: return "ZERO";
 	}
-	return NULL;
+	return nullptr;
 }
 
 static inline char * DESCRIBE_REG(char *s, UINT8 r, const char *name) {
@@ -570,7 +570,7 @@ void es5510_device::device_reset() {
 }
 
 const address_space_config *es5510_device::memory_space_config(address_spacenum spacenum) const {
-	return 0;
+	return nullptr;
 }
 
 UINT64 es5510_device::execute_clocks_to_cycles(UINT64 clocks) const {
@@ -613,7 +613,7 @@ void es5510_device::list_program(void(p)(const char *, ...)) {
 	}
 
 	for (addr = 0; addr < 0xa0; addr++) {
-		DESCRIBE_INSTR(buf, instr[addr], gpr[addr], NULL, NULL, NULL, NULL);
+		DESCRIBE_INSTR(buf, instr[addr], gpr[addr], nullptr, nullptr, nullptr, nullptr);
 		UINT64 inst = instr[addr];
 		UINT8 aReg = (UINT8)((inst >> 16) & 0xff);
 		UINT8 bReg = (UINT8)((inst >> 24) & 0xff);

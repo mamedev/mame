@@ -96,7 +96,7 @@ struct thom_vsignal {
 class thomson_state : public driver_device
 {
 public:
-	thomson_state(const machine_config &mconfig, device_type type, const char *tag) :
+	thomson_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_mc6854(*this, "mc6854"),
 		m_maincpu(*this, "maincpu"),
@@ -348,7 +348,6 @@ public:
 
 	optional_device<mc6854_device> m_mc6854;
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 
 	int m_centronics_busy;
@@ -621,8 +620,6 @@ protected:
 	void to7_floppy_reset();
 	void to9_floppy_init(void* int_base, void* ext_base);
 	void to9_floppy_reset();
-	void to7_midi_update_irq (  );
-	void to7_midi_ready_to_send_cb(  );
 };
 
 /*----------- defined in video/thomson.c -----------*/
@@ -677,7 +674,7 @@ class to7_io_line_device : public device_t
 {
 public:
 	// construction/destruction
-	to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	to7_io_line_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	/* read data register */
 	DECLARE_READ8_MEMBER(porta_in);
@@ -692,8 +689,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	required_device<pia6821_device> m_pia_io;

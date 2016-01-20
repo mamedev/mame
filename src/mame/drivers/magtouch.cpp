@@ -86,7 +86,7 @@ video card
 class magtouch_state : public pcat_base_state
 {
 public:
-	magtouch_state(const machine_config &mconfig, device_type type, const char *tag)
+	magtouch_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pcat_base_state(mconfig, type, tag),
 			m_uart(*this, "ns16450_0"),
 			m_microtouch(*this, "microtouch"){ }
@@ -97,7 +97,7 @@ public:
 	DECLARE_READ8_MEMBER(magtouch_io_r);
 	DECLARE_WRITE8_MEMBER(magtouch_io_w);
 	DECLARE_DRIVER_INIT(magtouch);
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 /*************************************

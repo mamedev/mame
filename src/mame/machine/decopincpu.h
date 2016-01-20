@@ -64,8 +64,8 @@
 class decocpu_type1_device : public device_t
 {
 public:
-	decocpu_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	decocpu_type1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	decocpu_type1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	decocpu_type1_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	required_device<cpu_device> m_cpu;
 	required_device<pia6821_device> m_pia21;
 	required_device<pia6821_device> m_pia24;
@@ -104,18 +104,18 @@ public:
 	INPUT_CHANGED_MEMBER(main_nmi);
 	INPUT_CHANGED_MEMBER(audio_nmi);
 
-	static void static_set_cpuregion(device_t &device, const char *tag);
+	static void static_set_cpuregion(device_t &device, std::string tag);
 
 protected:
 	// overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual ioport_constructor device_input_ports() const;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 0;
 
 private:
-	const char* m_cputag;  // region for cpu board code and data
+	std::string m_cputag;  // region for cpu board code and data
 	emu_timer* m_irq_timer;
 	bool m_irq_active;
 	bool m_ca2;
@@ -134,33 +134,33 @@ private:
 class decocpu_type2_device : public decocpu_type1_device
 {
 public:
-	decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	decocpu_type2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	decocpu_type2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	decocpu_type2_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 protected:
 	// overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 };
 
 class decocpu_type3_device : public decocpu_type2_device
 {
 public:
-	decocpu_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	decocpu_type3_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	decocpu_type3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	decocpu_type3_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 protected:
 	// overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class decocpu_type3b_device : public decocpu_type3_device
 {
 public:
-	decocpu_type3b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	decocpu_type3b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type DECOCPU1;

@@ -46,7 +46,7 @@ typedef device_delegate<void (void)> wswan_video_dmasnd_cb_delegate;
 class wswan_video_device : public device_t
 {
 public:
-	wswan_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wswan_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~wswan_video_device() {}
 
 	// static configuration
@@ -63,9 +63,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void setup_palettes();
 	void draw_background();

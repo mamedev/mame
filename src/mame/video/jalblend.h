@@ -3,7 +3,7 @@
 class jaleco_blend_device : public device_t
 {
 public:
-	jaleco_blend_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	jaleco_blend_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~jaleco_blend_device() {}
 
 	void set(int color, UINT8 val);
@@ -17,12 +17,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	/* each palette entry contains a fourth 'alpha' value */
-	UINT8 *m_table;
+	std::unique_ptr<UINT8[]> m_table;
 
 	template<class _BitmapClass>
 	void drawgfx_common(palette_device &palette,_BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,

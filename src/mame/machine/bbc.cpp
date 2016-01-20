@@ -951,7 +951,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			{
 				m_b6_caps_lock_led = 1;
 				/* call caps lock led update */
-				output_set_value("capslock_led", m_b6_caps_lock_led);
+				output().set_value("capslock_led", m_b6_caps_lock_led);
 			}
 			break;
 		case 7:
@@ -959,7 +959,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			{
 				m_b7_shift_lock_led = 1;
 				/* call shift lock led update */
-				output_set_value("shiftlock_led", m_b7_shift_lock_led);
+				output().set_value("shiftlock_led", m_b7_shift_lock_led);
 			}
 			break;
 		}
@@ -1036,7 +1036,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			{
 				m_b6_caps_lock_led = 0;
 				/* call caps lock led update */
-				output_set_value("capslock_led", m_b6_caps_lock_led);
+				output().set_value("capslock_led", m_b6_caps_lock_led);
 			}
 			break;
 		case 7:
@@ -1044,7 +1044,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			{
 				m_b7_shift_lock_led = 0;
 				/* call shift lock led update */
-				output_set_value("shiftlock_led", m_b7_shift_lock_led);
+				output().set_value("shiftlock_led", m_b7_shift_lock_led);
 			}
 			break;
 		}
@@ -1366,7 +1366,7 @@ void bbc_state::BBC_Cassette_motor(unsigned char status)
 		m_cass_out_phase = 0;
 		m_cass_out_samples_to_go = 4;
 	}
-	output_set_value("motor_led", !status);
+	output().set_value("motor_led", !status);
 }
 
 
@@ -1490,7 +1490,7 @@ WRITE_LINE_MEMBER(bbc_state::fdc_drq_w)
 
 WRITE8_MEMBER(bbc_state::bbc_wd1770_status_w)
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	m_drive_control = data;
 
@@ -1531,7 +1531,7 @@ READ8_MEMBER(bbc_state::bbcm_wd177xl_read)
 
 WRITE8_MEMBER(bbc_state::bbcm_wd1770l_write)
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	m_drive_control = data;
 
@@ -1554,7 +1554,7 @@ WRITE8_MEMBER(bbc_state::bbcm_wd1770l_write)
 
 WRITE8_MEMBER(bbc_state::bbcm_wd1772l_write)
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	m_drive_control = data;
 
@@ -1601,7 +1601,7 @@ int bbc_state::bbc_load_rom(device_image_interface &image, generic_slot_device *
 
 int bbc_state::bbcm_load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		UINT32 filesize = image.length();
 
@@ -1661,7 +1661,7 @@ DRIVER_INIT_MEMBER(bbc_state,bbc)
 void bbc_state::bbc_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size)
 {
 	std::string region_tag;
-	memory_region *tmp_reg;
+	memory_region *tmp_reg = nullptr;
 	UINT8 *eprom[4];
 	if (m_exp1 && (tmp_reg = memregion(region_tag.assign(m_exp1->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
 		eprom[0] = tmp_reg->base() + shift;
@@ -1695,7 +1695,7 @@ void bbc_state::bbc_setup_banks(memory_bank *membank, int banks, UINT32 shift, U
 void bbc_state::bbcm_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size)
 {
 	std::string region_tag;
-	memory_region *tmp_reg;
+	memory_region *tmp_reg = nullptr;
 	UINT8 *eprom[2];
 	if (m_exp1 && (tmp_reg = memregion(region_tag.assign(m_exp1->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
 		eprom[0] = tmp_reg->base() + shift;
@@ -1760,6 +1760,29 @@ MACHINE_RESET_MEMBER(bbc_state, bbcb)
 	UINT8 *RAM = m_region_maincpu->base();
 	m_Speech    = (ioport("BBCCONFIG")->read() >> 0) & 0x01;
 	m_SWRAMtype = (ioport("BBCCONFIG")->read() >> 3) & 0x03;
+	m_bank1->set_base(RAM);
+	m_bank3->set_base(RAM + 0x4000);
+	m_memorySize=32;
+
+	m_bank4->set_entry(0);
+	m_bank7->set_base(m_region_os->base());  /* bank 7 points at the OS rom  from c000 to ffff */
+
+	bbcb_IC32_initialise(this);
+}
+
+
+MACHINE_START_MEMBER(bbc_state, torch)
+{
+	m_machinetype = MODELB;
+	m_mc6850_clock = 0;
+	bbc_setup_banks(m_bank4, 16, 0, 0x4000);
+}
+
+MACHINE_RESET_MEMBER(bbc_state, torch)
+{
+	UINT8 *RAM = m_region_maincpu->base();
+	m_Speech    = 1;
+	m_SWRAMtype = 0;
 	m_bank1->set_base(RAM);
 	m_bank3->set_base(RAM + 0x4000);
 	m_memorySize=32;

@@ -61,7 +61,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 class beaminv_state : public driver_device
 {
 public:
-	beaminv_state(const machine_config &mconfig, device_type type, const char *tag)
+	beaminv_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -82,8 +82,8 @@ public:
 	DECLARE_READ8_MEMBER(v128_r);
 	DECLARE_WRITE8_MEMBER(controller_select_w);
 	DECLARE_READ8_MEMBER(controller_r);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_beaminv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 	void create_interrupt_timer();

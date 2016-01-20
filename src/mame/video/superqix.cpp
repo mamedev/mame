@@ -56,8 +56,8 @@ VIDEO_START_MEMBER(superqix_state,pbillian)
 
 VIDEO_START_MEMBER(superqix_state,superqix)
 {
-	m_fg_bitmap[0] = auto_bitmap_ind16_alloc(machine(), 256, 256);
-	m_fg_bitmap[1] = auto_bitmap_ind16_alloc(machine(), 256, 256);
+	m_fg_bitmap[0] = std::make_unique<bitmap_ind16>(256, 256);
+	m_fg_bitmap[1] = std::make_unique<bitmap_ind16>(256, 256);
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(superqix_state::sqix_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
 	m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
@@ -131,8 +131,8 @@ WRITE8_MEMBER(superqix_state::pbillian_0410_w)
 	 --5-----  flip screen
 	*/
 
-	coin_counter_w(machine(), 0,data & 0x02);
-	coin_counter_w(machine(), 1,data & 0x04);
+	machine().bookkeeping().coin_counter_w(0,data & 0x02);
+	machine().bookkeeping().coin_counter_w(1,data & 0x04);
 
 	membank("bank1")->set_entry((data & 0x08) >> 3);
 

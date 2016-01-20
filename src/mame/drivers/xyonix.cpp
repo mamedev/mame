@@ -60,8 +60,8 @@ void xyonix_state::handle_coins(int coin)
 			m_credits += coinage_table[tmp][1];
 			m_coins -= coinage_table[tmp][0];
 		}
-		coin_lockout_global_w(machine(), 0); /* Unlock all coin slots */
-		coin_counter_w(machine(),1,1); coin_counter_w(machine(),1,0); /* Count slot B */
+		machine().bookkeeping().coin_lockout_global_w(0); /* Unlock all coin slots */
+		machine().bookkeeping().coin_counter_w(1,1); machine().bookkeeping().coin_counter_w(1,0); /* Count slot B */
 	}
 
 	if (coin & 2)   // Coin 1 !
@@ -73,8 +73,8 @@ void xyonix_state::handle_coins(int coin)
 			m_credits += coinage_table[tmp][1];
 			m_coins -= coinage_table[tmp][0];
 		}
-		coin_lockout_global_w(machine(), 0); /* Unlock all coin slots */
-		coin_counter_w(machine(),0,1); coin_counter_w(machine(),0,0); /* Count slot A */
+		machine().bookkeeping().coin_lockout_global_w(0); /* Unlock all coin slots */
+		machine().bookkeeping().coin_counter_w(0,1); machine().bookkeeping().coin_counter_w(0,0); /* Count slot A */
 	}
 
 	if (m_credits >= 9)

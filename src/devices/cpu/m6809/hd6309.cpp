@@ -127,9 +127,9 @@ const device_type HD6309 = &device_creator<hd6309_device>;
 //  hd6309_device - constructor
 //-------------------------------------------------
 
-hd6309_device::hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	m6809_base_device(mconfig, "HD6309", tag, owner, clock, HD6309, 4, "hd6309", __FILE__), 
-	m_md(0), 
+hd6309_device::hd6309_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+	m6809_base_device(mconfig, "HD6309", tag, owner, clock, HD6309, 4, "hd6309", __FILE__),
+	m_md(0),
 	m_temp_im(0)
 {
 }
@@ -213,8 +213,8 @@ void hd6309_device::device_pre_save()
 
 void hd6309_device::device_post_load()
 {
-	m_reg8 = NULL;
-	m_reg16 = NULL;
+	m_reg8 = nullptr;
+	m_reg16 = nullptr;
 
 	switch(m_reg)
 	{

@@ -58,7 +58,7 @@ const device_type NCR53C7XX = &device_creator<ncr53c7xx_device>;
 //  ncr53c7xx_device - constructor/destructor
 //-------------------------------------------------
 
-ncr53c7xx_device::ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ncr53c7xx_device::ncr53c7xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	:   nscsi_device(mconfig, NCR53C7XX, "53C7xx SCSI", tag, owner, clock, "ncr537xx", __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
@@ -854,7 +854,7 @@ void ncr53c7xx_device::step(bool timeout)
 			if (((m_scntl[0] >> SCNTL0_ARB_SHIFT) & SCNTL0_ARB_MASK) == 3)
 			{
 				int win;
-				for (win = 7; win >=0 && !(data & (1 << win)); win--);
+				for (win = 7; win >=0 && !(data & (1 << win)); win--) {};
 
 				if ((1 << win) != m_scid)
 				{

@@ -41,7 +41,7 @@ class i8243_device :  public device_t
 {
 public:
 	// construction/destruction
-	i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8243_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_read_handler(device_t &device, _Object object) { return downcast<i8243_device &>(device).m_readhandler.set_callback(object); }
@@ -54,10 +54,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load() { }
-	virtual void device_clock_changed() { }
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override { }
+	virtual void device_clock_changed() override { }
 
 private:
 

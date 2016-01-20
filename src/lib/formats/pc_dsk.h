@@ -24,9 +24,9 @@ class pc_format : public upd765_format
 public:
 	pc_format();
 
-	virtual const char *name() const;
-	virtual const char *description() const;
-	virtual const char *extensions() const;
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual const char *extensions() const override;
 
 private:
 	static const format formats[];

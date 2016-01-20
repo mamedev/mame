@@ -166,7 +166,7 @@ void sm510_base_device::device_reset()
 inline UINT16 sm510_base_device::get_lcd_row(int column, UINT8* ram)
 {
 	// output 0 if lcd blackpate/bleeder is off, or in case row doesn't exist
-	if (ram == NULL || m_bc || !m_bp)
+	if (ram == nullptr || m_bc || !m_bp)
 		return 0;
 
 	UINT16 rowdata = 0;
@@ -274,7 +274,7 @@ void sm510_base_device::init_melody()
 	{
 		UINT8 data = m_melody_rom[i];
 		if (data & 0xc0 || (data & 0x0f) > 13)
-			logerror("%s unknown melody ROM data $%02X at $%02X\n", tag(), data, i);
+			logerror("%s unknown melody ROM data $%02X at $%02X\n", tag().c_str(), data, i);
 	}
 }
 

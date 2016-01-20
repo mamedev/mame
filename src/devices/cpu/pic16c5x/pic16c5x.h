@@ -64,7 +64,7 @@ class pic16c5x_device : public cpu_device
 {
 public:
 	// construction/destruction
-	pic16c5x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, int picmodel);
+	pic16c5x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, int picmodel);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_read_a_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_a.set_callback(object); }
@@ -89,8 +89,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
 	/**************************************************************************
@@ -100,29 +100,29 @@ protected:
 	 *  times. (Each instruction cycle passes through 4 machine states). This
 	 *  is handled by the cpu execution engine.
 	 */
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 4 - 1) / 4; }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 4); }
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 2; }
-	virtual UINT32 execute_input_lines() const { return 1; }
-	virtual UINT32 execute_default_irq_vector() const { return 0; }
-	virtual void execute_run();
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 4 - 1) / 4; }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 4); }
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 2; }
+	virtual UINT32 execute_input_lines() const override { return 1; }
+	virtual UINT32 execute_default_irq_vector() const override { return 0; }
+	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
 	{
-		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : NULL );
+		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr );
 	}
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_export(const device_state_entry &entry);
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 private:
 	address_space_config m_program_config;
@@ -237,7 +237,7 @@ class pic16c54_device : public pic16c5x_device
 {
 public:
 	// construction/destruction
-	pic16c54_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pic16c54_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -245,7 +245,7 @@ class pic16c55_device : public pic16c5x_device
 {
 public:
 	// construction/destruction
-	pic16c55_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pic16c55_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -253,7 +253,7 @@ class pic16c56_device : public pic16c5x_device
 {
 public:
 	// construction/destruction
-	pic16c56_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pic16c56_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -261,7 +261,7 @@ class pic16c57_device : public pic16c5x_device
 {
 public:
 	// construction/destruction
-	pic16c57_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pic16c57_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -269,7 +269,7 @@ class pic16c58_device : public pic16c5x_device
 {
 public:
 	// construction/destruction
-	pic16c58_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pic16c58_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 #endif  /* __PIC16C5X_H__ */

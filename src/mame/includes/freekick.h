@@ -5,7 +5,7 @@
 class freekick_state : public driver_device
 {
 public:
-	freekick_state(const machine_config &mconfig, device_type type, const char *tag)
+	freekick_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -49,7 +49,7 @@ public:
 	DECLARE_DRIVER_INIT(gigasb);
 	DECLARE_DRIVER_INIT(pbillrds);
 	TILE_GET_INFO_MEMBER(get_freek_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(pbillrd);
 	DECLARE_MACHINE_RESET(freekick);
 	DECLARE_MACHINE_START(freekick);

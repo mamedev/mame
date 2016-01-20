@@ -30,19 +30,19 @@ class sms_ctrl_adaptor_device : public device_t,
 {
 public:
 	// construction/destruction
-	sms_ctrl_adaptor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sms_ctrl_adaptor_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER(th_pin_w);
 	DECLARE_READ32_MEMBER(pixel_r);
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// device_gg_ext_port_interface overrides
-	virtual UINT8 peripheral_r();
-	virtual void peripheral_w(UINT8 data);
+	virtual UINT8 peripheral_r() override;
+	virtual void peripheral_w(UINT8 data) override;
 
 private:
 	required_device<sms_control_port_device> m_subctrl_port;

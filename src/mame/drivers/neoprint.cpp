@@ -31,7 +31,7 @@
 class neoprint_state : public driver_device
 {
 public:
-	neoprint_state(const machine_config &mconfig, device_type type, const char *tag)
+	neoprint_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_npvidram(*this, "npvidram"),
 		m_npvidregs(*this, "npvidregs"),
@@ -71,8 +71,8 @@ public:
 	DECLARE_DRIVER_INIT(npcartv1);
 	DECLARE_DRIVER_INIT(nprsp);
 	DECLARE_DRIVER_INIT(unkneo);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(nprsp);
 	UINT32 screen_update_neoprint(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_nprsp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

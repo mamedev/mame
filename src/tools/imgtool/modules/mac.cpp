@@ -131,24 +131,24 @@ struct UINT32BE
 	UINT8 bytes[4];
 };
 
-INLINE UINT16 get_UINT16BE(UINT16BE word)
+static inline UINT16 get_UINT16BE(UINT16BE word)
 {
 	return (word.bytes[0] << 8) | word.bytes[1];
 }
 
-INLINE void set_UINT16BE(UINT16BE *word, UINT16 data)
+static inline void set_UINT16BE(UINT16BE *word, UINT16 data)
 {
 	word->bytes[0] = (data >> 8) & 0xff;
 	word->bytes[1] = data & 0xff;
 }
 
 #if 0
-INLINE UINT32 get_UINT24BE(UINT24BE word)
+static inline UINT32 get_UINT24BE(UINT24BE word)
 {
 	return (word.bytes[0] << 16) | (word.bytes[1] << 8) | word.bytes[2];
 }
 
-INLINE void set_UINT24BE(UINT24BE *word, UINT32 data)
+static inline void set_UINT24BE(UINT24BE *word, UINT32 data)
 {
 	word->bytes[0] = (data >> 16) & 0xff;
 	word->bytes[1] = (data >> 8) & 0xff;
@@ -156,12 +156,12 @@ INLINE void set_UINT24BE(UINT24BE *word, UINT32 data)
 }
 #endif
 
-INLINE UINT32 get_UINT32BE(UINT32BE word)
+static inline UINT32 get_UINT32BE(UINT32BE word)
 {
 	return (word.bytes[0] << 24) | (word.bytes[1] << 16) | (word.bytes[2] << 8) | word.bytes[3];
 }
 
-INLINE void set_UINT32BE(UINT32BE *word, UINT32 data)
+static inline void set_UINT32BE(UINT32BE *word, UINT32 data)
 {
 	word->bytes[0] = (data >> 24) & 0xff;
 	word->bytes[1] = (data >> 16) & 0xff;
@@ -583,7 +583,7 @@ static int mac_stricmp(const UINT8 *s1, const UINT8 *s2)
     Return a zero if s1 and s2 are equal, a negative value if s1 is less than
     s2, and a positive value if s1 is greater than s2.
 */
-INLINE void mac_strcpy(UINT8 *dest, const UINT8 *src)
+static inline void mac_strcpy(UINT8 *dest, const UINT8 *src)
 {
 	memcpy(dest, src, src[0]+1);
 }
@@ -704,7 +704,7 @@ static imgtoolerr_t image_write_block(mac_l1_imgref *image, UINT32 block, const 
 
     Return tag length
 */
-INLINE int image_get_tag_len(mac_l1_imgref *image)
+static inline int image_get_tag_len(mac_l1_imgref *image)
 {
 	return 0;
 }

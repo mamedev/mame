@@ -58,7 +58,7 @@ TODO:
 class enigma2_state : public driver_device
 {
 public:
-	enigma2_state(const machine_config &mconfig, device_type type, const char *tag)
+	enigma2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -97,8 +97,8 @@ public:
 	DECLARE_READ8_MEMBER(sound_latch_r);
 	DECLARE_WRITE8_MEMBER(protection_data_w);
 	DECLARE_DRIVER_INIT(enigma2);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_enigma2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_enigma2a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_clear_callback);

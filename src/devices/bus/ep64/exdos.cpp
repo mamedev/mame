@@ -105,9 +105,9 @@ static MACHINE_CONFIG_FRAGMENT( ep64_exdos )
 	MCFG_WD1770_ADD(WD1770_TAG, XTAL_8MHz)
 
 	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":0", ep64_exdos_floppies, "35dd", ep64_exdos_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":1", ep64_exdos_floppies, NULL,  ep64_exdos_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":2", ep64_exdos_floppies, NULL,  ep64_exdos_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":3", ep64_exdos_floppies, NULL,  ep64_exdos_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":1", ep64_exdos_floppies, nullptr,  ep64_exdos_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":2", ep64_exdos_floppies, nullptr,  ep64_exdos_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":3", ep64_exdos_floppies, nullptr,  ep64_exdos_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -131,7 +131,7 @@ machine_config_constructor ep64_exdos_device::device_mconfig_additions() const
 //  ep64_exdos_device - constructor
 //-------------------------------------------------
 
-ep64_exdos_device::ep64_exdos_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ep64_exdos_device::ep64_exdos_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, EP64_EXDOS, "EXDOS", tag, owner, clock, "ep64_exdos", __FILE__),
 	device_ep64_expansion_bus_card_interface(mconfig, *this),
 	m_fdc(*this, WD1770_TAG),
@@ -139,7 +139,7 @@ ep64_exdos_device::ep64_exdos_device(const machine_config &mconfig, const char *
 	m_floppy1(*this, WD1770_TAG":1"),
 	m_floppy2(*this, WD1770_TAG":2"),
 	m_floppy3(*this, WD1770_TAG":3"),
-	m_floppy(NULL),
+	m_floppy(nullptr),
 	m_rom(*this, "rom")
 {
 }
@@ -166,7 +166,7 @@ void ep64_exdos_device::device_reset()
 {
 	m_fdc->reset();
 
-	m_floppy = NULL;
+	m_floppy = nullptr;
 	m_fdc->set_floppy(m_floppy);
 	m_fdc->dden_w(0);
 }
@@ -225,7 +225,7 @@ WRITE8_MEMBER( ep64_exdos_device::write )
 
 	*/
 
-	m_floppy = NULL;
+	m_floppy = nullptr;
 
 	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();

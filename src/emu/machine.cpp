@@ -115,13 +115,10 @@ osd_interface &running_machine::osd() const
 //-------------------------------------------------
 
 running_machine::running_machine(const machine_config &_config, machine_manager &manager)
-	: firstcpu(NULL),
-		primary_screen(NULL),
+	: firstcpu(nullptr),
+		primary_screen(nullptr),
 		debug_flags(0),
-		romload_data(NULL),
-		ui_input_data(NULL),
-		debugcpu_data(NULL),
-		generic_machine_data(NULL),
+		debugcpu_data(nullptr),
 		m_config(_config),
 		m_system(_config.gamedrv()),
 		m_manager(manager),
@@ -129,14 +126,14 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		m_paused(false),
 		m_hard_reset_pending(false),
 		m_exit_pending(false),
-		m_soft_reset_timer(NULL),
+		m_soft_reset_timer(nullptr),
 		m_rand_seed(0x9d14abd7),
 		m_ui_active(_config.options().ui_active()),
 		m_basename(_config.gamedrv().name),
 		m_sample_rate(_config.options().sample_rate()),
 		m_saveload_schedule(SLS_NONE),
 		m_saveload_schedule_time(attotime::zero),
-		m_saveload_searchpath(NULL),
+		m_saveload_searchpath(nullptr),
 
 		m_save(*this),
 		m_memory(*this),
@@ -148,12 +145,12 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 
 	// set the machine on all devices
 	device_iterator iter(root_device());
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 		device->set_machine(*this);
 
 	// find devices
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
-		if (dynamic_cast<cpu_device *>(device) != NULL)
+	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
+		if (dynamic_cast<cpu_device *>(device) != nullptr)
 		{
 			firstcpu = downcast<cpu_device *>(device);
 			break;
@@ -185,11 +182,11 @@ running_machine::~running_machine()
 const char *running_machine::describe_context()
 {
 	device_execute_interface *executing = m_scheduler.currently_executing();
-	if (executing != NULL)
+	if (executing != nullptr)
 	{
 		cpu_device *cpu = dynamic_cast<cpu_device *>(&executing->device());
-		if (cpu != NULL)
-			strprintf(m_context, "'%s' (%s)", cpu->tag(), core_i64_format(cpu->pc(), cpu->space(AS_PROGRAM).logaddrchars(), cpu->is_octal()));
+		if (cpu != nullptr)
+			strprintf(m_context, "'%s' (%s)", cpu->tag().c_str(), core_i64_format(cpu->pc(), cpu->space(AS_PROGRAM).logaddrchars(), cpu->is_octal()));
 	}
 	else
 		m_context.assign("(no context)");
@@ -217,21 +214,24 @@ TIMER_CALLBACK_MEMBER(running_machine::autoboot_callback)
 void running_machine::start()
 {
 	// initialize basic can't-fail systems here
-	config_init(*this);
-	m_input.reset(global_alloc(input_manager(*this)));
-	output_init(*this);
-	m_render.reset(global_alloc(render_manager(*this)));
-	generic_machine_init(*this);
+	m_configuration = std::make_unique<configuration_manager>(*this);
+	m_input = std::make_unique<input_manager>(*this);
+	m_output = std::make_unique<output_manager>(*this);
+	m_render = std::make_unique<render_manager>(*this);
+	m_bookkeeping = std::make_unique<bookkeeping_manager>(*this);
 
 	// allocate a soft_reset timer
 	m_soft_reset_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::soft_reset), this));
+
+	// intialize UI input
+	m_ui_input = make_unique_clear<ui_input_manager>(*this);
 
 	// init the osd layer
 	m_manager.osd().init(*this);
 
 	// create the video manager
-	m_video.reset(global_alloc(video_manager(*this)));
-	m_ui.reset(global_alloc(ui_manager(*this)));
+	m_video = std::make_unique<video_manager>(*this);
+	m_ui = std::make_unique<ui_manager>(*this);
 
 	// initialize the base time (needed for doing record/playback)
 	::time(&m_base_time);
@@ -243,21 +243,18 @@ void running_machine::start()
 	if (newbase != 0)
 		m_base_time = newbase;
 
-	// intialize UI input
-	ui_input_init(*this);
-
 	// initialize the streams engine before the sound devices start
-	m_sound.reset(global_alloc(sound_manager(*this)));
+	m_sound = std::make_unique<sound_manager>(*this);
 
 	// first load ROMs, then populate memory, and finally initialize CPUs
 	// these operations must proceed in this order
-	rom_init(*this);
+	m_rom_load = make_unique_clear<rom_load_manager>(*this);
 	m_memory.initialize();
 
 	// initialize the watchdog
 	m_watchdog_counter = 0;
 	m_watchdog_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::watchdog_fired), this));
-	if (config().m_watchdog_vblank_count != 0 && primary_screen != NULL)
+	if (config().m_watchdog_vblank_count != 0 && primary_screen != nullptr)
 		primary_screen->register_vblank_callback(vblank_state_delegate(FUNC(running_machine::watchdog_vblank), this));
 	save().save_item(NAME(m_watchdog_enabled));
 	save().save_item(NAME(m_watchdog_counter));
@@ -266,14 +263,18 @@ void running_machine::start()
 	save().save_item(NAME(m_rand_seed));
 
 	// initialize image devices
-	image_init(*this);
-	m_tilemap.reset(global_alloc(tilemap_manager(*this)));
-	crosshair_init(*this);
-	network_init(*this);
+	m_image = std::make_unique<image_manager>(*this);
+	m_tilemap = std::make_unique<tilemap_manager>(*this);
+	m_crosshair = make_unique_clear<crosshair_manager>(*this);
+	m_network = std::make_unique<network_manager>(*this);
 
 	// initialize the debugger
 	if ((debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debugger_init(*this);
+	{
+		m_debug_view = std::make_unique<debug_view_manager>(*this);
+		m_debugger = std::make_unique<debugger_manager>(*this);
+		m_debugger->initialize();
+	}
 
 	m_render->resolve_tags();
 
@@ -299,7 +300,7 @@ void running_machine::start()
 		schedule_load("auto");
 
 	// set up the cheat engine
-	m_cheat.reset(global_alloc(cheat_manager(*this)));
+	m_cheat = std::make_unique<cheat_manager>(*this);
 
 	// allocate autoboot timer
 	m_autoboot_timer = scheduler().timer_alloc(timer_expired_delegate(FUNC(running_machine::autoboot_callback), this));
@@ -325,7 +326,7 @@ int running_machine::run(bool firstrun)
 		// if we have a logfile, set up the callback
 		if (options().log() && &system() != &GAME_NAME(___empty))
 		{
-			m_logfile.reset(global_alloc(emu_file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)));
+			m_logfile = std::make_unique<emu_file>(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			file_error filerr = m_logfile->open("error.log");
 			assert_always(filerr == FILERR_NONE, "unable to open log file");
 			add_logerror_callback(logfile_callback);
@@ -335,7 +336,7 @@ int running_machine::run(bool firstrun)
 		start();
 
 		// load the configuration settings and NVRAM
-		config_load_settings(*this);
+		m_configuration->load_settings();
 
 		// disallow save state registrations starting here.
 		// Don't do it earlier, config load can create network
@@ -354,11 +355,6 @@ int running_machine::run(bool firstrun)
 		// perform a soft reset -- this takes us to the running phase
 		soft_reset();
 
-#ifdef MAME_DEBUG
-		g_tagmap_finds = 0;
-		if (strcmp(config().m_gamedrv.name, "___empty") != 0)
-			g_tagmap_counter_enabled = true;
-#endif
 		// handle initial load
 		if (m_saveload_schedule != SLS_NONE)
 			handle_saveload();
@@ -392,19 +388,10 @@ int running_machine::run(bool firstrun)
 		// and out via the exit phase
 		m_current_phase = MACHINE_PHASE_EXIT;
 
-#ifdef MAME_DEBUG
-		if (g_tagmap_counter_enabled)
-		{
-			g_tagmap_counter_enabled = false;
-			if (*(options().command()) == 0)
-				osd_printf_info("%d tagmap lookups\n", g_tagmap_finds);
-		}
-#endif
-
 		// save the NVRAM and configuration
 		sound().ui_mute(true);
 		nvram_save();
-		config_save_settings(*this);
+		m_configuration->save_settings();
 	}
 	catch (emu_fatalerror &fatal)
 	{
@@ -425,7 +412,7 @@ int running_machine::run(bool firstrun)
 	}
 	catch (add_exception &aex)
 	{
-		osd_printf_error("Tag '%s' already exists in tagged_list\n", aex.tag());
+		osd_printf_error("Tag '%s' already exists in tagged_list\n", aex.tag().c_str());
 		error = MAMERR_FATALERROR;
 	}
 	catch (std::exception &ex)
@@ -442,15 +429,6 @@ int running_machine::run(bool firstrun)
 	// make sure our phase is set properly before cleaning up,
 	// in case we got here via exception
 	m_current_phase = MACHINE_PHASE_EXIT;
-
-#ifdef MAME_DEBUG
-	if (g_tagmap_counter_enabled)
-	{
-		g_tagmap_counter_enabled = false;
-		if (*(options().command()) == 0)
-			osd_printf_info("%d tagmap lookups\n", g_tagmap_finds);
-	}
-#endif
 
 	// call all exit callbacks registered
 	call_notifiers(MACHINE_NOTIFY_EXIT);
@@ -472,15 +450,6 @@ void running_machine::schedule_exit()
 
 	// if we're executing, abort out immediately
 	m_scheduler.eat_all_cycles();
-
-#ifdef MAME_DEBUG
-	if (g_tagmap_counter_enabled)
-	{
-		g_tagmap_counter_enabled = false;
-		if (*(options().command()) == 0)
-			osd_printf_info("%d tagmap lookups\n", g_tagmap_finds);
-	}
-#endif
 
 	// if we're autosaving on exit, schedule a save as well
 	if (options().autosave() && (m_system.flags & MACHINE_SUPPORTS_SAVE) && this->time() > attotime::zero)
@@ -527,10 +496,10 @@ void running_machine::schedule_soft_reset()
 //  software
 //-------------------------------------------------
 
-std::string running_machine::get_statename(const char *option)
+std::string running_machine::get_statename(const char *option) const
 {
 	std::string statename_str("");
-	if (option == NULL || option[0] == 0)
+	if (option == nullptr || option[0] == 0)
 		statename_str.assign("%g");
 	else
 		statename_str.assign(option);
@@ -578,7 +547,7 @@ std::string running_machine::get_statename(const char *option)
 
 			// verify that there is such a device for this system
 			image_interface_iterator iter(root_device());
-			for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
+			for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
 			{
 				// get the device name
 				std::string tempdevname(image->brief_instance_name());
@@ -587,7 +556,7 @@ std::string running_machine::get_statename(const char *option)
 				if (devname_str.compare(tempdevname) == 0)
 				{
 					// verify that such a device has an image mounted
-					if (image->basename_noext() != NULL)
+					if (image->basename_noext() != nullptr)
 					{
 						std::string filename(image->basename_noext());
 
@@ -624,7 +593,7 @@ void running_machine::set_saveload_filename(const char *filename)
 	// free any existing request and allocate a copy of the requested name
 	if (osd_is_absolute_path(filename))
 	{
-		m_saveload_searchpath = NULL;
+		m_saveload_searchpath = nullptr;
 		m_saveload_pending_file.assign(filename);
 	}
 	else
@@ -768,11 +737,11 @@ void running_machine::add_notifier(machine_notification event, machine_notify_de
 
 	// exit notifiers are added to the head, and executed in reverse order
 	if (event == MACHINE_NOTIFY_EXIT)
-		m_notifier_list[event].prepend(*global_alloc(notifier_callback_item(callback)));
+		m_notifier_list[event].push_front(std::make_unique<notifier_callback_item>(callback));
 
 	// all other notifiers are added to the tail, and executed in the order registered
 	else
-		m_notifier_list[event].append(*global_alloc(notifier_callback_item(callback)));
+		m_notifier_list[event].push_back(std::make_unique<notifier_callback_item>(callback));
 }
 
 
@@ -784,7 +753,7 @@ void running_machine::add_notifier(machine_notification event, machine_notify_de
 void running_machine::add_logerror_callback(logerror_callback callback)
 {
 	assert_always(m_current_phase == MACHINE_PHASE_INIT, "Can only call add_logerror_callback at init time!");
-	m_logerror_list.append(*global_alloc(logerror_callback_item(callback)));
+	m_logerror_list.push_back(std::make_unique<logerror_callback_item>(callback));
 }
 
 /*-------------------------------------------------
@@ -794,7 +763,7 @@ void running_machine::add_logerror_callback(logerror_callback callback)
 void running_machine::popmessage(const char *format, ...) const
 {
 	// if the format is NULL, it is a signal to clear the popmessage
-	if (format == NULL)
+	if (format == nullptr)
 		ui().popup_time(0, " ");
 
 	// otherwise, generate the buffer and call the UI to display the message
@@ -835,7 +804,7 @@ void running_machine::logerror(const char *format, ...) const
 void running_machine::vlogerror(const char *format, va_list args) const
 {
 	// process only if there is a target
-	if (m_logerror_list.first() != NULL)
+	if (!m_logerror_list.empty())
 	{
 		g_profiler.start(PROFILER_LOGERROR);
 
@@ -843,8 +812,8 @@ void running_machine::vlogerror(const char *format, va_list args) const
 		vsnprintf(giant_string_buffer, ARRAY_LENGTH(giant_string_buffer), format, args);
 
 		// log to all callbacks
-		for (logerror_callback_item *cb = m_logerror_list.first(); cb != NULL; cb = cb->next())
-			(*cb->m_func)(*this, giant_string_buffer);
+		for (auto& cb : m_logerror_list)
+			(cb->m_func)(*this, giant_string_buffer);
 
 		g_profiler.stop();
 	}
@@ -895,7 +864,7 @@ UINT32 running_machine::rand()
 
 void running_machine::call_notifiers(machine_notification which)
 {
-	for (notifier_callback_item *cb = m_notifier_list[which].first(); cb != NULL; cb = cb->next())
+	for (auto& cb : m_notifier_list[which])
 		cb->m_func();
 }
 
@@ -978,7 +947,7 @@ void running_machine::handle_saveload()
 	// unschedule the operation
 cancel:
 	m_saveload_pending_file.clear();
-	m_saveload_searchpath = NULL;
+	m_saveload_searchpath = nullptr;
 	m_saveload_schedule = SLS_NONE;
 }
 
@@ -1094,7 +1063,7 @@ void running_machine::watchdog_vblank(screen_device &screen, bool vblank_state)
 
 void running_machine::logfile_callback(const running_machine &machine, const char *buffer)
 {
-	if (machine.m_logfile != NULL)
+	if (machine.m_logfile != nullptr)
 		machine.m_logfile->puts(buffer);
 }
 
@@ -1112,18 +1081,18 @@ void running_machine::start_all_devices()
 		// iterate over all devices
 		int failed_starts = 0;
 		device_iterator iter(root_device());
-		for (device_t *device = iter.first(); device != NULL; device = iter.next())
+		for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 			if (!device->started())
 			{
 				// attempt to start the device, catching any expected exceptions
 				try
 				{
 					// if the device doesn't have a machine yet, set it first
-					if (device->m_machine == NULL)
+					if (device->m_machine == nullptr)
 						device->set_machine(*this);
 
 					// now start the device
-					osd_printf_verbose("Starting %s '%s'\n", device->name(), device->tag());
+					osd_printf_verbose("Starting %s '%s'\n", device->name().c_str(), device->tag().c_str());
 					device->start();
 				}
 
@@ -1170,7 +1139,7 @@ void running_machine::stop_all_devices()
 
 	// iterate over devices and stop them
 	device_iterator iter(root_device());
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 		device->stop();
 }
 
@@ -1183,7 +1152,7 @@ void running_machine::stop_all_devices()
 void running_machine::presave_all_devices()
 {
 	device_iterator iter(root_device());
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 		device->pre_save();
 }
 
@@ -1196,7 +1165,7 @@ void running_machine::presave_all_devices()
 void running_machine::postload_all_devices()
 {
 	device_iterator iter(root_device());
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 		device->post_load();
 }
 
@@ -1205,42 +1174,35 @@ void running_machine::postload_all_devices()
     NVRAM MANAGEMENT
 ***************************************************************************/
 
-const char *running_machine::image_parent_basename(device_t *device)
-{
-	device_t *dev = device;
-	while(dev != &root_device())
-	{
-		device_image_interface *intf = NULL;
-		if (dev!=NULL && dev->interface(intf))
-		{
-			return intf->basename_noext();
-		}
-		dev = dev->owner();
-	}
-	return NULL;
-}
-
 /*-------------------------------------------------
     nvram_filename - returns filename of system's
     NVRAM depending of selected BIOS
 -------------------------------------------------*/
 
-std::string &running_machine::nvram_filename(std::string &result, device_t &device)
+std::string running_machine::nvram_filename(device_t &device) const
 {
 	// start with either basename or basename_biosnum
-	result.assign(basename());
+	std::string result(basename());
 	if (root_device().system_bios() != 0 && root_device().default_bios() != root_device().system_bios())
 		strcatprintf(result, "_%d", root_device().system_bios() - 1);
 
 	// device-based NVRAM gets its own name in a subdirectory
-	if (&device != &root_device())
+	if (device.owner() != nullptr)
 	{
 		// add per software nvrams into one folder
-		const char *software = image_parent_basename(&device);
-		if (software!=NULL && strlen(software)>0)
+		const char *software = nullptr;
+		for (device_t *dev = &device; dev->owner() != nullptr; dev = dev->owner())
 		{
-			result.append(PATH_SEPARATOR).append(software);
+			device_image_interface *intf;
+			if (dev->interface(intf))
+			{
+				software = intf->basename_noext();
+				break;
+			}
 		}
+		if (software != nullptr && *software != '\0')
+			result.append(PATH_SEPARATOR).append(software);
+
 		std::string tag(device.tag());
 		tag.erase(0, 1);
 		strreplacechr(tag,':', '_');
@@ -1256,11 +1218,10 @@ std::string &running_machine::nvram_filename(std::string &result, device_t &devi
 void running_machine::nvram_load()
 {
 	nvram_interface_iterator iter(root_device());
-	for (device_nvram_interface *nvram = iter.first(); nvram != NULL; nvram = iter.next())
+	for (device_nvram_interface *nvram = iter.first(); nvram != nullptr; nvram = iter.next())
 	{
-		std::string filename;
 		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
-		if (file.open(nvram_filename(filename, nvram->device()).c_str()) == FILERR_NONE)
+		if (file.open(nvram_filename(nvram->device()).c_str()) == FILERR_NONE)
 		{
 			nvram->nvram_load(file);
 			file.close();
@@ -1278,11 +1239,10 @@ void running_machine::nvram_load()
 void running_machine::nvram_save()
 {
 	nvram_interface_iterator iter(root_device());
-	for (device_nvram_interface *nvram = iter.first(); nvram != NULL; nvram = iter.next())
+	for (device_nvram_interface *nvram = iter.first(); nvram != nullptr; nvram = iter.next())
 	{
-		std::string filename;
 		emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(nvram_filename(filename, nvram->device()).c_str()) == FILERR_NONE)
+		if (file.open(nvram_filename(nvram->device()).c_str()) == FILERR_NONE)
 		{
 			nvram->nvram_save(file);
 			file.close();
@@ -1298,8 +1258,7 @@ void running_machine::nvram_save()
 //-------------------------------------------------
 
 running_machine::notifier_callback_item::notifier_callback_item(machine_notify_delegate func)
-	: m_next(NULL),
-		m_func(func)
+	: m_func(std::move(func))
 {
 }
 
@@ -1309,8 +1268,7 @@ running_machine::notifier_callback_item::notifier_callback_item(machine_notify_d
 //-------------------------------------------------
 
 running_machine::logerror_callback_item::logerror_callback_item(logerror_callback func)
-	: m_next(NULL),
-		m_func(func)
+	: m_func(func)
 {
 }
 

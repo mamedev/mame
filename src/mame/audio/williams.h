@@ -51,7 +51,7 @@ class williams_cvsd_sound_device :  public device_t,
 {
 public:
 	// construction/destruction
-	williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	williams_cvsd_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// read/write
 	DECLARE_WRITE16_MEMBER(write);
@@ -68,10 +68,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// devices
@@ -91,7 +91,7 @@ class williams_narc_sound_device :  public device_t,
 {
 public:
 	// construction/destruction
-	williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	williams_narc_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// read/write
 	DECLARE_READ16_MEMBER(read);
@@ -114,10 +114,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// timer IDs
@@ -149,7 +149,7 @@ class williams_adpcm_sound_device : public device_t,
 {
 public:
 	// construction/destruction
-	williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	williams_adpcm_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// read/write
 	DECLARE_WRITE16_MEMBER(write);
@@ -172,10 +172,10 @@ protected:
 	};
 
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// devices

@@ -7,12 +7,12 @@
 const device_type MSX_CART_HFOX = &device_creator<msx_cart_hfox>;
 
 
-msx_cart_hfox::msx_cart_hfox(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_hfox::msx_cart_hfox(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_HFOX, "MSX Cartridge - Harry Fox", tag, owner, clock, "msx_cart_hfox", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 {
 	m_selected_bank[0] = m_selected_bank[1] = 0;
-	m_bank_base[0] = m_bank_base[1] = NULL;
+	m_bank_base[0] = m_bank_base[1] = nullptr;
 }
 
 

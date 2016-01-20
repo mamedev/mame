@@ -12,20 +12,20 @@ class nes_txrom_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_txrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_txrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_txrom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_txrom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start() { mmc3_start(); }
-	virtual DECLARE_READ8_MEMBER(read_m);
-	virtual DECLARE_WRITE8_MEMBER(write_m);
+	virtual void device_start() override { mmc3_start(); }
+	virtual DECLARE_READ8_MEMBER(read_m) override;
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
 	virtual DECLARE_WRITE8_MEMBER(txrom_write);
-	virtual DECLARE_WRITE8_MEMBER(write_h) { txrom_write(space, offset, data, mem_mask); }
+	virtual DECLARE_WRITE8_MEMBER(write_h) override { txrom_write(space, offset, data, mem_mask); }
 	virtual void prg_cb(int start, int bank);
 	virtual void chr_cb(int start, int bank, int source);
 
-	virtual void hblank_irq(int scanline, int vblank, int blanked);
-	virtual void pcb_reset();
+	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
+	virtual void pcb_reset() override;
 
 protected:
 	virtual void set_prg(int prg_base, int prg_mask);
@@ -56,15 +56,15 @@ class nes_hkrom_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_hkrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_hkrom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_READ8_MEMBER(read_m);
-	virtual DECLARE_WRITE8_MEMBER(write_m);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual void device_start() override;
+	virtual DECLARE_READ8_MEMBER(read_m) override;
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
 	int m_wram_enable;
@@ -81,11 +81,11 @@ class nes_txsrom_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_txsrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_txsrom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual DECLARE_WRITE8_MEMBER(write_h);
-	virtual void chr_cb(int start, int bank, int source);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void chr_cb(int start, int bank, int source) override;
 
 protected:
 	void set_mirror();
@@ -98,10 +98,10 @@ class nes_tqrom_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_tqrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_tqrom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void set_chr( UINT8 chr, int chr_base, int chr_mask );
+	virtual void set_chr( UINT8 chr, int chr_base, int chr_mask ) override;
 };
 
 
@@ -111,11 +111,11 @@ class nes_qj_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_qj_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_qj_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual DECLARE_WRITE8_MEMBER(write_m);
-	virtual void pcb_reset();
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual void pcb_reset() override;
 };
 
 
@@ -125,11 +125,11 @@ class nes_zz_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_zz_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_zz_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual DECLARE_WRITE8_MEMBER(write_m);
-	virtual void pcb_reset();
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual void pcb_reset() override;
 };
 
 

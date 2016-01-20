@@ -120,7 +120,7 @@ private:
 	void putChar(UINT8 thec,int x,int y,bitmap_ind16 &bitmap);
 
 public:
-	hp9k_state(const machine_config &mconfig, device_type type, const char *tag)
+	hp9k_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	//m_terminal(*this, TERMINAL_TAG),

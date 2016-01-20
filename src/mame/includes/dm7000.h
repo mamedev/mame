@@ -12,7 +12,7 @@
 class dm7000_state : public driver_device
 {
 public:
-	dm7000_state(const machine_config &mconfig, device_type type, const char *tag)
+	dm7000_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG)
@@ -51,8 +51,8 @@ public:
 	UINT16          m_enet_regs[32];
 
 	UINT32          dcr[1024];
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_dm7000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 

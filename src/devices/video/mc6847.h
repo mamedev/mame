@@ -90,8 +90,8 @@ public:
 	static void set_get_char_rom(device_t &device, mc6847_get_char_rom_delegate callback) { downcast<mc6847_friend_device &>(device).m_charrom_cb = callback; }
 
 protected:
-	mc6847_friend_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,
-		const UINT8 *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, bool supports_partial_body_scanlines, const char *shortname, const char *source);
+	mc6847_friend_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock,
+		const UINT8 *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, bool supports_partial_body_scanlines, std::string shortname, std::string source);
 
 	// video mode constants
 	static const UINT8 MODE_AG      = 0x80;
@@ -210,7 +210,7 @@ protected:
 
 		// artifacting config
 		void setup_config(device_t *device);
-		void poll_config(void) { m_artifacting = (m_config!=NULL) ? m_config->read() : 0; }
+		void poll_config(void) { m_artifacting = (m_config!=nullptr) ? m_config->read() : 0; }
 
 		// artifacting application
 		template<int xscale>
@@ -281,10 +281,10 @@ protected:
 	artifacter m_artifacter;
 
 	// device-level overrides
-	virtual void device_start(void);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_reset(void);
-	virtual void device_post_load(void);
+	virtual void device_start(void) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_reset(void) override;
+	virtual void device_post_load(void) override;
 
 	// other overridables
 	virtual void new_frame(void);
@@ -411,7 +411,7 @@ protected:
 	UINT32 emit_mc6847_samples(UINT8 mode, const UINT8 *data, int length, pixel_t *RESTRICT pixels, const pixel_t *RESTRICT palette,
 		mc6847_get_char_rom_delegate get_char_rom, int x, int y)
 	{
-		UINT32 result = 0;
+		UINT32 result;
 		if (mode & MODE_AG)
 		{
 			/* graphics */
@@ -447,12 +447,12 @@ protected:
 					break;
 			}
 		}
-		else if (!get_char_rom.isnull() && ((mode & (MODE_AG|MODE_AS|MODE_INTEXT)) == MODE_INTEXT))
+		else if (!m_charrom_cb.isnull() && ((mode & (MODE_AG|MODE_AS|MODE_INTEXT)) == MODE_INTEXT))
 		{
 			/* external ROM */
 			for (int i = 0; i < length; i++)
 			{
-				UINT8 byte = get_char_rom(data[i], y % 12) ^ (mode & MODE_INV ? 0xFF : 0x00);
+				UINT8 byte = m_charrom_cb(data[i], y % 12) ^ (mode & MODE_INV ? 0xFF : 0x00);
 				emit_extbytes<1, xscale>(&byte, 1, &pixels[i * 8], (mode & MODE_CSS) ? 14 : 12, palette);
 			}
 			result = length * 8 * xscale;
@@ -537,17 +537,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( inv_w )      { change_mode(MODE_INV, state); }
 
 protected:
-	mc6847_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, double tpfs, const char *shortname, const char *source);
+	mc6847_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, double tpfs, std::string shortname, std::string source);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// other overrides
-	virtual void field_sync_changed(bool line);
-	virtual void record_body_scanline(UINT16 physical_scanline, UINT16 scanline);
-	virtual void record_partial_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline, INT32 start_clock, INT32 end_clock);
+	virtual void field_sync_changed(bool line) override;
+	virtual void record_body_scanline(UINT16 physical_scanline, UINT16 scanline) override;
+	virtual void record_partial_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline, INT32 start_clock, INT32 end_clock) override;
 
 	void set_custom_palette(const pixel_t *custom_palette)
 	{
@@ -623,9 +623,6 @@ private:
 	void record_body_scanline(UINT16 physical_scanline, UINT16 scanline, INT32 start_pos, INT32 end_pos);
 	pixel_t border_value(UINT8 mode, const pixel_t *palette, bool is_mc6847t1);
 
-	template<int xscale>
-	void emit_samples(UINT8 mode, const UINT8 *data, int length, pixel_t *pixels, int x, int y);
-
 	// template function for doing video update collection
 	template<int sample_count, int yres>
 	void record_scanline_res(int scanline, INT32 start_pos, INT32 end_pos);
@@ -643,43 +640,43 @@ private:
 class mc6847_ntsc_device : public mc6847_base_device
 {
 public:
-	mc6847_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc6847_ntsc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class mc6847_pal_device : public mc6847_base_device
 {
 public:
-	mc6847_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc6847_pal_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class mc6847y_ntsc_device : public mc6847_base_device
 {
 public:
-	mc6847y_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc6847y_ntsc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class mc6847y_pal_device : public mc6847_base_device
 {
 public:
-	mc6847y_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc6847y_pal_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class mc6847t1_ntsc_device : public mc6847_base_device
 {
 public:
-	mc6847t1_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc6847t1_ntsc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class mc6847t1_pal_device : public mc6847_base_device
 {
 public:
-	mc6847t1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc6847t1_pal_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class s68047_device : public mc6847_base_device
 {
 public:
-	s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s68047_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void hack_black_becomes_blue(bool flag);
 
@@ -690,7 +687,7 @@ private:
 class m5c6847p1_device : public mc6847_base_device
 {
 public:
-	m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m5c6847p1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

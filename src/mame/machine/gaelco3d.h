@@ -62,7 +62,7 @@ struct osd_shared_mem
 class gaelco_serial_device : public device_t
 {
 public:
-	gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gaelco_serial_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~gaelco_serial_device() {}
 
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<gaelco_serial_device &>(device).m_irq_handler.set_callback(object); }
@@ -88,9 +88,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_stop();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_stop() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state

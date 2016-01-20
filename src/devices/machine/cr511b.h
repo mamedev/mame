@@ -75,7 +75,7 @@ class cr511b_device : public device_t
 {
 public:
 	// construction/destruction
-	cr511b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cr511b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// callbacks
 	template<class _Object> static devcb_base &set_stch_handler(device_t &device, _Object object)
@@ -104,10 +104,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	enum

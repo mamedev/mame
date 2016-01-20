@@ -71,8 +71,8 @@ class fixedfreq_device :  public device_t,
 {
 public:
 	// construction/destruction
-	fixedfreq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	fixedfreq_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	fixedfreq_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	fixedfreq_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// inline configuration helpers
 	static void set_minitor_clock(device_t &device, UINT32 clock) { downcast<fixedfreq_device &>(device).m_monitor_clock = clock; }
@@ -102,9 +102,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	void recompute_parameters(bool postload);
@@ -126,7 +126,7 @@ private:
 	attotime m_last_vsync_time;
 	attotime m_refresh;
 	attotime  m_clock_period;
-	bitmap_rgb32 *m_bitmap[2];
+	std::unique_ptr<bitmap_rgb32> m_bitmap[2];
 	int m_cur_bm;
 
 	/* adjustable by drivers */
@@ -151,9 +151,6 @@ private:
 	int m_sig_vsync;
 	int m_sig_composite;
 	int m_sig_field;
-
-protected:
-
 };
 
 

@@ -11,9 +11,9 @@ class d9060hd_device : public scsihd_device
 {
 public:
 	// construction/destruction
-	d9060hd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	d9060hd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual void ExecCommand();
+	virtual void ExecCommand() override;
 };
 
 // device type definition

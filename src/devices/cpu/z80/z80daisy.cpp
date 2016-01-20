@@ -45,7 +45,7 @@ device_z80daisy_interface::~device_z80daisy_interface()
 //-------------------------------------------------
 
 z80_daisy_chain::z80_daisy_chain()
-	: m_daisy_list(NULL)
+	: m_daisy_list(nullptr)
 {
 }
 
@@ -59,13 +59,13 @@ void z80_daisy_chain::init(device_t *cpudevice, const z80_daisy_config *daisy)
 {
 	// create a linked list of devices
 	daisy_entry **tailptr = &m_daisy_list;
-	for ( ; daisy->devname != NULL; daisy++)
+	for ( ; daisy->devname != nullptr; daisy++)
 	{
 		// find the device
 		device_t *target;
-		if ((target = cpudevice->subdevice(daisy->devname)) == NULL)
+		if ((target = cpudevice->subdevice(daisy->devname)) == nullptr)
 		{
-			if ((target = cpudevice->siblingdevice(daisy->devname)) == NULL)
+			if ((target = cpudevice->siblingdevice(daisy->devname)) == nullptr)
 				fatalerror("Unable to locate device '%s'\n", daisy->devname);
 		}
 
@@ -75,8 +75,8 @@ void z80_daisy_chain::init(device_t *cpudevice, const z80_daisy_config *daisy)
 			fatalerror("Device '%s' does not implement the z80daisy interface!\n", daisy->devname);
 
 		// append to the end, or overwrite existing entry
-		daisy_entry *next = (*tailptr) ? (*tailptr)->m_next : NULL;
-		if (*tailptr != NULL)
+		daisy_entry *next = (*tailptr) ? (*tailptr)->m_next : nullptr;
+		if (*tailptr != nullptr)
 			auto_free(cpudevice->machine(), *tailptr);
 		*tailptr = auto_alloc(cpudevice->machine(), daisy_entry(target));
 		(*tailptr)->m_next = next;
@@ -93,7 +93,7 @@ void z80_daisy_chain::init(device_t *cpudevice, const z80_daisy_config *daisy)
 void z80_daisy_chain::reset()
 {
 	// loop over all devices and call their reset function
-	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	for (daisy_entry *daisy = m_daisy_list; daisy != nullptr; daisy = daisy->m_next)
 		daisy->m_device->reset();
 }
 
@@ -106,7 +106,7 @@ void z80_daisy_chain::reset()
 int z80_daisy_chain::update_irq_state()
 {
 	// loop over all devices; dev[0] is highest priority
-	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	for (daisy_entry *daisy = m_daisy_list; daisy != nullptr; daisy = daisy->m_next)
 	{
 		// if this device is asserting the INT line, that's the one we want
 		int state = daisy->m_interface->z80daisy_irq_state();
@@ -131,7 +131,7 @@ int z80_daisy_chain::call_ack_device()
 	int vector = 0;
 
 	// loop over all devices; dev[0] is the highest priority
-	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	for (daisy_entry *daisy = m_daisy_list; daisy != nullptr; daisy = daisy->m_next)
 	{
 		// if this device is asserting the INT line, that's the one we want
 		int state = daisy->m_interface->z80daisy_irq_state();
@@ -152,7 +152,7 @@ int z80_daisy_chain::call_ack_device()
 void z80_daisy_chain::call_reti_device()
 {
 	// loop over all devices; dev[0] is the highest priority
-	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	for (daisy_entry *daisy = m_daisy_list; daisy != nullptr; daisy = daisy->m_next)
 	{
 		// if this device is asserting the IEO line, that's the one we want
 		int state = daisy->m_interface->z80daisy_irq_state();
@@ -171,9 +171,9 @@ void z80_daisy_chain::call_reti_device()
 //-------------------------------------------------
 
 z80_daisy_chain::daisy_entry::daisy_entry(device_t *device)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_device(device),
-		m_interface(NULL)
+		m_interface(nullptr)
 {
 	device->interface(m_interface);
 }

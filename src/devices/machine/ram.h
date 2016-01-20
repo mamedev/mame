@@ -51,12 +51,12 @@ class ram_device :  public device_t
 {
 public:
 	// construction/destruction
-	ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// accessors
 	UINT32 size(void) const { return m_size; }
 	UINT32 mask(void) const { return m_size - 1; }
-	UINT8 *pointer(void) { return &m_pointer[0]; }
+	UINT8 *pointer(void) { if (m_pointer.empty()) return nullptr; else return &m_pointer[0]; }
 	static UINT32 parse_string(const char *s);
 	UINT32 default_size(void) const;
 	const char *extra_options(void) const { return m_extra_options; }
@@ -71,8 +71,8 @@ public:
 	static void static_set_default_value(device_t &device, UINT8 default_value)         { downcast<ram_device &>(device).m_default_value = default_value; }
 
 protected:
-	virtual void device_start(void);
-	virtual void device_validity_check(validity_checker &valid) const;
+	virtual void device_start(void) override;
+	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:
 	// device state

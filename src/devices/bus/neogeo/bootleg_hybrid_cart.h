@@ -18,20 +18,20 @@ class neogeo_bootleg_hybrid_hybrid_cart : public device_t,
 {
 public:
 	// construction/destruction
-	neogeo_bootleg_hybrid_hybrid_cart(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT16 clock, const char *shortname, const char *source);
-	neogeo_bootleg_hybrid_hybrid_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock);
+	neogeo_bootleg_hybrid_hybrid_cart(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT16 clock, std::string shortname, std::string source);
+	neogeo_bootleg_hybrid_hybrid_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT16 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read_rom);
+	virtual DECLARE_READ16_MEMBER(read_rom) override;
 
-	virtual void activate_cart(ACTIVATE_CART_PARAMS) {}
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS) {}
-	virtual int get_fixed_bank_type(void) { return 0; }
+	virtual void activate_cart(ACTIVATE_CART_PARAMS) override {}
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override {}
+	virtual int get_fixed_bank_type(void) override { return 0; }
 
 	required_device<neogeo_banked_cart_device> m_banked_cart;
 	required_device<ngbootleg_prot_device> m_bootleg_prot;
@@ -55,10 +55,10 @@ extern const device_type NEOGEO_BOOTLEG_HYBRID_HYBRID_CART;
 class neogeo_bootleg_hybrid_mslug3b6_cart : public neogeo_bootleg_hybrid_hybrid_cart
 {
 public:
-	neogeo_bootleg_hybrid_mslug3b6_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void activate_cart(ACTIVATE_CART_PARAMS);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 0; }
+	neogeo_bootleg_hybrid_mslug3b6_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	void activate_cart(ACTIVATE_CART_PARAMS) override;
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 0; }
 };
 extern const device_type NEOGEO_BOOTLEG_HYBRID_MSLUG3B6_CART;
 
@@ -70,30 +70,30 @@ extern const device_type NEOGEO_BOOTLEG_HYBRID_MSLUG3B6_CART;
 class neogeo_bootleg_hybrid_kof2002b_cart : public neogeo_bootleg_hybrid_hybrid_cart
 {
 public:
-	neogeo_bootleg_hybrid_kof2002b_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void activate_cart(ACTIVATE_CART_PARAMS);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 0; }
+	neogeo_bootleg_hybrid_kof2002b_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	void activate_cart(ACTIVATE_CART_PARAMS) override;
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 0; }
 };
 extern const device_type NEOGEO_BOOTLEG_HYBRID_KOF2002B_CART;
 
 class neogeo_bootleg_hybrid_kf2k2mp_cart : public neogeo_bootleg_hybrid_hybrid_cart
 {
 public:
-	neogeo_bootleg_hybrid_kf2k2mp_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void activate_cart(ACTIVATE_CART_PARAMS);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 0; }
+	neogeo_bootleg_hybrid_kf2k2mp_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	void activate_cart(ACTIVATE_CART_PARAMS) override;
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 0; }
 };
 extern const device_type NEOGEO_BOOTLEG_HYBRID_KF2K2MP_CART;
 
 class neogeo_bootleg_hybrid_kf2k2mp2_cart : public neogeo_bootleg_hybrid_hybrid_cart
 {
 public:
-	neogeo_bootleg_hybrid_kf2k2mp2_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void activate_cart(ACTIVATE_CART_PARAMS);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 0; }
+	neogeo_bootleg_hybrid_kf2k2mp2_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	void activate_cart(ACTIVATE_CART_PARAMS) override;
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 0; }
 };
 extern const device_type NEOGEO_BOOTLEG_HYBRID_KF2K2MP2_CART;
 
@@ -105,10 +105,10 @@ extern const device_type NEOGEO_BOOTLEG_HYBRID_KF2K2MP2_CART;
 class neogeo_bootleg_hybrid_matrimbl_cart : public neogeo_bootleg_hybrid_hybrid_cart
 {
 public:
-	neogeo_bootleg_hybrid_matrimbl_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void activate_cart(ACTIVATE_CART_PARAMS);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 2; }
+	neogeo_bootleg_hybrid_matrimbl_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	void activate_cart(ACTIVATE_CART_PARAMS) override;
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 2; }
 };
 extern const device_type NEOGEO_BOOTLEG_HYBRID_MATRIMBL_CART;
 
@@ -119,10 +119,10 @@ extern const device_type NEOGEO_BOOTLEG_HYBRID_MATRIMBL_CART;
 class neogeo_bootleg_hybrid_ms5plus_cart : public neogeo_bootleg_hybrid_hybrid_cart
 {
 public:
-	neogeo_bootleg_hybrid_ms5plus_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void activate_cart(ACTIVATE_CART_PARAMS);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 1; }
+	neogeo_bootleg_hybrid_ms5plus_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	void activate_cart(ACTIVATE_CART_PARAMS) override;
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 1; }
 };
 extern const device_type NEOGEO_BOOTLEG_HYBRID_MS5PLUS_CART;
 
@@ -133,20 +133,20 @@ extern const device_type NEOGEO_BOOTLEG_HYBRID_MS5PLUS_CART;
 class neogeo_bootleg_hybrid_svcboot_cart : public neogeo_bootleg_hybrid_hybrid_cart
 {
 public:
-	neogeo_bootleg_hybrid_svcboot_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void activate_cart(ACTIVATE_CART_PARAMS);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 0; }
+	neogeo_bootleg_hybrid_svcboot_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	void activate_cart(ACTIVATE_CART_PARAMS) override;
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 0; }
 };
 extern const device_type NEOGEO_BOOTLEG_HYBRID_SVCBOOT_CART;
 
 class neogeo_bootleg_hybrid_svcsplus_cart : public neogeo_bootleg_hybrid_hybrid_cart
 {
 public:
-	neogeo_bootleg_hybrid_svcsplus_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void activate_cart(ACTIVATE_CART_PARAMS);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 0; }
+	neogeo_bootleg_hybrid_svcsplus_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	void activate_cart(ACTIVATE_CART_PARAMS) override;
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 0; }
 };
 extern const device_type NEOGEO_BOOTLEG_HYBRID_SVCSPLUS_CART;
 
@@ -159,20 +159,20 @@ extern const device_type NEOGEO_BOOTLEG_HYBRID_SVCSPLUS_CART;
 class neogeo_bootleg_hybrid_kf2k3bl_cart : public neogeo_bootleg_hybrid_hybrid_cart
 {
 public:
-	neogeo_bootleg_hybrid_kf2k3bl_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void activate_cart(ACTIVATE_CART_PARAMS);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 0; }
+	neogeo_bootleg_hybrid_kf2k3bl_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	void activate_cart(ACTIVATE_CART_PARAMS) override;
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 0; }
 };
 extern const device_type NEOGEO_BOOTLEG_HYBRID_KF2K3BL_CART;
 
 class neogeo_bootleg_hybrid_kf2k3pl_cart : public neogeo_bootleg_hybrid_hybrid_cart
 {
 public:
-	neogeo_bootleg_hybrid_kf2k3pl_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void activate_cart(ACTIVATE_CART_PARAMS);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 0; }
+	neogeo_bootleg_hybrid_kf2k3pl_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	void activate_cart(ACTIVATE_CART_PARAMS) override;
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 0; }
 };
 extern const device_type NEOGEO_BOOTLEG_HYBRID_KF2K3PL_CART;
 
@@ -180,10 +180,10 @@ extern const device_type NEOGEO_BOOTLEG_HYBRID_KF2K3PL_CART;
 class neogeo_bootleg_hybrid_kf2k3upl_cart : public neogeo_bootleg_hybrid_hybrid_cart
 {
 public:
-	neogeo_bootleg_hybrid_kf2k3upl_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void activate_cart(ACTIVATE_CART_PARAMS);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 0; }
+	neogeo_bootleg_hybrid_kf2k3upl_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	void activate_cart(ACTIVATE_CART_PARAMS) override;
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 0; }
 };
 extern const device_type NEOGEO_BOOTLEG_HYBRID_KF2K3UPL_CART;
 

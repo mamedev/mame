@@ -13,8 +13,8 @@ class i80186_cpu_device : public i8086_common_cpu_device
 {
 public:
 	// construction/destruction
-	i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	i80186_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int data_bus_size);
+	i80186_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i80186_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int data_bus_size);
 
 	template<class _Object> static devcb_base &static_set_read_slave_ack_callback(device_t &device, _Object object) { return downcast<i80186_cpu_device &>(device).m_read_slave_ack_func.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_chip_select_callback(device_t &device, _Object object) { return downcast<i80186_cpu_device &>(device).m_out_chip_select_func.set_callback(object); }
@@ -32,25 +32,25 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(int3_w) { external_int(3, state); }
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
 
 protected:
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks / 2); }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 2); }
-	virtual void execute_run();
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual UINT32 execute_input_lines() const { return 1; }
-	virtual UINT8 fetch_op();
-	virtual UINT8 fetch();
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks / 2); }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 2); }
+	virtual void execute_run() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual UINT32 execute_input_lines() const override { return 1; }
+	virtual UINT8 fetch_op() override;
+	virtual UINT8 fetch() override;
 	UINT32 pc() { return m_pc = (m_sregs[CS] << 4) + m_ip; }
 
-	virtual UINT8 read_port_byte(UINT16 port);
-	virtual UINT16 read_port_word(UINT16 port);
-	virtual void write_port_byte(UINT16 port, UINT8 data);
-	virtual void write_port_word(UINT16 port, UINT16 data);
+	virtual UINT8 read_port_byte(UINT16 port) override;
+	virtual UINT16 read_port_word(UINT16 port) override;
+	virtual void write_port_byte(UINT16 port, UINT8 data) override;
+	virtual void write_port_word(UINT16 port, UINT16 data) override;
 
 	static const UINT8 m_i80186_timing[200];
 
@@ -133,7 +133,7 @@ class i80188_cpu_device : public i80186_cpu_device
 {
 public:
 	// construction/destruction
-	i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i80188_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 #define MCFG_80186_IRQ_SLAVE_ACK(_devcb) \

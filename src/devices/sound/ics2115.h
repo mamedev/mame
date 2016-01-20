@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Alex Marshall,nimitz,austere
 #pragma once
 
@@ -90,7 +90,7 @@ class ics2115_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
-	ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ics2115_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<ics2115_device &>(device).m_irq_cb.set_callback(object); }
 
@@ -108,11 +108,11 @@ public:
 protected:
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// internal callbacks
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// internal state
 	required_region_ptr<UINT8> m_rom;

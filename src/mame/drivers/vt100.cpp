@@ -34,7 +34,7 @@
 class vt100_state : public driver_device
 {
 public:
-	vt100_state(const machine_config &mconfig, device_type type, const char *tag) :
+	vt100_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "vt100_video"),
@@ -63,8 +63,8 @@ public:
 	bool m_vertical_int;
 	bool m_key_scan;
 	UINT8 m_key_code;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vt100_vertical_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
@@ -152,13 +152,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(vt100_state::keyboard_callback)
 WRITE8_MEMBER( vt100_state::vt100_keyboard_w )
 {
 	m_speaker->set_frequency(786); // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
-	output_set_value("online_led",BIT(data, 5) ? 0 : 1);
-	output_set_value("local_led", BIT(data, 5));
-	output_set_value("locked_led",BIT(data, 4) ? 0 : 1);
-	output_set_value("l1_led", BIT(data, 3) ? 0 : 1);
-	output_set_value("l2_led", BIT(data, 2) ? 0 : 1);
-	output_set_value("l3_led", BIT(data, 1) ? 0 : 1);
-	output_set_value("l4_led", BIT(data, 0) ? 0 : 1);
+	output().set_value("online_led",BIT(data, 5) ? 0 : 1);
+	output().set_value("local_led", BIT(data, 5));
+	output().set_value("locked_led",BIT(data, 4) ? 0 : 1);
+	output().set_value("l1_led", BIT(data, 3) ? 0 : 1);
+	output().set_value("l2_led", BIT(data, 2) ? 0 : 1);
+	output().set_value("l3_led", BIT(data, 1) ? 0 : 1);
+	output().set_value("l4_led", BIT(data, 0) ? 0 : 1);
 	m_key_scan = BIT(data, 6);
 	m_speaker->set_state(BIT(data, 7));
 }
@@ -353,13 +353,13 @@ void vt100_state::machine_reset()
 	m_receiver_int = 0;
 	m_vertical_int = 0;
 	m_speaker->set_frequency(786); // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
-	output_set_value("online_led",1);
-	output_set_value("local_led", 0);
-	output_set_value("locked_led",1);
-	output_set_value("l1_led", 1);
-	output_set_value("l2_led", 1);
-	output_set_value("l3_led", 1);
-	output_set_value("l4_led", 1);
+	output().set_value("online_led",1);
+	output().set_value("local_led", 0);
+	output().set_value("locked_led",1);
+	output().set_value("l1_led", 1);
+	output().set_value("l2_led", 1);
+	output().set_value("l3_led", 1);
+	output().set_value("l4_led", 1);
 
 	m_key_scan = 0;
 }
@@ -431,7 +431,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
 

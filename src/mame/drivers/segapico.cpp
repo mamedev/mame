@@ -129,7 +129,7 @@ C = MB3514 / 9325 M36
 class pico_base_state : public md_cons_state
 {
 public:
-	pico_base_state(const machine_config &mconfig, device_type type, const char *tag)
+	pico_base_state(const machine_config &mconfig, device_type type, std::string tag)
 		: md_cons_state(mconfig, type, tag),
 		m_sega_315_5641_pcm(*this, "315_5641"),
 		m_io_page(*this, "PAGE"),
@@ -160,7 +160,7 @@ public:
 class pico_state : public pico_base_state
 {
 public:
-	pico_state(const machine_config &mconfig, device_type type, const char *tag)
+	pico_state(const machine_config &mconfig, device_type type, std::string tag)
 	: pico_base_state(mconfig, type, tag),
 	m_picocart(*this, "picoslot") { }
 
@@ -396,7 +396,7 @@ static MACHINE_CONFIG_START( pico, pico_state )
 	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
 	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
 
-	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, NULL)
+	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
 	MCFG_SOUND_ADD("315_5641", SEGA_315_5641_PCM, UPD7759_STANDARD_CLOCK*2)
@@ -417,7 +417,7 @@ static MACHINE_CONFIG_START( picopal, pico_state )
 	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
 	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
 
-	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, NULL)
+	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
 	MCFG_SOUND_ADD("315_5641", SEGA_315_5641_PCM, UPD7759_STANDARD_CLOCK*2)
@@ -554,7 +554,7 @@ S-AUDIO <-| |                              +-----------+           +-------+    
 class copera_state : public pico_base_state
 {
 public:
-	copera_state(const machine_config &mconfig, device_type type, const char *tag)
+	copera_state(const machine_config &mconfig, device_type type, std::string tag)
 	: pico_base_state(mconfig, type, tag),
 	m_picocart(*this, "coperaslot") { }
 
@@ -608,7 +608,7 @@ static MACHINE_CONFIG_START( copera, copera_state )
 	MCFG_MACHINE_START_OVERRIDE( copera_state, copera )
 	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
 
-	MCFG_COPERA_CARTRIDGE_ADD("coperaslot", copera_cart, NULL)
+	MCFG_COPERA_CARTRIDGE_ADD("coperaslot", copera_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","copera")
 
 	MCFG_SOUND_ADD("315_5641", SEGA_315_5641_PCM, UPD7759_STANDARD_CLOCK)

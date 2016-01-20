@@ -249,18 +249,18 @@ class z80dart_channel : public device_t,
 	friend class z80dart_device;
 
 public:
-	z80dart_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80dart_channel(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_serial_interface overrides
-	virtual void tra_callback();
-	virtual void tra_complete();
-	virtual void rcv_callback();
-	virtual void rcv_complete();
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+	virtual void rcv_callback() override;
+	virtual void rcv_complete() override;
 
 	UINT8 control_read();
 	void control_write(UINT8 data);
@@ -467,8 +467,8 @@ class z80dart_device :  public device_t,
 
 public:
 	// construction/destruction
-	z80dart_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
-	z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80dart_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source);
+	z80dart_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_out_txda_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_txda_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_dtra_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_dtra_cb.set_callback(object); }
@@ -531,14 +531,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// device_z80daisy_interface overrides
-	virtual int z80daisy_irq_state();
-	virtual int z80daisy_irq_ack();
-	virtual void z80daisy_irq_reti();
+	virtual int z80daisy_irq_state() override;
+	virtual int z80daisy_irq_ack() override;
+	virtual void z80daisy_irq_reti() override;
 
 	// internal interrupt management
 	void check_interrupts();
@@ -603,7 +603,7 @@ class z80sio0_device :  public z80dart_device
 {
 public:
 	// construction/destruction
-	z80sio0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80sio0_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -613,7 +613,7 @@ class z80sio1_device :  public z80dart_device
 {
 public:
 	// construction/destruction
-	z80sio1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80sio1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -623,7 +623,7 @@ class z80sio2_device :  public z80dart_device
 {
 public:
 	// construction/destruction
-	z80sio2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80sio2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -633,7 +633,7 @@ class z80sio3_device :  public z80dart_device
 {
 public:
 	// construction/destruction
-	z80sio3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80sio3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -643,7 +643,7 @@ class z80sio4_device :  public z80dart_device
 {
 public:
 	// construction/destruction
-	z80sio4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80sio4_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -653,7 +653,7 @@ class i8274_device :  public z80dart_device
 {
 public:
 	// construction/destruction
-	i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8274_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( inta_r ) { return m1_r(); };
 };
@@ -665,7 +665,7 @@ class upd7201_device :  public z80dart_device
 {
 public:
 	// construction/destruction
-	upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd7201_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

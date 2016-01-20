@@ -607,7 +607,7 @@ private:
 	void fixup_crc_victor_header(std::vector<UINT32> &buffer, const gen_crc_info *crc);
 	void fixup_crc_victor_data(std::vector<UINT32> &buffer, const gen_crc_info *crc);
 	void fixup_crcs(std::vector<UINT32> &buffer, gen_crc_info *crcs);
-	void collect_crcs(const desc_e *desc, gen_crc_info *crcs);
+	void collect_crcs(const desc_e *desc, gen_crc_info *crcs) const;
 
 	int sbit_r(const UINT8 *bitstream, int pos);
 	int sbit_rp(const UINT8 *bitstream, int &pos, int track_size);
@@ -721,9 +721,9 @@ public:
 	virtual ~floppy_image();
 
 	//! @return the form factor.
-	UINT32 get_form_factor() { return form_factor; }
+	UINT32 get_form_factor() const { return form_factor; }
 	//! @return the variant.
-	UINT32 get_variant() { return variant; }
+	UINT32 get_variant() const { return variant; }
 	//! @param v the variant.
 	void set_variant(UINT32 v) { variant = v; }
 
@@ -751,7 +751,7 @@ public:
 	//! @return the current write splice position.
 	UINT32 get_write_splice_position(int track, int head, int subtrack = 0) const { return track_array[track*4+subtrack][head].write_splice; }
 	//! @return the maximal geometry supported by this format.
-	void get_maximal_geometry(int &tracks, int &heads);
+	void get_maximal_geometry(int &tracks, int &heads) const;
 
 	//! @return the current geometry of the loaded image.
 	void get_actual_geometry(int &tracks, int &heads);

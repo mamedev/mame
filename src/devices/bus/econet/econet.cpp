@@ -53,7 +53,7 @@ device_econet_interface::device_econet_interface(const machine_config &mconfig, 
 //  econet_slot_device - constructor
 //-------------------------------------------------
 
-econet_slot_device::econet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+econet_slot_device::econet_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ECONET_SLOT, "Econet station", tag, owner, clock, "econet_slot", __FILE__),
 	device_slot_interface(mconfig, *this), m_address(0), m_econet(nullptr)
 {
@@ -100,7 +100,7 @@ inline void econet_device::set_signal(device_t *device, int signal, int state)
 	{
 		if (m_line[signal] != state)
 		{
-			if (LOG) logerror("Econet: '%s' %s %u\n", tag(), SIGNAL_NAME[signal], state);
+			if (LOG) logerror("Econet: '%s' %s %u\n", tag().c_str(), SIGNAL_NAME[signal], state);
 			m_line[signal] = state;
 			changed = true;
 		}
@@ -111,11 +111,11 @@ inline void econet_device::set_signal(device_t *device, int signal, int state)
 
 		while (entry)
 		{
-			if (!strcmp(entry->m_device->tag(), device->tag()))
+			if (entry->m_device->tag() == device->tag())
 			{
 				if (entry->m_line[signal] != state)
 				{
-					if (LOG) logerror("Econet: '%s' %s %u\n", device->tag(), SIGNAL_NAME[signal], state);
+					if (LOG) logerror("Econet: '%s' %s %u\n", device->tag().c_str(), SIGNAL_NAME[signal], state);
 					entry->m_line[signal] = state;
 					changed = true;
 				}
@@ -193,14 +193,14 @@ inline int econet_device::get_signal(int signal)
 //  econet_device - constructor
 //-------------------------------------------------
 
-econet_device::econet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+econet_device::econet_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ECONET, "Econet", tag, owner, clock, "econet", __FILE__),
 	m_write_clk(*this),
 	m_write_data(*this)
 {
-	for (int i = 0; i < SIGNAL_COUNT; i++)
+	for (auto & elem : m_line)
 	{
-		m_line[i] = 1;
+		elem = 1;
 	}
 }
 
@@ -233,7 +233,7 @@ void econet_device::device_stop()
 
 void econet_device::add_device(device_t *target, int address)
 {
-	daisy_entry *entry = global_alloc(daisy_entry(target));
+	auto entry = global_alloc(daisy_entry(target));
 
 	entry->m_interface->m_econet = this;
 	entry->m_interface->m_address = address;
@@ -247,13 +247,13 @@ void econet_device::add_device(device_t *target, int address)
 //-------------------------------------------------
 
 econet_device::daisy_entry::daisy_entry(device_t *device) :
-	m_next(NULL),
+	m_next(nullptr),
 	m_device(device),
-	m_interface(NULL)
+	m_interface(nullptr)
 {
-	for (int i = 0; i < SIGNAL_COUNT; i++)
+	for (auto & elem : m_line)
 	{
-		m_line[i] = 1;
+		elem = 1;
 	}
 
 	device->interface(m_interface);

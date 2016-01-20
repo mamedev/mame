@@ -5,12 +5,13 @@
 class dooyong_state : public driver_device
 {
 public:
-	dooyong_state(const machine_config &mconfig, device_type type, const char *tag)
+	dooyong_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_palette_bank(0)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(bgscroll_w);
@@ -23,6 +24,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg2_tile_info);
 	inline void get_tile_info(tile_data &tileinfo, int tile_index, UINT8 const *tilerom, UINT8 const *scroll, int graphics);
 	inline void scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, tilemap_t *map);
+
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg2_tilemap;
@@ -46,15 +48,15 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	UINT8 m_palette_bank;
 };
 
 class dooyong_z80_state : public dooyong_state
 {
 public:
-	dooyong_z80_state(const machine_config &mconfig, device_type type, const char *tag)
+	dooyong_z80_state(const machine_config &mconfig, device_type type, std::string tag)
 		: dooyong_state(mconfig, type, tag),
 		m_txvideoram(*this, "txvideoram"),
-		m_paletteram_flytiger(*this, "flytiger_palram"),
 		m_spriteram(*this, "spriteram")
 	{ }
 
@@ -70,6 +72,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(txvideoram_w);
 	DECLARE_WRITE8_MEMBER(primella_ctrl_w);
+	DECLARE_READ8_MEMBER(paletteram_flytiger_r);
 	DECLARE_WRITE8_MEMBER(paletteram_flytiger_w);
 	DECLARE_WRITE8_MEMBER(flytiger_ctrl_w);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
@@ -83,9 +86,8 @@ public:
 	DECLARE_VIDEO_START(primella);
 
 	required_shared_ptr<UINT8> m_txvideoram;
-	optional_shared_ptr<UINT8> m_paletteram_flytiger;
+	std::unique_ptr<UINT8[]> m_paletteram_flytiger;
 	UINT8 m_sprites_disabled;
-	UINT8 m_flytiger_palette_bank;
 	UINT8 m_flytiger_pri;
 	UINT8 m_tx_pri;
 	int m_tx_tilemap_mode;
@@ -96,7 +98,7 @@ public:
 class dooyong_z80_ym2203_state : public dooyong_z80_state
 {
 public:
-	dooyong_z80_ym2203_state(const machine_config &mconfig, device_type type, const char *tag)
+	dooyong_z80_ym2203_state(const machine_config &mconfig, device_type type, std::string tag)
 		: dooyong_z80_state(mconfig, type, tag)
 	{ }
 
@@ -120,7 +122,7 @@ public:
 class dooyong_68k_state : public dooyong_state
 {
 public:
-	dooyong_68k_state(const machine_config &mconfig, device_type type, const char *tag)
+	dooyong_68k_state(const machine_config &mconfig, device_type type, std::string tag)
 		: dooyong_state(mconfig, type, tag),
 		m_spriteram(*this, "spriteram")
 	{ }

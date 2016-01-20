@@ -18,7 +18,7 @@
 class tgtpanic_state : public driver_device
 {
 public:
-	tgtpanic_state(const machine_config &mconfig, device_type type, const char *tag)
+	tgtpanic_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
@@ -33,7 +33,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(color_w);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };

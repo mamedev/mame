@@ -13,7 +13,7 @@
 class eprom_state : public atarigen_state
 {
 public:
-	eprom_state(const machine_config &mconfig, device_type type, const char *tag)
+	eprom_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atarigen_state(mconfig, type, tag),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
@@ -30,8 +30,8 @@ public:
 	int             m_video_disable;
 	UINT16 *        m_sync_data;
 	int         m_last_offset;
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_READ16_MEMBER(special_port1_r);
 	DECLARE_READ16_MEMBER(adc_r);
 	DECLARE_WRITE16_MEMBER(eprom_latch_w);

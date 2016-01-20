@@ -43,7 +43,7 @@ class lk201_device : public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
-	lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	lk201_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( ddr_r );
 	DECLARE_WRITE8_MEMBER( ddr_w );
@@ -58,17 +58,17 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry *device_rom_region() const;
-	virtual ioport_constructor device_input_ports() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_serial overrides
-	virtual void rcv_complete();    // Rx completed receiving byte
-	virtual void tra_complete();    // Tx completed sending byte
-	virtual void tra_callback();    // Tx send bit
+	virtual void rcv_complete() override;    // Rx completed receiving byte
+	virtual void tra_complete() override;    // Tx completed sending byte
+	virtual void tra_callback() override;    // Tx send bit
 
 private:
 	UINT8 ddrs[3];

@@ -19,7 +19,7 @@
 class hh_sm510_state : public driver_device
 {
 public:
-	hh_sm510_state(const machine_config &mconfig, device_type type, const char *tag)
+	hh_sm510_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN"),
@@ -46,8 +46,8 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(lcd_segment_w);
 
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 
@@ -92,7 +92,7 @@ WRITE16_MEMBER(hh_sm510_state::lcd_segment_w)
 			// output to x.y, where x = row a/b/bs/c*4 + H1-4, y = seg1-16
 			char buf[0x10];
 			sprintf(buf, "%d.%d", offset, seg);
-			output_set_value(buf, state);
+			output().set_value(buf, state);
 
 			m_lcd_output_cache[index] = state;
 		}
@@ -159,7 +159,7 @@ READ8_MEMBER(hh_sm510_state::input_r)
 class ktopgun_state : public hh_sm510_state
 {
 public:
-	ktopgun_state(const machine_config &mconfig, device_type type, const char *tag)
+	ktopgun_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_sm510_state(mconfig, type, tag)
 	{
 		m_inp_lines = 3;
@@ -209,8 +209,6 @@ static MACHINE_CONFIG_START( ktopgun, ktopgun_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -234,7 +232,7 @@ MACHINE_CONFIG_END
 class ktmnt_state : public hh_sm510_state
 {
 public:
-	ktmnt_state(const machine_config &mconfig, device_type type, const char *tag)
+	ktmnt_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_sm510_state(mconfig, type, tag)
 	{
 		m_inp_lines = 3;
@@ -286,8 +284,6 @@ static MACHINE_CONFIG_START( ktmnt, ktmnt_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -309,7 +305,7 @@ MACHINE_CONFIG_END
 class gnwmndon_state : public hh_sm510_state
 {
 public:
-	gnwmndon_state(const machine_config &mconfig, device_type type, const char *tag)
+	gnwmndon_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_sm510_state(mconfig, type, tag)
 	{
 		m_inp_lines = 2;
@@ -354,8 +350,6 @@ static MACHINE_CONFIG_START( gnwmndon, gnwmndon_state )
 	MCFG_SM510_WRITE_R_CB(WRITE8(gnwmndon_state, speaker_w))
 
 	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

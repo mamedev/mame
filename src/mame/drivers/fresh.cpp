@@ -31,7 +31,7 @@ rom 5 and 6 are prg roms
 class fresh_state : public driver_device
 {
 public:
-	fresh_state(const machine_config &mconfig, device_type type, const char *tag)
+	fresh_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_bg_2_videoram(*this, "bg_videoram_2"),
@@ -94,7 +94,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(fake_scanline);
 
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_fresh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

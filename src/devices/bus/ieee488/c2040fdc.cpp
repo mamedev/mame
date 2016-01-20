@@ -69,14 +69,14 @@ const rom_entry *c2040_fdc_t::device_rom_region() const
 //  c2040_fdc_t - constructor
 //-------------------------------------------------
 
-c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C2040_FDC, "C2040 FDC", tag, owner, clock, "c2040fdc", __FILE__),
 	m_write_sync(*this),
 	m_write_ready(*this),
 	m_write_error(*this),
 	m_gcr_rom(*this, "gcr"),
-	m_floppy0(NULL),
-	m_floppy1(NULL),
+	m_floppy0(nullptr),
+	m_floppy1(nullptr),
 	m_mtr0(1),
 	m_mtr1(1),
 	m_stp0(0),

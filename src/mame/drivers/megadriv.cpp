@@ -274,6 +274,46 @@ MACHINE_START_MEMBER(md_cons_state, md_common)
 		m_cart->save_nvram();
 }
 
+void md_cons_state::install_cartslot()
+{
+	// for now m_cartslot is only in MD and not 32x and SegaCD
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_cart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_cart));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_cart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_cart));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a15),(base_md_cart_slot_device*)m_cart), write16_delegate(FUNC(base_md_cart_slot_device::write_a15),(base_md_cart_slot_device*)m_cart));
+//  m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(FUNC(base_md_cart_slot_device::write_tmss_bank),(base_md_cart_slot_device*)m_cart));
+}
+
+READ16_MEMBER( md_cons_state::tmss_r )
+{
+	if (offset < 0x4000 / 2)
+		return m_tmss[offset];
+
+	return 0xffff;
+}
+
+WRITE16_MEMBER( md_cons_state::tmss_swap_w )
+{
+	if (data & 0x0001)
+	{
+		install_cartslot();
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14100, 0xa14101, write16_delegate(FUNC(md_cons_state::tmss_swap_w),this));
+	}
+	else
+	{
+		install_tmss();
+	}
+}
+
+
+void md_cons_state::install_tmss()
+{
+	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x000000, 0x7fffff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x7fffff, read16_delegate(FUNC(md_cons_state::tmss_r),this));
+
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14100, 0xa14101, write16_delegate(FUNC(md_cons_state::tmss_swap_w),this));
+
+}
+
 MACHINE_START_MEMBER(md_cons_state, ms_megadriv)
 {
 	MACHINE_START_CALL_MEMBER( md_common );
@@ -282,11 +322,16 @@ MACHINE_START_MEMBER(md_cons_state, ms_megadriv)
 	if (m_cart->get_type() == SEGA_SVP)
 		m_vdp->set_dma_delay(2);
 
-	// for now m_cartslot is only in MD and not 32x and SegaCD
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_cart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_cart));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_cart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_cart));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a15),(base_md_cart_slot_device*)m_cart), write16_delegate(FUNC(base_md_cart_slot_device::write_a15),(base_md_cart_slot_device*)m_cart));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(FUNC(base_md_cart_slot_device::write_tmss_bank),(base_md_cart_slot_device*)m_cart));
+	if (m_tmss)
+	{
+		install_tmss();
+	}
+	else
+	{
+		install_cartslot();
+	}
+
+
 }
 
 MACHINE_START_MEMBER(md_cons_state, ms_megacd)
@@ -344,7 +389,7 @@ static MACHINE_CONFIG_START( ms_megadriv, md_cons_state )
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_DRIVER(md_cons_state, screen_eof_console)
 
-	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, NULL)
+	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
 MACHINE_CONFIG_END
 
@@ -357,7 +402,7 @@ static MACHINE_CONFIG_START( ms_megadpal, md_cons_state )
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_DRIVER(md_cons_state, screen_eof_console)
 
-	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, NULL)
+	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
 MACHINE_CONFIG_END
 
@@ -388,6 +433,13 @@ ROM_START(megadrij)
 	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
 ROM_END
 
+ROM_START(genesis_tmss)
+	ROM_REGION(MD_CPU_REGION_SIZE, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
+
+	ROM_REGION16_BE(0x4000, "tmss", ROMREGION_ERASEFF)
+	ROM_LOAD( "tmss_usa.bin", 0x0000,  0x4000, CRC(5f5e64eb) SHA1(453fca4e1db6fae4a10657c4451bccbb71955628) )
+ROM_END
 
 /*************************************
  *
@@ -477,7 +529,7 @@ DEVICE_IMAGE_LOAD_MEMBER( md_cons_state, _32x_cart )
 	UINT32 *ROM32;
 	int i;
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		length = image.length();
 		temp_copy.resize(length);
@@ -928,7 +980,7 @@ ROM_START( 32x_scd )
 	ROM_LOAD( "mpr-15764-t.bin", 0x000000,  0x020000, CRC(2e49d72c) SHA1(328a3228c29fba244b9db2055adc1ec4f7a87e6b) )
 
 	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
-	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
+	ROM_COPY( "gamecart", 0x000000, 0x0, 0x400000)
 
 	ROM_REGION16_BE( 0x400000, "32x_68k_bios", 0 ) /* 68000 Code */
 	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
@@ -947,7 +999,7 @@ ROM_START( 32x_mcd )
 	ROM_LOAD( "megacd_model1_bios_1_00_e.bin", 0x000000,  0x020000, CRC(529ac15a) SHA1(f891e0ea651e2232af0c5c4cb46a0cae2ee8f356) )
 
 	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
-	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
+	ROM_COPY( "gamecart", 0x000000, 0x0, 0x400000)
 
 	ROM_REGION16_BE( 0x400000, "32x_68k_bios", 0 ) /* 68000 Code */
 	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
@@ -980,7 +1032,7 @@ ROM_START( 32x_mcdj )
 	ROMX_LOAD( "epr-14088e.bin", 0x000000,  0x020000, CRC(9d2da8f2) SHA1(4846f448160059a7da0215a5df12ca160f26dd69), ROM_BIOS(5) )
 
 	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
-	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
+	ROM_COPY( "gamecart", 0x000000, 0x0, 0x400000)
 
 	ROM_REGION16_BE( 0x400000, "32x_68k_bios", 0 ) /* 68000 Code */
 	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
@@ -1004,6 +1056,10 @@ ROM_END
 CONS( 1989, genesis,    0,         0,      ms_megadriv,     md, md_cons_state,     genesis,   "Sega",   "Genesis (USA, NTSC)",  MACHINE_SUPPORTS_SAVE )
 CONS( 1990, megadriv,   genesis,   0,      ms_megadpal,     md, md_cons_state,     md_eur,    "Sega",   "Mega Drive (Europe, PAL)", MACHINE_SUPPORTS_SAVE )
 CONS( 1988, megadrij,   genesis,   0,      ms_megadriv,     md, md_cons_state,     md_jpn,    "Sega",   "Mega Drive (Japan, NTSC)", MACHINE_SUPPORTS_SAVE )
+
+// 1990+ models had the TMSS security chip, leave this as a clone, it reduces compatibility and nothing more.
+CONS( 1990, genesis_tmss, genesis, 0,      ms_megadriv,     md, md_cons_state,     genesis,   "Sega",   "Genesis (USA, NTSC, with TMSS chip)",  MACHINE_SUPPORTS_SAVE )
+
 
 // the 32X plugged in the cart slot, games plugged into the 32x.  Maybe it should be handled as an expansion device?
 CONS( 1994, 32x,        0,         0,      genesis_32x,     md, md_cons_state,     genesis,   "Sega",   "Genesis with 32X (USA, NTSC)", MACHINE_NOT_WORKING )

@@ -35,7 +35,7 @@ driver_list::driver_list()
 int driver_list::find(const char *name)
 {
 	// if no name, bail
-	if (name == NULL)
+	if (name == nullptr)
 		return -1;
 
 	// create a dummy item for comparison purposes
@@ -45,7 +45,7 @@ int driver_list::find(const char *name)
 
 	// binary search to find it
 	const game_driver **result = reinterpret_cast<const game_driver **>(bsearch(&driverptr, s_drivers_sorted, s_driver_count, sizeof(*s_drivers_sorted), driver_sort_callback));
-	return (result == NULL) ? -1 : result - s_drivers_sorted;
+	return (result == nullptr) ? -1 : result - s_drivers_sorted;
 }
 
 
@@ -57,11 +57,11 @@ int driver_list::find(const char *name)
 bool driver_list::matches(const char *wildstring, const char *string)
 {
 	// can only match internal drivers if the wildstring starts with an underscore
-	if (string[0] == '_' && (wildstring == NULL || wildstring[0] != '_'))
+	if (string[0] == '_' && (wildstring == nullptr || wildstring[0] != '_'))
 		return false;
 
 	// match everything else normally
-	return (wildstring == NULL || core_strwildcmp(wildstring, string) == 0);
+	return (wildstring == nullptr || core_strwildcmp(wildstring, string) == 0);
 }
 
 
@@ -187,19 +187,17 @@ machine_config &driver_enumerator::config(int index, emu_options &options) const
 	assert(index >= 0 && index < s_driver_count);
 
 	// if we don't have it cached, add it
-	if (m_config[index] == NULL)
+	if (m_config[index] == nullptr)
 	{
 		// if our cache is full, release the head entry
-		if (m_config_cache.count() == CONFIG_CACHE_COUNT)
+		if (m_config_cache.size() == CONFIG_CACHE_COUNT)
 		{
-			config_entry *first = m_config_cache.first();
-			m_config[first->index()] = NULL;
-			m_config_cache.remove(*first);
+			int first = m_config_cache.front();
+			m_config[first] = nullptr;
+			m_config_cache.erase(m_config_cache.begin());
 		}
-
-		// allocate the config and add it to the end of the list
-		machine_config *config = m_config[index] = global_alloc(machine_config(*s_drivers_sorted[index], options));
-		m_config_cache.append(*global_alloc(config_entry(*config, index)));
+		m_config[index] = std::make_unique<machine_config>(*s_drivers_sorted[index], options);
+		m_config_cache.push_back(index);
 	}
 	return *m_config[index];
 }
@@ -317,7 +315,7 @@ void driver_enumerator::find_approximate_matches(const char *string, int count, 
 #undef rand
 
 	// if no name, pick random entries
-	if (string == NULL || string[0] == 0)
+	if (string == nullptr || string[0] == 0)
 	{
 		// seed the RNG first
 		srand(osd_ticks());
@@ -402,11 +400,11 @@ void driver_enumerator::release_current() const
 		return;
 
 	// skip if we haven't cached a config
-	if (m_config[m_current] == NULL)
+	if (m_config[m_current] == nullptr)
 		return;
 
 	// iterate over software lists in this entry and reset
 	software_list_device_iterator deviter(m_config[m_current]->root_device());
-	for (software_list_device *swlistdev = deviter.first(); swlistdev != NULL; swlistdev = deviter.next())
+	for (software_list_device *swlistdev = deviter.first(); swlistdev != nullptr; swlistdev = deviter.next())
 		swlistdev->release();
 }

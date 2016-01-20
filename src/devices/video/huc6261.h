@@ -31,10 +31,10 @@ class huc6261_device :  public device_t,
 {
 public:
 	// construction/destruction
-	huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	huc6261_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	static void set_vdc1_tag(device_t &device, const char *tag) { downcast<huc6261_device &>(device).m_huc6270_a_tag = tag; }
-	static void set_vdc2_tag(device_t &device, const char *tag) { downcast<huc6261_device &>(device).m_huc6270_b_tag = tag; }
+	static void set_vdc1_tag(device_t &device, std::string tag) { downcast<huc6261_device &>(device).m_huc6270_a_tag = tag; }
+	static void set_vdc2_tag(device_t &device, std::string tag) { downcast<huc6261_device &>(device).m_huc6270_b_tag = tag; }
 
 	void video_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ16_MEMBER( read );
@@ -44,13 +44,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	const char *m_huc6270_a_tag;
-	const char *m_huc6270_b_tag;
+	std::string m_huc6270_a_tag;
+	std::string m_huc6270_b_tag;
 
 	huc6270_device *m_huc6270_a;
 	huc6270_device *m_huc6270_b;
@@ -70,7 +70,7 @@ private:
 	UINT8   m_pixel_clock;
 
 	emu_timer   *m_timer;
-	bitmap_rgb32    *m_bmp;
+	std::unique_ptr<bitmap_rgb32>  m_bmp;
 	INT32   m_uv_lookup[65536][3];
 };
 

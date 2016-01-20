@@ -36,7 +36,7 @@
 class plus4_state : public driver_device
 {
 public:
-	plus4_state(const machine_config &mconfig, device_type type, const char *tag)
+	plus4_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, MOS7501_TAG),
 			m_pla(*this, PLA_TAG),
@@ -97,13 +97,12 @@ public:
 	required_ioport m_row7;
 	required_ioport m_lock;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void check_interrupts();
 	void bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal);
 	UINT8 read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal);
-	UINT8 read_keyboard(UINT8 databus);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -113,8 +112,6 @@ public:
 	DECLARE_WRITE8_MEMBER( cpu_w );
 
 	DECLARE_WRITE_LINE_MEMBER( ted_irq_w );
-	DECLARE_READ8_MEMBER( ted_ram_r );
-	DECLARE_READ8_MEMBER( ted_rom_r );
 	DECLARE_READ8_MEMBER( ted_k_r );
 
 	DECLARE_WRITE_LINE_MEMBER( write_kb0 ) { if (state) m_kb |= 1; else m_kb &= ~1; }
@@ -164,7 +161,7 @@ public:
 class c16_state : public plus4_state
 {
 public:
-	c16_state(const machine_config &mconfig, device_type type, const char *tag)
+	c16_state(const machine_config &mconfig, device_type type, std::string tag)
 		: plus4_state(mconfig, type, tag)
 	{ }
 

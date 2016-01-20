@@ -22,7 +22,7 @@ driver by David Haywood and few bits by Pierpaolo Prazzoli
 class pkscram_state : public driver_device
 {
 public:
-	pkscram_state(const machine_config &mconfig, device_type type, const char *tag)
+	pkscram_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_pkscramble_fgtilemap_ram(*this, "fgtilemap_ram"),
 		m_pkscramble_mdtilemap_ram(*this, "mdtilemap_ram"),
@@ -46,9 +46,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_pkscramble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
@@ -111,7 +111,7 @@ WRITE16_MEMBER(pkscram_state::pkscramble_output_w)
 		m_interrupt_line_active = 0;
 	}
 
-	coin_counter_w(machine(), 0, data & 0x80);
+	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 }
 
 static ADDRESS_MAP_START( pkscramble_map, AS_PROGRAM, 16, pkscram_state )

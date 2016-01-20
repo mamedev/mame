@@ -18,20 +18,20 @@ class isa8_pds_device :
 		public device_isa8_card_interface
 {
 public:
-		isa8_pds_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		isa8_pds_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 		DECLARE_READ8_MEMBER(ppi_r);
 		DECLARE_WRITE8_MEMBER(ppi_w);
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
+		virtual machine_config_constructor device_mconfig_additions() const override;
 
 		required_device<i8255_device> m_ppi;
 protected:
 		// device-level overrides
-		virtual void device_start();
-		virtual void device_reset();
-		virtual void device_stop();
+		virtual void device_start() override;
+		virtual void device_reset() override;
+		virtual void device_stop() override;
 
 };
 

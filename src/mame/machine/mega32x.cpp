@@ -204,7 +204,7 @@ GFX check (these don't explicitly fails):
 const device_type SEGA_32X_NTSC = &device_creator<sega_32x_ntsc_device>;
 const device_type SEGA_32X_PAL = &device_creator<sega_32x_pal_device>;
 
-sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_master_cpu(*this, "32x_master_sh2"),
 		m_slave_cpu(*this, "32x_slave_sh2"),
@@ -215,12 +215,12 @@ sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type
 {
 }
 
-sega_32x_ntsc_device::sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega_32x_ntsc_device::sega_32x_ntsc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: sega_32x_device(mconfig, SEGA_32X_NTSC, "sega_32x_ntsc", tag, owner, clock, "sega_32x_ntsc", __FILE__)
 {
 }
 
-sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: sega_32x_device(mconfig, SEGA_32X_PAL, "sega_32x_pal", tag, owner, clock, "sega_32x_pal", __FILE__)
 {
 }
@@ -230,7 +230,7 @@ sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, const ch
 //  palette device
 //-------------------------------------------------
 
-void sega_32x_device::static_set_palette_tag(device_t &device, const char *tag)
+void sega_32x_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<sega_32x_device &>(device).m_palette.set_tag(tag);
 }
@@ -1038,13 +1038,13 @@ void sega_32x_device::_32x_check_framebuffer_swap(bool enabled)
 
 		if (m_32x_fb_swap & 1)
 		{
-			m_32x_access_dram = m_32x_dram0;
-			m_32x_display_dram = m_32x_dram1;
+			m_32x_access_dram = m_32x_dram0.get();
+			m_32x_display_dram = m_32x_dram1.get();
 		}
 		else
 		{
-			m_32x_display_dram = m_32x_dram0;
-			m_32x_access_dram = m_32x_dram1;
+			m_32x_display_dram = m_32x_dram0.get();
+			m_32x_access_dram = m_32x_dram1.get();
 		}
 	}
 }
@@ -1835,20 +1835,20 @@ void sega_32x_device::device_start()
 	m_32x_pwm_timer = machine().scheduler().timer_alloc(FUNC(_32x_pwm_callback), (void*)this);
 	m_32x_pwm_timer->adjust(attotime::never);
 
-	m_32x_dram0 = auto_alloc_array(machine(), UINT16, 0x40000/2);
-	m_32x_dram1 = auto_alloc_array(machine(), UINT16, 0x40000/2);
+	m_32x_dram0 = std::make_unique<UINT16[]>(0x40000/2);
+	m_32x_dram1 = std::make_unique<UINT16[]>(0x40000/2);
 
-	memset(m_32x_dram0, 0x00, 0x40000);
-	memset(m_32x_dram1, 0x00, 0x40000);
+	memset(m_32x_dram0.get(), 0x00, 0x40000);
+	memset(m_32x_dram1.get(), 0x00, 0x40000);
 
-	m_32x_palette_lookup = auto_alloc_array(machine(), UINT16, 0x200/2);
-	m_32x_palette = auto_alloc_array(machine(), UINT16, 0x200/2);
+	m_32x_palette_lookup = std::make_unique<UINT16[]>(0x200/2);
+	m_32x_palette = std::make_unique<UINT16[]>(0x200/2);
 
-	memset(m_32x_palette_lookup, 0x00, 0x200);
-	memset(m_32x_palette, 0x00, 0x200);
+	memset(m_32x_palette_lookup.get(), 0x00, 0x200);
+	memset(m_32x_palette.get(), 0x00, 0x200);
 
-	m_32x_display_dram = m_32x_dram0;
-	m_32x_access_dram = m_32x_dram1;
+	m_32x_display_dram = m_32x_dram0.get();
+	m_32x_access_dram = m_32x_dram1.get();
 }
 
 void sega_32x_device::device_reset()

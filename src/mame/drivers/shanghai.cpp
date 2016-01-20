@@ -30,7 +30,7 @@ displayed.
 class shanghai_state : public driver_device
 {
 public:
-	shanghai_state(const machine_config &mconfig, device_type type, const char *tag)
+	shanghai_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_hd63484(*this, "hd63484") { }
@@ -41,7 +41,7 @@ public:
 	DECLARE_WRITE16_MEMBER(shanghai_coin_w);
 	DECLARE_READ16_MEMBER(kothello_hd63484_status_r);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(shanghai);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -140,8 +140,8 @@ WRITE16_MEMBER(shanghai_state::shanghai_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0,data & 1);
-		coin_counter_w(machine(), 1,data & 2);
+		machine().bookkeeping().coin_counter_w(0,data & 1);
+		machine().bookkeeping().coin_counter_w(1,data & 2);
 	}
 }
 

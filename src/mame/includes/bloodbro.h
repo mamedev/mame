@@ -3,7 +3,7 @@
 class bloodbro_state : public driver_device
 {
 public:
-	bloodbro_state(const machine_config &mconfig, device_type type, const char *tag)
+	bloodbro_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -39,7 +39,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update_bloodbro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_weststry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

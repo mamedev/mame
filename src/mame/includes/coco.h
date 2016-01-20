@@ -88,7 +88,7 @@ MACHINE_CONFIG_EXTERN( coco_sound );
 class coco_state : public driver_device
 {
 public:
-	coco_state(const machine_config &mconfig, device_type type, const char *tag);
+	coco_state(const machine_config &mconfig, device_type type, std::string tag);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_0;
@@ -142,9 +142,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cart_w ) { cart_w((bool) state); }
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// interrupts
 	virtual bool firq_get_line(void);
@@ -209,7 +209,6 @@ private:
 
 	soundmux_status_t soundmux_status(void);
 	void update_sound(void);
-	bool joyin(void);
 	void poll_joystick(bool *joyin, UINT8 *buttons);
 	void poll_keyboard(void);
 	void poll_hires_joystick(void);

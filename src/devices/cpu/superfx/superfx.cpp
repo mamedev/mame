@@ -7,11 +7,11 @@
 
 const device_type SUPERFX = &device_creator<superfx_device>;
 
-superfx_device::superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+superfx_device::superfx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SUPERFX, "SuperFX", tag, owner, clock, "superfx", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 32, 0)
-	, m_out_irq_func(*this), m_pipeline(0), m_ramaddr(0), m_sfr(0), m_pbr(0), m_rombr(0), m_rambr(0), m_cbr(0), m_scbr(0), m_scmr(0), m_colr(0), m_por(0), 
-	m_bramr(0), m_vcr(0), m_cfgr(0), m_clsr(0), m_romcl(0), m_romdr(0), m_ramcl(0), m_ramar(0), m_ramdr(0), m_sreg(nullptr), m_sreg_idx(0), m_dreg(nullptr), 
+	, m_out_irq_func(*this), m_pipeline(0), m_ramaddr(0), m_sfr(0), m_pbr(0), m_rombr(0), m_rambr(0), m_cbr(0), m_scbr(0), m_scmr(0), m_colr(0), m_por(0),
+	m_bramr(0), m_vcr(0), m_cfgr(0), m_clsr(0), m_romcl(0), m_romdr(0), m_ramcl(0), m_ramar(0), m_ramdr(0), m_sreg(nullptr), m_sreg_idx(0), m_dreg(nullptr),
 	m_dreg_idx(0), m_r15_modified(0), m_irq(0), m_cache_access_speed(0), m_memory_access_speed(0), m_program(nullptr), m_icount(0), m_debugger_temp(0)
 {
 }
@@ -106,7 +106,7 @@ void superfx_device::superfx_pixelcache_flush(INT32 line)
 	UINT8 y = m_pixelcache[line].offset >> 5;
 	UINT32 cn = 0;
 	UINT32 bpp = 2 << ((m_scmr & SUPERFX_SCMR_MD) - ((m_scmr & SUPERFX_SCMR_MD) >> 1)); // = [regs.scmr.md]{ 2, 4, 4, 8 };
-	UINT32 addr = 0;
+	UINT32 addr;
 	UINT32 n = 0;
 
 	if(m_pixelcache[line].bitpend == 0x00)
@@ -218,8 +218,8 @@ void superfx_device::superfx_plot(UINT8 x, UINT8 y)
 UINT8 superfx_device::superfx_rpix(UINT8 x, UINT8 y)
 {
 	UINT32 cn = 0;
-	UINT32 bpp = 0;
-	UINT32 addr = 0;
+	UINT32 bpp;
+	UINT32 addr;
 	UINT8 data = 0x00;
 	UINT32 n = 0;
 
@@ -573,9 +573,9 @@ void superfx_device::add_clocks(INT32 clocks)
 
 void superfx_device::device_start()
 {
-	for(int i = 0; i < 16; i++)
+	for(auto & elem : m_r)
 	{
-		m_r[i] = 0;
+		elem = 0;
 	}
 
 	m_sfr = 0;
@@ -988,7 +988,7 @@ void superfx_device::execute_run()
 			case 0x46: case 0x47: case 0x48: case 0x49: case 0x4a: case 0x4b:   // LDW_IR / LDB_IR
 				if((m_sfr & SUPERFX_SFR_ALT1) == 0)
 				{ // LDW_IR
-					UINT16 data = 0;
+					UINT16 data;
 					m_ramaddr = m_r[op & 0xf];
 					data  = superfx_rambuffer_read(m_ramaddr ^ 0) << 0;
 					data |= superfx_rambuffer_read(m_ramaddr ^ 1) << 8;
@@ -1271,7 +1271,7 @@ void superfx_device::execute_run()
 					case SUPERFX_SFR_ALT1: // LMS
 					case SUPERFX_SFR_ALT3: // LMS
 					{
-						UINT16 data = 0;
+						UINT16 data;
 						m_ramaddr = superfx_pipe() << 1;
 						data  = superfx_rambuffer_read(m_ramaddr ^ 0) << 0;
 						data |= superfx_rambuffer_read(m_ramaddr ^ 1) << 8;

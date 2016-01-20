@@ -867,7 +867,7 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport", rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(avigo_state, com_interrupt))
 
-	MCFG_RS232_PORT_ADD( "serport", default_rs232_devices, NULL )
+	MCFG_RS232_PORT_ADD( "serport", default_rs232_devices, nullptr )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dcd_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dsr_w))

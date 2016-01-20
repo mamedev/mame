@@ -86,7 +86,7 @@ WRITE8_MEMBER(timeplt_state::nmi_enable_w)
 
 WRITE8_MEMBER(timeplt_state::coincounter_w)
 {
-	coin_counter_w(machine(), offset >> 1, data);
+	machine().bookkeeping().coin_counter_w(offset >> 1, data);
 }
 
 READ8_MEMBER(timeplt_state::psurge_protection_r)

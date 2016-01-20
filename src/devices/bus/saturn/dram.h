@@ -13,31 +13,31 @@ class saturn_dram_device : public device_t,
 {
 public:
 	// construction/destruction
-	saturn_dram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	saturn_dram_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ext_dram0);
-	virtual DECLARE_READ32_MEMBER(read_ext_dram1);
-	virtual DECLARE_WRITE32_MEMBER(write_ext_dram0);
-	virtual DECLARE_WRITE32_MEMBER(write_ext_dram1);
+	virtual DECLARE_READ32_MEMBER(read_ext_dram0) override;
+	virtual DECLARE_READ32_MEMBER(read_ext_dram1) override;
+	virtual DECLARE_WRITE32_MEMBER(write_ext_dram0) override;
+	virtual DECLARE_WRITE32_MEMBER(write_ext_dram1) override;
 };
 
 class saturn_dram8mb_device : public saturn_dram_device
 {
 public:
 	// construction/destruction
-	saturn_dram8mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saturn_dram8mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class saturn_dram32mb_device : public saturn_dram_device
 {
 public:
 	// construction/destruction
-	saturn_dram32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saturn_dram32mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

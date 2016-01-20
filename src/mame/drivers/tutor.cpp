@@ -182,7 +182,7 @@ A=AMA, P=PRO, these keys don't exist, and so the games cannot be played.
 class tutor_state : public driver_device
 {
 public:
-	tutor_state(const machine_config &mconfig, device_type type, const char *tag)
+	tutor_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
@@ -216,8 +216,8 @@ public:
 	DECLARE_READ8_MEMBER(tutor_highmem_r);
 	int m_tape_interrupt_enable;
 	emu_timer *m_tape_interrupt_timer;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(tape_interrupt_handler);
 
 	int m_centronics_busy;

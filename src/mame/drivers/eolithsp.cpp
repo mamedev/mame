@@ -63,7 +63,7 @@ static const struct
 	{ "klondkp",  0x0001a046, -1, 240 },
 	/* vegaeo.c */
 	{ "crazywar", 0x00008cf8, -1, 240 },
-	{ NULL, 0, 0 }
+	{ nullptr, 0, 0 }
 };
 
 
@@ -76,7 +76,7 @@ void eolith_state::init_speedup()
 	m_speedup_vblank = 0;
 	m_speedup_scanline = 0;
 
-	while( eolith_speedup_table[ n_game ].s_name != NULL )
+	while( eolith_speedup_table[ n_game ].s_name != nullptr )
 	{
 		if( strcmp( machine().system().name, eolith_speedup_table[ n_game ].s_name ) == 0 )
 		{

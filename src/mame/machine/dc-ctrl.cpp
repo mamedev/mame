@@ -5,7 +5,7 @@
 
 const device_type DC_CONTROLLER = &device_creator<dc_controller_device>;
 
-void dc_controller_device::static_set_port_tag(device_t &device, int port, const char *tag)
+void dc_controller_device::static_set_port_tag(device_t &device, int port, std::string tag)
 {
 	dc_controller_device &ctrl = downcast<dc_controller_device &>(device);
 	ctrl.port_tag[port] = tag;
@@ -29,11 +29,9 @@ void dc_controller_device::static_set_versions(device_t &device, const char *ver
 	ctrl.versions = versions;
 }
 
-dc_controller_device::dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+dc_controller_device::dc_controller_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	maple_device(mconfig, DC_CONTROLLER, "Dreamcast Controller", tag, owner, clock, "dcctrl", __FILE__)
 {
-	memset(port_tag, 0, sizeof(port_tag));
-
 	id = "Dreamcast Controller";
 	license = "Produced By or Under License From SEGA ENTERPRISES,LTD.";
 	versions = "Version 1.010,1998/09/28,315-6211-AB   ,Analog Module : The 4th Edition.5/8  +DF";
@@ -74,12 +72,12 @@ void dc_controller_device::fixed_status(UINT32 *dest)
 {
 	dest[0] = 0x20000000; // Controller
 	dest[1] =
-		((port[2] != NULL) ? 0x010000 : 0) |
-		((port[3] != NULL) ? 0x020000 : 0) |
-		((port[4] != NULL) ? 0x040000 : 0) |
-		((port[5] != NULL) ? 0x080000 : 0) |
-		((port[6] != NULL) ? 0x100000 : 0) |
-		((port[7] != NULL) ? 0x200000 : 0) |
+		((port[2] != nullptr) ? 0x010000 : 0) |
+		((port[3] != nullptr) ? 0x020000 : 0) |
+		((port[4] != nullptr) ? 0x040000 : 0) |
+		((port[5] != nullptr) ? 0x080000 : 0) |
+		((port[6] != nullptr) ? 0x100000 : 0) |
+		((port[7] != nullptr) ? 0x200000 : 0) |
 		((port[0] ? port[0]->active() : 0) << 8) |
 		(port[1] ? port[1]->active() : 0); // 1st function - controller
 	dest[2] = 0; // No 2nd function

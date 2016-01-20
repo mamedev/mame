@@ -12,7 +12,7 @@
 
 
 ui_metrics::ui_metrics(osd_options const &options) :
-	m_debug_font(NULL),
+	m_debug_font(nullptr),
 	m_debug_font_height(0),
 	m_debug_font_width(0),
 	m_debug_font_ascent(0),

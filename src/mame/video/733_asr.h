@@ -13,7 +13,7 @@ enum
 class asr733_device : public device_t
 {
 public:
-	asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	asr733_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_PALETTE_INIT(asr733);
 
@@ -33,12 +33,12 @@ public:
 
 protected:
 	// device-level overrides
-	void device_config_complete();
-	void device_start();
-	void device_reset();
-	machine_config_constructor device_mconfig_additions() const;
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	ioport_constructor device_input_ports() const;
+	void device_config_complete() override;
+	void device_start() override;
+	void device_reset() override;
+	machine_config_constructor device_mconfig_additions() const override;
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	ioport_constructor device_input_ports() const override;
 
 private:
 	// internal state
@@ -71,7 +71,7 @@ private:
 
 	int     m_x;
 
-	bitmap_ind16*       m_bitmap;
+	std::unique_ptr<bitmap_ind16>       m_bitmap;
 
 	required_device<palette_device>     m_palette;
 	required_device<gfxdecode_device>   m_gfxdecode;

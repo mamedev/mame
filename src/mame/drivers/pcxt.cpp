@@ -71,7 +71,7 @@ the main program is 9th October 1990.
 class pcxt_state : public driver_device
 {
 public:
-	pcxt_state(const machine_config &mconfig, device_type type, const char *tag)
+	pcxt_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_pit8253(*this, "pit8253"),
 			m_pic8259_1(*this, "pic8259_1"),
@@ -106,7 +106,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 	DECLARE_READ8_MEMBER(dma_page_select_r);
 	DECLARE_WRITE8_MEMBER(dma_page_select_w);
-	DECLARE_WRITE8_MEMBER(tetriskr_bg_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(ibm5150_pit8253_out2_changed);
 	DECLARE_READ8_MEMBER(port_a_r);
 	DECLARE_READ8_MEMBER(port_b_r);
@@ -122,8 +121,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
 	DECLARE_DRIVER_INIT(tetriskr);
 	DECLARE_DRIVER_INIT(filetto);
-	virtual void machine_reset();
-	UINT32 screen_update_tetriskr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual void machine_reset() override;
 	UINT8 pcxt_speaker_get_spk();
 	void pcxt_speaker_set_spkrdata(UINT8 data);
 	required_device<cpu_device> m_maincpu;
@@ -135,9 +133,9 @@ class isa8_cga_filetto_device : public isa8_cga_device
 {
 public:
 	// construction/destruction
-	isa8_cga_filetto_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_cga_filetto_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 const device_type ISA8_CGA_FILETTO = &device_creator<isa8_cga_filetto_device>;
@@ -146,7 +144,7 @@ const device_type ISA8_CGA_FILETTO = &device_creator<isa8_cga_filetto_device>;
 //  isa8_cga_filetto_device - constructor
 //-------------------------------------------------
 
-isa8_cga_filetto_device::isa8_cga_filetto_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_cga_filetto_device::isa8_cga_filetto_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		isa8_cga_device( mconfig, ISA8_CGA_FILETTO, "ISA8_CGA_FILETTO", tag, owner, clock, "filetto_cga", __FILE__)
 {
 }
@@ -167,11 +165,11 @@ class isa8_cga_tetriskr_device : public isa8_cga_superimpose_device
 {
 public:
 	// construction/destruction
-	isa8_cga_tetriskr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_cga_tetriskr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual void device_start();
-	virtual const rom_entry *device_rom_region() const;
+	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	virtual void device_start() override;
+	virtual const rom_entry *device_rom_region() const override;
 
 	DECLARE_READ8_MEMBER(bg_bank_r);
 	DECLARE_WRITE8_MEMBER(bg_bank_w);
@@ -187,7 +185,7 @@ const device_type ISA8_CGA_TETRISKR = &device_creator<isa8_cga_tetriskr_device>;
 //  isa8_cga_tetriskr_device - constructor
 //-------------------------------------------------
 
-isa8_cga_tetriskr_device::isa8_cga_tetriskr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_cga_tetriskr_device::isa8_cga_tetriskr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		isa8_cga_superimpose_device( mconfig, ISA8_CGA_TETRISKR, "ISA8_CGA_TETRISKR", tag, owner, clock, "tetriskr_cga", __FILE__)
 {
 }

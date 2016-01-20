@@ -416,7 +416,7 @@ static const key_trans_entry win_key_trans_table[] =
 //  INLINE FUNCTIONS
 //============================================================
 
-INLINE void poll_if_necessary(running_machine &machine)
+static inline void poll_if_necessary(running_machine &machine)
 {
 	// make sure we poll at least once every 1/4 second
 	if (GetTickCount() > last_poll + 1000 / 4)
@@ -424,7 +424,7 @@ INLINE void poll_if_necessary(running_machine &machine)
 }
 
 
-INLINE input_item_id keyboard_map_scancode_to_itemid(int scancode)
+static inline input_item_id keyboard_map_scancode_to_itemid(int scancode)
 {
 	int tablenum;
 
@@ -438,7 +438,7 @@ INLINE input_item_id keyboard_map_scancode_to_itemid(int scancode)
 }
 
 
-INLINE INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawmax)
+static inline INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawmax)
 {
 	INT32 center = (rawmax + rawmin) / 2;
 
@@ -858,7 +858,7 @@ static device_info *generic_device_alloc(running_machine &machine, device_info *
 	device_info *devinfo;
 
 	// allocate memory for the device object
-	devinfo = global_alloc_clear(device_info(machine));
+	devinfo = global_alloc_clear<device_info>(machine);
 	devinfo->head = devlist_head_ptr;
 
 	// allocate a UTF8 copy of the name
@@ -1831,7 +1831,7 @@ static device_info *rawinput_device_create(running_machine &machine, device_info
 	// determine the length of the device name, allocate it, and fetch it if not nameless
 	if ((*get_rawinput_device_info)(device->hDevice, RIDI_DEVICENAME, NULL, &name_length) != 0)
 		goto error;
-	tname = global_alloc_array_clear(TCHAR, name_length+1);
+	tname = global_alloc_array_clear<TCHAR>(name_length+1);
 	if (name_length > 1 && (*get_rawinput_device_info)(device->hDevice, RIDI_DEVICENAME, tname, &name_length) == -1)
 		goto error;
 

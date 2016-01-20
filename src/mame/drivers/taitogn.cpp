@@ -346,7 +346,7 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 class taitogn_state : public driver_device
 {
 public:
-	taitogn_state(const machine_config &mconfig, device_type type, const char *tag) :
+	taitogn_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_sio0(*this, "maincpu:sio0"),
 		m_cat702_1(*this, "cat702_1"),
@@ -392,8 +392,8 @@ public:
 	DECLARE_DRIVER_INIT(coh3002t_nz);
 
 protected:
-	virtual void driver_start();
-	virtual void machine_reset();
+	virtual void driver_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<psxsio0_device> m_sio0;

@@ -208,7 +208,7 @@ const device_type TMS32025 = &device_creator<tms32025_device>;
 const device_type TMS32026 = &device_creator<tms32026_device>;
 
 
-tms32025_device::tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms32025_device::tms32025_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, TMS32025, "TMS32025", tag, owner, clock, "tms32025", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1)
@@ -217,7 +217,7 @@ tms32025_device::tms32025_device(const machine_config &mconfig, const char *tag,
 }
 
 
-tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1)
@@ -226,7 +226,7 @@ tms32025_device::tms32025_device(const machine_config &mconfig, device_type type
 }
 
 
-tms32026_device::tms32026_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms32026_device::tms32026_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tms32025_device(mconfig, TMS32026, "TMS32026", tag, owner, clock, "tms32026", __FILE__)
 {
 }
@@ -799,14 +799,14 @@ void tms32025_device::cnfd()  /** next two fetches need to use previous CNF valu
 	CLR1(CNF0_REG);
 	m_datamap[4] = &m_intRAM[0x200];            /* B0 */
 	m_datamap[5] = &m_intRAM[0x280];            /* B0 */
-	m_pgmmap[510] = NULL;
-	m_pgmmap[511] = NULL;
+	m_pgmmap[510] = nullptr;
+	m_pgmmap[511] = nullptr;
 }
 void tms32025_device::cnfp()  /** next two fetches need to use previous CNF value ! **/
 {
 	SET1(CNF0_REG);
-	m_datamap[4] = NULL;                        /* B0 */
-	m_datamap[5] = NULL;                        /* B0 */
+	m_datamap[4] = nullptr;                        /* B0 */
+	m_datamap[5] = nullptr;                        /* B0 */
 	m_pgmmap[510] = &m_intRAM[0x200];
 	m_pgmmap[511] = &m_intRAM[0x280];
 }
@@ -827,25 +827,25 @@ void tms32025_device::conf()  /** Need to reconfigure the memory blocks */
 					m_datamap[13] = &m_intRAM[0x680];   /* B3 */
 					m_datamap[14] = &m_intRAM[0x700];   /* B3 */
 					m_datamap[15] = &m_intRAM[0x780];   /* B3 */
-					m_pgmmap[500] = NULL;
-					m_pgmmap[501] = NULL;
-					m_pgmmap[502] = NULL;
-					m_pgmmap[503] = NULL;
-					m_pgmmap[504] = NULL;
-					m_pgmmap[505] = NULL;
-					m_pgmmap[506] = NULL;
-					m_pgmmap[507] = NULL;
-					m_pgmmap[508] = NULL;
-					m_pgmmap[509] = NULL;
-					m_pgmmap[510] = NULL;
-					m_pgmmap[511] = NULL;
+					m_pgmmap[500] = nullptr;
+					m_pgmmap[501] = nullptr;
+					m_pgmmap[502] = nullptr;
+					m_pgmmap[503] = nullptr;
+					m_pgmmap[504] = nullptr;
+					m_pgmmap[505] = nullptr;
+					m_pgmmap[506] = nullptr;
+					m_pgmmap[507] = nullptr;
+					m_pgmmap[508] = nullptr;
+					m_pgmmap[509] = nullptr;
+					m_pgmmap[510] = nullptr;
+					m_pgmmap[511] = nullptr;
 					break;
 
 		case 01:    CLR1(CNF1_REG); SET1(CNF0_REG);
-					m_datamap[4] = NULL;
-					m_datamap[5] = NULL;
-					m_datamap[6] = NULL;
-					m_datamap[7] = NULL;
+					m_datamap[4] = nullptr;
+					m_datamap[5] = nullptr;
+					m_datamap[6] = nullptr;
+					m_datamap[7] = nullptr;
 					m_datamap[8] = &m_intRAM[0x400];    /* B1 */
 					m_datamap[9] = &m_intRAM[0x480];    /* B1 */
 					m_datamap[10] = &m_intRAM[0x500];   /* B1 */
@@ -858,25 +858,25 @@ void tms32025_device::conf()  /** Need to reconfigure the memory blocks */
 					m_pgmmap[501] = &m_intRAM[0x280];   /* B0 */
 					m_pgmmap[502] = &m_intRAM[0x300];   /* B0 */
 					m_pgmmap[503] = &m_intRAM[0x380];   /* B0 */
-					m_pgmmap[504] = NULL;
-					m_pgmmap[505] = NULL;
-					m_pgmmap[506] = NULL;
-					m_pgmmap[507] = NULL;
-					m_pgmmap[508] = NULL;
-					m_pgmmap[509] = NULL;
-					m_pgmmap[510] = NULL;
-					m_pgmmap[511] = NULL;
+					m_pgmmap[504] = nullptr;
+					m_pgmmap[505] = nullptr;
+					m_pgmmap[506] = nullptr;
+					m_pgmmap[507] = nullptr;
+					m_pgmmap[508] = nullptr;
+					m_pgmmap[509] = nullptr;
+					m_pgmmap[510] = nullptr;
+					m_pgmmap[511] = nullptr;
 					break;
 
 		case 02:    SET1(CNF1_REG); CLR1(CNF0_REG);
-					m_datamap[4] = NULL;
-					m_datamap[5] = NULL;
-					m_datamap[6] = NULL;
-					m_datamap[7] = NULL;
-					m_datamap[8] = NULL;
-					m_datamap[9] = NULL;
-					m_datamap[10] = NULL;
-					m_datamap[11] = NULL;
+					m_datamap[4] = nullptr;
+					m_datamap[5] = nullptr;
+					m_datamap[6] = nullptr;
+					m_datamap[7] = nullptr;
+					m_datamap[8] = nullptr;
+					m_datamap[9] = nullptr;
+					m_datamap[10] = nullptr;
+					m_datamap[11] = nullptr;
 					m_datamap[12] = &m_intRAM[0x600];   /* B3 */
 					m_datamap[13] = &m_intRAM[0x680];   /* B3 */
 					m_datamap[14] = &m_intRAM[0x700];   /* B3 */
@@ -889,25 +889,25 @@ void tms32025_device::conf()  /** Need to reconfigure the memory blocks */
 					m_pgmmap[505] = &m_intRAM[0x480];   /* B1 */
 					m_pgmmap[506] = &m_intRAM[0x500];   /* B1 */
 					m_pgmmap[507] = &m_intRAM[0x580];   /* B1 */
-					m_pgmmap[508] = NULL;
-					m_pgmmap[509] = NULL;
-					m_pgmmap[510] = NULL;
-					m_pgmmap[511] = NULL;
+					m_pgmmap[508] = nullptr;
+					m_pgmmap[509] = nullptr;
+					m_pgmmap[510] = nullptr;
+					m_pgmmap[511] = nullptr;
 					break;
 
 		case 03:    SET1(CNF1_REG); SET1(CNF0_REG);
-					m_datamap[4] = NULL;
-					m_datamap[5] = NULL;
-					m_datamap[6] = NULL;
-					m_datamap[7] = NULL;
-					m_datamap[8] = NULL;
-					m_datamap[9] = NULL;
-					m_datamap[10] = NULL;
-					m_datamap[11] = NULL;
-					m_datamap[12] = NULL;
-					m_datamap[13] = NULL;
-					m_datamap[14] = NULL;
-					m_datamap[15] = NULL;
+					m_datamap[4] = nullptr;
+					m_datamap[5] = nullptr;
+					m_datamap[6] = nullptr;
+					m_datamap[7] = nullptr;
+					m_datamap[8] = nullptr;
+					m_datamap[9] = nullptr;
+					m_datamap[10] = nullptr;
+					m_datamap[11] = nullptr;
+					m_datamap[12] = nullptr;
+					m_datamap[13] = nullptr;
+					m_datamap[14] = nullptr;
+					m_datamap[15] = nullptr;
 					m_pgmmap[500] = &m_intRAM[0x200];   /* B0 */
 					m_pgmmap[501] = &m_intRAM[0x280];   /* B0 */
 					m_pgmmap[502] = &m_intRAM[0x300];   /* B0 */
@@ -1801,7 +1801,7 @@ void tms32025_device::state_export(const device_state_entry &entry)
 }
 
 
-void tms32025_device::state_string_export(const device_state_entry &entry, std::string &str)
+void tms32025_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -2187,7 +2187,7 @@ bool tms32025_device::memory_readop(offs_t offset, int size, UINT64 &value)
  ****************************************************************************/
 bool tms32025_device::memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value)
 {
-	void *ptr = NULL;
+	void *ptr;
 	UINT64 temp = 0;
 
 	switch (spacenum)
@@ -2239,7 +2239,7 @@ bool tms32025_device::memory_read(address_spacenum spacenum, offs_t offset, int 
  ****************************************************************************/
 bool tms32025_device::memory_write(address_spacenum spacenum, offs_t offset, int size, UINT64 value)
 {
-	void *ptr = NULL;
+	void *ptr;
 
 	switch (spacenum)
 	{

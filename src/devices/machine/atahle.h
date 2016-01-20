@@ -20,26 +20,23 @@ class ata_hle_device : public device_t,
 	public device_slot_card_interface
 {
 public:
-	ata_hle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
+	ata_hle_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock,std::string shortname, std::string source);
 
-	virtual UINT16 read_dma();
-	virtual DECLARE_READ16_MEMBER(read_cs0);
-	virtual DECLARE_READ16_MEMBER(read_cs1);
+	virtual UINT16 read_dma() override;
+	virtual DECLARE_READ16_MEMBER(read_cs0) override;
+	virtual DECLARE_READ16_MEMBER(read_cs1) override;
 
-	virtual void write_dma(UINT16 data);
-	virtual DECLARE_WRITE16_MEMBER(write_cs0);
-	virtual DECLARE_WRITE16_MEMBER(write_cs1);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_csel);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_dmack);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_pdiag);
-
-	TIMER_CALLBACK_MEMBER(buffer_empty_timer_work);
-
+	virtual void write_dma(UINT16 data) override;
+	virtual DECLARE_WRITE16_MEMBER(write_cs0) override;
+	virtual DECLARE_WRITE16_MEMBER(write_cs1) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_csel) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_dmack) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_pdiag) override;
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void set_irq(int state);
 	void set_dmarq(int state);
@@ -129,6 +126,7 @@ protected:
 		IDE_COMMAND_IDENTIFY_DEVICE = 0xec,
 		IDE_COMMAND_SET_FEATURES = 0xef,
 		IDE_COMMAND_SECURITY_UNLOCK = 0xf2,
+		IDE_COMMAND_SECURITY_DISABLE_PASSWORD = 0xf6,
 		IDE_COMMAND_READ_NATIVE_MAX_ADDRESS = 0xf8,
 		IDE_COMMAND_SET_MAX = 0xf9
 	};

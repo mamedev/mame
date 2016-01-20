@@ -12,7 +12,7 @@
 class fastfred_state : public galaxold_state
 {
 public:
-	fastfred_state(const machine_config &mconfig, device_type type, const char *tag)
+	fastfred_state(const machine_config &mconfig, device_type type, std::string tag)
 		: galaxold_state(mconfig, type, tag),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_palette(*this, "palette"),
@@ -82,7 +82,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(fastfred);
 	DECLARE_MACHINE_START(imago);
 	DECLARE_VIDEO_START(fastfred);

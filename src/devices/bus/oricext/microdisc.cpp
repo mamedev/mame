@@ -26,9 +26,9 @@ static MACHINE_CONFIG_FRAGMENT( microdisc )
 	MCFG_WD_FDC_FORCE_READY
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", microdisc_floppies, "3dsdd", microdisc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", microdisc_floppies, NULL,    microdisc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", microdisc_floppies, NULL,    microdisc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", microdisc_floppies, NULL,    microdisc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", microdisc_floppies, nullptr,    microdisc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", microdisc_floppies, nullptr,    microdisc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", microdisc_floppies, nullptr,    microdisc_device::floppy_formats)
 MACHINE_CONFIG_END
 
 DEVICE_ADDRESS_MAP_START(map, 8, microdisc_device)
@@ -37,7 +37,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, microdisc_device)
 	AM_RANGE(0x318, 0x318) AM_READ(port_318_r)
 ADDRESS_MAP_END
 
-microdisc_device::microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+microdisc_device::microdisc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	oricext_device(mconfig, MICRODISC, "Microdisc floppy drive interface", tag, owner, clock, "microdisc", __FILE__),
 	fdc(*this, "fdc"), microdisc_rom(nullptr), port_314(0), intrq_state(false), drq_state(false), hld_state(false)
 {

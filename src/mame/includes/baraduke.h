@@ -5,7 +5,7 @@
 class baraduke_state : public driver_device
 {
 public:
-	baraduke_state(const machine_config &mconfig, device_type type, const char *tag)
+	baraduke_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
@@ -48,7 +48,7 @@ public:
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(baraduke);
 	UINT32 screen_update_baraduke(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_baraduke(screen_device &screen, bool state);

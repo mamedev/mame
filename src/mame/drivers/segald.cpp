@@ -28,7 +28,7 @@ Todo:
 class segald_state : public driver_device
 {
 public:
-	segald_state(const machine_config &mconfig, device_type type, const char *tag)
+	segald_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc") ,
 		m_obj_ram(*this, "obj_ram"),
@@ -61,7 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(astron_FIX_write);
 	DECLARE_WRITE8_MEMBER(astron_io_bankswitch_w);
 	DECLARE_DRIVER_INIT(astron);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	UINT32 screen_update_astron(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	void astron_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);

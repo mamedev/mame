@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_CPU_H_HEADER_GUARD
@@ -19,6 +19,9 @@
 #		include <intrin.h>
 #		include <windows.h>
 #	endif // !BX_PLATFORM_XBOX360
+#	if BX_PLATFORM_WINRT
+#		define _InterlockedExchangeAdd64 InterlockedExchangeAdd64
+#	endif // BX_PLATFORM_WINRT
 extern "C" void _ReadBarrier();
 extern "C" void _WriteBarrier();
 extern "C" void _ReadWriteBarrier();

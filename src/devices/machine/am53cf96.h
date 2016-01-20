@@ -41,7 +41,7 @@ class am53cf96_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
-	am53cf96_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	am53cf96_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<am53cf96_device &>(device).m_irq_handler.set_callback(object); }
@@ -54,8 +54,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	static const device_timer_id TIMER_TRANSFER = 0;

@@ -21,17 +21,17 @@ class isa8_com_device :
 {
 public:
 		// construction/destruction
-		isa8_com_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	isa8_com_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+		isa8_com_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	isa8_com_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_1) { m_isa->irq4_w(state); }
 	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_2) { m_isa->irq3_w(state); }
 protected:
 		// device-level overrides
-		virtual void device_start();
-		virtual void device_reset();
+		virtual void device_start() override;
+		virtual void device_reset() override;
 };
 
 
@@ -45,10 +45,10 @@ class isa8_com_at_device :
 {
 public:
 		// construction/destruction
-		isa8_com_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		isa8_com_at_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 

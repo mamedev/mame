@@ -27,7 +27,7 @@
 class mc1000_state : public driver_device
 {
 public:
-	mc1000_state(const machine_config &mconfig, device_type type, const char *tag)
+	mc1000_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_vdg(*this, MC6847_TAG),
@@ -76,10 +76,8 @@ public:
 	required_ioport m_joyakeymap;
 	required_ioport m_joybkeymap;
 
-	virtual void machine_start();
-	virtual void machine_reset();
-
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( printer_r );
 	DECLARE_WRITE8_MEMBER( printer_w );

@@ -169,12 +169,12 @@
 class hp64k_state : public driver_device
 {
 public:
-		hp64k_state(const machine_config &mconfig, device_type type, const char *tag);
+		hp64k_state(const machine_config &mconfig, device_type type, std::string tag);
 
-		virtual void driver_start();
+		virtual void driver_start() override;
 		//virtual void machine_start();
-		virtual void video_start();
-		virtual void machine_reset();
+		virtual void video_start() override;
+		virtual void machine_reset() override;
 
 		UINT8 hp64k_crtc_filter(UINT8 data);
 		DECLARE_WRITE16_MEMBER(hp64k_crtc_w);
@@ -347,7 +347,7 @@ static ADDRESS_MAP_START(cpu_io_map , AS_IO , 16 , hp64k_state)
 		AM_RANGE(HP_MAKE_IOADDR(12 , 0) , HP_MAKE_IOADDR(12 , 3)) AM_WRITE(hp64k_irl_mask_w)
 ADDRESS_MAP_END
 
-hp64k_state::hp64k_state(const machine_config &mconfig, device_type type, const char *tag)
+hp64k_state::hp64k_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig , type , tag),
 		m_cpu(*this , "cpu"),
 		m_crtc(*this , "crtc"),
@@ -402,7 +402,7 @@ void hp64k_state::machine_reset()
 		m_floppy_intrq = false;
 		m_floppy_drv_ctrl = ~0;
 		m_floppy_if_state = HP64K_FLPST_IDLE;
-		m_current_floppy = NULL;
+		m_current_floppy = nullptr;
 		m_floppy0_wpt = false;
 		m_floppy1_wpt = false;
 		m_beeper->set_state(0);
@@ -858,7 +858,7 @@ void hp64k_state::hp64k_update_drv_ctrl(void)
 		} else if (!BIT(m_floppy_drv_ctrl , 0)) {
 				new_drive = m_floppy0->get_device();
 		} else {
-				new_drive = NULL;
+				new_drive = nullptr;
 		}
 
 		if (new_drive != m_current_floppy) {
@@ -1398,7 +1398,7 @@ static MACHINE_CONFIG_START(hp64k , hp64k_state)
 				MCFG_I8251_DTR_HANDLER(WRITELINE(hp64k_state , hp64k_dtr_w));
 				MCFG_I8251_RTS_HANDLER(WRITELINE(hp64k_state , hp64k_rts_w));
 
-				MCFG_RS232_PORT_ADD("rs232" , default_rs232_devices , NULL)
+				MCFG_RS232_PORT_ADD("rs232" , default_rs232_devices , nullptr)
 				MCFG_RS232_RXD_HANDLER(WRITELINE(hp64k_state , hp64k_rs232_rxd_w))
 				MCFG_RS232_DCD_HANDLER(WRITELINE(hp64k_state , hp64k_rs232_dcd_w))
 				MCFG_RS232_CTS_HANDLER(WRITELINE(hp64k_state , hp64k_rs232_cts_w))

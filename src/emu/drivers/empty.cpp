@@ -21,12 +21,12 @@ class empty_state : public driver_device
 {
 public:
 	// constructor
-	empty_state(const machine_config &mconfig, device_type type, const char *tag)
+	empty_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 	{
 	}
 
-	virtual void machine_start()
+	virtual void machine_start() override
 	{
 		// force the UI to show the game select screen
 		ui_menu_select_game::force_game_select(machine(), &machine().render().ui_container());

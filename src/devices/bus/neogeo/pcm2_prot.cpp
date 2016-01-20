@@ -10,7 +10,7 @@
 extern const device_type PCM2_PROT = &device_creator<pcm2_prot_device>;
 
 
-pcm2_prot_device::pcm2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pcm2_prot_device::pcm2_prot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PCM2_PROT, "NeoGeo Protection (NEOPCM2)", tag, owner, clock, "pcm2_prot", __FILE__)
 {
 }
@@ -38,7 +38,7 @@ void pcm2_prot_device::neo_pcm2_snk_1999(UINT8* ymrom, UINT32 ymsize, int value)
 	int size = ymsize;
 	int i, j;
 
-	if( rom != NULL )
+	if( rom != nullptr )
 	{   /* swap address lines on the whole ROMs */
 		std::vector<UINT16> buffer(value / 2);
 

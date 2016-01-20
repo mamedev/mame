@@ -15,26 +15,26 @@
 
 class m6504_device : public m6502_device {
 public:
-	m6504_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m6504_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	class mi_6504_normal : public memory_interface {
 	public:
 		virtual ~mi_6504_normal() {}
-		virtual UINT8 read(UINT16 adr);
-		virtual UINT8 read_sync(UINT16 adr);
-		virtual UINT8 read_arg(UINT16 adr);
-		virtual void write(UINT16 adr, UINT8 val);
+		virtual UINT8 read(UINT16 adr) override;
+		virtual UINT8 read_sync(UINT16 adr) override;
+		virtual UINT8 read_arg(UINT16 adr) override;
+		virtual void write(UINT16 adr, UINT8 val) override;
 	};
 
 	class mi_6504_nd : public mi_6504_normal {
 	public:
 		virtual ~mi_6504_nd() {}
-		virtual UINT8 read_sync(UINT16 adr);
-		virtual UINT8 read_arg(UINT16 adr);
+		virtual UINT8 read_sync(UINT16 adr) override;
+		virtual UINT8 read_arg(UINT16 adr) override;
 	};
 
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 

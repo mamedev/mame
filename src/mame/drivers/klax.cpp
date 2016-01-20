@@ -24,7 +24,8 @@
 #include "sound/okim6295.h"
 #include "includes/klax.h"
 
-
+#include "cpu/z80/z80.h"
+#include "sound/msm5205.h"
 
 /*************************************
  *
@@ -91,7 +92,22 @@ static ADDRESS_MAP_START( klax_map, AS_PROGRAM, 16, klax_state )
 	AM_RANGE(0x3f2800, 0x3f3fff) AM_RAM
 ADDRESS_MAP_END
 
-
+static ADDRESS_MAP_START( klax2bl_map, AS_PROGRAM, 16, klax_state )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
+	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
+	AM_RANGE(0x260000, 0x260001) AM_READ_PORT("P1") AM_WRITE(klax_latch_w)
+	AM_RANGE(0x260002, 0x260003) AM_READ_PORT("P2")
+//  AM_RANGE(0x270000, 0x270001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff) // no OKI here
+	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x360000, 0x360001) AM_WRITE(interrupt_ack_w)
+	AM_RANGE(0x3e0000, 0x3e07ff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0xff00) AM_SHARE("palette")
+	AM_RANGE(0x3f0000, 0x3f0f7f) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
+	AM_RANGE(0x3f0f80, 0x3f0fff) AM_RAM AM_SHARE("mob:slip")
+	AM_RANGE(0x3f1000, 0x3f1fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write_ext) AM_SHARE("playfield_ext")
+	AM_RANGE(0x3f2000, 0x3f27ff) AM_RAM AM_SHARE("mob")
+	AM_RANGE(0x3f2800, 0x3f3fff) AM_RAM
+ADDRESS_MAP_END
 
 /*************************************
  *
@@ -148,6 +164,21 @@ static GFXDECODE_START( klax )
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,    0, 16 )      /* sprites & playfield */
 GFXDECODE_END
 
+static const gfx_layout bootleg_layout =
+{
+	8,8,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	{ 0,1,2,3,4,5,6,7 },
+	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
+	8*8
+};
+
+static GFXDECODE_START( klax2bl )
+	GFXDECODE_ENTRY( "gfx1", 0, bootleg_layout,  256, 16 )      /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,    0, 16 )      /* sprites & playfield */
+GFXDECODE_END
 
 
 /*************************************
@@ -194,7 +225,28 @@ static MACHINE_CONFIG_START( klax, klax_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+static ADDRESS_MAP_START( bootleg_sound_map, AS_PROGRAM, 8, klax_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+ADDRESS_MAP_END
 
+static MACHINE_CONFIG_DERIVED( klax2bl, klax )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(klax2bl_map)
+
+	MCFG_DEVICE_REMOVE("oki") // no 6295 here
+
+	MCFG_CPU_ADD("audiocpu", Z80, 6000000) /* ? */
+	MCFG_CPU_PROGRAM_MAP(bootleg_sound_map)
+
+	MCFG_GFXDECODE_MODIFY("gfxdecode", klax2bl)
+
+	// guess, probably something like this
+	MCFG_SOUND_ADD("msm", MSM5205, 375000)    /* ? */
+//  MCFG_MSM5205_VCLK_CB(WRITELINE(klax_state, m5205_int1)) /* interrupt function */
+//  MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz 4-bit */
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -259,6 +311,28 @@ ROM_START( klax2 )
 	ROM_LOAD( "136075-1002.8w.bin",  0x0000, 0x0117, CRC(4a7b6c44) SHA1(9579e098af3e5cd19bd14c361d3b1c5cb9047171) )
 	ROM_LOAD( "136075-1003.9w.bin",  0x0000, 0x0117, CRC(72f7f904) SHA1(f792b5bcc313c5f3338a569a6f376a3ebb1eabf7) )
 	ROM_LOAD( "136075-1004.6w.bin",  0x0000, 0x0117, CRC(6cd3270d) SHA1(84854b5beee539a80fc94f6e4637aa1c2543a1cb) )
+ROM_END
+
+ROM_START( klax2bl ) // derived from 'klax2' set
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
+	ROM_LOAD16_BYTE( "6.bin", 0x00000, 0x10000, CRC(3cfd2748) SHA1(165c446bab9df6517746451d056330386cb5212c) )
+	ROM_LOAD16_BYTE( "2.bin", 0x00001, 0x10000, CRC(910e5bf9) SHA1(2b5af427e7cbad8d4ed2a202900f227295e1dea9) )
+	ROM_LOAD16_BYTE( "5.bin", 0x20000, 0x10000, CRC(4fcacf88) SHA1(4ad87b03ac4cdf763586f8bf5d54bee950b6779c) )
+	ROM_LOAD16_BYTE( "1.bin", 0x20001, 0x10000, CRC(ed0e3585) SHA1(5dfdcca15fee6ec3ae8a47fff4d066860e902082) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 )
+	ROM_LOAD( "3.bin", 0x00000, 0x10000, CRC(b0441f1c) SHA1(edced52b86641ce6db934ba05435f1221a12809a) )
+	ROM_LOAD( "4.bin", 0x10000, 0x10000, CRC(a245e005) SHA1(8843edfa9deec405f491647d40007d0a38c25262) )
+
+	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_LOAD( "9.bin",  0x00000, 0x10000, CRC(ebe4bd96) SHA1(31f941e39aeaed6a64b35827df4d234cd641b47d) )
+	ROM_LOAD( "10.bin", 0x10000, 0x10000, CRC(e7ad1cbd) SHA1(4b37cbe5d3168e532b00e8e34e7b8cf6d69e3487) )
+	ROM_LOAD( "11.bin", 0x20000, 0x10000, CRC(ef7712fd) SHA1(9308b37a8b024837b32d10e358a5205fdc582214) )
+	ROM_LOAD( "12.bin", 0x30000, 0x10000, CRC(1e0c1262) SHA1(960d61b9751276e4d0dbfd3f07cadc1329079abc) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "7.bin", 0x00000, 0x10000, CRC(5c551e92) SHA1(cbff8fc4f4d370b6db2b4953ecbedd249916b891) )
+	ROM_LOAD( "8.bin", 0x10000, 0x10000, CRC(36764bbc) SHA1(5762996a327b5f7f93f42dad7eccb6297b3e4c0b) )
 ROM_END
 
 
@@ -364,3 +438,5 @@ GAME( 1989, klax2, klax, klax, klax, driver_device, 0, ROT0, "Atari Games", "Kla
 GAME( 1989, klax3, klax, klax, klax, driver_device, 0, ROT0, "Atari Games", "Klax (set 3)", 0 )
 GAME( 1989, klaxj, klax, klax, klax, driver_device, 0, ROT0, "Atari Games", "Klax (Japan)", 0 )
 GAME( 1989, klaxd, klax, klax, klax, driver_device, 0, ROT0, "Atari Games", "Klax (Germany)", 0 )
+
+GAME( 1989, klax2bl, klax, klax2bl, klax, driver_device, 0, ROT0, "bootleg", "Klax (set 2, bootleg)", MACHINE_NOT_WORKING )

@@ -31,7 +31,7 @@ V Virtual Memory
 class pimps_state : public driver_device
 {
 public:
-	pimps_state(const machine_config &mconfig, device_type type, const char *tag)
+	pimps_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_terminal(*this, TERMINAL_TAG),
 		m_maincpu(*this, "maincpu")
@@ -42,7 +42,7 @@ public:
 	DECLARE_READ8_MEMBER(term_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	required_device<generic_terminal_device> m_terminal;
 	required_device<cpu_device> m_maincpu;

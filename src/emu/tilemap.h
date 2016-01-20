@@ -692,8 +692,8 @@ public:
 	running_machine &machine() const { return m_machine; }
 
 	// tilemap creation
-	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated = NULL);
-	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated = NULL);
+	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated = nullptr);
+	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated = nullptr);
 
 	// tilemap list information
 	tilemap_t *find(int index) { return m_tilemap_list.find(index); }
@@ -724,10 +724,10 @@ class tilemap_device :  public device_t,
 {
 public:
 	// construction/destruction
-	tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tilemap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
 	static void static_set_bytes_per_entry(device_t &device, int bpe);
 	static void static_set_info_callback(device_t &device, tilemap_get_info_delegate tile_get_info);
 	static void static_set_layout(device_t &device, tilemap_standard_mapper mapper, int columns, int rows);
@@ -748,7 +748,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	// devices

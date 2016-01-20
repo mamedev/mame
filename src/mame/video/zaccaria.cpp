@@ -47,7 +47,7 @@ PALETTE_INIT_MEMBER(zaccaria_state, zaccaria)
 	compute_resistor_weights(0, 0xff, -1.0,
 								3, resistances_rg, weights_rg, 390, 0,
 								2, resistances_b,  weights_b,  470, 0,
-								0, 0, 0, 0, 0);
+								0, nullptr, nullptr, 0, 0);
 
 	for (i = 0; i < 0x200; i++)
 	{

@@ -22,7 +22,7 @@
 class n64_mess_state : public n64_state
 {
 public:
-	n64_mess_state(const machine_config &mconfig, device_type type, const char *tag)
+	n64_mess_state(const machine_config &mconfig, device_type type, std::string tag)
 		: n64_state(mconfig, type, tag)
 		{ }
 
@@ -284,7 +284,7 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 	n64_periphs *periphs = machine().device<n64_periphs>("rcp");
 	UINT8 *cart = memregion("user2")->base();
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		length = image.fread(cart, 0x4000000);
 	}

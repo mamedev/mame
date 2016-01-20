@@ -32,7 +32,7 @@
 class iskr103x_state : public driver_device
 {
 public:
-	iskr103x_state(const machine_config &mconfig, device_type type, const char *tag)
+	iskr103x_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
@@ -82,10 +82,10 @@ static MACHINE_CONFIG_START( iskr1030m, iskr103x_state )
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", iskr103x_isa8_cards, "cga_iskr1030m", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", iskr103x_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", iskr103x_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", iskr103x_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", iskr103x_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", iskr103x_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", iskr103x_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", iskr103x_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", iskr103x_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", iskr103x_isa8_cards, nullptr, false)
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_EC_1841)
 //  MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_ISKR_1030)
@@ -106,10 +106,10 @@ static MACHINE_CONFIG_START( iskr1031, iskr103x_state )
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", iskr103x_isa8_cards, "cga_iskr1031", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", iskr103x_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", iskr103x_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", iskr103x_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", iskr103x_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", iskr103x_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", iskr103x_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", iskr103x_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", iskr103x_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", iskr103x_isa8_cards, nullptr, false)
 
 //  MCFG_SOFTWARE_LIST_ADD("flop_list", "iskr1031")
 

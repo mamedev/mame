@@ -29,7 +29,7 @@
 class chsuper_state : public driver_device
 {
 public:
-	chsuper_state(const machine_config &mconfig, device_type type, const char *tag)
+	chsuper_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_gfxdecode(*this, "gfxdecode"),
@@ -42,7 +42,7 @@ public:
 	int m_tilexor;
 	UINT8 m_blacklamp;
 	UINT8 m_redlamp;
-	UINT8 *m_vram;
+	std::unique_ptr<UINT8[]> m_vram;
 
 	required_device<z180_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -54,7 +54,7 @@ protected:
 	//virtual void machine_start();
 	//virtual void machine_reset();
 
-	virtual void video_start();
+	virtual void video_start() override;
 public:
 	DECLARE_DRIVER_INIT(chsuper3);
 	DECLARE_DRIVER_INIT(chmpnum);
@@ -65,7 +65,7 @@ public:
 
 void chsuper_state::video_start()
 {
-	m_vram = auto_alloc_array_clear(machine(), UINT8, 1 << 14);
+	m_vram = make_unique_clear<UINT8[]>(1 << 14);
 }
 
 UINT32 chsuper_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -137,12 +137,12 @@ WRITE8_MEMBER( chsuper_state::chsuper_vram_w )
 
 WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
 {
-	coin_counter_w(machine(), 0, data & 0x01);  // Coin counter
-	output_set_lamp_value(0, (data >> 1) & 1);  // Hold 1 / Black (Nero) lamp.
-	coin_counter_w(machine(), 1, data & 0x04);  // Payout / Ticket Out pulse
-	output_set_lamp_value(1, (data >> 3) & 1);  // Hold 2 / Low (Bassa) lamp.
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);  // Coin counter
+	output().set_lamp_value(0, (data >> 1) & 1);  // Hold 1 / Black (Nero) lamp.
+	machine().bookkeeping().coin_counter_w(1, data & 0x04);  // Payout / Ticket Out pulse
+	output().set_lamp_value(1, (data >> 3) & 1);  // Hold 2 / Low (Bassa) lamp.
 	// D4: unused...
-	output_set_lamp_value(5, (data >> 5) & 1);  // BET lamp
+	output().set_lamp_value(5, (data >> 5) & 1);  // BET lamp
 	// D6: ticket motor...
 	// D7: unused...
 
@@ -153,11 +153,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
 
 	if ((m_blacklamp == 1) & (m_redlamp == 1))  // if both are ON...
 	{
-		output_set_lamp_value(2, 1);            // HOLD 3 ON
+		output().set_lamp_value(2, 1);            // HOLD 3 ON
 	}
 	else
 	{
-		output_set_lamp_value(2, 0);            // otherwise HOLD 3 OFF
+		output().set_lamp_value(2, 0);            // otherwise HOLD 3 OFF
 	}
 }
 
@@ -165,11 +165,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
 {
 	// D0: unknown...
 	// D1: unused...
-	output_set_lamp_value(3, (data >> 2) & 1);  // Hold 4 / High (Alta) lamp.
+	output().set_lamp_value(3, (data >> 2) & 1);  // Hold 4 / High (Alta) lamp.
 	// D3: unused...
 	// D4: unused...
-	output_set_lamp_value(4, (data >> 5) & 1);  // Hold 5 / Red (Rosso) / Gamble (Raddoppio) lamp.
-	output_set_lamp_value(6, (data >> 6) & 1);  // Start / Gamble (Raddoppio) lamp.
+	output().set_lamp_value(4, (data >> 5) & 1);  // Hold 5 / Red (Rosso) / Gamble (Raddoppio) lamp.
+	output().set_lamp_value(6, (data >> 6) & 1);  // Start / Gamble (Raddoppio) lamp.
 	// D7: unused...
 
 /*  Workaround to get the HOLD 3 lamp line active,
@@ -179,11 +179,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
 
 	if ((m_blacklamp == 1) & (m_redlamp == 1))  // if both are ON...
 	{
-		output_set_lamp_value(2, 1);    // Hold 3 ON
+		output().set_lamp_value(2, 1);    // Hold 3 ON
 	}
 	else
 	{
-		output_set_lamp_value(2, 0);    // Hold 3 OFF
+		output().set_lamp_value(2, 0);    // Hold 3 OFF
 	}
 }
 
@@ -399,13 +399,13 @@ ROM_END
 
 DRIVER_INIT_MEMBER(chsuper_state,chsuper2)
 {
-	UINT8 *buffer;
+	std::unique_ptr<UINT8[]> buffer;
 	UINT8 *rom = memregion("gfx1")->base();
 	int i;
 
 	m_tilexor = 0x7f00;
 
-	buffer = auto_alloc_array(machine(), UINT8, 0x100000);
+	buffer = std::make_unique<UINT8[]>(0x100000);
 
 	for (i=0;i<0x100000;i++)
 	{
@@ -416,18 +416,18 @@ DRIVER_INIT_MEMBER(chsuper_state,chsuper2)
 		buffer[j] = rom[i];
 	}
 
-	memcpy(rom,buffer,0x100000);
+	memcpy(rom,buffer.get(),0x100000);
 }
 
 DRIVER_INIT_MEMBER(chsuper_state,chsuper3)
 {
-	UINT8 *buffer;
+	std::unique_ptr<UINT8[]> buffer;
 	UINT8 *rom = memregion("gfx1")->base();
 	int i;
 
 	m_tilexor = 0x0e00;
 
-	buffer = auto_alloc_array(machine(), UINT8, 0x100000);
+	buffer = std::make_unique<UINT8[]>(0x100000);
 
 	for (i=0;i<0x100000;i++)
 	{
@@ -438,18 +438,18 @@ DRIVER_INIT_MEMBER(chsuper_state,chsuper3)
 		buffer[j] = rom[i];
 	}
 
-	memcpy(rom,buffer,0x100000);
+	memcpy(rom,buffer.get(),0x100000);
 }
 
 DRIVER_INIT_MEMBER(chsuper_state,chmpnum)
 {
-	UINT8 *buffer;
+	std::unique_ptr<UINT8[]> buffer;
 	UINT8 *rom = memregion("gfx1")->base();
 	int i;
 
 	m_tilexor = 0x1800;
 
-	buffer = auto_alloc_array(machine(), UINT8, 0x100000);
+	buffer = std::make_unique<UINT8[]>(0x100000);
 
 	for (i=0;i<0x100000;i++)
 	{
@@ -464,7 +464,7 @@ DRIVER_INIT_MEMBER(chsuper_state,chmpnum)
 		buffer[j] = rom[i];
 	}
 
-	memcpy(rom,buffer,0x100000);
+	memcpy(rom,buffer.get(),0x100000);
 }
 
 

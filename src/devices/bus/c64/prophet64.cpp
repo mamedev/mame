@@ -26,7 +26,7 @@ const device_type C64_PROPHET64 = &device_creator<c64_prophet64_cartridge_device
 //  c64_prophet64_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_prophet64_cartridge_device::c64_prophet64_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c64_prophet64_cartridge_device::c64_prophet64_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_PROPHET64, "PROPHET64", tag, owner, clock, "c64_prophet64", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_bank(0)

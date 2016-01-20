@@ -39,7 +39,7 @@ class rtc4543_device :  public device_t,
 {
 public:
 	// construction/destruction
-	rtc4543_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rtc4543_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( wr_w );
@@ -51,13 +51,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_rtc_interface overrides
-	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second);
-	virtual bool rtc_feature_leap_year() { return true; }
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
+	virtual bool rtc_feature_leap_year() override { return true; }
 
 private:
 	devcb_write_line data_cb;

@@ -51,7 +51,7 @@ device_adam_expansion_slot_card_interface::device_adam_expansion_slot_card_inter
 //  adam_expansion_slot_device - constructor
 //-------------------------------------------------
 
-adam_expansion_slot_device::adam_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+adam_expansion_slot_device::adam_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ADAM_EXPANSION_SLOT, "ADAM expansion slot", tag, owner, clock, "adam_expansion_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	device_image_interface(mconfig, *this),
@@ -90,9 +90,9 @@ bool adam_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
-		size_t size = 0;
+		size_t size;
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			size = length();
 
@@ -114,7 +114,7 @@ bool adam_expansion_slot_device::call_load()
 
 bool adam_expansion_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 
 	return true;
 }
@@ -124,9 +124,9 @@ bool adam_expansion_slot_device::call_softlist_load(software_list_device &swlist
 //  get_default_card_software -
 //-------------------------------------------------
 
-void adam_expansion_slot_device::get_default_card_software(std::string &result)
+std::string adam_expansion_slot_device::get_default_card_software()
 {
-	software_get_default_slot(result, "standard");
+	return software_get_default_slot("standard");
 }
 
 
@@ -136,7 +136,7 @@ void adam_expansion_slot_device::get_default_card_software(std::string &result)
 
 UINT8 adam_expansion_slot_device::bd_r(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		data = m_card->adam_bd_r(space, offset, data, bmreq, biorq, aux_rom_cs, cas1, cas2);
 	}
@@ -151,7 +151,7 @@ UINT8 adam_expansion_slot_device::bd_r(address_space &space, offs_t offset, UINT
 
 void adam_expansion_slot_device::bd_w(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		m_card->adam_bd_w(space, offset, data, bmreq, biorq, aux_rom_cs, cas1, cas2);
 	}

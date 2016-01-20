@@ -406,7 +406,7 @@ static const floppy_interface vtech2_floppy_interface =
 {
 	FLOPPY_STANDARD_5_25_SSDD_40,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL
+	nullptr
 };
 
 static MACHINE_CONFIG_START( laser350, vtech2_state )

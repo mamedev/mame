@@ -52,10 +52,13 @@ typedef device_delegate<void (void)> ttl74148_output_delegate;
 class ttl74148_device : public device_t
 {
 public:
-	ttl74148_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ttl74148_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~ttl74148_device() {}
 
-	static void set_output_callback(device_t &device, ttl74148_output_delegate callback) { downcast<ttl74148_device &>(device).m_output_cb = callback; }
+	static void set_output_callback(device_t &device, ttl74148_output_delegate callback)
+	{
+		downcast<ttl74148_device &>(device).m_output_cb = callback;
+	}
 
 	/* must call update() after setting the inputs */
 	void update();
@@ -68,8 +71,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 private:
 	// internal state
 	ttl74148_output_delegate m_output_cb;

@@ -268,7 +268,7 @@
 class blitz_state : public driver_device
 {
 public:
-	blitz_state(const machine_config &mconfig, device_type type, const char *tag)
+	blitz_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -286,7 +286,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_a_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(blitz);
 	UINT32 screen_update_megadpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -360,7 +360,7 @@ PALETTE_INIT_MEMBER(blitz_state, blitz)
 
 	/* 0000KBGR */
 
-	if (color_prom == 0) return;
+	if (color_prom == nullptr) return;
 
 	for (i = 0;i < palette.entries();i++)
 	{
@@ -419,16 +419,16 @@ WRITE8_MEMBER(blitz_state::mux_w)
 
 WRITE8_MEMBER(blitz_state::lamps_a_w)
 {
-//  output_set_lamp_value(0, 1 - ((data) & 1));         /* Lamp 0 */
-//  output_set_lamp_value(1, 1 - ((data >> 1) & 1));    /* Lamp 1 */
-//  output_set_lamp_value(2, 1 - ((data >> 2) & 1));    /* Lamp 2 */
-//  output_set_lamp_value(3, 1 - ((data >> 3) & 1));    /* Lamp 3 */
-//  output_set_lamp_value(4, 1 - ((data >> 4) & 1));    /* Lamp 4 */
+//  output().set_lamp_value(0, 1 - ((data) & 1));         /* Lamp 0 */
+//  output().set_lamp_value(1, 1 - ((data >> 1) & 1));    /* Lamp 1 */
+//  output().set_lamp_value(2, 1 - ((data >> 2) & 1));    /* Lamp 2 */
+//  output().set_lamp_value(3, 1 - ((data >> 3) & 1));    /* Lamp 3 */
+//  output().set_lamp_value(4, 1 - ((data >> 4) & 1));    /* Lamp 4 */
 
 //  popmessage("written : %02X", data);
-//  coin_counter_w(machine(), 0, data & 0x40);    /* counter1 */
-//  coin_counter_w(machine(), 1, data & 0x80);    /* counter2 */
-//  coin_counter_w(machine(), 2, data & 0x20);    /* counter3 */
+//  machine().bookkeeping().coin_counter_w(0, data & 0x40);    /* counter1 */
+//  machine().bookkeeping().coin_counter_w(1, data & 0x80);    /* counter2 */
+//  machine().bookkeeping().coin_counter_w(2, data & 0x20);    /* counter3 */
 }
 
 
@@ -764,7 +764,7 @@ ROM_START( megadpkr )
 	ROM_LOAD( "mega-1.u1",  0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_FILL(               0x0000, 0x2000, 0x000000 ) /* filling the R-G bitplanes */
 	ROM_LOAD( "car1.5a",    0x2000, 0x1000, CRC(29e244d2) SHA1(c309a5ee6922bf2752d218c134edb3ef5f808afa) )    /* text chars / cards deck gfx, bitplane3 */
 
 	ROM_REGION( 0x3000, "gfx2", 0 )
@@ -813,7 +813,7 @@ ROM_START( megadpkrb )
 	ROM_LOAD( "u11.bin",  0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_FILL(               0x0000, 0x2000, 0x0000 ) /* filling the R-G bitplanes */
 	ROM_LOAD( "car1_5a.bin",    0x2000, 0x1000, CRC(29e244d2) SHA1(c309a5ee6922bf2752d218c134edb3ef5f808afa) )    /* text chars / cards deck gfx, bitplane3 */
 
 	ROM_REGION( 0x3000, "gfx2", 0 )

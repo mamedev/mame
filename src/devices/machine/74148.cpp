@@ -46,7 +46,7 @@
 
 const device_type TTL74148 = &device_creator<ttl74148_device>;
 
-ttl74148_device::ttl74148_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ttl74148_device::ttl74148_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, TTL74148, "74148 TTL", tag, owner, clock, "74148", __FILE__),
 					m_enable_input(0),
 					m_output(0),
@@ -56,8 +56,8 @@ ttl74148_device::ttl74148_device(const machine_config &mconfig, const char *tag,
 					m_last_output_valid(0),
 					m_last_enable_output(0)
 {
-	for (int i = 0; i < 8; i++)
-		m_input_lines[i] = 0;
+	for (auto & elem : m_input_lines)
+		elem = 0;
 }
 
 //-------------------------------------------------

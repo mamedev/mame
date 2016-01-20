@@ -40,7 +40,7 @@ Up to 4096 bytes can be addressed.
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF( 3, 4 ) verboselog( device_t *device, int n_level, const char *s_fmt, ... )
+static inline void ATTR_PRINTF( 3, 4 ) verboselog( device_t *device, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -49,7 +49,7 @@ INLINE void ATTR_PRINTF( 3, 4 ) verboselog( device_t *device, int n_level, const
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		device->logerror( "%s: I2CMEM(%s) %s", device->machine().describe_context( ), device->tag(), buf );
+		device->logerror( "%s: I2CMEM(%s) %s", device->machine().describe_context( ), device->tag().c_str(), buf );
 	}
 }
 
@@ -74,7 +74,7 @@ ADDRESS_MAP_END
 //  i2cmem_device - constructor
 //-------------------------------------------------
 
-i2cmem_device::i2cmem_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+i2cmem_device::i2cmem_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock )
 	: device_t(mconfig, I2CMEM, "I2C Memory", tag, owner, clock, "i2cmem", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
@@ -159,7 +159,7 @@ void i2cmem_device::device_reset()
 
 const address_space_config *i2cmem_device::memory_space_config( address_spacenum spacenum ) const
 {
-	return ( spacenum == 0 ) ? &m_space_config : NULL;
+	return ( spacenum == 0 ) ? &m_space_config : nullptr;
 }
 
 
@@ -179,16 +179,16 @@ void i2cmem_device::nvram_default()
 	}
 
 	/* populate from a memory region if present */
-	if( m_region != NULL )
+	if( m_region != nullptr )
 	{
 		if( m_region->bytes() != i2cmem_bytes )
 		{
-			fatalerror( "i2cmem region '%s' wrong size (expected size = 0x%X)\n", tag(), i2cmem_bytes );
+			fatalerror( "i2cmem region '%s' wrong size (expected size = 0x%X)\n", tag().c_str(), i2cmem_bytes );
 		}
 
 		if( m_region->bytewidth() != 1 )
 		{
-			fatalerror( "i2cmem region '%s' needs to be an 8-bit region\n", tag() );
+			fatalerror( "i2cmem region '%s' needs to be an 8-bit region\n", tag().c_str() );
 		}
 
 		UINT8 *default_data = m_region->base();

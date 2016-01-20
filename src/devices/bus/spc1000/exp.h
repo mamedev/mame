@@ -15,8 +15,6 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write) {}
-
-protected:
 };
 
 
@@ -27,11 +25,11 @@ class spc1000_exp_device : public device_t,
 {
 public:
 	// construction/destruction
-	spc1000_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	spc1000_exp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~spc1000_exp_device();
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read);

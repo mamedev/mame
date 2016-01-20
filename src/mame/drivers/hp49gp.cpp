@@ -24,7 +24,7 @@ struct lcd_spi_t
 class hp49gp_state : public driver_device
 {
 public:
-	hp49gp_state(const machine_config &mconfig, device_type type, const char *tag)
+	hp49gp_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_s3c2410(*this, "s3c2410"),
 		m_steppingstone(*this, "steppingstone"),
@@ -35,8 +35,8 @@ public:
 	required_shared_ptr<UINT32> m_steppingstone;
 	lcd_spi_t m_lcd_spi;
 	DECLARE_DRIVER_INIT(hp49gp);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
 	DECLARE_READ32_MEMBER(s3c2410_gpio_port_r);
 	DECLARE_WRITE32_MEMBER(s3c2410_gpio_port_w);

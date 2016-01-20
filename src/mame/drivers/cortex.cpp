@@ -30,13 +30,13 @@
 class cortex_state : public driver_device
 {
 public:
-	cortex_state(const machine_config &mconfig, device_type type, const char *tag)
+	cortex_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_ram(*this, "ram")
 		{ }
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<tms9995_device> m_maincpu;
 	required_shared_ptr<UINT8> m_p_ram;
 };

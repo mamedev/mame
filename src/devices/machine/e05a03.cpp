@@ -16,7 +16,7 @@
 
 const device_type E05A03 = &device_creator<e05a03_device>;
 
-e05a03_device::e05a03_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e05a03_device::e05a03_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, E05A03, "E05A03", tag, owner, clock, "e05a03", __FILE__),
 	m_write_nlq_lp(*this),
 	m_write_pe_lp(*this),
@@ -118,8 +118,8 @@ WRITE8_MEMBER( e05a03_device::write )
 		break;
 
 	/* printhead */
-    case 0x04: m_printhead = (m_printhead & 0x100) | (data == 0 ? 0xff : 0); break;
-    case 0x05: m_printhead = (m_printhead & 0x0ff) | (BIT(data, 7) ? (1 << 8) : 0); break;
+	case 0x04: m_printhead = (m_printhead & 0x100) | (data == 0 ? 0xff : 0); break;
+	case 0x05: m_printhead = (m_printhead & 0x0ff) | (BIT(data, 7) ? (1 << 8) : 0); break;
 
 	/* paper feed and carriage motor phase data*/
 	case 0x06: m_pf_motor = (data & 0xf0) >> 4; break;

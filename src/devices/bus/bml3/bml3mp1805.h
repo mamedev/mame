@@ -27,11 +27,11 @@ class bml3bus_mp1805_device:
 {
 public:
 	// construction/destruction
-	bml3bus_mp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bml3bus_mp1805_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
 	DECLARE_READ8_MEMBER(bml3_mp1805_r);
 	DECLARE_WRITE8_MEMBER(bml3_mp1805_w);
@@ -39,8 +39,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( bml3_mc6843_intrq_w );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	required_device<mc6843_device> m_mc6843;
 

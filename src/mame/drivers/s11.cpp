@@ -232,7 +232,7 @@ WRITE8_MEMBER( s11_state::dig0_w )
 	data &= 0x7f;
 	m_strobe = data & 15;
 	m_diag = (data & 0x70) >> 4;
-	output_set_digit_value(60, patterns[data>>4]); // diag digit
+	output().set_digit_value(60, patterns[data>>4]); // diag digit
 	m_segment1 = 0;
 	m_segment2 = 0;
 }
@@ -243,7 +243,7 @@ WRITE8_MEMBER( s11_state::dig1_w )
 	m_segment2 |= 0x20000;
 	if ((m_segment2 & 0x70000) == 0x30000)
 	{
-		output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		m_segment2 |= 0x40000;
 	}
 }
@@ -267,7 +267,7 @@ WRITE8_MEMBER( s11_state::pia2c_pa_w )
 	m_segment1 |= 0x10000;
 	if ((m_segment1 & 0x70000) == 0x30000)
 	{
-		output_set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		m_segment1 |= 0x40000;
 	}
 }
@@ -278,7 +278,7 @@ WRITE8_MEMBER( s11_state::pia2c_pb_w )
 	m_segment1 |= 0x20000;
 	if ((m_segment1 & 0x70000) == 0x30000)
 	{
-		output_set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		m_segment1 |= 0x40000;
 	}
 }
@@ -301,7 +301,7 @@ WRITE8_MEMBER( s11_state::pia34_pa_w )
 	m_segment2 |= 0x10000;
 	if ((m_segment2 & 0x70000) == 0x30000)
 	{
-		output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		m_segment2 |= 0x40000;
 	}
 }
@@ -502,7 +502,7 @@ ROM_START(grand_l4)
 	ROM_LOAD("lzrd_u26.l4", 0x4000, 0x2000, CRC(5fe50db6) SHA1(7e2adfefce5c33ad605606574dbdfb2642aa0e85))
 	ROM_RELOAD( 0x6000, 0x2000)
 	ROM_LOAD("lzrd_u27.l4", 0x8000, 0x8000, CRC(6462ca55) SHA1(0ebfa998d3cefc213ada9ed815d44977120e5d6d))
-	ROM_FILL(0x6035, 1, 0) // default to English
+	ROM_FILL(0x6035, 1, 0x00) // default to English
 
 	// according to the manual these should be 32K roms just like the other games here
 	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)

@@ -94,7 +94,7 @@ void apple1_state::terminal_draw(screen_device &screen, bitmap_ind16 &dest, cons
 {
 	m_current_terminal = terminal;
 	terminal->tm->draw(screen, dest, cliprect, 0, 0);
-	m_current_terminal = NULL;
+	m_current_terminal = nullptr;
 }
 
 void apple1_state::verify_coords(terminal_t *terminal, int x, int y)

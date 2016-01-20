@@ -4,12 +4,13 @@
 class tiamc1_state : public driver_device
 {
 public:
-	tiamc1_state(const machine_config &mconfig, device_type type, const char *tag)
+	tiamc1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	std::unique_ptr<UINT8[]> m_videoram;
 	UINT8 *m_tileram;
 	UINT8 *m_charram;
 	UINT8 *m_spriteram_x;
@@ -21,7 +22,7 @@ public:
 	UINT8 m_bg_hshift;
 	tilemap_t *m_bg_tilemap1;
 	tilemap_t *m_bg_tilemap2;
-	rgb_t *m_palette_ptr;
+	std::unique_ptr<rgb_t[]> m_palette_ptr;
 	DECLARE_WRITE8_MEMBER(tiamc1_control_w);
 	DECLARE_WRITE8_MEMBER(tiamc1_videoram_w);
 	DECLARE_WRITE8_MEMBER(tiamc1_bankswitch_w);
@@ -34,8 +35,8 @@ public:
 	DECLARE_WRITE8_MEMBER(tiamc1_palette_w);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(tiamc1);
 	UINT32 screen_update_tiamc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -88,15 +89,15 @@ class tiamc1_sound_device : public device_t,
 							public device_sound_interface
 {
 public:
-	tiamc1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tiamc1_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~tiamc1_sound_device() { }
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
 	DECLARE_WRITE8_MEMBER( tiamc1_timer0_w );

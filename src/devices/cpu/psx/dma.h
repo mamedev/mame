@@ -37,7 +37,7 @@ struct psx_dma_channel
 class psxdma_device : public device_t
 {
 public:
-	psxdma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	psxdma_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<psxdma_device &>(device).m_irq_handler.set_callback(object); }
@@ -52,10 +52,10 @@ public:
 	size_t m_ramsize;
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	void dma_start_timer( int n_channel, UINT32 n_ticks );
@@ -63,8 +63,6 @@ private:
 	void dma_timer_adjust( int n_channel );
 	void dma_interrupt_update();
 	void dma_finished( int n_channel );
-	void write( offs_t offset, UINT32 data, UINT32 mem_mask );
-	UINT32 read( offs_t offset, UINT32 mem_mask );
 
 	psx_dma_channel m_channel[7];
 	UINT32 m_dpcp;

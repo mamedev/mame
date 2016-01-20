@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 #if 0
-INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UINT8* hbuff, const UINT32 hres);
-INLINE void divot_filter16(UINT8* r, UINT8* g, UINT8* b, UINT16* fbuff, UINT32 fbuff_index);
-INLINE void restore_filter16(INT32* r, INT32* g, INT32* b, UINT16* fbuff, UINT32 fbuff_index, UINT32 hres);
-INLINE void divot_filter16_buffer(INT32* r, INT32* g, INT32* b, color_t* vibuffer);
-INLINE void restore_filter16_buffer(INT32* r, INT32* g, INT32* b, color_t* vibuff, UINT32 hres);
-INLINE void restore_two(color_t* filtered, color_t* neighbour);
-INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb);
-INLINE UINT32 ge_two(UINT32 enb);
+static inline void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UINT8* hbuff, const UINT32 hres);
+static inline void divot_filter16(UINT8* r, UINT8* g, UINT8* b, UINT16* fbuff, UINT32 fbuff_index);
+static inline void restore_filter16(INT32* r, INT32* g, INT32* b, UINT16* fbuff, UINT32 fbuff_index, UINT32 hres);
+static inline void divot_filter16_buffer(INT32* r, INT32* g, INT32* b, color_t* vibuffer);
+static inline void restore_filter16_buffer(INT32* r, INT32* g, INT32* b, color_t* vibuff, UINT32 hres);
+static inline void restore_two(color_t* filtered, color_t* neighbour);
+static inline void video_max(UINT32* Pixels, UINT8* max, UINT32* enb);
+static inline UINT32 ge_two(UINT32 enb);
 
-INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UINT8* hbuff, const UINT32 hres)
+static inline void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UINT8* hbuff, const UINT32 hres)
 {
 	color_t penumax, penumin, max, min;
 	UINT16 pix = *vbuff;
@@ -210,7 +210,7 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 }
 
 // This needs to be fixed for endianness.
-INLINE void divot_filter16(UINT8* r, UINT8* g, UINT8* b, UINT16* fbuff, UINT32 fbuff_index)
+static inline void divot_filter16(UINT8* r, UINT8* g, UINT8* b, UINT16* fbuff, UINT32 fbuff_index)
 {
 	UINT8 leftr, leftg, leftb, rightr, rightg, rightb;
 	UINT16 leftpix, rightpix;
@@ -256,7 +256,7 @@ INLINE void divot_filter16(UINT8* r, UINT8* g, UINT8* b, UINT16* fbuff, UINT32 f
 	}
 }
 
-INLINE void divot_filter16_buffer(int* r, int* g, int* b, color_t* vibuffer)
+static inline void divot_filter16_buffer(int* r, int* g, int* b, color_t* vibuffer)
 {
 	color_t leftpix = vibuffer[-1];
 	color_t rightpix = vibuffer[1];
@@ -303,7 +303,7 @@ INLINE void divot_filter16_buffer(int* r, int* g, int* b, color_t* vibuffer)
 }
 
 // Fix me.
-INLINE void restore_filter16(int* r, int* g, int* b, UINT16* fbuff, UINT32 fbuff_index, UINT32 hres)
+static inline void restore_filter16(int* r, int* g, int* b, UINT16* fbuff, UINT32 fbuff_index, UINT32 hres)
 {
 	INT32 leftuppix = -hres - 1;
 	INT32 leftdownpix = hres - 1;
@@ -430,7 +430,7 @@ INLINE void restore_filter16(int* r, int* g, int* b, UINT16* fbuff, UINT32 fbuff
 	}
 }
 
-INLINE void restore_filter16_buffer(INT32* r, INT32* g, INT32* b, color_t* vibuff, UINT32 hres)
+static inline void restore_filter16_buffer(INT32* r, INT32* g, INT32* b, color_t* vibuff, UINT32 hres)
 {
 	color_t filtered;
 	color_t leftuppix, leftdownpix, leftpix;
@@ -474,7 +474,7 @@ INLINE void restore_filter16_buffer(INT32* r, INT32* g, INT32* b, color_t* vibuf
 }
 
 // This is wrong, only the 5 upper bits are compared.
-INLINE void restore_two(color_t* filtered, color_t* neighbour)
+static inline void restore_two(color_t* filtered, color_t* neighbour)
 {
 	if (neighbour->i.r > filtered->i.r)
 	{
@@ -502,7 +502,7 @@ INLINE void restore_two(color_t* filtered, color_t* neighbour)
 	}
 }
 
-INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
+static inline void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
 {
 	int i;
 	int pos = 0;
@@ -526,7 +526,7 @@ INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
 	*max = Pixels[pos];
 }
 
-INLINE UINT32 ge_two(UINT32 enb)
+static inline UINT32 ge_two(UINT32 enb)
 {
 	if(enb & 1)
 	{

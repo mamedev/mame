@@ -561,7 +561,7 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 	MCFG_F3853_EXT_INPUT_CB(vidbrain_state, f3853_int_req_w)
 
 	// cartridge
-	MCFG_VIDEOBRAIN_EXPANSION_SLOT_ADD(VIDEOBRAIN_EXPANSION_SLOT_TAG, vidbrain_expansion_cards, NULL)
+	MCFG_VIDEOBRAIN_EXPANSION_SLOT_ADD(VIDEOBRAIN_EXPANSION_SLOT_TAG, vidbrain_expansion_cards, nullptr)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vidbrain")

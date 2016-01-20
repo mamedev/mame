@@ -42,7 +42,7 @@ public:
 private:
 	// internal state
 	running_machine &       m_machine;              // reference to owning machine
-	tagmap_t<std::string>       m_parameters;
+	std::unordered_map<std::string,std::string>       m_parameters;
 };
 
 #endif  // __INPTPORT_H__ */

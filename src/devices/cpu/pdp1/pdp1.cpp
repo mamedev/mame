@@ -380,7 +380,7 @@
 const device_type PDP1 = &device_creator<pdp1_device>;
 
 
-pdp1_device::pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pdp1_device::pdp1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, PDP1, "PDP1", tag, owner, clock, "pdp1_cpu", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 18, 0)
 {
@@ -392,7 +392,7 @@ void pdp1_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const pdp1_reset_param_t *intf = reinterpret_cast<const pdp1_reset_param_t *>(static_config());
-	if (intf != NULL)
+	if (intf != nullptr)
 		*static_cast<pdp1_reset_param_t *>(this) = *intf;
 
 	// or initialize to defaults if none provided
@@ -404,9 +404,9 @@ void pdp1_device::device_config_complete()
 		hw_mul_div = 0;
 		type_20_sbs = 0;
 
-		for (int i = 0; i < 64; i++)
+		for (auto & elem : extern_iot)
 		{
-			memset(&extern_iot[i], 0, sizeof(extern_iot[i]));
+			memset(&elem, 0, sizeof(elem));
 		}
 	}
 }
@@ -737,7 +737,7 @@ void pdp1_device::state_export(const device_state_entry &entry)
 }
 
 
-void pdp1_device::state_string_export(const device_state_entry &entry, std::string &str)
+void pdp1_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

@@ -21,7 +21,7 @@
 class chessmst_state : public driver_device
 {
 public:
-	chessmst_state(const machine_config &mconfig, device_type type, const char *tag)
+	chessmst_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_speaker(*this, "speaker")
@@ -34,7 +34,7 @@ public:
 	UINT16 m_led_sel;
 	UINT8 m_sensor[64];
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER( pio1_port_a_w );
 	DECLARE_WRITE8_MEMBER( pio1_port_b_w );
@@ -170,25 +170,25 @@ WRITE8_MEMBER( chessmst_state::pio1_port_a_w )
 	for (int row=1; row<=8; row++)
 	{
 		if (m_led_sel & 0x01)
-			output_set_indexed_value("led_a", row, BIT(data, 8-row));
+			output().set_indexed_value("led_a", row, BIT(data, 8-row));
 		if (m_led_sel & 0x02)
-			output_set_indexed_value("led_b", row, BIT(data, 8-row));
+			output().set_indexed_value("led_b", row, BIT(data, 8-row));
 		if (m_led_sel & 0x04)
-			output_set_indexed_value("led_c", row, BIT(data, 8-row));
+			output().set_indexed_value("led_c", row, BIT(data, 8-row));
 		if (m_led_sel & 0x08)
-			output_set_indexed_value("led_d", row, BIT(data, 8-row));
+			output().set_indexed_value("led_d", row, BIT(data, 8-row));
 		if (m_led_sel & 0x10)
-			output_set_indexed_value("led_e", row, BIT(data, 8-row));
+			output().set_indexed_value("led_e", row, BIT(data, 8-row));
 		if (m_led_sel & 0x20)
-			output_set_indexed_value("led_f", row, BIT(data, 8-row));
+			output().set_indexed_value("led_f", row, BIT(data, 8-row));
 		if (m_led_sel & 0x40)
-			output_set_indexed_value("led_g", row, BIT(data, 8-row));
+			output().set_indexed_value("led_g", row, BIT(data, 8-row));
 		if (m_led_sel & 0x80)
-			output_set_indexed_value("led_h", row, BIT(data, 8-row));
+			output().set_indexed_value("led_h", row, BIT(data, 8-row));
 		if (m_led_sel & 0x100)
-			output_set_indexed_value("led_i", row, BIT(data, 8-row));
+			output().set_indexed_value("led_i", row, BIT(data, 8-row));
 		if (m_led_sel & 0x200)
-			output_set_indexed_value("led_j", row, BIT(data, 8-row));
+			output().set_indexed_value("led_j", row, BIT(data, 8-row));
 	}
 
 	m_led_sel = 0;

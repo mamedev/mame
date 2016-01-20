@@ -58,7 +58,7 @@
 class bcs3_state : public driver_device
 {
 public:
-	bcs3_state(const machine_config &mconfig, device_type type, const char *tag)
+	bcs3_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ctc(*this, "ctc")
@@ -337,7 +337,7 @@ WRITE_LINE_MEMBER( bcs3_state::ctc_z1_w )
 static const z80_daisy_config daisy_chain_intf[] =
 {
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 DRIVER_INIT_MEMBER( bcs3_state, bcs3a )

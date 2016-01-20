@@ -126,7 +126,7 @@ Dip locations verified for:
 class m63_state : public driver_device
 {
 public:
-	m63_state(const machine_config &mconfig, device_type type, const char *tag)
+	m63_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_scrollram(*this, "scrollram"),
@@ -163,7 +163,7 @@ public:
 	int      m_sound_status;
 	int      m_p1;
 	int      m_p2;
-	INT16    *m_samplebuf;
+	std::unique_ptr<INT16[]>    m_samplebuf;
 
 	/* sound devices */
 	required_device<cpu_device> m_soundcpu;
@@ -384,7 +384,7 @@ UINT32 m63_state::screen_update_m63(screen_device &screen, bitmap_ind16 &bitmap,
 
 WRITE8_MEMBER(m63_state::coin_w)
 {
-	coin_counter_w(machine(), offset, data & 0x01);
+	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
 }
 
 WRITE8_MEMBER(m63_state::snd_irq_w)
@@ -399,9 +399,9 @@ WRITE8_MEMBER(m63_state::snddata_w)
 		m_ay1->address_w(space, 0, offset);
 	else if ((m_p2 & 0xf0) == 0xa0)
 		m_ay1->data_w(space, 0, offset);
-	else if (m_ay2 != NULL && (m_p1 & 0xe0) == 0x60)
+	else if (m_ay2 != nullptr && (m_p1 & 0xe0) == 0x60)
 		m_ay2->address_w(space, 0, offset);
-	else if (m_ay2 != NULL && (m_p1 & 0xe0) == 0x40)
+	else if (m_ay2 != nullptr && (m_p1 & 0xe0) == 0x40)
 			m_ay2->data_w(space, 0, offset);
 	else if ((m_p2 & 0xf0) == 0x70 )
 		m_sound_status = offset;
@@ -449,7 +449,7 @@ READ8_MEMBER(m63_state::snddata_r)
 WRITE8_MEMBER(m63_state::fghtbskt_samples_w)
 {
 	if (data & 1)
-		m_samples->start_raw(0, m_samplebuf + ((data & 0xf0) << 8), 0x2000, 8000);
+		m_samples->start_raw(0, m_samplebuf.get() + ((data & 0xf0) << 8), 0x2000, 8000);
 }
 
 WRITE8_MEMBER(m63_state::nmi_mask_w)
@@ -704,8 +704,8 @@ SAMPLES_START_CB_MEMBER(m63_state::fghtbskt_sh_start)
 	int i, len = memregion("samples")->bytes();
 	UINT8 *ROM = memregion("samples")->base();
 
-	m_samplebuf = auto_alloc_array(machine(), INT16, len);
-	save_pointer(NAME(m_samplebuf), len);
+	m_samplebuf = std::make_unique<INT16[]>(len);
+	save_pointer(NAME(m_samplebuf.get()), len);
 
 	for(i = 0; i < len; i++)
 		m_samplebuf[i] = ((INT8)(ROM[i] ^ 0x80)) * 256;
@@ -974,7 +974,7 @@ ROM_START( fghtbskt )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "fb08.12f",     0x0000, 0x1000, CRC(271cd7b8) SHA1(00cfeb6ba429cf6cc59d6542dea8de2ca79155ed) )
-	ROM_FILL(                 0x1000, 0x1000, 0 )
+	ROM_FILL(                 0x1000, 0x1000, 0x00 )
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
 	ROM_LOAD( "fb21.25e",     0x0000, 0x2000, CRC(02843591) SHA1(e38ccc97dcbd642d0ac768837f7baf1573fdb91f) )

@@ -70,12 +70,12 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( hsscsi )
 	MCFG_NSCSI_BUS_ADD(SCSI_BUS_TAG)
-	MCFG_NSCSI_ADD("scsibus:0", hsscsi_devices, 0, false)
-	MCFG_NSCSI_ADD("scsibus:1", hsscsi_devices, 0, false)
-	MCFG_NSCSI_ADD("scsibus:2", hsscsi_devices, 0, false)
-	MCFG_NSCSI_ADD("scsibus:3", hsscsi_devices, 0, false)
-	MCFG_NSCSI_ADD("scsibus:4", hsscsi_devices, 0, false)
-	MCFG_NSCSI_ADD("scsibus:5", hsscsi_devices, 0, false)
+	MCFG_NSCSI_ADD("scsibus:0", hsscsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:1", hsscsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:2", hsscsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:3", hsscsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:4", hsscsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:5", hsscsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:6", hsscsi_devices, "harddisk", false)
 	MCFG_NSCSI_ADD("scsibus:7", hsscsi_devices, "ncr5380", true)
 	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5380", ncr5380)
@@ -113,7 +113,7 @@ const rom_entry *a2bus_hsscsi_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_hsscsi_device::a2bus_hsscsi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_hsscsi_device::a2bus_hsscsi_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_ncr5380(*this, SCSI_5380_TAG),
@@ -121,7 +121,7 @@ a2bus_hsscsi_device::a2bus_hsscsi_device(const machine_config &mconfig, device_t
 {
 }
 
-a2bus_hsscsi_device::a2bus_hsscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_hsscsi_device::a2bus_hsscsi_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, A2BUS_HSSCSI, "Apple II High-Speed SCSI Card", tag, owner, clock, "a2hsscsi", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_ncr5380(*this, SCSI_5380_TAG),

@@ -9,7 +9,7 @@
 class gaelco_state : public driver_device
 {
 public:
-	gaelco_state(const machine_config &mconfig, device_type type, const char *tag)
+	gaelco_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
@@ -41,7 +41,7 @@ public:
 	DECLARE_WRITE16_MEMBER(gaelco_vram_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco_screen0);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco_screen1);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_VIDEO_START(bigkarnk);
 	DECLARE_VIDEO_START(maniacsq);
 	UINT32 screen_update_bigkarnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

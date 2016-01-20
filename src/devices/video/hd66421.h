@@ -44,7 +44,7 @@ class hd66421_device :  public device_t,
 {
 public:
 	// construction/destruction
-	hd66421_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd66421_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( reg_idx_r );
 	DECLARE_WRITE8_MEMBER( reg_idx_w );
@@ -56,11 +56,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// address space configurations
 	const address_space_config      m_space_config;

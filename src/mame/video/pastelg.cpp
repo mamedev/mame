@@ -284,7 +284,7 @@ void pastelg_state::video_start()
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_videoram = auto_alloc_array_clear(machine(), UINT8, width * height);
+	m_videoram = make_unique_clear<UINT8[]>(width * height);
 
 	save_item(NAME(m_blitter_desty));
 	save_item(NAME(m_blitter_sizex));
@@ -296,7 +296,7 @@ void pastelg_state::video_start()
 	save_item(NAME(m_blitter_direction_x));
 	save_item(NAME(m_blitter_direction_y));
 	save_item(NAME(m_palbank));
-	save_pointer(NAME(m_videoram), width*height);
+	save_pointer(NAME(m_videoram.get()), width*height);
 	save_item(NAME(m_flipscreen_old));
 }
 

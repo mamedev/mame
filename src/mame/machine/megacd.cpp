@@ -289,7 +289,7 @@ machine_config_constructor sega_segacd_device::device_mconfig_additions() const
 }
 
 
-sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_gfx_interface(mconfig, *this, GFXDECODE_NAME( segacd )),
 		m_scdcpu(*this, "segacd_68k"),
@@ -305,17 +305,17 @@ sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_typ
 {
 }
 
-sega_segacd_us_device::sega_segacd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega_segacd_us_device::sega_segacd_us_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: sega_segacd_device(mconfig, SEGA_SEGACD_US, "sega_segacd_us", tag, owner, clock, "sega_segacd_us", __FILE__)
 {
 }
 
-sega_segacd_japan_device::sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega_segacd_japan_device::sega_segacd_japan_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: sega_segacd_device(mconfig, SEGA_SEGACD_JAPAN, "sega_segacd_japan", tag, owner, clock, "sega_segacd_japan", __FILE__)
 {
 }
 
-sega_segacd_europe_device::sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega_segacd_europe_device::sega_segacd_europe_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: sega_segacd_device(mconfig, SEGA_SEGACD_EUROPE, "sega_segacd_europe", tag, owner, clock, "sega_segacd_europe", __FILE__)
 {
 }
@@ -1240,8 +1240,8 @@ WRITE16_MEMBER( sega_segacd_device::segacd_sub_led_ready_w )
 		segacd_redled = (data >> 8)&1;
 		segacd_greenled = (data >> 9)&1;
 
-		output_set_value("red_led",segacd_redled ^ 1);
-		output_set_value("green_led",segacd_greenled ^ 1);
+		machine().output().set_value("red_led",segacd_redled ^ 1);
+		machine().output().set_value("green_led",segacd_greenled ^ 1);
 
 		//popmessage("%02x %02x",segacd_greenled,segacd_redled);
 	}
@@ -1486,7 +1486,7 @@ WRITE16_MEMBER( sega_segacd_device::segacd_trace_vector_base_address_w )
 
 		int line;
 		//bitmap_ind16 *srcbitmap = segacd_stampmap[segacd_get_active_stampmap_tilemap(->pixmap()]);
-		bitmap_ind16 *srcbitmap = 0;
+		bitmap_ind16 *srcbitmap = nullptr;
 		UINT32 bufferstart = ((segacd_imagebuffer_start_address&0xfff8)*2)<<3;
 
 		for (line=0;line<segacd_imagebuffer_vdot_size;line++)
@@ -1847,7 +1847,7 @@ void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UIN
 		}
 		else if (destination==DMA_PCM)
 		{
-			dest = 0;//fatalerror("PCM RAM DMA unimplemented!\n");
+			dest = nullptr;//fatalerror("PCM RAM DMA unimplemented!\n");
 		}
 		else
 		{

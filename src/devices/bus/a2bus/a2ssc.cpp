@@ -32,7 +32,7 @@ MACHINE_CONFIG_FRAGMENT( ssc )
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(a2bus_ssc_device, acia_irq_w))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(SSC_RS232_TAG, rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(SSC_RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(SSC_RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SSC_ACIA_TAG, mos6551_device, write_rxd))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SSC_ACIA_TAG, mos6551_device, write_dcd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(SSC_ACIA_TAG, mos6551_device, write_dsr))
@@ -127,7 +127,7 @@ const rom_entry *a2bus_ssc_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, A2BUS_SSC, "Apple Super Serial Card", tag, owner, clock, "a2ssc", __FILE__),
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),
@@ -137,7 +137,7 @@ a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, const char *ta
 {
 }
 
-a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),

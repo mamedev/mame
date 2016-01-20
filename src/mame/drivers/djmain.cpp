@@ -291,10 +291,10 @@ WRITE32_MEMBER(djmain_state::light_ctrl_1_w)
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		output_set_value("right-red-hlt",  !(data & 0x08000000));   // Right red HIGHLIGHT
-		output_set_value("left-red-hlt",   !(data & 0x04000000));   // Left red HIGHLIGHT
-		output_set_value("left-blue-hlt",  !(data & 0x02000000));   // Left blue HIGHLIGHT
-		output_set_value("right-blue-hlt", !(data & 0x00200000));   // Right blue HIGHLIGHT
+		output().set_value("right-red-hlt",  !(data & 0x08000000));   // Right red HIGHLIGHT
+		output().set_value("left-red-hlt",   !(data & 0x04000000));   // Left red HIGHLIGHT
+		output().set_value("left-blue-hlt",  !(data & 0x02000000));   // Left blue HIGHLIGHT
+		output().set_value("right-blue-hlt", !(data & 0x00200000));   // Right blue HIGHLIGHT
 	}
 }
 
@@ -302,11 +302,11 @@ WRITE32_MEMBER(djmain_state::light_ctrl_2_w)
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		output_set_value("left-ssr",       !!(data & 0x08000000));  // SSR
-		output_set_value("right-ssr",      !!(data & 0x08000000));  // SSR
-		set_led_status(machine(), 0, data & 0x00010000);            // 1P START
-		set_led_status(machine(), 1, data & 0x00020000);            // 2P START
-		set_led_status(machine(), 2, data & 0x00040000);            // EFFECT
+		output().set_value("left-ssr",       !!(data & 0x08000000));  // SSR
+		output().set_value("right-ssr",      !!(data & 0x08000000));  // SSR
+		output().set_led_value(0, data & 0x00010000);            // 1P START
+		output().set_led_value(1, data & 0x00020000);            // 2P START
+		output().set_led_value(2, data & 0x00040000);            // EFFECT
 	}
 }
 
@@ -1342,10 +1342,10 @@ GFXDECODE_END
 void djmain_state::machine_start()
 {
 	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
-	if (m_ata_master_password != NULL)
+	if (m_ata_master_password != nullptr)
 		hdd->set_master_password(m_ata_master_password);
 
-	if (m_ata_user_password != NULL)
+	if (m_ata_user_password != nullptr)
 		hdd->set_user_password(m_ata_user_password);
 
 	save_item(NAME(m_sndram_bank));
@@ -1364,9 +1364,9 @@ void djmain_state::machine_reset()
 	sndram_set_bank();
 
 	/* reset LEDs */
-	set_led_status(machine(), 0, 1);
-	set_led_status(machine(), 1, 1);
-	set_led_status(machine(), 2, 1);
+	output().set_led_value(0, 1);
+	output().set_led_value(1, 1);
+	output().set_led_value(2, 1);
 }
 
 
@@ -1386,7 +1386,7 @@ static MACHINE_CONFIG_START( djmainj, djmain_state )
 	MCFG_CPU_PROGRAM_MAP(maincpu_djmainj)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", djmain_state,  vb_interrupt)
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(djmain_state, ide_interrupt))
 
 	/* video hardware */
@@ -1967,8 +1967,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(djmain_state,beatmania)
 {
-	m_ata_master_password = NULL;
-	m_ata_user_password = NULL;
+	m_ata_master_password = nullptr;
+	m_ata_user_password = nullptr;
 }
 
 static const UINT8 beatmania_master_password[2 + 32] =

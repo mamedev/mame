@@ -38,7 +38,7 @@ class huc6260_device :  public device_t,
 {
 public:
 	// construction/destruction
-	huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	huc6260_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_next_pixel_data_callback(device_t &device, _Object object) { return downcast<huc6260_device &>(device).m_next_pixel_data_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_time_til_next_event_callback(device_t &device, _Object object) { return downcast<huc6260_device &>(device).m_time_til_next_event_cb.set_callback(object); }
@@ -55,10 +55,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	int     m_last_h;
@@ -88,7 +88,7 @@ private:
 	UINT8   m_pixel_clock;
 
 	emu_timer   *m_timer;
-	bitmap_ind16    *m_bmp;
+	std::unique_ptr<bitmap_ind16>   m_bmp;
 };
 
 

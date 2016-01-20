@@ -21,14 +21,13 @@ struct vgvector
 
 // ======================> avgdvg_device
 
-class avgdvg_device : public device_t,
-                      public device_execute_interface
+class avgdvg_device : public device_t
 {
 public:
 	// construction/destruction
-	avgdvg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	avgdvg_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
-	static void static_set_vector_tag(device_t &device, const char *tag);
+	static void static_set_vector_tag(device_t &device, std::string tag);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(done_r);
 	DECLARE_WRITE8_MEMBER(go_w);
@@ -41,6 +40,8 @@ public:
 	void set_flip_x(int flip);
 	void set_flip_y(int flip);
 
+	TIMER_CALLBACK_MEMBER(vg_set_halt_callback);
+	TIMER_CALLBACK_MEMBER(run_state_machine);
 protected:
 	void apply_flipping(int *x, int *y);
 	void vg_set_halt(int dummy);
@@ -51,20 +52,21 @@ protected:
 
 	void register_state();
 
-    virtual void execute_run();
-    int m_icount;
-    
 	UINT8 *avgdvg_vectorram;
 	size_t avgdvg_vectorram_size;
 
-    UINT8 *avgdvg_colorram;
+	UINT8 *avgdvg_colorram;
 
-	int m_xmin, m_xmax, m_ymin, m_ymax;
-	int m_xcenter, m_ycenter;
-	int m_flipx, m_flipy;
 
-	int m_nvect;
+	int xmin, xmax, ymin, ymax;
+	int xcenter, ycenter;
+	emu_timer *vg_run_timer, *vg_halt_timer;
+
+	int flip_x, flip_y;
+
+	int nvect;
 	vgvector vectbuf[MAXVECT];
+
 
 	UINT16 m_pc;
 	UINT8 m_sp;
@@ -125,24 +127,24 @@ class dvg_device : public avgdvg_device
 {
 public:
 	// construction/destruction
-	dvg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dvg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void dvg_draw_to(int x, int y, int intensity);
 
-	virtual int handler_0();
-	virtual int handler_1();
-	virtual int handler_2();
-	virtual int handler_3();
-	virtual int handler_4();
-	virtual int handler_5();
-	virtual int handler_6();
-	virtual int handler_7();
-	virtual UINT8 state_addr();
-	virtual void update_databus();
-	virtual void vggo();
-	virtual void vgrst();
+	virtual int handler_0() override;
+	virtual int handler_1() override;
+	virtual int handler_2() override;
+	virtual int handler_3() override;
+	virtual int handler_4() override;
+	virtual int handler_5() override;
+	virtual int handler_6() override;
+	virtual int handler_7() override;
+	virtual UINT8 state_addr() override;
+	virtual void update_databus() override;
+	virtual void vggo() override;
+	virtual void vgrst() override;
 
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 // device type definition
@@ -152,28 +154,27 @@ class avg_device : public avgdvg_device
 {
 public:
 	// construction/destruction
-	avg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	avg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	avg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	avg_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	int avg_common_strobe1();
 	int avg_common_strobe2();
 	int avg_common_strobe3();
 
-	virtual int handler_0();
-	virtual int handler_1();
-	virtual int handler_2();
-	virtual int handler_3();
-	virtual int handler_4();
-	virtual int handler_5();
-	virtual int handler_6();
-	virtual int handler_7();
-	virtual UINT8 state_addr();
-	virtual void update_databus();
-	virtual void vggo();
-	virtual void vgrst();
+	virtual int handler_0() override;
+	virtual int handler_1() override;
+	virtual int handler_2() override;
+	virtual int handler_3() override;
+	virtual int handler_4() override;
+	virtual int handler_5() override;
+	virtual int handler_6() override;
+	virtual int handler_7() override;
+	virtual UINT8 state_addr() override;
+	virtual void update_databus() override;
+	virtual void vggo() override;
+	virtual void vgrst() override;
 
-	virtual void device_start();
-	void avg_start_common();
+	virtual void device_start() override;
 };
 
 // device type definition
@@ -183,10 +184,10 @@ class avg_tempest_device : public avg_device
 {
 public:
 	// construction/destruction
-	avg_tempest_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	avg_tempest_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual int handler_6();
-	virtual int handler_7();
+	virtual int handler_6() override;
+	virtual int handler_7() override;
 	//virtual void vggo();
 };
 
@@ -197,13 +198,13 @@ class avg_mhavoc_device : public avg_device
 {
 public:
 	// construction/destruction
-	avg_mhavoc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	avg_mhavoc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual int handler_1();
-	virtual int handler_6();
-	virtual int handler_7();
-	virtual void update_databus();
-	virtual void vgrst();
+	virtual int handler_1() override;
+	virtual int handler_6() override;
+	virtual int handler_7() override;
+	virtual void update_databus() override;
+	virtual void vgrst() override;
 };
 
 // device type definition
@@ -213,10 +214,10 @@ class avg_starwars_device : public avg_device
 {
 public:
 	// construction/destruction
-	avg_starwars_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual int handler_6();
-	virtual int handler_7();
-	virtual void update_databus();
+	avg_starwars_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	virtual int handler_6() override;
+	virtual int handler_7() override;
+	virtual void update_databus() override;
 };
 
 // device type definition
@@ -226,17 +227,17 @@ class avg_quantum_device : public avg_device
 {
 public:
 	// construction/destruction
-	avg_quantum_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual int handler_0();
-	virtual int handler_1();
-	virtual int handler_2();
-	virtual int handler_3();
-	virtual int handler_4();
-	virtual int handler_5();
-	virtual int handler_6();
-	virtual int handler_7();
-	virtual void update_databus();
-	virtual void vggo();
+	avg_quantum_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	virtual int handler_0() override;
+	virtual int handler_1() override;
+	virtual int handler_2() override;
+	virtual int handler_3() override;
+	virtual int handler_4() override;
+	virtual int handler_5() override;
+	virtual int handler_6() override;
+	virtual int handler_7() override;
+	virtual void update_databus() override;
+	virtual void vggo() override;
 };
 
 // device type definition
@@ -246,10 +247,10 @@ class avg_bzone_device : public avg_device
 {
 public:
 	// construction/destruction
-	avg_bzone_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual int handler_1();
-	virtual int handler_6();
-	virtual int handler_7();
+	avg_bzone_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	virtual int handler_1() override;
+	virtual int handler_6() override;
+	virtual int handler_7() override;
 };
 
 // device type definition
@@ -259,10 +260,10 @@ class avg_tomcat_device : public avg_device
 {
 public:
 	// construction/destruction
-	avg_tomcat_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	avg_tomcat_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual int handler_6();
-	virtual int handler_7();
+	virtual int handler_6() override;
+	virtual int handler_7() override;
 };
 
 // device type definition

@@ -67,7 +67,7 @@ class t6721a_device : public device_t,
 						public device_sound_interface
 {
 public:
-	t6721a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	t6721a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _eos> void set_eos_callback(_eos eos) { m_write_eos.set_callback(eos); }
@@ -84,10 +84,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	enum

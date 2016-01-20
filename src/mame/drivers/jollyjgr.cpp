@@ -107,7 +107,7 @@ Notes:
 class jollyjgr_state : public driver_device
 {
 public:
-	jollyjgr_state(const machine_config &mconfig, device_type type, const char *tag)
+	jollyjgr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -141,9 +141,9 @@ public:
 	DECLARE_WRITE8_MEMBER(jollyjgr_misc_w);
 	DECLARE_WRITE8_MEMBER(jollyjgr_coin_lookout_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jollyjgr);
 	UINT32 screen_update_jollyjgr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_fspider(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -205,7 +205,7 @@ WRITE8_MEMBER(jollyjgr_state::jollyjgr_misc_w)
 
 WRITE8_MEMBER(jollyjgr_state::jollyjgr_coin_lookout_w)
 {
-	coin_lockout_global_w(machine(), data & 1);
+	machine().bookkeeping().coin_lockout_global_w(data & 1);
 
 	/* bits 4, 5, 6 and 7 are used too */
 }

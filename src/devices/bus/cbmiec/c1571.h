@@ -44,13 +44,13 @@ class c1571_t :  public device_t,
 {
 public:
 	// construction/destruction
-	c1571_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	c1571_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1571_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	c1571_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
 	DECLARE_READ8_MEMBER( via0_pa_r );
@@ -73,26 +73,24 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( byte_w );
 
-	DECLARE_WRITE_LINE_MEMBER( wpt_w );
-
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	void wpt_callback(floppy_image_device *floppy, int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_cbm_iec_interface overrides
-	virtual void cbm_iec_srq(int state);
-	virtual void cbm_iec_atn(int state);
-	virtual void cbm_iec_data(int state);
-	virtual void cbm_iec_reset(int state);
+	virtual void cbm_iec_srq(int state) override;
+	virtual void cbm_iec_atn(int state) override;
+	virtual void cbm_iec_data(int state) override;
+	virtual void cbm_iec_reset(int state) override;
 
 	// device_c64_floppy_parallel_interface overrides
-	virtual void parallel_data_w(UINT8 data);
-	virtual void parallel_strobe_w(int state);
+	virtual void parallel_data_w(UINT8 data) override;
+	virtual void parallel_strobe_w(int state) override;
 
 	enum
 	{
@@ -133,11 +131,11 @@ class c1570_t :  public c1571_t
 {
 public:
 	// construction/destruction
-	c1570_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1570_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 
@@ -147,11 +145,11 @@ class c1571cr_t :  public c1571_t
 {
 public:
 	// construction/destruction
-	c1571cr_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1571cr_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_WRITE8_MEMBER( via0_pa_w );
 	DECLARE_WRITE8_MEMBER( via0_pb_w );
@@ -164,11 +162,11 @@ class mini_chief_t :  public c1571_t
 {
 public:
 	// construction/destruction
-	mini_chief_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mini_chief_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_READ8_MEMBER( cia_pa_r );
 	DECLARE_WRITE8_MEMBER( cia_pa_w );

@@ -984,7 +984,7 @@ READ8_MEMBER( c128_state::cia1_pa_r )
 
 	// keyboard
 	UINT8 cia1_pb = m_cia1->pb_r();
-	UINT8 row[8] = { m_row0->read(), m_row1->read() & m_lock->read(), m_row2->read(), m_row3->read(),
+	UINT32 row[8] = { m_row0->read(), m_row1->read() & m_lock->read(), m_row2->read(), m_row3->read(),
 						m_row4->read(), m_row5->read(), m_row6->read(), m_row7->read() };
 
 	for (int i = 0; i < 8; i++)
@@ -1523,10 +1523,10 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(c128_state, cia2_pb_w))
 	MCFG_MOS6526_PC_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_8))
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(DEVWRITELINE(MOS8564_TAG, mos8564_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, XTAL_14_31818MHz*2/3.5/8, c64_expansion_cards, NULL)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, XTAL_14_31818MHz*2/3.5/8, c64_expansion_cards, nullptr)
 	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(c128_state, exp_irq_w))
 	MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(WRITELINE(c128_state, exp_nmi_w))
 	MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(WRITELINE(c128_state, exp_reset_w))
@@ -1534,7 +1534,7 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 	MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(c128_state, exp_dma_cd_w))
 	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(WRITELINE(c128_state, exp_dma_w))
 
-	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, c64_user_port_cards, NULL)
+	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, c64_user_port_cards, nullptr)
 	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(c128_state, exp_reset_w))
 	MCFG_PET_USER_PORT_4_HANDLER(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w))
 	MCFG_PET_USER_PORT_5_HANDLER(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
@@ -1607,7 +1607,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( c128d81, ntsc )
-	MCFG_CBM_IEC_ADD(NULL)
+	MCFG_CBM_IEC_ADD(nullptr)
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(c128_state, iec_srq_w))
 	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(c128_state, iec_data_w))
 
@@ -1696,10 +1696,10 @@ static MACHINE_CONFIG_START( pal, c128_state )
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(c128_state, cia2_pb_w))
 	MCFG_MOS6526_PC_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_8))
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(DEVWRITELINE(MOS8566_TAG, mos8566_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, XTAL_17_734472MHz*2/4.5/8, c64_expansion_cards, NULL)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, XTAL_17_734472MHz*2/4.5/8, c64_expansion_cards, nullptr)
 	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(c128_state, exp_irq_w))
 	MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(WRITELINE(c128_state, exp_nmi_w))
 	MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(WRITELINE(c128_state, exp_reset_w))
@@ -1707,7 +1707,7 @@ static MACHINE_CONFIG_START( pal, c128_state )
 	MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(c128_state, exp_dma_cd_w))
 	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(WRITELINE(c128_state, exp_dma_w))
 
-	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, c64_user_port_cards, NULL)
+	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, c64_user_port_cards, nullptr)
 	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(c128_state, exp_reset_w))
 	MCFG_PET_USER_PORT_4_HANDLER(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w))
 	MCFG_PET_USER_PORT_5_HANDLER(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))

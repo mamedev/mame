@@ -68,7 +68,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(exterm_state::from_shiftreg_slave)
 TMS340X0_SCANLINE_IND16_CB_MEMBER(exterm_state::scanline_update)
 {
 	UINT16 *bgsrc = &m_master_videoram[(params->rowaddr << 8) & 0xff00];
-	UINT16 *fgsrc = NULL;
+	UINT16 *fgsrc = nullptr;
 	UINT16 *dest = &bitmap.pix16(scanline);
 	tms34010_display_params fgparams;
 	int coladdr = params->coladdr;
@@ -90,7 +90,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(exterm_state::scanline_update)
 	{
 		UINT16 bgdata, fgdata = 0;
 
-		if (fgsrc != NULL)
+		if (fgsrc != nullptr)
 			fgdata = fgsrc[fgcoladdr++ & 0x7f];
 
 		bgdata = bgsrc[coladdr++ & 0xff];

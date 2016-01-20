@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Paul Leaman
 /***************************************************************************
 
@@ -331,10 +331,10 @@ WRITE16_MEMBER(cps_state::cps1_coinctrl_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0, data & 0x0100);
-		coin_counter_w(machine(), 1, data & 0x0200);
-		coin_lockout_w(machine(), 0, ~data & 0x0400);
-		coin_lockout_w(machine(), 1, ~data & 0x0800);
+		machine().bookkeeping().coin_counter_w(0, data & 0x0100);
+		machine().bookkeeping().coin_counter_w(1, data & 0x0200);
+		machine().bookkeeping().coin_lockout_w(0, ~data & 0x0400);
+		machine().bookkeeping().coin_lockout_w(1, ~data & 0x0800);
 
 		// bit 15 = CPS-A custom reset?
 	}
@@ -344,10 +344,10 @@ WRITE16_MEMBER(cps_state::cpsq_coinctrl2_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 2, data & 0x01);
-		coin_lockout_w(machine(), 2, ~data & 0x02);
-		coin_counter_w(machine(), 3, data & 0x04);
-		coin_lockout_w(machine(), 3, ~data & 0x08);
+		machine().bookkeeping().coin_counter_w(2, data & 0x01);
+		machine().bookkeeping().coin_lockout_w(2, ~data & 0x02);
+		machine().bookkeeping().coin_counter_w(3, data & 0x04);
+		machine().bookkeeping().coin_lockout_w(3, ~data & 0x08);
 	}
 }
 
@@ -640,6 +640,25 @@ static ADDRESS_MAP_START( sf2m3_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x8001c4, 0x8001c5) AM_WRITE(sf2m3_layer_w)
 	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_SHARE("gfxram")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sf2m10_map, AS_PROGRAM, 16, cps_state )
+	AM_RANGE(0x000000, 0x3fffff) AM_ROM
+	AM_RANGE(0x800000, 0x800007) AM_READ_PORT("IN1")
+	AM_RANGE(0x800018, 0x80001f) AM_READ(cps1_hack_dsw_r)
+	AM_RANGE(0x800020, 0x800021) AM_READNOP
+	AM_RANGE(0x800030, 0x800037) AM_WRITE(cps1_coinctrl_w)
+	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_SHARE("cps_a_regs")
+	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_SHARE("cps_b_regs")
+	AM_RANGE(0x800180, 0x800187) AM_WRITE(cps1_soundlatch_w)
+	AM_RANGE(0x800188, 0x80018f) AM_WRITE(cps1_soundlatch2_w)
+	AM_RANGE(0x8001a2, 0x8001b3) AM_WRITE(cps1_cps_a_w) // make 8001b2 point at 800110
+	AM_RANGE(0x8001fe, 0x8001ff) AM_WRITENOP // writes FFFF here a lot
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_SHARE("gfxram")
+	AM_RANGE(0xe00000, 0xefffff) AM_RAM // it writes to the whole range at start
+	AM_RANGE(0xf1c000, 0xf1c001) AM_READ(cps1_in2_r)
+	AM_RANGE(0xfeff00, 0xfeffff) AM_RAM // fix stack crash at start
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
 /***********************************************************
@@ -3273,6 +3292,11 @@ static MACHINE_CONFIG_DERIVED( sf2m3, cps1_12MHz)
 	MCFG_CPU_PROGRAM_MAP(sf2m3_map)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( sf2m10, cps1_12MHz)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(sf2m10_map)
+MACHINE_CONFIG_END
+
 
 /***************************************************************************
 
@@ -3367,7 +3391,7 @@ ROM_END
    LW-07 @ 10G
 
    Also known to have LW-13 @ 10D instead of LW_25.10C, LW_26.10E, LW_27.11C & LW_28.11E
-   
+
    OTHER:
    2 PALs labeled LW621 (near LW_1.2A) and LWI0 (near LW_00.13C)
    Custom chip -   CAPCOM CPS-B-01 (QFP160)
@@ -3978,6 +4002,48 @@ ROM_START( striderua )
 	ROM_REGION( 0x0200, "bboardplds", 0 )
 	ROM_LOAD( "st24b2.1a",    0x0000, 0x0117, NO_DUMP )
 	ROM_LOAD( "lwio.11e",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )
+ROM_END
+
+// 90629B-3 PCB - Converted from an SF2 'inhouse' (but with no official labels etc.)
+ROM_START( strideruc )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "34.8f", 0x000000, 0x80000, CRC(e0fb5657) SHA1(6c7f668220de80169feea35371aff363f67f7b0c) )
+	ROM_LOAD16_WORD_SWAP( "33.6f", 0x080000, 0x80000, CRC(9b3cfc08) SHA1(a7d7f270a097437affa845d80bed82a1fa874878) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROMX_LOAD( "6.8a",   0x000000, 0x80000, CRC(4eee9aea) SHA1(5e619fd5f3f1181e32a8fd9dbb4661d74ff8a484) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "8.10a",  0x000002, 0x80000, CRC(2d7f21e4) SHA1(593cec513de40ff802084d54313bb25a4561e25d) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "5.7a",   0x000004, 0x80000, CRC(7705aa46) SHA1(6cbfa30b2852fd117d117beefba434ce41d24c2f) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "7.9a",   0x000006, 0x80000, CRC(5b18b722) SHA1(cf71c62348ca6b404279e87a6686cb3a842eb381) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "15.8c",  0x200000, 0x80000, CRC(005f000b) SHA1(e6f65af7cc3295be9efaaded352e7ae6320b4133) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "17.10c", 0x200002, 0x80000, CRC(b9441519) SHA1(bb0926dc484dae4f64c5e5a6bce20afdc7aeba55) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "14.7c",  0x200004, 0x80000, CRC(b7d04e8b) SHA1(5c5a079baa694927c33d0e0c23e5ff09d6c9d985) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "16.9c",  0x200006, 0x80000, CRC(6b4713b4) SHA1(759b8b1fc7a5c4b00d74a27c2dd11667db44b09e) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "9.12a",  0x00000, 0x08000, CRC(08d63519) SHA1(c120ecfe25c3c50bc51bc7d5a9ef1c8ca6591240) )
+	ROM_CONTINUE(            0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "18.11c",  0x00000, 0x20000, CRC(4386bc80) SHA1(fb2b261995aeacfa13e7ee40b1a973dfb178f015) )
+	ROM_LOAD( "19.12c",  0x20000, 0x20000, CRC(444536d7) SHA1(a14f5de2f6b5b29ae5161dca1f8c08c566301a91) )
+
+	// which of these should we be using?
+	/*
+	ROM_REGION( 0x0200, "aboardplds", ROMREGION_ERASE00 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+	ROM_REGION( 0x0200, "bboardplds", ROMREGION_ERASE00 )
+	ROM_LOAD( "stf29.1a",     0x0000, 0x0117, CRC(043309c5) SHA1(f6b9610c9f896c495041ba56a654776a521c356b) )
+	ROM_LOAD( "iob1.11d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
+
+	ROM_REGION( 0x0200, "cboardplds", ROMREGION_ERASE00 )
+	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
+	*/
 ROM_END
 
 /* B-Board 88622B-3 */
@@ -8977,6 +9043,48 @@ ROM_START( sf2ceblp )
 	ROM_LOAD( "pic16c55",    0x00000, 0x2000, BAD_DUMP CRC(f22e2311) SHA1(320edfba140728599e91c01e863a8b6d071e4bbf) )
 ROM_END
 
+
+
+ROM_START( sf2cebltw )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "27.12e",           0x000000, 0x20000, CRC(035ee5d9) SHA1(9d268333db96dc6d1539ea938d3b213482e276c6) )
+	ROM_LOAD16_BYTE( "31.12f",           0x000001, 0x20000, CRC(353dbde1) SHA1(039785f8863fda945267fc8b9cf640d954ea9803) )
+	ROM_LOAD16_BYTE( "24.9e",            0x040000, 0x20000, CRC(005b54cc) SHA1(3d3d7742c11f31cc62d81931dc970cd1f4a26835) )
+	ROM_LOAD16_BYTE( "28.9f",            0x040001, 0x20000, CRC(c184d26d) SHA1(b1011e869d0b84c1ab609fcf193b46c7d9cc3b28) )
+	ROM_LOAD16_BYTE( "25.10e",           0x080000, 0x20000, CRC(524f5c55) SHA1(67adfd36bb325c4a6d3e1e5b668c4dc983ac0a62) )
+	ROM_LOAD16_BYTE( "29.10f",           0x080001, 0x20000, CRC(f06a12f2) SHA1(ddc431ce01392d4a7562760743abd9ea73b06cf3) )
+	ROM_LOAD16_BYTE( "26.11e",           0x0c0000, 0x20000, CRC(8312d055) SHA1(e36c23c197096d50d71ceefbf93205d5758153e0) )
+	ROM_LOAD16_BYTE( "30.11f",           0x0c0001, 0x20000, CRC(d0580ff2) SHA1(1b2e4c4abbe90a68283c86e7cb5328b242be5683) )
+	ROM_LOAD16_WORD_SWAP( "s92_21a.5f",  0x100000, 0x80000, CRC(925a7877) SHA1(1960dca35f0ca6f2b399a9fccfbc0132ac6425d1) )
+
+	ROM_REGION( 0x40000, "pal", 0 )
+	ROM_LOAD( "bruteforce.palce16v8h-25.11d",    0x00000, 0x40000, CRC(430f722d) SHA1(b0c0570057c782b1114819fae907f45a01c55065) )
+
+	ROM_REGION( 0x600000, "gfx", 0 )
+	ROMX_LOAD( "s92_01.bin",   0x000000, 0x80000, CRC(03b0d852) SHA1(f370f25c96ad2b94f8c53d6b7139100285a25bef) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_02.bin",   0x000002, 0x80000, CRC(840289ec) SHA1(2fb42a242f60ba7e74009b5a90eb26e035ba1e82) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_03.bin",   0x000004, 0x80000, CRC(cdb5f027) SHA1(4c7d944fef200fdfcaf57758b901b5511188ed2e) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_04.bin",   0x000006, 0x80000, CRC(e2799472) SHA1(27d3796429338d82a8de246a0ea06dd487a87768) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_05.bin",   0x200000, 0x80000, CRC(ba8a2761) SHA1(4b696d66c51611e43522bed752654314e76d33b6) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_06.bin",   0x200002, 0x80000, CRC(e584bfb5) SHA1(ebdf1f5e2638eed3a65dda82b1ed9151a355f4c9) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_07.bin",   0x200004, 0x80000, CRC(21e3f87d) SHA1(4a4961bb68c3a1ce15f9d393d9c03ecb2466cc29) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_08.bin",   0x200006, 0x80000, CRC(befc47df) SHA1(520390420da3a0271ba90b0a933e65143265e5cf) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_10.bin",   0x400000, 0x80000, CRC(960687d5) SHA1(2868c31121b1c7564e9767b9a19cdbf655c7ed1d) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_11.bin",   0x400002, 0x80000, CRC(978ecd18) SHA1(648a59706b93c84b4206a968ecbdc3e834c476f6) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_12.bin",   0x400004, 0x80000, CRC(d6ec9a0a) SHA1(ed6143f8737013b6ef1684e37c05e037e7a80dae) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_13.bin",   0x400006, 0x80000, CRC(ed2c67f6) SHA1(0083c0ffaf6fe7659ff0cf822be4346cd6e61329) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "s92_09.bin",    0x00000, 0x08000, CRC(08f6b60e) SHA1(8258fcaca4ac419312531eec67079b97f471179c) )
+	ROM_CONTINUE(              0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "s92_18.bin",    0x00000, 0x20000, CRC(7f162009) SHA1(346bf42992b4c36c593e21901e22c87ae4a7d86d) )
+	ROM_LOAD( "s92_19.bin",    0x20000, 0x20000, CRC(beade53f) SHA1(277c397dc12752719ec6b47d2224750bd1c07f79) )
+ROM_END
+
+
+
 ROM_START( sf2amf )
 	/* the PCB is not working on real hardware */
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
@@ -9329,6 +9437,87 @@ ROM_START( sf2m8 )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "b-16.6", 0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )
+ROM_END
+
+/* SF2M10
+ From HBMAME (SF2H14)
+ Same as sf2ebbl2, except it has program roms unique to sf2h14.
+
+ Using sf2ce gfx roms to get clean gfx (the board was a bodgy
+ half-done conversion attempt).
+
+** PCB DETAILS ***
+Street Fighter II Champion Edition (bootleg)
+
+PCB Layout
+----------
+
+|-----------------------------------------------------|
+|LM324 ROM1  3.579545MHz                   ROM10 ROM12|
+|LM324 ROM2  16MHz 2018                    ROM9  ROM11|
+|     M6295  12MHz 2018                    SE235 SE005|
+|                  2018                               |
+|YM2151  2018      2018             ROM8              |
+|    ROM3                                  SE194 SE064|
+|J    Z80                                  SF004 SF001|
+|A                             2018 2018              |
+|M     6116 6116               2018 2018              |
+|M                                                    |
+|A      |--|                                          |
+|       |6 |                   62256                  |
+|DSWA(8)|8 |62256 62256        62256                  |
+|       |0 |ROM4  ROM6                                |
+|DSWB(8)|0 |ROM5  ROM7                                |
+|       |0 |                                          |
+|DSWC(8)|--|                                          |
+|-----------------------------------------------------|
+Notes:
+      68000 - Clock 12MHz
+        Z80 - Clock 3.579545MHz
+      M6295 - Clock 1.000MHz [16/16]. Pin 7 HIGH
+     YM2151 - Clock 3.579545MHz
+      62256 - 32k x8 SRAM
+       2018 - 2k x8 SRAM
+       6116 - 2k x8 SRAM
+*/
+
+ROM_START( sf2m10 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sf2h14.7", 0x000000, 0x80000, CRC(74803532) SHA1(c1f774bbc4c7b18fcac15417711a86eb852b9957) )
+	ROM_LOAD16_BYTE( "sf2h14.5", 0x000001, 0x80000, CRC(66c91972) SHA1(219aecad1feb60bb758190ea82223171075c858e) )
+	ROM_LOAD16_BYTE( "yyc-4.1", 0x100000, 0x20000, CRC(1073b7b6) SHA1(81ca1eab65ceac69520584bb23a684ccb9d92f89) )
+	ROM_LOAD16_BYTE( "yyc-5.3", 0x100001, 0x20000, CRC(924c6ce2) SHA1(676a912652bd75da5087f0c7eae047b7681a993c) )
+
+	ROM_REGION( 0x600000, "gfx", 0 )
+	// using the proper roms for this program
+	ROMX_LOAD( "s92-1m.3a",  0x000000, 0x80000, CRC(03b0d852) SHA1(f370f25c96ad2b94f8c53d6b7139100285a25bef) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-3m.5a",  0x000002, 0x80000, CRC(840289ec) SHA1(2fb42a242f60ba7e74009b5a90eb26e035ba1e82) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-2m.4a",  0x000004, 0x80000, CRC(cdb5f027) SHA1(4c7d944fef200fdfcaf57758b901b5511188ed2e) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-4m.6a",  0x000006, 0x80000, CRC(e2799472) SHA1(27d3796429338d82a8de246a0ea06dd487a87768) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-5m.7a",  0x200000, 0x80000, CRC(ba8a2761) SHA1(4b696d66c51611e43522bed752654314e76d33b6) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-7m.9a",  0x200002, 0x80000, CRC(e584bfb5) SHA1(ebdf1f5e2638eed3a65dda82b1ed9151a355f4c9) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-6m.8a",  0x200004, 0x80000, CRC(21e3f87d) SHA1(4a4961bb68c3a1ce15f9d393d9c03ecb2466cc29) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-8m.10a", 0x200006, 0x80000, CRC(befc47df) SHA1(520390420da3a0271ba90b0a933e65143265e5cf) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-10m.3c", 0x400000, 0x80000, CRC(960687d5) SHA1(2868c31121b1c7564e9767b9a19cdbf655c7ed1d) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-12m.5c", 0x400002, 0x80000, CRC(978ecd18) SHA1(648a59706b93c84b4206a968ecbdc3e834c476f6) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-11m.4c", 0x400004, 0x80000, CRC(d6ec9a0a) SHA1(ed6143f8737013b6ef1684e37c05e037e7a80dae) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-13m.6c", 0x400006, 0x80000, CRC(ed2c67f6) SHA1(0083c0ffaf6fe7659ff0cf822be4346cd6e61329) , ROM_GROUPWORD | ROM_SKIP(6) )
+	// and overwrite some gfx with supplied extra roms
+	ROMX_LOAD( "27c1024.10", 0x400000, 0x20000, CRC(84427d1b) SHA1(f988a2b53c8cc46eeb8032084f24966a539b3734) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "27c1024.12", 0x400002, 0x20000, CRC(55bc790c) SHA1(a1114b89f6fa4487210477676984c77ad94b5ef8) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "27c1024.9",  0x400004, 0x20000, CRC(f8725add) SHA1(fa3fcf6637ee4dd7667bd89766074b3c6ba4f166) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "27c1024.11", 0x400006, 0x20000, CRC(c2a5373e) SHA1(602b32e5ecc7007efe9ad30751040ee52b81f59a) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 )
+	ROM_LOAD( "27c512.3",    0x00000, 0x08000, CRC(a4823a1b) SHA1(7b6bf59dfd578bfbbdb64c27988796783442d659) )
+	ROM_CONTINUE(            0x10000, 0x08000 )
+
+	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_LOAD( "27c512.8",    0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "27c010.2",    0x00000, 0x20000, CRC(7f162009) SHA1(346bf42992b4c36c593e21901e22c87ae4a7d86d) )
+	ROM_LOAD( "27c010.1",    0x20000, 0x20000, CRC(beade53f) SHA1(277c397dc12752719ec6b47d2224750bd1c07f79) )
 ROM_END
 
 ROM_START( sf2yyc )
@@ -10666,7 +10855,7 @@ ROM_START( slammast )
 	ROM_CONTINUE(           0x10000, 0x18000 )
 
 	ROM_REGION( 0x8000, "user1", 0 )
-	ROM_COPY( "audiocpu", 0x00000, 0x00000, 0x8000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x00000, 0x8000 )
 
 	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
 	ROM_LOAD( "mb-q1.1k",   0x000000, 0x80000, CRC(0630c3ce) SHA1(520fc74c5c3638f611fa2f1b5efb08b91747e29b) )
@@ -10729,7 +10918,7 @@ ROM_START( slammastu )
 	ROM_CONTINUE(           0x10000, 0x18000 )
 
 	ROM_REGION( 0x8000, "user1", 0 )
-	ROM_COPY( "audiocpu", 0x00000, 0x00000, 0x8000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x00000, 0x8000 )
 
 	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
 	ROM_LOAD( "mb-q1.1k",   0x000000, 0x80000, CRC(0630c3ce) SHA1(520fc74c5c3638f611fa2f1b5efb08b91747e29b) )
@@ -10789,7 +10978,7 @@ ROM_START( mbomberj )
 	ROM_CONTINUE(           0x10000, 0x18000 )
 
 	ROM_REGION( 0x8000, "user1", 0 )
-	ROM_COPY( "audiocpu", 0x00000, 0x00000, 0x8000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x00000, 0x8000 )
 
 	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
 	ROM_LOAD( "mb-q1.1k",   0x000000, 0x80000, CRC(0630c3ce) SHA1(520fc74c5c3638f611fa2f1b5efb08b91747e29b) )
@@ -11704,10 +11893,10 @@ DRIVER_INIT_MEMBER( cps_state, sf2m8 )
 
 void cps_state::kabuki_setup(void (*decode)(UINT8 *src, UINT8 *dst))
 {
-	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
+	m_decrypt_kabuki = std::make_unique<UINT8[]>(0x8000);
 	UINT8 *rom = memregion("audiocpu")->base();
-	decode(rom, decrypt);
-	membank("decrypted")->set_base(decrypt);
+	decode(rom, m_decrypt_kabuki.get());
+	membank("decrypted")->set_base(m_decrypt_kabuki.get());
 }
 
 DRIVER_INIT_MEMBER(cps_state,wof)
@@ -11836,6 +12025,7 @@ GAME( 1988, daimakai,    ghouls,   cps1_10MHz, daimakai, cps_state,   cps1,     
 GAME( 1988, daimakair,   ghouls,   cps1_12MHz, daimakai, cps_state,   cps1,     ROT0,   "Capcom", "Daimakaimura (Japan Resale Ver.)", MACHINE_SUPPORTS_SAVE )      // Wed.26.10.1988 in the ROMs   // 12MHz verified
 GAME( 1989, strider,     0,        cps1_10MHz, strider,  cps_state,   cps1,     ROT0,   "Capcom", "Strider (USA, B-Board 89624B-2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, striderua,   strider,  cps1_10MHz, stridrua, cps_state,   cps1,     ROT0,   "Capcom", "Strider (USA, B-Board 89624B-3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, strideruc,   strider,  cps1_10MHz, stridrua, cps_state,   cps1,     ROT0,   "Capcom", "Strider (USA, B-Board 90629B-3, Street Fighter II conversion)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, striderj,    strider,  cps1_10MHz, strider,  cps_state,   cps1,     ROT0,   "Capcom", "Strider Hiryu (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, striderjr,   strider,  cps1_12MHz, strider,  cps_state,   cps1,     ROT0,   "Capcom", "Strider Hiryu (Japan Resale Ver.)", MACHINE_SUPPORTS_SAVE ) // 12MHz verified
 GAME( 1989, dynwar,      0,        cps1_10MHz, dynwar,   cps_state,   cps1,     ROT0,   "Capcom", "Dynasty Wars (USA, B-Board 89624B-?)", MACHINE_SUPPORTS_SAVE )  // (c) Capcom U.S.A.
@@ -11950,6 +12140,7 @@ GAME( 1992, sf2amf,      sf2ce,    cps1_12MHz, sf2amf,   cps_state,   sf2hack,  
 GAME( 1992, sf2amf2,     sf2ce,    cps1_12MHz, sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (L735 Test Rom, bootleg)", MACHINE_SUPPORTS_SAVE )     // 920313 - based on World version
 GAME( 1992, sf2dkot2,    sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Double K.O. Turbo II, bootleg)", MACHINE_SUPPORTS_SAVE ) // 902140 !!! - based on USA version
 GAME( 1992, sf2ceblp,    sf2ce,    cps1_10MHz, sf2,      cps_state,   sf2ceblp, ROT0,   "bootleg", "Street Fighter II': Champion Edition (protected bootleg on non-dash board)", MACHINE_SUPPORTS_SAVE )          // 920313 - based on USA version
+GAME( 1992, sf2cebltw,   sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition ('Taiwan' bootleg with PAL)", MACHINE_SUPPORTS_SAVE ) // 'Taiwan'
 GAME( 1992, sf2m2,       sf2ce,    cps1_12MHz, sf2m2,    cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (M2, bootleg)", MACHINE_SUPPORTS_SAVE )               // 920313 - based on World version
 GAME( 1992, sf2m3,       sf2ce,    sf2m3,      sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (M3, bootleg)", MACHINE_SUPPORTS_SAVE )               // 920313 - based on USA version
 GAME( 1992, sf2m4,       sf2ce,    cps1_12MHz, sf2m4,    cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (M4, bootleg)", MACHINE_SUPPORTS_SAVE )               // 920322 - based on Japan version
@@ -11957,6 +12148,7 @@ GAME( 1992, sf2m5,       sf2ce,    cps1_12MHz, sf2hack,  cps_state,   sf2hack,  
 GAME( 1992, sf2m6,       sf2ce,    cps1_12MHz, sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (M6, bootleg)", MACHINE_SUPPORTS_SAVE )               // 811102 !!! - based on World version
 GAME( 1992, sf2m7,       sf2ce,    cps1_12MHz, sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (M7, bootleg)", MACHINE_SUPPORTS_SAVE )               // 920313 - based on World version
 GAME( 1992, sf2m8,       sf2ce,    sf2m3,      sf2,      cps_state,   sf2m8,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (M8, bootleg)", MACHINE_SUPPORTS_SAVE )               // 920313 - based on USA version
+GAME( 1992, sf2m10,      sf2ce,    sf2m10,     sf2hack,  cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (M10, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, sf2yyc,      sf2ce,    cps1_12MHz, sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (YYC, bootleg)", MACHINE_SUPPORTS_SAVE )              // 920313 - based on World version
 GAME( 1992, sf2koryu,    sf2ce,    cps1_12MHz, sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (Xiang Long, Chinese bootleg)", MACHINE_SUPPORTS_SAVE )       // 811102 !!! - based on World version
 GAME( 1992, sf2dongb,    sf2ce,    cps1_12MHz, sf2,      cps_state,   sf2dongb, ROT0,   "bootleg", "Street Fighter II': Champion Edition (Dongfang Bubai protection, bootleg)", MACHINE_SUPPORTS_SAVE ) // 920313 - based on World version

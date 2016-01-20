@@ -64,7 +64,7 @@ Infinite loop is reached at address 0x7699
 class hprot1_state : public driver_device
 {
 public:
-	hprot1_state(const machine_config &mconfig, device_type type, const char *tag)
+	hprot1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_lcdc(*this, "hd44780")
@@ -75,8 +75,8 @@ public:
 	DECLARE_DRIVER_INIT(hprot1);
 	DECLARE_PALETTE_INIT(hprot1);
 private:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 };

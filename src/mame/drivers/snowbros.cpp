@@ -2162,6 +2162,24 @@ ROM_START( twinadvk )
 	ROM_LOAD( "srb.bin", 0x40000, 0x40000, CRC(109e51e6) SHA1(3344c68d63bbad4a02b47143b2d2f72ce9bcb4bb) ) // bank 2
 ROM_END
 
+ROM_START( multi96 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "uh12",  0x00001, 0x20000, CRC(e912ea4e) SHA1(cf0b37d6b6fbdd311ef7b404c4ba2c6a7e1f8486) )
+	ROM_LOAD16_BYTE( "ui12",  0x00000, 0x20000, CRC(ac99e837) SHA1(20bc1599f78a4eac65cae54350872fa292daa807) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )    /* 64k for z80 sound code */
+	ROM_LOAD( "uh15.bin", 0x0000, 0x8000, CRC(3d5acd08) SHA1(c19f686862dfc12d2fa91c2dd3d3b75d9cb410c3) )
+
+	ROM_REGION( 0x180000, "gfx1", 0 ) /* 4bpp gfx */
+	ROM_LOAD( "ua4", 0x000000, 0x80000, CRC(66cae586) SHA1(22af524b26241a6456b777a847db73ff8d3db11f) )
+	ROM_LOAD( "ua5", 0x080000, 0x80000, CRC(0bd9f6bb) SHA1(400ddff7a76860caacfe8bfd803f9ccd2dba3356) )
+	ROM_LOAD( "ua6", 0x100000, 0x80000, CRC(0e90b26c) SHA1(fd9b40988d03db8ed797abf859a8828bb65db8d5) )
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* Samples - both banks are almost the same */
+	/* todo, check bank ordering .. */
+	ROM_LOAD( "sra.bin", 0x00000, 0x40000, CRC(82f452c4) SHA1(95ad6ede87ceafb045ed7df40496baf96190b97f) ) // bank 1
+	ROM_LOAD( "srb.bin", 0x40000, 0x40000, CRC(109e51e6) SHA1(3344c68d63bbad4a02b47143b2d2f72ce9bcb4bb) ) // bank 2
+ROM_END
 
 /* SemiCom Games */
 
@@ -2737,6 +2755,7 @@ GAME( 1995, honeydol, 0,        honeydol, honeydol, driver_device, 0, ROT0, "Bar
 
 GAME( 1995, twinadv,  0,        twinadv,  twinadv, driver_device,  0, ROT0, "Barko Corp.", "Twin Adventure (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, twinadvk, twinadv,  twinadv,  twinadv, driver_device,  0, ROT0, "Barko Corp.", "Twin Adventure (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, multi96,  twinadv,  twinadv,  twinadv, driver_device,  0, ROT0, "Barko Corp.", "Multi Game '96 (Italy)", MACHINE_SUPPORTS_SAVE )
 
 // The Korean games database shows an earlier version of this called Ball Boy with a different title screen to the version of Ball Boy we have
 // http://mamedev.emulab.it/undumped/images/Ballboy.jpg

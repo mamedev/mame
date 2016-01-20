@@ -3,7 +3,7 @@
 class tp84_state : public driver_device
 {
 public:
-	tp84_state(const machine_config &mconfig, device_type type, const char *tag)
+	tp84_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_audiocpu(*this, "audiocpu"),
 		m_palette_bank(*this, "palette_bank"),
@@ -46,8 +46,8 @@ public:
 	DECLARE_READ8_MEMBER(tp84_scanline_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(tp84);
 	UINT32 screen_update_tp84(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sub_vblank_irq);

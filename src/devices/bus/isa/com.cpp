@@ -49,7 +49,7 @@ static MACHINE_CONFIG_FRAGMENT( com_config )
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, ri_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, cts_w))
 
-	MCFG_RS232_PORT_ADD( "serport1", isa_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", isa_com, nullptr )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, dcd_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, dsr_w))
@@ -95,13 +95,13 @@ machine_config_constructor isa8_com_device::device_mconfig_additions() const
 //  isa8_com_device - constructor
 //-------------------------------------------------
 
-isa8_com_device::isa8_com_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_com_device::isa8_com_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8_COM, "Communications Adapter PC/XT", tag, owner, clock, "isa_com", __FILE__),
 		device_isa8_card_interface(mconfig, *this)
 {
 }
 
-isa8_com_device::isa8_com_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+isa8_com_device::isa8_com_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this)
 {
@@ -157,7 +157,7 @@ static MACHINE_CONFIG_FRAGMENT( com_at_config )
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, ri_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, cts_w))
 
-	MCFG_RS232_PORT_ADD( "serport1", isa_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", isa_com, nullptr )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, dcd_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, dsr_w))
@@ -188,7 +188,7 @@ machine_config_constructor isa8_com_at_device::device_mconfig_additions() const
 //  isa8_com_device - constructor
 //-------------------------------------------------
 
-isa8_com_at_device::isa8_com_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_com_at_device::isa8_com_at_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		isa8_com_device(mconfig, ISA8_COM_AT, "Communications Adapter", tag, owner, clock, "isa_com_at", __FILE__)
 {
 }

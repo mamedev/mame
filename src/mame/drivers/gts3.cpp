@@ -38,7 +38,7 @@ ToDo:
 class gts3_state : public driver_device
 {
 public:
-	gts3_state(const machine_config &mconfig, device_type type, const char *tag)
+	gts3_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_u4(*this, "u4")
@@ -60,7 +60,7 @@ private:
 	UINT8 m_row; // for lamps and switches
 	UINT8 m_segment[4];
 	UINT8 m_u4b;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<m65c02_device> m_maincpu;
 	required_device<via6522_device> m_u4;
 	required_device<via6522_device> m_u5;
@@ -220,7 +220,7 @@ WRITE8_MEMBER( gts3_state::segbank_w )
 	m_segment[offset] = data;
 	seg1 = m_segment[offset&2] | (m_segment[offset|1] << 8);
 	seg2 = BITSWAP32(seg1,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15,14,9,7,13,11,10,6,8,12,5,4,3,3,2,1,0,0);
-	output_set_digit_value(m_digit+(BIT(offset, 1) ? 0 : 20), seg2);
+	output().set_digit_value(m_digit+(BIT(offset, 1) ? 0 : 20), seg2);
 }
 
 WRITE8_MEMBER( gts3_state::u4b_w )

@@ -17,7 +17,7 @@ const device_type PLA = &device_creator<pla_device>;
 //  pla_device - constructor
 //-------------------------------------------------
 
-pla_device::pla_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pla_device::pla_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PLA, "PLA", tag, owner, clock, "pla", __FILE__),
 		m_format(PLA_FMT_JEDBIN),
 		m_inputs(0),
@@ -35,7 +35,7 @@ pla_device::pla_device(const machine_config &mconfig, const char *tag, device_t 
 
 void pla_device::device_start()
 {
-	assert(region() != NULL);
+	assert(region() != nullptr);
 	assert(m_terms < MAX_TERMS);
 	assert(m_inputs < 32 && m_outputs <= 32);
 
@@ -48,8 +48,8 @@ void pla_device::device_start()
 
 	// initialize cache
 	m_cache2_ptr = 0;
-	for (int i = 0; i < CACHE2_SIZE; i++)
-		m_cache2[i] = 0x80000000;
+	for (auto & elem : m_cache2)
+		elem = 0x80000000;
 
 	m_cache_size = 0;
 	int csize = 1 << ((m_inputs > MAX_CACHE_BITS) ? MAX_CACHE_BITS : m_inputs);
@@ -90,7 +90,7 @@ void pla_device::parse_fusemap()
 			m_term[p].or_mask = 0;
 		}
 
-		logerror("%s PLA parse error %d!\n", tag(), result);
+		logerror("%s PLA parse error %d!\n", tag().c_str(), result);
 		return;
 	}
 
@@ -146,10 +146,8 @@ UINT32 pla_device::read(UINT32 input)
 	if (input < m_cache_size)
 		return m_cache[input];
 
-	for (int i = 0; i < CACHE2_SIZE; ++i)
+	for (auto cache2_entry : m_cache2)
 	{
-		UINT64 cache2_entry = m_cache2[i];
-
 		if ((UINT32)cache2_entry == input)
 		{
 			// cache2 hit

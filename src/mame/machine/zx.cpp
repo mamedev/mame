@@ -92,10 +92,10 @@ void zx_state::drop_sync()
 			// Ignore too short frame times, they're cassette output
 			if(time - m_base_vsync_clock > 52000) {
 				logerror("frame time %d\n", int(time - m_base_vsync_clock));
-				
+
 				rectangle rect(0, 383, 0, 310);
 				copybitmap(*m_bitmap_buffer, *m_bitmap_render, 0, 0, 0, 0, rect);
-				m_bitmap_render->fill(0);			
+				m_bitmap_render->fill(0);
 				m_base_vsync_clock = time;
 				m_ypos = 0;
 			}

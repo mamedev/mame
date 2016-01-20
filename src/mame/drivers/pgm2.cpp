@@ -64,7 +64,7 @@
 class pgm2_state : public driver_device
 {
 public:
-	pgm2_state(const machine_config &mconfig, device_type type, const char *tag)
+	pgm2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
@@ -73,9 +73,9 @@ public:
 	DECLARE_DRIVER_INIT(ddpdojh);
 	DECLARE_DRIVER_INIT(kov3);
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_pgm2(screen_device &screen, bool state);
 	required_device<cpu_device> m_maincpu;

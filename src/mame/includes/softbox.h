@@ -26,7 +26,7 @@
 class softbox_state : public driver_device
 {
 public:
-	softbox_state(const machine_config &mconfig, device_type type, const char *tag)
+	softbox_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_dbrg(*this, COM8116_TAG),
@@ -39,8 +39,8 @@ public:
 	required_device<ieee488_device> m_ieee;
 	required_device<corvus_hdc_t> m_hdc;
 
-	virtual void machine_start();
-	virtual void device_reset_after_children();
+	virtual void machine_start() override;
+	virtual void device_reset_after_children() override;
 
 	// device_ieee488_interface overrides
 	virtual void ieee488_ifc(int state);

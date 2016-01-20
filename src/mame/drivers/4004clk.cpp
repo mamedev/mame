@@ -16,7 +16,7 @@
 class nixieclock_state : public driver_device
 {
 public:
-	nixieclock_state(const machine_config &mconfig, device_type type, const char *tag)
+	nixieclock_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
@@ -32,7 +32,7 @@ public:
 	DECLARE_WRITE8_MEMBER( relays_w );
 	UINT16 m_nixie[16];
 	UINT8 m_timer;
-	virtual void machine_start();
+	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 	UINT8 nixie_to_num(UINT16 val);
 	inline void output_set_nixie_value(int index, int value);
@@ -61,12 +61,12 @@ UINT8 nixieclock_state::nixie_to_num(UINT16 val)
 
 inline void nixieclock_state::output_set_nixie_value(int index, int value)
 {
-	output_set_indexed_value("nixie", index, value);
+	output().set_indexed_value("nixie", index, value);
 }
 
 inline void nixieclock_state::output_set_neon_value(int index, int value)
 {
-	output_set_indexed_value("neon", index, value);
+	output().set_indexed_value("neon", index, value);
 }
 
 WRITE8_MEMBER(nixieclock_state::nixie_w)

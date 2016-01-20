@@ -32,7 +32,7 @@ const device_type rtc9701 = &device_creator<rtc9701_device>;
 //  rtc9701_device - constructor
 //-------------------------------------------------
 
-rtc9701_device::rtc9701_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rtc9701_device::rtc9701_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, rtc9701, "RTC-9701", tag, owner, clock, "rtc9701", __FILE__),
 		device_nvram_interface(mconfig, *this),
 		m_latch(0),
@@ -129,8 +129,8 @@ void rtc9701_device::device_reset()
 
 void rtc9701_device::nvram_default()
 {
-	for (offs_t offs = 0; offs < 0x100; offs++)
-		rtc9701_data[offs] = 0xffff;
+	for (auto & elem : rtc9701_data)
+		elem = 0xffff;
 }
 
 

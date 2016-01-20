@@ -9,7 +9,7 @@ const device_type H8S2245 = &device_creator<h8s2245_device>;
 const device_type H8S2246 = &device_creator<h8s2246_device>;
 
 
-h8s2245_device::h8s2245_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+h8s2245_device::h8s2245_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	h8s2000_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(h8s2245_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -37,7 +37,7 @@ h8s2245_device::h8s2245_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-h8s2245_device::h8s2245_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2245_device::h8s2245_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	h8s2000_device(mconfig, H8S2245, "H8S/2245", tag, owner, clock, "h8s2245", __FILE__, address_map_delegate(FUNC(h8s2245_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -66,19 +66,19 @@ h8s2245_device::h8s2245_device(const machine_config &mconfig, const char *tag, d
 	ram_start = 0xffec00;
 }
 
-h8s2241_device::h8s2241_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2241_device::h8s2241_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	h8s2245_device(mconfig, H8S2241, "H8S/2241", tag, owner, clock, "h8s2241", __FILE__)
 {
 	ram_start = 0xffec00;
 }
 
-h8s2242_device::h8s2242_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2242_device::h8s2242_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	h8s2245_device(mconfig, H8S2242, "H8S/2242", tag, owner, clock, "h8s2242", __FILE__)
 {
 	ram_start = 0xffdc00;
 }
 
-h8s2246_device::h8s2246_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2246_device::h8s2246_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	h8s2245_device(mconfig, H8S2246, "H8S/2246", tag, owner, clock, "h8s2246", __FILE__)
 {
 	ram_start = 0xffdc00;
@@ -343,5 +343,5 @@ WRITE8_MEMBER(h8s2245_device::syscr_w)
 {
 	syscr = data;
 	update_irq_filter();
-	logerror("%s: syscr = %02x\n", tag(), data);
+	logerror("%s: syscr = %02x\n", tag().c_str(), data);
 }

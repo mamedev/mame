@@ -23,7 +23,7 @@ const device_type ISA8_SIDE116 = &device_creator<side116_device>;
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( side116 )
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(side116_device, ide_interrupt))
 MACHINE_CONFIG_END
 
@@ -86,7 +86,7 @@ const rom_entry *side116_device::device_rom_region() const
 //  side116_device - constructor
 //-------------------------------------------------
 
-side116_device::side116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+side116_device::side116_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ISA8_SIDE116, "Acculogic sIDE-1/16 IDE Disk Controller", tag, owner, clock, "side116", __FILE__),
 	device_isa8_card_interface( mconfig, *this ),
 	m_ata(*this, "ata"),

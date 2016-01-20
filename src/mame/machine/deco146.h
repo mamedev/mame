@@ -80,8 +80,8 @@ struct deco146port_xx
 class deco_146_base_device : public device_t
 {
 public:
-	//deco_146_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	deco_146_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	//deco_146_base_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	deco_146_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	void write_data(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask, UINT8 &csflags);
 	UINT16 read_data(UINT16 address, UINT16 mem_mask, UINT8 &csflags);
@@ -131,9 +131,9 @@ public:
 
 
 protected:
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	UINT16 read_protport(UINT16 address, UINT16 mem_mask);
 	virtual void write_protport(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask);
@@ -164,7 +164,7 @@ extern const device_type DECO146BASE;
 class deco146_device : public deco_146_base_device
 {
 public:
-	deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	deco146_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type DECO146PROT;

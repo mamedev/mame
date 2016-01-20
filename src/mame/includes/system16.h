@@ -11,7 +11,7 @@
 class segas1x_bootleg_state : public sega_16bit_common_base
 {
 public:
-	segas1x_bootleg_state(const machine_config &mconfig, device_type type, const char *tag)
+	segas1x_bootleg_state(const machine_config &mconfig, device_type type, std::string tag)
 		: sega_16bit_common_base(mconfig, type, tag) ,
 		m_textram(*this, "textram"),
 		m_bg0_tileram(*this, "bg0_tileram"),
@@ -162,7 +162,6 @@ public:
 	DECLARE_WRITE8_MEMBER(shdancbl_msm5205_data_w);
 	DECLARE_READ8_MEMBER(shdancbl_soundbank_r);
 	DECLARE_WRITE8_MEMBER(shdancbl_bankctrl_w);
-	DECLARE_WRITE16_MEMBER(sys16_paletteram_w);
 	DECLARE_WRITE16_MEMBER(sys16_tileram_w);
 	DECLARE_WRITE16_MEMBER(sys16_textram_w);
 	DECLARE_WRITE16_MEMBER(s16a_bootleg_bgscrolly_w);

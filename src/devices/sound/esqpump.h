@@ -18,7 +18,7 @@ class esq_5505_5510_pump : public device_t,
 	public device_sound_interface
 {
 public:
-	esq_5505_5510_pump(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	esq_5505_5510_pump(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void set_otis(es5505_device *otis) { m_otis = otis; }
 	void set_esp(es5510_device *esp) { m_esp = esp; }
@@ -70,15 +70,15 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_stop();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_stop() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// timer callback overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// internal state:

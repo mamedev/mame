@@ -45,7 +45,7 @@ class victor_9000_fdc_t :  public device_t
 {
 public:
 	// construction/destruction
-	victor_9000_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	victor_9000_fdc_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<victor_9000_fdc_t &>(device).m_irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_syn_wr_callback(device_t &device, _Object object) { return downcast<victor_9000_fdc_t &>(device).m_syn_cb.set_callback(object); }
@@ -89,13 +89,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	static const int rpm[0x100];

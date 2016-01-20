@@ -26,7 +26,7 @@ INPUT_CHANGED_MEMBER( vcs_lightpen_device::trigger )
 
 static INPUT_PORTS_START( vcs_lightpen )
 	PORT_START("JOY")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vcs_lightpen_device, trigger, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vcs_lightpen_device, trigger, nullptr)
 	PORT_BIT( 0xdf, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("LIGHTX")
@@ -56,7 +56,7 @@ ioport_constructor vcs_lightpen_device::device_input_ports() const
 //  vcs_lightpen_device - constructor
 //-------------------------------------------------
 
-vcs_lightpen_device::vcs_lightpen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+vcs_lightpen_device::vcs_lightpen_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VCS_LIGHTPEN, "Atari / CBM Light Pen", tag, owner, clock, "vcs_lightpen", __FILE__),
 	device_vcs_control_port_interface(mconfig, *this),
 	m_joy(*this, "JOY"),

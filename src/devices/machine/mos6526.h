@@ -108,8 +108,8 @@ class mos6526_device :  public device_t,
 {
 public:
 	// construction/destruction
-	mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
-	mos6526_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos6526_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source);
+	mos6526_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void static_set_tod_clock(device_t &device, int clock) { downcast<mos6526_device &>(device).m_tod_clock = clock; }
 
@@ -148,10 +148,10 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void execute_run();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void execute_run() override;
 
 	int m_icount;
 	int m_variant;
@@ -254,7 +254,7 @@ protected:
 class mos6526a_device : public mos6526_device
 {
 public:
-	mos6526a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos6526a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -263,13 +263,13 @@ public:
 class mos8520_device : public mos6526_device
 {
 public:
-	mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos8520_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
 protected:
-	virtual inline void clock_tod();
+	virtual inline void clock_tod() override;
 };
 
 
@@ -278,7 +278,7 @@ protected:
 class mos5710_device : public mos6526_device
 {
 public:
-	mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos5710_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	//DECLARE_READ8_MEMBER( read );
 	//DECLARE_WRITE8_MEMBER( write );

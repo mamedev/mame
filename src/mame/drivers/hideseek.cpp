@@ -33,7 +33,7 @@ Other stuff: NEC D4992 (RTC?) and xtal possibly 32.768kHz, 3V coin battery, 93L4
 class hideseek_state : public driver_device
 {
 public:
-	hideseek_state(const machine_config &mconfig, device_type type, const char *tag)
+	hideseek_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu")
 		{ }
@@ -42,7 +42,7 @@ public:
 
 
 	DECLARE_DRIVER_INIT(hideseek);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(hideseek);
 	UINT32 screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

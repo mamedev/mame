@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo, Stefan Jokisch
 /*
  *  The schematics don't seem to make a lot of sense when it
@@ -35,7 +35,7 @@
 class starshp1_state : public driver_device
 {
 public:
-	starshp1_state(const machine_config &mconfig, device_type type, const char *tag)
+	starshp1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_playfield_ram(*this, "playfield_ram"),
 		m_hpos_ram(*this, "hpos_ram"),
@@ -68,7 +68,7 @@ public:
 	int m_starfield_kill;
 	int m_mux;
 	int m_inverse;
-	UINT16 *m_LSFR;
+	std::unique_ptr<UINT16[]> m_LSFR;
 	bitmap_ind16 m_helper;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(starshp1_collision_reset_w);
@@ -83,7 +83,7 @@ public:
 	DECLARE_WRITE8_MEMBER(starshp1_audio_w);
 	DECLARE_WRITE8_MEMBER(starshp1_analog_out_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(starshp1);
 	UINT32 screen_update_starshp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_starshp1(screen_device &screen, bool state);

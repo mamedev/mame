@@ -19,7 +19,7 @@
 class pgm_state : public driver_device
 {
 public:
-	pgm_state(const machine_config &mconfig, device_type type, const char *tag)
+	pgm_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_videoregs(*this, "videoregs"),
 			m_videoram(*this, "videoram"),
@@ -41,9 +41,9 @@ public:
 	UINT16 *      m_bg_videoram;
 	UINT16 *      m_tx_videoram;
 	UINT16 *      m_rowscrollram;
-	UINT8  *      m_sprite_a_region;
+	std::unique_ptr<UINT8[]>      m_sprite_a_region;
 	size_t        m_sprite_a_region_size;
-	UINT16 *      m_spritebufferram; // buffered spriteram
+	std::unique_ptr<UINT16[]>     m_spritebufferram; // buffered spriteram
 
 	/* video-related */
 	tilemap_t       *m_bg_tilemap;
@@ -115,7 +115,7 @@ public:
 class pgm_asic3_state : public pgm_state
 {
 public:
-	pgm_asic3_state(const machine_config &mconfig, device_type type, const char *tag)
+	pgm_asic3_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pgm_state(mconfig, type, tag) {
 	}
 
@@ -130,7 +130,6 @@ public:
 	void asic3_compute_hold(int,int);
 	DECLARE_READ16_MEMBER( pgm_asic3_r );
 	DECLARE_WRITE16_MEMBER( pgm_asic3_w );
-	DECLARE_WRITE16_MEMBER( pgm_asic3_reg_w );
 };
 
 
@@ -138,7 +137,7 @@ public:
 class pgm_arm_type1_state : public pgm_state
 {
 public:
-	pgm_arm_type1_state(const machine_config &mconfig, device_type type, const char *tag)
+	pgm_arm_type1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pgm_state(mconfig, type, tag),
 			m_arm7_shareram(*this, "arm7_shareram"),
 			m_prot(*this, "prot") {
@@ -264,7 +263,7 @@ public:
 class pgm_arm_type2_state : public pgm_state
 {
 public:
-	pgm_arm_type2_state(const machine_config &mconfig, device_type type, const char *tag)
+	pgm_arm_type2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pgm_state(mconfig, type, tag),
 			m_arm_ram(*this, "arm_ram"),
 			m_arm7_shareram(*this, "arm7_shareram"),
@@ -308,7 +307,7 @@ public:
 class pgm_arm_type3_state : public pgm_state
 {
 public:
-	pgm_arm_type3_state(const machine_config &mconfig, device_type type, const char *tag)
+	pgm_arm_type3_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pgm_state(mconfig, type, tag),
 			m_arm_ram(*this, "arm_ram"),
 			m_arm_ram2(*this, "arm_ram2"),
@@ -316,7 +315,7 @@ public:
 	}
 	// svg
 	int           m_svg_ram_sel;
-	UINT32 *      m_svg_shareram[2];    //for 5585G MACHINE
+	std::unique_ptr<UINT32[]>      m_svg_shareram[2];    //for 5585G MACHINE
 
 	UINT32        m_svg_latchdata_68k_w;
 	UINT32        m_svg_latchdata_arm_w;
@@ -368,7 +367,7 @@ public:
 class pgm_022_025_state : public pgm_state
 {
 public:
-	pgm_022_025_state(const machine_config &mconfig, device_type type, const char *tag)
+	pgm_022_025_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pgm_state(mconfig, type, tag),
 			m_sharedprotram(*this, "sharedprotram"),
 			m_igs025(*this,"igs025"),
@@ -396,7 +395,7 @@ public:
 class pgm_012_025_state : public pgm_state
 {
 public:
-	pgm_012_025_state(const machine_config &mconfig, device_type type, const char *tag)
+	pgm_012_025_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pgm_state(mconfig, type, tag),
 			m_igs025(*this,"igs025")
 	{
@@ -423,7 +422,7 @@ public:
 class pgm_028_025_state : public pgm_state
 {
 public:
-	pgm_028_025_state(const machine_config &mconfig, device_type type, const char *tag)
+	pgm_028_025_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pgm_state(mconfig, type, tag),
 			m_sharedprotram(*this, "sharedprotram"),
 			m_igs025(*this,"igs025"),

@@ -486,6 +486,20 @@
      0  0  1  x   x  x  x  x   x  x  x  x   x  x  x  x  2000-3FFF   CS PIA IC4
      1  1  1  x   x  x  x  x   x  x  x  x   x  x  x  x  E000-FFFF   8K ROM
 
+TODO:
+Mystic Marathon colors are very likely incorrectly derived from schematics.
+
+The video DAC is in the lower right corner of the schematic on page 11 of the Mystic Marathon Drawing Set,
+or page 19 of the Turkey Shoot Service Manual (both are identical as far can be seen).   Both schematics
+are available at http://arcarc.xmission.com/PDF_Arcade_Williams/
+
+It's a RAM-based palette with 4 bit red, green, blue and brightness/intensity components. It looks like the
+brightness component (from IC76, the uppermost of the four 2148 SRAMs) should be combined with the color
+components in a more complicated way than simply multiplying them like MAME does. 
+
+Reference video: https://www.youtube.com/watch?v=R5OeC6Wc_yI
+
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -3099,8 +3113,8 @@ GAME( 1985, alienaru,   alienar,  williams_muxed, alienar, williams_state,  alie
 GAME( 1987, lottofun,   0,        lottofun,       lottofun, williams_state, lottofun, ROT0,   "H.A.R. Management", "Lotto Fun", MACHINE_SUPPORTS_SAVE )
 
 /* 2nd Generation Williams hardware with tilemaps */
-GAME( 1983, mysticm,    0,        mysticm,        mysticm, williams2_state, mysticm,  ROT0,   "Williams", "Mystic Marathon", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mysticmp,   mysticm,  mysticm,        mysticm, williams2_state, mysticm,  ROT0,   "Williams", "Mystic Marathon (prototype)", MACHINE_SUPPORTS_SAVE ) // newest roms are 'proto 6' ?
+GAME( 1983, mysticm,    0,        mysticm,        mysticm, williams2_state, mysticm,  ROT0,   "Williams", "Mystic Marathon", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE)
+GAME( 1983, mysticmp,   mysticm,  mysticm,        mysticm, williams2_state, mysticm,  ROT0,   "Williams", "Mystic Marathon (prototype)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // newest roms are 'proto 6' ?
 GAME( 1984, tshoot,     0,        tshoot,         tshoot, williams2_state,  tshoot,   ROT0,   "Williams", "Turkey Shoot", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, inferno,    0,        williams2,      inferno, williams2_state, inferno,  ROT0,   "Williams", "Inferno (Williams)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, joust2,     0,        joust2,         joust2, joust2_state,     joust2,   ROT270, "Williams", "Joust 2 - Survival of the Fittest (revision 2)", MACHINE_SUPPORTS_SAVE )

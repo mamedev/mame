@@ -52,7 +52,7 @@ class ie15_state : public driver_device,
 	public device_serial_interface
 {
 public:
-	ie15_state(const machine_config &mconfig, device_type type, const char *tag) :
+	ie15_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		device_serial_interface(mconfig, *this),
 		m_maincpu(*this, "maincpu"),
@@ -62,18 +62,18 @@ public:
 		m_io_keyboard(*this, "keyboard")
 	{ }
 
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
 	DECLARE_WRITE16_MEMBER( kbd_put );
 	DECLARE_PALETTE_INIT( ie15 );
 
 	DECLARE_WRITE_LINE_MEMBER( serial_rx_callback );
-	virtual void rcv_complete();
-	virtual void tra_callback();
-	virtual void tra_complete();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void rcv_complete() override;
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	DECLARE_WRITE8_MEMBER( mem_w );
 	DECLARE_READ8_MEMBER( mem_r );
@@ -541,14 +541,14 @@ UINT32 ie15_state::draw_scanline(UINT16 *p, UINT16 offset, UINT8 scanline)
 void ie15_state::update_leds()
 {
 	UINT8 data = m_io_keyboard->read();
-	output_set_value("lat_led", m_kb_ruslat ^ 1);
-	output_set_value("nr_led", BIT(m_kb_control, IE_KB_NR_BIT) ^ 1);
-	output_set_value("pch_led", BIT(data, IE_KB_PCH_BIT) ^ 1);
-	output_set_value("dup_led", BIT(data, IE_KB_DUP_BIT) ^ 1);
-	output_set_value("lin_led", BIT(data, IE_KB_LIN_BIT) ^ 1);
-	output_set_value("red_led", BIT(data, IE_KB_RED_BIT) ^ 1);
-	output_set_value("sdv_led", BIT(m_kb_control, IE_KB_SDV_BIT) ^ 1);
-	output_set_value("prd_led", 1); // XXX
+	output().set_value("lat_led", m_kb_ruslat ^ 1);
+	output().set_value("nr_led", BIT(m_kb_control, IE_KB_NR_BIT) ^ 1);
+	output().set_value("pch_led", BIT(data, IE_KB_PCH_BIT) ^ 1);
+	output().set_value("dup_led", BIT(data, IE_KB_DUP_BIT) ^ 1);
+	output().set_value("lin_led", BIT(data, IE_KB_LIN_BIT) ^ 1);
+	output().set_value("red_led", BIT(data, IE_KB_RED_BIT) ^ 1);
+	output().set_value("sdv_led", BIT(m_kb_control, IE_KB_SDV_BIT) ^ 1);
+	output().set_value("prd_led", 1); // XXX
 }
 
 /*

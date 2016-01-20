@@ -22,7 +22,7 @@
 
 #define VERBOSE_LEVEL   (0)
 
-INLINE void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
+static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -240,7 +240,7 @@ void gba_state::dma_exec(FPTR ch)
 
 //  printf("settng DMA timer %d for %d cycs (tmr %x)\n", ch, cnt, (UINT32)m_dma_timer[ch]);
 //  m_dma_timer[ch]->adjust(ATTOTIME_IN_CYCLES(0, cnt), ch);
-	dma_complete(NULL, ch);
+	dma_complete(nullptr, ch);
 }
 
 void gba_state::audio_tick(int ref)
@@ -1838,7 +1838,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 	}
 }
 
-INLINE UINT32 COMBINE_DATA32_16(UINT32 prev, UINT32 data, UINT32 mem_mask)
+static inline UINT32 COMBINE_DATA32_16(UINT32 prev, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&prev);
 	switch(mem_mask)
@@ -2279,7 +2279,7 @@ static MACHINE_CONFIG_START( gbadv, gba_state )
 	MCFG_SOUND_ADD("direct_b_right", DAC, 0)        // GBA direct sound B right
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "spkright", 0.50)
 
-	MCFG_GBA_CARTRIDGE_ADD("cartslot", gba_cart, NULL)
+	MCFG_GBA_CARTRIDGE_ADD("cartslot", gba_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gba")
 MACHINE_CONFIG_END
 

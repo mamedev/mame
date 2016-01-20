@@ -15,7 +15,8 @@ public:
 	: osd_module(OSD_NETDEV_PROVIDER, "none"), netdev_module()
 	{
 	}
-	int init(const osd_options &options) { return 0; }
+
+	virtual int init(const osd_options &options) override { return 0; }
 };
 
 MODULE_DEFINITION(NETDEV_NONE, netdev_none)

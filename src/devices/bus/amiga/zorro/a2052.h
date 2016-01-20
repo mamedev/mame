@@ -28,17 +28,17 @@ class a2052_device : public device_t, public device_zorro2_card_interface, publi
 {
 public:
 	// construction/destruction
-	a2052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a2052_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual ioport_constructor device_input_ports() const;
-	virtual void device_start();
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
 
 	// device_zorro2_card_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w ) override;
 
 	// amiga_autoconfig overrides
-	virtual void autoconfig_base_address(offs_t address);
+	virtual void autoconfig_base_address(offs_t address) override;
 
 private:
 	required_ioport m_config;

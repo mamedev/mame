@@ -89,8 +89,8 @@ WRITE16_MEMBER(dbz_state::dbzcontrol_w)
 	else
 		m_k053246->k053246_set_objcha_line( CLEAR_LINE);
 
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
 WRITE16_MEMBER(dbz_state::dbz_sound_command_w)

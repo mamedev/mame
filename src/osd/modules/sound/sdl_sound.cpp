@@ -57,13 +57,13 @@ public:
 	}
 	virtual ~sound_sdl() { }
 
-	virtual int init(const osd_options &options);
-	virtual void exit();
+	virtual int init(const osd_options &options) override;
+	virtual void exit() override;
 
 	// sound_module
 
-	virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame);
-	virtual void set_mastervolume(int attenuation);
+	virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame) override;
+	virtual void set_mastervolume(int attenuation) override;
 
 private:
 	int lock_buffer(bool is_throttled, long offset, long size, void **buffer1, long *length1, void **buffer2, long *length2);
@@ -518,7 +518,7 @@ int sound_sdl::sdl_create_buffers(void)
 {
 	osd_printf_verbose("sdl_create_buffers: creating stream buffer of %u bytes\n", stream_buffer_size);
 
-	stream_buffer = global_alloc_array_clear(INT8, stream_buffer_size);
+	stream_buffer = global_alloc_array_clear<INT8>(stream_buffer_size);
 	stream_playpos = 0;
 	buf_locked = 0;
 	return 0;

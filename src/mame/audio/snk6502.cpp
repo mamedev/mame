@@ -39,7 +39,7 @@ const char *const sasuke_sample_names[] =
 	"shot",
 	"boss_attack",
 
-	0
+	nullptr
 };
 
 const char *const vanguard_sample_names[] =
@@ -68,7 +68,7 @@ const char *const vanguard_sample_names[] =
 	"vg_voi-e",
 	"vg_voi-f",
 
-	0
+	nullptr
 };
 
 
@@ -90,7 +90,7 @@ const char *const fantasy_sample_names[] =
 	"ft_voi-a",
 	"ft_voi-b",
 
-	0
+	nullptr
 };
 
 
@@ -130,15 +130,15 @@ DISCRETE_SOUND_END
 
 const device_type SNK6502 = &device_creator<snk6502_sound_device>;
 
-snk6502_sound_device::snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+snk6502_sound_device::snk6502_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SNK6502, "SNK6502 Audio Custom", tag, owner, clock, "snk6502_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		//m_tone_channels[CHANNELS],
 		m_tone_clock_expire(0),
 		m_tone_clock(0),
-		m_tone_stream(NULL),
+		m_tone_stream(nullptr),
 		m_samples(*this, ":samples"),
-		m_ROM(NULL),
+		m_ROM(nullptr),
 		m_Sound0StopOnRollover(0),
 		m_LastPort1(0),
 		m_hd38880_cmd(0),

@@ -1,4 +1,11 @@
 language: cpp
+addons:
+    apt:
+        sources:
+            - ubuntu-toolchain-r-test
+        packages:
+            - g++-5
+            - gcc-5
 compiler:
   - gcc
   - clang
@@ -9,14 +16,16 @@ matrix:
   exclude:
     - os: osx
       compiler: gcc
+    - os: linux
+      compiler: clang
 env:
   - SUBTARGET=arcade MAME=mamearcade64 LDOPTS="-Wl,-no-keep-memory"
   - SUBTARGET=mess   MAME=mess64
 script:
   - if [ $TRAVIS_OS_NAME == 'linux' ]; then
     if [ $CC == 'clang' ]; then
-    make -j2 linux_x64_clang && ./$MAME -validate;
-    else make -j2 OPTIMIZE=0      && ./$MAME -validate;
+    make -j2 OVERRIDE_CXX="clang++-3.6" OVERRIDE_CC="clang-3.6" && ./$MAME -validate;
+    else make -j4 OPTIMIZE=0 OVERRIDE_CC="gcc-5" OVERRIDE_CXX="g++-5" && ./$MAME -validate;
     fi
     elif [ $TRAVIS_OS_NAME == 'osx' ]; then
     unset LDOPTS && make -j2 OPTIMIZE=0 MACOSX_USE_LIBSDL=1 && ./$MAME -validate;

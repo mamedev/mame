@@ -14,7 +14,7 @@
 class ssem_state : public driver_device
 {
 public:
-	ssem_state(const machine_config &mconfig, device_type type, const char *tag)
+	ssem_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_store(*this, "store"),
@@ -25,8 +25,8 @@ public:
 	required_device<screen_device> m_screen;
 
 	UINT8 m_store_line;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(panel_check);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(ssem_store);

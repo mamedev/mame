@@ -199,7 +199,7 @@ MAIN BOARD:
 
 WRITE8_MEMBER(trackfld_state::coin_w)
 {
-	coin_counter_w(machine(), offset, data & 1);
+	machine().bookkeeping().coin_counter_w(offset, data & 1);
 }
 
 WRITE8_MEMBER(trackfld_state::questions_bank_w)

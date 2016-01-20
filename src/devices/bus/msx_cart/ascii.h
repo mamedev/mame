@@ -17,16 +17,16 @@ class msx_cart_ascii8 : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_ascii8(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_ascii8(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 
 	void restore_banks();
 
@@ -41,16 +41,16 @@ class msx_cart_ascii16 : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_ascii16(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_ascii16(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 
 	void restore_banks();
 
@@ -65,16 +65,16 @@ class msx_cart_ascii8_sram : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_ascii8_sram(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_ascii8_sram(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 
 	void restore_banks();
 
@@ -92,16 +92,16 @@ class msx_cart_ascii16_sram : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_ascii16_sram(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_ascii16_sram(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 
 	void restore_banks();
 
@@ -119,16 +119,16 @@ class msx_cart_msxwrite : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_msxwrite(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_msxwrite(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 
 	void restore_banks();
 

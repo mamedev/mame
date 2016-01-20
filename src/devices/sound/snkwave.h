@@ -28,15 +28,15 @@ class snkwave_device : public device_t,
 						public device_sound_interface
 {
 public:
-	snkwave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	snkwave_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~snkwave_device() { }
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
 	DECLARE_WRITE8_MEMBER( snkwave_w );

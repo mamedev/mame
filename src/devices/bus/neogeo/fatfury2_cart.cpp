@@ -18,7 +18,7 @@
 const device_type NEOGEO_FATFURY2_CART = &device_creator<neogeo_fatfury2_cart>;
 
 
-neogeo_fatfury2_cart::neogeo_fatfury2_cart(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT16 clock, const char *shortname, const char *source)
+neogeo_fatfury2_cart::neogeo_fatfury2_cart(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT16 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_neogeo_cart_interface( mconfig, *this ),
 						m_banked_cart(*this, "banked_cart"),
@@ -26,7 +26,7 @@ neogeo_fatfury2_cart::neogeo_fatfury2_cart(const machine_config &mconfig, device
 {
 }
 
-neogeo_fatfury2_cart::neogeo_fatfury2_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock)
+neogeo_fatfury2_cart::neogeo_fatfury2_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT16 clock)
 					: device_t(mconfig, NEOGEO_FATFURY2_CART, "NEOGEO Fatal Fury 2 Cart", tag, owner, clock, "neogeo_rom", __FILE__),
 						device_neogeo_cart_interface( mconfig, *this ),
 						m_banked_cart(*this, "banked_cart"),

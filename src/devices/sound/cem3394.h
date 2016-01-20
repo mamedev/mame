@@ -47,7 +47,7 @@ class cem3394_device : public device_t,
 						public device_sound_interface
 {
 public:
-	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cem3394_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~cem3394_device() { }
 
 	static void set_ext_input_callback(device_t &device, cem3394_ext_input_delegate callback) { downcast<cem3394_device &>(device).m_ext_cb = callback; }
@@ -56,10 +56,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
 	// Set the voltage going to a particular parameter
@@ -107,8 +107,8 @@ private:
 	double m_inv_sample_rate;
 	int m_sample_rate;
 
-	INT16 *m_mixer_buffer;
-	INT16 *m_external_buffer;
+	std::unique_ptr<INT16[]> m_mixer_buffer;
+	std::unique_ptr<INT16[]> m_external_buffer;
 };
 
 extern const device_type CEM3394;

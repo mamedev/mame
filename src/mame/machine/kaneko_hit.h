@@ -38,7 +38,7 @@ struct calc3_hit_t
 class kaneko_hit_device : public device_t
 {
 public:
-	kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kaneko_hit_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void set_type(device_t &device, int hittype);
 
@@ -48,8 +48,8 @@ public:
 	DECLARE_WRITE16_MEMBER(kaneko_hit_w);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	calc1_hit_t m_hit;

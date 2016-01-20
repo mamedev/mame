@@ -12,7 +12,7 @@ struct chr_bank
 class playch10_state : public driver_device
 {
 public:
-	playch10_state(const machine_config &mconfig, device_type type, const char *tag)
+	playch10_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ppu(*this, "ppu"),
@@ -50,9 +50,9 @@ public:
 	int m_MMC2_bank[4];
 	int m_MMC2_bank_latch[2];
 	UINT8* m_vrom;
-	UINT8* m_vram;
+	std::unique_ptr<UINT8[]> m_vram;
 	UINT8* m_nametable[4];
-	UINT8* m_nt_ram;
+	std::unique_ptr<UINT8[]> m_nt_ram;
 	chr_bank m_chr_page[8];
 	int m_mmc1_shiftreg;
 	int m_mmc1_shiftcount;
@@ -122,9 +122,9 @@ public:
 	DECLARE_DRIVER_INIT(pckboard);
 	DECLARE_DRIVER_INIT(pc_hrz);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(playch10);
 	DECLARE_MACHINE_START(playch10_hboard);
 	DECLARE_VIDEO_START(playch10_hboard);

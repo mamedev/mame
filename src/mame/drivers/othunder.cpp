@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Graves
+// thanks-to:Richard Bush
 /***************************************************************************
 
 Operation Thunderbolt  (Taito)
@@ -366,8 +367,8 @@ WRITE16_MEMBER(othunder_state::othunder_tc0220ioc_w)
                 x0000000    eeprom out data  */
 
 				/* Recoil Piston Motor Status */
-				output_set_value("Player1_Recoil_Piston", data & 0x1 );
-				output_set_value("Player2_Recoil_Piston", (data & 0x2) >>1 );
+				output().set_value("Player1_Recoil_Piston", data & 0x1 );
+				output().set_value("Player2_Recoil_Piston", (data & 0x2) >>1 );
 
 				if (data & 4)
 					popmessage("OBPRI SET!");

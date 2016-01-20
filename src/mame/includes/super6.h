@@ -30,7 +30,7 @@
 class super6_state : public driver_device
 {
 public:
-	super6_state(const machine_config &mconfig, device_type type, const char *tag)
+	super6_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_ctc(*this, Z80CTC_TAG),
@@ -59,8 +59,8 @@ public:
 	required_region_ptr<UINT8> m_rom;
 	required_ioport m_j7;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
@@ -79,7 +79,6 @@ public:
 	UINT8 m_bank0;
 	UINT8 m_bank1;
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
-	DECLARE_WRITE8_MEMBER(dummy_w);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);

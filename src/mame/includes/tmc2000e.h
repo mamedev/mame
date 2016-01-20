@@ -22,7 +22,7 @@
 class tmc2000e_state : public driver_device
 {
 public:
-	tmc2000e_state(const machine_config &mconfig, device_type type, const char *tag)
+	tmc2000e_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
 			m_cti(*this, CDP1864_TAG),
@@ -53,8 +53,8 @@ public:
 	required_ioport m_y7;
 	required_ioport m_run;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( vismac_r );
 	DECLARE_WRITE8_MEMBER( vismac_w );

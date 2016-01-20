@@ -5,7 +5,7 @@
 class shangha3_state : public driver_device
 {
 public:
-	shangha3_state(const machine_config &mconfig, device_type type, const char *tag)
+	shangha3_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -52,7 +52,7 @@ public:
 
 	DECLARE_DRIVER_INIT(shangha3);
 	DECLARE_DRIVER_INIT(heberpop);
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

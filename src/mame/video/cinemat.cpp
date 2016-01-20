@@ -227,15 +227,15 @@ UINT32 cinemat_state::screen_update_spacewar(screen_device &screen, bitmap_rgb32
 	screen_update_cinemat(screen, bitmap, cliprect);
 
 	/* set the state of the artwork */
-	output_set_value("pressed3", (~sw_option >> 0) & 1);
-	output_set_value("pressed8", (~sw_option >> 1) & 1);
-	output_set_value("pressed4", (~sw_option >> 2) & 1);
-	output_set_value("pressed9", (~sw_option >> 3) & 1);
-	output_set_value("pressed1", (~sw_option >> 4) & 1);
-	output_set_value("pressed6", (~sw_option >> 5) & 1);
-	output_set_value("pressed2", (~sw_option >> 6) & 1);
-	output_set_value("pressed7", (~sw_option >> 7) & 1);
-	output_set_value("pressed5", (~sw_option >> 10) & 1);
-	output_set_value("pressed0", (~sw_option >> 11) & 1);
+	output().set_value("pressed3", (~sw_option >> 0) & 1);
+	output().set_value("pressed8", (~sw_option >> 1) & 1);
+	output().set_value("pressed4", (~sw_option >> 2) & 1);
+	output().set_value("pressed9", (~sw_option >> 3) & 1);
+	output().set_value("pressed1", (~sw_option >> 4) & 1);
+	output().set_value("pressed6", (~sw_option >> 5) & 1);
+	output().set_value("pressed2", (~sw_option >> 6) & 1);
+	output().set_value("pressed7", (~sw_option >> 7) & 1);
+	output().set_value("pressed5", (~sw_option >> 10) & 1);
+	output().set_value("pressed0", (~sw_option >> 11) & 1);
 	return 0;
 }

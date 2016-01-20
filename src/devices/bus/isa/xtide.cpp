@@ -122,7 +122,7 @@ WRITE_LINE_MEMBER(xtide_device::ide_interrupt)
 }
 
 static MACHINE_CONFIG_FRAGMENT( xtide_config )
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(xtide_device, ide_interrupt))
 
 	MCFG_EEPROM_2864_ADD("eeprom")
@@ -299,7 +299,7 @@ const rom_entry *xtide_device::device_rom_region() const
 //  xtide_device - constructor
 //-------------------------------------------------
 
-xtide_device::xtide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+xtide_device::xtide_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ISA8_XTIDE, "XT-IDE Fixed Drive Adapter", tag, owner, clock, "isa8_xtide", __FILE__),
 	device_isa8_card_interface( mconfig, *this ),
 	m_ata(*this, "ata"),

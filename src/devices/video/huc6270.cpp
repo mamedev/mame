@@ -96,7 +96,7 @@ const device_type HUC6270 = &device_creator<huc6270_device>;
 
 const UINT8 huc6270_device::vram_increments[4] = { 1, 32, 64, 128 };
 
-huc6270_device::huc6270_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+huc6270_device::huc6270_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HUC6270, "HuC6270 VDC", tag, owner, clock, "huc6270", __FILE__),
 	m_vram_size(0),
 	m_irq_changed_cb(*this)
@@ -804,10 +804,10 @@ void huc6270_device::device_start()
 	/* Resolve callbacks */
 	m_irq_changed_cb.resolve_safe();
 
-	m_vram = auto_alloc_array_clear(machine(), UINT16, m_vram_size/sizeof(UINT16));
+	m_vram = make_unique_clear<UINT16[]>(m_vram_size/sizeof(UINT16));
 	m_vram_mask = (m_vram_size >> 1) - 1;
 
-	save_pointer(NAME(m_vram), m_vram_size/sizeof(UINT16));
+	save_pointer(NAME(m_vram.get()), m_vram_size/sizeof(UINT16));
 
 	save_item(NAME(m_register_index));
 	save_item(NAME(m_mawr));

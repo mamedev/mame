@@ -18,7 +18,7 @@ public:
 		TIMER_REFRESH_END
 	};
 
-	cchasm_state(const machine_config &mconfig, device_type type, const char *tag)
+	cchasm_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ctc(*this, "ctc"),
@@ -60,11 +60,11 @@ public:
 
 	INPUT_CHANGED_MEMBER(set_coin_flag);
 
-	virtual void video_start();
-	virtual void sound_start();
+	virtual void video_start() override;
+	virtual void sound_start() override;
 
 	void refresh();
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

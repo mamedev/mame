@@ -42,7 +42,7 @@ It means we probably would have to emulate a modem device for it to treat commun
 class ti630_state : public driver_device
 {
 public:
-	ti630_state(const machine_config &mconfig, device_type type, const char *tag)
+	ti630_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_lcdc(*this, "hd44780")
@@ -53,8 +53,8 @@ public:
 	DECLARE_DRIVER_INIT(ti630);
 	DECLARE_PALETTE_INIT(ti630);
 private:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 };

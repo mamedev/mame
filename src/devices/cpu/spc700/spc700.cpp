@@ -80,7 +80,7 @@ Address  Function Register  R/W  When Reset          Remarks
 #define MAKE_INT_8(A) (int8)((A)&0xff)
 #else
 #define int8   int
-INLINE int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
+static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 #endif /* UCHAR_MAX == 0xff */
 
 #define MAKE_UINT_8(A) ((A)&0xff)
@@ -219,7 +219,7 @@ INLINE int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 const device_type SPC700 = &device_creator<spc700_device>;
 
 
-spc700_device::spc700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+spc700_device::spc700_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SPC700, "SPC700", tag, owner, clock, "spc700", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_a(0)
@@ -1244,7 +1244,7 @@ void spc700_device::device_start()
 }
 
 
-void spc700_device::state_string_export(const device_state_entry &entry, std::string &str)
+void spc700_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

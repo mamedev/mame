@@ -156,7 +156,7 @@ WRITE8_MEMBER(suprridr_state::sound_irq_ack_w)
 WRITE8_MEMBER(suprridr_state::coin_lock_w)
 {
 	/* cleared when 9 credits are hit, but never reset! */
-/*  coin_lockout_global_w(machine(), ~data & 1); */
+/*  machine().bookkeeping().coin_lockout_global_w(~data & 1); */
 }
 
 

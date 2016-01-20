@@ -36,7 +36,7 @@ class namco_audio_device : public device_t,
 							public device_sound_interface
 {
 public:
-	namco_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	namco_audio_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	~namco_audio_device() {}
 
 	// static configuration
@@ -45,7 +45,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// internal state
 
@@ -73,13 +73,13 @@ protected:
 	/* decoded waveform table */
 	INT16 *m_waveform[MAX_VOLUME];
 
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
 
 class namco_device : public namco_audio_device
 {
 public:
-	namco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER( pacman_sound_enable_w );
 	DECLARE_WRITE8_MEMBER( pacman_sound_w );
@@ -90,7 +90,7 @@ public:
 	DECLARE_WRITE8_MEMBER( polepos_sound_w );
 
 protected:
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
 
 extern const device_type NAMCO;
@@ -98,7 +98,7 @@ extern const device_type NAMCO;
 class namco_15xx_device : public namco_audio_device
 {
 public:
-	namco_15xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_15xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER( namco_15xx_w );
 	DECLARE_READ8_MEMBER( sharedram_r );
@@ -107,7 +107,7 @@ public:
 	void mappy_sound_enable(int enable);
 
 protected:
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
 
 extern const device_type NAMCO_15XX;
@@ -115,7 +115,7 @@ extern const device_type NAMCO_15XX;
 class namco_cus30_device : public namco_audio_device
 {
 public:
-	namco_cus30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_cus30_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER( namcos1_cus30_w );   /* wavedata + sound registers + RAM */
 	DECLARE_READ8_MEMBER( namcos1_cus30_r );
@@ -124,7 +124,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pacman_sound_w );
 
 protected:
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
 
 extern const device_type NAMCO_CUS30;

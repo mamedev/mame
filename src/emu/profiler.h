@@ -91,7 +91,7 @@ public:
 	// getters
 	bool enabled() const
 	{
-		return m_filoptr != NULL;
+		return m_filoptr != nullptr;
 	}
 	const char *text(running_machine &machine);
 

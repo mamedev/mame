@@ -398,7 +398,7 @@ bool i386_device::i386_translate_address(int intention, offs_t *address, vtlb_en
 	UINT32 directory = (a >> 22) & 0x3ff;
 	UINT32 table = (a >> 12) & 0x3ff;
 	vtlb_entry perm = 0;
-	bool ret = false;
+	bool ret;
 	bool user = (intention & TRANSLATE_USER_MASK) ? true : false;
 	bool write = (intention & TRANSLATE_WRITE) ? true : false;
 	bool debug = (intention & TRANSLATE_DEBUG_MASK) ? true : false;

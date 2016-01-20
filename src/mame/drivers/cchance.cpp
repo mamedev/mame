@@ -42,7 +42,7 @@ cha3    $10d8
 class cchance_state : public tnzs_state
 {
 public:
-	cchance_state(const machine_config &mconfig, device_type type, const char *tag)
+	cchance_state(const machine_config &mconfig, device_type type, std::string tag)
 		: tnzs_state(mconfig, type, tag) { }
 
 	UINT8 m_hop_io;
@@ -58,9 +58,9 @@ public:
 WRITE8_MEMBER(cchance_state::output_0_w)
 {
 	//---- --x- divider?
-	coin_lockout_w(machine(), 0, ~data & 1);
+	machine().bookkeeping().coin_lockout_w(0, ~data & 1);
 
-//  coin_counter_w(machine(), 0, ~data & 1);
+//  machine().bookkeeping().coin_counter_w(0, ~data & 1);
 }
 
 

@@ -162,7 +162,7 @@ static const UINT8 Div31[POLY5_SIZE] =
 void tia_write(void *_chip, offs_t offset, UINT8 data)
 {
 	struct tia *chip = (struct tia *)_chip;
-	UINT16 new_val = 0;
+	UINT16 new_val;
 	UINT8 chan;
 
 	/* determine which address was changed */
@@ -564,7 +564,7 @@ void *tia_sound_init(device_t *device, int clock, int sample_rate, int gain)
 	struct tia *chip;
 	int chan;
 
-	chip = global_alloc_clear(struct tia);
+	chip = global_alloc_clear<struct tia>();
 
 	/* set the gain factor (normally use TIA_DEFAULT_GAIN) */
 	chip->tia_gain = gain;

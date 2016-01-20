@@ -15,7 +15,7 @@
 
 #define VERBOSE_LEVEL   (0)
 
-INLINE void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
+static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
 {
 	if (VERBOSE_LEVEL >= n_level)
 	{
@@ -31,7 +31,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const cha
 const device_type MC68328 = &device_creator<mc68328_device>;
 
 
-mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mc68328_device::mc68328_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, MC68328, "MC68328 (DragonBall) Integrated Processor", tag, owner, clock, "mc68328", __FILE__), m_rtc(nullptr), m_pwm(nullptr),
 				m_out_port_a_cb(*this),
 				m_out_port_b_cb(*this),
@@ -1794,7 +1794,7 @@ WRITE16_MEMBER( mc68328_device::write )
 
 READ16_MEMBER( mc68328_device::read )
 {
-	UINT16 temp16 = 0;
+	UINT16 temp16;
 	UINT32 address = offset << 1;
 
 	switch (address)

@@ -80,7 +80,7 @@ Dumped by Chack'n
 class cyclemb_state : public driver_device
 {
 public:
-	cyclemb_state(const machine_config &mconfig, device_type type, const char *tag)
+	cyclemb_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -124,8 +124,8 @@ public:
 
 	DECLARE_DRIVER_INIT(skydest);
 	DECLARE_DRIVER_INIT(cyclemb);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(cyclemb);
 
 	UINT32 screen_update_cyclemb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

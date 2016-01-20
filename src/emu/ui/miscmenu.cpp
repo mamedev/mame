@@ -32,7 +32,7 @@ ui_menu_keyboard_mode::ui_menu_keyboard_mode(running_machine &machine, render_co
 void ui_menu_keyboard_mode::populate()
 {
 	bool natural = machine().ui().use_natural_keyboard();
-	item_append("Keyboard Mode:", natural ? "Natural" : "Emulated", natural ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, NULL);
+	item_append("Keyboard Mode:", natural ? "Natural" : "Emulated", natural ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, nullptr);
 }
 
 ui_menu_keyboard_mode::~ui_menu_keyboard_mode()
@@ -46,7 +46,7 @@ void ui_menu_keyboard_mode::handle()
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
 
-	if (menu_event != NULL)
+	if (menu_event != nullptr)
 	{
 		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 		{
@@ -70,7 +70,7 @@ void ui_menu_bios_selection::populate()
 {
 	/* cycle through all devices for this system */
 	device_iterator deviter(machine().root_device());
-	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
 	{
 		if (device->rom_region()) {
 			const char *val = "default";
@@ -81,12 +81,12 @@ void ui_menu_bios_selection::populate()
 					val = ROM_GETHASHDATA(rom);
 				}
 			}
-			item_append(strcmp(device->tag(),":")==0 ? "driver" : device->tag()+1, val, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)device);
+			item_append(device->tag()==":" ? "driver" : device->tag().substr(1).c_str(), val, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)device);
 		}
 	}
 
-	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-	item_append("Reset",  NULL, 0, (void *)1);
+	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append("Reset",  nullptr, 0, (void *)1);
 }
 
 ui_menu_bios_selection::~ui_menu_bios_selection()
@@ -102,7 +102,7 @@ void ui_menu_bios_selection::handle()
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
 
-	if (menu_event != NULL && menu_event->itemref != NULL)
+	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		if ((FPTR)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
 			machine().schedule_hard_reset();
@@ -118,16 +118,15 @@ void ui_menu_bios_selection::handle()
 			if (val<1) val=cnt;
 			if (val>cnt) val=1;
 			dev->set_system_bios(val);
-			if (strcmp(dev->tag(),":")==0) {
+			if (dev->tag()!=":") {
 				std::string error;
 				machine().options().set_value("bios", val-1, OPTION_PRIORITY_CMDLINE, error);
 				assert(error.empty());
 			} else {
 				std::string error;
-				std::string value;
-				std::string temp;
-				strprintf(value,"%s,bios=%d",machine().options().main_value(temp,dev->owner()->tag()+1),val-1);
-				machine().options().set_value(dev->owner()->tag()+1, value.c_str(), OPTION_PRIORITY_CMDLINE, error);
+				std::string value = machine().options().main_value(dev->owner()->tag().substr(1).c_str());
+				strcatprintf(value,",bios=%d",val-1);
+				machine().options().set_value(dev->owner()->tag().substr(1).c_str(), value.c_str(), OPTION_PRIORITY_CMDLINE, error);
 				assert(error.empty());
 			}
 			reset(UI_MENU_RESET_REMEMBER_REF);
@@ -154,10 +153,10 @@ void ui_menu_network_devices::populate()
 {
 	/* cycle through all devices for this system */
 	network_interface_iterator iter(machine().root_device());
-	for (device_network_interface *network = iter.first(); network != NULL; network = iter.next())
+	for (device_network_interface *network = iter.first(); network != nullptr; network = iter.next())
 	{
 		int curr = network->get_interface();
-		const char *title = NULL;
+		const char *title = nullptr;
 		const osd_netdev::entry_t *entry = netdev_first();
 		while(entry) {
 			if(entry->id==curr) {
@@ -167,7 +166,7 @@ void ui_menu_network_devices::populate()
 			entry = entry->m_next;
 		}
 
-		item_append(network->device().tag(),  (title) ? title : "------", MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)network);
+		item_append(network->device().tag().c_str(),  (title) ? title : "------", MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)network);
 	}
 }
 
@@ -180,7 +179,7 @@ void ui_menu_network_devices::handle()
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
 
-	if (menu_event != NULL && menu_event->itemref != NULL)
+	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT) {
 			device_network_interface *network = (device_network_interface *)menu_event->itemref;
@@ -231,7 +230,7 @@ ui_menu_bookkeeping::~ui_menu_bookkeeping()
 
 void ui_menu_bookkeeping::populate()
 {
-	int tickets = get_dispensed_tickets(machine());
+	int tickets = machine().bookkeeping().get_dispensed_tickets();
 	std::string tempstring;
 	int ctrnum;
 
@@ -248,7 +247,7 @@ void ui_menu_bookkeeping::populate()
 	/* loop over coin counters */
 	for (ctrnum = 0; ctrnum < COIN_COUNTERS; ctrnum++)
 	{
-		int count = coin_counter_get_count(machine(), ctrnum);
+		int count = machine().bookkeeping().coin_counter_get_count(ctrnum);
 
 		/* display the coin counter number */
 		strcatprintf(tempstring,"Coin %c: ", ctrnum + 'A');
@@ -260,13 +259,13 @@ void ui_menu_bookkeeping::populate()
 			strcatprintf(tempstring, "%d", count);
 
 		/* display whether or not we are locked out */
-		if (coin_lockout_get_state(machine(), ctrnum))
+		if (machine().bookkeeping().coin_lockout_get_state(ctrnum))
 			tempstring.append(" (locked)");
 		tempstring.append("\n");
 	}
 
 	/* append the single item */
-	item_append(tempstring.c_str(), NULL, MENU_FLAG_MULTILINE, NULL);
+	item_append(tempstring.c_str(), nullptr, MENU_FLAG_MULTILINE, nullptr);
 }
 
 /*-------------------------------------------------
@@ -280,7 +279,7 @@ void ui_menu_crosshair::handle()
 	const ui_menu_event *menu_event = process(UI_MENU_PROCESS_LR_REPEAT);
 
 	/* handle events */
-	if (menu_event != NULL && menu_event->itemref != NULL)
+	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		crosshair_user_settings settings;
 		crosshair_item_data *data = (crosshair_item_data *)menu_event->itemref;
@@ -289,7 +288,7 @@ void ui_menu_crosshair::handle()
 		int newval = data->cur;
 
 		/* retreive the user settings */
-		crosshair_get_user_settings(machine(), data->player, &settings);
+		machine().crosshair().get_user_settings(data->player, &settings);
 
 		switch (menu_event->iptkey)
 		{
@@ -361,7 +360,7 @@ void ui_menu_crosshair::handle()
 		if (changed)
 		{
 			/* save the user settings */
-			crosshair_set_user_settings(machine(), data->player, &settings);
+			machine().crosshair().set_user_settings(data->player, &settings);
 
 			/* rebuild the menu */
 			reset(UI_MENU_RESET_REMEMBER_POSITION);
@@ -392,7 +391,7 @@ void ui_menu_crosshair::populate()
 	for (player = 0; player < MAX_PLAYERS; player++)
 	{
 		/* get the user settings */
-		crosshair_get_user_settings(machine(), player, &settings);
+		machine().crosshair().get_user_settings(player, &settings);
 
 		/* add menu items for usable crosshairs */
 		if (settings.used)
@@ -445,7 +444,7 @@ void ui_menu_crosshair::populate()
 
 			/* look for the current name, then remember the name before */
 			/* and find the next name */
-			while (((dir = path.next()) != NULL) && !finished)
+			while (((dir = path.next()) != nullptr) && !finished)
 			{
 				int length = strlen(dir->name);
 
@@ -503,7 +502,7 @@ void ui_menu_crosshair::populate()
 	if (use_auto)
 	{
 		/* any player can be used to get the autotime */
-		crosshair_get_user_settings(machine(), 0, &settings);
+		machine().crosshair().get_user_settings(0, &settings);
 
 		/* CROSSHAIR_ITEM_AUTO_TIME - allocate a data item and fill it */
 		data = (crosshair_item_data *)m_pool_alloc(sizeof(*data));

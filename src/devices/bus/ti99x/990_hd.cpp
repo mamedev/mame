@@ -41,13 +41,13 @@ struct UINT32BE
 	UINT8 bytes[4];
 };
 
-INLINE UINT32 get_UINT32BE(UINT32BE word)
+static inline UINT32 get_UINT32BE(UINT32BE word)
 {
 	return (word.bytes[0] << 24) | (word.bytes[1] << 16) | (word.bytes[2] << 8) | word.bytes[3];
 }
 
 #ifdef UNUSED_FUNCTION
-INLINE void set_UINT32BE(UINT32BE *word, UINT32 data)
+static inline void set_UINT32BE(UINT32BE *word, UINT32 data)
 {
 	word->bytes[0] = (data >> 24) & 0xff;
 	word->bytes[1] = (data >> 16) & 0xff;
@@ -137,19 +137,19 @@ int ti990_hdc_device::get_id_from_device( device_t *device )
 {
 	int id = -1;
 
-	if ( ! strcmp( ":harddisk1", device->tag() ) )
+	if (":harddisk1" == device->tag())
 	{
 		id = 0;
 	}
-	else if ( ! strcmp( ":harddisk2", device->tag() ) )
+	else if (":harddisk2"==device->tag())
 	{
 		id = 1;
 	}
-	else if ( ! strcmp( ":harddisk3", device->tag() ) )
+	else if (":harddisk3"==device->tag())
 	{
 		id = 2;
 	}
-	else if ( ! strcmp( ":harddisk4", device->tag() ) )
+	else if (":harddisk4"==device->tag())
 	{
 		id = 3;
 	}
@@ -196,7 +196,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device, ti990_hd )
 
 		/* set file descriptor */
 		d->format = format_old;
-		d->hd_handle = NULL;
+		d->hd_handle = nullptr;
 
 		/* use custom image header. */
 		/* to convert old header-less images to this format, insert a 16-byte
@@ -220,7 +220,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device, ti990_hd )
 	if (d->bytes_per_sector > MAX_SECTOR_SIZE)
 	{
 		d->format = format_mame;
-		d->hd_handle = NULL;
+		d->hd_handle = nullptr;
 		d->wp = 1;
 		d->unsafe = 1;
 		return IMAGE_INIT_FAIL;
@@ -247,7 +247,7 @@ DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hdc_device, ti990_hd )
 	d = &m_d[id];
 
 	d->format = format_mame;    /* don't care */
-	d->hd_handle = NULL;
+	d->hd_handle = nullptr;
 	d->wp = 1;
 	d->unsafe = 1;
 
@@ -265,7 +265,7 @@ int ti990_hdc_device::is_unit_loaded(int unit)
 	switch (m_d[unit].format)
 	{
 	case format_mame:
-		reply = (m_d[unit].hd_handle != NULL);
+		reply = (m_d[unit].hd_handle != nullptr);
 		break;
 
 	case format_old:
@@ -976,7 +976,7 @@ MACHINE_CONFIG_END
 
 const device_type TI990_HDC = &device_creator<ti990_hdc_device>;
 
-ti990_hdc_device::ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti990_hdc_device::ti990_hdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TI990_HDC, "Generic TI-990 Hard Disk Controller", tag, owner, clock, "hdc_990", __FILE__),
 	m_interrupt_callback(*this)
 {
@@ -995,7 +995,7 @@ void ti990_hdc_device::device_start()
 	for (i=0; i<MAX_DISK_UNIT; i++)
 	{
 		m_d[i].format = format_mame;
-		m_d[i].hd_handle = NULL;
+		m_d[i].hd_handle = nullptr;
 		m_d[i].wp = 1;
 		m_d[i].unsafe = 1;
 	}

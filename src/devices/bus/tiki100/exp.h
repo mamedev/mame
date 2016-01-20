@@ -110,16 +110,16 @@ class tiki100_bus_slot_t : public device_t,
 {
 public:
 	// construction/destruction
-	tiki100_bus_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tiki100_bus_slot_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 protected:
 	// device_z80daisy_interface overrides
-	virtual int z80daisy_irq_state() { return get_card_device() ? m_card->z80daisy_irq_state() : 0; }
-	virtual int z80daisy_irq_ack() { return get_card_device() ? m_card->z80daisy_irq_ack() : 0; }
-	virtual void z80daisy_irq_reti() { if (get_card_device()) m_card->z80daisy_irq_reti(); }
+	virtual int z80daisy_irq_state() override { return get_card_device() ? m_card->z80daisy_irq_state() : 0; }
+	virtual int z80daisy_irq_ack() override { return get_card_device() ? m_card->z80daisy_irq_ack() : 0; }
+	virtual void z80daisy_irq_reti() override { if (get_card_device()) m_card->z80daisy_irq_reti(); }
 
 private:
 	// configuration
@@ -138,7 +138,7 @@ class tiki100_bus_t : public device_t
 {
 public:
 	// construction/destruction
-	tiki100_bus_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tiki100_bus_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~tiki100_bus_t() { m_device_list.detach_all(); }
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<tiki100_bus_t &>(device).m_irq_cb.set_callback(object); }
@@ -167,7 +167,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	devcb_write_line   m_irq_cb;

@@ -79,7 +79,7 @@ class im6402_device :  public device_t,
 {
 public:
 	// construction/destruction
-	im6402_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	im6402_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void set_rrc(device_t &device, int rrc) { downcast<im6402_device &>(device).m_rrc = rrc; }
 	static void set_trc(device_t &device, int trc) { downcast<im6402_device &>(device).m_trc = trc; }
@@ -114,15 +114,15 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_serial_interface overrides
-	virtual void tra_callback();
-	virtual void tra_complete();
-	virtual void rcv_callback();
-	virtual void rcv_complete();
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+	virtual void rcv_callback() override;
+	virtual void rcv_complete() override;
 
 private:
 	inline void set_dr(int state);

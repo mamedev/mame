@@ -25,7 +25,7 @@
 class modellot_state : public driver_device
 {
 public:
-	modellot_state(const machine_config &mconfig, device_type type, const char *tag)
+	modellot_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu")
@@ -40,7 +40,7 @@ public:
 private:
 	UINT8 m_term_data;
 	const UINT8 *m_p_chargen;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 

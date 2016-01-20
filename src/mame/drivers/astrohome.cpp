@@ -20,7 +20,7 @@
 class astrocde_mess_state : public astrocde_state
 {
 public:
-	astrocde_mess_state(const machine_config &mconfig, device_type type, const char *tag)
+	astrocde_mess_state(const machine_config &mconfig, device_type type, std::string tag)
 		: astrocde_state(mconfig, type, tag),
 		m_cart(*this, "cartslot"),
 		m_exp(*this, "exp")
@@ -208,10 +208,10 @@ static MACHINE_CONFIG_START( astrocde, astrocde_mess_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* expansion port */
-	MCFG_ASTROCADE_EXPANSION_SLOT_ADD("exp", astrocade_exp, NULL)
+	MCFG_ASTROCADE_EXPANSION_SLOT_ADD("exp", astrocade_exp, nullptr)
 
 	/* cartridge */
-	MCFG_ASTROCADE_CARTRIDGE_ADD("cartslot", astrocade_cart, NULL)
+	MCFG_ASTROCADE_CARTRIDGE_ADD("cartslot", astrocade_cart, nullptr)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","astrocde")

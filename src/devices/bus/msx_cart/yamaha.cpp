@@ -18,7 +18,7 @@ const device_type MSX_CART_SFG01 = &device_creator<msx_cart_sfg01>;
 const device_type MSX_CART_SFG05 = &device_creator<msx_cart_sfg05>;
 
 
-msx_cart_sfg::msx_cart_sfg(const machine_config &mconfig, const device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+msx_cart_sfg::msx_cart_sfg(const machine_config &mconfig, const device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_region_sfg(*this, "sfg")
@@ -32,13 +32,13 @@ msx_cart_sfg::msx_cart_sfg(const machine_config &mconfig, const device_type type
 }
 
 
-msx_cart_sfg01::msx_cart_sfg01(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_sfg01::msx_cart_sfg01(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: msx_cart_sfg(mconfig, MSX_CART_SFG01, "MSX Cartridge - SFG01", tag, owner, clock, "msx_cart_sfg01")
 {
 }
 
 
-msx_cart_sfg05::msx_cart_sfg05(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_sfg05::msx_cart_sfg05(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: msx_cart_sfg(mconfig, MSX_CART_SFG05, "MSX Cartridge - SFG05", tag, owner, clock, "msx_cart_sfg05")
 {
 }
@@ -61,7 +61,7 @@ static MACHINE_CONFIG_FRAGMENT( msx_sfg )
 	MCFG_YM2148_PORT_READ_HANDLER(DEVREAD8("kbdc", msx_audio_kbdc_port_device, read))
 	MCFG_YM2148_IRQ_HANDLER(WRITELINE(msx_cart_sfg,ym2148_irq_w))
 
-	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, NULL)
+	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, nullptr)
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 

@@ -15,8 +15,6 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write) {}
-
-protected:
 };
 
 
@@ -27,11 +25,11 @@ class astrocade_exp_device : public device_t,
 {
 public:
 	// construction/destruction
-	astrocade_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	astrocade_exp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~astrocade_exp_device();
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	bool get_card_mounted() { return m_card_mounted; }
 

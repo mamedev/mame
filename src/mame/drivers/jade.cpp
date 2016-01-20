@@ -23,7 +23,7 @@
 class jade_state : public driver_device
 {
 public:
-	jade_state(const machine_config &mconfig, device_type type, const char *tag)
+	jade_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG),
@@ -34,10 +34,9 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_READ8_MEMBER(data_r);
 private:
 	UINT8 m_term_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<i8251_device> m_uart;

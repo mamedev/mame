@@ -27,8 +27,6 @@ class osd_interface;
 // cli_frontend handles command-line processing and emulator execution
 class cli_frontend
 {
-	typedef tagmap_t<FPTR> int_map;
-
 public:
 	// construction/destruction
 	cli_frontend(cli_options &options, osd_interface &osd);
@@ -46,7 +44,6 @@ public:
 	void listcrc(const char *gamename = "*");
 	void listroms(const char *gamename = "*");
 	void listsamples(const char *gamename = "*");
-	static int compare_devices(const void *i1, const void *i2);
 	void listdevices(const char *gamename = "*");
 	void listslots(const char *gamename = "*");
 	void listmedia(const char *gamename = "*");
@@ -69,7 +66,6 @@ private:
 	cli_options &       m_options;
 	osd_interface &     m_osd;
 	int                 m_result;
-	UINT64              m_start_memory;
 };
 
 

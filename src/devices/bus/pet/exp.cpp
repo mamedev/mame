@@ -34,7 +34,7 @@ const device_type PET_EXPANSION_SLOT = &device_creator<pet_expansion_slot_device
 //  pet_expansion_slot_device - constructor
 //-------------------------------------------------
 
-pet_expansion_slot_device::pet_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pet_expansion_slot_device::pet_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PET_EXPANSION_SLOT, "PET memory expansion port", tag, owner, clock, "pet_expansion_slot", __FILE__),
 	device_slot_interface(mconfig, *this), m_card(nullptr),
 	m_read_dma(*this),
@@ -92,7 +92,7 @@ void pet_expansion_slot_device::device_start()
 
 void pet_expansion_slot_device::device_reset()
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		get_card_device()->reset();
 	}
@@ -115,7 +115,7 @@ int pet_expansion_slot_device::norom_r(address_space &space, offs_t offset, int 
 
 UINT8 pet_expansion_slot_device::read(address_space &space, offs_t offset, UINT8 data, int &sel)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		data = m_card->pet_bd_r(space, offset, data, sel);
 	}
@@ -130,7 +130,7 @@ UINT8 pet_expansion_slot_device::read(address_space &space, offs_t offset, UINT8
 
 void pet_expansion_slot_device::write(address_space &space, offs_t offset, UINT8 data, int &sel)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		m_card->pet_bd_w(space, offset, data, sel);
 	}

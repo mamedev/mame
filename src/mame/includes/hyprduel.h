@@ -7,7 +7,7 @@
 class hyprduel_state : public driver_device
 {
 public:
-	hyprduel_state(const machine_config &mconfig, device_type type, const char *tag)
+	hyprduel_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_vram_0(*this, "vram_0"),
 		m_vram_1(*this, "vram_1"),
@@ -46,16 +46,16 @@ public:
 	required_shared_ptr<UINT16> m_videoregs;
 	required_shared_ptr<UINT16> m_sharedram1;
 	required_shared_ptr<UINT16> m_sharedram3;
-	UINT16 *  m_tiletable_old;
+	std::unique_ptr<UINT16[]>  m_tiletable_old;
 
 	/* video-related */
 	tilemap_t   *m_bg_tilemap[3];
-	UINT8     *m_empty_tiles;
-	UINT8     *m_dirtyindex;
+	std::unique_ptr<UINT8[]>    m_empty_tiles;
+	std::unique_ptr<UINT8[]>     m_dirtyindex;
 	int       m_sprite_xoffs;
 	int       m_sprite_yoffs;
 	int       m_sprite_yoffs_sub;
-	UINT8 *   m_expanded_gfx1;
+	std::unique_ptr<UINT8[]>   m_expanded_gfx1;
 
 	/* misc */
 	emu_timer *m_magerror_irq_timer;
@@ -94,7 +94,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_0_8bit);
 	TILE_GET_INFO_MEMBER(get_tile_info_1_8bit);
 	TILE_GET_INFO_MEMBER(get_tile_info_2_8bit);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(hyprduel);
 	DECLARE_VIDEO_START(hyprduel_14220);
 	DECLARE_MACHINE_START(magerror);

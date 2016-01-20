@@ -105,7 +105,7 @@ void ym3526_device::device_start()
 
 	/* stream system initialize */
 	m_chip = ym3526_init(this,clock(),rate);
-	assert_always(m_chip != NULL, "Error creating YM3526 chip");
+	assert_always(m_chip != nullptr, "Error creating YM3526 chip");
 
 	m_stream = machine().sound().stream_alloc(*this,0,1,rate);
 	/* YM3526 setup */
@@ -154,11 +154,11 @@ WRITE8_MEMBER( ym3526_device::write_port_w ) { write(space, 1, data); }
 
 const device_type YM3526 = &device_creator<ym3526_device>;
 
-ym3526_device::ym3526_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ym3526_device::ym3526_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YM3526, "YM3526", tag, owner, clock, "ym3526", __FILE__),
-		device_sound_interface(mconfig, *this), 
-		m_stream(NULL), 
-		m_chip(NULL),
+		device_sound_interface(mconfig, *this),
+		m_stream(nullptr),
+		m_chip(nullptr),
 		m_irq_handler(*this)
 {
 }

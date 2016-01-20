@@ -62,7 +62,7 @@ Notes:
 class rbmk_state : public driver_device
 {
 public:
-	rbmk_state(const machine_config &mconfig, device_type type, const char *tag)
+	rbmk_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_gms_vidram2(*this, "gms_vidram2"),
 		m_gms_vidram(*this, "gms_vidram"),
@@ -84,7 +84,7 @@ public:
 	DECLARE_WRITE8_MEMBER(rbmk_mcu_io_w);
 	DECLARE_WRITE8_MEMBER(mcu_io_mux_w);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mcu_irq);
 	required_device<cpu_device> m_maincpu;

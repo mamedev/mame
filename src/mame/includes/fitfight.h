@@ -4,7 +4,7 @@
 class fitfight_state : public driver_device
 {
 public:
-	fitfight_state(const machine_config &mconfig, device_type type, const char *tag)
+	fitfight_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_fof_100000(*this, "fof_100000"),
 		m_fof_600000(*this, "fof_600000"),
@@ -62,9 +62,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_fof_bak_tile_info);
 	TILE_GET_INFO_MEMBER(get_fof_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_fof_txt_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_fitfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(snd_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer );

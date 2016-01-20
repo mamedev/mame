@@ -286,11 +286,11 @@ class ygv608_device : public device_t
 {
 public:
 	// construction/destruction
-	ygv608_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ygv608_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 
 	DECLARE_WRITE16_MEMBER( write );
 	DECLARE_READ16_MEMBER( read );
@@ -306,7 +306,7 @@ public:
 	DECLARE_READ16_MEMBER( debug_trigger_r );
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 private:
 	TILEMAP_MAPPER_MEMBER(get_tile_offset);
 	TILE_GET_INFO_MEMBER(get_tile_info_A_8);

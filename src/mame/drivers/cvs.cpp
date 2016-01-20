@@ -155,7 +155,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_r)
 	if (m_s2650_flag)
 		return m_character_ram[(0 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return m_s2636_0->work_ram_r(space, offset);
+		return m_s2636_0->read_data(space, offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
@@ -167,7 +167,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
 		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
 	}
 	else
-		m_s2636_0->work_ram_w(space, offset, data);
+		m_s2636_0->write_data(space, offset, data);
 }
 
 
@@ -176,7 +176,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_r)
 	if (m_s2650_flag)
 		return m_character_ram[(1 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return m_s2636_1->work_ram_r(space, offset);
+		return m_s2636_1->read_data(space, offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
@@ -188,7 +188,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
 		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
 	}
 	else
-		m_s2636_1->work_ram_w(space, offset, data);
+		m_s2636_1->write_data(space, offset, data);
 }
 
 
@@ -197,7 +197,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_r)
 	if (m_s2650_flag)
 		return m_character_ram[(2 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return m_s2636_2->work_ram_r(space, offset);
+		return m_s2636_2->read_data(space, offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
@@ -209,7 +209,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
 		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
 	}
 	else
-		m_s2636_2->work_ram_w(space, offset, data);
+		m_s2636_2->write_data(space, offset, data);
 }
 
 
@@ -291,7 +291,7 @@ TIMER_CALLBACK_MEMBER(cvs_state::cvs_393hz_timer_cb)
 	m_cvs_393hz_clock = !m_cvs_393hz_clock;
 
 	/* quasar.c games use this timer but have no dac3! */
-	if (m_dac3 != NULL)
+	if (m_dac3 != nullptr)
 	{
 		if (m_dac3_state[2])
 			m_dac3->write_unsigned8(m_cvs_393hz_clock * 0xff);
@@ -924,7 +924,7 @@ static const gfx_layout charlayout =
 
 static GFXDECODE_START( cvs )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 256+4 )
-	GFXDECODE_ENTRY( NULL,   0x0000, charlayout, 0, 256+4 )
+	GFXDECODE_ENTRY( nullptr,   0x0000, charlayout, 0, 256+4 )
 GFXDECODE_END
 
 
@@ -938,7 +938,7 @@ GFXDECODE_END
 MACHINE_START_MEMBER(cvs_state,cvs)
 {
 	/* allocate memory */
-	if (m_gfxdecode->gfx(1) != NULL)
+	if (m_gfxdecode->gfx(1) != nullptr)
 		m_gfxdecode->gfx(1)->set_source(m_character_ram);
 
 	start_393hz_timer();
@@ -1011,15 +1011,12 @@ static MACHINE_CONFIG_START( cvs, cvs_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("s2636_0", S2636, 0)
-	MCFG_S2636_WORKRAM_SIZE(0x100)
 	MCFG_S2636_OFFSETS(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET)
 
 	MCFG_DEVICE_ADD("s2636_1", S2636, 0)
-	MCFG_S2636_WORKRAM_SIZE(0x100)
 	MCFG_S2636_OFFSETS(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET)
 
 	MCFG_DEVICE_ADD("s2636_2", S2636, 0)
-	MCFG_S2636_WORKRAM_SIZE(0x100)
 	MCFG_S2636_OFFSETS(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET)
 
 	/* audio hardware */

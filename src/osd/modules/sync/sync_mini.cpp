@@ -82,7 +82,7 @@ void osd_lock_free(osd_lock *lock)
 
 osd_event *osd_event_alloc(int manualreset, int initialstate)
 {
-	return NULL;
+	return nullptr;
 }
 
 
@@ -129,7 +129,7 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 
 osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 {
-	return NULL;
+	return nullptr;
 }
 
 

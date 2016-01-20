@@ -70,7 +70,7 @@ const device_type SNS_BSX_CART_SLOT = &device_creator<sns_bsx_cart_slot_device>;
 
 device_sns_cart_interface::device_sns_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
+		m_rom(nullptr),
 		m_rom_size(0)
 {
 }
@@ -88,9 +88,9 @@ device_sns_cart_interface::~device_sns_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_sns_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_sns_cart_interface::rom_alloc(UINT32 size, std::string tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = device().machine().memory().region_alloc(std::string(tag).append(SNSSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
@@ -172,7 +172,7 @@ void device_sns_cart_interface::rom_map_setup(UINT32 size)
 //-------------------------------------------------
 //  base_sns_cart_slot_device - constructor
 //-------------------------------------------------
-base_sns_cart_slot_device::base_sns_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+base_sns_cart_slot_device::base_sns_cart_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 						device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -181,17 +181,17 @@ base_sns_cart_slot_device::base_sns_cart_slot_device(const machine_config &mconf
 {
 }
 
-sns_cart_slot_device::sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sns_cart_slot_device::sns_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						base_sns_cart_slot_device(mconfig, SNS_CART_SLOT, "SNES Cartridge Slot", tag, owner, clock, "sns_cart_slot", __FILE__)
 {
 }
 
-sns_sufami_cart_slot_device::sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sns_sufami_cart_slot_device::sns_sufami_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						base_sns_cart_slot_device(mconfig, SNS_SUFAMI_CART_SLOT, "SNES Sufami Turbo Cartridge Slot", tag, owner, clock, "sns_sufami_cart_slot", __FILE__)
 {
 }
 
-sns_bsx_cart_slot_device::sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sns_bsx_cart_slot_device::sns_bsx_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						base_sns_cart_slot_device(mconfig, SNS_BSX_CART_SLOT, "SNES BS-X Cartridge Slot", tag, owner, clock, "sns_bsx_cart_slot", __FILE__)
 {
 }
@@ -289,10 +289,10 @@ static const sns_slot slot_list[] =
 
 static int sns_get_pcb_id(const char *slot)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(slot_list[i].slot_option, slot))
-			return slot_list[i].pcb_id;
+		if (!core_stricmp(elem.slot_option, slot))
+			return elem.pcb_id;
 	}
 
 	return 0;
@@ -300,10 +300,10 @@ static int sns_get_pcb_id(const char *slot)
 
 static const char *sns_get_slot(int type)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (slot_list[i].pcb_id == type)
-			return slot_list[i].slot_option;
+		if (elem.pcb_id == type)
+			return elem.slot_option;
 	}
 
 	return "lorom";
@@ -609,7 +609,7 @@ bool base_sns_cart_slot_device::call_load()
 		const char *slot_name;
 
 		/* Check for a header (512 bytes), and skip it if found */
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			UINT32 tmplen = length();
 			dynamic_buffer tmpROM(tmplen);
@@ -618,11 +618,11 @@ bool base_sns_cart_slot_device::call_load()
 			fseek(offset, SEEK_SET);
 		}
 
-		len = (software_entry() == NULL) ? (length() - offset) : get_software_region_length("rom");
+		len = (software_entry() == nullptr) ? (length() - offset) : get_software_region_length("rom");
 
 		m_cart->rom_alloc(len, tag());
 		ROM = m_cart->get_rom_base();
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 			fread(ROM, len);
 		else
 			memcpy(ROM, get_software_region("rom"), len);
@@ -630,7 +630,7 @@ bool base_sns_cart_slot_device::call_load()
 		m_cart->rom_map_setup(len);
 
 		// check for on-cart CPU bios
-		if (software_entry() != NULL)
+		if (software_entry() != nullptr)
 		{
 			if (get_software_region("addon"))
 			{
@@ -640,11 +640,11 @@ bool base_sns_cart_slot_device::call_load()
 		}
 
 		// get pcb type
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 			get_cart_type_addon(ROM, len, m_type, m_addon);
 		else
 		{
-			if ((slot_name = get_feature("slot")) == NULL)
+			if ((slot_name = get_feature("slot")) == nullptr)
 				m_type = SNES_MODE20;
 			else
 				m_type = sns_get_pcb_id(slot_name);
@@ -653,7 +653,7 @@ bool base_sns_cart_slot_device::call_load()
 					m_type = SNES_DSP_2MB;
 		}
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 			setup_addon_from_fullpath();
 
 		// in carts with an add-on CPU having internal dump, this speeds up access to the internal rom
@@ -797,7 +797,7 @@ void base_sns_cart_slot_device::setup_addon_from_fullpath()
 	if (!m_cart->get_addon_bios_size())
 	{
 		std::string region = std::string(m_cart->device().tag()).append(":addon");
-		UINT8 *ROM = NULL;
+		UINT8 *ROM;
 
 		switch (m_addon)
 		{
@@ -845,7 +845,7 @@ void base_sns_cart_slot_device::setup_nvram()
 {
 	UINT8 *ROM = (UINT8 *)m_cart->get_rom_base();
 	UINT32 size = 0;
-	if (software_entry() == NULL)
+	if (software_entry() == nullptr)
 	{
 		int hilo_mode = snes_find_hilo_mode(this, ROM, m_cart->get_rom_size());
 		UINT8 sram_size = (m_type == SNES_SFX) ? (ROM[0x00ffbd] & 0x07) : (ROM[hilo_mode + 0x18] & 0x07);
@@ -886,7 +886,7 @@ void base_sns_cart_slot_device::setup_nvram()
 
 bool base_sns_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry );
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
@@ -999,14 +999,14 @@ void base_sns_cart_slot_device::get_cart_type_addon(UINT8 *ROM, UINT32 len, int 
  get default card software
  -------------------------------------------------*/
 
-void base_sns_cart_slot_device::get_default_card_software(std::string &result)
+std::string base_sns_cart_slot_device::get_default_card_software()
 {
 	bool fullpath = open_image_file(mconfig().options());
 
 	if (fullpath)
 	{
-		const char *slot_string = "lorom";
-		UINT32 offset = 0;
+		const char *slot_string;
+		UINT32 offset;
 		UINT32 len = core_fsize(m_file);
 		dynamic_buffer rom(len);
 		int type = 0, addon = 0;
@@ -1058,11 +1058,10 @@ void base_sns_cart_slot_device::get_default_card_software(std::string &result)
 
 		clear();
 
-		result.assign(slot_string);
-		return;
+		return std::string(slot_string);
 	}
 
-	software_get_default_slot(result, "lorom");
+	return software_get_default_slot("lorom");
 }
 
 

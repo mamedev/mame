@@ -63,14 +63,14 @@ READ_LINE_MEMBER(konami573_cassette_interface::read_line_adc083x_sars)
 
 const device_type KONAMI573_CASSETTE_X = &device_creator<konami573_cassette_x_device>;
 
-konami573_cassette_x_device::konami573_cassette_x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+konami573_cassette_x_device::konami573_cassette_x_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, KONAMI573_CASSETTE_X, "Konami 573 Cassette X", tag, owner, clock, "k573cassx", __FILE__),
 	konami573_cassette_interface(mconfig, *this),
 	m_x76f041(*this, "eeprom")
 {
 }
 
-konami573_cassette_x_device::konami573_cassette_x_device(const machine_config &mconfig, const device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+konami573_cassette_x_device::konami573_cassette_x_device(const machine_config &mconfig, const device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	konami573_cassette_interface(mconfig, *this),
 	m_x76f041(*this, "eeprom")
@@ -119,7 +119,7 @@ READ_LINE_MEMBER(konami573_cassette_x_device::read_line_secflash_sda)
 
 const device_type KONAMI573_CASSETTE_XI = &device_creator<konami573_cassette_xi_device>;
 
-konami573_cassette_xi_device::konami573_cassette_xi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+konami573_cassette_xi_device::konami573_cassette_xi_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	konami573_cassette_x_device(mconfig, KONAMI573_CASSETTE_XI, "Konami 573 Cassette XI", tag, owner, clock, "k573cassxi", __FILE__),
 	m_ds2401(*this, "id"),
 	m_adc0838(*this, "adc0838")
@@ -179,7 +179,7 @@ READ_LINE_MEMBER(konami573_cassette_xi_device::read_line_adc083x_sars)
 
 const device_type KONAMI573_CASSETTE_Y = &device_creator<konami573_cassette_y_device>;
 
-konami573_cassette_y_device::konami573_cassette_y_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+konami573_cassette_y_device::konami573_cassette_y_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, KONAMI573_CASSETTE_Y, "Konami 573 Cassette Y", tag, owner, clock, "k573cassy", __FILE__),
 	konami573_cassette_interface(mconfig, *this),
 	m_x76f100(*this, "eeprom"),
@@ -194,7 +194,7 @@ konami573_cassette_y_device::konami573_cassette_y_device(const machine_config &m
 {
 }
 
-konami573_cassette_y_device::konami573_cassette_y_device(const machine_config &mconfig, const device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+konami573_cassette_y_device::konami573_cassette_y_device(const machine_config &mconfig, const device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	konami573_cassette_interface(mconfig, *this),
 	m_x76f100(*this, "eeprom"),
@@ -284,7 +284,7 @@ WRITE_LINE_MEMBER(konami573_cassette_y_device::write_line_d7)
 
 const device_type KONAMI573_CASSETTE_YI = &device_creator<konami573_cassette_yi_device>;
 
-konami573_cassette_yi_device::konami573_cassette_yi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+konami573_cassette_yi_device::konami573_cassette_yi_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	konami573_cassette_y_device(mconfig, KONAMI573_CASSETTE_YI, "Konami 573 Cassette YI", tag, owner, clock, "k573cassyi", __FILE__),
 	m_ds2401(*this, "id")
 {
@@ -315,7 +315,7 @@ READ_LINE_MEMBER(konami573_cassette_yi_device::read_line_ds2401)
 
 const device_type KONAMI573_CASSETTE_ZI = &device_creator<konami573_cassette_zi_device>;
 
-konami573_cassette_zi_device::konami573_cassette_zi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+konami573_cassette_zi_device::konami573_cassette_zi_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, KONAMI573_CASSETTE_ZI, "Konami 573 Cassette ZI", tag, owner, clock, "k573casszi", __FILE__),
 	konami573_cassette_interface(mconfig, *this),
 	m_zs01(*this,"eeprom"),
@@ -377,7 +377,7 @@ READ_LINE_MEMBER(konami573_cassette_zi_device::read_line_secflash_sda)
 
 const device_type KONAMI573_CASSETTE_SLOT = &device_creator<konami573_cassette_slot_device>;
 
-konami573_cassette_slot_device::konami573_cassette_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+konami573_cassette_slot_device::konami573_cassette_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, KONAMI573_CASSETTE_SLOT, "Konami 573 Cassette Slot", tag, owner, clock, "k573cassslot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_dsr_handler(*this)

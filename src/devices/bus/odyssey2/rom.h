@@ -13,18 +13,18 @@ class o2_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	o2_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	o2_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	o2_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	o2_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom04);
-	virtual DECLARE_READ8_MEMBER(read_rom0c);
+	virtual DECLARE_READ8_MEMBER(read_rom04) override;
+	virtual DECLARE_READ8_MEMBER(read_rom0c) override;
 
-	virtual void write_bank(int bank);
+	virtual void write_bank(int bank) override;
 
 protected:
 	int m_bank_base;
@@ -36,11 +36,11 @@ class o2_rom12_device : public o2_rom_device
 {
 public:
 	// construction/destruction
-	o2_rom12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	o2_rom12_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom04);
-	virtual DECLARE_READ8_MEMBER(read_rom0c);
+	virtual DECLARE_READ8_MEMBER(read_rom04) override;
+	virtual DECLARE_READ8_MEMBER(read_rom0c) override;
 };
 
 // ======================> o2_rom16_device
@@ -49,11 +49,11 @@ class o2_rom16_device : public o2_rom_device
 {
 public:
 	// construction/destruction
-	o2_rom16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	o2_rom16_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom04);
-	virtual DECLARE_READ8_MEMBER(read_rom0c);
+	virtual DECLARE_READ8_MEMBER(read_rom04) override;
+	virtual DECLARE_READ8_MEMBER(read_rom0c) override;
 };
 
 

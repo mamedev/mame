@@ -92,7 +92,7 @@ const rom_entry *qubide_t::device_rom_region() const
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( qubide )
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 MACHINE_CONFIG_END
 
 
@@ -168,7 +168,7 @@ ioport_constructor qubide_t::device_input_ports() const
 //  qubide_t - constructor
 //-------------------------------------------------
 
-qubide_t::qubide_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+qubide_t::qubide_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, QUBIDE, "QubIDE", tag, owner, clock, "ql_qubide", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_ata(*this, "ata"),

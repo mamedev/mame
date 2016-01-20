@@ -81,7 +81,7 @@ TODO :
 class ti990_10_state : public driver_device
 {
 public:
-	ti990_10_state(const machine_config &mconfig, device_type type, const char *tag)
+	ti990_10_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_intlines(0),
@@ -89,8 +89,8 @@ public:
 
 	device_t *m_terminal;
 	DECLARE_DRIVER_INIT(ti990_10);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	DECLARE_WRITE_LINE_MEMBER( key_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( line_interrupt );

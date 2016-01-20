@@ -113,12 +113,12 @@ Its BIOS performs POST and halts as there's no keyboard.
 class octopus_state : public driver_device
 {
 public:
-	octopus_state(const machine_config &mconfig, device_type type, const char *tag)
+	octopus_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_WRITE8_MEMBER(port_c9);
 	UINT32 screen_update_octopus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;

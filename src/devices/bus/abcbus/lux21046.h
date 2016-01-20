@@ -53,13 +53,13 @@ class luxor_55_21046_device :  public device_t,
 {
 public:
 	// construction/destruction
-	luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	luxor_55_21046_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	luxor_55_21046_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	luxor_55_21046_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// not really public
 	DECLARE_READ8_MEMBER( out_r );
@@ -82,18 +82,18 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_abcbus_interface overrides
-	virtual void abcbus_cs(UINT8 data);
-	virtual int abcbus_csb();
-	virtual UINT8 abcbus_inp();
-	virtual void abcbus_out(UINT8 data);
-	virtual UINT8 abcbus_stat();
-	virtual void abcbus_c1(UINT8 data);
-	virtual void abcbus_c3(UINT8 data);
-	virtual void abcbus_c4(UINT8 data);
+	virtual void abcbus_cs(UINT8 data) override;
+	virtual int abcbus_csb() override;
+	virtual UINT8 abcbus_inp() override;
+	virtual void abcbus_out(UINT8 data) override;
+	virtual UINT8 abcbus_stat() override;
+	virtual void abcbus_c1(UINT8 data) override;
+	virtual void abcbus_c3(UINT8 data) override;
+	virtual void abcbus_c4(UINT8 data) override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -123,11 +123,11 @@ class abc830_device :  public luxor_55_21046_device
 {
 public:
 	// construction/destruction
-	abc830_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc830_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 };
 
 
@@ -137,11 +137,11 @@ class abc832_device :  public luxor_55_21046_device
 {
 public:
 	// construction/destruction
-	abc832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc832_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 };
 
 
@@ -151,11 +151,11 @@ class abc834_device :  public luxor_55_21046_device
 {
 public:
 	// construction/destruction
-	abc834_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc834_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 };
 
 
@@ -165,11 +165,11 @@ class abc838_device :  public luxor_55_21046_device
 {
 public:
 	// construction/destruction
-	abc838_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc838_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 };
 
 
@@ -179,11 +179,11 @@ class abc850_floppy_device :  public luxor_55_21046_device
 {
 public:
 	// construction/destruction
-	abc850_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc850_floppy_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 };
 
 

@@ -71,7 +71,7 @@ class lmc1992_device :  public device_t,
 {
 public:
 	// construction/destruction
-	lmc1992_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	lmc1992_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER( clock_w );
 	DECLARE_WRITE_LINE_MEMBER( data_w );
@@ -79,10 +79,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// internal callbacks
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	inline void execute_command(int addr, int data);

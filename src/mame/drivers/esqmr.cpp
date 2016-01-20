@@ -208,7 +208,7 @@
 class esqmr_state : public driver_device
 {
 public:
-	esqmr_state(const machine_config &mconfig, device_type type, const char *tag)
+	esqmr_state(const machine_config &mconfig, device_type type, std::string tag)
 	: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sq1vfd(*this, "sq1vfd")
@@ -217,7 +217,7 @@ public:
 	required_device<m68340cpu_device> m_maincpu;
 	required_device<esq2x40_sq1_t> m_sq1vfd;
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 public:
 	DECLARE_DRIVER_INIT(mr);

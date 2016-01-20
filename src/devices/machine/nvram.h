@@ -77,7 +77,7 @@ public:
 	};
 
 	// construction/destruction
-	nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nvram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
 	static void static_set_default_value(device_t &device, default_value value);
@@ -88,12 +88,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
 
 	// internal helpers
 	void determine_final_base();

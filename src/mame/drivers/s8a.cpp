@@ -31,7 +31,7 @@ ToDo:
 class s8a_state : public genpin_class
 {
 public:
-	s8a_state(const machine_config &mconfig, device_type type, const char *tag)
+	s8a_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
@@ -51,7 +51,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sol2_w) { }; // solenoids 8-15
 	DECLARE_WRITE8_MEMBER(sol3_w); // solenoids 0-7
 	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(dips_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
@@ -71,7 +70,7 @@ private:
 	UINT8 m_kbdrow;
 	bool m_data_ok;
 	emu_timer* m_irq_timer;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -196,7 +195,7 @@ WRITE8_MEMBER( s8a_state::dig0_w )
 	data &= 0x7f;
 	m_strobe = data & 15;
 	m_data_ok = true;
-	output_set_digit_value(60, patterns[data>>4]); // diag digit
+	output().set_digit_value(60, patterns[data>>4]); // diag digit
 }
 
 WRITE8_MEMBER( s8a_state::dig1_w )
@@ -204,8 +203,8 @@ WRITE8_MEMBER( s8a_state::dig1_w )
 	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
 	if (m_data_ok)
 	{
-		output_set_digit_value(m_strobe+16, patterns[data&15]);
-		output_set_digit_value(m_strobe, patterns[data>>4]);
+		output().set_digit_value(m_strobe+16, patterns[data&15]);
+		output().set_digit_value(m_strobe, patterns[data>>4]);
 	}
 	m_data_ok = false;
 }

@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Roberto Fresca
 /*************************************************************************************************
 
@@ -330,7 +330,7 @@
 class fortecar_state : public driver_device
 {
 public:
-	fortecar_state(const machine_config &mconfig, device_type type, const char *tag)
+	fortecar_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_vram(*this, "vram"),
@@ -345,8 +345,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ayporta_w);
 	DECLARE_WRITE8_MEMBER(ayportb_w);
 	DECLARE_DRIVER_INIT(fortecar);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(fortecar);
 	UINT32 screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -487,7 +487,7 @@ WRITE8_MEMBER(fortecar_state::ayporta_w)
 	int i;
 
 	for(i = 0; i < 8; i++)
-		output_set_lamp_value(i, (data >> i) & 1);
+		output().set_lamp_value(i, (data >> i) & 1);
 }
 
 

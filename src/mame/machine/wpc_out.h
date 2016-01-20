@@ -15,7 +15,7 @@ class wpc_out_device : public device_t
 public:
 	typedef delegate<bool (int, bool)> handler_t;
 
-	wpc_out_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wpc_out_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~wpc_out_device();
 
 	DECLARE_WRITE8_MEMBER(out_w);
@@ -39,9 +39,9 @@ protected:
 
 	void send_output(int sid, int state);
 
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void gi_update();
 };

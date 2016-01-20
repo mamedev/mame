@@ -79,7 +79,7 @@ class mc2661_device :  public device_t,
 {
 public:
 	// construction/destruction
-	mc2661_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc2661_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void static_set_rxc(device_t &device, int clock) { downcast<mc2661_device &>(device).m_rxc = clock; }
 	static void static_set_txc(device_t &device, int clock) { downcast<mc2661_device &>(device).m_txc = clock; }
@@ -107,14 +107,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_serial_interface overrides
-	virtual void tra_callback();
-	virtual void tra_complete();
-	virtual void rcv_complete();
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+	virtual void rcv_complete() override;
 
 private:
 	devcb_write_line   m_write_txd;

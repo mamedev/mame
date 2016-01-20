@@ -165,27 +165,27 @@ VIDEO_START_MEMBER(deco32_state,captaven)
 
 VIDEO_START_MEMBER(deco32_state,fghthist)
 {
-	m_dirty_palette = auto_alloc_array(machine(), UINT8, 4096);
+	m_dirty_palette = std::make_unique<UINT8[]>(4096);
 	m_sprgen->alloc_sprite_bitmap();
 	m_has_ace_ram=0;
 
-	save_pointer(NAME(m_dirty_palette), 4096);
+	save_pointer(NAME(m_dirty_palette.get()), 4096);
 	deco32_state::video_start();
 }
 
 VIDEO_START_MEMBER(deco32_state,nslasher)
 {
 	int width, height;
-	m_dirty_palette = auto_alloc_array(machine(), UINT8, 4096);
+	m_dirty_palette = std::make_unique<UINT8[]>(4096);
 	width = m_screen->width();
 	height = m_screen->height();
-	m_tilemap_alpha_bitmap=auto_bitmap_ind16_alloc(machine(), width, height );
+	m_tilemap_alpha_bitmap=std::make_unique<bitmap_ind16>(width, height );
 	m_sprgen1->alloc_sprite_bitmap();
 	m_sprgen2->alloc_sprite_bitmap();
-	memset(m_dirty_palette,0,4096);
+	memset(m_dirty_palette.get(),0,4096);
 	m_has_ace_ram=1;
 
-	save_pointer(NAME(m_dirty_palette), 4096);
+	save_pointer(NAME(m_dirty_palette.get()), 4096);
 	save_item(NAME(m_ace_ram_dirty));
 	save_item(NAME(m_spriteram16_2));
 	save_item(NAME(m_spriteram16_2_buffered));
@@ -203,28 +203,28 @@ void dragngun_state::video_start()
 
 VIDEO_START_MEMBER(dragngun_state,dragngun)
 {
-	m_dirty_palette = auto_alloc_array(machine(), UINT8, 4096);
+	m_dirty_palette = std::make_unique<UINT8[]>(4096);
 	m_screen->register_screen_bitmap(m_temp_render_bitmap);
 
-	memset(m_dirty_palette,0,4096);
+	memset(m_dirty_palette.get(),0,4096);
 
 	m_has_ace_ram=0;
 
 	save_item(NAME(m_sprite_ctrl));
-	save_pointer(NAME(m_dirty_palette), 4096);
+	save_pointer(NAME(m_dirty_palette.get()), 4096);
 }
 
 VIDEO_START_MEMBER(dragngun_state,lockload)
 {
-	m_dirty_palette = auto_alloc_array(machine(), UINT8, 4096);
+	m_dirty_palette = std::make_unique<UINT8[]>(4096);
 	m_screen->register_screen_bitmap(m_temp_render_bitmap);
 
-	memset(m_dirty_palette,0,4096);
+	memset(m_dirty_palette.get(),0,4096);
 
 	m_has_ace_ram=0;
 
 	save_item(NAME(m_sprite_ctrl));
-	save_pointer(NAME(m_dirty_palette), 4096);
+	save_pointer(NAME(m_dirty_palette.get()), 4096);
 }
 /******************************************************************************/
 

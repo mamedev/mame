@@ -49,7 +49,7 @@ PALETTE_INIT_MEMBER(ssystem3_state, ssystem3)
 void ssystem3_state::video_start()
 {
 	// artwork seams to need this
-	m_videoram = auto_alloc_array(machine(), UINT8, 6 * 2 + 24);
+	m_videoram = std::make_unique<UINT8[]>(6 * 2 + 24);
 }
 
 

@@ -186,7 +186,7 @@ JALECO MADE IN JAPAN
 |HA1388 VOL    AY-3-8910                 7611.9S |
 |------------------------------------------------|
 Notes:
- ENCR_Z80 - Encrypted Z80 CPU. Clock 3.00MHz [12/4]. No markings on 
+ ENCR_Z80 - Encrypted Z80 CPU. Clock 3.00MHz [12/4]. No markings on
             the chip but likely made by Sega (possibly 315-5018)
  AY3-8910 - Clock 1.50MHz [12/8]
      7603 - Harris M3-7603 32 bytes x8-bit (256 bits) bipolar PROM
@@ -2483,11 +2483,11 @@ DRIVER_INIT_MEMBER(cclimber_state,toprollr)
 		{ 0x20,0xa0,0x28,0xa8 }, { 0x00,0x08,0x20,0x28 }    /* ...1...1...1...1 */
 	};
 
-	UINT8 *opcodes = auto_alloc_array(machine(), UINT8, 0x6000*3);
-	sega_decode(memregion("user1")->base(), opcodes, 0, convtable, 3, 0x6000);
+	m_opcodes = std::make_unique<UINT8[]>(0x6000*3);
+	sega_decode(memregion("user1")->base(), m_opcodes.get(), 0, convtable, 3, 0x6000);
 
 	membank("bank1")->configure_entries(0, 3, memregion("user1")->base(), 0x6000);
-	membank("bank1d")->configure_entries(0, 3, opcodes, 0x6000);
+	membank("bank1d")->configure_entries(0, 3, m_opcodes.get(), 0x6000);
 
 	membank("bank1")->set_entry(0);
 	membank("bank1d")->set_entry(0);

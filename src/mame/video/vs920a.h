@@ -5,12 +5,12 @@
 class vs920a_text_tilemap_device : public device_t
 {
 public:
-	vs920a_text_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	vs920a_text_tilemap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
 	static void set_gfx_region(device_t &device, int gfxregion);
 
 	tilemap_t* m_tmap;
-	UINT16* m_vram;
+	std::unique_ptr<UINT16[]> m_vram;
 	UINT16 m_pal_base;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -23,8 +23,8 @@ public:
 
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 
 private:

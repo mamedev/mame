@@ -60,8 +60,8 @@ private:
 	int writenum;
 
 protected:
-	virtual void machine_reset();
-	virtual void machine_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 public:
 
@@ -93,7 +93,7 @@ public:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 
-	rm380z_state(const machine_config &mconfig, device_type type, const char *tag)
+	rm380z_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, RM380Z_MAINCPU_TAG),
 		m_messram(*this, RAM_TAG),
@@ -107,9 +107,6 @@ public:
 	DECLARE_READ8_MEMBER( port_read );
 	DECLARE_WRITE8_MEMBER( port_write_1b00 );
 	DECLARE_READ8_MEMBER( port_read_1b00 );
-
-	DECLARE_READ8_MEMBER( main_read );
-	DECLARE_WRITE8_MEMBER( main_write );
 
 	DECLARE_READ8_MEMBER( videoram_read );
 	DECLARE_WRITE8_MEMBER( videoram_write );
@@ -128,7 +125,6 @@ public:
 	DECLARE_WRITE8_MEMBER( keyboard_put );
 
 	void config_memory_map();
-	int keyboard_decode();
 	void update_screen(bitmap_ind16 &bitmap);
 	UINT32 screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(static_vblank_timer);

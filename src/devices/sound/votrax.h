@@ -35,7 +35,7 @@ class votrax_sc01_device :  public device_t,
 {
 public:
 	// construction/destruction
-	votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	votrax_sc01_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_request_callback(device_t &device, _Object object) { return downcast<votrax_sc01_device &>(device).m_request_cb.set_callback(object); }
 
@@ -46,14 +46,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_clock_changed();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual const rom_entry *device_rom_region() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	// internal helpers

@@ -70,7 +70,7 @@ READ8_MEMBER(runaway_state::runaway_pot_r)
 
 WRITE8_MEMBER(runaway_state::runaway_led_w)
 {
-	set_led_status(machine(), offset, ~data & 1);
+	output().set_led_value(offset, ~data & 1);
 }
 
 

@@ -34,7 +34,7 @@
 class ep64_state : public driver_device
 {
 public:
-	ep64_state(const machine_config &mconfig, device_type type, const char *tag)
+	ep64_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_dave(*this, DAVE_TAG),
@@ -79,14 +79,12 @@ public:
 	required_ioport m_y8;
 	required_ioport m_y9;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( rd0_r );
 	DECLARE_WRITE8_MEMBER( wr0_w );
 	DECLARE_READ8_MEMBER( rd1_r );
-	DECLARE_WRITE8_MEMBER( wr1_w );
-	DECLARE_READ8_MEMBER( rd2_r );
 	DECLARE_WRITE8_MEMBER( wr2_w );
 
 	UINT8 m_key;

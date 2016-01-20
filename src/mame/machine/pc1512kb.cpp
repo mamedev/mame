@@ -225,7 +225,7 @@ ioport_constructor pc1512_keyboard_device::device_input_ports() const
 //  pc1512_keyboard_device - constructor
 //-------------------------------------------------
 
-pc1512_keyboard_device::pc1512_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pc1512_keyboard_device::pc1512_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PC1512_KEYBOARD, "Amstrad PC1512 Keyboard", tag, owner, clock, "pc1512kb", __FILE__),
 		m_maincpu(*this, I8048_TAG),
 		m_y1(*this, "Y1"),
@@ -473,10 +473,10 @@ WRITE8_MEMBER( pc1512_keyboard_device::kb_p2_w )
 	m_write_clock(BIT(data, 1));
 
 	// CAPS LOCK
-	output_set_led_value(LED_CAPS, BIT(data, 2));
+	machine().output().set_led_value(LED_CAPS, BIT(data, 2));
 
 	// NUM LOCK
-	output_set_led_value(LED_NUM, BIT(data, 3));
+	machine().output().set_led_value(LED_NUM, BIT(data, 3));
 
 	// keyboard row
 	m_kb_y = (((data >> 4) & 0x07) << 8) | (m_kb_y & 0xff);

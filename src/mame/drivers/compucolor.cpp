@@ -36,7 +36,7 @@
 class compucolor2_state : public driver_device
 {
 public:
-	compucolor2_state(const machine_config &mconfig, device_type type, const char *tag)
+	compucolor2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, I8080_TAG),
 			m_mioc(*this, TMS5501_TAG),
@@ -93,8 +93,8 @@ public:
 	required_ioport m_y15;
 	required_ioport m_y128;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -463,13 +463,13 @@ static MACHINE_CONFIG_START( compucolor2, compucolor2_state )
 	MCFG_TMS5501_XI_CALLBACK(READ8(compucolor2_state, xi_r))
 	MCFG_TMS5501_XO_CALLBACK(WRITE8(compucolor2_state, xo_w))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
 
 	MCFG_COMPUCOLOR_FLOPPY_PORT_ADD("cd0", compucolor_floppy_port_devices, "floppy")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
 
-	MCFG_COMPUCOLOR_FLOPPY_PORT_ADD("cd1", compucolor_floppy_port_devices, NULL)
+	MCFG_COMPUCOLOR_FLOPPY_PORT_ADD("cd1", compucolor_floppy_port_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
 
 	// internal ram

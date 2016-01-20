@@ -151,8 +151,8 @@ WRITE16_MEMBER(seta2_state::grdians_lockout_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		// initially 0, then either $25 (coin 1) or $2a (coin 2)
-		coin_counter_w(machine(), 0,data & 0x01);   // or 0x04
-		coin_counter_w(machine(), 1,data & 0x02);   // or 0x08
+		machine().bookkeeping().coin_counter_w(0,data & 0x01);   // or 0x04
+		machine().bookkeeping().coin_counter_w(1,data & 0x02);   // or 0x08
 	}
 //  popmessage("%04X", data & 0xffff);
 }
@@ -344,8 +344,8 @@ WRITE16_MEMBER(seta2_state::pzlbowl_coin_counter_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0,data & 0x10);
-		coin_counter_w(machine(), 1,data & 0x20);
+		machine().bookkeeping().coin_counter_w(0,data & 0x10);
+		machine().bookkeeping().coin_counter_w(1,data & 0x20);
 	}
 }
 
@@ -402,13 +402,13 @@ WRITE16_MEMBER(seta2_state::reelquak_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		set_led_status( machine(), 0, data & 0x0001 );  // start
-		set_led_status( machine(), 1, data & 0x0002 );  // small
-		set_led_status( machine(), 2, data & 0x0004 );  // bet
-		set_led_status( machine(), 3, data & 0x0008 );  // big
-		set_led_status( machine(), 4, data & 0x0010 );  // double up
-		set_led_status( machine(), 5, data & 0x0020 );  // collect
-		set_led_status( machine(), 6, data & 0x0040 );  // bet cancel
+		output().set_led_value(0, data & 0x0001 );  // start
+		output().set_led_value(1, data & 0x0002 );  // small
+		output().set_led_value(2, data & 0x0004 );  // bet
+		output().set_led_value(3, data & 0x0008 );  // big
+		output().set_led_value(4, data & 0x0010 );  // double up
+		output().set_led_value(5, data & 0x0020 );  // collect
+		output().set_led_value(6, data & 0x0040 );  // bet cancel
 	}
 	if (ACCESSING_BITS_8_15)
 	{
@@ -422,10 +422,10 @@ WRITE16_MEMBER(seta2_state::reelquak_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0, data & 0x01);  // coin in
-		coin_counter_w(machine(), 1, data & 0x02);  // coin in
-		coin_counter_w(machine(), 2, data & 0x04);  // pay out
-		coin_counter_w(machine(), 3, data & 0x08);  // key in
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);  // coin in
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);  // coin in
+		machine().bookkeeping().coin_counter_w(2, data & 0x04);  // pay out
+		machine().bookkeeping().coin_counter_w(3, data & 0x08);  // key in
 		//                                data & 0x10); // Sound IRQ Ack.? 1->0
 		//                                data & 0x20); // Vblank IRQ.? 1
 	}
@@ -474,11 +474,11 @@ WRITE16_MEMBER(seta2_state::samshoot_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0, data & 0x10);
-		coin_counter_w(machine(), 1, data & 0x20);
+		machine().bookkeeping().coin_counter_w(0, data & 0x10);
+		machine().bookkeeping().coin_counter_w(1, data & 0x20);
 		// Are these connected? They are set in I/O test
-		coin_lockout_w(machine(), 0,~data & 0x40);
-		coin_lockout_w(machine(), 1,~data & 0x80);
+		machine().bookkeeping().coin_lockout_w(0,~data & 0x40);
+		machine().bookkeeping().coin_lockout_w(1,~data & 0x80);
 	}
 //  popmessage("%04x",data);
 }
@@ -527,18 +527,18 @@ class funcube_touchscreen_device : public device_t,
 									public device_serial_interface
 {
 public:
-	funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	funcube_touchscreen_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 	template<class _Object> static devcb_base &set_tx_cb(device_t &device, _Object object) { return downcast<funcube_touchscreen_device &>(device).m_tx_cb.set_callback(object); }
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual void tra_complete();
-	virtual void tra_callback();
+	virtual void tra_complete() override;
+	virtual void tra_callback() override;
 
 private:
 	devcb_write_line m_tx_cb;
@@ -564,7 +564,7 @@ static INPUT_PORTS_START( funcube_touchscreen )
 	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_Y ) PORT_MINMAX(0,0x46+1) PORT_CROSSHAIR(Y, -(0xf0-8.0)/0xf0*0x047/0x46, -1.0/0x46, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(5) PORT_REVERSE
 INPUT_PORTS_END
 
-funcube_touchscreen_device::funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+funcube_touchscreen_device::funcube_touchscreen_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, FUNCUBE_TOUCHSCREEN, "Funcube Touchscreen", tag, owner, clock, "funcube_touchscrene", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_tx_cb(*this),
@@ -788,14 +788,14 @@ WRITE16_MEMBER(seta2_state::funcube_leds_w)
 {
 	*m_funcube_leds = data;
 
-	set_led_status( machine(), 0, (~data) & 0x01 ); // win lamp (red)
-	set_led_status( machine(), 1, (~data) & 0x02 ); // win lamp (green)
+	output().set_led_value(0, (~data) & 0x01 ); // win lamp (red)
+	output().set_led_value(1, (~data) & 0x02 ); // win lamp (green)
 
 	// Set in a moving pattern: 0111 -> 1011 -> 1101 -> 1110
-	set_led_status( machine(), 2, (~data) & 0x10 );
-	set_led_status( machine(), 3, (~data) & 0x20 );
-	set_led_status( machine(), 4, (~data) & 0x40 );
-	set_led_status( machine(), 5, (~data) & 0x80 );
+	output().set_led_value(2, (~data) & 0x10 );
+	output().set_led_value(3, (~data) & 0x20 );
+	output().set_led_value(4, (~data) & 0x40 );
+	output().set_led_value(5, (~data) & 0x80 );
 
 	funcube_debug_outputs();
 }
@@ -818,7 +818,7 @@ WRITE16_MEMBER(seta2_state::funcube_outputs_w)
 	// Bit 1: high on pay out
 
 	// Bit 3: low after coining up, blinks on pay out
-	set_led_status( machine(), 6, (~data) & 0x08 );
+	output().set_led_value(6, (~data) & 0x08 );
 
 	funcube_debug_outputs();
 }
@@ -2720,7 +2720,7 @@ ROM_START( gundamex )
 	ROM_LOAD( "ka001006.u21",  0x1000000, 0x200000, CRC(6aac2f2f) SHA1(fac5478ca2941a93c57f670a058ff626e537bcde) )
 	ROM_LOAD( "ka001007.u22",  0x1200000, 0x200000, CRC(588f9d63) SHA1(ed5148d09d02e3bc12c50c39c5c86e6356b2dd7a) )
 	ROM_LOAD( "ka001008.u23",  0x1400000, 0x200000, CRC(db55a60a) SHA1(03d118c7284ca86219891c473e2a89489710ea27) )
-	ROM_FILL(                  0x1800000, 0x600000, 0 ) // 6bpp instead of 8bpp
+	ROM_FILL(                  0x1800000, 0x600000, 0x00 ) // 6bpp instead of 8bpp
 
 	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
 	// Leave 1MB empty (addressable by the chip)
@@ -2759,7 +2759,7 @@ ROM_START( mj4simai )
 	ROM_LOAD( "cha-06.u17",  0x0c00000, 0x400000, CRC(5cb0b3a9) SHA1(92fb82d45b4c46326d5796981f812e20a8ddb4f2) )
 	ROM_LOAD( "cha-01.u21",  0x1000000, 0x400000, CRC(35f47b37) SHA1(4a8eb088890272f2a069e2c3f00fadf6421f7b0e) )
 	ROM_LOAD( "cha-02.u22",  0x1400000, 0x400000, CRC(f6346860) SHA1(4eebd3fa315b97964fa39b88224f9de7622ba881) )
-	ROM_FILL(                0x1800000, 0x800000, 0 )   // 6bpp instead of 8bpp
+	ROM_FILL(                0x1800000, 0x800000, 0x00 )   // 6bpp instead of 8bpp
 
 	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
 	// Leave 1MB empty (addressable by the chip)
@@ -3035,7 +3035,7 @@ ROM_START( penbros )
 	ROM_LOAD( "u38.bin", 0x000000, 0x400000, CRC(4247b39e) SHA1(f273931293beced312e02c870bf35e9cf0c91a8b) )
 	ROM_LOAD( "u39.bin", 0x400000, 0x400000, CRC(f9f07faf) SHA1(66fc4a9ad422fb384d2c775e43619137226898fc) )
 	ROM_LOAD( "u40.bin", 0x800000, 0x400000, CRC(dc9e0a96) SHA1(c2c8ccf9039ee0e179b08fdd2d37f29899349cda) )
-	ROM_FILL(            0xc00000, 0x400000, 0 )    // 6bpp instead of 8bpp
+	ROM_FILL(            0xc00000, 0x400000, 0x00 )    // 6bpp instead of 8bpp
 
 	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
 	// Leave 1MB empty (addressable by the chip)

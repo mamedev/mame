@@ -66,7 +66,7 @@ class mb89363b_device :  public device_t
 {
 public:
 	// construction/destruction
-	mb89363b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb89363b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -104,9 +104,9 @@ public:
 	required_device<i8255_device> m_i8255_b;
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 
 

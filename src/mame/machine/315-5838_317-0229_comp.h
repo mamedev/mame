@@ -22,7 +22,7 @@ class sega_315_5838_comp_device :  public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_315_5838_comp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	sega_dec_read_delegate m_read_ch2;
 
@@ -61,8 +61,8 @@ public:
 	DECLARE_WRITE32_MEMBER(doa_prot_w);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 

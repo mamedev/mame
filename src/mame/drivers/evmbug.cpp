@@ -20,7 +20,7 @@
 class evmbug_state : public driver_device
 {
 public:
-	evmbug_state(const machine_config &mconfig, device_type type, const char *tag)
+	evmbug_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG)
@@ -30,7 +30,7 @@ public:
 	DECLARE_READ8_MEMBER(rs232_r);
 	DECLARE_WRITE8_MEMBER(rs232_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	UINT8 m_term_data;
 	UINT8 m_term_out;
 	required_device<cpu_device> m_maincpu;

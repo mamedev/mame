@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 /***************************************************************************
 
@@ -27,7 +27,7 @@ public:
 		TIMER_DESTROYR_FRAME
 	};
 
-	destroyr_state(const machine_config &mconfig, device_type type, const char *tag)
+	destroyr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -68,8 +68,8 @@ public:
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ8_MEMBER(scanline_r);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(destroyr);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -78,7 +78,7 @@ public:
 	TIMER_CALLBACK_MEMBER(frame_callback);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
@@ -222,8 +222,8 @@ WRITE8_MEMBER(destroyr_state::misc_w)
 	m_wavemod = data & 0x10;
 	m_potmask[1] = data & 0x20;
 
-	coin_lockout_w(machine(), 0, !m_attract);
-	coin_lockout_w(machine(), 1, !m_attract);
+	machine().bookkeeping().coin_lockout_w(0, !m_attract);
+	machine().bookkeeping().coin_lockout_w(1, !m_attract);
 }
 
 
@@ -247,10 +247,10 @@ WRITE8_MEMBER(destroyr_state::output_w)
 	else switch (offset & 7)
 	{
 	case 0:
-		set_led_status(machine(), 0, data & 1);
+		output().set_led_value(0, data & 1);
 		break;
 	case 1:
-		set_led_status(machine(), 1, data & 1); /* no second LED present on cab */
+		output().set_led_value(1, data & 1); /* no second LED present on cab */
 		break;
 	case 2:
 		/* bit 0 => songate */
@@ -422,7 +422,7 @@ static const gfx_layout destroyr_major_object_layout =
 	},
 	0x0800,   /* increment */
 	destroyr_major_object_layout_xoffset,
-	NULL
+	nullptr
 };
 
 static const UINT32 destroyr_waves_layout_xoffset[64] =
@@ -447,7 +447,7 @@ static const gfx_layout destroyr_waves_layout =
 	{ 0x00, 0x80 },
 	0x04,     /* increment */
 	destroyr_waves_layout_xoffset,
-	NULL
+	nullptr
 };
 
 

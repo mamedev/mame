@@ -3,7 +3,7 @@
 class tsamurai_state : public driver_device
 {
 public:
-	tsamurai_state(const machine_config &mconfig, device_type type, const char *tag)
+	tsamurai_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -91,11 +91,11 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_vsgongf_tile_info);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_MACHINE_START(m660);
 	DECLARE_MACHINE_START(tsamurai);
 	DECLARE_MACHINE_START(vsgongf);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(m660);
 	DECLARE_VIDEO_START(tsamurai);
 	DECLARE_VIDEO_START(vsgongf);

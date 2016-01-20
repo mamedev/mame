@@ -20,9 +20,9 @@
 class namco_54xx_device : public device_t
 {
 public:
-	namco_54xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_54xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	static void set_discrete(device_t &device, const char *tag) { downcast<namco_54xx_device &>(device).m_discrete.set_tag(tag); }
+	static void set_discrete(device_t &device, std::string tag) { downcast<namco_54xx_device &>(device).m_discrete.set_tag(tag); }
 	static void set_basenote(device_t &device, int node) { downcast<namco_54xx_device &>(device).m_basenode = node; }
 
 	DECLARE_READ8_MEMBER( K_r );
@@ -33,9 +33,9 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	TIMER_CALLBACK_MEMBER( latch_callback );
 	TIMER_CALLBACK_MEMBER( irq_clear );

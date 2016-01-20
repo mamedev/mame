@@ -31,7 +31,7 @@
 class crvision_state : public driver_device
 {
 public:
-	crvision_state(const machine_config &mconfig, device_type type, const char *tag)
+	crvision_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, M6502_TAG),
 		m_pia(*this, PIA6821_TAG),
@@ -67,13 +67,13 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 class crvision_pal_state : public crvision_state
 {
 public:
-	crvision_pal_state(const machine_config &mconfig, device_type type, const char *tag)
+	crvision_pal_state(const machine_config &mconfig, device_type type, std::string tag)
 		: crvision_state(mconfig, type, tag)
 	{ }
 };
@@ -81,7 +81,7 @@ public:
 class laser2001_state : public crvision_state
 {
 public:
-	laser2001_state(const machine_config &mconfig, device_type type, const char *tag)
+	laser2001_state(const machine_config &mconfig, device_type type, std::string tag)
 		: crvision_state(mconfig, type, tag),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_inp_y(*this, "Y"),
@@ -108,7 +108,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 #endif // __CRVISION__

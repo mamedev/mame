@@ -30,13 +30,13 @@
 class ide_controller_device : public ata_interface_device
 {
 public:
-	ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	ide_controller_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ide_controller_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
-	virtual DECLARE_READ16_MEMBER(read_cs0);
-	virtual DECLARE_READ16_MEMBER(read_cs1);
-	virtual DECLARE_WRITE16_MEMBER(write_cs0);
-	virtual DECLARE_WRITE16_MEMBER(write_cs1);
+	virtual DECLARE_READ16_MEMBER(read_cs0) override;
+	virtual DECLARE_READ16_MEMBER(read_cs1) override;
+	virtual DECLARE_WRITE16_MEMBER(write_cs0) override;
+	virtual DECLARE_WRITE16_MEMBER(write_cs1) override;
 };
 
 extern const device_type IDE_CONTROLLER;
@@ -53,8 +53,8 @@ extern const device_type IDE_CONTROLLER;
 class ide_controller_32_device : public ide_controller_device
 {
 public:
-	ide_controller_32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	ide_controller_32_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	ide_controller_32_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ide_controller_32_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	virtual DECLARE_READ32_MEMBER(read_cs0);
 	virtual DECLARE_READ32_MEMBER(read_cs1);
@@ -85,17 +85,17 @@ extern const device_type IDE_CONTROLLER_32;
 class bus_master_ide_controller_device : public ide_controller_32_device
 {
 public:
-	bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bus_master_ide_controller_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	static void set_bus_master_space(device_t &device, const char *bmcpu, UINT32 bmspace) {bus_master_ide_controller_device &ide = downcast<bus_master_ide_controller_device &>(device); ide.m_bmcpu = bmcpu; ide.m_bmspace = bmspace; }
 
 	DECLARE_READ32_MEMBER( bmdma_r );
 	DECLARE_WRITE32_MEMBER( bmdma_w );
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
-	virtual void set_irq(int state);
-	virtual void set_dmarq(int state);
+	virtual void set_irq(int state) override;
+	virtual void set_dmarq(int state) override;
 
 private:
 	void execute_dma();

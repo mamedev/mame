@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Derrick Renaud
 /*
 
@@ -49,7 +49,7 @@ Driver Notes:
 class dai3wksi_state : public driver_device
 {
 public:
-	dai3wksi_state(const machine_config &mconfig, device_type type, const char *tag)
+	dai3wksi_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
@@ -91,8 +91,8 @@ public:
 	/* i/o ports */
 	required_ioport m_in2;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 
@@ -274,7 +274,7 @@ static const char *const dai3wksi_sample_names[] =
 	"5",
 	"6",
 	"6-2",
-	0
+	nullptr
 };
 
 

@@ -15,20 +15,20 @@ class neogeo_sma_cart : public device_t,
 {
 public:
 	// construction/destruction
-	neogeo_sma_cart(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT16 clock, const char *shortname, const char *source);
-	neogeo_sma_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock);
+	neogeo_sma_cart(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT16 clock, std::string shortname, std::string source);
+	neogeo_sma_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT16 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read_rom);
+	virtual DECLARE_READ16_MEMBER(read_rom) override;
 
-	virtual void activate_cart(ACTIVATE_CART_PARAMS) {}
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS) {}
-	virtual int get_fixed_bank_type(void) { return 0; }
+	virtual void activate_cart(ACTIVATE_CART_PARAMS) override {}
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override {}
+	virtual int get_fixed_bank_type(void) override { return 0; }
 
 	required_device<neogeo_banked_cart_device> m_banked_cart;
 	required_device<sma_prot_device> m_sma_prot;
@@ -48,10 +48,10 @@ extern const device_type NEOGEO_SMA_CART;
 class neogeo_sma_kof99_cart : public neogeo_sma_cart
 {
 public:
-	neogeo_sma_kof99_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual void activate_cart(ACTIVATE_CART_PARAMS);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 1; }
+	neogeo_sma_kof99_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	virtual void activate_cart(ACTIVATE_CART_PARAMS) override;
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 1; }
 };
 extern const device_type NEOGEO_SMA_KOF99_CART;
 
@@ -62,20 +62,20 @@ extern const device_type NEOGEO_SMA_KOF99_CART;
 class neogeo_sma_garou_cart : public neogeo_sma_cart
 {
 public:
-	neogeo_sma_garou_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual void activate_cart(ACTIVATE_CART_PARAMS);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 1; }
+	neogeo_sma_garou_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	virtual void activate_cart(ACTIVATE_CART_PARAMS) override;
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 1; }
 };
 extern const device_type NEOGEO_SMA_GAROU_CART;
 
 class neogeo_sma_garouh_cart : public neogeo_sma_cart
 {
 public:
-	neogeo_sma_garouh_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual void activate_cart(ACTIVATE_CART_PARAMS);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 1; }
+	neogeo_sma_garouh_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	virtual void activate_cart(ACTIVATE_CART_PARAMS) override;
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 1; }
 };
 extern const device_type NEOGEO_SMA_GAROUH_CART;
 
@@ -86,10 +86,10 @@ extern const device_type NEOGEO_SMA_GAROUH_CART;
 class neogeo_sma_mslug3_cart : public neogeo_sma_cart
 {
 public:
-	neogeo_sma_mslug3_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual void activate_cart(ACTIVATE_CART_PARAMS);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 1; }
+	neogeo_sma_mslug3_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	virtual void activate_cart(ACTIVATE_CART_PARAMS) override;
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 1; }
 };
 extern const device_type NEOGEO_SMA_MSLUG3_CART;
 
@@ -101,10 +101,10 @@ extern const device_type NEOGEO_SMA_MSLUG3_CART;
 class neogeo_sma_kof2000_cart : public neogeo_sma_cart
 {
 public:
-	neogeo_sma_kof2000_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual void activate_cart(ACTIVATE_CART_PARAMS);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 2; }
+	neogeo_sma_kof2000_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	virtual void activate_cart(ACTIVATE_CART_PARAMS) override;
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 2; }
 };
 extern const device_type NEOGEO_SMA_KOF2000_CART;
 

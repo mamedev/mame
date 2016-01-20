@@ -712,17 +712,17 @@ WRITE8_MEMBER(itech32_state::drivedge_portb_out)
 	/* bit 4 controls the ticket dispenser */
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
-	set_led_status(machine(), 1, data & 0x01);
-	set_led_status(machine(), 2, data & 0x02);
-	set_led_status(machine(), 3, data & 0x04);
+	output().set_led_value(1, data & 0x01);
+	output().set_led_value(2, data & 0x02);
+	output().set_led_value(3, data & 0x04);
 	machine().device<ticket_dispenser_device>("ticket")->write(machine().driver_data()->generic_space(), 0, (data & 0x10) << 3);
-	coin_counter_w(machine(), 0, (data & 0x20) >> 5);
+	machine().bookkeeping().coin_counter_w(0, (data & 0x20) >> 5);
 }
 
 
 WRITE_LINE_MEMBER(itech32_state::drivedge_turbo_light)
 {
-	set_led_status(machine(), 0, state);
+	output().set_led_value(0, state);
 }
 
 
@@ -734,7 +734,7 @@ WRITE8_MEMBER(itech32_state::pia_portb_out)
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
 	machine().device<ticket_dispenser_device>("ticket")->write(machine().driver_data()->generic_space(), 0, (data & 0x10) << 3);
-	coin_counter_w(machine(), 0, (data & 0x20) >> 5);
+	machine().bookkeeping().coin_counter_w(0, (data & 0x20) >> 5);
 }
 
 
@@ -4161,7 +4161,7 @@ ROM_END
 
 void itech32_state::init_program_rom()
 {
-	if (m_main_ram == NULL)
+	if (m_main_ram == nullptr)
 		m_main_ram.set_target(m_nvram, m_nvram.bytes());
 	memcpy(m_main_ram, m_main_rom, 0x80);
 }

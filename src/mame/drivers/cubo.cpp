@@ -12,17 +12,19 @@
    ----------------------------------------------
    Candy Puzzle         |  1.0 | 1995
    Double Strixx        |      | 1995
+   Greyhound Race       |      | 199x
    Harem Challenge      |      | 1995
    Laser Quiz           |      | 1995
+   Laser Quiz France    |  1.0 | 1995
+   Laser Quiz Greece?   |      | 1995 *may exist
    Laser Quiz 2 "Italy" |  1.0 | 1995
    Laser Strixx         |      | 1995
    Laser Strixx 2       |      | 1995
+   Lucky Five           |      | 1995
+   Magic Number         |      | 1995
    Magic Premium        |  1.1 | 1996
-   Laser Quiz France    |  1.0 | 1995
-   Laser Quiz Greece?   |      | 1995 *may exist
    Odeon Twister        |      | 199x
    Odeon Twister 2      |202.19| 1999
-
 
    ToDo:
    - remove the hack needed to make inputs working
@@ -322,7 +324,7 @@ routines :
 class cubo_state : public amiga_state
 {
 public:
-	cubo_state(const machine_config &mconfig, device_type type, const char *tag) :
+	cubo_state(const machine_config &mconfig, device_type type, std::string tag) :
 	amiga_state(mconfig, type, tag),
 	m_p1_port(*this, "P1"),
 	m_p2_port(*this, "P2"),
@@ -353,8 +355,8 @@ public:
 	UINT16 m_potgo_value;
 
 protected:
-	virtual void rs232_tx(int state);
-	virtual void potgo_w(UINT16 data);
+	virtual void rs232_tx(int state) override;
+	virtual void potgo_w(UINT16 data) override;
 
 private:
 	required_device<microtouch_device> m_microtouch;
@@ -397,7 +399,7 @@ WRITE8_MEMBER( cubo_state::akiko_cia_0_port_a_write )
 	m_cdda->set_output_gain( 0, ( data & 1 ) ? 0.0 : 1.0 );
 
 	/* bit 2 = Power Led on Amiga */
-	set_led_status(machine(), 0, (data & 2) ? 0 : 1);
+	output().set_led_value(0, (data & 2) ? 0 : 1);
 
 	handle_cd32_joystick_cia(machine(), data, m_cia_0->read(space, 2));
 }
@@ -439,7 +441,7 @@ void cubo_state::potgo_w(UINT16 data)
 {
 	int i;
 
-	if (m_input_hack != NULL)
+	if (m_input_hack != nullptr)
 		(this->*m_input_hack)();
 
 	m_potgo_value = m_potgo_value & 0x5500;
@@ -1049,6 +1051,7 @@ static MACHINE_CONFIG_START( cubo, cubo_state )
 	MCFG_FRAGMENT_ADD(pal_video)
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
+	MCFG_SCREEN_NO_PALETTE
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
@@ -1103,7 +1106,7 @@ DRIVER_INIT_MEMBER( cubo_state, cubo )
 {
 	m_agnus_id = ALICE_PAL_NEW;
 	m_denise_id = LISA;
-	m_input_hack = NULL;
+	m_input_hack = nullptr;
 }
 
 

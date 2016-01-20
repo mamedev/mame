@@ -79,7 +79,7 @@ enum
 class hdc92x4_device : public device_t
 {
 public:
-	hdc92x4_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	hdc92x4_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// Accesors from the CPU side
 	DECLARE_READ8_MEMBER( read );
@@ -115,8 +115,8 @@ public:
 	void connect_hard_drive(mfm_harddisk_device *harddisk);
 
 protected:
-	void device_start();
-	void device_reset();
+	void device_start() override;
+	void device_reset() override;
 
 	bool m_is_hdc9234;
 
@@ -173,7 +173,7 @@ protected:
 	// emu_timer *m_live_timer;
 
 	// Timer callback
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// Handlers for incoming signals
 	void ready_handler();
@@ -475,13 +475,13 @@ protected:
 class hdc9224_device : public hdc92x4_device
 {
 public:
-	hdc9224_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hdc9224_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class hdc9234_device : public hdc92x4_device
 {
 public:
-	hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hdc9234_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 #endif

@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Bryan McPhail,Fuzz,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
+// thanks-to:Fuzz
 /***************************************************************************
 
     Neo-Geo hardware
@@ -30,26 +31,26 @@ void neogeo_state::create_rgb_lookups()
 	double weights_normal[5];
 	double scaler = compute_resistor_weights(0, 255, -1,
 											5, resistances, weights_normal, 0, 0,
-											0, NULL, NULL, 0, 0,
-											0, NULL, NULL, 0, 0);
+											0, nullptr, nullptr, 0, 0,
+											0, nullptr, nullptr, 0, 0);
 
 	double weights_dark[5];
 	compute_resistor_weights(0, 255, scaler,
 							5, resistances, weights_dark, 8200, 0,
-							0, NULL, NULL, 0, 0,
-							0, NULL, NULL, 0, 0);
+							0, nullptr, nullptr, 0, 0,
+							0, nullptr, nullptr, 0, 0);
 
 	double weights_shadow[5];
 	compute_resistor_weights(0, 255, scaler,
 							5, resistances, weights_shadow, 150, 0,
-							0, NULL, NULL, 0, 0,
-							0, NULL, NULL, 0, 0);
+							0, nullptr, nullptr, 0, 0,
+							0, nullptr, nullptr, 0, 0);
 
 	double weights_dark_shadow[5];
 	compute_resistor_weights(0, 255, scaler,
 							5, resistances, weights_dark_shadow, 1.0 / ((1.0 / 8200) + (1.0 / 150)), 0,
-							0, NULL, NULL, 0, 0,
-							0, NULL, NULL, 0, 0);
+							0, nullptr, nullptr, 0, 0,
+							0, nullptr, nullptr, 0, 0);
 
 	for (int i = 0; i < 32; i++)
 	{

@@ -1099,12 +1099,12 @@ void tx1_state::tx1_draw_objects(UINT8 *bitmap)
 VIDEO_START_MEMBER(tx1_state,tx1)
 {
 	/* Allocate a large bitmap that covers the three screens */
-	m_bitmap = auto_bitmap_ind16_alloc(machine(), 768, 256);
+	m_bitmap = std::make_unique<bitmap_ind16>(768, 256);
 
 	/* Allocate some bitmaps */
-	m_chr_bmp = auto_alloc_array(machine(), UINT8, 256 * 3 * 240);
-	m_obj_bmp = auto_alloc_array(machine(), UINT8, 256 * 3 * 240);
-	m_rod_bmp = auto_alloc_array(machine(), UINT8, 256 * 3 * 240);
+	m_chr_bmp = std::make_unique<UINT8[]>(256 * 3 * 240);
+	m_obj_bmp = std::make_unique<UINT8[]>(256 * 3 * 240);
+	m_rod_bmp = std::make_unique<UINT8[]>(256 * 3 * 240);
 
 	/* Set a timer to run the interrupts */
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx1_state::interrupt_callback),this));
@@ -1138,9 +1138,9 @@ void tx1_state::tx1_combine_layers(bitmap_ind16 &bitmap, int screen)
 
 		UINT32 bmp_offset = y * 768 + x_offset;
 
-		UINT8 *chr_addr = m_chr_bmp + bmp_offset;
-		UINT8 *rod_addr = m_rod_bmp + bmp_offset;
-		UINT8 *obj_addr = m_obj_bmp + bmp_offset;
+		UINT8 *chr_addr = m_chr_bmp.get() + bmp_offset;
+		UINT8 *rod_addr = m_rod_bmp.get() + bmp_offset;
+		UINT8 *obj_addr = m_obj_bmp.get() + bmp_offset;
 
 		for (x = 0; x < 256; ++x)
 		{
@@ -1178,11 +1178,11 @@ void tx1_state::tx1_combine_layers(bitmap_ind16 &bitmap, int screen)
 
 void tx1_state::tx1_update_layers()
 {
-	memset(m_obj_bmp, 0, 768*240);
+	memset(m_obj_bmp.get(), 0, 768*240);
 
-	tx1_draw_char(m_chr_bmp);
-	tx1_draw_road(m_rod_bmp);
-	tx1_draw_objects(m_obj_bmp);
+	tx1_draw_char(m_chr_bmp.get());
+	tx1_draw_road(m_rod_bmp.get());
+	tx1_draw_objects(m_obj_bmp.get());
 
 	m_needs_update = false;
 }
@@ -2946,9 +2946,9 @@ void tx1_state::bb_combine_layers(bitmap_ind16 &bitmap, int screen)
 
 		UINT32 bmp_offset = y * bmp_stride + x_offset;
 
-		UINT8 *chr_addr = m_chr_bmp + bmp_offset;
-		UINT8 *rod_addr = m_rod_bmp + bmp_offset;
-		UINT8 *obj_addr = m_obj_bmp + bmp_offset;
+		UINT8 *chr_addr = m_chr_bmp.get() + bmp_offset;
+		UINT8 *rod_addr = m_rod_bmp.get() + bmp_offset;
+		UINT8 *obj_addr = m_obj_bmp.get() + bmp_offset;
 
 		UINT32 sky_en = BIT(m_vregs.sky, 7);
 		UINT32 sky_val = (((m_vregs.sky & 0x7f) + y) >> 2) & 0x3f;
@@ -2992,9 +2992,9 @@ void tx1_state::bb_combine_layers(bitmap_ind16 &bitmap, int screen)
 VIDEO_START_MEMBER(tx1_state,buggyboy)
 {
 	/* Allocate some bitmaps */
-	m_chr_bmp = auto_alloc_array(machine(), UINT8, 3 * 256 * 240);
-	m_obj_bmp = auto_alloc_array(machine(), UINT8, 3 * 256 * 240);
-	m_rod_bmp = auto_alloc_array(machine(), UINT8, 3 * 256 * 240);
+	m_chr_bmp = std::make_unique<UINT8[]>(3 * 256 * 240);
+	m_obj_bmp = std::make_unique<UINT8[]>(3 * 256 * 240);
+	m_rod_bmp = std::make_unique<UINT8[]>(3 * 256 * 240);
 
 	/* Set a timer to run the interrupts */
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx1_state::interrupt_callback),this));
@@ -3006,9 +3006,9 @@ VIDEO_START_MEMBER(tx1_state,buggyboy)
 VIDEO_START_MEMBER(tx1_state,buggybjr)
 {
 	/* Allocate some bitmaps */
-	m_chr_bmp = auto_alloc_array(machine(), UINT8, 256 * 240);
-	m_obj_bmp = auto_alloc_array(machine(), UINT8, 256 * 240);
-	m_rod_bmp = auto_alloc_array(machine(), UINT8, 256 * 240);
+	m_chr_bmp = std::make_unique<UINT8[]>(256 * 240);
+	m_obj_bmp = std::make_unique<UINT8[]>(256 * 240);
+	m_rod_bmp = std::make_unique<UINT8[]>(256 * 240);
 
 	/* Set a timer to run the interrupts */
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx1_state::interrupt_callback),this));
@@ -3035,12 +3035,12 @@ void tx1_state::screen_eof_buggyboy(screen_device &screen, bool state)
 
 void tx1_state::bb_update_layers()
 {
-	memset(m_obj_bmp, 0, 768*240);
-	memset(m_rod_bmp, 0, 768*240);
+	memset(m_obj_bmp.get(), 0, 768*240);
+	memset(m_rod_bmp.get(), 0, 768*240);
 
-	buggyboy_draw_char(m_chr_bmp, 1);
-	buggyboy_draw_road(m_rod_bmp);
-	buggyboy_draw_objs(m_obj_bmp, 1);
+	buggyboy_draw_char(m_chr_bmp.get(), 1);
+	buggyboy_draw_road(m_rod_bmp.get());
+	buggyboy_draw_objs(m_obj_bmp.get(), 1);
 
 	m_needs_update = false;
 }
@@ -3074,11 +3074,11 @@ UINT32 tx1_state::screen_update_buggyboy_right(screen_device &screen, bitmap_ind
 
 UINT32 tx1_state::screen_update_buggybjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	memset(m_obj_bmp, 0, 256*240);
+	memset(m_obj_bmp.get(), 0, 256*240);
 
-	buggyboy_draw_char(m_chr_bmp, 0);
-	buggybjr_draw_road(m_rod_bmp);
-	buggyboy_draw_objs(m_obj_bmp, 0);
+	buggyboy_draw_char(m_chr_bmp.get(), 0);
+	buggybjr_draw_road(m_rod_bmp.get());
+	buggyboy_draw_objs(m_obj_bmp.get(), 0);
 
 	bb_combine_layers(bitmap, -1);
 	return 0;

@@ -106,9 +106,8 @@ Optional (on expansion card) (Viper)
 class bfm_sc1_state : public driver_device
 {
 public:
-	bfm_sc1_state(const machine_config &mconfig, device_type type, const char *tag)
+	bfm_sc1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
-		m_vfd0(*this, "vfd0"),
 		m_maincpu(*this, "maincpu"),
 		m_reel0(*this, "reel0"),
 		m_reel1(*this, "reel1"),
@@ -116,9 +115,9 @@ public:
 		m_reel3(*this, "reel3"),
 		m_reel4(*this, "reel4"),
 		m_reel5(*this, "reel5"),
-		m_upd7759(*this, "upd") { }
-
-	optional_device<bfm_bd1_t> m_vfd0;
+		m_upd7759(*this, "upd"),
+		m_vfd0(*this, "vfd0"),
+		m_meters(*this, "meters") { }
 
 	int m_mmtr_latch;
 	int m_triac_latch;
@@ -175,7 +174,6 @@ public:
 	DECLARE_WRITE8_MEMBER(triac_w);
 	DECLARE_READ8_MEMBER(triac_r);
 	DECLARE_READ8_MEMBER(nec_r);
-	DECLARE_WRITE8_MEMBER(nec_reset_w);
 	DECLARE_WRITE8_MEMBER(nec_latch_w);
 
 	void save_state();
@@ -187,11 +185,10 @@ public:
 	DECLARE_DRIVER_INIT(clatt);
 	DECLARE_DRIVER_INIT(rou029);
 	DECLARE_DRIVER_INIT(nocrypt);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void sc1_common_init(int reels, int decrypt, int defaultbank);
 	void Scorpion1_SetSwitchState(int strobe, int data, int state);
-	int Scorpion1_GetSwitchState(int strobe, int data);
 	int sc1_find_project_string( );
 	required_device<cpu_device> m_maincpu;
 	required_device<stepper_device> m_reel0;
@@ -201,6 +198,8 @@ public:
 	required_device<stepper_device> m_reel4;
 	required_device<stepper_device> m_reel5;
 	optional_device<upd7759_device> m_upd7759;
+	optional_device<bfm_bd1_t> m_vfd0;
+	required_device<meters_device> m_meters;
 };
 
 #define VFD_RESET  0x20
@@ -298,8 +297,8 @@ WRITE8_MEMBER(bfm_sc1_state::reel12_w)
 		m_reel0->update((data>>4)&0x0f);
 		m_reel1->update( data    &0x0f);
 	}
-	awp_draw_reel("reel1", m_reel0);
-	awp_draw_reel("reel2", m_reel1);
+	awp_draw_reel(machine(),"reel1", m_reel0);
+	awp_draw_reel(machine(),"reel2", m_reel1);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -315,8 +314,8 @@ WRITE8_MEMBER(bfm_sc1_state::reel34_w)
 		m_reel2->update((data>>4)&0x0f);
 		m_reel3->update( data    &0x0f);
 	}
-	awp_draw_reel("reel3", m_reel2);
-	awp_draw_reel("reel4", m_reel3);
+	awp_draw_reel(machine(),"reel3", m_reel2);
+	awp_draw_reel(machine(),"reel4", m_reel3);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -326,8 +325,8 @@ WRITE8_MEMBER(bfm_sc1_state::reel56_w)
 	m_reel4->update((data>>4)&0x0f);
 	m_reel5->update( data    &0x0f);
 
-	awp_draw_reel("reel5", m_reel4);
-	awp_draw_reel("reel6", m_reel5);
+	awp_draw_reel(machine(),"reel5", m_reel4);
+	awp_draw_reel(machine(),"reel6", m_reel5);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -351,7 +350,7 @@ WRITE8_MEMBER(bfm_sc1_state::mmtr_w)
 		{
 			if ( changed & (1 << i) )
 			{
-				MechMtr_update(i, data & (1 << i) );
+				m_meters->update(i, data & (1 << i) );
 				m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 			}
 		}
@@ -460,8 +459,8 @@ WRITE8_MEMBER(bfm_sc1_state::mux1latch_w)
 
 			for ( i = 0; i < 8; i++ )
 			{
-				output_set_lamp_value(BFM_strcnv[offset  ], (m_mux1_datalo & pattern?1:0) );
-				output_set_lamp_value(BFM_strcnv[offset+8], (m_mux1_datahi & pattern?1:0) );
+				output().set_lamp_value(BFM_strcnv[offset  ], (m_mux1_datalo & pattern?1:0) );
+				output().set_lamp_value(BFM_strcnv[offset+8], (m_mux1_datahi & pattern?1:0) );
 				pattern<<=1;
 				offset++;
 			}
@@ -533,8 +532,8 @@ WRITE8_MEMBER(bfm_sc1_state::mux2latch_w)
 
 			for ( i = 0; i < 8; i++ )
 			{
-				output_set_lamp_value(BFM_strcnv[offset  ], (m_mux2_datalo & pattern?1:0) );
-				output_set_lamp_value(BFM_strcnv[offset+8], (m_mux2_datahi & pattern?1:0) );
+				output().set_lamp_value(BFM_strcnv[offset  ], (m_mux2_datalo & pattern?1:0) );
+				output().set_lamp_value(BFM_strcnv[offset+8], (m_mux2_datahi & pattern?1:0) );
 				pattern<<=1;
 				offset++;
 			}
@@ -1090,6 +1089,9 @@ static MACHINE_CONFIG_START( scorpion1, bfm_sc1_state )
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel4_optic_cb))
 	MCFG_STARPOINT_48STEP_ADD("reel5")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel5_optic_cb))
+	
+	MCFG_DEVICE_ADD("meters", METERS, 0)
+	MCFG_METERS_NUMBER(8)
 MACHINE_CONFIG_END
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1147,9 +1149,9 @@ int bfm_sc1_state::sc1_find_project_string( )
 	UINT8 *src = memregion( "maincpu" )->base();
 	int size = memregion( "maincpu" )->bytes();
 
-	for (int search=0;search<7;search++)
+	for (auto & elem : title_string)
 	{
-		int strlength = strlen(title_string[search]);
+		int strlength = strlen(elem);
 
 		for (int i=0;i<size-strlength;i++)
 		{
@@ -1158,7 +1160,7 @@ int bfm_sc1_state::sc1_find_project_string( )
 			for (j=0;j<strlength;j+=1)
 			{
 				UINT8 rom = src[(i+j)];
-				UINT8 chr = title_string[search][j];
+				UINT8 chr = elem[j];
 
 				if (rom != chr)
 				{
@@ -1219,7 +1221,6 @@ int bfm_sc1_state::sc1_find_project_string( )
 DRIVER_INIT_MEMBER(bfm_sc1_state,toppoker)
 {
 	sc1_common_init(3,1, 3);
-	MechMtr_config(machine(),8);
 	sc1_find_project_string();
 	save_state();
 }
@@ -1227,7 +1228,6 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,toppoker)
 DRIVER_INIT_MEMBER(bfm_sc1_state,lotse)
 {
 	sc1_common_init(6,1, 3);
-	MechMtr_config(machine(),8);
 	sc1_find_project_string();
 	save_state();
 }
@@ -1235,7 +1235,6 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,lotse)
 DRIVER_INIT_MEMBER(bfm_sc1_state,lotse_bank0)
 {
 	sc1_common_init(6,1, 0);
-	MechMtr_config(machine(),8);
 	sc1_find_project_string();
 	save_state();
 }
@@ -1244,7 +1243,6 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,lotse_bank0)
 DRIVER_INIT_MEMBER(bfm_sc1_state,nocrypt)
 {
 	sc1_common_init(6,0, 3);
-	MechMtr_config(machine(),8);
 	sc1_find_project_string();
 	save_state();
 }
@@ -1252,7 +1250,6 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,nocrypt)
 DRIVER_INIT_MEMBER(bfm_sc1_state,nocrypt_bank0)
 {
 	sc1_common_init(6,0, 0);
-	MechMtr_config(machine(),8);
 	sc1_find_project_string();
 	save_state();
 }
@@ -1263,7 +1260,6 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,nocrypt_bank0)
 DRIVER_INIT_MEMBER(bfm_sc1_state,rou029)
 {
 	sc1_common_init(6,0, 3);
-	MechMtr_config(machine(),8);
 	sc1_find_project_string();
 	save_state();
 }
@@ -1273,7 +1269,6 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,rou029)
 DRIVER_INIT_MEMBER(bfm_sc1_state,clatt)
 {
 	sc1_common_init(6,1, 3);
-	MechMtr_config(machine(),8);
 
 	Scorpion1_SetSwitchState(3,2,1);
 	Scorpion1_SetSwitchState(3,3,1);

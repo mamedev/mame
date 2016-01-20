@@ -84,7 +84,7 @@ ToDo:
 class gts1_state : public genpin_class
 {
 public:
-	gts1_state(const machine_config &mconfig, device_type type, const char *tag)
+	gts1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_switches(*this, "X")
@@ -107,7 +107,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gts1_pa_w);
 	DECLARE_WRITE8_MEMBER(gts1_pb_w);
 private:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<5> m_switches;
 	UINT8 m_strobe;             //!< switches strobe lines (5 lower bits used)
@@ -461,8 +461,8 @@ WRITE8_MEMBER(gts1_state::gts1_display_w)
 	UINT8 b = ttl7448_mod[(data >> 4) & 15];
 	// LOG(("%s: offset:%d data:%02x a:%02x b:%02x\n", __FUNCTION__, offset, data, a, b));
 	if ((offset % 8) < 7) {
-		output_set_indexed_value("digit8_", offset, a);
-		output_set_indexed_value("digit8_", offset + 16, b);
+		output().set_indexed_value("digit8_", offset, a);
+		output().set_indexed_value("digit8_", offset + 16, b);
 	} else {
 		/*
 		 * For the 4 7-seg displays the segment h is turned back into
@@ -472,9 +472,9 @@ WRITE8_MEMBER(gts1_state::gts1_display_w)
 			a = _b | _c;
 		if (b & _h)
 			b = _b | _c;
-		output_set_indexed_value("digit7_", offset, a);
+		output().set_indexed_value("digit7_", offset, a);
 		// FIXME: there is nothing on outputs 22, 23, 30 and 31?
-		output_set_indexed_value("digit7_", offset + 16, b);
+		output().set_indexed_value("digit7_", offset + 16, b);
 	}
 #undef _a
 #undef _b
@@ -500,7 +500,7 @@ READ8_MEMBER (gts1_state::gts1_nvram_r)
 			// FIXME: Schematics says TO Z5
 			if (!m_nvram_wr && m_nvram_e2) {
 				UINT8* nvram = memregion("nvram")->base();
-				assert(nvram != NULL);
+				assert(nvram != nullptr);
 				data = nvram[m_nvram_addr];
 				LOG(("%s: nvram[%02x] -> %x\n", __FUNCTION__, m_nvram_addr, data));
 			}
@@ -532,7 +532,7 @@ WRITE8_MEMBER(gts1_state::gts1_nvram_w)
 			if (m_nvram_wr && m_nvram_e2) {
 				LOG(("%s: nvram[%02x] <- %x\n", __FUNCTION__, m_nvram_addr, data & 15));
 				UINT8* nvram = memregion("nvram")->base();
-				assert(nvram != NULL);
+				assert(nvram != nullptr);
 				nvram[m_nvram_addr] = data & 15;
 			}
 			break;

@@ -170,7 +170,7 @@ ioport_constructor c4023_t::device_input_ports() const
 //  c1526_base_t - constructor
 //-------------------------------------------------
 
-c1526_base_t:: c1526_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+c1526_base_t:: c1526_base_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
@@ -180,7 +180,7 @@ c1526_base_t:: c1526_base_t(const machine_config &mconfig, device_type type, con
 //  c1526_t - constructor
 //-------------------------------------------------
 
-c1526_t::c1526_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c1526_t::c1526_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	c1526_base_t(mconfig, C1526, "1526", tag, owner, clock, "c1526", __FILE__),
 	device_cbm_iec_interface(mconfig, *this)
 {
@@ -191,7 +191,7 @@ c1526_t::c1526_t(const machine_config &mconfig, const char *tag, device_t *owner
 //  c4023_t - constructor
 //-------------------------------------------------
 
-c4023_t::c4023_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c4023_t::c4023_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	c1526_base_t(mconfig, C4023, "4023", tag, owner, clock, "c4023", __FILE__),
 	device_ieee488_interface(mconfig, *this)
 {

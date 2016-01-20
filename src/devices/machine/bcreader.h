@@ -24,7 +24,7 @@ class barcode_reader_device : public device_t
 {
 public:
 	// construction/destruction
-	barcode_reader_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	barcode_reader_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void write_code(const char *barcode, int len);
 	int get_pending_code() { return m_new_code; }
@@ -38,7 +38,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	UINT8 m_byte_data[13];
 	UINT8 m_pixel_data[100];

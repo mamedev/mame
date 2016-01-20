@@ -40,7 +40,7 @@ extern const device_type SEGA315_5838_COMP = &device_creator<sega_315_5838_comp_
 
 //#define DEBUG_DATA_DUMP
 
-sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGA315_5838_COMP, "Sega 315-5838 / 317-0029 Compression (Encryption?)", tag, owner, clock, "sega315_5838", __FILE__)
 {
 }
@@ -49,24 +49,24 @@ sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconf
 
 void sega_315_5838_comp_device::device_start()
 {
-	for (int i = 0; i < 2; i++)
+	for (auto & elem : m_channel)
 	{
-		m_channel[i].m_decathlt_lastcount = 0;
-		m_channel[i].m_decathlt_prot_uploadmode = 0;
-		m_channel[i].m_decathlt_prot_uploadoffset = 0;
-		m_channel[i].m_read_ch.bind_relative_to(*owner());
+		elem.m_decathlt_lastcount = 0;
+		elem.m_decathlt_prot_uploadmode = 0;
+		elem.m_decathlt_prot_uploadoffset = 0;
+		elem.m_read_ch.bind_relative_to(*owner());
 
 	}
 }
 
 void sega_315_5838_comp_device::device_reset()
 {
-	for (int i = 0; i < 2; i++)
+	for (auto & elem : m_channel)
 	{
-		m_channel[i].m_srcoffset = 0;
-		m_channel[i].m_decathlt_lastcount = 0;
-		m_channel[i].m_decathlt_prot_uploadmode = 0;
-		m_channel[i].m_decathlt_prot_uploadoffset = 0;
+		elem.m_srcoffset = 0;
+		elem.m_decathlt_lastcount = 0;
+		elem.m_decathlt_prot_uploadmode = 0;
+		elem.m_decathlt_prot_uploadoffset = 0;
 	}
 
 	m_protstate = 0;

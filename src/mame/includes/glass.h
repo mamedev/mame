@@ -9,7 +9,7 @@
 class glass_state : public driver_device
 {
 public:
-	glass_state(const machine_config &mconfig, device_type type, const char *tag)
+	glass_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
@@ -27,7 +27,7 @@ public:
 
 	/* video-related */
 	tilemap_t     *m_pant[2];
-	bitmap_ind16    *m_screen_bitmap;
+	std::unique_ptr<bitmap_ind16> m_screen_bitmap;
 
 	/* misc */
 	int         m_current_bit;
@@ -44,11 +44,12 @@ public:
 	DECLARE_WRITE16_MEMBER( glass_mainram_w );
 
 	DECLARE_DRIVER_INIT(glass);
+	DECLARE_DRIVER_INIT(glassp);
 	TILE_GET_INFO_MEMBER(get_tile_info_glass_screen0);
 	TILE_GET_INFO_MEMBER(get_tile_info_glass_screen1);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_glass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(glass_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

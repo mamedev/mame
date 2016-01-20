@@ -29,7 +29,7 @@
 
 const device_type KANEKO_CALC3 = &device_creator<kaneko_calc3_device>;
 
-kaneko_calc3_device::kaneko_calc3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+kaneko_calc3_device::kaneko_calc3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, KANEKO_CALC3, "Kaneko CALC3 MCU", tag, owner, clock, "kaneko_calc3", __FILE__),
 		m_mcuram(*this, ":mcuram"),
 		m_mcu_status(0),
@@ -1706,7 +1706,7 @@ void kaneko_calc3_device::mcu_run()
 				{
 					int length;
 
-					length = decompress_table(commandtabl, 0, m_writeaddress_current-2);
+					length = decompress_table(commandtabl, nullptr, m_writeaddress_current-2);
 
 					if (length)
 					{

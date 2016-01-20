@@ -79,7 +79,7 @@ machine_config_constructor isbc_218a_device::device_mconfig_additions() const
 //  isbc_218a_device - constructor
 //-------------------------------------------------
 
-isbc_218a_device::isbc_218a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isbc_218a_device::isbc_218a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ISBC_218A, "ISBX 218a for ISBC", tag, owner, clock, "isbc_218a", __FILE__),
 	device_isbx_card_interface(mconfig, *this),
 	m_fdc(*this, I8272_TAG),

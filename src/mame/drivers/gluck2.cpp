@@ -204,7 +204,7 @@
 class gluck2_state : public driver_device
 {
 public:
-	gluck2_state(const machine_config &mconfig, device_type type, const char *tag)
+	gluck2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -224,7 +224,7 @@ public:
 	DECLARE_WRITE8_MEMBER(counters_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(gluck2);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -332,9 +332,9 @@ WRITE8_MEMBER(gluck2_state::counters_w)
 */
 	data = data ^ 0xff; // inverted
 
-	coin_counter_w(machine(), 0, data & 0x10);  /* coins */
-	coin_counter_w(machine(), 1, data & 0x02);  /* notes */
-	coin_counter_w(machine(), 2, data & 0x04);  /* payout */
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);  /* coins */
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);  /* notes */
+	machine().bookkeeping().coin_counter_w(2, data & 0x04);  /* payout */
 }
 
 

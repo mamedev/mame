@@ -23,7 +23,7 @@
 class poly880_state : public driver_device
 {
 public:
-	poly880_state(const machine_config &mconfig, device_type type, const char *tag)
+	poly880_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_cassette(*this, "cassette"),
@@ -38,7 +38,7 @@ public:
 	required_ioport m_ki2;
 	required_ioport m_ki3;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER( cldig_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );

@@ -18,7 +18,7 @@
 class hh_ucom4_state : public driver_device
 {
 public:
-	hh_ucom4_state(const machine_config &mconfig, device_type type, const char *tag)
+	hh_ucom4_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN"),
@@ -58,8 +58,8 @@ public:
 	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
 
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 

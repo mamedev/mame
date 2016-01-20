@@ -166,7 +166,7 @@ public:
 	};
 
 	// construction/destruction
-	symbol_table(void *globalref, symbol_table *parent = NULL);
+	symbol_table(void *globalref, symbol_table *parent = nullptr);
 
 	// getters
 	symbol_entry *first() const { return m_symlist.first(); }
@@ -177,9 +177,9 @@ public:
 	void configure_memory(void *param, valid_func valid, read_func read, write_func write);
 
 	// symbol access
-	void add(const char *name, read_write rw, UINT64 *ptr = NULL);
+	void add(const char *name, read_write rw, UINT64 *ptr = nullptr);
 	void add(const char *name, UINT64 constvalue);
-	void add(const char *name, void *ref, getter_func getter, setter_func setter = NULL);
+	void add(const char *name, void *ref, getter_func getter, setter_func setter = nullptr);
 	void add(const char *name, void *ref, int minparams, int maxparams, execute_func execute);
 	symbol_entry *find(const char *name) { return m_symlist.find(name); }
 	symbol_entry *find_deep(const char *name);
@@ -214,7 +214,7 @@ class parsed_expression
 public:
 	// construction/destruction
 	parsed_expression(const parsed_expression &src) { copy(src); }
-	parsed_expression(symbol_table *symtable = NULL, const char *expression = NULL, UINT64 *result = NULL);
+	parsed_expression(symbol_table *symtable = nullptr, const char *expression = nullptr, UINT64 *result = nullptr);
 
 	// operators
 	parsed_expression &operator=(const parsed_expression &src) { copy(src); return *this; }
@@ -331,7 +331,7 @@ private:
 	public:
 		// construction/destruction
 		expression_string(const char *string, int length = 0)
-			: m_next(NULL),
+			: m_next(nullptr),
 				m_string(string, (length == 0) ? strlen(string) : length) { }
 
 		// operators

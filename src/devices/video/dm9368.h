@@ -46,7 +46,7 @@ class dm9368_device :   public device_t,
 {
 public:
 	// construction/destruction
-	dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dm9368_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void a_w(UINT8 data);
 
@@ -55,7 +55,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	devcb_write_line   m_write_rbo;

@@ -307,7 +307,7 @@ Pin 22 Solder Side - Gun 2 Trigger
 class namcos11_state : public driver_device
 {
 public:
-	namcos11_state(const machine_config &mconfig, device_type type, const char *tag)
+	namcos11_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_sharedram(*this,"sharedram"),
 		m_maincpu(*this,"maincpu"),
@@ -329,7 +329,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
 
 protected:
-	virtual void driver_start();
+	virtual void driver_start() override;
 
 private:
 	required_shared_ptr<UINT16> m_sharedram;
@@ -381,10 +381,10 @@ WRITE16_MEMBER(namcos11_state::lightgun_w)
 	switch( offset )
 	{
 	case 0:
-		output_set_value( "led0", !( data & 0x08 ) );
-		output_set_value( "led1", !( data & 0x04 ) );
-		output_set_value( "recoil0", !( data & 0x02 ) );
-		output_set_value( "recoil1", !( data & 0x01 ) );
+		output().set_value( "led0", !( data & 0x08 ) );
+		output().set_value( "led1", !( data & 0x04 ) );
+		output().set_value( "recoil0", !( data & 0x02 ) );
+		output().set_value( "recoil1", !( data & 0x01 ) );
 
 		verboselog(1, "lightgun_w: outputs (%08x %08x)\n", data, mem_mask );
 		break;
@@ -535,7 +535,7 @@ void namcos11_state::driver_start()
 	}
 
 	memory_region *bankedroms = memregion( "bankedroms" );
-	if( bankedroms != NULL )
+	if( bankedroms != nullptr )
 	{
 		UINT8 *base = bankedroms->base();
 		int entries = bankedroms->bytes() / ( 1024 * 1024 );
@@ -545,7 +545,7 @@ void namcos11_state::driver_start()
 		for( int bank = 0; bank < 8; bank++ )
 		{
 			m_bank[ bank ] = membank( bankname[ bank ] );
-			if( m_bank[ bank ] != NULL )
+			if( m_bank[ bank ] != nullptr )
 			{
 				m_bank[ bank ]->configure_entries( 0, entries, base, 1024 * 1024 );
 				m_bank[ bank ]->set_entry( 0 );

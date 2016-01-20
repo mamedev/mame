@@ -236,7 +236,7 @@ TODO :
 class witch_state : public driver_device
 {
 public:
-	witch_state(const machine_config &mconfig, device_type type, const char *tag)
+	witch_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
@@ -285,7 +285,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_gfx0b_tile_info);
 	TILE_GET_INFO_MEMBER(get_gfx0a_tile_info);
 	TILE_GET_INFO_MEMBER(get_gfx1_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_witch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

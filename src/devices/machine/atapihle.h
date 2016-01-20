@@ -20,7 +20,7 @@ class atapi_hle_device : public ata_hle_device,
 	public virtual t10spc
 {
 public:
-	atapi_hle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
+	atapi_hle_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock,std::string shortname, std::string source);
 
 	enum atapi_features_flag_t
 	{
@@ -50,16 +50,16 @@ public:
 	};
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual int sector_length() { return ATAPI_BUFFER_LENGTH; }
-	virtual void process_buffer();
-	virtual void fill_buffer();
-	virtual bool is_ready() { return false; }
-	virtual void signature();
-	virtual void process_command();
-	virtual void finished_command();
+	virtual int sector_length() override { return ATAPI_BUFFER_LENGTH; }
+	virtual void process_buffer() override;
+	virtual void fill_buffer() override;
+	virtual bool is_ready() override { return false; }
+	virtual void signature() override;
+	virtual void process_command() override;
+	virtual void finished_command() override;
 
 	virtual void identify_packet_device() = 0;
 

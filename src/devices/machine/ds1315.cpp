@@ -27,7 +27,7 @@
 
 const device_type DS1315 = &device_creator<ds1315_device>;
 
-ds1315_device::ds1315_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ds1315_device::ds1315_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, DS1315, "Dallas Semiconductor DS1315", tag, owner, clock, "ds1315", __FILE__), m_mode(), m_count(0)
 			{
 }
@@ -231,7 +231,7 @@ READ8_MEMBER(ds1315_device::write_data)
 
 void ds1315_device::input_raw_data()
 {
-	int raw[8], i, j=0;
+	int raw[8], i, j;
 	raw[0] = raw[1] = raw[2] = raw[3] = raw[4] = raw[5] = raw[6] = raw[7] = 0;
 	UINT8 flag = 1;
 

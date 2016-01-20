@@ -33,8 +33,8 @@ class gb_lcd_device :   public device_t,
 						public device_video_interface
 {
 public:
-	gb_lcd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	gb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gb_lcd_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	gb_lcd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -57,8 +57,8 @@ protected:
 	virtual void update_scanline();
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	void common_start();
 	void common_reset();
 
@@ -73,7 +73,7 @@ protected:
 	UINT16 m_sgb_pal_data[4096];
 	UINT8 m_sgb_pal_map[20][18];
 	UINT16 m_sgb_pal[128];
-	UINT8 *m_sgb_tile_data;
+	std::unique_ptr<UINT8[]> m_sgb_tile_data;
 	UINT8 m_sgb_tile_map[2048];
 	UINT8 m_sgb_window_mask;
 
@@ -119,8 +119,8 @@ protected:
 	emu_timer *m_lcd_timer;
 	int m_gbc_mode;
 
-	UINT8   *m_vram;     // Pointer to VRAM
-	UINT8   *m_oam;      // Pointer to OAM memory
+	std::unique_ptr<UINT8[]>   m_vram;     // Pointer to VRAM
+	std::unique_ptr<UINT8[]>   m_oam;      // Pointer to OAM memory
 	UINT8   m_gb_tile_no_mod;
 	UINT32  m_gb_chrgen_offs;     // GB Character generator
 	UINT32  m_gb_bgdtab_offs;     // GB Background character table
@@ -133,7 +133,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(video_init_vbl);
 	virtual TIMER_CALLBACK_MEMBER(lcd_timer_proc);
 	virtual void videoptr_restore();
-	void save_gb_video();
 	void increment_scanline();
 	void lcd_switch_on();
 };
@@ -142,30 +141,30 @@ protected:
 class mgb_lcd_device : public gb_lcd_device
 {
 public:
-	mgb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mgb_lcd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
 class sgb_lcd_device : public gb_lcd_device
 {
 public:
-	sgb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sgb_lcd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void sgb_io_write_pal(int offs, UINT8 *data);
 
 protected:
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void update_sprites();
-	virtual void update_scanline();
+	virtual void update_sprites() override;
+	virtual void update_scanline() override;
 	void refresh_border();
 };
 
@@ -173,22 +172,22 @@ protected:
 class cgb_lcd_device : public gb_lcd_device
 {
 public:
-	cgb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cgb_lcd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ8_MEMBER(video_r);
-	virtual DECLARE_WRITE8_MEMBER(video_w);
+	virtual DECLARE_READ8_MEMBER(video_r) override;
+	virtual DECLARE_WRITE8_MEMBER(video_w) override;
 
 protected:
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void update_sprites();
-	virtual void update_scanline();
+	virtual void update_sprites() override;
+	virtual void update_scanline() override;
 
-	virtual TIMER_CALLBACK_MEMBER(lcd_timer_proc);
-	virtual void videoptr_restore();
+	virtual TIMER_CALLBACK_MEMBER(lcd_timer_proc) override;
+	virtual void videoptr_restore() override;
 	void hdma_trans(UINT16 length);
 };
 

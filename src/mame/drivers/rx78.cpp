@@ -53,7 +53,7 @@
 class rx78_state : public driver_device
 {
 public:
-	rx78_state(const machine_config &mconfig, device_type type, const char *tag)
+	rx78_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cass(*this, "cassette"),
@@ -78,8 +78,8 @@ public:
 	UINT8 m_pal_reg[7];
 	UINT8 m_pri_mask;
 	UINT8 m_key_mux;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(rx78);
 	required_device<cpu_device> m_maincpu;

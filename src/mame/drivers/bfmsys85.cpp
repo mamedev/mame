@@ -73,18 +73,18 @@ ___________________________________________________________________________
 class bfmsys85_state : public driver_device
 {
 public:
-	bfmsys85_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag),
+	bfmsys85_state(const machine_config &mconfig, device_type type, std::string tag) : driver_device(mconfig, type, tag),
 		m_vfd(*this, "vfd"),
 		m_maincpu(*this, "maincpu"),
 		m_reel0(*this, "reel0"),
 		m_reel1(*this, "reel1"),
 		m_reel2(*this, "reel2"),
 		m_reel3(*this, "reel3"),
-		m_acia6850_0(*this, "acia6850_0")
+		m_acia6850_0(*this, "acia6850_0"),
+		m_meters(*this, "meters")
 	{
 	}
 
-	optional_device<roc10937_t> m_vfd;
 	int m_mmtr_latch;
 	int m_triac_latch;
 	int m_alpha_clock;
@@ -117,21 +117,22 @@ public:
 	DECLARE_WRITE8_MEMBER(mux_enable_w);
 	DECLARE_WRITE8_MEMBER(triac_w);
 	DECLARE_READ8_MEMBER(triac_r);
-	DECLARE_READ_LINE_MEMBER(sys85_data_r);
 	DECLARE_WRITE_LINE_MEMBER(sys85_data_w);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_DRIVER_INIT(decode);
 	DECLARE_DRIVER_INIT(nodecode);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	int b85_find_project_string( );
+	optional_device<roc10937_t> m_vfd;
 	required_device<cpu_device> m_maincpu;
 	required_device<stepper_device> m_reel0;
 	required_device<stepper_device> m_reel1;
 	required_device<stepper_device> m_reel2;
 	required_device<stepper_device> m_reel3;
 	required_device<acia6850_device> m_acia6850_0;
+	required_device<meters_device> m_meters;
 };
 
 #define MASTER_CLOCK    (XTAL_4MHz)
@@ -210,8 +211,8 @@ WRITE8_MEMBER(bfmsys85_state::reel12_w)
 	m_reel0->update((data>>4)&0x0f);
 	m_reel1->update( data    &0x0f);
 
-	awp_draw_reel("reel1", m_reel0);
-	awp_draw_reel("reel2", m_reel1);
+	awp_draw_reel(machine(),"reel1", m_reel0);
+	awp_draw_reel(machine(),"reel2", m_reel1);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -221,8 +222,8 @@ WRITE8_MEMBER(bfmsys85_state::reel34_w)
 	m_reel2->update((data>>4)&0x0f);
 	m_reel3->update( data    &0x0f);
 
-	awp_draw_reel("reel3", m_reel2);
-	awp_draw_reel("reel4", m_reel3);
+	awp_draw_reel(machine(),"reel3", m_reel2);
+	awp_draw_reel(machine(),"reel4", m_reel3);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -231,13 +232,13 @@ WRITE8_MEMBER(bfmsys85_state::reel34_w)
 
 WRITE8_MEMBER(bfmsys85_state::mmtr_w)
 {
-	int i;
 	int  changed = m_mmtr_latch ^ data;
 
 	m_mmtr_latch = data;
 
-	for (i=0; i<8; i++)
-	if ( changed & (1 << i) )   MechMtr_update(i, data & (1 << i) );
+	for (int i=0; i<8; i++)
+	if ( changed & (1 << i) )
+		m_meters->update(i, data & (1 << i) );
 
 	if ( data ) m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
@@ -311,7 +312,7 @@ WRITE8_MEMBER(bfmsys85_state::mux_data_w)
 
 	for ( i = 0; i < 8; i++ )
 	{
-		output_set_lamp_value(off, (data & pattern ? 1 : 0));
+		output().set_lamp_value(off, (data & pattern ? 1 : 0));
 		pattern <<= 1;
 		off++;
 	}
@@ -412,6 +413,9 @@ static MACHINE_CONFIG_START( bfmsys85, bfmsys85_state )
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfmsys85_state, reel2_optic_cb))
 	MCFG_STARPOINT_48STEP_ADD("reel3")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfmsys85_state, reel3_optic_cb))
+
+	MCFG_DEVICE_ADD("meters", METERS, 0)
+	MCFG_METERS_NUMBER(8)
 
 	MCFG_DEFAULT_LAYOUT(layout_bfmsys85)
 MACHINE_CONFIG_END
@@ -671,9 +675,9 @@ int bfmsys85_state::b85_find_project_string( )
 	UINT8 *src = memregion( "maincpu" )->base();
 	int size = memregion( "maincpu" )->bytes();
 
-	for (int search=0;search<7;search++)
+	for (auto & elem : title_string)
 	{
-		int strlength = strlen(title_string[search]);
+		int strlength = strlen(elem);
 
 		for (int i=0;i<size-strlength;i++)
 		{
@@ -682,7 +686,7 @@ int bfmsys85_state::b85_find_project_string( )
 			for (j=0;j<strlength;j+=1)
 			{
 				UINT8 rom = src[(i+j)];
-				UINT8 chr = title_string[search][j];
+				UINT8 chr = elem[j];
 
 				if (rom != chr)
 				{

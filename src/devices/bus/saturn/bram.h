@@ -14,48 +14,48 @@ class saturn_bram_device : public device_t,
 {
 public:
 	// construction/destruction
-	saturn_bram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	saturn_bram_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file) { if (!m_ext_bram.empty()) file.read(&m_ext_bram[0], m_ext_bram.size()); }
-	virtual void nvram_write(emu_file &file) { if (!m_ext_bram.empty()) file.write(&m_ext_bram[0], m_ext_bram.size()); }
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override { if (!m_ext_bram.empty()) file.read(&m_ext_bram[0], m_ext_bram.size()); }
+	virtual void nvram_write(emu_file &file) override { if (!m_ext_bram.empty()) file.write(&m_ext_bram[0], m_ext_bram.size()); }
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ext_bram);
-	virtual DECLARE_WRITE32_MEMBER(write_ext_bram);
+	virtual DECLARE_READ32_MEMBER(read_ext_bram) override;
+	virtual DECLARE_WRITE32_MEMBER(write_ext_bram) override;
 };
 
 class saturn_bram4mb_device : public saturn_bram_device
 {
 public:
 	// construction/destruction
-	saturn_bram4mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saturn_bram4mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class saturn_bram8mb_device : public saturn_bram_device
 {
 public:
 	// construction/destruction
-	saturn_bram8mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saturn_bram8mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class saturn_bram16mb_device : public saturn_bram_device
 {
 public:
 	// construction/destruction
-	saturn_bram16mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saturn_bram16mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class saturn_bram32mb_device : public saturn_bram_device
 {
 public:
 	// construction/destruction
-	saturn_bram32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saturn_bram32mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

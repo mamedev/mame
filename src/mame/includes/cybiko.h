@@ -49,7 +49,7 @@ struct CYBIKO_RS232
 class cybiko_state : public driver_device
 {
 public:
-	cybiko_state(const machine_config &mconfig, device_type type, const char *tag)
+	cybiko_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "hd66421"),
@@ -61,7 +61,6 @@ public:
 		m_input(*this, "A")
 	{ }
 
-	DECLARE_READ16_MEMBER(serflash_r);
 	DECLARE_WRITE16_MEMBER(serflash_w);
 	DECLARE_READ16_MEMBER(clock_r);
 	DECLARE_WRITE16_MEMBER(clock_w);
@@ -96,8 +95,8 @@ public:
 	optional_ioport_array<15> m_input;
 	DECLARE_DRIVER_INIT(cybikoxt);
 	DECLARE_DRIVER_INIT(cybiko);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void machine_stop_cybiko();
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cybiko );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cybikoxt );

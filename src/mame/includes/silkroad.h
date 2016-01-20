@@ -5,7 +5,7 @@
 class silkroad_state : public driver_device
 {
 public:
-	silkroad_state(const machine_config &mconfig, device_type type, const char *tag)
+	silkroad_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_oki1(*this, "oki1"),
@@ -45,7 +45,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg3_tile_info);
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update_silkroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

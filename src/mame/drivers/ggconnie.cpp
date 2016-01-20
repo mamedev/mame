@@ -32,7 +32,7 @@
 class ggconnie_state : public pce_common_state
 {
 public:
-	ggconnie_state(const machine_config &mconfig, device_type type, const char *tag)
+	ggconnie_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pce_common_state(mconfig, type, tag),
 		m_rtc(*this, "rtc"),
 		m_oki(*this, "oki")
@@ -42,14 +42,12 @@ public:
 	required_device <okim6295_device> m_oki;
 	DECLARE_WRITE8_MEMBER(lamp_w);
 	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_READ8_MEMBER(rtc_r);
-	DECLARE_WRITE8_MEMBER(rtc_w);
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
 };
 
 WRITE8_MEMBER(ggconnie_state::lamp_w)
 {
-	output_set_value("lamp", !BIT(data,0));
+	output().set_value("lamp", !BIT(data,0));
 }
 
 WRITE8_MEMBER(ggconnie_state::output_w)

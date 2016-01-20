@@ -20,7 +20,7 @@
 class beta_disk_device : public device_t
 {
 public:
-	beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	beta_disk_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~beta_disk_device() {}
 
 	DECLARE_READ8_MEMBER(status_r);
@@ -44,10 +44,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	required_device<kr1818vg93_t> m_wd179x;

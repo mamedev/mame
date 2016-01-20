@@ -42,7 +42,7 @@
 class tiki100_state : public driver_device
 {
 public:
-	tiki100_state(const machine_config &mconfig, device_type type, const char *tag) :
+	tiki100_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_ctc(*this, Z80CTC_TAG),
@@ -107,8 +107,8 @@ public:
 	required_ioport m_st_io;
 	required_device<palette_device> m_palette;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

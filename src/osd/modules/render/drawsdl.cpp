@@ -69,11 +69,11 @@ public:
 	m_last_dim(0, 0)
 	{ }
 
-	/* virtual */ int create();
-	/* virtual */ int draw(const int update);
-	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
-	/* virtual */ void destroy();
-	/* virtual */ render_primitive_list *get_primitives()
+	/* virtual */ int create() override;
+	/* virtual */ int draw(const int update) override;
+	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
+	/* virtual */ void destroy() override;
+	/* virtual */ render_primitive_list *get_primitives() override
 	{
 		osd_dim nd = window().blit_surface_size();
 		if (nd != m_blit_dim)
@@ -443,6 +443,14 @@ int sdl_info::create()
 		m_sdl_renderer = SDL_CreateRenderer(window().sdl_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 	else
 		m_sdl_renderer = SDL_CreateRenderer(window().sdl_window(), -1, SDL_RENDERER_ACCELERATED);
+
+	if (!m_sdl_renderer)
+	{
+		if (video_config.waitvsync)
+			m_sdl_renderer = SDL_CreateRenderer(window().sdl_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_SOFTWARE);
+		else
+			m_sdl_renderer = SDL_CreateRenderer(window().sdl_window(), -1, SDL_RENDERER_SOFTWARE);
+	}
 
 	if (!m_sdl_renderer)
 	{

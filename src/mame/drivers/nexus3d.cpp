@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Scott Stone
 /************************************************************************
 
@@ -25,7 +25,7 @@
 class nexus3d_state : public driver_device
 {
 public:
-	nexus3d_state(const machine_config &mconfig, device_type type, const char *tag)
+	nexus3d_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_maincpu(*this, "maincpu"),
@@ -43,8 +43,8 @@ public:
 //  DECLARE_WRITE32_MEMBER(nexus3d_unk3_w);
 
 	DECLARE_DRIVER_INIT(nexus3d);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_nexus3d(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 

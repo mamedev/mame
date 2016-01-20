@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Michael Strutts,Nicola Salmoria,Tormod Tjaberg,Mirko Buffoni,Lee Taylor,Valerio Verrando,Marco Cassili,Zsolt Vasvari,Aaron Giles,Jonathan Gevaryahu,hap,Robbbert
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni,Lee Taylor, Valerio Verrando, Zsolt Vasvari
+// thanks-to:Michael Strutts, Marco Cassili
 /***************************************************************************
 
     8080-based black and white hardware
@@ -17,7 +18,7 @@
 class _8080bw_state : public mw8080bw_state
 {
 public:
-	_8080bw_state(const machine_config &mconfig, device_type type, const char *tag)
+	_8080bw_state(const machine_config &mconfig, device_type type, std::string tag)
 		: mw8080bw_state(mconfig, type, tag),
 		m_schaser_effect_555_timer(*this, "schaser_sh_555"),
 		m_claybust_gun_on(*this, "claybust_gun"),

@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Lee Taylor, John Clegg
+// license:BSD-3-Clause
+// copyright-holders:Lee Taylor
+// thanks-to:John Clegg
 /****************************************************************************
 
     Irem M58 hardware
@@ -436,7 +437,7 @@ DRIVER_INIT_MEMBER(m58_state,yard85)
 {
 	// on these sets the content of the sprite color PROM needs reversing
 	//  are the proms on the other sets from bootleg boards, or hand modified?
-	UINT8* buffer = auto_alloc_array(machine(), UINT8, 0x10);
+	std::unique_ptr<UINT8[]> buffer = std::make_unique<UINT8[]>(0x10);
 	UINT8* region = memregion("proms")->base();
 	int i;
 
@@ -444,7 +445,7 @@ DRIVER_INIT_MEMBER(m58_state,yard85)
 	{
 		buffer[i] = region[0x20f-i];
 	}
-	memcpy(region+0x200, buffer, 0x10);
+	memcpy(region+0x200, buffer.get(), 0x10);
 	m_palette->update();
 }
 

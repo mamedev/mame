@@ -68,7 +68,7 @@ static const offs_t RCR_TOP_ADDRESS[4] =    { 0xf000, 0xf000, 0xe000, 0xc000 };
 //  mos8722_device - constructor
 //-------------------------------------------------
 
-mos8722_device::mos8722_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mos8722_device::mos8722_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MOS8722, "MOS8722", tag, owner, clock, "mos8722", __FILE__),
 	m_write_z80en(*this),
 	m_write_fsdir(*this),
@@ -100,9 +100,9 @@ void mos8722_device::device_start()
 
 void mos8722_device::device_reset()
 {
-	for (int i = 0; i < 16; i++)
+	for (auto & elem : m_reg)
 	{
-		m_reg[i] = 0;
+		elem = 0;
 	}
 
 	m_reg[P1L] = 0x01;
@@ -176,7 +176,7 @@ WRITE8_MEMBER( mos8722_device::write )
 
 	if (!CR_IO && offset >= 0xd500 && offset < 0xd50c)
 	{
-		if (LOG) logerror("MOS8722 '%s' Write %01x : %02x\n", tag(), offset & 0x0f, data);
+		if (LOG) logerror("MOS8722 '%s' Write %01x : %02x\n", tag().c_str(), offset & 0x0f, data);
 
 		switch (offset & 0x0f)
 		{
@@ -231,7 +231,7 @@ WRITE8_MEMBER( mos8722_device::write )
 	}
 	else if (offset >= 0xff00 && offset < 0xff05)
 	{
-		if (LOG) logerror("MOS8722 '%s' Write %01x : %02x\n", tag(), offset & 0x0f, data);
+		if (LOG) logerror("MOS8722 '%s' Write %01x : %02x\n", tag().c_str(), offset & 0x0f, data);
 
 		switch (offset & 0x0f)
 		{

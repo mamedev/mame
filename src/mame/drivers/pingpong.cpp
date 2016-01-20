@@ -51,8 +51,8 @@ WRITE8_MEMBER(pingpong_state::coin_w)
 	m_intenable = data & 0x0c;
 
 	/* bit 0/1 = coin counters */
-	coin_counter_w(machine(), 0,data & 1);
-	coin_counter_w(machine(), 1,data & 2);
+	machine().bookkeeping().coin_counter_w(0,data & 1);
+	machine().bookkeeping().coin_counter_w(1,data & 2);
 
 	/* other bits unknown */
 }

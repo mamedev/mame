@@ -92,8 +92,8 @@ WRITE32_MEMBER(fuuki32_state::vram_3_w){ vram_w(offset, data, mem_mask, 3); }
 
 void fuuki32_state::video_start()
 {
-//  m_buf_spriteram = auto_alloc_array(machine(), UINT32, m_spriteram.bytes() / 4);
-//  m_buf_spriteram2 = auto_alloc_array(machine(), UINT32, m_spriteram.bytes() / 4);
+//  m_buf_spriteram = std::make_unique<UINT32[]>(m_spriteram.bytes() / 4);
+//  m_buf_spriteram2 = std::make_unique<UINT32[]>(m_spriteram.bytes() / 4);
 
 
 

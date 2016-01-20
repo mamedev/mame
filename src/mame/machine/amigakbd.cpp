@@ -260,7 +260,7 @@ ioport_constructor amigakbd_device::device_input_ports() const
 //  amigakbd_device - constructor
 //-------------------------------------------------
 
-amigakbd_device::amigakbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+amigakbd_device::amigakbd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AMIGAKBD, "Amiga 500 Keyboard with 6570-036 MPU", tag, owner, clock, "amigakbd", __FILE__),
 	m_write_kclk(*this),
 	m_write_kdat(*this),
@@ -282,9 +282,9 @@ amigakbd_device::amigakbd_device(const machine_config &mconfig, const char *tag,
 	m_row_c2(*this, "row_c2"),
 	m_row_c1(*this, "row_c1"),
 	m_row_c0(*this, "row_c0"),
-	m_timer(NULL),
-	m_watchdog(NULL),
-	m_reset(NULL),
+	m_timer(nullptr),
+	m_watchdog(nullptr),
+	m_reset(nullptr),
 	m_kdat(1),
 	m_kclk(1),
 	m_port_c(0xff),
@@ -307,9 +307,9 @@ void amigakbd_device::device_start()
 	m_write_krst.resolve_safe();
 
 	// allocate timers
-	m_timer = timer_alloc(0, NULL);
-	m_watchdog = timer_alloc(1, NULL);
-	m_reset = timer_alloc(2, NULL);
+	m_timer = timer_alloc(0, nullptr);
+	m_watchdog = timer_alloc(1, nullptr);
+	m_reset = timer_alloc(2, nullptr);
 
 	// register for save states
 	save_item(NAME(m_kdat));
@@ -482,7 +482,7 @@ WRITE8_MEMBER( amigakbd_device::port_a_w )
 WRITE8_MEMBER( amigakbd_device::port_b_w )
 {
 	// caps lock led
-	output_set_value("led0", BIT(data, 7));
+	machine().output().set_value("led0", BIT(data, 7));
 }
 
 WRITE8_MEMBER( amigakbd_device::port_c_w )

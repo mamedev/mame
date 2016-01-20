@@ -14,7 +14,7 @@ extern const device_type FD800;
 class fd800_legacy_device : public device_t
 {
 public:
-	fd800_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fd800_legacy_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( cru_r );
 	DECLARE_WRITE8_MEMBER( cru_w );
@@ -24,8 +24,8 @@ public:
 	}
 
 private:
-	void device_start(void);
-	void device_reset(void);
+	void device_start(void) override;
+	void device_reset(void) override;
 	void set_interrupt_line();
 
 	int     read_id(int unit, int head, int *cylinder_id, int *sector_id);

@@ -36,7 +36,7 @@
 class dragon_state : public coco12_state
 {
 public:
-	dragon_state(const machine_config &mconfig, device_type type, const char *tag)
+	dragon_state(const machine_config &mconfig, device_type type, std::string tag)
 	: coco12_state(mconfig, type, tag),
 		m_printer(*this, PRINTER_TAG)
 	{
@@ -45,7 +45,7 @@ public:
 	required_device<printer_image_device> m_printer;
 
 protected:
-	virtual void pia1_pa_changed(UINT8 data);
+	virtual void pia1_pa_changed(UINT8 data) override;
 };
 
 
@@ -53,7 +53,7 @@ protected:
 class dragon64_state : public dragon_state
 {
 public:
-	dragon64_state(const machine_config &mconfig, device_type type, const char *tag)
+	dragon64_state(const machine_config &mconfig, device_type type, std::string tag)
 	: dragon_state(mconfig, type, tag),
 		m_acia(*this, ACIA_TAG)
 	{
@@ -62,10 +62,10 @@ public:
 	required_device<mos6551_device> m_acia;
 
 protected:
-	virtual DECLARE_READ8_MEMBER( ff00_read );
-	virtual DECLARE_WRITE8_MEMBER( ff00_write );
+	virtual DECLARE_READ8_MEMBER( ff00_read ) override;
+	virtual DECLARE_WRITE8_MEMBER( ff00_write ) override;
 
-	virtual void pia1_pb_changed(UINT8 data);
+	virtual void pia1_pb_changed(UINT8 data) override;
 	void page_rom(bool romswitch);
 };
 

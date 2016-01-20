@@ -19,7 +19,7 @@ Status: Boots into monitor, some commands work, some freeze.
 class pm68k_state : public driver_device
 {
 public:
-	pm68k_state(const machine_config &mconfig, device_type type, const char *tag)
+	pm68k_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_p_base(*this, "rambase"),
 		m_maincpu(*this, "maincpu"),
@@ -32,7 +32,7 @@ public:
 	DECLARE_READ16_MEMBER(status_r);
 private:
 	UINT8 m_term_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_shared_ptr<UINT16> m_p_base;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;

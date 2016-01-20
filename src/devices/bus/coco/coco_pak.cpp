@@ -39,13 +39,13 @@ const device_type COCO_PAK = &device_creator<coco_pak_device>;
 //-------------------------------------------------
 //  coco_pak_device - constructor
 //-------------------------------------------------
-coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_cococart_interface( mconfig, *this ), m_cart(nullptr), m_owner(nullptr)
 {
 }
 
-coco_pak_device::coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+coco_pak_device::coco_pak_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, COCO_PAK, "CoCo Program PAK", tag, owner, clock, "cocopak", __FILE__),
 		device_cococart_interface( mconfig, *this ), m_cart(nullptr), m_owner(nullptr)
 	{
@@ -125,7 +125,7 @@ const device_type COCO_PAK_BANKED = &device_creator<coco_pak_banked_device>;
 //  coco_pak_device - constructor
 //-------------------------------------------------
 
-coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 		: coco_pak_device(mconfig, COCO_PAK_BANKED, "CoCo Program PAK (Banked)", tag, owner, clock, "cocopak_banked", __FILE__)
 {
 }

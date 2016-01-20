@@ -5,7 +5,7 @@
 class splash_state : public driver_device
 {
 public:
-	splash_state(const machine_config &mconfig, device_type type, const char *tag)
+	splash_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -105,7 +105,7 @@ public:
 	DECLARE_DRIVER_INIT(splash);
 	DECLARE_DRIVER_INIT(rebus);
 	DECLARE_DRIVER_INIT(funystrp);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(splash);
 	DECLARE_MACHINE_START(roldfrog);
 	DECLARE_MACHINE_START(funystrp);

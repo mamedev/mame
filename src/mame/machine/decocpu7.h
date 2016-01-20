@@ -6,7 +6,7 @@
 
 class deco_cpu7_device : public m6502_device {
 public:
-	deco_cpu7_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	deco_cpu7_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	class mi_decrypt : public mi_default_normal {
@@ -14,12 +14,12 @@ protected:
 		bool had_written;
 
 		virtual ~mi_decrypt() {}
-		virtual UINT8 read_sync(UINT16 adr);
-		virtual void write(UINT16 adr, UINT8 val);
+		virtual UINT8 read_sync(UINT16 adr) override;
+		virtual void write(UINT16 adr, UINT8 val) override;
 	};
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 };
 

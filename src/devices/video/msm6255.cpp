@@ -74,11 +74,11 @@ ADDRESS_MAP_END
 //  msm6255_device - constructor
 //-------------------------------------------------
 
-msm6255_device::msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+msm6255_device::msm6255_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MSM6255, "MSM6255", tag, owner, clock, "msm6255", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 20, 0, NULL, *ADDRESS_MAP_NAME(msm6255)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 20, 0, nullptr, *ADDRESS_MAP_NAME(msm6255)),
 	m_cursor(0)
 {
 }
@@ -123,7 +123,7 @@ void msm6255_device::device_reset()
 
 const address_space_config *msm6255_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 

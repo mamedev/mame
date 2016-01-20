@@ -61,7 +61,7 @@
 class ramtek_state : public driver_device
 {
 public:
-	ramtek_state(const machine_config &mconfig, device_type type, const char *tag)
+	ramtek_state(const machine_config &mconfig, device_type type, std::string tag)
 	: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_video(*this, "fixfreq")
@@ -75,10 +75,10 @@ public:
 protected:
 
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 private:
 
@@ -149,7 +149,7 @@ ROM_START( hockyrmt )
 	ROM_LOAD( "ramtek5.g9",     0x0000, 0x0020, CRC(205bf9a1) SHA1(3014d226d8afebc6a52e5adb84f1846dd1c0b01c) )
 ROM_END
 
-ROM_START( soccrrmt ) 
+ROM_START( soccrrmt )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0020, "roms", ROMREGION_ERASE00 )

@@ -42,7 +42,7 @@ abc_keyboard_interface::abc_keyboard_interface(const machine_config &mconfig, de
 //  abc_keyboard_port_device - constructor
 //-------------------------------------------------
 
-abc_keyboard_port_device::abc_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+abc_keyboard_port_device::abc_keyboard_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ABC_KEYBOARD_PORT, "Luxor ABC keyboard port", tag, owner, clock, "abc_keyboard_port", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_out_rx_handler(*this),
@@ -73,7 +73,7 @@ void abc_keyboard_port_device::device_start()
 
 void abc_keyboard_port_device::device_reset()
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 		get_card_device()->reset();
 }
 
@@ -94,7 +94,7 @@ WRITE_LINE_MEMBER( abc_keyboard_port_device::write_rx )
 
 WRITE_LINE_MEMBER( abc_keyboard_port_device::txd_w )
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 		m_card->txd_w(state);
 }
 

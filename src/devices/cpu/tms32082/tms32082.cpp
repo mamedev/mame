@@ -44,7 +44,7 @@ const UINT32 tms32082_mp_device::SHIFT_MASK[] =
 
 
 
-tms32082_mp_device::tms32082_mp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms32082_mp_device::tms32082_mp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, TMS32082_MP, "TMS32082 MP", tag, owner, clock, "tms32082_mp", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(mp_internal_map))
 {
@@ -56,6 +56,12 @@ offs_t tms32082_mp_device::disasm_disassemble(char *buffer, offs_t pc, const UIN
 	return CPU_DISASSEMBLE_NAME(tms32082_mp)(this, buffer, pc, oprom, opram, options);
 }
 
+
+
+void tms32082_mp_device::set_command_callback(write32_delegate callback)
+{
+	m_cmd_callback = callback;
+}
 
 
 READ32_MEMBER(tms32082_mp_device::mp_param_r)
@@ -208,7 +214,7 @@ void tms32082_mp_device::device_start()
 	m_icountptr = &m_icount;
 }
 
-void tms32082_mp_device::state_string_export(const device_state_entry &entry, std::string &str)
+void tms32082_mp_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -277,75 +283,10 @@ void tms32082_mp_device::processor_command(UINT32 command)
 	if (command & 0x00000001)
 		printf("PP0 ");
 
+	if (!m_cmd_callback.isnull())
+		m_cmd_callback(*m_program, 0, command, 0xffffffff);
+
 	printf("\n");
-
-	// PP0
-	if (command & 1)
-	{
-		if (command & 0x00004000)
-		{
-			// simulate PP behavior for now...
-			m_program->write_dword(0x00000084, 3);
-
-			UINT32 num = m_program->read_dword(0x90);
-
-			printf("PP num %d\n", num);
-
-			/*
-			UINT32 ra = 0x1000280;
-
-			printf("FIFO push:\n");
-
-			for (int i=0; i < num; i++)
-			{
-			    printf("Entry %d:\n", i);
-			    for (int k=0; k < 6; k++)
-			    {
-			        for (int l=0; l < 4; l++)
-			        {
-			            UINT32 dd = m_program->read_dword(ra);
-			            ra += 4;
-
-			            printf("%08X(%f) ", dd, u2f(dd));
-			        }
-			        printf("\n");
-			    }
-			    printf("\n");
-			}
-			*/
-
-			UINT32 ra = 0x1000280;
-
-			int oldnum = m_program->read_dword(0x600ffffc);
-			UINT32 rb = 0x60000000 + (oldnum * 0x60);
-
-			for (int i=0; i < num; i++)
-			{
-				for (int k=0; k < 24; k++)
-				{
-					UINT32 dd = m_program->read_dword(ra);
-					ra += 4;
-
-					m_program->write_dword(rb, dd);
-					rb += 4;
-				}
-			}
-			m_program->write_dword(0x600ffffc, oldnum+num);
-
-			m_program->write_dword(0x00000090, 0);
-			m_program->write_dword(0x00000094, num);
-
-		}
-	}
-	// PP1
-	if (command & 2)
-	{
-		if (command & 0x00004000)
-		{
-			// simulate PP behavior for now...
-			m_program->write_dword(0x00001014, 3);
-		}
-	}
 }
 
 UINT32 tms32082_mp_device::read_creg(int reg)
@@ -512,14 +453,11 @@ void tms32082_mp_device::execute_run()
 		m_ir = fetch();
 		execute();
 
-		if (m_tcount == 0)
+		m_tcount--;
+		if (m_tcount < 0)
 		{
 			// TODO: timer interrupt
 			m_tcount = m_tscale;
-		}
-		else
-		{
-			m_tcount--;
 		}
 
 		m_icount--;
@@ -543,7 +481,7 @@ static ADDRESS_MAP_START(pp_internal_map, AS_PROGRAM, 32, tms32082_pp_device)
 	AM_RANGE(0x01001000, 0x01001fff) AM_RAM AM_SHARE("pp1_param")
 ADDRESS_MAP_END
 
-tms32082_pp_device::tms32082_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms32082_pp_device::tms32082_pp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, TMS32082_PP, "TMS32082 PP", tag, owner, clock, "tms32082_pp", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(pp_internal_map))
 {
@@ -573,7 +511,7 @@ void tms32082_pp_device::device_start()
 	m_icountptr = &m_icount;
 }
 
-void tms32082_pp_device::state_string_export(const device_state_entry &entry, std::string &str)
+void tms32082_pp_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

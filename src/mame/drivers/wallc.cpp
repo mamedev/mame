@@ -58,7 +58,7 @@ Thanks to HIGHWAYMAN for providing info on how to get to these epoxies
 class wallc_state : public driver_device
 {
 public:
-	wallc_state(const machine_config &mconfig, device_type type, const char *tag)
+	wallc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -77,7 +77,7 @@ public:
 	DECLARE_DRIVER_INIT(wallca);
 	DECLARE_DRIVER_INIT(sidam);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(wallc);
 	UINT32 screen_update_wallc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -170,7 +170,7 @@ UINT32 wallc_state::screen_update_wallc(screen_device &screen, bitmap_ind16 &bit
 
 WRITE8_MEMBER(wallc_state::wallc_coin_counter_w)
 {
-	coin_counter_w(machine(), 0,data & 2);
+	machine().bookkeeping().coin_counter_w(0,data & 2);
 }
 
 static ADDRESS_MAP_START( wallc_map, AS_PROGRAM, 8, wallc_state )

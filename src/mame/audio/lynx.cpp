@@ -96,21 +96,21 @@ const device_type LYNX2_SND = &device_creator<lynx2_sound_device>;
 //  lynx_sound_device - constructor
 //-------------------------------------------------
 
-lynx_sound_device::lynx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+lynx_sound_device::lynx_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, LYNX_SND, "Mikey", tag, owner, clock, "lynx_sound", __FILE__),
 						device_sound_interface(mconfig, *this)
 {
 	m_timer_delegate = lynx_sound_timer_delegate();
 }
 
-lynx_sound_device::lynx_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+lynx_sound_device::lynx_sound_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_sound_interface(mconfig, *this)
 {
 }
 
 
-lynx2_sound_device::lynx2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+lynx2_sound_device::lynx2_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: lynx_sound_device(mconfig, LYNX2_SND, "Mikey (Lynx II)", tag, owner, clock, "lynx2_sound", __FILE__)
 {
 }
@@ -159,8 +159,8 @@ void lynx_sound_device::register_save()
 
 void lynx_sound_device::init()
 {
-	m_shift_mask = auto_alloc_array_clear(machine(), int, 512);
-	m_shift_xor = auto_alloc_array_clear(machine(), int, 4096);
+	m_shift_mask = make_unique_clear<int[]>(512);
+	m_shift_xor = make_unique_clear<int[]>(4096);
 
 	for (int i = 0; i < 512; i++)
 	{
@@ -212,9 +212,9 @@ void lynx2_sound_device::device_start()
 
 void lynx_sound_device::device_reset()
 {
-	for (int i = 0; i < LYNX_AUDIO_CHANNELS; i++)
+	for (auto & elem : m_audio)
 	{
-		reset_channel(&m_audio[i]);
+		reset_channel(&elem);
 	}
 }
 

@@ -26,7 +26,7 @@ const device_type CPC_EXPANSION_SLOT = &device_creator<cpc_expansion_slot_device
 
 
 device_cpc_expansion_card_interface::device_cpc_expansion_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device), 
+	: device_slot_card_interface(mconfig,device),
 	m_rom_sel(0)
 {
 }
@@ -42,7 +42,7 @@ device_cpc_expansion_card_interface::~device_cpc_expansion_card_interface()
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_expansion_slot_device::cpc_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cpc_expansion_slot_device::cpc_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, CPC_EXPANSION_SLOT, "Amstrad CPC expansion port", tag, owner, clock, "cpc_expansion_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		m_out_irq_cb(*this),

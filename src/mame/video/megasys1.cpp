@@ -143,13 +143,13 @@ No? No? c2108   Sprite Bank
 
 
 
-84100 44100 c2200 Sprite Control
+84100 44100 c2200 Sprite Control ( m_sprite_flag )
 
             fedc ba9- ---- ---- ? (unused?)
             ---- ---8 ---- ---- Enable Sprite Splitting In 2 Groups:
                                 Some Sprite Appear Over, Some Below The Layers
             ---- ---- 765- ---- ? (unused?)
-            ---- ---- ---4 ---- Enable Effect (?)
+            ---- ---- ---4 ---- Enable Effect (don't clear sprite framebuffer)
             ---- ---- ---- 3210 Effect Number (?)
 
 I think bit 4 enables some sort of color cycling for sprites having priority
@@ -225,10 +225,10 @@ VIDEO_START_MEMBER(megasys1_state,megasys1)
 
 	m_spriteram = &m_ram[0x8000/2];
 
-	m_buffer_objectram = auto_alloc_array(machine(), UINT16, 0x2000);
-	m_buffer_spriteram16 = auto_alloc_array(machine(), UINT16, 0x2000);
-	m_buffer2_objectram = auto_alloc_array(machine(), UINT16, 0x2000);
-	m_buffer2_spriteram16 = auto_alloc_array(machine(), UINT16, 0x2000);
+	m_buffer_objectram = std::make_unique<UINT16[]>(0x2000);
+	m_buffer_spriteram16 = std::make_unique<UINT16[]>(0x2000);
+	m_buffer2_objectram = std::make_unique<UINT16[]>(0x2000);
+	m_buffer2_spriteram16 = std::make_unique<UINT16[]>(0x2000);
 
 	create_tilemaps();
 	m_tmap[0] = m_tilemap[0][0][0];
@@ -254,7 +254,7 @@ VIDEO_START_MEMBER(megasys1_state,megasys1)
 
     However, this is probably a game specific thing, as Soldam uses
     layer 1 in both modes, and even with 8x8 tiles the tile code must
-    be multiplied by 4!
+    be multiplied by 4! (for the High Score table)
 
     AFAIK, the other games use a layer in one mode only (always 8x8 or
     16x16) so it could be that the multiplication factor is constant
@@ -265,7 +265,8 @@ VIDEO_START_MEMBER(megasys1_state,megasys1)
 	m_8x8_scroll_factor[1] = 1; m_16x16_scroll_factor[1] = 4;
 	m_8x8_scroll_factor[2] = 1; m_16x16_scroll_factor[2] = 4;
 
-	if (strcmp(machine().system().name, "soldamj") == 0)
+	if (strcmp(machine().system().name, "soldam") == 0 ||
+		strcmp(machine().system().name, "soldamj") == 0)
 	{
 		m_8x8_scroll_factor[1] = 4; m_16x16_scroll_factor[1] = 4;
 	}
@@ -274,6 +275,8 @@ VIDEO_START_MEMBER(megasys1_state,megasys1)
 	if (strcmp(machine().system().name, "lomakai") == 0 ||
 		strcmp(machine().system().name, "makaiden") == 0)
 		m_hardware_type_z = 1;
+
+	m_screen->register_screen_bitmap(m_sprite_buffer_bitmap);
 }
 
 /***************************************************************************
@@ -411,6 +414,9 @@ void megasys1_state::megasys1_set_vreg_flag(int which, int data)
 WRITE16_MEMBER(megasys1_state::megasys1_vregs_A_w)
 {
 	UINT16 new_data = COMBINE_DATA(&m_vregs[offset]);
+
+	if(((offset*2) & 0x300) == 0)
+		m_screen->update_partial(m_screen->vpos());
 
 	switch (offset)
 	{
@@ -589,8 +595,8 @@ WRITE16_MEMBER(megasys1_state::megasys1_vregs_D_w)
 
     00-07                       ?
     08      fed- ---- ---- ---- ?
-            ---c ---- ---- ---- mosaic sol. (?)
-            ---- ba98 ---- ---- mosaic      (?)
+            ---c ---- ---- ---- mosaic sol.
+            ---- ba98 ---- ---- mosaic
             ---- ---- 7--- ---- y flip
             ---- ---- -6-- ---- x flip
             ---- ---- --45 ---- ?
@@ -599,9 +605,106 @@ WRITE16_MEMBER(megasys1_state::megasys1_vregs_D_w)
     0C      Y position
     0E      Code                                            */
 
+
+void megasys1_state::mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	gfx_element *decodegfx = m_gfxdecode->gfx(3);
+	UINT16 colorbase = decodegfx->colorbase();
+
+	for (int y = cliprect.min_y;y <= cliprect.max_y;y++)
+	{
+		UINT16* srcline = &m_sprite_buffer_bitmap.pix16(y);
+		UINT16* dstline = &bitmap.pix16(y);
+		UINT8 *prio = &screen.priority().pix8(y);
+
+		for (int x = cliprect.min_x;x <= cliprect.max_x;x++)
+		{
+			UINT16 pixel = srcline[x];
+
+			if ((pixel & 0xf) != 0xf)
+			{
+				int priority = (pixel & 0x4000) >> 14;
+				priority = (priority) ? 0x0c : 0x0a;
+
+				if ((priority & (1 << (prio[x] & 0x1f))) == 0)
+				{
+					UINT8 coldat = pixel & 0x3fff;
+					dstline[x] = coldat + colorbase;
+
+				}
+			}
+		}
+	}
+}
+
+void megasys1_state::partial_clear_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 param)
+{
+	for (int y = cliprect.min_y;y <= cliprect.max_y;y++)
+	{
+		UINT16* srcline = &m_sprite_buffer_bitmap.pix16(y);
+
+		for (int x = cliprect.min_x;x <= cliprect.max_x;x++)
+		{
+			UINT16 pixel = srcline[x];
+			srcline[x] = pixel & 0x7fff; // wipe our 'drawn here' marker otherwise trails will always have priority over new sprites, which is incorrect.
+
+			// guess, very unclear from the video refernece we have, used when removing p47 trails
+			if (((pixel & 0xf0) >> 4) < param)
+				srcline[x] = 0x7fff;
+		}
+	}
+}
+
+
+inline void megasys1_state::draw_16x16_priority_sprite(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect, INT32 code, INT32 color, INT32 sx, INT32 sy, INT32 flipx, INT32 flipy, UINT8 mosaic, UINT8 mosaicsol, INT32 priority)
+{
+//  if (sy >= nScreenHeight || sy < -15 || sx >= nScreenWidth || sx < -15) return;
+	gfx_element *decodegfx = m_gfxdecode->gfx(3);
+	sy = sy + 16;
+
+	const UINT8* gfx = decodegfx->get_data(code);
+
+	flipy = (flipy) ? 0x0f : 0;
+	flipx = (flipx) ? 0x0f : 0;
+
+	color = color * 16;
+
+
+	for (INT32 y = 0; y < 16; y++, sy++, sx-=16)
+	{
+	//  UINT16 *dest = &bitmap.pix16(sy)+ sx;
+	//  UINT8 *prio = &screen.priority().pix8(sy) + sx;
+		UINT16* dest = &m_sprite_buffer_bitmap.pix16(sy)+ sx;
+
+		for (INT32 x = 0; x < 16; x++, sx++)
+		{
+			if (sx < cliprect.min_x || sy < cliprect.min_y || sx > cliprect.max_x || sy > cliprect.max_y) continue;
+
+			INT32 pxl;
+
+			if (mosaicsol) {
+				pxl = gfx[(((y ^ flipy) |  mosaic) * 16) + ((x ^ flipx) |  mosaic)];
+			} else {
+				pxl = gfx[(((y ^ flipy) & ~mosaic) * 16) + ((x ^ flipx) & ~mosaic)];
+			}
+
+			if (pxl != 0x0f) {
+				if (!(dest[x] & 0x8000)) {
+					dest[x] = (pxl+color) | (priority << 14);
+
+					dest[x] |= 0x8000;
+				}
+			}
+		}
+	}
+
+}
+
 void megasys1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	int color,code,sx,sy,flipx,flipy,attr,sprite,offs,color_mask;
+	int color,code,sx,sy,flipx,flipy,attr,sprite;
+
+
 
 /* objram: 0x100*4 entries      spritedata: 0x80 entries */
 
@@ -609,47 +712,62 @@ void megasys1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 
 	if (m_hardware_type_z == 0)  /* standard sprite hardware */
 	{
-		color_mask = (m_sprite_flag & 0x100) ? 0x07 : 0x0f;
-
-		for (offs = (0x800-8)/2;offs >= 0;offs -= 8/2)
+		if (!(m_sprite_flag&0x10))
+			m_sprite_buffer_bitmap.fill(0x7fff, cliprect);
+		else
 		{
-			for (sprite = 0; sprite < 4 ; sprite ++)
+			// P47 sprite trails effect.. not quite right tho
+			// I think the low 4 bits are used to clear specific pens?
+			// when the hardware wants to clear the trails from the screen
+			// it increases the value from 0x00 to 0x0e
+			//printf("m_sprite_flag %02x\n", m_sprite_flag);
+			partial_clear_sprite_bitmap(screen, bitmap, cliprect, m_sprite_flag&0x0f);
+		}
+
+		INT32 color_mask = (m_sprite_flag & 0x100) ? 0x07 : 0x0f;
+
+		UINT16 *objectram = (UINT16*)m_buffer2_objectram.get();
+		UINT16 *spriteram = (UINT16*)m_buffer2_spriteram16.get();
+
+		for (INT32 offs = (0x800-8)/2; offs >= 0; offs -= 4)
+		{
+			for (INT32 sprite = 0; sprite < 4 ; sprite ++)
 			{
-				UINT16 *objectdata = &m_buffer2_objectram[offs + (0x800/2) * sprite];
-				UINT16 *spritedata = &m_buffer2_spriteram16[ (objectdata[ 0 ] & 0x7f) * 0x10/2];
+				UINT16 *objectdata = &objectram[offs + (0x800/2) * sprite];
+				UINT16 *spritedata = &spriteram[(objectdata[0] & 0x7f) * 8];
 
-				attr = spritedata[ 8/2 ];
-				if (((attr & 0xc0)>>6) != sprite)   continue;   // flipping
+				INT32 attr = spritedata[4];
+				if (((attr & 0xc0) >> 6) != sprite) continue;
 
-				/* apply the position displacements */
-				sx = ( spritedata[0x0A/2] + objectdata[0x02/2] ) % 512;
-				sy = ( spritedata[0x0C/2] + objectdata[0x04/2] ) % 512;
+				INT32 sx = (spritedata[5] + objectdata[1]) & 0x1ff;
+				INT32 sy = (spritedata[6] + objectdata[2]) & 0x1ff;
 
-				if (sx > 256-1) sx -= 512;
-				if (sy > 256-1) sy -= 512;
+				if (sx > 255) sx -= 512;
+				if (sy > 255) sy -= 512;
 
-				flipx = attr & 0x40;
-				flipy = attr & 0x80;
+				INT32 code  = spritedata[7] + objectdata[3];
+				INT32 color = attr & color_mask;
+
+				INT32 flipx = attr & 0x40;
+				INT32 flipy = attr & 0x80;
+				//INT32 pri  = (attr & 0x08) ? 0x0c : 0x0a;
+				INT32 pri  = (attr & 0x08)>>3;
+				INT32 mosaic = (attr & 0x0f00)>>8;
+				INT32 mossol = (attr & 0x1000)>>8;
+
+				code = (code & 0xfff) + ((m_sprite_bank & 1) << 12);
 
 				if (m_screen_flag & 1)
 				{
-					flipx = !flipx;     flipy = !flipy;
-					sx = 240-sx;        sy = 240-sy;
+					flipx = !flipx;
+					flipy = !flipy;
+					sx = 240 - sx;
+					sy = 240 - sy;
 				}
 
-				/* sprite code is displaced as well */
-				code  = spritedata[0x0E/2] + objectdata[0x06/2];
-				color = (attr & color_mask);
-
-				m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
-						(code & 0xfff ) + ((m_sprite_bank & 1) << 12),
-						color,
-						flipx, flipy,
-						sx, sy,
-						screen.priority(),
-						(attr & 0x08) ? 0x0c : 0x0a,15);
-			}   /* sprite */
-		}   /* offs */
+				draw_16x16_priority_sprite(screen,bitmap,cliprect,code, color, sx, sy - 16, flipx, flipy, mosaic, mossol, pri);
+			}
+		}
 	}   /* non Z hw */
 	else
 	{
@@ -732,7 +850,7 @@ static const struct priority priorities[] =
 		{ 0x14032,0x04132,0x14032,0x04132,0xfffff,0xfffff,0xfffff,0xfffff,
 			0xfffff,0xfffff,0x01324,0xfffff,0xfffff,0xfffff,0xfffff,0xfffff }
 	},
-	{   0   }   // end of list: use the prom's data
+	{   nullptr   }   // end of list: use the prom's data
 };
 
 
@@ -955,7 +1073,7 @@ PALETTE_INIT_MEMBER(megasys1_state,megasys1)
 
 UINT32 megasys1_state::screen_update_megasys1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i,flag,pri,primask;
+	int i, flag, pri, primask;
 	int active_layers;
 
 	if (m_hardware_type_z)
@@ -982,13 +1100,13 @@ UINT32 megasys1_state::screen_update_megasys1(screen_device &screen, bitmap_ind1
 
 		/* see what layers are really active (layers 4 & f will do no harm) */
 		for (i = 0;i < 5;i++)
-			reallyactive |= 1 << ((pri >> (4*i)) & 0x0f);
+			reallyactive |= 1 << ((pri >> (4 * i)) & 0x0f);
 
 		active_layers = m_active_layers & reallyactive;
 		active_layers |= 1 << ((pri & 0xf0000) >> 16);  // bottom layer can't be disabled
 	}
 
-	machine().tilemap().set_flip_all((m_screen_flag & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0 );
+	machine().tilemap().set_flip_all((m_screen_flag & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	for (i = 0;i < 3;i++)
 	{
@@ -996,8 +1114,8 @@ UINT32 megasys1_state::screen_update_megasys1(screen_device &screen, bitmap_ind1
 		{
 			m_tmap[i]->enable(active_layers & (1 << i));
 
-			m_tmap[i]->set_scrollx(0,m_scrollx[i]);
-			m_tmap[i]->set_scrolly(0,m_scrolly[i]);
+			m_tmap[i]->set_scrollx(0, m_scrollx[i]);
+			m_tmap[i]->set_scrolly(0, m_scrolly[i]);
 		}
 	}
 
@@ -1013,38 +1131,45 @@ UINT32 megasys1_state::screen_update_megasys1(screen_device &screen, bitmap_ind1
 
 		switch (layer)
 		{
-			case 0:
-			case 1:
-			case 2:
-				if ( (m_tmap[layer]) && (active_layers & (1 << layer) ) )
-				{
-					m_tmap[layer]->draw(screen, bitmap, cliprect, flag,primask);
-					flag = 0;
-				}
-				break;
-			case 3:
-			case 4:
-				if (flag != 0)
-				{
-					flag = 0;
-					bitmap.fill(0, cliprect);
-				}
+		case 0:
+		case 1:
+		case 2:
+			if ((m_tmap[layer]) && (active_layers & (1 << layer)))
+			{
+				m_tmap[layer]->draw(screen, bitmap, cliprect, flag, primask);
+				flag = 0;
+			}
+			break;
+		case 3:
+		case 4:
+			if (flag != 0)
+			{
+				flag = 0;
+				bitmap.fill(0, cliprect);
+			}
 
-				if (m_sprite_flag & 0x100)  /* sprites are split */
-				{
-					/* following tilemaps will obscure this sprites layer */
-					primask |= 1 << (layer-3);
-				}
-				else
-					/* following tilemaps will obscure all sprites */
-					if (layer == 3) primask |= 3;
+			if (m_sprite_flag & 0x100)  /* sprites are split */
+			{
+				/* following tilemaps will obscure this sprites layer */
+				primask |= 1 << (layer - 3);
+			}
+			else
+				/* following tilemaps will obscure all sprites */
+				if (layer == 3) primask |= 3;
 
-				break;
+			break;
 		}
 	}
 
 	if (active_layers & 0x08)
-		draw_sprites(screen,bitmap,cliprect);
+	{
+		draw_sprites(screen, bitmap, cliprect);
+
+		if (m_hardware_type_z == 0)
+			mix_sprite_bitmap(screen, bitmap, cliprect);
+
+	}
+
 	return 0;
 }
 
@@ -1055,11 +1180,11 @@ void megasys1_state::screen_eof_megasys1(screen_device &screen, bool state)
 	{
 		/* Sprite are TWO frames ahead, like NMK16 HW. */
 	//m_objectram
-		memcpy(m_buffer2_objectram,m_buffer_objectram, 0x2000);
-		memcpy(m_buffer_objectram, m_objectram, 0x2000);
+		memcpy(m_buffer2_objectram.get(),m_buffer_objectram.get(), 0x2000);
+		memcpy(m_buffer_objectram.get(), m_objectram, 0x2000);
 	//spriteram16
-		memcpy(m_buffer2_spriteram16, m_buffer_spriteram16, 0x2000);
-		memcpy(m_buffer_spriteram16, m_spriteram, 0x2000);
+		memcpy(m_buffer2_spriteram16.get(), m_buffer_spriteram16.get(), 0x2000);
+		memcpy(m_buffer_spriteram16.get(), m_spriteram, 0x2000);
 	}
 
 }

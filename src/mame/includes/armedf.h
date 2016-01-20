@@ -6,7 +6,7 @@
 class armedf_state : public driver_device
 {
 public:
-	armedf_state(const machine_config &mconfig, device_type type, const char *tag)
+	armedf_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_extra(*this, "extra"),
@@ -28,7 +28,7 @@ public:
 	required_device<buffered_spriteram16_device> m_spriteram;
 
 	/* memory pointers */
-	UINT8 *m_text_videoram;
+	std::unique_ptr<UINT8[]> m_text_videoram;
 	required_shared_ptr<UINT16> m_spr_pal_clut;
 	required_shared_ptr<UINT16> m_fg_videoram;
 	required_shared_ptr<UINT16> m_bg_videoram;
@@ -104,7 +104,7 @@ public:
 class bigfghtr_state : public armedf_state
 {
 public:
-	bigfghtr_state(const machine_config &mconfig, device_type type, const char *tag)
+	bigfghtr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: armedf_state(mconfig, type, tag),
 		m_sharedram(*this, "sharedram") { }
 

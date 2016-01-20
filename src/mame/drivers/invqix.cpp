@@ -126,7 +126,7 @@ as well as Up Right, Cocktail or Flip Screen from the service menu.
 class invqix_state : public driver_device
 {
 public:
-	invqix_state(const machine_config &mconfig, device_type type, const char *tag)
+	invqix_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
@@ -153,7 +153,7 @@ protected:
 	required_shared_ptr<UINT16> m_vram;
 
 	// driver_device overrides
-	virtual void video_start();
+	virtual void video_start() override;
 
 private:
 	UINT16 m_vctl;      // 0000 for normal, 0001 for flip, 0100 when going to change (blank?)

@@ -66,7 +66,7 @@ inline int atari_rle_objects_device::round_to_powerof2(int value)
 //  atari_rle_objects_device: Constructor
 //-------------------------------------------------
 
-atari_rle_objects_device::atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+atari_rle_objects_device::atari_rle_objects_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ATARI_RLE_OBJECTS, "Atari RLE Motion Objects", tag, owner, clock, "atari_rle", __FILE__),
 		device_video_interface(mconfig, *this)
 {
@@ -190,8 +190,8 @@ void atari_rle_objects_device::device_start()
 {
 	// resolve our memory
 	memory_share *share = owner()->memshare(tag());
-	if (share == NULL)
-		throw emu_fatalerror("Error: unable to find memory share '%s' needed for Atari RLE device", tag());
+	if (share == nullptr)
+		throw emu_fatalerror("Error: unable to find memory share '%s' needed for Atari RLE device", tag().c_str());
 	m_ram.set(*share, 2);
 
 	// register a VBLANK callback
@@ -386,7 +386,7 @@ void atari_rle_objects_device::prescan_rle(int which)
 	// make sure it's valid
 	if (offset < which * 4 || offset >= m_romlength)
 	{
-		info.data = NULL;
+		info.data = nullptr;
 		return;
 	}
 
@@ -474,7 +474,7 @@ void atari_rle_objects_device::sort_and_render()
 	};
 
 	// sort the motion objects into their proper priorities
-	sort_entry_t *list_head[256] = { 0 };
+	sort_entry_t *list_head[256] = { nullptr };
 	sort_entry_t sort_entry[256];
 	for (int objnum = 0; objnum < 256; objnum++)
 	{
@@ -489,7 +489,7 @@ void atari_rle_objects_device::sort_and_render()
 	int count = 0;
 int hilite = -1;
 	for (int order = 1; order < 256; order++)
-		for (sort_entry_t *current = list_head[order]; current != NULL; current = current->next)
+		for (sort_entry_t *current = list_head[order]; current != nullptr; current = current->next)
 		{
 			// extract scale and code
 			int scale = m_scalemask.extract(m_ram, current->entry);
@@ -537,7 +537,7 @@ void atari_rle_objects_device::draw_rle(bitmap_ind16 &bitmap, const rectangle &c
 {
 	// bail on a NULL object
 	const object_info &info = m_info[code];
-	if (info.data == NULL)
+	if (info.data == nullptr)
 		return;
 
 	//

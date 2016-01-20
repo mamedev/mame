@@ -582,7 +582,7 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	/* cartridge */
-	MCFG_INTV_CARTRIDGE_ADD("cartslot", intv_cart, NULL)
+	MCFG_INTV_CARTRIDGE_ADD("cartslot", intv_cart, nullptr)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "intv")

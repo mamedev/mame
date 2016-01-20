@@ -125,7 +125,7 @@ inline void rp5c15_device::set_alarm_line()
 
 	if (m_alarm != alarm)
 	{
-		if (LOG) logerror("RP5C15 '%s' Alarm %u\n", tag(), alarm);
+		if (LOG) logerror("RP5C15 '%s' Alarm %u\n", tag().c_str(), alarm);
 
 		m_out_alarm_cb(alarm);
 		m_alarm = alarm;
@@ -182,7 +182,7 @@ inline void rp5c15_device::check_alarm()
 //  rp5c15_device - constructor
 //-------------------------------------------------
 
-rp5c15_device::rp5c15_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rp5c15_device::rp5c15_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RP5C15, "RP5C15", tag, owner, clock, "rp5c15", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		m_out_alarm_cb(*this),
@@ -323,7 +323,7 @@ READ8_MEMBER( rp5c15_device::read )
 		break;
 	}
 
-	if (LOG) logerror("RP5C15 '%s' Register %u Read %02x\n", tag(), offset, data);
+	if (LOG) logerror("RP5C15 '%s' Register %u Read %02x\n", tag().c_str(), offset, data);
 
 	return data & 0x0f;
 }
@@ -345,14 +345,14 @@ WRITE8_MEMBER( rp5c15_device::write )
 
 		if (LOG)
 		{
-			logerror("RP5C15 '%s' Mode %u\n", tag(), data & MODE_MASK);
-			logerror("RP5C15 '%s' Timer %s\n", tag(), (data & MODE_TIMER_EN) ? "enabled" : "disabled");
-			logerror("RP5C15 '%s' Alarm %s\n", tag(), (data & MODE_ALARM_EN) ? "enabled" : "disabled");
+			logerror("RP5C15 '%s' Mode %u\n", tag().c_str(), data & MODE_MASK);
+			logerror("RP5C15 '%s' Timer %s\n", tag().c_str(), (data & MODE_TIMER_EN) ? "enabled" : "disabled");
+			logerror("RP5C15 '%s' Alarm %s\n", tag().c_str(), (data & MODE_ALARM_EN) ? "enabled" : "disabled");
 		}
 		break;
 
 	case REGISTER_TEST:
-		if (LOG) logerror("RP5C15 '%s' Test %u not supported!\n", tag(), data);
+		if (LOG) logerror("RP5C15 '%s' Test %u not supported!\n", tag().c_str(), data);
 		break;
 
 	case REGISTER_RESET:
@@ -369,10 +369,10 @@ WRITE8_MEMBER( rp5c15_device::write )
 
 		if (LOG)
 		{
-			if (data & RESET_ALARM) logerror("RP5C15 '%s' Alarm Reset\n", tag());
-			if (data & RESET_TIMER) logerror("RP5C15 '%s' Timer Reset not supported!\n", tag());
-			logerror("RP5C15 '%s' 16Hz Signal %s\n", tag(), (data & RESET_16_HZ) ? "disabled" : "enabled");
-			logerror("RP5C15 '%s' 1Hz Signal %s\n", tag(), (data & RESET_1_HZ) ? "disabled" : "enabled");
+			if (data & RESET_ALARM) logerror("RP5C15 '%s' Alarm Reset\n", tag().c_str());
+			if (data & RESET_TIMER) logerror("RP5C15 '%s' Timer Reset not supported!\n", tag().c_str());
+			logerror("RP5C15 '%s' 16Hz Signal %s\n", tag().c_str(), (data & RESET_16_HZ) ? "disabled" : "enabled");
+			logerror("RP5C15 '%s' 1Hz Signal %s\n", tag().c_str(), (data & RESET_1_HZ) ? "disabled" : "enabled");
 		}
 		break;
 
@@ -441,7 +441,7 @@ WRITE8_MEMBER( rp5c15_device::write )
 			break;
 		}
 
-		if (LOG) logerror("RP5C15 '%s' Register %u Write %02x\n", tag(), offset, data);
+		if (LOG) logerror("RP5C15 '%s' Register %u Write %02x\n", tag().c_str(), offset, data);
 		break;
 	}
 }

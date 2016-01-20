@@ -31,7 +31,7 @@
 class bw2_state : public driver_device
 {
 public:
-	bw2_state(const machine_config &mconfig, device_type type, const char *tag)
+	bw2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_uart(*this, I8251_TAG),
@@ -43,7 +43,7 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_floppy0(*this, WD2797_TAG":0"),
 			m_floppy1(*this, WD2797_TAG":1"),
-			m_floppy(NULL),
+			m_floppy(nullptr),
 			m_rom(*this, Z80_TAG),
 			m_y0(*this, "Y0"),
 			m_y1(*this, "Y1"),
@@ -81,7 +81,7 @@ public:
 	required_ioport m_y8;
 	required_ioport m_y9;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

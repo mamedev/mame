@@ -20,11 +20,11 @@
 
 // class representing a single dirty region
 class sparse_dirty_rect : public rectangle
-{	
+{
 	friend class simple_list<sparse_dirty_rect>;
 
 public:
-	sparse_dirty_rect(): m_next(NULL) { }
+	sparse_dirty_rect(): m_next(nullptr) { }
 	// getters
 	const sparse_dirty_rect *next() const { return m_next; }
 
@@ -85,11 +85,11 @@ class sprite_device : public device_t
 
 protected:
 	// construction/destruction - only for subclasses
-	sprite_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file, int dirty_granularity = 3)
-		: device_t(mconfig, type, name, tag, owner, 0, shortname, file),
+	sprite_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source, int dirty_granularity = 3)
+		: device_t(mconfig, type, name, tag, owner, 0, shortname, source),
 			m_xorigin(0),
 			m_yorigin(0),
-			m_spriteram(NULL),
+			m_spriteram(nullptr),
 			m_spriteram_bytes(0),
 			m_dirty(dirty_granularity)
 	{
@@ -126,7 +126,7 @@ public:
 	void clear() { clear(m_bitmap.cliprect()); }
 	void clear(const rectangle &cliprect)
 	{
-		for (const sparse_dirty_rect *rect = m_dirty.first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+		for (const sparse_dirty_rect *rect = m_dirty.first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 			m_bitmap.fill(~0, *rect);
 		m_dirty.clean(cliprect);
 	}
@@ -167,11 +167,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start()
+	virtual void device_start() override
 	{
 		// find spriteram
 		memory_share *spriteram = owner()->memshare(tag());
-		if (spriteram != NULL)
+		if (spriteram != nullptr)
 		{
 			set_spriteram(reinterpret_cast<_SpriteRAMType *>(spriteram->ptr()), spriteram->bytes());
 

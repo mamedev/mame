@@ -25,7 +25,7 @@
 class fruitpc_state : public pcat_base_state
 {
 public:
-	fruitpc_state(const machine_config &mconfig, device_type type, const char *tag)
+	fruitpc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pcat_base_state(mconfig, type, tag),
 			m_inp1(*this, "INP1"),
 			m_inp2(*this, "INP2"),
@@ -40,8 +40,8 @@ public:
 
 	DECLARE_DRIVER_INIT(fruitpc);
 	DECLARE_READ8_MEMBER(fruit_inp_r);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 READ8_MEMBER(fruitpc_state::fruit_inp_r)
@@ -125,7 +125,7 @@ static MACHINE_CONFIG_START( fruitpc, fruitpc_state )
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	/* video hardware */

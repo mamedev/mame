@@ -11,7 +11,7 @@ const device_type MSX_CART_ASCII16_SRAM = &device_creator<msx_cart_ascii16_sram>
 const device_type MSX_CART_MSXWRITE = &device_creator<msx_cart_msxwrite>;
 
 
-msx_cart_ascii8::msx_cart_ascii8(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_ascii8::msx_cart_ascii8(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_ASCII8, "MSX Cartridge - ASCII8", tag, owner, clock, "msx_cart_ascii8", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
@@ -19,7 +19,7 @@ msx_cart_ascii8::msx_cart_ascii8(const machine_config &mconfig, const char *tag,
 	for (int i = 0; i < 4; i++)
 	{
 		m_selected_bank[i] = 0;
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 }
 
@@ -43,9 +43,9 @@ void msx_cart_ascii8::restore_banks()
 
 void msx_cart_ascii8::device_reset()
 {
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_selected_bank)
 	{
-		m_selected_bank[i] = 0;
+		elem = 0;
 	}
 }
 
@@ -95,7 +95,7 @@ WRITE8_MEMBER(msx_cart_ascii8::write_cart)
 
 
 
-msx_cart_ascii16::msx_cart_ascii16(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_ascii16::msx_cart_ascii16(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_ASCII16, "MSX Cartridge - ASCII16", tag, owner, clock, "msx_cart_ascii16", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
@@ -103,7 +103,7 @@ msx_cart_ascii16::msx_cart_ascii16(const machine_config &mconfig, const char *ta
 	for (int i = 0; i < 2; i++)
 	{
 		m_selected_bank[i] = 0;
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 }
 
@@ -127,9 +127,9 @@ void msx_cart_ascii16::restore_banks()
 
 void msx_cart_ascii16::device_reset()
 {
-	for (int i = 0; i < 2; i++)
+	for (auto & elem : m_selected_bank)
 	{
-		m_selected_bank[i] = 0;
+		elem = 0;
 	}
 }
 
@@ -185,7 +185,7 @@ WRITE8_MEMBER(msx_cart_ascii16::write_cart)
 
 
 
-msx_cart_ascii8_sram::msx_cart_ascii8_sram(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_ascii8_sram::msx_cart_ascii8_sram(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_ASCII8_SRAM, "MSX Cartridge - ASCII8 w/SRAM", tag, owner, clock, "msx_cart_ascii8_sram", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
@@ -194,7 +194,7 @@ msx_cart_ascii8_sram::msx_cart_ascii8_sram(const machine_config &mconfig, const 
 	for (int i = 0; i < 4; i++)
 	{
 		m_selected_bank[i] = 0;
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 }
 
@@ -212,7 +212,7 @@ void msx_cart_ascii8_sram::setup_bank(UINT8 bank)
 	if (m_selected_bank[bank] & ~(m_sram_select_mask | m_bank_mask))
 	{
 		// Nothing is mapped
-		m_bank_base[bank] = NULL;
+		m_bank_base[bank] = nullptr;
 	}
 	else if (m_selected_bank[bank] & m_sram_select_mask)
 	{
@@ -237,9 +237,9 @@ void msx_cart_ascii8_sram::restore_banks()
 
 void msx_cart_ascii8_sram::device_reset()
 {
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_selected_bank)
 	{
-		m_selected_bank[i] = 0;
+		elem = 0;
 	}
 }
 
@@ -278,7 +278,7 @@ READ8_MEMBER(msx_cart_ascii8_sram::read_cart)
 	{
 		UINT8 *bank_base = m_bank_base[(offset - 0x4000) >> 13];
 
-		if (bank_base != NULL)
+		if (bank_base != nullptr)
 		{
 			return bank_base[offset & 0x1fff];
 		}
@@ -310,7 +310,7 @@ WRITE8_MEMBER(msx_cart_ascii8_sram::write_cart)
 
 
 
-msx_cart_ascii16_sram::msx_cart_ascii16_sram(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_ascii16_sram::msx_cart_ascii16_sram(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_ASCII16_SRAM, "MSX Cartridge - ASCII16 w/SRAM", tag, owner, clock, "msx_cart_ascii16_sram", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
@@ -319,7 +319,7 @@ msx_cart_ascii16_sram::msx_cart_ascii16_sram(const machine_config &mconfig, cons
 	for (int i = 0; i < 2; i++)
 	{
 		m_selected_bank[i] = 0;
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 }
 
@@ -337,7 +337,7 @@ void msx_cart_ascii16_sram::setup_bank(UINT8 bank)
 	if (m_selected_bank[bank] & ~(m_sram_select_mask | m_bank_mask))
 	{
 		// Nothing is mapped
-		m_bank_base[bank] = NULL;
+		m_bank_base[bank] = nullptr;
 	}
 	else if (m_selected_bank[bank] & m_sram_select_mask)
 	{
@@ -362,9 +362,9 @@ void msx_cart_ascii16_sram::restore_banks()
 
 void msx_cart_ascii16_sram::device_reset()
 {
-	for (int i = 0; i < 2; i++)
+	for (auto & elem : m_selected_bank)
 	{
-		m_selected_bank[i] = 0;
+		elem = 0;
 	}
 }
 
@@ -403,7 +403,7 @@ READ8_MEMBER(msx_cart_ascii16_sram::read_cart)
 	{
 		UINT8 bank = offset >> 15;
 
-		if (m_bank_base[bank] != NULL)
+		if (m_bank_base[bank] != nullptr)
 		{
 			if (m_selected_bank[bank] & m_sram_select_mask)
 			{
@@ -445,7 +445,7 @@ WRITE8_MEMBER(msx_cart_ascii16_sram::write_cart)
 
 
 
-msx_cart_msxwrite::msx_cart_msxwrite(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_msxwrite::msx_cart_msxwrite(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_MSXWRITE, "MSX Cartridge - MSXWRITE", tag, owner, clock, "msx_cart_msxwrite", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
@@ -453,7 +453,7 @@ msx_cart_msxwrite::msx_cart_msxwrite(const machine_config &mconfig, const char *
 	for (int i = 0; i < 2; i++)
 	{
 		m_selected_bank[i] = 0;
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 }
 
@@ -477,9 +477,9 @@ void msx_cart_msxwrite::restore_banks()
 
 void msx_cart_msxwrite::device_reset()
 {
-	for (int i = 0; i < 2; i++)
+	for (auto & elem : m_selected_bank)
 	{
-		m_selected_bank[i] = 0;
+		elem = 0;
 	}
 }
 

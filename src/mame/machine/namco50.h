@@ -13,7 +13,7 @@
 class namco_50xx_device : public device_t
 {
 public:
-	namco_50xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_50xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	WRITE8_MEMBER( write );
 	WRITE_LINE_MEMBER(read_request);
@@ -26,9 +26,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	TIMER_CALLBACK_MEMBER( latch_callback );
 	TIMER_CALLBACK_MEMBER( readrequest_callback );

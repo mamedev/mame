@@ -32,7 +32,7 @@
 class r10696_device : public device_t
 {
 public:
-	r10696_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	r10696_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~r10696_device() {}
 
 	DECLARE_READ8_MEMBER ( io_r );
@@ -42,8 +42,8 @@ public:
 	template<class _Object> static devcb_base &set_iowr(device_t &device, _Object object) { return downcast<r10696_device &>(device).m_iowr.set_callback(object); }
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	UINT8         m_io_a;   //!< input/output flip-flops group A

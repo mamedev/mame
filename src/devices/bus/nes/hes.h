@@ -12,13 +12,13 @@ class nes_hes_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_hes_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_hes_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_WRITE8_MEMBER(write_l);
+	virtual void device_start() override;
+	virtual DECLARE_WRITE8_MEMBER(write_l) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 

@@ -23,11 +23,11 @@ class isa8_lpt_device : public device_t,
 {
 public:
 	// construction/destruction
-	isa8_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_lpt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	bool is_primary() { return m_is_primary; }
 
@@ -35,8 +35,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 

@@ -31,7 +31,7 @@ public:
 	virtual void write(offs_t offset, UINT8 data) { }
 	virtual void io_read(offs_t offset, UINT8 &data) { }
 	virtual void io_write(offs_t offset, UINT8 data) { }
-	virtual UINT8* get_cart_base() { return NULL; }
+	virtual UINT8* get_cart_base() { return nullptr; }
 	virtual DECLARE_WRITE_LINE_MEMBER( mei_w ) { };
 };
 
@@ -42,8 +42,8 @@ class kcexp_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	kcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	kcexp_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	kcexp_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	kcexp_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	virtual ~kcexp_slot_device();
 
 	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<kcexp_slot_device &>(device).m_out_irq_cb.set_callback(object); }
@@ -51,10 +51,10 @@ public:
 	template<class _Object> static devcb_base &set_out_halt_callback(device_t &device, _Object object) { return downcast<kcexp_slot_device &>(device).m_out_halt_cb.set_callback(object); }
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// inline configuration
-	static void static_set_next_slot(device_t &device, const char *next_module_tag);
+	static void static_set_next_slot(device_t &device, std::string next_module_tag);
 
 	// reading and writing
 	virtual UINT8 module_id_r();
@@ -72,7 +72,7 @@ public:
 
 	device_kcexp_interface*     m_cart;
 
-	const char*                 m_next_slot_tag;
+	std::string                 m_next_slot_tag;
 	kcexp_slot_device*          m_next_slot;
 };
 
@@ -83,28 +83,28 @@ class kccart_slot_device : public kcexp_slot_device,
 {
 public:
 	// construction/destruction
-	kccart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kccart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual ~kccart_slot_device();
 
 	// device-level overrides
-	virtual void device_config_complete();
+	virtual void device_config_complete() override;
 
 	// image-level overrides
-	virtual bool call_load();
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
+	virtual bool call_load() override;
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
 
-	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 0; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 1; }
-	virtual const char *image_interface() const { return "kc_cart"; }
-	virtual const char *file_extensions() const { return "bin"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 0; }
+	virtual bool is_creatable() const override { return 0; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 1; }
+	virtual const char *image_interface() const override { return "kc_cart"; }
+	virtual const char *file_extensions() const override { return "bin"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result);
+	virtual std::string get_default_card_software() override;
 };
 
 // device type definition

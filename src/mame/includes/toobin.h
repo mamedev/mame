@@ -13,7 +13,7 @@
 class toobin_state : public atarigen_state
 {
 public:
-	toobin_state(const machine_config &mconfig, device_type type, const char *tag)
+	toobin_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atarigen_state(mconfig, type, tag),
 			m_jsa(*this, "jsa"),
 			m_playfield_tilemap(*this, "playfield"),
@@ -31,7 +31,7 @@ public:
 	double          m_brightness;
 	bitmap_ind16 m_pfbitmap;
 
-	virtual void update_interrupts();
+	virtual void update_interrupts() override;
 
 	DECLARE_WRITE16_MEMBER(interrupt_scan_w);
 	DECLARE_WRITE16_MEMBER(paletteram_w);

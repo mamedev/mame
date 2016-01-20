@@ -37,7 +37,7 @@ class upd775x_device : public device_t,
 									public device_sound_interface
 {
 public:
-	upd775x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	upd775x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	~upd775x_device() {}
 
 	template<class _Object> static devcb_base &set_drq_callback(device_t &device, _Object object) { return downcast<upd775x_device &>(device).m_drqcallback.set_callback(object); }
@@ -51,11 +51,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// internal state
 	sound_stream *m_channel;                  /* stream channel for playback */
@@ -109,18 +109,18 @@ protected:
 class upd7759_device : public upd775x_device
 {
 public:
-	upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	upd7759_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	upd7759_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	upd7759_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	enum
 	{
 		TIMER_SLAVE_UPDATE
 	};
 
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	emu_timer *m_timer;                       /* timer */
 
@@ -130,11 +130,11 @@ public:
 class upd7756_device : public upd775x_device
 {
 public:
-	upd7756_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd7756_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	DECLARE_WRITE_LINE_MEMBER( start_w );
 };

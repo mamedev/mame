@@ -43,7 +43,7 @@
 class zsbc3_state : public driver_device
 {
 public:
-	zsbc3_state(const machine_config &mconfig, device_type type, const char *tag)
+	zsbc3_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG)
@@ -55,7 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 private:
 	UINT8 m_term_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };

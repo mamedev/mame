@@ -65,7 +65,7 @@ ToDo:
 class v6809_state : public driver_device
 {
 public:
-	v6809_state(const machine_config &mconfig, device_type type, const char *tag)
+	v6809_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_video_address(0),
 		m_pia0(*this, "pia0"),
@@ -257,7 +257,7 @@ READ8_MEMBER( v6809_state::pb_r )
 // can support 4 drives
 WRITE8_MEMBER( v6809_state::pa_w )
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 	if ((data & 3) == 0) floppy = m_floppy0->get_device();
 	//if ((data & 3) == 1) floppy = m_floppy1->get_device();
 	//if ((data & 3) == 2) floppy = m_floppy2->get_device();

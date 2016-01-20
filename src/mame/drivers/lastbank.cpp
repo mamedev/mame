@@ -23,7 +23,7 @@
 class lastbank_state : public driver_device
 {
 public:
-	lastbank_state(const machine_config &mconfig, device_type type, const char *tag)
+	lastbank_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_vdp(*this, "tc0091lvc")
@@ -32,7 +32,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0091lvc_device> m_vdp;
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 

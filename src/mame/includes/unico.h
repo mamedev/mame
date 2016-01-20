@@ -6,7 +6,7 @@
 class unico_state : public driver_device
 {
 public:
-	unico_state(const machine_config &mconfig, device_type type, const char *tag)
+	unico_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
@@ -17,12 +17,12 @@ public:
 		m_generic_paletteram_16(*this, "paletteram"),
 		m_generic_paletteram_32(*this, "paletteram") { }
 
-	UINT16* m_vram;
-	UINT16* m_scroll;
+	std::unique_ptr<UINT16[]> m_vram;
+	std::unique_ptr<UINT16[]> m_scroll;
 	tilemap_t *m_tilemap[3];
 	int m_sprites_scrolldx;
 	int m_sprites_scrolldy;
-	UINT16* m_spriteram;
+	std::unique_ptr<UINT16[]> m_spriteram;
 	DECLARE_WRITE16_MEMBER(zeropnt_sound_bank_w);
 	DECLARE_READ16_MEMBER(unico_gunx_0_msb_r);
 	DECLARE_READ16_MEMBER(unico_guny_0_msb_r);

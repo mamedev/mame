@@ -12,13 +12,13 @@
 
 
 logwin_info::logwin_info(debugger_windows_interface &debugger) :
-	debugwin_info(debugger, false, std::string("Errorlog: ").append(debugger.machine().system().description).append(" [").append(debugger.machine().system().name).append("]").c_str(), NULL)
+	debugwin_info(debugger, false, std::string("Errorlog: ").append(debugger.machine().system().description).append(" [").append(debugger.machine().system().name).append("]").c_str(), nullptr)
 {
 	if (!window())
 		return;
 
 	m_views[0].reset(global_alloc(debugview_info(debugger, *this, window(), DVT_LOG)));
-	if ((m_views[0] == NULL) || !m_views[0]->is_valid())
+	if ((m_views[0] == nullptr) || !m_views[0]->is_valid())
 	{
 		m_views[0].reset();
 		return;

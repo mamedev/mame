@@ -73,7 +73,7 @@ class necdsp_device : public cpu_device
 {
 protected:
 	// construction/destruction
-	necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, UINT32 abits, UINT32 dbits, const char *name, const char *shortname, const char *source);
+	necdsp_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, UINT32 abits, UINT32 dbits, const char *name, std::string shortname, std::string source);
 
 public:
 
@@ -94,28 +94,28 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const;
-	virtual UINT32 execute_max_cycles() const;
-	virtual UINT32 execute_input_lines() const;
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override;
+	virtual UINT32 execute_max_cycles() const override;
+	virtual UINT32 execute_input_lines() const override;
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_export(const device_state_entry &entry);
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const;
-	virtual UINT32 disasm_max_opcode_bytes() const;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override;
+	virtual UINT32 disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// inline data
 	const address_space_config m_program_config, m_data_config;
@@ -188,9 +188,6 @@ private:
 	void exec_jp(UINT32 opcode);
 	void exec_ld(UINT32 opcode);
 
-	void stack_push();
-	void stack_pull();
-
 	int m_icount;
 	int m_irq; // old irq line state, for detecting rising edges.
 
@@ -216,14 +213,14 @@ class upd7725_device : public necdsp_device
 {
 public:
 	// construction/destruction
-	upd7725_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd7725_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class upd96050_device : public necdsp_device
 {
 public:
 	// construction/destruction
-	upd96050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd96050_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	UINT16 dataram_r(UINT16 addr) { return dataRAM[addr]; }
 	void dataram_w(UINT16 addr, UINT16 data) { dataRAM[addr] = data; }

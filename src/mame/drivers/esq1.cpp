@@ -194,7 +194,7 @@ class esq1_filters : public device_t,
 {
 public:
 	// construction/destruction
-	esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	esq1_filters(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void set_vca(int channel, UINT8 value);
 	void set_vpan(int channel, UINT8 value);
@@ -203,10 +203,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	struct filter {
@@ -225,7 +225,7 @@ private:
 
 static const device_type ESQ1_FILTERS = &device_creator<esq1_filters>;
 
-esq1_filters::esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+esq1_filters::esq1_filters(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ESQ1_FILTERS, "ESQ1 Filters stage", tag, owner, clock, "esq1-filters", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
@@ -332,8 +332,8 @@ void esq1_filters::device_start()
 {
 	stream = stream_alloc(8, 2, 44100);
 	memset(filters, 0, sizeof(filters));
-	for(int i=0; i<8; i++)
-		recalc_filter(filters[i]);
+	for(auto & elem : filters)
+		recalc_filter(elem);
 }
 
 void esq1_filters::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
@@ -382,7 +382,7 @@ void esq1_filters::sound_stream_update(sound_stream &stream, stream_sample_t **i
 class esq1_state : public driver_device
 {
 public:
-	esq1_state(const machine_config &mconfig, device_type type, const char *tag)
+	esq1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
@@ -418,7 +418,7 @@ public:
 	int m_seq_bank;
 	UINT8 m_seqram[0x10000];
 	UINT8 m_dosram[0x2000];
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 	void send_through_panel(UINT8 data);

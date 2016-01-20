@@ -91,7 +91,7 @@ Stephh's notes (based on the game TMS9995 code and some tests) :
 class pachifev_state : public driver_device
 {
 public:
-	pachifev_state(const machine_config &mconfig, device_type type, const char *tag)
+	pachifev_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
@@ -108,8 +108,8 @@ public:
 	UINT8 m_adpcm_data;
 	DECLARE_WRITE8_MEMBER(controls_w);
 	DECLARE_READ8_MEMBER(controls_r);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(pachifev_vblank_irq);
 	required_device<cpu_device> m_maincpu;
 };

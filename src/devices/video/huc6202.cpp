@@ -14,7 +14,7 @@
 const device_type HUC6202 = &device_creator<huc6202_device>;
 
 
-huc6202_device::huc6202_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+huc6202_device::huc6202_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HUC6202, "HuC6202 VPC", tag, owner, clock, "huc6202", __FILE__),
 		m_next_pixel_0_cb(*this),
 		m_time_til_next_event_0_cb(*this),

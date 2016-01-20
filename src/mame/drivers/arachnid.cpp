@@ -77,7 +77,7 @@
 class arachnid_state : public driver_device
 {
 public:
-	arachnid_state(const machine_config &mconfig, device_type type, const char *tag)
+	arachnid_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M6809_TAG),
 			m_pia_u4(*this, PIA6821_U4_TAG),
@@ -90,7 +90,7 @@ public:
 	required_device<pia6821_device> m_pia_u17;
 	required_device<speaker_sound_device> m_speaker;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_READ8_MEMBER( pia_u4_pa_r );
 	DECLARE_READ8_MEMBER( pia_u4_pb_r );
 	DECLARE_READ_LINE_MEMBER( pia_u4_pca_r );

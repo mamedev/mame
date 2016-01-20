@@ -13,7 +13,7 @@
 class mb14241_device : public device_t
 {
 public:
-	mb14241_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb14241_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER ( shift_count_w );
 	DECLARE_WRITE8_MEMBER ( shift_data_w );
@@ -21,9 +21,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state

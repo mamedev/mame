@@ -192,7 +192,7 @@ machine_config_constructor s1410_device::device_mconfig_additions() const
 //  s1410_device - constructor
 //-------------------------------------------------
 
-s1410_device::s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+s1410_device::s1410_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: scsihd_device(mconfig, S1410, "Xebec S1410", tag, owner, clock, "s1410", __FILE__)
 {
 }

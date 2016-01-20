@@ -83,7 +83,7 @@ WRITE_LINE_MEMBER( sandy_super_disk_t::busy_w )
 static MACHINE_CONFIG_FRAGMENT( sandy_super_disk )
 	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, 8000000)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", sandy_super_disk_floppies, "35dd", sandy_super_disk_t::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", sandy_super_disk_floppies, NULL, sandy_super_disk_t::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", sandy_super_disk_floppies, nullptr, sandy_super_disk_t::floppy_formats)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(sandy_super_disk_t, busy_w))
@@ -111,7 +111,7 @@ machine_config_constructor sandy_super_disk_t::device_mconfig_additions() const
 //  sandy_super_disk_t - constructor
 //-------------------------------------------------
 
-sandy_super_disk_t::sandy_super_disk_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sandy_super_disk_t::sandy_super_disk_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SANDY_SUPER_DISK, "Sandy Super Disk", tag, owner, clock, "ql_sdisk", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1772_TAG),
@@ -144,7 +144,7 @@ void sandy_super_disk_t::device_start()
 void sandy_super_disk_t::device_reset()
 {
 	m_fdc->reset();
-	m_fdc->set_floppy(NULL);
+	m_fdc->set_floppy(nullptr);
 	m_fdc->dden_w(0);
 
 	m_latch->write(0);
@@ -231,7 +231,7 @@ void sandy_super_disk_t::write(address_space &space, offs_t offset, UINT8 data)
 
 				*/
 
-				floppy_image_device *floppy = NULL;
+				floppy_image_device *floppy = nullptr;
 
 				if (BIT(data, 1))
 				{

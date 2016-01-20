@@ -57,7 +57,7 @@ expected: 43 FB CC 9A D4 23 6C 01 3E  <- From ROM 4
 class laserbas_state : public driver_device
 {
 public:
-	laserbas_state(const machine_config &mconfig, device_type type, const char *tag)
+	laserbas_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_protram(*this, "protram"),
 		m_maincpu(*this, "maincpu") { }
@@ -73,16 +73,15 @@ public:
 	required_shared_ptr<UINT8> m_protram;
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(read_unk);
 	DECLARE_WRITE8_MEMBER(vrambank_w);
 	DECLARE_READ8_MEMBER(protram_r);
 	DECLARE_WRITE8_MEMBER(protram_w);
 	DECLARE_READ8_MEMBER(track_lo_r);
 	DECLARE_READ8_MEMBER(track_hi_r);
 	DECLARE_WRITE8_MEMBER(out_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_laserbas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };

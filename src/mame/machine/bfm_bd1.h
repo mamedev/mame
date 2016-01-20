@@ -15,7 +15,7 @@
 class bfm_bd1_t : public device_t
 {
 public:
-	bfm_bd1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bfm_bd1_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
 	static void static_set_value(device_t &device, int val);
@@ -59,9 +59,9 @@ protected:
 	UINT16 m_user_data;             // user defined character data (16 bit)
 	UINT16 m_user_def;          // user defined character state
 
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 };
 

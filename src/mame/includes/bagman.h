@@ -5,7 +5,7 @@
 class bagman_state : public driver_device
 {
 public:
-	bagman_state(const machine_config &mconfig, device_type type, const char *tag)
+	bagman_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -62,11 +62,11 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_MACHINE_START(bagman);
 	DECLARE_MACHINE_START(squaitsa);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(bagman);
 	DECLARE_DRIVER_INIT(bagman);
 

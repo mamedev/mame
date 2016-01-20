@@ -95,27 +95,27 @@ struct chan_info {
 class es1373_device : public pci_device, public device_sound_interface
 {
 public:
-	es1373_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	es1373_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space);
+							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;
 
-	void set_irq_info(const char *tag, const int irq_num);
+	void set_irq_info(std::string tag, const int irq_num);
 
 	DECLARE_READ32_MEMBER (reg_r);
 	DECLARE_WRITE32_MEMBER(reg_w);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// Sound stream
 	sound_stream *m_stream;
 
 protected:
-	virtual void device_start();
-	virtual void device_stop();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void device_start() override;
+	virtual void device_stop() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	FILE *m_eslog;
 
@@ -123,7 +123,7 @@ private:
 	UINT32 m_tempCount;
 	emu_timer *m_timer;
 	address_space *m_memory_space;
-	const char *m_cpu_tag;
+	std::string m_cpu_tag;
 	cpu_device *m_cpu;
 	int m_irq_num;
 	DECLARE_ADDRESS_MAP(map, 32);

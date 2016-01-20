@@ -69,7 +69,7 @@
 
 const device_type BEEZER = &device_creator<beezer_sound_device>;
 
-beezer_sound_device::beezer_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+beezer_sound_device::beezer_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, BEEZER, "beezer SFX", tag, owner, clock, "beezer_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		//m_ptm_irq_state(0),
@@ -83,7 +83,7 @@ beezer_sound_device::beezer_sound_device(const machine_config &mconfig, const ch
 		m_sh6840_latchwriteold(0),
 		m_sh6840_noiselatch1(0),
 		m_sh6840_noiselatch3(0),
-		m_stream(NULL)/*,
+		m_stream(nullptr)/*,
         m_freq_to_step(0)*/
 {
 	memset(m_sh6840_timer, 0, sizeof(m_sh6840_timer));
@@ -192,7 +192,7 @@ void beezer_sound_device::device_reset()
  *
  *************************************/
 // need to set int_flag properly here
-INLINE void sh6840_apply_clock(struct sh6840_timer_channel_beez *t, int clocks)
+static inline void sh6840_apply_clock(struct sh6840_timer_channel_beez *t, int clocks)
 {
 	/* dual 8-bit case */
 	if (t->cr & 0x04)

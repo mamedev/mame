@@ -203,7 +203,7 @@ class studio2_state : public driver_device
 {
 public:
 
-	studio2_state(const machine_config &mconfig, device_type type, const char *tag)
+	studio2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
 			m_beeper(*this, "beeper"),
@@ -224,8 +224,8 @@ public:
 	required_ioport m_b;
 	required_device<screen_device> m_screen;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( cart_400 );
 	DECLARE_READ8_MEMBER( cart_a00 );
@@ -248,7 +248,7 @@ public:
 class visicom_state : public studio2_state
 {
 public:
-	visicom_state(const machine_config &mconfig, device_type type, const char *tag)
+	visicom_state(const machine_config &mconfig, device_type type, std::string tag)
 		: studio2_state(mconfig, type, tag),
 			m_color0_ram(*this, "color0_ram"),
 			m_color1_ram(*this, "color1_ram")
@@ -265,7 +265,7 @@ public:
 class mpt02_state : public studio2_state
 {
 public:
-	mpt02_state(const machine_config &mconfig, device_type type, const char *tag)
+	mpt02_state(const machine_config &mconfig, device_type type, std::string tag)
 		: studio2_state(mconfig, type, tag),
 			m_cti(*this, CDP1864_TAG),
 			m_color_ram(*this, "color_ram")
@@ -273,8 +273,8 @@ public:
 
 	required_device<cdp1864_device> m_cti;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( cart_c00 );
 	DECLARE_WRITE8_MEMBER( dma_w );
@@ -534,7 +534,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 	// always alloc 3K, even if range $400-$600 is not read by the system (RAM is present there)
 	m_cart->rom_alloc(0xc00, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		if (!strcmp(image.filetype(), "st2"))
 		{

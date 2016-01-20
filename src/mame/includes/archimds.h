@@ -44,7 +44,7 @@
 class archimedes_state : public driver_device
 {
 public:
-	archimedes_state(const machine_config &mconfig, device_type type, const char *tag)
+	archimedes_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_kart(*this, "kart"),
 		m_maincpu(*this, "maincpu"),
@@ -91,7 +91,7 @@ public:
 	UINT8 m_vidc_interlace;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 protected:
 	required_device<cpu_device> m_maincpu;

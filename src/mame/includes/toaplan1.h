@@ -11,7 +11,7 @@
 class toaplan1_state : public driver_device
 {
 public:
-	toaplan1_state(const machine_config &mconfig, device_type type, const char *tag)
+	toaplan1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_bgpaletteram(*this, "bgpalette"),
 		m_fgpaletteram(*this, "fgpalette"),
@@ -43,15 +43,15 @@ public:
 	UINT8 m_vimana_credits;
 	UINT8 m_vimana_latch;
 
-	UINT16 *m_pf4_tilevram16;   /*  ||  Drawn in this order */
-	UINT16 *m_pf3_tilevram16;   /*  ||  */
-	UINT16 *m_pf2_tilevram16;   /* \||/ */
-	UINT16 *m_pf1_tilevram16;   /*  \/  */
+	std::unique_ptr<UINT16[]> m_pf4_tilevram16;   /*  ||  Drawn in this order */
+	std::unique_ptr<UINT16[]> m_pf3_tilevram16;   /*  ||  */
+	std::unique_ptr<UINT16[]> m_pf2_tilevram16;   /* \||/ */
+	std::unique_ptr<UINT16[]> m_pf1_tilevram16;   /*  \/  */
 
 	optional_shared_ptr<UINT16> m_spriteram;
-	UINT16 *m_buffered_spriteram;
-	UINT16 *m_spritesizeram16;
-	UINT16 *m_buffered_spritesizeram16;
+	std::unique_ptr<UINT16[]> m_buffered_spriteram;
+	std::unique_ptr<UINT16[]> m_spritesizeram16;
+	std::unique_ptr<UINT16[]> m_buffered_spritesizeram16;
 
 	INT32 m_bcu_flipscreen;     /* Tile   controller flip flag */
 	INT32 m_fcu_flipscreen;     /* Sprite controller flip flag */
@@ -164,7 +164,7 @@ public:
 class toaplan1_rallybik_state : public toaplan1_state
 {
 public:
-	toaplan1_rallybik_state(const machine_config &mconfig, device_type type, const char *tag)
+	toaplan1_rallybik_state(const machine_config &mconfig, device_type type, std::string tag)
 		: toaplan1_state(mconfig, type, tag),
 		m_spritegen(*this, "scu")
 	{

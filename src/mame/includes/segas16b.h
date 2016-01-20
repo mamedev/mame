@@ -24,7 +24,7 @@ class segas16b_state : public sega_16bit_common_base
 {
 public:
 	// construction/destruction
-	segas16b_state(const machine_config &mconfig, device_type type, const char *tag)
+	segas16b_state(const machine_config &mconfig, device_type type, std::string tag)
 		: sega_16bit_common_base(mconfig, type, tag),
 			m_mapper(*this, "mapper"),
 			m_maincpu(*this, "maincpu"),
@@ -43,7 +43,7 @@ public:
 			m_romboard(ROM_BOARD_INVALID),
 			m_tilemap_type(SEGAIC16_TILEMAP_16B),
 			m_disable_screen_blanking(false),
-			m_i8751_initial_config(NULL),
+			m_i8751_initial_config(nullptr),
 			m_atomicp_sound_divisor(0),
 			m_atomicp_sound_count(0),
 			m_hwc_input_value(0),
@@ -147,9 +147,9 @@ protected:
 	};
 
 	// device overrides
-	virtual void video_start();
-	virtual void machine_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void video_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// internal helpers
 	void init_generic(segas16b_rom_board rom_board);
@@ -187,7 +187,7 @@ protected:
 	optional_device<sega_315_5250_compare_timer_device> m_cmptimer_1;
 	optional_device<sega_315_5250_compare_timer_device> m_cmptimer_2;
 	required_device<nvram_device> m_nvram;
-	required_device<sega_sys16b_sprite_device> m_sprites;
+	optional_device<sega_sys16b_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 
 	// memory pointers
@@ -221,7 +221,7 @@ class isgsm_state : public segas16b_state
 {
 public:
 	// construction/destruction
-	isgsm_state(const machine_config &mconfig, device_type type, const char *tag)
+	isgsm_state(const machine_config &mconfig, device_type type, std::string tag)
 		: segas16b_state(mconfig, type, tag),
 			m_read_xor(0),
 			m_cart_addrlatch(0),
@@ -264,7 +264,7 @@ public:
 
 //protected:
 	// driver overrides
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	// configuration
 	UINT8           m_read_xor;

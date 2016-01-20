@@ -83,10 +83,10 @@ class atari_motion_objects_device : public sprite16_device_ind16,
 
 public:
 	// construction/destruction
-	atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atari_motion_objects_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
 	static void static_set_config(device_t &device, const atari_motion_objects_config &config);
 
 	// getters
@@ -105,7 +105,7 @@ public:
 	void set_slipram(UINT16 *ram) { m_slipram.set_target(ram, 2); }
 
 	// rendering
-	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	void apply_stain(bitmap_ind16 &bitmap, UINT16 *pf, UINT16 *mo, int x, int y);
 
 	// memory access
@@ -113,14 +113,14 @@ public:
 
 	// constants
 	static const int PRIORITY_SHIFT = 12;
-	static const UINT16 PRIORITY_MASK = (~0 << PRIORITY_SHIFT) & 0xffff;
+	static const UINT16 PRIORITY_MASK = (0xffff << PRIORITY_SHIFT) & 0xffff;
 	static const UINT16 DATA_MASK = PRIORITY_MASK ^ 0xffff;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// timer IDs

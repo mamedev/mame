@@ -99,7 +99,7 @@ static const ext_to_type extension_lookup[] =
 
 static const token_entry dummy_token_table[] =
 {
-	{ NULL, KEYWORD_CLASS }
+	{ nullptr, KEYWORD_CLASS }
 };
 
 
@@ -192,7 +192,7 @@ static const token_entry c_token_table[] =
     { "UINT64", CUSTOM_CLASS },
     { "ARRAY_LENGTH", CUSTOM_CLASS },
 */
-	{ NULL, KEYWORD_CLASS }
+	{ nullptr, KEYWORD_CLASS }
 };
 
 
@@ -244,9 +244,9 @@ int main(int argc, char *argv[])
 		if (arg[0] == '-' && arg[1] == 'I')
 		{
 			*incpathhead = new include_path;
-			if (*incpathhead != NULL)
+			if (*incpathhead != nullptr)
 			{
-				(*incpathhead)->next = NULL;
+				(*incpathhead)->next = nullptr;
 				strreplacechr((*incpathhead)->path.assign(&arg[2]), '/', PATH_SEPARATOR[0]);
 				incpathhead = &(*incpathhead)->next;
 			}
@@ -348,7 +348,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 
 		// open the directory and iterate through it
 		osd_directory *dir = osd_opendir(srcdir.c_str());
-		if (dir == NULL)
+		if (dir == nullptr)
 		{
 			result = 1;
 			break;
@@ -357,11 +357,11 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 		// build up the list of files
 		const osd_directory_entry *entry;
 		int found = 0;
-		list_entry *list = NULL;
-		while ((entry = osd_readdir(dir)) != NULL)
+		list_entry *list = nullptr;
+		while ((entry = osd_readdir(dir)) != nullptr)
 			if (entry->type == entry_type && entry->name[0] != '.')
 			{
-				list_entry *lentry = new list_entry;
+				auto lentry = new list_entry;
 				lentry->name.assign(entry->name);
 				lentry->next = list;
 				list = lentry;
@@ -376,16 +376,16 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 			continue;
 
 		// allocate memory for sorting
-		list_entry **listarray = new list_entry *[found];
+		auto listarray = new list_entry *[found];
 		found = 0;
-		for (list_entry *curlist = list; curlist != NULL; curlist = curlist->next)
+		for (list_entry *curlist = list; curlist != nullptr; curlist = curlist->next)
 			listarray[found++] = curlist;
 
 		// sort the list
 		qsort(listarray, found, sizeof(listarray[0]), compare_list_entries);
 
 		// rebuild the list
-		list = NULL;
+		list = nullptr;
 		while (--found >= 0)
 		{
 			listarray[found]->next = list;
@@ -394,7 +394,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 		delete[] listarray;
 
 		// iterate through each file
-		for (list_entry *curlist = list; curlist != NULL && result == 0; curlist = curlist->next)
+		for (list_entry *curlist = list; curlist != nullptr && result == 0; curlist = curlist->next)
 		{
 			// add a header
 			if (curlist == list)
@@ -410,10 +410,10 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 			{
 				// make sure we care, first
 				file_type type = FILE_TYPE_INVALID;
-				for (int extnum = 0; extnum < ARRAY_LENGTH(extension_lookup); extnum++)
-					if (core_filename_ends_with(curlist->name.c_str(), extension_lookup[extnum].extension))
+				for (auto & elem : extension_lookup)
+					if (core_filename_ends_with(curlist->name.c_str(), elem.extension))
 					{
-						type = extension_lookup[extnum].type;
+						type = elem.type;
 						break;
 					}
 
@@ -421,7 +421,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 				if (type != FILE_TYPE_INVALID)
 				{
 					strprintf(dstfile, "%s%c%s.html", dstdir.c_str(), PATH_SEPARATOR[0], curlist->name.c_str());
-					if (indexfile != NULL)
+					if (indexfile != nullptr)
 						core_fprintf(indexfile, "\t<li><a href=\"%s.html\">%s</a></li>\n", curlist->name.c_str(), curlist->name.c_str());
 					result = output_file(type, srcrootlen, dstrootlen, srcfile, dstfile, srcdir.compare(dstdir) == 0, tempheader, tempfooter);
 				}
@@ -431,18 +431,18 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 			else
 			{
 				strprintf(dstfile, "%s%c%s", dstdir.c_str(), PATH_SEPARATOR[0], curlist->name.c_str());
-				if (indexfile != NULL)
+				if (indexfile != nullptr)
 					core_fprintf(indexfile, "\t<li><a href=\"%s/index.html\">%s/</a></li>\n", curlist->name.c_str(), curlist->name.c_str());
 				result = recurse_dir(srcrootlen, dstrootlen, srcfile, dstfile, tempheader, tempfooter);
 			}
 		}
 
 		// close the list if we found some stuff
-		if (list != NULL)
+		if (list != nullptr)
 			core_fprintf(indexfile, "\t</ul>\n");
 
 		// free all the allocated entries
-		while (list != NULL)
+		while (list != nullptr)
 		{
 			list_entry *next = list->next;
 			delete list;
@@ -450,7 +450,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 		}
 	}
 
-	if (indexfile != NULL)
+	if (indexfile != nullptr)
 		output_footer_and_close_file(indexfile, tempfooter, srcdir_subpath);
 	return result;
 }
@@ -525,7 +525,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 
 	// open the output file
 	core_file *dst = create_file_and_output_header(dstfile, tempheader, srcfile_subpath);
-	if (dst == NULL)
+	if (dst == nullptr)
 	{
 		fprintf(stderr, "Unable to write file '%s'\n", dstfile.c_str());
 		core_fclose(src);
@@ -544,7 +544,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 	int linenum = 1;
 	bool in_comment = false;
 	char srcline[4096];
-	while (core_fgets(srcline, ARRAY_LENGTH(srcline), src) != NULL)
+	while (core_fgets(srcline, ARRAY_LENGTH(srcline), src) != nullptr)
 	{
 		// start with the line number
 		std::string dstline;
@@ -608,7 +608,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 
 				// scan the token table
 				last_token_was_include = false;
-				for (curtoken = token_table; curtoken->token != NULL; curtoken++)
+				for (curtoken = token_table; curtoken->token != nullptr; curtoken++)
 					if (strncmp(srcptr - 1, curtoken->token, toklength) == 0 && strlen(curtoken->token) == toklength)
 					{
 						strcatprintf(dstline, "<span class=\"%s\">%s</span>", curtoken->color, curtoken->token);
@@ -653,7 +653,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 					if (last_token_was_include)
 					{
 						char *endquote = strchr(srcptr, ch);
-						if (endquote != NULL)
+						if (endquote != nullptr)
 						{
 							std::string filename(srcptr, endquote - srcptr);
 							std::string target;
@@ -734,7 +734,7 @@ static core_file *create_file_and_output_header(std::string &filename, std::stri
 	// create the indexfile
 	core_file *file;
 	if (core_fopen(filename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, &file) != FILERR_NONE)
-		return NULL;
+		return nullptr;
 
 	// print a header
 	std::string modified(templatefile);
@@ -831,7 +831,7 @@ static void output_path_as_links(core_file *file, std::string &path, bool end_is
 static bool find_include_file(std::string &srcincpath, int srcrootlen, int dstrootlen, std::string &srcfile, std::string &dstfile, std::string &filename)
 {
 	// iterate over include paths and find the file
-	for (include_path *curpath = incpaths; curpath != NULL; curpath = curpath->next)
+	for (include_path *curpath = incpaths; curpath != nullptr; curpath = curpath->next)
 	{
 		// a '.' include path is specially treated
 		if (curpath->path.compare(".") == 0)

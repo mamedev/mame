@@ -48,7 +48,7 @@ class ds75160a_device : public device_t
 {
 public:
 	// construction/destruction
-	ds75160a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ds75160a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _read, class _write> void set_callbacks(_read rd, _write wr) {
 		m_read.set_callback(rd);
@@ -63,7 +63,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	devcb_read8  m_read;

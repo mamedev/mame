@@ -202,7 +202,7 @@ DIP locations verified from manuals for:
 
 WRITE16_MEMBER(alpha68k_state::tnextspc_coin_counters_w)
 {
-	coin_counter_w(machine(), offset, data & 0x01);
+	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
 }
 
 WRITE16_MEMBER(alpha68k_state::tnextspc_unknown_w)

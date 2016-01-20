@@ -156,7 +156,7 @@ static const int mjflove_commands[8]    = { BLIT_STOP, BLIT_CHANGE_PEN, BLIT_CHA
 class ddenlovr_state : public dynax_state
 {
 public:
-	ddenlovr_state(const machine_config &mconfig, device_type type, const char *tag)
+	ddenlovr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: dynax_state(mconfig, type, tag),
 		m_dsw_sel16(*this, "dsw_sel16"),
 		m_protection1(*this, "protection1"),
@@ -168,7 +168,7 @@ public:
 	optional_shared_ptr<UINT16> m_protection2;
 
 
-	UINT8 *  m_ddenlovr_pixmap[8];
+	std::unique_ptr<UINT8[]>  m_ddenlovr_pixmap[8];
 
 	/* blitter (TODO: merge with the dynax.h, where possible) */
 	int m_extra_layers;
@@ -461,7 +461,7 @@ VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
 
 	for (i = 0; i < 8; i++)
 	{
-		m_ddenlovr_pixmap[i] = auto_alloc_array(machine(), UINT8, 512 * 512);
+		m_ddenlovr_pixmap[i] = std::make_unique<UINT8[]>(512 * 512);
 		m_ddenlovr_scroll[i * 2 + 0] = m_ddenlovr_scroll[i * 2 + 1] = 0;
 	}
 
@@ -542,14 +542,14 @@ VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
 	save_item(NAME(m_ddenlovr_blit_pen_mask));
 	save_item(NAME(m_ddenlovr_blit_regs));
 
-	save_pointer(NAME(m_ddenlovr_pixmap[0]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[1]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[2]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[3]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[4]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[5]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[6]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[7]), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[0].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[1].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[2].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[3].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[4].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[5].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[6].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[7].get()), 512 * 512);
 }
 
 VIDEO_START_MEMBER(ddenlovr_state,mmpanic)
@@ -686,7 +686,7 @@ void ddenlovr_state::do_plot( int x, int y, int pen )
 }
 
 
-INLINE int fetch_bit( UINT8 *src_data, int src_len, int *bit_addr )
+static inline int fetch_bit( UINT8 *src_data, int src_len, int *bit_addr )
 {
 	const int baddrmask = 0x7ffffff;
 
@@ -697,7 +697,7 @@ INLINE int fetch_bit( UINT8 *src_data, int src_len, int *bit_addr )
 	if (baddr / 8 >= src_len)
 	{
 #ifdef MAME_DEBUG
-//		popmessage("GFX ROM OVER %06x", baddr / 8);
+//      popmessage("GFX ROM OVER %06x", baddr / 8);
 #endif
 		return 1;
 	}
@@ -705,7 +705,7 @@ INLINE int fetch_bit( UINT8 *src_data, int src_len, int *bit_addr )
 	return (src_data[baddr / 8] >> (7 - (baddr & 7))) & 1;
 }
 
-INLINE int fetch_word( UINT8 *src_data, int src_len, int *bit_addr, int word_len )
+static inline int fetch_word( UINT8 *src_data, int src_len, int *bit_addr, int word_len )
 {
 	int res = 0;
 
@@ -872,17 +872,17 @@ void ddenlovr_state::blit_rect_yh()
 		if (start + length > 512 * 512)
 			length = 512 * 512 - start;
 
-		if (m_ddenlovr_dest_layer & 0x0001) memset(m_ddenlovr_pixmap[0] + start, m_ddenlovr_blit_pen, length);
-		if (m_ddenlovr_dest_layer & 0x0002) memset(m_ddenlovr_pixmap[1] + start, m_ddenlovr_blit_pen, length);
-		if (m_ddenlovr_dest_layer & 0x0004) memset(m_ddenlovr_pixmap[2] + start, m_ddenlovr_blit_pen, length);
-		if (m_ddenlovr_dest_layer & 0x0008) memset(m_ddenlovr_pixmap[3] + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0001) memset(m_ddenlovr_pixmap[0].get() + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0002) memset(m_ddenlovr_pixmap[1].get() + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0004) memset(m_ddenlovr_pixmap[2].get() + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0008) memset(m_ddenlovr_pixmap[3].get() + start, m_ddenlovr_blit_pen, length);
 
 		if (!m_extra_layers) return;
 
-		if (m_ddenlovr_dest_layer & 0x0100) memset(m_ddenlovr_pixmap[4] + start, m_ddenlovr_blit_pen, length);
-		if (m_ddenlovr_dest_layer & 0x0200) memset(m_ddenlovr_pixmap[5] + start, m_ddenlovr_blit_pen, length);
-		if (m_ddenlovr_dest_layer & 0x0400) memset(m_ddenlovr_pixmap[6] + start, m_ddenlovr_blit_pen, length);
-		if (m_ddenlovr_dest_layer & 0x0800) memset(m_ddenlovr_pixmap[7] + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0100) memset(m_ddenlovr_pixmap[4].get() + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0200) memset(m_ddenlovr_pixmap[5].get() + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0400) memset(m_ddenlovr_pixmap[6].get() + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0800) memset(m_ddenlovr_pixmap[7].get() + start, m_ddenlovr_blit_pen, length);
 	}
 }
 
@@ -905,17 +905,17 @@ void ddenlovr_state::blit_fill_xy( int x, int y )
 //      popmessage("FILL command X %03x Y %03x", x, y);
 #endif
 
-	if (m_ddenlovr_dest_layer & 0x0001) memset(m_ddenlovr_pixmap[0] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (m_ddenlovr_dest_layer & 0x0002) memset(m_ddenlovr_pixmap[1] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (m_ddenlovr_dest_layer & 0x0004) memset(m_ddenlovr_pixmap[2] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (m_ddenlovr_dest_layer & 0x0008) memset(m_ddenlovr_pixmap[3] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0001) memset(m_ddenlovr_pixmap[0].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0002) memset(m_ddenlovr_pixmap[1].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0004) memset(m_ddenlovr_pixmap[2].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0008) memset(m_ddenlovr_pixmap[3].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
 
 	if (!m_extra_layers) return;
 
-	if (m_ddenlovr_dest_layer & 0x0100) memset(m_ddenlovr_pixmap[4] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (m_ddenlovr_dest_layer & 0x0200) memset(m_ddenlovr_pixmap[5] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (m_ddenlovr_dest_layer & 0x0400) memset(m_ddenlovr_pixmap[6] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (m_ddenlovr_dest_layer & 0x0800) memset(m_ddenlovr_pixmap[7] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0100) memset(m_ddenlovr_pixmap[4].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0200) memset(m_ddenlovr_pixmap[5].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0400) memset(m_ddenlovr_pixmap[6].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0800) memset(m_ddenlovr_pixmap[7].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
 }
 
 
@@ -1701,12 +1701,12 @@ CUSTOM_INPUT_MEMBER(ddenlovr_state::ddenlovr_blitter_irq_r)
 WRITE16_MEMBER(ddenlovr_state::ddenlovr_coincounter_0_w)
 {
 	if (ACCESSING_BITS_0_7)
-		coin_counter_w(machine(), 0, data & 1);
+		machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 WRITE16_MEMBER(ddenlovr_state::ddenlovr_coincounter_1_w)
 {
 	if (ACCESSING_BITS_0_7)
-		coin_counter_w(machine(), 1, data & 1);
+		machine().bookkeeping().coin_counter_w(1, data & 1);
 }
 
 
@@ -1936,8 +1936,8 @@ WRITE16_MEMBER(ddenlovr_state::quiz365_coincounter_w)
 	{
 		if (m_input_sel == 0x1c)
 		{
-			coin_counter_w(machine(), 0, ~data & 1);
-			coin_counter_w(machine(), 1, ~data & 4);
+			machine().bookkeeping().coin_counter_w(0, ~data & 1);
+			machine().bookkeeping().coin_counter_w(1, ~data & 4);
 		}
 	}
 }
@@ -2012,8 +2012,8 @@ WRITE16_MEMBER(ddenlovr_state::ddenlovj_coincounter_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0, data & 0x01);
-		coin_counter_w(machine(), 1, data & 0x04);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x04);
 		//                data & 0x80 ?
 	}
 }
@@ -2186,8 +2186,8 @@ WRITE16_MEMBER(ddenlovr_state::nettoqc_coincounter_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0, data & 0x01);
-		coin_counter_w(machine(), 1, data & 0x04);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x04);
 		//                data & 0x80 ?
 	}
 }
@@ -2430,7 +2430,7 @@ WRITE8_MEMBER(ddenlovr_state::mmpanic_blitter2_w)
 
 void ddenlovr_state::mmpanic_update_leds()
 {
-	set_led_status(machine(), 0, m_mmpanic_leds);
+	output().set_led_value(0, m_mmpanic_leds);
 }
 
 /* leds 1-8 */
@@ -2451,9 +2451,9 @@ WRITE8_MEMBER(ddenlovr_state::mmpanic_lockout_w)
 {
 	if (m_dsw_sel == 0x0c)
 	{
-		coin_counter_w(machine(), 0, (~data) & 0x01);
-		coin_lockout_w(machine(), 0, (~data) & 0x02);
-		set_led_status(machine(), 1, (~data) & 0x04);
+		machine().bookkeeping().coin_counter_w(0, (~data) & 0x01);
+		machine().bookkeeping().coin_lockout_w(0, (~data) & 0x02);
+		output().set_led_value(1, (~data) & 0x04);
 	}
 }
 
@@ -2609,8 +2609,8 @@ WRITE8_MEMBER(ddenlovr_state::funkyfig_lockout_w)
 	{
 		case 0x2c:
 			m_funkyfig_lockout = data;
-			coin_counter_w(machine(), 0,   data  & 0x01);
-			coin_lockout_w(machine(), 0, (~data) & 0x02);
+			machine().bookkeeping().coin_counter_w(0,   data  & 0x01);
+			machine().bookkeeping().coin_lockout_w(0, (~data) & 0x02);
 			if (data & ~0x03)
 				logerror("%06x: warning, unknown bits written, lockout = %02x\n", space.device().safe_pc(), data);
 			break;
@@ -2757,8 +2757,8 @@ WRITE8_MEMBER(ddenlovr_state::hanakanz_coincounter_w)
 	// bit 2 = hopper (if bet on)
 	// bit 3 = 1 if bet off
 
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 
 	if (data & 0xf0)
 		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);
@@ -3001,8 +3001,8 @@ WRITE8_MEMBER(ddenlovr_state::mjchuuka_coincounter_w)
 	// bit 3 = lockout
 	// bit 8?
 
-	coin_counter_w(machine(), 0,  data   & 0x01);
-	coin_lockout_w(machine(), 0, (~data) & 0x08);
+	machine().bookkeeping().coin_counter_w(0,  data   & 0x01);
+	machine().bookkeeping().coin_lockout_w(0, (~data) & 0x08);
 
 	if (data & 0x74)
 		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);
@@ -3180,8 +3180,8 @@ WRITE8_MEMBER(ddenlovr_state::mjmyster_coincounter_w)
 	switch (m_input_sel)
 	{
 		case 0x0c:
-			coin_counter_w(machine(), 0, (~data) & 0x01);   // coin in
-			coin_counter_w(machine(), 0, (~data) & 0x02);   // coin out actually
+			machine().bookkeeping().coin_counter_w(0, (~data) & 0x01);   // coin in
+			machine().bookkeeping().coin_counter_w(0, (~data) & 0x02);   // coin out actually
 			#ifdef MAME_DEBUG
 //              popmessage("cc: %02x",data);
 			#endif
@@ -3304,8 +3304,8 @@ WRITE8_MEMBER(ddenlovr_state::hginga_coins_w)
 			// bit 2 = hopper (if bet on)
 			// bit 3 = 1 if bet on
 			// bit 7?
-			coin_counter_w(machine(), 0, data & 1);
-			coin_counter_w(machine(), 1, data & 2);
+			machine().bookkeeping().coin_counter_w(0, data & 1);
+			machine().bookkeeping().coin_counter_w(1, data & 2);
 #ifdef MAME_DEBUG
 //          popmessage("COINS %02x", data);
 #endif
@@ -3439,8 +3439,8 @@ WRITE8_MEMBER(ddenlovr_state::hgokou_input_w)
 			// bit 1 = out counter
 			// bit 2 = hopper
 			// bit 7 = ?
-			coin_counter_w(machine(), 0, data & 1);
-			coin_counter_w(machine(), 1, data & 2);
+			machine().bookkeeping().coin_counter_w(0, data & 1);
+			machine().bookkeeping().coin_counter_w(1, data & 2);
 			m_hopper = data & 0x04;
 #ifdef MAME_DEBUG
 //          popmessage("COINS %02x",data);
@@ -3607,7 +3607,7 @@ WRITE8_MEMBER(ddenlovr_state::hparadis_coin_w)
 {
 	switch (m_input_sel)
 	{
-		case 0x0c:  coin_counter_w(machine(), 0, data & 1); break;
+		case 0x0c:  machine().bookkeeping().coin_counter_w(0, data & 1); break;
 		case 0x0d:  break;
 		default:
 			logerror("%04x: coins_w with select = %02x, data = %02x\n",space.device().safe_pc(), m_input_sel, data);
@@ -3836,7 +3836,7 @@ WRITE8_MEMBER(ddenlovr_state::mjflove_blitter_w)
 WRITE8_MEMBER(ddenlovr_state::mjflove_coincounter_w)
 {
 	// bit 0 = in counter
-	coin_counter_w(machine(), 0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 
 	if (data & 0xfe)
 	{
@@ -3923,10 +3923,10 @@ WRITE8_MEMBER(ddenlovr_state::mjgnight_coincounter_w)
 {
 	m_prot_val = data;
 
-	set_led_status(machine(), 0, data & 0x01);  // led? 1 in-game, 0 in service mode / while booting
+	output().set_led_value(0, data & 0x01);  // led? 1 in-game, 0 in service mode / while booting
 
-	coin_counter_w(machine(), 0, data & 0x04);  // coin-out
-	coin_counter_w(machine(), 1, data & 0x08);  // coin-in
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);  // coin-out
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);  // coin-in
 
 	if (data & 0xf2)
 		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);
@@ -4008,8 +4008,8 @@ WRITE8_MEMBER(ddenlovr_state::sryudens_coincounter_w)
 	// bit 4 = ? on except during boot or test mode
 	// bit 7 = ? mostly on
 
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 	m_hopper = data & 0x04;
 
 	if (data & 0x68)
@@ -4069,8 +4069,8 @@ WRITE8_MEMBER(ddenlovr_state::janshinp_coincounter_w)
 	// bit 3 = ? on except during boot or test mode
 	// bit 7 = ? mostly on
 
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 
 	if (data & ~0x8b)
 		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);
@@ -4272,7 +4272,7 @@ WRITE8_MEMBER(ddenlovr_state::htengoku_coin_w)
 			// bit 0 = coin counter
 			// bit 1 = out counter
 			// bit 2 = hopper
-			coin_counter_w(machine(), 0, data & 1);
+			machine().bookkeeping().coin_counter_w(0, data & 1);
 			m_hopper = data & 0x04;
 #ifdef MAME_DEBUG
 //          popmessage("COINS %02x",data);
@@ -11614,13 +11614,13 @@ ROM_START( kotbinsp )
 	ROM_LOAD16_BYTE( "909033.6c", 0x200001, 0x080000, CRC(9388b85d) SHA1(a35fe0b585cba256bb5575f7b539b33dd0ca3aa0) )
 	ROM_FILL(                     0x300000, 0x100000, 0xff )
 	// mirror the whole address space (25 bits)
-	ROM_COPY( "blitter", 0, 0x0400000, 0x400000 )
-	ROM_COPY( "blitter", 0, 0x0800000, 0x400000 )
-	ROM_COPY( "blitter", 0, 0x0c00000, 0x400000 )
-	ROM_COPY( "blitter", 0, 0x1000000, 0x400000 )
-	ROM_COPY( "blitter", 0, 0x1400000, 0x400000 )
-	ROM_COPY( "blitter", 0, 0x1800000, 0x400000 )
-	ROM_COPY( "blitter", 0, 0x1c00000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x0400000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x0800000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x0c00000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x1000000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x1400000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x1800000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x1c00000, 0x400000 )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "909031.1c", 0x00000, 0x80000, CRC(9f20a531) SHA1(1b43edd70c4c958cbbcd6c051ea6ba5e6fb41e77) )

@@ -22,12 +22,12 @@ public:
 	friend class isa8_hercules_device;
 
 	// construction/destruction
-	isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	isa8_mda_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	isa8_mda_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	isa8_mda_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
 	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
@@ -44,8 +44,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 public:
 	int m_framecnt;
 
@@ -71,26 +71,24 @@ class isa8_hercules_device :
 {
 public:
 	// construction/destruction
-	isa8_hercules_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_hercules_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
-	virtual DECLARE_READ8_MEMBER(io_read);
-	virtual DECLARE_WRITE8_MEMBER(io_write);
-	virtual DECLARE_READ8_MEMBER(status_r);
-	virtual DECLARE_WRITE8_MEMBER(mode_control_w);
+	virtual DECLARE_READ8_MEMBER(io_read) override;
+	virtual DECLARE_WRITE8_MEMBER(io_write) override;
+	virtual DECLARE_READ8_MEMBER(status_r) override;
+	virtual DECLARE_WRITE8_MEMBER(mode_control_w) override;
 
-	virtual MC6845_UPDATE_ROW( crtc_update_row );
+	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 	MC6845_UPDATE_ROW( hercules_gfx_update_row );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-private:
-	// internal state
 public:
 	UINT8 m_configuration_switch; //hercules
 };
@@ -106,23 +104,23 @@ class isa8_ec1840_0002_device :
 {
 public:
 	// construction/destruction
-	isa8_ec1840_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_ec1840_0002_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual DECLARE_WRITE8_MEMBER(mode_control_w);
+	virtual DECLARE_WRITE8_MEMBER(mode_control_w) override;
 
-	virtual MC6845_UPDATE_ROW( crtc_update_row );
+	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 	MC6845_UPDATE_ROW( mda_lowres_text_inten_update_row );
 	MC6845_UPDATE_ROW( mda_lowres_text_blink_update_row );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 public:
-	UINT8   *m_soft_chr_gen;
+	std::unique_ptr<UINT8[]>   m_soft_chr_gen;
 
 };
 

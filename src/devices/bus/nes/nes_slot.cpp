@@ -106,12 +106,12 @@ const device_type NES_CART_SLOT = &device_creator<nes_cart_slot_device>;
 
 device_nes_cart_interface::device_nes_cart_interface(const machine_config &mconfig, device_t &device)
 						: device_slot_card_interface(mconfig, device),
-						m_prg(NULL),
-						m_vrom(NULL),
-						m_ciram(NULL),
+						m_prg(nullptr),
+						m_vrom(nullptr),
+						m_ciram(nullptr),
 						m_prg_size(0),
 						m_vrom_size(0), m_maincpu(nullptr),
-						m_mapper_sram(NULL),
+						m_mapper_sram(nullptr),
 						m_mapper_sram_size(0),
 						m_ce_mask(0),
 						m_ce_state(0),
@@ -146,9 +146,9 @@ device_nes_cart_interface::~device_nes_cart_interface()
 //  pointer allocators
 //-------------------------------------------------
 
-void device_nes_cart_interface::prg_alloc(size_t size, const char *tag)
+void device_nes_cart_interface::prg_alloc(size_t size, std::string tag)
 {
-	if (m_prg == NULL)
+	if (m_prg == nullptr)
 	{
 		m_prg = device().machine().memory().region_alloc(std::string(tag).append(NESSLOT_PRGROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_prg_size = size;
@@ -213,9 +213,9 @@ void device_nes_cart_interface::prg_alloc(size_t size, const char *tag)
 	}
 }
 
-void device_nes_cart_interface::vrom_alloc(size_t size, const char *tag)
+void device_nes_cart_interface::vrom_alloc(size_t size, std::string tag)
 {
-	if (m_vrom == NULL)
+	if (m_vrom == nullptr)
 	{
 		std::string tempstring(tag);
 		tempstring.append(NESSLOT_CHRROM_REGION_TAG);
@@ -371,7 +371,7 @@ inline void device_nes_cart_interface::chr_sanity_check( int source )
 	if (source == CHRRAM && m_vram.empty())
 		fatalerror("CHRRAM bankswitch with no VRAM\n");
 
-	if (source == CHRROM && m_vrom == NULL)
+	if (source == CHRROM && m_vrom == nullptr)
 		fatalerror("CHRROM bankswitch with no VROM\n");
 }
 
@@ -492,7 +492,7 @@ void device_nes_cart_interface::set_nt_page(int page, int source, int bank, int 
 			break;
 		case EXRAM:
 		case MMC5FILL:
-			base_ptr = NULL;
+			base_ptr = nullptr;
 			break;
 		case CIRAM:
 		default:
@@ -742,7 +742,7 @@ void device_nes_cart_interface::nes_banks_restore()
 //-------------------------------------------------
 //  nes_cart_slot_device - constructor
 //-------------------------------------------------
-nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, NES_CART_SLOT, "NES Cartridge Slot", tag, owner, clock, "nes_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -833,7 +833,7 @@ bool nes_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			char magic[4];
 
@@ -904,7 +904,7 @@ void nes_cart_slot_device::call_unload()
 
 bool nes_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 	return TRUE;
 }
 
@@ -912,7 +912,7 @@ bool nes_cart_slot_device::call_softlist_load(software_list_device &swlist, cons
  get default card software
  -------------------------------------------------*/
 
-void nes_cart_slot_device::get_default_card_software(std::string &result)
+std::string nes_cart_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -930,10 +930,10 @@ void nes_cart_slot_device::get_default_card_software(std::string &result)
 
 		clear();
 
-		result.assign(slot_string);
+		return std::string(slot_string);
 	}
 	else
-		software_get_default_slot(result, "nrom");
+		return software_get_default_slot("nrom");
 }
 
 

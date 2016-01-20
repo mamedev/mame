@@ -30,7 +30,7 @@
 class sb2m600_state : public driver_device
 {
 public:
-	sb2m600_state(const machine_config &mconfig, device_type type, const char *tag) :
+	sb2m600_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, M6502_TAG),
 		m_acia_0(*this, "acia_0"),
@@ -65,9 +65,9 @@ public:
 	DECLARE_PALETTE_INIT(osi630);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	enum
 	{
@@ -108,7 +108,7 @@ protected:
 class c1p_state : public sb2m600_state
 {
 public:
-	c1p_state(const machine_config &mconfig, device_type type, const char *tag) :
+	c1p_state(const machine_config &mconfig, device_type type, std::string tag) :
 		sb2m600_state(mconfig, type, tag),
 		m_beep(*this, "beeper")
 	{
@@ -116,7 +116,7 @@ public:
 
 	required_device<beep_device> m_beep;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER( osi630_ctrl_w );
 	DECLARE_WRITE8_MEMBER( osi630_sound_w );
@@ -126,7 +126,7 @@ public:
 class c1pmf_state : public c1p_state
 {
 public:
-	c1pmf_state(const machine_config &mconfig, device_type type, const char *tag) :
+	c1pmf_state(const machine_config &mconfig, device_type type, std::string tag) :
 		c1p_state(mconfig, type, tag),
 		m_floppy0(*this, "floppy0"),
 		m_floppy1(*this, "floppy1")
@@ -138,7 +138,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( osi470_pia_cb2_w );
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 private:
 	required_device<floppy_connector> m_floppy0;
@@ -148,7 +148,7 @@ private:
 class uk101_state : public sb2m600_state
 {
 public:
-	uk101_state(const machine_config &mconfig, device_type type, const char *tag) :
+	uk101_state(const machine_config &mconfig, device_type type, std::string tag) :
 		sb2m600_state(mconfig, type, tag)
 	{
 	}

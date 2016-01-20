@@ -11,7 +11,7 @@
 static int cas_size;
 
 
-INLINE int kim1_output_signal( INT16 *buffer, int sample_pos, int high )
+static inline int kim1_output_signal( INT16 *buffer, int sample_pos, int high )
 {
 	int sample_count, i, j;
 
@@ -62,7 +62,7 @@ INLINE int kim1_output_signal( INT16 *buffer, int sample_pos, int high )
 }
 
 
-INLINE int kim1_output_byte( INT16 *buffer, int sample_pos, UINT8 byte )
+static inline int kim1_output_byte( INT16 *buffer, int sample_pos, UINT8 byte )
 {
 	int i;
 	int sample_count = 0;
@@ -156,7 +156,7 @@ static int kim1_kim_to_wav_size(const UINT8 *casdata, int caslen)
 {
 	cas_size = caslen;
 
-	return kim1_handle_kim( NULL, casdata );
+	return kim1_handle_kim( nullptr, casdata );
 }
 
 static const struct CassetteLegacyWaveFiller kim1_kim_legacy_fill_wave =
@@ -188,7 +188,7 @@ static const struct CassetteFormat kim1_kim_format =
 	"kim,kim1",
 	kim1_kim_identify,
 	kim1_kim_load,
-	NULL
+	nullptr
 };
 
 

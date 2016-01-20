@@ -129,7 +129,7 @@ WRITE8_MEMBER(turbo_state::turbo_sound_b_w)
 
 	/* ACC0-ACC5 */
 	m_turbo_accel = data & 0x3f;
-	output_set_value("tachometer", m_turbo_accel);
+	output().set_value("tachometer", m_turbo_accel);
 
 	/* /AMBU: channel 4 */
 	if ((diff & 0x40) && !(data & 0x40) && !m_samples->playing(4)) m_samples->start(4, 8, true);
@@ -152,7 +152,7 @@ WRITE8_MEMBER(turbo_state::turbo_sound_c_w)
 	m_turbo_bsel = (data >> 2) & 3;
 
 	/* SPEED0-3 */
-	output_set_value("speed", (data >> 4) & 0x0f);
+	output().set_value("speed", (data >> 4) & 0x0f);
 
 	/* update any samples */
 	turbo_update_samples();
@@ -178,7 +178,7 @@ static const char *const turbo_sample_names[] =
 	"skidding", /* 6: Spin */
 	"idle",     /* 7: Idle */
 	"ambulanc", /* 8: Ambulance */
-	0
+	nullptr
 };
 
 
@@ -425,7 +425,7 @@ static const char *const subroc3d_sample_names[] =
 	"09",   /*  8: prolog sound */
 	"11",   /*  9: alarm 0 */
 	"12",   /* 10: alarm 1 */
-	0
+	nullptr
 };
 
 MACHINE_CONFIG_FRAGMENT( subroc3d_samples )
@@ -569,7 +569,7 @@ static const char *const buckrog_sample_names[]=
 	"shipsnd1", /* 8 */
 	"shipsnd2", /* 9 */
 	"shipsnd3", /* 10 */
-	0
+	nullptr
 };
 
 

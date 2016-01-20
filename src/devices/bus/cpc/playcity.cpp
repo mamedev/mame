@@ -34,7 +34,7 @@ static MACHINE_CONFIG_FRAGMENT( cpc_playcity )
 
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(DEVWRITELINE("^", cpc_expansion_slot_device, irq_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
@@ -52,7 +52,7 @@ machine_config_constructor cpc_playcity_device::device_mconfig_additions() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_playcity_device::cpc_playcity_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cpc_playcity_device::cpc_playcity_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CPC_PLAYCITY, "PlayCity", tag, owner, clock, "cpc_playcity", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_ctc(*this,"ctc"),

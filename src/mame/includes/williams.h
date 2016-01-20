@@ -14,7 +14,7 @@
 class williams_state : public driver_device
 {
 public:
-	williams_state(const machine_config &mconfig, device_type type, const char *tag)
+	williams_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_nvram(*this, "nvram"),
 		m_videoram(*this, "videoram"),
@@ -46,12 +46,12 @@ public:
 	UINT8 m_blitter_window_enable;
 	UINT8 m_cocktail;
 	UINT8 m_port_select;
-	rgb_t *m_palette_lookup;
+	std::unique_ptr<rgb_t[]> m_palette_lookup;
 	UINT8 m_blitterram[8];
 	UINT8 m_blitter_xor;
 	UINT8 m_blitter_remap_index;
 	const UINT8 *m_blitter_remap;
-	UINT8 *m_blitter_remap_lookup;
+	std::unique_ptr<UINT8[]> m_blitter_remap_lookup;
 	DECLARE_WRITE8_MEMBER(williams_vram_select_w);
 	DECLARE_WRITE8_MEMBER(williams_cmos_w);
 	DECLARE_WRITE8_MEMBER(bubbles_cmos_w);
@@ -118,7 +118,7 @@ public:
 class blaster_state : public williams_state
 {
 public:
-	blaster_state(const machine_config &mconfig, device_type type, const char *tag)
+	blaster_state(const machine_config &mconfig, device_type type, std::string tag)
 		: williams_state(mconfig, type, tag),
 		m_soundcpu_b(*this, "soundcpu_b"),
 		m_blaster_palette_0(*this, "blaster_pal0"),
@@ -154,7 +154,7 @@ public:
 class williams2_state : public williams_state
 {
 public:
-	williams2_state(const machine_config &mconfig, device_type type, const char *tag)
+	williams2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: williams_state(mconfig, type, tag),
 		m_bank8000(*this, "bank8000"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -204,7 +204,7 @@ public:
 class joust2_state : public williams2_state
 {
 public:
-	joust2_state(const machine_config &mconfig, device_type type, const char *tag)
+	joust2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: williams2_state(mconfig, type, tag),
 		m_cvsd_sound(*this, "cvsd") { }
 

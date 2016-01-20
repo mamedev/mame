@@ -100,11 +100,11 @@ void taotaido_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(taotaido_state::bg_tile_info),this),tilemap_mapper_delegate(FUNC(taotaido_state::tilemap_scan_rows),this),16,16,128,64);
 
-	m_spriteram_old = auto_alloc_array(machine(), UINT16, 0x2000/2);
-	m_spriteram_older = auto_alloc_array(machine(), UINT16, 0x2000/2);
+	m_spriteram_old = std::make_unique<UINT16[]>(0x2000/2);
+	m_spriteram_older = std::make_unique<UINT16[]>(0x2000/2);
 
-	m_spriteram2_old = auto_alloc_array(machine(), UINT16, 0x10000/2);
-	m_spriteram2_older = auto_alloc_array(machine(), UINT16, 0x10000/2);
+	m_spriteram2_old = std::make_unique<UINT16[]>(0x10000/2);
+	m_spriteram2_older = std::make_unique<UINT16[]>(0x10000/2);
 
 	save_item(NAME(m_sprite_character_bank_select));
 	save_item(NAME(m_video_bank_select));
@@ -133,7 +133,7 @@ UINT32 taotaido_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		m_bg_tilemap->draw(screen, bitmap, clip, 0,0);
 	}
 
-	m_spr->draw_sprites(m_spriteram_older, m_spriteram.bytes(), screen, bitmap,cliprect);
+	m_spr->draw_sprites(m_spriteram_older.get(), m_spriteram.bytes(), screen, bitmap,cliprect);
 	return 0;
 }
 
@@ -144,10 +144,10 @@ void taotaido_state::screen_eof(screen_device &screen, bool state)
 	{
 		/* sprites need to be delayed by 2 frames? */
 
-		memcpy(m_spriteram2_older,m_spriteram2_old,0x10000);
-		memcpy(m_spriteram2_old,m_spriteram2,0x10000);
+		memcpy(m_spriteram2_older.get(),m_spriteram2_old.get(),0x10000);
+		memcpy(m_spriteram2_old.get(),m_spriteram2,0x10000);
 
-		memcpy(m_spriteram_older,m_spriteram_old,0x2000);
-		memcpy(m_spriteram_old,m_spriteram,0x2000);
+		memcpy(m_spriteram_older.get(),m_spriteram_old.get(),0x2000);
+		memcpy(m_spriteram_old.get(),m_spriteram,0x2000);
 	}
 }

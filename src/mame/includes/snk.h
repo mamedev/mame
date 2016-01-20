@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Marco Cassili,Ernesto Corvi,Tim Lindquist,Carlos A. Lozano,Bryan McPhail,Jarek Parchanski,Nicola Salmoria,Tomasz Slanina,Phil Stroffolino,Acho A. Tang,Victor Trucco
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi,Tim Lindquist,Carlos A. Lozano,Bryan McPhail,Jarek Parchanski,Nicola Salmoria,Tomasz Slanina,Phil Stroffolino,Acho A. Tang,Victor Trucco
+// thanks-to:Marco Cassili
 /*************************************************************************
 
     various SNK triple Z80 games
@@ -9,7 +10,7 @@
 class snk_state : public driver_device
 {
 public:
-	snk_state(const machine_config &mconfig, device_type type, const char *tag)
+	snk_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),

@@ -49,7 +49,7 @@ ToDo:
 class unior_state : public driver_device
 {
 public:
-	unior_state(const machine_config &mconfig, device_type type, const char *tag) :
+	unior_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pit(*this, "pit"),
@@ -79,8 +79,8 @@ public:
 private:
 	UINT8 m_4c;
 	UINT8 m_4e;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<i8257_device> m_dma;

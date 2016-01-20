@@ -117,8 +117,8 @@ class rs232_port_device : public device_t,
 	friend class device_rs232_port_interface;
 
 public:
-	rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	rs232_port_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	rs232_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	rs232_port_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	virtual ~rs232_port_device();
 
 	// static configuration helpers
@@ -140,8 +140,8 @@ public:
 	DECLARE_READ_LINE_MEMBER( cts_r ) { return m_cts; }
 
 protected:
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 	int m_rxd;
 	int m_dcd;

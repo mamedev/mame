@@ -115,18 +115,18 @@ class z80scc_channel : public device_t,
 	friend class z80scc_device;
 
 public:
-	z80scc_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80scc_channel(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_serial_interface overrides
-	virtual void tra_callback();
-	virtual void tra_complete();
-	virtual void rcv_callback();
-	virtual void rcv_complete();
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+	virtual void rcv_callback() override;
+	virtual void rcv_complete() override;
 
 	// read register handlers
 	UINT8 do_sccreg_rr0();
@@ -137,7 +137,7 @@ public:
 	UINT8 do_sccreg_rr5();
 	UINT8 do_sccreg_rr6();
 	UINT8 do_sccreg_rr7();
-	UINT8 do_sccreg_rr8();
+//  UINT8 do_sccreg_rr8();
 	UINT8 do_sccreg_rr9();
 	UINT8 do_sccreg_rr10();
 	UINT8 do_sccreg_rr11();
@@ -523,8 +523,8 @@ class z80scc_device :  public device_t
 
 public:
 	// construction/destruction
-	z80scc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
-	z80scc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80scc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source);
+	z80scc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_out_txda_callback(device_t &device, _Object object) { return downcast<z80scc_device &>(device).m_out_txda_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_dtra_callback(device_t &device, _Object object) { return downcast<z80scc_device &>(device).m_out_dtra_cb.set_callback(object); }
@@ -555,6 +555,8 @@ public:
 	DECLARE_WRITE8_MEMBER( cd_ba_w );
 	DECLARE_READ8_MEMBER( ba_cd_r );
 	DECLARE_WRITE8_MEMBER( ba_cd_w );
+	DECLARE_READ8_MEMBER( ba_cd_inv_r );
+	DECLARE_WRITE8_MEMBER( ba_cd_inv_w );
 
 	/* Definitions moved to z80scc.c for enhencements */
 	DECLARE_READ8_MEMBER( da_r );  // { return m_chanA->data_read(); }
@@ -588,14 +590,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// device_z80daisy_interface overrides
-	virtual int z80daisy_irq_state();
-	virtual int z80daisy_irq_ack();
-	virtual void z80daisy_irq_reti();
+	virtual int z80daisy_irq_state() override;
+	virtual int z80daisy_irq_ack() override;
+	virtual void z80daisy_irq_reti() override;
 
 	// internal interrupt management
 	void check_interrupts();
@@ -668,49 +670,49 @@ protected:
 class scc8030_device : public z80scc_device
 {
 public :
-	scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scc8030_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class scc80C30_device : public z80scc_device
 {
 public :
-	scc80C30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scc80C30_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class scc80230_device : public z80scc_device
 {
 public :
-	scc80230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scc80230_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class scc8530_device : public z80scc_device
 {
 public :
-	scc8530_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scc8530_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class scc85C30_device : public z80scc_device
 {
 public :
-	scc85C30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scc85C30_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class scc85230_device : public z80scc_device
 {
 public :
-	scc85230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scc85230_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class scc85233_device : public z80scc_device
 {
 public :
-	scc85233_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scc85233_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class scc8523L_device : public z80scc_device
 {
 public :
-	scc8523L_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scc8523L_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 // device type definition

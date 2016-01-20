@@ -28,16 +28,16 @@ class printer_interface_device : public device_t, public device_ioexp_interface
 {
 public:
 	// construction/destruction
-	printer_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	printer_interface_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER( busy_w );
 	DECLARE_READ8_MEMBER( busy_r );
 	DECLARE_WRITE8_MEMBER( strobe_w );
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	required_device<centronics_device> m_centronics;

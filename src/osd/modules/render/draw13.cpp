@@ -174,11 +174,11 @@ public:
 		}
 	}
 
-	/* virtual */ int create();
-	/* virtual */ int draw(const int update);
-	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
-	/* virtual */ void destroy();
-	/* virtual */ render_primitive_list *get_primitives()
+	/* virtual */ int create() override;
+	/* virtual */ int draw(const int update) override;
+	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
+	/* virtual */ void destroy() override;
+	/* virtual */ render_primitive_list *get_primitives() override
 	{
 		osd_dim nd = window().blit_surface_size();
 		if (nd != m_blit_dim)
@@ -260,7 +260,7 @@ static void drawsdl2_exit(void);
 //  STATIC VARIABLES
 //============================================================
 
-#define BM_ALL (-1)
+#define BM_ALL (UINT32_MAX)
 //( SDL_BLENDMODE_MASK | SDL_BLENDMODE_BLEND | SDL_BLENDMODE_ADD | SDL_BLENDMODE_MOD)
 
 #define ENTRY(a,b,f) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, &texcopy_ ## f, BM_ALL, #a, #b, 0, 0, 0, 0}
@@ -354,17 +354,17 @@ static bool blit_info_initialized = false;
 //============================================================
 
 
-INLINE float round_nearest(float f)
+static inline float round_nearest(float f)
 {
 	return floor(f + 0.5f);
 }
 
-INLINE HashT texture_compute_hash(const render_texinfo &texture, const UINT32 flags)
+static inline HashT texture_compute_hash(const render_texinfo &texture, const UINT32 flags)
 {
 	return (HashT)texture.base ^ (flags & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK));
 }
 
-INLINE SDL_BlendMode map_blendmode(const int blendmode)
+static inline SDL_BlendMode map_blendmode(const int blendmode)
 {
 	switch (blendmode)
 	{
@@ -382,7 +382,7 @@ INLINE SDL_BlendMode map_blendmode(const int blendmode)
 	return SDL_BLENDMODE_NONE;
 }
 
-INLINE void set_coloralphamode(SDL_Texture  *texture_id, const render_color *color)
+static inline void set_coloralphamode(SDL_Texture  *texture_id, const render_color *color)
 {
 	UINT32 sr = (UINT32)(255.0f * color->r);
 	UINT32 sg = (UINT32)(255.0f * color->g);

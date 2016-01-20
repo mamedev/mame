@@ -101,14 +101,14 @@ void mb86235_cpu_device::execute_set_input(int irqline, int state)
 }
 #endif
 
-mb86235_cpu_device::mb86235_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mb86235_cpu_device::mb86235_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, MB86235, "MB86235", tag, owner, clock, "mb86235", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, -2)
 {
 }
 
 
-void mb86235_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void mb86235_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

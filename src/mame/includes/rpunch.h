@@ -5,7 +5,7 @@
 class rpunch_state : public driver_device
 {
 public:
-	rpunch_state(const machine_config &mconfig, device_type type, const char *tag)
+	rpunch_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -57,8 +57,8 @@ public:
 	DECLARE_DRIVER_INIT(svolley);
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_VIDEO_START(rpunch);
 	DECLARE_VIDEO_START(svolley);

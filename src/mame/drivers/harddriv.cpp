@@ -340,7 +340,7 @@ Notes:
 
 const device_type HARDDRIV_DEVICE = &device_creator<harddriv_state>;
 
-harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+harddriv_state::harddriv_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HARDDRIV_DEVICE, "Hard Drivin' PCB Family", tag, owner, clock, "harddriv_pcb", __FILE__),
 /*  device_video_interface(mconfig, *this, false), */
 			m_maincpu(*this, "maincpu"),
@@ -360,12 +360,12 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 			m_hd34010_host_access(0),
 			m_dsk_pio_access(0),
 			m_msp_ram(*this, "msp_ram"),
-			m_dsk_ram(0),
-			m_dsk_rom(0),
+			m_dsk_ram(nullptr),
+			m_dsk_rom(nullptr),
 			m_dsk_10c(*this, "dsk_10c"),
 			m_dsk_30c(*this, "dsk_30c"),
-			m_m68k_slapstic_base(0),
-			m_m68k_sloop_alt_base(0),
+			m_m68k_slapstic_base(nullptr),
+			m_m68k_sloop_alt_base(nullptr),
 			m_200e(*this, "200e"),
 			m_210e(*this, "210e"),
 			m_adsp_data_memory(*this, "adsp_data"),
@@ -373,11 +373,11 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 			m_ds3sdsp_data_memory(*this, "ds3sdsp_data"),
 			m_ds3sdsp_pgm_memory(*this, "ds3sdsp_pgm"),
 			m_ds3xdsp_pgm_memory(*this, "ds3xdsp_pgm"),
-			m_gsp_protection(0),
+			m_gsp_protection(nullptr),
 			m_gsp_speedup_pc(0),
-			m_msp_speedup_addr(0),
+			m_msp_speedup_addr(nullptr),
 			m_msp_speedup_pc(0),
-			m_ds3_speedup_addr(0),
+			m_ds3_speedup_addr(nullptr),
 			m_ds3_speedup_pc(0),
 			m_ds3_transfer_pc(0),
 			m_gsp_multisync(0),
@@ -407,10 +407,10 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 			m_adsp_sim_address(0),
 			m_adsp_som_address(0),
 			m_adsp_eprom_base(0),
-			m_sim_memory(0),
+			m_sim_memory(nullptr),
 			m_sim_memory_size(0),
-			m_adsp_pgm_memory_word(0),
-			m_ds3_sdata_memory(0),
+			m_adsp_pgm_memory_word(nullptr),
+			m_ds3_sdata_memory(nullptr),
 			m_ds3_sdata_memory_size(0),
 			m_ds3_gcmd(0),
 			m_ds3_gflag(0),
@@ -452,7 +452,7 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 			m_next_msp_sync(0),
 			m_vram_mask(0),
 			m_shiftreg_enable(0),
-			m_gsp_shiftreg_source(0),
+			m_gsp_shiftreg_source(nullptr),
 			m_gfx_finescroll(0),
 			m_gfx_palettebank(0),
 			m_duart(*this, "duartn68681"),
@@ -466,8 +466,8 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 
 	for (i = 0; i < 2; i++)
 	{
-		m_gsp_speedup_addr[i] = 0;
-		m_rddsp32_sync[i] = 0;
+		m_gsp_speedup_addr[i] = nullptr;
+		m_rddsp32_sync[i] = nullptr;
 	}
 
 	for (i = 0; i < 4; i++)
@@ -490,7 +490,7 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 
 	for (i = 0; i < MAX_MSP_SYNC; i++)
 	{
-		m_dataptr[i] = 0;
+		m_dataptr[i] = nullptr;
 		m_dataval[i] = 0;
 	}
 
@@ -504,7 +504,7 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 class harddriv_new_state : public driver_device
 {
 public:
-	harddriv_new_state(const machine_config &mconfig, device_type type, const char *tag)
+	harddriv_new_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_mainpcb(*this, "mainpcb")
 		, m_leftpcb(*this, "leftpcb")
@@ -1740,7 +1740,7 @@ MACHINE_CONFIG_END
 
 const device_type HARDDRIV_BOARD_DEVICE = &device_creator<harddriv_board_device_state>;
 
-harddriv_board_device_state::harddriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+harddriv_board_device_state::harddriv_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1766,7 +1766,7 @@ void harddrivc_board_device_state::device_start()
 
 const device_type HARDDRIVC_BOARD_DEVICE = &device_creator<harddrivc_board_device_state>;
 
-harddrivc_board_device_state::harddrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+harddrivc_board_device_state::harddrivc_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1794,7 +1794,7 @@ void racedrivb1_board_device_state::device_start()
 const device_type RACEDRIV_BOARD_DEVICE = &device_creator<racedriv_board_device_state>;
 const device_type RACEDRIVB1_BOARD_DEVICE = &device_creator<racedrivb1_board_device_state>;
 
-racedriv_board_device_state::racedriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+racedriv_board_device_state::racedriv_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1831,7 +1831,7 @@ const device_type RACEDRIVC_BOARD_DEVICE = &device_creator<racedrivc_board_devic
 const device_type RACEDRIVC1_BOARD_DEVICE = &device_creator<racedrivc1_board_device_state>;
 const device_type RACEDRIVC_PANORAMA_SIDE_BOARD_DEVICE = &device_creator<racedrivc_panorama_side_board_device_state>;
 
-racedrivc_board_device_state::racedrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+racedrivc_board_device_state::racedrivc_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1857,7 +1857,7 @@ void stunrun_board_device_state::device_start()
 
 const device_type STUNRUN_BOARD_DEVICE = &device_creator<stunrun_board_device_state>;
 
-stunrun_board_device_state::stunrun_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+stunrun_board_device_state::stunrun_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1891,7 +1891,7 @@ const device_type STEELTAL_BOARD_DEVICE = &device_creator<steeltal_board_device_
 const device_type STEELTAL1_BOARD_DEVICE = &device_creator<steeltal1_board_device_state>;
 const device_type STEELTALP_BOARD_DEVICE = &device_creator<steeltalp_board_device_state>;
 
-steeltal_board_device_state::steeltal_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+steeltal_board_device_state::steeltal_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1911,7 +1911,7 @@ void strtdriv_board_device_state::device_start()
 
 const device_type STRTDRIV_BOARD_DEVICE = &device_creator<strtdriv_board_device_state>;
 
-strtdriv_board_device_state::strtdriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+strtdriv_board_device_state::strtdriv_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1938,7 +1938,7 @@ void hdrivairp_board_device_state::device_start()
 const device_type HDRIVAIR_BOARD_DEVICE = &device_creator<hdrivair_board_device_state>;
 const device_type HDRIVAIRP_BOARD_DEVICE = &device_creator<hdrivairp_board_device_state>;
 
-hdrivair_board_device_state::hdrivair_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hdrivair_board_device_state::hdrivair_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -4485,7 +4485,7 @@ ROM_START( strtdriv )
 	ROM_LOAD( "136091-0033.10j", 0x000000, 0x010000, CRC(57504ab6) SHA1(ec8361b7da964c07ca0da48a87537badc3986fe0) )
 
 	ROM_REGION16_BE( 0x100000, "mainpcb:ds3xdsp", 0 )  /* DS III auxillary ADSP-2105 (unused) */
-	ROM_FILL(                    0x000000, 0x010000, 0x00)
+	ROM_FILL(                    0x000000, 0x010000, nullptr)
 
 	ROM_REGION( 0x80000, "mainpcb:ds3sdsp_data", 0 )
 	ROM_LOAD16_BYTE( "136052-1123.12lm",0x00000, 0x10000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
@@ -4652,7 +4652,7 @@ void harddriv_state::init_multisync(int compact_inputs)
 	m_gsp_multisync = TRUE;
 
 	// if we have a JSA board, install the read/write handlers
-	if (m_jsa != NULL)
+	if (m_jsa != nullptr)
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x600000, 0x603fff, read8_delegate(FUNC(atari_jsa_base_device::main_response_r),m_jsa.target()), write8_delegate(FUNC(atari_jsa_base_device::main_command_w),m_jsa.target()), 0xff00);
 
 	/* install handlers for the compact driving games' inputs */

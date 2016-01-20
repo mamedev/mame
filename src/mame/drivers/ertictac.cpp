@@ -34,13 +34,13 @@ PCB has a single OSC at 24MHz
 class ertictac_state : public archimedes_state
 {
 public:
-	ertictac_state(const machine_config &mconfig, device_type type, const char *tag)
+	ertictac_state(const machine_config &mconfig, device_type type, std::string tag)
 		: archimedes_state(mconfig, type, tag) { }
 
 	DECLARE_READ32_MEMBER(ertictac_podule_r);
 	DECLARE_DRIVER_INIT(ertictac);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(ertictac_podule_irq);
 };
 

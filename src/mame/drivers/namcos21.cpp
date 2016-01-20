@@ -294,18 +294,18 @@ CPU68 PCB:
 
   JP2          /D-ST           /VBL
   JP3
-  
-*****************************  
+
+*****************************
 
 Winning Run / Winning Run Suzuka GP/ Winning Run 91
 Namco 1988-91
 
 These games run on Namco System 21 hardware. Note each set of PCBs for System 21 games are slightly different,
 with some common PCBs and some unique-to-that-game PCBs. This covers the Winning Run series.
-The PCBs are housed in a metal box. The front has a small filter board containing a 60-pin flat cable connector. 
-Underneath is a connector that plugs into PCB #3. 
-Inside at the bottom is a small MOTHER PCB containing 8 connectors where the PCBs plug in and the power input connector. 
-On Winning Run there is an additional PCB for the controls and cabinet motion. 
+The PCBs are housed in a metal box. The front has a small filter board containing a 60-pin flat cable connector.
+Underneath is a connector that plugs into PCB #3.
+Inside at the bottom is a small MOTHER PCB containing 8 connectors where the PCBs plug in and the power input connector.
+On Winning Run there is an additional PCB for the controls and cabinet motion.
 The PAL labels suggest it was originally used with Metal Hawk. It may be used with other games too.
 
 
@@ -514,9 +514,9 @@ Filter Board
 |                                |
 |-------|60-PIN FLAT CABLE|------|
         |-------CONN------|
-        
-****************************  
- 
+
+****************************
+
 */
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -811,7 +811,7 @@ int namcos21_state::init_dsp()
 	pMem[0x8000] = 0xFF80;
 	pMem[0x8001] = 0x0000;
 
-	m_mpDspState = auto_alloc_clear(machine(), dsp_state);
+	m_mpDspState = make_unique_clear<dsp_state>();
 
 	return 0;
 }
@@ -2448,7 +2448,7 @@ ROM_END
 void namcos21_state::init(int game_type)
 {
 	m_gametype = game_type;
-	m_pointram = auto_alloc_array(machine(), UINT8, PTRAM_SIZE);
+	m_pointram = std::make_unique<UINT8[]>(PTRAM_SIZE);
 	init_dsp();
 	m_mbNeedsKickstart = 20;
 	if( game_type==NAMCOS21_CYBERSLED )
@@ -2464,10 +2464,10 @@ DRIVER_INIT_MEMBER(namcos21_state,winrun)
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
 
-	m_winrun_dspcomram = auto_alloc_array(machine(), UINT16, 0x1000*2);
+	m_winrun_dspcomram = std::make_unique<UINT16[]>(0x1000*2);
 
 	m_gametype = NAMCOS21_WINRUN91;
-	m_pointram = auto_alloc_array(machine(), UINT8, PTRAM_SIZE);
+	m_pointram = std::make_unique<UINT8[]>(PTRAM_SIZE);
 	m_pointram_idx = 0;
 	m_mbNeedsKickstart = 0;
 }
@@ -2505,9 +2505,9 @@ DRIVER_INIT_MEMBER(namcos21_state,driveyes)
 	int pc = 0;
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
-	m_winrun_dspcomram = auto_alloc_array(machine(), UINT16, 0x1000*2);
+	m_winrun_dspcomram = std::make_unique<UINT16[]>(0x1000*2);
 	m_gametype = NAMCOS21_DRIVERS_EYES;
-	m_pointram = auto_alloc_array(machine(), UINT8, PTRAM_SIZE);
+	m_pointram = std::make_unique<UINT8[]>(PTRAM_SIZE);
 	m_pointram_idx = 0;
 	m_mbNeedsKickstart = 0;
 }

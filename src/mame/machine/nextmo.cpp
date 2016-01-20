@@ -18,7 +18,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, nextmo_device)
 	AM_RANGE(0x10, 0x17) AM_READWRITE(r10_r, r10_w)
 ADDRESS_MAP_END
 
-nextmo_device::nextmo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nextmo_device::nextmo_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, NEXTMO, "NeXT Magneto-optical drive", tag, owner, clock, "nextmo", __FILE__),
 	r4(0),
 	irq_cb(*this),

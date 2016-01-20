@@ -26,7 +26,7 @@ class speaker_sound_device : public device_t,
 								public device_sound_interface
 {
 public:
-	speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	speaker_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~speaker_sound_device() {}
 
 	// static configuration
@@ -36,11 +36,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	// internal state

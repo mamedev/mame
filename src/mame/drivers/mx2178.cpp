@@ -31,7 +31,7 @@
 class mx2178_state : public driver_device
 {
 public:
-	mx2178_state(const machine_config &mconfig, device_type type, const char *tag) :
+	mx2178_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -49,7 +49,7 @@ public:
 	required_shared_ptr<UINT8> m_p_videoram;
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 private:
 	UINT8 m_term_data;

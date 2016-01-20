@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Carlos A. Lozano, Rob Rosenbrock, Phil Stroffolino
 /***************************************************************************
 
@@ -268,7 +268,7 @@ WRITE8_MEMBER(xain_state::m68705_w)
 	m_from_main = data;
 	m_mcu_accept = 0;
 
-	if (m_mcu != NULL)
+	if (m_mcu != nullptr)
 		m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
@@ -358,7 +358,7 @@ CUSTOM_INPUT_MEMBER(xain_state::mcu_status_r)
 {
 	UINT8 res = 0;
 
-	if (m_mcu != NULL)
+	if (m_mcu != nullptr)
 	{
 		if (m_mcu_ready == 1)
 			res |= 0x01;
@@ -378,7 +378,7 @@ READ8_MEMBER(xain_state::mcu_comm_reset_r)
 	m_mcu_ready = 1;
 	m_mcu_accept = 1;
 
-	if (m_mcu != NULL)
+	if (m_mcu != nullptr)
 		m_mcu->set_input_line(0, CLEAR_LINE);
 
 	return 0xff;
@@ -849,8 +849,60 @@ ROM_START( xsleenab )
 	ROM_LOAD( "pt-0.ic59",    0x00000, 0x0100, CRC(fed32888) SHA1(4e9330456b20f7198c1e27ca1ae7200f25595599) ) /* BPROM type MB7114E  Priority (not used) */
 ROM_END
 
+ROM_START( xsleenaba )
+	ROM_REGION( 0x14000, "maincpu", 0 )
+	ROM_LOAD( "xs87b-10.7d",    0x08000, 0x8000, CRC(3d5f9fb4) SHA1(d315b5415a471e05ee61b84fcaf739c75f890061) )
+	ROM_LOAD( "xs87b-11.7c",    0x04000, 0x4000, CRC(81c80d54) SHA1(2049c5843c6134560d8fbacf020cbff34833ded7) )
+	ROM_CONTINUE(             0x10000, 0x4000 )
+
+	ROM_REGION( 0x14000, "sub", 0 )
+	ROM_LOAD( "p1-0.ic29",    0x08000, 0x8000, CRC(a1a860e2) SHA1(fb2b152bfafc44608039774436ddf3b17eed979c) )
+	ROM_LOAD( "p0-0.ic15",    0x04000, 0x4000, CRC(948b9757) SHA1(3ea840cc47ae6a66f3e5f6a2f3e88475dcfe1840) )
+	ROM_CONTINUE(             0x10000, 0x4000 )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "p2-0.ic49",     0x8000, 0x8000, CRC(a5318cb8) SHA1(35fb28c5598e39f22552bb036ae356b78422f080) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "pb-01.ic24",   0x00000, 0x8000, CRC(83c00dd8) SHA1(8e9b19281039b63072270c7a63d9fb30cda570fd) ) /* chars */
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "pk-0.ic136",   0x00000, 0x8000, CRC(11eb4247) SHA1(5d2f1fa07b8fb1c6bebfdb02c39282d29813791b) ) /* tiles */
+	ROM_LOAD( "pl-0.ic135",   0x08000, 0x8000, CRC(422b536e) SHA1(d5985c0bd1c840cb6f0da6b177a2caaff6db5a04) )
+	ROM_LOAD( "pm-0.ic134",   0x10000, 0x8000, CRC(828c1b0c) SHA1(cb9b64073b0ade3885f61545191db4c445e3066b) )
+	ROM_LOAD( "pn-0.ic133",   0x18000, 0x8000, CRC(d37939e0) SHA1(301d9f6720857c64a4e070444a07a38138ddd4ef) )
+	ROM_LOAD( "pc-0.ic114",   0x20000, 0x8000, CRC(8f0aa1a7) SHA1(be3fdb6204b77dba28b14c5b880d65d7c1d6a161) )
+	ROM_LOAD( "pd-0.ic113",   0x28000, 0x8000, CRC(45681910) SHA1(60c3eb4bc08bf11bf09bcd27549c6427fafbb1fb) )
+	ROM_LOAD( "pe-0.ic112",   0x30000, 0x8000, CRC(a8eeabc8) SHA1(e5dc31df0b223b65144af3602be5bcb2ff9eebbd) )
+	ROM_LOAD( "pf-0.ic111",   0x38000, 0x8000, CRC(e59a2f27) SHA1(4643cea85f8613c36b416f46f9d1753fa9839237) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "p5-0.ic44",    0x00000, 0x8000, CRC(5c6c453c) SHA1(68c0028d15da8f5e53f09e3d154d18cd9f219601) ) /* tiles */
+	ROM_LOAD( "p4-0.ic45",    0x08000, 0x8000, CRC(59d87a9a) SHA1(f23cb9a9d6c6249a8a1f8e2acbc235086b008c7b) )
+	ROM_LOAD( "p3-0.ic46",    0x10000, 0x8000, CRC(84884a2e) SHA1(5087010a72226e91a084a61b5089c110dba7e933) )
+	/* 0x60000-0x67fff empty */
+	ROM_LOAD( "p6-0.ic43",    0x20000, 0x8000, CRC(8d637639) SHA1(301a7893de8f1bb526f5075e2af8203b8af4b0d3) )
+	ROM_LOAD( "p7-0.ic42",    0x28000, 0x8000, CRC(71eec4e6) SHA1(3417c52a39a6fc43c51ad707168180f54153177a) )
+	ROM_LOAD( "p8-0.ic41",    0x30000, 0x8000, CRC(7fc9704f) SHA1(b6f353fb7fec58f68b9e28be2aa29146ac64ffd4) )
+	/* 0x80000-0x87fff empty */
+
+	ROM_REGION( 0x40000, "gfx4", 0 )
+	ROM_LOAD( "po-0.ic131",   0x00000, 0x8000, CRC(252976ae) SHA1(534c9148d33e453f3541543a8c0eb4afc59c7de8) ) /* sprites */
+	ROM_LOAD( "pp-0.ic130",   0x08000, 0x8000, CRC(e6f1e8d5) SHA1(2ee0227361d1f1358f5b5964dab7e691243cd9ae) )
+	ROM_LOAD( "pq-0.ic129",   0x10000, 0x8000, CRC(785381ed) SHA1(95bf4eb29830c589a9793a4138e645e5b77f0c06) )
+	ROM_LOAD( "pr-0.ic128",   0x18000, 0x8000, CRC(59754e3d) SHA1(d1781dbc83965fc84492f7282d6813507ba1e81b) )
+	ROM_LOAD( "pg-0.ic109",   0x20000, 0x8000, CRC(4d977f33) SHA1(30b446ddb2f32354334ea780c435f2407d128808) )
+	ROM_LOAD( "ph-0.ic108",   0x28000, 0x8000, CRC(3f3b62a0) SHA1(ab7e8f0ff707771401e679b6151ad0ea85cfc792) )
+	ROM_LOAD( "pi-0.ic107",   0x30000, 0x8000, CRC(76641ee3) SHA1(8fba0fa6639e7bdfb3f7be5e945a55b64411d242) )
+	ROM_LOAD( "pj-0.ic106",   0x38000, 0x8000, CRC(37671f36) SHA1(1494eec4ecde9ae1f1101aa13eb301b3f3d06602) )
+
+	ROM_REGION( 0x0100, "proms", 0 ) /* Priority */
+	ROM_LOAD( "pt-0.ic59",    0x00000, 0x0100, CRC(fed32888) SHA1(4e9330456b20f7198c1e27ca1ae7200f25595599) ) /* BPROM type MB7114E  Priority (not used) */
+ROM_END
+
 
 GAME( 1986, xsleena,  0,       xsleena,  xsleena, driver_device, 0, ROT0, "Technos Japan (Taito license)", "Xain'd Sleena (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, xsleenaj, xsleena, xsleena,  xsleena, driver_device, 0, ROT0, "Technos Japan", "Xain'd Sleena (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, solrwarr, xsleena, xsleena,  xsleena, driver_device, 0, ROT0, "Technos Japan (Taito / Memetron license)", "Solar-Warrior (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, xsleenab, xsleena, xsleenab, xsleena, driver_device, 0, ROT0, "bootleg", "Xain'd Sleena (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, xsleenaba,xsleena, xsleenab, xsleena, driver_device, 0, ROT0, "bootleg", "Xain'd Sleena (bootleg, bugfixed)", MACHINE_SUPPORTS_SAVE ) // newer bootleg, fixes some of the issues with the other one

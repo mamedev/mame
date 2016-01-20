@@ -10,7 +10,7 @@
 class tecmosys_state : public driver_device
 {
 public:
-	tecmosys_state(const machine_config &mconfig, device_type type, const char *tag)
+	tecmosys_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -93,8 +93,8 @@ public:
 	DECLARE_DRIVER_INIT(tkdensha);
 	DECLARE_DRIVER_INIT(deroon);
 	DECLARE_DRIVER_INIT(tkdensho);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	TILE_GET_INFO_MEMBER(get_bg0tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1tile_info);

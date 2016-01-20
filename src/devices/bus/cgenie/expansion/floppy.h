@@ -27,7 +27,7 @@ class cgenie_fdc_device : public device_t, public device_expansion_interface
 {
 public:
 	// construction/destruction
-	cgenie_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cgenie_fdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_ADDRESS_MAP(mmio, 8);
 
@@ -44,14 +44,12 @@ public:
 
 
 protected:
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
-	void update_irq();
-
 	required_device<fd1793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;

@@ -3,7 +3,7 @@
 class sprcros2_state : public driver_device
 {
 public:
-	sprcros2_state(const machine_config &mconfig, device_type type, const char *tag)
+	sprcros2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_master(*this,"master"),
 		m_slave(*this,"slave"),
@@ -37,8 +37,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_bgtile_info);
 	TILE_GET_INFO_MEMBER(get_fgtile_info);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sprcros2);
 
 	INTERRUPT_GEN_MEMBER(s_interrupt);

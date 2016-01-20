@@ -35,7 +35,7 @@ gladiatr and Great Swordsman set.
 
 const device_type TAITO8741_4PACK = &device_creator<taito8741_4pack_device>;
 
-taito8741_4pack_device::taito8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+taito8741_4pack_device::taito8741_4pack_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TAITO8741_4PACK, "I8741 MCU Simulation (Taito 4Pack)", tag, owner, clock, "taito8741_4pack", __FILE__),
 	m_port_handler_0_r(*this),
 	m_port_handler_1_r(*this),
@@ -127,7 +127,7 @@ void taito8741_4pack_device::update(int num)
 		st = &m_taito8741[num];
 		if( st->connect != -1 )
 				sst = &m_taito8741[st->connect];
-		else sst = 0;
+		else sst = nullptr;
 		next = -1;
 		/* check pending command */
 		switch(st->phase)
@@ -347,7 +347,7 @@ joshi Vollyball set.
 
 const device_type JOSVOLLY8741_4PACK = &device_creator<josvolly8741_4pack_device>;
 
-josvolly8741_4pack_device::josvolly8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+josvolly8741_4pack_device::josvolly8741_4pack_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, JOSVOLLY8741_4PACK, "I8741 MCU Simulation (Joshi Volleyball)", tag, owner, clock, "josvolly8741_4pack", __FILE__),
 	m_port_handler_0_r(*this),
 	m_port_handler_1_r(*this),
@@ -381,15 +381,15 @@ void josvolly8741_4pack_device::device_reset()
 {
 	m_nmi_enable = 0;
 
-	for(int i=0;i<4;i++)
+	for(auto & elem : m_i8741)
 	{
-		m_i8741[i].cmd = 0;
-		m_i8741[i].sts = 0; // 0xf0; /* init flag */
-		m_i8741[i].txd = 0;
-		m_i8741[i].outport = 0xff;
-		m_i8741[i].rxd = 0;
+		elem.cmd = 0;
+		elem.sts = 0; // 0xf0; /* init flag */
+		elem.txd = 0;
+		elem.outport = 0xff;
+		elem.rxd = 0;
 
-		m_i8741[i].rst = 1;
+		elem.rst = 1;
 	}
 }
 

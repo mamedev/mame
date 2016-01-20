@@ -294,9 +294,9 @@ void nbmj8991_state::video_start()
 	int height = m_screen->height();
 
 	m_screen->register_screen_bitmap(m_tmpbitmap);
-	m_videoram = auto_alloc_array(machine(), UINT8, width * height);
-	m_clut = auto_alloc_array(machine(), UINT8, 0x800);
-	memset(m_videoram, 0x00, (width * height * sizeof(UINT8)));
+	m_videoram = std::make_unique<UINT8[]>(width * height);
+	m_clut = std::make_unique<UINT8[]>(0x800);
+	memset(m_videoram.get(), 0x00, (width * height * sizeof(UINT8)));
 
 	m_screen_refresh = 1;
 
@@ -313,8 +313,8 @@ void nbmj8991_state::video_start()
 	save_item(NAME(m_dispflag));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_clutsel));
-	save_pointer(NAME(m_videoram), width * height);
-	save_pointer(NAME(m_clut), 0x800);
+	save_pointer(NAME(m_videoram.get()), width * height);
+	save_pointer(NAME(m_clut.get()), 0x800);
 	save_item(NAME(m_flipscreen_old));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(nbmj8991_state::postload), this));

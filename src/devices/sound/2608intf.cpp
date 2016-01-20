@@ -151,7 +151,7 @@ void ym2608_device::device_start()
 	m_chip = ym2608_init(this,this,clock(),rate,
 					pcmbufa,pcmsizea,
 					timer_handler,IRQHandler,&psgintf);
-	assert_always(m_chip != NULL, "Error creating YM2608 chip");
+	assert_always(m_chip != nullptr, "Error creating YM2608 chip");
 }
 
 //-------------------------------------------------
@@ -185,7 +185,7 @@ WRITE8_MEMBER( ym2608_device::write )
 
 const device_type YM2608 = &device_creator<ym2608_device>;
 
-ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ym2608_device::ym2608_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: ay8910_device(mconfig, YM2608, "YM2608", tag, owner, clock, PSG_TYPE_YM, 1, 2, "ym2608", __FILE__),
 		m_irq_handler(*this)
 {

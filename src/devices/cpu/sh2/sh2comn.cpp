@@ -68,7 +68,7 @@ void sh2_device::sh2_timer_activate()
 			m_frc_base = total_cycles();
 			m_timer->adjust(cycles_to_attotime(max_delta));
 		} else {
-			logerror("SH2.%s: Timer event in %d cycles of external clock", tag(), max_delta);
+			logerror("SH2.%s: Timer event in %d cycles of external clock", tag().c_str(), max_delta);
 		}
 	}
 }
@@ -365,7 +365,7 @@ void sh2_device::sh2_do_dma(int dma)
 		}
 
 
-		LOG(("SH2.%s: DMA %d complete\n", tag(), dma));
+		LOG(("SH2.%s: DMA %d complete\n", tag().c_str(), dma));
 		m_m[0x62+4*dma] = 0;
 		m_m[0x63+4*dma] |= 2;
 		m_dma_timer_active[dma] = 0;
@@ -584,7 +584,7 @@ WRITE32_MEMBER( sh2_device::sh7604_w )
 		{
 			INT32 a = m_m[0x41];
 			INT32 b = m_m[0x40];
-			LOG(("SH2 '%s' div+mod %d/%d\n", tag(), a, b));
+			LOG(("SH2 '%s' div+mod %d/%d\n", tag().c_str(), a, b));
 			if (b)
 			{
 				m_m[0x45] = a / b;
@@ -612,7 +612,7 @@ WRITE32_MEMBER( sh2_device::sh7604_w )
 		{
 			INT64 a = m_m[0x45] | ((UINT64)(m_m[0x44]) << 32);
 			INT64 b = (INT32)m_m[0x40];
-			LOG(("SH2 '%s' div+mod %" I64FMT "d/%" I64FMT "d\n", tag(), a, b));
+			LOG(("SH2 '%s' div+mod %" I64FMT "d/%" I64FMT "d\n", tag().c_str(), a, b));
 			if (b)
 			{
 				INT64 q = a / b;
@@ -765,7 +765,7 @@ void sh2_device::sh2_set_frt_input(int state)
 	sh2_timer_resync();
 	m_icr = m_frc;
 	m_m[4] |= ICF;
-	//logerror("SH2.%s: ICF activated (%x)\n", tag(), m_sh2_state->pc & AM);
+	//logerror("SH2.%s: ICF activated (%x)\n", tag().c_str(), m_sh2_state->pc & AM);
 	sh2_recalc_irq();
 }
 
@@ -829,27 +829,27 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 			vector = m_internal_irq_vector;
 			/* avoid spurious irqs with this (TODO: needs a better fix) */
 			m_sh2_state->internal_irq_level = -1;
-			LOG(("SH-2 '%s' exception #%d (internal vector: $%x) after [%s]\n", tag(), irqline, vector, message));
+			LOG(("SH-2 '%s' exception #%d (internal vector: $%x) after [%s]\n", tag().c_str(), irqline, vector, message));
 		}
 		else
 		{
 			if(m_m[0x38] & 0x00010000)
 			{
 				vector = standard_irq_callback(irqline);
-				LOG(("SH-2 '%s' exception #%d (external vector: $%x) after [%s]\n", tag(), irqline, vector, message));
+				LOG(("SH-2 '%s' exception #%d (external vector: $%x) after [%s]\n", tag().c_str(), irqline, vector, message));
 			}
 			else
 			{
 				standard_irq_callback(irqline);
 				vector = 64 + irqline/2;
-				LOG(("SH-2 '%s' exception #%d (autovector: $%x) after [%s]\n", tag(), irqline, vector, message));
+				LOG(("SH-2 '%s' exception #%d (autovector: $%x) after [%s]\n", tag().c_str(), irqline, vector, message));
 			}
 		}
 	}
 	else
 	{
 		vector = 11;
-		LOG(("SH-2 '%s' nmi exception (autovector: $%x) after [%s]\n", tag(), vector, message));
+		LOG(("SH-2 '%s' nmi exception (autovector: $%x) after [%s]\n", tag().c_str(), vector, message));
 	}
 
 	if (m_isdrc)

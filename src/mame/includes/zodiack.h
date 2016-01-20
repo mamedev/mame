@@ -6,7 +6,7 @@
 class zodiack_state : public driver_device
 {
 public:
-	zodiack_state(const machine_config &mconfig, device_type type, const char *tag)
+	zodiack_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
@@ -57,9 +57,9 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	DECLARE_DRIVER_INIT(zodiack);
 	DECLARE_DRIVER_INIT(percuss);

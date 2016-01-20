@@ -413,16 +413,16 @@ READ8_MEMBER(tx1_state::ts_r)
 
 WRITE8_MEMBER(tx1_state::tx1_coin_cnt_w)
 {
-	coin_counter_w(machine(), 0, data & 0x80);
-	coin_counter_w(machine(), 1, data & 0x40);
-//  coin_counter_w(machine(), 2, data & 0x40);
+	machine().bookkeeping().coin_counter_w(0, data & 0x80);
+	machine().bookkeeping().coin_counter_w(1, data & 0x40);
+//  machine().bookkeeping().coin_counter_w(2, data & 0x40);
 }
 
 WRITE8_MEMBER(tx1_state::bb_coin_cnt_w)
 {
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
-//  coin_counter_w(machine(), 2, data & 0x04);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+//  machine().bookkeeping().coin_counter_w(2, data & 0x04);
 }
 
 WRITE8_MEMBER(tx1_state::tx1_ppi_latch_w)

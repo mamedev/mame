@@ -82,7 +82,7 @@ JMON ToDo:
 class tec1_state : public driver_device
 {
 public:
-	tec1_state(const machine_config &mconfig, device_type type, const char *tag)
+	tec1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
@@ -118,8 +118,8 @@ public:
 	UINT8 m_kbd_row;
 	UINT8 m_refresh[6];
 	UINT8 tec1_convert_col_to_bin( UINT8 col, UINT8 row );
-	virtual void machine_reset();
-	virtual void machine_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	TIMER_CALLBACK_MEMBER(tec1_kbd_callback);
 };
 
@@ -233,12 +233,12 @@ TIMER_CALLBACK_MEMBER(tec1_state::tec1_kbd_callback)
 		if (BIT(m_digit, i))
 		{
 			m_refresh[i] = 1;
-			output_set_digit_value(i, m_segment);
+			output().set_digit_value(i, m_segment);
 		}
 		else
 		if (m_refresh[i] == 0x80)
 		{
-			output_set_digit_value(i, 0);
+			output().set_digit_value(i, 0);
 			m_refresh[i] = 0;
 		}
 		else

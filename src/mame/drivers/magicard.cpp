@@ -174,7 +174,7 @@
 class magicard_state : public driver_device
 {
 public:
-	magicard_state(const machine_config &mconfig, device_type type, const char *tag)
+	magicard_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_magicram(*this, "magicram"),
 		m_magicramb(*this, "magicramb"),
@@ -222,8 +222,8 @@ public:
 	DECLARE_READ16_MEMBER(scc68070_mmu_r);
 	DECLARE_WRITE16_MEMBER(scc68070_mmu_w);
 	DECLARE_DRIVER_INIT(magicard);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(magicard_irq);
 	required_device<cpu_device> m_maincpu;

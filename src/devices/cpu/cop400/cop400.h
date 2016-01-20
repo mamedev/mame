@@ -128,9 +128,9 @@ class cop400_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	cop400_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, UINT8 program_addr_bits, UINT8 data_addr_bits, UINT8 featuremask, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, bool has_counter, bool has_inil, address_map_constructor internal_map_program, address_map_constructor internal_map_data);
+	cop400_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, UINT8 program_addr_bits, UINT8 data_addr_bits, UINT8 featuremask, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, bool has_counter, bool has_inil, address_map_constructor internal_map_program, address_map_constructor internal_map_data);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_read_l_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_read_l.set_callback(object); }
@@ -150,32 +150,32 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + m_cki - 1) / m_cki; }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * m_cki); }
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 2; }
-	virtual UINT32 execute_input_lines() const { return 0; }
-	virtual void execute_run();
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + m_cki - 1) / m_cki; }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * m_cki); }
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 2; }
+	virtual UINT32 execute_input_lines() const override { return 0; }
+	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
 	{
-		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : NULL );
+		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr );
 	}
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_export(const device_state_entry &entry);
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -370,7 +370,7 @@ class cop401_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop401_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cop401_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -378,7 +378,7 @@ class cop410_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop410_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cop410_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -387,7 +387,7 @@ class cop411_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop411_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cop411_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -397,7 +397,7 @@ class cop402_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop402_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cop402_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -405,7 +405,7 @@ class cop420_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop420_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cop420_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -414,7 +414,7 @@ class cop421_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop421_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cop421_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -423,7 +423,7 @@ class cop422_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop422_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cop422_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -433,7 +433,7 @@ class cop404_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop404_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cop404_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -442,7 +442,7 @@ class cop424_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop424_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cop424_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -451,7 +451,7 @@ class cop425_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop425_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cop425_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -460,7 +460,7 @@ class cop426_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop426_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cop426_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -468,7 +468,7 @@ class cop444_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop444_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cop444_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -477,7 +477,7 @@ class cop445_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop445_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cop445_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

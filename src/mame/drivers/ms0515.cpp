@@ -17,7 +17,7 @@
 class ms0515_state : public driver_device
 {
 public:
-	ms0515_state(const machine_config &mconfig, device_type type, const char *tag)
+	ms0515_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_ram(*this, RAM_TAG),
@@ -31,7 +31,7 @@ public:
 	DECLARE_WRITE16_MEMBER(ms0515_bank_w);
 	DECLARE_WRITE8_MEMBER(ms0515_sys_w);
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	UINT8 *m_video_ram;
 	UINT8 m_sysreg;

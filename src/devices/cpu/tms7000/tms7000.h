@@ -45,11 +45,11 @@ class tms7000_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tms7000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms7000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal, UINT32 info_flags, const char *shortname, const char *source);
+	tms7000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms7000_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, address_map_constructor internal, UINT32 info_flags, std::string shortname, std::string source);
 
-	DECLARE_READ8_MEMBER(tms7000_unmapped_rf_r) { if (!space.debugger_access()) logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag(), m_pc, offset + 0x80); return 0; };
-	DECLARE_WRITE8_MEMBER(tms7000_unmapped_rf_w) { logerror("'%s' (%04X): unmapped_rf_w @ $%04x = $%02x\n", tag(), m_pc, offset + 0x80, data); };
+	DECLARE_READ8_MEMBER(tms7000_unmapped_rf_r) { if (!space.debugger_access()) logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag().c_str(), m_pc, offset + 0x80); return 0; };
+	DECLARE_WRITE8_MEMBER(tms7000_unmapped_rf_w) { logerror("'%s' (%04X): unmapped_rf_w @ $%04x = $%02x\n", tag().c_str(), m_pc, offset + 0x80, data); };
 
 	DECLARE_READ8_MEMBER(tms7000_pf_r);
 	DECLARE_WRITE8_MEMBER(tms7000_pf_w);
@@ -64,28 +64,28 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 2 - 1) / 2; } // internal /2 divider
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 2); } // internal /2 divider
-	virtual UINT32 execute_min_cycles() const { return 5; }
-	virtual UINT32 execute_max_cycles() const { return 49; }
-	virtual UINT32 execute_input_lines() const { return 2; }
-	virtual void execute_run();
-	virtual void execute_set_input(int extline, int state);
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 2 - 1) / 2; } // internal /2 divider
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 2); } // internal /2 divider
+	virtual UINT32 execute_min_cycles() const override { return 5; }
+	virtual UINT32 execute_max_cycles() const override { return 49; }
+	virtual UINT32 execute_input_lines() const override { return 2; }
+	virtual void execute_run() override;
+	virtual void execute_set_input(int extline, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	virtual void execute_one(UINT8 op);
 
@@ -250,17 +250,17 @@ protected:
 class tms7020_device : public tms7000_device
 {
 public:
-	tms7020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms7020_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms7020_exl_device : public tms7000_device
 {
 public:
-	tms7020_exl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms7020_exl_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void execute_one(UINT8 op);
+	virtual void execute_one(UINT8 op) override;
 
 private:
 	void lvdp();
@@ -270,35 +270,35 @@ private:
 class tms7040_device : public tms7000_device
 {
 public:
-	tms7040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms7040_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms70c00_device : public tms7000_device
 {
 public:
-	tms70c00_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms70c00_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms70c20_device : public tms7000_device
 {
 public:
-	tms70c20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms70c20_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms70c40_device : public tms7000_device
 {
 public:
-	tms70c40_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms70c40_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms70c46_device : public tms7000_device
 {
 public:
-	tms70c46_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms70c46_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(control_r);
 	DECLARE_WRITE8_MEMBER(control_w);
@@ -314,8 +314,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	UINT8 m_control;
@@ -325,28 +325,28 @@ private:
 class tms7001_device : public tms7000_device
 {
 public:
-	tms7001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms7001_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms7041_device : public tms7000_device
 {
 public:
-	tms7041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms7041_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms7002_device : public tms7000_device
 {
 public:
-	tms7002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms7002_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms7042_device : public tms7000_device
 {
 public:
-	tms7042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms7042_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

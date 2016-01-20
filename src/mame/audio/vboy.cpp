@@ -184,8 +184,8 @@ static const INT8 outLvlTbl[16][16] = {
 	{ 0,  2,  4,  6,  8, 10, 12, 14, 16, 17, 19, 21, 23, 25, 27, 29}
 };
 
-INLINE UINT8 mgetb(register UINT8 *ptr) { return *ptr; }
-INLINE void mputb(UINT8 *ptr, INT8 data) { *ptr = data; }
+static inline UINT8 mgetb(register UINT8 *ptr) { return *ptr; }
+static inline void mputb(UINT8 *ptr, INT8 data) { *ptr = data; }
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -195,7 +195,7 @@ INLINE void mputb(UINT8 *ptr, INT8 data) { *ptr = data; }
 //  vboysnd_device - constructor
 //-------------------------------------------------
 
-vboysnd_device::vboysnd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vboysnd_device::vboysnd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VBOYSND, "Virtual Boy audio", tag, owner, clock, "vboysnd", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
@@ -224,7 +224,7 @@ void vboysnd_device::device_start()
 
 	memset(m_aram, 0, 0x600);
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(attotime::zero, 0, attotime::from_hz(AUDIO_FREQ/4));
 }
 

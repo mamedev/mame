@@ -3,7 +3,7 @@
 OP(illegal,2)
 {
 	logerror("Z180 '%s' ill. opcode $ed $%02x\n",
-			tag(), m_odirect->read_byte((_PCD-1)&0xffff));
+			tag().c_str(), m_odirect->read_byte((_PCD-1)&0xffff));
 }
 
 /**********************************************************

@@ -208,7 +208,7 @@ class s100_bus_t : public device_t
 {
 public:
 	// construction/destruction
-	s100_bus_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s100_bus_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~s100_bus_t() { m_device_list.detach_all(); }
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_irq.set_callback(object); }
@@ -257,8 +257,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	devcb_write_line   m_write_irq;
@@ -290,10 +290,10 @@ class s100_slot_t : public device_t,
 {
 public:
 	// construction/destruction
-	s100_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s100_slot_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	s100_bus_t  *m_bus;

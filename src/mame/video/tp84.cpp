@@ -53,8 +53,8 @@ PALETTE_INIT_MEMBER(tp84_state, tp84)
 	/* compute the color output resistor weights */
 	compute_resistor_weights(0, 255, -1.0,
 			4, resistances, weights, 470, 0,
-			0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0);
+			0, nullptr, nullptr, 0, 0,
+			0, nullptr, nullptr, 0, 0);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)

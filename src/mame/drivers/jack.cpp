@@ -878,8 +878,8 @@ MACHINE_RESET_MEMBER(jack_state,striv)
 	m_question_address = 0;
 	m_question_rom = 0;
 
-	for (int i = 0; i < 16; i++)
-		m_remap_address[i] = 0;
+	for (auto & elem : m_remap_address)
+		elem = 0;
 }
 
 
@@ -1204,16 +1204,16 @@ ROM_START( sucasino )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "11",           0x0000, 0x1000, CRC(f92c4c5b) SHA1(a415c8f55d1792e79d05ece223ef423f8578f896) )
-	ROM_FILL(                 0x1000, 0x1000, 0 )
+	ROM_FILL(                 0x1000, 0x1000, 0x00 )
 	ROM_LOAD( "10",           0x2000, 0x1000, CRC(3b0783ce) SHA1(880f258351a8b0d76abe433cc77d95b991ae1adc) )
-	ROM_FILL(                 0x3000, 0x1000, 0 )
+	ROM_FILL(                 0x3000, 0x1000, 0x00 )
 ROM_END
 
 
 ROM_START( tripool )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tri73a.bin",   0x0000, 0x1000, CRC(96893aa7) SHA1(ea1dc5824d89c1bb131850625a65d018a9127179) )
-	ROM_FILL(                 0x1000, 0x1000, 0 )
+	ROM_FILL(                 0x1000, 0x1000, 0x00 )
 	ROM_LOAD( "tri62a.bin",   0x2000, 0x1000, CRC(3299dc65) SHA1(8f93247e2f49be6b601006be62f4ad539ec899fe) )
 	ROM_LOAD( "tri52b.bin",   0x3000, 0x1000, CRC(27ef765e) SHA1(2a18a9b74fd4d9f3a724270cd3a98adbfdf22a5e) )
 	ROM_LOAD( "tri33c.bin",   0xc000, 0x1000, CRC(d7ef061d) SHA1(3ea3a136ecb3b5753a1dd929212b93ad8c7e9157) )
@@ -1226,16 +1226,16 @@ ROM_START( tripool )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "tri105a.bin",  0x0000, 0x1000, CRC(366a753c) SHA1(30fa8d80e42287e3e8677aefd15beab384265728) )
-	ROM_FILL(                 0x1000, 0x1000, 0 )
+	ROM_FILL(                 0x1000, 0x1000, 0x00 )
 	ROM_LOAD( "tri93a.bin",   0x2000, 0x1000, CRC(35213782) SHA1(05d5a67ffa3d26377c54777917d3ba51677ebd28) )
-	ROM_FILL(                 0x3000, 0x1000, 0 )
+	ROM_FILL(                 0x3000, 0x1000, 0x00 )
 ROM_END
 
 
 ROM_START( tripoola )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tri73a.bin",   0x0000, 0x1000, CRC(96893aa7) SHA1(ea1dc5824d89c1bb131850625a65d018a9127179) )
-	ROM_FILL(                 0x1000, 0x1000, 0 )
+	ROM_FILL(                 0x1000, 0x1000, 0x00 )
 	ROM_LOAD( "tri62a.bin",   0x2000, 0x1000, CRC(3299dc65) SHA1(8f93247e2f49be6b601006be62f4ad539ec899fe) )
 	ROM_LOAD( "tri52b.bin",   0x3000, 0x1000, CRC(27ef765e) SHA1(2a18a9b74fd4d9f3a724270cd3a98adbfdf22a5e) )
 	ROM_LOAD( "tri33c.bin",   0xc000, 0x1000, CRC(d7ef061d) SHA1(3ea3a136ecb3b5753a1dd929212b93ad8c7e9157) )
@@ -1248,9 +1248,9 @@ ROM_START( tripoola )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "tri105a.bin",  0x0000, 0x1000, CRC(366a753c) SHA1(30fa8d80e42287e3e8677aefd15beab384265728) )
-	ROM_FILL(                 0x1000, 0x1000, 0 )
+	ROM_FILL(                 0x1000, 0x1000, 0x00 )
 	ROM_LOAD( "tri93a.bin",   0x2000, 0x1000, CRC(35213782) SHA1(05d5a67ffa3d26377c54777917d3ba51677ebd28) )
-	ROM_FILL(                 0x3000, 0x1000, 0 )
+	ROM_FILL(                 0x3000, 0x1000, 0x00 )
 ROM_END
 
 

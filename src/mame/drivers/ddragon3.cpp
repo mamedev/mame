@@ -290,13 +290,13 @@ WRITE8_MEMBER(wwfwfest_state::wwfwfest_priority_w)
 /* DIPs are spread across the other input ports */
 CUSTOM_INPUT_MEMBER(wwfwfest_state::dsw_3f_r)
 {
-	const char *tag = (const char *)param;
+	std::string tag = (const char *)param;
 	return ioport(tag)->read() & 0x3f;
 }
 
 CUSTOM_INPUT_MEMBER(wwfwfest_state::dsw_c0_r)
 {
-	const char *tag = (const char *)param;
+	std::string tag = (const char *)param;
 	return (ioport(tag)->read() & 0xc0) >> 6;
 }
 

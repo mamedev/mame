@@ -362,7 +362,7 @@ INTERRUPT_GEN_MEMBER(microtan_state::microtan_interrupt)
 		m_lastrow = row;
 		/* CapsLock LED */
 		if( row == 3 && chg == 0x80 )
-			set_led_status(machine(), 1, (m_keyrows[3] & 0x80) ? 0 : 1);
+			output().set_led_value(1, (m_keyrows[3] & 0x80) ? 0 : 1);
 
 		if (newvar & chg)  /* key(s) pressed ? */
 		{
@@ -463,11 +463,11 @@ DRIVER_INIT_MEMBER(microtan_state,microtan)
 			space.nop_readwrite(0x0400, 0xbbff);
 			break;
 		case 1:  // +7K TANEX
-			space.install_ram(0x0400, 0x1fff,NULL);
+			space.install_ram(0x0400, 0x1fff,nullptr);
 			space.nop_readwrite(0x2000, 0xbbff);
 			break;
 		default: // +7K TANEX + 40K TANRAM
-			space.install_ram(0x0400, 0xbbff, NULL);
+			space.install_ram(0x0400, 0xbbff, nullptr);
 			break;
 	}
 
@@ -519,7 +519,7 @@ void microtan_state::machine_reset()
 	{
 		m_keyrows[i] = ioport(keynames[i-1])->read();
 	}
-	set_led_status(machine(), 1, (m_keyrows[3] & 0x80) ? 0 : 1);
+	output().set_led_value(1, (m_keyrows[3] & 0x80) ? 0 : 1);
 }
 
 int microtan_state::microtan_verify_snapshot(UINT8 *data, int size)

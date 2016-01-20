@@ -165,8 +165,8 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_text_tile_info)
 
 void macrossp_state::video_start()
 {
-	m_spriteram_old = auto_alloc_array_clear(machine(), UINT32, m_spriteram.bytes() / 4);
-	m_spriteram_old2 = auto_alloc_array_clear(machine(), UINT32, m_spriteram.bytes() / 4);
+	m_spriteram_old = make_unique_clear<UINT32[]>(m_spriteram.bytes() / 4);
+	m_spriteram_old2 = make_unique_clear<UINT32[]>(m_spriteram.bytes() / 4);
 
 	m_text_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(macrossp_state::get_macrossp_text_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_scra_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(macrossp_state::get_macrossp_scra_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
@@ -183,8 +183,8 @@ void macrossp_state::video_start()
 	m_gfxdecode->gfx(2)->set_granularity(64);
 	m_gfxdecode->gfx(3)->set_granularity(64);
 
-	save_pointer(NAME(m_spriteram_old), m_spriteram.bytes() / 4);
-	save_pointer(NAME(m_spriteram_old2), m_spriteram.bytes() / 4);
+	save_pointer(NAME(m_spriteram_old.get()), m_spriteram.bytes() / 4);
+	save_pointer(NAME(m_spriteram_old2.get()), m_spriteram.bytes() / 4);
 }
 
 
@@ -193,8 +193,8 @@ void macrossp_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, c
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	//  UINT32 *source = m_spriteram;
-	UINT32 *source = (m_spriteram_old2 + m_spriteram.bytes() / 4) - 3; /* buffers by two frames */
-	UINT32 *finish = m_spriteram_old2;
+	UINT32 *source = (m_spriteram_old2.get() + m_spriteram.bytes() / 4) - 3; /* buffers by two frames */
+	UINT32 *finish = m_spriteram_old2.get();
 
 	/* reverse order */
 	while (source >= finish)
@@ -463,7 +463,7 @@ void macrossp_state::screen_eof_macrossp(screen_device &screen, bool state)
 	if (state)
 	{
 		/* looks like sprites are *two* frames ahead, like nmk16 */
-		memcpy(m_spriteram_old2, m_spriteram_old, m_spriteram.bytes());
-		memcpy(m_spriteram_old, m_spriteram, m_spriteram.bytes());
+		memcpy(m_spriteram_old2.get(), m_spriteram_old.get(), m_spriteram.bytes());
+		memcpy(m_spriteram_old.get(), m_spriteram, m_spriteram.bytes());
 	}
 }

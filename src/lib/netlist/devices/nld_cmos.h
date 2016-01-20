@@ -24,13 +24,13 @@ class nld_vdd_vss : public device_t
 		analog_input_t m_vss;
 
 	protected:
-		ATTR_HOT void update() {};
-		ATTR_HOT void start()
+		ATTR_HOT void update() override {};
+		ATTR_HOT void start() override
 		{
 			register_input("VDD", m_vdd);
 			register_input("VSS", m_vss);
 		};
-		ATTR_HOT void reset()  {};
+		ATTR_HOT void reset() override  {};
 
 public:
 	ATTR_HOT inline nl_double vdd() { return INPANALOG(m_vdd); }

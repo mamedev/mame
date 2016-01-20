@@ -57,7 +57,7 @@
 class hp9k3xx_state : public driver_device
 {
 public:
-	hp9k3xx_state(const machine_config &mconfig, device_type type, const char *tag)
+	hp9k3xx_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU_TAG),
 		m_vram16(*this, "vram16"),
@@ -65,7 +65,7 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	optional_shared_ptr<UINT16> m_vram16;
 	optional_shared_ptr<UINT32> m_vram;

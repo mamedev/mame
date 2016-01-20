@@ -311,7 +311,7 @@
 class fanucs15_state : public driver_device
 {
 public:
-	fanucs15_state(const machine_config &mconfig, device_type type, const char *tag)
+	fanucs15_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")       // main 68020
 		, m_pmccpu(*this, "pmccpu")         // sub 68000-12
@@ -325,7 +325,7 @@ public:
 	required_device<i80286_cpu_device> m_convcpu;
 
 private:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 static ADDRESS_MAP_START(maincpu_mem, AS_PROGRAM, 32, fanucs15_state)

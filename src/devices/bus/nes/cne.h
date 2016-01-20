@@ -12,13 +12,13 @@ class nes_cne_decathl_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_cne_decathl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_cne_decathl_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual void device_start() override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -28,14 +28,14 @@ class nes_cne_fsb_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_cne_fsb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_cne_fsb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_READ8_MEMBER(read_m);
-	virtual DECLARE_WRITE8_MEMBER(write_m);
+	virtual void device_start() override;
+	virtual DECLARE_READ8_MEMBER(read_m) override;
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -45,13 +45,13 @@ class nes_cne_shlz_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_cne_shlz_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_cne_shlz_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_WRITE8_MEMBER(write_l);
+	virtual void device_start() override;
+	virtual DECLARE_WRITE8_MEMBER(write_l) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 

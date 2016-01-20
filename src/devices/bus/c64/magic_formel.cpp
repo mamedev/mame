@@ -139,7 +139,7 @@ INPUT_CHANGED_MEMBER( c64_magic_formel_cartridge_device::freeze )
 
 static INPUT_PORTS_START( c64_magic_formel )
 	PORT_START("FREEZE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, c64_magic_formel_cartridge_device, freeze, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, c64_magic_formel_cartridge_device, freeze, nullptr)
 INPUT_PORTS_END
 
 
@@ -162,7 +162,7 @@ ioport_constructor c64_magic_formel_cartridge_device::device_input_ports() const
 //  c64_magic_formel_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_magic_formel_cartridge_device::c64_magic_formel_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c64_magic_formel_cartridge_device::c64_magic_formel_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_MAGIC_FORMEL, "C64 Magic Formel cartridge", tag, owner, clock, "c64_magic_formel", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_pia(*this, MC6821_TAG),

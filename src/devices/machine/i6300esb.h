@@ -18,18 +18,18 @@
 
 class i6300esb_lpc_device : public pci_device {
 public:
-	i6300esb_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i6300esb_lpc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual void reset_all_mappings();
+	virtual void reset_all_mappings() override;
 	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space);
+							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;
 
-	virtual DECLARE_ADDRESS_MAP(config_map, 32);
+	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	required_device<lpc_acpi_device> acpi;
@@ -144,11 +144,11 @@ private:
 
 class i6300esb_watchdog_device : public pci_device {
 public:
-	i6300esb_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i6300esb_watchdog_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	DECLARE_ADDRESS_MAP(map, 32);

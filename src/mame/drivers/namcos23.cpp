@@ -1384,7 +1384,7 @@ struct c404_t
 
 struct render_t
 {
-	namcos23_renderer *polymgr;
+	std::unique_ptr<namcos23_renderer> polymgr;
 	int cur;
 	int poly_count;
 	int count[2];
@@ -1396,7 +1396,7 @@ struct render_t
 class namcos23_state : public driver_device
 {
 public:
-	namcos23_state(const machine_config &mconfig, device_type type, const char *tag)
+	namcos23_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
@@ -1534,7 +1534,6 @@ public:
 	DECLARE_WRITE16_MEMBER(mcu_p8_w);
 	DECLARE_READ16_MEMBER(mcu_pa_r);
 	DECLARE_WRITE16_MEMBER(mcu_pa_w);
-	DECLARE_READ16_MEMBER(mcu_rtc_r);
 	DECLARE_READ16_MEMBER(mcu_pb_r);
 	DECLARE_WRITE16_MEMBER(mcu_pb_w);
 	DECLARE_READ16_MEMBER(mcu_p6_r);
@@ -1551,8 +1550,8 @@ public:
 	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
 	DECLARE_VIDEO_START(s23);
 	DECLARE_MACHINE_RESET(gmen);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(c361_timer_cb);
@@ -1575,7 +1574,6 @@ public:
 	void c435_matrix_set();
 	void c435_vector_set();
 	void c435_matrix_vector_mul();
-	void c435_vector_matrix_mul();
 	void c435_state_set();
 	void c435_scaling_set();
 	void c435_render();
@@ -1655,7 +1653,7 @@ float namcos23_state::f24_to_f32(UINT32 v)
 	return *(float *)&r;
 }
 
-INLINE UINT8 light(UINT8 c, float l)
+static inline UINT8 light(UINT8 c, float l)
 {
 	if(l < 1)
 		l = l*c;
@@ -1706,7 +1704,7 @@ void namcos23_state::c435_state_set_projection_matrix_line(const UINT16 *param)
 	for(int i=0; i<8; i++)
 		p += sprintf(p, " %f", f24_to_f32((param[2*i+1] << 16) | param[2*i+2]));
 	p += sprintf(p, "\n");
-	logerror(buf);
+	logerror("%s\n",buf);
 }
 
 void namcos23_state::c435_state_set(UINT16 type, const UINT16 *param)
@@ -1721,7 +1719,7 @@ void namcos23_state::c435_state_set(UINT16 type, const UINT16 *param)
 		for(int i=0; i<c435_get_state_entry_size(type); i++)
 			p += sprintf(p, " %04x", param[i]);
 		p += sprintf(p, "\n");
-		logerror(buf);
+		logerror("%s",buf);
 		break;
 	}
 	}
@@ -1897,7 +1895,7 @@ void namcos23_state::c435_render() // 8
 	re->model.scaling = use_scaling ? m_scaling / 16384.0 : 1.0;
 	memcpy(re->model.m, m, sizeof(re->model.m));
 	memcpy(re->model.v, v, sizeof(re->model.v));
-	//	re->model.v[2] *= 768/420.0;
+	//  re->model.v[2] *= 768/420.0;
 
 	if(0)
 		logerror("Render %04x (%f %f %f %f %f %f %f %f %f) (%f %f %f) %f\n",
@@ -1968,7 +1966,7 @@ void namcos23_state::c435_pio_w(UINT16 data)
 		for(int i=0; i<m_c435_buffer_pos; i++)
 			p += sprintf(p, " %04x", m_c435_buffer[i]);
 		p += sprintf(p, "\n");
-		logerror(buf);
+		logerror("%s",buf);
 	}
 
 	m_c435_buffer_pos = 0;
@@ -2380,7 +2378,7 @@ VIDEO_START_MEMBER(namcos23_state,s23)
 	m_bgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos23_state::TextTilemapGetInfo),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_bgtilemap->set_transparent_pen(0xf);
 	m_bgtilemap->set_scrolldx(860, 860);
-	m_render.polymgr = auto_alloc(machine(), namcos23_renderer(*this));
+	m_render.polymgr = std::make_unique<namcos23_renderer>(*this);
 }
 
 
@@ -2768,7 +2766,7 @@ WRITE16_MEMBER(namcos23_state::ctl_w)
 		if(m_ctl_led != (data & 0xff)) {
 			m_ctl_led = data & 0xff;
 			for(int i = 0; i < 8; i++)
-				output_set_lamp_value(i, (~data<<i & 0x80) ? 0 : 1);
+				output().set_lamp_value(i, (~data<<i & 0x80) ? 0 : 1);
 		}
 		break;
 
@@ -3385,20 +3383,20 @@ static INPUT_PORTS_START( downhill )
 	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN01")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3)		// brake left
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START1)		// start
-	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_SERVICE) PORT_TOGGLE	// test switch
-	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)		// select up
-	PORT_BIT(0x400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)	// select down
-	PORT_BIT(0x800, IP_ACTIVE_LOW, IPT_BUTTON1)	// enter
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3)      // brake left
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START1)       // start
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_SERVICE) PORT_TOGGLE // test switch
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)     // select up
+	PORT_BIT(0x400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)   // select down
+	PORT_BIT(0x800, IP_ACTIVE_LOW, IPT_BUTTON1) // enter
 	PORT_BIT(0xf00c, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
 	PORT_START("IN23")
-	PORT_BIT(0x400, IP_ACTIVE_LOW, IPT_BUTTON4)		// brake right
+	PORT_BIT(0x400, IP_ACTIVE_LOW, IPT_BUTTON4)     // brake right
 	PORT_BIT(0xfbff, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )	// service coin
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )   // service coin
 
 	PORT_START("DSW")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
@@ -3523,7 +3521,7 @@ static const gfx_layout namcos23_cg_layout =
 }; /* cg_layout */
 
 static GFXDECODE_START( namcos23 )
-	GFXDECODE_ENTRY( NULL, 0, namcos23_cg_layout, 0, 0x800 )
+	GFXDECODE_ENTRY( nullptr, 0, namcos23_cg_layout, 0, 0x800 )
 GFXDECODE_END
 
 

@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "bgfx_p.h"
@@ -11,6 +11,7 @@
 #	if BGFX_USE_EGL
 
 #		if BX_PLATFORM_RPI
+#			include <X11/Xlib.h>
 #			include <bcm_host.h>
 #		endif // BX_PLATFORM_RPI
 
@@ -145,12 +146,6 @@ EGL_IMPORT
 
 #	if BX_PLATFORM_RPI
 	static EGL_DISPMANX_WINDOW_T s_dispmanWindow;
-
-	void x11SetDisplayWindow(::Display* _display, ::Window _window)
-	{
-		// Noop for now...
-		BX_UNUSED(_display, _window);
-	}
 #	endif // BX_PLATFORM_RPI
 
 	void GlContext::create(uint32_t _width, uint32_t _height)
@@ -163,6 +158,10 @@ EGL_IMPORT
 
 		if (NULL == g_platformData.context)
 		{
+#	if BX_PLATFORM_RPI
+			g_platformData.ndt = EGL_DEFAULT_DISPLAY;
+#	endif // BX_PLATFORM_RPI
+
 			BX_UNUSED(_width, _height);
 			EGLNativeDisplayType ndt = (EGLNativeDisplayType)g_platformData.ndt;
 			EGLNativeWindowType  nwh = (EGLNativeWindowType )g_platformData.nwh;
@@ -224,8 +223,8 @@ EGL_IMPORT
 			DISPMANX_DISPLAY_HANDLE_T dispmanDisplay = vc_dispmanx_display_open(0);
 			DISPMANX_UPDATE_HANDLE_T  dispmanUpdate  = vc_dispmanx_update_start(0);
 
-			VC_RECT_T dstRect = { 0, 0, _width,        _height       };
-			VC_RECT_T srcRect = { 0, 0, _width  << 16, _height << 16 };
+			VC_RECT_T dstRect = { 0, 0, int32_t(_width),        int32_t(_height)       };
+			VC_RECT_T srcRect = { 0, 0, int32_t(_width)  << 16, int32_t(_height) << 16 };
 
 			DISPMANX_ELEMENT_HANDLE_T dispmanElement = vc_dispmanx_element_add(dispmanUpdate
 				, dispmanDisplay
@@ -259,6 +258,9 @@ EGL_IMPORT
 
 				EGLint flags = 0;
 
+#	if BX_PLATFORM_RPI
+				BX_UNUSED(hasEglKhrCreateContext, hasEglKhrNoError);
+#else
 				if (hasEglKhrCreateContext)
 				{
 					bx::write(&writer, EGLint(EGL_CONTEXT_MAJOR_VERSION_KHR) );
@@ -285,6 +287,7 @@ EGL_IMPORT
 					}
 				}
 				else
+#	endif // BX_PLATFORM_RPI
 				{
 					bx::write(&writer, EGLint(EGL_CONTEXT_CLIENT_VERSION) );
 					bx::write(&writer, 2);

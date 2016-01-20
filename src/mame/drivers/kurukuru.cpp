@@ -204,7 +204,7 @@
 class kurukuru_state : public driver_device
 {
 public:
-	kurukuru_state(const machine_config &mconfig, device_type type, const char *tag)
+	kurukuru_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_audiocpu(*this, "audiocpu"),
 		m_v9938(*this, "v9938"),
@@ -231,8 +231,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ym2149_bout_w);
 
 	void update_sound_irq(UINT8 cause);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_vdp_interrupt);
 	required_device<cpu_device> m_maincpu;
@@ -309,9 +309,9 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
     07 | Not connected      | unused
 
 */
-	coin_counter_w(machine(), 0, data & 0x01);      /* Coin Counter 1 */
-	coin_counter_w(machine(), 1, data & 0x20);      /* Coin Counter 2 */
-	coin_lockout_global_w(machine(), data & 0x40);  /* Coin Lock */
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);      /* Coin Counter 1 */
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);      /* Coin Counter 2 */
+	machine().bookkeeping().coin_lockout_global_w(data & 0x40);  /* Coin Lock */
 	m_hopper->write(space, 0, (data & 0x40));    /* Hopper Motor */
 
 	if (data & 0x9e)

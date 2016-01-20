@@ -12,7 +12,7 @@
 class malzak_state : public driver_device
 {
 public:
-	malzak_state(const machine_config &mconfig, device_type type, const char *tag)
+	malzak_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_s2636_0(*this, "s2636_0"),
@@ -50,8 +50,8 @@ public:
 	DECLARE_READ8_MEMBER(collision_r);
 	DECLARE_WRITE8_MEMBER(malzak_playfield_w);
 	DECLARE_READ8_MEMBER(videoram_r);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(malzak);
 	UINT32 screen_update_malzak(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };

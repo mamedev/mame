@@ -138,7 +138,7 @@ const struct CassetteFormat atom_tap_format =
 	"tap",
 	atom_tap_identify,
 	atom_tap_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START( atom_cassette_formats )

@@ -76,13 +76,13 @@ VIDEO_START_MEMBER(toaplan2_state,toaplan2)
 	/* our current VDP implementation needs this bitmap to work with */
 	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
 
-	if (m_vdp0 != NULL)
+	if (m_vdp0 != nullptr)
 	{
 		m_secondary_render_bitmap.reset();
 		m_vdp0->custom_priority_bitmap = &m_custom_priority_bitmap;
 	}
 
-	if (m_vdp1 != NULL)
+	if (m_vdp1 != nullptr)
 	{
 		m_screen->register_screen_bitmap(m_secondary_render_bitmap);
 		m_vdp1->custom_priority_bitmap = &m_custom_priority_bitmap;

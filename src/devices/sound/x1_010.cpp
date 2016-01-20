@@ -85,13 +85,13 @@ struct X1_010_CHANNEL {
 
 const device_type X1_010 = &device_creator<x1_010_device>;
 
-x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+x1_010_device::x1_010_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, X1_010, "X1-010", tag, owner, clock, "x1_010", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
 		m_rate(0),
 		m_adr(0),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_sound_enable(0),
 		m_base_clock(0)
 {
@@ -192,9 +192,9 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 {
 	X1_010_CHANNEL  *reg;
 	int     ch, i, volL, volR, freq, div;
-	register INT8   *start, *end, data;
-	register UINT8  *env;
-	register UINT32 smp_offs, smp_step, env_offs, env_step, delta;
+	INT8   *start, *end, data;
+	UINT8  *env;
+	UINT32 smp_offs, smp_step, env_offs, env_step, delta;
 
 	// mixer buffer zero clear
 	memset( outputs[0], 0, samples*sizeof(*outputs[0]) );

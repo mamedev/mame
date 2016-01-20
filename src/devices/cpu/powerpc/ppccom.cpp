@@ -207,67 +207,67 @@ const device_type PPC403GCX = &device_creator<ppc403gcx_device>;
 const device_type PPC405GP = &device_creator<ppc405gp_device>;
 
 
-ppc_device::ppc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int address_bits, int data_bits, powerpc_flavor flavor, UINT32 cap, UINT32 tb_divisor, address_map_constructor internal_map)
+ppc_device::ppc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int address_bits, int data_bits, powerpc_flavor flavor, UINT32 cap, UINT32 tb_divisor, address_map_constructor internal_map)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, data_bits, address_bits, 0, internal_map)
 	, c_bus_frequency(0)
-	, m_core(NULL)
+	, m_core(nullptr)
 	, m_bus_freq_multiplier(1)
-	, m_vtlb(NULL)
+	, m_vtlb(nullptr)
 	, m_flavor(flavor)
 	, m_cap(cap)
 	, m_tb_divisor(tb_divisor)
 	, m_cache(CACHE_SIZE + sizeof(internal_ppc_state))
-	, m_drcuml(NULL)
-	, m_drcfe(NULL)
+	, m_drcuml(nullptr)
+	, m_drcfe(nullptr)
 	, m_drcoptions(0)
 {
 	m_program_config.m_logaddr_width = 32;
 	m_program_config.m_page_shift = POWERPC_MIN_PAGE_SHIFT;
 }
 
-//ppc403_device::ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+//ppc403_device::ppc403_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 //  : ppc_device(mconfig, PPC403, "PPC403", tag, owner, clock, "ppc403", 32?, 64?)
 //{
 //}
 //
-//ppc405_device::ppc405_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+//ppc405_device::ppc405_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 //  : ppc_device(mconfig, PPC405, "PPC405", tag, owner, clock, "ppc405", 32?, 64?)
 //{
 //}
 
-ppc603_device::ppc603_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ppc_device(mconfig, PPC603, "PowerPC 603", tag, owner, clock, "ppc603", 32, 64, PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, NULL)
+ppc603_device::ppc603_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+	: ppc_device(mconfig, PPC603, "PowerPC 603", tag, owner, clock, "ppc603", 32, 64, PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, nullptr)
 {
 }
 
-ppc603e_device::ppc603e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ppc_device(mconfig, PPC603E, "PowerPC 603e", tag, owner, clock, "ppc603e", 32, 64, PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, NULL)
+ppc603e_device::ppc603e_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+	: ppc_device(mconfig, PPC603E, "PowerPC 603e", tag, owner, clock, "ppc603e", 32, 64, PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, nullptr)
 {
 }
 
-ppc603r_device::ppc603r_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ppc_device(mconfig, PPC603R, "PowerPC 603R", tag, owner, clock, "ppc603r", 32, 64, PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, NULL)
+ppc603r_device::ppc603r_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+	: ppc_device(mconfig, PPC603R, "PowerPC 603R", tag, owner, clock, "ppc603r", 32, 64, PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, nullptr)
 {
 }
 
-ppc602_device::ppc602_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ppc_device(mconfig, PPC602, "PowerPC 602", tag, owner, clock, "ppc602", 32, 64, PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, NULL)
+ppc602_device::ppc602_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+	: ppc_device(mconfig, PPC602, "PowerPC 602", tag, owner, clock, "ppc602", 32, 64, PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, nullptr)
 {
 }
 
-mpc8240_device::mpc8240_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ppc_device(mconfig, MPC8240, "PowerPC MPC8240", tag, owner, clock, "mpc8240", 32, 64, PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4/* unknown */, NULL)
+mpc8240_device::mpc8240_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+	: ppc_device(mconfig, MPC8240, "PowerPC MPC8240", tag, owner, clock, "mpc8240", 32, 64, PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4/* unknown */, nullptr)
 {
 }
 
-ppc601_device::ppc601_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ppc_device(mconfig, PPC601, "PowerPC 601", tag, owner, clock, "ppc601", 32, 64, PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_MFIOC | PPCCAP_601BAT, 0/* no TB */, NULL)
+ppc601_device::ppc601_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+	: ppc_device(mconfig, PPC601, "PowerPC 601", tag, owner, clock, "ppc601", 32, 64, PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_MFIOC | PPCCAP_601BAT, 0/* no TB */, nullptr)
 {
 }
 
-ppc604_device::ppc604_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ppc_device(mconfig, PPC604, "PowerPC 604", tag, owner, clock, "ppc604", 32, 64, PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU, 4, NULL)
+ppc604_device::ppc604_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+	: ppc_device(mconfig, PPC604, "PowerPC 604", tag, owner, clock, "ppc604", 32, 64, PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU, 4, nullptr)
 {
 }
 
@@ -275,22 +275,22 @@ static ADDRESS_MAP_START( internal_ppc4xx, AS_PROGRAM, 32, ppc4xx_device )
 	AM_RANGE(0x40000000, 0x4000000f) AM_READWRITE8(ppc4xx_spu_r, ppc4xx_spu_w, 0xffffffff)
 ADDRESS_MAP_END
 
-ppc4xx_device::ppc4xx_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, powerpc_flavor flavor, UINT32 cap, UINT32 tb_divisor)
+ppc4xx_device::ppc4xx_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, powerpc_flavor flavor, UINT32 cap, UINT32 tb_divisor)
 	: ppc_device(mconfig, type, name, tag, owner, clock, shortname, 31, 32, flavor, cap, tb_divisor, ADDRESS_MAP_NAME(internal_ppc4xx))
 {
 }
 
-ppc403ga_device::ppc403ga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ppc403ga_device::ppc403ga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: ppc4xx_device(mconfig, PPC403GA, "PowerPC 403GA", tag, owner, clock, "ppc403ga", PPC_MODEL_403GA, PPCCAP_4XX, 1)
 {
 }
 
-ppc403gcx_device::ppc403gcx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ppc403gcx_device::ppc403gcx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: ppc4xx_device(mconfig, PPC403GCX, "PowerPC 403GCX", tag, owner, clock, "ppc403gcx", PPC_MODEL_403GCX, PPCCAP_4XX, 1)
 {
 }
 
-ppc405gp_device::ppc405gp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ppc405gp_device::ppc405gp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: ppc4xx_device(mconfig, PPC405GP, "PowerPC 405GP", tag, owner, clock, "ppc405gp", PPC_MODEL_405GP, PPCCAP_4XX | PPCCAP_VEA, 1)
 {
 }
@@ -306,7 +306,7 @@ ppc405gp_device::ppc405gp_device(const machine_config &mconfig, const char *tag,
     of access and the protection bits
 -------------------------------------------------*/
 
-INLINE int page_access_allowed(int transtype, UINT8 key, UINT8 protbits)
+static inline int page_access_allowed(int transtype, UINT8 key, UINT8 protbits)
 {
 	if (key == 0)
 		return (transtype == TRANSLATE_WRITE) ? (protbits != 3) : TRUE;
@@ -450,7 +450,7 @@ inline void ppc_device::set_decrementer(UINT32 newdec)
     is_nan_double - is a double value a NaN
 -------------------------------------------------*/
 
-INLINE int is_nan_double(double x)
+static inline int is_nan_double(double x)
 {
 	UINT64 xi = *(UINT64*)&x;
 	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
@@ -464,7 +464,7 @@ INLINE int is_nan_double(double x)
     quiet NaN
 -------------------------------------------------*/
 
-INLINE int is_qnan_double(double x)
+static inline int is_qnan_double(double x)
 {
 	UINT64 xi = *(UINT64*)&x;
 	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
@@ -479,7 +479,7 @@ INLINE int is_qnan_double(double x)
     signaling NaN
 -------------------------------------------------*/
 
-INLINE int is_snan_double(double x)
+static inline int is_snan_double(double x)
 {
 	UINT64 xi = *(UINT64*)&x;
 	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
@@ -494,7 +494,7 @@ INLINE int is_snan_double(double x)
     infinity
 -------------------------------------------------*/
 
-INLINE int is_infinity_double(double x)
+static inline int is_infinity_double(double x)
 {
 	UINT64 xi = *(UINT64*)&x;
 	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
@@ -507,7 +507,7 @@ INLINE int is_infinity_double(double x)
     normalized
 -------------------------------------------------*/
 
-INLINE int is_normalized_double(double x)
+static inline int is_normalized_double(double x)
 {
 	UINT64 exp;
 	UINT64 xi = *(UINT64*)&x;
@@ -522,7 +522,7 @@ INLINE int is_normalized_double(double x)
     denormalized
 -------------------------------------------------*/
 
-INLINE int is_denormalized_double(double x)
+static inline int is_denormalized_double(double x)
 {
 	UINT64 xi = *(UINT64*)&x;
 	return( ((xi & DOUBLE_EXP) == 0) &&
@@ -534,7 +534,7 @@ INLINE int is_denormalized_double(double x)
     sign_double - return sign of a double value
 -------------------------------------------------*/
 
-INLINE int sign_double(double x)
+static inline int sign_double(double x)
 {
 	UINT64 xi = *(UINT64*)&x;
 	return ((xi & DOUBLE_SIGN) != 0);
@@ -557,11 +557,11 @@ void ppc_device::device_start()
 	m_core = (internal_ppc_state *)m_cache.alloc_near(sizeof(internal_ppc_state));
 	memset(m_core, 0, sizeof(internal_ppc_state));
 
-	m_entry = NULL;
-	m_nocode = NULL;
-	m_out_of_cycles = NULL;
-	m_tlb_mismatch = NULL;
-	m_swap_tgpr = NULL;
+	m_entry = nullptr;
+	m_nocode = nullptr;
+	m_out_of_cycles = nullptr;
+	m_tlb_mismatch = nullptr;
+	m_swap_tgpr = nullptr;
 	memset(m_lsw, 0, sizeof(m_lsw));
 	memset(m_stsw, 0, sizeof(m_stsw));
 	memset(m_read8, 0, sizeof(m_read8));
@@ -882,7 +882,7 @@ void ppc_device::device_start()
 
 	UINT32 flags = 0;
 	/* initialize the UML generator */
-	m_drcuml = auto_alloc(machine(), drcuml_state(*this, m_cache, flags, 8, 32, 2));
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 8, 32, 2);
 
 	/* add symbols for our stuff */
 	m_drcuml->symbol_add(&m_core->pc, sizeof(m_core->pc), "pc");
@@ -928,7 +928,7 @@ void ppc_device::device_start()
 	m_drcuml->symbol_add(&m_fcmp_cr_table, sizeof(m_fcmp_cr_table), "fcmp_cr_table");
 
 	/* initialize the front-end helper */
-	m_drcfe = auto_alloc(machine(), ppc_frontend(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
+	m_drcfe = std::make_unique<ppc_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 
 	/* compute the register parameters */
 	for (int regnum = 0; regnum < 32; regnum++)
@@ -1007,7 +1007,7 @@ void ppc_device::state_import(const device_state_entry &entry)
 }
 
 
-void ppc_device::state_string_export(const device_state_entry &entry, std::string &str)
+void ppc_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -1148,13 +1148,9 @@ void ppc_device::state_string_export(const device_state_entry &entry, std::strin
 
 void ppc_device::device_stop()
 {
-	if (m_vtlb != NULL)
+	if (m_vtlb != nullptr)
 		vtlb_free(m_vtlb);
-	m_vtlb = NULL;
-
-	/* clean up the DRC */
-	auto_free(machine(), m_drcfe);
-	auto_free(machine(), m_drcuml);
+	m_vtlb = nullptr;
 }
 
 
@@ -1176,7 +1172,7 @@ void ppc_device::device_reset()
 		m_dec_zero_cycles = total_cycles();
 		if (m_tb_divisor)
 		{
-			decrementer_int_callback(NULL, 0);
+			decrementer_int_callback(nullptr, 0);
 		}
 	}
 
@@ -1408,7 +1404,7 @@ UINT32 ppc_device::ppccom_translate_address_internal(int intention, offs_t &addr
 		UINT32 *ptegptr = (UINT32 *)m_program->get_read_ptr(ptegaddr);
 
 		/* should only have valid memory here, but make sure */
-		if (ptegptr != NULL)
+		if (ptegptr != nullptr)
 		{
 			UINT32 targetupper = 0x80000000 | ((segreg & 0xffffff) << 7) | (hashnum << 6) | ((address >> 22) & 0x3f);
 			int ptenum;
@@ -1520,7 +1516,7 @@ void ppc_device::ppccom_execute_tlbl()
 {
 	UINT32 address = m_core->param0;
 	int isitlb = m_core->param1;
-	vtlb_entry flags = 0;
+	vtlb_entry flags;
 	int entrynum;
 
 	/* determine entry number; we use rand() for associativity */
@@ -1794,9 +1790,9 @@ void ppc_device::ppccom_execute_mtspr()
 			case SPR4XX_TCR:
 				m_core->spr[SPR4XX_TCR] = m_core->param1 | (oldval & PPC4XX_TCR_WRC_MASK);
 				if ((oldval ^ m_core->spr[SPR4XX_TCR]) & PPC4XX_TCR_FIE)
-					ppc4xx_fit_callback(NULL, FALSE);
+					ppc4xx_fit_callback(nullptr, FALSE);
 				if ((oldval ^ m_core->spr[SPR4XX_TCR]) & PPC4XX_TCR_PIE)
-					ppc4xx_pit_callback(NULL, FALSE);
+					ppc4xx_pit_callback(nullptr, FALSE);
 				return;
 
 			/* timer status register */
@@ -1809,7 +1805,7 @@ void ppc_device::ppccom_execute_mtspr()
 			case SPR4XX_PIT:
 				m_core->spr[SPR4XX_PIT] = m_core->param1;
 				m_pit_reload = m_core->param1;
-				ppc4xx_pit_callback(NULL, FALSE);
+				ppc4xx_pit_callback(nullptr, FALSE);
 				return;
 
 			/* timebase */

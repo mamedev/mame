@@ -13,6 +13,8 @@ project "netlist"
 	uuid "665ef8ac-2a4c-4c3e-a05f-fd1e5db11de9"
 	kind (LIBTYPE)
 
+	addprojectflags()
+
 	includedirs {
 		MAME_DIR .. "src/lib/netlist",
 		MAME_DIR .. "src/osd",

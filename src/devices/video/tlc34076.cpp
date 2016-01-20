@@ -41,7 +41,7 @@ const device_type TLC34076 = &device_creator<tlc34076_device>;
 //-------------------------------------------------
 //  tlc34076_device - constructor
 //-------------------------------------------------
-tlc34076_device::tlc34076_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tlc34076_device::tlc34076_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	:   device_t(mconfig, TLC34076, "TLC34076 VIP", tag, owner, clock, "tlc34076", __FILE__),
 		m_dacbits(6)
 {

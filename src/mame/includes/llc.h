@@ -21,7 +21,7 @@
 class llc_state : public driver_device
 {
 public:
-	llc_state(const machine_config &mconfig, device_type type, const char *tag)
+	llc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_speaker(*this, "speaker"),
 		m_p_videoram(*this, "videoram"),
@@ -51,7 +51,7 @@ private:
 public:
 	DECLARE_DRIVER_INIT(llc2);
 	DECLARE_DRIVER_INIT(llc1);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(llc1);
 	DECLARE_MACHINE_RESET(llc1);
 	DECLARE_MACHINE_RESET(llc2);

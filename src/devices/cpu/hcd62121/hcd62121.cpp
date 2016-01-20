@@ -29,11 +29,11 @@ Martin Poupe's site can be found at http://martin.poupe.org/casio/
 const device_type HCD62121 = &device_creator<hcd62121_cpu_device>;
 
 
-hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, HCD62121, "Hitachi HCD62121", tag, owner, clock, "hcd62121", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 24, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0), m_prev_pc(0)
-	  , m_sp(0)
+		, m_sp(0)
 	, m_ip(0)
 	, m_dsize(0)
 	, m_cseg(0)
@@ -363,7 +363,7 @@ void hcd62121_cpu_device::device_start()
 }
 
 
-void hcd62121_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void hcd62121_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -493,9 +493,9 @@ void hcd62121_cpu_device::device_reset()
 	m_f = 0;
 	m_dsize = 0;
 
-	for( int i = 0; i < 0x80; i++ )
+	for(auto & elem : m_reg)
 	{
-		m_reg[i] = 0;
+		elem = 0;
 	}
 }
 

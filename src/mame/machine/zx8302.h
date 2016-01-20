@@ -98,7 +98,7 @@ class zx8302_device :  public device_t,
 {
 public:
 	// construction/destruction
-	zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	zx8302_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void set_rtc_clock(device_t &device, int rtc_clock) { downcast<zx8302_device &>(device).m_rtc_clock = rtc_clock; }
 	template<class _Object> static devcb_base &set_out_ipl1l_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_out_ipl1l_cb.set_callback(object); }
@@ -137,14 +137,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_serial_interface overrides
-	virtual void tra_callback();
-	virtual void tra_complete();
-	virtual void rcv_callback();
-	virtual void rcv_complete();
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+	virtual void rcv_callback() override;
+	virtual void rcv_complete() override;
 
 	inline void trigger_interrupt(UINT8 line);
 	inline void transmit_ipc_data();

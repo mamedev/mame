@@ -342,7 +342,7 @@ static int sol20_cassette_calculate_size_in_samples(const UINT8 *bytes, int leng
 {
 	sol20_image_size = length;
 
-	return sol20_handle_cassette(NULL, bytes);
+	return sol20_handle_cassette(nullptr, bytes);
 }
 
 static const struct CassetteLegacyWaveFiller sol20_legacy_fill_wave =
@@ -371,7 +371,7 @@ static const struct CassetteFormat sol20_cassette_image_format =
 	"svt",
 	sol20_cassette_identify,
 	sol20_cassette_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(sol20_cassette_formats)

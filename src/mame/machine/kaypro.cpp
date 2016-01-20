@@ -47,7 +47,7 @@ WRITE8_MEMBER( kaypro_state::kayproii_pio_system_w )
 	membank("bank3")->set_entry(BIT(data, 7));
 	m_is_motor_off = BIT(data, 6);
 
-	m_floppy = NULL;
+	m_floppy = nullptr;
 	if (BIT(data, 0))
 		m_floppy = m_floppy0->get_device();
 	else
@@ -63,8 +63,8 @@ WRITE8_MEMBER( kaypro_state::kayproii_pio_system_w )
 		m_floppy->ss_w(!BIT(data, 2)); // signal exists even though drives are single sided
 	}
 
-	output_set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
-	output_set_value("ledB", BIT(data, 1));
+	output().set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
+	output().set_value("ledB", BIT(data, 1));
 
 	m_centronics->write_strobe(BIT(data, 4));
 
@@ -108,7 +108,7 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 	membank("bank3")->set_entry(BIT(data, 7));
 	m_is_motor_off = !BIT(data, 4);
 
-	m_floppy = NULL;
+	m_floppy = nullptr;
 	if (!BIT(data, 0))
 		m_floppy = m_floppy0->get_device();
 	else
@@ -124,8 +124,8 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 		m_floppy->ss_w(!BIT(data, 2));
 	}
 
-	output_set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
-	output_set_value("ledB", BIT(data, 1));
+	output().set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
+	output().set_value("ledB", BIT(data, 1));
 
 	m_centronics->write_strobe(BIT(data, 3));
 

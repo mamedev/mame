@@ -1745,13 +1745,13 @@ struct voodoo_state
  *
  *************************************/
 
-INLINE void fifo_reset(fifo_state *f)
+static inline void fifo_reset(fifo_state *f)
 {
 	f->in = f->out = 0;
 }
 
 
-INLINE void fifo_add(fifo_state *f, UINT32 data)
+static inline void fifo_add(fifo_state *f, UINT32 data)
 {
 	INT32 next_in;
 
@@ -1769,7 +1769,7 @@ INLINE void fifo_add(fifo_state *f, UINT32 data)
 }
 
 
-INLINE UINT32 fifo_remove(fifo_state *f)
+static inline UINT32 fifo_remove(fifo_state *f)
 {
 	UINT32 data = 0xffffffff;
 
@@ -1791,25 +1791,25 @@ INLINE UINT32 fifo_remove(fifo_state *f)
 }
 
 
-INLINE UINT32 fifo_peek(fifo_state *f)
+static inline UINT32 fifo_peek(fifo_state *f)
 {
 	return f->base[f->out];
 }
 
 
-INLINE int fifo_empty(fifo_state *f)
+static inline int fifo_empty(fifo_state *f)
 {
 	return (f->in == f->out);
 }
 
 
-INLINE int fifo_full(fifo_state *f)
+static inline int fifo_full(fifo_state *f)
 {
 	return (f->in + 1 == f->out || (f->in == f->size - 1 && f->out == 0));
 }
 
 
-INLINE INT32 fifo_items(fifo_state *f)
+static inline INT32 fifo_items(fifo_state *f)
 {
 	INT32 items = f->in - f->out;
 	if (items < 0)
@@ -1818,7 +1818,7 @@ INLINE INT32 fifo_items(fifo_state *f)
 }
 
 
-INLINE INT32 fifo_space(fifo_state *f)
+static inline INT32 fifo_space(fifo_state *f)
 {
 	INT32 items = f->in - f->out;
 	if (items < 0)
@@ -1847,7 +1847,7 @@ INLINE INT32 fifo_space(fifo_state *f)
  *
  *************************************/
 
-INLINE INT32 fast_reciplog(INT64 value, INT32 *log2)
+static inline INT32 fast_reciplog(INT64 value, INT32 *log2)
 {
 	extern UINT32 voodoo_reciplog[];
 	UINT32 temp, recip, rlog;
@@ -1925,7 +1925,7 @@ INLINE INT32 fast_reciplog(INT64 value, INT32 *log2)
  *
  *************************************/
 
-INLINE INT32 float_to_int32(UINT32 data, int fixedbits)
+static inline INT32 float_to_int32(UINT32 data, int fixedbits)
 {
 	int exponent = ((data >> 23) & 0xff) - 127 - 23 + fixedbits;
 	INT32 result = (data & 0x7fffff) | 0x800000;
@@ -1949,7 +1949,7 @@ INLINE INT32 float_to_int32(UINT32 data, int fixedbits)
 }
 
 
-INLINE INT64 float_to_int64(UINT32 data, int fixedbits)
+static inline INT64 float_to_int64(UINT32 data, int fixedbits)
 {
 	int exponent = ((data >> 23) & 0xff) - 127 - 23 + fixedbits;
 	INT64 result = (data & 0x7fffff) | 0x800000;
@@ -1980,7 +1980,7 @@ INLINE INT64 float_to_int64(UINT32 data, int fixedbits)
  *
  *************************************/
 
-INLINE UINT32 normalize_color_path(UINT32 eff_color_path)
+static inline UINT32 normalize_color_path(UINT32 eff_color_path)
 {
 	/* ignore the subpixel adjust and texture enable flags */
 	eff_color_path &= ~((1 << 26) | (1 << 27));
@@ -1989,7 +1989,7 @@ INLINE UINT32 normalize_color_path(UINT32 eff_color_path)
 }
 
 
-INLINE UINT32 normalize_alpha_mode(UINT32 eff_alpha_mode)
+static inline UINT32 normalize_alpha_mode(UINT32 eff_alpha_mode)
 {
 	/* always ignore alpha ref value */
 	eff_alpha_mode &= ~(0xff << 24);
@@ -2006,7 +2006,7 @@ INLINE UINT32 normalize_alpha_mode(UINT32 eff_alpha_mode)
 }
 
 
-INLINE UINT32 normalize_fog_mode(UINT32 eff_fog_mode)
+static inline UINT32 normalize_fog_mode(UINT32 eff_fog_mode)
 {
 	/* if not doing fogging, ignore all the other fog bits */
 	if (!FOGMODE_ENABLE_FOG(eff_fog_mode))
@@ -2016,7 +2016,7 @@ INLINE UINT32 normalize_fog_mode(UINT32 eff_fog_mode)
 }
 
 
-INLINE UINT32 normalize_fbz_mode(UINT32 eff_fbz_mode)
+static inline UINT32 normalize_fbz_mode(UINT32 eff_fbz_mode)
 {
 	/* ignore the draw buffer */
 	eff_fbz_mode &= ~(3 << 14);
@@ -2025,7 +2025,7 @@ INLINE UINT32 normalize_fbz_mode(UINT32 eff_fbz_mode)
 }
 
 
-INLINE UINT32 normalize_tex_mode(UINT32 eff_tex_mode)
+static inline UINT32 normalize_tex_mode(UINT32 eff_tex_mode)
 {
 	/* ignore the NCC table and seq_8_downld flags */
 	eff_tex_mode &= ~((1 << 5) | (1 << 31));
@@ -2042,7 +2042,7 @@ INLINE UINT32 normalize_tex_mode(UINT32 eff_tex_mode)
 }
 
 
-INLINE UINT32 compute_raster_hash(const raster_info *info)
+static inline UINT32 compute_raster_hash(const raster_info *info)
 {
 	UINT32 hash;
 
@@ -2199,7 +2199,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-INLINE rgbaint_t ATTR_FORCE_INLINE clampARGB(const rgbaint_t &iterargb, UINT32 FBZCP)
+static inline rgbaint_t ATTR_FORCE_INLINE clampARGB(const rgbaint_t &iterargb, UINT32 FBZCP)
 {
 	rgbaint_t result(iterargb);
 	//rgbaint_t colorint((INT32) (itera>>12), (INT32) (iterr>>12), (INT32) (iterg>>12), (INT32) (iterb>>12));
@@ -2346,7 +2346,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-INLINE bool ATTR_FORCE_INLINE chromaKeyTest(voodoo_state *v, stats_block *stats, UINT32 fbzModeReg, rgbaint_t rgbaIntColor)
+static inline bool ATTR_FORCE_INLINE chromaKeyTest(voodoo_state *v, stats_block *stats, UINT32 fbzModeReg, rgbaint_t rgbaIntColor)
 {
 	if (FBZMODE_ENABLE_CHROMAKEY(fbzModeReg))
 	{
@@ -2366,7 +2366,7 @@ INLINE bool ATTR_FORCE_INLINE chromaKeyTest(voodoo_state *v, stats_block *stats,
 		else
 		{
 			INT32 low, high, test;
-			int results = 0;
+			int results;
 
 			/* check blue */
 			low = v->reg[chromaKey].rgb.b;
@@ -2435,7 +2435,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-INLINE bool alphaMaskTest(stats_block *stats, UINT32 fbzModeReg, UINT8 alpha)
+static inline bool alphaMaskTest(stats_block *stats, UINT32 fbzModeReg, UINT8 alpha)
 {
 	if (FBZMODE_ENABLE_ALPHA_MASK(fbzModeReg))
 	{
@@ -2521,7 +2521,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-INLINE bool ATTR_FORCE_INLINE alphaTest(voodoo_state *v, stats_block *stats, UINT32 alphaModeReg, UINT8 alpha)
+static inline bool ATTR_FORCE_INLINE alphaTest(voodoo_state *v, stats_block *stats, UINT32 alphaModeReg, UINT8 alpha)
 {
 	if (ALPHAMODE_ALPHATEST(alphaModeReg))
 	{
@@ -2750,7 +2750,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-INLINE void ATTR_FORCE_INLINE alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *dither, int dpix, UINT16 *depth, rgbaint_t &preFog, rgbaint_t &srcColor)
+static inline void ATTR_FORCE_INLINE alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *dither, int dpix, UINT16 *depth, rgbaint_t &preFog, rgbaint_t &srcColor)
 {
 	if (ALPHAMODE_ALPHABLEND(ALPHAMODE))
 	{
@@ -3068,7 +3068,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-INLINE void ATTR_FORCE_INLINE applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 fbzCpReg,  INT32 x, const UINT8 *dither4, INT32 fogDepth,
+static inline void ATTR_FORCE_INLINE applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 fbzCpReg,  INT32 x, const UINT8 *dither4, INT32 fogDepth,
 	rgbaint_t &color, INT32 iterz, INT64 iterw, UINT8 itera)
 {
 	if (FOGMODE_ENABLE_FOG(fogModeReg))
@@ -3711,7 +3711,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-INLINE bool ATTR_FORCE_INLINE depthTest(UINT16 zaColorReg, stats_block *stats, INT32 destDepth, UINT32 fbzModeReg, INT32 biasdepth)
+static inline bool ATTR_FORCE_INLINE depthTest(UINT16 zaColorReg, stats_block *stats, INT32 destDepth, UINT32 fbzModeReg, INT32 biasdepth)
 {
 	/* handle depth buffer testing */
 	if (FBZMODE_ENABLE_DEPTHBUF(fbzModeReg))
@@ -4163,7 +4163,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-INLINE bool ATTR_FORCE_INLINE combineColor(voodoo_state *VV, stats_block *STATS, UINT32 FBZCOLORPATH, UINT32 FBZMODE, UINT32 ALPHAMODE,
+static inline bool ATTR_FORCE_INLINE combineColor(voodoo_state *VV, stats_block *STATS, UINT32 FBZCOLORPATH, UINT32 FBZMODE, UINT32 ALPHAMODE,
 													rgbaint_t TEXELARGB, INT32 ITERZ, INT64 ITERW, rgbaint_t &srcColor)
 {
 	rgbaint_t c_other;
@@ -4722,7 +4722,7 @@ static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, co
 // The return value is coded as a 24.8 value.
 // The maximum error using a 4 bit lookup from the mantissa is 0.0875, which is less than 1/2 lsb (0.125) for 2 bits of fraction.
 // ******************************************************************************************************************************
-INLINE INT32 ATTR_FORCE_INLINE new_log2(double &value)
+static inline INT32 ATTR_FORCE_INLINE new_log2(double &value)
 {
 	static const INT32 new_log2_table[16] = {0, 22, 44, 63, 82, 100, 118, 134, 150, 165, 179, 193, 207, 220, 232, 244};
 	UINT64 ival = *((UINT64 *)&value);
@@ -4738,7 +4738,7 @@ INLINE INT32 ATTR_FORCE_INLINE new_log2(double &value)
 
 // Computes A/C and B/C and returns log2 of 1/C
 // A, B and C are 16.32 values.  The results are 24.8.
-INLINE void ATTR_FORCE_INLINE multi_reciplog(INT64 valueA, INT64 valueB, INT64 valueC, INT32 &log, INT32 &resA, INT32 &resB)
+static inline void ATTR_FORCE_INLINE multi_reciplog(INT64 valueA, INT64 valueB, INT64 valueC, INT32 &log, INT32 &resA, INT32 &resB)
 {
 	double recip = double(1ULL<<(47-39))/valueC;
 	double resAD = valueA * recip;
@@ -4750,7 +4750,7 @@ INLINE void ATTR_FORCE_INLINE multi_reciplog(INT64 valueA, INT64 valueB, INT64 v
 }
 
 
-INLINE rgbaint_t ATTR_FORCE_INLINE genTexture(tmu_state *TT, INT32 x, const UINT8 *dither4, const UINT32 TEXMODE, rgb_t *LOOKUP, INT32 LODBASE, INT64 ITERS, INT64 ITERT, INT64 ITERW, INT32 &lod)
+static inline rgbaint_t ATTR_FORCE_INLINE genTexture(tmu_state *TT, INT32 x, const UINT8 *dither4, const UINT32 TEXMODE, rgb_t *LOOKUP, INT32 LODBASE, INT64 ITERS, INT64 ITERT, INT64 ITERW, INT32 &lod)
 {
 	rgbaint_t result;
 	INT32 s, t, ilod;
@@ -4941,7 +4941,7 @@ INLINE rgbaint_t ATTR_FORCE_INLINE genTexture(tmu_state *TT, INT32 x, const UINT
 	return result;
 }
 
-INLINE rgbaint_t ATTR_FORCE_INLINE combineTexture(tmu_state *TT, const UINT32 TEXMODE, rgbaint_t c_local, rgbaint_t c_other, INT32 lod)
+static inline rgbaint_t ATTR_FORCE_INLINE combineTexture(tmu_state *TT, const UINT32 TEXMODE, rgbaint_t c_local, rgbaint_t c_other, INT32 lod)
 {
 	INT32 a_other = c_other.get_a();
 	INT32 a_local = c_local.get_a();

@@ -16,7 +16,7 @@
 class coleco_state : public driver_device
 {
 public:
-	coleco_state(const machine_config &mconfig, device_type type, const char *tag)
+	coleco_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_cart(*this, COLECOVISION_CARTRIDGE_SLOT_TAG),
@@ -40,8 +40,8 @@ public:
 			m_roller_y(*this, "ROLLER_Y")
 	{ }
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( cart_r );
 	DECLARE_READ8_MEMBER( paddle_1_r );

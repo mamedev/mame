@@ -27,11 +27,11 @@
 class indiana_state : public driver_device
 {
 public:
-	indiana_state(const machine_config &mconfig, device_type type, const char *tag)
+	indiana_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, M68K_TAG) { }
 	DECLARE_DRIVER_INIT(indiana);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 

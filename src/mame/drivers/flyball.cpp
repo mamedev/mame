@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 /***************************************************************************
 
@@ -35,7 +35,7 @@ public:
 		TIMER_QUARTER
 	};
 
-	flyball_state(const machine_config &mconfig, device_type type, const char *tag)
+	flyball_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -81,9 +81,9 @@ public:
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(flyball);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -92,7 +92,7 @@ public:
 	TIMER_CALLBACK_MEMBER(quarter_callback);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
@@ -276,7 +276,7 @@ WRITE8_MEMBER(flyball_state::misc_w)
 	switch (offset)
 	{
 	case 0:
-		set_led_status(machine(), 0, bit);
+		output().set_led_value(0, bit);
 		break;
 	case 1:
 		/* crowd very loud */

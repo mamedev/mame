@@ -26,7 +26,7 @@ const device_type CBM2_24K = &device_creator<cbm2_24k_cartridge_device>;
 //  cbm2_24k_cartridge_device - constructor
 //-------------------------------------------------
 
-cbm2_24k_cartridge_device::cbm2_24k_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cbm2_24k_cartridge_device::cbm2_24k_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CBM2_24K, "24K RAM/ROM cartridge", tag, owner, clock, "cbm2_24k", __FILE__),
 	device_cbm2_expansion_card_interface(mconfig, *this),
 	m_ram(*this, "ram")

@@ -2,7 +2,7 @@
 // copyright-holders:smf
 #include "terminal.h"
 
-serial_terminal_device::serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+serial_terminal_device::serial_terminal_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: generic_terminal_device(mconfig, SERIAL_TERMINAL, "Serial Terminal", tag, owner, clock, "serial_terminal", __FILE__),
 	device_serial_interface(mconfig, *this),
 	device_rs232_port_interface(mconfig, *this),
@@ -11,8 +11,8 @@ serial_terminal_device::serial_terminal_device(const machine_config &mconfig, co
 	m_rs232_startbits(*this, "RS232_STARTBITS"),
 	m_rs232_databits(*this, "RS232_DATABITS"),
 	m_rs232_parity(*this, "RS232_PARITY"),
-	m_rs232_stopbits(*this, "RS232_STOPBITS"), 
-	m_curr_key(0), 
+	m_rs232_stopbits(*this, "RS232_STOPBITS"),
+	m_curr_key(0),
 	m_key_valid(false)
 {
 }

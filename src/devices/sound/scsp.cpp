@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:ElSemi, R. Belmont
+// thanks-to: kingshriek
 /*
     Sega/Yamaha YMF292-F (SCSP = Saturn Custom Sound Processor) emulation
     By ElSemi
@@ -142,19 +143,19 @@ static const float SDLT[8]={-1000000.0f,-36.0f,-30.0f,-24.0f,-18.0f,-12.0f,-6.0f
 
 const device_type SCSP = &device_creator<scsp_device>;
 
-scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+scsp_device::scsp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SCSP, "SCSP", tag, owner, clock, "scsp", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_roffset(0),
 		m_irq_cb(*this),
 		m_main_irq_cb(*this),
 		m_BUFPTR(0),
-		m_SCSPRAM(NULL),
+		m_SCSPRAM(nullptr),
 		m_SCSPRAM_LENGTH(0),
 		m_Master(0),
-		m_stream(NULL),
-		m_buffertmpl(NULL),
-		m_buffertmpr(NULL),
+		m_stream(nullptr),
+		m_buffertmpl(nullptr),
+		m_buffertmpr(nullptr),
 		m_IrqTimA(0),
 		m_IrqTimBC(0),
 		m_IrqMidi(0),
@@ -162,15 +163,15 @@ scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_
 		m_MidiOutR(0),
 		m_MidiW(0),
 		m_MidiR(0),
-		m_timerA(NULL),
-		m_timerB(NULL),
-		m_timerC(NULL),
+		m_timerA(nullptr),
+		m_timerB(nullptr),
+		m_timerC(nullptr),
 		m_mcieb(0),
 		m_mcipd(0),
-		m_bufferl(NULL),
-		m_bufferr(NULL),
+		m_bufferl(nullptr),
+		m_bufferr(nullptr),
 		m_length(0),
-		m_RBUFDST(NULL)
+		m_RBUFDST(nullptr)
 {
 	memset(m_RINGBUF, 0, sizeof(m_RINGBUF));
 	memset(m_MidiStack, 0, sizeof(m_MidiStack));
@@ -505,7 +506,7 @@ void scsp_device::init()
 	m_MidiOutR=m_MidiOutW=0;
 
 	// get SCSP RAM
-	if (strcmp(tag(), ":scsp") == 0 || strcmp(tag(), ":scsp1") == 0)
+	if (tag()==":scsp" || tag()==":scsp1")
 	{
 		m_Master=1;
 	}
@@ -539,10 +540,10 @@ void scsp_device::init()
 		int iTL =(i>>0x0)&0xff;
 		int iPAN=(i>>0x8)&0x1f;
 		int iSDL=(i>>0xD)&0x07;
-		float TL=1.0f;
+		float TL;
 		float SegaDB=0.0f;
-		float fSDL=1.0f;
-		float PAN=1.0f;
+		float fSDL;
+		float PAN;
 		float LPAN,RPAN;
 
 		if(iTL&0x01) SegaDB-=0.4f;
@@ -611,13 +612,13 @@ void scsp_device::init()
 	{
 		m_Slots[i].slot=i;
 		m_Slots[i].active=0;
-		m_Slots[i].base=NULL;
+		m_Slots[i].base=nullptr;
 		m_Slots[i].EG.state=SCSP_RELEASE;
 	}
 
 	LFO_Init();
-	m_buffertmpl=auto_alloc_array_clear(machine(), signed int, 44100);
-	m_buffertmpr=auto_alloc_array_clear(machine(), signed int, 44100);
+	m_buffertmpl=make_unique_clear<INT32[]>(44100);
+	m_buffertmpr=make_unique_clear<INT32[]>(44100);
 
 	// no "pend"
 	m_udata.data[0x20/2] = 0;

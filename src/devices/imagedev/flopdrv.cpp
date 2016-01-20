@@ -16,7 +16,6 @@
 #include "emu.h"
 #include "formats/imageutl.h"
 #include "flopdrv.h"
-#include "image.h"
 
 #define VERBOSE     0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
@@ -124,7 +123,7 @@ void legacy_floppy_image_device::floppy_drive_init()
 {
 	/* initialise flags */
 	m_flags = 0;
-	m_index_pulse_callback = NULL;
+	m_index_pulse_callback = nullptr;
 	m_index_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(legacy_floppy_image_device::floppy_drive_index_callback),this));
 	m_idx = 0;
 
@@ -138,7 +137,7 @@ void legacy_floppy_image_device::floppy_drive_init()
 	/* default RPM */
 	m_rpm = 300;
 
-	m_controller = NULL;
+	m_controller = nullptr;
 
 	m_floppy_drive_type = FLOPPY_TYPE_REGULAR;
 }
@@ -425,7 +424,7 @@ int legacy_floppy_image_device::internal_floppy_device_load(int create_format, o
 	int floppy_flags, i;
 	const char *extension;
 
-	device_image_interface *image = NULL;
+	device_image_interface *image = nullptr;
 	interface(image);   /* figure out the floppy options */
 	floppy_options = ((floppy_interface*)static_config())->formats;
 
@@ -478,7 +477,7 @@ legacy_floppy_image_device *floppy_get_device(running_machine &machine,int drive
 		case 2 : return machine.device<legacy_floppy_image_device>(FLOPPY_2);
 		case 3 : return machine.device<legacy_floppy_image_device>(FLOPPY_3);
 	}
-	return NULL;
+	return nullptr;
 }
 
 int legacy_floppy_image_device::floppy_get_drive_type()
@@ -504,16 +503,16 @@ legacy_floppy_image_device *floppy_get_device_by_type(running_machine &machine,i
 			cnt++;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 int floppy_get_drive(device_t *image)
 {
 	int drive =0;
-	if (strcmp(image->tag(), ":" FLOPPY_0) == 0) drive = 0;
-	if (strcmp(image->tag(), ":" FLOPPY_1) == 0) drive = 1;
-	if (strcmp(image->tag(), ":" FLOPPY_2) == 0) drive = 2;
-	if (strcmp(image->tag(), ":" FLOPPY_3) == 0) drive = 3;
+	if (strcmp(image->tag().c_str(), ":" FLOPPY_0) == 0) drive = 0;
+	if (strcmp(image->tag().c_str(), ":" FLOPPY_1) == 0) drive = 1;
+	if (strcmp(image->tag().c_str(), ":" FLOPPY_2) == 0) drive = 2;
+	if (strcmp(image->tag().c_str(), ":" FLOPPY_3) == 0) drive = 3;
 	return drive;
 }
 
@@ -672,7 +671,7 @@ READ_LINE_MEMBER( legacy_floppy_image_device::floppy_dskchg_r )
 /* 2-sided disk */
 READ_LINE_MEMBER( legacy_floppy_image_device::floppy_twosid_r )
 {
-	if (m_floppy == NULL)
+	if (m_floppy == nullptr)
 		return ASSERT_LINE;
 	else
 		return !floppy_get_heads_per_disk(m_floppy);
@@ -695,7 +694,7 @@ const device_type LEGACY_FLOPPY = &device_creator<legacy_floppy_image_device>;
 //  legacy_floppy_image_device - constructor
 //-------------------------------------------------
 
-legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, LEGACY_FLOPPY, "Floppy Disk", tag, owner, clock, "legacy_floppy_image", __FILE__),
 		device_image_interface(mconfig, *this),
 		m_out_idx_func(*this),
@@ -709,27 +708,27 @@ legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mco
 		m_rdy(0),
 		m_dskchg(0),
 		m_drive_id(0),
-		m_active(0), 
-		m_config(NULL),
+		m_active(0),
+		m_config(nullptr),
 		m_flags(0),
 		m_max_track(0),
 		m_num_sides(0),
-		m_current_track(0), 
-		m_index_timer(NULL),
-		m_index_pulse_callback(NULL),
+		m_current_track(0),
+		m_index_timer(nullptr),
+		m_index_pulse_callback(nullptr),
 		m_rpm(0.0f),
 		m_id_index(0),
-		m_controller(NULL),
-		m_floppy(NULL),
+		m_controller(nullptr),
+		m_floppy(nullptr),
 		m_track(0),
-		m_load_proc(NULL),
-		m_unload_proc(NULL),
+		m_load_proc(nullptr),
+		m_unload_proc(nullptr),
 		m_floppy_drive_type(0)
 {
 	memset(&m_extension_list,0,sizeof(m_extension_list));
 }
 
-legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_image_interface(mconfig, *this),
 		m_out_idx_func(*this),
@@ -743,21 +742,21 @@ legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mco
 		m_rdy(0),
 		m_dskchg(0),
 		m_drive_id(0),
-		m_active(0), 
-	    m_config(NULL),
+		m_active(0),
+		m_config(nullptr),
 		m_flags(0),
 		m_max_track(0),
 		m_num_sides(0),
-		m_current_track(0), 
-		m_index_timer(NULL),
-		m_index_pulse_callback(NULL),
+		m_current_track(0),
+		m_index_timer(nullptr),
+		m_index_pulse_callback(nullptr),
 		m_rpm(0.0f),
 		m_id_index(0),
-		m_controller(NULL),
-		m_floppy(NULL),
+		m_controller(nullptr),
+		m_floppy(nullptr),
 		m_track(0),
-		m_load_proc(NULL),
-		m_unload_proc(NULL),
+		m_load_proc(nullptr),
+		m_unload_proc(nullptr),
 		m_floppy_drive_type(0)
 {
 	memset(&m_extension_list,0,sizeof(m_extension_list));
@@ -839,7 +838,7 @@ bool legacy_floppy_image_device::call_create(int format_type, option_resolution 
 
 bool legacy_floppy_image_device::call_load()
 {
-	int retVal = internal_floppy_device_load(-1, NULL);
+	int retVal = internal_floppy_device_load(-1, nullptr);
 	if (retVal==IMAGE_INIT_PASS) {
 		/* if we have one of our hacky unload procs, call it */
 		if (m_load_proc)
@@ -869,7 +868,7 @@ void legacy_floppy_image_device::call_unload()
 		m_unload_proc(*this);
 
 	floppy_close(m_floppy);
-	m_floppy = NULL;
+	m_floppy = nullptr;
 
 	/* disk changed */
 	m_dskchg = CLEAR_LINE;

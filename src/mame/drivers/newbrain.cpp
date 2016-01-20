@@ -472,7 +472,7 @@ WRITE8_MEMBER( newbrain_state::cop_d_w )
 
 		m_keydata = m_key_row[m_keylatch]->read();
 
-		output_set_digit_value(m_keylatch, m_segment_data[m_keylatch]);
+		output().set_digit_value(m_keylatch, m_segment_data[m_keylatch]);
 	}
 }
 

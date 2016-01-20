@@ -127,7 +127,7 @@ How does the Super Famicom Box operates
 class sfcbox_state : public snes_state
 {
 public:
-	sfcbox_state(const machine_config &mconfig, device_type type, const char *tag)
+	sfcbox_state(const machine_config &mconfig, device_type type, std::string tag)
 		: snes_state(mconfig, type, tag),
 		m_bios(*this, "bios"),
 		m_mb90082(*this,"mb90082"),
@@ -147,8 +147,8 @@ public:
 	DECLARE_WRITE8_MEMBER( port_83_w );
 	DECLARE_WRITE8_MEMBER( snes_map_0_w );
 	DECLARE_WRITE8_MEMBER( snes_map_1_w );
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
 };

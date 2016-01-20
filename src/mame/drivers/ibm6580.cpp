@@ -22,7 +22,7 @@ ToDo:
 class ibm6580_state : public driver_device
 {
 public:
-	ibm6580_state(const machine_config &mconfig, device_type type, const char *tag)
+	ibm6580_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 	{ }
@@ -31,7 +31,7 @@ public:
 	DECLARE_PALETTE_INIT(ibm6580);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 

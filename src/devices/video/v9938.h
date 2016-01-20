@@ -76,7 +76,7 @@ class v99x8_device :    public device_t,
 {
 protected:
 	// construction/destruction
-	v99x8_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock);
+	v99x8_device(const machine_config &mconfig, device_type type, std::string name, std::string shortname, std::string tag, device_t *owner, UINT32 clock);
 
 public:
 	template<class _irq> void set_interrupt_callback(_irq irq) {
@@ -125,12 +125,12 @@ protected:
 	int m_model;
 
 	// device overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_DATA) const { return (spacenum == AS_DATA) ? &m_space_config : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_DATA) const override { return (spacenum == AS_DATA) ? &m_space_config : nullptr; }
 
 	void configure_pal_ntsc();
 	void set_screen_parameters();
@@ -277,22 +277,22 @@ protected:
 class v9938_device : public v99x8_device
 {
 public:
-	v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v9938_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_PALETTE_INIT(v9938);
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class v9958_device : public v99x8_device
 {
 public:
-	v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v9958_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_PALETTE_INIT(v9958);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 

@@ -56,14 +56,14 @@ static const char *const hdc_command_names[] =
 {
 	"CMD_TESTREADY",        /* 0x00 */
 	"CMD_RECALIBRATE",      /* 0x01 */
-	NULL,                   /* 0x02 */
+	nullptr,                   /* 0x02 */
 	"CMD_SENSE",            /* 0x03 */
 	"CMD_FORMATDRV",        /* 0x04 */
 	"CMD_VERIFY",           /* 0x05 */
 	"CMD_FORMATTRK",        /* 0x06 */
 	"CMD_FORMATBAD",        /* 0x07 */
 	"CMD_READ",             /* 0x08 */
-	NULL,                   /* 0x09 */
+	nullptr,                   /* 0x09 */
 	"CMD_WRITE",            /* 0x0A */
 	"CMD_SEEK",             /* 0x0B */
 	"CMD_SETPARAM",         /* 0x0C */
@@ -71,45 +71,45 @@ static const char *const hdc_command_names[] =
 	"CMD_READSBUFF",        /* 0x0E */
 	"CMD_WRITESBUFF",       /* 0x0F */
 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x10-0x17 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x18-0x1F */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x20-0x27 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x28-0x2F */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x30-0x37 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x38-0x3F */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x40-0x47 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x48-0x4F */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x50-0x57 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x58-0x5F */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x60-0x67 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x68-0x6F */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x70-0x77 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x78-0x7F */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x80-0x87 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x88-0x8F */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x90-0x97 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x98-0x9F */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xA0-0xA7 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xA8-0xAF */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xB0-0xB7 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xB8-0xBF */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xC0-0xC7 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xC8-0xCF */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xD0-0xD7 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xD8-0xDF */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0x10-0x17 */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0x18-0x1F */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0x20-0x27 */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0x28-0x2F */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0x30-0x37 */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0x38-0x3F */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0x40-0x47 */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0x48-0x4F */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0x50-0x57 */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0x58-0x5F */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0x60-0x67 */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0x68-0x6F */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0x70-0x77 */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0x78-0x7F */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0x80-0x87 */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0x88-0x8F */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0x90-0x97 */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0x98-0x9F */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0xA0-0xA7 */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0xA8-0xAF */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0xB0-0xB7 */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0xB8-0xBF */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0xC0-0xC7 */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0xC8-0xCF */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0xD0-0xD7 */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0xD8-0xDF */
 
 	"CMD_RAMDIAG",          /* 0xE0 */
-	NULL,                   /* 0xE1 */
-	NULL,                   /* 0xE2 */
+	nullptr,                   /* 0xE1 */
+	nullptr,                   /* 0xE2 */
 	"CMD_DRIVEDIAG",        /* 0xE3 */
 	"CMD_INTERNDIAG",       /* 0xE4 */
 	"CMD_READLONG",         /* 0xE5 */
 	"CMD_WRITELONG",        /* 0xE6 */
-	NULL,                   /* 0xE7 */
+	nullptr,                   /* 0xE7 */
 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xE8-0xEF */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xF0-0xF7 */
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL  /* 0xF8-0xFF */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0xE8-0xEF */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* 0xF0-0xF7 */
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr  /* 0xF8-0xFF */
 };
 
 static MACHINE_CONFIG_FRAGMENT( xt_hdc_config )
@@ -161,7 +161,7 @@ const device_type XT_HDC = &device_creator<xt_hdc_device>;
 const device_type EC1841_HDC = &device_creator<ec1841_device>;
 const device_type ST11M_HDC = &device_creator<st11m_device>;
 
-xt_hdc_device::xt_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+xt_hdc_device::xt_hdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, XT_HDC, "Generic PC-XT Fixed Disk Controller", tag, owner, clock, "xt_hdc", __FILE__), buffer_ptr(nullptr), csb(0), status(0), error(0), m_current_cmd(0),
 		m_irq_handler(*this),
 		m_drq_handler(*this), drv(0), timer(nullptr), data_cnt(0), hdc_control(0), hdcdma_src(nullptr), hdcdma_dst(nullptr), hdcdma_read(0), hdcdma_write(0), hdcdma_size(0)
@@ -169,14 +169,14 @@ xt_hdc_device::xt_hdc_device(const machine_config &mconfig, const char *tag, dev
 	m_type = STANDARD;
 }
 
-xt_hdc_device::xt_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+xt_hdc_device::xt_hdc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source), buffer_ptr(nullptr), csb(0), status(0), error(0), m_type(0), m_current_cmd(0),
 		m_irq_handler(*this),
 		m_drq_handler(*this), drv(0), timer(nullptr), data_cnt(0), hdc_control(0), hdcdma_src(nullptr), hdcdma_dst(nullptr), hdcdma_read(0), hdcdma_write(0), hdcdma_size(0)
 {
 }
 
-ec1841_device::ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ec1841_device::ec1841_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		xt_hdc_device(mconfig, EC1841_HDC, "EC1841 Fixed Disk Controller", tag, owner, clock, "ec1481", __FILE__),
 		m_irq_handler(*this),
 		m_drq_handler(*this)
@@ -184,7 +184,7 @@ ec1841_device::ec1841_device(const machine_config &mconfig, const char *tag, dev
 	m_type = EC1841;
 }
 
-st11m_device::st11m_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+st11m_device::st11m_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		xt_hdc_device(mconfig, EC1841_HDC, "Seagate ST11M Fixed Disk Controller", tag, owner, clock, "st11m", __FILE__),
 		m_irq_handler(*this),
 		m_drq_handler(*this)
@@ -204,7 +204,7 @@ void xt_hdc_device::device_reset()
 {
 	drv = 0;
 	data_cnt = 0;
-	buffer_ptr = NULL;
+	buffer_ptr = nullptr;
 	hdc_control = 0;
 	for (int i = 0; i < 2; i++)
 	{
@@ -229,7 +229,7 @@ void xt_hdc_device::device_reset()
 
 hard_disk_file *xt_hdc_device::pc_hdc_file(int id)
 {
-	harddisk_image_device *img = NULL;
+	harddisk_image_device *img = nullptr;
 	switch( id )
 	{
 	case 0:
@@ -239,11 +239,11 @@ hard_disk_file *xt_hdc_device::pc_hdc_file(int id)
 		img = dynamic_cast<harddisk_image_device *>(machine().device(subtag("slave").c_str()));
 		break;
 	}
-	if ( img == NULL )
-		return NULL;
+	if ( img == nullptr )
+		return nullptr;
 
 	if (!img->exists())
-		return NULL;
+		return nullptr;
 
 	return img->get_hard_disk_file();
 }
@@ -430,7 +430,7 @@ void xt_hdc_device::dack_ws(int data)
 
 void xt_hdc_device::execute_read()
 {
-	hard_disk_file *disk = NULL;
+	hard_disk_file *disk;
 	int size = sector_cnt[drv] * 512;
 	int read_ = 0;
 
@@ -460,7 +460,7 @@ void xt_hdc_device::execute_read()
 
 void xt_hdc_device::execute_write()
 {
-	hard_disk_file *disk = NULL;
+	hard_disk_file *disk;
 	int size = sector_cnt[drv] * 512;
 	int write_ = 512;
 
@@ -918,21 +918,21 @@ ioport_constructor isa8_hdc_device::device_input_ports() const
 //  isa8_hdc_device - constructor
 //-------------------------------------------------
 
-isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8_HDC, "Fixed Disk Controller Card", tag, owner, clock, "hdc", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
 		m_hdc(*this,"hdc"), dip(0)
 {
 }
 
-isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this),
 		m_hdc(*this,"hdc"), dip(0)
 {
 }
 
-isa8_hdc_ec1841_device::isa8_hdc_ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_hdc_ec1841_device::isa8_hdc_ec1841_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		isa8_hdc_device( mconfig, ISA8_HDC_EC1841, "EC1841 HDC", tag, owner, clock, "hdc_ec1841", __FILE__),
 		m_hdc(*this,"hdc")
 {

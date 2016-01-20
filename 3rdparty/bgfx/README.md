@@ -50,6 +50,7 @@ Languages:
  * [D language API bindings](https://github.com/DerelictOrg/DerelictBgfx)
  * [Go language API bindings](https://github.com/james4k/go-bgfx)
  * [Java language API bindings](https://github.com/enleeten/twilight-bgfx)
+ * [Haskell language API bindings](https://github.com/haskell-game/bgfx)
 
 Build status
 ------------
@@ -67,7 +68,8 @@ https://github.com/dariomanesku/cmftStudio cmftStudio - cubemap filtering tool.
 
 https://github.com/taylor001/crown Crown is a general purpose data-driven game
 engine, written from scratch with a minimalistic and data-oriented design
-philosophy in mind.
+philosophy in mind.  
+![Crown screenshot](https://raw.githubusercontent.com/taylor001/crown/master/docs/shots/level-editor.png)
 
 https://github.com/emoon/ProDBG - ProDBG is a new debugger under development
 that will support a variety of targets and operating systems. Currently it's in
@@ -94,6 +96,17 @@ https://github.com/nem0/LumixEngine LumixEngine is a MIT licensed 3D engine.
 The main goal is performance and Unity-like usability.  
 ![LumixEngine screenshot](https://cloud.githubusercontent.com/assets/153526/10109455/450c51be-63c7-11e5-9c87-96d9d00efe02.png)
 
+https://github.com/podgorskiy/KeplerOrbits KeplerOrbits - Tool that calculates
+positions of celestial bodies using their orbital elements. [Web Demo](http://podgorskiy.com/KeplerOrbits/KeplerOrbits.html)
+
+https://github.com/cyberegoorg/cetech - CETech is Data-Driven game engine and
+toolbox inspired by Bitsquid/Stingray engine.  
+![CETech screenshot](https://github.com/cyberegoorg/cetech/raw/master/docs/img/prototyp.png)
+
+https://github.com/jpcy/ioq3-renderer-bgfx - A renderer for ioquake3 written in
+C++ and using bgfx to support multiple rendering APIs.  
+![ioq3-renderer-bgfx screenshot](https://camo.githubusercontent.com/052aa40c05120e56306294d3a1bb5f99f97de8c8/687474703a2f2f692e696d6775722e636f6d2f64364f6856594b2e6a7067)
+
 [Building](https://bkaradzic.github.io/bgfx/build.html)
 -------------------------------------------------------
 
@@ -113,7 +126,7 @@ The main goal is performance and Unity-like usability.
 <img align="right" src="http://opensource.org/trademarks/opensource/OSI-Approved-License-100x137.png">
 </a>
 
-	Copyright 2010-2015 Branimir Karadzic. All rights reserved.
+	Copyright 2010-2016 Branimir Karadzic. All rights reserved.
 	
 	https://github.com/bkaradzic/bgfx
 	

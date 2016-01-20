@@ -9,7 +9,7 @@ newoption {
 premake.check_paths = true
 premake.make.override = { "TARGET" }
 MAME_DIR = (path.getabsolute("..") .. "/")
-MAME_DIR = string.gsub(MAME_DIR, "(%s)", "\\%1")
+--MAME_DIR = string.gsub(MAME_DIR, "(%s)", "\\%1")
 local MAME_BUILD_DIR = (MAME_DIR .. _OPTIONS["build-dir"] .. "/")
 local naclToolchain = ""
 
@@ -51,6 +51,19 @@ end
 function layoutbuildtask(_folder, _name)
 	return { MAME_DIR .. "src/".._folder.."/".. _name ..".lay" ,    GEN_DIR .. _folder .. "/".._name..".lh",
 		{  MAME_DIR .. "scripts/build/file2str.py" }, {"@echo Converting src/".._folder.."/".._name..".lay...",    PYTHON .. " $(1) $(<) $(@) layout_".._name }};
+end
+
+function precompiledheaders()
+	pchheader("emu.h")
+end
+
+function addprojectflags()
+	local version = str_to_version(_OPTIONS["gcc_version"])
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "gcc") and (version >= 50100) then
+		buildoptions_cpp {
+			"-Wsuggest-override",
+		}
+	end
 end
 
 CPUS = {}
@@ -306,26 +319,8 @@ newoption {
 }
 
 newoption {
-	trigger = "CPP11",
-	description = "Compile c++ code as C++11.",
-	allowed = {
-		{ "0",   "Disabled" 	},
-		{ "1",   "Enabled"      },
-	}
-}
-
-newoption {
 	trigger = "FASTDEBUG",
 	description = "Fast DEBUG.",
-	allowed = {
-		{ "0",   "Disabled" 	},
-		{ "1",   "Enabled"      },
-	}
-}
-
-newoption {
-	trigger = "FILTER_DEPS",
-	description = "Filter dependency files.",
 	allowed = {
 		{ "0",   "Disabled" 	},
 		{ "1",   "Enabled"      },
@@ -386,6 +381,11 @@ newoption {
 		{ "0",   "Disabled" 	},
 		{ "1",   "Enabled"      },
 	}
+}
+
+newoption {
+	trigger = "PLATFORM",
+	description = "Target machine platform (x86,arm,...)",
 }
 
 if _OPTIONS["SHLIB"]=="1" then
@@ -451,11 +451,11 @@ language "C++"
 
 flags {
 	"StaticRuntime",
-	"NoPCH",
 }
 
 configuration { "vs*" }
 	flags {
+		"NoPCH",
 		"ExtraWarnings",
 		"NoEditAndContinue",
 		"EnableMinimalRebuild",
@@ -479,36 +479,6 @@ configuration { "Release", "vs*" }
 
 configuration {}
 
-local AWK = ""
-if (os.is("windows")) then
-	AWK_TEST = backtick("awk --version 2> NUL")
-	if (AWK_TEST~='') then
-		AWK = "awk"
-	else
-		AWK_TEST = backtick("gawk --version 2> NUL")
-		if (AWK_TEST~='') then
-			AWK = "gawk"
-		end
-	end
-else
-	AWK_TEST = backtick("awk --version 2> /dev/null")
-	if (AWK_TEST~='') then
-		AWK = "awk"
-	else
-		AWK_TEST = backtick("gawk --version 2> /dev/null")
-		if (AWK_TEST~='') then
-			AWK = "gawk"
-		end
-	end
-end
-
-if (_OPTIONS["FILTER_DEPS"]=="1") and (AWK~='') then
-	postcompiletasks {
-		AWK .. " -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)",
-		"mv $(@:%.o=%.dep) $(@:%.o=%.d)",
-	}
-end
-
 msgcompile ("Compiling $(subst ../,,$<)...")
 
 msgcompile_objc ("Objective-C compiling $(subst ../,,$<)...")
@@ -519,6 +489,8 @@ msglinking ("Linking $(notdir $@)...")
 
 msgarchiving ("Archiving $(notdir $@)...")
 
+msgprecompile ("Precompiling $(subst ../,,$<)...")
+
 messageskip { "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage" }
 
 if (_OPTIONS["SOURCES"] == nil) then
@@ -526,17 +498,9 @@ if (_OPTIONS["SOURCES"] == nil) then
 		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 	end
 	dofile (path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
-else
-	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " target " .. _OPTIONS["subtarget"])
-	load(OUT_STR)()
-	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.cpp")
 end
+
 configuration { "gmake" }
-if _OPTIONS["CPP11"]~="1" then
-	defines {
-		"nullptr=NULL" -- getting ready for C++11
-	}
-end
 	flags {
 		"SingleOutputDir",
 	}
@@ -558,24 +522,6 @@ if (_ACTION == nil) then return false end
 -- define PTR64 if we are a 64-bit target
 configuration { "x64" }
 	defines { "PTR64=1" }
-
--- map the INLINE to something digestible by GCC
-configuration { "gmake" }
-	buildoptions_cpp {
-		"-DINLINE=\"static inline\"",
-	}
-	buildoptions_objc {
-		"-DINLINE=\"static inline\"",
-	}
-configuration { "xcode4*" }
-	buildoptions {
-		"-DINLINE=\"static inline\"",
-	}
-
-configuration { "vs*" }
-	defines {
-		"INLINE=static inline",
-	}
 
 -- define MAME_DEBUG if we are a debugging build
 configuration { "Debug" }
@@ -726,53 +672,41 @@ end
 
 	if _ACTION == "gmake" then
 
-	--we compile C-only to C89 standard with GNU extensions
-if (_OPTIONS["targetos"]=="solaris") then
+	--we compile C-only to C99 standard with GNU extensions
+
 	buildoptions_c {
 		"-std=gnu99",
 	}
-else
-	buildoptions_c {
---		"-std=gnu99",
-		"-std=gnu89",
---		"-Wpedantic",
---		"-pedantic",
---		"-Wno-variadic-macros",
---		"-Wno-long-long",
-	}
-end
 
-
-if _OPTIONS["CPP11"]=="1" then
+local version = str_to_version(_OPTIONS["gcc_version"])
+if string.find(_OPTIONS["gcc"], "clang") and ((version < 30500) or (_OPTIONS["targetos"]=="macosx" and (version <= 60000))) then
 	buildoptions_cpp {
 		"-x c++",
-		"-std=gnu++11",
---		"-std=c++11",
---		"-Wpedantic",
---		"-pedantic",
---		"-Wno-variadic-macros",
---		"-Wno-long-long",
-
+		"-std=c++1y",
 	}
-else
-	--we compile C++ code to C++98 standard with GNU extensions
-	buildoptions_cpp {
-		"-x c++",
---		"-Wpedantic",
---		"-pedantic",
-		"-std=gnu++98",
-		"-Wno-variadic-macros",
-		"-Wno-long-long",
-		"-Wno-variadic-macros",
---		"-std=c++98",
-	}
-end
 
 	buildoptions_objc {
 		"-x objective-c++",
+		"-std=c++1y",
 	}
+else
+	if _OPTIONS["targetos"]=="os2" then
+		buildoptions_cpp {
+			"-x c++",
+			"-std=gnu++14",
+		}
+	else
+		buildoptions_cpp {
+			"-x c++",
+			"-std=c++14",
+		}
+	end
 
-
+	buildoptions_objc {
+		"-x objective-c++",
+		"-std=c++14",
+	}
+end
 -- this speeds it up a bit by piping between the preprocessor/compiler/assembler
 	if not ("pnacl" == _OPTIONS["gcc"]) then
 		buildoptions {
@@ -853,6 +787,9 @@ if _OPTIONS["OPTIMIZE"] then
 		buildoptions {
 			_OPTIONS["ARCHOPTS"]
 		}
+		linkoptions {
+			_OPTIONS["ARCHOPTS"]
+		}
 	end
 	if _OPTIONS["OPT_FLAGS"] then
 		buildoptions {
@@ -861,30 +798,46 @@ if _OPTIONS["OPTIMIZE"] then
 	end
 	if _OPTIONS["LTO"]=="1" then
 		buildoptions {
--- windows native mingw GCC 5.2 fails with -flto=x with x > 1. bug unfixed as of this date
+-- windows native mingw GCC 5.2 fails with -flto=x with x > 1. bug unfixed as of this commit
 			"-flto=1",
+-- if ld fails, just buy more RAM or uncomment this!
+--			"-Wl,-no-keep-memory",
+			"-Wl,-v",
+-- silence redefine warnings from discrete.c.
+			"-Wl,-allow-multiple-definition",
 			"-fuse-linker-plugin",
 -- these next flags allow MAME to compile in GCC 5.2. odr warnings should be fixed as LTO randomly crashes otherwise
 -- some GCC 4.9.x on Windows do not have -Wodr and -flto-odr-type-merging enabled. adjust accordingly...
--- -ffat-lto-objects lets you link non-lto version without rebuilding all .o/.a
-			"-ffat-lto-objects",
+-- no-fat-lto-objects is faster to compile and uses less memory, but you can't mix with a non-lto .o/.a without rebuilding
+			"-fno-fat-lto-objects",
 			"-flto-odr-type-merging",
 			"-Wodr",
-			"-flto-compression-level=9", -- lto didn't work with anything <9  on linux with < 12G RAM
+			"-flto-compression-level=0", -- lto doesn't work with anything <9 on linux with < 12G RAM, much slower if <> 0
 --			"-flto-report", -- if you get an error in lto after [WPA] stage, but before [LTRANS] stage, you need more memory!
 --			"-fmem-report-wpa","-fmem-report","-fpre-ipa-mem-report","-fpost-ipa-mem-report","-flto-report-wpa","-fmem-report",
+-- this six flag combo lets MAME compile with LTO=1 on linux with no errors and ~2% speed boost, but compile time is much longer
+-- if you are going to wait on lto, you might as well enable these for GCC
+--			"-fdevirtualize-at-ltrans","-fgcse-sm","-fgcse-las",
+--			"-fipa-pta","-fipa-icf","-fvariable-expansion-in-unroller",
 		}
 -- same flags are needed by linker
 		linkoptions {
-			"-Wl,-no-keep-memory",
 			"-flto=1",
+--			"-Wl,-no-keep-memory",
+			"-Wl,-v",
+			"-Wl,-allow-multiple-definition",
 			"-fuse-linker-plugin",
-			"-ffat-lto-objects",
+			"-fno-fat-lto-objects",
 			"-flto-odr-type-merging",
 			"-Wodr",
-			"-flto-compression-level=9", -- lto didn't work with anything < 9 on linux with < 12G RAM
+			"-flto-compression-level=0", -- lto doesn't work with anything <9 on linux with < 12G RAM, much slower if <> 0
 --			"-flto-report", -- if you get an error in lto after [WPA] stage, but before [LTRANS] stage, you need more memory!
 --			"-fmem-report-wpa","-fmem-report","-fpre-ipa-mem-report","-fpost-ipa-mem-report","-flto-report-wpa","-fmem-report",
+-- this six flag combo lets MAME compile with LTO=1 on linux with no errors and ~2% speed boost, but compile time is much longer
+-- if you are going to wait on lto, you might as well enable these for GCC
+--			"-fdevirtualize-at-ltrans","-fgcse-sm","-fgcse-las",
+--			"-fipa-pta","-fipa-icf","-fvariable-expansion-in-unroller",
+
 		}
 
 	end
@@ -993,22 +946,19 @@ end
 
 		local version = str_to_version(_OPTIONS["gcc_version"])
 		if string.find(_OPTIONS["gcc"], "clang") then
+			if (version < 30400) then
+				print("Clang version 3.4 or later needed")
+				os.exit(-1)
+			end
 			buildoptions {
 				"-Wno-cast-align",
 				"-Wno-tautological-compare",
 				"-Wno-dynamic-class-memaccess",
+				"-Wno-unused-value",
+				"-Wno-inline-new-delete",
+				"-Wno-constant-logical-operand",
+				"-Wno-deprecated-register",
 			}
-			if (version >= 30200) then
-				buildoptions {
-					"-Wno-unused-value",
-				}
-			end
-			if (version >= 30400) then
-				buildoptions {
-					"-Wno-inline-new-delete",
-					"-Wno-constant-logical-operand",
-				}
-			end
 			if (version >= 30500) then
 				buildoptions {
 					"-Wno-absolute-value",
@@ -1016,58 +966,29 @@ end
 					"-Wno-extern-c-compat",
 				}
 			end
- 			if (version >= 70000) then
+			if (version >= 70000) then
 				buildoptions {
 					"-Wno-tautological-undefined-compare",
 				}
 			end
 		else
-			if (version == 40201) then
+			if (version < 40900) then
+				print("GCC version 4.9 or later needed")
+				os.exit(-1)
+			end
 				buildoptions {
-					"-Wno-cast-align"
+					"-Wno-unused-result", -- needed for fgets,fread on linux
+					-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
+					"-Wno-array-bounds",
 				}
-			end
-			if (version >= 40400) then
-				buildoptions {
-					"-Wno-unused-result",
-				}
-			end
-
-			if (version >= 40700) then
-				buildoptions {
-					"-Wno-narrowing",
-					"-Wno-attributes"
-				}
-			end
-			if (version >= 40800) then
--- grr.. array-bounds works on GCC5.2 linux, but fails in sqllite3.c on MingW GCC 5.1.1 for now
---				if (version < 50000) then
---					-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
-					buildoptions {
-						"-Wno-array-bounds"
-					}
---				end
-			end
-			if (version >= 50000) then
-				buildoptions {
---					"-D__USE_MINGW_ANSI_STDIO=1", -- required or lua won't compile linux ignores this but Windows needs it
-					"-freport-bug",
-					"-D_GLIBCXX_USE_CXX11_ABI=0", -- does not seem to matter in linux, mingw needs to link printf,etc
---					"-DNO_MEM_TRACKING",          -- must comment out for mingw GCC 5.2 pedantic or get new/delete redef error
--- next two should work, but compiler complains about end conditions that are int when loop variable is unsigned. maybe these can be fixed
---					"-funsafe-loop-optimizations",
---					"-Wunsafe-loop-optimizations",
--- this six flag combo lets MAME compile with LTO=1 on linux with no errors and ~2% speed boost, but compile time is much longer
---					"-fdevirtualize-at-ltrans","-fgcse-sm","-fgcse-las",
---					"-fipa-pta","-fipa-icf","-fvariable-expansion-in-unroller",
-
-				}
-			end
 		end
 	end
---ifeq ($(findstring arm,$(UNAME)),arm)
---	CCOMFLAGS += -Wno-cast-align
---endif
+	
+if (_OPTIONS["PLATFORM"]=="arm") then
+	buildoptions {
+		"-Wno-cast-align",
+	}
+end
 
 local subdir
 if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
@@ -1087,14 +1008,9 @@ configuration { "asmjs" }
 	}
 	buildoptions_cpp {
 		"-x c++",
-		"-std=gnu++98",
+		"-std=c++14",
 	}
 	archivesplit_size "20"
-	if os.getenv("EMSCRIPTEN") then
-		includedirs {
-			os.getenv("EMSCRIPTEN") .. "/system/lib/libcxxabi/include"
-		}
-	end
 
 configuration { "android*" }
 	buildoptions {
@@ -1102,7 +1018,7 @@ configuration { "android*" }
 	}
 	buildoptions_cpp {
 		"-x c++",
-		"-std=gnu++98",
+		"-std=c++14",
 	}
 	archivesplit_size "20"
 
@@ -1113,14 +1029,14 @@ configuration { "pnacl" }
 	}
 	buildoptions_cpp {
 		"-x c++",
-		"-std=gnu++98",
+		"-std=c++14",
 	}
 	archivesplit_size "20"
 
 configuration { "nacl*" }
 	buildoptions_cpp {
 		"-x c++",
-		"-std=gnu++98",
+		"-std=c++14",
 	}
 	archivesplit_size "20"
 
@@ -1145,6 +1061,7 @@ configuration { "mingw*" }
 		linkoptions {
 			"-static-libgcc",
 			"-static-libstdc++",
+			"-static",
 		}
 		links {
 			"user32",
@@ -1153,6 +1070,11 @@ configuration { "mingw*" }
 			"shlwapi",
 			"wsock32",
 		}
+configuration { "mingw-clang" }
+		linkoptions {
+			"-pthread",
+		}
+		
 
 configuration { "vs*" }
 		defines {
@@ -1171,6 +1093,7 @@ configuration { "vs*" }
 		}
 
 		buildoptions {
+			"/WX",	   -- Treats all compiler warnings as errors.
 			"/wd4025", -- warning C4025: 'number' : based pointer passed to function with variable arguments: parameter number
 			"/wd4003", -- warning C4003: not enough actual parameters for macro 'xxx'
 			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch
@@ -1217,7 +1140,7 @@ configuration { "vs*" }
 			"/wd4365", -- warning C4365: 'action' : conversion from 'type_1' to 'type_2', signed/unsigned mismatch
 			"/wd4389", -- warning C4389: 'operator' : signed/unsigned mismatch
 			"/wd4245", -- warning C4245: 'conversion' : conversion from 'type1' to 'type2', signed/unsigned mismatch
-			"/wd4388", -- warning C4388:
+			"/wd4388", -- warning C4388: signed/unsigned mismatch
 			"/wd4267", -- warning C4267: 'var' : conversion from 'size_t' to 'type', possible loss of data
 			"/wd4005", -- warning C4005: The macro identifier is defined twice. The compiler uses the second macro definition
 			"/wd4350", -- warning C4350: behavior change: 'member1' called instead of 'member2'
@@ -1226,10 +1149,10 @@ configuration { "vs*" }
 			"/wd4060", -- warning C4060: switch statement contains no 'case' or 'default' labels
 			"/wd4065", -- warning C4065: switch statement contains 'default' but no 'case' labels
 			"/wd4640", -- warning C4640: 'instance' : construction of local static object is not thread-safe
-			"/wd4290", -- warning C4290:
+			"/wd4290", -- warning C4290: C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
 			"/wd4355", -- warning C4355: 'this' : used in base member initializer list
 			"/wd4800", -- warning C4800: 'type' : forcing value to bool 'true' or 'false' (performance warning)
-			"/wd4371", -- warning C4371:
+			"/wd4371", -- warning C4371: layout of class may have changed from a previous version of the compiler due to better packing of member 'member'
 			"/wd4548", -- warning C4548: expression before comma has no effect; expected expression with side-effect
 		}
 if _OPTIONS["vs"]=="intel-15" then
@@ -1261,8 +1184,8 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd1879", 			-- warning #1879: unimplemented pragma ignored
 			"/Qwd3291", 			-- warning #3291: invalid narrowing conversion from "double" to "int"
 			"/Qwd1195", 			-- error #1195: conversion from integer to smaller pointer
-			"/Qwd47",				-- error #47: incompatible redefinition of macro "xxx"
-			"/Qwd265",				-- error #265: floating-point operation result is out of range
+			"/Qwd47",			-- error #47: incompatible redefinition of macro "xxx"
+			"/Qwd265",			-- error #265: floating-point operation result is out of range
 			-- these occur on a release build, while we can increase the size limits instead some of the files do require extreme amounts
 			"/Qwd11074",			-- remark #11074: Inlining inhibited by limit max-size  / remark #11074: Inlining inhibited by limit max-total-size
 			"/Qwd11075",			-- remark #11075: To get full report use -Qopt-report:4 -Qopt-report-phase ipo
@@ -1287,11 +1210,6 @@ configuration { "vs2015" }
 			"/wd4297", -- warning C4297: 'xxx::~xxx': function assumed not to throw an exception but does
 			"/wd4319", -- warning C4319: 'operator' : zero extending 'type' to 'type' of greater size
 		}
-configuration { "vs2010" }
-		buildoptions {
-			"/wd4481", -- warning C4481: nonstandard extension used: override specifier 'override'
-		}
-
 configuration { "winphone8* or winstore8*" }
 	removelinks {
 		"DelayImp",
@@ -1309,6 +1227,11 @@ configuration { "winphone8* or winstore8*" }
 
 configuration { }
 
+if (_OPTIONS["SOURCES"] ~= nil) then
+	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " target " .. _OPTIONS["subtarget"])
+	load(OUT_STR)()
+	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.cpp")
+end
 
 group "libs"
 
@@ -1335,15 +1258,19 @@ findfunction("createProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarg
 
 group "emulator"
 dofile(path.join("src", "main.lua"))
-if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
-	startproject (_OPTIONS["target"])
-else
-	if (_OPTIONS["subtarget"]=="mess") then
-		startproject (_OPTIONS["subtarget"])
+if (_OPTIONS["SOURCES"] == nil) then 
+	if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
+		startproject (_OPTIONS["target"])
 	else
-		startproject (_OPTIONS["target"] .. _OPTIONS["subtarget"])
+		if (_OPTIONS["subtarget"]=="mess") then
+			startproject (_OPTIONS["subtarget"])
+		else
+			startproject (_OPTIONS["target"] .. _OPTIONS["subtarget"])
+		end
 	end
-end
+else
+	startproject (_OPTIONS["subtarget"])
+end 
 mainProject(_OPTIONS["target"],_OPTIONS["subtarget"])
 
 if (_OPTIONS["STRIP_SYMBOLS"]=="1") then

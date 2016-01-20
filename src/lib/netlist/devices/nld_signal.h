@@ -37,7 +37,7 @@ public:
 	{
 	}
 
-	void start()
+	void start() override
 	{
 		const char *sIN[8] = { "A", "B", "C", "D", "E", "F", "G", "H" };
 
@@ -49,7 +49,7 @@ public:
 		save(NLNAME(m_active));
 	}
 
-	void reset()
+	void reset() override
 	{
 		m_Q[0].initial(0);
 		m_active = 1;
@@ -72,7 +72,7 @@ public:
 		return _check ^ _invert;
 	}
 
-	ATTR_HOT virtual void inc_active()
+	ATTR_HOT virtual void inc_active() override
 	{
 		const netlist_time times[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22)};
 		nl_assert(netlist().use_deactivate());
@@ -90,7 +90,7 @@ public:
 		}
 	}
 
-	ATTR_HOT virtual void dec_active()
+	ATTR_HOT virtual void dec_active() override
 	{
 		nl_assert(netlist().use_deactivate());
 		if (--m_active == 0)
@@ -100,7 +100,7 @@ public:
 		}
 	}
 
-	virtual void update()
+	virtual void update() override
 	{
 		const netlist_time times[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22)};
 

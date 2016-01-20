@@ -226,7 +226,7 @@ static const struct CassetteFormat zx81_p_image_format =
 	"p,81",
 	zx81_p_identify,
 	zx81_p_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(zx81_p_format)
@@ -289,7 +289,7 @@ static const struct CassetteFormat zx80_o_image_format =
 	"o,80",
 	zx80_o_identify,
 	zx80_o_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(zx80_o_format)

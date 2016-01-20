@@ -14,7 +14,7 @@
 class atarigx2_state : public atarigen_state
 {
 public:
-	atarigx2_state(const machine_config &mconfig, device_type type, const char *tag)
+	atarigx2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atarigen_state(mconfig, type, tag),
 			m_jsa(*this, "jsa"),
 			m_mo_command(*this, "mo_command"),
@@ -44,8 +44,8 @@ public:
 	UINT16          m_last_write;
 	UINT16          m_last_write_offset;
 
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_READ32_MEMBER(special_port2_r);
 	DECLARE_READ32_MEMBER(special_port3_r);
 	DECLARE_READ32_MEMBER(a2d_data_r);

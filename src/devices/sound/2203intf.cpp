@@ -134,7 +134,7 @@ void ym2203_device::device_start()
 
 	/* Initialize FM emurator */
 	m_chip = ym2203_init(this,this,clock(),rate,timer_handler,IRQHandler,&psgintf);
-	assert_always(m_chip != NULL, "Error creating YM2203 chip");
+	assert_always(m_chip != nullptr, "Error creating YM2203 chip");
 }
 
 //-------------------------------------------------
@@ -188,7 +188,7 @@ WRITE8_MEMBER( ym2203_device::write_port_w )
 
 const device_type YM2203 = &device_creator<ym2203_device>;
 
-ym2203_device::ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ym2203_device::ym2203_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: ay8910_device(mconfig, YM2203, "YM2203", tag, owner, clock, PSG_TYPE_YM, 3, 2, "ym2203", __FILE__),
 		m_irq_handler(*this)
 {

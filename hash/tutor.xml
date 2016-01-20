@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- Tomy Tutor ant Pyuuta Cartridges
+<!-- Tomy Tutor and Pyuuta Cartridges
 Here's a list of known software packages and peripherals. There are 50 documented cartridges, counting both Japanese and American domestic releases; however, some are Japan-only, and a few are verifiably vapourware or were never otherwise released.
 
 Info Taken from: http://www.floodgap.com/retrobits/tomy/carts.html
@@ -27,11 +27,11 @@ Japanese Releases - Pyuuta
 017E Maze Patrol ~ メイズ パトロール    [dumped]
 018E Tron ~ トロン
 019E Mr. Do! ~ Mr.DO!    [dumped]
-020E Bermuda Triangle ~ バミューダ・ トライアングル
-021E 4-nin Mahjan ~ 四人麻雀
-022E Triplecommand ~ トリプルコマンド
+020E Bermuda Triangle ~ バミューダ・ トライアングル  [dumped]
+021E 4-nin Mahjan ~ 四人麻雀 [dumped]
+022E Triplecommand ~ トリプルコマンド   [dumped]
 023E SuperBike ~ スーパーバイク
-024E Rescue Copter [3D] ~ レスキュー コプター
+024E Rescue Copter [3D] ~ レスキュー コプター   [dumped]
 025E Baseball [3D] ~ ベースボール [dumped]
 026E Battlefighter [3D] ~ バトルファイター
 
@@ -80,9 +80,22 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 
 <softwarelist name="tutor" description="Tomy Tutor &amp; Pyuuta cartridges">
 
+	<software name="4ninmj">
+		<description>4-nin Mahjan (Jpn)</description>
+		<year>1984</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="四人麻雀 "/>
+		<info name="serial" value="021E"/>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="0x4000">
+		<rom name="Yonnin Majan.bin" size="0x4000" crc="1c2eb2f0" sha1="4e9a0ce55f479c4b1a5fee9320561ce93765c4d7" offset="0" /> <!-- needs splitting into 2 files? there are 2 roms, marked 1 and 2 in the cart?? -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="baseball">
 		<description>Baseball (Jpn)</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="ベースボール"/>
 		<info name="serial" value="025E"/>
@@ -118,15 +131,17 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
+	<!-- Crawlers and Maze Patrol are confirmed as using the exact same ROM data -->
 	<software name="crawlers">
 	<!-- Stock No: 8100, Clone of Maze Patrol (Japanese 017E)-->
-		<description>Cave Crawlers (USA)</description>
+		<description>Cave Crawlers (USA) / Maze Patrol (Jpn)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
-		<info name="serial" value="8100"/>
+		<info name="alt_title" value="メイズ パトロール"/>
+		<info name="serial" value="8100 / 017E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="crawlers.bin" size="8192" crc="f3059779" sha1="fd51c445f0356ed3796bdbbd4a7f6086d7bb5331" offset="0" />
+				<rom name="tomy 36.7.u1" size="8192" crc="f3059779" sha1="fd51c445f0356ed3796bdbbd4a7f6086d7bb5331" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -215,19 +230,6 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="tomy 32.2.u1" size="8192" crc="90f6a3d9" sha1="9e7007b97ec2c1cf865b2f55989bb616af14a6e6" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mazeptrl">
-		<description>Maze Patrol (Jpn)</description>
-		<year>1983</year>
-		<publisher>Tomy</publisher>
-		<info name="alt_title" value="メイズ パトロール"/>
-		<info name="serial" value="017E"/>
-		<part name="cart" interface="tutor_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="tomy 36.7.u1" size="8192" crc="f3059779" sha1="fd51c445f0356ed3796bdbbd4a7f6086d7bb5331" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -373,12 +375,14 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
+	<!-- Torpedo and Bermuda Triangle are confirmed as using the exact same ROM data -->
 	<software name="torpedo">
 	<!-- Stock No: 8101, Clone of Bermuda Triangle (Japanese 020E)-->
-		<description>Torpedo Terror</description>
+		<description>Torpedo Terror (USA) / Bermuda Triangle (Jpn)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
-		<info name="serial" value="8101"/>
+		<info name="alt_title" value="バミューダ・ トライアングル"/>
+		<info name="serial" value="8101 / 020E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="torpedo.bin" size="8192" crc="95577ceb" sha1="4b75c4bdd2285eff5ed0df3a951d8527270e6b96" offset="0" />

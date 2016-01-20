@@ -275,6 +275,7 @@ VIDEOS["BUFSPRITE"] = true
 VIDEOS["DM9368"] = true
 --VIDEOS["EF9340_1"] = true
 --VIDEOS["EF9345"] = true
+--VIDEOS["EF9365"] = true
 --VIDEOS["GF4500"] = true
 VIDEOS["GF7600GS"] = true
 VIDEOS["EPIC12"] = true
@@ -764,6 +765,8 @@ function createMAMEProjects(_target, _subtarget, _name)
 	targetsubdir(_target .."_" .. _subtarget)
 	kind (LIBTYPE)
 	uuid (os.uuid("drv-" .. _target .."_" .. _subtarget .. "_" .._name))
+	addprojectflags()
+	precompiledheaders()
 
 	includedirs {
 		MAME_DIR .. "src/osd",
@@ -1322,6 +1325,7 @@ files {
 	MAME_DIR .. "src/mame/video/vulgus.cpp",
 	MAME_DIR .. "src/mame/machine/kabuki.cpp",
 	MAME_DIR .. "src/mame/machine/kabuki.h",
+	MAME_DIR .. "src/mame/drivers/tvcapcom.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "cinemat")
@@ -1792,7 +1796,6 @@ files {
 createMAMEProjects(_target, _subtarget, "igs")
 files {
 	MAME_DIR .. "src/mame/drivers/cabaret.cpp",
-	MAME_DIR .. "src/mame/drivers/ddz.cpp",
 	MAME_DIR .. "src/mame/drivers/dunhuang.cpp",
 	MAME_DIR .. "src/mame/drivers/goldstar.cpp",
 	MAME_DIR .. "src/mame/includes/goldstar.h",
@@ -3660,6 +3663,8 @@ files {
 	MAME_DIR .. "src/mame/video/tc0110pcr.h",
 	MAME_DIR .. "src/mame/video/tc0180vcu.cpp",
 	MAME_DIR .. "src/mame/video/tc0180vcu.h",
+	MAME_DIR .. "src/mame/video/tc0780fpa.cpp",
+	MAME_DIR .. "src/mame/video/tc0780fpa.h",
 }
 
 createMAMEProjects(_target, _subtarget, "tatsumi")
@@ -4016,6 +4021,7 @@ createMAMEProjects(_target, _subtarget, "zaccaria")
 files {
 	MAME_DIR .. "src/mame/drivers/laserbat.cpp",
 	MAME_DIR .. "src/mame/includes/laserbat.h",
+	MAME_DIR .. "src/mame/video/laserbat.cpp",
 	MAME_DIR .. "src/mame/audio/laserbat.cpp",
 	MAME_DIR .. "src/mame/drivers/seabattl.cpp",
 	MAME_DIR .. "src/mame/drivers/zac2650.cpp",
@@ -4161,8 +4167,10 @@ files {
 	MAME_DIR .. "src/mame/drivers/aces1.cpp",
 	MAME_DIR .. "src/mame/drivers/acesp.cpp",
 	MAME_DIR .. "src/mame/drivers/adp.cpp",
+	MAME_DIR .. "src/mame/drivers/age_candy.cpp",
 	MAME_DIR .. "src/mame/drivers/alinvade.cpp",
 	MAME_DIR .. "src/mame/drivers/amaticmg.cpp",
+	MAME_DIR .. "src/mame/drivers/amerihok.cpp",
 	MAME_DIR .. "src/mame/drivers/ampoker2.cpp",
 	MAME_DIR .. "src/mame/includes/ampoker2.h",
 	MAME_DIR .. "src/mame/video/ampoker2.cpp",
@@ -4222,6 +4230,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cidelsa.cpp",
 	MAME_DIR .. "src/mame/includes/cidelsa.h",
 	MAME_DIR .. "src/mame/video/cidelsa.cpp",
+	MAME_DIR .. "src/mame/drivers/clowndwn.cpp",
 	MAME_DIR .. "src/mame/drivers/cocoloco.cpp",
 	MAME_DIR .. "src/mame/drivers/coinmstr.cpp",
 	MAME_DIR .. "src/mame/drivers/coinmvga.cpp",
@@ -4273,6 +4282,7 @@ files {
 	MAME_DIR .. "src/mame/video/esripsys.cpp",
 	MAME_DIR .. "src/mame/drivers/ettrivia.cpp",
 	MAME_DIR .. "src/mame/drivers/extrema.cpp",
+	MAME_DIR .. "src/mame/drivers/fastinvaders.cpp",
 	MAME_DIR .. "src/mame/drivers/fireball.cpp",
 	MAME_DIR .. "src/mame/drivers/flipjack.cpp",
 	MAME_DIR .. "src/mame/drivers/flower.cpp",
@@ -4293,6 +4303,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/gammagic.cpp",
 	MAME_DIR .. "src/mame/drivers/gamtor.cpp",
 	MAME_DIR .. "src/mame/drivers/gei.cpp",
+	MAME_DIR .. "src/mame/drivers/gkigt.cpp",
 	MAME_DIR .. "src/mame/drivers/globalfr.cpp",
 	MAME_DIR .. "src/mame/drivers/globalvr.cpp",
 	MAME_DIR .. "src/mame/drivers/gluck2.cpp",
@@ -4344,6 +4355,9 @@ files {
 	MAME_DIR .. "src/mame/includes/ladyfrog.h",
 	MAME_DIR .. "src/mame/video/ladyfrog.cpp",
 	MAME_DIR .. "src/mame/drivers/laserbas.cpp",
+	MAME_DIR .. "src/mame/drivers/laz_awetoss.cpp",
+	MAME_DIR .. "src/mame/drivers/laz_aftrshok.cpp",
+	MAME_DIR .. "src/mame/drivers/laz_ribrac.cpp",
 	MAME_DIR .. "src/mame/drivers/lethalj.cpp",
 	MAME_DIR .. "src/mame/includes/lethalj.h",
 	MAME_DIR .. "src/mame/video/lethalj.cpp",
@@ -4431,7 +4445,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/poker72.cpp",
 	MAME_DIR .. "src/mame/drivers/potgoldu.cpp",
 	MAME_DIR .. "src/mame/drivers/proconn.cpp",
-	MAME_DIR .. "src/mame/drivers/psattack.cpp",
 	MAME_DIR .. "src/mame/drivers/pse.cpp",
 	MAME_DIR .. "src/mame/drivers/quizo.cpp",
 	MAME_DIR .. "src/mame/drivers/quizpun2.cpp",
@@ -4442,7 +4455,9 @@ files {
 	MAME_DIR .. "src/mame/drivers/roul.cpp",
 	MAME_DIR .. "src/mame/drivers/savquest.cpp",
 	MAME_DIR .. "src/mame/drivers/sanremo.cpp",
+	MAME_DIR .. "src/mame/drivers/sanremmg.cpp",
 	MAME_DIR .. "src/mame/drivers/sealy.cpp",
+	MAME_DIR .. "src/mame/drivers/scm_500.cpp",
 	MAME_DIR .. "src/mame/drivers/sfbonus.cpp",
 	MAME_DIR .. "src/mame/drivers/shangkid.cpp",
 	MAME_DIR .. "src/mame/includes/shangkid.h",
@@ -4499,6 +4514,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/trvquest.cpp",
 	MAME_DIR .. "src/mame/drivers/ttchamp.cpp",
 	MAME_DIR .. "src/mame/drivers/tugboat.cpp",
+	MAME_DIR .. "src/mame/drivers/ice_bozopail.cpp",
+	MAME_DIR .. "src/mame/drivers/ice_tbd.cpp",
 	MAME_DIR .. "src/mame/drivers/umipoker.cpp",
 	MAME_DIR .. "src/mame/drivers/unkfr.cpp",
 	MAME_DIR .. "src/mame/drivers/unkhorse.cpp",

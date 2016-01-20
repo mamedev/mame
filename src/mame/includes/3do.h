@@ -131,15 +131,15 @@ struct SVF {
 };
 
 struct DSPP {
-	UINT16 *N;
-	UINT16 *EI;
-	UINT16 *EO;
+	std::unique_ptr<UINT16[]> N;
+	std::unique_ptr<UINT16[]> EI;
+	std::unique_ptr<UINT16[]> EO;
 };
 
 class _3do_state : public driver_device
 {
 public:
-	_3do_state(const machine_config &mconfig, device_type type, const char *tag)
+	_3do_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dram(*this, "dram"),
@@ -170,8 +170,8 @@ public:
 	DECLARE_WRITE32_MEMBER(_3do_madam_w);
 	DECLARE_READ32_MEMBER(_3do_clio_r);
 	DECLARE_WRITE32_MEMBER(_3do_clio_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(_3do);
 	UINT32 screen_update__3do(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

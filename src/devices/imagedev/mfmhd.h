@@ -44,14 +44,14 @@ public:
 private:
 	mfm_harddisk_device*        m_mfmhd;
 	mfmhd_trackimage*           m_tracks;
-	running_machine &			m_machine;
+	running_machine &           m_machine;
 };
 
 class mfm_harddisk_device : public harddisk_image_device,
 							public device_slot_card_interface
 {
 public:
-	mfm_harddisk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	mfm_harddisk_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	~mfm_harddisk_device();
 
 	typedef delegate<void (mfm_harddisk_device*, int)> index_pulse_cb;
@@ -88,8 +88,8 @@ public:
 	// Head select
 	void            headsel_w(int head) { m_current_head = head & 0x0f; }
 
-	bool            call_load();
-	void            call_unload();
+	bool            call_load() override;
+	void            call_unload() override;
 
 	// Tells us the time when the track ends (next index pulse). Needed by the controller.
 	attotime        track_end_time();
@@ -102,10 +102,10 @@ public:
 	int             get_actual_heads();
 
 protected:
-	void                device_start();
-	void                device_stop();
-	void                device_reset();
-	void                device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void                device_start() override;
+	void                device_stop() override;
+	void                device_reset() override;
+	void                device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	std::string         tts(const attotime &t);
 
@@ -174,7 +174,7 @@ private:
 class mfm_hd_generic_device : public mfm_harddisk_device
 {
 public:
-	mfm_hd_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mfm_hd_generic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type MFMHD_GENERIC;
@@ -182,7 +182,7 @@ extern const device_type MFMHD_GENERIC;
 class mfm_hd_st213_device : public mfm_harddisk_device
 {
 public:
-	mfm_hd_st213_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mfm_hd_st213_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type MFMHD_ST213;
@@ -190,7 +190,7 @@ extern const device_type MFMHD_ST213;
 class mfm_hd_st225_device : public mfm_harddisk_device
 {
 public:
-	mfm_hd_st225_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mfm_hd_st225_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type MFMHD_ST225;
@@ -198,7 +198,7 @@ extern const device_type MFMHD_ST225;
 class mfm_hd_st251_device : public mfm_harddisk_device
 {
 public:
-	mfm_hd_st251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mfm_hd_st251_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type MFMHD_ST251;
@@ -209,7 +209,7 @@ class mfm_harddisk_connector : public device_t,
 								public device_slot_interface
 {
 public:
-	mfm_harddisk_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mfm_harddisk_connector(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~mfm_harddisk_connector();
 
 	mfm_harddisk_device *get_device();
@@ -217,8 +217,8 @@ public:
 	void configure(mfmhd_enc_t encoding, int spinupms, int cache, mfmhd_format_type format);
 
 protected:
-	void device_start() { };
-	void device_config_complete();
+	void device_start() override { };
+	void device_config_complete() override;
 
 private:
 	mfmhd_enc_t m_encoding;

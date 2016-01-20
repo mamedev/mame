@@ -36,7 +36,7 @@
 class aim65_state : public driver_device
 {
 public:
-	aim65_state(const machine_config &mconfig, device_type type, const char *tag)
+	aim65_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cassette1(*this, "cassette"),
@@ -56,9 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(aim65_pia_b_w);
 	DECLARE_READ8_MEMBER(aim65_riot_b_r);
 	DECLARE_WRITE8_MEMBER(aim65_riot_a_w);
-	DECLARE_WRITE8_MEMBER(aim65_pa_w);
 	DECLARE_WRITE8_MEMBER(aim65_pb_w);
-	DECLARE_WRITE8_MEMBER(aim65_printer_on);
 	DECLARE_READ8_MEMBER(aim65_pb_r);
 	UINT8 m_pia_a;
 	UINT8 m_pia_b;
@@ -77,8 +75,7 @@ public:
 	required_device<dl1416_device> m_ds3;
 	required_device<dl1416_device> m_ds4;
 	required_device<dl1416_device> m_ds5;
-	virtual void machine_start();
-	TIMER_CALLBACK_MEMBER(aim65_printer_timer);
+	virtual void machine_start() override;
 	void aim65_pia();
 
 	DECLARE_WRITE16_MEMBER(aim65_update_ds1);

@@ -39,7 +39,7 @@ WRITE8_MEMBER(gng_state::gng_bankswitch_w)
 
 WRITE8_MEMBER(gng_state::gng_coin_counter_w)
 {
-	coin_counter_w(machine(), offset, data);
+	machine().bookkeeping().coin_counter_w(offset, data);
 }
 
 static ADDRESS_MAP_START( gng_map, AS_PROGRAM, 8, gng_state )

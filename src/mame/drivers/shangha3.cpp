@@ -73,10 +73,10 @@ WRITE16_MEMBER(shangha3_state::shangha3_coinctrl_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_lockout_w(machine(), 0,~data & 0x0400);
-		coin_lockout_w(machine(), 1,~data & 0x0400);
-		coin_counter_w(machine(), 0,data & 0x0100);
-		coin_counter_w(machine(), 1,data & 0x0200);
+		machine().bookkeeping().coin_lockout_w(0,~data & 0x0400);
+		machine().bookkeeping().coin_lockout_w(1,~data & 0x0400);
+		machine().bookkeeping().coin_counter_w(0,data & 0x0100);
+		machine().bookkeeping().coin_counter_w(1,data & 0x0200);
 	}
 }
 
@@ -87,10 +87,10 @@ WRITE16_MEMBER(shangha3_state::heberpop_coinctrl_w)
 		/* the sound ROM bank is selected by the main CPU! */
 		m_oki->set_bank_base((data & 0x08) ? 0x40000 : 0x00000);
 
-		coin_lockout_w(machine(), 0,~data & 0x04);
-		coin_lockout_w(machine(), 1,~data & 0x04);
-		coin_counter_w(machine(), 0,data & 0x01);
-		coin_counter_w(machine(), 1,data & 0x02);
+		machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
+		machine().bookkeeping().coin_lockout_w(1,~data & 0x04);
+		machine().bookkeeping().coin_counter_w(0,data & 0x01);
+		machine().bookkeeping().coin_counter_w(1,data & 0x02);
 	}
 }
 
@@ -101,10 +101,10 @@ WRITE16_MEMBER(shangha3_state::blocken_coinctrl_w)
 		/* the sound ROM bank is selected by the main CPU! */
 		m_oki->set_bank_base(((data >> 4) & 3) * 0x40000);
 
-		coin_lockout_w(machine(), 0,~data & 0x04);
-		coin_lockout_w(machine(), 1,~data & 0x04);
-		coin_counter_w(machine(), 0,data & 0x01);
-		coin_counter_w(machine(), 1,data & 0x02);
+		machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
+		machine().bookkeeping().coin_lockout_w(1,~data & 0x04);
+		machine().bookkeeping().coin_counter_w(0,data & 0x01);
+		machine().bookkeeping().coin_counter_w(1,data & 0x02);
 	}
 }
 

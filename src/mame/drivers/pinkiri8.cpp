@@ -46,7 +46,7 @@ Dumped by Chackn
 class pinkiri8_state : public driver_device
 {
 public:
-	pinkiri8_state(const machine_config &mconfig, device_type type, const char *tag)
+	pinkiri8_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_janshi_back_vram(*this, "janshivdp:back_vram"),
 		m_janshi_vram1(*this, "janshivdp:vram1"),
@@ -86,7 +86,7 @@ public:
 	DECLARE_READ8_MEMBER(ronjan_prot_status_r);
 	DECLARE_READ8_MEMBER(ronjan_patched_prot_r);
 	DECLARE_DRIVER_INIT(ronjan);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_pinkiri8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -103,14 +103,14 @@ class janshi_vdp_device : public device_t,
 							public device_memory_interface
 {
 public:
-	janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	janshi_vdp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	DECLARE_ADDRESS_MAP(map, 8);
 protected:
-	virtual void device_config_complete();
-	virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual void device_config_complete() override;
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 	address_space_config        m_space_config;
 };
 
@@ -133,7 +133,7 @@ ADDRESS_MAP_END
 
 const device_type JANSHIVDP = &device_creator<janshi_vdp_device>;
 
-janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, JANSHIVDP, "Janshi VDP", tag, owner, clock, "janshi_vdp", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,24, 0, address_map_delegate(FUNC(janshi_vdp_device::map), this))
@@ -147,7 +147,7 @@ void janshi_vdp_device::device_reset() {}
 
 const address_space_config *janshi_vdp_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 void pinkiri8_state::video_start() {}

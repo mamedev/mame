@@ -11,7 +11,7 @@
 class namcoio_device : public device_t
 {
 public:
-	namcoio_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
+	namcoio_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname);
 
 	template<class _Object> static devcb_base &set_in_0_callback(device_t &device, _Object object) { return downcast<namcoio_device &>(device).m_in_0_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_in_1_callback(device_t &device, _Object object) { return downcast<namcoio_device &>(device).m_in_1_cb.set_callback(object); }
@@ -29,8 +29,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	int m_device_type;
 
@@ -69,25 +69,25 @@ private:
 class namco56xx_device : public namcoio_device
 {
 public:
-	namco56xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco56xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual void customio_run();
+	virtual void customio_run() override;
 };
 
 class namco58xx_device : public namcoio_device
 {
 public:
-	namco58xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco58xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual void customio_run();
+	virtual void customio_run() override;
 };
 
 class namco59xx_device : public namcoio_device
 {
 public:
-	namco59xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco59xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual void customio_run();
+	virtual void customio_run() override;
 };
 
 extern const device_type NAMCO56XX;

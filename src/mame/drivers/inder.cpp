@@ -40,7 +40,7 @@
 class inder_state : public genpin_class
 {
 public:
-	inder_state(const machine_config &mconfig, device_type type, const char *tag)
+	inder_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
@@ -86,7 +86,7 @@ private:
 	UINT8 m_sndbank;
 	UINT32 m_sound_addr;
 	UINT8 *m_p_speech;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<sn76489_device> m_sn;
@@ -1187,7 +1187,7 @@ WRITE8_MEMBER( inder_state::disp_w )
 	{
 		offset = (offset >> 3) & 7;
 		for (i = 0; i < 5; i++)
-			output_set_digit_value(i*10+offset, m_segment[i]);
+			output().set_digit_value(i*10+offset, m_segment[i]);
 	}
 }
 
@@ -1219,7 +1219,7 @@ WRITE8_MEMBER( inder_state::ppi64c_w )
 		{
 			if ((m_game==1) && (i == 4))  // mundial,clown,250cc,atleta have credit and ball displays swapped
 				data ^= 4;
-			output_set_digit_value(i*10+data, m_segment[i]);
+			output().set_digit_value(i*10+data, m_segment[i]);
 		}
 	}
 }

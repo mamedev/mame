@@ -15,7 +15,7 @@
 class apexc_state : public driver_device
 {
 public:
-	apexc_state(const machine_config &mconfig, device_type type, const char *tag)
+	apexc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -26,7 +26,7 @@ public:
                                 be edited - the existence of this register is a personnal
                                 guess */
 
-	bitmap_ind16 *m_bitmap;
+	std::unique_ptr<bitmap_ind16> m_bitmap;
 
 	UINT32 m_old_edit_keys;
 	int m_old_control_keys;
@@ -34,8 +34,8 @@ public:
 	int m_letters;
 	int m_pos;
 	DECLARE_DRIVER_INIT(apexc);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(apexc);
 	UINT32 screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(apexc_interrupt);
@@ -74,33 +74,33 @@ class apexc_cylinder_image_device : public device_t, public device_image_interfa
 {
 public:
 	// construction/destruction
-	apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apexc_cylinder_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const { return IO_CYLINDER; }
+	virtual iodevice_t image_type() const override { return IO_CYLINDER; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 1; }
-	virtual const char *image_interface() const { return NULL; }
-	virtual const char *file_extensions() const { return "apc"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 1; }
+	virtual bool is_creatable() const override { return 0; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 1; }
+	virtual const char *image_interface() const override { return nullptr; }
+	virtual const char *file_extensions() const override { return "apc"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	virtual bool call_load();
-	virtual void call_unload();
+	virtual bool call_load() override;
+	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { update_names(); }
-	virtual void device_start() { }
+	virtual void device_config_complete() override { update_names(); }
+	virtual void device_start() override { }
 private:
 	int m_writable;
 };
 
 const device_type APEXC_CYLINDER = &device_creator<apexc_cylinder_image_device>;
 
-apexc_cylinder_image_device::apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+apexc_cylinder_image_device::apexc_cylinder_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, APEXC_CYLINDER, "APEXC Cylinder", tag, owner, clock, "apexc_cylinder_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -203,28 +203,28 @@ class apexc_tape_puncher_image_device : public device_t, public device_image_int
 {
 public:
 	// construction/destruction
-	apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apexc_tape_puncher_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const { return IO_PUNCHTAPE; }
+	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
 
-	virtual bool is_readable()  const { return 0; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 1; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
-	virtual const char *file_extensions() const { return "tap"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual bool is_readable()  const override { return 0; }
+	virtual bool is_writeable() const override { return 1; }
+	virtual bool is_creatable() const override { return 1; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override { return nullptr; }
+	virtual const char *file_extensions() const override { return "tap"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { update_names(); }
-	virtual void device_start() { }
+	virtual void device_config_complete() override { update_names(); }
+	virtual void device_start() override { }
 };
 
 const device_type APEXC_TAPE_PUNCHER = &device_creator<apexc_tape_puncher_image_device>;
 
-apexc_tape_puncher_image_device::apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+apexc_tape_puncher_image_device::apexc_tape_puncher_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, APEXC_TAPE_PUNCHER, "APEXC Tape Puncher", tag, owner, clock, "apexc_tape_puncher_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -237,28 +237,28 @@ class apexc_tape_reader_image_device :  public device_t, public device_image_int
 {
 public:
 	// construction/destruction
-	apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apexc_tape_reader_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const { return IO_PUNCHTAPE; }
+	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 0; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
-	virtual const char *file_extensions() const { return "tap"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 0; }
+	virtual bool is_creatable() const override { return 0; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override { return nullptr; }
+	virtual const char *file_extensions() const override { return "tap"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { update_names(); }
-	virtual void device_start() { }
+	virtual void device_config_complete() override { update_names(); }
+	virtual void device_start() override { }
 };
 
 const device_type APEXC_TAPE_READER = &device_creator<apexc_tape_reader_image_device>;
 
-apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, APEXC_TAPE_READER, "APEXC Tape Reader", tag, owner, clock, "apexc_tape_reader_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -568,7 +568,7 @@ void apexc_state::video_start()
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
+	m_bitmap = std::make_unique<bitmap_ind16>(width, height);
 	m_bitmap->fill(0, /*machine().visible_area*/teletyper_window);
 }
 

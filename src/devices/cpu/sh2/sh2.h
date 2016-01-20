@@ -92,8 +92,8 @@ class sh2_device : public cpu_device
 
 public:
 	// construction/destruction
-	sh2_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
-	sh2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type,address_map_constructor internal_map, int addrlines);
+	sh2_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
+	sh2_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int cpu_type,address_map_constructor internal_map, int addrlines);
 
 	static void set_is_slave(device_t &device, int slave) { downcast<sh2_device &>(device).m_is_slave = slave; }
 	static void set_dma_kludge_callback(device_t &device, sh2_dma_kludge_delegate callback) { downcast<sh2_device &>(device).m_dma_kludge_cb = callback; }
@@ -113,30 +113,30 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_stop();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_stop() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 4; }
-	virtual UINT32 execute_input_lines() const { return 16; }
-	virtual UINT32 execute_default_irq_vector() const { return 0; }
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 4; }
+	virtual UINT32 execute_input_lines() const override { return 16; }
+	virtual UINT32 execute_default_irq_vector() const override { return 0; }
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_export(const device_state_entry &entry);
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 	address_space *m_program, *m_decrypted_program;
 
 private:
@@ -219,8 +219,8 @@ private:
 	sh2_ftcsr_read_delegate              m_ftcsr_read_cb;
 
 	drc_cache           m_cache;                  /* pointer to the DRC code cache */
-	drcuml_state *      m_drcuml;                 /* DRC UML generator state */
-	sh2_frontend *      m_drcfe;                  /* pointer to the DRC front-end state */
+	std::unique_ptr<drcuml_state>      m_drcuml;                 /* DRC UML generator state */
+	std::unique_ptr<sh2_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
 	UINT32              m_drcoptions;         /* configurable DRC options */
 
 	internal_sh2_state *m_sh2_state;
@@ -486,7 +486,7 @@ class sh2a_device : public sh2_device
 {
 public:
 	// construction/destruction
-	sh2a_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	sh2a_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
 
 	DECLARE_READ32_MEMBER(dma_sar0_r);
 	DECLARE_WRITE32_MEMBER(dma_sar0_w);
@@ -519,7 +519,7 @@ class sh1_device : public sh2_device
 {
 public:
 	// construction/destruction
-	sh1_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	sh1_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
 
 	DECLARE_READ16_MEMBER(sh7032_r);
 	DECLARE_WRITE16_MEMBER(sh7032_w);
@@ -534,7 +534,7 @@ public:
 	sh2_frontend(sh2_device *device, UINT32 window_start, UINT32 window_end, UINT32 max_sequence);
 
 protected:
-	virtual bool describe(opcode_desc &desc, const opcode_desc *prev);
+	virtual bool describe(opcode_desc &desc, const opcode_desc *prev) override;
 
 private:
 	bool describe_group_0(opcode_desc &desc, const opcode_desc *prev, UINT16 opcode);

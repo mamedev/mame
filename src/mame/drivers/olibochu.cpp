@@ -60,7 +60,7 @@ $7004 writes, related to $7000 reads
 class olibochu_state : public driver_device
 {
 public:
-	olibochu_state(const machine_config &mconfig, device_type type, const char *tag)
+	olibochu_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -86,9 +86,9 @@ public:
 	DECLARE_WRITE8_MEMBER(olibochu_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(olibochu);
 	UINT32 screen_update_olibochu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(olibochu_scanline);

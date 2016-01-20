@@ -20,10 +20,10 @@ const device_type N64PERIPH = &device_creator<n64_periphs>;
 
 
 
-n64_periphs::n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+n64_periphs::n64_periphs(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, N64PERIPH, "N64 Periphal Chips", tag, owner, clock, "n64_periphs", __FILE__)
 	, device_video_interface(mconfig, *this)
-	, m_nvram_image(NULL)
+	, m_nvram_image(nullptr)
 	, dd_present(false)
 	, disk_present(false)
 	, cart_present(false)
@@ -1281,7 +1281,7 @@ n64_periphs::AUDIO_DMA *n64_periphs::ai_fifo_get_top()
 	}
 	else
 	{
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -1324,7 +1324,7 @@ void n64_periphs::ai_timer_tick()
 	signal_rcp_interrupt(AI_INTERRUPT);
 
 	// keep playing if there's another DMA queued
-	if (ai_fifo_get_top() != NULL)
+	if (ai_fifo_get_top() != nullptr)
 	{
 		ai_dma();
 	}
@@ -1669,10 +1669,10 @@ READ32_MEMBER( n64_periphs::ri_reg_r )
 {
 	if(offset == 0x0C/4) // RI_SELECT
 	{
-		/* This is to 'simulate' the time that RDRAM initialization 
+		/* This is to 'simulate' the time that RDRAM initialization
 		would take if the RI registers were not set to skip the RDRAM
 		testing during device reset.  Proper simulation would require
-		emulating the RDRAM modules and bus stalls for the mips cpu. 
+		emulating the RDRAM modules and bus stalls for the mips cpu.
 		The cycle amount chosen represents 1/2 second, which is not
 		necessarily the time for RDRAM initialization, but rather the
 		time recommended for letting the SI devices settle after startup.
@@ -1739,7 +1739,7 @@ UINT8 n64_periphs::calc_mempak_crc(UINT8 *buffer, int length)
 	return crc;
 }
 
-INLINE UINT8 convert_to_bcd(int val)
+static inline UINT8 convert_to_bcd(int val)
 {
 	return ((val / 10) << 4) | (val % 10);
 }
@@ -2736,7 +2736,7 @@ void n64_state::n64_machine_stop()
 {
 	n64_periphs *periphs = machine().device<n64_periphs>("rcp");
 
-	if( periphs->m_nvram_image == NULL )
+	if( periphs->m_nvram_image == nullptr )
 		return;
 
 	device_image_interface *image = dynamic_cast<device_image_interface *>(periphs->m_nvram_image);

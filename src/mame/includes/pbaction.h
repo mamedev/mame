@@ -9,7 +9,7 @@
 class pbaction_state : public driver_device
 {
 public:
-	pbaction_state(const machine_config &mconfig, device_type type, const char *tag)
+	pbaction_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
@@ -57,9 +57,9 @@ public:
 	DECLARE_DRIVER_INIT(pbactio4);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_pbaction(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pbaction_interrupt);
 	INTERRUPT_GEN_MEMBER(vblank_irq);

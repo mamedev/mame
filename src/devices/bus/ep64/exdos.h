@@ -29,11 +29,11 @@ class ep64_exdos_device : public device_t,
 {
 public:
 	// construction/destruction
-	ep64_exdos_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ep64_exdos_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -42,8 +42,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	required_device<wd1770_t> m_fdc;

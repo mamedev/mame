@@ -14,13 +14,13 @@ class msx_cart_moonsound : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_moonsound(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_moonsound(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
 	DECLARE_WRITE8_MEMBER(write_ymf278b_fm);
 	DECLARE_READ8_MEMBER(read_ymf278b_fm);

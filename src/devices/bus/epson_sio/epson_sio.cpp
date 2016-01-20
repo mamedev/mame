@@ -52,7 +52,7 @@ device_epson_sio_interface::~device_epson_sio_interface()
 //  epson_sio_device - constructor
 //-------------------------------------------------
 
-epson_sio_device::epson_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+epson_sio_device::epson_sio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, EPSON_SIO, "EPSON SIO port", tag, owner, clock, "epson_sio", __FILE__),
 		device_slot_interface(mconfig, *this), m_cart(nullptr),
 		m_write_rx(*this),
@@ -94,13 +94,13 @@ void epson_sio_device::device_reset()
 
 WRITE_LINE_MEMBER( epson_sio_device::tx_w )
 {
-	if (m_cart != NULL)
+	if (m_cart != nullptr)
 		m_cart->tx_w(state);
 }
 
 WRITE_LINE_MEMBER( epson_sio_device::pout_w )
 {
-	if (m_cart != NULL)
+	if (m_cart != nullptr)
 		m_cart->pout_w(state);
 }
 

@@ -17,7 +17,7 @@ extern const device_type CAT702;
 class cat702_device : public device_t
 {
 public:
-	cat702_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cat702_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_dataout_handler(device_t &device, _Object object) { return downcast<cat702_device &>(device).m_dataout_handler.set_callback(object); }
@@ -29,7 +29,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_clock);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	UINT8 compute_sbox_coef(int sel, int bit);

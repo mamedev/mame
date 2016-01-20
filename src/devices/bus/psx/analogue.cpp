@@ -5,14 +5,14 @@
 const device_type PSX_ANALOG_JOYSTICK = &device_creator<psx_analog_joystick_device>;
 const device_type PSX_DUALSHOCK = &device_creator<psx_dualshock_device>;
 
-psx_analog_controller_device::psx_analog_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+psx_analog_controller_device::psx_analog_controller_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_psx_controller_interface(mconfig, *this), 
-		m_type(), 
-		m_confmode(false), 
-		m_analogmode(false), 
-		m_analoglock(false), 
-		m_temp(0), 
+		device_psx_controller_interface(mconfig, *this),
+		m_type(),
+		m_confmode(false),
+		m_analogmode(false),
+		m_analoglock(false),
+		m_temp(0),
 		m_cmd(0),
 		m_pad0(*this, "PSXPAD0"),
 		m_pad1(*this, "PSXPAD1"),
@@ -23,13 +23,13 @@ psx_analog_controller_device::psx_analog_controller_device(const machine_config 
 {
 }
 
-psx_dualshock_device::psx_dualshock_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+psx_dualshock_device::psx_dualshock_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		psx_analog_controller_device(mconfig, PSX_DUALSHOCK, "Playstation Dualshock Pad", tag, owner, clock, "psx_dualshock_pad", __FILE__)
 {
 	m_type = DUALSHOCK;
 }
 
-psx_analog_joystick_device::psx_analog_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+psx_analog_joystick_device::psx_analog_joystick_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		psx_analog_controller_device(mconfig, PSX_ANALOG_JOYSTICK, "Playstation Analog Joystick", tag, owner, clock, "psx_analog_joystick", __FILE__)
 {
 	m_type = JOYSTICK;
@@ -255,7 +255,7 @@ static INPUT_PORTS_START( psx_analog_controller )
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Left Analog Y") PORT_SENSITIVITY(100)
 
 	PORT_START("PSXMISC")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Analog") PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, psx_analog_controller_device, change_mode, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Analog") PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, psx_analog_controller_device, change_mode, nullptr)
 INPUT_PORTS_END
 
 ioport_constructor psx_analog_controller_device::device_input_ports() const

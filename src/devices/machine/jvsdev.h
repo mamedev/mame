@@ -13,7 +13,7 @@ class jvs_host;
 class jvs_device : public device_t
 {
 public:
-	jvs_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	jvs_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	static void static_set_jvs_host_tag(device_t &device, const char *jvs_host_tag);
 
 	void chain(jvs_device *dev);
@@ -26,8 +26,8 @@ protected:
 	void handle_output(ioport_port *port, UINT8 id, UINT8 val);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// JVS device overrides
 	virtual const char *device_id();

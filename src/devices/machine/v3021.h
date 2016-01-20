@@ -40,7 +40,7 @@ class v3021_device :    public device_t
 {
 public:
 	// construction/destruction
-	v3021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v3021_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
@@ -49,12 +49,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start();
-	virtual void device_reset();
-
-	inline UINT8 rtc_read(UINT8 offset);
-	inline void rtc_write(UINT8 offset,UINT8 data);
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	static TIMER_CALLBACK( rtc_inc_callback );
 

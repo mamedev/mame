@@ -78,14 +78,14 @@
 class sun2_state : public driver_device
 {
 public:
-	sun2_state(const machine_config &mconfig, device_type type, const char *tag)
+	sun2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu")
 	,
 		m_p_ram(*this, "p_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	required_shared_ptr<UINT16> m_p_ram;
 };

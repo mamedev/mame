@@ -68,7 +68,7 @@ private:
 class ti99_datamux_device : public device_t
 {
 public:
-	ti99_datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti99_datamux_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 	DECLARE_SETOFFSET_MEMBER( setoffset );
@@ -84,10 +84,10 @@ public:
 
 protected:
 	/* Constructor */
-	void device_start();
-	void device_stop();
-	void device_reset();
-	ioport_constructor device_input_ports() const;
+	void device_start() override;
+	void device_stop() override;
+	void device_reset() override;
+	ioport_constructor device_input_ports() const override;
 
 private:
 	// Keeps the address space pointer
@@ -134,7 +134,7 @@ private:
 	int   m_waitcount;
 
 	/* Memory expansion (internal, 16 bit). */
-	UINT16 *m_ram16b;
+	std::unique_ptr<UINT16[]> m_ram16b;
 
 	/* Use the memory expansion? */
 	bool m_use32k;

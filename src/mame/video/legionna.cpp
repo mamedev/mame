@@ -33,7 +33,7 @@ WRITE16_MEMBER(legionna_state::tile_scroll_w)
 	COMBINE_DATA(scrollvals + offset);
 	data = scrollvals[offset];
 
-	tilemap_t *tm = 0;
+	tilemap_t *tm = nullptr;
 	switch(offset/2) {
 	case 0: tm = m_background_layer; break;
 	case 1: tm = m_midground_layer; break;
@@ -43,6 +43,21 @@ WRITE16_MEMBER(legionna_state::tile_scroll_w)
 		tm->set_scrolly(0, data);
 	else
 		tm->set_scrollx(0, data);
+}
+
+WRITE16_MEMBER(legionna_state::tile_vreg_1a_w)
+{
+	flip_screen_set(data & 1);
+	// TODO: other bits ...
+}
+
+WRITE16_MEMBER(legionna_state::tile_scroll_base_w)
+{
+	// TODO: specific for Godzilla, needs visible area changes.
+	if(offset == 7)
+		m_text_layer->set_scrolldy(0x1ef - data,0x1ef - data);
+
+	printf("%02x %04x\n",offset,data);
 }
 
 WRITE16_MEMBER(legionna_state::heatbrl_setgfxbank)
@@ -196,17 +211,17 @@ TILE_GET_INFO_MEMBER(legionna_state::get_text_tile_info)
 
 VIDEO_START_MEMBER(legionna_state,legionna)
 {
-	m_back_data = auto_alloc_array_clear(machine(), UINT16, 0x800/2);
-	m_fore_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
-	m_mid_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
-	m_textram =  auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
+	m_back_data = make_unique_clear<UINT16[]>(0x800/2);
+	m_fore_data =  make_unique_clear<UINT16[]>(0x800/2);
+	m_mid_data =  make_unique_clear<UINT16[]>(0x800/2);
+	m_textram =  make_unique_clear<UINT16[]>(0x1000/2);
 
 	m_background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_foreground_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_midground_layer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_text_layer =       &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
 
-	m_scrollram16 = auto_alloc_array(machine(), UINT16, 0x60/2);
+	m_scrollram16 = std::make_unique<UINT16[]>(0x60/2);
 	m_sprite_xoffs = 0;
 	m_sprite_yoffs = 0;
 
@@ -221,17 +236,17 @@ VIDEO_START_MEMBER(legionna_state,legionna)
 
 VIDEO_START_MEMBER(legionna_state,denjinmk)
 {
-	m_back_data = auto_alloc_array_clear(machine(), UINT16, 0x800/2);
-	m_fore_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
-	m_mid_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
-	m_textram =  auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
+	m_back_data = make_unique_clear<UINT16[]>(0x800/2);
+	m_fore_data =  make_unique_clear<UINT16[]>(0x800/2);
+	m_mid_data =  make_unique_clear<UINT16[]>(0x800/2);
+	m_textram =  make_unique_clear<UINT16[]>(0x1000/2);
 
 	m_background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_foreground_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info_denji),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_midground_layer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info_denji),this), TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_text_layer =       &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
 
-	m_scrollram16 = auto_alloc_array(machine(), UINT16, 0x60/2);
+	m_scrollram16 = std::make_unique<UINT16[]>(0x60/2);
 	m_sprite_xoffs = 0;
 	m_sprite_yoffs = 0;
 
@@ -246,17 +261,17 @@ VIDEO_START_MEMBER(legionna_state,denjinmk)
 
 VIDEO_START_MEMBER(legionna_state,cupsoc)
 {
-	m_back_data = auto_alloc_array_clear(machine(), UINT16, 0x800/2);
-	m_fore_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
-	m_mid_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
-	m_textram =  auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
+	m_back_data = make_unique_clear<UINT16[]>(0x800/2);
+	m_fore_data =  make_unique_clear<UINT16[]>(0x800/2);
+	m_mid_data =  make_unique_clear<UINT16[]>(0x800/2);
+	m_textram =  make_unique_clear<UINT16[]>(0x1000/2);
 
 	m_background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_foreground_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_midground_layer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info_cupsoc),this), TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_text_layer =       &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
 
-	m_scrollram16 = auto_alloc_array(machine(), UINT16, 0x60/2);
+	m_scrollram16 = std::make_unique<UINT16[]>(0x60/2);
 	m_sprite_xoffs = 0;
 	m_sprite_yoffs = 0;
 

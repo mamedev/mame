@@ -3,7 +3,7 @@
 class taxidriv_state : public driver_device
 {
 public:
-	taxidriv_state(const machine_config &mconfig, device_type type, const char *tag)
+	taxidriv_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -63,7 +63,7 @@ public:
 	DECLARE_WRITE8_MEMBER(p8910_0b_w);
 	DECLARE_WRITE8_MEMBER(spritectrl_w);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(taxidriv);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

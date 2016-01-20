@@ -215,10 +215,10 @@ WRITE16_MEMBER(pgm_state::pgm_videoram_w)
 
 WRITE16_MEMBER(pgm_state::pgm_coin_counter_w)
 {
-	coin_counter_w(machine(), 0, data & 0x0001);
-	coin_counter_w(machine(), 1, data & 0x0002);
-	coin_counter_w(machine(), 2, data & 0x0004);
-	coin_counter_w(machine(), 3, data & 0x0008);
+	machine().bookkeeping().coin_counter_w(0, data & 0x0001);
+	machine().bookkeeping().coin_counter_w(1, data & 0x0002);
+	machine().bookkeeping().coin_counter_w(2, data & 0x0004);
+	machine().bookkeeping().coin_counter_w(3, data & 0x0008);
 }
 
 READ16_MEMBER(pgm_state::z80_ram_r)
@@ -4376,7 +4376,7 @@ void pgm_state::expand_colourdata()
 	while (m_sprite_a_region_size < needed)
 		m_sprite_a_region_size <<= 1;
 
-	m_sprite_a_region = auto_alloc_array(machine(), UINT8, m_sprite_a_region_size);
+	m_sprite_a_region = std::make_unique<UINT8[]>(m_sprite_a_region_size);
 
 	for (cnt = 0 ; cnt < srcsize / 2 ; cnt++)
 	{

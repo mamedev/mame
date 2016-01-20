@@ -89,7 +89,7 @@ struct keyboard_t
 class mbc55x_state : public driver_device
 {
 public:
-	mbc55x_state(const machine_config &mconfig, device_type type, const char *tag)
+	mbc55x_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU_TAG),
 		m_crtc(*this, VID_MC6845_NAME),
@@ -138,8 +138,6 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi8255_w);
 	//DECLARE_READ8_MEMBER(pit8253_r);
 	//DECLARE_WRITE8_MEMBER(pit8253_w);
-	DECLARE_READ16_MEMBER(mbc55x_io_r);
-	DECLARE_WRITE16_MEMBER(mbc55x_io_w);
 	DECLARE_READ8_MEMBER(mbc55x_ppi_porta_r);
 	DECLARE_READ8_MEMBER(mbc55x_ppi_portb_r);
 	DECLARE_READ8_MEMBER(mbc55x_ppi_portc_r);
@@ -166,10 +164,10 @@ public:
 	DECLARE_WRITE8_MEMBER(mbc55x_kb_usart_w);
 	DECLARE_DRIVER_INIT(mbc55x);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
-	virtual void video_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void video_reset() override;
 	DECLARE_PALETTE_INIT(mbc55x);
 	void screen_eof_mbc55x(screen_device &screen, bool state);
 	TIMER_CALLBACK_MEMBER(keyscan_callback);

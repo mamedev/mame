@@ -19,19 +19,19 @@ const device_type SNS_HIROM = &device_creator<sns_rom21_device>;
 const device_type SNS_HIROM_SRTC = &device_creator<sns_rom21_srtc_device>;
 
 
-sns_rom21_device::sns_rom21_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+sns_rom21_device::sns_rom21_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_sns_cart_interface( mconfig, *this )
 {
 }
 
-sns_rom21_device::sns_rom21_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sns_rom21_device::sns_rom21_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, SNS_HIROM, "SNES Cart (HiROM)", tag, owner, clock, "sns_rom21", __FILE__),
 						device_sns_cart_interface( mconfig, *this )
 {
 }
 
-sns_rom21_srtc_device::sns_rom21_srtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sns_rom21_srtc_device::sns_rom21_srtc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: sns_rom21_device(mconfig, SNS_HIROM_SRTC, "SNES Cart (HiROM) + S-RTC", tag, owner, clock, "sns_rom21_srtc", __FILE__), m_mode(0), m_index(0)
 				{
 }

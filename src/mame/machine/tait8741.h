@@ -57,7 +57,7 @@ class taito8741_4pack_device : public device_t
 	};
 
 public:
-	taito8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	taito8741_4pack_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~taito8741_4pack_device() {}
 
 	template<class _Object> static devcb_base &set_port_handler_0_callback(device_t &device, _Object object) { return downcast<taito8741_4pack_device &>(device).m_port_handler_0_r.set_callback(object); }
@@ -88,8 +88,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	void hostdata_w(I8741 *st,int data);
@@ -143,7 +143,7 @@ class josvolly8741_4pack_device : public device_t
 	};
 
 public:
-	josvolly8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	josvolly8741_4pack_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~josvolly8741_4pack_device() {}
 
 	template<class _Object> static devcb_base &set_port_handler_0_callback(device_t &device, _Object object) { return downcast<josvolly8741_4pack_device &>(device).m_port_handler_0_r.set_callback(object); }
@@ -163,8 +163,8 @@ public:
 	TIMER_CALLBACK_MEMBER( tx );
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	void update(int num);

@@ -181,7 +181,7 @@ float GetSpotAddend(float2 coord, float amount)
 	float SpotRadius = amount * 0.75f;
 	float Spot = smoothstep(SpotRadius, SpotRadius - SpotBlur, length(SpotCoord));
 
-	float SigmoidSpot = normalizedSigmoid(Spot, 0.75) * amount;
+	float SigmoidSpot = amount * normalizedSigmoid(Spot, 0.75);
 
 	// increase strength by 100%
 	SigmoidSpot = SigmoidSpot * 2.0f;
@@ -215,8 +215,6 @@ float GetRoundCornerFactor(float2 coord, float radiusAmount, float smoothAmount)
 // www.francois-tarlier.com/blog/cubic-lens-distortion-shader/
 float2 GetDistortedCoords(float2 centerCoord, float amount)
 {
-	amount *= 0.25f; // reduced amount
-
 	// lens distortion coefficient
 	float k = amount;
 
@@ -266,7 +264,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 BaseCoord = TexCoord;
 
 	// Screen Curvature
-	BaseCoord = GetCoords(BaseCoord, CurvatureAmount);
+	BaseCoord = GetCoords(BaseCoord, CurvatureAmount * 0.25f); // reduced amount
 
 	float2 BaseCoordCentered = BaseCoord;
 	BaseCoordCentered -= 0.5f;

@@ -120,7 +120,7 @@ const UINT8 i80186_cpu_device::m_i80186_timing[] =
 const device_type I80186 = &device_creator<i80186_cpu_device>;
 const device_type I80188 = &device_creator<i80188_cpu_device>;
 
-i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: i80186_cpu_device(mconfig, I80188, "I80188", tag, owner, clock, "i80188", __FILE__, 8)
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
@@ -128,7 +128,7 @@ i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *
 	static_set_irq_acknowledge_callback(*this, device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback), this));
 }
 
-i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: i8086_common_cpu_device(mconfig, I80186, "I80186", tag, owner, clock, "i80186", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, 0)
@@ -142,7 +142,7 @@ i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *
 	static_set_irq_acknowledge_callback(*this, device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback), this));
 }
 
-i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int data_bus_size)
+i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int data_bus_size)
 	: i8086_common_cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, data_bus_size, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, data_bus_size, 16, 0)
@@ -270,7 +270,7 @@ void i80186_cpu_device::execute_run()
 					if (tmp<low || tmp>high)
 						interrupt(5);
 					CLK(BOUND);
-					logerror("%s: %06x: bound %04x high %04x low %04x tmp\n", tag(), pc(), high, low, tmp);
+					logerror("%s: %06x: bound %04x high %04x low %04x tmp\n", tag().c_str(), pc(), high, low, tmp);
 				}
 				break;
 
@@ -341,7 +341,7 @@ void i80186_cpu_device::execute_run()
 					m_sregs[DS] = m_src;
 					break;
 				default:
-					logerror("%s: %06x: Mov Sreg - Invalid register\n", tag(), pc());
+					logerror("%s: %06x: Mov Sreg - Invalid register\n", tag().c_str(), pc());
 					m_ip = m_prev_ip;
 					interrupt(6);
 					break;
@@ -537,7 +537,7 @@ void i80186_cpu_device::execute_run()
 				if(!common_op(op))
 				{
 					m_icount -= 10; // UD fault timing?
-					logerror("%s: %06x: Invalid Opcode %02x\n", tag(), pc(), op);
+					logerror("%s: %06x: Invalid Opcode %02x\n", tag().c_str(), pc(), op);
 					m_ip = m_prev_ip;
 					interrupt(6); // 80186 has #UD
 					break;
@@ -636,19 +636,19 @@ void i80186_cpu_device::device_reset()
 	m_intr.ext_state        = 0x00;
 	m_reloc = 0x20ff;
 
-	for (int i = 0; i < ARRAY_LENGTH(m_dma); i++)
+	for (auto & elem : m_dma)
 	{
-		m_dma[i].drq_state = false;
-		m_dma[i].control = 0;
+		elem.drq_state = false;
+		elem.control = 0;
 	}
 
-	for (int i = 0; i < ARRAY_LENGTH(m_timer); i++)
+	for (auto & elem : m_timer)
 	{
-		m_timer[i].control = 0;
-		m_timer[i].maxA = 0;
-		m_timer[i].maxB = 0;
-		m_timer[i].active_count = false;
-		m_timer[i].count = 0;
+		elem.control = 0;
+		elem.maxA = 0;
+		elem.maxB = 0;
+		elem.active_count = false;
+		elem.count = 0;
 	}
 }
 
@@ -1071,10 +1071,10 @@ void i80186_cpu_device::inc_timer(int which)
 	if (t->control & 2)
 	{
 		if (t->count == (t->active_count ? t->maxB : t->maxA))
-			device_timer(*t->int_timer, which, which, NULL);
+			device_timer(*t->int_timer, which, which, nullptr);
 	}
 	else if (t->count == t->maxA)
-		device_timer(*t->int_timer, which, which, NULL);
+		device_timer(*t->int_timer, which, which, nullptr);
 }
 
 void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_maxA, int new_maxB, int new_control)

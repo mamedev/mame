@@ -38,7 +38,7 @@
 class chaos_state : public driver_device
 {
 public:
-	chaos_state(const machine_config &mconfig, device_type type, const char *tag)
+	chaos_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_terminal(*this, TERMINAL_TAG),
 		m_p_ram(*this, "p_ram") ,
@@ -50,10 +50,9 @@ public:
 	DECLARE_WRITE8_MEMBER(port1f_w);
 	DECLARE_READ8_MEMBER(port90_r);
 	DECLARE_READ8_MEMBER(port91_r);
-	DECLARE_WRITE8_MEMBER(port92_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<UINT8> m_p_ram;
 	required_device<cpu_device> m_maincpu;

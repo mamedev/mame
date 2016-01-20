@@ -41,7 +41,7 @@ static int cCpuAscending(const void* a, const void* b)
 {
 	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
 	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return strcmp(left->debugInterface()->device().tag(), right->debugInterface()->device().tag());
+	return left->debugInterface()->device().tag() != right->debugInterface()->device().tag();
 }
 
 static int cCpuDescending(const void* a, const void* b)
@@ -152,10 +152,10 @@ void debug_view_watchpoints::enumerate_sources()
 
 	// iterate over devices with disassembly interfaces
 	disasm_interface_iterator iter(machine().root_device());
-	for (device_disasm_interface *dasm = iter.first(); dasm != NULL; dasm = iter.next())
+	for (device_disasm_interface *dasm = iter.first(); dasm != nullptr; dasm = iter.next())
 	{
 		std::string name;
-		strprintf(name, "%s '%s'", dasm->device().name(), dasm->device().tag());
+		strprintf(name, "%s '%s'", dasm->device().name().c_str(), dasm->device().tag().c_str());
 		m_source_list.append(*global_alloc(debug_view_source(name.c_str(), &dasm->device())));
 	}
 
@@ -227,13 +227,13 @@ void debug_view_watchpoints::pad_astring_to_length(std::string& str, int len)
 void debug_view_watchpoints::gather_watchpoints()
 {
 	m_buffer.resize(0);
-	for (const debug_view_source *source = m_source_list.first(); source != NULL; source = source->next())
+	for (const debug_view_source *source = m_source_list.first(); source != nullptr; source = source->next())
 	{
 		// Collect
 		device_debug &debugInterface = *source->device()->debug();
 		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
 		{
-			for (device_debug::watchpoint *wp = debugInterface.watchpoint_first(spacenum); wp != NULL; wp = wp->next())
+			for (device_debug::watchpoint *wp = debugInterface.watchpoint_first(spacenum); wp != nullptr; wp = wp->next())
 				m_buffer.push_back(wp);
 		}
 	}

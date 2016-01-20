@@ -46,7 +46,7 @@ PCB:
 class albazg_state : public driver_device
 {
 public:
-	albazg_state(const machine_config &mconfig, device_type type, const char *tag)
+	albazg_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_cus_ram(*this, "cus_ram"),
 		m_videoram(*this, "videoram"),
@@ -75,9 +75,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(yumefuda_output_w);
 	TILE_GET_INFO_MEMBER(y_get_bg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_yumefuda(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -192,9 +192,9 @@ WRITE8_MEMBER(albazg_state::mux_w)
 
 WRITE8_MEMBER(albazg_state::yumefuda_output_w)
 {
-	coin_counter_w(machine(), 0, ~data & 4);
-	coin_counter_w(machine(), 1, ~data & 2);
-	coin_lockout_global_w(machine(), data & 1);
+	machine().bookkeeping().coin_counter_w(0, ~data & 4);
+	machine().bookkeeping().coin_counter_w(1, ~data & 2);
+	machine().bookkeeping().coin_lockout_global_w(data & 1);
 	//data & 0x10 hopper-c (active LOW)
 	//data & 0x08 divider (active HIGH)
 	flip_screen_set(~data & 0x20);

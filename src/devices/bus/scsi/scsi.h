@@ -99,7 +99,7 @@ class SCSI_PORT_DEVICE : public device_t
 
 public:
 	// construction/destruction
-	SCSI_PORT_DEVICE(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	SCSI_PORT_DEVICE(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_bsy_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_bsy_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_sel_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_sel_handler.set_callback(object); }
@@ -139,8 +139,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	void update_bsy();
 	void update_sel();
@@ -229,15 +229,15 @@ class SCSI_PORT_SLOT_device : public device_t,
 	friend class scsi_port_interface;
 
 public:
-	SCSI_PORT_SLOT_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	SCSI_PORT_SLOT_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	scsi_port_interface *dev() { return m_dev; }
 	SCSI_PORT_DEVICE *port() { return m_port; }
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 protected:
 	scsi_port_interface *m_dev;

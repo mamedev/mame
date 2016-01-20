@@ -42,9 +42,9 @@ DRIVER_INIT_MEMBER(mz_state,mz700)
 	m_mz700 = TRUE;
 	m_mz700_mode = TRUE;
 
-	m_videoram = auto_alloc_array(machine(), UINT8, 0x1000);
-	memset(m_videoram, 0, sizeof(UINT8) * 0x1000);
-	m_colorram = m_videoram + 0x800;
+	m_videoram = std::make_unique<UINT8[]>(0x1000);
+	memset(m_videoram.get(), 0, sizeof(UINT8) * 0x1000);
+	m_colorram = m_videoram.get() + 0x800;
 
 	m_p_chargen = memregion("cgrom")->base();
 	UINT8 *rom = memregion("monitor")->base();
@@ -53,7 +53,7 @@ DRIVER_INIT_MEMBER(mz_state,mz700)
 	membank("bankr0")->configure_entry(1, &rom[0]); // rom
 	membank("bankw0")->configure_entry(0, &ram[0]); // ram
 	membank("bankd")->configure_entry(0, &ram[0xd000]); // ram
-	membank("bankd")->configure_entry(1, m_videoram); // vram
+	membank("bankd")->configure_entry(1, m_videoram.get()); // vram
 }
 
 DRIVER_INIT_MEMBER(mz_state,mz800)
@@ -62,17 +62,17 @@ DRIVER_INIT_MEMBER(mz_state,mz800)
 	m_mz700_mode = true;//FALSE;
 
 	/* video ram */
-	m_videoram = auto_alloc_array(machine(), UINT8, 0x4000);
-	memset(m_videoram, 0, sizeof(UINT8) * 0x4000);
-	m_colorram = m_videoram + 0x800;
+	m_videoram = std::make_unique<UINT8[]>(0x4000);
+	memset(m_videoram.get(), 0, sizeof(UINT8) * 0x4000);
+	m_colorram = m_videoram.get() + 0x800;
 
 	/* character generator ram */
-	m_cgram = auto_alloc_array(machine(), UINT8, 0x1000);
-	memset(m_cgram, 0, sizeof(UINT8) * 0x1000);
+	m_cgram = std::make_unique<UINT8[]>(0x1000);
+	memset(m_cgram.get(), 0, sizeof(UINT8) * 0x1000);
 
 	m_p_chargen = memregion("cgrom")->base();
 	if (!m_p_chargen)
-		m_p_chargen = m_cgram;
+		m_p_chargen = m_cgram.get();
 	UINT8 *rom = memregion("monitor")->base();
 	UINT8 *ram = m_ram->pointer();
 	// configure banks (0 = RAM in all cases)
@@ -82,11 +82,11 @@ DRIVER_INIT_MEMBER(mz_state,mz800)
 	membank("bank1")->configure_entry(0, &ram[0x1000]); // ram
 	membank("bank1")->configure_entry(1, &rom[0x1000]); // chargen
 	membank("banka")->configure_entry(0, &ram[0x8000]); // ram
-	membank("banka")->configure_entry(1, m_videoram); // vram in mz800 mode
+	membank("banka")->configure_entry(1, m_videoram.get()); // vram in mz800 mode
 	membank("bankc")->configure_entry(0, &ram[0xc000]); // ram
-	membank("bankc")->configure_entry(1, m_cgram); // cgram in mz800 mode
+	membank("bankc")->configure_entry(1, m_cgram.get()); // cgram in mz800 mode
 	membank("bankd")->configure_entry(0, &ram[0xd000]); // ram
-	membank("bankd")->configure_entry(1, m_videoram); // vram in mz700 mode
+	membank("bankd")->configure_entry(1, m_videoram.get()); // vram in mz700 mode
 }
 
 void mz_state::machine_start()

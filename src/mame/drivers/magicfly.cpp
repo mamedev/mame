@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
+// thanks-to:Iris Falbala,Rob Ragon
 /******************************************************************************
 
     MAGIC FLY
@@ -447,7 +448,7 @@
 class magicfly_state : public driver_device
 {
 public:
-	magicfly_state(const machine_config &mconfig, device_type type, const char *tag)
+	magicfly_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -465,7 +466,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mux_port_w);
 	TILE_GET_INFO_MEMBER(get_magicfly_tile_info);
 	TILE_GET_INFO_MEMBER(get_7mezzo_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(magicfly);
 	DECLARE_PALETTE_INIT(bchance);
 	DECLARE_VIDEO_START(7mezzo);
@@ -654,9 +655,9 @@ WRITE8_MEMBER(magicfly_state::mux_port_w)
 
 	m_dac->write_unsigned8(data & 0x80);      /* Sound DAC */
 
-	coin_counter_w(machine(), 0, data & 0x40);  /* Coin1 */
-	coin_counter_w(machine(), 1, data & 0x10);  /* Coin2 */
-	coin_counter_w(machine(), 2, data & 0x20);  /* Payout */
+	machine().bookkeeping().coin_counter_w(0, data & 0x40);  /* Coin1 */
+	machine().bookkeeping().coin_counter_w(1, data & 0x10);  /* Coin2 */
+	machine().bookkeeping().coin_counter_w(2, data & 0x20);  /* Payout */
 }
 
 

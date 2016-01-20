@@ -727,20 +727,19 @@ ROM_START( vgoalsca )
 	ROM_REGION( 0x20000, "gfx1", 0 ) // fixed tile
 	ROM_LOAD( "c16_u48.u48",  0x000000, 0x020000, CRC(ca059e7f) SHA1(2fa48b0fec1210575f3a1ecee7d2aec0af3fa9c4) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) // scroll tile
-	ROM_LOAD( "vgoalc16.u20", 0x000000, 0x200000, CRC(2b211fb2) SHA1(4e04e099a1dae7abdb0732808a5d74fdc7afcf45) )
-	ROM_LOAD( "vgoalc16.u17", 0x000000, 0x200000, CRC(2b211fb2) SHA1(4e04e099a1dae7abdb0732808a5d74fdc7afcf45) ) // same content, dif pos on board
+	ROM_REGION( 0x100000, "gfx2", 0 ) // scroll tile
+	ROM_LOAD( "c13_u20.u20",  0x000000, 0x100000, CRC(bc6e07e8) SHA1(3f164165a2eed909aaf38d1ae23a622482d39f96) )
+	ROM_LOAD( "c13_u17.u17",  0x000000, 0x100000, CRC(bc6e07e8) SHA1(3f164165a2eed909aaf38d1ae23a622482d39f96) ) // same content, dif pos on board
 
 	ROM_REGION( 0x400000, "gfx3", 0 )
-	//ROM_LOAD( "vgoalc16.u11", 0x000000, 0x200000, CRC(5bc3146c) SHA1(ede4def1ddc4390fed8fd89643900967faff3640) ) // this is just a bad dump, are the above roms too?
 	ROM_LOAD( "c13_u11.u11",  0x000000, 0x200000, CRC(76d09f27) SHA1(ffef83954426f9e56bbe2d98b32cea675c063fab) )
 	ROM_LOAD( "c13_u12.u12",  0x200000, 0x200000, CRC(a3874419) SHA1(c9fa283106ada3419e311f400fcf4251b32318c4) )
 
 	ROM_REGION( 0x40000, "ymsnd.deltat", 0 )
 	ROM_LOAD( "c13_u86.u86",  0x000000, 0x040000, CRC(4b76a162) SHA1(38dcb7536662f5f520e59f3ff746b42e9df789d2) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )
-	ROM_LOAD( "vgoalc16.104", 0x000000, 0x100000, CRC(6fb06e1b) SHA1(c4584b480fe1165f8e2f887acaa578690514d35d) )
+	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_LOAD( "c13_u104.104", 0x000000, 0x200000, CRC(8437b6f8) SHA1(79f183dcbf3cde5c77e086e4fdd8341809396e37) )
 ROM_END
 
 ROM_START( twrldc94 )

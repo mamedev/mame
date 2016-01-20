@@ -32,13 +32,13 @@ class tms5220_device : public device_t,
 									public device_sound_interface
 {
 public:
-	tms5220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms5220_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	tms5220_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms5220_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_irq_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_readyq_handler(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_readyq_handler.set_callback(object); }
-	static void set_speechrom_tag(device_t &device, const char *_tag) { downcast<tms5220_device &>(device).m_speechrom_tag = _tag; }
+	static void set_speechrom_tag(device_t &device, std::string _tag) { downcast<tms5220_device &>(device).m_speechrom_tag = _tag; }
 
 	/* Control lines - once written to will switch interface into
 	 * "true" timing behaviour.
@@ -61,14 +61,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	void set_variant(int variant);
 
@@ -201,7 +201,7 @@ private:
 	/* callbacks */
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_readyq_handler;
-	const char *m_speechrom_tag;
+	std::string m_speechrom_tag;
 	speechrom_device *m_speechrom;
 };
 
@@ -210,10 +210,10 @@ extern const device_type TMS5220;
 class tms5220c_device : public tms5220_device
 {
 public:
-	tms5220c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms5220c_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type TMS5220C;
@@ -221,10 +221,10 @@ extern const device_type TMS5220C;
 class cd2501e_device : public tms5220_device
 {
 public:
-	cd2501e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cd2501e_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type CD2501E;
@@ -232,10 +232,10 @@ extern const device_type CD2501E;
 class tms5200_device : public tms5220_device
 {
 public:
-	tms5200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms5200_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type TMS5200;
@@ -243,10 +243,10 @@ extern const device_type TMS5200;
 class cd2501ecd_device : public tms5220_device
 {
 public:
-	cd2501ecd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cd2501ecd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type CD2501ECD;

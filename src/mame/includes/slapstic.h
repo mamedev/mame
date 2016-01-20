@@ -132,7 +132,7 @@ class atari_slapstic_device :  public device_t
 {
 public:
 	// construction/destruction
-	atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atari_slapstic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void slapstic_init(running_machine &machine, int chip);
 	void slapstic_reset(void);
@@ -166,8 +166,8 @@ public:
 
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 
 private:

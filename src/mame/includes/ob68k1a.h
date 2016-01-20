@@ -26,7 +26,7 @@
 class ob68k1a_state : public driver_device
 {
 public:
-	ob68k1a_state(const machine_config &mconfig, device_type type, const char *tag)
+	ob68k1a_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, MC68000L10_TAG),
 			m_dbrg(*this, COM8116_TAG),
@@ -49,8 +49,8 @@ public:
 	required_device<rs232_port_device> m_rs232b;
 	required_device<ram_device> m_ram;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER( com8116_w );
 	DECLARE_READ8_MEMBER( pia_r );

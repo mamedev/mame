@@ -80,7 +80,7 @@ static MACHINE_CONFIG_FRAGMENT( adam_spi )
 
 	MCFG_DEVICE_ADD(MC2661_TAG, MC2661, XTAL_4_9152MHz)
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
@@ -109,7 +109,7 @@ machine_config_constructor adam_spi_device::device_mconfig_additions() const
 //  adam_spi_device - constructor
 //-------------------------------------------------
 
-adam_spi_device::adam_spi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+adam_spi_device::adam_spi_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ADAM_SPI, "Adam SPI", tag, owner, clock, "adam_spi", __FILE__),
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG)

@@ -114,10 +114,10 @@ static int is_mk4b;
  *
  *************************************/
 
-INLINE UINT8 get_texel_4bit(const void *base, int y, int x, int width);
-INLINE UINT8 get_texel_alt_4bit(const void *base, int y, int x, int width);
-INLINE UINT8 get_texel_8bit(const void *base, int y, int x, int width);
-INLINE UINT8 get_texel_alt_8bit(const void *base, int y, int x, int width);
+static inline UINT8 get_texel_4bit(const void *base, int y, int x, int width);
+static inline UINT8 get_texel_alt_4bit(const void *base, int y, int x, int width);
+static inline UINT8 get_texel_8bit(const void *base, int y, int x, int width);
+static inline UINT8 get_texel_alt_8bit(const void *base, int y, int x, int width);
 
 
 /*************************************
@@ -160,25 +160,25 @@ INLINE UINT8 get_texel_alt_8bit(const void *base, int y, int x, int width);
  *
  *************************************/
 
-INLINE void *waveram0_ptr_from_block_addr(UINT32 addr)
+static inline void *waveram0_ptr_from_block_addr(UINT32 addr)
 {
 	UINT32 blocknum = (addr % WAVERAM0_WIDTH) + ((addr >> 12) % WAVERAM0_HEIGHT) * WAVERAM0_WIDTH;
 	return WAVERAM_BLOCK0(blocknum);
 }
 
-INLINE void *waveram0_ptr_from_expanded_addr(UINT32 addr)
+static inline void *waveram0_ptr_from_expanded_addr(UINT32 addr)
 {
 	UINT32 blocknum = (addr % WAVERAM0_WIDTH) + ((addr >> 16) % WAVERAM0_HEIGHT) * WAVERAM0_WIDTH;
 	return WAVERAM_BLOCK0(blocknum);
 }
 
-INLINE void *waveram1_ptr_from_expanded_addr(UINT32 addr)
+static inline void *waveram1_ptr_from_expanded_addr(UINT32 addr)
 {
 	UINT32 blocknum = (addr % WAVERAM1_WIDTH) + ((addr >> 16) % WAVERAM1_HEIGHT) * WAVERAM1_WIDTH;
 	return WAVERAM_BLOCK1(blocknum);
 }
 
-INLINE void *waveram0_ptr_from_texture_addr(UINT32 addr, int width)
+static inline void *waveram0_ptr_from_texture_addr(UINT32 addr, int width)
 {
 	UINT32 blocknum = (((addr & ~1) * width) / 8) % (WAVERAM0_WIDTH * WAVERAM0_HEIGHT);
 	return WAVERAM_BLOCK0(blocknum);
@@ -192,7 +192,7 @@ INLINE void *waveram0_ptr_from_texture_addr(UINT32 addr, int width)
  *
  *************************************/
 
-INLINE void waveram_plot_depth(int y, int x, UINT16 color, UINT16 depth)
+static inline void waveram_plot_depth(int y, int x, UINT16 color, UINT16 depth)
 {
 	if (zeus_cliprect.contains(x, y))
 	{
@@ -202,13 +202,13 @@ INLINE void waveram_plot_depth(int y, int x, UINT16 color, UINT16 depth)
 }
 
 #ifdef UNUSED_FUNCTION
-INLINE void waveram_plot(int y, int x, UINT16 color)
+static inline void waveram_plot(int y, int x, UINT16 color)
 {
 	if (zeus_cliprect.contains(x, y))
 		WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
 }
 
-INLINE void waveram_plot_check_depth(int y, int x, UINT16 color, UINT16 depth)
+static inline void waveram_plot_check_depth(int y, int x, UINT16 color, UINT16 depth)
 {
 	if (zeus_cliprect.contains(x, y))
 	{
@@ -221,7 +221,7 @@ INLINE void waveram_plot_check_depth(int y, int x, UINT16 color, UINT16 depth)
 	}
 }
 
-INLINE void waveram_plot_check_depth_nowrite(int y, int x, UINT16 color, UINT16 depth)
+static inline void waveram_plot_check_depth_nowrite(int y, int x, UINT16 color, UINT16 depth)
 {
 	if (zeus_cliprect.contains(x, y))
 	{
@@ -240,26 +240,26 @@ INLINE void waveram_plot_check_depth_nowrite(int y, int x, UINT16 color, UINT16 
  *************************************/
 
 // 4x2 block size
-INLINE UINT8 get_texel_4bit(const void *base, int y, int x, int width)
+static inline UINT8 get_texel_4bit(const void *base, int y, int x, int width)
 {
 	UINT32 byteoffs = (y / 2) * (width * 2) + ((x / 8) << 3) + ((y & 1) << 2) + ((x / 2) & 3);
 	return (WAVERAM_READ8(base, byteoffs) >> (4 * (x & 1))) & 0x0f;
 }
 
-INLINE UINT8 get_texel_8bit(const void *base, int y, int x, int width)
+static inline UINT8 get_texel_8bit(const void *base, int y, int x, int width)
 {
 	UINT32 byteoffs = (y / 2) * (width * 2) + ((x / 4) << 3) + ((y & 1) << 2) + (x & 3);
 	return WAVERAM_READ8(base, byteoffs);
 }
 
 // 2x2 block size
-INLINE UINT8 get_texel_alt_4bit(const void *base, int y, int x, int width)
+static inline UINT8 get_texel_alt_4bit(const void *base, int y, int x, int width)
 {
 	UINT32 byteoffs = (y / 4) * (width * 4) + ((x / 4) << 3) + ((y & 3) << 1) + ((x / 2) & 1);
 	return (WAVERAM_READ8(base, byteoffs) >> (4 * (x & 1))) & 0x0f;
 }
 
-INLINE UINT8 get_texel_alt_8bit(const void *base, int y, int x, int width)
+static inline UINT8 get_texel_alt_8bit(const void *base, int y, int x, int width)
 {
 	UINT32 byteoffs =  (y / 4) * (width * 4) + ((x / 2) << 3) + ((y & 3) << 1) + (x & 1);
 	return WAVERAM_READ8(base, byteoffs);

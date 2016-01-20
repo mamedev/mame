@@ -26,7 +26,7 @@ static const char *const depthch_sample_names[] =
 	"shortex",
 	"spray",
 	"sonar",
-	0
+	nullptr
 };
 
 

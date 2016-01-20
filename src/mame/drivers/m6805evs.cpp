@@ -33,14 +33,14 @@ ToDo:
 class m6805evs_state : public driver_device
 {
 public:
-	m6805evs_state(const machine_config &mconfig, device_type type, const char *tag)
+	m6805evs_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 	{ }
 
 private:
 	required_device<cpu_device> m_maincpu;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 

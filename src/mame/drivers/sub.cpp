@@ -117,7 +117,7 @@ PCB2  (Top board, CPU board)
 class sub_state : public driver_device
 {
 public:
-	sub_state(const machine_config &mconfig, device_type type, const char *tag)
+	sub_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
@@ -145,7 +145,7 @@ public:
 	DECLARE_WRITE8_MEMBER(to_sound_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(sub);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

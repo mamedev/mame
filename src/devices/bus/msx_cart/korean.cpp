@@ -8,7 +8,7 @@ const device_type MSX_CART_KOREAN_90IN1 = &device_creator<msx_cart_korean_90in1>
 const device_type MSX_CART_KOREAN_126IN1 = &device_creator<msx_cart_korean_126in1>;
 
 
-msx_cart_korean_80in1::msx_cart_korean_80in1(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_korean_80in1::msx_cart_korean_80in1(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_KOREAN_80IN1, "MSX Cartridge - Korean 80-in-1", tag, owner, clock, "msx_cart_korean_80in1", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
@@ -16,7 +16,7 @@ msx_cart_korean_80in1::msx_cart_korean_80in1(const machine_config &mconfig, cons
 	for (int i = 0; i < 4; i++)
 	{
 		m_selected_bank[i] = i;
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 }
 
@@ -101,15 +101,15 @@ WRITE8_MEMBER(msx_cart_korean_80in1::write_cart)
 
 
 
-msx_cart_korean_90in1::msx_cart_korean_90in1(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_korean_90in1::msx_cart_korean_90in1(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_KOREAN_90IN1, "MSX Cartridge - Korean 90-in-1", tag, owner, clock, "msx_cart_korean_90in1", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
 	, m_selected_bank(0)
 {
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_bank_base)
 	{
-		m_bank_base[i] = NULL;
+		elem = nullptr;
 	}
 }
 
@@ -208,7 +208,7 @@ WRITE8_MEMBER(msx_cart_korean_90in1::banking)
 
 
 
-msx_cart_korean_126in1::msx_cart_korean_126in1(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_korean_126in1::msx_cart_korean_126in1(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_KOREAN_126IN1, "MSX Cartridge - Korean 126-in-1", tag, owner, clock, "msx_cart_korean_126in1", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
@@ -216,7 +216,7 @@ msx_cart_korean_126in1::msx_cart_korean_126in1(const machine_config &mconfig, co
 	for (int i = 0; i < 2; i++)
 	{
 		m_selected_bank[i] = i;
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 }
 

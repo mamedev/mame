@@ -617,7 +617,7 @@ READ8_MEMBER(centiped_state::bullsdrt_data_port_r)
 
 WRITE8_MEMBER(centiped_state::led_w)
 {
-	set_led_status(machine(), offset, ~data & 0x80);
+	output().set_led_value(offset, ~data & 0x80);
 }
 
 
@@ -629,13 +629,13 @@ READ8_MEMBER(centiped_state::caterplr_unknown_r)
 
 WRITE8_MEMBER(centiped_state::coin_count_w)
 {
-	coin_counter_w(machine(), offset, data);
+	machine().bookkeeping().coin_counter_w(offset, data);
 }
 
 
 WRITE8_MEMBER(centiped_state::bullsdrt_coin_count_w)
 {
-	coin_counter_w(machine(), 0, data);
+	machine().bookkeeping().coin_counter_w(0, data);
 }
 
 

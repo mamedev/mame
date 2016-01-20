@@ -55,15 +55,15 @@ class saa5050_device :  public device_t
 {
 public:
 	// construction/destruction
-	saa5050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saa5050_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	saa5050_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void static_set_screen_size(device_t &device, int cols, int rows, int size) { downcast<saa5050_device &>(device).m_cols = cols; downcast<saa5050_device &>(device).m_rows = rows; downcast<saa5050_device &>(device).m_size = size; }
 
 	template<class _Object> static devcb_base &set_d_rd_callback(device_t &device, _Object object) { return downcast<saa5050_device &>(device).m_read_d.set_callback(object); }
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 
 	DECLARE_WRITE_LINE_MEMBER( crs_w );
 	DECLARE_WRITE_LINE_MEMBER( dew_w );
@@ -80,8 +80,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	enum
@@ -169,10 +169,10 @@ class saa5051_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saa5051_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -182,10 +182,10 @@ class saa5052_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saa5052_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -195,10 +195,10 @@ class saa5053_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5053_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saa5053_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -208,10 +208,10 @@ class saa5054_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5054_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saa5054_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -221,10 +221,10 @@ class saa5055_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5055_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saa5055_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -234,10 +234,10 @@ class saa5056_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5056_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saa5056_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -247,10 +247,10 @@ class saa5057_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5057_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saa5057_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 

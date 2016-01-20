@@ -25,7 +25,7 @@ class scn2674_device : public device_t,
 						public device_memory_interface
 {
 public:
-	scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scn2674_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	typedef device_delegate<void (bitmap_rgb32 &bitmap, int x, int y, UINT8 linecount, UINT8 charcode, UINT16 address, UINT8 cursor, UINT8 dw, UINT8 lg, UINT8 ul, UINT8 blink)> draw_character_delegate;
 
@@ -41,12 +41,12 @@ public:
 	DECLARE_WRITE8_MEMBER( buffer_w ) { m_buffer = data; }
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_0) ? &m_space_config : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_0) ? &m_space_config : nullptr; }
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	bitmap_rgb32 m_bitmap;

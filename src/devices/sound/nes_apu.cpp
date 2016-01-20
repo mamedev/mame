@@ -103,41 +103,41 @@ static void create_noise(uint8 *buf, const int bits, int size)
 
 const device_type NES_APU = &device_creator<nesapu_device>;
 
-nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nesapu_device::nesapu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NES_APU, "N2A03 APU", tag, owner, clock, "nesapu", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_apu_incsize(0.0),
 		m_samps_per_sync(0),
 		m_buffer_size(0),
 		m_real_rate(0),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_cpu_tag("")
 {
-	for (int i = 0; i < NOISE_LONG; i++)
+	for (auto & elem : m_noise_lut)
 	{
-		m_noise_lut[i] = 0;
+		elem = 0;
 	}
 
-	for (int i = 0; i < 0X20; i++)
+	for (auto & elem : m_vbl_times)
 	{
-		m_vbl_times[i] = 0;
+		elem = 0;
 	}
 
-	for (int i = 0; i < SYNCS_MAX1; i++)
+	for (auto & elem : m_sync_times1)
 	{
-		m_sync_times1[i] = 0;
+		elem = 0;
 	}
 
-	for (int i = 0; i < SYNCS_MAX2; i++)
+	for (auto & elem : m_sync_times2)
 	{
-		m_sync_times2[i] = 0;
+		elem = 0;
 	}
 }
 
-void nesapu_device::set_tag_memory(const char *tag)
+void nesapu_device::set_tag_memory(std::string tag)
 {
 	/* Initialize individual chips */
-	if (tag)
+	if (!tag.empty())
 		(m_APU.dpcm).memory = &machine().device(tag)->memory().space(AS_PROGRAM);
 }
 
@@ -427,7 +427,7 @@ int8 nesapu_device::apu_noise(noise_t *chan)
 }
 
 /* RESET DPCM PARAMETERS */
-INLINE void apu_dpcmreset(dpcm_t *chan)
+static inline void apu_dpcmreset(dpcm_t *chan)
 {
 	chan->address = 0xC000 + (uint16) (chan->regs[2] << 6);
 	chan->length = (uint16) (chan->regs[3] << 4) + 1;

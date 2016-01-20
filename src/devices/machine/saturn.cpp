@@ -964,10 +964,10 @@ static const gfx_layout tiles16x16x8_layout =
 
 
 GFXDECODE_START( stv )
-	GFXDECODE_ENTRY( NULL, 0, tiles8x8x4_layout,   0x00, (0x80*(2+1))  )
-	GFXDECODE_ENTRY( NULL, 0, tiles16x16x4_layout, 0x00, (0x80*(2+1))  )
-	GFXDECODE_ENTRY( NULL, 0, tiles8x8x8_layout,   0x00, (0x08*(2+1))  )
-	GFXDECODE_ENTRY( NULL, 0, tiles16x16x8_layout, 0x00, (0x08*(2+1))  )
+	GFXDECODE_ENTRY( nullptr, 0, tiles8x8x4_layout,   0x00, (0x80*(2+1))  )
+	GFXDECODE_ENTRY( nullptr, 0, tiles16x16x4_layout, 0x00, (0x80*(2+1))  )
+	GFXDECODE_ENTRY( nullptr, 0, tiles8x8x8_layout,   0x00, (0x08*(2+1))  )
+	GFXDECODE_ENTRY( nullptr, 0, tiles16x16x8_layout, 0x00, (0x08*(2+1))  )
 GFXDECODE_END
 
 WRITE_LINE_MEMBER(saturn_state::scudsp_end_w)

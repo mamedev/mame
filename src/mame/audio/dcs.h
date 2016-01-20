@@ -23,7 +23,7 @@ class dcs_audio_device : public device_t
 {
 public:
 	// construction/destruction
-	dcs_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int rev = 1);
+	dcs_audio_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int rev = 1);
 
 	// for dcs2 (int dram_in_mb, offs_t polling_offset)
 	static void static_set_dram_in_mb(device_t &device, int dram_in_mb) { downcast<dcs_audio_device &>(device).m_dram_in_mb = dram_in_mb; }
@@ -48,9 +48,6 @@ public:
 	DECLARE_WRITE32_MEMBER( dsio_idma_data_w );
 	DECLARE_READ32_MEMBER( dsio_idma_data_r );
 
-	DECLARE_READ32_MEMBER(de_r);
-	DECLARE_WRITE32_MEMBER(de_w);
-
 	// non public
 	void dcs_boot();
 	TIMER_CALLBACK_MEMBER( dcs_reset );
@@ -59,8 +56,6 @@ public:
 	DECLARE_WRITE16_MEMBER( dcs_dataram_w );
 	DECLARE_WRITE16_MEMBER( dcs_data_bank_select_w );
 	DECLARE_WRITE16_MEMBER( dcs_data_bank_select2_w );
-	DECLARE_READ16_MEMBER( dcs_dataram_bank_select_r );
-	DECLARE_WRITE16_MEMBER( dcs_dataram_bank_select_w );
 	inline void sdrc_update_bank_pointers();
 	void sdrc_remap_memory();
 	void sdrc_reset();
@@ -109,8 +104,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 protected:
 	struct sdrc_state
@@ -217,10 +212,10 @@ class dcs_audio_2k_device : public dcs_audio_device
 {
 public:
 	// construction/destruction
-	dcs_audio_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dcs_audio_2k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 };
 
@@ -233,10 +228,10 @@ class dcs_audio_2k_uart_device : public dcs_audio_device
 {
 public:
 	// construction/destruction
-	dcs_audio_2k_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dcs_audio_2k_uart_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 };
 
@@ -249,10 +244,10 @@ class dcs_audio_8k_device : public dcs_audio_device
 {
 public:
 	// construction/destruction
-	dcs_audio_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dcs_audio_8k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 };
 
@@ -265,10 +260,10 @@ class dcs_audio_wpc_device : public dcs_audio_device
 {
 public:
 	// construction/destruction
-	dcs_audio_wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dcs_audio_wpc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 // device type definition
@@ -281,11 +276,11 @@ class dcs2_audio_device : public dcs_audio_device
 {
 public:
 	// construction/destruction
-	dcs2_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	dcs2_audio_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 // dcs2_audio_2115_device
@@ -294,10 +289,10 @@ class dcs2_audio_2115_device : public dcs2_audio_device
 {
 public:
 	// construction/destruction
-	dcs2_audio_2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dcs2_audio_2115_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 };
 
@@ -310,10 +305,10 @@ class dcs2_audio_2104_device : public dcs2_audio_device
 {
 public:
 	// construction/destruction
-	dcs2_audio_2104_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dcs2_audio_2104_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 };
 
@@ -326,10 +321,10 @@ class dcs2_audio_dsio_device : public dcs2_audio_device
 {
 public:
 	// construction/destruction
-	dcs2_audio_dsio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dcs2_audio_dsio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 };
 
@@ -342,10 +337,10 @@ class dcs2_audio_denver_device : public dcs2_audio_device
 {
 public:
 	// construction/destruction
-	dcs2_audio_denver_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dcs2_audio_denver_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 };
 

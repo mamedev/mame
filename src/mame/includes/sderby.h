@@ -3,7 +3,7 @@
 class sderby_state : public driver_device
 {
 public:
-	sderby_state(const machine_config &mconfig, device_type type, const char *tag)
+	sderby_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_md_videoram(*this, "md_videoram"),
@@ -38,7 +38,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_sderby_tile_info);
 	TILE_GET_INFO_MEMBER(get_sderby_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_sderby_fg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_sderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_pmroulet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int codeshift);

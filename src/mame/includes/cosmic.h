@@ -16,7 +16,7 @@
 class cosmic_state : public driver_device
 {
 public:
-	cosmic_state(const machine_config &mconfig, device_type type, const char *tag)
+	cosmic_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -47,7 +47,6 @@ public:
 	/* misc */
 	UINT32         m_pixel_clock;
 	int            m_ic_state;   // for 9980
-	DECLARE_READ8_MEMBER( interrupt_level );
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

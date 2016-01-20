@@ -53,7 +53,7 @@ ToDO:
 class taito_state : public genpin_class
 {
 public:
-	taito_state(const machine_config &mconfig, device_type type, const char *tag)
+	taito_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cpu2(*this, "audiocpu")
@@ -75,7 +75,7 @@ private:
 	UINT8 m_sndcmd;
 	UINT8 m_votrax_cmd;
 	UINT8 m_io[16];
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_cpu2;
 	required_device<pia6821_device> m_pia;
@@ -314,8 +314,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( taito_state::timer_a )
 	m_out_offs &= 15;
 
 	UINT8 digit = m_out_offs << 1;
-	output_set_digit_value(digit, patterns[m_p_ram[m_out_offs]>>4]);
-	output_set_digit_value(++digit, patterns[m_p_ram[m_out_offs++]&15]);
+	output().set_digit_value(digit, patterns[m_p_ram[m_out_offs]>>4]);
+	output().set_digit_value(++digit, patterns[m_p_ram[m_out_offs++]&15]);
 }
 
 static MACHINE_CONFIG_START( taito, taito_state )

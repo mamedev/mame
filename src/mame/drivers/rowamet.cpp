@@ -30,7 +30,7 @@ ToDO:
 class rowamet_state : public driver_device
 {
 public:
-	rowamet_state(const machine_config &mconfig, device_type type, const char *tag)
+	rowamet_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cpu2(*this, "cpu2")
@@ -46,7 +46,7 @@ private:
 	UINT8 m_out_offs;
 	UINT8 m_sndcmd;
 	UINT8 m_io[16];
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_cpu2;
 	required_shared_ptr<UINT8> m_p_ram;
@@ -199,8 +199,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( rowamet_state::timer_a )
 	m_out_offs &= 15;
 
 	UINT8 digit = m_out_offs << 1;
-	output_set_digit_value(digit, patterns[m_p_ram[m_out_offs]>>4]);
-	output_set_digit_value(++digit, patterns[m_p_ram[m_out_offs++]&15]);
+	output().set_digit_value(digit, patterns[m_p_ram[m_out_offs]>>4]);
+	output().set_digit_value(++digit, patterns[m_p_ram[m_out_offs++]&15]);
 }
 
 static MACHINE_CONFIG_START( rowamet, rowamet_state )

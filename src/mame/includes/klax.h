@@ -12,7 +12,7 @@
 class klax_state : public atarigen_state
 {
 public:
-	klax_state(const machine_config &mconfig, device_type type, const char *tag)
+	klax_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atarigen_state(mconfig, type, tag),
 			m_playfield_tilemap(*this, "playfield"),
 			m_mob(*this, "mob")  { }
@@ -20,8 +20,8 @@ public:
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<atari_motion_objects_device> m_mob;
 
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(interrupt_ack_w);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	DECLARE_MACHINE_START(klax);

@@ -126,38 +126,38 @@ class mcs48_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int rom_size, int ram_size, UINT8 feature_mask = 0);
+	mcs48_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int rom_size, int ram_size, UINT8 feature_mask = 0);
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 15 - 1) / 15; }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 15); }
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 3; }
-	virtual UINT32 execute_input_lines() const { return 2; }
-	virtual UINT32 execute_default_irq_vector() const { return MCS48_INPUT_IRQ; }
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 15 - 1) / 15; }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 15); }
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 3; }
+	virtual UINT32 execute_input_lines() const override { return 2; }
+	virtual UINT32 execute_default_irq_vector() const override { return MCS48_INPUT_IRQ; }
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
 	{
-		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : NULL ) );
+		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ) );
 	}
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_export(const device_state_entry &entry);
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 protected:
 	address_space_config m_program_config;
@@ -483,108 +483,108 @@ class i8021_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8021_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 30 - 1) / 30; }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 30); }
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 30 - 1) / 30; }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 30); }
 };
 
 class i8022_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8022_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8022_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 30 - 1) / 30; }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 30); }
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 30 - 1) / 30; }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 30); }
 };
 
 class i8035_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8035_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8035_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class i8048_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8048_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8048_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class i8648_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8648_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8648_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class i8748_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8748_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8748_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class i8039_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8039_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8039_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class i8049_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8049_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8049_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class i8749_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8749_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8749_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class i8040_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8040_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class i8050_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8050_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class mb8884_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	mb8884_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb8884_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class n7751_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	n7751_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	n7751_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class m58715_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	m58715_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m58715_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -592,14 +592,14 @@ class upi41_cpu_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	upi41_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int rom_size, int ram_size);
+	upi41_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int rom_size, int ram_size);
 
 	/* functions for talking to the input/output buffers on the UPI41-class chips */
 	DECLARE_READ8_MEMBER(upi41_master_r);
 	DECLARE_WRITE8_MEMBER(upi41_master_w);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	TIMER_CALLBACK_MEMBER( master_callback );
 };
@@ -608,35 +608,35 @@ class i8041_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8041_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class i8741_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8741_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8741_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class i8042_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8042_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class i8242_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8242_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8242_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class i8742_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8742_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8742_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

@@ -456,7 +456,7 @@
 class _5clown_state : public driver_device
 {
 public:
-	_5clown_state(const machine_config &mconfig, device_type type, const char *tag)
+	_5clown_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -500,8 +500,8 @@ public:
 	DECLARE_WRITE8_MEMBER(fclown_ay8910_w);
 	DECLARE_DRIVER_INIT(fclown);
 	TILE_GET_INFO_MEMBER(get_fclown_tile_info);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(_5clown);
 	UINT32 screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -583,7 +583,7 @@ PALETTE_INIT_MEMBER(_5clown_state, _5clown)
 
 	/* 0000KBGR */
 
-	if (color_prom == 0) return;
+	if (color_prom == nullptr) return;
 
 	for (i = 0;i < m_palette->entries();i++)
 	{
@@ -650,10 +650,10 @@ WRITE8_MEMBER(_5clown_state::counters_w)
     -x-- ----   Unknown (increments at start).
     x--- ----   Unknown (increments at start).
 */
-	coin_counter_w(machine(), 0, data & 0x10);  /* Key In */
-	coin_counter_w(machine(), 1, data & 0x20);  /* Payout */
-	coin_counter_w(machine(), 2, data & 0x40);  /* unknown */
-	coin_counter_w(machine(), 3, data & 0x80);  /* unknown */
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);  /* Key In */
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);  /* Payout */
+	machine().bookkeeping().coin_counter_w(2, data & 0x40);  /* unknown */
+	machine().bookkeeping().coin_counter_w(3, data & 0x80);  /* unknown */
 
 }
 
@@ -1085,7 +1085,7 @@ ROM_START( 5clown )
 
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x2000, 0 ) /* filling the remaining bitplanes */
+	ROM_FILL(               0x0000, 0x2000, 0x00 ) /* filling the remaining bitplanes */
 	ROM_COPY( "gfxbanks",   0x7000, 0x2000, 0x1000 )
 
 	ROM_REGION( 0x3000, "gfx2", 0 )
@@ -1117,7 +1117,7 @@ ROM_START( 5clowna )
 
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x2000, 0 ) /* filling the remaining bitplanes */
+	ROM_FILL(               0x0000, 0x2000, 0x00 ) /* filling the remaining bitplanes */
 	ROM_COPY( "gfxbanks",   0x7000, 0x2000, 0x1000 )
 
 	ROM_REGION( 0x3000, "gfx2", 0 )
@@ -1148,7 +1148,7 @@ ROM_START( 5clownsp )
 
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x2000, 0 ) /* filling the remaining bitplanes */
+	ROM_FILL(               0x0000, 0x2000, 0x00 ) /* filling the remaining bitplanes */
 	ROM_COPY( "gfxbanks",   0x7000, 0x2000, 0x1000 )
 
 	ROM_REGION( 0x3000, "gfx2", 0 )

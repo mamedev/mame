@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 /*************************************************************************
 
@@ -13,7 +13,7 @@
 class liberatr_state : public atarigen_state
 {
 public:
-	liberatr_state(const machine_config &mconfig, device_type type, const char *tag)
+	liberatr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atarigen_state(mconfig, type, tag),
 			m_base_ram(*this, "base_ram"),
 			m_planet_frame(*this, "planet_frame"),
@@ -36,10 +36,10 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
-	virtual void update_interrupts() { }
+	virtual void update_interrupts() override { }
 
 	struct planet;
 

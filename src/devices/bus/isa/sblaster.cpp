@@ -1101,7 +1101,7 @@ machine_config_constructor isa16_sblaster16_device::device_mconfig_additions() c
 //  LIVE DEVICE
 //**************************************************************************
 
-sb_device::sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source) :
+sb_device::sb_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, std::string name, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_serial_interface(mconfig, *this),
 	m_dacl(*this, "sbdacl"),
@@ -1111,14 +1111,14 @@ sb_device::sb_device(const machine_config &mconfig, device_type type, const char
 {
 }
 
-sb8_device::sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source) :
+sb8_device::sb8_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, std::string name, std::string shortname, std::string source) :
 	sb_device(mconfig, type, tag, owner, clock, name, shortname, source),
 	device_isa8_card_interface(mconfig, *this),
 	m_ym3812(*this, "ym3812")
 {
 }
 
-sb16_device::sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source) :
+sb16_device::sb16_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, std::string name, std::string shortname, std::string source) :
 	sb_device(mconfig, type, tag, owner, clock, name, shortname, source),
 	device_isa16_card_interface(mconfig, *this)
 {
@@ -1128,19 +1128,19 @@ sb16_device::sb16_device(const machine_config &mconfig, device_type type, const 
 //  isa8_sblaster_device - constructor
 //-------------------------------------------------
 
-isa8_sblaster1_0_device::isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_sblaster1_0_device::isa8_sblaster1_0_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_0, tag, owner, clock, "Sound Blaster 1.0", "isa_sblaster1_0", __FILE__),
 	m_saa1099_1(*this, "saa1099.1"),
 	m_saa1099_2(*this, "saa1099.2")
 {
 }
 
-isa8_sblaster1_5_device::isa8_sblaster1_5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_sblaster1_5_device::isa8_sblaster1_5_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_5, tag, owner, clock, "Sound Blaster 1.5", "isa_sblaster1_5", __FILE__)
 {
 }
 
-isa16_sblaster16_device::isa16_sblaster16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa16_sblaster16_device::isa16_sblaster16_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	sb16_device(mconfig, ISA16_SOUND_BLASTER_16, tag, owner, clock, "Sound Blaster 16", "isa_sblaster_16", __FILE__)
 {
 }
@@ -1170,7 +1170,7 @@ void sb8_device::device_start()
 		m_isa->install_device(0x0228, 0x0229, 0, 0, read8_delegate( FUNC(sb8_device::ym3812_16_r), this ), write8_delegate( FUNC(sb8_device::ym3812_16_w), this ) );
 	}
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 
 	save_item(NAME(m_dack_out));
 	save_item(NAME(m_onebyte_midi));
@@ -1223,7 +1223,7 @@ void sb16_device::device_start()
 	m_isa->install_device(0x0220, 0x0223, 0, 0, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
 	m_isa->install_device(0x0228, 0x0229, 0, 0, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 
 	save_item(NAME(m_mixer.data));
 	save_item(NAME(m_mixer.status));

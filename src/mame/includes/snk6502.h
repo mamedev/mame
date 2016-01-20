@@ -15,7 +15,7 @@ class snk6502_sound_device;
 class snk6502_state : public driver_device
 {
 public:
-	snk6502_state(const machine_config &mconfig, device_type type, const char *tag)
+	snk6502_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "snk6502"),
@@ -65,7 +65,7 @@ public:
 	TILE_GET_INFO_MEMBER(satansat_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(satansat_get_fg_tile_info);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(sasuke);
 	DECLARE_VIDEO_START(satansat);
 	DECLARE_PALETTE_INIT(satansat);
@@ -107,7 +107,7 @@ class snk6502_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	snk6502_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~snk6502_sound_device() {}
 
 	DECLARE_WRITE8_MEMBER( sasuke_sound_w );
@@ -123,10 +123,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	// internal state

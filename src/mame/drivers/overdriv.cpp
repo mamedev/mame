@@ -97,9 +97,9 @@ WRITE16_MEMBER(overdriv_state::cpuA_ctrl_w)
 
 		/* bit 1 is clear during service mode - function unknown */
 
-		set_led_status(machine(), 0, data & 0x08);
-		coin_counter_w(machine(), 0, data & 0x10);
-		coin_counter_w(machine(), 1, data & 0x20);
+		output().set_led_value(0, data & 0x08);
+		machine().bookkeeping().coin_counter_w(0, data & 0x10);
+		machine().bookkeeping().coin_counter_w(1, data & 0x20);
 
 //logerror("%06x: write %04x to cpuA_ctrl_w\n",space.device().safe_pc(),data);
 	}
@@ -147,9 +147,9 @@ static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITENOP            /* unknown (always 0x30) */
-	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)          /* 053252? (LSB) */
+	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff) /* 053252? (LSB) */
 	AM_RANGE(0x140000, 0x140001) AM_WRITENOP //watchdog reset?
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("PADDLE")
+	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("PADDLE") AM_WRITENOP  // writes 0 at POST and expect that motor busy flag is off, then checks if paddle is at center otherwise throws a "VOLUME ERROR".
 	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVWRITE8("k051316_1", k051316_device, ctrl_w, 0xff00)
 	AM_RANGE(0x1c8000, 0x1c801f) AM_DEVWRITE8("k051316_2", k051316_device, ctrl_w, 0xff00)
 	AM_RANGE(0x1d0000, 0x1d001f) AM_DEVWRITE("k053251", k053251_device, msb_w)
@@ -239,7 +239,7 @@ static INPUT_PORTS_START( overdriv )
 	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   // ?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   // motor busy flag
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(50)

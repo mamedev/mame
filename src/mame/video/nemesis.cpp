@@ -158,8 +158,8 @@ WRITE16_MEMBER(nemesis_state::salamand_control_port_word_w)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_lockout_w(machine(), 0, data & 0x0200);
-		coin_lockout_w(machine(), 1, data & 0x0400);
+		machine().bookkeeping().coin_lockout_w(0, data & 0x0200);
+		machine().bookkeeping().coin_lockout_w(1, data & 0x0400);
 
 		if (data & 0x0800)
 			m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -188,8 +188,8 @@ void nemesis_state::create_palette_lookups()
 	// normalize black/white levels
 	double black = m_palette_lookup[0];
 	double white = 255.0 / (m_palette_lookup[31] - black);
-	for (int i = 0; i < 32; i++)
-		m_palette_lookup[i] = (m_palette_lookup[i] - black) * white + 0.5;
+	for (auto & elem : m_palette_lookup)
+		elem = (elem - black) * white + 0.5;
 }
 
 

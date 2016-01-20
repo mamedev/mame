@@ -17,7 +17,7 @@
 class hh_melps4_state : public driver_device
 {
 public:
-	hh_melps4_state(const machine_config &mconfig, device_type type, const char *tag)
+	hh_melps4_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN"),
@@ -57,8 +57,8 @@ public:
 	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
 
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 
@@ -131,7 +131,7 @@ void hh_melps4_state::display_update()
 		if (m_display_cache[y] != active_state[y])
 		{
 			if (m_display_segmask[y] != 0)
-				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
+				output().set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
 			for (int x = 0; x <= m_display_maxx; x++)
@@ -151,8 +151,8 @@ void hh_melps4_state::display_update()
 					sprintf(buf1, "lamp%d", y * mul + x);
 					sprintf(buf2, "%d.%d", y, x);
 				}
-				output_set_value(buf1, state);
-				output_set_value(buf2, state);
+				output().set_value(buf1, state);
+				output().set_value(buf2, state);
 			}
 		}
 
@@ -231,7 +231,7 @@ INPUT_CHANGED_MEMBER(hh_melps4_state::reset_button)
 class cfrogger_state : public hh_melps4_state
 {
 public:
-	cfrogger_state(const machine_config &mconfig, device_type type, const char *tag)
+	cfrogger_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_melps4_state(mconfig, type, tag)
 	{ }
 
@@ -320,8 +320,6 @@ static MACHINE_CONFIG_START( cfrogger, cfrogger_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_melps4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_melps4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -346,7 +344,7 @@ MACHINE_CONFIG_END
 class gjungler_state : public hh_melps4_state
 {
 public:
-	gjungler_state(const machine_config &mconfig, device_type type, const char *tag)
+	gjungler_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_melps4_state(mconfig, type, tag)
 	{ }
 
@@ -435,8 +433,6 @@ static MACHINE_CONFIG_START( gjungler, gjungler_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_melps4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_melps4_test)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -184,7 +184,7 @@ static floperr_t basicdsk_format_track(floppy_image_legacy *floppy, int head, in
 {
 	floperr_t err = FLOPPY_ERROR_SUCCESS;
 	UINT8 local_buffer[512];
-	void *alloc_buffer = NULL;
+	void *alloc_buffer = nullptr;
 	void *buffer;
 	UINT32 sector_length;
 	int sector;
@@ -206,7 +206,7 @@ static floperr_t basicdsk_format_track(floppy_image_legacy *floppy, int head, in
 	}
 	else
 	{
-		alloc_buffer = NULL;
+		alloc_buffer = nullptr;
 		buffer = local_buffer;
 	}
 
@@ -245,7 +245,7 @@ static floperr_t basicdsk_get_sector_length(floppy_image_legacy *floppy, int hea
 {
 	floperr_t err;
 
-	err = get_offset(floppy, head, track, sector, FALSE, NULL);
+	err = get_offset(floppy, head, track, sector, FALSE, nullptr);
 	if (err)
 		return err;
 

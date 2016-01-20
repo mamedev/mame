@@ -31,7 +31,7 @@
 class sega_32x_device : public device_t
 {
 public:
-	sega_32x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	sega_32x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	required_device<sh2_device> m_master_cpu;
 	required_device<sh2_device> m_slave_cpu;
@@ -49,7 +49,7 @@ public:
 	void update_total_scanlines(bool mode3) { m_total_scanlines = mode3 ? (m_base_total_scanlines * 2) : m_base_total_scanlines; }  // this gets set at each EOF
 
 	// static configuration
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 
 	DECLARE_READ32_MEMBER( _32x_sh2_master_4000_common_4002_r );
 	DECLARE_READ32_MEMBER( _32x_sh2_slave_4000_common_4002_r );
@@ -148,12 +148,12 @@ public:
 	emu_timer *m_32x_pwm_timer;
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// optional information overrides
 //  virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 
@@ -193,11 +193,11 @@ private:
 
 	UINT16 m_commsram[8];
 
-	UINT16* m_32x_dram0;
-	UINT16* m_32x_dram1;
+	std::unique_ptr<UINT16[]> m_32x_dram0;
+	std::unique_ptr<UINT16[]> m_32x_dram1;
 	UINT16 *m_32x_display_dram, *m_32x_access_dram;
-	UINT16* m_32x_palette;
-	UINT16* m_32x_palette_lookup;
+	std::unique_ptr<UINT16[]> m_32x_palette;
+	std::unique_ptr<UINT16[]> m_32x_palette_lookup;
 
 	UINT16 m_fifo_block_a[4];
 	UINT16 m_fifo_block_b[4];
@@ -215,16 +215,16 @@ private:
 class sega_32x_ntsc_device : public sega_32x_device
 {
 	public:
-		sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		sega_32x_ntsc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 };
 
 class sega_32x_pal_device : public sega_32x_device
 {
 	public:
-		sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		sega_32x_pal_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	protected:
-		virtual machine_config_constructor device_mconfig_additions() const;
+		virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 

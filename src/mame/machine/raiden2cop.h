@@ -34,7 +34,7 @@
 class raiden2cop_device : public device_t
 {
 public:
-	raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	raiden2cop_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// Command Table
 	UINT16 cop_func_trigger[0x100/8];       /* function trigger */
@@ -116,8 +116,6 @@ public:
 	DECLARE_READ16_MEMBER ( cop_status_r );
 	DECLARE_READ16_MEMBER ( cop_dist_r );
 	DECLARE_READ16_MEMBER ( cop_angle_r );
-	DECLARE_WRITE16_MEMBER( cop_angle_compare_w );
-	DECLARE_WRITE16_MEMBER( cop_angle_mod_val_w );
 
 	DECLARE_WRITE16_MEMBER(cop_hitbox_baseadr_w);
 
@@ -259,7 +257,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	// internal state

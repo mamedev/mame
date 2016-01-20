@@ -68,7 +68,7 @@ static MACHINE_CONFIG_FRAGMENT( plus4_sid )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 MACHINE_CONFIG_END
 
 
@@ -92,7 +92,7 @@ machine_config_constructor plus4_sid_cartridge_device::device_mconfig_additions(
 //  plus4_sid_cartridge_device - constructor
 //-------------------------------------------------
 
-plus4_sid_cartridge_device::plus4_sid_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+plus4_sid_cartridge_device::plus4_sid_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PLUS4_SID, "Plus/4 SID cartridge", tag, owner, clock, "plus4_sid", __FILE__),
 	device_plus4_expansion_card_interface(mconfig, *this),
 	m_sid(*this, MOS8580_TAG),

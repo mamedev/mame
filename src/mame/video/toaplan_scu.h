@@ -10,7 +10,7 @@ class toaplan_scu_device : public device_t, public device_gfx_interface
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 public:
-	toaplan_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	toaplan_scu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration
 	static void static_set_xoffsets(device_t &device, int xoffs, int xoffs_flipped);
@@ -20,8 +20,8 @@ public:
 	void alloc_sprite_bitmap(screen_device &screen);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	bitmap_ind16 m_temp_spritebitmap;

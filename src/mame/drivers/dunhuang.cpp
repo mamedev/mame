@@ -63,7 +63,7 @@ Notes:
 class dunhuang_state : public driver_device
 {
 public:
-	dunhuang_state(const machine_config &mconfig, device_type type, const char *tag)
+	dunhuang_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -121,13 +121,12 @@ public:
 	DECLARE_READ8_MEMBER(dunhuang_service_r);
 	DECLARE_READ8_MEMBER(dunhuang_input_r);
 	DECLARE_WRITE8_MEMBER(dunhuang_rombank_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_82_w);
 	DECLARE_READ8_MEMBER(dunhuang_dsw_r);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_dunhuang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -480,7 +479,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_rombank_w)
 	membank("bank1")->set_entry(((data >> 2) & 0x7));
 
 	// COIN OUT:        data & 0x20
-	coin_counter_w(machine(), 0,    data & 0x40);
+	machine().bookkeeping().coin_counter_w(0,    data & 0x40);
 	m_hopper = data & 0x80;
 }
 

@@ -13,18 +13,18 @@ class neogeo_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	neogeo_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT16 clock, const char *shortname, const char *source);
-	neogeo_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock);
+	neogeo_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT16 clock, std::string shortname, std::string source);
+	neogeo_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT16 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read_rom);
+	virtual DECLARE_READ16_MEMBER(read_rom) override;
 
-	virtual void activate_cart(ACTIVATE_CART_PARAMS);
+	virtual void activate_cart(ACTIVATE_CART_PARAMS) override;
 
 	required_device<neogeo_banked_cart_device> m_banked_cart;
 };

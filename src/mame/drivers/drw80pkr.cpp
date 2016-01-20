@@ -36,7 +36,7 @@
 class drw80pkr_state : public driver_device
 {
 public:
-	drw80pkr_state(const machine_config &mconfig, device_type type, const char *tag)
+	drw80pkr_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
@@ -71,8 +71,8 @@ public:
 	DECLARE_READ8_MEMBER(drw80pkr_io_r);
 	DECLARE_DRIVER_INIT(drw80pkr);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(drw80pkr);
 	UINT32 screen_update_drw80pkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;

@@ -6,7 +6,7 @@
 
 static const int TIMER_POLL = 1;
 
-pseudo_terminal_device::pseudo_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pseudo_terminal_device::pseudo_terminal_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PSEUDO_TERMINAL, "Pseudo terminal", tag, owner, clock, "pseudo_terminal", __FILE__),
 		device_serial_interface(mconfig, *this),
 		device_rs232_port_interface(mconfig, *this),
@@ -18,8 +18,8 @@ pseudo_terminal_device::pseudo_terminal_device(const machine_config &mconfig, co
 		m_rs232_parity(*this, "RS232_PARITY"),
 		m_rs232_stopbits(*this, "RS232_STOPBITS"),
 		m_input_count(0),
-		m_input_index(0), 
-		m_timer_poll(NULL)
+		m_input_index(0),
+		m_timer_poll(nullptr)
 {
 }
 

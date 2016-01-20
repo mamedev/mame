@@ -202,7 +202,7 @@ WRITE8_MEMBER( c80_state::pio1_pb_w )
 
 	if (!m_pio1_a5)
 	{
-		output_set_digit_value(m_digit, data);
+		output().set_digit_value(m_digit, data);
 	}
 
 	m_keylatch = data;
@@ -230,7 +230,7 @@ static const z80_daisy_config c80_daisy_chain[] =
 {
 	{ Z80PIO1_TAG },
 	{ Z80PIO2_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 /* Machine Initialization */

@@ -9,12 +9,12 @@
 
 void volfied_state::video_start()
 {
-	m_video_ram = auto_alloc_array(machine(), UINT16, 0x40000);
+	m_video_ram = std::make_unique<UINT16[]>(0x40000);
 
 	m_video_ctrl = 0;
 	m_video_mask = 0;
 
-	save_pointer(NAME(m_video_ram), 0x40000);
+	save_pointer(NAME(m_video_ram.get()), 0x40000);
 	save_item(NAME(m_video_ctrl));
 	save_item(NAME(m_video_mask));
 }
@@ -91,7 +91,7 @@ void volfied_state::refresh_pixel_layer( bitmap_ind16 &bitmap )
 
 	*********************************************************/
 
-	UINT16* p = m_video_ram;
+	UINT16* p = m_video_ram.get();
 	int width = m_screen->width();
 	int height = m_screen->height();
 

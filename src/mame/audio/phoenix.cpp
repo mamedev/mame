@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller, Derrick Renaud
 /****************************************************************************
  *
@@ -50,7 +50,7 @@
 
 const device_type PHOENIX = &device_creator<phoenix_sound_device>;
 
-phoenix_sound_device::phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+phoenix_sound_device::phoenix_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PHOENIX, "Phoenix Audio Custom", tag, owner, clock, "phoenix_sound", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
@@ -83,7 +83,7 @@ void phoenix_sound_device::device_start()
 	m_discrete = machine().device<discrete_device>("discrete");
 	m_tms = machine().device<tms36xx_device>("tms");
 
-	m_poly18 = auto_alloc_array(machine(), UINT32, 1ul << (18-5));
+	m_poly18 = std::make_unique<UINT32[]>(1ul << (18-5));
 
 	shiftreg = 0;
 	for( i = 0; i < (1ul << (18-5)); i++ )
@@ -112,7 +112,7 @@ void phoenix_sound_device::device_start()
 	save_item(NAME(m_noise_state.polyoffs));
 	save_item(NAME(m_noise_state.lowpass_counter));
 	save_item(NAME(m_noise_state.lowpass_polybit));
-	save_pointer(NAME(m_poly18), (1ul << (18-5)));
+	save_pointer(NAME(m_poly18.get()), (1ul << (18-5)));
 }
 
 int phoenix_sound_device::update_c24(int samplerate)

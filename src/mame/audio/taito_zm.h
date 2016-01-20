@@ -16,7 +16,7 @@ class taito_zoom_device : public device_t
 
 {
 public:
-	taito_zoom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	taito_zoom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~taito_zoom_device() {}
 
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
@@ -31,8 +31,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// inherited devices/pointers
@@ -42,7 +42,7 @@ private:
 	// internal state
 	UINT16 m_reg_address;
 	UINT8 m_tms_ctrl;
-	UINT8* m_snd_shared_ram;
+	std::unique_ptr<UINT8[]> m_snd_shared_ram;
 };
 
 extern const device_type TAITO_ZOOM;

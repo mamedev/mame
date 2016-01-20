@@ -20,11 +20,11 @@ class northbridge_device :
 {
 public:
 		// construction/destruction
-		northbridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+		northbridge_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 protected:
 		// device-level overrides
-		virtual void device_start();
-		virtual void device_reset();
+		virtual void device_start() override;
+		virtual void device_reset() override;
 public:
 		required_device<cpu_device> m_maincpu;
 		required_device<ram_device> m_ram;

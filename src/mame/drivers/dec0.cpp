@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+// thanks-to:Richard Bush
 /***************************************************************************
 
   Data East 16 bit games - Bryan McPhail, mish@tendril.co.uk
@@ -1886,6 +1887,103 @@ ROM_START( drgninjab )
 	ROM_LOAD( "eg08.2c",   0x0000, 0x10000, CRC(92f2c916) SHA1(38b4ed81edcc2069b096591bdc5baab8b9edfa9a) ) // different to baddudes
 ROM_END
 
+
+
+/*
+
+ CPUs
+QTY     Type    clock   position    function
+1x  SCN68000CAN64       main PCB 9h     16/32-bit Microprocessor - main
+1x  UM6502      main PCB 7d     8-bit Microprocessor - sound
+1x  MC3403      main PCB 14e    Quad Operational Amplifier - sound
+1x  GL358       main PCB 13b    Dual Operational Amplifier - sound
+1x  YM2203C         main PCB 12a    FM Operator Type-M (OPM) - sound
+2x  YM3014B         main PCB 13d, 13e   D/A Converter (DAC) - sound
+1x  YM3812      main PCB 9b     FM Operator Type-L II (OPL II) - sound
+1x  MC68705R3P      ROMs PCB 1l     8-bit EPROM Microcomputer Unit - main (not dumped)
+1x  M5205       ROMs PCB 12c    ADPCM Speech Syntesis IC - sound
+1x  oscillator  24.000MHz   main PCB 2a
+1x  oscillator  16.0000     main PCB 12n
+1x  blu resonator   CSB-400P    ROMs PCB 12b
+ROMs
+QTY     Type    position    status
+4x  27256   main PCB 1-4    dumped
+4x  27512   main PCB 5-8    dumped
+7x  27256   ROMs PCB 15,20-23,28,29     dumped
+9x  27512   ROMs PCB 9-14,27-30     dumped
+2x  N82S129AN   main PCB 2q,3p  not dumped yet
+1x  N82S131N    main PCB 5q     not dumped yet
+1x  N82S137N    main PCB 8u     not dumped yet
+1x  N82S129AN   ROMs PCB 12c    not dumped yet
+RAMs
+QTY     Type    position
+2x  HY6264  main PCB 12c,12d
+14x     TMM2018     main PCB 1e,2e,5k,5l,5m,5n,5o,5p,7m,7n,8b,11s,11t,11u
+2x  TMM2064     ROMs PCB 8n,8o
+4x  TMM2018     ROMs PCB 8f,8g,8j,8k
+PLDs
+QTY     Type    position    status
+Others
+
+1x 28x2 edge connector
+3x 50 pins flat cable connector from main board to roms board
+1x trimmer (volume)
+1x 8x2 switches DIP
+
+*/
+
+ROM_START( drgninjab2 )
+	ROM_REGION( 0x60000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "a14.3e",  0x00000, 0x10000, CRC(c4b9f4e7) SHA1(4a8176cce8c7909aace8ece4f97b1a199617938e) ) // 99.978638%
+	ROM_LOAD16_BYTE( "a11.3b",  0x00001, 0x10000, CRC(e4cc7c60) SHA1(63aeab4e20420f28a947438f2d7079c92a43d2df) ) // 99.978638%
+	ROM_LOAD16_BYTE( "a12.2e",  0x40000, 0x10000, CRC(2b81faf7) SHA1(6d10c29f5ee06856843d83e77ba24c2b6e00a9cb) )
+	ROM_LOAD16_BYTE( "a9.2b",   0x40001, 0x10000, CRC(c52c2e9d) SHA1(399f2b7df9d558c8f33bf1a7c8048c62e0f54cec) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_LOAD( "a15.7b",   0x8000, 0x8000, CRC(82007af2) SHA1(f0db1b1dab199df402a7590e56d4d5ab4baca803) ) // 99.612427%
+
+	ROM_REGION( 0x1000, "mcu", 0 )  /* 68705 microcontroller */
+	ROM_LOAD( "mc68705r3p",     0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x10000, "gfx1", 0 ) /* chars */
+	ROM_LOAD( "a22.9m",  0x00000, 0x08000, CRC(6791bc20) SHA1(7240b2688cda04ee9ea331472a84fbffc85b8e90) ) // 99.996948%
+	ROM_LOAD( "a23.9n",  0x08000, 0x08000, CRC(5d75fc8f) SHA1(92947dd78bfe8067fb5f645fa1ef212e48b69c70) )
+
+	ROM_REGION( 0x40000, "gfx2", 0 ) /* tiles */ // identical but split into 4 roms
+	ROM_LOAD( "a25.10f",  0x00000, 0x10000, CRC(05cfc3e5) SHA1(a0163921c77dc9706463a402c3dd45ec4341cd21) )
+	ROM_LOAD( "a27.10h",  0x10000, 0x10000, CRC(e11e988f) SHA1(0c59f0d8d1abe414c7e1ebd49d454179fed2cd00) )
+	ROM_LOAD( "a24.10e",  0x20000, 0x10000, CRC(b893d880) SHA1(99e228174677f2e3e96154f77bfa9bf0f1c0a6a5) )
+	ROM_LOAD( "a26.10g",  0x30000, 0x10000, CRC(6f226dda) SHA1(65ebb16a292c57d49c135fce7ed7537146226eb5) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 ) /* tiles */
+	ROM_LOAD( "a29.10k",   0x00000, 0x08000, CRC(4bf80966) SHA1(de4d83bac16f161a43678c2b2ae71f8fcac7212d) )
+	ROM_LOAD( "a21.9k",    0x08000, 0x08000, CRC(b2e989fc) SHA1(492c1f3b18a4059c87254e0cba01ad9848e8b553) )
+	ROM_LOAD( "a28.10j",   0x10000, 0x08000, CRC(2d38032d) SHA1(833ebff370825e5c8b8fc59fbe663b8998884353) )
+	ROM_LOAD( "a20.9j",    0x18000, 0x08000, CRC(e71c0793) SHA1(e42a8192c772da1d6c93f9f9e89c553d712e18f7) )
+
+	ROM_REGION( 0x80000, "gfx4", 0 ) /* sprites */
+	ROM_LOAD( "a6.4g",  0x00000, 0x10000, CRC(5617d67f) SHA1(8f684de27ae79c4d35720706cdd2733af0e0a9cc) )
+	ROM_LOAD( "a2.4c",  0x10000, 0x08000, CRC(17e42633) SHA1(405f5296a741901677cca978a1b287d894eb1e54) )
+	ROM_LOAD( "a8.5g",  0x20000, 0x10000, CRC(ba83e8d8) SHA1(63092a5d0da0c9228a72a83b43a67a47b1388724) )
+	ROM_LOAD( "a4.5c",  0x30000, 0x08000, CRC(fea2a134) SHA1(525dd5f48993db1fe1e3c095442884178f75e8e0) )
+	ROM_LOAD( "a5.3g",  0x40000, 0x10000, CRC(fd91e08e) SHA1(8998f020791c8830e963096dc7b8fcb430d041d4) )
+	ROM_LOAD( "a1.3c",  0x50000, 0x08000, CRC(e83c760a) SHA1(d08db381658b8b3288c5eaa9048a906126e0f712) )
+	ROM_LOAD( "a7.4-5g",  0x60000, 0x10000, CRC(601b7b23) SHA1(c1c665614f1377bc47720382b25c965266a2593f) )
+	ROM_LOAD( "a3.4-5c",  0x70000, 0x08000, CRC(eeee8a1a) SHA1(2bf8378ff38f6a7c7cbd4cbd489de25cb1f0fe71) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "a30.10b",   0x0000, 0x10000, CRC(f6806826) SHA1(e2c6a0682f34d30c63dab8715729151cc3657387) ) //  99.218750%
+
+	ROM_REGION( 0x40000, "proms", 0 ) /* proms */
+	ROM_LOAD( "n82s129an.12c",   0x0000, 0x100, CRC(78994fdb) SHA1(cd52bff11b81f19eeb2683ed94b236f1464a5ea9) )
+	ROM_LOAD( "n82s129an.2q",    0x0000, 0x100, CRC(af46d1ee) SHA1(281bcc61d9d67b007c1399e228ec6baf6ab5d4ff) )
+	ROM_LOAD( "n82s129an.3p",    0x0000, 0x100, CRC(9f6aa3e5) SHA1(518247d4581eee3a078269fcf0c86d182cf622cd) )
+	ROM_LOAD( "n82s131n.5q",   0x0000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "n82s137n.8u",   0x0000, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
+ROM_END
+
+
+
 ROM_START( birdtry )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "ek-04.bin",     0x00000, 0x10000, CRC(5f0f4686) SHA1(5eea74f5626339ebd50e623029f21f1cd0f93135) )
@@ -3140,11 +3238,14 @@ GAME( 1990, bouldashj,  bouldash, slyspy,   bouldash, dec0_state,   slyspy, ROT0
 GAME( 1988, robocopb,   robocop,  robocopb, robocop, dec0_state,  robocop,  ROT0,   "bootleg", "Robocop (World bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, drgninjab,  baddudes, baddudes, drgninja, dec0_state, baddudes, ROT0,   "bootleg", "Dragonninja (bootleg)", MACHINE_SUPPORTS_SAVE )
 
+
+
+
 // this is a common bootleg board
 GAME( 1989, midresb,    midres,   midresb,  midresb, dec0_state,  midresb,  ROT0,   "bootleg", "Midnight Resistance (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // need to hook up 68705? (probably unused)
 GAME( 1989, midresbj,   midres,   midresb,  midresb, dec0_state,  midresb,  ROT0,   "bootleg", "Midnight Resistance (Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffantasybl, hippodrm, ffantasybl, ffantasybl, dec0_state, ffantasybl,   ROT0,   "bootleg", "Fighting Fantasy (bootleg with 68705)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 68705 not dumped, might be the same as midresb
-/* A Bad Dudes bootleg with 68705 like the midres and ffantasy ones exists, but is not dumped */
+GAME( 1988, drgninjab2, baddudes, baddudes, drgninja, dec0_state, baddudes, ROT0,   "bootleg", "Dragonninja (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // is this the same board as above? (region warning hacked to World, but still shows Japanese text)
 
 // these are different to the above but quite similar to each other
 GAME( 1988, automat,    robocop,  automat,  robocop, dec0_state,  robocop,  ROT0,   "bootleg", "Automat (bootleg of Robocop)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // sound rom / music from section z with mods for ADPCM?

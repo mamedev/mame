@@ -3,8 +3,6 @@
 
 #include "osdcore.h"
 
-bool g_print_verbose = false;
-
 static const int MAXSTACK = 10;
 static osd_output *m_stack[MAXSTACK];
 static int m_ptr = -1;
@@ -17,7 +15,7 @@ void osd_output::push(osd_output *delegate)
 {
 	if (m_ptr < MAXSTACK)
 	{
-		delegate->m_chain = (m_ptr >= 0 ? m_stack[m_ptr] : NULL);
+		delegate->m_chain = (m_ptr >= 0 ? m_stack[m_ptr] : nullptr);
 		m_ptr++;
 		m_stack[m_ptr] = delegate;
 	}
@@ -103,10 +101,6 @@ void CLIB_DECL osd_printf_info(const char *format, ...)
 void CLIB_DECL osd_printf_verbose(const char *format, ...)
 {
 	va_list argptr;
-
-	/* if we're not verbose, skip it */
-	if (!g_print_verbose)
-		return;
 
 	/* do the output */
 	va_start(argptr, format);

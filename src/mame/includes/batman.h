@@ -13,7 +13,7 @@
 class batman_state : public atarigen_state
 {
 public:
-	batman_state(const machine_config &mconfig, device_type type, const char *tag)
+	batman_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atarigen_state(mconfig, type, tag),
 			m_jsa(*this, "jsa"),
 			m_vad(*this, "vad") { }
@@ -24,7 +24,7 @@ public:
 	UINT16          m_latch_data;
 	UINT8           m_alpha_tile_bank;
 
-	virtual void update_interrupts();
+	virtual void update_interrupts() override;
 	DECLARE_WRITE16_MEMBER(latch_w);
 	DECLARE_DRIVER_INIT(batman);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);

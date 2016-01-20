@@ -108,7 +108,7 @@ WRITE8_MEMBER( c1551_t::port_w )
 	m_ga->mtr_w(BIT(data, 2));
 
 	// activity LED
-	output_set_led_value(LED_ACT, BIT(data, 3));
+	machine().output().set_led_value(LED_ACT, BIT(data, 3));
 
 	// density select
 	m_ga->ds_w((data >> 5) & 0x03);
@@ -413,7 +413,7 @@ ioport_constructor c1551_t::device_input_ports() const
 //  c1551_t - constructor
 //-------------------------------------------------
 
-c1551_t::c1551_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c1551_t::c1551_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, C1551, "C1551", tag, owner, clock, "c1551", __FILE__),
 		device_plus4_expansion_card_interface(mconfig, *this),
 		m_maincpu(*this, M6510T_TAG),

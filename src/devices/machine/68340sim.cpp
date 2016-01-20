@@ -11,7 +11,7 @@ READ16_MEMBER( m68340cpu_device::m68340_internal_sim_r )
 {
 	m68340cpu_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
-	assert(sim != NULL);
+	assert(sim != nullptr);
 
 	if (sim)
 	{
@@ -62,7 +62,7 @@ READ8_MEMBER( m68340cpu_device::m68340_internal_sim_ports_r )
 	offset += 0x10;
 	m68340cpu_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
-	assert(sim != NULL);
+	assert(sim != nullptr);
 
 	if (sim)
 	{
@@ -118,7 +118,7 @@ READ32_MEMBER( m68340cpu_device::m68340_internal_sim_cs_r )
 
 	m68340cpu_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
-	assert(sim != NULL);
+	assert(sim != nullptr);
 
 	if (sim)
 	{
@@ -148,7 +148,7 @@ WRITE16_MEMBER( m68340cpu_device::m68340_internal_sim_w )
 {
 	m68340cpu_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
-	assert(sim != NULL);
+	assert(sim != nullptr);
 
 	if (sim)
 	{
@@ -207,7 +207,7 @@ WRITE8_MEMBER( m68340cpu_device::m68340_internal_sim_ports_w )
 	offset += 0x10;
 	m68340cpu_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
-	assert(sim != NULL);
+	assert(sim != nullptr);
 
 	if (sim)
 	{
@@ -260,7 +260,7 @@ WRITE32_MEMBER( m68340cpu_device::m68340_internal_sim_cs_w )
 	offset += m68340SIM_AM_CS0>>2;
 	m68340cpu_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
-	assert(sim != NULL);
+	assert(sim != nullptr);
 
 	if (sim)
 	{

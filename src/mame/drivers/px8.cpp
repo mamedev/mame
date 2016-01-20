@@ -322,9 +322,9 @@ WRITE8_MEMBER( px8_state::gah40m_w )
 
 		*/
 
-		output_set_value("led_0", BIT(data, 0));
-		output_set_value("led_1", BIT(data, 1));
-		output_set_value("led_2", BIT(data, 2));
+		output().set_value("led_0", BIT(data, 0));
+		output().set_value("led_1", BIT(data, 1));
+		output().set_value("led_2", BIT(data, 2));
 		break;
 
 	case GAH40M_IER:
@@ -789,10 +789,10 @@ static MACHINE_CONFIG_START( px8, px8_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, NULL)
+	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
-	MCFG_GENERIC_CARTSLOT_ADD("capsule2", generic_plain_slot, NULL)
+	MCFG_GENERIC_CARTSLOT_ADD("capsule2", generic_plain_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* devices */

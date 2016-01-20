@@ -116,7 +116,7 @@ Main board:
 class bmcbowl_state : public driver_device
 {
 public:
-	bmcbowl_state(const machine_config &mconfig, device_type type, const char *tag)
+	bmcbowl_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_stats_ram(*this, "nvram", 16),
@@ -140,8 +140,8 @@ public:
 	DECLARE_READ8_MEMBER(dips1_r);
 	DECLARE_WRITE8_MEMBER(input_mux_w);
 	DECLARE_DRIVER_INIT(bmcbowl);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void init_stats(const UINT8 *table, int table_len, int address);
 };

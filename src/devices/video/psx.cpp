@@ -22,7 +22,7 @@ const device_type CXD8561BQ = &device_creator<cxd8561bq_device>;
 const device_type CXD8561CQ = &device_creator<cxd8561cq_device>;
 const device_type CXD8654Q = &device_creator<cxd8654q_device>;
 
-psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_vblank_handler(*this)
 #if DEBUG_VIEWER
@@ -51,32 +51,32 @@ void psxgpu_device::device_reset( void )
 	gpu_reset();
 }
 
-cxd8514q_device::cxd8514q_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cxd8514q_device::cxd8514q_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: psxgpu_device(mconfig, CXD8514Q, "CXD8514Q GPU", tag, owner, clock, "cxd8514q", __FILE__)
 {
 }
 
-cxd8538q_device::cxd8538q_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cxd8538q_device::cxd8538q_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: psxgpu_device(mconfig, CXD8538Q, "CXD8538Q GPU", tag, owner, clock, "cxd8538q", __FILE__)
 {
 }
 
-cxd8561q_device::cxd8561q_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cxd8561q_device::cxd8561q_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: psxgpu_device(mconfig, CXD8561Q, "CXD8561Q GPU", tag, owner, clock, "cxd8561q", __FILE__)
 {
 }
 
-cxd8561bq_device::cxd8561bq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cxd8561bq_device::cxd8561bq_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: psxgpu_device(mconfig, CXD8561BQ, "CXD8561BQ", tag, owner, clock, "cxd8561bq", __FILE__)
 {
 }
 
-cxd8561cq_device::cxd8561cq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cxd8561cq_device::cxd8561cq_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: psxgpu_device(mconfig, CXD8561CQ, "CXD8561CQ GPU", tag, owner, clock, "cxd8561cq", __FILE__)
 {
 }
 
-cxd8654q_device::cxd8654q_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cxd8654q_device::cxd8654q_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: psxgpu_device(mconfig, CXD8654Q, "CXD8654Q GPU", tag, owner, clock, "cxd8654q", __FILE__)
 {
 }
@@ -101,7 +101,7 @@ static const UINT16 m_p_n_prevpointlist3[] = { 2, 0, 1 };
 #define TEXTURE_V( a ) ( a.b.h )
 #define TEXTURE_U( a ) ( a.b.l )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char *s_fmt, ... )
+static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -127,7 +127,7 @@ void psxgpu_device::DebugMeshInit( void )
 	m_debug.b_clear = 1;
 	m_debug.n_coord = 0;
 	m_debug.n_skip = 0;
-	m_debug.mesh = auto_bitmap_ind16_alloc( machine(), width, height );
+	m_debug.mesh = std::make_unique<bitmap_ind16>(width, height );
 }
 
 void psxgpu_device::DebugMesh( int n_coordx, int n_coordy )
@@ -469,7 +469,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	n_lightgun_y = 0;
 	b_reverseflag = 0;
 
-	p_vram = auto_alloc_array_clear( machine(), UINT16, width * height );
+	p_vram = make_unique_clear<UINT16[]>(width * height );
 
 	for( n_line = 0; n_line < 1024; n_line++ )
 	{
@@ -568,9 +568,9 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	}
 
 	// icky!!!
-	machine().save().save_memory( this, "globals", NULL, 0, "m_packet", (UINT8 *)&m_packet, 1, sizeof( m_packet ) );
+	machine().save().save_memory( this, "globals", std::string(), 0, "m_packet", (UINT8 *)&m_packet, 1, sizeof( m_packet ) );
 
-	save_pointer(NAME(p_vram), width * height );
+	save_pointer(NAME(p_vram.get()), width * height );
 	save_item(NAME(n_gpu_buffer_offset));
 	save_item(NAME(n_vramx));
 	save_item(NAME(n_vramy));
@@ -752,7 +752,7 @@ UINT32 psxgpu_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap,
 			n_line = n_lines;
 			while( n_line > 0 )
 			{
-				draw_scanline16( bitmap, n_x + n_left, n_y + n_top, n_columns, p_p_vram[ ( n_y + n_displaystarty ) & 1023 ] + n_x + n_displaystartx, NULL );
+				draw_scanline16( bitmap, n_x + n_left, n_y + n_top, n_columns, p_p_vram[ ( n_y + n_displaystarty ) & 1023 ] + n_x + n_displaystartx, nullptr );
 				n_y++;
 				n_line--;
 			}
@@ -1282,7 +1282,7 @@ void psxgpu_device::decode_tpage( UINT32 tpage )
 	a.sw.l = SINT11( COORD_X( a ) ); \
 	a.sw.h = SINT11( COORD_Y( a ) );
 
-INLINE int CullVertex( int a, int b )
+static inline int CullVertex( int a, int b )
 {
 	int d = a - b;
 	if( d < -1023 || d > 1023 )

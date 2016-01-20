@@ -100,7 +100,7 @@ device_nes_control_port_interface::~device_nes_control_port_interface()
 //  nes_control_port_device - constructor
 //-------------------------------------------------
 
-nes_control_port_device::nes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_control_port_device::nes_control_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, NES_CONTROL_PORT, "Nintendo NES/FC control port", tag, owner, clock, "nes_control_port", __FILE__),
 						device_slot_interface(mconfig, *this), m_device(nullptr)
 {

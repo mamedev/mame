@@ -63,8 +63,8 @@ WRITE8_MEMBER(buggychl_state::buggychl_ctrl_w)
 
 	m_sprite_color_base = (data & 0x10) ? 1 * 16 : 3 * 16;
 
-	coin_lockout_global_w(machine(), (~data & 0x40) >> 6);
-	set_led_status(machine(), 0, ~data & 0x80);
+	machine().bookkeeping().coin_lockout_global_w((~data & 0x40) >> 6);
+	output().set_led_value(0, ~data & 0x80);
 }
 
 WRITE8_MEMBER(buggychl_state::buggychl_bg_scrollx_w)
@@ -120,7 +120,7 @@ void buggychl_state::draw_bg( bitmap_ind16 &bitmap, const rectangle &cliprect )
 	for (offs = 0; offs < 256; offs++)
 		scroll[offs] = -m_scrollh[offs];
 
-	copyscrollbitmap_trans(bitmap, m_tmp_bitmap2, 256, scroll, 0, 0, clip, 32);
+	copyscrollbitmap_trans(bitmap, m_tmp_bitmap2, 256, scroll, 0, nullptr, clip, 32);
 }
 
 

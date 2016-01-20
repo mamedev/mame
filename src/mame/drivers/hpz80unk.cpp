@@ -41,7 +41,7 @@ Z nothing
 class hpz80unk_state : public driver_device
 {
 public:
-	hpz80unk_state(const machine_config &mconfig, device_type type, const char *tag)
+	hpz80unk_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG),
@@ -59,7 +59,7 @@ public:
 	required_shared_ptr<UINT8> m_p_rom;
 	UINT8 m_term_data;
 	UINT8 m_port02_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 READ8_MEMBER( hpz80unk_state::port02_r )

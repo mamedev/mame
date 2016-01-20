@@ -105,7 +105,7 @@ Alien Crush & Pac_Land: dumps made from PC-Engine dumps of JP versions
 class uapce_state : public pce_common_state
 {
 public:
-	uapce_state(const machine_config &mconfig, device_type type, const char *tag)
+	uapce_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pce_common_state(mconfig, type, tag),
 		m_discrete(*this, "discrete") { }
 
@@ -113,8 +113,8 @@ public:
 	DECLARE_WRITE8_MEMBER(jamma_if_control_latch_w);
 	DECLARE_READ8_MEMBER(jamma_if_control_latch_r);
 	DECLARE_READ8_MEMBER(jamma_if_read_dsw);
-	virtual UINT8 joy_read();
-	virtual void machine_reset();
+	virtual UINT8 joy_read() override;
+	virtual void machine_reset() override;
 	required_device<discrete_device> m_discrete;
 	DECLARE_WRITE_LINE_MEMBER(pce_irq_changed);
 };
@@ -153,7 +153,7 @@ WRITE8_MEMBER(uapce_state::jamma_if_control_latch_w)
 
    Pin 'z' is a normally ground connection, but on this board it is isolated from ground.
    The wiring harness also has the corresponding wire separate from the others. */
-	coin_counter_w(machine(), 0, BIT(data,5));
+	machine().bookkeeping().coin_counter_w(0, BIT(data,5));
 
 /* D4 : Connects the START1 switch input from the JAMMA connector to the
     "RUN" key input of the control pad multiplexer.

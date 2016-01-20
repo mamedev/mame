@@ -25,7 +25,7 @@
 class micronic_state : public driver_device
 {
 public:
-	micronic_state(const machine_config &mconfig, device_type type, const char *tag)
+	micronic_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_lcdc(*this, HD61830_TAG),
@@ -56,8 +56,8 @@ public:
 	required_device<nvram_device> m_nvram2;
 	required_device<ram_device> m_ram;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	DECLARE_READ8_MEMBER( keypad_r );

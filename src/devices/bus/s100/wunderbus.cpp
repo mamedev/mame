@@ -111,14 +111,14 @@ static MACHINE_CONFIG_FRAGMENT( s100_wunderbus )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(INS8250_1_TAG, ins8250_uart_device, cts_w))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INS8250_2_TAG, ins8250_uart_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(INS8250_2_TAG, ins8250_uart_device, dcd_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(INS8250_2_TAG, ins8250_uart_device, dsr_w))
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE(INS8250_2_TAG, ins8250_uart_device, ri_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(INS8250_2_TAG, ins8250_uart_device, cts_w))
 
-	MCFG_RS232_PORT_ADD(RS232_C_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_C_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INS8250_3_TAG, ins8250_uart_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(INS8250_3_TAG, ins8250_uart_device, dcd_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(INS8250_3_TAG, ins8250_uart_device, dsr_w))
@@ -236,7 +236,7 @@ ioport_constructor s100_wunderbus_device::device_input_ports() const
 //  s100_wunderbus_device - constructor
 //-------------------------------------------------
 
-s100_wunderbus_device::s100_wunderbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+s100_wunderbus_device::s100_wunderbus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, S100_WUNDERBUS, "Wunderbus I/O", tag, owner, clock, "s100_wunderbus", __FILE__),
 	device_s100_card_interface(mconfig, *this),
 	m_pic(*this, I8259A_TAG),

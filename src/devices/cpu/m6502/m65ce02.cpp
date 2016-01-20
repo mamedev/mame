@@ -13,12 +13,12 @@
 
 const device_type M65CE02 = &device_creator<m65ce02_device>;
 
-m65ce02_device::m65ce02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+m65ce02_device::m65ce02_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	m65c02_device(mconfig, M65CE02, "M65CE02", tag, owner, clock, "m65ce02", __FILE__), TMP3(0), Z(0), B(0)
 {
 }
 
-m65ce02_device::m65ce02_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+m65ce02_device::m65ce02_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	m65c02_device(mconfig, type, name, tag, owner, clock, shortname, source), TMP3(0), Z(0), B(0)
 {
 }
@@ -75,7 +75,7 @@ void m65ce02_device::state_export(const device_state_entry &entry)
 {
 }
 
-void m65ce02_device::state_string_export(const device_state_entry &entry, std::string &str)
+void m65ce02_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch(entry.index()) {
 	case STATE_GENFLAGS:

@@ -197,20 +197,20 @@ WRITE8_MEMBER(warpwarp_state::geebee_out7_w)
 	switch (offset & 7)
 	{
 		case 0:
-			set_led_status(machine(), 0,data & 1);
+			output().set_led_value(0,data & 1);
 			break;
 		case 1:
-			set_led_status(machine(), 1,data & 1);
+			output().set_led_value(1,data & 1);
 			break;
 		case 2:
-			set_led_status(machine(), 2,data & 1);
+			output().set_led_value(2,data & 1);
 			break;
 		case 3:
-			coin_counter_w(machine(), 0,data & 1);
+			machine().bookkeeping().coin_counter_w(0,data & 1);
 			break;
 		case 4:
 			if (strcmp(machine().system().name, "geebeeb"))
-				coin_lockout_global_w(machine(), ~data & 1);
+				machine().bookkeeping().coin_lockout_global_w(~data & 1);
 			break;
 		case 5:
 			if( m_geebee_bgw != (data & 1) )
@@ -284,22 +284,22 @@ WRITE8_MEMBER(warpwarp_state::warpwarp_out3_w)
 	switch (offset & 7)
 	{
 		case 0:
-			set_led_status(machine(), 0,data & 1);
+			output().set_led_value(0,data & 1);
 			break;
 		case 1:
-			set_led_status(machine(), 1,data & 1);
+			output().set_led_value(1,data & 1);
 			break;
 		case 2:
-			set_led_status(machine(), 2,data & 1);
+			output().set_led_value(2,data & 1);
 			break;
 		case 3:
 			/* n.c. */
 			break;
 		case 4:
-			coin_lockout_global_w(machine(), ~data & 1);
+			machine().bookkeeping().coin_lockout_global_w(~data & 1);
 			break;
 		case 5:
-			coin_counter_w(machine(), 0,data & 1);
+			machine().bookkeeping().coin_counter_w(0,data & 1);
 			break;
 		case 6:
 			m_ball_on = data & 1;

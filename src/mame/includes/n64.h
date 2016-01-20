@@ -15,16 +15,16 @@ class n64_rdp;
 class n64_state : public driver_device
 {
 public:
-	n64_state(const machine_config &mconfig, device_type type, const char *tag)
+	n64_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
 	/* video-related */
 	n64_rdp *m_rdp;
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	void n64_machine_stop();
 
 	UINT32 screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -58,7 +58,7 @@ private:
 
 public:
 	// construction/destruction
-	n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	n64_periphs(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ32_MEMBER( is64_r );
 	DECLARE_WRITE32_MEMBER( is64_w );
@@ -139,8 +139,8 @@ public:
 	UINT32 dp_clock;
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	address_space *mem_map;
@@ -228,7 +228,6 @@ private:
 	UINT32 dd_track_offset;
 
 	// Peripheral Interface (PI) registers and functions
-	void pi_dma();
 	emu_timer *pi_dma_timer;
 	UINT32 pi_dram_addr;
 	UINT32 pi_cart_addr;

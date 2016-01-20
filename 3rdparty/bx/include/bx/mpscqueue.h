@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_MPSCQUEUE_H_HEADER_GUARD
@@ -29,7 +29,7 @@ namespace bx
 
 		void push(Ty* _ptr) // producer only
 		{
-			LwMutexScope $(m_write);
+			LwMutexScope lock(m_write);
 			m_queue.push(_ptr);
 		}
 

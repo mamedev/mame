@@ -42,7 +42,7 @@ to discover the special features of this Basic.
 class basic52_state : public driver_device
 {
 public:
-	basic52_state(const machine_config &mconfig, device_type type, const char *tag)
+	basic52_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG)
@@ -54,7 +54,7 @@ public:
 	UINT8 m_term_data;
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(to_term);
 	DECLARE_READ8_MEMBER(from_term);
 };

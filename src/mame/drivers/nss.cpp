@@ -299,7 +299,7 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 class nss_state : public snes_state
 {
 public:
-	nss_state(const machine_config &mconfig, device_type type, const char *tag)
+	nss_state(const machine_config &mconfig, device_type type, std::string tag)
 		: snes_state(mconfig, type, tag),
 		m_m50458(*this,"m50458"),
 		m_s3520cf(*this, "s3520cf"),
@@ -315,7 +315,7 @@ public:
 	optional_device<palette_device> m_palette;
 
 	UINT8 m_wram_wp_flag;
-	UINT8 *m_wram;
+	std::unique_ptr<UINT8[]> m_wram;
 	UINT8 m_nmi_enable;
 	UINT8 m_cart_sel;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -336,8 +336,8 @@ public:
 	DECLARE_DRIVER_INIT(nss);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(game_over_flag_r);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(nss_vblank_irq);
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
@@ -599,8 +599,8 @@ WRITE8_MEMBER(nss_state::port_03_w)
 
 WRITE8_MEMBER(nss_state::port_04_w)
 {
-	coin_counter_w(machine(), 0, (data >> 0) & 1);
-	coin_counter_w(machine(), 1, (data >> 1) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 1);
+	machine().bookkeeping().coin_counter_w(1, (data >> 1) & 1);
 }
 
 WRITE8_MEMBER(nss_state::port_07_w)
@@ -623,7 +623,7 @@ void nss_state::machine_start()
 	snes_state::machine_start();
 
 	m_is_nss = 1;
-	m_wram = auto_alloc_array_clear(machine(), UINT8, 0x1000);
+	m_wram = make_unique_clear<UINT8[]>(0x1000);
 }
 
 

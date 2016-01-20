@@ -98,7 +98,7 @@ but unlike to DC/AW/Naomi SH4 'peripheral clock' (at which works TMU timers and 
 class atvtrack_state : public driver_device
 {
 public:
-	atvtrack_state(const machine_config &mconfig, device_type type, const char *tag)
+	atvtrack_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu") { }
@@ -113,9 +113,9 @@ public:
 	DECLARE_WRITE64_MEMBER(area4_w);
 	DECLARE_READ64_MEMBER(ioport_r);
 	DECLARE_WRITE64_MEMBER(ioport_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_atvtrack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline UINT32 decode64_32(offs_t offset64, UINT64 data, UINT64 mem_mask, offs_t &offset32);
 	void logbinary(UINT32 data,int high,int low);
@@ -134,11 +134,11 @@ protected:
 class smashdrv_state : public atvtrack_state
 {
 public:
-	smashdrv_state(const machine_config &mconfig, device_type type, const char *tag)
+	smashdrv_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atvtrack_state(mconfig, type, tag) { }
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 void atvtrack_state::logbinary(UINT32 data,int high=31,int low=0)
@@ -327,7 +327,7 @@ READ64_MEMBER(atvtrack_state::ioport_r)
 {
 	if (offset == SH4_IOPORT_16/8) {
 		// much simplified way
-		if (strcmp(space.device().tag(), ":maincpu") == 0)
+		if (space.device().tag() == ":maincpu")
 #ifndef SPECIALMODE
 			return -1; // normal
 #else

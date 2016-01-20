@@ -9,7 +9,7 @@
 class blmbycar_state : public driver_device
 {
 public:
-	blmbycar_state(const machine_config &mconfig, device_type type, const char *tag)
+	blmbycar_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_vram_1(*this, "vram_1"),
 		m_vram_0(*this, "vram_0"),
@@ -46,7 +46,7 @@ public:
 	DECLARE_DRIVER_INIT(blmbycar);
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(blmbycar);
 	DECLARE_MACHINE_RESET(blmbycar);
 	DECLARE_MACHINE_START(watrball);

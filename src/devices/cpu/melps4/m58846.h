@@ -17,22 +17,22 @@
 class m58846_device : public melps4_cpu_device
 {
 public:
-	m58846_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m58846_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual void execute_one();
+	virtual void execute_one() override;
 
 	// device_disasm_interface overrides
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// timers
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void write_v(UINT8 data);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void write_v(UINT8 data) override;
 
 	emu_timer *m_timer;
 	void reset_timer();

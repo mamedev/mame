@@ -12,7 +12,7 @@
 class supbtime_state : public driver_device
 {
 public:
-	supbtime_state(const machine_config &mconfig, device_type type, const char *tag)
+	supbtime_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
@@ -37,6 +37,6 @@ public:
 	required_device<deco16ic_device> m_deco_tilegen1;
 	DECLARE_READ16_MEMBER(supbtime_controls_r);
 	DECLARE_WRITE16_MEMBER(sound_w);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	UINT32 screen_update_supbtime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

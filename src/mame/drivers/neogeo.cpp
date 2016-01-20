@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Bryan McPhail,Fuzz,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
+// thanks-to:Fuzz
 /***************************************************************************
 
     Neo-Geo hardware
@@ -1011,15 +1012,15 @@ void neogeo_state::set_outputs(  )
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	/* EL */
-	output_set_digit_value(0, led_map[m_el_value]);
+	output().set_digit_value(0, led_map[m_el_value]);
 
 	/* LED1 */
-	output_set_digit_value(1, led_map[m_led1_value >> 4]);
-	output_set_digit_value(2, led_map[m_led1_value & 0x0f]);
+	output().set_digit_value(1, led_map[m_led1_value >> 4]);
+	output().set_digit_value(2, led_map[m_led1_value & 0x0f]);
 
 	/* LED2 */
-	output_set_digit_value(3, led_map[m_led2_value >> 4]);
-	output_set_digit_value(4, led_map[m_led2_value & 0x0f]);
+	output().set_digit_value(3, led_map[m_led2_value >> 4]);
+	output().set_digit_value(4, led_map[m_led2_value & 0x0f]);
 }
 
 
@@ -1485,12 +1486,12 @@ static MACHINE_CONFIG_DERIVED( mvs, neogeo_arcade )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_slot)
 
-	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot1", neogeo_cart, NULL)
-	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot2", neogeo_cart, NULL)
-	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot3", neogeo_cart, NULL)
-	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot4", neogeo_cart, NULL)
-	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot5", neogeo_cart, NULL)
-	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot6", neogeo_cart, NULL)
+	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot1", neogeo_cart, nullptr)
+	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot2", neogeo_cart, nullptr)
+	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot3", neogeo_cart, nullptr)
+	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot4", neogeo_cart, nullptr)
+	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot5", neogeo_cart, nullptr)
+	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot6", neogeo_cart, nullptr)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","neogeo")
 MACHINE_CONFIG_END

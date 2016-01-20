@@ -892,33 +892,33 @@ class ti990_tape_image_device : public device_t,
 {
 public:
 	// construction/destruction
-	ti990_tape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti990_tape_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const { return IO_MAGTAPE; }
+	virtual iodevice_t image_type() const override { return IO_MAGTAPE; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 1; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
-	virtual const char *file_extensions() const { return "tap"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 1; }
+	virtual bool is_creatable() const override { return 1; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override { return nullptr; }
+	virtual const char *file_extensions() const override { return "tap"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	virtual bool call_load();
-	virtual void call_unload();
+	virtual bool call_load() override;
+	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 private:
 	int tape_get_id();
 };
 
 const device_type TI990_TAPE = &device_creator<ti990_tape_image_device>;
 
-ti990_tape_image_device::ti990_tape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti990_tape_image_device::ti990_tape_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TI990_TAPE, "TI-990 Magnetic Tape", tag, owner, clock, "ti990_tape_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -938,10 +938,10 @@ void ti990_tape_image_device::device_start()
 int ti990_tape_image_device::tape_get_id()
 {
 	int drive =0;
-	if (strcmp(tag(), ":tape0") == 0) drive = 0;
-	if (strcmp(tag(), ":tape1") == 0) drive = 1;
-	if (strcmp(tag(), ":tape2") == 0) drive = 2;
-	if (strcmp(tag(), ":tape3") == 0) drive = 3;
+	if (tag()==":tape0") drive = 0;
+	if (tag()==":tape1") drive = 1;
+	if (tag()==":tape2") drive = 2;
+	if (tag()==":tape3") drive = 3;
 	return drive;
 }
 
@@ -978,7 +978,7 @@ MACHINE_CONFIG_END
 
 const device_type TI990_TAPE_CTRL = &device_creator<tap_990_device>;
 
-tap_990_device::tap_990_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tap_990_device::tap_990_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TI990_TAPE_CTRL, "Generic TI-990 Tape Controller", tag, owner, clock, "tap_990", __FILE__),
 	m_int_line(*this)
 {

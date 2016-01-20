@@ -13,7 +13,7 @@
 class thunderj_state : public atarigen_state
 {
 public:
-	thunderj_state(const machine_config &mconfig, device_type type, const char *tag)
+	thunderj_state(const machine_config &mconfig, device_type type, std::string tag)
 		: atarigen_state(mconfig, type, tag),
 			m_jsa(*this, "jsa"),
 			m_vad(*this, "vad"),
@@ -24,7 +24,7 @@ public:
 	required_device<cpu_device> m_extra;
 
 	UINT8           m_alpha_tile_bank;
-	virtual void update_interrupts();
+	virtual void update_interrupts() override;
 	DECLARE_READ16_MEMBER(special_port2_r);
 	DECLARE_WRITE16_MEMBER(latch_w);
 	DECLARE_DRIVER_INIT(thunderj);

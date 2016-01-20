@@ -22,7 +22,7 @@ Interrupts: INT6 is output of Timer 2, INT7 is output of Timer 3 (refresh),
 class ft68m_state : public driver_device
 {
 public:
-	ft68m_state(const machine_config &mconfig, device_type type, const char *tag)
+	ft68m_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_p_base(*this, "rambase"),
 		m_maincpu(*this, "maincpu"),
@@ -36,7 +36,7 @@ public:
 	DECLARE_READ16_MEMBER(switches_r);
 private:
 	UINT8 m_term_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_shared_ptr<UINT16> m_p_base;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;

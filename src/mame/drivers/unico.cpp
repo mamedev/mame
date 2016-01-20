@@ -91,9 +91,9 @@ WRITE16_MEMBER(unico_state::zeropnt_sound_bank_w)
 		UINT8 *src  = dst + 0x80000 + 0x20000 + 0x20000 * bank;
 		memcpy(dst + 0x20000, src, 0x20000);
 
-		coin_counter_w(machine(), 0,data & 0x1000);
-		set_led_status(machine(), 0,data & 0x0800); // Start 1
-		set_led_status(machine(), 1,data & 0x0400); // Start 2
+		machine().bookkeeping().coin_counter_w(0,data & 0x1000);
+		output().set_led_value(0,data & 0x0800); // Start 1
+		output().set_led_value(1,data & 0x0400); // Start 2
 	}
 }
 
@@ -186,9 +186,9 @@ WRITE32_MEMBER(unico_state::zeropnt2_leds_w)
 {
 	if (ACCESSING_BITS_16_23)
 	{
-		coin_counter_w(machine(), 0,data & 0x00010000);
-		set_led_status(machine(), 0,data & 0x00800000); // Start 1
-		set_led_status(machine(), 1,data & 0x00400000); // Start 2
+		machine().bookkeeping().coin_counter_w(0,data & 0x00010000);
+		output().set_led_value(0,data & 0x00800000); // Start 1
+		output().set_led_value(1,data & 0x00400000); // Start 2
 	}
 }
 

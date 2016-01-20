@@ -77,7 +77,7 @@ class scsp_device : public device_t,
 					public device_sound_interface
 {
 public:
-	scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scsp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void set_roffset(device_t &device, int roffset) { downcast<scsp_device &>(device).m_roffset = roffset; }
 	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<scsp_device &>(device).m_irq_cb.set_callback(object); }
@@ -95,10 +95,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	int m_roffset;                /* offset in the region */
@@ -123,7 +123,8 @@ private:
 	char m_Master;
 	sound_stream * m_stream;
 
-	INT32 *m_buffertmpl,*m_buffertmpr;
+	std::unique_ptr<INT32[]> m_buffertmpl;
+	std::unique_ptr<INT32[]> m_buffertmpr;
 
 	UINT32 m_IrqTimA;
 	UINT32 m_IrqTimBC;

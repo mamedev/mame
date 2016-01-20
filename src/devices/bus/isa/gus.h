@@ -121,7 +121,7 @@ class gf1_device :
 {
 public:
 	// construction/destruction
-	gf1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gf1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_txirq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_txirq_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_rxirq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_rxirq_handler.set_callback(object); }
@@ -165,8 +165,8 @@ public:
 	void eop_w(int state);
 
 	// optional information overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// voice-specific registers
 	gus_voice m_voice[32];
@@ -195,11 +195,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_stop();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_stop() override;
 
-	virtual void update_irq();
+	virtual void update_irq() override;
 
 private:
 	// internal state
@@ -267,7 +267,7 @@ class isa16_gus_device :
 	public device_isa16_card_interface
 {
 public:
-	isa16_gus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa16_gus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	void set_irq(UINT8 source);
 	void reset_irq(UINT8 source);
 	void set_midi_irq(UINT8 source);
@@ -295,19 +295,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 
 	// DMA overrides
-	virtual UINT8 dack_r(int line);
-	virtual void dack_w(int line,UINT8 data);
-	virtual void eop_w(int state);
+	virtual UINT8 dack_r(int line) override;
+	virtual void dack_w(int line,UINT8 data) override;
+	virtual void eop_w(int state) override;
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_stop();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_stop() override;
 
 private:
 	required_device<gf1_device> m_gf1;

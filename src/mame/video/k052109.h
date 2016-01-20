@@ -28,7 +28,7 @@ class k052109_device : public device_t, public device_gfx_interface
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_ram);
 
 public:
-	k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k052109_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~k052109_device() {}
 
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object)
@@ -36,7 +36,7 @@ public:
 
 	static void set_k052109_callback(device_t &device, k052109_cb_delegate callback) { downcast<k052109_device &>(device).m_k052109_cb = callback; }
 	static void set_ram(device_t &device, bool ram);
-	static void set_screen_tag(device_t &device, device_t *owner, const char *tag);
+	static void set_screen_tag(device_t &device, device_t *owner, std::string tag);
 
 	/*
 	The callback is passed:
@@ -71,12 +71,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
-	UINT8    *m_ram;
+	std::unique_ptr<UINT8[]>   m_ram;
 	UINT8    *m_videoram_F;
 	UINT8    *m_videoram_A;
 	UINT8    *m_videoram_B;
@@ -99,7 +99,7 @@ private:
 	UINT8 *m_char_rom;
 	UINT32 m_char_size;
 
-	const char *m_screen_tag;
+	std::string m_screen_tag;
 
 	k052109_cb_delegate m_k052109_cb;
 

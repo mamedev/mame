@@ -123,10 +123,10 @@ WRITE32_MEMBER(groundfx_state::groundfx_input_w)
 		case 0x01:
 			if (ACCESSING_BITS_24_31)
 			{
-				coin_lockout_w(machine(), 0,~data & 0x01000000);
-				coin_lockout_w(machine(), 1,~data & 0x02000000);
-				coin_counter_w(machine(), 0, data & 0x04000000);
-				coin_counter_w(machine(), 1, data & 0x08000000);
+				machine().bookkeeping().coin_lockout_w(0,~data & 0x01000000);
+				machine().bookkeeping().coin_lockout_w(1,~data & 0x02000000);
+				machine().bookkeeping().coin_counter_w(0, data & 0x04000000);
+				machine().bookkeeping().coin_counter_w(1, data & 0x08000000);
 				m_coin_word = (data >> 16) &0xffff;
 			}
 			break;
@@ -380,7 +380,7 @@ ROM_START( groundfx )
 	ROM_LOAD16_BYTE( "d51-10.95", 0x000000, 0x100000, CRC(d5910604) SHA1(8efe13884cfdef208394ddfe19f43eb1b9f78ff3) )    /* SCC 8x8 tiles, 6bpp */
 	ROM_LOAD16_BYTE( "d51-11.96", 0x000001, 0x100000, CRC(fee5f5c6) SHA1(1be88747f9c71c348dd61a8f0040007df3a3e6a6) )
 	ROM_LOAD       ( "d51-12.97", 0x300000, 0x100000, CRC(d630287b) SHA1(2fa09e1821b7280d193ca9a2a270759c3c3189d1) )
-	ROM_FILL       (              0x200000, 0x100000, 0 )
+	ROM_FILL       (              0x200000, 0x100000, 0x00 )
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
 	ROM_LOAD16_WORD( "d51-13.7", 0x00000,  0x80000,  CRC(36921b8b) SHA1(2130120f78a3b984618a53054fc937cf727177b9) ) /* STY, spritemap */

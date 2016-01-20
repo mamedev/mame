@@ -18,7 +18,7 @@
 class ipds_state : public driver_device
 {
 public:
-	ipds_state(const machine_config &mconfig, device_type type, const char *tag)
+	ipds_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "i8275"),
@@ -36,7 +36,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	UINT8 m_term_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 READ8_MEMBER( ipds_state::ipds_b0_r )

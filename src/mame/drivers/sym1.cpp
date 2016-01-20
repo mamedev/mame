@@ -33,7 +33,7 @@
 class sym1_state : public driver_device
 {
 public:
-	sym1_state(const machine_config &mconfig, device_type type, const char *tag)
+	sym1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_ram_1k(*this, "ram_1k"),
 		m_ram_2k(*this, "ram_2k"),
@@ -58,7 +58,7 @@ public:
 	UINT8 m_riot_port_b;
 	emu_timer *m_led_update;
 	DECLARE_DRIVER_INIT(sym1);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_0_w);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_1_w);
@@ -97,7 +97,7 @@ WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_5_w ) { if (state) m_led_update
 
 TIMER_CALLBACK_MEMBER( sym1_state::led_refresh )
 {
-	output_set_digit_value(param, m_riot_port_a);
+	output().set_digit_value(param, m_riot_port_a);
 }
 
 READ8_MEMBER( sym1_state::sym1_riot_a_r )

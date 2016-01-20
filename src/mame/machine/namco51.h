@@ -30,7 +30,7 @@
 class namco_51xx_device : public device_t
 {
 public:
-	namco_51xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_51xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_input_0_callback(device_t &device, _Object object) { return downcast<namco_51xx_device &>(device).m_in_0.set_callback(object); }
 	template<class _Object> static devcb_base &set_input_1_callback(device_t &device, _Object object) { return downcast<namco_51xx_device &>(device).m_in_1.set_callback(object); }
@@ -45,10 +45,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;

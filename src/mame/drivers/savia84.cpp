@@ -37,7 +37,7 @@
 class savia84_state : public driver_device
 {
 public:
-	savia84_state(const machine_config &mconfig, device_type type, const char *tag)
+	savia84_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_ppi8255(*this, "ppi8255")
@@ -53,7 +53,7 @@ public:
 	UINT8 m_segment;
 	UINT8 m_digit;
 	UINT8 m_digit_last;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 static ADDRESS_MAP_START( savia84_mem, AS_PROGRAM, 8, savia84_state )
@@ -131,7 +131,7 @@ void savia84_state::machine_reset()
 WRITE8_MEMBER( savia84_state::savia84_8255_porta_w ) // OUT F8 - output segments on the selected digit
 {
 	m_segment = ~data & 0x7f;
-	if (m_digit && (m_digit != m_digit_last)) output_set_digit_value(m_digit, m_segment);
+	if (m_digit && (m_digit != m_digit_last)) output().set_digit_value(m_digit, m_segment);
 	m_digit_last = m_digit;
 }
 
@@ -141,7 +141,7 @@ WRITE8_MEMBER( savia84_state::savia84_8255_portb_w ) // OUT F9 - light the 8 led
 	for (int i = 0; i < 8; i++)
 	{
 		sprintf(ledname,"led%d",i);
-		output_set_value(ledname, !BIT(data, i));
+		output().set_value(ledname, !BIT(data, i));
 	}
 }
 

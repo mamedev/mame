@@ -33,19 +33,19 @@ class sms_sports_pad_jp_device : public device_t,
 {
 public:
 	// construction/destruction
-	sms_sports_pad_jp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sms_sports_pad_jp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 	CUSTOM_INPUT_MEMBER( dir_pins_r );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_sms_control_port_interface overrides
-	virtual UINT8 peripheral_r();
+	virtual UINT8 peripheral_r() override;
 
 private:
 	required_ioport m_sports_jp_in;

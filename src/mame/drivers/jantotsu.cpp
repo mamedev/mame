@@ -104,7 +104,7 @@ dumped by sayu
 class jantotsu_state : public driver_device
 {
 public:
-	jantotsu_state(const machine_config &mconfig, device_type type, const char *tag)
+	jantotsu_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_adpcm(*this, "adpcm") ,
@@ -131,9 +131,9 @@ public:
 	DECLARE_WRITE8_MEMBER(jantotsu_mux_w);
 	DECLARE_READ8_MEMBER(jantotsu_dsw2_r);
 	DECLARE_WRITE8_MEMBER(jan_adpcm_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jantotsu);
 	UINT32 screen_update_jantotsu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(jan_adpcm_int);

@@ -125,7 +125,7 @@
 class force68k_state : public driver_device
 {
 public:
-force68k_state(const machine_config &mconfig, device_type type, const char *tag) :
+force68k_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device (mconfig, type, tag),
 		m_maincpu (*this, "maincpu"),
 		m_rtc (*this, "rtc"),
@@ -147,7 +147,7 @@ DECLARE_READ16_MEMBER (vme_a24_r);
 DECLARE_WRITE16_MEMBER (vme_a24_w);
 DECLARE_READ16_MEMBER (vme_a16_r);
 DECLARE_WRITE16_MEMBER (vme_a16_w);
-virtual void machine_start ();
+virtual void machine_start () override;
 // clocks
 DECLARE_WRITE_LINE_MEMBER (write_aciahost_clock);
 DECLARE_WRITE_LINE_MEMBER (write_aciaterm_clock);

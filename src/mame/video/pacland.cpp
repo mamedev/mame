@@ -114,9 +114,9 @@ PALETTE_INIT_MEMBER(pacland_state, pacland)
 	switch_palette();
 
 	/* precalculate transparency masks for sprites */
-	m_transmask[0] = auto_alloc_array(machine(), UINT32, 64);
-	m_transmask[1] = auto_alloc_array(machine(), UINT32, 64);
-	m_transmask[2] = auto_alloc_array(machine(), UINT32, 64);
+	m_transmask[0] = std::make_unique<UINT32[]>(64);
+	m_transmask[1] = std::make_unique<UINT32[]>(64);
+	m_transmask[2] = std::make_unique<UINT32[]>(64);
 	for (i = 0; i < 64; i++)
 	{
 		int palentry;

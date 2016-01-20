@@ -3,7 +3,7 @@
 class xxmissio_state : public driver_device
 {
 public:
-	xxmissio_state(const machine_config &mconfig, device_type type, const char *tag)
+	xxmissio_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
@@ -46,8 +46,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	DECLARE_PALETTE_DECODER(BBGGRRII);
 

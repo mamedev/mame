@@ -560,7 +560,7 @@ TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
 				m_cchip_ram[0x52] = 0x55;
 				m_cchip_coins[slot] -= m_cchip_coins_for_credit[slot];
 			}
-			coin_counter_w(machine(), slot, 1);
+			machine().bookkeeping().coin_counter_w(slot, 1);
 		}
 
 		if (m_cchip_ram[0x53] > 9)
@@ -581,10 +581,10 @@ TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
 	m_cchip_last_05=m_cchip_ram[0x5];
 
 	// Cchip handles coin lockout (68k flags error if more than 9 coins)
-	coin_lockout_w(machine(), 1, m_cchip_ram[0x53] == 9);
-	coin_lockout_w(machine(), 0, m_cchip_ram[0x53] == 9);
-	coin_counter_w(machine(), 0, 0);
-	coin_counter_w(machine(), 1, 0);
+	machine().bookkeeping().coin_lockout_w(1, m_cchip_ram[0x53] == 9);
+	machine().bookkeeping().coin_lockout_w(0, m_cchip_ram[0x53] == 9);
+	machine().bookkeeping().coin_counter_w(0, 0);
+	machine().bookkeeping().coin_counter_w(1, 0);
 
 	// Special handling for last level
 	if (m_cchip_ram[0x1b] == 0x6)

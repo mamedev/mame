@@ -136,8 +136,8 @@ WRITE8_MEMBER(kncljoe_state::kncljoe_control_w)
 	m_flipscreen = data & 0x01;
 	machine().tilemap().set_flip_all(m_flipscreen ? TILEMAP_FLIPX : TILEMAP_FLIPY);
 
-	coin_counter_w(machine(), 0, data & 0x02);
-	coin_counter_w(machine(), 1, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, data & 0x02);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 
 	i = (data & 0x10) >> 4;
 	if (m_tile_bank != i)

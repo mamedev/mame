@@ -4,13 +4,14 @@
 
   machine.c
 
-  Functions to emulate general aspects of the machine 
-  (RAM, ROM, interrupts, I/O ports)
+  Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
+  I/O ports)
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "machine/atari_vg.h"
+#include "video/avgdvg.h"
 #include "includes/asteroid.h"
 
 
@@ -99,8 +100,8 @@ WRITE8_MEMBER(asteroid_state::asteroid_bank_switch_w)
 	m_ram1->set_entry(bank);
 	m_ram2->set_entry(bank);
 
-	set_led_status (machine(), 0, ~data & 0x02);
-	set_led_status (machine(), 1, ~data & 0x01);
+	output().set_led_value(0, ~data & 0x02);
+	output().set_led_value(1, ~data & 0x01);
 }
 
 
@@ -113,13 +114,13 @@ WRITE8_MEMBER(asteroid_state::astdelux_bank_switch_w)
 
 WRITE8_MEMBER(asteroid_state::astdelux_led_w)
 {
-	set_led_status(machine(), offset, (data & 0x80) ? 0 : 1);
+	output().set_led_value(offset, (data & 0x80) ? 0 : 1);
 }
 
 void asteroid_state::machine_start()
 {
 	/* configure RAM banks if present (not on llander) */
-	if (m_ram1.target() != NULL)
+	if (m_ram1.target() != nullptr)
 	{
 		UINT8 *ram1 = reinterpret_cast<UINT8 *>(memshare("ram1")->ptr());
 		UINT8 *ram2 = reinterpret_cast<UINT8 *>(memshare("ram2")->ptr());
@@ -138,7 +139,7 @@ void asteroid_state::machine_reset()
 	m_dvg->reset_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 
 	/* reset RAM banks if present */
-	if (m_ram1.target() != NULL)
+	if (m_ram1.target() != nullptr)
 	{
 		m_ram1->set_entry(0);
 		m_ram2->set_entry(0);

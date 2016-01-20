@@ -20,11 +20,11 @@ public:
 	pointswin_info(debugger_windows_interface &debugger);
 	virtual ~pointswin_info();
 
-	virtual bool handle_key(WPARAM wparam, LPARAM lparam);
+	virtual bool handle_key(WPARAM wparam, LPARAM lparam) override;
 
 protected:
-	virtual void update_menu();
-	virtual bool handle_command(WPARAM wparam, LPARAM lparam);
+	virtual void update_menu() override;
+	virtual bool handle_command(WPARAM wparam, LPARAM lparam) override;
 };
 
 #endif

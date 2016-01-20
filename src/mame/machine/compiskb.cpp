@@ -235,7 +235,7 @@ ioport_constructor compis_keyboard_device::device_input_ports() const
 //  compis_keyboard_device - constructor
 //-------------------------------------------------
 
-compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, COMPIS_KEYBOARD, "Compis Keyboard", tag, owner, clock, "compiskb", __FILE__),
 		m_maincpu(*this, I8748_TAG),
 		m_speaker(*this, SPEAKER_TAG),
@@ -319,7 +319,7 @@ WRITE8_MEMBER( compis_keyboard_device::bus_w )
 	m_speaker->level_w(BIT(data, 5));
 
 	// LEDs
-	output_set_led_value(LED_CAPS, BIT(data, 6));
+	machine().output().set_led_value(LED_CAPS, BIT(data, 6));
 
 	// serial data out
 	m_out_tx_handler(BIT(data, 7));

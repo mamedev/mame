@@ -11,7 +11,7 @@
 class mermaid_state : public driver_device
 {
 public:
-	mermaid_state(const machine_config &mconfig, device_type type, const char *tag)
+	mermaid_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram2(*this, "videoram2"),
 		m_videoram(*this, "videoram"),
@@ -89,9 +89,9 @@ public:
 	DECLARE_READ8_MEMBER(mermaid_collision_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mermaid);
 	DECLARE_PALETTE_INIT(rougien);
 	UINT32 screen_update_mermaid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

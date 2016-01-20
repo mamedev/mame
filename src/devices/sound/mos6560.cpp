@@ -626,7 +626,7 @@ void mos6560_device::sound_start()
 
 	/* buffer for fastest played sample for 5 second so we have enough data for min 5 second */
 	m_noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;
-	m_noise = auto_alloc_array(machine(), INT8, m_noisesize);
+	m_noise = std::make_unique<INT8[]>(m_noisesize);
 	{
 		int noiseshift = 0x7ffff8;
 		char data;
@@ -661,7 +661,7 @@ void mos6560_device::sound_start()
 
 	if (m_tonesize > 0)
 	{
-		m_tone = auto_alloc_array(machine(), INT16, m_tonesize);
+		m_tone = std::make_unique<INT16[]>(m_tonesize);
 
 		for (i = 0; i < m_tonesize; i++)
 		{
@@ -670,7 +670,7 @@ void mos6560_device::sound_start()
 	}
 	else
 	{
-		m_tone = NULL;
+		m_tone = nullptr;
 	}
 }
 
@@ -688,36 +688,36 @@ static ADDRESS_MAP_START( mos6560_colorram_map, AS_1, 8, mos6560_device )
 	AM_RANGE(0x000, 0x3ff) AM_RAM
 ADDRESS_MAP_END
 
-mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_variant(variant),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6560_videoram_map)),
-		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6560_colorram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(mos6560_videoram_map)),
+		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, nullptr, *ADDRESS_MAP_NAME(mos6560_colorram_map)),
 		m_read_potx(*this),
 		m_read_poty(*this)
 {
 }
 
-mos6560_device::mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos6560_device::mos6560_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MOS6560, "MOS6560", tag, owner, clock, "mos6560", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_variant(TYPE_6560),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6560_videoram_map)),
-		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6560_colorram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(mos6560_videoram_map)),
+		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, nullptr, *ADDRESS_MAP_NAME(mos6560_colorram_map)),
 		m_read_potx(*this),
 		m_read_poty(*this)
 {
 }
 
-mos6561_device::mos6561_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos6561_device::mos6561_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	:mos6560_device(mconfig, MOS6561, "MOS6561", tag, owner, clock, TYPE_6561, "mos6561", __FILE__) { }
 
-mos656x_attack_ufo_device::mos656x_attack_ufo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos656x_attack_ufo_device::mos656x_attack_ufo_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	:mos6560_device(mconfig, MOS656X_ATTACK_UFO, "MOS656X", tag, owner, clock, TYPE_ATTACK_UFO, "mos656x_attack_ufo", __FILE__) { }
 
 
@@ -732,7 +732,7 @@ const address_space_config *mos6560_device::memory_space_config(address_spacenum
 	{
 		case AS_0: return &m_videoram_space_config;
 		case AS_1: return &m_colorram_space_config;
-		default: return NULL;
+		default: return nullptr;
 	}
 }
 

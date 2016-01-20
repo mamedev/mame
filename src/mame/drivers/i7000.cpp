@@ -54,7 +54,7 @@
 class i7000_state : public driver_device
 {
 public:
-	i7000_state(const machine_config &mconfig, device_type type, const char *tag)
+	i7000_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_card(*this, "cardslot"),
@@ -62,8 +62,8 @@ public:
 			m_videoram(*this, "videoram")
 	{ }
 
-	void video_start();
-	void machine_start();
+	void video_start() override;
+	void machine_start() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_card;

@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Paul Leaman
 /***************************************************************************
 
@@ -87,8 +87,8 @@ WRITE8_MEMBER(srumbler_state::_4009_w)
 	/* bits 4-5 used during attract mode, unknown */
 
 	/* bits 6-7 coin counters */
-	coin_counter_w(machine(), 0,data & 0x40);
-	coin_counter_w(machine(), 1,data & 0x80);
+	machine().bookkeeping().coin_counter_w(0,data & 0x40);
+	machine().bookkeeping().coin_counter_w(1,data & 0x80);
 }
 
 

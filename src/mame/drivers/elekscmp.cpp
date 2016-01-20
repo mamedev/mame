@@ -32,7 +32,7 @@ ToDo:
 class elekscmp_state : public driver_device
 {
 public:
-	elekscmp_state(const machine_config &mconfig, device_type type, const char *tag)
+	elekscmp_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_x0(*this, "X0"),
@@ -55,7 +55,7 @@ protected:
 
 WRITE8_MEMBER(elekscmp_state::hex_display_w)
 {
-	output_set_digit_value(offset, data);
+	output().set_digit_value(offset, data);
 }
 
 UINT8 elekscmp_state::convert_key(UINT8 data)

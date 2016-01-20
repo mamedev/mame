@@ -69,7 +69,7 @@ UINT32 super80_state::screen_update_super80(screen_device &screen, bitmap_ind16 
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=m_vidpg,x;
 
-	output_set_value("cass_led",BIT(m_portf0, 5));
+	output().set_value("cass_led",BIT(m_portf0, 5));
 
 	if ((BIT(m_portf0, 2)) | (!BIT(m_io_config->read(), 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
@@ -109,7 +109,7 @@ UINT32 super80_state::screen_update_super80d(screen_device &screen, bitmap_ind16
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=m_vidpg,x;
 
-	output_set_value("cass_led",BIT(m_portf0, 5));
+	output().set_value("cass_led",BIT(m_portf0, 5));
 
 	if ((BIT(m_portf0, 2)) | (!BIT(m_io_config->read(), 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
@@ -149,7 +149,7 @@ UINT32 super80_state::screen_update_super80e(screen_device &screen, bitmap_ind16
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=m_vidpg,x;
 
-	output_set_value("cass_led",BIT(m_portf0, 5));
+	output().set_value("cass_led",BIT(m_portf0, 5));
 
 	if ((BIT(m_portf0, 2)) | (!BIT(m_io_config->read(), 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
@@ -193,7 +193,7 @@ UINT32 super80_state::screen_update_super80m(screen_device &screen, bitmap_ind16
 	/* get selected character generator */
 	UINT8 cgen = m_current_charset ^ ((options & 0x10)>>4); /* bit 0 of port F1 and cgen config switch */
 
-	output_set_value("cass_led",BIT(m_portf0, 5));
+	output().set_value("cass_led",BIT(m_portf0, 5));
 
 	if ((BIT(m_portf0, 2)) | (!BIT(options, 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
@@ -354,7 +354,7 @@ VIDEO_START_MEMBER(super80_state,super80v)
 UINT32 super80_state::screen_update_super80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_s_options=m_io_config->read();
-	output_set_value("cass_led",BIT(m_portf0, 5));
+	output().set_value("cass_led",BIT(m_portf0, 5));
 	m_crtc->screen_update(screen, bitmap, cliprect);
 	return 0;
 }

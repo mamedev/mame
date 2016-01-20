@@ -30,7 +30,7 @@
 class besta_state : public driver_device
 {
 public:
-	besta_state(const machine_config &mconfig, device_type type, const char *tag)
+	besta_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pit1 (*this, "pit1"),
@@ -49,7 +49,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<pit68230_device> m_pit1;
 	required_device<pit68230_device> m_pit2;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<UINT32> m_p_ram;

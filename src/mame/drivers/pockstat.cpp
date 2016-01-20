@@ -104,7 +104,7 @@ struct ps_rtc_regs_t
 class pockstat_state : public driver_device
 {
 public:
-	pockstat_state(const machine_config &mconfig, device_type type, const char *tag)
+	pockstat_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_lcd_buffer(*this, "lcd_buffer"),
 		m_maincpu(*this, "maincpu"),
@@ -144,8 +144,8 @@ public:
 	DECLARE_READ32_MEMBER(ps_audio_r);
 	DECLARE_WRITE32_MEMBER(ps_audio_w);
 	DECLARE_WRITE32_MEMBER(ps_dac_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(input_update);
 	TIMER_CALLBACK_MEMBER(timer_tick);

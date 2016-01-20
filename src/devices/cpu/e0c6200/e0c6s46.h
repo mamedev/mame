@@ -66,7 +66,7 @@ typedef void (*e0c6s46_pixel_update_func)(device_t &device, bitmap_ind16 &bitmap
 class e0c6s46_device : public e0c6200_cpu_device
 {
 public:
-	e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e0c6s46_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_write_r0_callback(device_t &device, _Object object) { return downcast<e0c6s46_device &>(device).m_write_r0.set_callback(object); }
@@ -93,14 +93,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_input_lines() const { return 8; }
-	virtual void execute_set_input(int line, int state);
-	virtual void execute_one();
-	virtual bool check_interrupt();
+	virtual UINT32 execute_input_lines() const override { return 8; }
+	virtual void execute_set_input(int line, int state) override;
+	virtual void execute_one() override;
+	virtual bool check_interrupt() override;
 
 private:
 	required_shared_ptr<UINT8> m_vram1;

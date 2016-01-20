@@ -36,7 +36,7 @@ class hd61830_device :  public device_t,
 {
 public:
 	// construction/destruction
-	hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd61830_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_rd_rd_callback(device_t &device, _Object object) { return downcast<hd61830_device &>(device).m_read_rd.set_callback(object); }
 
@@ -50,13 +50,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual const rom_entry *device_rom_region() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	inline UINT8 readbyte(offs_t address);
 	inline void writebyte(offs_t address, UINT8 data);

@@ -52,7 +52,7 @@
 class tapatune_state : public driver_device
 {
 public:
-	tapatune_state(const machine_config &mconfig, device_type type, const char *tag)
+	tapatune_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_videocpu(*this, "videocpu"),
@@ -79,8 +79,8 @@ public:
 	UINT8   m_bsmt_data_h;
 	bool    m_bsmt_reset;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
 

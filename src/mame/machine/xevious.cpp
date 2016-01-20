@@ -137,12 +137,12 @@ WRITE8_MEMBER( xevious_state::battles_customio_data3_w )
 
 WRITE8_MEMBER( xevious_state::battles_CPU4_coin_w )
 {
-	set_led_status(machine(), 0,data & 0x02); // Start 1
-	set_led_status(machine(), 1,data & 0x01); // Start 2
+	output().set_led_value(0,data & 0x02); // Start 1
+	output().set_led_value(1,data & 0x01); // Start 2
 
-	coin_counter_w(machine(), 0,data & 0x20);
-	coin_counter_w(machine(), 1,data & 0x10);
-	coin_lockout_global_w(machine(), ~data & 0x04);
+	machine().bookkeeping().coin_counter_w(0,data & 0x20);
+	machine().bookkeeping().coin_counter_w(1,data & 0x10);
+	machine().bookkeeping().coin_lockout_global_w(~data & 0x04);
 }
 
 

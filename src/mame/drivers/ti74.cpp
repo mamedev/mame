@@ -84,7 +84,7 @@
 class ti74_state : public driver_device
 {
 public:
-	ti74_state(const machine_config &mconfig, device_type type, const char *tag)
+	ti74_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
@@ -107,8 +107,8 @@ public:
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 
-	virtual void machine_reset();
-	virtual void machine_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(ti74);
 	DECLARE_INPUT_CHANGED_MEMBER(battery_status_changed);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ti74_cartridge);
@@ -168,7 +168,7 @@ void ti74_state::update_lcd_indicator(UINT8 y, UINT8 x, int state)
 	// above    | _LOW _ERROR  2nd  INV  ALPHA  LC  INS  DEGRAD  HEX  OCT  I/O
 	// screen-  | _P{70} <{71}                                             RUN{3}
 	//   area   .                                                          SYS{4}
-	output_set_lamp_value(y * 10 + x, state);
+	output().set_lamp_value(y * 10 + x, state);
 }
 
 static HD44780_PIXEL_UPDATE(ti74_pixel_update)

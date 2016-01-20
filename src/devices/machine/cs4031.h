@@ -82,10 +82,10 @@ class cs4031_device : public device_t
 {
 public:
 	// construction/destruction
-	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cs4031_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// callbacks
 	template<class _ior> void set_ior_callback(_ior ior) { m_read_ior.set_callback(ior); }
@@ -181,16 +181,16 @@ public:
 	IRQ_CALLBACK_MEMBER(int_ack_r) { return m_intc1->acknowledge(); }
 
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
-	static void static_set_isatag(device_t &device, const char *tag);
-	static void static_set_biostag(device_t &device, const char *tag);
-	static void static_set_keybctag(device_t &device, const char *tag);
+	static void static_set_cputag(device_t &device, std::string tag);
+	static void static_set_isatag(device_t &device, std::string tag);
+	static void static_set_biostag(device_t &device, std::string tag);
+	static void static_set_keybctag(device_t &device, std::string tag);
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_reset_after_children();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_reset_after_children() override;
 
 private:
 	devcb_read16 m_read_ior;
@@ -221,10 +221,10 @@ private:
 	void update_write_regions();
 
 	// internal state
-	const char *m_cputag;
-	const char *m_isatag;
-	const char *m_biostag;
-	const char *m_keybctag;
+	std::string m_cputag;
+	std::string m_isatag;
+	std::string m_biostag;
+	std::string m_keybctag;
 
 	address_space *m_space;
 	address_space *m_space_io;

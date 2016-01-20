@@ -614,9 +614,9 @@ DRIVER_INIT_MEMBER(spectrum_state,spectrum)
 	switch (m_ram->size())
 	{
 		case 48*1024:
-		space.install_ram(0x8000, 0xffff, NULL); // Fall through
+		space.install_ram(0x8000, 0xffff, nullptr); // Fall through
 		case 16*1024:
-		space.install_ram(0x5b00, 0x7fff, NULL);
+		space.install_ram(0x5b00, 0x7fff, nullptr);
 	}
 }
 

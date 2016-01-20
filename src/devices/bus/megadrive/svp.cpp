@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Pierpaolo Prazzoli,Grazvydas Ignotas
 /****************************************** SVP related *****************************************/
 
@@ -36,7 +36,7 @@
 
 const device_type MD_ROM_SVP = &device_creator<md_rom_svp_device>;
 
-md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 							: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 							device_md_cart_interface( mconfig, *this ),
 							m_svp(*this, "svp"),
@@ -44,7 +44,7 @@ md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, device_type 
 						{
 }
 
-md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 							: device_t(mconfig, MD_ROM_SVP, "MD Virtua Racing", tag, owner, clock, "md_rom_svp", __FILE__),
 							device_md_cart_interface( mconfig, *this ),
 							m_svp(*this, "svp"),
@@ -60,7 +60,7 @@ md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, const char *
 
 // HELPERS
 
-INLINE int get_inc(int mode)
+static inline int get_inc(int mode)
 {
 	int inc = (mode >> 11) & 7;
 	if (inc != 0) {
@@ -71,7 +71,7 @@ INLINE int get_inc(int mode)
 	return inc;
 }
 
-INLINE void overwrite_write(UINT16 *dst, UINT16 d)
+static inline void overwrite_write(UINT16 *dst, UINT16 d)
 {
 	if (d & 0xf000) { *dst &= ~0xf000; *dst |= d & 0xf000; }
 	if (d & 0x0f00) { *dst &= ~0x0f00; *dst |= d & 0x0f00; }

@@ -100,7 +100,7 @@ Notes:
 class joystand_state : public driver_device
 {
 public:
-	joystand_state(const machine_config &mconfig, device_type type, const char *tag)
+	joystand_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tmp68301(*this, "tmp68301"),
@@ -195,11 +195,11 @@ public:
 
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual void video_start();
+	virtual void video_start() override;
 
 	// machine
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(joystand_interrupt);
 };
 
@@ -306,10 +306,10 @@ void joystand_state::video_start()
 	m_bg1_tmap->set_transparent_pen(0xf);
 	m_bg2_tmap->set_transparent_pen(0xf);
 
-	for (int i = 0; i < 2; ++i)
+	for (auto & elem : m_bg15_bitmap)
 	{
-		m_bg15_bitmap[i].allocate(0x200, 0x200);
-		m_bg15_bitmap[i].fill(BG15_TRANSPARENT);
+		elem.allocate(0x200, 0x200);
+		elem.fill(BG15_TRANSPARENT);
 	}
 
 	bg15_tiles_dirty = true;
@@ -394,17 +394,17 @@ WRITE16_MEMBER(joystand_state::outputs_w)
 	COMBINE_DATA(&m_outputs[0]);
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0,            BIT(data, 0)); // coin counter 1
-		coin_counter_w(machine(), 1,            BIT(data, 1)); // coin counter 2
+		machine().bookkeeping().coin_counter_w(0,            BIT(data, 0)); // coin counter 1
+		machine().bookkeeping().coin_counter_w(1,            BIT(data, 1)); // coin counter 2
 
-		output_set_value("blocker",             BIT(data, 2));
-		output_set_value("error_lamp",          BIT(data, 3)); // counter error
-		output_set_value("photo_lamp",          BIT(data, 4)); // during photo
+		output().set_value("blocker",             BIT(data, 2));
+		output().set_value("error_lamp",          BIT(data, 3)); // counter error
+		output().set_value("photo_lamp",          BIT(data, 4)); // during photo
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		output_set_value("ok_button_led",       BIT(data, 8));
-		output_set_value("cancel_button_led",   BIT(data, 9));
+		output().set_value("ok_button_led",       BIT(data, 8));
+		output().set_value("cancel_button_led",   BIT(data, 9));
 	}
 }
 

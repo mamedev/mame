@@ -20,7 +20,7 @@
 #define ROL16(val, shift)   ( ((UINT16)val << shift) | ((UINT16)val >> (16 - shift)) )
 #define SWAP16(val)         ( (((UINT16)val << 8) & 0xff00) | ((UINT16)val >> 8) )
 
-INLINE UINT8 reverse_nibble(UINT8 nibble)
+static inline UINT8 reverse_nibble(UINT8 nibble)
 {
 	return  (nibble & 1) << 3 |
 			(nibble & 2) << 1 |
@@ -40,20 +40,20 @@ static const UINT8 state_table[16][8] =
 {
 	{  4,  4,  4,  4,  5,  1,  1,  0 },
 	{  4,  4,  4,  4,  5,  5,  3,  0 },
-	{ -1, -1, -1, -1, -1, -1, -1, -1 },
+	{0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf },
 	{  4,  4,  4,  4,  5,  5, 11,  0 },
 	{  8,  8,  8,  8,  8,  8,  8,  8 },
 	{ 10, 10, 10, 10, 10, 10, 10, 10 },
-	{ -1, -1, -1, -1, -1, -1, -1, -1 },
-	{ -1, -1, -1, -1, -1, -1, -1, -1 },
+	{0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf },
+	{0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf },
 	{  4,  4,  4,  4,  5,  0,  1,  0 },
-	{ -1, -1, -1, -1, -1, -1, -1, -1 },
+	{0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf },
 	{  4,  4,  4,  4,  4,  5,  1,  0 },
 	{  4,  4,  4,  4,  5,  5,  1,  0 },
-	{ -1, -1, -1, -1, -1, -1, -1, -1 },
-	{ -1, -1, -1, -1, -1, -1, -1, -1 },
-	{ -1, -1, -1, -1, -1, -1, -1, -1 },
-	{ -1, -1, -1, -1, -1, -1, -1, -1 },
+	{0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf },
+	{0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf },
+	{0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf },
+	{0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf },
 };
 
 static void sn_multiply(running_machine &machine)
@@ -402,7 +402,7 @@ enum
 
 #define TX1_SET_INS0_BIT    do { if (!(ins & 0x4) && math.i0ff) ins |= math.i0ff; } while(0)
 
-INLINE UINT16 get_tx1_datarom_addr(math_t &math)
+static inline UINT16 get_tx1_datarom_addr(math_t &math)
 {
 	UINT16 addr;
 
@@ -960,7 +960,7 @@ enum
 
 #define BB_SET_INS0_BIT do { if (!(ins & 0x4) && math.i0ff) ins |= math.i0ff;} while(0)
 
-INLINE UINT16 get_bb_datarom_addr(math_t &math)
+static inline UINT16 get_bb_datarom_addr(math_t &math)
 {
 	UINT16 addr;
 

@@ -108,8 +108,8 @@ WRITE8_MEMBER(polygonet_state::polygonet_sys_w)
 		    D17 = COIN2        - Coin counter 2
 		    D16 = COIN1        - Coin counter 1
 		*/
-			coin_counter_w(machine(), 0, data & 1);
-			coin_counter_w(machine(), 1, data & 2);
+			machine().bookkeeping().coin_counter_w(0, data & 1);
+			machine().bookkeeping().coin_counter_w(1, data & 2);
 
 			if (~data & 0x20)
 				m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);

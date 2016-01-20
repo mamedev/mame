@@ -114,7 +114,7 @@ static const int pi_table[32] =
 const device_type MEA8000 = &device_creator<mea8000_device>;
 
 
-mea8000_device::mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mea8000_device::mea8000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MEA8000, "Philips / Signetics MEA 8000 speech synthesizer", tag, owner, clock, "mea8000", __FILE__),
 	m_write_req(*this),
 	m_dac(*this)
@@ -174,10 +174,10 @@ void mea8000_device::device_reset()
 	m_roe = 0;
 	m_state = MEA8000_STOPPED;
 	update_req();
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_f)
 	{
-		m_f[i].last_output = 0;
-		m_f[i].output = 0;
+		elem.last_output = 0;
+		elem.output = 0;
 	}
 }
 
@@ -215,8 +215,8 @@ void mea8000_device::init_tables()
 		m_exp_table[i]  = exp(-M_PI * f) * QUANT;
 		m_exp2_table[i] = exp(-2 * M_PI * f) * QUANT;
 	}
-	for (int i = 0; i < NOISE_LEN; i++)
-		m_noise_table[i] = (machine().rand() % (2 * QUANT)) - QUANT;
+	for (auto & elem : m_noise_table)
+		elem = (machine().rand() % (2 * QUANT)) - QUANT;
 }
 
 
@@ -371,10 +371,10 @@ int mea8000_device::compute_sample()
 void mea8000_device::shift_frame()
 {
 	m_last_pitch = m_pitch;
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_f)
 	{
-		m_f[i].last_bw = m_f[i].bw;
-		m_f[i].last_fm = m_f[i].fm;
+		elem.last_bw = elem.bw;
+		elem.last_fm = elem.fm;
 	}
 	m_last_ampl = m_ampl;
 }

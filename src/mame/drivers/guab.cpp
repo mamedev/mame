@@ -64,7 +64,7 @@ struct ef9369
 class guab_state : public driver_device
 {
 public:
-	guab_state(const machine_config &mconfig, device_type type, const char *tag)
+	guab_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tms34061(*this, "tms34061"),
@@ -87,7 +87,7 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;

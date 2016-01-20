@@ -28,7 +28,7 @@ class k05324x_device : public device_t,
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_6bpp);
 
 public:
-	k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k05324x_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~k05324x_device() {}
 
 	// static configuration
@@ -59,13 +59,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
-	UINT16    *m_ram;
-	UINT16    *m_buffer;
+	std::unique_ptr<UINT16[]>  m_ram;
+	std::unique_ptr<UINT16[]>  m_buffer;
 	UINT8     *m_sprite_rom;
 	UINT32    m_sprite_size;
 

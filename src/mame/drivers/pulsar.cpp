@@ -48,7 +48,7 @@ X - Test off-board memory banks
 class pulsar_state : public driver_device
 {
 public:
-	pulsar_state(const machine_config &mconfig, device_type type, const char *tag) :
+	pulsar_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dart(*this, "z80dart"),
@@ -125,7 +125,7 @@ TIMER_CALLBACK_MEMBER( pulsar_state::pulsar_reset)
 static const z80_daisy_config daisy_chain_intf[] =
 {
 	{ "z80dart" },
-	{ NULL }
+	{ nullptr }
 };
 
 /*
@@ -137,7 +137,7 @@ d7     XMEMEX line (for external memory, not emulated)
 */
 WRITE8_MEMBER( pulsar_state::ppi_pa_w )
 {
-	m_floppy = NULL;
+	m_floppy = nullptr;
 	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
 	m_fdc->set_floppy(m_floppy);
 	m_fdc->dden_w(BIT(data, 5));

@@ -49,7 +49,7 @@ Z Goto Prom (0xC000)
 class swtpc_state : public driver_device
 {
 public:
-	swtpc_state(const machine_config &mconfig, device_type type, const char *tag)
+	swtpc_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG)
@@ -61,10 +61,9 @@ public:
 	DECLARE_READ8_MEMBER(swtpc_status_r);
 	DECLARE_READ8_MEMBER(swtpc_terminal_r);
 	DECLARE_READ8_MEMBER(swtpc_tricky_r);
-	DECLARE_WRITE8_MEMBER(swtpc_terminal_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 // bit 0 - ready to receive a character; bit 1 - ready to send a character to the terminal

@@ -51,7 +51,7 @@ class i80130_device :  public device_t
 {
 public:
 	// construction/destruction
-	i80130_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i80130_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_ack_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_ack.set_callback(object); }
@@ -64,8 +64,8 @@ public:
 	virtual DECLARE_ADDRESS_MAP(io_map, 16);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	UINT8 inta_r() { return m_pic->acknowledge(); }
 
@@ -88,8 +88,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	required_device<pic8259_device> m_pic;
 	required_device<pit8254_device> m_pit;

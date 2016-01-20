@@ -70,7 +70,7 @@ const device_type MSX_CART_MSX_AUDIO_NMS1205 = &device_creator<msx_cart_msx_audi
 const device_type MSX_CART_MSX_AUDIO_FSCA1 = &device_creator<msx_cart_msx_audio_fsca1>;
 
 
-msx_cart_msx_audio_hxmu900::msx_cart_msx_audio_hxmu900(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_msx_audio_hxmu900::msx_cart_msx_audio_hxmu900(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_MSX_AUDIO_HXMU900, "MSX Cartridge - MSX-AUDIO HX-MU900", tag, owner, clock, "msx_audio_hxmu900", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_y8950(*this, "y8950")
@@ -86,7 +86,7 @@ static MACHINE_CONFIG_FRAGMENT( msx_audio_hxmu900 )
 	MCFG_Y8950_KEYBOARD_WRITE_HANDLER(DEVWRITE8("kbdc", msx_audio_kbdc_port_device, write))
 	MCFG_Y8950_KEYBOARD_READ_HANDLER(DEVREAD8("kbdc", msx_audio_kbdc_port_device, read))
 
-	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, NULL)
+	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, nullptr)
 MACHINE_CONFIG_END
 
 
@@ -127,7 +127,7 @@ READ8_MEMBER(msx_cart_msx_audio_hxmu900::read_cart)
 
 
 
-msx_cart_msx_audio_nms1205::msx_cart_msx_audio_nms1205(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_msx_audio_nms1205::msx_cart_msx_audio_nms1205(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_MSX_AUDIO_NMS1205, "MSX Cartridge - MSX-AUDIO NMS-1205", tag, owner, clock, "msx_audio_nms1205", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_y8950(*this, "y8950")
@@ -148,7 +148,7 @@ static MACHINE_CONFIG_FRAGMENT( msx_audio_nms1205 )
 	MCFG_Y8950_KEYBOARD_READ_HANDLER(DEVREAD8("kbdc", msx_audio_kbdc_port_device, read))
 	MCFG_Y8950_IRQ_HANDLER(WRITELINE(msx_cart_msx_audio_nms1205, irq_write))
 
-	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, NULL)
+	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, nullptr)
 
 	// There is a 2 MHz crystal on the PCB, the 6850 TX and RX clocks are derived from it
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
@@ -235,7 +235,7 @@ READ8_MEMBER(msx_cart_msx_audio_nms1205::read_cart)
 
 
 
-msx_cart_msx_audio_fsca1::msx_cart_msx_audio_fsca1(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_msx_audio_fsca1::msx_cart_msx_audio_fsca1(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_MSX_AUDIO_FSCA1, "MSX Cartridge - MSX-AUDIO FS-CA1", tag, owner, clock, "msx_audio_fsca1", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_y8950(*this, "y8950")
@@ -257,7 +257,7 @@ static MACHINE_CONFIG_FRAGMENT( msx_audio_fsca1 )
 	MCFG_Y8950_IO_READ_HANDLER(READ8(msx_cart_msx_audio_fsca1, y8950_io_r))
 	MCFG_Y8950_IO_WRITE_HANDLER(WRITE8(msx_cart_msx_audio_fsca1, y8950_io_w))
 
-	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, NULL)
+	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, nullptr)
 MACHINE_CONFIG_END
 
 

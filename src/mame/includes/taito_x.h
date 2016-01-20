@@ -1,11 +1,12 @@
-// license:???
-// copyright-holders:Richard Bush, Howie Cohen, Yochizo
+// license:BSD-3-Clause
+// copyright-holders:Howie Cohen, Yochizo
+// thanks-to:Richard Bush
 #include "includes/seta.h"
 
 class taitox_state : public seta_state
 {
 public:
-	taitox_state(const machine_config &mconfig, device_type type, const char *tag)
+	taitox_state(const machine_config &mconfig, device_type type, std::string tag)
 		: seta_state(mconfig, type, tag) { }
 
 	DECLARE_READ16_MEMBER(superman_dsw_input_r);

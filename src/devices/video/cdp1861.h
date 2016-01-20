@@ -93,7 +93,7 @@ class cdp1861_device :  public device_t,
 {
 public:
 	// construction/destruction
-	cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cdp1861_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<cdp1861_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_dma_out_wr_callback(device_t &device, _Object object) { return downcast<cdp1861_device &>(device).m_write_dma_out.set_callback(object); }
@@ -109,9 +109,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	enum

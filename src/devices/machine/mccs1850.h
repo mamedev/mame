@@ -53,7 +53,7 @@ class mccs1850_device : public device_t,
 {
 public:
 	// construction/destruction
-	mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mccs1850_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_int_wr_callback(device_t &device, _Object object) { return downcast<mccs1850_device &>(device).int_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_pse_wr_callback(device_t &device, _Object object) { return downcast<mccs1850_device &>(device).pse_cb.set_callback(object); }
@@ -72,14 +72,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
 
 private:
 	inline void check_interrupt();

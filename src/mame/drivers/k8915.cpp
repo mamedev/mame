@@ -19,7 +19,7 @@
 class k8915_state : public driver_device
 {
 public:
-	k8915_state(const machine_config &mconfig, device_type type, const char *tag)
+	k8915_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_p_videoram(*this, "p_videoram")
@@ -35,8 +35,8 @@ public:
 	UINT8 *m_p_chargen;
 	UINT8 m_framecnt;
 	UINT8 m_term_data;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(k8915);
 };

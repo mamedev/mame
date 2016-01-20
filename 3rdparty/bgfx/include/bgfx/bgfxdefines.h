@@ -1,10 +1,12 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef BGFX_DEFINES_H_HEADER_GUARD
 #define BGFX_DEFINES_H_HEADER_GUARD
+
+#define BGFX_API_VERSION UINT32_C(2)
 
 ///
 #define BGFX_STATE_RGB_WRITE             UINT64_C(0x0000000000000001) //!< Enable RGB write.
@@ -71,7 +73,9 @@
 /// MSAA frame buffer.
 #define BGFX_STATE_MSAA                  UINT64_C(0x1000000000000000) //!< Enable MSAA rasterization.
 
-#define BGFX_STATE_RESERVED_MASK         UINT64_C(0xe000000000000000) //!< Internal bits, do not use!
+/// Do not use!
+#define BGFX_STATE_RESERVED_SHIFT        61                           //!< Internal bits shift.
+#define BGFX_STATE_RESERVED_MASK         UINT64_C(0xe000000000000000) //!< Internal bits mask.
 
 /// See BGFX_STATE_POINT_SIZE(_size) helper macro.
 #define BGFX_STATE_NONE                  UINT64_C(0x0000000000000000) //!< No state.
@@ -350,6 +354,10 @@
 #define BGFX_RESET_FLIP_AFTER_RENDER     UINT32_C(0x00004000) //!< This flag  specifies where flip occurs. Default behavior is that flip occurs before rendering new frame. This flag only has effect when `BGFX_CONFIG_MULTITHREADED=0`.
 #define BGFX_RESET_SRGB_BACKBUFFER       UINT32_C(0x00008000) //!< Enable sRGB backbuffer.
 #define BGFX_RESET_HIDPI                 UINT32_C(0x00010000) //!< Enable HiDPI rendering.
+#define BGFX_RESET_DEPTH_CLAMP           UINT32_C(0x00020000) //!< Enable depth clamp.
+
+#define BGFX_RESET_RESERVED_SHIFT        31                   //!< Internal bits shift.
+#define BGFX_RESET_RESERVED_MASK         UINT32_C(0x80000000) //!< Internal bits mask.
 
 ///
 #define BGFX_CAPS_TEXTURE_COMPARE_LEQUAL UINT64_C(0x0000000000000001) //!< Texture compare less equal mode is supported.
@@ -370,6 +378,7 @@
 #define BGFX_CAPS_HIDPI                  UINT64_C(0x0000000000008000) //!< HiDPI rendering is supported.
 #define BGFX_CAPS_TEXTURE_BLIT           UINT64_C(0x0000000000010000) //!< Texture blit is supported.
 #define BGFX_CAPS_TEXTURE_READ_BACK      UINT64_C(0x0000000000020000) //!< Read-back texture is supported.
+#define BGFX_CAPS_OCCLUSION_QUERY        UINT64_C(0x0000000000040000) //!< Occlusion query is supported.
 
 ///
 #define BGFX_CAPS_FORMAT_TEXTURE_NONE             UINT16_C(0x0000) //!< Texture format is not supported.
@@ -393,10 +402,13 @@
 #define BGFX_VIEW_STEREO UINT8_C(0x01) //!< View will be rendered in stereo mode.
 
 ///
-#define BGFX_SUBMIT_EYE_LEFT  UINT8_C(0x01) //!< Submit to left eye.
-#define BGFX_SUBMIT_EYE_RIGHT UINT8_C(0x02) //!< Submit to right eye.
-#define BGFX_SUBMIT_EYE_MASK  UINT8_C(0x03) //!<
-#define BGFX_SUBMIT_EYE_FIRST BGFX_SUBMIT_EYE_LEFT
+#define BGFX_SUBMIT_EYE_LEFT       UINT8_C(0x01) //!< Submit to left eye.
+#define BGFX_SUBMIT_EYE_RIGHT      UINT8_C(0x02) //!< Submit to right eye.
+#define BGFX_SUBMIT_EYE_MASK       UINT8_C(0x03) //!<
+#define BGFX_SUBMIT_EYE_FIRST      BGFX_SUBMIT_EYE_LEFT
+
+#define BGFX_SUBMIT_RESERVED_SHIFT 7             //!< Internal bits shift.
+#define BGFX_SUBMIT_RESERVED_MASK  UINT8_C(0x80) //!< Internal bits mask.
 
 ///
 #define BGFX_PCI_ID_NONE                UINT16_C(0x0000) //!< Autoselect adapter.

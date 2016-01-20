@@ -26,7 +26,7 @@ const device_type PET_USERPORT_DIAGNOSTIC_CONNECTOR = &device_creator<pet_userpo
 //  pet_userport_diagnostic_connector_t - constructor
 //-------------------------------------------------
 
-pet_userport_diagnostic_connector_t::pet_userport_diagnostic_connector_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pet_userport_diagnostic_connector_t::pet_userport_diagnostic_connector_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PET_USERPORT_DIAGNOSTIC_CONNECTOR, "PET Userport Diagnostic Connector", tag, owner, clock, "pet_user_diag", __FILE__),
 	device_pet_user_port_interface(mconfig, *this)
 {

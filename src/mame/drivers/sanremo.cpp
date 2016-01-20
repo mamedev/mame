@@ -108,7 +108,7 @@
 class sanremo_state : public driver_device
 {
 public:
-	sanremo_state(const machine_config &mconfig, device_type type, const char *tag)
+	sanremo_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -123,7 +123,7 @@ public:
 	DECLARE_WRITE8_MEMBER(banksel_w);
 	DECLARE_WRITE8_MEMBER(lamps_w);
 	int banksel;
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sanremo);
 	UINT32 screen_update_sanremo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -193,13 +193,13 @@ WRITE8_MEMBER(sanremo_state::lamps_w)
     -x-- ----  BET
     x--- ----  (always on)
 */
-	output_set_lamp_value(0, (data >> 0) & 1);  /* DISCARD 1 */
-	output_set_lamp_value(1, (data >> 1) & 1);  /* DISCARD 2 */
-	output_set_lamp_value(2, (data >> 2) & 1);  /* DISCARD 3 */
-	output_set_lamp_value(3, (data >> 3) & 1);  /* DISCARD 4 */
-	output_set_lamp_value(4, (data >> 4) & 1);  /* DISCARD 5 */
-	output_set_lamp_value(5, (data >> 5) & 1);  /* START */
-	output_set_lamp_value(6, (data >> 6) & 1);  /* BET */
+	output().set_lamp_value(0, (data >> 0) & 1);  /* DISCARD 1 */
+	output().set_lamp_value(1, (data >> 1) & 1);  /* DISCARD 2 */
+	output().set_lamp_value(2, (data >> 2) & 1);  /* DISCARD 3 */
+	output().set_lamp_value(3, (data >> 3) & 1);  /* DISCARD 4 */
+	output().set_lamp_value(4, (data >> 4) & 1);  /* DISCARD 5 */
+	output().set_lamp_value(5, (data >> 5) & 1);  /* START */
+	output().set_lamp_value(6, (data >> 6) & 1);  /* BET */
 }
 
 WRITE8_MEMBER(sanremo_state::banksel_w)

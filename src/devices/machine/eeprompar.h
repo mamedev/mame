@@ -51,14 +51,12 @@ class eeprom_parallel_base_device : public eeprom_base_device
 {
 protected:
 	// construction/destruction
-	eeprom_parallel_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
-
-public:
+	eeprom_parallel_base_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source);
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 
@@ -69,7 +67,7 @@ class eeprom_parallel_28xx_device : public eeprom_parallel_base_device
 {
 protected:
 	// construction/destruction
-	eeprom_parallel_28xx_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
+	eeprom_parallel_28xx_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source);
 
 public:
 	// read/write data lines - for now we cheat and ignore the control lines, assuming
@@ -89,7 +87,7 @@ public:
 class eeprom_parallel_##_lowercase##_device : public eeprom_parallel_##_baseclass##_device \
 { \
 public: \
-	eeprom_parallel_##_lowercase##_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock); \
+	eeprom_parallel_##_lowercase##_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock); \
 }; \
 extern const device_type EEPROM_PARALLEL_##_uppercase;
 // standard 28XX class of 8-bit EEPROMs

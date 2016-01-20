@@ -340,7 +340,7 @@ inline int cdp1869_device::get_pen(int ccb0, int ccb1, int pcb)
 //  cdp1869_device - constructor
 //-------------------------------------------------
 
-cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cdp1869_device::cdp1869_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CDP1869, "RCA CDP1869", tag, owner, clock, "cdp1869", __FILE__),
 	device_sound_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
@@ -348,9 +348,9 @@ cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, d
 	m_read_pal_ntsc(*this),
 	m_write_prd(*this),
 	m_color_clock(0),
-	m_stream(NULL),
+	m_stream(nullptr),
 	m_palette(*this, "palette"),
-	m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, NULL, *ADDRESS_MAP_NAME(cdp1869))
+	m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, nullptr, *ADDRESS_MAP_NAME(cdp1869))
 {
 }
 
@@ -467,7 +467,7 @@ void cdp1869_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 const address_space_config *cdp1869_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 

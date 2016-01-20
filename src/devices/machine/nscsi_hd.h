@@ -9,18 +9,18 @@
 class nscsi_harddisk_device : public nscsi_full_device
 {
 public:
-	nscsi_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	nscsi_harddisk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	nscsi_harddisk_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nscsi_harddisk_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void scsi_command();
-	virtual UINT8 scsi_get_data(int id, int pos);
-	virtual void scsi_put_data(int buf, int offset, UINT8 data);
+	virtual void scsi_command() override;
+	virtual UINT8 scsi_get_data(int id, int pos) override;
+	virtual void scsi_put_data(int buf, int offset, UINT8 data) override;
 
 	UINT8 block[512];
 	hard_disk_file *harddisk;

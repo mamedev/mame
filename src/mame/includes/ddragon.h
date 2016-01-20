@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Philip Bennett,Carlos A. Lozano, Rob Rosenbrock, Phil Stroffolino, Ernesto Corvi, David Haywood, R. Belmont
 /*************************************************************************
 
@@ -10,7 +10,7 @@
 class ddragon_state : public driver_device
 {
 public:
-	ddragon_state(const machine_config &mconfig, device_type type, const char *tag)
+	ddragon_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_rambase(*this, "rambase"),
 		m_bgvideoram(*this, "bgvideoram"),

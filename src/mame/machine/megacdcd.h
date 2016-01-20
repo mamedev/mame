@@ -147,7 +147,7 @@ typedef device_delegate<void (void)> interrupt_delegate;
 class lc89510_temp_device : public device_t
 {
 public:
-	lc89510_temp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	lc89510_temp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// HACK for DMA handling
 	segacd_dma_delegate segacd_dma_callback;
@@ -306,9 +306,9 @@ public:
 	void nff0002_set(UINT16 wordValue);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 private:
 
 

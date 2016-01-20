@@ -37,7 +37,7 @@ public:
 		m_R_high = 130.0;
 		m_is_static = true;
 	}
-	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(logic_output_t *proxied) const
+	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(logic_output_t *proxied) const override
 	{
 		return palloc(devices::nld_d_to_a_proxy(proxied));
 	}
@@ -58,7 +58,7 @@ public:
 		m_R_high = 10.0;
 		m_is_static = true;
 	}
-	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(logic_output_t *proxied) const
+	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(logic_output_t *proxied) const override
 	{
 		return palloc(devices::nld_d_to_a_proxy(proxied));
 	}

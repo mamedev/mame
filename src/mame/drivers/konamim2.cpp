@@ -206,7 +206,7 @@ struct CDE_DMA
 class konamim2_state : public driver_device
 {
 public:
-	konamim2_state(const machine_config &mconfig, device_type type, const char *tag)
+	konamim2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_main_ram(*this, "main_ram"),
 		m_maincpu(*this, "maincpu"),
@@ -236,7 +236,6 @@ public:
 	DECLARE_WRITE64_MEMBER(irq_enable_w);
 	DECLARE_READ64_MEMBER(irq_active_r);
 	DECLARE_READ64_MEMBER(unk1_r);
-	DECLARE_READ64_MEMBER(unk2_r);
 	DECLARE_READ64_MEMBER(unk3_r);
 	DECLARE_READ64_MEMBER(unk4_r);
 	DECLARE_WRITE64_MEMBER(unk4_w);
@@ -253,7 +252,7 @@ public:
 	DECLARE_READ64_MEMBER(device2_r);
 	DECLARE_READ64_MEMBER(cpu_r);
 	DECLARE_DRIVER_INIT(m2);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m2);
 	void cde_init();
@@ -500,7 +499,7 @@ WRITE64_MEMBER(konamim2_state::reset_w)
 
 void konamim2_state::cde_init()
 {
-	cdrom_file *cdfile = cdrom_open(get_disk_handle(machine(), ":cdrom"));
+	cdrom_file *cdfile = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
 
 	const cdrom_toc *toc = cdrom_get_toc(cdfile);
 

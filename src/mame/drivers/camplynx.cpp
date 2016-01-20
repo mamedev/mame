@@ -129,7 +129,7 @@
 class camplynx_state : public driver_device
 {
 public:
-	camplynx_state(const machine_config &mconfig, device_type type, const char *tag)
+	camplynx_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
@@ -760,7 +760,7 @@ d7 = 125ns or 250ns */
 			port7f_w(space, 0, m_bankdata);
 	}
 
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 	if ((data & 3) == 0) floppy = m_floppy0->get_device();
 	else
 	if ((data & 3) == 1) floppy = m_floppy1->get_device();

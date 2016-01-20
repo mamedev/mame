@@ -26,7 +26,7 @@
 class mpf1_state : public driver_device
 {
 public:
-	mpf1_state(const machine_config &mconfig, device_type type, const char *tag)
+	mpf1_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_ctc(*this, Z80CTC_TAG),
@@ -53,8 +53,8 @@ public:
 	required_ioport m_pc5;
 	required_ioport m_special;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( ppi_pa_r );
 	DECLARE_WRITE8_MEMBER( ppi_pb_w );

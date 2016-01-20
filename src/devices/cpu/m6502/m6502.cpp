@@ -14,18 +14,18 @@
 
 const device_type M6502 = &device_creator<m6502_device>;
 
-m6502_device::m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+m6502_device::m6502_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	cpu_device(mconfig, M6502, "M6502", tag, owner, clock, "m6502", __FILE__),
 	sync_w(*this),
 	program_config("program", ENDIANNESS_LITTLE, 8, 16),
-	sprogram_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16), PPC(0), NPC(0), PC(0), SP(0), TMP(0), TMP2(0), A(0), X(0), Y(0), P(0), IR(0), inst_state_base(0), mintf(nullptr), 
+	sprogram_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16), PPC(0), NPC(0), PC(0), SP(0), TMP(0), TMP2(0), A(0), X(0), Y(0), P(0), IR(0), inst_state_base(0), mintf(nullptr),
 	inst_state(0), inst_substate(0), icount(0), nmi_state(false), irq_state(false), apu_irq_state(false), v_state(false), irq_taken(false), sync(false), inhibit_interrupts(false)
 {
 	direct_disabled = false;
 }
 
-m6502_device::m6502_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source), 
+m6502_device::m6502_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	sync_w(*this),
 	program_config("program", ENDIANNESS_LITTLE, 8, 16),
 	sprogram_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16), PPC(0), NPC(0), PC(0), SP(0), TMP(0), TMP2(0), A(0), X(0), Y(0), P(0), IR(0), inst_state_base(0), mintf(nullptr),
@@ -412,8 +412,8 @@ const address_space_config *m6502_device::memory_space_config(address_spacenum s
 	switch(spacenum)
 	{
 	case AS_PROGRAM:           return &program_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &sprogram_config : NULL;
-	default:                   return NULL;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &sprogram_config : nullptr;
+	default:                   return nullptr;
 	}
 }
 
@@ -439,7 +439,7 @@ void m6502_device::state_export(const device_state_entry &entry)
 {
 }
 
-void m6502_device::state_string_export(const device_state_entry &entry, std::string &str)
+void m6502_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch(entry.index()) {
 	case STATE_GENFLAGS:

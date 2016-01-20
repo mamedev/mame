@@ -102,7 +102,7 @@ public:
 	/* this probably should do more, like make Genesis V2 'die' if the SEGA string is not written promptly */
 	virtual DECLARE_WRITE16_MEMBER(write_tmss_bank) { m_device.logerror("Write to TMSS bank: offset %x data %x\n", 0xa14000 + (offset << 1), data); };
 
-	virtual void rom_alloc(size_t size, const char *tag);
+	virtual void rom_alloc(size_t size, std::string tag);
 	virtual void nvram_alloc(size_t size);
 	virtual UINT16* get_rom_base() { return m_rom; };
 	virtual UINT16* get_nvram_base() { return &m_nvram[0]; };
@@ -140,28 +140,28 @@ class base_md_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	base_md_cart_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	virtual ~base_md_cart_slot_device();
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 	// image-level overrides
-	virtual bool call_load();
-	virtual void call_unload();
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
+	virtual bool call_load() override;
+	virtual void call_unload() override;
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
 
-	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 0; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return m_must_be_loaded; }
-	virtual bool is_reset_on_load() const { return 1; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 0; }
+	virtual bool is_creatable() const override { return 0; }
+	virtual bool must_be_loaded() const override { return m_must_be_loaded; }
+	virtual bool is_reset_on_load() const override { return 1; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result);
+	virtual std::string get_default_card_software() override;
 
 	int get_type() { return m_type; }
 
@@ -201,9 +201,9 @@ class md_cart_slot_device :  public base_md_cart_slot_device
 {
 public:
 	// construction/destruction
-	md_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual const char *image_interface() const { return "megadriv_cart"; }
-	virtual const char *file_extensions() const { return "smd,bin,md,gen"; }
+	md_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	virtual const char *image_interface() const override { return "megadriv_cart"; }
+	virtual const char *file_extensions() const override { return "smd,bin,md,gen"; }
 };
 
 // ======================> pico_cart_slot_device
@@ -212,9 +212,9 @@ class pico_cart_slot_device :  public base_md_cart_slot_device
 {
 public:
 	// construction/destruction
-	pico_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual const char *image_interface() const { return "pico_cart"; }
-	virtual const char *file_extensions() const { return "bin,md"; }
+	pico_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	virtual const char *image_interface() const override { return "pico_cart"; }
+	virtual const char *file_extensions() const override { return "bin,md"; }
 };
 
 // ======================> copera_cart_slot_device
@@ -223,9 +223,9 @@ class copera_cart_slot_device :  public base_md_cart_slot_device
 {
 public:
 	// construction/destruction
-	copera_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual const char *image_interface() const { return "copera_cart"; }
-	virtual const char *file_extensions() const { return "bin,md"; }
+	copera_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	virtual const char *image_interface() const override { return "copera_cart"; }
+	virtual const char *file_extensions() const override { return "bin,md"; }
 };
 
 

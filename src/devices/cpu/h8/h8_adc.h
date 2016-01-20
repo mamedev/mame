@@ -39,9 +39,9 @@
 
 class h8_adc_device : public device_t {
 public:
-	h8_adc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	h8_adc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
-	void set_info(const char *intc_tag, int vect);
+	void set_info(std::string intc_tag, int vect);
 
 	DECLARE_READ8_MEMBER(addr8_r);
 	DECLARE_READ16_MEMBER(addr16_r);
@@ -58,7 +58,7 @@ protected:
 	required_device<h8_device> cpu;
 	h8_intc_device *intc;
 	address_space *io;
-	const char *intc_tag;
+	std::string intc_tag;
 	int intc_vector;
 
 	enum {
@@ -94,8 +94,8 @@ protected:
 	bool analog_powered, adtrg;
 	UINT64 next_event;
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void sampling();
 	void start_conversion();
@@ -113,58 +113,58 @@ protected:
 
 class h8_adc_3337_device : public h8_adc_device {
 public:
-	h8_adc_3337_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_adc_3337_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual int conversion_time(bool first, bool poweron);
-	virtual void mode_update();
+	virtual int conversion_time(bool first, bool poweron) override;
+	virtual void mode_update() override;
 };
 
 class h8_adc_3006_device : public h8_adc_device {
 public:
-	h8_adc_3006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_adc_3006_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual int conversion_time(bool first, bool poweron);
-	virtual void mode_update();
+	virtual int conversion_time(bool first, bool poweron) override;
+	virtual void mode_update() override;
 };
 
 class h8_adc_2245_device : public h8_adc_device {
 public:
-	h8_adc_2245_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_adc_2245_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual int conversion_time(bool first, bool poweron);
-	virtual void mode_update();
+	virtual int conversion_time(bool first, bool poweron) override;
+	virtual void mode_update() override;
 };
 
 class h8_adc_2320_device : public h8_adc_device {
 public:
-	h8_adc_2320_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_adc_2320_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual int conversion_time(bool first, bool poweron);
-	virtual void mode_update();
+	virtual int conversion_time(bool first, bool poweron) override;
+	virtual void mode_update() override;
 };
 
 class h8_adc_2357_device : public h8_adc_device {
 public:
-	h8_adc_2357_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_adc_2357_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual int conversion_time(bool first, bool poweron);
-	virtual void mode_update();
+	virtual int conversion_time(bool first, bool poweron) override;
+	virtual void mode_update() override;
 };
 
 class h8_adc_2655_device : public h8_adc_device {
 public:
-	h8_adc_2655_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_adc_2655_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual int conversion_time(bool first, bool poweron);
-	virtual void mode_update();
-	virtual void do_buffering(int buffer);
-	virtual int get_channel_index(int count);
+	virtual int conversion_time(bool first, bool poweron) override;
+	virtual void mode_update() override;
+	virtual void do_buffering(int buffer) override;
+	virtual int get_channel_index(int count) override;
 };
 
 extern const device_type H8_ADC_3337;

@@ -27,14 +27,14 @@
 const device_type MD_ROM_SK = &device_creator<md_rom_sk_device>;
 
 
-md_rom_sk_device::md_rom_sk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+md_rom_sk_device::md_rom_sk_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_md_cart_interface( mconfig, *this ),
 						m_exp(*this, "subslot")
 {
 }
 
-md_rom_sk_device::md_rom_sk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+md_rom_sk_device::md_rom_sk_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, MD_ROM_SK, "MD Sonic & Knuckles", tag, owner, clock, "md_rom_sk", __FILE__),
 						device_md_cart_interface( mconfig, *this ),
 						m_exp(*this, "subslot")
@@ -52,7 +52,7 @@ void md_rom_sk_device::device_start()
 
 READ16_MEMBER(md_rom_sk_device::read)
 {
-	if (m_exp->m_cart != NULL && m_exp->m_cart->get_rom_base() != NULL && offset >= 0x200000/2 && offset < (0x200000 + m_exp->m_cart->get_rom_size())/2)
+	if (m_exp->m_cart != nullptr && m_exp->m_cart->get_rom_base() != nullptr && offset >= 0x200000/2 && offset < (0x200000 + m_exp->m_cart->get_rom_size())/2)
 		return m_exp->m_cart->m_rom[offset - 0x200000/2];
 	if (offset < 0x400000/2)
 		return m_rom[MD_ADDR(offset)];
@@ -79,7 +79,7 @@ static SLOT_INTERFACE_START(sk_sub_cart)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( sk_slot )
-	MCFG_MD_CARTRIDGE_ADD("subslot", sk_sub_cart, NULL)
+	MCFG_MD_CARTRIDGE_ADD("subslot", sk_sub_cart, nullptr)
 	MCFG_MD_CARTRIDGE_NOT_MANDATORY
 MACHINE_CONFIG_END
 

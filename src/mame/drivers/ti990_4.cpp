@@ -50,7 +50,7 @@ TODO:
 class ti990_4_state : public driver_device
 {
 public:
-	ti990_4_state(const machine_config &mconfig, device_type type, const char *tag)
+	ti990_4_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_fd800(*this, "fd800") { }
@@ -71,7 +71,7 @@ public:
 
 private:
 	void        hold_load();
-	void        device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void        device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	int         m_intlines;
 	int         m_int_level;
 	emu_timer*  m_nmi_timer;

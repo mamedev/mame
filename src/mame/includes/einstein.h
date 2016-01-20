@@ -49,7 +49,7 @@
 class einstein_state : public driver_device
 {
 public:
-	einstein_state(const machine_config &mconfig, device_type type, const char *tag)
+	einstein_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_fdc(*this, IC_I042),
 		m_color_screen(*this, "screen"),
@@ -97,7 +97,7 @@ public:
 	/* 80 column device */
 	optional_device<mc6845_device> m_mc6845;
 	optional_device<screen_device> m_crtc_screen;
-	UINT8 *m_crtc_ram;
+	std::unique_ptr<UINT8[]> m_crtc_ram;
 	UINT8   m_de;
 
 	int m_centronics_busy;
@@ -118,8 +118,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(einstein2);
 	DECLARE_MACHINE_RESET(einstein2);
 	UINT32 screen_update_einstein2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -166,14 +166,14 @@ class einstein_keyboard_daisy_device :  public device_t,
 {
 public:
 	// construction/destruction
-	einstein_keyboard_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	einstein_keyboard_daisy_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 private:
-	virtual void device_start();
+	virtual void device_start() override;
 	// z80daisy_interface overrides
-	virtual int z80daisy_irq_state();
-	virtual int z80daisy_irq_ack();
-	virtual void z80daisy_irq_reti();
+	virtual int z80daisy_irq_state() override;
+	virtual int z80daisy_irq_ack() override;
+	virtual void z80daisy_irq_reti() override;
 };
 
 extern const device_type EINSTEIN_KEYBOARD_DAISY;
@@ -186,14 +186,14 @@ class einstein_adc_daisy_device :   public device_t,
 {
 public:
 	// construction/destruction
-	einstein_adc_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	einstein_adc_daisy_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 private:
-	virtual void device_start();
+	virtual void device_start() override;
 	// z80daisy_interface overrides
-	virtual int z80daisy_irq_state();
-	virtual int z80daisy_irq_ack();
-	virtual void z80daisy_irq_reti();
+	virtual int z80daisy_irq_state() override;
+	virtual int z80daisy_irq_ack() override;
+	virtual void z80daisy_irq_reti() override;
 
 };
 
@@ -206,14 +206,14 @@ class einstein_fire_daisy_device :  public device_t,
 {
 public:
 	// construction/destruction
-	einstein_fire_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	einstein_fire_daisy_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 private:
-	virtual void device_start();
+	virtual void device_start() override;
 	// z80daisy_interface overrides
-	virtual int z80daisy_irq_state();
-	virtual int z80daisy_irq_ack();
-	virtual void z80daisy_irq_reti();
+	virtual int z80daisy_irq_state() override;
+	virtual int z80daisy_irq_ack() override;
+	virtual void z80daisy_irq_reti() override;
 };
 
 extern const device_type EINSTEIN_FIRE_DAISY;

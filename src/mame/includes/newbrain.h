@@ -56,7 +56,7 @@
 class newbrain_state : public driver_device
 {
 public:
-	newbrain_state(const machine_config &mconfig, device_type type, const char *tag) :
+	newbrain_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_copcpu(*this, COP420_TAG),
@@ -116,11 +116,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(cop_regint_tick);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	enum
 	{
@@ -206,7 +206,7 @@ protected:
 class newbrain_eim_state : public newbrain_state
 {
 public:
-	newbrain_eim_state(const machine_config &mconfig, device_type type, const char *tag)
+	newbrain_eim_state(const machine_config &mconfig, device_type type, std::string tag)
 		: newbrain_state(mconfig, type, tag),
 			m_fdccpu(*this, FDC_Z80_TAG),
 			m_ctc(*this, Z80CTC_TAG),
@@ -223,7 +223,7 @@ public:
 	required_device<floppy_image_device> m_floppy;
 	optional_shared_ptr<UINT8> m_eim_ram;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER( fdc_auxiliary_w );
 	DECLARE_READ8_MEMBER( fdc_control_r );

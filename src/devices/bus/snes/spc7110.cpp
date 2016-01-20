@@ -24,16 +24,16 @@ const device_type SNS_HIROM_SPC7110 = &device_creator<sns_rom_spc7110_device>;
 const device_type SNS_HIROM_SPC7110_RTC = &device_creator<sns_rom_spc7110rtc_device>;
 
 
-sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-			: sns_rom21_device(mconfig, type, name, tag, owner, clock, shortname, source), m_r4801(0), m_r4802(0), m_r4803(0), m_r4804(0), m_r4805(0), m_r4806(0), m_r4807(0), 
-	m_r4808(0), m_r4809(0), m_r480a(0), m_r480b(0), m_r480c(0), m_decomp(nullptr), m_r4811(0), m_r4812(0), m_r4813(0), m_r4814(0), m_r4815(0), m_r4816(0), m_r4817(0), m_r4818(0), 
-	m_r481x(0), m_r4814_latch(0), m_r4815_latch(0), m_r4820(0), m_r4821(0), m_r4822(0), m_r4823(0), m_r4824(0), m_r4825(0), m_r4826(0), m_r4827(0), m_r4828(0), m_r4829(0), m_r482a(0), 
-	m_r482b(0), m_r482c(0), m_r482d(0), m_r482e(0), m_r482f(0), m_r4830(0), m_r4831(0), m_r4832(0), m_r4833(0), m_r4834(0), m_dx_offset(0), m_ex_offset(0), m_fx_offset(0), m_r4840(0), 
+sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+			: sns_rom21_device(mconfig, type, name, tag, owner, clock, shortname, source), m_r4801(0), m_r4802(0), m_r4803(0), m_r4804(0), m_r4805(0), m_r4806(0), m_r4807(0),
+	m_r4808(0), m_r4809(0), m_r480a(0), m_r480b(0), m_r480c(0), m_decomp(nullptr), m_r4811(0), m_r4812(0), m_r4813(0), m_r4814(0), m_r4815(0), m_r4816(0), m_r4817(0), m_r4818(0),
+	m_r481x(0), m_r4814_latch(0), m_r4815_latch(0), m_r4820(0), m_r4821(0), m_r4822(0), m_r4823(0), m_r4824(0), m_r4825(0), m_r4826(0), m_r4827(0), m_r4828(0), m_r4829(0), m_r482a(0),
+	m_r482b(0), m_r482c(0), m_r482d(0), m_r482e(0), m_r482f(0), m_r4830(0), m_r4831(0), m_r4832(0), m_r4833(0), m_r4834(0), m_dx_offset(0), m_ex_offset(0), m_fx_offset(0), m_r4840(0),
 	m_r4841(0), m_r4842(0), m_rtc_state(0), m_rtc_mode(0), m_rtc_index(0), m_rtc_offset(0)
 		{
 }
 
-sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 			: sns_rom21_device(mconfig, SNS_HIROM_SPC7110, "SNES Cart + SPC-7110", tag, owner, clock, "sns_rom_spc7110", __FILE__), m_r4801(0), m_r4802(0), m_r4803(0), m_r4804(0), m_r4805(0), m_r4806(0), m_r4807(0),
 	m_r4808(0), m_r4809(0), m_r480a(0), m_r480b(0), m_r480c(0), m_decomp(nullptr), m_r4811(0), m_r4812(0), m_r4813(0), m_r4814(0), m_r4815(0), m_r4816(0), m_r4817(0), m_r4818(0),
 	m_r481x(0), m_r4814_latch(0), m_r4815_latch(0), m_r4820(0), m_r4821(0), m_r4822(0), m_r4823(0), m_r4824(0), m_r4825(0), m_r4826(0), m_r4827(0), m_r4828(0), m_r4829(0), m_r482a(0),
@@ -42,7 +42,7 @@ sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, co
 {
 }
 
-sns_rom_spc7110rtc_device::sns_rom_spc7110rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sns_rom_spc7110rtc_device::sns_rom_spc7110rtc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 			: sns_rom_spc7110_device(mconfig, SNS_HIROM_SPC7110_RTC, "SNES Cart + SPC-7110 + RTC", tag, owner, clock, "sns_rom_spc7110rtc", __FILE__)
 {
 }
@@ -50,7 +50,7 @@ sns_rom_spc7110rtc_device::sns_rom_spc7110rtc_device(const machine_config &mconf
 
 void sns_rom_spc7110_device::spc7110_start()
 {
-	m_decomp = auto_alloc(machine(), SPC7110_Decomp(machine()));
+	m_decomp = std::make_unique<SPC7110_Decomp>(machine());
 
 	// The SPC7110 works in conjunction with 0x2000 of RAM, which is battery backed up (and hence emulated by our m_nvram)
 
@@ -300,7 +300,7 @@ static const UINT8 spc7110_mode2_context_table[32][2] =
 SPC7110_Decomp::SPC7110_Decomp(running_machine &machine)
 				:  m_machine(machine)
 {
-	m_decomp_buffer = (UINT8*)auto_alloc_array(machine, UINT8, SPC7110_DECOMP_BUFFER_SIZE);
+	m_decomp_buffer = std::make_unique<UINT8[]>(SPC7110_DECOMP_BUFFER_SIZE);
 	reset();
 
 	for (int i = 0; i < 256; i++)
@@ -325,7 +325,7 @@ SPC7110_Decomp::SPC7110_Decomp(running_machine &machine)
 
 	m_machine.save().save_item(m_decomp_mode, "SNES_SPC7110/m_decomp_mode");
 	m_machine.save().save_item(m_decomp_offset, "SNES_SPC7110/m_decomp_offset");
-	m_machine.save().save_pointer(m_decomp_buffer, "SNES_SPC7110/m_decomp_buffer", SPC7110_DECOMP_BUFFER_SIZE);
+	m_machine.save().save_pointer(m_decomp_buffer.get(), "SNES_SPC7110/m_decomp_buffer", SPC7110_DECOMP_BUFFER_SIZE);
 	m_machine.save().save_item(m_decomp_buffer_rdoffset, "SNES_SPC7110/m_decomp_buffer_rdoffset");
 	m_machine.save().save_item(m_decomp_buffer_wroffset, "SNES_SPC7110/m_decomp_buffer_wroffset");
 	m_machine.save().save_item(m_decomp_buffer_length, "SNES_SPC7110/m_decomp_buffer_length");
@@ -389,10 +389,10 @@ void SPC7110_Decomp::init(running_machine &machine, UINT8 *ROM, UINT32 len, UINT
 	m_decomp_buffer_length   = 0;
 
 	//reset context states
-	for (int i = 0; i < 32; i++)
+	for (auto & elem : m_context)
 	{
-		m_context[i].index  = 0;
-		m_context[i].invert = 0;
+		elem.index  = 0;
+		elem.invert = 0;
 	}
 
 	switch (m_decomp_mode)
@@ -873,9 +873,9 @@ void SPC7110_Decomp::mode2(UINT8 init, UINT8 *ROM, UINT32 len)
 
 		if (m_m2_buffer_index == 16)
 		{
-			for (int i = 0; i < 16; i++)
+			for (auto & elem : m_m2_bitplanebuffer)
 			{
-				write(m_m2_bitplanebuffer[i]);
+				write(elem);
 			}
 			m_m2_buffer_index = 0;
 		}
@@ -1233,7 +1233,7 @@ READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 		case 0x4840: return m_r4840;
 		case 0x4841:
 		{
-			UINT8 data = 0;
+			UINT8 data;
 			if (m_rtc_state == RTCS_Inactive || m_rtc_state == RTCS_ModeSelect)
 				return 0x00;
 

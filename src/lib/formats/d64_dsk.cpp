@@ -79,7 +79,7 @@ const int d64_format::speed_zone[] =
 	0, 0                                               // 41-42
 };
 
-int d64_format::find_size(io_generic *io, UINT32 form_factor)
+int d64_format::find_size(io_generic *io, UINT32 form_factor) const
 {
 	UINT64 size = io_generic_size(io);
 	for(int i=0; formats[i].sector_count; i++) {

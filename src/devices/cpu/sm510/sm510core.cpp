@@ -30,7 +30,7 @@ ADDRESS_MAP_END
 
 
 // device definitions
-sm510_device::sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sm510_device::sm510_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: sm510_base_device(mconfig, SM510, "SM510", tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, ADDRESS_MAP_NAME(program_2_7k), 7 /* data width */, ADDRESS_MAP_NAME(data_96_32x4), "sm510", __FILE__)
 { }
 

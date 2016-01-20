@@ -227,7 +227,7 @@ bool wd177x_format::save(io_generic *io, floppy_image *image)
 {
 	// Count the number of formats
 	int formats_count;
-	for(formats_count=0; formats[formats_count].form_factor; formats_count++);
+	for(formats_count=0; formats[formats_count].form_factor; formats_count++) {};
 
 	// Allocate the storage for the list of testable formats for a
 	// given cell size

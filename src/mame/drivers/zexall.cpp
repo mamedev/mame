@@ -29,7 +29,7 @@ One i/o port is used:
 class zexall_state : public driver_device
 {
 public:
-	zexall_state(const machine_config &mconfig, device_type type, const char *tag)
+	zexall_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG),
@@ -52,7 +52,7 @@ private:
 	UINT8 m_out_req; // byte written to 0xFFFE
 	UINT8 m_out_req_last; // old value at 0xFFFE before the most recent write
 	UINT8 m_out_ack; // byte written to 0xFFFC
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 DRIVER_INIT_MEMBER(zexall_state,zexall)

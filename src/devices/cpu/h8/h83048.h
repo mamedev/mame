@@ -31,8 +31,8 @@
 
 class h83048_device : public h8h_device {
 public:
-	h83048_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	h83048_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h83048_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	h83048_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(syscr_r);
 	DECLARE_WRITE8_MEMBER(syscr_w);
@@ -63,32 +63,32 @@ protected:
 	UINT32 ram_start;
 	UINT8 syscr;
 
-	virtual void update_irq_filter();
-	virtual void interrupt_taken();
-	virtual int trapa_setup();
-	virtual void irq_setup();
-	virtual void internal_update(UINT64 current_time);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void update_irq_filter() override;
+	virtual void interrupt_taken() override;
+	virtual int trapa_setup() override;
+	virtual void irq_setup() override;
+	virtual void internal_update(UINT64 current_time) override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 	DECLARE_ADDRESS_MAP(map, 16);
 
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 };
 
 class h83044_device : public h83048_device {
 public:
-	h83044_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h83044_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class h83045_device : public h83048_device {
 public:
-	h83045_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h83045_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 class h83047_device : public h83048_device {
 public:
-	h83047_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h83047_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type H83044;

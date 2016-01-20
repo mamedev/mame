@@ -108,14 +108,11 @@
 //  ctor
 //-------------------------------------------------
 
-gime_base_device::gime_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, const char *shortname, const char *source)
+gime_base_device::gime_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, std::string shortname, std::string source)
 	:   mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, true, 263, 25+192+26+3, false, shortname, source),
 		m_write_irq(*this),
 		m_write_firq(*this),
-		m_read_floating_bus(*this),
-		m_maincpu_tag(NULL),
-		m_ram_tag(NULL),
-		m_ext_tag(NULL)
+		m_read_floating_bus(*this)
 {
 }
 
@@ -620,7 +617,7 @@ void gime_base_device::update_memory(int bank)
 		// are we in onboard ROM or cart ROM?
 		UINT8 *rom_ptr = (block & 4) ? m_cart_rom : m_rom;
 		// TODO: make this unmapped
-		if (rom_ptr==NULL) rom_ptr = m_rom;
+		if (rom_ptr==nullptr) rom_ptr = m_rom;
 		// perform the look up
 		memory = &rom_ptr[(block & 3) * 0x2000];
 		is_read_only = true;
@@ -1738,7 +1735,7 @@ inline void gime_base_device::render_scanline(const scanline_record *scanline, p
 	int left_border, right_border;
 	int x, x2, pixel_position;
 	pixel_t border_color = resolver->lookup(scanline->m_border);
-	const pixel_t *resolved_palette = NULL;
+	const pixel_t *resolved_palette = nullptr;
 
 	/* is this a wide video mode? */
 	bool wide = !m_legacy_video && (scanline->m_ff99_value & 0x04);
@@ -2060,7 +2057,7 @@ const device_type GIME_PAL = &device_creator<gime_pal_device>;
 //  gime_ntsc_device
 //-------------------------------------------------
 
-gime_ntsc_device::gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gime_ntsc_device::gime_ntsc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: gime_base_device(mconfig, GIME_NTSC, "GIME_NTSC", tag, owner, clock, ntsc_round_fontdata8x12, "gime_ntsc", __FILE__)
 {
 }
@@ -2071,7 +2068,7 @@ gime_ntsc_device::gime_ntsc_device(const machine_config &mconfig, const char *ta
 //  gime_pal_device
 //-------------------------------------------------
 
-gime_pal_device::gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gime_pal_device::gime_pal_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: gime_base_device(mconfig, GIME_PAL, "GIME_PAL", tag, owner, clock, pal_round_fontdata8x12, "gime_pal", __FILE__)
 {
 }

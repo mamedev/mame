@@ -31,7 +31,7 @@ struct cx_timer_regs_t
 class cxhumax_state : public driver_device
 {
 public:
-	cxhumax_state(const machine_config &mconfig, device_type type, const char *tag)
+	cxhumax_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_flash(*this, "flash"),
@@ -160,9 +160,9 @@ public:
 	UINT32 m_hdmi_regs[0x400/4];
 
 	UINT32 m_gxa_cmd_regs[0x130/4];
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_cxhumax(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_tick);
 };

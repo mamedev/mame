@@ -14,7 +14,7 @@
 class _20pacgal_state : public driver_device
 {
 public:
-	_20pacgal_state(const machine_config &mconfig, device_type type, const char *tag)
+	_20pacgal_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_char_gfx_ram(*this, "char_gfx_ram"),
@@ -58,8 +58,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sprite_lookup_w);
 	DECLARE_DRIVER_INIT(25pacman);
 	DECLARE_DRIVER_INIT(20pacgal);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void set_bankptr();
@@ -77,12 +77,12 @@ public:
 class _25pacman_state : public _20pacgal_state
 {
 public:
-	_25pacman_state(const machine_config &mconfig, device_type type, const char *tag)
+	_25pacman_state(const machine_config &mconfig, device_type type, std::string tag)
 		: _20pacgal_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_READ8_MEMBER( _25pacman_io_87_r );
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 /*----------- defined in video/20pacgal.c -----------*/

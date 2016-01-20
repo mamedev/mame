@@ -67,7 +67,7 @@ const rom_entry *isa8_pc1640_iga_device::device_rom_region() const
 //  isa8_pc1640_iga_device - constructor
 //-------------------------------------------------
 
-isa8_pc1640_iga_device::isa8_pc1640_iga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+isa8_pc1640_iga_device::isa8_pc1640_iga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: isa8_ega_device(mconfig, ISA8_PC1640_IGA, "Amstrad PC1640 IGA", tag, owner, clock, "pc1640_iga", __FILE__)
 {
 }
@@ -79,7 +79,7 @@ isa8_pc1640_iga_device::isa8_pc1640_iga_device(const machine_config &mconfig, co
 
 void isa8_pc1640_iga_device::device_start()
 {
-	if (m_palette != NULL && !m_palette->started())
+	if (m_palette != nullptr && !m_palette->started())
 		throw device_missing_dependencies();
 
 	set_isa_device();

@@ -25,7 +25,7 @@ enum
 class tnzs_state : public driver_device
 {
 public:
-	tnzs_state(const machine_config &mconfig, device_type type, const char *tag)
+	tnzs_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -72,7 +72,7 @@ public:
 	optional_ioport m_an2;
 
 	/* sound-related */
-	INT16    *m_sampledata[MAX_SAMPLES];
+	std::unique_ptr<INT16[]>    m_sampledata[MAX_SAMPLES];
 	int      m_samplesize[MAX_SAMPLES];
 
 	/* misc / mcu */
@@ -107,7 +107,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_arknoid2_w);
 	DECLARE_READ8_MEMBER(mcu_extrmatn_r);
 	DECLARE_WRITE8_MEMBER(mcu_extrmatn_w);
-	DECLARE_WRITE8_MEMBER(tnzs_sync_kludge_w);
 	DECLARE_READ8_MEMBER(kageki_csport_r);
 	DECLARE_WRITE8_MEMBER(kageki_csport_w);
 	DECLARE_WRITE8_MEMBER(kabukiz_sound_bank_w);
@@ -136,9 +135,7 @@ public:
 	void screen_eof_tnzs(screen_device &screen, bool state);
 
 	INTERRUPT_GEN_MEMBER(arknoid2_interrupt);
-	TIMER_CALLBACK_MEMBER(kludge_callback);
 
-	void tnzs_postload();
 	void mcu_reset();
 	void mcu_handle_coins(int coin);
 };

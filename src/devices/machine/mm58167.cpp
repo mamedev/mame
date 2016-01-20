@@ -50,7 +50,7 @@ typedef enum
 //  mm58167_device - constructor
 //-------------------------------------------------
 
-mm58167_device::mm58167_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mm58167_device::mm58167_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MM58167, "National Semiconductor MM58167", tag, owner, clock, "mm58167", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		m_irq_w(*this)
@@ -93,7 +93,7 @@ void mm58167_device::device_reset()
 }
 
 
-INLINE UINT8 make_bcd(UINT8 data)
+static inline UINT8 make_bcd(UINT8 data)
 {
 	return ((data / 10) << 4) | (data % 10);
 }

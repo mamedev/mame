@@ -53,16 +53,16 @@ static const double tx1_engine_gains[16] =
 
 const device_type TX1 = &device_creator<tx1_sound_device>;
 
-tx1_sound_device::tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tx1_sound_device::tx1_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TX1, "TX-1 Audio Custom", tag, owner, clock, "tx1_sound", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 }
 
-tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_freq_to_step(0),
 		m_step0(0),
 		m_step1(0),
@@ -98,9 +98,9 @@ void tx1_sound_device::device_config_complete()
 
 void tx1_sound_device::device_start()
 {
-	static const int r0[4] = { 390e3, 180e3, 180e3, 180e3 };
-	static const int r1[3] = { 180e3, 390e3, 56e3 };
-	static const int r2[3] = { 390e3, 390e3, 180e3 };
+	static const int r0[4] = { static_cast<int>(390e3), static_cast<int>(180e3), static_cast<int>(180e3), static_cast<int>(180e3) };
+	static const int r1[3] = { static_cast<int>(180e3), static_cast<int>(390e3), static_cast<int>(56e3) };
+	static const int r2[3] = { static_cast<int>(390e3), static_cast<int>(390e3), static_cast<int>(180e3) };
 
 
 	/* Allocate the stream */
@@ -231,7 +231,7 @@ WRITE8_MEMBER( tx1_sound_device::ay8910_b_w )
 
  ***************************************************************************/
 
-INLINE void update_engine(int eng[4])
+static inline void update_engine(int eng[4])
 {
 	int p0 = eng[0];
 	int p1 = eng[1];
@@ -346,7 +346,7 @@ static const double bb_engine_gains[16] =
 
 const device_type BUGGYBOY = &device_creator<buggyboy_sound_device>;
 
-buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tx1_sound_device(mconfig, BUGGYBOY, "Buggy Boy Audio Custom", tag, owner, clock, "buggyboy_sound", __FILE__)
 {
 }
@@ -377,8 +377,8 @@ void buggyboy_sound_device::device_start()
 
 	compute_resistor_weights(0, 16384,  -1.0,
 							4,  &resistors[0], aweights, 0, 0,
-							0, 0, 0, 0, 0,
-							0, 0, 0, 0, 0 );
+							0, nullptr, nullptr, 0, 0,
+							0, nullptr, nullptr, 0, 0 );
 
 	for (i = 0; i < 16; i++)
 		m_eng_voltages[i] = combine_4_weights(aweights, BIT(tmp[i], 0), BIT(tmp[i], 1), BIT(tmp[i], 2), BIT(tmp[i], 3));
@@ -464,8 +464,8 @@ WRITE8_MEMBER( buggyboy_sound_device::ym2_b_w )
 
 	if (!strcmp(space.machine().system().name, "buggyboyjr"))
 	{
-		coin_counter_w(space.machine(), 0, data & 0x01);
-		coin_counter_w(space.machine(), 1, data & 0x02);
+		space.machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		space.machine().bookkeeping().coin_counter_w(1, data & 0x02);
 	}
 
 	/*

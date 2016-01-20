@@ -49,24 +49,24 @@ The sprite RAM format is very similar to the 053245.
 
 void k053247_device::clear_all()
 {
-	m_ram = 0;
-	m_gfx = 0;
+	m_ram = nullptr;
+	m_gfx = nullptr;
 
-	for (int i=0;i<8;i++)
-		m_kx46_regs[i] = 0;
+	for (auto & elem : m_kx46_regs)
+		elem = 0;
 
-	for (int i=0;i<16;i++)
-		m_kx47_regs[i] = 0;
+	for (auto & elem : m_kx47_regs)
+		elem = 0;
 
 	m_objcha_line = 0;
 	m_z_rejection = 0;
 
-	m_memory_region = 0;
+	m_memory_region = nullptr;
 }
 
 void k053247_device::k053247_get_ram( UINT16 **ram )
 {
-	*ram = m_ram;
+	*ram = m_ram.get();
 }
 
 int k053247_device::k053247_get_dx( void )
@@ -102,7 +102,7 @@ READ16_MEMBER( k053247_device::k053247_word_r )
 
 WRITE16_MEMBER( k053247_device::k053247_word_w )
 {
-	COMBINE_DATA(m_ram + offset);
+	COMBINE_DATA(m_ram.get() + offset);
 }
 
 READ8_MEMBER( k053247_device::k053247_r )
@@ -400,8 +400,8 @@ void k053247_device::k053247_sprites_draw_common( _BitmapClass &bitmap, const re
 		m_k053247_cb(&code, &color, &primask);
 
 		k053247_draw_single_sprite_gxcore( bitmap, cliprect,
-				NULL, NULL,
-				code, m_ram, offs,
+				nullptr, nullptr,
+				code, m_ram.get(), offs,
 				color,
 				/* gx only */
 				0, 0, 0, 0,
@@ -902,7 +902,7 @@ void k053247_device::zdrawgfxzoom32GP(
 
 const device_type K055673 = &device_creator<k055673_device>;
 
-k055673_device::k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k055673_device::k055673_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: k053247_device(mconfig, K055673, "K053246 & K055673 Sprite Generator", tag, owner, clock, "k055673", __FILE__)
 {
 }
@@ -967,7 +967,7 @@ void k055673_device::device_start()
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (m_gfxdecode->gfx(gfx_index) == 0)
+		if (m_gfxdecode->gfx(gfx_index) == nullptr)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
@@ -1023,13 +1023,13 @@ void k055673_device::device_start()
 	m_z_rejection = -1;
 	m_gfx = m_gfxdecode->gfx(gfx_index);
 	m_objcha_line = CLEAR_LINE;
-	m_ram = auto_alloc_array(machine(), UINT16, 0x1000/2);
+	m_ram = std::make_unique<UINT16[]>(0x1000/2);
 
-	memset(m_ram,  0, 0x1000);
+	memset(m_ram.get(),  0, 0x1000);
 	memset(m_kx46_regs, 0, 8);
 	memset(m_kx47_regs, 0, 32);
 
-	machine().save().save_pointer(NAME(m_ram), 0x800);
+	machine().save().save_pointer(NAME(m_ram.get()), 0x800);
 	machine().save().save_item(NAME(m_kx46_regs));
 	machine().save().save_item(NAME(m_kx47_regs));
 	machine().save().save_item(NAME(m_objcha_line));
@@ -1043,7 +1043,7 @@ void k055673_device::device_start()
 
 const device_type K053246 = &device_creator<k053247_device>;
 
-k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k053247_device::k053247_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053246, "K053246 & K053247 Sprite Generator", tag, owner, clock, "k053247", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_gfxdecode(*this),
@@ -1052,7 +1052,7 @@ k053247_device::k053247_device(const machine_config &mconfig, const char *tag, d
 	clear_all();
 }
 
-k053247_device::k053247_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+k053247_device::k053247_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
 		m_gfxdecode(*this),
@@ -1066,7 +1066,7 @@ k053247_device::k053247_device(const machine_config &mconfig, device_type type, 
 //  gfx decoder
 //-------------------------------------------------
 
-void k053247_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void k053247_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 {
 	downcast<k053247_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -1076,7 +1076,7 @@ void k053247_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 //  palette device
 //-------------------------------------------------
 
-void k053247_device::static_set_palette_tag(device_t &device, const char *tag)
+void k053247_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<k053247_device &>(device).m_palette.set_tag(tag);
 }
@@ -1087,10 +1087,6 @@ void k053247_device::static_set_palette_tag(device_t &device, const char *tag)
 
 void k053247_device::device_start()
 {
-//  bitmap_rgb32* blah;
-//  if (0)
-//      k053247_draw_single_sprite_gxcore(blah,
-
 	UINT32 total;
 	static const gfx_layout spritelayout =
 	{
@@ -1133,9 +1129,9 @@ void k053247_device::device_start()
 
 	m_gfx = m_gfxdecode->gfx(m_gfx_num);
 
-	m_ram = auto_alloc_array_clear(machine(), UINT16, 0x1000 / 2);
+	m_ram = make_unique_clear<UINT16[]>(0x1000 / 2);
 
-	save_pointer(NAME(m_ram), 0x1000 / 2);
+	save_pointer(NAME(m_ram.get()), 0x1000 / 2);
 	save_item(NAME(m_kx46_regs));
 	save_item(NAME(m_kx47_regs));
 	save_item(NAME(m_objcha_line));

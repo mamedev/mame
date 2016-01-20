@@ -9,7 +9,7 @@
 class qdrmfgp_state : public driver_device
 {
 public:
-	qdrmfgp_state(const machine_config &mconfig, device_type type, const char *tag)
+	qdrmfgp_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_nvram(*this, "nvram"),
@@ -53,7 +53,7 @@ public:
 	DECLARE_READ16_MEMBER(inputs_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(battery_sensor_r);
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	DECLARE_MACHINE_START(qdrmfgp);
 	DECLARE_VIDEO_START(qdrmfgp);

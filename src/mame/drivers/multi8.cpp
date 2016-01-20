@@ -25,7 +25,7 @@
 class multi8_state : public driver_device
 {
 public:
-	multi8_state(const machine_config &mconfig, device_type type, const char *tag)
+	multi8_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_ppi(*this, "ppi8255_0"),
@@ -66,9 +66,9 @@ public:
 	UINT16 m_knj_addr;
 	DECLARE_READ8_MEMBER(ay8912_0_r);
 	DECLARE_READ8_MEMBER(ay8912_1_r);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_multi8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	void multi8_draw_pixel(bitmap_ind16 &bitmap,int y,int x,UINT8 pen,UINT8 width);

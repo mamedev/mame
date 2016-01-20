@@ -219,7 +219,7 @@ struct bt471_t
 class mpu4vid_state : public mpu4_state
 {
 public:
-	mpu4vid_state(const machine_config &mconfig, device_type type, const char *tag)
+	mpu4vid_state(const machine_config &mconfig, device_type type, std::string tag)
 		: mpu4_state(mconfig, type, tag),
 		m_videocpu(*this, "video"),
 		m_scn2674(*this, "scn2674_vid"),
@@ -435,13 +435,13 @@ VIDEO_START_MEMBER(mpu4vid_state,mpu4_vid)
 
 	/* find first empty slot to decode gfx */
 	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
-		if (m_gfxdecode->gfx(m_gfx_index) == 0)
+		if (m_gfxdecode->gfx(m_gfx_index) == nullptr)
 			break;
 
 	assert(m_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index+0, global_alloc(gfx_element(m_palette, mpu4_vid_char_8x8_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index+0, std::make_unique<gfx_element>(m_palette, mpu4_vid_char_8x8_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0));
 }
 
 
@@ -1216,9 +1216,6 @@ MACHINE_START_MEMBER(mpu4vid_state,mpu4_vid)
 	/* setup communications */
 	m_link7a_connected = 1;
 
-	/* setup 8 mechanical meters */
-	MechMtr_config(machine(),8);
-
 	/* Hook the reset line */
 	m_videocpu->set_reset_callback(write_line_delegate(FUNC(mpu4vid_state::mpu_video_reset),this));
 }
@@ -1656,15 +1653,15 @@ static mpu4_chr_table quidgrid_data[64] = {
 };
 
 static mpu4_chr_table blank_data[72] = {
-{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},
-{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},
-{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},
-{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},
-{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},
-{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},
-{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},
-{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},
-{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},
+{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
+{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
 };
 
 

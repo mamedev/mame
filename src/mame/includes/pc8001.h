@@ -31,7 +31,7 @@
 class pc8001_state : public driver_device
 {
 public:
-	pc8001_state(const machine_config &mconfig, device_type type, const char *tag)
+	pc8001_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_rtc(*this, UPD1990A_TAG),
@@ -58,13 +58,12 @@ public:
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER( port10_w );
 	DECLARE_WRITE8_MEMBER( port30_w );
 	DECLARE_READ8_MEMBER( port40_r );
 	DECLARE_WRITE8_MEMBER( port40_w );
-	DECLARE_WRITE_LINE_MEMBER( crtc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	DECLARE_READ8_MEMBER( dma_mem_r );
 
@@ -83,7 +82,7 @@ public:
 class pc8001mk2_state : public pc8001_state
 {
 public:
-	pc8001mk2_state(const machine_config &mconfig, device_type type, const char *tag)
+	pc8001mk2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: pc8001_state(mconfig, type, tag),
 			m_kanji_rom(*this, "kanji")
 	{ }

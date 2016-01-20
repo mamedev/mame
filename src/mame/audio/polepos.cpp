@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Derrick Renaud
 /***************************************************************************
     polepos.c
@@ -51,14 +51,14 @@ const device_type POLEPOS = &device_creator<polepos_sound_device>;
 //  polepos_sound_device - constructor
 //-------------------------------------------------
 
-polepos_sound_device::polepos_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+polepos_sound_device::polepos_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, POLEPOS, "Pole Position Audio Custom", tag, owner, clock, "polepos_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_current_position(0),
 		m_sample_msb(0),
 		m_sample_lsb(0),
 		m_sample_enable(0),
-		m_stream(NULL)
+		m_stream(nullptr)
 {
 }
 

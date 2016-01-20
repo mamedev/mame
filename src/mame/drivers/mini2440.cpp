@@ -18,7 +18,7 @@
 class mini2440_state : public driver_device
 {
 public:
-	mini2440_state(const machine_config &mconfig, device_type type, const char *tag)
+	mini2440_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_s3c2440(*this, "s3c2440"),
@@ -38,8 +38,8 @@ public:
 
 	UINT32 m_port[9];
 	DECLARE_DRIVER_INIT(mini2440);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(mini2440_input_changed);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	DECLARE_READ32_MEMBER(s3c2440_gpio_port_r);

@@ -28,14 +28,14 @@ class joystick_interface_device : public device_t, public device_ioexp_interface
 {
 public:
 	// construction/destruction
-	joystick_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	joystick_interface_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( joystick_r );
 
 protected:
-	virtual ioport_constructor device_input_ports() const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	required_ioport m_joy0;

@@ -12,13 +12,13 @@ class nes_bf9093_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_bf9093_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_bf9093_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual void device_start() override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -28,14 +28,14 @@ class nes_bf9096_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_bf9096_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_bf9096_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_WRITE8_MEMBER(write_h);
-	virtual DECLARE_WRITE8_MEMBER(write_m) { write_h(space, offset, data, mem_mask); }
+	virtual void device_start() override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual DECLARE_WRITE8_MEMBER(write_m) override { write_h(space, offset, data, mem_mask); }
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 private:
 	UINT8 m_bank_base, m_latch;
@@ -48,13 +48,13 @@ class nes_golden5_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_golden5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_golden5_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual void device_start() override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 private:
 	UINT8 m_bank_base, m_latch;

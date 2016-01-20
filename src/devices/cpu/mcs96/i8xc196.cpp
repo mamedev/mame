@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "i8xc196.h"
 
-i8xc196_device::i8xc196_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+i8xc196_device::i8xc196_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	mcs96_device(mconfig, type, name, tag, owner, clock, 16, shortname, source)
 {
 }
@@ -29,7 +29,7 @@ void i8xc196_device::io_w8(UINT8 adr, UINT8 data)
 	case 1:
 		break;
 	default:
-		logerror("%s: io_w8 %02x, %02x (%04x)\n", tag(), adr, data, PPC);
+		logerror("%s: io_w8 %02x, %02x (%04x)\n", tag().c_str(), adr, data, PPC);
 	}
 	return;
 }
@@ -56,7 +56,7 @@ UINT8 i8xc196_device::io_r8(UINT8 adr)
 		return 0x00;
 	}
 	UINT8 data = 0x00;
-	logerror("%s: io_r8 %02x, %02x (%04x)\n", tag(), adr, data, PPC);
+	logerror("%s: io_r8 %02x, %02x (%04x)\n", tag().c_str(), adr, data, PPC);
 	return data;
 }
 
@@ -65,7 +65,7 @@ UINT16 i8xc196_device::io_r16(UINT8 adr)
 	if(adr < 2)
 		return 0x0000;
 	UINT16 data = 0x0000;
-	logerror("%s: io_r16 %02x, %04x (%04x)\n", tag(), adr, data, PPC);
+	logerror("%s: io_r16 %02x, %04x (%04x)\n", tag().c_str(), adr, data, PPC);
 	return data;
 }
 

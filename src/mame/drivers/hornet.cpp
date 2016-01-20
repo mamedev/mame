@@ -329,7 +329,7 @@
 class hornet_state : public driver_device
 {
 public:
-	hornet_state(const machine_config &mconfig, device_type type, const char *tag)
+	hornet_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_workram(*this, "workram"),
 		m_sharc_dataram0(*this, "sharc_dataram0"),
@@ -377,7 +377,7 @@ public:
 	emu_timer *m_sound_irq_timer;
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
-	UINT8 *m_jvs_sdata;
+	std::unique_ptr<UINT8[]> m_jvs_sdata;
 	UINT32 m_jvs_sdata_ptr;
 	UINT16 m_gn680_latch;
 	UINT16 m_gn680_ret0;
@@ -412,8 +412,8 @@ public:
 
 	DECLARE_DRIVER_INIT(hornet);
 	DECLARE_DRIVER_INIT(hornet_2board);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_RESET(hornet_2board);
 	UINT32 screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -487,7 +487,7 @@ UINT32 hornet_state::screen_update_hornet(screen_device &screen, bitmap_rgb32 &b
 
 UINT32 hornet_state::screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (strcmp(screen.tag(), ":lscreen") == 0)
+	if (screen.tag()==":lscreen")
 	{
 		device_t *voodoo = machine().device("voodoo0");
 		voodoo_update(voodoo, bitmap, cliprect);
@@ -495,7 +495,7 @@ UINT32 hornet_state::screen_update_hornet_2board(screen_device &screen, bitmap_r
 		/* TODO: tilemaps per screen */
 		m_k037122_1->tile_draw(screen, bitmap, cliprect);
 	}
-	else if (strcmp(screen.tag(), ":rscreen") == 0)
+	else if (screen.tag()==":rscreen")
 	{
 		device_t *voodoo = machine().device("voodoo1");
 		voodoo_update(voodoo, bitmap, cliprect);
@@ -652,7 +652,7 @@ WRITE32_MEMBER(hornet_state::comm_rombank_w)
 {
 	int bank = data >> 24;
 	UINT8 *usr3 = memregion("user3")->base();
-	if (usr3 != NULL)
+	if (usr3 != nullptr)
 		membank("bank1")->set_entry(bank & 0x7f);
 }
 
@@ -928,7 +928,7 @@ INPUT_PORTS_END
 void hornet_state::machine_start()
 {
 	m_jvs_sdata_ptr = 0;
-	m_jvs_sdata = auto_alloc_array_clear(machine(), UINT8, 1024);
+	m_jvs_sdata = make_unique_clear<UINT8[]>(1024);
 
 	/* set conservative DRC options */
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
@@ -938,7 +938,7 @@ void hornet_state::machine_start()
 
 	save_item(NAME(m_led_reg0));
 	save_item(NAME(m_led_reg1));
-	save_pointer(NAME(m_jvs_sdata), 1024);
+	save_pointer(NAME(m_jvs_sdata.get()), 1024);
 	save_item(NAME(m_jvs_sdata_ptr));
 
 	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hornet_state::sound_irq), this));
@@ -948,7 +948,7 @@ void hornet_state::machine_reset()
 {
 	UINT8 *usr3 = memregion("user3")->base();
 	UINT8 *usr5 = memregion("user5")->base();
-	if (usr3 != NULL)
+	if (usr3 != nullptr)
 	{
 		membank("bank1")->configure_entries(0, memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
 		membank("bank1")->set_entry(0);
@@ -1041,7 +1041,7 @@ MACHINE_RESET_MEMBER(hornet_state,hornet_2board)
 	UINT8 *usr3 = memregion("user3")->base();
 	UINT8 *usr5 = memregion("user5")->base();
 
-	if (usr3 != NULL)
+	if (usr3 != nullptr)
 	{
 		membank("bank1")->configure_entries(0, memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
 		membank("bank1")->set_entry(0);

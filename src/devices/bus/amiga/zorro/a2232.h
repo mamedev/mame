@@ -34,7 +34,7 @@ class a2232_device : public device_t, public device_zorro2_card_interface, publi
 {
 public:
 	// construction/destruction
-	a2232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a2232_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// cpu
 	WRITE8_MEMBER( int2_w );
@@ -101,15 +101,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rs232_7_cts_w );
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset_after_children();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset_after_children() override;
 
 	// device_zorro2_card_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w ) override;
 
 	// amiga_autoconfig overrides
-	virtual void autoconfig_base_address(offs_t address);
+	virtual void autoconfig_base_address(offs_t address) override;
 
 private:
 	enum

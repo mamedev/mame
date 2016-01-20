@@ -48,7 +48,7 @@
 class px4_state : public driver_device, public device_serial_interface
 {
 public:
-	px4_state(const machine_config &mconfig, device_type type, const char *tag) :
+	px4_state(const machine_config &mconfig, device_type type, std::string tag) :
 	driver_device(mconfig, type, tag),
 	device_serial_interface(mconfig, *this),
 	m_z80(*this, "maincpu"),
@@ -61,15 +61,13 @@ public:
 	m_sio(*this, "sio"),
 	m_rs232(*this, "rs232"),
 	m_caps1(*this, "capsule1"), m_caps2(*this, "capsule2"),
-	m_caps1_rom(NULL), m_caps2_rom(NULL),
+	m_caps1_rom(nullptr), m_caps2_rom(nullptr),
 	m_ctrl1(0), m_icrb(0), m_bankr(0),
-	m_isr(0), m_ier(0), m_str(0), m_sior(0xbf),
+	m_isr(0), m_ier(0), m_sior(0xbf),
 	m_frc_value(0), m_frc_latch(0),
 	m_vadr(0), m_yoff(0),
-	m_receive_timer(NULL), m_transmit_timer(NULL),
 	m_artdir(0xff), m_artdor(0xff), m_artsr(0), m_artcr(0),
-	m_swr(0),
-	m_one_sec_int_enabled(true), m_alarm_int_enabled(true), m_key_int_enabled(true),
+	m_one_sec_int_enabled(true),
 	m_key_status(0), m_interrupt_status(0),
 	m_time(), m_clock_state(0),
 	m_ear_last_state(0),
@@ -123,8 +121,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rs232_dcd_w );
 	DECLARE_WRITE_LINE_MEMBER( rs232_dsr_w );
 	DECLARE_WRITE_LINE_MEMBER( rs232_cts_w );
-	TIMER_CALLBACK_MEMBER( transmit_data );
-	TIMER_CALLBACK_MEMBER( receive_data );
 
 	// centronics
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
@@ -132,16 +128,16 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	// device_serial_interface overrides
-	virtual void tra_callback();
-	virtual void tra_complete();
-	virtual void rcv_callback();
-	virtual void rcv_complete();
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+	virtual void rcv_callback() override;
+	virtual void rcv_complete() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// z80 interrupt sources
@@ -204,7 +200,6 @@ private:
 	UINT8 m_bankr;
 	UINT8 m_isr;
 	UINT8 m_ier;
-	UINT8 m_str;
 	UINT8 m_sior;
 
 	// gapnit internal
@@ -216,8 +211,6 @@ private:
 	UINT8 m_yoff;
 
 	// gapnio
-	emu_timer *m_receive_timer;
-	emu_timer *m_transmit_timer;
 	UINT8 m_artdir;
 	UINT8 m_artdor;
 	UINT8 m_artsr;
@@ -226,7 +219,6 @@ private:
 
 	// 7508 internal
 	bool m_one_sec_int_enabled;
-	bool m_alarm_int_enabled;
 	bool m_key_int_enabled;
 
 	UINT8 m_key_status;
@@ -252,12 +244,12 @@ private:
 class px4p_state : public px4_state
 {
 public:
-	px4p_state(const machine_config &mconfig, device_type type, const char *tag) :
+	px4p_state(const machine_config &mconfig, device_type type, std::string tag) :
 	px4_state(mconfig, type, tag),
 	m_rdnvram(*this, "rdnvram"),
 	m_rdsocket(*this, "ramdisk_socket"),
 	m_ramdisk_address(0),
-	m_ramdisk(NULL)
+	m_ramdisk(nullptr)
 	{ }
 
 	DECLARE_DRIVER_INIT( px4p );
@@ -271,14 +263,14 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 private:
 	required_device<nvram_device> m_rdnvram;
 	required_device<generic_slot_device> m_rdsocket;
 
 	offs_t m_ramdisk_address;
-	UINT8 *m_ramdisk;
+	std::unique_ptr<UINT8[]> m_ramdisk;
 };
 
 
@@ -967,7 +959,7 @@ WRITE8_MEMBER( px4_state::artmr_w )
 	stop_bits_t stop_bits = BIT(data, 7) ? STOP_BITS_2 : STOP_BITS_1;
 
 	if (VERBOSE)
-		logerror("%s: serial frame setup: %d-%s-%d\n", tag(), data_bit_count, device_serial_interface::parity_tostring(parity), stop_bits);
+		logerror("%s: serial frame setup: %d-%s-%d\n", tag().c_str(), data_bit_count, device_serial_interface::parity_tostring(parity), stop_bits);
 
 	set_data_frame(1, data_bit_count, parity, stop_bits);
 }
@@ -1044,9 +1036,9 @@ WRITE8_MEMBER( px4_state::ioctlr_w )
 
 	// bit 3, cartridge reset
 
-	output_set_value("led_0", BIT(data, 4)); // caps lock
-	output_set_value("led_1", BIT(data, 5)); // num lock
-	output_set_value("led_2", BIT(data, 6)); // "led 2"
+	output().set_value("led_0", BIT(data, 4)); // caps lock
+	output().set_value("led_1", BIT(data, 5)); // num lock
+	output().set_value("led_2", BIT(data, 6)); // "led 2"
 
 	m_speaker->level_w(BIT(data, 7));
 }
@@ -1223,7 +1215,7 @@ DRIVER_INIT_MEMBER( px4p_state, px4p )
 	DRIVER_INIT_CALL(px4);
 
 	// reserve memory for external ram-disk
-	m_ramdisk = auto_alloc_array(machine(), UINT8, 0x20000);
+	m_ramdisk = std::make_unique<UINT8[]>(0x20000);
 }
 
 void px4_state::machine_start()
@@ -1248,7 +1240,7 @@ void px4_state::machine_reset()
 void px4p_state::machine_start()
 {
 	px4_state::machine_start();
-	m_rdnvram->set_base(m_ramdisk, 0x20000);
+	m_rdnvram->set_base(m_ramdisk.get(), 0x20000);
 }
 
 
@@ -1349,23 +1341,23 @@ static INPUT_PORTS_START( px4_h450a )
 	PORT_INCLUDE(px4_dips)
 
 	PORT_START("keyboard_0")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(ESC)) // 00
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(PAUSE))   // 01
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F6))    PORT_NAME("Help") // 02
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F1))    PORT_NAME("PF1")  // 03
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F2))    PORT_NAME("PF2")  // 04
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F6) PORT_CHAR(UCHAR_MAMEKEY(F3))    PORT_NAME("PF3")  // 05
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F7) PORT_CHAR(UCHAR_MAMEKEY(F4))    PORT_NAME("PF4")  // 06
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F5))    PORT_NAME("PF5")  // 07
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)nullptr) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(ESC)) // 00
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)nullptr) PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(PAUSE))   // 01
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)nullptr) PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F6))    PORT_NAME("Help") // 02
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)nullptr) PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F1))    PORT_NAME("PF1")  // 03
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)nullptr) PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F2))    PORT_NAME("PF2")  // 04
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)nullptr) PORT_CODE(KEYCODE_F6) PORT_CHAR(UCHAR_MAMEKEY(F3))    PORT_NAME("PF3")  // 05
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)nullptr) PORT_CODE(KEYCODE_F7) PORT_CHAR(UCHAR_MAMEKEY(F4))    PORT_NAME("PF4")  // 06
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)nullptr) PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F5))    PORT_NAME("PF5")  // 07
 	PORT_BIT(0x0000ff00, IP_ACTIVE_HIGH, IPT_UNUSED)    // 08-0f
-	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_ESC)  PORT_CHAR(UCHAR_MAMEKEY(CANCEL)) PORT_NAME("Stop")  // 10
-	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_1)   PORT_CHAR('1') PORT_CHAR('!')    // 11
-	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_2)   PORT_CHAR('2') PORT_CHAR('"')    // 12
-	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_3)   PORT_CHAR('3') PORT_CHAR('#')    // 13
-	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_4)   PORT_CHAR('4') PORT_CHAR('$')    // 14
-	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_5)   PORT_CHAR('5') PORT_CHAR('%')    // 15
-	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_6)   PORT_CHAR('6') PORT_CHAR('&')    // 16
-	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_7)   PORT_CHAR('7') PORT_CHAR('\'')   // 17
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)nullptr) PORT_CODE(KEYCODE_ESC)  PORT_CHAR(UCHAR_MAMEKEY(CANCEL)) PORT_NAME("Stop")  // 10
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)nullptr) PORT_CODE(KEYCODE_1)   PORT_CHAR('1') PORT_CHAR('!')    // 11
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)nullptr) PORT_CODE(KEYCODE_2)   PORT_CHAR('2') PORT_CHAR('"')    // 12
+	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)nullptr) PORT_CODE(KEYCODE_3)   PORT_CHAR('3') PORT_CHAR('#')    // 13
+	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)nullptr) PORT_CODE(KEYCODE_4)   PORT_CHAR('4') PORT_CHAR('$')    // 14
+	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)nullptr) PORT_CODE(KEYCODE_5)   PORT_CHAR('5') PORT_CHAR('%')    // 15
+	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)nullptr) PORT_CODE(KEYCODE_6)   PORT_CHAR('6') PORT_CHAR('&')    // 16
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)nullptr) PORT_CODE(KEYCODE_7)   PORT_CHAR('7') PORT_CHAR('\'')   // 17
 	PORT_BIT(0xff000000, IP_ACTIVE_HIGH, IPT_UNUSED)    // 18-1f
 
 	PORT_START("keyboard_1")
@@ -1520,12 +1512,12 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_TIMER_DRIVER_ADD("extcas_timer", px4_state, ext_cassette_read)
 
 	// sio port
-	MCFG_EPSON_SIO_ADD("sio", NULL)
+	MCFG_EPSON_SIO_ADD("sio", nullptr)
 	MCFG_EPSON_SIO_RX(WRITELINE(px4_state, sio_rx_w))
 	MCFG_EPSON_SIO_PIN(WRITELINE(px4_state, sio_pin_w))
 
 	// rs232 port
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(px4_state, rs232_rx_w))
 	MCFG_RS232_DCD_HANDLER(WRITELINE(px4_state, rs232_dcd_w))
 	MCFG_RS232_DSR_HANDLER(WRITELINE(px4_state, rs232_dsr_w))

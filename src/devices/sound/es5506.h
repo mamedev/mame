@@ -115,7 +115,7 @@ class es550x_device : public device_t,
 									public device_sound_interface
 {
 public:
-	es550x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	es550x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	~es550x_device() {}
 
 	static void set_region0(device_t &device, const char *region0) { downcast<es550x_device &>(device).m_region0 = region0; }
@@ -129,12 +129,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_stop();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_stop() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// internal state
 	sound_stream *m_stream;               /* which stream are we using */
@@ -154,10 +154,10 @@ protected:
 
 	es550x_voice m_voice[32];             /* the 32 voices */
 
-	INT32 *     m_scratch;
+	std::unique_ptr<INT32[]>     m_scratch;
 
-	INT16 *     m_ulaw_lookup;
-	UINT16 *    m_volume_lookup;
+	std::unique_ptr<INT16[]>     m_ulaw_lookup;
+	std::unique_ptr<UINT16[]>    m_volume_lookup;
 
 	#if MAKE_WAVS
 	void *      m_wavraw;                 /* raw waveform */
@@ -186,7 +186,7 @@ protected:
 class es5506_device : public es550x_device
 {
 public:
-	es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	es5506_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~es5506_device() {}
 
 	DECLARE_READ8_MEMBER( read );
@@ -195,10 +195,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 
 	void generate_samples(INT32 **outputs, int offset, int samples);
@@ -218,7 +218,7 @@ extern const device_type ES5506;
 class es5505_device : public es550x_device
 {
 public:
-	es5505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	es5505_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
@@ -226,9 +226,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	void generate_samples(INT32 **outputs, int offset, int samples);
 

@@ -26,7 +26,7 @@
 class tecnbras_state : public driver_device
 {
 public:
-	tecnbras_state(const machine_config &mconfig, device_type type, const char *tag)
+	tecnbras_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 	{ }
@@ -40,8 +40,8 @@ public:
 private:
 	int m_xcoord;
 	char m_digit[14][7];
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -60,9 +60,9 @@ ADDRESS_MAP_END
 DRIVER_INIT_MEMBER( tecnbras_state, tecnbras )
 {
 	m_xcoord = 0;
-	for (int x=0; x<14; x++){
+	for (auto & elem : m_digit){
 		for (int y=0; y<7; y++){
-			m_digit[x][y] = 0;
+			elem[y] = 0;
 		}
 	}
 }
@@ -79,7 +79,7 @@ WRITE8_MEMBER(tecnbras_state::print_column_w)
 		if((x/5) < ARRAY_LENGTH(m_digit)){
 			m_digit[x/5][i] &= ~(1 << (x%5));
 			m_digit[x/5][i] |= BIT(data, 7-i) ? (1 << (x%5)) : 0;
-			output_set_indexed_value("dmd_", (x/5)*7 + i, 0x1F & m_digit[x/5][i]);
+			output().set_indexed_value("dmd_", (x/5)*7 + i, 0x1F & m_digit[x/5][i]);
 		}
 	}
 }
@@ -89,7 +89,7 @@ void tecnbras_state::machine_start()
 /*
     for (int x=0; x<14; x++){
         for (int y=0; y<7; y++){
-            output_set_indexed_value("dmd_", x*7 + y, y);
+            output().set_indexed_value("dmd_", x*7 + y, y);
         }
     }
 */

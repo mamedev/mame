@@ -27,7 +27,7 @@ static const floppy_interface bml3_mp1805_floppy_interface =
 {
 	FLOPPY_STANDARD_3_SSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL
+	nullptr
 };
 
 WRITE_LINE_MEMBER( bml3bus_mp1805_device::bml3_mc6843_intrq_w )
@@ -92,7 +92,7 @@ WRITE8_MEMBER( bml3bus_mp1805_device::bml3_mp1805_w)
 	// TODO: MESS UI for flipping disk? Note that D88 images are double-sided, but the physical drive is single-sided
 	int side = 0;
 	int motor = BIT(data, 7);
-	const char *floppy_name = NULL;
+	const char *floppy_name = nullptr;
 	switch (drive_select) {
 	case 1:
 		drive = 0;
@@ -137,7 +137,7 @@ WRITE8_MEMBER( bml3bus_mp1805_device::bml3_mp1805_w)
 //  LIVE DEVICE
 //**************************************************************************
 
-bml3bus_mp1805_device::bml3bus_mp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+bml3bus_mp1805_device::bml3bus_mp1805_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, BML3BUS_MP1805, "Hitachi MP-1805 Floppy Controller Card", tag, owner, clock, "bml3mp1805", __FILE__),
 	device_bml3bus_card_interface(mconfig, *this),
 	m_mc6843(*this, "mc6843"), m_rom(nullptr)

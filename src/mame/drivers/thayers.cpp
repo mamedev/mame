@@ -42,7 +42,7 @@ public:
 		TIMER_SSI263_PHONEME_TICK
 	};
 
-	thayers_state(const machine_config &mconfig, device_type type, const char *tag)
+	thayers_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_pr7820(*this, "laserdisc"),
 		m_ldv1000(*this, "ldv1000"),
@@ -89,14 +89,14 @@ public:
 	DECLARE_READ8_MEMBER(ssi263_register_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_enter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_ready_r);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void check_interrupt();
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<10> m_row;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
@@ -382,8 +382,8 @@ READ8_MEMBER(thayers_state::dsw_b_r)
 
 READ8_MEMBER(thayers_state::laserdsc_data_r)
 {
-	if (m_ldv1000 != NULL) return m_ldv1000->status_r();
-	if (m_pr7820 != NULL) return m_pr7820->data_r();
+	if (m_ldv1000 != nullptr) return m_ldv1000->status_r();
+	if (m_pr7820 != nullptr) return m_pr7820->data_r();
 	return 0;
 }
 
@@ -409,16 +409,16 @@ WRITE8_MEMBER(thayers_state::laserdsc_control_w)
 
 	*/
 
-	coin_counter_w(machine(), 0, BIT(data, 4));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
 
 	if (BIT(data, 5))
 	{
-		if (m_ldv1000 != NULL)
+		if (m_ldv1000 != nullptr)
 		{
 			m_ldv1000->data_w(m_laserdisc_data);
 			m_ldv1000->enter_w(BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 		}
-		if (m_pr7820 != NULL)
+		if (m_pr7820 != nullptr)
 		{
 			m_pr7820->data_w(m_laserdisc_data);
 			m_pr7820_enter = BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE;
@@ -445,7 +445,7 @@ WRITE8_MEMBER(thayers_state::den1_w)
 
 	*/
 
-	output_set_digit_value(data >> 4, led_map[data & 0x0f]);
+	output().set_digit_value(data >> 4, led_map[data & 0x0f]);
 }
 
 WRITE8_MEMBER(thayers_state::den2_w)
@@ -465,7 +465,7 @@ WRITE8_MEMBER(thayers_state::den2_w)
 
 	*/
 
-	output_set_digit_value(8 + (data >> 4), led_map[data & 0x0f]);
+	output().set_digit_value(8 + (data >> 4), led_map[data & 0x0f]);
 }
 
 /* SSI-263 */
@@ -627,15 +627,15 @@ ADDRESS_MAP_END
 
 CUSTOM_INPUT_MEMBER(thayers_state::laserdisc_enter_r)
 {
-	if (m_pr7820 != NULL) return m_pr7820_enter;
-	if (m_ldv1000 != NULL) return (m_ldv1000->status_strobe_r() == ASSERT_LINE) ? 0 : 1;
+	if (m_pr7820 != nullptr) return m_pr7820_enter;
+	if (m_ldv1000 != nullptr) return (m_ldv1000->status_strobe_r() == ASSERT_LINE) ? 0 : 1;
 	return 0;
 }
 
 CUSTOM_INPUT_MEMBER(thayers_state::laserdisc_ready_r)
 {
-	if (m_pr7820 != NULL) return (m_pr7820->ready_r() == ASSERT_LINE) ? 0 : 1;
-	if (m_ldv1000 != NULL) return (m_ldv1000->command_strobe_r() == ASSERT_LINE) ? 0 : 1;
+	if (m_pr7820 != nullptr) return (m_pr7820->ready_r() == ASSERT_LINE) ? 0 : 1;
+	if (m_ldv1000 != nullptr) return (m_ldv1000->command_strobe_r() == ASSERT_LINE) ? 0 : 1;
 	return 0;
 }
 

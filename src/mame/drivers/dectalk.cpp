@@ -275,7 +275,7 @@ public:
 		TIMER_OUTFIFO_READ
 	};
 
-	dectalk_state(const machine_config &mconfig, device_type type, const char *tag)
+	dectalk_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dsp(*this, "dsp"),
@@ -330,7 +330,7 @@ public:
 	DECLARE_WRITE16_MEMBER(spc_outfifo_data_w);
 	DECLARE_READ16_MEMBER(spc_semaphore_r);
 	DECLARE_DRIVER_INIT(dectalk);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
 	void dectalk_outfifo_check ();
 	void dectalk_clear_all_fifos(  );
@@ -339,7 +339,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dectalk_reset);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

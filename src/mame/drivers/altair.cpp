@@ -28,7 +28,7 @@
 class altair_state : public driver_device
 {
 public:
-	altair_state(const machine_config &mconfig, device_type type, const char *tag) :
+	altair_state(const machine_config &mconfig, device_type type, std::string tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mc6850(*this, "mc6850"),
@@ -40,7 +40,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 private:
 	required_device<cpu_device> m_maincpu;

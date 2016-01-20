@@ -31,7 +31,7 @@ static MACHINE_CONFIG_FRAGMENT( cpc_rs232 )
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232",default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("rs232",default_rs232_devices,nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("dart",z80dart_device,rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("dart",z80dart_device,dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("dart",z80dart_device,ctsa_w))
@@ -39,7 +39,7 @@ static MACHINE_CONFIG_FRAGMENT( cpc_rs232 )
 
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(DEVWRITELINE("^", cpc_expansion_slot_device, irq_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
@@ -80,7 +80,7 @@ const rom_entry *cpc_ams_rs232_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_rs232_device::cpc_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cpc_rs232_device::cpc_rs232_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CPC_RS232, "Pace RS232C interface", tag, owner, clock, "cpc_ser", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this),
 	m_pit(*this,"pit"),
@@ -89,7 +89,7 @@ cpc_rs232_device::cpc_rs232_device(const machine_config &mconfig, const char *ta
 {
 }
 
-cpc_rs232_device::cpc_rs232_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+cpc_rs232_device::cpc_rs232_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_cpc_expansion_card_interface(mconfig, *this),
 	m_pit(*this,"pit"),
@@ -98,7 +98,7 @@ cpc_rs232_device::cpc_rs232_device(const machine_config &mconfig, device_type ty
 {
 }
 
-cpc_ams_rs232_device::cpc_ams_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cpc_ams_rs232_device::cpc_ams_rs232_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	cpc_rs232_device(mconfig, CPC_RS232_AMS, "Amstrad RS232C interface", tag, owner, clock, "cpc_serams", __FILE__)
 {
 }

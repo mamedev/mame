@@ -21,7 +21,7 @@ public:
 		TIMER_NMI
 	};
 
-	tmnt_state(const machine_config &mconfig, device_type type, const char *tag)
+	tmnt_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_tmnt2_rom(*this, "tmnt2_rom"),
@@ -166,7 +166,6 @@ public:
 	INTERRUPT_GEN_MEMBER(tmnt_interrupt);
 	INTERRUPT_GEN_MEMBER(punkshot_interrupt);
 	INTERRUPT_GEN_MEMBER(lgtnfght_interrupt);
-	void sound_nmi_callback( int param );
 	inline UINT32 tmnt2_get_word( UINT32 addr );
 	void tmnt2_put_word( address_space &space, UINT32 addr, UINT16 data );
 	DECLARE_WRITE8_MEMBER(volume_callback);
@@ -185,5 +184,5 @@ public:
 	SAMPLES_START_CB_MEMBER(tmnt_decode_sample);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

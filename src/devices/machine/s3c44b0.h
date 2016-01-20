@@ -505,7 +505,7 @@ struct s3c44b0_lcd_t
 {
 	s3c44b0_lcd_regs_t regs;
 	emu_timer *timer;
-	UINT8 *bitmap;
+	std::unique_ptr<UINT8[]> bitmap;
 	UINT32 vramaddr_cur;
 	UINT32 vramaddr_max;
 	UINT32 offsize;
@@ -600,7 +600,7 @@ enum
 class s3c44b0_device : public device_t
 {
 public:
-	s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s3c44b0_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~s3c44b0_device() {}
 
 	template<class _Object> static devcb_base &set_gpio_port_r_callback(device_t &device, _Object object) { return downcast<s3c44b0_device &>(device).m_port_r_cb.set_callback(object); }
@@ -652,8 +652,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state

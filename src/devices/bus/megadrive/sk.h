@@ -13,16 +13,16 @@ class md_rom_sk_device : public device_t,
 {
 public:
 	// construction/destruction
-	md_rom_sk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	md_rom_sk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_rom_sk_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	md_rom_sk_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read);
-	virtual DECLARE_WRITE16_MEMBER(write);
+	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual DECLARE_WRITE16_MEMBER(write) override;
 
 private:
 	required_device<md_cart_slot_device> m_exp;

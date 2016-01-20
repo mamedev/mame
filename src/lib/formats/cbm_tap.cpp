@@ -135,7 +135,7 @@ static int      len;
 
 
 /* This in fact gives the number of samples for half of the pulse */
-INLINE int tap_data_to_samplecount(int data, int frequency)
+static inline int tap_data_to_samplecount(int data, int frequency)
 {
 //  return (int) (0.5 * (0.5 + (((double)CBM_WAV_FREQUENCY / frequency) * (double)data)));      // MESS TZX formula
 	return (int) (0.5 * (((double)CBM_WAV_FREQUENCY / frequency) * (double)((data) + 0.5)));    // tap2wav formula
@@ -157,7 +157,7 @@ static void toggle_wave_data(void )
 
 static void cbm_output_wave( INT16 **buffer, int length )
 {
-	if (buffer == NULL)
+	if (buffer == nullptr)
 		return;
 
 	for( ; length > 0; length-- )
@@ -187,7 +187,7 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 	/* int waveamp_high, waveamp_low; */
 
 	/* Log .TAP info but only once */
-	if (!(buffer == NULL))
+	if (!(buffer == nullptr))
 	{
 		LOG_FORMATS("TAP version    : %d\n", version);
 		LOG_FORMATS("Machine type   : %d\n", system);
@@ -204,7 +204,7 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 	}
 
 	/* is the .tap file corrupted? */
-	if ((data == NULL) || (length <= CBM_HEADER_SIZE))
+	if ((data == nullptr) || (length <= CBM_HEADER_SIZE))
 		return -1;
 
 
@@ -321,7 +321,7 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 
 static int cbm_tap_to_wav_size( const UINT8 *tapdata, int taplen )
 {
-	int size = cbm_tap_do_work(NULL, taplen, tapdata);
+	int size = cbm_tap_do_work(nullptr, taplen, tapdata);
 	len = taplen;
 
 	return size;
@@ -364,7 +364,7 @@ static const struct CassetteFormat cbm_tap_cassette_format = {
 	"tap",
 	cbm_cassette_identify,
 	cbm_cassette_load,
-	NULL
+	nullptr
 };
 
 

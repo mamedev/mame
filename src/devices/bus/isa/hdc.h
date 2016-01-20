@@ -31,8 +31,8 @@ class xt_hdc_device :
 {
 public:
 	// construction/destruction
-	xt_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	xt_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	xt_hdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	xt_hdc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<xt_hdc_device &>(device).m_irq_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_handler(device_t &device, _Object object) { return downcast<xt_hdc_device &>(device).m_drq_handler.set_callback(object); }
@@ -53,9 +53,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	hard_disk_file *pc_hdc_file(int id);
 	void pc_hdc_result(int set_error_info);
 	int no_dma(void);
@@ -114,7 +114,7 @@ private:
 class ec1841_device : public xt_hdc_device
 {
 public:
-	ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ec1841_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 protected:
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;
@@ -123,7 +123,7 @@ protected:
 class st11m_device : public xt_hdc_device
 {
 public:
-	st11m_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	st11m_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
 	devcb_write_line m_irq_handler;
@@ -142,8 +142,8 @@ class isa8_hdc_device :
 {
 public:
 		// construction/destruction
-		isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-		isa8_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+		isa8_hdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+		isa8_hdc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 		DECLARE_READ8_MEMBER(pc_hdc_r);
 		DECLARE_WRITE8_MEMBER(pc_hdc_w);
@@ -152,16 +152,16 @@ public:
 		required_device<xt_hdc_device> m_hdc;
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
-		virtual const rom_entry *device_rom_region() const;
-		virtual ioport_constructor device_input_ports() const;
+		virtual machine_config_constructor device_mconfig_additions() const override;
+		virtual const rom_entry *device_rom_region() const override;
+		virtual ioport_constructor device_input_ports() const override;
 protected:
 		// device-level overrides
-		virtual void device_start();
-		virtual void device_reset();
+		virtual void device_start() override;
+		virtual void device_reset() override;
 public:
-		virtual UINT8 dack_r(int line);
-		virtual void dack_w(int line,UINT8 data);
+		virtual UINT8 dack_r(int line) override;
+		virtual void dack_w(int line,UINT8 data) override;
 		UINT8 pc_hdc_dipswitch_r();
 
 		int dip;                /* dip switches */
@@ -171,10 +171,10 @@ public:
 class isa8_hdc_ec1841_device : public isa8_hdc_device
 {
 public:
-	isa8_hdc_ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_hdc_ec1841_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	required_device<ec1841_device> m_hdc;
 };

@@ -67,7 +67,7 @@ device_plus4_expansion_card_interface::~device_plus4_expansion_card_interface()
 //  plus4_expansion_slot_device - constructor
 //-------------------------------------------------
 
-plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PLUS4_EXPANSION_SLOT, "Expansion Port", tag, owner, clock, "plus4_expansion_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this),
@@ -124,7 +124,7 @@ bool plus4_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			// TODO
 		}
@@ -147,7 +147,7 @@ bool plus4_expansion_slot_device::call_load()
 
 bool plus4_expansion_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 
 	return true;
 }
@@ -157,9 +157,9 @@ bool plus4_expansion_slot_device::call_softlist_load(software_list_device &swlis
 //  get_default_card_software -
 //-------------------------------------------------
 
-void plus4_expansion_slot_device::get_default_card_software(std::string &result)
+std::string plus4_expansion_slot_device::get_default_card_software()
 {
-	software_get_default_slot(result, "standard");
+	return software_get_default_slot("standard");
 }
 
 
@@ -169,7 +169,7 @@ void plus4_expansion_slot_device::get_default_card_software(std::string &result)
 
 UINT8 plus4_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		data = m_card->plus4_cd_r(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
 	}
@@ -184,7 +184,7 @@ UINT8 plus4_expansion_slot_device::cd_r(address_space &space, offs_t offset, UIN
 
 void plus4_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		m_card->plus4_cd_w(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
 	}

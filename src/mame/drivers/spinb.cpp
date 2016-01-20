@@ -40,7 +40,7 @@ ToDo:
 class spinb_state : public genpin_class
 {
 public:
-	spinb_state(const machine_config &mconfig, device_type type, const char *tag)
+	spinb_state(const machine_config &mconfig, device_type type, std::string tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
@@ -108,8 +108,8 @@ private:
 	UINT8 *m_p_audio;
 	UINT8 *m_p_music;
 	UINT8 *m_p_dmdcpu;
-	virtual void machine_reset();
-	virtual void machine_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_musiccpu;

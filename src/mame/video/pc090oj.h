@@ -6,12 +6,12 @@
 class pc090oj_device : public device_t
 {
 public:
-	pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc090oj_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~pc090oj_device() {}
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 	static void set_gfx_region(device_t &device, int gfxregion) { downcast<pc090oj_device &>(device).m_gfxnum = gfxregion; }
 	static void set_usebuffer(device_t &device, int use_buf) { downcast<pc090oj_device &>(device).m_use_buffer = use_buf; }
 	static void set_offsets(device_t &device, int x_offset, int y_offset)
@@ -30,8 +30,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	/* NB: pc090oj_ctrl is the internal register controlling flipping
@@ -47,8 +47,8 @@ private:
 	UINT16     m_ctrl;
 	UINT16     m_sprite_ctrl;
 
-	UINT16 *   m_ram;
-	UINT16 *   m_ram_buffered;
+	std::unique_ptr<UINT16[]>  m_ram;
+	std::unique_ptr<UINT16[]>  m_ram_buffered;
 
 	int        m_gfxnum;
 	int        m_x_offset, m_y_offset;

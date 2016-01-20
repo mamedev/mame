@@ -60,12 +60,12 @@
 class hp16500_state : public driver_device
 {
 public:
-	hp16500_state(const machine_config &mconfig, device_type type, const char *tag)
+	hp16500_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU_TAG)
 		{ }
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

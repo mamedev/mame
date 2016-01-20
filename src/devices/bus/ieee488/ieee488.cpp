@@ -63,7 +63,7 @@ device_ieee488_interface::~device_ieee488_interface()
 //  ieee488_slot_device - constructor
 //-------------------------------------------------
 
-ieee488_slot_device::ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ieee488_slot_device::ieee488_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, IEEE488_SLOT, "IEEE-488 slot", tag, owner, clock, "ieee488_slot", __FILE__),
 		device_slot_interface(mconfig, *this), m_address(0)
 {
@@ -76,12 +76,12 @@ ieee488_slot_device::ieee488_slot_device(const machine_config &mconfig, const ch
 
 void ieee488_slot_device::device_start()
 {
-	ieee488_device* bus = NULL;
+	ieee488_device* bus = nullptr;
 
-	for (device_t *device = owner(); device != NULL; device = device->owner())
+	for (device_t *device = owner(); device != nullptr; device = device->owner())
 	{
 		bus = device->subdevice<ieee488_device>(IEEE488_TAG);
-		if (bus != NULL) break;
+		if (bus != nullptr) break;
 	}
 
 	assert(bus);
@@ -100,7 +100,7 @@ void ieee488_slot_device::device_start()
 //  ieee488_device - constructor
 //-------------------------------------------------
 
-ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ieee488_device::ieee488_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, IEEE488, "IEEE-488 bus", tag, owner, clock, "ieee488", __FILE__),
 		m_write_eoi(*this),
 		m_write_dav(*this),
@@ -112,9 +112,9 @@ ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, d
 		m_write_ren(*this),
 		m_dio(0xff)
 {
-	for (int i = 0; i < SIGNAL_COUNT; i++)
+	for (auto & elem : m_line)
 	{
-		m_line[i] = 1;
+		elem = 1;
 	}
 }
 
@@ -153,7 +153,7 @@ void ieee488_device::device_stop()
 
 void ieee488_device::add_device(ieee488_slot_device *slot, device_t *target)
 {
-	daisy_entry *entry = global_alloc(daisy_entry(target));
+	auto entry = global_alloc(daisy_entry(target));
 
 	entry->m_interface->m_bus = this;
 	entry->m_interface->m_slot = slot;
@@ -167,14 +167,14 @@ void ieee488_device::add_device(ieee488_slot_device *slot, device_t *target)
 //-------------------------------------------------
 
 ieee488_device::daisy_entry::daisy_entry(device_t *device)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_device(device),
-		m_interface(NULL),
+		m_interface(nullptr),
 		m_dio(0xff)
 {
-	for (int i = 0; i < SIGNAL_COUNT; i++)
+	for (auto & elem : m_line)
 	{
-		m_line[i] = 1;
+		elem = 1;
 	}
 
 	device->interface(m_interface);
@@ -193,7 +193,7 @@ void ieee488_device::set_signal(device_t *device, int signal, int state)
 	{
 		if (m_line[signal] != state)
 		{
-			if (LOG) logerror("%s IEEE488: '%s' %s %u\n", machine().describe_context(), tag(), SIGNAL_NAME[signal], state);
+			if (LOG) logerror("%s IEEE488: '%s' %s %u\n", machine().describe_context(), tag().c_str(), SIGNAL_NAME[signal], state);
 			m_line[signal] = state;
 			changed = true;
 		}
@@ -204,11 +204,11 @@ void ieee488_device::set_signal(device_t *device, int signal, int state)
 
 		while (entry)
 		{
-			if (!strcmp(entry->m_device->tag(), device->tag()))
+			if (entry->m_device->tag() == device->tag())
 			{
 				if (entry->m_line[signal] != state)
 				{
-					if (LOG) logerror("%s IEEE488: '%s' %s %u\n", machine().describe_context(), device->tag(), SIGNAL_NAME[signal], state);
+					if (LOG) logerror("%s IEEE488: '%s' %s %u\n", machine().describe_context(), device->tag().c_str(), SIGNAL_NAME[signal], state);
 					entry->m_line[signal] = state;
 					changed = true;
 				}
@@ -317,7 +317,7 @@ void ieee488_device::set_data(device_t *device, UINT8 data)
 {
 	if (device == this)
 	{
-		if (LOG) logerror("%s IEEE488: '%s' DIO %02x\n", machine().describe_context(), tag(), data);
+		if (LOG) logerror("%s IEEE488: '%s' DIO %02x\n", machine().describe_context(), tag().c_str(), data);
 
 		m_dio = data;
 	}
@@ -327,11 +327,11 @@ void ieee488_device::set_data(device_t *device, UINT8 data)
 
 		while (entry)
 		{
-			if (!strcmp(entry->m_device->tag(), device->tag()))
+			if (entry->m_device->tag() == device->tag())
 			{
 				if (entry->m_dio != data)
 				{
-					if (LOG) logerror("%s IEEE488: '%s' DIO %02x\n", machine().describe_context(), device->tag(), data);
+					if (LOG) logerror("%s IEEE488: '%s' DIO %02x\n", machine().describe_context(), device->tag().c_str(), data);
 					entry->m_dio = data;
 				}
 			}

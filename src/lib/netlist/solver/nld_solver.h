@@ -125,9 +125,9 @@ public:
 	}
 
 	/* netdevice functions */
-	ATTR_HOT  virtual void update();
-	virtual void start();
-	virtual void reset();
+	ATTR_HOT  virtual void update() override;
+	virtual void start() override;
+	virtual void reset() override;
 
 	ATTR_COLD int get_net_idx(net_t *net);
 
@@ -186,15 +186,15 @@ public:
 	virtual ~NETLIB_NAME(solver)();
 
 	ATTR_COLD void post_start();
-	ATTR_COLD void stop();
+	ATTR_COLD void stop() override;
 
 	ATTR_HOT inline nl_double gmin() { return m_gmin.Value(); }
 
 protected:
-	ATTR_HOT void update();
-	ATTR_HOT void start();
-	ATTR_HOT void reset();
-	ATTR_HOT void update_param();
+	ATTR_HOT void update() override;
+	ATTR_HOT void start() override;
+	ATTR_HOT void reset() override;
+	ATTR_HOT void update_param() override;
 
 	logic_input_t m_fb_step;
 	logic_output_t m_Q_step;

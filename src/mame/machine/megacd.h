@@ -42,7 +42,7 @@
 class sega_segacd_device : public device_t, public device_gfx_interface
 {
 public:
-	sega_segacd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	sega_segacd_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	required_device<cpu_device> m_scdcpu;
 	required_device<rf5c68_device> m_rfsnd;
@@ -96,8 +96,6 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER( irq3_timer_callback );
 	TIMER_DEVICE_CALLBACK_MEMBER( stamp_timer_callback );
-
-	UINT16 handle_segacd_sub_int_callback(int irqline);
 
 	inline void write_pixel(UINT8 pix, int pixeloffset);
 	UINT16 segacd_1meg_mode_word_read(int offset, UINT16 mem_mask);
@@ -212,12 +210,12 @@ public:
 	void SegaCD_CDC_Do_DMA( int &dmacount, UINT8 *CDC_BUFFER, UINT16 &dma_addrc, UINT16 &destination );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// optional information overrides
 //  virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 private:
 //  virtual void device_config_complete();
 
@@ -227,7 +225,7 @@ private:
 class sega_segacd_us_device : public sega_segacd_device
 {
 	public:
-		sega_segacd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		sega_segacd_us_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	protected:
 
 };
@@ -235,7 +233,7 @@ class sega_segacd_us_device : public sega_segacd_device
 class sega_segacd_japan_device : public sega_segacd_device
 {
 	public:
-		sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		sega_segacd_japan_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	protected:
 //      virtual machine_config_constructor device_mconfig_additions() const;
 };
@@ -243,7 +241,7 @@ class sega_segacd_japan_device : public sega_segacd_device
 class sega_segacd_europe_device : public sega_segacd_device
 {
 	public:
-		sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		sega_segacd_europe_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	protected:
 //      virtual machine_config_constructor device_mconfig_additions() const;
 };

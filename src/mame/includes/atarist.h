@@ -80,7 +80,7 @@ public:
 		TIMER_BLITTER_TICK
 	};
 
-	st_state(const machine_config &mconfig, device_type type, const char *tag)
+	st_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M68000_TAG),
 			m_fdc(*this, WD1772_TAG),
@@ -153,9 +153,9 @@ public:
 	optional_ioport m_mousey;
 	optional_ioport m_config;
 
-	void machine_start();
+	void machine_start() override;
 
-	void video_start();
+	void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -335,13 +335,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 class megast_state : public st_state
 {
 public:
-	megast_state(const machine_config &mconfig, device_type type, const char *tag)
+	megast_state(const machine_config &mconfig, device_type type, std::string tag)
 		: st_state(mconfig, type, tag)
 	{ }
 
@@ -358,16 +358,16 @@ public:
 		TIMER_MICROWIRE_TICK
 	};
 
-	ste_state(const machine_config &mconfig, device_type type, const char *tag)
+	ste_state(const machine_config &mconfig, device_type type, std::string tag)
 		: st_state(mconfig, type, tag),
 			m_lmc1992(*this, LMC1992_TAG)
 	{ }
 
 	optional_device<lmc1992_device> m_lmc1992;
 
-	void machine_start();
+	void machine_start() override;
 
-	void video_start();
+	void video_start() override;
 
 	DECLARE_READ8_MEMBER( shifter_base_low_r );
 	DECLARE_WRITE8_MEMBER( shifter_base_low_w );
@@ -393,7 +393,6 @@ public:
 	DECLARE_READ16_MEMBER( microwire_mask_r );
 	DECLARE_WRITE16_MEMBER( microwire_mask_w );
 
-	DECLARE_READ8_MEMBER( mfp_gpio_r );
 	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
 	void dmasound_set_state(int level);
@@ -428,17 +427,17 @@ public:
 	emu_timer *m_dmasound_timer;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 class megaste_state : public ste_state
 {
 public:
-	megaste_state(const machine_config &mconfig, device_type type, const char *tag)
+	megaste_state(const machine_config &mconfig, device_type type, std::string tag)
 		: ste_state(mconfig, type, tag)
 	{ }
 
-	void machine_start();
+	void machine_start() override;
 
 	DECLARE_READ16_MEMBER( cache_r );
 	DECLARE_WRITE16_MEMBER( cache_w );
@@ -449,15 +448,15 @@ public:
 class stbook_state : public ste_state
 {
 public:
-	stbook_state(const machine_config &mconfig, device_type type, const char *tag)
+	stbook_state(const machine_config &mconfig, device_type type, std::string tag)
 		: ste_state(mconfig, type, tag),
 			m_sw400(*this, "SW400")
 	{ }
 
 	required_ioport m_sw400;
 
-	void machine_start();
-	void video_start();
+	void machine_start() override;
+	void video_start() override;
 
 	DECLARE_READ16_MEMBER( config_r );
 	DECLARE_WRITE16_MEMBER( lcd_control_w );

@@ -170,7 +170,7 @@ ADDRESS_MAP_END
 //  lc8670_cpu_device - constructor
 //-------------------------------------------------
 
-lc8670_cpu_device::lc8670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+lc8670_cpu_device::lc8670_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, LC8670, "Sanyo LC8670", tag, owner, clock, "lc8670", __FILE__),
 		m_program_config("program", ENDIANNESS_BIG, 8, 16, 0),
 		m_data_config("data", ENDIANNESS_BIG, 8, 9, 0, ADDRESS_MAP_NAME(lc8670_internal_map)),
@@ -369,7 +369,7 @@ void lc8670_cpu_device::state_import(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void lc8670_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void lc8670_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -396,7 +396,7 @@ const address_space_config * lc8670_cpu_device::memory_space_config(address_spac
 	return  (spacenum == AS_PROGRAM) ? &m_program_config :
 			(spacenum == AS_DATA) ? &m_data_config :
 			(spacenum == AS_IO) ? &m_io_config :
-			NULL;
+			nullptr;
 }
 
 //-------------------------------------------------
@@ -418,7 +418,7 @@ void lc8670_cpu_device::execute_run()
 
 		debugger_instruction_hook(this, m_pc);
 
-		int cycles = 0;
+		int cycles;
 		m_ppc = m_pc;
 
 		if (REG_PCON & HALT_MODE)
@@ -625,13 +625,13 @@ void lc8670_cpu_device::check_irqs()
 		// IRQ with less priority of current interrupt are not executed until the end of the current interrupt routine
 		if (irq != 0 && ((m_irq_lev & (1<<priority)) || (priority == 0 && (m_irq_lev & 0x06)) || (priority == 1 && (m_irq_lev & 0x04))))
 		{
-			if (LOG_IRQ)    logerror("%s: interrupt %d (Priority=%d, Level=%d) delayed\n", tag(), irq, priority, m_irq_lev);
+			if (LOG_IRQ)    logerror("%s: interrupt %d (Priority=%d, Level=%d) delayed\n", tag().c_str(), irq, priority, m_irq_lev);
 			irq = 0;
 		}
 
 		if (irq != 0)
 		{
-			if (LOG_IRQ)    logerror("%s: interrupt %d (Priority=%d, Level=%d) executed\n", tag(), irq, priority, m_irq_lev);
+			if (LOG_IRQ)    logerror("%s: interrupt %d (Priority=%d, Level=%d) executed\n", tag().c_str(), irq, priority, m_irq_lev);
 
 			m_irq_lev |= (1<<priority);
 
@@ -672,7 +672,7 @@ void lc8670_cpu_device::base_timer_tick()
 
 		if (base_counter_h & 0x40)
 		{
-			if (LOG_TIMERS) logerror("%s: base timer 0 overflow, IRQ: %d\n", tag(), BIT(REG_BTCR,0));
+			if (LOG_TIMERS) logerror("%s: base timer 0 overflow, IRQ: %d\n", tag().c_str(), BIT(REG_BTCR,0));
 			REG_BTCR |= 0x02;
 			if (REG_BTCR & 0x01)
 				set_irq_flag(4);
@@ -701,7 +701,7 @@ void lc8670_cpu_device::base_timer_tick()
 
 		if (bt1_req)
 		{
-			if (LOG_TIMERS) logerror("%s: base timer 1 overflow, IRQ: %d\n", tag(), BIT(REG_BTCR,3));
+			if (LOG_TIMERS) logerror("%s: base timer 1 overflow, IRQ: %d\n", tag().c_str(), BIT(REG_BTCR,3));
 			REG_BTCR |= 0x08;
 			if (REG_BTCR & 0x04)
 				set_irq_flag(4);
@@ -726,7 +726,7 @@ void lc8670_cpu_device::timer0_prescaler_tick()
 	UINT16 prescaler = m_timer0_prescaler + 1;
 	if (prescaler & 0x100)
 	{
-		if (LOG_TIMERS) logerror("%s: timer0 prescaler overflow\n", tag());
+		if (LOG_TIMERS) logerror("%s: timer0 prescaler overflow\n", tag().c_str());
 
 		if ((REG_ISL & 0x30) == 0x30)
 			base_timer_tick();
@@ -758,7 +758,7 @@ void lc8670_cpu_device::timer0_tick(bool ext_line)
 
 				if (timer0 & 0x10000)
 				{
-					if (LOG_TIMERS) logerror("%s: timer0 long overflow, IRQ: %d\n", tag(), BIT(REG_T0CNT,3));
+					if (LOG_TIMERS) logerror("%s: timer0 long overflow, IRQ: %d\n", tag().c_str(), BIT(REG_T0CNT,3));
 					m_timer0[0] = REG_T0LR;
 					m_timer0[1] = REG_T0HR;
 					REG_T0CNT |= 0x0a;
@@ -781,7 +781,7 @@ void lc8670_cpu_device::timer0_tick(bool ext_line)
 
 				if (timer0l & 0x100)
 				{
-					if (LOG_TIMERS) logerror("%s: timer0 low overflow, IRQ: %d\n", tag(), BIT(REG_T0CNT,0));
+					if (LOG_TIMERS) logerror("%s: timer0 low overflow, IRQ: %d\n", tag().c_str(), BIT(REG_T0CNT,0));
 					m_timer0[0] = REG_T0LR;
 					REG_T0CNT |= 0x02;
 					if (REG_T0CNT & 0x01)
@@ -797,7 +797,7 @@ void lc8670_cpu_device::timer0_tick(bool ext_line)
 				UINT16 timer0h = m_timer0[1] + 1;
 				if (timer0h & 0x100)
 				{
-					if (LOG_TIMERS) logerror("%s: timer0 high overflow, IRQ: %d\n", tag(), BIT(REG_T0CNT,3));
+					if (LOG_TIMERS) logerror("%s: timer0 high overflow, IRQ: %d\n", tag().c_str(), BIT(REG_T0CNT,3));
 					m_timer0[1] = REG_T0HR;
 					REG_T0CNT |= 0x08;
 					if (REG_T0CNT & 0x04)
@@ -834,7 +834,7 @@ void lc8670_cpu_device::timer1_tick()
 
 					if (timer1h & 0x100)
 					{
-						if (LOG_TIMERS) logerror("%s: timer1 long overflow, IRQ: %d\n", tag(), BIT(REG_T1CNT,3));
+						if (LOG_TIMERS) logerror("%s: timer1 long overflow, IRQ: %d\n", tag().c_str(), BIT(REG_T1CNT,3));
 						m_timer1[1] = REG_T1HR;
 						REG_T1CNT |= 0x08;
 						if (REG_T1CNT & 0x05)
@@ -863,7 +863,7 @@ void lc8670_cpu_device::timer1_tick()
 
 				if (timer1l & 0x100)
 				{
-					if (LOG_TIMERS) logerror("%s: timer1 low overflow, IRQ: %d\n", tag(), BIT(REG_T1CNT,0));
+					if (LOG_TIMERS) logerror("%s: timer1 low overflow, IRQ: %d\n", tag().c_str(), BIT(REG_T1CNT,0));
 					m_timer1[0] = REG_T1LR;
 					update_port1(m_p1_data & 0x7f);
 					REG_T1CNT |= 0x02;
@@ -881,7 +881,7 @@ void lc8670_cpu_device::timer1_tick()
 
 				if (timer1h & 0x100)
 				{
-					if (LOG_TIMERS) logerror("%s: timer1 high overflow, IRQ: %d\n", tag(), BIT(REG_T1CNT,3));
+					if (LOG_TIMERS) logerror("%s: timer1 high overflow, IRQ: %d\n", tag().c_str(), BIT(REG_T1CNT,3));
 					m_timer1[1] = REG_T1HR;
 					REG_T1CNT |= 0x08;
 					if (REG_T1CNT & 0x04)
@@ -1135,7 +1135,7 @@ inline UINT8 lc8670_cpu_device::pop()
 inline UINT16 lc8670_cpu_device::get_addr()
 {
 	int mode = m_op & 0x0f;
-	UINT16 addr = 0;
+	UINT16 addr;
 
 	if (mode > 0x01 && mode <= 0x03)
 		addr = GET_D9;
@@ -1150,7 +1150,7 @@ inline UINT16 lc8670_cpu_device::get_addr()
 inline UINT8 lc8670_cpu_device::get_data()
 {
 	int mode = m_op & 0x0f;
-	UINT8 data = 0;
+	UINT8 data;
 
 	if (mode == 0x01)
 		data = GET_I8;
@@ -1211,13 +1211,13 @@ inline void lc8670_cpu_device::check_p3int()
 
 inline void lc8670_cpu_device::set_irq_flag(int source)
 {
-	if (LOG_IRQ)    logerror("%s: set interrupt flag: %d\n", tag(), source);
+	if (LOG_IRQ)    logerror("%s: set interrupt flag: %d\n", tag().c_str(), source);
 	m_irq_flag |= 1<<source;
 }
 
 int lc8670_cpu_device::decode_op(UINT8 op)
 {
-	int idx = 0;
+	int idx;
 	switch (op & 0x0f)
 	{
 		case 0: case 1:

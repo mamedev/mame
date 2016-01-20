@@ -19,7 +19,7 @@
 class jonos_state : public driver_device
 {
 public:
-	jonos_state(const machine_config &mconfig, device_type type, const char *tag)
+	jonos_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
@@ -30,8 +30,8 @@ public:
 	required_shared_ptr<UINT8> m_p_videoram;
 private:
 	const UINT8 *m_p_chargen;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 };
 

@@ -26,7 +26,7 @@
 class sprint2_state : public driver_device
 {
 public:
-	sprint2_state(const machine_config &mconfig, device_type type, const char *tag)
+	sprint2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
@@ -72,7 +72,7 @@ public:
 	DECLARE_DRIVER_INIT(dominos);
 	DECLARE_DRIVER_INIT(dominos4);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sprint2);
 	UINT32 screen_update_sprint2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sprint2(screen_device &screen, bool state);

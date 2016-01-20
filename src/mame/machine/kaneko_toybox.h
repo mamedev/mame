@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:David Haywood, Luca Elia, Sebastien Volpe
 /* Kaneko Toybox */
 
@@ -335,7 +335,7 @@ static const UINT8 decryption_table_alt[0x100] = {
 class kaneko_toybox_device : public device_t
 {
 public:
-	kaneko_toybox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kaneko_toybox_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void set_table(device_t &device, int tabletype);
 	static void set_game_type(device_t &device, int gametype);
@@ -347,8 +347,8 @@ public:
 	DECLARE_READ16_MEMBER(mcu_status_r);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	required_shared_ptr<UINT16> m_mcuram;

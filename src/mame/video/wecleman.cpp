@@ -825,6 +825,7 @@ void wecleman_state::hotchase_draw_road(bitmap_ind16 &bitmap, const rectangle &c
 ***************************************************************************/
 
 // new video and palette code
+// TODO: remove me.
 WRITE16_MEMBER(wecleman_state::wecleman_videostatus_w)
 {
 	COMBINE_DATA(m_videostatus);
@@ -1022,7 +1023,7 @@ UINT32 wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rgb3
 
 	video_on = m_irqctrl & 0x40;
 
-	set_led_status(machine(), 0, m_selected_ip & 0x04); // Start lamp
+	output().set_led_value(0, m_selected_ip & 0x04); // Start lamp
 
 	fg_y = (m_txtram[0x0f24>>1] & (TILEMAP_DIMY - 1));
 	bg_y = (m_txtram[0x0f26>>1] & (TILEMAP_DIMY - 1));
@@ -1108,7 +1109,7 @@ UINT32 wecleman_state::screen_update_hotchase(screen_device &screen, bitmap_ind1
 
 	video_on = m_irqctrl & 0x40;
 
-	set_led_status(machine(), 0, m_selected_ip & 0x04); // Start lamp
+	output().set_led_value(0, m_selected_ip & 0x04); // Start lamp
 
 	get_sprite_info();
 

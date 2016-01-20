@@ -96,7 +96,7 @@ class ttl74123_device :  public device_t
 {
 public:
 	// construction/destruction
-	ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ttl74123_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void set_connection_type(device_t &device, int type) { downcast<ttl74123_device &>(device).m_connection_type = type; }
 	static void set_resistor_value(device_t &device, double value) { downcast<ttl74123_device &>(device).m_res = value; }
@@ -113,10 +113,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load() { }
-	virtual void device_clock_changed() { }
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override { }
+	virtual void device_clock_changed() override { }
 
 	TIMER_CALLBACK_MEMBER( output_callback );
 	TIMER_CALLBACK_MEMBER( clear_callback );
@@ -125,10 +125,8 @@ private:
 
 	int timer_running();
 	void start_pulse();
-	void output(INT32 param);
 	void set_output();
 	attotime compute_duration();
-	void clear();
 
 	emu_timer *m_timer;
 	int m_connection_type;  /* the hook up type - one of the constants above */

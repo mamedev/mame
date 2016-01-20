@@ -16,7 +16,7 @@
 
 const device_type KANEKO_GRAP2 = &device_creator<kaneko_grap2_device>;
 
-kaneko_grap2_device::kaneko_grap2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+kaneko_grap2_device::kaneko_grap2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, KANEKO_GRAP2, "Kaneko GRAP2", tag, owner, clock, "kaneko_grap2", __FILE__),
 	m_palette(*this)
 {
@@ -35,7 +35,7 @@ void kaneko_grap2_device::set_chipnum(device_t &device, int chipnum)
 //  palette device
 //-------------------------------------------------
 
-void kaneko_grap2_device::static_set_palette_tag(device_t &device, const char *tag)
+void kaneko_grap2_device::static_set_palette_tag(device_t &device, std::string tag)
 {
 	downcast<kaneko_grap2_device &>(device).m_palette.set_tag(tag);
 }
@@ -43,15 +43,15 @@ void kaneko_grap2_device::static_set_palette_tag(device_t &device, const char *t
 
 void kaneko_grap2_device::device_start()
 {
-	m_framebuffer = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x80000/2);
-	m_framebuffer_palette = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x200/2);
-	m_framebuffer_unk1 = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x400/2);
-	m_framebuffer_unk2 = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x400/2);
+	m_framebuffer = make_unique_clear<UINT16[]>(0x80000/2);
+	m_framebuffer_palette = make_unique_clear<UINT16[]>(0x200/2);
+	m_framebuffer_unk1 = make_unique_clear<UINT16[]>(0x400/2);
+	m_framebuffer_unk2 = make_unique_clear<UINT16[]>(0x400/2);
 
-	save_pointer(NAME(m_framebuffer), 0x80000/2);
-	save_pointer(NAME(m_framebuffer_palette), 0x200/2);
-	save_pointer(NAME(m_framebuffer_unk1), 0x400/2);
-	save_pointer(NAME(m_framebuffer_unk2), 0x400/2);
+	save_pointer(NAME(m_framebuffer.get()), 0x80000/2);
+	save_pointer(NAME(m_framebuffer_palette.get()), 0x200/2);
+	save_pointer(NAME(m_framebuffer_unk1.get()), 0x400/2);
+	save_pointer(NAME(m_framebuffer_unk2.get()), 0x400/2);
 
 	save_item(NAME(m_framebuffer_bgcol));
 	save_item(NAME(m_framebuffer_scrolly));
@@ -93,7 +93,7 @@ READ16_MEMBER(kaneko_grap2_device::galpani3_regs1_r)
 		}
 
 		default:
-			logerror("cpu '%s' (PC=%06X): galpani3_regs1_r %02x %04x\n", space.device().tag(), space.device().safe_pcbase(), offset, mem_mask);
+			logerror("cpu '%s' (PC=%06X): galpani3_regs1_r %02x %04x\n", space.device().tag().c_str(), space.device().safe_pcbase(), offset, mem_mask);
 			break;
 
 	}
@@ -160,7 +160,7 @@ WRITE16_MEMBER(kaneko_grap2_device::galpani3_regs1_go_w)
 	UINT8* rledata = memregion(":gfx2")->base();
 
 //  printf("galpani3_regs1_go_w? %08x\n",address );
-	if ((data==0x2000) || (data==0x3000)) gp3_do_rle(address, m_framebuffer, rledata);
+	if ((data==0x2000) || (data==0x3000)) gp3_do_rle(address, m_framebuffer.get(), rledata);
 }
 
 

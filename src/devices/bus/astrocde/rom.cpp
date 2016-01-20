@@ -22,24 +22,24 @@ const device_type ASTROCADE_ROM_256K = &device_creator<astrocade_rom_256k_device
 const device_type ASTROCADE_ROM_512K = &device_creator<astrocade_rom_512k_device>;
 
 
-astrocade_rom_device::astrocade_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+astrocade_rom_device::astrocade_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_astrocade_cart_interface(mconfig, *this)
 {
 }
 
-astrocade_rom_device::astrocade_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+astrocade_rom_device::astrocade_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, ASTROCADE_ROM_STD, "Bally Astrocade Standard Carts", tag, owner, clock, "astrocade_rom", __FILE__),
 						device_astrocade_cart_interface(mconfig, *this)
 {
 }
 
-astrocade_rom_256k_device::astrocade_rom_256k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+astrocade_rom_256k_device::astrocade_rom_256k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: astrocade_rom_device(mconfig, ASTROCADE_ROM_256K, "Bally Astrocade 256K Carts", tag, owner, clock, "astrocade_256k", __FILE__), m_base_bank(0)
 				{
 }
 
-astrocade_rom_512k_device::astrocade_rom_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+astrocade_rom_512k_device::astrocade_rom_512k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 					: astrocade_rom_device(mconfig, ASTROCADE_ROM_512K, "Bally Astrocade 512K Carts", tag, owner, clock, "astrocade_512k", __FILE__), m_base_bank(0)
 				{
 }

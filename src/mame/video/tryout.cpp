@@ -165,16 +165,16 @@ void tryout_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tryout_state::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(tryout_state::get_fg_memory_offset),this),8,8,32,32);
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tryout_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(tryout_state::get_bg_memory_offset),this),16,16,64,16);
 
-	m_vram=auto_alloc_array(machine(), UINT8, 8 * 0x800);
-	m_vram_gfx=auto_alloc_array(machine(), UINT8, 0x6000);
+	m_vram=std::make_unique<UINT8[]>(8 * 0x800);
+	m_vram_gfx=std::make_unique<UINT8[]>(0x6000);
 
-	m_gfxdecode->gfx(2)->set_source(m_vram_gfx);
+	m_gfxdecode->gfx(2)->set_source(m_vram_gfx.get());
 
 	m_fg_tilemap->set_transparent_pen(0);
 
 	save_item(NAME(m_vram_bank));
-	save_pointer(NAME(m_vram), 8 * 0x800);
-	save_pointer(NAME(m_vram_gfx), 0x6000);
+	save_pointer(NAME(m_vram.get()), 8 * 0x800);
+	save_pointer(NAME(m_vram_gfx.get()), 0x6000);
 }
 
 void tryout_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)

@@ -25,7 +25,7 @@
 class jpmsru_state : public driver_device
 {
 public:
-	jpmsru_state(const machine_config &mconfig, device_type type, const char *tag)
+	jpmsru_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }
@@ -36,7 +36,6 @@ protected:
 	required_device<cpu_device> m_maincpu;
 public:
 	DECLARE_DRIVER_INIT(jpmsru);
-	DECLARE_READ8_MEMBER( interrupt_level );
 };
 
 // blind guess

@@ -94,7 +94,7 @@
 class hh_hmcs40_state : public driver_device
 {
 public:
-	hh_hmcs40_state(const machine_config &mconfig, device_type type, const char *tag)
+	hh_hmcs40_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -141,8 +141,8 @@ public:
 	void display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety);
 
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 
@@ -222,7 +222,7 @@ void hh_hmcs40_state::display_update()
 		if (m_display_cache[y] != active_state[y])
 		{
 			if (m_display_segmask[y] != 0)
-				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
+				output().set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
 			for (int x = 0; x <= m_display_maxx; x++)
@@ -242,8 +242,8 @@ void hh_hmcs40_state::display_update()
 					sprintf(buf1, "lamp%d", y * mul + x);
 					sprintf(buf2, "%d.%d", y, x);
 				}
-				output_set_value(buf1, state);
-				output_set_value(buf2, state);
+				output().set_value(buf1, state);
+				output().set_value(buf2, state);
 			}
 		}
 
@@ -341,7 +341,7 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
 class bambball_state : public hh_hmcs40_state
 {
 public:
-	bambball_state(const machine_config &mconfig, device_type type, const char *tag)
+	bambball_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -427,8 +427,6 @@ static MACHINE_CONFIG_START( bambball, bambball_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -453,7 +451,7 @@ MACHINE_CONFIG_END
 class bmboxing_state : public hh_hmcs40_state
 {
 public:
-	bmboxing_state(const machine_config &mconfig, device_type type, const char *tag)
+	bmboxing_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -563,8 +561,6 @@ static MACHINE_CONFIG_START( bmboxing, bmboxing_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -589,7 +585,7 @@ MACHINE_CONFIG_END
 class bfriskyt_state : public hh_hmcs40_state
 {
 public:
-	bfriskyt_state(const machine_config &mconfig, device_type type, const char *tag)
+	bfriskyt_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -665,7 +661,7 @@ static INPUT_PORTS_START( bfriskyt )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, bfriskyt_state, input_changed, NULL)
 
 	PORT_START("IN.5") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(bfriskyt_state::input_changed)
@@ -686,8 +682,6 @@ static MACHINE_CONFIG_START( bfriskyt, bfriskyt_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -719,7 +713,7 @@ MACHINE_CONFIG_END
 class packmon_state : public hh_hmcs40_state
 {
 public:
-	packmon_state(const machine_config &mconfig, device_type type, const char *tag)
+	packmon_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -797,8 +791,6 @@ static MACHINE_CONFIG_START( packmon, packmon_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -830,7 +822,7 @@ MACHINE_CONFIG_END
 class msthawk_state : public hh_hmcs40_state
 {
 public:
-	msthawk_state(const machine_config &mconfig, device_type type, const char *tag)
+	msthawk_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -931,8 +923,6 @@ static MACHINE_CONFIG_START( msthawk, msthawk_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -958,7 +948,7 @@ MACHINE_CONFIG_END
 class bzaxxon_state : public hh_hmcs40_state
 {
 public:
-	bzaxxon_state(const machine_config &mconfig, device_type type, const char *tag)
+	bzaxxon_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1026,7 +1016,7 @@ static INPUT_PORTS_START( bzaxxon )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, bzaxxon_state, input_changed, NULL)
 
 	PORT_START("IN.4") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
 
 	PORT_START("IN.5") // port D
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SELECT )
@@ -1053,8 +1043,6 @@ static MACHINE_CONFIG_START( bzaxxon, bzaxxon_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1078,7 +1066,7 @@ MACHINE_CONFIG_END
 class zackman_state : public hh_hmcs40_state
 {
 public:
-	zackman_state(const machine_config &mconfig, device_type type, const char *tag)
+	zackman_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1171,8 +1159,6 @@ static MACHINE_CONFIG_START( zackman, zackman_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1197,7 +1183,7 @@ MACHINE_CONFIG_END
 class bpengo_state : public hh_hmcs40_state
 {
 public:
-	bpengo_state(const machine_config &mconfig, device_type type, const char *tag)
+	bpengo_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1299,8 +1285,6 @@ static MACHINE_CONFIG_START( bpengo, bpengo_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1325,7 +1309,7 @@ MACHINE_CONFIG_END
 class bbtime_state : public hh_hmcs40_state
 {
 public:
-	bbtime_state(const machine_config &mconfig, device_type type, const char *tag)
+	bbtime_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1423,8 +1407,6 @@ static MACHINE_CONFIG_START( bbtime, bbtime_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1449,7 +1431,7 @@ MACHINE_CONFIG_END
 class bdoramon_state : public hh_hmcs40_state
 {
 public:
-	bdoramon_state(const machine_config &mconfig, device_type type, const char *tag)
+	bdoramon_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1488,7 +1470,7 @@ WRITE16_MEMBER(bdoramon_state::grid_w)
 
 static INPUT_PORTS_START( bdoramon )
 	PORT_START("IN.0") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
 
 	PORT_START("IN.1") // INT1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)1)
@@ -1521,8 +1503,6 @@ static MACHINE_CONFIG_START( bdoramon, bdoramon_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1547,7 +1527,7 @@ MACHINE_CONFIG_END
 class bultrman_state : public hh_hmcs40_state
 {
 public:
-	bultrman_state(const machine_config &mconfig, device_type type, const char *tag)
+	bultrman_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1586,7 +1566,7 @@ WRITE16_MEMBER(bultrman_state::grid_w)
 
 static INPUT_PORTS_START( bultrman )
 	PORT_START("IN.0") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
 
 	PORT_START("IN.1") // port D
 	PORT_CONFNAME( 0x0010, 0x0000, "Factory Test" )
@@ -1610,8 +1590,6 @@ static MACHINE_CONFIG_START( bultrman, bultrman_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1637,7 +1615,7 @@ MACHINE_CONFIG_END
 class machiman_state : public hh_hmcs40_state
 {
 public:
-	machiman_state(const machine_config &mconfig, device_type type, const char *tag)
+	machiman_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1677,7 +1655,7 @@ WRITE16_MEMBER(machiman_state::grid_w)
 
 static INPUT_PORTS_START( machiman )
 	PORT_START("IN.0") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
 
 	PORT_START("IN.1") // port D
 	PORT_BIT( 0x3fff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1699,8 +1677,6 @@ static MACHINE_CONFIG_START( machiman, machiman_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1731,7 +1707,7 @@ MACHINE_CONFIG_END
 class pairmtch_state : public hh_hmcs40_state
 {
 public:
-	pairmtch_state(const machine_config &mconfig, device_type type, const char *tag)
+	pairmtch_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1855,8 +1831,6 @@ static MACHINE_CONFIG_START( pairmtch, pairmtch_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_pairmtch)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1883,7 +1857,7 @@ MACHINE_CONFIG_END
 class alnattck_state : public hh_hmcs40_state
 {
 public:
-	alnattck_state(const machine_config &mconfig, device_type type, const char *tag)
+	alnattck_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1968,8 +1942,6 @@ static MACHINE_CONFIG_START( alnattck, alnattck_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1994,7 +1966,7 @@ MACHINE_CONFIG_END
 class cdkong_state : public hh_hmcs40_state
 {
 public:
-	cdkong_state(const machine_config &mconfig, device_type type, const char *tag)
+	cdkong_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -2006,7 +1978,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 // handlers
@@ -2058,7 +2030,7 @@ WRITE16_MEMBER(cdkong_state::grid_w)
 
 static INPUT_PORTS_START( cdkong )
 	PORT_START("IN.0") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
 
 	PORT_START("IN.1") // port D
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
@@ -2096,8 +2068,6 @@ static MACHINE_CONFIG_START( cdkong, cdkong_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -2128,7 +2098,7 @@ MACHINE_CONFIG_END
 class cgalaxn_state : public hh_hmcs40_state
 {
 public:
-	cgalaxn_state(const machine_config &mconfig, device_type type, const char *tag)
+	cgalaxn_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -2196,7 +2166,7 @@ static INPUT_PORTS_START( cgalaxn )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
 
 	PORT_START("IN.3") // INT1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)1)
@@ -2222,8 +2192,6 @@ static MACHINE_CONFIG_START( cgalaxn, cgalaxn_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2261,7 +2229,7 @@ MACHINE_CONFIG_END
 class cpacman_state : public hh_hmcs40_state
 {
 public:
-	cpacman_state(const machine_config &mconfig, device_type type, const char *tag)
+	cpacman_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -2344,8 +2312,6 @@ static MACHINE_CONFIG_START( cpacman, cpacman_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -2377,7 +2343,7 @@ MACHINE_CONFIG_END
 class cmspacmn_state : public hh_hmcs40_state
 {
 public:
-	cmspacmn_state(const machine_config &mconfig, device_type type, const char *tag)
+	cmspacmn_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -2460,8 +2426,6 @@ static MACHINE_CONFIG_START( cmspacmn, cmspacmn_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -2486,7 +2450,7 @@ MACHINE_CONFIG_END
 class egalaxn2_state : public hh_hmcs40_state
 {
 public:
-	egalaxn2_state(const machine_config &mconfig, device_type type, const char *tag)
+	egalaxn2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -2582,8 +2546,6 @@ static MACHINE_CONFIG_START( egalaxn2, egalaxn2_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -2610,7 +2572,7 @@ MACHINE_CONFIG_END
 class epacman2_state : public egalaxn2_state
 {
 public:
-	epacman2_state(const machine_config &mconfig, device_type type, const char *tag)
+	epacman2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: egalaxn2_state(mconfig, type, tag)
 	{ }
 };
@@ -2668,7 +2630,7 @@ INPUT_PORTS_END
 class eturtles_state : public hh_hmcs40_state
 {
 public:
-	eturtles_state(const machine_config &mconfig, device_type type, const char *tag)
+	eturtles_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag),
 		m_cop_irq(0)
 	{ }
@@ -2687,7 +2649,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 // handlers: maincpu side
@@ -2834,8 +2796,6 @@ static MACHINE_CONFIG_START( eturtles, eturtles_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -2861,11 +2821,11 @@ MACHINE_CONFIG_END
 class estargte_state : public eturtles_state
 {
 public:
-	estargte_state(const machine_config &mconfig, device_type type, const char *tag)
+	estargte_state(const machine_config &mconfig, device_type type, std::string tag)
 		: eturtles_state(mconfig, type, tag)
 	{ }
 
-	virtual void prepare_display();
+	virtual void prepare_display() override;
 	DECLARE_READ8_MEMBER(cop_data_r);
 };
 
@@ -2942,8 +2902,6 @@ static MACHINE_CONFIG_START( estargte, estargte_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -2971,7 +2929,7 @@ MACHINE_CONFIG_END
 class ghalien_state : public hh_hmcs40_state
 {
 public:
-	ghalien_state(const machine_config &mconfig, device_type type, const char *tag)
+	ghalien_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3057,8 +3015,6 @@ static MACHINE_CONFIG_START( ghalien, ghalien_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -3087,7 +3043,7 @@ MACHINE_CONFIG_END
 class gckong_state : public hh_hmcs40_state
 {
 public:
-	gckong_state(const machine_config &mconfig, device_type type, const char *tag)
+	gckong_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3155,7 +3111,7 @@ static INPUT_PORTS_START( gckong )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, gckong_state, input_changed, NULL)
 
 	PORT_START("IN.4") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
 
 	PORT_START("IN.5") // port D
 	PORT_CONFNAME( 0x0010, 0x0000, "Skill Level" )
@@ -3184,8 +3140,6 @@ static MACHINE_CONFIG_START( gckong, gckong_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -3210,7 +3164,7 @@ MACHINE_CONFIG_END
 class gdigdug_state : public hh_hmcs40_state
 {
 public:
-	gdigdug_state(const machine_config &mconfig, device_type type, const char *tag)
+	gdigdug_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3280,7 +3234,7 @@ static INPUT_PORTS_START( gdigdug )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gdigdug_state, input_changed, NULL)
 
 	PORT_START("IN.5") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(gdigdug_state::input_changed)
@@ -3304,8 +3258,6 @@ static MACHINE_CONFIG_START( gdigdug, gdigdug_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3335,7 +3287,7 @@ MACHINE_CONFIG_END
 class mwcbaseb_state : public hh_hmcs40_state
 {
 public:
-	mwcbaseb_state(const machine_config &mconfig, device_type type, const char *tag)
+	mwcbaseb_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3466,8 +3418,6 @@ static MACHINE_CONFIG_START( mwcbaseb, mwcbaseb_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -3493,7 +3443,7 @@ MACHINE_CONFIG_END
 class pbqbert_state : public hh_hmcs40_state
 {
 public:
-	pbqbert_state(const machine_config &mconfig, device_type type, const char *tag)
+	pbqbert_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3555,8 +3505,6 @@ static MACHINE_CONFIG_START( pbqbert, pbqbert_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -3581,7 +3529,7 @@ MACHINE_CONFIG_END
 class kingman_state : public hh_hmcs40_state
 {
 public:
-	kingman_state(const machine_config &mconfig, device_type type, const char *tag)
+	kingman_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3676,8 +3624,6 @@ static MACHINE_CONFIG_START( kingman, kingman_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -3702,7 +3648,7 @@ MACHINE_CONFIG_END
 class tmtron_state : public hh_hmcs40_state
 {
 public:
-	tmtron_state(const machine_config &mconfig, device_type type, const char *tag)
+	tmtron_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3775,7 +3721,7 @@ static INPUT_PORTS_START( tmtron )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_CHANGED_MEMBER(DEVICE_SELF, tmtron_state, input_changed, NULL)
 
 	PORT_START("IN.4") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(tmtron_state::input_changed)
@@ -3796,8 +3742,6 @@ static MACHINE_CONFIG_START( tmtron, tmtron_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3827,7 +3771,7 @@ MACHINE_CONFIG_END
 class vinvader_state : public hh_hmcs40_state
 {
 public:
-	vinvader_state(const machine_config &mconfig, device_type type, const char *tag)
+	vinvader_state(const machine_config &mconfig, device_type type, std::string tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3890,8 +3834,6 @@ static MACHINE_CONFIG_START( vinvader, vinvader_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

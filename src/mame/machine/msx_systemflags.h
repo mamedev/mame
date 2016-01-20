@@ -20,7 +20,7 @@ extern const device_type MSX_SYSTEMFLAGS;
 class msx_systemflags_device : public device_t
 {
 public:
-	msx_systemflags_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_systemflags_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	static void set_initial_value(device_t &device, UINT8 initial_value) { dynamic_cast<msx_systemflags_device &>(device).m_initial_value = initial_value; }
@@ -29,7 +29,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	UINT8 m_initial_value;

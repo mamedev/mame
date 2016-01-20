@@ -5,7 +5,7 @@
 class fromanc2_state : public driver_device
 {
 public:
-	fromanc2_state(const machine_config &mconfig, device_type type, const char *tag)
+	fromanc2_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -16,8 +16,8 @@ public:
 		m_rpalette(*this, "rpalette") { }
 
 	/* memory pointers */
-	UINT16   *m_videoram[2][4];
-	UINT8    *m_bankedram;
+	std::unique_ptr<UINT16[]>   m_videoram[2][4];
+	std::unique_ptr<UINT8[]>    m_bankedram;
 
 	/* video-related */
 	tilemap_t  *m_tilemap[2][4];
@@ -95,7 +95,7 @@ public:
 	TILE_GET_INFO_MEMBER(fromancr_get_v1_l0_tile_info);
 	TILE_GET_INFO_MEMBER(fromancr_get_v1_l1_tile_info);
 	TILE_GET_INFO_MEMBER(fromancr_get_v1_l2_tile_info);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(fromanc2);
 	DECLARE_VIDEO_START(fromanc2);
 	DECLARE_VIDEO_START(fromancr);

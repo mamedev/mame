@@ -94,8 +94,8 @@ class upd7810_device : public cpu_device
 {
 public:
 	// construction/destruction
-	upd7810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	upd7810_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	upd7810_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	upd7810_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_to_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_to_func.set_callback(object); }
@@ -156,26 +156,26 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 40; }
-	virtual UINT32 execute_input_lines() const { return 2; }
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 40; }
+	virtual UINT32 execute_input_lines() const override { return 2; }
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	virtual void handle_timers(int cycles);
 	virtual void upd7810_take_irq();
@@ -1373,10 +1373,10 @@ class upd7807_device : public upd7810_device
 {
 public:
 	// construction/destruction
-	upd7807_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd7807_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 };
 
 
@@ -1384,14 +1384,14 @@ class upd7801_device : public upd7810_device
 {
 public:
 	// construction/destruction
-	upd7801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd7801_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_reset();
-	virtual void execute_set_input(int inputnum, int state);
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	virtual void handle_timers(int cycles);
-	virtual void upd7810_take_irq();
+	virtual void device_reset() override;
+	virtual void execute_set_input(int inputnum, int state) override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual void handle_timers(int cycles) override;
+	virtual void upd7810_take_irq() override;
 };
 
 
@@ -1399,16 +1399,16 @@ class upd78c05_device : public upd7810_device
 {
 public:
 	// construction/destruction
-	upd78c05_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	upd78c05_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	upd78c05_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	upd78c05_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 4 - 1) / 4; }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 4); }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	virtual void handle_timers(int cycles);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 4 - 1) / 4; }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 4); }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual void handle_timers(int cycles) override;
 };
 
 
@@ -1416,7 +1416,7 @@ class upd78c06_device : public upd78c05_device
 {
 public:
 	// construction/destruction
-	upd78c06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd78c06_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 };
 
 

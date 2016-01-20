@@ -33,26 +33,26 @@ const device_type TMS34020 = &device_creator<tms34020_device>;
     GLOBAL VARIABLES
 ***************************************************************************/
 
-tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, device_video_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 32, 3), m_pc(0), m_ppc(0), m_st(0), m_pixel_write(nullptr), m_pixel_read(nullptr), m_raster_op(nullptr), m_pixel_op(nullptr), m_pixel_op_timing(0), m_convsp(0), m_convdp(0), m_convmp(0), m_gfxcycles(0), m_pixelshift(0), m_is_34020(0), m_reset_deferred(false)
-	  , m_halt_on_reset(FALSE), m_hblank_stable(0), m_external_host_access(0), m_executing(0), m_program(nullptr), m_direct(nullptr)
-	  , m_pixclock(0)
+		, m_halt_on_reset(FALSE), m_hblank_stable(0), m_external_host_access(0), m_executing(0), m_program(nullptr), m_direct(nullptr)
+		, m_pixclock(0)
 	, m_pixperclock(0), m_scantimer(nullptr), m_icount(0)
-	  , m_output_int_cb(*this)
+		, m_output_int_cb(*this)
 {
 }
 
 
-tms34010_device::tms34010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms34010_device::tms34010_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tms340x0_device(mconfig, TMS34010, "TMS34010", tag, owner, clock, "tms34010")
 {
 	m_is_34020 = 0;
 }
 
 
-tms34020_device::tms34020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms34020_device::tms34020_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: tms340x0_device(mconfig, TMS34020, "TMS34020", tag, owner, clock, "tms34020")
 {
 	m_is_34020 = 1;
@@ -487,7 +487,7 @@ void tms340x0_device::check_interrupt()
 	/* check for NMI first */
 	if (IOREG(REG_HSTCTLH) & 0x0100)
 	{
-		LOG(("TMS34010 '%s' takes NMI\n", tag()));
+		LOG(("TMS34010 '%s' takes NMI\n", tag().c_str()));
 
 		/* ack the NMI */
 		IOREG(REG_HSTCTLH) &= ~0x0100;
@@ -514,28 +514,28 @@ void tms340x0_device::check_interrupt()
 	/* host interrupt */
 	if (irq & TMS34010_HI)
 	{
-		LOG(("TMS34010 '%s' takes HI\n", tag()));
+		LOG(("TMS34010 '%s' takes HI\n", tag().c_str()));
 		vector = 0xfffffec0;
 	}
 
 	/* display interrupt */
 	else if (irq & TMS34010_DI)
 	{
-		LOG(("TMS34010 '%s' takes DI\n", tag()));
+		LOG(("TMS34010 '%s' takes DI\n", tag().c_str()));
 		vector = 0xfffffea0;
 	}
 
 	/* window violation interrupt */
 	else if (irq & TMS34010_WV)
 	{
-		LOG(("TMS34010 '%s' takes WV\n", tag()));
+		LOG(("TMS34010 '%s' takes WV\n", tag().c_str()));
 		vector = 0xfffffe80;
 	}
 
 	/* external 1 interrupt */
 	else if (irq & TMS34010_INT1)
 	{
-		LOG(("TMS34010 '%s' takes INT1\n", tag()));
+		LOG(("TMS34010 '%s' takes INT1\n", tag().c_str()));
 		vector = 0xffffffc0;
 		irqline = 0;
 	}
@@ -543,7 +543,7 @@ void tms340x0_device::check_interrupt()
 	/* external 2 interrupt */
 	else if (irq & TMS34010_INT2)
 	{
-		LOG(("TMS34010 '%s' takes INT2\n", tag()));
+		LOG(("TMS34010 '%s' takes INT2\n", tag().c_str()));
 		vector = 0xffffffa0;
 		irqline = 1;
 	}
@@ -592,14 +592,13 @@ void tms340x0_device::device_start()
 		state_add(TMS34010_ST,     "ST",        m_st);
 		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_st).noshow().formatstr("%18s");
 
-		std::string tempstr;
 		for (int regnum = 0; regnum < 15; regnum++)
 		{
-			state_add(TMS34010_A0 + regnum, strformat(tempstr, "A%d", regnum).c_str(), m_regs[regnum].reg);
+			state_add(TMS34010_A0 + regnum, strformat("A%d", regnum).c_str(), m_regs[regnum].reg);
 		}
 		for (int regnum = 0; regnum < 15; regnum++)
 		{
-			state_add(TMS34010_B0 + regnum, strformat(tempstr, "B%d", regnum).c_str(), m_regs[30 - regnum].reg);
+			state_add(TMS34010_B0 + regnum, strformat("B%d", regnum).c_str(), m_regs[30 - regnum].reg);
 		}
 	}
 
@@ -627,10 +626,10 @@ void tms340x0_device::device_reset()
 {
 	m_ppc = 0;
 	m_st = 0;
-	m_pixel_write = NULL;
-	m_pixel_read = NULL;
-	m_raster_op = NULL;
-	m_pixel_op = NULL;
+	m_pixel_write = nullptr;
+	m_pixel_read = nullptr;
+	m_raster_op = nullptr;
+	m_pixel_op = nullptr;
 	m_pixel_op_timing = 0;
 	m_convsp = 0;
 	m_convdp = 0;
@@ -665,7 +664,7 @@ void tms340x0_device::device_reset()
 
 void tms340x0_device::execute_set_input(int inputnum, int state)
 {
-	LOG(("TMS34010 '%s' set irq line %d state %d\n", tag(), inputnum, state));
+	LOG(("TMS34010 '%s' set irq line %d state %d\n", tag().c_str(), inputnum, state));
 
 	/* set the pending interrupt */
 	switch (inputnum)
@@ -698,7 +697,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::internal_interrupt_callback )
 
 	/* call through to the CPU to generate the int */
 	IOREG(REG_INTPEND) |= type;
-	LOG(("TMS34010 '%s' set internal interrupt $%04x\n", tag(), type));
+	LOG(("TMS34010 '%s' set internal interrupt $%04x\n", tag().c_str(), type));
 
 	/* generate triggers so that spin loops can key off them */
 	signal_interrupt_trigger();
@@ -812,14 +811,14 @@ void tms340x0_device::set_pixel_function()
 
 const tms340x0_device::raster_op_func tms340x0_device::s_raster_ops[32] =
 {
-				NULL, &tms340x0_device::raster_op_1 , &tms340x0_device::raster_op_2 , &tms340x0_device::raster_op_3,
+				nullptr, &tms340x0_device::raster_op_1 , &tms340x0_device::raster_op_2 , &tms340x0_device::raster_op_3,
 	&tms340x0_device::raster_op_4 , &tms340x0_device::raster_op_5 , &tms340x0_device::raster_op_6 , &tms340x0_device::raster_op_7,
 	&tms340x0_device::raster_op_8 , &tms340x0_device::raster_op_9 , &tms340x0_device::raster_op_10, &tms340x0_device::raster_op_11,
 	&tms340x0_device::raster_op_12, &tms340x0_device::raster_op_13, &tms340x0_device::raster_op_14, &tms340x0_device::raster_op_15,
 	&tms340x0_device::raster_op_16, &tms340x0_device::raster_op_17, &tms340x0_device::raster_op_18, &tms340x0_device::raster_op_19,
-	&tms340x0_device::raster_op_20, &tms340x0_device::raster_op_21,            NULL,            NULL,
-				NULL,            NULL,            NULL,            NULL,
-				NULL,            NULL,            NULL,            NULL,
+	&tms340x0_device::raster_op_20, &tms340x0_device::raster_op_21,            nullptr,            nullptr,
+				nullptr,            nullptr,            nullptr,            nullptr,
+				nullptr,            nullptr,            nullptr,            nullptr,
 };
 
 
@@ -861,7 +860,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 	if (enabled && vcount == SMART_IOREG(DPYINT))
 	{
 		/* generate the display interrupt signal */
-		internal_interrupt_callback(NULL, TMS34010_DI);
+		internal_interrupt_callback(nullptr, TMS34010_DI);
 	}
 
 	/* at the start of VBLANK, load the starting display address */
@@ -1599,7 +1598,7 @@ READ16_MEMBER( tms340x0_device::host_r )
 }
 
 
-void tms340x0_device::state_string_export(const device_state_entry &entry, std::string &str)
+void tms340x0_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

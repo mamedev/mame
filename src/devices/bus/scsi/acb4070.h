@@ -11,10 +11,10 @@ class acb4070_device : public scsihd_device
 {
 public:
 	// construction/destruction
-	acb4070_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	acb4070_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	virtual void ExecCommand();
-	virtual void WriteData( UINT8 *data, int dataLength );
+	virtual void ExecCommand() override;
+	virtual void WriteData( UINT8 *data, int dataLength ) override;
 
 private:
 	struct adaptec_sense_t

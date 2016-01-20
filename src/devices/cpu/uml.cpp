@@ -256,12 +256,12 @@ inline UINT64 rol64(UINT64 source, UINT8 count)
 uml::code_handle::code_handle(drcuml_state &drcuml, const char *name)
 	: m_code(reinterpret_cast<drccodeptr *>(drcuml.cache().alloc_near(sizeof(drccodeptr)))),
 		m_string(name),
-		m_next(NULL),
+		m_next(nullptr),
 		m_drcuml(drcuml)
 {
-	if (m_code == NULL)
+	if (m_code == nullptr)
 		throw std::bad_alloc();
-	*m_code = NULL;
+	*m_code = nullptr;
 }
 
 
@@ -271,7 +271,7 @@ uml::code_handle::code_handle(drcuml_state &drcuml, const char *name)
 
 void uml::code_handle::set_codeptr(drccodeptr code)
 {
-	assert(*m_code == NULL);
+	assert(*m_code == nullptr);
 	assert_in_cache(m_drcuml.cache(), code);
 	*m_code = code;
 }
@@ -739,9 +739,8 @@ void uml::instruction::simplify()
 	/*
 	    if (LOG_SIMPLIFICATIONS && memcmp(&orig, inst, sizeof(orig)) != 0)
 	    {
-	        std::string disasm1, disasm2;
-	        orig.disasm(disasm1, block->drcuml);
-	        inst->disasm(disasm2, block->drcuml);
+	        std::string disasm1 = orig.disasm(block->drcuml);
+	        std::string disasm2 = inst->disasm(block->drcuml);
 	        osd_printf_debug("Simplified: %-50.50s -> %s\n", disasm1.c_str(), disasm2.c_str());
 	    }
 	*/
@@ -854,7 +853,7 @@ UINT8 uml::instruction::modified_flags() const
 //  given buffer
 //-------------------------------------------------
 
-const char *uml::instruction::disasm(std::string &buffer, drcuml_state *drcuml) const
+std::string uml::instruction::disasm(drcuml_state *drcuml) const
 {
 	static const char *const conditions[] = { "z", "nz", "s", "ns", "c", "nc", "v", "nv", "u", "nu", "a", "be", "g", "le", "l", "ge" };
 	static const char *const pound_size[] = { "?", "?", "?", "?", "s", "?", "?", "?", "d" };
@@ -868,7 +867,7 @@ const char *uml::instruction::disasm(std::string &buffer, drcuml_state *drcuml) 
 	assert(m_opcode != OP_INVALID && m_opcode < OP_MAX);
 
 	// start with the raw mnemonic and substitute sizes
-	buffer.clear();
+	std::string buffer;
 	for (const char *opsrc = opinfo.mnemonic; *opsrc != 0; opsrc++)
 		if (*opsrc == '!')
 			strcatprintf(buffer, "%s", bang_size[m_size]);
@@ -972,7 +971,7 @@ const char *uml::instruction::disasm(std::string &buffer, drcuml_state *drcuml) 
 				UINT32 symoffset;
 
 				// symbol
-				if (drcuml != NULL && (symbol = drcuml->symbol_find(param.memory(), &symoffset)) != NULL)
+				if (drcuml != nullptr && (symbol = drcuml->symbol_find(param.memory(), &symoffset)) != nullptr)
 				{
 					if (symoffset == 0)
 						strcatprintf(buffer, "[%s]", symbol);
@@ -981,7 +980,7 @@ const char *uml::instruction::disasm(std::string &buffer, drcuml_state *drcuml) 
 				}
 
 				// cache memory
-				else if (drcuml != NULL && drcuml->cache().contains_pointer(param.memory()))
+				else if (drcuml != nullptr && drcuml->cache().contains_pointer(param.memory()))
 					strcatprintf(buffer, "[+$%X]", (UINT32)(FPTR)((drccodeptr)param.memory() - drcuml->cache().near()));
 
 				// general memory
@@ -1025,5 +1024,5 @@ const char *uml::instruction::disasm(std::string &buffer, drcuml_state *drcuml) 
 		if (m_flags & FLAG_C)
 			buffer.push_back('C');
 	}
-	return buffer.c_str();
+	return buffer;
 }

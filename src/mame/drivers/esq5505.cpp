@@ -163,7 +163,7 @@ static void ATTR_PRINTF(1,2) print_to_stderr(const char *format, ...)
 class esq5505_state : public driver_device
 {
 public:
-	esq5505_state(const machine_config &mconfig, device_type type, const char *tag)
+	esq5505_state(const machine_config &mconfig, device_type type, std::string tag)
 	: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
@@ -186,8 +186,8 @@ public:
 	optional_device<hd63450_device> m_dmac;
 	required_device<midi_port_device> m_mdout;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ16_MEMBER(lower_r);
 	DECLARE_WRITE16_MEMBER(lower_w);
@@ -277,7 +277,7 @@ void esq5505_state::machine_start()
 void esq5505_state::machine_reset()
 {
 	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
-	floppy_image_device *floppy = con ? con->get_device() : 0;
+	floppy_image_device *floppy = con ? con->get_device() : nullptr;
 
 	m_rom = (UINT16 *)(void *)memregion("osrom")->base();
 	m_ram = (UINT16 *)(void *)memshare("osram")->ptr();
@@ -453,7 +453,7 @@ WRITE_LINE_MEMBER(esq5505_state::duart_irq_handler)
 WRITE8_MEMBER(esq5505_state::duart_output)
 {
 	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
-	floppy_image_device *floppy = con ? con->get_device() : 0;
+	floppy_image_device *floppy = con ? con->get_device() : nullptr;
 
 	m_duart_io = data;
 
@@ -905,7 +905,7 @@ DRIVER_INIT_MEMBER(esq5505_state,common)
 	m_duart_io = 0;
 
 	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
-	floppy_image_device *floppy = con ? con->get_device() : 0;
+	floppy_image_device *floppy = con ? con->get_device() : nullptr;
 	if (floppy)
 	{
 		m_fdc->set_floppy(floppy);

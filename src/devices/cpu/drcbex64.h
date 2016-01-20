@@ -36,12 +36,12 @@ public:
 	virtual ~drcbe_x64();
 
 	// required overrides
-	virtual void reset();
-	virtual int execute(uml::code_handle &entry);
-	virtual void generate(drcuml_block &block, const uml::instruction *instlist, UINT32 numinst);
-	virtual bool hash_exists(UINT32 mode, UINT32 pc);
-	virtual void get_info(drcbe_info &info);
-	virtual bool logging() const { return m_log != NULL; }
+	virtual void reset() override;
+	virtual int execute(uml::code_handle &entry) override;
+	virtual void generate(drcuml_block &block, const uml::instruction *instlist, UINT32 numinst) override;
+	virtual bool hash_exists(UINT32 mode, UINT32 pc) override;
+	virtual void get_info(drcbe_info &info) override;
+	virtual bool logging() const override { return m_log != nullptr; }
 
 private:
 	// a be_parameter is similar to a uml::parameter but maps to native registers/memory

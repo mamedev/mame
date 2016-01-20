@@ -173,7 +173,7 @@ WRITE_LINE_MEMBER( eti660_state::q_w )
 	m_cti->aoe_w(state);
 
 	/* PULSE led */
-	set_led_status(machine(), LED_PULSE, state);
+	output().set_led_value(LED_PULSE, state);
 
 	/* tape output */
 	m_cassette->output(state ? 1.0 : -1.0);

@@ -16,7 +16,7 @@
 class warriorb_state : public driver_device
 {
 public:
-	warriorb_state(const machine_config &mconfig, device_type type, const char *tag)
+	warriorb_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tc0140syt(*this, "tc0140syt"),
@@ -62,8 +62,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pancontrol);
 	DECLARE_WRITE16_MEMBER(tc0100scn_dual_screen_w);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	UINT32 screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -10,7 +10,7 @@ class multipcm_device : public device_t,
 						public device_memory_interface
 {
 public:
-	multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	multipcm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~multipcm_device() {}
 
 	DECLARE_WRITE8_MEMBER( write );
@@ -20,14 +20,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	const address_space_config  m_space_config;
 
@@ -98,7 +98,7 @@ private:
 
 	// internal state
 	sound_stream *m_stream;
-	sample_t *m_samples;        	// Max 512 samples
+	sample_t *m_samples;            // Max 512 samples
 	slot_t *m_slots;
 	UINT32 m_cur_slot;
 	UINT32 m_address;
@@ -107,8 +107,8 @@ private:
 	float m_rate;
 
 	UINT32 *m_attack_step;
-	UINT32 *m_decay_release_step;	// Envelope step tables
-	UINT32 *m_freq_step_table;		// Frequency step table
+	UINT32 *m_decay_release_step;   // Envelope step tables
+	UINT32 *m_freq_step_table;      // Frequency step table
 
 	direct_read_data *m_direct;
 
@@ -126,7 +126,6 @@ private:
 
 	// Internal LFO functions
 	void lfo_init();
-	INT32 lfo_float_to_fixed(const float value);
 	void lfo_compute_step(lfo_t *lfo, UINT32 lfo_frequency, UINT32 LFOS, INT32 amplitude_lfo);
 	INT32 pitch_lfo_step(lfo_t *lfo);
 	INT32 amplitude_lfo_step(lfo_t *lfo);

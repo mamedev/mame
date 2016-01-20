@@ -5,7 +5,7 @@
 class nycaptor_state : public driver_device
 {
 public:
-	nycaptor_state(const machine_config &mconfig, device_type type, const char *tag)
+	nycaptor_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_scrlram(*this, "scrlram"),
@@ -109,13 +109,12 @@ public:
 	DECLARE_DRIVER_INIT(bronx);
 	DECLARE_DRIVER_INIT(nycaptor);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(ta7630);
 	UINT32 screen_update_nycaptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	int nycaptor_spot(  );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
-	void nycaptor_setmask(  );
 };

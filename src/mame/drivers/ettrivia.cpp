@@ -36,7 +36,7 @@ Notes:
 class ettrivia_state : public driver_device
 {
 public:
-	ettrivia_state(const machine_config &mconfig, device_type type, const char *tag)
+	ettrivia_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
@@ -62,7 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(b800_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ettrivia);
 	UINT32 screen_update_ettrivia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ettrivia_interrupt);
@@ -93,7 +93,7 @@ WRITE8_MEMBER(ettrivia_state::ettrivia_control_w)
 
 	m_question_bank = (data >> 3) & 3;
 
-	coin_counter_w(machine(), 0, data & 0x80);
+	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 
 	flip_screen_set(data & 1);
 }
@@ -234,7 +234,7 @@ PALETTE_INIT_MEMBER(ettrivia_state, ettrivia)
 	compute_resistor_weights(0, 255, -1.0,
 			2, resistances, weights, 0, 0,
 			2, resistances, weights, 0, 0,
-			0, 0, 0, 0, 0);
+			0, nullptr, nullptr, 0, 0);
 
 	for (i = 0;i < palette.entries(); i++)
 	{

@@ -28,12 +28,12 @@ const device_type IE15 = &device_creator<ie15_device>;
 //-------------------------------------------------
 //  ie15_device - constructor
 //-------------------------------------------------
-ie15_device::ie15_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ie15_device::ie15_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, IE15, "ie15", tag, owner, clock, "ie15_cpu", __FILE__),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 14),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 8), m_A(0), m_CF(0), m_ZF(0), m_RF(0), m_flags(0),
-		m_program(0), m_io(nullptr),
-		m_direct(0)
+		m_program(nullptr), m_io(nullptr),
+		m_direct(nullptr)
 {
 	// set our instruction counter
 	m_icountptr = &m_icount;
@@ -64,9 +64,8 @@ void ie15_device::device_start()
 	state_add(STATE_GENFLAGS,"GENFLAGS", m_flags).mask(0x0f).callimport().callexport().noshow().formatstr("%4s");
 	state_add(IE15_A,        "A",        m_A);
 
-	std::string tempstring;
 	for (int ireg = 0; ireg < 32; ireg++)
-		state_add(IE15_R0 + ireg, strformat(tempstring, "R%d", ireg).c_str(), m_REGS[ireg]);
+		state_add(IE15_R0 + ireg, strformat("R%d", ireg).c_str(), m_REGS[ireg]);
 }
 
 //-------------------------------------------------
@@ -91,7 +90,7 @@ const address_space_config *ie15_device::memory_space_config(address_spacenum sp
 {
 	return  (spacenum == AS_PROGRAM) ? &m_program_config :
 			(spacenum == AS_IO) ? &m_io_config :
-			NULL;
+			nullptr;
 }
 
 //-------------------------------------------------
@@ -133,7 +132,7 @@ void ie15_device::state_export(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void ie15_device::state_string_export(const device_state_entry &entry, std::string &str)
+void ie15_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -174,7 +173,7 @@ UINT32 ie15_device::disasm_max_opcode_bytes() const
 offs_t ie15_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
 	extern CPU_DISASSEMBLE( ie15 );
-	return CPU_DISASSEMBLE_NAME(ie15)(NULL, buffer, pc, oprom, opram, 0);
+	return CPU_DISASSEMBLE_NAME(ie15)(nullptr, buffer, pc, oprom, opram, 0);
 }
 
 //**************************************************************************

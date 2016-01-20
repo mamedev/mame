@@ -27,7 +27,7 @@ be found!
 class pv9234_state : public driver_device
 {
 public:
-	pv9234_state(const machine_config &mconfig, device_type type, const char *tag)
+	pv9234_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_p_ram(*this, "p_ram"),
 		m_maincpu(*this, "maincpu") { }
@@ -36,8 +36,8 @@ public:
 	DECLARE_WRITE32_MEMBER(debug1_w);
 	DECLARE_WRITE32_MEMBER(debug2_w);
 	required_shared_ptr<UINT32> m_p_ram;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_pv9234(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };

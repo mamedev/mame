@@ -28,7 +28,7 @@ const device_type CPC_SYMBIFACE2 = &device_creator<cpc_symbiface2_device>;
 
 // device machine config
 static MACHINE_CONFIG_FRAGMENT( cpc_symbiface2 )
-	MCFG_ATA_INTERFACE_ADD("ide",ata_devices,"hdd",NULL,false)
+	MCFG_ATA_INTERFACE_ADD("ide",ata_devices,"hdd",nullptr,false)
 	MCFG_DS12885_ADD("rtc")
 	MCFG_NVRAM_ADD_1FILL("nvram")
 	// no pass-through
@@ -71,7 +71,7 @@ ioport_constructor cpc_symbiface2_device::device_input_ports() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_symbiface2_device::cpc_symbiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cpc_symbiface2_device::cpc_symbiface2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CPC_SYMBIFACE2, "SYMBiFACE II", tag, owner, clock, "cpc_symf2", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_ide(*this,"ide"),

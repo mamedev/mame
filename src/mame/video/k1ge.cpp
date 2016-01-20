@@ -802,10 +802,10 @@ void k1ge_device::device_start()
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k1ge_device::timer_callback), this));
 	m_hblank_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k1ge_device::hblank_on_timer_callback), this));
-	m_vram = auto_alloc_array_clear(machine(), UINT8, 0x4000);
-	m_bitmap = auto_bitmap_ind16_alloc( machine(), m_screen->width(), m_screen->height() );
+	m_vram = make_unique_clear<UINT8[]>(0x4000);
+	m_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height() );
 
-	save_pointer(NAME(m_vram), 0x4000);
+	save_pointer(NAME(m_vram.get()), 0x4000);
 	save_item(NAME(m_wba_h));
 	save_item(NAME(m_wba_v));
 	save_item(NAME(m_wsi_h));
@@ -863,7 +863,7 @@ void k1ge_device::device_reset()
 
 const device_type K1GE = &device_creator<k1ge_device>;
 
-k1ge_device::k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k1ge_device::k1ge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K1GE, "K1GE Monochrome Graphics + LCD", tag, owner, clock, "k1ge", __FILE__)
 	, device_video_interface(mconfig, *this)
 	, m_vblank_pin_w(*this)
@@ -871,7 +871,7 @@ k1ge_device::k1ge_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
-k1ge_device::k1ge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+k1ge_device::k1ge_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_video_interface(mconfig, *this)
 	, m_vblank_pin_w(*this)
@@ -897,7 +897,7 @@ machine_config_constructor k1ge_device::device_mconfig_additions() const
 
 const device_type K2GE = &device_creator<k2ge_device>;
 
-k2ge_device::k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k2ge_device::k2ge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: k1ge_device(mconfig, K2GE, "K2GE Color Graphics + LCD", tag, owner, clock, "k2ge", __FILE__)
 {
 }

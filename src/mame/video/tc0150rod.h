@@ -6,7 +6,7 @@
 class tc0150rod_device : public device_t
 {
 public:
-	tc0150rod_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tc0150rod_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	~tc0150rod_device() {}
 
 	DECLARE_READ16_MEMBER( word_r );
@@ -15,7 +15,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	// internal state

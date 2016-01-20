@@ -97,11 +97,11 @@ INPUT_PORTS_START( apollo_config )
 		PORT_CONFNAME(APOLLO_CONF_25_YEARS_AGO, APOLLO_CONF_25_YEARS_AGO, "25 Years Ago ...")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_25_YEARS_AGO, DEF_STR ( On ) )
-#ifdef APOLLO_XXL
+
 		PORT_CONFNAME(APOLLO_CONF_NODE_ID, APOLLO_CONF_NODE_ID, "Node ID from Disk")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_NODE_ID, DEF_STR ( On ) )
-#endif
+
 //      PORT_CONFNAME(APOLLO_CONF_IDLE_SLEEP, 0x00, "Idle Sleep")
 //      PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 //      PORT_CONFSETTING(APOLLO_CONF_IDLE_SLEEP, DEF_STR ( On ) )
@@ -127,12 +127,12 @@ INPUT_PORTS_END
 class apollo_config_device : public device_t
 {
 public:
-	apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apollo_config_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 private:
 	// internal state
 };
@@ -141,7 +141,7 @@ extern const device_type APOLLO_CONF;
 
 const device_type APOLLO_CONF = &device_creator<apollo_config_device>;
 
-apollo_config_device::apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+apollo_config_device::apollo_config_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, APOLLO_CONF, "Apollo Configuration", tag, owner, clock, "apollo_config", __FILE__)
 {
 }
@@ -278,14 +278,14 @@ WRITE16_MEMBER(apollo_state::apollo_csr_control_register_w)
 
 	cpu_control_register = (cpu_control_register & ~mem_mask) | (data & mem_mask);
 
-	output_set_value("internal_led_1", (cpu_control_register >> 15) & 1);
-	output_set_value("internal_led_2", (cpu_control_register >> 14) & 1);
-	output_set_value("internal_led_3", (cpu_control_register >> 13) & 1);
-	output_set_value("internal_led_4", (cpu_control_register >> 12) & 1);
-	output_set_value("external_led_a", (cpu_control_register >> 11) & 1);
-	output_set_value("external_led_b", (cpu_control_register >> 10) & 1);
-	output_set_value("external_led_c", (cpu_control_register >> 9) & 1);
-	output_set_value("external_led_d", (cpu_control_register >> 8) & 1);
+	output().set_value("internal_led_1", (cpu_control_register >> 15) & 1);
+	output().set_value("internal_led_2", (cpu_control_register >> 14) & 1);
+	output().set_value("internal_led_3", (cpu_control_register >> 13) & 1);
+	output().set_value("internal_led_4", (cpu_control_register >> 12) & 1);
+	output().set_value("external_led_a", (cpu_control_register >> 11) & 1);
+	output().set_value("external_led_b", (cpu_control_register >> 10) & 1);
+	output().set_value("external_led_c", (cpu_control_register >> 9) & 1);
+	output().set_value("external_led_d", (cpu_control_register >> 8) & 1);
 
 	leds = ((cpu_control_register >> 8) & 0xff) ^ 0xff;
 
@@ -724,7 +724,7 @@ TIMER_CALLBACK_MEMBER( apollo_state::apollo_rtc_timer )
 #undef VERBOSE
 #define VERBOSE 0
 
-apollo_sio::apollo_sio(const machine_config &mconfig, const char *tag,
+apollo_sio::apollo_sio(const machine_config &mconfig, std::string tag,
 		device_t *owner, UINT32 clock) :
 	mc68681_device(mconfig, tag, owner, clock),
 	m_csrb(0),
@@ -880,7 +880,7 @@ const device_type APOLLO_NI = &device_creator<apollo_ni> ;
 //  apollo_ni - constructor
 //-------------------------------------------------
 
-apollo_ni::apollo_ni(const machine_config &mconfig, const char *tag,
+apollo_ni::apollo_ni(const machine_config &mconfig, std::string tag,
 		device_t *owner, UINT32 clock) :
 	device_t(mconfig, APOLLO_NI, "Node ID", tag, owner, clock, "node_id",
 			__FILE__), device_image_interface(mconfig, *this)
@@ -1047,25 +1047,25 @@ void apollo_ni::call_unload()
 
 void apollo_ni::set_node_id_from_disk()
 {
-#ifdef APOLLO_XXL
-	// set node ID from UID of logical volume 1 of logical unit 0
+	omti8621_apollo_device *omti8621 = machine().device<omti8621_apollo_device>("isa1:wdc");
 	UINT8 db[0x50];
 
 	// check label of physical volume and get sector data of logical volume 1
 	// Note: sector data starts with 32 byte block header
-	if (omti8621_device::get_sector(0, db, sizeof(db), 0) == sizeof(db)
+	// set node ID from UID of logical volume 1 of logical unit 0
+	if (omti8621
+			&& omti8621->get_sector(0, db, sizeof(db), 0) == sizeof(db)
 			&& memcmp(db + 0x22, "APOLLO", 6) == 0)
 	{
 		UINT16 sector1 = apollo_is_dn5500() ? 4 : 1;
 
-		if (omti8621_device::get_sector(sector1, db, sizeof(db), 0) == sizeof(db))
+		if (omti8621->get_sector(sector1, db, sizeof(db), 0) == sizeof(db))
 		{
 			// set node_id from UID of logical volume 1 of logical unit 0
 			m_node_id = (((db[0x49] << 8) | db[0x4a]) << 8) | db[0x4b];
 			CLOG1(("apollo_ni::set_node_id_from_disk: node ID is %x", m_node_id));
 		}
 	}
-#endif
 }
 
 //##########################################################################
@@ -1076,7 +1076,7 @@ void apollo_ni::set_node_id_from_disk()
 #define VERBOSE 0
 
 static SLOT_INTERFACE_START(apollo_isa_cards)
-	SLOT_INTERFACE("wdc", ISA16_OMTI8621)   // Combo ESDI/AT floppy controller
+	SLOT_INTERFACE("wdc", ISA16_OMTI8621_APOLLO)   // Combo ESDI/AT floppy controller
 	SLOT_INTERFACE("ctape", ISA8_SC499)     // Archive SC499 cartridge tape
 	SLOT_INTERFACE("3c505", ISA16_3C505)   // 3Com 3C505 Ethernet card
 SLOT_INTERFACE_END
@@ -1161,10 +1161,10 @@ MACHINE_CONFIG_FRAGMENT( common )
 	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa1", apollo_isa_cards, "wdc", false)
 	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa2", apollo_isa_cards, "ctape", false)
 	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa3", apollo_isa_cards, "3c505", false)
-	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa4", apollo_isa_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa5", apollo_isa_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa6", apollo_isa_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa7", apollo_isa_cards, NULL, false)
+	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa4", apollo_isa_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa5", apollo_isa_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa6", apollo_isa_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa7", apollo_isa_cards, nullptr, false)
 
 	MCFG_SOFTWARE_LIST_ADD("ctape_list", "apollo_ctape")
 MACHINE_CONFIG_END
@@ -1288,7 +1288,7 @@ const device_type APOLLO_STDIO = &device_creator<apollo_stdio_device> ;
 //-------------------------------------------------
 
 apollo_stdio_device::apollo_stdio_device(const machine_config &mconfig,
-		const char *tag, device_t *owner, UINT32 clock) :
+		std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, APOLLO_STDIO, "Apollo STDIO", tag, owner, clock,
 			"apollo_stdio", __FILE__), device_serial_interface(mconfig, *this),
 			m_tx_w(*this)

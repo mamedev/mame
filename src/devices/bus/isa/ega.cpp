@@ -570,7 +570,7 @@ ioport_constructor isa8_ega_device::device_input_ports() const
 //  isa8_ega_device - constructor
 //-------------------------------------------------
 
-isa8_ega_device::isa8_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_ega_device::isa8_ega_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8_EGA, "IBM Enhanced Graphics Adapter", tag, owner, clock, "ega", __FILE__),
 		device_isa8_card_interface(mconfig, *this), m_crtc_ega(nullptr), m_vram(nullptr), m_videoram(nullptr), m_charA(nullptr), m_charB(nullptr),
 		m_misc_output(0), m_feature_control(0), m_frame_cnt(0), m_hsync(0), m_vsync(0), m_vblank(0), m_display_enable(0), m_video_mode(0),
@@ -578,7 +578,7 @@ isa8_ega_device::isa8_ega_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-isa8_ega_device::isa8_ega_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+isa8_ega_device::isa8_ega_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this), m_crtc_ega(nullptr), m_vram(nullptr), m_videoram(nullptr), m_charA(nullptr), m_charB(nullptr),
 		m_misc_output(0), m_feature_control(0), m_frame_cnt(0), m_hsync(0), m_vsync(0), m_vblank(0), m_display_enable(0), m_video_mode(0),
@@ -592,7 +592,7 @@ isa8_ega_device::isa8_ega_device(const machine_config &mconfig, device_type type
 
 void isa8_ega_device::device_start()
 {
-	if (m_palette != NULL && !m_palette->started())
+	if (m_palette != nullptr && !m_palette->started())
 		throw device_missing_dependencies();
 
 	set_isa_device();
@@ -854,7 +854,7 @@ CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_text )
 		UINT16  offset = ma + i;
 		UINT8   chr = m_plane[0][ offset ];
 		UINT8   attr = m_plane[1][ offset ];
-		UINT8   data = 0;
+		UINT8   data;
 		UINT16  fg = m_attribute.data[ attr & 0x07 ];
 		UINT16  bg = m_attribute.data[ ( attr >> 4 ) & 0x07 ];
 
@@ -1329,7 +1329,7 @@ WRITE8_MEMBER(isa8_ega_device::pc_ega8_3c0_w )
 			0x0F, 0x0F, 0x0F, 0x1F, 0x07, 0x3F, 0x0F, 0x0F,
 			0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		};
-	int index = 0;
+	int index;
 
 	if ( VERBOSE_EGA )
 	{

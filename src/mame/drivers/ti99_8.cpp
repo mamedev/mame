@@ -234,7 +234,7 @@ enum
 class ti99_8_state : public driver_device
 {
 public:
-	ti99_8_state(const machine_config &mconfig, device_type type, const char *tag)
+	ti99_8_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_cpu(*this, "maincpu"),
 		m_tms9901(*this, TMS9901_TAG),
@@ -933,7 +933,7 @@ static const mapper8_list_entry mapper_devices[] =
 	{ INTSNAME,         PHYSIC, STOP, 0xffe000, 0xfffff0, 0x000000  },  // ffe000-ffe00f Interrupt level sense
 	{ PERIBOX_TAG,      PHYSIC, STOP, 0x000000, 0x000000, 0x000000  },  // Peripheral Expansion Box
 
-	{ NULL, 0, 0, 0, 0, 0  }
+	{ nullptr, 0, 0, 0, 0, 0  }
 };
 
 static MAPPER8_CONFIG( mapper_conf )

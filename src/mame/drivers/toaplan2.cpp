@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Quench, Yochizo, David Haywood
+// thanks-to:Richard Bush
 /*****************************************************************************
 
         ToaPlan      game hardware from 1991 - 1994
@@ -378,7 +379,7 @@ MACHINE_START_MEMBER(toaplan2_state,toaplan2)
 
 WRITE_LINE_MEMBER(toaplan2_state::toaplan2_reset)
 {
-	if (m_audiocpu != NULL)
+	if (m_audiocpu != nullptr)
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
@@ -538,14 +539,14 @@ WRITE8_MEMBER(toaplan2_state::toaplan2_coin_w)
 
 	if (data & 0x0f)
 	{
-		coin_lockout_w( machine(), 0, ((data & 4) ? 0 : 1) );
-		coin_lockout_w( machine(), 1, ((data & 8) ? 0 : 1) );
-		coin_counter_w( machine(), 0, (data & 1) );
-		coin_counter_w( machine(), 1, (data & 2) );
+		machine().bookkeeping().coin_lockout_w(0, ((data & 4) ? 0 : 1) );
+		machine().bookkeeping().coin_lockout_w(1, ((data & 8) ? 0 : 1) );
+		machine().bookkeeping().coin_counter_w(0, (data & 1) );
+		machine().bookkeeping().coin_counter_w(1, (data & 2) );
 	}
 	else
 	{
-		coin_lockout_global_w(machine(), 1);    // Lock all coin slots
+		machine().bookkeeping().coin_lockout_global_w(1);    // Lock all coin slots
 	}
 	if (data & 0xe0)
 	{
@@ -555,8 +556,8 @@ WRITE8_MEMBER(toaplan2_state::toaplan2_coin_w)
 
 WRITE8_MEMBER(toaplan2_state::pwrkick_coin_w)
 {
-	coin_counter_w( machine(), 0, (data & 2) >> 1 );
-	coin_counter_w( machine(), 1, (data & 8) >> 3 );
+	machine().bookkeeping().coin_counter_w(0, (data & 2) >> 1 );
+	machine().bookkeeping().coin_counter_w(1, (data & 8) >> 3 );
 	m_pwrkick_hopper = (data & 0x80) >> 7;
 }
 
@@ -3057,7 +3058,7 @@ static const gfx_layout fixeightblayout =
 };
 
 static GFXDECODE_START( truxton2 )
-	GFXDECODE_ENTRY( NULL,   0, truxton2_tx_tilelayout, 64*16, 64 )
+	GFXDECODE_ENTRY( nullptr,   0, truxton2_tx_tilelayout, 64*16, 64 )
 GFXDECODE_END
 
 static GFXDECODE_START( raizing )
@@ -3065,7 +3066,7 @@ static GFXDECODE_START( raizing )
 GFXDECODE_END
 
 static GFXDECODE_START( batrider )
-	GFXDECODE_ENTRY( NULL,   0, batrider_tx_tilelayout, 64*16, 64 )
+	GFXDECODE_ENTRY( nullptr,   0, batrider_tx_tilelayout, 64*16, 64 )
 GFXDECODE_END
 
 static GFXDECODE_START( fixeightbl )

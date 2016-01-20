@@ -46,7 +46,7 @@
 class poly_state : public driver_device
 {
 public:
-	poly_state(const machine_config &mconfig, device_type type, const char *tag)
+	poly_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pia0(*this, "pia0"),
@@ -66,7 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER( ptm_o3_callback );
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 private:
 	required_device<cpu_device> m_maincpu;

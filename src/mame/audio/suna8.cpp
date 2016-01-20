@@ -18,7 +18,7 @@ SAMPLES_START_CB_MEMBER(suna8_state::sh_start)
 	int i, len = memregion("samples")->bytes() * 2;  // 2 samples per byte
 	UINT8 *ROM = memregion("samples")->base();
 
-	m_samplebuf = auto_alloc_array(machine(), INT16, len);
+	m_samplebuf = std::make_unique<INT16[]>(len);
 
 	// Convert 4 bit to 16 bit samples
 	for(i = 0; i < len; i++)

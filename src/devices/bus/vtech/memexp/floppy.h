@@ -29,7 +29,7 @@ class floppy_controller_device : public device_t, public device_memexp_interface
 {
 public:
 	// construction/destruction
-	floppy_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	floppy_controller_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_ADDRESS_MAP(map, 8);
 
@@ -39,10 +39,10 @@ public:
 	DECLARE_READ8_MEMBER(wpt_r);
 
 protected:
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	required_device<memexp_slot_device> m_memexp;
 	required_device<floppy_connector> m_floppy0, m_floppy1;

@@ -45,7 +45,7 @@ SYSINTR_GPS      = INT_EINT3, INT_EINT8_23 (EINT18)
 class gizmondo_state : public driver_device
 {
 public:
-	gizmondo_state(const machine_config &mconfig, device_type type, const char *tag)
+	gizmondo_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag) ,
 		m_s3c2440(*this, "s3c2440"),
 		m_maincpu(*this, "maincpu"),
@@ -55,8 +55,8 @@ public:
 	UINT32 m_port[9];
 	required_device<s3c2440_device> m_s3c2440;
 	DECLARE_DRIVER_INIT(gizmondo);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	required_device<cpu_device> m_maincpu;

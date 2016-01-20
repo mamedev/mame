@@ -51,7 +51,7 @@ class mcf5206e_peripheral_device :  public device_t,
 {
 public:
 	// construction/destruction
-	mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mcf5206e_peripheral_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void ICR_info(UINT8 ICR);
 
@@ -163,12 +163,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load() { }
-	virtual void device_clock_changed() { }
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override { }
+	virtual void device_clock_changed() override { }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 	address_space_config        m_space_config;
 
 

@@ -49,10 +49,10 @@ enum
 	cru_reg_reset = 0x80
 };
 
-nouspikel_ide_interface_device::nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ti_expansion_card_device(mconfig, TI99_IDE, "Nouspikel IDE interface card", tag, owner, clock, "ti99_ide", __FILE__), m_ata_irq(false), 
+nouspikel_ide_interface_device::nouspikel_ide_interface_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+	: ti_expansion_card_device(mconfig, TI99_IDE, "Nouspikel IDE interface card", tag, owner, clock, "ti99_ide", __FILE__), m_ata_irq(false),
 	m_cru_register(0), m_rtc(nullptr),
-	m_ata(*this, "ata"), m_clk_irq(false), m_sram_enable(false), m_sram_enable_dip(false), m_cur_page(0), m_tms9995_mode(false), 
+	m_ata(*this, "ata"), m_clk_irq(false), m_sram_enable(false), m_sram_enable_dip(false), m_cur_page(0), m_tms9995_mode(false),
 	m_input_latch(0), m_output_latch(0), m_ram(nullptr)
 {
 }
@@ -336,7 +336,7 @@ void nouspikel_ide_interface_device::device_reset()
 MACHINE_CONFIG_FRAGMENT( tn_ide )
 	MCFG_DEVICE_ADD( "ide_rtc", RTC65271, 0 )
 	MCFG_RTC65271_INTERRUPT_CB(WRITELINE(nouspikel_ide_interface_device, clock_interrupt_callback))
-	MCFG_ATA_INTERFACE_ADD( "ata", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD( "ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(nouspikel_ide_interface_device, ide_interrupt_callback))
 MACHINE_CONFIG_END
 

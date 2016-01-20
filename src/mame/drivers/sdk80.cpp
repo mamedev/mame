@@ -41,7 +41,7 @@ No known manual or schematic of the video board.
 class sdk80_state : public driver_device
 {
 public:
-	sdk80_state(const machine_config &mconfig, device_type type, const char *tag)
+	sdk80_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_usart(*this, I8251A_TAG)
@@ -152,6 +152,7 @@ static MACHINE_CONFIG_START( sdk80, sdk80_state )
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_cts))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL_18_432MHz/60)

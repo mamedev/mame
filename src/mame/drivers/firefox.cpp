@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf, Aaron Giles, Chris Hardy
+// thanks-to:Scott Waye
 /***************************************************************************
 
     Atari Fire Fox hardware
@@ -40,7 +41,7 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 class firefox_state : public driver_device
 {
 public:
-	firefox_state(const machine_config &mconfig, device_type type, const char *tag)
+	firefox_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc") ,
 		m_tileram(*this, "tileram"),
@@ -103,8 +104,8 @@ public:
 	DECLARE_WRITE8_MEMBER(riot_porta_w);
 	DECLARE_WRITE_LINE_MEMBER(riot_irq);
 	TILE_GET_INFO_MEMBER(bgtile_get_info);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(video_timer_callback);
 	void set_rgba( int start, int index, unsigned char *palette_ram );
@@ -482,12 +483,12 @@ WRITE8_MEMBER(firefox_state::self_reset_w)
 
 WRITE8_MEMBER(firefox_state::led_w)
 {
-	set_led_status( machine(), offset, ( data & 0x80 ) == 0 );
+	output().set_led_value(offset, ( data & 0x80 ) == 0 );
 }
 
 WRITE8_MEMBER(firefox_state::firefox_coin_counter_w)
 {
-	coin_counter_w( machine(), offset, data & 0x80 );
+	machine().bookkeeping().coin_counter_w(offset, data & 0x80 );
 }
 
 

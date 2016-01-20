@@ -13,7 +13,7 @@
 
 const device_type TRACKFLD_AUDIO = &device_creator<trackfld_audio_device>;
 
-trackfld_audio_device::trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+trackfld_audio_device::trackfld_audio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TRACKFLD_AUDIO, "Track And Field Audio", tag, owner, clock, "trackfld_audio", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_last_addr(0),
@@ -101,7 +101,7 @@ READ8_MEMBER( trackfld_audio_device::hyperspt_sh_timer_r )
 {
 	UINT32 clock = m_audiocpu->total_cycles() / TIMER_RATE;
 
-	if (m_vlm != NULL)
+	if (m_vlm != nullptr)
 		return (clock & 0x3) | (m_vlm->bsy() ? 0x04 : 0);
 	else
 		return (clock & 0x3);

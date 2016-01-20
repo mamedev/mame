@@ -27,7 +27,7 @@
 class altos5_state : public driver_device
 {
 public:
-	altos5_state(const machine_config &mconfig, device_type type, const char *tag)
+	altos5_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pio0(*this, "z80pio_0"),
@@ -64,7 +64,7 @@ private:
 	floppy_image_device *m_floppy;
 	UINT8 convert(offs_t offset, bool state);
 	void setup_banks(UINT8 source);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio0;
 	required_device<z80pio_device> m_pio1;
@@ -201,7 +201,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ "z80ctc" },
 	{ "z80dart" },
 	{ "z80sio" },
-	{ NULL }
+	{ nullptr }
 };
 
 
@@ -298,7 +298,7 @@ WRITE8_MEMBER( altos5_state::port08_w )
 {
 	m_port08 = data & 0x70;
 
-	m_floppy = NULL;
+	m_floppy = nullptr;
 	if (BIT(data, 5))
 		m_floppy = m_floppy1->get_device();
 	else

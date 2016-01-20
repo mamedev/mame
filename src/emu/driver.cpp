@@ -32,11 +32,11 @@ ADDRESS_MAP_END
 //  driver_device - constructor
 //-------------------------------------------------
 
-driver_device::driver_device(const machine_config &mconfig, device_type type, const char *tag)
-	: device_t(mconfig, type, "Driver Device", tag, NULL, 0, "", __FILE__),
+driver_device::driver_device(const machine_config &mconfig, device_type type, std::string tag)
+	: device_t(mconfig, type, "Driver Device", tag, nullptr, 0, "", __FILE__),
 		device_memory_interface(mconfig, *this),
-		m_space_config("generic", ENDIANNESS_LITTLE, 8, 32, 0, NULL, *ADDRESS_MAP_NAME(generic)),
-		m_system(NULL),
+		m_space_config("generic", ENDIANNESS_LITTLE, 8, 32, 0, nullptr, *ADDRESS_MAP_NAME(generic)),
+		m_system(nullptr),
 		m_latch_clear_value(0),
 		m_flip_screen_x(0),
 		m_flip_screen_y(0)
@@ -202,16 +202,16 @@ void driver_device::device_start()
 {
 	// reschedule ourselves to be last
 	device_iterator iter(*this);
-	for (device_t *test = iter.first(); test != NULL; test = iter.next())
+	for (device_t *test = iter.first(); test != nullptr; test = iter.next())
 		if (test != this && !test->started())
 			throw device_missing_dependencies();
 
 	// call the game-specific init
-	if (m_system->driver_init != NULL)
+	if (m_system->driver_init != nullptr)
 		(*m_system->driver_init)(machine());
 
 	// finish image devices init process
-	image_postdevice_init(machine());
+	machine().image().postdevice_init();
 
 	// start the various pieces
 	driver_start();
@@ -274,7 +274,7 @@ void driver_device::device_reset_after_children()
 
 const address_space_config *driver_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 
@@ -564,6 +564,23 @@ void driver_device::flip_screen_y_set(UINT32 on)
 	}
 }
 
+
+/***************************************************************************
+PORT READING HELPERS
+***************************************************************************/
+
+/*-------------------------------------------------
+custom_port_read - act like input_port_read
+but it is a custom port, it is useful for
+e.g. input ports which expect the same port
+repeated both in the upper and lower half
+-------------------------------------------------*/
+
+CUSTOM_INPUT_MEMBER(driver_device::custom_port_read)
+{
+	std::string tag = (const char *)param;
+	return ioport(tag)->read();
+}
 
 
 //**************************************************************************

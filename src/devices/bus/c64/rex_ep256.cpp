@@ -22,21 +22,21 @@ const device_type C64_REX_EP256 = &device_creator<c64_rex_ep256_cartridge_device
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_rex_ep256 )
-	MCFG_GENERIC_SOCKET_ADD("rom1", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom1", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom2", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom2", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom3", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom3", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom4", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom4", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom5", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom5", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom6", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom6", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom7", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom7", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom8", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom8", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 MACHINE_CONFIG_END
 
@@ -61,7 +61,7 @@ machine_config_constructor c64_rex_ep256_cartridge_device::device_mconfig_additi
 //  c64_rex_ep256_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_rex_ep256_cartridge_device::c64_rex_ep256_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c64_rex_ep256_cartridge_device::c64_rex_ep256_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_REX_EP256, "C64 Rex 256KB EPROM cartridge", tag, owner, clock, "rexep256", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this)
 {

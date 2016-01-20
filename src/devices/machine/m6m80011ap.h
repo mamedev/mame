@@ -43,7 +43,7 @@ class m6m80011ap_device :   public device_t,
 {
 public:
 	// construction/destruction
-	m6m80011ap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m6m80011ap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// I/O operations
 	DECLARE_READ_LINE_MEMBER( read_bit );
@@ -54,13 +54,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
 
 private:
 	UINT8 m_latch;

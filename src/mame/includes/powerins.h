@@ -5,7 +5,7 @@
 class powerins_state : public driver_device
 {
 public:
-	powerins_state(const machine_config &mconfig, device_type type, const char *tag)
+	powerins_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -44,7 +44,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILEMAP_MAPPER_MEMBER(get_memory_offset_0);
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);

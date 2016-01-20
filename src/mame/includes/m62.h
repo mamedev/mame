@@ -6,7 +6,7 @@
 class m62_state : public driver_device
 {
 public:
-	m62_state(const machine_config &mconfig, device_type type, const char *tag)
+	m62_state(const machine_config &mconfig, device_type type, std::string tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_m62_tileram(*this, "m62_tileram"),
@@ -88,9 +88,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_youjyudn_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_youjyudn_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_horizon_bg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(m62);
 	DECLARE_VIDEO_START(kungfum);
 	DECLARE_VIDEO_START(battroad);

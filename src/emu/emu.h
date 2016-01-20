@@ -15,10 +15,15 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef __EMU_H__
 #define __EMU_H__
+
+#include <stdio.h> // must be here otherwise issues with I64FMT in MINGW
+#include <list>
+#include <vector>
+#include <memory>
+#include <unordered_map>
+#include <unordered_set>
 
 // core emulator headers -- must be first
 #include "emucore.h"
@@ -105,7 +110,7 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "devcb.h"
 #include "dispatch.h"
 #include "drivers/xtal.h"
-#include "machine/generic.h"
+#include "bookkeeping.h"
 #include "video/generic.h"
 
 #endif  /* __EMU_H__ */

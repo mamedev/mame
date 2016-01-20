@@ -6,16 +6,16 @@
 class igs022_device : public device_t
 {
 public:
-	igs022_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	igs022_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	UINT16* m_sharedprotram;
 	void IGS022_handle_command();
 
 protected:
-	virtual void device_config_complete();
-	virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	UINT32        m_kb_regs[0x100];
 

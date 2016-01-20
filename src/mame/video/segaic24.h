@@ -30,11 +30,11 @@ class segas24_tile : public device_t
 	friend class segas24_tile_config;
 
 public:
-	segas24_tile(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segas24_tile(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
+	static void static_set_palette_tag(device_t &device, std::string tag);
 	static void static_set_tile_mask(device_t &device, UINT16 tile_mask);
 
 	DECLARE_READ16_MEMBER(tile_r);
@@ -51,14 +51,15 @@ public:
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	enum {
 		SYS24_TILES = 0x4000
 	};
 
-	UINT16 *char_ram, *tile_ram;
+	std::unique_ptr<UINT16[]> char_ram;
+	std::unique_ptr<UINT16[]> tile_ram;
 	int char_gfx_index;
 	tilemap_t *tile_layer[4];
 	UINT16 tile_mask;
@@ -87,7 +88,7 @@ class segas24_sprite : public device_t
 	friend class segas24_sprite_config;
 
 public:
-	segas24_sprite(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segas24_sprite(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
@@ -95,10 +96,10 @@ public:
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, const int *spri);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
-	UINT16 *sprite_ram;
+	std::unique_ptr<UINT16[]> sprite_ram;
 };
 
 
@@ -107,7 +108,7 @@ class segas24_mixer : public device_t
 	friend class segas24_mixer_config;
 
 public:
-	segas24_mixer(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segas24_mixer(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
@@ -115,7 +116,7 @@ public:
 	UINT16 get_reg(int reg);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	UINT16 mixer_reg[16];

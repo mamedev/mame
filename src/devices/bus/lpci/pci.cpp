@@ -89,13 +89,10 @@ const device_type PCI_BUS = &device_creator<pci_bus_device>;
 //-------------------------------------------------
 //  pci_bus_device - constructor
 //-------------------------------------------------
-pci_bus_device::pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pci_bus_device::pci_bus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PCI_BUS, "PCI Bus", tag, owner, clock, "pci_bus", __FILE__), m_busnum(0),
-		m_father(NULL), m_address(0), m_devicenum(0), m_busnumber(0), m_busnumaddr(nullptr)
+		m_father(nullptr), m_address(0), m_devicenum(0), m_busnumber(0), m_busnumaddr(nullptr)
 {
-	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++) {
-		m_devtag[i]= NULL;
-	}
 	m_siblings_count = 0;
 }
 
@@ -119,7 +116,7 @@ READ32_MEMBER( pci_bus_device::read )
 		case 1:
 			if (m_devicenum != -1)
 			{
-				if (m_busnumaddr->m_device[m_devicenum] != NULL)
+				if (m_busnumaddr->m_device[m_devicenum] != nullptr)
 				{
 					function = (m_address >> 8) & 0x07;
 					reg = (m_address >> 0) & 0xfc;
@@ -130,7 +127,7 @@ READ32_MEMBER( pci_bus_device::read )
 	}
 
 	if (LOG_PCI)
-		logerror("read('%s'): offset=%d result=0x%08X\n", tag(), offset, result);
+		logerror("read('%s'): offset=%d result=0x%08X\n", tag().c_str(), offset, result);
 
 	return result;
 }
@@ -149,10 +146,10 @@ pci_bus_device *pci_bus_device::pci_search_bustree(int busnum, int devicenum, pc
 	for (a = 0; a < pcibus->m_siblings_count; a++)
 	{
 		ret = pci_search_bustree(busnum, devicenum, pcibus->m_siblings[a]);
-		if (ret != NULL)
+		if (ret != nullptr)
 			return ret;
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -162,7 +159,7 @@ WRITE32_MEMBER( pci_bus_device::write )
 	offset %= 2;
 
 	if (LOG_PCI)
-		logerror("write('%s'): offset=%d data=0x%08X\n", tag(), offset, data);
+		logerror("write('%s'): offset=%d data=0x%08X\n", tag().c_str(), offset, data);
 
 	switch (offset)
 	{
@@ -175,7 +172,7 @@ WRITE32_MEMBER( pci_bus_device::write )
 				int busnum = (m_address >> 16) & 0xff;
 				int devicenum = (m_address >> 11) & 0x1f;
 				m_busnumaddr = pci_search_bustree(busnum, devicenum, this);
-				if (m_busnumaddr != NULL)
+				if (m_busnumaddr != nullptr)
 				{
 					m_busnumber = busnum;
 					m_devicenum = devicenum;
@@ -190,7 +187,7 @@ WRITE32_MEMBER( pci_bus_device::write )
 		case 1:
 			if (m_devicenum != -1)
 			{
-				if (m_busnumaddr->m_device[m_devicenum] != NULL)
+				if (m_busnumaddr->m_device[m_devicenum] != nullptr)
 				{
 					int function = (m_address >> 8) & 0x07;
 					int reg = (m_address >> 0) & 0xfc;
@@ -263,13 +260,13 @@ void pci_bus_device::device_start()
 	{
 		sprintf(id, "%d", i);
 		pci_connector *conn = downcast<pci_connector *>(subdevice(id));
-		if (conn!=NULL)
+		if (conn!=nullptr)
 			m_device[i] = conn->get_device();
 		else
-			m_device[i] = NULL;
+			m_device[i] = nullptr;
 	}
 
-	if (m_father != NULL) {
+	if (m_father != nullptr) {
 		pci_bus_device *father = machine().device<pci_bus_device>(m_father);
 		if (father)
 			father->add_sibling(this, m_busnum);
@@ -314,7 +311,7 @@ pci_device_interface::~pci_device_interface()
 const device_type PCI_CONNECTOR = &device_creator<pci_connector>;
 
 
-pci_connector::pci_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pci_connector::pci_connector(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PCI_CONNECTOR, "PCI device connector abstraction", tag, owner, clock, "pci_connector", __FILE__),
 	device_slot_interface(mconfig, *this)
 {

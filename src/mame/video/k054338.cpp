@@ -20,11 +20,10 @@
 
 const device_type K054338 = &device_creator<k054338_device>;
 
-k054338_device::k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k054338_device::k054338_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K054338, "K054338 Mixer", tag, owner, clock, "k054338", __FILE__),
 	device_video_interface(mconfig, *this),
-	m_alpha_inv(0),
-	m_k055555_tag(NULL)
+	m_alpha_inv(0)
 {
 	memset(&m_regs, 0, sizeof(m_regs));
 	memset(&m_shd_rgb, 0, sizeof(m_shd_rgb));
@@ -36,7 +35,7 @@ k054338_device::k054338_device(const machine_config &mconfig, const char *tag, d
 
 void k054338_device::device_start()
 {
-	m_k055555 = m_k055555_tag ? machine().device<k055555_device>(m_k055555_tag) : NULL;
+	m_k055555 = m_k055555_tag ? machine().device<k055555_device>(m_k055555_tag) : nullptr;
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_shd_rgb));

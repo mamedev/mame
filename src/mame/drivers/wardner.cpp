@@ -138,7 +138,7 @@ out:
 class wardner_state : public twincobr_state
 {
 public:
-	wardner_state(const machine_config &mconfig, device_type type, const char *tag)
+	wardner_state(const machine_config &mconfig, device_type type, std::string tag)
 		: twincobr_state(mconfig, type, tag),
 		m_membank(*this, "membank")
 	{
@@ -150,8 +150,8 @@ public:
 	DECLARE_DRIVER_INIT(wardner);
 
 protected:
-	virtual void driver_start();
-	virtual void machine_reset();
+	virtual void driver_start() override;
+	virtual void machine_reset() override;
 };
 
 

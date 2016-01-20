@@ -82,7 +82,7 @@ const rom_entry *nubus_specpdq_device::device_rom_region() const
 //  nubus_specpdq_device - constructor
 //-------------------------------------------------
 
-nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, NUBUS_SPECPDQ, "SuperMac Spectrum PDQ video card", tag, owner, clock, "nb_spdq", __FILE__),
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr), m_width(0), m_height(0), m_patofsx(0), m_patofsy(0), m_vram_addr(0), m_vram_src(0),
@@ -92,7 +92,7 @@ nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, const 
 	m_screen_tag = m_assembled_tag.c_str();
 }
 
-nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr), m_width(0), m_height(0), m_patofsx(0), m_patofsy(0), m_vram_addr(0), m_vram_src(0),
@@ -123,7 +123,7 @@ void nubus_specpdq_device::device_start()
 	m_nubus->install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_specpdq_device::vram_r), this), write32_delegate(FUNC(nubus_specpdq_device::vram_w), this));
 	m_nubus->install_device(slotspace+0x400000, slotspace+0xfbffff, read32_delegate(FUNC(nubus_specpdq_device::specpdq_r), this), write32_delegate(FUNC(nubus_specpdq_device::specpdq_w), this));
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(m_screen->time_until_pos(843, 0), 0);
 }
 

@@ -16,7 +16,7 @@ upd765_format::upd765_format(const format *_formats)
 	formats = _formats;
 }
 
-int upd765_format::find_size(io_generic *io, UINT32 form_factor)
+int upd765_format::find_size(io_generic *io, UINT32 form_factor) const
 {
 	UINT64 size = io_generic_size(io);
 	for(int i=0; formats[i].form_factor; i++) {
@@ -232,7 +232,7 @@ bool upd765_format::save(io_generic *io, floppy_image *image)
 {
 	// Count the number of formats
 	int formats_count;
-	for(formats_count=0; formats[formats_count].form_factor; formats_count++);
+	for(formats_count=0; formats[formats_count].form_factor; formats_count++) {};
 
 	// Allocate the storage for the list of testable formats for a
 	// given cell size

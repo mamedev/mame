@@ -63,10 +63,10 @@ class wd7600_device : public device_t
 {
 public:
 	// construction/destruction
-	wd7600_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wd7600_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// callbacks
 	template<class _ior> void set_ior_callback(_ior ior) { m_read_ior.set_callback(ior); }
@@ -80,10 +80,10 @@ public:
 	template<class _spkr> void set_spkr_callback(_spkr spkr) { m_write_spkr.set_callback(spkr); }
 
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
-	static void static_set_isatag(device_t &device, const char *tag);
-	static void static_set_biostag(device_t &device, const char *tag);
-	static void static_set_keybctag(device_t &device, const char *tag);
+	static void static_set_cputag(device_t &device, std::string tag);
+	static void static_set_isatag(device_t &device, std::string tag);
+	static void static_set_biostag(device_t &device, std::string tag);
+	static void static_set_keybctag(device_t &device, std::string tag);
 
 	DECLARE_WRITE_LINE_MEMBER(rtc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER( pic1_int_w ) { m_write_intr(state); }
@@ -175,8 +175,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	devcb_read16 m_read_ior;
@@ -203,10 +203,10 @@ private:
 	void a20m();
 
 	// internal state
-	const char *m_cputag;
-	const char *m_isatag;
-	const char *m_biostag;
-	const char *m_keybctag;
+	std::string m_cputag;
+	std::string m_isatag;
+	std::string m_biostag;
+	std::string m_keybctag;
 	UINT8 m_portb;
 	int m_iochck;
 	int m_nmi_mask;
