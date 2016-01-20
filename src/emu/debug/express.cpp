@@ -927,15 +927,15 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 
 	// if we have an 0x prefix, we must be a hex value
 	if (buffer[0] == '0' && buffer[1] == 'x')
-		return parse_number(token, buffer.substr(2).c_str(), 16, expression_error::INVALID_NUMBER);
+		return parse_number(token, buffer.c_str() + 2, 16, expression_error::INVALID_NUMBER);
 
 	// if we have a # prefix, we must be a decimal value
 	if (buffer[0] == '#')
-		return parse_number(token, buffer.substr(1).c_str(), 10, expression_error::INVALID_NUMBER);
+		return parse_number(token, buffer.c_str() + 1, 10, expression_error::INVALID_NUMBER);
 
 	// if we have a $ prefix, we are a hex value
 	if (buffer[0] == '$')
-		return parse_number(token, buffer.substr(1).c_str(), 16, expression_error::INVALID_NUMBER);
+		return parse_number(token, buffer.c_str() + 1, 16, expression_error::INVALID_NUMBER);
 
 	// check for a symbol match
 	symbol_entry *symbol = m_symtable->find_deep(buffer.c_str());
