@@ -68,7 +68,7 @@ class crt9212_t :  public device_t
 {
 public:
 	// construction/destruction
-	crt9212_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	crt9212_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void static_set_wen2(device_t &device, int state) { downcast<crt9212_t &>(device).m_wen2 = state; }
 

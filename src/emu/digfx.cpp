@@ -25,7 +25,7 @@ device_gfx_interface::device_gfx_interface(const machine_config &mconfig, device
 	: device_interface(device, "gfx"),
 	m_palette(nullptr),
 	m_gfxdecodeinfo(gfxinfo),
-	m_palette_tag(palette_tag==nullptr ? std::string() : palette_tag),
+	m_palette_tag(palette_tag),
 	m_palette_is_sibling(palette_tag == nullptr),
 	m_decoded(false)
 {
@@ -49,7 +49,7 @@ void device_gfx_interface::static_set_info(device_t &device, const gfx_decode_en
 {
 	device_gfx_interface *gfx;
 	if (!device.interface(gfx))
-		throw emu_fatalerror("MCFG_GFX_INFO called on device '%s' with no gfx interface\n", device.tag().c_str());
+		throw emu_fatalerror("MCFG_GFX_INFO called on device '%s' with no gfx interface\n", device.tag());
 
 	gfx->m_gfxdecodeinfo = gfxinfo;
 }
@@ -60,11 +60,11 @@ void device_gfx_interface::static_set_info(device_t &device, const gfx_decode_en
 //  set the palette used by the device
 //-------------------------------------------------
 
-void device_gfx_interface::static_set_palette(device_t &device, std::string tag)
+void device_gfx_interface::static_set_palette(device_t &device, const char *tag)
 {
 	device_gfx_interface *gfx;
 	if (!device.interface(gfx))
-		throw emu_fatalerror("MCFG_GFX_PALETTE called on device '%s' with no gfx interface\n", device.tag().c_str());
+		throw emu_fatalerror("MCFG_GFX_PALETTE called on device '%s' with no gfx interface\n", device.tag());
 
 	gfx->m_palette_tag = tag;
 	gfx->m_palette_is_sibling = true;
@@ -78,8 +78,8 @@ void device_gfx_interface::static_set_palette(device_t &device, std::string tag)
 
 void device_gfx_interface::interface_pre_start()
 {
-	if (m_palette_tag.empty())
-		fatalerror("No palette specified for device '%s'\n", device().tag().c_str());
+	if (m_palette_tag == nullptr)
+		fatalerror("No palette specified for device '%s'\n", device().tag());
 
 	// find our palette device, either as a sibling device or subdevice
 	if (m_palette_is_sibling)
@@ -89,9 +89,9 @@ void device_gfx_interface::interface_pre_start()
 
 	if (m_palette == nullptr)
 		fatalerror("Device '%s' specifies nonexistent %sdevice '%s' as palette\n",
-								device().tag().c_str(),
+								device().tag(),
 								(m_palette_is_sibling ? "sibling " : "sub"),
-								m_palette_tag.c_str());
+								m_palette_tag);
 
 	// if palette device isn't started, wait for it
 	// if (!m_palette->started())
@@ -291,8 +291,8 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 void device_gfx_interface::interface_validity_check(validity_checker &valid) const
 {
 	// validate palette tag
-	if (m_palette_tag.empty())
-		osd_printf_error("No palette specified for device '%s'\n", device().tag().c_str());
+	if (m_palette_tag == nullptr)
+		osd_printf_error("No palette specified for device '%s'\n", device().tag());
 	else
 	{
 		palette_device *palette;
@@ -303,9 +303,9 @@ void device_gfx_interface::interface_validity_check(validity_checker &valid) con
 
 		if (palette == nullptr)
 			osd_printf_error("Device '%s' specifies nonexistent %sdevice '%s' as palette\n",
-								device().tag().c_str(),
+								device().tag(),
 								(m_palette_is_sibling ? "sibling " : "sub"),
-								m_palette_tag.c_str());
+								m_palette_tag);
 	}
 
 	if (!m_gfxdecodeinfo)

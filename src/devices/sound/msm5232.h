@@ -45,7 +45,7 @@ class msm5232_device : public device_t,
 									public device_sound_interface
 {
 public:
-	msm5232_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	msm5232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~msm5232_device() {}
 
 	static void static_set_capacitors(device_t &device, double cap1, double cap2, double cap3, double cap4, double cap5, double cap6, double cap7, double cap8);

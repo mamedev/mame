@@ -69,7 +69,7 @@ ioport_constructor nes_mjpanel_device::device_input_ports() const
 //  nes_mjpanel_device - constructor
 //-------------------------------------------------
 
-nes_mjpanel_device::nes_mjpanel_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+nes_mjpanel_device::nes_mjpanel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 					device_t(mconfig, NES_MJPANEL, "Famicom Mahjong Panel", tag, owner, clock, "nes_mjpanel", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_panel(*this, "MJPANEL"), m_latch(0)

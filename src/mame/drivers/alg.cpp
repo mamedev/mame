@@ -34,7 +34,7 @@
 class alg_state : public amiga_state
 {
 public:
-	alg_state(const machine_config &mconfig, device_type type, std::string tag)
+	alg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag),
 		m_laserdisc(*this, "laserdisc"),
 		m_gun1x(*this, "GUN1X"),

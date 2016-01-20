@@ -14,11 +14,11 @@ class decospr_device : public device_t,
 						public device_video_interface
 {
 public:
-	decospr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
-	static void static_set_palette_tag(device_t &device, std::string tag);
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_gfx_region(device_t &device, int gfxregion);
 	static void set_pri_callback(device_t &device, decospr_pri_cb_delegate callback) { downcast<decospr_device &>(device).m_pri_cb = callback; }
 	static void set_col_callback(device_t &device, decospr_col_cb_delegate callback) { downcast<decospr_device &>(device).m_col_cb = callback; }

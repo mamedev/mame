@@ -9,7 +9,7 @@ class jvs_device;
 
 class jvs_host : public device_t {
 public:
-	jvs_host(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	jvs_host(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	void add_device(jvs_device *dev);
 

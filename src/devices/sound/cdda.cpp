@@ -254,7 +254,7 @@ INT16 cdda_device::get_channel_volume(int channel)
 
 const device_type CDDA = &device_creator<cdda_device>;
 
-cdda_device::cdda_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+cdda_device::cdda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CDDA, "CD/DA", tag, owner, clock, "cdda", __FILE__),
 		device_sound_interface(mconfig, *this)
 {

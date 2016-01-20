@@ -61,7 +61,7 @@ machine_config_constructor c64_dela_ep256_cartridge_device::device_mconfig_addit
 //  c64_dela_ep256_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_dela_ep256_cartridge_device::c64_dela_ep256_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+c64_dela_ep256_cartridge_device::c64_dela_ep256_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_DELA_EP256, "C64 Dela 256KB EPROM cartridge", tag, owner, clock, "delep256", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this)
 {

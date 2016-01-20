@@ -4,7 +4,7 @@
 class gomoku_state : public driver_device
 {
 public:
-	gomoku_state(const machine_config &mconfig, device_type type, std::string tag)
+	gomoku_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -68,7 +68,7 @@ class gomoku_sound_device : public device_t,
 							public device_sound_interface
 {
 public:
-	gomoku_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gomoku_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~gomoku_sound_device() { }
 
 protected:

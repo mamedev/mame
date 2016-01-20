@@ -209,7 +209,7 @@ ioport_constructor mackbd_device::device_input_ports() const
 //  mackbd_device - constructor
 //-------------------------------------------------
 
-mackbd_device::mackbd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mackbd_device::mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MACKBD, "Macintosh keyboard", tag, owner, clock, "mackbd", __FILE__),
 	m_maincpu(*this, MACKBD_CPU_TAG),
 	m_clkout_handler(*this),

@@ -5,7 +5,7 @@
 
 const device_type M20_8086 = &device_creator<m20_8086_device>;
 
-m20_8086_device::m20_8086_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+m20_8086_device::m20_8086_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, M20_8086, "Olivetti M20 8086 Adapter", tag, owner, clock, "m20_8086", __FILE__),
 	m_8086(*this, "8086"),
 	m_maincpu(*this, ":maincpu"),

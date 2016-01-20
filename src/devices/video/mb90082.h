@@ -38,7 +38,7 @@ class mb90082_device :  public device_t,
 {
 public:
 	// construction/destruction
-	mb90082_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mb90082_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );

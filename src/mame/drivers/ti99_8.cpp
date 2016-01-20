@@ -234,7 +234,7 @@ enum
 class ti99_8_state : public driver_device
 {
 public:
-	ti99_8_state(const machine_config &mconfig, device_type type, std::string tag)
+	ti99_8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cpu(*this, "maincpu"),
 		m_tms9901(*this, TMS9901_TAG),

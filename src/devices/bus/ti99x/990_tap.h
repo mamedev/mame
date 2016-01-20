@@ -18,7 +18,7 @@ struct tape_unit_t
 class tap_990_device : public device_t
 {
 public:
-	tap_990_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tap_990_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object)
 	{
 		return downcast<tap_990_device &>(device).m_int_line.set_callback(object);

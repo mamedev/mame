@@ -1101,7 +1101,7 @@ UINT32 amstrad_state::screen_update_amstrad(screen_device &screen, bitmap_ind16 
 
 
 /* traverses the daisy-chain of expansion devices, looking for the specified device */
-static device_t* get_expansion_device(running_machine &machine, std::string tag)
+static device_t* get_expansion_device(running_machine &machine, const char* tag)
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
 	cpc_expansion_slot_device* exp_port = state->m_exp;

@@ -192,14 +192,14 @@ typedef device_delegate<void (int scanline)> md_32x_scanline_helper_delegate;
 class sega315_5313_device : public sega315_5124_device
 {
 public:
-	sega315_5313_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_sndirqline_callback(device_t &device, _Object object) { return downcast<sega315_5313_device &>(device).m_sndirqline_callback.set_callback(object); }
 	template<class _Object> static devcb_base &set_lv6irqline_callback(device_t &device, _Object object) { return downcast<sega315_5313_device &>(device).m_lv6irqline_callback.set_callback(object); }
 	template<class _Object> static devcb_base &set_lv4irqline_callback(device_t &device, _Object object) { return downcast<sega315_5313_device &>(device).m_lv4irqline_callback.set_callback(object); }
 	static void set_alt_timing(device_t &device, int use_alt_timing);
 	static void set_palwrite_base(device_t &device, int palwrite_base);
-	static void static_set_palette_tag(device_t &device, std::string tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 
 	static void set_md_32x_scanline(device_t &device, md_32x_scanline_delegate callback) { downcast<sega315_5313_device &>(device).m_32x_scanline_func = callback; }
 	static void set_md_32x_interrupt(device_t &device, md_32x_interrupt_delegate callback) { downcast<sega315_5313_device &>(device).m_32x_interrupt_func = callback; }

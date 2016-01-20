@@ -17,7 +17,7 @@
 
 const device_type METERS = &device_creator<meters_device>;
 
-meters_device::meters_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+meters_device::meters_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, METERS, "Electro mechanical meters", tag, owner, clock, "meters", __FILE__),
 	m_number_mtr(0)
 {

@@ -18,7 +18,7 @@ class dempa_shinbunsha_joystick_device : public device_t,
 {
 public:
 	// construction/destruction
-	dempa_shinbunsha_joystick_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	dempa_shinbunsha_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

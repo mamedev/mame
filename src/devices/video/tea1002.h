@@ -45,7 +45,7 @@ class tea1002_device : public device_t
 {
 public:
 	// construction/destruction
-	tea1002_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tea1002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	rgb_t color(int index);
 

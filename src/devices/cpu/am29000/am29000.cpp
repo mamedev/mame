@@ -78,7 +78,7 @@ const device_type AM29000 = &device_creator<am29000_cpu_device>;
     STATE ACCESSORS
 ***************************************************************************/
 
-am29000_cpu_device::am29000_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+am29000_cpu_device::am29000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, AM29000, "AMD Am29000", tag, owner, clock, "am29000", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 32, 32, 0)

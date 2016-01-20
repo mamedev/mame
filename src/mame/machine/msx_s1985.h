@@ -17,7 +17,7 @@ extern const device_type MSX_S1985;
 class msx_s1985_device : public msx_switched_device
 {
 public:
-	msx_s1985_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	msx_s1985_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT8 get_id() override;
 

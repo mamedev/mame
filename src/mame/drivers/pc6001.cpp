@@ -142,7 +142,7 @@ irq vector 0x26:                                                                
 class pc6001_state : public driver_device
 {
 public:
-	pc6001_state(const machine_config &mconfig, device_type type, std::string tag)
+	pc6001_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ppi(*this, "ppi8255"),
 		m_ram(*this, "ram"),

@@ -14,7 +14,7 @@
 class williams_state : public driver_device
 {
 public:
-	williams_state(const machine_config &mconfig, device_type type, std::string tag)
+	williams_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_nvram(*this, "nvram"),
 		m_videoram(*this, "videoram"),
@@ -118,7 +118,7 @@ public:
 class blaster_state : public williams_state
 {
 public:
-	blaster_state(const machine_config &mconfig, device_type type, std::string tag)
+	blaster_state(const machine_config &mconfig, device_type type, const char *tag)
 		: williams_state(mconfig, type, tag),
 		m_soundcpu_b(*this, "soundcpu_b"),
 		m_blaster_palette_0(*this, "blaster_pal0"),
@@ -154,7 +154,7 @@ public:
 class williams2_state : public williams_state
 {
 public:
-	williams2_state(const machine_config &mconfig, device_type type, std::string tag)
+	williams2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: williams_state(mconfig, type, tag),
 		m_bank8000(*this, "bank8000"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -204,7 +204,7 @@ public:
 class joust2_state : public williams2_state
 {
 public:
-	joust2_state(const machine_config &mconfig, device_type type, std::string tag)
+	joust2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: williams2_state(mconfig, type, tag),
 		m_cvsd_sound(*this, "cvsd") { }
 

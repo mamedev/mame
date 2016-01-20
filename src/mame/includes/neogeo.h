@@ -30,7 +30,7 @@
 class neogeo_state : public driver_device
 {
 public:
-	neogeo_state(const machine_config &mconfig, device_type type, std::string tag)
+	neogeo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_banked_cart(*this, "banked_cart"),
 		m_maincpu(*this, "maincpu"),
@@ -228,7 +228,7 @@ public:
 class neogeo_noslot_state : public neogeo_state
 {
 	public:
-		neogeo_noslot_state(const machine_config &mconfig, device_type type, std::string tag)
+		neogeo_noslot_state(const machine_config &mconfig, device_type type, const char *tag)
 			: neogeo_state(mconfig, type, tag),
 			/* legacy cartridge specifics */
 			m_mslugx_prot(*this, "mslugx_prot"),
@@ -331,7 +331,7 @@ class neogeo_noslot_state : public neogeo_state
 class neogeo_noslot_kog_state : public neogeo_state
 {
 public:
-	neogeo_noslot_kog_state(const machine_config &mconfig, device_type type, std::string tag)
+	neogeo_noslot_kog_state(const machine_config &mconfig, device_type type, const char *tag)
 		: neogeo_state(mconfig, type, tag),
 		/* legacy cartridge specifics */
 		m_bootleg_prot(*this, "bootleg_prot"),

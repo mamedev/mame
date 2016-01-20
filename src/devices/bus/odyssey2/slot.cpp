@@ -45,7 +45,7 @@ device_o2_cart_interface::~device_o2_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_o2_cart_interface::rom_alloc(UINT32 size, std::string tag)
+void device_o2_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -72,7 +72,7 @@ void device_o2_cart_interface::ram_alloc(UINT32 size)
 //-------------------------------------------------
 //  o2_cart_slot_device - constructor
 //-------------------------------------------------
-o2_cart_slot_device::o2_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+o2_cart_slot_device::o2_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, O2_CART_SLOT, "Odyssey 2 Cartridge Slot", tag, owner, clock, "o2_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),

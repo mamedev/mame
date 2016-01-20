@@ -44,7 +44,7 @@ class harddriv_state :  public device_t
 	/* public device_video_interface */
 {
 public:
-	harddriv_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	harddriv_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 
 	required_device<cpu_device> m_maincpu;
@@ -438,7 +438,7 @@ class harddriv_sound_board_device :  public device_t
 {
 public:
 	// construction/destruction
-	harddriv_sound_board_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	harddriv_sound_board_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~harddriv_sound_board_device() {}
 
 	DECLARE_READ16_MEMBER(hd68k_snd_data_r);
@@ -506,7 +506,7 @@ private:
 class harddriv_board_device_state :  public harddriv_state
 {
 public:
-	harddriv_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	harddriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -519,7 +519,7 @@ protected:
 class harddrivc_board_device_state :  public harddriv_state
 {
 public:
-	harddrivc_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	harddrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -532,7 +532,7 @@ protected:
 class racedriv_board_device_state :  public harddriv_state
 {
 public:
-	racedriv_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	racedriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -543,7 +543,7 @@ protected:
 class racedrivb1_board_device_state :  public racedriv_board_device_state
 {
 public:
-	racedrivb1_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+	racedrivb1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		racedriv_board_device_state(mconfig, tag, owner, clock)
 		{};
 
@@ -556,7 +556,7 @@ protected:
 class racedrivc_board_device_state :  public harddriv_state
 {
 public:
-	racedrivc_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	racedrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -567,7 +567,7 @@ protected:
 class racedrivc1_board_device_state :  public racedrivc_board_device_state
 {
 public:
-	racedrivc1_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+	racedrivc1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		racedrivc_board_device_state(mconfig, tag, owner, clock)
 		{};
 protected:
@@ -577,7 +577,7 @@ protected:
 class racedrivc_panorama_side_board_device_state :  public racedrivc_board_device_state
 {
 public:
-	racedrivc_panorama_side_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+	racedrivc_panorama_side_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		racedrivc_board_device_state(mconfig, tag, owner, clock)
 		{};
 protected:
@@ -591,7 +591,7 @@ protected:
 class stunrun_board_device_state :  public harddriv_state
 {
 public:
-	stunrun_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	stunrun_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -604,7 +604,7 @@ protected:
 class steeltal_board_device_state :  public harddriv_state
 {
 public:
-	steeltal_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	steeltal_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -615,7 +615,7 @@ protected:
 class steeltal1_board_device_state :  public steeltal_board_device_state
 {
 public:
-	steeltal1_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+	steeltal1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		steeltal_board_device_state(mconfig, tag, owner, clock)
 		{};
 
@@ -626,7 +626,7 @@ protected:
 class steeltalp_board_device_state :  public steeltal_board_device_state
 {
 public:
-	steeltalp_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+	steeltalp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		steeltal_board_device_state(mconfig, tag, owner, clock)
 		{};
 
@@ -641,7 +641,7 @@ protected:
 class strtdriv_board_device_state :  public harddriv_state
 {
 public:
-	strtdriv_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	strtdriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -654,7 +654,7 @@ protected:
 class hdrivair_board_device_state :  public harddriv_state
 {
 public:
-	hdrivair_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	hdrivair_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -665,7 +665,7 @@ protected:
 class hdrivairp_board_device_state :  public hdrivair_board_device_state
 {
 public:
-	hdrivairp_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+	hdrivairp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		hdrivair_board_device_state(mconfig, tag, owner, clock)
 		{};
 

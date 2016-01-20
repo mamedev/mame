@@ -71,7 +71,7 @@ Abstracts the VS9210
 
 const device_type VSYSTEM_SPR = &device_creator<vsystem_spr_device>;
 
-vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VSYSTEM_SPR, "Video System Sprites", tag, owner, clock, "vsystem_spr", __FILE__),
 		m_gfxdecode(*this),
 		m_palette(*this)
@@ -94,7 +94,7 @@ vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, std::strin
 //  gfx decoder
 //-------------------------------------------------
 
-void vsystem_spr_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
+void vsystem_spr_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<vsystem_spr_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -104,7 +104,7 @@ void vsystem_spr_device::static_set_gfxdecode_tag(device_t &device, std::string 
 //  palette device
 //-------------------------------------------------
 
-void vsystem_spr_device::static_set_palette_tag(device_t &device, std::string tag)
+void vsystem_spr_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<vsystem_spr_device &>(device).m_palette.set_tag(tag);
 }

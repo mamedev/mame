@@ -357,7 +357,7 @@ Super Missile Attack Board Layout
 class missile_state : public driver_device
 {
 public:
-	missile_state(const machine_config &mconfig, device_type type, std::string tag)
+	missile_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_videoram(*this, "videoram"),

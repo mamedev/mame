@@ -31,7 +31,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, co
 const device_type MC68328 = &device_creator<mc68328_device>;
 
 
-mc68328_device::mc68328_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, MC68328, "MC68328 (DragonBall) Integrated Processor", tag, owner, clock, "mc68328", __FILE__), m_rtc(nullptr), m_pwm(nullptr),
 				m_out_port_a_cb(*this),
 				m_out_port_b_cb(*this),

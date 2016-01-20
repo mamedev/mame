@@ -37,7 +37,7 @@ Lot of infos available at: http://www.classiccmp.org/cini/ht68k.htm
 class ht68k_state : public driver_device
 {
 public:
-	ht68k_state(const machine_config &mconfig, device_type type, std::string tag)
+	ht68k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart68681"),

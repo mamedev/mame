@@ -370,9 +370,9 @@ public:
 	void install_read_port(offs_t addrstart, offs_t addrend, const char *rtag) { install_read_port(addrstart, addrend, 0, 0, rtag); }
 	void install_write_port(offs_t addrstart, offs_t addrend, const char *wtag) { install_write_port(addrstart, addrend, 0, 0, wtag); }
 	void install_readwrite_port(offs_t addrstart, offs_t addrend, const char *rtag, const char *wtag) { install_readwrite_port(addrstart, addrend, 0, 0, rtag, wtag); }
-	void install_read_bank(offs_t addrstart, offs_t addrend, std::string tag) { install_read_bank(addrstart, addrend, 0, 0, tag); }
-	void install_write_bank(offs_t addrstart, offs_t addrend, std::string tag) { install_write_bank(addrstart, addrend, 0, 0, tag); }
-	void install_readwrite_bank(offs_t addrstart, offs_t addrend, std::string tag) { install_readwrite_bank(addrstart, addrend, 0, 0, tag); }
+	void install_read_bank(offs_t addrstart, offs_t addrend, const char *tag) { install_read_bank(addrstart, addrend, 0, 0, tag); }
+	void install_write_bank(offs_t addrstart, offs_t addrend, const char *tag) { install_write_bank(addrstart, addrend, 0, 0, tag); }
+	void install_readwrite_bank(offs_t addrstart, offs_t addrend, const char *tag) { install_readwrite_bank(addrstart, addrend, 0, 0, tag); }
 	void install_read_bank(offs_t addrstart, offs_t addrend, memory_bank *bank) { install_read_bank(addrstart, addrend, 0, 0, bank); }
 	void install_write_bank(offs_t addrstart, offs_t addrend, memory_bank *bank) { install_write_bank(addrstart, addrend, 0, 0, bank); }
 	void install_readwrite_bank(offs_t addrstart, offs_t addrend, memory_bank *bank) { install_readwrite_bank(addrstart, addrend, 0, 0, bank); }
@@ -384,9 +384,9 @@ public:
 	void install_read_port(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag) { install_readwrite_port(addrstart, addrend, addrmask, addrmirror, rtag, nullptr); }
 	void install_write_port(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *wtag) { install_readwrite_port(addrstart, addrend, addrmask, addrmirror, nullptr, wtag); }
 	void install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag);
-	void install_read_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, std::string tag) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, tag.c_str(), nullptr); }
-	void install_write_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, std::string tag) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, nullptr, tag.c_str()); }
-	void install_readwrite_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, std::string tag)  { install_bank_generic(addrstart, addrend, addrmask, addrmirror, tag.c_str(), tag.c_str()); }
+	void install_read_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, tag, nullptr); }
+	void install_write_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, nullptr, tag); }
+	void install_readwrite_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag)  { install_bank_generic(addrstart, addrend, addrmask, addrmirror, tag, tag); }
 	void install_read_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, memory_bank *bank) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, bank, nullptr); }
 	void install_write_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, memory_bank *bank) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, nullptr, bank); }
 	void install_readwrite_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, memory_bank *bank)  { install_bank_generic(addrstart, addrend, addrmask, addrmirror, bank, bank); }
@@ -455,7 +455,7 @@ private:
 	void adjust_addresses(offs_t &start, offs_t &end, offs_t &mask, offs_t &mirror);
 	void *find_backing_memory(offs_t addrstart, offs_t addrend);
 	bool needs_backing_store(const address_map_entry *entry);
-	memory_bank &bank_find_or_allocate(std::string tag, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite);
+	memory_bank &bank_find_or_allocate(const char *tag, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite);
 	address_map_entry *block_assign_intersecting(offs_t bytestart, offs_t byteend, UINT8 *base);
 
 protected:
@@ -568,7 +568,7 @@ class memory_bank
 
 public:
 	// construction/destruction
-	memory_bank(address_space &space, int index, offs_t bytestart, offs_t byteend, std::string tag = nullptr);
+	memory_bank(address_space &space, int index, offs_t bytestart, offs_t byteend, const char *tag = nullptr);
 	~memory_bank();
 
 	// getters
@@ -579,7 +579,7 @@ public:
 	bool anonymous() const { return m_anonymous; }
 	offs_t bytestart() const { return m_bytestart; }
 	void *base() const { return *m_baseptr; }
-	std::string tag() const { return m_tag.c_str(); }
+	const char *tag() const { return m_tag.c_str(); }
 	const char *name() const { return m_name.c_str(); }
 
 	// compare a range against our range
@@ -744,9 +744,9 @@ public:
 private:
 	// internal helpers
 	memory_bank *first_bank() const { return m_banklist.first(); }
-	memory_bank *bank(std::string tag) const { return m_banklist.find(tag); }
-	memory_region *region(std::string tag) { return m_regionlist.find(tag); }
-	memory_share *shared(std::string tag) { return m_sharelist.find(tag); }
+	memory_bank *bank(const char *tag) const { return m_banklist.find(tag); }
+	memory_region *region(const char *tag) { return m_regionlist.find(tag); }
+	memory_share *shared(const char *tag) { return m_sharelist.find(tag); }
 	void bank_reattach();
 
 	// internal state

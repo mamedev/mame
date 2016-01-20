@@ -314,7 +314,7 @@ const device_type SC499 = &device_creator<sc499_device>;
 // sc499_device - constructor
 //-------------------------------------------------
 
-sc499_device::sc499_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sc499_device::sc499_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SC499, "Archive SC-499", tag, owner, clock, "sc499", __FILE__),
 	device_isa8_card_interface(mconfig, *this),
 	m_iobase(*this, "IO_BASE"),
@@ -413,7 +413,7 @@ const char *sc499_device::cpu_context()
 	int s = t / osd_ticks_per_second();
 	int ms = (t % osd_ticks_per_second()) / 1000;
 
-	sprintf(statebuf, "%d.%03d%s:", s, ms, tag().c_str());
+	sprintf(statebuf, "%d.%03d%s:", s, ms, tag());
 
 	return statebuf;
 }
@@ -1279,7 +1279,7 @@ void sc499_device::block_set_filemark()
 
 const device_type SC499_CTAPE = &device_creator<sc499_ctape_image_device>;
 
-sc499_ctape_image_device::sc499_ctape_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sc499_ctape_image_device::sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SC499_CTAPE, "Cartridge Tape", tag, owner, clock, "sc499_ctape", __FILE__),
 		device_image_interface(mconfig, *this)
 {

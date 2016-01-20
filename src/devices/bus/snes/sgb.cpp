@@ -22,7 +22,7 @@
 const device_type SNS_LOROM_SUPERGB = &device_creator<sns_rom_sgb_device>;
 
 
-sns_rom_sgb_device::sns_rom_sgb_device(const machine_config& mconfig, std::string tag, device_t* owner, UINT32 clock) :
+sns_rom_sgb_device::sns_rom_sgb_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	sns_rom_device(mconfig, SNS_LOROM_SUPERGB, "SNES Super Game Boy Cart", tag, owner, clock, "sns_rom_sgb", __FILE__),
 	m_gb_cpu(*this, "sgb_cpu"),
 	m_gb_snd(*this, "sgb_snd"),

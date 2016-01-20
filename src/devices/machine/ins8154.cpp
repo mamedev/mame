@@ -42,7 +42,7 @@ const device_type INS8154 = &device_creator<ins8154_device>;
 //  ins8154_device - constructor
 //-------------------------------------------------
 
-ins8154_device::ins8154_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ins8154_device::ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, INS8154, "INS8154 RAM I/O", tag, owner, clock, "ins8154", __FILE__),
 	m_in_a_cb(*this),
 	m_out_a_cb(*this),
@@ -100,7 +100,7 @@ READ8_MEMBER(ins8154_device::ins8154_r)
 	{
 		if (VERBOSE)
 		{
-			logerror("%s: INS8154 '%s' Read from invalid offset %02x!\n", machine().describe_context(), tag().c_str(), offset);
+			logerror("%s: INS8154 '%s' Read from invalid offset %02x!\n", machine().describe_context(), tag(), offset);
 		}
 		return 0xff;
 	}
@@ -174,7 +174,7 @@ WRITE8_MEMBER(ins8154_device::ins8154_w)
 	{
 		if (VERBOSE)
 		{
-			logerror("%s: INS8154 '%s' Write %02x to invalid offset %02x!\n", machine().describe_context(), tag().c_str(), data, offset);
+			logerror("%s: INS8154 '%s' Write %02x to invalid offset %02x!\n", machine().describe_context(), tag(), data, offset);
 		}
 		return;
 	}
@@ -192,7 +192,7 @@ WRITE8_MEMBER(ins8154_device::ins8154_w)
 	case 0x22:
 		if (VERBOSE)
 		{
-			logerror("%s: INS8154 '%s' ODRA set to %02x\n", machine().describe_context(), tag().c_str(), data);
+			logerror("%s: INS8154 '%s' ODRA set to %02x\n", machine().describe_context(), tag(), data);
 		}
 
 		m_odra = data;
@@ -201,7 +201,7 @@ WRITE8_MEMBER(ins8154_device::ins8154_w)
 	case 0x23:
 		if (VERBOSE)
 		{
-			logerror("%s: INS8154 '%s' ODRB set to %02x\n", machine().describe_context(), tag().c_str(), data);
+			logerror("%s: INS8154 '%s' ODRB set to %02x\n", machine().describe_context(), tag(), data);
 		}
 
 		m_odrb = data;
@@ -210,7 +210,7 @@ WRITE8_MEMBER(ins8154_device::ins8154_w)
 	case 0x24:
 		if (VERBOSE)
 		{
-			logerror("%s: INS8154 '%s' MDR set to %02x\n", machine().describe_context(), tag().c_str(), data);
+			logerror("%s: INS8154 '%s' MDR set to %02x\n", machine().describe_context(), tag(), data);
 		}
 
 		m_mdr = data;

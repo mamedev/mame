@@ -37,7 +37,7 @@ const device_type DMAC = &device_creator<dmac_device>;
 //  dmac_device - constructor
 //-------------------------------------------------
 
-dmac_device::dmac_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+dmac_device::dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, DMAC, "DMAC DMA Controller", tag, owner, clock, "dmac", __FILE__),
 	amiga_autoconfig(),
 	m_cfgout_handler(*this),

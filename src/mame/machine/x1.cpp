@@ -14,7 +14,7 @@ const device_type X1_KEYBOARD = &device_creator<x1_keyboard_device>;
 //  z80ctc_device - constructor
 //-------------------------------------------------
 
-x1_keyboard_device::x1_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+x1_keyboard_device::x1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, X1_KEYBOARD, "X1 Keyboard", tag, owner, clock, "x1_keyboard", __FILE__),
 		device_z80daisy_interface(mconfig, *this)
 {

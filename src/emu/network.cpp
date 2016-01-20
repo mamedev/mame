@@ -46,7 +46,7 @@ void network_manager::config_load(config_type cfg_type, xml_data_node *parentnod
 				network_interface_iterator iter(machine().root_device());
 				for (device_network_interface *network = iter.first(); network != nullptr; network = iter.next())
 				{
-					if (!strcmp(tag, network->device().tag().c_str())) {
+					if (!strcmp(tag, network->device().tag())) {
 						int interface = xml_get_attribute_int(node, "interface", 0);
 						network->set_interface(interface);
 						const char *mac_addr = xml_get_attribute_string(node, "mac", nullptr);
@@ -82,7 +82,7 @@ void network_manager::config_save(config_type cfg_type, xml_data_node *parentnod
 			node = xml_add_child(parentnode, "device", nullptr);
 			if (node != nullptr)
 			{
-				xml_set_attribute(node, "tag", network->device().tag().c_str());
+				xml_set_attribute(node, "tag", network->device().tag());
 				xml_set_attribute_int(node, "interface", network->get_interface());
 				const char *mac = network->get_mac();
 				char mac_addr[6 * 3];

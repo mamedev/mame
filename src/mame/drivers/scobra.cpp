@@ -45,7 +45,7 @@ Notes/Tidbits:
 class scobra_state : public scramble_state
 {
 public:
-	scobra_state(const machine_config &mconfig, device_type type, std::string tag)
+	scobra_state(const machine_config &mconfig, device_type type, const char *tag)
 		: scramble_state(mconfig, type, tag),
 			m_soundram(*this, "soundram") { }
 

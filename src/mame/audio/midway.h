@@ -62,7 +62,7 @@ class midway_ssio_device :  public device_t,
 {
 public:
 	// construction/destruction
-	midway_ssio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	midway_ssio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// read/write
 	DECLARE_READ8_MEMBER(read);
@@ -128,7 +128,7 @@ class midway_chip_squeak_deluxe_device :    public device_t,
 {
 public:
 	// construction/destruction
-	midway_chip_squeak_deluxe_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	midway_chip_squeak_deluxe_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// read/write
 	DECLARE_READ8_MEMBER(read);
@@ -168,7 +168,7 @@ class midway_sounds_good_device :   public device_t,
 {
 public:
 	// construction/destruction
-	midway_sounds_good_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	midway_sounds_good_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// read/write
 	DECLARE_READ8_MEMBER(read);
@@ -206,7 +206,7 @@ class midway_turbo_chip_squeak_device : public device_t,
 {
 public:
 	// construction/destruction
-	midway_turbo_chip_squeak_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	midway_turbo_chip_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// read/write
 	DECLARE_READ8_MEMBER(read);
@@ -244,7 +244,7 @@ class midway_squawk_n_talk_device : public device_t,
 {
 public:
 	// construction/destruction
-	midway_squawk_n_talk_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	midway_squawk_n_talk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// read/write
 	DECLARE_WRITE8_MEMBER(write);

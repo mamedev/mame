@@ -23,7 +23,7 @@
 class mc1502_state : public driver_device
 {
 public:
-	mc1502_state(const machine_config &mconfig, device_type type, std::string tag)
+	mc1502_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_upd8251(*this, "upd8251"),

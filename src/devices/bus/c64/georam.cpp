@@ -26,7 +26,7 @@ const device_type C64_GEORAM = &device_creator<c64_georam_cartridge_device>;
 //  c64_georam_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_georam_cartridge_device::c64_georam_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+c64_georam_cartridge_device::c64_georam_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_GEORAM, "C64 GeoRAM cartridge", tag, owner, clock, "c64_georam", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_ram(*this, "ram"),

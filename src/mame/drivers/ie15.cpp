@@ -52,7 +52,7 @@ class ie15_state : public driver_device,
 	public device_serial_interface
 {
 public:
-	ie15_state(const machine_config &mconfig, device_type type, std::string tag) :
+	ie15_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		device_serial_interface(mconfig, *this),
 		m_maincpu(*this, "maincpu"),

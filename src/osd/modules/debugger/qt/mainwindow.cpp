@@ -145,7 +145,7 @@ void MainWindow::setProcessor(device_t* processor)
 
 	// Window title
 	std::string title;
-	strprintf(title,"Debug: %s - %s '%s'", m_machine->system().name, processor->name(), processor->tag().c_str());
+	strprintf(title,"Debug: %s - %s '%s'", m_machine->system().name, processor->name(), processor->tag());
 	setWindowTitle(title.c_str());
 }
 

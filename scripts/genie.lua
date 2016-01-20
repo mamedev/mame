@@ -1258,19 +1258,15 @@ findfunction("createProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarg
 
 group "emulator"
 dofile(path.join("src", "main.lua"))
-if (_OPTIONS["SOURCES"] == nil) then 
-	if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
-		startproject (_OPTIONS["target"])
-	else
-		if (_OPTIONS["subtarget"]=="mess") then
-			startproject (_OPTIONS["subtarget"])
-		else
-			startproject (_OPTIONS["target"] .. _OPTIONS["subtarget"])
-		end
-	end
+if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
+	startproject (_OPTIONS["target"])
 else
-	startproject (_OPTIONS["subtarget"])
-end 
+	if (_OPTIONS["subtarget"]=="mess") then
+		startproject (_OPTIONS["subtarget"])
+	else
+		startproject (_OPTIONS["target"] .. _OPTIONS["subtarget"])
+	end
+end
 mainProject(_OPTIONS["target"],_OPTIONS["subtarget"])
 
 if (_OPTIONS["STRIP_SYMBOLS"]=="1") then

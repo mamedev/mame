@@ -60,7 +60,7 @@ class gameboy_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	gameboy_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gameboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_READ8_MEMBER(wave_r);

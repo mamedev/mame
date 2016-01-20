@@ -36,7 +36,7 @@ public:
 		TIMER_NMI_CLEAR
 	};
 
-	gottlieb_state(const machine_config &mconfig, device_type type, std::string tag)
+	gottlieb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_laserdisc(*this, "laserdisc"),

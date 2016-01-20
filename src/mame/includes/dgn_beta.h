@@ -81,7 +81,7 @@ struct PageReg
 class dgn_beta_state : public driver_device
 {
 public:
-	dgn_beta_state(const machine_config &mconfig, device_type type, std::string tag)
+	dgn_beta_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_mc6845(*this, "crtc"),
 		m_videoram(*this, "videoram"),

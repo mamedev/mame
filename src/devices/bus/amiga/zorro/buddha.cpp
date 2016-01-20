@@ -67,7 +67,7 @@ const rom_entry *buddha_device::device_rom_region() const
 //  buddha_device - constructor
 //-------------------------------------------------
 
-buddha_device::buddha_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+buddha_device::buddha_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, BUDDHA, "Buddha IDE controller", tag, owner, clock, "buddha", __FILE__),
 	device_zorro2_card_interface(mconfig, *this),
 	m_ata_0(*this, "ata_0"),

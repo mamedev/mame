@@ -28,7 +28,7 @@ There's unknown usage of ports 11 thru 1B, 34, and F0 thru F2.
 class ccs300_state : public driver_device
 {
 public:
-	ccs300_state(const machine_config &mconfig, device_type type, std::string tag)
+	ccs300_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG)

@@ -203,7 +203,7 @@ class studio2_state : public driver_device
 {
 public:
 
-	studio2_state(const machine_config &mconfig, device_type type, std::string tag)
+	studio2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
 			m_beeper(*this, "beeper"),
@@ -248,7 +248,7 @@ public:
 class visicom_state : public studio2_state
 {
 public:
-	visicom_state(const machine_config &mconfig, device_type type, std::string tag)
+	visicom_state(const machine_config &mconfig, device_type type, const char *tag)
 		: studio2_state(mconfig, type, tag),
 			m_color0_ram(*this, "color0_ram"),
 			m_color1_ram(*this, "color1_ram")
@@ -265,7 +265,7 @@ public:
 class mpt02_state : public studio2_state
 {
 public:
-	mpt02_state(const machine_config &mconfig, device_type type, std::string tag)
+	mpt02_state(const machine_config &mconfig, device_type type, const char *tag)
 		: studio2_state(mconfig, type, tag),
 			m_cti(*this, CDP1864_TAG),
 			m_color_ram(*this, "color_ram")

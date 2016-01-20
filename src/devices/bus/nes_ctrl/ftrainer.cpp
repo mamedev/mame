@@ -83,7 +83,7 @@ ioport_constructor nes_ftrainer_device::device_input_ports() const
 //  nes_ftrainer_device - constructor
 //-------------------------------------------------
 
-nes_ftrainer_device::nes_ftrainer_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+nes_ftrainer_device::nes_ftrainer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 					device_t(mconfig, NES_FTRAINER, "Bandai Family Trainer", tag, owner, clock, "nes_famtrain", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_trainer(*this, "FT_COL"), m_row_scan(0)

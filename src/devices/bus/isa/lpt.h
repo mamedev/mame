@@ -23,7 +23,7 @@ class isa8_lpt_device : public device_t,
 {
 public:
 	// construction/destruction
-	isa8_lpt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	isa8_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

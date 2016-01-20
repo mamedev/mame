@@ -47,7 +47,7 @@ class cdp1863_device :  public device_t,
 {
 public:
 	// construction/destruction
-	cdp1863_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cdp1863_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
 	static void static_set_clock2(device_t &device, int clock2);

@@ -31,7 +31,7 @@ ToDo:
 class micropin_state : public genpin_class
 {
 public:
-	micropin_state(const machine_config &mconfig, device_type type, std::string tag)
+	micropin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_v1cpu(*this, "v1cpu")
 		, m_v2cpu(*this, "v2cpu")

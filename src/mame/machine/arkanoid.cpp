@@ -223,8 +223,8 @@ CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_68705_input_r)
 
 CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_input_mux)
 {
-	const char * tag1 = (const char *)param;
-	const char * tag2 = tag1 + strlen(tag1) + 1;
+	const char *tag1 = (const char *)param;
+	const char *tag2 = tag1 + strlen(tag1) + 1;
 	return ioport((m_paddle_select == 0) ? tag1 : tag2)->read();
 }
 

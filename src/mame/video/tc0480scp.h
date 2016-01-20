@@ -6,12 +6,12 @@
 class tc0480scp_device : public device_t
 {
 public:
-	tc0480scp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~tc0480scp_device() {}
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
-	static void static_set_palette_tag(device_t &device, std::string tag);
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_gfx_region(device_t &device, int gfxregion) { downcast<tc0480scp_device &>(device).m_gfxnum = gfxregion; }
 	static void set_tx_region(device_t &device, int txregion) { downcast<tc0480scp_device &>(device).m_txnum = txregion; }
 	static void set_col_base(device_t &device, int col) { downcast<tc0480scp_device &>(device).m_col_base = col; }

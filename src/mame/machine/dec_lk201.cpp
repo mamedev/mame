@@ -461,7 +461,7 @@ ioport_constructor lk201_device::device_input_ports() const
 //  lk201_device - constructor
 //-------------------------------------------------
 
-lk201_device::lk201_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+lk201_device::lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, LK201, "DEC LK201 keyboard", tag, owner, clock, "lk201", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_maincpu(*this, LK201_CPU_TAG),

@@ -108,7 +108,7 @@
 class jrpacman_state : public pacman_state
 {
 public:
-	jrpacman_state(const machine_config &mconfig, device_type type, std::string tag)
+	jrpacman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pacman_state(mconfig, type, tag) { }
 	DECLARE_WRITE8_MEMBER(jrpacman_interrupt_vector_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);

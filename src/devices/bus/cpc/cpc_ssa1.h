@@ -53,7 +53,7 @@ class cpc_ssa1_device : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_ssa1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cpc_ssa1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
@@ -89,7 +89,7 @@ class cpc_dkspeech_device : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_dkspeech_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cpc_dkspeech_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;

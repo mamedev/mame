@@ -8,7 +8,7 @@
 
 const device_type SEGAIC16_ROAD = &device_creator<segaic16_road_device>;
 
-segaic16_road_device::segaic16_road_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+segaic16_road_device::segaic16_road_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGAIC16_ROAD, "Sega 16-bit Road Generator", tag, owner, clock, "segaic16_road", __FILE__)
 {
 }

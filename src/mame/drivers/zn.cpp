@@ -36,7 +36,7 @@
 class zn_state : public driver_device
 {
 public:
-	zn_state(const machine_config &mconfig, device_type type, std::string tag) :
+	zn_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_gpu(*this, "gpu"),
 		m_gpu_screen(*this, "gpu:screen"),

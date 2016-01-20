@@ -27,7 +27,7 @@
 
 const device_type HD63484 = &device_creator<hd63484_device>;
 
-hd63484_device::hd63484_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HD63484, "HD63484 CRTC", tag, owner, clock, "hd63484", __FILE__),
 	m_ram(nullptr),
 	m_fifo_counter(0),

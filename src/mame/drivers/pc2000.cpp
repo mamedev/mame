@@ -30,7 +30,7 @@
 class pc2000_state : public driver_device
 {
 public:
-	pc2000_state(const machine_config &mconfig, device_type type, std::string tag)
+	pc2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_lcdc(*this, "hd44780"),
@@ -69,7 +69,7 @@ public:
 class gl3000s_state : public pc2000_state
 {
 public:
-	gl3000s_state(const machine_config &mconfig, device_type type, std::string tag)
+	gl3000s_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc2000_state(mconfig, type, tag),
 			m_lcdc_r(*this, "sed1520_r"),
 			m_lcdc_l(*this, "sed1520_l")
@@ -84,7 +84,7 @@ public:
 class gl4004_state : public pc2000_state
 {
 public:
-	gl4004_state(const machine_config &mconfig, device_type type, std::string tag)
+	gl4004_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc2000_state(mconfig, type, tag)
 		{ }
 
@@ -94,7 +94,7 @@ public:
 class pc1000_state : public pc2000_state
 {
 public:
-	pc1000_state(const machine_config &mconfig, device_type type, std::string tag)
+	pc1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc2000_state(mconfig, type, tag)
 		{ }
 

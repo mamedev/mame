@@ -11,7 +11,7 @@
 class naomi_rom_board : public naomi_board
 {
 public:
-	naomi_rom_board(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	naomi_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;

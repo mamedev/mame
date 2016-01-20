@@ -75,7 +75,7 @@ const device_type DMV_K806 = &device_creator<dmv_k806_device>;
 //  dmv_k806_device - constructor
 //-------------------------------------------------
 
-dmv_k806_device::dmv_k806_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+dmv_k806_device::dmv_k806_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, DMV_K806, "K806 mouse", tag, owner, clock, "dmv_k806", __FILE__),
 		device_dmvslot_interface( mconfig, *this ),
 		m_mcu(*this, "mcu"),

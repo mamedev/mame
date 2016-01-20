@@ -33,7 +33,7 @@ Other stuff: NEC D4992 (RTC?) and xtal possibly 32.768kHz, 3V coin battery, 93L4
 class hideseek_state : public driver_device
 {
 public:
-	hideseek_state(const machine_config &mconfig, device_type type, std::string tag)
+	hideseek_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu")
 		{ }

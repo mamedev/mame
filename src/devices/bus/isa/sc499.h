@@ -26,7 +26,7 @@ class sc499_ctape_image_device : public device_t, public device_image_interface
 {
 public:
 	// construction/destruction
-	sc499_ctape_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
 	virtual bool call_load() override;
@@ -61,7 +61,7 @@ class sc499_device: public device_t, public device_isa8_card_interface
 {
 public:
 	// construction/destruction
-	sc499_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sc499_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	required_ioport m_iobase;
 	required_ioport m_irqdrq;

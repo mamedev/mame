@@ -36,7 +36,7 @@ const device_type MM74C923 = &device_creator<mm74c922_device>;
 //  mm74c922_device - constructor
 //-------------------------------------------------
 
-mm74c922_device::mm74c922_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+mm74c922_device::mm74c922_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MM74C922, "MM74C922", tag, owner, clock, "mm74c922", __FILE__),
 	m_write_da(*this),
 	m_read_x1(*this),
@@ -103,7 +103,7 @@ void mm74c922_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 UINT8 mm74c922_device::read()
 {
-	if (LOG) logerror("MM74C922 '%s' Data Read: %02x\n", tag().c_str(), m_data);
+	if (LOG) logerror("MM74C922 '%s' Data Read: %02x\n", tag(), m_data);
 
 	return m_data;
 }
@@ -119,7 +119,7 @@ void mm74c922_device::change_output_lines()
 	{
 		m_da = m_next_da;
 
-		if (LOG) logerror("MM74C922 '%s' Data Available: %u\n", tag().c_str(), m_da);
+		if (LOG) logerror("MM74C922 '%s' Data Available: %u\n", tag(), m_da);
 
 		m_write_da(m_da);
 	}
@@ -166,7 +166,7 @@ void mm74c922_device::detect_keypress()
 			m_next_da = 0;
 			m_data = 0xff; // high-Z
 
-			if (LOG) logerror("MM74C922 '%s' Key Released\n", tag().c_str());
+			if (LOG) logerror("MM74C922 '%s' Key Released\n", tag());
 		}
 	}
 	else
@@ -182,7 +182,7 @@ void mm74c922_device::detect_keypress()
 
 				m_data = (y << 2) | m_x;
 
-				if (LOG) logerror("MM74C922 '%s' Key Depressed: X %u Y %u = %02x\n", tag().c_str(), m_x, y, m_data);
+				if (LOG) logerror("MM74C922 '%s' Key Depressed: X %u Y %u = %02x\n", tag(), m_x, y, m_data);
 				return;
 			}
 		}

@@ -936,7 +936,7 @@ WRITE8_MEMBER( ymz280b_device::write )
 
 const device_type YMZ280B = &device_creator<ymz280b_device>;
 
-ymz280b_device::ymz280b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ymz280b_device::ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YMZ280B, "YMZ280B", tag, owner, clock, "ymz280b", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_current_register(0),

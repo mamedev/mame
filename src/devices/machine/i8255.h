@@ -68,7 +68,7 @@ class i8255_device :  public device_t
 {
 public:
 	// construction/destruction
-	i8255_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_in_pa_callback(device_t &device, _Object object)  { return downcast<i8255_device &>(device).m_in_pa_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_in_pb_callback(device_t &device, _Object object)  { return downcast<i8255_device &>(device).m_in_pb_cb.set_callback(object); }

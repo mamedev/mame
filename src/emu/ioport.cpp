@@ -1399,7 +1399,7 @@ bool ioport_condition::eval() const
 
 void ioport_condition::initialize(device_t &device)
 {
-	if (!m_tag.empty())
+	if (m_tag != nullptr)
 		m_port = device.ioport(m_tag);
 }
 
@@ -1487,7 +1487,7 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 		const input_device_default *def = device().input_ports_defaults();
 		if (def != nullptr)
 		{
-			std::string fulltag = port.tag();
+			const char *fulltag = port.tag();
 			for ( ; def->tag != nullptr; def++)
 				if (device().subtag(def->tag) == fulltag && def->mask == m_mask)
 					m_defvalue = def->defvalue & m_mask;
@@ -2200,7 +2200,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 //  ioport_port - constructor
 //-------------------------------------------------
 
-ioport_port::ioport_port(device_t &owner, std::string tag)
+ioport_port::ioport_port(device_t &owner, const char *tag)
 	: m_next(nullptr),
 		m_device(owner),
 		m_tag(tag),
@@ -2354,7 +2354,7 @@ void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedb
 	if (newfield.condition().none())
 	{
 		if ((newfield.mask() & disallowedbits) != 0)
-			strcatprintf(errorbuf, "INPUT_TOKEN_FIELD specifies duplicate port bits (port=%s mask=%X)\n", tag().c_str(), newfield.mask());
+			strcatprintf(errorbuf, "INPUT_TOKEN_FIELD specifies duplicate port bits (port=%s mask=%X)\n", tag(), newfield.mask());
 		disallowedbits |= newfield.mask();
 	}
 
@@ -3087,13 +3087,13 @@ bool ioport_manager::load_default_config(xml_data_node *portnode, int type, int 
 bool ioport_manager::load_game_config(xml_data_node *portnode, int type, int player, const input_seq *newseq)
 {
 	// read the mask, index, and defvalue attributes
-	std::string tag = xml_get_attribute_string(portnode, "tag", nullptr);
+	const char *tag = xml_get_attribute_string(portnode, "tag", nullptr);
 	ioport_value mask = xml_get_attribute_int(portnode, "mask", 0);
 	ioport_value defvalue = xml_get_attribute_int(portnode, "defvalue", 0);
 
 	// find the port we want; if no tag, search them all
 	for (ioport_port *port = first_port(); port != nullptr; port = port->next())
-		if (tag.empty() || port->tag()==tag)
+		if (tag == nullptr || strcmp(port->tag(), tag) == 0)
 			for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 
 				// find the matching mask and defvalue
@@ -3286,7 +3286,7 @@ void ioport_manager::save_game_inputs(xml_data_node *parentnode)
 					if (portnode != nullptr)
 					{
 						// add the identifying information and attributes
-						xml_set_attribute(portnode, "tag", port->tag().c_str());
+						xml_set_attribute(portnode, "tag", port->tag());
 						xml_set_attribute(portnode, "type", input_type_to_token(field->type(), field->player()).c_str());
 						xml_set_attribute_int(portnode, "mask", field->mask());
 						xml_set_attribute_int(portnode, "defvalue", field->defvalue() & field->mask());
@@ -3679,7 +3679,7 @@ const char *ioport_configurer::string_from_token(const char *string)
 //  port_alloc - allocate a new port
 //-------------------------------------------------
 
-void ioport_configurer::port_alloc(std::string tag)
+void ioport_configurer::port_alloc(const char *tag)
 {
 	// create the full tag
 	std::string fulltag = m_owner.subtag(tag);
@@ -3696,7 +3696,7 @@ void ioport_configurer::port_alloc(std::string tag)
 //  modify it
 //-------------------------------------------------
 
-void ioport_configurer::port_modify(std::string tag)
+void ioport_configurer::port_modify(const char *tag)
 {
 	// create the full tag
 	std::string fulltag = m_owner.subtag(tag);
@@ -3780,7 +3780,7 @@ void ioport_configurer::setting_alloc(ioport_value value, const char *name)
 //  the current setting or field
 //-------------------------------------------------
 
-void ioport_configurer::set_condition(ioport_condition::condition_t condition, std::string tag, ioport_value mask, ioport_value value)
+void ioport_configurer::set_condition(ioport_condition::condition_t condition, const char *tag, ioport_value mask, ioport_value value)
 {
 	ioport_condition &target = (m_cursetting != nullptr) ? m_cursetting->condition() : m_curfield->condition();
 	target.set(condition, tag, mask, value);

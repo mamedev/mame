@@ -20,7 +20,7 @@
 class gts80a_state : public genpin_class
 {
 public:
-	gts80a_state(const machine_config &mconfig, device_type type, std::string tag)
+	gts80a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_r0_sound(*this, "r0sound")
@@ -382,7 +382,7 @@ MACHINE_CONFIG_END
 class caveman_state : public gts80a_state
 {
 public:
-	caveman_state(const machine_config &mconfig, device_type type, std::string tag)
+	caveman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: gts80a_state(mconfig, type, tag)
 		, m_videocpu(*this, "video_cpu")
 		, m_vram(*this, "vram")

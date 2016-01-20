@@ -21,7 +21,7 @@ class huc6270_device :  public device_t
 {
 public:
 	// construction/destruction
-	huc6270_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	huc6270_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void set_vram_size(device_t &device, UINT32 vram_size) { downcast<huc6270_device &>(device).m_vram_size = vram_size; }
 	template<class _Object> static devcb_base &set_irq_changed_callback(device_t &device, _Object object) { return downcast<huc6270_device &>(device).m_irq_changed_cb.set_callback(object); }

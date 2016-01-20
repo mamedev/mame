@@ -35,7 +35,7 @@ class at28c16_device :
 {
 public:
 	// construction/destruction
-	at28c16_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock );
+	at28c16_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock );
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );

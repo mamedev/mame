@@ -26,10 +26,10 @@ struct upd71071_reg
 class upd71071_device : public device_t
 {
 public:
-	upd71071_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	upd71071_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~upd71071_device() {}
 
-	static void static_set_cpu_tag(device_t &device, std::string tag) { downcast<upd71071_device &>(device).m_cpu.set_tag(tag); }
+	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<upd71071_device &>(device).m_cpu.set_tag(tag); }
 	static void set_clock(device_t &device, int clock) { downcast<upd71071_device &>(device).m_upd_clock = clock; }
 	template<class _Object> static devcb_base &set_out_hreq_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_out_hreq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_eop_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_out_eop_cb.set_callback(object); }

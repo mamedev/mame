@@ -22,7 +22,7 @@
 class eolith16_state : public eolith_state
 {
 public:
-	eolith16_state(const machine_config &mconfig, device_type type, std::string tag)
+	eolith16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: eolith_state(mconfig, type, tag) { }
 
 	std::unique_ptr<UINT16[]> m_vram;

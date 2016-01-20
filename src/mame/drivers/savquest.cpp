@@ -57,7 +57,7 @@
 class savquest_state : public pcat_base_state
 {
 public:
-	savquest_state(const machine_config &mconfig, device_type type, std::string tag)
+	savquest_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag),
 		m_vga(*this, "vga"),
 		m_voodoo(*this, "voodoo")

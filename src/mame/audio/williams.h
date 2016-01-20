@@ -51,7 +51,7 @@ class williams_cvsd_sound_device :  public device_t,
 {
 public:
 	// construction/destruction
-	williams_cvsd_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// read/write
 	DECLARE_WRITE16_MEMBER(write);
@@ -91,7 +91,7 @@ class williams_narc_sound_device :  public device_t,
 {
 public:
 	// construction/destruction
-	williams_narc_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// read/write
 	DECLARE_READ16_MEMBER(read);
@@ -149,7 +149,7 @@ class williams_adpcm_sound_device : public device_t,
 {
 public:
 	// construction/destruction
-	williams_adpcm_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// read/write
 	DECLARE_WRITE16_MEMBER(write);

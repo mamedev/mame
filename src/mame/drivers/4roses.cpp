@@ -185,7 +185,7 @@
 class _4roses_state : public funworld_state
 {
 public:
-	_4roses_state(const machine_config &mconfig, device_type type, std::string tag)
+	_4roses_state(const machine_config &mconfig, device_type type, const char *tag)
 		: funworld_state(mconfig, type, tag) { }
 
 	DECLARE_DRIVER_INIT(4roses);

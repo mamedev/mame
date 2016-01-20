@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( dsp56156_x_data_map, AS_DATA, 16, dsp56k_device )
 ADDRESS_MAP_END
 
 
-dsp56k_device::dsp56k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+dsp56k_device::dsp56k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, DSP56156, "DSP56156", tag, owner, clock, "dsp56156", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(dsp56156_program_map))
 	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(dsp56156_x_data_map))

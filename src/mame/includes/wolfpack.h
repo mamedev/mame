@@ -16,7 +16,7 @@ public:
 		TIMER_PERIODIC
 	};
 
-	wolfpack_state(const machine_config &mconfig, device_type type, std::string tag)
+	wolfpack_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_alpha_num_ram(*this, "alpha_num_ram"),
 		m_maincpu(*this, "maincpu"),

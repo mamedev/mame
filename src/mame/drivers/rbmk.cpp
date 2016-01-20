@@ -62,7 +62,7 @@ Notes:
 class rbmk_state : public driver_device
 {
 public:
-	rbmk_state(const machine_config &mconfig, device_type type, std::string tag)
+	rbmk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_gms_vidram2(*this, "gms_vidram2"),
 		m_gms_vidram(*this, "gms_vidram"),

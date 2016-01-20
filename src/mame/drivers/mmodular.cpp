@@ -129,7 +129,7 @@ UINT8 lcd32_char;
 class polgar_state : public mboard_state
 {
 public:
-	polgar_state(const machine_config &mconfig, device_type type, std::string tag)
+	polgar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mboard_state(mconfig, type, tag),
 			m_lcdc(*this, "hd44780"),
 			m_beeper(*this, "beeper")

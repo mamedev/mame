@@ -5,7 +5,7 @@
 class prehisle_state : public driver_device
 {
 public:
-	prehisle_state(const machine_config &mconfig, device_type type, std::string tag)
+	prehisle_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_tx_vram(*this, "tx_vram"),
 		m_spriteram(*this, "spriteram"),

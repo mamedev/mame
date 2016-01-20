@@ -94,7 +94,7 @@ class superfx_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	superfx_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
+	superfx_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_out_irq_func(device_t &device, _Object object) { return downcast<superfx_device &>(device).m_out_irq_func.set_callback(object); }

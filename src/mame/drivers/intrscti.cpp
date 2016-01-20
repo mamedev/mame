@@ -20,7 +20,7 @@ I've not had a chance to wire up the board yet, but it might be possible to writ
 class intrscti_state : public driver_device
 {
 public:
-	intrscti_state(const machine_config &mconfig, device_type type, std::string tag)
+	intrscti_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_subcpu(*this,"subcpu"),

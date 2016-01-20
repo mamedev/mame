@@ -16,7 +16,7 @@ class trident_vga_device :  public svga_device
 {
 public:
 	// construction/destruction
-	trident_vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	trident_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual READ8_MEMBER(port_03c0_r) override;
 	virtual WRITE8_MEMBER(port_03c0_w) override;

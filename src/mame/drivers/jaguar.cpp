@@ -377,7 +377,7 @@ extern const device_type COJAG_HARDDISK;
 class cojag_hdd : public ide_hdd_device
 {
 public:
-	cojag_hdd(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+	cojag_hdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: ide_hdd_device(mconfig, COJAG_HARDDISK, "HDD CoJag", tag, owner, clock, "cojag_hdd", __FILE__)
 	{
 	}

@@ -40,7 +40,7 @@ ADDRESS_MAP_END
 DEVICE_ADDRESS_MAP_START(empty, 32, pci9050_device)
 ADDRESS_MAP_END
 
-pci9050_device::pci9050_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pci9050_device::pci9050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, PCI9050, "PLX PCI9050 PCI to Local Bus Bridge", tag, owner, clock, "pci9050", __FILE__)
 {
 	for(int i=0; i<4; i++) {

@@ -143,7 +143,7 @@ static const float SDLT[8]={-1000000.0f,-36.0f,-30.0f,-24.0f,-18.0f,-12.0f,-6.0f
 
 const device_type SCSP = &device_creator<scsp_device>;
 
-scsp_device::scsp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SCSP, "SCSP", tag, owner, clock, "scsp", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_roffset(0),
@@ -506,7 +506,7 @@ void scsp_device::init()
 	m_MidiOutR=m_MidiOutW=0;
 
 	// get SCSP RAM
-	if (tag()==":scsp" || tag()==":scsp1")
+	if (strcmp(tag(), ":scsp") == 0 || strcmp(tag(), ":scsp1") == 0)
 	{
 		m_Master=1;
 	}

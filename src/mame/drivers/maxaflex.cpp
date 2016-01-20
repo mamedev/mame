@@ -27,7 +27,7 @@
 class maxaflex_state : public atari_common_state
 {
 public:
-	maxaflex_state(const machine_config &mconfig, device_type type, std::string tag)
+	maxaflex_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atari_common_state(mconfig, type, tag),
 		m_mcu(*this, "mcu"),
 		m_speaker(*this, "speaker"),

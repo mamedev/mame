@@ -159,7 +159,7 @@ PCB 'Z545-1 A240570-1'
 class casloopy_state : public driver_device
 {
 public:
-	casloopy_state(const machine_config &mconfig, device_type type, std::string tag)
+	casloopy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_bios_rom(*this, "bios_rom"),
 		m_vregs(*this, "vregs"),

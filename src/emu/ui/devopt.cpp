@@ -29,7 +29,7 @@ ui_menu_device_config::ui_menu_device_config(running_machine &machine, render_co
 	device_iterator deviter(machine.config().root_device());
 	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
 	{
-		if (device->tag() == tmp_tag)
+		if (strcmp(device->tag(), tmp_tag.c_str()) == 0)
 		{
 			m_mounted = true;
 			break;
@@ -100,7 +100,7 @@ void ui_menu_device_config::populate()
 		str.append("* Video:\n");
 		for (screen_device *screen = scriter.first(); screen != nullptr; screen = scriter.next())
 		{
-			strcatprintf(str,"  Screen '%s': ", screen->tag().c_str());
+			strcatprintf(str,"  Screen '%s': ", screen->tag());
 
 			if (screen->screen_type() == SCREEN_TYPE_VECTOR)
 				str.append("Vector\n");
@@ -263,7 +263,7 @@ void ui_menu_device_config::populate()
 	{
 		str.append("* Media Options:\n");
 		for (const device_image_interface *imagedev = imgiter.first(); imagedev != nullptr; imagedev = imgiter.next())
-			strcatprintf(str,"  %s    [tag: %s]\n", imagedev->image_type_name(), imagedev->device().tag().c_str());
+			strcatprintf(str,"  %s    [tag: %s]\n", imagedev->image_type_name(), imagedev->device().tag());
 	}
 
 	slot_interface_iterator slotiter(*dev);
@@ -271,7 +271,7 @@ void ui_menu_device_config::populate()
 	{
 		str.append("* Slot Options:\n");
 		for (const device_slot_interface *slot = slotiter.first(); slot != nullptr; slot = slotiter.next())
-			strcatprintf(str,"  %s    [default: %s]\n", slot->device().tag().c_str(), slot->default_option() ? slot->default_option() : "----");
+			strcatprintf(str,"  %s    [default: %s]\n", slot->device().tag(), slot->default_option() ? slot->default_option() : "----");
 	}
 
 	if ((execiter.count() + scriter.count() + snditer.count() + imgiter.count() + slotiter.count() + bios + dips + confs

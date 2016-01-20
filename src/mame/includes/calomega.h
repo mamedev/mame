@@ -6,7 +6,7 @@
 class calomega_state : public driver_device
 {
 public:
-	calomega_state(const machine_config &mconfig, device_type type, std::string tag) :
+	calomega_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_acia6850_0(*this, "acia6850_0"),

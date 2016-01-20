@@ -16,7 +16,7 @@
 
 class n2a03_device : public m6502_device {
 public:
-	n2a03_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	required_device<nesapu_device> m_apu;
 

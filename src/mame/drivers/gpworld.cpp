@@ -54,7 +54,7 @@ public:
 		TIMER_IRQ_STOP
 	};
 
-	gpworld_state(const machine_config &mconfig, device_type type, std::string tag)
+	gpworld_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc") ,
 		m_sprite_ram(*this, "sprite_ram"),

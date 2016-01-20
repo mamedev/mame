@@ -252,7 +252,7 @@ void emu_timer::register_save()
 	// for device timers, it is an index based on the device and timer ID
 	else
 	{
-		strprintf(name,"%s/%d", m_device->tag().c_str(), m_id);
+		strprintf(name,"%s/%d", m_device->tag(), m_id);
 		for (emu_timer *curtimer = machine().scheduler().first_timer(); curtimer != nullptr; curtimer = curtimer->next())
 			if (!curtimer->m_temporary && curtimer->m_device != nullptr && curtimer->m_device == m_device && curtimer->m_id == m_id)
 				index++;
@@ -296,7 +296,7 @@ void emu_timer::dump() const
 	if (m_device == nullptr)
 		machine().logerror(" cb=%s\n", m_callback.name());
 	else
-		machine().logerror(" dev=%s id=%d\n", m_device->tag().c_str(), m_id);
+		machine().logerror(" dev=%s id=%d\n", m_device->tag(), m_id);
 }
 
 
@@ -457,7 +457,7 @@ void device_scheduler::timeslice()
 				{
 					// compute how many cycles we want to execute
 					int ran = exec->m_cycles_running = divu_64x32((UINT64)delta >> exec->m_divshift, exec->m_divisor);
-					LOG(("  cpu '%s': %" I64FMT"d (%d cycles)\n", exec->device().tag().c_str(), delta, exec->m_cycles_running));
+					LOG(("  cpu '%s': %" I64FMT"d (%d cycles)\n", exec->device().tag(), delta, exec->m_cycles_running));
 
 					// if we're not suspended, actually execute
 					if (exec->m_suspend == 0)
@@ -895,7 +895,7 @@ inline void device_scheduler::execute_timers()
 
 			if (timer.m_device != nullptr)
 			{
-				LOG(("execute_timers: timer device %s timer %d\n", timer.m_device->tag().c_str(), timer.m_id));
+				LOG(("execute_timers: timer device %s timer %d\n", timer.m_device->tag(), timer.m_id));
 				timer.m_device->timer_expired(timer, timer.m_id, timer.m_param, timer.m_ptr);
 			}
 			else if (!timer.m_callback.isnull())

@@ -3,7 +3,7 @@
 class mcr3_state : public mcr_state
 {
 public:
-	mcr3_state(const machine_config &mconfig, device_type type, std::string tag)
+	mcr3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mcr_state(mconfig, type, tag),
 			m_spyhunt_alpharam(*this, "spyhunt_alpha"),
 		m_screen(*this, "screen") { }

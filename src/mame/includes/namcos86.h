@@ -5,7 +5,7 @@
 class namcos86_state : public driver_device
 {
 public:
-	namcos86_state(const machine_config &mconfig, device_type type, std::string tag)
+	namcos86_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cpu1(*this, "cpu1"),
 		m_cpu2(*this, "cpu2"),

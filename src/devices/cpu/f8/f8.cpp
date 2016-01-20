@@ -59,7 +59,7 @@
 const device_type F8 = &device_creator<f8_cpu_device>;
 
 
-f8_cpu_device::f8_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, F8, "Fairchild F8", tag, owner, clock, "f8", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0)

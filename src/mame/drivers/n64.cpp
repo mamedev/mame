@@ -22,7 +22,7 @@
 class n64_mess_state : public n64_state
 {
 public:
-	n64_mess_state(const machine_config &mconfig, device_type type, std::string tag)
+	n64_mess_state(const machine_config &mconfig, device_type type, const char *tag)
 		: n64_state(mconfig, type, tag)
 		{ }
 

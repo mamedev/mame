@@ -55,15 +55,15 @@ ADDRESS_MAP_END
 
 
 // device definitions
-amis2000_cpu_device::amis2000_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+amis2000_cpu_device::amis2000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: amis2000_base_device(mconfig, AMI_S2000, "AMI S2000", tag, owner, clock, 2, 10, 3, 13, ADDRESS_MAP_NAME(program_1k), 6, ADDRESS_MAP_NAME(data_64x4), "amis2000", __FILE__)
 { }
 
-amis2150_cpu_device::amis2150_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+amis2150_cpu_device::amis2150_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: amis2000_base_device(mconfig, AMI_S2150, "AMI S2150", tag, owner, clock, 3, 11, 3, 13, ADDRESS_MAP_NAME(program_1_5k), 7, ADDRESS_MAP_NAME(data_80x4), "amis2150", __FILE__)
 { }
 
-amis2152_cpu_device::amis2152_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+amis2152_cpu_device::amis2152_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: amis2000_base_device(mconfig, AMI_S2152, "AMI S2152", tag, owner, clock, 3, 11, 3, 13, ADDRESS_MAP_NAME(program_1_5k), 7, ADDRESS_MAP_NAME(data_80x4), "amis2152", __FILE__)
 { }
 

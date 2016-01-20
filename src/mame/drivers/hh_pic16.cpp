@@ -34,7 +34,7 @@
 class hh_pic16_state : public driver_device
 {
 public:
-	hh_pic16_state(const machine_config &mconfig, device_type type, std::string tag)
+	hh_pic16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN"),
@@ -217,7 +217,7 @@ void hh_pic16_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 class maniac_state : public hh_pic16_state
 {
 public:
-	maniac_state(const machine_config &mconfig, device_type type, std::string tag)
+	maniac_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_pic16_state(mconfig, type, tag)
 	{ }
 

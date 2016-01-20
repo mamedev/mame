@@ -61,7 +61,7 @@
 class arcadia_amiga_state : public amiga_state
 {
 public:
-	arcadia_amiga_state(const machine_config &mconfig, device_type type, std::string tag)
+	arcadia_amiga_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag) { }
 
 	UINT8 m_coin_counter[2];
@@ -87,7 +87,7 @@ public:
 	DECLARE_DRIVER_INIT(dlta);
 	DECLARE_DRIVER_INIT(argh);
 
-	inline void generic_decode(std::string tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0);
+	inline void generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0);
 
 protected:
 	virtual void machine_reset() override;
@@ -880,7 +880,7 @@ ROM_END
  *
  *************************************/
 
-void arcadia_amiga_state::generic_decode(std::string tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0)
+void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0)
 {
 	UINT16 *rom = (UINT16 *)memregion(tag)->base();
 	int i;

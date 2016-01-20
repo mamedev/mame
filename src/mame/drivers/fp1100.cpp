@@ -66,7 +66,7 @@
 class fp1100_state : public driver_device
 {
 public:
-	fp1100_state(const machine_config &mconfig, device_type type, std::string tag)
+	fp1100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")

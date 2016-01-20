@@ -23,7 +23,7 @@ const device_type S24SPRITE = &device_creator<segas24_sprite>;
 const device_type S24MIXER = &device_creator<segas24_mixer>;
 
 
-segas24_tile::segas24_tile(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+segas24_tile::segas24_tile(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, S24TILE, "Sega System 24 Tilemap", tag, owner, clock, "segas24_tile", __FILE__),
 		m_gfxdecode(*this),
 		m_palette(*this)
@@ -35,7 +35,7 @@ segas24_tile::segas24_tile(const machine_config &mconfig, std::string tag, devic
 //  gfx decoder
 //-------------------------------------------------
 
-void segas24_tile::static_set_gfxdecode_tag(device_t &device, std::string tag)
+void segas24_tile::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<segas24_tile &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -45,7 +45,7 @@ void segas24_tile::static_set_gfxdecode_tag(device_t &device, std::string tag)
 //  palette device
 //-------------------------------------------------
 
-void segas24_tile::static_set_palette_tag(device_t &device, std::string tag)
+void segas24_tile::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<segas24_tile &>(device).m_palette.set_tag(tag);
 }
@@ -602,7 +602,7 @@ WRITE32_MEMBER(segas24_tile::char32_w)
 }
 
 
-segas24_sprite::segas24_sprite(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+segas24_sprite::segas24_sprite(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, S24SPRITE, "Sega System 24 Sprites", tag, owner, clock, "segas24_sprite", __FILE__)
 {
 }
@@ -847,7 +847,7 @@ READ16_MEMBER(segas24_sprite::read)
 }
 
 
-segas24_mixer::segas24_mixer(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+segas24_mixer::segas24_mixer(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, S24MIXER, "Sega System 24 Mixer", tag, owner, clock, "segas24_mixer", __FILE__)
 {
 }

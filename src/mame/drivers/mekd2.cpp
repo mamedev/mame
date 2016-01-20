@@ -92,7 +92,7 @@ public:
 		TIMER_TRACE
 	};
 
-	mekd2_state(const machine_config &mconfig, device_type type, std::string tag)
+	mekd2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pia_s(*this, "pia_s"),

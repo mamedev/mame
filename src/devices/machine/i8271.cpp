@@ -5,7 +5,7 @@
 
 const device_type I8271 = &device_creator<i8271_device>;
 
-i8271_device::i8271_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8271_device::i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I8271, "Intel 8271", tag, owner, clock, "i8271", __FILE__), ready_connected(false), mode(0), main_phase(0),
 	intrq_cb(*this),
 	drq_cb(*this),
@@ -763,7 +763,7 @@ void i8271_device::start_command(int cmd)
 	}
 	case C_SPECIFY:
 		logerror("%s: command specify %02x %02x %02x %02x\n",
-					tag().c_str(), command[1],
+					tag(), command[1],
 					command[2], command[3], command[4]);
 		switch(command[1]) {
 		case 0x0d:
@@ -885,7 +885,7 @@ void i8271_device::start_command(int cmd)
 
 void i8271_device::command_end(floppy_info &fi, bool data_completion)
 {
-	logerror("%s: command done (%s) - %02x\n", tag().c_str(), data_completion ? "data" : "seek", rr);
+	logerror("%s: command done (%s) - %02x\n", tag(), data_completion ? "data" : "seek", rr);
 	fi.main_state = fi.sub_state = IDLE;
 	main_phase = PHASE_RESULT;
 	set_irq(true);
@@ -893,7 +893,7 @@ void i8271_device::command_end(floppy_info &fi, bool data_completion)
 
 void i8271_device::recalibrate_start(floppy_info &fi)
 {
-	logerror("%s: command recalibrate\n", tag().c_str());
+	logerror("%s: command recalibrate\n", tag());
 	fi.main_state = RECALIBRATE;
 	fi.sub_state = SEEK_WAIT_STEP_TIME_DONE;
 	fi.dir = 1;
@@ -903,7 +903,7 @@ void i8271_device::recalibrate_start(floppy_info &fi)
 
 void i8271_device::seek_start(floppy_info &fi)
 {
-	logerror("%s: command seek %d\n", tag().c_str(), command[1]);
+	logerror("%s: command seek %d\n", tag(), command[1]);
 	fi.main_state = SEEK;
 	fi.sub_state = SEEK_WAIT_STEP_TIME_DONE;
 	fi.dir = fi.pcn > command[1] ? 1 : 0;
@@ -984,7 +984,7 @@ void i8271_device::read_data_start(floppy_info &fi)
 	fi.sub_state = HEAD_LOAD_DONE;
 
 	logerror("%s: command read%s data%s cmd=%02x crn=(%d, %d, %d) len=%02x rate=%d\n",
-				tag().c_str(),
+				tag(),
 				command[0] & 0x04 ? " deleted" : "",
 				command[0] & 0x01 ? " multi" : "",
 				command[0],
@@ -1013,7 +1013,7 @@ void i8271_device::scan_start(floppy_info &fi)
 	fi.sub_state = HEAD_LOAD_DONE;
 
 	logerror("%s: command scan%s data%s cmd=%02x crn=(%d, %d, %d) len=%02x rate=%d\n",
-				tag().c_str(),
+				tag(),
 				command[0] & 0x04 ? " deleted" : "",
 				command[0] & 0x01 ? " multi" : "",
 				command[0],
@@ -1044,7 +1044,7 @@ void i8271_device::verify_data_start(floppy_info &fi)
 	fi.sub_state = HEAD_LOAD_DONE;
 
 	logerror("%s: command verify%s data%s cmd=%02x crn=(%d, %d, %d) len=%02x rate=%d\n",
-				tag().c_str(),
+				tag(),
 				command[0] & 0x04 ? " deleted" : "",
 				command[0] & 0x01 ? " multi" : "",
 				command[0],
@@ -1129,7 +1129,7 @@ void i8271_device::read_data_continue(floppy_info &fi)
 				return;
 			}
 			logerror("%s: reading sector %02x %02x %02x %02x\n",
-						tag().c_str(),
+						tag(),
 						cur_live.idbuf[0],
 						cur_live.idbuf[1],
 						cur_live.idbuf[2],
@@ -1183,7 +1183,7 @@ void i8271_device::write_data_start(floppy_info &fi)
 	fi.main_state = WRITE_DATA;
 	fi.sub_state = HEAD_LOAD_DONE;
 	logerror("%s: command write%s data%s cmd=%02x crn=(%d, %d, %d) len=%02x rate=%d\n",
-				tag().c_str(),
+				tag(),
 				command[0] & 0x04 ? " deleted" : "",
 				command[0] & 0x01 ? " multi" : "",
 				command[0],
@@ -1314,7 +1314,7 @@ void i8271_device::format_track_start(floppy_info &fi)
 	fi.sub_state = HEAD_LOAD_DONE;
 
 	logerror("%s: command format track c=%02x n=%02x sc=%02x gap3=%02x gap5=%02x gap1=%02x\n",
-				tag().c_str(),
+				tag(),
 				command[1], command[3] >> 5, command[3] & 0x1f, command[2], command[4], command[5]);
 
 	rr = ERR_NONE;
@@ -1381,7 +1381,7 @@ void i8271_device::format_track_continue(floppy_info &fi)
 			return;
 
 		case WAIT_INDEX_DONE:
-			logerror("%s: index found, writing track\n", tag().c_str());
+			logerror("%s: index found, writing track\n", tag());
 			fi.sub_state = TRACK_DONE;
 			cur_live.pll.start_writing(machine().time());
 			set_drq(true);
@@ -1405,7 +1405,7 @@ void i8271_device::read_id_start(floppy_info &fi)
 	fi.sub_state = HEAD_LOAD_DONE;
 
 	logerror("%s: command read id, rate=%d\n",
-				tag().c_str(),
+				tag(),
 				cur_rate);
 
 	rr = ERR_NONE;
@@ -1688,7 +1688,7 @@ void i8271_device::live_write_fm(UINT8 fm)
 bool i8271_device::sector_matches() const
 {
 	if(0)
-		logerror("%s: matching %02x %02x %02x - %02x %02x %02x\n", tag().c_str(),
+		logerror("%s: matching %02x %02x %02x - %02x %02x %02x\n", tag(),
 					cur_live.idbuf[0], cur_live.idbuf[2], cur_live.idbuf[3],
 					command[1], command[2], command[3] >> 5);
 	return

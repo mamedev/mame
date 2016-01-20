@@ -22,7 +22,7 @@ http://www.citylan.it/wiki/index.php/Fast_Invaders_%288275_version%29
 class fastinvaders_state : public driver_device
 {
 public:
-	fastinvaders_state(const machine_config &mconfig, device_type type, std::string tag)
+	fastinvaders_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -248,7 +248,7 @@ WRITE8_MEMBER(fastinvaders_state::io_40_w)
 
 WRITE8_MEMBER(fastinvaders_state::io_90_w)
 {
-	logerror("Audio write %02X\n",data);
+logerror("Audio write &02X\n",data);
 }
 
 

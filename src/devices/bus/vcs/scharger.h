@@ -16,7 +16,7 @@ class a26_rom_ss_device : public a26_rom_f6_device
 {
 public:
 	// construction/destruction
-	a26_rom_ss_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a26_rom_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

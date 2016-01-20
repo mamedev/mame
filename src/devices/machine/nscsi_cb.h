@@ -36,7 +36,7 @@
 class nscsi_callback_device : public nscsi_device
 {
 public:
-	nscsi_callback_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nscsi_callback_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _line> void set_rst_callback(_line line) { m_write_rst.set_callback(line); }
 	template<class _line> void set_atn_callback(_line line) { m_write_atn.set_callback(line); }

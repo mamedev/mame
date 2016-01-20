@@ -16,7 +16,7 @@ class psxcard_device :  public device_t,
 						public device_image_interface
 {
 public:
-	psxcard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	psxcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual iodevice_t image_type() const override { return IO_MEMCARD; }
 

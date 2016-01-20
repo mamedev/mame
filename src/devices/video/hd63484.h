@@ -26,7 +26,7 @@
 class hd63484_device : public device_t
 {
 public:
-	hd63484_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~hd63484_device() {}
 
 	DECLARE_READ16_MEMBER( status_r );

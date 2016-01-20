@@ -18,7 +18,7 @@
 class _8080bw_state : public mw8080bw_state
 {
 public:
-	_8080bw_state(const machine_config &mconfig, device_type type, std::string tag)
+	_8080bw_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mw8080bw_state(mconfig, type, tag),
 		m_schaser_effect_555_timer(*this, "schaser_sh_555"),
 		m_claybust_gun_on(*this, "claybust_gun"),

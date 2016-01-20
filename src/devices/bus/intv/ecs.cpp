@@ -27,7 +27,7 @@
 
 const device_type INTV_ROM_ECS = &device_creator<intv_ecs_device>;
 
-intv_ecs_device::intv_ecs_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+intv_ecs_device::intv_ecs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: intv_rom_device(mconfig, INTV_ROM_ECS, "Intellivision ECS Expansion", tag, owner, clock, "intv_ecs", __FILE__),
 					m_snd(*this, "ay8914"),
 					m_subslot(*this, "subslot"),

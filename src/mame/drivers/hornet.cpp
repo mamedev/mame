@@ -329,7 +329,7 @@
 class hornet_state : public driver_device
 {
 public:
-	hornet_state(const machine_config &mconfig, device_type type, std::string tag)
+	hornet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_workram(*this, "workram"),
 		m_sharc_dataram0(*this, "sharc_dataram0"),
@@ -487,7 +487,7 @@ UINT32 hornet_state::screen_update_hornet(screen_device &screen, bitmap_rgb32 &b
 
 UINT32 hornet_state::screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (screen.tag()==":lscreen")
+	if (strcmp(screen.tag(), ":lscreen") == 0)
 	{
 		device_t *voodoo = machine().device("voodoo0");
 		voodoo_update(voodoo, bitmap, cliprect);
@@ -495,7 +495,7 @@ UINT32 hornet_state::screen_update_hornet_2board(screen_device &screen, bitmap_r
 		/* TODO: tilemaps per screen */
 		m_k037122_1->tile_draw(screen, bitmap, cliprect);
 	}
-	else if (screen.tag()==":rscreen")
+	else if (strcmp(screen.tag(), ":rscreen") == 0)
 	{
 		device_t *voodoo = machine().device("voodoo1");
 		voodoo_update(voodoo, bitmap, cliprect);

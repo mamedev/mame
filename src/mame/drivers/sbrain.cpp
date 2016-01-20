@@ -47,7 +47,7 @@ To Do:
 class sbrain_state : public driver_device
 {
 public:
-	sbrain_state(const machine_config &mconfig, device_type type, std::string tag) :
+	sbrain_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),

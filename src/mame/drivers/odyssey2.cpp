@@ -23,7 +23,7 @@
 class odyssey2_state : public driver_device
 {
 public:
-	odyssey2_state(const machine_config &mconfig, device_type type, std::string tag)
+	odyssey2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_i8244(*this, "i8244"),
@@ -75,7 +75,7 @@ protected:
 class g7400_state : public odyssey2_state
 {
 public:
-	g7400_state(const machine_config &mconfig, device_type type, std::string tag)
+	g7400_state(const machine_config &mconfig, device_type type, const char *tag)
 		: odyssey2_state(mconfig, type, tag)
 		, m_i8243(*this, "i8243")
 		, m_ef9340_1(*this, "ef9340_1")

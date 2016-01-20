@@ -51,14 +51,14 @@
 
 const device_type YGV608 = &device_creator<ygv608_device>;
 
-ygv608_device::ygv608_device( const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock )
+ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
 	: device_t(mconfig, YGV608, "YGV608 VDP", tag, owner, clock, "ygv608", __FILE__),
 	m_gfxdecode(*this),
 	m_palette(*this)
 {
 }
 
-void ygv608_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
+void ygv608_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<ygv608_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -68,7 +68,7 @@ void ygv608_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 //  palette device
 //-------------------------------------------------
 
-void ygv608_device::static_set_palette_tag(device_t &device, std::string tag)
+void ygv608_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<ygv608_device &>(device).m_palette.set_tag(tag);
 }

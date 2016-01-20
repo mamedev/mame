@@ -37,7 +37,7 @@ ToDo:
 class zac_1_state : public genpin_class
 {
 public:
-	zac_1_state(const machine_config &mconfig, device_type type, std::string tag)
+	zac_1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_p_ram(*this, "ram")

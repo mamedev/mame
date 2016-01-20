@@ -109,7 +109,7 @@ ADDRESS_MAP_END
 
 
 
-m68340cpu_device::m68340cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+m68340cpu_device::m68340cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: fscpu32_device(mconfig, "MC68340", tag, owner, clock, M68340, 32,32, ADDRESS_MAP_NAME(m68340_internal_map), "mc68340", __FILE__)
 {
 	m68340SIM = nullptr;

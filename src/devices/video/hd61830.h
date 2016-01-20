@@ -36,7 +36,7 @@ class hd61830_device :  public device_t,
 {
 public:
 	// construction/destruction
-	hd61830_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_rd_rd_callback(device_t &device, _Object object) { return downcast<hd61830_device &>(device).m_read_rd.set_callback(object); }
 

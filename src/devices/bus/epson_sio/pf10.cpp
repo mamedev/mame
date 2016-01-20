@@ -91,7 +91,7 @@ machine_config_constructor epson_pf10_device::device_mconfig_additions() const
 //  epson_pf10_device - constructor
 //-------------------------------------------------
 
-epson_pf10_device::epson_pf10_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+epson_pf10_device::epson_pf10_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, EPSON_PF10, "EPSON PF-10 Portable Floppy Unit", tag, owner, clock, "epson_pf10", __FILE__),
 	device_epson_sio_interface(mconfig, *this),
 	m_cpu(*this, "maincpu"),
@@ -145,41 +145,41 @@ void epson_pf10_device::device_timer(emu_timer &timer, device_timer_id id, int p
 
 READ8_MEMBER( epson_pf10_device::port1_r )
 {
-	logerror("%s: port1_r(%02x)\n", tag().c_str(), m_port1);
+	logerror("%s: port1_r(%02x)\n", tag(), m_port1);
 	return m_port1;
 }
 
 WRITE8_MEMBER( epson_pf10_device::port1_w )
 {
-	logerror("%s: port1_w(%02x)\n", tag().c_str(), data);
+	logerror("%s: port1_w(%02x)\n", tag(), data);
 }
 
 READ8_MEMBER( epson_pf10_device::port2_r )
 {
-	logerror("%s: port2_r(%02x)\n", tag().c_str(), m_port2);
+	logerror("%s: port2_r(%02x)\n", tag(), m_port2);
 	return m_port2;
 }
 
 WRITE8_MEMBER( epson_pf10_device::port2_w )
 {
 	m_floppy->mon_w(data & PORT2_MON);
-	logerror("%s: port2_w(%02x)\n", tag().c_str(), data);
+	logerror("%s: port2_w(%02x)\n", tag(), data);
 }
 
 READ8_MEMBER( epson_pf10_device::fdc_r )
 {
-	logerror("%s: fdc_r @ %04x\n", tag().c_str(), offset);
+	logerror("%s: fdc_r @ %04x\n", tag(), offset);
 	return 0xff;
 }
 
 WRITE8_MEMBER( epson_pf10_device::fdc_w )
 {
-	logerror("%s: fdc_w @ %04x (%02x)\n", tag().c_str(), offset, data);
+	logerror("%s: fdc_w @ %04x (%02x)\n", tag(), offset, data);
 }
 
 WRITE8_MEMBER( epson_pf10_device::fdc_tc_w )
 {
-	logerror("%s: fdc_tc_w(%02x)\n", tag().c_str(), data);
+	logerror("%s: fdc_tc_w(%02x)\n", tag(), data);
 }
 
 

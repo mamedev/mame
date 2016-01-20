@@ -105,7 +105,7 @@ To do:
 class darkhors_state : public driver_device
 {
 public:
-	darkhors_state(const machine_config &mconfig, device_type type, std::string tag)
+	darkhors_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_tmapram(*this, "tmapram"),
 		m_tmapscroll(*this, "tmapscroll"),

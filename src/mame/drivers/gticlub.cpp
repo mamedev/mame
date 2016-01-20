@@ -242,7 +242,7 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 class gticlub_state : public driver_device
 {
 public:
-	gticlub_state(const machine_config &mconfig, device_type type, std::string tag)
+	gticlub_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -908,7 +908,7 @@ UINT32 gticlub_state::screen_update_hangplt(screen_device &screen, bitmap_rgb32 
 {
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	if (screen.tag()==":lscreen")
+	if (strcmp(screen.tag(), ":lscreen") == 0)
 	{
 		device_t *voodoo = machine().device("voodoo0");
 
@@ -918,7 +918,7 @@ UINT32 gticlub_state::screen_update_hangplt(screen_device &screen, bitmap_rgb32 
 
 		m_k001604_1->draw_front_layer(screen, bitmap, cliprect);
 	}
-	else if (screen.tag()==":rscreen")
+	else if (strcmp(screen.tag(), ":rscreen") == 0)
 	{
 		device_t *voodoo = machine().device("voodoo1");
 

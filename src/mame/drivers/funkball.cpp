@@ -83,7 +83,7 @@ Notes:
 class funkball_state : public pcat_base_state
 {
 public:
-	funkball_state(const machine_config &mconfig, device_type type, std::string tag)
+	funkball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag),
 			m_voodoo(*this, "voodoo_0"),
 			m_unk_ram(*this, "unk_ram"),

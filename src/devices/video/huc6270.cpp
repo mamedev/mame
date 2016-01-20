@@ -96,7 +96,7 @@ const device_type HUC6270 = &device_creator<huc6270_device>;
 
 const UINT8 huc6270_device::vram_increments[4] = { 1, 32, 64, 128 };
 
-huc6270_device::huc6270_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+huc6270_device::huc6270_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HUC6270, "HuC6270 VDC", tag, owner, clock, "huc6270", __FILE__),
 	m_vram_size(0),
 	m_irq_changed_cb(*this)

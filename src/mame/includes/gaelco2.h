@@ -7,7 +7,7 @@
 class gaelco2_state : public driver_device
 {
 public:
-	gaelco2_state(const machine_config &mconfig, device_type type, std::string tag)
+	gaelco2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_spriteram(*this,"spriteram"),
@@ -66,7 +66,7 @@ public:
 class bang_state : public gaelco2_state
 {
 public:
-	bang_state(const machine_config &mconfig, device_type type, std::string tag)
+	bang_state(const machine_config &mconfig, device_type type, const char *tag)
 		: gaelco2_state(mconfig, type, tag)
 		, m_light0_x(*this, "LIGHT0_X")
 		, m_light0_y(*this, "LIGHT0_Y")
@@ -94,7 +94,7 @@ public:
 class wrally2_state : public gaelco2_state
 {
 public:
-	wrally2_state(const machine_config &mconfig, device_type type, std::string tag)
+	wrally2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: gaelco2_state(mconfig, type, tag)
 		, m_analog0(*this, "ANALOG0")
 		, m_analog1(*this, "ANALOG1")

@@ -47,7 +47,7 @@ extern const device_type TMS9902;
 class tms9902_device : public device_t
 {
 public:
-	tms9902_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms9902_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_int_callback(device_t &device, _Object object) { return downcast<tms9902_device &>(device).m_int_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_rcv_callback(device_t &device, _Object object) { return downcast<tms9902_device &>(device).m_rcv_cb.set_callback(object); }

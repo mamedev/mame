@@ -52,7 +52,7 @@ machine_config_constructor cpc_playcity_device::device_mconfig_additions() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_playcity_device::cpc_playcity_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+cpc_playcity_device::cpc_playcity_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CPC_PLAYCITY, "PlayCity", tag, owner, clock, "cpc_playcity", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_ctc(*this,"ctc"),

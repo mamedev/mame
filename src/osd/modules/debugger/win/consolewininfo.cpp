@@ -108,7 +108,7 @@ void consolewin_info::set_cpu(device_t &device)
 	char curtitle[256];
 	std::string title;
 
-	strprintf(title, "Debug: %s - %s '%s'", device.machine().system().name, device.name(), device.tag().c_str());
+	strprintf(title, "Debug: %s - %s '%s'", device.machine().system().name, device.name(), device.tag());
 	win_get_window_text_utf8(window(), curtitle, ARRAY_LENGTH(curtitle));
 	if (title.compare(curtitle) != 0)
 		win_set_window_text_utf8(window(), title.c_str());

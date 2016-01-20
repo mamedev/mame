@@ -48,7 +48,7 @@ class adamnet_device : public device_t
 {
 public:
 	// construction/destruction
-	adamnet_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	adamnet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void add_device(device_t *target);
 
@@ -93,7 +93,7 @@ class adamnet_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	adamnet_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	adamnet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

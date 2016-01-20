@@ -62,7 +62,7 @@ class f3853_device :  public device_t
 {
 public:
 	// construction/destruction
-	f3853_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void set_interrupt_req_callback(device_t &device, f3853_interrupt_req_delegate callback) { downcast<f3853_device &>(device).m_interrupt_req_cb = callback; }
 

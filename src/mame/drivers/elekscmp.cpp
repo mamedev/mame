@@ -32,7 +32,7 @@ ToDo:
 class elekscmp_state : public driver_device
 {
 public:
-	elekscmp_state(const machine_config &mconfig, device_type type, std::string tag)
+	elekscmp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_x0(*this, "X0"),

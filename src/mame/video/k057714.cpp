@@ -13,7 +13,7 @@
 
 const device_type K057714 = &device_creator<k057714_device>;
 
-k057714_device::k057714_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+k057714_device::k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K057714, "K057714 GCU", tag, owner, clock, "k057714", __FILE__),
 	m_irq(*this)
 {

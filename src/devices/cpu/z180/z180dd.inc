@@ -2,7 +2,7 @@
 // copyright-holders:Juergen Buchmueller
 OP(illegal,1) {
 	logerror("Z180 '%s' ill. opcode $%02x $%02x\n",
-			tag().c_str(), m_odirect->read_byte((_PCD-1)&0xffff), m_odirect->read_byte(_PCD));
+			tag(), m_odirect->read_byte((_PCD-1)&0xffff), m_odirect->read_byte(_PCD));
 }
 
 /**********************************************************

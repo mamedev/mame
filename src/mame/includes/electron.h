@@ -68,7 +68,7 @@ public:
 		TIMER_SCANLINE_INTERRUPT
 	};
 
-	electron_state(const machine_config &mconfig, device_type type, std::string tag)
+	electron_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),

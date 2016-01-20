@@ -144,7 +144,7 @@ inline const address_space_config *device_get_space_config(const device_t &devic
 {
 	const device_memory_interface *intf;
 	if (!device.interface(intf))
-		throw emu_fatalerror("Device '%s' does not have memory interface", device.tag().c_str());
+		throw emu_fatalerror("Device '%s' does not have memory interface", device.tag());
 	return intf->space_config(spacenum);
 }
 

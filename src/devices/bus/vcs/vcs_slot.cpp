@@ -49,7 +49,7 @@ device_vcs_cart_interface::~device_vcs_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_vcs_cart_interface::rom_alloc(UINT32 size, std::string tag)
+void device_vcs_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -77,7 +77,7 @@ void device_vcs_cart_interface::ram_alloc(UINT32 size)
 //-------------------------------------------------
 //  vcs_cart_slot_device - constructor
 //-------------------------------------------------
-vcs_cart_slot_device::vcs_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+vcs_cart_slot_device::vcs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, VCS_CART_SLOT, "Atari VCS 2600 Cartridge Slot", tag, owner, clock, "vcs_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this), m_cart(nullptr), m_type(0)

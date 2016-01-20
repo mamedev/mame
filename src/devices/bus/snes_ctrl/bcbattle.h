@@ -27,7 +27,7 @@ class snes_bcbattle_device : public device_t,
 {
 public:
 	// construction/destruction
-	snes_bcbattle_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	snes_bcbattle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual machine_config_constructor device_mconfig_additions() const override;

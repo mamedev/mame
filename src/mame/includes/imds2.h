@@ -22,7 +22,7 @@
 class imds2_state : public driver_device
 {
 	public:
-	imds2_state(const machine_config &mconfig, device_type type, std::string tag);
+	imds2_state(const machine_config &mconfig, device_type type, const char *tag);
 
 	DECLARE_READ8_MEMBER(ipc_mem_read);
 	DECLARE_WRITE8_MEMBER(ipc_mem_write);

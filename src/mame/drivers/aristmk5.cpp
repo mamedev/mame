@@ -178,7 +178,7 @@
 class aristmk5_state : public archimedes_state
 {
 public:
-	aristmk5_state(const machine_config &mconfig, device_type type, std::string tag)
+	aristmk5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: archimedes_state(mconfig, type, tag) { }
 
 	emu_timer *m_mk5_2KHz_timer;

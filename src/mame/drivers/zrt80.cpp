@@ -33,7 +33,7 @@ public:
 		TIMER_BEEP_OFF
 	};
 
-	zrt80_state(const machine_config &mconfig, device_type type, std::string tag)
+	zrt80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),

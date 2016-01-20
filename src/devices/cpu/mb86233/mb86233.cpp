@@ -23,7 +23,7 @@
 const device_type MB86233 = &device_creator<mb86233_cpu_device>;
 
 
-mb86233_cpu_device::mb86233_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mb86233_cpu_device::mb86233_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, MB86233, "MB86233", tag, owner, clock, "mb86233", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, -2)
 	, m_data_config("data", ENDIANNESS_LITTLE, 32, 32, 0), m_pc(0), m_reps(0), m_pcsp(0), m_eb(0), m_shift(0), m_repcnt(0), m_sr(0),

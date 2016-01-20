@@ -18,7 +18,7 @@
 class atarigt_state : public atarigen_state
 {
 public:
-	atarigt_state(const machine_config &mconfig, device_type type, std::string tag)
+	atarigt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
 			m_colorram(*this, "colorram", 32),
 			m_playfield_tilemap(*this, "playfield"),

@@ -153,7 +153,7 @@
 	// add the stuff that's always present
 	[self addLabel:@"Tag:"
 		 withWidth:100
-		  andField:[NSString stringWithUTF8String:device->tag().c_str()]
+		  andField:[NSString stringWithUTF8String:device->tag()]
 			toView:contentView];
 	[self addLabel:@"Name:"
 		 withWidth:100

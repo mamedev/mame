@@ -204,7 +204,7 @@ void amis2000_base_device::op_inp()
 void amis2000_base_device::op_out()
 {
 	// OUT: pulse output ACC and RAM to D-pins
-	logerror("%s unknown opcode $%02X at $%04X\n", tag().c_str(), m_op, m_pc);
+	logerror("%s unknown opcode $%02X at $%04X\n", tag(), m_op, m_pc);
 }
 
 void amis2000_base_device::op_disb()
@@ -356,7 +356,7 @@ void amis2000_base_device::op_nop()
 void amis2000_base_device::op_halt()
 {
 	// HALT: debugger breakpoint for devkit-use
-	logerror("%s unknown opcode $%02X at $%04X\n", tag().c_str(), m_op, m_pc);
+	logerror("%s unknown opcode $%02X at $%04X\n", tag(), m_op, m_pc);
 }
 
 
@@ -402,7 +402,7 @@ void amis2000_base_device::op_sam()
 void amis2000_base_device::op_sos()
 {
 	// SOS: skip next on SF(timer output), clear SF
-	logerror("%s unknown opcode $%02X at $%04X\n", tag().c_str(), m_op, m_pc);
+	logerror("%s unknown opcode $%02X at $%04X\n", tag(), m_op, m_pc);
 }
 
 void amis2000_base_device::op_tf1()

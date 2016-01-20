@@ -154,7 +154,7 @@ WRITE8_MEMBER( ym3526_device::write_port_w ) { write(space, 1, data); }
 
 const device_type YM3526 = &device_creator<ym3526_device>;
 
-ym3526_device::ym3526_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ym3526_device::ym3526_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YM3526, "YM3526", tag, owner, clock, "ym3526", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),

@@ -60,7 +60,7 @@ class mb89352_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
-	mb89352_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<mb89352_device &>(device).m_irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_callback(device_t &device, _Object object) { return downcast<mb89352_device &>(device).m_drq_cb.set_callback(object); }

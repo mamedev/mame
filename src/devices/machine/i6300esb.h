@@ -18,7 +18,7 @@
 
 class i6300esb_lpc_device : public pci_device {
 public:
-	i6300esb_lpc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i6300esb_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void reset_all_mappings() override;
 	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
@@ -144,7 +144,7 @@ private:
 
 class i6300esb_watchdog_device : public pci_device {
 public:
-	i6300esb_watchdog_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i6300esb_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;

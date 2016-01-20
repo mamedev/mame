@@ -4,7 +4,7 @@
 
 const device_type MIDI_KBD = &device_creator<midi_keyboard_device>;
 
-midi_keyboard_device::midi_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+midi_keyboard_device::midi_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MIDI_KBD, "Generic MIDI Keyboard", tag, owner, clock, "midi_kbd", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_out_tx_func(*this),

@@ -61,7 +61,7 @@ ioport_constructor c64_4ksa_device::device_input_ports() const
 //  c64_4ksa_device - constructor
 //-------------------------------------------------
 
-c64_4ksa_device::c64_4ksa_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+c64_4ksa_device::c64_4ksa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_4KSA, "C64 Kingsoft 4-Player Adapter", tag, owner, clock, "c64_4ksa", __FILE__),
 	device_pet_user_port_interface(mconfig, *this)
 {

@@ -97,7 +97,7 @@ typedef device_delegate<int (int in)> segac2_prot_delegate;
 class segac2_state : public md_base_state
 {
 public:
-	segac2_state(const machine_config &mconfig, device_type type, std::string tag)
+	segac2_state(const machine_config &mconfig, device_type type, const char *tag)
 	: md_base_state(mconfig, type, tag),
 	m_paletteram(*this, "paletteram"),
 	m_upd7759(*this, "upd"),

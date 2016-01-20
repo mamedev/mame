@@ -15,7 +15,7 @@ class msx_cart_korean_80in1 : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_korean_80in1(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	msx_cart_korean_80in1(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -41,7 +41,7 @@ class msx_cart_korean_90in1 : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_korean_90in1(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	msx_cart_korean_90in1(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -66,7 +66,7 @@ class msx_cart_korean_126in1 : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_korean_126in1(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	msx_cart_korean_126in1(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

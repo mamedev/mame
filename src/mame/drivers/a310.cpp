@@ -73,7 +73,7 @@
 class a310_state : public archimedes_state
 {
 public:
-	a310_state(const machine_config &mconfig, device_type type, std::string tag)
+	a310_state(const machine_config &mconfig, device_type type, const char *tag)
 		: archimedes_state(mconfig, type, tag)
 		, m_physram(*this, "physicalram")
 		, m_ram(*this, RAM_TAG)

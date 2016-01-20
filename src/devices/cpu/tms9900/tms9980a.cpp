@@ -74,7 +74,7 @@
     Constructor
 ****************************************************************************/
 
-tms9980a_device::tms9980a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tms9980a_device::tms9980a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms99xx_device(mconfig, TMS9980A, "TMS9980A", tag, 8, 14, 11, owner, clock, "tms9980a", __FILE__)
 {
 }

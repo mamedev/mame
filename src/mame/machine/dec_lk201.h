@@ -43,7 +43,7 @@ class lk201_device : public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
-	lk201_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( ddr_r );
 	DECLARE_WRITE8_MEMBER( ddr_w );

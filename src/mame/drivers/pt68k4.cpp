@@ -79,7 +79,7 @@ TODO: 68230 device
 class pt68k4_state : public driver_device
 {
 public:
-	pt68k4_state(const machine_config &mconfig, device_type type, std::string tag)
+	pt68k4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_p_base(*this, "rambase")
 		, m_maincpu(*this, M68K_TAG)

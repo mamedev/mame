@@ -27,7 +27,7 @@
 class meters_device : public device_t
 {
 public:
-	meters_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	meters_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~meters_device() {}
 
 	static void static_set_number_meters(device_t &device, int number) { downcast<meters_device &>(device).m_number_mtr = number; }

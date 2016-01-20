@@ -21,7 +21,7 @@ public:
 		TIMER_VBLANK_LATCH_CLEAR
 	};
 
-	segag80r_state(const machine_config &mconfig, device_type type, std::string tag)
+	segag80r_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_videoram(*this, "videoram"),
@@ -164,7 +164,7 @@ class sega005_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	sega005_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	emu_timer *m_sega005_sound_timer;
 	sound_stream *m_sega005_stream;

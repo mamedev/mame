@@ -12,7 +12,7 @@
 
 const device_type MIDIIN_PORT = &device_creator<midiin_port_device>;
 
-midiin_port_device::midiin_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+midiin_port_device::midiin_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MIDIIN_PORT, "MIDI In port", tag, owner, clock, "midiin_port", __FILE__),
 	device_midi_port_interface(mconfig, *this),
 	m_midiin(*this, "midiinimg")

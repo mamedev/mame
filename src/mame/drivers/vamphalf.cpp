@@ -71,7 +71,7 @@ TODO:
 class vamphalf_state : public driver_device
 {
 public:
-	vamphalf_state(const machine_config &mconfig, device_type type, std::string tag)
+	vamphalf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_qs1000(*this, "qs1000"),

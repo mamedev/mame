@@ -373,7 +373,7 @@ Quick review of the system16 hardware:
 
 const device_type SEGAIC16VID = &device_creator<segaic16_video_device>;
 
-segaic16_video_device::segaic16_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+segaic16_video_device::segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGAIC16VID, "Sega 16-bit Video", tag, owner, clock, "segaic16_video", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_display_enable(0),
@@ -391,7 +391,7 @@ segaic16_video_device::segaic16_video_device(const machine_config &mconfig, std:
 //  gfx decoder
 //-------------------------------------------------
 
-void segaic16_video_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
+void segaic16_video_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<segaic16_video_device &>(device).m_gfxdecode.set_tag(tag);
 }

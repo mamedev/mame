@@ -34,7 +34,7 @@ MACHINE_CONFIG_END
 //  alesis_dm3ag_device - constructor
 //-------------------------------------------------
 
-alesis_dm3ag_device::alesis_dm3ag_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+alesis_dm3ag_device::alesis_dm3ag_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ALESIS_DM3AG, "Alesis DM3AG", tag, owner, clock, "alesis_dm3ag", __FILE__),
 		m_dac(*this, "dac"),
 		m_samples(*this, DEVICE_SELF)
@@ -97,7 +97,7 @@ void alesis_dm3ag_device::device_timer(emu_timer &timer, device_timer_id id, int
 				*/
 				m_shift--;
 
-				if (LOG)    logerror("DM3AG '%s' shift: %02x\n", tag().c_str(), m_shift);
+				if (LOG)    logerror("DM3AG '%s' shift: %02x\n", tag(), m_shift);
 			}
 
 			// every block ends with three or more -1 samples
@@ -106,7 +106,7 @@ void alesis_dm3ag_device::device_timer(emu_timer &timer, device_timer_id id, int
 				m_output_active = false;
 				sample = 0;
 
-				if (LOG)    logerror("DM3AG '%s' stop: %d, len: %d\n", tag().c_str(), m_cur_sample, m_cur_sample-((m_cmd[0]<<12) | (m_cmd[1]<<4) | ((m_cmd[2]>>4) & 0x0f)));
+				if (LOG)    logerror("DM3AG '%s' stop: %d, len: %d\n", tag(), m_cur_sample, m_cur_sample-((m_cmd[0]<<12) | (m_cmd[1]<<4) | ((m_cmd[2]>>4) & 0x0f)));
 
 				break;
 			}
@@ -120,7 +120,7 @@ void alesis_dm3ag_device::device_timer(emu_timer &timer, device_timer_id id, int
 
 WRITE8_MEMBER(alesis_dm3ag_device::write)
 {
-	if (LOG)    logerror("DM3AG '%s' write: %02x\n", tag().c_str(), data);
+	if (LOG)    logerror("DM3AG '%s' write: %02x\n", tag(), data);
 
 	m_cmd[m_count++] = data;
 
@@ -148,7 +148,7 @@ WRITE8_MEMBER(alesis_dm3ag_device::write)
 			{
 				bool good_pos = (m_cur_sample<2 || m_samples[m_cur_sample-2] == -128);
 
-				logerror("DM3AG '%s' start: %d (%s), vol: %02x out: %d pan: %d\n", tag().c_str(), m_cur_sample, good_pos ? "ok": "no", m_cmd[3], m_cmd[4] & 0x10 ? 1 : 2, (m_cmd[4]>>5)&7);
+				logerror("DM3AG '%s' start: %d (%s), vol: %02x out: %d pan: %d\n", tag(), m_cur_sample, good_pos ? "ok": "no", m_cmd[3], m_cmd[4] & 0x10 ? 1 : 2, (m_cmd[4]>>5)&7);
 			}
 		}
 

@@ -43,7 +43,7 @@ struct edge
 class namcos21_state : public namcos2_shared_state
 {
 public:
-	namcos21_state(const machine_config &mconfig, device_type type, std::string tag)
+	namcos21_state(const machine_config &mconfig, device_type type, const char *tag)
 		: namcos2_shared_state(mconfig, type, tag),
 		m_winrun_dspbios(*this,"winrun_dspbios"),
 		m_winrun_polydata(*this,"winrun_polydata"),

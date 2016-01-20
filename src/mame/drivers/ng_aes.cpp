@@ -94,7 +94,7 @@ UINT8 NeoSystem = NEOCD_REGION_JAPAN;
 class ng_aes_state : public neogeo_state
 {
 public:
-	ng_aes_state(const machine_config &mconfig, device_type type, std::string tag)
+	ng_aes_state(const machine_config &mconfig, device_type type, const char *tag)
 		: neogeo_state(mconfig, type, tag)
 		, m_tempcdc(*this,"tempcdc")
 		, m_io_in2(*this, "IN2")

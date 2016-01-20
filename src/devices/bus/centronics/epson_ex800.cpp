@@ -357,7 +357,7 @@ ioport_constructor epson_ex800_t::device_input_ports() const
 //  epson_ex800_t - constructor
 //-------------------------------------------------
 
-epson_ex800_t::epson_ex800_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+epson_ex800_t::epson_ex800_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, EPSON_EX800, "Epson EX-800", tag, owner, clock, "ex800", __FILE__),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),

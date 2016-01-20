@@ -162,7 +162,7 @@ DIPSW-2
 class sfkick_state : public driver_device
 {
 public:
-	sfkick_state(const machine_config &mconfig, device_type type, std::string tag)
+	sfkick_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_v9938(*this, "v9938"),
 		m_maincpu(*this, "maincpu"),

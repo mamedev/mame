@@ -7,7 +7,7 @@
 const device_type MSX_MATSUSHITA = &device_creator<msx_matsushita_device>;
 
 
-msx_matsushita_device::msx_matsushita_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+msx_matsushita_device::msx_matsushita_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: msx_switched_device(mconfig, MSX_MATSUSHITA, "Matsushita switched device", tag, owner, clock, "msx_matsushita", __FILE__)
 	, m_io_config(*this, "CONFIG")
 	, m_nvram(*this, "nvram")

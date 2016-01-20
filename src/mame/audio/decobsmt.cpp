@@ -73,7 +73,7 @@ machine_config_constructor decobsmt_device::device_mconfig_additions() const
 //  decobsmt_device - constructor
 //-------------------------------------------------
 
-decobsmt_device::decobsmt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+decobsmt_device::decobsmt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, DECOBSMT, "Data East/Sega/Stern BSMT2000 Sound Board", tag, owner, clock, "decobsmt", __FILE__),
 	m_ourcpu(*this, M6809_TAG),
 	m_bsmt(*this, BSMT_TAG)

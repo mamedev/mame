@@ -75,7 +75,7 @@
 class gamecstl_state : public pcat_base_state
 {
 public:
-	gamecstl_state(const machine_config &mconfig, device_type type, std::string tag)
+	gamecstl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag),
 		m_cga_ram(*this, "cga_ram"),
 		m_gfxdecode(*this, "gfxdecode"),

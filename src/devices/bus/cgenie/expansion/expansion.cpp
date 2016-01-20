@@ -26,7 +26,7 @@ const device_type EXPANSION_SLOT = &device_creator<expansion_slot_device>;
 //  expansion_slot_device - constructor
 //-------------------------------------------------
 
-expansion_slot_device::expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+expansion_slot_device::expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, EXPANSION_SLOT, "Expansion Slot", tag, owner, clock, "expansion_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_program(nullptr),

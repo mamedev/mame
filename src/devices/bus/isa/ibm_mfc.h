@@ -30,7 +30,7 @@ class isa8_ibm_mfc_device : public device_t,
 {
 public:
 	// Construction/destruction
-	isa8_ibm_mfc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	isa8_ibm_mfc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( ppi0_i_a );
 	DECLARE_WRITE8_MEMBER( ppi0_o_b );

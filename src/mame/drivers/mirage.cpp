@@ -46,7 +46,7 @@ MR_01-.3A    [a0b758aa]
 class miragemi_state : public driver_device
 {
 public:
-	miragemi_state(const machine_config &mconfig, device_type type, std::string tag)
+	miragemi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_deco_tilegen1(*this, "tilegen1"),

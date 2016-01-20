@@ -64,7 +64,7 @@ struct ef9369
 class guab_state : public driver_device
 {
 public:
-	guab_state(const machine_config &mconfig, device_type type, std::string tag)
+	guab_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tms34061(*this, "tms34061"),

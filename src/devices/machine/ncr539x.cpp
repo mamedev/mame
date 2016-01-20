@@ -116,7 +116,7 @@ const device_type NCR539X = &device_creator<ncr539x_device>;
 //  ncr539x_device - constructor/destructor
 //-------------------------------------------------
 
-ncr539x_device::ncr539x_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+ncr539x_device::ncr539x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	legacy_scsi_host_adapter(mconfig, NCR539X, "539x SCSI", tag, owner, clock, "ncr539x", __FILE__),
 	m_out_irq_cb(*this),
 	m_out_drq_cb(*this)

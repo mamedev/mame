@@ -113,7 +113,7 @@ struct CMAP_t
 class newport_video_device : public device_t
 {
 public:
-	newport_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~newport_video_device() {}
 
 

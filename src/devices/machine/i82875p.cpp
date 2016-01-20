@@ -41,12 +41,12 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, i82875p_host_device)
 	AM_INHERIT_FROM(pci_host_device::config_map)
 ADDRESS_MAP_END
 
-i82875p_host_device::i82875p_host_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i82875p_host_device::i82875p_host_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_host_device(mconfig, I82875P_HOST, "I82875P Northbridge", tag, owner, clock, "i82875p_host", __FILE__)
 {
 }
 
-void i82875p_host_device::set_cpu_tag(std::string _cpu_tag)
+void i82875p_host_device::set_cpu_tag(const char *_cpu_tag)
 {
 	cpu_tag = _cpu_tag;
 }
@@ -90,7 +90,7 @@ READ8_MEMBER(  i82875p_host_device::agpm_r)
 WRITE8_MEMBER( i82875p_host_device::agpm_w)
 {
 	agpm = data;
-	logerror("%s: agpm = %02x\n", tag().c_str(), agpm);
+	logerror("%s: agpm = %02x\n", tag(), agpm);
 }
 
 READ8_MEMBER(  i82875p_host_device::gc_r)
@@ -126,7 +126,7 @@ READ8_MEMBER(  i82875p_host_device::fpllcont_r)
 WRITE8_MEMBER( i82875p_host_device::fpllcont_w)
 {
 	fpllcont = data;
-	logerror("%s: fpllcont = %02x\n", tag().c_str(), data);
+	logerror("%s: fpllcont = %02x\n", tag(), data);
 }
 
 READ8_MEMBER(  i82875p_host_device::pam_r)
@@ -137,7 +137,7 @@ READ8_MEMBER(  i82875p_host_device::pam_r)
 WRITE8_MEMBER( i82875p_host_device::pam_w)
 {
 	pam[offset] = data;
-	logerror("%s: pam[%d] = %02x\n", tag().c_str(), offset, data);
+	logerror("%s: pam[%d] = %02x\n", tag(), offset, data);
 	remap_cb();
 }
 
@@ -150,7 +150,7 @@ WRITE8_MEMBER( i82875p_host_device::smram_w)
 {
 	if(!(smram & 0x10))
 		smram = (data & 0xfe) | 0x02;
-	logerror("%s: smram = %02x\n", tag().c_str(), smram);
+	logerror("%s: smram = %02x\n", tag(), smram);
 	remap_cb();
 }
 
@@ -163,7 +163,7 @@ WRITE8_MEMBER( i82875p_host_device::esmramc_w)
 {
 	if(!(smram & 0x10))
 		esmramc = (data & 0x87) | 0x38;
-	logerror("%s: esmramc = %02x\n", tag().c_str(), smram);
+	logerror("%s: esmramc = %02x\n", tag(), smram);
 	remap_cb();
 }
 
@@ -190,7 +190,7 @@ READ32_MEMBER( i82875p_host_device::agpctrl_r)
 WRITE32_MEMBER(i82875p_host_device::agpctrl_w)
 {
 	COMBINE_DATA(&agpctrl);
-	logerror("%s: agpctrl = %08x\n", tag().c_str(), agpctrl);
+	logerror("%s: agpctrl = %08x\n", tag(), agpctrl);
 }
 
 READ8_MEMBER(  i82875p_host_device::apsize_r)
@@ -201,7 +201,7 @@ READ8_MEMBER(  i82875p_host_device::apsize_r)
 WRITE8_MEMBER( i82875p_host_device::apsize_w)
 {
 	apsize = data;
-	logerror("%s: apsize = %02x\n", tag().c_str(), apsize);
+	logerror("%s: apsize = %02x\n", tag(), apsize);
 }
 
 READ32_MEMBER( i82875p_host_device::attbase_r)
@@ -212,7 +212,7 @@ READ32_MEMBER( i82875p_host_device::attbase_r)
 WRITE32_MEMBER(i82875p_host_device::attbase_w)
 {
 	COMBINE_DATA(&attbase);
-	logerror("%s: attbase = %08x\n", tag().c_str(), attbase);
+	logerror("%s: attbase = %08x\n", tag(), attbase);
 }
 
 READ8_MEMBER(  i82875p_host_device::amtt_r)
@@ -244,7 +244,7 @@ WRITE16_MEMBER(i82875p_host_device::toud_w)
 {
 	COMBINE_DATA(&toud);
 	toud &= ~7;
-	logerror("%s: toud = %08x\n", tag().c_str(), toud << 16);
+	logerror("%s: toud = %08x\n", tag(), toud << 16);
 	remap_cb();
 }
 
@@ -426,7 +426,7 @@ void i82875p_host_device::map_extra(UINT64 memory_window_start, UINT64 memory_wi
 }
 
 
-i82875p_agp_device::i82875p_agp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i82875p_agp_device::i82875p_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: agp_bridge_device(mconfig, I82875P_AGP, "I82875P AGP Bridge", tag, owner, clock, "i82875p_agp", __FILE__)
 {
 }
@@ -449,7 +449,7 @@ DEVICE_ADDRESS_MAP_START(overflow_map, 32, i82875p_overflow_device)
 ADDRESS_MAP_END
 
 
-i82875p_overflow_device::i82875p_overflow_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i82875p_overflow_device::i82875p_overflow_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, I82875P_OVERFLOW, "I82875P Configuration Overflow", tag, owner, clock, "i82875p_overflow", __FILE__)
 {
 }
@@ -478,7 +478,7 @@ READ8_MEMBER  (i82875p_overflow_device::dram_row_boundary_r)
 WRITE8_MEMBER (i82875p_overflow_device::dram_row_boundary_w)
 {
 	dram_row_boundary[offset] = data;
-	logerror("%s: dram_row_boundary_w %d, %02x\n", tag().c_str(), offset, data);
+	logerror("%s: dram_row_boundary_w %d, %02x\n", tag(), offset, data);
 }
 
 READ8_MEMBER  (i82875p_overflow_device::dram_row_attribute_r)
@@ -489,7 +489,7 @@ READ8_MEMBER  (i82875p_overflow_device::dram_row_attribute_r)
 WRITE8_MEMBER (i82875p_overflow_device::dram_row_attribute_w)
 {
 	dram_row_attribute[offset] = data;
-	logerror("%s: dram_row_attribute_w %d, %02x\n", tag().c_str(), offset, data);
+	logerror("%s: dram_row_attribute_w %d, %02x\n", tag(), offset, data);
 }
 
 READ32_MEMBER (i82875p_overflow_device::dram_timing_r)
@@ -500,7 +500,7 @@ READ32_MEMBER (i82875p_overflow_device::dram_timing_r)
 WRITE32_MEMBER(i82875p_overflow_device::dram_timing_w)
 {
 	COMBINE_DATA(&dram_timing);
-	logerror("%s: dram_timing_w %08x\n", tag().c_str(), dram_timing);
+	logerror("%s: dram_timing_w %08x\n", tag(), dram_timing);
 }
 
 READ32_MEMBER (i82875p_overflow_device::dram_controller_mode_r)
@@ -511,5 +511,5 @@ READ32_MEMBER (i82875p_overflow_device::dram_controller_mode_r)
 WRITE32_MEMBER(i82875p_overflow_device::dram_controller_mode_w)
 {
 	COMBINE_DATA(&dram_controller_mode);
-	logerror("%s: dram_controller_mode_w %08x\n", tag().c_str(), dram_controller_mode);
+	logerror("%s: dram_controller_mode_w %08x\n", tag(), dram_controller_mode);
 }
