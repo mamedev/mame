@@ -292,7 +292,7 @@ ADDRESS_MAP_END
 //  hyperstone_device - constructor
 //-------------------------------------------------
 
-hyperstone_device::hyperstone_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock,
+hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *name, std::string tag, device_t *owner, UINT32 clock,
 										const device_type type, UINT32 prg_data_width, UINT32 io_data_width, address_map_constructor internal_map, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map),

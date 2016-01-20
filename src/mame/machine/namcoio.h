@@ -11,7 +11,7 @@
 class namcoio_device : public device_t
 {
 public:
-	namcoio_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname);
+	namcoio_device(const machine_config &mconfig, device_type type, const char* name, std::string tag, device_t *owner, UINT32 clock, const char *shortname);
 
 	template<class _Object> static devcb_base &set_in_0_callback(device_t &device, _Object object) { return downcast<namcoio_device &>(device).m_in_0_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_in_1_callback(device_t &device, _Object object) { return downcast<namcoio_device &>(device).m_in_1_cb.set_callback(object); }

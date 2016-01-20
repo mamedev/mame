@@ -28,7 +28,7 @@ class action_replay_device : public device_t, public device_exp_card_interface
 public:
 	// construction/destruction
 	action_replay_device(const machine_config &mconfig, device_type type, std::string tag,
-		device_t *owner, UINT32 clock, std::string name, std::string shortname);
+		device_t *owner, UINT32 clock, const char *name, const char *shortname);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;

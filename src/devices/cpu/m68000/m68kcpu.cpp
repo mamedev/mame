@@ -2307,7 +2307,7 @@ m68000_base_device::m68000_base_device(const machine_config &mconfig, std::strin
 
 
 
-m68000_base_device::m68000_base_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock,
+m68000_base_device::m68000_base_device(const machine_config &mconfig, const char *name, std::string tag, device_t *owner, UINT32 clock,
 										const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map),
@@ -2317,7 +2317,7 @@ m68000_base_device::m68000_base_device(const machine_config &mconfig, std::strin
 }
 
 
-m68000_base_device::m68000_base_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock,
+m68000_base_device::m68000_base_device(const machine_config &mconfig, const char *name, std::string tag, device_t *owner, UINT32 clock,
 										const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits),
@@ -2548,7 +2548,7 @@ void m68000_device::device_start()
 	init_cpu_m68000();
 }
 
-m68000_device::m68000_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock,
+m68000_device::m68000_device(const machine_config &mconfig, const char *name, std::string tag, device_t *owner, UINT32 clock,
 										const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, std::string shortname, std::string source)
 	: m68000_base_device(mconfig, name, tag, owner, clock, type, prg_data_width, prg_address_bits, internal_map, shortname, source)
 {
@@ -2752,7 +2752,7 @@ fscpu32_device::fscpu32_device(const machine_config &mconfig, std::string tag, d
 {
 }
 
-fscpu32_device::fscpu32_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock,
+fscpu32_device::fscpu32_device(const machine_config &mconfig, const char *name, std::string tag, device_t *owner, UINT32 clock,
 										const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, std::string shortname, std::string source)
 	: m68000_base_device(mconfig, name, tag, owner, clock, type, prg_data_width, prg_address_bits, internal_map, shortname, source)
 {

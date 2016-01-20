@@ -32,7 +32,7 @@ const device_type DMV_K208 = &device_creator<dmv_k208_device>;
 //  dmv_ram_device - constructor
 //-------------------------------------------------
 
-dmv_ram_device::dmv_ram_device(const machine_config &mconfig, device_type type, UINT32 size, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+dmv_ram_device::dmv_ram_device(const machine_config &mconfig, device_type type, UINT32 size, const char *name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_dmvslot_interface( mconfig, *this ), m_ram(nullptr),
 		m_size(size)

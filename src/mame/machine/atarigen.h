@@ -265,7 +265,7 @@ class atari_eeprom_device : public device_t
 {
 protected:
 	// construction/destruction
-	atari_eeprom_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source);
+	atari_eeprom_device(const machine_config &mconfig, device_type devtype, const char *name, std::string tag, device_t *owner, const char *shortname, const char *file);
 
 public:
 	// unlock controls

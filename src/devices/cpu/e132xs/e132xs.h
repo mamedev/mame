@@ -212,7 +212,7 @@ class hyperstone_device : public cpu_device
 {
 public:
 	// construction/destruction
-	hyperstone_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock,
+	hyperstone_device(const machine_config &mconfig, const char *name, std::string tag, device_t *owner, UINT32 clock,
 						const device_type type, UINT32 prg_data_width, UINT32 io_data_width, address_map_constructor internal_map, std::string shortname, std::string source);
 
 	// public interfaces

@@ -125,10 +125,10 @@ class m68000_base_device : public cpu_device
 public:
 
 	// construction/destruction
-	m68000_base_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock,
+	m68000_base_device(const machine_config &mconfig, const char *name, std::string tag, device_t *owner, UINT32 clock,
 						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, std::string shortname, std::string source);
 
-	m68000_base_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock,
+	m68000_base_device(const machine_config &mconfig, const char *name, std::string tag, device_t *owner, UINT32 clock,
 						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, std::string shortname, std::string source);
 
 	m68000_base_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
@@ -411,7 +411,7 @@ public:
 	m68000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 	m68000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
-	m68000_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock,
+	m68000_device(const machine_config &mconfig, const char *name, std::string tag, device_t *owner, UINT32 clock,
 						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, std::string shortname, std::string source);
 
 
@@ -728,7 +728,7 @@ public:
 	// construction/destruction
 	fscpu32_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
-	fscpu32_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock,
+	fscpu32_device(const machine_config &mconfig, const char *name, std::string tag, device_t *owner, UINT32 clock,
 						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, std::string shortname, std::string source);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };

@@ -44,8 +44,8 @@ ADDRESS_MAP_END
 //  eeprom_base_device - constructor
 //-------------------------------------------------
 
-eeprom_base_device::eeprom_base_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source)
-	: device_t(mconfig, devtype, name, tag, owner, 0, shortname, source),
+eeprom_base_device::eeprom_base_device(const machine_config &mconfig, device_type devtype, const char *name, std::string tag, device_t *owner, const char *shortname, const char *file)
+	: device_t(mconfig, devtype, name, tag, owner, 0, shortname, file),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 		m_cells(0),

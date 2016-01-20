@@ -17,7 +17,7 @@ class msx_cart_sfg : public device_t
 					, public msx_cart_interface
 {
 public:
-	msx_cart_sfg(const machine_config &mconfig, const device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname);
+	msx_cart_sfg(const machine_config &mconfig, const device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

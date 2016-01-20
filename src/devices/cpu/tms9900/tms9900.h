@@ -42,7 +42,7 @@ static const char opname[][5] =
 class tms99xx_device : public cpu_device
 {
 public:
-	tms99xx_device(const machine_config &mconfig, device_type type, std::string name,
+	tms99xx_device(const machine_config &mconfig, device_type type,  const char *name,
 				std::string tag, int databus_width, int prg_addr_bits, int cru_addr_bits,
 				device_t *owner, UINT32 clock, std::string shortname, std::string source);
 

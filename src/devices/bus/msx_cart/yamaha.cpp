@@ -18,7 +18,7 @@ const device_type MSX_CART_SFG01 = &device_creator<msx_cart_sfg01>;
 const device_type MSX_CART_SFG05 = &device_creator<msx_cart_sfg05>;
 
 
-msx_cart_sfg::msx_cart_sfg(const machine_config &mconfig, const device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname)
+msx_cart_sfg::msx_cart_sfg(const machine_config &mconfig, const device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_region_sfg(*this, "sfg")

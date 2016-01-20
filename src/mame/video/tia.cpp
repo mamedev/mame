@@ -351,7 +351,7 @@ PALETTE_INIT_MEMBER(tia_pal_video_device, tia_pal)
 	extend_palette( palette );
 }
 
-tia_video_device::tia_video_device(const machine_config &mconfig, device_type type, std::string name, std::string shortname, std::string tag, device_t *owner, UINT32 clock)
+tia_video_device::tia_video_device(const machine_config &mconfig, device_type type, std::string name, const char *shortname, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 		device_video_interface(mconfig, *this),
 		m_read_input_port_cb(*this),

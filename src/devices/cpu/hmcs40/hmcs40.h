@@ -349,7 +349,7 @@ protected:
 class hmcs43_cpu_device : public hmcs40_cpu_device
 {
 public:
-	hmcs43_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT16 polarity, std::string shortname);
+	hmcs43_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname);
 
 protected:
 	// overrides
@@ -386,7 +386,7 @@ public:
 class hmcs44_cpu_device : public hmcs40_cpu_device
 {
 public:
-	hmcs44_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT16 polarity, std::string shortname);
+	hmcs44_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname);
 
 protected:
 	// overrides
@@ -422,7 +422,7 @@ public:
 class hmcs45_cpu_device : public hmcs40_cpu_device
 {
 public:
-	hmcs45_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT16 polarity, std::string shortname);
+	hmcs45_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname);
 
 protected:
 	// overrides

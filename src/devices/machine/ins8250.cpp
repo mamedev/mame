@@ -91,7 +91,7 @@ const device_type NS16450 = &device_creator<ns16450_device>;
 const device_type NS16550 = &device_creator<ns16550_device>;
 const device_type PC16552D = &device_creator<pc16552_device>;
 
-ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname)
+ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_type type, const char* name, std::string tag, device_t *owner, UINT32 clock, const char *shortname)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 			device_serial_interface(mconfig, *this),
 			m_out_tx_cb(*this),
