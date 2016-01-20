@@ -161,8 +161,8 @@ private:
 	// internal state
 	simple_list<audit_record>   m_record_list;
 	const driver_enumerator &   m_enumerator;
-	const char *                m_validation;
-	const char *                m_searchpath;
+	std::string                 m_validation;
+	std::string                 m_searchpath;
 };
 
 

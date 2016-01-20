@@ -25,8 +25,7 @@
 
 media_auditor::media_auditor(const driver_enumerator &enumerator)
 	: m_enumerator(enumerator),
-		m_validation(AUDIT_VALIDATE_FULL),
-		m_searchpath(nullptr)
+		m_validation(AUDIT_VALIDATE_FULL)
 {
 }
 
@@ -58,7 +57,7 @@ const char *driverpath = m_enumerator.config().root_device().searchpath().c_str(
 	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
 	{
 		// determine the search path for this source and iterate through the regions
-		m_searchpath = device->searchpath().c_str();
+		m_searchpath = device->searchpath();
 
 		// now iterate over regions and ROMs within
 		for (const rom_entry *region = rom_first_region(*device); region != nullptr; region = rom_next_region(region))
@@ -67,7 +66,7 @@ const char *driverpath = m_enumerator.config().root_device().searchpath().c_str(
 std::string combinedpath = std::string(device->searchpath()).append(";").append(driverpath);
 if (!device->shortname().empty())
 	combinedpath.append(";").append(device->shortname());
-m_searchpath = combinedpath.c_str();
+m_searchpath = combinedpath;
 
 			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 			{
@@ -131,7 +130,7 @@ media_auditor::summary media_auditor::audit_device(device_t *device, const char 
 
 	// store validation for later
 	m_validation = validation;
-	m_searchpath = device->shortname().c_str();
+	m_searchpath = device->shortname();
 
 	int found = 0;
 	int required = 0;
@@ -202,7 +201,7 @@ media_auditor::summary media_auditor::audit_software(const char *list_name, soft
 		locationtag.append(swinfo->parentname());
 		combinedpath.append(";").append(swinfo->parentname()).append(";").append(list_name).append(PATH_SEPARATOR).append(swinfo->parentname());
 	}
-	m_searchpath = combinedpath.c_str();
+	m_searchpath = combinedpath;
 
 	int found = 0;
 	int required = 0;
@@ -428,7 +427,7 @@ audit_record *media_auditor::audit_one_rom(const rom_entry *rom)
 	// find the file and checksum it, getting the file length along the way
 	emu_file file(m_enumerator.options().media_path(), OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD);
 	file.set_restrict_to_mediapath(true);
-	path_iterator path(m_searchpath);
+	path_iterator path(m_searchpath.c_str());
 	std::string curpath;
 	while (path.next(curpath, record.name()))
 	{
@@ -442,7 +441,7 @@ audit_record *media_auditor::audit_one_rom(const rom_entry *rom)
 		// if it worked, get the actual length and hashes, then stop
 		if (filerr == FILERR_NONE)
 		{
-			record.set_actual(file.hashes(m_validation), file.size());
+			record.set_actual(file.hashes(m_validation.c_str()), file.size());
 			break;
 		}
 	}
