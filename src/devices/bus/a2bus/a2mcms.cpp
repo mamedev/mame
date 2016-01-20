@@ -68,7 +68,7 @@ machine_config_constructor a2bus_mcms1_device::device_mconfig_additions() const
 //  LIVE DEVICE - Card 1
 //**************************************************************************
 
-a2bus_mcms1_device::a2bus_mcms1_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+a2bus_mcms1_device::a2bus_mcms1_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_mcms(*this, ENGINE_TAG)
@@ -149,7 +149,7 @@ WRITE_LINE_MEMBER(a2bus_mcms1_device::irq_w)
 //  LIVE DEVICE - Card 2
 //**************************************************************************
 
-a2bus_mcms2_device::a2bus_mcms2_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+a2bus_mcms2_device::a2bus_mcms2_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this), m_card1(nullptr), m_engine(nullptr)
 {

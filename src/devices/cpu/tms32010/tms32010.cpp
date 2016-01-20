@@ -111,7 +111,7 @@ tms32010_device::tms32010_device(const machine_config &mconfig, std::string tag,
 }
 
 
-tms32010_device::tms32010_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int addr_mask)
+tms32010_device::tms32010_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int addr_mask)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 12, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 8, -1, ADDRESS_MAP_NAME(tms32015_ram))

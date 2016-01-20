@@ -281,7 +281,7 @@ decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, std::s
 		m_write_solenoid(*this)
 {}
 
-decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_cpu(*this,"maincpu"),
 		m_pia21(*this, "pia21"),
@@ -331,7 +331,7 @@ decocpu_type2_device::decocpu_type2_device(const machine_config &mconfig, std::s
 	: decocpu_type1_device(mconfig, DECOCPU2, "Data East Pinball CPU Board Type 2", tag, owner, clock, "decocpu2", __FILE__)
 {}
 
-decocpu_type2_device::decocpu_type2_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+decocpu_type2_device::decocpu_type2_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: decocpu_type1_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {}
 
@@ -349,7 +349,7 @@ decocpu_type3_device::decocpu_type3_device(const machine_config &mconfig, std::s
 	: decocpu_type2_device(mconfig, DECOCPU3, "Data East Pinball CPU Board Type 3", tag, owner, clock, "decocpu3", __FILE__)
 {}
 
-decocpu_type3_device::decocpu_type3_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+decocpu_type3_device::decocpu_type3_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: decocpu_type2_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {}
 

@@ -170,7 +170,7 @@ ioport_constructor c4023_t::device_input_ports() const
 //  c1526_base_t - constructor
 //-------------------------------------------------
 
-c1526_base_t:: c1526_base_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+c1526_base_t:: c1526_base_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

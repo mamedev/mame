@@ -57,7 +57,7 @@ const UINT32 VIRTUAL_LEAD_OUT_TRACKS = LEAD_OUT_MIN_SIZE_IN_UM * 1000 / NOMINAL_
 //  laserdisc_device - constructor
 //-------------------------------------------------
 
-laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),

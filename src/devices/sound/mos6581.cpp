@@ -37,7 +37,7 @@ const device_type MOS8580 = &device_creator<mos8580_device>;
 //  mos6581_device - constructor
 //-------------------------------------------------
 
-mos6581_device::mos6581_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source)
+mos6581_device::mos6581_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_read_potx(*this),

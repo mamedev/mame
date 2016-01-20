@@ -39,7 +39,7 @@ const device_type NES_CONY = &device_creator<nes_cony_device>;
 const device_type NES_YOKO = &device_creator<nes_yoko_device>;
 
 
-nes_cony_device::nes_cony_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_cony_device::nes_cony_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_irq_count(0),
 	m_irq_enable(0),

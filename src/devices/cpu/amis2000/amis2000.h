@@ -44,7 +44,7 @@ class amis2000_base_device : public cpu_device
 {
 public:
 	// construction/destruction
-	amis2000_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT8 bu_bits, UINT8 callstack_bits, UINT8 callstack_depth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source)
+	amis2000_base_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT8 bu_bits, UINT8 callstack_bits, UINT8 callstack_depth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_BIG, 8, prgwidth, 0, program)
 		, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)

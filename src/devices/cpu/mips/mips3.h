@@ -269,7 +269,7 @@ protected:
 
 public:
 	// construction/destruction
-	mips3_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, mips3_flavor flavor, endianness_t endiannes);
+	mips3_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, mips3_flavor flavor, endianness_t endiannes);
 
 	static void set_icache_size(device_t &device, size_t icache_size) { downcast<mips3_device &>(device).c_icache_size = icache_size; }
 	static void set_dcache_size(device_t &device, size_t dcache_size) { downcast<mips3_device &>(device).c_dcache_size = dcache_size; }

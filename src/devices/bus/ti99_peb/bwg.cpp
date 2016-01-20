@@ -604,7 +604,7 @@ void snug_bwg_device::device_reset()
 	for (int i=0; i < 4; i++)
 	{
 		if (m_floppy[i] != nullptr)
-			logerror("bwg: Connector %d with %s\n", i, m_floppy[i]->name().c_str());
+			logerror("bwg: Connector %d with %s\n", i, m_floppy[i]->name());
 		else
 			logerror("bwg: Connector %d has no floppy attached\n", i);
 	}

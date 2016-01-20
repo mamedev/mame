@@ -31,7 +31,7 @@ enum
 const device_type PCVIDEO_T1000 = &device_creator<pcvideo_t1000_device>;
 const device_type PCVIDEO_PCJR = &device_creator<pcvideo_pcjr_device>;
 
-pc_t1t_device::pc_t1t_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+pc_t1t_device::pc_t1t_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_video_interface(mconfig, *this),
 	m_mc6845(*this, T1000_MC6845_NAME),

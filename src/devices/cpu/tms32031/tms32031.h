@@ -143,7 +143,7 @@ protected:
 	};
 
 	// construction/destruction
-	tms3203x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, address_map_constructor internal_map, std::string shortname, std::string source);
+	tms3203x_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, address_map_constructor internal_map, const char *shortname, const char *source);
 	virtual ~tms3203x_device();
 
 public:

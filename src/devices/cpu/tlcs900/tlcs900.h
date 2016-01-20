@@ -49,7 +49,7 @@ class tlcs900h_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tlcs900h_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname);
+	tlcs900h_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname);
 
 	// static configuration helpers
 	static void set_am8_16(device_t &device, int am8_16) { downcast<tlcs900h_device &>(device).m_am8_16 = am8_16; }

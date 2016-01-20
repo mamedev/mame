@@ -29,7 +29,7 @@ const device_type SNS_LOROM_MCPIR2 = &device_creator<sns_rom_mcpirate2_device>;
 const device_type SNS_LOROM_20COL = &device_creator<sns_rom_20col_device>;
 
 
-sns_rom_device::sns_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+sns_rom_device::sns_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_sns_cart_interface( mconfig, *this )
 {

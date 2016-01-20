@@ -114,7 +114,7 @@ static const UINT16 font[]=
 	0x0000, // 0000 0000 0000 0000 (DEL)
 };
 
-esqvfd_t::esqvfd_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+esqvfd_t::esqvfd_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

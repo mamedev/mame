@@ -68,7 +68,7 @@ const device_type ASTROCADE_WHITERAM    = &device_creator<astrocade_whiteram_dev
 const device_type ASTROCADE_RL64RAM     = &device_creator<astrocade_rl64ram_device>;
 
 
-astrocade_blueram_4k_device::astrocade_blueram_4k_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+astrocade_blueram_4k_device::astrocade_blueram_4k_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_astrocade_card_interface(mconfig, *this),
 						m_write_prot(*this, "RAM_PROTECT")

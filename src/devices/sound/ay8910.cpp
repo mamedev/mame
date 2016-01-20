@@ -881,10 +881,10 @@ void ay8910_device::device_start()
 	int master_clock = clock();
 
 	if (m_ioports < 1 && !(m_port_a_read_cb.isnull() && m_port_a_write_cb.isnull()))
-		fatalerror("Device '%s' is a %s and has no port A!", tag().c_str(), name().c_str());
+		fatalerror("Device '%s' is a %s and has no port A!", tag().c_str(), name());
 
 	if (m_ioports < 2 && !(m_port_b_read_cb.isnull() && m_port_b_write_cb.isnull()))
-		fatalerror("Device '%s' is a %s and has no port B!", tag().c_str(), name().c_str());
+		fatalerror("Device '%s' is a %s and has no port B!", tag().c_str(), name());
 
 	m_port_a_read_cb.resolve();
 	m_port_b_read_cb.resolve();
@@ -893,7 +893,7 @@ void ay8910_device::device_start()
 
 	if ((m_flags & AY8910_SINGLE_OUTPUT) != 0)
 	{
-		logerror("%s device '%s' using single output!\n", name().c_str(), tag().c_str());
+		logerror("%s device '%s' using single output!\n", name(), tag().c_str());
 		m_streams = 1;
 	}
 
@@ -1165,8 +1165,8 @@ ay8910_device::ay8910_device(const machine_config &mconfig, std::string tag, dev
 	m_res_load[0] = m_res_load[1] = m_res_load[2] = 1000; //Default values for resistor loads
 }
 
-ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock,
-								psg_type_t psg_type, int streams, int ioports, std::string shortname, std::string source)
+ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock,
+								psg_type_t psg_type, int streams, int ioports, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_type(psg_type),

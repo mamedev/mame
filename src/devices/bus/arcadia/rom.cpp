@@ -22,7 +22,7 @@ const device_type ARCADIA_ROM_STD = &device_creator<arcadia_rom_device>;
 const device_type ARCADIA_ROM_GOLF = &device_creator<arcadia_golf_device>;
 
 
-arcadia_rom_device::arcadia_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+arcadia_rom_device::arcadia_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_arcadia_cart_interface( mconfig, *this )
 {

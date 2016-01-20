@@ -501,7 +501,7 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device, dev
 			std::string tag = owner.subtag(entry->m_read.m_tag);
 			device_t *mapdevice = machine.device(tag.c_str());
 			if (mapdevice == nullptr) {
-				throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", tag.c_str(), m_spacenum, device.basetag().c_str());
+				throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", tag.c_str(), m_spacenum, device.basetag());
 			}
 			// Grab the submap
 			address_map submap(*mapdevice, entry);

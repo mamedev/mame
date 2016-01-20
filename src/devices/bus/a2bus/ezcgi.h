@@ -29,7 +29,7 @@ class a2bus_ezcgi_device:
 public:
 	// construction/destruction
 	a2bus_ezcgi_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	a2bus_ezcgi_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	a2bus_ezcgi_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -54,7 +54,7 @@ class a2bus_ezcgi_9938_device:
 public:
 	// construction/destruction
 	a2bus_ezcgi_9938_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	a2bus_ezcgi_9938_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	a2bus_ezcgi_9938_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -79,7 +79,7 @@ class a2bus_ezcgi_9958_device:
 public:
 	// construction/destruction
 	a2bus_ezcgi_9958_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	a2bus_ezcgi_9958_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	a2bus_ezcgi_9958_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

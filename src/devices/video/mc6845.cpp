@@ -89,7 +89,7 @@ const device_type MOS8568 = &device_creator<mos8568_device>;
 #define ATTR_ALTERNATE_CHARSET      BIT(attr, 7)
 
 
-mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this, false),
 		m_show_border_area(true),
@@ -1454,7 +1454,7 @@ ams40489_device::ams40489_device(const machine_config &mconfig, std::string tag,
 }
 
 
-mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: mc6845_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
 		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mos8563_videoram_map)),

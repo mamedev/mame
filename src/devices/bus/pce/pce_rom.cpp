@@ -23,7 +23,7 @@ const device_type PCE_ROM_POPULOUS = &device_creator<pce_populous_device>;
 const device_type PCE_ROM_SF2 = &device_creator<pce_sf2_device>;
 
 
-pce_rom_device::pce_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+pce_rom_device::pce_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_pce_cart_interface( mconfig, *this )
 {

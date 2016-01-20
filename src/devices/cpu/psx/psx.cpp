@@ -1745,7 +1745,7 @@ ADDRESS_MAP_END
 //  psxcpu_device - constructor
 //-------------------------------------------------
 
-psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source ) :
+psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source ) :
 	cpu_device( mconfig, type, name, tag, owner, clock, shortname, source ),
 	m_program_config( "program", ENDIANNESS_LITTLE, 32, 32, 0, ADDRESS_MAP_NAME( psxcpu_internal_map ) ),
 	m_gpu_read_handler( *this ),

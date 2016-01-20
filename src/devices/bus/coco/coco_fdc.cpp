@@ -177,7 +177,7 @@ const device_type COCO_FDC = &device_creator<coco_fdc_device>;
 //-------------------------------------------------
 //  coco_fdc_device - constructor
 //-------------------------------------------------
-coco_fdc_device::coco_fdc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+coco_fdc_device::coco_fdc_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_cococart_interface( mconfig, *this ), m_owner(nullptr), m_dskreg(0), m_drq(0), m_intrq(0),
 		m_wd17xx(*this, WD_TAG),
@@ -444,7 +444,7 @@ const device_type DRAGON_FDC = &device_creator<dragon_fdc_device>;
 //-------------------------------------------------
 //  dragon_fdc_device - constructor
 //-------------------------------------------------
-dragon_fdc_device::dragon_fdc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+dragon_fdc_device::dragon_fdc_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: coco_fdc_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

@@ -221,7 +221,7 @@ ADDRESS_MAP_END
 //  fd1089_base_device - constructor
 //-------------------------------------------------
 
-fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: m68000_device(mconfig, tag, owner, clock, shortname, source),
 		m_decrypted_opcodes(*this, ":fd1089_decrypted_opcodes")
 {

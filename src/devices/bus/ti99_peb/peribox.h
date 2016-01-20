@@ -37,7 +37,7 @@ class peribox_device : public bus8z_device
 	friend class peribox_slot_device;
 public:
 	peribox_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	peribox_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	peribox_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	template<class _Object> static devcb_base &static_set_inta_callback(device_t &device, _Object object)  {  return downcast<peribox_device &>(device).m_console_inta.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_intb_callback(device_t &device, _Object object)  {  return downcast<peribox_device &>(device).m_console_intb.set_callback(object); }
@@ -191,7 +191,7 @@ class ti_expansion_card_device : public bus8z_device, public device_slot_card_in
 	friend class peribox_slot_device;
 
 public:
-	ti_expansion_card_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+	ti_expansion_card_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_slot_card_interface(mconfig, *this), m_selected(false), m_cru_base(0), m_select_mask(0), m_select_value(0)
 {

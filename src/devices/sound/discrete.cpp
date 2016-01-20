@@ -834,7 +834,7 @@ void discrete_device::static_set_intf(device_t &device, const discrete_block *in
 //  discrete_device - constructor
 //-------------------------------------------------
 
-discrete_device::discrete_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock)
+discrete_device::discrete_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock, "discrete", __FILE__),
 		m_intf(nullptr),
 		m_sample_rate(0),

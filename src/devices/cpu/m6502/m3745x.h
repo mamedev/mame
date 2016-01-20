@@ -61,7 +61,7 @@ public:
 	};
 
 	// construction/destruction
-	m3745x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, address_map_constructor internal_map, std::string shortname, std::string source);
+	m3745x_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, address_map_constructor internal_map, const char *shortname, const char *source);
 
 	const address_space_config m_program_config;
 
@@ -145,7 +145,7 @@ class m37450_device : public m3745x_device
 {
 public:
 	m37450_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	m37450_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	m37450_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 };
 
 extern const device_type M37450;

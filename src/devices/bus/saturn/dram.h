@@ -13,7 +13,7 @@ class saturn_dram_device : public device_t,
 {
 public:
 	// construction/destruction
-	saturn_dram_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	saturn_dram_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;

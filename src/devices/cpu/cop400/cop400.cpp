@@ -166,7 +166,7 @@ ADDRESS_MAP_END
 #endif
 
 
-cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, UINT8 program_addr_bits, UINT8 data_addr_bits, UINT8 featuremask, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, bool has_counter, bool has_inil, address_map_constructor internal_map_program, address_map_constructor internal_map_data)
+cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, UINT8 program_addr_bits, UINT8 data_addr_bits, UINT8 featuremask, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, bool has_counter, bool has_inil, address_map_constructor internal_map_program, address_map_constructor internal_map_data)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, program_addr_bits, 0, internal_map_program)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_addr_bits, 0, internal_map_data) // data width is really 4

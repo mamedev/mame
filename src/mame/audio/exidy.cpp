@@ -211,7 +211,7 @@ exidy_sound_device::exidy_sound_device(const machine_config &mconfig, std::strin
 {
 }
 
-exidy_sound_device::exidy_sound_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+exidy_sound_device::exidy_sound_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_riot_irq_state(0),

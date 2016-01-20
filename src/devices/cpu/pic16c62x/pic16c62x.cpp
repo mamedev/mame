@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( pic16c62xa_ram, AS_DATA, 8, pic16c62x_device )
 ADDRESS_MAP_END
 
 
-pic16c62x_device::pic16c62x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int picmodel)
+pic16c62x_device::pic16c62x_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int picmodel)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, program_width, -1
 		, ( ( program_width == 9 ) ? ADDRESS_MAP_NAME(pic16c62x_rom_9) : ( ( program_width == 10 ) ? ADDRESS_MAP_NAME(pic16c62x_rom_10) : ADDRESS_MAP_NAME(pic16c62x_rom_11) )))

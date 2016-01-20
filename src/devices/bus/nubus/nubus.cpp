@@ -32,7 +32,7 @@ nubus_slot_device::nubus_slot_device(const machine_config &mconfig, std::string 
 {
 }
 
-nubus_slot_device::nubus_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+nubus_slot_device::nubus_slot_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_slot_interface(mconfig, *this)
 {
@@ -87,7 +87,7 @@ nubus_device::nubus_device(const machine_config &mconfig, std::string tag, devic
 {
 }
 
-nubus_device::nubus_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+nubus_device::nubus_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr),
 		m_out_irq9_cb(*this),
 		m_out_irqa_cb(*this),

@@ -22,7 +22,7 @@ m6510_device::m6510_device(const machine_config &mconfig, std::string tag, devic
 	floating = 0x00;
 }
 
-m6510_device::m6510_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+m6510_device::m6510_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	m6502_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	read_port(*this),
 	write_port(*this), dir(0), port(0), drive(0)

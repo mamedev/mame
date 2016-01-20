@@ -128,7 +128,7 @@ static render_texture *get_vector_texture(float dx, float dy, float intensity)
 // device type definition
 const device_type VECTOR = &device_creator<vector_device>;
 
-vector_device::vector_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+vector_device::vector_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
 		m_vector_list(nullptr),

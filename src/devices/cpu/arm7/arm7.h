@@ -51,7 +51,7 @@ class arm7_cpu_device : public cpu_device
 public:
 	// construction/destruction
 	arm7_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	arm7_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, UINT8 archRev, UINT8 archFlags, endianness_t endianness = ENDIANNESS_LITTLE);
+	arm7_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, UINT8 archRev, UINT8 archFlags, endianness_t endianness = ENDIANNESS_LITTLE);
 
 protected:
 	// device-level overrides

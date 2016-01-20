@@ -170,7 +170,7 @@ nes_sachen_shero_device::nes_sachen_shero_device(const machine_config &mconfig, 
 //{
 //}
 
-nes_fk23c_device::nes_fk23c_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_fk23c_device::nes_fk23c_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_txrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_mmc_cmd1(0)
 				{
 }

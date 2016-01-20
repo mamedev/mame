@@ -160,7 +160,7 @@ UINT32 device_md_cart_interface::get_padded_size(UINT32 size)
 //-------------------------------------------------
 //  base_md_cart_slot_device - constructor
 //-------------------------------------------------
-base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 						device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),

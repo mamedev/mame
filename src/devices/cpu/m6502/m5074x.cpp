@@ -39,7 +39,7 @@ const device_type M50741 = &device_creator<m50741_device>;
 //-------------------------------------------------
 //  m5074x_device - constructor
 //-------------------------------------------------
-m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, address_map_constructor internal_map, std::string shortname, std::string source) :
+m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, address_map_constructor internal_map, const char *shortname, const char *source) :
 	m740_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 13, 0, internal_map),
 	read_p0(*this),
@@ -494,7 +494,7 @@ m50740_device::m50740_device(const machine_config &mconfig, std::string tag, dev
 {
 }
 
-m50740_device::m50740_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+m50740_device::m50740_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	m5074x_device(mconfig, type, name, tag, owner, clock, ADDRESS_MAP_NAME(m50740_map), shortname, source)
 {
 }
@@ -512,7 +512,7 @@ m50741_device::m50741_device(const machine_config &mconfig, std::string tag, dev
 {
 }
 
-m50741_device::m50741_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+m50741_device::m50741_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	m5074x_device(mconfig, type, name, tag, owner, clock, ADDRESS_MAP_NAME(m50741_map), shortname, source)
 {
 }

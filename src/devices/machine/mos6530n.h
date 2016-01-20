@@ -188,7 +188,7 @@ class mos6530_base_t :  public device_t
 {
 public:
 	// construction/destruction
-	mos6530_base_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	mos6530_base_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<mos6530_base_t &>(device).m_irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_pa_rd_callback(device_t &device, _Object object) { return downcast<mos6530_base_t &>(device).m_in_pa_cb.set_callback(object); }

@@ -52,7 +52,7 @@ extern const device_type PSX_SIO1;
 class psxsio_device : public device_t
 {
 public:
-	psxsio_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	psxsio_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<psxsio_device &>(device).m_irq_handler.set_callback(object); }

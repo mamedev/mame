@@ -14,7 +14,7 @@ class a78_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	a78_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	a78_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	a78_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
@@ -32,7 +32,7 @@ class a78_rom_pokey_device : public a78_rom_device
 {
 public:
 	// construction/destruction
-	a78_rom_pokey_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	a78_rom_pokey_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	a78_rom_pokey_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
@@ -53,7 +53,7 @@ class a78_rom_sg_device : public a78_rom_device
 {
 public:
 	// construction/destruction
-	a78_rom_sg_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	a78_rom_sg_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	a78_rom_sg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
@@ -95,7 +95,7 @@ class a78_rom_sg_ram_device : public a78_rom_sg_device
 {
 public:
 	// construction/destruction
-	a78_rom_sg_ram_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	a78_rom_sg_ram_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	a78_rom_sg_ram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
@@ -110,7 +110,7 @@ class a78_rom_sg9_device : public a78_rom_sg_device
 {
 public:
 	// construction/destruction
-	a78_rom_sg9_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	a78_rom_sg9_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	a78_rom_sg9_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing

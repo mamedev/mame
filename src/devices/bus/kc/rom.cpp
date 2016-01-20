@@ -48,7 +48,7 @@ kc_8k_device::kc_8k_device(const machine_config &mconfig, std::string tag, devic
 	{
 }
 
-kc_8k_device::kc_8k_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+kc_8k_device::kc_8k_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_kcexp_interface( mconfig, *this ), m_slot(nullptr), m_mei(0), m_rom(nullptr), m_enabled(0), m_base(0)
 	{

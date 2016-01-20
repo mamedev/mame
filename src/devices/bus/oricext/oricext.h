@@ -43,7 +43,7 @@ class oricext_device : public device_t,
 						public device_slot_card_interface
 {
 public:
-	oricext_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	oricext_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	void set_cputag(std::string tag);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);

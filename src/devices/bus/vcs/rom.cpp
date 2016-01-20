@@ -44,7 +44,7 @@ const device_type A26_ROM_32IN1 = &device_creator<a26_rom_32in1_device>;
 const device_type A26_ROM_X07 = &device_creator<a26_rom_x07_device>;
 
 
-a26_rom_2k_device::a26_rom_2k_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+a26_rom_2k_device::a26_rom_2k_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_vcs_cart_interface( mconfig, *this )
 {
@@ -63,7 +63,7 @@ a26_rom_4k_device::a26_rom_4k_device(const machine_config &mconfig, std::string 
 }
 
 
-a26_rom_f6_device::a26_rom_f6_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+a26_rom_f6_device::a26_rom_f6_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: a26_rom_2k_device(mconfig, type, name, tag, owner, clock, shortname, source),
 						m_base_bank(-1) // set to -1 to help the Xin1 multicart...
 {
@@ -82,7 +82,7 @@ a26_rom_f4_device::a26_rom_f4_device(const machine_config &mconfig, std::string 
 }
 
 
-a26_rom_f8_device::a26_rom_f8_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+a26_rom_f8_device::a26_rom_f8_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: a26_rom_f6_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

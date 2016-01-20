@@ -117,7 +117,7 @@ public:
 		this->m_target = dynamic_cast<_DeviceClass *>(device);
 		if (device != nullptr && this->m_target == nullptr)
 		{
-			this->printf_warning("Device '%s' found but is of incorrect type (actual type is %s)\n", this->m_tag.c_str(), device->name().c_str());
+			this->printf_warning("Device '%s' found but is of incorrect type (actual type is %s)\n", this->m_tag.c_str(), device->name());
 		}
 		return this->report_missing(this->m_target != nullptr, "device", _Required);
 	}

@@ -180,7 +180,7 @@ const device_type GB_LCD_CGB = &device_creator<cgb_lcd_device>;
 
 
 
-gb_lcd_device::gb_lcd_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+gb_lcd_device::gb_lcd_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 				: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_video_interface(mconfig, *this),
 					m_sgb_border_hack(0)

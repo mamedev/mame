@@ -107,7 +107,7 @@ void device_sega8_cart_interface::ram_alloc(UINT32 size)
 //  sega8_cart_slot_device - constructor
 //-------------------------------------------------
 
-sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, bool is_card, std::string shortname, std::string source) :
+sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, bool is_card, const char *shortname, const char *source) :
 						device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),

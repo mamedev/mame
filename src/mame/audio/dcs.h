@@ -23,7 +23,7 @@ class dcs_audio_device : public device_t
 {
 public:
 	// construction/destruction
-	dcs_audio_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int rev = 1);
+	dcs_audio_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int rev = 1);
 
 	// for dcs2 (int dram_in_mb, offs_t polling_offset)
 	static void static_set_dram_in_mb(device_t &device, int dram_in_mb) { downcast<dcs_audio_device &>(device).m_dram_in_mb = dram_in_mb; }
@@ -276,7 +276,7 @@ class dcs2_audio_device : public dcs_audio_device
 {
 public:
 	// construction/destruction
-	dcs2_audio_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	dcs2_audio_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
 	// device-level overrides

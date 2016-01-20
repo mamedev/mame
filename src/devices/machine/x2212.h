@@ -49,7 +49,7 @@ class x2212_device :    public device_t,
 public:
 	// construction/destruction
 	x2212_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	x2212_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	x2212_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// inline configuration helpers
 	static void static_set_auto_save(device_t &device);

@@ -42,7 +42,7 @@ const device_type NES_JY_TYPEB = &device_creator<nes_jy_typeb_device>;
 const device_type NES_JY_TYPEC = &device_creator<nes_jy_typec_device>;
 
 
-nes_jy_typea_device::nes_jy_typea_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_jy_typea_device::nes_jy_typea_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_latch(0), m_extra_chr_bank(0), m_extra_chr_mask(0), m_bank_6000(0),
 	m_irq_mode(0), m_irq_count(0), m_irq_prescale(0), m_irq_prescale_mask(0), m_irq_flip(0), m_irq_enable(0), m_irq_up(0), m_irq_down(0), irq_timer(nullptr)
 				{
@@ -55,7 +55,7 @@ nes_jy_typea_device::nes_jy_typea_device(const machine_config &mconfig, std::str
 {
 }
 
-nes_jy_typeb_device::nes_jy_typeb_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_jy_typeb_device::nes_jy_typeb_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_jy_typea_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

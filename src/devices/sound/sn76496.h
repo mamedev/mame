@@ -25,7 +25,7 @@ class sn76496_base_device : public device_t, public device_sound_interface
 public:
 	sn76496_base_device(const machine_config &mconfig, device_type type,  const char *name, std::string tag,
 		int feedbackmask, int noisetap1, int noisetap2, bool negate, bool stereo, int clockdivider, int sega,
-		device_t *owner, UINT32 clock, std::string shortname, std::string source);
+		device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_ready_handler(device_t &device, _Object object) { return downcast<sn76496_base_device &>(device).m_ready_handler.set_callback(object); }

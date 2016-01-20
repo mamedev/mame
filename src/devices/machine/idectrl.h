@@ -31,7 +31,7 @@ class ide_controller_device : public ata_interface_device
 {
 public:
 	ide_controller_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	ide_controller_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	ide_controller_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	virtual DECLARE_READ16_MEMBER(read_cs0) override;
 	virtual DECLARE_READ16_MEMBER(read_cs1) override;
@@ -54,7 +54,7 @@ class ide_controller_32_device : public ide_controller_device
 {
 public:
 	ide_controller_32_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	ide_controller_32_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	ide_controller_32_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	virtual DECLARE_READ32_MEMBER(read_cs0);
 	virtual DECLARE_READ32_MEMBER(read_cs1);

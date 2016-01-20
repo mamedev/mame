@@ -201,7 +201,7 @@ static ADDRESS_MAP_START(data_8bit, AS_DATA, 8, mcs48_cpu_device)
 ADDRESS_MAP_END
 
 
-mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int rom_size, int ram_size, UINT8 feature_mask)
+mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, int rom_size, int ram_size, UINT8 feature_mask)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0
 		, ( ( rom_size == 1024 ) ? ADDRESS_MAP_NAME(program_10bit) : ( ( rom_size == 2048 ) ? ADDRESS_MAP_NAME(program_11bit) : ( ( rom_size == 4096 ) ? ADDRESS_MAP_NAME(program_12bit) : nullptr ) ) ))
@@ -294,7 +294,7 @@ m58715_device::m58715_device(const machine_config &mconfig, std::string tag, dev
 {
 }
 
-upi41_cpu_device::upi41_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int rom_size, int ram_size)
+upi41_cpu_device::upi41_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, int rom_size, int ram_size)
 	: mcs48_cpu_device(mconfig, type, name, tag, owner, clock, shortname, rom_size, ram_size, UPI41_FEATURE)
 {
 }

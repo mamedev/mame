@@ -51,7 +51,7 @@ machine_config_constructor c2n_device::device_mconfig_additions() const
 //  c2n_device - constructor
 //-------------------------------------------------
 
-c2n_device::c2n_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+c2n_device::c2n_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_pet_datassette_port_interface(mconfig, *this),
 		m_cassette(*this, "cassette"),

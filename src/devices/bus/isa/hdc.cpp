@@ -169,7 +169,7 @@ xt_hdc_device::xt_hdc_device(const machine_config &mconfig, std::string tag, dev
 	m_type = STANDARD;
 }
 
-xt_hdc_device::xt_hdc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+xt_hdc_device::xt_hdc_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source), buffer_ptr(nullptr), csb(0), status(0), error(0), m_type(0), m_current_cmd(0),
 		m_irq_handler(*this),
 		m_drq_handler(*this), drv(0), timer(nullptr), data_cnt(0), hdc_control(0), hdcdma_src(nullptr), hdcdma_dst(nullptr), hdcdma_read(0), hdcdma_write(0), hdcdma_size(0)
@@ -925,7 +925,7 @@ isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, std::string tag,
 {
 }
 
-isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this),
 		m_hdc(*this,"hdc"), dip(0)

@@ -19,7 +19,7 @@ const device_type SNS_HIROM = &device_creator<sns_rom21_device>;
 const device_type SNS_HIROM_SRTC = &device_creator<sns_rom21_srtc_device>;
 
 
-sns_rom21_device::sns_rom21_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+sns_rom21_device::sns_rom21_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_sns_cart_interface( mconfig, *this )
 {

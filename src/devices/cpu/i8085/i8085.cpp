@@ -195,7 +195,7 @@ i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, std::string 
 }
 
 
-i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int cputype)
+i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cputype)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)

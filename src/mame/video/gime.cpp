@@ -108,7 +108,7 @@
 //  ctor
 //-------------------------------------------------
 
-gime_base_device::gime_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, std::string shortname, std::string source)
+gime_base_device::gime_base_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, const char *shortname, const char *source)
 	:   mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, true, 263, 25+192+26+3, false, shortname, source),
 		m_write_irq(*this),
 		m_write_firq(*this),

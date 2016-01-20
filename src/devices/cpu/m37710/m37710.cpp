@@ -94,7 +94,7 @@ ADDRESS_MAP_END
 // many other combinations of RAM and ROM size exist
 
 
-m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, address_map_delegate map_delegate)
+m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, address_map_delegate map_delegate)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, map_delegate)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
@@ -108,7 +108,7 @@ m37702m2_device::m37702m2_device(const machine_config &mconfig, std::string tag,
 }
 
 
-m37702m2_device::m37702m2_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+m37702m2_device::m37702m2_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: m37710_cpu_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(m37702m2_device::map), this))
 {
 }

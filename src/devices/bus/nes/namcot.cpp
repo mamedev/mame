@@ -49,7 +49,7 @@ const device_type NES_NAMCOT340 = &device_creator<nes_namcot340_device>;
 const device_type NES_NAMCOT163 = &device_creator<nes_namcot163_device>;
 
 
-nes_namcot3433_device::nes_namcot3433_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_namcot3433_device::nes_namcot3433_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_latch(0)
 				{
 }
@@ -69,7 +69,7 @@ nes_namcot3425_device::nes_namcot3425_device(const machine_config &mconfig, std:
 				{
 }
 
-nes_namcot340_device::nes_namcot340_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_namcot340_device::nes_namcot340_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
 				{
 }

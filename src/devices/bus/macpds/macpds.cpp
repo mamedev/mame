@@ -32,7 +32,7 @@ macpds_slot_device::macpds_slot_device(const machine_config &mconfig, std::strin
 {
 }
 
-macpds_slot_device::macpds_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+macpds_slot_device::macpds_slot_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_slot_interface(mconfig, *this)
 {
@@ -81,7 +81,7 @@ macpds_device::macpds_device(const machine_config &mconfig, std::string tag, dev
 {
 }
 
-macpds_device::macpds_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+macpds_device::macpds_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr)
 {
 }

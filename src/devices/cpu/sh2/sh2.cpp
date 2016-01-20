@@ -202,7 +202,7 @@ void sh2_device::device_stop()
 }
 
 
-sh2_device::sh2_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int cpu_type, address_map_constructor internal_map, int addrlines )
+sh2_device::sh2_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type, address_map_constructor internal_map, int addrlines )
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 32, addrlines, 0, internal_map)
 	, m_decrypted_program_config("decrypted_opcodes", ENDIANNESS_BIG, 32, addrlines, 0)

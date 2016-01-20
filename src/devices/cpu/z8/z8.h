@@ -27,7 +27,7 @@ class z8_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	z8_device(const machine_config &mconfig, device_type type, std::string name, std::string _tag, device_t *_owner, UINT32 _clock, std::string shortname, std::string source, int size);
+	z8_device(const machine_config &mconfig, device_type type, const char *name, std::string _tag, device_t *_owner, UINT32 _clock, const char *shortname, const char *source, int size);
 
 protected:
 	// device-level overrides

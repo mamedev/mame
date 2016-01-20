@@ -56,7 +56,7 @@ const device_type NES_WAIXING_WXZS2 = &device_creator<nes_waixing_wxzs2_device>;
 const device_type NES_WAIXING_FS304 = &device_creator<nes_waixing_fs304_device>;
 
 
-nes_waixing_a_device::nes_waixing_a_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_waixing_a_device::nes_waixing_a_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_txrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
@@ -101,7 +101,7 @@ nes_waixing_g_device::nes_waixing_g_device(const machine_config &mconfig, std::s
 {
 }
 
-nes_waixing_h_device::nes_waixing_h_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_waixing_h_device::nes_waixing_h_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_txrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

@@ -21,7 +21,7 @@ const device_type VBOY_ROM_STD = &device_creator<vboy_rom_device>;
 const device_type VBOY_ROM_EEPROM = &device_creator<vboy_eeprom_device>;
 
 
-vboy_rom_device::vboy_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+vboy_rom_device::vboy_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_vboy_cart_interface( mconfig, *this )
 {

@@ -56,7 +56,7 @@ adc12138_device::adc12138_device(const machine_config &mconfig, std::string tag,
 	: device_t(mconfig, ADC12138, "ADC12138", tag, owner, clock, "adc12138", __FILE__)
 {
 }
-adc12138_device::adc12138_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+adc12138_device::adc12138_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

@@ -86,7 +86,7 @@ nec_p72_t::nec_p72_t(const machine_config &mconfig, std::string tag, device_t *o
 {
 }
 
-nec_p72_t::nec_p72_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+nec_p72_t::nec_p72_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu")

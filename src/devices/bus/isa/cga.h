@@ -27,7 +27,7 @@ class isa8_cga_device :
 public:
 	// construction/destruction
 	isa8_cga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	isa8_cga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	isa8_cga_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	virtual MC6845_UPDATE_ROW( crtc_update_row );
 	MC6845_UPDATE_ROW( cga_text_inten_update_row );
@@ -98,7 +98,7 @@ class isa8_cga_superimpose_device :
 public:
 	// construction/destruction
 	isa8_cga_superimpose_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	isa8_cga_superimpose_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	isa8_cga_superimpose_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 };
 
 // device type definition

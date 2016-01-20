@@ -13,7 +13,7 @@ class generic_ram_plain_device : public device_t,
 {
 public:
 	// construction/destruction
-	generic_ram_plain_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 size, std::string shortname, std::string source);
+	generic_ram_plain_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 size, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -34,7 +34,7 @@ class generic_ram_linear_device : public device_t,
 {
 public:
 	// construction/destruction
-	generic_ram_linear_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 size, std::string shortname, std::string source);
+	generic_ram_linear_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 size, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;

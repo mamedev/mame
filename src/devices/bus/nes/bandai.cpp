@@ -63,7 +63,7 @@ nes_oekakids_device::nes_oekakids_device(const machine_config &mconfig, std::str
 				{
 }
 
-nes_fcg_device::nes_fcg_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_fcg_device::nes_fcg_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
 				{
 }
@@ -73,7 +73,7 @@ nes_fcg_device::nes_fcg_device(const machine_config &mconfig, std::string tag, d
 				{
 }
 
-nes_lz93d50_device::nes_lz93d50_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_lz93d50_device::nes_lz93d50_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_fcg_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
@@ -83,7 +83,7 @@ nes_lz93d50_device::nes_lz93d50_device(const machine_config &mconfig, std::strin
 {
 }
 
-nes_lz93d50_24c01_device::nes_lz93d50_24c01_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_lz93d50_24c01_device::nes_lz93d50_24c01_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_lz93d50_device(mconfig, type, name, tag, owner, clock, shortname, source),
 						m_i2cmem(*this, "i2cmem"), m_i2c_dir(0)
 				{

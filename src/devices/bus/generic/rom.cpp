@@ -31,13 +31,13 @@ const device_type GENERIC_ROM_LINEAR = &device_creator<generic_rom_linear_device
 const device_type GENERIC_ROMRAM_PLAIN = &device_creator<generic_romram_plain_device>;
 
 
-generic_rom_device::generic_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+generic_rom_device::generic_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_generic_cart_interface(mconfig, *this)
 {
 }
 
-generic_rom_plain_device::generic_rom_plain_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+generic_rom_plain_device::generic_rom_plain_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: generic_rom_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

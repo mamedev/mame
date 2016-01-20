@@ -55,7 +55,7 @@ image_manager::image_manager(running_machine &machine)
 				unload_all();
 
 				fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s",
-					image->device().name().c_str(),
+					image->device().name(),
 					image_basename.c_str(),
 					image_err.c_str());
 			}
@@ -236,7 +236,7 @@ void image_manager::postdevice_init()
 				unload_all();
 
 				fatalerror_exitcode(machine(), MAMERR_DEVICE, "Device %s load failed: %s",
-					image->device().name().c_str(),
+					image->device().name(),
 					image_err.c_str());
 			}
 	}

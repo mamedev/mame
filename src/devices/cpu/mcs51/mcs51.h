@@ -77,7 +77,7 @@ class mcs51_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	mcs51_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, UINT8 features = 0);
+	mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features = 0);
 
 	void i8051_set_serial_tx_callback(write8_delegate tx_func);
 	void i8051_set_serial_rx_callback(read8_delegate rx_func);
@@ -385,7 +385,7 @@ class i8052_device : public mcs51_cpu_device
 public:
 	// construction/destruction
 	i8052_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	i8052_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, UINT8 features = 0);
+	i8052_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features = 0);
 
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
@@ -425,7 +425,7 @@ class i80c51_device : public mcs51_cpu_device
 public:
 	// construction/destruction
 	i80c51_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	i80c51_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, UINT8 features = 0);
+	i80c51_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features = 0);
 
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
@@ -444,7 +444,7 @@ class i80c52_device : public i8052_device
 public:
 	// construction/destruction
 	i80c52_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	i80c52_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, UINT8 features = 0);
+	i80c52_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features = 0);
 
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;

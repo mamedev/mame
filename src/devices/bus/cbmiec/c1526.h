@@ -28,7 +28,7 @@ class c1526_base_t :  public device_t
 {
 public:
 	// construction/destruction
-	c1526_base_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	c1526_base_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
 	// device-level overrides

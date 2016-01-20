@@ -32,7 +32,7 @@ const device_type SNS_LOROM_SETA10 = &device_creator<sns_rom_seta10dsp_device>;
 const device_type SNS_LOROM_SETA11 = &device_creator<sns_rom_seta11dsp_device>;
 
 
-sns_rom20_necdsp_device::sns_rom20_necdsp_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+sns_rom20_necdsp_device::sns_rom20_necdsp_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: sns_rom_device(mconfig, type, name, tag, owner, clock, shortname, source),
 						m_upd7725(*this, "dsp")
 {
@@ -44,7 +44,7 @@ sns_rom20_necdsp_device::sns_rom20_necdsp_device(const machine_config &mconfig, 
 {
 }
 
-sns_rom21_necdsp_device::sns_rom21_necdsp_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+sns_rom21_necdsp_device::sns_rom21_necdsp_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: sns_rom21_device(mconfig, type, name, tag, owner, clock, shortname, source),
 						m_upd7725(*this, "dsp")
 {
@@ -56,7 +56,7 @@ sns_rom21_necdsp_device::sns_rom21_necdsp_device(const machine_config &mconfig, 
 {
 }
 
-sns_rom_setadsp_device::sns_rom_setadsp_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+sns_rom_setadsp_device::sns_rom_setadsp_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: sns_rom_device(mconfig, type, name, tag, owner, clock, shortname, source),
 						m_upd96050(*this, "dsp")
 {

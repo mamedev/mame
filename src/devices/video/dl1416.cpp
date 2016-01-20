@@ -96,7 +96,7 @@ static const UINT16 dl1416t_segments[128] = {
     DEVICE INTERFACE
 *****************************************************************************/
 
-dl1416_device::dl1416_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+dl1416_device::dl1416_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_write_enable(FALSE),
 	m_chip_enable(FALSE),

@@ -29,7 +29,7 @@ const device_type GBA_ROM_FLASH = &device_creator<gba_rom_flash_device>;
 const device_type GBA_ROM_FLASH1M = &device_creator<gba_rom_flash1m_device>;
 
 
-gba_rom_device::gba_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+gba_rom_device::gba_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_gba_cart_interface( mconfig, *this )
 {

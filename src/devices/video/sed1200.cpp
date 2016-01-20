@@ -31,7 +31,7 @@ ROM_START( sed1200x0b )
 	ROM_LOAD( "sed1200-b.bin", 0x000, 0x800, CRC(d0741f51) SHA1(c8c856f1357286a2c8c806af81724a828345357e))
 ROM_END
 
-sed1200_device::sed1200_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+sed1200_device::sed1200_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source), cursor_direction(false), cursor_blinking(false), cursor_full(false), cursor_on(false), display_on(false), cursor_address(0), cgram_address(0), cgrom(nullptr)
 {
 }

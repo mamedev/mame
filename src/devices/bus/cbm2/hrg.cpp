@@ -147,7 +147,7 @@ machine_config_constructor cbm2_hrg_b_t::device_mconfig_additions() const
 //  cbm2_hrg_t - constructor
 //-------------------------------------------------
 
-cbm2_hrg_t::cbm2_hrg_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+cbm2_hrg_t::cbm2_hrg_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_cbm2_expansion_card_interface(mconfig, *this),
 	m_gdc(*this, EF9366_TAG),

@@ -132,8 +132,8 @@ class nasbus_slot_device : public device_t, public device_slot_interface
 public:
 	// construction/destruction
 	nasbus_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	nasbus_slot_device(const machine_config &mconfig, device_type type, std::string name,
-		std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nasbus_slot_device(const machine_config &mconfig, device_type type, const char *name,
+		std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;

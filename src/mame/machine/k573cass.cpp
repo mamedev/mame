@@ -70,7 +70,7 @@ konami573_cassette_x_device::konami573_cassette_x_device(const machine_config &m
 {
 }
 
-konami573_cassette_x_device::konami573_cassette_x_device(const machine_config &mconfig, const device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+konami573_cassette_x_device::konami573_cassette_x_device(const machine_config &mconfig, const device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	konami573_cassette_interface(mconfig, *this),
 	m_x76f041(*this, "eeprom")
@@ -194,7 +194,7 @@ konami573_cassette_y_device::konami573_cassette_y_device(const machine_config &m
 {
 }
 
-konami573_cassette_y_device::konami573_cassette_y_device(const machine_config &mconfig, const device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+konami573_cassette_y_device::konami573_cassette_y_device(const machine_config &mconfig, const device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	konami573_cassette_interface(mconfig, *this),
 	m_x76f100(*this, "eeprom"),

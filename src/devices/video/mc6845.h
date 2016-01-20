@@ -100,7 +100,7 @@ class mc6845_device :   public device_t,
 public:
 	// construction/destruction
 	mc6845_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	mc6845_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	mc6845_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	static void set_show_border_area(device_t &device, bool show) { downcast<mc6845_device &>(device).m_show_border_area = show; }
 	static void set_visarea_adjust(device_t &device, int min_x, int max_x, int min_y, int max_y)
@@ -430,7 +430,7 @@ class mos8563_device : public mc6845_device,
 						public device_memory_interface
 {
 public:
-	mos8563_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	mos8563_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	mos8563_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;

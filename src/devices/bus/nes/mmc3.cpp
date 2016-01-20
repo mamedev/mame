@@ -53,7 +53,7 @@ const device_type NES_QJ_PCB = &device_creator<nes_qj_device>;
 const device_type NES_ZZ_PCB = &device_creator<nes_zz_device>;
 
 
-nes_txrom_device::nes_txrom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_txrom_device::nes_txrom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_prg_base(0), m_prg_mask(0), m_chr_base(0), m_chr_mask(0),
 	m_latch(0), m_wram_protect(0), m_alt_irq(0), m_irq_count(0), m_irq_count_latch(0), m_irq_clear(0), m_irq_enable(0)
 				{

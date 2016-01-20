@@ -46,7 +46,7 @@ class tms7000_device : public cpu_device
 public:
 	// construction/destruction
 	tms7000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	tms7000_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, address_map_constructor internal, UINT32 info_flags, std::string shortname, std::string source);
+	tms7000_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, address_map_constructor internal, UINT32 info_flags, const char *shortname, const char *source);
 
 	DECLARE_READ8_MEMBER(tms7000_unmapped_rf_r) { if (!space.debugger_access()) logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag().c_str(), m_pc, offset + 0x80); return 0; };
 	DECLARE_WRITE8_MEMBER(tms7000_unmapped_rf_w) { logerror("'%s' (%04X): unmapped_rf_w @ $%04x = $%02x\n", tag().c_str(), m_pc, offset + 0x80, data); };

@@ -78,7 +78,7 @@ isa8_aga_device::isa8_aga_device(const machine_config &mconfig, std::string tag,
 {
 }
 
-isa8_aga_device::isa8_aga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+isa8_aga_device::isa8_aga_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this),
 		m_palette(*this, "palette"),

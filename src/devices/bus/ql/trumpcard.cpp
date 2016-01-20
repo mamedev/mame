@@ -123,7 +123,7 @@ ql_trump_card_t::ql_trump_card_t(const machine_config &mconfig, std::string tag,
 {
 }
 
-ql_trump_card_t::ql_trump_card_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int ram_size) :
+ql_trump_card_t::ql_trump_card_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int ram_size) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1772_TAG),

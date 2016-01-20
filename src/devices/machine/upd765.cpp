@@ -108,7 +108,7 @@ ADDRESS_MAP_END
 
 int upd765_family_device::rates[4] = { 500000, 300000, 250000, 1000000 };
 
-upd765_family_device::upd765_family_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+upd765_family_device::upd765_family_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	pc_fdc_interface(mconfig, type, name, tag, owner, clock, shortname, source),
 	intrq_cb(*this),
 	drq_cb(*this),

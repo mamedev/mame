@@ -38,7 +38,7 @@ class dp8390_device : public device_t,
 {
 public:
 	// construction/destruction
-	dp8390_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, float bandwidth, std::string shortname, std::string source);
+	dp8390_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, float bandwidth, const char *shortname, const char *source);
 
 	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_breq_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_breq_cb.set_callback(object); }

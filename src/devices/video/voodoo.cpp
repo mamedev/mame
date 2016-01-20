@@ -5831,7 +5831,7 @@ static void dump_rasterizer_stats(voodoo_state *v)
 	}
 }
 
-voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_fbmem(0),
 		m_tmumem0(0),
@@ -5922,7 +5922,7 @@ voodoo_banshee_device::voodoo_banshee_device(const machine_config &mconfig, std:
 {
 }
 
-voodoo_banshee_device::voodoo_banshee_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+voodoo_banshee_device::voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: voodoo_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

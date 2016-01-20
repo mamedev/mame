@@ -44,7 +44,7 @@ nes_ffe3_device::nes_ffe3_device(const machine_config &mconfig, std::string tag,
 {
 }
 
-nes_ffe4_device::nes_ffe4_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_ffe4_device::nes_ffe4_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0), m_exram_enabled(0), m_exram_bank(0)
 				{
 }

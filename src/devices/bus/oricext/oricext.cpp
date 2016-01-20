@@ -39,7 +39,7 @@ void oricext_connector::device_config_complete()
 		dev->set_cputag(cputag);
 }
 
-oricext_device::oricext_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+oricext_device::oricext_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_slot_card_interface(mconfig, *this),	
 	cpu(nullptr),

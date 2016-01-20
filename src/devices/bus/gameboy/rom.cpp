@@ -29,7 +29,7 @@ const device_type GB_ROM_LASAMA = &device_creator<gb_rom_lasama_device>;
 const device_type MEGADUCK_ROM = &device_creator<megaduck_rom_device>;
 
 
-gb_rom_device::gb_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+gb_rom_device::gb_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_gb_cart_interface( mconfig, *this )
 {
@@ -67,7 +67,7 @@ gb_rom_lasama_device::gb_rom_lasama_device(const machine_config &mconfig, std::s
 }
 
 
-megaduck_rom_device::megaduck_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+megaduck_rom_device::megaduck_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_gb_cart_interface( mconfig, *this )
 {

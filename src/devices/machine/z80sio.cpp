@@ -103,7 +103,7 @@ machine_config_constructor z80sio_device::device_mconfig_additions() const
 //  z80sio_device - constructor
 //-------------------------------------------------
 
-z80sio_device::z80sio_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source)
+z80sio_device::z80sio_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_z80daisy_interface(mconfig, *this),
 	m_chanA(*this, CHANA_TAG),

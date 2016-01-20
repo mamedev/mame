@@ -268,7 +268,7 @@ const device_type CDP1802 = &device_creator<cdp1802_device>;
 //  cosmac_device - constructor
 //-------------------------------------------------
 
-cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 3),

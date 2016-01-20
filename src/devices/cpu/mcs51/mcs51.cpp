@@ -260,7 +260,7 @@ static ADDRESS_MAP_START(data_8bit, AS_DATA, 8, mcs51_cpu_device)
 ADDRESS_MAP_END
 
 
-mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, UINT8 features)
+mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0
 		, ( ( program_width == 12 ) ? ADDRESS_MAP_NAME(program_12bit) : ( ( program_width == 13 ) ? ADDRESS_MAP_NAME(program_13bit) : nullptr ) ))
@@ -299,7 +299,7 @@ i8751_device::i8751_device(const machine_config &mconfig, std::string tag, devic
 {
 }
 
-i8052_device::i8052_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, UINT8 features)
+i8052_device::i8052_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features)
 	: mcs51_cpu_device(mconfig, type, name, tag, owner, clock, shortname, program_width, data_width, features | FEATURE_I8052)
 {
 	m_num_interrupts = 6;
@@ -326,7 +326,7 @@ i80c31_device::i80c31_device(const machine_config &mconfig, std::string tag, dev
 {
 }
 
-i80c51_device::i80c51_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, UINT8 features)
+i80c51_device::i80c51_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features)
 	: mcs51_cpu_device(mconfig, type, name, tag, owner, clock, shortname, program_width, data_width, features | FEATURE_CMOS)
 {
 }
@@ -342,7 +342,7 @@ i87c51_device::i87c51_device(const machine_config &mconfig, std::string tag, dev
 }
 
 
-i80c52_device::i80c52_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, UINT8 features)
+i80c52_device::i80c52_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features)
 	: i8052_device(mconfig, type, name, tag, owner, clock, shortname, program_width, data_width, features | FEATURE_I80C52 | FEATURE_CMOS)
 {
 }

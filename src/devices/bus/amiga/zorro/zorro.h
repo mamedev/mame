@@ -229,8 +229,8 @@ class zorro_slot_device : public device_t, public device_slot_interface
 public:
 	// construction/destruction
 	zorro_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	zorro_slot_device(const machine_config &mconfig, device_type type, std::string name,
-		std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	zorro_slot_device(const machine_config &mconfig, device_type type, const char *name,
+		std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -252,8 +252,8 @@ class zorro_device : public device_t
 {
 public:
 	// construction/destruction
-	zorro_device(const machine_config &mconfig, device_type type, std::string name,
-		std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	zorro_device(const machine_config &mconfig, device_type type, const char *name,
+		std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
 	static void set_cputag(device_t &device, std::string tag);
@@ -299,8 +299,8 @@ class exp_slot_device : public zorro_device
 public:
 	// construction/destruction
 	exp_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	exp_slot_device(const machine_config &mconfig, device_type type, std::string name,
-		std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	exp_slot_device(const machine_config &mconfig, device_type type, const char *name,
+		std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	template<class _Object> static devcb_base &set_ipl_handler(device_t &device, _Object object)
 		{ return downcast<exp_slot_device &>(device).m_ipl_handler.set_callback(object); }
@@ -335,8 +335,8 @@ class zorro2_device : public zorro_device
 public:
 	// construction/destruction
 	zorro2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	zorro2_device(const machine_config &mconfig, device_type type, std::string name,
-		std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	zorro2_device(const machine_config &mconfig, device_type type, const char *name,
+		std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~zorro2_device();
 
 	template<class _Object> static devcb_base &set_eint1_handler(device_t &device, _Object object)

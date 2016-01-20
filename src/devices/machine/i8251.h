@@ -42,7 +42,7 @@ class i8251_device :  public device_t,
 {
 public:
 	// construction/destruction
-	i8251_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname);
+	i8251_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname);
 	i8251_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers

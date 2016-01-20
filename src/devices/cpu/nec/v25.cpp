@@ -49,7 +49,7 @@ const device_type V25 = &device_creator<v25_device>;
 const device_type V35 = &device_creator<v35_device>;
 
 
-v25_common_device::v25_common_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, bool is_16bit, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type)
+v25_common_device::v25_common_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, bool is_16bit, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 17, 0)

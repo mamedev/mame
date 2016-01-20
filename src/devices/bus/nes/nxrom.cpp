@@ -59,7 +59,7 @@ const device_type NES_UN1ROM = &device_creator<nes_un1rom_device>;
 const device_type NES_NOCHR = &device_creator<nes_nochr_device>;
 
 
-nes_nrom_device::nes_nrom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_nrom_device::nes_nrom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_nes_cart_interface( mconfig, *this )
 {
@@ -91,7 +91,7 @@ nes_bxrom_device::nes_bxrom_device(const machine_config &mconfig, std::string ta
 {
 }
 
-nes_cnrom_device::nes_cnrom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_cnrom_device::nes_cnrom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_chr_open_bus(0)
 				{
 }

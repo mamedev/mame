@@ -320,7 +320,7 @@ isa8_cga_device::isa8_cga_device(const machine_config &mconfig, std::string tag,
 	m_superimpose = false;
 }
 
-isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this),
 		m_cga_config(*this, "cga_config"), m_framecnt(0), m_mode_control(0), m_color_select(0),
@@ -478,7 +478,7 @@ isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &m
 	m_superimpose = true;
 }
 
-isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		isa8_cga_device( mconfig, type, name, tag, owner, clock, shortname, source)
 {
 	m_superimpose = true;

@@ -12,7 +12,7 @@ class nes_namcot3433_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_namcot3433_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_namcot3433_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	nes_namcot3433_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
@@ -72,7 +72,7 @@ class nes_namcot340_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_namcot340_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_namcot340_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	nes_namcot340_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides

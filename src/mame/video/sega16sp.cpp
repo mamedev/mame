@@ -36,7 +36,7 @@ const device_type SEGA_YBOARD_SPRITES = &device_creator<sega_yboard_sprite_devic
 //  sega_16bit_sprite_device -- core constructor
 //-------------------------------------------------
 
-sega_16bit_sprite_device::sega_16bit_sprite_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source)
+sega_16bit_sprite_device::sega_16bit_sprite_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, const char *shortname, const char *source)
 	: sprite16_device_ind16(mconfig, type, name, tag, owner, shortname, source),
 		m_flip(false)
 {
@@ -1026,7 +1026,7 @@ sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconf
 	set_local_origin(189, 0x00);
 }
 
-sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock, bool xboard_variant, std::string shortname, std::string source)
+sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock, bool xboard_variant, const char *shortname, const char *source)
 	: sega_16bit_sprite_device(mconfig, SEGA_XBOARD_SPRITES, "Sega X-Board Sprites", tag, owner, shortname, source),
 		m_is_xboard(true)
 {

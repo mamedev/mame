@@ -817,7 +817,7 @@ inline void c8050_t::update_ieee_signals()
 //  c8050_t - constructor
 //-------------------------------------------------
 
-c8050_t::c8050_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+c8050_t::c8050_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_ieee488_interface(mconfig, *this),
 	m_maincpu(*this, M6502_TAG),

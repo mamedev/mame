@@ -1319,7 +1319,7 @@ UINT16 deco_146_base_device::read_data(UINT16 address, UINT16 mem_mask, UINT8 &c
 
 
 
-deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 	m_port_a_r =  deco146_port_read_cb(FUNC(deco_146_base_device::port_a_default), this);

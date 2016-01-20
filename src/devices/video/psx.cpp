@@ -22,7 +22,7 @@ const device_type CXD8561BQ = &device_creator<cxd8561bq_device>;
 const device_type CXD8561CQ = &device_creator<cxd8561cq_device>;
 const device_type CXD8654Q = &device_creator<cxd8654q_device>;
 
-psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_vblank_handler(*this)
 #if DEBUG_VIEWER

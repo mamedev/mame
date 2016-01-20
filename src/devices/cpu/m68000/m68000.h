@@ -126,10 +126,10 @@ public:
 
 	// construction/destruction
 	m68000_base_device(const machine_config &mconfig, const char *name, std::string tag, device_t *owner, UINT32 clock,
-						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, std::string shortname, std::string source);
+						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, const char *shortname, const char *source);
 
 	m68000_base_device(const machine_config &mconfig, const char *name, std::string tag, device_t *owner, UINT32 clock,
-						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, std::string shortname, std::string source);
+						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source);
 
 	m68000_base_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
@@ -409,10 +409,10 @@ class m68000_device : public m68000_base_device
 public:
 	// construction/destruction
 	m68000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	m68000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	m68000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	m68000_device(const machine_config &mconfig, const char *name, std::string tag, device_t *owner, UINT32 clock,
-						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, std::string shortname, std::string source);
+						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source);
 
 
 
@@ -729,7 +729,7 @@ public:
 	fscpu32_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	fscpu32_device(const machine_config &mconfig, const char *name, std::string tag, device_t *owner, UINT32 clock,
-						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, std::string shortname, std::string source);
+						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };

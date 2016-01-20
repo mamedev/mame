@@ -85,7 +85,7 @@ static ADDRESS_MAP_START( sh3_internal_map, AS_PROGRAM, 64, sh3_base_device )
 ADDRESS_MAP_END
 
 
-sh34_base_device::sh34_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, endianness_t endianness, address_map_constructor internal)
+sh34_base_device::sh34_base_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, endianness_t endianness, address_map_constructor internal)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, m_program_config("program", endianness, 64, 32, 0, internal)
 	, m_io_config("io", endianness, 64, 8)
@@ -113,14 +113,14 @@ sh34_base_device::sh34_base_device(const machine_config &mconfig, device_type ty
 }
 
 
-sh3_base_device::sh3_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, endianness_t endianness)
+sh3_base_device::sh3_base_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, endianness_t endianness)
 	: sh34_base_device(mconfig, type, name, tag, owner, clock, shortname, endianness, ADDRESS_MAP_NAME(sh3_internal_map))
 {
 	m_cpu_type = CPU_TYPE_SH3;
 }
 
 
-sh4_base_device::sh4_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, endianness_t endianness)
+sh4_base_device::sh4_base_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, endianness_t endianness)
 	: sh34_base_device(mconfig, type, name, tag, owner, clock, shortname, endianness, ADDRESS_MAP_NAME(sh4_internal_map))
 {
 	m_cpu_type = CPU_TYPE_SH4;

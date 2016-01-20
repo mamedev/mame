@@ -122,7 +122,7 @@ static SLOT_INTERFACE_START( msx_floppies )
 SLOT_INTERFACE_END
 
 
-msx_cart_disk::msx_cart_disk(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname)
+msx_cart_disk::msx_cart_disk(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_floppy0(*this, "fdc:0")
@@ -132,21 +132,21 @@ msx_cart_disk::msx_cart_disk(const machine_config &mconfig, device_type type, st
 }
 
 
-msx_cart_disk_wd::msx_cart_disk_wd(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname)
+msx_cart_disk_wd::msx_cart_disk_wd(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname)
 	: msx_cart_disk(mconfig, type, name, tag, owner, clock, shortname)
 	, m_fdc(*this, "fdc")
 {
 }
 
 
-msx_cart_disk_type1::msx_cart_disk_type1(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname)
+msx_cart_disk_type1::msx_cart_disk_type1(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname)
 	: msx_cart_disk_wd(mconfig, type, name, tag, owner, clock, shortname), m_side_control(0)
 		, m_control(0)
 {
 }
 
 
-msx_cart_disk_type2::msx_cart_disk_type2(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname)
+msx_cart_disk_type2::msx_cart_disk_type2(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname)
 	: msx_cart_disk_wd(mconfig, type, name, tag, owner, clock, shortname)
 	, m_control(0)
 {
@@ -171,7 +171,7 @@ msx_cart_fscf351::msx_cart_fscf351(const machine_config &mconfig, std::string ta
 }
 
 
-msx_cart_disk_tc8566::msx_cart_disk_tc8566(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname)
+msx_cart_disk_tc8566::msx_cart_disk_tc8566(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname)
 	: msx_cart_disk(mconfig, type, name, tag, owner, clock, shortname)
 	, m_fdc(*this, "fdc")
 {

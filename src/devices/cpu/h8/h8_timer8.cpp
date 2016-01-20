@@ -13,7 +13,7 @@ h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig
 {
 }
 
-h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	cpu(*this, "^"), chained_timer(nullptr), intc(nullptr), irq_ca(0), irq_cb(0), irq_v(0), chain_type(0), tcr(0), tcsr(0), tcnt(0), extra_clock_bit(false),
 	has_adte(false), has_ice(false), clock_type(0), clock_divider(0), clear_type(0), counter_cycle(0), last_clock_update(0), event_time(0)

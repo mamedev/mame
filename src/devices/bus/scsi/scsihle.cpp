@@ -10,7 +10,7 @@ Base class for HLE'd SCSI devices.
 
 #include "scsihle.h"
 
-scsihle_device::scsihle_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+scsihle_device::scsihle_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	scsi_port_interface(mconfig, *this),
 	m_scsi_id(*this, "SCSI_ID"),

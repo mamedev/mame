@@ -124,7 +124,7 @@ midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig
 	memset(m_data,0,sizeof(m_data));
 }
 
-midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_upper(0),
 	m_buff(0),
@@ -234,7 +234,7 @@ midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconf
 
 }
 
-midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	midway_serial_pic_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_nvram_interface(mconfig, *this),
 	m_latch(0),

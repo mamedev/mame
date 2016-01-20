@@ -119,7 +119,7 @@ const device_type ADSP2181 = &device_creator<adsp2181_device>;
 //  adsp21xx_device - constructor
 //-------------------------------------------------
 
-adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, std::string shortname, std::string source)
+adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 14, -2),
 		m_data_config("data", ENDIANNESS_LITTLE, 16, 14, -1),
@@ -253,7 +253,7 @@ adsp2100_device::adsp2100_device(const machine_config &mconfig, std::string tag,
 adsp2101_device::adsp2101_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	: adsp21xx_device(mconfig, ADSP2101, "ADSP-2101", tag, owner, clock, CHIP_TYPE_ADSP2101, "adsp2101", __FILE__) { }
 
-adsp2101_device::adsp2101_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, std::string shortname, std::string source)
+adsp2101_device::adsp2101_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, const char *shortname, const char *source)
 	: adsp21xx_device(mconfig, type, name, tag, owner, clock, chiptype, shortname, source) { }
 
 adsp2104_device::adsp2104_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)

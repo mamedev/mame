@@ -399,7 +399,7 @@ class apollo_graphics_15i : public device_t
 {
 public:
 	apollo_graphics_15i(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	apollo_graphics_15i(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock, device_type type, const char *name, std::string shortname, std::string source);
+	apollo_graphics_15i(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock, device_type type, const char *name, const char *shortname, const char *source);
 	~apollo_graphics_15i();
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

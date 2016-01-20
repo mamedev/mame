@@ -8,7 +8,7 @@
 const device_type PCD_VIDEO = &device_creator<pcd_video_device>;
 const device_type PCX_VIDEO = &device_creator<pcx_video_device>;
 
-pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_maincpu(*this, ":maincpu"),
 	m_mcu(*this, "graphics"),

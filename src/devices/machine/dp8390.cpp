@@ -19,7 +19,7 @@ rtl8019a_device::rtl8019a_device(const machine_config &mconfig, std::string tag,
 		m_type = TYPE_RTL8019A;
 }
 
-dp8390_device::dp8390_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, float bandwidth, std::string shortname, std::string source)
+dp8390_device::dp8390_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, float bandwidth, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_network_interface(mconfig, *this, bandwidth), m_type(0),
 		m_irq_cb(*this),

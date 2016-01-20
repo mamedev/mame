@@ -161,7 +161,7 @@ ADDRESS_MAP_END
 //  intelfsh_device - constructor
 //-------------------------------------------------
 
-intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source)
+intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
@@ -398,10 +398,10 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 	m_space_config = address_space_config("flash", ENDIANNESS_BIG, m_bits, addrbits, (m_bits == 8) ? 0 : -1, map);
 }
 
-intelfsh8_device::intelfsh8_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source)
+intelfsh8_device::intelfsh8_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
 	: intelfsh_device(mconfig, type, name, tag, owner, clock, variant, shortname, source) { }
 
-intelfsh16_device::intelfsh16_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source)
+intelfsh16_device::intelfsh16_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
 	: intelfsh_device(mconfig, type, name, tag, owner, clock, variant, shortname, source) { }
 
 

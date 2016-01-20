@@ -76,7 +76,7 @@ const rom_entry *a2bus_thunderclock_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_thunderclock_device::a2bus_thunderclock_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+a2bus_thunderclock_device::a2bus_thunderclock_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_upd1990ac(*this, THUNDERCLOCK_UPD1990_TAG), m_rom(nullptr), m_dataout(0)

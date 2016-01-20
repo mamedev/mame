@@ -125,7 +125,7 @@ tms7000_device::tms7000_device(const machine_config &mconfig, std::string tag, d
 {
 }
 
-tms7000_device::tms7000_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, address_map_constructor internal, UINT32 info_flags, std::string shortname, std::string source)
+tms7000_device::tms7000_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, address_map_constructor internal, UINT32 info_flags, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal),
 	m_io_config("io", ENDIANNESS_BIG, 8, 8, 0, ADDRESS_MAP_NAME(tms7000_io)),

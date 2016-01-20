@@ -61,7 +61,7 @@ class sega315_5124_device : public device_t,
 public:
 	// construction/destruction
 	sega315_5124_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	sega315_5124_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset, bool supports_224_240, std::string shortname, std::string source);
+	sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset, bool supports_224_240, const char *shortname, const char *source);
 
 	static void set_signal_type(device_t &device, bool is_pal) { downcast<sega315_5124_device &>(device).m_is_pal = is_pal; }
 

@@ -13,7 +13,7 @@ class generic_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	generic_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	generic_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override {}
@@ -26,7 +26,7 @@ class generic_rom_plain_device : public generic_rom_device
 {
 public:
 	// construction/destruction
-	generic_rom_plain_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	generic_rom_plain_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	generic_rom_plain_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing

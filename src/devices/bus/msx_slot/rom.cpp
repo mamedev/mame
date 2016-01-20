@@ -17,7 +17,7 @@ msx_slot_rom_device::msx_slot_rom_device(const machine_config &mconfig, std::str
 }
 
 
-msx_slot_rom_device::msx_slot_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+msx_slot_rom_device::msx_slot_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, msx_internal_slot_interface()
 	, m_region(nullptr)

@@ -15,7 +15,7 @@ h8_intc_device::h8_intc_device(const machine_config &mconfig, std::string tag, d
 	irq_vector_nmi = 3;
 }
 
-h8_intc_device::h8_intc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+h8_intc_device::h8_intc_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source), irq_vector_base(0), irq_vector_nmi(0),
 	cpu(*this, DEVICE_SELF_OWNER), nmi_input(false), irq_input(0), ier(0), isr(0), iscr(0), icr_filter(0), ipr_filter(0)
 {
@@ -198,7 +198,7 @@ h8h_intc_device::h8h_intc_device(const machine_config &mconfig, std::string tag,
 	irq_vector_nmi = 7;
 }
 
-h8h_intc_device::h8h_intc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+h8h_intc_device::h8h_intc_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	h8_intc_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

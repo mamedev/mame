@@ -158,7 +158,7 @@ isa8_mda_device::isa8_mda_device(const machine_config &mconfig, std::string tag,
 {
 }
 
-isa8_mda_device::isa8_mda_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+isa8_mda_device::isa8_mda_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this), m_framecnt(0), m_mode_control(0),
 		m_update_row_type(-1), m_chr_gen(nullptr), m_vsync(0), m_hsync(0), m_pixel(0),

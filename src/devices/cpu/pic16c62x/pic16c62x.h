@@ -55,7 +55,7 @@ class pic16c62x_device : public cpu_device
 {
 public:
 	// construction/destruction
-	pic16c62x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int picmodel);
+	pic16c62x_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int picmodel);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

@@ -14,7 +14,7 @@ class nes_nrom_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_nrom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_nrom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	nes_nrom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	virtual void device_start() override { common_start(); }
@@ -89,7 +89,7 @@ class nes_cnrom_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_cnrom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_cnrom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	nes_cnrom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides

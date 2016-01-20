@@ -12,7 +12,7 @@ class psx_analog_controller_device :    public device_t,
 										public device_psx_controller_interface
 {
 public:
-	psx_analog_controller_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	psx_analog_controller_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	virtual ioport_constructor device_input_ports() const override;
 	DECLARE_INPUT_CHANGED_MEMBER(change_mode);

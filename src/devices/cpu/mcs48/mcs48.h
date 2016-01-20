@@ -126,7 +126,7 @@ class mcs48_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	mcs48_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int rom_size, int ram_size, UINT8 feature_mask = 0);
+	mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, int rom_size, int ram_size, UINT8 feature_mask = 0);
 
 protected:
 	// device-level overrides
@@ -592,7 +592,7 @@ class upi41_cpu_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	upi41_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int rom_size, int ram_size);
+	upi41_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, int rom_size, int ram_size);
 
 	/* functions for talking to the input/output buffers on the UPI41-class chips */
 	DECLARE_READ8_MEMBER(upi41_master_r);

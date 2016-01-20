@@ -31,7 +31,7 @@ isa8_slot_device::isa8_slot_device(const machine_config &mconfig, std::string ta
 {
 }
 
-isa8_slot_device::isa8_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+isa8_slot_device::isa8_slot_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_slot_interface(mconfig, *this), m_owner(nullptr)
 {
@@ -162,7 +162,7 @@ isa8_device::isa8_device(const machine_config &mconfig, std::string tag, device_
 	m_allocspaces = false;
 }
 
-isa8_device::isa8_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+isa8_device::isa8_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
 		m_program_config("ISA 8-bit program", ENDIANNESS_LITTLE, 8, 24, 0, nullptr),

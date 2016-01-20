@@ -26,7 +26,7 @@
 
 class pc_fdc_family_device : public pc_fdc_interface {
 public:
-	pc_fdc_family_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<pc_fdc_family_device &>(device).intrq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<pc_fdc_family_device &>(device).drq_cb.set_callback(object); }

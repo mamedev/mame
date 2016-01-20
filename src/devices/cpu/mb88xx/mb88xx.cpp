@@ -119,7 +119,7 @@ mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, std::string tag,
 }
 
 
-mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int program_width, int data_width)
+mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int program_width, int data_width)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 8, program_width, 0, ( (program_width == 9) ? ADDRESS_MAP_NAME(program_9bit) : (program_width == 10) ? ADDRESS_MAP_NAME(program_10bit) : ADDRESS_MAP_NAME(program_11bit) ) )
 	, m_data_config("data", ENDIANNESS_BIG, 8, data_width, 0, ( (data_width == 4) ? ADDRESS_MAP_NAME(data_4bit) : (data_width == 5) ? ADDRESS_MAP_NAME(data_5bit) : (data_width == 6) ? ADDRESS_MAP_NAME(data_6bit) : ADDRESS_MAP_NAME(data_7bit) ) )

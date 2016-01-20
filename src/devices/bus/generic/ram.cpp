@@ -34,14 +34,14 @@ const device_type GENERIC_RAM_64K_LINEAR = &device_creator<generic_ram_64k_linea
 const device_type GENERIC_RAM_128K_LINEAR = &device_creator<generic_ram_128k_linear_device>;
 
 
-generic_ram_plain_device::generic_ram_plain_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 size, std::string shortname, std::string source)
+generic_ram_plain_device::generic_ram_plain_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 size, const char *shortname, const char *source)
 						: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 							device_generic_cart_interface(mconfig, *this),
 							m_size(size)
 {
 }
 
-generic_ram_linear_device::generic_ram_linear_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 size, std::string shortname, std::string source)
+generic_ram_linear_device::generic_ram_linear_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 size, const char *shortname, const char *source)
 						: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 							device_generic_cart_interface(mconfig, *this),
 							m_size(size)

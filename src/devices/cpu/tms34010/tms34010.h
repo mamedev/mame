@@ -240,7 +240,7 @@ class tms340x0_device : public cpu_device,
 {
 public:
 	// construction/destruction
-	tms340x0_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname);
+	tms340x0_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname);
 
 	static void set_halt_on_reset(device_t &device, bool halt_on_reset) { downcast<tms340x0_device &>(device).m_halt_on_reset = halt_on_reset; }
 	static void set_pixel_clock(device_t &device, UINT32 pixclock) { downcast<tms340x0_device &>(device).m_pixclock = pixclock; }

@@ -25,7 +25,7 @@ class avgdvg_device : public device_t
 {
 public:
 	// construction/destruction
-	avgdvg_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	avgdvg_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	static void static_set_vector_tag(device_t &device, std::string tag);
 
@@ -155,7 +155,7 @@ class avg_device : public avgdvg_device
 public:
 	// construction/destruction
 	avg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	avg_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	avg_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	int avg_common_strobe1();
 	int avg_common_strobe2();

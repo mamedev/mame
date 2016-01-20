@@ -67,7 +67,7 @@ nes_jf16_device::nes_jf16_device(const machine_config &mconfig, std::string tag,
 {
 }
 
-nes_jf17_device::nes_jf17_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_jf17_device::nes_jf17_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_latch(0)
 				{
 }
@@ -83,7 +83,7 @@ nes_jf17_adpcm_device::nes_jf17_adpcm_device(const machine_config &mconfig, std:
 {
 }
 
-nes_jf19_device::nes_jf19_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_jf19_device::nes_jf19_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
@@ -99,7 +99,7 @@ nes_jf19_adpcm_device::nes_jf19_adpcm_device(const machine_config &mconfig, std:
 {
 }
 
-nes_ss88006_device::nes_ss88006_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_ss88006_device::nes_ss88006_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_irq_count(0), m_irq_count_latch(0), m_irq_mode(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0)
 				{
 }
@@ -109,7 +109,7 @@ nes_ss88006_device::nes_ss88006_device(const machine_config &mconfig, std::strin
 				{
 }
 
-nes_ss88006_adpcm_device::nes_ss88006_adpcm_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_ss88006_adpcm_device::nes_ss88006_adpcm_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_ss88006_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

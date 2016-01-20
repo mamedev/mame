@@ -33,7 +33,7 @@ const device_type TMS34020 = &device_creator<tms34020_device>;
     GLOBAL VARIABLES
 ***************************************************************************/
 
-tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname)
+tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, device_video_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 32, 3), m_pc(0), m_ppc(0), m_st(0), m_pixel_write(nullptr), m_pixel_read(nullptr), m_raster_op(nullptr), m_pixel_op(nullptr), m_pixel_op_timing(0), m_convsp(0), m_convdp(0), m_convmp(0), m_gfxcycles(0), m_pixelshift(0), m_is_34020(0), m_reset_deferred(false)

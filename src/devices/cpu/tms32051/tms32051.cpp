@@ -77,7 +77,7 @@ tms32051_device::tms32051_device(const machine_config &mconfig, std::string tag,
 {
 }
 
-tms32051_device::tms32051_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+tms32051_device::tms32051_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char* shortname, const char* source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1)

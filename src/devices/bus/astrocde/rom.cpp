@@ -22,7 +22,7 @@ const device_type ASTROCADE_ROM_256K = &device_creator<astrocade_rom_256k_device
 const device_type ASTROCADE_ROM_512K = &device_creator<astrocade_rom_512k_device>;
 
 
-astrocade_rom_device::astrocade_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+astrocade_rom_device::astrocade_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_astrocade_cart_interface(mconfig, *this)
 {

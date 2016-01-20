@@ -212,7 +212,7 @@ protected:
 	};
 
 	// construction/destruction
-	adsp21xx_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, std::string shortname, std::string source);
+	adsp21xx_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, const char *shortname, const char *source);
 	virtual ~adsp21xx_device();
 
 public:
@@ -507,7 +507,7 @@ public:
 	adsp2101_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 protected:
-	adsp2101_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, std::string shortname, std::string source);
+	adsp2101_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, const char *shortname, const char *source);
 
 	// device_execute_interface overrides
 	virtual UINT32 execute_input_lines() const override;

@@ -27,7 +27,7 @@
 /*
     Constructors
 */
-ti_video_device::ti_video_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+ti_video_device::ti_video_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 : bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source),
 m_tms9928a(nullptr)
 {

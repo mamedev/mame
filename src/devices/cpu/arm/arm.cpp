@@ -238,7 +238,7 @@ arm_cpu_device::arm_cpu_device(const machine_config &mconfig, std::string tag, d
 }
 
 
-arm_cpu_device::arm_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, endianness_t endianness)
+arm_cpu_device::arm_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, endianness_t endianness)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", endianness, 32, 26, 0)
 	, m_endian(endianness)

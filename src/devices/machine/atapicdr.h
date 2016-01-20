@@ -21,7 +21,7 @@ class atapi_cdrom_device : public atapi_hle_device,
 {
 public:
 	atapi_cdrom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	atapi_cdrom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock,std::string shortname, std::string source);
+	atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
 
 	UINT16 *identify_device_buffer() { return m_identify_buffer; }
 

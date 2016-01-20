@@ -785,7 +785,7 @@ void dcs_audio_device::dcs_register_state()
 //  dcs_audio_device - constructor
 //-------------------------------------------------
 
-dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int rev) :
+dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int rev) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_cpu(nullptr),
 	m_program(nullptr),
@@ -2442,7 +2442,7 @@ machine_config_constructor dcs_audio_wpc_device::device_mconfig_additions() cons
 //  dcs2_audio_device - constructor
 //-------------------------------------------------
 
-dcs2_audio_device::dcs2_audio_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+dcs2_audio_device::dcs2_audio_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	dcs_audio_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

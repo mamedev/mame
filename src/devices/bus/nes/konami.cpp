@@ -66,7 +66,7 @@ nes_konami_vrc3_device::nes_konami_vrc3_device(const machine_config &mconfig, st
 				{
 }
 
-nes_konami_vrc4_device::nes_konami_vrc4_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_konami_vrc4_device::nes_konami_vrc4_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_latch(0), m_mmc_prg_bank(0), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_enable_latch(0), m_irq_mode(0), m_irq_prescale(0), irq_timer(nullptr)
 				{
 }

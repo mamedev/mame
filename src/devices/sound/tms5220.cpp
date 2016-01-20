@@ -1459,7 +1459,7 @@ void tms5220_device::device_start()
 		m_speechrom = siblingdevice<speechrom_device>( m_speechrom_tag );
 		if( !m_speechrom )
 		{
-			throw new emu_fatalerror("Error: %s '%s' can't find speechrom '%s'\n", shortname().c_str(), tag().c_str(), m_speechrom_tag.c_str() );
+			throw new emu_fatalerror("Error: %s '%s' can't find speechrom '%s'\n", shortname(), tag().c_str(), m_speechrom_tag.c_str() );
 		}
 	}
 	else
@@ -1920,7 +1920,7 @@ tms5220_device::tms5220_device(const machine_config &mconfig, std::string tag, d
 {
 }
 
-tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this),

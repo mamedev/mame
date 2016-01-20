@@ -140,7 +140,7 @@ static const UINT8 terminal_font[256*16] =
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-generic_terminal_device::generic_terminal_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+generic_terminal_device::generic_terminal_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_palette(*this, "palette"),
 		m_io_term_conf(*this, "TERM_CONF"),

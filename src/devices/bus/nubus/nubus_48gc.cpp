@@ -76,7 +76,7 @@ const rom_entry *nubus_824gc_device::device_rom_region() const
 //  jmfb_device - constructor
 //-------------------------------------------------
 
-jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this), m_screen(nullptr), m_timer(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_stride(0), m_base(0), m_count(0), m_clutoffs(0), m_xres(0), m_yres(0), m_is824(false)

@@ -51,7 +51,7 @@ const device_type ADC0832 = &device_creator<adc0832_device>;
 const device_type ADC0834 = &device_creator<adc0834_device>;
 const device_type ADC0838 = &device_creator<adc0838_device>;
 
-adc083x_device::adc083x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+adc083x_device::adc083x_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_cs(0),
 	m_clk(0),

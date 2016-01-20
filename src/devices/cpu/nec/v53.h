@@ -107,7 +107,7 @@
 class v53_base_device : public nec_common_device
 {
 public:
-	v53_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type);
+	v53_base_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type);
 
 	DECLARE_WRITE8_MEMBER(BSEL_w);
 	DECLARE_WRITE8_MEMBER(BADR_w);

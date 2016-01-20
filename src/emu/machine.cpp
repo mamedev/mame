@@ -1092,7 +1092,7 @@ void running_machine::start_all_devices()
 						device->set_machine(*this);
 
 					// now start the device
-					osd_printf_verbose("Starting %s '%s'\n", device->name().c_str(), device->tag().c_str());
+					osd_printf_verbose("Starting %s '%s'\n", device->name(), device->tag().c_str());
 					device->start();
 				}
 

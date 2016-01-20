@@ -256,7 +256,7 @@ class tx1_sound_device : public device_t,
 {
 public:
 	tx1_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	tx1_sound_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	tx1_sound_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~tx1_sound_device() {}
 
 	DECLARE_READ8_MEMBER( pit8253_r );

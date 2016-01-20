@@ -44,7 +44,7 @@ msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconf
 }
 
 
-msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_image_interface(mconfig, *this)
 	, device_slot_interface(mconfig, *this)

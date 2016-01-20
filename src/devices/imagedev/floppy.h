@@ -67,7 +67,7 @@ public:
 	typedef delegate<void (floppy_image_device *, int)> wpt_cb;
 
 	// construction/destruction
-	floppy_image_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	floppy_image_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	virtual ~floppy_image_device();
 
 	virtual void handled_variants(UINT32 *variants, int &var_count) const = 0;

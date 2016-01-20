@@ -15,7 +15,7 @@ class neogeo_pcm2_cart : public device_t,
 {
 public:
 	// construction/destruction
-	neogeo_pcm2_cart(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT16 clock, std::string shortname, std::string source);
+	neogeo_pcm2_cart(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT16 clock, const char *shortname, const char *source);
 	neogeo_pcm2_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT16 clock);
 
 	// device-level overrides

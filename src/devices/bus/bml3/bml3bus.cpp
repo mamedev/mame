@@ -66,7 +66,7 @@ bml3bus_slot_device::bml3bus_slot_device(const machine_config &mconfig, std::str
 {
 }
 
-bml3bus_slot_device::bml3bus_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+bml3bus_slot_device::bml3bus_slot_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_slot_interface(mconfig, *this)
 {
@@ -118,7 +118,7 @@ bml3bus_device::bml3bus_device(const machine_config &mconfig, std::string tag, d
 {
 }
 
-bml3bus_device::bml3bus_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+bml3bus_device::bml3bus_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr),
 		m_out_nmi_cb(*this),
 		m_out_irq_cb(*this),

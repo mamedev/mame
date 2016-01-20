@@ -9,7 +9,7 @@ void jvs_device::static_set_jvs_host_tag(device_t &device, const char *jvs_host_
 	jvsdev.jvs_host_tag = jvs_host_tag;
 }
 
-jvs_device::jvs_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+jvs_device::jvs_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source), jvs_outputs(0), jvs_address(0), jvs_reset_counter(0)
 {
 	jvs_host_tag = nullptr;

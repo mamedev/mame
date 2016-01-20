@@ -28,7 +28,7 @@ protected:
 	tms9928a_device *m_tms9928a;
 
 	/* Constructor */
-	ti_video_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	ti_video_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	virtual void device_start(void) override;
 	virtual void device_reset(void) override;
 	virtual DECLARE_READ8Z_MEMBER(readz) override { };
@@ -84,7 +84,7 @@ extern const device_type TISOUND_76496;
 class ti_sound_system_device : public bus8z_device
 {
 public:
-	ti_sound_system_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+	ti_sound_system_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source), m_sound_chip(nullptr),
 		m_console_ready(*this) { };
 

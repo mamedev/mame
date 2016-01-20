@@ -10,7 +10,7 @@ class hc55516_device : public device_t,
 {
 public:
 	hc55516_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	hc55516_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	hc55516_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~hc55516_device() {}
 
 	/* sets the digit (0 or 1) */

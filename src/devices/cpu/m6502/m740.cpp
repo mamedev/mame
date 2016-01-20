@@ -18,7 +18,7 @@ m740_device::m740_device(const machine_config &mconfig, std::string tag, device_
 {
 }
 
-m740_device::m740_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+m740_device::m740_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	m6502_device(mconfig, type, name, tag, owner, clock, shortname, source), m_irq_multiplex(0), m_irq_vector(0)
 {
 }

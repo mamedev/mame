@@ -38,7 +38,7 @@ z88_32k_ram_device::z88_32k_ram_device(const machine_config &mconfig, std::strin
 	{
 }
 
-z88_32k_ram_device::z88_32k_ram_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+z88_32k_ram_device::z88_32k_ram_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_z88cart_interface( mconfig, *this ), m_ram(nullptr)
 	{

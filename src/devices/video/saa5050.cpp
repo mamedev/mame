@@ -173,7 +173,7 @@ const rom_entry *saa5057_device::device_rom_region() const
 //  saa5050_device - constructor
 //-------------------------------------------------
 
-saa5050_device::saa5050_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+saa5050_device::saa5050_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_char_rom(*this, "chargen"),
 	m_read_d(*this),

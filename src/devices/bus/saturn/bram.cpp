@@ -21,7 +21,7 @@ const device_type SATURN_BRAM_16MB = &device_creator<saturn_bram16mb_device>;
 const device_type SATURN_BRAM_32MB = &device_creator<saturn_bram32mb_device>;
 
 
-saturn_bram_device::saturn_bram_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+saturn_bram_device::saturn_bram_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_sat_cart_interface( mconfig, *this ),
 						device_nvram_interface(mconfig, *this)

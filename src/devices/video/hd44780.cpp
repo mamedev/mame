@@ -52,7 +52,7 @@ hd44780_device::hd44780_device(const machine_config &mconfig, std::string tag, d
 	set_charset_type(CHARSET_HD44780_A00);
 }
 
-hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_pixel_update_func(nullptr)
 {

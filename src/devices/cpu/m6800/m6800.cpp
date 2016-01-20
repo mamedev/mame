@@ -546,7 +546,7 @@ m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, std::string ta
 	m_clock_divider = 1;
 }
 
-m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, bool has_io, int clock_divider, const op_func *insn, const UINT8 *cycles, address_map_constructor internal)
+m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool has_io, int clock_divider, const op_func *insn, const UINT8 *cycles, address_map_constructor internal)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal)
 	, m_decrypted_opcodes_config("program", ENDIANNESS_BIG, 8, 16, 0)
@@ -565,7 +565,7 @@ m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, std::string ta
 {
 }
 
-m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, const op_func *insn, const UINT8 *cycles, address_map_constructor internal)
+m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, const op_func *insn, const UINT8 *cycles, address_map_constructor internal)
 	: m6800_cpu_device(mconfig, type, name, tag, owner, clock, shortname, source, true, 4, insn, cycles, internal)
 {
 }
@@ -575,7 +575,7 @@ m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, std::string ta
 {
 }
 
-m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, const op_func *insn, const UINT8 *cycles)
+m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, const op_func *insn, const UINT8 *cycles)
 	: m6800_cpu_device(mconfig, type, name, tag, owner, clock, shortname, source, false, 4, insn, cycles)
 {
 }
@@ -602,7 +602,7 @@ hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, std::string 
 {
 }
 
-hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: m6801_cpu_device(mconfig, type, name, tag, owner, clock, shortname, source, hd63701_insn, cycles_63701)
 {
 }

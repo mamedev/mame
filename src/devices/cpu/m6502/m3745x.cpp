@@ -37,7 +37,7 @@ const device_type M37450 = &device_creator<m37450_device>;
 //-------------------------------------------------
 //  m3745x_device - constructor
 //-------------------------------------------------
-m3745x_device::m3745x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, address_map_constructor internal_map, std::string shortname, std::string source) :
+m3745x_device::m3745x_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, address_map_constructor internal_map, const char *shortname, const char *source) :
 	m740_device(mconfig, type, name, tag, owner, clock, "m3745x", source),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map),
 	read_p3(*this),
@@ -503,7 +503,7 @@ m37450_device::m37450_device(const machine_config &mconfig, std::string tag, dev
 {
 }
 
-m37450_device::m37450_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+m37450_device::m37450_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	m3745x_device(mconfig, type, name, tag, owner, clock, ADDRESS_MAP_NAME(m37450_map), shortname, source)
 {
 }

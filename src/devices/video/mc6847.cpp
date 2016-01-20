@@ -129,8 +129,8 @@ const UINT32 mc6847_base_device::s_palette[mc6847_base_device::PALETTE_LENGTH] =
 //  ctor
 //-------------------------------------------------
 
-mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock,
-		const UINT8 *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, bool supports_partial_body_scanlines, std::string shortname, std::string source)
+mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock,
+		const UINT8 *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, bool supports_partial_body_scanlines, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_write_hsync(*this),
 		m_write_fsync(*this),
@@ -546,7 +546,7 @@ const char *mc6847_friend_device::describe_context(void)
 //  ctor
 //-------------------------------------------------
 
-mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, double tpfs, std::string shortname, std::string source) :
+mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, double tpfs, const char *shortname, const char *source) :
 	mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, (type == MC6847T1_NTSC) || (type == MC6847T1_PAL), tpfs, 25+191, true, shortname, source),
 	m_input_cb(*this),
 	m_black_and_white(false),

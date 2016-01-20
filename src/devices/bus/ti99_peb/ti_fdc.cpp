@@ -379,7 +379,7 @@ void ti_fdc_device::device_reset()
 	for (int i=0; i < 3; i++)
 	{
 		if (m_floppy[i] != nullptr)
-			logerror("tifdc: Connector %d with %s\n", i, m_floppy[i]->name().c_str());
+			logerror("tifdc: Connector %d with %s\n", i, m_floppy[i]->name());
 		else
 			logerror("tifdc: No floppy attached to connector %d\n", i);
 	}

@@ -109,7 +109,7 @@ protected:
 		CPU_TYPE_ATMEGA2560
 	};
 
-	avr8_device(const machine_config &mconfig, const char *name, std::string tag, device_t *owner, UINT32 clock, const device_type type, UINT32 address_mask, address_map_constructor internal_map, UINT8 cpu_type, std::string shortname, std::string source);
+	avr8_device(const machine_config &mconfig, const char *name, std::string tag, device_t *owner, UINT32 clock, const device_type type, UINT32 address_mask, address_map_constructor internal_map, UINT8 cpu_type, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
