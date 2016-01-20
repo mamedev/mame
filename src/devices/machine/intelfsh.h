@@ -369,7 +369,7 @@ public:
 class intel_te28f320_device : public intelfsh16_device
 {
 public:
-	intel_te28f320_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	intel_te28f320_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class intel_e28f400b_device : public intelfsh16_device

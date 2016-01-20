@@ -26,7 +26,7 @@ const device_type PCD8544 = &device_creator<pcd8544_device>;
 //  pcd8544_device - constructor
 //-------------------------------------------------
 
-pcd8544_device::pcd8544_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+pcd8544_device::pcd8544_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PCD8544, "PCD8544", tag, owner, clock, "pcd8544", __FILE__)
 {
 }

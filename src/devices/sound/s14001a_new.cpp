@@ -109,7 +109,7 @@ and off as it normally does during speech). Once START has gone low-high-low, th
 // device definition
 const device_type S14001A_NEW = &device_creator<s14001a_new_device>;
 
-s14001a_new_device::s14001a_new_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+s14001a_new_device::s14001a_new_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, S14001A_NEW, "S14001A_NEW", tag, owner, clock, "s14001a_new", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_SpeechRom(*this, DEVICE_SELF),

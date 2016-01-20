@@ -602,7 +602,7 @@ expect that the software reads these once on startup only.
 class fidelz80_state : public fidelz80base_state
 {
 public:
-	fidelz80_state(const machine_config &mconfig, device_type type, std::string tag)
+	fidelz80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: fidelz80base_state(mconfig, type, tag),
 		m_mcu(*this, "mcu"),
 		m_z80pio(*this, "z80pio"),

@@ -28,7 +28,7 @@
 class fidel6502_state : public fidelz80base_state
 {
 public:
-	fidel6502_state(const machine_config &mconfig, device_type type, std::string tag)
+	fidel6502_state(const machine_config &mconfig, device_type type, const char *tag)
 		: fidelz80base_state(mconfig, type, tag),
 		m_z80pio(*this, "z80pio"),
 		m_ppi8255(*this, "ppi8255")

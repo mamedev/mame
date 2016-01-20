@@ -32,7 +32,7 @@ class pcd8544_device :  public device_t
 {
 public:
 	// construction/destruction
-	pcd8544_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pcd8544_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	static void static_set_screen_update_cb(device_t &device, pcd8544_screen_update_delegate _cb) { downcast<pcd8544_device &>(device).m_screen_update_cb = _cb; }
 
 	// device interface
