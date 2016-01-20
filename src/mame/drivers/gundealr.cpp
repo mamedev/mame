@@ -509,26 +509,34 @@ MACHINE_CONFIG_END
 
 ROM_START( gundealr )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
-	ROM_LOAD( "gundealr.1",   0x00000, 0x10000, CRC(5797e830) SHA1(54bd9fbcafdf3fff55d73ecfe26d8e8df0dd55d9) )
+	ROM_LOAD( "1.3j",   0x00000, 0x10000, CRC(5797e830) SHA1(54bd9fbcafdf3fff55d73ecfe26d8e8df0dd55d9) ) /* 27c512; NOTE: the socket is labeled 1, but the rom has a '2' sticker on it! */
 	ROM_RELOAD(               0x10000, 0x10000 )    /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "3.6p",         0x00000, 0x10000, CRC(01f99de2) SHA1(2d9e9c50b0669811beb6fa53c0ff1b240fa939c7) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "gundealr.2",   0x00000, 0x20000, CRC(7874ec41) SHA1(2d2ff013cc37ce5966aa4b6c6724234655196102) )
+	ROM_LOAD( "2.6b",   0x00000, 0x20000, CRC(7874ec41) SHA1(2d2ff013cc37ce5966aa4b6c6724234655196102) ) /* NOTE: the socket is labeled 2, but the rom has a '1' sticker on it! */
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s135.7l", 0x0000, 0x0100, NO_DUMP)
+	ROM_LOAD( "82s129.7i", 0x0100, 0x0100, NO_DUMP)
 ROM_END
 
 ROM_START( gundealra )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
-	ROM_LOAD( "gundeala.1",   0x00000, 0x10000, CRC(d87e24f1) SHA1(5ac3e20e5848b9cab2a23e083d2566bfd54502d4) )
+	ROM_LOAD( "gundeala.1.3j",   0x00000, 0x10000, CRC(d87e24f1) SHA1(5ac3e20e5848b9cab2a23e083d2566bfd54502d4) )
 	ROM_RELOAD(               0x10000, 0x10000 )    /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "gundeala.3",   0x00000, 0x10000, CRC(836cf1a3) SHA1(ca57e7fc3e4497d249af963d1c8610e80ca65aa7) )
+	ROM_LOAD( "gundeala.3.6p",   0x00000, 0x10000, CRC(836cf1a3) SHA1(ca57e7fc3e4497d249af963d1c8610e80ca65aa7) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "gundeala.2",   0x00000, 0x20000, CRC(4b5fb53c) SHA1(3b73d9aeed334aece75f551f5b7f3cec0aedbfaa) )
+	ROM_LOAD( "gundeala.2.6b",   0x00000, 0x20000, CRC(4b5fb53c) SHA1(3b73d9aeed334aece75f551f5b7f3cec0aedbfaa) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s135.7l", 0x0000, 0x0100, NO_DUMP)
+	ROM_LOAD( "82s129.7i", 0x0100, 0x0100, NO_DUMP)
 ROM_END
 
 ROM_START( gundealrt )
@@ -541,6 +549,34 @@ ROM_START( gundealrt )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "2.6b",         0x00000, 0x20000, CRC(508ed0d0) SHA1(ea6b2d07e2e3d4f6c2a622a73b150ee7709b28de) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s135.7l", 0x0000, 0x0100, NO_DUMP)
+	ROM_LOAD( "82s129.7i", 0x0100, 0x0100, NO_DUMP)
+ROM_END
+
+ROM_START( gundealrbl ) // bootleg with gfx customs done out in TTL logic, different proms, patched code rom
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_LOAD( "29.2.am27c512.f10",   0x00000, 0x10000, CRC(7981751e) SHA1(3138581bcff84a11670ba54cbca608d590055b4e) ) // almost == gundealr "1.3j", 5 bytes different: (what does this change?)
+	ROM_RELOAD(               0x10000, 0x10000 )    /* banked at 0x8000-0xbfff */
+	// address gundealr gundealrbl
+	// 009a    07       00
+	// 6d4a    21       10
+	// 6d52    20       11
+	// 6d58    23       12
+	// 6d60    22       13
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "30.3.am27c512.d16",  0x00000, 0x10000, CRC(01f99de2) SHA1(2d9e9c50b0669811beb6fa53c0ff1b240fa939c7) ) // == gundealr "3.16d"
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "22.1.d27c010.a16",   0x00000, 0x20000, CRC(7874ec41) SHA1(2d2ff013cc37ce5966aa4b6c6724234655196102) ) // == gundealr "2.6b"
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "4.82s129.7e", 0x0000, 0x0100, CRC(5c78339e) SHA1(4567c20122ae9694358b462e899f8bd2b453499f) ) // this might match the undumped 82s129.7i on the original dooyong board
+
+	ROM_REGION( 0x0400, "pals", 0 )
+	ROM_LOAD( "ep320pc.jed", 0x0000, 0x0400, NO_DUMP) // altera ep320pc on a daughterboard, undumped
 ROM_END
 
 ROM_START( yamyam ) /* DY-90010001 PCB */
@@ -593,6 +629,7 @@ ROM_END
 GAME( 1990, gundealr,  0,        gundealr, gundealr, driver_device, 0, ROT270, "Dooyong", "Gun Dealer",                MACHINE_SUPPORTS_SAVE )
 GAME( 1990, gundealra, gundealr, gundealr, gundealr, driver_device, 0, ROT270, "Dooyong", "Gun Dealer (alt card set)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, gundealrt, gundealr, gundealr, gundealt, driver_device, 0, ROT270, "Dooyong (Tecmo license)", "Gun Dealer (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gundealrbl, gundealr, gundealr, gundealr, driver_device, 0, ROT270, "bootleg", "Gun Dealer (bootleg)",                MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, yamyam,    0,        yamyam,   yamyam, driver_device,   0, ROT0,   "Dooyong", "Yam! Yam!?",                MACHINE_SUPPORTS_SAVE )
 GAME( 1990, yamyamk,   yamyam,   yamyam,   yamyam, driver_device,   0, ROT0,   "Dooyong", "Yam! Yam!? (Korea)",        MACHINE_SUPPORTS_SAVE )
