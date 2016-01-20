@@ -1329,7 +1329,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		}
 
 		/* remember the base and length */
-		m_region = machine().memory().region_alloc(regiontag, regionlength, width, endianness);
+		m_region = machine().memory().region_alloc(regiontag.c_str(), regionlength, width, endianness);
 		LOG(("Allocated %X bytes @ %p\n", m_region->bytes(), m_region->base()));
 
 		/* clear the region if it's requested */
@@ -1402,7 +1402,7 @@ void rom_load_manager::process_region_list()
 					normalize_flags_for_device(machine(), regiontag.c_str(), width, endianness);
 
 				/* remember the base and length */
-				m_region = machine().memory().region_alloc(regiontag, regionlength, width, endianness);
+				m_region = machine().memory().region_alloc(regiontag.c_str(), regionlength, width, endianness);
 				LOG(("Allocated %X bytes @ %p\n", m_region->bytes(), m_region->base()));
 
 				/* clear the region if it's requested */
