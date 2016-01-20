@@ -149,7 +149,7 @@ void debug_view_memory::enumerate_sources()
 	// then add all the memory regions
 	for (memory_region *region = machine().memory().first_region(); region != nullptr; region = region->next())
 	{
-		strprintf(name, "Region '%s'", region->name());
+		strprintf(name, "Region '%s'", region->name().c_str());
 		m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), *region)));
 	}
 

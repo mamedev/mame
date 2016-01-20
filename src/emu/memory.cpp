@@ -1599,13 +1599,13 @@ void memory_manager::dump(FILE *file)
 //  region_alloc - allocates memory for a region
 //-------------------------------------------------
 
-memory_region *memory_manager::region_alloc(const char *name, UINT32 length, UINT8 width, endianness_t endian)
+memory_region *memory_manager::region_alloc(std::string name, UINT32 length, UINT8 width, endianness_t endian)
 {
-osd_printf_verbose("Region '%s' created\n", name);
+	osd_printf_verbose("Region '%s' created\n", name.c_str());
 	// make sure we don't have a region of the same name; also find the end of the list
 	memory_region *info = m_regionlist.find(name);
 	if (info != nullptr)
-		fatalerror("region_alloc called with duplicate region name \"%s\"\n", name);
+		fatalerror("region_alloc called with duplicate region name \"%s\"\n", name.c_str());
 
 	// allocate the region
 	return &m_regionlist.append(name, *global_alloc(memory_region(machine(), name, length, width, endian)));
@@ -1616,7 +1616,7 @@ osd_printf_verbose("Region '%s' created\n", name);
 //  region_free - releases memory for a region
 //-------------------------------------------------
 
-void memory_manager::region_free(const char *name)
+void memory_manager::region_free(std::string name)
 {
 	m_regionlist.remove(name);
 }
@@ -4051,7 +4051,7 @@ void memory_bank::configure_entries(int startentry, int numentries, void *base, 
 //  memory_region - constructor
 //-------------------------------------------------
 
-memory_region::memory_region(running_machine &machine, const char *name, UINT32 length, UINT8 width, endianness_t endian)
+memory_region::memory_region(running_machine &machine, std::string name, UINT32 length, UINT8 width, endianness_t endian)
 	: m_machine(machine),
 		m_next(nullptr),
 		m_name(name),

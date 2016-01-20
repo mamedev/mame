@@ -676,7 +676,7 @@ class memory_region
 	friend resource_pool_object<memory_region>::~resource_pool_object();
 
 	// construction/destruction
-	memory_region(running_machine &machine, const char *name, UINT32 length, UINT8 width, endianness_t endian);
+	memory_region(running_machine &machine, std::string name, UINT32 length, UINT8 width, endianness_t endian);
 
 public:
 	// getters
@@ -685,7 +685,7 @@ public:
 	UINT8 *base() { return (this != nullptr) ? &m_buffer[0] : nullptr; }
 	UINT8 *end() { return (this != nullptr) ? base() + m_buffer.size() : nullptr; }
 	UINT32 bytes() const { return (this != nullptr) ? m_buffer.size() : 0; }
-	const char *name() const { return m_name.c_str(); }
+	std::string name() const { return m_name; }
 
 	// flag expansion
 	endianness_t endianness() const { return m_endianness; }
@@ -738,8 +738,8 @@ public:
 	UINT8 **bank_pointer_addr(UINT8 index) { return &m_bank_ptr[index]; }
 
 	// regions
-	memory_region *region_alloc(const char *name, UINT32 length, UINT8 width, endianness_t endian);
-	void region_free(const char *name);
+	memory_region *region_alloc(std::string name, UINT32 length, UINT8 width, endianness_t endian);
+	void region_free(std::string name);
 
 private:
 	// internal helpers
