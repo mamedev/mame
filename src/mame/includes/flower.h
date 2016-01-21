@@ -3,7 +3,7 @@
 class flower_state : public driver_device
 {
 public:
-	flower_state(const machine_config &mconfig, device_type type, std::string tag)
+	flower_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_sn_nmi_enable(*this, "sn_nmi_enable"),
 		m_spriteram(*this, "spriteram"),
@@ -76,7 +76,7 @@ class flower_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	flower_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	flower_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~flower_sound_device() {}
 
 	enum

@@ -834,7 +834,7 @@ void discrete_device::static_set_intf(device_t &device, const discrete_block *in
 //  discrete_device - constructor
 //-------------------------------------------------
 
-discrete_device::discrete_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock)
+discrete_device::discrete_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock, "discrete", __FILE__),
 		m_intf(nullptr),
 		m_sample_rate(0),
@@ -849,7 +849,7 @@ discrete_device::discrete_device(const machine_config &mconfig, device_type type
 {
 }
 
-discrete_sound_device::discrete_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+discrete_sound_device::discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: discrete_device(mconfig, DISCRETE, "DISCRETE", tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr)
@@ -884,7 +884,7 @@ void discrete_device::device_start()
 	m_total_stream_updates = 0;
 
 	/* create the logfile */
-	sprintf(name, "discrete%s.log", this->tag().c_str());
+	sprintf(name, "discrete%s.log", this->tag());
 	if (DISCRETE_DEBUGLOG)
 		m_disclogfile = fopen(name, "w");
 

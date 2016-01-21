@@ -241,19 +241,19 @@ bool emu_options::add_slot_options(bool isfirstpass)
 		first = false;
 
 		// retrieve info about the device instance
-		std::string name(slot->device().tag().substr(1));
-		if (!exists(name.c_str()))
+		const char *name = slot->device().tag() + 1;
+		if (!exists(name))
 		{
 			// add the option
 			UINT32 flags = OPTION_STRING | OPTION_FLAG_DEVICE;
-			std::string defvalue = (slot->default_option()==nullptr) ? std::string() : slot->default_option();
-			if (defvalue.length() > 0)
+			const char *defvalue = slot->default_option();
+			if (defvalue != nullptr)
 			{
-				const device_slot_option *option = slot->option(defvalue.c_str());
+				const device_slot_option *option = slot->option(defvalue);
 				if (option != nullptr && !option->selectable())
 					flags |= OPTION_FLAG_INTERNAL;
 			}
-			add_entry(name.c_str(), nullptr, flags, defvalue.c_str(), true);
+			add_entry(name, nullptr, flags, defvalue, true);
 		}
 	}
 	return (options_count() != starting_count);
@@ -278,15 +278,15 @@ void emu_options::update_slot_options()
 	for (device_slot_interface *slot = iter.first(); slot != nullptr; slot = iter.next())
 	{
 		// retrieve info about the device instance
-		std::string name(slot->device().tag().substr(1));
-		if (exists(name.c_str()) && slot->first_option() != nullptr)
+		const char *name = slot->device().tag() + 1;
+		if (exists(name) && slot->first_option() != nullptr)
 		{
 			std::string defvalue = slot->get_default_card_software();
 			if (defvalue.length() > 0)
 			{
-				set_default_value(name.c_str(), defvalue.c_str());
+				set_default_value(name, defvalue.c_str());
 				const device_slot_option *option = slot->option(defvalue.c_str());
-				set_flag(name.c_str(), ~OPTION_FLAG_INTERNAL, (option != nullptr && !option->selectable()) ? OPTION_FLAG_INTERNAL : 0);
+				set_flag(name, ~OPTION_FLAG_INTERNAL, (option != nullptr && !option->selectable()) ? OPTION_FLAG_INTERNAL : 0);
 			}
 		}
 	}

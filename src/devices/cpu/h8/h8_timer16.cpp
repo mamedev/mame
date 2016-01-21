@@ -10,23 +10,23 @@ const device_type H8_TIMER16_CHANNEL  = &device_creator<h8_timer16_channel_devic
 const device_type H8H_TIMER16_CHANNEL = &device_creator<h8h_timer16_channel_device>;
 const device_type H8S_TIMER16_CHANNEL = &device_creator<h8s_timer16_channel_device>;
 
-h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, H8_TIMER16_CHANNEL, "H8 16-bits timer channel", tag, owner, clock, "h8_16bits_timer_channel", __FILE__),
-	cpu(*this, "^^"), chained_timer(nullptr), intc(nullptr), tier_mask(0), tgr_count(0), tbr_count(0), tgr_clearing(0), tcr(0), tier(0), ier(0), isr(0), clock_type(0),
+	cpu(*this, "^^"), chained_timer(nullptr), intc(nullptr), intc_tag(nullptr), tier_mask(0), tgr_count(0), tbr_count(0), tgr_clearing(0), tcr(0), tier(0), ier(0), isr(0), clock_type(0),
 	clock_divider(0), tcnt(0), last_clock_update(0), event_time(0), phase(0), counter_cycle(0), counter_incrementing(false), channel_active(false)
 {
-	chain_tag.clear();
+	chain_tag = nullptr;
 }
 
-h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	cpu(*this, "^^"), chained_timer(nullptr), intc(nullptr), tier_mask(0), tgr_count(0), tbr_count(0), tgr_clearing(0), tcr(0), tier(0), ier(0), isr(0), clock_type(0),
+	cpu(*this, "^^"), chained_timer(nullptr), intc(nullptr), intc_tag(nullptr), tier_mask(0), tgr_count(0), tbr_count(0), tgr_clearing(0), tcr(0), tier(0), ier(0), isr(0), clock_type(0),
 	clock_divider(0), tcnt(0), last_clock_update(0), event_time(0), phase(0), counter_cycle(0), counter_incrementing(false), channel_active(false)
 {
-	chain_tag.clear();
+	chain_tag = nullptr;
 }
 
-void h8_timer16_channel_device::set_info(int _tgr_count, int _tbr_count, std::string intc, int irq_base)
+void h8_timer16_channel_device::set_info(int _tgr_count, int _tbr_count, const char *intc, int irq_base)
 {
 	tgr_count = _tgr_count;
 	tbr_count = _tbr_count;
@@ -49,7 +49,7 @@ WRITE8_MEMBER(h8_timer16_channel_device::tcr_w)
 {
 	update_counter();
 	tcr = data;
-	logerror("%s: tcr_w %02x\n", tag().c_str(), data);
+	logerror("%s: tcr_w %02x\n", tag(), data);
 	tcr_update();
 	recalc_event();
 }
@@ -61,7 +61,7 @@ READ8_MEMBER(h8_timer16_channel_device::tmdr_r)
 
 WRITE8_MEMBER(h8_timer16_channel_device::tmdr_w)
 {
-	logerror("%s: tmdr_w %02x\n", tag().c_str(), data);
+	logerror("%s: tmdr_w %02x\n", tag(), data);
 }
 
 READ8_MEMBER(h8_timer16_channel_device::tior_r)
@@ -71,7 +71,7 @@ READ8_MEMBER(h8_timer16_channel_device::tior_r)
 
 WRITE8_MEMBER(h8_timer16_channel_device::tior_w)
 {
-	logerror("%s: tior_w %d, %02x\n", tag().c_str(), offset, data);
+	logerror("%s: tior_w %d, %02x\n", tag(), offset, data);
 }
 
 void h8_timer16_channel_device::set_ier(UINT8 value)
@@ -96,11 +96,11 @@ READ8_MEMBER(h8_timer16_channel_device::tier_r)
 WRITE8_MEMBER(h8_timer16_channel_device::tier_w)
 {
 	update_counter();
-	logerror("%s: tier_w %02x\n", tag().c_str(), data);
+	logerror("%s: tier_w %02x\n", tag(), data);
 	tier = data;
 	tier_update();
 	logerror("%s: irq %c%c%c%c%c%c trigger=%d\n",
-				tag().c_str(),
+				tag(),
 				ier & IRQ_A ? 'a' : '.',
 				ier & IRQ_B ? 'b' : '.',
 				ier & IRQ_C ? 'c' : '.',
@@ -118,7 +118,7 @@ READ8_MEMBER(h8_timer16_channel_device::tsr_r)
 
 WRITE8_MEMBER(h8_timer16_channel_device::tsr_w)
 {
-	logerror("%s: tsr_w %02x\n", tag().c_str(), data);
+	logerror("%s: tsr_w %02x\n", tag(), data);
 	isr_update(data);
 }
 
@@ -132,7 +132,7 @@ WRITE16_MEMBER(h8_timer16_channel_device::tcnt_w)
 {
 	update_counter();
 	COMBINE_DATA(&tcnt);
-	logerror("%s: tcnt_w %04x\n", tag().c_str(), tcnt);
+	logerror("%s: tcnt_w %04x\n", tag(), tcnt);
 	recalc_event();
 }
 
@@ -146,7 +146,7 @@ WRITE16_MEMBER(h8_timer16_channel_device::tgr_w)
 	update_counter();
 	COMBINE_DATA(tgr + offset);
 	if(1)
-		logerror("%s: tgr%c_w %04x\n", tag().c_str(), 'a'+offset, tgr[offset]);
+		logerror("%s: tgr%c_w %04x\n", tag(), 'a'+offset, tgr[offset]);
 	recalc_event();
 }
 
@@ -159,7 +159,7 @@ WRITE16_MEMBER(h8_timer16_channel_device::tbr_w)
 {
 	COMBINE_DATA(tgr + offset + tgr_count);
 	if(1)
-		logerror("%s: tbr%c_w %04x\n", tag().c_str(), 'a'+offset, tgr[offset]);
+		logerror("%s: tbr%c_w %04x\n", tag(), 'a'+offset, tgr[offset]);
 }
 
 void h8_timer16_channel_device::device_start()
@@ -209,7 +209,7 @@ UINT64 h8_timer16_channel_device::internal_update(UINT64 current_time)
 	if(event_time && current_time >= event_time) {
 		update_counter(current_time);
 		if(0)
-		logerror("%s: Reached event time (%ld), counter=%04x, dt=%d\n", tag().c_str(), long(current_time), tcnt, int(current_time - event_time));
+		logerror("%s: Reached event time (%ld), counter=%04x, dt=%d\n", tag(), long(current_time), tcnt, int(current_time - event_time));
 		recalc_event(current_time);
 	}
 
@@ -241,7 +241,7 @@ void h8_timer16_channel_device::update_counter(UINT64 cur_time)
 		tcnt = tt % counter_cycle;
 		if(0)
 		logerror("%s: Updating %d (%ld %ld) (%ld %ld) -> %d/%d\n",
-					tag().c_str(),
+					tag(),
 					ott,
 					long(last_clock_update), long(cur_time),
 					long(base_time), long(new_time),
@@ -309,7 +309,7 @@ void h8_timer16_channel_device::recalc_event(UINT64 cur_time)
 
 				if(0)
 				logerror("%s: tcnt=%d tgr%c=%d cycle=%d -> delay=%d\n",
-							tag().c_str(), tcnt, 'a'+i, tgr[i], counter_cycle, new_delay);
+							tag(), tcnt, 'a'+i, tgr[i], counter_cycle, new_delay);
 				if(event_delay > new_delay)
 					event_delay = new_delay;
 			}
@@ -320,7 +320,7 @@ void h8_timer16_channel_device::recalc_event(UINT64 cur_time)
 			event_time = 0;
 
 		if(event_time && LOG_EVENT_TIME)
-			logerror("%s: next event in %d cycles (%ld)\n", tag().c_str(), int(event_time - cpu->total_cycles()), long(event_time));
+			logerror("%s: next event in %d cycles (%ld)\n", tag(), int(event_time - cpu->total_cycles()), long(event_time));
 
 	} else {
 		logerror("decrementing counter\n");
@@ -331,7 +331,7 @@ void h8_timer16_channel_device::recalc_event(UINT64 cur_time)
 		cpu->internal_update();
 }
 
-h8_timer16_device::h8_timer16_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8_timer16_device::h8_timer16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, H8_TIMER16, "H8 16-bits timer", tag, owner, clock, "h8_timer16", __FILE__),
 	cpu(*this, DEVICE_SELF_OWNER)
 {
@@ -370,7 +370,7 @@ READ8_MEMBER(h8_timer16_device::tstr_r)
 
 WRITE8_MEMBER(h8_timer16_device::tstr_w)
 {
-	logerror("%s: tstr_w %02x\n", tag().c_str(), data);
+	logerror("%s: tstr_w %02x\n", tag(), data);
 	tstr = data;
 	for(int i=0; i<timer_count; i++)
 		timer_channel[i]->set_enable((tstr >> i) & 1);
@@ -383,7 +383,7 @@ READ8_MEMBER(h8_timer16_device::tsyr_r)
 
 WRITE8_MEMBER(h8_timer16_device::tsyr_w)
 {
-	logerror("%s: tsyr_w %02x\n", tag().c_str(), data);
+	logerror("%s: tsyr_w %02x\n", tag(), data);
 }
 
 READ8_MEMBER(h8_timer16_device::tmdr_r)
@@ -393,7 +393,7 @@ READ8_MEMBER(h8_timer16_device::tmdr_r)
 
 WRITE8_MEMBER(h8_timer16_device::tmdr_w)
 {
-	logerror("%s: tmdr_w %02x\n", tag().c_str(), data);
+	logerror("%s: tmdr_w %02x\n", tag(), data);
 }
 
 READ8_MEMBER(h8_timer16_device::tfcr_r)
@@ -403,7 +403,7 @@ READ8_MEMBER(h8_timer16_device::tfcr_r)
 
 WRITE8_MEMBER(h8_timer16_device::tfcr_w)
 {
-	logerror("%s: tfcr_w %02x\n", tag().c_str(), data);
+	logerror("%s: tfcr_w %02x\n", tag(), data);
 }
 
 READ8_MEMBER(h8_timer16_device::toer_r)
@@ -413,7 +413,7 @@ READ8_MEMBER(h8_timer16_device::toer_r)
 
 WRITE8_MEMBER(h8_timer16_device::toer_w)
 {
-	logerror("%s: toer_w %02x\n", tag().c_str(), data);
+	logerror("%s: toer_w %02x\n", tag(), data);
 }
 
 READ8_MEMBER(h8_timer16_device::tocr_r)
@@ -423,7 +423,7 @@ READ8_MEMBER(h8_timer16_device::tocr_r)
 
 WRITE8_MEMBER(h8_timer16_device::tocr_w)
 {
-	logerror("%s: tocr_w %02x\n", tag().c_str(), data);
+	logerror("%s: tocr_w %02x\n", tag(), data);
 }
 
 READ8_MEMBER(h8_timer16_device::tisr_r)
@@ -434,14 +434,14 @@ READ8_MEMBER(h8_timer16_device::tisr_r)
 	for(int i=timer_count; i<4; i++)
 		r |= 0x11 <<i;
 
-	logerror("%s: tisr%c_r %02x\n", tag().c_str(), 'a'+offset, r);
+	logerror("%s: tisr%c_r %02x\n", tag(), 'a'+offset, r);
 
 	return r;
 }
 
 WRITE8_MEMBER(h8_timer16_device::tisr_w)
 {
-	logerror("%s: tisr%c_w %02x\n", tag().c_str(), 'a'+offset, data);
+	logerror("%s: tisr%c_w %02x\n", tag(), 'a'+offset, data);
 	for(int i=0; i<timer_count; i++)
 		timer_channel[i]->tisr_w(offset, data >> i);
 }
@@ -458,7 +458,7 @@ WRITE8_MEMBER(h8_timer16_device::tisrc_w)
 
 WRITE8_MEMBER(h8_timer16_device::tolr_w)
 {
-	logerror("%s: tocr_w %02x\n", tag().c_str(), data);
+	logerror("%s: tocr_w %02x\n", tag(), data);
 }
 
 
@@ -537,7 +537,7 @@ UINT8 h8_timer16_channel_device::tisr_r(int offset) const
 	return 0x00;
 }
 
-h8h_timer16_channel_device::h8h_timer16_channel_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8h_timer16_channel_device::h8h_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8_timer16_channel_device(mconfig, H8H_TIMER16_CHANNEL, "H8H 16-bits timer channel", tag, owner, clock, "h8h_16bits_timer_channel", __FILE__)
 {
 }
@@ -546,7 +546,7 @@ h8h_timer16_channel_device::~h8h_timer16_channel_device()
 {
 }
 
-void h8h_timer16_channel_device::set_info(int _tgr_count, int _tbr_count, std::string intc, int irq_base)
+void h8h_timer16_channel_device::set_info(int _tgr_count, int _tbr_count, const char *intc, int irq_base)
 {
 	tgr_count = _tgr_count;
 	tbr_count = _tbr_count;
@@ -590,16 +590,16 @@ void h8h_timer16_channel_device::tcr_update()
 	switch(tcr & 0x60) {
 	case 0x00:
 		tgr_clearing = TGR_CLEAR_NONE;
-		logerror("%s: No automatic tcnt clearing\n", tag().c_str());
+		logerror("%s: No automatic tcnt clearing\n", tag());
 		break;
 	case 0x20: case 0x40: {
 		tgr_clearing = tcr & 0x20 ? 0 : 1;
-		logerror("%s: Auto-clear on tgr%c (%04x)\n", tag().c_str(), 'a'+tgr_clearing, tgr[tgr_clearing]);
+		logerror("%s: Auto-clear on tgr%c (%04x)\n", tag(), 'a'+tgr_clearing, tgr[tgr_clearing]);
 		break;
 	}
 	case 0x60:
 		tgr_clearing = TGR_CLEAR_EXT;
-		logerror("%s: External sync clear\n", tag().c_str());
+		logerror("%s: External sync clear\n", tag());
 		break;
 	}
 
@@ -607,23 +607,23 @@ void h8h_timer16_channel_device::tcr_update()
 	if(count_type < 4) {
 		clock_type = DIV_1;
 		clock_divider = count_type;
-		logerror("%s: clock divider %d (%d)\n", tag().c_str(), clock_divider, 1 << clock_divider);
+		logerror("%s: clock divider %d (%d)\n", tag(), clock_divider, 1 << clock_divider);
 		if(count_type <= DIV_2)
 			phase = 0;
 		else {
 			switch(tcr & 0x18) {
 			case 0x00:
 				phase = 0;
-				logerror("%s: Phase 0\n", tag().c_str());
+				logerror("%s: Phase 0\n", tag());
 				break;
 			case 0x08:
 				phase = 1 << (clock_divider-1);
-				logerror("%s: Phase 180\n", tag().c_str());
+				logerror("%s: Phase 180\n", tag());
 				break;
 			case 0x10: case 0x18:
 				phase = 0;
 				clock_divider--;
-				logerror("%s: Phase 0+180\n", tag().c_str());
+				logerror("%s: Phase 0+180\n", tag());
 				break;
 			}
 		}
@@ -631,11 +631,11 @@ void h8h_timer16_channel_device::tcr_update()
 		clock_type = INPUT_A + (count_type-4);
 		clock_divider = 0;
 		phase = 0;
-		logerror("%s: counting input %c\n", tag().c_str(), 'a'+count_type-INPUT_A);
+		logerror("%s: counting input %c\n", tag(), 'a'+count_type-INPUT_A);
 	}
 }
 
-h8s_timer16_channel_device::h8s_timer16_channel_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8s_timer16_channel_device::h8s_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8_timer16_channel_device(mconfig, H8S_TIMER16_CHANNEL, "H8S 16-bits timer channel", tag, owner, clock, "h8s_16bits_timer_channel", __FILE__)
 {
 }
@@ -644,12 +644,12 @@ h8s_timer16_channel_device::~h8s_timer16_channel_device()
 {
 }
 
-void h8s_timer16_channel_device::set_chain(std::string _chain_tag)
+void h8s_timer16_channel_device::set_chain(const char *_chain_tag)
 {
 	chain_tag = _chain_tag;
 }
 
-void h8s_timer16_channel_device::set_info(int _tgr_count, UINT8 _tier_mask, std::string intc, int irq_base,
+void h8s_timer16_channel_device::set_info(int _tgr_count, UINT8 _tier_mask, const char *intc, int irq_base,
 											int t0, int t1, int t2, int t3, int t4, int t5, int t6, int t7)
 {
 	tgr_count = _tgr_count;
@@ -702,18 +702,18 @@ void h8s_timer16_channel_device::tcr_update()
 	switch(tcr & 0x60) {
 	case 0x00:
 		tgr_clearing = TGR_CLEAR_NONE;
-		logerror("%s: No automatic tcnt clearing\n", tag().c_str());
+		logerror("%s: No automatic tcnt clearing\n", tag());
 		break;
 	case 0x20: case 0x40: {
 		tgr_clearing = tcr & 0x20 ? 0 : 1;
 		if(tgr_count > 2 && (tcr & 0x80))
 			tgr_clearing += 2;
-		logerror("%s: Auto-clear on tgr%c\n", tag().c_str(), 'a'+tgr_clearing);
+		logerror("%s: Auto-clear on tgr%c\n", tag(), 'a'+tgr_clearing);
 		break;
 	}
 	case 0x60:
 		tgr_clearing = TGR_CLEAR_EXT;
-		logerror("%s: External sync clear\n", tag().c_str());
+		logerror("%s: External sync clear\n", tag());
 		break;
 	}
 
@@ -721,23 +721,23 @@ void h8s_timer16_channel_device::tcr_update()
 	if(count_type >= DIV_1 && clock_type <= DIV_4) {
 		clock_type = DIV_1;
 		clock_divider = count_type - DIV_1;
-		logerror("%s: clock divider %d (%d)\n", tag().c_str(), clock_divider, 1 << clock_divider);
+		logerror("%s: clock divider %d (%d)\n", tag(), clock_divider, 1 << clock_divider);
 		if(!clock_divider)
 			phase = 0;
 		else {
 			switch(tcr & 0x18) {
 			case 0x00:
 				phase = 0;
-				logerror("%s: Phase 0\n", tag().c_str());
+				logerror("%s: Phase 0\n", tag());
 				break;
 			case 0x08:
 				phase = 1 << (clock_divider-1);
-				logerror("%s: Phase 180\n", tag().c_str());
+				logerror("%s: Phase 180\n", tag());
 				break;
 			case 0x10: case 0x18:
 				phase = 0;
 				clock_divider--;
-				logerror("%s: Phase 0+180\n", tag().c_str());
+				logerror("%s: Phase 0+180\n", tag());
 				break;
 			}
 		}
@@ -746,12 +746,12 @@ void h8s_timer16_channel_device::tcr_update()
 		clock_type = CHAIN;
 		clock_divider = 0;
 		phase = 0;
-		logerror("%s: chained timer\n", tag().c_str());
+		logerror("%s: chained timer\n", tag());
 
 	} else if(count_type >= INPUT_A && count_type <= INPUT_D) {
 		clock_type = count_type;
 		clock_divider = 0;
 		phase = 0;
-		logerror("%s: counting input %c\n", tag().c_str(), 'a'+count_type-INPUT_A);
+		logerror("%s: counting input %c\n", tag(), 'a'+count_type-INPUT_A);
 	}
 }

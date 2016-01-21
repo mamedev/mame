@@ -20,7 +20,7 @@ game details unknown
 class piggypas_state : public driver_device
 {
 public:
-	piggypas_state(const machine_config &mconfig, device_type type, std::string tag)
+	piggypas_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ticket(*this, "ticket")

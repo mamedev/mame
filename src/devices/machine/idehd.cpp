@@ -21,7 +21,7 @@
 #define TIME_FULL_STROKE_SEEK               (attotime::from_usec(13000))
 #define TIME_AVERAGE_ROTATIONAL_LATENCY     (attotime::from_usec(1300))
 
-ata_mass_storage_device::ata_mass_storage_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock,std::string shortname, std::string source)
+ata_mass_storage_device::ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source)
 	: ata_hle_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_can_identify_device(0),
 	m_num_cylinders(0),
@@ -761,13 +761,13 @@ const device_type IDE_HARDDISK = &device_creator<ide_hdd_device>;
 //  ide_hdd_device - constructor
 //-------------------------------------------------
 
-ide_hdd_device::ide_hdd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ide_hdd_device::ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ata_mass_storage_device(mconfig, IDE_HARDDISK, "IDE Hard Disk", tag, owner, clock, "hdd", __FILE__),
 	m_image(*this, "image")
 {
 }
 
-ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: ata_mass_storage_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_image(*this, "image")
 {

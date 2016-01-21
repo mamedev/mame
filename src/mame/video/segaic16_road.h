@@ -41,7 +41,7 @@ struct road_info
 class segaic16_road_device : public device_t
 {
 public:
-	segaic16_road_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	segaic16_road_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~segaic16_road_device() {}
 
 	UINT16 *segaic16_roadram_0;

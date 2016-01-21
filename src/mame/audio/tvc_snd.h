@@ -25,7 +25,7 @@ class tvc_sound_device : public device_t,
 {
 public:
 	// construction/destruction
-	tvc_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tvc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_sndint_wr_callback(device_t &device, _Object object) { return downcast<tvc_sound_device &>(device).m_write_sndint.set_callback(object); }
 

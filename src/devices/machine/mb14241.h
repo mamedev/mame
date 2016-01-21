@@ -13,7 +13,7 @@
 class mb14241_device : public device_t
 {
 public:
-	mb14241_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mb14241_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER ( shift_count_w );
 	DECLARE_WRITE8_MEMBER ( shift_data_w );

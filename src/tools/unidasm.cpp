@@ -656,7 +656,7 @@ int main(int argc, char *argv[])
 	}
 	catch (add_exception &aex)
 	{
-		fprintf(stderr, "Tag '%s' already exists in tagged_list\n", aex.tag().c_str());
+		fprintf(stderr, "Tag '%s' already exists in tagged_list\n", aex.tag());
 		result = 1;
 	}
 	catch (std::exception &ex)

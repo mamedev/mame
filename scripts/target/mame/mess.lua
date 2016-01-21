@@ -228,6 +228,7 @@ SOUNDS["VOTRAX"] = true
 --SOUNDS["ES8712"] = true
 SOUNDS["CDP1869"] = true
 SOUNDS["S14001A"] = true
+SOUNDS["S14001A_NEW"] = true
 SOUNDS["WAVE"] = true
 SOUNDS["SID6581"] = true
 SOUNDS["SID8580"] = true
@@ -301,6 +302,7 @@ VIDEOS["MSM6222B"] = true
 VIDEOS["MSM6255"] = true
 VIDEOS["MOS6566"] = true
 VIDEOS["PC_VGA"] = true
+VIDEOS["PCD8544"] = true
 --VIDEOS+= POLY"] = true
 VIDEOS["PSX"] = true
 VIDEOS["RAMDAC"] = true
@@ -1699,7 +1701,7 @@ createMESSProjects(_target, _subtarget, "fidelity")
 files {
 	MAME_DIR .. "src/mame/drivers/fidelz80.cpp",
 	MAME_DIR .. "src/mame/includes/fidelz80.h",
-	MAME_DIR .. "src/mame/drivers/fidelsensor.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel6502.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "force")

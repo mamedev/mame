@@ -31,7 +31,7 @@ const device_type SEGA_315_5296 = &device_creator<sega_315_5296_device>;
 //  sega_315_5296_device - constructor
 //-------------------------------------------------
 
-sega_315_5296_device::sega_315_5296_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_315_5296_device::sega_315_5296_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGA_315_5296, "Sega 315-5296 I/O", tag, owner, clock, "315_5296", __FILE__),
 	m_in_pa_cb(*this),
 	m_in_pb_cb(*this),

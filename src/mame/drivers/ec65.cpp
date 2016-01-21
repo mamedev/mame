@@ -29,7 +29,7 @@
 class ec65_state : public driver_device
 {
 public:
-	ec65_state(const machine_config &mconfig, device_type type, std::string tag)
+	ec65_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_via_0(*this, VIA6522_0_TAG),
 		m_via_1(*this, VIA6522_1_TAG),
@@ -54,7 +54,7 @@ public:
 class ec65k_state : public driver_device
 {
 public:
-	ec65k_state(const machine_config &mconfig, device_type type, std::string tag)
+	ec65k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 	{
 	}

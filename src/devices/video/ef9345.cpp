@@ -96,7 +96,7 @@ inline void ef9345_device::inc_y(UINT8 r)
 //  ef9345_device - constructor
 //-------------------------------------------------
 
-ef9345_device::ef9345_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, EF9345, "EF9345", tag, owner, clock, "ef9345", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
@@ -110,7 +110,7 @@ ef9345_device::ef9345_device(const machine_config &mconfig, std::string tag, dev
 //  palette device
 //-------------------------------------------------
 
-void ef9345_device::static_set_palette_tag(device_t &device, std::string tag)
+void ef9345_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<ef9345_device &>(device).m_palette.set_tag(tag);
 }

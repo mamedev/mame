@@ -26,8 +26,8 @@
 
 class h8_intc_device : public device_t {
 public:
-	h8_intc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	h8_intc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_intc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	int interrupt_taken(int vector);
 	void internal_interrupt(int vector);
@@ -68,8 +68,8 @@ protected:
 
 class h8h_intc_device : public h8_intc_device {
 public:
-	h8h_intc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	h8h_intc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	h8h_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8h_intc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	DECLARE_READ8_MEMBER(isr_r);
 	DECLARE_WRITE8_MEMBER(isr_w);
@@ -96,7 +96,7 @@ protected:
 
 class h8s_intc_device : public h8h_intc_device {
 public:
-	h8s_intc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h8s_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(ipr_r);
 	DECLARE_WRITE8_MEMBER(ipr_w);

@@ -143,8 +143,8 @@ ALLOW_SAVE_TYPE(eeprom_serial_base_device::eeprom_state);
 //  eeprom_serial_base_device - constructor
 //-------------------------------------------------
 
-eeprom_serial_base_device::eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source)
-	: eeprom_base_device(mconfig, devtype, name, tag, owner, shortname, source),
+eeprom_serial_base_device::eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
+	: eeprom_base_device(mconfig, devtype, name, tag, owner, shortname, file),
 		m_command_address_bits(0),
 		m_streaming_enabled(false),
 		m_state(STATE_IN_RESET),
@@ -625,8 +625,8 @@ void eeprom_serial_base_device::execute_write_command()
 //  eeprom_serial_93cxx_device - constructor
 //-------------------------------------------------
 
-eeprom_serial_93cxx_device::eeprom_serial_93cxx_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source)
-	: eeprom_serial_base_device(mconfig, devtype, name, tag, owner, shortname, source)
+eeprom_serial_93cxx_device::eeprom_serial_93cxx_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
+	: eeprom_serial_base_device(mconfig, devtype, name, tag, owner, shortname, file)
 {
 }
 
@@ -692,8 +692,8 @@ WRITE_LINE_MEMBER(eeprom_serial_93cxx_device::di_write) { base_di_write(state); 
 //  eeprom_serial_er5911_device - constructor
 //-------------------------------------------------
 
-eeprom_serial_er5911_device::eeprom_serial_er5911_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source)
-	: eeprom_serial_base_device(mconfig, devtype, name, tag, owner, shortname, source)
+eeprom_serial_er5911_device::eeprom_serial_er5911_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
+	: eeprom_serial_base_device(mconfig, devtype, name, tag, owner, shortname, file)
 {
 }
 
@@ -760,8 +760,8 @@ WRITE_LINE_MEMBER(eeprom_serial_er5911_device::di_write) { base_di_write(state);
 //  eeprom_serial_x24c44_device - constructor
 //-------------------------------------------------
 
-eeprom_serial_x24c44_device::eeprom_serial_x24c44_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source)
-	: eeprom_serial_base_device(mconfig, devtype, name, tag, owner, shortname, source)
+eeprom_serial_x24c44_device::eeprom_serial_x24c44_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
+	: eeprom_serial_base_device(mconfig, devtype, name, tag, owner, shortname, file)
 {
 }
 
@@ -1127,7 +1127,7 @@ WRITE_LINE_MEMBER(eeprom_serial_x24c44_device::di_write) { base_di_write(state);
 
 // macro for defining a new device class
 #define DEFINE_SERIAL_EEPROM_DEVICE(_baseclass, _lowercase, _uppercase, _bits, _cells, _addrbits) \
-eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) \
+eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) \
 	: eeprom_serial_##_baseclass##_device(mconfig, EEPROM_SERIAL_##_uppercase##_##_bits##BIT, "Serial EEPROM " #_uppercase " (" #_cells "x" #_bits ")", tag, owner, #_lowercase "_" #_bits, __FILE__) \
 { \
 	static_set_size(*this, _cells, _bits); \

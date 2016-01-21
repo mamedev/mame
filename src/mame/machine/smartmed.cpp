@@ -72,7 +72,7 @@ enum
 
 const device_type NAND = &device_creator<nand_device>;
 
-nand_device::nand_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nand_device::nand_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NAND, "NAND Flash Memory", tag, owner, clock, "nand", __FILE__),
 		m_page_data_size(0),
 		m_page_total_size(0),
@@ -88,7 +88,7 @@ nand_device::nand_device(const machine_config &mconfig, std::string tag, device_
 	memset(m_id, 0, sizeof(m_id));
 }
 
-nand_device::nand_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nand_device::nand_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_page_data_size(0),
 		m_page_total_size(0),
@@ -779,7 +779,7 @@ void nand_device::device_reset()
 
 const device_type SMARTMEDIA = &device_creator<smartmedia_image_device>;
 
-smartmedia_image_device::smartmedia_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+smartmedia_image_device::smartmedia_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: nand_device(mconfig, SMARTMEDIA, "SmartMedia Flash ROM", tag, owner, clock, "smartmedia", __FILE__),
 		device_image_interface(mconfig, *this)
 {

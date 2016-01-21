@@ -11,7 +11,7 @@
 class naomi_m1_board : public naomi_board
 {
 public:
-	naomi_m1_board(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	naomi_m1_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual DECLARE_ADDRESS_MAP(submap, 16) override;
 

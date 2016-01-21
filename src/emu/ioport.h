@@ -889,19 +889,19 @@ public:
 
 	// construction/destruction
 	ioport_condition() { reset(); }
-	ioport_condition(condition_t condition, std::string tag, ioport_value mask, ioport_value value) { set(condition, tag, mask, value); }
+	ioport_condition(condition_t condition, const char *tag, ioport_value mask, ioport_value value) { set(condition, tag, mask, value); }
 
 	// getters
-	std::string tag() const { return m_tag; }
+	const char *tag() const { return m_tag; }
 
 	// operators
-	bool operator==(const ioport_condition &rhs) const { return (m_mask == rhs.m_mask && m_value == rhs.m_value && m_condition == rhs.m_condition && m_tag==rhs.m_tag); }
+	bool operator==(const ioport_condition &rhs) const { return (m_mask == rhs.m_mask && m_value == rhs.m_value && m_condition == rhs.m_condition && strcmp(m_tag, rhs.m_tag) == 0); }
 	bool eval() const;
 	bool none() const { return (m_condition == ALWAYS); }
 
 	// configuration
-	void reset() { set(ALWAYS, std::string(), 0, 0); }
-	void set(condition_t condition, std::string tag, ioport_value mask, ioport_value value)
+	void reset() { set(ALWAYS, nullptr, 0, 0); }
+	void set(condition_t condition, const char *tag, ioport_value mask, ioport_value value)
 	{
 		m_condition = condition;
 		m_tag = tag;
@@ -914,7 +914,7 @@ public:
 private:
 	// internal state
 	condition_t     m_condition;    // condition to use
-	std::string     m_tag;          // tag of port whose condition is to be tested
+	const char *    m_tag;          // tag of port whose condition is to be tested
 	ioport_port *   m_port;         // reference to the port to be tested
 	ioport_value    m_mask;         // mask to apply to the port
 	ioport_value    m_value;        // value to compare against
@@ -1188,7 +1188,7 @@ class ioport_port
 
 public:
 	// construction/destruction
-	ioport_port(device_t &owner, std::string tag);
+	ioport_port(device_t &owner, const char *tag);
 	~ioport_port();
 
 	// getters
@@ -1197,7 +1197,7 @@ public:
 	device_t &device() const { return m_device; }
 	running_machine &machine() const;
 	ioport_field *first_field() const { return m_fieldlist.first(); }
-	std::string tag() const { return m_tag.c_str(); }
+	const char *tag() const { return m_tag.c_str(); }
 	int modcount() const { return m_modcount; }
 	ioport_value active() const { return m_active; }
 	ioport_port_live &live() const { assert(m_live != nullptr); return *m_live; }
@@ -1408,7 +1408,7 @@ private:
 	void frame_update_callback();
 	void frame_update();
 
-	ioport_port *port(std::string tag) const { return m_portlist.find(tag); }
+	ioport_port *port(const char *tag) const { return m_portlist.find(tag); }
 	void exit();
 	input_seq_type token_to_seq_type(const char *string);
 	void update_defaults();
@@ -1480,8 +1480,8 @@ public:
 	static const char *string_from_token(const char *string);
 
 	// port helpers
-	void port_alloc(std::string tag);
-	void port_modify(std::string tag);
+	void port_alloc(const char *tag);
+	void port_modify(const char *tag);
 
 	// field helpers
 	void field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name = nullptr);
@@ -1515,7 +1515,7 @@ public:
 	void setting_alloc(ioport_value value, const char *name);
 
 	// misc helpers
-	void set_condition(ioport_condition::condition_t condition, std::string tag, ioport_value mask, ioport_value value);
+	void set_condition(ioport_condition::condition_t condition, const char *tag, ioport_value mask, ioport_value value);
 	void onoff_alloc(const char *name, ioport_value defval, ioport_value mask, const char *diplocation);
 
 private:

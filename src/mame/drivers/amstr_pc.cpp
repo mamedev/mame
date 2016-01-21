@@ -41,7 +41,7 @@ More information can be found at http://www.seasip.info/AmstradXT/1640tech/index
 class amstrad_pc_state : public driver_device
 {
 public:
-	amstrad_pc_state(const machine_config &mconfig, device_type type, std::string tag)
+	amstrad_pc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mb(*this, "mb"),

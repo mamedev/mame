@@ -28,7 +28,7 @@ class cbm2_hrg_t : public device_t,
 {
 public:
 	// construction/destruction
-	cbm2_hrg_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	cbm2_hrg_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
@@ -54,7 +54,7 @@ class cbm2_hrg_a_t :  public cbm2_hrg_t
 {
 public:
 	// construction/destruction
-	cbm2_hrg_a_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cbm2_hrg_a_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -67,7 +67,7 @@ class cbm2_hrg_b_t :  public cbm2_hrg_t
 {
 public:
 	// construction/destruction
-	cbm2_hrg_b_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cbm2_hrg_b_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

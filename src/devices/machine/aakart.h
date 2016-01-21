@@ -43,7 +43,7 @@ class aakart_device : public device_t
 {
 public:
 	// construction/destruction
-	aakart_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	aakart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_out_tx_callback(device_t &device, _Object object) { return downcast<aakart_device &>(device).m_out_tx_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_rx_callback(device_t &device, _Object object) { return downcast<aakart_device &>(device).m_out_rx_cb.set_callback(object); }

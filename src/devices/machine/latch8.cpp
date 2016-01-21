@@ -145,7 +145,7 @@ WRITE8_MEMBER( latch8_device::bit7_w ) { bitx_w(7, offset, data); }
 
 const device_type LATCH8 = &device_creator<latch8_device>;
 
-latch8_device::latch8_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+latch8_device::latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, LATCH8, "8 bit latch", tag, owner, clock, "latch8", __FILE__),
 		m_value(0),
 		m_has_write(0),
@@ -181,14 +181,14 @@ latch8_device::latch8_device(const machine_config &mconfig, std::string tag, dev
 
 void latch8_device::device_validity_check(validity_checker &valid) const
 {
-	if (!m_read_0.isnull() && !m_write_0.isnull()) osd_printf_error("Device %s: Bit 0 already has a handler.\n", tag().c_str());
-	if (!m_read_1.isnull() && !m_write_1.isnull()) osd_printf_error("Device %s: Bit 1 already has a handler.\n", tag().c_str());
-	if (!m_read_2.isnull() && !m_write_2.isnull()) osd_printf_error("Device %s: Bit 2 already has a handler.\n", tag().c_str());
-	if (!m_read_3.isnull() && !m_write_3.isnull()) osd_printf_error("Device %s: Bit 3 already has a handler.\n", tag().c_str());
-	if (!m_read_4.isnull() && !m_write_4.isnull()) osd_printf_error("Device %s: Bit 4 already has a handler.\n", tag().c_str());
-	if (!m_read_5.isnull() && !m_write_5.isnull()) osd_printf_error("Device %s: Bit 5 already has a handler.\n", tag().c_str());
-	if (!m_read_6.isnull() && !m_write_6.isnull()) osd_printf_error("Device %s: Bit 6 already has a handler.\n", tag().c_str());
-	if (!m_read_7.isnull() && !m_write_7.isnull()) osd_printf_error("Device %s: Bit 7 already has a handler.\n", tag().c_str());
+	if (!m_read_0.isnull() && !m_write_0.isnull()) osd_printf_error("Device %s: Bit 0 already has a handler.\n", tag());
+	if (!m_read_1.isnull() && !m_write_1.isnull()) osd_printf_error("Device %s: Bit 1 already has a handler.\n", tag());
+	if (!m_read_2.isnull() && !m_write_2.isnull()) osd_printf_error("Device %s: Bit 2 already has a handler.\n", tag());
+	if (!m_read_3.isnull() && !m_write_3.isnull()) osd_printf_error("Device %s: Bit 3 already has a handler.\n", tag());
+	if (!m_read_4.isnull() && !m_write_4.isnull()) osd_printf_error("Device %s: Bit 4 already has a handler.\n", tag());
+	if (!m_read_5.isnull() && !m_write_5.isnull()) osd_printf_error("Device %s: Bit 5 already has a handler.\n", tag());
+	if (!m_read_6.isnull() && !m_write_6.isnull()) osd_printf_error("Device %s: Bit 6 already has a handler.\n", tag());
+	if (!m_read_7.isnull() && !m_write_7.isnull()) osd_printf_error("Device %s: Bit 7 already has a handler.\n", tag());
 }
 //-------------------------------------------------
 //  device_start - device-specific startup

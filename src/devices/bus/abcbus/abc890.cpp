@@ -186,39 +186,39 @@ machine_config_constructor abc856_t::device_mconfig_additions() const
 //  abc890_t - constructor
 //-------------------------------------------------
 
-abc890_t::abc890_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+abc890_t::abc890_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_abcbus_card_interface(mconfig, *this)
 {
 }
 
-abc890_t::abc890_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+abc890_t::abc890_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ABC890, "ABC 890", tag, owner, clock, "abc890", __FILE__),
 	device_abcbus_card_interface(mconfig, *this)
 {
 }
 
-abc_expansion_unit_t::abc_expansion_unit_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+abc_expansion_unit_t::abc_expansion_unit_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	abc890_t(mconfig, ABC_EXPANSION_UNIT, "ABC Expansion Unit", tag, owner, clock, "abcexp", __FILE__)
 {
 }
 
-abc894_t::abc894_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+abc894_t::abc894_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	abc890_t(mconfig, ABC894, "ABC 894", tag, owner, clock, "abc894", __FILE__)
 {
 }
 
-abc850_t::abc850_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+abc850_t::abc850_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	abc890_t(mconfig, ABC850, "ABC 850", tag, owner, clock, "abc850", __FILE__)
 {
 }
 
-abc852_t::abc852_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+abc852_t::abc852_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	abc890_t(mconfig, ABC852, "ABC 852", tag, owner, clock, "abc852", __FILE__)
 {
 }
 
-abc856_t::abc856_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+abc856_t::abc856_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	abc890_t(mconfig, ABC856, "ABC 856", tag, owner, clock, "abc856", __FILE__)
 {
 }

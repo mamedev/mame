@@ -9,7 +9,7 @@
 class nscsi_s1410_device : public nscsi_harddisk_device
 {
 public:
-	nscsi_s1410_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nscsi_s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// SCSI status returns

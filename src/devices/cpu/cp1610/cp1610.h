@@ -33,7 +33,7 @@ class cp1610_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	cp1610_cpu_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
+	cp1610_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 
 	template<class _read> void set_bext_callback(_read rd)
 	{

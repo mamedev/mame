@@ -28,7 +28,7 @@ Pluto 8: ColdFire 5475
 class jpmsys7_state : public driver_device
 {
 public:
-	jpmsys7_state(const machine_config &mconfig, device_type type, std::string tag)
+	jpmsys7_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }

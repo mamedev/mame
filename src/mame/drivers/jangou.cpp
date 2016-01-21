@@ -40,7 +40,7 @@ $c088-$c095 player tiles
 class jangou_state : public driver_device
 {
 public:
-	jangou_state(const machine_config &mconfig, device_type type, std::string tag)
+	jangou_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cpu_0(*this, "cpu0"),
 		m_cpu_1(*this, "cpu1"),

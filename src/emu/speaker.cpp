@@ -39,7 +39,7 @@ const device_type SPEAKER = &device_creator<speaker_device>;
 //  speaker_device - constructor
 //-------------------------------------------------
 
-speaker_device::speaker_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+speaker_device::speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SPEAKER, "Speaker", tag, owner, clock, "speaker", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_x(0.0),
@@ -64,7 +64,7 @@ speaker_device::~speaker_device()
 #ifdef MAME_DEBUG
 	// log the maximum sample values for all speakers
 	if (m_max_sample > 0)
-		osd_printf_debug("Speaker \"%s\" - max = %d (gain *= %f) - %d%% samples clipped\n", tag().c_str(), m_max_sample, 32767.0 / (m_max_sample ? m_max_sample : 1), (int)((double)m_clipped_samples * 100.0 / m_total_samples));
+		osd_printf_debug("Speaker \"%s\" - max = %d (gain *= %f) - %d%% samples clipped\n", tag(), m_max_sample, 32767.0 / (m_max_sample ? m_max_sample : 1), (int)((double)m_clipped_samples * 100.0 / m_total_samples));
 #endif
 }
 

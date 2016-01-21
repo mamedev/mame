@@ -1167,11 +1167,11 @@ std::string &ui_manager::game_info_astring(std::string &str)
 
 		// count how many identical CPUs we have
 		int count = 1;
-		std::string name = exec->device().name();
+		const char *name = exec->device().name();
 		execute_interface_iterator execinneriter(machine().root_device());
 		for (device_execute_interface *scan = execinneriter.first(); scan != nullptr; scan = execinneriter.next())
 		{
-			if (exec->device().type() == scan->device().type() && name==scan->device().name() && exec->device().clock() == scan->device().clock())
+			if (exec->device().type() == scan->device().type() && strcmp(name, scan->device().name()) == 0 && exec->device().clock() == scan->device().clock())
 				if (exectags.insert(scan->device().tag()).second)
 					count++;
 		}
@@ -1179,7 +1179,7 @@ std::string &ui_manager::game_info_astring(std::string &str)
 		// if more than one, prepend a #x in front of the CPU name
 		if (count > 1)
 			strcatprintf(str, "%d" UTF8_MULTIPLY, count);
-		str += name;
+		str.append(name);
 
 		// display clock in kHz or MHz
 		if (clock >= 1000000)
@@ -1879,7 +1879,7 @@ static slider_state *slider_init(running_machine &machine)
 		for (device_execute_interface *exec = iter.first(); exec != nullptr; exec = iter.next())
 		{
 			void *param = (void *)&exec->device();
-			strprintf(str, "Overclock CPU %s", exec->device().tag().c_str());
+			strprintf(str, "Overclock CPU %s", exec->device().tag());
 			*tailptr = slider_alloc(machine, str.c_str(), 10, 1000, 2000, 1, slider_overclock, param);
 			tailptr = &(*tailptr)->next;
 		}
@@ -1942,16 +1942,16 @@ static slider_state *slider_init(running_machine &machine)
 			void *param = (void *)laserdisc;
 
 			// add scale and offset controls per-overlay
-			strprintf(str,"Laserdisc '%s' Horiz Stretch", laserdisc->tag().c_str());
+			strprintf(str,"Laserdisc '%s' Horiz Stretch", laserdisc->tag());
 			*tailptr = slider_alloc(machine, str.c_str(), 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_overxscale, param);
 			tailptr = &(*tailptr)->next;
-			strprintf(str,"Laserdisc '%s' Horiz Position", laserdisc->tag().c_str());
+			strprintf(str,"Laserdisc '%s' Horiz Position", laserdisc->tag());
 			*tailptr = slider_alloc(machine, str.c_str(), -500, defxoffset, 500, 2, slider_overxoffset, param);
 			tailptr = &(*tailptr)->next;
-			strprintf(str,"Laserdisc '%s' Vert Stretch", laserdisc->tag().c_str());
+			strprintf(str,"Laserdisc '%s' Vert Stretch", laserdisc->tag());
 			*tailptr = slider_alloc(machine, str.c_str(), 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_overyscale, param);
 			tailptr = &(*tailptr)->next;
-			strprintf(str,"Laserdisc '%s' Vert Position", laserdisc->tag().c_str());
+			strprintf(str,"Laserdisc '%s' Vert Position", laserdisc->tag());
 			*tailptr = slider_alloc(machine, str.c_str(), -500, defyoffset, 500, 2, slider_overyoffset, param);
 			tailptr = &(*tailptr)->next;
 		}
@@ -2406,7 +2406,7 @@ static char *slider_get_screen_desc(screen_device &screen)
 	static char descbuf[256];
 
 	if (scrcount > 1)
-		sprintf(descbuf, "Screen '%s'", screen.tag().c_str());
+		sprintf(descbuf, "Screen '%s'", screen.tag());
 	else
 		strcpy(descbuf, "Screen");
 

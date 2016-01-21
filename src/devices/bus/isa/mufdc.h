@@ -36,7 +36,7 @@ class mufdc_device : public device_t,
 {
 public:
 	// construction/destruction
-	mufdc_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, std::string name, std::string shortname);
+	mufdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -67,7 +67,7 @@ class fdc344_device : public mufdc_device
 {
 public:
 	// construction/destruction
-	fdc344_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	fdc344_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual const rom_entry *device_rom_region() const override;
 
@@ -79,7 +79,7 @@ class fdcmag_device : public mufdc_device
 {
 public:
 	// construction/destruction
-	fdcmag_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	fdcmag_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual const rom_entry *device_rom_region() const override;
 

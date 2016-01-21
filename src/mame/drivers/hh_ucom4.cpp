@@ -244,7 +244,7 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
 class ufombs_state : public hh_ucom4_state
 {
 public:
-	ufombs_state(const machine_config &mconfig, device_type type, std::string tag)
+	ufombs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -354,7 +354,7 @@ MACHINE_CONFIG_END
 class ssfball_state : public hh_ucom4_state
 {
 public:
-	ssfball_state(const machine_config &mconfig, device_type type, std::string tag)
+	ssfball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -492,7 +492,7 @@ MACHINE_CONFIG_END
 class bmsoccer_state : public hh_ucom4_state
 {
 public:
-	bmsoccer_state(const machine_config &mconfig, device_type type, std::string tag)
+	bmsoccer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -612,7 +612,7 @@ MACHINE_CONFIG_END
 class bmsafari_state : public hh_ucom4_state
 {
 public:
-	bmsafari_state(const machine_config &mconfig, device_type type, std::string tag)
+	bmsafari_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -719,7 +719,7 @@ MACHINE_CONFIG_END
 class splasfgt_state : public hh_ucom4_state
 {
 public:
-	splasfgt_state(const machine_config &mconfig, device_type type, std::string tag)
+	splasfgt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -870,7 +870,7 @@ MACHINE_CONFIG_END
 class bcclimbr_state : public hh_ucom4_state
 {
 public:
-	bcclimbr_state(const machine_config &mconfig, device_type type, std::string tag)
+	bcclimbr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -972,7 +972,7 @@ MACHINE_CONFIG_END
 class tactix_state : public hh_ucom4_state
 {
 public:
-	tactix_state(const machine_config &mconfig, device_type type, std::string tag)
+	tactix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -1087,7 +1087,7 @@ MACHINE_CONFIG_END
 class invspace_state : public hh_ucom4_state
 {
 public:
-	invspace_state(const machine_config &mconfig, device_type type, std::string tag)
+	invspace_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -1186,7 +1186,7 @@ MACHINE_CONFIG_END
 class efball_state : public hh_ucom4_state
 {
 public:
-	efball_state(const machine_config &mconfig, device_type type, std::string tag)
+	efball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -1297,7 +1297,7 @@ MACHINE_CONFIG_END
 class galaxy2_state : public hh_ucom4_state
 {
 public:
-	galaxy2_state(const machine_config &mconfig, device_type type, std::string tag)
+	galaxy2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -1397,7 +1397,7 @@ MACHINE_CONFIG_END
 class astrocmd_state : public hh_ucom4_state
 {
 public:
-	astrocmd_state(const machine_config &mconfig, device_type type, std::string tag)
+	astrocmd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -1504,7 +1504,7 @@ MACHINE_CONFIG_END
 class edracula_state : public hh_ucom4_state
 {
 public:
-	edracula_state(const machine_config &mconfig, device_type type, std::string tag)
+	edracula_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -1592,7 +1592,7 @@ MACHINE_CONFIG_END
 class mvbfree_state : public hh_ucom4_state
 {
 public:
-	mvbfree_state(const machine_config &mconfig, device_type type, std::string tag)
+	mvbfree_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -1701,7 +1701,7 @@ MACHINE_CONFIG_END
 class tccombat_state : public hh_ucom4_state
 {
 public:
-	tccombat_state(const machine_config &mconfig, device_type type, std::string tag)
+	tccombat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -1798,7 +1798,7 @@ MACHINE_CONFIG_END
 class tmtennis_state : public hh_ucom4_state
 {
 public:
-	tmtennis_state(const machine_config &mconfig, device_type type, std::string tag)
+	tmtennis_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -1958,7 +1958,7 @@ MACHINE_CONFIG_END
 class tmpacman_state : public hh_ucom4_state
 {
 public:
-	tmpacman_state(const machine_config &mconfig, device_type type, std::string tag)
+	tmpacman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -2060,7 +2060,7 @@ MACHINE_CONFIG_END
 class tmscramb_state : public hh_ucom4_state
 {
 public:
-	tmscramb_state(const machine_config &mconfig, device_type type, std::string tag)
+	tmscramb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -2159,7 +2159,7 @@ MACHINE_CONFIG_END
 class tcaveman_state : public hh_ucom4_state
 {
 public:
-	tcaveman_state(const machine_config &mconfig, device_type type, std::string tag)
+	tcaveman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
@@ -2256,7 +2256,7 @@ MACHINE_CONFIG_END
 class alnchase_state : public hh_ucom4_state
 {
 public:
-	alnchase_state(const machine_config &mconfig, device_type type, std::string tag)
+	alnchase_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 

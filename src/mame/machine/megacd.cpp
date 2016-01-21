@@ -289,7 +289,7 @@ machine_config_constructor sega_segacd_device::device_mconfig_additions() const
 }
 
 
-sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_gfx_interface(mconfig, *this, GFXDECODE_NAME( segacd )),
 		m_scdcpu(*this, "segacd_68k"),
@@ -305,17 +305,17 @@ sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_typ
 {
 }
 
-sega_segacd_us_device::sega_segacd_us_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_segacd_us_device::sega_segacd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_segacd_device(mconfig, SEGA_SEGACD_US, "sega_segacd_us", tag, owner, clock, "sega_segacd_us", __FILE__)
 {
 }
 
-sega_segacd_japan_device::sega_segacd_japan_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_segacd_japan_device::sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_segacd_device(mconfig, SEGA_SEGACD_JAPAN, "sega_segacd_japan", tag, owner, clock, "sega_segacd_japan", __FILE__)
 {
 }
 
-sega_segacd_europe_device::sega_segacd_europe_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_segacd_europe_device::sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_segacd_device(mconfig, SEGA_SEGACD_EUROPE, "sega_segacd_europe", tag, owner, clock, "sega_segacd_europe", __FILE__)
 {
 }

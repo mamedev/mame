@@ -391,7 +391,7 @@ Notes:
 class hikaru_state : public driver_device
 {
 public:
-	hikaru_state(const machine_config &mconfig, device_type type, std::string tag)
+	hikaru_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 	virtual void video_start() override;

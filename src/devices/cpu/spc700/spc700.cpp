@@ -219,7 +219,7 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 const device_type SPC700 = &device_creator<spc700_device>;
 
 
-spc700_device::spc700_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+spc700_device::spc700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SPC700, "SPC700", tag, owner, clock, "spc700", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_a(0)

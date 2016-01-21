@@ -14,7 +14,7 @@ const device_type H8S2328 = &device_creator<h8s2328_device>;
 const device_type H8S2329 = &device_creator<h8s2329_device>;
 
 
-h8s2320_device::h8s2320_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+h8s2320_device::h8s2320_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	h8s2000_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(h8s2320_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -46,7 +46,7 @@ h8s2320_device::h8s2320_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-h8s2320_device::h8s2320_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8s2320_device::h8s2320_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8s2000_device(mconfig, H8S2320, "H8S/2320", tag, owner, clock, "h8s2320", __FILE__, address_map_delegate(FUNC(h8s2320_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -79,49 +79,49 @@ h8s2320_device::h8s2320_device(const machine_config &mconfig, std::string tag, d
 	ram_start = 0xffec00;
 }
 
-h8s2321_device::h8s2321_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8s2321_device::h8s2321_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8s2320_device(mconfig, H8S2321, "H8S/2321", tag, owner, clock, "h8s2321", __FILE__)
 {
 	ram_start = 0xffec00;
 }
 
-h8s2322_device::h8s2322_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8s2322_device::h8s2322_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8s2320_device(mconfig, H8S2322, "H8S/2322", tag, owner, clock, "h8s2322", __FILE__)
 {
 	ram_start = 0xffdc00;
 }
 
-h8s2323_device::h8s2323_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8s2323_device::h8s2323_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8s2320_device(mconfig, H8S2323, "H8S/2323", tag, owner, clock, "h8s2323", __FILE__)
 {
 	ram_start = 0xffdc00;
 }
 
-h8s2324_device::h8s2324_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8s2324_device::h8s2324_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8s2320_device(mconfig, H8S2324, "H8S/2324", tag, owner, clock, "h8s2324", __FILE__)
 {
 	ram_start = 0xff7c00;
 }
 
-h8s2326_device::h8s2326_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8s2326_device::h8s2326_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8s2320_device(mconfig, H8S2326, "H8S/2326", tag, owner, clock, "h8s2326", __FILE__)
 {
 	ram_start = 0xffdc00;
 }
 
-h8s2327_device::h8s2327_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8s2327_device::h8s2327_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8s2320_device(mconfig, H8S2327, "H8S/2327", tag, owner, clock, "h8s2327", __FILE__)
 {
 	ram_start = 0xffdc00;
 }
 
-h8s2328_device::h8s2328_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8s2328_device::h8s2328_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8s2320_device(mconfig, H8S2328, "H8S/2328", tag, owner, clock, "h8s2328", __FILE__)
 {
 	ram_start = 0xffdc00;
 }
 
-h8s2329_device::h8s2329_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8s2329_device::h8s2329_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8s2320_device(mconfig, H8S2329, "H8S/2329", tag, owner, clock, "h8s2329", __FILE__)
 {
 	ram_start = 0xff7c00;
@@ -452,5 +452,5 @@ WRITE8_MEMBER(h8s2320_device::syscr_w)
 	syscr = data;
 	mac_saturating = syscr & 0x80;
 	update_irq_filter();
-	logerror("%s: syscr = %02x\n", tag().c_str(), data);
+	logerror("%s: syscr = %02x\n", tag(), data);
 }

@@ -38,7 +38,7 @@ class victor_9000_keyboard_t :  public device_t
 {
 public:
 	// construction/destruction
-	victor_9000_keyboard_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	victor_9000_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_kbrdy_cb(device_t &device, _Object object) { return downcast<victor_9000_keyboard_t &>(device).m_kbrdy_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_kbdata_cb(device_t &device, _Object object) { return downcast<victor_9000_keyboard_t &>(device).m_kbdata_cb.set_callback(object); }

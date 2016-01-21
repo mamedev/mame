@@ -341,7 +341,7 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 
 	// start to output info
 	fprintf(m_output, "\t<%s", emulator_info::get_xml_top());
-	fprintf(m_output, " name=\"%s\"", xml_normalize_string(device.shortname().c_str()));
+	fprintf(m_output, " name=\"%s\"", xml_normalize_string(device.shortname()));
 	std::string src(device.source());
 	strreplace(src,"../", "");
 	fprintf(m_output, " sourcefile=\"%s\"", xml_normalize_string(src.c_str()));
@@ -349,7 +349,7 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 	fprintf(m_output, " runnable=\"no\"");
 	output_sampleof();
 	fprintf(m_output, ">\n");
-	fprintf(m_output, "\t\t<description>%s</description>\n", xml_normalize_string(device.name().c_str()));
+	fprintf(m_output, "\t\t<description>%s</description>\n", xml_normalize_string(device.name()));
 
 	output_rom(device);
 
@@ -394,10 +394,10 @@ void info_xml_creator::output_devices()
 		device_iterator deviter(m_drivlist.config().root_device());
 		for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
 		{
-			if (device->owner() != nullptr && !device->shortname().empty())
+			if (device->owner() != nullptr && device->shortname()!= nullptr && device->shortname()[0]!='\0')
 			{
 				if (shortnames.insert(device->shortname()).second)
-					output_one_device(*device, device->tag().c_str());
+					output_one_device(*device, device->tag());
 			}
 		}
 
@@ -424,10 +424,10 @@ void info_xml_creator::output_devices()
 				device_iterator deviter2(*dev);
 				for (device_t *device = deviter2.first(); device != nullptr; device = deviter2.next())
 				{
-					if (device->owner() == dev && !device->shortname().empty())
+					if (device->owner() == dev && device->shortname()!= nullptr && device->shortname()[0]!='\0')
 					{
 						if (shortnames.insert(device->shortname()).second)
-							output_one_device(*device, device->tag().c_str());
+							output_one_device(*device, device->tag());
 					}
 				}
 
@@ -447,8 +447,8 @@ void info_xml_creator::output_device_roms()
 {
 	device_iterator deviter(m_drivlist.config().root_device());
 	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
-		if (device->owner() != nullptr && !device->shortname().empty())
-			fprintf(m_output, "\t\t<device_ref name=\"%s\"/>\n", xml_normalize_string(device->shortname().c_str()));
+		if (device->owner() != nullptr && device->shortname()!= nullptr && device->shortname()[0]!='\0')
+			fprintf(m_output, "\t\t<device_ref name=\"%s\"/>\n", xml_normalize_string(device->shortname()));
 }
 
 
@@ -640,7 +640,7 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 	execute_interface_iterator execiter(device);
 	for (device_execute_interface *exec = execiter.first(); exec != nullptr; exec = execiter.next())
 	{
-		if (exec->device().tag() != device.tag())
+		if (strcmp(exec->device().tag(), device.tag()))
 		{
 			std::string newtag(exec->device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
@@ -648,7 +648,7 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 			fprintf(m_output, "\t\t<chip");
 			fprintf(m_output, " type=\"cpu\"");
 			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag.c_str()));
-			fprintf(m_output, " name=\"%s\"", xml_normalize_string(exec->device().name().c_str()));
+			fprintf(m_output, " name=\"%s\"", xml_normalize_string(exec->device().name()));
 			fprintf(m_output, " clock=\"%d\"", exec->device().clock());
 			fprintf(m_output, "/>\n");
 		}
@@ -658,7 +658,7 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 	sound_interface_iterator sounditer(device);
 	for (device_sound_interface *sound = sounditer.first(); sound != nullptr; sound = sounditer.next())
 	{
-		if (sound->device().tag() != device.tag())
+		if (strcmp(sound->device().tag(), device.tag()))
 		{
 			std::string newtag(sound->device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
@@ -666,7 +666,7 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 			fprintf(m_output, "\t\t<chip");
 			fprintf(m_output, " type=\"audio\"");
 			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag.c_str()));
-			fprintf(m_output, " name=\"%s\"", xml_normalize_string(sound->device().name().c_str()));
+			fprintf(m_output, " name=\"%s\"", xml_normalize_string(sound->device().name()));
 			if (sound->device().clock() != 0)
 				fprintf(m_output, " clock=\"%d\"", sound->device().clock());
 			fprintf(m_output, "/>\n");
@@ -686,7 +686,7 @@ void info_xml_creator::output_display(device_t &device, const char *root_tag)
 	screen_device_iterator iter(device);
 	for (const screen_device *screendev = iter.first(); screendev != nullptr; screendev = iter.next())
 	{
-		if (screendev->tag() != device.tag())
+		if (strcmp(screendev->tag(), device.tag()))
 		{
 			std::string newtag(screendev->tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
@@ -1124,7 +1124,7 @@ void info_xml_creator::output_ports(const ioport_list &portlist)
 	// cycle through ports
 	for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
 	{
-		fprintf(m_output,"\t\t<port tag=\"%s\">\n",port->tag().c_str());
+		fprintf(m_output,"\t\t<port tag=\"%s\">\n",port->tag());
 		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 		{
 			if(field->is_analog())
@@ -1223,7 +1223,7 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 	image_interface_iterator iter(device);
 	for (const device_image_interface *imagedev = iter.first(); imagedev != nullptr; imagedev = iter.next())
 	{
-		if (imagedev->device().tag() != device.tag())
+		if (strcmp(imagedev->device().tag(), device.tag()))
 		{
 			std::string newtag(imagedev->device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
@@ -1232,7 +1232,7 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 			fprintf(m_output, "\t\t<device type=\"%s\"", xml_normalize_string(imagedev->image_type_name()));
 
 			// does this device have a tag?
-			if (!imagedev->device().tag().empty())
+			if (imagedev->device().tag())
 				fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag.c_str()));
 
 			// is this device mandatory?
@@ -1281,7 +1281,7 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 	{
 		if (slot->fixed()) continue;    // or shall we list these as non-configurable?
 
-		if (slot->device().tag()!=device.tag())
+		if (strcmp(slot->device().tag(), device.tag()))
 		{
 			std::string newtag(slot->device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
@@ -1304,7 +1304,7 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 
 					fprintf(m_output, "\t\t\t<slotoption");
 					fprintf(m_output, " name=\"%s\"", xml_normalize_string(option->name()));
-					fprintf(m_output, " devname=\"%s\"", xml_normalize_string(dev->shortname().c_str()));
+					fprintf(m_output, " devname=\"%s\"", xml_normalize_string(dev->shortname()));
 					if (slot->default_option() != nullptr && strcmp(slot->default_option(),option->name())==0)
 						fprintf(m_output, " default=\"yes\"");
 					fprintf(m_output, "/>\n");

@@ -13,7 +13,7 @@ class m72_audio_device : public device_t,
 									public device_sound_interface
 {
 public:
-	m72_audio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~m72_audio_device() {}
 
 	enum

@@ -112,8 +112,8 @@ class netlist_mame_device_t : public device_t
 public:
 
 	// construction/destruction
-	netlist_mame_device_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	netlist_mame_device_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	netlist_mame_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	netlist_mame_device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *file);
 	virtual ~netlist_mame_device_t() { pstring::resetmem(); }
 
 	static void static_set_constructor(device_t &device, void (*setup_func)(netlist::setup_t &));
@@ -176,7 +176,7 @@ class netlist_mame_cpu_device_t : public netlist_mame_device_t,
 public:
 
 	// construction/destruction
-	netlist_mame_cpu_device_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	netlist_mame_cpu_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~netlist_mame_cpu_device_t() {}
 protected:
 	// netlist_mame_device_t
@@ -250,7 +250,7 @@ class netlist_mame_sound_device_t : public netlist_mame_device_t,
 public:
 
 	// construction/destruction
-	netlist_mame_sound_device_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	netlist_mame_sound_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~netlist_mame_sound_device_t() {}
 
 	inline sound_stream *get_stream() { return m_stream; }
@@ -333,7 +333,7 @@ class netlist_mame_analog_input_t : public device_t,
 public:
 
 	// construction/destruction
-	netlist_mame_analog_input_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	netlist_mame_analog_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~netlist_mame_analog_input_t() { }
 
 	static void static_set_name(device_t &device, const char *param_name);
@@ -387,7 +387,7 @@ class netlist_mame_analog_output_t : public device_t,
 public:
 
 	// construction/destruction
-	netlist_mame_analog_output_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	netlist_mame_analog_output_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~netlist_mame_analog_output_t() { }
 
 	static void static_set_params(device_t &device, const char *in_name, netlist_analog_output_delegate adelegate);
@@ -413,7 +413,7 @@ class netlist_mame_logic_input_t :  public device_t,
 public:
 
 	// construction/destruction
-	netlist_mame_logic_input_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	netlist_mame_logic_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~netlist_mame_logic_input_t() { }
 
 	static void static_set_params(device_t &device, const char *param_name, const UINT32 mask, const UINT32 shift);
@@ -459,7 +459,7 @@ class netlist_mame_stream_input_t :  public device_t,
 public:
 
 	// construction/destruction
-	netlist_mame_stream_input_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	netlist_mame_stream_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~netlist_mame_stream_input_t() { }
 
 	static void static_set_params(device_t &device, int channel, const char *param_name);
@@ -483,7 +483,7 @@ class netlist_mame_stream_output_t :  public device_t,
 public:
 
 	// construction/destruction
-	netlist_mame_stream_output_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	netlist_mame_stream_output_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~netlist_mame_stream_output_t() { }
 
 	static void static_set_params(device_t &device, int channel, const char *out_name);

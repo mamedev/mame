@@ -384,7 +384,7 @@ Language Tutor modules:
 class tispeak_state : public hh_tms1k_state
 {
 public:
-	tispeak_state(const machine_config &mconfig, device_type type, std::string tag)
+	tispeak_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag),
 		m_tms5100(*this, "tms5100"),
 		m_tms6100(*this, "tms6100"),

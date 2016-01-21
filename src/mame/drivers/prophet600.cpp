@@ -75,7 +75,7 @@ enum
 class prophet600_state : public driver_device
 {
 public:
-	prophet600_state(const machine_config &mconfig, device_type type, std::string tag)
+	prophet600_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU_TAG),
 		m_acia(*this, UART_TAG),

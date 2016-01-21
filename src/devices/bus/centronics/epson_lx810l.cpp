@@ -285,7 +285,7 @@ INPUT_CHANGED_MEMBER(epson_lx810l_t::online_sw)
 //  epson_lx810l_t - constructor
 //-------------------------------------------------
 
-epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, EPSON_LX810L, "Epson LX-810L", tag, owner, clock, "lx810l", __FILE__),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
@@ -306,7 +306,7 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, std::string tag, d
 {
 }
 
-epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
@@ -327,7 +327,7 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, device_type type, 
 {
 }
 
-epson_ap2000_t::epson_ap2000_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+epson_ap2000_t::epson_ap2000_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: epson_lx810l_t(mconfig, EPSON_AP2000, "Epson ActionPrinter 2000", tag, owner, clock, "ap2000", __FILE__)
 { }
 

@@ -19,7 +19,7 @@
 class m5_state : public driver_device
 {
 public:
-	m5_state(const machine_config &mconfig, device_type type, std::string tag)
+	m5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_fd5cpu(*this, Z80_FD5_TAG),

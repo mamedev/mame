@@ -37,7 +37,7 @@ control registers
 
 const device_type K007342 = &device_creator<k007342_device>;
 
-k007342_device::k007342_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+k007342_device::k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K007342, "K007342 Video Controller", tag, owner, clock, "k007342", __FILE__),
 	m_ram(nullptr),
 	m_scroll_ram(nullptr),
@@ -61,7 +61,7 @@ k007342_device::k007342_device(const machine_config &mconfig, std::string tag, d
 //  gfx decoder
 //-------------------------------------------------
 
-void k007342_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
+void k007342_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<k007342_device &>(device).m_gfxdecode.set_tag(tag);
 }

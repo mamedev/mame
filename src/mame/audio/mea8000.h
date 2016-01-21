@@ -57,10 +57,10 @@ struct filter_t
 class mea8000_device : public device_t
 {
 public:
-	mea8000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~mea8000_device() {}
 
-	static void static_set_dac_tag(device_t &device, std::string tag) { downcast<mea8000_device &>(device).m_dac.set_tag(tag); }
+	static void static_set_dac_tag(device_t &device, const char *tag) { downcast<mea8000_device &>(device).m_dac.set_tag(tag); }
 	template<class _Object> static devcb_base &set_req_wr_callback(device_t &device, _Object object) { return downcast<mea8000_device &>(device).m_write_req.set_callback(object); }
 
 	DECLARE_READ8_MEMBER(read);

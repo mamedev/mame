@@ -143,7 +143,7 @@ ioport_constructor sms_sports_pad_device::device_input_ports() const
 //  sms_sports_pad_device - constructor
 //-------------------------------------------------
 
-sms_sports_pad_device::sms_sports_pad_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+sms_sports_pad_device::sms_sports_pad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SMS_SPORTS_PAD, "Sega SMS Sports Pad US", tag, owner, clock, "sms_sports_pad", __FILE__),
 	device_sms_control_port_interface(mconfig, *this),
 	m_sports_in(*this, "SPORTS_IN"),

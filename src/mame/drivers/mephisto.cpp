@@ -73,7 +73,7 @@ Mephisto 4 Turbo Kit 18mhz - (mm4tk)
 class mephisto_state : public mboard_state
 {
 public:
-	mephisto_state(const machine_config &mconfig, device_type type, std::string tag)
+	mephisto_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mboard_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_beep(*this, "beeper")
@@ -365,7 +365,7 @@ static MACHINE_CONFIG_START( mephisto, mephisto_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", mephisto_state, update_nmi, attotime::from_hz(600))

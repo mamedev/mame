@@ -255,7 +255,7 @@ MACHINE_CONFIG_END
 //  gottlieb_sound_r0_device - constructors
 //-------------------------------------------------
 
-gottlieb_sound_r0_device::gottlieb_sound_r0_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+gottlieb_sound_r0_device::gottlieb_sound_r0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GOTTLIEB_SOUND_REV1, "Gottlieb Sound rev. 0", tag, owner, clock, "gotsndr0", __FILE__)
 	, device_mixer_interface(mconfig, *this)
 	, m_audiocpu(*this, "audiocpu")
@@ -380,7 +380,7 @@ void gottlieb_sound_r0_device::device_start()
 //  gottlieb_sound_r1_device - constructors
 //-------------------------------------------------
 
-gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GOTTLIEB_SOUND_REV1, "Gottlieb Sound rev. 1", tag, owner, clock, "gotsndr1", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_audiocpu(*this, "audiocpu"),
@@ -398,7 +398,7 @@ gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig
 {
 }
 
-gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock, bool populate_votrax)
+gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, bool populate_votrax)
 	: device_t(mconfig, GOTTLIEB_SOUND_REV1, "Gottlieb Sound rev. 1", tag, owner, clock, "gotsndr1", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_audiocpu(*this, "audiocpu"),
@@ -625,7 +625,7 @@ void gottlieb_sound_r1_device::device_start()
 //  constructor
 //-------------------------------------------------
 
-gottlieb_sound_r1_with_votrax_device::gottlieb_sound_r1_with_votrax_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+gottlieb_sound_r1_with_votrax_device::gottlieb_sound_r1_with_votrax_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: gottlieb_sound_r1_device(mconfig, tag, owner, clock, true)
 {
 }
@@ -662,7 +662,7 @@ ioport_constructor gottlieb_sound_r1_with_votrax_device::device_input_ports() co
 //  gottlieb_sound_r2_device - constructor
 //-------------------------------------------------
 
-gottlieb_sound_r2_device::gottlieb_sound_r2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+gottlieb_sound_r2_device::gottlieb_sound_r2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GOTTLIEB_SOUND_REV2, "Gottlieb Sound rev. 2", tag, owner, clock, "gotsndr2", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_audiocpu(*this, "audiocpu"),

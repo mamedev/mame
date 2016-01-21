@@ -46,7 +46,7 @@ Port 82 in - upper byte = 0 thru 7
 class sc1_state : public driver_device
 {
 public:
-	sc1_state(const machine_config &mconfig, device_type type, std::string tag)
+	sc1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_speaker(*this, "speaker")

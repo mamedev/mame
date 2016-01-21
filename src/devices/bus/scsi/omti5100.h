@@ -11,7 +11,7 @@
 class omti5100_device : public scsihd_device
 {
 public:
-	omti5100_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	omti5100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	//virtual const rom_entry *device_rom_region() const;

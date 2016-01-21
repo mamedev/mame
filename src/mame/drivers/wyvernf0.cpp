@@ -37,7 +37,7 @@ Actual game video: http://www.nicozon.net/watch/sm10823430
 class wyvernf0_state : public driver_device
 {
 public:
-	wyvernf0_state(const machine_config &mconfig, device_type type, std::string tag)
+	wyvernf0_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_bgram(*this,"bgram"),
 		m_fgram(*this,"fgram"),

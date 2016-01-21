@@ -63,174 +63,174 @@ const device_type MD_ROM_BEGGARP = &device_creator<md_rom_beggarp_device>;
 const device_type MD_ROM_WUKONG = &device_creator<md_rom_wukong_device>;
 
 
-md_std_rom_device::md_std_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+md_std_rom_device::md_std_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_md_cart_interface( mconfig, *this )
 {
 }
 
-md_std_rom_device::md_std_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_std_rom_device::md_std_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, MD_STD_ROM, "MD Standard cart", tag, owner, clock, "md_std_rom", __FILE__),
 					device_md_cart_interface( mconfig, *this )
 {
 }
 
-md_rom_sram_device::md_rom_sram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_sram_device::md_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_SRAM, "MD Standard cart + SRAM", tag, owner, clock, "md_rom_sram", __FILE__)
 {
 }
 
-md_rom_fram_device::md_rom_fram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_fram_device::md_rom_fram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_FRAM, "MD Standard cart + FRAM", tag, owner, clock, "md_rom_fram", __FILE__)
 {
 }
 
-md_rom_ssf2_device::md_rom_ssf2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_ssf2_device::md_rom_ssf2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_SSF2, "MD Super SF2", tag, owner, clock, "md_rom_ssf2", __FILE__), m_lastoff(0), m_lastdata(0)
 				{
 }
 
-md_rom_cm2in1_device::md_rom_cm2in1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_cm2in1_device::md_rom_cm2in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_CM2IN1, "MD Codemasters 2in1", tag, owner, clock, "md_rom_cm2in1", __FILE__), m_base(0)
 				{
 }
 
-md_rom_mcpirate_device::md_rom_mcpirate_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_mcpirate_device::md_rom_mcpirate_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_MCPIR, "MD Pirate Multicarts (Various)", tag, owner, clock, "md_rom_mcpirate", __FILE__), m_bank(0)
 				{
 }
 
-md_rom_bugslife_device::md_rom_bugslife_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_bugslife_device::md_rom_bugslife_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_BUGSLIFE, "MD A Bug's Life", tag, owner, clock, "md_rom_bugslife", __FILE__)
 {
 }
 
-md_rom_smouse_device::md_rom_smouse_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_smouse_device::md_rom_smouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_SMOUSE, "MD Huan Le Tao Qi Shu / Smart Mouse", tag, owner, clock, "md_rom_smouse", __FILE__)
 {
 }
 
-md_rom_smb_device::md_rom_smb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_smb_device::md_rom_smb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_SMB, "MD Super Mario Bros.", tag, owner, clock, "md_rom_smb", __FILE__)
 {
 }
 
-md_rom_smb2_device::md_rom_smb2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_smb2_device::md_rom_smb2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_SMB2, "MD Super Mario Bros. 2", tag, owner, clock, "md_rom_smb2", __FILE__)
 {
 }
 
-md_rom_smw64_device::md_rom_smw64_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_smw64_device::md_rom_smw64_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_SMW64, "MD Super Mario World 64", tag, owner, clock, "md_rom_smw64", __FILE__), m_latch0(0), m_latch1(0)
 				{
 }
 
-md_rom_sbubl_device::md_rom_sbubl_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_sbubl_device::md_rom_sbubl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_SBUBL, "MD Super Bubble Bobble", tag, owner, clock, "md_rom_sbubl", __FILE__)
 {
 }
 
-md_rom_rx3_device::md_rom_rx3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_rx3_device::md_rom_rx3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_RX3, "MD Rockman X3", tag, owner, clock, "md_rom_rx3", __FILE__)
 {
 }
 
-md_rom_mjlov_device::md_rom_mjlov_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_mjlov_device::md_rom_mjlov_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_MJLOV, "MD Ma Jiang Qing Ren / Mahjong Lover", tag, owner, clock, "md_rom_mjlov", __FILE__)
 {
 }
 
-md_rom_kof98_device::md_rom_kof98_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_kof98_device::md_rom_kof98_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_KOF98, "MD KOF 98", tag, owner, clock, "md_rom_kof98", __FILE__)
 {
 }
 
-md_rom_kof99_device::md_rom_kof99_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_kof99_device::md_rom_kof99_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_KOF99, "MD KOF 99 (and others)", tag, owner, clock, "md_rom_kof99", __FILE__)
 {
 }
 
-md_rom_soulb_device::md_rom_soulb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_soulb_device::md_rom_soulb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_SOULB, "MD Soul Blade", tag, owner, clock, "md_rom_soulb", __FILE__)
 {
 }
 
-md_rom_chinf3_device::md_rom_chinf3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_chinf3_device::md_rom_chinf3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_CHINF3, "MD Chinese Fighter 3", tag, owner, clock, "md_rom_chinf3", __FILE__), m_bank(0)
 				{
 }
 
-md_rom_16mj2_device::md_rom_16mj2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_16mj2_device::md_rom_16mj2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_16MJ2, "MD 16 Mahjong Tiles II", tag, owner, clock, "md_rom_16mj2", __FILE__)
 {
 }
 
-md_rom_elfwor_device::md_rom_elfwor_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_elfwor_device::md_rom_elfwor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_ELFWOR, "MD Linghuan Daoshi Super Magician / Elf Wor", tag, owner, clock, "md_rom_elfwor", __FILE__)
 {
 }
 
-md_rom_yasech_device::md_rom_yasech_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_yasech_device::md_rom_yasech_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_YASECH, "MD Ya Se Chuan Shuo", tag, owner, clock, "md_rom_yasech", __FILE__)
 {
 }
 
-md_rom_lion2_device::md_rom_lion2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_lion2_device::md_rom_lion2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_LION2, "MD Lion King 2", tag, owner, clock, "md_rom_lion2", __FILE__), m_prot1_data(0), m_prot2_data(0)
 				{
 }
 
-md_rom_lion3_device::md_rom_lion3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_lion3_device::md_rom_lion3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_LION3, "MD Lion King 3", tag, owner, clock, "md_rom_lion3", __FILE__), m_bank(0)
 				{
 }
 
-md_rom_pokea_device::md_rom_pokea_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_pokea_device::md_rom_pokea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_POKEA, "MD Pokemon (Alt Protection)", tag, owner, clock, "md_rom_pokea", __FILE__)
 {
 }
 
-md_rom_pokestad_device::md_rom_pokestad_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_pokestad_device::md_rom_pokestad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_POKESTAD, "MD Pokemon Stadium", tag, owner, clock, "md_rom_pokestad", __FILE__), m_bank(0)
 				{
 }
 
-md_rom_realtec_device::md_rom_realtec_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_realtec_device::md_rom_realtec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_REALTEC, "MD Realtec", tag, owner, clock, "md_rom_realtec", __FILE__), m_bank_addr(0), m_bank_size(0), m_old_bank_addr(0)
 				{
 }
 
-md_rom_redcl_device::md_rom_redcl_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_redcl_device::md_rom_redcl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_REDCL, "MD Redcliff", tag, owner, clock, "md_rom_redcl", __FILE__)
 {
 }
 
-md_rom_squir_device::md_rom_squir_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_squir_device::md_rom_squir_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_SQUIR, "MD Squirrel King", tag, owner, clock, "md_rom_squir", __FILE__), m_latch(0)
 				{
 }
 
-md_rom_tekkensp_device::md_rom_tekkensp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_tekkensp_device::md_rom_tekkensp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_TEKKENSP, "MD Tekken Special", tag, owner, clock, "md_rom_tekkensp", __FILE__), m_reg(0)
 				{
 }
 
-md_rom_topf_device::md_rom_topf_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_topf_device::md_rom_topf_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_TOPF, "MD Top Fighter", tag, owner, clock, "md_rom_topf", __FILE__), m_latch(0)
 				{
 }
 
-md_rom_radica_device::md_rom_radica_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_radica_device::md_rom_radica_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_RADICA, "MD Radica TV games", tag, owner, clock, "md_rom_radica", __FILE__), m_bank(0)
 				{
 }
 
-md_rom_beggarp_device::md_rom_beggarp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_beggarp_device::md_rom_beggarp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_BEGGARP, "MD Beggar Prince", tag, owner, clock, "md_rom_beggarp", __FILE__), m_mode(0), m_lock(0)
 				{
 }
 
-md_rom_wukong_device::md_rom_wukong_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_wukong_device::md_rom_wukong_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_WUKONG, "MD Legend of Wukong", tag, owner, clock, "md_rom_wukong", __FILE__), m_mode(0)
 				{
 }

@@ -59,7 +59,7 @@ void snes_miracle_device::device_timer(emu_timer &timer, device_timer_id id, int
 //  snes_miracle_device - constructor
 //-------------------------------------------------
 
-snes_miracle_device::snes_miracle_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+snes_miracle_device::snes_miracle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 					device_t(mconfig, SNES_MIRACLE, "Miracle Piano SNES Cable", tag, owner, clock, "snes_miracle", __FILE__),
 					device_serial_interface(mconfig, *this),
 					device_snes_control_port_interface(mconfig, *this),

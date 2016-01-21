@@ -44,7 +44,7 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 			for ( ; img != NULL; img = iter.next())
 			{
 				std::string temp;
-				strprintf(temp,"%s : %s", img->device().name().c_str(), img->exists() ? img->filename() : "[no image]");
+				strprintf(temp,"%s : %s", img->device().name(), img->exists() ? img->filename() : "[no image]");
 				TCHAR *tc_buf = tstring_from_utf8(temp.c_str());
 				if (tc_buf != NULL)
 				{
@@ -108,7 +108,7 @@ void consolewin_info::set_cpu(device_t &device)
 	char curtitle[256];
 	std::string title;
 
-	strprintf(title, "Debug: %s - %s '%s'", device.machine().system().name, device.name().c_str(), device.tag().c_str());
+	strprintf(title, "Debug: %s - %s '%s'", device.machine().system().name, device.name(), device.tag());
 	win_get_window_text_utf8(window(), curtitle, ARRAY_LENGTH(curtitle));
 	if (title.compare(curtitle) != 0)
 		win_set_window_text_utf8(window(), title.c_str());
@@ -201,7 +201,7 @@ void consolewin_info::update_menu()
 			}
 
 			std::string temp;
-			strprintf(temp,"%s :%s", img->device().name().c_str(), img->exists() ? img->filename() : "[empty slot]");
+			strprintf(temp,"%s :%s", img->device().name(), img->exists() ? img->filename() : "[empty slot]");
 			TCHAR *tc_buf = tstring_from_utf8(temp.c_str());
 			if (tc_buf != NULL)
 			{

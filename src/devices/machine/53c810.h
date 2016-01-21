@@ -19,7 +19,7 @@ class lsi53c810_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
-	lsi53c810_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	lsi53c810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void set_irq_callback(device_t &device, lsi53c810_irq_delegate callback) { downcast<lsi53c810_device &>(device).m_irq_cb = callback; }
 	static void set_dma_callback(device_t &device, lsi53c810_dma_delegate callback) { downcast<lsi53c810_device &>(device).m_dma_cb = callback; }

@@ -75,7 +75,7 @@ class wd2010_device :   public device_t
 {
 public:
 	// construction/destruction
-	wd2010_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	wd2010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_out_intrq_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_out_intrq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_bdrq_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_out_bdrq_cb.set_callback(object); }

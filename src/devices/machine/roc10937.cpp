@@ -127,7 +127,7 @@ static const int roc10937poslut[]=
 
 const device_type ROC10937 = &device_creator<roc10937_t>;
 
-rocvfd_t::rocvfd_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+rocvfd_t::rocvfd_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 	m_port_val=0;
@@ -246,7 +246,7 @@ void rocvfd_t::shift_clock(int state)
 }
 
 ///////////////////////////////////////////////////////////////////////////
-roc10937_t::roc10937_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+roc10937_t::roc10937_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: rocvfd_t(mconfig, ROC10937, "Rockwell 10937 VFD controller and compatible", tag, owner, clock, "roc10937", __FILE__)
 {
 	m_port_val=0;
@@ -254,7 +254,7 @@ roc10937_t::roc10937_t(const machine_config &mconfig, std::string tag, device_t 
 
 const device_type MSC1937 = &device_creator<msc1937_t>;
 
-msc1937_t::msc1937_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+msc1937_t::msc1937_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: rocvfd_t(mconfig, MSC1937, "OKI MSC1937 VFD controller", tag, owner, clock, "msc1937", __FILE__)
 {
 	m_port_val=0;
@@ -313,7 +313,7 @@ void rocvfd_t::write_char(int data)
 
 const device_type ROC10957 = &device_creator<roc10957_t>;
 
-roc10957_t::roc10957_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+roc10957_t::roc10957_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: rocvfd_t(mconfig, ROC10957, "Rockwell 10957 VFD controller and compatible", tag, owner, clock, "roc10957", __FILE__)
 {
 	m_port_val=0;
@@ -381,7 +381,7 @@ void roc10957_t::write_char(int data)
 
 const device_type S16LF01 = &device_creator<s16lf01_t>;
 
-s16lf01_t::s16lf01_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+s16lf01_t::s16lf01_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: rocvfd_t(mconfig, S16LF01, "Samsung 16LF01 Series VFD controller and compatible", tag, owner, clock, "s16lf01", __FILE__)
 {
 	m_port_val=0;

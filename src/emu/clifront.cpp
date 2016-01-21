@@ -27,7 +27,6 @@
 #include "osdepend.h"
 #include "softlist.h"
 
-#include <algorithm>
 #include <new>
 #include <ctype.h>
 
@@ -248,7 +247,7 @@ int cli_frontend::execute(int argc, char **argv)
 	}
 	catch (add_exception &aex)
 	{
-		osd_printf_error("Tag '%s' already exists in tagged_list\n", aex.tag().c_str());
+		osd_printf_error("Tag '%s' already exists in tagged_list\n", aex.tag());
 		m_result = MAMERR_FATALERROR;
 	}
 	catch (std::exception &ex)
@@ -439,7 +438,7 @@ void cli_frontend::listcrc(const char *gamename)
 					// if we have a CRC, display it
 					UINT32 crc;
 					if (hash_collection(ROM_GETHASHDATA(rom)).crc(crc))
-						osd_printf_info("%08x %-16s \t %-8s \t %s\n", crc, ROM_GETNAME(rom), device->shortname().c_str(), device->name().c_str());
+						osd_printf_info("%08x %-16s \t %-8s \t %s\n", crc, ROM_GETNAME(rom), device->shortname(), device->name());
 				}
 	}
 }
@@ -550,6 +549,13 @@ void cli_frontend::listsamples(const char *gamename)
 //  referenced by a given game or set of games
 //-------------------------------------------------
 
+int cli_frontend::compare_devices(const void *i1, const void *i2)
+{
+	device_t *dev1 = *(device_t **)i1;
+	device_t *dev2 = *(device_t **)i2;
+	return strcmp(dev1->tag(), dev2->tag());
+}
+
 void cli_frontend::listdevices(const char *gamename)
 {
 	// determine which drivers to output; return an error if none found
@@ -574,36 +580,33 @@ void cli_frontend::listdevices(const char *gamename)
 			device_list.push_back(device);
 
 		// sort them by tag
-		std::sort(device_list.begin(), device_list.end(), [](device_t *dev1, device_t *dev2) {
-			return dev1->tag() < dev2->tag();
-		});
+		qsort(&device_list[0], device_list.size(), sizeof(device_list[0]), compare_devices);
 
 		// dump the results
-		for (device_t *device : device_list)
+		for (auto device : device_list)
 		{
 			// extract the tag, stripping the leading colon
-			std::string tag = device->tag();
-			if (tag[0] == ':')
-				tag = tag.erase(0, 1);
+			const char *tag = device->tag();
+			if (*tag == ':')
+				tag++;
 
 			// determine the depth
 			int depth = 1;
-			if (tag.empty())
+			if (*tag == 0)
 			{
 				tag = "<root>";
 				depth = 0;
 			}
 			else
 			{
-				const char *tag_c = tag.c_str();
-				for (const char *c = tag_c; *c != 0; c++)
+				for (const char *c = tag; *c != 0; c++)
 					if (*c == ':')
 					{
-						tag_c = c + 1;
+						tag = c + 1;
 						depth++;
 					}
 			}
-			printf("   %*s%-*s %s", depth * 2, "", 30 - depth * 2, tag.c_str(), device->name().c_str());
+			printf("   %*s%-*s %s", depth * 2, "", 30 - depth * 2, tag, device->name());
 
 			// add more information
 			UINT32 clock = device->clock();
@@ -648,7 +651,7 @@ void cli_frontend::listslots(const char *gamename)
 		{
 			if (slot->fixed()) continue;
 			// output the line, up to the list of extensions
-			printf("%-13s%-10s   ", first ? drivlist.driver().name : "", std::string(slot->device().tag()).substr(1).c_str());
+			printf("%-13s%-10s   ", first ? drivlist.driver().name : "", slot->device().tag()+1);
 
 			bool first_option = true;
 
@@ -660,9 +663,9 @@ void cli_frontend::listslots(const char *gamename)
 					device_t *dev = (*option->devtype())(drivlist.config(), "dummy", &drivlist.config().root_device(), 0);
 					dev->config_complete();
 					if (first_option) {
-						printf("%-15s %s\n", option->name(),dev->name().c_str());
+						printf("%-15s %s\n", option->name(),dev->name());
 					} else {
-						printf("%-23s   %-15s %s\n", "",option->name(),dev->name().c_str());
+						printf("%-23s   %-15s %s\n", "",option->name(),dev->name());
 					}
 					global_free(dev);
 
@@ -811,8 +814,8 @@ void cli_frontend::verifyroms(const char *gamename)
 			device_iterator iter(config.root_device());
 			for (device_t *dev = iter.first(); dev != nullptr; dev = iter.next())
 			{
-				if (dev->owner() != nullptr && (!dev->shortname().empty()) && dev->rom_region() != nullptr && (device_map.insert(dev->shortname()).second)) {
-					if (core_strwildcmp(gamename, dev->shortname().c_str()) == 0)
+				if (dev->owner() != nullptr && (*(dev->shortname()) != 0) && dev->rom_region() != nullptr && (device_map.insert(dev->shortname()).second)) {
+					if (core_strwildcmp(gamename, dev->shortname()) == 0)
 					{
 						matched++;
 
@@ -827,11 +830,11 @@ void cli_frontend::verifyroms(const char *gamename)
 						{
 							// output the summary of the audit
 							std::string summary_string;
-							auditor.summarize(dev->shortname().c_str(),&summary_string);
+							auditor.summarize(dev->shortname(),&summary_string);
 							osd_printf_info("%s", summary_string.c_str());
 
 							// display information about what we discovered
-							osd_printf_info("romset %s ", dev->shortname().c_str());
+							osd_printf_info("romset %s ", dev->shortname());
 
 							// switch off of the result
 							switch (summary)
@@ -875,7 +878,7 @@ void cli_frontend::verifyroms(const char *gamename)
 							device->config_complete();
 
 					if (device_map.insert(dev->shortname()).second) {
-						if (core_strwildcmp(gamename, dev->shortname().c_str()) == 0)
+						if (core_strwildcmp(gamename, dev->shortname()) == 0)
 						{
 							matched++;
 							if (dev->rom_region() != nullptr)
@@ -892,11 +895,11 @@ void cli_frontend::verifyroms(const char *gamename)
 								{
 									// output the summary of the audit
 									std::string summary_string;
-									auditor.summarize(dev->shortname().c_str(),&summary_string);
+									auditor.summarize(dev->shortname(),&summary_string);
 									osd_printf_info("%s", summary_string.c_str());
 
 									// display information about what we discovered
-									osd_printf_info("romset %s ", dev->shortname().c_str());
+									osd_printf_info("romset %s ", dev->shortname());
 
 									// switch off of the result
 									switch (summary)
@@ -930,11 +933,11 @@ void cli_frontend::verifyroms(const char *gamename)
 							device_iterator subsubiter(*device);
 							for (device_t *subdev = subsubiter.first(); subdev != nullptr; subdev = subsubiter.next())
 							{
-								if (subdev->owner() == device && subdev->rom_region() != nullptr && !subdev->shortname().empty())
+								if (subdev->owner() == device && subdev->rom_region() != nullptr && subdev->shortname() != nullptr && subdev->shortname()[0] != '\0')
 								{
 									if (device_map.insert(subdev->shortname()).second)
 									{
-										if (core_strwildcmp(gamename, subdev->shortname().c_str()) == 0)
+										if (core_strwildcmp(gamename, subdev->shortname()) == 0)
 										{
 											matched++;
 
@@ -950,11 +953,11 @@ void cli_frontend::verifyroms(const char *gamename)
 											{
 												// output the summary of the audit
 												std::string summary_string;
-												auditor.summarize(subdev->shortname().c_str(),&summary_string);
+												auditor.summarize(subdev->shortname(),&summary_string);
 												osd_printf_info("%s", summary_string.c_str());
 
 												// display information about what we discovered
-												osd_printf_info("romset %s ", subdev->shortname().c_str());
+												osd_printf_info("romset %s ", subdev->shortname());
 
 												// switch off of the result
 												switch (summary)

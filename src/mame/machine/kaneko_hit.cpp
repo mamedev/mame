@@ -30,7 +30,7 @@
 
 const device_type KANEKO_HIT = &device_creator<kaneko_hit_device>;
 
-kaneko_hit_device::kaneko_hit_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+kaneko_hit_device::kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, KANEKO_HIT, "Kaneko CALC Hitbox", tag, owner, clock, "kaneko_hit", __FILE__)
 {
 	m_hittype = -1;

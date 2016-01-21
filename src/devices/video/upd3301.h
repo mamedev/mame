@@ -79,7 +79,7 @@ class upd3301_device :  public device_t,
 {
 public:
 	// construction/destruction
-	upd3301_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void static_set_character_width(device_t &device, int value) { downcast<upd3301_device &>(device).m_width = value; }
 	static void static_set_display_callback(device_t &device, upd3301_draw_character_delegate callback) { downcast<upd3301_device &>(device).m_display_cb = callback; }

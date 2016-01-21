@@ -44,7 +44,7 @@ ioport_constructor nes_zapper_device::device_input_ports() const
 //  nes_zapper_device - constructor
 //-------------------------------------------------
 
-nes_zapper_device::nes_zapper_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+nes_zapper_device::nes_zapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 					device_t(mconfig, NES_ZAPPER, "Nintendo Zapper Lightgun", tag, owner, clock, "nes_zapper", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_lightx(*this, "ZAPPER_X"),

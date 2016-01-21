@@ -49,7 +49,7 @@ ToDo (granny):
 class by133_state : public driver_device
 {
 public:
-	by133_state(const machine_config &mconfig, device_type type, std::string tag)
+	by133_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_videocpu(*this, "videocpu")
@@ -796,7 +796,7 @@ static MACHINE_CONFIG_START( babypac, by133_state )
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SPEAKER_STANDARD_MONO("beee")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 600)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "beee", 0.10)
 MACHINE_CONFIG_END
 

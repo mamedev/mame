@@ -149,7 +149,7 @@ machine_config_constructor cbm8000_hsg_b_t::device_mconfig_additions() const
 //  cbm8000_hsg_t - constructor
 //-------------------------------------------------
 
-cbm8000_hsg_t::cbm8000_hsg_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+cbm8000_hsg_t::cbm8000_hsg_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_pet_expansion_card_interface(mconfig, *this),
 	m_gdc(*this, EF9365_TAG),
@@ -158,12 +158,12 @@ cbm8000_hsg_t::cbm8000_hsg_t(const machine_config &mconfig, device_type type, st
 {
 }
 
-cbm8000_hsg_a_t::cbm8000_hsg_a_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+cbm8000_hsg_a_t::cbm8000_hsg_a_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	cbm8000_hsg_t(mconfig, CBM8000_HSG_A, "CBM 8000 High Speed Graphics (A)", tag, owner, clock, "cbm8000_hsg_a", __FILE__)
 {
 }
 
-cbm8000_hsg_b_t::cbm8000_hsg_b_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+cbm8000_hsg_b_t::cbm8000_hsg_b_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	cbm8000_hsg_t(mconfig, CBM8000_HSG_B, "CBM 8000 High Speed Graphics (B)", tag, owner, clock, "cbm8000_hsg_b", __FILE__)
 {
 }

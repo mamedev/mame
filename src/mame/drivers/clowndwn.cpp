@@ -15,7 +15,7 @@ can't find any info on this?
 class clowndwn_state : public driver_device
 {
 public:
-	clowndwn_state(const machine_config &mconfig, device_type type, std::string tag)
+	clowndwn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 	//  ,m_maincpu(*this, "maincpu")
 	{ }

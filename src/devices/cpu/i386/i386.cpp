@@ -39,7 +39,7 @@ const device_type PENTIUM3 = &device_creator<pentium3_device>;
 const device_type PENTIUM4 = &device_creator<pentium4_device>;
 
 
-i386_device::i386_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i386_device::i386_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, I386, "I386", tag, owner, clock, "i386", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 32, 16, 0)
@@ -50,7 +50,7 @@ i386_device::i386_device(const machine_config &mconfig, std::string tag, device_
 }
 
 
-i386_device::i386_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int program_data_width, int program_addr_width, int io_data_width)
+i386_device::i386_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int program_data_width, int program_addr_width, int io_data_width)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
@@ -60,52 +60,52 @@ i386_device::i386_device(const machine_config &mconfig, device_type type, std::s
 	m_program_config.m_page_shift = 12;
 }
 
-i386SX_device::i386SX_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i386SX_device::i386SX_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i386_device(mconfig, I386SX, "I386SX", tag, owner, clock, "i386sx", __FILE__, 16, 24, 16)
 {
 }
 
-i486_device::i486_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i486_device::i486_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i386_device(mconfig, I486, "I486", tag, owner, clock, "i486", __FILE__)
 {
 }
 
-pentium_device::pentium_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pentium_device::pentium_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i386_device(mconfig, PENTIUM, "PENTIUM", tag, owner, clock, "pentium", __FILE__)
 {
 }
 
-pentium_device::pentium_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+pentium_device::pentium_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: i386_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-mediagx_device::mediagx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mediagx_device::mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i386_device(mconfig, MEDIAGX, "MEDIAGX", tag, owner, clock, "mediagx", __FILE__)
 {
 }
 
-pentium_pro_device::pentium_pro_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pentium_pro_device::pentium_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pentium_device(mconfig, PENTIUM_PRO, "Pentium Pro", tag, owner, clock, "pentium_pro", __FILE__)
 {
 }
 
-pentium_mmx_device::pentium_mmx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pentium_mmx_device::pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pentium_device(mconfig, PENTIUM_MMX, "Pentium MMX", tag, owner, clock, "pentium_mmx", __FILE__)
 {
 }
 
-pentium2_device::pentium2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pentium2_device::pentium2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pentium_device(mconfig, PENTIUM2, "Pentium II", tag, owner, clock, "pentium2", __FILE__)
 {
 }
 
-pentium3_device::pentium3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pentium3_device::pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pentium_device(mconfig, PENTIUM3, "Pentium III", tag, owner, clock, "pentium3", __FILE__)
 {
 }
 
-pentium4_device::pentium4_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pentium4_device::pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pentium_device(mconfig, PENTIUM4, "Pentium 4", tag, owner, clock, "pentium4", __FILE__)
 {
 }

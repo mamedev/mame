@@ -49,7 +49,7 @@ class ptm6840_device :  public device_t
 {
 public:
 	// construction/destruction
-	ptm6840_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void set_internal_clock(device_t &device, double clock) { downcast<ptm6840_device &>(device).m_internal_clock = clock; }
 	static void set_external_clocks(device_t &device, double clock0, double clock1, double clock2) { downcast<ptm6840_device &>(device).m_external_clock[0] = clock0; downcast<ptm6840_device &>(device).m_external_clock[1] = clock1; downcast<ptm6840_device &>(device).m_external_clock[2] = clock2; }

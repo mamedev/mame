@@ -12,7 +12,7 @@
 class naomi_gdrom_board : public naomi_board
 {
 public:
-	naomi_gdrom_board(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void static_set_tags(device_t &device, const char *_image_tag, const char *_pic_tag);
 

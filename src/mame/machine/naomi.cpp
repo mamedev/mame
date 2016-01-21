@@ -213,7 +213,7 @@ INPUT_CHANGED_MEMBER(naomi_state::naomi_mp_w)
 }
 CUSTOM_INPUT_MEMBER(naomi_state::naomi_mp_r)
 {
-	const char * tagptr = (const char *)param;
+	const char *tagptr = (const char *)param;
 	UINT8 retval = 0;
 
 	for (int i = 0x80; i >= 0x08; i >>= 1)

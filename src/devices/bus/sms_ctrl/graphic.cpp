@@ -75,7 +75,7 @@ ioport_constructor sms_graphic_device::device_input_ports() const
 //  sms_graphic_device - constructor
 //-------------------------------------------------
 
-sms_graphic_device::sms_graphic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sms_graphic_device::sms_graphic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SMS_GRAPHIC, "Sega SMS Graphic Board", tag, owner, clock, "sms_graphic", __FILE__)
 	, device_sms_control_port_interface(mconfig, *this)
 	, m_buttons(*this, "BUTTONS")

@@ -41,7 +41,7 @@
 
 const device_type TTL74153 = &device_creator<ttl74153_device>;
 
-ttl74153_device::ttl74153_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ttl74153_device::ttl74153_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, TTL74153, "74153 TTL", tag, owner, clock, "74153", __FILE__),
 					m_a(0),
 					m_b(0)

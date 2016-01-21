@@ -130,7 +130,7 @@ machine_config_constructor i80130_device::device_mconfig_additions() const
 //  i80130_device - constructor
 //-------------------------------------------------
 
-i80130_device::i80130_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i80130_device::i80130_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I80130, "I80130", tag, owner, clock, "i80130", __FILE__),
 		m_pic(*this, "pic"),
 		m_pit(*this, "pit"),

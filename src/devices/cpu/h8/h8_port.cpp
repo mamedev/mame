@@ -5,7 +5,7 @@
 
 const device_type H8_PORT = &device_creator<h8_port_device>;
 
-h8_port_device::h8_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8_port_device::h8_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, H8_PORT, "H8 digital port", tag, owner, clock, "h8_digital_port", __FILE__),
 	cpu(*this, DEVICE_SELF_OWNER), io(nullptr), address(0), default_ddr(0), ddr(0), pcr(0), odr(0), mask(0), dr(0), last_output(0)
 {
@@ -20,21 +20,21 @@ void h8_port_device::set_info(int _address, UINT8 _default_ddr, UINT8 _mask)
 
 WRITE8_MEMBER(h8_port_device::ddr_w)
 {
-	//  logerror("%s: ddr_w %02x\n", tag().c_str(), data);
+	//  logerror("%s: ddr_w %02x\n", tag(), data);
 	ddr = data;
 	update_output();
 }
 
 WRITE8_MEMBER(h8_port_device::dr_w)
 {
-	//  logerror("%s: dr_w %02x\n", tag().c_str(), data);
+	//  logerror("%s: dr_w %02x\n", tag(), data);
 	dr = data;
 	update_output();
 }
 
 READ8_MEMBER(h8_port_device::dr_r)
 {
-	//  logerror("%s: dr_r %02x\n", tag().c_str(), (dr | mask) & 0xff);
+	//  logerror("%s: dr_r %02x\n", tag(), (dr | mask) & 0xff);
 	return dr | mask;
 }
 
@@ -44,31 +44,31 @@ READ8_MEMBER(h8_port_device::port_r)
 	if((ddr & ~mask) != UINT8(~mask))
 		res |= io->read_word(address) & ~ddr;
 
-	//  logerror("%s: port_r %02x (%02x %02x)\n", tag().c_str(), res, ddr & ~mask, UINT8(~mask));
+	//  logerror("%s: port_r %02x (%02x %02x)\n", tag(), res, ddr & ~mask, UINT8(~mask));
 	return res;
 }
 
 WRITE8_MEMBER(h8_port_device::pcr_w)
 {
-	logerror("%s: pcr_w %02x\n", tag().c_str(), data);
+	logerror("%s: pcr_w %02x\n", tag(), data);
 	pcr = data;
 }
 
 READ8_MEMBER(h8_port_device::pcr_r)
 {
-	logerror("%s: dr_r %02x\n", tag().c_str(), (pcr | mask) & 0xff);
+	logerror("%s: dr_r %02x\n", tag(), (pcr | mask) & 0xff);
 	return pcr | mask;
 }
 
 WRITE8_MEMBER(h8_port_device::odr_w)
 {
-	logerror("%s: odr_w %02x\n", tag().c_str(), data);
+	logerror("%s: odr_w %02x\n", tag(), data);
 	odr = data;
 }
 
 READ8_MEMBER(h8_port_device::odr_r)
 {
-	logerror("%s: odr_r %02x\n", tag().c_str(), (odr | mask) & 0xff);
+	logerror("%s: odr_r %02x\n", tag(), (odr | mask) & 0xff);
 	return odr | ~mask;
 }
 

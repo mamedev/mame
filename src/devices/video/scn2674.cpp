@@ -17,7 +17,7 @@ static ADDRESS_MAP_START( scn2674_vram, AS_0, 8, scn2674_device )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
-scn2674_device::scn2674_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+scn2674_device::scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SCN2674_VIDEO, "Signetics SCN2674 AVDC", tag, owner, clock, "scn2674_device", __FILE__),
 		device_video_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),

@@ -29,7 +29,7 @@ const device_type DIABLO = &device_creator<diablo_image_device>;
 //  diablo_image_device - constructor
 //-------------------------------------------------
 
-diablo_image_device::diablo_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+diablo_image_device::diablo_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DIABLO, "Diablo", tag, owner, clock, "diablo_image", __FILE__),
 		device_image_interface(mconfig, *this),
 		m_chd(nullptr),
@@ -76,7 +76,7 @@ void diablo_image_device::device_start()
 	m_chd = nullptr;
 
 	// try to locate the CHD from a DISK_REGION
-	chd_file *handle = machine().rom_load().get_disk_handle(tag().c_str());
+	chd_file *handle = machine().rom_load().get_disk_handle(tag());
 	if (handle != nullptr)
 	{
 		m_hard_disk_handle = hard_disk_open(handle);

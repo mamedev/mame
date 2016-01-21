@@ -30,7 +30,7 @@ Todo:
 class istellar_state : public driver_device
 {
 public:
-	istellar_state(const machine_config &mconfig, device_type type, std::string tag)
+	istellar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc") ,
 		m_tile_ram(*this, "tile_ram"),

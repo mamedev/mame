@@ -6,7 +6,7 @@
 class bfm_sc5_state : public bfm_sc45_state
 {
 public:
-	bfm_sc5_state(const machine_config &mconfig, device_type type, std::string tag)
+	bfm_sc5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: bfm_sc45_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu")
 	{ }

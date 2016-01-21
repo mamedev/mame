@@ -277,7 +277,7 @@ const at_keyboard_device::extended_keyboard_code at_keyboard_device::m_extended_
 const device_type PC_KEYB = &device_creator<pc_keyboard_device>;
 const device_type AT_KEYB = &device_creator<at_keyboard_device>;
 
-pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PC_KEYB, "PC Keyboard", tag, owner, clock, "pc_keyb", __FILE__),
 	m_type(KEYBOARD_TYPE_PC),
 	m_ioport_0(*this, ":pc_keyboard_0"),
@@ -292,7 +292,7 @@ pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, std::strin
 {
 }
 
-pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_ioport_0(*this, ":pc_keyboard_0"),
 	m_ioport_1(*this, ":pc_keyboard_1"),
@@ -306,7 +306,7 @@ pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, device_typ
 {
 }
 
-at_keyboard_device::at_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+at_keyboard_device::at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	pc_keyboard_device(mconfig, AT_KEYB, "AT Keyboard", tag, owner, clock, "at_keyb", __FILE__),
 	m_scan_code_set(1)
 {

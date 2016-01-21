@@ -159,7 +159,7 @@ GFXDECODE_MEMBER( k052109_device::gfxinfo_ram )
 GFXDECODE_END
 
 
-k052109_device::k052109_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+k052109_device::k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K052109, "K052109 Tilemap Generator", tag, owner, clock, "k052109", __FILE__),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_ram(nullptr),
@@ -180,6 +180,7 @@ k052109_device::k052109_device(const machine_config &mconfig, std::string tag, d
 	m_scrollctrl(0),
 	m_char_rom(nullptr),
 	m_char_size(0),
+	m_screen_tag(nullptr),
 	m_irq_handler(*this),
 	m_firq_handler(*this),
 	m_nmi_handler(*this)
@@ -204,7 +205,7 @@ void k052109_device::set_ram(device_t &device, bool ram)
 
 void k052109_device::device_start()
 {
-	if (!m_screen_tag.empty())
+	if (m_screen_tag != nullptr)
 	{
 		// make sure our screen is started
 		screen_device *screen = m_owner->subdevice<screen_device>(m_screen_tag);
@@ -287,7 +288,7 @@ void k052109_device::device_reset()
 //  set_screen_tag - set screen we are attached to
 //-------------------------------------------------
 
-void k052109_device::set_screen_tag(device_t &device, device_t *owner, std::string tag)
+void k052109_device::set_screen_tag(device_t &device, device_t *owner, const char *tag)
 {
 	k052109_device &dev = dynamic_cast<k052109_device &>(device);
 	dev.m_screen_tag = tag;

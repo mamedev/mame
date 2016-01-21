@@ -996,7 +996,6 @@ ADDRESS_MAP_END
 TIMER_CALLBACK_MEMBER(pcw_state::setup_beep)
 {
 	m_beeper->set_state(0);
-	m_beeper->set_frequency(3750);
 }
 
 
@@ -1286,7 +1285,7 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 3750)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_UPD765A_ADD("upd765", true, true)

@@ -6,7 +6,7 @@
 const device_type H8S2655 = &device_creator<h8s2655_device>;
 const device_type H8S2653 = &device_creator<h8s2653_device>;
 
-h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	h8s2600_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(h8s2655_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -39,7 +39,7 @@ h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, 
 	has_trace = true;
 }
 
-h8s2655_device::h8s2655_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8s2655_device::h8s2655_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8s2600_device(mconfig, H8S2655, "H8S/2655", tag, owner, clock, "h8s2655", __FILE__, address_map_delegate(FUNC(h8s2655_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -73,7 +73,7 @@ h8s2655_device::h8s2655_device(const machine_config &mconfig, std::string tag, d
 	has_trace = true;
 }
 
-h8s2653_device::h8s2653_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8s2653_device::h8s2653_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8s2655_device(mconfig, H8S2653, "H8S/2653", tag, owner, clock, "h8s2653", __FILE__)
 {
 }
@@ -430,5 +430,5 @@ WRITE8_MEMBER(h8s2655_device::syscr_w)
 {
 	syscr = data;
 	update_irq_filter();
-	logerror("%s: syscr = %02x\n", tag().c_str(), data);
+	logerror("%s: syscr = %02x\n", tag(), data);
 }

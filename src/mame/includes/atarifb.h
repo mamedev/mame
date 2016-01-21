@@ -20,7 +20,7 @@
 class atarifb_state : public driver_device
 {
 public:
-	atarifb_state(const machine_config &mconfig, device_type type, std::string tag)
+	atarifb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_alphap1_videoram(*this, "p1_videoram"),
 		m_alphap2_videoram(*this, "p2_videoram"),

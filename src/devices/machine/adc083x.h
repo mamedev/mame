@@ -46,7 +46,7 @@ typedef device_delegate<double (UINT8 input)> adc083x_input_delegate;
 class adc083x_device : public device_t
 {
 public:
-	adc083x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	adc083x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
 	static void set_input_callback(device_t &device, adc083x_input_delegate input_callback) { downcast<adc083x_device &>(device).m_input_callback = input_callback; }
@@ -90,7 +90,7 @@ private:
 class adc0831_device : public adc083x_device
 {
 public:
-	adc0831_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type ADC0831;
@@ -99,7 +99,7 @@ extern const device_type ADC0831;
 class adc0832_device : public adc083x_device
 {
 public:
-	adc0832_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type ADC0832;
@@ -108,7 +108,7 @@ extern const device_type ADC0832;
 class adc0834_device : public adc083x_device
 {
 public:
-	adc0834_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type ADC0834;
@@ -117,7 +117,7 @@ extern const device_type ADC0834;
 class adc0838_device : public adc083x_device
 {
 public:
-	adc0838_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type ADC0838;

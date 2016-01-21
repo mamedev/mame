@@ -24,8 +24,8 @@ class a2eaux_ext80col_device:
 {
 public:
 	// construction/destruction
-	a2eaux_ext80col_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	a2eaux_ext80col_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	a2eaux_ext80col_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a2eaux_ext80col_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
 	virtual void device_start() override;

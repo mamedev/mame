@@ -144,7 +144,7 @@
 #define FRAC_MASK       (FRAC_ONE - 1)
 
 
-upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),
@@ -181,14 +181,14 @@ upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, 
 
 const device_type UPD7759 = &device_creator<upd7759_device>;
 
-upd7759_device::upd7759_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+upd7759_device::upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: upd775x_device(mconfig, UPD7759, "uPD7759", tag, owner, clock, "upd7759", __FILE__),
 		m_timer(nullptr)
 {
 }
 
 
-upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: upd775x_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_timer(nullptr)
 {
@@ -197,7 +197,7 @@ upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, 
 
 const device_type UPD7756 = &device_creator<upd7756_device>;
 
-upd7756_device::upd7756_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+upd7756_device::upd7756_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: upd775x_device(mconfig, UPD7756, "uPD7756", tag, owner, clock, "upd7756", __FILE__)
 {
 }

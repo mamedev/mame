@@ -48,7 +48,7 @@ Shisensho II                            1993  Rev 3.34 M81  Yes
 
 const device_type M72 = &device_creator<m72_audio_device>;
 
-m72_audio_device::m72_audio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, M72, "Irem M72 Audio Custom", tag, owner, clock, "m72_audio", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_irqvector(0),

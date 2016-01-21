@@ -448,7 +448,7 @@
 class bingor_state : public driver_device
 {
 public:
-	bingor_state(const machine_config &mconfig, device_type type, std::string tag)
+	bingor_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_blit_ram(*this, "blit_ram"),
 		m_maincpu(*this, "maincpu"),

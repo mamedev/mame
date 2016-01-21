@@ -16,7 +16,7 @@
 class pecom_state : public driver_device
 {
 public:
-	pecom_state(const machine_config &mconfig, device_type type, std::string tag)
+	pecom_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cdp1802(*this, CDP1802_TAG),
 		m_cdp1869(*this, CDP1869_TAG),

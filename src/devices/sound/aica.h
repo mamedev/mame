@@ -79,7 +79,7 @@ class aica_device : public device_t,
 									public device_sound_interface
 {
 public:
-	aica_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	aica_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void set_master(device_t &device) { downcast<aica_device &>(device).m_master = true; }
 	static void set_roffset(device_t &device, int roffset) { downcast<aica_device &>(device).m_roffset = roffset; }

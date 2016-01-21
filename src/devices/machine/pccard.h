@@ -24,7 +24,7 @@ class pccard_slot_device : public device_t,
 	public device_slot_interface
 {
 public:
-	pccard_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pccard_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ_LINE_MEMBER(read_line_inserted);
 	DECLARE_READ16_MEMBER(read_memory);

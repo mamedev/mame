@@ -70,7 +70,7 @@ class snes_ppu_device :  public device_t,
 {
 public:
 	// construction/destruction
-	snes_ppu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	snes_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
 	template<class _Object> static devcb_base &static_set_open_bus_callback(device_t &device, _Object object) { return downcast<snes_ppu_device &>(device).m_openbus_cb.set_callback(object); }

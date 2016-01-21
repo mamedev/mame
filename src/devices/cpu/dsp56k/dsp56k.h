@@ -202,7 +202,7 @@ struct dsp56k_core
 class dsp56k_device : public cpu_device
 {
 public:
-	dsp56k_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
+	dsp56k_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 
 	DECLARE_READ16_MEMBER( peripheral_register_r );
 	DECLARE_WRITE16_MEMBER( peripheral_register_w );

@@ -63,7 +63,7 @@
 class su2000_state : public pcat_base_state
 {
 public:
-	su2000_state(const machine_config &mconfig, device_type type, std::string tag)
+	su2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag){ }
 
 	std::unique_ptr<UINT32[]>      m_pc_ram;

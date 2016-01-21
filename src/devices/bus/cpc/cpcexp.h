@@ -117,7 +117,7 @@ class cpc_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cpc_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~cpc_expansion_slot_device();
 
 	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_irq_cb.set_callback(object); }

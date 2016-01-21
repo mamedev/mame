@@ -194,7 +194,7 @@ machine_config_constructor m2comm_device::device_mconfig_additions() const
 //  m2comm_device - constructor
 //-------------------------------------------------
 
-m2comm_device::m2comm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+m2comm_device::m2comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, M2COMM, "MODEL2 COMMUNICATION BD", tag, owner, clock, "m2comm", __FILE__),
 	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
 	m_line_tx(OPEN_FLAG_READ)

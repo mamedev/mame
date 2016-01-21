@@ -207,7 +207,7 @@ READ8_MEMBER(topspeed_state::input_bypass_r)
 CUSTOM_INPUT_MEMBER(topspeed_state::pedal_r)
 {
 	static const UINT8 retval[8] = { 0,1,3,2,6,7,5,4 };
-	std::string tag = (const char *)param;
+	const char *tag = (const char *)param;
 	return retval[read_safe(ioport(tag), 0) & 7];
 }
 

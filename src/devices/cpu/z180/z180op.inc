@@ -317,7 +317,7 @@ int z180_device::take_interrupt(int irq)
 		else
 			irq_vector = standard_irq_callback(0);
 
-		LOG(("Z180 '%s' single int. irq_vector $%02x\n", tag().c_str(), irq_vector));
+		LOG(("Z180 '%s' single int. irq_vector $%02x\n", tag(), irq_vector));
 
 		/* Interrupt mode 2. Call [m_I:databyte] */
 		if( m_IM == 2 )
@@ -325,7 +325,7 @@ int z180_device::take_interrupt(int irq)
 			irq_vector = (irq_vector & 0xff) + (m_I << 8);
 			PUSH( PC );
 			RM16(irq_vector, &m_PC );
-			LOG(("Z180 '%s' IM2 [$%04x] = $%04x\n", tag().c_str() , irq_vector, _PCD));
+			LOG(("Z180 '%s' IM2 [$%04x] = $%04x\n",tag() , irq_vector, _PCD));
 			/* CALL opcode timing */
 			cycles += m_cc[Z180_TABLE_op][0xcd];
 		}
@@ -333,7 +333,7 @@ int z180_device::take_interrupt(int irq)
 		/* Interrupt mode 1. RST 38h */
 		if( m_IM == 1 )
 		{
-			LOG(("Z180 '%s' IM1 $0038\n", tag().c_str() ));
+			LOG(("Z180 '%s' IM1 $0038\n",tag() ));
 			PUSH( PC );
 			_PCD = 0x0038;
 			/* RST $38 + 'interrupt latency' cycles */
@@ -344,7 +344,7 @@ int z180_device::take_interrupt(int irq)
 			/* Interrupt mode 0. We check for CALL and JP instructions, */
 			/* if neither of these were found we assume a 1 byte opcode */
 			/* was placed on the databus                                */
-			LOG(("Z180 '%s' IM0 $%04x\n", tag().c_str() , irq_vector));
+			LOG(("Z180 '%s' IM0 $%04x\n",tag() , irq_vector));
 			switch (irq_vector & 0xff0000)
 			{
 				case 0xcd0000:  /* call */
@@ -373,7 +373,7 @@ int z180_device::take_interrupt(int irq)
 		irq_vector = (m_I << 8) + (irq_vector & 0xff);
 		PUSH( PC );
 		RM16(irq_vector, &m_PC );
-		LOG(("Z180 '%s' INT%d [$%04x] = $%04x\n", tag().c_str(), irq, irq_vector, _PCD));
+		LOG(("Z180 '%s' INT%d [$%04x] = $%04x\n", tag(), irq, irq_vector, _PCD));
 		/* CALL opcode timing */
 		cycles += m_cc[Z180_TABLE_op][0xcd];
 	}

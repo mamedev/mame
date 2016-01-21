@@ -161,7 +161,7 @@ class screen_device : public device_t
 
 public:
 	// construction/destruction
-	screen_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~screen_device();
 
 	// configuration readers
@@ -191,7 +191,7 @@ public:
 	static void static_set_screen_update(device_t &device, screen_update_ind16_delegate callback);
 	static void static_set_screen_update(device_t &device, screen_update_rgb32_delegate callback);
 	static void static_set_screen_vblank(device_t &device, screen_vblank_delegate callback);
-	static void static_set_palette(device_t &device, std::string tag);
+	static void static_set_palette(device_t &device, const char *tag);
 	static void static_set_video_attributes(device_t &device, UINT32 flags);
 
 	// information getters

@@ -33,7 +33,7 @@ ADDRESS_MAP_END
 //  er2055_device - constructor
 //-------------------------------------------------
 
-er2055_device::er2055_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+er2055_device::er2055_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ER2055, "ER2055 EAROM", tag, owner, clock, "er2055", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
@@ -85,9 +85,9 @@ void er2055_device::nvram_default()
 	if (m_region != nullptr)
 	{
 		if (m_region->bytes() != SIZE_DATA)
-			fatalerror("er2055 region '%s' wrong size (expected size = 0x40)\n", tag().c_str());
+			fatalerror("er2055 region '%s' wrong size (expected size = 0x40)\n", tag());
 		if (m_region->bytewidth() != 1)
-			fatalerror("er2055 region '%s' needs to be an 8-bit region\n", tag().c_str());
+			fatalerror("er2055 region '%s' needs to be an 8-bit region\n", tag());
 
 		UINT8 *default_data = m_region->base();
 		for (int byte = 0; byte < SIZE_DATA; byte++)

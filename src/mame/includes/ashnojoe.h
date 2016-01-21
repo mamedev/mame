@@ -10,7 +10,7 @@
 class ashnojoe_state : public driver_device
 {
 public:
-	ashnojoe_state(const machine_config &mconfig, device_type type, std::string tag)
+	ashnojoe_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_tileram_3(*this, "tileram_3"),
 		m_tileram_4(*this, "tileram_4"),

@@ -22,7 +22,7 @@
 class tb303_state : public hh_ucom4_state
 {
 public:
-	tb303_state(const machine_config &mconfig, device_type type, std::string tag)
+	tb303_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_ucom4_state(mconfig, type, tag),
 		m_t3_off_timer(*this, "t3_off")
 	{ }

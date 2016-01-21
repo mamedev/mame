@@ -39,27 +39,27 @@ const device_type NES_SOROM_A = &device_creator<nes_sorom_a_device>;
 
 
 
-nes_sxrom_device::nes_sxrom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_sxrom_device::nes_sxrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_reg_write_enable(0), m_latch(0), m_count(0)
 				{
 }
 
-nes_sxrom_device::nes_sxrom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_sxrom_device::nes_sxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_SXROM, "NES Cart SxROM (MMC-1) PCB", tag, owner, clock, "nes_sxrom", __FILE__), m_reg_write_enable(0), m_latch(0), m_count(0)
 				{
 }
 
-nes_sorom_device::nes_sorom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_sorom_device::nes_sorom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_sxrom_device(mconfig, NES_SOROM, "NES Cart SOROM (MMC-1) PCB", tag, owner, clock, "nes_sorom", __FILE__)
 {
 }
 
-nes_sxrom_a_device::nes_sxrom_a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_sxrom_a_device::nes_sxrom_a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_sxrom_device(mconfig, NES_SXROM_A, "NES Cart SxROM (MMC-1A) PCB", tag, owner, clock, "nes_sxrom_a", __FILE__)
 {
 }
 
-nes_sorom_a_device::nes_sorom_a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_sorom_a_device::nes_sorom_a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_sxrom_device(mconfig, NES_SOROM_A, "NES Cart SOROM (MMC-1A) PCB", tag, owner, clock, "nes_sorom_a", __FILE__)
 {
 }

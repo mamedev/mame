@@ -12,7 +12,7 @@
 class wpc_shift_device : public device_t
 {
 public:
-	wpc_shift_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	wpc_shift_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~wpc_shift_device();
 
 	DECLARE_ADDRESS_MAP(registers, 8);

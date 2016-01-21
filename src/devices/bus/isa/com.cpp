@@ -95,13 +95,13 @@ machine_config_constructor isa8_com_device::device_mconfig_additions() const
 //  isa8_com_device - constructor
 //-------------------------------------------------
 
-isa8_com_device::isa8_com_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa8_com_device::isa8_com_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8_COM, "Communications Adapter PC/XT", tag, owner, clock, "isa_com", __FILE__),
 		device_isa8_card_interface(mconfig, *this)
 {
 }
 
-isa8_com_device::isa8_com_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+isa8_com_device::isa8_com_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this)
 {
@@ -188,7 +188,7 @@ machine_config_constructor isa8_com_at_device::device_mconfig_additions() const
 //  isa8_com_device - constructor
 //-------------------------------------------------
 
-isa8_com_at_device::isa8_com_at_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa8_com_at_device::isa8_com_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		isa8_com_device(mconfig, ISA8_COM_AT, "Communications Adapter", tag, owner, clock, "isa_com_at", __FILE__)
 {
 }

@@ -63,7 +63,7 @@ public:
 
 	virtual void setup_addon_ptr(UINT8 *ptr) {}
 
-	void rom_alloc(UINT32 size, std::string tag);
+	void rom_alloc(UINT32 size, const char *tag);
 	void ram_alloc(UINT32 size);
 	UINT8* get_rom_base() { return m_rom; }
 	UINT8*  get_ram_base() { return &m_ram[0]; }
@@ -86,7 +86,7 @@ class vcs_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	vcs_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	vcs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~vcs_cart_slot_device();
 
 	// device-level overrides

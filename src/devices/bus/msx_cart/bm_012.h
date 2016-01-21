@@ -15,7 +15,7 @@ class msx_cart_bm_012 : public device_t
 					, public msx_cart_interface
 {
 public:
-	msx_cart_bm_012(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	msx_cart_bm_012(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

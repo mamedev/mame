@@ -40,7 +40,7 @@
 class snes_console_state : public snes_state
 {
 public:
-	snes_console_state(const machine_config &mconfig, device_type type, std::string tag)
+	snes_console_state(const machine_config &mconfig, device_type type, const char *tag)
 			: snes_state(mconfig, type, tag)
 			, m_ctrl1(*this, "ctrl1")
 			, m_ctrl2(*this, "ctrl2")

@@ -145,7 +145,7 @@ void MainWindow::setProcessor(device_t* processor)
 
 	// Window title
 	std::string title;
-	strprintf(title,"Debug: %s - %s '%s'", m_machine->system().name, processor->name().c_str(), processor->tag().c_str());
+	strprintf(title,"Debug: %s - %s '%s'", m_machine->system().name, processor->name(), processor->tag());
 	setWindowTitle(title.c_str());
 }
 
@@ -476,10 +476,10 @@ void MainWindow::createImagesMenu()
 	for (device_image_interface *img = iter.first(); img != NULL; img = iter.next())
 	{
 		std::string menuName;
-		strprintf(menuName,"%s : %s", img->device().name().c_str(), img->exists() ? img->filename() : "[empty slot]");
+		strprintf(menuName,"%s : %s", img->device().name(), img->exists() ? img->filename() : "[empty slot]");
 
 		QMenu* interfaceMenu = imagesMenu->addMenu(menuName.c_str());
-		interfaceMenu->setObjectName(img->device().name().c_str());
+		interfaceMenu->setObjectName(img->device().name());
 
 		QAction* mountAct = new QAction("Mount...", interfaceMenu);
 		QAction* unmountAct = new QAction("Unmount", interfaceMenu);

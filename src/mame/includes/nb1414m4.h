@@ -4,7 +4,7 @@ class nb1414m4_device : public device_t,
 									public device_video_interface
 {
 public:
-	nb1414m4_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nb1414m4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~nb1414m4_device() {}
 
 	void exec(UINT16 mcu_cmd, UINT8 *vram, UINT16 &scrollx, UINT16 &scrolly, tilemap_t *tilemap);

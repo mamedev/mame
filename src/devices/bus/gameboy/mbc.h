@@ -13,7 +13,7 @@ class gb_rom_mbc_device : public device_t,
 {
 public:
 	// construction/destruction
-	gb_rom_mbc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	gb_rom_mbc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override { shared_start(); };
@@ -42,8 +42,8 @@ public:
 	};
 
 	// construction/destruction
-	gb_rom_mbc1_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	gb_rom_mbc1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gb_rom_mbc1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	gb_rom_mbc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override { shared_start(); save_item(NAME(m_mode)); };
@@ -65,7 +65,7 @@ class gb_rom_mbc2_device : public gb_rom_mbc_device
 {
 public:
 	// construction/destruction
-	gb_rom_mbc2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gb_rom_mbc2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override { shared_start(); };
@@ -83,7 +83,7 @@ class gb_rom_mbc3_device : public gb_rom_mbc_device
 {
 public:
 	// construction/destruction
-	gb_rom_mbc3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gb_rom_mbc3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -102,8 +102,8 @@ class gb_rom_mbc5_device : public gb_rom_mbc_device
 {
 public:
 	// construction/destruction
-	gb_rom_mbc5_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	gb_rom_mbc5_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gb_rom_mbc5_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	gb_rom_mbc5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override { shared_start(); };
@@ -121,7 +121,7 @@ class gb_rom_mbc6_device : public gb_rom_mbc_device
 {
 public:
 	// construction/destruction
-	gb_rom_mbc6_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gb_rom_mbc6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -141,7 +141,7 @@ class gb_rom_mbc7_device : public gb_rom_mbc_device
 {
 public:
 	// construction/destruction
-	gb_rom_mbc7_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gb_rom_mbc7_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override { shared_start(); };
@@ -160,7 +160,7 @@ class gb_rom_m161_device : public gb_rom_mbc_device
 public:
 
 	// construction/destruction
-	gb_rom_m161_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gb_rom_m161_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -179,7 +179,7 @@ class gb_rom_mmm01_device : public gb_rom_mbc_device
 {
 public:
 	// construction/destruction
-	gb_rom_mmm01_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gb_rom_mmm01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -203,8 +203,8 @@ public:
 	};
 
 	// construction/destruction
-	gb_rom_sachen_mmc1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	gb_rom_sachen_mmc1_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	gb_rom_sachen_mmc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gb_rom_sachen_mmc1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -231,7 +231,7 @@ public:
 	};
 
 	// construction/destruction
-	gb_rom_sachen_mmc2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gb_rom_sachen_mmc2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -248,7 +248,7 @@ class gb_rom_188in1_device : public gb_rom_mbc1_device
 {
 public:
 	// construction/destruction
-	gb_rom_188in1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gb_rom_188in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override { shared_start(); save_item(NAME(m_game_base)); };
@@ -267,7 +267,7 @@ class gb_rom_sintax_device : public gb_rom_mbc_device
 {
 public:
 	// construction/destruction
-	gb_rom_sintax_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gb_rom_sintax_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -290,7 +290,7 @@ class gb_rom_chongwu_device : public gb_rom_mbc5_device
 {
 public:
 	// construction/destruction
-	gb_rom_chongwu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gb_rom_chongwu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -306,7 +306,7 @@ class gb_rom_licheng_device : public gb_rom_mbc5_device
 {
 public:
 	// construction/destruction
-	gb_rom_licheng_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gb_rom_licheng_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 };
@@ -317,7 +317,7 @@ class gb_rom_digimon_device : public gb_rom_mbc5_device
 {
 public:
 	// construction/destruction
-	gb_rom_digimon_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gb_rom_digimon_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override { shared_start(); };
@@ -334,7 +334,7 @@ class gb_rom_rockman8_device : public gb_rom_mbc_device
 {
 public:
 	// construction/destruction
-	gb_rom_rockman8_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gb_rom_rockman8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override { shared_start(); };
@@ -353,7 +353,7 @@ class gb_rom_sm3sp_device : public gb_rom_mbc_device
 {
 public:
 	// construction/destruction
-	gb_rom_sm3sp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gb_rom_sm3sp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override { shared_start(); };

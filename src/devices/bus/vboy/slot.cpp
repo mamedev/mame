@@ -46,7 +46,7 @@ device_vboy_cart_interface::~device_vboy_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_vboy_cart_interface::rom_alloc(UINT32 size, std::string tag)
+void device_vboy_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -74,7 +74,7 @@ void device_vboy_cart_interface::eeprom_alloc(UINT32 size)
 //-------------------------------------------------
 //  vboy_cart_slot_device - constructor
 //-------------------------------------------------
-vboy_cart_slot_device::vboy_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+vboy_cart_slot_device::vboy_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, VBOY_CART_SLOT, "Nintendo Virtual Boy Cartridge Slot", tag, owner, clock, "vboy_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),

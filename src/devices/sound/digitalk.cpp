@@ -263,7 +263,7 @@ static const int pitch_vals[32] = {
 
 const device_type DIGITALKER = &device_creator<digitalker_device>;
 
-digitalker_device::digitalker_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+digitalker_device::digitalker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DIGITALKER, "Digitalker", tag, owner, clock, "digitalker", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_rom(nullptr),

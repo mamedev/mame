@@ -34,7 +34,7 @@ class pc_t1t_device :  public device_t,
 {
 public:
 	// construction/destruction
-	pc_t1t_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	pc_t1t_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	DECLARE_PALETTE_INIT( pcjr );
 
@@ -88,7 +88,7 @@ class pcvideo_t1000_device :  public pc_t1t_device
 {
 public:
 	// construction/destruction
-	pcvideo_t1000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( videoram_r );
@@ -116,7 +116,7 @@ class pcvideo_pcjr_device :  public pc_t1t_device
 {
 public:
 	// construction/destruction
-	pcvideo_pcjr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( pcjr_vsync_changed );

@@ -13,7 +13,7 @@
 
 const device_type MSM5232 = &device_creator<msm5232_device>;
 
-msm5232_device::msm5232_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+msm5232_device::msm5232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSM5232, "MSM5232", tag, owner, clock, "msm5232", __FILE__),
 		device_sound_interface(mconfig, *this), m_stream(nullptr), m_noise_cnt(0), m_noise_step(0), m_noise_rng(0), m_noise_clocks(0), m_UpdateStep(0), m_control1(0), m_control2(0), m_gate(0), m_chip_clock(0), m_rate(0),
 		m_gate_handler_cb(*this)

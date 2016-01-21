@@ -68,7 +68,7 @@ ToDo:
 class s7_state : public genpin_class
 {
 public:
-	s7_state(const machine_config &mconfig, device_type type, std::string tag)
+	s7_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")

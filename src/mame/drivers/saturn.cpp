@@ -444,7 +444,7 @@ test1f diagnostic hacks:
 class sat_console_state : public saturn_state
 {
 public:
-	sat_console_state(const machine_config &mconfig, device_type type, std::string tag)
+	sat_console_state(const machine_config &mconfig, device_type type, const char *tag)
 				: saturn_state(mconfig, type, tag)
 				, m_exp(*this, "exp")
 				, m_nvram(*this, "nvram")

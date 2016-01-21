@@ -32,7 +32,7 @@ class pcf8593_device :  public device_t,
 						public device_nvram_interface
 {
 public:
-	pcf8593_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pcf8593_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER(scl_w);
 	DECLARE_WRITE_LINE_MEMBER(sda_w);

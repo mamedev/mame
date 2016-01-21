@@ -346,7 +346,7 @@ ioport_constructor hardbox_device::device_input_ports() const
 //  hardbox_device - constructor
 //-------------------------------------------------
 
-hardbox_device::hardbox_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+hardbox_device::hardbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HARDBOX, "HardBox", tag, owner, clock, "hardbox", __FILE__),
 		device_ieee488_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),

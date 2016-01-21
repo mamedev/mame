@@ -67,7 +67,7 @@ struct wd17xx_state_t {
 class z80ne_state : public driver_device
 {
 public:
-	z80ne_state(const machine_config &mconfig, device_type type, std::string tag)
+	z80ne_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_vdg(*this, "mc6847"),
 		m_videoram(*this, "videoram"),

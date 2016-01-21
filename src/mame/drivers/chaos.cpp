@@ -38,7 +38,7 @@
 class chaos_state : public driver_device
 {
 public:
-	chaos_state(const machine_config &mconfig, device_type type, std::string tag)
+	chaos_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_terminal(*this, TERMINAL_TAG),
 		m_p_ram(*this, "p_ram") ,

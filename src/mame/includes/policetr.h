@@ -14,7 +14,7 @@ public:
 		TIMER_IRQ5_GEN
 	};
 
-	policetr_state(const machine_config &mconfig, device_type type, std::string tag)
+	policetr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_rambase(*this, "rambase"),
 		m_maincpu(*this, "maincpu"),

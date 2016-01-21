@@ -211,10 +211,10 @@ class mos6566_device :  public device_t,
 {
 public:
 	// construction/destruction
-	mos6566_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source);
-	mos6566_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mos6566_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
+	mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void static_set_cpu_tag(device_t &device, std::string tag) { downcast<mos6566_device &>(device).m_cpu.set_tag(tag); }
+	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<mos6566_device &>(device).m_cpu.set_tag(tag); }
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<mos6566_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_ba_wr_callback(device_t &device, _Object object) { return downcast<mos6566_device &>(device).m_write_ba.set_callback(object); }
 	template<class _Object> static devcb_base &set_aec_wr_callback(device_t &device, _Object object) { return downcast<mos6566_device &>(device).m_write_aec.set_callback(object); }
@@ -374,8 +374,8 @@ class mos6567_device :  public mos6566_device
 {
 public:
 	// construction/destruction
-	mos6567_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	mos6567_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source);
+	mos6567_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos6567_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 };
 
 
@@ -385,7 +385,7 @@ class mos8562_device :  public mos6567_device
 {
 public:
 	// construction/destruction
-	mos8562_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mos8562_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -395,7 +395,7 @@ class mos8564_device :  public mos6567_device
 {
 public:
 	// construction/destruction
-	mos8564_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mos8564_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device_execute_interface overrides
 	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks / 8); }
@@ -409,8 +409,8 @@ class mos6569_device :  public mos6566_device
 {
 public:
 	// construction/destruction
-	mos6569_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	mos6569_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source);
+	mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos6569_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void execute_run() override;
@@ -423,7 +423,7 @@ class mos8565_device :  public mos6569_device
 {
 public:
 	// construction/destruction
-	mos8565_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mos8565_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -433,7 +433,7 @@ class mos8566_device :  public mos6569_device
 {
 public:
 	// construction/destruction
-	mos8566_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mos8566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device_execute_interface overrides
 	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks / 8); }

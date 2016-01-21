@@ -16,8 +16,8 @@ void ym2610_update_request(void *param);
 class ym2610_device : public ay8910_device
 {
 public:
-	ym2610_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	ym2610_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ym2610_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ym2610_device &>(device).m_irq_handler.set_callback(object); }
@@ -54,7 +54,7 @@ extern const device_type YM2610;
 class ym2610b_device : public ym2610_device
 {
 public:
-	ym2610b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ym2610b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };

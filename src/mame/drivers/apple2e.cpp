@@ -192,7 +192,7 @@ Address bus A0-A11 is Y0-Y11
 class apple2e_state : public driver_device
 {
 public:
-	apple2e_state(const machine_config &mconfig, device_type type, std::string tag)
+	apple2e_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, A2_CPU_TAG),
 		m_ram(*this, RAM_TAG),

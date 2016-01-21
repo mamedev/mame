@@ -13,7 +13,7 @@
 class midzeus_state : public driver_device
 {
 public:
-	midzeus_state(const machine_config &mconfig, device_type type, std::string tag)
+	midzeus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_nvram(*this, "nvram"),
 			m_ram_base(*this, "ram_base"),
@@ -89,7 +89,7 @@ private:
 class midzeus2_state : public midzeus_state
 {
 public:
-	midzeus2_state(const machine_config &mconfig, device_type type, std::string tag)
+	midzeus2_state(const machine_config &mconfig, device_type type, const char *tag)
 				: midzeus_state(mconfig, type, tag) { }
 
 	DECLARE_VIDEO_START(midzeus2);

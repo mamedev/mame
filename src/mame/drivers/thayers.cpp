@@ -42,7 +42,7 @@ public:
 		TIMER_SSI263_PHONEME_TICK
 	};
 
-	thayers_state(const machine_config &mconfig, device_type type, std::string tag)
+	thayers_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_pr7820(*this, "laserdisc"),
 		m_ldv1000(*this, "ldv1000"),

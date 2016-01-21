@@ -77,7 +77,7 @@
 const device_type E01 = &device_creator<e01_device>;
 const device_type E01S = &device_creator<e01s_device>;
 
-e01s_device::e01s_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+e01s_device::e01s_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:e01_device(mconfig, E01S, "Acorn FileStore E01S", tag, owner, clock, "e01s", __FILE__) { m_variant = TYPE_E01S; }
 
 
@@ -372,7 +372,7 @@ inline void e01_device::hdc_irq_enable(int enabled)
 //  e01_device - constructor
 //-------------------------------------------------
 
-e01_device::e01_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+e01_device::e01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, E01, "Acorn FileStore E01", tag, owner, clock, "e01" , __FILE__),
 		device_econet_interface(mconfig, *this),
 		m_maincpu(*this, R65C102_TAG),
@@ -402,7 +402,7 @@ e01_device::e01_device(const machine_config &mconfig, std::string tag, device_t 
 }
 
 
-e01_device::e01_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+e01_device::e01_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_econet_interface(mconfig, *this),
 		m_maincpu(*this, R65C102_TAG),

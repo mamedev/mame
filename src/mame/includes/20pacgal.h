@@ -14,7 +14,7 @@
 class _20pacgal_state : public driver_device
 {
 public:
-	_20pacgal_state(const machine_config &mconfig, device_type type, std::string tag)
+	_20pacgal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_char_gfx_ram(*this, "char_gfx_ram"),
@@ -77,7 +77,7 @@ public:
 class _25pacman_state : public _20pacgal_state
 {
 public:
-	_25pacman_state(const machine_config &mconfig, device_type type, std::string tag)
+	_25pacman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: _20pacgal_state(mconfig, type, tag)
 	{ }
 

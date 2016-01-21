@@ -81,7 +81,7 @@ const device_type V60 = &device_creator<v60_device>;
 const device_type V70 = &device_creator<v70_device>;
 
 
-v60_device::v60_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+v60_device::v60_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, V60, "V60", tag, owner, clock, "v60", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 24, 0)
@@ -93,7 +93,7 @@ v60_device::v60_device(const machine_config &mconfig, std::string tag, device_t 
 }
 
 
-v60_device::v60_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+v60_device::v60_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 24, 0)
@@ -104,7 +104,7 @@ v60_device::v60_device(const machine_config &mconfig, device_type type, std::str
 	m_reg[45] = 0x00007000;
 }
 
-v70_device::v70_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+v70_device::v70_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: v60_device(mconfig, V70, "V70", tag, owner, clock, "v70", __FILE__)
 {
 }

@@ -152,7 +152,7 @@ WRITE8_MEMBER( ym3812_device::write_port_w ) { write(   space, 1, data); }
 
 const device_type YM3812 = &device_creator<ym3812_device>;
 
-ym3812_device::ym3812_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ym3812_device::ym3812_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YM3812, "YM3812", tag, owner, clock, "ym3812", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),

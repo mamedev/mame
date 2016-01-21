@@ -47,7 +47,7 @@
 
 const device_type R10696 = &device_creator<r10696_device>;
 
-r10696_device::r10696_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+r10696_device::r10696_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, R10696, "Rockwell 10696", tag, owner, clock, "r10696", __FILE__),
 		m_io_a(0), m_io_b(0), m_io_c(0),
 		m_iord(*this), m_iowr(*this)

@@ -31,7 +31,7 @@ ToDo:
 class micropin_state : public genpin_class
 {
 public:
-	micropin_state(const machine_config &mconfig, device_type type, std::string tag)
+	micropin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_v1cpu(*this, "v1cpu")
 		, m_v2cpu(*this, "v2cpu")
@@ -292,7 +292,7 @@ static MACHINE_CONFIG_START( micropin, micropin_state )
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 387)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

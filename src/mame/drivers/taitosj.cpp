@@ -2424,11 +2424,11 @@ ROM_START( elevator )
 	/* 10000-11fff space for banked ROMs (not used) */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "ea-ic70.bin",  0x0000, 0x1000, CRC(6d5f57cb) SHA1(abb916d675ee85032697d656121d4f525202cab3) )
-	ROM_LOAD( "ea-ic71.bin",  0x1000, 0x1000, CRC(f0a769a1) SHA1(9970fba3afeaaaa7fd217f0704fb9df9cf13cf65) )
+	ROM_LOAD( "ea-9.ic70",  0x0000, 0x1000, CRC(6d5f57cb) SHA1(abb916d675ee85032697d656121d4f525202cab3) )
+	ROM_LOAD( "ea-10.ic71",  0x1000, 0x1000, CRC(f0a769a1) SHA1(9970fba3afeaaaa7fd217f0704fb9df9cf13cf65) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )       /* 2k for the microcontroller */
-	ROM_LOAD( "ba3.11",       0x0000, 0x0800, CRC(9ce75afc) SHA1(4c8f5d926ae2bec8fcb70692125b9e1c863166c6) )
+	ROM_LOAD( "ba3.11.ic4",       0x0000, 0x0800, CRC(9ce75afc) SHA1(4c8f5d926ae2bec8fcb70692125b9e1c863166c6) ) // IC4 on the z80+security daughterboard; older 4-layer pcbs the mcu is at a different location on the maincpu board itself. The MCU itself has a strange custom from-factory silkscreen, rather than "MC68705P3S" it is labeled "15-00011-001 // DA68237"
 
 	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime */
 	ROM_LOAD( "ea-ic1.bin",   0x0000, 0x1000, CRC(bbbb3fba) SHA1(a8e3a0886ea5dc8e70aa280b4cef5fb26ca0e125) )
@@ -2458,8 +2458,8 @@ ROM_START( elevatorb )
 	ROM_LOAD( "ea52.bin",     0x11000, 0x1000, CRC(44b1314a) SHA1(e8980536f787fcb603943d4b2b3a64f475e51a16) ) /* protection crack, bank switched at 7000 */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "ea-ic70.bin",  0x0000, 0x1000, CRC(6d5f57cb) SHA1(abb916d675ee85032697d656121d4f525202cab3) )
-	ROM_LOAD( "ea-ic71.bin",  0x1000, 0x1000, CRC(f0a769a1) SHA1(9970fba3afeaaaa7fd217f0704fb9df9cf13cf65) )
+	ROM_LOAD( "ea-9.ic70",  0x0000, 0x1000, CRC(6d5f57cb) SHA1(abb916d675ee85032697d656121d4f525202cab3) )
+	ROM_LOAD( "ea-10.ic71",  0x1000, 0x1000, CRC(f0a769a1) SHA1(9970fba3afeaaaa7fd217f0704fb9df9cf13cf65) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime */
 	ROM_LOAD( "ea-ic1.bin",   0x0000, 0x1000, CRC(bbbb3fba) SHA1(a8e3a0886ea5dc8e70aa280b4cef5fb26ca0e125) )

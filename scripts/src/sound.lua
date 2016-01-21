@@ -925,6 +925,7 @@ if (SOUNDS["SP0250"]~=null) then
 end
 
 
+
 ---------------------------------------------------
 -- S14001A speech synthesizer
 --@src/devices/sound/s14001a.h,SOUNDS["S14001A"] = true
@@ -934,6 +935,20 @@ if (SOUNDS["S14001A"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/s14001a.cpp",
 		MAME_DIR .. "src/devices/sound/s14001a.h",
+	}
+end
+
+
+
+---------------------------------------------------
+-- S14001A_NEW speech synthesizer
+--@src/devices/sound/s14001a_new.h,SOUNDS["S14001A_NEW"] = true
+---------------------------------------------------
+
+if (SOUNDS["S14001A_NEW"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/s14001a_new.cpp",
+		MAME_DIR .. "src/devices/sound/s14001a_new.h",
 	}
 end
 

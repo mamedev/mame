@@ -28,7 +28,7 @@ void jvs_host::device_reset()
 	memset(recv_buffer, 0, sizeof(recv_buffer));
 }
 
-jvs_host::jvs_host(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+jvs_host::jvs_host(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source), send_size(0), recv_size(0), recv_is_encoded(false)
 {
 	first_device = nullptr;

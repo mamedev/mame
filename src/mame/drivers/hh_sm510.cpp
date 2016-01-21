@@ -19,7 +19,7 @@
 class hh_sm510_state : public driver_device
 {
 public:
-	hh_sm510_state(const machine_config &mconfig, device_type type, std::string tag)
+	hh_sm510_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN"),
@@ -159,7 +159,7 @@ READ8_MEMBER(hh_sm510_state::input_r)
 class ktopgun_state : public hh_sm510_state
 {
 public:
-	ktopgun_state(const machine_config &mconfig, device_type type, std::string tag)
+	ktopgun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_sm510_state(mconfig, type, tag)
 	{
 		m_inp_lines = 3;
@@ -232,7 +232,7 @@ MACHINE_CONFIG_END
 class ktmnt_state : public hh_sm510_state
 {
 public:
-	ktmnt_state(const machine_config &mconfig, device_type type, std::string tag)
+	ktmnt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_sm510_state(mconfig, type, tag)
 	{
 		m_inp_lines = 3;
@@ -305,7 +305,7 @@ MACHINE_CONFIG_END
 class gnwmndon_state : public hh_sm510_state
 {
 public:
-	gnwmndon_state(const machine_config &mconfig, device_type type, std::string tag)
+	gnwmndon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_sm510_state(mconfig, type, tag)
 	{
 		m_inp_lines = 2;

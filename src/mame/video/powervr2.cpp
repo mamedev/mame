@@ -912,13 +912,13 @@ WRITE32_MEMBER( powervr2_device::softreset_w )
 	COMBINE_DATA(&softreset);
 	if (softreset & 1) {
 #if DEBUG_PVRTA
-		logerror("%s: TA soft reset\n", tag().c_str());
+		logerror("%s: TA soft reset\n", tag());
 #endif
 		listtype_used=0;
 	}
 	if (softreset & 2) {
 #if DEBUG_PVRTA
-		logerror("%s: Core Pipeline soft reset\n", tag().c_str());
+		logerror("%s: Core Pipeline soft reset\n", tag());
 #endif
 		if (start_render_received == 1) {
 			for (auto & elem : grab)
@@ -929,7 +929,7 @@ WRITE32_MEMBER( powervr2_device::softreset_w )
 	}
 	if (softreset & 4) {
 #if DEBUG_PVRTA
-		logerror("%s: sdram I/F soft reset\n", tag().c_str());
+		logerror("%s: sdram I/F soft reset\n", tag());
 #endif
 	}
 }
@@ -939,7 +939,7 @@ WRITE32_MEMBER( powervr2_device::startrender_w )
 	dc_state *state = machine().driver_data<dc_state>();
 	g_profiler.start(PROFILER_USER1);
 #if DEBUG_PVRTA
-	logerror("%s: Start render, region=%08x, params=%08x\n", tag().c_str(), region_base, param_base);
+	logerror("%s: Start render, region=%08x, params=%08x\n", tag(), region_base, param_base);
 #endif
 
 	// select buffer to draw using param_base
@@ -1458,7 +1458,7 @@ READ32_MEMBER( powervr2_device::ta_yuv_tex_base_r )
 WRITE32_MEMBER( powervr2_device::ta_yuv_tex_base_w )
 {
 	COMBINE_DATA(&ta_yuv_tex_base);
-	logerror("%s: ta_yuv_tex_base = %08x\n", tag().c_str(), ta_yuv_tex_base);
+	logerror("%s: ta_yuv_tex_base = %08x\n", tag(), ta_yuv_tex_base);
 
 	ta_yuv_index = 0;
 	ta_yuv_x = 0;
@@ -1476,7 +1476,7 @@ WRITE32_MEMBER( powervr2_device::ta_yuv_tex_ctrl_w )
 	COMBINE_DATA(&ta_yuv_tex_ctrl);
 	ta_yuv_x_size = ((ta_yuv_tex_ctrl & 0x3f)+1)*16;
 	ta_yuv_y_size = (((ta_yuv_tex_ctrl>>8) & 0x3f)+1)*16;
-	logerror("%s: ta_yuv_tex_ctrl = %08x\n", tag().c_str(), ta_yuv_tex_ctrl);
+	logerror("%s: ta_yuv_tex_ctrl = %08x\n", tag(), ta_yuv_tex_ctrl);
 	if(ta_yuv_tex_ctrl & 0x01010000)
 		fatalerror("YUV with setting %08x",ta_yuv_tex_ctrl);
 }
@@ -3599,7 +3599,7 @@ void powervr2_device::pvr_dma_execute(address_space &space)
 	machine().scheduler().timer_set(state->m_maincpu->cycles_to_attotime(m_pvr_dma.size/4), timer_expired_delegate(FUNC(powervr2_device::pvr_dma_irq), this));
 }
 
-powervr2_device::powervr2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+powervr2_device::powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, POWERVR2, "PowerVR 2", tag, owner, clock, "powervr2", __FILE__),
 		device_video_interface(mconfig, *this),
 		irq_cb(*this),

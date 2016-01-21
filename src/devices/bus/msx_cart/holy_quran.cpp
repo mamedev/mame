@@ -7,7 +7,7 @@
 const device_type MSX_CART_HOLY_QURAN = &device_creator<msx_cart_holy_quran>;
 
 
-msx_cart_holy_quran::msx_cart_holy_quran(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+msx_cart_holy_quran::msx_cart_holy_quran(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_HOLY_QURAN, "MSX Cartridge - Holy Quran", tag, owner, clock, "msx_cart_holy_quran", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_decrypt(false)

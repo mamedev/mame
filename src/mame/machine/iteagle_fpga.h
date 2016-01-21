@@ -34,9 +34,9 @@ class iteagle_fpga_device : public pci_device,
 				public device_nvram_interface
 {
 public:
-	iteagle_fpga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	void set_init_info(int version, int seq_init) {m_version=version; m_seq_init=seq_init;}
-	void set_irq_info(std::string tag, const int irq_num) {m_cpu_tag = tag; m_irq_num = irq_num;}
+	void set_irq_info(const char *tag, const int irq_num) {m_cpu_tag = tag; m_irq_num = irq_num;}
 
 
 protected:
@@ -51,7 +51,7 @@ protected:
 
 private:
 	emu_timer *     m_timer;
-	std::string m_cpu_tag;
+	const char *m_cpu_tag;
 	cpu_device *m_cpu;
 	int m_irq_num;
 
@@ -90,7 +90,7 @@ private:
 
 class iteagle_eeprom_device : public pci_device {
 public:
-	iteagle_eeprom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
@@ -115,10 +115,10 @@ private:
 
 class iteagle_ide_device : public pci_device {
 public:
-	iteagle_ide_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	iteagle_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	void set_irq_info(std::string tag, const int irq_num);
+	void set_irq_info(const char *tag, const int irq_num);
 
 	required_device<bus_master_ide_controller_device> m_ide;
 	required_device<bus_master_ide_controller_device> m_ide2;
@@ -130,7 +130,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	std::string m_cpu_tag;
+	const char *m_cpu_tag;
 	cpu_device *m_cpu;
 	int m_irq_num;
 	int m_irq_status;

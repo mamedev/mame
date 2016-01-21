@@ -48,7 +48,7 @@ const rom_entry *miracle_hard_disk_t::device_rom_region() const
 //  miracle_hard_disk_t - constructor
 //-------------------------------------------------
 
-miracle_hard_disk_t::miracle_hard_disk_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+miracle_hard_disk_t::miracle_hard_disk_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MIRACLE_HARD_DISK, "Miracle Hard Disk", tag, owner, clock, "ql_mhd", __FILE__),
 	device_ql_rom_cartridge_card_interface(mconfig, *this)
 {

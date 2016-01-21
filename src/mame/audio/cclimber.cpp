@@ -43,7 +43,7 @@ const device_type CCLIMBER_AUDIO = &device_creator<cclimber_audio_device>;
 //  cclimber_audio_device: Constructor
 //-------------------------------------------------
 
-cclimber_audio_device::cclimber_audio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+cclimber_audio_device::cclimber_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CCLIMBER_AUDIO, "Crazy Climber Sound Board", tag, owner, clock, "cclimber_audio", __FILE__),
 	m_sample_buf(nullptr),
 	m_sample_num(0),

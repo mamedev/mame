@@ -439,7 +439,7 @@ Keyboard TX commands:
 class pc9801_state : public driver_device
 {
 public:
-	pc9801_state(const machine_config &mconfig, device_type type, std::string tag) :
+	pc9801_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dmac(*this, "i8237"),
@@ -3116,7 +3116,6 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 			m_tvram[(0x3fe0>>1)+i] = default_memsw_data[i];
 	}
 
-	m_beeper->set_frequency(2400);
 	m_beeper->set_state(0);
 
 	m_nmi_ff = 0;
@@ -3341,7 +3340,7 @@ static MACHINE_CONFIG_FRAGMENT( pc9801_common )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc9801)
 MACHINE_CONFIG_END

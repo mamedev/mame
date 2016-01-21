@@ -26,7 +26,7 @@ class asap_device : public cpu_device
 {
 public:
 	// construction/destruction
-	asap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	asap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// public interfaces
 

@@ -74,7 +74,7 @@ const device_type UPD3301 = &device_creator<upd3301_device>;
 //  upd3301_device - constructor
 //-------------------------------------------------
 
-upd3301_device::upd3301_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+upd3301_device::upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, UPD3301, "UPD3301", tag, owner, clock, "upd3301", __FILE__),
 	device_video_interface(mconfig, *this),
 	m_write_int(*this),
@@ -189,7 +189,7 @@ void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 	case TIMER_HRTC:
-		if (LOG) logerror("UPD3301 '%s' HRTC: %u\n", tag().c_str(), param);
+		if (LOG) logerror("UPD3301 '%s' HRTC: %u\n", tag(), param);
 
 		m_write_hrtc(param);
 		m_hrtc = param;
@@ -198,7 +198,7 @@ void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		break;
 
 	case TIMER_VRTC:
-		if (LOG) logerror("UPD3301 '%s' VRTC: %u\n", tag().c_str(), param);
+		if (LOG) logerror("UPD3301 '%s' VRTC: %u\n", tag(), param);
 
 		m_write_vrtc(param);
 		m_vrtc = param;
@@ -258,31 +258,31 @@ WRITE8_MEMBER( upd3301_device::write )
 			case 0:
 				m_dma_mode = BIT(data, 7);
 				m_h = (data & 0x7f) + 2;
-				if (LOG) logerror("UPD3301 '%s' DMA Mode: %s\n", tag().c_str(), m_dma_mode ? "character" : "burst");
-				if (LOG) logerror("UPD3301 '%s' H: %u\n", tag().c_str(), m_h);
+				if (LOG) logerror("UPD3301 '%s' DMA Mode: %s\n", tag(), m_dma_mode ? "character" : "burst");
+				if (LOG) logerror("UPD3301 '%s' H: %u\n", tag(), m_h);
 				break;
 
 			case 1:
 				m_b = ((data >> 6) + 1) * 16;
 				m_l = (data & 0x3f) + 1;
-				if (LOG) logerror("UPD3301 '%s' B: %u\n", tag().c_str(), m_b);
-				if (LOG) logerror("UPD3301 '%s' L: %u\n", tag().c_str(), m_l);
+				if (LOG) logerror("UPD3301 '%s' B: %u\n", tag(), m_b);
+				if (LOG) logerror("UPD3301 '%s' L: %u\n", tag(), m_l);
 				break;
 
 			case 2:
 				m_s = BIT(data, 7);
 				m_c = (data >> 4) & 0x03;
 				m_r = (data & 0x1f) + 1;
-				if (LOG) logerror("UPD3301 '%s' S: %u\n", tag().c_str(), m_s);
-				if (LOG) logerror("UPD3301 '%s' C: %u\n", tag().c_str(), m_c);
-				if (LOG) logerror("UPD3301 '%s' R: %u\n", tag().c_str(), m_r);
+				if (LOG) logerror("UPD3301 '%s' S: %u\n", tag(), m_s);
+				if (LOG) logerror("UPD3301 '%s' C: %u\n", tag(), m_c);
+				if (LOG) logerror("UPD3301 '%s' R: %u\n", tag(), m_r);
 				break;
 
 			case 3:
 				m_v = (data >> 5) + 1;
 				m_z = (data & 0x1f) + 2;
-				if (LOG) logerror("UPD3301 '%s' V: %u\n", tag().c_str(), m_v);
-				if (LOG) logerror("UPD3301 '%s' Z: %u\n", tag().c_str(), m_z);
+				if (LOG) logerror("UPD3301 '%s' V: %u\n", tag(), m_v);
+				if (LOG) logerror("UPD3301 '%s' Z: %u\n", tag(), m_z);
 				recompute_parameters();
 				break;
 
@@ -291,10 +291,10 @@ WRITE8_MEMBER( upd3301_device::write )
 				m_at0 = BIT(data, 6);
 				m_sc = BIT(data, 5);
 				m_attr = (data & 0x1f) + 1;
-				if (LOG) logerror("UPD3301 '%s' AT1: %u\n", tag().c_str(), m_at1);
-				if (LOG) logerror("UPD3301 '%s' AT0: %u\n", tag().c_str(), m_at0);
-				if (LOG) logerror("UPD3301 '%s' SC: %u\n", tag().c_str(), m_sc);
-				if (LOG) logerror("UPD3301 '%s' ATTR: %u\n", tag().c_str(), m_attr);
+				if (LOG) logerror("UPD3301 '%s' AT1: %u\n", tag(), m_at1);
+				if (LOG) logerror("UPD3301 '%s' AT0: %u\n", tag(), m_at0);
+				if (LOG) logerror("UPD3301 '%s' SC: %u\n", tag(), m_sc);
+				if (LOG) logerror("UPD3301 '%s' ATTR: %u\n", tag(), m_attr);
 
 				m_mode = MODE_NONE;
 				break;
@@ -308,12 +308,12 @@ WRITE8_MEMBER( upd3301_device::write )
 			{
 			case 0:
 				m_cx = data & 0x7f;
-				if (LOG) logerror("UPD3301 '%s' CX: %u\n", tag().c_str(), m_cx);
+				if (LOG) logerror("UPD3301 '%s' CX: %u\n", tag(), m_cx);
 				break;
 
 			case 1:
 				m_cy = data & 0x3f;
-				if (LOG) logerror("UPD3301 '%s' CY: %u\n", tag().c_str(), m_cy);
+				if (LOG) logerror("UPD3301 '%s' CY: %u\n", tag(), m_cy);
 
 				m_mode = MODE_NONE;
 				break;
@@ -323,7 +323,7 @@ WRITE8_MEMBER( upd3301_device::write )
 			break;
 
 		default:
-			if (LOG) logerror("UPD3301 '%s' Invalid Parameter Byte %02x!\n", tag().c_str(), data);
+			if (LOG) logerror("UPD3301 '%s' Invalid Parameter Byte %02x!\n", tag(), data);
 		}
 		break;
 
@@ -334,45 +334,45 @@ WRITE8_MEMBER( upd3301_device::write )
 		switch (data & 0xe0)
 		{
 		case COMMAND_RESET:
-			if (LOG) logerror("UPD3301 '%s' Reset\n", tag().c_str());
+			if (LOG) logerror("UPD3301 '%s' Reset\n", tag());
 			m_mode = MODE_RESET;
 			set_display(0);
 			set_interrupt(0);
 			break;
 
 		case COMMAND_START_DISPLAY:
-			if (LOG) logerror("UPD3301 '%s' Start Display\n", tag().c_str());
+			if (LOG) logerror("UPD3301 '%s' Start Display\n", tag());
 			set_display(1);
 			reset_counters();
 			break;
 
 		case COMMAND_SET_INTERRUPT_MASK:
-			if (LOG) logerror("UPD3301 '%s' Set Interrupt Mask\n", tag().c_str());
+			if (LOG) logerror("UPD3301 '%s' Set Interrupt Mask\n", tag());
 			m_me = BIT(data, 0);
 			m_mn = BIT(data, 1);
-			if (LOG) logerror("UPD3301 '%s' ME: %u\n", tag().c_str(), m_me);
-			if (LOG) logerror("UPD3301 '%s' MN: %u\n", tag().c_str(), m_mn);
+			if (LOG) logerror("UPD3301 '%s' ME: %u\n", tag(), m_me);
+			if (LOG) logerror("UPD3301 '%s' MN: %u\n", tag(), m_mn);
 			break;
 
 		case COMMAND_READ_LIGHT_PEN:
-			if (LOG) logerror("UPD3301 '%s' Read Light Pen\n", tag().c_str());
+			if (LOG) logerror("UPD3301 '%s' Read Light Pen\n", tag());
 			m_mode = MODE_READ_LIGHT_PEN;
 			break;
 
 		case COMMAND_LOAD_CURSOR_POSITION:
-			if (LOG) logerror("UPD3301 '%s' Load Cursor Position\n", tag().c_str());
+			if (LOG) logerror("UPD3301 '%s' Load Cursor Position\n", tag());
 			m_mode = MODE_LOAD_CURSOR_POSITION;
 			m_cm = BIT(data, 0);
-			if (LOG) logerror("UPD3301 '%s' CM: %u\n", tag().c_str(), m_cm);
+			if (LOG) logerror("UPD3301 '%s' CM: %u\n", tag(), m_cm);
 			break;
 
 		case COMMAND_RESET_INTERRUPT:
-			if (LOG) logerror("UPD3301 '%s' Reset Interrupt\n", tag().c_str());
+			if (LOG) logerror("UPD3301 '%s' Reset Interrupt\n", tag());
 			set_interrupt(0);
 			break;
 
 		case COMMAND_RESET_COUNTERS:
-			if (LOG) logerror("UPD3301 '%s' Reset Counters\n", tag().c_str());
+			if (LOG) logerror("UPD3301 '%s' Reset Counters\n", tag());
 			m_mode = MODE_RESET_COUNTERS;
 			reset_counters();
 			break;
@@ -525,7 +525,7 @@ UINT32 upd3301_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 void upd3301_device::set_interrupt(int state)
 {
-	if (LOG) logerror("UPD3301 '%s' Interrupt: %u\n", tag().c_str(), state);
+	if (LOG) logerror("UPD3301 '%s' Interrupt: %u\n", tag(), state);
 
 	m_write_int(state);
 
@@ -542,7 +542,7 @@ void upd3301_device::set_interrupt(int state)
 
 void upd3301_device::set_drq(int state)
 {
-	if (LOG) logerror("UPD3301 '%s' DRQ: %u\n", tag().c_str(), state);
+	if (LOG) logerror("UPD3301 '%s' DRQ: %u\n", tag(), state);
 
 	m_write_drq(state);
 }
@@ -624,8 +624,8 @@ void upd3301_device::recompute_parameters()
 
 	if (LOG)
 	{
-		if (LOG) logerror("UPD3301 '%s' Screen: %u x %u @ %f Hz\n", tag().c_str(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
-		if (LOG) logerror("UPD3301 '%s' Visible Area: (%u, %u) - (%u, %u)\n", tag().c_str(), visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+		if (LOG) logerror("UPD3301 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+		if (LOG) logerror("UPD3301 '%s' Visible Area: (%u, %u) - (%u, %u)\n", tag(), visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 	}
 
 	m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);

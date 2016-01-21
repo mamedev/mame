@@ -20,7 +20,7 @@
 class astrocde_mess_state : public astrocde_state
 {
 public:
-	astrocde_mess_state(const machine_config &mconfig, device_type type, std::string tag)
+	astrocde_mess_state(const machine_config &mconfig, device_type type, const char *tag)
 		: astrocde_state(mconfig, type, tag),
 		m_cart(*this, "cartslot"),
 		m_exp(*this, "exp")

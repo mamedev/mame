@@ -8,7 +8,7 @@
 
 #include "decocpu6.h"
 
-deco_cpu6_device::deco_cpu6_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+deco_cpu6_device::deco_cpu6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	m6502_device(mconfig, DECO_CPU6, "DECO CPU-6", tag, owner, clock, "decocpu6", __FILE__)
 {
 }

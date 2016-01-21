@@ -229,7 +229,7 @@ void K053936_set_offset(int chip, int xoffs, int yoffs)
 
 const device_type K053936 = &device_creator<k053936_device>;
 
-k053936_device::k053936_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+k053936_device::k053936_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053936, "K053936 Video Controller", tag, owner, clock, "k053936", __FILE__),
 	m_ctrl(nullptr),
 	m_linectrl(nullptr),

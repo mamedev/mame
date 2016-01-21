@@ -7,7 +7,7 @@
 const device_type MSX_CART_ARC = &device_creator<msx_cart_arc>;
 
 
-msx_cart_arc::msx_cart_arc(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+msx_cart_arc::msx_cart_arc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_ARC, "MSX Cartridge - Arc", tag, owner, clock, "msx_cart_arc", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_7f(0)

@@ -28,7 +28,7 @@ protected:
 	tms9928a_device *m_tms9928a;
 
 	/* Constructor */
-	ti_video_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	ti_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	virtual void device_start(void) override;
 	virtual void device_reset(void) override;
 	virtual DECLARE_READ8Z_MEMBER(readz) override { };
@@ -41,7 +41,7 @@ protected:
 class ti_std_video_device : public ti_video_device
 {
 public:
-	ti_std_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ti_std_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 
@@ -54,7 +54,7 @@ public:
 class ti_exp_video_device : public ti_video_device
 {
 public:
-	ti_exp_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ti_exp_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	void video_update_mouse(int delta_x, int delta_y, int buttons);
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
@@ -84,7 +84,7 @@ extern const device_type TISOUND_76496;
 class ti_sound_system_device : public bus8z_device
 {
 public:
-	ti_sound_system_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+	ti_sound_system_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source), m_sound_chip(nullptr),
 		m_console_ready(*this) { };
 
@@ -110,7 +110,7 @@ private:
 class ti_sound_sn94624_device : public ti_sound_system_device
 {
 public:
-	ti_sound_sn94624_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ti_sound_sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -122,7 +122,7 @@ protected:
 class ti_sound_sn76496_device : public ti_sound_system_device
 {
 public:
-	ti_sound_sn76496_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ti_sound_sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;

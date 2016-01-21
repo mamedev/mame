@@ -1714,7 +1714,7 @@ ADDRESS_MAP_END
 
 class puzzlet_io_device : public device_t {
 public:
-	puzzlet_io_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( clk_w );
@@ -1736,7 +1736,7 @@ private:
 const device_type PUZZLET_IO = &device_creator<puzzlet_io_device>;
 
 
-puzzlet_io_device::puzzlet_io_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+puzzlet_io_device::puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PUZZLET_IO, "Puzzlet Coin/Start I/O", tag, owner, clock, "puzzlet_io", __FILE__),
 		data_cb(*this),
 		port(*this, ":IN0")

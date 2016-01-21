@@ -7,7 +7,7 @@
 class raiden2_state : public driver_device
 {
 public:
-	raiden2_state(const machine_config &mconfig, device_type type, std::string tag)
+	raiden2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		/*
 		  back_data(*this, "back_data"),

@@ -23,7 +23,7 @@
 class kaneko16_state : public driver_device
 {
 public:
-	kaneko16_state(const machine_config &mconfig, device_type type, std::string tag)
+	kaneko16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -98,7 +98,7 @@ public:
 	template<class _BitmapClass>
 	void kaneko16_fill_bitmap(palette_device* palette, _BitmapClass &bitmap, const rectangle &cliprect);
 
-	void kaneko16_common_oki_bank_w(  const char *bankname, std::string tag, int bank, size_t fixedsize, size_t bankedsize );
+	void kaneko16_common_oki_bank_w(  const char *bankname, const char* tag, int bank, size_t fixedsize, size_t bankedsize );
 	void kaneko16_unscramble_tiles(const char *region);
 	void kaneko16_expand_sample_banks(const char *region);
 };
@@ -106,7 +106,7 @@ public:
 class kaneko16_gtmr_state : public kaneko16_state
 {
 public:
-	kaneko16_gtmr_state(const machine_config &mconfig, device_type type, std::string tag)
+	kaneko16_gtmr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: kaneko16_state(mconfig, type, tag)
 	{
 	}
@@ -130,7 +130,7 @@ public:
 class kaneko16_berlwall_state : public kaneko16_state
 {
 public:
-	kaneko16_berlwall_state(const machine_config &mconfig, device_type type, std::string tag)
+	kaneko16_berlwall_state(const machine_config &mconfig, device_type type, const char *tag)
 		: kaneko16_state(mconfig, type, tag),
 		m_bg15_select(*this, "bg15_select"),
 		m_bg15_scroll(*this, "bg15_scroll"),
@@ -170,7 +170,7 @@ public:
 class kaneko16_shogwarr_state : public kaneko16_state
 {
 public:
-	kaneko16_shogwarr_state(const machine_config &mconfig, device_type type, std::string tag)
+	kaneko16_shogwarr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: kaneko16_state(mconfig, type, tag),
 		m_calc3_prot(*this, "calc3_prot")
 	{

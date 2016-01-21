@@ -32,7 +32,7 @@
 class ticalc1x_state : public hh_tms1k_state
 {
 public:
-	ticalc1x_state(const machine_config &mconfig, device_type type, std::string tag)
+	ticalc1x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -70,7 +70,7 @@ void ticalc1x_state::machine_start()
 class tisr16_state : public ticalc1x_state
 {
 public:
-	tisr16_state(const machine_config &mconfig, device_type type, std::string tag)
+	tisr16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
@@ -302,7 +302,7 @@ MACHINE_CONFIG_END
 class ti1250_state : public ticalc1x_state
 {
 public:
-	ti1250_state(const machine_config &mconfig, device_type type, std::string tag)
+	ti1250_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
@@ -438,7 +438,7 @@ MACHINE_CONFIG_END
 class ti1000_state : public ticalc1x_state
 {
 public:
-	ti1000_state(const machine_config &mconfig, device_type type, std::string tag)
+	ti1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
@@ -535,7 +535,7 @@ MACHINE_CONFIG_END
 class wizatron_state : public ticalc1x_state
 {
 public:
-	wizatron_state(const machine_config &mconfig, device_type type, std::string tag)
+	wizatron_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
@@ -637,7 +637,7 @@ MACHINE_CONFIG_END
 class lilprof_state : public wizatron_state
 {
 public:
-	lilprof_state(const machine_config &mconfig, device_type type, std::string tag)
+	lilprof_state(const machine_config &mconfig, device_type type, const char *tag)
 		: wizatron_state(mconfig, type, tag)
 	{ }
 
@@ -711,7 +711,7 @@ MACHINE_CONFIG_END
 class lilprof78_state : public ticalc1x_state
 {
 public:
-	lilprof78_state(const machine_config &mconfig, device_type type, std::string tag)
+	lilprof78_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
@@ -821,7 +821,7 @@ MACHINE_CONFIG_END
 class dataman_state : public ticalc1x_state
 {
 public:
-	dataman_state(const machine_config &mconfig, device_type type, std::string tag)
+	dataman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
@@ -946,7 +946,7 @@ MACHINE_CONFIG_END
 class ti30_state : public ticalc1x_state
 {
 public:
-	ti30_state(const machine_config &mconfig, device_type type, std::string tag)
+	ti30_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 

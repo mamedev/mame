@@ -172,7 +172,7 @@ Added Multiple Coin Feature:
 class pipedrm_state : public fromance_state
 {
 public:
-	pipedrm_state(const machine_config &mconfig, device_type type, std::string tag)
+	pipedrm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: fromance_state(mconfig, type, tag)
 	{ }
 

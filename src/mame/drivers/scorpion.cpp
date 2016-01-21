@@ -14,7 +14,7 @@
 class scorpion_state : public spectrum_state
 {
 public:
-	scorpion_state(const machine_config &mconfig, device_type type, std::string tag)
+	scorpion_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_state(mconfig, type, tag)
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")

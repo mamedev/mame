@@ -32,7 +32,7 @@ public:
 		TIMER_GET_DEVICES
 	};
 
-	bebox_state(const machine_config &mconfig, device_type type, std::string tag)
+	bebox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_ppc1(*this, "ppc1"),
 			m_ppc2(*this, "ppc2"),

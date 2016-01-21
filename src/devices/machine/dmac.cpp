@@ -37,7 +37,7 @@ const device_type DMAC = &device_creator<dmac_device>;
 //  dmac_device - constructor
 //-------------------------------------------------
 
-dmac_device::dmac_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+dmac_device::dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, DMAC, "DMAC DMA Controller", tag, owner, clock, "dmac", __FILE__),
 	amiga_autoconfig(),
 	m_cfgout_handler(*this),
@@ -90,7 +90,7 @@ void dmac_device::device_reset()
 void dmac_device::autoconfig_base_address(offs_t address)
 {
 	if (VERBOSE)
-		logerror("%s('%s'): autoconfig_base_address received: 0x%06x\n", shortname().c_str(), basetag().c_str(), address);
+		logerror("%s('%s'): autoconfig_base_address received: 0x%06x\n", shortname(), basetag(), address);
 
 	if (!m_configured && m_ram_size > 0)
 	{
@@ -188,7 +188,7 @@ READ16_MEMBER( dmac_device::register_read )
 		check_interrupts();
 
 		if (VERBOSE)
-			logerror("%s('%s'): read istr %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
+			logerror("%s('%s'): read istr %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 		break;
 
@@ -196,7 +196,7 @@ READ16_MEMBER( dmac_device::register_read )
 		data = m_cntr;
 
 		if (VERBOSE)
-			logerror("%s('%s'): read cntr %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
+			logerror("%s('%s'): read cntr %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 		break;
 
@@ -213,27 +213,27 @@ READ16_MEMBER( dmac_device::register_read )
 		data = m_scsi_read_handler(offset);
 
 		if (VERBOSE)
-			logerror("%s('%s'): read scsi data @ %02x %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), offset, data, mem_mask);
+			logerror("%s('%s'): read scsi data @ %02x %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
 
 		break;
 
 	case 0x70:
 		if (VERBOSE)
-			logerror("%s('%s'): read dma start strobe %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
+			logerror("%s('%s'): read dma start strobe %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 		start_dma();
 		break;
 
 	case 0x71:
 		if (VERBOSE)
-			logerror("%s('%s'): read dma stop strobe %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
+			logerror("%s('%s'): read dma stop strobe %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 		stop_dma();
 		break;
 
 	case 0x72:
 		if (VERBOSE)
-			logerror("%s('%s'): read clear irq strobe %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
+			logerror("%s('%s'): read clear irq strobe %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 		// clear all interrupts
 		m_istr &= ~ISTR_INT_MASK;
@@ -242,14 +242,14 @@ READ16_MEMBER( dmac_device::register_read )
 
 	case 0x74:
 		if (VERBOSE)
-			logerror("%s('%s'): read flush fifo strobe %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
+			logerror("%s('%s'): read flush fifo strobe %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 		m_istr |= ISTR_FE_FLG;
 		break;
 
 	default:
 		if (VERBOSE)
-			logerror("%s('%s'): register_read %04x @ %02x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, offset, mem_mask);
+			logerror("%s('%s'): register_read %04x @ %02x [mask = %04x]\n", shortname(), basetag(), data, offset, mem_mask);
 	}
 
 	return data;
@@ -261,7 +261,7 @@ WRITE16_MEMBER( dmac_device::register_write )
 	{
 	case 0x21:
 		if (VERBOSE)
-			logerror("%s('%s'): write cntr %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
+			logerror("%s('%s'): write cntr %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 		m_cntr = data;
 		check_interrupts();
@@ -269,7 +269,7 @@ WRITE16_MEMBER( dmac_device::register_write )
 
 	case 0x40:
 		if (VERBOSE)
-			logerror("%s('%s'): write wtc hi %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
+			logerror("%s('%s'): write wtc hi %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 		m_wtc &= 0x0000ffff;
 		m_wtc |= ((UINT32) data) << 16;
@@ -277,7 +277,7 @@ WRITE16_MEMBER( dmac_device::register_write )
 
 	case 0x41:
 		if (VERBOSE)
-			logerror("%s('%s'): write wtc lo %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
+			logerror("%s('%s'): write wtc lo %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 		m_wtc &= 0xffff0000;
 		m_wtc |= data;
@@ -285,7 +285,7 @@ WRITE16_MEMBER( dmac_device::register_write )
 
 	case 0x42:
 		if (VERBOSE)
-			logerror("%s('%s'): write acr hi %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
+			logerror("%s('%s'): write acr hi %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 		m_acr &= 0x0000ffff;
 		m_acr |= ((UINT32) data) << 16;
@@ -293,7 +293,7 @@ WRITE16_MEMBER( dmac_device::register_write )
 
 	case 0x43:
 		if (VERBOSE)
-			logerror("%s('%s'): write acr lo %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
+			logerror("%s('%s'): write acr lo %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 		m_acr &= 0xffff0000;
 		m_acr |= data;
@@ -301,7 +301,7 @@ WRITE16_MEMBER( dmac_device::register_write )
 
 	case 0x47:
 		if (VERBOSE)
-			logerror("%s('%s'): write dawr %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
+			logerror("%s('%s'): write dawr %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 		break;
 
 	case 0x48:
@@ -315,28 +315,28 @@ WRITE16_MEMBER( dmac_device::register_write )
 	case 0x5e:
 	case 0x5f:
 		if (VERBOSE)
-			logerror("%s('%s'): write scsi data @ %02x %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), offset, data, mem_mask);
+			logerror("%s('%s'): write scsi data @ %02x %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
 
 		m_scsi_write_handler(offset, data, 0xff);
 		break;
 
 	case 0x70:
 		if (VERBOSE)
-			logerror("%s('%s'): write dma start strobe %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
+			logerror("%s('%s'): write dma start strobe %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 		start_dma();
 		break;
 
 	case 0x71:
 		if (VERBOSE)
-			logerror("%s('%s'): write dma stop strobe %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
+			logerror("%s('%s'): write dma stop strobe %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 		stop_dma();
 		break;
 
 	case 0x72:
 		if (VERBOSE)
-			logerror("%s('%s'): write clear irq strobe %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
+			logerror("%s('%s'): write clear irq strobe %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 		// clear all interrupts
 		m_istr &= ~ISTR_INT_MASK;
@@ -345,14 +345,14 @@ WRITE16_MEMBER( dmac_device::register_write )
 
 	case 0x74:
 		if (VERBOSE)
-			logerror("%s('%s'): write flush fifo strobe %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
+			logerror("%s('%s'): write flush fifo strobe %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 		m_istr |= ISTR_FE_FLG;
 		break;
 
 	default:
 		if (VERBOSE)
-			logerror("%s('%s'): write %04x @ %02x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, offset, mem_mask);
+			logerror("%s('%s'): write %04x @ %02x [mask = %04x]\n", shortname(), basetag(), data, offset, mem_mask);
 	}
 }
 
@@ -360,7 +360,7 @@ WRITE16_MEMBER( dmac_device::register_write )
 WRITE_LINE_MEMBER( dmac_device::configin_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): configin_w (%d)\n", shortname().c_str(), basetag().c_str(), state);
+		logerror("%s('%s'): configin_w (%d)\n", shortname(), basetag(), state);
 
 	if (state == 0 && !m_configured)
 	{
@@ -416,7 +416,7 @@ WRITE_LINE_MEMBER( dmac_device::configin_w )
 WRITE_LINE_MEMBER( dmac_device::ramsz_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): ramsz_w (%d)\n", shortname().c_str(), basetag().c_str(), state);
+		logerror("%s('%s'): ramsz_w (%d)\n", shortname(), basetag(), state);
 
 	switch (state)
 	{
@@ -431,7 +431,7 @@ WRITE_LINE_MEMBER( dmac_device::ramsz_w )
 WRITE_LINE_MEMBER( dmac_device::rst_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): rst_w (%d)\n", shortname().c_str(), basetag().c_str(), state);
+		logerror("%s('%s'): rst_w (%d)\n", shortname(), basetag(), state);
 
 	if (m_rst == 1 && state == 0)
 		device_reset();
@@ -443,7 +443,7 @@ WRITE_LINE_MEMBER( dmac_device::rst_w )
 WRITE_LINE_MEMBER( dmac_device::intx_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): intx_w (%d)\n", shortname().c_str(), basetag().c_str(), state);
+		logerror("%s('%s'): intx_w (%d)\n", shortname(), basetag(), state);
 
 	if (state)
 		m_istr |= ISTR_INTS;
@@ -457,7 +457,7 @@ WRITE_LINE_MEMBER( dmac_device::intx_w )
 WRITE_LINE_MEMBER( dmac_device::xdreq_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): xdreq_w (%d)\n", shortname().c_str(), basetag().c_str(), state);
+		logerror("%s('%s'): xdreq_w (%d)\n", shortname(), basetag(), state);
 
 	if (m_dma_active)
 	{

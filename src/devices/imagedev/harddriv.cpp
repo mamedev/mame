@@ -38,7 +38,7 @@ const device_type HARDDISK = &device_creator<harddisk_image_device>;
 //  harddisk_image_device - constructor
 //-------------------------------------------------
 
-harddisk_image_device::harddisk_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+harddisk_image_device::harddisk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HARDDISK, "Harddisk", tag, owner, clock, "harddisk_image", __FILE__),
 		device_image_interface(mconfig, *this),
 		m_chd(nullptr),
@@ -52,7 +52,7 @@ harddisk_image_device::harddisk_image_device(const machine_config &mconfig, std:
 //-------------------------------------------------
 //  harddisk_image_device - constructor for subclasses
 //-------------------------------------------------
-harddisk_image_device::harddisk_image_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+harddisk_image_device::harddisk_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_image_interface(mconfig, *this),
 		m_chd(nullptr),
@@ -99,7 +99,7 @@ void harddisk_image_device::device_start()
 	m_chd = nullptr;
 
 	// try to locate the CHD from a DISK_REGION
-	chd_file *handle = machine().rom_load().get_disk_handle(tag().c_str());
+	chd_file *handle = machine().rom_load().get_disk_handle(tag());
 	if (handle != nullptr)
 	{
 		m_hard_disk_handle = hard_disk_open(handle);

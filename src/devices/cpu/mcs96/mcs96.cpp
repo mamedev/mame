@@ -12,7 +12,7 @@
 #include "debugger.h"
 #include "mcs96.h"
 
-mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, int data_width, std::string shortname, std::string source) :
+mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int data_width, const char *shortname, const char *source) :
 	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	program_config("program", ENDIANNESS_LITTLE, data_width, 16), program(nullptr), direct(nullptr), icount(0), bcount(0), inst_state(0), cycles_scaling(0), pending_irq(0),
 	PC(0), PPC(0), PSW(0), OP1(0), OP2(0), OP3(0), OPI(0), TMP(0), irq_requested(false)
@@ -427,52 +427,52 @@ void mcs96_device::io_w8(UINT8 adr, UINT8 data)
 {
 	switch(adr) {
 	case 0x02:
-		logerror("%s: ad_command %02x (%04x)\n", tag().c_str(), data, PPC);
+		logerror("%s: ad_command %02x (%04x)\n", tag(), data, PPC);
 		break;
 	case 0x03:
-		logerror("%s: hsi_mode %02x (%04x)\n", tag().c_str(), data, PPC);
+		logerror("%s: hsi_mode %02x (%04x)\n", tag(), data, PPC);
 		break;
 	case 0x04:
-		logerror("%s: hso_time.l %02x (%04x)\n", tag().c_str(), data, PPC);
+		logerror("%s: hso_time.l %02x (%04x)\n", tag(), data, PPC);
 		break;
 	case 0x05:
-		logerror("%s: hso_time.h %02x (%04x)\n", tag().c_str(), data, PPC);
+		logerror("%s: hso_time.h %02x (%04x)\n", tag(), data, PPC);
 		break;
 	case 0x06:
-		logerror("%s: hso_command %02x (%04x)\n", tag().c_str(), data, PPC);
+		logerror("%s: hso_command %02x (%04x)\n", tag(), data, PPC);
 		break;
 	case 0x07:
-		logerror("%s: sbuf %02x (%04x)\n", tag().c_str(), data, PPC);
+		logerror("%s: sbuf %02x (%04x)\n", tag(), data, PPC);
 		break;
 	case 0x08:
 		PSW = (PSW & 0xff00) | data;
 		break;
 	case 0x09:
-		logerror("%s: int_pending %02x (%04x)\n", tag().c_str(), data, PPC);
+		logerror("%s: int_pending %02x (%04x)\n", tag(), data, PPC);
 		break;
 	case 0x0a:
-		logerror("%s: watchdog %02x (%04x)\n", tag().c_str(), data, PPC);
+		logerror("%s: watchdog %02x (%04x)\n", tag(), data, PPC);
 		break;
 	case 0x0e:
-		logerror("%s: baud rate %02x (%04x)\n", tag().c_str(), data, PPC);
+		logerror("%s: baud rate %02x (%04x)\n", tag(), data, PPC);
 		break;
 	case 0x0f:
-		logerror("%s: io port 1 %02x (%04x)\n", tag().c_str(), data, PPC);
+		logerror("%s: io port 1 %02x (%04x)\n", tag(), data, PPC);
 		break;
 	case 0x10:
-		logerror("%s: io port 2 %02x (%04x)\n", tag().c_str(), data, PPC);
+		logerror("%s: io port 2 %02x (%04x)\n", tag(), data, PPC);
 		break;
 	case 0x11:
-		logerror("%s: sp con %02x (%04x)\n", tag().c_str(), data, PPC);
+		logerror("%s: sp con %02x (%04x)\n", tag(), data, PPC);
 		break;
 	case 0x15:
-		logerror("%s: ioc0 %02x (%04x)\n", tag().c_str(), data, PPC);
+		logerror("%s: ioc0 %02x (%04x)\n", tag(), data, PPC);
 		break;
 	case 0x16:
-		logerror("%s: ioc1 %02x (%04x)\n", tag().c_str(), data, PPC);
+		logerror("%s: ioc1 %02x (%04x)\n", tag(), data, PPC);
 		break;
 	case 0x17:
-		logerror("%s: pwm control %02x (%04x)\n", tag().c_str(), data, PPC);
+		logerror("%s: pwm control %02x (%04x)\n", tag(), data, PPC);
 		break;
 	}
 	return;
@@ -484,7 +484,7 @@ void mcs96_device::io_w16(UINT8 adr, UINT16 data)
 	case 0:
 		break;
 	case 4:
-		logerror("%s: hso_time %04x (%04x)\n", tag().c_str(), data, PPC);
+		logerror("%s: hso_time %04x (%04x)\n", tag(), data, PPC);
 		break;
 	default:
 		io_w8(adr, data);
@@ -505,7 +505,7 @@ UINT8 mcs96_device::io_r8(UINT8 adr)
 		return PSW;
 	}
 	UINT8 data = 0x00;
-	logerror("%s: io_r8 %02x, %02x (%04x)\n", tag().c_str(), adr, data, PPC);
+	logerror("%s: io_r8 %02x, %02x (%04x)\n", tag(), adr, data, PPC);
 	return data;
 }
 
@@ -514,7 +514,7 @@ UINT16 mcs96_device::io_r16(UINT8 adr)
 	if(adr < 2)
 		return 0x0000;
 	UINT16 data = 0x0000;
-	logerror("%s: io_r16 %02x, %04x (%04x)\n", tag().c_str(), adr, data, PPC);
+	logerror("%s: io_r16 %02x, %04x (%04x)\n", tag(), adr, data, PPC);
 	return data;
 }
 

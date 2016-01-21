@@ -213,7 +213,7 @@ GFXDECODE_END
 
 const device_type GP9001_VDP = &device_creator<gp9001vdp_device>;
 
-gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GP9001_VDP, "GP9001 VDP", tag, owner, clock, "gp9001vdp", __FILE__),
 		device_gfx_interface(mconfig, *this, gfxinfo),
 		device_video_interface(mconfig, *this),

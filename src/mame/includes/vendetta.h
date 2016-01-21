@@ -20,7 +20,7 @@ public:
 		TIMER_Z80_NMI
 	};
 
-	vendetta_state(const machine_config &mconfig, device_type type, std::string tag)
+	vendetta_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),

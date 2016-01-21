@@ -89,7 +89,7 @@ PCB board that connects to 044 boards via J6 & J7
 class igt_gameking_state : public driver_device
 {
 public:
-	igt_gameking_state(const machine_config &mconfig, device_type type, std::string tag)
+	igt_gameking_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 	{ }
 

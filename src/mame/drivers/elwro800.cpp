@@ -35,7 +35,7 @@
 class elwro800_state : public spectrum_state
 {
 public:
-	elwro800_state(const machine_config &mconfig, device_type type, std::string tag)
+	elwro800_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_state(mconfig, type, tag),
 		m_i8251(*this, "i8251"),
 		m_i8255(*this, "ppi8255"),

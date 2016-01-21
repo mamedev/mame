@@ -70,7 +70,7 @@ class i960_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	i960_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i960_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// call from any read/write handler for a memory area that can't be bursted
 	// on the real hardware (e.g. Model 2's interrupt control registers)

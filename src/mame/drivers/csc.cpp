@@ -2,7 +2,7 @@
 // copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco
 /******************************************************************************
 
-WIP: plan to move to main fidelity chess driver^Z^Z^Z^Z - move magnet board sensor games to this driver
+WIP: plan to move to main fidelity chess driver
 
 
 
@@ -28,7 +28,7 @@ WIP: plan to move to main fidelity chess driver^Z^Z^Z^Z - move magnet board sens
 class csc_state : public driver_device
 {
 public:
-	csc_state(const machine_config &mconfig, device_type type, std::string tag)
+	csc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speech(*this, "speech")
@@ -343,17 +343,7 @@ ROM_START(csc)
 	ROM_LOAD("101-32107.bin", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d))
 ROM_END
 
-ROM_START( fexcelv )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-1080a01.ic5", 0x0000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) )
-
-	ROM_REGION( 0x8000, "speech", 0 )
-	ROM_LOAD("101-1081a01.ic2", 0x0000, 0x8000, CRC(c8ae1607) SHA1(6491ce6be60ed77f3dd931c0ca17616f13af943e) )
-ROM_END
-
 /* Driver */
 
 /*    YEAR  NAME          PARENT  COMPAT  MACHINE    INPUT       INIT      COMPANY  FULLNAME                     FLAGS */
 COMP( 1981, csc,     0,      0,      csc,  csc, driver_device,   0, "Fidelity Electronics", "Champion Chess Challenger (model CSC)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK)
-
-COMP( 1987, fexcelv,     0,      0,      csc,  csc, driver_device,   0, "Fidelity Electronics", "Voice Excellence (model 6092)", MACHINE_NOT_WORKING )

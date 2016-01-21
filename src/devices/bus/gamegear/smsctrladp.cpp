@@ -26,7 +26,7 @@ const device_type SMS_CTRL_ADAPTOR = &device_creator<sms_ctrl_adaptor_device>;
 //  sms_ctrl_adaptor_device - constructor
 //-------------------------------------------------
 
-sms_ctrl_adaptor_device::sms_ctrl_adaptor_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+sms_ctrl_adaptor_device::sms_ctrl_adaptor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SMS_CTRL_ADAPTOR, "SMS Controller Adaptor", tag, owner, clock, "sms_ctrl_adaptor", __FILE__),
 	device_gg_ext_port_interface(mconfig, *this),
 	m_subctrl_port(*this, "ctrl")

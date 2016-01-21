@@ -23,7 +23,7 @@ extern const device_type TI99_BWG;
 class snug_bwg_device : public ti_expansion_card_device
 {
 public:
-	snug_bwg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;

@@ -31,7 +31,7 @@ public:
 		TIMER_PERIODIC
 	};
 
-	boxer_state(const machine_config &mconfig, device_type type, std::string tag)
+	boxer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_tile_ram(*this, "tile_ram"),
 		m_sprite_ram(*this, "sprite_ram"),

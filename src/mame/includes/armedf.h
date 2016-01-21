@@ -6,7 +6,7 @@
 class armedf_state : public driver_device
 {
 public:
-	armedf_state(const machine_config &mconfig, device_type type, std::string tag)
+	armedf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_extra(*this, "extra"),
@@ -104,7 +104,7 @@ public:
 class bigfghtr_state : public armedf_state
 {
 public:
-	bigfghtr_state(const machine_config &mconfig, device_type type, std::string tag)
+	bigfghtr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: armedf_state(mconfig, type, tag),
 		m_sharedram(*this, "sharedram") { }
 

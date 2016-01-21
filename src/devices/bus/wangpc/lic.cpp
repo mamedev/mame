@@ -73,7 +73,7 @@ machine_config_constructor wangpc_lic_device::device_mconfig_additions() const
 //  wangpc_lic_device - constructor
 //-------------------------------------------------
 
-wangpc_lic_device::wangpc_lic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+wangpc_lic_device::wangpc_lic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, WANGPC_LIC, "Wang PC-PM070", tag, owner, clock, "wangpc_lic", __FILE__),
 	device_wangpcbus_card_interface(mconfig, *this)
 {

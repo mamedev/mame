@@ -25,24 +25,24 @@ const device_type VECTREX_ROM_64K = &device_creator<vectrex_rom64k_device>;
 const device_type VECTREX_ROM_SRAM = &device_creator<vectrex_sram_device>;
 
 
-vectrex_rom_device::vectrex_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+vectrex_rom_device::vectrex_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_vectrex_cart_interface(mconfig, *this)
 {
 }
 
-vectrex_rom_device::vectrex_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+vectrex_rom_device::vectrex_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, VECTREX_ROM_STD, "Vectrex Standard Carts", tag, owner, clock, "vectrex_rom", __FILE__),
 						device_vectrex_cart_interface(mconfig, *this)
 {
 }
 
-vectrex_rom64k_device::vectrex_rom64k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+vectrex_rom64k_device::vectrex_rom64k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: vectrex_rom_device(mconfig, VECTREX_ROM_64K, "Vectrex Carts w/ Bankswitch", tag, owner, clock, "vectrex_64k", __FILE__), m_bank(0)
 				{
 }
 
-vectrex_sram_device::vectrex_sram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+vectrex_sram_device::vectrex_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: vectrex_rom_device(mconfig, VECTREX_ROM_SRAM, "Vectrex Carts w/ SRAM", tag, owner, clock, "vectrex_sram", __FILE__)
 {
 }

@@ -114,7 +114,7 @@ class cdp1864_device :  public device_t,
 {
 public:
 	// construction/destruction
-	cdp1864_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cdp1864_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _inlace> void set_inlace_callback(_inlace inlace) { m_read_inlace.set_callback(inlace); }
 	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }

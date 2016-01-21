@@ -140,7 +140,7 @@
 class e100_state : public driver_device
 {
  public:
- e100_state(const machine_config &mconfig, device_type type, std::string tag)
+ e100_state(const machine_config &mconfig, device_type type, const char *tag)
 	 : driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pia1(*this, "pia1"),
@@ -157,7 +157,7 @@ protected:
 class md6802_state : public driver_device
 {
  public:
- md6802_state(const machine_config &mconfig, device_type type, std::string tag)
+ md6802_state(const machine_config &mconfig, device_type type, const char *tag)
 	 : driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pia1(*this, "pia1"),
@@ -179,7 +179,7 @@ protected:
 class mp68a_state : public driver_device
 {
  public:
- mp68a_state(const machine_config &mconfig, device_type type, std::string tag)
+ mp68a_state(const machine_config &mconfig, device_type type, const char *tag)
 	 : driver_device(mconfig, type, tag)
 	 	,m_maincpu(*this, "maincpu")
 		,m_io_line0(*this, "LINE0")

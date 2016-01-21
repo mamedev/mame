@@ -18,7 +18,7 @@
 
 const device_type TAITO_EN = &device_creator<taito_en_device>;
 
-taito_en_device::taito_en_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TAITO_EN, "Taito Ensoniq Sound System", tag, owner, clock, "taito_en", __FILE__),
 	m_audiocpu(*this, ":audiocpu"),
 	m_ensoniq(*this, ":ensoniq"),

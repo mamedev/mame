@@ -19,7 +19,7 @@ const device_type PRINTER = &device_creator<printer_image_device>;
 //  printer_image_device - constructor
 //-------------------------------------------------
 
-printer_image_device::printer_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+printer_image_device::printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PRINTER, "Printer", tag, owner, clock, "printer_image", __FILE__),
 	device_image_interface(mconfig, *this),
 	m_online_cb(*this)

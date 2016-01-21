@@ -13,7 +13,7 @@
 class naomi_m2_board : public naomi_board
 {
 public:
-	naomi_m2_board(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	UINT32 rom_cur_address;
 	static const int RAM_SIZE = 65536;
 	std::unique_ptr<UINT8[]> ram;

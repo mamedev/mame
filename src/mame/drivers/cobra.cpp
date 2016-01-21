@@ -491,7 +491,7 @@ private:
 class cobra_jvs : public jvs_device
 {
 public:
-	cobra_jvs(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual bool switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch) override;
@@ -500,7 +500,7 @@ protected:
 
 const device_type COBRA_JVS = &device_creator<cobra_jvs>;
 
-cobra_jvs::cobra_jvs(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+cobra_jvs::cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: jvs_device(mconfig, COBRA_JVS, "JVS (COBRA)", tag, owner, clock, "cobra_jvs", __FILE__)
 {
 }
@@ -548,7 +548,7 @@ bool cobra_jvs::coin_counters(UINT8 *&buf, UINT8 count)
 class cobra_jvs_host : public jvs_host
 {
 public:
-	cobra_jvs_host(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cobra_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	void write(UINT8, const UINT8 *&rec_data, UINT32 &rec_size);
 
 private:
@@ -558,7 +558,7 @@ private:
 
 const device_type COBRA_JVS_HOST = &device_creator<cobra_jvs_host>;
 
-cobra_jvs_host::cobra_jvs_host(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+cobra_jvs_host::cobra_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: jvs_host(mconfig, COBRA_JVS_HOST, "JVS-HOST (COBRA)", tag, owner, clock, "cobra_jvs_host", __FILE__)
 {
 	m_send_ptr = 0;
@@ -605,7 +605,7 @@ void cobra_jvs_host::write(UINT8 data, const UINT8 *&rec_data, UINT32 &rec_size)
 class cobra_state : public driver_device
 {
 public:
-	cobra_state(const machine_config &mconfig, device_type type, std::string tag)
+	cobra_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
@@ -1072,7 +1072,7 @@ void cobra_fifo::push(const device_t *cpu, UINT64 data)
 		if (cpu != nullptr)
 		{
 			// cpu has a name and a PC
-			sprintf(accessor_location, "(%s) %08X", cpu->tag().c_str(), const_cast<device_t *>(cpu)->safe_pc());
+			sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
 		}
 		else
 		{
@@ -1092,7 +1092,7 @@ void cobra_fifo::push(const device_t *cpu, UINT64 data)
 			if (cpu != nullptr)
 			{
 				// cpu has a name and a PC
-				sprintf(accessor_location, "(%s) %08X", cpu->tag().c_str(), const_cast<device_t *>(cpu)->safe_pc());
+				sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
 			}
 			else
 			{
@@ -1149,7 +1149,7 @@ bool cobra_fifo::pop(const device_t *cpu, UINT64 *result)
 			if (cpu != nullptr)
 			{
 				// cpu has a name and a PC
-				sprintf(accessor_location, "(%s) %08X", cpu->tag().c_str(), const_cast<device_t *>(cpu)->safe_pc());
+				sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
 			}
 			else
 			{
@@ -1170,7 +1170,7 @@ bool cobra_fifo::pop(const device_t *cpu, UINT64 *result)
 		if (cpu != nullptr)
 		{
 			// cpu has a name and a PC
-			sprintf(accessor_location, "(%s) %08X", cpu->tag().c_str(), const_cast<device_t *>(cpu)->safe_pc());
+			sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
 		}
 		else
 		{
@@ -3206,7 +3206,7 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, "", mpc106_pci_r, mpc106_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, mpc106_pci_r, mpc106_pci_w)
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(cobra_state, ide_interrupt))

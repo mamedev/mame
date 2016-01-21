@@ -76,7 +76,7 @@ TODO:
 class caswin_state : public driver_device
 {
 public:
-	caswin_state(const machine_config &mconfig, device_type type, std::string tag)
+	caswin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_sc0_vram(*this, "sc0_vram"),
 		m_sc0_attr(*this, "sc0_attr"),

@@ -52,8 +52,8 @@ class upd1990a_device : public device_t,
 {
 public:
 	// construction/destruction
-	upd1990a_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source);
-	upd1990a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	upd1990a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
+	upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _data> void set_data_callback(_data data) { m_write_data.set_callback(data); }
 	template<class _tp> void set_tp_callback(_tp tp) { m_write_tp.set_callback(tp); }
@@ -148,7 +148,7 @@ private:
 class upd4990a_device : public upd1990a_device
 {
 public:
-	upd4990a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

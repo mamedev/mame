@@ -36,7 +36,7 @@ const device_type SEGA_YBOARD_SPRITES = &device_creator<sega_yboard_sprite_devic
 //  sega_16bit_sprite_device -- core constructor
 //-------------------------------------------------
 
-sega_16bit_sprite_device::sega_16bit_sprite_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source)
+sega_16bit_sprite_device::sega_16bit_sprite_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, const char *shortname, const char *source)
 	: sprite16_device_ind16(mconfig, type, name, tag, owner, shortname, source),
 		m_flip(false)
 {
@@ -94,7 +94,7 @@ WRITE16_MEMBER( sega_16bit_sprite_device::draw_write )
 //  sega_hangon_sprite_device -- constructor
 //-------------------------------------------------
 
-sega_hangon_sprite_device::sega_hangon_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_hangon_sprite_device::sega_hangon_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_HANGON_SPRITES, "Sega Custom Sprites (Hang On)", tag, owner, "sega_hangon_sprite", __FILE__)
 {
 	set_local_origin(189, -1);
@@ -270,7 +270,7 @@ void sega_hangon_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 //  sega_sharrier_sprite_device -- constructor
 //-------------------------------------------------
 
-sega_sharrier_sprite_device::sega_sharrier_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_sharrier_sprite_device::sega_sharrier_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_SHARRIER_SPRITES, "Sega Custom Sprites (Space Harrier)", tag, owner, "sega_sharrier_sprite", __FILE__)
 {
 	set_local_origin(189, -1);
@@ -457,7 +457,7 @@ void sega_sharrier_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 //  sega_sys16a_sprite_device -- constructor
 //-------------------------------------------------
 
-sega_sys16a_sprite_device::sega_sys16a_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_sys16a_sprite_device::sega_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_SYS16A_SPRITES, "Sega System 16A Sprites", tag, owner, "sega_sys16a_sprite", __FILE__)
 {
 	set_local_origin(189, -1, -189, -1);
@@ -636,7 +636,7 @@ void sega_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 //  bootleg_sys16a_sprite_device -- constructor
 //-------------------------------------------------
 
-bootleg_sys16a_sprite_device::bootleg_sys16a_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+bootleg_sys16a_sprite_device::bootleg_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, BOOTLEG_SYS16A_SPRITES, "Sega System 16A Sprites (Bootleg)", tag, owner, "bootleg_sys16a_sprite", __FILE__)
 {
 	m_addrmap[0] = 0;
@@ -824,7 +824,7 @@ void bootleg_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &c
 //  sega_sys16b_sprite_device -- constructor
 //-------------------------------------------------
 
-sega_sys16b_sprite_device::sega_sys16b_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_sys16b_sprite_device::sega_sys16b_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_SYS16B_SPRITES, "Sega System 16B Sprites", tag, owner, "sega_16bit_sprite", __FILE__)
 {
 	set_local_origin(184, 0x00, -184, 0);
@@ -1019,14 +1019,14 @@ void sega_sys16b_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 //  sega_outrun_sprite_device -- constructor
 //-------------------------------------------------
 
-sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_OUTRUN_SPRITES, "Sega Custom Sprites (Out Run)", tag, owner, "sega_outrun_sprite", __FILE__),
 		m_is_xboard(false)
 {
 	set_local_origin(189, 0x00);
 }
 
-sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock, bool xboard_variant, std::string shortname, std::string source)
+sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, bool xboard_variant, const char *shortname, const char *source)
 	: sega_16bit_sprite_device(mconfig, SEGA_XBOARD_SPRITES, "Sega X-Board Sprites", tag, owner, shortname, source),
 		m_is_xboard(true)
 {
@@ -1038,7 +1038,7 @@ sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconf
 //  sega_xboard_sprite_device -- constructor
 //-------------------------------------------------
 
-sega_xboard_sprite_device::sega_xboard_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_xboard_sprite_device::sega_xboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_outrun_sprite_device(mconfig, tag, owner, clock, true, "sega_xboard_sprite", __FILE__)
 {
 }
@@ -1232,7 +1232,7 @@ void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 //  sega_yboard_sprite_device -- constructor
 //-------------------------------------------------
 
-sega_yboard_sprite_device::sega_yboard_sprite_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_yboard_sprite_device::sega_yboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_YBOARD_SPRITES, "Sega Y-Board Sprites", tag, owner, "sega_yboard_sprite", __FILE__)
 {
 	set_local_origin(0x600, 0x600);

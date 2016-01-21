@@ -41,7 +41,7 @@ the sound board should be fully discrete.
 class seabattl_state : public driver_device
 {
 public:
-	seabattl_state(const machine_config &mconfig, device_type type, std::string tag)
+	seabattl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),

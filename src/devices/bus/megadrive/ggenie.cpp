@@ -32,7 +32,7 @@
 const device_type MD_ROM_GAMEGENIE = &device_creator<md_rom_ggenie_device>;
 
 
-md_rom_ggenie_device::md_rom_ggenie_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+md_rom_ggenie_device::md_rom_ggenie_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, MD_ROM_GAMEGENIE, "MD Game Genie", tag, owner, clock, "md_ggenie", __FILE__),
 						device_md_cart_interface( mconfig, *this ),
 						m_exp(*this, "subslot"), m_gg_bypass(0), m_reg_enable(0)

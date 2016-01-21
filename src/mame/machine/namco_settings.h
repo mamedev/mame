@@ -11,7 +11,7 @@
 
 class namco_settings_device : public device_t {
 public:
-	namco_settings_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	namco_settings_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( clk_w );

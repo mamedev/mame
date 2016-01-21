@@ -121,7 +121,7 @@ control registers
 
 const device_type K007121 = &device_creator<k007121_device>;
 
-k007121_device::k007121_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+k007121_device::k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K007121, "K007121 Sprite/Tilemap Controller", tag, owner, clock, "k007121", __FILE__),
 	m_flipscreen(0),
 	m_palette(*this)
@@ -364,7 +364,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 //  palette device
 //-------------------------------------------------
 
-void k007121_device::static_set_palette_tag(device_t &device, std::string tag)
+void k007121_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<k007121_device &>(device).m_palette.set_tag(tag);
 }

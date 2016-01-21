@@ -87,7 +87,7 @@
 class nyny_state : public driver_device
 {
 public:
-	nyny_state(const machine_config &mconfig, device_type type, std::string tag)
+	nyny_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram1(*this, "videoram1"),
 		m_colorram1(*this, "colorram1"),

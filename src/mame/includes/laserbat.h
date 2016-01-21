@@ -19,7 +19,7 @@ class laserbat_state_base : public driver_device
 {
 public:
 
-	laserbat_state_base(const machine_config &mconfig, device_type type, std::string tag)
+	laserbat_state_base(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_row0(*this, "ROW0")
 		, m_row1(*this, "ROW1")
@@ -153,7 +153,7 @@ protected:
 class laserbat_state : public laserbat_state_base
 {
 public:
-	laserbat_state(const machine_config &mconfig, device_type type, std::string tag)
+	laserbat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: laserbat_state_base(mconfig, type, tag)
 		, m_csg(*this, "csg")
 		, m_synth_low(*this, "synth_low")
@@ -183,7 +183,7 @@ protected:
 class catnmous_state : public laserbat_state_base
 {
 public:
-	catnmous_state(const machine_config &mconfig, device_type type, std::string tag)
+	catnmous_state(const machine_config &mconfig, device_type type, const char *tag)
 		: laserbat_state_base(mconfig, type, tag)
 		, m_audiocpu(*this, "audiocpu")
 		, m_pia(*this, "pia")

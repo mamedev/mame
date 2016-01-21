@@ -104,7 +104,7 @@ static const int mb87078_gain_percent[66] = {
 
 const device_type MB87078 = &device_creator<mb87078_device>;
 
-mb87078_device::mb87078_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mb87078_device::mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MB87078, "MB87078 Volume Controller", tag, owner, clock, "mb87078", __FILE__),
 	m_channel_latch(0),
 	m_reset_comp(0),

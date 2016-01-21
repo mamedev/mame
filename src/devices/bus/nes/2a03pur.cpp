@@ -34,7 +34,7 @@
 const device_type NES_2A03PURITANS = &device_creator<nes_2a03pur_device>;
 
 
-nes_2a03pur_device::nes_2a03pur_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_2a03pur_device::nes_2a03pur_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_2A03PURITANS, "NES Cart 2A03 Puritans Album PCB", tag, owner, clock, "nes_2a03pur", __FILE__)
 {
 }

@@ -39,7 +39,7 @@ class i8089_channel : public device_t
 {
 public:
 	// construction/destruction
-	i8089_channel(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8089_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _sintr> void set_sintr_callback(_sintr sintr) { m_write_sintr.set_callback(sintr); }
 

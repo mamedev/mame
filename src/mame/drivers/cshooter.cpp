@@ -93,7 +93,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 class cshooter_state : public driver_device
 {
 public:
-	cshooter_state(const machine_config &mconfig, device_type type, std::string tag)
+	cshooter_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_seibu_sound(*this, "seibu_sound"),

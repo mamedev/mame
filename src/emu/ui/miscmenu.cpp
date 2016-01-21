@@ -81,7 +81,7 @@ void ui_menu_bios_selection::populate()
 					val = ROM_GETHASHDATA(rom);
 				}
 			}
-			item_append(device->tag()==":" ? "driver" : device->tag().substr(1).c_str(), val, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)device);
+			item_append(strcmp(device->tag(),":")==0 ? "driver" : device->tag()+1, val, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)device);
 		}
 	}
 
@@ -118,15 +118,15 @@ void ui_menu_bios_selection::handle()
 			if (val<1) val=cnt;
 			if (val>cnt) val=1;
 			dev->set_system_bios(val);
-			if (dev->tag()!=":") {
+			if (strcmp(dev->tag(),":")==0) {
 				std::string error;
 				machine().options().set_value("bios", val-1, OPTION_PRIORITY_CMDLINE, error);
 				assert(error.empty());
 			} else {
 				std::string error;
-				std::string value = machine().options().main_value(dev->owner()->tag().substr(1).c_str());
+				std::string value = machine().options().main_value(dev->owner()->tag()+1);
 				strcatprintf(value,",bios=%d",val-1);
-				machine().options().set_value(dev->owner()->tag().substr(1).c_str(), value.c_str(), OPTION_PRIORITY_CMDLINE, error);
+				machine().options().set_value(dev->owner()->tag()+1, value.c_str(), OPTION_PRIORITY_CMDLINE, error);
 				assert(error.empty());
 			}
 			reset(UI_MENU_RESET_REMEMBER_REF);
@@ -166,7 +166,7 @@ void ui_menu_network_devices::populate()
 			entry = entry->m_next;
 		}
 
-		item_append(network->device().tag().c_str(),  (title) ? title : "------", MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)network);
+		item_append(network->device().tag(),  (title) ? title : "------", MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)network);
 	}
 }
 

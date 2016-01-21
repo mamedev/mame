@@ -68,14 +68,14 @@ machine_config_constructor a2bus_mcms1_device::device_mconfig_additions() const
 //  LIVE DEVICE - Card 1
 //**************************************************************************
 
-a2bus_mcms1_device::a2bus_mcms1_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+a2bus_mcms1_device::a2bus_mcms1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_mcms(*this, ENGINE_TAG)
 {
 }
 
-a2bus_mcms1_device::a2bus_mcms1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+a2bus_mcms1_device::a2bus_mcms1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, A2BUS_MCMS1, "Mountain Computer Music System (card 1)", tag, owner, clock, "a2mcms1", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_mcms(*this, ENGINE_TAG)
@@ -149,13 +149,13 @@ WRITE_LINE_MEMBER(a2bus_mcms1_device::irq_w)
 //  LIVE DEVICE - Card 2
 //**************************************************************************
 
-a2bus_mcms2_device::a2bus_mcms2_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+a2bus_mcms2_device::a2bus_mcms2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this), m_card1(nullptr), m_engine(nullptr)
 {
 }
 
-a2bus_mcms2_device::a2bus_mcms2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+a2bus_mcms2_device::a2bus_mcms2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, A2BUS_MCMS2, "Mountain Computer Music System (card 2)", tag, owner, clock, "a2mcms2", __FILE__),
 	device_a2bus_card_interface(mconfig, *this), m_card1(nullptr), m_engine(nullptr)
 {
@@ -212,7 +212,7 @@ void a2bus_mcms2_device::write_cnxx(address_space &space, UINT8 offset, UINT8 da
     Sound device implementation
 */
 
-mcms_device::mcms_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mcms_device::mcms_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MCMS, "Mountain Computer Music System engine", tag, owner, clock, "msmseng", __FILE__),
 	device_sound_interface(mconfig, *this),
 	m_write_irq(*this), m_stream(nullptr), m_timer(nullptr), m_clrtimer(nullptr), m_pBusDevice(nullptr), m_enabled(false), m_mastervol(0), m_rand(0)

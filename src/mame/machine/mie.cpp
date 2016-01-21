@@ -87,12 +87,12 @@ machine_config_constructor mie_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME(mie);
 }
 
-mie_jvs_device::mie_jvs_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mie_jvs_device::mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: jvs_host(mconfig, MIE_JVS, "JVS (MIE)", tag, owner, clock, "mie_jvs", __FILE__)
 {
 }
 
-mie_device::mie_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mie_device::mie_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: maple_device(mconfig, MIE, "Sega 315-6146 MIE", tag, owner, clock, "mie", __FILE__)
 {
 	memset(gpio_name, 0, sizeof(gpio_name));

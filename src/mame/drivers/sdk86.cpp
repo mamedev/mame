@@ -40,7 +40,7 @@ ToDo:
 class sdk86_state : public driver_device
 {
 public:
-	sdk86_state(const machine_config &mconfig, device_type type, std::string tag) :
+	sdk86_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_usart(*this, I8251_TAG)

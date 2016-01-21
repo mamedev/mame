@@ -863,7 +863,7 @@ void k1ge_device::device_reset()
 
 const device_type K1GE = &device_creator<k1ge_device>;
 
-k1ge_device::k1ge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+k1ge_device::k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K1GE, "K1GE Monochrome Graphics + LCD", tag, owner, clock, "k1ge", __FILE__)
 	, device_video_interface(mconfig, *this)
 	, m_vblank_pin_w(*this)
@@ -871,7 +871,7 @@ k1ge_device::k1ge_device(const machine_config &mconfig, std::string tag, device_
 {
 }
 
-k1ge_device::k1ge_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+k1ge_device::k1ge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_video_interface(mconfig, *this)
 	, m_vblank_pin_w(*this)
@@ -897,7 +897,7 @@ machine_config_constructor k1ge_device::device_mconfig_additions() const
 
 const device_type K2GE = &device_creator<k2ge_device>;
 
-k2ge_device::k2ge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+k2ge_device::k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: k1ge_device(mconfig, K2GE, "K2GE Color Graphics + LCD", tag, owner, clock, "k2ge", __FILE__)
 {
 }

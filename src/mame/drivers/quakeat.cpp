@@ -68,7 +68,7 @@ TODO:
 class quakeat_state : public pcat_base_state
 {
 public:
-	quakeat_state(const machine_config &mconfig, device_type type, std::string tag)
+	quakeat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag)
 		{ }
 

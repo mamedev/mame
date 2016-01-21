@@ -26,7 +26,7 @@ class nes_zapper_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_zapper_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nes_zapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 

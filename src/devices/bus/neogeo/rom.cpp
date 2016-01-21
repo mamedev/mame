@@ -18,14 +18,14 @@
 const device_type NEOGEO_ROM = &device_creator<neogeo_rom_device>;
 
 
-neogeo_rom_device::neogeo_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT16 clock, std::string shortname, std::string source)
+neogeo_rom_device::neogeo_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT16 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_neogeo_cart_interface( mconfig, *this ),
 						m_banked_cart(*this, "banked_cart")
 {
 }
 
-neogeo_rom_device::neogeo_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT16 clock)
+neogeo_rom_device::neogeo_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock)
 					: device_t(mconfig, NEOGEO_ROM, "NEOGEO ROM Carts", tag, owner, clock, "neogeo_rom", __FILE__),
 						device_neogeo_cart_interface( mconfig, *this ),
 						m_banked_cart(*this, "banked_cart")

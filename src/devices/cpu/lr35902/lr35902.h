@@ -37,7 +37,7 @@ class lr35902_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	lr35902_cpu_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
+	lr35902_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_timer_cb(device_t &device, _Object object) { return downcast<lr35902_cpu_device &>(device).m_timer_func.set_callback(object); }

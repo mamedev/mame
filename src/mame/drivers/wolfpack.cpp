@@ -2,7 +2,7 @@
 // copyright-holders:Stefan Jokisch
 /***************************************************************************
 
-Atari Wolf Pack (prototype) driver
+    Atari Wolf Pack (prototype) driver
 
 ***************************************************************************/
 
@@ -65,7 +65,7 @@ READ8_MEMBER(wolfpack_state::wolfpack_misc_r)
 	/* BIT6 => UNUSED      */
 	/* BIT7 => VBLANK      */
 
-	if (!m_s14001a->bsy_r())
+	if (!m_s14001a->busy_r())
 		val |= 0x01;
 
 	if (!m_collision)
@@ -93,12 +93,12 @@ WRITE8_MEMBER(wolfpack_state::wolfpack_word_w)
 {
 	/* latch word from bus into temp register, and place on s14001a input bus */
 	/* there is no real need for a temp register at all, since the bus 'register' acts as one */
-	m_s14001a->reg_w(data & 0x1f); /* SA0 (IN5) is pulled low according to the schematic, so its 0x1f and not 0x3f as one would expect */
+	m_s14001a->data_w(space, 0, data & 0x1f); /* SA0 (IN5) is pulled low according to the schematic, so its 0x1f and not 0x3f as one would expect */
 }
 
 WRITE8_MEMBER(wolfpack_state::wolfpack_start_speech_w)
 {
-	m_s14001a->rst_w(data&1);
+	m_s14001a->start_w(data&1);
 }
 
 
@@ -298,15 +298,12 @@ GFXDECODE_END
 
 
 static MACHINE_CONFIG_START( wolfpack, wolfpack_state )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	/* video hardware */
-
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 262)
@@ -321,8 +318,9 @@ static MACHINE_CONFIG_START( wolfpack, wolfpack_state )
 	MCFG_PALETTE_INIT_OWNER(wolfpack_state, wolfpack)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("speech", S14001A, 20000) /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speech", S14001A_NEW, 20000) /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 

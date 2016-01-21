@@ -45,7 +45,7 @@ device_scv_cart_interface::~device_scv_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_scv_cart_interface::rom_alloc(UINT32 size, std::string tag)
+void device_scv_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -72,7 +72,7 @@ void device_scv_cart_interface::ram_alloc(UINT32 size)
 //-------------------------------------------------
 //  scv_cart_slot_device - constructor
 //-------------------------------------------------
-scv_cart_slot_device::scv_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+scv_cart_slot_device::scv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, SCV_CART_SLOT, "SCV Cartridge Slot", tag, owner, clock, "scv_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
