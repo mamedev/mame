@@ -358,12 +358,12 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 			m_screen(*this, "screen"),
 			m_duartn68681(*this, "duartn68681"),
 			m_hd34010_host_access(0),
-			m_dsk_pio_access(0),
 			m_msp_ram(*this, "msp_ram"),
 			m_dsk_ram(nullptr),
 			m_dsk_rom(nullptr),
 			m_dsk_10c(*this, "dsk_10c"),
 			m_dsk_30c(*this, "dsk_30c"),
+			m_dsk_pio_access(0),
 			m_m68k_slapstic_base(nullptr),
 			m_m68k_sloop_alt_base(nullptr),
 			m_200e(*this, "200e"),
@@ -410,7 +410,7 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 			m_sim_memory(nullptr),
 			m_sim_memory_size(0),
 			m_adsp_pgm_memory_word(nullptr),
-			m_ds3_sdata_memory(nullptr),
+			m_ds3_sdata_memory(*this, "ds3sdsp_data"),
 			m_ds3_sdata_memory_size(0),
 			m_ds3_gcmd(0),
 			m_ds3_gflag(0),
@@ -2005,8 +2005,8 @@ MACHINE_CONFIG_END
 WRITE_LINE_MEMBER(harddriv_new_state::tx_a)
 {
 	// passive connection, one way, to both screens
-	m_leftpcb->m_duartn68681->rx_a_w(state);
-	m_rightpcb->m_duartn68681->rx_a_w(state);
+	m_leftpcb->get_duart()->rx_a_w(state);
+	m_rightpcb->get_duart()->rx_a_w(state);
 }
 
 static MACHINE_CONFIG_START( racedriv_panorama_machine, harddriv_new_state )
@@ -2026,9 +2026,9 @@ MACHINE_CONFIG_END
 // by forcing them to stay in sync using this ugly method everything works much better.
 TIMER_DEVICE_CALLBACK_MEMBER(harddriv_new_state::hack_timer)
 {
-	m_leftpcb->m_screen->reset_origin(0, 0);
-	m_mainpcb->m_screen->reset_origin(0, 0);
-	m_rightpcb->m_screen->reset_origin(0, 0);
+	m_leftpcb->get_screen()->reset_origin(0, 0);
+	m_mainpcb->get_screen()->reset_origin(0, 0);
+	m_rightpcb->get_screen()->reset_origin(0, 0);
 }
 
 /*************************************
@@ -4707,9 +4707,7 @@ void harddriv_state::init_ds3()
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x823800, 0x823fff, write16_delegate(FUNC(harddriv_state::hd68k_ds3_control_w), this));
 
 	/* predetermine memory regions */
-	m_ds3_sdata_memory = (UINT16 *)memregion("ds3sdsp_data")->base();
-	m_ds3_sdata_memory_size = memregion("ds3sdsp_data")->bytes() / 2;
-
+	m_ds3_sdata_memory_size = m_ds3_sdata_memory.bytes() / 2;
 /*
 
 

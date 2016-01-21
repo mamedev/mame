@@ -366,8 +366,16 @@ void es5505_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 2 * channels, clock() / (16*32));
 
 	/* initialize the regions */
-	m_region_base[0] = m_region0 ? (UINT16 *)machine().root_device().memregion(m_region0)->base() : nullptr;
-	m_region_base[1] = m_region1 ? (UINT16 *)machine().root_device().memregion(m_region1)->base() : nullptr;
+	if (m_region0)
+	{
+		memory_region* region = machine().root_device().memregion(m_region0);
+		m_region_base[0] = region ? reinterpret_cast<UINT16 *>(region->base()) : nullptr;
+	}
+	if (m_region1)
+	{
+		memory_region* region = machine().root_device().memregion(m_region1);
+		m_region_base[1] = region ? reinterpret_cast<UINT16 *>(region->base()) : nullptr;
+	}
 
 	/* initialize the rest of the structure */
 	m_master_clock = clock();
