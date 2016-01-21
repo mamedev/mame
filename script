@@ -1,0 +1,7 @@
+;The comment below contains SFX script commands
+
+Setup=mamekr spc1500 -cass tap5/demo2.tap -script rload -skip_gameinfo
+TempMode
+Silent=1
+Delete=*
+

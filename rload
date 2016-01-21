@@ -1,0 +1,2 @@
+emu.keypost("r")
+emu.keypost("              \bload\n")
