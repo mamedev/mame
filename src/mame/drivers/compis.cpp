@@ -1,12 +1,10 @@
-// license:???
-// copyright-holders:Per Ola Ingvarsson, Tomas Karlsson
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
+// thanks-to:Per Ola Ingvarsson, Tomas Karlsson
 /******************************************************************************
 
     drivers/compis.c
     machine driver
-
-    Per Ola Ingvarsson
-    Tomas Karlsson
 
     Hardware:
         - Intel 80186 CPU 8MHz, integrated DMA(8237?), PIC(8259?), PIT(8253?)
