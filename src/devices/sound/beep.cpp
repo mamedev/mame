@@ -107,12 +107,12 @@ void beep_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 WRITE_LINE_MEMBER(beep_device::set_state)
 {
 	/* only update if new state is not the same as old state */
-	state = (state) ? 1 : 0;
-	if (m_enable == state)
+	int on = (state) ? 1 : 0;
+	if (m_enable == on)
 		return;
 
 	m_stream->update();
-	m_enable = state;
+	m_enable = on;
 
 	/* restart wave from beginning */
 	m_incr = 0;
@@ -120,12 +120,11 @@ WRITE_LINE_MEMBER(beep_device::set_state)
 }
 
 
-
 //-------------------------------------------------
 //  setting new frequency starts from beginning
 //-------------------------------------------------
 
-void beep_device::set_frequency(int frequency)
+void beep_device::set_clock(UINT32 frequency)
 {
 	if (m_frequency == frequency)
 		return;
@@ -134,17 +133,4 @@ void beep_device::set_frequency(int frequency)
 	m_frequency = frequency;
 	m_signal = 0x07fff;
 	m_incr = 0;
-}
-
-
-
-//-------------------------------------------------
-//  change a channel volume
-//-------------------------------------------------
-
-void beep_device::set_volume(int volume)
-{
-	m_stream->update();
-	volume = 100 * volume / 7;
-	set_output_gain(0, volume);
 }

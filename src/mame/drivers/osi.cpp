@@ -349,7 +349,8 @@ WRITE8_MEMBER( c1p_state::osi630_ctrl_w )
 
 WRITE8_MEMBER( c1p_state::osi630_sound_w )
 {
-	if (data) m_beep->set_frequency(49152 / data);
+	if (data != 0)
+		m_beep->set_clock(49152 / data);
 }
 
 /* Disk Drive */
@@ -885,7 +886,7 @@ void sb2m600_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 	case TIMER_SETUP_BEEP:
 		m_beeper->set_state(0);
-		m_beeper->set_frequency(300);
+		m_beeper->set_clock(300);
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in sb2m600_state::device_timer");

@@ -559,7 +559,7 @@ READ8_MEMBER( by133_state::m6803_port2_r )
 WRITE8_MEMBER( by133_state::m6803_port2_w )
 {
 	//m_u7_b = data >> 1;
-	m_beep->set_frequency(600);
+	m_beep->set_clock(600);
 	m_beep->set_state(BIT(data, 0));
 }
 
@@ -581,7 +581,7 @@ WRITE_LINE_MEMBER( by133_state::u11_ca2_w )
 WRITE_LINE_MEMBER( by133_state::u7_cb2_w )
 {
 	// red led
-	m_beep->set_frequency(950);
+	m_beep->set_clock(950);
 	m_beep->set_state(state);
 }
 
