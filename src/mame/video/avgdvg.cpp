@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Eric Smith, Brad Oliver, Bernd Wiebelt, Aaron Giles, Andrew Caldwell
+// copyright-holders:Mathis Rosenhauer
+// thanks-to:Eric Smith, Brad Oliver, Bernd Wiebelt, Aaron Giles, Andrew Caldwell
 /*************************************************************************
 
     avgdvg.c: Atari DVG and AVG
