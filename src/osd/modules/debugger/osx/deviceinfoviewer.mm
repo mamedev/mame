@@ -139,7 +139,7 @@
 	NSScrollView		*contentScroll;
 
 	if (!(self = [super initWithMachine:m
-								  title:[NSString stringWithFormat:@"Device %s", d.tag().c_str()]
+								  title:[NSString stringWithFormat:@"Device %s", d.tag()]
 								console:c]))
 	{
 		return nil;
