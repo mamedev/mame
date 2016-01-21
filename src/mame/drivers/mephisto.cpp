@@ -365,7 +365,7 @@ static MACHINE_CONFIG_START( mephisto, mephisto_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", mephisto_state, update_nmi, attotime::from_hz(600))

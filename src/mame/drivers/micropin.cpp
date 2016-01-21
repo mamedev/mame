@@ -292,7 +292,7 @@ static MACHINE_CONFIG_START( micropin, micropin_state )
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 387)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

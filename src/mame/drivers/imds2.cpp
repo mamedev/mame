@@ -597,7 +597,6 @@ void imds2_state::video_start()
 
 void imds2_state::machine_reset()
 {
-	m_iocbeep->set_frequency(IOC_BEEP_FREQ);
 	m_ipc_control = 0x00;
 	m_ipc_ioc_status = 0x0f;
 
@@ -844,7 +843,7 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 		MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 		MCFG_SPEAKER_STANDARD_MONO("mono")
-		MCFG_SOUND_ADD("iocbeep" , BEEP , 0)
+		MCFG_SOUND_ADD("iocbeep" , BEEP , IOC_BEEP_FREQ)
 		MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 1.00)
 
 		MCFG_DEVICE_ADD("iocdma" , I8257 , IOC_XTAL_Y2 / 9)

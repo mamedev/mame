@@ -36,9 +36,7 @@ beep_device::beep_device(const machine_config &mconfig, const char *tag, device_
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
 		m_enable(0),
-		m_frequency(0),
-		m_incr(0),
-		m_signal(0)
+		m_frequency(clock)
 {
 }
 
@@ -51,9 +49,13 @@ void beep_device::device_start()
 {
 	m_stream = stream_alloc(0, 1, BEEP_RATE);
 	m_enable = 0;
-	m_frequency = 3250;
-	m_incr = 0;
 	m_signal = 0x07fff;
+	
+	// register for savestates
+	save_item(NAME(m_enable));
+	save_item(NAME(m_frequency));
+	save_item(NAME(m_incr));
+	save_item(NAME(m_signal));
 }
 
 
@@ -102,14 +104,15 @@ void beep_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 //  changing state to on from off will restart tone
 //-------------------------------------------------
 
-void beep_device::set_state(int on)
+WRITE_LINE_MEMBER(beep_device::set_state)
 {
 	/* only update if new state is not the same as old state */
-	if (m_enable == on)
+	state = (state) ? 1 : 0;
+	if (m_enable == state)
 		return;
 
 	m_stream->update();
-	m_enable = on;
+	m_enable = state;
 
 	/* restart wave from beginning */
 	m_incr = 0;

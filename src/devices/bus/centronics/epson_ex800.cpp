@@ -235,7 +235,7 @@ static MACHINE_CONFIG_FRAGMENT( epson_ex800 )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 4000) /* measured at 4000 Hz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -384,7 +384,6 @@ void epson_ex800_t::device_reset()
 {
 	/* Setup beep */
 	m_beeper->set_state(0);
-	m_beeper->set_frequency(4000); /* measured at 4000 Hz */
 }
 
 

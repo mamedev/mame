@@ -237,7 +237,6 @@ void pve500_state::machine_reset()
 {
 	/* Setup beep */
 	m_buzzer->set_state(0);
-	m_buzzer->set_frequency(3750); //CLK2 coming out of IC D4 (frequency divider circuitry)
 }
 
 WRITE_LINE_MEMBER(pve500_state::mb8421_intl)
@@ -415,7 +414,7 @@ static MACHINE_CONFIG_START( pve500, pve500_state )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("buzzer", BEEP, 0)
+	MCFG_SOUND_ADD("buzzer", BEEP, 3750) // CLK2 coming out of IC D4 (frequency divider circuitry)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 
 MACHINE_CONFIG_END

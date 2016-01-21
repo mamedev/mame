@@ -192,7 +192,6 @@ void apollo_kbd_device::beeper::on()
 {
 	if (keyboard_has_beeper())
 	{
-		m_beeper->set_frequency(1000);
 		m_beeper->set_state(1);
 		m_timer->adjust( attotime::from_msec(10), 0, attotime::zero);
 	}

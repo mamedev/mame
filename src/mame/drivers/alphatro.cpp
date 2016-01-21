@@ -396,7 +396,6 @@ void alphatro_state::machine_reset()
 	m_cassold = 0;
 	m_usart->write_rxd(0);
 	m_beep->set_state(0);
-	m_beep->set_frequency(950);    /* piezo-device needs to be measured */
 }
 
 PALETTE_INIT_MEMBER(alphatro_state, alphatro)
@@ -465,7 +464,7 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 950) /* piezo-device needs to be measured */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

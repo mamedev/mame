@@ -251,8 +251,6 @@ INPUT_PORTS_END
 
 void destiny_state::machine_start()
 {
-	m_beeper->set_frequency(800); // TODO: determine exact frequency thru schematics
-	m_beeper->set_state(0);
 }
 
 void destiny_state::machine_reset()
@@ -265,7 +263,7 @@ static MACHINE_CONFIG_START( destiny, destiny_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_4MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(destiny_state, irq0_line_hold,  60) // timer irq controls update speed, frequency needs to be determined yet (2MHz through three 74LS390)
+	MCFG_CPU_PERIODIC_INT_DRIVER(destiny_state, irq0_line_hold, 60) // timer irq controls update speed, frequency needs to be determined yet (2MHz through three 74LS390)
 
 	/* video hardware (dummy) */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -278,10 +276,9 @@ static MACHINE_CONFIG_START( destiny, destiny_state )
 
 	MCFG_PALETTE_ADD("palette", 16)
 
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 800) // TODO: determine exact frequency thru schematics
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 

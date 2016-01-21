@@ -22,9 +22,9 @@ class sc2_state : public driver_device
 public:
 	sc2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_beep(*this, "beeper")
-	,
-		m_maincpu(*this, "maincpu") { }
+		m_beep(*this, "beeper"),
+		m_maincpu(*this, "maincpu")
+	{ }
 
 	required_device<beep_device> m_beep;
 	DECLARE_READ8_MEMBER(pio_port_a_r);
@@ -214,7 +214,7 @@ static MACHINE_CONFIG_START( sc2, sc2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
+	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.50 )
 MACHINE_CONFIG_END
 

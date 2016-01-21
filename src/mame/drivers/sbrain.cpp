@@ -270,7 +270,6 @@ SLOT_INTERFACE_END
 
 MACHINE_RESET_MEMBER( sbrain_state, sbrain )
 {
-	m_beep->set_frequency(800);
 	m_p_chargen = memregion("chargen")->base();
 	m_bankr0->set_entry(1); // point at rom
 	m_bankw0->set_entry(0); // always write to ram
@@ -337,7 +336,7 @@ static MACHINE_CONFIG_START( sbrain, sbrain_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */

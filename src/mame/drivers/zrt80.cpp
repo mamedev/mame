@@ -206,7 +206,6 @@ INPUT_PORTS_END
 
 void zrt80_state::machine_reset()
 {
-	m_beep->set_frequency(800);
 	m_term_data = 0;
 }
 
@@ -292,7 +291,7 @@ static MACHINE_CONFIG_START( zrt80, zrt80_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

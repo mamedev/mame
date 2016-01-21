@@ -298,7 +298,6 @@ void glasgow_state::machine_start()
 	mboard_key_selector = 0;
 	m_irq_flag = 0;
 	m_lcd_shift_counter = 3;
-	m_beep->set_frequency(44);
 
 	mboard_savestate_register();
 }
@@ -307,7 +306,6 @@ void glasgow_state::machine_start()
 MACHINE_START_MEMBER(glasgow_state,dallas32)
 {
 	m_lcd_shift_counter = 3;
-	m_beep->set_frequency(44);
 
 	mboard_savestate_register();
 }
@@ -422,7 +420,7 @@ static MACHINE_CONFIG_START( glasgow, glasgow_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(glasgow_mem)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 44)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", glasgow_state, update_nmi, attotime::from_hz(50))

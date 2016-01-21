@@ -942,7 +942,7 @@ static MACHINE_CONFIG_START( pce220, pce220_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
@@ -978,7 +978,7 @@ static MACHINE_CONFIG_START( pcg850v, pcg850v_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))

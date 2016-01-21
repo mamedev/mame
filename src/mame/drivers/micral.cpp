@@ -242,7 +242,6 @@ MACHINE_RESET_MEMBER( micral_state, micral )
 {
 	//membank("bankr0")->set_entry(0); // point at rom
 	//membank("bankw0")->set_entry(0); // always write to ram
-	m_beep->set_frequency(2000);
 	m_maincpu->set_state_int(Z80_PC, 0xf800);
 }
 
@@ -274,7 +273,7 @@ static MACHINE_CONFIG_START( micral, micral_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 2000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

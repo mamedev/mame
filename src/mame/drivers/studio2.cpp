@@ -242,7 +242,6 @@ public:
 
 	/* keyboard state */
 	UINT8 m_keylatch;
-	DECLARE_DRIVER_INIT(studio2);
 };
 
 class visicom_state : public studio2_state
@@ -640,7 +639,7 @@ static MACHINE_CONFIG_START( studio2, studio2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 300)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_FRAGMENT_ADD( studio2_cartslot )
@@ -668,7 +667,7 @@ static MACHINE_CONFIG_START( visicom, visicom_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 300)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "visicom_cart")
@@ -696,7 +695,7 @@ static MACHINE_CONFIG_START( mpt02, mpt02_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 300)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, CDP1864_CLOCK, GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1), NULL, READLINE(mpt02_state, rdata_r), READLINE(mpt02_state, bdata_r), READLINE(mpt02_state, gdata_r))
@@ -739,22 +738,15 @@ ROM_END
 #define rom_cm1200 rom_mpt02
 #define rom_apollo80 rom_mpt02
 
-/* Driver Initialization */
-
-DRIVER_INIT_MEMBER(studio2_state,studio2)
-{
-	m_beeper->set_state(0);
-	m_beeper->set_frequency(300);
-}
 
 /* Game Drivers */
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    INIT                       COMPANY    FULLNAME                                         FLAGS
-CONS( 1977, studio2,    0,      0,      studio2,    studio2, studio2_state, studio2,    "RCA",      "Studio II",                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 1978, visicom,    studio2,0,      visicom,    studio2, studio2_state, studio2,    "Toshiba",  "Visicom COM-100 (Japan)",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mpt02,      studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Soundic",  "Victory MPT-02 Home TV Programmer (Austria)",  MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mpt02h,     studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Hanimex",  "MPT-02 Jeu TV Programmable (France)",          MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mtc9016,    studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Mustang",  "9016 Telespiel Computer (Germany)",            MACHINE_SUPPORTS_SAVE )
-CONS( 1978, shmc1200,   studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Sheen",    "M1200 Micro Computer (Australia)",             MACHINE_SUPPORTS_SAVE )
-CONS( 1978, cm1200,     studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Conic",    "M-1200 (?)",                                   MACHINE_SUPPORTS_SAVE )
-CONS( 1978, apollo80,   studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Academy",  "Apollo 80 (Germany)",                          MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    INIT                 COMPANY    FULLNAME                                         FLAGS
+CONS( 1977, studio2,    0,      0,      studio2,    studio2, driver_device, 0,    "RCA",      "Studio II",                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1978, visicom,    studio2,0,      visicom,    studio2, driver_device, 0,    "Toshiba",  "Visicom COM-100 (Japan)",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mpt02,      studio2,0,      mpt02,      studio2, driver_device, 0,    "Soundic",  "Victory MPT-02 Home TV Programmer (Austria)",  MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mpt02h,     studio2,0,      mpt02,      studio2, driver_device, 0,    "Hanimex",  "MPT-02 Jeu TV Programmable (France)",          MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mtc9016,    studio2,0,      mpt02,      studio2, driver_device, 0,    "Mustang",  "9016 Telespiel Computer (Germany)",            MACHINE_SUPPORTS_SAVE )
+CONS( 1978, shmc1200,   studio2,0,      mpt02,      studio2, driver_device, 0,    "Sheen",    "M1200 Micro Computer (Australia)",             MACHINE_SUPPORTS_SAVE )
+CONS( 1978, cm1200,     studio2,0,      mpt02,      studio2, driver_device, 0,    "Conic",    "M-1200 (?)",                                   MACHINE_SUPPORTS_SAVE )
+CONS( 1978, apollo80,   studio2,0,      mpt02,      studio2, driver_device, 0,    "Academy",  "Apollo 80 (Germany)",                          MACHINE_SUPPORTS_SAVE )
