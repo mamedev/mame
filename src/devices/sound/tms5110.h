@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Frank Palazzolo, Jarek Burczynski, Aaron Giles, Jonathan Gevaryahu, Couriersud
 #pragma once
 

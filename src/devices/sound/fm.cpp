@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski,Tatsuyuki Satoh
 #define YM2610B_WARNING
 

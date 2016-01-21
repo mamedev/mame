@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 #include "emu.h"
 #include "includes/taito_b.h"
