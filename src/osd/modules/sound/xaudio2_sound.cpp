@@ -539,9 +539,9 @@ void sound_xaudio2::create_buffers(const WAVEFORMATEX &format)
 
     osd_printf_verbose(
         "Sound: XAudio2 created initial buffers. total size: %u, count %u, size each %u\n",
-        total_buffer_size,
-        m_buffer_count,
-        m_buffer_size);
+        (unsigned int)total_buffer_size,
+        (unsigned int)m_buffer_count,
+        (unsigned int)m_buffer_size);
 
     // reset buffer states
     m_writepos = 0;
