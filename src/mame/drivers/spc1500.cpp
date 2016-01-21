@@ -401,7 +401,7 @@ WRITE8_MEMBER( spc1500_state::portc_w)
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
 	m_vdg->set_clock(VDP_CLOCK/(BIT(data, 2) ? 48 : 24));
 	m_centronics->write_strobe(BIT(data, 7));
-	if (!m_double_mode && (!m_p5bit && BIT(data, 5)))
+	if (!m_p5bit && BIT(data, 5))
 		m_double_mode = true; // double access I/O mode
 	m_p5bit = BIT(data, 5);
 #if 0	
@@ -448,6 +448,8 @@ WRITE8_MEMBER( spc1500_state::crtc_w)
 	else
 	{
 		m_crtc_vreg[m_crtc_index] = data;
+//		printf("vreg[%d]=0x%02x\n", m_crtc_index, data);
+		fflush(stdout);
 		m_vdg->register_w(space, 0, data);
 	}
 }
@@ -491,7 +493,7 @@ WRITE8_MEMBER( spc1500_state::pcg_w)
 	int reg = (offset>>8)-0x15;
 	get_pcg_addr();
 
-	m_pcgram[m_pcg_char * 8 + m_pcg_offset[reg] + (reg*0x800)] = data;
+	m_pcgram[m_pcg_char * 8  + m_pcg_offset[reg] + (reg*0x800)] = data;
 	if (m_pcg_offset[reg] == 7)
 		m_pcg_offset[reg] = 0;
 	else
@@ -520,6 +522,7 @@ READ8_MEMBER( spc1500_state::pcg_r)
 WRITE8_MEMBER( spc1500_state::priority_w)
 {
 	m_priority = data;
+//	printf("m_priority=%02x\n", data);
 }
 
 WRITE8_MEMBER( spc1500_state::palet_w)
@@ -568,13 +571,13 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	unsigned char cho[] ={1,1,1,1,1,1,1,1,0,0,1,1,1,3,5,5,0,0,5,3,3,5,5,5,0,0,3,3,5,1};
 	unsigned char jong[]={0,0,0,1,1,1,1,1,0,0,1,1,1,2,2,2,0,0,2,2,2,2,2,2,0,0,2,2,1,1};
 	bool inv = false;
-	char hs = (m_crtc_vreg[0x9] < 15 ? 3 : 4);
+	char hs = (m_crtc_vreg[0x9] < 15 ? (m_crtc_vreg[0x9] < 6 ? 2 : 3) : 4);
 	int n = y & (m_crtc_vreg[0x9]);
 	bool ln400 = (hs == 4 && m_crtc_vreg[0x4] > 20);
 	UINT8 *vram = &m_p_videoram[0] + (m_crtc_vreg[12] << 8) + m_crtc_vreg[13];
 	for (i = 0; i < x_count; i++)
 	{
-		UINT8 *pp = &vram[0x2000+((y>>hs)*x_count+(((y)&7)<<11))+i+(((hs==4)&&(y&8))?0x400:0)];
+		UINT8 *pp = &vram[0x2000+((y>>hs)*x_count+(((y)&(m_crtc_vreg[0x9] < 4 ? 3 : 7))<<11))+i+(((hs==4)&&(y&8))?0x400:0)];
 		UINT8 *pv = &vram[(y>>hs)*x_count + i];
 		UINT8 ascii = *(pv+0x1000);
 		UINT8 attr = *pv;
@@ -622,7 +625,7 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 		}
 		else if (attr & 0x20)
 		{
-			UINT8 *pa = &m_pcgram[(ascii*(m_crtc_vreg[0x9]+1))+n];
+			UINT8 *pa = &m_pcgram[(ascii*8)+n];
 			UINT8 b = *pa;
 			UINT8 r = *(pa+0x800);
 			UINT8 g = *(pa+0x1000);
@@ -659,9 +662,10 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 WRITE8_MEMBER( spc1500_state::fdc_w )
 {
 	if (m_fd0)
-		m_fd0->mon_w(!BIT(data, 0));
+		m_fd0->mon_w(BIT(data, 1));
 	m_fdc->tc_w(BIT(data, 3));
-//	printf("fdc_w(0x%02x, 0x%02x)\n", offset & 0xff, data); 
+	m_fdc->ready_w(BIT(data, 4));
+	//printf("fdc_w(0x%02x, 0x%02x)\n", offset & 0xff, data); 
 }
 
 READ8_MEMBER( spc1500_state::fdc_r )
@@ -1025,12 +1029,14 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+//	MCFG_SCREEN_SIZE(720, 480)
+//	MCFG_SCREEN_VISIBLE_AREA((720-640)/2,720-(720-640)/2-1,80/2,480-(480-400)/2-1)
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0,640-1,0,400-1)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update )
 	MCFG_PALETTE_ADD("palette", 8)	
 	MCFG_PALETTE_INIT_OWNER(spc1500_state, spc)
-	MCFG_MC6845_ADD("mc6845", MC6845, "screen", (VDP_CLOCK/48)) //unknown divider
+	MCFG_MC6845_ADD("mc6845", H46505, "screen", (VDP_CLOCK/48)) //unknown divider
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(spc1500_state, crtc_update_row)

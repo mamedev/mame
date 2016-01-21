@@ -1,0 +1,2 @@
+X1 0x21a --> spc1500 0x02a9 read data from floppy
+X1 1->0  spc1500 1->0 double access mode

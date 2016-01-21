@@ -1,0 +1,2 @@
+bin/rar a -sfx spc1500_xevious mamekr.exe rload fkey roms/spc1500.zip tap5/xevious.d88 cfg/spc1500.cfg cfg/default.cfg samples/floppy/*.wav -zscript_xevious
+bin/ResourceHacker -script rh_xevious

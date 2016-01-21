@@ -1,0 +1,6 @@
+[FILENAMES]
+	 Exe=    spc1500_xevious.exe
+	 SaveAs= spc1500_xevious.exe
+	
+[COMMANDS]
+	 -addoverwrite src/mame/osd/windows/mame/mame.ico, ICONGROUP, MAINICON, 0 
