@@ -56,7 +56,8 @@ private:
 	int m_sample_num;
 	int m_sample_freq;
 	int m_sample_volume;
-	required_device<samples_device> m_samples;
+	optional_device<samples_device> m_samples;
+	optional_region_ptr<UINT8> m_samples_region;
 };
 
 

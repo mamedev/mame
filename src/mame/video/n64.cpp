@@ -2285,29 +2285,29 @@ void n64_rdp::cmd_tex_rect(UINT32 w1, UINT32 w2)
 	ewdata[0] = (0x24 << 24) | ((0x80 | tilenum) << 16) | yl;   // command, flipped, tile, yl
 	ewdata[1] = (yl << 16) | yh;                                // ym, yh
 	ewdata[2] = (xlint << 16) | ((xl & 3) << 14);               // xl, xl frac
-	ewdata[3] = 0;                                              // dxldy, dxldy frac
+	// ewdata[3] = 0;                                              dxldy, dxldy frac
 	ewdata[4] = (xhint << 16) | ((xh & 3) << 14);               // xh, xh frac
-	ewdata[5] = 0;                                              // dxhdy, dxhdy frac
+	// ewdata[5] = 0;                                              dxhdy, dxhdy frac
 	ewdata[6] = (xlint << 16) | ((xl & 3) << 14);               // xm, xm frac
-	ewdata[7] = 0;                                              // dxmdy, dxmdy frac
+	//ewdata[7] = 0;                                               dxmdy, dxmdy frac
 	memset(&ewdata[8], 0, 16 * sizeof(UINT32));                 // shade
 	ewdata[24] = (s << 16) | t;                                 // s, t
-	ewdata[25] = 0;                                             // w
+	// ewdata[25] = 0;                                             w
 	ewdata[26] = ((dsdx >> 5) << 16);                           // dsdx, dtdx
-	ewdata[27] = 0;                                             // dwdx
-	ewdata[28] = 0;                                             // s frac, t frac
-	ewdata[29] = 0;                                             // w frac
+	// ewdata[27] = 0;                                             dwdx
+	// ewdata[28] = 0;                                             s frac, t frac
+	// ewdata[29] = 0;                                             w frac
 	ewdata[30] = ((dsdx & 0x1f) << 11) << 16;                   // dsdx frac, dtdx frac
-	ewdata[31] = 0;                                             // dwdx frac
-	ewdata[32] = (dtdy >> 5) & 0xffff;//dsde, dtde
-	ewdata[33] = 0;//dwde
-	ewdata[34] = (dtdy >> 5) & 0xffff;//dsdy, dtdy
-	ewdata[35] = 0;//dwdy
-	ewdata[36] = (dtdy & 0x1f) << 11;//dsde frac, dtde frac
-	ewdata[37] = 0;//dwde frac
-	ewdata[38] = (dtdy & 0x1f) << 11;//dsdy frac, dtdy frac
-	ewdata[39] = 0;//dwdy frac
-	memset(&ewdata[40], 0, 4 * sizeof(UINT32));//depth
+	// ewdata[31] = 0;                                             dwdx frac
+	ewdata[32] = (dtdy >> 5) & 0xffff;							// dsde, dtde
+	// ewdata[33] = 0;											   dwde
+	ewdata[34] = (dtdy >> 5) & 0xffff;							// dsdy, dtdy
+	// ewdata[35] = 0;											   dwdy
+	ewdata[36] = (dtdy & 0x1f) << 11;							// dsde frac, dtde frac
+	// ewdata[37] = 0;											   dwde frac
+	ewdata[38] = (dtdy & 0x1f) << 11;							// dsdy frac, dtdy frac
+	// ewdata[39] = 0;											// dwdy frac
+	// ewdata[40-43] = 0;										// depth
 
 	draw_triangle(true, true, false, true);
 }
@@ -2339,32 +2339,32 @@ void n64_rdp::cmd_tex_rect_flip(UINT32 w1, UINT32 w2)
 	const INT32 xhint = (xh >> 2) & 0x3ff;
 
 	UINT32* ewdata = m_temp_rect_data;
-	ewdata[0] = (0x25 << 24) | ((0x80 | tilenum) << 16) | yl;//command, flipped, tile, yl
-	ewdata[1] = (yl << 16) | yh;//ym, yh
-	ewdata[2] = (xlint << 16) | ((xl & 3) << 14);//xl, xl frac
-	ewdata[3] = 0;//dxldy, dxldy frac
-	ewdata[4] = (xhint << 16) | ((xh & 3) << 14);//xh, xh frac
-	ewdata[5] = 0;//dxhdy, dxhdy frac
-	ewdata[6] = (xlint << 16) | ((xl & 3) << 14);//xm, xm frac
-	ewdata[7] = 0;//dxmdy, dxmdy frac
-	memset(&ewdata[8], 0, 16 * sizeof(UINT32));//shade
-	ewdata[24] = (s << 16) | t;//s, t
-	ewdata[25] = 0;//w
-	ewdata[26] = (dtdy >> 5) & 0xffff;//dsdx, dtdx
-	ewdata[27] = 0;//dwdx
-	ewdata[28] = 0;//s frac, t frac
-	ewdata[29] = 0;//w frac
-	ewdata[30] = ((dtdy & 0x1f) << 11);//dsdx frac, dtdx frac
-	ewdata[31] = 0;//dwdx frac
-	ewdata[32] = (dsdx >> 5) << 16;//dsde, dtde
-	ewdata[33] = 0;//dwde
-	ewdata[34] = (dsdx >> 5) << 16;//dsdy, dtdy
-	ewdata[35] = 0;//dwdy
-	ewdata[36] = (dsdx & 0x1f) << 27;//dsde frac, dtde frac
-	ewdata[37] = 0;//dwde frac
-	ewdata[38] = (dsdx & 0x1f) << 27;//dsdy frac, dtdy frac
-	ewdata[39] = 0;//dwdy frac
-	memset(&ewdata[40], 0, 4 * sizeof(UINT32));//depth
+	ewdata[0] = (0x25 << 24) | ((0x80 | tilenum) << 16) | yl;	// command, flipped, tile, yl
+	ewdata[1] = (yl << 16) | yh;								// ym, yh
+	ewdata[2] = (xlint << 16) | ((xl & 3) << 14);				// xl, xl frac
+	// ewdata[3] = 0;											   dxldy, dxldy frac
+	ewdata[4] = (xhint << 16) | ((xh & 3) << 14);				// xh, xh frac
+	// ewdata[5] = 0;											   dxhdy, dxhdy frac
+	ewdata[6] = (xlint << 16) | ((xl & 3) << 14);				// xm, xm frac
+	// ewdata[7] = 0;											   dxmdy, dxmdy frac
+	memset(&ewdata[8], 0, 16 * sizeof(UINT32));					// shade
+	ewdata[24] = (s << 16) | t;									// s, t
+	// ewdata[25] = 0;											// w
+	ewdata[26] = (dtdy >> 5) & 0xffff;							// dsdx, dtdx
+	// ewdata[27] = 0;											   dwdx
+	// ewdata[28] = 0;											   s frac, t frac
+	// ewdata[29] = 0;											   w frac
+	ewdata[30] = ((dtdy & 0x1f) << 11);							// dsdx frac, dtdx frac
+	// ewdata[31] = 0;											   dwdx frac
+	ewdata[32] = (dsdx >> 5) << 16;								// dsde, dtde
+	// ewdata[33] = 0;											   dwde
+	ewdata[34] = (dsdx >> 5) << 16;								// dsdy, dtdy
+	// ewdata[35] = 0;											   dwdy
+	ewdata[36] = (dsdx & 0x1f) << 27;							// dsde frac, dtde frac
+	// ewdata[37] = 0;											   dwde frac
+	ewdata[38] = (dsdx & 0x1f) << 27;							// dsdy frac, dtdy frac
+	// ewdata[39] = 0;											// dwdy frac
+	// ewdata[40-43] = 0;										// depth
 
 	draw_triangle(true, true, false, true);
 }
@@ -3157,6 +3157,8 @@ n64_rdp::n64_rdp(n64_state &state, UINT32* rdram, UINT32* dmem) : poly_manager<U
 
 	m_prim_lod_fraction.set(0, 0, 0, 0);
 	z_build_com_table();
+
+	memset(m_temp_rect_data, 0, sizeof(UINT32) * 0x1000);
 
 	for (INT32 i = 0; i < 0x4000; i++)
 	{

@@ -826,7 +826,7 @@ void bootleg_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &c
 
 sega_sys16b_sprite_device::sega_sys16b_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_SYS16B_SPRITES, "Sega System 16B Sprites", tag, owner, "sega_16bit_sprite", __FILE__)
-	, m_sprite_region_ptr(*this, DEVICE_SELF)
+	, m_sprite_region_ptr(*this, ":sprites")
 {
 	set_local_origin(184, 0x00, -184, 0);
 }
@@ -868,14 +868,8 @@ void sega_sys16b_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 	//  Note that the zooming described below is 100% accurate to the real board.
 	//
 
-	// if the game does not have sprites, don't try to draw anything
-	if (m_sprite_region_ptr == NULL)
-	{
-		return;
-	}
-
 	// render the sprites in order
-	const UINT16 *spritebase = m_sprite_region_ptr;
+	const UINT16 *spritebase = reinterpret_cast<const UINT16 *>(&m_sprite_region_ptr[0]);
 	UINT8 numbanks = m_sprite_region_ptr.bytes() / 0x20000;
 	UINT16 *ramend = spriteram() + spriteram_elements();
 	for (UINT16 *data = spriteram(); data < ramend; data += 8)

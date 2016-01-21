@@ -94,33 +94,35 @@ class dkong_state : public driver_device
 {
 public:
 	dkong_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"),
-		m_eeprom(*this, "eeprom"),
-		m_dev_n2a03a(*this, "n2a03a"),
-		m_dev_n2a03b(*this, "n2a03b"),
-		m_dev_vp2(*this, "virtual_p2"),
-		m_dev_6h(*this, "ls259.6h"),
-		m_discrete(*this, "discrete"),
-		m_video_ram(*this,"video_ram"),
-		m_sprite_ram(*this,"sprite_ram"),
-		m_vidhw(DKONG_BOARD),
-		m_sig30Hz(0),
-		m_blue_level(0),
-		m_cv1(0),
-		m_cv2(0),
-		m_vg1(0),
-		m_vg2(0),
-		m_vg3(0),
-		m_cv3(0),
-		m_cv4(0),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_z80dma(*this, "z80dma"),
-		m_dma8257(*this, "dma8257")
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_eeprom(*this, "eeprom")
+		, m_dev_n2a03a(*this, "n2a03a")
+		, m_dev_n2a03b(*this, "n2a03b")
+		, m_dev_vp2(*this, "virtual_p2")
+		, m_dev_6h(*this, "ls259.6h")
+		, m_discrete(*this, "discrete")
+		, m_video_ram(*this,"video_ram")
+		, m_sprite_ram(*this,"sprite_ram")
+		, m_snd_rom(*this, "soundcpu")
+		, m_vidhw(DKONG_BOARD)
+		, m_sig30Hz(0)
+		, m_blue_level(0)
+		, m_cv1(0)
+		, m_cv2(0)
+		, m_vg1(0)
+		, m_vg2(0)
+		, m_vg3(0)
+		, m_cv3(0)
+		, m_cv4(0)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_z80dma(*this, "z80dma")
+		, m_dma8257(*this, "dma8257")
+	{
+	}
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -141,8 +143,9 @@ public:
 	UINT8               m_nmi_mask;
 
 	std::unique_ptr<UINT8[]> m_decrypted;
+
 	/* sound state */
-	const UINT8       *m_snd_rom;
+	optional_region_ptr<UINT8>	m_snd_rom;
 
 	/* video state */
 	tilemap_t           *m_bg_tilemap;
