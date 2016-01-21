@@ -7,7 +7,6 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "sound/speaker.h"
 #include "sound/s14001a_new.h"
 
 class fidelz80base_state : public driver_device
@@ -19,7 +18,6 @@ public:
 		m_inp_matrix(*this, "IN"),
 		m_speech(*this, "speech"),
 		m_speech_rom(*this, "speech"),
-		m_speaker(*this, "speaker"),
 		m_display_wait(33),
 		m_display_maxy(1),
 		m_display_maxx(0)
@@ -30,7 +28,6 @@ public:
 	optional_ioport_array<10> m_inp_matrix; // max 10
 	optional_device<s14001a_new_device> m_speech;
 	optional_region_ptr<UINT8> m_speech_rom;
-	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
 	UINT16 m_inp_mux;                   // multiplexed keypad/leds mask

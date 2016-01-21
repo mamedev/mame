@@ -3,7 +3,6 @@
 /******************************************************************************
  
     Fidelity Electronics 6502 based board driver
-
     See drivers/fidelz80.cpp for hardware description
 
     TODO:
@@ -13,10 +12,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "cpu/z80/z80.h"
 #include "machine/6821pia.h"
-#include "machine/i8255.h"
-#include "machine/z80pio.h"
 
 #include "includes/fidelz80.h"
 
@@ -30,13 +26,11 @@ class fidel6502_state : public fidelz80base_state
 public:
 	fidel6502_state(const machine_config &mconfig, device_type type, const char *tag)
 		: fidelz80base_state(mconfig, type, tag),
-		m_z80pio(*this, "z80pio"),
-		m_ppi8255(*this, "ppi8255")
+		m_6821pia(*this, "6821pia")
 	{ }
 
 	// devices/pointers
-	optional_device<z80pio_device> m_z80pio;
-	optional_device<i8255_device> m_ppi8255;
+	optional_device<pia6821_device> m_6821pia;
 
 	UINT16 input_read(int index);
 	DECLARE_WRITE8_MEMBER( pia0_pa_w );
@@ -367,6 +361,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME          PARENT  COMPAT  MACHINE    INPUT       INIT      COMPANY  FULLNAME                     FLAGS */
-COMP( 1981, csc,     0,      0,      csc,  csc, driver_device,   0, "Fidelity Electronics", "Champion Chess Challenger (model CSC)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK)
+COMP( 1981, csc,     0,      0,      csc,  csc, driver_device,   0, "Fidelity Electronics", "Champion Sensory Chess Challenger",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK)
 
-COMP( 1987, fexcelv,     0,      0,      csc,  csc, driver_device,   0, "Fidelity Electronics", "Voice Excellence (model 6092)", MACHINE_NOT_WORKING )
+COMP( 1987, fexcelv,     0,      0,      csc,  csc, driver_device,   0, "Fidelity Electronics", "Voice Excellence", MACHINE_NOT_WORKING )

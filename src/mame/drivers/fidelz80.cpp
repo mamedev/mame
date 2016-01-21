@@ -3,28 +3,31 @@
 /******************************************************************************
  
     Fidelity Electronics Z80 based board driver
+    for 6502 based boards, see drivers/fidel6502.cpp
 
     All detailed RE work done by Kevin 'kevtris' Horton
 
     TODO:
     - Figure out why it says the first speech line twice; it shouldn't?
       It sometimes does this on Voice Sensory Chess Challenger real hardware.
-      It can also be heard on Advanced Talking Chess Challenger real hardware, but not the whole line:
+      It can also be heard on Advanced Voice Chess Challenger real hardware, but not the whole line:
       "I I am Fidelity's chess challenger", instead.
     - Get rom locations from pcb (done for UVC, VCC is probably similar)
     - correctly hook up VBRC speech so that the z80 is halted while words are being spoken
 
 ***********************************************************************
 
-Talking Chess Challenger (VCC)
-Advanced Talking Chess Challenger (UVC)
-(which both share the same hardware)
+Voice Chess Challenger (VCC) (version A and B?)
+Advanced Voice Chess Challenger (UVC)
+Grandmaster Voice Chess Challenger
+Decorator Challenger (FCC)
+
+(which share the same hardware)
 ----------------------
 
 The CPU is a Z80 running at 4MHz.  The TSI chip runs at around 25KHz, using a
 470K / 100pf RC network.  This system is very very basic, and is composed of just
 the Z80, 4 ROMs, the TSI chip, and an 8255.
-
 
 The Z80's interrupt inputs are all pulled to VCC, so no interrupts are used.
 
@@ -73,7 +76,7 @@ PB.3 - digit 1, top dot (W)
 PB.4 - digit 2 (W)
 PB.5 - digit 3 (W)
 PB.6 - enable language switches (W, see below)
-PB.7 - TSI BSY line (R)
+PB.7 - TSI BUSY line (R)
 
 (button rows pulled up to 5V through 2.2K resistors)
 PC.0 - button row 0, German language jumper (R)
@@ -115,8 +118,11 @@ determination and give you a language option on power up or something.
 
 ***********************************************************************
 
-Chess Challenger 3/10
-----------------------
+Chess Challenger 10
+-------------------
+
+4 versions are known to exist: A,B,C,D. Strangely, version C has an 8080
+instead of Z80. Chess Challenger 1,3 and 7 also run on very similar hardware.
 
 This is an earlier hardware upon which the VCC and UVC above were based on;
 The hardware is nearly the same; in fact the only significant differences are
@@ -135,6 +141,9 @@ PA.5 - segment B (W)
 PA.6 - segment A (W)
 PA.7 - 'beeper' direct speaker output (W)
 
+The beeper is via a 556 timer, fixed-frequency at around 1300-1400Hz.
+Not all hardware configurations include the beeper.
+
 PB.0 - dot commons (W)
 PB.1 - NC
 PB.2 - digit 0, bottom dot (W)
@@ -142,7 +151,7 @@ PB.3 - digit 1, top dot (W)
 PB.4 - digit 2 (W)
 PB.5 - digit 3 (W)
 PB.6 - NC
-PB.7 - Mode select (cc3 vs cc10, R)
+PB.7 - Mode select (cc3 vs cc10, R) - note: there is no CC3 with 16 buttons
 
 (button rows pulled up to 5V through 2.2K resistors)
 PC.0 - button row 0 (R)
@@ -296,8 +305,8 @@ A detailed description of the hardware can be found also in the patent 4,373,719
 
 ******************************************************************************
 
-Sensory Chess Challenger champion (6502 based -> fidel6502.cpp driver)
----------------------------------
+Champion Sensory Chess Challenger (CSC) (6502 based -> fidel6502.cpp driver)
+---------------------------------------
 
 Memory map:
 -----------
@@ -335,7 +344,7 @@ PA7 - 7seg segments D
 PB0 - A12 on speech ROM (if used... not used on this model, ROM is 4K)
 PB1 - START line on S14001A
 PB2 - white wire
-PB3 - BSY line from S14001A
+PB3 - BUSY line from S14001A
 PB4 - Tone line (toggle to make a tone in the speaker)
 PB5 - button column I
 PB6 - selection jumper (resistor to 5V)
@@ -438,8 +447,8 @@ All three of the above are called "segment H".
 
 ***********************************************************************
 
-Sensory Chess Challenger
-------------------------
+Voice Sensory Chess Challenger (VSC)
+------------------------------------
 
 The display/button/LED/speech technology is identical to the above product.
 Only the CPU board was changed.  As such, it works the same but is interfaced
@@ -562,7 +571,7 @@ PB.0 - button column I
 PB.1 - button row 9
 PB.2 - Tone line (toggle to make tone in the speaker)
 PB.3 - violet wire
-PB.4 - white wire (and TSI BSY line)
+PB.4 - white wire (and TSI BUSY line)
 PB.5 - selection jumper input (see below)
 PB.6 - TSI start line
 PB.7 - TSI ROM D0 line
@@ -581,6 +590,43 @@ Anyways, the two jumpers are connected to button columns A and B and the common
 connects to Z80A PIO PB.5, which basically makes a 10th button row.  I would
 expect that the software reads these once on startup only.
 
+
+******************************************************************************
+
+Voice Excellence (FEV, model 6092) (6502 based -> fidel6502.cpp driver)
+----------------------------------
+
+PCB 1: 510.1117A02, appears to be identical to other "Excellence" boards
+CPU: GTE G65SC102P-3, 32 KB PRG ROM: AMI 101-1080A01(IC5), 8192x8 SRAM SRM2264C10(IC6)
+2 rows of LEDs on the side: 1*8 green, 1*8 red
+
+PCB 2: 510.1117A01
+Speech: TSI S14001A, 32 KB ROM: AMI 101-1081A01(IC2)
+Dip Switches set ROM A13 and ROM A14, on the side of the tablet
+
+ROM A12 is tied to S14001A's A11 (yuck)
+ROM A11 is however tied to the CPU's XYZ
+
+0000_07FF - Spanish 1/4
+0800_0FFF - Spanish 3/4
+1000_17FF - Spanish 2/4
+1800_1FFF - Spanish 4/4
+
+2000_27FF - French 1/4
+2800_2FFF - French 3/4
+3000_3FFF - French 2/4
+3800_3FFF - French 4/4
+
+4000_47FF - German 1/4
+4800_4FFF - German 3/4
+5000_57FF - German 2/4
+5800_5FFF - German 4/4
+
+6000_67FF - English 1/2
+6800_6FFF - Bridge Challenger 1/2
+7000_77FF - English 2/2
+7800_7FFF - Bridge Challenger 2/2
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -589,6 +635,8 @@ expect that the software reads these once on startup only.
 #include "machine/i8255.h"
 #include "machine/i8243.h"
 #include "machine/z80pio.h"
+#include "sound/speaker.h"
+#include "sound/beep.h"
 
 #include "includes/fidelz80.h"
 
@@ -607,7 +655,10 @@ public:
 		m_mcu(*this, "mcu"),
 		m_z80pio(*this, "z80pio"),
 		m_ppi8255(*this, "ppi8255"),
-		m_i8243(*this, "i8243")
+		m_i8243(*this, "i8243"),
+		m_speaker(*this, "speaker"),
+		m_beeper_off(*this, "beeper_off"),
+		m_beeper(*this, "beeper")
 	{ }
 
 	// devices/pointers
@@ -615,18 +666,22 @@ public:
 	optional_device<z80pio_device> m_z80pio;
 	optional_device<i8255_device> m_ppi8255;
 	optional_device<i8243_device> m_i8243;
+	optional_device<speaker_sound_device> m_speaker;
+	optional_device<timer_device> m_beeper_off;
+	optional_device<beep_device> m_beeper;
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
-	// model VCC/UVC
+	// model VCC/UVC/CC10
 	void vcc_prepare_display();
+	DECLARE_READ8_MEMBER(vcc_speech_r);
 	DECLARE_WRITE8_MEMBER(vcc_ppi_porta_w);
 	DECLARE_READ8_MEMBER(vcc_ppi_portb_r);
 	DECLARE_WRITE8_MEMBER(vcc_ppi_portb_w);
 	DECLARE_READ8_MEMBER(vcc_ppi_portc_r);
 	DECLARE_WRITE8_MEMBER(vcc_ppi_portc_w);
 	DECLARE_WRITE8_MEMBER(cc10_ppi_porta_w);
-	DECLARE_READ8_MEMBER(vcc_speech_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off_callback);
 
 	// model VSC
 	void vsc_prepare_display();
@@ -642,11 +697,10 @@ public:
 	// model 7014 and VBC
 	void vbrc_prepare_display();
 	DECLARE_WRITE8_MEMBER(vbrc_speech_w);
-	DECLARE_WRITE8_MEMBER(kp_matrix_w);
-	DECLARE_READ8_MEMBER(vbrc_scanner_r);
-	DECLARE_READ8_MEMBER(vbrc_unknown_r);
-	DECLARE_READ8_MEMBER(vbrc_input_r);
-	DECLARE_WRITE8_MEMBER(digit_w);
+	DECLARE_WRITE8_MEMBER(vbrc_mcu_p1_w);
+	DECLARE_READ8_MEMBER(vbrc_mcu_t_r);
+	DECLARE_READ8_MEMBER(vbrc_mcu_p2_r);
+	DECLARE_WRITE8_MEMBER(vbrc_ioexp_port_w);
 };
 
 
@@ -795,6 +849,15 @@ UINT16 fidelz80base_state::read_inputs(int columns)
 	return ret;
 }
 
+INPUT_CHANGED_MEMBER(fidelz80_state::reset_button)
+{
+	// when RE button is directly wired to RESET pin(s)
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+	
+	if (m_mcu)
+		m_mcu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
 
 
 // Devices, I/O
@@ -841,7 +904,7 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_porta_w)
 
 READ8_MEMBER(fidelz80_state::vcc_ppi_portb_r)
 {
-	// d7: TSI BSY line
+	// d7: TSI BUSY line
 	return (m_speech->busy_r()) ? 0x80 : 0x00;
 }
 
@@ -868,14 +931,23 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_portc_w)
 
 // CC10-specific (no speech chip, 1-bit beeper instead)
 
+TIMER_DEVICE_CALLBACK_MEMBER(fidelz80_state::beeper_off_callback)
+{
+	m_beeper->set_state(0);
+}
+
 WRITE8_MEMBER(fidelz80_state::cc10_ppi_porta_w)
 {
+	// d7: enable beeper on falling edge
+	if (m_beeper && ~data & m_7seg_data & 0x80)
+	{
+		m_beeper->set_state(1);
+		m_beeper_off->adjust(attotime::from_msec(80)); // duration is approximate
+	}
+
 	// d0-d6: digit segment data (same as VCC)
 	m_7seg_data = BITSWAP8(data,7,0,1,2,3,4,5,6);
 	vcc_prepare_display();
-
-	// d7: beeper output
-	m_speaker->level_w(data >> 7 & 1);
 }
 
 
@@ -941,7 +1013,7 @@ READ8_MEMBER(fidelz80_state::vsc_pio_portb_r)
 {
 	UINT8 ret = 0;
 	
-	// d4: TSI BSY line
+	// d4: TSI BUSY line
 	ret |= (m_speech->busy_r()) ? 0 : 0x10;
 	
 	return ret;
@@ -972,11 +1044,9 @@ void fidelz80_state::vbrc_prepare_display()
 		m_display_segmask[i] = 0x3fff;
 
 	display_matrix(16, 8, outdata, m_led_select);
-
-
 }
 
-WRITE8_MEMBER(fidelz80_state::digit_w)
+WRITE8_MEMBER(fidelz80_state::vbrc_ioexp_port_w)
 {
 	// P4-P7: digit segment data
 	m_7seg_data = (m_7seg_data & ~(0xf << (4*offset))) | ((data & 0xf) << (4*offset));
@@ -988,32 +1058,30 @@ WRITE8_MEMBER(fidelz80_state::digit_w)
     I8041 MCU, for VBRC
 ******************************************************************************/
 
-WRITE8_MEMBER(fidelz80_state::kp_matrix_w)
+WRITE8_MEMBER(fidelz80_state::vbrc_mcu_p1_w)
 {
 	// d0-d7: select digits, input mux
 	m_inp_mux = m_led_select = data;
 	vbrc_prepare_display();
 }
 
-READ8_MEMBER(fidelz80_state::vbrc_input_r)
+READ8_MEMBER(fidelz80_state::vbrc_mcu_p2_r)
 {
 	// d0-d3: I8243 P2
 	// d4-d7: multiplexed inputs (inverted)
 	return (m_i8243->i8243_p2_r(space, offset) & 0x0f) | (read_inputs(8) << 4 ^ 0xf0);
 }
 
-READ8_MEMBER(fidelz80_state::vbrc_scanner_r)
+READ8_MEMBER(fidelz80_state::vbrc_mcu_t_r)
 {
-	return 0;
+	// T0: card scanner?
+	if (offset == 0)
+		return 0;
+	
+	// T1: ?
+	else
+		return rand() & 1;
 }
-
-READ8_MEMBER(fidelz80_state::vbrc_unknown_r)
-{
-	return rand() & 1;
-}
-
-
-
 
 
 
@@ -1082,7 +1150,7 @@ WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
 {
 	//printf("%X ",data);
 	
-	// todo: HALT THE z80 here, and set up a callback to poll the s14001a BSY line to resume z80
+	// todo: HALT THE z80 here, and set up a callback to poll the s14001a BUSY line to resume z80
 	m_speech->data_w(space, 0, data & 0x3f);
 	m_speech->start_w(1);
 	m_speech->start_w(0);
@@ -1097,8 +1165,6 @@ static ADDRESS_MAP_START( vbrc_main_map, AS_PROGRAM, 8, fidelz80_state )
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(vbrc_speech_w) AM_MIRROR(0x1fff)
 ADDRESS_MAP_END
 
-
-
 static ADDRESS_MAP_START( vbrc_main_io, AS_IO, 8, fidelz80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x01)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("mcu", i8041_device, upi41_master_r, upi41_master_w)
@@ -1106,11 +1172,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vbrc_mcu_map, AS_IO, 8, fidelz80_state )
 	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(kp_matrix_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(vbrc_input_r) AM_DEVWRITE("i8243", i8243_device, i8243_p2_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(vbrc_mcu_p1_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(vbrc_mcu_p2_r) AM_DEVWRITE("i8243", i8243_device, i8243_p2_w)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("i8243", i8243_device, i8243_prog_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(vbrc_scanner_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(vbrc_unknown_r)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T1) AM_READ(vbrc_mcu_t_r)
 ADDRESS_MAP_END
 
 
@@ -1118,15 +1183,6 @@ ADDRESS_MAP_END
 /******************************************************************************
     Input Ports
 ******************************************************************************/
-
-INPUT_CHANGED_MEMBER(fidelz80_state::reset_button)
-{
-	// when RE button is directly wired to RESET pin(s)
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-	
-	if (m_mcu)
-		m_mcu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
 
 static INPUT_PORTS_START( fidelz80 )
 	PORT_START("IN.0")
@@ -1272,7 +1328,7 @@ static INPUT_PORTS_START( vsc )
 	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( bridgec )
+static INPUT_PORTS_START( vbrc )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("10") PORT_CODE(KEYCODE_0)
@@ -1350,8 +1406,9 @@ static MACHINE_CONFIG_START( cc10, fidelz80_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 1360) // approximation, from 556 timer ic
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_TIMER_DRIVER_ADD("beeper_off", fidelz80_state, beeper_off_callback)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( vcc, fidelz80_state )
@@ -1408,7 +1465,7 @@ static MACHINE_CONFIG_START( vsc, fidelz80_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bridgec, fidelz80_state )
+static MACHINE_CONFIG_START( vbrc, fidelz80_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz/2)
@@ -1419,7 +1476,7 @@ static MACHINE_CONFIG_START( bridgec, fidelz80_state )
 	MCFG_CPU_ADD("mcu", I8041, XTAL_5MHz) // or XTAL_5MHz/4?
 	MCFG_CPU_IO_MAP(vbrc_mcu_map)
 
-	MCFG_I8243_ADD("i8243", NOOP, WRITE8(fidelz80_state, digit_w))
+	MCFG_I8243_ADD("i8243", NOOP, WRITE8(fidelz80_state, vbrc_ioexp_port_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_vbrc)
@@ -1540,14 +1597,14 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-COMP( 1978, cc10,     0,      0,      cc10,    fidelz80, driver_device, 0, "Fidelity Electronics", "Chess Challenger 10/3 (Model CC10/BCC)", MACHINE_NOT_WORKING )
-COMP( 1979, vcc,      0,      0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Talking Chess Challenger (model VCC)", MACHINE_NOT_WORKING )
-COMP( 1979, vccg,     vcc,    0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Talking Chess Challenger (model VCC, German)", MACHINE_NOT_WORKING )
-COMP( 1979, vccfr,    vcc,    0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Talking Chess Challenger (model VCC, French)", MACHINE_NOT_WORKING )
-COMP( 1979, vccsp,    vcc,    0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Talking Chess Challenger (model VCC, Spanish)", MACHINE_NOT_WORKING )
-COMP( 1980, uvc,      vcc,    0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Advanced Talking Chess Challenger (model UVC)", MACHINE_NOT_WORKING )
+COMP( 1978, cc10,     0,      0,      cc10,    fidelz80, driver_device, 0, "Fidelity Electronics", "Chess Challenger 10 (version B?)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1979, vcc,      0,      0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1979, vccg,     vcc,    0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1979, vccfr,    vcc,    0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1979, vccsp,    vcc,    0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1980, uvc,      vcc,    0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Advanced Voice Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-COMP( 1980, vsc,      0,      0,      vsc,     vsc,      driver_device, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (model VSC)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1980, vsc,      0,      0,      vsc,     vsc,      driver_device, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 
-COMP( 1979, vbrc,     0,      0,      bridgec, bridgec,  driver_device, 0, "Fidelity Electronics", "Bridge Challenger (model VBRC/7002)",  MACHINE_NOT_WORKING )
-COMP( 1980, bridgec3, vbrc,   0,      bridgec, bridgec,  driver_device, 0, "Fidelity Electronics", "Bridge Challenger 3 (model 7014)", MACHINE_NOT_WORKING )
+COMP( 1979, vbrc,     0,      0,      vbrc,    vbrc,     driver_device, 0, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1980, bridgec3, vbrc,   0,      vbrc,    vbrc,     driver_device, 0, "Fidelity Electronics", "Voice Bridge Challenger III", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
