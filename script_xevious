@@ -1,6 +1,6 @@
 ;The comment below contains SFX script commands
 
-Setup=mamekr spc1500 -flop1 tap5/xevious.d88 -script fkey -skip_gameinfo -ui_active
+Setup=mamekr spc1500 -flop1 tap5/xevious.d88 -script fkey -skip_gameinfo -ui_active -effect scan75
 TempMode
 Silent=1
 Delete=*
