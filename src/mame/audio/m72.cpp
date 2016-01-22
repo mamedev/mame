@@ -49,12 +49,12 @@ Shisensho II                            1993  Rev 3.34 M81  Yes
 const device_type M72 = &device_creator<m72_audio_device>;
 
 m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, M72, "Irem M72 Audio Custom", tag, owner, clock, "m72_audio", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_irqvector(0),
-		m_sample_addr(0),
-		m_samples(nullptr),
-		m_samples_size(0)
+	: device_t(mconfig, M72, "Irem M72 Audio Custom", tag, owner, clock, "m72_audio", __FILE__)
+	, device_sound_interface(mconfig, *this)
+	, m_irqvector(0)
+	, m_sample_addr(0)
+	, m_samples(*this, "samples")
+	, m_samples_size(0)
 {
 }
 
@@ -74,8 +74,7 @@ void m72_audio_device::device_config_complete()
 
 void m72_audio_device::device_start()
 {
-	m_samples = machine().root_device().memregion("samples")->base();
-	m_samples_size = machine().root_device().memregion("samples")->bytes();
+	m_samples_size = m_samples.bytes();
 	m_space = &machine().device("soundcpu")->memory().space(AS_IO);
 	m_dac = machine().device<dac_device>("dac");
 
