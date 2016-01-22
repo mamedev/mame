@@ -11,8 +11,6 @@
 #ifndef __MACHINE_ATARIGEN__
 #define __MACHINE_ATARIGEN__
 
-#include "machine/nvram.h"
-#include "machine/er2055.h"
 #include "machine/eeprompar.h"
 #include "video/atarimo.h"
 #include "cpu/m6502/m6502.h"
@@ -383,11 +381,6 @@ public:
 	// misc helpers
 	void blend_gfx(int gfx0, int gfx1, int mask0, int mask1);
 
-	// vector and early raster EAROM interface
-	DECLARE_READ8_MEMBER( earom_r );
-	DECLARE_WRITE8_MEMBER( earom_w );
-	DECLARE_WRITE8_MEMBER( earom_control_w );
-
 	// timer IDs
 	enum
 	{
@@ -396,11 +389,6 @@ public:
 		TID_UNHALT_CPU,
 		TID_ATARIGEN_LAST
 	};
-
-	// vector and early raster EAROM interface
-	optional_device<er2055_device> m_earom;
-	UINT8               m_earom_data;
-	UINT8               m_earom_control;
 
 	UINT8               m_scanline_int_state;
 	UINT8               m_sound_int_state;
