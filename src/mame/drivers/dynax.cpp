@@ -308,8 +308,7 @@ WRITE8_MEMBER(dynax_state::hnoridur_palette_w)
 		// hnoridur: R/W RAM
 		case 0x18:
 		{
-			UINT8 *RAM = memregion("maincpu")->base() + 0x10000 + m_hnoridur_bank * 0x8000;
-			RAM[offset] = data;
+			m_hnoridur_ptr[offset] = data;
 			return;
 		}
 
@@ -4335,6 +4334,9 @@ MACHINE_START_MEMBER(dynax_state,hnoridur)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 	int bank_n = (memregion("maincpu")->bytes() - 0x10000) / 0x8000;
+	
+	m_hnoridur_ptr = &ROM[0x10000 + 0x18 * 0x8000];
+	save_pointer(NAME(m_hnoridur_ptr), 0x8000);
 
 	membank("bank1")->configure_entries(0, bank_n, &ROM[0x10000], 0x8000);
 

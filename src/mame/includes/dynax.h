@@ -112,6 +112,7 @@ public:
 	UINT8 m_gekisha_val[2];
 	UINT8 m_gekisha_rom_enable;
 	UINT8 *m_romptr;
+	UINT8 *m_hnoridur_ptr;
 
 	DECLARE_WRITE8_MEMBER(dynax_vblank_ack_w);
 	DECLARE_WRITE8_MEMBER(dynax_blitter_ack_w);
