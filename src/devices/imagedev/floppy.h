@@ -36,6 +36,9 @@
 
 #define FLOPPY_FORMATS_MEMBER(_member) \
 	const floppy_format_type _member [] = {
+#define FLOPPY_FORMATS_END0 \
+		, \
+		NULL };
 #define FLOPPY_FORMATS_END \
 		, \
 		FLOPPY_D88_FORMAT, \
@@ -46,8 +49,8 @@
 		FLOPPY_MFM_FORMAT, \
 		FLOPPY_TD0_FORMAT, \
 		FLOPPY_CQM_FORMAT, \
-		FLOPPY_DSK_FORMAT, \
-		NULL };
+		FLOPPY_DSK_FORMAT \
+	FLOPPY_FORMATS_END0
 
 class floppy_sound_device;
 
