@@ -1495,7 +1495,7 @@ MACHINE_CONFIG_END
 
 ROM_START( cc10 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cc10.bin", 0x0000, 0x1000, CRC(bb9e6055) SHA1(18276e57cf56465a6352239781a828c5f3d5ba63) )
+	ROM_LOAD( "cc10.bin", 0x0000, 0x1000, BAD_DUMP CRC(bb9e6055) SHA1(18276e57cf56465a6352239781a828c5f3d5ba63) ) // second half empty
 ROM_END
 
 
@@ -1512,32 +1512,32 @@ ROM_END
 
 ROM_START( vccg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257bb5ab) SHA1(f7589225bb8e5f3eac55f23e2bd526be780b38b5) ) // 32014.VCC??? at location b3?
-	ROM_LOAD("vcc2.bin", 0x1000, 0x1000, CRC(f33095e7) SHA1(692fcab1b88c910b74d04fe4d0660367aee3f4f0) ) // at location a2?
-	ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) ) // at location a1?
+	ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257bb5ab) SHA1(f7589225bb8e5f3eac55f23e2bd526be780b38b5) )
+	ROM_LOAD("vcc2.bin", 0x1000, 0x1000, CRC(f33095e7) SHA1(692fcab1b88c910b74d04fe4d0660367aee3f4f0) )
+	ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) )
 
 	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("vcc-german.bin", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // at location c4?
+	ROM_LOAD("vcc-german.bin", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // taken from fexcelv
 ROM_END
 
 ROM_START( vccfr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257bb5ab) SHA1(f7589225bb8e5f3eac55f23e2bd526be780b38b5) ) // 32014.VCC??? at location b3?
-	ROM_LOAD("vcc2.bin", 0x1000, 0x1000, CRC(f33095e7) SHA1(692fcab1b88c910b74d04fe4d0660367aee3f4f0) ) // at location a2?
-	ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) ) // at location a1?
+	ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257bb5ab) SHA1(f7589225bb8e5f3eac55f23e2bd526be780b38b5) )
+	ROM_LOAD("vcc2.bin", 0x1000, 0x1000, CRC(f33095e7) SHA1(692fcab1b88c910b74d04fe4d0660367aee3f4f0) )
+	ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) )
 
 	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("vcc-french.bin", 0x0000, 0x2000, BAD_DUMP CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3) ) // at location c4?
+	ROM_LOAD("vcc-french.bin", 0x0000, 0x2000, BAD_DUMP CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3) ) // taken from fexcelv
 ROM_END
 
 ROM_START( vccsp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257bb5ab) SHA1(f7589225bb8e5f3eac55f23e2bd526be780b38b5) ) // 32014.VCC??? at location b3?
-	ROM_LOAD("vcc2.bin", 0x1000, 0x1000, CRC(f33095e7) SHA1(692fcab1b88c910b74d04fe4d0660367aee3f4f0) ) // at location a2?
-	ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) ) // at location a1?
+	ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257bb5ab) SHA1(f7589225bb8e5f3eac55f23e2bd526be780b38b5) )
+	ROM_LOAD("vcc2.bin", 0x1000, 0x1000, CRC(f33095e7) SHA1(692fcab1b88c910b74d04fe4d0660367aee3f4f0) )
+	ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) )
 
 	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("vcc-spanish.bin", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) ) // at location c4?
+	ROM_LOAD("vcc-spanish.bin", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) )
 ROM_END
 
 
