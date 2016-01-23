@@ -226,7 +226,6 @@ SOUNDS["VOTRAX"] = true
 SOUNDS["ES8712"] = true
 SOUNDS["CDP1869"] = true
 SOUNDS["S14001A"] = true
-SOUNDS["S14001A_NEW"] = true
 SOUNDS["WAVE"] = true
 SOUNDS["SID6581"] = true
 SOUNDS["SID8580"] = true

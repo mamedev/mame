@@ -1430,7 +1430,7 @@ static MACHINE_CONFIG_START( vcc, fidelz80_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speech", S14001A_NEW, 25000) // R/C circuit, around 25khz
+	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
 	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidelz80_state, vcc_speech_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
@@ -1458,7 +1458,7 @@ static MACHINE_CONFIG_START( vsc, fidelz80_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speech", S14001A_NEW, 25000) // R/C circuit, around 25khz
+	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1483,7 +1483,7 @@ static MACHINE_CONFIG_START( vbrc, fidelz80_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speech", S14001A_NEW, 25000) // R/C circuit, around 25khz
+	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 

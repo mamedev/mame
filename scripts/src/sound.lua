@@ -941,20 +941,6 @@ end
 
 
 ---------------------------------------------------
--- S14001A_NEW speech synthesizer
---@src/devices/sound/s14001a_new.h,SOUNDS["S14001A_NEW"] = true
----------------------------------------------------
-
-if (SOUNDS["S14001A_NEW"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/s14001a_new.cpp",
-		MAME_DIR .. "src/devices/sound/s14001a_new.h",
-	}
-end
-
-
-
----------------------------------------------------
 -- Texas Instruments SN76477 analog chip
 --@src/devices/sound/sn76477.h,SOUNDS["SN76477"] = true
 ---------------------------------------------------

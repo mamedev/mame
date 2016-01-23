@@ -332,7 +332,7 @@ static MACHINE_CONFIG_START( csc, fidel6502_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speech", S14001A_NEW, 25000) // around 25khz
+	MCFG_SOUND_ADD("speech", S14001A, 25000) // around 25khz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 

@@ -7,7 +7,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "sound/s14001a_new.h"
+#include "sound/s14001a.h"
 
 class fidelz80base_state : public driver_device
 {
@@ -26,7 +26,7 @@ public:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	optional_ioport_array<10> m_inp_matrix; // max 10
-	optional_device<s14001a_new_device> m_speech;
+	optional_device<s14001a_device> m_speech;
 	optional_region_ptr<UINT8> m_speech_rom;
 
 	// misc common
