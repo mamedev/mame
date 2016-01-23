@@ -4485,7 +4485,7 @@ ROM_START( strtdriv )
 	ROM_LOAD( "136091-0033.10j", 0x000000, 0x010000, CRC(57504ab6) SHA1(ec8361b7da964c07ca0da48a87537badc3986fe0) )
 
 	ROM_REGION16_BE( 0x100000, "mainpcb:ds3xdsp", 0 )  /* DS III auxillary ADSP-2105 (unused) */
-	ROM_FILL(                    0x000000, 0x010000, nullptr)
+	ROM_FILL(                    0x000000, 0x010000, 0x00)
 
 	ROM_REGION( 0x80000, "mainpcb:ds3sdsp_data", 0 )
 	ROM_LOAD16_BYTE( "136052-1123.12lm",0x00000, 0x10000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
