@@ -156,6 +156,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/ef9364.h,VIDEOS["EF9364"] = true
+--------------------------------------------------
+
+if (VIDEOS["EF9364"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ef9364.cpp",
+		MAME_DIR .. "src/devices/video/ef9364.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/ef9365.h,VIDEOS["EF9365"] = true
 --------------------------------------------------
 
