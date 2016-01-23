@@ -20,6 +20,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "sound/ay8910.h"
 #include "machine/i8279.h"
+#include "marywu.lh"
 
 class marywu_state : public driver_device
 {
@@ -33,8 +34,10 @@ public:
 
 WRITE8_MEMBER( marywu_state::display_7seg_data_w )
 {
-    output_set_digit_value(0, data & 0x0F);
-    output_set_digit_value(1, data & 0xF0);
+    static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // HEF4511BP (7 seg display driver)
+
+    output_set_digit_value(0, patterns[data & 0x0F]);
+    output_set_digit_value(1, patterns[(data >> 4) & 0x0F]);
 }
 
 static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, marywu_state )
@@ -55,11 +58,14 @@ static MACHINE_CONFIG_START( marywu , marywu_state )
     MCFG_CPU_PROGRAM_MAP(program_map)
     MCFG_CPU_IO_MAP(io_map)
 
-    /* Keyboard interface */
+    /* Keyboard & display interface */
     MCFG_DEVICE_ADD("i8279", I8279, XTAL_10_738635MHz) /* should it be perhaps a fraction of the XTAL clock ? */
 //    MCFG_I8279_OUT_SL_CB(WRITE8(marywu_state, marywu_scanlines_w))          // scan SL lines
 //    MCFG_I8279_IN_RL_CB(READ8(marywu_state, marywu_kbd_r))                  // kbd RL lines
     MCFG_I8279_OUT_DISP_CB(WRITE8(marywu_state, display_7seg_data_w))
+
+    /* Video */
+    MCFG_DEFAULT_LAYOUT(layout_marywu)
 
     /* sound hardware */
     MCFG_SPEAKER_STANDARD_MONO("mono")
