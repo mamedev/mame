@@ -26,8 +26,7 @@ const device_type COCO_DWSOCK = &device_creator<beckerport_device>;
 
 INPUT_PORTS_START( coco_drivewire )
 	PORT_START(DRIVEWIRE_PORT_TAG)
-	PORT_CONFNAME( 0xffff, 65504, "Drivewire Server TCP Port")
-		PORT_CHANGED_MEMBER(DEVICE_SELF, beckerport_device, drivewire_port_changed, NULL )
+	PORT_CONFNAME( 0xffff, 65504, "Drivewire Server TCP Port") PORT_CHANGED_MEMBER(DEVICE_SELF, beckerport_device, drivewire_port_changed, nullptr)
 	PORT_CONFSETTING(      65500, "65500" )
 	PORT_CONFSETTING(      65501, "65501" )
 	PORT_CONFSETTING(      65502, "65502" )

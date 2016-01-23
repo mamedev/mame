@@ -52,7 +52,7 @@ DECLARE_CUSTOM_INPUT_MEMBER( sms_sports_pad_jp_device::dir_pins_r )
 
 static INPUT_PORTS_START( sms_sports_pad_jp )
 	PORT_START("SPORTS_JP_IN")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_sports_pad_jp_device, dir_pins_r, NULL) // Directional pins
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_sports_pad_jp_device, dir_pins_r, nullptr) // Directional pins
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // Vcc
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // TL (Button 1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // TH
