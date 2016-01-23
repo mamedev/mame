@@ -211,7 +211,6 @@ static MACHINE_CONFIG_START( yard, m58_state )
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("irem_audio", IREM_M52_LARGE_AUDIO, 0)
-
 MACHINE_CONFIG_END
 
 
@@ -222,8 +221,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-ROM_START( 10yard )
-// Dumped from an original Irem M52 board. Serial no. 307761/License Seal 09461.
+ROM_START( 10yard ) // Dumped from an original Irem M52 board. Serial no. 307761/License Seal 09461.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "yf-a-3p-b",    0x0000, 0x2000, CRC(2e205ec2) SHA1(fcfa08f45423b35f2c99d4e6b5474ab1b3a84fec) )
 	ROM_LOAD( "yf-a-3n-b",    0x2000, 0x2000, CRC(82fcd980) SHA1(7846705b29961cb95ee1571ee7e16baceea522d4) )
@@ -384,10 +382,10 @@ ROM_START( vs10yardu )
 	ROM_LOAD( "yf-b-5j.5j",      0x08000, 0x2000, CRC(713ef31f) SHA1(b48df9ed4f26fded3c7eaac3a52b580b2dd60477) )
 	ROM_LOAD( "yf-b-5k.5k",      0x0a000, 0x2000, CRC(f49651cc) SHA1(5b87d7360bcd5883ec265b2a01a3e02e10a85345) )
 
-	ROM_REGION( 0x0520, "proms", 0 )
+	ROM_REGION( 0x0520, "proms", 0 ) // on these sets the content of the sprite color PROM needs reversing - are the proms on the other sets from bootleg boards, or hand modified?
 	ROM_LOAD( "yf-a-5c.5c",      0x0000, 0x0100, CRC(08fa5103) SHA1(98af48dafbbaa42f58232bf74ccbf5da41723e71) ) /* chars palette low 4 bits */
 	ROM_LOAD( "yf-a-5d.5d",      0x0100, 0x0100, CRC(7c04994c) SHA1(790bf1616335b9df4943cffcafa48d8e8aee009e) ) /* chars palette high 4 bits */
-	ROM_LOAD( "yf-b-2b.2b",      0x0200, 0x0020, CRC(fcd283ea) SHA1(6ebc3e966bb920685250f38edab5fe1f8a27c316) ) /* sprites palette */
+	ROMX_LOAD( "yf-b-2b.2b",     0x0200, 0x0020, CRC(fcd283ea) SHA1(6ebc3e966bb920685250f38edab5fe1f8a27c316), ROM_GROUPSIZE(16) | ROM_REVERSE ) /* sprites palette */
 	ROM_LOAD( "yf-b-3l.3l",      0x0220, 0x0100, CRC(e1cdfb06) SHA1(a8cc3456cfc272e3faac80370b2298d8e1f8c2fe) ) /* sprites lookup table */
 	ROM_LOAD( "yf-b-2r.2r",      0x0320, 0x0100, CRC(cd85b646) SHA1(5268db705006058eec308afe474f4df3c15465bb) ) /* radar palette low 4 bits */
 	ROM_LOAD( "yf-b-2p.2p",      0x0420, 0x0100, CRC(45384397) SHA1(e4c662ee81aef63efd8b4a45f85c4a78dc2d419e) ) /* radar palette high 4 bits */
@@ -418,40 +416,20 @@ ROM_START( 10yard85 )
 	ROM_LOAD( "yf-b-5j.5j",      0x08000, 0x2000, CRC(713ef31f) SHA1(b48df9ed4f26fded3c7eaac3a52b580b2dd60477) )
 	ROM_LOAD( "yf-b-5k.5k",      0x0a000, 0x2000, CRC(f49651cc) SHA1(5b87d7360bcd5883ec265b2a01a3e02e10a85345) )
 
-	ROM_REGION( 0x0520, "proms", 0 )
+	ROM_REGION( 0x0520, "proms", 0 ) // on these sets the content of the sprite color PROM needs reversing - are the proms on the other sets from bootleg boards, or hand modified?
 	ROM_LOAD( "yf-a-5c.5c",      0x0000, 0x0100, CRC(08fa5103) SHA1(98af48dafbbaa42f58232bf74ccbf5da41723e71) ) /* chars palette low 4 bits */
 	ROM_LOAD( "yf-a-5d.5d",      0x0100, 0x0100, CRC(7c04994c) SHA1(790bf1616335b9df4943cffcafa48d8e8aee009e) ) /* chars palette high 4 bits */
-	ROM_LOAD( "yf-b-2b.2b",      0x0200, 0x0020, CRC(fcd283ea) SHA1(6ebc3e966bb920685250f38edab5fe1f8a27c316) ) /* sprites palette */
+	ROMX_LOAD( "yf-b-2b.2b",     0x0200, 0x0020, CRC(fcd283ea) SHA1(6ebc3e966bb920685250f38edab5fe1f8a27c316), ROM_GROUPSIZE(16) | ROM_REVERSE ) /* sprites palette */
 	ROM_LOAD( "yf-b-3l.3l",      0x0220, 0x0100, CRC(e1cdfb06) SHA1(a8cc3456cfc272e3faac80370b2298d8e1f8c2fe) ) /* sprites lookup table */
 	ROM_LOAD( "yf-b-2r.2r",      0x0320, 0x0100, CRC(cd85b646) SHA1(5268db705006058eec308afe474f4df3c15465bb) ) /* radar palette low 4 bits */
 	ROM_LOAD( "yf-b-2p.2p",      0x0420, 0x0100, CRC(45384397) SHA1(e4c662ee81aef63efd8b4a45f85c4a78dc2d419e) ) /* radar palette high 4 bits */
 ROM_END
 
-/*************************************
- *
- *  Game drivers
- *
- *************************************/
 
-DRIVER_INIT_MEMBER(m58_state,yard85)
-{
-	// on these sets the content of the sprite color PROM needs reversing
-	//  are the proms on the other sets from bootleg boards, or hand modified?
-	std::unique_ptr<UINT8[]> buffer = std::make_unique<UINT8[]>(0x10);
-	UINT8* region = memregion("proms")->base();
-	int i;
-
-	for (i=0;i<0x10;i++)
-	{
-		buffer[i] = region[0x20f-i];
-	}
-	memcpy(region+0x200, buffer.get(), 0x10);
-	m_palette->update();
-}
-
-GAME( 1983, 10yard,   0,        yard,     yard, driver_device,     0, ROT0, "Irem", "10-Yard Fight (World, set 1)", MACHINE_SUPPORTS_SAVE ) // no copyright
-GAME( 1983, 10yardj,  10yard,   yard,     yard, driver_device,     0, ROT0, "Irem", "10-Yard Fight (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, vs10yard, 10yard,   yard,     vs10yard, driver_device, 0, ROT0, "Irem", "Vs 10-Yard Fight (World, 11/05/84)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, vs10yardj,10yard,   yard,     vs10yarj, driver_device, 0, ROT0, "Irem", "Vs 10-Yard Fight (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, vs10yardu,10yard,   yard,     vs10yard, m58_state, yard85, ROT0, "Irem (Taito license)", "Vs 10-Yard Fight (US, Taito license)", MACHINE_SUPPORTS_SAVE ) // had '85 stickers, but doesn't have '85 on the title screen like the set below
-GAME( 1985, 10yard85, 10yard,   yard,     yard, m58_state,     yard85, ROT0, "Irem (Taito license)", "10-Yard Fight '85 (US, Taito license)", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME       PARENT    MACHINE  INPUT     INIT              MONITOR, COMPANY, FULLNAME, FLAGS */
+GAME( 1983, 10yard,    0,        yard,    yard,     driver_device, 0, ROT0, "Irem", "10-Yard Fight (World, set 1)", MACHINE_SUPPORTS_SAVE ) // no copyright
+GAME( 1983, 10yardj,   10yard,   yard,    yard,     driver_device, 0, ROT0, "Irem", "10-Yard Fight (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vs10yard,  10yard,   yard,    vs10yard, driver_device, 0, ROT0, "Irem", "Vs 10-Yard Fight (World, 11/05/84)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vs10yardj, 10yard,   yard,    vs10yarj, driver_device, 0, ROT0, "Irem", "Vs 10-Yard Fight (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vs10yardu, 10yard,   yard,    vs10yard, driver_device, 0, ROT0, "Irem (Taito license)", "Vs 10-Yard Fight (US, Taito license)", MACHINE_SUPPORTS_SAVE ) // had '85 stickers, but doesn't have '85 on the title screen like the set below
+GAME( 1985, 10yard85,  10yard,   yard,    yard,     driver_device, 0, ROT0, "Irem (Taito license)", "10-Yard Fight '85 (US, Taito license)", MACHINE_SUPPORTS_SAVE )

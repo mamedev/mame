@@ -11,9 +11,6 @@
 #include "video/resnet.h"
 #include "includes/m58.h"
 
-#define SCROLL_PANEL_WIDTH  (14*4)
-#define RADAR_PALETTE_BASE  (256)
-
 
 
 /*************************************
@@ -114,24 +111,22 @@ WRITE8_MEMBER(m58_state::videoram_w)
 
 WRITE8_MEMBER(m58_state::scroll_panel_w)
 {
-	int sx,sy,i;
-
-	sx = ( offset % 16 );
-	sy = ( offset / 16 );
+	int sx = ( offset % 16 );
+	int sy = ( offset / 16 );
 
 	if (sx < 1 || sx > 14)
 		return;
 
 	sx = 4 * (sx - 1);
 
-	for (i = 0;i < 4;i++)
+	for (int i = 0;i < 4;i++)
 	{
 		int col;
 
 		col = (data >> i) & 0x11;
 		col = ((col >> 3) | col) & 3;
 
-		m_scroll_panel_bitmap.pix16(sy, sx + i) = RADAR_PALETTE_BASE + (sy & 0xfc) + col;
+		m_scroll_panel_bitmap.pix16(sy, sx + i) = 0x100 + (sy & 0xfc) + col;
 	}
 }
 
@@ -178,11 +173,10 @@ void m58_state::video_start()
 	int height = m_screen->height();
 	const rectangle &visarea = m_screen->visible_area();
 
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m58_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(m58_state::tilemap_scan_rows),this),  8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m58_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(m58_state::tilemap_scan_rows),this), 8, 8, 64, 32);
 	m_bg_tilemap->set_scrolldx(visarea.min_x, width - (visarea.max_x + 1));
 	m_bg_tilemap->set_scrolldy(visarea.min_y - 8, height + 16 - (visarea.max_y + 1));
 
-	//m_scroll_panel_bitmap = std::make_unique<bitmap_ind16>(SCROLL_PANEL_WIDTH, height);
 	m_screen->register_screen_bitmap(m_scroll_panel_bitmap);
 	save_item(NAME(m_scroll_panel_bitmap));
 }
@@ -212,14 +206,11 @@ WRITE8_MEMBER(m58_state::flipscreen_w)
  *
  *************************************/
 
-#define DRAW_SPRITE(code, sy)  m_gfxdecode->gfx(1)->transmask(bitmap,cliprect, code, color, flipx, flipy, sx, sy, m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 512));
-
 void m58_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int offs;
 	const rectangle &visarea = m_screen->visible_area();
 
-	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int attr = m_spriteram[offs + 1];
 		int bank = (attr & 0x20) >> 5;
@@ -254,9 +245,17 @@ void m58_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 		{
 			sy2 = sy1 + 0x10;
 		}
-
-		DRAW_SPRITE(code1 + 256 * bank, visarea.min_y + sy1)
-		DRAW_SPRITE(code2 + 256 * bank, visarea.min_y + sy2)
+		
+		m_gfxdecode->gfx(1)->transmask(bitmap, cliprect,
+			code1 + 256 * bank, color,
+			flipx, flipy, sx, visarea.min_y + sy1,
+			m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 512)
+		);
+		m_gfxdecode->gfx(1)->transmask(bitmap, cliprect,
+			code2 + 256 * bank, color,
+			flipx, flipy, sx, visarea.min_y + sy2,
+			m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 512)
+		);
 	}
 }
 
@@ -276,15 +275,14 @@ void m58_state::draw_panel( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		const rectangle clippanelflip(0*8, 6*8-1, 1*8, 31*8-1);
 		rectangle clip = flip_screen() ? clippanelflip : clippanel;
 		const rectangle &visarea = m_screen->visible_area();
-		int sx = flip_screen() ? cliprect.min_x - 8 : cliprect.max_x + 1 - SCROLL_PANEL_WIDTH;
+		int sx = flip_screen() ? cliprect.min_x - 8 : cliprect.max_x + 1 - 14*4;
 		int yoffs = flip_screen() ? -40 : -16;
 
 		clip.min_y += visarea.min_y + yoffs;
 		clip.max_y += visarea.max_y + yoffs;
 		clip &= cliprect;
 
-		copybitmap(bitmap, m_scroll_panel_bitmap, flip_screen(), flip_screen(),
-					sx, visarea.min_y + yoffs, clip);
+		copybitmap(bitmap, m_scroll_panel_bitmap, flip_screen(), flip_screen(), sx, visarea.min_y + yoffs, clip);
 	}
 }
 
