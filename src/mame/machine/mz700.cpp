@@ -70,8 +70,9 @@ DRIVER_INIT_MEMBER(mz_state,mz800)
 	m_cgram = std::make_unique<UINT8[]>(0x1000);
 	memset(m_cgram.get(), 0, sizeof(UINT8) * 0x1000);
 
-	m_p_chargen = memregion("cgrom")->base();
-	if (!m_p_chargen)
+	if (memregion("cgrom"))
+		m_p_chargen = memregion("cgrom")->base();
+	else
 		m_p_chargen = m_cgram.get();
 	UINT8 *rom = memregion("monitor")->base();
 	UINT8 *ram = m_ram->pointer();
