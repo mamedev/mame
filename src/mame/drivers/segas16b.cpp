@@ -1127,7 +1127,8 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 			//  D0 : Output to coin counter 1
 			//
 			m_segaic16vid->tilemap_set_flip(0, data & 0x40);
-			m_sprites->set_flip(data & 0x40);
+			if (m_sprites.found())
+				m_sprites->set_flip(data & 0x40);
 			if (!m_disable_screen_blanking)
 				m_segaic16vid->set_display_enable(data & 0x20);
 			output().set_led_value(1, data & 0x08);

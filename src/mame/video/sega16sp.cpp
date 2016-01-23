@@ -869,7 +869,7 @@ void sega_sys16b_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 	//
 
 	// render the sprites in order
-	const UINT16 *spritebase = reinterpret_cast<const UINT16 *>(&m_sprite_region_ptr[0]);
+	const UINT16 *spritebase = &m_sprite_region_ptr[0];
 	UINT8 numbanks = m_sprite_region_ptr.bytes() / 0x20000;
 	UINT16 *ramend = spriteram() + spriteram_elements();
 	for (UINT16 *data = spriteram(); data < ramend; data += 8)

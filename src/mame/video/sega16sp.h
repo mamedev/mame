@@ -203,7 +203,7 @@ protected:
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 	// memory regions
-	optional_region_ptr<UINT8> m_sprite_region_ptr;
+	required_region_ptr<UINT16> m_sprite_region_ptr;
 };
 
 
