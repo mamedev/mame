@@ -3303,9 +3303,6 @@ ROM_START( brdrline )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "borderc.49",   0x0000, 0x0020, CRC(bc6be94e) SHA1(34e113ec25e19212b74907d35be5cb8714a8249c) )
 
-	ROM_REGION( 0x0400, "sound", 0 ) /* sound ROM */
-	ROM_LOAD( "au.bin",       0x0000, 0x0400, CRC(a23e1d9f) SHA1(ce209571f6341aa6f036a015e666673098bc98ea) )
-
 	ROM_REGION( 0x0100, "user1", 0 )    /* misc PROM */
 	ROM_LOAD( "border.32",   0x0000, 0x0020, CRC(c128d0ba) SHA1(0ce9febbb7e2f5388ed999a479e3d385dba0b342) )
 	ROM_LOAD( "bordera.15",  0x0000, 0x0020, CRC(6449e678) SHA1(421c45c8fba3c2bc2a7ebbea2c837c8fa1a5a2f3) ) // sequence
@@ -3313,6 +3310,9 @@ ROM_START( brdrline )
 	/* following 2 from sound board */
 	ROM_LOAD( "prom93427.1", 0x0000, 0x0100, CRC(64b98dc7) SHA1(f0bb7d0b4b56cc2936ce4cbec165394f3026ed6d) )
 	ROM_LOAD( "prom93427.2", 0x0000, 0x0100, CRC(bda82367) SHA1(1c96453c2ae372892c39b5657cf2b252a90a10a9) )
+
+	ROM_REGION( 0x0400, "user2", 0 ) /* sound ROM */
+	ROM_LOAD( "au.bin",       0x0000, 0x0400, CRC(a23e1d9f) SHA1(ce209571f6341aa6f036a015e666673098bc98ea) )
 ROM_END
 
 
@@ -3374,9 +3374,6 @@ ROM_START( starrkr )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "pr-23.u49",   0x0000, 0x0020, CRC(0a2156b3) SHA1(504abe8e253ff9b12ac6ffacd92722f8ee8a30ae) )
 
-	ROM_REGION( 0x0400, "sound", 0 ) /* sound ROM */
-	ROM_LOAD( "epr-613.1",   0x0000, 0x0400, CRC(ff4be0c7) SHA1(7311c34aa88f6ba905a01e7a9f2ed99a0353a06b) )
-
 	ROM_REGION( 0x0800, "user1", 0 )    /* misc PROM */
 	ROM_LOAD( "pr-33.u15",  0x0000, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )
 	ROM_LOAD( "pr-34.u14",  0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )
@@ -3390,6 +3387,9 @@ ROM_START( starrkr )
 	ROM_LOAD( "pr-64.25",   0x0000, 0x0800, CRC(7342cf53) SHA1(761aa5a38a28c044cbbbe66e3a8a2f47c493d56d) )
 	ROM_LOAD( "pr-62.26",   0x0000, 0x0800, CRC(d352c545) SHA1(6da4f7a7974e2f471b081d230a47767315b2f1a7) )
 	ROM_LOAD( "pr-66.28",   0x0000, 0x0800, CRC(895c5733) SHA1(881a274cdcf23292ea658dcab793303cfb445e51) )
+
+	ROM_REGION( 0x0400, "user2", 0 ) /* sound ROM */
+	ROM_LOAD( "epr-613.1",   0x0000, 0x0400, CRC(ff4be0c7) SHA1(7311c34aa88f6ba905a01e7a9f2ed99a0353a06b) )
 ROM_END
 
 /*
@@ -3448,9 +3448,6 @@ ROM_START( brdrlins )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "5610.49",    0x0000, 0x0020, CRC(bc6be94e) SHA1(34e113ec25e19212b74907d35be5cb8714a8249c) )
 
-	ROM_REGION( 0x0400, "sound", 0 ) /* sound ROM */
-	ROM_LOAD( "au.bin",     0x0000, 0x0400, CRC(a23e1d9f) SHA1(ce209571f6341aa6f036a015e666673098bc98ea) )
-
 	ROM_REGION( 0x0100, "user1", 0 )    /* misc PROM */
 	ROM_LOAD( "82s123.bin", 0x0000, 0x0020, CRC(c128d0ba) SHA1(0ce9febbb7e2f5388ed999a479e3d385dba0b342) )
 	ROM_LOAD( "5610.15",    0x0000, 0x0020, CRC(6449e678) SHA1(421c45c8fba3c2bc2a7ebbea2c837c8fa1a5a2f3) )
@@ -3458,6 +3455,9 @@ ROM_START( brdrlins )
 	/* following 2 from sound board */
 	ROM_LOAD( "93427.1",    0x0000, 0x0100, CRC(64b98dc7) SHA1(f0bb7d0b4b56cc2936ce4cbec165394f3026ed6d) )
 	ROM_LOAD( "93427.2",    0x0000, 0x0100, CRC(bda82367) SHA1(1c96453c2ae372892c39b5657cf2b252a90a10a9) )
+
+	ROM_REGION( 0x0400, "user2", 0 ) /* sound ROM */
+	ROM_LOAD( "au.bin",     0x0000, 0x0400, CRC(a23e1d9f) SHA1(ce209571f6341aa6f036a015e666673098bc98ea) )
 ROM_END
 
 ROM_START( brdrlinb )
@@ -3474,13 +3474,13 @@ ROM_START( brdrlinb )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "borderc.49",   0x0000, 0x0020, CRC(bc6be94e) SHA1(34e113ec25e19212b74907d35be5cb8714a8249c) )
 
-	ROM_REGION( 0x0400, "sound", 0 ) /* sound ROM */
-	ROM_LOAD( "bords.bin",    0x0000, 0x0400, CRC(a23e1d9f) SHA1(ce209571f6341aa6f036a015e666673098bc98ea) )
-
 	ROM_REGION( 0x0020, "user1", 0 )    /* misc PROM */
 	ROM_LOAD( "border.32",   0x0000, 0x0020, CRC(c128d0ba) SHA1(0ce9febbb7e2f5388ed999a479e3d385dba0b342) )
 	ROM_LOAD( "bordera.15",  0x0000, 0x0020, CRC(6449e678) SHA1(421c45c8fba3c2bc2a7ebbea2c837c8fa1a5a2f3) )
 	ROM_LOAD( "borderb.14",  0x0000, 0x0020, CRC(55dcdef1) SHA1(6fbd041edc258b7e1b99bbe9526612cfb1b541f8) )
+
+	ROM_REGION( 0x0400, "user2", 0 ) /* sound ROM */
+	ROM_LOAD( "bords.bin",    0x0000, 0x0400, CRC(a23e1d9f) SHA1(ce209571f6341aa6f036a015e666673098bc98ea) )
 ROM_END
 
 ROM_START( startrks )
