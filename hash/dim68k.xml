@@ -9,6 +9,49 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
 
 <softwarelist name="dim68k" description="Dimension 68000 Disks">
 
+	<software name="cpm124">
+		<description>CP/M-68K Release 1.24</description>
+		<!-- Serial Number: 1015-1004-0004016-->
+		<!-- Build Date: Sept 27, 1984 -->
+		<year>1984</year>
+		<publisher>Micro Craft Corporation</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="User Master"/>
+			<dataarea name="flop" size="365718">
+				<rom name="system.imd" size="365718" crc="302a26f0" sha1="e480f90206fc24b9d74681633a90f4d575c380ca" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities"/>
+			<dataarea name="flop" size="343743">
+				<rom name="utilities.imd" size="343743" crc="c3bbf1f0" sha1="332771861b8a27deb307f2a758ce741406c3da36" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Assembler"/>
+			<dataarea name="flop" size="381558">
+				<rom name="assembler.imd" size="381558" crc="d0a9ced3" sha1="11ba67ffa495eb81b76eab72cfff30e77a604d00" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="C Language/Linker"/>
+			<dataarea name="flop" size="318713">
+				<rom name="clanguage.imd" size="318713" crc="a0d6748d" sha1="080adfd1f435895bac511231e654beeb59e7657d" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Emulation"/>
+			<dataarea name="flop" size="395324">
+				<rom name="emulator.imd" size="395324" crc="60264ee0" sha1="fcd206f5670d5289b618ee03fb0bcad937306f15" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cpm121">
 		<description>CP/M-68K Release 1.21</description>
 		<!-- Serial Number: 1015-1004-000548-->
@@ -18,6 +61,7 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
 
 		<part name="flop1" interface="floppy_5_25">
 		<!-- Disk Content: User Master -->
+			<feature name="part_id" value="User Master"/>
 			<dataarea name="flop" size="369826">
 				<rom name="system.imd" size="369826" crc="18fe0e83" sha1="b389159e47c8fccc6674d3cb0e35d716f04d267e" offset="0x0000" />
 			</dataarea>
@@ -25,6 +69,7 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
 
 		<part name="flop2" interface="floppy_5_25">
 		<!-- Disk Content: utilities -->
+			<feature name="part_id" value="Utilities"/>
 			<dataarea name="flop" size="384645">
 				<rom name="utilities.imd" size="384645" crc="175e10da" sha1="47f3151805556a4fd0c9e33329dc2db1d3b28725" offset="0x0000" />
 			</dataarea>
@@ -32,6 +77,7 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
 
 		<part name="flop3" interface="floppy_5_25">
 		<!-- Disk Content: Assembler -->
+			<feature name="part_id" value="Assembler"/>
 			<dataarea name="flop" size="381579">
 				<rom name="assembler.imd" size="381579" crc="05926cfa" sha1="feaa2f0a9833aae96882d8b880dcd4cc8bbf871c" offset="0x0000" />
 			</dataarea>
@@ -39,6 +85,7 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
 
 		<part name="flop4" interface="floppy_5_25">
 		<!-- Disk Content: C Language/Linker -->
+			<feature name="part_id" value="C Language/Linker"/>
 			<dataarea name="flop" size="302891">
 				<rom name="clanguage.imd" size="302891" crc="2e6505af" sha1="8f2296b3e852600aa77d96bd5b66f8ca52e2a24e" offset="0x0000" />
 			</dataarea>
@@ -46,6 +93,7 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
 
 		<part name="flop5" interface="floppy_5_25">
 		<!-- Disk Content: Apple ][+, Kaypro II, Z80, and IBM emulators  -->
+			<feature name="part_id" value="Apple ][+, Kaypro II, Z80, and IBM emulators"/>
 			<dataarea name="flop" size="398409">
 				<rom name="emulator.imd" size="398409" crc="0f8cfc5b" sha1="5a3653bbf8f34ddf1b85565b069716ef30ede195" offset="0x0000" />
 			</dataarea>
@@ -118,4 +166,38 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="d68brnin">
+		<description>Dimension 68000 Burnin Test</description>
+		<year>1984</year>
+		<publisher>Micro Craft Corporation</publisher>
+		
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="181726">
+				<rom name="d68brnin.imd" size="181726" crc="40229a75" sha1="fac1f9a69ae9b9bac5ac7af35f21b8879a21aeb2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d68fort">
+		<description>Fortran 68K</description>
+		<year>1983</year>
+		<publisher>Silicon Valley Software</publisher>
+		
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="391735">
+				<rom name="d68fort1.imd" size="391735" crc="db27dc48" sha1="b912b91ed49e828c91863d3f71d3a7d673ac08b1" offset="0"/>
+			</dataarea>
+		</part>
+		
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="386625">
+				<rom name="d68fort2.imd" size="386625" crc="cdd04f0c" sha1="db9028aad6d757cf5dc316142d06398d7e27abab" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
 </softwarelist>
