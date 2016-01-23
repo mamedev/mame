@@ -104,7 +104,6 @@ private:
 	int m_roffset;                /* offset in the region */
 	devcb_write8       m_irq_cb;  /* irq callback */
 	devcb_write_line   m_main_irq_cb;
-	required_memory_region m_ram_region;
 
 	union
 	{

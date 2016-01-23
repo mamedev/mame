@@ -149,7 +149,6 @@ scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_
 		m_roffset(0),
 		m_irq_cb(*this),
 		m_main_irq_cb(*this),
-		m_ram_region(*this, DEVICE_SELF),
 		m_BUFPTR(0),
 		m_SCSPRAM(nullptr),
 		m_SCSPRAM_LENGTH(0),
@@ -516,10 +515,13 @@ void scsp_device::init()
 		m_Master = 0;
 	}
 
-	if (m_ram_region != NULL)
+	memory_region* ram_region = memregion(tag());
+	
+	// coolridr.c defines a region for the RAM, stv.c doesn't (uses set_ram_base instead, which seems to be more correct anyway?)
+	if (ram_regon != NULL)
 	{
-		m_SCSPRAM = m_ram_region->base();
-		m_SCSPRAM_LENGTH = m_ram_region->bytes();
+		m_SCSPRAM = ram_region->base();
+		m_SCSPRAM_LENGTH = ram_region->bytes();
 		m_DSP.SCSPRAM = (UINT16 *)m_SCSPRAM;
 		m_DSP.SCSPRAM_LENGTH = m_SCSPRAM_LENGTH / 2;
 		m_SCSPRAM += m_roffset;
