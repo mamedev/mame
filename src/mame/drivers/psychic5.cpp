@@ -309,6 +309,24 @@ The first sprite data is located at f20b,then f21b and so on.
         F= Flip
     SZ=Size 0=16x16 sprite,1=32x32 sprite
         C= Color palette selector
+
+====
+
+Notes (23-Jan-2016 AS):
+- Bombs Away tests CPU roms with a sum8, with following algorithm:
+  * tests rom 0, compares result with [$4]
+  * tests banks 3,2,1, reads [$5], no bank 0 (?)
+  * tests banks 7,6,5,4, reads [$6]
+  fwiw extra roms contains palette/sprite/level data, nothing to do with game logic.
+- Bombs Away sports following issues, which indicates it's a unfinished product:
+  - missing bullets (missing data from ROMs);
+  - missing levels above 4 (missing data from ROMs);
+  - occasionally wrong flip x when the player route is from up to down; 
+  - enemy counter stops entirely when the S is collected;
+  - boss fights uses always the same pattern;
+  - single BGM repeated over and over, for every level;
+  - a very sketchy ending screen (just credits with a special BGM played). Game sits there until BGM is finished and no new plays are allowed until so;
+
 */
 
 #include "emu.h"
@@ -714,7 +732,7 @@ static MACHINE_CONFIG_START( psychic5, psychic5_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,394, 0, 256, 282, 16, 256) // was 53.8 Hz before, assume same as Bombs Away
+	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,394, 0, 256, 282, 16, 240) // was 53.8 Hz before, assume same as Bombs Away
 	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_psychic5)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psychic5)
@@ -766,7 +784,7 @@ static MACHINE_CONFIG_START( bombsa, psychic5_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,394, 0, 256, 282, 16, 256) /* Guru says : VSync - 54Hz . HSync - 15.25kHz */
+	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,394, 0, 256, 282, 16, 240) /* Guru says : VSync - 54Hz . HSync - 15.25kHz */
 	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_bombsa)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bombsa)
@@ -917,8 +935,9 @@ Notes:
       logic on both sides.
 */
 
+
 ROM_START( bombsa )
-	ROM_REGION( 0x30000, "maincpu", 0 )                 /* Main CPU */
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )                 /* Main CPU */
 	ROM_LOAD( "4.7a",         0x00000, 0x08000, CRC(0191f6a7) SHA1(10a0434abbf4be068751e65c81b1a211729e3742) )
 	/* these fail their self-test... should be checked on real hw (hold start1+start2 on boot) */
 	ROM_LOAD( "5.7c",         0x10000, 0x08000, BAD_DUMP CRC(095c451a) SHA1(892ca84376f89640ad4d28f1e548c26bc8f72c0e) ) // contains palettes etc. but fails rom check??
