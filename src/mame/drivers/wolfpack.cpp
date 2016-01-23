@@ -162,7 +162,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wolfpack )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state,wolfpack_dial_r, (void *)nullptr)    /* dial connects here */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state,wolfpack_dial_r, (void *)0)    /* dial connects here */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state,wolfpack_dial_r, (void *)1)    /* dial connects here */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )

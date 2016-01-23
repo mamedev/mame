@@ -223,7 +223,7 @@ static INPUT_PORTS_START( kizuna4p )
 	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Players ) ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING(      0x0002, "2" )
 	PORT_DIPSETTING(      0x0000, "4" )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, kizuna4p_controller_r, (void *)nullptr)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, kizuna4p_controller_r, (void *)0)
 
 	PORT_MODIFY("P2")
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, kizuna4p_controller_r, (void *)1)
@@ -283,7 +283,7 @@ static INPUT_PORTS_START( irrmaze )
 	PORT_INCLUDE( neogeo )
 
 	PORT_MODIFY("P1/DSW")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)nullptr)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)0)
 
 	PORT_MODIFY("P2")
 	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -308,7 +308,7 @@ static INPUT_PORTS_START( popbounc )
 	PORT_INCLUDE( neogeo )
 
 	PORT_MODIFY("P1/DSW")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)nullptr)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)0)
 
 	PORT_MODIFY("P2")
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)1)

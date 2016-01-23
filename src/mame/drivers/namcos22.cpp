@@ -3344,7 +3344,7 @@ static INPUT_PORTS_START( alpiner )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START ) // Decision / View Change
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY // L Selection
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_16WAY // R Selection
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state,alpine_motor_read, (void *)nullptr) // steps are free
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state,alpine_motor_read, (void *)0) // steps are free
 
 	PORT_START("MCUP5B")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state,alpine_motor_read, (void *)1) // steps are locked
