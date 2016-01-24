@@ -1595,7 +1595,8 @@ void cli_frontend::execute_commands(const char *exename)
 	if (strcmp(m_options.command(), CLICOMMAND_VALIDATE) == 0)
 	{
 		validity_checker valid(m_options);
-		bool result = valid.check_all();
+		const char *sysname = m_options.system_name();
+		bool result = valid.check_all_matching((sysname[0] == 0) ? "*" : sysname);
 		if (!result)
 			throw emu_fatalerror(MAMERR_FAILED_VALIDITY, "Validity check failed (%d errors, %d warnings in total)\n", valid.errors(), valid.warnings());
 		return;
