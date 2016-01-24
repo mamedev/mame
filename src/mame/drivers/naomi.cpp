@@ -7963,6 +7963,20 @@ ROM_START( puyofev )
 	ROM_LOAD("317-0375-com.pic", 0x00, 0x4000, CRC(52b56b52) SHA1(221590efbb09824621714cb163bda51a921d7d54) )
 ROM_END
 
+// requires 837-14381 "G2 EXPANSION BD" I/O board
+ROM_START( dragntr3 )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0041a", 0, SHA1(955f6b0509aefba43048adf5f5fd6fec5024da53) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16F628A
+	// copy, original labels unknown
+	ROM_LOAD("317-xxxx-xxx.pic", 0x00, 0x4000, CRC(8df4d33a) SHA1(0d27ec46a64af60b1e46ad4b3d34b6df5448f81a) )
+ROM_END
+
 ROM_START( ndcfboxa )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -9554,7 +9568,7 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 /* 0039B */ GAME( 2006, inidv3cy, naomi2,  naomigd,  naomi,   naomi_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev B) (GDS-0039B)", GAME_FLAGS )
 // 0040
 // 0041  Dragon Treasure 3 (GDS-0041)
-// 0041A Dragon Treasure 3 (Rev A) (GDS-0041A)
+/* 0041A */ GAME( 2005, dragntr3, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Dragon Treasure 3 (Rev A) (GDS-0041A)", GAME_FLAGS )
 // 0042  NAOMI DIMM Firm Update for CF-BOX (GDS-0042)
 /* 0042A */ GAME( 2001, ndcfboxa, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Naomi DIMM Firmware Update for CF-BOX (Rev A) (GDS-0042A)", GAME_FLAGS )
 // 00??  Dragon Treasure (GDS-00xx)
