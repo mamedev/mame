@@ -31,13 +31,84 @@ public:
 
     DECLARE_WRITE8_MEMBER(display_7seg_data_w);
     DECLARE_WRITE8_MEMBER(multiplex_7seg_w);
+    DECLARE_READ8_MEMBER(keyboard_r);
 private:
     uint8_t m_selected_7seg_module;
 };
 
+static INPUT_PORTS_START( marywu )
+    PORT_START("KEYS1")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)
+
+    PORT_START("KEYS2")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)
+
+    PORT_START("DSW")
+    PORT_DIPNAME( 0x01, 0x01, "Unknown bit #0" )    PORT_DIPLOCATION("DSW:0")
+        PORT_DIPSETTING(0x01, DEF_STR( On ) )
+        PORT_DIPSETTING(0x00, DEF_STR( Off ) )
+    PORT_DIPNAME( 0x02, 0x02, "Unknown bit #1" )    PORT_DIPLOCATION("DSW:1")
+        PORT_DIPSETTING(0x02, DEF_STR( On ) )
+        PORT_DIPSETTING(0x00, DEF_STR( Off ) )
+    PORT_DIPNAME( 0x04, 0x04, "Unknown bit #2" )    PORT_DIPLOCATION("DSW:2")
+        PORT_DIPSETTING(0x04, DEF_STR( On ) )
+        PORT_DIPSETTING(0x00, DEF_STR( Off ) )
+    PORT_DIPNAME( 0x08, 0x08, "Unknown bit #3" )    PORT_DIPLOCATION("DSW:3")
+        PORT_DIPSETTING(0x08, DEF_STR( On ) )
+        PORT_DIPSETTING(0x00, DEF_STR( Off ) )
+    PORT_DIPNAME( 0x10, 0x10, "Unknown bit #4" )    PORT_DIPLOCATION("DSW:4")
+        PORT_DIPSETTING(0x10, DEF_STR( On ) )
+        PORT_DIPSETTING(0x00, DEF_STR( Off ) )
+    PORT_DIPNAME( 0x20, 0x20, "Unknown bit #5" )    PORT_DIPLOCATION("DSW:5")
+        PORT_DIPSETTING(0x20, DEF_STR( On ) )
+        PORT_DIPSETTING(0x00, DEF_STR( Off ) )
+    PORT_DIPNAME( 0x40, 0x40, "Unknown bit #6" )    PORT_DIPLOCATION("DSW:6")
+        PORT_DIPSETTING(0x40, DEF_STR( On ) )
+        PORT_DIPSETTING(0x00, DEF_STR( Off ) )
+    PORT_DIPNAME( 0x80, 0x80, "Unknown bit #7" )    PORT_DIPLOCATION("DSW:7")
+        PORT_DIPSETTING(0x80, DEF_STR( On ) )
+        PORT_DIPSETTING(0x00, DEF_STR( Off ) )
+
+    PORT_START("PUSHBUTTONS")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)
+INPUT_PORTS_END
+
 WRITE8_MEMBER( marywu_state::multiplex_7seg_w )
 {
-        m_selected_7seg_module = data;
+    m_selected_7seg_module = data;
+}
+
+READ8_MEMBER( marywu_state::keyboard_r )
+{
+    switch(m_selected_7seg_module % 8){
+	case 0: return ioport("KEYS1")->read();
+        case 1: return ioport("KEYS2")->read();
+        case 2: return ioport("DSW")->read();
+        case 3: return ioport("PUSHBUTTONS")->read();
+	default:
+            return 0x00;
+    }
 }
 
 WRITE8_MEMBER( marywu_state::display_7seg_data_w )
@@ -60,6 +131,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, marywu_state )
     AM_RANGE(0x9001, 0x9001) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
     AM_RANGE(0x9002, 0x9002) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
     AM_RANGE(0x9003, 0x9003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
+    AM_RANGE(0xf000, 0xf000) AM_NOP /* TODO: Investigate this. There's something going on at this address range. */
     AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_NOP /* FIX-ME! I am ignoring port accesses for a while. */
 ADDRESS_MAP_END
 
@@ -72,7 +144,7 @@ static MACHINE_CONFIG_START( marywu , marywu_state )
     /* Keyboard & display interface */
     MCFG_DEVICE_ADD("i8279", I8279, XTAL_10_738635MHz) /* should it be perhaps a fraction of the XTAL clock ? */
     MCFG_I8279_OUT_SL_CB(WRITE8(marywu_state, multiplex_7seg_w))          // select  block of 7seg modules by multiplexing the SL scan lines
-//    MCFG_I8279_IN_RL_CB(READ8(marywu_state, marywu_kbd_r))                  // kbd RL lines
+    MCFG_I8279_IN_RL_CB(READ8(marywu_state, keyboard_r))                  // keyboard Return Lines
     MCFG_I8279_OUT_DISP_CB(WRITE8(marywu_state, display_7seg_data_w))
 
     /* Video */
@@ -93,4 +165,4 @@ ROM_START( marywu )
 ROM_END
 
 /*    YEAR  NAME       PARENT   MACHINE   INPUT     STATE          INIT   ROT    COMPANY       FULLNAME          FLAGS  */
-GAME( ????, marywu,    0,       marywu,   0,        driver_device, 0,     ROT0, "<unknown>", "<unknown> Labeled 'WU- MARY-1A' Music by: SunKiss Chen", MACHINE_NOT_WORKING )
+GAME( ????, marywu,    0,       marywu,   marywu,   driver_device, 0,     ROT0, "<unknown>", "<unknown> Labeled 'WU- MARY-1A' Music by: SunKiss Chen", MACHINE_NOT_WORKING )
