@@ -127,7 +127,7 @@ floppy_connector::floppy_connector(const machine_config &mconfig, std::string ta
 	device_t(mconfig, FLOPPY_CONNECTOR, "Floppy drive connector abstraction", tag, owner, clock, "floppy_connector", __FILE__),
 	device_slot_interface(mconfig, *this),
 	formats(nullptr),
-	m_enable_sound(false)
+	m_enable_sound(true)
 {
 }
 
