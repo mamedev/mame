@@ -1508,7 +1508,7 @@ MACHINE_CONFIG_END
 
 ROM_START( cc10 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cc10.bin", 0x0000, 0x1000, BAD_DUMP CRC(bb9e6055) SHA1(18276e57cf56465a6352239781a828c5f3d5ba63) ) // second half empty
+	ROM_LOAD( "cc10b", 0x0000, 0x1000, CRC(afd3ca99) SHA1(870d09b2b52ccb8572d69642c59b5215d5fb26ab) ) // 2332
 ROM_END
 
 
@@ -1610,7 +1610,7 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-COMP( 1978, cc10,     0,      0,      cc10,    fidelz80, driver_device, 0, "Fidelity Electronics", "Chess Challenger 10 (version B?)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1978, cc10,     0,      0,      cc10,    fidelz80, driver_device, 0, "Fidelity Electronics", "Chess Challenger 10 (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 COMP( 1979, vcc,      0,      0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 COMP( 1979, vccg,     vcc,    0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 COMP( 1979, vccfr,    vcc,    0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
