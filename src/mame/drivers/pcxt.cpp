@@ -409,7 +409,7 @@ WRITE8_MEMBER(pcxt_state::port_b_w)
 //  popmessage("%02x\n",data);
 //  beep->beep_set_state(0);
 //  beep->beep_set_state(1);
-//  beep->beep_set_frequency(m_port_b_data);
+//  beep->beep_set_clock(m_port_b_data);
 }
 
 WRITE8_MEMBER(pcxt_state::wss_1_w)

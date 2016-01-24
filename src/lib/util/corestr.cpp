@@ -217,14 +217,13 @@ int strprintf(std::string &str, const char *format, ...)
 	return retVal;
 }
 
-std::string strformat(std::string &str, const char *format, ...)
+std::string strformat(const char *format, ...)
 {
 	std::string retVal;
 	va_list ap;
 	va_start(ap, format);
-	strvprintf(str, format, ap);
+	strvprintf(retVal, format, ap);
 	va_end(ap);
-	retVal.assign(str);
 	return retVal;
 }
 

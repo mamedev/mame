@@ -143,17 +143,17 @@ static INPUT_PORTS_START( alto2 )
 	PORT_KEY(A2_KEY_FR5,        KEYCODE_F9,         0,              0,            "FR5"          )  //!< ADL right function key 5
 
 	PORT_START("mouseb0")   // Mouse button 0
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse RED (left)")      PORT_PLAYER(1) PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_button_0, 0 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse RED (left)")      PORT_PLAYER(1) PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_button_0, nullptr )
 	PORT_START("mouseb1")   // Mouse button 1
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Mouse BLUE (right)")    PORT_PLAYER(1) PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_button_1, 0 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Mouse BLUE (right)")    PORT_PLAYER(1) PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_button_1, nullptr )
 	PORT_START("mouseb2")   // Mouse button 2
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Mouse YELLOW (middle)") PORT_PLAYER(1) PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_button_2, 0 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Mouse YELLOW (middle)") PORT_PLAYER(1) PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_button_2, nullptr )
 
 	PORT_START("mousex")    // Mouse - X AXIS
-	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_x, 0 )
+	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_x, nullptr )
 
 	PORT_START("mousey")    // Mouse - Y AXIS
-	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_y, 0 )
+	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_y, nullptr )
 
 	PORT_START("CONFIG")    /* Memory switch on AIM board */
 	PORT_CONFNAME( 0x01, 0x01, "Memory switch")

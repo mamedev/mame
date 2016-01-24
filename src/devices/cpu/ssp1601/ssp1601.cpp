@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli,Grazvydas Ignotas
 /*
  * Samsung SSP1601 DSP emulator
@@ -547,7 +547,7 @@ void ssp1601_device::device_start()
 }
 
 
-void ssp1601_device::state_string_export(const device_state_entry &entry, std::string &str)
+void ssp1601_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

@@ -2085,6 +2085,13 @@ static MACHINE_CONFIG_DERIVED( hardhea2, brickzn )
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( hardhea2b, hardhea2 )
+	MCFG_DEVICE_REMOVE("maincpu")
+
+	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        //bootleg clock not verified (?)
+	MCFG_CPU_PROGRAM_MAP(hardhea2_map)
+MACHINE_CONFIG_END
+
 
 /***************************************************************************
                                 Star Fighter
@@ -3043,7 +3050,7 @@ GAME( 1989, sparkmana, sparkman, sparkman, sparkman, suna8_state, sparkman,  ROT
 GAME( 1990, starfigh,  0,        starfigh, starfigh, suna8_state, starfigh,  ROT90, "SunA",                       "Star Fighter (v1)",           MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1991, hardhea2,  0,        hardhea2, hardhea2, suna8_state, hardhea2,  ROT0,  "SunA",                       "Hard Head 2 (v2.0)",          0 )
-GAME( 1991, hardhea2b, hardhea2, hardhea2, hardhea2, suna8_state, hardhea2b, ROT0,  "SunA",                       "Hard Head 2 (v2.0, bootleg)",       MACHINE_NOT_WORKING )
+GAME( 1991, hardhea2b, hardhea2, hardhea2b,hardhea2, suna8_state, hardhea2b, ROT0,  "SunA",                       "Hard Head 2 (v2.0, bootleg)",       MACHINE_NOT_WORKING )
 
 GAME( 1992, brickzn,   0,        brickzn,  brickznv6,suna8_state, brickzn,   ROT90, "SunA",                       "Brick Zone (v6.0, Joystick)", 0 )
 GAME( 1992, brickznv5, brickzn,  brickzn,  brickzn,  suna8_state, brickznv5, ROT90, "SunA",                       "Brick Zone (v5.0, Joystick)", 0 )

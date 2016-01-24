@@ -276,6 +276,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(x1_cmt_wind_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(x1_keyboard_callback);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	DECLARE_WRITE_LINE_MEMBER(hdl_w);
+	UINT8 m_fdc_ctrl;
 
 	void x1_draw_pixel(bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height);
 	void draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprect);

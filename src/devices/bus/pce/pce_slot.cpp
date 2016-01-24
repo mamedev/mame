@@ -300,7 +300,7 @@ void pce_cart_slot_device::call_unload()
 
 bool pce_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 	return TRUE;
 }
 
@@ -339,7 +339,7 @@ int pce_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
  get default card software
  -------------------------------------------------*/
 
-void pce_cart_slot_device::get_default_card_software(std::string &result)
+std::string pce_cart_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -356,11 +356,10 @@ void pce_cart_slot_device::get_default_card_software(std::string &result)
 		//printf("type: %s\n", slot_string);
 		clear();
 
-		result.assign(slot_string);
-		return;
+		return std::string(slot_string);
 	}
 
-	software_get_default_slot(result, "rom");
+	return software_get_default_slot("rom");
 }
 
 /*-------------------------------------------------

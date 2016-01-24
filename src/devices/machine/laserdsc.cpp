@@ -737,7 +737,7 @@ void laserdisc_device::init_disc()
 	if (!m_getdisc_callback.isnull())
 		m_disc = m_getdisc_callback(*this);
 	else
-		m_disc = get_disk_handle(machine(), tag());
+		m_disc = machine().rom_load().get_disk_handle(tag());
 
 	// set default parameters
 	m_width = 720;

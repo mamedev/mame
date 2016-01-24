@@ -372,7 +372,7 @@ void tms9995_device::state_export(const device_state_entry &entry)
 /*
     state_string_export - export state as a string for the debugger
 */
-void tms9995_device::state_string_export(const device_state_entry &entry, std::string &str)
+void tms9995_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	static const char *statestr = "LAECOPX-----IIII";
 	char flags[17];

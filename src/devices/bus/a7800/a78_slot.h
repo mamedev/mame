@@ -113,7 +113,7 @@ public:
 	virtual device_image_partialhash_func get_partial_hash() const override { return &a78_partialhash; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_04xx);

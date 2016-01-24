@@ -90,10 +90,13 @@ class bookkeeping_manager;
 class configuration_manager;
 class output_manager;
 class ui_input_manager;
+class crosshair_manager;
+class image_manager;
+class rom_load_manager;
+class debugger_manager;
 class osd_interface;
 enum class config_type;
 
-struct romload_private;
 struct debugcpu_private;
 
 
@@ -137,7 +140,6 @@ class running_machine
 {
 	DISABLE_COPYING(running_machine);
 
-	friend void debugger_init(running_machine &machine);
 	friend class sound_manager;
 
 	typedef void (*logerror_callback)(const running_machine &machine, const char *string);
@@ -173,8 +175,12 @@ public:
 	output_manager  &output() const { assert(m_output != nullptr); return *m_output; }
 	ui_manager &ui() const { assert(m_ui != nullptr); return *m_ui; }
 	ui_input_manager &ui_input() const { assert(m_ui_input != nullptr); return *m_ui_input; }
+	crosshair_manager &crosshair() const { assert(m_crosshair != nullptr); return *m_crosshair; }
+	image_manager &image() const { assert(m_image != nullptr); return *m_image; }
+	rom_load_manager &rom_load() const { assert(m_rom_load != nullptr); return *m_rom_load; }
 	tilemap_manager &tilemap() const { assert(m_tilemap != nullptr); return *m_tilemap; }
 	debug_view_manager &debug_view() const { assert(m_debug_view != nullptr); return *m_debug_view; }
+	debugger_manager &debugger() const { assert(m_debugger != nullptr); return *m_debugger; }
 	driver_device *driver_data() const { return &downcast<driver_device &>(root_device()); }
 	template<class _DriverClass> _DriverClass *driver_data() const { return &downcast<_DriverClass &>(root_device()); }
 	machine_phase phase() const { return m_current_phase; }
@@ -244,20 +250,18 @@ public:
 	UINT32                  debug_flags;        // the current debug flags
 
 	// internal core information
-	romload_private *       romload_data;       // internal data from romload.c
 	debugcpu_private *      debugcpu_data;      // internal data from debugcpu.c
 
 private:
 	// internal helpers
 	void start();
 	void set_saveload_filename(const char *filename);
-	std::string get_statename(const char *statename_opt);
+	std::string get_statename(const char *statename_opt) const;
 	void handle_saveload();
 	void soft_reset(void *ptr = nullptr, INT32 param = 0);
 	void watchdog_fired(void *ptr = nullptr, INT32 param = 0);
 	void watchdog_vblank(screen_device &screen, bool vblank_state);
-	const char *image_parent_basename(device_t *device);
-	std::string &nvram_filename(std::string &result, device_t &device);
+	std::string nvram_filename(device_t &device) const;
 	void nvram_load();
 	void nvram_save();
 
@@ -278,19 +282,23 @@ private:
 	const game_driver &     m_system;               // reference to the definition of the game machine
 	machine_manager &       m_manager;              // reference to machine manager system
 	// managers
-	std::unique_ptr<cheat_manager> m_cheat;            // internal data from cheat.c
-	std::unique_ptr<render_manager> m_render;          // internal data from render.c
-	std::unique_ptr<input_manager> m_input;            // internal data from input.c
-	std::unique_ptr<sound_manager> m_sound;            // internal data from sound.c
-	std::unique_ptr<video_manager> m_video;            // internal data from video.c
-	std::unique_ptr<ui_manager> m_ui;                  // internal data from ui.c
-	std::unique_ptr<ui_input_manager> m_ui_input;      // internal data from uiinput.c
-	std::unique_ptr<tilemap_manager> m_tilemap;        // internal data from tilemap.c
-	std::unique_ptr<debug_view_manager> m_debug_view;  // internal data from debugvw.c
-	std::unique_ptr<network_manager> m_network;        // internal data from network.c
-	std::unique_ptr<bookkeeping_manager> m_bookkeeping;// internal data from bookkeeping.c
-	std::unique_ptr<configuration_manager> m_configuration; // internal data from config.c
-	std::unique_ptr<output_manager> m_output;		   // internal data from output.c
+	std::unique_ptr<cheat_manager> m_cheat;            // internal data from cheat.cpp
+	std::unique_ptr<render_manager> m_render;          // internal data from render.cpp
+	std::unique_ptr<input_manager> m_input;            // internal data from input.cpp
+	std::unique_ptr<sound_manager> m_sound;            // internal data from sound.cpp
+	std::unique_ptr<video_manager> m_video;            // internal data from video.cpp
+	std::unique_ptr<ui_manager> m_ui;                  // internal data from ui.cpp
+	std::unique_ptr<ui_input_manager> m_ui_input;      // internal data from uiinput.cpp
+	std::unique_ptr<tilemap_manager> m_tilemap;        // internal data from tilemap.cpp
+	std::unique_ptr<debug_view_manager> m_debug_view;  // internal data from debugvw.cpp
+	std::unique_ptr<network_manager> m_network;        // internal data from network.cpp
+	std::unique_ptr<bookkeeping_manager> m_bookkeeping;// internal data from bookkeeping.cpp
+	std::unique_ptr<configuration_manager> m_configuration; // internal data from config.cpp
+	std::unique_ptr<output_manager> m_output;		   // internal data from output.cpp
+	std::unique_ptr<crosshair_manager> m_crosshair;	   // internal data from crsshair.cpp
+	std::unique_ptr<image_manager> m_image;	           // internal data from image.cpp
+	std::unique_ptr<rom_load_manager> m_rom_load;	   // internal data from romload.cpp
+	std::unique_ptr<debugger_manager> m_debugger;	   // internal data from debugger.cpp
 
 	// system state
 	machine_phase           m_current_phase;        // current execution phase

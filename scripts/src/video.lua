@@ -524,6 +524,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pcd8544.h,VIDEOS["PCD8544"] = true
+--------------------------------------------------
+
+if (VIDEOS["PCD8544"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pcd8544.cpp",
+		MAME_DIR .. "src/devices/video/pcd8544.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/polylgcy.h,VIDEOS["POLY"] = true
 --------------------------------------------------
 

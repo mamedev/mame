@@ -1292,18 +1292,15 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 
 		// input events
 		case WM_MOUSEMOVE:
-			if (window->machine().phase() != MACHINE_PHASE_RUNNING) break;
 			window->machine().ui_input().push_mouse_move_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 			break;
 
 		case WM_MOUSELEAVE:
-			if (window->machine().phase() != MACHINE_PHASE_RUNNING) break;
 			window->machine().ui_input().push_mouse_leave_event(window->m_target);
 			break;
 
 		case WM_LBUTTONDOWN:
 		{
-			if (window->machine().phase() != MACHINE_PHASE_RUNNING) break;
 			DWORD ticks = GetTickCount();
 			window->machine().ui_input().push_mouse_down_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 
@@ -1325,12 +1322,10 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		}
 
 		case WM_LBUTTONUP:
-			if (window->machine().phase() != MACHINE_PHASE_RUNNING) break;
 			window->machine().ui_input().push_mouse_up_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 			break;
 
 		case WM_CHAR:
-			if (window->machine().phase() != MACHINE_PHASE_RUNNING) break;
 			window->machine().ui_input().push_char_event(window->m_target, (unicode_char) wparam);
 			break;
 

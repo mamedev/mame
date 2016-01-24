@@ -594,31 +594,32 @@ MACHINE_CONFIG_END
 
 void dcs_audio_device::dcs_boot()
 {
-	UINT8 buffer[0x1000];
-//  UINT32 max_banks;
-	UINT16 *base;
-	int i;
-
 	switch (m_rev)
 	{
 		/* rev 1/1.5: use the last set data bank to boot from */
 		case 1:
 		case 15:
-
+		{
 			/* determine the base */
-//          max_banks = m_bootrom_words / 0x1000;
-			base = m_bootrom + ((m_sounddata_bank * 0x1000) % m_bootrom_words);
+			// max_banks = m_bootrom_words / 0x1000;
+			UINT16* base = m_bootrom + ((m_sounddata_bank * 0x1000) % m_bootrom_words);
 
 			/* convert from 16-bit data to 8-bit data and boot */
-			for (i = 0; i < 0x1000; i++)
+			UINT8 buffer[0x1000];
+			for (int i = 0; i < 0x1000; i++)
+			{
 				buffer[i] = base[i];
+			}
+			assert(m_internal_program_ram != NULL);
 			m_cpu->load_boot_data(buffer, m_internal_program_ram);
 			break;
+		}
 
 		/* rev 2: use the ROM page in the SDRC to boot from */
 		case 2:
-
+		{
 			/* determine the base */
+			UINT16* base;
 			if (m_bootrom == m_sounddata)
 			{
 				/* EPROM case: page is selected from the page register */
@@ -631,10 +632,15 @@ void dcs_audio_device::dcs_boot()
 			}
 
 			/* convert from 16-bit data to 8-bit data and boot */
-			for (i = 0; i < 0x1000; i++)
+			UINT8 buffer[0x1000];
+			for (int i = 0; i < 0x1000; i++)
+			{
 				buffer[i] = base[i];
+			}
+			assert(m_internal_program_ram != NULL);
 			m_cpu->load_boot_data(buffer, m_internal_program_ram);
 			break;
+		}
 
 		/* rev 3/4: HALT the ADSP-2181 until program is downloaded via IDMA */
 		case 3:
@@ -665,7 +671,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_reset )
 		case 1:
 		case 15:
 			m_sounddata_bank = 0;
-			membank("databank")->set_entry(0);
+			m_data_bank->set_entry(0);
 			break;
 
 		/* rev 2: reset the SDRC ASIC */
@@ -807,6 +813,9 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 	m_sounddata_words(0),
 	m_sounddata_banks(0),
 	m_sounddata_bank(0),
+	m_data_bank(*this, "databank"),
+	m_rom_page(NULL),
+	m_dram_page(NULL),
 	m_auto_ack(0),
 	m_latch_control(0),
 	m_input_data(0),
@@ -845,8 +854,16 @@ void dcs_audio_device::device_start()
 {
 	m_sram = nullptr;
 
-	m_internal_program_ram = (UINT32 *)memshare("dcsint")->ptr();
-	m_external_program_ram = (UINT32 *)memshare("dcsext")->ptr();
+	memory_share *internal_ram = memshare("dcsint");
+	if (internal_ram != NULL)
+	{
+		m_internal_program_ram = (UINT32 *)internal_ram->ptr();
+	}
+	memory_share *external_ram = memshare("dcsext");
+	if (external_ram != NULL)
+	{
+		m_external_program_ram = (UINT32 *)external_ram->ptr();
+	}
 
 	/* find the DCS CPU and the sound ROMs */
 	m_cpu = subdevice<adsp21xx_device>("dcs");
@@ -866,12 +883,12 @@ void dcs_audio_device::device_start()
 	if (m_rev == 1)
 	{
 		m_sounddata_banks = m_sounddata_words / 0x1000;
-		membank("databank")->configure_entries(0, m_sounddata_banks, m_sounddata, 0x1000*2);
+		m_data_bank->configure_entries(0, m_sounddata_banks, m_sounddata, 0x1000*2);
 	}
 	else
 	{
 		m_sounddata_banks = m_sounddata_words / 0x800;
-		membank("databank")->configure_entries(0, m_sounddata_banks, m_sounddata, 0x800*2);
+		m_data_bank->configure_entries(0, m_sounddata_banks, m_sounddata, 0x800*2);
 	}
 
 	/* create the timers */
@@ -891,8 +908,16 @@ void dcs2_audio_device::device_start()
 {
 	int soundbank_words;
 
-	m_internal_program_ram = (UINT32 *)memshare("dcsint")->ptr();
-	m_external_program_ram = (UINT32 *)memshare("dcsext")->ptr();
+	memory_share *internal_ram = memshare("dcsint");
+	if (internal_ram != NULL)
+	{
+		m_internal_program_ram = (UINT32 *)internal_ram->ptr();
+	}
+	memory_share *external_ram = memshare("dcsext");
+	if (external_ram != NULL)
+	{
+		m_external_program_ram = (UINT32 *)external_ram->ptr();
+	}
 
 	/* find the DCS CPU and the sound ROMs */
 	m_cpu = subdevice<adsp21xx_device>("dcs2");
@@ -920,8 +945,12 @@ void dcs2_audio_device::device_start()
 	m_dmadac[1] = subdevice<dmadac_sound_device>("dac2");
 
 	/* always boot from the base of "dcs" */
-	m_bootrom = (UINT16 *)machine().root_device().memregion("dcs")->base();
-	m_bootrom_words = machine().root_device().memregion("dcs")->bytes() / 2;
+	memory_region *bootrom_region = machine().root_device().memregion("dcs");
+	if (bootrom_region != NULL)
+	{
+		m_bootrom = (UINT16 *)bootrom_region->base();
+		m_bootrom_words = bootrom_region->bytes() / 2;
+	}
 
 	/* supports both RAM and ROM variants */
 	if (m_dram_in_mb != 0)
@@ -937,7 +966,9 @@ void dcs2_audio_device::device_start()
 	}
 	m_sounddata_banks = m_sounddata_words / soundbank_words;
 	if (m_rev != 2)
-		membank("databank")->configure_entries(0, m_sounddata_banks, m_sounddata, soundbank_words*2);
+	{
+		m_data_bank->configure_entries(0, m_sounddata_banks, m_sounddata, soundbank_words*2);
+	}
 
 	/* allocate memory for the SRAM */
 	m_sram = auto_alloc_array(machine(), UINT16, 0x8000*4/2);
@@ -982,12 +1013,14 @@ void dcs_audio_device::set_auto_ack(int state)
 
 READ16_MEMBER( dcs_audio_device::dcs_dataram_r )
 {
+	assert(m_external_program_ram != NULL);
 	return m_external_program_ram[offset] >> 8;
 }
 
 
 WRITE16_MEMBER( dcs_audio_device::dcs_dataram_w )
 {
+	assert(m_external_program_ram != NULL);
 	UINT16 val = m_external_program_ram[offset] >> 8;
 	COMBINE_DATA(&val);
 	m_external_program_ram[offset] = (val << 8) | (m_external_program_ram[offset] & 0x0000ff);
@@ -1001,7 +1034,7 @@ WRITE16_MEMBER( dcs_audio_device::dcs_data_bank_select_w )
 	else
 		m_sounddata_bank = (m_sounddata_bank & 0xff00) | (data & 0xff);
 
-	membank("databank")->set_entry(m_sounddata_bank % m_sounddata_banks);
+	m_data_bank->set_entry(m_sounddata_bank % m_sounddata_banks);
 
 	/* bit 11 = sound board led */
 #if 0
@@ -1014,7 +1047,7 @@ WRITE16_MEMBER( dcs_audio_device::dcs_data_bank_select2_w )
 {
 	m_sounddata_bank = (m_sounddata_bank & 0x00ff) | ((data & 0x01) << 8) | ((data & 0xfc) << 7);
 
-	membank("databank")->set_entry(m_sounddata_bank % m_sounddata_banks);
+	m_data_bank->set_entry(m_sounddata_bank % m_sounddata_banks);
 }
 
 /*************************************
@@ -1034,15 +1067,21 @@ void dcs_audio_device::sdrc_update_bank_pointers()
 		{
 			/* ROM-based; use the memory page to select from ROM */
 			if (SDRC_ROM_MS == 1 && SDRC_ROM_ST != 3)
-				membank("rompage")->set_base(&m_sounddata[(SDRC_EPM_PG * pagesize) % m_sounddata_words]);
+			{
+				m_rom_page->set_base(&m_sounddata[(SDRC_EPM_PG * pagesize) % m_sounddata_words]);
+			}
 		}
 		else
 		{
 			/* RAM-based; use the ROM page to select from ROM, and the memory page to select from RAM */
 			if (SDRC_ROM_MS == 1 && SDRC_ROM_ST != 3)
-				membank("rompage")->set_base(&m_bootrom[(SDRC_ROM_PG * 4096 /*pagesize*/) % m_bootrom_words]);
+			{
+				m_rom_page->set_base(&m_bootrom[(SDRC_ROM_PG * 4096 /*pagesize*/) % m_bootrom_words]);
+			}
 			if (SDRC_DM_ST != 0)
-				membank("drampage")->set_base(&m_sounddata[(SDRC_DM_PG * 1024) % m_sounddata_words]);
+			{
+				m_dram_page->set_base(&m_sounddata[(SDRC_DM_PG * 1024) % m_sounddata_words]);
+			}
 		}
 	}
 }
@@ -1087,6 +1126,7 @@ void dcs_audio_device::sdrc_remap_memory()
 		int baseaddr = (SDRC_ROM_ST == 0) ? 0x0000 : (SDRC_ROM_ST == 1) ? 0x3000 : 0x3400;
 		int pagesize = (SDRC_ROM_SZ == 0 && SDRC_ROM_ST != 0) ? 4096 : 1024;
 		m_data->install_read_bank(baseaddr, baseaddr + pagesize - 1, "rompage");
+		m_rom_page = membank("rompage");
 	}
 
 	/* map the DRAM page as bank 26 */
@@ -1094,6 +1134,7 @@ void dcs_audio_device::sdrc_remap_memory()
 	{
 		int baseaddr = (SDRC_DM_ST == 1) ? 0x0000 : (SDRC_DM_ST == 2) ? 0x3000 : 0x3400;
 		m_data->install_readwrite_bank(baseaddr, baseaddr + 0x3ff, "drampage");
+		m_dram_page = membank("drampage");
 	}
 
 	/* update the bank pointers */
@@ -1285,7 +1326,7 @@ WRITE16_MEMBER( dcs_audio_device::dsio_w )
 		/* offset 2 controls RAM pages */
 		case 2:
 			dsio.reg[2] = data;
-			membank("databank")->set_entry(DSIO_DM_PG % m_sounddata_banks);
+			m_data_bank->set_entry(DSIO_DM_PG % m_sounddata_banks);
 			break;
 	}
 }
@@ -1352,7 +1393,7 @@ WRITE16_MEMBER( dcs_audio_device::denver_w )
 		/* offset 2 controls RAM pages */
 		case 2:
 			dsio.reg[2] = data;
-			membank("databank")->set_entry(DENV_DM_PG % m_sounddata_banks);
+			m_data_bank->set_entry(DENV_DM_PG % m_sounddata_banks);
 			break;
 
 		/* offset 3 controls FIFO reset */

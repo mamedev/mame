@@ -148,12 +148,14 @@ class gfx_element
 {
 public:
 	// construction/destruction
+#ifdef UNUSED_FUNCTION
 	gfx_element();
-	gfx_element(palette_device *palette, const gfx_layout &gl, const UINT8 *srcdata, UINT32 xormask, UINT32 total_colors, UINT32 color_base);
-	gfx_element(palette_device *palette, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 total_colors, UINT32 color_base, UINT32 color_granularity);
+#endif
+	gfx_element(palette_device &palette, const gfx_layout &gl, const UINT8 *srcdata, UINT32 xormask, UINT32 total_colors, UINT32 color_base);
+	gfx_element(palette_device &palette, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 total_colors, UINT32 color_base, UINT32 color_granularity);
 
 	// getters
-	palette_device *palette() const { return m_palette; }
+	palette_device &palette() const { return *m_palette; }
 	UINT16 width() const { return m_width; }
 	UINT16 height() const { return m_height; }
 	UINT32 elements() const { return m_total_elements; }
@@ -173,7 +175,7 @@ public:
 	void set_source(const UINT8 *source);
 	void set_source_and_total(const UINT8 *source, UINT32 total);
 	void set_xormask(UINT32 xormask) { m_layout_xormask = xormask; }
-	void set_palette(palette_device *palette) { m_palette = palette; }
+	void set_palette(palette_device &palette) { m_palette = &palette; }
 	void set_colors(UINT32 colors) { m_total_colors = colors; }
 	void set_colorbase(UINT16 colorbase) { m_color_base = colorbase; }
 	void set_granularity(UINT16 granularity) { m_color_granularity = granularity; }

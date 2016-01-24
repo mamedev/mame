@@ -189,7 +189,7 @@
 
 		// fail to do this and the display doesn't update
 		machine->debug_view().update_all();
-		debugger_refresh_display(*machine);
+		machine->debugger().refresh_display();
 	}
 }
 
@@ -208,7 +208,7 @@
 								 (UINT32)bp->index(),
 								 bp->enabled() ? "enabled" : "disabled");
 			machine->debug_view().update_all();
-			debugger_refresh_display(*machine);
+			machine->debugger().refresh_display();
 		}
 	}
 }

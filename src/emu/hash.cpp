@@ -115,14 +115,14 @@ bool hash_collection::operator==(const hash_collection &rhs) const
 //  a string
 //-------------------------------------------------
 
-const char *hash_collection::hash_types(std::string &buffer) const
+std::string hash_collection::hash_types() const
 {
-	buffer.clear();
+	std::string buffer;
 	if (m_has_crc32)
 		buffer.push_back(HASH_CRC);
 	if (m_has_sha1)
 		buffer.push_back(HASH_SHA1);
-	return buffer.c_str();
+	return buffer;
 }
 
 
@@ -190,24 +190,24 @@ bool hash_collection::remove(char type)
 //  format
 //-------------------------------------------------
 
-const char *hash_collection::internal_string(std::string &buffer) const
+std::string hash_collection::internal_string() const
 {
-	buffer.clear();
+	std::string buffer;
 
 	// handle CRCs
-	std::string temp;
 	if (m_has_crc32) {
 		buffer.push_back(HASH_CRC);
-		buffer.append(m_crc32.as_string(temp));
+		buffer.append(m_crc32.as_string());
 	}
 	// handle SHA1s
 	if (m_has_sha1) {
 		buffer.push_back(HASH_SHA1);
-		buffer.append(m_sha1.as_string(temp));
+		buffer.append(m_sha1.as_string());
 	}
 
 	// append flags
-	return buffer.append(m_flags).c_str();
+	buffer.append(m_flags);
+	return buffer;
 }
 
 
@@ -216,18 +216,17 @@ const char *hash_collection::internal_string(std::string &buffer) const
 //  flags to a string in the macroized format
 //-------------------------------------------------
 
-const char *hash_collection::macro_string(std::string &buffer) const
+std::string hash_collection::macro_string() const
 {
-	buffer.clear();
+	std::string buffer;
 
 	// handle CRCs
-	std::string temp;
 	if (m_has_crc32)
-		buffer.append("CRC(").append(m_crc32.as_string(temp)).append(") ");
+		buffer.append("CRC(").append(m_crc32.as_string()).append(") ");
 
 	// handle SHA1s
 	if (m_has_sha1)
-		buffer.append("SHA1(").append(m_sha1.as_string(temp)).append(") ");
+		buffer.append("SHA1(").append(m_sha1.as_string()).append(") ");
 
 	// append flags
 	if (flag(FLAG_NO_DUMP))
@@ -235,7 +234,7 @@ const char *hash_collection::macro_string(std::string &buffer) const
 	if (flag(FLAG_BAD_DUMP))
 		buffer.append("BAD_DUMP ");
 	strtrimspace(buffer);
-	return buffer.c_str();
+	return buffer;
 }
 
 
@@ -244,18 +243,17 @@ const char *hash_collection::macro_string(std::string &buffer) const
 //  flags to a string in XML attribute format
 //-------------------------------------------------
 
-const char *hash_collection::attribute_string(std::string &buffer) const
+std::string hash_collection::attribute_string() const
 {
-	buffer.clear();
+	std::string buffer;
 
 	// handle CRCs
-	std::string temp;
 	if (m_has_crc32)
-		buffer.append("crc=\"").append(m_crc32.as_string(temp)).append("\" ");
+		buffer.append("crc=\"").append(m_crc32.as_string()).append("\" ");
 
 	// handle SHA1s
 	if (m_has_sha1)
-		buffer.append("sha1=\"").append(m_sha1.as_string(temp)).append("\" ");
+		buffer.append("sha1=\"").append(m_sha1.as_string()).append("\" ");
 
 	// append flags
 	if (flag(FLAG_NO_DUMP))
@@ -263,7 +261,7 @@ const char *hash_collection::attribute_string(std::string &buffer) const
 	if (flag(FLAG_BAD_DUMP))
 		buffer.append("status=\"baddump\"");
 	strtrimspace(buffer);
-	return buffer.c_str();
+	return buffer;
 }
 
 

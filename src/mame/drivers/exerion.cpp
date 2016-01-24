@@ -232,7 +232,7 @@ ADDRESS_MAP_END
 /* verified from Z80 code */
 static INPUT_PORTS_START( exerion )
 	PORT_START("IN0")
-	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exerion_state,exerion_controls_r, (void *)nullptr)
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exerion_state, exerion_controls_r, NULL)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 

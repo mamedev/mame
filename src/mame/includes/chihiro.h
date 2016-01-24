@@ -650,9 +650,9 @@ public:
 	bool logical_operation_enabled;
 	NV2A_LOGIC_OP logical_operation;
 	struct {
-		float modelview[16];
-		float modelview_inverse[16];
-		float projection[16];
+		float modelview[4][4];
+		float modelview_inverse[4][4];
+		float projection[4][4];
 		float translate[4];
 		float scale[4];
 	} matrix;

@@ -14,16 +14,18 @@ class dynax_state : public driver_device
 {
 public:
 	dynax_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_soundcpu(*this, "soundcpu"),
-			m_ym2413(*this, "ym2413"),
-			m_oki(*this, "oki"),
-			m_msm(*this, "msm"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette"),
-			m_rtc(*this, "rtc")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_ym2413(*this, "ym2413")
+		, m_oki(*this, "oki")
+		, m_msm(*this, "msm")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_rtc(*this, "rtc")
+		, m_gfx_region(*this, "gfx")
+	{
+	}
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -34,6 +36,7 @@ public:
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<msm6242_device> m_rtc;
+	optional_region_ptr<UINT8> m_gfx_region;
 
 	// up to 8 layers, 2 images per layer (interleaved on screen)
 	std::unique_ptr<UINT8[]>  m_pixmap[8][2];
@@ -112,6 +115,7 @@ public:
 	UINT8 m_gekisha_val[2];
 	UINT8 m_gekisha_rom_enable;
 	UINT8 *m_romptr;
+	UINT8 *m_hnoridur_ptr;
 
 	DECLARE_WRITE8_MEMBER(dynax_vblank_ack_w);
 	DECLARE_WRITE8_MEMBER(dynax_blitter_ack_w);

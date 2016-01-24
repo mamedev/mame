@@ -210,7 +210,7 @@ void sat_cart_slot_device::call_unload()
 
 bool sat_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 	return TRUE;
 }
 
@@ -219,9 +219,9 @@ bool sat_cart_slot_device::call_softlist_load(software_list_device &swlist, cons
  get default card software
  -------------------------------------------------*/
 
-void sat_cart_slot_device::get_default_card_software(std::string &result)
+std::string sat_cart_slot_device::get_default_card_software()
 {
-	software_get_default_slot(result, "rom");
+	return software_get_default_slot("rom");
 }
 
 

@@ -10,7 +10,7 @@
 
 #include "debugwininfo.h"
 #include "uimetrics.h"
-
+#include "debugger.h"
 #include "debug/debugcpu.h"
 
 #include "strconv.h"

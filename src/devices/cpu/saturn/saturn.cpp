@@ -169,7 +169,7 @@ void saturn_device::device_start()
 	m_icountptr = &m_icount;
 }
 
-void saturn_device::state_string_export(const device_state_entry &entry, std::string &str)
+void saturn_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 #define Reg64Data(s) s[15],s[14],s[13],s[12],s[11],s[10],s[9],s[8],s[7],s[6],s[5],s[4],s[3],s[2],s[1],s[0]
 #define Reg64Format "%x %x%x%x%x%x%x%x %x%x%x %x%x%x%x%x"

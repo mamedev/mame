@@ -39,15 +39,16 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	for (device_slot_interface *slot = slotiter.first(); slot != nullptr; slot = slotiter.next())
 	{
 		device_t &owner = slot->device();
-		std::string temp;
-		const char *selval = options.main_value(temp, owner.tag()+1);
+		std::string selval;
 		bool isdefault = (options.priority(owner.tag()+1)==OPTION_PRIORITY_DEFAULT);
-		if (!is_selected_driver || !options.exists(owner.tag()+1))
-			selval = slot->default_option();
+		if (is_selected_driver && options.exists(owner.tag()+1))
+			selval = options.main_value(owner.tag()+1);
+		else if (slot->default_option() != nullptr)
+			selval.assign(slot->default_option());
 
-		if (selval != nullptr && *selval != 0)
+		if (!selval.empty())
 		{
-			const device_slot_option *option = slot->option(selval);
+			const device_slot_option *option = slot->option(selval.c_str());
 
 			if (option && (isdefault || option->selectable()))
 			{
@@ -66,7 +67,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 					device_t::static_set_input_default(*new_dev, input_device_defaults);
 			}
 			else
-				throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval, owner.tag()+1);
+				throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval.c_str(), owner.tag()+1);
 		}
 	}
 

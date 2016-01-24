@@ -433,7 +433,7 @@ void naomi_gdrom_board::device_start()
 		logerror("key is %08x%08x\n", (UINT32)((key & 0xffffffff00000000ULL)>>32), (UINT32)(key & 0x00000000ffffffffULL));
 
 		UINT8 buffer[2048];
-		cdrom_file *gdromfile = cdrom_open(get_disk_handle(machine(), image_tag));
+		cdrom_file *gdromfile = cdrom_open(machine().rom_load().get_disk_handle(image_tag));
 		// primary volume descriptor
 		// read frame 0xb06e (frame=sector+150)
 		// dimm board firmware starts straight from this frame

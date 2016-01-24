@@ -21,18 +21,18 @@
 -------------------------------------------------*/
 device_slot_option *ui_menu_slot_devices::slot_get_current_option(device_slot_interface *slot)
 {
-	const char *current;
+	std::string current;
 	if (slot->fixed())
 	{
-		current = slot->default_option();
+		if (slot->default_option() == nullptr) return nullptr;
+		current.assign(slot->default_option());
 	}
 	else
 	{
-		std::string temp;
-		current = machine().options().main_value(temp, slot->device().tag() + 1);
+		current = machine().options().main_value(slot->device().tag() + 1);
 	}
 
-	return slot->option(current);
+	return slot->option(current.c_str());
 }
 
 /*-------------------------------------------------

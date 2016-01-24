@@ -484,7 +484,6 @@ void a5105_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	a5105_ab_w(space, 0, 9); // turn motor off
-	m_beep->set_frequency(500);
 
 	m_ram_base = (UINT8*)m_ram->pointer();
 	m_rom_base = (UINT8*)memregion("maincpu")->base();
@@ -575,7 +574,7 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 500)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

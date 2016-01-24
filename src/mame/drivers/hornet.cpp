@@ -351,7 +351,9 @@ public:
 		m_dsw(*this, "DSW"),
 		m_eepromout(*this, "EEPROMOUT"),
 		m_analog1(*this, "ANALOG1"),
-		m_analog2(*this, "ANALOG2")
+		m_analog2(*this, "ANALOG2"),
+		m_user3_ptr(*this, "user3"),
+		m_user5_ptr(*this, "user5")
 	{ }
 
 	// TODO: Needs verification on real hardware
@@ -373,6 +375,8 @@ public:
 	optional_device<eeprom_serial_93cxx_device> m_lan_eeprom;
 	required_ioport m_in0, m_in1, m_in2, m_dsw;
 	optional_ioport m_eepromout, m_analog1, m_analog2;
+	optional_region_ptr<UINT8> m_user3_ptr;
+	optional_region_ptr<UINT8> m_user5_ptr;
 
 	emu_timer *m_sound_irq_timer;
 	UINT8 m_led_reg0;
@@ -946,18 +950,18 @@ void hornet_state::machine_start()
 
 void hornet_state::machine_reset()
 {
-	UINT8 *usr3 = memregion("user3")->base();
-	UINT8 *usr5 = memregion("user5")->base();
-	if (usr3 != nullptr)
+	if (m_user3_ptr)
 	{
-		membank("bank1")->configure_entries(0, memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
+		membank("bank1")->configure_entries(0, m_user3_ptr.bytes() / 0x10000, m_user3_ptr, 0x10000);
 		membank("bank1")->set_entry(0);
 	}
 
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	if (usr5)
-		membank("bank5")->set_base(usr5);
+	if (m_user5_ptr)
+	{
+		membank("bank5")->set_base(m_user5_ptr);
+	}
 }
 
 ADC12138_IPT_CONVERT_CB(hornet_state::adc12138_input_callback)
@@ -1038,21 +1042,18 @@ MACHINE_CONFIG_END
 
 MACHINE_RESET_MEMBER(hornet_state,hornet_2board)
 {
-	UINT8 *usr3 = memregion("user3")->base();
-	UINT8 *usr5 = memregion("user5")->base();
-
-	if (usr3 != nullptr)
+	if (m_user3_ptr)
 	{
-		membank("bank1")->configure_entries(0, memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
+		membank("bank1")->configure_entries(0, m_user3_ptr.bytes() / 0x10000, m_user3_ptr, 0x10000);
 		membank("bank1")->set_entry(0);
 	}
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	if (usr5)
+	if (m_user5_ptr)
 	{
-		membank("bank5")->set_base(usr5);
-		membank("bank6")->set_base(usr5);
+		membank("bank5")->set_base(m_user5_ptr);
+		membank("bank6")->set_base(m_user5_ptr);
 	}
 }
 

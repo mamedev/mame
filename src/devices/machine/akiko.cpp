@@ -170,7 +170,7 @@ void akiko_device::device_reset()
 	else
 	{
 		// MAME case
-		m_cdrom = cdrom_open(get_disk_handle(machine(), ":cdrom"));
+		m_cdrom = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
 		m_cdrom_is_device = 0;
 	}
 

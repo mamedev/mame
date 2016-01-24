@@ -53,7 +53,7 @@ void sm8500_cpu_device::get_sp()
 }
 
 
-UINT8 sm8500_cpu_device::mem_readbyte( UINT32 offset )
+UINT8 sm8500_cpu_device::mem_readbyte( UINT32 offset ) const
 {
 	offset &= 0xffff;
 	if ( offset < 0x10)
@@ -141,7 +141,7 @@ void sm8500_cpu_device::device_start()
 }
 
 
-void sm8500_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void sm8500_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

@@ -79,7 +79,7 @@ const option_guide *cdrom_image_device::create_option_guide() const
 void cdrom_image_device::device_start()
 {
 	// try to locate the CHD from a DISK_REGION
-	chd_file *chd = get_disk_handle( machine(), owner()->tag() );
+	chd_file *chd = machine().rom_load().get_disk_handle(owner()->tag() );
 	if( chd != nullptr )
 	{
 		m_cdrom_handle = cdrom_open( chd );
@@ -115,7 +115,7 @@ bool cdrom_image_device::call_load()
 			chd = &m_self_chd;
 		}
 	} else {
-		chd = get_disk_handle(device().machine(), device().subtag("cdrom").c_str());
+		chd = device().machine().rom_load().get_disk_handle(device().subtag("cdrom").c_str());
 	}
 
 	/* open the CHD file */

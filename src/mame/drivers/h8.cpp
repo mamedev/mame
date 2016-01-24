@@ -215,7 +215,6 @@ INPUT_PORTS_END
 
 void h8_state::machine_reset()
 {
-	m_beep->set_frequency(H8_BEEP_FRQ);
 	output().set_value("pwr_led", 0);
 	m_irq_ctl = 1;
 	m_cass_state = 1;
@@ -318,7 +317,7 @@ static MACHINE_CONFIG_START( h8, h8_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, H8_BEEP_FRQ)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

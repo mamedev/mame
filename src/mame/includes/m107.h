@@ -18,16 +18,18 @@ class m107_state : public driver_device
 {
 public:
 	m107_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_soundcpu(*this, "soundcpu"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette"),
-			m_spriteram(*this, "spriteram"),
-			m_vram_data(*this, "vram_data"),
-			m_upd71059c(*this, "upd71059c")
-			{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_spriteram(*this, "spriteram")
+		, m_vram_data(*this, "vram_data")
+		, m_upd71059c(*this, "upd71059c")
+		, m_user1_ptr(*this, "user1")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -38,6 +40,7 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_vram_data;
 	required_device<pic8259_device> m_upd71059c;
+	optional_region_ptr<UINT8> m_user1_ptr;
 
 	// driver init
 	UINT8 m_spritesystem;

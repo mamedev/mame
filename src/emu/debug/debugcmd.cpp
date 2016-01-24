@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "debugger.h"
 #include "debugcmd.h"
 #include "debugcon.h"
 #include "debugcpu.h"

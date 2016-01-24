@@ -625,9 +625,15 @@ void prestige_state::machine_start()
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
 	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *cart = m_cart_rom->base();
-	if (cart == nullptr)
+	UINT8 *cart = NULL;
+	if (m_cart_rom != NULL)
+	{
+		cart = m_cart_rom->base();
+	}
+	else
+	{
 		cart = rom + 0x40000;   // internal ROM also includes extra contents that are activated by a cartridge that works as a jumper
+	}
 	UINT8 *ram = m_ram->pointer();
 	memset(ram, 0x00, m_ram->size());
 

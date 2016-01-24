@@ -499,7 +499,7 @@ WRITE64_MEMBER(konamim2_state::reset_w)
 
 void konamim2_state::cde_init()
 {
-	cdrom_file *cdfile = cdrom_open(get_disk_handle(machine(), ":cdrom"));
+	cdrom_file *cdfile = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
 
 	const cdrom_toc *toc = cdrom_get_toc(cdfile);
 

@@ -918,7 +918,6 @@ INPUT_PORTS_END
 
 void vk100_state::machine_start()
 {
-	m_speaker->set_frequency(116); //116 hz (page 172 of TM), but duty cycle is wrong here!
 	output().set_value("online_led",1);
 	output().set_value("local_led", 0);
 	output().set_value("noscroll_led",1);
@@ -1063,7 +1062,7 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 	MCFG_DEFAULT_LAYOUT( layout_vk100 )
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
+	MCFG_SOUND_ADD( "beeper", BEEP, 116 ) // 116 hz (page 172 of TM), but duty cycle is wrong here!
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.25 )
 MACHINE_CONFIG_END
 

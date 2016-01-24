@@ -149,7 +149,7 @@ const address_space_config *ssem_device::memory_space_config(address_spacenum sp
 //  for the debugger
 //-------------------------------------------------
 
-void ssem_device::state_string_export(const device_state_entry &entry, std::string &str)
+void ssem_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

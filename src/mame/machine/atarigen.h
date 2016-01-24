@@ -11,8 +11,6 @@
 #ifndef __MACHINE_ATARIGEN__
 #define __MACHINE_ATARIGEN__
 
-#include "machine/nvram.h"
-#include "machine/er2055.h"
 #include "machine/eeprompar.h"
 #include "video/atarimo.h"
 #include "cpu/m6502/m6502.h"
@@ -190,10 +188,10 @@ public:
 	template<class _Object> static devcb_base &static_set_scanline_int_cb(device_t &device, _Object object) { return downcast<atari_vad_device &>(device).m_scanline_int_cb.set_callback(object); }
 
 	// getters
-	tilemap_device *alpha() const { return m_alpha_tilemap; }
-	tilemap_device *playfield() const { return m_playfield_tilemap; }
-	tilemap_device *playfield2() const { return m_playfield2_tilemap; }
-	atari_motion_objects_device *mob() const { return m_mob; }
+	tilemap_device &alpha() const { return *m_alpha_tilemap; }
+	tilemap_device &playfield() const { return *m_playfield_tilemap; }
+	tilemap_device &playfield2() const { return *m_playfield2_tilemap; }
+	atari_motion_objects_device &mob() const { return *m_mob; }
 
 	// read/write handlers
 	DECLARE_READ16_MEMBER(control_read);
@@ -383,11 +381,6 @@ public:
 	// misc helpers
 	void blend_gfx(int gfx0, int gfx1, int mask0, int mask1);
 
-	// vector and early raster EAROM interface
-	DECLARE_READ8_MEMBER( earom_r );
-	DECLARE_WRITE8_MEMBER( earom_w );
-	DECLARE_WRITE8_MEMBER( earom_control_w );
-
 	// timer IDs
 	enum
 	{
@@ -396,11 +389,6 @@ public:
 		TID_UNHALT_CPU,
 		TID_ATARIGEN_LAST
 	};
-
-	// vector and early raster EAROM interface
-	optional_device<er2055_device> m_earom;
-	UINT8               m_earom_data;
-	UINT8               m_earom_control;
 
 	UINT8               m_scanline_int_state;
 	UINT8               m_sound_int_state;

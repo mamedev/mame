@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Paul Leaman
 #include "emu.h"
 #include "includes/blktiger.h"

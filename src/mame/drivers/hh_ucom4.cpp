@@ -49,8 +49,8 @@
  *060     uPD650C  1979, Mattel Computer Gin
  *085     uPD650C  1980, Roland TR-808
  *127     uPD650C  198?, Sony OA-S1100 Typecorder (subcpu, have dump)
- *128     uPD650C  1981, Roland TR-606
-  133     uPD650C  1982, Roland TB-303 -> tb303.c
+  128     uPD650C  1981, Roland TR-606 -> tr606.cpp
+  133     uPD650C  1982, Roland TB-303 -> tb303.cpp
 
   (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 

@@ -358,7 +358,7 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 				break;
 
 			case 3:
-				if (show_mandatory_fileman && image_mandatory_scan(machine(), messagebox_text).length() > 0)
+				if (show_mandatory_fileman && machine().image().mandatory_scan(messagebox_text).length() > 0)
 				{
 					std::string warning;
 					warning.assign("This driver requires images to be loaded in the following device(s): ").append(messagebox_text.substr(0, messagebox_text.length() - 2));
@@ -1019,16 +1019,18 @@ std::string &ui_manager::warnings_string(std::string &str)
 						MACHINE_IMPERFECT_SOUND |  \
 						MACHINE_IMPERFECT_GRAPHICS | \
 						MACHINE_IMPERFECT_KEYBOARD | \
-						MACHINE_NO_COCKTAIL)
+						MACHINE_NO_COCKTAIL| \
+						MACHINE_IS_INCOMPLETE| \
+						MACHINE_NO_SOUND_HW )
 
 	str.clear();
 
 	// if no warnings, nothing to return
-	if (rom_load_warnings(machine()) == 0 && rom_load_knownbad(machine()) == 0 && !(machine().system().flags & WARNING_FLAGS) && software_load_warnings_message(machine()).length() == 0)
+	if (machine().rom_load().warnings() == 0 && machine().rom_load().knownbad() == 0 && !(machine().system().flags & WARNING_FLAGS) && machine().rom_load().software_load_warnings_message().length() == 0)
 		return str;
 
 	// add a warning if any ROMs were loaded with warnings
-	if (rom_load_warnings(machine()) > 0)
+	if (machine().rom_load().warnings() > 0)
 	{
 		str.append("One or more ROMs/CHDs for this ");
 		str.append(emulator_info::get_gamenoun());
@@ -1039,20 +1041,20 @@ std::string &ui_manager::warnings_string(std::string &str)
 			str.append("\n");
 	}
 
-	if (software_load_warnings_message(machine()).length()>0) {
-		str.append(software_load_warnings_message(machine()));
+	if (machine().rom_load().software_load_warnings_message().length()>0) {
+		str.append(machine().rom_load().software_load_warnings_message());
 		if (machine().system().flags & WARNING_FLAGS)
 			str.append("\n");
 	}
 	// if we have at least one warning flag, print the general header
-	if ((machine().system().flags & WARNING_FLAGS) || rom_load_knownbad(machine()) > 0)
+	if ((machine().system().flags & WARNING_FLAGS) || machine().rom_load().knownbad() > 0)
 	{
 		str.append("There are known problems with this ");
 		str.append(emulator_info::get_gamenoun());
 		str.append("\n\n");
 
 		// add a warning if any ROMs are flagged BAD_DUMP/NO_DUMP
-		if (rom_load_knownbad(machine()) > 0) {
+		if (machine().rom_load().knownbad() > 0) {
 			str.append("One or more ROMs/CHDs for this ");
 			str.append(emulator_info::get_gamenoun());
 			str.append(" have not been correctly dumped.\n");
@@ -1083,6 +1085,20 @@ std::string &ui_manager::warnings_string(std::string &str)
 			str.append(" requires external artwork files\n");
 		}
 
+		if (machine().system().flags & MACHINE_IS_INCOMPLETE )
+		{
+			str.append("This ");
+			str.append(emulator_info::get_gamenoun());
+			str.append(" was never completed. It may exhibit strange behavior or missing elements that are not bugs in the emulation.\n");
+		}
+		
+		if (machine().system().flags & MACHINE_NO_SOUND_HW )
+		{
+			str.append("This ");
+			str.append(emulator_info::get_gamenoun());
+			str.append(" has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n");
+		}
+		
 		// if there's a NOT WORKING, UNEMULATED PROTECTION or GAME MECHANICAL warning, make it stronger
 		if (machine().system().flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_MECHANICAL))
 		{
@@ -1153,8 +1169,7 @@ std::string &ui_manager::warnings_string(std::string &str)
 std::string &ui_manager::game_info_astring(std::string &str)
 {
 	// print description, manufacturer, and CPU:
-	std::string tempstr;
-	strprintf(str, "%s\n%s %s\nDriver: %s\n\nCPU:\n", machine().system().description, machine().system().year, machine().system().manufacturer, core_filename_extract_base(tempstr, machine().system().source_file).c_str());
+	strprintf(str, "%s\n%s %s\nDriver: %s\n\nCPU:\n", machine().system().description, machine().system().year, machine().system().manufacturer, core_filename_extract_base(machine().system().source_file).c_str());
 
 	// loop over all CPUs
 	execute_interface_iterator execiter(machine().root_device());
@@ -1489,7 +1504,7 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	if (machine.ui().show_fps_counter())
 	{
 		std::string tempstring;
-		machine.ui().draw_text_full(container, machine.video().speed_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
+		machine.ui().draw_text_full(container, machine.video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, nullptr, nullptr);
 	}
 
@@ -1767,17 +1782,13 @@ void ui_manager::request_quit()
 UINT32 ui_manager::handler_confirm_quit(running_machine &machine, render_container *container, UINT32 state)
 {
 	// get the text for 'UI Select'
-	std::string ui_select_text;
-	machine.input().seq_name(ui_select_text, machine.ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD));
+	std::string ui_select_text = machine.input().seq_name(machine.ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD));
 
 	// get the text for 'UI Cancel'
-	std::string ui_cancel_text;
-	machine.input().seq_name(ui_cancel_text, machine.ioport().type_seq(IPT_UI_CANCEL, 0, SEQ_TYPE_STANDARD));
+	std::string ui_cancel_text = machine.input().seq_name(machine.ioport().type_seq(IPT_UI_CANCEL, 0, SEQ_TYPE_STANDARD));
 
 	// assemble the quit message
-	std::string quit_message;
-	strprintf(quit_message,
-		"Are you sure you want to quit?\n\n"
+	std::string quit_message = strformat("Are you sure you want to quit?\n\n"
 		"Press ''%s'' to quit,\n"
 		"Press ''%s'' to return to emulation.",
 		ui_select_text.c_str(),

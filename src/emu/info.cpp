@@ -572,8 +572,7 @@ void info_xml_creator::output_rom(device_t &device)
 				if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
 				{
 					// iterate over hash function types and print m_output their values
-					std::string tempstr;
-					strcatprintf(output," %s", hashes.attribute_string(tempstr));
+					output.append(" ").append(hashes.attribute_string());
 				}
 				else
 					output.append(" status=\"nodump\"");
@@ -1306,11 +1305,8 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 					fprintf(m_output, "\t\t\t<slotoption");
 					fprintf(m_output, " name=\"%s\"", xml_normalize_string(option->name()));
 					fprintf(m_output, " devname=\"%s\"", xml_normalize_string(dev->shortname()));
-					if (slot->default_option())
-					{
-						if (strcmp(slot->default_option(),option->name())==0)
-							fprintf(m_output, " default=\"yes\"");
-					}
+					if (slot->default_option() != nullptr && strcmp(slot->default_option(),option->name())==0)
+						fprintf(m_output, " default=\"yes\"");
 					fprintf(m_output, "/>\n");
 					const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), "dummy");
 				}

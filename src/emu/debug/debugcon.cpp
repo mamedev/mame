@@ -385,7 +385,7 @@ CMDERR debug_console_execute_command(running_machine &machine, const char *comma
 	if (echo)
 	{
 		machine.debug_view().update_all();
-		debugger_refresh_display(machine);
+		machine.debugger().refresh_display();
 	}
 	return result;
 }

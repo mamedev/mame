@@ -12,12 +12,15 @@ class _4enraya_state : public driver_device
 {
 public:
 	_4enraya_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_ay(*this, "aysnd"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ay(*this, "aysnd")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_prom(*this, "pal_prom")
+		, m_rom(*this, "maincpu")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ay8910_device> m_ay;
@@ -28,8 +31,8 @@ public:
 	UINT8 m_videoram[0x1000];
 	UINT8 m_workram[0x1000];
 
-	UINT8* m_prom;
-	UINT8* m_rom;
+	optional_region_ptr<UINT8> m_prom;
+	optional_region_ptr<UINT8> m_rom;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;

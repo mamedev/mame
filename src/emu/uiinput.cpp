@@ -43,10 +43,6 @@ ui_input_manager::ui_input_manager(running_machine &machine)
 	m_current_mouse_x = -1;
 	m_current_mouse_y = -1;
 
-	memset(m_next_repeat, 0, sizeof(m_next_repeat));
-	memset(m_seqpressed, 0, sizeof(m_seqpressed));
-	memset(m_events, 0, sizeof(m_events));
-
 	/* add a frame callback to poll inputs */
 	machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(ui_input_manager::frame_update), this));
 }

@@ -611,7 +611,6 @@ MACHINE_RESET_MEMBER( fp1100_state, fp1100 )
 		m_slot[i].id = id_type[slot_type];
 	}
 
-	m_beep->set_frequency(950);    /* guess */
 	m_beep->set_state(0);
 
 	membank("bankr0")->set_entry(0); // point at rom
@@ -666,7 +665,7 @@ static MACHINE_CONFIG_START( fp1100, fp1100_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 950) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50) // inside the keyboard
 
 	/* CRTC */

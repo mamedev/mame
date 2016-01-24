@@ -904,7 +904,7 @@ static void gfxset_draw_item(running_machine &machine, gfx_element &gfx, int ind
 {
 	int width = (rotate & ORIENTATION_SWAP_XY) ? gfx.height() : gfx.width();
 	int height = (rotate & ORIENTATION_SWAP_XY) ? gfx.width() : gfx.height();
-	const rgb_t *palette = gfx.palette()->palette()->entry_list_raw() + gfx.colorbase() + color * gfx.granularity();
+	const rgb_t *palette = gfx.palette().palette()->entry_list_raw() + gfx.colorbase() + color * gfx.granularity();
 	int x, y;
 
 	// loop over rows in the cell

@@ -293,7 +293,6 @@ MACHINE_RESET_MEMBER(kaypro_state,kay_kbd)
 	kbd->beep_on = 1;
 	kbd->control_status = 0x14;
 	kbd->beeper->set_state(0);
-	kbd->beeper->set_frequency(950);   /* piezo-device needs to be measured */
 	kbd->head = kbd->tail = 0;          /* init buffer */
 }
 

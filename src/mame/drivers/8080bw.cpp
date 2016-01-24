@@ -3274,26 +3274,10 @@ WRITE8_MEMBER(_8080bw_state::invmulti_eeprom_w)
 
 WRITE8_MEMBER(_8080bw_state::invmulti_bank_w)
 {
-	m_invmulti_bank = data; //needed to restore the bankswitch post load
-
 	// d0, d4, d6: bank
 	int bank = (data & 1) | (data >> 3 & 2) | (data >> 4 & 4);
-	membank("bank1")->set_base(memregion("maincpu")->base() + bank * 0x4000 + 0x0000);
-	membank("bank2")->set_base(memregion("maincpu")->base() + bank * 0x4000 + 0x2000);
-}
-
-void _8080bw_state::invmulti_bankswitch_restore()
-{
-	invmulti_bank_w(m_maincpu->space(AS_PROGRAM), 0, m_invmulti_bank);
-}
-
-MACHINE_RESET_MEMBER(_8080bw_state,invmulti)
-{
-	m_invmulti_bank = 0;
-
-	invmulti_bank_w(m_maincpu->space(AS_PROGRAM), 0, 0);
-
-	MACHINE_RESET_CALL_MEMBER(mw8080bw);
+	membank("bank1")->set_entry(bank);
+	membank("bank2")->set_entry(bank);
 }
 
 MACHINE_CONFIG_DERIVED_CLASS( invmulti, invaders, _8080bw_state )
@@ -3304,7 +3288,7 @@ MACHINE_CONFIG_DERIVED_CLASS( invmulti, invaders, _8080bw_state )
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
-	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state,invmulti)
+	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(_8080bw_state,invmulti)
@@ -3316,9 +3300,11 @@ DRIVER_INIT_MEMBER(_8080bw_state,invmulti)
 	// decrypt rom
 	for (int i = 0; i < len; i++)
 		dest[i] = BITSWAP8(src[(i & 0x100ff) | (BITSWAP8(i >> 8 & 0xff, 7,3,4,5,0,6,1,2) << 8)],0,6,5,7,4,3,1,2);
-
-	save_item(NAME(m_invmulti_bank));
-	machine().save().register_postload(save_prepost_delegate(FUNC(_8080bw_state::invmulti_bankswitch_restore), this));
+	
+	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
+	membank("bank1")->set_entry(0);
+	membank("bank2")->configure_entries(0, 8, memregion("maincpu")->base() + 0x2000, 0x4000);
+	membank("bank2")->set_entry(0);
 }
 
 

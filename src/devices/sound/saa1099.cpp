@@ -63,13 +63,6 @@
     0x1c | ---- ---x | All channels enable (0 = off, 1 = on)
     0x1c | ---- --x- | Synch & Reset generators
 
-    Version History:
-    ================
-    ??-??-200? - First version of the driver submitted for MESS (GPL/MESS license)
-    ??-??-200? - Submitted to DOSBOX for Creative Music System/Game Blaster emulation
-    ??-??-201? - Driver relicensed to BSD 3 Clause (GPL+ compatible)
-    06-27-2015 - Applied clock divisor fix from DOSBOX SVN, http://www.vogons.org/viewtopic.php?p=344227#p344227
-
 ***************************************************************************/
 
 #include "emu.h"

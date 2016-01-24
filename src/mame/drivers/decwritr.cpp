@@ -291,7 +291,6 @@ INPUT_PORTS_END
 
 void decwriter_state::machine_start()
 {
-	m_speaker->set_frequency(786); // TODO: LA120 speaker is controlled by asic; VT100 has: 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
 #if 0
 	output().set_value("online_led",1);
 	output().set_value("local_led", 0);
@@ -341,7 +340,7 @@ static MACHINE_CONFIG_START( la120, decwriter_state )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 786) // TODO: LA120 speaker is controlled by asic; VT100 has: 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* i8251 */

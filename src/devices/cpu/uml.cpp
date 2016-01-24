@@ -739,9 +739,8 @@ void uml::instruction::simplify()
 	/*
 	    if (LOG_SIMPLIFICATIONS && memcmp(&orig, inst, sizeof(orig)) != 0)
 	    {
-	        std::string disasm1, disasm2;
-	        orig.disasm(disasm1, block->drcuml);
-	        inst->disasm(disasm2, block->drcuml);
+	        std::string disasm1 = orig.disasm(block->drcuml);
+	        std::string disasm2 = inst->disasm(block->drcuml);
 	        osd_printf_debug("Simplified: %-50.50s -> %s\n", disasm1.c_str(), disasm2.c_str());
 	    }
 	*/
@@ -854,7 +853,7 @@ UINT8 uml::instruction::modified_flags() const
 //  given buffer
 //-------------------------------------------------
 
-const char *uml::instruction::disasm(std::string &buffer, drcuml_state *drcuml) const
+std::string uml::instruction::disasm(drcuml_state *drcuml) const
 {
 	static const char *const conditions[] = { "z", "nz", "s", "ns", "c", "nc", "v", "nv", "u", "nu", "a", "be", "g", "le", "l", "ge" };
 	static const char *const pound_size[] = { "?", "?", "?", "?", "s", "?", "?", "?", "d" };
@@ -868,7 +867,7 @@ const char *uml::instruction::disasm(std::string &buffer, drcuml_state *drcuml) 
 	assert(m_opcode != OP_INVALID && m_opcode < OP_MAX);
 
 	// start with the raw mnemonic and substitute sizes
-	buffer.clear();
+	std::string buffer;
 	for (const char *opsrc = opinfo.mnemonic; *opsrc != 0; opsrc++)
 		if (*opsrc == '!')
 			strcatprintf(buffer, "%s", bang_size[m_size]);
@@ -1025,5 +1024,5 @@ const char *uml::instruction::disasm(std::string &buffer, drcuml_state *drcuml) 
 		if (m_flags & FLAG_C)
 			buffer.push_back('C');
 	}
-	return buffer.c_str();
+	return buffer;
 }

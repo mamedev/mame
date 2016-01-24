@@ -1437,9 +1437,9 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	float screen_scale[2] = { xscale, yscale };
 	float screen_offset[2] = { xoffset, yoffset };
 
-	rgb_t back_color_rgb = machine->first_screen()->palette() == NULL
+	rgb_t back_color_rgb = !machine->first_screen()->has_palette()
 		? rgb_t(0, 0, 0)
-		: machine->first_screen()->palette()->palette()->entry_color(0);
+		: machine->first_screen()->palette().palette()->entry_color(0);
 	back_color_rgb = apply_color_convolution(back_color_rgb);
 	float back_color[3] = {
 		static_cast<float>(back_color_rgb.r()) / 255.0f,

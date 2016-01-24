@@ -1292,6 +1292,7 @@ iq128    // 1997 Genius IQ 128 (Germany)
 iqtv512 // IQ TV512 (Germany)
 pc1000 // 1988 PreComputer 1000
 misterx // 1988 (Yeno) MisterX
+ordisava // 1988 Ordisavant (France)
 pc2000 // 1993 PreComputer 2000
 gl2000 // 1993 Genius Leader 2000
 gl2000p // 1993 Genius Leader 2000 Plus
@@ -2033,7 +2034,18 @@ newbrainmd
 mm1m6
 mm1m7
 
+noki3210
+noki7110
+noki8210
+noki8850
 noki3310
+noki6210
+noki6250
+noki8250
+noki8890
+noki3330
+noki3410
+noki5210
 
 // Nuova Elettronica
 z80ne    // 1980 - Z80NE
@@ -2111,6 +2123,7 @@ swtpc09d3 // S09, DMF3 Floppy UNIBUG U3 rom - UniFLEX U3
 imds2 // Intellec MDS series-II
 
 //***************Games******************************************************
+
 // Computer Electronic
 ccmk1      // Chess Champion MK I
 // Quelle International
@@ -2126,6 +2139,19 @@ sexpertb // 1988 Novag Expert B Chess Computer
 sfortec  // 1989 Novag Super Forte C Chess Computer
 sexpertc // 1989 Novag Super Expert C Chess Computer
 diablo68 // 1991 Novag Diablo 68000 Chess Computer
+
+// Fidelity
+cc10
+vcc
+vccg
+vccfr
+vccsp
+uvc
+bridgec3
+vbrc
+vsc
+csc
+fexcelv
 
 // Hegener & Glaser Munich
 //mephisto  // Mephisto 1 - roms needed - not in driver
@@ -2343,6 +2369,7 @@ alnchase    // Tomy
 
 // hh_ucom4 derivatives
 tb303       // Roland
+tr606       // Roland
 
 // other
 tama        // Bandai
@@ -2373,6 +2400,7 @@ c80
 ds348 //Sigtron Daruma
 mc1000
 d6809
+mp68a
 mk85
 mk90
 elwro800
@@ -2548,11 +2576,6 @@ dms5000
 dms86
 codata
 rvoicepc
-vcc
-uvc
-bridgec3
-vbrc
-vsc
 victor9k
 phc25
 phc25j
@@ -2608,7 +2631,6 @@ czk80
 c10
 k8915
 mes
-cc10
 systec
 p112
 selz80
@@ -2687,7 +2709,6 @@ cvicny
 pc486mu
 mstation
 mbc200
-csc
 chesstrv
 alphatro
 ax20

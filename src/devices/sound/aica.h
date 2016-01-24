@@ -143,6 +143,7 @@ private:
 	int m_roffset;                /* offset in the region */
 	devcb_write_line m_irq_cb;
 	devcb_write_line m_main_irq_cb;
+	optional_memory_region m_ram_region;
 
 	union
 	{

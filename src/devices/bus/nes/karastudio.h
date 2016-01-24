@@ -64,7 +64,7 @@ public:
 	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 
 	virtual DECLARE_READ8_MEMBER(read);
 	void write_prg_bank(UINT8 bank) { if (m_cart) m_cart->write_prg_bank(bank); }

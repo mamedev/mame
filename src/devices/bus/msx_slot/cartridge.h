@@ -55,7 +55,7 @@ public:
 	virtual const char *file_extensions() const override { return "mx1,bin,rom"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 
 	// msx_internal_slot-level overrides
 	virtual DECLARE_READ8_MEMBER(read) override;

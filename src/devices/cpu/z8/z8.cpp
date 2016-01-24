@@ -677,9 +677,8 @@ void z8_device::device_start()
 		state_add(Z8_T1,         "T1",        m_t1);
 		state_add(STATE_GENFLAGS, "GENFLAGS", m_r[Z8_REGISTER_FLAGS]).noshow().formatstr("%6s");
 
-		std::string tempstr;
 		for (int regnum = 0; regnum < 16; regnum++)
-			state_add(Z8_R0 + regnum, strformat(tempstr, "R%d", regnum).c_str(), m_fake_r[regnum]).callimport().callexport();
+			state_add(Z8_R0 + regnum, strformat("R%d", regnum).c_str(), m_fake_r[regnum]).callimport().callexport();
 	}
 
 	/* find address spaces */
@@ -806,7 +805,7 @@ void z8_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void z8_device::state_string_export(const device_state_entry &entry, std::string &str)
+void z8_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

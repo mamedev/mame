@@ -398,7 +398,6 @@ void pc100_state::machine_start()
 
 void pc100_state::machine_reset()
 {
-	m_beeper->set_frequency(2400);
 	m_beeper->set_state(0);
 }
 
@@ -499,7 +498,7 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 

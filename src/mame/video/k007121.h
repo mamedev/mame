@@ -17,7 +17,7 @@ public:
 
 	/* shall we move source in the interface? */
 	/* also notice that now we directly pass *gfx[chip] instead of **gfx !! */
-	void sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, palette_device *palette, const UINT8 *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, UINT32 pri_mask );
+	void sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, palette_device &palette, const UINT8 *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, UINT32 pri_mask, bool is_flakatck = false );
 
 protected:
 	// device-level overrides

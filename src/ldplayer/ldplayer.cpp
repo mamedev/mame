@@ -83,9 +83,9 @@ public:
 
 protected:
 	// device overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	// internal helpers
 	chd_file *get_disc();
@@ -150,12 +150,12 @@ public:
 
 protected:
 	// device overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	// command execution hook
-	virtual void execute_command(int command);
+	virtual void execute_command(int command) override;
 
 	// internal helpers
 	inline void add_command(UINT8 command);
@@ -189,7 +189,7 @@ protected:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 
 	// command execution hook
-	virtual void execute_command(int command);
+	virtual void execute_command(int command) override;
 };
 
 
@@ -229,7 +229,7 @@ chd_file *ldplayer_state::get_disc()
 
 				// try to open the CHD
 
-				if (set_disk_handle(machine(), "laserdisc", fullpath.c_str()) == CHDERR_NONE)
+				if (machine().rom_load().set_disk_handle("laserdisc", fullpath.c_str()) == CHDERR_NONE)
 				{
 					m_filename.assign(dir->name);
 					found = TRUE;
@@ -243,7 +243,7 @@ chd_file *ldplayer_state::get_disc()
 	if (found == FALSE)
 		throw emu_fatalerror("No valid image file found!\n");
 
-	return get_disk_handle(machine(), "laserdisc");
+	return machine().rom_load().get_disk_handle("laserdisc");
 }
 
 

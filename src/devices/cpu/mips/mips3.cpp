@@ -659,7 +659,7 @@ void mips3_device::state_export(const device_state_entry &entry)
 }
 
 
-void mips3_device::state_string_export(const device_state_entry &entry, std::string &str)
+void mips3_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

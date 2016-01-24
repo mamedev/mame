@@ -581,7 +581,6 @@ void mz2000_state::machine_reset()
 	m_tvram_enable = 0;
 	m_gvram_enable = 0;
 
-	m_beeper->set_frequency(4096);
 	m_beeper->set_state(0);
 
 	m_color_mode = m_io_config->read() & 1;
@@ -853,7 +852,7 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 4096)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 

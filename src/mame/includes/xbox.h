@@ -39,6 +39,8 @@ struct OHCIIsochronousTransferDescriptor {
 	UINT32 nexttd; // NextTD
 	UINT32 be; // BufferEnd
 	UINT32 offset[8]; // Offset/PacketStatusWord
+	UINT32 word0;
+	UINT32 word1;
 };
 
 enum OHCIRegisters {
@@ -193,7 +195,11 @@ public:
 	int execute_transfer(int address, int endpoint, int pid, UINT8 *buffer, int size);
 private:
 	int address;
-	int controldir;
+	int newaddress;
+	int controldirection;
+	int controltype;
+	int controlrecipient;
+	bool settingaddress;
 	int remain;
 	UINT8 *position;
 };
@@ -214,6 +220,10 @@ public:
 	DECLARE_WRITE32_MEMBER(usbctrl_w);
 	DECLARE_READ32_MEMBER(smbus_r);
 	DECLARE_WRITE32_MEMBER(smbus_w);
+	DECLARE_READ8_MEMBER(superio_read);
+	DECLARE_WRITE8_MEMBER(superio_write);
+	DECLARE_READ8_MEMBER(superiors232_read);
+	DECLARE_WRITE8_MEMBER(superiors232_write);
 	DECLARE_READ32_MEMBER(audio_apu_r);
 	DECLARE_WRITE32_MEMBER(audio_apu_w);
 	DECLARE_READ32_MEMBER(audio_ac93_r);
@@ -232,6 +242,7 @@ public:
 	void usb_ohci_read_transfer_descriptor(UINT32 address);
 	void usb_ohci_writeback_transfer_descriptor(UINT32 address);
 	void usb_ohci_read_isochronous_transfer_descriptor(UINT32 address);
+	void usb_ohci_writeback_isochronous_transfer_descriptor(UINT32 address);
 	void dword_write_le(UINT8 *addr, UINT32 d);
 	void word_write_le(UINT8 *addr, UINT16 d);
 	void debug_generate_irq(int irq, bool active);
@@ -309,6 +320,13 @@ public:
 		OHCITransferDescriptor transfer_descriptor;
 		OHCIIsochronousTransferDescriptor isochronous_transfer_descriptor;
 	} ohcist;
+	struct superio_state
+	{
+		bool configuration_mode;
+		int index;
+		int selected;
+		UINT8 registers[16][256]; // 256 registers for up to 16 devices, registers 0-0x2f common to all
+	} superiost;
 	UINT8 pic16lc_buffer[0xff];
 	std::unique_ptr<nv2a_renderer> nvidia_nv2a;
 	bool debug_irq_active;

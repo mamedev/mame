@@ -1,6 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Lee Taylor
 // thanks-to:John Clegg
+/****************************************************************************
+
+    Irem M58 hardware
+
+****************************************************************************/
+
 class m58_state : public driver_device
 {
 public:
@@ -15,7 +21,8 @@ public:
 		m_scroll_x_low(*this, "scroll_x_low"),
 		m_scroll_x_high(*this, "scroll_x_high"),
 		m_scroll_y_low(*this, "scroll_y_low"),
-		m_score_panel_disabled(*this, "score_disable") { }
+		m_score_panel_disabled(*this, "score_disable")
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -32,14 +39,13 @@ public:
 	required_shared_ptr<UINT8> m_score_panel_disabled;
 
 	/* video-related */
-	tilemap_t*             m_bg_tilemap;
-	bitmap_ind16             m_scroll_panel_bitmap;
+	tilemap_t* m_bg_tilemap;
+	bitmap_ind16 m_scroll_panel_bitmap;
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(scroll_panel_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 
-	DECLARE_DRIVER_INIT(yard85);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(m58);
 

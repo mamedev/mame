@@ -225,7 +225,7 @@ WRITE_LINE_MEMBER( micropin_state::p50ca2_w )
 WRITE8_MEMBER( micropin_state::p51a_w )
 {
 	static UINT16 frequency[16] = { 387, 435, 488, 517, 581, 652, 691, 775, 870, 977, 1035, 1161, 1304, 1381, 1550, 1740 };
-	m_beep->set_frequency(frequency[data & 15]);
+	m_beep->set_clock(frequency[data & 15]);
 	m_beep_time = 10; // number of 10ms intervals before it is silenced
 	m_beep->set_state(1);
 }
@@ -292,7 +292,7 @@ static MACHINE_CONFIG_START( micropin, micropin_state )
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 387)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

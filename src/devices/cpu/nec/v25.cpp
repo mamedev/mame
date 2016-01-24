@@ -525,7 +525,7 @@ void v25_common_device::device_start()
 }
 
 
-void v25_common_device::state_string_export(const device_state_entry &entry, std::string &str)
+void v25_common_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	UINT16 flags = CompressFlags();
 

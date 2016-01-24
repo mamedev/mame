@@ -151,7 +151,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(vt100_state::keyboard_callback)
 
 WRITE8_MEMBER( vt100_state::vt100_keyboard_w )
 {
-	m_speaker->set_frequency(786); // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
 	output().set_value("online_led",BIT(data, 5) ? 0 : 1);
 	output().set_value("local_led", BIT(data, 5));
 	output().set_value("locked_led",BIT(data, 4) ? 0 : 1);
@@ -352,7 +351,6 @@ void vt100_state::machine_reset()
 	m_keyboard_int = 0;
 	m_receiver_int = 0;
 	m_vertical_int = 0;
-	m_speaker->set_frequency(786); // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
 	output().set_value("online_led",1);
 	output().set_value("local_led", 0);
 	output().set_value("locked_led",1);
@@ -441,7 +439,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 786) // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", vt100_state, keyboard_callback, attotime::from_hz(800))

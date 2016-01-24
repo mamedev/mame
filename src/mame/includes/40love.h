@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 #include "machine/buggychl.h"
 #include "sound/msm5232.h"
@@ -42,7 +42,9 @@ public:
 	bitmap_ind16    *m_pixel_bitmap1;
 	bitmap_ind16    *m_pixel_bitmap2;
 	int         m_pixram_sel;
-
+	bool		m_color_bank;
+	bool		m_screen_disable;
+	
 	/* sound-related */
 	int         m_sound_nmi_enable;
 	int         m_pending_nmi;

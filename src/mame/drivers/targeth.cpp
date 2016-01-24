@@ -204,6 +204,9 @@ ROM_START( targeth )
 	ROM_LOAD16_BYTE( "targeth.c23", 0x000000, 0x040000, CRC(840887d6) SHA1(9a36b346608d531a62a2e0704ea44f12e07f9d91) )
 	ROM_LOAD16_BYTE( "targeth.c22", 0x000001, 0x040000, CRC(d2435eb8) SHA1(ce75a115dad8019c8e66a1c3b3e15f54781f65ae) )
 
+	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_LOAD( "targeth_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* Graphics */
 	ROM_LOAD( "targeth.i13",    0x000000, 0x080000, CRC(b892be24) SHA1(9cccaaacf20e77c7358f0ceac60b8a1012f1216c) )
 	ROM_LOAD( "targeth.i11",    0x080000, 0x080000, CRC(6797faf9) SHA1(112cffe72f91cb46c262e19a47b0cab3237dd60f) )
@@ -221,6 +224,9 @@ ROM_START( targetha )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "c23.bin", 0x000000, 0x040000, CRC(e38a54e2) SHA1(239bfa6f1c0fc8aa0ad7de9be237bef55b384007) )
 	ROM_LOAD16_BYTE( "c22.bin", 0x000001, 0x040000, CRC(24fe3efb) SHA1(8f48f08a6db28966c9263be119883c9179e349ed) )
+
+	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_LOAD( "targeth_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* Graphics */
 	ROM_LOAD( "targeth.i13",    0x000000, 0x080000, CRC(b892be24) SHA1(9cccaaacf20e77c7358f0ceac60b8a1012f1216c) )

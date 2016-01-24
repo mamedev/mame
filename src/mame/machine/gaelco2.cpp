@@ -290,7 +290,7 @@ WRITE16_MEMBER(gaelco2_state::gaelco2_eeprom_data_w)
 READ16_MEMBER(gaelco2_state::snowboar_protection_r)
 {
 
-	chd_file * table = get_disk_handle(machine(), ":decrypt");
+	chd_file * table = machine().rom_load().get_disk_handle(":decrypt");
 	UINT8 temp[1024];
 	table->read_hunk(snowboard_latch>>9, &temp[0]);
 	UINT16 data = (temp[(snowboard_latch & 0x1ff)*2]<<8) | temp[((snowboard_latch & 0x1ff)*2)+1];

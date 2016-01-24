@@ -53,7 +53,7 @@ void m740_device::device_reset()
 	SP = 0x00ff;
 }
 
-void m740_device::state_string_export(const device_state_entry &entry, std::string &str)
+void m740_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch(entry.index()) {
 	case STATE_GENFLAGS:

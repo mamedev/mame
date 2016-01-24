@@ -6,15 +6,17 @@ class vsnes_state : public driver_device
 {
 public:
 	vsnes_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub"),
-		m_ppu1(*this, "ppu1"),
-		m_ppu2(*this, "ppu2"),
-		m_work_ram(*this, "work_ram"),
-		m_work_ram_1(*this, "work_ram_1"),
-		m_palette(*this, "palette")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "sub")
+		, m_ppu1(*this, "ppu1")
+		, m_ppu2(*this, "ppu2")
+		, m_work_ram(*this, "work_ram")
+		, m_work_ram_1(*this, "work_ram_1")
+		, m_palette(*this, "palette")
+		, m_gfx1_rom(*this, "gfx1")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
@@ -24,6 +26,9 @@ public:
 	required_shared_ptr<UINT8> m_work_ram;
 	optional_shared_ptr<UINT8> m_work_ram_1;
 	required_device<palette_device> m_palette;
+
+	optional_memory_region m_gfx1_rom;
+
 	int m_coin;
 	int m_do_vrom_bank;
 	int m_input_latch[4];

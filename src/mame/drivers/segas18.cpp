@@ -174,6 +174,10 @@ void segas18_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
+void segas18_state::machine_start()
+{
+	membank("soundbank")->configure_entries(0, 256, memregion("soundcpu")->base() + 0x10000, 0x2000);
+}
 
 void segas18_state::machine_reset()
 {
@@ -491,7 +495,7 @@ WRITE16_MEMBER( segas18_state::wwally_custom_io_w )
 
 WRITE8_MEMBER( segas18_state::soundbank_w )
 {
-	membank("bank1")->set_base(memregion("soundcpu")->base() + 0x10000 + 0x2000 * data);
+	membank("soundbank")->set_entry(data);
 }
 
 
@@ -535,7 +539,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas18_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0x10000)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("soundbank")
 	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_DEVWRITE("rfsnd", rf5c68_device, rf5c68_w)
 	AM_RANGE(0xd000, 0xdfff) AM_DEVREADWRITE("rfsnd", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM

@@ -365,7 +365,7 @@ public:
 	bool parse(const char *mapstring);
 
 	// create a friendly string
-	const char *to_string(std::string &str) const;
+	std::string to_string() const;
 
 	// update the state of a live map
 	UINT8 update(INT32 xaxisval, INT32 yaxisval);
@@ -654,8 +654,8 @@ public:
 	input_device *device_from_code(input_code code) const;
 	input_device_item *item_from_code(input_code code) const;
 	input_code code_from_itemid(input_item_id itemid) const;
-	const char *code_name(std::string &str, input_code code) const;
-	const char *code_to_token(std::string &str, input_code code) const;
+	std::string code_name(input_code code) const;
+	std::string code_to_token(input_code code) const;
 	input_code code_from_token(const char *_token);
 
 	// input sequence readers
@@ -668,8 +668,8 @@ public:
 	const input_seq &seq_poll_final() const { return m_poll_seq; }
 
 	// input sequence helpers
-	const char *seq_name(std::string &str, const input_seq &seq) const;
-	const char *seq_to_tokens(std::string &str, const input_seq &seq) const;
+	std::string seq_name(const input_seq &seq) const;
+	std::string seq_to_tokens(const input_seq &seq) const;
 	void seq_from_tokens(input_seq &seq, const char *_token);
 
 	// misc

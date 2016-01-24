@@ -10,21 +10,24 @@ class btime_state : public driver_device
 {
 public:
 	btime_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_rambase(*this, "rambase"),
-		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"),
-		m_bnj_backgroundram(*this, "bnj_bgram"),
-		m_zoar_scrollram(*this, "zoar_scrollram"),
-		m_lnc_charbank(*this, "lnc_charbank"),
-		m_deco_charram(*this, "deco_charram"),
-		m_spriteram(*this, "spriteram"),
-		m_audio_rambase(*this, "audio_rambase"),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		: driver_device(mconfig, type, tag)
+		, m_rambase(*this, "rambase")
+		, m_videoram(*this, "videoram")
+		, m_colorram(*this, "colorram")
+		, m_bnj_backgroundram(*this, "bnj_bgram")
+		, m_zoar_scrollram(*this, "zoar_scrollram")
+		, m_lnc_charbank(*this, "lnc_charbank")
+		, m_deco_charram(*this, "deco_charram")
+		, m_spriteram(*this, "spriteram")
+		, m_audio_rambase(*this, "audio_rambase")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_prom_region(*this, "proms")
+	{
+	}
 
 	/* memory pointers */
 	optional_shared_ptr<UINT8> m_rambase;
@@ -62,6 +65,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_memory_region m_prom_region;
 
 	DECLARE_WRITE8_MEMBER(audio_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(audio_command_w);

@@ -102,28 +102,23 @@
 //  the format
 //-------------------------------------------------
 
-inline const char *number_and_format::format(std::string &str) const
+inline std::string number_and_format::format() const
 {
 	switch (m_format)
 	{
 		default:
 		case XML_INT_FORMAT_DECIMAL:
-			strprintf(str, "%d", (UINT32)m_value);
-			break;
+			return strformat("%d", (UINT32)m_value);
 
 		case XML_INT_FORMAT_DECIMAL_POUND:
-			strprintf(str, "#%d", (UINT32)m_value);
-			break;
+			return strformat("#%d", (UINT32)m_value);
 
 		case XML_INT_FORMAT_HEX_DOLLAR:
-			strprintf(str, "$%X", (UINT32)m_value);
-			break;
+			return strformat("$%X", (UINT32)m_value);
 
 		case XML_INT_FORMAT_HEX_C:
-			strprintf(str, "0x%X", (UINT32)m_value);
-			break;
+			return strformat("0x%X", (UINT32)m_value);
 	}
-	return str.c_str();
 }
 
 
@@ -206,15 +201,14 @@ void cheat_parameter::save(emu_file &cheatfile) const
 	cheatfile.printf("\t\t<parameter");
 
 	// if no items, just output min/max/step
-	std::string str;
 	if (!has_itemlist())
 	{
 		if (m_minval != 0)
-			cheatfile.printf(" min=\"%s\"", m_minval.format(str));
+			cheatfile.printf(" min=\"%s\"", m_minval.format().c_str());
 		if (m_maxval != 0)
-			cheatfile.printf(" max=\"%s\"", m_maxval.format(str));
+			cheatfile.printf(" max=\"%s\"", m_maxval.format().c_str());
 		if (m_stepval != 1)
-			cheatfile.printf(" step=\"%s\"", m_stepval.format(str));
+			cheatfile.printf(" step=\"%s\"", m_stepval.format().c_str());
 		cheatfile.printf("/>\n");
 	}
 
@@ -222,7 +216,7 @@ void cheat_parameter::save(emu_file &cheatfile) const
 	else
 	{
 		for (const item *curitem = m_itemlist.first(); curitem != nullptr; curitem = curitem->next())
-			cheatfile.printf("\t\t\t<item value=\"%s\">%s</item>\n", curitem->value().format(str), curitem->text());
+			cheatfile.printf("\t\t\t<item value=\"%s\">%s</item>\n", curitem->value().format().c_str(), curitem->text());
 		cheatfile.printf("\t\t</parameter>\n");
 	}
 }
@@ -527,15 +521,13 @@ void cheat_script::script_entry::execute(cheat_manager &manager, UINT64 &arginde
 
 void cheat_script::script_entry::save(emu_file &cheatfile) const
 {
-	std::string tempstring;
-
 	// output an action
 	if (m_format.empty())
 	{
 		cheatfile.printf("\t\t\t<action");
 		if (!m_condition.is_empty())
-			cheatfile.printf(" condition=\"%s\"", cheat_manager::quote_expression(tempstring, m_condition));
-		cheatfile.printf(">%s</action>\n", cheat_manager::quote_expression(tempstring, m_expression));
+			cheatfile.printf(" condition=\"%s\"", cheat_manager::quote_expression(m_condition).c_str());
+		cheatfile.printf(">%s</action>\n", cheat_manager::quote_expression(m_expression).c_str());
 	}
 
 	// output an output
@@ -543,7 +535,7 @@ void cheat_script::script_entry::save(emu_file &cheatfile) const
 	{
 		cheatfile.printf("\t\t\t<output format=\"%s\"", m_format.c_str());
 		if (!m_condition.is_empty())
-			cheatfile.printf(" condition=\"%s\"", cheat_manager::quote_expression(tempstring, m_condition));
+			cheatfile.printf(" condition=\"%s\"", cheat_manager::quote_expression(m_condition).c_str());
 		if (m_line != 0)
 			cheatfile.printf(" line=\"%d\"", m_line);
 		if (m_justify == JUSTIFY_CENTER)
@@ -661,12 +653,10 @@ int cheat_script::script_entry::output_argument::values(UINT64 &argindex, UINT64
 
 void cheat_script::script_entry::output_argument::save(emu_file &cheatfile) const
 {
-	std::string tempstring;
-
 	cheatfile.printf("\t\t\t\t<argument");
 	if (m_count != 1)
 		cheatfile.printf(" count=\"%d\"", (int)m_count);
-	cheatfile.printf(">%s</argument>\n", cheat_manager::quote_expression(tempstring, m_expression));
+	cheatfile.printf(">%s</argument>\n", cheat_manager::quote_expression(m_expression).c_str());
 }
 
 
@@ -706,10 +696,8 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 
 		// create the symbol table
 		m_symbols.add("argindex", symbol_table::READ_ONLY, &m_argindex);
-		std::string tempname;
 		for (int curtemp = 0; curtemp < tempcount; curtemp++) {
-			strprintf(tempname,"temp%d", curtemp);
-			m_symbols.add(tempname.c_str(), symbol_table::READ_WRITE);
+			m_symbols.add(strformat("temp%d", curtemp).c_str(), symbol_table::READ_WRITE);
 		}
 
 		// read the first comment node
@@ -1267,9 +1255,9 @@ std::string &cheat_manager::get_output_astring(int row, int justify)
 //  document
 //-------------------------------------------------
 
-const char *cheat_manager::quote_expression(std::string &str, const parsed_expression &expression)
+std::string cheat_manager::quote_expression(const parsed_expression &expression)
 {
-	str.assign(expression.original_string());
+	std::string str = expression.original_string();
 
 	strreplace(str, " && ", " and ");
 	strreplace(str, " &&", " and ");
@@ -1296,7 +1284,7 @@ const char *cheat_manager::quote_expression(std::string &str, const parsed_expre
 	strreplace(str, "<< ", " lshift ");
 	strreplace(str, "<<", " lshift ");
 
-	return str.c_str();
+	return str;
 }
 
 

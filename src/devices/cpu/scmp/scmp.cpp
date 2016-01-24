@@ -547,7 +547,7 @@ void scmp_device::device_reset()
     COMMON STATE IMPORT/EXPORT
 ***************************************************************************/
 
-void scmp_device::state_string_export(const device_state_entry &entry, std::string &str)
+void scmp_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

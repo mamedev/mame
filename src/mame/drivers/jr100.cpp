@@ -119,7 +119,7 @@ WRITE8_MEMBER(jr100_state::jr100_via_w)
 		if(m_beep_en)
 		{
 			m_beeper->set_state(1);
-			m_beeper->set_frequency(894886.25 / (double)(m_t1latch) / 2.0);
+			m_beeper->set_clock(894886.25 / (double)(m_t1latch) / 2.0);
 		}
 	}
 	m_via->write(space,offset,data);
@@ -203,8 +203,6 @@ INPUT_PORTS_END
 
 void jr100_state::machine_start()
 {
-	m_beeper->set_frequency(0);
-	m_beeper->set_state(0);
 }
 
 void jr100_state::machine_reset()
@@ -365,10 +363,10 @@ QUICKLOAD_LOAD_MEMBER( jr100_state,jr100)
 }
 
 static MACHINE_CONFIG_START( jr100, jr100_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6802, XTAL_14_31818MHz / 4) // clock devided internaly by 4
 	MCFG_CPU_PROGRAM_MAP(jr100_mem)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

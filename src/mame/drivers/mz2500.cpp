@@ -1806,7 +1806,6 @@ void mz2500_state::machine_reset()
 
 	m_cg_clear_flag = 0;
 
-	m_beeper->set_frequency(4096);
 	m_beeper->set_state(0);
 
 //  m_monitor_type = ioport("DSW1")->read() & 0x40 ? 1 : 0;
@@ -2140,7 +2139,7 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 4096)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 

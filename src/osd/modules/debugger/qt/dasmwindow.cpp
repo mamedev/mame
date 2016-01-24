@@ -166,7 +166,7 @@ void DasmWindow::toggleBreakpointAtCursor(bool changedTo)
 			debug_console_printf(*m_machine, "Breakpoint %X cleared\n", bpindex);
 		}
 		m_machine->debug_view().update_all();
-		debugger_refresh_display(*m_machine);
+		m_machine->debugger().refresh_display();
 	}
 
 	refreshAll();
@@ -191,7 +191,7 @@ void DasmWindow::enableBreakpointAtCursor(bool changedTo)
 			cpuinfo->breakpoint_enable(bp->index(), !bp->enabled());
 			debug_console_printf(*m_machine, "Breakpoint %X %s\n", (UINT32)bp->index(), bp->enabled() ? "enabled" : "disabled");
 			m_machine->debug_view().update_all();
-			debugger_refresh_display(*m_machine);
+			m_machine->debugger().refresh_display();
 		}
 	}
 

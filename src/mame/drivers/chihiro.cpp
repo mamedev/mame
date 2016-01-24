@@ -61,6 +61,7 @@ Games on this system include....
 |*| 2005 | Sangokushi Taisen                                  | Sega                     | DVDROM | CDV-10022  |              |
 |*| 2006 | Sangokushi Taisen 2 Firmware Update                | Sega                     | DVDROM | CDV-10023  |              |
 |*| 2006 | Sangokushi Taisen 2                                | Sega                     | DVDROM | CDV-10029  |              |
+|*| 2007 | Mobile Suit Gundam 0083 Card Builder               | Dimps - Banpresto        | DVDROM | CDV-10030  |              |
 |*| 2008 | Sangokushi Taisen 3                                | Sega                     | DVDROM | CDV-10036  |              |
 |*| 2008 | Sangokushi Taisen 3 (Ver.J)                        | Sega                     | DVDROM | CDV-10036J |              |
 |*| 2008 | Sangokushi Taisen 3 War Begins (Ver.3.59)          | Sega                     | DVDROM | CDV-10041  |              |
@@ -364,14 +365,11 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/lpci.h"
 #include "machine/pic8259.h"
-#include "machine/pit8253.h"
 #include "machine/idectrl.h"
 #include "machine/idehd.h"
 #include "machine/naomigd.h"
 #include "video/poly.h"
-#include "bitmap.h"
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 #include "debug/debugcpu.h"

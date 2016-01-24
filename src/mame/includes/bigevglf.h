@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski, Tomasz Slanina
 #include "sound/msm5232.h"
 

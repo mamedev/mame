@@ -348,7 +348,7 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, device_gfx_interface &decod
 	// populate managers and devices
 	m_manager = &manager;
 	m_device = dynamic_cast<tilemap_device *>(this);
-	m_palette = decoder.palette();
+	m_palette = &decoder.palette();
 	m_next = nullptr;
 	m_user_data = nullptr;
 

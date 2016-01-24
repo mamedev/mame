@@ -506,6 +506,10 @@ void ata_mass_storage_device::process_buffer()
 		if (m_master_password_enable || m_user_password_enable)
 			security_error();
 	}
+	else if (m_command == IDE_COMMAND_SECURITY_DISABLE_PASSWORD)
+	{
+		LOGPRINT(("IDE Done unimplemented SECURITY_DISABLE_PASSWORD command\n"));
+	}
 	else
 	{
 		set_dasp(ASSERT_LINE);
@@ -678,6 +682,15 @@ void ata_mass_storage_device::process_command()
 
 	case IDE_COMMAND_SECURITY_UNLOCK:
 		LOGPRINT(("IDE Security Unlock\n"));
+
+		/* mark the buffer ready */
+		m_status |= IDE_STATUS_DRQ;
+
+		set_irq(ASSERT_LINE);
+		break;
+
+	case IDE_COMMAND_SECURITY_DISABLE_PASSWORD:
+		LOGPRINT(("IDE Unimplemented SECURITY DISABLE PASSWORD command\n"));
 
 		/* mark the buffer ready */
 		m_status |= IDE_STATUS_DRQ;

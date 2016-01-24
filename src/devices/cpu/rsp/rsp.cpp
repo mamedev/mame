@@ -539,7 +539,7 @@ void rsp_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void rsp_device::state_string_export(const device_state_entry &entry, std::string &str)
+void rsp_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	const int index = entry.index();
 	if (index >= RSP_V0 && index <= RSP_V31)

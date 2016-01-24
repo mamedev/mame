@@ -581,9 +581,14 @@ void ymz280b_device::device_start()
 
 	/* initialize the rest of the structure */
 	m_master_clock = (double)clock() / 384.0;
-	m_mem_base = region()->base();
-	m_mem_size = region()->bytes();
 	m_irq_handler.resolve();
+
+	if (region() != NULL)
+	{
+		/* Some systems (e.g. Konami Firebeat) have a YMZ280B on-board that isn't hooked up to ROM, so be safe. */
+		m_mem_base = region()->base();
+		m_mem_size = region()->bytes();
+	}
 
 	for (int i = 0; i < 8; i++)
 	{

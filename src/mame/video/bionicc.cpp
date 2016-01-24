@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Steven Frew, Phil Stroffolino, Paul Leaman
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino, Paul Leaman
+// thanks-to: Steven Frew (the author of Slutte)
 /***************************************************************************
 
     Bionic Commando Video Hardware

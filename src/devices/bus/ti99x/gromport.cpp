@@ -134,6 +134,52 @@
 #define GKRACKER_ROM_TAG "gkracker_rom"
 #define GKRACKER_NVRAM_TAG "gkracker_nvram"
 
+/*-------------------------------------------------
+    image_battery_load_by_name - retrieves the battery
+    backed RAM for an image. A filename may be supplied
+    to the function.
+
+    The function comes in two flavors, depending on
+    what should happen when no battery is available:
+    we could fill the memory with a given value, or
+    pass a default battery (for a pre-initialized
+    battery from factory)
+-------------------------------------------------*/
+
+static void image_battery_load_by_name(emu_options &options, const char *filename, void *buffer, int length, int fill)
+{
+	file_error filerr;
+	int bytes_read = 0;
+
+	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+
+	/* try to open the battery file and read it in, if possible */
+	emu_file file(options.nvram_directory(), OPEN_FLAG_READ);
+	filerr = file.open(filename);
+	if (filerr == FILERR_NONE)
+		bytes_read = file.read(buffer, length);
+
+	/* fill remaining bytes (if necessary) */
+	memset(((char *) buffer) + bytes_read, fill, length - bytes_read);
+}
+
+/*-------------------------------------------------
+    image_battery_save_by_name - stores the battery
+    backed RAM for an image. A filename may be supplied
+    to the function.
+-------------------------------------------------*/
+static void image_battery_save_by_name(emu_options &options, const char *filename, const void *buffer, int length)
+{
+	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+
+	/* try to open the battery file and write it out, if possible */
+	emu_file file(options.nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	file_error filerr = file.open(filename);
+	if (filerr == FILERR_NONE)
+		file.write(buffer, length);
+}
+
+
 gromport_device::gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:   bus8z_device(mconfig, GROMPORT, "Cartridge port", tag, owner, clock, "gromport", __FILE__),
 		device_slot_interface(mconfig, *this),
@@ -1347,7 +1393,7 @@ void ti99_cartridge_device::set_slot(int i)
 bool ti99_cartridge_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
 	if (TRACE_CONFIG) logerror("%s: swlist = %s, swname = %s\n", tag(), swlist.list_name(), swname);
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 	m_softlist = true;
 	m_rpk = nullptr;
 	return true;

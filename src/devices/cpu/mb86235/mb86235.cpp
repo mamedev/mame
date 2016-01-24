@@ -108,7 +108,7 @@ mb86235_cpu_device::mb86235_cpu_device(const machine_config &mconfig, const char
 }
 
 
-void mb86235_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void mb86235_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

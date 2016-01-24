@@ -235,7 +235,7 @@ static MACHINE_CONFIG_FRAGMENT( epson_ex800 )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 4000) /* measured at 4000 Hz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -269,7 +269,7 @@ INPUT_CHANGED_MEMBER(epson_ex800_t::online_switch)
 INPUT_PORTS_START( epson_ex800 )
 	PORT_START("ONLISW")
 	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON LINE")   PORT_CODE(KEYCODE_F9) PORT_CHANGED_MEMBER(DEVICE_SELF, epson_ex800_t, online_switch, NULL)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON LINE")   PORT_CODE(KEYCODE_F9) PORT_CHANGED_MEMBER(DEVICE_SELF, epson_ex800_t, online_switch, nullptr)
 
 	PORT_START("FEED")
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -384,7 +384,6 @@ void epson_ex800_t::device_reset()
 {
 	/* Setup beep */
 	m_beeper->set_state(0);
-	m_beeper->set_frequency(4000); /* measured at 4000 Hz */
 }
 
 

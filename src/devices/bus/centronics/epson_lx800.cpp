@@ -91,7 +91,7 @@ static MACHINE_CONFIG_FRAGMENT( epson_lx800 )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 4000) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 
 	/* gate array */
@@ -232,7 +232,6 @@ void epson_lx800_t::device_start()
 void epson_lx800_t::device_reset()
 {
 	m_beep->set_state(0);
-	m_beep->set_frequency(4000); /* ? */
 }
 
 

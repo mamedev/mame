@@ -110,6 +110,7 @@ private:
 	std::unique_ptr<INT16[]> m_mixer_buffer_right;
 
 	int m_baserate;
+	optional_region_ptr<INT8> m_rom_ptr;
 	INT8 *m_pRom;
 	UINT8 m_REG[0x200];
 

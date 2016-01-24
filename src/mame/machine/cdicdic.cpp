@@ -1232,7 +1232,7 @@ void cdicdic_device::device_reset()
 	else
 	{
 		// MAME case
-		m_cd = cdrom_open(get_disk_handle(machine(), ":cdrom"));
+		m_cd = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
 		state->m_cdda->set_cdrom(m_cd);
 	}
 }

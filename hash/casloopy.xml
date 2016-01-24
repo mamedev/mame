@@ -3,9 +3,7 @@
 <softwarelist name="casloopy" description="Casio Loopy cartridges">
 
 <!-- Undumped titles:
-- Loopy Town no Oheya ga Hoshii! (ルーピータウンのおへやがほしい!)
 - Little Romance (リトルロマンス)
-- Lupiton no Wonder Palette (ルピトンのワンダーパレット)
 - Chakura-kun no Omajinai Paradise (チャクラくんのおまじないパラダイス)
 - Magical Shop [add-on to extract images from vhs/dvd?]
 -->
@@ -87,4 +85,32 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="loopytwn">
+		<description>Loopy Town no Oheya ga Hoshii!</description>
+		<year>1996</year>
+ 		<publisher>Casio</publisher>
+		<info name="serial" value="XK-504"/> 
+    <info name="alt_name" value="ルーピータウンのおへやがほしい!"/>
+		<part name="cart" interface="loopy_cart">
+			<dataarea name="rom" size="0x300000">
+				<rom name="CHIP1.IC104" size="0x200000" crc="bae71d45" sha1="79628715ccedd9bc3fd72d21fa9ea6513b88cf51" offset="0x000000" />
+ 				<rom name="CHIP2.IC105" size="0x100000" crc="e0514d03" sha1="4dd02faa1ebf6754da0ade417e488512f3502620" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lupiton">
+		<description>Lupiton no Wonder Palette</description>
+		<year>1995</year>
+		<publisher>Casio</publisher>
+		<info name="serial" value="XK-701"/>
+		<info name="alt_name" value="ルピトンのワンダーパレット"/>
+		<part name="cart" interface="loopy_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="lupiton.bin" size="0x200000" crc="338a5af7" sha1="ddb3e2b363ef0325a1370511f3692ca47031cb46" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

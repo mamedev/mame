@@ -281,7 +281,7 @@ WRITE8_MEMBER( d6800_state::d6800_cassette_w )
 	    are in progress (DMA/CB2 line low).
 	*/
 
-	m_beeper->set_frequency(BIT(data, 0) ? 2400 : 1200);
+	m_beeper->set_clock(BIT(data, 0) ? 2400 : 1200);
 	m_beeper->set_state(BIT(data, 6) & (m_cb2 ? 1 : 0));
 
 	m_portb = data & 0x7f;
@@ -397,7 +397,7 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 1200)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */

@@ -179,7 +179,6 @@ MACHINE_RESET_MEMBER( tavernie_state, cpu09)
 MACHINE_RESET_MEMBER( tavernie_state, ivg09)
 {
 	m_p_chargen = memregion("chargen")->base();
-	m_beep->set_frequency(950);    /* guess */
 	m_beep->set_state(1);
 	m_term_data = 0;
 	m_pia_ivg->cb1_w(1);
@@ -354,7 +353,7 @@ static MACHINE_CONFIG_DERIVED( ivg09, cpu09 )
 	MCFG_DEFAULT_LAYOUT(layout_tavernie)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 950) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

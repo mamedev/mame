@@ -546,7 +546,7 @@ UINT32 bnstars_state::screen_update_bnstars_right(screen_device &screen, bitmap_
 
 static INPUT_PORTS_START( bnstars )
 	PORT_START("P1")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bnstars_state, mahjong_ctrl_r, (void *)nullptr)
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bnstars_state, mahjong_ctrl_r, (void *)0)
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -708,7 +708,7 @@ GFXDECODE_END
 
 CUSTOM_INPUT_MEMBER(bnstars_state::mahjong_ctrl_r)
 {
-	required_ioport_array<4> &keys = (param == nullptr) ? m_p1_keys : m_p2_keys;
+	required_ioport_array<4> &keys = (((int)(FPTR)param) == 0) ? m_p1_keys : m_p2_keys;
 
 	switch (m_bnstars1_mahjong_select & 0x2080)
 	{

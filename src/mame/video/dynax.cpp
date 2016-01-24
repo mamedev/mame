@@ -393,11 +393,7 @@ void dynax_state::blitter_plot_pixel( int layer, int mask, int x, int y, int pen
 */
 int dynax_state::blitter_drawgfx( int layer, int mask, const char *gfx, int src, int pen, int x, int y, int wrap, int flags )
 {
-	UINT8 cmd;
-	UINT8 *ROM = memregion(gfx)->base();
-	size_t ROM_size = memregion(gfx)->bytes();
-
-	int sx;
+	size_t rom_size = m_gfx_region.bytes();
 
 	if (m_layer_layout == LAYOUT_HNORIDUR)   // e.g. yarunara
 		pen = ((pen >> 4) & 0xf) | ((mask & 0x10) ? ((pen & 0x08) << 1) : 0);
@@ -409,18 +405,14 @@ int dynax_state::blitter_drawgfx( int layer, int mask, const char *gfx, int src,
 
 	if (flags & 1)
 	{
-		int start, len;
-
 		/* Clear the buffer(s) starting from the given scanline and exit */
-
 		int addr = x + (y << 8);
 
+		int start = addr;
 		if (m_flipscreen)
 			start = 0;
-		else
-			start = addr;
 
-		len = 0x10000 - addr;
+		int len = 0x10000 - addr;
 
 		switch (m_layer_layout)
 		{
@@ -469,20 +461,20 @@ int dynax_state::blitter_drawgfx( int layer, int mask, const char *gfx, int src,
 		return src;
 	}
 
-	sx = x;
+	int sx = x;
 
 	src &= 0xfffff;
 
 	for ( ;; )
 	{
-		if (src >= ROM_size)
+		if (src >= rom_size)
 		{
 			popmessage("GFXROM %s OVER %08x",gfx,src);
 			LOG(("\nGFXROM %s OVER %08x",gfx,src));
 			return src;
 		}
 
-		cmd = ROM[src++];
+		UINT8 cmd = m_gfx_region[src++];
 		src &= 0xfffff;
 		if (!(flags & 0x02))    // Ignore the pens specified in ROM, draw everything with the pen supplied as parameter
 			pen = (pen & 0xf0) | ((cmd & 0xf0) >> 4);
@@ -503,24 +495,24 @@ int dynax_state::blitter_drawgfx( int layer, int mask, const char *gfx, int src,
 			popmessage("Blitter unknown command %06X: %02X\n", src - 1, cmd);
 
 		case 0xd:   // Skip X pixels
-			if (src >= ROM_size)
+			if (src >= rom_size)
 			{
 				popmessage("GFXROM %s OVER %08x",gfx,src);
 				LOG(("\nGFXROM %s OVER %08x",gfx,src));
 				return src;
 			}
-			x = sx + ROM[src++];
+			x = sx + m_gfx_region[src++];
 			src &= 0xfffff;
 			/* fall through into next case */
 
 		case 0xc:   // Draw N pixels
-			if (src >= ROM_size)
+			if (src >= rom_size)
 			{
 				popmessage("GFXROM %s OVER %08x",gfx,src);
 				LOG(("\nGFXROM %s OVER %08x",gfx,src));
 				return src;
 			}
-			cmd = ROM[src++];
+			cmd = m_gfx_region[src++];
 			src &= 0xfffff;
 			/* fall through into next case */
 

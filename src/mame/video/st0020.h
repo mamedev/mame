@@ -47,6 +47,7 @@ private:
 	DECLARE_WRITE16_MEMBER(st0020_blit_w);
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_region_ptr<UINT8> m_rom_ptr;
 };
 
 #define ST0020_ST0032_BYTESWAP_DATA \

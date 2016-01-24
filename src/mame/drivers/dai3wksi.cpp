@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Derrick Renaud
+// license:???
+// copyright-holders:Hau,Derrick Renaud
 /*
 
 -Galaxy Force

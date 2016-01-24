@@ -85,8 +85,8 @@ void cyberbal_state::video_start_common(int screens)
 	if (screens == 2)
 	{
 		palette_device *rpalette = subdevice<palette_device>("rpalette");
-		m_playfield2_tilemap->set_palette(rpalette);
-		m_alpha2_tilemap->set_palette(rpalette);
+		m_playfield2_tilemap->set_palette(*rpalette);
+		m_alpha2_tilemap->set_palette(*rpalette);
 	}
 
 	/* initialize the motion objects */

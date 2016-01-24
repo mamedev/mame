@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Oliver Bergmann, Bryan McPhail, Randy Mongenel
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
+// thanks-to:Oliver Bergmann,Randy Mongenel (for initial CPU core)
 /***************************************************************************
 
     Seibu Raiden hardware
@@ -8,8 +9,6 @@
     Raiden (Alternate Hardware)     (c) 1990 Seibu Kaihatsu
     Raiden (Korean license)         (c) 1990 Seibu Kaihatsu
     Raiden (Taiwanese license)      (c) 1990 Seibu Kaihatsu
-
-    driver by Oliver Bergmann, Bryan McPhail, Randy Mongenel
 
     The alternate hardware version is probably newer than the main sets.
     It looks closer to the newer 68000 games, while the main set looks
