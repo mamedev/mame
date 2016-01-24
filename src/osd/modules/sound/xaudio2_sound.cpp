@@ -306,8 +306,6 @@ int sound_xaudio2::init(osd_options const &options)
 {
     HRESULT result = S_OK;
 
-    HR_IGNORE(CoInitializeEx(NULL, COINITBASE_MULTITHREADED));
-
     // Create the IXAudio2 object
     IXAudio2 *temp_xaudio2 = nullptr;
     HR_RET1(xaudio2_create(&temp_xaudio2));
@@ -330,6 +328,9 @@ int sound_xaudio2::init(osd_options const &options)
     debugConfig.LogFunctionName = TRUE;
     m_xAudio2->SetDebugConfiguration(&debugConfig);
 #endif
+
+    // Create the buffers
+    create_buffers(format);
 
     // Initialize our events
     m_hEventBufferCompleted = CreateEvent(NULL, FALSE, FALSE, NULL);
