@@ -53,7 +53,7 @@ m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *ta
 	, device_sound_interface(mconfig, *this)
 	, m_irqvector(0)
 	, m_sample_addr(0)
-	, m_samples(*this, "samples")
+	, m_samples(*this, "^samples")
 	, m_samples_size(0)
 {
 }
