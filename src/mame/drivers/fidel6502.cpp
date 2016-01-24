@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m65c02.h"
 #include "machine/6821pia.h"
 #include "sound/speaker.h"
 
@@ -203,12 +204,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(fidel6502_state::irq_timer)
 
 static ADDRESS_MAP_START( csc_map, AS_PROGRAM, 8, fidel6502_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x07ff) AM_RAM AM_MIRROR(0x4000)
-	AM_RANGE( 0x0800, 0x0bff) AM_RAM AM_MIRROR(0x4400)
-	AM_RANGE( 0x1000, 0x1003) AM_DEVREADWRITE("pia0", pia6821_device, read, write) AM_MIRROR(0x47fc)
-	AM_RANGE( 0x1800, 0x1803) AM_DEVREADWRITE("pia1", pia6821_device, read, write) AM_MIRROR(0x47fc)
-	AM_RANGE( 0x2000, 0x3fff) AM_ROM AM_MIRROR(0x4000)
-	AM_RANGE( 0xa000, 0xffff) AM_ROM
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x4000)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_MIRROR(0x4400)
+	AM_RANGE(0x1000, 0x1003) AM_DEVREADWRITE("pia0", pia6821_device, read, write) AM_MIRROR(0x47fc)
+	AM_RANGE(0x1800, 0x1803) AM_DEVREADWRITE("pia1", pia6821_device, read, write) AM_MIRROR(0x47fc)
+	AM_RANGE(0x2000, 0x3fff) AM_ROM AM_MIRROR(0x4000)
+	AM_RANGE(0xa000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( sc12_map, AS_PROGRAM, 8, fidel6502_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x8000, 0x9fff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_ROM AM_MIRROR(0x1000)
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -366,6 +376,22 @@ static MACHINE_CONFIG_START( csc, fidel6502_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
+
+static MACHINE_CONFIG_START( sc12, fidel6502_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M65C02, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(sc12_map)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_fidel_vsc)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
 /******************************************************************************
     ROM Definitions
 ******************************************************************************/
@@ -383,6 +409,13 @@ ROM_START( csc )
 	ROM_RELOAD(               0x1000, 0x1000)
 ROM_END
 
+ROM_START( fscc12 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-1068a01",   0x8000, 0x2000, CRC(63c76cdd) SHA1(e0771c98d4483a6b1620791cb99a7e46b0db95c4) ) // SSS SCM23C65E4
+	ROM_LOAD("tms2732ajl-45", 0xc000, 0x1000, CRC(45070a71) SHA1(8aeecff828f26fb7081902c757559903be272649) ) // TI TMS2732AJL-45
+	ROM_LOAD("tmm2764d-2",    0xe000, 0x2000, CRC(183d3edc) SHA1(3296a4c3bce5209587d4a1694fce153558544e63) ) // Toshiba TMM2764D-2
+ROM_END
+
 ROM_START( fexcelv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1080a01.ic5", 0x0000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) )
@@ -397,5 +430,7 @@ ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
 COMP( 1981, csc,     0,      0,      csc,  csc, driver_device,   0, "Fidelity Electronics", "Champion Sensory Chess Challenger", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+COMP( 1984, fscc12,     0,      0,      sc12,  csc, driver_device,   0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_NOT_WORKING )
 
 COMP( 1987, fexcelv,     0,      0,      csc,  csc, driver_device,   0, "Fidelity Electronics", "Voice Excellence", MACHINE_NOT_WORKING )
