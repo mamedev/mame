@@ -102,7 +102,8 @@ above expectations. TI continued to manufacture many products for this line.
     - notes: no display, MCU is TMS1100 instead of TMS0270, overall similar to Touch & Tell
 
     Speak & Spell Compact (UK) "Speak & Write", 1981
-    - MCU & TMS51xx: same as US 1981 version
+    - MCU: same as US 1981 version
+    - TMS51xx: CD2801A
     - VSM: 16KB CD62174(rev.A)
     - notes: BTANB: gibberish when the module button is pressed (with module present),
       anecdotes from the developer, the same person working on the original UK version:
@@ -1170,6 +1171,13 @@ static MACHINE_CONFIG_START( snspellc, tispeak_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "snspell")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( snspellcuk, snspellc )
+
+	/* sound hardware */
+	MCFG_SOUND_REPLACE("tms5100", CD2801, MASTER_CLOCK) // CD2801A!
+	MCFG_FRAGMENT_ADD(tms5110_route)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_START( vocaid, tispeak_state )
 
@@ -1541,7 +1549,7 @@ COMP( 1982, snspellit,  snspell,  0, sns_cd2801_m, snspellit,  tispeak_state, sn
 
 COMP( 1981, snspellc,   0,        0, snspellc,     snspellc,   tispeak_state, snspell,  "Texas Instruments", "Speak & Spell Compact (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1982, snspellca,  snspellc, 0, snspellc,     snspellc,   tispeak_state, snspell,  "Texas Instruments", "Speak & Spell Compact (US, 1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1982, snspellcuk, snspellc, 0, snspellc,     snspellcuk, tispeak_state, snspell,  "Texas Instruments", "Speak & Write (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1982, snspellcuk, snspellc, 0, snspellcuk,   snspellcuk, tispeak_state, snspell,  "Texas Instruments", "Speak & Write (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 COMP( 1986, snmath,     0,        0, snmath,       snmath,     driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1986 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1980, snmathp,    snmath,   0, snmath,       snmath,     driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1980 version/patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

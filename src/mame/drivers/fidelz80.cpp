@@ -5,7 +5,7 @@
     Fidelity Electronics Z80 based board driver
     for 6502 based boards, see drivers/fidel6502.cpp
 
-    All detailed RE work done by Kevin 'kevtris' Horton
+    Detailed RE work done by Kevin 'kevtris' Horton, except where noted
 
     TODO:
     - Figure out why it says the first speech line twice; it shouldn't?
@@ -235,7 +235,7 @@ P27 - row 3 through inverter
 PROG - I/O expander
 
 T0 - optical card sensor (high = bright/reflective, low = dark/non reflective)
-T1 - connects to inverter, then nothing
+T1 - connects to inverter, then nothing?
 
 
 D8243C I/O expander:
@@ -332,21 +332,21 @@ Reset is connected to a power-on reset circuit.
 PIA 0:
 ------
 
-PA0 - 7seg segments H, TSI A0
-PA1 - 7seg segments G, TSI A1
+PA0 - 7seg segments E, TSI A0
+PA1 - 7seg segments D, TSI A1
 PA2 - 7seg segments C, TSI A2
-PA3 - 7seg segments B, TSI A3
-PA4 - 7seg segments A, TSI A4
+PA3 - 7seg segments H, TSI A3
+PA4 - 7seg segments G, TSI A4
 PA5 - 7seg segments F, TSI A5
-PA6 - 7seg segments E
-PA7 - 7seg segments D
+PA6 - 7seg segments B
+PA7 - 7seg segments A
 
 PB0 - A12 on speech ROM (if used... not used on this model, ROM is 4K)
 PB1 - START line on S14001A
 PB2 - white wire
 PB3 - BUSY line from S14001A
 PB4 - Tone line (toggle to make a tone in the speaker)
-PB5 - button column I
+PB5 - button row 9
 PB6 - selection jumper (resistor to 5V)
 PB7 - selection jumper (resistor to ground)
 
@@ -568,7 +568,7 @@ PA.6 - button row 7
 PA.7 - button row 8
 
 PB.0 - button column I
-PB.1 - button row 9
+PB.1 - button column J
 PB.2 - Tone line (toggle to make tone in the speaker)
 PB.3 - violet wire
 PB.4 - white wire (and TSI BUSY line)
@@ -863,8 +863,10 @@ INPUT_CHANGED_MEMBER(fidelz80_state::reset_button)
 // Devices, I/O
 
 /******************************************************************************
-    I8255 Device, for VCC/UVC
+    CC10 and VCC/UVC
 ******************************************************************************/
+
+// misc handlers
 
 void fidelz80_state::vcc_prepare_display()
 {
@@ -881,6 +883,9 @@ READ8_MEMBER(fidelz80_state::vcc_speech_r)
 {
 	return m_speech_rom[m_speech_bank << 12 | offset];
 }
+
+
+// I8255 PPI
 
 WRITE8_MEMBER(fidelz80_state::vcc_ppi_porta_w)
 {
@@ -918,7 +923,7 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_portb_w)
 
 READ8_MEMBER(fidelz80_state::vcc_ppi_portc_r)
 {
-	// d0-d3: multiplexed inputs (inverted), also language switches
+	// d0-d3: multiplexed inputs (active low), also language switches
 	UINT8 lan = (~m_led_select & 0x40) ? m_inp_matrix[4]->read() : 0;
 	return ~(lan | read_inputs(4)) & 0xf;
 }
@@ -928,6 +933,7 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_portc_w)
 	// d4-d7: input mux (inverted)
 	m_inp_mux = ~data >> 4 & 0xf;
 }
+
 
 // CC10-specific (no speech chip, 1-bit beeper instead)
 
@@ -951,9 +957,12 @@ WRITE8_MEMBER(fidelz80_state::cc10_ppi_porta_w)
 }
 
 
+
 /******************************************************************************
-    I8255 Device, for VSC
+    VSC
 ******************************************************************************/
+
+// misc handlers
 
 void fidelz80_state::vsc_prepare_display()
 {
@@ -971,6 +980,9 @@ void fidelz80_state::vsc_prepare_display()
 	set_display_size(8, 12);
 	display_update();
 }
+
+
+// I8255 PPI
 
 WRITE8_MEMBER(fidelz80_state::vsc_ppi_porta_w)
 {
@@ -999,9 +1011,7 @@ WRITE8_MEMBER(fidelz80_state::vsc_ppi_portc_w)
 }
 
 
-/******************************************************************************
-    Z80 PIO Device, for VSC
-******************************************************************************/
+// Z80 PIO
 
 READ8_MEMBER(fidelz80_state::vsc_pio_porta_r)
 {
@@ -1032,9 +1042,12 @@ WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 }
 
 
+
 /******************************************************************************
-    I8243 I/O Expander Device, for VBRC
+    VBRC
 ******************************************************************************/
+
+// misc handlers
 
 void fidelz80_state::vbrc_prepare_display()
 {
@@ -1046,6 +1059,9 @@ void fidelz80_state::vbrc_prepare_display()
 	display_matrix(16, 8, outdata, m_led_select);
 }
 
+
+// I8243 I/O expander
+
 WRITE8_MEMBER(fidelz80_state::vbrc_ioexp_port_w)
 {
 	// P4-P7: digit segment data
@@ -1054,9 +1070,7 @@ WRITE8_MEMBER(fidelz80_state::vbrc_ioexp_port_w)
 }
 
 
-/******************************************************************************
-    I8041 MCU, for VBRC
-******************************************************************************/
+// I8041 MCU
 
 WRITE8_MEMBER(fidelz80_state::vbrc_mcu_p1_w)
 {
@@ -1068,7 +1082,7 @@ WRITE8_MEMBER(fidelz80_state::vbrc_mcu_p1_w)
 READ8_MEMBER(fidelz80_state::vbrc_mcu_p2_r)
 {
 	// d0-d3: I8243 P2
-	// d4-d7: multiplexed inputs (inverted)
+	// d4-d7: multiplexed inputs (active low)
 	return (m_i8243->i8243_p2_r(space, offset) & 0x0f) | (read_inputs(8) << 4 ^ 0xf0);
 }
 
@@ -1187,7 +1201,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( fidelz80 )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV") PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV") PORT_CODE(KEYCODE_L)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("A1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("E5") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_E)
 
@@ -1316,7 +1330,6 @@ static INPUT_PORTS_START( vsc )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("King") PORT_CODE(KEYCODE_6)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("IN.9") // buttons beside the display
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("TM") PORT_CODE(KEYCODE_T)
@@ -1401,7 +1414,7 @@ static MACHINE_CONFIG_START( cc10, fidelz80_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(fidelz80_state, vcc_ppi_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidelz80_state, vcc_ppi_portc_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_cc)
 
 	/* sound hardware */
@@ -1425,7 +1438,7 @@ static MACHINE_CONFIG_START( vcc, fidelz80_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(fidelz80_state, vcc_ppi_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidelz80_state, vcc_ppi_portc_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_vcc)
 
 	/* sound hardware */
@@ -1441,7 +1454,7 @@ static MACHINE_CONFIG_START( vsc, fidelz80_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(vsc_map)
 	MCFG_CPU_IO_MAP(vsc_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidelz80_state, nmi_line_pulse, 600) // 555 timer, approx 600hz
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidelz80base_state, nmi_line_pulse, 600) // 555 timer, approx 600hz
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(fidelz80_state, vsc_ppi_porta_w))
@@ -1453,7 +1466,7 @@ static MACHINE_CONFIG_START( vsc, fidelz80_state )
 	MCFG_Z80PIO_IN_PB_CB(READ8(fidelz80_state, vsc_pio_portb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(fidelz80_state, vsc_pio_portb_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_vsc)
 
 	/* sound hardware */
@@ -1478,7 +1491,7 @@ static MACHINE_CONFIG_START( vbrc, fidelz80_state )
 
 	MCFG_I8243_ADD("i8243", NOOP, WRITE8(fidelz80_state, vbrc_ioexp_port_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_vbrc)
 
 	/* sound hardware */
