@@ -89,6 +89,8 @@ private:
     int   bitplane_xres;
     int   bitplane_yres;
     int   vsync_scanline_pos;
+    int   cursor_cnt;
+    int   cursor_state;
 
     UINT32 clock_freq;
     bitmap_rgb32 m_screen_out;

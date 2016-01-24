@@ -125,6 +125,9 @@ void ef9364_device::device_start()
 
     m_screen_out.allocate( bitplane_xres, m_screen->height() );
 
+    cursor_cnt = 0;
+    cursor_state = 0;
+
     save_item(NAME(m_border));
 
     save_item(NAME(m_screen_out));
@@ -199,15 +202,29 @@ UINT32 ef9364_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
         {
             for( x = 0 ; x < EF9364_NB_OF_COLUMNS * 8 ; x++ )
             {
-                c = m_textram->read_byte( ( r * EF9364_NB_OF_COLUMNS ) + ( x>>3 ) );
+                if( ( ( x >> 3 ) != x_curs_pos )   ||  ( r != y_curs_pos ) || !cursor_state)
+                {
+                    c = m_textram->read_byte( ( r * EF9364_NB_OF_COLUMNS ) + ( x>>3 ) );
 
-                if( m_charset->u8(((c&0x7F)<<3) + y ) & (0x80>>(x&7)) )
-                    m_screen_out.pix32((r*12)+y, x) = palette[1];
+                    if( m_charset->u8(((c&0x7F)<<3) + y ) & (0x80>>(x&7)) )
+                        m_screen_out.pix32((r*12)+y, x) = palette[1];
+                    else
+                        m_screen_out.pix32((r*12)+y, x) = palette[0];
+                }
                 else
-                    m_screen_out.pix32((r*12)+y, x) = palette[0];
+                {
+                    if(y != 7)
+                        m_screen_out.pix32((r*12)+y, x) = palette[0];
+                    else
+                        m_screen_out.pix32((r*12)+y, x) = palette[1];
+                }
             }
         }
     }
+
+    cursor_cnt = (cursor_cnt + 1) % 13;
+    if(!cursor_cnt)
+        cursor_state ^= 1;
 
     copybitmap(bitmap, m_screen_out, 0, 0, 0, 0, cliprect);
     return 0;
@@ -240,7 +257,7 @@ void ef9364_device::command_w(UINT8 cmd)
 
     switch( cmd&7 )
     {
-        case 0x0: // Page Erase ² Cursor hiom
+        case 0x0: // Page Erase & Cursor home
             for( y=0 ; y < EF9364_NB_OF_ROWS ; y++ )
             {
                 for( x=0 ; x < EF9364_NB_OF_COLUMNS ; x++ )
@@ -313,7 +330,23 @@ void ef9364_device::command_w(UINT8 cmd)
                 x_curs_pos=0;
                 y_curs_pos++;
                 if( y_curs_pos >= EF9364_NB_OF_ROWS )
+                {
+                    // Scroll
+                    for( j = 1 ; j < EF9364_NB_OF_ROWS ; j++ )
+                    {
+                        for( i = 0 ; i < EF9364_NB_OF_COLUMNS ; i++ )
+                        {
+                            m_textram->write_byte ( (j-1) * EF9364_NB_OF_COLUMNS + i ,  m_textram->read_byte ( j * EF9364_NB_OF_COLUMNS + i ) );
+                        }
+                    }
+                    // Erase last line
+                    for( i = 0 ; i < EF9364_NB_OF_COLUMNS ; i++ )
+                    {
+                        m_textram->write_byte ( ( EF9364_NB_OF_ROWS - 1 ) * EF9364_NB_OF_COLUMNS + i , 0x7F );
+                    }
+
                     y_curs_pos = EF9364_NB_OF_ROWS - 1;
+                }
             }
         break;
 
