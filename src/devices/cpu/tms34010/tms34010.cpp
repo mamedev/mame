@@ -1004,7 +1004,7 @@ void tms340x0_device::get_display_params(tms34010_display_params *params)
 
 UINT32 tms340x0_device::tms340x0_ind16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pen_t blackpen = screen.palette()->black_pen();
+	pen_t blackpen = screen.palette().black_pen();
 	tms34010_display_params params;
 	int x;
 

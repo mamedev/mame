@@ -247,8 +247,9 @@ void video_manager::frame_update(bool debug)
 	if (phase == MACHINE_PHASE_RUNNING)
 	{
 		// reset partial updates if we're paused or if the debugger is active
-		if (machine().first_screen() != nullptr && (machine().paused() || debug || debugger_within_instruction_hook(machine())))
-			machine().first_screen()->reset_partial_updates();
+		screen_device *screen = machine().first_screen();
+		if (screen != nullptr && (machine().paused() || debug || debugger_within_instruction_hook(machine())))
+			screen->reset_partial_updates();
 	}
 }
 
@@ -316,8 +317,8 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 	png_add_text(&pnginfo, "System", text2.c_str());
 
 	// now do the actual work
-	const rgb_t *palette = (screen !=nullptr && screen->palette() != nullptr) ? screen->palette()->palette()->entry_list_adjusted() : nullptr;
-	int entries = (screen !=nullptr && screen->palette() != nullptr) ? screen->palette()->entries() : 0;
+	const rgb_t *palette = (screen != nullptr && screen->has_palette()) ? screen->palette().palette()->entry_list_adjusted() : nullptr;
+	int entries = (screen != nullptr && screen->has_palette()) ? screen->palette().entries() : 0;
 	png_error error = png_write_bitmap(file, &pnginfo, m_snap_bitmap, entries, palette);
 	if (error != PNGERR_NONE)
 		osd_printf_error("Error generating PNG for snapshot: png_error = %d\n", error);
@@ -380,9 +381,10 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		m_avi_next_frame_time = machine().time();
 
 		// build up information about this new movie
+		screen_device *screen = machine().first_screen();
 		avi_movie_info info;
 		info.video_format = 0;
-		info.video_timescale = 1000 * ((machine().first_screen() != nullptr) ? ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds()) : screen_device::DEFAULT_FRAME_RATE);
+		info.video_timescale = 1000 * ((screen != nullptr) ? ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds()) : screen_device::DEFAULT_FRAME_RATE);
 		info.video_sampletime = 1000;
 		info.video_numsamples = 0;
 		info.video_width = m_snap_bitmap.width();
@@ -448,7 +450,8 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		if (filerr == FILERR_NONE)
 		{
 			// start the capture
-			int rate = (machine().first_screen() != nullptr) ? ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds()) : screen_device::DEFAULT_FRAME_RATE;
+			screen_device *screen = machine().first_screen();
+			int rate = (screen != nullptr) ? ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds()) : screen_device::DEFAULT_FRAME_RATE;
 			png_error pngerr = mng_capture_start(*m_mng_file, m_snap_bitmap, rate);
 			if (pngerr != PNGERR_NONE)
 			{
@@ -1037,13 +1040,14 @@ void video_manager::recompute_speed(const attotime &emutime)
 	// if we're past the "time-to-execute" requested, signal an exit
 	if (m_seconds_to_run != 0 && emutime.seconds() >= m_seconds_to_run)
 	{
-		if (machine().first_screen() != nullptr)
+		screen_device *screen = machine().first_screen();
+		if (screen != nullptr)
 		{
 			// create a final screenshot
 			emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			file_error filerr = file.open(machine().basename(), PATH_SEPARATOR "final.png");
 			if (filerr == FILERR_NONE)
-				save_snapshot(machine().first_screen(), file);
+				save_snapshot(screen, file);
 		}
 		//printf("Scheduled exit at %f\n", emutime.as_double());
 		// schedule our demise
@@ -1279,8 +1283,9 @@ void video_manager::record_frame()
 			}
 
 			// write the next frame
-			const rgb_t *palette = (machine().first_screen() !=nullptr && machine().first_screen()->palette() != nullptr) ? machine().first_screen()->palette()->palette()->entry_list_adjusted() : nullptr;
-			int entries = (machine().first_screen() !=nullptr && machine().first_screen()->palette() != nullptr) ? machine().first_screen()->palette()->entries() : 0;
+			screen_device *screen = machine().first_screen();
+			const rgb_t *palette = (screen != nullptr && screen->has_palette()) ? screen->palette().palette()->entry_list_adjusted() : nullptr;
+			int entries = (screen != nullptr && screen->has_palette()) ? screen->palette().entries() : 0;
 			png_error error = mng_capture_frame(*m_mng_file, &pnginfo, m_snap_bitmap, entries, palette);
 			png_free(&pnginfo);
 			if (error != PNGERR_NONE)
