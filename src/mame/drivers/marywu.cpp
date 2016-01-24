@@ -53,11 +53,14 @@ static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, marywu_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, marywu_state )
-    AM_RANGE(0x8000, 0x87ff) AM_RAM //HM6116: 2kbytes of Static RAM /* This is a guess. Maybe it is also mirrored? */
-    AM_RANGE(0xB000, 0xB000) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w)
-    AM_RANGE(0xB001, 0xB001) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
-    AM_RANGE(0x9001, 0x9002) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_data_w) /* This is a guess */
-    AM_RANGE(0x9003, 0x9004) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_data_w) /* This is a guess */
+    AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0100) AM_RAM /* HM6116: 2kbytes of Static RAM */
+    AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w)
+    AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
+    AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
+    AM_RANGE(0x9001, 0x9001) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
+    AM_RANGE(0x9002, 0x9002) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
+    AM_RANGE(0x9003, 0x9003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
+    AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_NOP /* FIX-ME! I am ignoring port accesses for a while. */
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( marywu , marywu_state )
