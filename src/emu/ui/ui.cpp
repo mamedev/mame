@@ -1872,7 +1872,7 @@ static slider_state *slider_init(running_machine &machine)
 		INT32 maxval = 2000;
 		INT32 defval = 1000;
 
-		info.stream->input_name(info.inputnum, str);
+		str.assign(info.stream->input_name(info.inputnum));
 		str.append(" Volume");
 		*tailptr = slider_alloc(machine, str.c_str(), 0, defval, maxval, 20, slider_mixervol, (void *)(FPTR)item);
 		tailptr = &(*tailptr)->next;
