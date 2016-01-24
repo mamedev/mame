@@ -26,7 +26,7 @@ public:
 			m_suby(*this, "suby"),
 			m_soundcpu(*this, "soundcpu"),
 			m_linkcpu(*this, "linkcpu"),
-			m_bsprites(*this, "bsprites"),
+			m_bsprites(*this, "sprites"),
 			m_ysprites(*this, "ysprites"),
 			m_segaic16vid(*this, "segaic16vid"),
 			m_digital_ports(*this, digital_ports),
