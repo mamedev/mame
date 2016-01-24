@@ -408,7 +408,7 @@ INPUT_PORTS_START( horizon )
 		PORT_DIPSETTING(    0x02, "Geneve mode" )
 
 	PORT_START( "HORIZONACT" )
-	PORT_DIPNAME( 0x01, 0x00, "Horizon killswitch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, horizon_ramdisk_device, ks_changed, 1)
+	PORT_DIPNAME( 0x01, 0x00, "Horizon killswitch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, horizon_ramdisk_device, ks_changed, nullptr)
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
