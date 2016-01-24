@@ -16,7 +16,9 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_16(*this, "paletteram") { }
+		m_generic_paletteram_16(*this, "paletteram"),
+		m_shareram(*this, "shareram")
+	{ }
 
 	required_device<m68000_device> m_maincpu;
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -26,6 +28,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
+	optional_shared_ptr<UINT16> m_shareram;
+
+	
 
 	UINT32 snowboard_latch;
 
@@ -34,7 +39,9 @@ public:
 	tilemap_t *m_pant[2];
 	int m_dual_monitor;
 
-	DECLARE_READ16_MEMBER(dallas_kludge_r);
+	DECLARE_READ16_MEMBER(dallas_kludge_r);	
+	DECLARE_READ16_MEMBER(maniacsqa_prot_r);
+
 	DECLARE_WRITE16_MEMBER(gaelco2_coin_w);
 	DECLARE_WRITE16_MEMBER(gaelco2_coin2_w);
 	DECLARE_WRITE16_MEMBER(touchgo_coin_w);
@@ -45,6 +52,7 @@ public:
 	DECLARE_DRIVER_INIT(touchgo);
 	DECLARE_DRIVER_INIT(snowboar);
 	DECLARE_DRIVER_INIT(alighunt);
+	DECLARE_DRIVER_INIT(maniacsqa);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen1);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0_dual);

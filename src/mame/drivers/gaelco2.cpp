@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x30004a, 0x30004b) AM_WRITENOP                                                                /* Sound muting? */
 	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("COIN")                                                       /* COINSW + SERVICESW */
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(gaelco2_coin_w)                                                   /* Coin lockout + counters */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM                                                                     /* Work RAM */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                                /* Work RAM */
 ADDRESS_MAP_END
 
 
@@ -1453,6 +1453,48 @@ ROM_START( grtesoro4 ) /* there are version 4.0 and version 1.0 strings in this,
 	ROM_LOAD( "palce16v8h.u29",  0x0000, 0x0117, BAD_DUMP CRC(4a0a6f39) SHA1(57351e471649391c9abf110828fe2f128fe84eee) )
 ROM_END
 
+
+READ16_MEMBER(gaelco2_state::maniacsqa_prot_r)
+{
+	int pc = space.device().safe_pc();
+	
+	// if -1 is returned at any point on these checks the game instantly reports 'power failure'
+	// these are generally done right before the other checks
+	if (pc == 0x3dbc) return 0x0000; // must not be -1
+	if (pc == 0x5ce4) return 0x0000; // must not be -1
+	if (pc == 0x5d08) return 0x0000; // must not be -1 (stores 5 here just before)
+	if (pc == 0xaa90) return 0x0000; // must not be -1
+	if (pc == 0xaab2) return 0x0000; // must not be -1
+	if (pc == 0x9f10) return 0x0000; // must not be -1
+	if (pc == 0x3b86) return 0x0000; // must not be -1
+
+	if (pc == 0x3dce) return 0x0000; // must be 0
+
+	if (pc == 0x25c2) return 0x0000; // writes 0 to 0xfe45fa then expects this to be 0
+	
+	if (pc == 0x5cf6) return 0x0000; // must be 0
+	if (pc == 0x5d1a) return 0x0000; // must be 0
+	if (pc == 0xaaa0) return 0x0000; // must be 0?
+
+	if (pc == 0xaac4) return 0x0000; // checks for 0, 2 possible code paths after - happens when piece is dropped
+	if (pc == 0xaad0) return 0x0a00; // if above ISN'T 0 this must be 0x0a00 (but code then dies, probably wants some data filled?)
+	// other code path just results in no more pieces dropping? maybe the MCU does the matching algorithm?
+
+	
+	
+
+
+	printf("read at PC %08x\n", pc);
+	return m_shareram[(0xfedaa2 - 0xfe0000) / 2];
+
+}
+
+DRIVER_INIT_MEMBER(gaelco2_state,maniacsqa)
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfedaa2, 0xfedaa3, read16_delegate(FUNC(gaelco2_state::maniacsqa_prot_r), this) );
+}
+
+
 GAME( 1994, aligator,  0,       alighunt, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1994, aligatorun,aligator,alighunt, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected)", 0 )
 GAME( 1995, touchgo,  0,        touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (World)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
@@ -1460,7 +1502,7 @@ GAME( 1995, touchgon, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgo,  ROT
 GAME( 1995, touchgoe, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (earlier revision)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1995, wrally2,  0,        wrally2,  wrally2,  driver_device, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1996, maniacsq, 0,        maniacsq, maniacsq, driver_device, 0,        ROT0, "Gaelco", "Maniac Square (unprotected)", 0 )
-GAME( 1996, maniacsqa,maniacsq, maniacsq, maniacsq, driver_device, 0,        ROT0, "Gaelco", "Maniac Square (protected)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1996, maniacsqa,maniacsq, maniacsq, maniacsq, gaelco2_state, maniacsqa,ROT0, "Gaelco", "Maniac Square (protected)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1996, snowboar, 0,        snowboar, snowboar, driver_device, 0,        ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", 0 )
 GAME( 1996, snowboara,snowboar, snowboar, snowboar, gaelco2_state, snowboar, ROT0, "Gaelco", "Snow Board Championship (Version 2.0)", 0 )
 GAME( 1998, bang,     0,        bang,     bang,     bang_state,    bang,     ROT0, "Gaelco", "Bang!", 0 )
