@@ -188,10 +188,10 @@ public:
 	template<class _Object> static devcb_base &static_set_scanline_int_cb(device_t &device, _Object object) { return downcast<atari_vad_device &>(device).m_scanline_int_cb.set_callback(object); }
 
 	// getters
-	tilemap_device *alpha() const { return m_alpha_tilemap; }
-	tilemap_device *playfield() const { return m_playfield_tilemap; }
-	tilemap_device *playfield2() const { return m_playfield2_tilemap; }
-	atari_motion_objects_device *mob() const { return m_mob; }
+	tilemap_device &alpha() const { return *m_alpha_tilemap; }
+	tilemap_device &playfield() const { return *m_playfield_tilemap; }
+	tilemap_device &playfield2() const { return *m_playfield2_tilemap; }
+	atari_motion_objects_device &mob() const { return *m_mob; }
 
 	// read/write handlers
 	DECLARE_READ16_MEMBER(control_read);

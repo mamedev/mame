@@ -70,7 +70,7 @@ public:
 	void zoom_draw(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,UINT32 priority);
 	void wraparound_enable(int status);
 
-	void mark_gfx_dirty(offs_t byteoffset) { m_gfx[0]->mark_dirty(byteoffset * m_pixels_per_byte / (16 * 16)); }
+	void mark_gfx_dirty(offs_t byteoffset) { gfx(0)->mark_dirty(byteoffset * m_pixels_per_byte / (16 * 16)); }
 	void mark_tmap_dirty() { m_tmap->mark_all_dirty(); }
 
 protected:

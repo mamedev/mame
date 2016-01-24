@@ -197,7 +197,8 @@ public:
 	// information getters
 	render_container &container() const { assert(m_container != nullptr); return *m_container; }
 	bitmap_ind8 &priority() { return m_priority; }
-	palette_device *palette() { return m_palette; }
+	palette_device &palette() const { assert(m_palette.found()); return *m_palette; }
+	bool has_palette() const { return m_palette.found(); }
 
 	// dynamic configuration
 	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);

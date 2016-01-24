@@ -96,7 +96,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(shogwarr_interrupt);
 
 	template<class _BitmapClass>
-	void kaneko16_fill_bitmap(palette_device* palette, _BitmapClass &bitmap, const rectangle &cliprect);
+	void kaneko16_fill_bitmap(_BitmapClass &bitmap, const rectangle &cliprect);
 
 	void kaneko16_common_oki_bank_w(  const char *bankname, const char* tag, int bank, size_t fixedsize, size_t bankedsize );
 	void kaneko16_unscramble_tiles(const char *region);

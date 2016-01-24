@@ -10,7 +10,7 @@ class tecmo_mix_device : public device_t,
 public:
 	tecmo_mix_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device* palette, bitmap_ind16* bitmap_bg, bitmap_ind16* bitmap_fg, bitmap_ind16* bitmap_tx, bitmap_ind16* bitmap_sp);
+	void mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device &palette, bitmap_ind16* bitmap_bg, bitmap_ind16* bitmap_fg, bitmap_ind16* bitmap_tx, bitmap_ind16* bitmap_sp);
 	static void set_mixer_shifts(device_t &device, int sprpri_shift, int sprbln_shift, int sprcol_shift);
 	static void set_blendcols(device_t &device, int bgblend_comp, int fgblend_comp, int txblend_comp, int spblend_comp);
 	static void set_regularcols(device_t &device, int bgregular_comp, int fgregular_comp, int txregular_comp, int spregular_comp);

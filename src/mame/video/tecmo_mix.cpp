@@ -90,13 +90,13 @@ void tecmo_mix_device::set_bgpen(device_t &device, int bgpen)
 }
 
 
-void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device* palette, bitmap_ind16* bitmap_bg, bitmap_ind16* bitmap_fg, bitmap_ind16* bitmap_tx, bitmap_ind16* bitmap_sp)
+void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device &palette, bitmap_ind16* bitmap_bg, bitmap_ind16* bitmap_fg, bitmap_ind16* bitmap_tx, bitmap_ind16* bitmap_sp)
 {
 	//int frame = (screen.frame_number()) & 1;
 	// note this game has no tx layer, comments relate to other drivers
 
 	int y, x;
-	const pen_t *paldata = palette->pens();
+	const pen_t *paldata = palette.pens();
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
