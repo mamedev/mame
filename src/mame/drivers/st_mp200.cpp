@@ -73,7 +73,6 @@ private:
 	bool m_u11_cb2;
 	bool m_timer_x;
 	bool m_u11_timer;
-	bool m_su; // speech unit fitted yes/no
 	bool m_7d; // 7-digit display yes/no
 	UINT8 m_digit;
 	UINT8 m_counter;
@@ -321,7 +320,7 @@ WRITE_LINE_MEMBER( st_mp200_state::u10_ca2_w )
 
 WRITE_LINE_MEMBER( st_mp200_state::u10_cb2_w )
 {
-	if (m_su)
+	if (m_s14001a)
 	{
 		if (m_s14001a->busy_r())
 			m_pia_u11->cb1_w(0);
@@ -334,7 +333,7 @@ WRITE_LINE_MEMBER( st_mp200_state::u11_ca2_w )
 {
 	output().set_value("led0", !state);
 
-	if ((m_su) & (state))
+	if (m_s14001a && state)
 	{
 		if BIT(m_u10a, 7)
 		{
@@ -552,19 +551,16 @@ void st_mp200_state::machine_reset()
 DRIVER_INIT_MEMBER( st_mp200_state, st_mp200 )
 {
 	m_7d = 1;
-	m_su = 0;
 }
 
 DRIVER_INIT_MEMBER( st_mp200_state, st_mp201 )
 {
 	m_7d = 1;
-	m_su = 1;
 }
 
 DRIVER_INIT_MEMBER( st_mp200_state, st_mp202 )
 {
 	m_7d = 0;
-	m_su = 0;
 }
 
 // zero-cross detection
