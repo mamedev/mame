@@ -100,7 +100,8 @@ void debug_view_disasm::enumerate_sources()
 	for (device_disasm_interface *dasm = iter.first(); dasm != nullptr; dasm = iter.next())
 	{
 		strprintf(name,"%s '%s'", dasm->device().name(), dasm->device().tag());
-		m_source_list.append(*global_alloc(debug_view_disasm_source(name.c_str(), dasm->device())));
+		if (dasm->device().memory().space_config(AS_PROGRAM)!=nullptr)
+			m_source_list.append(*global_alloc(debug_view_disasm_source(name.c_str(), dasm->device())));
 	}
 
 	// reset the source to a known good entry
