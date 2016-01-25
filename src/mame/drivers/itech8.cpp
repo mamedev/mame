@@ -2313,7 +2313,7 @@ ROM_START( stratabs )
 	ROM_REGION( 0xc0000, "grom", 0 )
 	ROM_LOAD( "sb_grom00", 0x00000, 0x20000, CRC(22f6ce56) SHA1(8e423122384257d9c5d8f48192ff6fa1f544fd97) )
 	ROM_LOAD( "sb_grom01", 0x20000, 0x20000, CRC(6cc7ad6f) SHA1(d601b9bb81f26ad86e5cc053cab055831331ccde) )
-	ROM_LOAD( "grom02",    0x40000, 0x20000, CRC(475134ef) SHA1(5920e7a211f1b2234e8a3f51e570303c3787d8fd) )
+	ROM_LOAD( "sb_grom02",  0x40000, 0x20000, CRC(475134ef) SHA1(5920e7a211f1b2234e8a3f51e570303c3787d8fd) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "sb_srom0", 0x00000, 0x20000, CRC(6ff390b9) SHA1(f31dae9e31f3fc83b9253e49fd4204820db3587e) )
@@ -2761,7 +2761,7 @@ GAME( 1990, slikshot16,slikshot, slikshot_hi,       slikshot, itech8_state, slik
 GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop,  itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", MACHINE_MECHANICAL )
 GAME( 1990, sstrike,   0,        sstrike,           sstrike,  itech8_state, sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", MACHINE_MECHANICAL )
 GAME( 1991, pokrdice,  0,        slikshot_lo_noz80, pokrdice, driver_device,0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
-GAME( 1990, stratabs,  stratab,  sstrike,           stratabs, itech8_state, sstrike,  ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1 4, Super Strike Bowling type PCB)", MACHINE_NOT_WORKING ) // need to figure out the control hookup for this set, service mode indicates it's still a trackball like stratab
+GAME( 1990, stratabs,  stratab,  sstrike,           stratabs, itech8_state, sstrike,  ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1 4T, Super Strike Bowling type PCB)", MACHINE_NOT_WORKING ) // need to figure out the control hookup for this set, service mode indicates it's still a trackball like stratab
 
 /* Hot Shots Tennis-style PCB */
 GAME( 1990, hstennis,  0,        hstennis_hi,       hstennis, itech8_state, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.1)", 0 )
