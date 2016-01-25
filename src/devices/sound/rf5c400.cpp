@@ -354,6 +354,11 @@ READ16_MEMBER( rf5c400_device::rf5c400_r )
 		{
 			return 0;
 		}
+
+		case 0x13:		// memory read
+		{
+			return m_rom[m_ext_mem_address];
+		}
 	}
 
 	return 0;
@@ -413,17 +418,32 @@ WRITE16_MEMBER( rf5c400_device::rf5c400_w )
 			case 0x08:      // relative to env attack (channel no)
 			case 0x09:      // relative to env attack (0x0c00/ 0x1c00)
 
-			case 0x11:      // ? counter for 0x13?
+			case 0x11:      // memory r/w address, bits 15 - 0
 			{
+				m_ext_mem_address &= ~0xffff;
+				m_ext_mem_address |= data;
 				break;
 			}
-			case 0x13:      // ? bujutsu writes sample data here
+			case 0x12:      // memory r/w address, bits 23 - 16
 			{
+				m_ext_mem_address &= 0xffff;
+				m_ext_mem_address |= (UINT32)(data) << 16;
+				break;
+			}
+			case 0x13:      // memory write data
+			{
+				m_ext_mem_data = data;
 				break;
 			}
 
-			case 0x14:      // ? related to 0x11/0x13 ?
+			case 0x14:      // memory write
+			{
+				if ((data & 0x3) == 3)
+				{
+					m_rom[m_ext_mem_address] = m_ext_mem_data;
+				}
 				break;
+			}
 
 			case 0x21:      // reverb(character).w
 			case 0x32:      // reverb(pre-lpf).w

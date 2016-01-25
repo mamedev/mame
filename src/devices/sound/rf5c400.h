@@ -109,6 +109,9 @@ private:
 	double m_env_rr_table[0x9f];
 
 	rf5c400_channel m_channels[32];
+
+	UINT32 m_ext_mem_address;
+	UINT16 m_ext_mem_data;
 };
 
 extern const device_type RF5C400;
