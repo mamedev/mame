@@ -23,7 +23,15 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_rtc(*this, "rtc")
-		, m_gfx_region(*this, "gfx")
+		, m_gfx_region1(*this, "gfx1")
+		, m_gfx_region2(*this, "gfx2")
+		, m_gfx_region3(*this, "gfx3")
+		, m_gfx_region4(*this, "gfx4")
+		, m_gfx_region5(*this, "gfx5")
+		, m_gfx_region6(*this, "gfx6")
+		, m_gfx_region7(*this, "gfx7")
+		, m_gfx_region8(*this, "gfx8")
+
 	{
 	}
 
@@ -36,7 +44,16 @@ public:
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<msm6242_device> m_rtc;
-	optional_region_ptr<UINT8> m_gfx_region;
+	optional_region_ptr<UINT8> m_gfx_region1;
+	optional_region_ptr<UINT8> m_gfx_region2;
+	optional_region_ptr<UINT8> m_gfx_region3;
+	optional_region_ptr<UINT8> m_gfx_region4;
+	optional_region_ptr<UINT8> m_gfx_region5;
+	optional_region_ptr<UINT8> m_gfx_region6;
+	optional_region_ptr<UINT8> m_gfx_region7;
+	optional_region_ptr<UINT8> m_gfx_region8;
+
+	static memory_region * gfxregions[];
 
 	// up to 8 layers, 2 images per layer (interleaved on screen)
 	std::unique_ptr<UINT8[]>  m_pixmap[8][2];
@@ -286,7 +303,7 @@ public:
 	DECLARE_VIDEO_START(neruton);
 
 	inline void blitter_plot_pixel( int layer, int mask, int x, int y, int pen, int wrap, int flags );
-	int blitter_drawgfx( int layer, int mask, const char *gfx, int src, int pen, int x, int y, int wrap, int flags );
+	int blitter_drawgfx( int layer, int mask, memory_region *gfx, int src, int pen, int x, int y, int wrap, int flags );
 	void dynax_blitter_start( int flags );
 	void jantouki_blitter_start( int flags );
 	void jantouki_blitter2_start( int flags );

@@ -275,18 +275,18 @@ WRITE8_MEMBER(dynax_state::dynax_flipscreen_w)
 }
 
 
-static const char *const gfxregions[] = { "gfx1", "gfx2", "gfx3", "gfx4", "gfx5", "gfx6", "gfx7", "gfx8" };
+
 
 WRITE8_MEMBER(dynax_state::dynax_blit_romregion_w)
 {
-	if (data < ARRAY_LENGTH(gfxregions))
+	if (data < 8)
 		m_blit_romregion = data;
 	LOG(("GFX%X ", data + 1));
 }
 
 WRITE8_MEMBER(dynax_state::dynax_blit2_romregion_w)
 {
-	if (data + 1 < ARRAY_LENGTH(gfxregions))
+	if (data + 1 < 8)
 		m_blit2_romregion = data + 1;
 	LOG(("GFX%X' ", data + 2));
 }
@@ -391,9 +391,13 @@ void dynax_state::blitter_plot_pixel( int layer, int mask, int x, int y, int pen
     ---- --1-   0 = Ignore the pens specified in ROM, draw everything with the pen supplied as parameter
     ---- ---0   Clear
 */
-int dynax_state::blitter_drawgfx( int layer, int mask, const char *gfx, int src, int pen, int x, int y, int wrap, int flags )
+int dynax_state::blitter_drawgfx( int layer, int mask, memory_region *gfx, int src, int pen, int x, int y, int wrap, int flags )
 {
-	size_t rom_size = m_gfx_region.bytes();
+	if (!gfx)
+		return 0;
+
+	size_t rom_size = gfx->bytes();
+	UINT8* rom_data = gfx->base();
 
 	if (m_layer_layout == LAYOUT_HNORIDUR)   // e.g. yarunara
 		pen = ((pen >> 4) & 0xf) | ((mask & 0x10) ? ((pen & 0x08) << 1) : 0);
@@ -474,7 +478,7 @@ int dynax_state::blitter_drawgfx( int layer, int mask, const char *gfx, int src,
 			return src;
 		}
 
-		UINT8 cmd = m_gfx_region[src++];
+		UINT8 cmd = rom_data[src++];
 		src &= 0xfffff;
 		if (!(flags & 0x02))    // Ignore the pens specified in ROM, draw everything with the pen supplied as parameter
 			pen = (pen & 0xf0) | ((cmd & 0xf0) >> 4);
@@ -501,7 +505,7 @@ int dynax_state::blitter_drawgfx( int layer, int mask, const char *gfx, int src,
 				LOG(("\nGFXROM %s OVER %08x",gfx,src));
 				return src;
 			}
-			x = sx + m_gfx_region[src++];
+			x = sx + rom_data[src++];
 			src &= 0xfffff;
 			/* fall through into next case */
 
@@ -512,7 +516,7 @@ int dynax_state::blitter_drawgfx( int layer, int mask, const char *gfx, int src,
 				LOG(("\nGFXROM %s OVER %08x",gfx,src));
 				return src;
 			}
-			cmd = m_gfx_region[src++];
+			cmd = rom_data[src++];
 			src &= 0xfffff;
 			/* fall through into next case */
 
@@ -542,6 +546,7 @@ int dynax_state::blitter_drawgfx( int layer, int mask, const char *gfx, int src,
 void dynax_state::dynax_blitter_start(int flags )
 {
 	int blit_newsrc;
+	memory_region * gfxregions[] = { memregion("gfx1"), memregion("gfx2"), memregion("gfx3"), memregion("gfx4"), memregion("gfx5"), memregion("gfx6"), memregion("gfx7"), memregion("gfx8") };
 
 	LOG(("XY=%X,%X SRC=%X BLIT=%X\n", m_blit_x, m_blit_y, m_blit_src, flags));
 
@@ -569,6 +574,7 @@ void dynax_state::dynax_blitter_start(int flags )
 void dynax_state::jantouki_blitter_start( int flags )
 {
 	int blit_newsrc;
+	memory_region * gfxregions[] = { memregion("gfx1"), memregion("gfx2"), memregion("gfx3"), memregion("gfx4"), memregion("gfx5"), memregion("gfx6"), memregion("gfx7"), memregion("gfx8") };
 
 	LOG(("XY=%X,%X SRC=%X BLIT=%X\n", m_blit_x, m_blit_y, m_blit_src, flags));
 
@@ -596,6 +602,7 @@ void dynax_state::jantouki_blitter_start( int flags )
 void dynax_state::jantouki_blitter2_start( int flags )
 {
 	int blit2_newsrc;
+	memory_region * gfxregions[] = { memregion("gfx1"), memregion("gfx2"), memregion("gfx3"), memregion("gfx4"), memregion("gfx5"), memregion("gfx6"), memregion("gfx7"), memregion("gfx8") };
 
 	LOG(("XY'=%X,%X SRC'=%X BLIT'=%02X\n", m_blit2_x, m_blit2_y, m_blit2_src, flags));
 
