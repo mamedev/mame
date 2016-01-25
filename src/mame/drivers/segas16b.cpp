@@ -8242,9 +8242,11 @@ DRIVER_INIT_MEMBER(segas16b_state,sdi_5358_small)
 	DRIVER_INIT_CALL(generic_5358_small);
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::sdi_custom_io_r), this);
 
-	UINT8 *rom = memregion("maincpux")->base();
-	if (rom)
+	if (memregion("maincpux") != nullptr)
+	{
+		UINT8 *rom = memregion("maincpux")->base();
 		memcpy(m_decrypted_opcodes, rom, 0x30000);
+	}
 }
 
 

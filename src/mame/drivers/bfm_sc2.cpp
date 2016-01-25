@@ -2284,11 +2284,10 @@ void bfm_sc2_state::sc2_common_init(int decrypt)
 
 void bfm_sc2_state::adder2_common_init()
 {
-	UINT8 *pal;
-
-	pal = memregion("proms")->base();
-	if ( pal )
+	if (memregion("proms") != nullptr)
 	{
+		UINT8 *pal;
+		pal = memregion("proms")->base();
 		memcpy(m_key, pal, 8);
 	}
 }
