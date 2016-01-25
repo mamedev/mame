@@ -160,52 +160,70 @@ void m107_state::video_start()
 void m107_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT16 *spriteram = m_buffered_spriteram.get();
-
-	for (int offs = 0; offs < 0x800; offs += 4)
+	int offs;
+	UINT8 *rom = m_user1_ptr;
+	
+	for (offs = 0;offs < 0x800;offs += 4)
 	{
-		int pri_mask = (!(spriteram[offs + 2] & 0x80)) ? 2 : 0;
+		int x,y,sprite,colour,fx,fy,y_multi,i,s_ptr,pri_mask;
 
-		int y = spriteram[offs + 0] & 0x1ff;
-		int x = spriteram[offs + 3] & 0x1ff;
+		pri_mask = (!(spriteram[offs+2]&0x80)) ? 2 : 0;
+
+		y=spriteram[offs+0];
+		x=spriteram[offs+3];
+		x&=0x1ff;
+		y&=0x1ff;
 
 		if (x==0 || y==0) continue; /* offscreen */
 
-		int sprite_code = spriteram[offs + 1] & 0x7fff;
+		sprite=spriteram[offs+1]&0x7fff;
 
 		x = x - 16;
 		y = 384 - 16 - y;
 
-		int colour = spriteram[offs + 2] & 0x7f;
-		bool fx = (spriteram[offs + 2] >> 8) & 0x1;
-		bool fy = (spriteram[offs + 2] >> 8) & 0x2;
-		int y_multi=(spriteram[offs + 0] >> 11) & 0x3;
+		colour=spriteram[offs+2]&0x7f;
+		fx=(spriteram[offs+2]>>8)&0x1;
+		fy=(spriteram[offs+2]>>8)&0x2;
+		y_multi=(spriteram[offs+0]>>11)&0x3;
 
 		if (m_spritesystem == 0)
 		{
-			y_multi = 1 << y_multi; /* 1, 2, 4 or 8 */
+			y_multi=1 << y_multi; /* 1, 2, 4 or 8 */
 
-			int s_ptr = fy ? 0 : y_multi - 1;
+			s_ptr = 0;
+			if (!fy) s_ptr+=y_multi-1;
 
-			for (int i = 0; i < y_multi; i++)
+			for (i=0; i<y_multi; i++)
 			{
-				m_gfxdecode->gfx(1)->prio_transpen(bitmap, cliprect, sprite_code + s_ptr, colour, fx, fy, x, y - i * 16, screen.priority(), pri_mask, 0);
-				m_gfxdecode->gfx(1)->prio_transpen(bitmap, cliprect, sprite_code + s_ptr, colour, fx, fy, x, (y - i * 16) - 0x200, screen.priority(), pri_mask, 0); /* wrap-around y */
+				m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+						sprite + s_ptr,
+						colour,
+						fx,fy,
+						x,y-i*16,
+						screen.priority(),pri_mask,0);
 
-				if (fy)
-					s_ptr++;
-				else
-					s_ptr--;
+				/* wrap-around y */
+				m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+						sprite + s_ptr,
+						colour,
+						fx,fy,
+						x,(y-i*16) - 0x200,
+						screen.priority(),pri_mask,0);
+
+				if (fy) s_ptr++; else s_ptr--;
 			}
 		}
 		else
 		{
-			int rom_offs = sprite_code * 8;
+			int rom_offs = sprite*8;
 
-			if (m_user1_ptr[rom_offs + 1] || m_user1_ptr[rom_offs + 3] || m_user1_ptr[rom_offs + 5] || m_user1_ptr[rom_offs + 7])
+			if (!rom)
+				return;
+
+			if (rom[rom_offs+1] || rom[rom_offs+3] || rom[rom_offs+5] || rom[rom_offs+7])
 			{
 				while (rom_offs < 0x40000)  /* safety check */
 				{
-					UINT8 *sprite = m_user1_ptr + rom_offs;
 					/*
 					[1]
 					x--- ---- end of block marker
@@ -226,29 +244,34 @@ void m107_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const
 					---- ---x X offs hi byte
 					*/
 
-					int xdisp = (sprite[7] << 8) | sprite[6];
-					int ydisp = (sprite[3] << 8) | sprite[2];
-					int ffx = fx ^ (sprite[1] & 1);
-					int ffy = fy ^ (sprite[1] & 2);
-					sprite_code = (sprite[5] << 8) | sprite[4];
-					y_multi = 1 << ((sprite[3] >> 1) & 0x3);
-					if (fx)
-						xdisp = -xdisp - 16;
-					if (fy)
-						ydisp = -ydisp - (16 * y_multi - 1);
-					if (!ffy)
-						sprite += y_multi - 1;
-
-					for (int i = 0; i < y_multi; i++)
+					int xdisp = rom[rom_offs+6]+256*rom[rom_offs+7];
+					int ydisp = rom[rom_offs+2]+256*rom[rom_offs+3];
+					int ffx=fx^(rom[rom_offs+1]&1);
+					int ffy=fy^(rom[rom_offs+1]&2);
+					sprite=rom[rom_offs+4]+256*rom[rom_offs+5];
+					y_multi=1<<((rom[rom_offs+3]>>1)&0x3);
+					if (fx) xdisp = -xdisp-16;
+					if (fy) ydisp = -ydisp - (16*y_multi-1);
+					if (!ffy) sprite+=y_multi-1;
+					for (i=0; i<y_multi; i++)
 					{
-						m_gfxdecode->gfx(1)->prio_transpen(bitmap, cliprect, sprite_code + (ffy ? i : -i), colour, ffx, ffy, (x + xdisp) & 0x1ff, (y - ydisp - 16 * i) & 0x1ff, screen.priority(), pri_mask, 0);
+						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+								sprite+(ffy?i:-i),
+								colour,
+								ffx,ffy,
+								(x+xdisp)&0x1ff,(y-ydisp-16*i)&0x1ff,
+								screen.priority(),pri_mask,0);
 
 						/* wrap-around y */
-						m_gfxdecode->gfx(1)->prio_transpen(bitmap, cliprect, sprite_code + (ffy ? i : -i), colour, ffx, ffy, (x + xdisp) & 0x1ff, ((y - ydisp - 16 * i) & 0x1ff) - 0x200, screen.priority(), pri_mask, 0);
+						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+								sprite+(ffy?i:-i),
+								colour,
+								ffx,ffy,
+								(x+xdisp)&0x1ff,((y-ydisp-16*i)&0x1ff)-0x200,
+								screen.priority(),pri_mask,0);
 					}
 
-					if (sprite[1] & 0x80)
-						break;    /* end of block */
+					if (rom[rom_offs+1]&0x80) break;    /* end of block */
 
 					rom_offs += 8;
 				}
