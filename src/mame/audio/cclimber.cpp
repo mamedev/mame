@@ -52,7 +52,7 @@ cclimber_audio_device::cclimber_audio_device(const machine_config &mconfig, cons
 	m_sample_freq(0),
 	m_sample_volume(0),
 	m_samples(*this, "samples"),
-	m_samples_region(*this, "samples")
+	m_samples_region(*this, "^samples")
 {
 }
 
