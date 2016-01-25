@@ -36,6 +36,7 @@ public:
     DECLARE_WRITE8_MEMBER(ay2_port_a_w);
     DECLARE_WRITE8_MEMBER(ay2_port_b_w);
     DECLARE_READ8_MEMBER(keyboard_r);
+    DECLARE_READ8_MEMBER(port_r);
 private:
     uint8_t m_selected_7seg_module;
 };
@@ -132,6 +133,17 @@ WRITE8_MEMBER( marywu_state::multiplex_7seg_w )
     m_selected_7seg_module = data;
 }
 
+READ8_MEMBER( marywu_state::port_r )
+{
+//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
+    switch(offset){
+        //case 1:
+	//	return (1 << 6);
+	default:
+		return 0x00;
+    }
+}
+
 READ8_MEMBER( marywu_state::keyboard_r )
 {
     switch(m_selected_7seg_module % 8){
@@ -165,7 +177,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, marywu_state )
     AM_RANGE(0x9002, 0x9002) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
     AM_RANGE(0x9003, 0x9003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
     AM_RANGE(0xf000, 0xf000) AM_NOP /* TODO: Investigate this. There's something going on at this address range. */
-    AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_NOP /* FIX-ME! I am ignoring port accesses for a while. */
+    AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(port_r)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( marywu , marywu_state )
