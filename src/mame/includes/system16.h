@@ -34,7 +34,7 @@ public:
 	optional_shared_ptr<UINT16> m_goldnaxeb2_bgpage;
 	optional_shared_ptr<UINT16> m_goldnaxeb2_fgpage;
 
-	required_device<sega_16bit_sprite_device> m_sprites;
+	optional_device<sega_16bit_sprite_device> m_sprites;
 
 	UINT16 m_coinctrl;
 
