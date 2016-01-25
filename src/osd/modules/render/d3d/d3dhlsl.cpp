@@ -76,7 +76,7 @@ shaders::shaders() :
 	vecbuf_type(), vecbuf_index(0), vecbuf_count(0), avi_output_file(NULL), avi_frame(0), avi_copy_surface(NULL), avi_copy_texture(NULL), avi_final_target(NULL), avi_final_texture(NULL),
 	black_surface(NULL), black_texture(NULL), render_snap(false), snap_rendered(false), snap_copy_target(NULL), snap_copy_texture(NULL), snap_target(NULL), snap_texture(NULL),
 	snap_width(0), snap_height(0), lines_pending(false), backbuffer(NULL), curr_effect(NULL), default_effect(NULL), prescale_effect(NULL), post_effect(NULL), distortion_effect(NULL),
-	focus_effect(NULL), phosphor_effect(NULL), deconverge_effect(NULL), color_effect(NULL), yiq_encode_effect(NULL), yiq_decode_effect(NULL), bloom_effect(NULL),
+	focus_effect(NULL), phosphor_effect(NULL), deconverge_effect(NULL), color_effect(NULL), ntsc_effect(NULL), bloom_effect(NULL),
 	downsample_effect(NULL), vector_effect(NULL), fsfx_vertices(NULL), curr_texture(NULL), curr_render_target(NULL), curr_poly(NULL)
 {
 	master_enable = false;
@@ -632,7 +632,7 @@ void shaders::set_texture(texture_info *texture)
 	default_effect->set_texture("Diffuse", (texture == NULL) ? default_texture->get_finaltex() : texture->get_finaltex());
 	if (options->yiq_enable)
 	{
-		yiq_encode_effect->set_texture("Diffuse", (texture == NULL) ? default_texture->get_finaltex() : texture->get_finaltex());
+		ntsc_effect->set_texture("Diffuse", (texture == NULL) ? default_texture->get_finaltex() : texture->get_finaltex());
 	}
 	else
 	{
@@ -706,7 +706,8 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 		options->scanline_height = winoptions.screen_scanline_height();
 		options->scanline_bright_scale = winoptions.screen_scanline_bright_scale();
 		options->scanline_bright_offset = winoptions.screen_scanline_bright_offset();
-		options->scanline_offset = winoptions.screen_scanline_offset();
+		options->scanline_jitter = winoptions.screen_scanline_jitter();
+		options->hum_bar_alpha = winoptions.screen_hum_bar_alpha();
 		get_vector(winoptions.screen_defocus(), 2, options->defocus, TRUE);
 		get_vector(winoptions.screen_converge_x(), 3, options->converge_x, TRUE);
 		get_vector(winoptions.screen_converge_y(), 3, options->converge_y, TRUE);
@@ -722,6 +723,7 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 		get_vector(winoptions.screen_phosphor(), 3, options->phosphor, TRUE);
 		options->saturation = winoptions.screen_saturation();
 		options->yiq_enable = winoptions.screen_yiq_enable();
+		options->yiq_jitter = winoptions.screen_yiq_jitter();
 		options->yiq_cc = winoptions.screen_yiq_cc();
 		options->yiq_a = winoptions.screen_yiq_a();
 		options->yiq_b = winoptions.screen_yiq_b();
@@ -917,8 +919,7 @@ int shaders::create_resources(bool reset)
 	focus_effect = new effect(this, d3d->get_device(), "focus.fx", fx_dir);
 	deconverge_effect = new effect(this, d3d->get_device(), "deconverge.fx", fx_dir);
 	color_effect = new effect(this, d3d->get_device(), "color.fx", fx_dir);
-	yiq_encode_effect = new effect(this, d3d->get_device(), "yiq_encode.fx", fx_dir);
-	yiq_decode_effect = new effect(this, d3d->get_device(), "yiq_decode.fx", fx_dir);
+	ntsc_effect = new effect(this, d3d->get_device(), "ntsc.fx", fx_dir);
 	bloom_effect = new effect(this, d3d->get_device(), "bloom.fx", fx_dir);
 	downsample_effect = new effect(this, d3d->get_device(), "downsample.fx", fx_dir);
 	vector_effect = new effect(this, d3d->get_device(), "vector.fx", fx_dir);
@@ -931,8 +932,7 @@ int shaders::create_resources(bool reset)
 		!focus_effect->is_valid() ||
 		!deconverge_effect->is_valid() ||
 		!color_effect->is_valid() ||
-		!yiq_encode_effect->is_valid() ||
-		!yiq_decode_effect->is_valid() ||
+		!ntsc_effect->is_valid() ||
 		!bloom_effect->is_valid() ||
 		!downsample_effect->is_valid() ||
 		!vector_effect->is_valid())
@@ -940,7 +940,7 @@ int shaders::create_resources(bool reset)
 		return 1;
 	}
 
-	effect *effects[14] = {
+	effect *effects[13] = {
 		default_effect,
 		post_effect,
 		distortion_effect,
@@ -949,15 +949,14 @@ int shaders::create_resources(bool reset)
 		focus_effect,
 		deconverge_effect,
 		color_effect,
-		yiq_encode_effect,
-		yiq_decode_effect,
+		ntsc_effect,
 		color_effect,
 		bloom_effect,
 		downsample_effect,
 		vector_effect
 	};
 
-	for (int i = 0; i < 14; i++)
+	for (int i = 0; i < 13; i++)
 	{
 		effects[i]->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
 		effects[i]->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
@@ -967,27 +966,16 @@ int shaders::create_resources(bool reset)
 		effects[i]->add_uniform("SwapXY", uniform::UT_BOOL, uniform::CU_SWAP_XY);
 	}
 
-	yiq_encode_effect->add_uniform("CCValue", uniform::UT_FLOAT, uniform::CU_NTSC_CCFREQ);
-	yiq_encode_effect->add_uniform("AValue", uniform::UT_FLOAT, uniform::CU_NTSC_A);
-	yiq_encode_effect->add_uniform("BValue", uniform::UT_FLOAT, uniform::CU_NTSC_B);
-	yiq_decode_effect->add_uniform("OValue", uniform::UT_FLOAT, uniform::CU_NTSC_O);
-	yiq_encode_effect->add_uniform("PValue", uniform::UT_FLOAT, uniform::CU_NTSC_P);
-	yiq_encode_effect->add_uniform("NotchHalfWidth", uniform::UT_FLOAT, uniform::CU_NTSC_NOTCH);
-	yiq_encode_effect->add_uniform("YFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_YFREQ);
-	yiq_encode_effect->add_uniform("IFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_IFREQ);
-	yiq_encode_effect->add_uniform("QFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_QFREQ);
-	yiq_encode_effect->add_uniform("ScanTime", uniform::UT_FLOAT, uniform::CU_NTSC_HTIME);
-	
-	yiq_decode_effect->add_uniform("CCValue", uniform::UT_FLOAT, uniform::CU_NTSC_CCFREQ);
-	yiq_decode_effect->add_uniform("AValue", uniform::UT_FLOAT, uniform::CU_NTSC_A);
-	yiq_decode_effect->add_uniform("BValue", uniform::UT_FLOAT, uniform::CU_NTSC_B);
-	yiq_decode_effect->add_uniform("OValue", uniform::UT_FLOAT, uniform::CU_NTSC_O);
-	yiq_decode_effect->add_uniform("PValue", uniform::UT_FLOAT, uniform::CU_NTSC_P);
-	yiq_decode_effect->add_uniform("NotchHalfWidth", uniform::UT_FLOAT, uniform::CU_NTSC_NOTCH);
-	yiq_decode_effect->add_uniform("YFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_YFREQ);
-	yiq_decode_effect->add_uniform("IFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_IFREQ);
-	yiq_decode_effect->add_uniform("QFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_QFREQ);
-	yiq_decode_effect->add_uniform("ScanTime", uniform::UT_FLOAT, uniform::CU_NTSC_HTIME);
+	ntsc_effect->add_uniform("CCValue", uniform::UT_FLOAT, uniform::CU_NTSC_CCFREQ);
+	ntsc_effect->add_uniform("AValue", uniform::UT_FLOAT, uniform::CU_NTSC_A);
+	ntsc_effect->add_uniform("BValue", uniform::UT_FLOAT, uniform::CU_NTSC_B);
+	ntsc_effect->add_uniform("OValue", uniform::UT_FLOAT, uniform::CU_NTSC_O);
+	ntsc_effect->add_uniform("PValue", uniform::UT_FLOAT, uniform::CU_NTSC_P);
+	ntsc_effect->add_uniform("NotchHalfWidth", uniform::UT_FLOAT, uniform::CU_NTSC_NOTCH);
+	ntsc_effect->add_uniform("YFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_YFREQ);
+	ntsc_effect->add_uniform("IFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_IFREQ);
+	ntsc_effect->add_uniform("QFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_QFREQ);
+	ntsc_effect->add_uniform("ScanTime", uniform::UT_FLOAT, uniform::CU_NTSC_HTIME);
 
 	color_effect->add_uniform("RedRatios", uniform::UT_VEC3, uniform::CU_COLOR_RED_RATIOS);
 	color_effect->add_uniform("GrnRatios", uniform::UT_VEC3, uniform::CU_COLOR_GRN_RATIOS);
@@ -1062,8 +1050,7 @@ void shaders::begin_draw()
 	focus_effect->set_technique("DefaultTechnique");
 	deconverge_effect->set_technique("DefaultTechnique");
 	color_effect->set_technique("DefaultTechnique");
-	yiq_encode_effect->set_technique("DefaultTechnique");
-	yiq_decode_effect->set_technique("DefaultTechnique");
+	ntsc_effect->set_technique("DefaultTechnique");
 	color_effect->set_technique("DefaultTechnique");
 	bloom_effect->set_technique("DefaultTechnique");
 	downsample_effect->set_technique("DefaultTechnique");
@@ -1244,27 +1231,16 @@ int shaders::ntsc_pass(render_target *rt, int source_index, poly_info *poly, int
 	{
 		return next_index;
 	}
-
-	float frame_offset = curr_texture->get_cur_frame() == 0
-		? 0.0f 
-		: (float)curr_texture->get_cur_frame();
-
-	// Convert our signal into YIQ
-	curr_effect = yiq_encode_effect;
-	curr_effect->update_uniforms();
-	curr_effect->set_float("FrameOffset", frame_offset);
 	
+	float signal_offset = curr_texture->get_cur_frame() == 0
+		? 0.0f
+		: options->yiq_jitter;
+
 	// initial "Diffuse"  texture is set in shaders::set_texture()
 
-	next_index = rt->next_index(next_index);
-	blit(rt->native_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
-
-	// Convert our signal from YIQ
-	curr_effect = yiq_decode_effect;
+	curr_effect = ntsc_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Composite", rt->native_texture[next_index]);
-	curr_effect->set_texture("Diffuse", curr_texture->get_finaltex());
-	curr_effect->set_float("FrameOffset", frame_offset);
+	curr_effect->set_float("SignalOffset", signal_offset);
 	
 	next_index = rt->next_index(next_index);
 	blit(rt->native_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
@@ -1457,7 +1433,9 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	curr_effect->set_vector("BackColor", 3, back_color);
 	curr_effect->set_vector("ScreenScale", 2, screen_scale);
 	curr_effect->set_vector("ScreenOffset", 2, screen_offset);
-	curr_effect->set_float("ScanlineOffset", curr_texture->get_cur_frame() == 0 ? 0.0f : options->scanline_offset);
+	curr_effect->set_float("ScanlineOffset", curr_texture->get_cur_frame() == 0 ? 0.0f : options->scanline_jitter);
+	curr_effect->set_float("TimeMilliseconds", (float)machine->time().as_double() * 1000.0f);
+	curr_effect->set_float("HumBarAlpha", options->hum_bar_alpha);
 	curr_effect->set_bool("PrepareBloom", prepare_bloom);
 	curr_effect->set_bool("PrepareVector", prepare_vector);
 
@@ -2159,15 +2137,10 @@ void shaders::delete_resources(bool reset)
 		delete color_effect;
 		color_effect = NULL;
 	}
-	if (yiq_encode_effect != NULL)
+	if (ntsc_effect != NULL)
 	{
-		delete yiq_encode_effect;
-		yiq_encode_effect = NULL;
-	}
-	if (yiq_decode_effect != NULL)
-	{
-		delete yiq_decode_effect;
-		yiq_decode_effect = NULL;
+		delete ntsc_effect;
+		ntsc_effect = NULL;
 	}
 
 	if (backbuffer != NULL)
@@ -2423,10 +2396,16 @@ static INT32 slider_scanline_bright_offset(running_machine &machine, void *arg, 
 	return slider_set(&(((hlsl_options*)arg)->scanline_bright_offset), 0.05f, "%2.2f", str, newval);
 }
 
-static INT32 slider_scanline_offset(running_machine &machine, void *arg, std::string *str, INT32 newval)
+static INT32 slider_scanline_jitter(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
 	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->scanline_offset), 0.05f, "%2.2f", str, newval);
+	return slider_set(&(((hlsl_options*)arg)->scanline_jitter), 0.01f, "%1.2f", str, newval);
+}
+
+static INT32 slider_hum_bar_alpha(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->hum_bar_alpha), 0.01f, "%1.2f", str, newval);
 }
 
 static INT32 slider_defocus_x(running_machine &machine, void *arg, std::string *str, INT32 newval)
@@ -2781,6 +2760,105 @@ static INT32 slider_bloom_lvl10_scale(running_machine &machine, void *arg, std::
 	return slider_set(&(((hlsl_options*)arg)->bloom_level10_weight), 0.01f, "%1.2f", str, newval);
 }
 
+
+static INT32 slider_ntsc_enable(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	hlsl_options *options = (hlsl_options*)arg;
+	if (newval != SLIDER_NOCHANGE)
+	{
+		options->yiq_enable = newval;
+	}
+	if (str != NULL)
+	{
+		strprintf(*str, "%s", options->yiq_enable == 0 ? "Off" : "On");
+	}
+	options->params_dirty = true;
+
+	return options->yiq_enable;
+}
+
+// static INT32 slider_ntsc_phase_count(running_machine &machine, void *arg, std::string *str, INT32 newval)
+// {	
+// 	hlsl_options *options = (hlsl_options*)arg;
+// 	if (newval != SLIDER_NOCHANGE)
+// 	{
+// 		options->yiq_phase_count = newval;
+// 	}
+// 	if (str != NULL)
+// 	{
+// 		strprintf(*str, "%d", options->yiq_phase_count);
+// 	}
+// 	options->params_dirty = true;
+
+// 	return options->yiq_phase_count;
+// }
+
+static INT32 slider_ntsc_jitter(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->yiq_jitter), 0.01f, "%1.2f", str, newval);
+}
+
+static INT32 slider_ntsc_a_value(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->yiq_a), 0.01f, "%1.2f", str, newval);
+}
+
+static INT32 slider_ntsc_b_value(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->yiq_b), 0.01f, "%1.2f", str, newval);
+}
+
+static INT32 slider_ntsc_p_value(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->yiq_p), 0.01f, "%1.2f", str, newval);
+}
+
+static INT32 slider_ntsc_o_value(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->yiq_o), 0.01f, "%1.2f", str, newval);
+}
+
+static INT32 slider_ntsc_cc_value(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->yiq_cc), 0.0001f, "%1.4f", str, newval);
+}
+
+static INT32 slider_ntsc_n_value(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->yiq_n), 0.01f, "%1.4f", str, newval);
+}
+
+static INT32 slider_ntsc_y_value(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->yiq_y), 0.01f, "%1.4f", str, newval);
+}
+
+static INT32 slider_ntsc_i_value(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->yiq_i), 0.01f, "%1.4f", str, newval);
+}
+
+static INT32 slider_ntsc_q_value(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->yiq_q), 0.01f, "%1.4f", str, newval);
+}
+
+static INT32 slider_ntsc_scan_time(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->yiq_scan_time), 0.01f, "%1.2f", str, newval);
+}
+
 hlsl_options shaders::last_options = { false };
 
 shaders::slider_desc shaders::s_sliders[] =
@@ -2805,7 +2883,8 @@ shaders::slider_desc shaders::s_sliders[] =
 	{ "Scanline Indiv. Height",              1,    20,    80, 1, 5, slider_scanline_height },
 	{ "Scanline Brightness",                 0,    20,    40, 1, 5, slider_scanline_bright_scale },
 	{ "Scanline Brightness Overdrive",       0,     0,    20, 1, 5, slider_scanline_bright_offset },
-	{ "Scanline Jitter",                     0,     0,    40, 1, 5, slider_scanline_offset },
+	{ "Scanline Jitter",                     0,     0,   100, 1, 5, slider_scanline_jitter },
+	{ "Hum Bar Darkness",                    0,     0,   100, 1, 5, slider_hum_bar_alpha },
 	{ "Defocus X",                           0,     0,   100, 1, 7, slider_defocus_x },
 	{ "Defocus Y",                           0,     0,   100, 1, 7, slider_defocus_y },
 	{ "Red Position Offset X",            -100,     0,   100, 1, 7, slider_red_converge_x },
@@ -2861,6 +2940,19 @@ shaders::slider_desc shaders::s_sliders[] =
 	{ "Bloom Level 8 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl8_scale },
 	{ "Bloom Level 9 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl9_scale },
 	{ "Bloom Level 10 Scale",                0,     0,   100, 1, 7, slider_bloom_lvl10_scale },
+	{ "NTSC processing",                     0,     0,     1, 1, 5, slider_ntsc_enable },
+	{ "Signal Jitter",                       0,     0,   100, 1, 5, slider_ntsc_jitter },
+	{ "A Value",                          -100,    50,   100, 1, 5, slider_ntsc_a_value },
+	{ "B Value",                          -100,    50,   100, 1, 5, slider_ntsc_b_value },
+	{ "Incoming Pixel Clock Scaling",     -300,   100,   300, 1, 5, slider_ntsc_p_value },
+	{ "Outgoing Color Carrier Phase",     -300,     0,   300, 1, 5, slider_ntsc_o_value },
+	{ "Color Carrier Frequency",             0, 35795, 60000, 5, 5, slider_ntsc_cc_value },
+	{ "Y Notch",                             0,   100,   600, 5, 5, slider_ntsc_n_value },
+	{ "Y Frequency",                         0,   600,   600, 5, 5, slider_ntsc_y_value },
+	{ "I Frequency",                         0,   120,   600, 5, 5, slider_ntsc_i_value },
+	{ "Q Frequency",                         0,    60,   600, 5, 5, slider_ntsc_q_value },
+	{ "Scanline Duration",                   0,  5260, 10000, 1, 5, slider_ntsc_scan_time },
+	// { "Phase Count",                         1,     2,     3, 1, 5, slider_ntsc_phase_count },
 	{ NULL, 0, 0, 0, 0, 0, NULL },
 };
 

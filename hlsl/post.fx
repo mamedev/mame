@@ -65,6 +65,7 @@ struct PS_INPUT
 //-----------------------------------------------------------------------------
 
 static const float PI = 3.1415927f;
+static const float PHI = 1.618034f;
 
 //-----------------------------------------------------------------------------
 // Scanline & Shadowmask Vertex Shader
@@ -118,6 +119,11 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 // Scanline & Shadowmask Pixel Shader
 //-----------------------------------------------------------------------------
 
+uniform float HumBarHertzRate = 60.0f / 59.94f - 1.0f; // difference between the 59.94 Hz field rate and 60 Hz line frequency (NTSC)
+uniform float HumBarAlpha = 0.0f;
+
+uniform float TimeMilliseconds = 0.0f;
+
 uniform float2 ScreenScale = float2(1.0f, 1.0f);
 uniform float2 ScreenOffset = float2(0.0f, 0.0f);
 
@@ -159,6 +165,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 ScreenTexelDims = 1.0f / ScreenDims;
 	float2 SourceTexelDims = 1.0f / SourceDims;
+	float2 SourceRes = SourceDims * SourceRect;
 
 	float2 HalfSourceRect = SourceRect * 0.5f;
 
@@ -175,7 +182,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	}
 
 	// Mask Simulation (may not affect bloom)
-	if (!PrepareBloom)
+	if (!PrepareBloom && ShadowAlpha > 0.0f)
 	{
 		float2 shadowDims = ShadowDims;
 		shadowDims = SwapXY
@@ -235,14 +242,23 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	if (!PrepareBloom)
 	{
 		// Scanline Simulation (may not affect vector screen)
-		if (!PrepareVector)
+		if (!PrepareVector && ScanlineAlpha > 0.0f)
 		{
-			float InnerSine = BaseCoord.y * ScanlineScale * SourceDims.y;
-			float ScanJitter = ScanlineOffset * SourceDims.y;
-			float ScanBrightMod = sin(InnerSine * PI + ScanJitter);
-			float3 ScanColor = lerp(1.0f, (pow(ScanBrightMod * ScanBrightMod, ScanlineHeight) * ScanlineBrightScale + 1.0f + ScanlineBrightOffset) * 0.5f, ScanlineAlpha);
+			float ScanCoord = BaseCoord.y * SourceDims.y * ScanlineScale * PI;
+			float ScanCoordJitter = ScanlineOffset * PHI;
+			float ScanSine = sin(ScanCoord + ScanCoordJitter);
+			float ScanSineScaled = pow(ScanSine * ScanSine, ScanlineHeight);
+			float ScanBrightness = ScanSineScaled * ScanlineBrightScale + 1.0f + ScanlineBrightOffset;
 
-			BaseColor.rgb *= ScanColor;
+			BaseColor.rgb *= lerp(1.0f, ScanBrightness * 0.5f, ScanlineAlpha);
+		}
+
+		// Hum Bar Simulation (may not affect vector screen)
+		if (!PrepareVector && HumBarAlpha > 0.0f)
+		{
+			float HumTimeStep = frac(TimeMilliseconds * HumBarHertzRate);
+			float HumBrightness = 1.0 - frac(BaseCoord.y / SourceRect.y + HumTimeStep) * HumBarAlpha;
+			BaseColor.rgb *= HumBrightness;
 		}
 	}
 

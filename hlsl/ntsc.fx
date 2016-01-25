@@ -1,25 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz,ImJezze
 //-----------------------------------------------------------------------------
-// YIQ Decode Effect
+// NTSC Effect
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
 // Sampler Definitions
 //-----------------------------------------------------------------------------
-
-texture Composite;
-
-sampler CompositeSampler = sampler_state
-{
-	Texture   = <Composite>;
-	MipFilter = POINT;
-	MinFilter = POINT;
-	MagFilter = POINT;
-	AddressU = CLAMP;
-	AddressV = CLAMP;
-	AddressW = CLAMP;
-};
 
 texture Diffuse;
 
@@ -81,51 +68,90 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 }
 
 //-----------------------------------------------------------------------------
-// YIQ Decode Pixel Shader
+// NTSC Pixel Shader
 //-----------------------------------------------------------------------------
 
 uniform float AValue = 0.5f;
 uniform float BValue = 0.5f;
-uniform float CCValue = 3.5975454f;
+uniform float CCValue = 3.5795454f;
 uniform float OValue = 0.0f;
-uniform float PValue = 1.0f; // unused
-
+uniform float PValue = 1.0f;
 uniform float ScanTime = 52.6f;
-uniform float FrameOffset = 0.0f;
 
 uniform float NotchHalfWidth = 1.0f;
 uniform float YFreqResponse = 6.0f;
 uniform float IFreqResponse = 1.2f;
 uniform float QFreqResponse = 0.6f;
 
+uniform float SignalOffset = 0.0f;
+
 //-----------------------------------------------------------------------------
 // Constants
 //-----------------------------------------------------------------------------
 
+static const float PI = 3.1415927f;
+static const float PI2 = PI * 2.0f;
+
+static const float4 YDot = float4(0.299f, 0.587f, 0.114f, 0.0f);
+static const float4 IDot = float4(0.595716f, -0.274453f, -0.321263f, 0.0f);
+static const float4 QDot = float4(0.211456f, -0.522591f, 0.311135f, 0.0f);
+
+static const float3 RDot = float3(1.0f, 0.956f, 0.621f);
+static const float3 GDot = float3(1.0f, -0.272f, -0.647f);
+static const float3 BDot = float3(1.0f, -1.106f, 1.703f);
+
+static const float4 OffsetX = float4(0.0f, 0.25f, 0.50f, 0.75f);
 static const float4 NotchOffset = float4(0.0f, 1.0f, 2.0f, 3.0f);
 
-static const float PI = 3.1415927f;
-static const float PI2 = 6.2831855f;
+static const int SampleCount = 64;
+static const int HalfSampleCount = SampleCount / 2;
 
-static const float MaxC = 2.1183f;
-static const float MinC = -1.1183f;
-static const float CRange = 3.2366f;
+float4 GetCompositeYIQ(float2 TexCoord)
+{
+	float2 SourceTexelDims = 1.0f / SourceDims;	
+	float2 SourceRes = SourceDims * SourceRect;
+
+	float2 PValueSourceTexel = float2(PValue, 0.0f) * SourceTexelDims;
+
+	float2 C0 = TexCoord + PValueSourceTexel * OffsetX.x;
+	float2 C1 = TexCoord + PValueSourceTexel * OffsetX.y;
+	float2 C2 = TexCoord + PValueSourceTexel * OffsetX.z;
+	float2 C3 = TexCoord + PValueSourceTexel * OffsetX.w;
+	float4 Cx = float4(C0.x, C1.x, C2.x, C3.x);
+	float4 Cy = float4(C0.y, C1.y, C2.y, C3.y);
+	float4 Texel0 = tex2D(DiffuseSampler, C0);
+	float4 Texel1 = tex2D(DiffuseSampler, C1);
+	float4 Texel2 = tex2D(DiffuseSampler, C2);
+	float4 Texel3 = tex2D(DiffuseSampler, C3);
+
+	float4 HPosition = Cx / SourceRect.x;
+	float4 VPosition = Cy / SourceRect.y;
+
+	float4 Y = float4(dot(Texel0, YDot), dot(Texel1, YDot), dot(Texel2, YDot), dot(Texel3, YDot));
+	float4 I = float4(dot(Texel0, IDot), dot(Texel1, IDot), dot(Texel2, IDot), dot(Texel3, IDot));
+	float4 Q = float4(dot(Texel0, QDot), dot(Texel1, QDot), dot(Texel2, QDot), dot(Texel3, QDot));
+
+	float4 W = PI2 * CCValue * ScanTime;
+
+	float4 T = HPosition
+		+ (AValue / 360.0f * SourceRes.y) * VPosition
+		+ (BValue / 360.0f)
+		+ (SignalOffset / 360.0f);
+	float4 TW = T * W;
+
+	float4 CompositeYIQ = Y + I * cos(TW) + Q * sin(TW);
+
+	return CompositeYIQ;
+}
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord.xy);
+	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
 
-	float2 InvDims = 1.0f / SourceDims;
+	float2 SourceTexelDims = 1.0f / SourceDims;
+	float2 SourceRes = SourceDims * SourceRect;
 
-	// YIQ convolution: N coefficients each
-	float4 YAccum = 0.0f;
-	float4 IAccum = 0.0f;
-	float4 QAccum = 0.0f;
-
-	float BValueFrameOffset = BValue * FrameOffset;
-
-	float FrameWidthx4 = SourceDims.x * SourceRect.x * 4.0f;
-	float TimePerSample = ScanTime / FrameWidthx4;
+	float TimePerSample = ScanTime / (SourceRes.x * 4.0f);
 
 	float Fc_y1 = (CCValue - NotchHalfWidth) * TimePerSample;
 	float Fc_y2 = (CCValue + NotchHalfWidth) * TimePerSample;
@@ -142,24 +168,34 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float Fc_y1_pi2 = Fc_y1 * PI2;
 	float Fc_y2_pi2 = Fc_y2 * PI2;
 	float Fc_y3_pi2 = Fc_y3 * PI2;
-	float PI2Length = PI2 / 82.0f;
+	float PI2Length = PI2 / SampleCount;
 
 	float W = PI2 * CCValue * ScanTime;
+	
+	float4 YAccum = 0.0f;
+	float4 IAccum = 0.0f;
+	float4 QAccum = 0.0f;
 
 	float4 Cy = Input.TexCoord.y;
-	float4 VPosition = Cy * (SourceDims.y * SourceRect.y) * 2.0f;
+	float4 VPosition = Cy / SourceRect.y;
 
-	for(float n = -41.0f; n < 42.0f; n += 4.0f)
+	for (float i = 0; i < SampleCount; i += 4.0f)
 	{
+		float n = i - HalfSampleCount;
+
 		float4 n4 = n + NotchOffset;
 
-		float4 Cx = Input.TexCoord.x + InvDims.x * n4 * 0.25f;
-		float4 HPosition = (Cx / SourceRect.x);
+		float4 Cx = Input.TexCoord.x + SourceTexelDims.x * (n4 * 0.25f);
+		float4 HPosition = Cx / SourceRect.x;
 
-		float4 C = tex2D(CompositeSampler, float2(Cx.r, Cy.r)) * CRange + MinC;
+		float4 C = GetCompositeYIQ(float2(Cx.r, Cy.r));
 
-		float4 T = HPosition + AValue * VPosition + BValueFrameOffset;
-		float4 WT = W * T + OValue;
+		float4 T = HPosition
+			+ (AValue / 360.0f * SourceRes.y) * VPosition
+			+ (BValue / 360.0f)
+			+ (SignalOffset / 360.0f);
+		float4 WT = W * T
+			+ OValue;
 
 		float4 SincKernel = 0.54f + 0.46f * cos(PI2Length * n4);
 
@@ -186,21 +222,21 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		QAccum = QAccum + C * sin(WT) * FilterQ;
 	}
 
-	float Y = YAccum.r + YAccum.g + YAccum.b + YAccum.a;
-	float I = (IAccum.r + IAccum.g + IAccum.b + IAccum.a) * 2.0f;
-	float Q = (QAccum.r + QAccum.g + QAccum.b + QAccum.a) * 2.0f;
+	float3 YIQ = float3(
+		(YAccum.r + YAccum.g + YAccum.b + YAccum.a),
+		(IAccum.r + IAccum.g + IAccum.b + IAccum.a) * 2.0f,
+		(QAccum.r + QAccum.g + QAccum.b + QAccum.a) * 2.0f);
 
-	float3 YIQ = float3(Y, I, Q);
+	float3 RGB = float3(
+		dot(YIQ, RDot),
+		dot(YIQ, GDot),
+		dot(YIQ, BDot));
 
-	float3 Decode = float3(
-		dot(YIQ, float3(1.0f, 0.956f, 0.621f)),
-		dot(YIQ, float3(1.0f, -0.272f, -0.647f)),
-		dot(YIQ, float3(1.0f, -1.106f, 1.703f)));	
-	return float4(Decode, BaseTexel.a);
+	return float4(RGB, BaseTexel.a);
 }
 
 //-----------------------------------------------------------------------------
-// YIQ Decode Technique
+// NTSC Technique
 //-----------------------------------------------------------------------------
 
 technique DefaultTechnique
