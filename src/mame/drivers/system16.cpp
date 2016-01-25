@@ -3124,7 +3124,7 @@ ROM_START( beautyb )
 	ROM_LOAD( "b53.bin", 0x10000, 0x10000, CRC(aca8e330) SHA1(912e636e3c1e238682ea29620e8e2c6089c77209) )
 	ROM_LOAD( "b63.bin", 0x00000, 0x10000, CRC(f2af2fd5) SHA1(0a95ebb5eae7cdc6535533d73d06419c23d01ac3) )
 
-	ROM_REGION( 0x020000, "sprites", ROMREGION_ERASEFF ) /* sprites */
+	ROM_REGION16_BE( 0x020000, "sprites", ROMREGION_ERASEFF ) /* sprites */
 	/* no sprites on this */
 
 	ROM_REGION( 0x40000, "soundcpu", 0 ) /* sound CPU */
@@ -3151,7 +3151,7 @@ ROM_START( iqpipe )
 	ROM_LOAD( "iqpipe.5", 0x10000, 0x10000, CRC(dfaedd39) SHA1(498f1c34fecd8de497fdce41bb683d00047a868a) )
 	ROM_LOAD( "iqpipe.6", 0x00000, 0x10000, CRC(8e554f8d) SHA1(4b3b0e47c36f37947422f1c31063f11975108cd0) )
 
-	ROM_REGION( 0x020000, "sprites", ROMREGION_ERASEFF ) /* sprites */
+	ROM_REGION16_BE( 0x020000, "sprites", ROMREGION_ERASEFF ) /* sprites */
 	/* no sprites on this */
 
 	ROM_REGION( 0x40000, "soundcpu", 0 ) /* sound CPU */
