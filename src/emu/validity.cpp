@@ -184,10 +184,11 @@ void validity_checker::check_shared_source(const game_driver &driver)
 
 
 //-------------------------------------------------
-//  check_all - check all drivers
+//  check_all_matching - check all drivers whose
+//  names match the given string
 //-------------------------------------------------
 
-bool validity_checker::check_all()
+bool validity_checker::check_all_matching(const char *string)
 {
 	// start by checking core stuff
 	validate_begin();
@@ -210,7 +211,8 @@ bool validity_checker::check_all()
 	// then iterate over all drivers and check them
 	m_drivlist.reset();
 	while (m_drivlist.next())
-		validate_one(m_drivlist.driver());
+		if (m_drivlist.matches(string, m_drivlist.driver().name))
+			validate_one(m_drivlist.driver());
 
 	// cleanup
 	validate_end();
@@ -968,15 +970,11 @@ void validity_checker::validate_devices()
 	device_iterator iter_find(m_current_config->root_device());
 	for (const device_t *device = iter_find.first(); device != nullptr; device = iter_find.next())
 	{
-		device->findit(true);
-	}
-
-	// iterate over devices
-	device_iterator iter(m_current_config->root_device());
-	for (const device_t *device = iter.first(); device != nullptr; device = iter.next())
-	{
 		// track the current device
 		m_current_device = device;
+
+		// validate auto-finders
+		device->findit(true);
 
 		// validate the device tag
 		validate_tag(device->basetag());
