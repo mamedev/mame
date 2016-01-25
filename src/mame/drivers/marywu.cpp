@@ -102,21 +102,21 @@ INPUT_PORTS_END
 WRITE8_MEMBER( marywu_state::ay1_port_a_w )
 {
     for (uint8_t i=0; i<8; i++){
-        output_set_led_value(i, (data & (1 << i)) ? 1 : 0);
+        output().set_led_value(i, (data & (1 << i)) ? 1 : 0);
     }
 }
 
 WRITE8_MEMBER( marywu_state::ay1_port_b_w )
 {
     for (uint8_t i=0; i<8; i++){
-        output_set_led_value(i+8, (data & (1 << i)) ? 1 : 0);
+        output().set_led_value(i+8, (data & (1 << i)) ? 1 : 0);
     }
 }
 
 WRITE8_MEMBER( marywu_state::ay2_port_a_w )
 {
     for (uint8_t i=0; i<8; i++){
-        output_set_led_value(i+16, (data & (1 << i)) ? 1 : 0);
+        output().set_led_value(i+16, (data & (1 << i)) ? 1 : 0);
     }
 }
 
@@ -124,7 +124,7 @@ WRITE8_MEMBER( marywu_state::ay2_port_b_w )
 {
     for (uint8_t i=0; i<6; i++){
         /* we only have 30 LEDs. The last 2 bits in this port are unused.  */
-        output_set_led_value(i+24, (data & (1 << i)) ? 1 : 0);
+        output().set_led_value(i+24, (data & (1 << i)) ? 1 : 0);
     }
 }
 
@@ -160,8 +160,8 @@ WRITE8_MEMBER( marywu_state::display_7seg_data_w )
 {
     static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // HEF4511BP (7 seg display driver)
 
-    output_set_digit_value(2 * m_selected_7seg_module + 0, patterns[data & 0x0F]);
-    output_set_digit_value(2 * m_selected_7seg_module + 1, patterns[(data >> 4) & 0x0F]);
+    output().set_digit_value(2 * m_selected_7seg_module + 0, patterns[data & 0x0F]);
+    output().set_digit_value(2 * m_selected_7seg_module + 1, patterns[(data >> 4) & 0x0F]);
 }
 
 static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, marywu_state )
