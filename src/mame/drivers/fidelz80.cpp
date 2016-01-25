@@ -593,6 +593,18 @@ expect that the software reads these once on startup only.
 
 ******************************************************************************
 
+Sensory Chess Challenger (SC12-B) (6502 based -> fidel6502.cpp driver)
+---------------------------------
+
+RE information by Berger
+
+
+
+
+
+
+******************************************************************************
+
 Voice Excellence (FEV, model 6092) (6502 based -> fidel6502.cpp driver)
 ----------------------------------
 

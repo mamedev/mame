@@ -12,13 +12,17 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/r65c02.h"
+#include "cpu/m6502/m65sc02.h"
 #include "machine/6821pia.h"
 #include "sound/speaker.h"
 
 #include "includes/fidelz80.h"
 
 // internal artwork
+#include "fidel_sc12.lh"
+#include "fidel_fev.lh"
+
 extern const char layout_fidel_vsc[]; // same layout as fidelz80/vsc
 
 
@@ -221,6 +225,11 @@ static ADDRESS_MAP_START( sc12_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( fev_map, AS_PROGRAM, 8, fidel6502_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
 
 
 /******************************************************************************
@@ -380,17 +389,36 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( sc12, fidel6502_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", R65C02, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(sc12_map)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_vsc)
+	MCFG_DEFAULT_LAYOUT(layout_fidel_sc12)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
+
+
+
+static MACHINE_CONFIG_START( fev, fidel6502_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M65SC02, XTAL_3MHz) // M65SC102 (CMD)
+	MCFG_CPU_PROGRAM_MAP(fev_map)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_fidel_fev)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
+	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidel6502_state, csc_speech_r))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+MACHINE_CONFIG_END
+
 
 /******************************************************************************
     ROM Definitions
@@ -418,7 +446,7 @@ ROM_END
 
 ROM_START( fexcelv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-1080a01.ic5", 0x0000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) )
+	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) )
 
 	ROM_REGION( 0x8000, "speech", 0 )
 	ROM_LOAD("101-1081a01.ic2", 0x0000, 0x8000, CRC(c8ae1607) SHA1(6491ce6be60ed77f3dd931c0ca17616f13af943e) )
@@ -433,4 +461,4 @@ COMP( 1981, csc,     0,      0,      csc,  csc, driver_device,   0, "Fidelity El
 
 COMP( 1984, fscc12,     0,      0,      sc12,  csc, driver_device,   0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_NOT_WORKING )
 
-COMP( 1987, fexcelv,     0,      0,      csc,  csc, driver_device,   0, "Fidelity Electronics", "Voice Excellence", MACHINE_NOT_WORKING )
+COMP( 1987, fexcelv,     0,      0,      fev,  csc, driver_device,   0, "Fidelity Electronics", "Voice Excellence", MACHINE_NOT_WORKING )
