@@ -231,7 +231,8 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 void namco_c45_road_device::device_start()
 {
-	m_clut = memregion("clut")->base();
+	if (memregion("clut") != nullptr)
+		m_clut = memregion("clut")->base();
 
 	// create a tilemap for the road
 	m_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c45_road_device::get_road_info), this),
