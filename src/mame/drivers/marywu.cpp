@@ -31,6 +31,10 @@ public:
 
     DECLARE_WRITE8_MEMBER(display_7seg_data_w);
     DECLARE_WRITE8_MEMBER(multiplex_7seg_w);
+    DECLARE_WRITE8_MEMBER(ay1_port_a_w);
+    DECLARE_WRITE8_MEMBER(ay1_port_b_w);
+    DECLARE_WRITE8_MEMBER(ay2_port_a_w);
+    DECLARE_WRITE8_MEMBER(ay2_port_b_w);
     DECLARE_READ8_MEMBER(keyboard_r);
 private:
     uint8_t m_selected_7seg_module;
@@ -94,6 +98,35 @@ static INPUT_PORTS_START( marywu )
     PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)
 INPUT_PORTS_END
 
+WRITE8_MEMBER( marywu_state::ay1_port_a_w )
+{
+    for (uint8_t i=0; i<8; i++){
+        output_set_led_value(i, (data & (1 << i)) ? 1 : 0);
+    }
+}
+
+WRITE8_MEMBER( marywu_state::ay1_port_b_w )
+{
+    for (uint8_t i=0; i<8; i++){
+        output_set_led_value(i+8, (data & (1 << i)) ? 1 : 0);
+    }
+}
+
+WRITE8_MEMBER( marywu_state::ay2_port_a_w )
+{
+    for (uint8_t i=0; i<8; i++){
+        output_set_led_value(i+16, (data & (1 << i)) ? 1 : 0);
+    }
+}
+
+WRITE8_MEMBER( marywu_state::ay2_port_b_w )
+{
+    for (uint8_t i=0; i<6; i++){
+        /* we only have 30 LEDs. The last 2 bits in this port are unused.  */
+        output_set_led_value(i+24, (data & (1 << i)) ? 1 : 0);
+    }
+}
+
 WRITE8_MEMBER( marywu_state::multiplex_7seg_w )
 {
     m_selected_7seg_module = data;
@@ -154,9 +187,13 @@ static MACHINE_CONFIG_START( marywu , marywu_state )
     MCFG_SPEAKER_STANDARD_MONO("mono")
     MCFG_SOUND_ADD("ay1", AY8910, XTAL_10_738635MHz) /* should it be perhaps a fraction of the XTAL clock ? */
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+    MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(marywu_state, ay1_port_a_w))
+    MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(marywu_state, ay1_port_b_w))
     
     MCFG_SOUND_ADD("ay2", AY8910, XTAL_10_738635MHz) /* should it be perhaps a fraction of the XTAL clock ? */
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+    MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(marywu_state, ay2_port_a_w))
+    MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(marywu_state, ay2_port_b_w))
 MACHINE_CONFIG_END
 
 ROM_START( marywu )
