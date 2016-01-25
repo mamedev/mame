@@ -105,8 +105,6 @@
  *  - Expansion bus
  *  - Expansion overlay
  *
- *  - The md6802 has a strange delay in keyboard input that needs to be investigated
- *
  ****************************************************************************/
 
 #include "emu.h"
@@ -593,7 +591,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
 }
 
 static MACHINE_CONFIG_START( e100, e100_state )
-	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz/4)
+	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(e100_map)
 
 	/* devices */
@@ -602,7 +600,7 @@ static MACHINE_CONFIG_START( e100, e100_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( md6802, md6802_state )
-	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz/4)
+	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(md6802_map)
 	MCFG_DEFAULT_LAYOUT(layout_md6802)
 
