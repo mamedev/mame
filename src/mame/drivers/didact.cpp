@@ -176,7 +176,7 @@ class e100_state : public didact_state
 		m_pia2(*this, "pia2")
 	   { }
 	required_device<m6802_cpu_device> m_maincpu;
-	virtual void machine_reset(){ m_maincpu->reset(); LOG(("--->%s()\n", FUNCNAME)); };
+	virtual void machine_reset() override { m_maincpu->reset(); LOG(("--->%s()\n", FUNCNAME)); };
 protected:
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
