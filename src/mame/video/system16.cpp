@@ -416,7 +416,8 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,system16)
 		m_system18 = 0;
 	}
 
-	setup_system16_bootleg_spritebanking();
+	if (m_sprites.found())
+		setup_system16_bootleg_spritebanking();
 }
 
 VIDEO_START_MEMBER(segas1x_bootleg_state,system18old)
@@ -602,7 +603,8 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen, 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	// start the sprites drawing
-	m_sprites->draw_async(cliprect);
+	if (m_sprites.found())
+		m_sprites->draw_async(cliprect);
 
 	// I can't bring myself to care about dirty tile marking on something which runs at a bazillion % speed anyway, clean code is better
 	m_bg_tilemaps[0]->mark_all_dirty();
@@ -642,6 +644,7 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen, 
 	}
 
 	// mix in sprites
+	if (!m_sprites.found()) return 0;
 	bitmap_ind16 &sprites = m_sprites->bitmap();
 	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
