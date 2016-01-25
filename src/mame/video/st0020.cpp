@@ -19,7 +19,6 @@ st0020_device::st0020_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, ST0020_SPRITES, "Seta ST0020 Sprites", tag, owner, clock, "st0020", __FILE__)
 	, m_gfxdecode(*this)
 	, m_palette(*this)
-	, m_rom_ptr(*this, ":st0020")
 {
 	m_is_st0032 = 0;
 	m_is_jclub2 = 0;
@@ -74,6 +73,19 @@ static const gfx_layout layout_16x8x8_2 =
 
 void st0020_device::device_start()
 {
+	memory_region* rgn = memregion(tag());
+
+	if (rgn)
+	{
+		m_rom_ptr = rgn->base();
+		m_rom_size = rgn->bytes();
+	}
+	else
+	{
+		m_rom_ptr = nullptr;
+		m_rom_size = 0;
+	}
+
 	m_st0020_gfxram = make_unique_clear<UINT16[]>(4 * 0x100000 / 2);
 	m_st0020_spriteram = make_unique_clear<UINT16[]>(0x80000 / 2);
 	m_st0020_blitram = make_unique_clear<UINT16[]>(0x100 / 2);
@@ -190,7 +202,7 @@ WRITE16_MEMBER(st0020_device::st0020_blit_w)
 				return;
 			}
 
-			size_t size =   m_rom_ptr.bytes();
+			size_t size = m_rom_size;
 
 			if ( (src+len <= size) && (dst+len <= 4 * 0x100000) )
 			{
