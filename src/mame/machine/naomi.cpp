@@ -87,13 +87,17 @@ UINT8 naomi_state::asciihex_to_dec(UINT8 in)
 void naomi_state::create_pic_from_retdat()
 {
 	{
-		UINT8* hexregion = memregion("pichex")->base();
-		UINT8* retregion = memregion("picreturn")->base();
-		UINT8* newregion = memregion("pic")->base();
+		memory_region * rgn_hexregion = memregion("pichex");
+		memory_region * rgn_retregion = memregion("picreturn");
+		memory_region * rgn_newregion = memregion("pic");
 		int outcount = 0;
 
-		if (hexregion && retregion && newregion)
+		if (rgn_hexregion && rgn_newregion)
 		{
+			UINT8* hexregion = rgn_hexregion->base();
+			UINT8* newregion = rgn_newregion->base();
+
+
 			int hexoffs = 0;
 			int line;
 
@@ -131,7 +135,12 @@ void naomi_state::create_pic_from_retdat()
 
 			}
 
+			if (rgn_retregion && rgn_newregion)
 			{
+				UINT8* retregion = rgn_retregion->base();
+				UINT8* newregion = rgn_newregion->base();
+
+
 				int i;
 				printf("string 1 (key1)\n");
 				for (i=0;i<7;i++)
@@ -166,8 +175,10 @@ void naomi_state::create_pic_from_retdat()
 				}
 			}
 
-
+			if (rgn_newregion)
 			{
+				UINT8* newregion = rgn_newregion->base();
+
 				FILE *fp;
 				char filename[256];
 				sprintf(filename,"picbin_%s", machine().system().name);
