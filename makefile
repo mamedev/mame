@@ -1179,6 +1179,32 @@ os2_x86: generate $(PROJECTDIR)/gmake-os2/Makefile
 
 
 #-------------------------------------------------
+# gmake-steamlink
+#-------------------------------------------------
+
+$(PROJECTDIR)/gmake-steamlink/Makefile: makefile $(SCRIPTS) $(GENIE)
+ifndef MARVELL_SDK_PATH
+	$(error MARVELL_SDK_PATH is not set)
+endif
+ifndef MARVELL_ROOTFS
+	$(error MARVELL_ROOTFS is not set)
+endif
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=steamlink --gcc_version=$(GCC_VERSION) --USE_BGFX=0 --NO_OPENGL=1 --NO_USE_MIDI=1 --NO_X11=1 --NOASM=1 --SDL_INSTALL_ROOT=$(MARVELL_ROOTFS)/usr  gmake 
+
+.PHONY: steamlink
+ifndef MARVELL_SDK_PATH
+	$(error MARVELL_SDK_PATH is not set)
+endif
+ifndef MARVELL_ROOTFS
+	$(error MARVELL_ROOTFS is not set)
+endif
+steamlink: generate $(PROJECTDIR)/gmake-steamlink/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-steamlink config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-steamlink config=$(CONFIG)
+
+
+
+#-------------------------------------------------
 # cmake
 #-------------------------------------------------
 cmake: generate
