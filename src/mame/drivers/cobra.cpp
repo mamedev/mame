@@ -493,9 +493,16 @@ class cobra_jvs : public jvs_device
 public:
 	cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	DECLARE_WRITE_LINE_MEMBER(coin_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_2_w);
+
 protected:
 	virtual bool switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch) override;
 	virtual bool coin_counters(UINT8 *&buf, UINT8 count) override;
+	virtual void function_list(UINT8 *&buf) override;
+
+private:
+	int m_coin_counter[2];
 };
 
 const device_type COBRA_JVS = &device_creator<cobra_jvs>;
@@ -503,6 +510,35 @@ const device_type COBRA_JVS = &device_creator<cobra_jvs>;
 cobra_jvs::cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: jvs_device(mconfig, COBRA_JVS, "JVS (COBRA)", tag, owner, clock, "cobra_jvs", __FILE__)
 {
+	m_coin_counter[0] = 0;
+	m_coin_counter[1] = 0;
+}
+
+WRITE_LINE_MEMBER(cobra_jvs::coin_1_w)
+{
+	if(state)
+		m_coin_counter[0]++;
+}
+
+WRITE_LINE_MEMBER(cobra_jvs::coin_2_w)
+{
+	if(state)
+		m_coin_counter[1]++;
+}
+
+void cobra_jvs::function_list(UINT8 *&buf)
+{
+	// SW input - 2 players, 13 bits
+	*buf++ = 0x01; *buf++ = 2; *buf++ = 13; *buf++ = 0;
+
+	// Coin input - 2 slots
+	*buf++ = 0x02; *buf++ = 2; *buf++ = 0; *buf++ = 0;
+
+	// Analog input - 8 channels
+	*buf++ = 0x03; *buf++ = 8; *buf++ = 16; *buf++ = 0;
+
+	// Driver out - 6 channels
+	*buf++ = 0x12; *buf++ = 6; *buf++ = 0; *buf++ = 0;
 }
 
 bool cobra_jvs::switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch)
@@ -538,8 +574,10 @@ bool cobra_jvs::coin_counters(UINT8 *&buf, UINT8 count)
 	if (count > 2)
 		return false;
 
-	*buf++ = 0x00;
-	*buf++ = 0x01;
+	*buf++ = m_coin_counter[0] >> 8; *buf++ = m_coin_counter[0];
+
+	if(count > 1)
+		*buf++ = m_coin_counter[1] >> 8; *buf++ = m_coin_counter[1];
 
 	return true;
 }
@@ -744,6 +782,7 @@ public:
 	DECLARE_DRIVER_INIT(racjamdx);
 	DECLARE_DRIVER_INIT(bujutsu);
 	DECLARE_DRIVER_INIT(cobra);
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	UINT32 screen_update_cobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -2249,13 +2288,13 @@ void cobra_renderer::gfx_fifo_exec()
 					// GFX register select
 					m_gfx_register_select = w[3];
 
-					printf("GFX: register select %08X\n", m_gfx_register_select);
+				//	printf("GFX: register select %08X\n", m_gfx_register_select);
 				}
 				else if (w2 == 0x10500018)
 				{
 					// register write to the register selected above?
 					// 64-bit registers, top 32-bits in word 2, low 32-bit in word 3
-					printf("GFX: register write %08X: %08X %08X\n", m_gfx_register_select, w[2], w[3]);
+				//	printf("GFX: register write %08X: %08X %08X\n", m_gfx_register_select, w[2], w[3]);
 
 					gfx_write_reg(((UINT64)(w[2]) << 32) | w[3]);
 				}
@@ -3096,50 +3135,54 @@ ADDRESS_MAP_END
 
 INPUT_PORTS_START( cobra )
 	PORT_START("TEST")
-	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW)            /* Test Button */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_HIGH)            /* Test Button */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1")
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("P1 Service") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
 
 	PORT_START("P2")
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("P2 Service") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
+
+	PORT_START("COINS")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_WRITE_LINE_DEVICE_MEMBER("cobra_jvs1", cobra_jvs, coin_1_w)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2) PORT_WRITE_LINE_DEVICE_MEMBER("cobra_jvs1", cobra_jvs, coin_2_w)
 INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(cobra_state::ide_interrupt)
@@ -3162,6 +3205,17 @@ INTERRUPT_GEN_MEMBER(cobra_state::cobra_vblank)
 		device.execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		m_gfx_unk_flag = 0x80;
 	}
+}
+
+void cobra_state::machine_start()
+{
+	/* configure fast RAM regions for DRC */
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, FALSE, m_main_ram);
+
+	m_subcpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, FALSE, m_sub_ram);
+
+	m_gfxcpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, FALSE, m_gfx_ram0);
+	m_gfxcpu->ppcdrc_add_fastram(0x07c00000, 0x07ffffff, FALSE, m_gfx_ram1);
 }
 
 void cobra_state::machine_reset()
@@ -3246,7 +3300,9 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_K001604_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("cobra_jvs_host", COBRA_JVS_HOST, 4000000)
-	MCFG_JVS_DEVICE_ADD("cobra_jvs", COBRA_JVS, "cobra_jvs_host")
+	MCFG_JVS_DEVICE_ADD("cobra_jvs1", COBRA_JVS, "cobra_jvs_host")
+	MCFG_JVS_DEVICE_ADD("cobra_jvs2", COBRA_JVS, "cobra_jvs_host")
+	MCFG_JVS_DEVICE_ADD("cobra_jvs3", COBRA_JVS, "cobra_jvs_host")
 
 MACHINE_CONFIG_END
 
