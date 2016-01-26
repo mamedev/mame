@@ -92,9 +92,9 @@ static const char g_version[] = "4.90";
 #define MAX_OPCODE_OUTPUT_TABLE_LENGTH 3000 /* Max length of opcode handler tbl */
 
 /* Default filenames */
-#define FILENAME_INPUT      "m68k_in.c"
+#define FILENAME_INPUT      "m68k_in.cpp"
 #define FILENAME_PROTOTYPE  "m68kops.h"
-#define FILENAME_TABLE      "m68kops.c"
+#define FILENAME_TABLE      "m68kops.cpp"
 
 
 /* Identifier sequences recognized by this program */
