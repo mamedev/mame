@@ -4005,6 +4005,8 @@ ROM_START( striderua )
 ROM_END
 
 // 90629B-3 PCB - Converted from an SF2 'inhouse' (but with no official labels etc.)
+// actually an incomplete conversion, layer enables are wrong in a number of places which causes the game to break even on real hardware.
+// this is essentially a Capcom made bootleg of a Capcom game.
 ROM_START( strideruc )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "34.8f", 0x000000, 0x80000, CRC(e0fb5657) SHA1(6c7f668220de80169feea35371aff363f67f7b0c) )
@@ -12025,7 +12027,7 @@ GAME( 1988, daimakai,    ghouls,   cps1_10MHz, daimakai, cps_state,   cps1,     
 GAME( 1988, daimakair,   ghouls,   cps1_12MHz, daimakai, cps_state,   cps1,     ROT0,   "Capcom", "Daimakaimura (Japan Resale Ver.)", MACHINE_SUPPORTS_SAVE )      // Wed.26.10.1988 in the ROMs   // 12MHz verified
 GAME( 1989, strider,     0,        cps1_10MHz, strider,  cps_state,   cps1,     ROT0,   "Capcom", "Strider (USA, B-Board 89624B-2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, striderua,   strider,  cps1_10MHz, stridrua, cps_state,   cps1,     ROT0,   "Capcom", "Strider (USA, B-Board 89624B-3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, strideruc,   strider,  cps1_10MHz, stridrua, cps_state,   cps1,     ROT0,   "Capcom", "Strider (USA, B-Board 90629B-3, Street Fighter II conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, strideruc,   strider,  cps1_10MHz, stridrua, cps_state,   cps1,     ROT0,   "bootleg (Capcom)", "Strider (USA, B-Board 90629B-3, buggy Street Fighter II conversion)", MACHINE_SUPPORTS_SAVE ) // various bugs even on PCB, see rom load
 GAME( 1989, striderj,    strider,  cps1_10MHz, strider,  cps_state,   cps1,     ROT0,   "Capcom", "Strider Hiryu (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, striderjr,   strider,  cps1_12MHz, strider,  cps_state,   cps1,     ROT0,   "Capcom", "Strider Hiryu (Japan Resale Ver.)", MACHINE_SUPPORTS_SAVE ) // 12MHz verified
 GAME( 1989, dynwar,      0,        cps1_10MHz, dynwar,   cps_state,   cps1,     ROT0,   "Capcom", "Dynasty Wars (USA, B-Board 89624B-?)", MACHINE_SUPPORTS_SAVE )  // (c) Capcom U.S.A.
