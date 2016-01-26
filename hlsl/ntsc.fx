@@ -108,7 +108,7 @@ static const int HalfSampleCount = SampleCount / 2;
 
 float4 GetCompositeYIQ(float2 TexCoord)
 {
-	float2 SourceTexelDims = 1.0f / SourceDims;	
+	float2 SourceTexelDims = 1.0f / SourceDims;
 	float2 SourceRes = SourceDims * SourceRect;
 
 	float2 PValueSourceTexel = float2(PValue, 0.0f) * SourceTexelDims;
@@ -131,12 +131,13 @@ float4 GetCompositeYIQ(float2 TexCoord)
 	float4 I = float4(dot(Texel0, IDot), dot(Texel1, IDot), dot(Texel2, IDot), dot(Texel3, IDot));
 	float4 Q = float4(dot(Texel0, QDot), dot(Texel1, QDot), dot(Texel2, QDot), dot(Texel3, QDot));
 
-	float4 W = PI2 * CCValue * ScanTime;
+	float W = PI2 * CCValue * ScanTime;
+	float WoPI = W / PI;
 
-	float4 T = HPosition
-		+ (AValue / 360.0f * SourceRes.y) * VPosition
-		+ (BValue / 360.0f)
-		+ (SignalOffset / 360.0f);
+	float HOffset = (BValue + SignalOffset) / WoPI;
+	float VScale = (AValue * SourceRes.y) / WoPI;
+
+	float4 T = HPosition + HOffset + VPosition * VScale;
 	float4 TW = T * W;
 
 	float4 CompositeYIQ = Y + I * cos(TW) + Q * sin(TW);
@@ -171,7 +172,11 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float PI2Length = PI2 / SampleCount;
 
 	float W = PI2 * CCValue * ScanTime;
-	
+	float WoPI = W / PI;
+
+	float HOffset = (BValue + SignalOffset) / WoPI;
+	float VScale = (AValue * SourceRes.y) / WoPI;
+
 	float4 YAccum = 0.0f;
 	float4 IAccum = 0.0f;
 	float4 QAccum = 0.0f;
@@ -190,12 +195,8 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 		float4 C = GetCompositeYIQ(float2(Cx.r, Cy.r));
 
-		float4 T = HPosition
-			+ (AValue / 360.0f * SourceRes.y) * VPosition
-			+ (BValue / 360.0f)
-			+ (SignalOffset / 360.0f);
-		float4 WT = W * T
-			+ OValue;
+		float4 T = HPosition + HOffset + VPosition * VScale;
+		float4 WT = W * T + OValue;
 
 		float4 SincKernel = 0.54f + 0.46f * cos(PI2Length * n4);
 

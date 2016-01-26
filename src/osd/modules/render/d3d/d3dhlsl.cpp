@@ -990,7 +990,7 @@ int shaders::create_resources(bool reset)
 	deconverge_effect->add_uniform("RadialConvergeY", uniform::UT_VEC3, uniform::CU_CONVERGE_RADIAL_Y);
 
 	focus_effect->add_uniform("Defocus", uniform::UT_VEC2, uniform::CU_FOCUS_SIZE);
-	
+
 	phosphor_effect->add_uniform("Phosphor", uniform::UT_VEC3, uniform::CU_PHOSPHOR_LIFE);
 
 	post_effect->add_uniform("VignettingAmount", uniform::UT_FLOAT, uniform::CU_POST_VIGNETTING); // backward compatibility
@@ -1231,7 +1231,7 @@ int shaders::ntsc_pass(render_target *rt, int source_index, poly_info *poly, int
 	{
 		return next_index;
 	}
-	
+
 	float signal_offset = curr_texture->get_cur_frame() == 0
 		? 0.0f
 		: options->yiq_jitter;
@@ -1241,7 +1241,7 @@ int shaders::ntsc_pass(render_target *rt, int source_index, poly_info *poly, int
 	curr_effect = ntsc_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_float("SignalOffset", signal_offset);
-	
+
 	next_index = rt->next_index(next_index);
 	blit(rt->native_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
 
@@ -2778,7 +2778,7 @@ static INT32 slider_ntsc_enable(running_machine &machine, void *arg, std::string
 }
 
 // static INT32 slider_ntsc_phase_count(running_machine &machine, void *arg, std::string *str, INT32 newval)
-// {	
+// {
 // 	hlsl_options *options = (hlsl_options*)arg;
 // 	if (newval != SLIDER_NOCHANGE)
 // 	{
@@ -3066,7 +3066,7 @@ void uniform::update()
 			break;
 		}
 		case CU_SOURCE_RECT:
-		{			
+		{
 			bool prepare_vector =
 				d3d->window().machine().first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
 
@@ -3076,7 +3076,7 @@ void uniform::update()
 				m_shader->set_vector("SourceRect", 2, delta);
 				break;
 			}
-			
+
 			if (shadersys->curr_texture != NULL)
 			{
 				vec2f delta = shadersys->curr_texture->get_uvstop() - shadersys->curr_texture->get_uvstart();
