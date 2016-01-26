@@ -53,7 +53,7 @@ public:
 	optional_region_ptr<UINT8> m_gfx_region7;
 	optional_region_ptr<UINT8> m_gfx_region8;
 
-	static memory_region * gfxregions[];
+	memory_region * m_gfxregions[8];
 
 	// up to 8 layers, 2 images per layer (interleaved on screen)
 	std::unique_ptr<UINT8[]>  m_pixmap[8][2];
