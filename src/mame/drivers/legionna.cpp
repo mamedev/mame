@@ -1534,7 +1534,7 @@ ROM_START( legionna )
 	ROM_LOAD( "copx-d1.u0330",  0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) ) /* not dumped from this PCB assumed to be the same */
 
 	ROM_REGION( 0x200, "proms", 0 ) /* Priority? */
-	ROM_LOAD( "leg007.u091",   0x000000, 0x000200, NO_DUMP ) /* N82S147N type BPROM */
+	ROM_LOAD( "leg007.u0910",   0x000000, 0x000200, CRC(cc6da568) SHA1(cde01291f32def1ce291d7b558f64ce0758cf379) ) /* N82S147N type BPROM */
 ROM_END
 
 ROM_START( legionnaj )
@@ -1582,7 +1582,7 @@ ROM_START( legionnaj )
 	ROM_LOAD( "copx-d1.u0330",  0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) ) /* not dumped from this PCB assumed to be the same */
 
 	ROM_REGION( 0x200, "proms", 0 ) /* Priority? */
-	ROM_LOAD( "leg007.u091",   0x000000, 0x000200, NO_DUMP ) /* N82S147N type BPROM */
+	ROM_LOAD( "leg007.u0910",   0x000000, 0x000200, CRC(cc6da568) SHA1(cde01291f32def1ce291d7b558f64ce0758cf379) ) /* N82S147N type BPROM */
 ROM_END
 
 ROM_START( legionnau )
@@ -1630,7 +1630,7 @@ ROM_START( legionnau )
 	ROM_LOAD( "copx-d1.u0330",  0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) ) /* not dumped from this PCB assumed to be the same */
 
 	ROM_REGION( 0x200, "proms", 0 ) /* Priority? */
-	ROM_LOAD( "leg007.u091",   0x000000, 0x000200, NO_DUMP ) /* N82S147N type BPROM */
+	ROM_LOAD( "leg007.u0910",   0x000000, 0x000200, CRC(cc6da568) SHA1(cde01291f32def1ce291d7b558f64ce0758cf379) ) /* N82S147N type BPROM */
 ROM_END
 
 ROM_START( heatbrl )
