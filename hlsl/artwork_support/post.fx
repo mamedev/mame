@@ -66,6 +66,7 @@ struct PS_INPUT
 
 static const float Epsilon = 1.0e-7f;
 static const float PI = 3.1415927f;
+static const float PHI = 1.618034f;
 static const float E = 2.7182817f;
 static const float Gelfond = 23.140692f; // e^pi (Gelfond constant)
 static const float GelfondSchneider = 2.6651442f; // 2^sqrt(2) (Gelfond-Schneider constant)
