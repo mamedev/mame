@@ -462,9 +462,12 @@ static inline void write64le_with_32le_device_handler(write32_delegate handler, 
 
 static inline UINT64 read64be_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, UINT64 mem_mask)
 {
-	UINT64 result;
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	result = read64le_with_32le_device_handler(handler, space, offset, mem_mask);
+	UINT64 result = 0;
+	if (ACCESSING_BITS_0_31)
+		result = (UINT64)(handler)(space, offset * 2, mem_mask & 0xffffffff);
+	if (ACCESSING_BITS_32_63)
+		result |= (UINT64)(handler)(space, offset * 2 + 1, mem_mask >> 32) << 32;
 	return FLIPENDIAN_INT64(result);
 }
 
@@ -473,7 +476,10 @@ static inline void write64be_with_32le_device_handler(write32_delegate handler, 
 {
 	data = FLIPENDIAN_INT64(data);
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	write64le_with_32le_device_handler(handler, space, offset, data, mem_mask);
+	if (ACCESSING_BITS_0_31)
+		handler(space, offset * 2, data & 0xffffffff, mem_mask & 0xffffffff);
+	if (ACCESSING_BITS_32_63)
+		handler(space, offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
 
 /*****************************************************************************/
