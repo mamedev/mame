@@ -4,6 +4,10 @@
 // Distortion Effect
 //-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
+// Sampler Definitions
+//-----------------------------------------------------------------------------
+
 texture DiffuseTexture;
 
 sampler DiffuseSampler = sampler_state
@@ -55,11 +59,6 @@ static const float GelfondSchneider = 2.6651442f; // 2^sqrt(2) (Gelfond-Schneide
 // Functions
 //-----------------------------------------------------------------------------
 
-bool xor(bool a, bool b)
-{
-	return (a || b) && !(a && b);
-}
-
 // www.stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader/
 float random(float2 seed)
 {
@@ -109,7 +108,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 }
 
 //-----------------------------------------------------------------------------
-// Post-Processing Pixel Shader
+// Distortion Pixel Shader
 //-----------------------------------------------------------------------------
 
 uniform float CurvatureAmount = 0.0f;
@@ -118,8 +117,6 @@ uniform float SmoothBorderAmount = 0.0f;
 uniform float VignettingAmount = 0.0f;
 uniform float ReflectionAmount = 0.0f;
 
-uniform bool OrientationSwapXY = false; // false landscape, true portrait for default screen orientation
-uniform bool RotationSwapXY = false; // swapped default screen orientation due to screen rotation
 uniform int RotationType = 0; // 0 = 0°, 1 = 90°, 2 = 180°, 3 = 270°
 
 float2 GetRatioCorrection()
@@ -299,10 +296,10 @@ float4 ps_main(PS_INPUT Input) : COLOR
 }
 
 //-----------------------------------------------------------------------------
-// Distortion Effect
+// Distortion Technique
 //-----------------------------------------------------------------------------
 
-technique DistortionTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{
