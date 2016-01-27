@@ -370,17 +370,37 @@ static ADDRESS_MAP_START( ppj_map, AS_PROGRAM, 8, kurukuru_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppj_io, AS_IO, 8, kurukuru_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0f) AM_WRITE(kurukuru_bankswitch_w)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0x0c) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
+	AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_WRITE(kurukuru_soundlatch_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_READ_PORT("DSW1")
+	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_WRITE(kurukuru_out_latch_w)
 	AM_RANGE(0x60, 0x60) AM_MIRROR(0x0f) AM_READ_PORT("IN1")
 	AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) AM_READ_PORT("IN0")
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVWRITE("ym2149", ay8910_device, address_w)
 	AM_RANGE(0xc8, 0xc8) AM_MIRROR(0x0f) AM_DEVREAD("ym2149", ay8910_device, data_r)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_DEVWRITE("ym2149", ay8910_device, data_w)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
+/*
 
+ 00h  W --> bankswitching reg...
+ 
+ 10h  W --> 00's           \
+ 11h  W --> 02 8f 20 91...  > V9938 OK
+ 13h  W -->                /
+
+ 30h  W --> soundlatch...
+ 40h R  --> (very begining) seems DSW1
+ 50h  W --> Output port (counters)
+ 60h R  --> Input port
+ 70h R  --> Input port
+
+ C0h  W --> YM2149 address W
+ C8h R  --> YM2149 data R --> DSW2
+ D0h  W --> YM2149 data W
+
+*/
 
 // Audio CPU
 
