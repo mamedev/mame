@@ -16,6 +16,9 @@
 #include "cpu/m6502/m65sc02.h"
 #include "machine/6821pia.h"
 #include "sound/speaker.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+#include "softlist.h"
 
 #include "includes/fidelz80.h"
 
@@ -32,12 +35,14 @@ public:
 	fidel6502_state(const machine_config &mconfig, device_type type, const char *tag)
 		: fidelz80base_state(mconfig, type, tag),
 		m_6821pia(*this, "6821pia"),
+		m_cart(*this, "cartslot"),
 		m_speaker(*this, "speaker"),
 		m_irq_off(*this, "irq_off")
 	{ }
 
 	// devices/pointers
 	optional_device<pia6821_device> m_6821pia;
+	optional_device<generic_slot_device> m_cart;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<timer_device> m_irq_off;
 
@@ -57,6 +62,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(csc_pia1_cb1_r);
 
 	// model SC12
+	DECLARE_MACHINE_START(sc12);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(scc_cartridge);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off);
 	TIMER_DEVICE_CALLBACK_MEMBER(sc12_irq);
 	DECLARE_WRITE8_MEMBER(sc12_control_w);
@@ -203,6 +210,34 @@ WRITE_LINE_MEMBER(fidel6502_state::csc_pia1_ca2_w)
     SC12
 ******************************************************************************/
 
+// cartridge
+
+DEVICE_IMAGE_LOAD_MEMBER(fidel6502_state, scc_cartridge)
+{
+	UINT32 size = m_cart->common_get_size("rom");
+
+	// max size is 16KB
+	if (size > 0x4000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
+		return IMAGE_INIT_FAIL;
+	}
+
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return IMAGE_INIT_PASS;
+}
+
+MACHINE_START_MEMBER(fidel6502_state, sc12)
+{
+	if (m_cart->exists())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+
+	fidelz80base_state::machine_start();
+}
+
+
 // interrupt handling
 
 TIMER_DEVICE_CALLBACK_MEMBER(fidel6502_state::irq_off)
@@ -331,7 +366,7 @@ static INPUT_PORTS_START( csc )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
-	PORT_BIT(0x100,IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV") PORT_CODE(KEYCODE_L) // level
+	PORT_BIT(0x100,IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV") PORT_CODE(KEYCODE_L)
 
 	PORT_START("IN.4")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
@@ -384,8 +419,8 @@ static INPUT_PORTS_START( csc )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Bishop") PORT_CODE(KEYCODE_4)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Queen") PORT_CODE(KEYCODE_5)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("King") PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL) // clear
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) // reset
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R)
 	PORT_BIT(0x100,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_UNUSED
 INPUT_PORTS_END
 
@@ -477,8 +512,8 @@ static INPUT_PORTS_START( sc12 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV / Rook") PORT_CODE(KEYCODE_4)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PV / Queen") PORT_CODE(KEYCODE_5)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PB / King") PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL) // clear
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) // reset
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R)
 INPUT_PORTS_END
 
 
@@ -533,10 +568,19 @@ static MACHINE_CONFIG_START( sc12, fidel6502_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_sc12)
 
+	MCFG_MACHINE_START_OVERRIDE(fidel6502_state, sc12)
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* cartridge */
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
+	MCFG_GENERIC_EXTENSIONS("bin,dat")
+	MCFG_GENERIC_LOAD(fidel6502_state, scc_cartridge)
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( fev, fidel6502_state )

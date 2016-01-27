@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="fidel_scc" description="Fidelity SCC Modules">
+
+<!-- Sensory Chess Challenger: 9, 12, A/S, .. -->
+
+	<software name="cb16">
+		<description>Challenger Book Openings 2</description>
+		<year>1982</year>
+		<publisher>Fidelity Electronics</publisher>
+		<part name="cart" interface="fidel_scc">
+			<dataarea name="rom" size="0x4000">
+				<rom name="101-1042a01" size="0x2000" crc="591b3e4a" sha1="f75ae850f2f70808b5423f847ff12ee890752bf8" offset="0x0000" />
+				<rom name="101-1042a02" size="0x2000" crc="1bdf0a21" sha1="1c6f673c0bf846e705d15c802f433ac1dc9b153c" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

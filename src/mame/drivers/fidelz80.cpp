@@ -3,17 +3,40 @@
 /******************************************************************************
 
     Fidelity Electronics Z80 based board driver
-    for 6502 based boards, see drivers/fidel6502.cpp
-
-    Detailed RE work done by Kevin 'kevtris' Horton, except where noted
+    for 6502 based boards, see drivers/fidel6502.cpp (documentation is in this driver)
 
     TODO:
     - Figure out why it says the first speech line twice; it shouldn't?
       It sometimes does this on Voice Sensory Chess Challenger real hardware.
       It can also be heard on Advanced Voice Chess Challenger real hardware, but not the whole line:
       "I I am Fidelity's chess challenger", instead.
-    - Get rom locations from pcb (done for UVC, VCC is probably similar)
     - correctly hook up VBRC speech so that the z80 is halted while words are being spoken
+
+    Read the official manual(s) on how to play.
+    
+    Keypad legend:
+    - RE: Reset
+    - CL: Clear
+    - EN: Enter
+    - PB: Problem Mode
+    - PV: Position Verification
+    - LV: Playing Levels
+    - TB: Take Back
+    - DM: Display Move/Double Move
+    - RV: Reverse
+    
+    Peripherals, compatible with various boards:
+    - Fidelity Challenger Printer - thermal printer, MCU=?
+    
+    Program/data cartridges, for various boards, some cross-compatible:
+    - CG6: Greatest Chess Games 1
+    - CAC: Challenger Advanced Chess - 8KB 101-1038A01
+    - CB9: Challenger Book Openings 1 - 8KB?
+    - CB16: Challenger Book Openings 2 - 8+8KB 101-1042A01,02
+    - others are alt. titles of these?
+    
+    Board hardware descriptions below.
+    Detailed RE work done by Kevin 'kevtris' Horton, except where noted
 
 ***********************************************************************
 
@@ -305,7 +328,7 @@ A detailed description of the hardware can be found also in the patent 4,373,719
 
 ******************************************************************************
 
-Champion Sensory Chess Challenger (CSC) (6502 based -> fidel6502.cpp driver)
+Champion Sensory Chess Challenger (CSC)
 ---------------------------------------
 
 Memory map:
@@ -594,10 +617,11 @@ expect that the software reads these once on startup only.
 
 ******************************************************************************
 
-Sensory Chess Challenger (SC12-B) (6502 based -> fidel6502.cpp driver)
+Sensory Chess Challenger (SC12-B)
+4 versions are known to exist: A,B,C, and X, with increasing CPU speed.
 ---------------------------------
 
-RE information by Berger
+RE information from netlist by Berger
 
 8*(8+1) buttons, 8+8+2 red LEDs
 DIN 41524C printer port
@@ -637,7 +661,7 @@ If control Q4 is set, printer data can be read from I0.
 
 ******************************************************************************
 
-Voice Excellence (FEV, model 6092) (6502 based -> fidel6502.cpp driver)
+Voice Excellence (FEV, model 6092)
 ----------------------------------
 
 PCB 1: 510.1117A02, appears to be identical to other "Excellence" boards
