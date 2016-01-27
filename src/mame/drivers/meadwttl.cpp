@@ -41,7 +41,7 @@
 class meadwttl_state : public driver_device
 {
 public:
-	meadwttl_state(const machine_config &mconfig, device_type type, std::string tag)
+	meadwttl_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_video(*this, "fixfreq")
@@ -119,9 +119,9 @@ ROM_START( bombaway )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0400, "roms", ROMREGION_ERASE00 )
-	ROM_LOAD( "bombs.j3",      0x0000, 0x0200, CRC(d1e3ddfd) SHA1(268915eba79179b7329076c875172f910cf77930) )
-	ROM_LOAD( "bombs.j4",      0x0000, 0x0200, CRC(95108ae8) SHA1(872596a666bfc03fcc40b1f8c532d41951b0b506) )
-	ROM_LOAD( "bombs.j5",      0x0000, 0x0200, CRC(3804bc84) SHA1(ba943bdb3fa1ab8210da0d4613a641fd2578eca2) )
+	ROM_LOAD( "b.3j",      0x0000, 0x0200, CRC(d1e3ddfd) SHA1(268915eba79179b7329076c875172f910cf77930) ) // bottom row (4 point) ship graphic
+	ROM_LOAD( "c.4j",      0x0000, 0x0200, CRC(95108ae8) SHA1(872596a666bfc03fcc40b1f8c532d41951b0b506) ) // middle row (2 point) ship graphic
+	ROM_LOAD( "a.5j",      0x0000, 0x0200, CRC(3804bc84) SHA1(ba943bdb3fa1ab8210da0d4613a641fd2578eca2) ) // top row (1 point) ship graphic
 ROM_END
 
 ROM_START( ckidzo )

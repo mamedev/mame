@@ -136,7 +136,7 @@ static const UINT8 teleprinter_font[128*8] =
 	0x2a,0x15,0x2a,0x15,0x2a,0x15,0x2a,0x15
 };
 
-teleprinter_device::teleprinter_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+teleprinter_device::teleprinter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: generic_terminal_device(mconfig, TELEPRINTER, "Teleprinter", tag, owner, clock, "teleprinter", __FILE__)
 {
 }

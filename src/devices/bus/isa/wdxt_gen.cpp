@@ -189,7 +189,7 @@ machine_config_constructor wdxt_gen_device::device_mconfig_additions() const
 //  wdxt_gen_device - constructor
 //-------------------------------------------------
 
-wdxt_gen_device::wdxt_gen_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+wdxt_gen_device::wdxt_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ISA8_WDXT_GEN, "Western Digital WDXT-GEN (Amstrad PC1512/1640)", tag, owner, clock, "wdxt_gen", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
 		m_maincpu(*this, WD1015_TAG),

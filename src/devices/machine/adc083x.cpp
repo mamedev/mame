@@ -51,7 +51,7 @@ const device_type ADC0832 = &device_creator<adc0832_device>;
 const device_type ADC0834 = &device_creator<adc0834_device>;
 const device_type ADC0838 = &device_creator<adc0838_device>;
 
-adc083x_device::adc083x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+adc083x_device::adc083x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_cs(0),
 	m_clk(0),
@@ -68,25 +68,25 @@ adc083x_device::adc083x_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-adc0831_device::adc0831_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+adc0831_device::adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: adc083x_device(mconfig, ADC0831, "ADC0831", tag, owner, clock, "adc0831", __FILE__)
 {
 	m_mux_bits = 0;
 }
 
-adc0832_device::adc0832_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+adc0832_device::adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: adc083x_device(mconfig, ADC0832, "ADC0832", tag, owner, clock, "adc0832", __FILE__)
 {
 	m_mux_bits = 2;
 }
 
-adc0834_device::adc0834_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+adc0834_device::adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: adc083x_device(mconfig, ADC0834, "ADC0834", tag, owner, clock, "adc0834", __FILE__)
 {
 	m_mux_bits = 3;
 }
 
-adc0838_device::adc0838_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+adc0838_device::adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: adc083x_device(mconfig, ADC0838, "ADC0838", tag, owner, clock, "adc0838", __FILE__)
 {
 	m_mux_bits = 4;
@@ -144,7 +144,7 @@ WRITE_LINE_MEMBER( adc083x_device::cs_write )
 {
 	if( m_cs != state )
 	{
-		verboselog( 2, *this, "adc083x_cs_write( %s, %d )\n", tag().c_str(), state );
+		verboselog( 2, *this, "adc083x_cs_write( %s, %d )\n", tag(), state );
 	}
 
 	if( m_cs == 0 && state != 0 )
@@ -259,7 +259,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 {
 	if( m_clk != state )
 	{
-		verboselog( 2, *this, "adc083x_clk_write( %s, %d )\n", tag().c_str(), state );
+		verboselog( 2, *this, "adc083x_clk_write( %s, %d )\n", tag(), state );
 	}
 
 	if( m_cs == 0 )
@@ -271,7 +271,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 			case STATE_WAIT_FOR_START:
 				if( m_di != 0 )
 				{
-					verboselog( 1, *this, "adc083x %s got start bit\n", tag().c_str() );
+					verboselog( 1, *this, "adc083x %s got start bit\n", tag() );
 					m_state = STATE_SHIFT_MUX;
 					m_sars = 0;
 					m_sgl = 0;
@@ -282,7 +282,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 				}
 				else
 				{
-					verboselog( 1, *this, "adc083x %s not start bit\n", tag().c_str() );
+					verboselog( 1, *this, "adc083x %s not start bit\n", tag() );
 				}
 				break;
 
@@ -294,7 +294,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 					{
 						m_sgl = 1;
 					}
-					verboselog( 1, *this, "adc083x %s sgl <- %d\n", tag().c_str(), m_sgl );
+					verboselog( 1, *this, "adc083x %s sgl <- %d\n", tag(), m_sgl );
 					break;
 
 				case 1:
@@ -302,7 +302,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 					{
 						m_odd = 1;
 					}
-					verboselog( 1, *this, "adc083x %s odd <- %d\n", tag().c_str(), m_odd );
+					verboselog( 1, *this, "adc083x %s odd <- %d\n", tag(), m_odd );
 					break;
 
 				case 2:
@@ -310,7 +310,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 					{
 						m_sel1 = 1;
 					}
-					verboselog( 1, *this, "adc083x %s sel1 <- %d\n", tag().c_str(), m_sel1 );
+					verboselog( 1, *this, "adc083x %s sel1 <- %d\n", tag(), m_sel1 );
 					break;
 
 				case 3:
@@ -318,7 +318,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 					{
 						m_sel0 = 1;
 					}
-					verboselog( 1, *this, "adc083x %s sel0 <- %d\n", tag().c_str(), m_sel0 );
+					verboselog( 1, *this, "adc083x %s sel0 <- %d\n", tag(), m_sel0 );
 					break;
 				}
 
@@ -334,11 +334,11 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 				m_sars = 0;
 				if( type() == ADC0838 && m_se != 0 )
 				{
-					verboselog( 1, *this, "adc083x %s not se\n", tag().c_str() );
+					verboselog( 1, *this, "adc083x %s not se\n", tag() );
 				}
 				else
 				{
-					verboselog( 1, *this, "adc083x %s got se\n", tag().c_str() );
+					verboselog( 1, *this, "adc083x %s got se\n", tag() );
 					m_state = STATE_OUTPUT_LSB_FIRST;
 					m_bit = 1;
 				}
@@ -351,7 +351,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 			switch( m_state )
 			{
 			case STATE_MUX_SETTLE:
-				verboselog( 1, *this, "adc083x %s mux settle\n", tag().c_str() );
+				verboselog( 1, *this, "adc083x %s mux settle\n", tag() );
 				m_output = conversion();
 				m_state = STATE_OUTPUT_MSB_FIRST;
 				m_bit = 7;
@@ -361,7 +361,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 
 			case STATE_OUTPUT_MSB_FIRST:
 				m_do = ( m_output >> m_bit ) & 1;
-				verboselog( 1, *this, "adc083x %s msb %d -> %d\n", tag().c_str(), m_bit, m_do );
+				verboselog( 1, *this, "adc083x %s msb %d -> %d\n", tag(), m_bit, m_do );
 
 				m_bit--;
 				if( m_bit < 0 )
@@ -379,7 +379,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
 
 			case STATE_OUTPUT_LSB_FIRST:
 				m_do = ( m_output >> m_bit ) & 1;
-				verboselog( 1, *this, "adc083x %s lsb %d -> %d\n", tag().c_str(), m_bit, m_do );
+				verboselog( 1, *this, "adc083x %s lsb %d -> %d\n", tag(), m_bit, m_do );
 
 				m_bit++;
 				if( m_bit == 8 )
@@ -407,7 +407,7 @@ WRITE_LINE_MEMBER( adc083x_device::di_write )
 {
 	if( m_di != state )
 	{
-		verboselog( 2, *this, "adc083x_di_write( %s, %d )\n", tag().c_str(), state );
+		verboselog( 2, *this, "adc083x_di_write( %s, %d )\n", tag(), state );
 	}
 
 	m_di = state;
@@ -421,7 +421,7 @@ WRITE_LINE_MEMBER( adc083x_device::se_write )
 {
 	if( m_se != state )
 	{
-		verboselog( 2, *this, "adc083x_se_write( %s, %d )\n", tag().c_str(), state );
+		verboselog( 2, *this, "adc083x_se_write( %s, %d )\n", tag(), state );
 	}
 
 	m_se = state;
@@ -433,7 +433,7 @@ WRITE_LINE_MEMBER( adc083x_device::se_write )
 
 READ_LINE_MEMBER( adc083x_device::sars_read )
 {
-	verboselog( 1, *this, "adc083x_sars_read( %s ) %d\n", tag().c_str(), m_sars );
+	verboselog( 1, *this, "adc083x_sars_read( %s ) %d\n", tag(), m_sars );
 	return m_sars;
 }
 
@@ -443,6 +443,6 @@ READ_LINE_MEMBER( adc083x_device::sars_read )
 
 READ_LINE_MEMBER( adc083x_device::do_read )
 {
-	verboselog( 1, *this, "adc083x_do_read( %s ) %d\n", tag().c_str(), m_do );
+	verboselog( 1, *this, "adc083x_do_read( %s ) %d\n", tag(), m_do );
 	return m_do;
 }

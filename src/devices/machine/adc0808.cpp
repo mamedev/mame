@@ -23,7 +23,7 @@ const device_type ADC0808 = &device_creator<adc0808_device>;
 //  adc0808_device - constructor
 //-------------------------------------------------
 
-adc0808_device::adc0808_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+adc0808_device::adc0808_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ADC0808, "ADC0808", tag, owner, clock, "adc0808", __FILE__),
 		m_out_eoc_cb(*this),
 		m_address(0),

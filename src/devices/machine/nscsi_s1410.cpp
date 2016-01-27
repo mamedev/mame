@@ -4,7 +4,7 @@
 
 const device_type NSCSI_S1410 = &device_creator<nscsi_s1410_device>;
 
-nscsi_s1410_device::nscsi_s1410_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+nscsi_s1410_device::nscsi_s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	nscsi_harddisk_device(mconfig, NSCSI_S1410, "S1410", tag, owner, clock, "scsi_s1410", __FILE__)
 {
 }
@@ -64,7 +64,7 @@ void nscsi_s1410_device::scsi_command()
 		memset(&data[0], 0xc6, track_length);
 
 		if(!hard_disk_write(harddisk, lba, &data[0])) {
-			logerror("%s: HD WRITE ERROR !\n", tag().c_str());
+			logerror("%s: HD WRITE ERROR !\n", tag());
 			scsi_status_complete(SS_FORMAT_ERROR);
 		} else {
 			scsi_status_complete(SS_GOOD);
@@ -115,7 +115,7 @@ void nscsi_s1410_device::scsi_command()
 		break;
 
 	default:
-		logerror("%s: command %02x ***UNKNOWN***\n", tag().c_str(), scsi_cmdbuf[0]);
+		logerror("%s: command %02x ***UNKNOWN***\n", tag(), scsi_cmdbuf[0]);
 		break;
 	}
 }

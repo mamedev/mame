@@ -102,7 +102,7 @@ X - change banks
 class bigbord2_state : public driver_device
 {
 public:
-	bigbord2_state(const machine_config &mconfig, device_type type, std::string tag)
+	bigbord2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_6845(*this, "crtc"),
@@ -471,7 +471,6 @@ void bigbord2_state::machine_reset()
 	for (i = 0; i < 8; i++)
 		m_c8[i] = 0;
 	m_beeper->set_state(0);
-	m_beeper->set_frequency(950); // actual frequency is unknown
 	m_bankr->set_entry(0);
 	m_bankv->set_entry(0);
 	m_banka->set_entry(0);
@@ -595,7 +594,7 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 950) // actual frequency is unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

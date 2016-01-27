@@ -11,7 +11,7 @@
 class quasar_state : public cvs_state
 {
 public:
-	quasar_state(const machine_config &mconfig, device_type type, std::string tag)
+	quasar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cvs_state(mconfig, type, tag) { }
 
 	std::unique_ptr<UINT8[]>    m_effectram;

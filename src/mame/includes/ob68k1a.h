@@ -26,7 +26,7 @@
 class ob68k1a_state : public driver_device
 {
 public:
-	ob68k1a_state(const machine_config &mconfig, device_type type, std::string tag)
+	ob68k1a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, MC68000L10_TAG),
 			m_dbrg(*this, COM8116_TAG),

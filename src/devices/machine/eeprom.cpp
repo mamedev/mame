@@ -44,8 +44,8 @@ ADDRESS_MAP_END
 //  eeprom_base_device - constructor
 //-------------------------------------------------
 
-eeprom_base_device::eeprom_base_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source)
-	: device_t(mconfig, devtype, name, tag, owner, 0, shortname, source),
+eeprom_base_device::eeprom_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
+	: device_t(mconfig, devtype, name, tag, owner, 0, shortname, file),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 		m_cells(0),
@@ -292,12 +292,12 @@ void eeprom_base_device::nvram_default()
 	if (m_region != nullptr)
 	{
 		if (m_region->bytes() != eeprom_bytes)
-			fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)\n", tag().c_str(), eeprom_bytes);
+			fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)\n", tag(), eeprom_bytes);
 		if (m_data_bits == 8 && m_region->bytewidth() != 1)
-			fatalerror("eeprom region '%s' needs to be an 8-bit region\n", tag().c_str());
+			fatalerror("eeprom region '%s' needs to be an 8-bit region\n", tag());
 		if (m_data_bits == 16 && (m_region->bytewidth() != 2 || m_region->endianness() != ENDIANNESS_BIG))
-			fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region\n", tag().c_str());
-		osd_printf_verbose("Loading data from EEPROM region '%s'\n", tag().c_str());
+			fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region\n", tag());
+		osd_printf_verbose("Loading data from EEPROM region '%s'\n", tag());
 
 		if (m_data_bits == 8)
 		{

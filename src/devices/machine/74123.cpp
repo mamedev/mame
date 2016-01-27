@@ -28,7 +28,7 @@ const device_type TTL74123 = &device_creator<ttl74123_device>;
 //  ttl74123_device - constructor
 //-------------------------------------------------
 
-ttl74123_device::ttl74123_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ttl74123_device::ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TTL74123, "74123 TTL", tag, owner, clock, "ttl74123", __FILE__), m_timer(nullptr),
 		m_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE),
 		m_res(1.0),
@@ -135,7 +135,7 @@ void ttl74123_device::set_output()
 
 	machine().scheduler().timer_set( attotime::zero, timer_expired_delegate(FUNC(ttl74123_device::output_callback ),this), output);
 
-	if (LOG) logerror("74123 %s:  Output: %d\n", tag().c_str(), output);
+	if (LOG) logerror("74123 %s:  Output: %d\n", tag(), output);
 }
 
 
@@ -167,11 +167,11 @@ void ttl74123_device::start_pulse()
 		{
 			m_timer->adjust(duration);
 
-			if (LOG) logerror("74123 %s:  Retriggering pulse.  Duration: %f\n", tag().c_str(), duration.as_double());
+			if (LOG) logerror("74123 %s:  Retriggering pulse.  Duration: %f\n", tag(), duration.as_double());
 		}
 		else
 		{
-			if (LOG) logerror("74123 %s:  Retriggering failed.\n", tag().c_str());
+			if (LOG) logerror("74123 %s:  Retriggering failed.\n", tag());
 		}
 	}
 	else
@@ -181,7 +181,7 @@ void ttl74123_device::start_pulse()
 
 		set_output();
 
-		if (LOG) logerror("74123 %s:  Starting pulse.  Duration: %f\n", tag().c_str(), duration.as_double());
+		if (LOG) logerror("74123 %s:  Starting pulse.  Duration: %f\n", tag(), duration.as_double());
 	}
 }
 
@@ -233,7 +233,7 @@ WRITE8_MEMBER( ttl74123_device::clear_w)
 	{
 		m_timer->adjust(attotime::zero);
 
-		if (LOG) logerror("74123 #%s:  Cleared\n", tag().c_str() );
+		if (LOG) logerror("74123 #%s:  Cleared\n", tag() );
 	}
 	m_clear = data;
 }

@@ -18,7 +18,7 @@
 class asic65_device : public device_t
 {
 public:
-	asic65_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// (static) configuration helpers
 	static void set_type(device_t &device, int type) { downcast<asic65_device &>(device).m_asic65_type = type; }

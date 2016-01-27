@@ -16,7 +16,7 @@
 class mz6500_state : public driver_device
 {
 public:
-	mz6500_state(const machine_config &mconfig, device_type type, std::string tag)
+	mz6500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_hgdc(*this, "upd7220"),
 		m_fdc(*this, "upd765"),

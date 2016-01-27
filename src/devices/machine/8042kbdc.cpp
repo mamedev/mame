@@ -196,7 +196,7 @@ const device_type KBDC8042 = &device_creator<kbdc8042_device>;
 //  kbdc8042_device - constructor
 //-------------------------------------------------
 
-kbdc8042_device::kbdc8042_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, KBDC8042, "8042 Keyboard Controller", tag, owner, clock, "kbdc8042", __FILE__)
 	, m_keyboard_dev(*this, "at_keyboard")
 	, m_system_reset_cb(*this)

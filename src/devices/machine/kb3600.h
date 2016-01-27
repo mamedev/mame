@@ -101,7 +101,7 @@ class ay3600_device :   public device_t
 {
 public:
 	// construction/destruction
-	ay3600_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ay3600_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// public interface
 	UINT16 b_r();

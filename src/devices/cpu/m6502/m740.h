@@ -36,8 +36,8 @@ public:
 			M740_SET_OVERFLOW = m6502_device::V_LINE
 		};
 
-		m740_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-		m740_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+		m740_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		m740_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 		virtual void device_start() override;
 		virtual void device_reset() override;

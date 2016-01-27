@@ -55,7 +55,7 @@ const device_type TTL7474 = &device_creator<ttl7474_device>;
 //  ttl7474_device - constructor
 //-------------------------------------------------
 
-ttl7474_device::ttl7474_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ttl7474_device::ttl7474_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TTL7474, "7474 TTL", tag, owner, clock, "7474", __FILE__),
 		m_output_func(*this),
 		m_comp_output_func(*this)

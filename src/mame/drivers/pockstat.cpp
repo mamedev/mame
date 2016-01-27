@@ -104,7 +104,7 @@ struct ps_rtc_regs_t
 class pockstat_state : public driver_device
 {
 public:
-	pockstat_state(const machine_config &mconfig, device_type type, std::string tag)
+	pockstat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_lcd_buffer(*this, "lcd_buffer"),
 		m_maincpu(*this, "maincpu"),

@@ -576,7 +576,6 @@ void osd_subst_env(char **dst, const char *src)
 	// start with an environment variable?
 	if (*dst[0] == '$')
 	{
-
 		envstr = (char *) osd_malloc_array(strlen(src)+1);
 		strcpy(envstr, src);
 

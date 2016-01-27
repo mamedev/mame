@@ -35,7 +35,7 @@ class prof80_mmu_device : public device_t,
 							public device_memory_interface
 {
 public:
-	prof80_mmu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	prof80_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual DECLARE_ADDRESS_MAP(z80_program_map, 8);
 

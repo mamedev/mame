@@ -28,7 +28,7 @@
 class mbdtower_state : public hh_tms1k_state
 {
 public:
-	mbdtower_state(const machine_config &mconfig, device_type type, std::string tag)
+	mbdtower_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 

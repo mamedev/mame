@@ -45,7 +45,7 @@ ADDRESS_MAP_END
 //  c352_device - constructor
 //-------------------------------------------------
 
-c352_device::c352_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+c352_device::c352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, C352, "C352", tag, owner, clock, "c352", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),

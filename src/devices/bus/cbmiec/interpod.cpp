@@ -153,7 +153,7 @@ machine_config_constructor interpod_device::device_mconfig_additions() const
 //  interpod_device - constructor
 //-------------------------------------------------
 
-interpod_device::interpod_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+interpod_device::interpod_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, INTERPOD, "Interpod", tag, owner, clock, "interpod", __FILE__),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, R6502_TAG),

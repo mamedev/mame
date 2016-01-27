@@ -16,7 +16,7 @@ Todo:
 const device_type MSX_SLOT_PANASONIC08 = &device_creator<msx_slot_panasonic08_device>;
 
 
-msx_slot_panasonic08_device::msx_slot_panasonic08_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+msx_slot_panasonic08_device::msx_slot_panasonic08_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_SLOT_PANASONIC08, "MSX Internal Panasonic08", tag, owner, clock, "msx_slot_panasonic08", __FILE__)
 	, msx_internal_slot_interface()
 	, m_nvram(*this, "nvram")
@@ -62,7 +62,7 @@ void msx_slot_panasonic08_device::device_start()
 	// Sanity checks
 	if (m_rom_region == nullptr )
 	{
-		fatalerror("Rom slot '%s': Unable to find memory region '%s'\n", tag().c_str(), m_region);
+		fatalerror("Rom slot '%s': Unable to find memory region '%s'\n", tag(), m_region);
 	}
 	if (m_rom_region->bytes() < m_region_offset + 0x200000)
 	{

@@ -26,7 +26,7 @@ const device_type ESQPANEL2x40_SQ1 = &device_creator<esqpanel2x40_sq1_device>;
 //  esqpanel_device - constructor
 //-------------------------------------------------
 
-esqpanel_device::esqpanel_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+esqpanel_device::esqpanel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_serial_interface(mconfig, *this),
 	m_write_tx(*this),
@@ -209,7 +209,7 @@ machine_config_constructor esqpanel1x22_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( esqpanel1x22 );
 }
 
-esqpanel1x22_device::esqpanel1x22_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+esqpanel1x22_device::esqpanel1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	esqpanel_device(mconfig, ESQPANEL1x22, "Ensoniq front panel with 1x22 VFD", tag, owner, clock, "esqpanel122", __FILE__),
 	m_vfd(*this, "vfd")
 {
@@ -227,7 +227,7 @@ machine_config_constructor esqpanel2x40_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( esqpanel2x40 );
 }
 
-esqpanel2x40_device::esqpanel2x40_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+esqpanel2x40_device::esqpanel2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	esqpanel_device(mconfig, ESQPANEL2x40, "Ensoniq front panel with 2x40 VFD", tag, owner, clock, "esqpanel240", __FILE__),
 	m_vfd(*this, "vfd")
 {
@@ -245,7 +245,7 @@ machine_config_constructor esqpanel2x40_sq1_device::device_mconfig_additions() c
 	return MACHINE_CONFIG_NAME( esqpanel2x40_sq1 );
 }
 
-esqpanel2x40_sq1_device::esqpanel2x40_sq1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+esqpanel2x40_sq1_device::esqpanel2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	esqpanel_device(mconfig, ESQPANEL2x40, "Ensoniq front panel with 2x16 LCD", tag, owner, clock, "esqpanel240_sq1", __FILE__),
 	m_vfd(*this, "vfd")
 {

@@ -131,19 +131,19 @@ class nasbus_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	nasbus_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	nasbus_slot_device(const machine_config &mconfig, device_type type, std::string name,
-		std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nasbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nasbus_slot_device(const machine_config &mconfig, device_type type, const char *name,
+		const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
 
 	// inline configuration
-	static void set_nasbus_slot(device_t &device, device_t *owner, std::string nasbus_tag);
+	static void set_nasbus_slot(device_t &device, device_t *owner, const char *nasbus_tag);
 
 protected:
 	// configuration
-	std::string m_nasbus_tag;
+	const char *m_nasbus_tag;
 };
 
 // device type definition
@@ -155,7 +155,7 @@ class nasbus_device : public device_t
 {
 public:
 	// construction/destruction
-	nasbus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nasbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~nasbus_device();
 
 	template<class _Object> static devcb_base &set_ram_disable_handler(device_t &device, _Object object)

@@ -36,8 +36,8 @@
 
 class h8s2320_device : public h8s2000_device {
 public:
-	h8s2320_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	h8s2320_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h8s2320_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	h8s2320_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(syscr_r);
 	DECLARE_WRITE8_MEMBER(syscr_w);
@@ -91,42 +91,42 @@ protected:
 
 class h8s2321_device : public h8s2320_device {
 public:
-	h8s2321_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h8s2321_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class h8s2322_device : public h8s2320_device {
 public:
-	h8s2322_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h8s2322_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class h8s2323_device : public h8s2320_device {
 public:
-	h8s2323_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h8s2323_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class h8s2324_device : public h8s2320_device {
 public:
-	h8s2324_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h8s2324_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class h8s2326_device : public h8s2320_device {
 public:
-	h8s2326_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h8s2326_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class h8s2327_device : public h8s2320_device {
 public:
-	h8s2327_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h8s2327_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class h8s2328_device : public h8s2320_device {
 public:
-	h8s2328_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h8s2328_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class h8s2329_device : public h8s2320_device {
 public:
-	h8s2329_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h8s2329_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type H8S2320;

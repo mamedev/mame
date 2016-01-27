@@ -40,7 +40,7 @@ public:
 		TIMER_UPDATE_SIGNAL
 	};
 
-	vectrex_state(const machine_config &mconfig, device_type type, std::string tag)
+	vectrex_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_gce_vectorram(*this, "gce_vectorram"),
 		m_maincpu(*this, "maincpu"),

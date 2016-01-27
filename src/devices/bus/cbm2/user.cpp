@@ -42,7 +42,7 @@ device_cbm2_user_port_interface::device_cbm2_user_port_interface(const machine_c
 //  cbm2_user_port_device - constructor
 //-------------------------------------------------
 
-cbm2_user_port_device::cbm2_user_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+cbm2_user_port_device::cbm2_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CBM2_USER_PORT, "CBM2 user port", tag, owner, clock, "cbm2_user_port", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_write_irq(*this),

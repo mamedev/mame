@@ -54,7 +54,7 @@
 
 const device_type RA17XX = &device_creator<ra17xx_device>;
 
-ra17xx_device::ra17xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ra17xx_device::ra17xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RA17XX, "Rockwell A17XX", tag, owner, clock, "ra17xx", __FILE__),
 		m_enable(false),
 		m_iord(*this),

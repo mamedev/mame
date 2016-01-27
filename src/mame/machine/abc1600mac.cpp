@@ -105,7 +105,7 @@ const rom_entry *abc1600_mac_device::device_rom_region() const
 //  abc1600_mac_device - constructor
 //-------------------------------------------------
 
-abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ABC1600_MAC, "ABC 1600 MAC", tag, owner, clock, "abc1600mac", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, *ADDRESS_MAP_NAME(program_map)),

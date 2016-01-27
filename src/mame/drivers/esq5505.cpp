@@ -163,7 +163,7 @@ static void ATTR_PRINTF(1,2) print_to_stderr(const char *format, ...)
 class esq5505_state : public driver_device
 {
 public:
-	esq5505_state(const machine_config &mconfig, device_type type, std::string tag)
+	esq5505_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),

@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="bw14" description="Bondwell 14 disk images">
+
+	<software name="cpm30">
+		<description>CP/M 3.02</description>
+		<year>1984</year>
+		<publisher>Digital Research Inc.</publisher>
+		<info name="serial" value="1006-1269-00306" />
+		<info name="part" value="MM00027/MM00028" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System &amp; Utl. (1)"/>
+			<dataarea name="flop" size="368974">
+				<rom name="cpm3sys1.cqm" size="368974" crc="22b4904b" sha1="cc5fcbf445281625bf9f670d7bbc1f88e0b0f5af" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="System &amp; Utl. (2)"/>
+			<dataarea name="flop" size="368974">
+				<rom name="cpm3sys2.cqm" size="368974" crc="6285e8cc" sha1="3886f19a73f4f83db524df5b217f86dfa86bd8c4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="calcstar">
+		<description>CalcStar v1.45</description>
+		<year>1983</year>
+		<publisher>MicroPro International</publisher>
+		<info name="serial" value="BC01-0003-01003" />
+		<info name="part" value="MM00013" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="CalcStar"/>
+			<dataarea name="flop" size="368974">
+				<rom name="calcstar.cqm" size="368974" crc="78855358" sha1="bdf5bc01f2eca7a5b264df7a5367622270f17631" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="datastar">
+		<description>DataStar v1.41</description>
+		<year>1982</year>
+		<publisher>MicroPro International</publisher>
+		<info name="serial" value="BC01-0004-01003" />
+		<info name="part" value="MM00014" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="DataStar"/>
+			<dataarea name="flop" size="368974">
+				<rom name="datastar.cqm" size="368974" crc="a67d06bd" sha1="13298801950eb3fdbbb4b2f9604b7b5cb0619629" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="datastarc" cloneof="datastar">
+		<description>DataStar v1.41c</description>
+		<year>1982</year>
+		<publisher>MicroPro International</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="DataStar"/>
+			<dataarea name="flop" size="368974">
+				<rom name="datastar_v141c.cqm" size="368974" crc="65459fa1" sha1="f61c14a3cb4f4a36a53c8c343d236983db1c5506" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="repstar">
+		<description>ReportStar v1.02</description>
+		<year>1982</year>
+		<publisher>MicroPro International</publisher>
+		<info name="serial" value="BC01-0005-01003/BC01-0006-01003" />
+		<info name="part" value="MM00015/MM00018" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="ReportStar"/>
+			<dataarea name="flop" size="368974">
+				<rom name="reportstar.cqm" size="368974" crc="cb7512ec" sha1="547ccb4401d59d6691790a9b7465a5bdff102207" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="ReportStar Installation"/>
+			<dataarea name="flop" size="368974">
+				<rom name="reportstar_installation.cqm" size="368974" crc="0e017a2c" sha1="af55804ff8b59d7ce4782f7c7ba31ad6a8eeca89" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordstar">
+		<description>WordStar v3.30</description>
+		<year>1983</year>
+		<publisher>MicroPro International</publisher>
+		<info name="serial" value="BC01-0001-01003/BC01-0002-01003" />
+		<info name="part" value="MM00011/MM00012" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="WordStar &amp; MailMerge"/>
+			<dataarea name="flop" size="368974">
+				<rom name="wordstar.cqm" size="368974" crc="2c443cf8" sha1="b647902c851a7a037bb7f6ceb8d37e018d25f9fc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="WordStar Installation"/>
+			<dataarea name="flop" size="368974">
+				<rom name="wordstar_installation.cqm" size="368974" crc="37c19ef0" sha1="2fcd919a8c32acbb3d66d2eedba5da3fe587d400" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

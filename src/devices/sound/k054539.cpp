@@ -17,7 +17,7 @@ const device_type K054539 = &device_creator<k054539_device>;
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-k054539_device::k054539_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+k054539_device::k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K054539, "K054539 ADPCM", tag, owner, clock, "k054539", __FILE__),
 		device_sound_interface(mconfig, *this), flags(0), ram(nullptr), reverb_pos(0), cur_ptr(0), cur_limit(0),
 	cur_zone(nullptr), rom(nullptr), rom_size(0), rom_mask(0), stream(nullptr), m_timer(nullptr), m_timer_state(0),

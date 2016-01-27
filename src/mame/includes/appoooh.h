@@ -5,7 +5,7 @@
 class appoooh_state : public driver_device
 {
 public:
-	appoooh_state(const machine_config &mconfig, device_type type, std::string tag)
+	appoooh_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_fg_videoram(*this, "fg_videoram"),

@@ -16,12 +16,12 @@
 class nmk112_device : public device_t
 {
 public:
-	nmk112_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nmk112_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~nmk112_device() {}
 
 	// static configuration
-	static void set_rom0_tag(device_t &device, std::string tag) { downcast<nmk112_device &>(device).m_tag0 = tag; }
-	static void set_rom1_tag(device_t &device, std::string tag) { downcast<nmk112_device &>(device).m_tag1 = tag; }
+	static void set_rom0_tag(device_t &device, const char *tag) { downcast<nmk112_device &>(device).m_tag0 = tag; }
+	static void set_rom1_tag(device_t &device, const char *tag) { downcast<nmk112_device &>(device).m_tag1 = tag; }
 	static void set_page_mask(device_t &device, UINT8 mask) { downcast<nmk112_device &>(device).m_page_mask = ~mask; }
 
 	DECLARE_WRITE8_MEMBER( okibank_w );
@@ -42,8 +42,7 @@ private:
 
 	UINT8 m_current_bank[8];
 
-	std::string m_tag0;
-	std::string m_tag1;
+	const char *m_tag0, *m_tag1;
 	UINT8 *m_rom0, *m_rom1;
 	int   m_size0, m_size1;
 };

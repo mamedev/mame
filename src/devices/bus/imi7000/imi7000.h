@@ -74,7 +74,7 @@ class imi7000_bus_device : public device_t
 {
 public:
 	// construction/destruction
-	imi7000_bus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	imi7000_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
@@ -91,7 +91,7 @@ class imi7000_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	imi7000_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	imi7000_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

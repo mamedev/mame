@@ -23,7 +23,7 @@
 class psion_state : public driver_device
 {
 public:
-	psion_state(const machine_config &mconfig, device_type type, std::string tag)
+	psion_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_lcdc(*this, "hd44780"),
@@ -88,7 +88,7 @@ public:
 class psion1_state : public psion_state
 {
 public:
-	psion1_state(const machine_config &mconfig, device_type type, std::string tag)
+	psion1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: psion_state(mconfig, type, tag)
 		{ }
 

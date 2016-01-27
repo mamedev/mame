@@ -16,7 +16,7 @@ class msx_slot_ram_device : public device_t,
 							public msx_internal_slot_interface
 {
 public:
-	msx_slot_ram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	msx_slot_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void force_start_address(device_t &device, UINT16 start) { downcast<msx_slot_ram_device &>(device).m_start_address = start; }
 

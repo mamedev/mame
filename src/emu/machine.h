@@ -198,8 +198,8 @@ public:
 	bool scheduled_event_pending() const { return m_exit_pending || m_hard_reset_pending; }
 
 	// fetch items by name
-	inline device_t *device(std::string tag) const { return root_device().subdevice(tag); }
-	template<class _DeviceClass> inline _DeviceClass *device(std::string tag) { return downcast<_DeviceClass *>(device(tag)); }
+	inline device_t *device(const char *tag) const { return root_device().subdevice(tag); }
+	template<class _DeviceClass> inline _DeviceClass *device(const char *tag) { return downcast<_DeviceClass *>(device(tag)); }
 
 	// immediate operations
 	int run(bool firstrun);
@@ -232,8 +232,8 @@ public:
 	INT32 get_vblank_watchdog_counter() const { return m_watchdog_counter; }
 
 	// misc
-	void popmessage(const char *format, ...) const ATTR_PRINTF(2,3);
-	void logerror(const char *format, ...) const ATTR_PRINTF(2,3);
+	void popmessage(const char *format, ...) const;
+	void logerror(const char *format, ...) const;
 	void vlogerror(const char *format, va_list args) const;
 	UINT32 rand();
 	const char *describe_context();
@@ -294,11 +294,11 @@ private:
 	std::unique_ptr<network_manager> m_network;        // internal data from network.cpp
 	std::unique_ptr<bookkeeping_manager> m_bookkeeping;// internal data from bookkeeping.cpp
 	std::unique_ptr<configuration_manager> m_configuration; // internal data from config.cpp
-	std::unique_ptr<output_manager> m_output;		   // internal data from output.cpp
-	std::unique_ptr<crosshair_manager> m_crosshair;	   // internal data from crsshair.cpp
-	std::unique_ptr<image_manager> m_image;	           // internal data from image.cpp
-	std::unique_ptr<rom_load_manager> m_rom_load;	   // internal data from romload.cpp
-	std::unique_ptr<debugger_manager> m_debugger;	   // internal data from debugger.cpp
+	std::unique_ptr<output_manager> m_output;          // internal data from output.cpp
+	std::unique_ptr<crosshair_manager> m_crosshair;    // internal data from crsshair.cpp
+	std::unique_ptr<image_manager> m_image;            // internal data from image.cpp
+	std::unique_ptr<rom_load_manager> m_rom_load;      // internal data from romload.cpp
+	std::unique_ptr<debugger_manager> m_debugger;      // internal data from debugger.cpp
 
 	// system state
 	machine_phase           m_current_phase;        // current execution phase

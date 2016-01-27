@@ -6,7 +6,7 @@
 
 const device_type PC_MSSW_PAD = &device_creator<pc_mssw_pad_device>;
 
-pc_mssw_pad_device::pc_mssw_pad_device(const machine_config& mconfig, std::string tag, device_t* owner, UINT32 clock) :
+pc_mssw_pad_device::pc_mssw_pad_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	device_t(mconfig, PC_MSSW_PAD, "Microsoft Sidewinder Pad", tag, owner, clock, "mssw_pad", __FILE__),
 	device_pc_joy_interface(mconfig, *this),
 	m_btn1(*this, "btn1"),

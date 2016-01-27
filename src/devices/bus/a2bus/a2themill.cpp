@@ -67,14 +67,14 @@ machine_config_constructor a2bus_themill_device::device_mconfig_additions() cons
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_6809(*this, M6809_TAG), m_bEnabled(false), m_flipAddrSpace(false), m_6809Mode(false), m_status(0)
 {
 }
 
-a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, A2BUS_THEMILL, "Stellation Two The Mill", tag, owner, clock, "a2themill", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_6809(*this, M6809_TAG), m_bEnabled(false), m_flipAddrSpace(false), m_6809Mode(false), m_status(0)

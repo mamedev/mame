@@ -14,7 +14,7 @@
 class funkyjet_state : public driver_device
 {
 public:
-	funkyjet_state(const machine_config &mconfig, device_type type, std::string tag)
+	funkyjet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_deco146(*this, "ioprot"),

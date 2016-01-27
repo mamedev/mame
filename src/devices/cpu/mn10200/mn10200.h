@@ -46,7 +46,7 @@ class mn10200_device : public cpu_device
 {
 public:
 	// construction/destruction
-	mn10200_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, address_map_constructor program, std::string shortname, std::string source)
+	mn10200_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor program, const char *shortname, const char *source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, program), m_program(nullptr)
 			, m_read_port0(*this), m_read_port1(*this), m_read_port2(*this), m_read_port3(*this), m_read_port4(*this)
@@ -208,7 +208,7 @@ private:
 class mn1020012a_device : public mn10200_device
 {
 public:
-	mn1020012a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mn1020012a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

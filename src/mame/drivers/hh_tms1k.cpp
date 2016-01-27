@@ -13,15 +13,20 @@
 --------------------------------------------------------------------
  @CP0904A  TMS0970   1977, Milton Bradley Comp IV
  @MP0905B  TMS0970   1977, Parker Brothers Codename Sector
+ *MP0057   TMS1000   1978, APH Student Speech+ (same ROM contents as TSI Speech+?)
+ *MP0158   TMS1000   1979, Entex Soccer
  *MP0168   TMS1000?  1979, Conic Basketball
+ *MP0170   TMS1000?  1979, E.R.S. Football
  @MP0914   TMS1000   1979, Entex Baseball 1
  @MP0923   TMS1000   1979, Entex Baseball 2
  @MP1030   TMS1100   1980, APF Mathemagician
  @MP1133   TMS1470   1979, Kosmos Astro
  @MP1180   TMS1100   1980, Tomy Power House Pinball
+ *MP1181   TMS1100   1979, Conic Football 2
  @MP1204   TMS1100   1980, Entex Baseball 3 (6007)
  @MP1211   TMS1100   1980, Entex Space Invader
  @MP1218   TMS1100   1980, Entex Basketball 2 (6010)
+ *MP1219   TMS1100   1980, U.S. Games Super Sports 4
  @MP1221   TMS1100   1980, Entex Raise The Devil
  *MP1296   TMS1100?  1982, Entex Black Knight
  *MP1312   TMS1100   198?, Tandy/RadioShack Science Fair Microcomputer Trainer
@@ -39,7 +44,7 @@
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
  *MP3320A  TMS1000   1979, Coleco Head to Head Basketball
  *M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
-  MP3403   TMS1100   1978, Marx Electronic Bowling -> elecbowl.c
+  MP3403   TMS1100   1978, Marx Electronic Bowling -> elecbowl.cpp
  @MP3404   TMS1100   1978, Parker Brothers Merlin
  @MP3405   TMS1100   1979, Coleco Amaze-A-Tron
  *MP3415   TMS1100   1978, Coleco Electronic Quarterback
@@ -58,6 +63,7 @@
   MP3496   TMS1100   1980, MicroVision cartridge: Sea Duel
   M34009   TMS1100   1981, MicroVision cartridge: Alien Raiders (note: MP3498, MP3499, M3400x..)
  @M34012   TMS1100   1980, Mattel Dungeons & Dragons - Computer Labyrinth Game
+ *M34014   TMS1100   1981, Coleco Bowlatronic
   M34017   TMS1100   1981, MicroVision cartridge: Cosmic Hunter
   M34047   TMS1100   1982, MicroVision cartridge: Super Blockbuster
  *M34078A  TMS1100   1983, Milton Bradley Arcade Mania
@@ -68,7 +74,7 @@
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
  @MP7314   TMS1400   1980, Parker Brothers Split Second
  *MP7324   TMS1400?  1985, Coleco Talking Teacher
-  MP7332   TMS1400   1981, Milton Bradley Dark Tower -> mbdtower.c
+  MP7332   TMS1400   1981, Milton Bradley Dark Tower -> mbdtower.cpp
  @MP7334   TMS1400   1981, Coleco Total Control 4
  @MP7351   TMS1400CR 1982, Parker Brothers Master Merlin
  @MP7551   TMS1670   1980, Entex Color Football 4 (6009)
@@ -77,8 +83,9 @@
 
   inconsistent:
 
- *M95041   ?         1983, Tsukuda Game Pachinko (? note: 40-pin, VFD-capable)
+ *TMC1007  TMS1000   1976, TSI Speech+ (S14002-A)
  @CD7282SL TMS1100   1981, Tandy/RadioShack Tandy-12 (serial is similar to TI Speak & Spell series?)
+ *M95041   ?         1983, Tsukuda Game Pachinko (? note: 40-pin, VFD-capable)
 
   (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
@@ -349,7 +356,7 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 class mathmagi_state : public hh_tms1k_state
 {
 public:
-	mathmagi_state(const machine_config &mconfig, device_type type, std::string tag)
+	mathmagi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -527,7 +534,7 @@ MACHINE_CONFIG_END
 class amaztron_state : public hh_tms1k_state
 {
 public:
-	amaztron_state(const machine_config &mconfig, device_type type, std::string tag)
+	amaztron_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -668,7 +675,7 @@ MACHINE_CONFIG_END
 class h2hbaseb_state : public hh_tms1k_state
 {
 public:
-	h2hbaseb_state(const machine_config &mconfig, device_type type, std::string tag)
+	h2hbaseb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -806,7 +813,7 @@ MACHINE_CONFIG_END
 class h2hfootb_state : public hh_tms1k_state
 {
 public:
-	h2hfootb_state(const machine_config &mconfig, device_type type, std::string tag)
+	h2hfootb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -944,7 +951,7 @@ MACHINE_CONFIG_END
 class tc4_state : public hh_tms1k_state
 {
 public:
-	tc4_state(const machine_config &mconfig, device_type type, std::string tag)
+	tc4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -1099,7 +1106,7 @@ MACHINE_CONFIG_END
 class ebball_state : public hh_tms1k_state
 {
 public:
-	ebball_state(const machine_config &mconfig, device_type type, std::string tag)
+	ebball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -1230,7 +1237,7 @@ MACHINE_CONFIG_END
 class ebball2_state : public hh_tms1k_state
 {
 public:
-	ebball2_state(const machine_config &mconfig, device_type type, std::string tag)
+	ebball2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -1360,7 +1367,7 @@ MACHINE_CONFIG_END
 class ebball3_state : public hh_tms1k_state
 {
 public:
-	ebball3_state(const machine_config &mconfig, device_type type, std::string tag)
+	ebball3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -1523,7 +1530,7 @@ MACHINE_CONFIG_END
 class einvader_state : public hh_tms1k_state
 {
 public:
-	einvader_state(const machine_config &mconfig, device_type type, std::string tag)
+	einvader_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -1631,7 +1638,7 @@ MACHINE_CONFIG_END
 class efootb4_state : public hh_tms1k_state
 {
 public:
-	efootb4_state(const machine_config &mconfig, device_type type, std::string tag)
+	efootb4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -1760,7 +1767,7 @@ MACHINE_CONFIG_END
 class ebaskb2_state : public hh_tms1k_state
 {
 public:
-	ebaskb2_state(const machine_config &mconfig, device_type type, std::string tag)
+	ebaskb2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -1886,7 +1893,7 @@ MACHINE_CONFIG_END
 class raisedvl_state : public hh_tms1k_state
 {
 public:
-	raisedvl_state(const machine_config &mconfig, device_type type, std::string tag)
+	raisedvl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -2018,7 +2025,7 @@ MACHINE_CONFIG_END
 class gpoker_state : public hh_tms1k_state
 {
 public:
-	gpoker_state(const machine_config &mconfig, device_type type, std::string tag)
+	gpoker_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag),
 		m_beeper(*this, "beeper")
 	{ }
@@ -2163,7 +2170,7 @@ MACHINE_CONFIG_END
 class gjackpot_state : public gpoker_state
 {
 public:
-	gjackpot_state(const machine_config &mconfig, device_type type, std::string tag)
+	gjackpot_state(const machine_config &mconfig, device_type type, const char *tag)
 		: gpoker_state(mconfig, type, tag)
 	{ }
 
@@ -2278,7 +2285,7 @@ MACHINE_CONFIG_END
 class elecdet_state : public hh_tms1k_state
 {
 public:
-	elecdet_state(const machine_config &mconfig, device_type type, std::string tag)
+	elecdet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -2402,7 +2409,7 @@ MACHINE_CONFIG_END
 class starwbc_state : public hh_tms1k_state
 {
 public:
-	starwbc_state(const machine_config &mconfig, device_type type, std::string tag)
+	starwbc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -2527,7 +2534,7 @@ MACHINE_CONFIG_END
 class astro_state : public hh_tms1k_state
 {
 public:
-	astro_state(const machine_config &mconfig, device_type type, std::string tag)
+	astro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -2651,7 +2658,7 @@ MACHINE_CONFIG_END
 class mdndclab_state : public hh_tms1k_state
 {
 public:
-	mdndclab_state(const machine_config &mconfig, device_type type, std::string tag)
+	mdndclab_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -2848,7 +2855,7 @@ MACHINE_CONFIG_END
 class comp4_state : public hh_tms1k_state
 {
 public:
-	comp4_state(const machine_config &mconfig, device_type type, std::string tag)
+	comp4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -2947,7 +2954,7 @@ MACHINE_CONFIG_END
 class simon_state : public hh_tms1k_state
 {
 public:
-	simon_state(const machine_config &mconfig, device_type type, std::string tag)
+	simon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -3046,7 +3053,7 @@ MACHINE_CONFIG_END
 class ssimon_state : public hh_tms1k_state
 {
 public:
-	ssimon_state(const machine_config &mconfig, device_type type, std::string tag)
+	ssimon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -3194,7 +3201,7 @@ MACHINE_CONFIG_END
 class bigtrak_state : public hh_tms1k_state
 {
 public:
-	bigtrak_state(const machine_config &mconfig, device_type type, std::string tag)
+	bigtrak_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -3373,7 +3380,7 @@ MACHINE_CONFIG_END
 class cnsector_state : public hh_tms1k_state
 {
 public:
-	cnsector_state(const machine_config &mconfig, device_type type, std::string tag)
+	cnsector_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -3506,7 +3513,7 @@ MACHINE_CONFIG_END
 class merlin_state : public hh_tms1k_state
 {
 public:
-	merlin_state(const machine_config &mconfig, device_type type, std::string tag)
+	merlin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -3625,7 +3632,7 @@ MACHINE_CONFIG_END
 class mmerlin_state : public merlin_state
 {
 public:
-	mmerlin_state(const machine_config &mconfig, device_type type, std::string tag)
+	mmerlin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: merlin_state(mconfig, type, tag)
 	{ }
 };
@@ -3679,7 +3686,7 @@ MACHINE_CONFIG_END
 class stopthief_state : public hh_tms1k_state
 {
 public:
-	stopthief_state(const machine_config &mconfig, device_type type, std::string tag)
+	stopthief_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -3800,7 +3807,7 @@ MACHINE_CONFIG_END
 class bankshot_state : public hh_tms1k_state
 {
 public:
-	bankshot_state(const machine_config &mconfig, device_type type, std::string tag)
+	bankshot_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -3923,7 +3930,7 @@ MACHINE_CONFIG_END
 class splitsec_state : public hh_tms1k_state
 {
 public:
-	splitsec_state(const machine_config &mconfig, device_type type, std::string tag)
+	splitsec_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -4024,7 +4031,7 @@ MACHINE_CONFIG_END
 class tandy12_state : public hh_tms1k_state
 {
 public:
-	tandy12_state(const machine_config &mconfig, device_type type, std::string tag)
+	tandy12_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -4196,7 +4203,7 @@ MACHINE_CONFIG_END
 class tbreakup_state : public hh_tms1k_state
 {
 public:
-	tbreakup_state(const machine_config &mconfig, device_type type, std::string tag)
+	tbreakup_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag),
 		m_expander(*this, "expander")
 	{ }
@@ -4392,7 +4399,7 @@ MACHINE_CONFIG_END
 class phpball_state : public hh_tms1k_state
 {
 public:
-	phpball_state(const machine_config &mconfig, device_type type, std::string tag)
+	phpball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 

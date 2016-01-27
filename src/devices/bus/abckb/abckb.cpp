@@ -42,7 +42,7 @@ abc_keyboard_interface::abc_keyboard_interface(const machine_config &mconfig, de
 //  abc_keyboard_port_device - constructor
 //-------------------------------------------------
 
-abc_keyboard_port_device::abc_keyboard_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+abc_keyboard_port_device::abc_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ABC_KEYBOARD_PORT, "Luxor ABC keyboard port", tag, owner, clock, "abc_keyboard_port", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_out_rx_handler(*this),

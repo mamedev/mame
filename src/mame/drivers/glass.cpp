@@ -223,6 +223,9 @@ ROM_START( glass ) /* Version 1.1 */
 	ROM_LOAD16_BYTE( "1.c23", 0x000000, 0x040000, CRC(aeebd4ed) SHA1(04759dc146dff0fc74b78d70e79dfaebe68328f9) )
 	ROM_LOAD16_BYTE( "2.c22", 0x000001, 0x040000, CRC(165e2e01) SHA1(180a2e2b5151f2321d85ac23eff7fbc9f52023a5) )
 
+	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_LOAD( "glass_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )   /* Graphics */
 	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
 
@@ -244,6 +247,9 @@ ROM_START( glass10 ) /* Version 1.0 */
 	ROM_LOAD16_BYTE( "c23.bin", 0x000000, 0x040000, CRC(688cdf33) SHA1(b59dcc3fc15f72037692b745927b110e97d8282e) )
 	ROM_LOAD16_BYTE( "c22.bin", 0x000001, 0x040000, CRC(ab17c992) SHA1(1509b5b4bbfb4e022e0ab6fbbc0ffc070adfa531) )
 
+	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_LOAD( "glass_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )   /* Graphics */
 	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
 
@@ -264,6 +270,9 @@ ROM_START( glass10a ) /* Title screen shows "GLASS" and under that "Break Editio
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "spl-c23.bin", 0x000000, 0x040000, CRC(c1393bea) SHA1(a5f877ba38305a7b49fa3c96b9344cbf71e8c9ef) )
 	ROM_LOAD16_BYTE( "spl-c22.bin", 0x000001, 0x040000, CRC(0d6fa33e) SHA1(37e9258ef7e108d034c80abc8e5e5ab6dacf0a61) )
+
+	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_LOAD( "glass_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )   /* Graphics */
 	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */

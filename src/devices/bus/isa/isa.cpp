@@ -24,16 +24,17 @@ const device_type ISA8_SLOT = &device_creator<isa8_slot_device>;
 //-------------------------------------------------
 //  isa8_slot_device - constructor
 //-------------------------------------------------
-isa8_slot_device::isa8_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa8_slot_device::isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8_SLOT, "ISA8_SLOT", tag, owner, clock, "isa8_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
-	m_owner(nullptr)
+	m_owner(nullptr),
+	m_isa_tag(nullptr)
 {
 }
 
-isa8_slot_device::isa8_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+isa8_slot_device::isa8_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_interface(mconfig, *this), m_owner(nullptr)
+		device_slot_interface(mconfig, *this), m_owner(nullptr), m_isa_tag(nullptr)
 {
 }
 
@@ -73,7 +74,7 @@ const device_type ISA16_SLOT = &device_creator<isa16_slot_device>;
 //-------------------------------------------------
 //  isa16_slot_device - constructor
 //-------------------------------------------------
-isa16_slot_device::isa16_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa16_slot_device::isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		isa8_slot_device(mconfig, ISA16_SLOT, "ISA16_SLOT", tag, owner, clock, "isa16_slot", __FILE__)
 {
 }
@@ -102,7 +103,7 @@ void isa16_slot_device::device_start()
 
 const device_type ISA8 = &device_creator<isa8_device>;
 
-void isa8_device::static_set_cputag(device_t &device, std::string tag)
+void isa8_device::static_set_cputag(device_t &device, const char *tag)
 {
 	isa8_device &isa = downcast<isa8_device &>(device);
 	isa.m_cputag = tag;
@@ -134,7 +135,7 @@ void isa8_device::device_config_complete()
 //  isa8_device - constructor
 //-------------------------------------------------
 
-isa8_device::isa8_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8, "ISA8", tag, owner, clock, "isa8", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_program_config("ISA 8-bit program", ENDIANNESS_LITTLE, 8, 24, 0, nullptr),
@@ -149,7 +150,7 @@ isa8_device::isa8_device(const machine_config &mconfig, std::string tag, device_
 		m_out_irq7_cb(*this),
 		m_out_drq1_cb(*this),
 		m_out_drq2_cb(*this),
-		m_out_drq3_cb(*this),
+		m_out_drq3_cb(*this), m_cputag(nullptr),
 		m_write_iochck(*this)
 {
 	for(int i=0;i<8;i++)
@@ -162,7 +163,7 @@ isa8_device::isa8_device(const machine_config &mconfig, std::string tag, device_
 	m_allocspaces = false;
 }
 
-isa8_device::isa8_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+isa8_device::isa8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
 		m_program_config("ISA 8-bit program", ENDIANNESS_LITTLE, 8, 24, 0, nullptr),
@@ -177,7 +178,7 @@ isa8_device::isa8_device(const machine_config &mconfig, device_type type, std::s
 		m_out_irq7_cb(*this),
 		m_out_drq1_cb(*this),
 		m_out_drq2_cb(*this),
-		m_out_drq3_cb(*this),
+		m_out_drq3_cb(*this), m_cputag(nullptr),
 		m_write_iochck(*this)
 {
 	for(int i=0;i<8;i++)
@@ -319,7 +320,7 @@ void isa8_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t m
 }
 
 
-void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, std::string tag, UINT8 *data)
+void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
 {
 	m_prgspace->install_readwrite_bank(start, end, mask, mirror, tag );
 	machine().root_device().membank(tag)->set_base(data);
@@ -330,7 +331,7 @@ void isa8_device::unmap_bank(offs_t start, offs_t end, offs_t mask, offs_t mirro
 	m_prgspace->unmap_readwrite(start, end, mask, mirror);
 }
 
-void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, std::string tag, const char *region)
+void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region)
 {
 	if (machine().root_device().memregion("isa")) {
 		UINT8 *src = dev->memregion(region)->base();
@@ -461,7 +462,7 @@ const device_type ISA16 = &device_creator<isa16_device>;
 //  isa16_device - constructor
 //-------------------------------------------------
 
-isa16_device::isa16_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa16_device::isa16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		isa8_device(mconfig, ISA16, "ISA16", tag, owner, clock, "isa16", __FILE__),
 		m_out_irq10_cb(*this),
 		m_out_irq11_cb(*this),

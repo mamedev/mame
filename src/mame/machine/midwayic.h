@@ -18,8 +18,8 @@ class midway_serial_pic_device : public device_t
 {
 public:
 	// construction/destruction
-	midway_serial_pic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	midway_serial_pic_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	midway_serial_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	static void static_set_upper(device_t &device, int upper) { downcast<midway_serial_pic_device &>(device).m_upper = upper; }
 
@@ -61,8 +61,8 @@ class midway_serial_pic2_device : public midway_serial_pic_device,
 {
 public:
 	// construction/destruction
-	midway_serial_pic2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	midway_serial_pic2_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	midway_serial_pic2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	static void static_set_yearoffs(device_t &device, int yearoffs) { downcast<midway_serial_pic2_device &>(device).m_yearoffs = yearoffs; }
 
@@ -119,7 +119,7 @@ class midway_ioasic_device : public midway_serial_pic2_device
 {
 public:
 	// construction/destruction
-	midway_ioasic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	midway_ioasic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void static_set_shuffle(device_t &device, UINT8 shuffle) { downcast<midway_ioasic_device &>(device).m_shuffle_type = shuffle; }
 	static void static_set_shuffle_default(device_t &device, UINT8 shuffle) { downcast<midway_ioasic_device &>(device).m_shuffle_default = shuffle; }

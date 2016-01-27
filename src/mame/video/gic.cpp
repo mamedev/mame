@@ -80,7 +80,7 @@ ROM_END
 //  gic_device - constructor
 //-------------------------------------------------
 
-gic_device::gic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+gic_device::gic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GIC, "GIC", tag, owner, clock, "gic", __FILE__)
 	, device_sound_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
@@ -93,7 +93,7 @@ gic_device::gic_device(const machine_config &mconfig, std::string tag, device_t 
 }
 
 
-gic_device::gic_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, int lines, std::string shortname, std::string source)
+gic_device::gic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int lines, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_sound_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)

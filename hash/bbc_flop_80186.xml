@@ -8,7 +8,7 @@
       Hold down the SHIFT key and press and release the BREAK key.
 -->
 
-<softwarelist name="bbc_80186_flop" description="80186 Co-Processor Discs">
+<softwarelist name="bbc_flop_80186" description="80186 Co-Processor Discs">
 
 	<software name="m512sys" supported="no">
 		<description>BBC Master 512 System Discs</description>

@@ -500,7 +500,7 @@ ioport_constructor ibm5160_mb_device::device_input_ports() const
 }
 
 
-void ibm5160_mb_device::static_set_cputag(device_t &device, std::string tag)
+void ibm5160_mb_device::static_set_cputag(device_t &device, const char *tag)
 {
 	ibm5160_mb_device &board = downcast<ibm5160_mb_device &>(device);
 	board.m_cputag = tag;
@@ -514,7 +514,7 @@ void ibm5160_mb_device::static_set_cputag(device_t &device, std::string tag)
 //  ibm5160_mb_device - constructor
 //-------------------------------------------------
 
-ibm5160_mb_device::ibm5160_mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ibm5160_mb_device::ibm5160_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, IBM5160_MOTHERBOARD, "IBM5160_MOTHERBOARD", tag, owner, clock, "ibm5160_mb", __FILE__),
 		m_maincpu(*owner, "maincpu"),
 		m_pic8259(*this, "pic8259"),
@@ -630,7 +630,7 @@ machine_config_constructor ibm5150_mb_device::device_mconfig_additions() const
 //  ibm5150_mb_device - constructor
 //-------------------------------------------------
 
-ibm5150_mb_device::ibm5150_mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ibm5150_mb_device::ibm5150_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ibm5160_mb_device(mconfig, tag, owner, clock),
 		m_cassette(*this, "cassette")
 {
@@ -850,7 +850,7 @@ ioport_constructor ec1841_mb_device::device_input_ports() const
 //  ec1841_mb_device - constructor
 //-------------------------------------------------
 
-ec1841_mb_device::ec1841_mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ec1841_mb_device::ec1841_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ibm5160_mb_device(mconfig, tag, owner, clock)
 {
 }
@@ -905,7 +905,7 @@ READ8_MEMBER ( ec1841_mb_device::pc_ppi_portc_r )
 	return data;
 }
 
-pc_noppi_mb_device::pc_noppi_mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pc_noppi_mb_device::pc_noppi_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: ibm5160_mb_device(mconfig, tag, owner, clock)
 {
 }

@@ -371,7 +371,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 class ksys573_state : public driver_device
 {
 public:
-	ksys573_state( const machine_config &mconfig, device_type type, std::string tag ) :
+	ksys573_state( const machine_config &mconfig, device_type type, const char *tag ) :
 		driver_device( mconfig, type, tag ),
 		m_analog0(*this, "analog0" ),
 		m_analog1(*this, "analog1" ),

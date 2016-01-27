@@ -12,7 +12,7 @@
 
 const device_type ESQ_5505_5510_PUMP = &device_creator<esq_5505_5510_pump>;
 
-esq_5505_5510_pump::esq_5505_5510_pump(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+esq_5505_5510_pump::esq_5505_5510_pump(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ESQ_5505_5510_PUMP, "ESQ_5505_5510_PUMP", tag, owner, clock, "esq_5505_5510_pump", __FILE__),
 		device_sound_interface(mconfig, *this), m_stream(nullptr), m_timer(nullptr), m_otis(nullptr), m_esp(nullptr),
 		m_esp_halted(true), ticks_spent_processing(0), samples_processed(0)

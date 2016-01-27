@@ -171,7 +171,7 @@
 class wildpkr_state : public driver_device
 {
 public:
-	wildpkr_state(const machine_config &mconfig, device_type type, std::string tag)
+	wildpkr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
@@ -231,9 +231,9 @@ static ADDRESS_MAP_START( tabpkr_map, AS_PROGRAM, 16, wildpkr_state )
 	AM_RANGE(0x300000, 0x303fff) AM_RAM
 	AM_RANGE(0x400000, 0x4007ff) AM_RAM // dallas timekeeper?
 
-//	AM_RANGE(0x800200, 0x800201) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0xff00)
-//	AM_RANGE(0x800202, 0x800203) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0xff00)
-//	AM_RANGE(0x800204, 0x800205) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0xff00)
+//  AM_RANGE(0x800200, 0x800201) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0xff00)
+//  AM_RANGE(0x800202, 0x800203) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0xff00)
+//  AM_RANGE(0x800204, 0x800205) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0xff00)
 ADDRESS_MAP_END
 
 /* Unknown R/W:

@@ -48,7 +48,7 @@ public:
 	typedef delegate<void (phillips_22vp931_device &, int)> data_ready_delegate;
 
 	// construction/destruction
-	phillips_22vp931_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	phillips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// input and output
 	void data_w(UINT8 data) { synchronize(TID_DEFERRED_DATA, data); }

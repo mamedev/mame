@@ -6,7 +6,7 @@
 
 class deco_222_device : public m6502_device {
 public:
-	deco_222_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	deco_222_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	class mi_decrypt : public mi_default_normal {
@@ -28,7 +28,7 @@ static const device_type DECO_222 = &device_creator<deco_222_device>;
 
 class deco_c10707_device : public m6502_device {
 public:
-	deco_c10707_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	deco_c10707_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	class mi_decrypt : public mi_default_normal {

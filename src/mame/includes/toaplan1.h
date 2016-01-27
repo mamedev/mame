@@ -11,7 +11,7 @@
 class toaplan1_state : public driver_device
 {
 public:
-	toaplan1_state(const machine_config &mconfig, device_type type, std::string tag)
+	toaplan1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_bgpaletteram(*this, "bgpalette"),
 		m_fgpaletteram(*this, "fgpalette"),
@@ -164,7 +164,7 @@ public:
 class toaplan1_rallybik_state : public toaplan1_state
 {
 public:
-	toaplan1_rallybik_state(const machine_config &mconfig, device_type type, std::string tag)
+	toaplan1_rallybik_state(const machine_config &mconfig, device_type type, const char *tag)
 		: toaplan1_state(mconfig, type, tag),
 		m_spritegen(*this, "scu")
 	{

@@ -31,7 +31,7 @@
 
 #define RAMREGION "ram"
 
-ti_32k_expcard_device::ti_32k_expcard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ti_32k_expcard_device::ti_32k_expcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : ti_expansion_card_device(mconfig, TI_32KMEM, "TI-99 32KiB memory expansion card", tag, owner, clock, "ti99_32k", __FILE__), m_ram_ptr(nullptr)
 {
 }

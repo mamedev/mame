@@ -7,10 +7,10 @@ class fuukivid_device : public device_t,
 						public device_video_interface
 {
 public:
-	fuukivid_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	fuukivid_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip_screen, UINT32* tilebank);
 	std::unique_ptr<UINT16[]> m_sprram;

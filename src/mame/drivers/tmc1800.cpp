@@ -863,7 +863,7 @@ void tmc1800_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 	case TIMER_SETUP_BEEP:
 		m_beeper->set_state(0);
-		m_beeper->set_frequency(0);
+		m_beeper->set_clock(0);
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in tmc1800_state::device_timer");

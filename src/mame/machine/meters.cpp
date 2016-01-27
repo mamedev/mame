@@ -17,7 +17,7 @@
 
 const device_type METERS = &device_creator<meters_device>;
 
-meters_device::meters_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+meters_device::meters_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, METERS, "Electro mechanical meters", tag, owner, clock, "meters", __FILE__),
 	m_number_mtr(0)
 {
@@ -41,7 +41,7 @@ void meters_device::device_start()
 		m_meter_info[i].on        = 0;
 		m_meter_info[i].meter_timer = timer_alloc(i);
 		m_meter_info[i].meter_timer->reset();
-		
+
 		//save_item(NAME(m_meter_info[i].reacttime), i); //enable if void ReactTime(int id, INT32 cycles) gets used
 		save_item(NAME(m_meter_info[i].state), i);
 		save_item(NAME(m_meter_info[i].count), i);
@@ -65,7 +65,7 @@ void meters_device::device_timer(emu_timer &timer, device_timer_id id, int param
 {
 	if (id >= m_number_mtr)
 			assert_always(FALSE, "Unknown id in meters_device::device_timer");
-	
+
 	m_meter_info[param].count++;
 }
 

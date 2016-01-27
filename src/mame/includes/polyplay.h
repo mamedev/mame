@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Martin Buchholz
 #include "sound/samples.h"
 
@@ -7,7 +7,7 @@
 class polyplay_state : public driver_device
 {
 public:
-	polyplay_state(const machine_config &mconfig, device_type type, std::string tag)
+	polyplay_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_characterram(*this, "characterram"),

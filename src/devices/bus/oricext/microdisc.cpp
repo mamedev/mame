@@ -37,7 +37,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, microdisc_device)
 	AM_RANGE(0x318, 0x318) AM_READ(port_318_r)
 ADDRESS_MAP_END
 
-microdisc_device::microdisc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+microdisc_device::microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	oricext_device(mconfig, MICRODISC, "Microdisc floppy drive interface", tag, owner, clock, "microdisc", __FILE__),
 	fdc(*this, "fdc"), microdisc_rom(nullptr), port_314(0), intrq_state(false), drq_state(false), hld_state(false)
 {

@@ -27,7 +27,7 @@
 
 const device_type HARDDRIV_SOUND_BOARD_DEVICE = &device_creator<harddriv_sound_board_device>;
 
-harddriv_sound_board_device::harddriv_sound_board_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+harddriv_sound_board_device::harddriv_sound_board_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, HARDDRIV_SOUND_BOARD_DEVICE, "Hard Drivin' Sound Board", tag, owner, clock, "harddriv_sound", __FILE__),
 	m_soundcpu(*this, "soundcpu"),
 	m_dac(*this, "dac"),

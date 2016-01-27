@@ -137,19 +137,19 @@ int ti990_hdc_device::get_id_from_device( device_t *device )
 {
 	int id = -1;
 
-	if (":harddisk1" == device->tag())
+	if ( ! strcmp( ":harddisk1", device->tag() ) )
 	{
 		id = 0;
 	}
-	else if (":harddisk2"==device->tag())
+	else if ( ! strcmp( ":harddisk2", device->tag() ) )
 	{
 		id = 1;
 	}
-	else if (":harddisk3"==device->tag())
+	else if ( ! strcmp( ":harddisk3", device->tag() ) )
 	{
 		id = 2;
 	}
-	else if (":harddisk4"==device->tag())
+	else if ( ! strcmp( ":harddisk4", device->tag() ) )
 	{
 		id = 3;
 	}
@@ -976,7 +976,7 @@ MACHINE_CONFIG_END
 
 const device_type TI990_HDC = &device_creator<ti990_hdc_device>;
 
-ti990_hdc_device::ti990_hdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ti990_hdc_device::ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TI990_HDC, "Generic TI-990 Hard Disk Controller", tag, owner, clock, "hdc_990", __FILE__),
 	m_interrupt_callback(*this)
 {

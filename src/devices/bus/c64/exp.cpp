@@ -56,7 +56,7 @@ device_c64_expansion_card_interface::~device_c64_expansion_card_interface()
 //  c64_expansion_slot_device - constructor
 //-------------------------------------------------
 
-c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, C64_EXPANSION_SLOT, "C64 expansion port", tag, owner, clock, "c64_expansion_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this),

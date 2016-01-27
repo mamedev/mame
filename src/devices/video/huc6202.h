@@ -53,7 +53,7 @@ class huc6202_device : public device_t
 {
 public:
 	// construction/destruction
-	huc6202_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	huc6202_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_next_pixel_0_callback(device_t &device, _Object object) { return downcast<huc6202_device &>(device).m_next_pixel_0_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_time_til_next_event_0_callback(device_t &device, _Object object) { return downcast<huc6202_device &>(device).m_time_til_next_event_0_cb.set_callback(object); }

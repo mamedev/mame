@@ -18,7 +18,7 @@
 const device_type KL5C80A12 = &device_creator<kl5c80a12_device>;
 
 
-kl5c80a12_device::kl5c80a12_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+kl5c80a12_device::kl5c80a12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: z80_device(mconfig, KL5C80A12, "KL5C80A12", tag, owner, clock, "kl5c80a12", __FILE__)
 {
 }

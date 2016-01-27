@@ -28,7 +28,7 @@ class k05324x_device : public device_t,
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_6bpp);
 
 public:
-	k05324x_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k05324x_device() {}
 
 	// static configuration

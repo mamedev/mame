@@ -31,7 +31,7 @@ class i8086_common_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	i8086_common_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	i8086_common_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	template<class _Object> static devcb_base &set_lock_handler(device_t &device, _Object object)
 		{ return downcast<i8086_common_cpu_device &>(device).m_lock_handler.set_callback(object); }
@@ -341,8 +341,8 @@ class i8086_cpu_device : public i8086_common_cpu_device
 {
 public:
 	// construction/destruction
-	i8086_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	i8086_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int data_bus_size);
+	i8086_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8086_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int data_bus_size);
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
@@ -364,7 +364,7 @@ class i8088_cpu_device : public i8086_cpu_device
 {
 public:
 	// construction/destruction
-	i8088_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8088_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

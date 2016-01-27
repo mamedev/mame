@@ -4,7 +4,7 @@
 
 const device_type ISA8_DECTALK = &device_creator<dectalk_isa_device>;
 
-dectalk_isa_device::dectalk_isa_device(const machine_config& mconfig, std::string tag, device_t* owner, UINT32 clock) :
+dectalk_isa_device::dectalk_isa_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	device_t(mconfig, ISA8_DECTALK, "DECTalk-PC", tag, owner, clock, "dectalk_isa", __FILE__),
 	device_isa8_card_interface(mconfig, *this),
 	m_cmd(0),

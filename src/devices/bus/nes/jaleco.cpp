@@ -51,88 +51,88 @@ const device_type NES_JF29 = &device_creator<nes_jf29_device>;
 const device_type NES_JF33 = &device_creator<nes_jf33_device>;
 
 
-nes_jf11_device::nes_jf11_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_jf11_device::nes_jf11_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_JF11, "NES Cart Jaleco JF-11 PCB", tag, owner, clock, "nes_jf11", __FILE__)
 {
 }
 
-nes_jf13_device::nes_jf13_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_jf13_device::nes_jf13_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_JF13, "NES Cart Jaleco JF-13 PCB", tag, owner, clock, "nes_jf13", __FILE__),
 						m_samples(*this, "samples")
 {
 }
 
-nes_jf16_device::nes_jf16_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_jf16_device::nes_jf16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_JF16, "NES Cart Jaleco JF-16 PCB", tag, owner, clock, "nes_jf16", __FILE__)
 {
 }
 
-nes_jf17_device::nes_jf17_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_jf17_device::nes_jf17_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_latch(0)
 				{
 }
 
-nes_jf17_device::nes_jf17_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_jf17_device::nes_jf17_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_JF17, "NES Cart Jaleco JF-17 PCB", tag, owner, clock, "nes_jf17", __FILE__), m_latch(0)
 				{
 }
 
-nes_jf17_adpcm_device::nes_jf17_adpcm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_jf17_adpcm_device::nes_jf17_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_jf17_device(mconfig, NES_JF17_ADPCM, "NES Cart Jaleco JF-17 + ADPCM (Moero!! Pro Tennis) PCB", tag, owner, clock, "nes_jf17_pcm", __FILE__),
 						m_samples(*this, "samples")
 {
 }
 
-nes_jf19_device::nes_jf19_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_jf19_device::nes_jf19_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-nes_jf19_device::nes_jf19_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_jf19_device::nes_jf19_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_JF19, "NES Cart Jaleco JF-19 (Moero!! Pro Soccer) PCB", tag, owner, clock, "nes_jf19", __FILE__)
 {
 }
 
-nes_jf19_adpcm_device::nes_jf19_adpcm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_jf19_adpcm_device::nes_jf19_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_jf19_device(mconfig, NES_JF19_ADPCM, "NES Cart Jaleco JF-19 + ADPCM  (Moero!! Pro Yakyuu 88) PCB", tag, owner, clock, "nes_jf19_pcm", __FILE__),
 						m_samples(*this, "samples")
 {
 }
 
-nes_ss88006_device::nes_ss88006_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_ss88006_device::nes_ss88006_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_irq_count(0), m_irq_count_latch(0), m_irq_mode(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0)
 				{
 }
 
-nes_ss88006_device::nes_ss88006_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_ss88006_device::nes_ss88006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_SS88006, "NES Cart Jaleco SS88006 PCB", tag, owner, clock, "nes_ss88006", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_mode(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0)
 				{
 }
 
-nes_ss88006_adpcm_device::nes_ss88006_adpcm_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_ss88006_adpcm_device::nes_ss88006_adpcm_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_ss88006_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-nes_jf23_device::nes_jf23_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_jf23_device::nes_jf23_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_ss88006_adpcm_device(mconfig, NES_JF23, "NES Cart Jaleco Shin Moero Pro Yakyuu PCB", tag, owner, clock, "nes_jf23", __FILE__),
 						m_samples(*this, "samples")
 {
 }
 
-nes_jf24_device::nes_jf24_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_jf24_device::nes_jf24_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_ss88006_adpcm_device(mconfig, NES_JF24, "NES Cart Jaleco Terao no Dosukoi Oozumou PCB", tag, owner, clock, "nes_jf24", __FILE__),
 						m_samples(*this, "samples")
 {
 }
 
-nes_jf29_device::nes_jf29_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_jf29_device::nes_jf29_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_ss88006_adpcm_device(mconfig, NES_JF29, "NES Cart Jaleco Moe Pro! '90 PCB", tag, owner, clock, "nes_jf29", __FILE__),
 						m_samples(*this, "samples")
 {
 }
 
-nes_jf33_device::nes_jf33_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_jf33_device::nes_jf33_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_ss88006_adpcm_device(mconfig, NES_JF33, "NES Cart Jaleco Moe Pro! Saikyou-hen PCB", tag, owner, clock, "nes_jf33", __FILE__),
 						m_samples(*this, "samples")
 {

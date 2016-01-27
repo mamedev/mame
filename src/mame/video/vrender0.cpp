@@ -25,7 +25,7 @@
 
 const device_type VIDEO_VRENDER0 = &device_creator<vr0video_device>;
 
-vr0video_device::vr0video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+vr0video_device::vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VIDEO_VRENDER0, "VRender0 Video", tag, owner, clock, "vr0video", __FILE__),
 		m_cpu(*this)
 {

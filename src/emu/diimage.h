@@ -208,10 +208,10 @@ public:
 	void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
 	const char * working_directory();
 
-	UINT8 *get_software_region(std::string tag);
-	UINT32 get_software_region_length(std::string tag);
+	UINT8 *get_software_region(const char *tag);
+	UINT32 get_software_region_length(const char *tag);
 	const char *get_feature(const char *feature_name);
-	bool load_software_region(std::string tag, optional_shared_ptr<UINT8> &ptr);
+	bool load_software_region(const char *tag, optional_shared_ptr<UINT8> &ptr);
 
 	UINT32 crc();
 	hash_collection& hash() { return m_hash; }

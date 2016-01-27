@@ -36,7 +36,7 @@ class upd7227_device :  public device_t,
 {
 public:
 	// construction/destruction
-	upd7227_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	upd7227_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
 	static void static_set_offsets(device_t &device, int sx, int sy);

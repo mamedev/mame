@@ -13,8 +13,8 @@ class apf_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	apf_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	apf_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	apf_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	apf_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override {}
@@ -30,7 +30,7 @@ class apf_basic_device : public apf_rom_device
 {
 public:
 	// construction/destruction
-	apf_basic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	apf_basic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(extra_rom) override;
@@ -42,7 +42,7 @@ class apf_spacedst_device : public apf_rom_device
 {
 public:
 	// construction/destruction
-	apf_spacedst_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	apf_spacedst_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_ram) override;

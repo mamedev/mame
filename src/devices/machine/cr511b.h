@@ -75,7 +75,7 @@ class cr511b_device : public device_t
 {
 public:
 	// construction/destruction
-	cr511b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cr511b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// callbacks
 	template<class _Object> static devcb_base &set_stch_handler(device_t &device, _Object object)

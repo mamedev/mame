@@ -45,7 +45,7 @@ ADDRESS_MAP_END
 
 
 // device definitions
-mn1020012a_device::mn1020012a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mn1020012a_device::mn1020012a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mn10200_device(mconfig, MN1020012A, "MN1020012A", tag, owner, clock, ADDRESS_MAP_NAME(mn1020012a_internal_map), "mn1020012a", __FILE__)
 { }
 

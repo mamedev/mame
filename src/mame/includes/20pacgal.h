@@ -14,7 +14,7 @@
 class _20pacgal_state : public driver_device
 {
 public:
-	_20pacgal_state(const machine_config &mconfig, device_type type, std::string tag)
+	_20pacgal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_char_gfx_ram(*this, "char_gfx_ram"),
@@ -62,7 +62,6 @@ public:
 	virtual void machine_reset() override;
 	UINT32 screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	void set_bankptr();
 	void get_pens(pen_t *pens);
 	void do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_rgb32 &bitmap);
@@ -77,7 +76,7 @@ public:
 class _25pacman_state : public _20pacgal_state
 {
 public:
-	_25pacman_state(const machine_config &mconfig, device_type type, std::string tag)
+	_25pacman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: _20pacgal_state(mconfig, type, tag)
 	{ }
 

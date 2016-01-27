@@ -105,7 +105,7 @@ const device_type GAMEBOY = &device_creator<gameboy_sound_device>;
 //  gameboy_sound_device - constructor
 //-------------------------------------------------
 
-gameboy_sound_device::gameboy_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+gameboy_sound_device::gameboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, GAMEBOY, "LR35902 Sound", tag, owner, clock, "gameboy_sound", __FILE__),
 						device_sound_interface(mconfig, *this)
 {

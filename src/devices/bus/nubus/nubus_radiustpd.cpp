@@ -65,7 +65,7 @@ const rom_entry *nubus_radiustpd_device::device_rom_region() const
 //  nubus_radiustpd_device - constructor
 //-------------------------------------------------
 
-nubus_radiustpd_device::nubus_radiustpd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+nubus_radiustpd_device::nubus_radiustpd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, NUBUS_RADIUSTPD, "Radius Two Page Display video card", tag, owner, clock, "nb_rtpd", __FILE__),
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
@@ -74,7 +74,7 @@ nubus_radiustpd_device::nubus_radiustpd_device(const machine_config &mconfig, st
 	m_screen_tag = m_assembled_tag.c_str();
 }
 
-nubus_radiustpd_device::nubus_radiustpd_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+nubus_radiustpd_device::nubus_radiustpd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)

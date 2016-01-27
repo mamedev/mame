@@ -4436,13 +4436,13 @@ void i860_cpu_device::execute_run()
 		if (m_pc == 0xfffc0370 ||
 			m_pc == 0xfffc03a4)
 		{
-			fprintf(stderr, "(%s) 0x%08x: snag 0x20000000\n", tag().c_str(), m_pc);
+			fprintf(stderr, "(%s) 0x%08x: snag 0x20000000\n", tag(), m_pc);
 			m_single_stepping = 0;
 		}
 		else if (m_pc == 0xfffc0384 ||
 					m_pc == 0xfffc03b8)
 		{
-			fprintf(stderr, "(%s) 0x%08x: passed 0x20000000\n", tag().c_str(), m_pc);
+			fprintf(stderr, "(%s) 0x%08x: passed 0x20000000\n", tag(), m_pc);
 			m_single_stepping = 0;
 		}
 #endif

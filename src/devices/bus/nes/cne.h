@@ -12,7 +12,7 @@ class nes_cne_decathl_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_cne_decathl_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nes_cne_decathl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -28,7 +28,7 @@ class nes_cne_fsb_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_cne_fsb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nes_cne_fsb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -45,7 +45,7 @@ class nes_cne_shlz_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_cne_shlz_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nes_cne_shlz_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

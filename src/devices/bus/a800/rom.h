@@ -13,8 +13,8 @@ class a800_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	a800_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	a800_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a800_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a800_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -30,7 +30,7 @@ class a800_rom_bbsb_device : public a800_rom_device
 {
 public:
 	// construction/destruction
-	a800_rom_bbsb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a800_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -50,7 +50,7 @@ class a800_rom_williams_device : public a800_rom_device
 {
 public:
 	// construction/destruction
-	a800_rom_williams_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a800_rom_williams_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -70,7 +70,7 @@ class a800_rom_express_device : public a800_rom_device
 {
 public:
 	// construction/destruction
-	a800_rom_express_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a800_rom_express_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -90,7 +90,7 @@ class a800_rom_blizzard_device : public a800_rom_device
 {
 public:
 	// construction/destruction
-	a800_rom_blizzard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a800_rom_blizzard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -106,7 +106,7 @@ class a800_rom_turbo_device : public a800_rom_device
 {
 public:
 	// construction/destruction
-	a800_rom_turbo_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a800_rom_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -126,7 +126,7 @@ class a800_rom_telelink2_device : public a800_rom_device
 {
 public:
 	// construction/destruction
-	a800_rom_telelink2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a800_rom_telelink2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual DECLARE_READ8_MEMBER(read_80xx) override;
 	virtual DECLARE_WRITE8_MEMBER(write_80xx) override;
@@ -141,7 +141,7 @@ class a800_rom_microcalc_device : public a800_rom_device
 {
 public:
 	// construction/destruction
-	a800_rom_microcalc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a800_rom_microcalc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -161,7 +161,7 @@ class xegs_rom_device : public a800_rom_device
 {
 public:
 	// construction/destruction
-	xegs_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	xegs_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -181,7 +181,7 @@ class a5200_rom_2chips_device : public a800_rom_device
 {
 public:
 	// construction/destruction
-	a5200_rom_2chips_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a5200_rom_2chips_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual DECLARE_READ8_MEMBER(read_80xx) override;
 };
@@ -193,7 +193,7 @@ class a5200_rom_bbsb_device : public a800_rom_device
 {
 public:
 	// construction/destruction
-	a5200_rom_bbsb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a5200_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

@@ -14,8 +14,8 @@ class gba_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	gba_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	gba_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gba_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	gba_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -31,7 +31,7 @@ class gba_rom_sram_device : public gba_rom_device
 {
 public:
 	// construction/destruction
-	gba_rom_sram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gba_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_ram) override;
@@ -44,7 +44,7 @@ class gba_rom_flash_device : public gba_rom_device
 {
 public:
 	// construction/destruction
-	gba_rom_flash_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gba_rom_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -66,7 +66,7 @@ class gba_rom_flash1m_device : public gba_rom_device
 {
 public:
 	// construction/destruction
-	gba_rom_flash1m_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gba_rom_flash1m_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -127,7 +127,7 @@ class gba_rom_eeprom_device : public gba_rom_device
 {
 public:
 	// construction/destruction
-	gba_rom_eeprom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gba_rom_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -147,7 +147,7 @@ class gba_rom_eeprom64_device : public gba_rom_device
 {
 public:
 	// construction/destruction
-	gba_rom_eeprom64_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gba_rom_eeprom64_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

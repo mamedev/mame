@@ -33,7 +33,7 @@
 // device type definition
 const device_type FIXFREQ = &device_creator<fixedfreq_device>;
 
-fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this, false), m_htotal(0), m_vtotal(0), m_vid(0), m_last_x(0), m_last_y(0), m_cur_bm(0),
 		// default to NTSC "704x480@30i"
@@ -52,7 +52,7 @@ fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type ty
 {
 }
 
-fixedfreq_device::fixedfreq_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+fixedfreq_device::fixedfreq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, FIXFREQ, "Fixed Frequency Monochrome Monitor", tag, owner, clock, "fixfreq", __FILE__),
 		device_video_interface(mconfig, *this, false),
 		// default to NTSC "704x480@30i"

@@ -69,26 +69,26 @@
 #endif
 
 #if RDP_RANGE_CHECK
-#define RREADADDR8(in) ((rdp_range_check((in))) ? 0 : (((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR]))
-#define RREADIDX16(in) ((rdp_range_check((in) << 1)) ? 0 : (((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR]))
-#define RREADIDX32(in) ((rdp_range_check((in) << 2)) ? 0 : rdram[(in)])
+#define RREADADDR8(in) ((rdp_range_check((in))) ? 0 : (((UINT8*)m_rdram)[(in) ^ BYTE_ADDR_XOR]))
+#define RREADIDX16(in) ((rdp_range_check((in) << 1)) ? 0 : (((UINT16*)m_rdram)[(in) ^ WORD_ADDR_XOR]))
+#define RREADIDX32(in) ((rdp_range_check((in) << 2)) ? 0 : m_rdram[(in)])
 
-#define RWRITEADDR8(in, val)    if(rdp_range_check((in))) { printf("Write8: Address %08x out of range!\n", (in)); fflush(stdout); fatalerror("Address %08x out of range!\n", (in)); } else { ((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR] = val;}
-#define RWRITEIDX16(in, val)    if(rdp_range_check((in) << 1)) { printf("Write16: Address %08x out of range!\n", ((object.m_misc_state.m_fb_address >> 1) + curpixel) << 1); fflush(stdout); fatalerror("Address out of range\n"); } else { ((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR] = val;}
-#define RWRITEIDX32(in, val)    if(rdp_range_check((in) << 2)) { printf("Write32: Address %08x out of range!\n", (in) << 2); fflush(stdout); fatalerror("Address %08x out of range!\n", (in) << 2); } else { rdram[(in)] = val;}
+#define RWRITEADDR8(in, val)    if(rdp_range_check((in))) { printf("Write8: Address %08x out of range!\n", (in)); fflush(stdout); fatalerror("Address %08x out of range!\n", (in)); } else { ((UINT8*)m_rdram)[(in) ^ BYTE_ADDR_XOR] = val;}
+#define RWRITEIDX16(in, val)    if(rdp_range_check((in) << 1)) { printf("Write16: Address %08x out of range!\n", ((object.m_misc_state.m_fb_address >> 1) + curpixel) << 1); fflush(stdout); fatalerror("Address out of range\n"); } else { ((UINT16*)m_rdram)[(in) ^ WORD_ADDR_XOR] = val;}
+#define RWRITEIDX32(in, val)    if(rdp_range_check((in) << 2)) { printf("Write32: Address %08x out of range!\n", (in) << 2); fflush(stdout); fatalerror("Address %08x out of range!\n", (in) << 2); } else { m_rdram[(in)] = val;}
 #else
-#define RREADADDR8(in) (((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR])
-#define RREADIDX16(in) (((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR])
-#define RREADIDX32(in) (rdram[(in)])
+#define RREADADDR8(in) (((UINT8*)m_rdram)[(in) ^ BYTE_ADDR_XOR])
+#define RREADIDX16(in) (((UINT16*)m_rdram)[(in) ^ WORD_ADDR_XOR])
+#define RREADIDX32(in) (m_rdram[(in)])
 
-#define RWRITEADDR8(in, val)    ((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR] = val;
-#define RWRITEIDX16(in, val)    ((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR] = val;
-#define RWRITEIDX32(in, val)    rdram[(in)] = val
+#define RWRITEADDR8(in, val)    ((UINT8*)m_rdram)[(in) ^ BYTE_ADDR_XOR] = val;
+#define RWRITEIDX16(in, val)    ((UINT16*)m_rdram)[(in) ^ WORD_ADDR_XOR] = val;
+#define RWRITEIDX32(in, val)    m_rdram[(in)] = val
 #endif
 
-#define U_RREADADDR8(in) (((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR])
-#define U_RREADIDX16(in) (((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR])
-#define U_RREADIDX32(in) (rdram[(in)])
+#define U_RREADADDR8(in) (((UINT8*)m_rdram)[(in) ^ BYTE_ADDR_XOR])
+#define U_RREADIDX16(in) (((UINT16*)m_rdram)[(in) ^ WORD_ADDR_XOR])
+#define U_RREADIDX32(in) (m_rdram[(in)])
 
 #define GETLOWCOL(x)    (((x) & 0x3e) << 2)
 #define GETMEDCOL(x)    (((x) & 0x7c0) >> 3)
@@ -133,7 +133,7 @@ typedef void (*rdp_command_t)(UINT32 w1, UINT32 w2);
 class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 {
 public:
-	n64_rdp(n64_state &state);
+	n64_rdp(n64_state &state, UINT32* rdram, UINT32* dmem);
 
 	running_machine &machine() const { assert(m_machine != nullptr); return *m_machine; }
 
@@ -331,6 +331,8 @@ private:
 	compute_cvg_t   m_compute_cvg[2];
 
 	running_machine* m_machine;
+	UINT32*         m_rdram;
+	UINT32*         m_dmem;
 
 	combine_modes_t m_combine;
 	bool            m_pending_mode_block;

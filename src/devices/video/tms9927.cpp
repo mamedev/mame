@@ -34,37 +34,39 @@ const device_type CRT5027 = &device_creator<crt5027_device>;
 const device_type CRT5037 = &device_creator<crt5037_device>;
 const device_type CRT5057 = &device_creator<crt5057_device>;
 
-tms9927_device::tms9927_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tms9927_device::tms9927_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, TMS9927, "TMS9927 VTC", tag, owner, clock, "tms9927", __FILE__),
 					device_video_interface(mconfig, *this),
 					m_write_vsyn(*this),
 					m_hpixels_per_column(0),
+					m_selfload_region(nullptr),
 					m_reset(0)
 {
 	memset(m_reg, 0x00, sizeof(m_reg));
 }
 
-tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 				: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_video_interface(mconfig, *this),
 					m_write_vsyn(*this),
 					m_hpixels_per_column(0),
+					m_selfload_region(nullptr),
 					m_reset(0)
 {
 	memset(m_reg, 0x00, sizeof(m_reg));
 }
 
-crt5027_device::crt5027_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+crt5027_device::crt5027_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 				: tms9927_device(mconfig, CRT5027, "CRT5027", tag, owner, clock, "crt5027", __FILE__)
 {
 }
 
-crt5037_device::crt5037_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+crt5037_device::crt5037_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 				: tms9927_device(mconfig, CRT5037, "CRT5037", tag, owner, clock, "crt5037", __FILE__)
 {
 }
 
-crt5057_device::crt5057_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+crt5057_device::crt5057_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 				: tms9927_device(mconfig, CRT5057, "CRT5057", tag, owner, clock, "crt5057", __FILE__)
 {
 }
@@ -83,7 +85,7 @@ void tms9927_device::device_start()
 	m_clock = clock();
 
 	/* get the self-load PROM */
-	if (!m_selfload_region.empty())
+	if (m_selfload_region != nullptr)
 	{
 		m_selfload = machine().root_device().memregion(m_selfload_region)->base();
 		assert(m_selfload != nullptr);

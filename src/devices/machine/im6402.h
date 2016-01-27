@@ -79,7 +79,7 @@ class im6402_device :  public device_t,
 {
 public:
 	// construction/destruction
-	im6402_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	im6402_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void set_rrc(device_t &device, int rrc) { downcast<im6402_device &>(device).m_rrc = rrc; }
 	static void set_trc(device_t &device, int trc) { downcast<im6402_device &>(device).m_trc = trc; }

@@ -199,7 +199,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_iganinju_scanline)
 	int scanline = param;
 
 	// TODO: there's more than one hint that MCU controls IRQ signals via work RAM buffers.
-	//		 This is a bare miminum guessing for this specific game, it definitely don't like neither lv 1 nor 2.
+	//       This is a bare miminum guessing for this specific game, it definitely don't like neither lv 1 nor 2.
 	//       Of course MCU is probably doing a lot more to mask and probably set a specific line too.
 	if(m_ram[0] == 0)
 		return;

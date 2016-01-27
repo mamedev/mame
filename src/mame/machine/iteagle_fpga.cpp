@@ -25,7 +25,7 @@ DEVICE_ADDRESS_MAP_START(ram_map, 32, iteagle_fpga_device)
 	AM_RANGE(0x00000, 0x1ffff) AM_READWRITE(ram_r, ram_w)
 ADDRESS_MAP_END
 
-iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, ITEAGLE_FPGA, "ITEagle FPGA", tag, owner, clock, "iteagle_fpga", __FILE__),
 		device_nvram_interface(mconfig, *this), m_version(0), m_seq_init(0)
 {
@@ -487,7 +487,7 @@ machine_config_constructor iteagle_eeprom_device::device_mconfig_additions() con
 	return MACHINE_CONFIG_NAME( iteagle_eeprom );
 }
 
-iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, ITEAGLE_EEPROM, "ITEagle EEPROM AT93C46", tag, owner, clock, "eeprom", __FILE__),
 		m_eeprom(*this, "eeprom"), m_sw_version(0)
 {
@@ -612,7 +612,7 @@ machine_config_constructor iteagle_ide_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( iteagle_ide );
 }
 
-iteagle_ide_device::iteagle_ide_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+iteagle_ide_device::iteagle_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, ITEAGLE_IDE, "ITEagle IDE Controller", tag, owner, clock, "ide", __FILE__),
 		m_ide(*this, "ide"),
 		m_ide2(*this, "ide2"),
@@ -620,7 +620,7 @@ iteagle_ide_device::iteagle_ide_device(const machine_config &mconfig, std::strin
 {
 }
 
-void iteagle_ide_device::set_irq_info(std::string tag, const int irq_num)
+void iteagle_ide_device::set_irq_info(const char *tag, const int irq_num)
 {
 	m_cpu_tag = tag;
 	m_irq_num = irq_num;

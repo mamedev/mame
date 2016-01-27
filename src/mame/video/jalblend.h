@@ -3,7 +3,7 @@
 class jaleco_blend_device : public device_t
 {
 public:
-	jaleco_blend_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	jaleco_blend_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~jaleco_blend_device() {}
 
 	void set(int color, UINT8 val);

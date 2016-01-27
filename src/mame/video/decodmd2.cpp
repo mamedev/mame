@@ -135,7 +135,7 @@ static MACHINE_CONFIG_FRAGMENT( decodmd2 )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("firq_timer",decodmd_type2_device,dmd_firq,attotime::from_hz(80))
 
-	MCFG_MC6845_ADD("dmd6845", MC6845, "", XTAL_8MHz / 8)  // TODO: confirm clock speed
+	MCFG_MC6845_ADD("dmd6845", MC6845, nullptr, XTAL_8MHz / 8)  // TODO: confirm clock speed
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(decodmd_type2_device, crtc_update_row)
@@ -158,7 +158,7 @@ machine_config_constructor decodmd_type2_device::device_mconfig_additions() cons
 	return MACHINE_CONFIG_NAME( decodmd2 );
 }
 
-decodmd_type2_device::decodmd_type2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+decodmd_type2_device::decodmd_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECODMD2, "Data East Pinball Dot Matrix Display Type 2", tag, owner, clock, "decodmd2", __FILE__),
 		m_cpu(*this,"dmdcpu"),
 		m_mc6845(*this,"dmd6845"),
@@ -190,7 +190,7 @@ void decodmd_type2_device::device_reset()
 	m_busy = false;
 }
 
-void decodmd_type2_device::static_set_gfxregion(device_t &device, std::string tag)
+void decodmd_type2_device::static_set_gfxregion(device_t &device, const char *tag)
 {
 	decodmd_type2_device &cpuboard = downcast<decodmd_type2_device &>(device);
 	cpuboard.m_gfxtag = tag;

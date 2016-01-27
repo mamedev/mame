@@ -319,7 +319,7 @@ bool debug_comment_save(running_machine &machine)
 				xml_data_node *curnode = xml_add_child(systemnode, "cpu", nullptr);
 				if (curnode == nullptr)
 					throw emu_exception();
-				xml_set_attribute(curnode, "tag", device->tag().c_str());
+				xml_set_attribute(curnode, "tag", device->tag());
 
 				// export the comments
 				if (!device->debug()->comment_export(*curnode))
@@ -1110,7 +1110,7 @@ static void process_source_file(running_machine &machine)
     based on a case insensitive tag search
 -------------------------------------------------*/
 
-static device_t *expression_get_device(running_machine &machine, std::string tag)
+static device_t *expression_get_device(running_machine &machine, const char *tag)
 {
 	// convert to lowercase then lookup the name (tags are enforced to be all lower case)
 	std::string fullname(tag);
@@ -1792,7 +1792,7 @@ void device_debug::interrupt_hook(int irqline)
 	if ((m_flags & DEBUG_FLAG_STOP_INTERRUPT) != 0 && (m_stopirq == -1 || m_stopirq == irqline))
 	{
 		global->execution_state = EXECUTION_STATE_STOPPED;
-		debug_console_printf(m_device.machine(), "Stopped on interrupt (CPU '%s', IRQ %d)\n", m_device.tag().c_str(), irqline);
+		debug_console_printf(m_device.machine(), "Stopped on interrupt (CPU '%s', IRQ %d)\n", m_device.tag(), irqline);
 		compute_debug_flags();
 	}
 }
@@ -1811,7 +1811,7 @@ void device_debug::exception_hook(int exception)
 	if ((m_flags & DEBUG_FLAG_STOP_EXCEPTION) != 0 && (m_stopexception == -1 || m_stopexception == exception))
 	{
 		global->execution_state = EXECUTION_STATE_STOPPED;
-		debug_console_printf(m_device.machine(), "Stopped on exception (CPU '%s', exception %d)\n", m_device.tag().c_str(), exception);
+		debug_console_printf(m_device.machine(), "Stopped on exception (CPU '%s', exception %d)\n", m_device.tag(), exception);
 		compute_debug_flags();
 	}
 }
@@ -1889,7 +1889,7 @@ void device_debug::instruction_hook(offs_t curpc)
 		// check the temp running breakpoint and break if we hit it
 		else if ((m_flags & DEBUG_FLAG_STOP_PC) != 0 && m_stopaddr == curpc)
 		{
-			debug_console_printf(machine, "Stopped at temporary breakpoint %X on CPU '%s'\n", m_stopaddr, m_device.tag().c_str());
+			debug_console_printf(machine, "Stopped at temporary breakpoint %X on CPU '%s'\n", m_stopaddr, m_device.tag());
 			global->execution_state = EXECUTION_STATE_STOPPED;
 		}
 

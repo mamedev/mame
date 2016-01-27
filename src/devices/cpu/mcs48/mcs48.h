@@ -126,7 +126,7 @@ class mcs48_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	mcs48_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int rom_size, int ram_size, UINT8 feature_mask = 0);
+	mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int rom_size, int ram_size, UINT8 feature_mask = 0);
 
 protected:
 	// device-level overrides
@@ -483,7 +483,7 @@ class i8021_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8021_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device_execute_interface overrides
@@ -495,7 +495,7 @@ class i8022_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8022_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8022_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device_execute_interface overrides
@@ -507,84 +507,84 @@ class i8035_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8035_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8035_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class i8048_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8048_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8048_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class i8648_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8648_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8648_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class i8748_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8748_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8748_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class i8039_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8039_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8039_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class i8049_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8049_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8049_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class i8749_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8749_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8749_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class i8040_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8040_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class i8050_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8050_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class mb8884_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	mb8884_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mb8884_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class n7751_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	n7751_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	n7751_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class m58715_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	m58715_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m58715_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -592,7 +592,7 @@ class upi41_cpu_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	upi41_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int rom_size, int ram_size);
+	upi41_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int rom_size, int ram_size);
 
 	/* functions for talking to the input/output buffers on the UPI41-class chips */
 	DECLARE_READ8_MEMBER(upi41_master_r);
@@ -608,35 +608,35 @@ class i8041_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8041_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class i8741_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8741_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8741_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class i8042_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8042_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class i8242_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8242_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8242_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class i8742_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8742_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8742_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

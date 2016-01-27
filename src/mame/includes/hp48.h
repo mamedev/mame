@@ -44,7 +44,7 @@ typedef struct
 class hp48_state : public driver_device
 {
 public:
-	hp48_state(const machine_config &mconfig, device_type type, std::string tag)
+	hp48_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
@@ -173,7 +173,7 @@ class hp48_port_image_device :  public device_t,
 {
 public:
 	// construction/destruction
-	hp48_port_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void set_port_config(device_t &device, int port, int module, int max_size)
 	{

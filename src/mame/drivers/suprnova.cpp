@@ -456,7 +456,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(skns_state::skns_irq)
 
 CUSTOM_INPUT_MEMBER(skns_state::paddle_r)
 {
-	std::string tag = (const char *)param;
+	const char *tag = (const char *)param;
 	return ioport(tag)->read();
 }
 

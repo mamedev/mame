@@ -108,7 +108,7 @@ class ql_expansion_slot_t : public device_t,
 {
 public:
 	// construction/destruction
-	ql_expansion_slot_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ql_expansion_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_ipl0l_wr_callback(device_t &device, _Object object) { return downcast<ql_expansion_slot_t &>(device).m_write_ipl0l.set_callback(object); }
 	template<class _Object> static devcb_base &set_ipl1l_wr_callback(device_t &device, _Object object) { return downcast<ql_expansion_slot_t &>(device).m_write_ipl1l.set_callback(object); }

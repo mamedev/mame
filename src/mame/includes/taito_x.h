@@ -6,7 +6,7 @@
 class taitox_state : public seta_state
 {
 public:
-	taitox_state(const machine_config &mconfig, device_type type, std::string tag)
+	taitox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: seta_state(mconfig, type, tag) { }
 
 	DECLARE_READ16_MEMBER(superman_dsw_input_r);

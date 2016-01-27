@@ -531,7 +531,7 @@ const device_type FLOPPY_SONY = &device_creator<sonydriv_floppy_image_device>;
 //  sonydriv_floppy_image_device - constructor
 //-------------------------------------------------
 
-sonydriv_floppy_image_device::sonydriv_floppy_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sonydriv_floppy_image_device::sonydriv_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: legacy_floppy_image_device(mconfig, FLOPPY_SONY, "Floppy Disk [Sony]", tag, owner, clock, "floppy_sonny", __FILE__)
 {
 }

@@ -43,7 +43,7 @@ struct psx_root
 class psxrcnt_device : public device_t
 {
 public:
-	psxrcnt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	psxrcnt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq0_handler(device_t &device, _Object object) { return downcast<psxrcnt_device &>(device).m_irq0_handler.set_callback(object); }

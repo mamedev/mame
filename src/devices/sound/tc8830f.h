@@ -32,7 +32,7 @@ class tc8830f_device : public device_t,
 {
 public:
 	// construction/destruction
-	tc8830f_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tc8830f_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void reset();
 	void write_p(UINT8 data);

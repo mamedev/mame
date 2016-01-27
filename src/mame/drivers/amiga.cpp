@@ -32,7 +32,7 @@
 class a1000_state : public amiga_state
 {
 public:
-	a1000_state(const machine_config &mconfig, device_type type, std::string tag) :
+	a1000_state(const machine_config &mconfig, device_type type, const char *tag) :
 	amiga_state(mconfig, type, tag),
 	m_bootrom(*this, "bootrom"),
 	m_wom(*this, "wom")
@@ -56,7 +56,7 @@ private:
 class a2000_state : public amiga_state
 {
 public:
-	a2000_state(const machine_config &mconfig, device_type type, std::string tag) :
+	a2000_state(const machine_config &mconfig, device_type type, const char *tag) :
 	amiga_state(mconfig, type, tag),
 	m_rtc(*this, "u65"),
 	m_zorro(*this, ZORROBUS_TAG),
@@ -93,7 +93,7 @@ private:
 class a500_state : public amiga_state
 {
 public:
-	a500_state(const machine_config &mconfig, device_type type, std::string tag) :
+	a500_state(const machine_config &mconfig, device_type type, const char *tag) :
 	amiga_state(mconfig, type, tag),
 	m_side(*this, EXP_SLOT_TAG),
 	m_side_int2(0),
@@ -122,7 +122,7 @@ private:
 class cdtv_state : public amiga_state
 {
 public:
-	cdtv_state(const machine_config &mconfig, device_type type, std::string tag) :
+	cdtv_state(const machine_config &mconfig, device_type type, const char *tag) :
 	amiga_state(mconfig, type, tag),
 	m_rtc(*this, "u61"),
 	m_dmac(*this, "u36"),
@@ -170,7 +170,7 @@ private:
 class a3000_state : public amiga_state
 {
 public:
-	a3000_state(const machine_config &mconfig, device_type type, std::string tag) :
+	a3000_state(const machine_config &mconfig, device_type type, const char *tag) :
 	amiga_state(mconfig, type, tag)
 	{ }
 
@@ -190,7 +190,7 @@ private:
 class a500p_state : public amiga_state
 {
 public:
-	a500p_state(const machine_config &mconfig, device_type type, std::string tag) :
+	a500p_state(const machine_config &mconfig, device_type type, const char *tag) :
 	amiga_state(mconfig, type, tag),
 	m_rtc(*this, "u9"),
 	m_side(*this, EXP_SLOT_TAG),
@@ -224,7 +224,7 @@ private:
 class a600_state : public amiga_state
 {
 public:
-	a600_state(const machine_config &mconfig, device_type type, std::string tag) :
+	a600_state(const machine_config &mconfig, device_type type, const char *tag) :
 	amiga_state(mconfig, type, tag),
 	m_gayle_int2(0)
 	{ }
@@ -246,7 +246,7 @@ private:
 class a1200_state : public amiga_state
 {
 public:
-	a1200_state(const machine_config &mconfig, device_type type, std::string tag) :
+	a1200_state(const machine_config &mconfig, device_type type, const char *tag) :
 	amiga_state(mconfig, type, tag),
 	m_gayle_int2(0)
 	{ }
@@ -268,7 +268,7 @@ private:
 class a4000_state : public amiga_state
 {
 public:
-	a4000_state(const machine_config &mconfig, device_type type, std::string tag) :
+	a4000_state(const machine_config &mconfig, device_type type, const char *tag) :
 	amiga_state(mconfig, type, tag),
 	m_ata(*this, "ata"),
 	m_ramsey_config(0),
@@ -304,7 +304,7 @@ private:
 class cd32_state : public amiga_state
 {
 public:
-	cd32_state(const machine_config &mconfig, device_type type, std::string tag) :
+	cd32_state(const machine_config &mconfig, device_type type, const char *tag) :
 	amiga_state(mconfig, type, tag),
 	m_p1_port(*this, "p1_cd32_buttons"),
 	m_p2_port(*this, "p2_cd32_buttons"),
@@ -1198,16 +1198,16 @@ static INPUT_PORTS_START( amiga )
 	PORT_CONFSETTING(0x20, DEF_STR(Joystick) )
 
 	PORT_START("cia_0_port_a")
-	PORT_BIT(0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, amiga_state, floppy_drive_status, 0)
+	PORT_BIT(0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, amiga_state, floppy_drive_status, (void *)0)
 	PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_BUTTON1) PORT_PLAYER(1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_BUTTON1) PORT_PLAYER(2)
 
 	PORT_START("joy_0_dat")
-	PORT_BIT(0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, amiga_state, amiga_joystick_convert, 0)
+	PORT_BIT(0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, amiga_state, amiga_joystick_convert, (void *)0)
 	PORT_BIT(0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("joy_1_dat")
-	PORT_BIT(0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, amiga_state, amiga_joystick_convert, 1)
+	PORT_BIT(0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, amiga_state, amiga_joystick_convert, (void *)1)
 	PORT_BIT(0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("potgo")
@@ -1248,19 +1248,19 @@ INPUT_PORTS_START( cd32 )
 	PORT_MODIFY("cia_0_port_a")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_SPECIAL )
 	// this is the regular port for reading a single button joystick on the Amiga, many CD32 games require this to mirror the pad start button!
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cd32_state, cd32_sel_mirror_input, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cd32_state, cd32_sel_mirror_input, 1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cd32_state, cd32_sel_mirror_input, (void *)0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cd32_state, cd32_sel_mirror_input, (void *)1)
 
 	PORT_MODIFY("joy_0_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, amiga_state, amiga_joystick_convert, 0)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, amiga_state, amiga_joystick_convert, (void *)0)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("joy_1_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, amiga_state, amiga_joystick_convert, 1)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, amiga_state, amiga_joystick_convert, (void *)1)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("potgo")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cd32_state, cd32_input, 0)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cd32_state, cd32_input, (void *)0)
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	// CD32 '11' button pad (4 dpad directions + 7 buttons), not read directly
@@ -1668,6 +1668,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a1200, amiga_base, a1200_state )
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
+	MCFG_SCREEN_NO_PALETTE
 
 	MCFG_DEVICE_REMOVE("palette")
 
@@ -1695,6 +1696,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a1200n, a1200, a1200_state )
 	MCFG_FRAGMENT_ADD(ntsc_video)
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
+	MCFG_SCREEN_NO_PALETTE
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
 	MCFG_DEVICE_MODIFY("cia_0")
@@ -1719,6 +1721,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a4000, amiga_base, a4000_state )
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
+	MCFG_SCREEN_NO_PALETTE
 
 	MCFG_DEVICE_REMOVE("palette")
 
@@ -1739,6 +1742,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a4000n, a4000, a4000_state )
 	MCFG_FRAGMENT_ADD(ntsc_video)
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
+	MCFG_SCREEN_NO_PALETTE
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
 	MCFG_DEVICE_MODIFY("cia_0")
@@ -1763,6 +1767,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a400030n, a400030, a4000_state )
 	MCFG_FRAGMENT_ADD(ntsc_video)
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
+	MCFG_SCREEN_NO_PALETTE
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
 	MCFG_DEVICE_MODIFY("cia_0")
@@ -1796,6 +1801,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( cd32, amiga_base, cd32_state )
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
+	MCFG_SCREEN_NO_PALETTE
 
 	MCFG_DEVICE_REMOVE("palette")
 
@@ -1822,6 +1828,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( cd32n, cd32, cd32_state )
 	MCFG_FRAGMENT_ADD(ntsc_video)
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
+	MCFG_SCREEN_NO_PALETTE
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
 	MCFG_DEVICE_MODIFY("cia_0")
@@ -1846,6 +1853,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a4000tn, a4000, a4000_state )
 	MCFG_FRAGMENT_ADD(ntsc_video)
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
+	MCFG_SCREEN_NO_PALETTE
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
 	MCFG_DEVICE_MODIFY("cia_0")

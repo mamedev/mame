@@ -16,7 +16,7 @@ Control Data Corporation CDC 721 Terminal (Viking)
 class cdc721_state : public driver_device
 {
 public:
-	cdc721_state(const machine_config &mconfig, device_type type, std::string tag)
+	cdc721_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 	, m_p_videoram(*this, "videoram")
 	, m_maincpu(*this, "maincpu")

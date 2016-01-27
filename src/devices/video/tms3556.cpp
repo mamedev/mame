@@ -80,7 +80,7 @@ inline void tms3556_device::writebyte(offs_t address, UINT8 data)
 //  tms3556_device - constructor
 //-------------------------------------------------
 
-tms3556_device::tms3556_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tms3556_device::tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS3556, "Texas Instruments VDP TMS3556", tag, owner, clock, "tms3556", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(tms3556)),

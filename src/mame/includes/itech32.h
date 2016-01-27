@@ -19,7 +19,7 @@
 class itech32_state : public driver_device
 {
 public:
-	itech32_state(const machine_config &mconfig, device_type type, std::string tag)
+	itech32_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_main_ram(*this, "main_ram", 0),
 		m_nvram(*this, "nvram", 0),
@@ -167,7 +167,7 @@ public:
 	inline offs_t compute_safe_address(int x, int y);
 	inline void disable_clipping();
 	inline void enable_clipping();
-	void logblit(std::string tag);
+	void logblit(const char *tag);
 	void update_interrupts(int fast);
 	void draw_raw(UINT16 *base, UINT16 color);
 	void draw_raw_drivedge(UINT16 *base, UINT16 *zbase, UINT16 color);

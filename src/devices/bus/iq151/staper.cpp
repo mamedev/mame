@@ -44,7 +44,7 @@ const device_type IQ151_STAPER = &device_creator<iq151_staper_device>;
 //  iq151_staper_device - constructor
 //-------------------------------------------------
 
-iq151_staper_device::iq151_staper_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+iq151_staper_device::iq151_staper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, IQ151_STAPER, "IQ151 STAPER", tag, owner, clock, "iq151_staper", __FILE__),
 		device_iq151cart_interface( mconfig, *this ),
 		m_ppi(*this, "ppi8255"),

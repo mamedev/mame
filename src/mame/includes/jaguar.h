@@ -27,7 +27,7 @@
 class jaguar_state : public driver_device
 {
 public:
-	jaguar_state(const machine_config &mconfig, device_type type, std::string tag)
+	jaguar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_gpu(*this, "gpu"),
@@ -43,6 +43,7 @@ public:
 			m_shared_ram(*this, "sharedram"),
 			m_gpu_ram(*this, "gpuram"),
 			m_gpu_clut(*this, "gpuclut"),
+			m_romboard_region(*this, "romboard"),
 			m_is_r3000(false),
 			m_is_cojag(false),
 			m_hacks_enabled(false),
@@ -83,6 +84,7 @@ public:
 	required_shared_ptr<UINT32> m_shared_ram;
 	required_shared_ptr<UINT32> m_gpu_ram;
 	required_shared_ptr<UINT32> m_gpu_clut;
+	optional_memory_region      m_romboard_region;
 
 	// configuration
 	bool m_is_r3000;

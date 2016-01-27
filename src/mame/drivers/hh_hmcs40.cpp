@@ -94,7 +94,7 @@
 class hh_hmcs40_state : public driver_device
 {
 public:
-	hh_hmcs40_state(const machine_config &mconfig, device_type type, std::string tag)
+	hh_hmcs40_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -341,7 +341,7 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
 class bambball_state : public hh_hmcs40_state
 {
 public:
-	bambball_state(const machine_config &mconfig, device_type type, std::string tag)
+	bambball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -451,7 +451,7 @@ MACHINE_CONFIG_END
 class bmboxing_state : public hh_hmcs40_state
 {
 public:
-	bmboxing_state(const machine_config &mconfig, device_type type, std::string tag)
+	bmboxing_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -585,7 +585,7 @@ MACHINE_CONFIG_END
 class bfriskyt_state : public hh_hmcs40_state
 {
 public:
-	bfriskyt_state(const machine_config &mconfig, device_type type, std::string tag)
+	bfriskyt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -661,7 +661,7 @@ static INPUT_PORTS_START( bfriskyt )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, bfriskyt_state, input_changed, NULL)
 
 	PORT_START("IN.5") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(bfriskyt_state::input_changed)
@@ -713,7 +713,7 @@ MACHINE_CONFIG_END
 class packmon_state : public hh_hmcs40_state
 {
 public:
-	packmon_state(const machine_config &mconfig, device_type type, std::string tag)
+	packmon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -822,7 +822,7 @@ MACHINE_CONFIG_END
 class msthawk_state : public hh_hmcs40_state
 {
 public:
-	msthawk_state(const machine_config &mconfig, device_type type, std::string tag)
+	msthawk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -948,7 +948,7 @@ MACHINE_CONFIG_END
 class bzaxxon_state : public hh_hmcs40_state
 {
 public:
-	bzaxxon_state(const machine_config &mconfig, device_type type, std::string tag)
+	bzaxxon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1016,7 +1016,7 @@ static INPUT_PORTS_START( bzaxxon )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, bzaxxon_state, input_changed, NULL)
 
 	PORT_START("IN.4") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 
 	PORT_START("IN.5") // port D
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SELECT )
@@ -1066,7 +1066,7 @@ MACHINE_CONFIG_END
 class zackman_state : public hh_hmcs40_state
 {
 public:
-	zackman_state(const machine_config &mconfig, device_type type, std::string tag)
+	zackman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1183,7 +1183,7 @@ MACHINE_CONFIG_END
 class bpengo_state : public hh_hmcs40_state
 {
 public:
-	bpengo_state(const machine_config &mconfig, device_type type, std::string tag)
+	bpengo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1309,7 +1309,7 @@ MACHINE_CONFIG_END
 class bbtime_state : public hh_hmcs40_state
 {
 public:
-	bbtime_state(const machine_config &mconfig, device_type type, std::string tag)
+	bbtime_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1431,7 +1431,7 @@ MACHINE_CONFIG_END
 class bdoramon_state : public hh_hmcs40_state
 {
 public:
-	bdoramon_state(const machine_config &mconfig, device_type type, std::string tag)
+	bdoramon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1470,7 +1470,7 @@ WRITE16_MEMBER(bdoramon_state::grid_w)
 
 static INPUT_PORTS_START( bdoramon )
 	PORT_START("IN.0") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 
 	PORT_START("IN.1") // INT1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)1)
@@ -1527,7 +1527,7 @@ MACHINE_CONFIG_END
 class bultrman_state : public hh_hmcs40_state
 {
 public:
-	bultrman_state(const machine_config &mconfig, device_type type, std::string tag)
+	bultrman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1566,7 +1566,7 @@ WRITE16_MEMBER(bultrman_state::grid_w)
 
 static INPUT_PORTS_START( bultrman )
 	PORT_START("IN.0") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 
 	PORT_START("IN.1") // port D
 	PORT_CONFNAME( 0x0010, 0x0000, "Factory Test" )
@@ -1615,7 +1615,7 @@ MACHINE_CONFIG_END
 class machiman_state : public hh_hmcs40_state
 {
 public:
-	machiman_state(const machine_config &mconfig, device_type type, std::string tag)
+	machiman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1655,7 +1655,7 @@ WRITE16_MEMBER(machiman_state::grid_w)
 
 static INPUT_PORTS_START( machiman )
 	PORT_START("IN.0") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 
 	PORT_START("IN.1") // port D
 	PORT_BIT( 0x3fff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1707,7 +1707,7 @@ MACHINE_CONFIG_END
 class pairmtch_state : public hh_hmcs40_state
 {
 public:
-	pairmtch_state(const machine_config &mconfig, device_type type, std::string tag)
+	pairmtch_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1857,7 +1857,7 @@ MACHINE_CONFIG_END
 class alnattck_state : public hh_hmcs40_state
 {
 public:
-	alnattck_state(const machine_config &mconfig, device_type type, std::string tag)
+	alnattck_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1966,7 +1966,7 @@ MACHINE_CONFIG_END
 class cdkong_state : public hh_hmcs40_state
 {
 public:
-	cdkong_state(const machine_config &mconfig, device_type type, std::string tag)
+	cdkong_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -2030,7 +2030,7 @@ WRITE16_MEMBER(cdkong_state::grid_w)
 
 static INPUT_PORTS_START( cdkong )
 	PORT_START("IN.0") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 
 	PORT_START("IN.1") // port D
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
@@ -2098,7 +2098,7 @@ MACHINE_CONFIG_END
 class cgalaxn_state : public hh_hmcs40_state
 {
 public:
-	cgalaxn_state(const machine_config &mconfig, device_type type, std::string tag)
+	cgalaxn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -2166,7 +2166,7 @@ static INPUT_PORTS_START( cgalaxn )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 
 	PORT_START("IN.3") // INT1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)1)
@@ -2229,7 +2229,7 @@ MACHINE_CONFIG_END
 class cpacman_state : public hh_hmcs40_state
 {
 public:
-	cpacman_state(const machine_config &mconfig, device_type type, std::string tag)
+	cpacman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -2343,7 +2343,7 @@ MACHINE_CONFIG_END
 class cmspacmn_state : public hh_hmcs40_state
 {
 public:
-	cmspacmn_state(const machine_config &mconfig, device_type type, std::string tag)
+	cmspacmn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -2450,7 +2450,7 @@ MACHINE_CONFIG_END
 class egalaxn2_state : public hh_hmcs40_state
 {
 public:
-	egalaxn2_state(const machine_config &mconfig, device_type type, std::string tag)
+	egalaxn2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -2572,7 +2572,7 @@ MACHINE_CONFIG_END
 class epacman2_state : public egalaxn2_state
 {
 public:
-	epacman2_state(const machine_config &mconfig, device_type type, std::string tag)
+	epacman2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: egalaxn2_state(mconfig, type, tag)
 	{ }
 };
@@ -2630,7 +2630,7 @@ INPUT_PORTS_END
 class eturtles_state : public hh_hmcs40_state
 {
 public:
-	eturtles_state(const machine_config &mconfig, device_type type, std::string tag)
+	eturtles_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag),
 		m_cop_irq(0)
 	{ }
@@ -2821,7 +2821,7 @@ MACHINE_CONFIG_END
 class estargte_state : public eturtles_state
 {
 public:
-	estargte_state(const machine_config &mconfig, device_type type, std::string tag)
+	estargte_state(const machine_config &mconfig, device_type type, const char *tag)
 		: eturtles_state(mconfig, type, tag)
 	{ }
 
@@ -2929,7 +2929,7 @@ MACHINE_CONFIG_END
 class ghalien_state : public hh_hmcs40_state
 {
 public:
-	ghalien_state(const machine_config &mconfig, device_type type, std::string tag)
+	ghalien_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3043,7 +3043,7 @@ MACHINE_CONFIG_END
 class gckong_state : public hh_hmcs40_state
 {
 public:
-	gckong_state(const machine_config &mconfig, device_type type, std::string tag)
+	gckong_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3111,7 +3111,7 @@ static INPUT_PORTS_START( gckong )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, gckong_state, input_changed, NULL)
 
 	PORT_START("IN.4") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 
 	PORT_START("IN.5") // port D
 	PORT_CONFNAME( 0x0010, 0x0000, "Skill Level" )
@@ -3164,7 +3164,7 @@ MACHINE_CONFIG_END
 class gdigdug_state : public hh_hmcs40_state
 {
 public:
-	gdigdug_state(const machine_config &mconfig, device_type type, std::string tag)
+	gdigdug_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3234,7 +3234,7 @@ static INPUT_PORTS_START( gdigdug )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gdigdug_state, input_changed, NULL)
 
 	PORT_START("IN.5") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(gdigdug_state::input_changed)
@@ -3287,7 +3287,7 @@ MACHINE_CONFIG_END
 class mwcbaseb_state : public hh_hmcs40_state
 {
 public:
-	mwcbaseb_state(const machine_config &mconfig, device_type type, std::string tag)
+	mwcbaseb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3443,7 +3443,7 @@ MACHINE_CONFIG_END
 class pbqbert_state : public hh_hmcs40_state
 {
 public:
-	pbqbert_state(const machine_config &mconfig, device_type type, std::string tag)
+	pbqbert_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3529,7 +3529,7 @@ MACHINE_CONFIG_END
 class kingman_state : public hh_hmcs40_state
 {
 public:
-	kingman_state(const machine_config &mconfig, device_type type, std::string tag)
+	kingman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3648,7 +3648,7 @@ MACHINE_CONFIG_END
 class tmtron_state : public hh_hmcs40_state
 {
 public:
-	tmtron_state(const machine_config &mconfig, device_type type, std::string tag)
+	tmtron_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3721,7 +3721,7 @@ static INPUT_PORTS_START( tmtron )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_CHANGED_MEMBER(DEVICE_SELF, tmtron_state, input_changed, NULL)
 
 	PORT_START("IN.4") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(tmtron_state::input_changed)
@@ -3771,7 +3771,7 @@ MACHINE_CONFIG_END
 class vinvader_state : public hh_hmcs40_state
 {
 public:
-	vinvader_state(const machine_config &mconfig, device_type type, std::string tag)
+	vinvader_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 

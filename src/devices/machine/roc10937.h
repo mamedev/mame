@@ -49,7 +49,7 @@
 
 class rocvfd_t : public device_t {
 public:
-	rocvfd_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	rocvfd_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// inline configuration helpers
 	static void static_set_value(device_t &device, int val);
@@ -87,24 +87,24 @@ protected:
 
 class roc10937_t : public rocvfd_t {
 public:
-	roc10937_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	roc10937_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class msc1937_t : public rocvfd_t {
 public:
-	msc1937_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	msc1937_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class roc10957_t : public rocvfd_t {
 public:
-	roc10957_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	roc10957_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void write_char(int data);
 };
 
 class s16lf01_t : public rocvfd_t {
 public:
-	s16lf01_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	s16lf01_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type ROC10937;

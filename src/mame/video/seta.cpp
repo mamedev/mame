@@ -295,6 +295,9 @@ WRITE16_MEMBER(seta_state::seta_vregs_w)
 
 				if (new_bank != m_samples_bank)
 				{
+					if (memregion("x1snd") == nullptr) // triplfun no longer has the hardware, but still writes here
+						break;
+
 					UINT8 *rom = memregion("x1snd")->base();
 					int samples_len = memregion("x1snd")->bytes();
 					int addr;

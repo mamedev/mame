@@ -10,7 +10,7 @@
 
 class apic_device : public pci_device {
 public:
-	apic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	apic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;

@@ -33,7 +33,7 @@ class ms7004_device : public device_t //, public device_serial_interface
 {
 public:
 	// construction/destruction
-	ms7004_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ms7004_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_tx_handler(device_t &device, _Object wr) { return downcast<ms7004_device &>(device).m_tx_handler.set_callback(wr); }
 

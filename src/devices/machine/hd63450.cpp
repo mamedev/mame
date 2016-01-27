@@ -10,7 +10,7 @@
 
 const device_type HD63450 = &device_creator<hd63450_device>;
 
-hd63450_device::hd63450_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HD63450, "Hitachi HD63450", tag, owner, clock, "hd63450", __FILE__),
 		m_dma_end(*this),
 		m_dma_error(*this),
@@ -22,6 +22,7 @@ hd63450_device::hd63450_device(const machine_config &mconfig, std::string tag, d
 		m_dma_write_1(*this),
 		m_dma_write_2(*this),
 		m_dma_write_3(*this),
+		m_cpu_tag(nullptr),
 		m_cpu(nullptr)
 {
 	for (int i = 0; i < 4; i++)

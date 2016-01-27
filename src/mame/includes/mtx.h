@@ -30,7 +30,7 @@
 class mtx_state : public driver_device
 {
 public:
-	mtx_state(const machine_config &mconfig, device_type type, std::string tag)
+	mtx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 		m_sn(*this, SN76489A_TAG),

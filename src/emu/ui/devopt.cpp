@@ -29,7 +29,7 @@ ui_menu_device_config::ui_menu_device_config(running_machine &machine, render_co
 	device_iterator deviter(machine.config().root_device());
 	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
 	{
-		if (device->tag() == tmp_tag)
+		if (strcmp(device->tag(), tmp_tag.c_str()) == 0)
 		{
 			m_mounted = true;
 			break;
@@ -47,7 +47,7 @@ void ui_menu_device_config::populate()
 
 	dev = const_cast<machine_config &>(machine().config()).device_add(&machine().config().root_device(), m_option->name(), m_option->devtype(), 0);
 
-	strcatprintf(str,"Device: %s\n", dev->name().c_str());
+	strcatprintf(str,"Device: %s\n", dev->name());
 	if (!m_mounted)
 		str.append("\nIf you select this option, the following items will be enabled:\n");
 	else
@@ -69,11 +69,11 @@ void ui_menu_device_config::populate()
 
 			// count how many identical CPUs we have
 			int count = 1;
-			std::string name = exec->device().name();
+			const char *name = exec->device().name();
 			execute_interface_iterator execinneriter(*dev);
 			for (device_execute_interface *scan = execinneriter.first(); scan != nullptr; scan = execinneriter.next())
 			{
-				if (exec->device().type() == scan->device().type() && name==scan->device().name() && exec->device().clock() == scan->device().clock())
+				if (exec->device().type() == scan->device().type() && strcmp(name, scan->device().name()) == 0 && exec->device().clock() == scan->device().clock())
 					if (exectags.insert(scan->device().tag()).second)
 						count++;
 			}
@@ -83,7 +83,7 @@ void ui_menu_device_config::populate()
 				strcatprintf(str,"  %d" UTF8_MULTIPLY, count);
 			else
 				str.append("  ");
-			str += name;
+			str.append(name);
 
 			// display clock in kHz or MHz
 			if (clock >= 1000000)
@@ -100,7 +100,7 @@ void ui_menu_device_config::populate()
 		str.append("* Video:\n");
 		for (screen_device *screen = scriter.first(); screen != nullptr; screen = scriter.next())
 		{
-			strcatprintf(str,"  Screen '%s': ", screen->tag().c_str());
+			strcatprintf(str,"  Screen '%s': ", screen->tag());
 
 			if (screen->screen_type() == SCREEN_TYPE_VECTOR)
 				str.append("Vector\n");
@@ -263,7 +263,7 @@ void ui_menu_device_config::populate()
 	{
 		str.append("* Media Options:\n");
 		for (const device_image_interface *imagedev = imgiter.first(); imagedev != nullptr; imagedev = imgiter.next())
-			strcatprintf(str,"  %s    [tag: %s]\n", imagedev->image_type_name(), imagedev->device().tag().c_str());
+			strcatprintf(str,"  %s    [tag: %s]\n", imagedev->image_type_name(), imagedev->device().tag());
 	}
 
 	slot_interface_iterator slotiter(*dev);
@@ -271,7 +271,7 @@ void ui_menu_device_config::populate()
 	{
 		str.append("* Slot Options:\n");
 		for (const device_slot_interface *slot = slotiter.first(); slot != nullptr; slot = slotiter.next())
-			strcatprintf(str,"  %s    [default: %s]\n", slot->device().tag().c_str(), slot->default_option() ? slot->default_option() : "----");
+			strcatprintf(str,"  %s    [default: %s]\n", slot->device().tag(), slot->default_option() ? slot->default_option() : "----");
 	}
 
 	if ((execiter.count() + scriter.count() + snditer.count() + imgiter.count() + slotiter.count() + bios + dips + confs

@@ -1,7 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 //-----------------------------------------------------------------------------
-// Effect File Variables
+// Primary Effect
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Sampler Definitions
 //-----------------------------------------------------------------------------
 
 texture Diffuse;
@@ -42,7 +46,7 @@ struct PS_INPUT
 };
 
 //-----------------------------------------------------------------------------
-// Simple Vertex Shader
+// Primary Vertex Shader
 //-----------------------------------------------------------------------------
 
 static const float Epsilon = 1.0e-7f;
@@ -79,7 +83,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 }
 
 //-----------------------------------------------------------------------------
-// Simple Pixel Shader
+// Primary Pixel Shader
 //-----------------------------------------------------------------------------
 
 float4 ps_main(PS_INPUT Input) : COLOR
@@ -91,16 +95,14 @@ float4 ps_main(PS_INPUT Input) : COLOR
 }
 
 //-----------------------------------------------------------------------------
-// Simple Effect
+// Primary Technique
 //-----------------------------------------------------------------------------
 
-technique TestTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{
 		Lighting = FALSE;
-
-		Sampler[0] = <DiffuseSampler>;
 
 		VertexShader = compile vs_2_0 vs_main();
 		PixelShader  = compile ps_2_0 ps_main();

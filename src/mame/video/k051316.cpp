@@ -103,7 +103,7 @@ GFXDECODE_MEMBER( k051316_device::gfxinfo4_ram )
 GFXDECODE_END
 
 
-k051316_device::k051316_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+k051316_device::k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K051316, "K051316 PSAC", tag, owner, clock, "k051316", __FILE__),
 		device_gfx_interface(mconfig, *this, gfxinfo),
 		m_zoom_rom(nullptr),
@@ -159,7 +159,7 @@ void k051316_device::device_start()
 	}
 
 	decode_gfx();
-	m_gfx[0]->set_colors(m_palette->entries() / m_gfx[0]->depth());
+	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
 
 	m_tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k051316_device::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_ram.resize(0x800);

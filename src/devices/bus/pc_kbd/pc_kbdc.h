@@ -42,7 +42,7 @@ class pc_kbdc_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	pc_kbdc_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pc_kbdc_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -65,7 +65,7 @@ class pc_kbdc_device :  public device_t
 {
 public:
 	// construction/destruction
-	pc_kbdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pc_kbdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_out_clock_callback(device_t &device, _Object object) { return downcast<pc_kbdc_device &>(device).m_out_clock_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_data_callback(device_t &device, _Object object) { return downcast<pc_kbdc_device &>(device).m_out_data_cb.set_callback(object); }
@@ -134,7 +134,7 @@ public:
 	static void static_set_pc_kbdc(device_t &device, device_t *kbdc_device);
 
 	pc_kbdc_device          *m_pc_kbdc;
-	std::string m_pc_kbdc_tag;
+	const char              *m_pc_kbdc_tag;
 	device_pc_kbd_interface *m_next;
 };
 

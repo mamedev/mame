@@ -84,7 +84,7 @@ ToDo:
 class gts1_state : public genpin_class
 {
 public:
-	gts1_state(const machine_config &mconfig, device_type type, std::string tag)
+	gts1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_switches(*this, "X")

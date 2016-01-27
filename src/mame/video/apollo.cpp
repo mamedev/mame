@@ -1719,14 +1719,14 @@ MACHINE_CONFIG_END
 
 const device_type APOLLO_GRAPHICS = &device_creator<apollo_graphics_15i> ;
 
-apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,std::string tag, device_t *owner, UINT32 clock) :
+apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, APOLLO_GRAPHICS, "Apollo Screen", tag, owner, clock,"apollo_graphics_15i", __FILE__),
 	m_lut_fifo(nullptr),
 	m_bt458(nullptr)
 {
 }
 
-apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,std::string tag, device_t *owner, UINT32 clock, device_type type,const char *name, std::string shortname, std::string source) :
+apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, UINT32 clock, device_type type,const char *name, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_lut_fifo(nullptr),
 	m_bt458(nullptr)
@@ -1904,7 +1904,7 @@ MACHINE_CONFIG_FRAGMENT( apollo_mono19i )
 const device_type APOLLO_MONO19I = &device_creator<apollo_graphics_19i> ;
 
 apollo_graphics_19i::apollo_graphics_19i(const machine_config &mconfig,
-		std::string tag, device_t *owner, UINT32 clock) :
+		const char *tag, device_t *owner, UINT32 clock) :
 	apollo_graphics_15i(mconfig, tag, owner, clock, APOLLO_MONO19I,
 			"Apollo 19\" Monochrome Screen", "apollo_graphics_19i", __FILE__)
 {

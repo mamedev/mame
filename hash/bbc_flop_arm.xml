@@ -8,7 +8,7 @@
       Hold down the SHIFT key and press and release the BREAK key.
 -->
 
-<softwarelist name="bbc_arm_flop" description="ARM Co-Processor Discs">
+<softwarelist name="bbc_flop_arm" description="ARM Co-Processor Discs">
 
 	<software name="armevals" supported="no">
 		<description>ARM Evaluation System Discs</description>

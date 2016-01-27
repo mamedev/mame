@@ -679,7 +679,7 @@ const device_type APPLE2_VIDEO = &device_creator<a2_video_device>;
 //  a2_video_device - constructor
 //-------------------------------------------------
 
-a2_video_device::a2_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+a2_video_device::a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, APPLE2_VIDEO, "Apple II video", tag, owner, clock, "a2video", __FILE__)
 {
 }

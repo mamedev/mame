@@ -9,7 +9,7 @@
 class sega_315_5641_pcm_device : public upd7759_device
 {
 public:
-	sega_315_5641_pcm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sega_315_5641_pcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	UINT8 get_fifo_space();
 	void advance_state() override;

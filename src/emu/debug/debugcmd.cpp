@@ -603,7 +603,7 @@ int debug_command_parameter_cpu_space(running_machine &machine, const char *para
 	/* fetch the space pointer */
 	if (!cpu->memory().has_space(spacenum))
 	{
-		debug_console_printf(machine, "No matching memory space found for CPU '%s'\n", cpu->tag().c_str());
+		debug_console_printf(machine, "No matching memory space found for CPU '%s'\n", cpu->tag());
 		return FALSE;
 	}
 	result = &cpu->memory().space(spacenum);
@@ -1013,7 +1013,7 @@ static void execute_focus(running_machine &machine, int ref, int params, const c
 	for (device_execute_interface *exec = iter.first(); exec != nullptr; exec = iter.next())
 		if (&exec->device() != cpu)
 			exec->device().debug()->ignore(true);
-	debug_console_printf(machine, "Now focused on CPU '%s'\n", cpu->tag().c_str());
+	debug_console_printf(machine, "Now focused on CPU '%s'\n", cpu->tag());
 }
 
 
@@ -1036,9 +1036,9 @@ static void execute_ignore(running_machine &machine, int ref, int params, const 
 			if (!exec->device().debug()->observing())
 			{
 				if (buffer.empty())
-					strprintf(buffer, "Currently ignoring device '%s'", exec->device().tag().c_str());
+					strprintf(buffer, "Currently ignoring device '%s'", exec->device().tag());
 				else
-					strcatprintf(buffer, ", '%s'", exec->device().tag().c_str());
+					strcatprintf(buffer, ", '%s'", exec->device().tag());
 			}
 
 		/* special message for none */
@@ -1076,7 +1076,7 @@ static void execute_ignore(running_machine &machine, int ref, int params, const 
 			}
 
 			devicelist[paramnum]->debug()->ignore(true);
-			debug_console_printf(machine, "Now ignoring device '%s'\n", devicelist[paramnum]->tag().c_str());
+			debug_console_printf(machine, "Now ignoring device '%s'\n", devicelist[paramnum]->tag());
 		}
 	}
 }
@@ -1101,9 +1101,9 @@ static void execute_observe(running_machine &machine, int ref, int params, const
 			if (exec->device().debug()->observing())
 			{
 				if (buffer.empty())
-					strprintf(buffer, "Currently observing CPU '%s'", exec->device().tag().c_str());
+					strprintf(buffer, "Currently observing CPU '%s'", exec->device().tag());
 				else
-					strcatprintf(buffer, ", '%s'", exec->device().tag().c_str());
+					strcatprintf(buffer, ", '%s'", exec->device().tag());
 			}
 
 		/* special message for none */
@@ -1126,7 +1126,7 @@ static void execute_observe(running_machine &machine, int ref, int params, const
 		for (int paramnum = 0; paramnum < params; paramnum++)
 		{
 			devicelist[paramnum]->debug()->ignore(false);
-			debug_console_printf(machine, "Now observing device '%s'\n", devicelist[paramnum]->tag().c_str());
+			debug_console_printf(machine, "Now observing device '%s'\n", devicelist[paramnum]->tag());
 		}
 	}
 }
@@ -1324,7 +1324,7 @@ static void execute_bplist(running_machine &machine, int ref, int params, const 
 	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 		if (device->debug()->breakpoint_first() != nullptr)
 		{
-			debug_console_printf(machine, "Device '%s' breakpoints:\n", device->tag().c_str());
+			debug_console_printf(machine, "Device '%s' breakpoints:\n", device->tag());
 
 			/* loop over the breakpoints */
 			for (device_debug::breakpoint *bp = device->debug()->breakpoint_first(); bp != nullptr; bp = bp->next())
@@ -1490,7 +1490,7 @@ static void execute_wplist(running_machine &machine, int ref, int params, const 
 			{
 				static const char *const types[] = { "unkn ", "read ", "write", "r/w  " };
 
-				debug_console_printf(machine, "Device '%s' %s space watchpoints:\n", device->tag().c_str(),
+				debug_console_printf(machine, "Device '%s' %s space watchpoints:\n", device->tag(),
 																						device->debug()->watchpoint_first(spacenum)->space().name());
 
 				/* loop over the watchpoints */
@@ -1634,7 +1634,7 @@ static void execute_rplist(running_machine &machine, int ref, int params, const 
 	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 		if (device->debug()->registerpoint_first() != nullptr)
 		{
-			debug_console_printf(machine, "Device '%s' registerpoints:\n", device->tag().c_str());
+			debug_console_printf(machine, "Device '%s' registerpoints:\n", device->tag());
 
 			/* loop over the breakpoints */
 			for (device_debug::registerpoint *rp = device->debug()->registerpoint_first(); rp != nullptr; rp = rp->next())
@@ -1671,7 +1671,7 @@ static void execute_hotspot(running_machine &machine, int ref, int params, const
 			if (device->debug()->hotspot_tracking_enabled())
 			{
 				device->debug()->hotspot_track(0, 0);
-				debug_console_printf(machine, "Cleared hotspot tracking on CPU '%s'\n", device->tag().c_str());
+				debug_console_printf(machine, "Cleared hotspot tracking on CPU '%s'\n", device->tag());
 				cleared = true;
 			}
 
@@ -1693,7 +1693,7 @@ static void execute_hotspot(running_machine &machine, int ref, int params, const
 
 	/* attempt to install */
 	device->debug()->hotspot_track(count, threshhold);
-	debug_console_printf(machine, "Now tracking hotspots on CPU '%s' using %d slots with a threshhold of %d\n", device->tag().c_str(), (int)count, (int)threshhold);
+	debug_console_printf(machine, "Now tracking hotspots on CPU '%s' using %d slots with a threshhold of %d\n", device->tag(), (int)count, (int)threshhold);
 }
 
 
@@ -1989,14 +1989,14 @@ static void execute_cheatinit(running_machine &machine, int ref, int params, con
 		{
 			cheat_region[region_count].offset = space->address_to_byte(entry->m_addrstart) & space->bytemask();
 			cheat_region[region_count].endoffset = space->address_to_byte(entry->m_addrend) & space->bytemask();
-			cheat_region[region_count].share = entry->m_share.c_str();
+			cheat_region[region_count].share = entry->m_share;
 			cheat_region[region_count].disabled = (entry->m_write.m_type == AMH_RAM) ? FALSE : TRUE;
 
 			/* disable double share regions */
-			if (!entry->m_share.empty())
+			if (entry->m_share != nullptr)
 				for (i = 0; i < region_count; i++)
 					if (cheat_region[i].share != nullptr)
-						if (strcmp(cheat_region[i].share, entry->m_share.c_str()) == 0)
+						if (strcmp(cheat_region[i].share, entry->m_share) == 0)
 							cheat_region[region_count].disabled = TRUE;
 
 			region_count++;
@@ -2071,7 +2071,7 @@ static void execute_cheatinit(running_machine &machine, int ref, int params, con
 	/* give a detailed init message to avoid searches being mistakingly carried out on the wrong CPU */
 	device_t *cpu = nullptr;
 	debug_command_parameter_cpu(machine, cheat.cpu, &cpu);
-	debug_console_printf(machine, "%u cheat initialized for CPU index %s ( aka %s )\n", active_cheat, cheat.cpu, cpu->tag().c_str());
+	debug_console_printf(machine, "%u cheat initialized for CPU index %s ( aka %s )\n", active_cheat, cheat.cpu, cpu->tag());
 }
 
 
@@ -2305,7 +2305,7 @@ static void execute_cheatlist(running_machine &machine, int ref, int params, con
 				active_cheat++;
 				fprintf(f, "  <cheat desc=\"Possibility %d : %s (%s)\">\n", active_cheat, core_i64_hex_format(address, space->logaddrchars()), core_i64_hex_format(value, cheat.width * 2));
 				fprintf(f, "    <script state=\"run\">\n");
-				fprintf(f, "      <action>%s.p%c%c@%s=%s</action>\n", cpu->tag().c_str(), spaceletter, sizeletter, core_i64_hex_format(address, space->logaddrchars()), core_i64_hex_format(cheat_byte_swap(&cheat, cheat.cheatmap[cheatindex].first_value) & sizemask, cheat.width * 2));
+				fprintf(f, "      <action>%s.p%c%c@%s=%s</action>\n", cpu->tag(), spaceletter, sizeletter, core_i64_hex_format(address, space->logaddrchars()), core_i64_hex_format(cheat_byte_swap(&cheat, cheat.cheatmap[cheatindex].first_value) & sizemask, cheat.width * 2));
 				fprintf(f, "    </script>\n");
 				fprintf(f, "  </cheat>\n\n");
 			}
@@ -2607,9 +2607,9 @@ static void execute_trace_internal(running_machine &machine, int ref, int params
 	/* do it */
 	cpu->debug()->trace(f, trace_over, action);
 	if (f)
-		debug_console_printf(machine, "Tracing CPU '%s' to file %s\n", cpu->tag().c_str(), filename.c_str());
+		debug_console_printf(machine, "Tracing CPU '%s' to file %s\n", cpu->tag(), filename.c_str());
 	else
-		debug_console_printf(machine, "Stopped tracing on CPU '%s'\n", cpu->tag().c_str());
+		debug_console_printf(machine, "Stopped tracing on CPU '%s'\n", cpu->tag());
 }
 
 
@@ -2945,7 +2945,7 @@ static void execute_symlist(running_machine &machine, int ref, int params, const
 		if (!debug_command_parameter_cpu(machine, param[0], &cpu))
 			return;
 		symtable = &cpu->debug()->symtable();
-		debug_console_printf(machine, "CPU '%s' symbols:\n", cpu->tag().c_str());
+		debug_console_printf(machine, "CPU '%s' symbols:\n", cpu->tag());
 	}
 	else
 	{

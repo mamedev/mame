@@ -12,7 +12,7 @@ void maple_device::static_set_host(device_t &device, const char *_host_tag, int 
 }
 
 
-maple_device::maple_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) : device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+maple_device::maple_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) : device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 	host_tag = nullptr;
 	host_port = 0;

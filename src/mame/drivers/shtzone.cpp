@@ -55,7 +55,7 @@ Notes:
 class shtzone_state : public driver_device
 {
 public:
-	shtzone_state(const machine_config &mconfig, device_type type, std::string tag)
+	shtzone_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

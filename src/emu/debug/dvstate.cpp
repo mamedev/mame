@@ -78,7 +78,7 @@ void debug_view_state::enumerate_sources()
 	std::string name;
 	for (device_state_interface *state = iter.first(); state != nullptr; state = iter.next())
 	{
-		strprintf(name,"%s '%s'", state->device().name().c_str(), state->device().tag().c_str());
+		strprintf(name,"%s '%s'", state->device().name(), state->device().tag());
 		m_source_list.append(*global_alloc(debug_view_state_source(name.c_str(), state->device())));
 	}
 

@@ -132,7 +132,7 @@ const device_type DMV_K220 = &device_creator<dmv_k220_device>;
 //  dmv_k220_device - constructor
 //-------------------------------------------------
 
-dmv_k220_device::dmv_k220_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+dmv_k220_device::dmv_k220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, DMV_K220, "K220 diagnostic", tag, owner, clock, "dmv_k220", __FILE__),
 		device_dmvslot_interface( mconfig, *this ),
 		m_pit(*this, "pit8253"),

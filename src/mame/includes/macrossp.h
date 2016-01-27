@@ -9,7 +9,7 @@
 class macrossp_state : public driver_device
 {
 public:
-	macrossp_state(const machine_config &mconfig, device_type type, std::string tag)
+	macrossp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_scra_videoram(*this, "scra_videoram"),

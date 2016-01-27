@@ -35,12 +35,12 @@ struct RenderStateInfo
 class vr0video_device : public device_t
 {
 public:
-	vr0video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~vr0video_device() {}
 
 	int vrender0_ProcessPacket(UINT32 PacketPtr, UINT16 *Dest, UINT8 *TEXTURE);
 
-	static void set_cpu_tag(device_t &device, std::string tag) { downcast<vr0video_device &>(device).m_cpu.set_tag(tag); }
+	static void set_cpu_tag(device_t &device, const char *tag) { downcast<vr0video_device &>(device).m_cpu.set_tag(tag); }
 
 protected:
 	// device-level overrides

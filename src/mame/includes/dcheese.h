@@ -16,7 +16,7 @@ public:
 		TIMER_SIGNAL_IRQ
 	};
 
-	dcheese_state(const machine_config &mconfig, device_type type, std::string tag)
+	dcheese_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),

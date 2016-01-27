@@ -15,7 +15,7 @@
 class ti990_10_device : public cpu_device
 {
 public:
-	ti990_10_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ti990_10_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~ti990_10_device();
 
 protected:

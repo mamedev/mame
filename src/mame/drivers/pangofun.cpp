@@ -103,7 +103,7 @@ Arcade Version (Coin-Op) by InfoCube (Pisa, Italy)
 class pangofun_state : public pcat_base_state
 {
 public:
-	pangofun_state(const machine_config &mconfig, device_type type, std::string tag)
+	pangofun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag) { }
 
 	DECLARE_DRIVER_INIT(pangofun);

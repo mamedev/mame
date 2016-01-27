@@ -56,7 +56,7 @@ device_vic10_expansion_card_interface::~device_vic10_expansion_card_interface()
 //  vic10_expansion_slot_device - constructor
 //-------------------------------------------------
 
-vic10_expansion_slot_device::vic10_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+vic10_expansion_slot_device::vic10_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, VIC10_EXPANSION_SLOT, "VIC-10 expansion port", tag, owner, clock, "vic10_expansion_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this),

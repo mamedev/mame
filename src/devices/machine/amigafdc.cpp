@@ -18,7 +18,7 @@ FLOPPY_FORMATS_MEMBER( amiga_fdc::floppy_formats )
 	FLOPPY_ADF_FORMAT
 FLOPPY_FORMATS_END
 
-amiga_fdc::amiga_fdc(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+amiga_fdc::amiga_fdc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, AMIGA_FDC, "Amiga FDC", tag, owner, clock, "amiga_fdc", __FILE__),
 	m_write_index(*this), floppy(nullptr), t_gen(nullptr), dsklen(0), pre_dsklen(0), dsksync(0), dskbyt(0), adkcon(0), dmacon(0), dskpt(0), dma_value(0), dma_state(0)
 {

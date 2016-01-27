@@ -19,19 +19,19 @@ const device_type SATURN_DRAM_8MB = &device_creator<saturn_dram8mb_device>;
 const device_type SATURN_DRAM_32MB = &device_creator<saturn_dram32mb_device>;
 
 
-saturn_dram_device::saturn_dram_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+saturn_dram_device::saturn_dram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_sat_cart_interface( mconfig, *this )
 {
 }
 
-saturn_dram8mb_device::saturn_dram8mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+saturn_dram8mb_device::saturn_dram8mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: saturn_dram_device(mconfig, SATURN_DRAM_8MB, "Saturn Data RAM 8Mbit Cart", tag, owner, clock, "sat_dram_8mb", __FILE__)
 {
 	m_cart_type = 0x5a;
 }
 
-saturn_dram32mb_device::saturn_dram32mb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+saturn_dram32mb_device::saturn_dram32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: saturn_dram_device(mconfig, SATURN_DRAM_32MB, "Saturn Data RAM 32Mbit Cart", tag, owner, clock, "sat_dram_32mb", __FILE__)
 {
 	m_cart_type = 0x5c;

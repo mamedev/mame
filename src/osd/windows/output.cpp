@@ -309,9 +309,9 @@ static LRESULT send_id_string(running_machine &machine, HWND hwnd, LPARAM id)
 
 static void notifier_callback(const char *outname, INT32 value, void *param)
 {
-	registered_client *client;	
+	registered_client *client;
 	// loop over clients and notify them
-	for (client = clientlist; client != nullptr; client = client->next) 
+	for (client = clientlist; client != nullptr; client = client->next)
 	{
 		printf("there are clients\n");
 		if (param == nullptr || param == client)

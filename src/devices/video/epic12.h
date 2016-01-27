@@ -47,7 +47,7 @@ class epic12_device : public device_t,
 	public device_video_interface
 {
 public:
-	epic12_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void set_rambase(UINT16* rambase) { m_ram16 = rambase; }
 	void set_delay_scale(int delay_scale) { m_delay_scale = delay_scale; }

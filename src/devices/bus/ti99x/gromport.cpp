@@ -180,7 +180,7 @@ static void image_battery_save_by_name(emu_options &options, const char *filenam
 }
 
 
-gromport_device::gromport_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+gromport_device::gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:   bus8z_device(mconfig, GROMPORT, "Cartridge port", tag, owner, clock, "gromport", __FILE__),
 		device_slot_interface(mconfig, *this),
 		m_connector(nullptr),
@@ -294,7 +294,7 @@ const device_type GROMPORT_SINGLE = &device_creator<single_conn_device>;
 const device_type GROMPORT_MULTI = &device_creator<multi_conn_device>;
 const device_type GROMPORT_GK = &device_creator<gkracker_device>;
 
-ti99_cartridge_connector_device::ti99_cartridge_connector_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+ti99_cartridge_connector_device::ti99_cartridge_connector_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_gromport(nullptr)
 {
@@ -320,7 +320,7 @@ UINT16 ti99_cartridge_connector_device::grom_mask()
 	return m_gromport->get_grom_mask();
 }
 
-single_conn_device::single_conn_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+single_conn_device::single_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ti99_cartridge_connector_device(mconfig, GROMPORT_SINGLE, "Standard cartridge connector", tag, owner, clock, "single", __FILE__),
 	m_cartridge(nullptr)
 {
@@ -413,7 +413,7 @@ machine_config_constructor single_conn_device::device_mconfig_additions() const
 
 #define AUTO -1
 
-multi_conn_device::multi_conn_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+multi_conn_device::multi_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ti99_cartridge_connector_device(mconfig, GROMPORT_MULTI, "Multi-cartridge extender", tag, owner, clock, "multi", __FILE__),
 	m_active_slot(0),
 	m_fixed_slot(0),
@@ -462,7 +462,7 @@ multi_conn_device::multi_conn_device(const machine_config &mconfig, std::string 
 void multi_conn_device::set_slot(int slotnumber)
 {
 	if (TRACE_CHANGE)
-		if (m_active_slot != slotnumber) logerror("%s: Setting cartslot to %d\n", tag().c_str(), slotnumber);
+		if (m_active_slot != slotnumber) logerror("%s: Setting cartslot to %d\n", tag(), slotnumber);
 
 	if (m_fixed_slot==AUTO)
 		m_active_slot = slotnumber;
@@ -486,14 +486,14 @@ int multi_conn_device::get_active_slot(bool changebase, offs_t offset)
 
 void multi_conn_device::insert(int index, ti99_cartridge_device* cart)
 {
-	if (TRACE_CHANGE) logerror("%s: Insert slot %d\n", tag().c_str(), index);
+	if (TRACE_CHANGE) logerror("%s: Insert slot %d\n", tag(), index);
 	m_cartridge[index] = cart;
 	m_gromport->cartridge_inserted();
 }
 
 void multi_conn_device::remove(int index)
 {
-	if (TRACE_CHANGE) logerror("%s: Remove slot %d\n", tag().c_str(), index);
+	if (TRACE_CHANGE) logerror("%s: Remove slot %d\n", tag(), index);
 	m_cartridge[index] = nullptr;
 }
 
@@ -548,7 +548,7 @@ WRITE8_MEMBER(multi_conn_device::write)
 	{
 		if (slot < NUMBER_OF_CARTRIDGE_SLOTS && m_cartridge[slot] != nullptr)
 		{
-			//      logerror("%s: try it on slot %d\n", tag().c_str(), slot);
+			//      logerror("%s: try it on slot %d\n", tag(), slot);
 			m_cartridge[slot]->write(space, offset, data, mem_mask);
 		}
 	}
@@ -739,7 +739,7 @@ enum
 #define GKSWITCH4_TAG "GKSWITCH4"
 #define GKSWITCH5_TAG "GKSWITCH5"
 
-gkracker_device::gkracker_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+gkracker_device::gkracker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:   ti99_cartridge_connector_device(mconfig, GROMPORT_GK, "GRAMKracker", tag, owner, clock, "ti99_gkracker", __FILE__),
 		device_nvram_interface(mconfig, *this),
 		m_ram_page(0),
@@ -852,7 +852,7 @@ READ8Z_MEMBER(gkracker_device::readz)
 			}
 		}
 	}
-	if (TRACE_READ) logerror("%s: Read %04x -> %02x\n", tag().c_str(), offset, *value);
+	if (TRACE_READ) logerror("%s: Read %04x -> %02x\n", tag(), offset, *value);
 }
 
 WRITE8_MEMBER(gkracker_device::write)
@@ -874,7 +874,7 @@ WRITE8_MEMBER(gkracker_device::write)
 				// Accept low address byte (second write)
 				m_grom_address = (m_grom_address & 0xff00) | data;
 				m_waddr_LSB = false;
-				if (TRACE_GROM) logerror("%s: Set grom address %04x\n", tag().c_str(), m_grom_address);
+				if (TRACE_GROM) logerror("%s: Set grom address %04x\n", tag(), m_grom_address);
 			}
 			else
 			{
@@ -886,7 +886,7 @@ WRITE8_MEMBER(gkracker_device::write)
 		else
 		{
 			// Write data byte to GRAM area.
-			if (TRACE_GROM) logerror("%s: gwrite %04x(%04x) <- %02x\n", tag().c_str(), offset, m_grom_address, data);
+			if (TRACE_GROM) logerror("%s: gwrite %04x(%04x) <- %02x\n", tag(), offset, m_grom_address, data);
 
 			// According to manual:
 			// Writing to GRAM 0: switch 2 set to GRAM 0 + Write protect switch (4) in 1 or 2 position
@@ -925,7 +925,7 @@ WRITE8_MEMBER(gkracker_device::write)
 	{
 		// Write to the RAM space of the GRAM Kracker
 		// (only if no cartridge is present)
-		if (TRACE_GROM) logerror("%s: write %04x <- %02x\n", tag().c_str(), offset, data);
+		if (TRACE_GROM) logerror("%s: write %04x <- %02x\n", tag(), offset, data);
 		if (m_cartridge == nullptr)
 		{
 			if (m_gk_switch[1] == GK_OFF) return; // just don't do anything
@@ -962,13 +962,13 @@ WRITE8_MEMBER( gkracker_device::cruwrite )
 
 INPUT_CHANGED_MEMBER( gkracker_device::gk_changed )
 {
-	if (TRACE_GKRACKER) logerror("%s: Input changed %d - %d\n", tag().c_str(), (int)((UINT64)param & 0x07), newval);
+	if (TRACE_GKRACKER) logerror("%s: Input changed %d - %d\n", tag(), (int)((UINT64)param & 0x07), newval);
 	m_gk_switch[(UINT64)param & 0x07] = newval;
 }
 
 void gkracker_device::insert(int index, ti99_cartridge_device* cart)
 {
-	if (TRACE_CHANGE) logerror("%s: Insert cartridge\n", tag().c_str());
+	if (TRACE_CHANGE) logerror("%s: Insert cartridge\n", tag());
 	m_cartridge = cart;
 	// Switch 1 has a third location for resetting. We do the reset by default
 	// here. It can be turned off in the configuration.
@@ -977,7 +977,7 @@ void gkracker_device::insert(int index, ti99_cartridge_device* cart)
 
 void gkracker_device::remove(int index)
 {
-	if (TRACE_CHANGE) logerror("%s: Remove cartridge\n", tag().c_str());
+	if (TRACE_CHANGE) logerror("%s: Remove cartridge\n", tag());
 	m_cartridge = nullptr;
 }
 
@@ -1000,7 +1000,7 @@ void gkracker_device::gk_install_menu(const char* menutext, int len, int ptr, in
 */
 void gkracker_device::nvram_default()
 {
-	if (TRACE_GKRACKER) logerror("%s: Creating default NVRAM\n", tag().c_str());
+	if (TRACE_GKRACKER) logerror("%s: Creating default NVRAM\n", tag());
 	memset(m_ram_ptr, 0, 81920);
 
 	m_ram_ptr[0x6000] = 0xaa;
@@ -1024,7 +1024,7 @@ void gkracker_device::nvram_default()
 void gkracker_device::nvram_read(emu_file &file)
 {
 	int readsize = file.read(m_ram_ptr, 81920);
-	if (TRACE_GKRACKER) logerror("%s: Reading NVRAM\n", tag().c_str());
+	if (TRACE_GKRACKER) logerror("%s: Reading NVRAM\n", tag());
 	// If we increased the size, fill the remaining parts with 0
 	if (readsize < 81920)
 	{
@@ -1034,7 +1034,7 @@ void gkracker_device::nvram_read(emu_file &file)
 
 void gkracker_device::nvram_write(emu_file &file)
 {
-	if (TRACE_GKRACKER) logerror("%s: Writing NVRAM\n", tag().c_str());
+	if (TRACE_GKRACKER) logerror("%s: Writing NVRAM\n", tag());
 	file.write(m_ram_ptr, 81920);
 }
 
@@ -1164,7 +1164,7 @@ static const pcb_type sw_pcbdefs[] =
 	{ 0, nullptr}
 };
 
-ti99_cartridge_device::ti99_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ti99_cartridge_device::ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 :   bus8z_device(mconfig, TI99CART, "TI-99 cartridge", tag, owner, clock, "cartridge", __FILE__),
 	device_image_interface(mconfig, *this),
 	m_softlist(false),
@@ -1196,7 +1196,7 @@ void ti99_cartridge_device::prepare_cartridge()
 	for (int i=0; i < 5; i++) m_pcb->m_grom[i] = nullptr;
 
 	m_pcb->m_grom_size = m_softlist? get_software_region_length("grom_socket") : m_rpk->get_resource_length("grom_socket");
-	if (TRACE_CONFIG) logerror("%s: grom_socket.size=0x%04x\n", tag().c_str(), m_pcb->m_grom_size);
+	if (TRACE_CONFIG) logerror("%s: grom_socket.size=0x%04x\n", tag(), m_pcb->m_grom_size);
 
 	if (m_pcb->m_grom_size > 0)
 	{
@@ -1217,7 +1217,7 @@ void ti99_cartridge_device::prepare_cartridge()
 	m_pcb->m_rom_size = m_softlist? get_software_region_length("rom_socket") : m_rpk->get_resource_length("rom_socket");
 	if (m_pcb->m_rom_size > 0)
 	{
-		if (TRACE_CONFIG) logerror("%s: rom_socket.size=0x%04x\n", tag().c_str(), m_pcb->m_rom_size);
+		if (TRACE_CONFIG) logerror("%s: rom_socket.size=0x%04x\n", tag(), m_pcb->m_rom_size);
 		regr = memregion(CARTROM_TAG);
 		rom_ptr = m_softlist? get_software_region("rom_socket") : m_rpk->get_contents_of_socket("rom_socket");
 		memcpy(regr->base(), rom_ptr, m_pcb->m_rom_size);
@@ -1254,7 +1254,7 @@ void ti99_cartridge_device::prepare_cartridge()
 */
 int ti99_cartridge_device::get_index_from_tagname()
 {
-	const char *mytag = tag().c_str();
+	const char *mytag = tag();
 	int maxlen = strlen(mytag);
 	int i;
 
@@ -1284,11 +1284,11 @@ bool ti99_cartridge_device::call_load()
 {
 	// File name is in m_basename
 	// return true = error
-	if (TRACE_CHANGE) logerror("%s: Loading %s in slot %s\n", tag().c_str(), m_basename.c_str(), tag().c_str());
+	if (TRACE_CHANGE) logerror("%s: Loading %s in slot %s\n", tag(), m_basename.c_str(), tag());
 
 	if (m_softlist)
 	{
-		if (TRACE_CONFIG) logerror("%s: Using softlists\n", tag().c_str());
+		if (TRACE_CONFIG) logerror("%s: Using softlists\n", tag());
 		int i = 0;
 		const char* pcb = get_feature("pcb");
 		do
@@ -1300,7 +1300,7 @@ bool ti99_cartridge_device::call_load()
 			}
 			i++;
 		} while (sw_pcbdefs[i].id != 0);
-		if (TRACE_CONFIG) logerror("%s: Cartridge type is %s (%d)\n", tag().c_str(), pcb, m_pcbtype);
+		if (TRACE_CONFIG) logerror("%s: Cartridge type is %s (%d)\n", tag(), pcb, m_pcbtype);
 	}
 	else
 	{
@@ -1312,7 +1312,7 @@ bool ti99_cartridge_device::call_load()
 		}
 		catch (rpk_exception& err)
 		{
-			logerror("%s: Failed to load cartridge '%s': %s\n", tag().c_str(), basename(), err.to_string());
+			logerror("%s: Failed to load cartridge '%s': %s\n", tag(), basename(), err.to_string());
 			m_rpk = nullptr;
 			m_err = IMAGE_ERROR_INVALIDIMAGE;
 			return true;
@@ -1322,43 +1322,43 @@ bool ti99_cartridge_device::call_load()
 	switch (m_pcbtype)
 	{
 	case PCB_STANDARD:
-		if (TRACE_CONFIG) logerror("%s: Standard PCB\n", tag().c_str());
+		if (TRACE_CONFIG) logerror("%s: Standard PCB\n", tag());
 		m_pcb = new ti99_standard_cartridge();
 		break;
 	case PCB_PAGED:
-		if (TRACE_CONFIG) logerror("%s: Paged PCB\n", tag().c_str());
+		if (TRACE_CONFIG) logerror("%s: Paged PCB\n", tag());
 		m_pcb = new ti99_paged_cartridge();
 		break;
 	case PCB_MINIMEM:
-		if (TRACE_CONFIG) logerror("%s: Minimem PCB\n", tag().c_str());
+		if (TRACE_CONFIG) logerror("%s: Minimem PCB\n", tag());
 		m_pcb = new ti99_minimem_cartridge();
 		break;
 	case PCB_SUPER:
-		if (TRACE_CONFIG) logerror("%s: Superspace PCB\n", tag().c_str());
+		if (TRACE_CONFIG) logerror("%s: Superspace PCB\n", tag());
 		m_pcb = new ti99_super_cartridge();
 		break;
 	case PCB_MBX:
-		if (TRACE_CONFIG) logerror("%s: MBX PCB\n", tag().c_str());
+		if (TRACE_CONFIG) logerror("%s: MBX PCB\n", tag());
 		m_pcb = new ti99_mbx_cartridge();
 		break;
 	case PCB_PAGED379I:
-		if (TRACE_CONFIG) logerror("%s: Paged379i PCB\n", tag().c_str());
+		if (TRACE_CONFIG) logerror("%s: Paged379i PCB\n", tag());
 		m_pcb = new ti99_paged379i_cartridge();
 		break;
 	case PCB_PAGED378:
-		if (TRACE_CONFIG) logerror("%s: Paged378 PCB\n", tag().c_str());
+		if (TRACE_CONFIG) logerror("%s: Paged378 PCB\n", tag());
 		m_pcb = new ti99_paged378_cartridge();
 		break;
 	case PCB_PAGED377:
-		if (TRACE_CONFIG) logerror("%s: Paged377 PCB\n", tag().c_str());
+		if (TRACE_CONFIG) logerror("%s: Paged377 PCB\n", tag());
 		m_pcb = new ti99_paged377_cartridge();
 		break;
 	case PCB_PAGEDCRU:
-		if (TRACE_CONFIG) logerror("%s: PagedCRU PCB\n", tag().c_str());
+		if (TRACE_CONFIG) logerror("%s: PagedCRU PCB\n", tag());
 		m_pcb = new ti99_pagedcru_cartridge();
 		break;
 	case PCB_GROMEMU:
-		if (TRACE_CONFIG) logerror("%s: Grom Emulation PCB\n", tag().c_str());
+		if (TRACE_CONFIG) logerror("%s: Grom Emulation PCB\n", tag());
 		m_pcb = new ti99_gromemu_cartridge();
 		break;
 	}
@@ -1373,7 +1373,7 @@ bool ti99_cartridge_device::call_load()
 
 void ti99_cartridge_device::call_unload()
 {
-	if (TRACE_CHANGE) logerror("%s: Unload\n", tag().c_str());
+	if (TRACE_CHANGE) logerror("%s: Unload\n", tag());
 	if (m_rpk != nullptr)
 	{
 		m_rpk->close(); // will write NVRAM contents
@@ -1392,7 +1392,7 @@ void ti99_cartridge_device::set_slot(int i)
 
 bool ti99_cartridge_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	if (TRACE_CONFIG) logerror("%s: swlist = %s, swname = %s\n", tag().c_str(), swlist.list_name(), swname);
+	if (TRACE_CONFIG) logerror("%s: swlist = %s, swname = %s\n", tag(), swlist.list_name(), swname);
 	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 	m_softlist = true;
 	m_rpk = nullptr;
@@ -1499,7 +1499,7 @@ const device_type TI99CART = &device_creator<ti99_cartridge_device>;
     Unlike in the previous implementation we do not model it as a full device.
 ***************************************************************************/
 
-ti99_cartridge_pcb::ti99_cartridge_pcb(): m_cart(nullptr), m_grom_size(0), m_rom_size(0), m_ram_size(0), m_rom_ptr(nullptr), m_ram_ptr(nullptr), m_rom_page(0), m_grom_ptr(nullptr), m_grom_address(0), m_ram_page(0)
+ti99_cartridge_pcb::ti99_cartridge_pcb(): m_cart(nullptr), m_grom_size(0), m_rom_size(0), m_ram_size(0), m_rom_ptr(nullptr), m_ram_ptr(nullptr), m_rom_page(0), m_grom_ptr(nullptr), m_grom_address(0), m_ram_page(0), m_tag(nullptr)
 {
 }
 
@@ -1551,19 +1551,19 @@ READ8Z_MEMBER(ti99_cartridge_pcb::readz)
 			// For TI-99/8 we should plan for 16K cartridges. However, none was ever produced.
 			// Well, forget about that.
 			*value = m_rom_ptr[offset & 0x1fff];
-			//      logerror("%s: read cartridge rom space %04x = %02x\n", tag().c_str(), offset, *value);
+			//      logerror("%s: read cartridge rom space %04x = %02x\n", tag(), offset, *value);
 		}
 	}
 }
 
 WRITE8_MEMBER(ti99_cartridge_pcb::write)
 {
-	// logerror("%s: write standard\n", tag().c_str());
+	// logerror("%s: write standard\n", tag());
 	if ((offset & grom_mask())==grom_base())
 		gromwrite(space, offset, data, mem_mask);
 	else
 	{
-		if (TRACE_ILLWRITE) space.device().logerror("%s: Cannot write to ROM space at %04x\n", tag().c_str(), offset);
+		if (TRACE_ILLWRITE) space.device().logerror("%s: Cannot write to ROM space at %04x\n", tag(), offset);
 	}
 }
 
@@ -1601,7 +1601,7 @@ READ8Z_MEMBER(ti99_paged_cartridge::readz)
 
 WRITE8_MEMBER(ti99_paged_cartridge::write)
 {
-	// logerror("%s: write standard\n", tag().c_str());
+	// logerror("%s: write standard\n", tag());
 	if ((offset & grom_mask())==grom_base())
 		gromwrite(space, offset, data, mem_mask);
 
@@ -1642,7 +1642,7 @@ READ8Z_MEMBER(ti99_minimem_cartridge::readz)
 /* Write function for the minimem cartridge. */
 WRITE8_MEMBER(ti99_minimem_cartridge::write)
 {
-	// logerror("%s: write standard\n", tag().c_str());
+	// logerror("%s: write standard\n", tag());
 	if ((offset & grom_mask())==grom_base())
 		gromwrite(space, offset, data, mem_mask);
 
@@ -1650,7 +1650,7 @@ WRITE8_MEMBER(ti99_minimem_cartridge::write)
 	{
 		if ((offset & 0x1000)==0x0000)
 		{
-			if (TRACE_ILLWRITE) space.device().logerror("%s: Write access to cartridge ROM at address %04x ignored", tag().c_str(), offset);
+			if (TRACE_ILLWRITE) space.device().logerror("%s: Write access to cartridge ROM at address %04x ignored", tag(), offset);
 		}
 		else
 		{
@@ -1732,7 +1732,7 @@ READ8Z_MEMBER(ti99_super_cartridge::crureadz)
 
 	if ((offset & 0xfff0) == 0x0800)
 	{
-		if (TRACE_CRU) space.device().logerror("%s: CRU accessed at %04x\n", tag().c_str(), offset);
+		if (TRACE_CRU) space.device().logerror("%s: CRU accessed at %04x\n", tag(), offset);
 		UINT8 val = 0x02 << (m_ram_page << 1);
 		*value = (val >> ((offset - 0x0800)>>1)) & 0xff;
 	}
@@ -1742,7 +1742,7 @@ WRITE8_MEMBER(ti99_super_cartridge::cruwrite)
 {
 	if ((offset & 0xfff0) == 0x0800)
 	{
-		if (TRACE_CRU) space.device().logerror("%s: CRU accessed at %04x\n", tag().c_str(), offset);
+		if (TRACE_CRU) space.device().logerror("%s: CRU accessed at %04x\n", tag(), offset);
 		if (data != 0)
 			m_ram_page = (offset-0x0802)>>2;
 	}
@@ -2055,7 +2055,7 @@ READ8Z_MEMBER(ti99_gromemu_cartridge::readz)
 
 WRITE8_MEMBER(ti99_gromemu_cartridge::write)
 {
-	// logerror("%s: write standard\n", tag().c_str());
+	// logerror("%s: write standard\n", tag());
 	if ((offset & grom_mask())==grom_base())
 		gromemuwrite(space, offset, data, mem_mask);
 
@@ -2100,7 +2100,7 @@ WRITE8_MEMBER(ti99_gromemu_cartridge::gromemuwrite)
 			// Accept low address byte (second write)
 			m_grom_address = (m_grom_address & 0xff00) | data;
 			m_waddr_LSB = false;
-			if (TRACE_GROM) space.device().logerror("%s: Set grom address %04x\n", tag().c_str(), m_grom_address);
+			if (TRACE_GROM) space.device().logerror("%s: Set grom address %04x\n", tag(), m_grom_address);
 		}
 		else
 		{
@@ -2110,7 +2110,7 @@ WRITE8_MEMBER(ti99_gromemu_cartridge::gromemuwrite)
 		}
 	}
 	else {
-		if (TRACE_ILLWRITE) space.device().logerror("%s: Ignoring write to GROM area at address %04x\n", tag().c_str(), m_grom_address);
+		if (TRACE_ILLWRITE) space.device().logerror("%s: Ignoring write to GROM area at address %04x\n", tag(), m_grom_address);
 	}
 }
 

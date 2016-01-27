@@ -13,7 +13,7 @@ class generic_ram_plain_device : public device_t,
 {
 public:
 	// construction/destruction
-	generic_ram_plain_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 size, std::string shortname, std::string source);
+	generic_ram_plain_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 size, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -34,7 +34,7 @@ class generic_ram_linear_device : public device_t,
 {
 public:
 	// construction/destruction
-	generic_ram_linear_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 size, std::string shortname, std::string source);
+	generic_ram_linear_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 size, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -54,21 +54,21 @@ class generic_ram_32k_plain_device : public generic_ram_plain_device
 {
 public:
 	// construction/destruction
-	generic_ram_32k_plain_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	generic_ram_32k_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class generic_ram_64k_plain_device : public generic_ram_plain_device
 {
 public:
 	// construction/destruction
-	generic_ram_64k_plain_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	generic_ram_64k_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class generic_ram_128k_plain_device : public generic_ram_plain_device
 {
 public:
 	// construction/destruction
-	generic_ram_128k_plain_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	generic_ram_128k_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -78,21 +78,21 @@ class generic_ram_32k_linear_device : public generic_ram_linear_device
 {
 public:
 	// construction/destruction
-	generic_ram_32k_linear_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	generic_ram_32k_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class generic_ram_64k_linear_device : public generic_ram_linear_device
 {
 public:
 	// construction/destruction
-	generic_ram_64k_linear_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	generic_ram_64k_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class generic_ram_128k_linear_device : public generic_ram_linear_device
 {
 public:
 	// construction/destruction
-	generic_ram_128k_linear_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	generic_ram_128k_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

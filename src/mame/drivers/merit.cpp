@@ -87,7 +87,7 @@ Merit Riviera Notes - There are several known versions:
 class merit_state : public driver_device
 {
 public:
-	merit_state(const machine_config &mconfig, device_type type, std::string tag)
+	merit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ram_attr(*this, "raattr"),
 		m_ram_video(*this, "ravideo"),

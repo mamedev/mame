@@ -1127,7 +1127,8 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 			//  D0 : Output to coin counter 1
 			//
 			m_segaic16vid->tilemap_set_flip(0, data & 0x40);
-			m_sprites->set_flip(data & 0x40);
+			if (m_sprites.found())
+				m_sprites->set_flip(data & 0x40);
 			if (!m_disable_screen_blanking)
 				m_segaic16vid->set_display_enable(data & 0x20);
 			output().set_led_value(1, data & 0x08);
@@ -1293,11 +1294,14 @@ void segas16b_state::machine_reset()
 	m_segaic16vid->tilemap_reset(*m_screen);
 
 	// configure sprite banks
-	static const UINT8 default_banklist[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
-	static const UINT8 alternate_banklist[] = { 0,255,255,255, 255,255,255,3, 255,255,255,2, 255,1,0,255 };
-	const UINT8 *banklist = (m_romboard == ROM_BOARD_171_5358 || m_romboard == ROM_BOARD_171_5358_SMALL) ? alternate_banklist : default_banklist;
-	for (int banknum = 0; banknum < 16; banknum++)
-		m_sprites->set_bank(banknum, banklist[banknum]);
+	if (m_sprites.found())
+	{
+		static const UINT8 default_banklist[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+		static const UINT8 alternate_banklist[] = { 0,255,255,255, 255,255,255,3, 255,255,255,2, 255,1,0,255 };
+		const UINT8 *banklist = (m_romboard == ROM_BOARD_171_5358 || m_romboard == ROM_BOARD_171_5358_SMALL) ? alternate_banklist : default_banklist;
+		for (int banknum = 0; banknum < 16; banknum++)
+			m_sprites->set_bank(banknum, banklist[banknum]);
+	}
 }
 
 
@@ -3430,6 +3434,7 @@ static MACHINE_CONFIG_DERIVED( atomicp, system16b ) // 10MHz CPU Clock verified
 
 	// basic machine hardware
 	MCFG_DEVICE_REMOVE("soundcpu")
+	MCFG_DEVICE_REMOVE("sprites")
 
 	// sound hardware
 	MCFG_DEVICE_REMOVE("ym2151")
@@ -8237,9 +8242,11 @@ DRIVER_INIT_MEMBER(segas16b_state,sdi_5358_small)
 	DRIVER_INIT_CALL(generic_5358_small);
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::sdi_custom_io_r), this);
 
-	UINT8 *rom = memregion("maincpux")->base();
-	if (rom)
+	if (memregion("maincpux") != nullptr)
+	{
+		UINT8 *rom = memregion("maincpux")->base();
 		memcpy(m_decrypted_opcodes, rom, 0x30000);
+	}
 }
 
 
@@ -8908,8 +8915,9 @@ void isgsm_state::machine_reset()
 	m_segaic16vid->tilemap_reset(*m_screen);
 
 	// configure sprite banks
-	for (int i = 0; i < 16; i++)
-		m_sprites->set_bank(i, i);
+	if (m_sprites.found())
+		for (int i = 0; i < 16; i++)
+			m_sprites->set_bank(i, i);
 
 	membank(ISGSM_MAIN_BANK)->set_base(memregion("bios")->base());
 	m_maincpu->reset();

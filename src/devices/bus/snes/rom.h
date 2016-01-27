@@ -13,8 +13,8 @@ class sns_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	sns_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	sns_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sns_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	sns_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -30,7 +30,7 @@ class sns_rom_obc1_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_obc1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sns_rom_obc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -54,7 +54,7 @@ class sns_rom_pokemon_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_pokemon_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sns_rom_pokemon_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -72,7 +72,7 @@ class sns_rom_tekken2_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_tekken2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sns_rom_tekken2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -95,7 +95,7 @@ class sns_rom_soulblad_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_soulblad_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sns_rom_soulblad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(chip_read) override;    // protection device
@@ -107,7 +107,7 @@ class sns_rom_mcpirate1_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_mcpirate1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sns_rom_mcpirate1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -126,7 +126,7 @@ class sns_rom_mcpirate2_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_mcpirate2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sns_rom_mcpirate2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -145,7 +145,7 @@ class sns_rom_20col_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_20col_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sns_rom_20col_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -163,7 +163,7 @@ class sns_rom_banana_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_banana_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sns_rom_banana_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 //  virtual void device_start();
@@ -181,7 +181,7 @@ class sns_rom_bugs_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_bugs_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sns_rom_bugs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

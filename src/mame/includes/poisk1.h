@@ -24,7 +24,7 @@
 class p1_state : public driver_device
 {
 public:
-	p1_state(const machine_config &mconfig, device_type type, std::string tag)
+	p1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pic8259(*this, "pic8259"),

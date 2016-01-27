@@ -50,7 +50,7 @@ machine_config_constructor cgenie_printer_device::device_mconfig_additions() con
 //  cgenie_printer_device - constructor
 //-------------------------------------------------
 
-cgenie_printer_device::cgenie_printer_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+cgenie_printer_device::cgenie_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CGENIE_PRINTER, "Printer Interface EG2012", tag, owner, clock, "cgenie_printer", __FILE__),
 	device_parallel_interface(mconfig, *this),
 	m_centronics(*this, "centronics"),
@@ -106,7 +106,7 @@ WRITE_LINE_MEMBER( cgenie_printer_device::fault_w )
 void cgenie_printer_device::pa_w(UINT8 data)
 {
 	if (VERBOSE)
-		logerror("%s: pa_w %02x\n", tag().c_str(), data);
+		logerror("%s: pa_w %02x\n", tag(), data);
 
 	m_latch->write(data);
 }
@@ -126,7 +126,7 @@ UINT8 cgenie_printer_device::pb_r()
 void cgenie_printer_device::pb_w(UINT8 data)
 {
 	if (VERBOSE)
-		logerror("%s: pa_w %02x\n", tag().c_str(), data);
+		logerror("%s: pa_w %02x\n", tag(), data);
 
 	m_centronics->write_strobe(BIT(data, 0));
 }

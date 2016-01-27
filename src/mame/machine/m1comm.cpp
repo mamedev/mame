@@ -122,7 +122,7 @@ const rom_entry *m1comm_device::device_rom_region() const
 //  m1comm_device - constructor
 //-------------------------------------------------
 
-m1comm_device::m1comm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, M1COMM, "MODEL-1 COMMUNICATION BD", tag, owner, clock, "m1comm", __FILE__),
 	m_commcpu(*this, Z80_TAG),
 	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),

@@ -25,6 +25,8 @@
 # USE_BGFX = 1
 # NO_OPENGL = 1
 # USE_DISPATCH_GL = 0
+# MODERN_WIN_API = 0
+# USE_XAUDIO2 = 0
 # DIRECTINPUT = 7
 # USE_SDL = 1
 # SDL_INI_PATH = .;$HOME/.mame/;ini;
@@ -456,7 +458,10 @@ endif
 # set the symbols level
 ifdef SYMBOLS
 ifndef SYMLEVEL
+SYMLEVEL = 1
+ifdef SOURCES
 SYMLEVEL = 2
+endif
 endif
 endif
 
@@ -562,6 +567,14 @@ endif
 
 ifdef USE_QTDEBUG
 PARAMS += --USE_QTDEBUG='$(USE_QTDEBUG)'
+endif
+
+ifdef MODERN_WIN_API
+PARAMS += --MODERN_WIN_API='$(MODERN_WIN_API)'
+endif
+
+ifdef USE_XAUDIO2
+PARAMS += --USE_XAUDIO2='$(USE_XAUDIO2)'
 endif
 
 ifdef DIRECTINPUT
@@ -1166,6 +1179,32 @@ os2_x86: generate $(PROJECTDIR)/gmake-os2/Makefile
 
 
 #-------------------------------------------------
+# gmake-steamlink
+#-------------------------------------------------
+
+$(PROJECTDIR)/gmake-steamlink/Makefile: makefile $(SCRIPTS) $(GENIE)
+ifndef MARVELL_SDK_PATH
+	$(error MARVELL_SDK_PATH is not set)
+endif
+ifndef MARVELL_ROOTFS
+	$(error MARVELL_ROOTFS is not set)
+endif
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=steamlink --gcc_version=$(GCC_VERSION) --USE_BGFX=0 --NO_OPENGL=1 --NO_USE_MIDI=1 --NO_X11=1 --NOASM=1 --SDL_INSTALL_ROOT=$(MARVELL_ROOTFS)/usr  gmake 
+
+.PHONY: steamlink
+ifndef MARVELL_SDK_PATH
+	$(error MARVELL_SDK_PATH is not set)
+endif
+ifndef MARVELL_ROOTFS
+	$(error MARVELL_ROOTFS is not set)
+endif
+steamlink: generate $(PROJECTDIR)/gmake-steamlink/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-steamlink config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-steamlink config=$(CONFIG)
+
+
+
+#-------------------------------------------------
 # cmake
 #-------------------------------------------------
 cmake: generate
@@ -1194,6 +1233,7 @@ clean:
 	@echo Cleaning...
 	-@rm -rf $(BUILDDIR)
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make clean
+	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000 clean
 
 GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET)/
 
@@ -1213,12 +1253,15 @@ $(GEN_FOLDERS):
 generate: \
 		$(GENIE) \
 		$(GEN_FOLDERS) \
-		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS))
+		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
+		$(SRC)/devices/cpu/m68000/m68kops.cpp
 
 $(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/file2str.py | $(GEN_FOLDERS)
 	@echo Converting $<...
 	$(SILENT)$(PYTHON) scripts/build/file2str.py $< $@ layout_$(basename $(notdir $<))
 
+$(SRC)/devices/cpu/m68000/m68kops.cpp: $(SRC)/devices/cpu/m68000/m68k_in.cpp $(SRC)/devices/cpu/m68000/m68kmake.cpp
+	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000
 
 #-------------------------------------------------
 # Regression tests

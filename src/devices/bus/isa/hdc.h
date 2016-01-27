@@ -31,8 +31,8 @@ class xt_hdc_device :
 {
 public:
 	// construction/destruction
-	xt_hdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	xt_hdc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	xt_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	xt_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<xt_hdc_device &>(device).m_irq_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_handler(device_t &device, _Object object) { return downcast<xt_hdc_device &>(device).m_drq_handler.set_callback(object); }
@@ -114,7 +114,7 @@ private:
 class ec1841_device : public xt_hdc_device
 {
 public:
-	ec1841_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;
@@ -123,7 +123,7 @@ protected:
 class st11m_device : public xt_hdc_device
 {
 public:
-	st11m_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	st11m_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	devcb_write_line m_irq_handler;
@@ -142,8 +142,8 @@ class isa8_hdc_device :
 {
 public:
 		// construction/destruction
-		isa8_hdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-		isa8_hdc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+		isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		isa8_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 		DECLARE_READ8_MEMBER(pc_hdc_r);
 		DECLARE_WRITE8_MEMBER(pc_hdc_w);
@@ -171,7 +171,7 @@ public:
 class isa8_hdc_ec1841_device : public isa8_hdc_device
 {
 public:
-	isa8_hdc_ec1841_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	isa8_hdc_ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

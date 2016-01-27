@@ -23,8 +23,7 @@ enum
 	STALLED_UNTIL_FIFO_EMPTY
 };
 
-// Use old macro style or newer SSE2 optimized functions
-#define USE_OLD_RASTER  0
+
 
 // Use old table lookup versus straight double divide
 #define USE_FAST_RECIP  0
@@ -3787,47 +3786,6 @@ static inline bool ATTR_FORCE_INLINE depthTest(UINT16 zaColorReg, stats_block *s
 	return true;
 }
 
-#if USE_OLD_RASTER == 1
-#define PIXEL_PIPELINE_END(VV, STATS, DITHER, DITHER4, DITHER_LOOKUP, XX, dest, depth, FBZMODE, FBZCOLORPATH, ALPHAMODE, FOGMODE, ITERZ, ITERW, ITERAXXX) \
-																				\
-	/* perform fogging */                                                       \
-	INT32 prefogr, prefogg, prefogb;                                            \
-	prefogr = r;                                                                \
-	prefogg = g;                                                                \
-	prefogb = b;                                                                \
-	APPLY_FOGGING(VV, FOGMODE, FBZCOLORPATH, XX, DITHER4, r, g, b,              \
-					ITERZ, ITERW, ITERAXXX);                                    \
-																					\
-		/* perform alpha blending */                                                \
-		APPLY_ALPHA_BLEND(FBZMODE, ALPHAMODE, XX, DITHER, r, g, b, a);              \
-	/* modify the pixel for debugging purposes */                               \
-	MODIFY_PIXEL(VV);                                                           \
-																				\
-	/* write to framebuffer */                                                  \
-	if (FBZMODE_RGB_BUFFER_MASK(FBZMODE))                                       \
-	{                                                                           \
-		/* apply dithering */                                                   \
-		APPLY_DITHER(FBZMODE, XX, DITHER_LOOKUP, r, g, b);                      \
-		dest[XX] = (r << 11) | (g << 5) | b;                                    \
-	}                                                                           \
-																				\
-	/* write to aux buffer */                                                   \
-	if (depth && FBZMODE_AUX_BUFFER_MASK(FBZMODE))                              \
-	{                                                                           \
-		if (FBZMODE_ENABLE_ALPHA_PLANES(FBZMODE) == 0)                          \
-			depth[XX] = biasdepth;                                               \
-		else                                                                    \
-			depth[XX] = a;                                                      \
-	}                                                                           \
-																				\
-	/* track pixel writes to the frame buffer regardless of mask */             \
-	(STATS)->pixels_out++;                                                      \
-																				\
-skipdrawdepth:                                                                  \
-	;                                                                           \
-}                                                                               \
-while (0)
-#else
 #define PIXEL_PIPELINE_END(VV, STATS, DITHER, DITHER4, DITHER_LOOKUP, XX, dest, depth, FBZMODE, FBZCOLORPATH, ALPHAMODE, FOGMODE, ITERZ, ITERW, ITERAXXX) \
 																				\
 	/* perform fogging */                                                       \
@@ -3863,7 +3821,7 @@ skipdrawdepth:                                                                  
 	;                                                                           \
 }                                                                               \
 while (0)
-#endif
+
 
 
 /*************************************
@@ -4411,155 +4369,7 @@ static inline bool ATTR_FORCE_INLINE combineColor(voodoo_state *VV, stats_block 
  *  Rasterizer generator macro
  *
  *************************************/
-#if USE_OLD_RASTER == 1
-#define RASTERIZER(name, TMUS, FBZCOLORPATH, FBZMODE, ALPHAMODE, FOGMODE, TEXMODE0, TEXMODE1) \
-																				\
-static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, const void *extradata, int threadid) \
-{                                                                               \
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;          \
-	voodoo_state *v = extra->state;                                             \
-	stats_block *stats = &v->thread_stats[threadid];                            \
-	DECLARE_DITHER_POINTERS;                                                    \
-	INT32 startx = extent->startx;                                              \
-	INT32 stopx = extent->stopx;                                                \
-	INT32 iterr, iterg, iterb, itera;                                           \
-	INT32 iterz;                                                                \
-	INT64 iterw, iterw0 = 0, iterw1 = 0;                                        \
-	INT64 iters0 = 0, iters1 = 0;                                               \
-	INT64 itert0 = 0, itert1 = 0;                                               \
-	UINT16 *depth;                                                              \
-	UINT16 *dest;                                                               \
-	INT32 dx, dy;                                                               \
-	INT32 scry;                                                                 \
-	INT32 x;                                                                    \
-																				\
-	/* determine the screen Y */                                                \
-	scry = y;                                                                   \
-	if (FBZMODE_Y_ORIGIN(FBZMODE))                                              \
-		scry = (v->fbi.yorigin - y) & 0x3ff;                                    \
-																				\
-	/* compute dithering */                                                     \
-	COMPUTE_DITHER_POINTERS(FBZMODE, y);                                        \
-																				\
-	/* apply clipping */                                                        \
-	if (FBZMODE_ENABLE_CLIPPING(FBZMODE))                                       \
-	{                                                                           \
-		INT32 tempclip;                                                         \
-																				\
-		/* Y clipping buys us the whole scanline */                             \
-		if (scry < ((v->reg[clipLowYHighY].u >> 16) & 0x3ff) ||                 \
-			scry >= (v->reg[clipLowYHighY].u & 0x3ff))                          \
-		{                                                                       \
-			stats->pixels_in += stopx - startx;                                 \
-			stats->clip_fail += stopx - startx;                                 \
-			return;                                                             \
-		}                                                                       \
-																				\
-		/* X clipping */                                                        \
-		tempclip = (v->reg[clipLeftRight].u >> 16) & 0x3ff;                     \
-		if (startx < tempclip)                                                  \
-		{                                                                       \
-			stats->pixels_in += tempclip - startx;                              \
-			v->stats.total_clipped += tempclip - startx;                        \
-			startx = tempclip;                                                  \
-		}                                                                       \
-		tempclip = v->reg[clipLeftRight].u & 0x3ff;                             \
-		if (stopx >= tempclip)                                                  \
-		{                                                                       \
-			stats->pixels_in += stopx - tempclip;                               \
-			v->stats.total_clipped += stopx - tempclip;                         \
-			stopx = tempclip - 1;                                               \
-		}                                                                       \
-	}                                                                           \
-																				\
-	/* get pointers to the target buffer and depth buffer */                    \
-	dest = (UINT16 *)destbase + scry * v->fbi.rowpixels;                        \
-	depth = (v->fbi.auxoffs != ~0) ? ((UINT16 *)(v->fbi.ram + v->fbi.auxoffs) + scry * v->fbi.rowpixels) : NULL; \
-																				\
-	/* compute the starting parameters */                                       \
-	dx = startx - (extra->ax >> 4);                                             \
-	dy = y - (extra->ay >> 4);                                                  \
-	iterr = extra->startr + dy * extra->drdy + dx * extra->drdx;                \
-	iterg = extra->startg + dy * extra->dgdy + dx * extra->dgdx;                \
-	iterb = extra->startb + dy * extra->dbdy + dx * extra->dbdx;                \
-	itera = extra->starta + dy * extra->dady + dx * extra->dadx;                \
-	iterz = extra->startz + dy * extra->dzdy + dx * extra->dzdx;                \
-	iterw = extra->startw + dy * extra->dwdy + dx * extra->dwdx;                \
-	if (TMUS >= 1)                                                              \
-	{                                                                           \
-		iterw0 = extra->startw0 + dy * extra->dw0dy +   dx * extra->dw0dx;      \
-		iters0 = extra->starts0 + dy * extra->ds0dy + dx * extra->ds0dx;        \
-		itert0 = extra->startt0 + dy * extra->dt0dy + dx * extra->dt0dx;        \
-	}                                                                           \
-	if (TMUS >= 2)                                                              \
-	{                                                                           \
-		iterw1 = extra->startw1 + dy * extra->dw1dy +   dx * extra->dw1dx;      \
-		iters1 = extra->starts1 + dy * extra->ds1dy + dx * extra->ds1dx;        \
-		itert1 = extra->startt1 + dy * extra->dt1dy + dx * extra->dt1dx;        \
-	}                                                                           \
-	extra->info->hits++;                                                        \
-	/* loop in X */                                                             \
-	for (x = startx; x < stopx; x++)                                            \
-	{                                                                           \
-		rgb_union iterargb;                                             \
-		rgb_union texel = { 0 };                                                \
-																				\
-		/* pixel pipeline part 1 handles depth setup and stippling */         \
-		PIXEL_PIPELINE_BEGIN(v, stats, x, y, FBZCOLORPATH, FBZMODE, iterz, iterw); \
-		DEPTH_TEST(v, stats, x, FBZMODE);   \
-																				\
-		/* run the texture pipeline on TMU1 to produce a value in texel */      \
-		/* note that they set LOD min to 8 to "disable" a TMU */                \
-		if (TMUS >= 2 && v->tmu[1].lodmin < (8 << 8))                           \
-			TEXTURE_PIPELINE(&v->tmu[1], x, dither4, TEXMODE1, texel,           \
-								v->tmu[1].lookup, extra->lodbase1,              \
-								iters1, itert1, iterw1, texel);                 \
-																				\
-		/* run the texture pipeline on TMU0 to produce a final */               \
-		/* result in texel */                                                   \
-		/* note that they set LOD min to 8 to "disable" a TMU */                \
-		if (TMUS >= 1 && v->tmu[0].lodmin < (8 << 8))                           \
-		{                                                                     \
-			if (!v->send_config)                                                \
-				TEXTURE_PIPELINE(&v->tmu[0], x, dither4, TEXMODE0, texel,           \
-									v->tmu[0].lookup, extra->lodbase0,              \
-									iters0, itert0, iterw0, texel);               \
-			else                                                                \
-				texel.u = v->tmu_config;                                              \
-		}                                                                     \
-		/* colorpath pipeline selects source colors and does blending */        \
-		CLAMPED_ARGB(iterr, iterg, iterb, itera, FBZCOLORPATH, iterargb);       \
-		COLORPATH_PIPELINE(v, stats, FBZCOLORPATH, FBZMODE, ALPHAMODE, texel,   \
-								iterz, iterw, iterargb);                            \
-																				\
-		/* pixel pipeline part 2 handles fog, alpha, and final output */        \
-		PIXEL_PIPELINE_END(v, stats, dither, dither4, dither_lookup, x, dest, depth, \
-							FBZMODE, FBZCOLORPATH, ALPHAMODE, FOGMODE,          \
-							iterz, iterw, iterargb);                            \
-																				\
-		/* update the iterated parameters */                                    \
-		iterr += extra->drdx;                                                   \
-		iterg += extra->dgdx;                                                   \
-		iterb += extra->dbdx;                                                   \
-		itera += extra->dadx;                                                   \
-		iterz += extra->dzdx;                                                   \
-		iterw += extra->dwdx;                                                   \
-		if (TMUS >= 1)                                                          \
-		{                                                                       \
-			iterw0 += extra->dw0dx;                                             \
-			iters0 += extra->ds0dx;                                             \
-			itert0 += extra->dt0dx;                                             \
-		}                                                                       \
-		if (TMUS >= 2)                                                          \
-		{                                                                       \
-			iterw1 += extra->dw1dx;                                             \
-			iters1 += extra->ds1dx;                                             \
-			itert1 += extra->dt1dx;                                             \
-		}                                                                       \
-	}                                                                           \
-}
-#else
-// New rasterizer implementation
+
 #define RASTERIZER(name, TMUS, FBZCOLORPATH, FBZMODE, ALPHAMODE, FOGMODE, TEXMODE0, TEXMODE1) \
 																				\
 static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, const void *extradata, int threadid) \
@@ -4716,7 +4526,8 @@ static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, co
 		}                                                                       \
 	}                                                                           \
 }
-#endif
+
+
 // ******************************************************************************************************************************
 // Computes a log2 of a 16.32 value to 2 fractional bits of precision.
 // The return value is coded as a 24.8 value.

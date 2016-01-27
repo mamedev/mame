@@ -94,17 +94,17 @@ class ecbbus_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	ecbbus_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ecbbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 
 	// inline configuration
-	static void static_set_ecbbus_slot(device_t &device, std::string tag, int num);
+	static void static_set_ecbbus_slot(device_t &device, const char *tag, int num);
 
 private:
 	// configuration
-	std::string m_bus_tag;
+	const char *m_bus_tag;
 	int m_bus_num;
 	ecbbus_device  *m_bus;
 };
@@ -125,7 +125,7 @@ class ecbbus_device : public device_t
 {
 public:
 	// construction/destruction
-	ecbbus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ecbbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<ecbbus_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<ecbbus_device &>(device).m_write_nmi.set_callback(object); }

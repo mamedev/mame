@@ -38,7 +38,7 @@ const device_type CDP1861 = &device_creator<cdp1861_device>;
 //  cdp1861_device - constructor
 //-------------------------------------------------
 
-cdp1861_device::cdp1861_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CDP1861, "CDP1861", tag, owner, clock, "cdp1861", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_write_irq(*this),

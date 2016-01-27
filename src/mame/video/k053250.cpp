@@ -4,7 +4,7 @@
 
 const device_type K053250 = &device_creator<k053250_device>;
 
-k053250_device::k053250_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+k053250_device::k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053250, "K053250 LVC", tag, owner, clock, "k053250", __FILE__),
 		device_gfx_interface(mconfig, *this),
 		device_video_interface(mconfig, *this)
@@ -21,7 +21,7 @@ void k053250_device::static_set_offsets(device_t &device, int offx, int offy)
 void k053250_device::unpack_nibbles()
 {
 	if(!m_region)
-		throw emu_fatalerror("k053250 %s: no associated region found\n", tag().c_str());
+		throw emu_fatalerror("k053250 %s: no associated region found\n", tag());
 
 	const UINT8 *base = m_region->base();
 	int size = m_region->bytes();
@@ -353,7 +353,7 @@ void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int 
 	linedata_offs += line_start * linedata_adv;     // pre-advance line info offset for the clipped region
 
 	// load physical palette base
-	pal_base = m_palette->pens() + (colorbase << 4) % m_palette->entries();
+	pal_base = palette().pens() + (colorbase << 4) % palette().entries();
 
 	// walk the target bitmap within the visible area vertically or horizontally, one line at a time
 	for (line_pos=line_start; line_pos <= line_end; linedata_offs += linedata_adv, line_pos++)

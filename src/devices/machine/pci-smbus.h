@@ -10,7 +10,7 @@
 
 class smbus_device : public pci_device {
 public:
-	smbus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER  (hst_sts_r);
 	DECLARE_WRITE8_MEMBER (hst_sts_w);

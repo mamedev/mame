@@ -51,7 +51,7 @@ class omti_disk_image_device :  public device_t,
 {
 public:
 	// construction/destruction
-	omti_disk_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_HARDDISK; }
@@ -192,8 +192,8 @@ static const char *cpu_context(const device_t *device) {
 		int s = t / osd_ticks_per_second();
 		int ms = (t % osd_ticks_per_second()) / 1000;
 
-		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag().c_str(),
-				cpu->safe_pcbase(), device->tag().c_str());
+		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag(),
+				cpu->safe_pcbase(), device->tag());
 	} else {
 		strcpy(statebuf, "(no context)");
 	}
@@ -373,19 +373,19 @@ void omti8621_device::device_reset()
 
 const device_type ISA16_OMTI8621 = &device_creator<omti8621_pc_device>;
 
-omti8621_pc_device::omti8621_pc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+omti8621_pc_device::omti8621_pc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: omti8621_device(mconfig, ISA16_OMTI8621, tag, owner, clock)
 {
 }
 
 const device_type ISA16_OMTI8621_APOLLO = &device_creator<omti8621_apollo_device>;
 
-omti8621_apollo_device::omti8621_apollo_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+omti8621_apollo_device::omti8621_apollo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: omti8621_device(mconfig, ISA16_OMTI8621_APOLLO, tag, owner, clock)
 {
 }
 
-omti8621_device::omti8621_device(const machine_config &mconfig, device_type type,std::string tag, device_t *owner, UINT32 clock)
+omti8621_device::omti8621_device(const machine_config &mconfig, device_type type,const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, "OMTI 8621 ESDI/floppy controller", tag, owner, clock, "omti8621", __FILE__),
 	device_isa16_card_interface(mconfig, *this),
 	m_fdc(*this, OMTI_FDC_TAG),
@@ -785,7 +785,7 @@ void omti8621_device::log_command(const UINT8 cdb[], const UINT16 cdb_length)
 			break;
 		}
 		text += "\n";
-		logerror("%s",text.c_str());
+		logerror(text.c_str());
 	}
 }
 
@@ -813,7 +813,7 @@ void omti8621_device::log_data()
 			text += " ...";
 		}
 		text += "\n";
-		logerror("%s",text.c_str());
+		logerror(text.c_str());
 	}
 }
 
@@ -1309,7 +1309,7 @@ void omti8621_device::eop_w(int state)
 // device type definition
 const device_type OMTI_DISK = &device_creator<omti_disk_image_device>;
 
-omti_disk_image_device::omti_disk_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+omti_disk_image_device::omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, OMTI_DISK, "OMTI8621 ESDI disk", tag, owner, clock, "omti_disk_image", __FILE__),
 		device_image_interface(mconfig, *this), m_type(0), m_cylinders(0), m_heads(0), m_sectors(0), m_sectorbytes(0), m_sector_count(0), m_image(nullptr)
 {

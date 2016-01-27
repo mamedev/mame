@@ -83,10 +83,10 @@ class atari_motion_objects_device : public sprite16_device_ind16,
 
 public:
 	// construction/destruction
-	atari_motion_objects_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_config(device_t &device, const atari_motion_objects_config &config);
 
 	// getters

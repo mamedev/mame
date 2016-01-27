@@ -6,7 +6,7 @@
 class igs022_device : public device_t
 {
 public:
-	igs022_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	igs022_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	UINT16* m_sharedprotram;
 	void IGS022_handle_command();

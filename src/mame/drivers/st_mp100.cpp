@@ -24,7 +24,7 @@ ToDo:
 class st_mp100_state : public genpin_class
 {
 public:
-	st_mp100_state(const machine_config &mconfig, device_type type, std::string tag)
+	st_mp100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_pia_u10(*this, "pia_u10")

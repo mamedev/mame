@@ -28,7 +28,7 @@
 class bartop52_state : public atari_common_state
 {
 public:
-	bartop52_state(const machine_config &mconfig, device_type type, std::string tag)
+	bartop52_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atari_common_state(mconfig, type, tag)
 		{ }
 

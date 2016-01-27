@@ -38,7 +38,7 @@
 class ec184x_state : public driver_device
 {
 public:
-	ec184x_state(const machine_config &mconfig, device_type type, std::string tag)
+	ec184x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 

@@ -55,7 +55,8 @@
 #define WINOPTION_SCANLINE_HEIGHT           "scanline_height"
 #define WINOPTION_SCANLINE_BRIGHT_SCALE     "scanline_bright_scale"
 #define WINOPTION_SCANLINE_BRIGHT_OFFSET    "scanline_bright_offset"
-#define WINOPTION_SCANLINE_OFFSET           "scanline_jitter"
+#define WINOPTION_SCANLINE_JITTER           "scanline_jitter"
+#define WINOPTION_HUM_BAR_ALPHA             "hum_bar_alpha"
 #define WINOPTION_DEFOCUS                   "defocus"
 #define WINOPTION_CONVERGE_X                "converge_x"
 #define WINOPTION_CONVERGE_Y                "converge_y"
@@ -71,6 +72,7 @@
 #define WINOPTION_PHOSPHOR                  "phosphor_life"
 #define WINOPTION_SATURATION                "saturation"
 #define WINOPTION_YIQ_ENABLE                "yiq_enable"
+#define WINOPTION_YIQ_JITTER                "yiq_jitter"
 #define WINOPTION_YIQ_CCVALUE               "yiq_cc"
 #define WINOPTION_YIQ_AVALUE                "yiq_a"
 #define WINOPTION_YIQ_BVALUE                "yiq_b"
@@ -154,7 +156,8 @@ public:
 	float screen_scanline_height() const { return float_value(WINOPTION_SCANLINE_HEIGHT); }
 	float screen_scanline_bright_scale() const { return float_value(WINOPTION_SCANLINE_BRIGHT_SCALE); }
 	float screen_scanline_bright_offset() const { return float_value(WINOPTION_SCANLINE_BRIGHT_OFFSET); }
-	float screen_scanline_offset() const { return float_value(WINOPTION_SCANLINE_OFFSET); }
+	float screen_scanline_jitter() const { return float_value(WINOPTION_SCANLINE_JITTER); }
+	float screen_hum_bar_alpha() const { return float_value(WINOPTION_HUM_BAR_ALPHA); }
 	float screen_reflection() const { return float_value(WINOPTION_REFLECTION); }
 	float screen_curvature() const { return float_value(WINOPTION_CURVATURE); }
 	float screen_round_corner() const { return float_value(WINOPTION_ROUND_CORNER); }
@@ -169,6 +172,7 @@ public:
 	const char *screen_grn_ratio() const { return value(WINOPTION_GRN_RATIO); }
 	const char *screen_blu_ratio() const { return value(WINOPTION_BLU_RATIO); }
 	bool screen_yiq_enable() const { return bool_value(WINOPTION_YIQ_ENABLE); }
+	float screen_yiq_jitter() const { return float_value(WINOPTION_YIQ_JITTER); }
 	float screen_yiq_cc() const { return float_value(WINOPTION_YIQ_CCVALUE); }
 	float screen_yiq_a() const { return float_value(WINOPTION_YIQ_AVALUE); }
 	float screen_yiq_b() const { return float_value(WINOPTION_YIQ_BVALUE); }

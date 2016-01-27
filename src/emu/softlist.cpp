@@ -273,7 +273,7 @@ bool software_info::has_multiple_parts(const char *interface) const
 //  software_list_device - constructor
 //-------------------------------------------------
 
-software_list_device::software_list_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+software_list_device::software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SOFTWARE_LIST, "Software list", tag, owner, clock, "software_list", __FILE__),
 		m_list_type(SOFTWARE_LIST_ORIGINAL_SYSTEM),
 		m_filter(nullptr),

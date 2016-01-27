@@ -17,7 +17,7 @@ TIMER_CALLBACK_MEMBER( sh34_base_device::sh4_dmac_callback )
 {
 	int channel = param;
 
-	LOG(("SH4 '%s': DMA %d complete\n", tag().c_str(), channel));
+	LOG(("SH4 '%s': DMA %d complete\n", tag(), channel));
 	m_dma_timer_active[channel] = 0;
 	switch (channel)
 	{

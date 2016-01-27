@@ -46,7 +46,7 @@ class cassette_image_device :   public device_t,
 {
 public:
 	// construction/destruction
-	cassette_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~cassette_image_device();
 
 	static void static_set_formats(device_t &device, const struct CassetteFormat*  const *formats) { downcast<cassette_image_device &>(device).m_formats = formats; }

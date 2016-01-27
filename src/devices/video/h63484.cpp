@@ -28,7 +28,7 @@ ADDRESS_MAP_END
 //  h63484_device - constructor
 //-------------------------------------------------
 
-h63484_device::h63484_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+h63484_device::h63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, H63484, "HD63484 CRTC (rewrite)", tag, owner, clock, "h63484", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
@@ -387,7 +387,7 @@ inline void h63484_device::inc_ar(int value)
 	if(m_ar & 0x80)
 	{
 		if (m_ar + value > 0xff)    // TODO: what happens if it overflows?
-			logerror("HD63484 '%s': Address Register overflows 0x%02x\n", tag().c_str(), m_ar + value);
+			logerror("HD63484 '%s': Address Register overflows 0x%02x\n", tag(), m_ar + value);
 
 		m_ar = (m_ar + value) & 0xff;
 	}
@@ -767,7 +767,7 @@ bool h63484_device::set_dot(INT16 x, INT16 y, UINT16 color)
 	writeword(offset, res);
 
 	if (area)
-		logerror("HD63484 '%s': unsupported area detection %x (%d %d)\n", tag().c_str(), area, x, y);
+		logerror("HD63484 '%s': unsupported area detection %x (%d %d)\n", tag(), area, x, y);
 
 	return false;   // TODO: return area detection status
 }
@@ -1425,8 +1425,8 @@ void h63484_device::process_fifo()
 	switch (translate_command(m_cr))
 	{
 		case COMMAND_INVALID:
-			if (CMD_LOG)    logerror("HD63484 '%s': <invalid %04x>\n", tag().c_str(), m_cr);
-			printf("H63484 '%s' Invalid Command Byte %02x\n", tag().c_str(), m_cr);
+			if (CMD_LOG)    logerror("HD63484 '%s': <invalid %04x>\n", tag(), m_cr);
+			printf("H63484 '%s' Invalid Command Byte %02x\n", tag(), m_cr);
 			m_sr |= H63484_SR_CER; // command error
 			command_end_seq();
 			break;
@@ -1434,7 +1434,7 @@ void h63484_device::process_fifo()
 		case COMMAND_ORG:
 			if (m_param_ptr == 2)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': ORG 0x%04x, 0x%04x\n", tag().c_str(), m_pr[0], m_pr[1]);
+				if (CMD_LOG)    logerror("HD63484 '%s': ORG 0x%04x, 0x%04x\n", tag(), m_pr[0], m_pr[1]);
 				m_org_dn = (m_pr[0] & 0xc000) >> 14;
 				m_org_dpa = ((m_pr[0] & 0xff) << 12) | ((m_pr[1] & 0xfff0) >> 4);
 				m_org_dpd = (m_pr[1] & 0xf);
@@ -1446,7 +1446,7 @@ void h63484_device::process_fifo()
 		case COMMAND_WPR: // 0x0800 & ~0x1f
 			if (m_param_ptr == 1)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': WPR (%d) 0x%04x\n", tag().c_str(), m_cr & 0x1f, m_pr[0]);
+				if (CMD_LOG)    logerror("HD63484 '%s': WPR (%d) 0x%04x\n", tag(), m_cr & 0x1f, m_pr[0]);
 				command_wpr_exec();
 				command_end_seq();
 			}
@@ -1455,7 +1455,7 @@ void h63484_device::process_fifo()
 		case COMMAND_RPR:
 			if (m_param_ptr == 0)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': RPR (%d)\n", tag().c_str(), m_cr & 0x1f);
+				if (CMD_LOG)    logerror("HD63484 '%s': RPR (%d)\n", tag(), m_cr & 0x1f);
 				UINT16 data = command_rpr_exec();
 				queue_r((data >> 8) & 0xff);
 				queue_r((data >> 0) & 0xff);
@@ -1474,7 +1474,7 @@ void h63484_device::process_fifo()
 
 			if(m_param_ptr == (1 + m_dn))
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': WPTN (%d) %d", tag().c_str(), m_cr & 0x0f, m_pr[0]);
+				if (CMD_LOG)    logerror("HD63484 '%s': WPTN (%d) %d", tag(), m_cr & 0x0f, m_pr[0]);
 
 				int pra = m_cr & 0xf;
 				for(int i=0; i<m_dn; i++)
@@ -1491,7 +1491,7 @@ void h63484_device::process_fifo()
 		case COMMAND_RPTN:
 			if(m_param_ptr == 1)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': RPTN (%d) %d\n", tag().c_str(), m_cr & 0x0f, m_pr[0]);
+				if (CMD_LOG)    logerror("HD63484 '%s': RPTN (%d) %d\n", tag(), m_cr & 0x0f, m_pr[0]);
 				command_end_seq();
 				fatalerror("HD63484 COMMAND_RPTN!\n");
 			}
@@ -1500,7 +1500,7 @@ void h63484_device::process_fifo()
 		case COMMAND_DRD:
 			if (m_param_ptr == 2)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': DRD %d, %d\n", tag().c_str(), m_pr[0], m_pr[1]);
+				if (CMD_LOG)    logerror("HD63484 '%s': DRD %d, %d\n", tag(), m_pr[0], m_pr[1]);
 				command_end_seq();
 				fatalerror("HD63484 COMMAND_DRD!\n");
 			}
@@ -1509,7 +1509,7 @@ void h63484_device::process_fifo()
 		case COMMAND_DWT:
 			if (m_param_ptr == 2)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': DWT %d, %d\n", tag().c_str(), m_pr[0], m_pr[1]);
+				if (CMD_LOG)    logerror("HD63484 '%s': DWT %d, %d\n", tag(), m_pr[0], m_pr[1]);
 				command_end_seq();
 				fatalerror("HD63484 COMMAND_DWT!\n");
 			}
@@ -1518,7 +1518,7 @@ void h63484_device::process_fifo()
 		case COMMAND_DMOD:
 			if (m_param_ptr == 2)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': DMOD (%d) %d, %d\n", tag().c_str(), m_cr & 0x03, m_pr[0], m_pr[1]);
+				if (CMD_LOG)    logerror("HD63484 '%s': DMOD (%d) %d, %d\n", tag(), m_cr & 0x03, m_pr[0], m_pr[1]);
 				command_end_seq();
 				fatalerror("HD63484 COMMAND_DMOD!\n");
 			}
@@ -1527,7 +1527,7 @@ void h63484_device::process_fifo()
 		case COMMAND_RD:
 			if (m_param_ptr == 0)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': RD\n", tag().c_str());
+				if (CMD_LOG)    logerror("HD63484 '%s': RD\n", tag());
 				UINT16 data = readword(m_rwp[m_rwp_dn]);
 				queue_r((data >> 8) & 0xff);
 				queue_r((data >> 0) & 0xff);
@@ -1540,7 +1540,7 @@ void h63484_device::process_fifo()
 		case COMMAND_WT:
 			if (m_param_ptr == 1)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': WT 0x%04x\n", tag().c_str(), m_pr[0]);
+				if (CMD_LOG)    logerror("HD63484 '%s': WT 0x%04x\n", tag(), m_pr[0]);
 				writeword(m_rwp[m_rwp_dn], m_pr[0]);
 				m_rwp[m_rwp_dn]+=1;
 				m_rwp[m_rwp_dn]&=0xfffff;
@@ -1551,7 +1551,7 @@ void h63484_device::process_fifo()
 		case COMMAND_MOD:
 			if(m_param_ptr == 1)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': MOD (%d) 0x%04x\n", tag().c_str(), m_cr & 0x03, m_pr[0]);
+				if (CMD_LOG)    logerror("HD63484 '%s': MOD (%d) 0x%04x\n", tag(), m_cr & 0x03, m_pr[0]);
 				UINT16 d = m_pr[0];
 				UINT16 data = readword(m_rwp[m_rwp_dn]);
 				UINT16 res = 0;
@@ -1584,9 +1584,9 @@ void h63484_device::process_fifo()
 				if (CMD_LOG)
 				{
 					if (BIT(m_cr, 10))
-						logerror("HD63484 '%s': SCLR (%d) 0x%04x,  %d, %d\n", tag().c_str(), m_cr & 0x03, m_pr[0], (INT16)m_pr[1], (INT16)m_pr[2]);
+						logerror("HD63484 '%s': SCLR (%d) 0x%04x,  %d, %d\n", tag(), m_cr & 0x03, m_pr[0], (INT16)m_pr[1], (INT16)m_pr[2]);
 					else
-						logerror("HD63484 '%s': CLR 0x%04x, %d, %d\n", tag().c_str(), m_pr[0], (INT16)m_pr[1], (INT16)m_pr[2]);
+						logerror("HD63484 '%s': CLR 0x%04x, %d, %d\n", tag(), m_pr[0], (INT16)m_pr[1], (INT16)m_pr[2]);
 				}
 
 				command_clr_exec();
@@ -1601,9 +1601,9 @@ void h63484_device::process_fifo()
 				if (CMD_LOG)
 				{
 					if (BIT(m_cr, 12))
-						logerror("HD63484 '%s': SCPY (%d, %d, %d) 0x%x, 0x%x, %d, %d\n", tag().c_str(), BIT(m_cr, 11), (m_cr >> 8) & 0x07, m_cr & 0x07, m_pr[0] & 0xff, (m_pr[1]&0xfff0) >> 4, (INT16)m_pr[2], (INT16)m_pr[3]);
+						logerror("HD63484 '%s': SCPY (%d, %d, %d) 0x%x, 0x%x, %d, %d\n", tag(), BIT(m_cr, 11), (m_cr >> 8) & 0x07, m_cr & 0x07, m_pr[0] & 0xff, (m_pr[1]&0xfff0) >> 4, (INT16)m_pr[2], (INT16)m_pr[3]);
 					else
-						logerror("HD63484 '%s': CPY (%d, %d) 0x%x, 0x%x, %d, %d\n", tag().c_str(), BIT(m_cr, 11), (m_cr >> 8) & 0x07, m_pr[0] & 0xff, (m_pr[1]&0xfff0) >> 4, (INT16)m_pr[2], (INT16)m_pr[3]);
+						logerror("HD63484 '%s': CPY (%d, %d) 0x%x, 0x%x, %d, %d\n", tag(), BIT(m_cr, 11), (m_cr >> 8) & 0x07, m_pr[0] & 0xff, (m_pr[1]&0xfff0) >> 4, (INT16)m_pr[2], (INT16)m_pr[3]);
 				}
 
 				command_cpy_exec();
@@ -1615,7 +1615,7 @@ void h63484_device::process_fifo()
 		case COMMAND_RMOVE:
 			if (m_param_ptr == 2)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': %cMOVE %d, %d\n", tag().c_str(), BIT(m_cr, 10) ? 'R' : 'A', (INT16)m_pr[0], (INT16)m_pr[1]);
+				if (CMD_LOG)    logerror("HD63484 '%s': %cMOVE %d, %d\n", tag(), BIT(m_cr, 10) ? 'R' : 'A', (INT16)m_pr[0], (INT16)m_pr[1]);
 				if (BIT(m_cr, 10))
 				{
 					m_cpx += (INT16)m_pr[0];
@@ -1634,7 +1634,7 @@ void h63484_device::process_fifo()
 		case COMMAND_ARCT:
 			if (m_param_ptr == 2)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': %cRTC (%d, %d, %d) %d, %d\n", tag().c_str(), BIT(m_cr, 10) ? 'R' : 'A', (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (INT16)m_pr[0], (INT16)m_pr[1]);
+				if (CMD_LOG)    logerror("HD63484 '%s': %cRTC (%d, %d, %d) %d, %d\n", tag(), BIT(m_cr, 10) ? 'R' : 'A', (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (INT16)m_pr[0], (INT16)m_pr[1]);
 				command_rct_exec();
 				command_end_seq();
 			}
@@ -1644,7 +1644,7 @@ void h63484_device::process_fifo()
 		case COMMAND_ALINE:
 			if (m_param_ptr == 2)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': %cLINE (%d, %d, %d) %d, %d\n", tag().c_str(), BIT(m_cr, 10) ? 'R' : 'A', (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (INT16)m_pr[0], (INT16)m_pr[1]);
+				if (CMD_LOG)    logerror("HD63484 '%s': %cLINE (%d, %d, %d) %d, %d\n", tag(), BIT(m_cr, 10) ? 'R' : 'A', (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (INT16)m_pr[0], (INT16)m_pr[1]);
 				command_line_exec();
 				command_end_seq();
 			}
@@ -1661,7 +1661,7 @@ void h63484_device::process_fifo()
 			{
 				if (CMD_LOG)
 				{
-					logerror("HD63484 '%s': %cPL%c (%d, %d, %d) %d", tag().c_str(), BIT(m_cr, 10) ? 'R' : 'A', m_cr & 0x2000 ? 'G' : 'L', (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0]);
+					logerror("HD63484 '%s': %cPL%c (%d, %d, %d) %d", tag(), BIT(m_cr, 10) ? 'R' : 'A', m_cr & 0x2000 ? 'G' : 'L', (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0]);
 					for (int i=0; i<m_dn; i++)
 						logerror(", %d, %d", (INT16)m_pr[1 + i * 2], (INT16)m_pr[1 + i * 2 + 1]);
 					logerror("\n");
@@ -1675,7 +1675,7 @@ void h63484_device::process_fifo()
 		case COMMAND_CRCL:
 			if(m_param_ptr == 1)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': CRCL (%d, %d, %d, %d) %d\n", tag().c_str(), BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0]);
+				if (CMD_LOG)    logerror("HD63484 '%s': CRCL (%d, %d, %d, %d) %d\n", tag(), BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0]);
 				UINT16 r = m_pr[0] & 0x1fff;
 				draw_ellipse(m_cpx, m_cpy, r, r, DEGREE_TO_RADIAN(0), DEGREE_TO_RADIAN(360), BIT(m_cr, 8));
 				command_end_seq();
@@ -1685,7 +1685,7 @@ void h63484_device::process_fifo()
 		case COMMAND_ELPS:
 			if(m_param_ptr == 3)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': ELPS (%d, %d, %d, %d) %d, %d, %d\n", tag().c_str(), BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0], m_pr[1], m_pr[2]);
+				if (CMD_LOG)    logerror("HD63484 '%s': ELPS (%d, %d, %d, %d) %d, %d, %d\n", tag(), BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0], m_pr[1], m_pr[2]);
 				double dx = (double)m_pr[3];
 				double dy = sqrt(pow(dx, 2) / ((double)m_pr[0] / m_pr[1]));
 				draw_ellipse(m_cpx, m_cpy, dx, dy, DEGREE_TO_RADIAN(0), DEGREE_TO_RADIAN(360), BIT(m_cr, 8));
@@ -1697,7 +1697,7 @@ void h63484_device::process_fifo()
 		case COMMAND_RARC:
 			if(m_param_ptr == 4)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': %cARC (%d, %d, %d, %d) %d, %d, %d, %d\n", tag().c_str(), BIT(m_cr, 10) ? 'R' : 'A', BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (INT16)m_pr[0], (INT16)m_pr[1], (INT16)m_pr[2], (INT16)m_pr[3]);
+				if (CMD_LOG)    logerror("HD63484 '%s': %cARC (%d, %d, %d, %d) %d, %d, %d, %d\n", tag(), BIT(m_cr, 10) ? 'R' : 'A', BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (INT16)m_pr[0], (INT16)m_pr[1], (INT16)m_pr[2], (INT16)m_pr[3]);
 				command_arc_exec();
 				command_end_seq();
 			}
@@ -1707,7 +1707,7 @@ void h63484_device::process_fifo()
 		case COMMAND_REARC:
 			if(m_param_ptr == 6)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': %cEARC (%d, %d, %d, %d) %d, %d, %d, %d, %d, %d\n", tag().c_str(), BIT(m_cr, 10) ? 'R' : 'A', BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0], m_pr[1], m_pr[2], m_pr[3], m_pr[4], m_pr[5]);
+				if (CMD_LOG)    logerror("HD63484 '%s': %cEARC (%d, %d, %d, %d) %d, %d, %d, %d, %d, %d\n", tag(), BIT(m_cr, 10) ? 'R' : 'A', BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0], m_pr[1], m_pr[2], m_pr[3], m_pr[4], m_pr[5]);
 				command_earc_exec();
 				command_end_seq();
 			}
@@ -1717,7 +1717,7 @@ void h63484_device::process_fifo()
 		case COMMAND_RFRCT:
 			if (m_param_ptr == 2)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': %cFRCT (%d, %d, %d) %d, %d\n", tag().c_str(), BIT(m_cr, 10) ? 'R' : 'A', (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (INT16)m_pr[0], (INT16)m_pr[1]);
+				if (CMD_LOG)    logerror("HD63484 '%s': %cFRCT (%d, %d, %d) %d, %d\n", tag(), BIT(m_cr, 10) ? 'R' : 'A', (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (INT16)m_pr[0], (INT16)m_pr[1]);
 
 				command_frct_exec();
 				command_end_seq();
@@ -1727,7 +1727,7 @@ void h63484_device::process_fifo()
 		case COMMAND_PAINT:
 			if (m_param_ptr == 0)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': PAINT (%d, %d, %d, %d)\n", tag().c_str(), BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07);
+				if (CMD_LOG)    logerror("HD63484 '%s': PAINT (%d, %d, %d, %d)\n", tag(), BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07);
 				paint(m_cpx, m_cpy);
 				command_end_seq();
 			}
@@ -1736,7 +1736,7 @@ void h63484_device::process_fifo()
 		case COMMAND_DOT:
 			if (m_param_ptr == 0)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': DOT (%d, %d, %d)\n", tag().c_str(), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07);
+				if (CMD_LOG)    logerror("HD63484 '%s': DOT (%d, %d, %d)\n", tag(), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07);
 				set_dot(m_cpx, m_cpy, 0, 0);
 				command_end_seq();
 			}
@@ -1745,7 +1745,7 @@ void h63484_device::process_fifo()
 		case COMMAND_PTN:
 			if (m_param_ptr == 1)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': PTN (%d, %d, %d, %d, %d) 0x%04x\n", tag().c_str(), (m_cr >> 11) & 0x01, (m_cr >> 8) & 0x07, (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0]);
+				if (CMD_LOG)    logerror("HD63484 '%s': PTN (%d, %d, %d, %d, %d) 0x%04x\n", tag(), (m_cr >> 11) & 0x01, (m_cr >> 8) & 0x07, (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0]);
 				command_ptn_exec();
 				command_end_seq();
 			}
@@ -1755,7 +1755,7 @@ void h63484_device::process_fifo()
 		case COMMAND_AGCPY:
 			if (m_param_ptr == 4)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': %cGCPY (%d, %d, %d, %d, %d) %d, %d, %d, %d\n", tag().c_str(), BIT(m_cr, 12) ? 'R' : 'A', (m_cr >> 11) & 0x01, (m_cr >> 8) & 0x07, (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (INT16)m_pr[0], (INT16)m_pr[1], (INT16)m_pr[2], (INT16)m_pr[3]);
+				if (CMD_LOG)    logerror("HD63484 '%s': %cGCPY (%d, %d, %d, %d, %d) %d, %d, %d, %d\n", tag(), BIT(m_cr, 12) ? 'R' : 'A', (m_cr >> 11) & 0x01, (m_cr >> 8) & 0x07, (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (INT16)m_pr[0], (INT16)m_pr[1], (INT16)m_pr[2], (INT16)m_pr[3]);
 
 				command_gcpy_exec();
 				command_end_seq();

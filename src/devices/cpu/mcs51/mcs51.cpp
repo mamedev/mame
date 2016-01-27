@@ -260,7 +260,7 @@ static ADDRESS_MAP_START(data_8bit, AS_DATA, 8, mcs51_cpu_device)
 ADDRESS_MAP_END
 
 
-mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, UINT8 features)
+mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0
 		, ( ( program_width == 12 ) ? ADDRESS_MAP_NAME(program_12bit) : ( ( program_width == 13 ) ? ADDRESS_MAP_NAME(program_13bit) : nullptr ) ))
@@ -284,91 +284,91 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 }
 
 
-i8031_device::i8031_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8031_device::i8031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs51_cpu_device(mconfig, I8031, "I8031", tag, owner, clock, "i8031", 0, 7)
 {
 }
 
-i8051_device::i8051_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8051_device::i8051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs51_cpu_device(mconfig, I8051, "I8051", tag, owner, clock, "i8051", 12, 7)
 {
 }
 
-i8751_device::i8751_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8751_device::i8751_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs51_cpu_device(mconfig, I8751, "I8751", tag, owner, clock, "i8751", 12, 7)
 {
 }
 
-i8052_device::i8052_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, UINT8 features)
+i8052_device::i8052_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features)
 	: mcs51_cpu_device(mconfig, type, name, tag, owner, clock, shortname, program_width, data_width, features | FEATURE_I8052)
 {
 	m_num_interrupts = 6;
 }
 
-i8052_device::i8052_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8052_device::i8052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs51_cpu_device(mconfig, I8052, "I8052", tag, owner, clock, "i8052", 13, 8, FEATURE_I8052)
 {
 	m_num_interrupts = 6;
 }
 
-i8032_device::i8032_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8032_device::i8032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i8052_device(mconfig, I8032, "I8032", tag, owner, clock, "i8032", 0, 8)
 {
 }
 
-i8752_device::i8752_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8752_device::i8752_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i8052_device(mconfig, I8752, "I8752", tag, owner, clock, "i8752", 13, 8)
 {
 }
 
-i80c31_device::i80c31_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i80c31_device::i80c31_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i8052_device(mconfig, I80C31, "I80C31", tag, owner, clock, "i80c31", 0, 7)
 {
 }
 
-i80c51_device::i80c51_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, UINT8 features)
+i80c51_device::i80c51_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features)
 	: mcs51_cpu_device(mconfig, type, name, tag, owner, clock, shortname, program_width, data_width, features | FEATURE_CMOS)
 {
 }
 
-i80c51_device::i80c51_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i80c51_device::i80c51_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs51_cpu_device(mconfig, I80C51, "I80C51", tag, owner, clock, "i80c51", 12, 7)
 {
 }
 
-i87c51_device::i87c51_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i87c51_device::i87c51_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i80c51_device(mconfig, I87C51, "I87C51", tag, owner, clock, "i87c51", 12, 7)
 {
 }
 
 
-i80c52_device::i80c52_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, UINT8 features)
+i80c52_device::i80c52_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features)
 	: i8052_device(mconfig, type, name, tag, owner, clock, shortname, program_width, data_width, features | FEATURE_I80C52 | FEATURE_CMOS)
 {
 }
 
-i80c52_device::i80c52_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i80c52_device::i80c52_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i8052_device(mconfig, I80C52, "I80C52", tag, owner, clock, "i80C52", 13, 8, FEATURE_I80C52 | FEATURE_CMOS)
 {
 }
 
-i80c32_device::i80c32_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i80c32_device::i80c32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i80c52_device(mconfig, I80C32, "I80C32", tag, owner, clock, "i80c32", 0, 8)
 {
 }
 
 
-i87c52_device::i87c52_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i87c52_device::i87c52_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i80c52_device(mconfig, I87C52, "I87C52", tag, owner, clock, "i87c52", 13, 8)
 {
 }
 
-at89c4051_device::at89c4051_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+at89c4051_device::at89c4051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i80c51_device(mconfig, AT89C4051, "AT89C4051", tag, owner, clock, "at89c4051", 12, 7)
 {
 }
 
-ds5002fp_device::ds5002fp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ds5002fp_device::ds5002fp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs51_cpu_device(mconfig, DS5002FP, "DS5002FP", tag, owner, clock, "ds5002fp", 12, 7, FEATURE_DS5002FP | FEATURE_CMOS)
 {
 }
@@ -2059,7 +2059,7 @@ void mcs51_cpu_device::sfr_write(size_t offset, UINT8 data)
 		case ADDR_SCON:
 			break;
 		default:
-			LOG(("mcs51 '%s': attemping to write to an invalid/non-implemented SFR address: %x at 0x%04x, data=%x\n", tag().c_str(), (UINT32)offset,PC,data));
+			LOG(("mcs51 '%s': attemping to write to an invalid/non-implemented SFR address: %x at 0x%04x, data=%x\n", tag(), (UINT32)offset,PC,data));
 			/* no write in this case according to manual */
 			return;
 	}
@@ -2099,7 +2099,7 @@ UINT8 mcs51_cpu_device::sfr_read(size_t offset)
 			return m_data->read_byte((size_t) offset | 0x100);
 		/* Illegal or non-implemented sfr */
 		default:
-			LOG(("mcs51 '%s': attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", tag().c_str(), (UINT32)offset,PC));
+			LOG(("mcs51 '%s': attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", tag(), (UINT32)offset,PC));
 			/* according to the manual, the read may return random bits */
 			return 0xff;
 	}
@@ -2405,8 +2405,8 @@ UINT8 i80c52_device::sfr_read(size_t offset)
  ****************************************************************************/
 
 
-#define DS5_LOGW(a, d)  LOG(("ds5002fp '%s': write to  " # a " register at 0x%04x, data=%x\n", tag().c_str(), PC, d))
-#define DS5_LOGR(a, d)  LOG(("ds5002fp '%s': read from " # a " register at 0x%04x\n", tag().c_str(), PC))
+#define DS5_LOGW(a, d)  LOG(("ds5002fp '%s': write to  " # a " register at 0x%04x, data=%x\n", tag(), PC, d))
+#define DS5_LOGR(a, d)  LOG(("ds5002fp '%s': read from " # a " register at 0x%04x\n", tag(), PC))
 
 UINT8 mcs51_cpu_device::ds5002fp_protected(size_t offset, UINT8 data, UINT8 ta_mask, UINT8 mask)
 {
@@ -2431,7 +2431,7 @@ void ds5002fp_device::sfr_write(size_t offset, UINT8 data)
 			if ((data == 0xaa) && (m_ds5002fp.ta_window == 0))
 			{
 				m_ds5002fp.ta_window = 6; /* 4*12 + 2*12 */
-				LOG(("ds5002fp '%s': TA window initiated at 0x%04x\n", tag().c_str(), PC));
+				LOG(("ds5002fp '%s': TA window initiated at 0x%04x\n", tag(), PC));
 			}
 			break;
 		case ADDR_MCON:     data = ds5002fp_protected(ADDR_MCON, data, 0x0f, 0xf7);    DS5_LOGW(MCON, data); break;

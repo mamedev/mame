@@ -36,8 +36,8 @@ class t11_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	t11_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
-	t11_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	t11_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	t11_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
 	static void set_initial_mode(device_t &device, const UINT16 mode) { downcast<t11_device &>(device).c_initial_mode = mode; }
@@ -1138,7 +1138,7 @@ class k1801vm2_device : public t11_device
 {
 public:
 	// construction/destruction
-	k1801vm2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	k1801vm2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

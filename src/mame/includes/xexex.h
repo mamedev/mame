@@ -19,7 +19,7 @@
 class xexex_state : public driver_device
 {
 public:
-	xexex_state(const machine_config &mconfig, device_type type, std::string tag)
+	xexex_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_workram(*this, "workram"),
 		m_spriteram(*this, "spriteram"),

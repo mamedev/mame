@@ -29,8 +29,8 @@ class c2n_device :  public device_t,
 {
 public:
 	// construction/destruction
-	c2n_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	c2n_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	c2n_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	c2n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -62,7 +62,7 @@ class c1530_device :  public c2n_device
 {
 public:
 	// construction/destruction
-	c1530_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	c1530_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -72,7 +72,7 @@ class c1531_device :  public c2n_device
 {
 public:
 	// construction/destruction
-	c1531_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	c1531_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

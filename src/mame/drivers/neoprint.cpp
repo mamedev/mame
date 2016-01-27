@@ -31,7 +31,7 @@
 class neoprint_state : public driver_device
 {
 public:
-	neoprint_state(const machine_config &mconfig, device_type type, std::string tag)
+	neoprint_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_npvidram(*this, "npvidram"),
 		m_npvidregs(*this, "npvidregs"),

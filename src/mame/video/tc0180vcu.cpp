@@ -11,7 +11,7 @@
 
 const device_type TC0180VCU = &device_creator<tc0180vcu_device>;
 
-tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0180VCU, "Taito TC0180VCU", tag, owner, clock, "tc0180vcu", __FILE__),
 	m_ram(nullptr),
 	//m_scrollram(NULL),
@@ -32,7 +32,7 @@ tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, std::string ta
 //  gfx decoder
 //-------------------------------------------------
 
-void tc0180vcu_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
+void tc0180vcu_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<tc0180vcu_device &>(device).m_gfxdecode.set_tag(tag);
 }

@@ -47,7 +47,7 @@
 class mbc200_state : public driver_device
 {
 public:
-	mbc200_state(const machine_config &mconfig, device_type type, std::string tag)
+	mbc200_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_crtc(*this, "crtc")

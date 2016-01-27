@@ -125,71 +125,71 @@ const device_type ATI_VGA = &device_creator<ati_vga_device>;
 const device_type IBM8514A = &device_creator<ibm8514a_device>;
 const device_type MACH8 = &device_creator<mach8_device>;
 
-vga_device::vga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+vga_device::vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_palette(*this, "^palette"),
 		m_screen(*this,"^screen")
 {
 }
 
-vga_device::vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+vga_device::vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VGA, "VGA", tag, owner, clock, "vga", __FILE__),
 		m_palette(*this, "^palette"),
 		m_screen(*this,"^screen")
 {
 }
 
-svga_device::svga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+svga_device::svga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: vga_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-tseng_vga_device::tseng_vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: svga_device(mconfig, TSENG_VGA, "TSENG LABS VGA", tag, owner, clock, "tseng_vga", __FILE__)
 {
 }
 
-s3_vga_device::s3_vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+s3_vga_device::s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ati_vga_device(mconfig, S3_VGA, "S3 Graphics VGA", tag, owner, clock, "s3_vga", __FILE__)
 {
 }
 
-s3_vga_device::s3_vga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+s3_vga_device::s3_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: ati_vga_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-gamtor_vga_device::gamtor_vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+gamtor_vga_device::gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: svga_device(mconfig, GAMTOR_VGA, "GAMTOR VGA", tag, owner, clock, "gamtor_vga", __FILE__)
 {
 }
 
-ati_vga_device::ati_vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ati_vga_device::ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: svga_device(mconfig, ATI_VGA, "ATI VGA", tag, owner, clock, "ati_vga", __FILE__)
 {
 }
 
-ati_vga_device::ati_vga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+ati_vga_device::ati_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: svga_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-ibm8514a_device::ibm8514a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ibm8514a_device::ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, IBM8514A, "IBM8514A Video", tag, owner, clock, "ibm8514a", __FILE__)
 {
 }
 
-ibm8514a_device::ibm8514a_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+ibm8514a_device::ibm8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-mach8_device::mach8_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+mach8_device::mach8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: ibm8514a_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-mach8_device::mach8_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mach8_device::mach8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ibm8514a_device(mconfig, MACH8, "MACH8", tag, owner, clock, "mach8", __FILE__)
 {
 }
