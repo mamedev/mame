@@ -310,6 +310,7 @@ Champion Sensory Chess Challenger (CSC) (6502 based -> fidel6502.cpp driver)
 
 Memory map:
 -----------
+
 0000-07FF: 2K of RAM
 0800-0FFF: 1K of RAM (note: mirrored twice)
 1000-17FF: PIA 0 (display, TSI speech chip)
@@ -598,9 +599,40 @@ Sensory Chess Challenger (SC12-B) (6502 based -> fidel6502.cpp driver)
 
 RE information by Berger
 
+8*(8+1) buttons, 8+8+2 red LEDs
+DIN 41524C printer port
+36-pin edge connector
+CPU is a R65C02P4, running at 4MHz
+
+NE556 dual-timer IC:
+- timer#1, one-shot at power-on, to CPU _RESET
+- timer#2: R1=82K, R2=1K, C=22nf, to CPU _IRQ: ~780Hz, active low=15.25us
 
 
+Memory map:
+-----------
 
+6000-0FFF: 4K of RAM (2016 * 2)
+2000-5FFF: cartridge
+6000-7FFF: control(W)
+8000-9FFF: 8K ROM SSS SCM23C65E4
+A000-BFFF: keypad(R)
+C000-DFFF: 4K ROM TI TMS2732AJL-45
+E000-FFFF: 8K ROM Toshiba TMM2764D-2
+
+control: (74LS377)
+--------
+
+Q0-Q3: 7442 A0-A3
+Q4: enable printer port pin 1 input
+Q5: printer port pin 5 output
+Q6,Q7: LEDs common anode
+
+7442 0-8: input mux and LEDs cathode
+7442 9: buzzer
+
+The keypad is read through a 74HC251, where S0,1,2 is from CPU A0,1,2, Y is connected to CPU D7.
+If control Q4 is set, printer data can be read from I0.
 
 
 ******************************************************************************
@@ -1126,7 +1158,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vcc_map, AS_PROGRAM, 8, fidelz80_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_MIRROR(0x1c00)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vcc_io, AS_IO, 8, fidelz80_state )
@@ -1140,8 +1172,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vsc_map, AS_PROGRAM, 8, fidelz80_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_ROM AM_MIRROR(0x1000)
-	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_MIRROR(0x1c00)
+	AM_RANGE(0x4000, 0x4fff) AM_MIRROR(0x1000) AM_ROM
+	AM_RANGE(0x6000, 0x63ff) AM_MIRROR(0x1c00) AM_RAM
 ADDRESS_MAP_END
 
 // VSC io: A2 is 8255 _CE, A3 is Z80 PIO _CE - in theory, both chips can be accessed simultaneously
@@ -1187,8 +1219,8 @@ WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
 static ADDRESS_MAP_START( vbrc_main_map, AS_PROGRAM, 8, fidelz80_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_MIRROR(0x1c00)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(vbrc_speech_w) AM_MIRROR(0x1fff)
+	AM_RANGE(0x6000, 0x63ff) AM_MIRROR(0x1c00) AM_RAM
+	AM_RANGE(0xe000, 0xffff) AM_MIRROR(0x1fff) AM_WRITE(vbrc_speech_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vbrc_main_io, AS_IO, 8, fidelz80_state )

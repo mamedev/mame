@@ -32,12 +32,14 @@ public:
 	fidel6502_state(const machine_config &mconfig, device_type type, const char *tag)
 		: fidelz80base_state(mconfig, type, tag),
 		m_6821pia(*this, "6821pia"),
-		m_speaker(*this, "speaker")
+		m_speaker(*this, "speaker"),
+		m_irq_off(*this, "irq_off")
 	{ }
 
 	// devices/pointers
 	optional_device<pia6821_device> m_6821pia;
 	optional_device<speaker_sound_device> m_speaker;
+	optional_device<timer_device> m_irq_off;
 
 	// model CSC
 	void csc_prepare_display();
@@ -54,10 +56,11 @@ public:
 	DECLARE_READ_LINE_MEMBER(csc_pia1_ca1_r);
 	DECLARE_READ_LINE_MEMBER(csc_pia1_cb1_r);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
-
-protected:
-	virtual void machine_start() override;
+	// model SC12
+	TIMER_DEVICE_CALLBACK_MEMBER(irq_off);
+	TIMER_DEVICE_CALLBACK_MEMBER(sc12_irq);
+	DECLARE_WRITE8_MEMBER(sc12_control_w);
+	DECLARE_READ8_MEMBER(sc12_input_r);
 };
 
 
@@ -196,40 +199,89 @@ WRITE_LINE_MEMBER(fidel6502_state::csc_pia1_ca2_w)
 
 
 
+/******************************************************************************
+    SC12
+******************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(fidel6502_state::irq_timer)
+// interrupt handling
+
+TIMER_DEVICE_CALLBACK_MEMBER(fidel6502_state::irq_off)
 {
-	m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
+
+TIMER_DEVICE_CALLBACK_MEMBER(fidel6502_state::sc12_irq)
+{
+	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	m_irq_off->adjust(attotime::from_nsec(15250)); // active low for 15.25us
+}
+
+
+// TTL
+
+WRITE8_MEMBER(fidel6502_state::sc12_control_w)
+{
+	// d0-d3: 7442 a0-a3
+	// 7442 0-8: led data, input mux
+	UINT16 sel = 1 << (data & 0xf) & 0x3ff;
+	m_inp_mux = sel & 0x1ff;
+
+	// 7442 9: speaker out
+	m_speaker->level_w(sel >> 9 & 1);
+	
+	// d6,d7: led select (active low)
+	display_matrix(9, 2, sel & 0x1ff, ~data >> 6 & 3);
+	
+	// d4,d5: printer
+	//..
+}
+
+READ8_MEMBER(fidel6502_state::sc12_input_r)
+{
+	// a0-a2,d7: multiplexed inputs (active low)
+	return (read_inputs(9) << (offset^7) & 0x80) ^ 0xff;
+}
+
+
 
 /******************************************************************************
     Address Maps
 ******************************************************************************/
 
+// CSC
+
 static ADDRESS_MAP_START( csc_map, AS_PROGRAM, 8, fidel6502_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x4000)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_MIRROR(0x4400)
-	AM_RANGE(0x1000, 0x1003) AM_DEVREADWRITE("pia0", pia6821_device, read, write) AM_MIRROR(0x47fc)
-	AM_RANGE(0x1800, 0x1803) AM_DEVREADWRITE("pia1", pia6821_device, read, write) AM_MIRROR(0x47fc)
-	AM_RANGE(0x2000, 0x3fff) AM_ROM AM_MIRROR(0x4000)
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x4000) AM_RAM
+	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x4400) AM_RAM
+	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x47fc) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x1800, 0x1803) AM_MIRROR(0x47fc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
+// SC12
+
 static ADDRESS_MAP_START( sc12_map, AS_PROGRAM, 8, fidel6502_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_WRITE(sc12_control_w)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_ROM AM_MIRROR(0x1000)
+	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x1ff8) AM_READ(sc12_input_r)
+	AM_RANGE(0xc000, 0xcfff) AM_MIRROR(0x1000) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
+
+
+// FEV
 
 static ADDRESS_MAP_START( fev_map, AS_PROGRAM, 8, fidel6502_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
+
 
 
 /******************************************************************************
@@ -337,11 +389,98 @@ static INPUT_PORTS_START( csc )
 	PORT_BIT(0x100,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_UNUSED
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sc12 )
+	PORT_START("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
 
-void fidel6502_state::machine_start()
-{
-	fidelz80base_state::machine_start();
-}
+	PORT_START("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+
+	PORT_START("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+
+	PORT_START("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+
+	PORT_START("IN.4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+
+	PORT_START("IN.5")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+
+	PORT_START("IN.6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+
+	PORT_START("IN.7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+
+	PORT_START("IN.8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RV / Pawn") PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM / Knight") PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("TB / Bishop") PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV / Rook") PORT_CODE(KEYCODE_4)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PV / Queen") PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PB / King") PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL) // clear
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) // reset
+INPUT_PORTS_END
+
 
 
 /******************************************************************************
@@ -351,11 +490,9 @@ void fidel6502_state::machine_start()
 static MACHINE_CONFIG_START( csc, fidel6502_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 3900000/2)
+	MCFG_CPU_ADD("maincpu", M6502, 3900000/2) // from 3.9MHz resonator
 	MCFG_CPU_PROGRAM_MAP(csc_map)
-
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", fidel6502_state, irq_timer, attotime::from_hz(38400/64))
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidelz80base_state, irq0_line_hold, 600) // 38400kHz/64
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(fidel6502_state, csc_pia0_pb_r))
@@ -385,12 +522,13 @@ static MACHINE_CONFIG_START( csc, fidel6502_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-
 static MACHINE_CONFIG_START( sc12, fidel6502_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R65C02, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(sc12_map)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("sc12_irq", fidel6502_state, sc12_irq, attotime::from_hz(780)) // from 556 timer
+	MCFG_TIMER_DRIVER_ADD("irq_off", fidel6502_state, irq_off)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_sc12)
@@ -400,8 +538,6 @@ static MACHINE_CONFIG_START( sc12, fidel6502_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
-
-
 
 static MACHINE_CONFIG_START( fev, fidel6502_state )
 
@@ -418,6 +554,7 @@ static MACHINE_CONFIG_START( fev, fidel6502_state )
 	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidel6502_state, csc_speech_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
+
 
 
 /******************************************************************************
@@ -459,6 +596,6 @@ ROM_END
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
 COMP( 1981, csc,     0,      0,      csc,  csc, driver_device,   0, "Fidelity Electronics", "Champion Sensory Chess Challenger", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-COMP( 1984, fscc12,     0,      0,      sc12,  csc, driver_device,   0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_NOT_WORKING )
+COMP( 1984, fscc12,     0,      0,      sc12,  sc12, driver_device,   0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_NOT_WORKING )
 
 COMP( 1987, fexcelv,     0,      0,      fev,  csc, driver_device,   0, "Fidelity Electronics", "Voice Excellence", MACHINE_NOT_WORKING )
