@@ -140,7 +140,7 @@ RAM4 is HMC HM6264LP-70
 class gstream_state : public driver_device
 {
 public:
-	gstream_state(const machine_config &mconfig, device_type type, std::string tag)
+	gstream_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_oki_1(*this, "oki1"),

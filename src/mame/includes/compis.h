@@ -1,13 +1,11 @@
-// license:???
-// copyright-holders:Per Ola Ingvarsson, Tomas Karlsson
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
+// thanks-to:Per Ola Ingvarsson, Tomas Karlsson
 /*****************************************************************************
  *
  * includes/compis.h
  *
  * machine driver header
- *
- * Per Ola Ingvarsson
- * Tomas Karlsson
  *
  ****************************************************************************/
 
@@ -52,7 +50,7 @@
 class compis_state : public driver_device
 {
 public:
-	compis_state(const machine_config &mconfig, device_type type, std::string tag)
+	compis_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, I80186_TAG),
 			m_osp(*this, I80130_TAG),

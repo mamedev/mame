@@ -68,7 +68,7 @@ static inline INT32 normalize_yscroll(const bitmap_t &bitmap, INT32 yscroll)
 
 const device_type GFXDECODE = &device_creator<gfxdecode_device>;
 
-gfxdecode_device::gfxdecode_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, GFXDECODE, "gfxdecode", tag, owner, clock, "gfxdecode", __FILE__),
 	device_gfx_interface(mconfig, *this)
 {
@@ -86,6 +86,7 @@ gfxdecode_device::gfxdecode_device(const machine_config &mconfig, std::string ta
 //  gfx_element - constructor
 //-------------------------------------------------
 
+#ifdef UNUSED_FUNCTION
 gfx_element::gfx_element()
 	: m_palette(nullptr),
 		m_width(0),
@@ -110,9 +111,10 @@ gfx_element::gfx_element()
 		m_layout_charincrement(0)
 {
 }
+#endif
 
-gfx_element::gfx_element(palette_device *palette, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 total_colors, UINT32 color_base, UINT32 color_granularity)
-	: m_palette(palette),
+gfx_element::gfx_element(palette_device &palette, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 total_colors, UINT32 color_base, UINT32 color_granularity)
+	: m_palette(&palette),
 		m_width(width),
 		m_height(height),
 		m_startx(0),
@@ -136,8 +138,8 @@ gfx_element::gfx_element(palette_device *palette, UINT8 *base, UINT32 width, UIN
 {
 }
 
-gfx_element::gfx_element(palette_device *palette, const gfx_layout &gl, const UINT8 *srcdata, UINT32 xormask, UINT32 total_colors, UINT32 color_base)
-	: m_palette(palette),
+gfx_element::gfx_element(palette_device &palette, const gfx_layout &gl, const UINT8 *srcdata, UINT32 xormask, UINT32 total_colors, UINT32 color_base)
+	: m_palette(&palette),
 		m_width(0),
 		m_height(0),
 		m_startx(0),

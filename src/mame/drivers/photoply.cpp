@@ -22,7 +22,7 @@ TODO:
 class photoply_state : public pcat_base_state
 {
 public:
-	photoply_state(const machine_config &mconfig, device_type type, std::string tag)
+	photoply_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag)
 	{
 	}

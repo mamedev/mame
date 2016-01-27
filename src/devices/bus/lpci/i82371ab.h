@@ -21,7 +21,7 @@ class i82371ab_device :  public southbridge_device,
 {
 public:
 	// construction/destruction
-	i82371ab_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i82371ab_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask) override;
 	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask) override;

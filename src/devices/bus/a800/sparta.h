@@ -12,7 +12,7 @@ class a800_rom_spartados_device : public a800_rom_device
 {
 public:
 	// construction/destruction
-	a800_rom_spartados_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a800_rom_spartados_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

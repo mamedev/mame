@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:David Graves, Jarek Burczynski
 /*************************************************************************
 
@@ -18,7 +18,7 @@ public:
 		TIMER_CCHIP
 	};
 
-	opwolf_state(const machine_config &mconfig, device_type type, std::string tag)
+	opwolf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cchip_ram(*this, "cchip_ram"),
 		m_maincpu(*this, "maincpu"),

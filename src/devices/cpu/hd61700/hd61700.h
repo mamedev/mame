@@ -67,7 +67,7 @@ class hd61700_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	hd61700_cpu_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
+	hd61700_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 
 	template<class _Object> static devcb_base &set_lcd_ctrl_callback(device_t &device, _Object object) { return downcast<hd61700_cpu_device &>(device).m_lcd_ctrl_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_lcd_write_callback(device_t &device, _Object object) { return downcast<hd61700_cpu_device &>(device).m_lcd_write_cb.set_callback(object); }

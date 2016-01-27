@@ -20,7 +20,7 @@ class atapi_hle_device : public ata_hle_device,
 	public virtual t10spc
 {
 public:
-	atapi_hle_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock,std::string shortname, std::string source);
+	atapi_hle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
 
 	enum atapi_features_flag_t
 	{

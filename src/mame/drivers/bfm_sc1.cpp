@@ -106,7 +106,7 @@ Optional (on expansion card) (Viper)
 class bfm_sc1_state : public driver_device
 {
 public:
-	bfm_sc1_state(const machine_config &mconfig, device_type type, std::string tag)
+	bfm_sc1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_reel0(*this, "reel0"),
@@ -1089,7 +1089,7 @@ static MACHINE_CONFIG_START( scorpion1, bfm_sc1_state )
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel4_optic_cb))
 	MCFG_STARPOINT_48STEP_ADD("reel5")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel5_optic_cb))
-	
+
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
 MACHINE_CONFIG_END

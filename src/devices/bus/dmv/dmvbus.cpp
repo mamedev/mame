@@ -194,7 +194,7 @@ device_dmvslot_interface::~device_dmvslot_interface()
 //-------------------------------------------------
 //  dmvcart_slot_device - constructor
 //-------------------------------------------------
-dmvcart_slot_device::dmvcart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+dmvcart_slot_device::dmvcart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, DMVCART_SLOT, "Decision Mate V cartridge slot", tag, owner, clock, "dmvcart_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		m_prog_read_cb(*this),

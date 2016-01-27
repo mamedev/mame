@@ -94,7 +94,7 @@ enum
 //  mc2661_device - constructor
 //-------------------------------------------------
 
-mc2661_device::mc2661_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+mc2661_device::mc2661_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MC2661, "MC2661", tag, owner, clock, "mc2661", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_write_txd(*this),
@@ -264,7 +264,7 @@ WRITE8_MEMBER( mc2661_device::write )
 	switch (offset & 0x03)
 	{
 	case REGISTER_HOLDING:
-		if (LOG) logerror("MC2661 '%s' Transmit Holding Register: %02x\n", tag().c_str(), data);
+		if (LOG) logerror("MC2661 '%s' Transmit Holding Register: %02x\n", tag(), data);
 
 		m_thr = data;
 		if(COMMAND_TXEN)
@@ -283,7 +283,7 @@ WRITE8_MEMBER( mc2661_device::write )
 		break;
 
 	case REGISTER_SYNC:
-		if (LOG) logerror("MC2661 '%s' Sync Register %u: %02x\n", tag().c_str(), m_sync_index + 1, data);
+		if (LOG) logerror("MC2661 '%s' Sync Register %u: %02x\n", tag(), m_sync_index + 1, data);
 
 		m_sync[m_sync_index] = data;
 
@@ -292,7 +292,7 @@ WRITE8_MEMBER( mc2661_device::write )
 		break;
 
 	case REGISTER_MODE:
-		if (LOG) logerror("MC2661 '%s' Mode Register %u: %02x\n", tag().c_str(), m_mode_index + 1, data);
+		if (LOG) logerror("MC2661 '%s' Mode Register %u: %02x\n", tag(), m_mode_index + 1, data);
 
 		m_mr[m_mode_index] = data;
 
@@ -383,7 +383,7 @@ WRITE8_MEMBER( mc2661_device::write )
 		break;
 
 	case REGISTER_COMMAND:
-		if (LOG) logerror("MC2661 '%s' Command Register: %02x\n", tag().c_str(), data);
+		if (LOG) logerror("MC2661 '%s' Command Register: %02x\n", tag(), data);
 
 		m_cr = data & 0xef;
 
@@ -431,7 +431,7 @@ WRITE8_MEMBER( mc2661_device::write )
 
 WRITE_LINE_MEMBER( mc2661_device::dsr_w )
 {
-	if (LOG) logerror("MC2661 '%s' Data Set Ready: %u\n", tag().c_str(), state);
+	if (LOG) logerror("MC2661 '%s' Data Set Ready: %u\n", tag(), state);
 
 	if (state)
 	{
@@ -450,7 +450,7 @@ WRITE_LINE_MEMBER( mc2661_device::dsr_w )
 
 WRITE_LINE_MEMBER( mc2661_device::dcd_w )
 {
-	if (LOG) logerror("MC2661 '%s' Data Carrier Detect: %u\n", tag().c_str(), state);
+	if (LOG) logerror("MC2661 '%s' Data Carrier Detect: %u\n", tag(), state);
 
 	if (state)
 	{
@@ -469,7 +469,7 @@ WRITE_LINE_MEMBER( mc2661_device::dcd_w )
 
 WRITE_LINE_MEMBER( mc2661_device::cts_w )
 {
-	if (LOG) logerror("MC2661 '%s' Clear to Send: %u\n", tag().c_str(), state);
+	if (LOG) logerror("MC2661 '%s' Clear to Send: %u\n", tag(), state);
 }
 
 

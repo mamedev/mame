@@ -43,7 +43,7 @@ static int cCpuAscending(const void* a, const void* b)
 {
 	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
 	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
-	return left->debugInterface()->device().tag() != right->debugInterface()->device().tag();
+	return strcmp(left->debugInterface()->device().tag(), right->debugInterface()->device().tag());
 }
 
 static int cCpuDescending(const void* a, const void* b)
@@ -134,7 +134,7 @@ void debug_view_breakpoints::enumerate_sources()
 	for (device_disasm_interface *dasm = iter.first(); dasm != nullptr; dasm = iter.next())
 	{
 		std::string name;
-		strprintf(name, "%s '%s'", dasm->device().name().c_str(), dasm->device().tag().c_str());
+		strprintf(name, "%s '%s'", dasm->device().name(), dasm->device().tag());
 		m_source_list.append(*global_alloc(debug_view_source(name.c_str(), &dasm->device())));
 	}
 

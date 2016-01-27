@@ -1,10 +1,9 @@
-// license:???
-// copyright-holders:Marc Lafontaine, Couriersud
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Couriersud
+// thanks-to: Marc Lafontaine
 /***************************************************************************
 
 Popeye  (c) 1982 Nintendo
-
-driver by Marc Lafontaine
 
 To enter service mode, reset keeping the service button pressed.
 

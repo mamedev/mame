@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( program_4kb, AS_PROGRAM, 8, z8_device )
 ADDRESS_MAP_END
 
 
-z8_device::z8_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int size)
+z8_device::z8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int size)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, ( size == 4 ) ? ADDRESS_MAP_NAME(program_4kb) : ADDRESS_MAP_NAME(program_2kb))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0)
@@ -179,19 +179,19 @@ z8_device::z8_device(const machine_config &mconfig, device_type type, std::strin
 }
 
 
-z8601_device::z8601_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock)
+z8601_device::z8601_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock)
 	: z8_device(mconfig, Z8601, "Z8601", _tag, _owner, _clock, "z8601", __FILE__, 2)
 {
 }
 
 
-ub8830d_device::ub8830d_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock)
+ub8830d_device::ub8830d_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock)
 	: z8_device(mconfig, UB8830D, "UB8830D", _tag, _owner, _clock, "ub8830d", __FILE__, 2)
 {
 }
 
 
-z8611_device::z8611_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock)
+z8611_device::z8611_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock)
 	: z8_device(mconfig, Z8611, "Z8611", _tag, _owner, _clock, "z8611", __FILE__, 4)
 {
 }

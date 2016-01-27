@@ -33,7 +33,7 @@ class konami_cpu_device : public m6809_base_device
 {
 public:
 	// construction/destruction
-	konami_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	konami_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// configuration
 	template<class _Object> static devcb_base &set_line_callback(device_t &device, _Object object) { return downcast<konami_cpu_device &>(device).m_set_lines.set_callback(object); }

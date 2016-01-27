@@ -24,7 +24,7 @@ static const UINT8 kbp_table[] = { 0x00,0x01,0x02,0x0f,0x03,0x0f,0x0f,0x0f,0x04,
 const device_type I4004 = &device_creator<i4004_cpu_device>;
 
 
-i4004_cpu_device::i4004_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i4004_cpu_device::i4004_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, I4004, "Intel I4004", tag, owner, clock, "i4004", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 6, 0)

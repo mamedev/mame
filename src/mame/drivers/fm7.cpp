@@ -313,29 +313,27 @@ READ8_MEMBER(fm7_state::fm7_sub_beeper_r)
 
 READ8_MEMBER(fm7_state::vector_r)
 {
-	UINT8* RAM = memregion("maincpu")->base();
-	UINT8* ROM = memregion("init")->base();
-	UINT32 init_size = memregion("init")->bytes();
+	UINT32 init_size = m_rom_ptr.bytes();
 
-	if(m_init_rom_en)
-		return ROM[(init_size-0x10)+offset];
+	if (m_init_rom_en)
+	{
+		return m_rom_ptr[(init_size-0x10)+offset];
+	}
 	else
 	{
 		if(m_type == SYS_FM7)
-			return RAM[0xfff0+offset];
+			return m_ram_ptr[0xfff0+offset];
 		else
-			return RAM[0x3fff0+offset];
+			return m_ram_ptr[0x3fff0+offset];
 	}
 }
 
 WRITE8_MEMBER(fm7_state::vector_w)
 {
-	UINT8* RAM = memregion("maincpu")->base();
-
 	if(m_type == SYS_FM7)
-		RAM[0xfff0+offset] = data;
+		m_ram_ptr[0xfff0+offset] = data;
 	else
-		RAM[0x3fff0+offset] = data;
+		m_ram_ptr[0x3fff0+offset] = data;
 }
 
 /*
@@ -1150,22 +1148,23 @@ void fm7_state::fm7_mmr_refresh(address_space& space)
 	}
 	if(m_init_rom_en)
 	{
-		UINT8* ROM = memregion("init")->base();
-		membank("init_bank_r")->set_base(ROM);
+		membank("init_bank_r")->set_base(m_rom_ptr);
 	}
 	else
 	{
-		membank("init_bank_r")->set_base(RAM+0x36000);
+		membank("init_bank_r")->set_base(m_ram_ptr + 0x36000);
 	}
-	if(m_basic_rom_en)
+
+	if (m_basic_rom_en)
 	{
-		UINT8* ROM = memregion("fbasic")->base();
-		if(ROM != nullptr)
-			membank("fbasic_bank_r")->set_base(ROM);
+		if (m_basic_ptr)
+		{
+			membank("fbasic_bank_r")->set_base(m_rom_ptr);
+		}
 	}
 	else
 	{
-		membank("fbasic_bank_r")->set_base(RAM+0x38000);
+		membank("fbasic_bank_r")->set_base(m_ram_ptr + 0x38000);
 	}
 }
 
@@ -1912,7 +1911,6 @@ MACHINE_START_MEMBER(fm7_state,fm7)
 	memset(m_shared_ram,0xff,0x80);
 	m_type = SYS_FM7;
 
-	m_beeper->set_frequency(1200);
 	m_beeper->set_state(0);
 }
 
@@ -1933,7 +1931,6 @@ MACHINE_START_MEMBER(fm7_state,fm77av)
 	membank("bank21")->set_base(RAM+0x800);
 
 	m_type = SYS_FM77AV;
-	m_beeper->set_frequency(1200);
 	m_beeper->set_state(0);
 }
 
@@ -1944,7 +1941,6 @@ MACHINE_START_MEMBER(fm7_state,fm11)
 
 	memset(m_shared_ram,0xff,0x80);
 	m_type = SYS_FM11;
-	m_beeper->set_frequency(1200);
 	m_beeper->set_state(0);
 	// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)
 	memcpy(RAM+0x3fff0,ROM+0x0ff0,16);
@@ -1953,15 +1949,11 @@ MACHINE_START_MEMBER(fm7_state,fm11)
 MACHINE_START_MEMBER(fm7_state,fm16)
 {
 	m_type = SYS_FM16;
-	m_beeper->set_frequency(1200);
 	m_beeper->set_state(0);
 }
 
 void fm7_state::machine_reset()
 {
-	UINT8* RAM = memregion("maincpu")->base();
-	UINT8* ROM = memregion("init")->base();
-
 	m_timer->adjust(attotime::from_nsec(2034500),0,attotime::from_nsec(2034500));
 	m_subtimer->adjust(attotime::from_msec(20),0,attotime::from_msec(20));
 	m_keyboard_timer->adjust(attotime::zero,0,attotime::from_msec(10));
@@ -1979,13 +1971,13 @@ void fm7_state::machine_reset()
 	{
 		m_init_rom_en = 1;
 		// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)
-		memcpy(RAM+0x3fff0,ROM+0x1ff0,16);
+		memcpy(m_ram_ptr + 0x3fff0, m_rom_ptr + 0x1ff0, 16);
 	}
 	else if (m_type == SYS_FM11)
 	{
 		m_init_rom_en = 1;
 		// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)
-		memcpy(RAM+0x3fff0,ROM+0x0ff0,16);
+		memcpy(m_ram_ptr + 0x3fff0, m_rom_ptr + 0x0ff0, 16);
 	}
 	else
 		m_init_rom_en = 0;
@@ -1994,11 +1986,13 @@ void fm7_state::machine_reset()
 		if(!(m_dsw->read() & 0x02))
 		{
 			m_basic_rom_en = 0;  // disabled for DOS mode
-			membank("bank1")->set_base(RAM+0x08000);
+			membank("bank1")->set_base(m_ram_ptr + 0x08000);
 		}
 		else
-			membank("bank1")->set_base(RAM+0x38000);
-		membank("bank2")->set_base(RAM+0x08000);
+		{
+			membank("bank1")->set_base(m_ram_ptr + 0x38000);
+		}
+		membank("bank2")->set_base(m_ram_ptr + 0x08000);
 	}
 	m_key_delay = 700;  // 700ms on FM-7
 	m_key_repeat = 70;  // 70ms on FM-7
@@ -2029,8 +2023,8 @@ void fm7_state::machine_reset()
 	if(m_type == SYS_FM77AV || m_type == SYS_FM77AV40EX || m_type == SYS_FM11)
 	{
 		fm7_mmr_refresh(m_maincpu->space(AS_PROGRAM));
-		membank("fbasic_bank_w")->set_base(RAM+0x38000);
-		membank("init_bank_w")->set_base(RAM+0x36000);
+		membank("fbasic_bank_w")->set_base(m_ram_ptr + 0x38000);
+		membank("init_bank_w")->set_base(m_ram_ptr + 0x36000);
 	}
 	if(m_type == SYS_FM11)
 	{
@@ -2070,7 +2064,7 @@ static MACHINE_CONFIG_START( fm7, fm7_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("psg", AY8910, XTAL_4_9152MHz / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 1.00)
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 1200)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.50)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.25)
@@ -2126,7 +2120,7 @@ static MACHINE_CONFIG_START( fm8, fm7_state )
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 1200)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
@@ -2182,7 +2176,7 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 	MCFG_AY8910_PORT_A_READ_CB(READ8(fm7_state, fm77av_joy_1_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(fm7_state, fm77av_joy_2_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 1200)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
@@ -2260,7 +2254,7 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 	MCFG_CPU_IO_MAP(fm11_x86_io)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 1200)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
@@ -2328,7 +2322,7 @@ static MACHINE_CONFIG_START( fm16beta, fm7_state )
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 1200)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)

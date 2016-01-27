@@ -688,7 +688,7 @@ ADDRESS_MAP_END
                                 Shogun Warriors
 ***************************************************************************/
 
-void kaneko16_state::kaneko16_common_oki_bank_w(  const char *bankname, std::string tag, int bank, size_t fixedsize, size_t bankedsize )
+void kaneko16_state::kaneko16_common_oki_bank_w(  const char *bankname, const char* tag, int bank, size_t fixedsize, size_t bankedsize )
 {
 	UINT32 bankaddr;
 	UINT8* samples = memregion(tag)->base();
@@ -785,7 +785,7 @@ WRITE8_MEMBER(kaneko16_state::wingforc_oki_bank_w)
 
 static ADDRESS_MAP_START( wingforc_soundport, AS_IO, 8, kaneko16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x00, 0x00) // 02 written at boot
+//  AM_RANGE(0x00, 0x00) // 02 written at boot
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x0a, 0x0a) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -1143,8 +1143,8 @@ static INPUT_PORTS_START( wingforc )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_LOW )		// unused
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_TILT )			// unused
+	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_LOW )     // unused
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_TILT )         // unused
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
 
@@ -2454,15 +2454,18 @@ MACHINE_CONFIG_END
 */
 void kaneko16_state::kaneko16_unscramble_tiles(const char *region)
 {
-	UINT8 *RAM  =   memregion(region)->base();
-	int size            =   memregion(region)->bytes();
-	int i;
-
-	if (RAM == nullptr)    return;
-
-	for (i = 0; i < size; i ++)
+	memory_region *tile_region = memregion(region);
+	if (tile_region == NULL)
 	{
-		RAM[i] = ((RAM[i] & 0xF0)>>4) + ((RAM[i] & 0x0F)<<4);
+		return;
+	}
+
+	UINT8 *ram = tile_region->base();
+	int size = tile_region->bytes();
+
+	for (int i = 0; i < size; i ++)
+	{
+		ram[i] = ((ram[i] & 0xF0) >> 4) + ((ram[i] & 0x0F) << 4);
 	}
 }
 

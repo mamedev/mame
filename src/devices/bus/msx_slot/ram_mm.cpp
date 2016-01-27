@@ -5,7 +5,7 @@
 
 const device_type MSX_SLOT_RAM_MM = &device_creator<msx_slot_ram_mm_device>;
 
-msx_slot_ram_mm_device::msx_slot_ram_mm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+msx_slot_ram_mm_device::msx_slot_ram_mm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_SLOT_RAM_MM, "MSX Internal Memory Mapped RAM", tag, owner, clock, "msx_slot_ram_mm", __FILE__)
 	, msx_internal_slot_interface()
 	, m_total_size(0)

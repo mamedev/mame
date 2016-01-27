@@ -54,7 +54,7 @@ enum
     Constructor for all variants
 */
 
-at29x_device::at29x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+at29x_device::at29x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_nvram_interface(mconfig, *this),
 	m_memory_size(0),   // bytes
@@ -70,7 +70,7 @@ at29x_device::at29x_device(const machine_config &mconfig, device_type type, std:
 /*
     Constructor for AT29C020
 */
-at29c020_device::at29c020_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+at29c020_device::at29c020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: at29x_device(mconfig, AT29C020, "ATMEL 29C020 256K x 8 FEEPROM", tag, owner, clock, "at29c020", __FILE__)
 {
 	m_memory_size = 256*1024;
@@ -81,7 +81,7 @@ at29c020_device::at29c020_device(const machine_config &mconfig, std::string tag,
 /*
     Constructor for AT29C040
 */
-at29c040_device::at29c040_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+at29c040_device::at29c040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: at29x_device(mconfig, AT29C040, "ATMEL 29C040 512K x 8 FEEPROM", tag, owner, clock, "at29c040", __FILE__)
 {
 	m_memory_size = 512*1024;
@@ -92,7 +92,7 @@ at29c040_device::at29c040_device(const machine_config &mconfig, std::string tag,
 /*
     Constructor for AT29C040A
 */
-at29c040a_device::at29c040a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+at29c040a_device::at29c040a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: at29x_device(mconfig, AT29C040A, "ATMEL 29C040A 512K x 8 FEEPROM", tag, owner, clock, "at29c040a", __FILE__)
 {
 	m_memory_size = 512*1024;
@@ -129,7 +129,7 @@ void at29x_device::nvram_read(emu_file &file)
 void at29x_device::nvram_write(emu_file &file)
 {
 	// If we don't write (because there were no changes), the file will be wiped
-	if (TRACE_PRG) logerror("%s: Write to NVRAM file\n", tag().c_str());
+	if (TRACE_PRG) logerror("%s: Write to NVRAM file\n", tag());
 	m_eememory[0] = m_version;
 	file.write(m_eememory.get(), m_memory_size+2);
 }
@@ -143,13 +143,13 @@ void at29x_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 	{
 	case PGM_1:
 		// Programming cycle timeout
-		logerror("%s: Programming cycle timeout\n", tag().c_str());
+		logerror("%s: Programming cycle timeout\n", tag());
 		m_pgm = PGM_0;
 		break;
 
 	case PGM_2:
 		// Programming cycle start
-		if (TRACE_PRG) logerror("%s: Sector write start\n", tag().c_str());
+		if (TRACE_PRG) logerror("%s: Sector write start\n", tag());
 		m_pgm = PGM_3;
 		// We assume a typical delay of 70% of the max value
 		m_programming_timer->adjust(attotime::from_msec(m_cycle_time*7/10));
@@ -159,7 +159,7 @@ void at29x_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		// Programming cycle end; now burn the buffer into the flash EEPROM
 		memcpy(m_eememory.get() + 2 + get_sector_number(m_programming_last_offset) * m_sector_size, m_programming_buffer.get(), m_sector_size);
 
-		if (TRACE_PRG) logerror("%s: Sector write completed at location %04x\n", tag().c_str(), m_programming_last_offset);
+		if (TRACE_PRG) logerror("%s: Sector write completed at location %04x\n", tag(), m_programming_last_offset);
 
 		// Data protect state will be activated at the end of the program cycle [1]
 		if (m_enabling_sdb)  m_sdp = true;
@@ -167,7 +167,7 @@ void at29x_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		// Data protect state will be deactivated at the end of the program period [1]
 		if (m_disabling_sdb) m_sdp = false;
 
-		if (TRACE_PRG) logerror("%s: Software data protection = %d\n", tag().c_str(), m_sdp);
+		if (TRACE_PRG) logerror("%s: Software data protection = %d\n", tag(), m_sdp);
 
 		m_pgm = PGM_0;
 		m_enabling_sdb = false;
@@ -176,7 +176,7 @@ void at29x_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		break;
 
 	default:
-		logerror("%s: Invalid state %d during programming\n", tag().c_str(), m_pgm);
+		logerror("%s: Invalid state %d during programming\n", tag(), m_pgm);
 		m_pgm = PGM_0;
 		break;
 	}
@@ -251,7 +251,7 @@ READ8_MEMBER( at29x_device::read )
 			m_programming_timer->adjust(attotime::from_msec(m_cycle_time*7/10));
 		}
 
-		if (TRACE_READ) logerror("%s: DATA poll; toggle bit 1\n", tag().c_str());
+		if (TRACE_READ) logerror("%s: DATA poll; toggle bit 1\n", tag());
 		reply = m_toggle_bit? 0x02 : 0x00;
 		m_toggle_bit = !m_toggle_bit;
 
@@ -265,7 +265,7 @@ READ8_MEMBER( at29x_device::read )
 		// Simple case: just read the memory contents
 		reply = m_eememory[offset+2];
 
-	if (TRACE_READ) logerror("%s: %05x -> %02x (PGM=%d)\n", tag().c_str(), offset, reply, m_pgm);
+	if (TRACE_READ) logerror("%s: %05x -> %02x (PGM=%d)\n", tag(), offset, reply, m_pgm);
 
 	return reply;
 }
@@ -276,7 +276,7 @@ READ8_MEMBER( at29x_device::read )
 WRITE8_MEMBER( at29x_device::write )
 {
 	offset &= m_address_mask;
-	if (TRACE_WRITE) logerror("%s: %05x <- %02x\n", tag().c_str(), offset, data);
+	if (TRACE_WRITE) logerror("%s: %05x <- %02x\n", tag(), offset, data);
 
 	// The special CFI commands assume a smaller address space according
 	// to the specification ("address format A14-A0")
@@ -285,12 +285,12 @@ WRITE8_MEMBER( at29x_device::write )
 	if (m_enabling_bbl)
 	{
 		// Determine whether we lock the upper or lower boot block
-		if (TRACE_STATE) logerror("%s: Enabling boot block lockout\n", tag().c_str());
+		if (TRACE_STATE) logerror("%s: Enabling boot block lockout\n", tag());
 		m_enabling_bbl = false;
 
 		if ((offset == 0x00000) && (data == 0x00))
 		{
-			if (TRACE_STATE) logerror("%s: Enabling lower boot block lockout\n", tag().c_str());
+			if (TRACE_STATE) logerror("%s: Enabling lower boot block lockout\n", tag());
 			m_lower_bbl = true;
 			sync_flags();
 			return;
@@ -299,14 +299,14 @@ WRITE8_MEMBER( at29x_device::write )
 		{
 			if ((offset == 0x7ffff) && (data == 0xff))
 			{
-				if (TRACE_STATE) logerror("%s: Enabling higher boot block lockout\n", tag().c_str());
+				if (TRACE_STATE) logerror("%s: Enabling higher boot block lockout\n", tag());
 				m_higher_bbl = true;
 				sync_flags();
 				return;
 			}
 			else
 			{
-				logerror("%s: Invalid boot block specification: %05x/%02x\n", tag().c_str(), offset, data);
+				logerror("%s: Invalid boot block specification: %05x/%02x\n", tag(), offset, data);
 			}
 		}
 	}
@@ -317,7 +317,7 @@ WRITE8_MEMBER( at29x_device::write )
 		//  CMD_0: start state
 		if ((cfi_offset == 0x5555) && (data == 0xaa))
 		{
-			if (TRACE_STATE) logerror("%s: Command sequence started (aa)\n", tag().c_str());
+			if (TRACE_STATE) logerror("%s: Command sequence started (aa)\n", tag());
 			m_cmd = CMD_1;
 			return;
 		}
@@ -332,7 +332,7 @@ WRITE8_MEMBER( at29x_device::write )
 		//  CMD_1: state after writing aa to 5555
 		if ((cfi_offset == 0x2aaa) && (data == 0x55))
 		{
-			if (TRACE_STATE) logerror("%s: Command sequence continued (55)\n", tag().c_str());
+			if (TRACE_STATE) logerror("%s: Command sequence continued (55)\n", tag());
 			m_cmd = CMD_2;
 			return;
 		}
@@ -340,7 +340,7 @@ WRITE8_MEMBER( at29x_device::write )
 		{
 			m_cmd = CMD_0;
 			m_long_sequence = false;
-			if (TRACE_STATE) logerror("%s: Command sequence aborted\n", tag().c_str());
+			if (TRACE_STATE) logerror("%s: Command sequence aborted\n", tag());
 		}
 		break;
 
@@ -354,7 +354,7 @@ WRITE8_MEMBER( at29x_device::write )
 			m_programming_timer->adjust(attotime::never);
 
 			// Process command
-			if (TRACE_STATE) logerror("%s: Command sequence continued (%2x)\n", tag().c_str(), data);
+			if (TRACE_STATE) logerror("%s: Command sequence continued (%2x)\n", tag(), data);
 			switch (data)
 			{
 			case 0x10:
@@ -362,10 +362,10 @@ WRITE8_MEMBER( at29x_device::write )
 				if (m_long_sequence)
 				{
 					if (m_lower_bbl || m_higher_bbl)
-						logerror("%s: Boot block lockout active; chip cannot be erased.\n", tag().c_str());
+						logerror("%s: Boot block lockout active; chip cannot be erased.\n", tag());
 					else
 					{
-						if (TRACE_STATE) logerror("%s: Erase chip\n", tag().c_str());
+						if (TRACE_STATE) logerror("%s: Erase chip\n", tag());
 						memset(m_eememory.get()+2, 0xff, m_memory_size);
 					}
 				}
@@ -377,7 +377,7 @@ WRITE8_MEMBER( at29x_device::write )
 				// so we need a 80 before, else the sequence is invalid
 				if (m_long_sequence)
 				{
-					if (TRACE_STATE) logerror("%s: Software data protection disable\n", tag().c_str());
+					if (TRACE_STATE) logerror("%s: Software data protection disable\n", tag());
 					m_pgm = PGM_1;
 					m_disabling_sdb = true;
 					// It is not clear from the specification whether the byte cycle timer
@@ -388,7 +388,7 @@ WRITE8_MEMBER( at29x_device::write )
 			case 0x40:
 				// Boot block lockout enable
 				// Complete sequence is aa-55-80-aa-55-40
-				if (TRACE_STATE) logerror("%s: Boot block lockout enable\n", tag().c_str());
+				if (TRACE_STATE) logerror("%s: Boot block lockout enable\n", tag());
 				if (m_long_sequence) m_enabling_bbl = true;
 				// We'll know which boot block is affected on the next write
 				break;
@@ -400,13 +400,13 @@ WRITE8_MEMBER( at29x_device::write )
 
 			case 0x90:
 				// Software product identification entry
-				if (TRACE_STATE) logerror("%s: Entering Identification mode\n", tag().c_str());
+				if (TRACE_STATE) logerror("%s: Entering Identification mode\n", tag());
 				m_id_mode = true;
 				break;
 
 			case 0xa0:
 				// Software data protection enable
-				if (TRACE_STATE) logerror("%s: Software data protection enable\n", tag().c_str());
+				if (TRACE_STATE) logerror("%s: Software data protection enable\n", tag());
 				m_pgm = PGM_1;
 				m_enabling_sdb = true;
 				// It is not clear from the specification whether the byte cycle timer
@@ -415,7 +415,7 @@ WRITE8_MEMBER( at29x_device::write )
 
 			case 0xf0:
 				// Software product identification exit
-				if (TRACE_STATE) logerror("%s: Exiting Identification mode\n", tag().c_str());
+				if (TRACE_STATE) logerror("%s: Exiting Identification mode\n", tag());
 				m_id_mode = false;
 				break;
 			}
@@ -435,7 +435,7 @@ WRITE8_MEMBER( at29x_device::write )
 	if ((m_pgm == PGM_2) && (get_sector_number(offset) != get_sector_number(m_programming_last_offset)))
 	{
 		// cancel current programming cycle
-		if (TRACE_WRITE) logerror("%s: Invalid sector change (from sector 0x%04x to 0x%04x); cancel programming cycle\n", tag().c_str(), get_sector_number(m_programming_last_offset), get_sector_number(offset));
+		if (TRACE_WRITE) logerror("%s: Invalid sector change (from sector 0x%04x to 0x%04x); cancel programming cycle\n", tag(), get_sector_number(m_programming_last_offset), get_sector_number(offset));
 		m_pgm = PGM_0;
 		m_enabling_sdb = false;
 		m_disabling_sdb = false;
@@ -450,7 +450,7 @@ WRITE8_MEMBER( at29x_device::write )
 		{
 			// attempt to access a locked out boot block: cancel programming
 			// command if necessary
-			if (TRACE_WRITE) logerror("%s: Attempt to access a locked out boot block: offset = %05x, lowblock=%d, highblock=%d\n", tag().c_str(), offset, m_lower_bbl, m_higher_bbl);
+			if (TRACE_WRITE) logerror("%s: Attempt to access a locked out boot block: offset = %05x, lowblock=%d, highblock=%d\n", tag(), offset, m_lower_bbl, m_higher_bbl);
 
 			m_pgm = PGM_0;
 			m_enabling_sdb = false;
@@ -458,7 +458,7 @@ WRITE8_MEMBER( at29x_device::write )
 		}
 		else
 		{   // enter programming mode
-			if (TRACE_STATE) logerror("%s: Enter programming mode (m_pgm=%d, m_sdp=%d)\n", tag().c_str(), m_pgm, m_sdp);
+			if (TRACE_STATE) logerror("%s: Enter programming mode (m_pgm=%d, m_sdp=%d)\n", tag(), m_pgm, m_sdp);
 			// Clear the programming buffer
 			memset(m_programming_buffer.get(), 0xff, m_sector_size);
 			m_pgm = PGM_2;
@@ -470,7 +470,7 @@ WRITE8_MEMBER( at29x_device::write )
 	if (m_pgm == PGM_2)
 	{
 		// write data to programming buffer
-		if (TRACE_PRG) logerror("%s: Write data to programming buffer: buf[%x] = %02x\n", tag().c_str(), offset & m_sector_mask, data);
+		if (TRACE_PRG) logerror("%s: Write data to programming buffer: buf[%x] = %02x\n", tag(), offset & m_sector_mask, data);
 		m_programming_buffer[offset & m_sector_mask] = data;
 		m_programming_last_offset = offset;
 		m_programming_timer->adjust(attotime::from_usec(150));  // next byte must be written before the timer expires
@@ -498,7 +498,7 @@ void at29x_device::device_reset(void)
 {
 	if (m_eememory[0] != m_version)
 	{
-		logerror("%s: Warning: Version mismatch; expected %d but found %d in file. Resetting.\n", tag().c_str(), m_version, m_eememory[0]);
+		logerror("%s: Warning: Version mismatch; expected %d but found %d in file. Resetting.\n", tag(), m_version, m_eememory[0]);
 		m_eememory[0] = 0;
 		m_eememory[1] = 0;
 	}
@@ -507,7 +507,7 @@ void at29x_device::device_reset(void)
 	m_higher_bbl =  ((m_eememory[1] & 0x02)!=0);
 	m_sdp        =  ((m_eememory[1] & 0x01)!=0);
 
-	if (TRACE_CONFIG) logerror("%s: LowerBBL = %d, HigherBBL = %d, SoftDataProt = %d\n", tag().c_str(), m_lower_bbl, m_higher_bbl, m_sdp);
+	if (TRACE_CONFIG) logerror("%s: LowerBBL = %d, HigherBBL = %d, SoftDataProt = %d\n", tag(), m_lower_bbl, m_higher_bbl, m_sdp);
 
 	m_id_mode = false;
 	m_cmd = CMD_0;

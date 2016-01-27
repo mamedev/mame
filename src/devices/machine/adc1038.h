@@ -26,7 +26,7 @@ typedef device_delegate<int (int input)> adc1038_input_delegate;
 class adc1038_device : public device_t
 {
 public:
-	adc1038_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	adc1038_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~adc1038_device() {}
 
 	static void set_input_callback(device_t &device, adc1038_input_delegate callback) { downcast<adc1038_device &>(device).m_input_cb = callback; }

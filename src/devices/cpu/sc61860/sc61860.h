@@ -72,7 +72,7 @@ class sc61860_device : public cpu_device
 {
 public:
 	// construction/destruction
-	sc61860_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sc61860_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_reset_cb(device_t &device, _Object object) { return downcast<sc61860_device &>(device).m_reset.set_callback(object); }

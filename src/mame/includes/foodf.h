@@ -12,7 +12,7 @@
 class foodf_state : public atarigen_state
 {
 public:
-	foodf_state(const machine_config &mconfig, device_type type, std::string tag)
+	foodf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
 			m_nvram(*this, "nvram"),
 			m_playfield_tilemap(*this, "playfield"),

@@ -41,7 +41,7 @@ MACHINE_CONFIG_END
 //  z88_1024k_flash_device - constructor
 //-------------------------------------------------
 
-z88_1024k_flash_device::z88_1024k_flash_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+z88_1024k_flash_device::z88_1024k_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, Z88_1024K_FLASH, "Z88 1024KB Flash", tag, owner, clock, "z88_1024k_flash", __FILE__),
 		device_z88cart_interface( mconfig, *this ),
 		m_flash(*this, FLASH_TAG)

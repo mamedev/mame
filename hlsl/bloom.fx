@@ -1,7 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz,ImJezze
 //-----------------------------------------------------------------------------
-// Effect File Variables
+// Bloom Effect
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Sampler Definitions
 //-----------------------------------------------------------------------------
 
 texture DiffuseA;
@@ -145,17 +149,17 @@ struct VS_OUTPUT
 {
 	float4 Position : POSITION;
 	float4 Color : COLOR0;
-	float4 TexCoord01 : TEXCOORD0;
-	float4 TexCoord23 : TEXCOORD1;
-	float4 TexCoord45 : TEXCOORD2;
-	float4 TexCoord67 : TEXCOORD3;
-	float4 TexCoord89 : TEXCOORD4;
-	float2 TexCoordA : TEXCOORD5;
+	float2 TexCoord0 : TEXCOORD0;
+	float4 TexCoord12 : TEXCOORD1;
+	float4 TexCoord34 : TEXCOORD2;
+	float4 TexCoord56 : TEXCOORD3;
+	float4 TexCoord78 : TEXCOORD4;
+	float4 TexCoord9A : TEXCOORD5;
 };
 
 struct VS_INPUT
 {
-	float3 Position : POSITION;
+	float4 Position : POSITION;
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
 };
@@ -163,12 +167,12 @@ struct VS_INPUT
 struct PS_INPUT
 {
 	float4 Color : COLOR0;
-	float4 TexCoord01 : TEXCOORD0;
-	float4 TexCoord23 : TEXCOORD1;
-	float4 TexCoord45 : TEXCOORD2;
-	float4 TexCoord67 : TEXCOORD3;
-	float4 TexCoord89 : TEXCOORD4;
-	float2 TexCoordA : TEXCOORD5;
+	float2 TexCoord0 : TEXCOORD0;
+	float4 TexCoord12 : TEXCOORD1;
+	float4 TexCoord34 : TEXCOORD2;
+	float4 TexCoord56 : TEXCOORD3;
+	float4 TexCoord78 : TEXCOORD4;
+	float4 TexCoord9A : TEXCOORD5;
 };
 
 //-----------------------------------------------------------------------------
@@ -198,13 +202,14 @@ float random(float2 seed)
 
 uniform float2 ScreenDims;
 uniform float2 TargetDims;
+uniform float2 SourceRect;
 
-uniform float4 Level01Size;
-uniform float4 Level23Size;
-uniform float4 Level45Size;
-uniform float4 Level67Size;
-uniform float4 Level89Size;
-uniform float2 LevelASize;
+uniform float2 Level0Size;
+uniform float4 Level12Size;
+uniform float4 Level34Size;
+uniform float4 Level56Size;
+uniform float4 Level78Size;
+uniform float4 Level9ASize;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -221,13 +226,12 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	float2 TexCoord = Input.Position.xy / ScreenDims;
 	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
-	Output.TexCoord01.xy = TexCoord.xy;
-	Output.TexCoord01.zw = TexCoord.xy + 0.5f / Level01Size.zw;
-	Output.TexCoord23 = TexCoord.xyxy + 0.5f / Level23Size;
-	Output.TexCoord45 = TexCoord.xyxy + 0.5f / Level45Size;
-	Output.TexCoord67 = TexCoord.xyxy + 0.5f / Level67Size;
-	Output.TexCoord89 = TexCoord.xyxy + 0.5f / Level89Size;
-	Output.TexCoordA = TexCoord.xy + 0.5f / LevelASize;
+	Output.TexCoord0 = TexCoord;
+	Output.TexCoord12 = TexCoord.xyxy + (0.5f / Level12Size);
+	Output.TexCoord34 = TexCoord.xyxy + (0.5f / Level34Size);
+	Output.TexCoord56 = TexCoord.xyxy + (0.5f / Level56Size);
+	Output.TexCoord78 = TexCoord.xyxy + (0.5f / Level78Size);
+	Output.TexCoord9A = TexCoord.xyxy + (0.5f / Level9ASize);
 
 	return Output;
 }
@@ -236,11 +240,14 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 // Bloom Pixel Shader
 //-----------------------------------------------------------------------------
 
-uniform float4 Level0123Weight;
-uniform float4 Level4567Weight;
-uniform float3 Level89AWeight;
+uniform float Level0Weight;
+uniform float2 Level12Weight;
+uniform float2 Level34Weight;
+uniform float2 Level56Weight;
+uniform float2 Level78Weight;
+uniform float2 Level9AWeight;
 
-uniform int BloomBlendMode = 1; // 0 addition, 1 darken
+uniform int BloomBlendMode = 0; // 0 addition, 1 darken
 uniform float BloomScale;
 uniform float3 BloomOverdrive;
 
@@ -252,34 +259,34 @@ float3 GetNoiseFactor(float3 n, float random)
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float3 texel0 = tex2D(DiffuseSampler0, Input.TexCoord01.xy).rgb;
-	float3 texel1 = tex2D(DiffuseSampler1, Input.TexCoord01.zw).rgb;
-	float3 texel2 = tex2D(DiffuseSampler2, Input.TexCoord23.xy).rgb;
-	float3 texel3 = tex2D(DiffuseSampler3, Input.TexCoord23.zw).rgb;
-	float3 texel4 = tex2D(DiffuseSampler4, Input.TexCoord45.xy).rgb;
-	float3 texel5 = tex2D(DiffuseSampler5, Input.TexCoord45.zw).rgb;
-	float3 texel6 = tex2D(DiffuseSampler6, Input.TexCoord67.xy).rgb;
-	float3 texel7 = tex2D(DiffuseSampler7, Input.TexCoord67.zw).rgb;
-	float3 texel8 = tex2D(DiffuseSampler8, Input.TexCoord89.xy).rgb;
-	float3 texel9 = tex2D(DiffuseSampler9, Input.TexCoord89.zw).rgb;
-	float3 texelA = tex2D(DiffuseSamplerA, Input.TexCoordA).rgb;
+	float3 texel0 = tex2D(DiffuseSampler0, Input.TexCoord0).rgb;
+	float3 texel1 = tex2D(DiffuseSampler1, Input.TexCoord12.xy).rgb;
+	float3 texel2 = tex2D(DiffuseSampler2, Input.TexCoord12.zw).rgb;
+	float3 texel3 = tex2D(DiffuseSampler3, Input.TexCoord34.xy).rgb;
+	float3 texel4 = tex2D(DiffuseSampler4, Input.TexCoord34.zw).rgb;
+	float3 texel5 = tex2D(DiffuseSampler5, Input.TexCoord56.xy).rgb;
+	float3 texel6 = tex2D(DiffuseSampler6, Input.TexCoord56.zw).rgb;
+	float3 texel7 = tex2D(DiffuseSampler7, Input.TexCoord78.xy).rgb;
+	float3 texel8 = tex2D(DiffuseSampler8, Input.TexCoord78.zw).rgb;
+	float3 texel9 = tex2D(DiffuseSampler9, Input.TexCoord9A.xy).rgb;
+	float3 texelA = tex2D(DiffuseSamplerA, Input.TexCoord9A.zw).rgb;
 
 	float3 blend;
 
 	// addition
 	if (BloomBlendMode == 0)
 	{
-		texel0 *= Level0123Weight.x;
-		texel1 *= Level0123Weight.y;
-		texel2 *= Level0123Weight.z;
-		texel3 *= Level0123Weight.w;
-		texel4 *= Level4567Weight.x;
-		texel5 *= Level4567Weight.y;
-		texel6 *= Level4567Weight.z;
-		texel7 *= Level4567Weight.w;
-		texel8 *= Level89AWeight.x;
-		texel9 *= Level89AWeight.y;
-		texelA *= Level89AWeight.z;
+		texel0 *= Level0Weight;
+		texel1 *= Level12Weight.x;
+		texel2 *= Level12Weight.y;
+		texel3 *= Level34Weight.x;
+		texel4 *= Level34Weight.y;
+		texel5 *= Level56Weight.x;
+		texel6 *= Level56Weight.y;
+		texel7 *= Level78Weight.x;
+		texel8 *= Level78Weight.y;
+		texel9 *= Level9AWeight.x;
+		texelA *= Level9AWeight.y;
 
 		float3 bloom = float3(
 			texel1 +
@@ -302,15 +309,15 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		bloom.b += bloomOverdrive.r * 0.5f;
 		bloom.b += bloomOverdrive.g * 0.5f;
 
-		float2 NoiseCoord = Input.TexCoord01.xy;
+		float2 NoiseCoord = Input.TexCoord0;
 		float3 NoiseFactor = GetNoiseFactor(bloom, random(NoiseCoord));
-		
+
 		blend = texel0 + bloom * NoiseFactor;
 	}
 
 	// darken
 	else
-	{	
+	{
 		texel1 = min(texel0, texel1);
 		texel2 = min(texel0, texel2);
 		texel3 = min(texel0, texel3);
@@ -322,43 +329,31 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		texel9 = min(texel0, texel9);
 		texelA = min(texel0, texelA);
 
-		blend = texel0 * Level0123Weight.x;
-		blend = lerp(blend, texel1, Level0123Weight.y * BloomScale);
-		blend = lerp(blend, texel2, Level0123Weight.z * BloomScale);
-		blend = lerp(blend, texel3, Level0123Weight.w * BloomScale);
-		blend = lerp(blend, texel4, Level4567Weight.x * BloomScale);
-		blend = lerp(blend, texel5, Level4567Weight.y * BloomScale);
-		blend = lerp(blend, texel6, Level4567Weight.z * BloomScale);
-		blend = lerp(blend, texel7, Level4567Weight.w * BloomScale);
-		blend = lerp(blend, texel8, Level89AWeight.x * BloomScale);
-		blend = lerp(blend, texel9, Level89AWeight.y * BloomScale);
-		blend = lerp(blend, texelA, Level89AWeight.z * BloomScale);
+		blend = texel0 * Level0Weight;
+		blend = lerp(blend, texel1, Level12Weight.x * BloomScale);
+		blend = lerp(blend, texel2, Level12Weight.y * BloomScale);
+		blend = lerp(blend, texel3, Level34Weight.x * BloomScale);
+		blend = lerp(blend, texel4, Level34Weight.y * BloomScale);
+		blend = lerp(blend, texel5, Level56Weight.x * BloomScale);
+		blend = lerp(blend, texel6, Level56Weight.y * BloomScale);
+		blend = lerp(blend, texel7, Level78Weight.x * BloomScale);
+		blend = lerp(blend, texel8, Level78Weight.y * BloomScale);
+		blend = lerp(blend, texel9, Level9AWeight.x * BloomScale);
+		blend = lerp(blend, texelA, Level9AWeight.y * BloomScale);
 	}
 
 	return float4(blend, 1.0f);
 }
 
 //-----------------------------------------------------------------------------
-// Bloom Effect
+// Bloom Technique
 //-----------------------------------------------------------------------------
 
-technique TestTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{
 		Lighting = FALSE;
-
-		Sampler[0] = <DiffuseSampler0>; // 2048x2048
-		Sampler[1] = <DiffuseSampler1>; // 1024x1024
-		Sampler[2] = <DiffuseSampler2>; // 512x512
-		Sampler[3] = <DiffuseSampler3>; // 256x256
-		Sampler[4] = <DiffuseSampler4>; // 128x128
-		Sampler[5] = <DiffuseSampler5>; // 64x64
-		Sampler[6] = <DiffuseSampler6>; // 32x32
-		Sampler[7] = <DiffuseSampler7>; // 16x16
-		Sampler[8] = <DiffuseSampler8>; // 8x8
-		Sampler[9] = <DiffuseSampler9>; // 4x4
-		Sampler[10] = <DiffuseSamplerA>; // 2x2
 
 		VertexShader = compile vs_3_0 vs_main();
 		PixelShader = compile ps_3_0 ps_main();

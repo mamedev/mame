@@ -2,7 +2,7 @@
 // copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco
 /******************************************************************************
 
-WIP: plan to move to main fidelity chess driver^Z^Z^Z^Z - move magnet board sensor games to this driver
+WIP: plan to move to main fidelity chess driver
 
 
 
@@ -28,7 +28,7 @@ WIP: plan to move to main fidelity chess driver^Z^Z^Z^Z - move magnet board sens
 class csc_state : public driver_device
 {
 public:
-	csc_state(const machine_config &mconfig, device_type type, std::string tag)
+	csc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speech(*this, "speech")

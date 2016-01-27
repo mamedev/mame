@@ -371,15 +371,16 @@ const char * device_image_interface::working_directory()
     get_software_region
 -------------------------------------------------*/
 
-UINT8 *device_image_interface::get_software_region(std::string tag)
+UINT8 *device_image_interface::get_software_region(const char *tag)
 {
 	char full_tag[256];
 
 	if ( m_software_info_ptr == nullptr || m_software_part_ptr == nullptr )
 		return nullptr;
 
-	sprintf( full_tag, "%s:%s", device().tag().c_str(), tag.c_str() );
-	return device().machine().root_device().memregion( full_tag )->base();
+	sprintf( full_tag, "%s:%s", device().tag(), tag );
+	memory_region *region = device().machine().root_device().memregion(full_tag);
+	return region != NULL ? region->base() : NULL;
 }
 
 
@@ -387,12 +388,14 @@ UINT8 *device_image_interface::get_software_region(std::string tag)
     image_get_software_region_length
 -------------------------------------------------*/
 
-UINT32 device_image_interface::get_software_region_length(std::string tag)
+UINT32 device_image_interface::get_software_region_length(const char *tag)
 {
 	char full_tag[256];
 
-	sprintf( full_tag, "%s:%s", device().tag().c_str(), tag.c_str() );
-	return device().machine().root_device().memregion( full_tag )->bytes();
+	sprintf( full_tag, "%s:%s", device().tag(), tag );
+
+	memory_region *region = device().machine().root_device().memregion(full_tag);
+	return region != NULL ? region->bytes() : 0;
 }
 
 
@@ -410,7 +413,7 @@ const char *device_image_interface::get_feature(const char *feature_name)
 //  load_software_region -
 //-------------------------------------------------
 
-bool device_image_interface::load_software_region(std::string tag, optional_shared_ptr<UINT8> &ptr)
+bool device_image_interface::load_software_region(const char *tag, optional_shared_ptr<UINT8> &ptr)
 {
 	size_t size = get_software_region_length(tag);
 
@@ -1417,4 +1420,3 @@ struct io_procs image_ioprocs =
 	image_fwrite_thunk,
 	image_fsize_thunk
 };
-

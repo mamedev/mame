@@ -23,29 +23,29 @@ const device_type PCE_ROM_POPULOUS = &device_creator<pce_populous_device>;
 const device_type PCE_ROM_SF2 = &device_creator<pce_sf2_device>;
 
 
-pce_rom_device::pce_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+pce_rom_device::pce_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_pce_cart_interface( mconfig, *this )
 {
 }
 
-pce_rom_device::pce_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pce_rom_device::pce_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, PCE_ROM_STD, "PCE & TG16 Carts", tag, owner, clock, "pce_rom", __FILE__),
 						device_pce_cart_interface( mconfig, *this )
 {
 }
 
-pce_cdsys3_device::pce_cdsys3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pce_cdsys3_device::pce_cdsys3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: pce_rom_device(mconfig, PCE_ROM_CDSYS3, "PCE & TG16 CD-System Cart v3.00", tag, owner, clock, "pce_cdsys3", __FILE__)
 {
 }
 
-pce_populous_device::pce_populous_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pce_populous_device::pce_populous_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: pce_rom_device(mconfig, PCE_ROM_POPULOUS, "PCE Populous Cart", tag, owner, clock, "pce_populous", __FILE__)
 {
 }
 
-pce_sf2_device::pce_sf2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pce_sf2_device::pce_sf2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: pce_rom_device(mconfig, PCE_ROM_SF2, "PCE Street Fighters 2 Cart", tag, owner, clock, "pce_sf2", __FILE__), m_bank_base(0)
 				{
 }

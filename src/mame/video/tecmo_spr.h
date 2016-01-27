@@ -7,7 +7,7 @@
 class tecmo_spr_device : public device_t
 {
 public:
-	tecmo_spr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tecmo_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	static void set_gfx_region(device_t &device, int gfxregion);
 	static void set_bootleg(device_t &device, int bootleg);
 	static void set_yoffset(device_t &device, int bootleg);

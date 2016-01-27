@@ -195,7 +195,7 @@ GUN_xP are 6 pin gun connectors (pins 1-4 match the UNICO sytle guns):
 class crystal_state : public driver_device
 {
 public:
-	crystal_state(const machine_config &mconfig, device_type type, std::string tag)
+	crystal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_sysregs(*this, "sysregs"),
 		m_workram(*this, "workram"),

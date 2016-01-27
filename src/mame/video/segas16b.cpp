@@ -36,7 +36,8 @@ UINT32 segas16b_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	}
 
 	// start the sprites drawing
-	m_sprites->draw_async(cliprect);
+	if (m_sprites.found())
+		m_sprites->draw_async(cliprect);
 
 	// reset priorities
 	screen.priority().fill(0, cliprect);
@@ -59,6 +60,7 @@ UINT32 segas16b_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_TEXT, 1, 0x08);
 
 	// mix in sprites
+	if (!m_sprites.found()) return 0;
 	bitmap_ind16 &sprites = m_sprites->bitmap();
 	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)

@@ -32,7 +32,7 @@
 class ticalc1x_state : public hh_tms1k_state
 {
 public:
-	ticalc1x_state(const machine_config &mconfig, device_type type, std::string tag)
+	ticalc1x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
@@ -60,7 +60,7 @@ void ticalc1x_state::machine_start()
   TI SR-16 (1974, first consumer product with TMS1000 series MCU)
   * TMS1000 MCU labeled TMS1001NL (die labeled 1000, 1001A)
   * 12-digit 7seg LED display
-  
+
   TI SR-16 II (1975 version)
   * TMS1000 MCU labeled TMS1016NL (die labeled 1000B, 1016A)
   * notes: cost-reduced 'sequel', [10^x] was removed, and [pi] was added.
@@ -70,7 +70,7 @@ void ticalc1x_state::machine_start()
 class tisr16_state : public ticalc1x_state
 {
 public:
-	tisr16_state(const machine_config &mconfig, device_type type, std::string tag)
+	tisr16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
@@ -283,11 +283,11 @@ MACHINE_CONFIG_END
   TI-1250/TI-1200 (1976 version), TI-1400, TI-1450, TI-1205, TI-1255, LADY 1200, ABLE
   * TMS0970 MCU labeled TMS0972NL ZA0348, JP0972A (die labeled 0970D-72A)
   * 8-digit 7seg LED display, or 9 digits with leftmost unused
-  
+
   As seen listed above, the basic 4-function TMS0972 calculator MCU was used
   in many calculators. It was licensed to other manufacturers too, one funny
   example being a Mattel Barbie handheld calculator.
-  
+
   Some cheaper models lacked the memory buttons (the function itself still works).
   The ABLE series was for educational purposes, with each having a small subset of
   available buttons.
@@ -302,7 +302,7 @@ MACHINE_CONFIG_END
 class ti1250_state : public ticalc1x_state
 {
 public:
-	ti1250_state(const machine_config &mconfig, device_type type, std::string tag)
+	ti1250_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
@@ -438,7 +438,7 @@ MACHINE_CONFIG_END
 class ti1000_state : public ticalc1x_state
 {
 public:
-	ti1000_state(const machine_config &mconfig, device_type type, std::string tag)
+	ti1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
@@ -535,7 +535,7 @@ MACHINE_CONFIG_END
 class wizatron_state : public ticalc1x_state
 {
 public:
-	wizatron_state(const machine_config &mconfig, device_type type, std::string tag)
+	wizatron_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
@@ -637,7 +637,7 @@ MACHINE_CONFIG_END
 class lilprof_state : public wizatron_state
 {
 public:
-	lilprof_state(const machine_config &mconfig, device_type type, std::string tag)
+	lilprof_state(const machine_config &mconfig, device_type type, const char *tag)
 		: wizatron_state(mconfig, type, tag)
 	{ }
 
@@ -711,7 +711,7 @@ MACHINE_CONFIG_END
 class lilprof78_state : public ticalc1x_state
 {
 public:
-	lilprof78_state(const machine_config &mconfig, device_type type, std::string tag)
+	lilprof78_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
@@ -821,7 +821,7 @@ MACHINE_CONFIG_END
 class dataman_state : public ticalc1x_state
 {
 public:
-	dataman_state(const machine_config &mconfig, device_type type, std::string tag)
+	dataman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
@@ -946,7 +946,7 @@ MACHINE_CONFIG_END
 class ti30_state : public ticalc1x_state
 {
 public:
-	ti30_state(const machine_config &mconfig, device_type type, std::string tag)
+	ti30_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 

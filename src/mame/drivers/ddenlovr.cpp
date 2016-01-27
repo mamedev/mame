@@ -156,7 +156,7 @@ static const int mjflove_commands[8]    = { BLIT_STOP, BLIT_CHANGE_PEN, BLIT_CHA
 class ddenlovr_state : public dynax_state
 {
 public:
-	ddenlovr_state(const machine_config &mconfig, device_type type, std::string tag)
+	ddenlovr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dynax_state(mconfig, type, tag),
 		m_dsw_sel16(*this, "dsw_sel16"),
 		m_protection1(*this, "protection1"),

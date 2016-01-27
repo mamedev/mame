@@ -40,7 +40,7 @@ extern const device_type SEGA315_5838_COMP = &device_creator<sega_315_5838_comp_
 
 //#define DEBUG_DATA_DUMP
 
-sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGA315_5838_COMP, "Sega 315-5838 / 317-0029 Compression (Encryption?)", tag, owner, clock, "sega315_5838", __FILE__)
 {
 }

@@ -51,7 +51,7 @@ typedef delegate<void ()> save_prepost_delegate;
 // use this as above, but also to declare that std::vector<TYPE> is safe as well
 #define ALLOW_SAVE_TYPE_AND_ARRAY(TYPE) \
 	ALLOW_SAVE_TYPE(TYPE); \
-	template<> inline void save_manager::save_item(device_t *device, std::string module, std::string tag, int index, std::vector<TYPE> &value, std::string name) { save_memory(device, module, tag, index, name, &value[0], sizeof(TYPE), value.size()); }
+	template<> inline void save_manager::save_item(device_t *device, const char *module, const char *tag, int index, std::vector<TYPE> &value, const char *name) { save_memory(device, module, tag, index, name, &value[0], sizeof(TYPE), value.size()); }
 
 
 //**************************************************************************
@@ -62,7 +62,7 @@ class state_entry
 {
 public:
 	// construction/destruction
-	state_entry(void *data, std::string name, device_t *device, std::string module, std::string tag, int index, UINT8 size, UINT32 count);
+	state_entry(void *data, const char *name, device_t *device, const char *module, const char *tag, int index, UINT8 size, UINT32 count);
 
 	// getters
 	state_entry *next() const { return m_next; }
@@ -111,11 +111,11 @@ public:
 	void dispatch_postload();
 
 	// generic memory registration
-	void save_memory(device_t *device, std::string module, std::string tag, UINT32 index, std::string name, void *val, UINT32 valsize, UINT32 valcount = 1);
+	void save_memory(device_t *device, const char *module, const char *tag, UINT32 index, const char *name, void *val, UINT32 valsize, UINT32 valcount = 1);
 
 	// templatized wrapper for general objects
 	template<typename _ItemType>
-	void save_item(device_t *device, std::string module, std::string tag, int index, _ItemType &value, std::string valname)
+	void save_item(device_t *device, const char *module, const char *tag, int index, _ItemType &value, const char *valname)
 	{
 		if (type_checker<_ItemType>::is_pointer) throw emu_fatalerror("Called save_item on a pointer with no count!");
 		if (!type_checker<_ItemType>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
@@ -124,7 +124,7 @@ public:
 
 	// templatized wrapper for 1-dimensional arrays
 	template<typename _ItemType, std::size_t N>
-	void save_item(device_t *device, std::string module, std::string tag, int index, _ItemType (&value)[N], std::string valname)
+	void save_item(device_t *device, const char *module, const char *tag, int index, _ItemType (&value)[N], const char *valname)
 	{
 		if (!type_checker<_ItemType>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
 		save_memory(device, module, tag, index, valname, &value[0], sizeof(value[0]), N);
@@ -132,7 +132,7 @@ public:
 
 	// templatized wrapper for 2-dimensional arrays
 	template<typename _ItemType, std::size_t M, std::size_t N>
-	void save_item(device_t *device, std::string module, std::string tag, int index, _ItemType (&value)[M][N], std::string valname)
+	void save_item(device_t *device, const char *module, const char *tag, int index, _ItemType (&value)[M][N], const char *valname)
 	{
 		if (!type_checker<_ItemType>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
 		save_memory(device, module, tag, index, valname, &value[0][0], sizeof(value[0][0]), M * N);
@@ -140,7 +140,7 @@ public:
 
 	// templatized wrapper for pointers
 	template<typename _ItemType>
-	void save_pointer(device_t *device, std::string module, std::string tag, int index, _ItemType *value, std::string valname, UINT32 count)
+	void save_pointer(device_t *device, const char *module, const char *tag, int index, _ItemType *value, const char *valname, UINT32 count)
 	{
 		if (!type_checker<_ItemType>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
 		save_memory(device, module, tag, index, valname, value, sizeof(*value), count);
@@ -148,9 +148,9 @@ public:
 
 	// global memory registration
 	template<typename _ItemType>
-	void save_item(_ItemType &value, std::string valname, int index = 0) { save_item(nullptr, "global", std::string(), index, value, valname); }
+	void save_item(_ItemType &value, const char *valname, int index = 0) { save_item(nullptr, "global", nullptr, index, value, valname); }
 	template<typename _ItemType>
-	void save_pointer(_ItemType *value, std::string valname, UINT32 count, int index = 0) { save_pointer(nullptr, "global", std::string(), index, value, valname, count); }
+	void save_pointer(_ItemType *value, const char *valname, UINT32 count, int index = 0) { save_pointer(nullptr, "global", nullptr, index, value, valname, count); }
 
 	// file processing
 	static save_error check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
@@ -218,25 +218,25 @@ ALLOW_SAVE_TYPE_AND_ARRAY(rgb_t)
 //-------------------------------------------------
 
 template<>
-inline void save_manager::save_item(device_t *device, std::string module, std::string tag, int index, bitmap_ind8 &value, std::string name)
+inline void save_manager::save_item(device_t *device, const char *module, const char *tag, int index, bitmap_ind8 &value, const char *name)
 {
 	save_memory(device, module, tag, index, name, &value.pix(0), value.bpp() / 8, value.rowpixels() * value.height());
 }
 
 template<>
-inline void save_manager::save_item(device_t *device, std::string module, std::string tag, int index, bitmap_ind16 &value, std::string name)
+inline void save_manager::save_item(device_t *device, const char *module, const char *tag, int index, bitmap_ind16 &value, const char *name)
 {
 	save_memory(device, module, tag, index, name, &value.pix(0), value.bpp() / 8, value.rowpixels() * value.height());
 }
 
 template<>
-inline void save_manager::save_item(device_t *device, std::string module, std::string tag, int index, bitmap_ind32 &value, std::string name)
+inline void save_manager::save_item(device_t *device, const char *module, const char *tag, int index, bitmap_ind32 &value, const char *name)
 {
 	save_memory(device, module, tag, index, name, &value.pix(0), value.bpp() / 8, value.rowpixels() * value.height());
 }
 
 template<>
-inline void save_manager::save_item(device_t *device, std::string module, std::string tag, int index, bitmap_rgb32 &value, std::string name)
+inline void save_manager::save_item(device_t *device, const char *module, const char *tag, int index, bitmap_rgb32 &value, const char *name)
 {
 	save_memory(device, module, tag, index, name, &value.pix(0), value.bpp() / 8, value.rowpixels() * value.height());
 }
@@ -247,11 +247,11 @@ inline void save_manager::save_item(device_t *device, std::string module, std::s
 //-------------------------------------------------
 
 template<>
-inline void save_manager::save_item(device_t *device, std::string module, std::string tag, int index, attotime &value, std::string name)
+inline void save_manager::save_item(device_t *device, const char *module, const char *tag, int index, attotime &value, const char *name)
 {
-	std::string tempstr = name + ".attoseconds";
+	std::string tempstr = std::string(name).append(".attoseconds");
 	save_memory(device, module, tag, index, tempstr.c_str(), &value.m_attoseconds, sizeof(value.m_attoseconds));
-	tempstr  = name + ".seconds";
+	tempstr.assign(name).append(".seconds");
 	save_memory(device, module, tag, index, tempstr.c_str(), &value.m_seconds, sizeof(value.m_seconds));
 }
 

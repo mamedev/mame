@@ -102,7 +102,7 @@ class isbx_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	isbx_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	isbx_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _mintr0> void set_mintr0_callback(_mintr0 mintr0) { m_write_mintr0.set_callback(mintr0); }
 	template<class _mintr1> void set_mintr1_callback(_mintr1 mintr1) { m_write_mintr1.set_callback(mintr1); }

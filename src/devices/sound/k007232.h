@@ -19,7 +19,7 @@ class k007232_device : public device_t,
 									public device_sound_interface
 {
 public:
-	k007232_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k007232_device() {}
 
 	template<class _Object> static devcb_base &set_port_write_handler(device_t &device, _Object object) { return downcast<k007232_device &>(device).m_port_write_handler.set_callback(object); }

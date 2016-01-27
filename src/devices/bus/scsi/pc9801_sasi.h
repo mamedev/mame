@@ -9,7 +9,7 @@ class pc9801_sasi_device  : public scsihd_device
 {
 public:
 	// construction/destruction
-	pc9801_sasi_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pc9801_sasi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void ExecCommand() override;
 };

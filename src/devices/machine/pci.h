@@ -30,7 +30,7 @@ public:
 
 	mapper_cb remap_cb, remap_config_cb;
 
-	pci_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	pci_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	void set_ids(UINT32 main_id, UINT8 revision, UINT32 pclass, UINT32 subsystem_id);
 	void set_multifunction_device(bool enable);
@@ -137,7 +137,7 @@ protected:
 
 class agp_device : public pci_device {
 public:
-	agp_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	agp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
 	virtual void device_start() override;
@@ -146,8 +146,8 @@ protected:
 
 class pci_bridge_device : public pci_device, public device_memory_interface {
 public:
-	pci_bridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	pci_bridge_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pci_bridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	virtual void set_remap_cb(mapper_cb _remap_cb) override;
 	virtual void map_device(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
@@ -226,7 +226,7 @@ private:
 
 class agp_bridge_device : public pci_bridge_device {
 public:
-	agp_bridge_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	agp_bridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
 	virtual void device_start() override;
@@ -237,7 +237,7 @@ class pci_host_device : public pci_bridge_device {
 public:
 	DECLARE_ADDRESS_MAP(io_configuration_access_map, 32);
 
-	pci_host_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	pci_host_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
 	address_space *memory_space, *io_space;
@@ -265,7 +265,7 @@ protected:
 
 class pci_root_device : public device_t {
 public:
-	pci_root_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pci_root_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;

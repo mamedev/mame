@@ -105,23 +105,23 @@ VIDEO_START_MEMBER(batman_state,batman)
 UINT32 batman_state::screen_update_batman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// start drawing
-	m_vad->mob()->draw_async(cliprect);
+	m_vad->mob().draw_async(cliprect);
 
 	/* draw the playfield */
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	priority_bitmap.fill(0, cliprect);
-	m_vad->playfield()->draw(screen, bitmap, cliprect, 0, 0x00);
-	m_vad->playfield()->draw(screen, bitmap, cliprect, 1, 0x01);
-	m_vad->playfield()->draw(screen, bitmap, cliprect, 2, 0x02);
-	m_vad->playfield()->draw(screen, bitmap, cliprect, 3, 0x03);
-	m_vad->playfield2()->draw(screen, bitmap, cliprect, 0, 0x80);
-	m_vad->playfield2()->draw(screen, bitmap, cliprect, 1, 0x84);
-	m_vad->playfield2()->draw(screen, bitmap, cliprect, 2, 0x88);
-	m_vad->playfield2()->draw(screen, bitmap, cliprect, 3, 0x8c);
+	m_vad->playfield().draw(screen, bitmap, cliprect, 0, 0x00);
+	m_vad->playfield().draw(screen, bitmap, cliprect, 1, 0x01);
+	m_vad->playfield().draw(screen, bitmap, cliprect, 2, 0x02);
+	m_vad->playfield().draw(screen, bitmap, cliprect, 3, 0x03);
+	m_vad->playfield2().draw(screen, bitmap, cliprect, 0, 0x80);
+	m_vad->playfield2().draw(screen, bitmap, cliprect, 1, 0x84);
+	m_vad->playfield2().draw(screen, bitmap, cliprect, 2, 0x88);
+	m_vad->playfield2().draw(screen, bitmap, cliprect, 3, 0x8c);
 
 	// draw and merge the MO
-	bitmap_ind16 &mobitmap = m_vad->mob()->bitmap();
-	for (const sparse_dirty_rect *rect = m_vad->mob()->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
+	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
+	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap.pix16(y);
@@ -190,10 +190,10 @@ UINT32 batman_state::screen_update_batman(screen_device &screen, bitmap_ind16 &b
 		}
 
 	/* add the alpha on top */
-	m_vad->alpha()->draw(screen, bitmap, cliprect, 0, 0);
+	m_vad->alpha().draw(screen, bitmap, cliprect, 0, 0);
 
 	/* now go back and process the upper bit of MO priority */
-	for (const sparse_dirty_rect *rect = m_vad->mob()->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
+	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap.pix16(y);
@@ -208,7 +208,7 @@ UINT32 batman_state::screen_update_batman(screen_device &screen, bitmap_ind16 &b
 					{
 						/* if bit 2 is set, start setting high palette bits */
 						if (mo[x] & 2)
-							m_vad->mob()->apply_stain(bitmap, pf, mo, x, y);
+							m_vad->mob().apply_stain(bitmap, pf, mo, x, y);
 					}
 				}
 		}

@@ -28,7 +28,7 @@ const device_type DMV_K233 = &device_creator<dmv_k233_device>;
 //  dmv_k233_device - constructor
 //-------------------------------------------------
 
-dmv_k233_device::dmv_k233_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+dmv_k233_device::dmv_k233_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, DMV_K233, "K233 16K Shared RAM", tag, owner, clock, "dmv_k233", __FILE__),
 		device_dmvslot_interface( mconfig, *this ),
 	m_enabled(false),

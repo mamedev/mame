@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 /****************************************************************************
 
@@ -50,7 +50,7 @@ A1                   2101            2101
 class aceal_state : public driver_device
 {
 public:
-	aceal_state(const machine_config &mconfig, device_type type, std::string tag)
+	aceal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_scoreram(*this, "scoreram"),

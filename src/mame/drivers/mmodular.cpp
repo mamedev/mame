@@ -129,7 +129,7 @@ UINT8 lcd32_char;
 class polgar_state : public mboard_state
 {
 public:
-	polgar_state(const machine_config &mconfig, device_type type, std::string tag)
+	polgar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mboard_state(mconfig, type, tag),
 			m_lcdc(*this, "hd44780"),
 			m_beeper(*this, "beeper")
@@ -1536,7 +1536,7 @@ static MACHINE_CONFIG_FRAGMENT ( chess_common )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -1606,7 +1606,7 @@ static MACHINE_CONFIG_START( monteciv, polgar_state )
 	MCFG_MACHINE_START_OVERRIDE(polgar_state, polgar )
 	MCFG_MACHINE_RESET_OVERRIDE(polgar_state, monteciv )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", polgar_state, cause_nmi, attotime::from_hz(600))

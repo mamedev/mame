@@ -18,7 +18,7 @@
 class _8080bw_state : public mw8080bw_state
 {
 public:
-	_8080bw_state(const machine_config &mconfig, device_type type, std::string tag)
+	_8080bw_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mw8080bw_state(mconfig, type, tag),
 		m_schaser_effect_555_timer(*this, "schaser_sh_555"),
 		m_claybust_gun_on(*this, "claybust_gun"),
@@ -55,9 +55,6 @@ public:
 	UINT8 m_schaser_background_disable;
 	UINT8 m_schaser_background_select;
 	UINT16 m_claybust_gun_pos;
-
-	int m_invmulti_bank;
-
 
 	DECLARE_CUSTOM_INPUT_MEMBER(sflush_80_r);
 	DECLARE_INPUT_CHANGED_MEMBER(claybust_gun_trigger);
@@ -120,7 +117,6 @@ public:
 	DECLARE_MACHINE_START(polaris);
 	DECLARE_MACHINE_START(darthvdr);
 	DECLARE_MACHINE_RESET(darthvdr);
-	DECLARE_MACHINE_RESET(invmulti);
 	DECLARE_MACHINE_START(extra_8080bw_sh);
 	DECLARE_MACHINE_START(extra_8080bw_vh);
 	DECLARE_MACHINE_START(schaser_sh);
@@ -155,7 +151,6 @@ public:
 	inline void set_pixel( bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, int color );
 	inline void set_8_pixels( bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, UINT8 data, int fore_color, int back_color );
 	void clear_extra_columns( bitmap_rgb32 &bitmap, int color );
-	void invmulti_bankswitch_restore();
 };
 
 

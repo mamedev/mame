@@ -16,7 +16,7 @@ const device_type IREM_M62_AUDIO = &device_creator<m62_audio_device>;
 const device_type IREM_M52_SOUNDC_AUDIO = &device_creator<m52_soundc_audio_device>;
 const device_type IREM_M52_LARGE_AUDIO = &device_creator<m52_large_audio_device>;
 
-irem_audio_device::irem_audio_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+irem_audio_device::irem_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_port1(0),
 	m_port2(0)
@@ -25,17 +25,17 @@ irem_audio_device::irem_audio_device(const machine_config &mconfig, device_type 
 {
 }
 
-m62_audio_device::m62_audio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+m62_audio_device::m62_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: irem_audio_device(mconfig, IREM_M62_AUDIO, "Irem M62 Audio", tag, owner, clock, "irem_m62_audio", __FILE__)
 {
 }
 
-m52_soundc_audio_device::m52_soundc_audio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+m52_soundc_audio_device::m52_soundc_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: irem_audio_device(mconfig, IREM_M52_SOUNDC_AUDIO, "Irem M52 SoundC Audio", tag, owner, clock, "irem_m52_soundc_audio", __FILE__)
 {
 }
 
-m52_large_audio_device::m52_large_audio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+m52_large_audio_device::m52_large_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: irem_audio_device(mconfig, IREM_M52_LARGE_AUDIO, "Irem M52 Large Audio", tag, owner, clock, "irem_m52_large_audio", __FILE__)
 {
 }

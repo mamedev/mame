@@ -12,7 +12,7 @@ class sega8_cardcatch_device : public sega8_rom_device
 {
 public:
 	// construction/destruction
-	sega8_cardcatch_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sega8_cardcatch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart) override;

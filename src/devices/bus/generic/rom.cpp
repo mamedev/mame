@@ -31,28 +31,28 @@ const device_type GENERIC_ROM_LINEAR = &device_creator<generic_rom_linear_device
 const device_type GENERIC_ROMRAM_PLAIN = &device_creator<generic_romram_plain_device>;
 
 
-generic_rom_device::generic_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+generic_rom_device::generic_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_generic_cart_interface(mconfig, *this)
 {
 }
 
-generic_rom_plain_device::generic_rom_plain_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+generic_rom_plain_device::generic_rom_plain_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: generic_rom_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-generic_rom_plain_device::generic_rom_plain_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+generic_rom_plain_device::generic_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: generic_rom_device(mconfig, GENERIC_ROM_PLAIN, "Generic ROM (plain mapping)", tag, owner, clock, "generic_rom_plain", __FILE__)
 {
 }
 
-generic_rom_linear_device::generic_rom_linear_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+generic_rom_linear_device::generic_rom_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: generic_rom_device(mconfig, GENERIC_ROM_LINEAR, "Generic ROM (linear mapping)", tag, owner, clock, "generic_rom_linear", __FILE__)
 {
 }
 
-generic_romram_plain_device::generic_romram_plain_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+generic_romram_plain_device::generic_romram_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: generic_rom_plain_device(mconfig, GENERIC_ROMRAM_PLAIN, "Generic ROM + RAM (plain mapping)", tag, owner, clock, "generic_romram_plain", __FILE__)
 {
 }

@@ -11,11 +11,12 @@
 class ninjakd2_state : public driver_device
 {
 public:
-	ninjakd2_state(const machine_config &mconfig, device_type type, std::string tag)
+	ninjakd2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_pcm(*this, "pcm"),
+		m_pcm_region(*this, "pcm"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -28,6 +29,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<samples_device> m_pcm;
+	optional_memory_region m_pcm_region;
 	optional_shared_ptr<UINT8> m_bg_videoram;
 	required_shared_ptr<UINT8> m_fg_videoram;
 	required_shared_ptr<UINT8> m_spriteram;

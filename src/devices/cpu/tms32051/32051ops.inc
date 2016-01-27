@@ -198,39 +198,39 @@ UINT16 tms32051_device::GET_ADDRESS()
 
 bool tms32051_device::GET_ZLVC_CONDITION(int zlvc, int zlvc_mask)
 {
-	if (zlvc_mask & 0x2)			// OV-bit
+	if (zlvc_mask & 0x2)            // OV-bit
 	{
-		if ((zlvc & 0x2) && m_st0.ov == 0)			// OV
+		if ((zlvc & 0x2) && m_st0.ov == 0)          // OV
 			return false;
-		if (((zlvc & 0x2) == 0) && m_st0.ov != 0)	// NOV
+		if (((zlvc & 0x2) == 0) && m_st0.ov != 0)   // NOV
 			return false;
 	}
-	if (zlvc_mask & 0x1)			// C-bit
+	if (zlvc_mask & 0x1)            // C-bit
 	{
-		if ((zlvc & 0x1) && m_st1.c == 0)			// C
+		if ((zlvc & 0x1) && m_st1.c == 0)           // C
 			return false;
-		if (((zlvc & 0x1) == 0) && m_st1.c != 0)		// NC
+		if (((zlvc & 0x1) == 0) && m_st1.c != 0)        // NC
 			return false;
 	}
 
 	switch ((zlvc_mask & 0xc) | ((zlvc >> 2) & 0x3))
 	{
-		case 0x00: break;											// MZ=0, ML=0, Z=0, L=0
-		case 0x01: break;											// MZ=0, ML=0, Z=0, L=1
-		case 0x02: break;											// MZ=0, ML=0, Z=1, L=0
-		case 0x03: break;											// MZ=0, ML=0, Z=1, L=1
-		case 0x04: if ((INT32)(m_acc) <= 0) return false; break;		// MZ=0, ML=1, Z=0, L=0  (GT)
-		case 0x05: if ((INT32)(m_acc) >= 0) return false; break;		// MZ=0, ML=1, Z=0, L=1  (LT)
-		case 0x06: if ((INT32)(m_acc) <= 0) return false; break;		// MZ=0, ML=1, Z=1, L=0  (GT)
-		case 0x07: if ((INT32)(m_acc) >= 0) return false; break;		// MZ=0, ML=1, Z=1, L=1  (LT)
-		case 0x08: if ((INT32)(m_acc) == 0) return false; break;		// MZ=1, ML=0, Z=0, L=0  (NEQ)
-		case 0x09: if ((INT32)(m_acc) == 0) return false; break;		// MZ=1, ML=0, Z=0, L=1  (NEQ)
-		case 0x0a: if ((INT32)(m_acc) != 0) return false; break;		// MZ=1, ML=0, Z=1, L=0  (EQ)
-		case 0x0b: if ((INT32)(m_acc) != 0) return false; break;		// MZ=1, ML=0, Z=1, L=1  (EQ)
-		case 0x0c: if ((INT32)(m_acc) <= 0) return false; break;		// MZ=1, ML=1, Z=0, L=0  (GT)
-		case 0x0d: if ((INT32)(m_acc) >= 0) return false; break;		// MZ=1, ML=1, Z=0, L=1  (LT)
-		case 0x0e: if ((INT32)(m_acc) < 0) return false;	 break;		// MZ=1, ML=1, Z=1, L=0  (GEQ)
-		case 0x0f: if ((INT32)(m_acc) > 0) return false;	 break;		// MZ=1, ML=1, Z=1, L=1  (LEQ)
+		case 0x00: break;                                           // MZ=0, ML=0, Z=0, L=0
+		case 0x01: break;                                           // MZ=0, ML=0, Z=0, L=1
+		case 0x02: break;                                           // MZ=0, ML=0, Z=1, L=0
+		case 0x03: break;                                           // MZ=0, ML=0, Z=1, L=1
+		case 0x04: if ((INT32)(m_acc) <= 0) return false; break;        // MZ=0, ML=1, Z=0, L=0  (GT)
+		case 0x05: if ((INT32)(m_acc) >= 0) return false; break;        // MZ=0, ML=1, Z=0, L=1  (LT)
+		case 0x06: if ((INT32)(m_acc) <= 0) return false; break;        // MZ=0, ML=1, Z=1, L=0  (GT)
+		case 0x07: if ((INT32)(m_acc) >= 0) return false; break;        // MZ=0, ML=1, Z=1, L=1  (LT)
+		case 0x08: if ((INT32)(m_acc) == 0) return false; break;        // MZ=1, ML=0, Z=0, L=0  (NEQ)
+		case 0x09: if ((INT32)(m_acc) == 0) return false; break;        // MZ=1, ML=0, Z=0, L=1  (NEQ)
+		case 0x0a: if ((INT32)(m_acc) != 0) return false; break;        // MZ=1, ML=0, Z=1, L=0  (EQ)
+		case 0x0b: if ((INT32)(m_acc) != 0) return false; break;        // MZ=1, ML=0, Z=1, L=1  (EQ)
+		case 0x0c: if ((INT32)(m_acc) <= 0) return false; break;        // MZ=1, ML=1, Z=0, L=0  (GT)
+		case 0x0d: if ((INT32)(m_acc) >= 0) return false; break;        // MZ=1, ML=1, Z=0, L=1  (LT)
+		case 0x0e: if ((INT32)(m_acc) < 0) return false;     break;     // MZ=1, ML=1, Z=1, L=0  (GEQ)
+		case 0x0f: if ((INT32)(m_acc) > 0) return false;     break;     // MZ=1, ML=1, Z=1, L=1  (LEQ)
 	}
 	return true;
 }
@@ -239,14 +239,14 @@ bool tms32051_device::GET_TP_CONDITION(int tp)
 {
 	switch (tp)
 	{
-		case 0:		// BIO pin low
+		case 0:     // BIO pin low
 			// TODO
 			return false;
-		
-		case 1:		// TC == 1
+
+		case 1:     // TC == 1
 			return m_st1.tc != 0;
 
-		case 2:		// TC == 0
+		case 2:     // TC == 0
 			return m_st1.tc == 0;
 
 		case 3:
@@ -1376,7 +1376,7 @@ void tms32051_device::op_out()
 {
 	UINT16 port = ROPCODE();
 	UINT16 ea = GET_ADDRESS();
-	
+
 	UINT16 data = DM_READ16(ea);
 	m_io->write_word(port << 1, data);
 
@@ -1438,7 +1438,7 @@ void tms32051_device::op_apl_dbmr()
 {
 	UINT16 ea = GET_ADDRESS();
 	UINT16 data = DM_READ16(ea);
-	
+
 	data &= m_dbmr;
 
 	m_st1.tc = (data == 0) ? 1 : 0;
@@ -1452,7 +1452,7 @@ void tms32051_device::op_apl_imm()
 	UINT16 ea = GET_ADDRESS();
 	UINT16 imm = ROPCODE();
 	UINT16 data = DM_READ16(ea);
-	
+
 	data &= imm;
 
 	m_st1.tc = (data == 0) ? 1 : 0;

@@ -20,7 +20,7 @@ const device_type K056800 = &device_creator<k056800_device>;
 //  k056800_device - constructor
 //-------------------------------------------------
 
-k056800_device::k056800_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+k056800_device::k056800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, K056800, "K056800 MIRAC", tag, owner, clock, "k056800", __FILE__), m_int_pending(false), m_int_enabled(false),
 	m_int_handler(*this)
 {
@@ -108,11 +108,11 @@ WRITE8_MEMBER( k056800_device::host_w )
 
 		case 7:
 			// Sound interrupt
-			m_int_pending = true;
-
 			if (m_int_enabled)
+			{
+				m_int_pending = true;
 				m_int_handler(ASSERT_LINE);
-
+			}
 			break;
 	}
 }

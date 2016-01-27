@@ -17,7 +17,7 @@ extern const device_type KONAMI_573_NETWORK_PCB_UNIT;
 class k573npu_device : public device_t
 {
 public:
-	k573npu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	k573npu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;

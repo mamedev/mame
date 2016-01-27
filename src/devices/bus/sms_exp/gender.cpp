@@ -26,7 +26,7 @@ const device_type SMS_GENDER_ADAPTER = &device_creator<sms_gender_adapter_device
 //  sms_gender_adapter_device - constructor
 //-------------------------------------------------
 
-sms_gender_adapter_device::sms_gender_adapter_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+sms_gender_adapter_device::sms_gender_adapter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SMS_GENDER_ADAPTER, "Gender Adapter", tag, owner, clock, "sms_gender_adapter", __FILE__),
 	device_sms_expansion_slot_interface(mconfig, *this),
 	m_subslot(*this, "subslot")

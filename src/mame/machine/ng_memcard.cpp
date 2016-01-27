@@ -19,7 +19,7 @@ const device_type NG_MEMCARD = &device_creator<ng_memcard_device>;
 //  ng_memcard_device - constructor
 //-------------------------------------------------
 
-ng_memcard_device::ng_memcard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ng_memcard_device::ng_memcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NG_MEMCARD, "NeoGeo Memory Card", tag, owner, clock, "ng_memcard", __FILE__),
 		device_image_interface(mconfig, *this)
 {

@@ -59,7 +59,7 @@ it as ASCII text.
 class scregg_state : public btime_state
 {
 public:
-	scregg_state(const machine_config &mconfig, device_type type, std::string tag)
+	scregg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: btime_state(mconfig, type, tag) { }
 
 	DECLARE_WRITE8_MEMBER(scregg_irqack_w);

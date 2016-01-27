@@ -25,7 +25,7 @@ class upd1771c_device : public device_t,
 						public device_sound_interface
 {
 public:
-	upd1771c_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~upd1771c_device() {}
 
 	template<class _Object> static devcb_base &set_ack_handler(device_t &device, _Object object) { return downcast<upd1771c_device &>(device).m_ack_handler.set_callback(object); }

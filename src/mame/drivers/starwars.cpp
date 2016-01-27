@@ -1,10 +1,10 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Steve Baines, Frank Palazzolo
 /***************************************************************************
 
     Atari Star Wars hardware
 
-    driver by Steve Baines (sulaco@ntlworld.com) and Frank Palazzolo
+    driver by Steve Baines and Frank Palazzolo
 
     This file is Copyright Steve Baines.
     Modified by Frank Palazzolo for sound support

@@ -27,7 +27,7 @@ class abc80_16kb_ram_card_t :  public device_t,
 {
 public:
 	// construction/destruction
-	abc80_16kb_ram_card_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	abc80_16kb_ram_card_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

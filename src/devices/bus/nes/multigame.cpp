@@ -77,237 +77,237 @@ const device_type NES_BMC_4IN1RESET = &device_creator<nes_bmc_4in1reset_device>;
 const device_type NES_BMC_42IN1RESET = &device_creator<nes_bmc_42in1reset_device>;
 
 
-nes_action52_device::nes_action52_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_action52_device::nes_action52_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_ACTION52, "NES Cart Action 52 PCB", tag, owner, clock, "nes_action52", __FILE__)
 {
 }
 
-nes_caltron_device::nes_caltron_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_caltron_device::nes_caltron_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_CALTRON6IN1, "NES Cart Caltron 6 in 1 PCB", tag, owner, clock, "nes_caltron", __FILE__), m_latch(0)
 				{
 }
 
-nes_rumblestat_device::nes_rumblestat_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_rumblestat_device::nes_rumblestat_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_RUMBLESTATION, "NES Cart Rumblestation PCB", tag, owner, clock, "nes_rumblestat", __FILE__), m_prg(0), m_chr(0)
 				{
 }
 
-nes_svision16_device::nes_svision16_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_svision16_device::nes_svision16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_SVISION16, "NES Cart Supervision 16 in 1 PCB", tag, owner, clock, "nes_svision16", __FILE__), m_latch1(0), m_latch2(0)
 				{
 }
 
-nes_n625092_device::nes_n625092_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_n625092_device::nes_n625092_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_N625092, "NES Cart N625092 PCB", tag, owner, clock, "nes_n625092", __FILE__), m_latch1(0), m_latch2(0)
 				{
 }
 
-nes_a65as_device::nes_a65as_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_a65as_device::nes_a65as_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_A65AS, "NES Cart A65AS PCB", tag, owner, clock, "nes_a65as", __FILE__)
 {
 }
 
-nes_t262_device::nes_t262_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_t262_device::nes_t262_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_T262, "NES Cart T-262 PCB", tag, owner, clock, "nes_t262", __FILE__), m_latch1(0), m_latch2(0)
 				{
 }
 
-nes_novel1_device::nes_novel1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_novel1_device::nes_novel1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_NOVEL1, "NES Cart Novel Diamond Type 1 PCB", tag, owner, clock, "nes_novel1", __FILE__)
 {
 }
 
-nes_novel2_device::nes_novel2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_novel2_device::nes_novel2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_NOVEL2, "NES Cart Novel Diamond Type 2 PCB", tag, owner, clock, "nes_novel2", __FILE__)
 {
 }
 
-nes_studyngame_device::nes_studyngame_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_studyngame_device::nes_studyngame_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_STUDYNGAME, "NES Cart Study n Game PCB", tag, owner, clock, "nes_studyngame", __FILE__)
 {
 }
 
-nes_sgun20in1_device::nes_sgun20in1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_sgun20in1_device::nes_sgun20in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_SUPERGUN20IN1, "NES Cart Supergun 20 in 1 PCB", tag, owner, clock, "nes_sgun20in1", __FILE__)
 {
 }
 
-nes_vt5201_device::nes_vt5201_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_vt5201_device::nes_vt5201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_VT5201, "NES Cart VT5201 PCB", tag, owner, clock, "nes_vt5201", __FILE__), m_latch(0), m_dipsetting(0)
 				{
 }
 
-nes_810544c_device::nes_810544c_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_810544c_device::nes_810544c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_810544C, "NES Cart 810544-C-A1 PCB", tag, owner, clock, "nes_810544c", __FILE__)
 {
 }
 
-nes_ntd03_device::nes_ntd03_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_ntd03_device::nes_ntd03_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_NTD03, "NES Cart NTD-03 PCB", tag, owner, clock, "nes_ntd03", __FILE__)
 {
 }
 
-nes_bmc_gb63_device::nes_bmc_gb63_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_gb63_device::nes_bmc_gb63_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_GB63, "NES Cart BMC Ghostbusters 63 in 1 PCB", tag, owner, clock, "nes_bmc_gb63", __FILE__), m_latch(0), m_dipsetting(0), m_vram_disable(0)
 				{
 }
 
-nes_bmc_gka_device::nes_bmc_gka_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_gka_device::nes_bmc_gka_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_GKA, "NES Cart BMC GK-A PCB", tag, owner, clock, "nes_bmc_gka", __FILE__), m_latch1(0), m_latch2(0)
 				{
 }
 
-nes_bmc_gkb_device::nes_bmc_gkb_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_gkb_device::nes_bmc_gkb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_GKB, "NES Cart BMC GK-B PCB", tag, owner, clock, "nes_bmc_gkb", __FILE__)
 {
 }
 
-nes_bmc_ws_device::nes_bmc_ws_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_ws_device::nes_bmc_ws_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_WS, "NES Cart BMC WS PCB", tag, owner, clock, "nes_bmc_ws", __FILE__), m_latch(0)
 				{
 }
 
-nes_bmc_11160_device::nes_bmc_11160_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_11160_device::nes_bmc_11160_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_11160, "NES Cart BMC-11160 PCB", tag, owner, clock, "nes_bmc_11160", __FILE__)
 {
 }
 
-nes_bmc_g146_device::nes_bmc_g146_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_g146_device::nes_bmc_g146_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_G146, "NES Cart BMC-G-146 PCB", tag, owner, clock, "nes_bmc_g146", __FILE__)
 {
 }
 
-nes_bmc_8157_device::nes_bmc_8157_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_8157_device::nes_bmc_8157_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_8157, "NES Cart BMC-8157 PCB", tag, owner, clock, "nes_bmc_8157", __FILE__)
 {
 }
 
-nes_bmc_hik300_device::nes_bmc_hik300_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_hik300_device::nes_bmc_hik300_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_HIK300, "NES Cart BMC HIK 300 in 1 PCB", tag, owner, clock, "nes_bmc_hik300", __FILE__)
 {
 }
 
-nes_bmc_s700_device::nes_bmc_s700_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_s700_device::nes_bmc_s700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_S700, "NES Cart BMC Super 700 in 1 PCB", tag, owner, clock, "nes_bmc_s700", __FILE__)
 {
 }
 
-nes_bmc_ball11_device::nes_bmc_ball11_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_ball11_device::nes_bmc_ball11_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_BALL11, "NES Cart BMC Ball 11 in 1 PCB", tag, owner, clock, "nes_bmc_ball11", __FILE__)
 {
 }
 
-nes_bmc_22games_device::nes_bmc_22games_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_22games_device::nes_bmc_22games_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_22GAMES, "NES Cart BMC 22 Games PCB", tag, owner, clock, "nes_bmc_22games", __FILE__)
 {
 }
 
-nes_bmc_64y2k_device::nes_bmc_64y2k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_64y2k_device::nes_bmc_64y2k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_64Y2K, "NES Cart BMC 64 in 1 Y2K PCB", tag, owner, clock, "nes_bmc_64y2k", __FILE__)
 {
 }
 
-nes_bmc_12in1_device::nes_bmc_12in1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_12in1_device::nes_bmc_12in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_12IN1, "NES Cart BMC 12 in 1 PCB", tag, owner, clock, "nes_bmc_12in1", __FILE__)
 {
 }
 
-nes_bmc_20in1_device::nes_bmc_20in1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_20in1_device::nes_bmc_20in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_20IN1, "NES Cart BMC 20 in 1 PCB", tag, owner, clock, "nes_bmc_20in1", __FILE__)
 {
 }
 
-nes_bmc_21in1_device::nes_bmc_21in1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_21in1_device::nes_bmc_21in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_21IN1, "NES Cart BMC 21 in 1 PCB", tag, owner, clock, "nes_bmc_21in1", __FILE__)
 {
 }
 
-nes_bmc_31in1_device::nes_bmc_31in1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_31in1_device::nes_bmc_31in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_31IN1, "NES Cart BMC 31 in 1 PCB", tag, owner, clock, "nes_bmc_31in1", __FILE__)
 {
 }
 
-nes_bmc_35in1_device::nes_bmc_35in1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_35in1_device::nes_bmc_35in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_35IN1, "NES Cart BMC 35 in 1 PCB", tag, owner, clock, "nes_bmc_35in1", __FILE__)
 {
 }
 
-nes_bmc_36in1_device::nes_bmc_36in1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_36in1_device::nes_bmc_36in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_36IN1, "NES Cart BMC 36 in 1 PCB", tag, owner, clock, "nes_bmc_36in1", __FILE__)
 {
 }
 
-nes_bmc_64in1_device::nes_bmc_64in1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_64in1_device::nes_bmc_64in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_64IN1, "NES Cart BMC 64 in 1 PCB", tag, owner, clock, "nes_bmc_64in1", __FILE__)
 {
 }
 
-nes_bmc_70in1_device::nes_bmc_70in1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_70in1_device::nes_bmc_70in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_70IN1, "NES Cart BMC 70 in 1 PCB", tag, owner, clock, "nes_bmc_70in1", __FILE__), m_mode(0)
 				{
 }
 
-nes_bmc_72in1_device::nes_bmc_72in1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_72in1_device::nes_bmc_72in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_72IN1, "NES Cart BMC 72 in 1 PCB", tag, owner, clock, "nes_bmc_72in1", __FILE__)
 {
 }
 
-nes_bmc_76in1_device::nes_bmc_76in1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_76in1_device::nes_bmc_76in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_76IN1, "NES Cart BMC 76 in 1 PCB", tag, owner, clock, "nes_bmc_76in1", __FILE__), m_latch1(0), m_latch2(0)
 				{
 }
 
-nes_bmc_110in1_device::nes_bmc_110in1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_110in1_device::nes_bmc_110in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_110IN1, "NES Cart BMC 110 in 1 PCB", tag, owner, clock, "nes_bmc_110in1", __FILE__)
 {
 }
 
-nes_bmc_150in1_device::nes_bmc_150in1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_150in1_device::nes_bmc_150in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_150IN1, "NES Cart BMC 150 in 1 PCB", tag, owner, clock, "nes_bmc_150in1", __FILE__)
 {
 }
 
-nes_bmc_190in1_device::nes_bmc_190in1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_190in1_device::nes_bmc_190in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_190IN1, "NES Cart BMC 190 in 1 PCB", tag, owner, clock, "nes_bmc_190in1", __FILE__)
 {
 }
 
-nes_bmc_800in1_device::nes_bmc_800in1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_800in1_device::nes_bmc_800in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_800IN1, "NES Cart BMC 800 in 1 PCB", tag, owner, clock, "nes_bmc_800in1", __FILE__), m_mode(0)
 				{
 }
 
-nes_bmc_1200in1_device::nes_bmc_1200in1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_1200in1_device::nes_bmc_1200in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_1200IN1, "NES Cart BMC 1200 in 1 PCB", tag, owner, clock, "nes_bmc_1200in1", __FILE__), m_vram_protect(0)
 				{
 }
 
-nes_bmc_gold150_device::nes_bmc_gold150_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_gold150_device::nes_bmc_gold150_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_GOLD150, "NES Cart BMC Golden 150 in 1 PCB", tag, owner, clock, "nes_bmc_gold150", __FILE__), m_latch(0)
 				{
 }
 
-nes_bmc_gold260_device::nes_bmc_gold260_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_gold260_device::nes_bmc_gold260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_GOLD260, "NES Cart BMC Golden 260 in 1 PCB", tag, owner, clock, "nes_bmc_gold260", __FILE__)
 {
 }
 
-nes_bmc_ch001_device::nes_bmc_ch001_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_ch001_device::nes_bmc_ch001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_CH001, "NES Cart BMC CH-001 PCB", tag, owner, clock, "nes_bmc_ch001", __FILE__), m_latch(0)
 				{
 }
 
-nes_bmc_super22_device::nes_bmc_super22_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_super22_device::nes_bmc_super22_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_SUPER22, "NES Cart BMC Super 22 Games PCB", tag, owner, clock, "nes_bmc_super22", __FILE__)
 {
 }
 
-nes_bmc_4in1reset_device::nes_bmc_4in1reset_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_4in1reset_device::nes_bmc_4in1reset_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_4IN1RESET, "NES Cart BMC 4 in 1 (Reset Based) PCB", tag, owner, clock, "nes_bmc_4in1reset", __FILE__), m_latch(0)
 				{
 }
 
-nes_bmc_42in1reset_device::nes_bmc_42in1reset_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_bmc_42in1reset_device::nes_bmc_42in1reset_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_BMC_42IN1RESET, "NES Cart BMC 42 in 1 (Reset Based) PCB", tag, owner, clock, "nes_bmc_42in1reset", __FILE__), m_latch(0)
 				{
 }

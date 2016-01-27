@@ -19,7 +19,7 @@ const device_type TRIDENT_VGA = &device_creator<trident_vga_device>;
 #define LOG (1)
 #define LOG_ACCEL (1)
 
-trident_vga_device::trident_vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+trident_vga_device::trident_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: svga_device(mconfig, TRIDENT_VGA, "Trident TGUI9680", tag, owner, clock, "trident_vga", __FILE__)
 {
 }

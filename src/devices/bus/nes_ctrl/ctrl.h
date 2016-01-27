@@ -53,7 +53,7 @@ class nes_control_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_control_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~nes_control_port_device();
 
 	static void set_brightpixel_callback(device_t &device, nesctrl_brightpixel_delegate callback) { downcast<nes_control_port_device &>(device).m_brightpixel_cb = callback; }

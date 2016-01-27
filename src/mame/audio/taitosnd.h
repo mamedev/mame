@@ -24,11 +24,11 @@
 class tc0140syt_device : public device_t
 {
 public:
-	tc0140syt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~tc0140syt_device() { }
 
-	static void set_master_tag(device_t &device, std::string tag) { downcast<tc0140syt_device &>(device).m_mastercpu.set_tag(tag); }
-	static void set_slave_tag(device_t &device, std::string tag)  { downcast<tc0140syt_device &>(device).m_slavecpu.set_tag(tag); }
+	static void set_master_tag(device_t &device, const char *tag) { downcast<tc0140syt_device &>(device).m_mastercpu.set_tag(tag); }
+	static void set_slave_tag(device_t &device, const char *tag)  { downcast<tc0140syt_device &>(device).m_slavecpu.set_tag(tag); }
 
 	// MASTER (4-bit bus) control functions
 	DECLARE_WRITE8_MEMBER( master_port_w );

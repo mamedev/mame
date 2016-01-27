@@ -10,7 +10,7 @@
 class ojankohs_state : public driver_device
 {
 public:
-	ojankohs_state(const machine_config &mconfig, device_type type, std::string tag)
+	ojankohs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),

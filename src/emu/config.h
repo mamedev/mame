@@ -45,7 +45,7 @@ class configuration_manager
 {
 	struct config_element
 	{
-		std::string			     name;              /* node name */
+		std::string              name;              /* node name */
 		config_saveload_delegate load;              /* load callback */
 		config_saveload_delegate save;              /* save callback */
 	};

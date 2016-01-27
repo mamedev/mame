@@ -32,8 +32,8 @@ class nubus_image_device :
 {
 public:
 		// construction/destruction
-		nubus_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-		nubus_image_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+		nubus_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		nubus_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;

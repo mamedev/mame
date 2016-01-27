@@ -34,7 +34,7 @@ class apricot_keyboard_hle_device : public device_t, public device_serial_interf
 {
 public:
 	// construction/destruction
-	apricot_keyboard_hle_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	apricot_keyboard_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object)
 		{ return downcast<apricot_keyboard_hle_device &>(device).m_txd_handler.set_callback(object); }

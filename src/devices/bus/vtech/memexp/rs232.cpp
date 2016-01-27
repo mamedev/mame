@@ -53,7 +53,7 @@ machine_config_constructor rs232_interface_device::device_mconfig_additions() co
 //  wordpro_device - constructor
 //-------------------------------------------------
 
-rs232_interface_device::rs232_interface_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+rs232_interface_device::rs232_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, RS232_INTERFACE, "DSE VZ-200/300 RS-232 Interface", tag, owner, clock, "vz_rs232", __FILE__),
 	device_memexp_interface(mconfig, *this),
 	m_rs232(*this, "rs232"),

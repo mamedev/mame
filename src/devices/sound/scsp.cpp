@@ -143,7 +143,7 @@ static const float SDLT[8]={-1000000.0f,-36.0f,-30.0f,-24.0f,-18.0f,-12.0f,-6.0f
 
 const device_type SCSP = &device_creator<scsp_device>;
 
-scsp_device::scsp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SCSP, "SCSP", tag, owner, clock, "scsp", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_roffset(0),
@@ -502,25 +502,28 @@ void scsp_device::init()
 	SCSPDSP_Init(&m_DSP);
 
 	m_IrqTimA = m_IrqTimBC = m_IrqMidi = 0;
-	m_MidiR=m_MidiW=0;
-	m_MidiOutR=m_MidiOutW=0;
+	m_MidiR=m_MidiW = 0;
+	m_MidiOutR = m_MidiOutW = 0;
 
 	// get SCSP RAM
-	if (tag()==":scsp" || tag()==":scsp1")
+	if (strcmp(tag(), ":scsp") == 0 || strcmp(tag(), ":scsp1") == 0)
 	{
-		m_Master=1;
+		m_Master = 1;
 	}
 	else
 	{
-		m_Master=0;
+		m_Master = 0;
 	}
 
-	m_SCSPRAM = region()->base();
-	if (m_SCSPRAM)
+	memory_region* ram_region = memregion(tag());
+
+	// coolridr.c defines a region for the RAM, stv.c doesn't (uses set_ram_base instead, which seems to be more correct anyway?)
+	if (ram_region != NULL)
 	{
-		m_SCSPRAM_LENGTH = region()->bytes();
+		m_SCSPRAM = ram_region->base();
+		m_SCSPRAM_LENGTH = ram_region->bytes();
 		m_DSP.SCSPRAM = (UINT16 *)m_SCSPRAM;
-		m_DSP.SCSPRAM_LENGTH = m_SCSPRAM_LENGTH/2;
+		m_DSP.SCSPRAM_LENGTH = m_SCSPRAM_LENGTH / 2;
 		m_SCSPRAM += m_roffset;
 	}
 

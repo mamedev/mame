@@ -5196,6 +5196,7 @@ ROM_START( yesnoj ) /* Yes/No Sinri Tokimeki Chart */
 	ROM_LOAD( "d20-06.5",  0x00000, 0x04000, CRC(3eb537dc) SHA1(368a03fc265157faf50612b823a78c820b2519f1) )
 	ROM_CONTINUE(          0x10000, 0x0c000 ) /* banked stuff */
 
+	ROM_REGION( 0x100000, "ymsnd", ROMREGION_ERASE00 )
 	/* no ADPCM samples */
 
 	/* no Delta-T samples */

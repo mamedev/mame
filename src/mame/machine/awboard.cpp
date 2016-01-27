@@ -89,7 +89,7 @@ ROM board internal layouts:
  Type 1:
 
  00000000 - 00800000 IC18 flash ROM
- 00800000 - 01000000 unk, probably mirror of above
+ 00800000 - 01000000 mirror of above
  01000000 - 02000000 IC10 \
         .....               mask ROMs
  07000000 - 08000000 IC17 /
@@ -164,7 +164,7 @@ DEVICE_ADDRESS_MAP_START(submap, 16, aw_rom_board)
 	AM_RANGE(0x40, 0x41) AM_READWRITE(pio_r, pio_w)
 ADDRESS_MAP_END
 
-aw_rom_board::aw_rom_board(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+aw_rom_board::aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: naomi_g1_device(mconfig, AW_ROM_BOARD, "Sammy Atomiswave ROM Board", tag, owner, clock, "aw_rom_board", __FILE__)
 {
 	keyregion = nullptr;
@@ -256,7 +256,7 @@ UINT16 aw_rom_board::decrypt(UINT16 cipherText, UINT32 address, const UINT32 key
 void aw_rom_board::set_key()
 {
 	if(!m_region)
-		throw emu_fatalerror("AW-ROM-BOARD: region %s is missing\n", tag().c_str());
+		throw emu_fatalerror("AW-ROM-BOARD: region %s is missing\n", tag());
 
 	if(!keyregion)
 		return;

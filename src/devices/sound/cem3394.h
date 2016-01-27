@@ -47,7 +47,7 @@ class cem3394_device : public device_t,
 						public device_sound_interface
 {
 public:
-	cem3394_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~cem3394_device() { }
 
 	static void set_ext_input_callback(device_t &device, cem3394_ext_input_delegate callback) { downcast<cem3394_device &>(device).m_ext_cb = callback; }

@@ -38,7 +38,7 @@ const device_type FMSCSI = &device_creator<fmscsi_device>;
  * Device
  */
 
-fmscsi_device::fmscsi_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+fmscsi_device::fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: legacy_scsi_host_adapter(mconfig, FMSCSI, "FM-SCSI", tag, owner, clock, "fmscsi", __FILE__),
 	m_irq_handler(*this),
 	m_drq_handler(*this)

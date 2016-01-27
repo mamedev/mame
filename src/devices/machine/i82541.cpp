@@ -13,7 +13,7 @@ ADDRESS_MAP_END
 DEVICE_ADDRESS_MAP_START(registers_io_map, 32, i82541_device)
 ADDRESS_MAP_END
 
-i82541_device::i82541_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i82541_device::i82541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, I82541, "I82541 ethernet controller", tag, owner, clock, "i82541", __FILE__)
 {
 }

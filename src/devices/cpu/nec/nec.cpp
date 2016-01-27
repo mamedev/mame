@@ -122,7 +122,7 @@ const device_type V33A =&device_creator<v33a_device>;
 
 
 
-nec_common_device::nec_common_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, bool is_16bit, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type)
+nec_common_device::nec_common_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool is_16bit, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 16, 0)
@@ -134,13 +134,13 @@ nec_common_device::nec_common_device(const machine_config &mconfig, device_type 
 }
 
 
-v20_device::v20_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+v20_device::v20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: nec_common_device(mconfig, V20, "V20", tag, owner, clock, "v20", __FILE__, false, 0, 4, 4, V20_TYPE)
 {
 }
 
 
-v30_device::v30_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+v30_device::v30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: nec_common_device(mconfig, V30, "V30", tag, owner, clock, "v30", __FILE__, true, BYTE_XOR_LE(0), 6, 2, V30_TYPE)
 {
 }
@@ -149,13 +149,13 @@ v30_device::v30_device(const machine_config &mconfig, std::string tag, device_t 
 /* FIXME: Need information about prefetch size and cycles for V33.
  * complete guess below, nbbatman will not work
  * properly without. */
-v33_device::v33_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+v33_device::v33_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: nec_common_device(mconfig, V33, "V33", tag, owner, clock, "v33", __FILE__, true, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
 {
 }
 
 
-v33a_device::v33a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+v33a_device::v33a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: nec_common_device(mconfig, V33A, "V33A", tag, owner, clock, "v33A", __FILE__, true, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
 {
 }

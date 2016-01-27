@@ -14,7 +14,7 @@ class ata_flash_pccard_device : public ide_hdd_device,
 	public pccard_interface
 {
 public:
-	ata_flash_pccard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ata_flash_pccard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual DECLARE_READ16_MEMBER(read_memory) override;
 	virtual DECLARE_WRITE16_MEMBER(write_memory) override;

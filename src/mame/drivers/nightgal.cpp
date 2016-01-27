@@ -32,7 +32,7 @@ TODO:
 class nightgal_state : public driver_device
 {
 public:
-	nightgal_state(const machine_config &mconfig, device_type type, std::string tag)
+	nightgal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_comms_ram(*this, "comms_ram"),
 		m_maincpu(*this, "maincpu"),

@@ -16,7 +16,7 @@
 class carpolo_state : public driver_device
 {
 public:
-	carpolo_state(const machine_config &mconfig, device_type type, std::string tag)
+	carpolo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_alpharam(*this, "alpharam"),
 		m_spriteram(*this, "spriteram"),

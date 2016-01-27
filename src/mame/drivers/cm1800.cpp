@@ -42,7 +42,7 @@ to be a save command.
 class cm1800_state : public driver_device
 {
 public:
-	cm1800_state(const machine_config &mconfig, device_type type, std::string tag)
+	cm1800_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_terminal(*this, TERMINAL_TAG) ,
 		m_maincpu(*this, "maincpu")

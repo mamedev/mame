@@ -204,7 +204,7 @@ GFX check (these don't explicitly fails):
 const device_type SEGA_32X_NTSC = &device_creator<sega_32x_ntsc_device>;
 const device_type SEGA_32X_PAL = &device_creator<sega_32x_pal_device>;
 
-sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_master_cpu(*this, "32x_master_sh2"),
 		m_slave_cpu(*this, "32x_slave_sh2"),
@@ -215,12 +215,12 @@ sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type
 {
 }
 
-sega_32x_ntsc_device::sega_32x_ntsc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_32x_ntsc_device::sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_32x_device(mconfig, SEGA_32X_NTSC, "sega_32x_ntsc", tag, owner, clock, "sega_32x_ntsc", __FILE__)
 {
 }
 
-sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_32x_device(mconfig, SEGA_32X_PAL, "sega_32x_pal", tag, owner, clock, "sega_32x_pal", __FILE__)
 {
 }
@@ -230,7 +230,7 @@ sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, std::str
 //  palette device
 //-------------------------------------------------
 
-void sega_32x_device::static_set_palette_tag(device_t &device, std::string tag)
+void sega_32x_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<sega_32x_device &>(device).m_palette.set_tag(tag);
 }

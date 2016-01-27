@@ -37,7 +37,7 @@ class cmos_40105_device :  public device_t
 {
 public:
 	// construction/destruction
-	cmos_40105_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cmos_40105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _dir> void set_dir_callback(_dir dir) { m_write_dir.set_callback(dir); }
 	template<class _dor> void set_dor_callback(_dor dor) { m_write_dor.set_callback(dor); }

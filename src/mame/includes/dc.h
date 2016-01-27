@@ -17,7 +17,7 @@
 class dc_state : public driver_device
 {
 	public:
-		dc_state(const machine_config &mconfig, device_type type, std::string tag)
+		dc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		dc_framebuffer_ram(*this, "frameram"),
 		dc_texture_ram(*this, "dc_texture_ram"),

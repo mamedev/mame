@@ -65,7 +65,7 @@ enum
 const device_type LH5801 = &device_creator<lh5801_cpu_device>;
 
 
-lh5801_cpu_device::lh5801_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+lh5801_cpu_device::lh5801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, LH5801, "LH5801", tag, owner, clock, "lh5801", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)

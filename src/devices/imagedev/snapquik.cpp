@@ -18,7 +18,7 @@ const device_type SNAPSHOT = &device_creator<snapshot_image_device>;
 //  snapshot_image_device - constructor
 //-------------------------------------------------
 
-snapshot_image_device::snapshot_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+snapshot_image_device::snapshot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SNAPSHOT, "Snapshot", tag, owner, clock, "snapshot_image", __FILE__),
 		device_image_interface(mconfig, *this),
 		m_file_extensions(nullptr),
@@ -29,7 +29,7 @@ snapshot_image_device::snapshot_image_device(const machine_config &mconfig, std:
 {
 }
 
-snapshot_image_device::snapshot_image_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+snapshot_image_device::snapshot_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_image_interface(mconfig, *this),
 	m_file_extensions(nullptr),
@@ -96,7 +96,7 @@ const device_type QUICKLOAD = &device_creator<quickload_image_device>;
 //  quickload_image_device - constructor
 //-------------------------------------------------
 
-quickload_image_device::quickload_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+quickload_image_device::quickload_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: snapshot_image_device(mconfig, QUICKLOAD, "Quickload", tag, owner, clock, "quickload", __FILE__)
 {
 }

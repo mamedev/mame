@@ -153,7 +153,7 @@ rom.
 
 const device_type T5182 = &device_creator<t5182_device>;
 
-t5182_device::t5182_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+t5182_device::t5182_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, T5182, "T5182 MCU", tag, owner, clock, "t5182", __FILE__),
 	m_ourcpu(*this, "t5182_z80"),
 	m_sharedram(*this, "sharedram"),

@@ -258,7 +258,7 @@ static MACHINE_CONFIG_FRAGMENT( cga )
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(isa8_cga_device, hsync_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(isa8_cga_device, vsync_changed))
 	MCFG_MC6845_RECONFIGURE_CB(isa8_cga_device, reconfigure)
-	MCFG_VIDEO_SET_SCREEN("")
+	MCFG_VIDEO_SET_SCREEN(nullptr)
 MACHINE_CONFIG_END
 
 
@@ -304,7 +304,7 @@ const rom_entry *isa8_cga_device::device_rom_region() const
 //  isa8_cga_device - constructor
 //-------------------------------------------------
 
-isa8_cga_device::isa8_cga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa8_cga_device::isa8_cga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8_CGA, "IBM Color/Graphics Monitor Adapter", tag, owner, clock, "cga", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
 		m_cga_config(*this, "cga_config"), m_framecnt(0), m_mode_control(0), m_color_select(0),
@@ -320,7 +320,7 @@ isa8_cga_device::isa8_cga_device(const machine_config &mconfig, std::string tag,
 	m_superimpose = false;
 }
 
-isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this),
 		m_cga_config(*this, "cga_config"), m_framecnt(0), m_mode_control(0), m_color_select(0),
@@ -443,7 +443,7 @@ const device_type ISA8_CGA_POISK2 = &device_creator<isa8_cga_poisk2_device>;
 //  isa8_cga_poisk2_device - constructor
 //-------------------------------------------------
 
-isa8_cga_poisk2_device::isa8_cga_poisk2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa8_cga_poisk2_device::isa8_cga_poisk2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		isa8_cga_device( mconfig, ISA8_CGA_POISK2, "ISA8_CGA_POISK2", tag, owner, clock, "cga_poisk2", __FILE__)
 {
 	m_chr_gen_offset[0] = 0x0000;
@@ -472,13 +472,13 @@ const device_type ISA8_CGA_SUPERIMPOSE = &device_creator<isa8_cga_superimpose_de
 //  isa8_cga_superimpose_device - constructor
 //-------------------------------------------------
 
-isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		isa8_cga_device( mconfig, ISA8_CGA_SUPERIMPOSE, "ISA8_CGA_SUPERIMPOSE", tag, owner, clock, "cga_superimpose", __FILE__)
 {
 	m_superimpose = true;
 }
 
-isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		isa8_cga_device( mconfig, type, name, tag, owner, clock, shortname, source)
 {
 	m_superimpose = true;
@@ -1548,7 +1548,7 @@ const UINT8 isa8_cga_pc1512_device::mc6845_writeonce_register[31] =
 //  isa8_cga_pc1512_device - constructor
 //-------------------------------------------------
 
-isa8_cga_pc1512_device::isa8_cga_pc1512_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa8_cga_pc1512_device::isa8_cga_pc1512_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		isa8_cga_device( mconfig, ISA8_CGA_PC1512, "ISA8_CGA_PC1512", tag, owner, clock, "cga_pc1512", __FILE__), m_write(0), m_read(0), m_mc6845_address(0)
 {
 	m_vram_size = 0x10000;
@@ -1677,7 +1677,7 @@ const device_type ISA8_WYSE700 = &device_creator<isa8_wyse700_device>;
 //  isa8_wyse700_device - constructor
 //-------------------------------------------------
 
-isa8_wyse700_device::isa8_wyse700_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa8_wyse700_device::isa8_wyse700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		isa8_cga_device( mconfig, ISA8_WYSE700, "Wyse 700", tag, owner, clock, "wyse700", __FILE__), m_bank_offset(0), m_bank_base(0), m_control(0)
 {
 	m_vram_size = 0x20000;
@@ -1765,7 +1765,7 @@ const device_type ISA8_EC1841_0002 = &device_creator<isa8_ec1841_0002_device>;
 //  isa8_ec1841_0002_device - constructor
 //-------------------------------------------------
 
-isa8_ec1841_0002_device::isa8_ec1841_0002_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa8_ec1841_0002_device::isa8_ec1841_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		isa8_cga_device( mconfig, ISA8_EC1841_0002, "EC 1841.0002 (CGA)", tag, owner, clock, "ec1841_0002", __FILE__), m_p3df(0)
 {
 }
@@ -1845,7 +1845,7 @@ const device_type ISA8_CGA_MC1502 = &device_creator<isa8_cga_mc1502_device>;
 //  isa8_cga_mc1502_device - constructor
 //-------------------------------------------------
 
-isa8_cga_mc1502_device::isa8_cga_mc1502_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa8_cga_mc1502_device::isa8_cga_mc1502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		isa8_cga_device( mconfig, ISA8_CGA_MC1502, "MC1502 CGA", tag, owner, clock, "cga_mc1502", __FILE__)
 {
 	m_vram_size = 0x8000;
@@ -1874,7 +1874,7 @@ const device_type ISA8_CGA_ISKR1031 = &device_creator<isa8_cga_iskr1031_device>;
 //  isa8_cga_iskr1031_device - constructor
 //-------------------------------------------------
 
-isa8_cga_iskr1031_device::isa8_cga_iskr1031_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa8_cga_iskr1031_device::isa8_cga_iskr1031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		isa8_cga_device( mconfig, ISA8_CGA_ISKR1031, "Iskra-1031 CGA", tag, owner, clock, "cga_iskr1031", __FILE__)
 {
 }
@@ -1899,7 +1899,7 @@ const device_type ISA8_CGA_ISKR1030M = &device_creator<isa8_cga_iskr1030m_device
 //  isa8_cga_iskr1030m_device - constructor
 //-------------------------------------------------
 
-isa8_cga_iskr1030m_device::isa8_cga_iskr1030m_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa8_cga_iskr1030m_device::isa8_cga_iskr1030m_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		isa8_cga_device( mconfig, ISA8_CGA_ISKR1030M, "Iskra-1030M CGA", tag, owner, clock, "cga_iskr1030m", __FILE__)
 {
 }
@@ -1930,7 +1930,7 @@ machine_config_constructor isa8_cga_m24_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( m24 );
 }
-isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		isa8_cga_device( mconfig, ISA8_CGA_M24, "Olivetti M24 CGA", tag, owner, clock, "cga_m24", __FILE__), m_mode2(0), m_index(0)
 {
 	m_vram_size = 0x8000;

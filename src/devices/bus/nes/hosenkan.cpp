@@ -32,7 +32,7 @@
 const device_type NES_HOSENKAN = &device_creator<nes_hosenkan_device>;
 
 
-nes_hosenkan_device::nes_hosenkan_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_hosenkan_device::nes_hosenkan_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_HOSENKAN, "NES Cart HOSENKAN PCB", tag, owner, clock, "nes_hosenkan", __FILE__),
 	m_irq_count(0),
 	m_irq_count_latch(0),

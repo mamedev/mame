@@ -80,7 +80,7 @@ Notes:
 class dblewing_state : public driver_device
 {
 public:
-	dblewing_state(const machine_config &mconfig, device_type type, std::string tag)
+	dblewing_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_deco104(*this, "ioprot104"),
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),

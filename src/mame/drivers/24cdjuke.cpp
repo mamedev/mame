@@ -60,7 +60,7 @@ http://www.tilt.it/deb/i-midcoin.html
 class midcoin24cdjuke_state : public driver_device
 {
 public:
-	midcoin24cdjuke_state(const machine_config &mconfig, device_type type, std::string tag)
+	midcoin24cdjuke_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_io_row0(*this, "ROW0"),

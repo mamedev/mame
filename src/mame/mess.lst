@@ -120,7 +120,7 @@ dcdev    // 1998 Sega HKT-0120 Sega Dreamcast Development Box
 svmu     // 1998 Sega Visual Memory Unit
 
 // Sequential Circuits
-prpht600	// 1983 Sequential Circuits
+prpht600    // 1983 Sequential Circuits
 
 // Sony
 psj    // 1994 Sony PlayStation (Japan)
@@ -2034,7 +2034,18 @@ newbrainmd
 mm1m6
 mm1m7
 
+noki3210
+noki7110
+noki8210
+noki8850
 noki3310
+noki6210
+noki6250
+noki8250
+noki8890
+noki3330
+noki3410
+noki5210
 
 // Nuova Elettronica
 z80ne    // 1980 - Z80NE
@@ -2136,10 +2147,15 @@ vccg
 vccfr
 vccsp
 uvc
+uvcg
+uvcfr
+uvcsp
 bridgec3
 vbrc
 vsc
 csc
+fscc12
+fexcelv
 
 // Hegener & Glaser Munich
 //mephisto  // Mephisto 1 - roms needed - not in driver
@@ -2357,6 +2373,7 @@ alnchase    // Tomy
 
 // hh_ucom4 derivatives
 tb303       // Roland
+tr606       // Roland
 
 // other
 tama        // Bandai
@@ -2388,6 +2405,7 @@ ds348 //Sigtron Daruma
 mc1000
 d6809
 mp68a
+md6802
 mk85
 mk90
 elwro800

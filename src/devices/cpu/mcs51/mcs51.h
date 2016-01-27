@@ -77,7 +77,7 @@ class mcs51_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	mcs51_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, UINT8 features = 0);
+	mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features = 0);
 
 	void i8051_set_serial_tx_callback(write8_delegate tx_func);
 	void i8051_set_serial_rx_callback(read8_delegate rx_func);
@@ -362,21 +362,21 @@ class i8031_device : public mcs51_cpu_device
 {
 public:
 	// construction/destruction
-	i8031_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class i8051_device : public mcs51_cpu_device
 {
 public:
 	// construction/destruction
-	i8051_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class i8751_device : public mcs51_cpu_device
 {
 public:
 	// construction/destruction
-	i8751_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8751_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -384,8 +384,8 @@ class i8052_device : public mcs51_cpu_device
 {
 public:
 	// construction/destruction
-	i8052_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	i8052_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, UINT8 features = 0);
+	i8052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8052_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features = 0);
 
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
@@ -399,21 +399,21 @@ class i8032_device : public i8052_device
 {
 public:
 	// construction/destruction
-	i8032_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class i8752_device : public i8052_device
 {
 public:
 	// construction/destruction
-	i8752_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8752_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class i80c31_device : public i8052_device
 {
 public:
 	// construction/destruction
-	i80c31_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i80c31_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
@@ -424,8 +424,8 @@ class i80c51_device : public mcs51_cpu_device
 {
 public:
 	// construction/destruction
-	i80c51_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	i80c51_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, UINT8 features = 0);
+	i80c51_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i80c51_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features = 0);
 
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
@@ -435,7 +435,7 @@ class i87c51_device : public i80c51_device
 {
 public:
 	// construction/destruction
-	i87c51_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i87c51_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -443,8 +443,8 @@ class i80c52_device : public i8052_device
 {
 public:
 	// construction/destruction
-	i80c52_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	i80c52_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, UINT8 features = 0);
+	i80c52_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i80c52_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features = 0);
 
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
@@ -458,21 +458,21 @@ class i80c32_device : public i80c52_device
 {
 public:
 	// construction/destruction
-	i80c32_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i80c32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class i87c52_device : public i80c52_device
 {
 public:
 	// construction/destruction
-	i87c52_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i87c52_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class at89c4051_device : public i80c51_device
 {
 public:
 	// construction/destruction
-	at89c4051_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	at89c4051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 /*
@@ -500,7 +500,7 @@ class ds5002fp_device : public mcs51_cpu_device
 {
 public:
 	// construction/destruction
-	ds5002fp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ds5002fp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void set_mcon(device_t &device, UINT8 mcon) { downcast<ds5002fp_device &>(device).m_ds5002fp.mcon = mcon; }
 	static void set_rpctl(device_t &device, UINT8 rpctl) { downcast<ds5002fp_device &>(device).m_ds5002fp.rpctl = rpctl; }

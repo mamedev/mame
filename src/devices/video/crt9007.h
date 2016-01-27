@@ -99,7 +99,7 @@ class crt9007_t :  public device_t,
 {
 public:
 	// construction/destruction
-	crt9007_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	crt9007_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void static_set_character_width(device_t &device, int value) { downcast<crt9007_t &>(device).m_hpixels_per_column = value; }
 

@@ -258,7 +258,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 class rainbow_state : public driver_device
 {
 public:
-	rainbow_state(const machine_config &mconfig, device_type type, std::string tag) :
+	rainbow_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 
 #ifdef KEYBOARD_WORKAROUND

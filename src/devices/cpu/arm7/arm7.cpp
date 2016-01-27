@@ -54,7 +54,7 @@ const device_type PXA255 = &device_creator<pxa255_cpu_device>;
 const device_type SA1110 = &device_creator<sa1110_cpu_device>;
 
 
-arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, ARM7, "ARM7", tag, owner, clock, "arm7", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_endian(ENDIANNESS_LITTLE)
@@ -67,7 +67,7 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, std::string tag,
 }
 
 
-arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, UINT8 archRev, UINT8 archFlags, endianness_t endianness)
+arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, UINT8 archRev, UINT8 archFlags, endianness_t endianness)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", endianness, 32, 32, 0)
 	, m_endian(endianness)
@@ -80,20 +80,20 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type
 }
 
 
-arm7_be_cpu_device::arm7_be_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+arm7_be_cpu_device::arm7_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: arm7_cpu_device(mconfig, ARM7_BE, "ARM7 (big endian)", tag, owner, clock, "arm7_be", __FILE__, 4, eARM_ARCHFLAGS_T, ENDIANNESS_BIG)
 {
 }
 
 
-arm7500_cpu_device::arm7500_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+arm7500_cpu_device::arm7500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: arm7_cpu_device(mconfig, ARM7500, "ARM7500", tag, owner, clock, "arm7500", __FILE__, 3, eARM_ARCHFLAGS_MODE26)
 {
 	m_copro_id = (0x41 << 24) | (0 << 20) | (1 << 16) | (0x710 << 4) | (0 << 0);
 }
 
 
-arm9_cpu_device::arm9_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+arm9_cpu_device::arm9_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: arm7_cpu_device(mconfig, ARM9, "ARM9", tag, owner, clock, "arm9", __FILE__, 5, eARM_ARCHFLAGS_T | eARM_ARCHFLAGS_E)
 	// ARMv5
 	// has TE extensions
@@ -101,7 +101,7 @@ arm9_cpu_device::arm9_cpu_device(const machine_config &mconfig, std::string tag,
 }
 
 
-arm920t_cpu_device::arm920t_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+arm920t_cpu_device::arm920t_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: arm7_cpu_device(mconfig, ARM920T, "ARM920T", tag, owner, clock, "arm920t", __FILE__, 4, eARM_ARCHFLAGS_T)
 	// ARMv4
 	// has T extension
@@ -110,7 +110,7 @@ arm920t_cpu_device::arm920t_cpu_device(const machine_config &mconfig, std::strin
 }
 
 
-pxa255_cpu_device::pxa255_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pxa255_cpu_device::pxa255_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: arm7_cpu_device(mconfig, PXA255, "PXA255", tag, owner, clock, "pxa255", __FILE__, 5, eARM_ARCHFLAGS_T | eARM_ARCHFLAGS_E | eARM_ARCHFLAGS_XSCALE)
 	// ARMv5
 	// has TE and XScale extensions
@@ -118,7 +118,7 @@ pxa255_cpu_device::pxa255_cpu_device(const machine_config &mconfig, std::string 
 }
 
 
-sa1110_cpu_device::sa1110_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sa1110_cpu_device::sa1110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: arm7_cpu_device(mconfig, SA1110, "SA1110", tag, owner, clock, "sa1110", __FILE__, 4, eARM_ARCHFLAGS_SA)
 	// ARMv4
 	// has StrongARM, no Thumb, no Enhanced DSP

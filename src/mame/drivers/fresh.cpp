@@ -31,7 +31,7 @@ rom 5 and 6 are prg roms
 class fresh_state : public driver_device
 {
 public:
-	fresh_state(const machine_config &mconfig, device_type type, std::string tag)
+	fresh_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_bg_2_videoram(*this, "bg_videoram_2"),

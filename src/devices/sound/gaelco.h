@@ -40,11 +40,11 @@ class gaelco_gae1_device : public device_t,
 							public device_sound_interface
 {
 public:
-	gaelco_gae1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	gaelco_gae1_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	gaelco_gae1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gaelco_gae1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~gaelco_gae1_device() { }
 
-	static void set_snd_data_tag(device_t &device, std::string tag) { downcast<gaelco_gae1_device &>(device).m_data_tag = tag; }
+	static void set_snd_data_tag(device_t &device, const char *tag) { downcast<gaelco_gae1_device &>(device).m_data_tag = tag; }
 	static void set_bank_offsets(device_t &device, int offs1, int offs2, int offs3, int offs4)
 	{
 		gaelco_gae1_device &dev = downcast<gaelco_gae1_device &>(device);
@@ -72,7 +72,7 @@ private:
 	int m_banks[4];                                         /* start of each ROM bank */
 	gaelco_sound_channel m_channel[GAELCO_NUM_CHANNELS];    /* 7 stereo channels */
 
-	std::string m_data_tag;
+	const char *m_data_tag;
 
 	UINT16 m_sndregs[0x38];
 
@@ -89,7 +89,7 @@ extern const device_type GAELCO_GAE1;
 class gaelco_cg1v_device : public gaelco_gae1_device
 {
 public:
-	gaelco_cg1v_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gaelco_cg1v_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type GAELCO_CG1V;

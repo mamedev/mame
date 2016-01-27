@@ -166,7 +166,7 @@ const UINT8 i80286_cpu_device::m_i80286_timing[] =
 
 const device_type I80286 = &device_creator<i80286_cpu_device>;
 
-i80286_cpu_device::i80286_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i80286_cpu_device::i80286_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i8086_common_cpu_device(mconfig, I80286, "I80286", tag, owner, clock, "i80286", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, 0)
@@ -1367,7 +1367,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 					if (tmp<low || tmp>high)
 						interrupt(5);
 					CLK(BOUND);
-					logerror("%s: %06x: bound %04x high %04x low %04x tmp\n", tag().c_str(), pc(), high, low, tmp);
+					logerror("%s: %06x: bound %04x high %04x low %04x tmp\n", tag(), pc(), high, low, tmp);
 				}
 				break;
 
@@ -1444,7 +1444,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 					m_modrm = fetch();
 					if((m_modrm & 0x38) > 0x18)
 					{
-						logerror("%s: %06x: Mov Sreg - Invalid register\n", tag().c_str(), pc());
+						logerror("%s: %06x: Mov Sreg - Invalid register\n", tag(), pc());
 						throw TRAP(FAULT_UD, (UINT16)-1);
 					}
 					PutRMWord(m_sregs[(m_modrm & 0x38) >> 3]);
@@ -1468,7 +1468,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 							data_descriptor(DS, m_src);
 							break;
 						default:
-							logerror("%s: %06x: Mov Sreg - Invalid register\n", tag().c_str(), pc());
+							logerror("%s: %06x: Mov Sreg - Invalid register\n", tag(), pc());
 							throw TRAP(FAULT_UD, (UINT16)-1);
 					}
 					break;
@@ -1731,7 +1731,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 				case 0xf0: // i_lock
 					if(PM && (CPL > m_IOPL))
 						throw TRAP(FAULT_GP, 0);
-					logerror("%s: %06x: Warning - BUSLOCK\n", tag().c_str(), pc());
+					logerror("%s: %06x: Warning - BUSLOCK\n", tag(), pc());
 					m_no_interrupt = 1;
 					CLK(NOP);
 					break;
@@ -1808,7 +1808,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 							CLKM(PUSH_R16,PUSH_M16);
 							break;
 						default:
-							logerror("%s: %06x: FF Pre with unimplemented mod\n", tag().c_str(), pc());
+							logerror("%s: %06x: FF Pre with unimplemented mod\n", tag(), pc());
 							throw TRAP(FAULT_UD,(UINT16)-1);
 						}
 					}
@@ -1844,7 +1844,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 					if(!common_op(op))
 					{
 						m_icount -= 10; // UD fault timing?
-						logerror("%s: %06x: Invalid Opcode %02x\n", tag().c_str(), pc(), op);
+						logerror("%s: %06x: Invalid Opcode %02x\n", tag(), pc(), op);
 						m_ip = m_prev_ip;
 						throw TRAP(FAULT_UD, (UINT16)-1);
 					}

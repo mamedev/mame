@@ -8,12 +8,12 @@
 class k001604_device : public device_t
 {
 public:
-	k001604_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k001604_device() {}
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
-	static void static_set_palette_tag(device_t &device, std::string tag);
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_gfx_index_1(device_t &device, int idx) { downcast<k001604_device &>(device).m_gfx_index_1 = idx; }
 	static void set_gfx_index_2(device_t &device, int idx) { downcast<k001604_device &>(device).m_gfx_index_2 = idx; }
 	static void set_layer_size(device_t &device, int size) { downcast<k001604_device &>(device).m_layer_size = size; }

@@ -201,7 +201,7 @@ static ADDRESS_MAP_START(data_8bit, AS_DATA, 8, mcs48_cpu_device)
 ADDRESS_MAP_END
 
 
-mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int rom_size, int ram_size, UINT8 feature_mask)
+mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int rom_size, int ram_size, UINT8 feature_mask)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0
 		, ( ( rom_size == 1024 ) ? ADDRESS_MAP_NAME(program_10bit) : ( ( rom_size == 2048 ) ? ADDRESS_MAP_NAME(program_11bit) : ( ( rom_size == 4096 ) ? ADDRESS_MAP_NAME(program_12bit) : nullptr ) ) ))
@@ -224,102 +224,102 @@ mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type ty
 	}
 }
 
-i8021_device::i8021_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8021_device::i8021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs48_cpu_device(mconfig, I8021, "I8021", tag, owner, clock, "i8021", 1024, 64)
 {
 }
 
-i8022_device::i8022_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8022_device::i8022_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs48_cpu_device(mconfig, I8022, "I8022", tag, owner, clock, "i8022", 2048, 128)
 {
 }
 
-i8035_device::i8035_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8035_device::i8035_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs48_cpu_device(mconfig, I8035, "I8035", tag, owner, clock, "i8035", 0, 64)
 {
 }
 
-i8048_device::i8048_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8048_device::i8048_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs48_cpu_device(mconfig, I8048, "I8048", tag, owner, clock, "i8048", 1024, 64)
 {
 }
 
-i8648_device::i8648_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8648_device::i8648_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs48_cpu_device(mconfig, I8648, "I8648", tag, owner, clock, "i8648", 1024, 64)
 {
 }
 
-i8748_device::i8748_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8748_device::i8748_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs48_cpu_device(mconfig, I8748, "I8748", tag, owner, clock, "i8748", 1024, 64)
 {
 }
 
-i8039_device::i8039_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8039_device::i8039_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs48_cpu_device(mconfig, I8039, "I8039", tag, owner, clock, "i8039", 0, 128)
 {
 }
 
-i8049_device::i8049_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8049_device::i8049_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs48_cpu_device(mconfig, I8049, "I8049", tag, owner, clock, "i8049", 2048, 128)
 {
 }
 
-i8749_device::i8749_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8749_device::i8749_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs48_cpu_device(mconfig, I8749, "I8749", tag, owner, clock, "i8749", 2048, 128)
 {
 }
 
-i8040_device::i8040_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8040_device::i8040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs48_cpu_device(mconfig, I8040, "I8040", tag, owner, clock, "i8040", 0, 256)
 {
 }
 
-i8050_device::i8050_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8050_device::i8050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs48_cpu_device(mconfig, I8050, "I8050", tag, owner, clock, "i8050", 4096, 256)
 {
 }
 
-mb8884_device::mb8884_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mb8884_device::mb8884_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs48_cpu_device(mconfig, MB8884, "MB8884", tag, owner, clock, "mb8884", 0, 64)
 {
 }
 
-n7751_device::n7751_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+n7751_device::n7751_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs48_cpu_device(mconfig, N7751, "N7751", tag, owner, clock, "n7751", 1024, 64)
 {
 }
 
-m58715_device::m58715_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+m58715_device::m58715_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mcs48_cpu_device(mconfig, M58715, "M58715", tag, owner, clock, "m58715", 2048, 128)
 {
 }
 
-upi41_cpu_device::upi41_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int rom_size, int ram_size)
+upi41_cpu_device::upi41_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int rom_size, int ram_size)
 	: mcs48_cpu_device(mconfig, type, name, tag, owner, clock, shortname, rom_size, ram_size, UPI41_FEATURE)
 {
 }
 
-i8041_device::i8041_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8041_device::i8041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: upi41_cpu_device(mconfig, I8041, "I8041", tag, owner, clock, "i8041", 1024, 128)
 {
 }
 
-i8741_device::i8741_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8741_device::i8741_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: upi41_cpu_device(mconfig, I8741, "I8741", tag, owner, clock, "i8741", 1024, 128)
 {
 }
 
-i8042_device::i8042_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8042_device::i8042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: upi41_cpu_device(mconfig, I8042, "I8042", tag, owner, clock, "i8042", 2048, 256)
 {
 }
 
-i8242_device::i8242_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8242_device::i8242_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: upi41_cpu_device(mconfig, I8242, "I8242", tag, owner, clock, "i8242", 2048, 256)
 {
 }
 
-i8742_device::i8742_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8742_device::i8742_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: upi41_cpu_device(mconfig, I8742, "I8742", tag, owner, clock, "i8742", 2048, 256)
 {
 }

@@ -40,7 +40,7 @@ const rom_entry *sega_837_13551::device_rom_region() const
 	return ROM_NAME(jvs13551);
 }
 
-void sega_837_13551::static_set_port_tag(device_t &device, int port, std::string tag)
+void sega_837_13551::static_set_port_tag(device_t &device, int port, const char *tag)
 {
 	sega_837_13551 &ctrl = downcast<sega_837_13551 &>(device);
 	ctrl.port_tag[port] = tag;
@@ -51,8 +51,9 @@ ioport_constructor sega_837_13551::device_input_ports() const
 	return INPUT_PORTS_NAME(sega_837_13551_coins);
 }
 
-sega_837_13551::sega_837_13551(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : jvs_device(mconfig, SEGA_837_13551, "Sega 837-13551 I/O Board", tag, owner, clock, "jvs13551", __FILE__)
+sega_837_13551::sega_837_13551(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : jvs_device(mconfig, SEGA_837_13551, "Sega 837-13551 I/O Board", tag, owner, clock, "jvs13551", __FILE__)
 {
+	memset(port_tag, 0, sizeof(port_tag));
 }
 
 const char *sega_837_13551::device_id()

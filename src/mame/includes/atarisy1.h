@@ -13,7 +13,7 @@
 class atarisy1_state : public atarigen_state
 {
 public:
-	atarisy1_state(const machine_config &mconfig, device_type type, std::string tag)
+	atarisy1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
 			m_bankselect(*this, "bankselect"),
 			m_mob(*this, "mob"),

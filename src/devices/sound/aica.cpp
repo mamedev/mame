@@ -414,17 +414,15 @@ void aica_device::Init()
 	m_MidiOutR=m_MidiOutW=0;
 
 	// get AICA RAM
+	if (m_ram_region != NULL)
 	{
-		m_AICARAM = region()->base();
-		if (m_AICARAM)
-		{
-			m_AICARAM += m_roffset;
-			m_AICARAM_LENGTH = region()->bytes();
-			m_RAM_MASK = m_AICARAM_LENGTH-1;
-			m_RAM_MASK16 = m_RAM_MASK & 0x7ffffe;
-			m_DSP.AICARAM = (UINT16 *)m_AICARAM;
-			m_DSP.AICARAM_LENGTH = m_AICARAM_LENGTH/2;
-		}
+		m_AICARAM = m_ram_region->base();
+		m_AICARAM += m_roffset;
+		m_AICARAM_LENGTH = m_ram_region->bytes();
+		m_RAM_MASK = m_AICARAM_LENGTH-1;
+		m_RAM_MASK16 = m_RAM_MASK & 0x7ffffe;
+		m_DSP.AICARAM = (UINT16 *)m_AICARAM;
+		m_DSP.AICARAM_LENGTH = m_AICARAM_LENGTH/2;
 	}
 
 	m_timerA = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aica_device::timerA_cb), this));
@@ -1466,13 +1464,14 @@ READ16_MEMBER( aica_device::midi_out_r )
 
 const device_type AICA = &device_creator<aica_device>;
 
-aica_device::aica_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+aica_device::aica_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AICA, "AICA", tag, owner, clock, "aica", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_master(false),
 		m_roffset(0),
 		m_irq_cb(*this),
 		m_main_irq_cb(*this),
+		m_ram_region(*this, this->tag()),
 		m_IRQL(0),
 		m_IRQR(0),
 		m_BUFPTR(0),

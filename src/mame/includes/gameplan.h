@@ -34,7 +34,7 @@ public:
 		TIMER_VIA_0_CAL
 	};
 
-	gameplan_state(const machine_config &mconfig, device_type type, std::string tag)
+	gameplan_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_trvquest_question(*this, "trvquest_q"),
 			m_maincpu(*this, "maincpu"),

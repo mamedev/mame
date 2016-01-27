@@ -9,7 +9,7 @@
 extern const device_type CMC_PROT = &device_creator<cmc_prot_device>;
 
 
-cmc_prot_device::cmc_prot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+cmc_prot_device::cmc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CMC_PROT, "NeoGeo Protection (CMC)", tag, owner, clock, "cmc_prot", __FILE__),
 	type0_t03(nullptr),
 	type0_t12(nullptr),

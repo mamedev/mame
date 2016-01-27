@@ -1,11 +1,11 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski, Phil Stroffolino, Tomasz Slanina
 
 
 class changela_state : public driver_device
 {
 public:
-	changela_state(const machine_config &mconfig, device_type type, std::string tag)
+	changela_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),

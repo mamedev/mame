@@ -92,7 +92,7 @@ class tms1xxx_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tms1xxx_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source)
+	tms1xxx_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_BIG, byte_bits > 8 ? 16 : 8, prgwidth, 0, program)
 		, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
@@ -250,8 +250,8 @@ protected:
 class tms1000_cpu_device : public tms1xxx_cpu_device
 {
 public:
-	tms1000_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	tms1000_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source);
+	tms1000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1000_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 protected:
 	// overrides
@@ -265,28 +265,28 @@ protected:
 class tms1070_cpu_device : public tms1000_cpu_device
 {
 public:
-	tms1070_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms1070_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class tms1040_cpu_device : public tms1000_cpu_device
 {
 public:
-	tms1040_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms1040_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms1200_cpu_device : public tms1000_cpu_device
 {
 public:
-	tms1200_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms1200_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms1100_cpu_device : public tms1000_cpu_device
 {
 public:
-	tms1100_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	tms1100_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source);
+	tms1100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1100_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 protected:
 	// overrides
@@ -301,27 +301,27 @@ protected:
 class tms1170_cpu_device : public tms1100_cpu_device
 {
 public:
-	tms1170_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms1170_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class tms1300_cpu_device : public tms1100_cpu_device
 {
 public:
-	tms1300_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms1300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class tms1370_cpu_device : public tms1100_cpu_device
 {
 public:
-	tms1370_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms1370_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms1400_cpu_device : public tms1100_cpu_device
 {
 public:
-	tms1400_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	tms1400_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source);
+	tms1400_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1400_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 protected:
 	// overrides
@@ -339,29 +339,29 @@ protected:
 class tms1470_cpu_device : public tms1400_cpu_device
 {
 public:
-	tms1470_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms1470_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms1600_cpu_device : public tms1400_cpu_device
 {
 public:
-	tms1600_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	tms1600_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source);
+	tms1600_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1600_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 };
 
 class tms1670_cpu_device : public tms1600_cpu_device
 {
 public:
-	tms1670_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms1670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms0970_cpu_device : public tms1000_cpu_device
 {
 public:
-	tms0970_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	tms0970_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source);
+	tms0970_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms0970_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 protected:
 	// overrides
@@ -377,7 +377,7 @@ protected:
 class tms0950_cpu_device : public tms0970_cpu_device
 {
 public:
-	tms0950_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms0950_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// overrides
@@ -391,15 +391,15 @@ protected:
 class tms1990_cpu_device : public tms0970_cpu_device
 {
 public:
-	tms1990_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms1990_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms0980_cpu_device : public tms0970_cpu_device
 {
 public:
-	tms0980_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	tms0980_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source);
+	tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms0980_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 protected:
 	// overrides
@@ -423,7 +423,7 @@ protected:
 class tms1980_cpu_device : public tms0980_cpu_device
 {
 public:
-	tms1980_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms1980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// overrides
@@ -440,7 +440,7 @@ protected:
 class tms0270_cpu_device : public tms0980_cpu_device
 {
 public:
-	tms0270_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_read_ctl_callback(device_t &device, _Object object) { return downcast<tms0270_cpu_device &>(device).m_read_ctl.set_callback(object); }

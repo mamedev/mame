@@ -98,7 +98,7 @@ ROM_END
 
 const device_type NMK004 = &device_creator<nmk004_device>;
 
-nmk004_device::nmk004_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nmk004_device::nmk004_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NMK004, "NMK004", tag, owner, clock, "nmk004", __FILE__),
 	m_cpu(*this, "mcu"),
 	m_systemcpu(*this, ":maincpu"),

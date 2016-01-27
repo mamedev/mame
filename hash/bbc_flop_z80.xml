@@ -8,7 +8,7 @@
       Reset with Z80 co-processor enabled and Acorn CP/M System Disc 1 in drive 0.
 -->
 
-<softwarelist name="bbc_z80_flop" description="Z80 Co-Processor Discs">
+<softwarelist name="bbc_flop_z80" description="Z80 Co-Processor Discs">
 
 	<software name="cpmsys" supported="no">
 		<description>Acorn CP/M System Discs</description>

@@ -537,7 +537,7 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 
 const device_type SEGA_S32_PCB = &device_creator<segas32_state>;
 
-segas32_state::segas32_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+segas32_state::segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, SEGA_S32_PCB, "Sega System 32 PCB", tag, owner, clock, "segas32_pcb", __FILE__),
 		m_z80_shared_ram(*this,"z80_shared_ram"),
 		m_ga2_dpram(*this,"ga2_dpram"),
@@ -2521,7 +2521,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_S32_REGULAR_DEVICE = &device_creator<segas32_regular_state>;
 
-segas32_regular_state::segas32_regular_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+segas32_regular_state::segas32_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: segas32_state(mconfig, tag, owner, clock)
 {
 }
@@ -2545,7 +2545,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_S32_V25_DEVICE = &device_creator<segas32_v25_state>;
 
-segas32_v25_state::segas32_v25_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+segas32_v25_state::segas32_v25_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: segas32_state(mconfig, tag, owner, clock)
 {
 }
@@ -2608,7 +2608,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGA_MULTI32_DEVICE = &device_creator<sega_multi32_state>;
 
-sega_multi32_state::sega_multi32_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_multi32_state::sega_multi32_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: segas32_state(mconfig, tag, owner, clock)
 {
 }
@@ -2622,7 +2622,7 @@ machine_config_constructor sega_multi32_state::device_mconfig_additions() const
 class segas32_new_state : public driver_device
 {
 public:
-	segas32_new_state(const machine_config &mconfig, device_type type, std::string tag)
+	segas32_new_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_mainpcb(*this, "mainpcb"),
 	m_slavepcb(*this, "slavepcb")

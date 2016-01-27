@@ -32,7 +32,7 @@
 class hx20_state : public driver_device
 {
 public:
-	hx20_state(const machine_config &mconfig, device_type type, std::string tag)
+	hx20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, HD6301V1_MAIN_TAG),
 			m_subcpu(*this, HD6301V1_SLAVE_TAG),

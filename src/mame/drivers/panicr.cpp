@@ -69,7 +69,7 @@ D.9B         [f99cac4b] /
 class panicr_state : public driver_device
 {
 public:
-	panicr_state(const machine_config &mconfig, device_type type, std::string tag)
+	panicr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_t5182(*this, "t5182"),

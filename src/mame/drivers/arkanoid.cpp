@@ -900,7 +900,7 @@ ic45 = 74ls74
 ic46 = 74ls08
 ic87 = 74ls74
 ~VCC = 'pulled to vcc through a resistor'
-icxx.y = ic xx pin y                                  
+icxx.y = ic xx pin y
                                                                                +--------\_/--------+
                                                         GND -- =   VSS(GND) -- |  1             28 | <- /RESET  = <- ~VCC & ic32.9 (4Q) & ic26.13 (/reset2) & ic26.1 (/reset1)
                          ~VCC & ic26.6 (/1Q) & ic9.10 (I1C) -> =       /INT -> |  2             27 | <> PA7     = -> ic27.18 (8D)
@@ -1527,7 +1527,7 @@ ROM_START( arkanoiduo ) // V1.1 USA/Romstar
 	ROM_LOAD( "a75-07.ic24",    0x0000, 0x0200, CRC(0af8b289) SHA1(6bc589e8a609b4cf450aebedc8ce02d5d45c970f) )  /* Chip Silkscreen: "A75-07"; red component */
 	ROM_LOAD( "a75-08.ic23",    0x0200, 0x0200, CRC(abb002fb) SHA1(c14f56b8ef103600862e7930709d293b0aa97a73) )  /* Chip Silkscreen: "A75-08"; green component */
 	ROM_LOAD( "a75-09.ic22",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) )  /* Chip Silkscreen: "A75-09"; blue component */
-	
+
 	ROM_REGION( 0x8000, "altgfx", 0 )
 	ROM_LOAD( "a75__03(alternate).ic64",   0x00000, 0x8000, CRC(983d4485) SHA1(603a8798d1f531a70a527a5c6122f0ffd6adcfb6) ) // this was found on a legit v1.1 Romstar USA pcb with serial number 29342; the only difference seems to be the first 32 tiles are all 0xFF instead of 0x00. Those tiles don't seem to be used by the game at all. This is likely another incidence of "Taito forgot to clear programmer ram before burning a rom from a sparse s-record/ihex file"
 ROM_END

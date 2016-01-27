@@ -20,7 +20,7 @@ public:
 		TIMER_68705_PRESCALER_EXPIRED,
 	};
 
-	arkanoid_state(const machine_config &mconfig, device_type type, std::string tag)
+	arkanoid_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this,"videoram"),
 		m_spriteram(*this,"spriteram"),
@@ -54,7 +54,7 @@ public:
 	UINT8    m_toz80;           // byte latch for 68705->z80 comms
 
 	/* mcu internal related */
-	UINT8    m_port_a_in;    
+	UINT8    m_port_a_in;
 	UINT8    m_port_a_out;
 	UINT8    m_ddr_a;
 	UINT8    m_port_c_internal;

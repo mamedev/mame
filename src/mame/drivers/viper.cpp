@@ -373,7 +373,7 @@ static timer_device *ds2430_bit_timer;
 class viper_state : public driver_device
 {
 public:
-	viper_state(const machine_config &mconfig, device_type type, std::string tag)
+	viper_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ata(*this, "ata"),
@@ -441,6 +441,7 @@ UINT32 viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bit
 
 UINT32 m_mpc8240_regs[256/4];
 
+#ifdef UNUSED_FUNCTION
 static inline UINT64 read64le_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
@@ -459,12 +460,16 @@ static inline void write64le_with_32le_device_handler(write32_delegate handler, 
 	if (ACCESSING_BITS_32_63)
 		handler(space, offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
+#endif
 
 static inline UINT64 read64be_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, UINT64 mem_mask)
 {
-	UINT64 result;
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	result = read64le_with_32le_device_handler(handler, space, offset, mem_mask);
+	UINT64 result = 0;
+	if (ACCESSING_BITS_0_31)
+		result = (UINT64)(handler)(space, offset * 2, mem_mask & 0xffffffff);
+	if (ACCESSING_BITS_32_63)
+		result |= (UINT64)(handler)(space, offset * 2 + 1, mem_mask >> 32) << 32;
 	return FLIPENDIAN_INT64(result);
 }
 
@@ -473,7 +478,10 @@ static inline void write64be_with_32le_device_handler(write32_delegate handler, 
 {
 	data = FLIPENDIAN_INT64(data);
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	write64le_with_32le_device_handler(handler, space, offset, data, mem_mask);
+	if (ACCESSING_BITS_0_31)
+		handler(space, offset * 2, data & 0xffffffff, mem_mask & 0xffffffff);
+	if (ACCESSING_BITS_32_63)
+		handler(space, offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
 
 /*****************************************************************************/
@@ -2228,6 +2236,8 @@ ROM_END
 ROM_START(gticlub2ea) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("941eaa_nvram.u39", 0x00000, 0x2000, CRC(5ee7004d) SHA1(92e0ce01049308f459985d466fbfcfac82f34a47))
 
@@ -2491,6 +2501,8 @@ ROM_END
 ROM_START(wcombatk) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("wcombatk_nvram.u39", 0x00000, 0x2000, CRC(ebd4d645) SHA1(2fa7e2c6b113214f3eb1900c8ceef4d5fcf0bb76))
 
@@ -2500,6 +2512,8 @@ ROM_END
 
 ROM_START(wcombatu) //*
 	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("Warzaid u39 c22d02", 0x00000, 0x2000, CRC(71744990) SHA1(19ed07572f183e7b3a712704ebddf7a848c48a78) )

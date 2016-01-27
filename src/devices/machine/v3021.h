@@ -40,7 +40,7 @@ class v3021_device :    public device_t
 {
 public:
 	// construction/destruction
-	v3021_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	v3021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );

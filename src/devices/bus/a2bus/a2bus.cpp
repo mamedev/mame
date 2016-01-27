@@ -88,19 +88,19 @@ const device_type A2BUS_SLOT = &device_creator<a2bus_slot_device>;
 //-------------------------------------------------
 //  a2bus_slot_device - constructor
 //-------------------------------------------------
-a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, A2BUS_SLOT, "Apple II Slot", tag, owner, clock, "a2bus_slot", __FILE__),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this), m_a2bus_tag(nullptr), m_a2bus_slottag(nullptr)
 {
 }
 
-a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this), m_a2bus_tag(nullptr), m_a2bus_slottag(nullptr)
 {
 }
 
-void a2bus_slot_device::static_set_a2bus_slot(device_t &device, std::string tag, std::string slottag)
+void a2bus_slot_device::static_set_a2bus_slot(device_t &device, const char *tag, const char *slottag)
 {
 	a2bus_slot_device &a2bus_card = dynamic_cast<a2bus_slot_device &>(device);
 	a2bus_card.m_a2bus_tag = tag;
@@ -124,7 +124,7 @@ void a2bus_slot_device::device_start()
 
 const device_type A2BUS = &device_creator<a2bus_device>;
 
-void a2bus_device::static_set_cputag(device_t &device, std::string tag)
+void a2bus_device::static_set_cputag(device_t &device, const char *tag)
 {
 	a2bus_device &a2bus = downcast<a2bus_device &>(device);
 	a2bus.m_cputag = tag;
@@ -138,19 +138,19 @@ void a2bus_device::static_set_cputag(device_t &device, std::string tag)
 //  a2bus_device - constructor
 //-------------------------------------------------
 
-a2bus_device::a2bus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+a2bus_device::a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, A2BUS, "Apple II Bus", tag, owner, clock, "a2bus", __FILE__), m_maincpu(nullptr), m_maincpu_space(nullptr),
 		m_out_irq_cb(*this),
 		m_out_nmi_cb(*this),
-		m_out_inh_cb(*this), m_slot_irq_mask(0), m_slot_nmi_mask(0)
+		m_out_inh_cb(*this), m_cputag(nullptr), m_slot_irq_mask(0), m_slot_nmi_mask(0)
 {
 }
 
-a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr), m_maincpu_space(nullptr),
 		m_out_irq_cb(*this),
 		m_out_nmi_cb(*this),
-		m_out_inh_cb(*this), m_slot_irq_mask(0), m_slot_nmi_mask(0)
+		m_out_inh_cb(*this), m_cputag(nullptr), m_slot_irq_mask(0), m_slot_nmi_mask(0)
 {
 }
 //-------------------------------------------------
@@ -297,7 +297,7 @@ WRITE_LINE_MEMBER( a2bus_device::nmi_w ) { m_out_nmi_cb(state); }
 device_a2bus_card_interface::device_a2bus_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
 		m_a2bus(nullptr),
-		m_slot(0), m_next(nullptr)
+		m_a2bus_tag(nullptr), m_a2bus_slottag(nullptr), m_slot(0), m_next(nullptr)
 {
 }
 
@@ -310,7 +310,7 @@ device_a2bus_card_interface::~device_a2bus_card_interface()
 {
 }
 
-void device_a2bus_card_interface::static_set_a2bus_tag(device_t &device, std::string tag, std::string slottag)
+void device_a2bus_card_interface::static_set_a2bus_tag(device_t &device, const char *tag, const char *slottag)
 {
 	device_a2bus_card_interface &a2bus_card = dynamic_cast<device_a2bus_card_interface &>(device);
 	a2bus_card.m_a2bus_tag = tag;
@@ -320,7 +320,7 @@ void device_a2bus_card_interface::static_set_a2bus_tag(device_t &device, std::st
 void device_a2bus_card_interface::set_a2bus_device()
 {
 	// extract the slot number from the last digit of the slot tag
-	int tlen = m_a2bus_slottag.length();
+	int tlen = strlen(m_a2bus_slottag);
 
 	m_slot = (m_a2bus_slottag[tlen-1] - '0');
 

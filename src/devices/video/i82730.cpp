@@ -51,11 +51,11 @@ const char *i82730_device::m_command_names[] =
 //  i82730_device - constructor
 //-------------------------------------------------
 
-i82730_device::i82730_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+i82730_device::i82730_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, I82730, "I82730", tag, owner, clock, "i82730", __FILE__),
 	device_video_interface(mconfig, *this),
 	m_sint_handler(*this),
-	m_program(nullptr),
+	m_cpu_tag(nullptr), m_program(nullptr),
 	m_row_timer(nullptr),
 	m_initialized(false), m_mode_set(false),
 	m_ca(0),
@@ -73,7 +73,7 @@ i82730_device::i82730_device(const machine_config &mconfig, std::string tag, dev
 //  set_cpu_tag - set cpu we are attached to
 //-------------------------------------------------
 
-void i82730_device::set_cpu_tag(device_t &device, device_t *owner, std::string tag)
+void i82730_device::set_cpu_tag(device_t &device, device_t *owner, const char *tag)
 {
 	i82730_device &dev = dynamic_cast<i82730_device &>(device);
 	dev.m_cpu_tag = tag;
@@ -232,13 +232,13 @@ void i82730_device::mode_set()
 	// output some debug info
 	if (VERBOSE)
 	{
-		logerror("%s('%s'): ---- setting mode ----\n", shortname().c_str(), basetag().c_str());
-		logerror("%s('%s'): dma burst length %02x, space %02x\n", shortname().c_str(), basetag().c_str(), m_dma_burst_length, m_dma_burst_space);
-		logerror("%s('%s'): margin %02x, lpr %02x\n", shortname().c_str(), basetag().c_str(), m_margin, m_lpr);
+		logerror("%s('%s'): ---- setting mode ----\n", shortname(), basetag());
+		logerror("%s('%s'): dma burst length %02x, space %02x\n", shortname(), basetag(), m_dma_burst_length, m_dma_burst_space);
+		logerror("%s('%s'): margin %02x, lpr %02x\n", shortname(), basetag(), m_margin, m_lpr);
 		logerror("%s('%s'): hsyncstp: %02x, line_length: %02x, hfldstrt: %02x, hbrdstart: %02x, hfldstop: %02x, hbrdstop: %02x\n",
-			shortname().c_str(), basetag().c_str(), hsyncstp, line_length, m_hfldstrt, hbrdstrt, hfldstp, hbrdstp);
+			shortname(), basetag(), hsyncstp, line_length, m_hfldstrt, hbrdstrt, hfldstp, hbrdstp);
 		logerror("%s('%s'): frame_length %04x, vsyncstp: %04x, vfldstrt: %04x, vfldstp: %04x\n",
-			shortname().c_str(), basetag().c_str(), frame_length, m_vsyncstp, m_vfldstrt, m_vfldstp);
+			shortname(), basetag(), frame_length, m_vsyncstp, m_vfldstrt, m_vfldstp);
 	}
 }
 
@@ -248,7 +248,7 @@ void i82730_device::execute_command()
 	UINT16 tmp;
 
 	if (VERBOSE_COMMANDS && command < ARRAY_LENGTH(m_command_names))
-		logerror("%s('%s'): executing command: %s [cbp = %08x]\n", shortname().c_str(), basetag().c_str(), m_command_names[command], m_cbp);
+		logerror("%s('%s'): executing command: %s [cbp = %08x]\n", shortname(), basetag(), m_command_names[command], m_cbp);
 
 	tmp = read_word(m_cbp + 2);
 	m_list_switch = BIT(tmp, 6);
@@ -295,12 +295,12 @@ void i82730_device::execute_command()
 	case 0x06:
 		m_intmask = read_word(m_cbp + 22);
 		if (VERBOSE_COMMANDS)
-			logerror("%s('%s'): intmask now %04x\n", shortname().c_str(), basetag().c_str(), m_intmask);
+			logerror("%s('%s'): intmask now %04x\n", shortname(), basetag(), m_intmask);
 		break;
 
 	// LPEN ENABLE
 	case 0x07:
-		fatalerror("%s('%s'): Unimplemented command %s\n", shortname().c_str(), basetag().c_str(), m_command_names[command]);
+		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), m_command_names[command]);
 		break;
 
 	// READ STATUS
@@ -311,22 +311,22 @@ void i82730_device::execute_command()
 
 	// LD CUR POS
 	case 0x09:
-		fatalerror("%s('%s'): Unimplemented command %s\n", shortname().c_str(), basetag().c_str(), m_command_names[command]);
+		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), m_command_names[command]);
 		break;
 
 	// SELF TEST
 	case 0x0a:
-		fatalerror("%s('%s'): Unimplemented command %s\n", shortname().c_str(), basetag().c_str(), m_command_names[command]);
+		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), m_command_names[command]);
 		break;
 
 	// TEST ROW BUFFER
 	case 0x0b:
-		fatalerror("%s('%s'): Unimplemented command %s\n", shortname().c_str(), basetag().c_str(), m_command_names[command]);
+		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), m_command_names[command]);
 		break;
 
 	default:
 		if (VERBOSE_COMMANDS)
-			logerror("%s('%s'): executing command: (reserved) [cbp = %08x]\n", shortname().c_str(), basetag().c_str(), m_cbp);
+			logerror("%s('%s'): executing command: (reserved) [cbp = %08x]\n", shortname(), basetag(), m_cbp);
 		m_status |= RCC;
 		update_interrupts();
 		break;
@@ -356,12 +356,12 @@ void i82730_device::load_row()
 				m_sptr += 2;
 
 				if (VERBOSE_DATASTREAM)
-					logerror("%s('%s'): SET FIELD ATTRIB to %04x\n", shortname().c_str(), basetag().c_str(), m_field_attribute_mask);
+					logerror("%s('%s'): SET FIELD ATTRIB to %04x\n", shortname(), basetag(), m_field_attribute_mask);
 
 				break;
 
 			default:
-				fatalerror("%s('%s'): Unimplemented datastream command %02x\n", shortname().c_str(), basetag().c_str(), data >> 8);
+				fatalerror("%s('%s'): Unimplemented datastream command %02x\n", shortname(), basetag(), data >> 8);
 			}
 		}
 		else
@@ -468,7 +468,7 @@ TIMER_CALLBACK_MEMBER( i82730_device::row_update )
 WRITE_LINE_MEMBER( i82730_device::ca_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): ca_w %d\n", shortname().c_str(), basetag().c_str(), state);
+		logerror("%s('%s'): ca_w %d\n", shortname(), basetag(), state);
 
 	// falling edge
 	if (m_ca == 1 && state == 0)
@@ -493,10 +493,10 @@ WRITE_LINE_MEMBER( i82730_device::ca_w )
 			// output some debug info
 			if (VERBOSE)
 			{
-				logerror("%s('%s'): ---- initializing ----\n", shortname().c_str(), basetag().c_str());
-				logerror("%s('%s'): %s system bus\n", shortname().c_str(), basetag().c_str(), sysbus_16bit() ? "16-bit" : "8-bit");
-				logerror("%s('%s'): intermediate block pointer: %08x\n", shortname().c_str(), basetag().c_str(), m_ibp);
-				logerror("%s('%s'): addrbus: %s, clno: %d, clpos: %d, mode: %s, dtw16: %s, srdy: %s\n", shortname().c_str(), basetag().c_str(),
+				logerror("%s('%s'): ---- initializing ----\n", shortname(), basetag());
+				logerror("%s('%s'): %s system bus\n", shortname(), basetag(), sysbus_16bit() ? "16-bit" : "8-bit");
+				logerror("%s('%s'): intermediate block pointer: %08x\n", shortname(), basetag(), m_ibp);
+				logerror("%s('%s'): addrbus: %s, clno: %d, clpos: %d, mode: %s, dtw16: %s, srdy: %s\n", shortname(), basetag(),
 					BIT(scb, 0) ? "32-bit" : "16-bit", (scb >> 1) & 0x03, (scb >> 3) & 0x03,
 					BIT(scb, 5) ? "master" : "slave", BIT(scb, 6) ? "16-bit" : "8-bit", BIT(scb, 7) ? "synchronous" : "asynchronous");
 			}
@@ -515,7 +515,7 @@ WRITE_LINE_MEMBER( i82730_device::ca_w )
 WRITE_LINE_MEMBER( i82730_device::irst_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): irst_w %d\n", shortname().c_str(), basetag().c_str(), state);
+		logerror("%s('%s'): irst_w %d\n", shortname(), basetag(), state);
 
 	m_sint_handler(0);
 }

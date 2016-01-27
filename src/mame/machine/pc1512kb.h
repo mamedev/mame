@@ -47,7 +47,7 @@ class pc1512_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	pc1512_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pc1512_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_clock_wr_callback(device_t &device, _Object object) { return downcast<pc1512_keyboard_device &>(device).m_write_clock.set_callback(object); }
 	template<class _Object> static devcb_base &set_data_wr_callback(device_t &device, _Object object) { return downcast<pc1512_keyboard_device &>(device).m_write_data.set_callback(object); }

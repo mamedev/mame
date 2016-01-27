@@ -10,7 +10,7 @@ class multipcm_device : public device_t,
 						public device_memory_interface
 {
 public:
-	multipcm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~multipcm_device() {}
 
 	DECLARE_WRITE8_MEMBER( write );

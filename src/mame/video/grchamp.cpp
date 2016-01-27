@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ernesto Corvi, Phil Stroffolino
+// copyright-holders:Ernesto Corvi, Phil Stroffolino,Hans Andersson
 /*  Video hardware for Taito Grand Champion */
 
 /* updated by Hans Andersson, dec 2005     */

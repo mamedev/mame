@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 #include "sound/msm5205.h"
 
@@ -12,7 +12,7 @@ public:
 		TIMER_SPRITE
 	};
 
-	tubep_state(const machine_config &mconfig, device_type type, std::string tag)
+	tubep_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_textram(*this, "textram"),
 		m_backgroundram(*this, "backgroundram"),

@@ -532,7 +532,7 @@ const device_type HD6303R = &device_creator<hd6303r_cpu_device>;
 const device_type HD6303Y = &device_creator<hd6303y_cpu_device>;
 
 
-m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, M6800, "M6800", tag, owner, clock, "m6800", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_decrypted_opcodes_config("program", ENDIANNESS_BIG, 8, 16, 0)
@@ -546,7 +546,7 @@ m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, std::string ta
 	m_clock_divider = 1;
 }
 
-m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, bool has_io, int clock_divider, const op_func *insn, const UINT8 *cycles, address_map_constructor internal)
+m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool has_io, int clock_divider, const op_func *insn, const UINT8 *cycles, address_map_constructor internal)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal)
 	, m_decrypted_opcodes_config("program", ENDIANNESS_BIG, 8, 16, 0)
@@ -560,22 +560,22 @@ m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, device_type ty
 	m_clock_divider = clock_divider;
 }
 
-m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: m6800_cpu_device(mconfig, M6801, "M6801", tag, owner, clock, "m6801", __FILE__, true, 4, m6803_insn, cycles_6803)
 {
 }
 
-m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, const op_func *insn, const UINT8 *cycles, address_map_constructor internal)
+m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, const op_func *insn, const UINT8 *cycles, address_map_constructor internal)
 	: m6800_cpu_device(mconfig, type, name, tag, owner, clock, shortname, source, true, 4, insn, cycles, internal)
 {
 }
 
-m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: m6800_cpu_device(mconfig, M6802, "M6802", tag, owner, clock, "m6802", __FILE__, false, 4, m6800_insn, cycles_6800)
 {
 }
 
-m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, const op_func *insn, const UINT8 *cycles)
+m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, const op_func *insn, const UINT8 *cycles)
 	: m6800_cpu_device(mconfig, type, name, tag, owner, clock, shortname, source, false, 4, insn, cycles)
 {
 }
@@ -587,42 +587,42 @@ static ADDRESS_MAP_START(m6803_mem, AS_PROGRAM, 8, m6800_cpu_device)
 ADDRESS_MAP_END
 
 
-m6803_cpu_device::m6803_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+m6803_cpu_device::m6803_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: m6801_cpu_device(mconfig, M6803, "M6803", tag, owner, clock, "m6803", __FILE__, m6803_insn, cycles_6803, ADDRESS_MAP_NAME(m6803_mem))
 {
 }
 
-m6808_cpu_device::m6808_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+m6808_cpu_device::m6808_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: m6802_cpu_device(mconfig, M6808, "M6808", tag, owner, clock, "m6808", __FILE__, m6800_insn, cycles_6800)
 {
 }
 
-hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: m6801_cpu_device(mconfig, HD6301, "HD6301", tag, owner, clock, "hd6301", __FILE__, hd63701_insn, cycles_63701)
 {
 }
 
-hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: m6801_cpu_device(mconfig, type, name, tag, owner, clock, shortname, source, hd63701_insn, cycles_63701)
 {
 }
 
-hd63701_cpu_device::hd63701_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+hd63701_cpu_device::hd63701_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: m6801_cpu_device(mconfig, HD63701, "HD63701", tag, owner, clock, "hd63701", __FILE__, hd63701_insn, cycles_63701)
 {
 }
 
-nsc8105_cpu_device::nsc8105_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nsc8105_cpu_device::nsc8105_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: m6802_cpu_device(mconfig, NSC8105, "NSC8105", tag, owner, clock, "nsc8105", __FILE__, nsc8105_insn, cycles_nsc8105)
 {
 }
 
-hd6303r_cpu_device::hd6303r_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+hd6303r_cpu_device::hd6303r_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: hd6301_cpu_device(mconfig, HD6303R, "HD6303R", tag, owner, clock, "hd6303r", __FILE__)
 {
 }
 
-hd6303y_cpu_device::hd6303y_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+hd6303y_cpu_device::hd6303y_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: hd6301_cpu_device(mconfig, HD6303Y, "HD6303Y", tag, owner, clock, "hd6303y", __FILE__)
 {
 }
@@ -654,7 +654,7 @@ void m6800_cpu_device::WM16(UINT32 Addr, PAIR *p )
 /* IRQ enter */
 void m6800_cpu_device::enter_interrupt(const char *message,UINT16 irq_vector)
 {
-	LOG((message, tag().c_str()));
+	LOG((message, tag()));
 	if( m_wai_state & (M6800_WAI|M6800_SLP) )
 	{
 		if( m_wai_state & M6800_WAI )
@@ -695,7 +695,7 @@ void m6800_cpu_device::m6800_check_irq2()
 				((m_trcsr & (M6800_TRCSR_RIE|M6800_TRCSR_ORFE)) == (M6800_TRCSR_RIE|M6800_TRCSR_ORFE)) ||
 				((m_trcsr & (M6800_TRCSR_TIE|M6800_TRCSR_TDRE)) == (M6800_TRCSR_TIE|M6800_TRCSR_TDRE)))
 	{
-		//logerror("M6800 '%s' SCI interrupt\n", tag().c_str());
+		//logerror("M6800 '%s' SCI interrupt\n", tag());
 		TAKE_SCI;
 	}
 }
@@ -850,7 +850,7 @@ int m6800_cpu_device::m6800_rx()
 
 void m6800_cpu_device::serial_transmit()
 {
-	//logerror("M6800 '%s' Tx Tick\n", tag().c_str());
+	//logerror("M6800 '%s' Tx Tick\n", tag());
 
 	if (m_trcsr & M6800_TRCSR_TE)
 	{
@@ -894,7 +894,7 @@ void m6800_cpu_device::serial_transmit()
 
 					m_txbits++;
 
-					//logerror("M6800 '%s' Transmit START Data %02x\n", tag().c_str(), m_tsr);
+					//logerror("M6800 '%s' Transmit START Data %02x\n", tag(), m_tsr);
 				}
 				break;
 
@@ -906,7 +906,7 @@ void m6800_cpu_device::serial_transmit()
 
 				m_txbits = M6800_SERIAL_START;
 
-				//logerror("M6800 '%s' Transmit STOP\n", tag().c_str());
+				//logerror("M6800 '%s' Transmit STOP\n", tag());
 				break;
 
 			default:
@@ -916,7 +916,7 @@ void m6800_cpu_device::serial_transmit()
 				// shift transmit register
 				m_tsr >>= 1;
 
-				//logerror("M6800 '%s' Transmit Bit %u: %u\n", tag().c_str(), m_txbits, m_tx);
+				//logerror("M6800 '%s' Transmit Bit %u: %u\n", tag(), m_txbits, m_tx);
 
 				m_txbits++;
 				break;
@@ -932,7 +932,7 @@ void m6800_cpu_device::serial_transmit()
 
 void m6800_cpu_device::serial_receive()
 {
-	//logerror("M6800 '%s' Rx Tick TRCSR %02x bits %u check %02x\n", tag().c_str(), m_trcsr, m_rxbits, m_trcsr & M6800_TRCSR_RE);
+	//logerror("M6800 '%s' Rx Tick TRCSR %02x bits %u check %02x\n", tag(), m_trcsr, m_rxbits, m_trcsr & M6800_TRCSR_RE);
 
 	if (m_trcsr & M6800_TRCSR_RE)
 	{
@@ -943,11 +943,11 @@ void m6800_cpu_device::serial_receive()
 			{
 				m_rxbits++;
 
-				//logerror("M6800 '%s' Received WAKE UP bit %u\n", tag().c_str(), m_rxbits);
+				//logerror("M6800 '%s' Received WAKE UP bit %u\n", tag(), m_rxbits);
 
 				if (m_rxbits == 10)
 				{
-					//logerror("M6800 '%s' Receiver Wake Up\n", tag().c_str());
+					//logerror("M6800 '%s' Receiver Wake Up\n", tag());
 
 					m_trcsr &= ~M6800_TRCSR_WU;
 					m_rxbits = M6800_SERIAL_START;
@@ -955,7 +955,7 @@ void m6800_cpu_device::serial_receive()
 			}
 			else
 			{
-				//logerror("M6800 '%s' Receiver Wake Up interrupted\n", tag().c_str());
+				//logerror("M6800 '%s' Receiver Wake Up interrupted\n", tag());
 
 				m_rxbits = M6800_SERIAL_START;
 			}
@@ -971,21 +971,21 @@ void m6800_cpu_device::serial_receive()
 					// start bit found
 					m_rxbits++;
 
-					//logerror("M6800 '%s' Received START bit\n", tag().c_str());
+					//logerror("M6800 '%s' Received START bit\n", tag());
 				}
 				break;
 
 			case M6800_SERIAL_STOP:
 				if (m6800_rx() == 1)
 				{
-					//logerror("M6800 '%s' Received STOP bit\n", tag().c_str());
+					//logerror("M6800 '%s' Received STOP bit\n", tag());
 
 					if (m_trcsr & M6800_TRCSR_RDRF)
 					{
 						// overrun error
 						m_trcsr |= M6800_TRCSR_ORFE;
 
-						//logerror("M6800 '%s' Receive Overrun Error\n", tag().c_str());
+						//logerror("M6800 '%s' Receive Overrun Error\n", tag());
 
 						CHECK_IRQ_LINES();
 					}
@@ -996,7 +996,7 @@ void m6800_cpu_device::serial_receive()
 							// transfer data into receive register
 							m_rdr = m_rsr;
 
-							//logerror("M6800 '%s' Receive Data Register: %02x\n", tag().c_str(), m_rdr);
+							//logerror("M6800 '%s' Receive Data Register: %02x\n", tag(), m_rdr);
 
 							// set RDRF flag
 							m_trcsr |= M6800_TRCSR_RDRF;
@@ -1017,7 +1017,7 @@ void m6800_cpu_device::serial_receive()
 					m_trcsr |= M6800_TRCSR_ORFE;
 					m_trcsr &= ~M6800_TRCSR_RDRF;
 
-					//logerror("M6800 '%s' Receive Framing Error\n", tag().c_str());
+					//logerror("M6800 '%s' Receive Framing Error\n", tag());
 
 					CHECK_IRQ_LINES();
 				}
@@ -1032,7 +1032,7 @@ void m6800_cpu_device::serial_receive()
 				// receive bit into register
 				m_rsr |= (m6800_rx() << 7);
 
-				//logerror("M6800 '%s' Received DATA bit %u: %u\n", tag().c_str(), m_rxbits, BIT(m_rsr, 7));
+				//logerror("M6800 '%s' Received DATA bit %u: %u\n", tag(), m_rxbits, BIT(m_rsr, 7));
 
 				m_rxbits++;
 				break;
@@ -1223,7 +1223,7 @@ void m6800_cpu_device::execute_set_input(int irqline, int state)
 				// latch input data to port 3
 				m_port3_data = (m_io->read_byte(M6801_PORT3) & (m_port3_ddr ^ 0xff)) | (m_port3_data & m_port3_ddr);
 				m_port3_latched = 1;
-				//logerror("M6801 '%s' Latched Port 3 Data: %02x\n", tag().c_str(), m_port3_data);
+				//logerror("M6801 '%s' Latched Port 3 Data: %02x\n", tag(), m_port3_data);
 
 				// set IS3 flag bit
 				m_p3csr |= M6801_P3CSR_IS3_FLAG;
@@ -1233,7 +1233,7 @@ void m6800_cpu_device::execute_set_input(int irqline, int state)
 		break;
 
 	default:
-		LOG(("M6800 '%s' set_irq_line %d,%d\n", tag().c_str(), irqline, state));
+		LOG(("M6800 '%s' set_irq_line %d,%d\n", tag(), irqline, state));
 		m_irq_state[irqline] = state;
 
 		if (irqline == M6801_TIN_LINE && state != m_irq_state[irqline])
@@ -1296,7 +1296,7 @@ void m6800_cpu_device::hd63701_trap_pc()
 
 void m6800_cpu_device::set_os3(int state)
 {
-	//logerror("M6801 '%s' OS3: %u\n", tag().c_str(), state);
+	//logerror("M6801 '%s' OS3: %u\n", tag(), state);
 
 	m_out_sc2_func(state);
 }
@@ -1332,7 +1332,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 		break;
 
 	case IO_P3DDR:
-		logerror("M6801 '%s' Port 3 DDR is a write-only register\n", space.device().tag().c_str());
+		logerror("M6801 '%s' Port 3 DDR is a write-only register\n", space.device().tag());
 		break;
 
 	case IO_P4DDR:
@@ -1505,7 +1505,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 	case IO_ICR2H:
 	case IO_ICR2L:
 	default:
-		logerror("M6801 '%s' PC %04x: warning - read from reserved internal register %02x\n",space.device().tag().c_str(),space.device().safe_pc(),offset);
+		logerror("M6801 '%s' PC %04x: warning - read from reserved internal register %02x\n",space.device().tag(),space.device().safe_pc(),offset);
 	}
 
 	return data;
@@ -1731,7 +1731,7 @@ WRITE8_MEMBER( m6800_cpu_device::m6801_io_w )
 	case IO_ICR2H:
 	case IO_ICR2L:
 	default:
-		logerror("M6801 '%s' PC %04x: warning - write %02x to reserved internal register %02x\n",space.device().tag().c_str(),space.device().safe_pc(),data,offset);
+		logerror("M6801 '%s' PC %04x: warning - write %02x to reserved internal register %02x\n",space.device().tag(),space.device().safe_pc(),data,offset);
 		break;
 	}
 }

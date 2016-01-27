@@ -29,31 +29,31 @@ brk_16_imp
 	inst_state = -1;
 
 ill_non
-	logerror("%s: Unimplemented instruction %02x\n", tag().c_str(), inst_state);
+	logerror("%s: Unimplemented instruction %02x\n", tag(), inst_state);
 	prefetch();
 
 u0B_zpg
 	TMP2 = read_pc();
 	if(DECO16_VERBOSE)
-		logerror("%s: OP0B %02x (%04x)\n", tag().c_str(), NPC, TMP2);
+		logerror("%s: OP0B %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 u13_zpg
 	TMP2 = read_pc();
 	if(DECO16_VERBOSE)
-		logerror("%s: OP13 %02x (%04x)\n", tag().c_str(), NPC, TMP2);
+		logerror("%s: OP13 %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 u23_zpg
 	TMP2 = read_pc();
 	if(DECO16_VERBOSE)
-		logerror("%s: OP23 %02x (%04x)\n", tag().c_str(), NPC, TMP2);
+		logerror("%s: OP23 %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 u3F_zpg
 	TMP2 = read_pc();
 	if(DECO16_VERBOSE)
-		logerror("%s: OPBB %02x (%04x)\n", tag().c_str(), NPC, TMP2);
+		logerror("%s: OPBB %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 u4B_zpg
@@ -64,33 +64,33 @@ u4B_zpg
 u87_zpg
 	TMP2 = read_pc();
 	if(DECO16_VERBOSE)
-		logerror("%s: OP87 %02x (%04x)\n", tag().c_str(), NPC, TMP2);
+		logerror("%s: OP87 %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 u8F_zpg
 	TMP2 = read_pc();
 	if(DECO16_VERBOSE)
-		logerror("%s: OP8F (BANK) %02x (%04x)\n", tag().c_str(), NPC, TMP2);
+		logerror("%s: OP8F (BANK) %02x (%04x)\n", tag(), NPC, TMP2);
 	io->write_byte(0, TMP2);
 	prefetch();
 
 uA3_zpg
 	TMP2 = read_pc();
 	if(DECO16_VERBOSE)
-		logerror("%s: OPA3 %02x (%04x)\n", tag().c_str(), NPC, TMP2);
+		logerror("%s: OPA3 %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 uBB_zpg
 	TMP2 = read_pc();
 	if(DECO16_VERBOSE)
-		logerror("%s: OPBB %02x (%04x)\n", tag().c_str(), NPC, TMP2);
+		logerror("%s: OPBB %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 vbl_zpg
 	TMP2 = read_pc();
 	A = io->read_byte(0);
 	if(DECO16_VERBOSE)
-		logerror("%s: VBL %02x (%04x)\n", tag().c_str(), NPC, TMP2);
+		logerror("%s: VBL %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 #   exceptions

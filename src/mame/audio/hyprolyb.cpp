@@ -6,7 +6,7 @@
 
 const device_type HYPROLYB_ADPCM = &device_creator<hyprolyb_adpcm_device>;
 
-hyprolyb_adpcm_device::hyprolyb_adpcm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+hyprolyb_adpcm_device::hyprolyb_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HYPROLYB_ADPCM, "Hyper Olympics Audio", tag, owner, clock, "hyprolyb_adpcm", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_adpcm_ready(0),

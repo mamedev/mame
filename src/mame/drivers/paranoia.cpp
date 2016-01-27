@@ -48,7 +48,7 @@ HuC6280A (Hudson)
 class paranoia_state : public pce_common_state
 {
 public:
-	paranoia_state(const machine_config &mconfig, device_type type, std::string tag)
+	paranoia_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pce_common_state(mconfig, type, tag) { }
 
 	DECLARE_WRITE8_MEMBER(i8085_d000_w);

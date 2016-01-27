@@ -1521,7 +1521,7 @@ WRITE8_MEMBER(xbox_base_state::superio_write)
 			superiost.configuration_mode = true;
 		return;
 	}
-	if ((offset == 0) && (data == 0xaa)) 
+	if ((offset == 0) && (data == 0xaa))
 	{
 		// config port 0x2e
 		superiost.configuration_mode = false;
@@ -1543,7 +1543,7 @@ WRITE8_MEMBER(xbox_base_state::superio_write)
 		{
 			superiost.registers[superiost.selected][superiost.index] = data;
 			//if ((superiost.selected == 4) && (superiost.index == 0x30) && (data != 0))
-			//	; // add handlers 0x3f8- +7
+			//  ; // add handlers 0x3f8- +7
 		}
 	}
 }

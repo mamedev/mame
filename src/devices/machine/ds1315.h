@@ -31,7 +31,7 @@ ALLOW_SAVE_TYPE(ds1315_mode_t);
 class ds1315_device : public device_t
 {
 public:
-	ds1315_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ds1315_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~ds1315_device() {}
 
 	DECLARE_READ8_MEMBER(read_0);

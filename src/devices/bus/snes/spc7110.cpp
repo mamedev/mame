@@ -24,7 +24,7 @@ const device_type SNS_HIROM_SPC7110 = &device_creator<sns_rom_spc7110_device>;
 const device_type SNS_HIROM_SPC7110_RTC = &device_creator<sns_rom_spc7110rtc_device>;
 
 
-sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 			: sns_rom21_device(mconfig, type, name, tag, owner, clock, shortname, source), m_r4801(0), m_r4802(0), m_r4803(0), m_r4804(0), m_r4805(0), m_r4806(0), m_r4807(0),
 	m_r4808(0), m_r4809(0), m_r480a(0), m_r480b(0), m_r480c(0), m_decomp(nullptr), m_r4811(0), m_r4812(0), m_r4813(0), m_r4814(0), m_r4815(0), m_r4816(0), m_r4817(0), m_r4818(0),
 	m_r481x(0), m_r4814_latch(0), m_r4815_latch(0), m_r4820(0), m_r4821(0), m_r4822(0), m_r4823(0), m_r4824(0), m_r4825(0), m_r4826(0), m_r4827(0), m_r4828(0), m_r4829(0), m_r482a(0),
@@ -33,7 +33,7 @@ sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, de
 		{
 }
 
-sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 			: sns_rom21_device(mconfig, SNS_HIROM_SPC7110, "SNES Cart + SPC-7110", tag, owner, clock, "sns_rom_spc7110", __FILE__), m_r4801(0), m_r4802(0), m_r4803(0), m_r4804(0), m_r4805(0), m_r4806(0), m_r4807(0),
 	m_r4808(0), m_r4809(0), m_r480a(0), m_r480b(0), m_r480c(0), m_decomp(nullptr), m_r4811(0), m_r4812(0), m_r4813(0), m_r4814(0), m_r4815(0), m_r4816(0), m_r4817(0), m_r4818(0),
 	m_r481x(0), m_r4814_latch(0), m_r4815_latch(0), m_r4820(0), m_r4821(0), m_r4822(0), m_r4823(0), m_r4824(0), m_r4825(0), m_r4826(0), m_r4827(0), m_r4828(0), m_r4829(0), m_r482a(0),
@@ -42,7 +42,7 @@ sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, st
 {
 }
 
-sns_rom_spc7110rtc_device::sns_rom_spc7110rtc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sns_rom_spc7110rtc_device::sns_rom_spc7110rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 			: sns_rom_spc7110_device(mconfig, SNS_HIROM_SPC7110_RTC, "SNES Cart + SPC-7110 + RTC", tag, owner, clock, "sns_rom_spc7110rtc", __FILE__)
 {
 }

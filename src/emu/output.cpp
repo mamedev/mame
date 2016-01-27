@@ -20,7 +20,7 @@
 
 output_manager::output_manager(running_machine &machine)
 	: m_machine(machine),
-	  m_uniqueid(12345)
+		m_uniqueid(12345)
 {
 	/* add pause callback */
 	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(output_manager::pause), this));
@@ -49,7 +49,7 @@ output_manager::output_item* output_manager::find_item(const char *string)
 output_manager::output_item *output_manager::create_new_item(const char *outname, INT32 value)
 {
 	output_item item;
-	
+
 	/* fill in the data */
 	item.name = outname;
 	item.id = m_uniqueid++;
@@ -197,7 +197,7 @@ void output_manager::set_notifier(const char *outname, output_notifier_func call
 		/* if no item of that name, create a new one */
 		if (item == nullptr)
 			item = create_new_item(outname, 0);
-		
+
 		item->notifylist.push_back(notify);
 	}
 	else

@@ -51,7 +51,7 @@ class cdicdic_device : public device_t
 {
 public:
 	// construction/destruction
-	cdicdic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cdicdic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// non-static internal members
 	void sample_trigger();

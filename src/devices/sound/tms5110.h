@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo, Jarek Burczynski, Aaron Giles, Jonathan Gevaryahu, Couriersud
 #pragma once
 
@@ -46,8 +46,8 @@ class tms5110_device : public device_t,
 						public device_sound_interface
 {
 public:
-	tms5110_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	tms5110_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms5110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	template<class _Object> static devcb_base &set_m0_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_m0_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_m1_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_m1_cb.set_callback(object); }
@@ -97,6 +97,9 @@ private:
 	void parse_frame();
 
 	// internal state
+	/* table */
+	optional_region_ptr<UINT8> m_table;
+
 	/* coefficient tables */
 	int m_variant;                /* Variant of the 5110 - see tms5110.h */
 
@@ -191,7 +194,6 @@ private:
 	UINT8 m_romclk_hack_state;
 
 	emu_timer *m_romclk_hack_timer;
-	const UINT8 *m_table;
 };
 
 extern const device_type TMS5110;
@@ -199,7 +201,7 @@ extern const device_type TMS5110;
 class tms5100_device : public tms5110_device
 {
 public:
-	tms5100_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms5100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -210,7 +212,7 @@ extern const device_type TMS5100;
 class tmc0281_device : public tms5110_device
 {
 public:
-	tmc0281_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tmc0281_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -221,7 +223,7 @@ extern const device_type TMC0281;
 class tms5100a_device : public tms5110_device
 {
 public:
-	tms5100a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms5100a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -232,7 +234,7 @@ extern const device_type TMS5100A;
 class tmc0281d_device : public tms5110_device
 {
 public:
-	tmc0281d_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tmc0281d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -243,7 +245,7 @@ extern const device_type TMC0281D;
 class cd2801_device : public tms5110_device
 {
 public:
-	cd2801_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cd2801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -254,7 +256,7 @@ extern const device_type CD2801;
 class cd2802_device : public tms5110_device
 {
 public:
-	cd2802_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cd2802_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -265,7 +267,7 @@ extern const device_type CD2802;
 class tms5110a_device : public tms5110_device
 {
 public:
-	tms5110a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms5110a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -276,7 +278,7 @@ extern const device_type TMS5110A;
 class m58817_device : public tms5110_device
 {
 public:
-	m58817_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m58817_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( status_r );
 
@@ -294,7 +296,7 @@ extern const device_type M58817;
 class tmsprom_device : public device_t
 {
 public:
-	tmsprom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void set_region(device_t &device, const char *region) { downcast<tmsprom_device &>(device).m_prom_region = region; }
 	static void set_rom_size(device_t &device, UINT32 rom_size) { downcast<tmsprom_device &>(device).m_rom_size = rom_size; }

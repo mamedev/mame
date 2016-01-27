@@ -77,7 +77,7 @@ protected:
 	};
 
 	// construction/destruction
-	r3000_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, chip_type chiptype, std::string shortname, std::string source);
+	r3000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, chip_type chiptype, const char *shortname, const char *source);
 	virtual ~r3000_device();
 
 public:
@@ -268,7 +268,7 @@ protected:
 class r3041_device : public r3000_device
 {
 public:
-	r3041_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	r3041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -277,7 +277,7 @@ public:
 class r3051_device : public r3000_device
 {
 public:
-	r3051_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	r3051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -286,7 +286,7 @@ public:
 class r3052_device : public r3000_device
 {
 public:
-	r3052_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	r3052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -295,7 +295,7 @@ public:
 class r3071_device : public r3000_device
 {
 public:
-	r3071_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	r3071_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -304,7 +304,7 @@ public:
 class r3081_device : public r3000_device
 {
 public:
-	r3081_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	r3081_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

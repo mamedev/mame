@@ -46,7 +46,7 @@
 class pipbug_state : public driver_device
 {
 public:
-	pipbug_state(const machine_config &mconfig, device_type type, std::string tag)
+	pipbug_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_rs232(*this, "rs232"),
 		m_maincpu(*this, "maincpu")

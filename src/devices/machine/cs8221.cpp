@@ -58,26 +58,26 @@ static const char *const register_names[] =
 //  cs8221_device - constructor
 //-------------------------------------------------
 
-cs8221_device::cs8221_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+cs8221_device::cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CS8221, "CS8221", tag, owner, clock, "cs8221", __FILE__),
 		m_address(0),
 		m_address_valid(false)
 {
 }
 
-void cs8221_device::static_set_cputag(device_t &device, std::string tag)
+void cs8221_device::static_set_cputag(device_t &device, const char *tag)
 {
 	cs8221_device &cs8221 = downcast<cs8221_device &>(device);
 	cs8221.m_cputag = tag;
 }
 
-void cs8221_device::static_set_isatag(device_t &device, std::string tag)
+void cs8221_device::static_set_isatag(device_t &device, const char *tag)
 {
 	cs8221_device &cs8221 = downcast<cs8221_device &>(device);
 	cs8221.m_isatag = tag;
 }
 
-void cs8221_device::static_set_biostag(device_t &device, std::string tag)
+void cs8221_device::static_set_biostag(device_t &device, const char *tag)
 {
 	cs8221_device &cs8221 = downcast<cs8221_device &>(device);
 	cs8221.m_biostag = tag;

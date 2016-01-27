@@ -28,7 +28,7 @@ GFXDECODE_MEMBER( toaplan_scu_device::gfxinfo )
 GFXDECODE_END
 
 
-toaplan_scu_device::toaplan_scu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+toaplan_scu_device::toaplan_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TOAPLAN_SCU, "Toaplan SCU", tag, owner, clock, "toaplan_scu", __FILE__),
 	device_gfx_interface(mconfig, *this, gfxinfo )
 {
@@ -85,7 +85,7 @@ void toaplan_scu_device::draw_sprites_to_tempbitmap(const rectangle &cliprect, U
 			if (flipx) sx -= m_xoffs_flipped;
 
 			flipy = attribute & 0x200;
-			m_gfx[0]->transpen_raw(m_temp_spritebitmap,cliprect,
+			gfx(0)->transpen_raw(m_temp_spritebitmap,cliprect,
 				sprite,
 				color << 4 /* << 4 because using _raw */ ,
 				flipx,flipy,
@@ -103,7 +103,7 @@ void toaplan_scu_device::draw_sprites_to_tempbitmap(const rectangle &cliprect, U
 void toaplan_scu_device::copy_sprites_from_tempbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	int y, x;
-	int colourbase = m_gfx[0]->colorbase();
+	int colourbase = gfx(0)->colorbase();
 
 	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{

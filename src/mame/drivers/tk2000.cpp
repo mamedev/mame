@@ -34,7 +34,7 @@
 class tk2000_state : public driver_device
 {
 public:
-	tk2000_state(const machine_config &mconfig, device_type type, std::string tag)
+	tk2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, A2_CPU_TAG),
 		m_ram(*this, RAM_TAG),

@@ -27,7 +27,7 @@
 class supercon_state : public driver_device
 {
 public:
-	supercon_state(const machine_config &mconfig, device_type type, std::string tag)
+	supercon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_beep(*this, "beeper"),
@@ -791,7 +791,7 @@ static MACHINE_CONFIG_START( supercon, supercon_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", supercon_state, update_artwork, attotime::from_hz(20))

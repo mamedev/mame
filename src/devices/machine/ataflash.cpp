@@ -8,7 +8,7 @@
 
 const device_type ATA_FLASH_PCCARD = &device_creator<ata_flash_pccard_device>;
 
-ata_flash_pccard_device::ata_flash_pccard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+ata_flash_pccard_device::ata_flash_pccard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	ide_hdd_device(mconfig, ATA_FLASH_PCCARD, "ATA Flash PCCARD", tag, owner, clock, "ataflash", __FILE__), m_gnetreadlock(0), m_locked(0)
 {
 }

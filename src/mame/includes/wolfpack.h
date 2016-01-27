@@ -1,5 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
+/***************************************************************************
+
+    Atari Wolf Pack (prototype) driver
+
+***************************************************************************/
+
 #include "sound/s14001a.h"
 
 class wolfpack_state : public driver_device
@@ -10,17 +16,18 @@ public:
 		TIMER_PERIODIC
 	};
 
-	wolfpack_state(const machine_config &mconfig, device_type type, std::string tag)
+	wolfpack_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_alpha_num_ram(*this, "alpha_num_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_s14001a(*this, "speech"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
+	// devices, pointers
 	required_shared_ptr<UINT8> m_alpha_num_ram;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<s14001a_device> m_s14001a;
 	required_device<gfxdecode_device> m_gfxdecode;

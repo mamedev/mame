@@ -283,7 +283,7 @@ VIDEO_START_MEMBER(fromanc2_state,fromanc2)
 
 	for (int screen = 0; screen < 2; screen++)
 	{
-		palette_device *palette = (screen == 0 ? m_lpalette : m_rpalette);
+		palette_device &palette = (screen == 0 ? *m_lpalette : *m_rpalette);
 		for (int tmap = 0; tmap < 4; tmap++)
 		{
 			m_videoram[screen][tmap] = std::make_unique<UINT16[]>((64 * 64));
@@ -321,7 +321,7 @@ VIDEO_START_MEMBER(fromanc2_state,fromancr)
 
 	for (int screen = 0; screen < 2; screen++)
 	{
-		palette_device *palette = (screen == 0 ? m_lpalette : m_rpalette);
+		palette_device &palette = (screen == 0 ? *m_lpalette : *m_rpalette);
 		for (int tmap = 0; tmap < 3; tmap++)
 		{
 			m_videoram[screen][tmap] = std::make_unique<UINT16[]>((64 * 64));
@@ -357,7 +357,7 @@ VIDEO_START_MEMBER(fromanc2_state,fromanc4)
 
 	for (int screen = 0; screen < 2; screen++)
 	{
-		palette_device *palette = (screen == 0 ? m_lpalette : m_rpalette);
+		palette_device &palette = (screen == 0 ? *m_lpalette : *m_rpalette);
 		for (int tmap = 0; tmap < 3; tmap++)
 		{
 			m_videoram[screen][tmap] = std::make_unique<UINT16[]>((256 * 64));

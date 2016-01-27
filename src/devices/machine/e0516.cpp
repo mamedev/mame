@@ -38,7 +38,7 @@ const device_type E0516 = &device_creator<e0516_device>;
 //  e0516_device - constructor
 //-------------------------------------------------
 
-e0516_device::e0516_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+e0516_device::e0516_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, E0516, "E05-16", tag, owner, clock, "e0516", __FILE__),
 		device_rtc_interface(mconfig, *this), m_cs(0), m_clk(0), m_data_latch(0), m_reg_latch(0), m_read_write(0), m_state(0), m_bits(0), m_dio(0), m_timer(nullptr)
 {
@@ -93,7 +93,7 @@ void e0516_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 WRITE_LINE_MEMBER( e0516_device::cs_w )
 {
-	if (LOG) logerror("E05-16 '%s' CS %u\n", tag().c_str(), state);
+	if (LOG) logerror("E05-16 '%s' CS %u\n", tag(), state);
 
 	m_cs = state;
 
@@ -113,7 +113,7 @@ WRITE_LINE_MEMBER( e0516_device::cs_w )
 
 WRITE_LINE_MEMBER( e0516_device::clk_w )
 {
-	if (LOG) logerror("E05-16 '%s' CLK %u\n", tag().c_str(), state);
+	if (LOG) logerror("E05-16 '%s' CLK %u\n", tag(), state);
 
 	m_clk = state;
 
@@ -123,7 +123,7 @@ WRITE_LINE_MEMBER( e0516_device::clk_w )
 
 	if (m_state == STATE_ADDRESS)
 	{
-		if (LOG) logerror("E05-16 '%s' Command Bit %u\n", tag().c_str(), m_dio);
+		if (LOG) logerror("E05-16 '%s' Command Bit %u\n", tag(), m_dio);
 
 		// command
 		m_reg_latch |= m_dio << 3;
@@ -147,7 +147,7 @@ WRITE_LINE_MEMBER( e0516_device::clk_w )
 		if (BIT(m_reg_latch, 0))
 		{
 			// read
-			if (LOG) logerror("E05-16 '%s' Data Bit OUT %u\n", tag().c_str(), m_dio);
+			if (LOG) logerror("E05-16 '%s' Data Bit OUT %u\n", tag(), m_dio);
 
 			m_dio = BIT(m_data_latch, 0);
 			m_data_latch >>= 1;
@@ -155,7 +155,7 @@ WRITE_LINE_MEMBER( e0516_device::clk_w )
 		else
 		{
 			// write
-			if (LOG) logerror("E05-16 '%s' Data Bit IN %u\n", tag().c_str(), m_dio);
+			if (LOG) logerror("E05-16 '%s' Data Bit IN %u\n", tag(), m_dio);
 
 			m_data_latch |= m_dio << 7;
 			m_data_latch >>= 1;
@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER( e0516_device::clk_w )
 
 WRITE_LINE_MEMBER( e0516_device::dio_w )
 {
-	if (LOG) logerror("E05-16 '%s' DIO %u\n", tag().c_str(), state);
+	if (LOG) logerror("E05-16 '%s' DIO %u\n", tag(), state);
 
 	m_dio = state;
 }

@@ -47,14 +47,14 @@ class i82730_device : public device_t, public device_video_interface
 {
 public:
 	// construction/destruction
-	i82730_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i82730_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// callbacks
 	template<class _Object> static devcb_base &set_sint_handler(device_t &device, _Object object)
 		{ return downcast<i82730_device &>(device).m_sint_handler.set_callback(object); }
 
 	// inline configuration
-	static void set_cpu_tag(device_t &device, device_t *owner, std::string tag);
+	static void set_cpu_tag(device_t &device, device_t *owner, const char *tag);
 	static void set_update_row_callback(device_t &device, i82730_update_row_delegate callback) { downcast<i82730_device &>(device).m_update_row_cb = callback; }
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -100,7 +100,7 @@ private:
 	devcb_write_line m_sint_handler;
 	i82730_update_row_delegate m_update_row_cb;
 
-	std::string m_cpu_tag;
+	const char *m_cpu_tag;
 	address_space *m_program;
 
 	emu_timer *m_row_timer;

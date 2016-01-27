@@ -108,6 +108,7 @@ newoption {
 		{ "os2",           "OS/2 eComStation"       },
 		{ "haiku",         "Haiku"                  },
 		{ "solaris",       "Solaris SunOS"          },
+		{ "steamlink",     "Steam Link"             },
 	},
 }
 
@@ -1051,6 +1052,15 @@ configuration { "linux-*" }
 			}
 		end
 
+
+
+configuration { "steamlink" }
+	links {
+		"dl",
+	}
+	defines {
+		"EGL_API_FB",
+	}
 
 configuration { "osx*" }
 		links {

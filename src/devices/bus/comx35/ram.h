@@ -27,7 +27,7 @@ class comx_ram_device : public device_t,
 {
 public:
 	// construction/destruction
-	comx_ram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	comx_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

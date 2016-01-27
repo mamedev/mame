@@ -56,7 +56,7 @@ device_z88cart_interface::~device_z88cart_interface()
 //-------------------------------------------------
 //  z88cart_slot_device - constructor
 //-------------------------------------------------
-z88cart_slot_device::z88cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+z88cart_slot_device::z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, Z88CART_SLOT, "Z88 Cartridge Slot", tag, owner, clock, "z88cart_slot", __FILE__),
 		device_image_interface(mconfig, *this),
 		device_slot_interface(mconfig, *this),
@@ -158,7 +158,11 @@ bool z88cart_slot_device::call_load()
 void z88cart_slot_device::call_unload()
 {
 	if (m_cart)
-		memset(m_cart->get_cart_base(), 0xff, m_cart->get_cart_size());
+	{
+		auto cart_size = m_cart->get_cart_size();
+		if (cart_size>0)
+			memset(m_cart->get_cart_base(), 0xff, cart_size);
+	}
 
 	// open the flap
 	m_out_flp_cb(ASSERT_LINE);

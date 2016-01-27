@@ -39,7 +39,7 @@
 class cntsteer_state : public driver_device
 {
 public:
-	cntsteer_state(const machine_config &mconfig, device_type type, std::string tag)
+	cntsteer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),

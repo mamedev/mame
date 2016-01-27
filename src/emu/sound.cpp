@@ -163,17 +163,19 @@ float sound_stream::output_gain(int outputnum) const
 //  on a given stream's input
 //-------------------------------------------------
 
-const char *sound_stream::input_name(int inputnum, std::string &str) const
+std::string sound_stream::input_name(int inputnum) const
 {
+	std::string str;
+
 	// start with our device name and tag
 	assert(inputnum >= 0 && inputnum < m_input.size());
-	strprintf(str, "%s '%s': ", m_device.name().c_str(), m_device.tag().c_str());
+	strprintf(str, "%s '%s': ", m_device.name(), m_device.tag());
 
 	// if we have a source, indicate where the sound comes from by device name and tag
 	if (m_input[inputnum].m_source != nullptr && m_input[inputnum].m_source->m_stream != nullptr)
 	{
 		device_t &source = m_input[inputnum].m_source->m_stream->device();
-		strcatprintf(str, "%s '%s'", source.name().c_str(), source.tag().c_str());
+		strcatprintf(str, "%s '%s'", source.name(), source.tag());
 
 		// get the sound interface; if there is more than 1 output we need to figure out which one
 		device_sound_interface *sound;
@@ -191,7 +193,7 @@ const char *sound_stream::input_name(int inputnum, std::string &str) const
 				}
 		}
 	}
-	return str.c_str();
+	return str;
 }
 
 
@@ -225,7 +227,7 @@ int sound_stream::input_source_outputnum(int inputnum) const
 
 void sound_stream::set_input(int index, sound_stream *input_stream, int output_index, float gain)
 {
-	VPRINTF(("stream_set_input(%p, '%s', %d, %p, %d, %f)\n", (void *)this, m_device.tag().c_str(),
+	VPRINTF(("stream_set_input(%p, '%s', %d, %p, %d, %f)\n", (void *)this, m_device.tag(),
 			index, (void *)input_stream, output_index, (double) gain));
 
 	// make sure it's a valid input

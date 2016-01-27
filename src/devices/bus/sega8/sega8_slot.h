@@ -52,7 +52,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
 
-	void rom_alloc(UINT32 size, std::string tag);
+	void rom_alloc(UINT32 size, const char *tag);
 	void ram_alloc(UINT32 size);
 
 	virtual void late_bank_setup() {}
@@ -99,8 +99,8 @@ class sega8_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	sega8_cart_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, bool is_card, std::string shortname, std::string source);
-	sega8_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_card, const char *shortname, const char *source);
+	sega8_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~sega8_cart_slot_device();
 
 	// device-level overrides
@@ -161,7 +161,7 @@ class sega8_card_slot_device : public sega8_cart_slot_device
 {
 public:
 	// construction/destruction
-	sega8_card_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sega8_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void device_config_complete() override { update_names(SEGA8_CARD_SLOT, "card", "card"); }
 };

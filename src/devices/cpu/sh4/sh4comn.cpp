@@ -386,7 +386,7 @@ void sh34_base_device::sh4_exception(const char *message, int exception) // hand
 
 			vector = 0x600;
 			standard_irq_callback(INPUT_LINE_NMI);
-			LOG(("SH-4 '%s' nmi exception after [%s]\n", tag().c_str(), message));
+			LOG(("SH-4 '%s' nmi exception after [%s]\n", tag(), message));
 		} else {
 	//      if ((m_m[ICR] & 0x4000) && (m_nmi_line_state == ASSERT_LINE))
 	//          return;
@@ -400,7 +400,7 @@ void sh34_base_device::sh4_exception(const char *message, int exception) // hand
 				standard_irq_callback((exception-SH4_INTC_IRL0)+SH4_IRL0);
 			else
 				standard_irq_callback(SH4_IRL3+1);
-			LOG(("SH-4 '%s' interrupt exception #%d after [%s]\n", tag().c_str(), exception, message));
+			LOG(("SH-4 '%s' interrupt exception #%d after [%s]\n", tag(), exception, message));
 		}
 	}
 	else /* SH3 exceptions */
@@ -435,7 +435,7 @@ void sh34_base_device::sh4_exception(const char *message, int exception) // hand
 			m_sh3internal_upper[SH3_EXPEVT_ADDR] = exception_codes[exception];
 
 
-			LOG(("SH-3 '%s' interrupt exception #%d after [%s]\n", tag().c_str(), exception, message));
+			LOG(("SH-3 '%s' interrupt exception #%d after [%s]\n", tag(), exception, message));
 		}
 
 		/***** END ASSUME THIS TO BE WRONG FOR NOW *****/
@@ -1018,7 +1018,7 @@ void sh34_base_device::sh4_set_frt_input(int state)
 	sh4_timer_resync();
 	m_icr = m_frc;
 	m_m[4] |= ICF;
-	logerror("SH4 '%s': ICF activated (%x)\n", tag().c_str(), m_pc & AM);
+	logerror("SH4 '%s': ICF activated (%x)\n", tag(), m_pc & AM);
 	sh4_recalc_irq();
 #endif
 }
@@ -1052,12 +1052,12 @@ void sh34_base_device::execute_set_input(int irqline, int state) // set state of
 
 			if( state == CLEAR_LINE )
 			{
-				LOG(("SH-4 '%s' cleared external irq IRL%d\n", tag().c_str(), irqline));
+				LOG(("SH-4 '%s' cleared external irq IRL%d\n", tag(), irqline));
 				sh4_exception_unrequest(SH4_INTC_IRL0+irqline-SH4_IRL0);
 			}
 			else
 			{
-				LOG(("SH-4 '%s' assert external irq IRL%d\n", tag().c_str(), irqline));
+				LOG(("SH-4 '%s' assert external irq IRL%d\n", tag(), irqline));
 				sh4_exception_request(SH4_INTC_IRL0+irqline-SH4_IRL0);
 			}
 
@@ -1077,7 +1077,7 @@ void sh34_base_device::execute_set_input(int irqline, int state) // set state of
 			{
 				if ((state == CLEAR_LINE) && (m_nmi_line_state == ASSERT_LINE))  // rising
 				{
-					LOG(("SH-4 '%s' assert nmi\n", tag().c_str()));
+					LOG(("SH-4 '%s' assert nmi\n", tag()));
 					sh4_exception_request(SH4_INTC_NMI);
 					sh4_dmac_nmi();
 				}
@@ -1086,7 +1086,7 @@ void sh34_base_device::execute_set_input(int irqline, int state) // set state of
 			{
 				if ((state == ASSERT_LINE) && (m_nmi_line_state == CLEAR_LINE)) // falling
 				{
-					LOG(("SH-4 '%s' assert nmi\n", tag().c_str()));
+					LOG(("SH-4 '%s' assert nmi\n", tag()));
 					sh4_exception_request(SH4_INTC_NMI);
 					sh4_dmac_nmi();
 				}
@@ -1109,12 +1109,12 @@ void sh34_base_device::execute_set_input(int irqline, int state) // set state of
 
 				if( state == CLEAR_LINE )
 				{
-					LOG(("SH-4 '%s' cleared external irq IRL%d\n", tag().c_str(), irqline));
+					LOG(("SH-4 '%s' cleared external irq IRL%d\n", tag(), irqline));
 					sh4_exception_unrequest(SH4_INTC_IRL0+irqline-SH4_IRL0);
 				}
 				else
 				{
-					LOG(("SH-4 '%s' assert external irq IRL%d\n", tag().c_str(), irqline));
+					LOG(("SH-4 '%s' assert external irq IRL%d\n", tag(), irqline));
 					sh4_exception_request(SH4_INTC_IRL0+irqline-SH4_IRL0);
 				}
 			}
@@ -1128,7 +1128,7 @@ void sh34_base_device::execute_set_input(int irqline, int state) // set state of
 					sh4_exception_unrequest(SH4_INTC_IRLn0+s);
 				if (m_irln < 15)
 					sh4_exception_request(SH4_INTC_IRLn0+m_irln);
-				LOG(("SH-4 '%s' IRLn0-IRLn3 level #%d\n", tag().c_str(), m_irln));
+				LOG(("SH-4 '%s' IRLn0-IRLn3 level #%d\n", tag(), m_irln));
 			}
 		}
 		if (m_test_irq && (!m_delay))

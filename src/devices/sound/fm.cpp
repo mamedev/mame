@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski,Tatsuyuki Satoh
 #define YM2610B_WARNING
 
@@ -3686,14 +3686,21 @@ void ym2610_reset_chip(void *chip)
 	F2610->pcmbuf = (const UINT8 *)dev->machine().root_device().memregion(name.c_str())->base();
 	F2610->pcm_size = dev->machine().root_device().memregion(name.c_str())->bytes();
 	name.append(".deltat");
-	F2610->deltaT.memory = (UINT8 *)dev->machine().root_device().memregion(name.c_str())->base();
+	memory_region *deltat_region = dev->machine().root_device().memregion(name.c_str());
+	F2610->deltaT.memory = nullptr;
+	if (deltat_region != nullptr)
+	{
+		F2610->deltaT.memory = (UINT8 *)dev->machine().root_device().memregion(name.c_str())->base();
+	}
 	if(F2610->deltaT.memory == nullptr)
 	{
 		F2610->deltaT.memory = (UINT8*)F2610->pcmbuf;
 		F2610->deltaT.memory_size = F2610->pcm_size;
 	}
 	else
+	{
 		F2610->deltaT.memory_size = dev->machine().root_device().memregion(name.c_str())->bytes();
+	}
 
 	/* Reset Prescaler */
 	OPNSetPres( OPN, 6*24, 6*24, 4*2); /* OPN 1/6 , SSG 1/4 */

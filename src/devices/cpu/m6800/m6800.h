@@ -57,8 +57,8 @@ public:
 	typedef void (m6800_cpu_device::*op_func)();
 
 	// construction/destruction
-	m6800_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	m6800_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, bool has_io, int clock_divider, const m6800_cpu_device::op_func *insn, const UINT8 *cycles, address_map_constructor internal = nullptr);
+	m6800_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m6800_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool has_io, int clock_divider, const m6800_cpu_device::op_func *insn, const UINT8 *cycles, address_map_constructor internal = nullptr);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_out_sc2_func(device_t &device, _Object object) { return downcast<m6800_cpu_device &>(device).m_out_sc2_func.set_callback(object); }
@@ -432,8 +432,8 @@ protected:
 class m6801_cpu_device : public m6800_cpu_device
 {
 public:
-	m6801_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	m6801_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, const m6800_cpu_device::op_func *insn, const UINT8 *cycles, address_map_constructor internal = nullptr);
+	m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m6801_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, const m6800_cpu_device::op_func *insn, const UINT8 *cycles, address_map_constructor internal = nullptr);
 
 	void m6801_clock_serial();
 
@@ -447,8 +447,8 @@ protected:
 class m6802_cpu_device : public m6800_cpu_device
 {
 public:
-	m6802_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	m6802_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, const m6800_cpu_device::op_func *insn, const UINT8 *cycles);
+	m6802_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m6802_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, const m6800_cpu_device::op_func *insn, const UINT8 *cycles);
 
 protected:
 	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 4 - 1) / 4; }
@@ -460,7 +460,7 @@ protected:
 class m6803_cpu_device : public m6801_cpu_device
 {
 public:
-	m6803_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m6803_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
@@ -470,7 +470,7 @@ protected:
 class m6808_cpu_device : public m6802_cpu_device
 {
 public:
-	m6808_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m6808_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
@@ -480,8 +480,8 @@ protected:
 class hd6301_cpu_device : public m6801_cpu_device
 {
 public:
-	hd6301_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	hd6301_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	hd6301_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
@@ -491,7 +491,7 @@ protected:
 class hd63701_cpu_device : public m6801_cpu_device
 {
 public:
-	hd63701_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	hd63701_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
@@ -501,7 +501,7 @@ protected:
 class nsc8105_cpu_device : public m6802_cpu_device
 {
 public:
-	nsc8105_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nsc8105_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
@@ -515,7 +515,7 @@ protected:
 class hd6303r_cpu_device : public hd6301_cpu_device
 {
 public:
-	hd6303r_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	hd6303r_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -527,7 +527,7 @@ public:
 class hd6303y_cpu_device : public hd6301_cpu_device
 {
 public:
-	hd6303y_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	hd6303y_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

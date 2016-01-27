@@ -132,7 +132,7 @@ const char *apollo_cpu_context(device_t *cpu) {
 		int s = t / osd_ticks_per_second();
 		int ms = (t % osd_ticks_per_second()) / 1000;
 
-		sprintf(statebuf, "%d.%03d %s pc=%08x", s, ms, cpu->tag().c_str(), cpu->safe_pcbase());
+		sprintf(statebuf, "%d.%03d %s pc=%08x", s, ms, cpu->tag(), cpu->safe_pcbase());
 	} else {
 		strcpy(statebuf, "(no context)");
 	}
@@ -1053,7 +1053,7 @@ static MACHINE_CONFIG_START( dn3500, apollo_state )
 
 	/* keyboard beeper */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD("beep", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* internal ram */
@@ -1077,7 +1077,7 @@ static MACHINE_CONFIG_START( dsp3500, apollo_state )
 
 	/* keyboard beeper */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD("beep", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* internal ram */
@@ -1125,7 +1125,7 @@ static MACHINE_CONFIG_START( dsp3000, apollo_state )
 
 	/* keyboard beeper */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD("beep", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* internal ram */
@@ -1171,7 +1171,7 @@ static MACHINE_CONFIG_START( dsp5500, apollo_state )
 
 	/* keyboard beeper */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD("beep", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* terminal hardware */

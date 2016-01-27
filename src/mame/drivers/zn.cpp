@@ -36,7 +36,7 @@
 class zn_state : public driver_device
 {
 public:
-	zn_state(const machine_config &mconfig, device_type type, std::string tag) :
+	zn_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_gpu(*this, "gpu"),
 		m_gpu_screen(*this, "gpu:screen"),
@@ -4079,6 +4079,7 @@ ROM_START( taitofx1 )
 	TAITOFX1_BIOS
 	ROM_REGION32_LE( 0x01000000, "bankedroms", ROMREGION_ERASE00 )
 	ROM_REGION( 0x080000, "audiocpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "ymsnd", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( ftimpcta )

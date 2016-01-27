@@ -51,7 +51,7 @@ class com8116_device :  public device_t
 {
 public:
 	// construction/destruction
-	com8116_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_fx4_handler(device_t &device, _Object object) { return downcast<com8116_device &>(device).m_fx4_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_fr_handler(device_t &device, _Object object) { return downcast<com8116_device &>(device).m_fr_handler.set_callback(object); }

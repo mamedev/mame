@@ -68,7 +68,7 @@ const rom_entry *a2bus_diskiing_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_diskiing_device::a2bus_diskiing_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+a2bus_diskiing_device::a2bus_diskiing_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, A2BUS_DISKIING, "Apple Disk II NG controller", tag, owner, clock, "a2diskiing", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_wozfdc(*this, WOZFDC_TAG),

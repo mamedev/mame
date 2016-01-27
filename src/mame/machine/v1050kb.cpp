@@ -301,7 +301,7 @@ ioport_constructor v1050_keyboard_device::device_input_ports() const
 //  v1050_keyboard_device - constructor
 //-------------------------------------------------
 
-v1050_keyboard_device::v1050_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+v1050_keyboard_device::v1050_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, V1050_KEYBOARD, "Visual 1050 Keyboard", tag, owner, clock, "v1050kb", __FILE__),
 		m_maincpu(*this, I8049_TAG),
 		m_discrete(*this, DISCRETE_TAG),

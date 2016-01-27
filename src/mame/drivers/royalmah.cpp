@@ -104,7 +104,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 class royalmah_state : public driver_device
 {
 public:
-	royalmah_state(const machine_config &mconfig, device_type type, std::string tag)
+	royalmah_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_videoram(*this, "videoram"),

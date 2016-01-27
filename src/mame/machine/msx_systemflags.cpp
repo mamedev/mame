@@ -7,7 +7,7 @@
 const device_type MSX_SYSTEMFLAGS = &device_creator<msx_systemflags_device>;
 
 
-msx_systemflags_device::msx_systemflags_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+msx_systemflags_device::msx_systemflags_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_SYSTEMFLAGS, "MSX System Flags", tag, owner, clock, "msx_systemflags", __FILE__)
 	, m_initial_value(0xff)
 	, m_system_flags(0xff)

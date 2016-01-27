@@ -22,7 +22,7 @@
 
 const device_type E05A30 = &device_creator<e05a30_device>;
 
-e05a30_device::e05a30_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+e05a30_device::e05a30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, E05A30, "E05A30", tag, owner, clock, "e05a30", __FILE__),
 	m_write_printhead(*this),
 	m_write_pf_stepper(*this),

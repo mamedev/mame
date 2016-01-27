@@ -64,7 +64,7 @@ MACHINE_CONFIG_END
 //  LIVE DEVICE
 //**************************************************************************
 
-mc68681_device::mc68681_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mc68681_device::mc68681_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MC68681, "MC68681 DUART", tag, owner, clock, "mc68681", __FILE__),
 	m_chanA(*this, CHANA_TAG),
 	m_chanB(*this, CHANB_TAG),
@@ -294,7 +294,7 @@ READ8_MEMBER( mc68681_device::read )
 
 	offset &= 0xf;
 
-	LOG(( "Reading 68681 (%s) reg %x (%s) ", tag().c_str(), offset, duart68681_reg_read_names[offset] ));
+	LOG(( "Reading 68681 (%s) reg %x (%s) ", tag(), offset, duart68681_reg_read_names[offset] ));
 
 	switch (offset)
 	{
@@ -395,7 +395,7 @@ READ8_MEMBER( mc68681_device::read )
 WRITE8_MEMBER( mc68681_device::write )
 {
 	offset &= 0x0f;
-	LOG(( "Writing 68681 (%s) reg %x (%s) with %04x\n", tag().c_str(), offset, duart68681_reg_write_names[offset], data ));
+	LOG(( "Writing 68681 (%s) reg %x (%s) with %04x\n", tag(), offset, duart68681_reg_write_names[offset], data ));
 	switch(offset)
 	{
 		case 0x00: /* MRA */
@@ -468,7 +468,7 @@ WRITE8_MEMBER( mc68681_device::write )
 
 		case 0x0d: /* OPCR */
 			if ((data != 0x00) && ((data & 0xc) != 0x4))
-				logerror( "68681 (%s): Unhandled OPCR value: %02x\n", tag().c_str(), data);
+				logerror( "68681 (%s): Unhandled OPCR value: %02x\n", tag(), data);
 			OPCR = data;
 			break;
 
@@ -644,7 +644,7 @@ void mc68681_device::set_ISR_bits(int mask)
 
 // DUART channel class stuff
 
-mc68681_channel::mc68681_channel(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mc68681_channel::mc68681_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MC68681_CHANNEL, "MC68681 DUART CHANNEL", tag, owner, clock, "mc68681_channel", __FILE__),
 	device_serial_interface(mconfig, *this),
 	MR1(0),
@@ -702,7 +702,7 @@ void mc68681_channel::rcv_complete()
 {
 	receive_register_extract();
 
-//  printf("%s ch %d rcv complete\n", tag().c_str(), m_ch);
+//  printf("%s ch %d rcv complete\n", tag(), m_ch);
 
 	if ( rx_enabled )
 	{
@@ -724,7 +724,7 @@ void mc68681_channel::rcv_complete()
 
 void mc68681_channel::tra_complete()
 {
-//  printf("%s ch %d Tx complete\n", tag().c_str(), m_ch);
+//  printf("%s ch %d Tx complete\n", tag(), m_ch);
 	tx_ready = 1;
 	SR |= STATUS_TRANSMITTER_READY;
 
@@ -761,7 +761,7 @@ void mc68681_channel::tra_callback()
 	if ((MR2&0xC0) != 0x80)
 	{
 		int bit = transmit_register_get_data_bit();
-//      printf("%s ch %d transmit %d\n", tag().c_str(), m_ch, bit);
+//      printf("%s ch %d transmit %d\n", tag(), m_ch, bit);
 		if (m_ch == 0)
 		{
 			m_uart->write_a_tx(bit);
@@ -948,7 +948,7 @@ void mc68681_channel::write_chan_reg(int reg, UINT8 data)
 		CSR = data;
 		tx_baud_rate = m_uart->calc_baud(m_ch, data & 0xf);
 		rx_baud_rate = m_uart->calc_baud(m_ch, (data>>4) & 0xf);
-//      printf("%s ch %d CSR %02x Tx baud %d Rx baud %d\n", tag().c_str(), m_ch, data, tx_baud_rate, rx_baud_rate);
+//      printf("%s ch %d CSR %02x Tx baud %d Rx baud %d\n", tag(), m_ch, data, tx_baud_rate, rx_baud_rate);
 		set_rcv_rate(rx_baud_rate);
 		set_tra_rate(tx_baud_rate);
 		break;
@@ -1033,7 +1033,7 @@ void mc68681_channel::recalc_framing()
 			break;
 	}
 
-//  printf("%s ch %d MR1 %02x MR2 %02x => %d bits / char, %d stop bits, parity %d\n", tag().c_str(), m_ch, MR1, MR2, (MR1 & 3)+5, stopbits, parity);
+//  printf("%s ch %d MR1 %02x MR2 %02x => %d bits / char, %d stop bits, parity %d\n", tag(), m_ch, MR1, MR2, (MR1 & 3)+5, stopbits, parity);
 
 	set_data_frame(1, (MR1 & 3)+5, parity, stopbits);
 }
@@ -1125,7 +1125,7 @@ void mc68681_channel::write_TX(UINT8 data)
          printf("Write %02x to TX when TX not ready!\n", data);
     }*/
 
-//  printf("%s ch %d Tx %02x\n", tag().c_str(), m_ch, data);
+//  printf("%s ch %d Tx %02x\n", tag(), m_ch, data);
 
 	tx_ready = 0;
 	SR &= ~STATUS_TRANSMITTER_READY;

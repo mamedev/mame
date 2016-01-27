@@ -389,7 +389,7 @@ static void palette_handler(running_machine &machine, render_container *containe
 
 	// figure out the title and expand the outer box to fit
 	const char *suffix = palette->indirect_entries() == 0 ? "" : state.palette.which ? " COLORS" : " PENS";
-	sprintf(title, "'%s'%s", palette->tag().c_str(), suffix);
+	sprintf(title, "'%s'%s", palette->tag(), suffix);
 	titlewidth = ui_font->string_width(chheight, machine.render().ui_aspect(), title);
 	x0 = 0.0f;
 	if (boxbounds.x1 - boxbounds.x0 < titlewidth + chwidth)
@@ -649,7 +649,7 @@ static void gfxset_handler(running_machine &machine, render_container *container
 
 	// figure out the title and expand the outer box to fit
 	sprintf(title, "'%s' %d/%d %dx%d COLOR %X",
-					interface.device().tag().c_str(),
+					interface.device().tag(),
 					set, info.setcount - 1,
 					gfx.width(), gfx.height(),
 					info.color[set]);
@@ -904,7 +904,7 @@ static void gfxset_draw_item(running_machine &machine, gfx_element &gfx, int ind
 {
 	int width = (rotate & ORIENTATION_SWAP_XY) ? gfx.height() : gfx.width();
 	int height = (rotate & ORIENTATION_SWAP_XY) ? gfx.width() : gfx.height();
-	const rgb_t *palette = gfx.palette()->palette()->entry_list_raw() + gfx.colorbase() + color * gfx.granularity();
+	const rgb_t *palette = gfx.palette().palette()->entry_list_raw() + gfx.colorbase() + color * gfx.granularity();
 	int x, y;
 
 	// loop over rows in the cell

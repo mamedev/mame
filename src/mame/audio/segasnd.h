@@ -12,7 +12,7 @@ class speech_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	speech_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	speech_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~speech_sound_device() {}
 
 	DECLARE_WRITE8_MEMBER( data_w );
@@ -115,8 +115,8 @@ class usb_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	usb_sound_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	usb_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	usb_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~usb_sound_device() {}
 	required_device<i8035_device> m_ourcpu;                 /* CPU index of the 8035 */
 
@@ -176,7 +176,7 @@ extern const device_type SEGAUSB;
 class usb_rom_sound_device : public usb_sound_device
 {
 public:
-	usb_rom_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	usb_rom_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~usb_rom_sound_device() {}
 
 protected:

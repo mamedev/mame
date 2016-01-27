@@ -7,7 +7,7 @@
 class irem_audio_device : public device_t
 {
 public:
-	irem_audio_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	irem_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~irem_audio_device() {}
 
 	DECLARE_WRITE8_MEMBER( cmd_w );
@@ -52,21 +52,21 @@ private:
 class m62_audio_device : public irem_audio_device
 {
 public:
-	m62_audio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m62_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class m52_soundc_audio_device : public irem_audio_device
 {
 public:
-	m52_soundc_audio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m52_soundc_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class m52_large_audio_device : public irem_audio_device
 {
 public:
-	m52_large_audio_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m52_large_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 

@@ -35,7 +35,7 @@ class x1_keyboard_device :  public device_t,
 {
 public:
 	// construction/destruction
-	x1_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	x1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 private:
 	virtual void device_start() override;
@@ -74,7 +74,7 @@ struct x1_rtc_t
 class x1_state : public driver_device
 {
 public:
-	x1_state(const machine_config &mconfig, device_type type, std::string tag)
+	x1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"x1_cpu"),
 		m_cassette(*this, "cassette"),
@@ -276,6 +276,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(x1_cmt_wind_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(x1_keyboard_callback);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	DECLARE_WRITE_LINE_MEMBER(hdl_w);
+	UINT8 m_fdc_ctrl;
 
 	void x1_draw_pixel(bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height);
 	void draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprect);

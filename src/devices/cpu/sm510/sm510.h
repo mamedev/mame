@@ -68,7 +68,7 @@ class sm510_base_device : public cpu_device
 {
 public:
 	// construction/destruction
-	sm510_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source)
+	sm510_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_LITTLE, 8, prgwidth, 0, program)
 		, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
@@ -268,7 +268,7 @@ protected:
 class sm510_device : public sm510_base_device
 {
 public:
-	sm510_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
@@ -282,8 +282,8 @@ protected:
 class sm511_device : public sm510_base_device
 {
 public:
-	sm511_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	sm511_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source);
+	sm511_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sm511_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
@@ -294,7 +294,7 @@ protected:
 class sm512_device : public sm511_device
 {
 public:
-	sm512_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sm512_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

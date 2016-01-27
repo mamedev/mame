@@ -14,7 +14,7 @@
 
 const device_type M6502 = &device_creator<m6502_device>;
 
-m6502_device::m6502_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+m6502_device::m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	cpu_device(mconfig, M6502, "M6502", tag, owner, clock, "m6502", __FILE__),
 	sync_w(*this),
 	program_config("program", ENDIANNESS_LITTLE, 8, 16),
@@ -24,7 +24,7 @@ m6502_device::m6502_device(const machine_config &mconfig, std::string tag, devic
 	direct_disabled = false;
 }
 
-m6502_device::m6502_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+m6502_device::m6502_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	sync_w(*this),
 	program_config("program", ENDIANNESS_LITTLE, 8, 16),

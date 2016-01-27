@@ -66,7 +66,7 @@ static inline double step_cr_filter(g80_filter_state *state, double input)
 
 const device_type SEGASPEECH = &device_creator<speech_sound_device>;
 
-speech_sound_device::speech_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+speech_sound_device::speech_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGASPEECH, "Sega Speech Sound Board", tag, owner, clock, "sega_speech_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_drq(0),
@@ -239,7 +239,7 @@ MACHINE_CONFIG_END
 
 const device_type SEGAUSB = &device_creator<usb_sound_device>;
 
-usb_sound_device::usb_sound_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+usb_sound_device::usb_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_ourcpu(*this, "ourcpu"),
@@ -258,7 +258,7 @@ usb_sound_device::usb_sound_device(const machine_config &mconfig, device_type ty
 {
 }
 
-usb_sound_device::usb_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+usb_sound_device::usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGAUSB, "Sega Universal Sound Board", tag, owner, clock, "segausb", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_ourcpu(*this, "ourcpu"),
@@ -881,7 +881,7 @@ machine_config_constructor usb_sound_device::device_mconfig_additions() const
 
 const device_type SEGAUSBROM = &device_creator<usb_rom_sound_device>;
 
-usb_rom_sound_device::usb_rom_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+usb_rom_sound_device::usb_rom_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: usb_sound_device(mconfig, SEGAUSBROM, "Sega Universal Sound Board with ROM", tag, owner, clock, "segausbrom", __FILE__)
 {
 }

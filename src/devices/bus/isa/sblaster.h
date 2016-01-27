@@ -97,7 +97,7 @@ class sb_device :
 {
 public:
 		// construction/destruction
-		sb_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, std::string name, std::string shortname, std::string source);
+		sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source);
 
 		required_device<dac_device> m_dacl;
 		required_device<dac_device> m_dacr;
@@ -158,7 +158,7 @@ class sb8_device : public sb_device,
 {
 public:
 		// construction/destruction
-		sb8_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, std::string name, std::string shortname, std::string source);
+		sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source);
 
 		DECLARE_READ8_MEMBER(ym3812_16_r);
 		DECLARE_WRITE8_MEMBER(ym3812_16_w);
@@ -176,7 +176,7 @@ class isa8_sblaster1_0_device : public sb8_device
 {
 public:
 		// construction/destruction
-		isa8_sblaster1_0_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+		isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
@@ -198,7 +198,7 @@ class isa8_sblaster1_5_device : public sb8_device
 {
 public:
 		// construction/destruction
-		isa8_sblaster1_5_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+		isa8_sblaster1_5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
@@ -212,7 +212,7 @@ class sb16_device : public sb_device,
 {
 public:
 		// construction/destruction
-		sb16_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, std::string name, std::string shortname, std::string source);
+		sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source);
 		DECLARE_READ8_MEMBER(mpu401_r);
 		DECLARE_WRITE8_MEMBER(mpu401_w);
 		DECLARE_READ8_MEMBER(mixer_r);
@@ -237,7 +237,7 @@ class isa16_sblaster16_device : public sb16_device
 {
 public:
 		// construction/destruction
-		isa16_sblaster16_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+		isa16_sblaster16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;

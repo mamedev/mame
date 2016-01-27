@@ -20,10 +20,11 @@
 
 const device_type K054338 = &device_creator<k054338_device>;
 
-k054338_device::k054338_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+k054338_device::k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K054338, "K054338 Mixer", tag, owner, clock, "k054338", __FILE__),
 	device_video_interface(mconfig, *this),
-	m_alpha_inv(0)
+	m_alpha_inv(0),
+	m_k055555_tag(nullptr)
 {
 	memset(&m_regs, 0, sizeof(m_regs));
 	memset(&m_shd_rgb, 0, sizeof(m_shd_rgb));
@@ -73,7 +74,7 @@ int  k054338_device::register_r( int reg )
 	return m_regs[reg];
 }
 
-void k054338_device::update_all_shadows( int rushingheroes_hack, palette_device *palette )
+void k054338_device::update_all_shadows( int rushingheroes_hack, palette_device &palette )
 {
 	int i, d;
 	int noclip = m_regs[K338_REG_CONTROL] & K338_CTL_CLIPSL;
@@ -88,15 +89,15 @@ void k054338_device::update_all_shadows( int rushingheroes_hack, palette_device 
 
 	if (!rushingheroes_hack)
 	{
-		palette->set_shadow_dRGB32(0, m_shd_rgb[0], m_shd_rgb[1], m_shd_rgb[2], noclip);
-		palette->set_shadow_dRGB32(1, m_shd_rgb[3], m_shd_rgb[4], m_shd_rgb[5], noclip);
-		palette->set_shadow_dRGB32(2, m_shd_rgb[6], m_shd_rgb[7], m_shd_rgb[8], noclip);
+		palette.set_shadow_dRGB32(0, m_shd_rgb[0], m_shd_rgb[1], m_shd_rgb[2], noclip);
+		palette.set_shadow_dRGB32(1, m_shd_rgb[3], m_shd_rgb[4], m_shd_rgb[5], noclip);
+		palette.set_shadow_dRGB32(2, m_shd_rgb[6], m_shd_rgb[7], m_shd_rgb[8], noclip);
 	}
 	else // rushing heroes seems to specify shadows in another format, or it's not being interpreted properly.
 	{
-		palette->set_shadow_dRGB32(0, -80, -80, -80, 0);
-		palette->set_shadow_dRGB32(1, -80, -80, -80, 0);
-		palette->set_shadow_dRGB32(2, -80, -80, -80, 0);
+		palette.set_shadow_dRGB32(0, -80, -80, -80, 0);
+		palette.set_shadow_dRGB32(1, -80, -80, -80, 0);
+		palette.set_shadow_dRGB32(2, -80, -80, -80, 0);
 	}
 }
 

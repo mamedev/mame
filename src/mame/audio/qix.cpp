@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:John Butler, Ed Mueller, Aaron Giles
+// license:BSD-3-Clause
+// copyright-holders:Derrick Renaud,Couriersud
 /*************************************************************************
 
     audio/qix.c

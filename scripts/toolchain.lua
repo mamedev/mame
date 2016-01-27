@@ -32,6 +32,7 @@ newoption {
 		{ "qnx-arm",       "QNX/Blackberry - ARM"   },
 		{ "rpi",           "RaspberryPi"            },
 		{ "solaris", 	   "Solaris"                },
+		{ "steamlink", 	   "Steam Link"             },
 	},
 }
 
@@ -189,8 +190,18 @@ function toolchain(_buildDir, _subDir)
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-linux-clang")
 		end
 
+		if "steamlink" == _OPTIONS["gcc"] then
+			if not os.getenv("MARVELL_SDK_PATH") then
+				print("Set MARVELL_SDK_PATH envrionment variable.")
+			end
+			premake.gcc.cc  = "$(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-gcc"
+			premake.gcc.cxx = "$(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-g++"
+			premake.gcc.ar  = "$(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-ar"
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-steamlink")
+		end
+
 		if "mingw32-gcc" == _OPTIONS["gcc"] then
-			if not os.getenv("MINGW32") or not os.getenv("MINGW32") then
+			if not os.getenv("MINGW32") then
 				print("Set MINGW32 envrionment variable.")
 			end
 			premake.gcc.cc  = "$(MINGW32)/bin/i686-w64-mingw32-gcc"
@@ -207,7 +218,7 @@ function toolchain(_buildDir, _subDir)
 		end
 
 		if "mingw64-gcc" == _OPTIONS["gcc"] then
-			if not os.getenv("MINGW64") or not os.getenv("MINGW64") then
+			if not os.getenv("MINGW64") then
 				print("Set MINGW64 envrionment variable.")
 			end
 			premake.gcc.cc  = "$(MINGW64)/bin/x86_64-w64-mingw32-gcc"
@@ -483,6 +494,26 @@ function toolchain(_buildDir, _subDir)
 	configuration { "x64", "mingw64-gcc", "Debug" }
 		targetdir (_buildDir .. "mingw-gcc" .. "/bin/x64/Debug")
 
+	configuration { "steamlink" }
+		objdir ( _buildDir .. "steamlink/obj")
+
+		buildoptions {
+			"-marm",
+			"-mfloat-abi=hard",
+			"--sysroot=$(MARVELL_SDK_PATH)/rootfs",
+		}
+		linkoptions {
+			"-static-libgcc",
+			"-static-libstdc++",
+			"--sysroot=$(MARVELL_SDK_PATH)/rootfs",
+		}
+
+	configuration { "steamlink", "Release" }
+		targetdir (_buildDir .. "steamlink/bin/Release")
+
+	configuration { "steamlink", "Debug" }
+		targetdir (_buildDir .. "steamlink/bin/Debug")
+
 	configuration { "mingw-clang" }
 		linkoptions {
 			"-Wl,--allow-multiple-definition",
@@ -496,7 +527,7 @@ function toolchain(_buildDir, _subDir)
 		targetdir (_buildDir .. "mingw-clang/bin/x32/Release")
 
 	configuration { "x32", "mingw-clang", "Debug" }
-		targetdir (_buildDir .. "win32_mingw-clang/bin/x32/Debug")
+		targetdir (_buildDir .. "mingw-clang/bin/x32/Debug")
 
 	configuration { "x64", "mingw-clang" }
 		objdir (_buildDir .. "mingw-clang/obj")

@@ -115,7 +115,7 @@ class es550x_device : public device_t,
 									public device_sound_interface
 {
 public:
-	es550x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	es550x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~es550x_device() {}
 
 	static void set_region0(device_t &device, const char *region0) { downcast<es550x_device &>(device).m_region0 = region0; }
@@ -186,7 +186,7 @@ protected:
 class es5506_device : public es550x_device
 {
 public:
-	es5506_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~es5506_device() {}
 
 	DECLARE_READ8_MEMBER( read );
@@ -218,7 +218,7 @@ extern const device_type ES5506;
 class es5505_device : public es550x_device
 {
 public:
-	es5505_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	es5505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );

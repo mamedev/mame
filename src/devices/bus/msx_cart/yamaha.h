@@ -17,7 +17,7 @@ class msx_cart_sfg : public device_t
 					, public msx_cart_interface
 {
 public:
-	msx_cart_sfg(const machine_config &mconfig, const device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname);
+	msx_cart_sfg(const machine_config &mconfig, const device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -47,7 +47,7 @@ private:
 class msx_cart_sfg01 : public msx_cart_sfg
 {
 public:
-	msx_cart_sfg01(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	msx_cart_sfg01(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual const rom_entry *device_rom_region() const override;
 };
@@ -56,7 +56,7 @@ public:
 class msx_cart_sfg05 : public msx_cart_sfg
 {
 public:
-	msx_cart_sfg05(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	msx_cart_sfg05(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual const rom_entry *device_rom_region() const override;
 };

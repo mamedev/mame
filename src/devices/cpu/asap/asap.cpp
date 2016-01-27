@@ -136,7 +136,7 @@ const device_type ASAP = &device_creator<asap_device>;
 //  asap_device - constructor
 //-------------------------------------------------
 
-asap_device::asap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+asap_device::asap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, ASAP, "ASAP", tag, owner, clock, "asap", __FILE__),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 32),
 		m_pc(0),

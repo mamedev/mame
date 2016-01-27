@@ -10,7 +10,7 @@
 
 class lpc_acpi_device : public lpc_device {
 public:
-	lpc_acpi_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	lpc_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void map_device(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
 							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;

@@ -89,7 +89,7 @@ const device_type I8279 = &device_creator<i8279_device>;
 //  i8279_device - constructor
 //-------------------------------------------------
 
-i8279_device::i8279_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8279_device::i8279_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I8279, "8279 KDC", tag, owner, clock, "i8279", __FILE__),
 	m_out_irq_cb(*this),
 	m_out_sl_cb(*this),
@@ -440,7 +440,7 @@ WRITE8_MEMBER( i8279_device::cmd_w )
 	switch (cmd)
 	{
 		case 0:
-			if (LOG) logerror("I8279 '%s' kb mode %x, display mode %x\n", tag().c_str(), data & 7, (data>>3) & 3);
+			if (LOG) logerror("I8279 '%s' kb mode %x, display mode %x\n", tag(), data & 7, (data>>3) & 3);
 			break;
 		case 1:
 			if (data > 1)
@@ -455,7 +455,7 @@ WRITE8_MEMBER( i8279_device::cmd_w )
 			{
 				m_autoinc = BIT(data, 4);
 				m_s_ram_ptr = data & 7;
-				if (LOG) logerror("I8279 '%s' selct sensor row %x, AI %d\n", tag().c_str(), m_s_ram_ptr, m_autoinc);
+				if (LOG) logerror("I8279 '%s' selct sensor row %x, AI %d\n", tag(), m_s_ram_ptr, m_autoinc);
 			}
 			break;
 		case 3:
@@ -468,7 +468,7 @@ WRITE8_MEMBER( i8279_device::cmd_w )
 			m_autoinc = BIT(data, 4);
 			break;
 		case 6:
-			if (LOG) logerror("I8279 '%s' clear cmd %x\n", tag().c_str(), data);
+			if (LOG) logerror("I8279 '%s' clear cmd %x\n", tag(), data);
 			clear_display();
 			break;
 	}

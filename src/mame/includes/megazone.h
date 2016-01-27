@@ -9,7 +9,7 @@
 class megazone_state : public driver_device
 {
 public:
-	megazone_state(const machine_config &mconfig, device_type type, std::string tag)
+	megazone_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_scrolly(*this, "scrolly"),
 		m_scrollx(*this, "scrollx"),

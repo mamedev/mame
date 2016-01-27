@@ -24,19 +24,19 @@ const device_type TMS1025 = &device_creator<tms1025_device>;
 //  constructor
 //-------------------------------------------------
 
-tms1024_device::tms1024_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tms1024_device::tms1024_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS1024, "TMS1024 I/O Expander", tag, owner, clock, "tms1024", __FILE__), m_h(0), m_s(0), m_std(0),
 	m_write_port1(*this), m_write_port2(*this), m_write_port3(*this), m_write_port4(*this), m_write_port5(*this), m_write_port6(*this), m_write_port7(*this)
 {
 }
 
-tms1024_device::tms1024_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+tms1024_device::tms1024_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_h(0), m_s(0), m_std(0),
 	m_write_port1(*this), m_write_port2(*this), m_write_port3(*this), m_write_port4(*this), m_write_port5(*this), m_write_port6(*this), m_write_port7(*this)
 {
 }
 
-tms1025_device::tms1025_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tms1025_device::tms1025_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms1024_device(mconfig, TMS1025, "TMS1025 I/O Expander", tag, owner, clock, "tms1025", __FILE__)
 {
 }

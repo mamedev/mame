@@ -42,7 +42,7 @@ device_vcs_control_port_interface::device_vcs_control_port_interface(const machi
 //  vcs_control_port_device - constructor
 //-------------------------------------------------
 
-vcs_control_port_device::vcs_control_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+vcs_control_port_device::vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VCS_CONTROL_PORT, "Atari VCS control port", tag, owner, clock, "vcs_control_port", __FILE__),
 	device_slot_interface(mconfig, *this), m_device(nullptr),
 	m_write_trigger(*this)

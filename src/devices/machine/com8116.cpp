@@ -45,7 +45,7 @@ const int com8116_device::divisors_32X_5_0688MHz[] =
 //  com8116_device - constructor
 //-------------------------------------------------
 
-com8116_device::com8116_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+com8116_device::com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COM8116, "COM8116", tag, owner, clock, "com8116", __FILE__),
 	m_fx4_handler(*this),
 	m_fr_handler(*this),
@@ -128,7 +128,7 @@ void com8116_device::str_w(UINT8 data)
 	int fr_divider = data & 0x0f;
 	int fr_clock = clock() / m_fr_divisors[fr_divider];
 
-	if (LOG) logerror("COM8116 '%s' Receiver Divisor Select %01x: %u (%u Hz)\n", tag().c_str(), data & 0x0f, m_fr_divisors[fr_divider], fr_clock);
+	if (LOG) logerror("COM8116 '%s' Receiver Divisor Select %01x: %u (%u Hz)\n", tag(), data & 0x0f, m_fr_divisors[fr_divider], fr_clock);
 
 	m_fr_timer->adjust(attotime::from_nsec(3500), 0, attotime::from_hz(fr_clock * 2));
 }
@@ -148,7 +148,7 @@ void com8116_device::stt_w(UINT8 data)
 	int ft_divider = data & 0x0f;
 	int ft_clock = clock() / m_ft_divisors[ft_divider];
 
-	if (LOG) logerror("COM8116 '%s' Transmitter Divisor Select %01x: %u (%u Hz)\n", tag().c_str(), data & 0x0f, m_ft_divisors[ft_divider], ft_clock);
+	if (LOG) logerror("COM8116 '%s' Transmitter Divisor Select %01x: %u (%u Hz)\n", tag(), data & 0x0f, m_ft_divisors[ft_divider], ft_clock);
 
 	m_ft_timer->adjust(attotime::from_nsec(3500), 0, attotime::from_hz(ft_clock * 2));
 }

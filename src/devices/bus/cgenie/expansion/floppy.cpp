@@ -103,7 +103,7 @@ machine_config_constructor cgenie_fdc_device::device_mconfig_additions() const
 //  cgenie_fdc_device - constructor
 //-------------------------------------------------
 
-cgenie_fdc_device::cgenie_fdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+cgenie_fdc_device::cgenie_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CGENIE_FDC, "Floppy Disc Controller", tag, owner, clock, "cgenie_fdc", __FILE__),
 	device_expansion_interface(mconfig, *this),
 	m_fdc(*this, "fd1793"),

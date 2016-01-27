@@ -45,7 +45,7 @@ device_apf_cart_interface::~device_apf_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_apf_cart_interface::rom_alloc(UINT32 size, std::string tag)
+void device_apf_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -72,7 +72,7 @@ void device_apf_cart_interface::ram_alloc(UINT32 size)
 //-------------------------------------------------
 //  apf_cart_slot_device - constructor
 //-------------------------------------------------
-apf_cart_slot_device::apf_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+apf_cart_slot_device::apf_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, APF_CART_SLOT, "APF Cartridge Slot", tag, owner, clock, "apf_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),

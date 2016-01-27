@@ -27,7 +27,7 @@ control registers:
 
 const device_type TC0280GRD = &device_creator<tc0280grd_device>;
 
-tc0280grd_device::tc0280grd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tc0280grd_device::tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0280GRD, "Taito TC0280GRD & TC0430GRW", tag, owner, clock, "tc0280grd", __FILE__),
 	m_ram(nullptr),
 	//m_ctrl[8](0),
@@ -41,7 +41,7 @@ tc0280grd_device::tc0280grd_device(const machine_config &mconfig, std::string ta
 //  gfx decoder
 //-------------------------------------------------
 
-void tc0280grd_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
+void tc0280grd_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<tc0280grd_device &>(device).m_gfxdecode.set_tag(tag);
 }

@@ -27,7 +27,7 @@
 class photon_state : public pk8000_base_state
 {
 public:
-	photon_state(const machine_config &mconfig, device_type type, std::string tag)
+	photon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pk8000_base_state(mconfig, type, tag),
 		m_speaker(*this, "speaker") { }
 

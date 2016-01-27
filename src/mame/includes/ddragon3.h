@@ -12,7 +12,7 @@
 class ddragon3_state : public driver_device
 {
 public:
-	ddragon3_state(const machine_config &mconfig, device_type type, std::string tag)
+	ddragon3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram"),
@@ -85,7 +85,7 @@ public:
 class wwfwfest_state : public ddragon3_state
 {
 public:
-	wwfwfest_state(const machine_config &mconfig, device_type type, std::string tag)
+	wwfwfest_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ddragon3_state(mconfig, type, tag),
 		m_fg0_videoram(*this, "fg0_videoram"),
 		m_paletteram(*this, "palette")

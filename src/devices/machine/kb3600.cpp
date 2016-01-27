@@ -42,7 +42,7 @@ const device_type AY3600 = &device_creator<ay3600_device>;
 //  ay3600_device - constructor
 //-------------------------------------------------
 
-ay3600_device::ay3600_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ay3600_device::ay3600_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AY3600, "AY-5-3600", tag, owner, clock, "ay3600", __FILE__),
 	m_read_x0(*this),
 	m_read_x1(*this),

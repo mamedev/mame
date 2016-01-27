@@ -59,7 +59,7 @@ class crtc_ega_device : public device_t,
 						public device_video_interface
 {
 public:
-	crtc_ega_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	crtc_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_res_out_de_callback(device_t &device, _Object object)
 						{ return downcast<crtc_ega_device &>(device).m_res_out_de_cb.set_callback(object); }

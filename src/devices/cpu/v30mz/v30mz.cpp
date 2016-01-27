@@ -97,7 +97,7 @@ enum BREGS {
 const device_type V30MZ = &device_creator<v30mz_cpu_device>;
 
 
-v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, V30MZ, "V30MZ", tag, owner, clock, "v30mz", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
@@ -1583,7 +1583,7 @@ void v30mz_cpu_device::execute_run()
 							UINT16 si = m_regs.w[IX];
 							if (m_seg_prefix)
 							{
-								logerror("%s: %06x: Warning: seg_prefix defined for add4s\n", tag().c_str(), pc());
+								logerror("%s: %06x: Warning: seg_prefix defined for add4s\n", tag(), pc());
 							}
 							m_ZeroVal = m_CarryVal = 0;
 							for (int i=0;i<count;i++)
@@ -1614,7 +1614,7 @@ void v30mz_cpu_device::execute_run()
 							UINT16 si = m_regs.w[IX];
 							if (m_seg_prefix)
 							{
-								logerror("%s: %06x: Warning: seg_prefix defined for sub4s\n", tag().c_str(), pc());
+								logerror("%s: %06x: Warning: seg_prefix defined for sub4s\n", tag(), pc());
 							}
 							m_ZeroVal = m_CarryVal = 0;
 							for (int i=0; i<count; i++)
@@ -1654,7 +1654,7 @@ void v30mz_cpu_device::execute_run()
 							UINT16 si = m_regs.w[IX];
 							if (m_seg_prefix)
 							{
-								logerror("%s: %06x: Warning: seg_prefix defined for cmp4s\n", tag().c_str(), pc());
+								logerror("%s: %06x: Warning: seg_prefix defined for cmp4s\n", tag(), pc());
 							}
 							m_ZeroVal = m_CarryVal = 0;
 							for (int i=0; i<count; i++)
@@ -1706,29 +1706,29 @@ void v30mz_cpu_device::execute_run()
 						CLKM(13,19);
 						break;
 					case 0x31:
-						m_modrm = fetch(); m_modrm = 0; logerror("%s: %06x: Unimplemented bitfield INS\n", tag().c_str(), pc()); break;
+						m_modrm = fetch(); m_modrm = 0; logerror("%s: %06x: Unimplemented bitfield INS\n", tag(), pc()); break;
 					case 0x33:
-						m_modrm = fetch(); m_modrm = 0; logerror("%s: %06x: Unimplemented bitfield EXT\n", tag().c_str(), pc()); break;
+						m_modrm = fetch(); m_modrm = 0; logerror("%s: %06x: Unimplemented bitfield EXT\n", tag(), pc()); break;
 					case 0x92:  /* V25/35 FINT */
 						CLK(2);
 						break;
 					case 0xe0:
 						m_modrm = fetch();
 						m_modrm = 0;
-						logerror("%s: %06x: V33 unimplemented BRKXA (break to expansion address)\n", tag().c_str(), pc());
+						logerror("%s: %06x: V33 unimplemented BRKXA (break to expansion address)\n", tag(), pc());
 						break;
 					case 0xf0:
 						m_modrm = fetch();
 						m_modrm = 0;
-						logerror("%s: %06x: V33 unimplemented RETXA (return from expansion address)\n", tag().c_str(), pc());
+						logerror("%s: %06x: V33 unimplemented RETXA (return from expansion address)\n", tag(), pc());
 						break;
 					case 0xff:
 						m_modrm = fetch();
 						m_modrm = 0;
-						logerror("%s: %06x: unimplemented BRKEM (break to 8080 emulation mode)\n", tag().c_str(), pc());
+						logerror("%s: %06x: unimplemented BRKEM (break to 8080 emulation mode)\n", tag(), pc());
 						break;
 					default:
-						logerror("%s: %06x: Unknown V20 instruction\n", tag().c_str(), pc());
+						logerror("%s: %06x: Unknown V20 instruction\n", tag(), pc());
 						break;
 					}
 				}
@@ -2272,7 +2272,7 @@ void v30mz_cpu_device::execute_run()
 					{
 						CLK(13);
 					}
-					logerror("%s: %06x: bound %04x high %04x low %04x tmp\n", tag().c_str(), pc(), high, low, tmp);
+					logerror("%s: %06x: bound %04x high %04x low %04x tmp\n", tag(), pc(), high, low, tmp);
 				}
 				break;
 
@@ -2298,7 +2298,7 @@ void v30mz_cpu_device::execute_run()
 					case 0xae:  CLK(2); if (c) do { i_scasb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 					case 0xaf:  CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 					default:
-						logerror("%s: %06x: REPNC invalid\n", tag().c_str(), pc() );
+						logerror("%s: %06x: REPNC invalid\n", tag(), pc() );
 						// Decrement IP so the normal instruction will be executed next
 						m_ip--;
 						break;
@@ -2329,7 +2329,7 @@ void v30mz_cpu_device::execute_run()
 					case 0xae:  CLK(2); if (c) do { i_scasb(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 					case 0xaf:  CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 					default:
-						logerror("%s: %06x: REPC invalid\n", tag().c_str(), pc());
+						logerror("%s: %06x: REPC invalid\n", tag(), pc());
 						// Decrement IP so the normal instruction will be executed next
 						m_ip--;
 						break;
@@ -2625,7 +2625,7 @@ void v30mz_cpu_device::execute_run()
 					m_sregs[DS] = m_src;
 					break;
 				default:
-					logerror("%s: %06x: Mov Sreg - Invalid register\n", tag().c_str(), pc());
+					logerror("%s: %06x: Mov Sreg - Invalid register\n", tag(), pc());
 				}
 				m_no_interrupt = 1;
 				break;
@@ -2699,7 +2699,7 @@ void v30mz_cpu_device::execute_run()
 				break;
 
 			case 0x9b: // i_wait
-				logerror("%s: %06x: Hardware POLL\n", tag().c_str(), pc());
+				logerror("%s: %06x: Hardware POLL\n", tag(), pc());
 				break;
 
 			case 0x9c: // i_pushf
@@ -2921,7 +2921,7 @@ void v30mz_cpu_device::execute_run()
 						case 0x18: do { RORC_BYTE(); c--; } while (c>0); PutbackRMByte(m_dst); break;
 						case 0x20: SHL_BYTE(c); break;
 						case 0x28: SHR_BYTE(c); break;
-						case 0x30: logerror("%s: %06x: Undefined opcode 0xc0 0x30 (SHLA)\n", tag().c_str(), pc()); break;
+						case 0x30: logerror("%s: %06x: Undefined opcode 0xc0 0x30 (SHLA)\n", tag(), pc()); break;
 						case 0x38: SHRA_BYTE(c); break;
 						}
 					}
@@ -2946,7 +2946,7 @@ void v30mz_cpu_device::execute_run()
 						case 0x18: do { RORC_WORD(); c--; } while (c>0); PutbackRMWord(m_dst); break;
 						case 0x20: SHL_WORD(c); break;
 						case 0x28: SHR_WORD(c); break;
-						case 0x30: logerror("%s: %06x: Undefined opcode 0xc1 0x30 (SHLA)\n", tag().c_str(), pc()); break;
+						case 0x30: logerror("%s: %06x: Undefined opcode 0xc1 0x30 (SHLA)\n", tag(), pc()); break;
 						case 0x38: SHRA_WORD(c); break;
 						}
 					}
@@ -3081,7 +3081,7 @@ void v30mz_cpu_device::execute_run()
 				case 0x18: RORC_BYTE(); PutbackRMByte(m_dst); m_OverVal = (m_src ^ m_dst) & 0x80; break;
 				case 0x20: SHL_BYTE(1); m_OverVal = (m_src ^ m_dst) & 0x80; break;
 				case 0x28: SHR_BYTE(1); m_OverVal = (m_src ^ m_dst) & 0x80; break;
-				case 0x30: logerror("%s: %06x: Undefined opcode 0xd0 0x30 (SHLA)\n", tag().c_str(), pc()); break;
+				case 0x30: logerror("%s: %06x: Undefined opcode 0xd0 0x30 (SHLA)\n", tag(), pc()); break;
 				case 0x38: SHRA_BYTE(1); m_OverVal = 0; break;
 				}
 				break;
@@ -3099,7 +3099,7 @@ void v30mz_cpu_device::execute_run()
 				case 0x18: RORC_WORD(); PutbackRMWord(m_dst); m_OverVal = (m_src ^ m_dst) & 0x8000; break;
 				case 0x20: SHL_WORD(1); m_OverVal = (m_src ^ m_dst) & 0x8000;  break;
 				case 0x28: SHR_WORD(1); m_OverVal = (m_src ^ m_dst) & 0x8000;  break;
-				case 0x30: logerror("%s: %06x: Undefined opcode 0xd1 0x30 (SHLA)\n", tag().c_str(), pc()); break;
+				case 0x30: logerror("%s: %06x: Undefined opcode 0xd1 0x30 (SHLA)\n", tag(), pc()); break;
 				case 0x38: SHRA_WORD(1); m_OverVal = 0; break;
 				}
 				break;
@@ -3123,7 +3123,7 @@ void v30mz_cpu_device::execute_run()
 						case 0x18: do { RORC_BYTE(); c--; } while (c>0); PutbackRMByte(m_dst); break;
 						case 0x20: SHL_BYTE(c); break;
 						case 0x28: SHR_BYTE(c); break;
-						case 0x30: logerror("%s: %06x: Undefined opcode 0xd2 0x30 (SHLA)\n", tag().c_str(), pc()); break;
+						case 0x30: logerror("%s: %06x: Undefined opcode 0xd2 0x30 (SHLA)\n", tag(), pc()); break;
 						case 0x38: SHRA_BYTE(c); break;
 						}
 					}
@@ -3149,7 +3149,7 @@ void v30mz_cpu_device::execute_run()
 							case 0x18: do { RORC_WORD(); c--; } while (c>0); PutbackRMWord(m_dst); break;
 							case 0x20: SHL_WORD(c); break;
 							case 0x28: SHR_WORD(c); break;
-							case 0x30: logerror("%s: %06x: Undefined opcode 0xd3 0x30 (SHLA)\n", tag().c_str(), pc()); break;
+							case 0x30: logerror("%s: %06x: Undefined opcode 0xd3 0x30 (SHLA)\n", tag(), pc()); break;
 							case 0x38: SHRA_WORD(c); break;
 						}
 					}
@@ -3175,7 +3175,7 @@ void v30mz_cpu_device::execute_run()
 			case 0xd6: // i_setalc
 				m_regs.b[AL] = (CF) ? 0xff : 0x00;
 				CLK(3);
-				logerror("%s: %06x: Undefined opcode (SETALC)\n", tag().c_str(), pc() );
+				logerror("%s: %06x: Undefined opcode (SETALC)\n", tag(), pc() );
 				break;
 
 			case 0xd7: // i_trans
@@ -3186,7 +3186,7 @@ void v30mz_cpu_device::execute_run()
 			case 0xd8: // i_fpo
 				m_modrm = fetch();
 				CLK(1);
-				logerror("%s: %06x: Unimplemented floating point control %04x\n", tag().c_str(), pc(), m_modrm);
+				logerror("%s: %06x: Unimplemented floating point control %04x\n", tag(), pc(), m_modrm);
 				break;
 
 
@@ -3350,7 +3350,7 @@ void v30mz_cpu_device::execute_run()
 
 
 			case 0xf0: // i_lock
-				logerror("%s: %06x: Warning - BUSLOCK\n", tag().c_str(), pc());
+				logerror("%s: %06x: Warning - BUSLOCK\n", tag(), pc());
 				m_no_interrupt = 1;
 				CLK(1);
 				break;
@@ -3377,7 +3377,7 @@ void v30mz_cpu_device::execute_run()
 					case 0xae:  CLK(3); if (c) do { i_scasb(); c--; } while (c>0 && !ZF);   m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 					case 0xaf:  CLK(3); if (c) do { i_scasw(); c--; } while (c>0 && !ZF);   m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 					default:
-						logerror("%s: %06x: REPNE invalid\n", tag().c_str(), pc());
+						logerror("%s: %06x: REPNE invalid\n", tag(), pc());
 						// Decrement IP so the normal instruction will be executed next
 						m_ip--;
 						break;
@@ -3407,7 +3407,7 @@ void v30mz_cpu_device::execute_run()
 					case 0xae:  CLK(3); if (c) do { i_scasb(); c--; } while (c>0 && ZF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 					case 0xaf:  CLK(3); if (c) do { i_scasw(); c--; } while (c>0 && ZF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 					default:
-						logerror("%s: %06x: REPE invalid\n", tag().c_str(), pc());
+						logerror("%s: %06x: REPE invalid\n", tag(), pc());
 						// Decrement IP so the normal instruction will be executed next
 						m_ip--;
 						break;
@@ -3416,7 +3416,7 @@ void v30mz_cpu_device::execute_run()
 				break;
 
 			case 0xf4: // i_hlt
-				logerror("%s: %06x: HALT\n", tag().c_str(), pc());
+				logerror("%s: %06x: HALT\n", tag(), pc());
 				m_icount = 0;
 				break;
 
@@ -3442,7 +3442,7 @@ void v30mz_cpu_device::execute_run()
 						CLKM(1,2);
 						break;
 					case 0x08:
-						logerror("%s: %06x: Undefined opcode 0xf6 0x08\n", tag().c_str(), pc());
+						logerror("%s: %06x: Undefined opcode 0xf6 0x08\n", tag(), pc());
 						break;
 					case 0x10:  /* NOT */
 						PutbackRMByte(~tmp);
@@ -3532,7 +3532,7 @@ void v30mz_cpu_device::execute_run()
 						CLKM(1,2);
 						break;
 					case 0x08:
-						logerror("%s: %06x: Undefined opcode 0xf7 0x08\n", tag().c_str(), pc());
+						logerror("%s: %06x: Undefined opcode 0xf7 0x08\n", tag(), pc());
 						break;
 					case 0x10:  /* NOT */
 						PutbackRMWord(~tmp);
@@ -3660,7 +3660,7 @@ void v30mz_cpu_device::execute_run()
 						CLKM(1,3);
 						break;
 					default:
-						logerror("%s: %06x: FE Pre with unimplemented mod\n", tag().c_str(), pc());
+						logerror("%s: %06x: FE Pre with unimplemented mod\n", tag(), pc());
 						break;
 					}
 				}
@@ -3716,7 +3716,7 @@ void v30mz_cpu_device::execute_run()
 						CLK(1);
 						break;
 					default:
-						logerror("%s: %06x: FF Pre with unimplemented mod\n", tag().c_str(), pc());
+						logerror("%s: %06x: FF Pre with unimplemented mod\n", tag(), pc());
 						break;
 					}
 				}
@@ -3724,7 +3724,7 @@ void v30mz_cpu_device::execute_run()
 
 		default:
 			m_icount -= 10;
-			logerror("%s: %06x: Invalid Opcode %02x\n", tag().c_str(), pc(), op);
+			logerror("%s: %06x: Invalid Opcode %02x\n", tag(), pc(), op);
 			break;
 
 		}

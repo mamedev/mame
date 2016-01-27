@@ -38,7 +38,7 @@ const device_type X2210 = &device_creator<x2210_device>;
 //  x2212_device - constructor
 //-------------------------------------------------
 
-x2212_device::x2212_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+x2212_device::x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, X2212, "X2212 NVRAM", tag, owner, clock, "x2212", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
@@ -50,7 +50,7 @@ x2212_device::x2212_device(const machine_config &mconfig, std::string tag, devic
 {
 }
 
-x2212_device::x2212_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+x2212_device::x2212_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
@@ -129,9 +129,9 @@ void x2212_device::nvram_default()
 	if (m_region != nullptr)
 	{
 		if (m_region->bytes() != SIZE_DATA)
-			fatalerror("x2212 region '%s' wrong size (expected size = 0x100)\n", tag().c_str());
+			fatalerror("x2212 region '%s' wrong size (expected size = 0x100)\n", tag());
 		if (m_region->bytewidth() != 1)
-			fatalerror("x2212 region '%s' needs to be an 8-bit region\n", tag().c_str());
+			fatalerror("x2212 region '%s' needs to be an 8-bit region\n", tag());
 
 		UINT8 *default_data = m_region->base();
 		for (int byte = 0; byte < SIZE_DATA; byte++)
@@ -255,7 +255,7 @@ WRITE_LINE_MEMBER( x2212_device::recall )
 }
 
 
-x2210_device::x2210_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+x2210_device::x2210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: x2212_device(mconfig, X2210, "X2210", tag, owner, clock, "x2210", __FILE__)
 {
 }

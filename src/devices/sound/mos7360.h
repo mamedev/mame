@@ -94,8 +94,8 @@ class mos7360_device :  public device_t,
 {
 public:
 	// construction/destruction
-	//mos7360_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock);
-	mos7360_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	//mos7360_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	mos7360_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _irq, class _k> void set_callbacks(const char *cpu_tag, _irq irq, _k k) {
 		m_cpu_tag = cpu_tag;

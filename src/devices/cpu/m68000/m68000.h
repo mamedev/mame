@@ -125,13 +125,13 @@ class m68000_base_device : public cpu_device
 public:
 
 	// construction/destruction
-	m68000_base_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock,
-						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, std::string shortname, std::string source);
+	m68000_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
+						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, const char *shortname, const char *source);
 
-	m68000_base_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock,
-						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, std::string shortname, std::string source);
+	m68000_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
+						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source);
 
-	m68000_base_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER( write_irq1 );
 	DECLARE_WRITE_LINE_MEMBER( write_irq2 );
@@ -408,11 +408,11 @@ class m68000_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	m68000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	m68000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	m68000_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock,
-						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, std::string shortname, std::string source);
+	m68000_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
+						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source);
 
 
 
@@ -433,7 +433,7 @@ class m68301_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	m68301_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m68301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 10; };
@@ -455,7 +455,7 @@ class m68008_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	m68008_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m68008_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 10; };
@@ -474,7 +474,7 @@ class m68008plcc_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	m68008plcc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m68008plcc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 10; };
@@ -493,7 +493,7 @@ class m68010_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	m68010_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m68010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 10; };
@@ -512,7 +512,7 @@ class m68ec020_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	m68ec020_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m68ec020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
@@ -531,7 +531,7 @@ class m68020_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	m68020_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m68020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
@@ -550,7 +550,7 @@ class m68020fpu_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	m68020fpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m68020fpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
@@ -569,7 +569,7 @@ class m68020pmmu_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	m68020pmmu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m68020pmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
@@ -588,7 +588,7 @@ class m68020hmmu_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	m68020hmmu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m68020hmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
@@ -609,7 +609,7 @@ class m68ec030_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	m68ec030_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m68ec030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
@@ -628,7 +628,7 @@ class m68030_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	m68030_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m68030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
@@ -647,7 +647,7 @@ class m68ec040_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	m68ec040_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m68ec040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
@@ -666,7 +666,7 @@ class m68lc040_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	m68lc040_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m68lc040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
@@ -685,7 +685,7 @@ class m68040_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	m68040_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m68040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
@@ -704,7 +704,7 @@ class scc68070_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	scc68070_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	scc68070_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 10; };
@@ -726,10 +726,10 @@ class fscpu32_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	fscpu32_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	fscpu32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	fscpu32_device(const machine_config &mconfig, std::string name, std::string tag, device_t *owner, UINT32 clock,
-						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, std::string shortname, std::string source);
+	fscpu32_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
+						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
@@ -750,7 +750,7 @@ class mcf5206e_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	mcf5206e_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mcf5206e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };

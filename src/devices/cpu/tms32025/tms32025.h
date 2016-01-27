@@ -73,8 +73,8 @@ class tms32025_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tms32025_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	tms32025_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms32025_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
 	// device-level overrides
@@ -353,7 +353,7 @@ class tms32026_device : public tms32025_device
 {
 public:
 	// construction/destruction
-	tms32026_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms32026_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_reset() override;
