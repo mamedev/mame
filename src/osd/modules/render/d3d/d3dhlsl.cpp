@@ -1367,7 +1367,7 @@ int shaders::phosphor_pass(render_target *rt, cache_target *ct, int source_index
 	int next_index = source_index;
 
 	// skip phosphor if no influencing settings
-	if (options->phosphor[0] == 0.0f && options->defocus[0] == 0.0f && options->defocus[1] == 0.0f)
+	if (options->phosphor[0] == 0.0f && options->phosphor[1] == 0.0f && options->phosphor[2] == 0.0f)
 	{
 		return next_index;
 	}
