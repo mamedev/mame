@@ -30,6 +30,7 @@
     1992  Puyo Puyo                  Sega / Compile    317-0203         C2     171-5992A
     1992  Tant-R (Japan)             Sega              317-0211         C2
     1992  Tant-R (Korea)             Sega              ?                C2
+    1992  Waku Waku Marine           Sega              317-0140         C2
     1993  SegaSonic Popcorn Shop     Sega              317-0140         C2
     1994  PotoPoto (Japan)           Sega              317-0218         C2
     1994  Stack Columns (Japan)      Sega              317-0219         C2
@@ -1786,7 +1787,7 @@ ROM_START( ribbit ) /* Ribbit  (c)1991 Sega */
 ROM_END
 
 
-ROM_START( tantr ) /* Tant-R (Puzzle & Action)  (c)1992 Sega */
+ROM_START( tantr ) /* Tant-R (Puzzle & Action)  (c)1992 Sega - 834-9664 TANT-R (EMP5032 labeled 317-0211) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-15614.ic32", 0x000000, 0x080000, CRC(557782bc) SHA1(1546a999ab97c380dc87f6c95d5687722206740d) )
 	ROM_LOAD16_BYTE( "epr-15613.ic31", 0x000001, 0x080000, CRC(14bbb235) SHA1(8dbfec5fb1d7a695acbb2fc0e78e4bdf76eb8d9d) )
