@@ -145,7 +145,7 @@ public:
 	std::unique_ptr<UINT8[]> m_decrypted;
 
 	/* sound state */
-	optional_region_ptr<UINT8>	m_snd_rom;
+	optional_region_ptr<UINT8>  m_snd_rom;
 
 	/* video state */
 	tilemap_t           *m_bg_tilemap;

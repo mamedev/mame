@@ -189,7 +189,7 @@ protected:
 	required_device<z80dart_device> m_z80sio;
 	required_device<ay8910_device> m_ay;
 	required_device<meters_device> m_meters;
-	
+
 public:
 	int m_meter;
 	DECLARE_DRIVER_INIT(proconn);
@@ -379,7 +379,7 @@ static MACHINE_CONFIG_START( proconn, proconn_state )
 	MCFG_SOUND_ADD("aysnd", AY8910, 1000000) /* ?? Mhz */ // YM2149F on PC92?
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(proconn_state, meter_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
-	
+
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
 MACHINE_CONFIG_END

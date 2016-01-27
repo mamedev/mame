@@ -33,11 +33,11 @@ enum
 //-------------------------------------------------
 
 ui_input_manager::ui_input_manager(running_machine &machine)
-	: m_machine(machine), 
-	  m_current_mouse_target(nullptr), 
-	  m_current_mouse_down(false), 
-	  m_events_start(0), 
-	  m_events_end(0)
+	: m_machine(machine),
+		m_current_mouse_target(nullptr),
+		m_current_mouse_down(false),
+		m_events_start(0),
+		m_events_end(0)
 {
 	/* create the private data */
 	m_current_mouse_x = -1;
@@ -78,7 +78,6 @@ void ui_input_manager::frame_update()
 
 bool ui_input_manager::push_event(ui_event evt)
 {
-
 	/* some pre-processing (this is an icky place to do this stuff!) */
 	switch (evt.event_type)
 	{
@@ -241,8 +240,8 @@ g_profiler.stop();
 }
 
 /*-------------------------------------------------
-	push_mouse_move_event - pushes a mouse
-	move event to the specified render_target
+    push_mouse_move_event - pushes a mouse
+    move event to the specified render_target
 -------------------------------------------------*/
 
 void ui_input_manager::push_mouse_move_event(render_target* target, INT32 x, INT32 y)
@@ -256,8 +255,8 @@ void ui_input_manager::push_mouse_move_event(render_target* target, INT32 x, INT
 }
 
 /*-------------------------------------------------
-	push_mouse_leave_event - pushes a
-	mouse leave event to the specified render_target
+    push_mouse_leave_event - pushes a
+    mouse leave event to the specified render_target
 -------------------------------------------------*/
 
 void ui_input_manager::push_mouse_leave_event(render_target* target)
@@ -269,8 +268,8 @@ void ui_input_manager::push_mouse_leave_event(render_target* target)
 }
 
 /*-------------------------------------------------
-	push_mouse_down_event - pushes a mouse
-	down event to the specified render_target
+    push_mouse_down_event - pushes a mouse
+    down event to the specified render_target
 -------------------------------------------------*/
 
 void ui_input_manager::push_mouse_down_event(render_target* target, INT32 x, INT32 y)
@@ -284,8 +283,8 @@ void ui_input_manager::push_mouse_down_event(render_target* target, INT32 x, INT
 }
 
 /*-------------------------------------------------
-	push_mouse_down_event - pushes a mouse
-	down event to the specified render_target
+    push_mouse_down_event - pushes a mouse
+    down event to the specified render_target
 -------------------------------------------------*/
 
 void ui_input_manager::push_mouse_up_event(render_target* target, INT32 x, INT32 y)
@@ -299,9 +298,9 @@ void ui_input_manager::push_mouse_up_event(render_target* target, INT32 x, INT32
 }
 
 /*-------------------------------------------------
-	push_mouse_double_click_event - pushes
-	a mouse double-click event to the specified
-	render_target
+    push_mouse_double_click_event - pushes
+    a mouse double-click event to the specified
+    render_target
 -------------------------------------------------*/
 void ui_input_manager::push_mouse_double_click_event(render_target* target, INT32 x, INT32 y)
 {
@@ -314,8 +313,8 @@ void ui_input_manager::push_mouse_double_click_event(render_target* target, INT3
 }
 
 /*-------------------------------------------------
-	push_char_event - pushes a char event
-	to the specified render_target
+    push_char_event - pushes a char event
+    to the specified render_target
 -------------------------------------------------*/
 void ui_input_manager::push_char_event(render_target* target, unicode_char ch)
 {

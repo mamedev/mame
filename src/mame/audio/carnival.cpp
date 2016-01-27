@@ -203,7 +203,7 @@ ADDRESS_MAP_END
 
 
 MACHINE_CONFIG_FRAGMENT( carnival_audio )
-	
+
 	/* music board */
 	MCFG_CPU_ADD("audiocpu", I8039, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(mboard_map)

@@ -202,7 +202,7 @@ ROM_START( maniacsqa ) // REF 940411
 	ROM_REGION( 0x040000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "MS_U_45.U45",   0x000000, 0x020000, CRC(98f4fdc0) SHA1(1e4d5b0a8a432de885c96319c21280d304b38db0) )
 	ROM_LOAD16_BYTE( "MS_U_44.U44",   0x000001, 0x020000, CRC(1785dd41) SHA1(5c6a65c00248971ce54c8185858393f2c52cc583) )
-		
+
 	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
 	ROM_LOAD( "ms_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
 
@@ -217,7 +217,7 @@ ROM_START( maniacsqa ) // REF 940411
 	ROM_FILL(          0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
 ROM_END
 
-  
+
 
 /*============================================================================
                                 BANG
@@ -1457,7 +1457,7 @@ ROM_END
 READ16_MEMBER(gaelco2_state::maniacsqa_prot_r)
 {
 	int pc = space.device().safe_pc();
-	
+
 	// if -1 is returned at any point on these checks the game instantly reports 'power failure'
 	// these are generally done right before the other checks
 	if (pc == 0x3dbc) return 0x0000; // must not be -1
@@ -1471,7 +1471,7 @@ READ16_MEMBER(gaelco2_state::maniacsqa_prot_r)
 	if (pc == 0x3dce) return 0x0000; // must be 0
 
 	if (pc == 0x25c2) return 0x0000; // writes 0 to 0xfe45fa then expects this to be 0
-	
+
 	if (pc == 0x5cf6) return 0x0000; // must be 0
 	if (pc == 0x5d1a) return 0x0000; // must be 0
 	if (pc == 0xaaa0) return 0x0000; // must be 0?
@@ -1480,8 +1480,8 @@ READ16_MEMBER(gaelco2_state::maniacsqa_prot_r)
 	if (pc == 0xaad0) return 0x0a00; // if above ISN'T 0 this must be 0x0a00 (but code then dies, probably wants some data filled?)
 	// other code path just results in no more pieces dropping? maybe the MCU does the matching algorithm?
 
-	
-	
+
+
 
 
 	printf("read at PC %08x\n", pc);

@@ -30,7 +30,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(romen_r);  // ROM /EN (pin 9)
 	DECLARE_WRITE_LINE_MEMBER(start_w); // START (pin 10)
 	DECLARE_WRITE8_MEMBER(data_w);      // 6-bit word
-	
+
 	void set_clock(UINT32 clock);       // set new CLK frequency
 	void force_update();                // update stream, eg. before external ROM bankswitch
 
@@ -80,10 +80,10 @@ private:
 
 	UINT16 m_uDAR13To05P1;      // 9 MSBs of delta address register
 	UINT16 m_uDAR13To05P2;      // incrementing uDAR05To13 advances ROM address by 8 bytes
-	
+
 	UINT16 m_uDAR04To00P1;      // 5 LSBs of delta address register
 	UINT16 m_uDAR04To00P2;      // 3 address ROM, 2 mux 8 bits of data into 2 bit delta
-	                            // carry indicates end of quarter pitch period (32 cycles)
+								// carry indicates end of quarter pitch period (32 cycles)
 
 	UINT16 m_uCWARP1;           // 12 bits Control Word Address Register (syllable)
 	UINT16 m_uCWARP2;
@@ -96,9 +96,9 @@ private:
 	bool m_bSilenceP2;
 	UINT8 m_uLengthP1;          // 7 bits, upper three loaded from ROM length
 	UINT8 m_uLengthP2;          // middle two loaded from ROM repeat and/or uXRepeat
-	                            // bit 0 indicates mirror in voiced mode
-	                            // bit 1 indicates internal silence in voiced mode
-	                            // incremented each pitch period quarter
+								// bit 0 indicates mirror in voiced mode
+								// bit 1 indicates internal silence in voiced mode
+								// incremented each pitch period quarter
 
 	UINT8 m_uXRepeatP1;         // 2 bits, loaded from ROM repeat
 	UINT8 m_uXRepeatP2;

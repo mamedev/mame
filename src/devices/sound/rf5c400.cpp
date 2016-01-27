@@ -355,7 +355,7 @@ READ16_MEMBER( rf5c400_device::rf5c400_r )
 			return 0;
 		}
 
-		case 0x13:		// memory read
+		case 0x13:      // memory read
 		{
 			return m_rom[m_ext_mem_address];
 		}

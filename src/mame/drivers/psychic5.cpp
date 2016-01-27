@@ -321,7 +321,7 @@ Notes (23-Jan-2016 AS):
 - Bombs Away sports following issues, which indicates it's a unfinished product:
   - missing bullets (missing data from ROMs);
   - missing levels above 4 (missing data from ROMs);
-  - occasionally wrong flip x when the player route is from up to down; 
+  - occasionally wrong flip x when the player route is from up to down;
   - enemy counter stops entirely when the S is collected;
   - boss fights uses always the same pattern;
   - single BGM repeated over and over, for every level;

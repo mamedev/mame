@@ -205,8 +205,8 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 				<rom name="tron.bin" size="8192" crc="280f191d" sha1="0d8b5c43db89a438f6036794be7628793643818b" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="jungler"> <!-- US and Japan confirmed to be the same -->
 	<!-- Stock No: 8202, (Japanese 015E)-->
 		<description>Jungler</description>

@@ -493,7 +493,7 @@ are available at http://arcarc.xmission.com/PDF_Arcade_Williams/
 
 It's a RAM-based palette with 4 bit red, green, blue and brightness/intensity components. It looks like the
 brightness component (from IC76, the uppermost of the four 2148 SRAMs) should be combined with the color
-components in a more complicated way than simply multiplying them like MAME does. 
+components in a more complicated way than simply multiplying them like MAME does.
 
 Reference video: https://www.youtube.com/watch?v=R5OeC6Wc_yI
 

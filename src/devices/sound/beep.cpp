@@ -50,7 +50,7 @@ void beep_device::device_start()
 	m_stream = stream_alloc(0, 1, BEEP_RATE);
 	m_enable = 0;
 	m_signal = 0x07fff;
-	
+
 	// register for savestates
 	save_item(NAME(m_enable));
 	save_item(NAME(m_frequency));

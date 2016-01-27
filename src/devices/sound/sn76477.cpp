@@ -957,17 +957,17 @@ WRITE_LINE_MEMBER(sn76477_device::enable_w)
 	{
 		m_channel->update();
 
-	    m_enable = state;
+		m_enable = state;
 
-		    /* if falling edge */
-	    if (!m_enable)
-	    {
-		    /* start the attack phase */
-		    m_attack_decay_cap_voltage = AD_CAP_VOLTAGE_MIN;
+			/* if falling edge */
+		if (!m_enable)
+		{
+			/* start the attack phase */
+			m_attack_decay_cap_voltage = AD_CAP_VOLTAGE_MIN;
 
-		    /* one-shot runs regardless of envelope mode */
-		    m_one_shot_running_ff = 1;
-	    }
+			/* one-shot runs regardless of envelope mode */
+			m_one_shot_running_ff = 1;
+		}
 
 		log_enable_line();
 	}
@@ -1392,16 +1392,16 @@ void sn76477_device::noise_clock_res_w(double data)
 	{
 		m_channel->update();
 
-	    if (data == 0)
-	    {
-		    m_noise_clock_ext = 1;
-	    }
-	    else
-	    {
-		    m_noise_clock_ext = 0;
+		if (data == 0)
+		{
+			m_noise_clock_ext = 1;
+		}
+		else
+		{
+			m_noise_clock_ext = 0;
 
-		    m_noise_clock_res = data;
-	    }
+			m_noise_clock_res = data;
+		}
 
 		log_noise_gen_freq();
 	}
@@ -1711,7 +1711,7 @@ void sn76477_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 	stream_sample_t *buffer = outputs[0];
 
-    /* compute charging values, doing it here ensures that we always use the latest values */
+	/* compute charging values, doing it here ensures that we always use the latest values */
 	one_shot_cap_charging_step = compute_one_shot_cap_charging_rate() / m_our_sample_rate;
 	one_shot_cap_discharging_step = compute_one_shot_cap_discharging_rate() / m_our_sample_rate;
 

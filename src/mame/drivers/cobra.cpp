@@ -2288,13 +2288,13 @@ void cobra_renderer::gfx_fifo_exec()
 					// GFX register select
 					m_gfx_register_select = w[3];
 
-				//	printf("GFX: register select %08X\n", m_gfx_register_select);
+				//  printf("GFX: register select %08X\n", m_gfx_register_select);
 				}
 				else if (w2 == 0x10500018)
 				{
 					// register write to the register selected above?
 					// 64-bit registers, top 32-bits in word 2, low 32-bit in word 3
-				//	printf("GFX: register write %08X: %08X %08X\n", m_gfx_register_select, w[2], w[3]);
+				//  printf("GFX: register write %08X: %08X %08X\n", m_gfx_register_select, w[2], w[3]);
 
 					gfx_write_reg(((UINT64)(w[2]) << 32) | w[3]);
 				}

@@ -171,7 +171,7 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
 		<description>Dimension 68000 Burnin Test</description>
 		<year>1984</year>
 		<publisher>Micro Craft Corporation</publisher>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="181726">
@@ -184,14 +184,14 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
 		<description>Fortran 68K</description>
 		<year>1983</year>
 		<publisher>Silicon Valley Software</publisher>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="391735">
 				<rom name="d68fort1.imd" size="391735" crc="db27dc48" sha1="b912b91ed49e828c91863d3f71d3a7d673ac08b1" offset="0"/>
 			</dataarea>
 		</part>
-		
+
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="386625">
@@ -199,5 +199,5 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
 			</dataarea>
 		</part>
 	</software>
-	
+
 </softwarelist>

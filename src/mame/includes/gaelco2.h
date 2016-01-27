@@ -30,7 +30,7 @@ public:
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
 	optional_shared_ptr<UINT16> m_shareram;
 
-	
+
 
 	UINT32 snowboard_latch;
 
@@ -39,7 +39,7 @@ public:
 	tilemap_t *m_pant[2];
 	int m_dual_monitor;
 
-	DECLARE_READ16_MEMBER(dallas_kludge_r);	
+	DECLARE_READ16_MEMBER(dallas_kludge_r);
 	DECLARE_READ16_MEMBER(maniacsqa_prot_r);
 
 	DECLARE_WRITE16_MEMBER(gaelco2_coin_w);

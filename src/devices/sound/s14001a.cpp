@@ -132,11 +132,11 @@ void s14001a_device::device_start()
 	// resolve callbacks
 	m_ext_read_handler.resolve();
 	m_bsy_handler.resolve();
-	
+
 	// note: zerofill is done already by MAME core
 	ClearStatistics();
 	m_uOutputP1 = m_uOutputP2 = 7;
-	
+
 	// register for savestates
 	save_item(NAME(m_bPhase1));
 	save_item(NAME(m_uStateP1));

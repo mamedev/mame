@@ -68,13 +68,13 @@ READ8_MEMBER(arkanoid_state::arkanoid_68705_tcr_r)
 WRITE8_MEMBER(arkanoid_state::arkanoid_68705_tcr_w)
 {
 /*
-	logerror("arkanoid_68705 TCR written with %02X\n", data);
-	if (data&0x80) logerror("  TIR=1, Timer Interrupt state is set\n"); else logerror("  TIR=0; Timer Interrupt state is cleared\n");
-	if (data&0x40) logerror("  TIM=1, Timer Interrupt is now masked\n"); else logerror("  TIM=0, Timer Interrupt is now unmasked\n");
-	if (data&0x20) logerror("  TIN=1, Timer Clock source is set to external\n"); else logerror("  TIN=0, Timer Clock source is set to internal\n");
-	if (data&0x10) logerror("  TIE=1, Timer External pin is enabled\n"); else logerror("  TIE=0, Timer External pin is disabled\n");
-	if (data&0x08) logerror("  PSC=1, Prescaler counter cleared\n"); else logerror("  PSC=0, Prescaler counter left alone\n");
-	logerror("  Prescaler: %d\n", (1<<(data&0x7)));
+    logerror("arkanoid_68705 TCR written with %02X\n", data);
+    if (data&0x80) logerror("  TIR=1, Timer Interrupt state is set\n"); else logerror("  TIR=0; Timer Interrupt state is cleared\n");
+    if (data&0x40) logerror("  TIM=1, Timer Interrupt is now masked\n"); else logerror("  TIM=0, Timer Interrupt is now unmasked\n");
+    if (data&0x20) logerror("  TIN=1, Timer Clock source is set to external\n"); else logerror("  TIN=0, Timer Clock source is set to internal\n");
+    if (data&0x10) logerror("  TIE=1, Timer External pin is enabled\n"); else logerror("  TIE=0, Timer External pin is disabled\n");
+    if (data&0x08) logerror("  PSC=1, Prescaler counter cleared\n"); else logerror("  PSC=0, Prescaler counter left alone\n");
+    logerror("  Prescaler: %d\n", (1<<(data&0x7)));
 */
 	// if timer was enabled but now isn't, shut it off.
 	// below is a hack assuming the TIMER pin isn't going anywhere except tied to +5v, so basically TIN is acting as an active-low timer enable, and TIE is ignored even in the case where TIE=1, the timer will end up being 5v ANDED against the internal timer clock which == the internal timer clock.
@@ -95,7 +95,7 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_68705_tcr_w)
 	// if int state is set, and TIM is unmasked, assert an interrupt. otherwise clear it.
 	if ((m_tcr&0xC0) == 0x80)
 		m_mcu->set_input_line(M68705_INT_TIMER, ASSERT_LINE);
-	else 
+	else
 		m_mcu->set_input_line(M68705_INT_TIMER, CLEAR_LINE);
 
 }
@@ -118,7 +118,7 @@ TIMER_CALLBACK_MEMBER(arkanoid_state::timer_68705_increment)
 	if (m_tdr == 0x00) m_tcr |= 0x80; // if we overflowed, set the int bit
 	if ((m_tcr&0xC0) == 0x80)
 		m_mcu->set_input_line(M68705_INT_TIMER, ASSERT_LINE);
-	else 
+	else
 		m_mcu->set_input_line(M68705_INT_TIMER, CLEAR_LINE);
 	timer_set(attotime::from_hz(((XTAL_12MHz/4)/4)/(1<<(m_tcr&0x7))), TIMER_68705_PRESCALER_EXPIRED);
 }
@@ -178,7 +178,7 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_68705_ddr_c_w)
 	{
 		UINT8 changed_m_port_c_out = (m_port_c_out^(m_port_c_internal|(~(data|0xF0))));
 		m_port_c_out = (m_port_c_internal|(~(data|0xF0)));
-	
+
 		/* bits 0 and 1 are inputs, should never be set as outputs here. if they are, ignore them. */
 		/* bit 2 is an output, to clear latch 1(m_z80HasWritten) on rising edge, and enable the z80->68705 communication latch on level low */
 		// if 0x04 rising edge, clear m_z80HasWritten/latch 1 (and clear the irq line)
@@ -187,13 +187,13 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_68705_ddr_c_w)
 			m_z80HasWritten = 0;
 			m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 		}
-	
+
 		// if 0x04 low, enable the m_port_a_in latch, otherwise set the latch value to 0xFF
 		if (~m_port_c_out&0x04)
 			m_port_a_in = m_fromz80;
 		else
 			m_port_a_in = 0xFF;
-	
+
 		/* bit 3 is an output, to set latch 2(m_68705HasWritten) and latch the port_a value into the 68705->z80 latch, on falling edge or low level */
 		// if 0x08 low, set m_68705HasWritten/latch 2
 		if (~m_port_c_out&0x08)

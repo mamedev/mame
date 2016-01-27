@@ -291,15 +291,15 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 //static ADDRESS_MAP_START( prophet2_mem, AS_PROGRAM, 8, atom_state )
-//	AM_RANGE(0x0000, 0x09ff) AM_RAM
-//	AM_RANGE(0x0a00, 0x7fff) AM_RAM
-//	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("video_ram")
-//	AM_RANGE(0x9800, 0x9fff) AM_RAM
-//	AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
+//  AM_RANGE(0x0000, 0x09ff) AM_RAM
+//  AM_RANGE(0x0a00, 0x7fff) AM_RAM
+//  AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("video_ram")
+//  AM_RANGE(0x9800, 0x9fff) AM_RAM
+//  AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
 ////  AM_RANGE(0xb400, 0xb403) AM_DEVREADWRITE(MC6854_TAG, mc6854_device, read, write)
 ////  AM_RANGE(0xb404, 0xb404) AM_READ_PORT("ECONET")
-//	AM_RANGE(0xb800, 0xb80f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
-//	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
+//  AM_RANGE(0xb800, 0xb80f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
+//  AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
 //ADDRESS_MAP_END
 
 /***************************************************************************
@@ -859,17 +859,17 @@ MACHINE_CONFIG_END
 -------------------------------------------------*/
 
 //static MACHINE_CONFIG_DERIVED( prophet2, atom )
-//	/* basic machine hardware */
-//	MCFG_CPU_MODIFY(SY6502_TAG)
-//	MCFG_CPU_PROGRAM_MAP(prophet2_mem)
+//  /* basic machine hardware */
+//  MCFG_CPU_MODIFY(SY6502_TAG)
+//  MCFG_CPU_PROGRAM_MAP(prophet2_mem)
 //
-//	/* fdc */
-//	MCFG_DEVICE_REMOVE(I8271_TAG)
-//	MCFG_DEVICE_REMOVE(I8271_TAG ":0")
-//	MCFG_DEVICE_REMOVE(I8271_TAG ":1")
+//  /* fdc */
+//  MCFG_DEVICE_REMOVE(I8271_TAG)
+//  MCFG_DEVICE_REMOVE(I8271_TAG ":0")
+//  MCFG_DEVICE_REMOVE(I8271_TAG ":1")
 //
-//	/* Software lists */
-//	MCFG_SOFTWARE_LIST_REMOVE("flop_list")
+//  /* Software lists */
+//  MCFG_SOFTWARE_LIST_REMOVE("flop_list")
 //MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -885,9 +885,9 @@ MACHINE_CONFIG_END
 -------------------------------------------------*/
 
 //static MACHINE_CONFIG_DERIVED( atommc, atom )
-//	/* Software lists */
-//	MCFG_SOFTWARE_LIST_ADD("mmc_list","atom_mmc")
-//	MCFG_SOFTWARE_LIST_REMOVE("flop_list")
+//  /* Software lists */
+//  MCFG_SOFTWARE_LIST_ADD("mmc_list","atom_mmc")
+//  MCFG_SOFTWARE_LIST_REMOVE("flop_list")
 //MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -938,11 +938,11 @@ ROM_END
 -------------------------------------------------*/
 
 //ROM_START( atommc )
-//	ROM_REGION( 0x4000, SY6502_TAG, 0 )
-//	ROM_LOAD( "abasic.ic20", 0x0000, 0x1000, CRC(289b7791) SHA1(0072c83458a9690a3ea1f6094f0f38cf8e96a445) )
-//	ROM_CONTINUE(            0x3000, 0x1000 )
-//	ROM_LOAD( "afloat.ic21", 0x1000, 0x1000, CRC(81d86af7) SHA1(ebcde5b36cb3a3344567cbba4c7b9fde015f4802) )
-//	ROM_LOAD( "atommc2-2.9-a000.rom", 0x2000, 0x1000, CRC(ba73e36c) SHA1(ea9739e96f3283c90b5306288c796fc01144b771) )
+//  ROM_REGION( 0x4000, SY6502_TAG, 0 )
+//  ROM_LOAD( "abasic.ic20", 0x0000, 0x1000, CRC(289b7791) SHA1(0072c83458a9690a3ea1f6094f0f38cf8e96a445) )
+//  ROM_CONTINUE(            0x3000, 0x1000 )
+//  ROM_LOAD( "afloat.ic21", 0x1000, 0x1000, CRC(81d86af7) SHA1(ebcde5b36cb3a3344567cbba4c7b9fde015f4802) )
+//  ROM_LOAD( "atommc2-2.9-a000.rom", 0x2000, 0x1000, CRC(ba73e36c) SHA1(ea9739e96f3283c90b5306288c796fc01144b771) )
 //ROM_END
 
 DRIVER_INIT_MEMBER(atomeb_state, atomeb)

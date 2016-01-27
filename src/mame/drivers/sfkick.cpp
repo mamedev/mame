@@ -85,11 +85,11 @@ Player 2 Shoot | Z | 22| Player 1 Shoot
            GND | e | 27| GND
            GND | f | 28| GND
 
-         ____ 
+         ____
         /    \
        | Dial |
         \____/
-       /|   |\ 
+       /|   |\
      /  |   | \
  Blue Red Black Yellow
   /     |   |    \
@@ -510,22 +510,22 @@ static INPUT_PORTS_START( sfkick )
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(-20)
 
 	PORT_START("DSW1") /* bitswapped at read! 76543210 -> 45673210 */
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x01, 0x01,  "Stage Select" )	PORT_DIPLOCATION("SW1:2") /* How does this work?? */
+	PORT_DIPNAME( 0x01, 0x01,  "Stage Select" ) PORT_DIPLOCATION("SW1:2") /* How does this work?? */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20,  "Freeze" )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x20, 0x20,  "Freeze" )   PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02,  "Test Mode" )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x02, 0x02,  "Test Mode" )    PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x8c, 0x8c, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:6,8,7")
+	PORT_DIPNAME( 0x8c, 0x8c, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:6,8,7")
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x84, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_2C ) )
@@ -537,20 +537,20 @@ static INPUT_PORTS_START( sfkick )
 
 	PORT_START("DSW2") /* bitswapped at read! 76543210 -> 45673210 */
 	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:1" ) /* Manual states "No Comment" */
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x41, 0x01, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x41, 0x01, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x41, "1" )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x82, 0x02, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x82, 0x02, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x80, "Every 20,000" )
 	PORT_DIPSETTING(    0x02, "20,000 & 50,000" )
 	PORT_DIPSETTING(    0x00, "Every 50,000" )
 	PORT_DIPSETTING(    0x82, DEF_STR( None ) )
-	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x0c, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )

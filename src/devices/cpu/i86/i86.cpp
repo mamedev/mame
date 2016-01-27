@@ -159,7 +159,7 @@ void i8086_cpu_device::execute_run()
 				}
 			}
 
-			/* Trap should allow one instruction to be executed. 
+			/* Trap should allow one instruction to be executed.
 			   CPUID.ASM (by Bob Smith, 1985) suggests that in situations where m_no_interrupt is 1,
 			   (directly after POP SS / MOV_SREG), single step IRQs don't fire.
 			*/
@@ -167,7 +167,7 @@ void i8086_cpu_device::execute_run()
 			{
 				if ( (m_fire_trap >= 2) && (m_no_interrupt == 0) )
 				{
-					m_fire_trap = 0; // reset trap flag upon entry 
+					m_fire_trap = 0; // reset trap flag upon entry
 					interrupt(1);
 				}
 				else
@@ -1408,7 +1408,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 			m_src = GetRMWord();
 			m_sregs[(m_modrm & 0x18) >> 3] = m_src; // confirmed on hw: modrm bit 5 ignored
 			CLKM(MOV_SR,MOV_SM);
-			m_no_interrupt = 1; // Disable IRQ after load segment register. 
+			m_no_interrupt = 1; // Disable IRQ after load segment register.
 			break;
 
 		case 0x8f: // i_popw

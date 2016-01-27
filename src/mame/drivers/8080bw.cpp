@@ -3300,7 +3300,7 @@ DRIVER_INIT_MEMBER(_8080bw_state,invmulti)
 	// decrypt rom
 	for (int i = 0; i < len; i++)
 		dest[i] = BITSWAP8(src[(i & 0x100ff) | (BITSWAP8(i >> 8 & 0xff, 7,3,4,5,0,6,1,2) << 8)],0,6,5,7,4,3,1,2);
-	
+
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 	membank("bank1")->set_entry(0);
 	membank("bank2")->configure_entries(0, 8, memregion("maincpu")->base() + 0x2000, 0x4000);

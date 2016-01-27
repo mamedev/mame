@@ -164,16 +164,16 @@ WRITE8_MEMBER(fortyl_state::fortyl_pixram_sel_w)
 
 	if(data & 0xd2)
 		popmessage("pixram sel = %02x, contact MAMEdev",data);
-	
+
 	m_pixram_sel = (data & 0x04) >> 2;
 	m_screen_disable = bool(data & 0x20); // Undoukai
-	
+
 	if(cur_col_bank != m_color_bank)
 	{
 		m_color_bank = cur_col_bank;
 		redraw_pixels();
 	}
-	
+
 	if (m_flipscreen != f)
 	{
 		m_flipscreen = f;
@@ -372,7 +372,7 @@ UINT32 fortyl_state::screen_update_fortyl(screen_device &screen, bitmap_ind16 &b
 		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
-	
+
 	draw_pixram(bitmap, cliprect);
 
 	m_bg_tilemap->set_scrolldy(- m_video_ctrl[1] + 1, - m_video_ctrl[1] - 1 );

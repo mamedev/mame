@@ -3329,7 +3329,7 @@ ROM_START( pbobblen ) /* MVS ONLY RELEASE */
 	NEO_SFIX_128K( "d96-04.s1", CRC(9caae538) SHA1(cf2d90a7c1a42107c0bb8b9a61397634286dbe0a) ) /* mask rom TC531000 */
 
 	NEO_BIOS_AUDIO_128K( "d96-06.m1", CRC(f424368a) SHA1(5e5bbcaeb82bed2ee17df08f005ca20ad1030723) ) /* M27C1001 */
-	/* M1 on eprom with sticker; label is D96-06 */ 
+	/* M1 on eprom with sticker; label is D96-06 */
 
 	ROM_REGION( 0x380000, "ymsnd", 0 )
 	ROM_LOAD( "068-v1.v1", 0x000000, 0x100000, CRC(2ced86df) SHA1(d6b73d1f31efbd74fb745200d4dade5f80b71541) ) /* unused */ /* mask rom TC538200 */
@@ -4601,7 +4601,7 @@ ROM_END
  . NGM-222
  NEO-MVS PROGBK1 / NEO-MVS CHA256B
  NEO-MVS PROGBK1 / NEO-MVS CHA256
- . NGH-222 
+ . NGH-222
  NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ****************************************/
 
@@ -9610,7 +9610,7 @@ DRIVER_INIT_MEMBER(neogeo_noslot_state,kf2k3pcb)
                                                                                                 NEOGEO ROM-cart:2004/07/15
 ****************************************************************************/
 
-/*    YEAR  NAME        PARENT    MACHINE   	   INPUT   INIT            MONITOR */
+/*    YEAR  NAME        PARENT    MACHINE          INPUT   INIT            MONITOR */
 /* SNK */
 GAME( 1990, nam1975,    neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "NAM-1975 (NGM-001)(NGH-001)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, bstars,     neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Baseball Stars Professional (NGM-002)", MACHINE_SUPPORTS_SAVE )

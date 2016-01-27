@@ -158,7 +158,7 @@ void liberatr_state::machine_reset()
 	// reset the control latch on the EAROM
 	m_earom->set_control(0, 1, 1, 0, 0);
 }
-	
+
 
 
 /*************************************

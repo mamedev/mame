@@ -1861,10 +1861,10 @@ READ64_MEMBER(naomi_state::aw_modem_r )
 	if (reg == 0x280/4)
 	{
 	/*
-             0x00600280 r  0000dcba
-                 a/b/c/d - coin inputs 1-4, active low
-                 (ab == 0) -> BIOS skip RAM test
-        */ 
+	         0x00600280 r  0000dcba
+	             a/b/c/d - coin inputs 1-4, active low
+	             (ab == 0) -> BIOS skip RAM test
+	    */
 		return U64(0xffffffff00000000) | (ioport("COINS")->read() & 0x0F);
 	} else
 		if (reg == 0x284/4)
@@ -1888,20 +1888,20 @@ WRITE64_MEMBER(naomi_state::aw_modem_w )
 		aw_ctrl_type = dat & 0xF0;
 	}
 	/*
-            0x00600284 rw ddcc0000
-                cc/dd - set type of Maple devices at ports 2/3 (EX. IO board)
-            0 - regular Atomiswave controller
-            1 - DC lightgun
-            2 - DC mouse/trackball
-            TODO: hook this then MAME have such devices emulated
+	        0x00600284 rw ddcc0000
+	            cc/dd - set type of Maple devices at ports 2/3 (EX. IO board)
+	        0 - regular Atomiswave controller
+	        1 - DC lightgun
+	        2 - DC mouse/trackball
+	        TODO: hook this then MAME have such devices emulated
 
-            0x00600288 rw 0000dcba
-                a - 1P coin couner
-                b - 2P coin couner
-                c - 1P coin lockout
-                d - 2P coin lockout
+	        0x00600288 rw 0000dcba
+	            a - 1P coin couner
+	            b - 2P coin couner
+	            c - 1P coin lockout
+	            d - 2P coin lockout
 
-            0x0060028C rw POUT CN304 (EX. IO board)
+	        0x0060028C rw POUT CN304 (EX. IO board)
 	*/
 
 	osd_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);

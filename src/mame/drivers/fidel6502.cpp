@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco,hap
 /******************************************************************************
- 
+
     Fidelity Electronics 6502 based board driver
     See drivers/fidelz80.cpp for hardware description
 
@@ -77,14 +77,14 @@ void fidel6502_state::csc_prepare_display()
 {
 	// 7442 output, also update input mux (9 is unused)
 	m_inp_mux = (1 << m_led_select) & 0x1ff;
-	
+
 	// 4 7seg leds + H
 	for (int i = 0; i < 4; i++)
 	{
 		m_display_segmask[i] = 0x7f;
 		m_display_state[i] = (m_inp_mux >> i & 1) ? m_7seg_data : 0;
 	}
-	
+
 	// 8*8 chessboard leds
 	for (int i = 0; i < 8; i++)
 		m_display_state[i+4] = (m_inp_mux >> i & 1) ? m_led_data : 0;
@@ -136,7 +136,7 @@ READ8_MEMBER(fidel6502_state::csc_pia0_pb_r)
 	// d5: button row 8 (active low)
 	if (!(read_inputs(9) & 0x100))
 		data |= 0x20;
-	
+
 	// d6,d7: language switches
 	data|=0xc0;
 
@@ -228,10 +228,10 @@ WRITE8_MEMBER(fidel6502_state::sc12_control_w)
 
 	// 7442 9: speaker out
 	m_speaker->level_w(sel >> 9 & 1);
-	
+
 	// d6,d7: led select (active low)
 	display_matrix(9, 2, sel & 0x1ff, ~data >> 6 & 3);
-	
+
 	// d4,d5: printer
 	//..
 }

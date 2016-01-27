@@ -1495,7 +1495,7 @@ static void handle_keys(running_machine &machine)
 			debug_cpu_get_visible_cpu(machine)->debug()->go();
 		}
 	}
-	
+
 	if(machine.input().code_pressed_once(KEYCODE_F5))
 		debug_cpu_get_visible_cpu(machine)->debug()->go();
 	if(machine.input().code_pressed_once(KEYCODE_F6))
@@ -1556,7 +1556,7 @@ static void handle_keys(running_machine &machine)
 
 			set_focus_view(ndv);
 		}
-	}	
+	}
 	if(machine.input().code_pressed_once(KEYCODE_L))
 	{
 		if(machine.input().code_pressed(KEYCODE_LCONTROL))
@@ -1619,7 +1619,7 @@ static void handle_keys(running_machine &machine)
 		}
 	}
 
-	
+
 	// pass keypresses to debug view with focus
 	if(machine.input().code_pressed_once(KEYCODE_UP))
 		focus_view->view->process_char(DCH_UP);

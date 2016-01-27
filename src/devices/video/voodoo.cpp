@@ -3326,7 +3326,7 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
 
 				rgbaint_t color, preFog;
 				rgbaint_t iterargb(0);
-			
+
 
 				/* pixel pipeline part 1 handles depth testing and stippling */
 				//PIXEL_PIPELINE_BEGIN(v, stats, x, y, v->reg[fbzColorPath].u, v->reg[fbzMode].u, iterz, iterw);
@@ -3387,7 +3387,7 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
 				/* handle alpha test */
 				if (!alphaTest(v, stats, v->reg[alphaMode].u, color.get_a()))
 					goto nextpixel;
-				
+
 
 				/* wait for any outstanding work to finish */
 				poly_wait(v->poly, "LFB Write");
@@ -6016,5 +6016,3 @@ RASTERIZER(generic_1tmu, 1, v->reg[fbzColorPath].u, v->reg[fbzMode].u, v->reg[al
 
 RASTERIZER(generic_2tmu, 2, v->reg[fbzColorPath].u, v->reg[fbzMode].u, v->reg[alphaMode].u,
 			v->reg[fogMode].u, v->tmu[0].reg[textureMode].u, v->tmu[1].reg[textureMode].u)
-
-

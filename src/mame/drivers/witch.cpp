@@ -415,7 +415,7 @@ WRITE8_MEMBER(witch_state::write_a00x)
 		case 0x02: //A002 bit 7&6 = m_bank ????
 		{
 			m_reg_a002 = data;
-			
+
 			membank("bank1")->set_entry((data>>6)&3);
 		}
 		break;
@@ -724,7 +724,7 @@ void witch_state::video_start()
 	m_gfx0a_tilemap->set_palette_offset(0x100);
 	m_gfx0b_tilemap->set_palette_offset(0x100);
 	m_gfx1_tilemap->set_palette_offset(0x200);
-	
+
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
 	save_item(NAME(m_reg_a002));

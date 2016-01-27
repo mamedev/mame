@@ -53,8 +53,8 @@ public:
 	required_shared_ptr<UINT32> m_decrypted_gamerom;
 	required_shared_ptr<UINT32> m_0xc0000000_ram_decrypted;
 
-	optional_memory_region		m_user4_region;
-	optional_memory_region		m_user5_region;
+	optional_memory_region      m_user4_region;
+	optional_memory_region      m_user5_region;
 
 	fujitsu_29f016a_device *m_simm[7][8];
 	UINT32 m_cram_gfxflash_bank;

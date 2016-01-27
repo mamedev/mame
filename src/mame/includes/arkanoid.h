@@ -54,7 +54,7 @@ public:
 	UINT8    m_toz80;           // byte latch for 68705->z80 comms
 
 	/* mcu internal related */
-	UINT8    m_port_a_in;    
+	UINT8    m_port_a_in;
 	UINT8    m_port_a_out;
 	UINT8    m_ddr_a;
 	UINT8    m_port_c_internal;

@@ -320,8 +320,8 @@ READ16_MEMBER(casloopy_state::vregs_r)
 
 WRITE16_MEMBER(casloopy_state::vregs_w)
 {
-//	if(offset != 6/2)
-//		printf("%08x %08x\n",offset*2,data);
+//  if(offset != 6/2)
+//      printf("%08x %08x\n",offset*2,data);
 }
 
 READ16_MEMBER(casloopy_state::pal_r)

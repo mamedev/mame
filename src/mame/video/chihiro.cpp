@@ -2318,10 +2318,10 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, vertex_t *destinati
 			};
 			/*
 			for (int i = 0; i < 4; i++) {
-				v[i] *= matrix.scale[i];
+			    v[i] *= matrix.scale[i];
 			}
 			for (int i = 0; i < 4; i++) {
-				v[i] += matrix.translate[i];
+			    v[i] += matrix.translate[i];
 			}
 			*/
 			destination[m].x = v[0] / v[3]; // source[m].attribute[0].fv[0];

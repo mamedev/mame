@@ -1091,14 +1091,14 @@ std::string &ui_manager::warnings_string(std::string &str)
 			str.append(emulator_info::get_gamenoun());
 			str.append(" was never completed. It may exhibit strange behavior or missing elements that are not bugs in the emulation.\n");
 		}
-		
+
 		if (machine().system().flags & MACHINE_NO_SOUND_HW )
 		{
 			str.append("This ");
 			str.append(emulator_info::get_gamenoun());
 			str.append(" has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n");
 		}
-		
+
 		// if there's a NOT WORKING, UNEMULATED PROTECTION or GAME MECHANICAL warning, make it stronger
 		if (machine().system().flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_MECHANICAL))
 		{

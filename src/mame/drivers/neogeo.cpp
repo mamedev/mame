@@ -308,12 +308,12 @@
     MVS CHA:
     GIGA CHAR Board 1.0 Rev. A
     GIGA CHAR Board 1.5 Rev. 0
-	GIGA CHAR Board 1.5 Rev. C
+    GIGA CHAR Board 1.5 Rev. C
 
     MVS PROG:
     GIGA PROG Board 1.0 Rev. B
     GIGA PROG Board 1.5 Rev. A
-	GIGA PROG Board 1.5 Rev. C
+    GIGA PROG Board 1.5 Rev. C
 
 
     Unofficial pcb's from NEOBITZ:

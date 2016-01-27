@@ -41,7 +41,7 @@
  * |____________________________________________________________________________________________________________|        |______ |  _|||_  |___________________________________|
  *
  *  _____________________________________________________________________________________________   ___________________________________________________________________________
- * |The Didact Mikrodator 6802 CPU board by Lars Björklund 1983                            (  ) |  |The Didact Mikrodator 6802 TB16 board by Lars Björklund 1983               |
+ * |The Didact Mikrodator 6802 CPU board by Lars Bjorklund 1983                            (  ) |  |The Didact Mikrodator 6802 TB16 board by Lars Bj??rklund 1983               |
  * |                                                                                     +----= |  |             +-|||||||-+                                         ______    |
  * |                                                                                     |    = |  | CA2 Tx      |terminal |                                        |  ()  |   |
  * |                                                                                     |    = |  | PA7 Rx      +---------+               +----------+  C1nF,<=R18k|      |   |
@@ -77,8 +77,8 @@
  *
  * History of Didact
  *------------------
- * Didact Läromedelsproduktion was started in Linköping in Sweden by Anders Andersson, Arne Kullbjer and
- * Lars Björklund. They constructed a series of microcomputers for educational purposes such as "Mikrodator 6802",
+ * Didact Laromedelsproduktion was started in Linkoping in Sweden by Anders Andersson, Arne Kullbjer and
+ * Lars Bjorklund. They constructed a series of microcomputers for educational purposes such as "Mikrodator 6802",
  * Esselte 100 and the Candela computer for the swedish schools to educate the students in assembly programming
  * and BASIC for electro mechanical applications such as stepper motors, simple process control, buttons
  * and LED:s. Didact designs were marketed by Esselte Studium to the swedish schools. The Candela computer
@@ -92,7 +92,7 @@
  * http://elektronikforumet.com/forum/download/file.php?id=63988&mode=view
  * http://elektronikforumet.com/forum/viewtopic.php?f=2&t=79576&start=150#p1203915
  *
- *	TODO:
+ *  TODO:
  *  Didact designs:    mp68a, md6802, md6802v3, Esselte 100, Candela
  * --------------------------------------------------------------------------
  *  - Add PCB layouts   OK     OK
@@ -110,7 +110,7 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h" // For all boards
-#include "video/dm9368.h"	 // For the mp68a
+#include "video/dm9368.h"    // For the mp68a
 #include "machine/74145.h"   // For the md6802
 // Generated artwork includes
 #include "mp68a.lh"
@@ -132,9 +132,9 @@
 /* Didact base class */
 class didact_state : public driver_device
 {
- public:
+	public:
 	didact_state(const machine_config &mconfig, device_type type, const char * tag)
-	 : driver_device(mconfig, type, tag)
+		: driver_device(mconfig, type, tag)
 		,m_io_line0(*this, "LINE0")
 		,m_io_line1(*this, "LINE1")
 		,m_io_line2(*this, "LINE2")
@@ -166,13 +166,13 @@ class didact_state : public driver_device
 /* Esselte 100 driver class */
 class e100_state : public didact_state
 {
- public:
+	public:
 	e100_state(const machine_config &mconfig, device_type type, const char * tag)
-	 : didact_state(mconfig, type, tag),
+		: didact_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pia1(*this, "pia1"),
 		m_pia2(*this, "pia2")
-	   { }
+		{ }
 	required_device<m6802_cpu_device> m_maincpu;
 	virtual void machine_reset() override { m_maincpu->reset(); LOG(("--->%s()\n", FUNCNAME)); };
 protected:
@@ -183,15 +183,15 @@ protected:
 /* Mikrodator 6802 driver class */
 class md6802_state : public didact_state
 {
- public:
+	public:
 	md6802_state(const machine_config &mconfig, device_type type, const char * tag)
-	 : didact_state(mconfig, type, tag)
+		: didact_state(mconfig, type, tag)
 		,m_maincpu(*this, "maincpu")
 		,m_tb16_74145(*this, "tb16_74145")
 		,m_segments(0)
 		,m_pia1(*this, "pia1")
 		,m_pia2(*this, "pia2")
-	   { }
+		{ }
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_tb16_74145;
 	UINT8 m_segments;
@@ -228,7 +228,7 @@ READ8_MEMBER( md6802_state::pia2_kbA_r )
 		LOG(("%s()-->%02x %02x %02x %02x modified by %02x displaying %02x\n", FUNCNAME, m_line0, m_line1, m_line2, m_line3, m_shift, ls145));
 #endif
 
-    // Mask out those rows that has a button pressed
+	// Mask out those rows that has a button pressed
 	pa &= ~(((~m_line0 & ls145 ) != 0) ? 1 : 0);
 	pa &= ~(((~m_line1 & ls145 ) != 0) ? 2 : 0);
 	pa &= ~(((~m_line2 & ls145 ) != 0) ? 4 : 0);
@@ -236,7 +236,7 @@ READ8_MEMBER( md6802_state::pia2_kbA_r )
 
 	if (m_shift)
 	{
-		pa &= 0x7f;	  // Clear shift bit if button being pressed (PA7) to ground (internal pullup)
+		pa &= 0x7f;   // Clear shift bit if button being pressed (PA7) to ground (internal pullup)
 		LOG( ("SHIFT is pressed\n") );
 	}
 
@@ -253,10 +253,10 @@ WRITE8_MEMBER( md6802_state::pia2_kbA_w )
 {
 	UINT8 digit_nbr;
 
-//	LOG(("--->%s(%02x)\n", FUNCNAME, data));
+//  LOG(("--->%s(%02x)\n", FUNCNAME, data));
 
 	digit_nbr = (data >> 4) & 0x07;
-    m_tb16_74145->write( digit_nbr );
+	m_tb16_74145->write( digit_nbr );
 	if (digit_nbr < 6)
 	{
 		output().set_digit_value( digit_nbr, m_segments);
@@ -266,15 +266,15 @@ WRITE8_MEMBER( md6802_state::pia2_kbA_w )
 /* PIA 2 Port B is all outputs to drive the display so it is very unlikelly that this function is called */
 READ8_MEMBER( md6802_state::pia2_kbB_r )
 {
-    LOG( ("Warning, trying to read from Port B designated to drive the display, please check why\n") );
-    logerror("Warning, trying to read from Port B designated to drive the display, please check why\n");
+	LOG( ("Warning, trying to read from Port B designated to drive the display, please check why\n") );
+	logerror("Warning, trying to read from Port B designated to drive the display, please check why\n");
 	return 0;
 }
 
 /* Port B is fully used ouputting the segment pattern to the display */
 WRITE8_MEMBER( md6802_state::pia2_kbB_w )
 {
-//	LOG(("--->%s(%02x)\n", FUNCNAME, data));
+//  LOG(("--->%s(%02x)\n", FUNCNAME, data));
 
 	/* Store the segment pattern but do not lit up the digit here, done by pulling the correct cathode low on Port A */
 	m_segments = BITSWAP8(data, 0, 4, 5, 3, 2, 1, 7, 6);
@@ -299,7 +299,7 @@ void md6802_state::machine_reset()
 {
 	LOG(("--->%s()\n", FUNCNAME));
 	m_led = 1;
-	m_maincpu->reset(); 
+	m_maincpu->reset();
 }
 
 /* Didact mp68a driver class */
@@ -310,9 +310,9 @@ void md6802_state::machine_reset()
 #define PIA6820 PIA6821
 class mp68a_state : public didact_state
 {
- public:
+	public:
 	mp68a_state(const machine_config &mconfig, device_type type, const char * tag)
-	 : didact_state(mconfig, type, tag)
+		: didact_state(mconfig, type, tag)
 		,m_maincpu(*this, "maincpu")
 		,m_digit0(*this, "digit0")
 		,m_digit1(*this, "digit1")
@@ -322,7 +322,7 @@ class mp68a_state : public didact_state
 		,m_digit5(*this, "digit5")
 		,m_pia1(*this, "pia1")
 		,m_pia2(*this, "pia2")
-	   { }
+		{ }
 
 	required_device<m6800_cpu_device> m_maincpu;
 
@@ -367,8 +367,8 @@ WRITE8_MEMBER( mp68a_state::pia2_kbA_w )
 	   but we are using data read from the port. */
 	digit_nbr = (data >> 4) & 0x07;
 
-    /* There is actually only one 9368 and a 74145 to drive the cathode of the right digit low */
-    /* This can be emulated by prentending there are one 9368 per digit, at least for now      */
+	/* There is actually only one 9368 and a 74145 to drive the cathode of the right digit low */
+	/* This can be emulated by prentending there are one 9368 per digit, at least for now      */
 	switch (digit_nbr)
 	{
 	case 0: m_digit0->a_w(data & 0x0f); break;
@@ -406,11 +406,11 @@ READ8_MEMBER( mp68a_state::pia2_kbB_r )
 		while (a012 > 0 && !(line & (1 << --a012)));
 	}
 
-	pb	= a012;		  // A0-A2 -> PB0-PB3
+	pb  = a012;       // A0-A2 -> PB0-PB3
 
 	if (m_shift)
 	{
-		pb |= 0x80;	  // Set shift bit (PB7)
+		pb |= 0x80;   // Set shift bit (PB7)
 		m_shift = 0;  // Reset flip flop
 		output().set_led_value(m_led, m_shift);
 		LOG( ("SHIFT is released\n") );
@@ -489,31 +489,31 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( md6802 )
 	PORT_START("LINE0") /* KEY ROW 0 */
-	PORT_BIT(0x01, 0x01, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)	PORT_CHAR('0')
-	PORT_BIT(0x02, 0x02, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)	PORT_CHAR('1')
-	PORT_BIT(0x04, 0x04, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)	PORT_CHAR('2')
-	PORT_BIT(0x08, 0x08, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)	PORT_CHAR('3')
+	PORT_BIT(0x01, 0x01, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)  PORT_CHAR('0')
+	PORT_BIT(0x02, 0x02, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)  PORT_CHAR('1')
+	PORT_BIT(0x04, 0x04, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)  PORT_CHAR('2')
+	PORT_BIT(0x08, 0x08, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)  PORT_CHAR('3')
 	PORT_BIT(0xf0, 0x00, IPT_UNUSED )
 
 	PORT_START("LINE1") /* KEY ROW 1 */
-	PORT_BIT(0x01, 0x01, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)	PORT_CHAR('4')
-	PORT_BIT(0x02, 0x02, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)	PORT_CHAR('5')
-	PORT_BIT(0x04, 0x04, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)	PORT_CHAR('6')
-	PORT_BIT(0x08, 0x08, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)	PORT_CHAR('7')
+	PORT_BIT(0x01, 0x01, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)  PORT_CHAR('4')
+	PORT_BIT(0x02, 0x02, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)  PORT_CHAR('5')
+	PORT_BIT(0x04, 0x04, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)  PORT_CHAR('6')
+	PORT_BIT(0x08, 0x08, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)  PORT_CHAR('7')
 	PORT_BIT(0xf0, 0x00, IPT_UNUSED )
 
 	PORT_START("LINE2") /* KEY ROW 2 */
-	PORT_BIT(0x01, 0x01, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)	PORT_CHAR('8')
-	PORT_BIT(0x02, 0x02, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)	PORT_CHAR('9')
-	PORT_BIT(0x04, 0x04, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)	PORT_CHAR('A')
-	PORT_BIT(0x08, 0x08, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)	PORT_CHAR('B')
+	PORT_BIT(0x01, 0x01, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)  PORT_CHAR('8')
+	PORT_BIT(0x02, 0x02, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)  PORT_CHAR('9')
+	PORT_BIT(0x04, 0x04, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)  PORT_CHAR('A')
+	PORT_BIT(0x08, 0x08, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)  PORT_CHAR('B')
 	PORT_BIT(0xf0, 0x00, IPT_UNUSED )
 
 	PORT_START("LINE3") /* KEY ROW 3 */
-	PORT_BIT(0x01, 0x01, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)	PORT_CHAR('C')
-	PORT_BIT(0x02, 0x02, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)	PORT_CHAR('D')
-	PORT_BIT(0x04, 0x04, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)	PORT_CHAR('E')
-	PORT_BIT(0x08, 0x08, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)	PORT_CHAR('F')
+	PORT_BIT(0x01, 0x01, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)  PORT_CHAR('C')
+	PORT_BIT(0x02, 0x02, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)  PORT_CHAR('D')
+	PORT_BIT(0x04, 0x04, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)  PORT_CHAR('E')
+	PORT_BIT(0x08, 0x08, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)  PORT_CHAR('F')
 	PORT_BIT(0xf0, 0x00, IPT_UNUSED )
 
 	PORT_START("LINE4") /* Special KEY ROW for reset and Shift/'*' keys */
@@ -524,31 +524,31 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mp68a )
 	PORT_START("LINE0") /* KEY ROW 0 */
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)	PORT_CHAR('C')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)	PORT_CHAR('D')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)	PORT_CHAR('E')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)	PORT_CHAR('F')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)    PORT_CHAR('C')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)    PORT_CHAR('D')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)    PORT_CHAR('E')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)    PORT_CHAR('F')
 	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("LINE1") /* KEY ROW 1 */
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)	PORT_CHAR('8')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)	PORT_CHAR('9')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)	PORT_CHAR('A')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)	PORT_CHAR('B')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)    PORT_CHAR('8')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)    PORT_CHAR('9')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)    PORT_CHAR('A')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)    PORT_CHAR('B')
 	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("LINE2") /* KEY ROW 2 */
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)	PORT_CHAR('4')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)	PORT_CHAR('5')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)	PORT_CHAR('6')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)	PORT_CHAR('7')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)    PORT_CHAR('4')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)    PORT_CHAR('5')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)    PORT_CHAR('6')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)    PORT_CHAR('7')
 	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("LINE3") /* KEY ROW 3 */
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)	PORT_CHAR('0')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)	PORT_CHAR('1')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)	PORT_CHAR('2')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)	PORT_CHAR('3')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)    PORT_CHAR('0')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)    PORT_CHAR('1')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)    PORT_CHAR('2')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)    PORT_CHAR('3')
 	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("LINE4") /* Special KEY ROW for reset and Shift/'*' keys */
@@ -559,7 +559,7 @@ INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
 {
-	//	LOG(("--->%s()\n", FUNCNAME));
+	//  LOG(("--->%s()\n", FUNCNAME));
 
 	// Poll the artwork Reset key
 	if ( (m_io_line4->read() & 0x04) )
@@ -567,14 +567,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
 		LOG( ("RESET is pressed, resetting the CPU\n") );
 		m_shift = 0;
 		output().set_led_value(m_led, m_shift); // For mp68a only
-		if (m_reset == 0) 
+		if (m_reset == 0)
 		{
 			machine_reset();
 		}
 		m_reset = 1; // Inhibit multiple resets
 	}
 
-	 // Poll the artwork SHIFT/* key
+		// Poll the artwork SHIFT/* key
 	else if ( (m_io_line4->read() & 0x08) )
 	{
 		LOG( ("%s", !m_shift ? "SHIFT is set\n" : "") );
@@ -631,9 +631,9 @@ static MACHINE_CONFIG_START( md6802, md6802_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mp68a, mp68a_state )
-	// Clock source is based on a N9602N Dual Retriggerable Resettable Monostable Multivibrator oscillator at aprox 505KHz. 
+	// Clock source is based on a N9602N Dual Retriggerable Resettable Monostable Multivibrator oscillator at aprox 505KHz.
 	// Trimpot seems broken/stuck at 5K Ohm thu. ROM code 1Ms delay loops suggest 1MHz+
-	MCFG_CPU_ADD("maincpu", M6800, 505000) 
+	MCFG_CPU_ADD("maincpu", M6800, 505000)
 	MCFG_CPU_PROGRAM_MAP(mp68a_map)
 	MCFG_DEFAULT_LAYOUT(layout_mp68a)
 
@@ -646,14 +646,14 @@ static MACHINE_CONFIG_START( mp68a, mp68a_state )
 	/* --init----------------------- */
 	/* 0x0BAF 0x601 (Control A) = 0x30 - CA2 is low and enable DDRA */
 	/* 0x0BB1 0x603 (Control B) = 0x30 - CB2 is low and enable DDRB */
-	/* 0x0BB5 0x600 (DDR A)		= 0xFF - Port A all outputs and set to 0 (zero) */
-	/* 0x0BB9 0x602 (DDR B)		= 0x50 - Port B two outputs and set to 0 (zero) */
+	/* 0x0BB5 0x600 (DDR A)     = 0xFF - Port A all outputs and set to 0 (zero) */
+	/* 0x0BB9 0x602 (DDR B)     = 0x50 - Port B two outputs and set to 0 (zero) */
 	/* 0x0BBD 0x601 (Control A) = 0x34 - CA2 is low and lock DDRA */
 	/* 0x0BBF 0x603 (Control B) = 0x34 - CB2 is low and lock DDRB */
-	/* 0x0BC3 0x602 (Port B)	= 0x40 - Turn on display via RBI* on  */
+	/* 0x0BC3 0x602 (Port B)    = 0x40 - Turn on display via RBI* on  */
 	/* --execution-wait for key loop-- */
-	/* 0x086B Update display sequnc, see below							  */
-	/* 0x0826 CB1 read			= 0x603 (Control B)	 - is a key presssed? */
+	/* 0x086B Update display sequnc, see below                            */
+	/* 0x0826 CB1 read          = 0x603 (Control B)  - is a key presssed? */
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mp68a_state, pia2_kbA_w))
 	MCFG_PIA_READPA_HANDLER(READ8(mp68a_state, pia2_kbA_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mp68a_state, pia2_kbB_w))
@@ -663,18 +663,18 @@ static MACHINE_CONFIG_START( mp68a, mp68a_state )
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line)) /* Not used by ROM. Combined trace to CPU IRQ with IRQA */
 
 	/* Display - sequence outputting all '0':s at start */
-	/* 0x086B 0x600 (Port A)	= 0x00 */
-	/* 0x086B 0x600 (Port A)	= 0x70 */
-	/* 0x086B 0x600 (Port A)	= 0x10 */
-	/* 0x086B 0x600 (Port A)	= 0x70 */
-	/* 0x086B 0x600 (Port A)	= 0x20 */
-	/* 0x086B 0x600 (Port A)	= 0x70 */
-	/* 0x086B 0x600 (Port A)	= 0x30 */
-	/* 0x086B 0x600 (Port A)	= 0x70 */
-	/* 0x086B 0x600 (Port A)	= 0x40 */
-	/* 0x086B 0x600 (Port A)	= 0x70 */
-	/* 0x086B 0x600 (Port A)	= 0x50 */
-	/* 0x086B 0x600 (Port A)	= 0x70 */
+	/* 0x086B 0x600 (Port A)    = 0x00 */
+	/* 0x086B 0x600 (Port A)    = 0x70 */
+	/* 0x086B 0x600 (Port A)    = 0x10 */
+	/* 0x086B 0x600 (Port A)    = 0x70 */
+	/* 0x086B 0x600 (Port A)    = 0x20 */
+	/* 0x086B 0x600 (Port A)    = 0x70 */
+	/* 0x086B 0x600 (Port A)    = 0x30 */
+	/* 0x086B 0x600 (Port A)    = 0x70 */
+	/* 0x086B 0x600 (Port A)    = 0x40 */
+	/* 0x086B 0x600 (Port A)    = 0x70 */
+	/* 0x086B 0x600 (Port A)    = 0x50 */
+	/* 0x086B 0x600 (Port A)    = 0x70 */
 	MCFG_DEVICE_ADD("digit0", DM9368, 0)
 	MCFG_OUTPUT_INDEX(0)
 	MCFG_DEVICE_ADD("digit1", DM9368, 0)
@@ -715,6 +715,6 @@ ROM_START( mp68a ) // ROM image from http://elektronikforumet.com/forum/viewtopi
 ROM_END
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   CLASS            INIT        COMPANY             FULLNAME           FLAGS
-COMP( 1979, mp68a,	    0,          0,      mp68a,      mp68a,  driver_device,   0,          "Didact AB",        "mp68a",           MACHINE_NO_SOUND_HW )
-COMP( 1982, e100,	    0,          0,      e100,       e100,   driver_device,   0,          "Didact AB",        "Esselte 100",     MACHINE_IS_SKELETON )
-COMP( 1983, md6802,	    0,          0,      md6802,     md6802, driver_device,   0,          "Didact AB",        "Mikrodator 6802", MACHINE_NO_SOUND_HW )
+COMP( 1979, mp68a,      0,          0,      mp68a,      mp68a,  driver_device,   0,          "Didact AB",        "mp68a",           MACHINE_NO_SOUND_HW )
+COMP( 1982, e100,       0,          0,      e100,       e100,   driver_device,   0,          "Didact AB",        "Esselte 100",     MACHINE_IS_SKELETON )
+COMP( 1983, md6802,     0,          0,      md6802,     md6802, driver_device,   0,          "Didact AB",        "Mikrodator 6802", MACHINE_NO_SOUND_HW )

@@ -996,7 +996,7 @@ MACHINE_RESET_MEMBER(fortyl_state,common)
 	m_pix2[0] = 0;
 	m_pix2[1] = 0;
 	m_color_bank = false;
-	
+
 	/* sound */
 	m_sound_nmi_enable = 0;
 	m_pending_nmi = 0;

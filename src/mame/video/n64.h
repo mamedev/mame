@@ -331,8 +331,8 @@ private:
 	compute_cvg_t   m_compute_cvg[2];
 
 	running_machine* m_machine;
-	UINT32*			m_rdram;
-	UINT32*			m_dmem;
+	UINT32*         m_rdram;
+	UINT32*         m_dmem;
 
 	combine_modes_t m_combine;
 	bool            m_pending_mode_block;

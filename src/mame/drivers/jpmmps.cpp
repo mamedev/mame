@@ -169,9 +169,9 @@ static MACHINE_CONFIG_START( jpmmps, jpmmps_state )
 
 	MCFG_SOUND_ADD("sn", SN76489, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(9) // TODO: meters.cpp sets a max of 8 
+	MCFG_METERS_NUMBER(9) // TODO: meters.cpp sets a max of 8
 
 	MCFG_DEFAULT_LAYOUT(layout_jpmmps)
 MACHINE_CONFIG_END

@@ -18,8 +18,7 @@
 
 
 #define MCFG_METERS_NUMBER(_number) \
-	meters_device::static_set_number_meters(*device, _number); \
-
+	meters_device::static_set_number_meters(*device, _number);
 #define MAXMECHMETERS 8
 
 #define METERREACTTIME 0.025 // number of seconds meter has to be active to tick
@@ -56,7 +55,7 @@ private:
 		bool state;     // state 0/1
 		emu_timer *meter_timer;
 	};
-	
+
 	meter_info m_meter_info[MAXMECHMETERS];
 
 	int m_number_mtr;

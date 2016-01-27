@@ -245,7 +245,7 @@ void m58_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 		{
 			sy2 = sy1 + 0x10;
 		}
-		
+
 		m_gfxdecode->gfx(1)->transmask(bitmap, cliprect,
 			code1 + 256 * bank, color,
 			flipx, flipy, sx, visarea.min_y + sy1,

@@ -156,8 +156,8 @@ public:
 	float screen_scanline_height() const { return float_value(WINOPTION_SCANLINE_HEIGHT); }
 	float screen_scanline_bright_scale() const { return float_value(WINOPTION_SCANLINE_BRIGHT_SCALE); }
 	float screen_scanline_bright_offset() const { return float_value(WINOPTION_SCANLINE_BRIGHT_OFFSET); }
-	float screen_scanline_jitter() const { return float_value(WINOPTION_SCANLINE_JITTER); }	
-	float screen_hum_bar_alpha() const { return float_value(WINOPTION_HUM_BAR_ALPHA); }	
+	float screen_scanline_jitter() const { return float_value(WINOPTION_SCANLINE_JITTER); }
+	float screen_hum_bar_alpha() const { return float_value(WINOPTION_HUM_BAR_ALPHA); }
 	float screen_reflection() const { return float_value(WINOPTION_REFLECTION); }
 	float screen_curvature() const { return float_value(WINOPTION_CURVATURE); }
 	float screen_round_corner() const { return float_value(WINOPTION_ROUND_CORNER); }

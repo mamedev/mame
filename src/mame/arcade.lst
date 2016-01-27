@@ -2610,13 +2610,13 @@ optiger         // 1998.09 E63 (c) 1998 Taito
 taitotz
 batlgear        // E68 (c) 1999 Taito
 pwrshovl        // E74 (c) 1999 Taito
-pwrshovla		//
+pwrshovla       //
 landhigh        // E82 (c) 1999 Taito
 batlgr2         // E87 (c) 2000 Taito (2.04J)
 batlgr2a        // E87 (c) 2000 Taito (2.01J)
 styphp          // E98 (c) 2000 Taito
 raizpin         // F14 (c) 2002 Taito
-raizpinj		//
+raizpinj        //
 
 invqix          // F34 (c) 2003 Taito Corporation
 
@@ -2717,7 +2717,7 @@ toto            //
 honeydol        // (c) 1995 Barko Corp
 twinadv         // (c) 1995 Barko Corp
 twinadvk        // (c) 1995 Barko Corp
-multi96			// (c) 1996 Barko Corp
+multi96         // (c) 1996 Barko Corp
 snowbro3        // (c) 2002 Syrmex
 ballboy         // bootleg
 // SemiCom games on "SnowBros"-like hardware
@@ -3146,7 +3146,7 @@ daimakai        // 12/1988 (c) 1988 (Japan)
 daimakair       // 12/1988 (c) 1988 (Japan)
 strider         //  3/1989 (c) 1989 (not explicitly stated but should be USA)
 striderua       //  3/1989 (c) 1989 (not explicitly stated but should be USA)
-strideruc		// conversion
+strideruc       // conversion
 striderj        //  3/1989 (c) 1989 (Japan)
 striderjr       //  3/1989 (c) 1989 (Japan)
 dynwar          //  4/1989 (c) 1989 (USA)
@@ -4194,7 +4194,7 @@ wfortunea       // (c) 1989 GameTek
 grmatch         // (c) 1989 Yankee Game Technology
 stratab         // (c) 1990 Strata/Incredible Technologies
 stratab1        // (c) 1990 Strata/Incredible Technologies
-stratabs		// (c) 1990 Strata/Incredible Technologies
+stratabs        // (c) 1990 Strata/Incredible Technologies
 sstrike         // (c) 1990 Strata/Incredible Technologies
 gtg             // (c) 1990 Strata/Incredible Technologies
 gtgt            // (c) 1990 Strata/Incredible Technologies
@@ -4840,7 +4840,7 @@ mwalku          // 1990.08 Micheal Jackson's Moonwalker (US, FD1094+8751)
 mwalkj          // 1990.08 Micheal Jackson's Moonwalker (Japan, FD1094+8751)
 mwalk           // 1990.?? Micheal Jackson's Moonwalker (World, FD1094+8751)
 lghost          // 1990.?? Laser Ghost (World, FD1094)
-lghostj			// 1990.12 Laser Ghost (Japan)
+lghostj         // 1990.12 Laser Ghost (Japan)
 lghostu         // 1991.01 Laser Ghost (US, FD1094)
 cltchitr        // 1991.02 Clutch Hitter (US, FD1094)
 cltchitrj       // 1991.05 Clutch Hitter (Japan, FD1094)
@@ -5544,7 +5544,7 @@ alpiltdx        // 1999.?? Airline Pilots Deluxe (Rev B)
 				// 1999.?? Pocket Shooting
 sambap          // 1999.?? Samba de Amigo (prototype)
 spawn           // 1999.?? Spawn In the Demon's Hand
-tokyobus		// 1999.?? Tokyo Bus Guide (Rev A)
+tokyobus        // 1999.?? Tokyo Bus Guide (Rev A)
 vtennisg        // 1999.?? Virtua Tennis / Power Smash (GD-ROM)
 18wheelr        // 2000.01 18 Wheeler Deluxe (Rev A)
 18wheels        // 2000.01 18 Wheeler (Standard)
@@ -7687,7 +7687,7 @@ ikaria          // A5004 'IW' (c) 1986
 ikarinc         // A5004 'IW' (c) 1986
 ikarijp         // A5004 'IW' (c) 1986 (Japan)
 ikarijpb        // bootleg
-ikariram		// bootleg
+ikariram        // bootleg
 victroad        // A6002      (c) 1986
 dogosoke        // A6002      (c) 1986
 dogosokb        // bootleg
@@ -8243,7 +8243,7 @@ jackrabts       // (c) 1984
 mouser          // UPL-83001 (c) 1983
 mouserc         // UPL-83001 (c) 1983
 nova2001        // UPL-83005 (c) 1983
-nova2001h		// hack?
+nova2001h       // hack?
 nova2001u       // UPL-83005 (c) [1983] + Universal license
 ninjakun        // UPL-84003 (c) 1984 Taito Corporation
 raiders5        // UPL-85004 (c) 1985
@@ -8837,7 +8837,7 @@ weststry        // bootleg
 skysmash        // (c) 1990 Nihon System Inc.
 legionna        // (c) 1992 Tad (World)
 legionnau       // (c) 1992 Tad + Fabtek license (US)
-legionnaj		// (c) 1992 Tad (Japan)
+legionnaj       // (c) 1992 Tad (Japan)
 heatbrl         // (c) 1992 Tad (World version 3)
 heatbrl2        // (c) 1992 Tad (World version 2)
 heatbrlo        // (c) 1992 Tad (World)
@@ -9179,7 +9179,7 @@ touchgoe        // (c) 1995 - Ref 950510-1
 wrally2         // (c) 1995 - Ref 950510
 maniacsp        // (c) 1996 - Ref 922804/2 - (prototype)
 maniacsq        // (c) 1996 - Ref 940411 - (unprotected)
-maniacsqa		// (c) 1996 - Ref 940411
+maniacsqa       // (c) 1996 - Ref 940411
 snowboar        // (c) 1996 - Ref 960419/1
 snowboara       // (c) 1996 - Ref 960419/1
 bang            // (c) 1998 - Ref ???
@@ -13459,7 +13459,7 @@ tmspoker
 kas89           // 1989, SFC S.R.L.
 caspoker        // 1987, PM / Beck Elektronik.
 wildpkr         // 199?, TAB Austria.
-tabpkr			// 199?, TAB Austira
+tabpkr          // 199?, TAB Austira
 subhuntr        // 1979 Model Racing
 
 manohman        // 199?, Merkur.
@@ -32680,4 +32680,3 @@ clowndwn // Elwood Clown Roll Down
 
 fi6845
 fi8275
-

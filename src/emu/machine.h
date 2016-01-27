@@ -294,11 +294,11 @@ private:
 	std::unique_ptr<network_manager> m_network;        // internal data from network.cpp
 	std::unique_ptr<bookkeeping_manager> m_bookkeeping;// internal data from bookkeeping.cpp
 	std::unique_ptr<configuration_manager> m_configuration; // internal data from config.cpp
-	std::unique_ptr<output_manager> m_output;		   // internal data from output.cpp
-	std::unique_ptr<crosshair_manager> m_crosshair;	   // internal data from crsshair.cpp
-	std::unique_ptr<image_manager> m_image;	           // internal data from image.cpp
-	std::unique_ptr<rom_load_manager> m_rom_load;	   // internal data from romload.cpp
-	std::unique_ptr<debugger_manager> m_debugger;	   // internal data from debugger.cpp
+	std::unique_ptr<output_manager> m_output;          // internal data from output.cpp
+	std::unique_ptr<crosshair_manager> m_crosshair;    // internal data from crsshair.cpp
+	std::unique_ptr<image_manager> m_image;            // internal data from image.cpp
+	std::unique_ptr<rom_load_manager> m_rom_load;      // internal data from romload.cpp
+	std::unique_ptr<debugger_manager> m_debugger;      // internal data from debugger.cpp
 
 	// system state
 	machine_phase           m_current_phase;        // current execution phase

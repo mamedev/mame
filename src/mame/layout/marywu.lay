@@ -9,17 +9,17 @@
 		</led7seg>
 	</element>
 
-        <element name="led" defstate="0">
-                <text string=""></text>
-                <disk state="0">
-                        <color red="0.1" green="0.025" blue="0.028" />
-                        <bounds x="0.25" y="0.25" width="0.5" height="0.5" />
-                </disk>
-                <disk state="1">
-                        <color red="1.0" green="0.25" blue="0.28" />
-                        <bounds x="0.25" y="0.25" width="0.5" height="0.5" />
-                </disk>
-        </element>
+		<element name="led" defstate="0">
+				<text string=""></text>
+				<disk state="0">
+						<color red="0.1" green="0.025" blue="0.028" />
+						<bounds x="0.25" y="0.25" width="0.5" height="0.5" />
+				</disk>
+				<disk state="1">
+						<color red="1.0" green="0.25" blue="0.28" />
+						<bounds x="0.25" y="0.25" width="0.5" height="0.5" />
+				</disk>
+		</element>
 
 	<element name="background">
 		<rect>
@@ -35,90 +35,90 @@
 			<bounds left="0" top="20" right="798" bottom="770" />
 		</backdrop>
 
-                <!-- LEDs -->
+				<!-- LEDs -->
 
-                <bezel name="led4"  element="led"><bounds x="199" y="160" width="40" height="40" /></bezel>
-                <bezel name="led5"  element="led"><bounds x="249" y="160" width="40" height="40" /></bezel>
-                <bezel name="led6"  element="led"><bounds x="324" y="160" width="40" height="40" /></bezel>
-                <bezel name="led7"  element="led"><bounds x="399" y="160" width="40" height="40" /></bezel>
-                <bezel name="led8"  element="led"><bounds x="474" y="160" width="40" height="40" /></bezel>
-                <bezel name="led9"  element="led"><bounds x="549" y="160" width="40" height="40" /></bezel>
-                <bezel name="led10" element="led"><bounds x="599" y="160" width="40" height="40" /></bezel>
+				<bezel name="led4"  element="led"><bounds x="199" y="160" width="40" height="40" /></bezel>
+				<bezel name="led5"  element="led"><bounds x="249" y="160" width="40" height="40" /></bezel>
+				<bezel name="led6"  element="led"><bounds x="324" y="160" width="40" height="40" /></bezel>
+				<bezel name="led7"  element="led"><bounds x="399" y="160" width="40" height="40" /></bezel>
+				<bezel name="led8"  element="led"><bounds x="474" y="160" width="40" height="40" /></bezel>
+				<bezel name="led9"  element="led"><bounds x="549" y="160" width="40" height="40" /></bezel>
+				<bezel name="led10" element="led"><bounds x="599" y="160" width="40" height="40" /></bezel>
 
-                <bezel name="led3"  element="led"><bounds x="199" y="210" width="40" height="40" /></bezel>
-                <bezel name="led11" element="led"><bounds x="599" y="210" width="40" height="40" /></bezel>
+				<bezel name="led3"  element="led"><bounds x="199" y="210" width="40" height="40" /></bezel>
+				<bezel name="led11" element="led"><bounds x="599" y="210" width="40" height="40" /></bezel>
 
-                <bezel name="led2"  element="led"><bounds x="199" y="285" width="40" height="40" /></bezel>
-                <bezel name="led12" element="led"><bounds x="599" y="285" width="40" height="40" /></bezel>
+				<bezel name="led2"  element="led"><bounds x="199" y="285" width="40" height="40" /></bezel>
+				<bezel name="led12" element="led"><bounds x="599" y="285" width="40" height="40" /></bezel>
 
-                <bezel name="led1"  element="led"><bounds x="199" y="360" width="40" height="40" /></bezel>
-                <bezel name="led30" element="led"><bounds x="399" y="360" width="40" height="40" /></bezel>
-                <bezel name="led13" element="led"><bounds x="599" y="360" width="40" height="40" /></bezel>
+				<bezel name="led1"  element="led"><bounds x="199" y="360" width="40" height="40" /></bezel>
+				<bezel name="led30" element="led"><bounds x="399" y="360" width="40" height="40" /></bezel>
+				<bezel name="led13" element="led"><bounds x="599" y="360" width="40" height="40" /></bezel>
 
-                <bezel name="led0"  element="led"><bounds x="199" y="435" width="40" height="40" /></bezel>
-                <bezel name="led14" element="led"><bounds x="599" y="435" width="40" height="40" /></bezel>
+				<bezel name="led0"  element="led"><bounds x="199" y="435" width="40" height="40" /></bezel>
+				<bezel name="led14" element="led"><bounds x="599" y="435" width="40" height="40" /></bezel>
 
-                <bezel name="led23" element="led"><bounds x="199" y="510" width="40" height="40" /></bezel>
-                <bezel name="led15" element="led"><bounds x="599" y="510" width="40" height="40" /></bezel>
+				<bezel name="led23" element="led"><bounds x="199" y="510" width="40" height="40" /></bezel>
+				<bezel name="led15" element="led"><bounds x="599" y="510" width="40" height="40" /></bezel>
 
-                <bezel name="led22" element="led"><bounds x="199" y="560" width="40" height="40" /></bezel>
-                <bezel name="led21" element="led"><bounds x="249" y="560" width="40" height="40" /></bezel>
-                <bezel name="led20" element="led"><bounds x="324" y="560" width="40" height="40" /></bezel>
-                <bezel name="led19" element="led"><bounds x="399" y="560" width="40" height="40" /></bezel>
-                <bezel name="led18" element="led"><bounds x="474" y="560" width="40" height="40" /></bezel>
-                <bezel name="led17" element="led"><bounds x="549" y="560" width="40" height="40" /></bezel>
-                <bezel name="led16" element="led"><bounds x="599" y="560" width="40" height="40" /></bezel>
+				<bezel name="led22" element="led"><bounds x="199" y="560" width="40" height="40" /></bezel>
+				<bezel name="led21" element="led"><bounds x="249" y="560" width="40" height="40" /></bezel>
+				<bezel name="led20" element="led"><bounds x="324" y="560" width="40" height="40" /></bezel>
+				<bezel name="led19" element="led"><bounds x="399" y="560" width="40" height="40" /></bezel>
+				<bezel name="led18" element="led"><bounds x="474" y="560" width="40" height="40" /></bezel>
+				<bezel name="led17" element="led"><bounds x="549" y="560" width="40" height="40" /></bezel>
+				<bezel name="led16" element="led"><bounds x="599" y="560" width="40" height="40" /></bezel>
 
-                <bezel name="led29" element="led"><bounds x="199" y="660" width="40" height="40" /></bezel>
-                <bezel name="led28" element="led"><bounds x="279" y="660" width="40" height="40" /></bezel>
-                <bezel name="led27" element="led"><bounds x="359" y="660" width="40" height="40" /></bezel>
-                <bezel name="led26" element="led"><bounds x="439" y="660" width="40" height="40" /></bezel>
-                <bezel name="led25" element="led"><bounds x="519" y="660" width="40" height="40" /></bezel>
-                <bezel name="led24" element="led"><bounds x="599" y="660" width="40" height="40" /></bezel>
+				<bezel name="led29" element="led"><bounds x="199" y="660" width="40" height="40" /></bezel>
+				<bezel name="led28" element="led"><bounds x="279" y="660" width="40" height="40" /></bezel>
+				<bezel name="led27" element="led"><bounds x="359" y="660" width="40" height="40" /></bezel>
+				<bezel name="led26" element="led"><bounds x="439" y="660" width="40" height="40" /></bezel>
+				<bezel name="led25" element="led"><bounds x="519" y="660" width="40" height="40" /></bezel>
+				<bezel name="led24" element="led"><bounds x="599" y="660" width="40" height="40" /></bezel>
 
-                <!-- Top 7seg display modules -->
+				<!-- Top 7seg display modules -->
 
-                <bezel name="digit23" element="digit">
-                        <bounds left="200" top="45" right="234" bottom="84" />
-                </bezel>
-                <bezel name="digit22" element="digit">
-                        <bounds left="244" top="45" right="278" bottom="84" />
-                </bezel>
-                <bezel name="digit21" element="digit">
-                        <bounds left="288" top="45" right="322" bottom="84" />
-                </bezel>
-                <bezel name="digit20" element="digit">
-                        <bounds left="332" top="45" right="366" bottom="84" />
-                </bezel>
-
-
-                <bezel name="digit19" element="digit">
-                        <bounds left="432" top="45" right="466" bottom="84" />
-                </bezel>
-                <bezel name="digit18" element="digit">
-                        <bounds left="476" top="45" right="510" bottom="84" />
-                </bezel>
-                <bezel name="digit17" element="digit">
-                        <bounds left="520" top="45" right="554" bottom="84" />
-                </bezel>
-                <bezel name="digit16" element="digit">
-                        <bounds left="564" top="45" right="598" bottom="84" />
-                </bezel>
+				<bezel name="digit23" element="digit">
+						<bounds left="200" top="45" right="234" bottom="84" />
+				</bezel>
+				<bezel name="digit22" element="digit">
+						<bounds left="244" top="45" right="278" bottom="84" />
+				</bezel>
+				<bezel name="digit21" element="digit">
+						<bounds left="288" top="45" right="322" bottom="84" />
+				</bezel>
+				<bezel name="digit20" element="digit">
+						<bounds left="332" top="45" right="366" bottom="84" />
+				</bezel>
 
 
-
-                <!-- Middle 7seg display module -->
-
-                <bezel name="digit25" element="digit">
-                        <bounds left="355" top="421" right="389" bottom="460" />
-                </bezel>
-                <bezel name="digit24" element="digit">
-                        <bounds left="399" top="421" right="433" bottom="460" />
-                </bezel>
+				<bezel name="digit19" element="digit">
+						<bounds left="432" top="45" right="466" bottom="84" />
+				</bezel>
+				<bezel name="digit18" element="digit">
+						<bounds left="476" top="45" right="510" bottom="84" />
+				</bezel>
+				<bezel name="digit17" element="digit">
+						<bounds left="520" top="45" right="554" bottom="84" />
+				</bezel>
+				<bezel name="digit16" element="digit">
+						<bounds left="564" top="45" right="598" bottom="84" />
+				</bezel>
 
 
 
-                <!-- Bottom 7seg display modules -->
+				<!-- Middle 7seg display module -->
+
+				<bezel name="digit25" element="digit">
+						<bounds left="355" top="421" right="389" bottom="460" />
+				</bezel>
+				<bezel name="digit24" element="digit">
+						<bounds left="399" top="421" right="433" bottom="460" />
+				</bezel>
+
+
+
+				<!-- Bottom 7seg display modules -->
 
 		<bezel name="digit15" element="digit">
 			<bounds left="10" top="721" right="44" bottom="760" />

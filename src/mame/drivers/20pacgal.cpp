@@ -363,7 +363,7 @@ void _20pacgal_state::common_save_state()
 void _20pacgal_state::machine_start()
 {
 	common_save_state();
-	
+
 	// membank currently used only by 20pacgal
 	membank("bank1")->configure_entry(0, memregion("maincpu")->base() + 0x08000);
 	membank("bank1")->configure_entry(1, m_ram_48000);

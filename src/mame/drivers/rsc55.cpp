@@ -71,7 +71,7 @@ static MACHINE_CONFIG_START( sc55, sc55_state )
 MACHINE_CONFIG_END
 
 ROM_START( sc55 )
-	ROM_REGION( 0x40000, "maincpu", 0 )	// additional H8/532 code and patch data - revisions match main CPU revisions
+	ROM_REGION( 0x40000, "maincpu", 0 ) // additional H8/532 code and patch data - revisions match main CPU revisions
 	ROM_LOAD( "roland_r15209363.ic23", 0x000000, 0x040000, CRC(2dc58549) SHA1(9c17f85e784dc1549ac1f98d457b353393331f6b) )
 
 	ROM_REGION( 0x300000, "la", 0 )

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco,hap
 /******************************************************************************
- 
+
     Fidelity Electronics Z80 based board driver
     for 6502 based boards, see drivers/fidel6502.cpp
 
@@ -897,7 +897,7 @@ INPUT_CHANGED_MEMBER(fidelz80_state::reset_button)
 {
 	// when RE button is directly wired to RESET pin(s)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-	
+
 	if (m_mcu)
 		m_mcu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -917,7 +917,7 @@ void fidelz80_state::vcc_prepare_display()
 	// 4 7seg leds
 	for (int i = 0; i < 4; i++)
 		m_display_segmask[i] = 0x7f;
-	
+
 	// note: sel d0 for extra leds
 	UINT8 outdata = (m_7seg_data & 0x7f) | (m_led_select << 7 & 0x80);
 	display_matrix(8, 4, outdata, m_led_select >> 2 & 0xf);
@@ -1016,7 +1016,7 @@ void fidelz80_state::vsc_prepare_display()
 		m_display_segmask[i] = 0x7f;
 		m_display_state[i] = (m_led_select >> i & 1) ? m_7seg_data : 0;
 	}
-	
+
 	// 8*8 chessboard leds
 	for (int i = 0; i < 8; i++)
 		m_display_state[i+4] = (m_led_select >> i & 1) ? m_led_data : 0;
@@ -1066,10 +1066,10 @@ READ8_MEMBER(fidelz80_state::vsc_pio_porta_r)
 READ8_MEMBER(fidelz80_state::vsc_pio_portb_r)
 {
 	UINT8 ret = 0;
-	
+
 	// d4: TSI BUSY line
 	ret |= (m_speech->busy_r()) ? 0 : 0x10;
-	
+
 	return ret;
 }
 
@@ -1135,7 +1135,7 @@ READ8_MEMBER(fidelz80_state::vbrc_mcu_t_r)
 	// T0: card scanner?
 	if (offset == 0)
 		return 0;
-	
+
 	// T1: ?
 	else
 		return rand() & 1;
@@ -1184,7 +1184,7 @@ READ8_MEMBER(fidelz80_state::vsc_io_trampoline_r)
 		ret &= m_ppi8255->read(space, offset & 3);
 	if (~offset & 8)
 		ret &= m_z80pio->read(space, offset & 3);
-	
+
 	return ret;
 }
 
@@ -1207,12 +1207,12 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
 {
 	//printf("%X ",data);
-	
+
 	// todo: HALT THE z80 here, and set up a callback to poll the s14001a BUSY line to resume z80
 	m_speech->data_w(space, 0, data & 0x3f);
 	m_speech->start_w(1);
 	m_speech->start_w(0);
-	
+
 	//m_speech->start_w(BIT(data, 7));
 }
 

@@ -284,44 +284,44 @@ protected:
 	optional_shared_ptr<UINT8> m_shared_ram;
 	optional_shared_ptr<UINT8> m_boot_ram;
 
-	UINT8			m_irq_flags;
-	UINT8			m_irq_mask;
-	emu_timer*		m_timer;
-	emu_timer*		m_subtimer;
-	emu_timer*		m_keyboard_timer;
-	UINT8			m_basic_rom_en;
-	UINT8			m_init_rom_en;
+	UINT8           m_irq_flags;
+	UINT8           m_irq_mask;
+	emu_timer*      m_timer;
+	emu_timer*      m_subtimer;
+	emu_timer*      m_keyboard_timer;
+	UINT8           m_basic_rom_en;
+	UINT8           m_init_rom_en;
 
-	unsigned int	m_key_delay;
-	unsigned int	m_key_repeat;
-	UINT16 			m_current_scancode;
-	UINT32 			m_key_data[4];
-	UINT32 			m_mod_data;
-	UINT8 			m_key_scan_mode;
-	UINT8 			m_break_flag;
+	unsigned int    m_key_delay;
+	unsigned int    m_key_repeat;
+	UINT16          m_current_scancode;
+	UINT32          m_key_data[4];
+	UINT32          m_mod_data;
+	UINT8           m_key_scan_mode;
+	UINT8           m_break_flag;
 
-	UINT8 			m_psg_regsel;
-	UINT8 			m_psg_data;
+	UINT8           m_psg_regsel;
+	UINT8           m_psg_data;
 
-	UINT8 			m_fdc_side;
-	UINT8 			m_fdc_drive;
-	UINT8 			m_fdc_irq_flag;
-	UINT8 			m_fdc_drq_flag;
+	UINT8           m_fdc_side;
+	UINT8           m_fdc_drive;
+	UINT8           m_fdc_irq_flag;
+	UINT8           m_fdc_drq_flag;
 
-	UINT8 			m_fm77av_ym_irq;
-	UINT8 			m_speaker_active;
+	UINT8           m_fm77av_ym_irq;
+	UINT8           m_speaker_active;
 
-	UINT16 			m_kanji_address;
-	fm7_encoder_t	m_encoder;
-	fm7_mmr_t 		m_mmr;
-	UINT8 			m_cp_prev;
+	UINT16          m_kanji_address;
+	fm7_encoder_t   m_encoder;
+	fm7_mmr_t       m_mmr;
+	UINT8           m_cp_prev;
 
-	std::unique_ptr<UINT8[]>	m_video_ram;
-	emu_timer* 					m_fm77av_vsync_timer;
+	std::unique_ptr<UINT8[]>    m_video_ram;
+	emu_timer*                  m_fm77av_vsync_timer;
 	UINT8 m_type;
-	fm7_video_t		m_video;
-	fm7_alu_t		m_alu;
-	int				m_sb_prev;
+	fm7_video_t     m_video;
+	fm7_alu_t       m_alu;
+	int             m_sb_prev;
 
 	void fm77av_encoder_setup_command();
 	void fm77av_encoder_handle_command();

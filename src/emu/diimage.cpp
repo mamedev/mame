@@ -61,13 +61,13 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 		m_mame_file(nullptr),
 		m_software_info_ptr(nullptr),
 		m_software_part_ptr(nullptr),
-	    m_supported(0),
+		m_supported(0),
 		m_readonly(false),
 		m_created(false),
-	    m_init_phase(false),
-	    m_from_swlist(false),
-	    m_create_format(0),
-	    m_create_args(nullptr),
+		m_init_phase(false),
+		m_from_swlist(false),
+		m_create_format(0),
+		m_create_args(nullptr),
 		m_is_loading(FALSE)
 {
 }
@@ -1420,4 +1420,3 @@ struct io_procs image_ioprocs =
 	image_fwrite_thunk,
 	image_fsize_thunk
 };
-

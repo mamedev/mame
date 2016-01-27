@@ -605,7 +605,7 @@ WRITE8_MEMBER(bfm_sc2_state::mmtr_w)
 			}
 		}
 	}
-	
+
 	if ( data & 0x1F ) m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE );
 }
 
@@ -3656,7 +3656,7 @@ static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel4_optic_cb))
 	MCFG_STARPOINT_48STEP_ADD("reel5")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel5_optic_cb))
-	
+
 	MCFG_FRAGMENT_ADD(_8meters)
 MACHINE_CONFIG_END
 
@@ -3669,7 +3669,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( scorpion3, scorpion2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(memmap_no_vid)
-	
+
 	MCFG_DEVICE_REMOVE("meters")
 	MCFG_FRAGMENT_ADD(_5meters)
 MACHINE_CONFIG_END
@@ -3715,7 +3715,7 @@ static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel4_optic_cb))
 	MCFG_STARPOINT_48STEP_ADD("reel5")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel5_optic_cb))
-	
+
 	MCFG_FRAGMENT_ADD( _8meters)
 MACHINE_CONFIG_END
 

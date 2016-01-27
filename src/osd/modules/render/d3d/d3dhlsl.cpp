@@ -2779,18 +2779,18 @@ static INT32 slider_ntsc_enable(running_machine &machine, void *arg, std::string
 
 // static INT32 slider_ntsc_phase_count(running_machine &machine, void *arg, std::string *str, INT32 newval)
 // {
-// 	hlsl_options *options = (hlsl_options*)arg;
-// 	if (newval != SLIDER_NOCHANGE)
-// 	{
-// 		options->yiq_phase_count = newval;
-// 	}
-// 	if (str != NULL)
-// 	{
-// 		strprintf(*str, "%d", options->yiq_phase_count);
-// 	}
-// 	options->params_dirty = true;
+//  hlsl_options *options = (hlsl_options*)arg;
+//  if (newval != SLIDER_NOCHANGE)
+//  {
+//      options->yiq_phase_count = newval;
+//  }
+//  if (str != NULL)
+//  {
+//      strprintf(*str, "%d", options->yiq_phase_count);
+//  }
+//  options->params_dirty = true;
 
-// 	return options->yiq_phase_count;
+//  return options->yiq_phase_count;
 // }
 
 static INT32 slider_ntsc_jitter(running_machine &machine, void *arg, std::string *str, INT32 newval)
@@ -3091,7 +3091,7 @@ void uniform::update()
 			if (shadersys->curr_render_target != NULL)
 			{
 				float targetdims[2] = {
-					static_cast<float>(shadersys->curr_render_target->target_width), 
+					static_cast<float>(shadersys->curr_render_target->target_width),
 					static_cast<float>(shadersys->curr_render_target->target_height) };
 				m_shader->set_vector("TargetDims", 2, targetdims);
 			}

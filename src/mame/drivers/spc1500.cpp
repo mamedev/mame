@@ -7,19 +7,19 @@ Samsung SPC-1500 driver by Miso Kim
   2015-12-16 preliminary driver initialized
   2015-12-18 cassette tape supported
   2015-12-26 80/40 column mode supported
-  2015-12-28 double access mode supported for I/O 
+  2015-12-28 double access mode supported for I/O
   2016-01-02 Korean character input method and display enabled
-  2016-01-03 user defined char (PCG, Programmable Character Generator) support	
-  2016-01-05 detection of color palette initialization 
+  2016-01-03 user defined char (PCG, Programmable Character Generator) support
+  2016-01-05 detection of color palette initialization
   2016-01-06 80x16 mode graphic mode support
   2016-01-10 double character support
   2016-01-12 PCG adressing improved
   2016-01-13 Cassette tape motor improved
-	
+
 TODO:
   - Verify PCG ram read for Korean character (english character is fine)
   - Support floppy disk drive with SD-1500A controller card
-	
+
 ****************************************************************************/
 
 /*
@@ -32,7 +32,7 @@ TODO:
  * Market price 365,000 won ($430) on 04-01-1987
 
  Hardware Specification
- 
+
  1) SPC-1500
  RAM 122KB
   - Main Memory: 64KB
@@ -59,19 +59,19 @@ TODO:
  Two external power connector for FDD connection
   - DIP switch settings for the screen
   - Volume control
- 
+
  2) SPC-1500A
   July 1987 Release
   RF modulator only remove the product from an existing model
- 
+
  3) SPC-1500V
   This product can not confirm the release date because of PCB level modification.
   It equiped SPC-1500V VLSI chip embedded products and removed a lot of TTLs and the memory expansion card.
   - IOCS ROM Version: 1.6
   - Two internal 50-pin expension slots
- 
+
  Firmware
- 
+
   IOCS ROM
     The various versions with 32KB of capacity existed to date has confirmed the final version number 1.8
   - Version 1.3:
@@ -79,34 +79,34 @@ TODO:
   - Version 1.5:
   - Version 1.6:
   - Version 1.8: supports a variety of peripherals such as external hard disk, FM-Sound, RS-232C from Static soft (C)
-                 various memu appears on the initial screen.
- 
+                 various memu appears on the initial screen.
+
   BASIC ROM
    Capacity and the final version number of the currently identified 32KB 1.3
- 
+
   English ROM
    The final version of the verification of the capacity 8KB SS150-1222
    The character set of a 8x8 size, and are stored with the size 8x16 8x16 is a part of the size of the font data are written differently and 8x8.
- 
+
   Hangul ROM
    8KB each is divided by a consonant and consonant and neutral.
    - Inital (Choseong)  SS151-1223: 8 types of intial character (actual 6 types)
    - Middle (Jungseong) SS152-1224: 2 types of middle character
    - Final  (Jongseong) SS153-1225: 2 types of final character
-  
+
   Periperials - Monitor
    - , high-resolution monitor SM, color monitor model was to distinguish it from CD.
-  
+
   1) MD-1255H (Low resolution monitors MD)
    - 12 inches Composite 15.734KHz / 60Hz
    - N displayed after the model name in the model is non - CRT scanning products
    - Stand adopted: if you put the rest on the bottom that can be placed slightly tilted back.
- 
+
   2) MD-9052H (Low resolution monitors MD)
    - 9 inches Composite 15.734KHz / 60Hz
-   - N from model name means 'anti-glare' 
+   - N from model name means 'anti-glare'
    - All parts except for the appearance and size is the same as the CRT 1255H.
- 
+
   3) MD-2563 (color monitor SM)
   4) SM-1439A (high-resolution monitor SM)
   5) SM-1422 (high-resolution monitor SM)
@@ -115,38 +115,38 @@ TODO:
    - High-resolution monochrome monitor
   7) SM-1231A (high-resolution monitor SM)
    - The other part is other than the appearance of the stand is attached to the same as the model SM-1231
- 
-  8) CD-1451D (color monitor SM) 
+
+  8) CD-1451D (color monitor SM)
    - Composite color monitors
   9) CD-1462X (color monitor SM)
   10)CD-1464W (color monitor SM)
-  11)CW-4644 
- 
+  11)CW-4644
+
   FDD (floppy disk drive)
- 
+
   1) SD-1500A
    - 5.25 "floppy drive for 2D composed of external disk drives diskettes
-  2) SD-1500B
+  2) SD-1500B
    - Dual external disk drives
    - The two models are idential except the number of FDD. They need the expension controller card named by SFC-1500.
    - IBM PC XT compatible FDD can be quipped. SFD-5x0 model is a genuine FDD from Samsung Electronics.
 
   HDD (Hard Disk Drive)
- 
+
   1) STH-20
    - External hard disk drive set having a capacity of 20MB SCSI controller and the way
    - The controller had not solved alone but the controller can be used to mount another hard disk products.
    - Release price: 450,000 won ($530).
- 
+
   Joysticks
-   - Joystick was limited to 1 as possible (The PCB was designed by supporting two joysticks. 
- 
+   - Joystick was limited to 1 as possible (The PCB was designed by supporting two joysticks.
+
   1) SJ-1500
    - Release price: 8,000 won ($9.4)
    - SPC-1000A, MSX-compatible
- 
+
   Printer
- 
+
   1) SP-510S
    - Bitmap image output method Hangul support
    - Recommanded 80 columns dot-matrix printer
@@ -157,68 +157,68 @@ TODO:
   5) SP-570B
 
   Expansion Cards
- 
+
   1) SFC-1500
    - External FDD capacity of the floppy disk controller 5.25 inches / 320KB can connect up to two.
- 
+
   2) Multi-controller
    - Floppy disk controllers and hard disk controllers on the same PCB.
- 
+
   3) ST-PAC
    - FM sound card can play with up to 9 simultaneous sound or 5 simultaneous sound and 5 drum tones at the same time (FM-PAC compatible MSX)
    - Line output and speaker output volume, tone adjustment built-in volume
-   - it can be used as a synthesizer by connecting the ST-KEY2 product 
+   - it can be used as a synthesizer by connecting the ST-KEY2 product
    - Release price: 60,000won ($71)
- 
+
   SPC-1500 VDP card
-   - MSX game support 
+   - MSX game support
    - Release price: 35,000won ($41) with composite output only
    - Release price: 60,000won ($71) with composite and RGB outputs simultaneously
- 
+
   VDP UNIT I
    - Composite video output with built-in card expansion card using the same video chip and MSX (static soft)
    - Release price: 40,000won ($47).
- 
+
   VDP UNIT II
    - Expansion using the same video chip and video card with built-in card MSX with an RGB output (static soft)
    - Release price: 55,000won ($59).
- 
+
   LAN card (SAMNET-K)
    - It uses serial communication instead of an Ethernet network card has a way with two serial ports.
    - There are two kinds of host card without a DIP switch and the DIP switch is in the client card.
    - It was mainly supplied to the teacher / student in an educational institution.
- 
+
   Super Pack Card
    - Expansion cards that enable the external expansion slot, etc.
- 
+
   RS-232C card
-   - At least 300bps, an external modem connected to the serial communication card that supports up to 19,200bps 
-     additionally available communications services using the PSTN network (general switched telephone network) 
-	 and may also be connected to a 9-pin serial mouse.
-   - Support for common serial communications functions, 
+   - At least 300bps, an external modem connected to the serial communication card that supports up to 19,200bps
+     additionally available communications services using the PSTN network (general switched telephone network)
+     and may also be connected to a 9-pin serial mouse.
+   - Support for common serial communications functions,
      and if IOCS ROM version 1.8 or higher to connect an external modem to the PC communication card is available.
-   - When used in this communication program is super soft static net programs (XMODEM protocol, FS 220-6 compatible 
+   - When used in this communication program is super soft static net programs (XMODEM protocol, FS 220-6 compatible
      and supporting Samsung/Sambo combination korean character code, and an 8-bit code completion support Hangul) is used.
    - Release price: 60,000won ($71).
- 
+
   SS-1 ROM pack unit
    - The VDP unit containing 1 cartridge slot card and ROM pack
    - ROM pack was not compatible with original MSX ROM pack
    - Release price: 49,900won ($58)
- 
+
   Super Pack
    - External ROM cartrige from Static Soft (C)
    - 1 cartridge slot and 3 expansion slots (up to five expansion slots available)
    - It is available to use the MSX ROM packs without any modification with the static soft VDP card
    - Release price: 60,000won ($71)
- 
+
   ST-KEY2
    - For synthesizer external keyboard
- 
+
   * Compatiblity with X1 series of Sharp Electronics
    - Almost the key components is the same as X1 models of Sharp Electronics and except for the keyboard input.
    - To port the X1 software to SPC-1500, Text attribute, keyboard input and DMA related code should be modified
-   
+
 */
 
 #include "emu.h"
@@ -247,14 +247,14 @@ public:
 		, m_pcgram(*this, "pcgram")
 		, m_io_kb(*this, "LINE")
 		, m_io_joy(*this, "JOY")
-		, m_dipsw(*this, "DIP_SWITCH")		
+		, m_dipsw(*this, "DIP_SWITCH")
 		, m_centronics(*this, "centronics")
 		, m_pio(*this, "ppi8255")
 		, m_sound(*this, "ay8910")
 		, m_palette(*this, "palette")
 		, m_timer(nullptr)
 	{}
-	DECLARE_READ8_MEMBER(psga_r);	
+	DECLARE_READ8_MEMBER(psga_r);
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
 	DECLARE_READ8_MEMBER(mc6845_videoram_r);
@@ -281,7 +281,7 @@ public:
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_PALETTE_INIT(spc);
 	DECLARE_VIDEO_START(spc);
-	MC6845_UPDATE_ROW(crtc_update_row); 
+	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_RECONFIGURE(crtc_reconfig);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer);
 private:
@@ -315,8 +315,8 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<i8255_device> m_pio;
 	required_device<ay8910_device> m_sound;
-	required_device<palette_device> m_palette;	
-	UINT8 *m_font;        
+	required_device<palette_device> m_palette;
+	UINT8 *m_font;
 	UINT8 m_priority;
 	emu_timer *m_timer;
 	void get_pcg_addr();
@@ -338,7 +338,7 @@ WRITE8_MEMBER( spc1500_state::romsel)
 	if (m_ipl)
 		membank("bank1")->set_entry(0);
 	else
-		membank("bank1")->set_entry(1);		
+		membank("bank1")->set_entry(1);
 }
 
 WRITE8_MEMBER( spc1500_state::ramsel)
@@ -349,7 +349,7 @@ WRITE8_MEMBER( spc1500_state::ramsel)
 
 WRITE8_MEMBER( spc1500_state::portb_w)
 {
-//	m_ipl = data & (1 << 1);
+//  m_ipl = data & (1 << 1);
 }
 
 WRITE8_MEMBER( spc1500_state::psgb_w)
@@ -381,12 +381,12 @@ WRITE8_MEMBER( spc1500_state::portc_w)
 READ8_MEMBER( spc1500_state::portb_r)
 {
 	UINT8 data = 0;
- 	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED || ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED));
- 	data |= (m_dipsw->read() & 1) << 4;
- 	data |= (m_cass->input() > 0.0038)<<1;
- 	data |= m_vdg->vsync_r()<<7;
- 	data &= ~((m_centronics_busy==0)<<3);
- 	return data;
+	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED || ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED));
+	data |= (m_dipsw->read() & 1) << 4;
+	data |= (m_cass->input() > 0.0038)<<1;
+	data |= m_vdg->vsync_r()<<7;
+	data &= ~((m_centronics_busy==0)<<3);
+	return data;
 }
 
 WRITE8_MEMBER( spc1500_state::crtc_w)
@@ -444,7 +444,7 @@ void spc1500_state::get_pcg_addr()
 		m_pcg_offset[0] = 0;
 		m_pcg_offset[1] = 0;
 		m_pcg_offset[2] = 0;
-	}	
+	}
 }
 
 WRITE8_MEMBER( spc1500_state::pcg_w)
@@ -506,13 +506,12 @@ PALETTE_INIT_MEMBER(spc1500_state,spc)
 
 VIDEO_START_MEMBER(spc1500_state, spc)
 {
-	
 }
 
 MC6845_RECONFIGURE(spc1500_state::crtc_reconfig)
 {
-//	printf("reconfig. w:%d, h:%d, %f (%d,%d,%d,%d)\n", width, height, (float)frame_period, visarea.left(), visarea.top(), visarea.right(), visarea.bottom());
-//	printf("register. m_vert_disp:%d, m_horiz_disp:%d, m_max_ras_addr:%d, m_vert_char_total:%d\n", m_crtc_vreg[6], m_crtc_vreg[1],  m_crtc_vreg[9], m_crtc_vreg[0x4]);
+//  printf("reconfig. w:%d, h:%d, %f (%d,%d,%d,%d)\n", width, height, (float)frame_period, visarea.left(), visarea.top(), visarea.right(), visarea.bottom());
+//  printf("register. m_vert_disp:%d, m_horiz_disp:%d, m_max_ras_addr:%d, m_vert_char_total:%d\n", m_crtc_vreg[6], m_crtc_vreg[1],  m_crtc_vreg[9], m_crtc_vreg[0x4]);
 }
 
 MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
@@ -524,7 +523,7 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	int j;
 	int h1, h2, h3;
 	UINT32  *p = &bitmap.pix32(y);
-	
+
 	unsigned char cho[] ={1,1,1,1,1,1,1,1,0,0,1,1,1,3,5,5,0,0,5,3,3,5,5,5,0,0,3,3,5,1};
 	unsigned char jong[]={0,0,0,1,1,1,1,1,0,0,1,1,1,2,2,2,0,0,2,2,2,2,2,2,0,0,2,2,1,1};
 	bool inv = false;
@@ -564,7 +563,7 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 				hfnt = hfnt & ((*pf << 8) | (*(pf+16)));
 				pf = &m_font[0x6000+(h3 * 32) + (jong[h2]-1) * 16 * 2 * 32 + n];
 				hfnt = hfnt & ((*pf << 8) | (*(pf+16)));
-			}				
+			}
 			else
 			{
 				ascii = *(pv+0x1001);
@@ -639,15 +638,15 @@ WRITE8_MEMBER( spc1500_state::double_w)
 		if (offset < 0x1e00) { romsel(space, offset, data);} else
 		if (offset < 0x1f00) { ramsel(space, offset, data);} else
 		if (offset < 0x2000) {} else
-		if (offset < 0x10000) 
-		{ 
-			if (offset < 0x4000) 
+		if (offset < 0x10000)
+		{
+			if (offset < 0x4000)
 			{
 				offset &= 0xf7ff;
 				m_p_videoram[offset-0x1800] = m_p_videoram[offset-0x2000] = data;
 			}
 			else
-				m_p_videoram[offset-0x2000] = data; 
+				m_p_videoram[offset-0x2000] = data;
 		};
 	}
 }
@@ -655,7 +654,7 @@ WRITE8_MEMBER( spc1500_state::double_w)
 READ8_MEMBER( spc1500_state::io_r)
 {
 	m_double_mode = false;
-	if (offset < 0x1000) {} else 
+	if (offset < 0x1000) {} else
 	if (offset < 0x1400) {} else
 	if (offset < 0x1800) { return pcg_r(space, offset); } else
 	if (offset < 0x1900) { return crtc_r(space, offset); } else
@@ -663,7 +662,7 @@ READ8_MEMBER( spc1500_state::io_r)
 	if (offset < 0x1b00) { return m_pio->read(space, offset); } else
 	if (offset < 0x1c00) { return m_sound->data_r(space, offset); } else
 	if (offset < 0x2000) {} else
-	if (offset < 0x10000){ 
+	if (offset < 0x10000){
 		if (offset < 0x4000)
 			offset &= 0xf7ff;
 		return m_p_videoram[offset - 0x2000]; }
@@ -680,13 +679,13 @@ ADDRESS_MAP_END
 #if 0
 static ADDRESS_MAP_START( spc1500_io , AS_IO, 8, spc1500_state )
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("userio", user_device, userio_r, userio_w)
-//	AM_RANGE(0x0400, 0x05ff) AM_DEVREADWRITE("lanio", lan_device, lanio_r, lanio_w)
-//	AM_RANGE(0x0600, 0x07ff) AM_DEVREADWRITE("rs232c", rs232c_device, rs232c_r, rs232c_w)
-//	AM_RANGE(0x0800, 0x09ff) AM_DEVREADWRITE("fdcx", fdcx_device, fdcx_r, fdcx_w)
-//	AM_RANGE(0x0a00, 0x0bff) AM_DEVREADWRITE("userio", user_device, userio_r, userio_w)
-//	AM_RANGE(0x0c00, 0x0dff) AM_DEVREADWRITE("fdc", fdc_device, fdc_r, fdc_w)
-//	AM_RANGE(0x0e00, 0x0fff) AM_DEVREADWRITE("extram", extram_device, extram_r, extram_w)
+//  AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("userio", user_device, userio_r, userio_w)
+//  AM_RANGE(0x0400, 0x05ff) AM_DEVREADWRITE("lanio", lan_device, lanio_r, lanio_w)
+//  AM_RANGE(0x0600, 0x07ff) AM_DEVREADWRITE("rs232c", rs232c_device, rs232c_r, rs232c_w)
+//  AM_RANGE(0x0800, 0x09ff) AM_DEVREADWRITE("fdcx", fdcx_device, fdcx_r, fdcx_w)
+//  AM_RANGE(0x0a00, 0x0bff) AM_DEVREADWRITE("userio", user_device, userio_r, userio_w)
+//  AM_RANGE(0x0c00, 0x0dff) AM_DEVREADWRITE("fdc", fdc_device, fdc_r, fdc_w)
+//  AM_RANGE(0x0e00, 0x0fff) AM_DEVREADWRITE("extram", extram_device, extram_r, extram_w)
 	AM_RANGE(0x1000, 0x10ff) AM_WRITE(paletb_w)
 	AM_RANGE(0x1100, 0x11ff) AM_WRITE(paletr_w)
 	AM_RANGE(0x1200, 0x12ff) AM_WRITE(paletg_w)
@@ -696,48 +695,48 @@ static ADDRESS_MAP_START( spc1500_io , AS_IO, 8, spc1500_state )
 	AM_RANGE(0x1600, 0x16ff) AM_READWRITE(pcgr_r, pcgr_w)
 	AM_RANGE(0x1700, 0x17ff) AM_WRITE(pcgg_w)
 	AM_RANGE(0x1800, 0x18ff) AM_READWRITE(crtc_r, crtc_w)
-//	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("mc6845", mc6845_device, address_w)
-//	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("mc6845", mc6845_device, register_r, register_w)
-//	AM_RANGE(0x1800, 0x1801) AM_READWRITE(crtc_r, crtc_w)
+//  AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("mc6845", mc6845_device, address_w)
+//  AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("mc6845", mc6845_device, register_r, register_w)
+//  AM_RANGE(0x1800, 0x1801) AM_READWRITE(crtc_r, crtc_w)
 	AM_RANGE(0x1900, 0x1909) AM_READ(keyboard_r)
- 	AM_RANGE(0x1a00, 0x1a03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
+	AM_RANGE(0x1a00, 0x1a03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x1b00, 0x1bff) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)
 	AM_RANGE(0x1c00, 0x1cff) AM_DEVWRITE("ay8910", ay8910_device, address_w)
 	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(romsel)
 	AM_RANGE(0x1e00, 0x1e00) AM_WRITE(ramsel)
 	AM_RANGE(0x2000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
-#endif 
+#endif
 
 /* Input ports */
 static INPUT_PORTS_START( spc1500 )
 
- 	PORT_START("DIP_SWITCH") 
- 	PORT_DIPNAME( 0x01, 0x00, "40/80" )
- 	PORT_DIPSETTING(    0x00, "40COL" )
- 	PORT_DIPSETTING(    0x01, "80COL" )
- 	PORT_DIPNAME( 0x02, 0x02, "Language" )
- 	PORT_DIPSETTING(    0x02, "Korean" )
- 	PORT_DIPSETTING(    0x00, "English" )
+	PORT_START("DIP_SWITCH")
+	PORT_DIPNAME( 0x01, 0x00, "40/80" )
+	PORT_DIPSETTING(    0x00, "40COL" )
+	PORT_DIPSETTING(    0x01, "80COL" )
+	PORT_DIPNAME( 0x02, 0x02, "Language" )
+	PORT_DIPSETTING(    0x02, "Korean" )
+	PORT_DIPSETTING(    0x00, "English" )
 	PORT_DIPNAME( 0x04, 0x00, "V-Res" )
- 	PORT_DIPSETTING(    0x04, "400" )
+	PORT_DIPSETTING(    0x04, "400" )
 	PORT_DIPSETTING(    0x00, "200" )
 	PORT_DIPNAME( 0x08, 0x08, "X1" )
- 	PORT_DIPSETTING(    0x08, "Compatible Mode" )
+	PORT_DIPSETTING(    0x08, "Compatible Mode" )
 	PORT_DIPSETTING(    0x00, "Non Compatible" )
- 
+
 	PORT_START("LINE.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) 
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_RSHIFT) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_RCONTROL) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED) 
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_PAUSE)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\\ |") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|') PORT_CHAR(0x1c)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Graph") PORT_CODE(KEYCODE_LALT)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("LINE.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("= +") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+') 
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("= +") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
@@ -768,7 +767,7 @@ static INPUT_PORTS_START( spc1500 )
 
 	PORT_START("LINE.4")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Del Ins") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD)) PORT_CHAR(8)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)   
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Home") PORT_CODE(KEYCODE_HOME)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N') PORT_CHAR(0x0e)
@@ -777,9 +776,9 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4 $") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 
 	PORT_START("LINE.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) 
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED) 
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M') PORT_CHAR(0x0d)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G') PORT_CHAR(0x07)
@@ -787,7 +786,7 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5 %") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 
 	PORT_START("LINE.6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) 
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("[ {") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{') PORT_CHAR(0x1b)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(0x18)
@@ -797,9 +796,9 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6 ^") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('^')
 
 	PORT_START("LINE.7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) 
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED) 
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR(0x10)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J') PORT_CHAR(0x0a)
@@ -807,9 +806,9 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7 &") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
 
 	PORT_START("LINE.8")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) 
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F4)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED) 
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\' \"") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('\"')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K') PORT_CHAR(0x0b)
@@ -817,7 +816,7 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8 *") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')
 
 	PORT_START("LINE.9")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Hangul") PORT_CODE(KEYCODE_RALT)    
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Hangul") PORT_CODE(KEYCODE_RALT)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F5)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("- _") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 )") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
@@ -834,12 +833,12 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH,IPT_UNUSED) // DIP SW2 for Korean/English
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH,IPT_UNUSED) // DIP SW3 for 200/400 line 
+	PORT_BIT(0x80, IP_ACTIVE_HIGH,IPT_UNUSED) // DIP SW3 for 200/400 line
 INPUT_PORTS_END
 
 static ADDRESS_MAP_START(spc1500_mem, AS_PROGRAM, 8, spc1500_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2") 
+	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE_BANK("bank4")
 ADDRESS_MAP_END
 
@@ -848,7 +847,7 @@ void spc1500_state::machine_start()
 	UINT8 *mem_basic = memregion("basic")->base();
 	UINT8 *mem_ipl = memregion("ipl")->base();
 	m_p_ram = m_ram->pointer();
-	m_font = memregion("font1")->base();	
+	m_font = memregion("font1")->base();
 	// configure and intialize banks 1 (read banks)
 	membank("bank1")->configure_entry(0, mem_ipl);
 	membank("bank1")->configure_entry(1, mem_basic);
@@ -859,7 +858,7 @@ void spc1500_state::machine_start()
 	set_address_space(AS_IO, m_maincpu->space(AS_IO));
 	// intialize banks 2, 3, 4 (write banks)
 	membank("bank2")->set_base(m_p_ram);
-	membank("bank4")->set_base(m_p_ram + 0x8000);	
+	membank("bank4")->set_base(m_p_ram + 0x8000);
 	m_timer = timer_alloc(0);
 	m_timer->adjust(attotime::zero);
 }
@@ -867,7 +866,7 @@ void spc1500_state::machine_start()
 void spc1500_state::machine_reset()
 {
 	m_motor = false;
-   	m_time = machine().scheduler().time();	
+	m_time = machine().scheduler().time();
 	m_double_mode = false;
 	memset(&m_paltbl[0], 1, 8);
 	m_char_count = 0;
@@ -904,30 +903,30 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(spc1500_state, irq0_line_hold,  60)
 
 	/* video hardware */
-	
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0,640-1,0,400-1)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update )
-	MCFG_PALETTE_ADD("palette", 8)	
+	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(spc1500_state, spc)
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", (VDP_CLOCK/48)) //unknown divider
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(spc1500_state, crtc_update_row)
 	MCFG_MC6845_RECONFIGURE_CB(spc1500_state, crtc_reconfig)
-	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)	
-	
+	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)
+
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_I8255_IN_PORTB_CB(READ8(spc1500_state, portb_r))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(spc1500_state, portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(spc1500_state, portc_w))
-	
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz", spc1500_state, timer, attotime::from_hz(1))
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_4MHz / 2)
@@ -959,12 +958,12 @@ ROM_START( spc1500 )
 	ROM_LOAD("ipl.rom", 0x0000, 0x8000, CRC(80d0704a) SHA1(01e4cbe8baad72effbbe01addd477c5b0ec85c16))
 	ROM_REGION(0x8000, "basic", ROMREGION_ERASEFF)
 	ROM_LOAD("basic.rom", 0x0000, 0x8000, CRC(f48328e1) SHA1(fb874ea7d20078726682f2d0e03ea0d1f8bdbb07))
-	ROM_REGION(0x8000, "font1", 0) 
+	ROM_REGION(0x8000, "font1", 0)
 	ROM_LOAD( "ss150fnt.bin", 0x0000, 0x2000, CRC(affdc5c0) SHA1(2a93582fcccf9e40b99ae238ce585d189afe9a5a) )
 	ROM_LOAD( "ss151fnt.bin", 0x2000, 0x2000, CRC(83c2eb8d) SHA1(2adf7816206dc74b9f0d32cb3b56cbab31fa6044) )
 	ROM_LOAD( "ss152fnt.bin", 0x4000, 0x2000, CRC(f4a5a590) SHA1(c9a02756107083bf602ae7c90cfe29b8b964e0df) )
 	ROM_LOAD( "ss153fnt.bin", 0x6000, 0x2000, CRC(8677d5fa) SHA1(34bfacc855c3846744cd586c150c72e5cbe948b0) )
-	
+
 ROM_END
 
 

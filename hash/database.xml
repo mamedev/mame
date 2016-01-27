@@ -261,6 +261,6 @@
 				<rom name="leapfrog.bin" size="4096" crc="105eb530" sha1="7211b0b1c6e8798399f4f6d2a942db4e8379c691" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 </softwarelist>

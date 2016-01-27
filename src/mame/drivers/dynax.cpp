@@ -4334,7 +4334,7 @@ MACHINE_START_MEMBER(dynax_state,hnoridur)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 	int bank_n = (memregion("maincpu")->bytes() - 0x10000) / 0x8000;
-	
+
 	m_hnoridur_ptr = &ROM[0x10000 + 0x18 * 0x8000];
 	save_pointer(NAME(m_hnoridur_ptr), 0x8000);
 
