@@ -441,6 +441,7 @@ UINT32 viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bit
 
 UINT32 m_mpc8240_regs[256/4];
 
+#ifdef UNUSED_FUNCTION
 static inline UINT64 read64le_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
@@ -459,6 +460,7 @@ static inline void write64le_with_32le_device_handler(write32_delegate handler, 
 	if (ACCESSING_BITS_32_63)
 		handler(space, offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
+#endif
 
 static inline UINT64 read64be_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, UINT64 mem_mask)
 {
