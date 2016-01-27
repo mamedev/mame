@@ -45,8 +45,9 @@ public:
 	optional_device<generic_slot_device> m_cart;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<timer_device> m_irq_off;
-
+	
 	// model CSC
+	void csc_update_7442();
 	void csc_prepare_display();
 	DECLARE_READ8_MEMBER(csc_speech_r);
 	DECLARE_WRITE8_MEMBER(csc_pia0_pa_w);
@@ -80,10 +81,18 @@ public:
 
 // misc handlers
 
+void fidel6502_state::csc_update_7442()
+{
+	// 7442 0-8: led select, input mux
+	m_inp_mux = 1 << m_led_select & 0x3ff;
+	
+	// 7442 9: buzzer speaker out
+	m_speaker->level_w(m_inp_mux >> 9 & 1);
+}
+
 void fidel6502_state::csc_prepare_display()
 {
-	// 7442 output, also update input mux (9 is unused)
-	m_inp_mux = (1 << m_led_select) & 0x1ff;
+	csc_update_7442();
 
 	// 4 7seg leds + H
 	for (int i = 0; i < 4; i++)
@@ -126,9 +135,9 @@ WRITE8_MEMBER(fidel6502_state::csc_pia0_pb_w)
 
 	// d1: TSI START line
 	m_speech->start_w(data >> 1 & 1);
-
-	// d4: tone line
-	m_speaker->level_w(data >> 4 & 1);
+	
+	// d4: lower TSI volume
+	m_speech->set_output_gain(0, (data & 0x10) ? 0.5 : 1.0);
 }
 
 READ8_MEMBER(fidel6502_state::csc_pia0_pb_r)

@@ -366,10 +366,10 @@ PA6 - 7seg segments B
 PA7 - 7seg segments A
 
 PB0 - A12 on speech ROM (if used... not used on this model, ROM is 4K)
-PB1 - START line on S14001A
+PB1 - START line on TSI
 PB2 - white wire
-PB3 - BUSY line from S14001A
-PB4 - Tone line (toggle to make a tone in the speaker)
+PB3 - BUSY line from TSI
+PB4 - hi/lo TSI speaker volume
 PB5 - button row 9
 PB6 - selection jumper (resistor to 5V)
 PB7 - selection jumper (resistor to ground)
@@ -422,7 +422,7 @@ output # (selected turns this column on, and all others off)
 6 - LED column G, button column G
 7 - LED column H, button column H
 8 - button column I
-9 -
+9 - Tone line (toggle to make a tone in the buzzer)
 
 The rows/columns are indicated on the game board:
 
@@ -593,7 +593,7 @@ PA.7 - button row 8
 
 PB.0 - button column I
 PB.1 - button column J
-PB.2 - Tone line (toggle to make tone in the speaker)
+PB.2 - hi/lo TSI speaker volume
 PB.3 - violet wire
 PB.4 - white wire (and TSI BUSY line)
 PB.5 - selection jumper input (see below)
@@ -703,7 +703,6 @@ ROM A11 is however tied to the CPU's XYZ
 #include "machine/i8255.h"
 #include "machine/i8243.h"
 #include "machine/z80pio.h"
-#include "sound/speaker.h"
 #include "sound/beep.h"
 
 #include "includes/fidelz80.h"
@@ -724,7 +723,6 @@ public:
 		m_z80pio(*this, "z80pio"),
 		m_ppi8255(*this, "ppi8255"),
 		m_i8243(*this, "i8243"),
-		m_speaker(*this, "speaker"),
 		m_beeper_off(*this, "beeper_off"),
 		m_beeper(*this, "beeper")
 	{ }
@@ -734,7 +732,6 @@ public:
 	optional_device<z80pio_device> m_z80pio;
 	optional_device<i8255_device> m_ppi8255;
 	optional_device<i8243_device> m_i8243;
-	optional_device<speaker_sound_device> m_speaker;
 	optional_device<timer_device> m_beeper_off;
 	optional_device<beep_device> m_beeper;
 
@@ -1102,11 +1099,11 @@ WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 	// d0,d1: input mux highest bits
 	m_inp_mux = (m_inp_mux & 0xff) | (data << 8 & 0x300);
 
-	// d2: tone line
-	m_speaker->level_w(data >> 2 & 1);
-
 	// d6: TSI START line
 	m_speech->start_w(data >> 6 & 1);
+
+	// d2: lower TSI volume
+	m_speech->set_output_gain(0, (data & 4) ? 0.5 : 1.0);
 }
 
 
@@ -1274,7 +1271,7 @@ static INPUT_PORTS_START( fidelz80 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("E5") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_E)
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CB") PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Speak") PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM") PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("B2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_B)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F6") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F)
@@ -1541,9 +1538,6 @@ static MACHINE_CONFIG_START( vsc, fidelz80_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( vbrc, fidelz80_state )
