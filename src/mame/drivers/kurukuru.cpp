@@ -363,6 +363,16 @@ static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_DEVWRITE("ym2149", ay8910_device, data_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( ppj_map, AS_PROGRAM, 8, kurukuru_state )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK("bank1")
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ppj_io, AS_IO, 8, kurukuru_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+ADDRESS_MAP_END
+
 
 // Audio CPU
 
@@ -401,17 +411,26 @@ READ8_MEMBER(kurukuru_state::kurukuru_adpcm_timer_irqack_r)
 }
 
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, kurukuru_state )
+static ADDRESS_MAP_START( kurukuru_audio_map, AS_PROGRAM, 8, kurukuru_state )
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_io, AS_IO, 8, kurukuru_state )
+static ADDRESS_MAP_START( kurukuru_audio_io, AS_IO, 8, kurukuru_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_WRITE(kurukuru_adpcm_data_w)
 	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_WRITE(kurukuru_adpcm_reset_w)
 	AM_RANGE(0x60, 0x60) AM_MIRROR(0x0f) AM_READ(kurukuru_soundlatch_r)
 	AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) AM_READ(kurukuru_adpcm_timer_irqack_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ppj_audio_map, AS_PROGRAM, 8, kurukuru_state )
+	AM_RANGE(0x0000, 0xf7ff) AM_ROM
+	AM_RANGE(0xf800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ppj_audio_io, AS_IO, 8, kurukuru_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 ADDRESS_MAP_END
 
 
@@ -537,8 +556,43 @@ static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 	MCFG_CPU_IO_MAP(kurukuru_io)
 
 	MCFG_CPU_ADD("audiocpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_CPU_IO_MAP(audio_io)
+	MCFG_CPU_PROGRAM_MAP(kurukuru_audio_map)
+	MCFG_CPU_IO_MAP(kurukuru_audio_io)
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	/* video hardware */
+	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(kurukuru_state,kurukuru_vdp_interrupt))
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
+
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ym2149", YM2149, YM2149_CLOCK)
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(kurukuru_state, ym2149_aout_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kurukuru_state, ym2149_bout_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MCFG_SOUND_ADD("adpcm", MSM5205, M5205_CLOCK)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(kurukuru_state, kurukuru_msm5205_vck))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* changed on the fly */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_START( ppj, kurukuru_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(ppj_map)
+	MCFG_CPU_IO_MAP(ppj_io)
+
+	MCFG_CPU_ADD("audiocpu", Z80, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(ppj_audio_map)
+	MCFG_CPU_IO_MAP(ppj_audio_io)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -613,4 +667,4 @@ ROM_END
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY                   FULLNAME                       FLAGS  */
 GAME( 199?, kurukuru, 0,      kurukuru, kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",  0 )
-GAME( 199?, ppj,      0,      kurukuru, kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (Japan)",       MACHINE_NOT_WORKING )
+GAME( 199?, ppj,      0,      ppj,      kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (Japan)",       MACHINE_NOT_WORKING )
