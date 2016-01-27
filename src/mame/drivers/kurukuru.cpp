@@ -370,6 +370,7 @@ static ADDRESS_MAP_START( ppj_map, AS_PROGRAM, 8, kurukuru_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppj_io, AS_IO, 8, kurukuru_state )
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0f) AM_WRITE(kurukuru_bankswitch_w)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0x0c) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_READ_PORT("DSW1")
 	AM_RANGE(0x60, 0x60) AM_MIRROR(0x0f) AM_READ_PORT("IN1")
