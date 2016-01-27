@@ -1263,7 +1263,7 @@ ADDRESS_MAP_END
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( fidelz80 )
+static INPUT_PORTS_START( vcc_base )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV") PORT_CODE(KEYCODE_L)
@@ -1288,22 +1288,67 @@ static INPUT_PORTS_START( fidelz80 )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("D4") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_D)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_H)
 
-	PORT_START("IN.4") // TODO: hardcode this
-	PORT_CONFNAME( 0x0f, 0x00, "Language" )
-	PORT_CONFSETTING( 0x00, "English" )
-	PORT_CONFSETTING( 0x01, "French" )
-	PORT_CONFSETTING( 0x02, "Spanish" )
-	PORT_CONFSETTING( 0x04, "German" )
-	PORT_CONFSETTING( 0x08, "Special" )
-
 	PORT_START("RESET") // is not on matrix IN.0 d0
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, fidelz80_state, reset_button, 0)
+INPUT_PORTS_END
 
-	PORT_START("LEVEL") // cc10 only, TODO: hardcode this
-	PORT_CONFNAME( 0x80, 0x00, "Number of levels" )
+static INPUT_PORTS_START( cc10 )
+	PORT_INCLUDE( vcc_base )
+
+	PORT_START("IN.4")
+	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("LEVEL") // factory setting
+	PORT_CONFNAME( 0x80, 0x00, "PPI.B.7: Maximum Levels" )
 	PORT_CONFSETTING( 0x00, "10" )
 	PORT_CONFSETTING( 0x80, "3" )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( vcc )
+	PORT_INCLUDE( vcc_base )
+
+	PORT_START("IN.4") // not consumer accessible
+	PORT_CONFNAME( 0x01, 0x00, "PCB Jumper: French" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_CONFNAME( 0x02, 0x00, "PCB Jumper: Spanish" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_CONFNAME( 0x04, 0x00, "PCB Jumper: German" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
+	PORT_CONFNAME( 0x08, 0x00, "PCB Jumper: Special" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vccfr )
+	PORT_INCLUDE( vcc )
+
+	PORT_MODIFY("IN.4")
+	PORT_CONFNAME( 0x01, 0x01, "PCB Jumper: French" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vccsp )
+	PORT_INCLUDE( vcc )
+
+	PORT_MODIFY("IN.4")
+	PORT_CONFNAME( 0x02, 0x02, "PCB Jumper: Spanish" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vccg )
+	PORT_INCLUDE( vcc )
+
+	PORT_MODIFY("IN.4")
+	PORT_CONFNAME( 0x04, 0x04, "PCB Jumper: German" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( vsc )
 	PORT_START("IN.0")
@@ -1585,6 +1630,16 @@ ROM_START( vcc )
 	ROM_RELOAD(              0x1000, 0x1000)
 ROM_END
 
+ROM_START( vccsp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257bb5ab) SHA1(f7589225bb8e5f3eac55f23e2bd526be780b38b5) )
+	ROM_LOAD("vcc2.bin", 0x1000, 0x1000, CRC(f33095e7) SHA1(692fcab1b88c910b74d04fe4d0660367aee3f4f0) )
+	ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("vcc-spanish.bin", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) ) // dumped from Spanish VCC, is same as data in fexcelv
+ROM_END
+
 ROM_START( vccg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257bb5ab) SHA1(f7589225bb8e5f3eac55f23e2bd526be780b38b5) )
@@ -1592,7 +1647,7 @@ ROM_START( vccg )
 	ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) )
 
 	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("vcc-german.bin", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // taken from fexcelv
+	ROM_LOAD("vcc-german.bin", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // taken from fexcelv, assume correct
 ROM_END
 
 ROM_START( vccfr )
@@ -1602,17 +1657,7 @@ ROM_START( vccfr )
 	ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) )
 
 	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("vcc-french.bin", 0x0000, 0x2000, BAD_DUMP CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3) ) // taken from fexcelv
-ROM_END
-
-ROM_START( vccsp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257bb5ab) SHA1(f7589225bb8e5f3eac55f23e2bd526be780b38b5) )
-	ROM_LOAD("vcc2.bin", 0x1000, 0x1000, CRC(f33095e7) SHA1(692fcab1b88c910b74d04fe4d0660367aee3f4f0) )
-	ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("vcc-spanish.bin", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) )
+	ROM_LOAD("vcc-french.bin", 0x0000, 0x2000, BAD_DUMP CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3) ) // taken from fexcelv, assume correct
 ROM_END
 
 
@@ -1621,8 +1666,36 @@ ROM_START( uvc )
 	ROM_LOAD("101-64017.b3", 0x0000, 0x2000, CRC(f1133abf) SHA1(09dd85051c4e7d364d43507c1cfea5c2d08d37f4) ) // "MOS // 101-64017 // 3880"
 	ROM_LOAD("101-32010.a1", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) ) // "NEC P9Z021 // D2332C 228 // 101-32010", == vcc3.bin on vcc
 
-	ROM_REGION( 0x1000, "speech", 0 )
+	ROM_REGION( 0x2000, "speech", 0 )
 	ROM_LOAD("101-32107.c4", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) ) // "NEC P9Y019 // D2332C 229 // 101-32107", == vcc-engl.bin on vcc
+	ROM_RELOAD(              0x1000, 0x1000)
+ROM_END
+
+ROM_START( uvcsp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-64017.b3", 0x0000, 0x2000, CRC(f1133abf) SHA1(09dd85051c4e7d364d43507c1cfea5c2d08d37f4) )
+	ROM_LOAD("101-32010.a1", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("vcc-spanish.bin", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) )
+ROM_END
+
+ROM_START( uvcg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-64017.b3", 0x0000, 0x2000, CRC(f1133abf) SHA1(09dd85051c4e7d364d43507c1cfea5c2d08d37f4) )
+	ROM_LOAD("101-32010.a1", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("vcc-german.bin", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // taken from fexcelv, assume correct
+ROM_END
+
+ROM_START( uvcfr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-64017.b3", 0x0000, 0x2000, CRC(f1133abf) SHA1(09dd85051c4e7d364d43507c1cfea5c2d08d37f4) )
+	ROM_LOAD("101-32010.a1", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("vcc-french.bin", 0x0000, 0x2000, BAD_DUMP CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3) ) // taken from fexcelv, assume correct
 ROM_END
 
 
@@ -1671,15 +1744,20 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-COMP( 1978, cc10,     0,      0,      cc10,    fidelz80, driver_device, 0, "Fidelity Electronics", "Chess Challenger 10 (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-COMP( 1979, vcc,      0,      0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-COMP( 1979, vccg,     vcc,    0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-COMP( 1979, vccfr,    vcc,    0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-COMP( 1979, vccsp,    vcc,    0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-COMP( 1980, uvc,      vcc,    0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Advanced Voice Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   INIT              COMPANY, FULLNAME, FLAGS */
+COMP( 1978, cc10,     0,      0,      cc10,    cc10,   driver_device, 0, "Fidelity Electronics", "Chess Challenger 10 (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-COMP( 1980, vsc,      0,      0,      vsc,     vsc,      driver_device, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1979, vcc,      0,      0,      vcc,     vcc,    driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1979, vccsp,    vcc,    0,      vcc,     vccsp,  driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1979, vccg,     vcc,    0,      vcc,     vccg,   driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1979, vccfr,    vcc,    0,      vcc,     vccfr,  driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-COMP( 1979, vbrc,     0,      0,      vbrc,    vbrc,     driver_device, 0, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-COMP( 1980, bridgec3, vbrc,   0,      vbrc,    vbrc,     driver_device, 0, "Fidelity Electronics", "Voice Bridge Challenger III", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1980, uvc,      vcc,    0,      vcc,     vcc,    driver_device, 0, "Fidelity Electronics", "Advanced Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1980, uvcsp,    vcc,    0,      vcc,     vccsp,  driver_device, 0, "Fidelity Electronics", "Advanced Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1980, uvcg,     vcc,    0,      vcc,     vccg,   driver_device, 0, "Fidelity Electronics", "Advanced Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1980, uvcfr,    vcc,    0,      vcc,     vccfr,  driver_device, 0, "Fidelity Electronics", "Advanced Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+
+COMP( 1980, vsc,      0,      0,      vsc,     vsc,    driver_device, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+
+COMP( 1979, vbrc,     0,      0,      vbrc,    vbrc,   driver_device, 0, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1980, bridgec3, vbrc,   0,      vbrc,    vbrc,   driver_device, 0, "Fidelity Electronics", "Voice Bridge Challenger III", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
