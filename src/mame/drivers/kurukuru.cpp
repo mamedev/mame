@@ -370,6 +370,7 @@ static ADDRESS_MAP_START( ppj_map, AS_PROGRAM, 8, kurukuru_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppj_io, AS_IO, 8, kurukuru_state )
+	AM_RANGE(0x10, 0x13) AM_MIRROR(0x0c) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
