@@ -27,5 +27,5 @@ m68kmake$(EXE) : m68kmake.o
 
 m68kops.cpp: m68kmake$(EXE) 	m68k_in.cpp
 	@echo Generating M68K source files...
-	@m68kmake$(EXE) . m68k_in.cpp
+	@./m68kmake$(EXE) . m68k_in.cpp
 
