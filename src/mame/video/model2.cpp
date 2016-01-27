@@ -279,7 +279,7 @@ static void model2_3d_init( running_machine &machine, UINT16 *texture_rom )
 {
 	model2_state *state = machine.driver_data<model2_state>();
 
-	state->m_raster = auto_alloc_clear( machine, raster_state );
+	state->m_raster = auto_alloc_clear( machine, <raster_state>() );
 
 	state->m_raster->texture_rom = texture_rom;
 }
@@ -1197,7 +1197,7 @@ struct geo_state
 static void geo_init( running_machine &machine, UINT32 *polygon_rom )
 {
 	model2_state *state = machine.driver_data<model2_state>();
-	state->m_geo = auto_alloc_clear(machine, geo_state);
+	state->m_geo = auto_alloc_clear(machine, <geo_state>());
 	state->m_geo->state = state;
 
 	state->m_geo->raster = state->m_raster;
@@ -2601,7 +2601,7 @@ VIDEO_START_MEMBER(model2_state,model2)
 	geo_init( machine(), (UINT32*)memregion("user2")->base() );
 
 	/* init various video-related pointers */
-	m_palram = auto_alloc_array_clear(machine(), UINT16, 0x2000);
+	m_palram = make_unique_clear<UINT16[]>(0x2000);
 }
 
 UINT32 model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

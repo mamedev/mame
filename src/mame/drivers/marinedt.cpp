@@ -168,9 +168,9 @@ public:
 	required_shared_ptr<UINT8> m_tx_tileram;
 
 	/* video-related */
-	bitmap_ind16 *m_tile;
-	bitmap_ind16 *m_obj1;
-	bitmap_ind16 *m_obj2;
+	std::unique_ptr<bitmap_ind16> m_tile;
+	std::unique_ptr<bitmap_ind16> m_obj1;
+	std::unique_ptr<bitmap_ind16> m_obj2;
 	tilemap_t *m_tx_tilemap;
 
 	UINT8 m_obj1_a;
@@ -561,9 +561,9 @@ void marinedt_state::video_start()
 	m_tx_tilemap->set_scrolldx(0, 4*8);
 	m_tx_tilemap->set_scrolldy(0, -4*8);
 
-	m_tile = auto_bitmap_ind16_alloc(machine(), 32 * 8, 32 * 8);
-	m_obj1 = auto_bitmap_ind16_alloc(machine(), 32, 32);
-	m_obj2 = auto_bitmap_ind16_alloc(machine(), 32, 32);
+	m_tile = std::make_unique<bitmap_ind16>(32 * 8, 32 * 8);
+	m_obj1 = std::make_unique<bitmap_ind16>(32, 32);
+	m_obj2 = std::make_unique<bitmap_ind16>(32, 32);
 }
 
 

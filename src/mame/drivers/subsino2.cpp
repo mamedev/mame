@@ -64,9 +64,9 @@ enum vram_t
 // Layers
 struct layer_t
 {
-	UINT8 *videorams[2];
+	std::unique_ptr<UINT8[]> videorams[2];
 
-	UINT8 *scrollrams[2];
+	std::unique_ptr<UINT8[]> scrollrams[2];
 	int scroll_x;
 	int scroll_y;
 
@@ -88,12 +88,12 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
-	UINT8 *m_hm86171_colorram;
+	std::unique_ptr<UINT8[]> m_hm86171_colorram;
 	layer_t m_layers[2];
 	UINT8 m_ss9601_byte_lo;
 	UINT8 m_ss9601_byte_lo2;
-	UINT8 *m_ss9601_reelrams[2];
-	rectangle m_ss9601_reelrects[3];
+	std::unique_ptr<UINT8[]> m_ss9601_reelrams[2];
+	std::unique_ptr<bitmap_ind16> m_reelbitmap;
 	UINT8 m_ss9601_scrollctrl;
 	UINT8 m_ss9601_tilesize;
 	UINT8 m_ss9601_disable;
@@ -165,10 +165,7 @@ public:
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_0);
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_1);
 	DECLARE_VIDEO_START(subsino2);
-	DECLARE_VIDEO_START(mtrain);
-	DECLARE_VIDEO_START(xtrain);
 	UINT32 screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(h8_timer_irq);
 	INTERRUPT_GEN_MEMBER(am188em_int0_irq);
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
@@ -598,7 +595,7 @@ WRITE8_MEMBER(subsino2_state::ss9601_disable_w)
 
 VIDEO_START_MEMBER(subsino2_state,subsino2)
 {
-	m_hm86171_colorram = auto_alloc_array(machine(), UINT8, 256*3);
+	m_hm86171_colorram = std::make_unique<UINT8[]>(256*3);
 
 	// SS9601 Regs:
 
@@ -622,25 +619,22 @@ VIDEO_START_MEMBER(subsino2_state,subsino2)
 		// line scroll
 		l->tmap->set_scroll_rows(0x200);
 
-		l->videorams[VRAM_HI] = auto_alloc_array(machine(), UINT8, 0x80 * 0x40);
-		l->videorams[VRAM_LO] = auto_alloc_array(machine(), UINT8, 0x80 * 0x40);
+		l->videorams[VRAM_HI] = std::make_unique<UINT8[]>(0x80 * 0x40);
+		l->videorams[VRAM_LO] = std::make_unique<UINT8[]>(0x80 * 0x40);
 
-		l->scrollrams[VRAM_HI] = auto_alloc_array(machine(), UINT8, 0x200);
-		l->scrollrams[VRAM_LO] = auto_alloc_array(machine(), UINT8, 0x200);
-		memset(l->scrollrams[VRAM_HI], 0, 0x200);
-		memset(l->scrollrams[VRAM_LO], 0, 0x200);
+		l->scrollrams[VRAM_HI] = std::make_unique<UINT8[]>(0x200);
+		l->scrollrams[VRAM_LO] = std::make_unique<UINT8[]>(0x200);
+		memset(l->scrollrams[VRAM_HI].get(), 0, 0x200);
+		memset(l->scrollrams[VRAM_LO].get(), 0, 0x200);
 	}
 
 	// SS9601 Reels:
 
-	m_ss9601_reelrams[VRAM_HI] = auto_alloc_array(machine(), UINT8, 0x2000);
-	m_ss9601_reelrams[VRAM_LO] = auto_alloc_array(machine(), UINT8, 0x2000);
-	memset(m_ss9601_reelrams[VRAM_HI], 0, 0x2000);
-	memset(m_ss9601_reelrams[VRAM_LO], 0, 0x2000);
-	m_ss9601_reelrects[0].set(0, 0, 0x00*8, 0x09*8-1);
-	m_ss9601_reelrects[1].set(0, 0, 0x09*8, 0x10*8-1);
-	m_ss9601_reelrects[2].set(0, 0, 0x10*8, 256-16-1);
-
+	m_ss9601_reelrams[VRAM_HI] = std::make_unique<UINT8[]>(0x2000);
+	m_ss9601_reelrams[VRAM_LO] = std::make_unique<UINT8[]>(0x2000);
+	memset(m_ss9601_reelrams[VRAM_HI].get(), 0, 0x2000);
+	memset(m_ss9601_reelrams[VRAM_LO].get(), 0, 0x2000);
+	m_reelbitmap = std::make_unique<bitmap_ind16>(0x80*8, 0x40*8);
 /*
     save_pointer(NAME(m_ss9601_reelrams[VRAM_HI]), 0x2000);
     save_pointer(NAME(m_ss9601_reelrams[VRAM_LO]), 0x2000);
@@ -651,19 +645,6 @@ VIDEO_START_MEMBER(subsino2_state,subsino2)
     save_pointer(NAME(m_layers[1].scrollrams[VRAM_HI]), 0x200);
     save_pointer(NAME(m_layers[1].scrollrams[VRAM_LO]), 0x200);
 */
-}
-
-VIDEO_START_MEMBER(subsino2_state,mtrain)
-{
-	VIDEO_START_CALL_MEMBER( subsino2 );
-}
-
-VIDEO_START_MEMBER(subsino2_state,xtrain)
-{
-	VIDEO_START_CALL_MEMBER( subsino2 );
-	m_ss9601_reelrects[0].set(0, 0, 0x00*8, 0x08*8-1);
-	m_ss9601_reelrects[1].set(0, 0, 0x08*8, 0x18*8-1);
-	m_ss9601_reelrects[2].set(0, 0, 0x18*8, 256-16-1);
 }
 
 UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -695,6 +676,8 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 		case 0x07:
 			mask_y[0] = ~(8-1);
 			break;
+//      case 0x7f:  // ptrain
+//          break;
 		case 0xfd:
 			l0_reel = true;
 			break;
@@ -732,22 +715,23 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 			l->tmap->set_scroll_rows(1);
 			l->tmap->set_scroll_cols(1);
 
-			for (auto visible : m_ss9601_reelrects)
+			for (int y = 0; y < 0x20/4; y++)
 			{
-				
-
-				for (int x = 0; x < 0x40; x++)
+				for (int x = 0; x < 0x80; x++)
 				{
+					rectangle visible;
 					visible.min_x = 8 * x;
 					visible.max_x = 8 * (x+1) - 1;
+					visible.min_y = 4 * 0x10 * y;
+					visible.max_y = 4 * 0x10 * (y+1) - 1;
 
-					int reeladdr = (visible.min_y / 0x10) * 0x80 + x;
+					int reeladdr = y * 0x80 * 4 + x;
 					UINT16 reelscroll = (m_ss9601_reelrams[VRAM_HI][reeladdr] << 8) + m_ss9601_reelrams[VRAM_LO][reeladdr];
 
-					l->tmap->set_scrollx(0, (reelscroll >> 9) * 8 + l->scroll_x - visible.min_x);
+					l->tmap->set_scrollx(0, (reelscroll >> 9) * 8 - visible.min_x);
 
 					// wrap around at half tilemap (0x100)
-					int reelscroll_y = (reelscroll & 0x100) + ((reelscroll + l->scroll_y - visible.min_y/0x10*0x10 + 1) & 0xff);
+					int reelscroll_y = (reelscroll & 0x100) + ((reelscroll - visible.min_y) & 0xff);
 					int reelwrap_y = 0x100 - (reelscroll_y & 0xff);
 
 					rectangle tmp = visible;
@@ -758,7 +742,7 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 						if ( reelwrap_y-1 <= visible.max_y )
 							tmp.max_y = reelwrap_y-1;
 						l->tmap->set_scrolly(0, reelscroll_y);
-						l->tmap->draw(screen, bitmap, tmp, 0, 0);
+						l->tmap->draw(screen, *m_reelbitmap, tmp, TILEMAP_DRAW_OPAQUE);
 						tmp.max_y = visible.max_y;
 					}
 
@@ -768,11 +752,15 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 						if ( reelwrap_y >= visible.min_y )
 							tmp.min_y = reelwrap_y;
 						l->tmap->set_scrolly(0, -((reelwrap_y &0xff) | (reelscroll_y & 0x100)));
-						l->tmap->draw(screen, bitmap, tmp, 0, 0);
+						l->tmap->draw(screen, *m_reelbitmap, tmp, TILEMAP_DRAW_OPAQUE);
 						tmp.min_y = visible.min_y;
 					}
 				}
 			}
+
+			INT32 sx = -l->scroll_x;
+			INT32 sy = -(l->scroll_y + 1);
+			copyscrollbitmap(bitmap, *m_reelbitmap, 1, &sx, 1, &sy, cliprect);
 		}
 		else
 		{
@@ -928,7 +916,7 @@ WRITE16_MEMBER(subsino2_state::bishjan_outputs_w)
 			{
 				// coin out         data & 0x01;
 				machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x0002) ? 0x80 : 0);   // hopper
-				coin_counter_w(machine(), 0,    data & 0x0010 );
+				machine().bookkeeping().coin_counter_w(0,    data & 0x0010 );
 			}
 			break;
 	}
@@ -1000,21 +988,21 @@ WRITE8_MEMBER(subsino2_state::expcard_outputs_w)
 			break;
 
 		case 1: // C
-			set_led_status(machine(), 0,    data & 0x02);   // raise
+			output().set_led_value(0,    data & 0x02);   // raise
 			break;
 
 		case 2: // B
-			set_led_status(machine(), 1,    data & 0x04);   // hold 4 / small & hold 5 / big ?
-			set_led_status(machine(), 2,    data & 0x08);   // hold 1 / bet
-			set_led_status(machine(), 3,    data & 0x10);   // hold 2 / take ?
-			set_led_status(machine(), 4,    data & 0x20);   // hold 3 / double up ?
+			output().set_led_value(1,    data & 0x04);   // hold 4 / small & hold 5 / big ?
+			output().set_led_value(2,    data & 0x08);   // hold 1 / bet
+			output().set_led_value(3,    data & 0x10);   // hold 2 / take ?
+			output().set_led_value(4,    data & 0x20);   // hold 3 / double up ?
 			break;
 
 		case 3: // A
-			coin_counter_w(machine(), 0,    data & 0x01 );  // coin in
-			coin_counter_w(machine(), 1,    data & 0x02 );  // key in
+			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
+			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
 
-			set_led_status(machine(), 5,    data & 0x10);   // start
+			output().set_led_value(5,    data & 0x10);   // start
 			break;
 	}
 
@@ -1032,18 +1020,18 @@ WRITE8_MEMBER(subsino2_state::mtrain_outputs_w)
 	switch (offset)
 	{
 		case 0:
-			coin_counter_w(machine(), 0,    data & 0x01 );  // key in
-			coin_counter_w(machine(), 1,    data & 0x02 );  // coin in
-			coin_counter_w(machine(), 2,    data & 0x10 );  // pay out
-//          coin_counter_w(machine(), 3,   data & 0x20 );  // hopper motor
+			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // key in
+			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // coin in
+			machine().bookkeeping().coin_counter_w(2,    data & 0x10 );  // pay out
+//          machine().bookkeeping().coin_counter_w(3,   data & 0x20 );  // hopper motor
 			break;
 
 		case 1:
-			set_led_status(machine(), 0,    data & 0x01);   // stop reel?
-			set_led_status(machine(), 1,    data & 0x02);   // stop reel? (double or take)
-			set_led_status(machine(), 2,    data & 0x04);   // start all
-			set_led_status(machine(), 3,    data & 0x08);   // bet / stop all
-			set_led_status(machine(), 4,    data & 0x20);   // stop reel? (double or take)
+			output().set_led_value(0,    data & 0x01);   // stop reel?
+			output().set_led_value(1,    data & 0x02);   // stop reel? (double or take)
+			output().set_led_value(2,    data & 0x04);   // start all
+			output().set_led_value(3,    data & 0x08);   // bet / stop all
+			output().set_led_value(4,    data & 0x20);   // stop reel? (double or take)
 			break;
 
 		case 2:
@@ -1162,8 +1150,8 @@ WRITE8_MEMBER(subsino2_state::saklove_outputs_w)
 	switch (offset)
 	{
 		case 0:
-			coin_counter_w(machine(), 0,    data & 0x01 );  // coin in
-			coin_counter_w(machine(), 1,    data & 0x02 );  // key in
+			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
+			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
 			break;
 
 		case 1:
@@ -1246,22 +1234,22 @@ WRITE8_MEMBER(subsino2_state::xplan_outputs_w)
 			break;
 
 		case 1:
-			set_led_status(machine(), 0,    data & 0x02);   // raise
+			output().set_led_value(0,    data & 0x02);   // raise
 			break;
 
 		case 2: // B
-			set_led_status(machine(), 1,    data & 0x04);   // hold 1 / big ?
-			set_led_status(machine(), 2,    data & 0x08);   // hold 5 / bet
-			set_led_status(machine(), 3,    data & 0x10);   // hold 4 ?
-			set_led_status(machine(), 4,    data & 0x20);   // hold 2 / double up
-			set_led_status(machine(), 5,    data & 0x40);   // hold 3 / small ?
+			output().set_led_value(1,    data & 0x04);   // hold 1 / big ?
+			output().set_led_value(2,    data & 0x08);   // hold 5 / bet
+			output().set_led_value(3,    data & 0x10);   // hold 4 ?
+			output().set_led_value(4,    data & 0x20);   // hold 2 / double up
+			output().set_led_value(5,    data & 0x40);   // hold 3 / small ?
 			break;
 
 		case 3: // A
-			coin_counter_w(machine(), 0,    data & 0x01 );
-			coin_counter_w(machine(), 1,    data & 0x02 );
+			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );
+			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );
 
-			set_led_status(machine(), 6,    data & 0x10);   // start / take
+			output().set_led_value(6,    data & 0x10);   // start / take
 			break;
 	}
 
@@ -1345,23 +1333,23 @@ WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 			break;
 
 		case 1: // C
-			set_led_status(machine(), 0,    data & 0x02);   // re-double
-			set_led_status(machine(), 1,    data & 0x04);   // half double
+			output().set_led_value(0,    data & 0x02);   // re-double
+			output().set_led_value(1,    data & 0x04);   // half double
 			break;
 
 		case 2: // B
-			set_led_status(machine(), 2,    data & 0x02);   // hold 3 / small
-			set_led_status(machine(), 3,    data & 0x04);   // hold 2 / big
-			set_led_status(machine(), 4,    data & 0x08);   // bet
-			set_led_status(machine(), 5,    data & 0x10);   // hold1 / take
-			set_led_status(machine(), 6,    data & 0x20);   // double up
+			output().set_led_value(2,    data & 0x02);   // hold 3 / small
+			output().set_led_value(3,    data & 0x04);   // hold 2 / big
+			output().set_led_value(4,    data & 0x08);   // bet
+			output().set_led_value(5,    data & 0x10);   // hold1 / take
+			output().set_led_value(6,    data & 0x20);   // double up
 			break;
 
 		case 3: // A
-			coin_counter_w(machine(), 0,    data & 0x01 );  // coin in
-			coin_counter_w(machine(), 1,    data & 0x02 );  // key in
+			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
+			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
 
-			set_led_status(machine(), 7,    data & 0x10);   // start
+			output().set_led_value(7,    data & 0x10);   // start
 			break;
 	}
 
@@ -2194,7 +2182,7 @@ static MACHINE_CONFIG_START( mtrain, subsino2_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ss9601 )
 	MCFG_PALETTE_ADD( "palette", 256 )
 
-	MCFG_VIDEO_START_OVERRIDE(subsino2_state, mtrain )
+	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2274,8 +2262,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( xtrain, xplan )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(xtrain_io)
-
-	MCFG_VIDEO_START_OVERRIDE(subsino2_state, xtrain )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( expcard, xplan )
@@ -2806,6 +2792,6 @@ GAME( 1996, wtrnymph, 0,        mtrain,   wtrnymph, subsino2_state, wtrnymph, RO
 GAME( 1998, expcard,  0,        expcard,  expcard,  subsino2_state, expcard,  ROT0, "American Alpha", "Express Card / Top Card (Ver. 1.5)",   0 )
 GAME( 1998, saklove,  0,        saklove,  saklove,  subsino2_state, saklove,  ROT0, "Subsino",        "Ying Hua Lian 2.0 (China, Ver. 1.02)", 0 )
 GAME( 1999, xtrain,   0,        xtrain,   xtrain,   subsino2_state, xtrain,   ROT0, "Subsino",        "X-Train (Ver. 1.3)",                   0 )
-GAME( 1999, ptrain,   0,        xtrain,   xtrain,   subsino2_state, ptrain,   ROT0, "Subsino",        "Panda Train (Novamatic 1.7)",          0 )
+GAME( 1999, ptrain,   0,        xtrain,   xtrain,   subsino2_state, ptrain,   ROT0, "Subsino",        "Panda Train (Novamatic 1.7)",          MACHINE_IMPERFECT_GRAPHICS ) // missing scroll in race screens
 GAME( 1999, bishjan,  0,        bishjan,  bishjan,  subsino2_state, bishjan,  ROT0, "Subsino",        "Bishou Jan (Japan, Ver. 2.03)",        MACHINE_NO_SOUND )
 GAME( 2006, xplan,    0,        xplan,    xplan,    subsino2_state, xplan,    ROT0, "Subsino",        "X-Plan (Ver. 1.01)",                   0 )

@@ -731,7 +731,7 @@ ROM_START( lethalenj )  // Japan version JAD
 	ROM_LOAD( "lethalenj.nv", 0x0000, 0x0080, CRC(20b28f2f) SHA1(53d212f2c006729a01dfdb49cb36b67b9425172e) )
 ROM_END
 
-ROM_START( lethaleneaa )    // Euro ver. EAA  
+ROM_START( lethaleneaa )    // Euro ver. EAA
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "191_a01.u4", 0x00000, 0x40000, CRC(c6f4d712) SHA1(92938b823f057b5185a2ada7878efa4bf7e6c682) ) // handwritten label
 

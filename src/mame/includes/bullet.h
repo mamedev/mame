@@ -89,7 +89,6 @@ public:
 	DECLARE_WRITE8_MEMBER( exdma_w );
 	DECLARE_WRITE8_MEMBER( hdcon_w );
 	DECLARE_WRITE8_MEMBER( segst_w );
-	DECLARE_WRITE8_MEMBER( dart_w );
 	DECLARE_READ8_MEMBER( dma_mreq_r );
 	DECLARE_WRITE8_MEMBER( dma_mreq_w );
 	DECLARE_READ8_MEMBER( pio_pb_r );
@@ -101,9 +100,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
-	void bankswitch();
 	void update_dma_rdy();
-
 	// memory state
 	int m_segst;
 	int m_brom;
@@ -169,8 +166,6 @@ public:
 	DECLARE_WRITE8_MEMBER( pio_pa_w );
 	DECLARE_WRITE_LINE_MEMBER( cstrb_w );
 	DECLARE_WRITE_LINE_MEMBER( req_w );
-
-	void fdc_intrq_w(bool state);
 
 	void update_dma_rdy();
 

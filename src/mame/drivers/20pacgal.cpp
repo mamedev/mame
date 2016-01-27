@@ -129,7 +129,7 @@ WRITE8_MEMBER(_20pacgal_state::timer_pulse_w)
 
 WRITE8_MEMBER(_20pacgal_state::_20pacgal_coin_counter_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
 
@@ -140,21 +140,10 @@ WRITE8_MEMBER(_20pacgal_state::_20pacgal_coin_counter_w)
  *
  *************************************/
 
-void _20pacgal_state::set_bankptr()
-{
-	if (m_game_selected == 0)
-	{
-		UINT8 *rom = memregion("maincpu")->base();
-		membank("bank1")->set_base(rom + 0x08000);
-	}
-	else
-		membank("bank1")->set_base(m_ram_48000);
-}
-
 WRITE8_MEMBER(_20pacgal_state::ram_bank_select_w)
 {
 	m_game_selected = data & 1;
-	set_bankptr();
+	membank("bank1")->set_entry(m_game_selected);
 }
 
 WRITE8_MEMBER(_20pacgal_state::ram_48000_w)
@@ -374,7 +363,10 @@ void _20pacgal_state::common_save_state()
 void _20pacgal_state::machine_start()
 {
 	common_save_state();
-	machine().save().register_postload(save_prepost_delegate(FUNC(_20pacgal_state::set_bankptr), this)); //currently not used by 25pacman
+
+	// membank currently used only by 20pacgal
+	membank("bank1")->configure_entry(0, memregion("maincpu")->base() + 0x08000);
+	membank("bank1")->configure_entry(1, m_ram_48000);
 }
 
 void _25pacman_state::machine_start()
@@ -442,7 +434,7 @@ MACHINE_CONFIG_END
 */
 
 ROM_START( 25pacmano ) /* Revision 2.00 */
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "pacman_25th_rev2.0.u13", 0x00000, 0x40000, CRC(99a52784) SHA1(6222c2eb686e65ba23ca376ff4392be1bc826a03) ) /* Label printed Rev 2.0, program says Rev 2.00 */
 
 	ROM_REGION( 0x8000, "proms", 0 )    /* palette */
@@ -455,7 +447,7 @@ ROM_END
 ROM_START( 25pacman ) /* Revision 3.00 */
 	ROM_REGION( 0x40000, "flash", 0 )
 	ROM_LOAD( "pacman25ver3.u1", 0x00000, 0x40000, CRC(55b0076e) SHA1(4544cc193bdd22bfc88d096083ccc4069cac4607) ) /* program says Rev 3.00 */
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x8000, "proms", 0 )    /* palette */
 	// shouldn't be loading this! must be uploaded somewhere
@@ -467,7 +459,7 @@ ROM_END
 */
 
 ROM_START( 20pacgal ) /* Version 1.08 */
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "ms_pac-galaga_v1.08.u13", 0x00000, 0x40000, CRC(2ea16809) SHA1(27f041bdbb590917e9dcb70c21aa6b6d6c9f04fb) ) /* Also found labeled as "V1.08 HO" */
 
 	ROM_REGION( 0x8000, "proms", 0 )    /* palette */
@@ -475,7 +467,7 @@ ROM_START( 20pacgal ) /* Version 1.08 */
 ROM_END
 
 ROM_START( 20pacgalr4 ) /* Version 1.04 */
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "ms_pac-galaga_v1.04.u13", 0x00000, 0x40000, CRC(6c474d2d) SHA1(5a150fc9d2ed0e908385b9f9d532aa33cf80dba4) )
 
 	ROM_REGION( 0x8000, "proms", 0 )    /* palette */
@@ -483,7 +475,7 @@ ROM_START( 20pacgalr4 ) /* Version 1.04 */
 ROM_END
 
 ROM_START( 20pacgalr3 ) /* Version 1.03 */
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "ms_pac-galaga_v1.03.u13", 0x00000, 0x40000, CRC(e13dce63) SHA1(c8943f082883c423210fc3c97323222afb00f0a2) )
 
 	ROM_REGION( 0x8000, "proms", 0 )    /* palette */
@@ -491,7 +483,7 @@ ROM_START( 20pacgalr3 ) /* Version 1.03 */
 ROM_END
 
 ROM_START( 20pacgalr2 ) /* Version 1.02 */
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "ms_pac-galaga_v1.02.u13", 0x00000, 0x40000, CRC(b939f805) SHA1(5fe9470601156dfc2d339c94fd8f0aa4db197760) )
 
 	ROM_REGION( 0x8000, "proms", 0 )    /* palette */
@@ -499,7 +491,7 @@ ROM_START( 20pacgalr2 ) /* Version 1.02 */
 ROM_END
 
 ROM_START( 20pacgalr1 ) /* Version 1.01 */
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "ms_pac-galaga_v1.01.u13", 0x00000, 0x40000, CRC(77159582) SHA1(c05e005a941cbdc806dcd76b315069362c792a72) )
 
 	ROM_REGION( 0x8000, "proms", 0 )    /* palette */
@@ -507,7 +499,7 @@ ROM_START( 20pacgalr1 ) /* Version 1.01 */
 ROM_END
 
 ROM_START( 20pacgalr0 ) /* Version 1.00 */
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "ms_pac-galaga_v1.0.u13", 0x00000, 0x40000, CRC(3c92a269) SHA1(a616d912393f4e49b95231d72eec48567f46fc00) ) /* Label printed V1.0, program says v1.00 */
 
 	ROM_REGION( 0x8000, "proms", 0 )    /* palette */

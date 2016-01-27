@@ -81,11 +81,10 @@ public:
 	tilemap_t *m_tilemap_2;
 	TILE_GET_INFO_MEMBER(get_t1_tile_info);
 	TILE_GET_INFO_MEMBER(get_t2_tile_info);
-	TILE_GET_INFO_MEMBER(get_t3_tile_info);
 	DECLARE_WRITE16_MEMBER(videoram_1_w);
 	DECLARE_WRITE16_MEMBER(videoram_2_w);
 
-	bitmap_ind16 *m_pixbitmap;
+	std::unique_ptr<bitmap_ind16> m_pixbitmap;
 	void pixbitmap_redraw();
 	UINT16 m_pixpal;
 	DECLARE_WRITE16_MEMBER(pixram_w);
@@ -149,7 +148,7 @@ void bmcpokr_state::video_start()
 	m_tilemap_1->set_scroll_cols(1);
 	m_tilemap_2->set_scroll_cols(1);
 
-	m_pixbitmap  = auto_bitmap_ind16_alloc(machine(), 0x400, 0x200);
+	m_pixbitmap  = std::make_unique<bitmap_ind16>(0x400, 0x200);
 
 	save_state();
 }
@@ -328,8 +327,8 @@ WRITE16_MEMBER(bmcpokr_state::mux_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_hopper->write(space, 0,   (data & 0x0001) ? 0x80 : 0x00); // hopper motor
-		coin_counter_w(machine(), 1, data & 0x0002);                // coin-in / key-in
-		coin_counter_w(machine(), 2, data & 0x0004);                // pay-out
+		machine().bookkeeping().coin_counter_w(1, data & 0x0002);                // coin-in / key-in
+		machine().bookkeeping().coin_counter_w(2, data & 0x0004);                // pay-out
 		//                           data & 0x0060                  // DSW mux
 		//                           data & 0x0080                  // ? always on
 	}

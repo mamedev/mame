@@ -94,10 +94,6 @@ public:
 	DECLARE_READ8_MEMBER( rtc_r );
 	DECLARE_READ8_MEMBER( nmi_r );
 	DECLARE_WRITE8_MEMBER( nmi_w );
-	DECLARE_READ8_MEMBER( keyboard_busy_r );
-	DECLARE_READ8_MEMBER( keyboard_data_r );
-	DECLARE_WRITE8_MEMBER( keyboard_ctrl_w );
-	DECLARE_WRITE8_MEMBER( keyboard_latch_w );
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
 	DECLARE_WRITE_LINE_MEMBER( de_w );

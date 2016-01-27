@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Paul Leaman
 #include "video/bufsprite.h"
 #include "sound/msm5205.h"

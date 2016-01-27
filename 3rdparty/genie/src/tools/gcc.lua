@@ -52,33 +52,36 @@
 	premake.gcc.platforms =
 	{
 		Native = {
-			cppflags = "-MMD",
+			cppflags = "-MMD -MP",
 		},
 		x32 = {
-			cppflags = "-MMD",
+			cppflags = "-MMD -MP",
 			flags    = "-m32",
 		},
 		x64 = {
-			cppflags = "-MMD",
+			cppflags = "-MMD -MP",
 			flags    = "-m64",
 		},
 		Universal = {
-			cppflags = "",
+			ar       = "libtool",
+			cppflags = "-MMD -MP",
 			flags    = "-arch i386 -arch x86_64 -arch ppc -arch ppc64",
 		},
 		Universal32 = {
-			cppflags = "",
+			ar       = "libtool",
+			cppflags = "-MMD -MP",
 			flags    = "-arch i386 -arch ppc",
 		},
 		Universal64 = {
-			cppflags = "",
+			ar       = "libtool",
+			cppflags = "-MMD -MP",
 			flags    = "-arch x86_64 -arch ppc64",
 		},
 		PS3 = {
 			cc         = "ppu-lv2-g++",
 			cxx        = "ppu-lv2-g++",
 			ar         = "ppu-lv2-ar",
-			cppflags   = "-MMD",
+			cppflags   = "-MMD -MP",
 		},
 		WiiDev = {
 			cppflags    = "-MMD -MP -I$(LIBOGC_INC) $(MACHDEP)",
@@ -210,6 +213,47 @@
 		return result
 	end
 
+
+
+--
+-- Get flags for passing to AR before the target is appended to the commandline
+--  prj: project
+--  cfg: configuration
+--  ndx: true if the final step of a split archive
+--
+
+	function premake.gcc.getarchiveflags(prj, cfg, ndx)
+		local result = {}
+		if cfg.platform:startswith("Universal") then
+				if prj.options.ArchiveSplit then
+					error("gcc tool 'Universal*' platforms do not support split archives")
+				end
+				table.insert(result, '-o')
+		else
+			if (not prj.options.ArchiveSplit) then
+				if premake.gcc.llvm then
+					table.insert(result, 'rcs')
+				else
+					table.insert(result, '-rcs')
+				end
+			else
+				if premake.gcc.llvm then
+					if (not ndx) then
+						table.insert(result, 'qc')
+					else
+						table.insert(result, 'cs')
+					end
+				else
+					if (not ndx) then
+						table.insert(result, '-qc')
+					else
+						table.insert(result, '-cs')
+					end
+				end
+			end
+		end
+		return result
+	end
 
 
 --

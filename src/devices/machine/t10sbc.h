@@ -15,6 +15,11 @@ t10sbc.h
 class t10sbc : public virtual t10spc
 {
 public:
+	t10sbc()
+		: t10spc(), m_image(nullptr), m_lba(0), m_blocks(0), m_disk(nullptr), m_device(nullptr)
+	{
+	}
+
 	virtual void SetDevice( void *device ) override;
 	virtual void GetDevice( void **device ) override;
 	virtual void ExecCommand() override;

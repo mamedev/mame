@@ -252,7 +252,7 @@ WRITE8_MEMBER(electron_state::electron_ula_w)
 		 * but the divider is wrong(?), says 16 but results in high pitch,
 		 * 32 is more close
 		 */
-			m_beeper->set_frequency( 1000000 / ( 32 * ( data + 1 ) ) );
+			m_beeper->set_clock( 1000000 / ( 32 * ( data + 1 ) ) );
 		}
 		break;
 	case 0x07:  /* Misc. */
@@ -331,7 +331,7 @@ void electron_state::electron_interrupt_handler(int mode, int interrupt)
 TIMER_CALLBACK_MEMBER(electron_state::setup_beep)
 {
 	m_beeper->set_state( 0 );
-	m_beeper->set_frequency( 300 );
+	m_beeper->set_clock( 300 );
 }
 
 void electron_state::machine_reset()

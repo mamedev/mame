@@ -128,14 +128,14 @@ void pc080sn_device::device_start()
 		m_tilemap[1]->set_scroll_rows(512);
 	}
 
-	m_ram = auto_alloc_array_clear(machine(), UINT16, PC080SN_RAM_SIZE / 2);
+	m_ram = make_unique_clear<UINT16[]>(PC080SN_RAM_SIZE / 2);
 
-	m_bg_ram[0]       = m_ram + 0x0000 /2;
-	m_bg_ram[1]       = m_ram + 0x8000 /2;
-	m_bgscroll_ram[0] = m_ram + 0x4000 /2;
-	m_bgscroll_ram[1] = m_ram + 0xc000 /2;
+	m_bg_ram[0]       = m_ram.get() + 0x0000 /2;
+	m_bg_ram[1]       = m_ram.get() + 0x8000 /2;
+	m_bgscroll_ram[0] = m_ram.get() + 0x4000 /2;
+	m_bgscroll_ram[1] = m_ram.get() + 0xc000 /2;
 
-	save_pointer(NAME(m_ram), PC080SN_RAM_SIZE / 2);
+	save_pointer(NAME(m_ram.get()), PC080SN_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
 	machine().save().register_postload(save_prepost_delegate(FUNC(pc080sn_device::restore_scroll), this));
 

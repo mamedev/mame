@@ -121,6 +121,7 @@ void ccpu_cpu_device::device_start()
 	save_item(NAME(m_drflag));
 	save_item(NAME(m_waiting));
 	save_item(NAME(m_watchdog));
+	save_item(NAME(m_extinput));
 
 	// Register state for debugger
 	state_add( CCPU_PC, "PC", m_PC).formatstr("%04X");
@@ -139,7 +140,7 @@ void ccpu_cpu_device::device_start()
 }
 
 
-void ccpu_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void ccpu_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -149,7 +150,7 @@ void ccpu_cpu_device::state_string_export(const device_state_entry &entry, std::
 					TEST_NC ? 'N' : 'n',
 					TEST_LT ? 'L' : 'l',
 					TEST_EQ ? 'E' : 'e',
-					m_external_input() ? 'M' : 'm',
+					m_extinput ? 'M' : 'm',
 					TEST_DR ? 'D' : 'd');
 			break;
 	}
@@ -206,8 +207,11 @@ void ccpu_cpu_device::execute_run()
 		m_nextmiflag = m_nextnextmiflag;
 
 		/* fetch the opcode */
+		opcode = READOP(m_PC);
+		if (opcode == 0x51 || opcode == 0x59)
+			m_extinput = m_external_input();
 		debugger_instruction_hook(this, m_PC);
-		opcode = READOP(m_PC++);
+		m_PC++;
 
 		switch (opcode)
 		{
@@ -286,7 +290,7 @@ void ccpu_cpu_device::execute_run()
 
 			/* JMIB/JEHB */
 			case 0x51:
-				if (m_external_input()) { m_PC = ((m_PC - 1) & 0xf000) + m_J; CYCLES(2); }
+				if (m_extinput) { m_PC = ((m_PC - 1) & 0xf000) + m_J; CYCLES(2); }
 				NEXT_ACC_B; CYCLES(2);
 				break;
 
@@ -333,7 +337,7 @@ void ccpu_cpu_device::execute_run()
 
 			/* JMI/JEH */
 			case 0x59:
-				if (m_external_input()) { m_PC = ((m_PC - 1) & 0xf000) + m_J; CYCLES(2); }
+				if (m_extinput) { m_PC = ((m_PC - 1) & 0xf000) + m_J; CYCLES(2); }
 				NEXT_ACC_A; CYCLES(2);
 				break;
 

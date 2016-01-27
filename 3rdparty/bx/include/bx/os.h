@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_OS_H_HEADER_GUARD
@@ -14,8 +14,7 @@
 #	include <psapi.h>
 #elif  BX_PLATFORM_ANDROID \
 	|| BX_PLATFORM_EMSCRIPTEN \
-	|| BX_PLATFORM_FREEBSD \
-	|| BX_PLATFORM_NETBSD \
+	|| BX_PLATFORM_BSD \
 	|| BX_PLATFORM_IOS \
 	|| BX_PLATFORM_LINUX \
 	|| BX_PLATFORM_NACL \
@@ -24,8 +23,7 @@
 	|| BX_PLATFORM_RPI
 
 #	include <sched.h> // sched_yield
-#	if BX_PLATFORM_FREEBSD \
-	|| BX_PLATFORM_NETBSD \
+#	if BX_PLATFORM_BSD \
 	|| BX_PLATFORM_IOS \
 	|| BX_PLATFORM_NACL \
 	|| BX_PLATFORM_OSX \
@@ -105,7 +103,7 @@ namespace bx
 		return (pid_t)::syscall(SYS_gettid);
 #elif BX_PLATFORM_IOS || BX_PLATFORM_OSX
 		return (mach_port_t)::pthread_mach_thread_np(pthread_self() );
-#elif BX_PLATFORM_FREEBSD || BX_PLATFORM_NACL || BX_PLATFORM_NETBSD
+#elif BX_PLATFORM_BSD || BX_PLATFORM_NACL
 		// Casting __nc_basic_thread_data*... need better way to do this.
 		return *(uint32_t*)::pthread_self();
 #else

@@ -118,17 +118,17 @@ WRITE8_MEMBER( peyper_state::disp_w )
 		switch (q)
 		{
 			case 34: // player indicator lights (7-digit only)
-				output_set_indexed_value("led_",1,BIT(a,0)); // PLAYER 1
-				output_set_indexed_value("led_",2,BIT(a,1)); // PLAYER 2
-				output_set_indexed_value("led_",3,BIT(a,2)); // PLAYER 3
-				output_set_indexed_value("led_",4,BIT(a,3)); // PLAYER 4
+				output().set_indexed_value("led_",1,BIT(a,0)); // PLAYER 1
+				output().set_indexed_value("led_",2,BIT(a,1)); // PLAYER 2
+				output().set_indexed_value("led_",3,BIT(a,2)); // PLAYER 3
+				output().set_indexed_value("led_",4,BIT(a,3)); // PLAYER 4
 				break;
 
 			case 35: // units digits show 0
-				if (!BIT(a,0)) output_set_indexed_value("dpl_",m_disp_layout[32], 0x3f);
-				if (!BIT(a,1)) output_set_indexed_value("dpl_",m_disp_layout[33], 0x3f);
-				if (!BIT(a,2)) output_set_indexed_value("dpl_",m_disp_layout[34], 0x3f);
-				if (!BIT(a,3)) output_set_indexed_value("dpl_",m_disp_layout[35], 0x3f);
+				if (!BIT(a,0)) output().set_indexed_value("dpl_",m_disp_layout[32], 0x3f);
+				if (!BIT(a,1)) output().set_indexed_value("dpl_",m_disp_layout[33], 0x3f);
+				if (!BIT(a,2)) output().set_indexed_value("dpl_",m_disp_layout[34], 0x3f);
+				if (!BIT(a,3)) output().set_indexed_value("dpl_",m_disp_layout[35], 0x3f);
 				break;
 
 			case 36: // game status indicators
@@ -144,13 +144,13 @@ WRITE8_MEMBER( peyper_state::disp_w )
 			case 38: // player 2 indicators (6-digit only)
 			case 39: // player 3 indicators (6-digit only)
 			case 40: // player 4 indicators (6-digit only)
-				output_set_indexed_value("led_",q-36,BIT(a,1)); // player indicator
-				output_set_indexed_value("dpl_",q-7,BIT(a,2) ? 6:0); // million led (we show blank or 1 in millions digit)
+				output().set_indexed_value("led_",q-36,BIT(a,1)); // player indicator
+				output().set_indexed_value("dpl_",q-7,BIT(a,2) ? 6:0); // million led (we show blank or 1 in millions digit)
 				// bit 3, looks like it turns on all the decimal points, reason unknown
 				break;
 
 			default: // display a digit
-				output_set_indexed_value("dpl_",q,hex_a);
+				output().set_indexed_value("dpl_",q,hex_a);
 		}
 	}
 }

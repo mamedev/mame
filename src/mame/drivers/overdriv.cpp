@@ -97,9 +97,9 @@ WRITE16_MEMBER(overdriv_state::cpuA_ctrl_w)
 
 		/* bit 1 is clear during service mode - function unknown */
 
-		set_led_status(machine(), 0, data & 0x08);
-		coin_counter_w(machine(), 0, data & 0x10);
-		coin_counter_w(machine(), 1, data & 0x20);
+		output().set_led_value(0, data & 0x08);
+		machine().bookkeeping().coin_counter_w(0, data & 0x10);
+		machine().bookkeeping().coin_counter_w(1, data & 0x20);
 
 //logerror("%06x: write %04x to cpuA_ctrl_w\n",space.device().safe_pc(),data);
 	}

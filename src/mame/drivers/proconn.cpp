@@ -50,10 +50,9 @@ public:
 			m_z80pio_5(*this, "z80pio_5"),
 			m_z80ctc(*this, "z80ctc"),
 			m_z80sio(*this, "z80sio"),
-			m_ay(*this, "aysnd")
+			m_ay(*this, "aysnd"),
+			m_meters(*this, "meters")
 	{ }
-
-	optional_device<s16lf01_t> m_vfd;
 
 	DECLARE_WRITE8_MEMBER( ay_w0 ) { m_ay->address_data_w(space, 0, data); }
 	DECLARE_WRITE8_MEMBER( ay_w1 ) { m_ay->address_data_w(space, 1, data); }
@@ -179,6 +178,7 @@ public:
 protected:
 
 	// devices
+	optional_device<s16lf01_t> m_vfd;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_z80pio_1;
 	required_device<z80pio_device> m_z80pio_2;
@@ -188,6 +188,8 @@ protected:
 	required_device<z80ctc_device> m_z80ctc;
 	required_device<z80dart_device> m_z80sio;
 	required_device<ay8910_device> m_ay;
+	required_device<meters_device> m_meters;
+
 public:
 	int m_meter;
 	DECLARE_DRIVER_INIT(proconn);
@@ -290,12 +292,11 @@ READ16_MEMBER(proconn_state::serial_receive)
 
 WRITE8_MEMBER(proconn_state::meter_w)
 {
-	int i;
-	for (i=0; i<8; i++)
+	for (int i=0; i<8; i++)
 	{
 		if ( data & (1 << i) )
 		{
-			MechMtr_update(i, data & (1 << i) );
+			m_meters->update(i, data & (1 << i) );
 			m_meter = data;
 		}
 	}
@@ -378,6 +379,9 @@ static MACHINE_CONFIG_START( proconn, proconn_state )
 	MCFG_SOUND_ADD("aysnd", AY8910, 1000000) /* ?? Mhz */ // YM2149F on PC92?
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(proconn_state, meter_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
+
+	MCFG_DEVICE_ADD("meters", METERS, 0)
+	MCFG_METERS_NUMBER(8)
 MACHINE_CONFIG_END
 
 

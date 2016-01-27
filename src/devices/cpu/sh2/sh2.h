@@ -131,7 +131,7 @@ protected:
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
@@ -219,8 +219,8 @@ private:
 	sh2_ftcsr_read_delegate              m_ftcsr_read_cb;
 
 	drc_cache           m_cache;                  /* pointer to the DRC code cache */
-	drcuml_state *      m_drcuml;                 /* DRC UML generator state */
-	sh2_frontend *      m_drcfe;                  /* pointer to the DRC front-end state */
+	std::unique_ptr<drcuml_state>      m_drcuml;                 /* DRC UML generator state */
+	std::unique_ptr<sh2_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
 	UINT32              m_drcoptions;         /* configurable DRC options */
 
 	internal_sh2_state *m_sh2_state;

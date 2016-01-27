@@ -168,8 +168,8 @@ void itech32_state::video_start()
 	int i;
 
 	/* allocate memory */
-	m_videoram = auto_alloc_array(machine(), UINT16, VRAM_WIDTH * (m_vram_height + 16) * 2);
-	memset(m_videoram, 0xff, VRAM_WIDTH * (m_vram_height + 16) * 2 * 2);
+	m_videoram = std::make_unique<UINT16[]>(VRAM_WIDTH * (m_vram_height + 16) * 2);
+	memset(m_videoram.get(), 0xff, VRAM_WIDTH * (m_vram_height + 16) * 2 * 2);
 
 	/* videoplane[0] is the foreground; videoplane[1] is the background */
 	m_videoplane[0] = &m_videoram[0 * VRAM_WIDTH * (m_vram_height + 16) + 8 * VRAM_WIDTH];

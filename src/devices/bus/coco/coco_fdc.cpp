@@ -266,7 +266,7 @@ void coco_fdc_device::update_lines()
 void coco_fdc_device::dskreg_w(UINT8 data)
 {
 	UINT8 drive = 0;
-	UINT8 head = 0;
+	UINT8 head;
 
 	if (LOG_FDC)
 	{

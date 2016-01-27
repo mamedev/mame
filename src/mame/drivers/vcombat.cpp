@@ -105,8 +105,8 @@ public:
 		m_vid_1(*this, "vid_1"),
 		m_dac(*this, "dac") { }
 
-	UINT16* m_m68k_framebuffer[2];
-	UINT16* m_i860_framebuffer[2][2];
+	std::unique_ptr<UINT16[]> m_m68k_framebuffer[2];
+	std::unique_ptr<UINT16[]> m_i860_framebuffer[2][2];
 	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<UINT16> m_framebuffer_ctrl;
 	int m_crtc_select;
@@ -142,8 +142,8 @@ static UINT32 update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const r
 	int y;
 	const rgb_t *const pens = state->m_tlc34076->get_pens();
 
-	UINT16 *m68k_buf = state->m_m68k_framebuffer[(*state->m_framebuffer_ctrl & 0x20) ? 1 : 0];
-	UINT16 *i860_buf = state->m_i860_framebuffer[index][0];
+	UINT16 *m68k_buf = state->m_m68k_framebuffer[(*state->m_framebuffer_ctrl & 0x20) ? 1 : 0].get();
+	UINT16 *i860_buf = state->m_i860_framebuffer[index][0].get();
 
 	/* TODO: It looks like the leftmost chunk of the ground should really be on the right side? */
 	/*       But the i860 draws the background correctly, so it may be an original game issue. */
@@ -284,7 +284,7 @@ WRITE64_MEMBER(vcombat_state::v0_fb_w)
 {
 	/* The frame buffer seems to sit on a 32-bit data bus, while the
 	   i860 uses a 64-bit data bus.  Adjust accordingly.  */
-	char *p = (char *)(m_i860_framebuffer[0][0]);
+	char *p = (char *)(m_i860_framebuffer[0][0].get());
 	int m = mem_mask;
 	int o = (offset << 2);
 	if (m & 0xff000000) {
@@ -307,7 +307,7 @@ WRITE64_MEMBER(vcombat_state::v1_fb_w)
 {
 	/* The frame buffer seems to sit on a 32-bit data bus, while the
 	   i860 uses a 64-bit data bus.  Adjust accordingly.  */
-	char *p = (char *)(m_i860_framebuffer[1][0]);
+	char *p = (char *)(m_i860_framebuffer[1][0].get());
 	int m = mem_mask;
 	int o = (offset << 2);
 	if (m & 0xff000000) {
@@ -434,16 +434,16 @@ DRIVER_INIT_MEMBER(vcombat_state,vcombat)
 	UINT8 *ROM = memregion("maincpu")->base();
 
 	/* Allocate the 68000 framebuffers */
-	m_m68k_framebuffer[0] = auto_alloc_array(machine(), UINT16, 0x8000);
-	m_m68k_framebuffer[1] = auto_alloc_array(machine(), UINT16, 0x8000);
+	m_m68k_framebuffer[0] = std::make_unique<UINT16[]>(0x8000);
+	m_m68k_framebuffer[1] = std::make_unique<UINT16[]>(0x8000);
 
 	/* First i860 */
-	m_i860_framebuffer[0][0] = auto_alloc_array(machine(), UINT16, 0x8000);
-	m_i860_framebuffer[0][1] = auto_alloc_array(machine(), UINT16, 0x8000);
+	m_i860_framebuffer[0][0] = std::make_unique<UINT16[]>(0x8000);
+	m_i860_framebuffer[0][1] = std::make_unique<UINT16[]>(0x8000);
 
 	/* Second i860 */
-	m_i860_framebuffer[1][0] = auto_alloc_array(machine(), UINT16, 0x8000);
-	m_i860_framebuffer[1][1] = auto_alloc_array(machine(), UINT16, 0x8000);
+	m_i860_framebuffer[1][0] = std::make_unique<UINT16[]>(0x8000);
+	m_i860_framebuffer[1][1] = std::make_unique<UINT16[]>(0x8000);
 
 	/* pc==4016 : jump 4038 ... There's something strange about how it waits at 402e (interrupts all masked out)
 	   I think what is happening here is that M0 snags the first time
@@ -464,12 +464,12 @@ DRIVER_INIT_MEMBER(vcombat_state,vcombat)
 DRIVER_INIT_MEMBER(vcombat_state,shadfgtr)
 {
 	/* Allocate th 68000 frame buffers */
-	m_m68k_framebuffer[0] = auto_alloc_array(machine(), UINT16, 0x8000);
-	m_m68k_framebuffer[1] = auto_alloc_array(machine(), UINT16, 0x8000);
+	m_m68k_framebuffer[0] = std::make_unique<UINT16[]>(0x8000);
+	m_m68k_framebuffer[1] = std::make_unique<UINT16[]>(0x8000);
 
 	/* Only one i860 */
-	m_i860_framebuffer[0][0] = auto_alloc_array(machine(), UINT16, 0x8000);
-	m_i860_framebuffer[0][1] = auto_alloc_array(machine(), UINT16, 0x8000);
+	m_i860_framebuffer[0][0] = std::make_unique<UINT16[]>(0x8000);
+	m_i860_framebuffer[0][1] = std::make_unique<UINT16[]>(0x8000);
 	m_i860_framebuffer[1][0] = nullptr;
 	m_i860_framebuffer[1][1] = nullptr;
 }

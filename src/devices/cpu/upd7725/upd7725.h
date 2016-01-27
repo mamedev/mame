@@ -110,7 +110,7 @@ protected:
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override;
@@ -187,9 +187,6 @@ private:
 	void exec_rt(UINT32 opcode);
 	void exec_jp(UINT32 opcode);
 	void exec_ld(UINT32 opcode);
-
-	void stack_push();
-	void stack_pull();
 
 	int m_icount;
 	int m_irq; // old irq line state, for detecting rising edges.

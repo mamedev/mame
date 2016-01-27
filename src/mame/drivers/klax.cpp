@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( klax2bl_map, AS_PROGRAM, 16, klax_state )
 	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
 	AM_RANGE(0x260000, 0x260001) AM_READ_PORT("P1") AM_WRITE(klax_latch_w)
 	AM_RANGE(0x260002, 0x260003) AM_READ_PORT("P2")
-//	AM_RANGE(0x270000, 0x270001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff) // no OKI here
+//  AM_RANGE(0x270000, 0x270001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff) // no OKI here
 	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(interrupt_ack_w)
 	AM_RANGE(0x3e0000, 0x3e07ff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0xff00) AM_SHARE("palette")
@@ -237,14 +237,14 @@ static MACHINE_CONFIG_DERIVED( klax2bl, klax )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 6000000) /* ? */
 	MCFG_CPU_PROGRAM_MAP(bootleg_sound_map)
-	
+
 	MCFG_GFXDECODE_MODIFY("gfxdecode", klax2bl)
 
 	// guess, probably something like this
 	MCFG_SOUND_ADD("msm", MSM5205, 375000)    /* ? */
-//	MCFG_MSM5205_VCLK_CB(WRITELINE(klax_state, m5205_int1)) /* interrupt function */
-//	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz 4-bit */
-//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+//  MCFG_MSM5205_VCLK_CB(WRITELINE(klax_state, m5205_int1)) /* interrupt function */
+//  MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz 4-bit */
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END
 

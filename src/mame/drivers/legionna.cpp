@@ -1225,6 +1225,7 @@ static MACHINE_CONFIG_START( legionna, legionna_state )
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", legionna)
@@ -1261,6 +1262,7 @@ static MACHINE_CONFIG_START( heatbrl, legionna_state )
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
 
 
@@ -1293,14 +1295,15 @@ static MACHINE_CONFIG_START( godzilla, legionna_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 //  MCFG_SCREEN_SIZE(42*8, 36*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_RAW_PARAMS(14318180/2,455,0,320,258,0,224) // ~61 Hz
+	MCFG_SCREEN_RAW_PARAMS(14318180/2,455,0,320,258,0,224) // ~61 Hz, 15.734 kHz
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_godzilla)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
-
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_BASE_CB(WRITE16(legionna_state, tile_scroll_base_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", heatbrl)
 
@@ -1339,6 +1342,7 @@ static MACHINE_CONFIG_START( denjinmk, legionna_state )
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
 
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
@@ -1374,6 +1378,7 @@ static MACHINE_CONFIG_START( grainbow, legionna_state )
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
 
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", grainbow)
@@ -1412,6 +1417,7 @@ static MACHINE_CONFIG_START( cupsoc, legionna_state )
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
 
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cupsoc)
@@ -1460,7 +1466,7 @@ static MACHINE_CONFIG_START( cupsocbl, legionna_state )
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
-
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", heatbrl_csb)
 
@@ -1482,6 +1488,7 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+// all 3 Legionnaire sets differ only by the region byte at 0x1ef in rom 4 (Japan 0x00, US 0x01, World 0x02)
 ROM_START( legionna )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD32_BYTE( "1.u025",  0x00000, 0x20000, CRC(9e2d3ec8) SHA1(8af9ca349389cbbd2b541aafa09de57f87f6fd72) )
@@ -1527,7 +1534,55 @@ ROM_START( legionna )
 	ROM_LOAD( "copx-d1.u0330",  0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) ) /* not dumped from this PCB assumed to be the same */
 
 	ROM_REGION( 0x200, "proms", 0 ) /* Priority? */
-	ROM_LOAD( "leg007.u091",   0x000000, 0x000200, NO_DUMP ) /* N82S147N type BPROM */
+	ROM_LOAD( "leg007.u0910",   0x000000, 0x000200, CRC(cc6da568) SHA1(cde01291f32def1ce291d7b558f64ce0758cf379) ) /* N82S147N type BPROM */
+ROM_END
+
+ROM_START( legionnaj )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD32_BYTE( "1.u025",  0x00000, 0x20000, CRC(9e2d3ec8) SHA1(8af9ca349389cbbd2b541aafa09de57f87f6fd72) )
+	ROM_LOAD32_BYTE( "2.u024",  0x00001, 0x20000, CRC(35c8a28f) SHA1(31a1f2f9e04dfcab4b3357d6d27c24b434a8c14b) )
+	ROM_LOAD32_BYTE( "3.u026",  0x00002, 0x20000, CRC(553fc7c0) SHA1(b12a2eea6b2c9bd76c0c74ddf2765d58510f586a) )
+	ROM_LOAD32_BYTE( "4.u023",  0x00003, 0x20000, CRC(4c385dc7) SHA1(75ec869a5553228369faa8f8487d92ac5df7e563) ) // sldh
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
+	ROM_LOAD( "6.u1110",     0x000000, 0x08000, CRC(fe7b8d06) SHA1(1e5b52ea4b4042940e2ee2db75c7c0f24973422a) )
+	ROM_CONTINUE(            0x010000, 0x08000 )    /* banked stuff */
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x020000, "user1", 0 ) /* load the tiles here so we can split them up into the required regions by hand */
+	ROM_LOAD16_BYTE( "7.u077", 0x000000, 0x10000, CRC(88e26809) SHA1(40ee55d3b5329b6f657e0621d93c4caf6a035fdf) )
+	ROM_LOAD16_BYTE( "8.u072", 0x000001, 0x10000, CRC(06e35407) SHA1(affeeb97b7f3cfa9b65a584ebe25c16a5b2c9a89) )
+
+	ROM_REGION( 0x010000, "char", 0 )  /* FG Tiles */
+	ROM_COPY( "user1", 0x010000, 0x000000, 0x010000 )
+
+	ROM_REGION( 0x010000, "gfx5", 0 )  /* BK3 */
+	ROM_COPY( "user1", 0x000000, 0x000000, 0x010000 ) /* decrambled in INIT */
+
+	ROM_REGION( 0x200000, "sprite", 0 )
+	ROM_LOAD( "legionnire_obj1.u0815", 0x000000, 0x100000, CRC(d35602f5) SHA1(79379abf1c8131df47f81f42b2dc6876926a4e9d) )   /* sprites */
+	ROM_LOAD( "legionnire_obj2.u0814", 0x100000, 0x100000, CRC(351d3917) SHA1(014562ac55c09227c08275df3129df19d81af164) )
+
+	ROM_REGION( 0x100000, "user2", 0 ) /* load the tiles here so we can split them up into the required regions by hand */
+	ROM_LOAD( "legionnire_back.u075", 0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )    /* 3 sets of tiles ('MBK','LBK','BK3') */
+
+	ROM_REGION( 0x80000, "gfx3", 0 )  /* MBK */
+	ROM_COPY( "user2", 0x000000, 0x000000, 0x80000 )
+
+	ROM_REGION( 0x100000, "gfx4", ROMREGION_ERASEFF )
+	/* Not Used */
+
+	ROM_REGION( 0x80000, "gfx6", 0 )    /* LBK */
+	ROM_COPY( "user2", 0x080000, 0x000000, 0x78000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "5.u106", 0x00000, 0x20000, CRC(21d09bde) SHA1(8dce5011e083706ac7b57c5aee4b79d30fa8d4cb) )
+
+	ROM_REGION( 0x080000, "copx", 0 ) /* SEI300 data rom */
+	ROM_LOAD( "copx-d1.u0330",  0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) ) /* not dumped from this PCB assumed to be the same */
+
+	ROM_REGION( 0x200, "proms", 0 ) /* Priority? */
+	ROM_LOAD( "leg007.u0910",   0x000000, 0x000200, CRC(cc6da568) SHA1(cde01291f32def1ce291d7b558f64ce0758cf379) ) /* N82S147N type BPROM */
 ROM_END
 
 ROM_START( legionnau )
@@ -1575,7 +1630,7 @@ ROM_START( legionnau )
 	ROM_LOAD( "copx-d1.u0330",  0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) ) /* not dumped from this PCB assumed to be the same */
 
 	ROM_REGION( 0x200, "proms", 0 ) /* Priority? */
-	ROM_LOAD( "leg007.u091",   0x000000, 0x000200, NO_DUMP ) /* N82S147N type BPROM */
+	ROM_LOAD( "leg007.u0910",   0x000000, 0x000200, CRC(cc6da568) SHA1(cde01291f32def1ce291d7b558f64ce0758cf379) ) /* N82S147N type BPROM */
 ROM_END
 
 ROM_START( heatbrl )
@@ -2680,8 +2735,9 @@ DRIVER_INIT_MEMBER(legionna_state,legiongfx)
 
 
 
-GAME( 1992, legionna, 0,        legionna, legionna, legionna_state, legiongfx, ROT0, "TAD Corporation", "Legionnaire (World)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, legionna, 0,        legionna, legionna, legionna_state, legiongfx, ROT0, "TAD Corporation",                  "Legionnaire (World)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1992, legionnau,legionna, legionna, legionna, legionna_state, legiongfx, ROT0, "TAD Corporation (Fabtek license)", "Legionnaire (US)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, legionnaj,legionna, legionna, legionna, legionna_state, legiongfx, ROT0, "TAD Corporation",                  "Legionnaire (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 
 GAME( 1992, heatbrl,  0,        heatbrl,  heatbrl, driver_device,  0,         ROT0, "TAD Corporation", "Heated Barrel (World version 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1992, heatbrl2, heatbrl,  heatbrl,  heatbrl, driver_device,  0,         ROT0, "TAD Corporation", "Heated Barrel (World version 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

@@ -112,8 +112,8 @@ INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
 	if (newval)
 	{
 		/* increment the coin counter */
-		coin_counter_w(machine(), 0, 1);
-		coin_counter_w(machine(), 0, 0);
+		machine().bookkeeping().coin_counter_w(0, 1);
+		machine().bookkeeping().coin_counter_w(0, 0);
 
 		coin_in();
 	}
@@ -235,12 +235,14 @@ void vicdual_state::machine_start()
 	m_port1State = 0;
 	m_port2State = 0;
 	m_psgData = 0;
+	m_psgBus = 0;
 
 	save_item(NAME(m_coin_status));
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_port1State));
 	save_item(NAME(m_port2State));
 	save_item(NAME(m_psgData));
+	save_item(NAME(m_psgBus));
 }
 
 
@@ -1991,6 +1993,7 @@ static MACHINE_CONFIG_DERIVED( invds, vicdual_dualgame_root )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( carhntds, vicdual_dualgame_root )
+
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(carhntds_dualgame_map)
@@ -2024,22 +2027,19 @@ static MACHINE_CONFIG_DERIVED( carnival, vicdual_dualgame_root )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(carnival_io_map)
 
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_FRAGMENT_ADD(carnival_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( carnivalh, vicdual_dualgame_root )
+static MACHINE_CONFIG_DERIVED( carnivalh, carnival )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(headon_io_map)
-
-	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(carnival_audio)
 MACHINE_CONFIG_END
-
 
 
 static MACHINE_CONFIG_DERIVED( tranqgun, vicdual_dualgame_root )
@@ -2092,7 +2092,6 @@ MACHINE_CONFIG_END
  *  Samurai
  *
  *************************************/
-
 
 WRITE8_MEMBER(vicdual_state::samurai_protection_w)
 {
@@ -2301,8 +2300,8 @@ INPUT_CHANGED_MEMBER(vicdual_state::nsub_coin_in)
 				}
 
 				// increment coin counter
-				coin_counter_w(machine(), which, 1);
-				coin_counter_w(machine(), which, 0);
+				machine().bookkeeping().coin_counter_w(which, 1);
+				machine().bookkeeping().coin_counter_w(which, 0);
 				break;
 
 			// service coin
@@ -2334,7 +2333,7 @@ static INPUT_PORTS_START( nsub )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, NULL)
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vicdual_state,nsub_coin_in, (void*)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vicdual_state,nsub_coin_in, (void*)0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vicdual_state,nsub_coin_in, (void*)1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vicdual_state,nsub_coin_in, (void*)2)
 
@@ -3126,10 +3125,6 @@ ROM_START( tranqgun )
 	ROM_LOAD( "316-0042.u88", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    /* sequence PROM */
 ROM_END
 
-
-
-
-
 ROM_START( spacetrk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u33.bin",      0x0000, 0x0400, CRC(9033fe50) SHA1(0a9b86af03956575403d8b494963f55887fc4dc3) )
@@ -3206,7 +3201,7 @@ ROM_START( carnival )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "316-633",      0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
 
-	ROM_REGION( 0x0800, "audiocpu", 0 ) /* sound ROM */
+	ROM_REGION( 0x0400, "audiocpu", 0 ) /* sound ROM */
 	ROM_LOAD( "epr-412",     0x0000, 0x0400, CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) )
 
 	ROM_REGION( 0x0020, "user1", 0 )    /* timing PROM */
@@ -3235,7 +3230,7 @@ ROM_START( carnivalc )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "316-633",      0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
 
-	ROM_REGION( 0x0800, "audiocpu", 0 ) /* sound ROM */
+	ROM_REGION( 0x0400, "audiocpu", 0 ) /* sound ROM */
 	ROM_LOAD( "epr-412",     0x0000, 0x0400, CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) )
 
 	ROM_REGION( 0x0020, "user1", 0 )    /* timing PROM */
@@ -3256,7 +3251,7 @@ ROM_START( carnivalh )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "pr-62.u44",      0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) ) /* Same as 316-633 */
 
-	ROM_REGION( 0x0800, "audiocpu", 0 ) /* sound ROM */
+	ROM_REGION( 0x0400, "audiocpu", 0 ) /* sound ROM */
 	ROM_LOAD( "epr-412.u5",     0x0000, 0x0400, CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) )
 
 	ROM_REGION( 0x0040, "user1", 0 )    /* misc PROMs (type n82s123) */
@@ -3278,7 +3273,7 @@ ROM_START( carnivalha )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "pr-62.u44",      0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) ) /* Same as 316-633 */
 
-	ROM_REGION( 0x0800, "audiocpu", 0 ) /* sound ROM */
+	ROM_REGION( 0x0400, "audiocpu", 0 ) /* sound ROM */
 	ROM_LOAD( "epr-412.u5",     0x0000, 0x0400, CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) )
 
 	ROM_REGION( 0x0040, "user1", 0 )    /* misc PROMs (type n82s123) */
@@ -3308,16 +3303,16 @@ ROM_START( brdrline )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "borderc.49",   0x0000, 0x0020, CRC(bc6be94e) SHA1(34e113ec25e19212b74907d35be5cb8714a8249c) )
 
-	ROM_REGION( 0x0800, "cpu1", 0 ) /* sound ROM */
-	ROM_LOAD( "au.bin",       0x0000, 0x0400, CRC(a23e1d9f) SHA1(ce209571f6341aa6f036a015e666673098bc98ea) )
-
 	ROM_REGION( 0x0100, "user1", 0 )    /* misc PROM */
 	ROM_LOAD( "border.32",   0x0000, 0x0020, CRC(c128d0ba) SHA1(0ce9febbb7e2f5388ed999a479e3d385dba0b342) )
-	ROM_LOAD( "bordera.15",  0x0000, 0x0020, CRC(6449e678) SHA1(421c45c8fba3c2bc2a7ebbea2c837c8fa1a5a2f3) )
-	ROM_LOAD( "borderb.14",  0x0000, 0x0020, CRC(55dcdef1) SHA1(6fbd041edc258b7e1b99bbe9526612cfb1b541f8) )
+	ROM_LOAD( "bordera.15",  0x0000, 0x0020, CRC(6449e678) SHA1(421c45c8fba3c2bc2a7ebbea2c837c8fa1a5a2f3) ) // sequence
+	ROM_LOAD( "borderb.14",  0x0000, 0x0020, CRC(55dcdef1) SHA1(6fbd041edc258b7e1b99bbe9526612cfb1b541f8) ) // control
 	/* following 2 from sound board */
 	ROM_LOAD( "prom93427.1", 0x0000, 0x0100, CRC(64b98dc7) SHA1(f0bb7d0b4b56cc2936ce4cbec165394f3026ed6d) )
 	ROM_LOAD( "prom93427.2", 0x0000, 0x0100, CRC(bda82367) SHA1(1c96453c2ae372892c39b5657cf2b252a90a10a9) )
+
+	ROM_REGION( 0x0400, "user2", 0 ) /* sound ROM */
+	ROM_LOAD( "au.bin",       0x0000, 0x0400, CRC(a23e1d9f) SHA1(ce209571f6341aa6f036a015e666673098bc98ea) )
 ROM_END
 
 
@@ -3379,9 +3374,6 @@ ROM_START( starrkr )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "pr-23.u49",   0x0000, 0x0020, CRC(0a2156b3) SHA1(504abe8e253ff9b12ac6ffacd92722f8ee8a30ae) )
 
-	ROM_REGION( 0x0800, "cpu1", 0 ) /* sound ROM */
-	ROM_LOAD( "epr-613.1",   0x0000, 0x0400, CRC(ff4be0c7) SHA1(7311c34aa88f6ba905a01e7a9f2ed99a0353a06b) )
-
 	ROM_REGION( 0x0800, "user1", 0 )    /* misc PROM */
 	ROM_LOAD( "pr-33.u15",  0x0000, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )
 	ROM_LOAD( "pr-34.u14",  0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )
@@ -3395,6 +3387,9 @@ ROM_START( starrkr )
 	ROM_LOAD( "pr-64.25",   0x0000, 0x0800, CRC(7342cf53) SHA1(761aa5a38a28c044cbbbe66e3a8a2f47c493d56d) )
 	ROM_LOAD( "pr-62.26",   0x0000, 0x0800, CRC(d352c545) SHA1(6da4f7a7974e2f471b081d230a47767315b2f1a7) )
 	ROM_LOAD( "pr-66.28",   0x0000, 0x0800, CRC(895c5733) SHA1(881a274cdcf23292ea658dcab793303cfb445e51) )
+
+	ROM_REGION( 0x0400, "user2", 0 ) /* sound ROM */
+	ROM_LOAD( "epr-613.1",   0x0000, 0x0400, CRC(ff4be0c7) SHA1(7311c34aa88f6ba905a01e7a9f2ed99a0353a06b) )
 ROM_END
 
 /*
@@ -3453,9 +3448,6 @@ ROM_START( brdrlins )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "5610.49",    0x0000, 0x0020, CRC(bc6be94e) SHA1(34e113ec25e19212b74907d35be5cb8714a8249c) )
 
-	ROM_REGION( 0x0800, "cpu1", 0 ) /* sound ROM */
-	ROM_LOAD( "au.bin",     0x0000, 0x0400, CRC(a23e1d9f) SHA1(ce209571f6341aa6f036a015e666673098bc98ea) )
-
 	ROM_REGION( 0x0100, "user1", 0 )    /* misc PROM */
 	ROM_LOAD( "82s123.bin", 0x0000, 0x0020, CRC(c128d0ba) SHA1(0ce9febbb7e2f5388ed999a479e3d385dba0b342) )
 	ROM_LOAD( "5610.15",    0x0000, 0x0020, CRC(6449e678) SHA1(421c45c8fba3c2bc2a7ebbea2c837c8fa1a5a2f3) )
@@ -3463,6 +3455,9 @@ ROM_START( brdrlins )
 	/* following 2 from sound board */
 	ROM_LOAD( "93427.1",    0x0000, 0x0100, CRC(64b98dc7) SHA1(f0bb7d0b4b56cc2936ce4cbec165394f3026ed6d) )
 	ROM_LOAD( "93427.2",    0x0000, 0x0100, CRC(bda82367) SHA1(1c96453c2ae372892c39b5657cf2b252a90a10a9) )
+
+	ROM_REGION( 0x0400, "user2", 0 ) /* sound ROM */
+	ROM_LOAD( "au.bin",     0x0000, 0x0400, CRC(a23e1d9f) SHA1(ce209571f6341aa6f036a015e666673098bc98ea) )
 ROM_END
 
 ROM_START( brdrlinb )
@@ -3479,13 +3474,13 @@ ROM_START( brdrlinb )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "borderc.49",   0x0000, 0x0020, CRC(bc6be94e) SHA1(34e113ec25e19212b74907d35be5cb8714a8249c) )
 
-	ROM_REGION( 0x0800, "cpu1", 0 ) /* sound ROM */
-	ROM_LOAD( "bords.bin",    0x0000, 0x0400, CRC(a23e1d9f) SHA1(ce209571f6341aa6f036a015e666673098bc98ea) )
-
 	ROM_REGION( 0x0020, "user1", 0 )    /* misc PROM */
 	ROM_LOAD( "border.32",   0x0000, 0x0020, CRC(c128d0ba) SHA1(0ce9febbb7e2f5388ed999a479e3d385dba0b342) )
 	ROM_LOAD( "bordera.15",  0x0000, 0x0020, CRC(6449e678) SHA1(421c45c8fba3c2bc2a7ebbea2c837c8fa1a5a2f3) )
 	ROM_LOAD( "borderb.14",  0x0000, 0x0020, CRC(55dcdef1) SHA1(6fbd041edc258b7e1b99bbe9526612cfb1b541f8) )
+
+	ROM_REGION( 0x0400, "user2", 0 ) /* sound ROM */
+	ROM_LOAD( "bords.bin",    0x0000, 0x0400, CRC(a23e1d9f) SHA1(ce209571f6341aa6f036a015e666673098bc98ea) )
 ROM_END
 
 ROM_START( startrks )
@@ -3620,7 +3615,7 @@ GAME( 1979, headon,     0,        headon,    headon,    driver_device, 0, ROT0, 
 GAME( 1979, headon1,    headon,   headon,    headon,    driver_device, 0, ROT0,   "Gremlin", "Head On (1 player)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headons,    headon,   headons,   headons,   driver_device, 0, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headonsa,   headon,   headons,   headons,   driver_device, 0, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // won't coin up?
-GAME( 1979, headonmz,   headon,   headon,   headonmz,   driver_device, 0, ROT0,   "bootleg", "Head On (bootleg, alt maze)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headonmz,   headon,   headon,    headonmz,  driver_device, 0, ROT0,   "bootleg", "Head On (bootleg, alt maze)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, supcrash,   headon,   headons,   supcrash,  driver_device, 0, ROT0,   "bootleg", "Super Crash (bootleg of Head On)", MACHINE_NO_SOUND  | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, hocrash,    headon,   headons,   headons,   driver_device, 0, ROT0,   "bootleg (Fraber)", "Crash (bootleg of Head On)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon2,    0,        headon2,   headon2,   driver_device, 0, ROT0,   "Sega", "Head On 2",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
@@ -3645,7 +3640,6 @@ GAME( 1981, brdrlins,   brdrline, brdrline,  brdrline,  driver_device, 0, ROT270
 GAME( 1981, brdrlinb,   brdrline, brdrline,  brdrline,  driver_device, 0, ROT270, "bootleg (Karateco)", "Borderline (Karateco bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, brdrlinet,  brdrline, tranqgun,  tranqgun,  driver_device, 0, ROT270, "Sega", "Borderline (Tranquilizer Gun conversion)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // official factory conversion
 GAME( 198?, startrks,   0,        headons,   headons,   driver_device, 0, ROT0,   "bootleg (Sidam)", "Star Trek (Head On hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-
 GAME( 1980, digger,     0,        digger,    digger,    driver_device, 0, ROT270, "Sega", "Digger", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pulsar,     0,        pulsar,    pulsar,    driver_device, 0, ROT270, "Sega", "Pulsar", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, heiankyo,   0,        heiankyo,  heiankyo,  driver_device, 0, ROT270, "Denki Onkyo", "Heiankyo Alien", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

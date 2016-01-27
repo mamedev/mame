@@ -10,6 +10,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	std::unique_ptr<UINT8[]> m_videoram;
 	UINT8 *m_tileram;
 	UINT8 *m_charram;
 	UINT8 *m_spriteram_x;
@@ -21,7 +22,7 @@ public:
 	UINT8 m_bg_hshift;
 	tilemap_t *m_bg_tilemap1;
 	tilemap_t *m_bg_tilemap2;
-	rgb_t *m_palette_ptr;
+	std::unique_ptr<rgb_t[]> m_palette_ptr;
 	DECLARE_WRITE8_MEMBER(tiamc1_control_w);
 	DECLARE_WRITE8_MEMBER(tiamc1_videoram_w);
 	DECLARE_WRITE8_MEMBER(tiamc1_bankswitch_w);

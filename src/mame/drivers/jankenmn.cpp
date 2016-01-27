@@ -184,15 +184,15 @@ static const UINT8 led_map[16] = // 7748 IC?
 WRITE8_MEMBER(jankenmn_state::lamps1_w)
 {
 	// hand state: d0: rock, d1: scissors, d2: paper
-	output_set_lamp_value(8, (data & 7) != 0);
-	output_set_lamp_value(11, data & 1);
-	output_set_lamp_value(12, data >> 1 & 1);
-	output_set_lamp_value(9, data >> 2 & 1);
-	output_set_lamp_value(10, (data & 6) != 0);
-	output_set_lamp_value(13, (data & 3) != 0);
+	output().set_lamp_value(8, (data & 7) != 0);
+	output().set_lamp_value(11, data & 1);
+	output().set_lamp_value(12, data >> 1 & 1);
+	output().set_lamp_value(9, data >> 2 & 1);
+	output().set_lamp_value(10, (data & 6) != 0);
+	output().set_lamp_value(13, (data & 3) != 0);
 
 	// d4-d7: led7seg (remaining credits) right digit
-	output_set_digit_value(1, led_map[data >> 4 & 0x0f]);
+	output().set_digit_value(1, led_map[data >> 4 & 0x0f]);
 
 	// d3: ? (only set if game is over)
 }
@@ -200,36 +200,36 @@ WRITE8_MEMBER(jankenmn_state::lamps1_w)
 WRITE8_MEMBER(jankenmn_state::lamps2_w)
 {
 	// button LEDs: d1: paper, d2: scissors, d3: rock
-	output_set_lamp_value(2, data >> 3 & 1);
-	output_set_lamp_value(3, data >> 2 & 1);
-	output_set_lamp_value(4, data >> 1 & 1);
+	output().set_lamp_value(2, data >> 3 & 1);
+	output().set_lamp_value(3, data >> 2 & 1);
+	output().set_lamp_value(4, data >> 1 & 1);
 
 	// lamps: d5: draw, d6: lose, d7: win
-	output_set_lamp_value(5, data >> 6 & 1);
-	output_set_lamp_value(6, data >> 5 & 1);
-	output_set_lamp_value(7, data >> 7 & 1);
+	output().set_lamp_value(5, data >> 6 & 1);
+	output().set_lamp_value(6, data >> 5 & 1);
+	output().set_lamp_value(7, data >> 7 & 1);
 
 	// d4: payout error LED
-	output_set_lamp_value(14, data >> 4 & 1);
+	output().set_lamp_value(14, data >> 4 & 1);
 
 	// d0: led7seg (remaining credits) left digit
-	output_set_digit_value(0, led_map[data & 1]);
+	output().set_digit_value(0, led_map[data & 1]);
 }
 
 WRITE8_MEMBER(jankenmn_state::lamps3_w)
 {
 	// d1: blue rotating lamp on top of cab
-	output_set_lamp_value(15, data >> 1 & 1);
+	output().set_lamp_value(15, data >> 1 & 1);
 
 	// d2: payout (waits for hopper status)
-	coin_counter_w(machine(), 2, data & 0x04);
+	machine().bookkeeping().coin_counter_w(2, data & 0x04);
 
 	// d3: right multiplier lamp(2), d4: left multiplier lamp(1)
-	output_set_lamp_value(0, data >> 4 & 1);
-	output_set_lamp_value(1, data >> 3 & 1);
+	output().set_lamp_value(0, data >> 4 & 1);
+	output().set_lamp_value(1, data >> 3 & 1);
 
 	// d5: assume coin lockout
-	coin_lockout_global_w(machine(), ~data & 0x20);
+	machine().bookkeeping().coin_lockout_global_w(~data & 0x20);
 
 	// d0, d6, d7: N/C?
 	if (data & 0x04)

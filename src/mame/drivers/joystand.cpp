@@ -394,17 +394,17 @@ WRITE16_MEMBER(joystand_state::outputs_w)
 	COMBINE_DATA(&m_outputs[0]);
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0,            BIT(data, 0)); // coin counter 1
-		coin_counter_w(machine(), 1,            BIT(data, 1)); // coin counter 2
+		machine().bookkeeping().coin_counter_w(0,            BIT(data, 0)); // coin counter 1
+		machine().bookkeeping().coin_counter_w(1,            BIT(data, 1)); // coin counter 2
 
-		output_set_value("blocker",             BIT(data, 2));
-		output_set_value("error_lamp",          BIT(data, 3)); // counter error
-		output_set_value("photo_lamp",          BIT(data, 4)); // during photo
+		output().set_value("blocker",             BIT(data, 2));
+		output().set_value("error_lamp",          BIT(data, 3)); // counter error
+		output().set_value("photo_lamp",          BIT(data, 4)); // during photo
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		output_set_value("ok_button_led",       BIT(data, 8));
-		output_set_value("cancel_button_led",   BIT(data, 9));
+		output().set_value("ok_button_led",       BIT(data, 8));
+		output().set_value("cancel_button_led",   BIT(data, 9));
 	}
 }
 

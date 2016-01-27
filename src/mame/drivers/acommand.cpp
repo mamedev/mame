@@ -83,7 +83,7 @@ public:
 	required_shared_ptr<UINT16> m_ac_devram;
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_bg_tilemap;
-	UINT16 *m_ac_vregs;
+	std::unique_ptr<UINT16[]> m_ac_vregs;
 	UINT16 m_led0;
 	UINT16 m_led1;
 	UINT16 m_ufo_sw1;
@@ -199,7 +199,7 @@ void acommand_state::video_start()
 	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(acommand_state::ac_get_tx_tile_info),this),TILEMAP_SCAN_COLS,8,8,512,32);
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(acommand_state::ac_get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(acommand_state::bg_scan),this),16,16,256,16);
 
-	m_ac_vregs = auto_alloc_array(machine(), UINT16, 0x80/2);
+	m_ac_vregs = std::make_unique<UINT16[]>(0x80/2);
 
 	m_tx_tilemap->set_transparent_pen(15);
 }

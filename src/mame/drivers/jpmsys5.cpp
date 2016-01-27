@@ -177,9 +177,9 @@ void jpmsys5_state::sys5_draw_lamps()
 	int i;
 	for (i = 0; i <8; i++)
 	{
-		output_set_lamp_value( (16*m_lamp_strobe)+i,  (m_muxram[(4*m_lamp_strobe)] & (1 << i)) !=0);
-		output_set_lamp_value((16*m_lamp_strobe)+i+8, (m_muxram[(4*m_lamp_strobe) +1 ] & (1 << i)) !=0);
-		output_set_indexed_value("sys5led",(8*m_lamp_strobe)+i,(m_muxram[(4*m_lamp_strobe) +2 ] & (1 << i)) !=0);
+		output().set_lamp_value( (16*m_lamp_strobe)+i,  (m_muxram[(4*m_lamp_strobe)] & (1 << i)) !=0);
+		output().set_lamp_value((16*m_lamp_strobe)+i+8, (m_muxram[(4*m_lamp_strobe) +1 ] & (1 << i)) !=0);
+		output().set_indexed_value("sys5led",(8*m_lamp_strobe)+i,(m_muxram[(4*m_lamp_strobe) +2 ] & (1 << i)) !=0);
 	}
 }
 
@@ -472,30 +472,39 @@ WRITE_LINE_MEMBER(jpmsys5_state::pia_irq)
 
 READ8_MEMBER(jpmsys5_state::u29_porta_r)
 {
-	int combined_meter = MechMtr_GetActivity(0) | MechMtr_GetActivity(1) |
-							MechMtr_GetActivity(2) | MechMtr_GetActivity(3) |
-							MechMtr_GetActivity(4) | MechMtr_GetActivity(5) |
-							MechMtr_GetActivity(6) | MechMtr_GetActivity(7);
-
 	int meter_bit =0;
-	if(combined_meter)
+
+	if (m_meters != nullptr)
 	{
-		meter_bit =  0x80;
-	}
-	else
-	{
-		meter_bit =  0x00;
+		int combined_meter = m_meters->GetActivity(0) | m_meters->GetActivity(1) |
+							m_meters->GetActivity(2) | m_meters->GetActivity(3) |
+							m_meters->GetActivity(4) | m_meters->GetActivity(5) |
+							m_meters->GetActivity(6) | m_meters->GetActivity(7);
+
+		if(combined_meter)
+		{
+			meter_bit =  0x80;
+		}
+		else
+		{
+			meter_bit =  0x00;
+		}
+
+		return m_direct_port->read() | meter_bit;
 	}
 
-	return m_direct_port->read() | meter_bit;
+	else
+		return m_direct_port->read() | meter_bit;
 }
 
 WRITE8_MEMBER(jpmsys5_state::u29_portb_w)
 {
-	int meter =0;
-	for (meter = 0; meter < 8; meter ++)
+	if (m_meters != nullptr)
 	{
-		MechMtr_update(meter, (data & (1 << meter)));
+		for (int meter = 0; meter < 8; meter ++)
+		{
+			m_meters->update(meter, (data & (1 << meter)));
+		}
 	}
 }
 
@@ -805,10 +814,6 @@ INPUT_PORTS_END
 MACHINE_START_MEMBER(jpmsys5_state,jpmsys5)
 {
 //  membank("bank1")->set_base(memregion("maincpu")->base()+0x20000);
-
-	/* setup 8 mechanical meters */
-	MechMtr_config(machine(),8);
-
 }
 
 MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5)
@@ -875,6 +880,9 @@ MACHINE_CONFIG_START( jpmsys5_ym, jpmsys5_state )
 	MCFG_PTM6840_OUT0_CB(WRITE8(jpmsys5_state, u26_o1_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5_state, ptm_irq))
 	MCFG_DEFAULT_LAYOUT(layout_jpmsys5)
+
+	MCFG_DEVICE_ADD("meters", METERS, 0)
+	MCFG_METERS_NUMBER(8)
 MACHINE_CONFIG_END
 
 // the first rev PCB used an SAA1099
@@ -925,6 +933,9 @@ MACHINE_CONFIG_START( jpmsys5, jpmsys5_state )
 	MCFG_PTM6840_OUT0_CB(WRITE8(jpmsys5_state, u26_o1_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5_state, ptm_irq))
 	MCFG_DEFAULT_LAYOUT(layout_jpmsys5)
+
+	MCFG_DEVICE_ADD("meters", METERS, 0)
+	MCFG_METERS_NUMBER(8)
 MACHINE_CONFIG_END
 
 /*************************************

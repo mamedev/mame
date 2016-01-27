@@ -144,9 +144,9 @@ WRITE8_MEMBER( h8_state::portf0_w )
 	// d7 = beeper enable
 
 	m_digit = data & 15;
-	if (m_digit) output_set_digit_value(m_digit, m_segment);
+	if (m_digit) output().set_digit_value(m_digit, m_segment);
 
-	output_set_value("mon_led", !BIT(data, 5));
+	output().set_value("mon_led", !BIT(data, 5));
 	m_beep->set_state(!BIT(data, 7));
 
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
@@ -167,7 +167,7 @@ WRITE8_MEMBER( h8_state::portf1_w )
 	//d0 segment g
 
 	m_segment = 0xff ^ BITSWAP8(data, 7, 0, 6, 5, 4, 3, 2, 1);
-	if (m_digit) output_set_digit_value(m_digit, m_segment);
+	if (m_digit) output().set_digit_value(m_digit, m_segment);
 }
 
 static ADDRESS_MAP_START(h8_mem, AS_PROGRAM, 8, h8_state)
@@ -215,8 +215,7 @@ INPUT_PORTS_END
 
 void h8_state::machine_reset()
 {
-	m_beep->set_frequency(H8_BEEP_FRQ);
-	output_set_value("pwr_led", 0);
+	output().set_value("pwr_led", 0);
 	m_irq_ctl = 1;
 	m_cass_state = 1;
 	m_cass_data[0] = 0;
@@ -229,7 +228,7 @@ void h8_state::machine_reset()
 WRITE_LINE_MEMBER( h8_state::h8_inte_callback )
 {
 		// operate the ION LED
-	output_set_value("ion_led", !state);
+	output().set_value("ion_led", !state);
 	m_irq_ctl &= 0x7f | ((state) ? 0 : 0x80);
 }
 
@@ -261,7 +260,7 @@ But, all of this can only occur if bit 5 of port F0 is low. */
 
 
 		// operate the RUN LED
-	output_set_value("run_led", state);
+	output().set_value("run_led", state);
 }
 
 WRITE_LINE_MEMBER( h8_state::txdata_callback )
@@ -318,7 +317,7 @@ static MACHINE_CONFIG_START( h8, h8_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, H8_BEEP_FRQ)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

@@ -53,8 +53,8 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_spriteext;
-	UINT16 *    m_spriteram_buffered;
-	UINT16 *    m_spriteram_delayed;
+	std::unique_ptr<UINT16[]>    m_spriteram_buffered;
+	std::unique_ptr<UINT16[]>    m_spriteram_delayed;
 
 	/* video-related */
 	struct      slapshot_tempsprite *m_spritelist;

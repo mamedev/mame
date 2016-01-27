@@ -28,7 +28,7 @@ UINT32 turrett_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 {
 	int page = (m_video_ctrl & 1) ^ 1;
 
-	const UINT16 *vram = m_video_ram[page];
+	const UINT16 *vram = m_video_ram[page].get();
 
 	INT8 fade_b = m_video_fade & 0x1f;
 	INT8 fade_g = (m_video_fade >> 5) & 0x1f;

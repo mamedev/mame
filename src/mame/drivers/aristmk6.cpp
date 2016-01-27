@@ -152,7 +152,7 @@ READ8_MEMBER(aristmk6_state::test_r)
 	default:
 		logerror("Unmapped read %08x\n", 0x13800000 + offset);
 	}
-	
+
 	return 0;
 }
 

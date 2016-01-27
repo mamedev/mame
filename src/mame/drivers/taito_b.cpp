@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 /***************************************************************************
 
@@ -423,10 +423,10 @@ WRITE16_MEMBER(taitob_state::player_34_coin_ctrl_w)
 	COMBINE_DATA(&m_coin_word);
 
 	/* coin counters and lockout */
-	coin_lockout_w(machine(), 2, ~data & 0x0100);
-	coin_lockout_w(machine(), 3, ~data & 0x0200);
-	coin_counter_w(machine(), 2,  data & 0x0400);
-	coin_counter_w(machine(), 3,  data & 0x0800);
+	machine().bookkeeping().coin_lockout_w(2, ~data & 0x0100);
+	machine().bookkeeping().coin_lockout_w(3, ~data & 0x0200);
+	machine().bookkeeping().coin_counter_w(2,  data & 0x0400);
+	machine().bookkeeping().coin_counter_w(3,  data & 0x0800);
 }
 
 READ16_MEMBER(taitob_state::pbobble_input_bypass_r)

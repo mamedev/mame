@@ -124,6 +124,11 @@ void k053252_device::device_reset()
 
 	m_regs[0x08] = 1; // Xexex apparently does a wrong assignment for VC (sets up the INT enable register instead)
 
+	reset_internal_state();
+}
+
+void k053252_device::reset_internal_state()
+{
 	m_hc=0;
 	m_hfp=0;
 	m_hbp=0;
@@ -133,7 +138,6 @@ void k053252_device::device_reset()
 	m_vsw=0;
 	m_hsw=0;
 }
-
 
 /*****************************************************************************
     DEVICE HANDLERS
@@ -170,9 +174,6 @@ void k053252_device::res_change()
 		//VC - VFP - VBP - (VSW+1)
 		attoseconds_t refresh = HZ_TO_ATTOSECONDS(clock()) * (m_hc) * m_vc;
 
-		//printf("H %d %d %d %d\n",m_hc,m_hfp,m_hbp,m_hsw);
-		//printf("V %d %d %d %d\n",m_vc,m_vfp,m_vbp,m_vsw);
-
 		visarea.min_x = m_offsx;
 		visarea.min_y = m_offsy;
 		visarea.max_x = m_offsx + m_hc - m_hfp - m_hbp - 8*(m_hsw) - 1;
@@ -182,6 +183,16 @@ void k053252_device::res_change()
 
 		if (m_slave_screen)
 			m_slave_screen->configure(m_hc, m_vc, visarea, refresh);
+
+#if 0
+		attoseconds_t hsync = HZ_TO_ATTOSECONDS(clock()) * (m_hc);
+		printf("H %d HFP %d HSW %d HBP %d\n",m_hc,m_hfp,m_hsw*8,m_hbp);
+		printf("V %d VFP %d VSW %d VBP %d\n",m_vc,m_vfp,m_vsw,m_vbp);
+		// L stands for Legacy ...
+		printf("L %d %d\n",m_offsx,m_offsy);
+		printf("Screen params: Clock: %u V-Sync %.2f H-Sync %.f\n",clock(),ATTOSECONDS_TO_HZ(refresh),ATTOSECONDS_TO_HZ(hsync));
+		printf("visible screen area: %d x %d\n\n",(visarea.max_x - visarea.min_x) + 1,(visarea.max_y - visarea.min_y) + 1);
+#endif
 	}
 }
 
@@ -240,7 +251,7 @@ WRITE8_MEMBER( k053252_device::write )
 			logerror("%02x VSW / %02x HSW set\n",m_vsw,m_hsw);
 			res_change();
 			break;
-		
+
 		//case 0x0d: m_int_time(data); break;
 		case 0x0e: m_int1_ack_cb(1); break;
 		case 0x0f: m_int2_ack_cb(1); break;

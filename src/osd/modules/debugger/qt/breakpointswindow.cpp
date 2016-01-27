@@ -1,6 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
-#define NO_MEM_TRACKING
+#include <QtWidgets/QActionGroup>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QVBoxLayout>
 
 #include "breakpointswindow.h"
 
@@ -54,7 +58,7 @@ BreakpointsWindow::BreakpointsWindow(running_machine* machine, QWidget* parent) 
 	typeBreak->setShortcut(QKeySequence("Ctrl+1"));
 	typeWatch->setShortcut(QKeySequence("Ctrl+2"));
 	typeBreak->setChecked(true);
-	connect(typeGroup, SIGNAL(triggered(QAction*)), this, SLOT(typeChanged(QAction*)));
+	connect(typeGroup, &QActionGroup::triggered, this, &BreakpointsWindow::typeChanged);
 
 	// Assemble the options menu
 	QMenu* optionsMenu = menuBar()->addMenu("&Options");

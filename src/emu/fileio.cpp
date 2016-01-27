@@ -219,8 +219,7 @@ emu_file::operator core_file &()
 hash_collection &emu_file::hashes(const char *types)
 {
 	// determine the hashes we already have
-	std::string already_have;
-	m_hashes.hash_types(already_have);
+	std::string already_have = m_hashes.hash_types();
 
 	// determine which hashes we need
 	std::string needed;

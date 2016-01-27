@@ -70,16 +70,16 @@ WRITE8_MEMBER( zapcomp_state::display_7seg_w )
 {
 	switch (offset){
 		case 0: //Port 0x05 : address HI
-			output_set_digit_value(0, decode7seg(data >> 4));
-			output_set_digit_value(1, decode7seg(data));
+			output().set_digit_value(0, decode7seg(data >> 4));
+			output().set_digit_value(1, decode7seg(data));
 			break;
 		case 1: //Port 0x06 : address LOW
-			output_set_digit_value(2, decode7seg(data >> 4));
-			output_set_digit_value(3, decode7seg(data));
+			output().set_digit_value(2, decode7seg(data >> 4));
+			output().set_digit_value(3, decode7seg(data));
 			break;
 		case 2: //Port 0x07 : data
-			output_set_digit_value(4, decode7seg(data >> 4));
-			output_set_digit_value(5, decode7seg(data));
+			output().set_digit_value(4, decode7seg(data >> 4));
+			output().set_digit_value(5, decode7seg(data));
 			break;
 		default:
 			break;

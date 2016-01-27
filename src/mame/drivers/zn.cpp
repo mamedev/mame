@@ -123,7 +123,6 @@ protected:
 
 private:
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
-	inline UINT16 psxreadword( UINT32 *p_n_psxram, UINT32 n_address );
 	inline void psxwriteword( UINT32 *p_n_psxram, UINT32 n_address, UINT16 n_data );
 
 	UINT8 m_n_znsecsel;
@@ -131,7 +130,7 @@ private:
 	UINT16 m_bam2_mcu_command;
 	int m_jdredd_gun_mux;
 
-	UINT8* m_fx1b_fram;
+	std::unique_ptr<UINT8[]> m_fx1b_fram;
 
 	UINT16 m_vt83c461_latch;
 
@@ -1228,8 +1227,8 @@ ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(zn_state,coh1000tb)
 {
-	m_fx1b_fram = auto_alloc_array(machine(), UINT8, 0x200);
-	machine().device<nvram_device>("fm1208s")->set_base(m_fx1b_fram, 0x200);
+	m_fx1b_fram = std::make_unique<UINT8[]>(0x200);
+	machine().device<nvram_device>("fm1208s")->set_base(m_fx1b_fram.get(), 0x200);
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1000tb)
@@ -4080,6 +4079,7 @@ ROM_START( taitofx1 )
 	TAITOFX1_BIOS
 	ROM_REGION32_LE( 0x01000000, "bankedroms", ROMREGION_ERASE00 )
 	ROM_REGION( 0x080000, "audiocpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "ymsnd", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( ftimpcta )

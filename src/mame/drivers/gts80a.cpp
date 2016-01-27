@@ -287,15 +287,15 @@ WRITE8_MEMBER( gts80a_state::port2a_w )
 	{
 		case 0x10: // player 1&2
 			if (!BIT(m_segment, 7)) seg2 |= 0x300; // put '1' in the middle
-			output_set_digit_value(data & 15, seg2);
+			output().set_digit_value(data & 15, seg2);
 			break;
 		case 0x20: // player 3&4
 			if (!BIT(m_segment, 7)) seg2 |= 0x300; // put '1' in the middle
-			output_set_digit_value((data & 15)+20, seg2);
+			output().set_digit_value((data & 15)+20, seg2);
 			break;
 		case 0x40: // credits & balls
 			if (!BIT(m_segment, 7)) m_segment = 1; // turn '1' back to normal
-			output_set_digit_value((data & 15)+40, patterns[m_segment & 15]);
+			output().set_digit_value((data & 15)+40, patterns[m_segment & 15]);
 			break;
 	}
 }

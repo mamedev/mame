@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Paul Leaman
 /***************************************************************************
 
@@ -124,7 +124,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes")
+		m_decrypted_opcodes(*this, "decrypted_opcodes"),
+		m_region_stars(*this, "stars")
 	{ }
 
 	/* memory pointers */
@@ -138,21 +139,22 @@ public:
 	UINT16 *     m_scroll3;
 	UINT16 *     m_obj;
 	UINT16 *     m_other;
-	UINT16 *     m_buffered_obj;
+	std::unique_ptr<UINT16[]>     m_buffered_obj;
 	optional_shared_ptr<UINT8> m_qsound_sharedram1;
 	optional_shared_ptr<UINT8> m_qsound_sharedram2;
+	std::unique_ptr<UINT8[]> m_decrypt_kabuki;
 	// cps2
 	optional_shared_ptr<UINT16> m_objram1;
 	optional_shared_ptr<UINT16> m_objram2;
 	optional_shared_ptr<UINT16> m_output;
-	
+
 	optional_ioport m_io_in0;
 	optional_ioport m_io_in1;
-	UINT16 *     m_cps2_buffered_obj;
+	std::unique_ptr<UINT16[]>     m_cps2_buffered_obj;
 	// game-specific
-	UINT16 *     m_gigaman2_dummyqsound_ram;
+	std::unique_ptr<UINT16[]>    m_gigaman2_dummyqsound_ram;
 	UINT16  sf2ceblp_prot;
-	
+
 	/* video-related */
 	tilemap_t      *m_bg_tilemap[3];
 	int          m_scanline1;
@@ -183,11 +185,11 @@ public:
 	int          m_cps2digitalvolumelevel;
 	int          m_cps2disabledigitalvolume;
 	emu_timer    *m_digital_volume_timer;
-	int			 m_cps2_dial_type;
-	int			 m_ecofghtr_dial_direction0;
-	int			 m_ecofghtr_dial_direction1;
-	int			 m_ecofghtr_dial_last0;
-	int			 m_ecofghtr_dial_last1;
+	int          m_cps2_dial_type;
+	int          m_ecofghtr_dial_direction0;
+	int          m_ecofghtr_dial_direction1;
+	int          m_ecofghtr_dial_last0;
+	int          m_ecofghtr_dial_last1;
 
 
 	/* fcrash sound hw */
@@ -231,6 +233,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<UINT16> m_decrypted_opcodes;
+	optional_memory_region m_region_stars;
 
 	DECLARE_READ16_MEMBER(cps1_hack_dsw_r);
 	DECLARE_READ16_MEMBER(cps1_in1_r);

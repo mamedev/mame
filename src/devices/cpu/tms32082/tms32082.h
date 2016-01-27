@@ -71,6 +71,8 @@ public:
 	DECLARE_READ32_MEMBER(mp_param_r);
 	DECLARE_WRITE32_MEMBER(mp_param_w);
 
+	void set_command_callback(write32_delegate callback);
+
 
 protected:
 	// device level overrides
@@ -95,7 +97,7 @@ protected:
 	}
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
@@ -138,6 +140,8 @@ protected:
 
 	address_space *m_program;
 	direct_read_data* m_direct;
+
+	write32_delegate m_cmd_callback;
 
 	void check_interrupts();
 	void processor_command(UINT32 command);
@@ -188,7 +192,7 @@ protected:
 	}
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 8; }

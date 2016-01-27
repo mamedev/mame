@@ -18,7 +18,6 @@ public:
 	serial_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { device_serial_interface::rx_w(state); }
-	DECLARE_READ_LINE_MEMBER(tx_r);
 
 	virtual ioport_constructor device_input_ports() const override;
 

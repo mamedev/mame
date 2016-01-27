@@ -173,7 +173,7 @@ WRITE8_MEMBER(mw8080bw_state::seawolf_audio_w)
 	/* if (data & 0x10)  enable MINE HIT sound */
 	if (rising_bits & 0x10) m_samples->start(4, 4);
 
-	coin_counter_w(machine(), 0, (data >> 5) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 0x01);
 
 	/* D6 and D7 are not connected */
 
@@ -218,7 +218,7 @@ WRITE8_MEMBER(mw8080bw_state::gunfight_audio_w)
 {
 	/* D0 and D1 are just tied to 1k resistors */
 
-	coin_counter_w(machine(), 0, (data >> 2) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
 
 	/* the 74175 latches and inverts the top 4 bits */
 	switch ((~data >> 4) & 0x0f)
@@ -339,7 +339,7 @@ WRITE8_MEMBER(mw8080bw_state::tornbase_audio_w)
 		/* if (data & 0x40)  enable WHISTLE sound */
 	}
 
-	coin_counter_w(machine(), 0, (data >> 7) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 7) & 0x01);
 }
 
 
@@ -380,7 +380,7 @@ WRITE8_MEMBER(mw8080bw_state::zzzap_audio_2_w)
 	                                        before it appears again, not sure what
 	                                        it is supposed to sound like) */
 
-	coin_counter_w(machine(), 0, (data >> 5) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 0x01);
 
 	/* D4, D6 and D7 are not connected */
 }
@@ -812,7 +812,7 @@ WRITE8_MEMBER(mw8080bw_state::boothill_audio_w)
 {
 	/* D0 and D1 are not connected */
 
-	coin_counter_w(machine(), 0, (data >> 2) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
 
 	m_discrete->write(space, BOOTHILL_GAME_ON_EN, (data >> 3) & 0x01);
 
@@ -1043,7 +1043,7 @@ WRITE8_MEMBER(mw8080bw_state::checkmat_audio_w)
 
 	m_discrete->write(space, CHECKMAT_BOOM_EN, (data >> 1) & 0x01);
 
-	coin_counter_w(machine(), 0, (data >> 2) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
 
 	machine().sound().system_enable((data >> 3) & 0x01);
 
@@ -1252,7 +1252,7 @@ WRITE8_MEMBER(mw8080bw_state::desertgu_audio_1_w)
 {
 	/* D0 and D1 are not connected */
 
-	coin_counter_w(machine(), 0, (data >> 2) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
 
 	m_discrete->write(space, DESERTGU_GAME_ON_EN, (data >> 3) & 0x01);
 
@@ -1272,7 +1272,7 @@ WRITE8_MEMBER(mw8080bw_state::desertgu_audio_2_w)
 
 	m_discrete->write(space, DESERTGU_TRIGGER_CLICK_EN, (data >> 1) & 0x01);
 
-	output_set_value("Player1_Gun_Recoil", (data >> 2) & 0x01);
+	output().set_value("Player1_Gun_Recoil", (data >> 2) & 0x01);
 
 	m_desertgun_controller_select = (data >> 3) & 0x01;
 
@@ -1525,7 +1525,7 @@ WRITE8_MEMBER(mw8080bw_state::dplay_audio_w)
 
 	m_discrete->write(space, DPLAY_GAME_ON_EN, (data >> 4) & 0x01);
 
-	coin_counter_w(machine(), 0, (data >> 5) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 0x01);
 
 	/* D6 and D7 are not connected */
 }
@@ -1573,7 +1573,7 @@ WRITE8_MEMBER(mw8080bw_state::gmissile_audio_1_w)
 
 	/* D0 and D1 are not connected */
 
-	coin_counter_w(machine(), 0, (data >> 2) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
 
 	machine().sound().system_enable((data >> 3) & 0x01);
 
@@ -1581,14 +1581,14 @@ WRITE8_MEMBER(mw8080bw_state::gmissile_audio_1_w)
 	if (rising_bits & 0x10) m_samples2->start(0, 0);
 
 	/* if (data & 0x20)  enable LEFT EXPLOSION sound (goes to left speaker) */
-	output_set_value("L_EXP_LIGHT", (data >> 5) & 0x01);
+	output().set_value("L_EXP_LIGHT", (data >> 5) & 0x01);
 	if (rising_bits & 0x20) m_samples1->start(0, 1);
 
 	/* if (data & 0x40)  enable LEFT MISSILE sound (goes to left speaker) */
 	if (rising_bits & 0x40) m_samples1->start(0, 0);
 
 	/* if (data & 0x80)  enable RIGHT EXPLOSION sound (goes to right speaker) */
-	output_set_value("R_EXP_LIGHT", (data >> 7) & 0x01);
+	output().set_value("R_EXP_LIGHT", (data >> 7) & 0x01);
 	if (rising_bits & 0x80) m_samples2->start(0, 1);
 
 	m_port_1_last = data;
@@ -1662,7 +1662,7 @@ WRITE8_MEMBER(mw8080bw_state::m4_audio_1_w)
 
 	/* D0 and D1 are not connected */
 
-	coin_counter_w(machine(), 0, (data >> 2) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
 
 	machine().sound().system_enable((data >> 3) & 0x01);
 
@@ -1912,7 +1912,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(mw8080bw_state::clowns_audio_1_w)
 {
-	coin_counter_w(machine(), 0, (data >> 0) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 0x01);
 
 	m_clowns_controller_select = (data >> 1) & 0x01;
 
@@ -2277,7 +2277,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(mw8080bw_state::spacwalk_audio_1_w)
 {
-	coin_counter_w(machine(), 0, (data >> 0) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 0x01);
 
 	m_clowns_controller_select = (data >> 1) & 0x01;
 
@@ -2527,7 +2527,7 @@ WRITE8_MEMBER(mw8080bw_state::shuffle_audio_2_w)
 {
 	m_discrete->write(space, SHUFFLE_FOUL_EN, (data >> 0) & 0x01);
 
-	coin_counter_w(machine(), 0, (data >> 1) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 1) & 0x01);
 
 	/* D2-D7 are not connected */
 }
@@ -2689,7 +2689,7 @@ WRITE8_MEMBER(mw8080bw_state::dogpatch_audio_w)
 {
 	/* D0, D1 and D7 are not used */
 
-	coin_counter_w(machine(), 0, (data >> 2) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
 
 	machine().sound().system_enable((data >> 3) & 0x01);
 	m_discrete->write(space, DOGPATCH_GAME_ON_EN, (data >> 3) & 0x01);
@@ -3242,7 +3242,7 @@ WRITE8_MEMBER(mw8080bw_state::spcenctr_audio_3_w)
 
 	m_spcenctr_strobe_state = (data >> 2) & 0x01;
 
-	output_set_value("LAMP", (data >> 3) & 0x01);
+	output().set_value("LAMP", (data >> 3) & 0x01);
 
 	m_discrete->write(space, SPCENCTR_BONUS_EN, (data >> 4) & 0x01);
 
@@ -3290,7 +3290,7 @@ WRITE8_MEMBER(mw8080bw_state::phantom2_audio_1_w)
 	machine().sound().system_mute(!(data & 0x20));
 	machine().sound().system_enable((data >> 2) & 0x01);
 
-	coin_counter_w(machine(), 0, (data >> 3) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 3) & 0x01);
 
 	/* if (data & 0x10)  enable RADAR sound */
 
@@ -3309,7 +3309,7 @@ WRITE8_MEMBER(mw8080bw_state::phantom2_audio_2_w)
 	/* if (data & 0x08)  enable EXPLOSION sound */
 	if (rising_bits & 0x08) m_samples->start(1, 1);
 
-	output_set_value("EXPLAMP", (data >> 4) & 0x01);
+	output().set_value("EXPLAMP", (data >> 4) & 0x01);
 
 	/* set JET SOUND FREQ((data >> 5) & 0x07)  0, if no jet sound */
 
@@ -3410,7 +3410,7 @@ WRITE8_MEMBER(mw8080bw_state::bowler_audio_1_w)
 {
 	/* D0 - selects controller on the cocktail PCB */
 
-	coin_counter_w(machine(), 0, (data >> 1) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 1) & 0x01);
 
 	machine().sound().system_enable((data >> 2) & 0x01);
 

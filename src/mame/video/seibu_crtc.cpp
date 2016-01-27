@@ -30,7 +30,8 @@ preliminary memory map:
 (screen 3 -> Text layer)
 [0x00]: Total number of visible cells?
 [0x02]: Single cell H size +1?
-[0x1a]: Layer Dynamic Paging?
+[0x1a]: --x- Layer Dynamic Size?
+        ---x Flip Screen
 [0x1c]: Layer Enable
 ---x ---- sprite enable
 ---- x--- tilemap screen 3 enable
@@ -151,6 +152,8 @@ List of default vregs (title screen):
 100620:  0000 0000 0000 0000 0000 0000 01D8 01FF
 100630:  01DA 01FF 01D9 01FF 01D8 01FF 0034 003F
 100640:  0000 A8A8 0004 1830 0009 0000 0000 FFFF
+*Godzilla, 320 x 224 (455 x 258 hvtotal)
+100600:  000f 0013 00a0 00d7 00fa 000f 00fa 00ff
 
 *Seibu SPI is a newer CRTC?
 00000400: 013F007F - hblank start(-1), hblank length(-1)
@@ -179,7 +182,9 @@ const device_type SEIBU_CRTC = &device_creator<seibu_crtc_device>;
 
 static ADDRESS_MAP_START( seibu_crtc_vregs, AS_0, 16, seibu_crtc_device )
 	AM_RANGE(0x001c, 0x001d) AM_WRITE(layer_en_w)
+	AM_RANGE(0x001a, 0x001b) AM_WRITE(reg_1a_w)
 	AM_RANGE(0x0020, 0x002b) AM_WRITE(layer_scroll_w)
+	AM_RANGE(0x002c, 0x003b) AM_WRITE(layer_scroll_base_w)
 	AM_RANGE(0x0000, 0x004f) AM_RAM // debug
 ADDRESS_MAP_END
 
@@ -193,6 +198,18 @@ WRITE16_MEMBER( seibu_crtc_device::layer_scroll_w)
 {
 	if (!m_layer_scroll_cb.isnull())
 		m_layer_scroll_cb(offset,data,mem_mask);
+}
+
+WRITE16_MEMBER( seibu_crtc_device::reg_1a_w)
+{
+	if (!m_reg_1a_cb.isnull())
+		m_reg_1a_cb(offset,data,mem_mask);
+}
+
+WRITE16_MEMBER( seibu_crtc_device::layer_scroll_base_w)
+{
+	if (!m_layer_scroll_base_cb.isnull())
+		m_layer_scroll_base_cb(offset,data,mem_mask);
 }
 
 //**************************************************************************
@@ -209,6 +226,8 @@ seibu_crtc_device::seibu_crtc_device(const machine_config &mconfig, const char *
 		device_video_interface(mconfig, *this),
 		m_layer_en_cb(*this),
 		m_layer_scroll_cb(*this),
+		m_reg_1a_cb(*this),
+		m_layer_scroll_base_cb(*this),
 		m_space_config("vregs", ENDIANNESS_LITTLE, 16, 7, 0, nullptr, *ADDRESS_MAP_NAME(seibu_crtc_vregs))
 {
 }
@@ -231,6 +250,8 @@ void seibu_crtc_device::device_start()
 {
 	m_layer_en_cb.resolve();
 	m_layer_scroll_cb.resolve();
+	m_reg_1a_cb.resolve();
+	m_layer_scroll_base_cb.resolve();
 }
 
 

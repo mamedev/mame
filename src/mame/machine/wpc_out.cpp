@@ -55,10 +55,10 @@ void wpc_out_device::send_output(int sid, int state)
 		sprintf(buffer, "u:output %02d", sid);
 		name = buffer;
 	}
-	output_set_value(name, state);
+	machine().output().set_value(name, state);
 
 	if(sid == 41)
-		coin_counter_w(machine(), 0, state);
+		machine().bookkeeping().coin_counter_w(0, state);
 }
 
 WRITE8_MEMBER(wpc_out_device::out_w)
@@ -108,7 +108,7 @@ WRITE8_MEMBER(wpc_out_device::gi_w)
 WRITE8_MEMBER(wpc_out_device::led_w)
 {
 	first_after_led = true;
-	output_set_value("L:cpu led", data & 0x80 ? 1 : 0);
+	machine().output().set_value("L:cpu led", data & 0x80 ? 1 : 0);
 }
 
 void wpc_out_device::device_start()

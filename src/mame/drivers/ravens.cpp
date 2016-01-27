@@ -120,7 +120,7 @@ READ8_MEMBER( ravens_state::cass_r )
 
 WRITE8_MEMBER( ravens_state::display_w )
 {
-	output_set_digit_value(offset, data);
+	output().set_digit_value(offset, data);
 }
 
 WRITE8_MEMBER( ravens_state::leds_w )
@@ -129,7 +129,7 @@ WRITE8_MEMBER( ravens_state::leds_w )
 	for (int i = 0; i < 8; i++)
 	{
 		sprintf(ledname,"led%d",i);
-		output_set_value(ledname, !BIT(data, i));
+		output().set_value(ledname, !BIT(data, i));
 	}
 }
 
@@ -194,7 +194,7 @@ WRITE8_MEMBER( ravens_state::port1c_w )
 MACHINE_RESET_MEMBER( ravens_state, ravens2 )
 {
 	m_term_data = 0x80;
-	output_set_digit_value(6, 0);
+	output().set_digit_value(6, 0);
 }
 
 

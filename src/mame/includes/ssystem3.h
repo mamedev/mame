@@ -69,7 +69,7 @@ public:
 
 private:
 	UINT8 m_porta;
-	UINT8 *m_videoram;
+	std::unique_ptr<UINT8[]> m_videoram;
 	playfield_t m_playfield;
 	lcd_t m_lcd;
 

@@ -1,10 +1,9 @@
-// license:???
-// copyright-holders:John Butler, Ed Mueller, Aaron Giles
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles, Zsolt Vasvari
+// thanks-to: John Butler, Ed Mueller
 /***************************************************************************
 
     Taito Qix hardware
-
-    driver by John Butler, Ed Mueller, Aaron Giles
 
 ***************************************************************************/
 
@@ -225,8 +224,8 @@ WRITE8_MEMBER(qix_state::qix_68705_portA_w)
 WRITE8_MEMBER(qix_state::qix_68705_portB_w)
 {
 	m_68705_port_out[1] = data;
-	coin_lockout_w(machine(), 0, (~data >> 6) & 1);
-	coin_counter_w(machine(), 0, (data >> 7) & 1);
+	machine().bookkeeping().coin_lockout_w(0, (~data >> 6) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 7) & 1);
 }
 
 
@@ -266,8 +265,8 @@ WRITE8_MEMBER(qix_state::qix_pia_w)
 
 WRITE8_MEMBER(qix_state::qix_coinctl_w)
 {
-	coin_lockout_w(machine(), 0, (~data >> 2) & 1);
-	coin_counter_w(machine(), 0, (data >> 1) & 1);
+	machine().bookkeeping().coin_lockout_w(0, (~data >> 2) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 1) & 1);
 }
 
 

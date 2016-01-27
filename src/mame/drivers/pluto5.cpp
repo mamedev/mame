@@ -189,7 +189,7 @@ public:
 	{ }
 
 	UINT32* m_cpuregion;
-	UINT32* m_mainram;
+	std::unique_ptr<UINT32[]> m_mainram;
 
 	DECLARE_READ32_MEMBER(pluto5_mem_r);
 	DECLARE_WRITE32_MEMBER(pluto5_mem_w);
@@ -246,7 +246,7 @@ INPUT_PORTS_END
 void pluto5_state::machine_start()
 {
 	m_cpuregion = (UINT32*)memregion( "maincpu" )->base();
-	m_mainram = (UINT32*)auto_alloc_array_clear(machine(), UINT32, 0x10000);
+	m_mainram = make_unique_clear<UINT32[]>(0x10000);
 
 }
 

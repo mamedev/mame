@@ -521,14 +521,14 @@ WRITE8_MEMBER(luckgrln_state::lamps_a_w)
     x--- ----  TAKE
 
 */
-	output_set_lamp_value(0, (data >> 0) & 1);      /* HOLD1 */
-	output_set_lamp_value(1, (data >> 1) & 1);      /* HOLD2 */
-	output_set_lamp_value(2, (data >> 2) & 1);      /* HOLD3 */
-	output_set_lamp_value(3, (data >> 3) & 1);      /* HOLD4 */
-	output_set_lamp_value(4, (data >> 4) & 1);      /* HOLD5 */
-	output_set_lamp_value(5, (data >> 5) & 1);      /* START */
-	output_set_lamp_value(6, (data >> 6) & 1);      /* BET */
-	output_set_lamp_value(7, (data >> 7) & 1);      /* TAKE */
+	output().set_lamp_value(0, (data >> 0) & 1);      /* HOLD1 */
+	output().set_lamp_value(1, (data >> 1) & 1);      /* HOLD2 */
+	output().set_lamp_value(2, (data >> 2) & 1);      /* HOLD3 */
+	output().set_lamp_value(3, (data >> 3) & 1);      /* HOLD4 */
+	output().set_lamp_value(4, (data >> 4) & 1);      /* HOLD5 */
+	output().set_lamp_value(5, (data >> 5) & 1);      /* START */
+	output().set_lamp_value(6, (data >> 6) & 1);      /* BET */
+	output().set_lamp_value(7, (data >> 7) & 1);      /* TAKE */
 }
 
 WRITE8_MEMBER(luckgrln_state::lamps_b_w)
@@ -544,10 +544,10 @@ WRITE8_MEMBER(luckgrln_state::lamps_b_w)
     xx-- ----  unused
 
 */
-	output_set_lamp_value(8, (data >> 0) & 1);      /* D-UP */
-	output_set_lamp_value(9, (data >> 1) & 1);      /* HIGH */
-	output_set_lamp_value(10, (data >> 2) & 1);     /* LOW */
-	output_set_lamp_value(11, (data >> 3) & 1);     /* CANCEL */
+	output().set_lamp_value(8, (data >> 0) & 1);      /* D-UP */
+	output().set_lamp_value(9, (data >> 1) & 1);      /* HIGH */
+	output().set_lamp_value(10, (data >> 2) & 1);     /* LOW */
+	output().set_lamp_value(11, (data >> 3) & 1);     /* CANCEL */
 }
 
 WRITE8_MEMBER(luckgrln_state::counters_w)
@@ -562,10 +562,10 @@ WRITE8_MEMBER(luckgrln_state::counters_w)
     xxxx ----  unused
 
 */
-	coin_counter_w(machine(), 0, data & 0x01);  /* COIN 1 */
-	coin_counter_w(machine(), 1, data & 0x04);  /* COIN 2 */
-	coin_counter_w(machine(), 2, data & 0x08);  /* COIN 3 */
-	coin_counter_w(machine(), 3, data & 0x02);  /* KEY IN */
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);  /* COIN 1 */
+	machine().bookkeeping().coin_counter_w(1, data & 0x04);  /* COIN 2 */
+	machine().bookkeeping().coin_counter_w(2, data & 0x08);  /* COIN 3 */
+	machine().bookkeeping().coin_counter_w(3, data & 0x02);  /* KEY IN */
 }
 
 

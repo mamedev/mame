@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Paul Leaman
 #include "emu.h"
 #include "includes/blktiger.h"
@@ -69,7 +69,7 @@ void blktiger_state::video_start()
 	m_objon = 1;
 	m_screen_layout = 0;
 
-	m_scroll_ram = auto_alloc_array(machine(), UINT8, BGRAM_BANK_SIZE * BGRAM_BANKS);
+	m_scroll_ram = std::make_unique<UINT8[]>(BGRAM_BANK_SIZE * BGRAM_BANKS);
 
 	m_tx_tilemap =    &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(blktiger_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap8x4 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(blktiger_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(blktiger_state::bg8x4_scan),this), 16, 16, 128, 64);
@@ -86,7 +86,7 @@ void blktiger_state::video_start()
 	m_bg_tilemap4x8->set_transmask(2, 0xff00, 0x80ff);
 	m_bg_tilemap4x8->set_transmask(3, 0xf000, 0x8fff);
 
-	save_pointer(NAME(m_scroll_ram), BGRAM_BANK_SIZE * BGRAM_BANKS);
+	save_pointer(NAME(m_scroll_ram.get()), BGRAM_BANK_SIZE * BGRAM_BANKS);
 }
 
 
@@ -147,8 +147,8 @@ WRITE8_MEMBER(blktiger_state::blktiger_scrollx_w)
 WRITE8_MEMBER(blktiger_state::blktiger_video_control_w)
 {
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(machine(), 0,data & 1);
-	coin_counter_w(machine(), 1,data & 2);
+	machine().bookkeeping().coin_counter_w(0,data & 1);
+	machine().bookkeeping().coin_counter_w(1,data & 2);
 
 	/* bit 5 resets the sound CPU */
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);

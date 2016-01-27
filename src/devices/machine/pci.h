@@ -133,10 +133,6 @@ protected:
 	void set_map_address(int id, UINT64 adr);
 	void set_map_size(int id, UINT64 size);
 	void set_map_flags(int id, int flags);
-
-private:
-	void add_map_finish(int bid, UINT64 size, int flags);
-
 };
 
 class agp_device : public pci_device {

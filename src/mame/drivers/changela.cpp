@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski, Phil Stroffolino, Tomasz Slanina
 /**************************************************************************
 Change Lanes
@@ -198,7 +198,7 @@ WRITE8_MEMBER(changela_state::changela_collision_reset_1)
 
 WRITE8_MEMBER(changela_state::changela_coin_counter_w)
 {
-	coin_counter_w(machine(), offset, data);
+	machine().bookkeeping().coin_counter_w(offset, data);
 }
 
 

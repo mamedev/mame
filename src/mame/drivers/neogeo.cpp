@@ -241,9 +241,9 @@
     . NEO-AEG CHA42G-3
     . NEO-AEG CHA42G-4
     . NEO-AEG CHA256
-     . NEO-AEG CHA256 B
+    . NEO-AEG CHA256 B
     . NEO-AEG CHA256[B]
-     . NEO-AEG CHA256BY
+    . NEO-AEG CHA256BY
     . NEO-AEG CHA256RY
     . NEO-AEG CHA512Y
     . NEO-AEG CHAFIO (1999.8.10) - used with NEO-CMC 90G06C7042 or NEO-CMC 90G06C7050
@@ -266,7 +266,7 @@
     . NEO-AEG PROG4096 B
     . NEO-AEG PROGGS
     . NEO-AEG PROGTOP2
-     . NEO-AEG PROGTOP2Y
+    . NEO-AEG PROGTOP2Y
     . NEO-AEG PROGEOP (1999.4.2)
     . NEO-AEG PROGLBA (1999.7.6)
     . NEO-AEG PROGRK
@@ -306,12 +306,14 @@
     Unofficial pcb's from NG:DEV.TEAM:
 
     MVS CHA:
-    GIGA CHAR Board 1.0
-    GIGA CHAR Board 1.5
+    GIGA CHAR Board 1.0 Rev. A
+    GIGA CHAR Board 1.5 Rev. 0
+    GIGA CHAR Board 1.5 Rev. C
 
     MVS PROG:
-    GIGA PROG Board 1.0
-    GIGA PROG Board 1.5
+    GIGA PROG Board 1.0 Rev. B
+    GIGA PROG Board 1.5 Rev. A
+    GIGA PROG Board 1.5 Rev. C
 
 
     Unofficial pcb's from NEOBITZ:
@@ -1012,15 +1014,15 @@ void neogeo_state::set_outputs(  )
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	/* EL */
-	output_set_digit_value(0, led_map[m_el_value]);
+	output().set_digit_value(0, led_map[m_el_value]);
 
 	/* LED1 */
-	output_set_digit_value(1, led_map[m_led1_value >> 4]);
-	output_set_digit_value(2, led_map[m_led1_value & 0x0f]);
+	output().set_digit_value(1, led_map[m_led1_value >> 4]);
+	output().set_digit_value(2, led_map[m_led1_value & 0x0f]);
 
 	/* LED2 */
-	output_set_digit_value(3, led_map[m_led2_value >> 4]);
-	output_set_digit_value(4, led_map[m_led2_value & 0x0f]);
+	output().set_digit_value(3, led_map[m_led2_value >> 4]);
+	output().set_digit_value(4, led_map[m_led2_value & 0x0f]);
 }
 
 

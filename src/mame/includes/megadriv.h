@@ -33,7 +33,7 @@ struct genesis_z80_vars
 	int z80_is_reset;
 	int z80_has_bus;
 	UINT32 z80_bank_addr;
-	UINT8* z80_prgram;
+	std::unique_ptr<UINT8[]> z80_prgram;
 };
 
 
@@ -55,6 +55,7 @@ public:
 	required_device<sega315_5313_device> m_vdp;
 	required_device<sn76496_base_device> m_snsnd;
 	optional_shared_ptr<UINT16> m_megadrive_ram;
+
 
 	ioport_port *m_io_reset;
 	ioport_port *m_io_pad_3b[4];

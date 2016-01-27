@@ -6,15 +6,18 @@ class namcos86_state : public driver_device
 {
 public:
 	namcos86_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_cpu1(*this, "cpu1"),
-		m_cpu2(*this, "cpu2"),
-		m_cus30(*this, "namco"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_rthunder_videoram1(*this, "videoram1"),
-		m_rthunder_videoram2(*this, "videoram2"),
-		m_rthunder_spriteram(*this, "spriteram") { }
+		: driver_device(mconfig, type, tag)
+		, m_cpu1(*this, "cpu1")
+		, m_cpu2(*this, "cpu2")
+		, m_cus30(*this, "namco")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_rthunder_videoram1(*this, "videoram1")
+		, m_rthunder_videoram2(*this, "videoram2")
+		, m_rthunder_spriteram(*this, "spriteram")
+		, m_user1_ptr(*this, "user1")
+	{
+	}
 
 	required_device<cpu_device> m_cpu1;
 	required_device<cpu_device> m_cpu2;
@@ -24,6 +27,7 @@ public:
 	required_shared_ptr<UINT8> m_rthunder_videoram1;
 	required_shared_ptr<UINT8> m_rthunder_videoram2;
 	required_shared_ptr<UINT8> m_rthunder_spriteram;
+	optional_region_ptr<UINT8> m_user1_ptr;
 
 	UINT8 *m_spriteram;
 	int m_wdog;

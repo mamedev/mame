@@ -73,7 +73,6 @@ public:
 	int get_type() { return m_type; }
 	int get_cart_type(UINT8 *ROM, UINT32 len);
 
-	void setup_ram(UINT8 banks);
 	void internal_header_logging(UINT8 *ROM, UINT32 len);
 
 	void set_intf(const char * interface) { m_interface = interface; }
@@ -89,7 +88,7 @@ public:
 	virtual const char *file_extensions() const override { return "pce,bin"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart);

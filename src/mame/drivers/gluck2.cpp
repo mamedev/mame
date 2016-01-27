@@ -332,9 +332,9 @@ WRITE8_MEMBER(gluck2_state::counters_w)
 */
 	data = data ^ 0xff; // inverted
 
-	coin_counter_w(machine(), 0, data & 0x10);  /* coins */
-	coin_counter_w(machine(), 1, data & 0x02);  /* notes */
-	coin_counter_w(machine(), 2, data & 0x04);  /* payout */
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);  /* coins */
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);  /* notes */
+	machine().bookkeeping().coin_counter_w(2, data & 0x04);  /* payout */
 }
 
 

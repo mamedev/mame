@@ -13,8 +13,6 @@
 #include "osdepend.h"
 #include "modules/lib/osdobj_common.h"
 
-extern bool g_print_verbose;
-
 const options_entry osd_options::s_option_entries[] =
 {
 	{ NULL,                                   NULL,             OPTION_HEADER,    "OSD KEYBOARD MAPPING OPTIONS" },
@@ -155,6 +153,7 @@ osd_options::osd_options()
 osd_common_t::osd_common_t(osd_options &options)
 	: osd_output(), m_machine(NULL),
 		m_options(options),
+		m_print_verbose(false),
 		m_sound(NULL),
 		m_debugger(NULL)
 {
@@ -186,6 +185,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, SOUND_COREAUDIO);
 	REGISTER_MODULE(m_mod_man, SOUND_JS);
 	REGISTER_MODULE(m_mod_man, SOUND_SDL);
+	REGISTER_MODULE(m_mod_man, SOUND_XAUDIO2);
 	REGISTER_MODULE(m_mod_man, SOUND_NONE);
 
 #ifdef SDLMAME_MACOSX
@@ -278,9 +278,11 @@ void osd_common_t::output_callback(osd_output_channel channel, const char *msg, 
 			vfprintf(stderr, msg, args);
 			break;
 		case OSD_OUTPUT_CHANNEL_INFO:
-		case OSD_OUTPUT_CHANNEL_VERBOSE:
 		case OSD_OUTPUT_CHANNEL_LOG:
 			vfprintf(stdout, msg, args);
+			break;
+		case OSD_OUTPUT_CHANNEL_VERBOSE:
+			if (verbose()) vfprintf(stdout, msg, args);
 			break;
 		case OSD_OUTPUT_CHANNEL_DEBUG:
 #ifdef MAME_DEBUG
@@ -333,7 +335,7 @@ void osd_common_t::init(running_machine &machine)
 	osd_options &options = downcast<osd_options &>(machine.options());
 	// extract the verbose printing option
 	if (options.verbose())
-		g_print_verbose = true;
+		set_verbose(true);
 
 	// ensure we get called on the way out
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(osd_common_t::osd_exit), this));

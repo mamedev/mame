@@ -309,9 +309,9 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
     07 | Not connected      | unused
 
 */
-	coin_counter_w(machine(), 0, data & 0x01);      /* Coin Counter 1 */
-	coin_counter_w(machine(), 1, data & 0x20);      /* Coin Counter 2 */
-	coin_lockout_global_w(machine(), data & 0x40);  /* Coin Lock */
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);      /* Coin Counter 1 */
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);      /* Coin Counter 2 */
+	machine().bookkeeping().coin_lockout_global_w(data & 0x40);  /* Coin Lock */
 	m_hopper->write(space, 0, (data & 0x40));    /* Hopper Motor */
 
 	if (data & 0x9e)
@@ -590,6 +590,27 @@ ROM_START( kurukuru )
 	ROM_LOAD( "7908b-4.ic32", 0x0600, 0x0034, CRC(bddf925e) SHA1(861cf5966444d0c0392241e5cfa08db475fb439a) )
 ROM_END
 
+ROM_START( ppj )
+	ROM_REGION( 0x08000, "maincpu", 0 )
+	ROM_LOAD( "ppj17.ic17",  0x00000, 0x08000, CRC(5d9c9ceb) SHA1(0f52c8a0aaaf978afeb07e56493399133b4ce781) ) // program code
+
+	ROM_REGION( 0x40000, "user1", 0 ) // maincpu banked roms
+	ROM_FILL(                 0x00000, 0x10000, 0xff )                                                         // ic23: unpopulated
+	ROM_LOAD( "ppj18.ic18",   0x10000, 0x10000, CRC(69612fc6) SHA1(c6de2ec0db8ad2ace91c3a557a03ed73d0e7336d) ) // ic18: gfx set 1
+	ROM_LOAD( "ppj10.ic10",   0x20000, 0x10000, CRC(95314d84) SHA1(1a8cf50e9a1e9e8a8f5702cc735ec993ddd2fdce) ) // ic10: gfx set 2
+	ROM_FILL(                 0x30000, 0x10000, 0xff )                                                         // dummy entry for when no romchip is selected
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "ppj4.ic4",     0x00000, 0x10000, CRC(6573a0a0) SHA1(6bb99e153a22fce01a71efb3bba6c6cc04bbf8b1) ) // code & adpcm samples
+
+	ROM_REGION( 0x800, "plds", 0 )
+	ROM_LOAD( "pal16l8a_no21.ic26",    0x0000, 0x0104, CRC(414c8b50) SHA1(17f562c50a2bca41aeb7a1a7cb3916853cea0d24) )
+	ROM_LOAD( "pal16l8a_no22.ic27",    0x0200, 0x0104, CRC(ee2b9257) SHA1(15c79b143eafc7915e0f376a87c01afad8fad2b9) )
+	ROM_LOAD( "pal16l8a_no23.ic12",    0x0400, 0x0104, CRC(8a7fbbe0) SHA1(aab8d6b77d46cf2d8620861af1f7c039b6dcda99) )
+	ROM_LOAD( "pal12l6a_7908b-4.ic32", 0x0600, 0x0034, CRC(bddf925e) SHA1(861cf5966444d0c0392241e5cfa08db475fb439a) )  // identical to kurukuru...
+ROM_END
+
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY                   FULLNAME                       FLAGS  */
 GAME( 199?, kurukuru, 0,      kurukuru, kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",  0 )
+GAME( 199?, ppj,      0,      kurukuru, kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (Japan)",       MACHINE_NOT_WORKING )

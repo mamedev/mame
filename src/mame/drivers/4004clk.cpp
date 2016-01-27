@@ -61,12 +61,12 @@ UINT8 nixieclock_state::nixie_to_num(UINT16 val)
 
 inline void nixieclock_state::output_set_nixie_value(int index, int value)
 {
-	output_set_indexed_value("nixie", index, value);
+	output().set_indexed_value("nixie", index, value);
 }
 
 inline void nixieclock_state::output_set_neon_value(int index, int value)
 {
-	output_set_indexed_value("neon", index, value);
+	output().set_indexed_value("neon", index, value);
 }
 
 WRITE8_MEMBER(nixieclock_state::nixie_w)

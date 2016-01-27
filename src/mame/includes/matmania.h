@@ -45,8 +45,8 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	bitmap_ind16 *m_tmpbitmap;
-	bitmap_ind16 *m_tmpbitmap2;
+	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
+	std::unique_ptr<bitmap_ind16> m_tmpbitmap2;
 
 	/* maniach 68705 protection */
 	UINT8 m_port_a_in;

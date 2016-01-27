@@ -1423,8 +1423,6 @@ void render_target::invalidate_all(void *refptr)
 	// iterate through all our primitive lists
 	for (auto & list : m_primlist)
 	{
-		
-
 		// if we have a reference to this object, release our list
 		list.acquire_lock();
 		if (list.has_reference(refptr))
@@ -1456,13 +1454,13 @@ void render_target::debug_free(render_container &container)
 
 
 //-------------------------------------------------
-//  debug_top - move a debug view container to
-//  the top of the list
+//  debug_append - move a debug view container to
+//  the end of the list
 //-------------------------------------------------
 
-void render_target::debug_top(render_container &container)
+void render_target::debug_append(render_container &container)
 {
-	m_debug_containers.prepend(m_debug_containers.detach(container));
+	m_debug_containers.append(m_debug_containers.detach(container));
 }
 
 
@@ -2405,7 +2403,7 @@ render_manager::render_manager(running_machine &machine)
 		m_ui_container(global_alloc(render_container(*this)))
 {
 	// register callbacks
-	config_register(machine, "video", config_saveload_delegate(FUNC(render_manager::config_load), this), config_saveload_delegate(FUNC(render_manager::config_save), this));
+	machine.configuration().config_register("video", config_saveload_delegate(FUNC(render_manager::config_load), this), config_saveload_delegate(FUNC(render_manager::config_save), this));
 
 	// create one container per screen
 	screen_device_iterator iter(machine.root_device());
@@ -2652,10 +2650,10 @@ void render_manager::container_free(render_container *container)
 //  configuration file
 //-------------------------------------------------
 
-void render_manager::config_load(int config_type, xml_data_node *parentnode)
+void render_manager::config_load(config_type cfg_type, xml_data_node *parentnode)
 {
 	// we only care about game files
-	if (config_type != CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::CONFIG_TYPE_GAME)
 		return;
 
 	// might not have any data
@@ -2711,10 +2709,10 @@ void render_manager::config_load(int config_type, xml_data_node *parentnode)
 //  file
 //-------------------------------------------------
 
-void render_manager::config_save(int config_type, xml_data_node *parentnode)
+void render_manager::config_save(config_type cfg_type, xml_data_node *parentnode)
 {
 	// we only care about game files
-	if (config_type != CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::CONFIG_TYPE_GAME)
 		return;
 
 	// write out the interface target

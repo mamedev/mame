@@ -73,7 +73,6 @@ public:
 	required_shared_ptr<UINT8> m_protram;
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(read_unk);
 	DECLARE_WRITE8_MEMBER(vrambank_w);
 	DECLARE_READ8_MEMBER(protram_r);
 	DECLARE_WRITE8_MEMBER(protram_w);

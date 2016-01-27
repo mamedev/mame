@@ -175,29 +175,29 @@ CUSTOM_INPUT_MEMBER(lethalj_state::cclownz_paddle)
 
 WRITE16_MEMBER(lethalj_state::ripribit_control_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 	m_ticket->write(space, 0, ((data >> 1) & 1) << 7);
-	output_set_lamp_value(0, (data >> 2) & 1);
+	output().set_lamp_value(0, (data >> 2) & 1);
 }
 
 
 WRITE16_MEMBER(lethalj_state::cfarm_control_w)
 {
 	m_ticket->write(space, 0, ((data >> 0) & 1) << 7);
-	output_set_lamp_value(0, (data >> 2) & 1);
-	output_set_lamp_value(1, (data >> 3) & 1);
-	output_set_lamp_value(2, (data >> 4) & 1);
-	coin_counter_w(machine(), 0, (data >> 7) & 1);
+	output().set_lamp_value(0, (data >> 2) & 1);
+	output().set_lamp_value(1, (data >> 3) & 1);
+	output().set_lamp_value(2, (data >> 4) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 7) & 1);
 }
 
 
 WRITE16_MEMBER(lethalj_state::cclownz_control_w)
 {
 	m_ticket->write(space, 0, ((data >> 0) & 1) << 7);
-	output_set_lamp_value(0, (data >> 2) & 1);
-	output_set_lamp_value(1, (data >> 4) & 1);
-	output_set_lamp_value(2, (data >> 5) & 1);
-	coin_counter_w(machine(), 0, (data >> 6) & 1);
+	output().set_lamp_value(0, (data >> 2) & 1);
+	output().set_lamp_value(1, (data >> 4) & 1);
+	output().set_lamp_value(2, (data >> 5) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 6) & 1);
 }
 
 

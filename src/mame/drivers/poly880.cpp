@@ -49,7 +49,7 @@ void poly880_state::update_display()
 
 	for (i = 0; i < 8; i++)
 	{
-		if (BIT(m_digit, i)) output_set_digit_value(7 - i, m_segment);
+		if (BIT(m_digit, i)) output().set_digit_value(7 - i, m_segment);
 	}
 }
 

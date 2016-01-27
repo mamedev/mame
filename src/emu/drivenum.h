@@ -120,7 +120,7 @@ private:
 	void release_current() const;
 
 	static const int CONFIG_CACHE_COUNT = 100;
-	
+
 	// internal state
 	int                 m_current;
 	int                 m_filtered_count;

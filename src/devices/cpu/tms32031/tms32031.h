@@ -179,7 +179,7 @@ protected:
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override;
@@ -199,7 +199,6 @@ protected:
 	bool condition(int which);
 
 	// floating point helpers
-	void double_to_dsp_with_flags(double val, tmsreg &result);
 	void int2float(tmsreg &srcdst);
 	void float2int(tmsreg &srcdst, bool setflags);
 	void negf(tmsreg &dst, tmsreg &src);

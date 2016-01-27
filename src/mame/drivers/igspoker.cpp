@@ -242,12 +242,12 @@ void igspoker_state::show_out()
 
 WRITE8_MEMBER(igspoker_state::igs_nmi_and_coins_w)
 {
-	coin_counter_w(machine(), 0,        data & 0x01);   // coin_a
-	coin_counter_w(machine(), 1,        data & 0x04);   // coin_c
-	coin_counter_w(machine(), 2,        data & 0x08);   // key in
-	coin_counter_w(machine(), 3,        data & 0x10);   // coin m_out mech
+	machine().bookkeeping().coin_counter_w(0,        data & 0x01);   // coin_a
+	machine().bookkeeping().coin_counter_w(1,        data & 0x04);   // coin_c
+	machine().bookkeeping().coin_counter_w(2,        data & 0x08);   // key in
+	machine().bookkeeping().coin_counter_w(3,        data & 0x10);   // coin m_out mech
 
-	set_led_status(machine(), 6,        data & 0x20);   // led for coin m_out / m_hopper active
+	output().set_led_value(6,        data & 0x20);   // led for coin m_out / m_hopper active
 
 	m_nmi_enable = data & 0x80;     // nmi enable?
 #if VERBOSE
@@ -285,12 +285,12 @@ WRITE8_MEMBER(igspoker_state::igs_lamps_w)
     ---x ----  Hold5 lamp.
     xx-- ----  one pulse once bet amount allows start.
 */
-	output_set_lamp_value(1, (data >> 1) & 1);      /* Lamp 1 - HOLD 1 */
-	output_set_lamp_value(2, (data >> 5) & 1);      /* Lamp 2 - HOLD 2  */
-	output_set_lamp_value(3, (data >> 4) & 1);      /* Lamp 3 - HOLD 3 */
-	output_set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
-	output_set_lamp_value(5, (data >> 2) & 1);      /* Lamp 5 - HOLD 5 */
-	output_set_lamp_value(6, (data & 1));           /* Lamp 6 - START */
+	output().set_lamp_value(1, (data >> 1) & 1);      /* Lamp 1 - HOLD 1 */
+	output().set_lamp_value(2, (data >> 5) & 1);      /* Lamp 2 - HOLD 2  */
+	output().set_lamp_value(3, (data >> 4) & 1);      /* Lamp 3 - HOLD 3 */
+	output().set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
+	output().set_lamp_value(5, (data >> 2) & 1);      /* Lamp 5 - HOLD 5 */
+	output().set_lamp_value(6, (data & 1));           /* Lamp 6 - START */
 
 	m_hopper            =   (~data)& 0x80;
 
@@ -501,7 +501,7 @@ static INPUT_PORTS_START( cpoker )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)nullptr ) PORT_NAME("HPSW") // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state, hopper_r, NULL) PORT_NAME("HPSW") // hopper sensor
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
@@ -635,7 +635,7 @@ static INPUT_PORTS_START( cpokerx )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Attendent")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)nullptr ) PORT_NAME("HPSW") // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state, hopper_r, NULL) PORT_NAME("HPSW") // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -800,7 +800,7 @@ static INPUT_PORTS_START( csk227 )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)nullptr ) PORT_NAME("HPSW")  // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state, hopper_r, NULL) PORT_NAME("HPSW")  // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
@@ -945,7 +945,7 @@ static INPUT_PORTS_START( csk234 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)nullptr ) PORT_NAME("HPSW")  // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state, hopper_r, NULL) PORT_NAME("HPSW")  // hopper sensor
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
@@ -1097,7 +1097,7 @@ static INPUT_PORTS_START( igs_ncs )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)nullptr ) PORT_NAME("HPSW") // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state, hopper_r, NULL) PORT_NAME("HPSW") // hopper sensor
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
@@ -1417,7 +1417,7 @@ static INPUT_PORTS_START( cpokerpk )
 	PORT_DIPSETTING(    0x00, "100:1" )
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x8f, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)nullptr ) PORT_NAME("HPSW") // hopper sensor
+	PORT_BIT( 0x8f, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state, hopper_r, NULL) PORT_NAME("HPSW") // hopper sensor
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
@@ -1552,7 +1552,7 @@ static INPUT_PORTS_START( chleague )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)nullptr ) PORT_NAME("HPSW") // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state, hopper_r, NULL) PORT_NAME("HPSW") // hopper sensor
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
@@ -1691,7 +1691,7 @@ static INPUT_PORTS_START( pktet346 )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)nullptr ) PORT_NAME("HPSW") // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state, hopper_r, NULL) PORT_NAME("HPSW") // hopper sensor
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
@@ -2055,7 +2055,7 @@ ROM_START( cpokert )
 
 	//copy?
 	ROM_REGION( 0x60000, "gfx2", 0 )
-	ROM_COPY( "gfx1", nullptr, 0, 0x60000 )
+	ROM_COPY( "gfx1", 0x000000, 0, 0x60000 )
 
 	// convert them to the pld format
 	ROM_REGION( 0x2000, "plds", 0 )

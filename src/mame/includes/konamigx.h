@@ -52,7 +52,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
 	optional_device<tms57002_device> m_dasp;
-	optional_device<k053252_device> m_k053252; // not hooked up in tasman.cpp yet (does it even have it?)
+	required_device<k053252_device> m_k053252; // not hooked up in tasman.cpp yet (does it even have it?)
 	required_device<k055673_device> m_k055673;
 	required_device<k055555_device> m_k055555;
 	required_device<k056832_device> m_k056832;
@@ -79,9 +79,6 @@ public:
 	DECLARE_WRITE32_MEMBER(esc_w);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_WRITE32_MEMBER(control_w);
-	DECLARE_READ32_MEMBER(waitskip_r);
-	DECLARE_READ32_MEMBER(sound020_r);
-	DECLARE_WRITE32_MEMBER(sound020_w);
 	DECLARE_READ32_MEMBER(le2_gun_H_r);
 	DECLARE_READ32_MEMBER(le2_gun_V_r);
 	DECLARE_READ32_MEMBER(type1_roz_r1);
@@ -98,8 +95,6 @@ public:
 	DECLARE_WRITE16_MEMBER(K053990_martchmp_word_w);
 	DECLARE_WRITE32_MEMBER(fantjour_dma_w);
 	DECLARE_WRITE32_MEMBER(konamigx_type3_psac2_bank_w);
-	DECLARE_WRITE32_MEMBER(konamigx_555_palette_w);
-	DECLARE_WRITE32_MEMBER(konamigx_555_palette2_w);
 	DECLARE_WRITE32_MEMBER(konamigx_tilebank_w);
 	DECLARE_WRITE32_MEMBER(konamigx_t1_psacmap_w);
 	DECLARE_WRITE32_MEMBER(konamigx_t4_psacmap_w);
@@ -130,7 +125,6 @@ public:
 	INTERRUPT_GEN_MEMBER(konamigx_type2_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_type2_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_type4_scanline);
-	INTERRUPT_GEN_MEMBER(tms_sync);
 	DECLARE_WRITE_LINE_MEMBER(k054539_irq_gen);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	TIMER_CALLBACK_MEMBER(boothack_callback);
@@ -199,6 +193,7 @@ public:
 	int m_gx_cfgport;
 	int m_suspension_active, m_resume_trigger;
 	int m_last_prot_op, m_last_prot_clk;
+	UINT8 m_prev_pixel_clock;
 
 	UINT8 m_esc_program[4096];
 	esc_cb m_esc_cb;
@@ -221,20 +216,21 @@ public:
 	UINT16 m_gx_wrport2;
 
 	// 2nd-Tier GX/MW Graphics Variables
-	UINT8 *m_gx_objzbuf, *m_gx_shdzbuf;
+	UINT8 *m_gx_objzbuf;
+	std::unique_ptr<UINT8[]> m_gx_shdzbuf;
 	int m_layer_colorbase[4];
 	INT32 m_gx_tilebanks[8], m_gx_oldbanks[8];
 	int m_gx_tilemode, m_gx_rozenable, m_psac_colorbase, m_last_psac_colorbase;
 	int m_gx_specialrozenable; // type 1 roz, with voxel height-map, rendered from 2 source tilemaps (which include height data) to temp bitmap for further processing
 	int m_gx_rushingheroes_hack;
-	int m_gx_le2_textcolour_hack;
+
 	tilemap_t *m_gx_psac_tilemap, *m_gx_psac_tilemap2;
-	bitmap_ind16 *m_type3_roz_temp_bitmap;
+	std::unique_ptr<bitmap_ind16> m_type3_roz_temp_bitmap;
 	tilemap_t *m_gx_psac_tilemap_alt;
 	int m_konamigx_has_dual_screen;
 	int m_konamigx_palformat;
-	bitmap_rgb32 *m_dualscreen_left_tempbitmap;
-	bitmap_rgb32 *m_dualscreen_right_tempbitmap;
+	std::unique_ptr<bitmap_rgb32> m_dualscreen_left_tempbitmap;
+	std::unique_ptr<bitmap_rgb32> m_dualscreen_right_tempbitmap;
 
 	/* On Type-1 the K053936 output is rendered to these temporary bitmaps as raw data
 	the 'voxel' effect to give the pixels height is a post-process operation on the
@@ -252,8 +248,8 @@ public:
 
 
 	*/
-	bitmap_ind16 *m_gxtype1_roz_dstbitmap;
-	bitmap_ind16 *m_gxtype1_roz_dstbitmap2;
+	std::unique_ptr<bitmap_ind16> m_gxtype1_roz_dstbitmap;
+	std::unique_ptr<bitmap_ind16> m_gxtype1_roz_dstbitmap2;
 	rectangle m_gxtype1_roz_dstbitmapclip;
 
 	int m_konamigx_type3_psac2_actual_bank;

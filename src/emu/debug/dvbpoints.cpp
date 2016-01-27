@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "debugger.h"
 #include "dvbpoints.h"
 
 

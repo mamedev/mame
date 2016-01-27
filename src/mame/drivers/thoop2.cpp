@@ -66,11 +66,11 @@ WRITE16_MEMBER(thoop2_state::thoop2_coin_w)
 		switch ((offset >> 3)){
 			case 0x00:  /* Coin Lockouts */
 			case 0x01:
-				coin_lockout_w(machine(), (offset >> 3) & 0x01, ~data & 0x01);
+				machine().bookkeeping().coin_lockout_w((offset >> 3) & 0x01, ~data & 0x01);
 				break;
 			case 0x02:  /* Coin Counters */
 			case 0x03:
-				coin_counter_w(machine(), (offset >> 3) & 0x01, data & 0x01);
+				machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01, data & 0x01);
 				break;
 		}
 	}
@@ -220,6 +220,9 @@ ROM_START( thoop2 )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE(    "th2c23.040",   0x000000, 0x080000, CRC(3e465753) SHA1(1ea1173b9fe5d652e7b5fafb822e2535cecbc198) )
 	ROM_LOAD16_BYTE(    "th2c22.040",   0x000001, 0x080000, CRC(837205b7) SHA1(f78b90c2be0b4dddaba26f074ea00eff863cfdb2) )
+
+	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_LOAD( "thoop2_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD( "th2-h8.32m",     0x000000, 0x400000, CRC(60328a11) SHA1(fcdb374d2fc7ef5351a4181c471d192199dc2081) )

@@ -349,11 +349,11 @@ void tms99xx_device::state_export(const device_state_entry &entry)
 /*
     state_string_export - export state as a string for the debugger
 */
-void tms99xx_device::state_string_export(const device_state_entry &entry, std::string &str)
+void tms99xx_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	static const char *statestr = "LAECOPX-----IIII";
 	char flags[17];
-	memset(flags, 0x00, ARRAY_LENGTH(flags));
+	for (auto &flag : flags) flag = 0x00;
 	UINT16 val = 0x8000;
 	if (entry.index()==STATE_GENFLAGS)
 	{
@@ -1039,7 +1039,7 @@ const tms99xx_device::tms_instruction tms99xx_device::s_command[] =
 void tms99xx_device::build_command_lookup_table()
 {
 	int i = 0;
-	int cmdindex = 0;
+	int cmdindex;
 	int bitcount;
 	const tms_instruction *inst;
 	UINT16 opcode;
@@ -1968,7 +1968,7 @@ void tms99xx_device::alu_f3()
 
 void tms99xx_device::alu_multiply()
 {
-	UINT32 result = 0;
+	UINT32 result;
 
 	switch (m_state)
 	{

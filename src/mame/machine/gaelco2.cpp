@@ -12,6 +12,7 @@
 #include "emu.h"
 #include "machine/eepromser.h"
 #include "includes/gaelco2.h"
+#include "chd.h"
 
 /***************************************************************************
 
@@ -141,33 +142,33 @@ DRIVER_INIT_MEMBER(gaelco2_state,snowboar)
 WRITE16_MEMBER(gaelco2_state::gaelco2_coin_w)
 {
 	/* Coin Lockouts */
-	coin_lockout_w(machine(), 0, ~data & 0x01);
-	coin_lockout_w(machine(), 1, ~data & 0x02);
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
 
 	/* Coin Counters */
-	coin_counter_w(machine(), 0, data & 0x04);
-	coin_counter_w(machine(), 1, data & 0x08);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
 WRITE16_MEMBER(gaelco2_state::gaelco2_coin2_w)
 {
 	/* coin counters */
-	coin_counter_w(machine(), offset & 0x01,  data & 0x01);
+	machine().bookkeeping().coin_counter_w(offset & 0x01,  data & 0x01);
 }
 
 WRITE16_MEMBER(wrally2_state::wrally2_coin_w)
 {
 	/* coin counters */
-	coin_counter_w(machine(), (offset >> 3) & 0x01,  data & 0x01);
+	machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01,  data & 0x01);
 }
 
 WRITE16_MEMBER(gaelco2_state::touchgo_coin_w)
 {
 	if ((offset >> 2) == 0){
-		coin_counter_w(machine(), 0, data & 0x01);
-		coin_counter_w(machine(), 1, data & 0x02);
-		coin_counter_w(machine(), 2, data & 0x04);
-		coin_counter_w(machine(), 3, data & 0x08);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
+		machine().bookkeeping().coin_counter_w(2, data & 0x04);
+		machine().bookkeeping().coin_counter_w(3, data & 0x08);
 	}
 }
 
@@ -286,25 +287,28 @@ WRITE16_MEMBER(gaelco2_state::gaelco2_eeprom_data_w)
 
 ***************************************************************************/
 
-
-/*
-    The game writes 2 values and then reads from a memory address.
-    If the read value is wrong, the game can crash in some places.
-    If we always return 0, the game doesn't crash but you can't see
-    the full intro (because it expects 0xffff somewhere).
-
-    The protection handles sound, controls, gameplay and some sprites
-*/
-
 READ16_MEMBER(gaelco2_state::snowboar_protection_r)
 {
-	logerror("%06x: protection read from %04x\n", space.device().safe_pc(), offset*2);
-	return 0x0000;
+	chd_file * table = machine().rom_load().get_disk_handle(":decrypt");
+	UINT8 temp[1024];
+	table->read_hunk(snowboard_latch>>9, &temp[0]);
+	UINT16 data = (temp[(snowboard_latch & 0x1ff)*2]<<8) | temp[((snowboard_latch & 0x1ff)*2)+1];
+
+	// TODO: replace above lookup (8GB table) with emulation of device
+
+	logerror("%06x: protection read (input %08x output %04x)\n", space.device().safe_pc(), snowboard_latch, data);
+
+
+	return data;
+
 }
 
 WRITE16_MEMBER(gaelco2_state::snowboar_protection_w)
 {
 	COMBINE_DATA(&m_snowboar_protection[offset]);
+
+	snowboard_latch = (snowboard_latch << 16) | data;
+
 	logerror("%06x: protection write %04x to %04x\n", space.device().safe_pc(), data, offset*2);
 
 }

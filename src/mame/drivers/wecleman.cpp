@@ -18,7 +18,7 @@ Hot Chase:
 - Sound BGMs are regressed (hiccups badly);
 - Samples pitch is too low, for instance game over speech;
 Common Issues:
-- Too many hacks with protection/blitter/colors. 
+- Too many hacks with protection/blitter/colors.
   Additionally, there's a bug report that claims that current arrangement is broken for later levels in WEC Le Mans.
   007643 / 007645 could do with a rewrite, in short.
 - One ROM unused (32K in hotchase, 16K in wecleman)
@@ -676,7 +676,7 @@ WRITE8_MEMBER(wecleman_state::hotchase_sound_control_w)
 		    offset 00000xxx----- channel select (0:channel 0, 1:channel 1)
 		    ++------ chip select ( 0:chip 1, 1:chip2, 2:chip3)
 		    data&0x0f left volume  (data>>4)&0x0f right volume
-			*/
+		    */
 		case 0x0:
 		case 0x1:
 			m_k007232_1->set_volume( offset&1,  (data&0x0f) * 0x08, (data>>4) * 0x08 );

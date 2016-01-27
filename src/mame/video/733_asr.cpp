@@ -111,7 +111,7 @@ void asr733_device::device_start()
 	const rectangle &visarea = screen->visible_area();
 
 	m_last_key_pressed = 0x80;
-	m_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
+	m_bitmap = std::make_unique<bitmap_ind16>(width, height);
 
 	m_bitmap->fill(0, visarea);
 

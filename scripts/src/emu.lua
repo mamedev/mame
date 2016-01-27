@@ -15,6 +15,7 @@ uuid ("e6fa15e4-a354-4526-acef-13c8e80fcacf")
 kind (LIBTYPE)
 
 addprojectflags()
+precompiledheaders()
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -48,6 +49,8 @@ files {
 	MAME_DIR .. "src/emu/attotime.h",
 	MAME_DIR .. "src/emu/audit.cpp",
 	MAME_DIR .. "src/emu/audit.h",
+	MAME_DIR .. "src/emu/bookkeeping.cpp",
+	MAME_DIR .. "src/emu/bookkeeping.h",
 	MAME_DIR .. "src/emu/cheat.cpp",
 	MAME_DIR .. "src/emu/cheat.h",
 	MAME_DIR .. "src/emu/clifront.cpp",
@@ -271,8 +274,6 @@ files {
 	MAME_DIR .. "src/devices/machine/buffer.h",
 	MAME_DIR .. "src/devices/machine/clock.cpp",
 	MAME_DIR .. "src/devices/machine/clock.h",
-	MAME_DIR .. "src/emu/machine/generic.cpp",
-	MAME_DIR .. "src/emu/machine/generic.h",
 	MAME_DIR .. "src/devices/machine/keyboard.cpp",
 	MAME_DIR .. "src/devices/machine/keyboard.h",
 	MAME_DIR .. "src/devices/machine/laserdsc.cpp",
@@ -365,3 +366,30 @@ custombuildtask {
 	layoutbuildtask("emu/layout", "noscreens"),
 	layoutbuildtask("emu/layout", "snap"),
 }
+
+project ("precompile")
+targetsubdir(_OPTIONS["target"] .."_" .. _OPTIONS["subtarget"])
+uuid ("a6fb15d4-b123-4445-acef-13c8e80fcacf")
+kind (LIBTYPE)
+
+addprojectflags()
+precompiledheaders()
+
+includedirs {
+	MAME_DIR .. "src/osd",
+	MAME_DIR .. "src/emu",
+	MAME_DIR .. "src/devices", -- till deps are fixed
+	MAME_DIR .. "src/lib",
+	MAME_DIR .. "src/lib/util",
+	MAME_DIR .. "3rdparty",
+	GEN_DIR  .. "emu",
+	GEN_DIR  .. "emu/layout",
+}
+files {
+	MAME_DIR .. "src/emu/drivers/empty.cpp",
+}
+dependency {
+	{ "$(OBJDIR)/src/emu/drivers/empty.o", "$(GCH)", true  },
+}
+
+

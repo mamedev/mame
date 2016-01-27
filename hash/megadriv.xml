@@ -24757,12 +24757,23 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="stargatep" cloneof="stargate">
-		<description>Stargate (Euro, Prototype)</description>
+		<description>Stargate (Euro, Prototype, older)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="stargate (euro) (beta).bin" size="2097152" crc="8dc8ab23" sha1="95a0dab802a313281d74fe66b21c7877078c57e9" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stargatepa" cloneof="stargate">
+		<description>Stargate (Prototype)</description>
+		<year>1994</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="Stargate.98DC.bin" size="2097152" crc="51946ea9" sha1="92bee364d23fc28d9f976037d3420767c4f97d68" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -26675,6 +26686,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<feature name="ic1" value="MPR-18552-U"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="mpr-18552-u.ic1" size="4194304" crc="829fe313" sha1="49be571cd943fd594949c318a0bdbe6263fdd512" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystoryp" cloneof="toystory">
+		<description>Toy Story (USA, prototype)</description>
+		<year>1996</year>
+		<publisher>Disney Interactive</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="ExecuteDemo1.9F79.bin" size="4194304" crc="9321bec1" sha1="7932c7de237ca333750b98ff3d2832c5f65be851" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>

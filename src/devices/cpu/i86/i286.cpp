@@ -277,12 +277,12 @@ void i80286_cpu_device::device_start()
 	m_out_shutdown_func.resolve_safe();
 }
 
-void i80286_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void i80286_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
 		case STATE_GENPC:
-			strprintf(str, "%08X", pc());
+			strprintf(str, "%08X", m_base[CS] + m_ip);
 			break;
 
 		case STATE_GENFLAGS:
@@ -1970,7 +1970,7 @@ UINT16 i80286_cpu_device::far_return(int iret, int bytes)
 
 void i80286_cpu_device::check_permission(UINT8 check_seg, UINT32 offset, UINT16 size, int operation)
 {
-	int trap = 0;
+	int trap;
 	UINT8 rights;
 	if(PM)
 	{

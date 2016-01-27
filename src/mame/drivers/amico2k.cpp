@@ -106,7 +106,7 @@ TIMER_CALLBACK_MEMBER(amico2k_state::led_refresh)
 {
 	if (m_ls145_p > 3)
 	{
-		output_set_digit_value(m_ls145_p - 4, m_segment);
+		output().set_digit_value(m_ls145_p - 4, m_segment);
 	}
 }
 

@@ -55,8 +55,8 @@ private:
 	const address_space_config      m_videoram_space_config;
 	const address_space_config      m_paletteram_space_config;
 	UINT8 m_status;
-	UINT8 *m_ram;
-	UINT8 *m_palram;
+	std::unique_ptr<UINT8[]> m_ram;
+	std::unique_ptr<UINT8[]> m_palram;
 	UINT16 m_param_offset_latch;
 
 	INT16 m_xpos, m_ypos;

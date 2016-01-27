@@ -301,13 +301,13 @@ again:
 	}
 
 	// handle keys
-	if (ui_input_pressed(machine, IPT_UI_SELECT))
+	if (machine.ui_input().pressed(IPT_UI_SELECT))
 	{
 		state.mode = (state.mode + 1) % 3;
 		state.bitmap_dirty = true;
 	}
 
-	if (ui_input_pressed(machine, IPT_UI_PAUSE))
+	if (machine.ui_input().pressed(IPT_UI_PAUSE))
 	{
 		if (machine.paused())
 			machine.resume();
@@ -315,7 +315,7 @@ again:
 			machine.pause();
 	}
 
-	if (ui_input_pressed(machine, IPT_UI_CANCEL) || ui_input_pressed(machine, IPT_UI_SHOW_GFX))
+	if (machine.ui_input().pressed(IPT_UI_CANCEL) || machine.ui_input().pressed(IPT_UI_SHOW_GFX))
 		goto cancel;
 
 	return uistate;
@@ -481,9 +481,9 @@ static void palette_handle_keys(running_machine &machine, ui_gfx_state &state)
 	int total;
 
 	// handle zoom (minus,plus)
-	if (ui_input_pressed(machine, IPT_UI_ZOOM_OUT))
+	if (machine.ui_input().pressed(IPT_UI_ZOOM_OUT))
 		state.palette.columns /= 2;
-	if (ui_input_pressed(machine, IPT_UI_ZOOM_IN))
+	if (machine.ui_input().pressed(IPT_UI_ZOOM_IN))
 		state.palette.columns *= 2;
 
 	// clamp within range
@@ -493,7 +493,7 @@ static void palette_handle_keys(running_machine &machine, ui_gfx_state &state)
 		state.palette.columns = 64;
 
 	// handle colormap selection (open bracket,close bracket)
-	if (ui_input_pressed(machine, IPT_UI_PREV_GROUP))
+	if (machine.ui_input().pressed(IPT_UI_PREV_GROUP))
 	{
 		if (state.palette.which)
 			state.palette.which = 0;
@@ -505,7 +505,7 @@ static void palette_handle_keys(running_machine &machine, ui_gfx_state &state)
 			state.palette.which = (palette->indirect_entries() > 0);
 		}
 	}
-	if (ui_input_pressed(machine, IPT_UI_NEXT_GROUP))
+	if (machine.ui_input().pressed(IPT_UI_NEXT_GROUP))
 	{
 		if (!state.palette.which && palette->indirect_entries() > 0)
 			state.palette.which = 1;
@@ -526,17 +526,17 @@ static void palette_handle_keys(running_machine &machine, ui_gfx_state &state)
 	screencount = rowcount * rowcount;
 
 	// handle keyboard navigation
-	if (ui_input_pressed_repeat(machine, IPT_UI_UP, 4))
+	if (machine.ui_input().pressed_repeat(IPT_UI_UP, 4))
 		state.palette.offset -= rowcount;
-	if (ui_input_pressed_repeat(machine, IPT_UI_DOWN, 4))
+	if (machine.ui_input().pressed_repeat(IPT_UI_DOWN, 4))
 		state.palette.offset += rowcount;
-	if (ui_input_pressed_repeat(machine, IPT_UI_PAGE_UP, 6))
+	if (machine.ui_input().pressed_repeat(IPT_UI_PAGE_UP, 6))
 		state.palette.offset -= screencount;
-	if (ui_input_pressed_repeat(machine, IPT_UI_PAGE_DOWN, 6))
+	if (machine.ui_input().pressed_repeat(IPT_UI_PAGE_DOWN, 6))
 		state.palette.offset += screencount;
-	if (ui_input_pressed_repeat(machine, IPT_UI_HOME, 4))
+	if (machine.ui_input().pressed_repeat(IPT_UI_HOME, 4))
 		state.palette.offset = 0;
-	if (ui_input_pressed_repeat(machine, IPT_UI_END, 4))
+	if (machine.ui_input().pressed_repeat(IPT_UI_END, 4))
 		state.palette.offset = total;
 
 	// clamp within range
@@ -731,7 +731,7 @@ static void gfxset_handler(running_machine &machine, render_container *container
 static void gfxset_handle_keys(running_machine &machine, ui_gfx_state &state, int xcells, int ycells)
 {
 	// handle gfxset selection (open bracket,close bracket)
-	if (ui_input_pressed(machine, IPT_UI_PREV_GROUP))
+	if (machine.ui_input().pressed(IPT_UI_PREV_GROUP))
 	{
 		if (state.gfxset.set > 0)
 			state.gfxset.set--;
@@ -742,7 +742,7 @@ static void gfxset_handle_keys(running_machine &machine, ui_gfx_state &state, in
 		}
 		state.bitmap_dirty = true;
 	}
-	if (ui_input_pressed(machine, IPT_UI_NEXT_GROUP))
+	if (machine.ui_input().pressed(IPT_UI_NEXT_GROUP))
 	{
 		if (state.gfxset.set < state.gfxdev[state.gfxset.devindex].setcount - 1)
 			state.gfxset.set++;
@@ -761,10 +761,10 @@ static void gfxset_handle_keys(running_machine &machine, ui_gfx_state &state, in
 	gfx_element &gfx = *info.interface->gfx(set);
 
 	// handle cells per line (minus,plus)
-	if (ui_input_pressed(machine, IPT_UI_ZOOM_OUT))
+	if (machine.ui_input().pressed(IPT_UI_ZOOM_OUT))
 	{ info.columns[set] = xcells - 1; state.bitmap_dirty = true; }
 
-	if (ui_input_pressed(machine, IPT_UI_ZOOM_IN))
+	if (machine.ui_input().pressed(IPT_UI_ZOOM_IN))
 	{ info.columns[set] = xcells + 1; state.bitmap_dirty = true; }
 
 	// clamp within range
@@ -774,24 +774,24 @@ static void gfxset_handle_keys(running_machine &machine, ui_gfx_state &state, in
 	{ info.columns[set] = 128; state.bitmap_dirty = true; }
 
 	// handle rotation (R)
-	if (ui_input_pressed(machine, IPT_UI_ROTATE))
+	if (machine.ui_input().pressed(IPT_UI_ROTATE))
 	{
 		info.rotate[set] = orientation_add(ROT90, info.rotate[set]);
 		state.bitmap_dirty = true;
 	}
 
 	// handle navigation within the cells (up,down,pgup,pgdown)
-	if (ui_input_pressed_repeat(machine, IPT_UI_UP, 4))
+	if (machine.ui_input().pressed_repeat(IPT_UI_UP, 4))
 	{ info.offset[set] -= xcells; state.bitmap_dirty = true; }
-	if (ui_input_pressed_repeat(machine, IPT_UI_DOWN, 4))
+	if (machine.ui_input().pressed_repeat(IPT_UI_DOWN, 4))
 	{ info.offset[set] += xcells; state.bitmap_dirty = true; }
-	if (ui_input_pressed_repeat(machine, IPT_UI_PAGE_UP, 6))
+	if (machine.ui_input().pressed_repeat(IPT_UI_PAGE_UP, 6))
 	{ info.offset[set] -= xcells * ycells; state.bitmap_dirty = true; }
-	if (ui_input_pressed_repeat(machine, IPT_UI_PAGE_DOWN, 6))
+	if (machine.ui_input().pressed_repeat(IPT_UI_PAGE_DOWN, 6))
 	{ info.offset[set] += xcells * ycells; state.bitmap_dirty = true; }
-	if (ui_input_pressed_repeat(machine, IPT_UI_HOME, 4))
+	if (machine.ui_input().pressed_repeat(IPT_UI_HOME, 4))
 	{ info.offset[set] = 0; state.bitmap_dirty = true; }
-	if (ui_input_pressed_repeat(machine, IPT_UI_END, 4))
+	if (machine.ui_input().pressed_repeat(IPT_UI_END, 4))
 	{ info.offset[set] = gfx.elements(); state.bitmap_dirty = true; }
 
 	// clamp within range
@@ -804,9 +804,9 @@ static void gfxset_handle_keys(running_machine &machine, ui_gfx_state &state, in
 	{ info.offset[set] = 0; state.bitmap_dirty = true; }
 
 	// handle color selection (left,right)
-	if (ui_input_pressed_repeat(machine, IPT_UI_LEFT, 4))
+	if (machine.ui_input().pressed_repeat(IPT_UI_LEFT, 4))
 	{ info.color[set] -= 1; state.bitmap_dirty = true; }
-	if (ui_input_pressed_repeat(machine, IPT_UI_RIGHT, 4))
+	if (machine.ui_input().pressed_repeat(IPT_UI_RIGHT, 4))
 	{ info.color[set] += 1; state.bitmap_dirty = true; }
 
 	// clamp within range
@@ -904,7 +904,7 @@ static void gfxset_draw_item(running_machine &machine, gfx_element &gfx, int ind
 {
 	int width = (rotate & ORIENTATION_SWAP_XY) ? gfx.height() : gfx.width();
 	int height = (rotate & ORIENTATION_SWAP_XY) ? gfx.width() : gfx.height();
-	const rgb_t *palette = gfx.palette()->palette()->entry_list_raw() + gfx.colorbase() + color * gfx.granularity();
+	const rgb_t *palette = gfx.palette().palette()->entry_list_raw() + gfx.colorbase() + color * gfx.granularity();
 	int x, y;
 
 	// loop over rows in the cell
@@ -1073,9 +1073,9 @@ static void tilemap_handle_keys(running_machine &machine, ui_gfx_state &state, i
 	int step;
 
 	// handle tilemap selection (open bracket,close bracket)
-	if (ui_input_pressed(machine, IPT_UI_PREV_GROUP) && state.tilemap.which > 0)
+	if (machine.ui_input().pressed(IPT_UI_PREV_GROUP) && state.tilemap.which > 0)
 	{ state.tilemap.which--; state.bitmap_dirty = true; }
-	if (ui_input_pressed(machine, IPT_UI_NEXT_GROUP) && state.tilemap.which < machine.tilemap().count() - 1)
+	if (machine.ui_input().pressed(IPT_UI_NEXT_GROUP) && state.tilemap.which < machine.tilemap().count() - 1)
 	{ state.tilemap.which++; state.bitmap_dirty = true; }
 
 	// cache some info in locals
@@ -1084,7 +1084,7 @@ static void tilemap_handle_keys(running_machine &machine, ui_gfx_state &state, i
 	mapheight = tilemap->height();
 
 	// handle zoom (minus,plus)
-	if (ui_input_pressed(machine, IPT_UI_ZOOM_OUT) && state.tilemap.zoom > 0)
+	if (machine.ui_input().pressed(IPT_UI_ZOOM_OUT) && state.tilemap.zoom > 0)
 	{
 		state.tilemap.zoom--;
 		state.bitmap_dirty = true;
@@ -1093,7 +1093,7 @@ static void tilemap_handle_keys(running_machine &machine, ui_gfx_state &state, i
 		else
 			machine.popmessage("Zoom Auto");
 	}
-	if (ui_input_pressed(machine, IPT_UI_ZOOM_IN) && state.tilemap.zoom < 8)
+	if (machine.ui_input().pressed(IPT_UI_ZOOM_IN) && state.tilemap.zoom < 8)
 	{
 		state.tilemap.zoom++;
 		state.bitmap_dirty = true;
@@ -1101,7 +1101,7 @@ static void tilemap_handle_keys(running_machine &machine, ui_gfx_state &state, i
 	}
 
 	// handle rotation (R)
-	if (ui_input_pressed(machine, IPT_UI_ROTATE))
+	if (machine.ui_input().pressed(IPT_UI_ROTATE))
 	{
 		state.tilemap.rotate = orientation_add(ROT90, state.tilemap.rotate);
 		state.bitmap_dirty = true;
@@ -1111,13 +1111,13 @@ static void tilemap_handle_keys(running_machine &machine, ui_gfx_state &state, i
 	step = 8;
 	if (machine.input().code_pressed(KEYCODE_LSHIFT)) step = 1;
 	if (machine.input().code_pressed(KEYCODE_LCONTROL)) step = 64;
-	if (ui_input_pressed_repeat(machine, IPT_UI_UP, 4))
+	if (machine.ui_input().pressed_repeat(IPT_UI_UP, 4))
 	{ state.tilemap.yoffs -= step; state.bitmap_dirty = true; }
-	if (ui_input_pressed_repeat(machine, IPT_UI_DOWN, 4))
+	if (machine.ui_input().pressed_repeat(IPT_UI_DOWN, 4))
 	{ state.tilemap.yoffs += step; state.bitmap_dirty = true; }
-	if (ui_input_pressed_repeat(machine, IPT_UI_LEFT, 6))
+	if (machine.ui_input().pressed_repeat(IPT_UI_LEFT, 6))
 	{ state.tilemap.xoffs -= step; state.bitmap_dirty = true; }
-	if (ui_input_pressed_repeat(machine, IPT_UI_RIGHT, 6))
+	if (machine.ui_input().pressed_repeat(IPT_UI_RIGHT, 6))
 	{ state.tilemap.xoffs += step; state.bitmap_dirty = true; }
 
 	// clamp within range

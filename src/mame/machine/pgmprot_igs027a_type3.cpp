@@ -69,7 +69,7 @@ WRITE32_MEMBER(pgm_arm_type3_state::svg_arm7_shareram_w )
 READ16_MEMBER(pgm_arm_type3_state::svg_m68k_ram_r )
 {
 	int ram_sel = (m_svg_ram_sel & 1) ^ 1;
-	UINT16 *share16 = (UINT16 *)(m_svg_shareram[ram_sel & 1]);
+	UINT16 *share16 = (UINT16 *)(m_svg_shareram[ram_sel & 1].get());
 
 	return share16[BYTE_XOR_LE(offset)];
 }
@@ -77,7 +77,7 @@ READ16_MEMBER(pgm_arm_type3_state::svg_m68k_ram_r )
 WRITE16_MEMBER(pgm_arm_type3_state::svg_m68k_ram_w )
 {
 	int ram_sel = (m_svg_ram_sel & 1) ^ 1;
-	UINT16 *share16 = (UINT16 *)(m_svg_shareram[ram_sel & 1]);
+	UINT16 *share16 = (UINT16 *)(m_svg_shareram[ram_sel & 1].get());
 
 	COMBINE_DATA(&share16[BYTE_XOR_LE(offset)]);
 }
@@ -207,12 +207,12 @@ MACHINE_CONFIG_END
 void pgm_arm_type3_state::svg_basic_init()
 {
 	pgm_basic_init();
-	m_svg_shareram[0] = auto_alloc_array(machine(), UINT32, 0x20000 / 4);
-	m_svg_shareram[1] = auto_alloc_array(machine(), UINT32, 0x20000 / 4);
+	m_svg_shareram[0] = std::make_unique<UINT32[]>(0x20000 / 4);
+	m_svg_shareram[1] = std::make_unique<UINT32[]>(0x20000 / 4);
 	m_svg_ram_sel = 0;
 
-	save_pointer(NAME(m_svg_shareram[0]), 0x20000 / 4);
-	save_pointer(NAME(m_svg_shareram[1]), 0x20000 / 4);
+	save_pointer(NAME(m_svg_shareram[0].get()), 0x20000 / 4);
+	save_pointer(NAME(m_svg_shareram[1].get()), 0x20000 / 4);
 	save_item(NAME(m_svg_ram_sel));
 }
 
@@ -719,9 +719,9 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,dmnfrnt)
 	// we have to copy it to both shared ram regions because it reads from a different one before the attract story?
 	// could be a timing error? or shared ram behavior isn't how we think it is?
 	UINT16 *share16;
-	share16 = (UINT16 *)(m_svg_shareram[1]);
+	share16 = (UINT16 *)(m_svg_shareram[1].get());
 	share16[0x158/2] = 0x0005;
-	share16 = (UINT16 *)(m_svg_shareram[0]);
+	share16 = (UINT16 *)(m_svg_shareram[0].get());
 	share16[0x158/2] = 0x0005;
 }
 

@@ -70,8 +70,8 @@ void dogfgt_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dogfgt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	m_bitmapram = auto_alloc_array(machine(), UINT8, BITMAPRAM_SIZE);
-	save_pointer(NAME(m_bitmapram), BITMAPRAM_SIZE);
+	m_bitmapram = std::make_unique<UINT8[]>(BITMAPRAM_SIZE);
+	save_pointer(NAME(m_bitmapram.get()), BITMAPRAM_SIZE);
 
 	m_screen->register_screen_bitmap(m_pixbitmap);
 	save_item(NAME(m_pixbitmap));
@@ -154,8 +154,8 @@ WRITE8_MEMBER(dogfgt_state::dogfgt_1800_w)
 	m_pixcolor = ((data & 0x01) << 1) | ((data & 0x02) >> 1);
 
 	/* bits 4 and 5 are coin counters */
-	coin_counter_w(machine(), 0, data & 0x10);
-	coin_counter_w(machine(), 1, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 
 	/* bit 7 is screen flip */
 	flip_screen_set(data & 0x80);

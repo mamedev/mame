@@ -409,8 +409,8 @@ bool intv_cart_slot_device::call_load()
 			if (m_type == INTV_WSMLB)
 				extra_bank = true;
 
-			UINT32 size = 0;
-			UINT16 address = 0;
+			UINT32 size;
+			UINT16 address;
 			UINT8 *ROM, *region;
 
 			m_cart->rom_alloc(extra_bank ? 0x22000 : 0x20000, tag());
@@ -450,7 +450,7 @@ bool intv_cart_slot_device::call_load()
 
 bool intv_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 	return TRUE;
 }
 
@@ -459,11 +459,11 @@ bool intv_cart_slot_device::call_softlist_load(software_list_device &swlist, con
  get default card software
  -------------------------------------------------*/
 
-void intv_cart_slot_device::get_default_card_software(std::string &result)
+std::string intv_cart_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "intv_rom";
+		const char *slot_string;
 		UINT32 len = core_fsize(m_file);
 		dynamic_buffer rom(len);
 		int type = INTV_STD;
@@ -503,10 +503,9 @@ void intv_cart_slot_device::get_default_card_software(std::string &result)
 		//printf("type: %s\n", slot_string);
 		clear();
 
-		result.assign(slot_string);
-		return;
+		return std::string(slot_string);
 	}
-	software_get_default_slot(result, "intv_rom");
+	return software_get_default_slot("intv_rom");
 }
 
 /*-------------------------------------------------

@@ -315,21 +315,21 @@ WRITE8_MEMBER( ltd_state::port1_w )
 				if (m_clear)
 				{
 					if (row>7)
-						output_set_digit_value(row+2, segment); // P2
+						output().set_digit_value(row+2, segment); // P2
 					else
-						output_set_digit_value(row, segment); // P1
+						output().set_digit_value(row, segment); // P1
 				}
 				break;
 			case 8:
 				if (m_clear)
 				{
 					if (row>13)
-						output_set_digit_value(row+26, segment); // credits / ball
+						output().set_digit_value(row+26, segment); // credits / ball
 					else
 					if (row>7)
-						output_set_digit_value(row+22, segment); // P4
+						output().set_digit_value(row+22, segment); // P4
 					else
-						output_set_digit_value(row+20, segment); // P3
+						output().set_digit_value(row+20, segment); // P3
 				}
 				break;
 		}
@@ -370,8 +370,8 @@ DRIVER_INIT_MEMBER( ltd_state, ltd )
 DRIVER_INIT_MEMBER( ltd_state, atla_ltd )
 {
 	m_game = 1;
-	output_set_digit_value(0, 0x3f);
-	output_set_digit_value(10, 0x3f);
+	output().set_digit_value(0, 0x3f);
+	output().set_digit_value(10, 0x3f);
 }
 
 DRIVER_INIT_MEMBER( ltd_state, bhol_ltd )
@@ -401,24 +401,24 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 				switch(m_out_offs-0x60)
 				{
 					case 0:
-						output_set_digit_value(1, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(2, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(1, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(2, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 					case 1:
-						output_set_digit_value(11, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(12, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(11, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(12, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 					case 2:
-						output_set_digit_value(3, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(4, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(3, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(4, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 					case 3:
-						output_set_digit_value(13, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(14, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(13, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(14, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 					case 8:
-						output_set_digit_value(41, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(40, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(41, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(40, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 				}
 				break;
@@ -428,32 +428,32 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 				switch(m_out_offs-0x60)
 				{
 					case 0:
-						output_set_digit_value(0, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(1, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(0, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(1, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 					case 1:
-						output_set_digit_value(10, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(11, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(10, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(11, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 					case 2:
-						output_set_digit_value(2, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(3, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(2, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(3, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 					case 3:
-						output_set_digit_value(12, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(13, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(12, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(13, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 					case 4:
-						output_set_digit_value(4, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(5, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(4, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(5, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 					case 5:
-						output_set_digit_value(14, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(15, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(14, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(15, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 					case 8:
-						output_set_digit_value(41, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(40, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(41, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(40, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 				}
 				break;
@@ -463,44 +463,44 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 				switch(m_out_offs-0x60)
 				{
 					case 0:
-						output_set_digit_value(0, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(1, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(0, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(1, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 					case 1:
-						output_set_digit_value(2, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(3, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(2, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(3, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 					case 2:
-						output_set_digit_value(4, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(5, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(4, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(5, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 					case 3:
-						output_set_digit_value(10, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(11, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(10, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(11, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 					case 4:
-						output_set_digit_value(12, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(13, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(12, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(13, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 					case 5:
-						output_set_digit_value(14, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(15, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(14, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(15, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 					case 6:
-						output_set_digit_value(20, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(21, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(20, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(21, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 					case 7:
-						output_set_digit_value(22, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(23, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(22, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(23, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 					case 8:
-						output_set_digit_value(24, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(25, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(24, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(25, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 					case 9:
-						output_set_digit_value(40, patterns[m_p_ram[m_out_offs]&15]);
-						output_set_digit_value(41, patterns[m_p_ram[m_out_offs]>>4]);
+						output().set_digit_value(40, patterns[m_p_ram[m_out_offs]&15]);
+						output().set_digit_value(41, patterns[m_p_ram[m_out_offs]>>4]);
 						break;
 				}
 				break;

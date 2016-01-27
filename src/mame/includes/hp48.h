@@ -69,7 +69,7 @@ public:
 	*/
 	UINT32 m_port_size[2];
 	UINT8 m_port_write[2];
-	UINT8* m_port_data[2];
+	std::unique_ptr<UINT8[]> m_port_data[2];
 
 	UINT32 m_bank_switch;
 	UINT32 m_io_addr;
@@ -97,7 +97,6 @@ public:
 	DECLARE_WRITE8_MEMBER(hp49_bank_w);
 	TIMER_CALLBACK_MEMBER(hp48_rs232_byte_recv_cb);
 	TIMER_CALLBACK_MEMBER(hp48_rs232_byte_sent_cb);
-	TIMER_CALLBACK_MEMBER(hp48_chardev_byte_recv_cb);
 	TIMER_CALLBACK_MEMBER(hp48_kbd_cb);
 	TIMER_CALLBACK_MEMBER(hp48_timer1_cb);
 	TIMER_CALLBACK_MEMBER(hp48_timer2_cb);

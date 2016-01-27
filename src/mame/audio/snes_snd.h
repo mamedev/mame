@@ -97,7 +97,7 @@ private:
 	void state_register();
 
 	// internal state
-	UINT8                   *m_ram;
+	std::unique_ptr<UINT8[]>                   m_ram;
 	sound_stream            *m_channel;
 	UINT8                   m_dsp_regs[256];      /* DSP registers */
 	UINT8                   m_ipl_region[64];     /* SPC top 64 bytes */

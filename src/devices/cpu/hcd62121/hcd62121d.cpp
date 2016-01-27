@@ -131,7 +131,9 @@ static const hcd62121_dasm hcd62121_ops[256] =
 
 CPU_DISASSEMBLE( hcd62121 )
 {
-	UINT8 op, op1=0, op2=0;
+	UINT8 op;
+	UINT8 op1;
+	UINT8 op2;
 	int pos = 0;
 	const hcd62121_dasm *inst;
 

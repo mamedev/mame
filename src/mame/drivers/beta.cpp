@@ -155,7 +155,7 @@ TIMER_CALLBACK_MEMBER(beta_state::led_refresh)
 {
 	if (m_ls145_p < 6)
 	{
-		output_set_digit_value(m_ls145_p, m_segment);
+		output().set_digit_value(m_ls145_p, m_segment);
 	}
 }
 
@@ -253,10 +253,10 @@ WRITE8_MEMBER( beta_state::riot_pb_w )
 	m_speaker->level_w(!BIT(data, 4));
 
 	/* address led */
-	output_set_led_value(0, BIT(data, 5));
+	output().set_led_value(0, BIT(data, 5));
 
 	/* data led */
-	output_set_led_value(1, !BIT(data, 5));
+	output().set_led_value(1, !BIT(data, 5));
 
 	/* EPROM address shift */
 	if (!BIT(m_old_data, 5) && BIT(data, 5))

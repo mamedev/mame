@@ -496,14 +496,14 @@ void fd1094_init_debugging(running_machine &machine, const char *cpureg, const c
 	assert(coderegion_words == keystatus_words);
 
 	/* allocate memory for the ignore table */
-	ignorepc = auto_alloc_array_clear(machine, UINT8, 1 << 23);
+	ignorepc = make_unique_clear<UINT8>(1 << 23);
 
 	/* allocate memory for the undo buffer */
-	undobuff = auto_alloc_array(machine, UINT8, keystatus_words * 2);
+	undobuff = std::make_unique<UINT8[]>(keystatus_words * 2);
 	memcpy(undobuff, keystatus, keystatus_words * 2);
 
 	/* allocate memory for the possible seeds array */
-	possible_seed = auto_alloc_array(machine, UINT32, 65536);
+	possible_seed = std::make_unique<UINT32[]>(65536);
 
 	/* build the opcode table */
 	build_optable(machine);

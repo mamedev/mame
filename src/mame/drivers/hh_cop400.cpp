@@ -149,7 +149,7 @@ void hh_cop400_state::display_update()
 		if (m_display_cache[y] != active_state[y])
 		{
 			if (m_display_segmask[y] != 0)
-				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
+				output().set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
 			for (int x = 0; x <= m_display_maxx; x++)
@@ -169,8 +169,8 @@ void hh_cop400_state::display_update()
 					sprintf(buf1, "lamp%d", y * mul + x);
 					sprintf(buf2, "%d.%d", y, x);
 				}
-				output_set_value(buf1, state);
-				output_set_value(buf2, state);
+				output().set_value(buf1, state);
+				output().set_value(buf2, state);
 			}
 		}
 
@@ -262,8 +262,6 @@ static MACHINE_CONFIG_START( ctstein, ctstein_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
 //  MCFG_DEFAULT_LAYOUT(layout_ctstein)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -381,8 +379,6 @@ static MACHINE_CONFIG_START( einvaderc, einvaderc_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_einvaderc)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -490,8 +486,6 @@ static MACHINE_CONFIG_START( funjacks, funjacks_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_funjacks)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -524,7 +518,6 @@ public:
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_WRITE8_MEMBER(write_g);
-	DECLARE_READ8_MEMBER(read_g);
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 };
@@ -588,8 +581,6 @@ static MACHINE_CONFIG_START( funrlgl, funrlgl_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_funrlgl)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -632,10 +623,7 @@ static MACHINE_CONFIG_START( plus1, plus1_state )
 	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K to +5V, C=100pf to GND
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_ENABLED) // guessed
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-//  MCFG_DEFAULT_LAYOUT(layout_plus1)
-
-	/* no video! */
+	/* no visual feedback! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -773,8 +761,6 @@ static MACHINE_CONFIG_START( lightfgt, lightfgt_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_lightfgt)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

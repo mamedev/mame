@@ -46,7 +46,7 @@ INPUT_CHANGED_MEMBER(firetrk_state::gear_changed)
 	if (newval)
 	{
 		m_gear = (FPTR)param;
-		output_set_value("P1gear", m_gear+1);
+		output().set_value("P1gear", m_gear+1);
 	}
 }
 
@@ -69,24 +69,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(firetrk_state::firetrk_scanline)
 WRITE8_MEMBER(firetrk_state::firetrk_output_w)
 {
 	/* BIT0 => START1 LAMP */
-	set_led_status(machine(), 0, !(data & 0x01));
+	output().set_led_value(0, !(data & 0x01));
 
 	/* BIT1 => START2 LAMP */
-	set_led_status(machine(), 1, !(data & 0x02));
+	output().set_led_value(1, !(data & 0x02));
 
 	/* BIT2 => FLASH       */
 	m_flash = data & 0x04;
 
 	/* BIT3 => TRACK LAMP  */
-	set_led_status(machine(), 3, !(data & 0x08));
+	output().set_led_value(3, !(data & 0x08));
 
 	/* BIT4 => ATTRACT     */
 	m_discrete->write(space, FIRETRUCK_ATTRACT_EN, data & 0x10);
-	coin_lockout_w(machine(), 0, !(data & 0x10));
-	coin_lockout_w(machine(), 1, !(data & 0x10));
+	machine().bookkeeping().coin_lockout_w(0, !(data & 0x10));
+	machine().bookkeeping().coin_lockout_w(1, !(data & 0x10));
 
 	/* BIT5 => START3 LAMP */
-	set_led_status(machine(), 2, !(data & 0x20));
+	output().set_led_value(2, !(data & 0x20));
 
 	/* BIT6 => UNUSED      */
 
@@ -98,28 +98,28 @@ WRITE8_MEMBER(firetrk_state::firetrk_output_w)
 WRITE8_MEMBER(firetrk_state::superbug_output_w)
 {
 	/* BIT0 => START LAMP */
-	set_led_status(machine(), 0, offset & 0x01);
+	output().set_led_value(0, offset & 0x01);
 
 	/* BIT1 => ATTRACT    */
 	m_discrete->write(space, SUPERBUG_ATTRACT_EN, offset & 0x02);
-	coin_lockout_w(machine(), 0, !(offset & 0x02));
-	coin_lockout_w(machine(), 1, !(offset & 0x02));
+	machine().bookkeeping().coin_lockout_w(0, !(offset & 0x02));
+	machine().bookkeeping().coin_lockout_w(1, !(offset & 0x02));
 
 	/* BIT2 => FLASH      */
 	m_flash = offset & 0x04;
 
 	/* BIT3 => TRACK LAMP */
-	set_led_status(machine(), 1, offset & 0x08);
+	output().set_led_value(1, offset & 0x08);
 }
 
 
 WRITE8_MEMBER(firetrk_state::montecar_output_1_w)
 {
 	/* BIT0 => START LAMP    */
-	set_led_status(machine(), 0, !(data & 0x01));
+	output().set_led_value(0, !(data & 0x01));
 
 	/* BIT1 => TRACK LAMP    */
-	set_led_status(machine(), 1, !(data & 0x02));
+	output().set_led_value(1, !(data & 0x02));
 
 	/* BIT2 => ATTRACT       */
 	m_discrete->write(space, MONTECAR_ATTRACT_INV, data & 0x04);
@@ -128,13 +128,13 @@ WRITE8_MEMBER(firetrk_state::montecar_output_1_w)
 	/* BIT4 => UNUSED        */
 
 	/* BIT5 => COIN3 COUNTER */
-	coin_counter_w(machine(), 0, data & 0x80);
+	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 
 	/* BIT6 => COIN2 COUNTER */
-	coin_counter_w(machine(), 1, data & 0x40);
+	machine().bookkeeping().coin_counter_w(1, data & 0x40);
 
 	/* BIT7 => COIN1 COUNTER */
-	coin_counter_w(machine(), 2, data & 0x20);
+	machine().bookkeeping().coin_counter_w(2, data & 0x20);
 }
 
 
@@ -415,7 +415,7 @@ static INPUT_PORTS_START( firetrk )
 	PORT_START("BIT_0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gas") PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,steer_dir_r, (void *)nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,steer_dir_r, (void *)0)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,steer_dir_r, (void *)1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Bell") PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_TILT )
@@ -439,7 +439,7 @@ static INPUT_PORTS_START( firetrk )
 	PORT_START("BIT_7")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,steer_flag_r, (void *)nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,steer_flag_r, (void *)0)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,steer_flag_r, (void *)1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -487,25 +487,25 @@ static INPUT_PORTS_START( superbug )
 	PORT_START("BIT_0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,gear_r, (void *)1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gas")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,steer_dir_r, (void *)nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,steer_dir_r, (void *)0)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Hiscore Reset") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_SERVICE( 0x20, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,skid_r, (void *)nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,skid_r, (void *)0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
 
 	PORT_START("BIT_7")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,gear_r, (void *)2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,gear_r, (void *)nullptr)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,steer_flag_r, (void *)nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,gear_r, (void *)0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,steer_flag_r, (void *)0)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,crash_r, (void *)nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,crash_r, (void *)0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Track Select") PORT_CODE(KEYCODE_SPACE)
 
 	PORT_START("GEAR")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Gear 1") PORT_CODE(KEYCODE_Z) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,gear_changed, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Gear 1") PORT_CODE(KEYCODE_Z) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,gear_changed, (void *)0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear 2") PORT_CODE(KEYCODE_X) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,gear_changed, (void *)1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Gear 3") PORT_CODE(KEYCODE_C) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,gear_changed, (void *)2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Gear 4") PORT_CODE(KEYCODE_V) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,gear_changed, (void *)3)
@@ -557,13 +557,13 @@ static INPUT_PORTS_START( montecar )
 	PORT_DIPSETTING(    0x00, DEF_STR( German ) )
 
 	PORT_START("BIT_6")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,gear_r, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,gear_r, (void *)0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,gear_r, (void *)1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,gear_r, (void *)2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Track Select") PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gas")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,steer_dir_r, (void *)nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,steer_dir_r, (void *)0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,skid_r, (void *)1)
 
 	PORT_START("BIT_7")
@@ -573,11 +573,11 @@ static INPUT_PORTS_START( montecar )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,steer_flag_r, (void *)nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,skid_r, (void *)nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,steer_flag_r, (void *)0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,skid_r, (void *)0)
 
 	PORT_START("GEAR")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Gear 1") PORT_CODE(KEYCODE_Z) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,gear_changed, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Gear 1") PORT_CODE(KEYCODE_Z) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,gear_changed, (void *)0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear 2") PORT_CODE(KEYCODE_X) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,gear_changed, (void *)1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Gear 3") PORT_CODE(KEYCODE_C) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,gear_changed, (void *)2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Gear 4") PORT_CODE(KEYCODE_V) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,gear_changed, (void *)3)

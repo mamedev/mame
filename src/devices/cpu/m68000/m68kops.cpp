@@ -7176,9 +7176,9 @@ void m68000_base_device_ops::m68k_op_bfins_32_ai(m68000_base_device* mc68kcpu)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
-			insert_byte = MASK_OUT_ABOVE_8(insert_base);
+			insert_byte = MASK_OUT_ABOVE_8(insert_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
-			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
+			(mc68kcpu)->not_z_flag |= (insert_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, (data_byte & ~mask_byte) | insert_byte);
 		}
 		return;
@@ -7252,9 +7252,9 @@ void m68000_base_device_ops::m68k_op_bfins_32_di(m68000_base_device* mc68kcpu)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
-			insert_byte = MASK_OUT_ABOVE_8(insert_base);
+			insert_byte = MASK_OUT_ABOVE_8(insert_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
-			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
+			(mc68kcpu)->not_z_flag |= (insert_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, (data_byte & ~mask_byte) | insert_byte);
 		}
 		return;
@@ -7328,9 +7328,9 @@ void m68000_base_device_ops::m68k_op_bfins_32_ix(m68000_base_device* mc68kcpu)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
-			insert_byte = MASK_OUT_ABOVE_8(insert_base);
+			insert_byte = MASK_OUT_ABOVE_8(insert_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
-			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
+			(mc68kcpu)->not_z_flag |= (insert_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, (data_byte & ~mask_byte) | insert_byte);
 		}
 		return;
@@ -7404,9 +7404,9 @@ void m68000_base_device_ops::m68k_op_bfins_32_aw(m68000_base_device* mc68kcpu)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
-			insert_byte = MASK_OUT_ABOVE_8(insert_base);
+			insert_byte = MASK_OUT_ABOVE_8(insert_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
-			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
+			(mc68kcpu)->not_z_flag |= (insert_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, (data_byte & ~mask_byte) | insert_byte);
 		}
 		return;
@@ -7480,9 +7480,9 @@ void m68000_base_device_ops::m68k_op_bfins_32_al(m68000_base_device* mc68kcpu)
 		if((width + offset) > 32)
 		{
 			mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
-			insert_byte = MASK_OUT_ABOVE_8(insert_base);
+			insert_byte = MASK_OUT_ABOVE_8(insert_base) << (8-offset);
 			data_byte = m68ki_read_8((mc68kcpu), ea+4);
-			(mc68kcpu)->not_z_flag |= (data_byte & mask_byte);
+			(mc68kcpu)->not_z_flag |= (insert_byte & mask_byte);
 			m68ki_write_8((mc68kcpu), ea+4, (data_byte & ~mask_byte) | insert_byte);
 		}
 		return;
@@ -21288,7 +21288,7 @@ void m68000_base_device_ops::m68k_op_movec_32_rc(m68000_base_device* mc68kcpu)
 						(mc68kcpu)->cacr = REG_DA(mc68kcpu)[(word2 >> 12) & 15] & 0x0f;
 					}
 
-//                  logerror("movec to cacr=%04x\n", (mc68kcpu)->cacr);
+//                  mc68kcpu->logerror("movec to cacr=%04x\n", (mc68kcpu)->cacr);
 					if ((mc68kcpu)->cacr & (M68K_CACR_CI | M68K_CACR_CEI))
 					{
 						m68ki_ic_clear(mc68kcpu);
@@ -32728,7 +32728,7 @@ void m68000_base_device_ops::m68k_op_cinv_32(m68000_base_device* mc68kcpu)
 		UINT16 ir = mc68kcpu->ir;
 		UINT8 cache = (ir >> 6) & 3;
 //      UINT8 scope = (ir >> 3) & 3;
-//      logerror("68040 %s: pc=%08x ir=%04x cache=%d scope=%d register=%d\n", ir & 0x0020 ? "cpush" : "cinv", REG_PPC(mc68kcpu), ir, cache, scope, ir & 7);
+//      mc68kcpu->logerror("68040 %s: pc=%08x ir=%04x cache=%d scope=%d register=%d\n", ir & 0x0020 ? "cpush" : "cinv", REG_PPC(mc68kcpu), ir, cache, scope, ir & 7);
 		switch (cache)
 		{
 		case 2:

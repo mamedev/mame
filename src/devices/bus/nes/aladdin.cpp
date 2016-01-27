@@ -97,7 +97,7 @@ bool nes_aladdin_slot_device::call_load()
 	if (m_cart)
 	{
 		UINT8 *ROM = m_cart->get_cart_base();
-		UINT32 size = 0;
+		UINT32 size;
 
 		if (!ROM)
 			return IMAGE_INIT_FAIL;
@@ -138,11 +138,11 @@ bool nes_aladdin_slot_device::call_load()
 
 bool nes_aladdin_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry );
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
-void nes_aladdin_slot_device::get_default_card_software(std::string &result)
+std::string nes_aladdin_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -163,10 +163,10 @@ void nes_aladdin_slot_device::get_default_card_software(std::string &result)
 
 		clear();
 
-		result.assign(slot_string);
+		return std::string(slot_string);
 	}
 	else
-		software_get_default_slot(result, "algn");
+		return software_get_default_slot("algn");
 }
 
 

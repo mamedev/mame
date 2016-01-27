@@ -48,9 +48,9 @@ private:
 	int m_rate;
 
 	/* mixer tables and internal buffers */
-	INT16 *m_mixer_table;
+	std::unique_ptr<INT16[]> m_mixer_table;
 	INT16 *m_mixer_lookup;
-	short *m_mixer_buffer;
+	std::unique_ptr<short[]> m_mixer_buffer;
 
 	UINT32 m_counter[2];
 	UINT16 m_frequency[2];

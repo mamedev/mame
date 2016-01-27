@@ -1921,7 +1921,7 @@ ROM_START (dpc200)
 	ROM_LOAD ("200han.rom",  0x8000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( dpc200, msx_tms9918 )
+static MACHINE_CONFIG_DERIVED( dpc200, msx_ntsc )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots

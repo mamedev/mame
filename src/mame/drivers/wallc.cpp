@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 /****************************************************************************
 
@@ -170,7 +170,7 @@ UINT32 wallc_state::screen_update_wallc(screen_device &screen, bitmap_ind16 &bit
 
 WRITE8_MEMBER(wallc_state::wallc_coin_counter_w)
 {
-	coin_counter_w(machine(), 0,data & 2);
+	machine().bookkeeping().coin_counter_w(0,data & 2);
 }
 
 static ADDRESS_MAP_START( wallc_map, AS_PROGRAM, 8, wallc_state )

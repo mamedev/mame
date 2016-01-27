@@ -64,10 +64,10 @@ WRITE8_MEMBER(epos_state::epos_port_1_w)
 	   D4-D7 - unused
 	 */
 
-	set_led_status(machine(), 0, (data >> 0) & 0x01);
-	set_led_status(machine(), 1, (data >> 1) & 0x01);
+	output().set_led_value(0, (data >> 0) & 0x01);
+	output().set_led_value(1, (data >> 1) & 0x01);
 
-	coin_counter_w(machine(), 0, (data >> 2) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
 
 	m_palette = (data >> 3) & 0x01;
 }

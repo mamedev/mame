@@ -137,7 +137,7 @@ READ8_MEMBER(bob85_state::bob85_keyboard_r)
 
 WRITE8_MEMBER(bob85_state::bob85_7seg_w)
 {
-	output_set_digit_value(offset, BITSWAP8( data,3,2,1,0,7,6,5,4 ));
+	output().set_digit_value(offset, BITSWAP8( data,3,2,1,0,7,6,5,4 ));
 }
 
 static ADDRESS_MAP_START( bob85_mem, AS_PROGRAM, 8, bob85_state )

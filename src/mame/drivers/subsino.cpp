@@ -269,14 +269,14 @@ public:
 	tilemap_t *m_reel3_tilemap;
 	int m_tiles_offset;
 	UINT8 m_out_c;
-	UINT8 *m_reel1_attr;
-	UINT8 *m_reel2_attr;
-	UINT8 *m_reel3_attr;
+	std::unique_ptr<UINT8[]> m_reel1_attr;
+	std::unique_ptr<UINT8[]> m_reel2_attr;
+	std::unique_ptr<UINT8[]> m_reel3_attr;
 	UINT8 m_flash_val;
 	UINT8 m_flash_packet;
 	UINT8 m_flash_packet_start;
 	int m_colordac_offs;
-	UINT8 *m_stbsub_colorram;
+	std::unique_ptr<UINT8[]> m_stbsub_colorram;
 
 	ticket_dispenser_device *m_hopper;
 
@@ -666,19 +666,19 @@ WRITE8_MEMBER(subsino_state::subsino_out_a_w)
 
 */
 
-	output_set_lamp_value(8, (data) & 1);       /* Lamp 8 */
-	output_set_lamp_value(9, (data >> 1) & 1);  /* Lamp 9 */
-	output_set_lamp_value(10, (data >> 2) & 1); /* Lamp 10 */
-	output_set_lamp_value(11, (data >> 3) & 1); /* Lamp 11 */
-	output_set_lamp_value(12, (data >> 4) & 1); /* Lamp 12 */
-	output_set_lamp_value(13, (data >> 5) & 1); /* Lamp 13 */
-	output_set_lamp_value(14, (data >> 6) & 1); /* Lamp 14 */
-	output_set_lamp_value(15, (data >> 7) & 1); /* Lamp 15 */
+	output().set_lamp_value(8, (data) & 1);       /* Lamp 8 */
+	output().set_lamp_value(9, (data >> 1) & 1);  /* Lamp 9 */
+	output().set_lamp_value(10, (data >> 2) & 1); /* Lamp 10 */
+	output().set_lamp_value(11, (data >> 3) & 1); /* Lamp 11 */
+	output().set_lamp_value(12, (data >> 4) & 1); /* Lamp 12 */
+	output().set_lamp_value(13, (data >> 5) & 1); /* Lamp 13 */
+	output().set_lamp_value(14, (data >> 6) & 1); /* Lamp 14 */
+	output().set_lamp_value(15, (data >> 7) & 1); /* Lamp 15 */
 
-	coin_counter_w( machine(), 0, data & 0x01 );    /* coin / keyin */
-	coin_counter_w( machine(), 1, data & 0x02 );    /* keyin / coin */
-	coin_counter_w( machine(), 2, data & 0x10 );    /* keyout */
-	coin_counter_w( machine(), 3, data & 0x20 );    /* payout */
+	machine().bookkeeping().coin_counter_w(0, data & 0x01 );    /* coin / keyin */
+	machine().bookkeeping().coin_counter_w(1, data & 0x02 );    /* keyin / coin */
+	machine().bookkeeping().coin_counter_w(2, data & 0x10 );    /* keyout */
+	machine().bookkeeping().coin_counter_w(3, data & 0x20 );    /* payout */
 
 	m_hopper->write(space, 0, (data & 0x0020) ? 0x80 : 0);   // hopper motor
 
@@ -808,14 +808,14 @@ WRITE8_MEMBER(subsino_state::subsino_out_b_w)
 
 */
 
-	output_set_lamp_value(0, (data) & 1);       /* Lamp 0 */
-	output_set_lamp_value(1, (data >> 1) & 1);  /* Lamp 1 */
-	output_set_lamp_value(2, (data >> 2) & 1);  /* Lamp 2 */
-	output_set_lamp_value(3, (data >> 3) & 1);  /* Lamp 3 */
-	output_set_lamp_value(4, (data >> 4) & 1);  /* Lamp 4 */
-	output_set_lamp_value(5, (data >> 5) & 1);  /* Lamp 5 */
-	output_set_lamp_value(6, (data >> 6) & 1);  /* Lamp 6 */
-	output_set_lamp_value(7, (data >> 7) & 1);  /* Lamp 7 */
+	output().set_lamp_value(0, (data) & 1);       /* Lamp 0 */
+	output().set_lamp_value(1, (data >> 1) & 1);  /* Lamp 1 */
+	output().set_lamp_value(2, (data >> 2) & 1);  /* Lamp 2 */
+	output().set_lamp_value(3, (data >> 3) & 1);  /* Lamp 3 */
+	output().set_lamp_value(4, (data >> 4) & 1);  /* Lamp 4 */
+	output().set_lamp_value(5, (data >> 5) & 1);  /* Lamp 5 */
+	output().set_lamp_value(6, (data >> 6) & 1);  /* Lamp 6 */
+	output().set_lamp_value(7, (data >> 7) & 1);  /* Lamp 7 */
 
 //  popmessage("Out B %02x",data);
 }
@@ -3841,15 +3841,15 @@ DRIVER_INIT_MEMBER(subsino_state,stbsub)
 	rom[0x957] = 0x18; //patch "losing protection" check
 #endif
 
-	m_stbsub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
+	m_stbsub_colorram = std::make_unique<UINT8[]>(256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
 
-	m_reel1_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel2_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel3_attr = auto_alloc_array(machine(), UINT8, 0x200);
+	m_reel1_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel2_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel3_attr = std::make_unique<UINT8[]>(0x200);
 }
 
 DRIVER_INIT_MEMBER(subsino_state, stisub)
@@ -3858,15 +3858,15 @@ DRIVER_INIT_MEMBER(subsino_state, stisub)
 	rom[0x0FA0] = 0x28;
 	rom[0x0FA1] = 0x1d; //patch protection check
 
-	m_stbsub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
+	m_stbsub_colorram = std::make_unique<UINT8[]>(256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
 
-	m_reel1_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel2_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel3_attr = auto_alloc_array(machine(), UINT8, 0x200);
+	m_reel1_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel2_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel3_attr = std::make_unique<UINT8[]>(0x200);
 }
 
 DRIVER_INIT_MEMBER(subsino_state,tesorone)
@@ -3879,15 +3879,15 @@ DRIVER_INIT_MEMBER(subsino_state,tesorone)
 	rom[0xa84] = 0x18; //patch "losing protection" check
 #endif
 
-	m_stbsub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
+	m_stbsub_colorram = std::make_unique<UINT8[]>(256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
 
-	m_reel1_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel2_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel3_attr = auto_alloc_array(machine(), UINT8, 0x200);
+	m_reel1_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel2_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel3_attr = std::make_unique<UINT8[]>(0x200);
 }
 
 DRIVER_INIT_MEMBER(subsino_state,tesorone230)
@@ -3900,29 +3900,29 @@ DRIVER_INIT_MEMBER(subsino_state,tesorone230)
 	rom[0xa88] = 0x18; //patch "losing protection" check
 #endif
 
-	m_stbsub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
+	m_stbsub_colorram = std::make_unique<UINT8[]>(256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
 
-	m_reel1_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel2_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel3_attr = auto_alloc_array(machine(), UINT8, 0x200);
+	m_reel1_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel2_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel3_attr = std::make_unique<UINT8[]>(0x200);
 }
 
 
 DRIVER_INIT_MEMBER(subsino_state,mtrainnv)
 {
-	m_stbsub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
+	m_stbsub_colorram = std::make_unique<UINT8[]>(256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
 
-	m_reel1_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel2_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel3_attr = auto_alloc_array(machine(), UINT8, 0x200);
+	m_reel1_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel2_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel3_attr = std::make_unique<UINT8[]>(0x200);
 }
 
 /***************************************************************************

@@ -39,6 +39,7 @@ struct registered_client
 	registered_client * next;       // next client in the list
 	LPARAM              id;         // client-specified ID
 	HWND                hwnd;       // client HWND
+	running_machine   * machine;
 };
 
 
@@ -69,8 +70,8 @@ static UINT                 om_mame_get_id_string;
 
 static int create_window_class(void);
 static LRESULT CALLBACK output_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
-static LRESULT register_client(HWND hwnd, LPARAM id);
-static LRESULT unregister_client(HWND hwnd, LPARAM id);
+static LRESULT register_client(running_machine &machine, HWND hwnd, LPARAM id);
+static LRESULT unregister_client(running_machine &machine, HWND hwnd, LPARAM id);
 static LRESULT send_id_string(running_machine &machine, HWND hwnd, LPARAM id);
 static void notifier_callback(const char *outname, INT32 value, void *param);
 
@@ -128,7 +129,7 @@ bool windows_osd_interface::output_init()
 	PostMessage(HWND_BROADCAST, om_mame_start, (WPARAM)output_hwnd, 0);
 
 	// register a notifier for output changes
-	output_set_notifier(nullptr, notifier_callback, nullptr);
+	machine().output().set_notifier(nullptr, notifier_callback, &machine());
 
 	return true;
 }
@@ -194,11 +195,11 @@ static LRESULT CALLBACK output_window_proc(HWND wnd, UINT message, WPARAM wparam
 
 	// register a new client
 	if (message == om_mame_register_client)
-		return register_client((HWND)wparam, lparam);
+		return register_client(machine,(HWND)wparam, lparam);
 
 	// unregister a client
 	else if (message == om_mame_unregister_client)
-		return unregister_client((HWND)wparam, lparam);
+		return unregister_client(machine,(HWND)wparam, lparam);
 
 	// get a string for an ID
 	else if (message == om_mame_get_id_string)
@@ -213,7 +214,7 @@ static LRESULT CALLBACK output_window_proc(HWND wnd, UINT message, WPARAM wparam
 //  register_client
 //============================================================
 
-static LRESULT register_client(HWND hwnd, LPARAM id)
+static LRESULT register_client(running_machine &machine, HWND hwnd, LPARAM id)
 {
 	registered_client **client;
 
@@ -223,7 +224,7 @@ static LRESULT register_client(HWND hwnd, LPARAM id)
 		if ((*client)->id == id)
 		{
 			(*client)->hwnd = hwnd;
-			output_notify_all(notifier_callback, *client);
+			machine.output().notify_all(notifier_callback, *client);
 			return 1;
 		}
 
@@ -232,9 +233,10 @@ static LRESULT register_client(HWND hwnd, LPARAM id)
 	(*client)->next = nullptr;
 	(*client)->id = id;
 	(*client)->hwnd = hwnd;
+	(*client)->machine = &machine;
 
 	// request a notification for all outputs
-	output_notify_all(notifier_callback, *client);
+	machine.output().notify_all(notifier_callback, *client);
 	return 0;
 }
 
@@ -243,7 +245,7 @@ static LRESULT register_client(HWND hwnd, LPARAM id)
 //  unregister_client
 //============================================================
 
-static LRESULT unregister_client(HWND hwnd, LPARAM id)
+static LRESULT unregister_client(running_machine &machine, HWND hwnd, LPARAM id)
 {
 	registered_client **client;
 	int found = FALSE;
@@ -278,7 +280,7 @@ static LRESULT send_id_string(running_machine &machine, HWND hwnd, LPARAM id)
 	if (id == 0)
 		name = machine.system().name;
 	else
-		name = output_id_to_name(id);
+		name = machine.output().id_to_name(id);
 
 	// a NULL name is an empty string
 	if (name == nullptr)
@@ -308,9 +310,11 @@ static LRESULT send_id_string(running_machine &machine, HWND hwnd, LPARAM id)
 static void notifier_callback(const char *outname, INT32 value, void *param)
 {
 	registered_client *client;
-
 	// loop over clients and notify them
 	for (client = clientlist; client != nullptr; client = client->next)
+	{
+		printf("there are clients\n");
 		if (param == nullptr || param == client)
-			PostMessage(client->hwnd, om_mame_update_state, output_name_to_id(outname), value);
+			PostMessage(client->hwnd, om_mame_update_state, client->machine->output().name_to_id(outname), value);
+	}
 }

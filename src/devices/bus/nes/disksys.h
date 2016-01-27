@@ -38,7 +38,7 @@ public:
 
 private:
 	UINT8 *m_2c33_rom;
-	UINT8 *m_fds_data;    // here, we store a copy of the disk
+	std::unique_ptr<UINT8[]> m_fds_data;    // here, we store a copy of the disk
 	required_device<legacy_floppy_image_device> m_disk;
 
 	static const device_timer_id TIMER_IRQ = 0;

@@ -319,7 +319,7 @@ WRITE8_MEMBER( compis_keyboard_device::bus_w )
 	m_speaker->level_w(BIT(data, 5));
 
 	// LEDs
-	output_set_led_value(LED_CAPS, BIT(data, 6));
+	machine().output().set_led_value(LED_CAPS, BIT(data, 6));
 
 	// serial data out
 	m_out_tx_handler(BIT(data, 7));

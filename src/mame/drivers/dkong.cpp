@@ -439,8 +439,6 @@ MACHINE_START_MEMBER(dkong_state,dkong2b)
 {
 	m_hardware_type = HARDWARE_TKG04;
 
-	m_snd_rom = memregion("soundcpu")->base();
-
 	save_item(NAME(m_decrypt_counter));
 	save_item(NAME(m_dma_latch));
 }
@@ -578,7 +576,7 @@ WRITE8_MEMBER(dkong_state::p8257_ctl_w)
 
 WRITE8_MEMBER(dkong_state::dkong3_coin_counter_w)
 {
-	coin_counter_w(machine(), offset, data & 0x01);
+	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
 }
 
 WRITE8_MEMBER(dkong_state::p8257_drq_w)
@@ -596,7 +594,7 @@ READ8_MEMBER(dkong_state::dkong_in2_r)
 	UINT8 r;
 
 	r = (ioport("IN2")->read() & 0xBF) | (mcustatus << 6);
-	coin_counter_w(machine(), offset, r >> 7);
+	machine().bookkeeping().coin_counter_w(offset, r >> 7);
 	if (r & 0x10)
 		r = (r & ~0x10) | 0x80; /* service ==> coin */
 	return r;
@@ -609,7 +607,7 @@ READ8_MEMBER(dkong_state::dkongjr_in2_r)
 	UINT8 r;
 
 	r = (ioport("IN2")->read() & 0xBF) | 0x40;
-	coin_counter_w(machine(), offset, r >> 7);
+	machine().bookkeeping().coin_counter_w(offset, r >> 7);
 	if (r & 0x10)
 		r = (r & ~0x10) | 0x80; /* service ==> coin */
 	return r;
@@ -1880,7 +1878,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-ROM_START( radarscp )
+ROM_START( radarscp ) /* unclear which boardset this comes from; there existed a 5 pcb stack with trs-03 (no voice) sound board on top, and a 4 board as well as a 2 board pcb stack */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trs2c5fc",     0x0000, 0x1000, CRC(40949e0d) SHA1(94717b9d027600e25b863e89900df41325875961) )
 	ROM_LOAD( "trs2c5gc",     0x1000, 0x1000, CRC(afa8c49f) SHA1(25880e9dcf2dc8862f7f3c38687f01dfe2424293) )
@@ -1913,7 +1911,7 @@ ROM_START( radarscp )
 	ROM_LOAD( "rs2-v.1hc",    0x0200, 0x0100, CRC(1b828315) SHA1(00c9f8c5ae86b68d38c66f9071b5f1ef421c1005) ) /* character color codes on a per-column basis */
 ROM_END
 
-ROM_START( radarscp1 )
+ROM_START( radarscp1 ) /* TRS01 5-pcb stack with TRS01 "Voice" pcb on top containing the sound cpu and the m58817 speech chip and the m58819 speech serial rom emulator chip */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trs01_5f",     0x0000, 0x1000, CRC(40949e0d) SHA1(94717b9d027600e25b863e89900df41325875961) )
 	ROM_LOAD( "trs01_5g",     0x1000, 0x1000, CRC(afa8c49f) SHA1(25880e9dcf2dc8862f7f3c38687f01dfe2424293) )
@@ -1922,12 +1920,12 @@ ROM_START( radarscp1 )
 	/* space for diagnostic ROM */
 
 	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
-	ROM_LOAD( "trs015aa.bin", 0x0000, 0x0800, CRC(5166554c) SHA1(00bf501ca448929f6187598da6fdbc1ea488745a) )
+	ROM_LOAD( "trs-s__5a.5a", 0x0000, 0x0800, CRC(5166554c) SHA1(00bf501ca448929f6187598da6fdbc1ea488745a) ) // 5A on the 'voice' board on top of the 5-pcb stack; eprom label is "TRS-S ['S' overstrikes a '1'] // 5A [stamped '8' or 'a' in red ink]"
 	ROM_RELOAD(               0x0800, 0x0800 )
 	ROM_FILL(                 0x1000, 0x0800, 0xFF )
 
 	ROM_REGION( 0x0800, "m58819", 0 )  /* speech rom */
-	ROM_LOAD( "trs014ha.bin",      0x0000, 0x0800, CRC(d1f1b48c) SHA1(ee5584368d2e9f7bde271f5004585b53f5ff5c3f) ) /* speech rom */
+	ROM_LOAD( "trs-s__4h.4h",      0x0000, 0x0800, CRC(d1f1b48c) SHA1(ee5584368d2e9f7bde271f5004585b53f5ff5c3f) ) // 4H on the 'voice' board on top of the 5-pcb stack; eprom label is "TRS-S ['S' overstrikes a '1'] // 4H [stamped '8' or 'a' in red ink]"
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "trs01v3f",     0x0000, 0x0800, CRC(f095330e) SHA1(dd3de744f28ff108630d3336bd246d3323fa34af) )
@@ -3271,10 +3269,9 @@ DRIVER_INIT_MEMBER(dkong_state,strtheat)
 
 DRIVER_INIT_MEMBER(dkong_state,dkongx)
 {
-	UINT8 *decrypted;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
+	m_decrypted = std::make_unique<UINT8[]>(0x10000);
 
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x5fff, "bank1" );
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xffff, "bank2" );
@@ -3284,11 +3281,11 @@ DRIVER_INIT_MEMBER(dkong_state,dkongx)
 	space.install_read_handler(0xc800, 0xc800, read8_delegate(FUNC(dkong_state::braze_eeprom_r),this));
 	space.install_write_handler(0xc800, 0xc800, write8_delegate(FUNC(dkong_state::braze_eeprom_w),this));
 
-	braze_decrypt_rom(decrypted);
+	braze_decrypt_rom(m_decrypted.get());
 
-	membank("bank1")->configure_entries(0, 2, &decrypted[0], 0x8000);
+	membank("bank1")->configure_entries(0, 2, m_decrypted.get(), 0x8000);
 	membank("bank1")->set_entry(0);
-	membank("bank2")->configure_entries(0, 2, &decrypted[0], 0x8000);
+	membank("bank2")->configure_entries(0, 2, m_decrypted.get(), 0x8000);
 	membank("bank2")->set_entry(0);
 }
 

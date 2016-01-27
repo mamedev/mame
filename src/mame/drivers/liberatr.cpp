@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 /***************************************************************************
 
@@ -15,7 +15,7 @@
     Liberator Memory Map (for the main set, the other one is rearranged)
      (from the schematics/manual)
 
-    HEX        R/W   D7 D6 D5 D4 D3 D2 D2 D0  function
+    HEX        R/W   D7 D6 D5 D4 D3 D2 D1 D0  function
     ---------+-----+------------------------+------------------------
     0000             D  D  D  D  D  D  D  D   XCOORD
     0001             D  D  D  D  D  D  D  D   YCOORD
@@ -144,11 +144,19 @@
 
 void liberatr_state::machine_start()
 {
-	atarigen_state::machine_start();
+	save_item(NAME(m_earom_data));
+	save_item(NAME(m_earom_control));
 
 	save_item(NAME(m_trackball_offset));
 	save_item(NAME(m_ctrld));
 	save_item(NAME(m_videoram));
+}
+
+
+void liberatr_state::machine_reset()
+{
+	// reset the control latch on the EAROM
+	m_earom->set_control(0, 1, 1, 0, 0);
 }
 
 
@@ -161,13 +169,13 @@ void liberatr_state::machine_start()
 
 WRITE8_MEMBER( liberatr_state::led_w )
 {
-	set_led_status(machine(), offset, ~data & 0x10);
+	output().set_led_value(offset, ~data & 0x10);
 }
 
 
 WRITE8_MEMBER( liberatr_state::coin_counter_w )
 {
-	::coin_counter_w(machine(), offset ^ 0x01, data & 0x10);
+	machine().bookkeeping().coin_counter_w(offset ^ 0x01, data & 0x10);
 }
 
 
@@ -204,6 +212,48 @@ READ8_MEMBER( liberatr_state::port0_r )
 	/* otherwise, the LS191 is simply passing through the raw switch inputs */
 	else
 		return ioport("IN0")->read();
+}
+
+
+
+/*************************************
+ *
+ *  Early raster EAROM interface
+ *
+ *************************************/
+
+READ8_MEMBER( liberatr_state::earom_r )
+{
+	// return data latched from previous clock
+	return m_earom->data();
+}
+
+
+WRITE8_MEMBER( liberatr_state::earom_w )
+{
+	// remember the value written
+	m_earom_data = data;
+
+	// output latch only enabled if control bit 2 is set
+	if (m_earom_control & 4)
+		m_earom->set_data(m_earom_data);
+
+	// always latch the address
+	m_earom->set_address(offset);
+}
+
+
+WRITE8_MEMBER( liberatr_state::earom_control_w )
+{
+	// remember the control state
+	m_earom_control = data;
+
+	// ensure ouput data is put on data lines prior to updating controls
+	if (m_earom_control & 4)
+		m_earom->set_data(m_earom_data);
+
+	// set the control lines; /CS2 is always held low
+	m_earom->set_control(data & 8, 1, ~data & 4, data & 2, data & 1);
 }
 
 

@@ -797,7 +797,7 @@ void base_sns_cart_slot_device::setup_addon_from_fullpath()
 	if (!m_cart->get_addon_bios_size())
 	{
 		std::string region = std::string(m_cart->device().tag()).append(":addon");
-		UINT8 *ROM = nullptr;
+		UINT8 *ROM;
 
 		switch (m_addon)
 		{
@@ -886,7 +886,7 @@ void base_sns_cart_slot_device::setup_nvram()
 
 bool base_sns_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry );
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
@@ -999,14 +999,14 @@ void base_sns_cart_slot_device::get_cart_type_addon(UINT8 *ROM, UINT32 len, int 
  get default card software
  -------------------------------------------------*/
 
-void base_sns_cart_slot_device::get_default_card_software(std::string &result)
+std::string base_sns_cart_slot_device::get_default_card_software()
 {
 	bool fullpath = open_image_file(mconfig().options());
 
 	if (fullpath)
 	{
-		const char *slot_string = "lorom";
-		UINT32 offset = 0;
+		const char *slot_string;
+		UINT32 offset;
 		UINT32 len = core_fsize(m_file);
 		dynamic_buffer rom(len);
 		int type = 0, addon = 0;
@@ -1058,11 +1058,10 @@ void base_sns_cart_slot_device::get_default_card_software(std::string &result)
 
 		clear();
 
-		result.assign(slot_string);
-		return;
+		return std::string(slot_string);
 	}
 
-	software_get_default_slot(result, "lorom");
+	return software_get_default_slot("lorom");
 }
 
 

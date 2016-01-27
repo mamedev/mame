@@ -158,7 +158,7 @@ WRITE8_MEMBER( cosmicos_state::segment_w )
 
 	if ((m_counter > 0) && (m_counter < 9))
 	{
-		output_set_digit_value(10 - m_counter, data);
+		output().set_digit_value(10 - m_counter, data);
 	}
 }
 
@@ -201,7 +201,7 @@ INPUT_CHANGED_MEMBER( cosmicos_state::data )
 		if (!BIT(data, i))
 		{
 			m_data |= (1 << i);
-			output_set_led_value(LED_D0 - i, 1);
+			output().set_led_value(LED_D0 - i, 1);
 		}
 	}
 }
@@ -221,29 +221,29 @@ INPUT_CHANGED_MEMBER( cosmicos_state::single_step )
 
 void cosmicos_state::set_cdp1802_mode(int mode)
 {
-	output_set_led_value(LED_RUN, 0);
-	output_set_led_value(LED_LOAD, 0);
-	output_set_led_value(LED_PAUSE, 0);
-	output_set_led_value(LED_RESET, 0);
+	output().set_led_value(LED_RUN, 0);
+	output().set_led_value(LED_LOAD, 0);
+	output().set_led_value(LED_PAUSE, 0);
+	output().set_led_value(LED_RESET, 0);
 
 	switch (mode)
 	{
 	case MODE_RUN:
-		output_set_led_value(LED_RUN, 1);
+		output().set_led_value(LED_RUN, 1);
 
 		m_wait = 1;
 		m_clear = 1;
 		break;
 
 	case MODE_LOAD:
-		output_set_led_value(LED_LOAD, 1);
+		output().set_led_value(LED_LOAD, 1);
 
 		m_wait = 0;
 		m_clear = 0;
 		break;
 
 	case MODE_PAUSE:
-		output_set_led_value(LED_PAUSE, 1);
+		output().set_led_value(LED_PAUSE, 1);
 
 		m_wait = 1;
 		m_clear = 0;
@@ -257,7 +257,7 @@ void cosmicos_state::set_cdp1802_mode(int mode)
 		m_clear = 0;
 		m_boot = 1;
 
-		output_set_led_value(LED_RESET, 1);
+		output().set_led_value(LED_RESET, 1);
 		break;
 	}
 }
@@ -275,7 +275,7 @@ void cosmicos_state::clear_input_data()
 
 	for (i = 0; i < 8; i++)
 	{
-		output_set_led_value(LED_D0 - i, 0);
+		output().set_led_value(LED_D0 - i, 0);
 	}
 }
 
@@ -353,7 +353,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cosmicos_state::digit_tick)
 {
 	m_digit = !m_digit;
 
-	output_set_digit_value(m_digit, m_segment);
+	output().set_digit_value(m_digit, m_segment);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cosmicos_state::int_tick)
@@ -395,7 +395,7 @@ READ_LINE_MEMBER( cosmicos_state::ef2_r )
 	UINT8 special = m_special->read();
 	int casin = (m_cassette)->input() < 0.0;
 
-	output_set_led_value(LED_CASSETTE, casin);
+	output().set_led_value(LED_CASSETTE, casin);
 
 	return BIT(special, 1) | BIT(special, 3) | casin;
 }

@@ -27,7 +27,7 @@ public:
 	UINT8 m_flip_y;
 	tilemap_t *m_solid_tilemap;
 	tilemap_t *m_tilemap;
-	UINT8 *m_dummy_tile;
+	std::unique_ptr<UINT8[]> m_dummy_tile;
 	UINT8 m_nmi_mask;
 
 	int m_question_address;

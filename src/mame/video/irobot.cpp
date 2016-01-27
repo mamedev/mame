@@ -85,7 +85,7 @@ void irobot_state::_irobot_poly_clear(UINT8 *bitmap_base)
 
 void irobot_state::irobot_poly_clear()
 {
-	UINT8 *bitmap_base = m_bufsel ? m_polybitmap2 : m_polybitmap1;
+	UINT8 *bitmap_base = m_bufsel ? m_polybitmap2.get() : m_polybitmap1.get();
 	_irobot_poly_clear(bitmap_base);
 }
 
@@ -99,12 +99,12 @@ void irobot_state::video_start()
 {
 	/* Setup 2 bitmaps for the polygon generator */
 	int height = m_screen->height();
-	m_polybitmap1 = auto_alloc_array(machine(), UINT8, BITMAP_WIDTH * height);
-	m_polybitmap2 = auto_alloc_array(machine(), UINT8, BITMAP_WIDTH * height);
+	m_polybitmap1 = std::make_unique<UINT8[]>(BITMAP_WIDTH * height);
+	m_polybitmap2 = std::make_unique<UINT8[]>(BITMAP_WIDTH * height);
 
 	/* clear the bitmaps so we start with valid palette look-up values for drawing */
-	_irobot_poly_clear(m_polybitmap1);
-	_irobot_poly_clear(m_polybitmap2);
+	_irobot_poly_clear(m_polybitmap1.get());
+	_irobot_poly_clear(m_polybitmap2.get());
 
 	/* Set clipping */
 	m_ir_xmin = m_ir_ymin = 0;
@@ -225,9 +225,9 @@ void irobot_state::irobot_run_video()
 	logerror("Starting Polygon Generator, Clear=%d\n",m_vg_clear);
 
 	if (m_bufsel)
-		polybitmap = m_polybitmap2;
+		polybitmap = m_polybitmap2.get();
 	else
-		polybitmap = m_polybitmap1;
+		polybitmap = m_polybitmap1.get();
 
 	lpnt=0;
 	while (lpnt < 0x7ff)
@@ -348,7 +348,7 @@ void irobot_state::irobot_run_video()
 UINT32 irobot_state::screen_update_irobot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *videoram = m_videoram;
-	UINT8 *bitmap_base = m_bufsel ? m_polybitmap1 : m_polybitmap2;
+	UINT8 *bitmap_base = m_bufsel ? m_polybitmap1.get() : m_polybitmap2.get();
 	int x, y, offs;
 
 	/* copy the polygon bitmap */

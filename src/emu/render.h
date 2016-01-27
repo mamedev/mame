@@ -942,7 +942,7 @@ public:
 	// debug containers
 	render_container *debug_alloc();
 	void debug_free(render_container &container);
-	void debug_top(render_container &container);
+	void debug_append(render_container &container);
 
 	// resolve tag lookups
 	void resolve_tags();
@@ -1057,8 +1057,8 @@ private:
 	void container_free(render_container *container);
 
 	// config callbacks
-	void config_load(int config_type, xml_data_node *parentnode);
-	void config_save(int config_type, xml_data_node *parentnode);
+	void config_load(config_type cfg_type, xml_data_node *parentnode);
+	void config_save(config_type cfg_type, xml_data_node *parentnode);
 
 	// internal state
 	running_machine &               m_machine;          // reference back to the machine

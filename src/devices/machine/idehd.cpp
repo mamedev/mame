@@ -60,7 +60,7 @@ static void swap_strncpy(UINT16 *dst, const char *src, int field_size_in_words)
 {
 	for (int i = 0; i < field_size_in_words; i++)
 	{
-		UINT16 d = 0;
+		UINT16 d;
 
 		if (*src)
 		{
@@ -404,7 +404,7 @@ void ata_mass_storage_device::fill_buffer()
 
 void ata_mass_storage_device::finished_read()
 {
-	int lba = lba_address(), count = 0;
+	int lba = lba_address(), count;
 
 	set_dasp(CLEAR_LINE);
 
@@ -506,6 +506,10 @@ void ata_mass_storage_device::process_buffer()
 		if (m_master_password_enable || m_user_password_enable)
 			security_error();
 	}
+	else if (m_command == IDE_COMMAND_SECURITY_DISABLE_PASSWORD)
+	{
+		LOGPRINT(("IDE Done unimplemented SECURITY_DISABLE_PASSWORD command\n"));
+	}
 	else
 	{
 		set_dasp(ASSERT_LINE);
@@ -534,7 +538,7 @@ void ata_mass_storage_device::process_buffer()
 
 void ata_mass_storage_device::finished_write()
 {
-	int lba = lba_address(), count = 0;
+	int lba = lba_address(), count;
 
 	set_dasp(CLEAR_LINE);
 
@@ -678,6 +682,15 @@ void ata_mass_storage_device::process_command()
 
 	case IDE_COMMAND_SECURITY_UNLOCK:
 		LOGPRINT(("IDE Security Unlock\n"));
+
+		/* mark the buffer ready */
+		m_status |= IDE_STATUS_DRQ;
+
+		set_irq(ASSERT_LINE);
+		break;
+
+	case IDE_COMMAND_SECURITY_DISABLE_PASSWORD:
+		LOGPRINT(("IDE Unimplemented SECURITY DISABLE PASSWORD command\n"));
 
 		/* mark the buffer ready */
 		m_status |= IDE_STATUS_DRQ;

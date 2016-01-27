@@ -58,9 +58,9 @@ public:
 WRITE8_MEMBER(cchance_state::output_0_w)
 {
 	//---- --x- divider?
-	coin_lockout_w(machine(), 0, ~data & 1);
+	machine().bookkeeping().coin_lockout_w(0, ~data & 1);
 
-//  coin_counter_w(machine(), 0, ~data & 1);
+//  machine().bookkeeping().coin_counter_w(0, ~data & 1);
 }
 
 

@@ -2,9 +2,14 @@
 // copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco
 /******************************************************************************
 
+WIP: plan to move to main fidelity chess driver
+
+
+
+
     Fidelity Champion Chess Challenger (model CSC)
 
-    See fidelz80.c for hardware description
+    See drivers/fidelz80.cpp for hardware description
 
     TODO:
     - speech doesn't work
@@ -17,20 +22,19 @@
 #include "machine/6821pia.h"
 #include "sound/s14001a.h"
 
-#include "debugger.h"
-
 // same layout of Sensory Chess Challenger
-extern const char layout_vsc[];
+//extern const char layout_vsc[];
 
 class csc_state : public driver_device
 {
 public:
 	csc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_speech(*this, "speech")
-		,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_speech(*this, "speech")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
 	required_device<s14001a_device> m_speech;
 
 	virtual void machine_start() override;
@@ -50,7 +54,6 @@ public:
 
 	UINT8 m_selector;
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -58,8 +61,8 @@ UINT16 csc_state::input_read(int index)
 {
 	static const char *const col_tag[] =
 	{
-		"COL_A", "COL_B", "COL_C", "COL_D", "COL_E",
-		"COL_F", "COL_G", "COL_H", "COL_I"
+		"IN.0", "IN.1", "IN.2", "IN.3", "IN.4",
+		"IN.5", "IN.6", "IN.7", "IN.8"
 	};
 
 	return ioport(col_tag[index])->read();
@@ -73,19 +76,19 @@ WRITE8_MEMBER( csc_state::pia0_pa_w )
 	switch (m_selector)
 	{
 	case 0:
-		output_set_digit_value(0, out_digit & 0x7f);
-		output_set_value("pm_led", BIT(out_digit, 7));
+		output().set_digit_value(0, out_digit & 0x7f);
+		output().set_value("pm_led", BIT(out_digit, 7));
 		break;
 	case 1:
-		output_set_digit_value(1, out_digit & 0x7f);
+		output().set_digit_value(1, out_digit & 0x7f);
 		break;
 	case 2:
-		output_set_digit_value(2, out_digit & 0x7f);
-		output_set_value("up_dot", BIT(out_digit, 7));
+		output().set_digit_value(2, out_digit & 0x7f);
+		output().set_value("up_dot", BIT(out_digit, 7));
 		break;
 	case 3:
-		output_set_digit_value(3, out_digit & 0x7f);
-		output_set_value("low_dot", BIT(out_digit, 7));
+		output().set_digit_value(3, out_digit & 0x7f);
+		output().set_value("low_dot", BIT(out_digit, 7));
 		break;
 	}
 
@@ -134,7 +137,7 @@ WRITE8_MEMBER( csc_state::pia1_pb_w )
 
 	if (m_selector < 8)
 		for (int i=0; i<8; i++)
-			output_set_indexed_value(row_tag[m_selector], i+1, BIT(data, 7-i));
+			output().set_indexed_value(row_tag[m_selector], i+1, BIT(data, 7-i));
 }
 
 READ8_MEMBER( csc_state::pia1_pa_r )
@@ -197,7 +200,7 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( csc )
-	PORT_START("COL_A")
+	PORT_START("IN.0")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)
@@ -207,7 +210,7 @@ static INPUT_PORTS_START( csc )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x100,IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Speak") PORT_CODE(KEYCODE_SPACE)
-	PORT_START("COL_B")
+	PORT_START("IN.1")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)
@@ -217,7 +220,7 @@ static INPUT_PORTS_START( csc )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x100,IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("RV")   PORT_CODE(KEYCODE_V)
-	PORT_START("COL_C")
+	PORT_START("IN.2")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)
@@ -227,7 +230,7 @@ static INPUT_PORTS_START( csc )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x100,IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("TM")   PORT_CODE(KEYCODE_T)
-	PORT_START("COL_D")
+	PORT_START("IN.3")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)
@@ -237,7 +240,7 @@ static INPUT_PORTS_START( csc )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x100,IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("LV")   PORT_CODE(KEYCODE_L)
-	PORT_START("COL_E")
+	PORT_START("IN.4")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)
@@ -247,7 +250,7 @@ static INPUT_PORTS_START( csc )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x100,IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("DM")   PORT_CODE(KEYCODE_M)
-	PORT_START("COL_F")
+	PORT_START("IN.5")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)
@@ -257,7 +260,7 @@ static INPUT_PORTS_START( csc )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x100,IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("ST")   PORT_CODE(KEYCODE_S)
-	PORT_START("COL_G")
+	PORT_START("IN.6")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)
@@ -267,7 +270,7 @@ static INPUT_PORTS_START( csc )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x100,IP_ACTIVE_LOW, IPT_UNUSED) PORT_UNUSED
-	PORT_START("COL_H")
+	PORT_START("IN.7")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)
@@ -277,7 +280,7 @@ static INPUT_PORTS_START( csc )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)
 		PORT_BIT(0x100,IP_ACTIVE_LOW, IPT_UNUSED) PORT_UNUSED
-	PORT_START("COL_I")
+	PORT_START("IN.8")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Pawn")     PORT_CODE(KEYCODE_1)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Rook")     PORT_CODE(KEYCODE_2)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Knight")   PORT_CODE(KEYCODE_3)
@@ -301,7 +304,7 @@ static MACHINE_CONFIG_START( csc, csc_state )
 	MCFG_CPU_ADD("maincpu", M6502, 3900000/2)
 	MCFG_CPU_PROGRAM_MAP(csc_mem)
 
-	MCFG_DEFAULT_LAYOUT(layout_vsc)
+	//MCFG_DEFAULT_LAYOUT(layout_vsc)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", csc_state, irq_timer, attotime::from_hz(38400/64))
 
@@ -343,4 +346,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME          PARENT  COMPAT  MACHINE    INPUT       INIT      COMPANY  FULLNAME                     FLAGS */
-COMP( 198?, csc,     0,      0,      csc,  csc, driver_device,   0, "Fidelity Electronics", "Champion Chess Challenger (model CSC)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK)
+COMP( 1981, csc,     0,      0,      csc,  csc, driver_device,   0, "Fidelity Electronics", "Champion Chess Challenger (model CSC)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK)

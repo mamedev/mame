@@ -348,7 +348,6 @@ public:
 
 	optional_device<mc6854_device> m_mc6854;
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 
 	int m_centronics_busy;
@@ -621,8 +620,6 @@ protected:
 	void to7_floppy_reset();
 	void to9_floppy_init(void* int_base, void* ext_base);
 	void to9_floppy_reset();
-	void to7_midi_update_irq (  );
-	void to7_midi_ready_to_send_cb(  );
 };
 
 /*----------- defined in video/thomson.c -----------*/

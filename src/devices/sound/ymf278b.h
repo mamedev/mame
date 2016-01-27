@@ -130,7 +130,7 @@ private:
 	int m_clock;
 
 	sound_stream * m_stream;
-	INT32 *m_mix_buffer;
+	std::unique_ptr<INT32[]> m_mix_buffer;
 	direct_read_data * m_direct;
 	const address_space_config m_space_config;
 	devcb_write_line m_irq_handler;

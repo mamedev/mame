@@ -109,7 +109,7 @@ WRITE8_MEMBER(wink_state::tile_banking_w)
 
 WRITE8_MEMBER(wink_state::wink_coin_counter_w)
 {
-	coin_counter_w(machine(), offset,data & 1);
+	machine().bookkeeping().coin_counter_w(offset,data & 1);
 }
 
 READ8_MEMBER(wink_state::analog_port_r)

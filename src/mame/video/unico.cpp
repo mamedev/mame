@@ -102,7 +102,7 @@ READ16_MEMBER(unico_state::unico_vram_r) { return m_vram[offset]; }
 
 WRITE16_MEMBER(unico_state::unico_vram_w)
 {
-	UINT16 *vram = m_vram;
+	UINT16 *vram = m_vram.get();
 	int tile = ((offset / 0x2000) + 1) % 3;
 	COMBINE_DATA(&vram[offset]);
 	m_tilemap[tile]->mark_tile_dirty((offset & 0x1fff)/2);
@@ -127,13 +127,13 @@ WRITE16_MEMBER(unico_state::unico_spriteram_w)  { COMBINE_DATA(&m_spriteram[offs
 
 VIDEO_START_MEMBER(unico_state,unico)
 {
-	m_vram   = auto_alloc_array_clear(machine(), UINT16, 0xc000 / 2);
-	m_scroll = auto_alloc_array_clear(machine(), UINT16, 0x18 / 2);
-	m_spriteram = auto_alloc_array_clear(machine(), UINT16, 0x800 / 2);
+	m_vram   = make_unique_clear<UINT16[]>(0xc000 / 2);
+	m_scroll = make_unique_clear<UINT16[]>(0x18 / 2);
+	m_spriteram = make_unique_clear<UINT16[]>(0x800 / 2);
 
-	save_pointer(NAME(m_vram), 0xc000/2);
-	save_pointer(NAME(m_scroll), 0x18/2);
-	save_pointer(NAME(m_spriteram), 0x800/2);
+	save_pointer(NAME(m_vram.get()), 0xc000/2);
+	save_pointer(NAME(m_scroll.get()), 0x18/2);
+	save_pointer(NAME(m_spriteram.get()), 0x800/2);
 
 	m_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
 									16,16,  0x40, 0x40);
@@ -191,7 +191,7 @@ VIDEO_START_MEMBER(unico_state,unico)
 
 void unico_state::unico_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT16 *spriteram16 = m_spriteram;
+	UINT16 *spriteram16 = m_spriteram.get();
 	int offs;
 
 	/* Draw them backwards, for pdrawgfx */

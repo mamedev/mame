@@ -569,7 +569,7 @@ WRITE8_MEMBER(cops_state::io1_w)
 					sprintf(output_name, "digit%d", i);
 					display_data = m_lcd_data_l | (m_lcd_data_h << 8);
 					display_data = BITSWAP16(display_data, 4, 5, 12, 1, 0, 11, 10, 6, 7, 2, 9, 3, 15, 8, 14, 13);
-					output_set_value(output_name, display_data);
+					output().set_value(output_name, display_data);
 				}
 			}
 			break;
@@ -580,23 +580,23 @@ WRITE8_MEMBER(cops_state::io1_w)
 			m_lcd_data_h = data;
 			break;
 		case 0x04: /* WOP4 */
-			output_set_value("Offroad Right 4 Lamp", data & 0x80);
-			output_set_value("Offroad Right 3 Lamp", data & 0x40);
-			output_set_value("Offroad Right 2 Lamp", data & 0x20);
-			output_set_value("Offroad Right 1 Lamp", data & 0x10);
-			output_set_value("Offroad Left 4 Lamp", data & 0x08);
-			output_set_value("Offroad Left 3 Lamp", data & 0x04);
-			output_set_value("Offroad Left 2 Lamp", data & 0x02);
-			output_set_value("Offroad Left 1 Lamp", data & 0x01);
+			output().set_value("Offroad Right 4 Lamp", data & 0x80);
+			output().set_value("Offroad Right 3 Lamp", data & 0x40);
+			output().set_value("Offroad Right 2 Lamp", data & 0x20);
+			output().set_value("Offroad Right 1 Lamp", data & 0x10);
+			output().set_value("Offroad Left 4 Lamp", data & 0x08);
+			output().set_value("Offroad Left 3 Lamp", data & 0x04);
+			output().set_value("Offroad Left 2 Lamp", data & 0x02);
+			output().set_value("Offroad Left 1 Lamp", data & 0x01);
 			break;
 		case 0x05: /* WOP5 */
-			output_set_value("Damage Lamp", data & 0x80);
-			output_set_value("Stop Lamp", data & 0x40);
-			output_set_value("Gun Active Right Lamp", data & 0x20);
-			output_set_value("Vest Hit 2 Lamp", data & 0x10);
-			output_set_value("Vest Hit 3 Lamp", data & 0x04);
-			output_set_value("Gun Active Left Lamp", data & 0x02);
-			output_set_value("Vest Hit 1 Lamp", data & 0x01);
+			output().set_value("Damage Lamp", data & 0x80);
+			output().set_value("Stop Lamp", data & 0x40);
+			output().set_value("Gun Active Right Lamp", data & 0x20);
+			output().set_value("Vest Hit 2 Lamp", data & 0x10);
+			output().set_value("Vest Hit 3 Lamp", data & 0x04);
+			output().set_value("Gun Active Left Lamp", data & 0x02);
+			output().set_value("Vest Hit 1 Lamp", data & 0x01);
 			break;
 		case 0x06: /* WOP6 */
 			logerror("WOP6: data = %02x\n", data);
@@ -630,17 +630,17 @@ WRITE8_MEMBER(cops_state::io2_w)
 	switch( offset & 0x0f )
 	{
 		case 0x02:
-			output_set_value("Flash Red Lamp", data & 0x01);
-			output_set_value("Flash Blue Lamp", data & 0x80);
+			output().set_value("Flash Red Lamp", data & 0x01);
+			output().set_value("Flash Blue Lamp", data & 0x80);
 			if ( data & ~0x91 ) logerror("Unknown io2_w, offset = %02x, data = %02x\n", offset, data);
 			break;
 		case 0x04:
-			output_set_value("Bullet Lamp 6", data & 0x20);
-			output_set_value("Bullet Lamp 5", data & 0x10);
-			output_set_value("Bullet Lamp 4", data & 0x08);
-			output_set_value("Bullet Lamp 3", data & 0x04);
-			output_set_value("Bullet Lamp 2", data & 0x02);
-			output_set_value("Bullet Lamp 1", data & 0x01);
+			output().set_value("Bullet Lamp 6", data & 0x20);
+			output().set_value("Bullet Lamp 5", data & 0x10);
+			output().set_value("Bullet Lamp 4", data & 0x08);
+			output().set_value("Bullet Lamp 3", data & 0x04);
+			output().set_value("Bullet Lamp 2", data & 0x02);
+			output().set_value("Bullet Lamp 1", data & 0x01);
 			if ( data & ~0x3f ) logerror("Unknown io2_w, offset = %02x, data = %02x\n", offset, data);
 			break;
 		default:

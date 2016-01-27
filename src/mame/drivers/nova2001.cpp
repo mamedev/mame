@@ -60,6 +60,8 @@ Notes:
 - nova2001 is VERY sensitive to coin inputs, if the coin isn't held down long
   enough, or is held down too long the game will reset, likewise if coins are
   inserted too quickly. This only happens in nova2001 and not in nova2001u.
+  (the nova2001h set seems to be an unofficial fix for this issue, presumably
+   it's so sensitive it would reset sometimes in the original cabinet?)
 
 - Nova 2001 draws black bars on the sides of the screen so the visible area becomes
   240x192, however the physical resolution is still 256x192, the game probably does
@@ -816,6 +818,26 @@ ROM_START( nova2001 )
 	ROM_LOAD( "nova2001.clr", 0x0000, 0x0020, CRC(a2fac5cd) SHA1(ad14aa2be57722d1f48b47171fe72f96091423b6) )
 ROM_END
 
+ROM_START( nova2001h )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	// roms 1 and 2 had green stickers, but looks like an unofficial mod, bytes have been added in empty space to fix game checksum after mods were made to code.
+	// one of the mods fixes the game resetting if the coin input is held down for too short / long of a period, the purpose of the other is unknown.
+	ROM_LOAD( "1(green).6c",         0x0000, 0x2000, CRC(1a8731b3) SHA1(a865d1cb070686dfa19e0da887c599455692a860) )
+	ROM_LOAD( "2(green).6d",         0x2000, 0x2000, CRC(bc4e442b) SHA1(6e1dca5dde442db95403377bf49aaad2a337813e) ) // not actually modified?
+	ROM_LOAD( "3.6f",         0x4000, 0x2000, CRC(b2849038) SHA1(b56c7c03ef7c677cc6df0280a485f9cda3435b23) )
+	ROM_LOAD( "4.6g",         0x6000, 0x1000, CRC(6b5bb12d) SHA1(74aee3d08a7ee1f98eaec4a4b3062aa9d17948ec) )
+	ROM_RELOAD(               0x7000, 0x1000 )  // half size ROM, mirrored
+
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "5.12s",        0x0000, 0x2000, CRC(54198941) SHA1(fe762a0bbcf10b13ece87ded2ea730257cfbe7d3) )
+	ROM_LOAD16_BYTE( "6.12p",        0x0001, 0x2000, CRC(cbd90dca) SHA1(7eacde832f5783f4389fb98d6bf6b26dd494665d) )
+	ROM_LOAD16_BYTE( "7.12n",        0x4000, 0x2000, CRC(9ebd8806) SHA1(26b6caa0d0a7ae52a182070ecc7bc696c12038b3) )
+	ROM_LOAD16_BYTE( "8.12l",        0x4001, 0x2000, CRC(d1b18389) SHA1(2d808fee774f1bb4cec42e23cfef36b54eee0efa) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "nova2001.clr", 0x0000, 0x0020, CRC(a2fac5cd) SHA1(ad14aa2be57722d1f48b47171fe72f96091423b6) )
+ROM_END
+
 ROM_START( nova2001u )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nova2001.1",   0x0000, 0x2000, CRC(b79461bd) SHA1(7fac3313bc76612f66a6518450d0fed32fe70c45) )
@@ -995,8 +1017,11 @@ DRIVER_INIT_MEMBER(nova2001_state,raiders5)
  *
  *************************************/
 
+// many of these don't explicitly state Japan, eg. Nova 2001 could easily be used anywhere.
+
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
 GAME( 1983, nova2001,  0,        nova2001, nova2001, driver_device, 0,        ROT0,   "UPL", "Nova 2001 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001h, nova2001, nova2001, nova2001, driver_device, 0,        ROT0,   "UPL", "Nova 2001 (Japan, hack?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, nova2001u, nova2001, nova2001, nova2001, driver_device, 0,        ROT0,   "UPL (Universal license)", "Nova 2001 (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, ninjakun,  0,        ninjakun, ninjakun, driver_device, 0,        ROT0,   "UPL (Taito license)", "Ninjakun Majou no Bouken", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, pkunwar,   0,        pkunwar,  pkunwar, nova2001_state,  pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (US)", MACHINE_SUPPORTS_SAVE )

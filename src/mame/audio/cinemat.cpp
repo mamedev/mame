@@ -266,7 +266,7 @@ void cinemat_state::speedfrk_sound_w(UINT8 sound_val, UINT8 bits_changed)
 		m_samples->stop(0);
 
 	/* start LED is controlled by bit 0x02 */
-	set_led_status(machine(), 0, ~sound_val & 0x02);
+	output().set_led_value(0, ~sound_val & 0x02);
 }
 
 SOUND_RESET_MEMBER( cinemat_state, speedfrk )
@@ -476,7 +476,7 @@ void cinemat_state::tailg_sound_w(UINT8 sound_val, UINT8 bits_changed)
 			m_samples->start(5, 5);
 
 		/* LED */
-		set_led_status(machine(), 0, m_current_shift & 0x40);
+		output().set_led_value(0, m_current_shift & 0x40);
 
 		/* remember the previous value */
 		m_last_shift = m_current_shift;

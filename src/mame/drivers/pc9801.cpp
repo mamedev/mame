@@ -457,7 +457,8 @@ public:
 		m_sasi_data_out(*this, "sasi_data_out"),
 		m_sasi_data_in(*this, "sasi_data_in"),
 		m_sasi_ctrl_in(*this, "sasi_ctrl_in"),
-		m_ide(*this, "ide"),
+		m_ide1(*this, "ide1"),
+		m_ide2(*this, "ide2"),
 		m_video_ram_1(*this, "video_ram_1"),
 		m_video_ram_2(*this, "video_ram_2"),
 		m_ext_gvram(*this, "ext_gvram"),
@@ -485,10 +486,11 @@ public:
 	optional_device<output_latch_device> m_sasi_data_out;
 	optional_device<input_buffer_device> m_sasi_data_in;
 	optional_device<input_buffer_device> m_sasi_ctrl_in;
-	optional_device<ata_interface_device> m_ide;
+	optional_device<ata_interface_device> m_ide1;
+	optional_device<ata_interface_device> m_ide2;
 	required_shared_ptr<UINT16> m_video_ram_1;
 	required_shared_ptr<UINT16> m_video_ram_2;
-	optional_shared_ptr<UINT16> m_ext_gvram;
+	optional_shared_ptr<UINT32> m_ext_gvram;
 	required_device<beep_device> m_beeper;
 	optional_device<ram_device> m_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -516,7 +518,7 @@ public:
 	UINT8 m_txt_scroll_reg[8];
 	UINT8 m_pal_clut[4];
 
-	UINT16 *m_tvram;
+	std::unique_ptr<UINT16[]> m_tvram;
 
 	UINT16 m_font_addr;
 	UINT8 m_font_line;
@@ -598,7 +600,18 @@ public:
 	UINT16 egc_blit_r(UINT32 offset, UINT16 mem_mask);
 	UINT32 pc9801_286_a20(bool state);
 
-	DECLARE_READ8_MEMBER(ide_hack_r);
+	DECLARE_READ8_MEMBER(ide_ctrl_r);
+	DECLARE_WRITE8_MEMBER(ide_ctrl_w);
+	DECLARE_READ16_MEMBER(ide_cs0_r);
+	DECLARE_WRITE16_MEMBER(ide_cs0_w);
+	DECLARE_READ16_MEMBER(ide_cs1_r);
+	DECLARE_WRITE16_MEMBER(ide_cs1_w);
+	DECLARE_WRITE_LINE_MEMBER(ide1_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(ide2_irq_w);
+
+	UINT8 m_ide_sel;
+	bool m_ide1_irq, m_ide2_irq;
+
 	DECLARE_WRITE8_MEMBER(sasi_data_w);
 	DECLARE_READ8_MEMBER(sasi_data_r);
 	DECLARE_WRITE_LINE_MEMBER(write_sasi_io);
@@ -749,7 +762,7 @@ void pc9801_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 void pc9801_state::video_start()
 {
-	m_tvram = auto_alloc_array(machine(), UINT16, 0x2000);
+	m_tvram = std::make_unique<UINT16[]>(0x2000);
 
 	// find memory regions
 	m_char_rom = memregion("chargen")->base();
@@ -772,32 +785,24 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 	int xi;
 	int res_x,res_y;
 	UINT8 pen;
-	UINT8 interlace_on;
 	UINT8 colors16_mode;
 
 	if(m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
 
-//  popmessage("%02x %d",m_video_ff[INTERLACE_REG],machine().first_screen()->visible_area().max_y + 1);
-//  interlace_on = ((machine().first_screen()->visible_area().max_y + 1) >= 400) ? 1 : 0;
-	interlace_on = m_video_ff[INTERLACE_REG];
 	colors16_mode = (m_ex_video_ff[ANALOG_16_MODE]) ? 16 : 8;
 
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
+		UINT8 *ext_gvram = (UINT8 *)m_ext_gvram.target();
 		for(xi=0;xi<16;xi++)
 		{
 			res_x = x + xi;
 			res_y = y;
 
-			if(!m_screen->visible_area().contains(res_x, res_y*2+0))
-				return;
+			pen = ext_gvram[(address >> 1)*16+xi+(m_vram_disp*0x20000)];
 
-			pen = m_ext_gvram[((address*16+xi)+(m_vram_disp*0x40000)) >> 1];
-
-			bitmap.pix32(res_y*2+0, res_x) = palette[pen + 0x20];
-			if(m_screen->visible_area().contains(res_x, res_y*2+1))
-				bitmap.pix32(res_y*2+1, res_x) = palette[pen + 0x20];
+			bitmap.pix32(res_y, res_x) = palette[pen + 0x20];
 		}
 	}
 	else
@@ -812,17 +817,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 			pen|= ((m_video_ram_2[((address & 0x7fff) + (0x18000) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 4 : 0;
 			if(m_ex_video_ff[ANALOG_16_MODE])
 				pen|= ((m_video_ram_2[((address & 0x7fff) + (0) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 8 : 0;
-
-			if(interlace_on)
-			{
-				if(m_screen->visible_area().contains(res_x, res_y*2+0))
-					bitmap.pix32(res_y*2+0, res_x) = palette[pen + colors16_mode];
-				/* TODO: it looks like that PC-98xx can only display even lines ... */
-				if(m_screen->visible_area().contains(res_x, res_y*2+1))
-					bitmap.pix32(res_y*2+1, res_x) = palette[pen + colors16_mode];
-			}
-			else
-				bitmap.pix32(res_y, res_x) = palette[pen + colors16_mode];
+			bitmap.pix32(res_y, res_x) = palette[pen + colors16_mode];
 		}
 	}
 }
@@ -945,7 +940,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 					}
 
 					if(reverse) { tile_data^=0xff; }
-					if(u_line && yi == 7) { tile_data = 0xff; }
+					if(u_line && yi == lr-1) { tile_data = 0xff; }
 					if(v_line)  { tile_data|=8; }
 
 					/* TODO: proper blink rate for these two */
@@ -1604,12 +1599,50 @@ WRITE16_MEMBER(pc9801_state::upd7220_grcg_w)
 	}
 }
 
-READ8_MEMBER(pc9801_state::ide_hack_r)
+READ8_MEMBER(pc9801_state::ide_ctrl_r)
 {
 	address_space &ram = m_maincpu->space(AS_PROGRAM);
 	// this makes the ide driver not do 512 to 256 byte sector translation, the 9821 looks for bit 6 of offset 0xac403 of the kanji ram to set this, the rs unknown
 	ram.write_byte(0x457, ram.read_byte(0x457) | 0xc0);
-	return 0xff;
+	return m_ide_sel;
+}
+
+WRITE8_MEMBER(pc9801_state::ide_ctrl_w)
+{
+	if(!(data & 0x80))
+		m_ide_sel = data & 1;
+}
+
+READ16_MEMBER(pc9801_state::ide_cs0_r)
+{
+	return (m_ide_sel ? m_ide2 : m_ide1)->read_cs0(space, offset, mem_mask);
+}
+
+WRITE16_MEMBER(pc9801_state::ide_cs0_w)
+{
+	(m_ide_sel ? m_ide2 : m_ide1)->write_cs0(space, offset, data, mem_mask);
+}
+
+READ16_MEMBER(pc9801_state::ide_cs1_r)
+{
+	return (m_ide_sel ? m_ide2 : m_ide1)->read_cs1(space, offset, mem_mask);
+}
+
+WRITE16_MEMBER(pc9801_state::ide_cs1_w)
+{
+	(m_ide_sel ? m_ide2 : m_ide1)->write_cs1(space, offset, data, mem_mask);
+}
+
+WRITE_LINE_MEMBER(pc9801_state::ide1_irq_w)
+{
+	m_ide1_irq = state ? true : false;
+	m_pic2->ir1_w((state || m_ide2_irq) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(pc9801_state::ide2_irq_w)
+{
+	m_ide2_irq = state ? true : false;
+	m_pic2->ir1_w((state || m_ide1_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER( pc9801_state::sasi_data_r )
@@ -2226,9 +2259,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 16, pc9801_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0050, 0x0053) AM_WRITE8(pc9801rs_nmi_w, 0xffff)
-	AM_RANGE(0x0430, 0x0433) AM_READ8(ide_hack_r, 0x00ff)
-	AM_RANGE(0x0640, 0x064f) AM_DEVREADWRITE("ide", ata_interface_device, read_cs0, write_cs0)
-	AM_RANGE(0x0740, 0x074f) AM_DEVREADWRITE("ide", ata_interface_device, read_cs1, write_cs1)
+	AM_RANGE(0x0430, 0x0433) AM_READWRITE8(ide_ctrl_r, ide_ctrl_w, 0x00ff)
+	AM_RANGE(0x0640, 0x064f) AM_READWRITE(ide_cs0_r, ide_cs0_w)
+	AM_RANGE(0x0740, 0x074f) AM_READWRITE(ide_cs1_r, ide_cs1_w)
+	AM_RANGE(0x1e80, 0x1e8f) AM_NOP // temp
 	AM_RANGE(0xbfd8, 0xbfdf) AM_WRITE8(pc9801rs_mouse_freq_w, 0xffff)
 	AM_RANGE(0xe0d0, 0xe0d3) AM_READ8(pc9801rs_midi_r, 0xffff)
 	AM_IMPORT_FROM(pc9801ux_io)
@@ -2457,15 +2491,15 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(a20_ctrl_r,      a20_ctrl_w,      0x00ff00ff)
 //  AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
 //  AM_RANGE(0x018c, 0x018f) YM2203 OPN extended ports / <undefined>
-	AM_RANGE(0x0430, 0x0433) AM_READ8(ide_hack_r, 0x000000ff)
+	AM_RANGE(0x0430, 0x0433) AM_READWRITE8(ide_ctrl_r, ide_ctrl_w, 0x00ff00ff)
 	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffffffff)
 //  AM_RANGE(0x043d, 0x043d) ROM/RAM bank (NEC)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank (EPSON)
 	AM_RANGE(0x0460, 0x0463) AM_READWRITE8(pc9821_window_bank_r,pc9821_window_bank_w, 0xffffffff)
 	AM_RANGE(0x04a0, 0x04af) AM_WRITE16(egc_w, 0xffffffff)
 //  AM_RANGE(0x04be, 0x04be) FDC "RPM" register
-	AM_RANGE(0x0640, 0x064f) AM_DEVREADWRITE16("ide", ata_interface_device, read_cs0, write_cs0, 0xffffffff)
-	AM_RANGE(0x0740, 0x074f) AM_DEVREADWRITE16("ide", ata_interface_device, read_cs1, write_cs1, 0xffffffff)
+	AM_RANGE(0x0640, 0x064f) AM_READWRITE16(ide_cs0_r, ide_cs0_w, 0xffffffff)
+	AM_RANGE(0x0740, 0x074f) AM_READWRITE16(ide_cs1_r, ide_cs1_w, 0xffffffff)
 //  AM_RANGE(0x08e0, 0x08ea) <undefined> / EMM SIO registers
 	AM_RANGE(0x09a0, 0x09a3) AM_READWRITE8(pc9821_ext2_video_ff_r, pc9821_ext2_video_ff_w, 0x000000ff) // GDC extended register r/w
 //  AM_RANGE(0x09a8, 0x09a8) GDC 31KHz register r/w
@@ -3068,7 +3102,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9821ap2)
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 {
-	memset(m_tvram, 0, sizeof(UINT16) * 0x2000);
+	memset(m_tvram.get(), 0, sizeof(UINT16) * 0x2000);
 	/* this looks like to be some kind of backup ram, system will boot with green colors otherwise */
 	{
 		int i;
@@ -3082,7 +3116,6 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 			m_tvram[(0x3fe0>>1)+i] = default_memsw_data[i];
 	}
 
-	m_beeper->set_frequency(2400);
 	m_beeper->set_state(0);
 
 	m_nmi_ff = 0;
@@ -3122,6 +3155,8 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 	m_rom_bank = 0;
 	m_fdc_ctrl = 3;
 	m_access_ctrl = 0;
+	m_ide_sel = 0;
+	m_ide1_irq = m_ide2_irq = false;
 	m_keyb_press = 0xff; // temp kludge, for PC-9821 booting
 //  m_has_opna = ioport("SOUND_CONFIG")->read() & 1;
 	m_maincpu->set_input_line(INPUT_LINE_A20, m_gate_a20);
@@ -3145,7 +3180,7 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9821)
 void pc9801_state::device_reset_after_children()
 {
 	driver_device::device_reset_after_children();
-	ata_mass_storage_device *ide0 = machine().device<ata_mass_storage_device>("ide:0:hdd");
+	ata_mass_storage_device *ide0 = machine().device<ata_mass_storage_device>("ide1:0:hdd");
 	if(ide0)
 		ide0->identify_device_buffer()[47] = 0;
 }
@@ -3229,8 +3264,10 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_ide )
-	MCFG_ATA_INTERFACE_ADD("ide", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir1_w))
+	MCFG_ATA_INTERFACE_ADD("ide1", ata_devices, "hdd", nullptr, false)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(pc9801_state, ide1_irq_w))
+	MCFG_ATA_INTERFACE_ADD("ide2", ata_devices, "cdrom", nullptr, false)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(pc9801_state, ide2_irq_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_common )
@@ -3303,7 +3340,7 @@ static MACHINE_CONFIG_FRAGMENT( pc9801_common )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc9801)
 MACHINE_CONFIG_END

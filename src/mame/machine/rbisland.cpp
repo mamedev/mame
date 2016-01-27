@@ -648,8 +648,8 @@ void rbisland_state::request_round_data(  )
 {
 	int round = m_CRAM[1][0x141]; /* 0...49 */
 
-	memcpy(m_CRAM[1], CROM_BANK1, sizeof CROM_BANK1);
-	memcpy(m_CRAM[2], CROM_BANK2, sizeof CROM_BANK2);
+	memcpy(m_CRAM[1].get(), CROM_BANK1, sizeof CROM_BANK1);
+	memcpy(m_CRAM[2].get(), CROM_BANK2, sizeof CROM_BANK2);
 
 	m_CRAM[1][1] = cchip_round_height[round] >> 0;
 	m_CRAM[1][2] = cchip_round_height[round] >> 8;
@@ -682,9 +682,9 @@ void rbisland_state::request_world_data(  )
 
 	/* first two bytes in each bank are left unchanged  */
 
-	memcpy(m_CRAM[4] + 2, CROM_BANK4[world].data, CROM_BANK4[world].size);
-	memcpy(m_CRAM[5] + 2, CROM_BANK5[world].data, CROM_BANK5[world].size);
-	memcpy(m_CRAM[7] + 2, CROM_BANK7[world].data, CROM_BANK7[world].size);
+	memcpy(m_CRAM[4].get() + 2, CROM_BANK4[world].data, CROM_BANK4[world].size);
+	memcpy(m_CRAM[5].get() + 2, CROM_BANK5[world].data, CROM_BANK5[world].size);
+	memcpy(m_CRAM[7].get() + 2, CROM_BANK7[world].data, CROM_BANK7[world].size);
 
 	/* banks 5 and 6 are different in the extra version */
 
@@ -703,11 +703,11 @@ void rbisland_state::request_world_data(  )
 			}
 		}
 
-		memcpy(m_CRAM[6] + 2, CROM_BANK6_EXTRA, sizeof CROM_BANK6_EXTRA);
+		memcpy(m_CRAM[6].get() + 2, CROM_BANK6_EXTRA, sizeof CROM_BANK6_EXTRA);
 	}
 	else
 	{
-		memcpy(m_CRAM[6] + 2, CROM_BANK6, sizeof CROM_BANK6);
+		memcpy(m_CRAM[6].get() + 2, CROM_BANK6, sizeof CROM_BANK6);
 	}
 }
 
@@ -753,10 +753,10 @@ TIMER_CALLBACK_MEMBER(rbisland_state::cchip_timer)
 		m_CRAM[1][0x149] = 0xFF;
 	}
 
-	coin_lockout_w(machine(), 1, m_CRAM[0][8] & 0x80);
-	coin_lockout_w(machine(), 0, m_CRAM[0][8] & 0x40);
-	coin_counter_w(machine(), 1, m_CRAM[0][8] & 0x20);
-	coin_counter_w(machine(), 0, m_CRAM[0][8] & 0x10);
+	machine().bookkeeping().coin_lockout_w(1, m_CRAM[0][8] & 0x80);
+	machine().bookkeeping().coin_lockout_w(0, m_CRAM[0][8] & 0x40);
+	machine().bookkeeping().coin_counter_w(1, m_CRAM[0][8] & 0x20);
+	machine().bookkeeping().coin_counter_w(0, m_CRAM[0][8] & 0x10);
 
 	m_CRAM[0][3] = ioport("800007")->read();    /* STARTn + SERVICE1 */
 	m_CRAM[0][4] = ioport("800009")->read();    /* COINn */
@@ -821,9 +821,9 @@ void rbisland_state::rbisland_cchip_init( int version )
 
 	for (i = 0; i < 8; i++)
 	{
-		m_CRAM[i] = auto_alloc_array(machine(), UINT8, 0x400);
+		m_CRAM[i] = std::make_unique<UINT8[]>(0x400);
 
-		save_pointer(m_CRAM[i], "cchip/m_CRAM[i]", 0x400, i);
+		save_pointer(m_CRAM[i].get(), "cchip/m_CRAM[i]", 0x400, i);
 	}
 
 	save_item(m_current_bank, "cchip/m_current_bank");

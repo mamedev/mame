@@ -33,9 +33,6 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dmack) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_pdiag) override;
-
-	TIMER_CALLBACK_MEMBER(buffer_empty_timer_work);
-
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -129,6 +126,7 @@ protected:
 		IDE_COMMAND_IDENTIFY_DEVICE = 0xec,
 		IDE_COMMAND_SET_FEATURES = 0xef,
 		IDE_COMMAND_SECURITY_UNLOCK = 0xf2,
+		IDE_COMMAND_SECURITY_DISABLE_PASSWORD = 0xf6,
 		IDE_COMMAND_READ_NATIVE_MAX_ADDRESS = 0xf8,
 		IDE_COMMAND_SET_MAX = 0xf9
 	};

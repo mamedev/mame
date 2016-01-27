@@ -24,6 +24,7 @@ function devicesProject(_target, _subtarget)
 	}
 
 	addprojectflags()
+	precompiledheaders()
 
 	includedirs {
 		MAME_DIR .. "src/osd",
@@ -62,6 +63,7 @@ if (_OPTIONS["SOURCES"] == nil) then
 	kind (LIBTYPE)
 	targetsubdir(_target .."_" .. _subtarget)
 	addprojectflags()
+	precompiledheaders()
 	options {
 		"ArchiveSplit",
 	}
@@ -100,6 +102,7 @@ if #disasm_files > 0 then
 	kind (LIBTYPE)
 	targetsubdir(_target .."_" .. _subtarget)
 	addprojectflags()
+	precompiledheaders()
 
 	includedirs {
 		MAME_DIR .. "src/osd",

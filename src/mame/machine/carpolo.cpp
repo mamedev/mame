@@ -355,7 +355,7 @@ WRITE8_MEMBER(carpolo_state::pia_0_port_a_w)
 	   bit 6 - Player 1 crash sound
 	   bit 7 - Ball hit pulse sound */
 
-	coin_counter_w(machine(), 0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 
 
 	m_ttl7474_1f_1->clear_w((data & 0x08) >> 3);

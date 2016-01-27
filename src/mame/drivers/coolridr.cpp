@@ -390,16 +390,14 @@ public:
 	UINT8 sound_data, sound_fifo;
 
 	UINT8* m_compressedgfx;
-	UINT16* m_expanded_10bit_gfx;
-	UINT16* m_rearranged_16bit_gfx;
+	std::unique_ptr<UINT16[]> m_expanded_10bit_gfx;
+	std::unique_ptr<UINT16[]> m_rearranged_16bit_gfx;
 
 	UINT32 get_20bit_data(UINT32 romoffset, int _20bitwordnum);
 	UINT16 get_10bit_data(UINT32 romoffset, int _10bitwordnum);
 
 	DECLARE_READ32_MEMBER(sysh1_sound_dma_r);
 	DECLARE_WRITE32_MEMBER(sysh1_sound_dma_w);
-	DECLARE_READ32_MEMBER(sysh1_ioga_r);
-	DECLARE_WRITE32_MEMBER(sysh1_ioga_w);
 	DECLARE_READ32_MEMBER(sysh1_unk_blit_r);
 	DECLARE_WRITE32_MEMBER(sysh1_unk_blit_w);
 	DECLARE_WRITE32_MEMBER(sysh1_blit_mode_w);
@@ -407,9 +405,7 @@ public:
 	DECLARE_WRITE32_MEMBER(sysh1_fb_mode_w);
 	DECLARE_WRITE32_MEMBER(sysh1_fb_data_w);
 
-	DECLARE_WRITE32_MEMBER(sysh1_pal_w);
 	DECLARE_WRITE32_MEMBER(sysh1_dma_w);
-	DECLARE_WRITE32_MEMBER(sysh1_char_w);
 	DECLARE_READ32_MEMBER(coolridr_hack2_r);
 	DECLARE_READ32_MEMBER(aquastge_hack_r);
 	DECLARE_READ16_MEMBER(h1_soundram_r);
@@ -442,7 +438,6 @@ public:
 	UINT32 screen_update_coolridr1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_coolridr2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void blit_current_sprite(address_space &space);
-	INTERRUPT_GEN_MEMBER(system_h1);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_main);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_sub);
 	DECLARE_WRITE8_MEMBER(scsp_irq);
@@ -451,9 +446,9 @@ public:
 
 	int debug_randompal;
 
-	UINT16 *m_h1_vram;
-	UINT8 *m_h1_pcg;
-	UINT16 *m_h1_pal;
+	std::unique_ptr<UINT16[]> m_h1_vram;
+	std::unique_ptr<UINT8[]> m_h1_pcg;
+	std::unique_ptr<UINT16[]> m_h1_pal;
 	int m_gfx_index;
 	int m_color_bank;
 	struct {
@@ -480,8 +475,6 @@ public:
 		int screen;
 		int colbase;
 	};
-
-	static int comp_sprite_z(const void *q1, const void *q2);
 
 	struct cool_render_object **m_cool_render_object_list1;
 	struct cool_render_object **m_cool_render_object_list2;
@@ -573,7 +566,7 @@ void coolridr_state::video_start()
 	m_screen->register_screen_bitmap(m_screen1_bitmap);
 	m_screen->register_screen_bitmap(m_screen2_bitmap);
 
-	m_gfxdecode->set_gfx(m_gfx_index, global_alloc(gfx_element(m_palette, h1_tile_layout, m_h1_pcg, 0, 8, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(m_palette, h1_tile_layout, m_h1_pcg.get(), 0, 8, 0));
 }
 
 /*
@@ -1319,8 +1312,8 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 
 
-	UINT16* rearranged_16bit_gfx = object->state->m_rearranged_16bit_gfx;
-	UINT16* expanded_10bit_gfx = object->state->m_expanded_10bit_gfx;
+	UINT16* rearranged_16bit_gfx = object->state->m_rearranged_16bit_gfx.get();
+	UINT16* expanded_10bit_gfx = object->state->m_expanded_10bit_gfx.get();
 
 	INT16 clipminX = CLIPMINX_FULL;
 	INT16 clipmaxX = CLIPMAXX_FULL;
@@ -3621,7 +3614,7 @@ void coolridr_state::machine_start()
 	size_t  size    = memregion( "compressedgfx" )->bytes();
 
 	// we're expanding 10bit packed data to 16bits(10 used)
-	m_expanded_10bit_gfx = auto_alloc_array(machine(), UINT16, ((size/10)*16)/2);
+	m_expanded_10bit_gfx = std::make_unique<UINT16[]>(((size/10)*16)/2);
 
 	for (int i=0;i<(0x800000*8)/2;i++)
 	{
@@ -3630,7 +3623,7 @@ void coolridr_state::machine_start()
 
 	// do a rearranged version too with just the 16-bit words in a different order, palettes seem to
 	// be referenced this way?!
-	m_rearranged_16bit_gfx = auto_alloc_array(machine(), UINT16, size/2);
+	m_rearranged_16bit_gfx = std::make_unique<UINT16[]>(size/2);
 
 	UINT16* compressed = (UINT16*)memregion( "compressedgfx" )->base();
 	int count = 0;
@@ -3660,16 +3653,16 @@ void coolridr_state::machine_start()
 		{
 			for (int i=0;i<(0x800000*8);i++)
 			{
-				fwrite((UINT8*)m_expanded_10bit_gfx+(i^1), 1, 1, fp);
+				fwrite((UINT8*)m_expanded_10bit_gfx.get()+(i^1), 1, 1, fp);
 			}
 			fclose(fp);
 
 		}
 	}
 
-	m_h1_vram = auto_alloc_array_clear(machine(), UINT16, VRAM_SIZE);
-	m_h1_pcg = auto_alloc_array_clear(machine(), UINT8, VRAM_SIZE);
-	m_h1_pal = auto_alloc_array_clear(machine(), UINT16, VRAM_SIZE);
+	m_h1_vram = make_unique_clear<UINT16[]>(VRAM_SIZE);
+	m_h1_pcg = make_unique_clear<UINT8[]>(VRAM_SIZE);
+	m_h1_pal = make_unique_clear<UINT16[]>(VRAM_SIZE);
 
 	m_cool_render_object_list1 = auto_alloc_array_clear(machine(), struct cool_render_object*, 1000000);
 	m_listcount1 = 0;
@@ -3683,9 +3676,9 @@ void coolridr_state::machine_start()
 	decode[1].current_object = 0;
 	debug_randompal = 9;
 
-	save_pointer(NAME(m_h1_vram), VRAM_SIZE);
-	save_pointer(NAME(m_h1_pcg), VRAM_SIZE);
-	save_pointer(NAME(m_h1_pal), VRAM_SIZE);
+	save_pointer(NAME(m_h1_vram.get()), VRAM_SIZE);
+	save_pointer(NAME(m_h1_pcg.get()), VRAM_SIZE);
+	save_pointer(NAME(m_h1_pal.get()), VRAM_SIZE);
 }
 
 void coolridr_state::machine_reset()

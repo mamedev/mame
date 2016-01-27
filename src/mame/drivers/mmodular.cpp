@@ -254,16 +254,16 @@ WRITE8_MEMBER(polgar_state::write_polgar_IO)
 
 	if (BIT(data,7) && BIT(data, 4)) {
 		for (i = 0;i < 8;i++)
-		output_set_led_value(i,!BIT(latch_data,i));
+		output().set_led_value(i,!BIT(latch_data,i));
 	}
 	else if (BIT(data,6) && BIT(data,5)) {
 		for (i = 0;i < 8;i++)
-		output_set_led_value(10+i,!BIT(latch_data,7-i));
+		output().set_led_value(10+i,!BIT(latch_data,7-i));
 	}
 	else if (!data && (!strcmp(machine().system().name,"milano"))) {
 		for (i=0;i<8;i++) {
-			output_set_led_value(i,!BIT(latch_data,i));
-			output_set_led_value(10+i,!BIT(latch_data,7-i));
+			output().set_led_value(i,!BIT(latch_data,i));
+			output().set_led_value(10+i,!BIT(latch_data,7-i));
 		}
 	}
 
@@ -407,8 +407,8 @@ WRITE16_MEMBER(polgar_state::diablo68_write_LCD)
 WRITE8_MEMBER(polgar_state::milano_write_LED)
 {
 	UINT8 LED_offset = 100;
-	if (data == 0xff)   output_set_led_value(LED_offset+offset,1);
-	else                output_set_led_value(LED_offset+offset,0);
+	if (data == 0xff)   output().set_led_value(LED_offset+offset,1);
+	else                output().set_led_value(LED_offset+offset,0);
 
 	//logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
@@ -419,8 +419,8 @@ WRITE8_MEMBER(polgar_state::megaiv_write_LED)
 		m_beeper->set_state(1);
 	else
 		m_beeper->set_state(0);
-	output_set_led_value(102,BIT(data,1)?1:0);
-	output_set_led_value(107,BIT(data,6)?1:0);
+	output().set_led_value(102,BIT(data,1)?1:0);
+	output().set_led_value(107,BIT(data,6)?1:0);
 
 //  logerror("LEDs  FUNC = %02x found = %d\n",data,found);
 	logerror("LED mask %d\n",data);
@@ -455,26 +455,26 @@ if (start == 1) {
 */
 
 if ((data & 0x68) == 0x68) {
-	output_set_led_value(103,BIT(data,4)?0:1); // POS
-	output_set_led_value(107,BIT(data,7)?0:1); // white
+	output().set_led_value(103,BIT(data,4)?0:1); // POS
+	output().set_led_value(107,BIT(data,7)?0:1); // white
 	found = 1;
 }
 
 if ((data & 0x64) == 0x64) {
-	output_set_led_value(102,BIT(data,4)?0:1); // MEM
-	output_set_led_value(106,BIT(data,7)?0:1); // black
+	output().set_led_value(102,BIT(data,4)?0:1); // MEM
+	output().set_led_value(106,BIT(data,7)?0:1); // black
 	found = 1;
 }
 
 if ((data & 0xa2) == 0xa2) {
-	output_set_led_value(101,BIT(data,4)?0:1); // INFO
-	output_set_led_value(105,BIT(data,6)?0:1); // FUNC
+	output().set_led_value(101,BIT(data,4)?0:1); // INFO
+	output().set_led_value(105,BIT(data,6)?0:1); // FUNC
 	found = 1;
 }
 
 if ((data & 0xa1) == 0xa1) {
-	output_set_led_value(100,BIT(data,4)?0:1); // TRN
-	output_set_led_value(104,BIT(data,6)?0:1); // LVL
+	output().set_led_value(100,BIT(data,4)?0:1); // TRN
+	output().set_led_value(104,BIT(data,6)?0:1); // LVL
 	found = 1;
 }
 
@@ -507,8 +507,8 @@ WRITE32_MEMBER(polgar_state::write_LED_BPL32)
 
 	data >>= 24;
 	for (i=0;i<8;i++) {
-		output_set_led_value(i,BIT(data,i));
-		output_set_led_value(10+i,!BIT(BPL32latch_data,7-i));
+		output().set_led_value(i,BIT(data,i));
+		output().set_led_value(10+i,!BIT(BPL32latch_data,7-i));
 	}
 
 	logerror("LEDs  Offset = %d Data = %08x Latch = %08x\n",offset,data,BPL32latch_data);
@@ -528,7 +528,7 @@ WRITE8_MEMBER(polgar_state::polgar_write_LED)
 		led_status|=1<<offset;
 	}
 
-	if (offset < 6) output_set_led_value(LED_offset+offset, led_status&1<<offset?1:0);
+	if (offset < 6) output().set_led_value(LED_offset+offset, led_status&1<<offset?1:0);
 	logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
 
@@ -577,10 +577,10 @@ WRITE8_MEMBER(polgar_state::monteciv_write_LCD)
 			tempchar = 0;
 		}
 		if (whichchar == 4) {
-			output_set_digit_value(0,charstodisplay[0]);
-			output_set_digit_value(1,charstodisplay[1]);
-			output_set_digit_value(2,charstodisplay[2]);
-			output_set_digit_value(3,charstodisplay[3]);
+			output().set_digit_value(0,charstodisplay[0]);
+			output().set_digit_value(1,charstodisplay[1]);
+			output().set_digit_value(2,charstodisplay[2]);
+			output().set_digit_value(3,charstodisplay[3]);
 			whichchar = 0;
 		}
 	}
@@ -602,10 +602,10 @@ WRITE8_MEMBER(polgar_state::monteciv_write_LCD)
 			tempchar = 0;
 		}
 		if (whichchar == 4) {
-			output_set_digit_value(4+0,charstodisplay[0]);
-			output_set_digit_value(4+1,charstodisplay[1]);
-			output_set_digit_value(4+2,charstodisplay[2]);
-			output_set_digit_value(4+3,charstodisplay[3]);
+			output().set_digit_value(4+0,charstodisplay[0]);
+			output().set_digit_value(4+1,charstodisplay[1]);
+			output().set_digit_value(4+2,charstodisplay[2]);
+			output().set_digit_value(4+3,charstodisplay[3]);
 			whichchar = 0;
 		}
 	}
@@ -758,15 +758,15 @@ READ8_MEMBER(polgar_state::read_keys_board_monteciv)
 			data = ioport("BUTTONS_MONTE2")->read();
 #if 0
 			if (data) {
-				output_set_digit_value(0,64);
-				output_set_digit_value(1,113+128);
-				output_set_digit_value(2,190);
-				output_set_digit_value(3,64);
+				output().set_digit_value(0,64);
+				output().set_digit_value(1,113+128);
+				output().set_digit_value(2,190);
+				output().set_digit_value(3,64);
 
-				output_set_digit_value(4,246-128);
-				output_set_digit_value(5,247-128);
-				output_set_digit_value(6,219-128);
-				output_set_digit_value(7,249-128);
+				output().set_digit_value(4,246-128);
+				output().set_digit_value(5,247-128);
+				output().set_digit_value(6,219-128);
+				output().set_digit_value(7,249-128);
 			}
 #endif
 		} else {
@@ -1536,7 +1536,7 @@ static MACHINE_CONFIG_FRAGMENT ( chess_common )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -1606,7 +1606,7 @@ static MACHINE_CONFIG_START( monteciv, polgar_state )
 	MCFG_MACHINE_START_OVERRIDE(polgar_state, polgar )
 	MCFG_MACHINE_RESET_OVERRIDE(polgar_state, monteciv )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", polgar_state, cause_nmi, attotime::from_hz(600))

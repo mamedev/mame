@@ -58,7 +58,7 @@ extern const device_type CXD8654Q;
 
 struct psx_gpu_debug
 {
-	bitmap_ind16 *mesh;
+	std::unique_ptr<bitmap_ind16> mesh;
 	int b_clear;
 	int b_mesh;
 	int n_skip;
@@ -240,7 +240,7 @@ private:
 	INT32 n_iy;
 	INT32 n_ti;
 
-	UINT16 *p_vram;
+	std::unique_ptr<UINT16[]> p_vram;
 	UINT32 n_vramx;
 	UINT32 n_vramy;
 	UINT32 n_twy;

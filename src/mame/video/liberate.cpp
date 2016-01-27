@@ -210,9 +210,9 @@ VIDEO_START_MEMBER(liberate_state,prosoccr)
 	m_fix_tilemap->set_transparent_pen(0);
 
 	m_fg_gfx = memregion("fg_gfx")->base();
-	m_charram = auto_alloc_array(machine(), UINT8, 0x1800 * 2);
+	m_charram = std::make_unique<UINT8[]>(0x1800 * 2);
 
-	save_pointer(NAME(m_charram), 0x1800 * 2);
+	save_pointer(NAME(m_charram.get()), 0x1800 * 2);
 	save_pointer(NAME(m_fg_gfx), 0x6000);
 }
 

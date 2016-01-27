@@ -502,25 +502,28 @@ void scsp_device::init()
 	SCSPDSP_Init(&m_DSP);
 
 	m_IrqTimA = m_IrqTimBC = m_IrqMidi = 0;
-	m_MidiR=m_MidiW=0;
-	m_MidiOutR=m_MidiOutW=0;
+	m_MidiR=m_MidiW = 0;
+	m_MidiOutR = m_MidiOutW = 0;
 
 	// get SCSP RAM
 	if (strcmp(tag(), ":scsp") == 0 || strcmp(tag(), ":scsp1") == 0)
 	{
-		m_Master=1;
+		m_Master = 1;
 	}
 	else
 	{
-		m_Master=0;
+		m_Master = 0;
 	}
 
-	m_SCSPRAM = region()->base();
-	if (m_SCSPRAM)
+	memory_region* ram_region = memregion(tag());
+
+	// coolridr.c defines a region for the RAM, stv.c doesn't (uses set_ram_base instead, which seems to be more correct anyway?)
+	if (ram_region != NULL)
 	{
-		m_SCSPRAM_LENGTH = region()->bytes();
+		m_SCSPRAM = ram_region->base();
+		m_SCSPRAM_LENGTH = ram_region->bytes();
 		m_DSP.SCSPRAM = (UINT16 *)m_SCSPRAM;
-		m_DSP.SCSPRAM_LENGTH = m_SCSPRAM_LENGTH/2;
+		m_DSP.SCSPRAM_LENGTH = m_SCSPRAM_LENGTH / 2;
 		m_SCSPRAM += m_roffset;
 	}
 
@@ -540,10 +543,10 @@ void scsp_device::init()
 		int iTL =(i>>0x0)&0xff;
 		int iPAN=(i>>0x8)&0x1f;
 		int iSDL=(i>>0xD)&0x07;
-		float TL=1.0f;
+		float TL;
 		float SegaDB=0.0f;
-		float fSDL=1.0f;
-		float PAN=1.0f;
+		float fSDL;
+		float PAN;
 		float LPAN,RPAN;
 
 		if(iTL&0x01) SegaDB-=0.4f;
@@ -617,8 +620,8 @@ void scsp_device::init()
 	}
 
 	LFO_Init();
-	m_buffertmpl=auto_alloc_array_clear(machine(), signed int, 44100);
-	m_buffertmpr=auto_alloc_array_clear(machine(), signed int, 44100);
+	m_buffertmpl=make_unique_clear<INT32[]>(44100);
+	m_buffertmpr=make_unique_clear<INT32[]>(44100);
 
 	// no "pend"
 	m_udata.data[0x20/2] = 0;

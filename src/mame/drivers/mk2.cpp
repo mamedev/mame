@@ -119,12 +119,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(mk2_state::update_leds)
 	int i;
 
 	for (i=0; i<4; i++)
-		output_set_digit_value(i, m_led[i]);
+		output().set_digit_value(i, m_led[i]);
 
-	output_set_led_value(0, BIT(m_led[4], 3));
-	output_set_led_value(1, BIT(m_led[4], 5));
-	output_set_led_value(2, BIT(m_led[4], 4));
-	output_set_led_value(3, BIT(m_led[4], 4) ? 0 : 1);
+	output().set_led_value(0, BIT(m_led[4], 3));
+	output().set_led_value(1, BIT(m_led[4], 5));
+	output().set_led_value(2, BIT(m_led[4], 4));
+	output().set_led_value(3, BIT(m_led[4], 4) ? 0 : 1);
 
 	m_led[0]= m_led[1]= m_led[2]= m_led[3]= m_led[4]= 0;
 }

@@ -64,8 +64,6 @@ public:
 
 	required_device<upd7220_device> m_hgdc;
 	DECLARE_READ8_MEMBER( test_r );
-	DECLARE_READ8_MEMBER( pcg_r );
-	DECLARE_WRITE8_MEMBER( pcg_w );
 
 	//UINT16 m_pcg_addr;
 	//UINT8 m_pcg_internal_addr;

@@ -29,8 +29,8 @@ const rom_entry *cpc_transtape_device::device_rom_region() const
 
 static INPUT_PORTS_START(cpc_transtape)
 	PORT_START("transtape")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Red Button") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_transtape_device,button_red_w,1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Black Button") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_transtape_device,button_black_w,1)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Red Button") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_transtape_device,button_red_w,nullptr)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Black Button") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_transtape_device,button_black_w,nullptr)
 INPUT_PORTS_END
 
 ioport_constructor cpc_transtape_device::device_input_ports() const
@@ -61,7 +61,7 @@ void cpc_transtape_device::device_start()
 	m_cpu = static_cast<cpu_device*>(machine().device("maincpu"));
 	m_space = &m_cpu->space(AS_IO);
 
-	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
+	m_ram = make_unique_clear<UINT8[]>(0x2000);
 
 	m_space->install_write_handler(0xfbf0,0xfbf0,0,0,write8_delegate(FUNC(cpc_transtape_device::output_w),this));
 	m_space->install_read_handler(0xfbff,0xfbff,0,0,read8_delegate(FUNC(cpc_transtape_device::input_r),this));
@@ -88,10 +88,10 @@ void cpc_transtape_device::map_enable()
 	}
 	if(m_output & 0x01)  // RAM enable
 	{
-		membank(":bank7")->set_base(m_ram);
-		membank(":bank15")->set_base(m_ram);
-		membank(":bank8")->set_base(m_ram);  // repeats in second 8kB
-		membank(":bank16")->set_base(m_ram);
+		membank(":bank7")->set_base(m_ram.get());
+		membank(":bank15")->set_base(m_ram.get());
+		membank(":bank8")->set_base(m_ram.get());  // repeats in second 8kB
+		membank(":bank16")->set_base(m_ram.get());
 	}
 }
 

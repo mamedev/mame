@@ -133,51 +133,50 @@ class mpu3_state : public driver_device
 public:
 	mpu3_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
-			m_vfd(*this, "vfd"),
 			m_maincpu(*this, "maincpu"),
 			m_reel0(*this, "reel0"),
 			m_reel1(*this, "reel1"),
 			m_reel2(*this, "reel2"),
-			m_reel3(*this, "reel3")
+			m_reel3(*this, "reel3"),
+			m_meters(*this, "meters"),
+			m_vfd(*this, "vfd")
 			{ }
-	optional_device<roc10937_t> m_vfd;
 
+	int m_triac_ic3;
+	int m_triac_ic4;
+	int m_triac_ic5;
+	int m_ic3_data;
+	int m_IC11G1;
+	int m_IC11G2A;
+	int m_IC11G2B;
+	int m_IC11GC;
+	int m_IC11GB;
+	int m_IC11GA;
 
-int m_triac_ic3;
-int m_triac_ic4;
-int m_triac_ic5;
-int m_ic3_data;
-int m_IC11G1;
-int m_IC11G2A;
-int m_IC11G2B;
-int m_IC11GC;
-int m_IC11GB;
-int m_IC11GA;
+	int m_ic10_output;
+	int m_ic11_active;
+	int m_ic11_output;
+	int m_disp_func;
 
-int m_ic10_output;
-int m_ic11_active;
-int m_ic11_output;
-int m_disp_func;
+	int m_ic4_input_a;
+	int m_aux1_input;
+	int m_aux2_input;
+	int m_input_strobe;   /* IC11 74LS138 A = CA2 IC3, B = CA2 IC4, C = CA2 IC5 */
+	UINT8 m_lamp_strobe;
+	UINT8 m_led_strobe;
+	int m_signal_50hz;
 
-int m_ic4_input_a;
-int m_aux1_input;
-int m_aux2_input;
-int m_input_strobe;   /* IC11 74LS138 A = CA2 IC3, B = CA2 IC4, C = CA2 IC5 */
-UINT8 m_lamp_strobe;
-UINT8 m_led_strobe;
-int m_signal_50hz;
+	const mpu3_chr_table* m_current_chr_table;
+	int m_prot_col;
 
-const mpu3_chr_table* m_current_chr_table;
-int m_prot_col;
-
-int m_optic_pattern;
+	int m_optic_pattern;
 
 	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
 	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
 	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
 	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
 
-emu_timer *m_ic21_timer;
+	emu_timer *m_ic21_timer;
 	DECLARE_WRITE8_MEMBER(characteriser_w);
 	DECLARE_READ8_MEMBER(characteriser_r);
 	DECLARE_WRITE8_MEMBER(mpu3ptm_w);
@@ -219,6 +218,8 @@ emu_timer *m_ic21_timer;
 	required_device<stepper_device> m_reel1;
 	required_device<stepper_device> m_reel2;
 	required_device<stepper_device> m_reel3;
+	required_device<meters_device> m_meters;
+	optional_device<roc10937_t> m_vfd;
 };
 
 #define DISPLAY_PORT 0
@@ -234,7 +235,7 @@ void mpu3_state::update_triacs()
 
 	for (i = 0; i < 8; i++)
 	{
-		output_set_indexed_value("triac", i, triacdata & (1 << i));
+		output().set_indexed_value("triac", i, triacdata & (1 << i));
 	}
 }
 
@@ -452,7 +453,7 @@ WRITE8_MEMBER(mpu3_state::pia_ic4_porta_w)
 			if(m_led_strobe != m_input_strobe)
 			{
 				swizzle = ((m_ic4_input_a & 0x01) << 2)+(m_ic4_input_a & 0x02)+((m_ic4_input_a & 0x4) >> 2)+(m_ic4_input_a & 0x08)+((m_ic4_input_a & 0x10) << 2)+(m_ic4_input_a & 0x20)+((m_ic4_input_a & 0x40) >> 2);
-				output_set_digit_value(7 - m_input_strobe,swizzle);
+				output().set_digit_value(7 - m_input_strobe,swizzle);
 			}
 			m_led_strobe = m_input_strobe;
 		}
@@ -462,7 +463,7 @@ WRITE8_MEMBER(mpu3_state::pia_ic4_porta_w)
 		for (meter = 0; meter < 6; meter ++)
 		{
 			swizzle = ((m_ic4_input_a ^ 0xff) & 0x3f);
-			MechMtr_update(meter, (swizzle & (1 << meter)));
+			m_meters->update(meter, (swizzle & (1 << meter)));
 		}
 		break;
 
@@ -487,7 +488,7 @@ WRITE8_MEMBER(mpu3_state::pia_ic4_portb_w)
 
 			for (i = 0; i < 8; i++)
 			{
-				output_set_lamp_value((8*m_input_strobe)+i, ((data  & (1 << i)) !=0));
+				output().set_lamp_value((8*m_input_strobe)+i, ((data  & (1 << i)) !=0));
 			}
 			m_lamp_strobe = m_input_strobe;
 		}
@@ -515,10 +516,10 @@ WRITE8_MEMBER(mpu3_state::pia_ic5_porta_w)
 	m_reel1->update((data>>2) & 0x03);
 	m_reel2->update((data>>4) & 0x03);
 	m_reel3->update((data>>6) & 0x03);
-	awp_draw_reel("reel1", m_reel0);
-	awp_draw_reel("reel2", m_reel1);
-	awp_draw_reel("reel3", m_reel2);
-	awp_draw_reel("reel4", m_reel3);
+	awp_draw_reel(machine(),"reel1", m_reel0);
+	awp_draw_reel(machine(),"reel2", m_reel1);
+	awp_draw_reel(machine(),"reel3", m_reel2);
+	awp_draw_reel(machine(),"reel4", m_reel3);
 }
 
 READ8_MEMBER(mpu3_state::pia_ic5_portb_r)
@@ -696,10 +697,6 @@ void mpu3_state::mpu3_config_common()
 void mpu3_state::machine_start()
 {
 	mpu3_config_common();
-
-	/* setup 8 mechanical meters */
-	MechMtr_config(machine(),8);
-
 }
 /*
 Characteriser (CHR)
@@ -859,6 +856,9 @@ static MACHINE_CONFIG_START( mpu3base, mpu3_state )
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu3_state, reel2_optic_cb))
 	MCFG_MPU3_REEL_ADD("reel3")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu3_state, reel3_optic_cb))
+
+	MCFG_DEVICE_ADD("meters", METERS, 0)
+	MCFG_METERS_NUMBER(8)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

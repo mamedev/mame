@@ -73,7 +73,6 @@ class ti99_twin_joystick : public joyport_attached_device
 {
 public:
 	ti99_twin_joystick(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	DECLARE_READ8_MEMBER( read );
 	virtual void device_start(void) override;
 
 	UINT8 read_dev() override;

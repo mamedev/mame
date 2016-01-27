@@ -43,6 +43,7 @@ public:
 			m_shared_ram(*this, "sharedram"),
 			m_gpu_ram(*this, "gpuram"),
 			m_gpu_clut(*this, "gpuclut"),
+			m_romboard_region(*this, "romboard"),
 			m_is_r3000(false),
 			m_is_cojag(false),
 			m_hacks_enabled(false),
@@ -83,6 +84,7 @@ public:
 	required_shared_ptr<UINT32> m_shared_ram;
 	required_shared_ptr<UINT32> m_gpu_ram;
 	required_shared_ptr<UINT32> m_gpu_clut;
+	optional_memory_region      m_romboard_region;
 
 	// configuration
 	bool m_is_r3000;
@@ -239,7 +241,6 @@ public:
 
 	int quickload(device_image_interface &image, const char *file_type, int quickload_size);
 	void cart_start();
-	int cart_load(device_image_interface &image);
 	IRQ_CALLBACK_MEMBER(jaguar_irq_callback);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( jaguar_cart );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( jaguar );
@@ -338,9 +339,6 @@ protected:
 	void blitter_01800001_xxxxxx_xxxxxx(UINT32 command, UINT32 a1flags, UINT32 a2flags);
 	void blitter_x1800x01_xxxxxx_xxxxxx(UINT32 command, UINT32 a1flags, UINT32 a2flags);
 
-	emu_file *jaguar_nvram_fopen( UINT32 openflags);
-	void jaguar_nvram_load();
-	void jaguar_nvram_save();
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<vt83c461_device> m_ide;
 	required_device<screen_device> m_screen;

@@ -39,7 +39,7 @@ public:
 	optional_ioport m_light1_y;
 
 	UINT16 m_blitter_data[8];
-	UINT16 *m_screenram;
+	std::unique_ptr<UINT16[]> m_screenram;
 	UINT8 m_vispage;
 	UINT16 *m_blitter_base;
 	int m_blitter_rows;

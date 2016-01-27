@@ -228,11 +228,11 @@ VIDEO_START_MEMBER(tetrisp2_state,tetrisp2)
 	m_tilemap_rot->set_transparent_pen(0);
 
 	// should be smaller and mirrored like m32 I guess
-	m_priority = auto_alloc_array(machine(), UINT8, 0x40000);
+	m_priority = std::make_unique<UINT8[]>(0x40000);
 	ms32_rearrange_sprites(machine(), "gfx1");
 
 	save_item(NAME(m_flipscreen_old));
-	save_pointer(NAME(m_priority), 0x40000);
+	save_pointer(NAME(m_priority.get()), 0x40000);
 }
 
 VIDEO_START_MEMBER(tetrisp2_state,nndmseal)
@@ -254,11 +254,11 @@ VIDEO_START_MEMBER(tetrisp2_state,rockntread)
 	m_tilemap_rot->set_transparent_pen(0);
 
 	// should be smaller and mirrored like m32 I guess
-	m_priority = auto_alloc_array(machine(), UINT8, 0x40000);
+	m_priority = std::make_unique<UINT8[]>(0x40000);
 	ms32_rearrange_sprites(machine(), "gfx1");
 
 	save_item(NAME(m_flipscreen_old));
-	save_pointer(NAME(m_priority), 0x40000);
+	save_pointer(NAME(m_priority.get()), 0x40000);
 }
 
 
@@ -486,7 +486,7 @@ UINT32 tetrisp2_state::screen_update_tetrisp2(screen_device &screen, bitmap_ind1
 	else if (asc_pri == 2)
 		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority,
+	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority.get(),
 							m_spriteram, m_spriteram.bytes(), m_gfxdecode->gfx(0), (m_systemregs[0x00] & 0x02)    );
 	return 0;
 }
@@ -571,7 +571,7 @@ UINT32 tetrisp2_state::screen_update_rockntread(screen_device &screen, bitmap_in
 	else if (asc_pri == 2)
 		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority,
+	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority.get(),
 							m_spriteram, m_spriteram.bytes(), m_gfxdecode->gfx(0), (m_systemregs[0x00] & 0x02)    );
 	return 0;
 }
@@ -633,7 +633,7 @@ UINT32 tetrisp2_state::screen_update_rocknms_left(screen_device &screen, bitmap_
 	else if (asc_pri == 2)
 		m_tilemap_sub_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority,
+	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority.get(),
 							m_spriteram2, m_spriteram2.bytes(), m_sub_gfxdecode->gfx(0), (m_systemregs[0x00] & 0x02)  );
 
 	return 0;
@@ -694,7 +694,7 @@ UINT32 tetrisp2_state::screen_update_rocknms_right(screen_device &screen, bitmap
 	else if (asc_pri == 2)
 		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority,
+	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority.get(),
 							m_spriteram, m_spriteram.bytes(), m_gfxdecode->gfx(0), (m_systemregs[0x00] & 0x02)    );
 
 	return 0;
@@ -737,7 +737,7 @@ VIDEO_START_MEMBER(stepstag_state,stepstag)
 	m_tilemap_rot->set_transparent_pen(0);
 
 	// should be smaller and mirrored like m32 I guess
-	m_priority = auto_alloc_array(machine(), UINT8, 0x40000);
+	m_priority = std::make_unique<UINT8[]>(0x40000);
 
 	ms32_rearrange_sprites(machine(), "sprites_horiz");
 	ms32_rearrange_sprites(machine(), "sprites_vert");
@@ -748,7 +748,7 @@ UINT32 stepstag_state::screen_update_stepstag_left(screen_device &screen, bitmap
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0);
 
-	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority,
+	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority.get(),
 							m_spriteram, m_spriteram.bytes(), m_gfxdecode->gfx(1), (m_systemregs[0x00] & 0x02)    );
 	return 0;
 }
@@ -757,7 +757,7 @@ UINT32 stepstag_state::screen_update_stepstag_right(screen_device &screen, bitma
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0);
 
-	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority,
+	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority.get(),
 							m_spriteram3, m_spriteram3.bytes(), m_gfxdecode->gfx(1), (m_systemregs[0x00] & 0x02)  );
 	return 0;
 }
@@ -767,7 +767,7 @@ UINT32 stepstag_state::screen_update_stepstag_mid(screen_device &screen, bitmap_
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0);
 
-	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority,
+	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority.get(),
 							m_spriteram2, m_spriteram2.bytes(), m_gfxdecode->gfx(0), (m_systemregs[0x00] & 0x02)  );
 
 	m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);

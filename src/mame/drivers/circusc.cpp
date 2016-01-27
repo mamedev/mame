@@ -97,7 +97,7 @@ WRITE8_MEMBER(circusc_state::circusc_sh_irqtrigger_w)
 
 WRITE8_MEMBER(circusc_state::circusc_coin_counter_w)
 {
-	coin_counter_w(machine(), offset, data);
+	machine().bookkeeping().coin_counter_w(offset, data);
 }
 
 WRITE8_MEMBER(circusc_state::circusc_sound_w)

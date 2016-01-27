@@ -22,13 +22,13 @@ class laz_ribrac_state : public driver_device
 public:
 	laz_ribrac_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-	//	,m_maincpu(*this, "maincpu")
+	//  ,m_maincpu(*this, "maincpu")
 	{ }
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-//	required_device<mcs51_cpu_device> m_maincpu;
+//  required_device<mcs51_cpu_device> m_maincpu;
 };
 
 static INPUT_PORTS_START( laz_ribrac )
@@ -48,9 +48,9 @@ void laz_ribrac_state::machine_reset()
 static MACHINE_CONFIG_START( laz_ribrac, laz_ribrac_state )
 
 	/* basic machine hardware */
-//	MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
-//	MCFG_CPU_PROGRAM_MAP(laz_ribrac_map)
-//	MCFG_CPU_IO_MAP(laz_ribrac_io)
+//  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
+//  MCFG_CPU_PROGRAM_MAP(laz_ribrac_map)
+//  MCFG_CPU_IO_MAP(laz_ribrac_io)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -79,4 +79,3 @@ ROM_START( ribrac )
 ROM_END
 
 GAME( 1993, ribrac,  0,    laz_ribrac, laz_ribrac, driver_device,  0, ROT0, "Lazer-tron", "Ribbit Racing (Lazer-tron)", MACHINE_IS_SKELETON_MECHANICAL )
-

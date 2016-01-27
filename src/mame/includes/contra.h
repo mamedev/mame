@@ -29,8 +29,8 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	UINT8 *        m_buffered_spriteram;
-	UINT8 *        m_buffered_spriteram_2;
+	std::unique_ptr<UINT8[]>       m_buffered_spriteram;
+	std::unique_ptr<UINT8[]>       m_buffered_spriteram_2;
 	required_shared_ptr<UINT8> m_fg_cram;
 	required_shared_ptr<UINT8> m_fg_vram;
 	required_shared_ptr<UINT8> m_tx_cram;

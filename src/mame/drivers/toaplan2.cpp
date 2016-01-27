@@ -539,14 +539,14 @@ WRITE8_MEMBER(toaplan2_state::toaplan2_coin_w)
 
 	if (data & 0x0f)
 	{
-		coin_lockout_w( machine(), 0, ((data & 4) ? 0 : 1) );
-		coin_lockout_w( machine(), 1, ((data & 8) ? 0 : 1) );
-		coin_counter_w( machine(), 0, (data & 1) );
-		coin_counter_w( machine(), 1, (data & 2) );
+		machine().bookkeeping().coin_lockout_w(0, ((data & 4) ? 0 : 1) );
+		machine().bookkeeping().coin_lockout_w(1, ((data & 8) ? 0 : 1) );
+		machine().bookkeeping().coin_counter_w(0, (data & 1) );
+		machine().bookkeeping().coin_counter_w(1, (data & 2) );
 	}
 	else
 	{
-		coin_lockout_global_w(machine(), 1);    // Lock all coin slots
+		machine().bookkeeping().coin_lockout_global_w(1);    // Lock all coin slots
 	}
 	if (data & 0xe0)
 	{
@@ -556,8 +556,8 @@ WRITE8_MEMBER(toaplan2_state::toaplan2_coin_w)
 
 WRITE8_MEMBER(toaplan2_state::pwrkick_coin_w)
 {
-	coin_counter_w( machine(), 0, (data & 2) >> 1 );
-	coin_counter_w( machine(), 1, (data & 8) >> 3 );
+	machine().bookkeeping().coin_counter_w(0, (data & 2) >> 1 );
+	machine().bookkeeping().coin_counter_w(1, (data & 8) >> 3 );
 	m_pwrkick_hopper = (data & 0x80) >> 7;
 }
 

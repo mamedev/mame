@@ -26,7 +26,7 @@ extern char *output;
 
 CPU_DISASSEMBLE(arcompact)
 {
-	int size = 2;
+	int size;
 
 	UINT32 op = oprom[0] | (oprom[1] << 8);
 	output = buffer;

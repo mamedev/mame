@@ -15,8 +15,8 @@ end
 
 function addlibfromstring(str)
 	if (str==nil) then return  end
-	for w in str:gmatch("%S+") do 
-		if string.starts(w,"-l")==true then 
+	for w in str:gmatch("%S+") do
+		if string.starts(w,"-l")==true then
 			links {
 				string.sub(w,3)
 			}
@@ -26,8 +26,8 @@ end
 
 function addoptionsfromstring(str)
 	if (str==nil) then return  end
-	for w in str:gmatch("%S+") do 
-		if string.starts(w,"-l")==false then 
+	for w in str:gmatch("%S+") do
+		if string.starts(w,"-l")==false then
 			linkoptions {
 				w
 			}
@@ -54,7 +54,6 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/debugger/none.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/debugint.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/debugwin.cpp",
-		MAME_DIR .. "src/osd/modules/debugger/debugqt.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_sdl.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_windows.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_osx.cpp",
@@ -68,6 +67,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/sound/direct_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/coreaudio_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/sdl_sound.cpp",
+		MAME_DIR .. "src/osd/modules/sound/xaudio2_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/none.cpp",
 	}
 
@@ -121,6 +121,38 @@ function osdmodulesbuild()
 	end
 
 	if _OPTIONS["USE_QTDEBUG"]=="1" then
+		defines {
+			"USE_QTDEBUG=1",
+		}
+	else
+		defines {
+			"USE_QTDEBUG=0",
+		}
+	end
+
+end
+
+
+function qtdebuggerbuild()
+
+	removeflags {
+		"SingleOutputDir",
+	}
+  local version = str_to_version(_OPTIONS["gcc_version"])
+	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs")) then
+		configuration { "gmake" }
+		if (version >= 30600) then
+			buildoptions {
+				"-Wno-inconsistent-missing-override",
+			}
+		end
+	end
+
+	files {
+		MAME_DIR .. "src/osd/modules/debugger/debugqt.cpp",
+	}
+
+	if _OPTIONS["USE_QTDEBUG"]=="1" then
 		files {
 			MAME_DIR .. "src/osd/modules/debugger/qt/debuggerview.cpp",
 			MAME_DIR .. "src/osd/modules/debugger/qt/debuggerview.h",
@@ -153,7 +185,7 @@ function osdmodulesbuild()
 		defines {
 			"USE_QTDEBUG=1",
 		}
-		
+
 		local MOC = ""
 		if (os.is("windows")) then
 			MOC = "moc"
@@ -163,22 +195,22 @@ function osdmodulesbuild()
 				if (QMAKETST=='') then
 					print("Qt's Meta Object Compiler (moc) wasn't found!")
 					os.exit(1)
-				end	
+				end
 				MOC = _OPTIONS["QT_HOME"] .. "/bin/moc"
-			else 
-				MOCTST = backtick("which moc-qt4 2>/dev/null")			
+			else
+				MOCTST = backtick("which moc-qt5 2>/dev/null")
 				if (MOCTST=='') then
 					MOCTST = backtick("which moc 2>/dev/null")
 				end
 				if (MOCTST=='') then
 					print("Qt's Meta Object Compiler (moc) wasn't found!")
 					os.exit(1)
-				end	
+				end
 				MOC = MOCTST
 			end
 		end
-		
-		
+
+
 		custombuildtask {
 			{ MAME_DIR .. "src/osd/modules/debugger/qt/debuggerview.h", 			GEN_DIR .. "osd/modules/debugger/qt/debuggerview.moc.cpp", { },			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
 			{ MAME_DIR .. "src/osd/modules/debugger/qt/windowqt.h", 				GEN_DIR .. "osd/modules/debugger/qt/windowqt.moc.cpp", { }, 				{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
@@ -189,9 +221,9 @@ function osdmodulesbuild()
 			{ MAME_DIR .. "src/osd/modules/debugger/qt/breakpointswindow.h",		GEN_DIR .. "osd/modules/debugger/qt/breakpointswindow.moc.cpp", { }, 		{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
 			{ MAME_DIR .. "src/osd/modules/debugger/qt/deviceswindow.h", 			GEN_DIR .. "osd/modules/debugger/qt/deviceswindow.moc.cpp", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
 			{ MAME_DIR .. "src/osd/modules/debugger/qt/deviceinformationwindow.h",  GEN_DIR .. "osd/modules/debugger/qt/deviceinformationwindow.moc.cpp", { },{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			
+
 		}
-		
+
 		if _OPTIONS["targetos"]=="windows" then
 			configuration { "mingw*" }
 				buildoptions {
@@ -209,7 +241,7 @@ function osdmodulesbuild()
 				}
 			else
 				buildoptions {
-					backtick("pkg-config --cflags QtGui"),
+					backtick("pkg-config --cflags Qt5Widgets"),
 				}
 			end
 		end
@@ -261,16 +293,18 @@ function osdmodulestargetconf()
 			}
 			links {
 				"qtmain",
-				"QtGui4",
-				"QtCore4",
+				"Qt5Core.dll",
+				"Qt5Gui.dll",
+				"Qt5Widgets.dll",
 			}
 		elseif _OPTIONS["targetos"]=="macosx" then
 			linkoptions {
 				"-F" .. backtick("qmake -query QT_INSTALL_LIBS"),
 			}
 			links {
-				"QtCore.framework",
-				"QtGui.framework",
+				"Qt5Core.framework",
+				"Qt5Gui.framework",
+				"Qt5Widgets.framework",
 			}
 		else
 			if _OPTIONS["QT_HOME"]~=nil then
@@ -278,11 +312,12 @@ function osdmodulestargetconf()
 					"-L" .. backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_INSTALL_LIBS"),
 				}
 				links {
-					"QtGui",
-					"QtCore",
+					"Qt5Core",
+					"Qt5Gui",
+					"Qt5Widgets",
 				}
 			else
-				local str = backtick("pkg-config --libs QtGui")
+				local str = backtick("pkg-config --libs Qt5Widgets")
 				addlibfromstring(str)
 				addoptionsfromstring(str)
 			end
@@ -361,6 +396,38 @@ if not _OPTIONS["NO_USE_MIDI"] then
 	else
 		_OPTIONS["NO_USE_MIDI"] = "0"
 	end
+end
+
+newoption {
+	trigger = "MODERN_WIN_API",
+	description = "Use Modern Windows APIs",
+	allowed = {
+		{ "0",  "Use classic Windows APIs - allows support for XP and later"   },
+		{ "1",  "Use Modern Windows APIs - support for Windows 8.1 and later"  },
+	},
+}
+
+newoption {
+	trigger = "USE_XAUDIO2",
+	description = "Use XAudio2 API for audio",
+	allowed = {
+		{ "0",  "Disable XAudio2"  },
+		{ "1",  "Enable XAudio2" },
+	},
+}
+
+if _OPTIONS["USE_XAUDIO2"]=="1" then
+	_OPTIONS["MODERN_WIN_API"] = "1",
+	defines {
+		"USE_XAUDIO2=1",
+	},
+	includedirs {
+		MAME_DIR .. "3rdparty/win81sdk/Include/um",
+	}
+else
+	defines {
+		"USE_XAUDIO2=0",
+	}
 end
 
 newoption {

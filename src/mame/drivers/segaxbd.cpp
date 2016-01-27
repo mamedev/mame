@@ -854,7 +854,7 @@ void segaxbd_state::generic_iochip0_lamps_w(UINT8 data)
 	// d4: coin counter
 	// d7: mute audio (always handled above)
 	// other bits: lamps
-	coin_counter_w(machine(), 0, (data >> 4) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 4) & 0x01);
 
 	//
 	//    aburner2:
@@ -864,10 +864,10 @@ void segaxbd_state::generic_iochip0_lamps_w(UINT8 data)
 	// d6: danger lamp
 	// in clone aburner, lamps work only in testmode?
 
-	output_set_lamp_value(0, (data >> 5) & 0x01);
-	output_set_lamp_value(1, (data >> 6) & 0x01);
-	output_set_lamp_value(2, (data >> 1) & 0x01);
-	output_set_lamp_value(3, (data >> 2) & 0x01);
+	machine().output().set_lamp_value(0, (data >> 5) & 0x01);
+	machine().output().set_lamp_value(1, (data >> 6) & 0x01);
+	machine().output().set_lamp_value(2, (data >> 1) & 0x01);
+	machine().output().set_lamp_value(3, (data >> 2) & 0x01);
 }
 
 

@@ -105,7 +105,7 @@ void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	};
 
 
-	INT16 *rbase = (INT16 *)ram;
+	INT16 *rbase = (INT16 *)ram.get();
 
 	if(!(regs[0x22f] & 1))
 		return;
@@ -306,10 +306,10 @@ void k054539_device::init_chip()
 	memset(posreg_latch, 0, sizeof(posreg_latch)); //*
 	flags |= UPDATE_AT_KEYON; //* make it default until proven otherwise
 
-	ram = auto_alloc_array(machine(), unsigned char, 0x4000);
+	ram = std::make_unique<UINT8[]>(0x4000);
 	reverb_pos = 0;
 	cur_ptr = 0;
-	memset(ram, 0, 0x4000);
+	memset(ram.get(), 0, 0x4000);
 
 	memory_region *reg = (m_rgnoverride != nullptr) ? owner()->memregion(m_rgnoverride) : region();
 	rom = reg->base();
@@ -324,7 +324,7 @@ void k054539_device::init_chip()
 	stream = stream_alloc(0, 2, clock() / 384);
 
 	save_item(NAME(regs));
-	save_pointer(NAME(ram), 0x4000);
+	save_pointer(NAME(ram.get()), 0x4000);
 	save_item(NAME(cur_ptr));
 }
 
@@ -428,7 +428,7 @@ WRITE8_MEMBER(k054539_device::write)
 
 		case 0x22e:
 			cur_zone =
-				data == 0x80 ? ram :
+				data == 0x80 ? ram.get() :
 				rom + 0x20000*data;
 			cur_limit = data == 0x80 ? 0x4000 : 0x20000;
 			cur_ptr = 0;
@@ -466,7 +466,7 @@ WRITE8_MEMBER(k054539_device::write)
 void k054539_device::device_post_load()
 {
 	int data = regs[0x22e];
-	cur_zone = data == 0x80 ? ram : rom + 0x20000*data;
+	cur_zone = data == 0x80 ? ram.get() : rom + 0x20000*data;
 	cur_limit = data == 0x80 ? 0x4000 : 0x20000;
 }
 

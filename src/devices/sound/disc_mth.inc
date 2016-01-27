@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:K.Wilkins
+// copyright-holders:K.Wilkins,Derrick Renaud
 /************************************************************************
  *
  *  MAME - Discrete sound system emulation library

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Zsolt Vasvari
+// copyright-holders:Derrick Renaud
 /************************************************************************
  * copsnrob Sound System Analog emulation
  * Nov 2010, Derrick Renaud
@@ -729,7 +729,7 @@ WRITE8_MEMBER(copsnrob_state::copsnrob_misc_w)
 
 		case 0x06:
 			/* One Start */
-			set_led_status(machine(), 0, !special_data);
+			output().set_led_value(0, !special_data);
 			break;
 
 		case 0x07:

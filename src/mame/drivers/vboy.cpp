@@ -182,16 +182,16 @@ public:
 	DECLARE_WRITE8_MEMBER(lfb1_w);
 	DECLARE_WRITE8_MEMBER(rfb0_w);
 	DECLARE_WRITE8_MEMBER(rfb1_w);
-	UINT16 *m_font;
-	UINT16 *m_bgmap;
-	UINT8 *m_l_frame_0;
-	UINT8 *m_l_frame_1;
-	UINT8 *m_r_frame_0;
-	UINT8 *m_r_frame_1;
+	std::unique_ptr<UINT16[]> m_font;
+	std::unique_ptr<UINT16[]> m_bgmap;
+	std::unique_ptr<UINT8[]> m_l_frame_0;
+	std::unique_ptr<UINT8[]> m_l_frame_1;
+	std::unique_ptr<UINT8[]> m_r_frame_0;
+	std::unique_ptr<UINT8[]> m_r_frame_1;
 	vboy_regs_t m_vboy_regs;
 	vip_regs_t m_vip_regs;
 	vboy_timer_t m_vboy_timer;
-	INT32 *m_ovr_tempdraw_map;
+	std::unique_ptr<INT32[]> m_ovr_tempdraw_map;
 	UINT16 m_frame_count;
 	UINT8 m_displayfb;
 	UINT8 m_drawfb;
@@ -219,24 +219,22 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_main_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_pad_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineL);
-	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineR);
 };
 
 
 void vboy_state::video_start()
 {
 	// Allocate memory for temporary screens
-	m_ovr_tempdraw_map = auto_alloc_array_clear(machine(), INT32, 0x40);
+	m_ovr_tempdraw_map = make_unique_clear<INT32[]>(0x40);
 
 	// Allocate memory for framebuffers
-	m_l_frame_0 = auto_alloc_array_clear(machine(), UINT8, 0x6000);
-	m_l_frame_1 = auto_alloc_array_clear(machine(), UINT8, 0x6000);
-	m_r_frame_0 = auto_alloc_array_clear(machine(), UINT8, 0x6000);
-	m_r_frame_1 = auto_alloc_array_clear(machine(), UINT8, 0x6000);
+	m_l_frame_0 = make_unique_clear<UINT8[]>(0x6000);
+	m_l_frame_1 = make_unique_clear<UINT8[]>(0x6000);
+	m_r_frame_0 = make_unique_clear<UINT8[]>(0x6000);
+	m_r_frame_1 = make_unique_clear<UINT8[]>(0x6000);
 
-	m_font  = auto_alloc_array_clear(machine(), UINT16, (0x8000 >> 1)*4 * 2);
-	m_bgmap = auto_alloc_array(machine(), UINT16, 0x20000 >> 1);
-	memset(m_bgmap, 0, sizeof(UINT16) * (0x20000 >> 1));
+	m_font  = make_unique_clear<UINT16[]>((0x8000 >> 1)*4 * 2);
+	m_bgmap = make_unique_clear<UINT16[]>(0x20000 >> 1);
 }
 
 void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, UINT16 code, UINT8 pal)

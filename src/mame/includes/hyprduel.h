@@ -46,16 +46,16 @@ public:
 	required_shared_ptr<UINT16> m_videoregs;
 	required_shared_ptr<UINT16> m_sharedram1;
 	required_shared_ptr<UINT16> m_sharedram3;
-	UINT16 *  m_tiletable_old;
+	std::unique_ptr<UINT16[]>  m_tiletable_old;
 
 	/* video-related */
 	tilemap_t   *m_bg_tilemap[3];
-	UINT8     *m_empty_tiles;
-	UINT8     *m_dirtyindex;
+	std::unique_ptr<UINT8[]>    m_empty_tiles;
+	std::unique_ptr<UINT8[]>     m_dirtyindex;
 	int       m_sprite_xoffs;
 	int       m_sprite_yoffs;
 	int       m_sprite_yoffs_sub;
-	UINT8 *   m_expanded_gfx1;
+	std::unique_ptr<UINT8[]>   m_expanded_gfx1;
 
 	/* misc */
 	emu_timer *m_magerror_irq_timer;

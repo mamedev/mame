@@ -156,8 +156,8 @@ INTERRUPT_GEN_MEMBER(stfight_state::stfight_vb_interrupt)
 WRITE8_MEMBER(stfight_state::stfight_io_w)
 {
 	// TODO: What is bit 4?
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
 READ8_MEMBER(stfight_state::stfight_coin_r)

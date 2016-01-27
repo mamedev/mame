@@ -414,17 +414,15 @@ void aica_device::Init()
 	m_MidiOutR=m_MidiOutW=0;
 
 	// get AICA RAM
+	if (m_ram_region != NULL)
 	{
-		m_AICARAM = region()->base();
-		if (m_AICARAM)
-		{
-			m_AICARAM += m_roffset;
-			m_AICARAM_LENGTH = region()->bytes();
-			m_RAM_MASK = m_AICARAM_LENGTH-1;
-			m_RAM_MASK16 = m_RAM_MASK & 0x7ffffe;
-			m_DSP.AICARAM = (UINT16 *)m_AICARAM;
-			m_DSP.AICARAM_LENGTH = m_AICARAM_LENGTH/2;
-		}
+		m_AICARAM = m_ram_region->base();
+		m_AICARAM += m_roffset;
+		m_AICARAM_LENGTH = m_ram_region->bytes();
+		m_RAM_MASK = m_AICARAM_LENGTH-1;
+		m_RAM_MASK16 = m_RAM_MASK & 0x7ffffe;
+		m_DSP.AICARAM = (UINT16 *)m_AICARAM;
+		m_DSP.AICARAM_LENGTH = m_AICARAM_LENGTH/2;
 	}
 
 	m_timerA = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aica_device::timerA_cb), this));
@@ -443,10 +441,10 @@ void aica_device::Init()
 		int iTL =(i>>0x0)&0xff;
 		int iPAN=(i>>0x8)&0x1f;
 		int iSDL=(i>>0xD)&0x0F;
-		float TL=1.0;
+		float TL;
 		float SegaDB=0;
-		float fSDL=1.0;
-		float PAN=1.0;
+		float fSDL;
+		float PAN;
 		float LPAN,RPAN;
 
 		if(iTL&0x01) SegaDB-=0.4f;
@@ -521,8 +519,8 @@ void aica_device::Init()
 	}
 
 	AICALFO_Init();
-	m_buffertmpl=auto_alloc_array_clear(machine(), signed int, 44100);
-	m_buffertmpr=auto_alloc_array_clear(machine(), signed int, 44100);
+	m_buffertmpl=make_unique_clear<INT32[]>(44100);
+	m_buffertmpr=make_unique_clear<INT32[]>(44100);
 
 	// no "pend"
 	m_udata.data[0xa0/2] = 0;
@@ -804,7 +802,7 @@ void aica_device::UpdateRegR(address_space &space, int reg)
 			{
 				int slotnum = MSLC();
 				AICA_SLOT *slot=m_Slots + slotnum;
-				UINT16 LP = 0;
+				UINT16 LP;
 				if (!(AFSEL()))
 				{
 					UINT16 SGC;
@@ -834,7 +832,7 @@ void aica_device::UpdateRegR(address_space &space, int reg)
 				//m_stream->update();
 				int slotnum = MSLC();
 				AICA_SLOT *slot=m_Slots+slotnum;
-				unsigned int CA = 0;
+				unsigned int CA;
 
 				if (PCMS(slot) == 0)    // 16-bit samples
 				{
@@ -1473,6 +1471,7 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 		m_roffset(0),
 		m_irq_cb(*this),
 		m_main_irq_cb(*this),
+		m_ram_region(*this, this->tag()),
 		m_IRQL(0),
 		m_IRQR(0),
 		m_BUFPTR(0),

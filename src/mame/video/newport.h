@@ -146,7 +146,7 @@ private:
 	XMAP_t m_XMAP0;
 	XMAP_t m_XMAP1;
 	REX3_t m_REX3;
-	UINT32 *m_base;
+	std::unique_ptr<UINT32[]> m_base;
 	UINT8  m_nDrawGreen;
 	CMAP_t m_CMAP0;
 };

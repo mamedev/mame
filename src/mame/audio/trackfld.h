@@ -16,8 +16,6 @@ public:
 	DECLARE_WRITE8_MEMBER(trackfld_sound_w );
 	DECLARE_READ8_MEMBER(hyperspt_sh_timer_r );
 	DECLARE_WRITE8_MEMBER(hyperspt_sound_w );
-	DECLARE_WRITE8_MEMBER(konami_SN76496_latch_w );
-	DECLARE_WRITE8_MEMBER(konami_SN76496_w );
 
 protected:
 	// device-level overrides

@@ -145,7 +145,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 	/* bit 0 is unknown (used, maybe back color enable?) */
 
 	/* bit 1 is coin counter */
-	coin_counter_w(space.machine(), 0, data & 2);
+	space.machine().bookkeeping().coin_counter_w(0, data & 2);
 
 	/* bit 2 is flip screen */
 	if (m_flipscreen != (data & 0x04))
@@ -183,7 +183,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 	/* bit 0 is unknown (used, maybe back color enable?) */
 
 	/* bit 1 is coin counter */
-	coin_counter_w(machine(), 0, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 2);
 
 	/* bit 2 is flip screen */
 	if (m_flipscreen != (data & 0x04))
@@ -217,7 +217,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 	/* bit 0 is unknown (used, maybe back color enable?) */
 
 	/* bit 1 is coin counter */
-	coin_counter_w(machine(), 0, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 2);
 
 	/* bit 2 is flip screen */
 	if (m_flipscreen != (data & 0x04))

@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pc1000" description="VTech PreComputer 1000 cartridges">
+	<software name="biblekno">
+		<description>Bible Knowledge</description>
+		<year>1988</year>
+		<publisher>VTech</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="27-5410-00.ic1" size="0x20000" crc="fc1fa151" sha1="54cd1311aa9f58607836b152826e782de6bfe098" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="explor"> <!-- only working with PreComputer 1000 or MisterX -->
+		<description>Explorations</description>
+		<year>1988</year>
+		<publisher>VTech</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="27-5410-00.ic1" size="0x10000" crc="fc1fa151" sha1="54cd1311aa9f58607836b152826e782de6bfe098" offset="0" />
+				<rom size="0x10000" offset="0" loadflag="continue"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ftp">
+		<description>Famous Things &amp; Places</description>
+		<year>1992</year>
+		<publisher>VTech</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="LH531G30" size="0x20000" crc="3a0722b8" sha1="1ebc0ca41dddff8f4ef1e5a0f7986c4e5b5cfdd5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ftpa">
+		<description>Famous Things &amp; Places Alt</description>
+		<year>1992</year>
+		<publisher>VTech</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="LH531G30" size="0x10000" crc="3a0722b8" sha1="1ebc0ca41dddff8f4ef1e5a0f7986c4e5b5cfdd5" offset="0" />
+				<rom size="0x10000" offset="0" loadflag="continue"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="generalk">
+		<description>General Knowledge 2</description>
+		<year>1988</year>
+		<publisher>VTech</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="LH531G34.ic1" size="0x20000" crc="ec1c2c18" sha1="09ff0dbdbe679ed5ae2bd312d271be3d32bf252f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fantasyt">
+		<description>Fantasy Trivia</description>
+		<year>1988</year>
+		<publisher>VTech</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="LH531G34.ic1" size="0x10000" crc="ec1c2c18" sha1="09ff0dbdbe679ed5ae2bd312d271be3d32bf252f" offset="0" />
+				<rom size="0x10000" offset="0" loadflag="continue"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="generala">
+		<description>General Knowledge 2 Alt</description>
+		<year>1988</year>
+		<publisher>VTech</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="LH531G35.ic1" size="0x20000" crc="36f87983" sha1="505b564a01056ba33cc366cede761ce59d92d16e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sportstr">
+		<description>Sports Trivia</description>
+		<year>1988</year>
+		<publisher>VTech</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="LH531G35.ic1" size="0x10000" crc="36f87983" sha1="505b564a01056ba33cc366cede761ce59d92d16e" offset="0" />
+				<rom size="0x10000" offset="0" loadflag="continue"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supers">
+		<description>Super Science</description>
+		<year>1991</year>
+		<publisher>VTech</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="LH531G08.ic1" size="0x20000" crc="e311c7ea" sha1="8403675984043b0abeaa71a8496cb050c84a05b7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supersa">
+		<description>* Super Science *</description>
+		<year>1991</year>
+		<publisher>VTech</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="LH531G08.ic1" size="0x10000" crc="e311c7ea" sha1="8403675984043b0abeaa71a8496cb050c84a05b7" offset="0" />
+				<rom size="0x10000" offset="0" loadflag="continue"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cgen2">     <!-- cart for Ordisavant -->
+		<description>Connaissances Generales II</description>
+		<year>1988</year>
+		<publisher>VTech</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="27-5040-00-0.u1" size="0x20000" crc="4eb76fe6" sha1="99d3ad729b7eb784558dba50a38a80cf154a9b30" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="encyclop">  <!-- cart for Ordisavant -->
+		<description>Encyclopedie</description>
+		<year>1988</year>
+		<publisher>VTech</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="27-5040-00-0.u1" size="0x10000" crc="4eb76fe6" sha1="99d3ad729b7eb784558dba50a38a80cf154a9b30" offset="0" />
+				<rom size="0x10000" offset="0" loadflag="continue"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

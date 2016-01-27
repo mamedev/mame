@@ -174,7 +174,7 @@ public:
 			{
 				int data = ((m_lamps[i] << bit)&0x8000)>>15;
 
-				output_set_indexed_value("lamp", (i*16)+bit, data );
+				output().set_indexed_value("lamp", (i*16)+bit, data );
 			}
 		}
 
@@ -229,8 +229,8 @@ public:
 		m_reel0->update( data    &0x0f);
 		m_reel1->update((data>>4)&0x0f);
 
-		awp_draw_reel("reel1", m_reel0);
-		awp_draw_reel("reel2", m_reel1);
+		awp_draw_reel(machine(),"reel1", m_reel0);
+		awp_draw_reel(machine(),"reel2", m_reel1);
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_b_reel23)
@@ -240,8 +240,8 @@ public:
 		m_reel2->update( data    &0x0f);
 		m_reel3->update((data>>4)&0x0f);
 
-		awp_draw_reel("reel3", m_reel2);
-		awp_draw_reel("reel4", m_reel3);
+		awp_draw_reel(machine(),"reel3", m_reel2);
+		awp_draw_reel(machine(),"reel4", m_reel3);
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_c) { logerror("%04x - ppi8255_intf_d_(used)write_c %02x\n", m_maincpu->pcbase(), data);}
@@ -354,7 +354,7 @@ void ecoinf3_state::update_display()
 {
 	for (int i =0; i<14; i++)
 	{
-		output_set_indexed_value("vfd", i, set_display(m_chars[i]) );
+		output().set_indexed_value("vfd", i, set_display(m_chars[i]) );
 	}
 }
 
@@ -833,7 +833,7 @@ DRIVER_INIT_MEMBER(ecoinf3_state,ecoinf3_swap)
 		0x06, 0x02, 0x07, 0x03, 0x0e, 0x0a, 0x0f, 0x0b,     0x31, 0x21, 0x39, 0x29, 0x33, 0x23, 0x3b, 0x2b,
 	};
 
-	UINT8*  buffer = auto_alloc_array(machine(), UINT8, 0x10000);
+	auto buffer = std::make_unique<UINT8[]>(0x10000);
 	UINT8 *rom = memregion( "maincpu" )->base();
 
 
@@ -842,7 +842,7 @@ DRIVER_INIT_MEMBER(ecoinf3_state,ecoinf3_swap)
 		buffer[i] = rom[(i&0xff80)|table[i&0x7f]];
 	}
 
-	memcpy(rom,buffer,0x10000);
+	memcpy(rom,buffer.get(),0x10000);
 
 }
 

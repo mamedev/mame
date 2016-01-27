@@ -72,7 +72,6 @@ private:
 	void set_cr(UINT8 newcr);
 	void check_dma_complete();
 	void do_tx();
-	bool mcast_ck(const UINT8 *buf, int len);
 	void check_irq() { m_irq_cb((m_regs.imr & m_regs.isr & 0x7f)?ASSERT_LINE:CLEAR_LINE); }
 	void recv_overflow();
 	void stop();

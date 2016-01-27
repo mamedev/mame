@@ -59,7 +59,7 @@ private:
 	DIRECT_UPDATE_MEMBER( amstrad_default );
 	DIRECT_UPDATE_MEMBER( amstrad_multiface_directoverride );
 
-	unsigned char *m_multiface_ram;
+	std::unique_ptr<UINT8[]> m_multiface_ram;
 	unsigned long m_multiface_flags;
 
 	UINT8 m_romdis;

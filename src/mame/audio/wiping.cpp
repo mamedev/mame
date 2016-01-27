@@ -47,8 +47,8 @@ void wiping_sound_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, samplerate);
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	m_mixer_buffer = auto_alloc_array_clear(machine(), short, 2 * samplerate);
-	m_mixer_buffer_2 = m_mixer_buffer + samplerate;
+	m_mixer_buffer   = make_unique_clear<short[]>(samplerate);
+	m_mixer_buffer_2 = make_unique_clear<short[]>(samplerate);
 
 	/* build the mixer table */
 	make_mixer_table(8, defgain);
@@ -91,10 +91,10 @@ void wiping_sound_device::make_mixer_table(int voices, int gain)
 	int i;
 
 	/* allocate memory */
-	m_mixer_table = auto_alloc_array_clear(machine(), INT16, 256 * voices);
+	m_mixer_table = make_unique_clear<INT16[]>(256 * voices);
 
 	/* find the middle of the table */
-	m_mixer_lookup = m_mixer_table + (128 * voices);
+	m_mixer_lookup = m_mixer_table.get() + (128 * voices);
 
 	/* fill in the table - 16 bit case */
 	for (i = 0; i < count; i++)
@@ -174,7 +174,7 @@ void wiping_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	}
 
 	/* zap the contents of the mixer buffer */
-	memset(m_mixer_buffer, 0, samples * sizeof(short));
+	memset(m_mixer_buffer.get(), 0, samples * sizeof(short));
 
 	/* loop over each voice and add its contribution */
 	for (voice = m_channel_list; voice < m_last_channel; voice++)
@@ -188,7 +188,7 @@ void wiping_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 			const UINT8 *w = voice->wave;
 			int c = voice->counter;
 
-			mix = m_mixer_buffer;
+			mix = m_mixer_buffer.get();
 
 			/* add our contribution */
 			for (i = 0; i < samples; i++)
@@ -235,7 +235,7 @@ void wiping_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	}
 
 	/* mix it down */
-	mix = m_mixer_buffer;
+	mix = m_mixer_buffer.get();
 	for (i = 0; i < samples; i++)
 		*buffer++ = m_mixer_lookup[*mix++];
 }

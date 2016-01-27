@@ -301,6 +301,7 @@ VIDEOS["MSM6222B"] = true
 VIDEOS["MSM6255"] = true
 VIDEOS["MOS6566"] = true
 VIDEOS["PC_VGA"] = true
+VIDEOS["PCD8544"] = true
 --VIDEOS+= POLY"] = true
 VIDEOS["PSX"] = true
 VIDEOS["RAMDAC"] = true
@@ -486,6 +487,7 @@ MACHINES["PC_LPT"] = true
 MACHINES["PCCARD"] = true
 MACHINES["PCF8593"] = true
 MACHINES["PCKEYBRD"] = true
+MACHINES["PDC"] = true
 MACHINES["PIC8259"] = true
 MACHINES["PIT68230"] = true
 MACHINES["PIT8253"] = true
@@ -808,11 +810,14 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"robotron",
 		"rockwell",
 		"roland",
+		"rolm",
 		"sage",
 		"samcoupe",
 		"samsung",
 		"sanyo",
+		"saturn",
 		"sega",
+		"sequential",
 		"sgi",
 		"sharp",
 		"siemens",
@@ -883,6 +888,7 @@ function createMESSProjects(_target, _subtarget, _name)
 	kind (LIBTYPE)
 	uuid (os.uuid("drv-" .. _target .."_" .. _subtarget .. "_" .._name))
 	addprojectflags()
+	precompiledheaders()
 
 	includedirs {
 		MAME_DIR .. "src/osd",
@@ -1692,9 +1698,9 @@ files {
 
 createMESSProjects(_target, _subtarget, "fidelity")
 files {
-	MAME_DIR .. "src/mame/drivers/csc.cpp",
 	MAME_DIR .. "src/mame/drivers/fidelz80.cpp",
 	MAME_DIR .. "src/mame/includes/fidelz80.h",
+	MAME_DIR .. "src/mame/drivers/fidel6502.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "force")
@@ -2358,6 +2364,12 @@ files {
 	MAME_DIR .. "src/mame/drivers/rd110.cpp",
 	MAME_DIR .. "src/mame/drivers/rsc55.cpp",
 	MAME_DIR .. "src/mame/drivers/tb303.cpp",
+	MAME_DIR .. "src/mame/drivers/tr606.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "rolm")
+files {
+	MAME_DIR .. "src/mame/drivers/r9751.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "rockwell")
@@ -2366,6 +2378,11 @@ files {
 	MAME_DIR .. "src/mame/includes/aim65.h",
 	MAME_DIR .. "src/mame/machine/aim65.cpp",
 	MAME_DIR .. "src/mame/drivers/aim65_40.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "saturn")
+files {
+	MAME_DIR .. "src/mame/drivers/st17xx.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "sage")
@@ -2385,6 +2402,7 @@ files {
 createMESSProjects(_target, _subtarget, "samsung")
 files {
 	MAME_DIR .. "src/mame/drivers/spc1000.cpp",
+	MAME_DIR .. "src/mame/drivers/spc1500.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "sanyo")
@@ -2424,14 +2442,19 @@ files {
 	MAME_DIR .. "src/mame/machine/megacdcd.h",
 }
 
+createMESSProjects(_target, _subtarget, "sequential")
+files {
+	MAME_DIR .. "src/mame/drivers/prophet600.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "sgi")
 files {
 	MAME_DIR .. "src/mame/machine/sgi.cpp",
 	MAME_DIR .. "src/mame/machine/sgi.h",
-	MAME_DIR .. "src/mame/drivers/sgi_ip2.cpp",
-	MAME_DIR .. "src/mame/drivers/sgi_ip6.cpp",
-	MAME_DIR .. "src/mame/drivers/ip20.cpp",
-	MAME_DIR .. "src/mame/drivers/ip22.cpp",
+	MAME_DIR .. "src/mame/drivers/iris3130.cpp",
+	MAME_DIR .. "src/mame/drivers/4dpi.cpp",
+	MAME_DIR .. "src/mame/drivers/indigo.cpp",
+	MAME_DIR .. "src/mame/drivers/indy_indigo2.cpp",
 	MAME_DIR .. "src/mame/video/newport.cpp",
 	MAME_DIR .. "src/mame/video/newport.h",
 }
@@ -2713,6 +2736,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/geneve.cpp",
 	MAME_DIR .. "src/mame/drivers/ticalc1x.cpp",
 	MAME_DIR .. "src/mame/drivers/tispeak.cpp",
+	MAME_DIR .. "src/mame/drivers/tispellb.cpp",
 	MAME_DIR .. "src/mame/drivers/ti74.cpp",
 	MAME_DIR .. "src/mame/drivers/ti85.cpp",
 	MAME_DIR .. "src/mame/includes/ti85.h",
@@ -3032,6 +3056,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/d6800.cpp",
 	MAME_DIR .. "src/mame/drivers/d6809.cpp",
 	MAME_DIR .. "src/mame/drivers/daruma.cpp",
+	MAME_DIR .. "src/mame/drivers/didact.cpp",
 	MAME_DIR .. "src/mame/drivers/digel804.cpp",
 	MAME_DIR .. "src/mame/drivers/dim68k.cpp",
 	MAME_DIR .. "src/mame/drivers/dm7000.cpp",
@@ -3080,7 +3105,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/lft.cpp",
 	MAME_DIR .. "src/mame/drivers/lg-dvd.cpp",
 	MAME_DIR .. "src/mame/drivers/lola8a.cpp",
-	MAME_DIR .. "src/mame/drivers/m79152pc.cpp",
+    MAME_DIR .. "src/mame/drivers/m79152pc.cpp",
+    MAME_DIR .. "src/mame/drivers/marywu.cpp",
 	MAME_DIR .. "src/mame/drivers/mccpm.cpp",
 	MAME_DIR .. "src/mame/drivers/mes.cpp",
 	MAME_DIR .. "src/mame/drivers/mice.cpp",
@@ -3126,6 +3152,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/sbrain.cpp",
 	MAME_DIR .. "src/mame/drivers/seattlecmp.cpp",
 	MAME_DIR .. "src/mame/drivers/sh4robot.cpp",
+	MAME_DIR .. "src/mame/drivers/sansa_fuze.cpp",
 	MAME_DIR .. "src/mame/drivers/softbox.cpp",
 	MAME_DIR .. "src/mame/includes/softbox.h",
 	MAME_DIR .. "src/mame/drivers/squale.cpp",

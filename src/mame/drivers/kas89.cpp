@@ -272,7 +272,7 @@ WRITE_LINE_MEMBER(kas89_state::kas89_vdp_interrupt)
 
 void kas89_state::machine_start()
 {
-	output_set_lamp_value(37, 0);   /* turning off the operator led */
+	output().set_lamp_value(37, 0);   /* turning off the operator led */
 }
 
 void kas89_state::machine_reset()
@@ -309,7 +309,7 @@ READ8_MEMBER(kas89_state::mux_r)
 		case 0x20: return m_pl6->read();
 		case 0x40:
 		{
-			output_set_lamp_value(37, 1 - ((m_svc->read() >> 5) & 1));  /* Operator Key LAMP */
+			output().set_lamp_value(37, 1 - ((m_svc->read() >> 5) & 1));  /* Operator Key LAMP */
 			return m_svc->read();
 		}
 		case 0x80: return m_dsw->read();    /* Polled at $162a through NMI routine */
@@ -345,8 +345,8 @@ WRITE8_MEMBER(kas89_state::control_w)
 
 	m_main_nmi_enable = data & 0x40;
 
-	coin_counter_w(machine(), 0, (data ^ 0xff) & 0x01); /* Credits In counter */
-	coin_counter_w(machine(), 1, (data ^ 0xff) & 0x02); /* Credits Out counter */
+	machine().bookkeeping().coin_counter_w(0, (data ^ 0xff) & 0x01); /* Credits In counter */
+	machine().bookkeeping().coin_counter_w(1, (data ^ 0xff) & 0x02); /* Credits Out counter */
 }
 
 WRITE8_MEMBER(kas89_state::sound_comm_w)
@@ -375,7 +375,7 @@ WRITE8_MEMBER(kas89_state::sound_comm_w)
 			UINT8 i;
 			for ( i = 0; i < 37; i++ )
 			{
-				output_set_lamp_value(i, 0);    /* All roulette LEDs OFF */
+				output().set_lamp_value(i, 0);    /* All roulette LEDs OFF */
 			}
 		}
 
@@ -421,7 +421,7 @@ WRITE8_MEMBER(kas89_state::led_mux_select_w)
 	UINT8 i;
 	for ( i = 0; i < 37; i++ )
 	{
-		output_set_lamp_value(i, 0);    /* All LEDs OFF */
+		output().set_lamp_value(i, 0);    /* All LEDs OFF */
 	}
 
 	switch(data)
@@ -430,69 +430,69 @@ WRITE8_MEMBER(kas89_state::led_mux_select_w)
 		{
 			for ( i = 0; i < 37; i++ )
 			{
-				output_set_lamp_value(i, 0);    /* All LEDs OFF */
+				output().set_lamp_value(i, 0);    /* All LEDs OFF */
 			}
 		}
 
 		case 0x01:
 		{
-			output_set_lamp_value(11, (m_leds_mux_data >> 0) & 1);  /* Number 11 LED */
-			output_set_lamp_value(36, (m_leds_mux_data >> 1) & 1);  /* Number 36 LED */
-			output_set_lamp_value(13, (m_leds_mux_data >> 2) & 1);  /* Number 13 LED */
-			output_set_lamp_value(27, (m_leds_mux_data >> 3) & 1);  /* Number 27 LED */
-			output_set_lamp_value(06, (m_leds_mux_data >> 4) & 1);  /* Number  6 LED */
-			output_set_lamp_value(34, (m_leds_mux_data >> 5) & 1);  /* Number 34 LED */
-			output_set_lamp_value(17, (m_leds_mux_data >> 6) & 1);  /* Number 17 LED */
-			output_set_lamp_value(25, (m_leds_mux_data >> 7) & 1);  /* Number 25 LED */
+			output().set_lamp_value(11, (m_leds_mux_data >> 0) & 1);  /* Number 11 LED */
+			output().set_lamp_value(36, (m_leds_mux_data >> 1) & 1);  /* Number 36 LED */
+			output().set_lamp_value(13, (m_leds_mux_data >> 2) & 1);  /* Number 13 LED */
+			output().set_lamp_value(27, (m_leds_mux_data >> 3) & 1);  /* Number 27 LED */
+			output().set_lamp_value(06, (m_leds_mux_data >> 4) & 1);  /* Number  6 LED */
+			output().set_lamp_value(34, (m_leds_mux_data >> 5) & 1);  /* Number 34 LED */
+			output().set_lamp_value(17, (m_leds_mux_data >> 6) & 1);  /* Number 17 LED */
+			output().set_lamp_value(25, (m_leds_mux_data >> 7) & 1);  /* Number 25 LED */
 			break;
 		}
 
 		case 0x02:
 		{
-			output_set_lamp_value( 2, (m_leds_mux_data >> 0) & 1);  /* Number  2 LED */
-			output_set_lamp_value(21, (m_leds_mux_data >> 1) & 1);  /* Number 21 LED */
-			output_set_lamp_value( 4, (m_leds_mux_data >> 2) & 1);  /* Number  4 LED */
-			output_set_lamp_value(19, (m_leds_mux_data >> 3) & 1);  /* Number 19 LED */
-			output_set_lamp_value(15, (m_leds_mux_data >> 4) & 1);  /* Number 15 LED */
-			output_set_lamp_value(32, (m_leds_mux_data >> 5) & 1);  /* Number 32 LED */
-			output_set_lamp_value( 0, (m_leds_mux_data >> 6) & 1);  /* Number  0 LED */
-			output_set_lamp_value(26, (m_leds_mux_data >> 7) & 1);  /* Number 26 LED */
+			output().set_lamp_value( 2, (m_leds_mux_data >> 0) & 1);  /* Number  2 LED */
+			output().set_lamp_value(21, (m_leds_mux_data >> 1) & 1);  /* Number 21 LED */
+			output().set_lamp_value( 4, (m_leds_mux_data >> 2) & 1);  /* Number  4 LED */
+			output().set_lamp_value(19, (m_leds_mux_data >> 3) & 1);  /* Number 19 LED */
+			output().set_lamp_value(15, (m_leds_mux_data >> 4) & 1);  /* Number 15 LED */
+			output().set_lamp_value(32, (m_leds_mux_data >> 5) & 1);  /* Number 32 LED */
+			output().set_lamp_value( 0, (m_leds_mux_data >> 6) & 1);  /* Number  0 LED */
+			output().set_lamp_value(26, (m_leds_mux_data >> 7) & 1);  /* Number 26 LED */
 			break;
 		}
 
 		case 0x04:
 		{
-			output_set_lamp_value( 3, (m_leds_mux_data >> 0) & 1);  /* Number  3 LED */
-			output_set_lamp_value(35, (m_leds_mux_data >> 1) & 1);  /* Number 35 LED */
-			output_set_lamp_value(12, (m_leds_mux_data >> 2) & 1);  /* Number 12 LED */
-			output_set_lamp_value(28, (m_leds_mux_data >> 3) & 1);  /* Number 28 LED */
-			output_set_lamp_value( 7, (m_leds_mux_data >> 4) & 1);  /* Number  7 LED */
-			output_set_lamp_value(29, (m_leds_mux_data >> 5) & 1);  /* Number 29 LED */
-			output_set_lamp_value(18, (m_leds_mux_data >> 6) & 1);  /* Number 18 LED */
+			output().set_lamp_value( 3, (m_leds_mux_data >> 0) & 1);  /* Number  3 LED */
+			output().set_lamp_value(35, (m_leds_mux_data >> 1) & 1);  /* Number 35 LED */
+			output().set_lamp_value(12, (m_leds_mux_data >> 2) & 1);  /* Number 12 LED */
+			output().set_lamp_value(28, (m_leds_mux_data >> 3) & 1);  /* Number 28 LED */
+			output().set_lamp_value( 7, (m_leds_mux_data >> 4) & 1);  /* Number  7 LED */
+			output().set_lamp_value(29, (m_leds_mux_data >> 5) & 1);  /* Number 29 LED */
+			output().set_lamp_value(18, (m_leds_mux_data >> 6) & 1);  /* Number 18 LED */
 			break;
 		}
 
 		case 0x08:
 		{
-			output_set_lamp_value(22, (m_leds_mux_data >> 0) & 1);  /* Number 22 LED */
-			output_set_lamp_value( 9, (m_leds_mux_data >> 1) & 1);  /* Number  9 LED */
-			output_set_lamp_value(31, (m_leds_mux_data >> 2) & 1);  /* Number 31 LED */
-			output_set_lamp_value(14, (m_leds_mux_data >> 3) & 1);  /* Number 14 LED */
-			output_set_lamp_value(20, (m_leds_mux_data >> 4) & 1);  /* Number 20 LED */
-			output_set_lamp_value( 1, (m_leds_mux_data >> 5) & 1);  /* Number  1 LED */
-			output_set_lamp_value(33, (m_leds_mux_data >> 6) & 1);  /* Number 33 LED */
+			output().set_lamp_value(22, (m_leds_mux_data >> 0) & 1);  /* Number 22 LED */
+			output().set_lamp_value( 9, (m_leds_mux_data >> 1) & 1);  /* Number  9 LED */
+			output().set_lamp_value(31, (m_leds_mux_data >> 2) & 1);  /* Number 31 LED */
+			output().set_lamp_value(14, (m_leds_mux_data >> 3) & 1);  /* Number 14 LED */
+			output().set_lamp_value(20, (m_leds_mux_data >> 4) & 1);  /* Number 20 LED */
+			output().set_lamp_value( 1, (m_leds_mux_data >> 5) & 1);  /* Number  1 LED */
+			output().set_lamp_value(33, (m_leds_mux_data >> 6) & 1);  /* Number 33 LED */
 			break;
 		}
 
 		case 0x10:
 		{
-			output_set_lamp_value(16, (m_leds_mux_data >> 0) & 1);  /* Number 16 LED */
-			output_set_lamp_value(24, (m_leds_mux_data >> 1) & 1);  /* Number 24 LED */
-			output_set_lamp_value( 5, (m_leds_mux_data >> 2) & 1);  /* Number  5 LED */
-			output_set_lamp_value(10, (m_leds_mux_data >> 3) & 1);  /* Number 10 LED */
-			output_set_lamp_value(23, (m_leds_mux_data >> 4) & 1);  /* Number 23 LED */
-			output_set_lamp_value( 8, (m_leds_mux_data >> 5) & 1);  /* Number  8 LED */
-			output_set_lamp_value(30, (m_leds_mux_data >> 6) & 1);  /* Number 30 LED */
+			output().set_lamp_value(16, (m_leds_mux_data >> 0) & 1);  /* Number 16 LED */
+			output().set_lamp_value(24, (m_leds_mux_data >> 1) & 1);  /* Number 24 LED */
+			output().set_lamp_value( 5, (m_leds_mux_data >> 2) & 1);  /* Number  5 LED */
+			output().set_lamp_value(10, (m_leds_mux_data >> 3) & 1);  /* Number 10 LED */
+			output().set_lamp_value(23, (m_leds_mux_data >> 4) & 1);  /* Number 23 LED */
+			output().set_lamp_value( 8, (m_leds_mux_data >> 5) & 1);  /* Number  8 LED */
+			output().set_lamp_value(30, (m_leds_mux_data >> 6) & 1);  /* Number 30 LED */
 			break;
 		}
 
@@ -500,7 +500,7 @@ WRITE8_MEMBER(kas89_state::led_mux_select_w)
 		{
 			for ( i = 0; i < 37; i++ )
 			{
-				output_set_lamp_value(i, 1);    /* All LEDs ON */
+				output().set_lamp_value(i, 1);    /* All LEDs ON */
 			}
 		}
 	}

@@ -106,7 +106,7 @@ public:
 	attotime sample_period() const { return attotime(0, m_attoseconds_per_sample); }
 	int input_count() const { return m_input.size(); }
 	int output_count() const { return m_output.size(); }
-	const char *input_name(int inputnum, std::string &str) const;
+	std::string input_name(int inputnum) const;
 	device_t *input_source_device(int inputnum) const;
 	int input_source_outputnum(int inputnum) const;
 	float user_gain(int inputnum) const;
@@ -222,8 +222,8 @@ private:
 	void reset();
 	void pause();
 	void resume();
-	void config_load(int config_type, xml_data_node *parentnode);
-	void config_save(int config_type, xml_data_node *parentnode);
+	void config_load(config_type cfg_type, xml_data_node *parentnode);
+	void config_save(config_type cfg_type, xml_data_node *parentnode);
 
 	void update(void *ptr = nullptr, INT32 param = 0);
 

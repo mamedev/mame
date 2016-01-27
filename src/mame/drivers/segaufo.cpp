@@ -162,7 +162,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ufo_state::update_info)
 	// 3 C: 000 = closed, 100 = open
 	for (int p = 0; p < 2; p++)
 		for (int m = 0; m < 4; m++)
-			output_set_indexed_value("counter", p*4 + m, (UINT8)(m_player[p].motor[m].position * 100));
+			output().set_indexed_value("counter", p*4 + m, (UINT8)(m_player[p].motor[m].position * 100));
 
 #if 0
 	char msg1[0x100] = {0};
@@ -274,7 +274,7 @@ WRITE8_MEMBER(ufo_state::cp_lamps_w)
 	// d0-d3: p1/p2 button lamps
 	// other bits: ?
 	for (int i = 0; i < 4; i++)
-		output_set_lamp_value(i, ~data >> i & 1);
+		output().set_lamp_value(i, ~data >> i & 1);
 }
 
 WRITE8_MEMBER(ufo_state::cp_digits_w)
@@ -284,7 +284,7 @@ WRITE8_MEMBER(ufo_state::cp_digits_w)
 
 	// d0-d3: cpanel digit
 	// other bits: ?
-	output_set_digit_value(offset & 1, lut_7448[data & 0xf]);
+	output().set_digit_value(offset & 1, lut_7448[data & 0xf]);
 }
 
 WRITE8_MEMBER(ufo_state::crane_xyz_w)
@@ -313,13 +313,13 @@ WRITE8_MEMBER(ufo_state::ufo_lamps_w)
 	// 11 = red,   red
 	// 01 = green, red
 	// 10 = red,   green
-	output_set_lamp_value(10, data & 3);
-	output_set_lamp_value(11, data >> 2 & 3);
+	output().set_lamp_value(10, data & 3);
+	output().set_lamp_value(11, data >> 2 & 3);
 
 	// d4,d5: ?
 	// d6,d7: coincounters
-	coin_counter_w(machine(), 0, data & 0x40); // 100 Y
-	coin_counter_w(machine(), 1, data & 0x80); // 500 Y
+	machine().bookkeeping().coin_counter_w(0, data & 0x40); // 100 Y
+	machine().bookkeeping().coin_counter_w(1, data & 0x80); // 500 Y
 }
 
 
@@ -381,11 +381,11 @@ WRITE8_MEMBER(ufo_state::ex_cp_lamps_w)
 {
 	// d0,d1,d4,d5: p1/p2 button lamps
 	for (int i = 0; i < 4; i++)
-		output_set_lamp_value(i, ~data >> ((i&1) + (i&2) * 2) & 1);
+		output().set_lamp_value(i, ~data >> ((i&1) + (i&2) * 2) & 1);
 
 	// d2,d3,d6,d7: p1/p2 coincounters
 	for (int i = 0; i < 4; i++)
-		coin_counter_w(machine(), i, data >> (2 + (i&1) + (i&2) * 2) & 1);
+		machine().bookkeeping().coin_counter_w(i, data >> (2 + (i&1) + (i&2) * 2) & 1);
 }
 
 WRITE8_MEMBER(ufo_state::ex_crane_xyz_w)
@@ -412,7 +412,7 @@ WRITE8_MEMBER(ufo_state::ex_ufo800_lamps_w)
 	// d0-d4: 5 red leds on ufo
 	// other bits: ?
 	for (int i = 0; i < 5; i++)
-		output_set_lamp_value(10 + i, data >> i & 1);
+		output().set_lamp_value(10 + i, data >> i & 1);
 }
 
 /* 315-5338A */
@@ -423,7 +423,7 @@ WRITE8_MEMBER(ufo_state::ex_ufo21_lamps_w)
 	// d1-d6 are the 6 red leds on each ufo
 	// d7: ?
 	for (int i = 1; i < 7; i++)
-		output_set_lamp_value(10 + offset * 10 + i, data >> i & 1);
+		output().set_lamp_value(10 + offset * 10 + i, data >> i & 1);
 }
 
 WRITE8_MEMBER(ufo_state::ex_upd_start_w)

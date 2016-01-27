@@ -430,7 +430,7 @@ void xt_hdc_device::dack_ws(int data)
 
 void xt_hdc_device::execute_read()
 {
-	hard_disk_file *disk = nullptr;
+	hard_disk_file *disk;
 	int size = sector_cnt[drv] * 512;
 	int read_ = 0;
 
@@ -460,7 +460,7 @@ void xt_hdc_device::execute_read()
 
 void xt_hdc_device::execute_write()
 {
-	hard_disk_file *disk = nullptr;
+	hard_disk_file *disk;
 	int size = sector_cnt[drv] * 512;
 	int write_ = 512;
 

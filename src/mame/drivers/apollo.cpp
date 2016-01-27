@@ -905,13 +905,13 @@ void apollo_state::machine_reset()
 	// set configuration
 	omti8621_device::set_verbose(apollo_config(APOLLO_CONF_DISK_TRACE));
 	threecom3c505_device::set_verbose(apollo_config(APOLLO_CONF_NET_TRACE));
+#endif
 
 	if (apollo_config(APOLLO_CONF_NODE_ID))
 	{
 		// set node ID from UID of logical volume 1 of logical unit 0
 		m_node_id->set_node_id_from_disk();
 	}
-#endif
 
 	m_maincpu->set_instruction_hook(read32_delegate(FUNC(apollo_state::apollo_instruction_hook),this));
 }
@@ -1053,7 +1053,7 @@ static MACHINE_CONFIG_START( dn3500, apollo_state )
 
 	/* keyboard beeper */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD("beep", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* internal ram */
@@ -1077,7 +1077,7 @@ static MACHINE_CONFIG_START( dsp3500, apollo_state )
 
 	/* keyboard beeper */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD("beep", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* internal ram */
@@ -1125,7 +1125,7 @@ static MACHINE_CONFIG_START( dsp3000, apollo_state )
 
 	/* keyboard beeper */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD("beep", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* internal ram */
@@ -1171,7 +1171,7 @@ static MACHINE_CONFIG_START( dsp5500, apollo_state )
 
 	/* keyboard beeper */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD("beep", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* terminal hardware */

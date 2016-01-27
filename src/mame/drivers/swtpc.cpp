@@ -61,7 +61,6 @@ public:
 	DECLARE_READ8_MEMBER(swtpc_status_r);
 	DECLARE_READ8_MEMBER(swtpc_terminal_r);
 	DECLARE_READ8_MEMBER(swtpc_tricky_r);
-	DECLARE_WRITE8_MEMBER(swtpc_terminal_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
 	virtual void machine_reset() override;

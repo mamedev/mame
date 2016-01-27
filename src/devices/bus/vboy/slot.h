@@ -69,7 +69,6 @@ public:
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
 
 	int get_type() { return m_type; }
-	int get_cart_type(UINT8 *ROM, UINT32 len);
 
 	void save_eeprom()  { if (m_cart && m_cart->get_eeprom_size()) m_cart->save_eeprom(); }
 
@@ -84,7 +83,7 @@ public:
 	virtual const char *file_extensions() const override { return "vb,bin"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_cart);

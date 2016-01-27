@@ -658,103 +658,72 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 	MCFG_SLOT_DEFAULT_OPTION("gdrom")
 MACHINE_CONFIG_END
 
-/*
-PsyMan notes:
 
-Here's a basic report on the Dreamcast boot files used in MAME (BIOS+Flash pairs):
+#define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1))
 
------
+// actual mask rom labels can have -X1 or -X2 added, presumable depending on mobo revision and/or type of rom used (5v or 3.3v), contents is the same
+// known to exists undumped MPR-21086 (VA0 NTSC-J 3010) and MPR-21933 (VA0 US) boot roms
 
-"dc101d_us.bin", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )   // BIOS
-This is a proper European and USA BIOS. It's even possible that it was used at a later point for Japanese systems.
-It only has minor differences compared to BIOS 1.01c.
-
-
-"dcus_ntsc.bin", 0x000000, 0x020000, BAD_DUMP CRC(c611b498) SHA1(94d44d7f9529ec1642ba3771ed3c5f756d5bc872) )   // Flash
-Checking at 0x0001A000 and the mirrored data at 0x0001A0A0 gives away that this is hacked from a PAL/European flash file.
-The broadcast (0x0001A004) is also set at 50Hz which is a PAL standard.
-
-
-"dc101d_eu.bin", 0x000000, 0x200000, CRC(a2564fad) SHA1(edc5d3d70a93c935703d26119b37731fd317d2bf),ROM_BIOS(1))   // BIOS
-This BIOS has Chinese language added. So either this is a bad BIOS or Dreamcast was actually officially released there.
-
-
-"dc101c_eu.bin", 0x000000, 0x200000, CRC(2f551bc5) SHA1(1ede8d5be49116a4c6f3fe0961175469537a0434),ROM_BIOS(2))   // BIOS
-This seems to be a proper European and USA BIOS. It's even possible that it was used at a later point for Japanese systems.
-It only has minor differences compared to BIOS 1.01d.
-
-
-
-"dceu_pal.bin", 0x000000, 0x020000, BAD_DUMP CRC(b7e5aeeb) SHA1(11e02433e13b793ec7ffe0ae2356750bb8a575b4) )    // Flash
-This appears to be a valid PAL/European flash. It's unknown if the data at 0x0001A0A0 (from 0x0001A000) should be mirrored there.
-Maybe a game does this mirroring or maybe it's there by default. It's certain that some games wrote to this flash though.
-
-
-"dc1004jp.bin", 0x000000, 0x200000, CRC(5454841f) SHA1(1ea132c0fbbf07ef76789eadc07908045c089bd6) )    // BIOS
-This seems to be a proper Japanese BIOS. This BIOS was used at least by early Japanese Dreamcast models.
-Code-wise, it has major differences compared to later BIOS versions.
-
-
-"dcjp_ntsc.bin", 0x000000, 0x020000, CRC(5f92bf76) SHA1(be78b834f512ab2cf3d67b96e377c9f3093ff82a) )  // Flash
-Checking at 0x0001A000 and the mirrored data at 0x0001A0A0 gives away that this is hacked from a PAL/European flash file.
-The broadcast (0x0001A004) is also set at 50Hz which is a PAL standard.
-
------
-
-
-From all the aforementioned files the only personally verified one is "dc101d_us.bin", CRC(89f2b1a1).
-The resulting file was dumped twice, once from an NTSC/USA system and once from a PAL/EUR system. Both files had a side by side byte match.
-*/
+#define DREAMCAST_COMMON_BIOS \
+	ROM_REGION(0x200000, "maincpu", 0) \
+	ROM_SYSTEM_BIOS(0, "101d", "v1.01d (World)") \
+	ROM_LOAD_BIOS(0, "mpr-21931.ic501", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) ) \
+	ROM_SYSTEM_BIOS(1, "1022", "v1.022 (World)") \
+	ROM_LOAD_BIOS(1, "mpr-23588.ic501", 0x000000, 0x200000, CRC(786168f9) SHA1(ba8bbb90fdb29525f24f17055dc2c7b2d7674437) ) \
+	ROM_SYSTEM_BIOS(2, "101c", "v1.01c (World)") \
+	ROM_LOAD_BIOS(2, "mpr-21871.ic501", 0x000000, 0x200000, CRC(2f551bc5) SHA1(1ede8d5be49116a4c6f3fe0961175469537a0434) ) \
+	ROM_SYSTEM_BIOS(3, "101dch", "v1.01d (Chinese hack)") \
+	ROM_LOAD_BIOS(3, "dc101d_ch.bin",   0x000000, 0x200000, CRC(a2564fad) SHA1(edc5d3d70a93c935703d26119b37731fd317d2bf) )
+// ^^^ dc101d_eu.bin ^^^ is selfmade chinese translation, doesn't work on real hardware, does it must be here at all ?
 
 ROM_START(dc)
-	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_LOAD( "dc101d_us.bin", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )   // BIOS
+	DREAMCAST_COMMON_BIOS
 
 	ROM_REGION(0x020000, "dcflash", 0)
-	ROM_LOAD( "dcus_ntsc.bin", 0x000000, 0x020000, BAD_DUMP CRC(c611b498) SHA1(94d44d7f9529ec1642ba3771ed3c5f756d5bc872) )   // Flash
-	ROM_FILL( 0x1a004, 1, 0x30 ) // patch broadcast back to NTSC
+	ROM_LOAD( "dcus_ntsc.bin", 0x000000, 0x020000, BAD_DUMP CRC(e6862dd0) SHA1(24875ce85c011600e73b1c3fd2b341824cbf8544) )  // dumped from VA2.4 mobo with 1.022 BIOS
 ROM_END
 
 ROM_START( dceu )
-	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_SYSTEM_BIOS(0, "101d", "v1.01d")
-	ROMX_LOAD( "dc101d_eu.bin", 0x000000, 0x200000, CRC(a2564fad) SHA1(edc5d3d70a93c935703d26119b37731fd317d2bf),ROM_BIOS(1))   // BIOS
-	ROM_SYSTEM_BIOS(1, "101c", "v1.01c")
-	ROMX_LOAD( "dc101c_eu.bin", 0x000000, 0x200000, CRC(2f551bc5) SHA1(1ede8d5be49116a4c6f3fe0961175469537a0434),ROM_BIOS(2))   // BIOS
+	DREAMCAST_COMMON_BIOS
 
 	ROM_REGION(0x020000, "dcflash", 0)
-	ROM_LOAD( "dceu_pal.bin", 0x000000, 0x020000, BAD_DUMP CRC(b7e5aeeb) SHA1(11e02433e13b793ec7ffe0ae2356750bb8a575b4) )    // Flash
+	ROM_LOAD( "dceu_pal.bin", 0x000000, 0x020000, BAD_DUMP CRC(b7e5aeeb) SHA1(11e02433e13b793ec7ffe0ae2356750bb8a575b4) )
 ROM_END
 
 ROM_START( dcjp )
-	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_LOAD( "dc1004jp.bin", 0x000000, 0x200000, CRC(5454841f) SHA1(1ea132c0fbbf07ef76789eadc07908045c089bd6) )    // BIOS
+	DREAMCAST_COMMON_BIOS
+	ROM_SYSTEM_BIOS(4, "1004", "v1.004 (Japan)")    // oldest known mass production version, supports Japan region only
+	ROM_LOAD_BIOS(4, "mpr-21068.ic501", 0x000000, 0x200000, CRC(5454841f) SHA1(1ea132c0fbbf07ef76789eadc07908045c089bd6) )
 
 	ROM_REGION(0x020000, "dcflash", 0)
 	/* ROM_LOAD( "dcjp_ntsc.bad", 0x000000, 0x020000, BAD_DUMP CRC(307a7035) SHA1(1411423a9d071340ea52c56e19c1aafc4e1309ee) )      // Hacked Flash */
-	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, BAD_DUMP CRC(5f92bf76) SHA1(be78b834f512ab2cf3d67b96e377c9f3093ff82a) )  // Flash
+	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, BAD_DUMP CRC(5f92bf76) SHA1(be78b834f512ab2cf3d67b96e377c9f3093ff82a) )         // hacked PAL flash
 	ROM_FILL( 0x1a004, 1, 0x30 ) // patch broadcast back to NTSC
 ROM_END
 
+// normally, with DIP switch 4 off, HKT-100/110/120 AKA "Katana Set 5.xx", will be booted from flash ROM IC507 (first 2 dumps below)
+// otherwise it boots from EPROM which contain system checker software (last dump)
 ROM_START( dcdev )
 	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_LOAD( "hkt-0120.bin", 0x000000, 0x200000, CRC(2186e0e5) SHA1(6bd18fb83f8fdb56f1941e079580e5dd672a6dad) )        // BIOS
+	ROM_SYSTEM_BIOS(0, "1011", "Katana Set5 v1.011 (World)")    // BOOT flash rom update from Katana SDK R9-R11, WinCE SDK v2.1
+	ROM_LOAD_BIOS(0, "set5v1.011.ic507", 0x000000, 0x200000, CRC(2186e0e5) SHA1(6bd18fb83f8fdb56f1941e079580e5dd672a6dad) )
+	ROM_SYSTEM_BIOS(1, "1001", "Katana Set5 v1.001 (Japan)")    // BOOT flash rom update from WinCE SDK v1.0
+	ROM_LOAD_BIOS(1, "set5v1.001.ic507", 0x000000, 0x200000, CRC(5702d38f) SHA1(ea7a3ae1de73683008dd795c252941a4fc81b42e) )
+
+	// 27C160 EPROM (DIP42) IC??? labeled
+	// SET5 FC52
+	// V0.41 98/08/27
+	// also known to exists v0.71 98/11/13
+	ROM_SYSTEM_BIOS(2, "041", "Katana Set5 Checker v0.41")
+	ROM_LOAD_BIOS(2, "set5v0.41.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) )
 
 	ROM_REGION(0x020000, "dcflash", 0)
-	ROM_LOAD( "hkt-0120-flash.bin", 0x000000, 0x020000, CRC(7784c304) SHA1(31ef57f550d8cd13e40263cbc657253089e53034) )  // Flash
-ROM_END
-
-ROM_START( dcprt )
-	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_LOAD( "katana-set5-v0.41-98-08-27.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) ) // BIOS
-
-	ROM_REGION(0x020000, "dcflash", 0)
-	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, CRC(5f92bf76) SHA1(be78b834f512ab2cf3d67b96e377c9f3093ff82a) )  // Flash
+	ROM_LOAD( "hkt-0120-flash.bin", 0x000000, 0x020000, CRC(7784c304) SHA1(31ef57f550d8cd13e40263cbc657253089e53034) )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT      COMPANY FULLNAME */
 CONS( 1999, dc,     dcjp,   0,      dc,     dc, dc_cons_state,     dcus,   "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1998, dcjp,   0,      0,      dc,     dc, dc_cons_state,     dcjp,   "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1999, dceu,   dcjp,   0,      dc,     dc, dc_cons_state,     dcus,   "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
-CONS( 1998, dcdev,  dcjp,   0,      dc,     dc, dc_cons_state,     dc,     "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )
-CONS( 1998, dcprt,  dcjp,   0,      dc,     dc, dc_cons_state,     dcjp,   "Sega", "Katana Set 5 Prototype", MACHINE_NOT_WORKING )
+CONS( 1998, dcdev,  0,      0,      dc,     dc, dc_cons_state,     dc,     "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )

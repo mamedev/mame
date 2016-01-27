@@ -14,9 +14,6 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	virtual WRITE_LINE_MEMBER( input_txd ) override { device_serial_interface::rx_w(state); }
-
-	DECLARE_WRITE_LINE_MEMBER(update_serial);
-
 protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;

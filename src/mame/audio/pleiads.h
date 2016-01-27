@@ -79,7 +79,7 @@ protected:
 	int m_sound_latch_b;
 	int m_sound_latch_c;    /* part of the videoreg_w latch */
 
-	UINT32 *m_poly18;
+	std::unique_ptr<UINT32[]> m_poly18;
 	int m_polybit;
 
 	pl_t_state m_tone1;

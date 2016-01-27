@@ -35,7 +35,7 @@ public:
 	UINT8 m_palette_data[3];
 	rectangle m_render_clip;
 	UINT8 *m_srcbitmap;
-	UINT8 *m_dstbitmap;
+	std::unique_ptr<UINT8[]> m_dstbitmap;
 	UINT16 m_src_xoffs;
 	UINT16 m_src_yoffs;
 	UINT16 m_dst_xoffs;

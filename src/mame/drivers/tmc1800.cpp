@@ -541,7 +541,7 @@ WRITE_LINE_MEMBER( tmc2000_state::q_w )
 	m_cti->aoe_w(state);
 
 	/* set Q led status */
-	set_led_status(machine(), 1, state);
+	output().set_led_value(1, state);
 
 	/* tape output */
 	m_cassette->output(state ? 1.0 : -1.0);
@@ -586,7 +586,7 @@ WRITE_LINE_MEMBER( nano_state::q_w )
 	m_cti->aoe_w(state);
 
 	/* set Q led status */
-	set_led_status(machine(), 1, state);
+	output().set_led_value(1, state);
 
 	/* tape output */
 	m_cassette->output(state ? 1.0 : -1.0);
@@ -863,7 +863,7 @@ void tmc1800_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 	case TIMER_SETUP_BEEP:
 		m_beeper->set_state(0);
-		m_beeper->set_frequency(0);
+		m_beeper->set_clock(0);
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in tmc1800_state::device_timer");

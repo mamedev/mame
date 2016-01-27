@@ -205,22 +205,22 @@ WRITE8_MEMBER( g627_state::portc_w )
 	m_portc = data;
 	if ((m_type) && (data < 6))
 	{
-		output_set_digit_value(data, m_seg[0]);
-		output_set_digit_value(10 + data, m_seg[1]);
-		output_set_digit_value(20 + data, m_seg[2]);
-		output_set_digit_value(30 + data, m_seg[3]);
-		output_set_digit_value(50 + data, m_seg[5]);
+		output().set_digit_value(data, m_seg[0]);
+		output().set_digit_value(10 + data, m_seg[1]);
+		output().set_digit_value(20 + data, m_seg[2]);
+		output().set_digit_value(30 + data, m_seg[3]);
+		output().set_digit_value(50 + data, m_seg[5]);
 	}
 	else
 	if ((!m_type) && (data))
 	{
 		data--;
 
-		output_set_digit_value(data, m_seg[0]);
-		output_set_digit_value(10 + data, m_seg[1]);
-		output_set_digit_value(20 + data, m_seg[2]);
-		output_set_digit_value(30 + data, m_seg[3]);
-		output_set_digit_value(50 + data, m_seg[5]);
+		output().set_digit_value(data, m_seg[0]);
+		output().set_digit_value(10 + data, m_seg[1]);
+		output().set_digit_value(20 + data, m_seg[2]);
+		output().set_digit_value(30 + data, m_seg[3]);
+		output().set_digit_value(50 + data, m_seg[5]);
 	}
 }
 

@@ -25,7 +25,7 @@ void pcw_state::video_start()
 {
 	rectangle rect(0, PCW_PRINTER_WIDTH - 1, 0, PCW_PRINTER_HEIGHT - 1);
 
-	m_prn_output = auto_bitmap_ind16_alloc(machine(),PCW_PRINTER_WIDTH,PCW_PRINTER_HEIGHT);
+	m_prn_output = std::make_unique<bitmap_ind16>(PCW_PRINTER_WIDTH,PCW_PRINTER_HEIGHT);
 	m_prn_output->fill(1, rect);
 }
 

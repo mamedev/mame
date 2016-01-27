@@ -63,8 +63,8 @@ WRITE8_MEMBER(ddribble_state::ddribble_coin_counter_w)
 	/* b2-b3: unknown */
 	/* b1: coin counter 2 */
 	/* b0: coin counter 1 */
-	coin_counter_w(machine(), 0,(data) & 0x01);
-	coin_counter_w(machine(), 1,(data >> 1) & 0x01);
+	machine().bookkeeping().coin_counter_w(0,(data) & 0x01);
+	machine().bookkeeping().coin_counter_w(1,(data >> 1) & 0x01);
 }
 
 READ8_MEMBER(ddribble_state::ddribble_vlm5030_busy_r)

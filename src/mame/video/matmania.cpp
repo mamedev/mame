@@ -120,8 +120,8 @@ void matmania_state::video_start()
 	int height = m_screen->height();
 
 	/* Mat Mania has a virtual screen twice as large as the visible screen */
-	m_tmpbitmap  = auto_bitmap_ind16_alloc(machine(), width, 2 * height);
-	m_tmpbitmap2 = auto_bitmap_ind16_alloc(machine(), width, 2 * height);
+	m_tmpbitmap  = std::make_unique<bitmap_ind16>(width, 2 * height);
+	m_tmpbitmap2 = std::make_unique<bitmap_ind16>(width, 2 * height);
 }
 
 

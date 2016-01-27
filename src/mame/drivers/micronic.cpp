@@ -159,7 +159,7 @@ WRITE8_MEMBER( micronic_state::beep_w )
 		500,  444,  400,  364,  333, 308, 286, 267
 	};
 
-	m_beep->set_frequency(frequency[data & 0x0f]);
+	m_beep->set_clock(frequency[data & 0x0f]);
 	m_beep->set_state((data & 0x0f) ? 1 : 0);
 }
 

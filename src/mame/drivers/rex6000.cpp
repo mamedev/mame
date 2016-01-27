@@ -220,7 +220,7 @@ WRITE8_MEMBER( rex6000_state::beep_w )
 
 	switch (offset)
 	{
-		case 0:     //alarm mode control
+		case 0: // alarm mode control
 			/*
 			    ---- ---x   beep off
 			    ---- --x-   continuous beep
@@ -231,21 +231,24 @@ WRITE8_MEMBER( rex6000_state::beep_w )
 			    -x-- ----   single alarm
 			    x--- ----   single short beep
 			*/
-			//TODO: the beeper frequency and length in alarm mode need to be measured
+			// TODO: the beeper frequency and length in alarm mode need to be measured
 			break;
-		case 1:     //tone mode control
+		case 1: // tone mode control
 			if (m_beep_mode)
 			{
 				m_beep->set_state(BIT(data, 0));
 
-				//the beeper frequency is update only if the bit 1 is set
+				// the beeper frequency is update only if the bit 1 is set
 				if (BIT(data, 1))
-					m_beep->set_frequency(16384 / (((m_beep_io[2] | (m_beep_io[3]<<8)) & 0x0fff) + 2));
+				{
+					UINT16 div = ((m_beep_io[2] | m_beep_io[3]<<8) & 0x0fff) + 2;
+					m_beep->set_clock(16384 / div);
+				}
 			}
 			break;
-		case 4:     //select alarm/tone mode
+		case 4: // select alarm/tone mode
 			if (m_beep_mode != BIT(data, 0))
-				m_beep->set_state(0);      //turned off when mode changes
+				m_beep->set_state(0); // turned off when mode changes
 
 			m_beep_mode = BIT(data, 0);
 			break;

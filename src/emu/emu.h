@@ -15,8 +15,6 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef __EMU_H__
 #define __EMU_H__
 
@@ -112,7 +110,7 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "devcb.h"
 #include "dispatch.h"
 #include "drivers/xtal.h"
-#include "machine/generic.h"
+#include "bookkeeping.h"
 #include "video/generic.h"
 
 #endif  /* __EMU_H__ */

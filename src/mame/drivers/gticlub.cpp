@@ -332,8 +332,8 @@ private:
 
 	UINT8 m_gticlub_led_reg[2];
 	emu_timer *m_sound_irq_timer;
-	UINT32 *m_sharc_dataram_0;
-	UINT32 *m_sharc_dataram_1;
+	std::unique_ptr<UINT32[]> m_sharc_dataram_0;
+	std::unique_ptr<UINT32[]> m_sharc_dataram_1;
 };
 
 
@@ -1416,15 +1416,15 @@ ROM_END
 
 DRIVER_INIT_MEMBER(gticlub_state,gticlub)
 {
-	m_sharc_dataram_0 = auto_alloc_array(machine(), UINT32, 0x100000/4);
+	m_sharc_dataram_0 = std::make_unique<UINT32[]>(0x100000/4);
 }
 
 void gticlub_state::init_hangplt_common()
 {
 	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
 	m_konppc->set_cgboard_texture_bank(1, "bank6", memregion("user5")->base());
-	m_sharc_dataram_0 = auto_alloc_array(machine(), UINT32, 0x100000/4);
-	m_sharc_dataram_1 = auto_alloc_array(machine(), UINT32, 0x100000/4);
+	m_sharc_dataram_0 = std::make_unique<UINT32[]>(0x100000/4);
+	m_sharc_dataram_1 = std::make_unique<UINT32[]>(0x100000/4);
 }
 
 DRIVER_INIT_MEMBER(gticlub_state,hangplt)

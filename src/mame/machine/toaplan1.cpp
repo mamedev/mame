@@ -235,15 +235,15 @@ READ16_MEMBER(toaplan1_state::vimana_system_port_r)
 				m_vimana_credits += toaplan1_credits_for_coin[reg][slot][dsw];
 				m_vimana_coins[slot] -= toaplan1_coins_for_credit[reg][slot][dsw];
 			}
-			coin_counter_w(machine(), slot, 1);
-			coin_counter_w(machine(), slot, 0);
+			machine().bookkeeping().coin_counter_w(slot, 1);
+			machine().bookkeeping().coin_counter_w(slot, 0);
 		}
 
 		if (m_vimana_credits >= 9)
 			m_vimana_credits = 9;
 	}
 
-	coin_lockout_global_w(machine(), (m_vimana_credits >= 9));
+	machine().bookkeeping().coin_lockout_global_w((m_vimana_credits >= 9));
 
 	m_vimana_latch = p;
 
@@ -276,7 +276,7 @@ WRITE16_MEMBER(toaplan1_state::vimana_mcu_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				m_vimana_credits = data & 0xff;
-				coin_lockout_global_w(machine(), (m_vimana_credits >= 9));
+				machine().bookkeeping().coin_lockout_global_w((m_vimana_credits >= 9));
 			}
 			break;
 	}
@@ -314,14 +314,14 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_reset_sound_w)
 WRITE8_MEMBER(toaplan1_rallybik_state::rallybik_coin_w)
 {
 	switch (data) {
-		case 0x08: if (m_coin_count) { coin_counter_w(machine(), 0, 1); coin_counter_w(machine(), 0, 0); } break;
-		case 0x09: if (m_coin_count) { coin_counter_w(machine(), 2, 1); coin_counter_w(machine(), 2, 0); } break;
-		case 0x0a: if (m_coin_count) { coin_counter_w(machine(), 1, 1); coin_counter_w(machine(), 1, 0); } break;
-		case 0x0b: if (m_coin_count) { coin_counter_w(machine(), 3, 1); coin_counter_w(machine(), 3, 0); } break;
-		case 0x0c: coin_lockout_w(machine(), 0, 1); coin_lockout_w(machine(), 2, 1); break;
-		case 0x0d: coin_lockout_w(machine(), 0, 0); coin_lockout_w(machine(), 2, 0); break;
-		case 0x0e: coin_lockout_w(machine(), 1, 1); coin_lockout_w(machine(), 3, 1); break;
-		case 0x0f: coin_lockout_w(machine(), 1, 0); coin_lockout_w(machine(), 3, 0); m_coin_count=1; break;
+		case 0x08: if (m_coin_count) { machine().bookkeeping().coin_counter_w(0, 1); machine().bookkeeping().coin_counter_w(0, 0); } break;
+		case 0x09: if (m_coin_count) { machine().bookkeeping().coin_counter_w(2, 1); machine().bookkeeping().coin_counter_w(2, 0); } break;
+		case 0x0a: if (m_coin_count) { machine().bookkeeping().coin_counter_w(1, 1); machine().bookkeeping().coin_counter_w(1, 0); } break;
+		case 0x0b: if (m_coin_count) { machine().bookkeeping().coin_counter_w(3, 1); machine().bookkeeping().coin_counter_w(3, 0); } break;
+		case 0x0c: machine().bookkeeping().coin_lockout_w(0, 1); machine().bookkeeping().coin_lockout_w(2, 1); break;
+		case 0x0d: machine().bookkeeping().coin_lockout_w(0, 0); machine().bookkeeping().coin_lockout_w(2, 0); break;
+		case 0x0e: machine().bookkeeping().coin_lockout_w(1, 1); machine().bookkeeping().coin_lockout_w(3, 1); break;
+		case 0x0f: machine().bookkeeping().coin_lockout_w(1, 0); machine().bookkeeping().coin_lockout_w(3, 0); m_coin_count=1; break;
 		default:   logerror("PC:%04x  Writing unknown data (%04x) to coin count/lockout port\n",space.device().safe_pcbase(),data); break;
 	}
 }
@@ -334,24 +334,24 @@ WRITE8_MEMBER(toaplan1_state::toaplan1_coin_w)
 	/* Are some outputs for lights ? (no space on JAMMA for it though) */
 
 	switch (data) {
-		case 0xee: coin_counter_w(machine(), 1,1); coin_counter_w(machine(), 1,0); break; /* Count slot B */
-		case 0xed: coin_counter_w(machine(), 0,1); coin_counter_w(machine(), 0,0); break; /* Count slot A */
+		case 0xee: machine().bookkeeping().coin_counter_w(1,1); machine().bookkeeping().coin_counter_w(1,0); break; /* Count slot B */
+		case 0xed: machine().bookkeeping().coin_counter_w(0,1); machine().bookkeeping().coin_counter_w(0,0); break; /* Count slot A */
 	/* The following are coin counts after coin-lock active (faulty coin-lock ?) */
-		case 0xe2: coin_counter_w(machine(), 1,1); coin_counter_w(machine(), 1,0); coin_lockout_w(machine(), 1,1); break;
-		case 0xe1: coin_counter_w(machine(), 0,1); coin_counter_w(machine(), 0,0); coin_lockout_w(machine(), 0,1); break;
+		case 0xe2: machine().bookkeeping().coin_counter_w(1,1); machine().bookkeeping().coin_counter_w(1,0); machine().bookkeeping().coin_lockout_w(1,1); break;
+		case 0xe1: machine().bookkeeping().coin_counter_w(0,1); machine().bookkeeping().coin_counter_w(0,0); machine().bookkeeping().coin_lockout_w(0,1); break;
 
-		case 0xec: coin_lockout_global_w(machine(), 0); break;  /* ??? count games played */
+		case 0xec: machine().bookkeeping().coin_lockout_global_w(0); break;  /* ??? count games played */
 		case 0xe8: break;   /* ??? Maximum credits reached with coin/credit ratio */
 		case 0xe4: break;   /* ??? Reset coin system */
 
-		case 0x0c: coin_lockout_global_w(machine(), 0); break;  /* Unlock all coin slots */
-		case 0x08: coin_lockout_w(machine(), 2,0); break;   /* Unlock coin slot C */
-		case 0x09: coin_lockout_w(machine(), 0,0); break;   /* Unlock coin slot A */
-		case 0x0a: coin_lockout_w(machine(), 1,0); break;   /* Unlock coin slot B */
+		case 0x0c: machine().bookkeeping().coin_lockout_global_w(0); break;  /* Unlock all coin slots */
+		case 0x08: machine().bookkeeping().coin_lockout_w(2,0); break;   /* Unlock coin slot C */
+		case 0x09: machine().bookkeeping().coin_lockout_w(0,0); break;   /* Unlock coin slot A */
+		case 0x0a: machine().bookkeeping().coin_lockout_w(1,0); break;   /* Unlock coin slot B */
 
-		case 0x02: coin_lockout_w(machine(), 1,1); break;   /* Lock coin slot B */
-		case 0x01: coin_lockout_w(machine(), 0,1); break;   /* Lock coin slot A */
-		case 0x00: coin_lockout_global_w(machine(), 1); break;  /* Lock all coin slots */
+		case 0x02: machine().bookkeeping().coin_lockout_w(1,1); break;   /* Lock coin slot B */
+		case 0x01: machine().bookkeeping().coin_lockout_w(0,1); break;   /* Lock coin slot A */
+		case 0x00: machine().bookkeeping().coin_lockout_global_w(1); break;  /* Lock all coin slots */
 		default:   logerror("PC:%04x  Writing unknown data (%04x) to coin count/lockout port\n",space.device().safe_pcbase(),data); break;
 	}
 }
@@ -377,7 +377,7 @@ MACHINE_RESET_MEMBER(toaplan1_state,toaplan1)
 {
 	m_intenable = 0;
 	m_coin_count = 0;
-	coin_lockout_global_w(machine(), 0);
+	machine().bookkeeping().coin_lockout_global_w(0);
 }
 
 /* zerowing, fireshrk, outzone */

@@ -241,14 +241,14 @@ void seta_state::seta_coin_lockout_w(int data)
 		}
 	}
 
-	coin_counter_w      (machine(), 0, (( data) >> 0) & 1 );
-	coin_counter_w      (machine(), 1, (( data) >> 1) & 1 );
+	machine().bookkeeping().coin_counter_w(0, (( data) >> 0) & 1 );
+	machine().bookkeeping().coin_counter_w(1, (( data) >> 1) & 1 );
 
 	/* some games haven't the coin lockout device */
 	if (    !m_coin_lockout )
 		return;
-	coin_lockout_w      (machine(), 0, ((~data) >> 2) & 1 );
-	coin_lockout_w      (machine(), 1, ((~data) >> 3) & 1 );
+	machine().bookkeeping().coin_lockout_w(0, ((~data) >> 2) & 1 );
+	machine().bookkeeping().coin_lockout_w(1, ((~data) >> 3) & 1 );
 }
 
 
@@ -272,8 +272,8 @@ WRITE16_MEMBER(seta_state::seta_vregs_w)
 				seta_coin_lockout_w (data & 0x0f);
 				if (m_x1 != nullptr)
 					m_x1->enable_w (data & 0x20);
-				coin_counter_w(machine(), 0,data & 0x01);
-				coin_counter_w(machine(), 1,data & 0x02);
+				machine().bookkeeping().coin_counter_w(0,data & 0x01);
+				machine().bookkeeping().coin_counter_w(1,data & 0x02);
 			}
 			break;
 
@@ -295,6 +295,9 @@ WRITE16_MEMBER(seta_state::seta_vregs_w)
 
 				if (new_bank != m_samples_bank)
 				{
+					if (memregion("x1snd") == nullptr) // triplfun no longer has the hardware, but still writes here
+						break;
+
 					UINT8 *rom = memregion("x1snd")->base();
 					int samples_len = memregion("x1snd")->bytes();
 					int addr;

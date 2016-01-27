@@ -47,7 +47,7 @@ public:
 
 	void nvram_init(nvram_device &nvram, void *base, size_t length);
 
-	UINT16 *m_videoram;
+	std::unique_ptr<UINT16[]> m_videoram;
 	UINT8 m_vint_state;
 	UINT8 m_xint_state;
 	UINT8 m_qint_state;
@@ -117,10 +117,6 @@ public:
 	DECLARE_READ32_MEMBER(drivedge_tms1_speedup_r);
 	DECLARE_READ32_MEMBER(drivedge_tms2_speedup_r);
 	DECLARE_WRITE32_MEMBER(int1_ack32_w);
-	DECLARE_READ32_MEMBER(test1_r);
-	DECLARE_WRITE32_MEMBER(test1_w);
-	DECLARE_READ32_MEMBER(test2_r);
-	DECLARE_WRITE32_MEMBER(test2_w);
 	DECLARE_WRITE16_MEMBER(timekill_colora_w);
 	DECLARE_WRITE16_MEMBER(timekill_colorbc_w);
 	DECLARE_WRITE16_MEMBER(timekill_intensity_w);

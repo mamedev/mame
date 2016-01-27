@@ -255,10 +255,10 @@ SED1520_UPDATE_CB(gl3000s_screen_update_left)
 				else if ((x == 75 || x == 77 || x == 79) && yi == 5)    points[y][dpos] |= (state << 4);
 				else if ((x == 75 || x == 77 || x == 79) && yi == 6)    points[y][dpos] |= (state << 3);
 
-				else if (y == 1 && x >= 65 && x <= 68 && yi == 7)       output_set_indexed_value("LEV", x - 64, state);
-				else if (x >= 59  && x <= 60 && yi == 7)                output_set_indexed_value("TRY", x - 58 + (y ? 0 : 1), state);
-				else if (y == 1 && x >= 61 && x <= 64 && yi == 7)       output_set_indexed_value("TICK", x - 59, state);
-				else if (y == 0 && x >= 61 && x <= 64 && yi == 7)       output_set_indexed_value("TICK", 62 - x + (x >= 63 ? 8 : 0), state);
+				else if (y == 1 && x >= 65 && x <= 68 && yi == 7)       device.machine().output().set_indexed_value("LEV", x - 64, state);
+				else if (x >= 59  && x <= 60 && yi == 7)                device.machine().output().set_indexed_value("TRY", x - 58 + (y ? 0 : 1), state);
+				else if (y == 1 && x >= 61 && x <= 64 && yi == 7)       device.machine().output().set_indexed_value("TICK", x - 59, state);
+				else if (y == 0 && x >= 61 && x <= 64 && yi == 7)       device.machine().output().set_indexed_value("TICK", 62 - x + (x >= 63 ? 8 : 0), state);
 
 				else if (x < 74 && yi < 7)
 				{
@@ -270,9 +270,9 @@ SED1520_UPDATE_CB(gl3000s_screen_update_left)
 
 	for(int i=0; i < 3; i++)
 	{
-		output_set_indexed_value("TIME", i, sec[i]);
-		output_set_indexed_value("P1", i, points[1][i]);
-		output_set_indexed_value("P2", i, points[0][i]);
+		device.machine().output().set_indexed_value("TIME", i, sec[i]);
+		device.machine().output().set_indexed_value("P1", i, points[1][i]);
+		device.machine().output().set_indexed_value("P2", i, points[0][i]);
 	}
 
 	return gl3000s_sed1520_screen_update(device, bitmap, cliprect, vram, start_line, adc, 58);
@@ -747,9 +747,8 @@ void pc2000_state::machine_start()
 {
 	std::string region_tag;
 	UINT8 *bios = memregion("bios")->base();
-	UINT8 *cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str())->base();
-	if (!cart)
-		cart = memregion("bios")->base();
+	memory_region *cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	UINT8 *cart = (cart_region != NULL) ? cart_region->base() : memregion("bios")->base();
 
 	m_bank0->configure_entries(0, 0x10, bios, 0x4000);
 	m_bank1->configure_entries(0, 0x10, bios, 0x4000);
@@ -761,9 +760,8 @@ void gl4004_state::machine_start()
 {
 	std::string region_tag;
 	UINT8 *bios = memregion("bios")->base();
-	UINT8 *cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str())->base();
-	if (!cart)
-		cart = memregion("bios")->base();
+	memory_region *cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	UINT8 *cart = (cart_region != NULL) ? cart_region->base() : memregion("bios")->base();
 
 	m_bank0->configure_entries(0, 0x20, bios, 0x4000);
 	m_bank1->configure_entries(0, 0x20, bios, 0x4000);
@@ -850,11 +848,13 @@ static MACHINE_CONFIG_START( pc2000, pc2000_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
+	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "genius_cart")
 	MCFG_GENERIC_LOAD(pc2000_state, pc2000_cart)
+
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc1000_cart", "pc1000")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gl2000, pc2000 )
@@ -933,6 +933,12 @@ static MACHINE_CONFIG_DERIVED_CLASS( misterx, pc2000, pc1000_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "misterx")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( pc1000, misterx )
+	MCFG_SOFTWARE_LIST_REMOVE("cart_list")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "pc1000")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
+MACHINE_CONFIG_END
+
 /* ROM definition */
 ROM_START( pc2000 )
 	ROM_REGION( 0x40000, "bios", 0 )
@@ -1009,6 +1015,11 @@ ROM_START( misterx )
 	ROM_LOAD( "27-00882-001.bin", 0x000000, 0x020000, CRC(30e0dc94) SHA1(2f4675746a41399b3d9e3e8001a9b4a0dcc5b620))
 ROM_END
 
+ROM_START( ordisava )
+	ROM_REGION( 0x20000, "bios", 0 )
+	ROM_LOAD( "27-00874-001.u4", 0x000000, 0x020000, CRC(5e40764e) SHA1(636ea61d3d675e51c20f610aae6824369c01a804))
+ROM_END
+
 ROM_START( lexipcm )
 	ROM_REGION( 0x200000, "bios", 0 )
 	ROM_LOAD( "epoxy.u3", 0x00000, 0x100000, CRC(0a410790) SHA1(be04d5f74208a2f3b200daed75e04e966f64b545) )
@@ -1018,8 +1029,9 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1988, pc1000,   0,       0,     misterx,   pc1000, driver_device,   0,  "Video Technology", "PreComputer 1000", MACHINE_NOT_WORKING)
+COMP( 1988, pc1000,   0,       0,     pc1000,    pc1000, driver_device,   0,  "Video Technology", "PreComputer 1000", MACHINE_NOT_WORKING)
 COMP( 1988, misterx,  0,       0,     misterx,   pc1000, driver_device,   0,  "Video Technology / Yeno", "MisterX", MACHINE_NOT_WORKING)
+COMP( 1988, ordisava, 0,       0,     pc1000,    pc1000, driver_device,   0,  "Video Technology", "Ordisavant (France)", MACHINE_NOT_WORKING)
 COMP( 1993, pc2000,   0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "PreComputer 2000", MACHINE_NOT_WORKING)
 COMP( 1993, gl2000,   0,       0,     gl2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 2000", MACHINE_NOT_WORKING)
 COMP( 1994, gl2000c,  gl2000,  0,     gl2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 2000 Compact", MACHINE_NOT_WORKING)

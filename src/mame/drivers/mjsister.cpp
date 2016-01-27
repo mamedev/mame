@@ -31,8 +31,8 @@ public:
 		m_dac(*this, "dac") { }
 
 	/* video-related */
-	bitmap_ind16 *m_tmpbitmap0;
-	bitmap_ind16 *m_tmpbitmap1;
+	std::unique_ptr<bitmap_ind16> m_tmpbitmap0;
+	std::unique_ptr<bitmap_ind16> m_tmpbitmap1;
 	int  m_flip_screen;
 	int  m_video_enable;
 	int  m_screen_redraw;
@@ -90,8 +90,8 @@ protected:
 
 void mjsister_state::video_start()
 {
-	m_tmpbitmap0 = auto_bitmap_ind16_alloc(machine(), 256, 256);
-	m_tmpbitmap1 = auto_bitmap_ind16_alloc(machine(), 256, 256);
+	m_tmpbitmap0 = std::make_unique<bitmap_ind16>(256, 256);
+	m_tmpbitmap1 = std::make_unique<bitmap_ind16>(256, 256);
 
 	save_item(NAME(m_videoram0));
 	save_item(NAME(m_videoram1));

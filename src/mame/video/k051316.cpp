@@ -159,7 +159,7 @@ void k051316_device::device_start()
 	}
 
 	decode_gfx();
-	m_gfx[0]->set_colors(m_palette->entries() / m_gfx[0]->depth());
+	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
 
 	m_tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k051316_device::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_ram.resize(0x800);

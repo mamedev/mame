@@ -68,11 +68,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	bitmap_ind16 *m_sprite_sprite_collision_bitmap1;
-	bitmap_ind16 *m_sprite_sprite_collision_bitmap2;
-	bitmap_ind16 *m_sprite_goal_collision_bitmap1;
-	bitmap_ind16 *m_sprite_goal_collision_bitmap2;
-	bitmap_ind16 *m_sprite_border_collision_bitmap;
+	std::unique_ptr<bitmap_ind16> m_sprite_sprite_collision_bitmap1;
+	std::unique_ptr<bitmap_ind16> m_sprite_sprite_collision_bitmap2;
+	std::unique_ptr<bitmap_ind16> m_sprite_goal_collision_bitmap1;
+	std::unique_ptr<bitmap_ind16> m_sprite_goal_collision_bitmap2;
+	std::unique_ptr<bitmap_ind16> m_sprite_border_collision_bitmap;
 	DECLARE_READ8_MEMBER(carpolo_ball_screen_collision_cause_r);
 	DECLARE_READ8_MEMBER(carpolo_car_ball_collision_x_r);
 	DECLARE_READ8_MEMBER(carpolo_car_ball_collision_y_r);

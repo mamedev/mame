@@ -1331,7 +1331,7 @@ TGP_FUNCTION( model1_state::vmat_save )
 	int i;
 	logerror("TGP vmat_save 0x%x (%x)\n", a, m_pushpc);
 	for(i=0; i<16; i++)
-		memcpy(m_ram_data+a+0x10*i, m_mat_vector[i], sizeof(m_cmat));
+		memcpy(m_ram_data.get()+a+0x10*i, m_mat_vector[i], sizeof(m_cmat));
 	next_fn();
 }
 
@@ -1341,7 +1341,7 @@ TGP_FUNCTION( model1_state::vmat_load )
 	int i;
 	logerror("TGP vmat_load 0x%x (%x)\n", a, m_pushpc);
 	for(i=0; i<16; i++)
-		memcpy(m_mat_vector[i], m_ram_data+a+0x10*i, sizeof(m_cmat));
+		memcpy(m_mat_vector[i], m_ram_data.get()+a+0x10*i, sizeof(m_cmat));
 	next_fn();
 }
 
@@ -1449,7 +1449,7 @@ TGP_FUNCTION( model1_state::vmat_load1 )
 {
 	UINT32 a = fifoin_pop();
 	logerror("TGP vmat_load1 0x%x (%x)\n", a, m_pushpc);
-	memcpy(m_cmat, m_ram_data+a, sizeof(m_cmat));
+	memcpy(m_cmat, m_ram_data.get()+a, sizeof(m_cmat));
 	next_fn();
 }
 
@@ -1879,9 +1879,9 @@ WRITE16_MEMBER(model1_state::model1_tgp_copro_ram_w)
 
 MACHINE_START_MEMBER(model1_state,model1)
 {
-	m_ram_data = auto_alloc_array(machine(), UINT32, 0x10000);
+	m_ram_data = std::make_unique<UINT32[]>(0x10000);
 
-	save_pointer(NAME(m_ram_data), 0x10000);
+	save_pointer(NAME(m_ram_data.get()), 0x10000);
 	save_item(NAME(m_ram_adr));
 	save_item(NAME(m_ram_scanadr));
 	save_item(NAME(m_ram_latch));
@@ -1902,7 +1902,7 @@ MACHINE_START_MEMBER(model1_state,model1)
 void model1_state::tgp_reset(int swa)
 {
 	m_ram_adr = 0;
-	memset(m_ram_data, 0, 0x10000*4);
+	memset(m_ram_data.get(), 0, 0x10000*4);
 
 	m_fifoout_rpos = 0;
 	m_fifoout_wpos = 0;
@@ -1927,7 +1927,7 @@ void model1_state::tgp_reset(int swa)
 void model1_state::vr_tgp_reset()
 {
 	m_ram_adr = 0;
-	memset(m_ram_data, 0, 0x8000*4);
+	memset(m_ram_data.get(), 0, 0x8000*4);
 
 	m_copro_fifoout_rpos = 0;
 	m_copro_fifoout_wpos = 0;

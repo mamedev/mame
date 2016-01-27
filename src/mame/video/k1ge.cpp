@@ -802,10 +802,10 @@ void k1ge_device::device_start()
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k1ge_device::timer_callback), this));
 	m_hblank_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k1ge_device::hblank_on_timer_callback), this));
-	m_vram = auto_alloc_array_clear(machine(), UINT8, 0x4000);
-	m_bitmap = auto_bitmap_ind16_alloc( machine(), m_screen->width(), m_screen->height() );
+	m_vram = make_unique_clear<UINT8[]>(0x4000);
+	m_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height() );
 
-	save_pointer(NAME(m_vram), 0x4000);
+	save_pointer(NAME(m_vram.get()), 0x4000);
 	save_item(NAME(m_wba_h));
 	save_item(NAME(m_wba_v));
 	save_item(NAME(m_wsi_h));

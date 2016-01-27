@@ -45,9 +45,9 @@ Notes:
 
 WRITE16_MEMBER(drgnmst_state::drgnmst_coin_w)
 {
-	coin_counter_w(machine(), 0, data & 0x100);
-	coin_lockout_w(machine(), 0, ~data & 0x400);
-	coin_lockout_w(machine(), 1, ~data & 0x800);
+	machine().bookkeeping().coin_counter_w(0, data & 0x100);
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x400);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x800);
 }
 
 WRITE16_MEMBER(drgnmst_state::drgnmst_snd_command_w)

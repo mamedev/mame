@@ -48,7 +48,7 @@ warpwarp_sound_device::warpwarp_sound_device(const machine_config &mconfig, cons
 
 void warpwarp_sound_device::device_start()
 {
-	m_decay = auto_alloc_array(machine(), INT16, 32768);
+	m_decay = std::make_unique<INT16[]>(32768);
 
 	for (int i = 0; i < 0x8000; i++)
 		m_decay[0x7fff - i] = (INT16) (0x7fff/exp(1.0*i/4096));

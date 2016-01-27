@@ -356,7 +356,7 @@ WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
 
 	membank("bank2")->set_entry(data & 0x03);
 
-	coin_counter_w(machine(), 0, ~data & 0x80);
+	machine().bookkeeping().coin_counter_w(0, ~data & 0x80);
 
 	if (BIT(m_upd7807_portc, 5) && !BIT(data, 5))   /* write clock 1->0 */
 		m_ymsnd->write(space, BIT(data, 3), m_upd7807_porta);
@@ -495,7 +495,7 @@ WRITE8_MEMBER(homedata_state::pteacher_upd7807_portc_w)
 
 	membank("bank2")->set_entry((data & 0x0c) >> 2);
 
-	coin_counter_w(machine(), 0, ~data & 0x80);
+	machine().bookkeeping().coin_counter_w(0, ~data & 0x80);
 
 	if (BIT(m_upd7807_portc, 5) && !BIT(data, 5))   /* clock 1->0 */
 		m_sn->write(space, 0, m_upd7807_porta);

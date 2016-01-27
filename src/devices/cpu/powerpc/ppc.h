@@ -264,7 +264,7 @@ protected:
 	// device_state_interface overrides
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_import(const device_state_entry &entry) override;
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
@@ -537,8 +537,8 @@ protected:
 
 	/* core state */
 	drc_cache           m_cache;                      /* pointer to the DRC code cache */
-	drcuml_state *      m_drcuml;                     /* DRC UML generator state */
-	ppc_frontend *      m_drcfe;                      /* pointer to the DRC front-end state */
+	std::unique_ptr<drcuml_state>      m_drcuml;                     /* DRC UML generator state */
+	std::unique_ptr<ppc_frontend>      m_drcfe;                      /* pointer to the DRC front-end state */
 	UINT32              m_drcoptions;                 /* configurable DRC options */
 
 	/* parameters for subroutines */
@@ -620,9 +620,6 @@ protected:
 		uml::code_label  labelnum;                   /* index for local labels */
 	};
 
-	int IS_PPC602(void);
-	int IS_PPC603(void);
-	int IS_PPC403(void);
 	UINT32 get_cr();
 	void set_cr(UINT32 value);
 	UINT32 get_xer();

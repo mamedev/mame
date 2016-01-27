@@ -771,19 +771,13 @@ void cps3_state::cps3_decrypt_bios()
 
 void cps3_state::init_common(void)
 {
-	/* just some NOPs for the game to execute if it crashes and starts executing unmapped addresses
-	 - this prevents MAME from crashing */
-	m_nops = auto_alloc(machine(), UINT32);
-	m_nops[0] = 0x00090009;
-
 	// flash roms
-	std::string tempstr;
 	for (int simmnum = 0; simmnum < 7; simmnum++)
 		for (int chipnum = 0; chipnum < 8; chipnum++)
-			m_simm[simmnum][chipnum] = machine().device<fujitsu_29f016a_device>(strformat(tempstr,"simm%d.%d", simmnum + 1, chipnum).c_str());
+			m_simm[simmnum][chipnum] = machine().device<fujitsu_29f016a_device>(strformat("simm%d.%d", simmnum + 1, chipnum).c_str());
 
-	m_eeprom = auto_alloc_array(machine(), UINT32, 0x400/4);
-	machine().device<nvram_device>("eeprom")->set_base(m_eeprom, 0x400);
+	m_eeprom = std::make_unique<UINT32[]>(0x400/4);
+	machine().device<nvram_device>("eeprom")->set_base(m_eeprom.get(), 0x400);
 }
 
 
@@ -794,12 +788,25 @@ void cps3_state::init_crypt(UINT32 key1, UINT32 key2, int altEncryption)
 	m_altEncryption = altEncryption;
 
 	// cache pointers to regions
-	m_user4region = memregion("user4")->base();
-	m_user5region = memregion("user5")->base();
+	if (m_user4_region)
+	{
+		m_user4 = m_user4_region->base();
+	}
+	else
+	{
+		m_user4 = auto_alloc_array(machine(), UINT8, USER4REGION_LENGTH);
+	}
 
-	if (!m_user4region) m_user4region = auto_alloc_array(machine(), UINT8, USER4REGION_LENGTH);
-	if (!m_user5region) m_user5region = auto_alloc_array(machine(), UINT8, USER5REGION_LENGTH);
-	m_cps3sound->set_base((INT8*)m_user5region);
+	if (m_user5_region)
+	{
+		m_user5 = m_user5_region->base();
+	}
+	else
+	{
+		m_user5 = auto_alloc_array(machine(), UINT8, USER5REGION_LENGTH);
+	}
+
+	m_cps3sound->set_base((INT8*)m_user5);
 
 	// set strict verify
 	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY);
@@ -894,27 +901,27 @@ void cps3_state::cps3_set_mame_colours(int colournum, UINT16 data, UINT32 fadeva
 
 void cps3_state::video_start()
 {
-	m_ss_ram       = auto_alloc_array(machine(), UINT32, 0x10000/4);
-	memset(m_ss_ram, 0x00, 0x10000);
-	save_pointer(NAME(m_ss_ram), 0x10000/4);
+	m_ss_ram       = std::make_unique<UINT32[]>(0x10000/4);
+	memset(m_ss_ram.get(), 0x00, 0x10000);
+	save_pointer(NAME(m_ss_ram.get()), 0x10000/4);
 
-	m_char_ram = auto_alloc_array(machine(), UINT32, 0x800000/4);
-	memset(m_char_ram, 0x00, 0x800000);
-	save_pointer(NAME(m_char_ram), 0x800000 /4);
+	m_char_ram = std::make_unique<UINT32[]>(0x800000/4);
+	memset(m_char_ram.get(), 0x00, 0x800000);
+	save_pointer(NAME(m_char_ram.get()), 0x800000 /4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, cps3_tiles8x8_layout, (UINT8 *)m_ss_ram, 0, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, cps3_tiles8x8_layout, (UINT8 *)m_ss_ram.get(), 0, m_palette->entries() / 16, 0));
 
 	//decode_ssram();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(1, global_alloc(gfx_element(m_palette, cps3_tiles16x16_layout, (UINT8 *)m_char_ram, 0, m_palette->entries() / 64, 0)));
+	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(m_palette, cps3_tiles16x16_layout, (UINT8 *)m_char_ram.get(), 0, m_palette->entries() / 64, 0));
 	m_gfxdecode->gfx(1)->set_granularity(64);
 
 	//decode_charram();
 
-	m_mame_colours = auto_alloc_array(machine(), UINT32, 0x80000/4);
-	memset(m_mame_colours, 0x00, 0x80000);
+	m_mame_colours = std::make_unique<UINT32[]>(0x80000/4);
+	memset(m_mame_colours.get(), 0x00, 0x80000);
 
 	m_screenwidth = 384;
 
@@ -1474,7 +1481,7 @@ WRITE32_MEMBER(cps3_state::cps3_gfxflash_w)
 
 	/* make a copy in the linear memory region we actually use for drawing etc.  having it stored in interleaved flash roms isnt' very useful */
 	{
-		UINT32* romdata = (UINT32*)m_user5region;
+		UINT32* romdata = (UINT32*)m_user5;
 		int real_offset = 0;
 		UINT32 newdata;
 
@@ -1581,7 +1588,7 @@ void cps3_state::cps3_flashmain_w(int which, UINT32 offset, UINT32 data, UINT32 
 
 	/* copy data into regions to execute from */
 	{
-		UINT32* romdata =  (UINT32*)m_user4region;
+		UINT32* romdata =  (UINT32*)m_user4;
 		UINT32* romdata2 = (UINT32*)m_decrypted_gamerom;
 		int real_offset = 0;
 		UINT32 newdata;
@@ -1805,7 +1812,7 @@ WRITE32_MEMBER(cps3_state::cps3_palettedma_w)
 			if (data & 0x0002)
 			{
 				int i;
-				UINT16* src = (UINT16*)m_user5region;
+				UINT16* src = (UINT16*)m_user5;
 			//  if(DEBUG_PRINTF) printf("CPS3 pal dma start %08x (real: %08x) dest %08x fade %08x other2 %08x (length %04x)\n", m_paldma_source, m_paldma_realsource, m_paldma_dest, m_paldma_fade, m_paldma_other2, m_paldma_length);
 
 				for (i=0;i<m_paldma_length;i++)
@@ -1835,7 +1842,7 @@ WRITE32_MEMBER(cps3_state::cps3_palettedma_w)
 
 UINT32 cps3_state::process_byte( UINT8 real_byte, UINT32 destination, int max_length )
 {
-	UINT8* dest       = (UINT8*)m_char_ram;
+	UINT8* dest       = (UINT8*)m_char_ram.get();
 
 	//printf("process byte for destination %08x\n", destination);
 
@@ -1879,7 +1886,7 @@ UINT32 cps3_state::process_byte( UINT8 real_byte, UINT32 destination, int max_le
 
 void cps3_state::cps3_do_char_dma( UINT32 real_source, UINT32 real_destination, UINT32 real_length )
 {
-	UINT8* sourcedata = (UINT8*)m_user5region;
+	UINT8* sourcedata = (UINT8*)m_user5;
 	int length_remaining;
 
 	m_last_normal_byte = 0;
@@ -1930,7 +1937,7 @@ void cps3_state::cps3_do_char_dma( UINT32 real_source, UINT32 real_destination, 
 
 UINT32 cps3_state::ProcessByte8(UINT8 b,UINT32 dst_offset)
 {
-	UINT8* destRAM = (UINT8*)m_char_ram;
+	UINT8* destRAM = (UINT8*)m_char_ram.get();
 	int l=0;
 
 	if(m_lastb==m_lastb2) //rle
@@ -1962,7 +1969,7 @@ UINT32 cps3_state::ProcessByte8(UINT8 b,UINT32 dst_offset)
 
 void cps3_state::cps3_do_alt_char_dma( UINT32 src, UINT32 real_dest, UINT32 real_length )
 {
-	UINT8* px = (UINT8*)m_user5region;
+	UINT8* px = (UINT8*)m_user5;
 	UINT32 start = real_dest;
 	UINT32 ds = real_dest;
 
@@ -2305,7 +2312,7 @@ void cps3_state::machine_reset()
 // make a copy in the regions we execute code / draw gfx from
 void cps3_state::copy_from_nvram()
 {
-	UINT32* romdata = (UINT32*)m_user4region;
+	UINT32* romdata = (UINT32*)m_user4;
 	UINT32* romdata2 = (UINT32*)m_decrypted_gamerom;
 	int i;
 	/* copy + decrypt program roms which have been loaded from flashroms/nvram */
@@ -2342,7 +2349,7 @@ void cps3_state::copy_from_nvram()
 		int flashnum = 0;
 		int countoffset = 0;
 
-		romdata = (UINT32*)m_user5region;
+		romdata = (UINT32*)m_user5;
 		for (thebase = 0;thebase < len/2; thebase+=0x200000)
 		{
 		//  printf("flashnums %d. %d\n",flashnum, flashnum+1);
@@ -3651,10 +3658,18 @@ ROM_START( cps3boot ) // for cart with standard SH2
 	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
-	DISK_IMAGE_READONLY( "no-battery_multi-game_bootleg_cd_for_hd6417095_sh2", 0, SHA1(6057cc3ec7991c0c00a7ab9da6ac2f92c9fb1aed) )
+	DISK_IMAGE_READONLY( "UniCD-CPS3_for_standard_SH2_V4", 0, SHA1(099c52bd38753f0f4876243e7aa87ca482a2dcb7) )
 ROM_END
 
 ROM_START( cps3booto ) // for cart with standard SH2
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
+
+	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_IMAGE_READONLY( "no-battery_multi-game_bootleg_cd_for_hd6417095_sh2", 0, SHA1(6057cc3ec7991c0c00a7ab9da6ac2f92c9fb1aed) )
+ROM_END
+
+ROM_START( cps3booto2 ) // for cart with standard SH2
 	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
 	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
 
@@ -3683,11 +3698,19 @@ ROM_START( cps3boota ) // for cart with dead custom SH2 (or 2nd Impact CPU which
 	ROM_LOAD( "no-battery_bios_29f400_for_dead_security_cart.u2", 0x000000, 0x080000, CRC(0fd56fb3) SHA1(5a8bffc07eb7da73cf4bca6718df72e471296bfd) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_IMAGE_READONLY( "UniCD-CPS3_for_custom_SH2_V5", 0, SHA1(50a5b2845d3dd3de3bce15c4f1b58500db80cabe) )
+ROM_END
+
+ROM_START( cps3bootao ) // for cart with dead custom SH2 (or 2nd Impact CPU which is the same as a dead one)
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "no-battery_bios_29f400_for_dead_security_cart.u2", 0x000000, 0x080000, CRC(0fd56fb3) SHA1(5a8bffc07eb7da73cf4bca6718df72e471296bfd) )
+
+	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
 	DISK_IMAGE_READONLY( "no-battery_multi-game_bootleg_cd_for_dead_security_cart", 0, SHA1(1ede2f1ba197ee787208358a13eae7185a5ae3b2) )
 ROM_END
 
 
-ROM_START( cps3bootoa ) // for cart with dead custom SH2 (or 2nd Impact CPU which is the same as a dead one)
+ROM_START( cps3bootao2 ) // for cart with dead custom SH2 (or 2nd Impact CPU which is the same as a dead one)
 	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
 	ROM_LOAD( "no-battery_bios_29f400_for_dead_security_cart.u2", 0x000000, 0x080000, CRC(0fd56fb3) SHA1(5a8bffc07eb7da73cf4bca6718df72e471296bfd) )
 
@@ -3914,12 +3937,17 @@ GAME( 1999, jojobanr1, jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0
 GAME( 1999, jojobaner1,jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
 
 // bootlegs, hold START1 during bootup to change games
-GAME( 1999, cps3boot,  0,        sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, cps3boota, cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart", MACHINE_IMPERFECT_GRAPHICS )
+
+// newest revision, fixes some issues with Warzard decryption.
+GAME( 1999, cps3boot,   0,        sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (V4)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3boota,  cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (V5)", MACHINE_IMPERFECT_GRAPHICS )
+
+GAME( 1999, cps3booto,  cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (older)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3bootao, cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (older)", MACHINE_IMPERFECT_GRAPHICS )
 // this doesn't play 2nd Impact despite it being listed.  2nd Impact uses separate data/code encryption and can't be decrypted cleanly for a standard SH2.  Selecting it just flashes in a copy of 3rd Strike with the 2nd Impact loading screen
-GAME( 1999, cps3booto,  cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (older) (New Generation, 3rd Strike, JoJo's Venture, JoJo's Bizarre Adventure and Red Earth only)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3booto2, cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (oldest) (New Generation, 3rd Strike, JoJo's Venture, JoJo's Bizarre Adventure and Red Earth only)", MACHINE_IMPERFECT_GRAPHICS )
 // this does not play Red Earth or the 2 Jojo games.  New Generation and 3rd Strike have been heavily modified to work with the separate code/data encryption a dead cart / 2nd Impact cart has.  Selecting the other games will give an 'invalid CD' message.
-GAME( 1999, cps3bootoa, cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (older) (New Generation, 2nd Impact and 3rd Strike only)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3bootao2, cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (oldest) (New Generation, 2nd Impact and 3rd Strike only)", MACHINE_IMPERFECT_GRAPHICS )
 // these are test bootleg CDs for running 2nd Impact on a standard SH2
 GAME( 1999, cps3bs32,  cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, V3)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, cps3bs32a, cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, older)", MACHINE_IMPERFECT_GRAPHICS ) // older / buggier hack

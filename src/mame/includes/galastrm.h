@@ -78,10 +78,10 @@ public:
 	int m_tc0610_1_addr;
 	UINT32 m_mem[2];
 	INT16 m_tc0610_ctrl_reg[2][8];
-	struct gs_tempsprite *m_spritelist;
+	std::unique_ptr<gs_tempsprite[]> m_spritelist;
 	struct gs_tempsprite *m_sprite_ptr_pre;
 	bitmap_ind16 m_tmpbitmaps;
-	galastrm_renderer *m_poly;
+	std::unique_ptr<galastrm_renderer> m_poly;
 
 	int m_rsxb;
 	int m_rsyb;
@@ -101,7 +101,6 @@ public:
 	INTERRUPT_GEN_MEMBER(galastrm_interrupt);
 	void draw_sprites_pre(int x_offs, int y_offs);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int priority);
-	void tc0610_rotate_draw(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, const rectangle &clip);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

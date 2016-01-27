@@ -294,7 +294,9 @@ public:
 		m_2801_regs(*this, "2801_regs"),
 		m_2c01_regs(*this, "2c01_regs"),
 		m_3000_regs(*this, "3000_regs"),
-		m_3800_regs(*this, "3800_regs")  { }
+		m_3800_regs(*this, "3800_regs")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -308,18 +310,18 @@ public:
 	required_shared_ptr<UINT8> m_3000_regs;
 	required_shared_ptr<UINT8> m_3800_regs;
 
-	bitmap_ind16 *m_temp_reel_bitmap;
+	std::unique_ptr<bitmap_ind16> m_temp_reel_bitmap;
 	tilemap_t *m_tilemap;
 	tilemap_t *m_reel_tilemap;
 	tilemap_t *m_reel2_tilemap;
 	tilemap_t *m_reel3_tilemap;
 	tilemap_t *m_reel4_tilemap;
-	UINT8 *m_tilemap_ram;
-	UINT8 *m_reel_ram;
-	UINT8 *m_reel2_ram;
-	UINT8 *m_reel3_ram;
-	UINT8 *m_reel4_ram;
-	UINT8* m_videoram;
+	std::unique_ptr<UINT8[]> m_tilemap_ram;
+	std::unique_ptr<UINT8[]> m_reel_ram;
+	std::unique_ptr<UINT8[]> m_reel2_ram;
+	std::unique_ptr<UINT8[]> m_reel3_ram;
+	std::unique_ptr<UINT8[]> m_reel4_ram;
+	std::unique_ptr<UINT8[]> m_videoram;
 
 	DECLARE_WRITE8_MEMBER(sfbonus_videoram_w);
 	DECLARE_WRITE8_MEMBER(sfbonus_bank_w);
@@ -907,7 +909,7 @@ WRITE8_MEMBER(sfbonus_state::sfbonus_videoram_w)
 
 void sfbonus_state::video_start()
 {
-	m_temp_reel_bitmap = auto_bitmap_ind16_alloc(machine(),1024,512);
+	m_temp_reel_bitmap = std::make_unique<bitmap_ind16>(1024,512);
 
 	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 128, 64);
 	m_reel_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 16);
@@ -1180,22 +1182,22 @@ UINT32 sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind16 
 		|| (ipt == INPUT_PORTS_NAME(amcoe2_poker)))
 	{
 		// based on pirpok2
-		output_set_lamp_value(0, (m_1800_regs[6] & 0x1) >> 0);
-		output_set_lamp_value(1, (m_1800_regs[6] & 0x4) >> 2);
-		output_set_lamp_value(2, (m_1800_regs[5] & 0x4) >> 2);
-		output_set_lamp_value(3, (m_1800_regs[5] & 0x1) >> 0);
-		output_set_lamp_value(4, (m_1800_regs[4] & 0x4) >> 2);
-		output_set_lamp_value(5, (m_1800_regs[4] & 0x1) >> 0);
+		output().set_lamp_value(0, (m_1800_regs[6] & 0x1) >> 0);
+		output().set_lamp_value(1, (m_1800_regs[6] & 0x4) >> 2);
+		output().set_lamp_value(2, (m_1800_regs[5] & 0x4) >> 2);
+		output().set_lamp_value(3, (m_1800_regs[5] & 0x1) >> 0);
+		output().set_lamp_value(4, (m_1800_regs[4] & 0x4) >> 2);
+		output().set_lamp_value(5, (m_1800_regs[4] & 0x1) >> 0);
 	}
 	else if ((ipt == INPUT_PORTS_NAME(amcoe1_reels3)) || (ipt == INPUT_PORTS_NAME(amcoe1_reels4))
 		|| (ipt == INPUT_PORTS_NAME(amcoe1_poker)))
 	{
-		output_set_lamp_value(0, (m_1800_regs[0] & 0x2) >> 1);
-		output_set_lamp_value(1, (m_1800_regs[4] & 0x2) >> 1);
-		output_set_lamp_value(2, (m_1800_regs[3] & 0x2) >> 1);
-		output_set_lamp_value(3, (m_1800_regs[6] & 0x4) >> 2);
-		output_set_lamp_value(4, (m_1800_regs[4] & 0x4) >> 2);
-		output_set_lamp_value(5, (m_1800_regs[3] & 0x4) >> 2);
+		output().set_lamp_value(0, (m_1800_regs[0] & 0x2) >> 1);
+		output().set_lamp_value(1, (m_1800_regs[4] & 0x2) >> 1);
+		output().set_lamp_value(2, (m_1800_regs[3] & 0x2) >> 1);
+		output().set_lamp_value(3, (m_1800_regs[6] & 0x4) >> 2);
+		output().set_lamp_value(4, (m_1800_regs[4] & 0x4) >> 2);
+		output().set_lamp_value(5, (m_1800_regs[3] & 0x4) >> 2);
 	}
 
 	return 0;
@@ -5843,76 +5845,33 @@ ROM_START( amclink )
 	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 )
 ROM_END
 
-//ROM_REGION( 0x80000, "user1", 0 ) /* Z80 Code */
-//ROM_LOAD( "dummy.rom", 0x00000, 0x40000, CRC(1) SHA1(1) )
-
 DRIVER_INIT_MEMBER(sfbonus_state,sfbonus_common)
 {
-	m_tilemap_ram = auto_alloc_array(machine(), UINT8, 0x4000);
-	memset(m_tilemap_ram, 0xff, 0x4000);
-	save_pointer(NAME(m_tilemap_ram), 0x4000);
+	m_tilemap_ram = std::make_unique<UINT8[]>(0x4000);
+	memset(m_tilemap_ram.get(), 0xff, 0x4000);
+	save_pointer(NAME(m_tilemap_ram.get()), 0x4000);
 
-	m_reel_ram = auto_alloc_array(machine(), UINT8, 0x0800);
-	memset(m_reel_ram, 0xff ,0x0800);
-	save_pointer(NAME(m_reel_ram), 0x0800);
+	m_reel_ram = std::make_unique<UINT8[]>(0x0800);
+	memset(m_reel_ram.get(), 0xff ,0x0800);
+	save_pointer(NAME(m_reel_ram.get()), 0x0800);
 
-	m_reel2_ram = auto_alloc_array(machine(), UINT8, 0x0800);
-	memset(m_reel2_ram, 0xff, 0x0800);
-	save_pointer(NAME(m_reel2_ram), 0x0800);
+	m_reel2_ram = std::make_unique<UINT8[]>(0x0800);
+	memset(m_reel2_ram.get(), 0xff, 0x0800);
+	save_pointer(NAME(m_reel2_ram.get()), 0x0800);
 
-	m_reel3_ram = auto_alloc_array(machine(), UINT8, 0x0800);
-	memset(m_reel3_ram, 0xff, 0x0800);
-	save_pointer(NAME(m_reel3_ram), 0x0800);
+	m_reel3_ram = std::make_unique<UINT8[]>(0x0800);
+	memset(m_reel3_ram.get(), 0xff, 0x0800);
+	save_pointer(NAME(m_reel3_ram.get()), 0x0800);
 
-	m_reel4_ram = auto_alloc_array(machine(), UINT8, 0x0800);
-	memset(m_reel4_ram, 0xff, 0x0800);
-	save_pointer(NAME(m_reel4_ram), 0x0800);
+	m_reel4_ram = std::make_unique<UINT8[]>(0x0800);
+	memset(m_reel4_ram.get(), 0xff, 0x0800);
+	save_pointer(NAME(m_reel4_ram.get()), 0x0800);
 
-	m_videoram = auto_alloc_array(machine(), UINT8, 0x10000);
+	m_videoram = std::make_unique<UINT8[]>(0x10000);
 
-	memset(m_videoram, 0xff, 0x10000);
+	memset(m_videoram.get(), 0xff, 0x10000);
 
-	save_pointer(NAME(m_videoram), 0x10000);
-
-	// dummy.rom helper
-	{
-		UINT8 *ROM = memregion("maincpu")->base();
-		int length = memregion("maincpu")->bytes();
-		UINT8* ROM2 = memregion("user1")->base();
-
-		if (ROM2)
-		{
-			printf("X %02x %02x %02x %02x %02x %02x %02x %02x\n", ROM[0x50], ROM[0x51], ROM[0x52], ROM[0x53], ROM[0x54], ROM[0x55],ROM[0x56],ROM[0x57]);
-
-			{
-				int x;
-				int y;
-				for (y = 0; y < 0x8; y++)
-				{
-					printf("@Echo Off\n");
-					printf("a.exe ");
-					for (x = 0; x < 0x20 * 0x8; x += 0x8)
-					{
-						printf("%02x %02x ", ROM[x + y], ROM2[x + y]);
-					}
-					printf("\n");
-				}
-
-			}
-
-			{
-				FILE *fp;
-				char filename[256];
-				sprintf(filename,"decr_%s", machine().system().name);
-				fp = fopen(filename, "w+b");
-				if (fp)
-				{
-					fwrite(ROM, length, 1, fp);
-					fclose(fp);
-				}
-			}
-		}
-	}
+	save_pointer(NAME(m_videoram.get()), 0x10000);
 }
 
 void sfbonus_state::sfbonus_bitswap(
@@ -6348,8 +6307,6 @@ GAME( 2006, version4o,   version4, sfbonus,    amcoe1_reels3, sfbonus_state,    
 // Known sets but no roms dumped at all for these:
 // Merry Circus
 // Devil Island - 14 Liner version
-// Fruit Bonus 2010 (or is this on the older goldstar.c style hardware)
-
 
 // ?? what is this
 GAME( 200?, amclink,     0,        sfbonus,    amcoe1_reels3, sfbonus_state,    sfbonus_common,  ROT0,  "Amcoe", "Amcoe Link Control Box (Version 2.2)", MACHINE_NOT_WORKING)

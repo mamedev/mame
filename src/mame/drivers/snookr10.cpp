@@ -697,17 +697,17 @@ WRITE8_MEMBER(snookr10_state::output_port_0_w)
 	m_bit4 = m_outporth & 1;
 	m_bit5 = (m_outporth >> 1) & 1;
 
-	output_set_lamp_value(0, m_bit5);   /* Lamp 0 - START  */
-	output_set_lamp_value(1, m_bit2);   /* Lamp 1 - CANCEL */
-	output_set_lamp_value(2, m_bit0);   /* Lamp 2 - STOP1  */
-	output_set_lamp_value(3, m_bit1);   /* Lamp 3 - STOP2  */
-	output_set_lamp_value(4, m_bit0);   /* Lamp 4 - STOP3  */
-	output_set_lamp_value(5, m_bit3);   /* Lamp 5 - STOP4  */
-	output_set_lamp_value(6, m_bit4);   /* Lamp 6 - STOP5  */
+	output().set_lamp_value(0, m_bit5);   /* Lamp 0 - START  */
+	output().set_lamp_value(1, m_bit2);   /* Lamp 1 - CANCEL */
+	output().set_lamp_value(2, m_bit0);   /* Lamp 2 - STOP1  */
+	output().set_lamp_value(3, m_bit1);   /* Lamp 3 - STOP2  */
+	output().set_lamp_value(4, m_bit0);   /* Lamp 4 - STOP3  */
+	output().set_lamp_value(5, m_bit3);   /* Lamp 5 - STOP4  */
+	output().set_lamp_value(6, m_bit4);   /* Lamp 6 - STOP5  */
 
-	coin_counter_w(machine(), 0, data & 0x01);  /* Coin in */
-	coin_counter_w(machine(), 1, data & 0x10);  /* Key in */
-	coin_counter_w(machine(), 2, data & 0x04);  /* Payout x10 */
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);  /* Coin in */
+	machine().bookkeeping().coin_counter_w(1, data & 0x10);  /* Key in */
+	machine().bookkeeping().coin_counter_w(2, data & 0x04);  /* Payout x10 */
 
 //  logerror("high: %04x - low: %X \n", m_outporth, m_outportl);
 //  popmessage("written : %02X", data);
@@ -738,13 +738,13 @@ WRITE8_MEMBER(snookr10_state::output_port_1_w)
 	m_bit4 = data & 1;
 	m_bit5 = (data >> 1) & 1;
 
-	output_set_lamp_value(0, m_bit5);   /* Lamp 0 - START  */
-	output_set_lamp_value(1, m_bit2);   /* Lamp 1 - CANCEL */
-	output_set_lamp_value(2, m_bit0);   /* Lamp 2 - STOP1  */
-	output_set_lamp_value(3, m_bit1);   /* Lamp 3 - STOP2  */
-	output_set_lamp_value(4, m_bit0);   /* Lamp 4 - STOP3  */
-	output_set_lamp_value(5, m_bit3);   /* Lamp 5 - STOP4  */
-	output_set_lamp_value(6, m_bit4);   /* Lamp 6 - STOP5  */
+	output().set_lamp_value(0, m_bit5);   /* Lamp 0 - START  */
+	output().set_lamp_value(1, m_bit2);   /* Lamp 1 - CANCEL */
+	output().set_lamp_value(2, m_bit0);   /* Lamp 2 - STOP1  */
+	output().set_lamp_value(3, m_bit1);   /* Lamp 3 - STOP2  */
+	output().set_lamp_value(4, m_bit0);   /* Lamp 4 - STOP3  */
+	output().set_lamp_value(5, m_bit3);   /* Lamp 5 - STOP4  */
+	output().set_lamp_value(6, m_bit4);   /* Lamp 6 - STOP5  */
 }
 
 

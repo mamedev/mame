@@ -364,10 +364,10 @@ WRITE16_MEMBER(taitox_state::daisenpu_input_w)
 	switch (offset)
 	{
 		case 0x04:  /* coin counters and lockout */
-			coin_counter_w(machine(), 0,data & 0x01);
-			coin_counter_w(machine(), 1,data & 0x02);
-			coin_lockout_w(machine(), 0,~data & 0x04);
-			coin_lockout_w(machine(), 1,~data & 0x08);
+			machine().bookkeeping().coin_counter_w(0,data & 0x01);
+			machine().bookkeeping().coin_counter_w(1,data & 0x02);
+			machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
+			machine().bookkeeping().coin_lockout_w(1,~data & 0x08);
 //logerror("taitox coin control %04x to offset %04x\n",data,offset);
 			break;
 
@@ -382,10 +382,10 @@ WRITE16_MEMBER(taitox_state::kyustrkr_input_w)
 	switch (offset)
 	{
 		case 0x04:  /* coin counters and lockout */
-			coin_counter_w(machine(), 0,data & 0x01);
-			coin_counter_w(machine(), 1,data & 0x02);
-			coin_lockout_w(machine(), 0,data & 0x04);
-			coin_lockout_w(machine(), 1,data & 0x08);
+			machine().bookkeeping().coin_counter_w(0,data & 0x01);
+			machine().bookkeeping().coin_counter_w(1,data & 0x02);
+			machine().bookkeeping().coin_lockout_w(0,data & 0x04);
+			machine().bookkeeping().coin_lockout_w(1,data & 0x08);
 //logerror("taitox coin control %04x to offset %04x\n",data,offset);
 			break;
 

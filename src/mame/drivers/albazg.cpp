@@ -192,9 +192,9 @@ WRITE8_MEMBER(albazg_state::mux_w)
 
 WRITE8_MEMBER(albazg_state::yumefuda_output_w)
 {
-	coin_counter_w(machine(), 0, ~data & 4);
-	coin_counter_w(machine(), 1, ~data & 2);
-	coin_lockout_global_w(machine(), data & 1);
+	machine().bookkeeping().coin_counter_w(0, ~data & 4);
+	machine().bookkeeping().coin_counter_w(1, ~data & 2);
+	machine().bookkeeping().coin_lockout_global_w(data & 1);
 	//data & 0x10 hopper-c (active LOW)
 	//data & 0x08 divider (active HIGH)
 	flip_screen_set(~data & 0x20);

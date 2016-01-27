@@ -266,28 +266,28 @@ WRITE8_MEMBER(goldstar_state::p1_lamps_w)
   skill98 is like schery97 but doesn't activate bit 0 for stop
   nfb96, roypok96 and nc96 sets are like schery97 but they don't activate bit 2 for select
 */
-	output_set_lamp_value(0, (data >> 0) & 1);
-	output_set_lamp_value(1, (data >> 1) & 1);
-	output_set_lamp_value(2, (data >> 2) & 1);
-	output_set_lamp_value(3, (data >> 3) & 1);
-	output_set_lamp_value(4, (data >> 4) & 1);
-	output_set_lamp_value(5, (data >> 5) & 1);
-	output_set_lamp_value(6, (data >> 6) & 1);
-	output_set_lamp_value(7, (data >> 7) & 1);
+	output().set_lamp_value(0, (data >> 0) & 1);
+	output().set_lamp_value(1, (data >> 1) & 1);
+	output().set_lamp_value(2, (data >> 2) & 1);
+	output().set_lamp_value(3, (data >> 3) & 1);
+	output().set_lamp_value(4, (data >> 4) & 1);
+	output().set_lamp_value(5, (data >> 5) & 1);
+	output().set_lamp_value(6, (data >> 6) & 1);
+	output().set_lamp_value(7, (data >> 7) & 1);
 
 //  popmessage("p1 lamps: %02X", data);
 }
 
 WRITE8_MEMBER(goldstar_state::p2_lamps_w)
 {
-	output_set_lamp_value(8 + 0, (data >> 0) & 1);
-	output_set_lamp_value(8 + 1, (data >> 1) & 1);
-	output_set_lamp_value(8 + 2, (data >> 2) & 1);
-	output_set_lamp_value(8 + 3, (data >> 3) & 1);
-	output_set_lamp_value(8 + 4, (data >> 4) & 1);
-	output_set_lamp_value(8 + 5, (data >> 5) & 1);
-	output_set_lamp_value(8 + 6, (data >> 6) & 1);
-	output_set_lamp_value(8 + 7, (data >> 7) & 1);
+	output().set_lamp_value(8 + 0, (data >> 0) & 1);
+	output().set_lamp_value(8 + 1, (data >> 1) & 1);
+	output().set_lamp_value(8 + 2, (data >> 2) & 1);
+	output().set_lamp_value(8 + 3, (data >> 3) & 1);
+	output().set_lamp_value(8 + 4, (data >> 4) & 1);
+	output().set_lamp_value(8 + 5, (data >> 5) & 1);
+	output().set_lamp_value(8 + 6, (data >> 6) & 1);
+	output().set_lamp_value(8 + 7, (data >> 7) & 1);
 
 //  popmessage("p2 lamps: %02X", data);
 }
@@ -376,11 +376,11 @@ WRITE8_MEMBER(sanghopm_state::coincount_w)
   x--- -xx-  Unknown.
 
 */
-	coin_counter_w(machine(), 0, data & 0x08);  /* counter1 coin a */
-	coin_counter_w(machine(), 1, data & 0x10);  /* counter2 coin b */
-	coin_counter_w(machine(), 2, data & 0x20);  /* counter3 key in */
-	coin_counter_w(machine(), 3, data & 0x40);  /* counter4 coin c */
-	coin_counter_w(machine(), 4, data & 0x01);  /* counter5 payout */
+	machine().bookkeeping().coin_counter_w(0, data & 0x08);  /* counter1 coin a */
+	machine().bookkeeping().coin_counter_w(1, data & 0x10);  /* counter2 coin b */
+	machine().bookkeeping().coin_counter_w(2, data & 0x20);  /* counter3 key in */
+	machine().bookkeeping().coin_counter_w(3, data & 0x40);  /* counter4 coin c */
+	machine().bookkeeping().coin_counter_w(4, data & 0x01);  /* counter5 payout */
 }
 
 WRITE8_MEMBER(sanghopm_state::enable_w)
@@ -749,11 +749,11 @@ WRITE8_MEMBER(goldstar_state::cm_coincount_w)
   interestingly there is no counter for coin B in the cm/cmaster games
 */
 
-	coin_counter_w(machine(), 0, data & 0x40);  /* Counter 1 Coin A */
-	coin_counter_w(machine(), 1, data & 0x20);  /* Counter 2 Key In */
-	coin_counter_w(machine(), 2, data & 0x10);  /* Counter 3 Coin C */
-	coin_counter_w(machine(), 3, data & 0x08);  /* Counter 4 Coin D */
-	coin_counter_w(machine(), 4, data & 0x01);  /* Counter 5 Payout */
+	machine().bookkeeping().coin_counter_w(0, data & 0x40);  /* Counter 1 Coin A */
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);  /* Counter 2 Key In */
+	machine().bookkeeping().coin_counter_w(2, data & 0x10);  /* Counter 3 Coin C */
+	machine().bookkeeping().coin_counter_w(3, data & 0x08);  /* Counter 4 Coin D */
+	machine().bookkeeping().coin_counter_w(4, data & 0x01);  /* Counter 5 Payout */
 
 	if (data & 0x86)
 		popmessage("counters: %02X", data);
@@ -1026,9 +1026,9 @@ WRITE8_MEMBER(unkch_state::coincount_w)
 
 	m_ticket_dispenser->write(space, offset, data & 0x80);
 
-	coin_counter_w(machine(), 0, data & 0x04);  /* Credit counter */
-	coin_counter_w(machine(), 1, data & 0x08);  /* Key In counter */
-	coin_counter_w(machine(), 2, data & 0x02);  /* payout counter */
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);  /* Credit counter */
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);  /* Key In counter */
+	machine().bookkeeping().coin_counter_w(2, data & 0x02);  /* payout counter */
 
 	//popmessage("coin counters: %02x", data);
 }
@@ -1053,12 +1053,12 @@ WRITE8_MEMBER(unkch_state::unkcm_0x02_w)
 
 	m_vblank_irq_enable = data & 0x80;
 
-	output_set_lamp_value(0, (data >> 0) & 1);  /* Bet-A / Stop 2 */
-	output_set_lamp_value(1, (data >> 1) & 1);  /* Start / Stop All */
-	output_set_lamp_value(2, (data >> 2) & 1);  /* Info / Small / Stop 3 */
-	output_set_lamp_value(3, (data >> 3) & 1);  /* Big */
-	output_set_lamp_value(4, (data >> 4) & 1);  /* Bet-B / D-Up */
-	output_set_lamp_value(5, (data >> 5) & 1);  /* Take / Stop 1 */
+	output().set_lamp_value(0, (data >> 0) & 1);  /* Bet-A / Stop 2 */
+	output().set_lamp_value(1, (data >> 1) & 1);  /* Start / Stop All */
+	output().set_lamp_value(2, (data >> 2) & 1);  /* Info / Small / Stop 3 */
+	output().set_lamp_value(3, (data >> 3) & 1);  /* Big */
+	output().set_lamp_value(4, (data >> 4) & 1);  /* Bet-B / D-Up */
+	output().set_lamp_value(5, (data >> 5) & 1);  /* Take / Stop 1 */
 }
 
 WRITE8_MEMBER(unkch_state::unkcm_0x03_w)

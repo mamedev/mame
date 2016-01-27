@@ -75,7 +75,7 @@ PALETTE_INIT_MEMBER(cave_state,cave)
 	for (int chip = 0; chip < 4; chip++)
 	{
 		/* create a 1:1 palette map covering everything */
-		m_palette_map[chip] = auto_alloc_array(machine(), UINT16, palette.entries());
+		m_palette_map[chip] = std::make_unique<UINT16[]>(palette.entries());
 
 		int maxpens = m_paletteram[chip].bytes() / 2;
 		if (!maxpens)
@@ -1715,11 +1715,11 @@ UINT32 cave_state::screen_update_ppsatan_top(screen_device &screen, bitmap_rgb32
 }
 UINT32 cave_state::screen_update_ppsatan_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	crosshair_set_screen(machine(), 1, &screen);
+	machine().crosshair().set_screen(1, &screen);
 	return screen_update_ppsatan_core(screen, bitmap, cliprect, 1);
 }
 UINT32 cave_state::screen_update_ppsatan_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	crosshair_set_screen(machine(), 0, &screen);
+	machine().crosshair().set_screen(0, &screen);
 	return screen_update_ppsatan_core(screen, bitmap, cliprect, 2);
 }

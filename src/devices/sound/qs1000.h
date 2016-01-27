@@ -112,7 +112,6 @@ public:
 	};
 
 	void start_voice(int ch);
-	void set_voice_regs(int ch);
 
 	bool                    m_external_rom;
 

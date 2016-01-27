@@ -377,7 +377,7 @@ WRITE8_MEMBER( sns_rom_tekken2_device::chip_write )
 // Banks $c0-$ff return open bus.
 READ8_MEMBER( sns_rom_soulblad_device::chip_read )
 {
-	UINT8 value = 0;
+	UINT8 value;
 	offset &= 3;
 	switch (offset)
 	{

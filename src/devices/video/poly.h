@@ -186,16 +186,16 @@ private:
 		// construction
 		poly_array(running_machine &machine, poly_manager &manager)
 			: m_manager(manager),
-				m_base(auto_alloc_array_clear(machine, UINT8, k_itemsize * _Count)),
+				m_base(make_unique_clear<UINT8[]>(k_itemsize * _Count)),
 				m_next(0),
 				m_max(0),
 				m_waits(0) { }
 
 		// destruction
-		~poly_array() { auto_free(m_manager.machine(), m_base); }
+		~poly_array() { m_base = nullptr; }
 
 		// operators
-		_Type &operator[](int index) const { assert(index >= 0 && index < _Count); return *reinterpret_cast<_Type *>(m_base + index * k_itemsize); }
+		_Type &operator[](int index) const { assert(index >= 0 && index < _Count); return *reinterpret_cast<_Type *>(m_base.get() + index * k_itemsize); }
 
 		// getters
 		int count() const { return m_next; }
@@ -203,18 +203,18 @@ private:
 		int waits() const { return m_waits; }
 		int itemsize() const { return k_itemsize; }
 		int allocated() const { return _Count; }
-		int indexof(_Type &item) const { int result = (reinterpret_cast<UINT8 *>(&item) - m_base) / k_itemsize; assert(result >= 0 && result < _Count); return result; }
+		int indexof(_Type &item) const { int result = (reinterpret_cast<UINT8 *>(&item) - m_base.get()) / k_itemsize; assert(result >= 0 && result < _Count); return result; }
 
 		// operations
 		void reset() { m_next = 0; }
-		_Type &next() { if (m_next > m_max) m_max = m_next; assert(m_next < _Count); return *new(m_base + m_next++ * k_itemsize) _Type; }
+		_Type &next() { if (m_next > m_max) m_max = m_next; assert(m_next < _Count); return *new(m_base.get() + m_next++ * k_itemsize) _Type; }
 		_Type &last() const { return (*this)[m_next - 1]; }
 		void wait_for_space(int count = 1) { while ((m_next + count) >= _Count) { m_waits++; m_manager.wait(""); }  }
 
 	private:
 		// internal state
 		poly_manager &      m_manager;
-		UINT8 *             m_base;
+		std::unique_ptr<UINT8[]>             m_base;
 		int                 m_next;
 		int                 m_max;
 		int                 m_waits;

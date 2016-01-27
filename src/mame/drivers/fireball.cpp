@@ -109,13 +109,13 @@ WRITE8_MEMBER(fireball_state::io_00_w)
 
 	switch (data&0x0f)
 	{
-		case 1: output_set_digit_value(2, m_display_data);
+		case 1: output().set_digit_value(2, m_display_data);
 				break;
-		case 2: output_set_digit_value(1, m_display_data);
+		case 2: output().set_digit_value(1, m_display_data);
 				break;
-		case 4: output_set_digit_value(4, m_display_data);
+		case 4: output().set_digit_value(4, m_display_data);
 				break;
-		case 8: output_set_digit_value(3, m_display_data);
+		case 8: output().set_digit_value(3, m_display_data);
 				break;
 	}
 
@@ -123,9 +123,9 @@ WRITE8_MEMBER(fireball_state::io_00_w)
 	if (LOG_OUTPUT)
 		logerror("write to 0x00 IO (X11-X11A) %02X\n",data&0xf0);
 
-	output_set_value("Hopper1", BIT(data, 4));
-	output_set_value("Hopper2", BIT(data, 5));
-	output_set_value("Hopper3", BIT(data, 6));
+	output().set_value("Hopper1", BIT(data, 4));
+	output().set_value("Hopper2", BIT(data, 5));
+	output().set_value("Hopper3", BIT(data, 6));
 }
 
 READ8_MEMBER(fireball_state::io_02_r)
@@ -144,14 +144,14 @@ WRITE8_MEMBER(fireball_state::io_02_w)
 	if (LOG_OUTPUT)
 		logerror("write to 0x00 IO (X7-X9) %02X\n",data);
 
-	output_set_value("GameOver", BIT(data, 0));
-	output_set_value("Title", BIT(data, 1));
-	output_set_value("Credit", BIT(data, 2));
-	output_set_value("SS", BIT(data, 3));
-	output_set_value("C_LOCK", BIT(~data, 4));
-	output_set_value("SV", BIT(data, 5));
-	output_set_value("FBV", BIT(data, 6));
-	output_set_value("RV", BIT(data, 7));
+	output().set_value("GameOver", BIT(data, 0));
+	output().set_value("Title", BIT(data, 1));
+	output().set_value("Credit", BIT(data, 2));
+	output().set_value("SS", BIT(data, 3));
+	output().set_value("C_LOCK", BIT(~data, 4));
+	output().set_value("SV", BIT(data, 5));
+	output().set_value("FBV", BIT(data, 6));
+	output().set_value("RV", BIT(data, 7));
 }
 
 READ8_MEMBER(fireball_state::io_04_r)
@@ -194,7 +194,7 @@ WRITE8_MEMBER(fireball_state::io_06_w)
 	if (LOG_DISPLAY2)
 		logerror("On board display write %02X\n",UINT8(~(data&0xff)));
 
-	output_set_digit_value(7, UINT8(~(data&0xff)));
+	output().set_digit_value(7, UINT8(~(data&0xff)));
 }
 
 
@@ -443,21 +443,21 @@ INPUT_PORTS_END
 void fireball_state::machine_reset()
 {
 	int_timing=1;
-	output_set_digit_value(5, 0x3f);
-	output_set_digit_value(6, 0x3f);
+	output().set_digit_value(5, 0x3f);
+	output().set_digit_value(6, 0x3f);
 
-	output_set_value("Hopper1", 0);
-	output_set_value("Hopper2", 0);
-	output_set_value("Hopper3", 0);
+	output().set_value("Hopper1", 0);
+	output().set_value("Hopper2", 0);
+	output().set_value("Hopper3", 0);
 
-	output_set_value("GameOver", 0);
-	output_set_value("Title", 0);
-	output_set_value("Credit", 0);
-	output_set_value("SS", 0);
-	output_set_value("C_LOCK", 0);
-	output_set_value("SV", 0);
-	output_set_value("FBV", 0);
-	output_set_value("RV", 0);
+	output().set_value("GameOver", 0);
+	output().set_value("Title", 0);
+	output().set_value("Credit", 0);
+	output().set_value("SS", 0);
+	output().set_value("C_LOCK", 0);
+	output().set_value("SV", 0);
+	output().set_value("FBV", 0);
+	output().set_value("RV", 0);
 }
 
 /*************************

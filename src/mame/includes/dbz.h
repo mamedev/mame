@@ -55,7 +55,6 @@ public:
 	required_device<k053936_device> m_k053936_2;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_READ16_MEMBER(dbzcontrol_r);
 	DECLARE_WRITE16_MEMBER(dbzcontrol_w);
 	DECLARE_WRITE16_MEMBER(dbz_sound_command_w);
 	DECLARE_WRITE16_MEMBER(dbz_sound_cause_nmi);

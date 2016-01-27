@@ -73,7 +73,7 @@ void ui_menu_input_groups::handle()
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
 	if (menu_event != nullptr && menu_event->iptkey == IPT_UI_SELECT)
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_input_general(machine(), container, int((long long)(menu_event->itemref)-1))));
+		ui_menu::stack_push(auto_alloc_clear(machine(), <ui_menu_input_general>(machine(), container, int((long long)(menu_event->itemref)-1))));
 }
 
 
@@ -266,7 +266,7 @@ void ui_menu_input::handle()
 		input_item_data *item = pollingitem;
 
 		/* if UI_CANCEL is pressed, abort */
-		if (ui_input_pressed(machine(), IPT_UI_CANCEL))
+		if (machine().ui_input().pressed(IPT_UI_CANCEL))
 		{
 			pollingitem = nullptr;
 			record_next = false;
@@ -434,7 +434,7 @@ void ui_menu_input::populate_and_sort(input_item_data *itemlist)
 		/* otherwise, generate the sequence name and invert it if different from the default */
 		else
 		{
-			machine().input().seq_name(subtext, item->seq);
+			subtext = machine().input().seq_name(item->seq);
 			flags |= (item->seq != *item->defseq) ? MENU_FLAG_INVERT : 0;
 		}
 

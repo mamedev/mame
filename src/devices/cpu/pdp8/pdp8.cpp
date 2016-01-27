@@ -72,7 +72,6 @@ void pdp8_device::device_start()
 	m_program = &space(AS_PROGRAM);
 
 	// register our state for the debugger
-	std::string tempstr;
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_l).callimport().callexport().formatstr("%1s").noshow();
 	state_add(PDP8_PC,         "PC",        m_pc).mask(0xfff);
@@ -136,7 +135,7 @@ const address_space_config *pdp8_device::memory_space_config(address_spacenum sp
 //  for the debugger
 //-------------------------------------------------
 
-void pdp8_device::state_string_export(const device_state_entry &entry, std::string &str)
+void pdp8_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

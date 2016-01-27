@@ -99,20 +99,20 @@ UINT32 pc1500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 			}
 		}
 
-	output_set_value("BUSY",  BIT(m_lcd_data[0x4e], 0));
-	output_set_value("SHIFT", BIT(m_lcd_data[0x4e], 1));
-	output_set_value("SML",   BIT(m_lcd_data[0x4e], 2));
-	output_set_value("SMALL", BIT(m_lcd_data[0x4e], 3));
-	output_set_value("III",   BIT(m_lcd_data[0x4e], 4));
-	output_set_value("II",    BIT(m_lcd_data[0x4e], 5));
-	output_set_value("I",     BIT(m_lcd_data[0x4e], 6));
-	output_set_value("DEF",   BIT(m_lcd_data[0x4e], 7));
-	output_set_value("DE",    BIT(m_lcd_data[0x4f], 0));
-	output_set_value("G",     BIT(m_lcd_data[0x4f], 1));
-	output_set_value("RAD",   BIT(m_lcd_data[0x4f], 2));
-	output_set_value("RESERVE", BIT(m_lcd_data[0x4f], 4));
-	output_set_value("PRO",   BIT(m_lcd_data[0x4f], 5));
-	output_set_value("RUN",   BIT(m_lcd_data[0x4f], 6));
+	output().set_value("BUSY",  BIT(m_lcd_data[0x4e], 0));
+	output().set_value("SHIFT", BIT(m_lcd_data[0x4e], 1));
+	output().set_value("SML",   BIT(m_lcd_data[0x4e], 2));
+	output().set_value("SMALL", BIT(m_lcd_data[0x4e], 3));
+	output().set_value("III",   BIT(m_lcd_data[0x4e], 4));
+	output().set_value("II",    BIT(m_lcd_data[0x4e], 5));
+	output().set_value("I",     BIT(m_lcd_data[0x4e], 6));
+	output().set_value("DEF",   BIT(m_lcd_data[0x4e], 7));
+	output().set_value("DE",    BIT(m_lcd_data[0x4f], 0));
+	output().set_value("G",     BIT(m_lcd_data[0x4f], 1));
+	output().set_value("RAD",   BIT(m_lcd_data[0x4f], 2));
+	output().set_value("RESERVE", BIT(m_lcd_data[0x4f], 4));
+	output().set_value("PRO",   BIT(m_lcd_data[0x4f], 5));
+	output().set_value("RUN",   BIT(m_lcd_data[0x4f], 6));
 
 	return 0;
 }

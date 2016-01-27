@@ -79,9 +79,7 @@ public:
 	DECLARE_DRIVER_INIT(cyberbal2p);
 	DECLARE_DRIVER_INIT(cyberbal);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
-	TILE_GET_INFO_MEMBER(get_alpha2_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
 	DECLARE_MACHINE_START(cyberbal);
 	DECLARE_MACHINE_RESET(cyberbal);
 	DECLARE_VIDEO_START(cyberbal);
@@ -99,5 +97,4 @@ private:
 	void cyberbal_sound_reset();
 	UINT32 update_one_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index);
 	void update_sound_68k_interrupts();
-	inline void set_palette_entry(int entry, UINT16 value);
 };

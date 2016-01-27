@@ -143,8 +143,8 @@ WRITE8_MEMBER(suprloco_state::control_w)
 		/*logerror("Bit 4 = %d\n", (data >> 4) & 1); */
 	}
 
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 	flip_screen_set(data & 0x80);
 

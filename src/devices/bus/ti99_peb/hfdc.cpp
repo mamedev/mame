@@ -91,7 +91,7 @@ myarc_hfdc_device::myarc_hfdc_device(const machine_config &mconfig, const char *
 	: ti_expansion_card_device(mconfig, TI99_HFDC, "Myarc Hard and Floppy Disk Controller", tag, owner, clock, "ti99_hfdc", __FILE__), m_motor_on_timer(nullptr),
 		m_hdc9234(*this, FDC_TAG),
 		m_clock(*this, CLOCK_TAG), m_current_floppy(nullptr), m_current_harddisk(nullptr), m_see_switches(false), m_irq(), m_dip(), m_motor_running(false),
-	m_inDsrArea(false), m_HDCsel(false), m_RTCsel(false), m_tapesel(false), m_RAMsel(false), m_ROMsel(false), m_address(0), m_dma_in_progress(false),
+	m_inDsrArea(false), m_HDCsel(false), m_RTCsel(false), m_tapesel(false), m_RAMsel(false), m_ROMsel(false), m_address(0),
 	m_wait_for_hd1(false), m_dsrrom(nullptr), m_rom_page(0), m_buffer_ram(nullptr), m_status_latch(0), m_dma_address(0), m_output1_latch(0), m_output2_latch(0), m_lastval(0), m_MOTOR_ON(), m_readyflags(0)
 {
 }

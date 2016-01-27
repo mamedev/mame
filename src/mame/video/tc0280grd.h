@@ -32,7 +32,7 @@ protected:
 
 private:
 	// internal state
-	UINT16 *       m_ram;
+	std::unique_ptr<UINT16[]>       m_ram;
 
 	tilemap_t      *m_tilemap;
 

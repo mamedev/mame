@@ -131,7 +131,7 @@ private:
 	UINT8   m_bank_high1_read_only;
 	UINT8   m_bank_high2_read_only;
 
-	UINT8   *m_empty_bank;
+	std::unique_ptr<UINT8[]>   m_empty_bank;
 	UINT8   *m_bank_low_ptr;
 	UINT8   *m_bank_high1_ptr;
 	UINT8   *m_bank_high2_ptr;

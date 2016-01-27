@@ -143,6 +143,7 @@ private:
 	int m_roffset;                /* offset in the region */
 	devcb_write_line m_irq_cb;
 	devcb_write_line m_main_irq_cb;
+	optional_memory_region m_ram_region;
 
 	union
 	{
@@ -159,7 +160,8 @@ private:
 	UINT32 m_AICARAM_LENGTH, m_RAM_MASK, m_RAM_MASK16;
 	sound_stream * m_stream;
 
-	INT32 *m_buffertmpl, *m_buffertmpr;
+	std::unique_ptr<INT32[]> m_buffertmpl;
+	std::unique_ptr<INT32[]> m_buffertmpr;
 
 	UINT32 m_IrqTimA;
 	UINT32 m_IrqTimBC;

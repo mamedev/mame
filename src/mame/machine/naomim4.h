@@ -35,9 +35,9 @@ private:
 
 	const char *key_tag;
 	UINT16 subkey1, subkey2;
-	UINT16 *one_round;
+	std::unique_ptr<UINT16[]> one_round;
 
-	UINT8 *buffer;
+	std::unique_ptr<UINT8[]> buffer;
 	UINT32 rom_cur_address, buffer_actual_size;
 	UINT16 iv;
 	UINT8 counter;

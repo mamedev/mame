@@ -50,7 +50,7 @@
  ****************************/
 struct gate_array_t
 {
-	bitmap_ind16    *bitmap;        /* The bitmap we work on */
+	std::unique_ptr<bitmap_ind16>    bitmap;        /* The bitmap we work on */
 	UINT8   pen_selected;       /* Pen selection */
 	UINT8   mrer;               /* Mode and ROM Enable Register */
 	UINT8   upper_bank;
@@ -245,7 +245,6 @@ public:
 	DECLARE_WRITE8_MEMBER(amstrad_ppi_portc_w);
 
 	DECLARE_WRITE_LINE_MEMBER( cpc_romdis );
-	DECLARE_WRITE_LINE_MEMBER( cpc_romen );
 	DECLARE_WRITE8_MEMBER(rom_select);
 
 	DECLARE_FLOPPY_FORMATS( aleste_floppy_formats );

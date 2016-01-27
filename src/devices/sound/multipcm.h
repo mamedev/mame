@@ -126,7 +126,6 @@ private:
 
 	// Internal LFO functions
 	void lfo_init();
-	INT32 lfo_float_to_fixed(const float value);
 	void lfo_compute_step(lfo_t *lfo, UINT32 lfo_frequency, UINT32 LFOS, INT32 amplitude_lfo);
 	INT32 pitch_lfo_step(lfo_t *lfo);
 	INT32 amplitude_lfo_step(lfo_t *lfo);

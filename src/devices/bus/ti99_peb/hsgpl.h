@@ -47,8 +47,8 @@ private:
 	at29c040a_device* m_grom_a_eeprom;
 	at29c040a_device* m_grom_b_eeprom;
 
-	UINT8*          m_ram6_memory;
-	UINT8*          m_gram_memory;
+	std::unique_ptr<UINT8[]>         m_ram6_memory;
+	std::unique_ptr<UINT8[]>         m_gram_memory;
 
 	void            dsrspace_readz(address_space& space, offs_t offset, UINT8* value, UINT8 mem_mask);
 	void            cartspace_readz(address_space& space, offs_t offset, UINT8* value, UINT8 mem_mask);

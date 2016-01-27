@@ -81,7 +81,7 @@ struct rotate_info
 	UINT16          colorbase;                      /* base color index */
 	INT32           ramsize;                        /* size of rotate RAM */
 	UINT16 *        rotateram;                      /* pointer to rotateram pointer */
-	UINT16 *        buffer;                         /* buffered data */
+	std::unique_ptr<UINT16[]>        buffer;                         /* buffered data */
 };
 
 

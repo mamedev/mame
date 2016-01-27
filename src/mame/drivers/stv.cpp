@@ -124,10 +124,10 @@ WRITE8_MEMBER(stv_state::stv_ioga_w)
 		case 0x07:
 			m_system_output = data & 0xf;
 			/*Why does the BIOS tests these as ACTIVE HIGH? A program bug?*/
-			coin_counter_w(machine(), 0,~data & 0x01);
-			coin_counter_w(machine(), 1,~data & 0x02);
-			coin_lockout_w(machine(), 0,~data & 0x04);
-			coin_lockout_w(machine(), 1,~data & 0x08);
+			machine().bookkeeping().coin_counter_w(0,~data & 0x01);
+			machine().bookkeeping().coin_counter_w(1,~data & 0x02);
+			machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
+			machine().bookkeeping().coin_lockout_w(1,~data & 0x08);
 			break;
 	}
 }
@@ -377,9 +377,10 @@ DRIVER_INIT_MEMBER(stv_state,stv)
 	m_minit_boost_timeslice = attotime::zero;
 	m_sinit_boost_timeslice = attotime::zero;
 
-	m_scu_regs = auto_alloc_array(machine(), UINT32, 0x100/4);
-	m_scsp_regs  = auto_alloc_array(machine(), UINT16, 0x1000/2);
-	m_backupram = auto_alloc_array_clear(machine(), UINT8, 0x8000);
+	m_scu_regs = std::make_unique<UINT32[]>(0x100/4);
+	m_scsp_regs  = std::make_unique<UINT16[]>(0x1000/2);
+	m_backupram = std::make_unique<UINT8[]>(0x8000);
+	memset(m_backupram.get(), 0, sizeof(UINT8) * 0x8000);
 
 	install_stvbios_speedups();
 
@@ -1309,8 +1310,8 @@ MACHINE_START_MEMBER(stv_state,stv)
 	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
 
 	// save states
-	save_pointer(NAME(m_scu_regs), 0x100/4);
-	save_pointer(NAME(m_scsp_regs), 0x1000/2);
+	save_pointer(NAME(m_scu_regs.get()), 0x100/4);
+	save_pointer(NAME(m_scsp_regs.get()), 0x1000/2);
 	save_item(NAME(m_NMI_reset));
 	save_item(NAME(m_en_68k));
 //  save_item(NAME(scanline));

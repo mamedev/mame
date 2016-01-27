@@ -952,7 +952,7 @@ void g65816_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void g65816_device::state_string_export(const device_state_entry &entry, std::string &str)
+void g65816_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

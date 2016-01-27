@@ -68,7 +68,7 @@ void wpc_lamp_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				sprintf(buffer, "l:%s", names[i]);
 			else
 				sprintf(buffer, "l:%d%d", 1+(i >> 3), 1 + (i & 7));
-			output_set_value(buffer, (s & 0xc0) == 0x80);
+			machine().output().set_value(buffer, (s & 0xc0) == 0x80);
 		}
 	}
 }

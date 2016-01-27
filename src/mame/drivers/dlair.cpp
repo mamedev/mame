@@ -265,7 +265,7 @@ WRITE8_MEMBER(dlair_state::misc_w)
 	UINT8 diff = data ^ m_last_misc;
 	m_last_misc = data;
 
-	coin_counter_w(machine(), 0, (~data >> 4) & 1);
+	machine().bookkeeping().coin_counter_w(0, (~data >> 4) & 1);
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))
@@ -291,8 +291,8 @@ WRITE8_MEMBER(dlair_state::dleuro_misc_w)
 	UINT8 diff = data ^ m_last_misc;
 	m_last_misc = data;
 
-	coin_counter_w(machine(), 1, (~data >> 3) & 1);
-	coin_counter_w(machine(), 0, (~data >> 4) & 1);
+	machine().bookkeeping().coin_counter_w(1, (~data >> 3) & 1);
+	machine().bookkeeping().coin_counter_w(0, (~data >> 4) & 1);
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))
@@ -305,13 +305,13 @@ WRITE8_MEMBER(dlair_state::dleuro_misc_w)
 
 WRITE8_MEMBER(dlair_state::led_den1_w)
 {
-	output_set_digit_value(0 + (offset & 7), led_map[data & 0x0f]);
+	output().set_digit_value(0 + (offset & 7), led_map[data & 0x0f]);
 }
 
 
 WRITE8_MEMBER(dlair_state::led_den2_w)
 {
-	output_set_digit_value(8 + (offset & 7), led_map[data & 0x0f]);
+	output().set_digit_value(8 + (offset & 7), led_map[data & 0x0f]);
 }
 
 

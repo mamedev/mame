@@ -22,6 +22,7 @@
 #define MCFG_I386_SMIACT(_devcb) \
 	i386_device::set_smiact(*device, DEVCB_##_devcb);
 
+#define X86_NUM_CPUS        4
 
 class i386_device : public cpu_device
 {
@@ -58,7 +59,7 @@ protected:
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
@@ -67,6 +68,10 @@ protected:
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
+
+	std::unique_ptr<UINT8[]> cycle_table_rm[X86_NUM_CPUS];
+	std::unique_ptr<UINT8[]> cycle_table_pm[X86_NUM_CPUS];
+
 
 union I386_GPR {
 	UINT32 d[8];
@@ -357,7 +362,7 @@ struct I386_CALL_GATE
 	void i386_load_segment_descriptor(int segment );
 	UINT32 i386_get_stack_segment(UINT8 privilege);
 	UINT32 i386_get_stack_ptr(UINT8 privilege);
-	UINT32 get_flags();
+	UINT32 get_flags() const;
 	void set_flags(UINT32 f );
 	void sib_byte(UINT8 mod, UINT32* out_ea, UINT8* out_segment);
 	void modrm_to_EA(UINT8 mod_rm, UINT32* out_ea, UINT8* out_segment);

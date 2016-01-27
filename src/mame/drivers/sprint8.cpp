@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 /***************************************************************************
 
@@ -85,7 +85,7 @@ READ8_MEMBER(sprint8_state::sprint8_input_r)
 
 WRITE8_MEMBER(sprint8_state::sprint8_lockout_w)
 {
-	coin_lockout_w(machine(), offset, !(data & 1));
+	machine().bookkeeping().coin_lockout_w(offset, !(data & 1));
 }
 
 

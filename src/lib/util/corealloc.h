@@ -15,6 +15,9 @@
 
 #include <stdlib.h>
 #include <new>
+#include <type_traits>
+#include <utility>
+#include <memory>
 #include "osdcore.h"
 
 
@@ -23,82 +26,80 @@
 //**************************************************************************
 
 // global allocation helpers -- use these instead of new and delete
-#define global_alloc(_type)                         new(__FILE__, __LINE__) _type
-#define global_alloc_clear(_type)                   new(__FILE__, __LINE__, zeromem) _type
-#define global_alloc_array(_type, _num)             new(__FILE__, __LINE__) _type[_num]
-#define global_alloc_array_clear(_type, _num)       new(__FILE__, __LINE__, zeromem) _type[_num]
+#define global_alloc(_type)                         new _type
+#define global_alloc_array(_type, _num)             new _type[_num]
 #define global_free(_ptr)                           do { delete _ptr; } while (0)
 #define global_free_array(_ptr)                     do { delete[] _ptr; } while (0)
 
 
 
-//**************************************************************************
-//  FUNCTION PROTOTYPES
-//**************************************************************************
+template<typename _Tp, typename... _Args>
+inline _Tp* global_alloc_clear(_Args&&... __args)
+{
+	unsigned char * ptr = new unsigned char[sizeof(_Tp)]; // allocate memory
+	memset(ptr, 0, sizeof(_Tp));
+	return new(ptr) _Tp(std::forward<_Args>(__args)...);
+}
 
-// allocate memory with file and line number information
-void *malloc_file_line(size_t size, const char *file, int line, bool array, bool throw_on_fail, bool clear);
-
-// free memory with file and line number information
-void free_file_line(void *memory, const char *file, int line, bool array);
-inline void free_file_line(const void *memory, const char *file, int line, bool array) { free_file_line(const_cast<void *>(memory), file, line, array); }
-
-// called from the exit path of any code that wants to check for unfreed memory
-void track_memory(bool track);
-UINT64 next_memory_id();
-void dump_unfreed_mem(UINT64 start = 0);
-
-
-
-//**************************************************************************
-//  OPERATOR OVERLOADS - DECLARATIONS
-//**************************************************************************
-
-// zeromem_t is a dummy class used to tell new to zero memory after allocation
-class zeromem_t { };
-
-// file/line new/delete operators
-void *operator new(std::size_t size, const char *file, int line) throw (std::bad_alloc);
-void *operator new[](std::size_t size, const char *file, int line) throw (std::bad_alloc);
-void operator delete(void *ptr, const char *file, int line);
-void operator delete[](void *ptr, const char *file, int line);
-
-// file/line new/delete operators with zeroing
-void *operator new(std::size_t size, const char *file, int line, const zeromem_t &) throw (std::bad_alloc);
-void *operator new[](std::size_t size, const char *file, int line, const zeromem_t &) throw (std::bad_alloc);
-void operator delete(void *ptr, const char *file, int line, const zeromem_t &);
-void operator delete[](void *ptr, const char *file, int line, const zeromem_t &);
+template<typename _Tp>
+inline _Tp* global_alloc_array_clear(size_t __num)
+{
+	auto size = sizeof(_Tp) * __num;
+	unsigned char* ptr = new unsigned char[size]; // allocate memory
+	memset(ptr, 0, size);
+	return new(ptr) _Tp[__num]();
+}
 
 
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
+template<typename _Tp>
+struct _MakeUniqClear
+{
+	typedef std::unique_ptr<_Tp> __single_object;
+};
 
-// dummy objects to pass to the specialized new variants
-extern const zeromem_t zeromem;
+template<typename _Tp>
+struct _MakeUniqClear<_Tp[]>
+{
+	typedef std::unique_ptr<_Tp[]> __array;
+};
 
+template<typename _Tp, size_t _Bound>
+struct _MakeUniqClear<_Tp[_Bound]>
+{
+	struct __invalid_type { };
+};
 
+/// make_unique_clear for single objects
+template<typename _Tp, typename... _Args>
+inline typename _MakeUniqClear<_Tp>::__single_object make_unique_clear(_Args&&... __args)
+{
+	unsigned char* ptr = new unsigned char[sizeof(_Tp)]; // allocate memory
+	memset(ptr, 0, sizeof(_Tp));
+	return std::unique_ptr<_Tp>(new(ptr) _Tp(std::forward<_Args>(__args)...));
+}
 
-//**************************************************************************
-//  ADDDITIONAL MACROS
-//**************************************************************************
+/// make_unique_clear for arrays of unknown bound
+template<typename _Tp>
+inline typename _MakeUniqClear<_Tp>::__array make_unique_clear(size_t __num)
+{
+	auto size = sizeof(std::remove_extent_t<_Tp>) * __num;
+	unsigned char* ptr = new unsigned char[size]; // allocate memory
+	memset(ptr, 0, size);
+	return std::unique_ptr<_Tp>(new(ptr) std::remove_extent_t<_Tp>[__num]());
+}
 
-#ifndef NO_MEM_TRACKING
-// re-route classic malloc-style allocations
-#undef malloc
-#undef realloc
-#undef free
+template<typename _Tp, unsigned char _F>
+inline typename _MakeUniqClear<_Tp>::__array make_unique_clear(size_t __num)
+{
+	auto size = sizeof(std::remove_extent_t<_Tp>) * __num;
+	unsigned char* ptr = new unsigned char[size]; // allocate memory
+	memset(ptr, _F, size);
+	return std::unique_ptr<_Tp>(new(ptr) std::remove_extent_t<_Tp>[__num]());
+}
 
-#define malloc(x)       malloc_file_line(x, __FILE__, __LINE__, true, false, false)
-#define realloc(x,y)    __error_realloc_is_dangerous__
-#define free(x)         free_file_line(x, __FILE__, __LINE__, true)
-
-#if !defined(_MSC_VER) || _MSC_VER < 1900 // < VS2015
-#undef calloc
-#define calloc(x,y)     __error_use_auto_alloc_clear_or_global_alloc_clear_instead__
-#endif
-
-#endif
+/// Disable make_unique_clear for arrays of known bound
+template<typename _Tp, typename... _Args>
+inline typename _MakeUniqClear<_Tp>::__invalid_type make_unique_clear(_Args&&...) = delete;
 
 #endif  /* __COREALLOC_H__ */

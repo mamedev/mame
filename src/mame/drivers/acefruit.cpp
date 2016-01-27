@@ -274,7 +274,7 @@ WRITE8_MEMBER(acefruit_state::acefruit_lamp_w)
 
 	for( i = 0; i < 8; i++ )
 	{
-		output_set_lamp_value( ( offset * 8 ) + i, ( data >> i ) & 1 );
+		output().set_lamp_value( ( offset * 8 ) + i, ( data >> i ) & 1 );
 	}
 }
 
@@ -284,7 +284,7 @@ WRITE8_MEMBER(acefruit_state::acefruit_solenoid_w)
 
 	for( i = 0; i < 8; i++ )
 	{
-		output_set_indexed_value( "solenoid", i, ( data >> i ) & 1 );
+		output().set_indexed_value( "solenoid", i, ( data >> i ) & 1 );
 	}
 }
 

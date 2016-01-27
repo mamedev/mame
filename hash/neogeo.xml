@@ -12036,10 +12036,10 @@
 				<rom loadflag="load16_word_swap" name="dig-p1.bin" offset="0x000000" size="0x080000" crc="eda433d7" sha1="abb14c66777ab0fe4ac76a402e253a49df7178d8" />
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
-				<rom offset="0x000000" size="0x010000" name="dig-s1.bin" crc="75a88c1f" sha1="295dd9225f1e3d2fc64a65b3c287c7f1765417b1" />
+				<rom offset="0x000000" size="0x020000" name="dig-s1.bin" crc="9b3168f0" sha1="9be8c625686a1482f7399e5a856cfe2fef25ec52" />
 			</dataarea>
-			<dataarea name="audiocpu" size="0x010000">
-				<rom offset="0x000000" size="0x010000" name="dig-m1.bin" crc="833cdf1b" sha1="3a92c79adbe0d37956ea46a4746d6f1cbf7d2c14" />
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="dig-m1.bin" crc="e777a234" sha1="9f3974ac07859337bc0203f903c40ae3f60dc1fb" />
 			</dataarea>
 			<dataarea name="ymsnd" size="0x200000">
 				<rom name="dig-v1.bin" offset="0x000000" size="0x080000" crc="ee15bda4" sha1="fe2206728e6efd02d6302869a98b196eb19a17df" />

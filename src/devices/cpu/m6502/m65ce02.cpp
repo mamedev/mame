@@ -75,7 +75,7 @@ void m65ce02_device::state_export(const device_state_entry &entry)
 {
 }
 
-void m65ce02_device::state_string_export(const device_state_entry &entry, std::string &str)
+void m65ce02_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch(entry.index()) {
 	case STATE_GENFLAGS:

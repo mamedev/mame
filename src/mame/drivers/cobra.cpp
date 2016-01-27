@@ -358,15 +358,15 @@ public:
 	cobra_renderer(screen_device &screen)
 		: poly_manager<float, cobra_polydata, 8, 10000>(screen)
 	{
-		m_texture_ram = auto_alloc_array(machine(), UINT32, 0x100000);
+		m_texture_ram = std::make_unique<UINT32[]>(0x100000);
 
-		m_framebuffer = auto_bitmap_rgb32_alloc(machine(), 1024, 1024);
-		m_backbuffer = auto_bitmap_rgb32_alloc(machine(), 1024, 1024);
-		m_overlay = auto_bitmap_rgb32_alloc(machine(), 1024, 1024);
-		m_zbuffer = auto_bitmap_ind32_alloc(machine(), 1024, 1024);
-		m_stencil = auto_bitmap_ind32_alloc(machine(), 1024, 1024);
+		m_framebuffer = std::make_unique<bitmap_rgb32>( 1024, 1024);
+		m_backbuffer = std::make_unique<bitmap_rgb32>( 1024, 1024);
+		m_overlay = std::make_unique<bitmap_rgb32>( 1024, 1024);
+		m_zbuffer = std::make_unique<bitmap_ind32>(1024, 1024);
+		m_stencil = std::make_unique<bitmap_ind32>(1024, 1024);
 
-		m_gfx_regmask = auto_alloc_array(machine(), UINT32, 0x100);
+		m_gfx_regmask = std::make_unique<UINT32[]>(0x100);
 		for (int i=0; i < 0x100; i++)
 		{
 			UINT32 mask = 0;
@@ -400,19 +400,19 @@ public:
 	void display(bitmap_rgb32 *bitmap, const rectangle &cliprect);
 	inline rgb_t texture_fetch(UINT32 *texture, int u, int v, int width, int format);
 private:
-	bitmap_rgb32 *m_framebuffer;
-	bitmap_rgb32 *m_backbuffer;
-	bitmap_rgb32 *m_overlay;
-	bitmap_ind32 *m_zbuffer;
-	bitmap_ind32 *m_stencil;
+	std::unique_ptr<bitmap_rgb32> m_framebuffer;
+	std::unique_ptr<bitmap_rgb32> m_backbuffer;
+	std::unique_ptr<bitmap_rgb32> m_overlay;
+	std::unique_ptr<bitmap_ind32> m_zbuffer;
+	std::unique_ptr<bitmap_ind32> m_stencil;
 
-	UINT32 *m_texture_ram;
+	std::unique_ptr<UINT32[]> m_texture_ram;
 
-	UINT32 *m_gfx_gram;
-	UINT32 *m_gfx_regmask;
+	std::unique_ptr<UINT32[]> m_gfx_gram;
+	std::unique_ptr<UINT32[]> m_gfx_regmask;
 
 	UINT32 m_gfx_register_select;
-	UINT64 *m_gfx_register;
+	std::unique_ptr<UINT64[]> m_gfx_register;
 
 	UINT32 m_texram_ptr;
 
@@ -451,7 +451,7 @@ public:
 
 	cobra_fifo(running_machine &machine, int capacity, const char *name, bool verbose, event_delegate event_callback)
 	{
-		m_data = auto_alloc_array(machine, UINT64, capacity);
+		m_data = std::make_unique<UINT64[]>(capacity);
 
 		m_name = name;
 		m_size = capacity;
@@ -481,7 +481,7 @@ private:
 	int m_num;
 	bool m_verbose;
 	const char *m_name;
-	UINT64 *m_data;
+	std::unique_ptr<UINT64[]> m_data;
 	event_delegate m_event_callback;
 };
 
@@ -493,9 +493,16 @@ class cobra_jvs : public jvs_device
 public:
 	cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	DECLARE_WRITE_LINE_MEMBER(coin_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_2_w);
+
 protected:
 	virtual bool switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch) override;
 	virtual bool coin_counters(UINT8 *&buf, UINT8 count) override;
+	virtual void function_list(UINT8 *&buf) override;
+
+private:
+	int m_coin_counter[2];
 };
 
 const device_type COBRA_JVS = &device_creator<cobra_jvs>;
@@ -503,6 +510,35 @@ const device_type COBRA_JVS = &device_creator<cobra_jvs>;
 cobra_jvs::cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: jvs_device(mconfig, COBRA_JVS, "JVS (COBRA)", tag, owner, clock, "cobra_jvs", __FILE__)
 {
+	m_coin_counter[0] = 0;
+	m_coin_counter[1] = 0;
+}
+
+WRITE_LINE_MEMBER(cobra_jvs::coin_1_w)
+{
+	if(state)
+		m_coin_counter[0]++;
+}
+
+WRITE_LINE_MEMBER(cobra_jvs::coin_2_w)
+{
+	if(state)
+		m_coin_counter[1]++;
+}
+
+void cobra_jvs::function_list(UINT8 *&buf)
+{
+	// SW input - 2 players, 13 bits
+	*buf++ = 0x01; *buf++ = 2; *buf++ = 13; *buf++ = 0;
+
+	// Coin input - 2 slots
+	*buf++ = 0x02; *buf++ = 2; *buf++ = 0; *buf++ = 0;
+
+	// Analog input - 8 channels
+	*buf++ = 0x03; *buf++ = 8; *buf++ = 16; *buf++ = 0;
+
+	// Driver out - 6 channels
+	*buf++ = 0x12; *buf++ = 6; *buf++ = 0; *buf++ = 0;
 }
 
 bool cobra_jvs::switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch)
@@ -538,8 +574,10 @@ bool cobra_jvs::coin_counters(UINT8 *&buf, UINT8 count)
 	if (count > 2)
 		return false;
 
-	*buf++ = 0x00;
-	*buf++ = 0x01;
+	*buf++ = m_coin_counter[0] >> 8; *buf++ = m_coin_counter[0];
+
+	if(count > 1)
+		*buf++ = m_coin_counter[1] >> 8; *buf++ = m_coin_counter[1];
 
 	return true;
 }
@@ -647,8 +685,6 @@ public:
 
 	DECLARE_READ32_MEMBER(sub_comram_r);
 	DECLARE_WRITE32_MEMBER(sub_comram_w);
-	DECLARE_READ32_MEMBER(sub_sound_r);
-	DECLARE_WRITE32_MEMBER(sub_sound_w);
 	DECLARE_READ32_MEMBER(sub_unk7e_r);
 	DECLARE_WRITE32_MEMBER(sub_debug_w);
 	DECLARE_READ32_MEMBER(sub_unk1_r);
@@ -680,7 +716,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 
-	cobra_renderer *m_renderer;
+	std::unique_ptr<cobra_renderer> m_renderer;
 
 	cobra_fifo *m_gfxfifo_in;
 	cobra_fifo *m_gfxfifo_out;
@@ -708,7 +744,7 @@ public:
 	UINT8 m_main_int_active;
 
 
-	UINT32 *m_comram[2];
+	std::unique_ptr<UINT32[]> m_comram[2];
 	int m_comram_page;
 
 	int m_main_debug_state;
@@ -737,8 +773,8 @@ public:
 
 	bool m_has_psac;
 
-	INT16 *m_sound_dma_buffer_l;
-	INT16 *m_sound_dma_buffer_r;
+	std::unique_ptr<INT16[]> m_sound_dma_buffer_l;
+	std::unique_ptr<INT16[]> m_sound_dma_buffer_r;
 	UINT32 m_sound_dma_ptr;
 
 	dmadac_sound_device *m_dmadac[2];
@@ -746,6 +782,7 @@ public:
 	DECLARE_DRIVER_INIT(racjamdx);
 	DECLARE_DRIVER_INIT(bujutsu);
 	DECLARE_DRIVER_INIT(cobra);
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	UINT32 screen_update_cobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -1020,7 +1057,7 @@ void cobra_state::video_start()
 {
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cobra_state::cobra_video_exit), this));
 
-	m_renderer = auto_alloc(machine(), cobra_renderer(*m_screen));
+	m_renderer = std::make_unique<cobra_renderer>(*m_screen);
 	m_renderer->gfx_init();
 }
 
@@ -1895,7 +1932,7 @@ WRITE32_MEMBER(cobra_state::sub_comram_w)
 {
 	int page = m_comram_page ^ 1;
 
-	COMBINE_DATA(m_comram[page] + offset);
+	COMBINE_DATA(m_comram[page].get() + offset);
 }
 
 WRITE32_MEMBER(cobra_state::sub_psac_palette_w)
@@ -1946,8 +1983,8 @@ WRITE32_MEMBER(cobra_state::sub_sound_dma_w)
 	{
 		m_sound_dma_ptr = 0;
 
-		dmadac_transfer(&m_dmadac[0], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, m_sound_dma_buffer_l);
-		dmadac_transfer(&m_dmadac[1], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, m_sound_dma_buffer_r);
+		dmadac_transfer(&m_dmadac[0], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, m_sound_dma_buffer_l.get());
+		dmadac_transfer(&m_dmadac[1], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, m_sound_dma_buffer_r.get());
 	}
 }
 
@@ -2052,9 +2089,9 @@ void cobra_renderer::gfx_init()
 {
 	const rectangle& visarea = screen().visible_area();
 
-	m_gfx_gram = auto_alloc_array(machine(), UINT32, 0x40000);
+	m_gfx_gram = std::make_unique<UINT32[]>(0x40000);
 
-	m_gfx_register = auto_alloc_array(machine(), UINT64, 0x3000);
+	m_gfx_register = std::make_unique<UINT64[]>(0x3000);
 	m_gfx_register_select = 0;
 
 	float zvalue = 10000000.0f;
@@ -2251,13 +2288,13 @@ void cobra_renderer::gfx_fifo_exec()
 					// GFX register select
 					m_gfx_register_select = w[3];
 
-					printf("GFX: register select %08X\n", m_gfx_register_select);
+				//  printf("GFX: register select %08X\n", m_gfx_register_select);
 				}
 				else if (w2 == 0x10500018)
 				{
 					// register write to the register selected above?
 					// 64-bit registers, top 32-bits in word 2, low 32-bit in word 3
-					printf("GFX: register write %08X: %08X %08X\n", m_gfx_register_select, w[2], w[3]);
+				//  printf("GFX: register write %08X: %08X %08X\n", m_gfx_register_select, w[2], w[3]);
 
 					gfx_write_reg(((UINT64)(w[2]) << 32) | w[3]);
 				}
@@ -3098,50 +3135,54 @@ ADDRESS_MAP_END
 
 INPUT_PORTS_START( cobra )
 	PORT_START("TEST")
-	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW)            /* Test Button */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_HIGH)            /* Test Button */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1")
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("P1 Service") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
 
 	PORT_START("P2")
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("P2 Service") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
+
+	PORT_START("COINS")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_WRITE_LINE_DEVICE_MEMBER("cobra_jvs1", cobra_jvs, coin_1_w)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2) PORT_WRITE_LINE_DEVICE_MEMBER("cobra_jvs1", cobra_jvs, coin_2_w)
 INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(cobra_state::ide_interrupt)
@@ -3164,6 +3205,17 @@ INTERRUPT_GEN_MEMBER(cobra_state::cobra_vblank)
 		device.execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		m_gfx_unk_flag = 0x80;
 	}
+}
+
+void cobra_state::machine_start()
+{
+	/* configure fast RAM regions for DRC */
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, FALSE, m_main_ram);
+
+	m_subcpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, FALSE, m_sub_ram);
+
+	m_gfxcpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, FALSE, m_gfx_ram0);
+	m_gfxcpu->ppcdrc_add_fastram(0x07c00000, 0x07ffffff, FALSE, m_gfx_ram1);
 }
 
 void cobra_state::machine_reset()
@@ -3248,7 +3300,9 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_K001604_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("cobra_jvs_host", COBRA_JVS_HOST, 4000000)
-	MCFG_JVS_DEVICE_ADD("cobra_jvs", COBRA_JVS, "cobra_jvs_host")
+	MCFG_JVS_DEVICE_ADD("cobra_jvs1", COBRA_JVS, "cobra_jvs_host")
+	MCFG_JVS_DEVICE_ADD("cobra_jvs2", COBRA_JVS, "cobra_jvs_host")
+	MCFG_JVS_DEVICE_ADD("cobra_jvs3", COBRA_JVS, "cobra_jvs_host")
 
 MACHINE_CONFIG_END
 
@@ -3298,13 +3352,13 @@ DRIVER_INIT_MEMBER(cobra_state, cobra)
 	m_subcpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(cobra_state::sub_jvs_w), this));
 
 
-	m_comram[0] = auto_alloc_array(machine(), UINT32, 0x40000/4);
-	m_comram[1] = auto_alloc_array(machine(), UINT32, 0x40000/4);
+	m_comram[0] = std::make_unique<UINT32[]>(0x40000/4);
+	m_comram[1] = std::make_unique<UINT32[]>(0x40000/4);
 
 	m_comram_page = 0;
 
-	m_sound_dma_buffer_l = auto_alloc_array(machine(), INT16, DMA_SOUND_BUFFER_SIZE);
-	m_sound_dma_buffer_r = auto_alloc_array(machine(), INT16, DMA_SOUND_BUFFER_SIZE);
+	m_sound_dma_buffer_l = std::make_unique<INT16[]>(DMA_SOUND_BUFFER_SIZE);
+	m_sound_dma_buffer_r = std::make_unique<INT16[]>(DMA_SOUND_BUFFER_SIZE);
 
 	// setup fake pagetable until we figure out what really maps there...
 	//m_gfx_pagetable[0x80 / 8] = U64(0x800001001e0001a8);

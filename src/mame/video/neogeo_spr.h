@@ -51,7 +51,7 @@ public:
 	void set_screen(screen_device* screen);
 	void set_pens(const pen_t* pens);
 
-	UINT16     *m_videoram;
+	std::unique_ptr<UINT16[]>     m_videoram;
 	UINT16     *m_videoram_drawsource;
 
 	UINT16     m_vram_offset;
@@ -133,7 +133,7 @@ public:
 
 	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens) override;
 
-	UINT16* m_videoram_buffer;
+	std::unique_ptr<UINT16[]> m_videoram_buffer;
 	void buffer_vram();
 	virtual void draw_fixed_layer_2pixels(UINT32*&pixel_addr, int offset, UINT8* gfx_base, const pen_t* char_pens) override;
 	virtual void set_sprite_region(UINT8* region_sprites, UINT32 region_sprites_size) override;

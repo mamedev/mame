@@ -162,7 +162,7 @@ WRITE8_MEMBER( junior_state::junior_riot_a_w )
 
 	if ((idx >= 4 && idx < 10) & ( m_port_a != 0xff ))
 	{
-		output_set_digit_value( idx-4, m_port_a ^ 0x7f );
+		output().set_digit_value( idx-4, m_port_a ^ 0x7f );
 		m_led_time[idx - 4] = 10;
 	}
 }
@@ -176,7 +176,7 @@ WRITE8_MEMBER( junior_state::junior_riot_b_w )
 
 	if ((idx >= 4 && idx < 10) & ( m_port_a != 0xff ))
 	{
-		output_set_digit_value( idx-4, m_port_a ^ 0x7f );
+		output().set_digit_value( idx-4, m_port_a ^ 0x7f );
 		m_led_time[idx - 4] = 10;
 	}
 }
@@ -197,7 +197,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(junior_state::junior_update_leds)
 		if ( m_led_time[i] )
 			m_led_time[i]--;
 		else
-			output_set_digit_value( i, 0 );
+			output().set_digit_value( i, 0 );
 	}
 }
 

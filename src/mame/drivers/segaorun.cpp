@@ -407,20 +407,20 @@ WRITE8_MEMBER( segaorun_state::bankmotor_control_w )
 	if (data < 8)
 	{
 		// left
-		output_set_value("Bank_Motor_Direction", 1);
-		output_set_value("Bank_Motor_Speed", 8 - data);
+		output().set_value("Bank_Motor_Direction", 1);
+		output().set_value("Bank_Motor_Speed", 8 - data);
 	}
 	else if (data == 8)
 	{
 		// no movement
-		output_set_value("Bank_Motor_Direction", 0);
-		output_set_value("Bank_Motor_Speed", 0);
+		output().set_value("Bank_Motor_Direction", 0);
+		output().set_value("Bank_Motor_Speed", 0);
 	}
 	else
 	{
 		// right
-		output_set_value("Bank_Motor_Direction", 2);
-		output_set_value("Bank_Motor_Speed", data - 8);
+		output().set_value("Bank_Motor_Direction", 2);
+		output().set_value("Bank_Motor_Speed", data - 8);
 	}
 }
 
@@ -736,9 +736,9 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 				//  D1: Brake lamp
 				//  other bits: ?
 				machine().sound().system_enable(data & 0x80);
-				output_set_value("Vibration_motor", data >> 5 & 1);
-				output_set_value("Start_lamp", data >> 2 & 1);
-				output_set_value("Brake_lamp", data >> 1 & 1);
+				output().set_value("Vibration_motor", data >> 5 & 1);
+				output().set_value("Start_lamp", data >> 2 & 1);
+				output().set_value("Brake_lamp", data >> 1 & 1);
 			}
 			return;
 
@@ -815,8 +815,8 @@ WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
 				//  other bits: ?
 				m_adc_select = data >> 6 & 3;
 				m_segaic16vid->set_display_enable(data >> 5 & 1);
-				output_set_value("Vibration_motor", data >> 3 & 1);
-				output_set_value("Start_lamp", data >> 2 & 1);
+				output().set_value("Vibration_motor", data >> 3 & 1);
+				output().set_value("Start_lamp", data >> 2 & 1);
 			}
 			return;
 

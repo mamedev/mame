@@ -81,8 +81,8 @@ void k007342_device::device_start()
 	m_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k007342_device::get_tile_info0),this), tilemap_mapper_delegate(FUNC(k007342_device::scan),this), 8, 8, 64, 32);
 	m_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k007342_device::get_tile_info1),this), tilemap_mapper_delegate(FUNC(k007342_device::scan),this), 8, 8, 64, 32);
 
-	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
-	m_scroll_ram = auto_alloc_array_clear(machine(), UINT8, 0x0200);
+	m_ram = make_unique_clear<UINT8[]>(0x2000);
+	m_scroll_ram = make_unique_clear<UINT8[]>(0x0200);
 
 	m_colorram_0 = &m_ram[0x0000];
 	m_colorram_1 = &m_ram[0x1000];
@@ -92,8 +92,8 @@ void k007342_device::device_start()
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
 
-	save_pointer(NAME(m_ram), 0x2000);
-	save_pointer(NAME(m_scroll_ram), 0x0200);
+	save_pointer(NAME(m_ram.get()), 0x2000);
+	save_pointer(NAME(m_scroll_ram.get()), 0x0200);
 	save_item(NAME(m_int_enabled));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_scrollx));

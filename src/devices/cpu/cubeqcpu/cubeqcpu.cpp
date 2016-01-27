@@ -347,7 +347,7 @@ void cquestrot_cpu_device::device_reset()
 }
 
 
-void cquestrot_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void cquestrot_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -471,7 +471,7 @@ void cquestlin_cpu_device::device_reset()
 }
 
 
-void cquestlin_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void cquestlin_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

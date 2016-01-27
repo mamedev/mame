@@ -55,7 +55,7 @@ UINT32 segaybd_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			UINT16 *src = &sprites.pix(y);
 			UINT8 *pri = &screen.priority().pix(y);
 
-			
+
 
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
@@ -67,7 +67,7 @@ UINT32 segaybd_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 					// int colpri  = ((data[4] & 0xff) << 4) | (((data[1] >> 9) & 0xf) << 12);
 					// so  PPPPppppppppcccc (P = priority p = palette c = colour data)
 					// for Y board the (((data[1] >> 9) & 0xf) << 12) bit is the part we care about
-					
+
 					// the format of the screen.priority() buffer (populated in rotate_draw) is
 
 					//   ccc-----  Sprite color

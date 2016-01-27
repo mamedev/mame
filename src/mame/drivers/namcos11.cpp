@@ -381,10 +381,10 @@ WRITE16_MEMBER(namcos11_state::lightgun_w)
 	switch( offset )
 	{
 	case 0:
-		output_set_value( "led0", !( data & 0x08 ) );
-		output_set_value( "led1", !( data & 0x04 ) );
-		output_set_value( "recoil0", !( data & 0x02 ) );
-		output_set_value( "recoil1", !( data & 0x01 ) );
+		output().set_value( "led0", !( data & 0x08 ) );
+		output().set_value( "led1", !( data & 0x04 ) );
+		output().set_value( "recoil0", !( data & 0x02 ) );
+		output().set_value( "recoil1", !( data & 0x01 ) );
 
 		verboselog(1, "lightgun_w: outputs (%08x %08x)\n", data, mem_mask );
 		break;

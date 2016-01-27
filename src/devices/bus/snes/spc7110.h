@@ -50,7 +50,7 @@ private:
 	UINT32 m_decomp_mode;
 	UINT32 m_decomp_offset;
 
-	UINT8 *m_decomp_buffer;
+	std::unique_ptr<UINT8[]> m_decomp_buffer;
 	UINT32 m_decomp_buffer_rdoffset;
 	UINT32 m_decomp_buffer_wroffset;
 	UINT32 m_decomp_buffer_length;
@@ -130,7 +130,7 @@ public:
 	UINT8 m_r480b;        // decompression control register
 	UINT8 m_r480c;        // decompression status
 
-	SPC7110_Decomp* m_decomp;
+	std::unique_ptr<SPC7110_Decomp> m_decomp;
 
 	UINT8 m_r4811;        // data pointer low
 	UINT8 m_r4812;        // data pointer high

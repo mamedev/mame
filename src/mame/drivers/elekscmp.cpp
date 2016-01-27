@@ -55,7 +55,7 @@ protected:
 
 WRITE8_MEMBER(elekscmp_state::hex_display_w)
 {
-	output_set_digit_value(offset, data);
+	output().set_digit_value(offset, data);
 }
 
 UINT8 elekscmp_state::convert_key(UINT8 data)

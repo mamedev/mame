@@ -62,7 +62,7 @@ protected:
 	}
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
@@ -94,9 +94,6 @@ private:
 	UINT8   m_I1;        //!< Most recent instruction I(8:1)
 	UINT8   m_I2;       //!< Most recent parameter I2(8:1)
 	UINT8   m_Ip;       //!< Previous instruction I(8:1)
-
-	//! return the contents of B register (made of BU, BM and BL)
-	inline UINT16 B() const;
 
 	//! return memory at address B(12:1)
 	inline UINT8 M();

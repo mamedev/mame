@@ -57,8 +57,8 @@ protected:
 	lynx_sound_timer_delegate   m_timer_delegate;   // this calls lynx_timer_count_down from the driver state
 
 	float m_usec_per_sample;
-	int *m_shift_mask;
-	int *m_shift_xor;
+	std::unique_ptr<int[]> m_shift_mask;
+	std::unique_ptr<int[]> m_shift_xor;
 	UINT8 m_attenuation_enable;
 	UINT8 m_master_enable;
 	LYNX_AUDIO m_audio[4];

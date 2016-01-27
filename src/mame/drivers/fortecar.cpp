@@ -487,7 +487,7 @@ WRITE8_MEMBER(fortecar_state::ayporta_w)
 	int i;
 
 	for(i = 0; i < 8; i++)
-		output_set_lamp_value(i, (data >> i) & 1);
+		output().set_lamp_value(i, (data >> i) & 1);
 }
 
 

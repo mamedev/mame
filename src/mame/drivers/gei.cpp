@@ -189,24 +189,24 @@ UINT32 gei_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 WRITE8_MEMBER(gei_state::lamps_w)
 {
 	/* 5 button lamps */
-	set_led_status(machine(), 0,data & 0x01);
-	set_led_status(machine(), 1,data & 0x02);
-	set_led_status(machine(), 2,data & 0x04);
-	set_led_status(machine(), 3,data & 0x08);
-	set_led_status(machine(), 4,data & 0x10);
+	output().set_led_value(0,data & 0x01);
+	output().set_led_value(1,data & 0x02);
+	output().set_led_value(2,data & 0x04);
+	output().set_led_value(3,data & 0x08);
+	output().set_led_value(4,data & 0x10);
 
 	/* 3 button lamps for deal, cancel, stand in poker games;
 	lamp order verified in poker and selection self tests */
-	set_led_status(machine(), 7,data & 0x20);
-	set_led_status(machine(), 5,data & 0x40);
-	set_led_status(machine(), 6,data & 0x80);
+	output().set_led_value(7,data & 0x20);
+	output().set_led_value(5,data & 0x40);
+	output().set_led_value(6,data & 0x80);
 }
 
 WRITE8_MEMBER(gei_state::sound_w)
 {
 	/* bit 3 - coin lockout, lamp10 in poker / lamp6 in trivia test modes */
-	coin_lockout_global_w(machine(), ~data & 0x08);
-	set_led_status(machine(), 9,data & 0x08);
+	machine().bookkeeping().coin_lockout_global_w(~data & 0x08);
+	output().set_led_value(9,data & 0x08);
 
 	/* bit 5 - ticket out in trivia games */
 	if (m_ticket != nullptr)
@@ -222,15 +222,15 @@ WRITE8_MEMBER(gei_state::sound_w)
 WRITE8_MEMBER(gei_state::sound2_w)
 {
 	/* bit 3,6 - coin lockout, lamp10+11 in selection test mode */
-	coin_lockout_w(machine(), 0, ~data & 0x08);
-	coin_lockout_w(machine(), 1, ~data & 0x40);
-	set_led_status(machine(), 9,data & 0x08);
-	set_led_status(machine(), 10,data & 0x40);
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x08);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x40);
+	output().set_led_value(9,data & 0x08);
+	output().set_led_value(10,data & 0x40);
 
 	/* bit 4,5 - lamps 12, 13 in selection test mode;
 	12 lights up if dsw maximum bet = 30 an bet > 15 or if dsw maximum bet = 10 an bet = 10 */
-	set_led_status(machine(), 11,data & 0x10);
-	set_led_status(machine(), 12,data & 0x20);
+	output().set_led_value(11,data & 0x10);
+	output().set_led_value(12,data & 0x20);
 
 	/* bit 7 goes directly to the sound amplifier */
 	m_dac->write(((data & 0x80) >> 7) * 255);
@@ -239,13 +239,13 @@ WRITE8_MEMBER(gei_state::sound2_w)
 WRITE8_MEMBER(gei_state::lamps2_w)
 {
 	/* bit 4 - play/raise button lamp, lamp 9 in poker test mode  */
-	set_led_status(machine(), 8,data & 0x10);
+	output().set_led_value(8,data & 0x10);
 }
 
 WRITE8_MEMBER(gei_state::nmi_w)
 {
 	/* bit 4 - play/raise button lamp, lamp 9 in selection test mode  */
-	set_led_status(machine(), 8,data & 0x10);
+	output().set_led_value(8,data & 0x10);
 
 	/* bit 6 enables NMI */
 	m_nmi_mask = data & 0x40;

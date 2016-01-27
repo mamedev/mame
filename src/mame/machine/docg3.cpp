@@ -134,7 +134,7 @@ void diskonchip_g3_device::g3_write_data(UINT8 data)
 		{
 			const UINT8 xxx[] = { 0x00, 0x00, 0x27, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 			offset = g3_offset_data_2();
-			memcpy( m_data[1] + offset, xxx, 16);
+			memcpy( m_data[1].get() + offset, xxx, 16);
 		}
 		offset = g3_offset_data_1() + m_transfer_offset;
 		m_data[0][offset] = data;
@@ -470,9 +470,9 @@ void diskonchip_g3_device::g3_erase_block()
 		{
 			m_plane = j;
 			offset = g3_offset_data_1();
-			memset( m_data[0] + offset, 0xFF, (m_user_data_size + m_extra_area_size));
+			memset( m_data[0].get() + offset, 0xFF, (m_user_data_size + m_extra_area_size));
 			offset = g3_offset_data_2();
-			memcpy( m_data[1] + offset, xxx, 16);
+			memcpy( m_data[1].get() + offset, xxx, 16);
 		}
 	}
 }
@@ -777,12 +777,12 @@ void diskonchip_g3_device::device_start()
 
 	memset(m_sec_2, 0, sizeof(m_sec_2));
 
-	m_data[0] = auto_alloc_array( machine(), UINT8, m_data_size[0]);
-	memset(m_data[0], 0, sizeof(UINT8) * m_data_size[0]);
-	m_data[1] = auto_alloc_array( machine(), UINT8, m_data_size[1]);
-	memset(m_data[1], 0, sizeof(UINT8) * m_data_size[1]);
-	m_data[2] = auto_alloc_array( machine(), UINT8, m_data_size[2]);
-	memset(m_data[2], 0, sizeof(UINT8) * m_data_size[2]);
+	m_data[0] = std::make_unique<UINT8[]>(m_data_size[0]);
+	memset(m_data[0].get(), 0, sizeof(UINT8) * m_data_size[0]);
+	m_data[1] = std::make_unique<UINT8[]>(m_data_size[1]);
+	memset(m_data[1].get(), 0, sizeof(UINT8) * m_data_size[1]);
+	m_data[2] = std::make_unique<UINT8[]>(m_data_size[2]);
+	memset(m_data[2].get(), 0, sizeof(UINT8) * m_data_size[2]);
 
 //  diskonchip_load( device, "diskonchip");
 
@@ -791,9 +791,9 @@ void diskonchip_g3_device::device_start()
 	save_item( NAME(m_pages));
 	save_item( NAME(m_user_data_size));
 	save_item( NAME(m_extra_area_size));
-	save_pointer( NAME(m_data[0]), m_data_size[0]);
-	save_pointer( NAME(m_data[1]), m_data_size[1]);
-	save_pointer( NAME(m_data[2]), m_data_size[2]);
+	save_pointer( NAME(m_data[0].get()), m_data_size[0]);
+	save_pointer( NAME(m_data[1].get()), m_data_size[1]);
+	save_pointer( NAME(m_data[2].get()), m_data_size[2]);
 }
 
 //-------------------------------------------------
@@ -812,9 +812,9 @@ void diskonchip_g3_device::device_reset()
 
 void diskonchip_g3_device::nvram_default()
 {
-	memset(m_data[0], 0xFF, m_data_size[0]);
-	memset(m_data[1], 0x00, m_data_size[1]);
-	memset(m_data[2], 0xFF, m_data_size[2]);
+	memset(m_data[0].get(), 0xFF, m_data_size[0]);
+	memset(m_data[1].get(), 0x00, m_data_size[1]);
+	memset(m_data[2].get(), 0xFF, m_data_size[2]);
 }
 
 //-------------------------------------------------
@@ -824,9 +824,9 @@ void diskonchip_g3_device::nvram_default()
 
 void diskonchip_g3_device::nvram_read(emu_file &file)
 {
-	file.read(m_data[0], m_data_size[0]);
-	file.read(m_data[1], m_data_size[1]);
-	file.read(m_data[2], m_data_size[2]);
+	file.read(m_data[0].get(), m_data_size[0]);
+	file.read(m_data[1].get(), m_data_size[1]);
+	file.read(m_data[2].get(), m_data_size[2]);
 }
 
 //-------------------------------------------------
@@ -836,7 +836,7 @@ void diskonchip_g3_device::nvram_read(emu_file &file)
 
 void diskonchip_g3_device::nvram_write(emu_file &file)
 {
-	file.write(m_data[0], m_data_size[0]);
-	file.write(m_data[1], m_data_size[1]);
-	file.write(m_data[2], m_data_size[2]);
+	file.write(m_data[0].get(), m_data_size[0]);
+	file.write(m_data[1].get(), m_data_size[1]);
+	file.write(m_data[2].get(), m_data_size[2]);
 }

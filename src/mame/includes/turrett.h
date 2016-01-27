@@ -40,8 +40,6 @@ public:
 	DECLARE_WRITE32_MEMBER(video_w);
 	DECLARE_READ32_MEMBER(int_r);
 	DECLARE_WRITE32_MEMBER(int_w);
-	DECLARE_READ32_MEMBER(sound_r);
-	DECLARE_WRITE32_MEMBER(sound_w);
 	INPUT_CHANGED_MEMBER(ipt_change);
 	DECLARE_READ_LINE_MEMBER(sbrc2_r);
 	DECLARE_READ_LINE_MEMBER(sbrc3_r);
@@ -59,7 +57,7 @@ public:
 	// members
 	emu_timer *m_dma_timer;
 	UINT32  m_inputs_active;
-	UINT16  *m_video_ram[2];
+	std::unique_ptr<UINT16[]>  m_video_ram[2];
 	UINT16  m_last_pixel;
 	INT32   m_video_ctrl;
 	UINT16  m_video_fade;

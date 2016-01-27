@@ -371,6 +371,12 @@
 			scope = "config",
 		},
 
+		msgprecompile =
+		{
+			kind  = "string",
+			scope = "config",
+		},
+
 		msgcompile_objc =
 		{
 			kind  = "string",

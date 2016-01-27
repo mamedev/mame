@@ -52,9 +52,9 @@ WRITE16_MEMBER(mcatadv_state::mcatadv_videoram2_w)
 
 void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT16 *source = (m_spriteram_old + (m_spriteram.bytes() / 2) /2);
+	UINT16 *source = (m_spriteram_old.get() + (m_spriteram.bytes() / 2) /2);
 	source -= 4;
-	UINT16 *finish = m_spriteram_old;
+	UINT16 *finish = m_spriteram_old.get();
 	int global_x = m_vidregs[0] - 0x184;
 	int global_y = m_vidregs[1] - 0x1f1;
 
@@ -271,14 +271,14 @@ void mcatadv_state::video_start()
 	m_tilemap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mcatadv_state::get_mcatadv_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_tilemap2->set_transparent_pen(0);
 
-	m_spriteram_old = auto_alloc_array_clear(machine(), UINT16, m_spriteram.bytes() / 2);
-	m_vidregs_old = auto_alloc_array(machine(), UINT16, (0x0f + 1) / 2);
+	m_spriteram_old = make_unique_clear<UINT16[]>(m_spriteram.bytes() / 2);
+	m_vidregs_old = std::make_unique<UINT16[]>((0x0f + 1) / 2);
 
 	m_palette_bank1 = 0;
 	m_palette_bank2 = 0;
 
-	save_pointer(NAME(m_spriteram_old), m_spriteram.bytes() / 2);
-	save_pointer(NAME(m_vidregs_old), (0x0f + 1) / 2);
+	save_pointer(NAME(m_spriteram_old.get()), m_spriteram.bytes() / 2);
+	save_pointer(NAME(m_vidregs_old.get()), (0x0f + 1) / 2);
 }
 
 void mcatadv_state::screen_eof_mcatadv(screen_device &screen, bool state)
@@ -286,7 +286,7 @@ void mcatadv_state::screen_eof_mcatadv(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		memcpy(m_spriteram_old, m_spriteram, m_spriteram.bytes());
-		memcpy(m_vidregs_old, m_vidregs, 0xf);
+		memcpy(m_spriteram_old.get(), m_spriteram, m_spriteram.bytes());
+		memcpy(m_vidregs_old.get(), m_vidregs, 0xf);
 	}
 }

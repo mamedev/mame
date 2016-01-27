@@ -441,7 +441,7 @@ VIDEO_START_MEMBER(mpu4vid_state,mpu4_vid)
 	assert(m_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index+0, global_alloc(gfx_element(m_palette, mpu4_vid_char_8x8_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index+0, std::make_unique<gfx_element>(m_palette, mpu4_vid_char_8x8_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0));
 }
 
 
@@ -1215,9 +1215,6 @@ MACHINE_START_MEMBER(mpu4vid_state,mpu4_vid)
 	m_mod_number=4; //No AY chip
 	/* setup communications */
 	m_link7a_connected = 1;
-
-	/* setup 8 mechanical meters */
-	MechMtr_config(machine(),8);
 
 	/* Hook the reset line */
 	m_videocpu->set_reset_callback(write_line_delegate(FUNC(mpu4vid_state::mpu_video_reset),this));

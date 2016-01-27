@@ -170,7 +170,7 @@ void akiko_device::device_reset()
 	else
 	{
 		// MAME case
-		m_cdrom = cdrom_open(get_disk_handle(machine(), ":cdrom"));
+		m_cdrom = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
 		m_cdrom_is_device = 0;
 	}
 
@@ -187,10 +187,10 @@ void akiko_device::device_reset()
 
 		m_cdrom_numtracks = cdrom_get_last_track(m_cdrom)+3;
 
-		m_cdrom_toc = auto_alloc_array(machine(), UINT8, 13*m_cdrom_numtracks);
-		memset( m_cdrom_toc, 0, 13*m_cdrom_numtracks);
+		m_cdrom_toc = std::make_unique<UINT8[]>(13*m_cdrom_numtracks);
+		memset( m_cdrom_toc.get(), 0, 13*m_cdrom_numtracks);
 
-		p = m_cdrom_toc;
+		p = m_cdrom_toc.get();
 		p[1] = ((addrctrl & 0x0f) << 4) | ((addrctrl & 0xf0) >> 4);
 		p[3] = 0xa0; /* first track */
 		p[8] = 1;
@@ -471,7 +471,7 @@ TIMER_CALLBACK_MEMBER(akiko_device::dma_proc)
 	{
 		amiga_state *amiga = machine().driver_data<amiga_state>();
 		UINT32  track = cdrom_get_track( m_cdrom, m_cdrom_lba_cur );
-		UINT32  datasize = cdrom_get_toc( m_cdrom )->tracks[track].datasize;
+		UINT32  datasize;// = cdrom_get_toc(m_cdrom)->tracks[track].datasize;
 		UINT32  subsize = cdrom_get_toc( m_cdrom )->tracks[track].subsize;
 		int     i;
 

@@ -372,8 +372,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
 
 MACHINE_START_MEMBER(model2_state,model2)
 {
-	m_copro_fifoin_data = auto_alloc_array_clear(machine(), UINT32, COPRO_FIFOIN_SIZE);
-	m_copro_fifoout_data = auto_alloc_array_clear(machine(), UINT32, COPRO_FIFOOUT_SIZE);
+	m_copro_fifoin_data = make_unique_clear<UINT32[]>(COPRO_FIFOIN_SIZE);
+	m_copro_fifoout_data = make_unique_clear<UINT32[]>(COPRO_FIFOOUT_SIZE);
 }
 
 MACHINE_RESET_MEMBER(model2_state,model2_common)

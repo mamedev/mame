@@ -24,8 +24,8 @@ public:
 		m_msm(*this, "msm"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram_a;
-	UINT8 *  m_videoram_b;
+	std::unique_ptr<UINT8[]>  m_videoram_a;
+	std::unique_ptr<UINT8[]>  m_videoram_b;
 	required_shared_ptr<UINT8> m_color_select;
 	required_shared_ptr<UINT8> m_screen_flip;
 	required_shared_ptr<UINT8> m_screen_select;

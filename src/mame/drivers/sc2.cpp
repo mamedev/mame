@@ -22,9 +22,9 @@ class sc2_state : public driver_device
 public:
 	sc2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_beep(*this, "beeper")
-	,
-		m_maincpu(*this, "maincpu") { }
+		m_beep(*this, "beeper"),
+		m_maincpu(*this, "maincpu")
+	{ }
 
 	required_device<beep_device> m_beep;
 	DECLARE_READ8_MEMBER(pio_port_a_r);
@@ -120,29 +120,29 @@ void sc2_state::sc2_update_display()
 
 	if (!BIT(m_led_selected, 0))
 	{
-		output_set_digit_value(0, digit_data);
+		output().set_digit_value(0, digit_data);
 		m_led_7seg_data[0] = digit_data;
 
-		output_set_led_value(0, BIT(m_digit_data, 7));
+		output().set_led_value(0, BIT(m_digit_data, 7));
 	}
 
 	if (!BIT(m_led_selected, 1))
 	{
-		output_set_digit_value(1, digit_data);
+		output().set_digit_value(1, digit_data);
 		m_led_7seg_data[1] = digit_data;
 
-		output_set_led_value(1, BIT(m_digit_data, 7));
+		output().set_led_value(1, BIT(m_digit_data, 7));
 	}
 
 	if (!BIT(m_led_selected, 2))
 	{
-		output_set_digit_value(2, digit_data);
+		output().set_digit_value(2, digit_data);
 		m_led_7seg_data[2] = digit_data;
 	}
 
 	if (!BIT(m_led_selected, 3))
 	{
-		output_set_digit_value(3, digit_data);
+		output().set_digit_value(3, digit_data);
 		m_led_7seg_data[3] = digit_data;
 	}
 }
@@ -214,7 +214,7 @@ static MACHINE_CONFIG_START( sc2, sc2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
+	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.50 )
 MACHINE_CONFIG_END
 

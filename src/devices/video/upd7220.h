@@ -101,10 +101,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ext_sync_w );
 	DECLARE_WRITE_LINE_MEMBER( lpen_w );
 
-	DECLARE_WRITE8_MEMBER( bank_w );
-	DECLARE_READ8_MEMBER( vram_r );
-	DECLARE_WRITE8_MEMBER( vram_w );
-
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual const rom_entry *device_rom_region() const override;
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;

@@ -173,8 +173,8 @@ VIDEO_START_MEMBER(turbo_state,buckrog)
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(turbo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
 
 	/* allocate the bitmap RAM */
-	m_buckrog_bitmap_ram = auto_alloc_array(machine(), UINT8, 0xe000);
-	save_pointer(NAME(m_buckrog_bitmap_ram), 0xe000);
+	m_buckrog_bitmap_ram = std::make_unique<UINT8[]>(0xe000);
+	save_pointer(NAME(m_buckrog_bitmap_ram.get()), 0xe000);
 }
 
 

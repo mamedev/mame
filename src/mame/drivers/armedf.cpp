@@ -319,13 +319,13 @@ Notes:
 WRITE16_MEMBER(armedf_state::terraf_io_w)
 {
 	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
-		m_nb1414m4->exec((m_text_videoram[0] << 8) | (m_text_videoram[1] & 0xff),m_text_videoram,m_fg_scrollx,m_fg_scrolly,m_tx_tilemap);
+		m_nb1414m4->exec((m_text_videoram[0] << 8) | (m_text_videoram[1] & 0xff),m_text_videoram.get(),m_fg_scrollx,m_fg_scrolly,m_tx_tilemap);
 
 
 	COMBINE_DATA(&m_vreg);
 
-	coin_counter_w(machine(), 0, (data & 1) >> 0);
-	coin_counter_w(machine(), 1, (data & 2) >> 1);
+	machine().bookkeeping().coin_counter_w(0, (data & 1) >> 0);
+	machine().bookkeeping().coin_counter_w(1, (data & 2) >> 1);
 
 	flip_screen_set(m_vreg & 0x1000);
 }
@@ -337,8 +337,8 @@ WRITE16_MEMBER(armedf_state::terrafjb_io_w)
 
 	COMBINE_DATA(&m_vreg);
 
-	coin_counter_w(machine(), 0, (data & 1) >> 0);
-	coin_counter_w(machine(), 1, (data & 2) >> 1);
+	machine().bookkeeping().coin_counter_w(0, (data & 1) >> 0);
+	machine().bookkeeping().coin_counter_w(1, (data & 2) >> 1);
 
 	flip_screen_set(m_vreg & 0x1000);
 }
@@ -352,8 +352,8 @@ WRITE16_MEMBER(armedf_state::bootleg_io_w)
 
 	COMBINE_DATA(&m_vreg);
 
-	coin_counter_w(machine(), 0, (data & 1) >> 0);
-	coin_counter_w(machine(), 1, (data & 2) >> 1);
+	machine().bookkeeping().coin_counter_w(0, (data & 1) >> 0);
+	machine().bookkeeping().coin_counter_w(1, (data & 2) >> 1);
 
 	flip_screen_set(m_vreg & 0x1000);
 }
@@ -1263,6 +1263,10 @@ static MACHINE_CONFIG_START( terrafjb, armedf_state )
 
 	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( terrafb, terraf )
+	MCFG_DEVICE_REMOVE("nb1414m4")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( kozure, armedf_state )
@@ -2190,7 +2194,7 @@ GAME( 1987, terraf,   0,        terraf,   terraf,   armedf_state,   terrafu,  RO
 GAME( 1987, terrafu,  terraf,   terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu USA",                "Terra Force (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, terrafj,  terraf,   terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu Japan",              "Terra Force (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, terrafjb, terraf,   terrafjb, terraf,   armedf_state,   terrafjb, ROT0,   "bootleg",                       "Terra Force (Japan, bootleg with additional Z80)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, terrafb,  terraf,   terraf,   terraf,   armedf_state,   terraf,   ROT0,   "bootleg",                       "Terra Force (Japan, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terrafb,  terraf,   terrafb,  terraf,   armedf_state,   terraf,   ROT0,   "bootleg",                       "Terra Force (Japan, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, kozure,   0,        kozure,   kozure,   armedf_state,   kozure,   ROT0,   "Nichibutsu",                    "Kozure Ookami (Japan)", MACHINE_SUPPORTS_SAVE )
 

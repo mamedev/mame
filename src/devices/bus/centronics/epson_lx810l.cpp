@@ -192,7 +192,7 @@ static INPUT_PORTS_START( epson_lx810l )
 
 	/* Buttons on printer */
 	PORT_START("ONLINE")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_O) PORT_CHANGED_MEMBER(DEVICE_SELF, epson_lx810l_t, online_sw, NULL)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_O) PORT_CHANGED_MEMBER(DEVICE_SELF, epson_lx810l_t, online_sw, nullptr)
 	PORT_START("FORMFEED")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Form Feed") PORT_CODE(KEYCODE_F) PORT_TOGGLE
 	PORT_START("LINEFEED")
@@ -502,7 +502,7 @@ WRITE8_MEMBER( epson_lx810l_t::portc_w )
 	m_eeprom->clk_write(m_93c06_clk ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->cs_write (m_93c06_cs  ? ASSERT_LINE : CLEAR_LINE);
 
-	output_set_value("online_led", !BIT(data, 2));
+	machine().output().set_value("online_led", !BIT(data, 2));
 }
 
 

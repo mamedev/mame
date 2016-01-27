@@ -57,9 +57,9 @@ void gf4500_device::device_config_complete()
 
 void gf4500_device::device_start()
 {
-	m_data = auto_alloc_array_clear(machine(), UINT32, 0x140000/4);
+	m_data = make_unique_clear<UINT32[]>(0x140000/4);
 
-	save_pointer(NAME(m_data), 0x140000/4);
+	save_pointer(NAME(m_data.get()), 0x140000/4);
 	save_item(NAME(m_screen_x));
 	save_item(NAME(m_screen_y));
 	save_item(NAME(m_screen_x_max));
@@ -83,7 +83,7 @@ void gf4500_device::vram_write16( UINT16 data )
 {
 	if ((m_screen_x < m_screen_x_max) && (m_screen_y < m_screen_y_max))
 	{
-		UINT16 *vram = (UINT16 *)((UINT8 *)m_data + GF4500_FRAMEBUF_OFFSET + (((m_screen_y_min + m_screen_y) * (320 + 1)) + (m_screen_x_min + m_screen_x)) * 2);
+		UINT16 *vram = (UINT16 *)((UINT8 *)m_data.get() + GF4500_FRAMEBUF_OFFSET + (((m_screen_y_min + m_screen_y) * (320 + 1)) + (m_screen_x_min + m_screen_x)) * 2);
 		*vram = data;
 		m_screen_x++;
 	}
@@ -100,7 +100,7 @@ static rgb_t gf4500_get_color_16( UINT16 data )
 
 UINT32 gf4500_device::screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *vram = (UINT16 *)(m_data + GF4500_FRAMEBUF_OFFSET / 4);
+	UINT16 *vram = (UINT16 *)(m_data.get() + GF4500_FRAMEBUF_OFFSET / 4);
 	int x, y;
 	for (y = 0; y < 240; y++)
 	{

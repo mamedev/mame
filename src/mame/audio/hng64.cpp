@@ -92,7 +92,7 @@ WRITE32_MEMBER(hng64_state::hng64_soundram_w)
 			fp=fopen(filename, "w+b");
 			if (fp)
 			{
-				fwrite((UINT8*)m_soundram, 0x80000*4, 1, fp);
+				fwrite((UINT8*)m_soundram.get(), 0x80000*4, 1, fp);
 				fclose(fp);
 			}
 		}
@@ -145,7 +145,7 @@ WRITE32_MEMBER( hng64_state::hng64_soundcpu_enable_w )
 
 void hng64_state::reset_sound()
 {
-	UINT8 *RAM = (UINT8*)m_soundram;
+	UINT8 *RAM = (UINT8*)m_soundram.get();
 	membank("bank0")->set_base(&RAM[0x1f0000]);
 	membank("bank1")->set_base(&RAM[0x1f0000]);
 	membank("bank2")->set_base(&RAM[0x1f0000]);
@@ -222,7 +222,7 @@ WRITE16_MEMBER(hng64_state::hng64_sound_bank_w)
 
 	// the 2 early games don't do this.. maybe all banks actuallly default to that region tho?
 	// the sound code on those games seems buggier anyway.
-	UINT8 *RAM = (UINT8*)m_soundram;
+	UINT8 *RAM = (UINT8*)m_soundram.get();
 
 	int bank = data & 0x1f;
 

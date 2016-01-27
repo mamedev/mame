@@ -100,7 +100,6 @@ protected:
 
 private:
 	void make_mixer_table(int voices, int gain);
-	void show_soundregs();
 
 	// internal state
 	emu_timer *m_effect_timer;
@@ -115,9 +114,9 @@ private:
 	sound_stream * m_stream;
 
 	/* mixer tables and internal buffers */
-	INT16 *m_mixer_table;
+	std::unique_ptr<INT16[]> m_mixer_table;
 	INT16 *m_mixer_lookup;
-	short *m_mixer_buffer;
+	std::unique_ptr<short[]> m_mixer_buffer;
 
 	UINT8 m_soundregs1[0x40];
 	UINT8 m_soundregs2[0x40];

@@ -23,8 +23,8 @@
 
 WRITE8_MEMBER(crimfght_state::crimfght_coin_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
 READ8_MEMBER(crimfght_state::k052109_051960_r)
@@ -175,7 +175,7 @@ static INPUT_PORTS_START( crimfght )
 	PORT_DIPUNUSED_DIPLOC(0x02, IP_ACTIVE_LOW, "SW3:2")
 	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW3:3")
 	PORT_DIPUNUSED_DIPLOC(0x08, IP_ACTIVE_LOW, "SW3:4")
-	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, crimfght_state, system_r, 0)
+	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, crimfght_state, system_r, NULL)
 
 	PORT_START("P1")
 	KONAMI8_B12_UNK(1)

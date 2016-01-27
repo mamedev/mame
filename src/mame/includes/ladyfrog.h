@@ -23,7 +23,7 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
-	UINT8 *    m_spriteram;
+	std::unique_ptr<UINT8[]>    m_spriteram;
 	required_shared_ptr<UINT8> m_scrlram;
 	std::vector<UINT8> m_paletteram;
 	std::vector<UINT8> m_paletteram_ext;
@@ -57,7 +57,6 @@ public:
 	DECLARE_READ8_MEMBER(ladyfrog_palette_r);
 	DECLARE_WRITE8_MEMBER(ladyfrog_gfxctrl_w);
 	DECLARE_WRITE8_MEMBER(ladyfrog_gfxctrl2_w);
-	DECLARE_READ8_MEMBER(ladyfrog_gfxctrl_r);
 	DECLARE_READ8_MEMBER(ladyfrog_scrlram_r);
 	DECLARE_WRITE8_MEMBER(ladyfrog_scrlram_w);
 	DECLARE_WRITE8_MEMBER(unk_w);

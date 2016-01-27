@@ -44,6 +44,7 @@ const UINT32 MACHINE_TYPE_COMPUTER             = 0x00100000;   // any kind of co
 const UINT32 MACHINE_TYPE_OTHER                = 0x00200000;   // any other emulated system that doesn't fit above (ex. clock, satelite receiver,...)
 const UINT32 MACHINE_IMPERFECT_KEYBOARD        = 0x00400000;   // keyboard is known to be wrong
 const UINT32 MACHINE_CLICKABLE_ARTWORK         = 0x00800000;   // marking that artwork is clickable and require mouse cursor
+const UINT32 MACHINE_IS_INCOMPLETE             = 0x01000000;   // any official game/system with blantantly incomplete HW or SW should be marked with this
 
 // useful combinations of flags
 const UINT32 MACHINE_IS_SKELETON               = MACHINE_NO_SOUND | MACHINE_NOT_WORKING; // mask for skelly games

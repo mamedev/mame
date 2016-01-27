@@ -118,7 +118,7 @@ public:
 	UINT32 m_star_rng_origin;
 	UINT32 m_star_rng_origin_frame;
 	rgb_t m_star_color[64];
-	UINT8 *m_stars;
+	std::unique_ptr<UINT8[]> m_stars;
 	UINT8 m_stars_enabled;
 	UINT8 m_stars_blink_state;
 	rgb_t m_bullet_color[8];
@@ -285,8 +285,6 @@ public:
 	void turtles_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void frogger_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void quaak_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	int flip_and_clip(rectangle &draw, int xstart, int xend, const rectangle &cliprect);
-	void amidar_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void galaxian_draw_pixel(bitmap_rgb32 &bitmap, const rectangle &cliprect, int y, int x, rgb_t color);
 	void galaxian_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 	void mshuttle_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);

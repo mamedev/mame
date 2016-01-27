@@ -282,7 +282,7 @@ void wangpc_tig_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, U
 
 UINT8 wangpc_tig_device::wangpcbus_dack_r(address_space &space, int line)
 {
-	UINT8 data = 0;
+	UINT8 data;
 
 	if (DMA_GRAPHICS)
 	{

@@ -411,7 +411,7 @@ protected:
 	UINT32 emit_mc6847_samples(UINT8 mode, const UINT8 *data, int length, pixel_t *RESTRICT pixels, const pixel_t *RESTRICT palette,
 		mc6847_get_char_rom_delegate get_char_rom, int x, int y)
 	{
-		UINT32 result = 0;
+		UINT32 result;
 		if (mode & MODE_AG)
 		{
 			/* graphics */
@@ -447,12 +447,12 @@ protected:
 					break;
 			}
 		}
-		else if (!get_char_rom.isnull() && ((mode & (MODE_AG|MODE_AS|MODE_INTEXT)) == MODE_INTEXT))
+		else if (!m_charrom_cb.isnull() && ((mode & (MODE_AG|MODE_AS|MODE_INTEXT)) == MODE_INTEXT))
 		{
 			/* external ROM */
 			for (int i = 0; i < length; i++)
 			{
-				UINT8 byte = get_char_rom(data[i], y % 12) ^ (mode & MODE_INV ? 0xFF : 0x00);
+				UINT8 byte = m_charrom_cb(data[i], y % 12) ^ (mode & MODE_INV ? 0xFF : 0x00);
 				emit_extbytes<1, xscale>(&byte, 1, &pixels[i * 8], (mode & MODE_CSS) ? 14 : 12, palette);
 			}
 			result = length * 8 * xscale;
@@ -622,9 +622,6 @@ private:
 	// runtime functions
 	void record_body_scanline(UINT16 physical_scanline, UINT16 scanline, INT32 start_pos, INT32 end_pos);
 	pixel_t border_value(UINT8 mode, const pixel_t *palette, bool is_mc6847t1);
-
-	template<int xscale>
-	void emit_samples(UINT8 mode, const UINT8 *data, int length, pixel_t *pixels, int x, int y);
 
 	// template function for doing video update collection
 	template<int sample_count, int yres>

@@ -258,7 +258,7 @@ void metro_state::expand_gfx1()
 	UINT8 *base_gfx =   memregion("gfx1")->base();
 	UINT32 length   =   memregion("gfx1")->bytes() * 2;
 
-	m_expanded_gfx1 = auto_alloc_array(machine(), UINT8, length);
+	m_expanded_gfx1 = std::make_unique<UINT8[]>(length);
 
 	for (int i = 0; i < length; i += 2)
 	{
@@ -401,7 +401,7 @@ VIDEO_START_MEMBER(metro_state,gstrik2)
 
 void metro_state::metro_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *base_gfx4 = m_expanded_gfx1;
+	UINT8 *base_gfx4 = m_expanded_gfx1.get();
 	UINT8 *base_gfx8 = memregion("gfx1")->base();
 	UINT32 gfx_size = memregion("gfx1")->bytes();
 

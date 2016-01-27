@@ -66,10 +66,10 @@ void naomi_m4_board::device_start()
 	subkey1 = (key_data[0x5e2] << 8) | key_data[0x5e0];
 	subkey2 = (key_data[0x5e6] << 8) | key_data[0x5e4];
 
-	buffer = auto_alloc_array(machine(), UINT8, BUFFER_SIZE);
+	buffer = std::make_unique<UINT8[]>(BUFFER_SIZE);
 	enc_init();
 
-	save_pointer(NAME(buffer), BUFFER_SIZE);
+	save_pointer(NAME(buffer.get()), BUFFER_SIZE);
 	save_item(NAME(rom_cur_address));
 	save_item(NAME(buffer_actual_size));
 	save_item(NAME(encryption));
@@ -79,7 +79,7 @@ void naomi_m4_board::device_start()
 
 void naomi_m4_board::enc_init()
 {
-	one_round = auto_alloc_array(machine(), UINT16, 0x10000);
+	one_round = std::make_unique<UINT16[]>(0x10000);
 
 	for(int round_input = 0; round_input < 0x10000; round_input++) {
 		UINT8 input_nibble[4];
@@ -148,7 +148,7 @@ void naomi_m4_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
 	}
 
 	if(encryption) {
-		base = buffer;
+		base = buffer.get();
 		limit = BUFFER_SIZE;
 
 	} else {
@@ -168,7 +168,7 @@ void naomi_m4_board::board_advance(UINT32 size)
 {
 	if(encryption) {
 		if(size < buffer_actual_size) {
-			memmove(buffer, buffer + size, buffer_actual_size - size);
+			memmove(buffer.get(), buffer.get() + size, buffer_actual_size - size);
 			buffer_actual_size -= size;
 		} else
 			buffer_actual_size = 0;

@@ -138,9 +138,9 @@ WRITE8_MEMBER(toratora_state::clear_tv_w)
 WRITE8_MEMBER(toratora_state::port_b_u1_w)
 {
 	if (m_pia_u1->port_b_z_mask() & 0x20)
-		coin_counter_w(machine(), 0, 1);
+		machine().bookkeeping().coin_counter_w(0, 1);
 	else
-		coin_counter_w(machine(), 0, data & 0x20);
+		machine().bookkeeping().coin_counter_w(0, data & 0x20);
 }
 
 

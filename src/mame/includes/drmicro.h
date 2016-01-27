@@ -18,7 +18,7 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	UINT8 *        m_videoram;
+	std::unique_ptr<UINT8[]>       m_videoram;
 
 	/* video-related */
 	tilemap_t        *m_bg1;

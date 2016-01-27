@@ -97,7 +97,7 @@ WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_5_w ) { if (state) m_led_update
 
 TIMER_CALLBACK_MEMBER( sym1_state::led_refresh )
 {
-	output_set_digit_value(param, m_riot_port_a);
+	output().set_digit_value(param, m_riot_port_a);
 }
 
 READ8_MEMBER( sym1_state::sym1_riot_a_r )

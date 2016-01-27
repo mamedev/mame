@@ -314,8 +314,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( taito_state::timer_a )
 	m_out_offs &= 15;
 
 	UINT8 digit = m_out_offs << 1;
-	output_set_digit_value(digit, patterns[m_p_ram[m_out_offs]>>4]);
-	output_set_digit_value(++digit, patterns[m_p_ram[m_out_offs++]&15]);
+	output().set_digit_value(digit, patterns[m_p_ram[m_out_offs]>>4]);
+	output().set_digit_value(++digit, patterns[m_p_ram[m_out_offs++]&15]);
 }
 
 static MACHINE_CONFIG_START( taito, taito_state )

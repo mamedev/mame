@@ -302,12 +302,12 @@ WRITE8_MEMBER(superwng_state::superwng_flip_screen_w)
 
 WRITE8_MEMBER(superwng_state::superwng_cointcnt1_w)
 {
-	coin_counter_w(machine(), 0, data);
+	machine().bookkeeping().coin_counter_w(0, data);
 }
 
 WRITE8_MEMBER(superwng_state::superwng_cointcnt2_w)
 {
-	coin_counter_w(machine(), 1, data);
+	machine().bookkeeping().coin_counter_w(1, data);
 }
 
 WRITE8_MEMBER(superwng_state::superwng_hopper_w)

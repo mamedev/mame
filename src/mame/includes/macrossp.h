@@ -52,8 +52,8 @@ public:
 	required_shared_ptr<UINT32> m_text_linezoom;
 	required_shared_ptr<UINT32> m_text_videoregs;
 	required_shared_ptr<UINT32> m_mainram;
-	UINT32 *         m_spriteram_old;
-	UINT32 *         m_spriteram_old2;
+	std::unique_ptr<UINT32[]>         m_spriteram_old;
+	std::unique_ptr<UINT32[]>         m_spriteram_old2;
 
 	/* video-related */
 	tilemap_t  *m_scra_tilemap;
@@ -77,7 +77,6 @@ public:
 	DECLARE_READ16_MEMBER(macrossp_soundcmd_r);
 	DECLARE_WRITE16_MEMBER(palette_fade_w);
 	DECLARE_WRITE32_MEMBER(macrossp_speedup_w);
-	DECLARE_WRITE32_MEMBER(quizmoon_speedup_w);
 	DECLARE_WRITE32_MEMBER(macrossp_scra_videoram_w);
 	DECLARE_WRITE32_MEMBER(macrossp_scrb_videoram_w);
 	DECLARE_WRITE32_MEMBER(macrossp_scrc_videoram_w);

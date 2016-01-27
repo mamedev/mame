@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo, Stefan Jokisch
 /*
  *  The schematics don't seem to make a lot of sense when it
@@ -68,7 +68,7 @@ public:
 	int m_starfield_kill;
 	int m_mux;
 	int m_inverse;
-	UINT16 *m_LSFR;
+	std::unique_ptr<UINT16[]> m_LSFR;
 	bitmap_ind16 m_helper;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(starshp1_collision_reset_w);

@@ -280,7 +280,7 @@ void mips3_device::code_flush_cache()
 
 void mips3_device::code_compile_block(UINT8 mode, offs_t pc)
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	compiler_state compiler = { 0 };
 	const opcode_desc *seqhead, *seqlast;
 	const opcode_desc *desclist;
@@ -553,7 +553,7 @@ static void cfunc_unimplemented(void *param)
 
 void mips3_device::static_generate_entry_point()
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	code_label skip = 1;
 	drcuml_block *block;
 
@@ -601,7 +601,7 @@ void mips3_device::static_generate_entry_point()
 
 void mips3_device::static_generate_nocode_handler()
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	drcuml_block *block;
 
 	/* begin generating */
@@ -626,7 +626,7 @@ void mips3_device::static_generate_nocode_handler()
 
 void mips3_device::static_generate_out_of_cycles()
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	drcuml_block *block;
 
 	/* begin generating */
@@ -651,7 +651,7 @@ void mips3_device::static_generate_out_of_cycles()
 
 void mips3_device::static_generate_tlb_mismatch()
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	drcuml_block *block;
 
 	/* forward references */
@@ -702,7 +702,7 @@ void mips3_device::static_generate_tlb_mismatch()
 void mips3_device::static_generate_exception(UINT8 exception, int recover, const char *name)
 {
 	code_handle *&exception_handle = recover ? m_exception[exception] : m_exception_norecover[exception];
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	UINT32 offset = 0x180;
 	code_label next = 1;
 	code_label skip = 2;
@@ -805,7 +805,7 @@ void mips3_device::static_generate_memory_accessor(int mode, int size, int iswri
 	code_handle &exception_tlb = *m_exception[iswrite ? EXCEPTION_TLBSTORE : EXCEPTION_TLBLOAD];
 	code_handle &exception_tlbfill = *m_exception[iswrite ? EXCEPTION_TLBSTORE_FILL : EXCEPTION_TLBLOAD_FILL];
 	code_handle &exception_addrerr = *m_exception[iswrite ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD];
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	drcuml_block *block;
 	int tlbmiss = 0;
 	int label = 1;

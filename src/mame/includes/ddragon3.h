@@ -103,7 +103,6 @@ public:
 
 	//required_device<buffered_spriteram16_device> m_spriteram;
 	DECLARE_WRITE8_MEMBER(wwfwfest_priority_w);
-	DECLARE_WRITE16_MEMBER(wwfwfest_scroll_write);
 	DECLARE_WRITE16_MEMBER(wwfwfest_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(wwfwfest_flipscreen_w);
 	DECLARE_READ16_MEMBER(wwfwfest_paletteram_r);

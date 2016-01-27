@@ -284,8 +284,8 @@ private:
 	void read_track_data();
 	static void *read_async_static(void *param, int threadid);
 	void process_track_data();
-	void config_load(int config_type, xml_data_node *parentnode);
-	void config_save(int config_type, xml_data_node *parentnode);
+	void config_load(config_type cfg_type, xml_data_node *parentnode);
+	void config_save(config_type cfg_type, xml_data_node *parentnode);
 
 	// configuration
 	laserdisc_get_disc_delegate m_getdisc_callback;

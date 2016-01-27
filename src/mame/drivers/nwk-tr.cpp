@@ -304,8 +304,8 @@ public:
 	int m_fpga_uploaded;
 	int m_lanc2_ram_r;
 	int m_lanc2_ram_w;
-	UINT8 *m_lanc2_ram;
-	UINT32 *m_sharc_dataram;
+	std::unique_ptr<UINT8[]> m_lanc2_ram;
+	std::unique_ptr<UINT32[]> m_sharc_dataram;
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
 	DECLARE_READ32_MEMBER(sysreg_r);
 	DECLARE_WRITE32_MEMBER(sysreg_w);
@@ -443,7 +443,7 @@ void nwktr_state::lanc2_init()
 	m_fpga_uploaded = 0;
 	m_lanc2_ram_r = 0;
 	m_lanc2_ram_w = 0;
-	m_lanc2_ram = auto_alloc_array(machine(), UINT8, 0x8000);
+	m_lanc2_ram = std::make_unique<UINT8[]>(0x8000);
 }
 
 READ32_MEMBER(nwktr_state::lanc1_r)
@@ -841,7 +841,7 @@ DRIVER_INIT_MEMBER(nwktr_state, nwktr)
 {
 	machine().device<konppc_device>("konppc")->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
 
-	m_sharc_dataram = auto_alloc_array(machine(), UINT32, 0x100000/4);
+	m_sharc_dataram = std::make_unique<UINT32[]>(0x100000/4);
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
 	lanc2_init();

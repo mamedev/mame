@@ -15,7 +15,7 @@
     World Rally 2  | 1995 | GAE1 506  | 950510-1 | DS5002FP
     Touch & Go     | 1995 | GAE1 501  | 950906   | DS5002FP
     Touch & Go     | 1995 | GAE1 501  | 950510-1 | DS5002FP
-    Maniac Square  | 1996 | Unknown   | ???      | DS5002FP, but unprotected version available
+    Maniac Square  | 1996 | GAE1 501  | 940411   | DS5002FP, but unprotected version available
     Snow Board     | 1996 | CG-1V 366 | 960419/1 | Lattice IspLSI 1016-80LJ
     Bang!          | 1998 | CG-1V 388 | 980921/1 | No
 
@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x30004a, 0x30004b) AM_WRITENOP                                                                /* Sound muting? */
 	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("COIN")                                                       /* COINSW + SERVICESW */
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(gaelco2_coin_w)                                                   /* Coin lockout + counters */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM                                                                     /* Work RAM */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                                /* Work RAM */
 ADDRESS_MAP_END
 
 
@@ -196,6 +196,25 @@ ROM_START( maniacsq )
 	ROM_LOAD( "d24-d31.1m", 0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    /* GFX only */
 	ROM_FILL(               0x01a0000, 0x0060000, 0x00 )         /* Empty */
 	ROM_FILL(               0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
+ROM_END
+
+ROM_START( maniacsqa ) // REF 940411
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "MS_U_45.U45",   0x000000, 0x020000, CRC(98f4fdc0) SHA1(1e4d5b0a8a432de885c96319c21280d304b38db0) )
+	ROM_LOAD16_BYTE( "MS_U_44.U44",   0x000001, 0x020000, CRC(1785dd41) SHA1(5c6a65c00248971ce54c8185858393f2c52cc583) )
+
+	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_LOAD( "ms_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+
+	ROM_REGION( 0x0280000, "gfx1", 0 ) /* GFX + Sound */
+	// all 4 roms on a sub-board, no IC positions marked
+	ROM_LOAD( "MS1",   0x0000000, 0x0080000, CRC(d8551b2f) SHA1(78b5b07112bd89fed18055180e7cc64f8e0bd0b1) )    /* GFX + Sound */
+	ROM_LOAD( "MS2",   0x0080000, 0x0080000, CRC(b269c427) SHA1(b7f9501529fbb7ee82700cff82740ba5770cf3c5) )    /* GFX + Sound */
+	ROM_LOAD( "MS3",   0x0100000, 0x0020000, CRC(af4ea5e7) SHA1(ffaf09dc2588e32c124e7dd2f86ba009f1b8b176) )    /* GFX only */
+	ROM_FILL(          0x0120000, 0x0060000, 0x00 )         /* Empty */
+	ROM_LOAD( "MS4",   0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    /* GFX only */
+	ROM_FILL(          0x01a0000, 0x0060000, 0x00 )         /* Empty */
+	ROM_FILL(          0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
 ROM_END
 
 
@@ -577,6 +596,9 @@ ROM_START( aligator )
 	ROM_LOAD16_BYTE(    "u45",  0x000000, 0x080000, CRC(61c47c56) SHA1(6dd3fc6fdab252e0fb43c0793eef70203c888d7f) )
 	ROM_LOAD16_BYTE(    "u44",  0x000001, 0x080000, CRC(f0be007a) SHA1(2112b2e5f020028b50c8f2c72c83c9fee7a78224) )
 
+	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_LOAD( "aligator_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+
 	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
 	ROM_FILL(               0x1000000, 0x0400000, 0x00 )     /* to decode GFX as 5 bpp */
@@ -831,6 +853,9 @@ ROM_START( touchgo ) /* REF: 950906 */
 	ROM_LOAD16_BYTE( "tg_56", 0x000000, 0x080000, CRC(8ab065f3) SHA1(7664abd7e5f66ffca4a2865bba56ac36bd04f4e9) )
 	ROM_LOAD16_BYTE( "tg_57", 0x000001, 0x080000, CRC(0dfd3f65) SHA1(afb2ce8988c84f211ac71b84928ce4c421de7fee) )
 
+	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_LOAD( "touchgo_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+
 	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
 	ROM_LOAD( "ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
@@ -847,6 +872,9 @@ ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America
 	ROM_LOAD16_BYTE( "tg56.bin", 0x000000, 0x080000, CRC(fd3b4642) SHA1(3cab42aecad5ee641711763c6047b56784c2bcf3) )
 	ROM_LOAD16_BYTE( "tg57.bin", 0x000001, 0x080000, CRC(ee891835) SHA1(9f8c60e5e3696b70f756c3521e10313005053cc7) )
 
+	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_LOAD( "touchgo_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+
 	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
 	ROM_LOAD( "ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
@@ -862,6 +890,9 @@ ROM_START( touchgoe ) /* REF: 950510-1 */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "tg56", 0x000000, 0x080000, CRC(6d0f5c65) SHA1(00db7a7da3ec1676169aa78fe4f08a7746c3accf) )
 	ROM_LOAD16_BYTE( "tg57", 0x000001, 0x080000, CRC(845787b5) SHA1(27c9910cd9f38328326ecb5cd093dfeb6d4f6244) )
+
+	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_LOAD( "touchgo_ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
@@ -1015,6 +1046,9 @@ ROM_START( snowboara )
 	ROM_LOAD( "sb44",       0x0000000, 0x0400000, CRC(1bbe88bc) SHA1(15bce9ada2b742ba4d537fa8efc0f29f661bff00) )    /* GFX only */
 	ROM_LOAD( "sb45",       0x0400000, 0x0400000, CRC(373983d9) SHA1(05e35a8b27cab469885f0ec2a5df200a366b50a1) )    /* Sound only */
 	ROM_LOAD( "sb46",       0x0800000, 0x0400000, CRC(22e7c648) SHA1(baddb9bc13accd83bea61533d7286cf61cd89279) )    /* GFX only */
+
+	DISK_REGION( "decrypt" )
+	DISK_IMAGE( "snowboar", 0, SHA1(fecf611bd9289d24a0b1cabaaf030e2cee322cfa) )
 ROM_END
 
 ROM_START( snowboar )
@@ -1052,6 +1086,9 @@ ROM_START( snowboar )
 	ROM_LOAD( "sb.e2",      0x1100000, 0x0080000, CRC(f5948c6c) SHA1(91bba817ced194b02885ce84b7a8132ef5ca631a) )    /* GFX only */
 	ROM_LOAD( "sb.e3",      0x1180000, 0x0080000, CRC(4baa678f) SHA1(a7fbbd687e2d8d7e96207c8ace0799a3cc9c3272) )    /* GFX only */
 	ROM_FILL(               0x1200000, 0x0200000, 0x00 )         /* Empty */
+
+	DISK_REGION( "decrypt" )
+	DISK_IMAGE( "snowboar", 0, SHA1(fecf611bd9289d24a0b1cabaaf030e2cee322cfa) )
 ROM_END
 
 
@@ -1144,7 +1181,7 @@ static INPUT_PORTS_START( wrally2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Acc.")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Gear") PORT_TOGGLE
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, wrally2_state,wrally2_analog_bit_r, (void *)1)   /* ADC_2 serial input */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, wrally2_state,wrally2_analog_bit_r, (void *)0x01)   /* ADC_2 serial input */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1319,6 +1356,10 @@ ROM_START( wrally2 )
 	ROM_LOAD16_BYTE( "wr2.64",  0x000000, 0x080000, CRC(4cdf4e1e) SHA1(a3b3ff4a70336b61c7bba5d518527bf4bd901867) )
 	ROM_LOAD16_BYTE( "wr2.63",  0x000001, 0x080000, CRC(94887c9f) SHA1(ad09f1fbeff4c3ba47f72346d261b22fa6a51457) )
 
+	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_LOAD( "wr2_dallas.bin", 0x00000, 0x8000, NO_DUMP )
+
+
 	ROM_REGION( 0x0a00000, "gfx1", 0 )  /* GFX + Sound */
 	ROM_LOAD( "wr2.16d",    0x0000000, 0x0080000, CRC(ad26086b) SHA1(487ffaaca57c9d030fc486b8cae6735ee40a0ac3) )    /* GFX only */
 	ROM_LOAD( "wr2.17d",    0x0080000, 0x0080000, CRC(c1ec0745) SHA1(a6c3ce9c889e6a53f4155f54d6655825af34a35b) )    /* GFX only */
@@ -1379,6 +1420,9 @@ ROM_START( grtesoro )
 	ROM_LOAD16_BYTE( "2.u39",   0x000000, 0x020000, BAD_DUMP CRC(9939299e) SHA1(55303a2adf199f4b5a60f57be7480b0e119f8624) )
 	ROM_LOAD16_BYTE( "1.u40",   0x000001, 0x020000, BAD_DUMP CRC(311c2f94) SHA1(963d6b5f479598145146fcb8b7c6ce77fbc92b07) )
 
+	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_LOAD( "ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+
 	ROM_REGION( 0x0300000, "gfx1", 0 ) /* GFX + Sound */
 	ROM_LOAD( "3.u54", 0x0000000, 0x0080000, CRC(085008ed) SHA1(06eb4f972d79eab13b1b3b6829ef280e079abdb6) )
 	ROM_LOAD( "4.u53", 0x0080000, 0x0080000, CRC(94dc37a7) SHA1(28f9832b61541b292682a6e2d2264abccd138a2e) )
@@ -1395,6 +1439,9 @@ ROM_START( grtesoro4 ) /* there are version 4.0 and version 1.0 strings in this,
 	ROM_LOAD16_BYTE( "2.u39_v4",    0x000000, 0x020000, CRC(fff16141) SHA1(8493c3e58a231c03b152b336f43422a9a2d2618c) )
 	ROM_LOAD16_BYTE( "1.u40_v4",    0x000001, 0x020000, CRC(39f9d58e) SHA1(1cbdae2adc570f2a2e10a707075312ef717e2643) )
 
+	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
+	ROM_LOAD( "ds5002fp.bin", 0x00000, 0x8000, NO_DUMP )
+
 	ROM_REGION( 0x0300000, "gfx1", 0 ) /* GFX + Sound */
 	ROM_LOAD( "3.u54", 0x0000000, 0x0080000, CRC(085008ed) SHA1(06eb4f972d79eab13b1b3b6829ef280e079abdb6) )
 	ROM_LOAD( "4.u53", 0x0080000, 0x0080000, CRC(94dc37a7) SHA1(28f9832b61541b292682a6e2d2264abccd138a2e) )
@@ -1406,6 +1453,48 @@ ROM_START( grtesoro4 ) /* there are version 4.0 and version 1.0 strings in this,
 	ROM_LOAD( "palce16v8h.u29",  0x0000, 0x0117, BAD_DUMP CRC(4a0a6f39) SHA1(57351e471649391c9abf110828fe2f128fe84eee) )
 ROM_END
 
+
+READ16_MEMBER(gaelco2_state::maniacsqa_prot_r)
+{
+	int pc = space.device().safe_pc();
+
+	// if -1 is returned at any point on these checks the game instantly reports 'power failure'
+	// these are generally done right before the other checks
+	if (pc == 0x3dbc) return 0x0000; // must not be -1
+	if (pc == 0x5ce4) return 0x0000; // must not be -1
+	if (pc == 0x5d08) return 0x0000; // must not be -1 (stores 5 here just before)
+	if (pc == 0xaa90) return 0x0000; // must not be -1
+	if (pc == 0xaab2) return 0x0000; // must not be -1
+	if (pc == 0x9f10) return 0x0000; // must not be -1
+	if (pc == 0x3b86) return 0x0000; // must not be -1
+
+	if (pc == 0x3dce) return 0x0000; // must be 0
+
+	if (pc == 0x25c2) return 0x0000; // writes 0 to 0xfe45fa then expects this to be 0
+
+	if (pc == 0x5cf6) return 0x0000; // must be 0
+	if (pc == 0x5d1a) return 0x0000; // must be 0
+	if (pc == 0xaaa0) return 0x0000; // must be 0?
+
+	if (pc == 0xaac4) return 0x0000; // checks for 0, 2 possible code paths after - happens when piece is dropped
+	if (pc == 0xaad0) return 0x0a00; // if above ISN'T 0 this must be 0x0a00 (but code then dies, probably wants some data filled?)
+	// other code path just results in no more pieces dropping? maybe the MCU does the matching algorithm?
+
+
+
+
+
+	printf("read at PC %08x\n", pc);
+	return m_shareram[(0xfedaa2 - 0xfe0000) / 2];
+
+}
+
+DRIVER_INIT_MEMBER(gaelco2_state,maniacsqa)
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfedaa2, 0xfedaa3, read16_delegate(FUNC(gaelco2_state::maniacsqa_prot_r), this) );
+}
+
+
 GAME( 1994, aligator,  0,       alighunt, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1994, aligatorun,aligator,alighunt, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected)", 0 )
 GAME( 1995, touchgo,  0,        touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (World)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
@@ -1413,9 +1502,11 @@ GAME( 1995, touchgon, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgo,  ROT
 GAME( 1995, touchgoe, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (earlier revision)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1995, wrally2,  0,        wrally2,  wrally2,  driver_device, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1996, maniacsq, 0,        maniacsq, maniacsq, driver_device, 0,        ROT0, "Gaelco", "Maniac Square (unprotected)", 0 )
-GAME( 1996, snowboar, 0,        snowboar, snowboar, driver_device, 0,        ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1996, snowboara,snowboar, snowboar, snowboar, gaelco2_state, snowboar, ROT0, "Gaelco", "Snow Board Championship (Version 2.0)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1996, maniacsqa,maniacsq, maniacsq, maniacsq, gaelco2_state, maniacsqa,ROT0, "Gaelco", "Maniac Square (protected)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1996, snowboar, 0,        snowboar, snowboar, driver_device, 0,        ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", 0 )
+GAME( 1996, snowboara,snowboar, snowboar, snowboar, gaelco2_state, snowboar, ROT0, "Gaelco", "Snow Board Championship (Version 2.0)", 0 )
 GAME( 1998, bang,     0,        bang,     bang,     bang_state,    bang,     ROT0, "Gaelco", "Bang!", 0 )
 GAME( 1998, bangj,    bang,     bang,     bang,     bang_state,    bang,     ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
+// are these ACTUALLY Gaelco hardware, or do they just use the same Dallas?
 GAME( 1999, grtesoro,  0,       maniacsq, maniacsq, driver_device, 0,        ROT0, "Nova Desitec", "Gran Tesoro? / Play 2000 (v5.01) (Italy)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1999, grtesoro4, grtesoro,maniacsq, maniacsq, driver_device, 0,        ROT0, "Nova Desitec", "Gran Tesoro? / Play 2000 (v4.0) (Italy)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

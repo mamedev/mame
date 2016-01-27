@@ -41,8 +41,8 @@ public:
 	UINT8 m_firq_beam;
 	UINT8 *m_topsecex_yscroll;
 	UINT8 m_latched_x;
-	UINT8 *m_local_videoram;
-	UINT8 *m_local_paletteram;
+	std::unique_ptr<UINT8[]> m_local_videoram;
+	std::unique_ptr<UINT8[]> m_local_paletteram;
 	UINT8 m_firq_enable;
 	UINT8 m_firq_select;
 	UINT8 m_palettebank_io;

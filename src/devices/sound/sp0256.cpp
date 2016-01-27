@@ -125,8 +125,8 @@ void sp0256_device::device_start()
 	/* -------------------------------------------------------------------- */
 	/*  Allocate a scratch buffer for generating ~10kHz samples.             */
 	/* -------------------------------------------------------------------- */
-	m_scratch = auto_alloc_array(machine(), INT16, SCBUF_SIZE);
-	save_pointer(NAME(m_scratch), SCBUF_SIZE);
+	m_scratch = std::make_unique<INT16[]>(SCBUF_SIZE);
+	save_pointer(NAME(m_scratch.get()), SCBUF_SIZE);
 
 	m_sc_head = m_sc_tail = 0;
 
@@ -759,7 +759,7 @@ void sp0256_device::bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int l
 /* ======================================================================== */
 UINT32 sp0256_device::getb( int len )
 {
-	UINT32 data = 0;
+	UINT32 data;
 	UINT32 d0, d1;
 
 	/* -------------------------------------------------------------------- */
@@ -822,8 +822,8 @@ void sp0256_device::micro()
 	UINT8  immed4;
 	UINT8  opcode;
 	UINT16 cr;
-	int ctrl_xfer = 0;
-	int repeat    = 0;
+	int ctrl_xfer;
+	int repeat;
 	int i, idx0, idx1;
 
 	/* -------------------------------------------------------------------- */
@@ -1357,7 +1357,7 @@ void sp0256_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			else
 			{
 				did_samp += lpc12_update(&m_filt, do_samp,
-											m_scratch, &m_sc_head);
+											m_scratch.get(), &m_sc_head);
 			}
 
 			m_sc_head &= SCBUF_MASK;

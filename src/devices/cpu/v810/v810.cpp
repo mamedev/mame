@@ -1314,7 +1314,7 @@ void v810_device::device_start()
 	m_icountptr = &m_icount;
 }
 
-void v810_device::state_string_export(const device_state_entry &entry, std::string &str)
+void v810_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

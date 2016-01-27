@@ -53,14 +53,14 @@ WRITE8_MEMBER( et3400_state::et3400_display_w )
 	static const UINT8 segments[8]={0x40,0x20,0x10,0x08,0x04,0x02,0x01,0x80};
 	UINT8 digit = (offset >> 4) & 7;
 	UINT8 segment = segments[offset & 7];
-	UINT8 segdata = output_get_digit_value(digit);
+	UINT8 segdata = output().get_digit_value(digit);
 
 	if (data & 1)
 		segdata |= segment;
 	else
 		segdata &= ~segment;
 
-	output_set_digit_value(digit, segdata);
+	output().set_digit_value(digit, segdata);
 }
 
 

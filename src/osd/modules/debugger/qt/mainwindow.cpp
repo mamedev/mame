@@ -1,6 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
-#define NO_MEM_TRACKING
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QDockWidget>
+#include <QtWidgets/QScrollBar>
+#include <QtWidgets/QFileDialog>
+#include <QtGui/QCloseEvent>
 
 #include "mainwindow.h"
 
@@ -23,7 +29,7 @@ MainWindow::MainWindow(running_machine* machine, QWidget* parent) :
 
 	// The input line
 	m_inputEdit = new QLineEdit(mainWindowFrame);
-	connect(m_inputEdit, SIGNAL(returnPressed()), this, SLOT(executeCommand()));
+	connect(m_inputEdit, &QLineEdit::returnPressed, this, &MainWindow::executeCommandSlot);
 	m_inputEdit->installEventFilter(this);
 
 
@@ -52,9 +58,9 @@ MainWindow::MainWindow(running_machine* machine, QWidget* parent) :
 	m_breakpointToggleAct->setShortcut(Qt::Key_F9);
 	m_breakpointEnableAct->setShortcut(Qt::SHIFT + Qt::Key_F9);
 	m_runToCursorAct->setShortcut(Qt::Key_F4);
-	connect(m_breakpointToggleAct, SIGNAL(triggered(bool)), this, SLOT(toggleBreakpointAtCursor(bool)));
-	connect(m_breakpointEnableAct, SIGNAL(triggered(bool)), this, SLOT(enableBreakpointAtCursor(bool)));
-	connect(m_runToCursorAct, SIGNAL(triggered(bool)), this, SLOT(runToCursor(bool)));
+	connect(m_breakpointToggleAct, &QAction::triggered, this, &MainWindow::toggleBreakpointAtCursor);
+	connect(m_breakpointEnableAct, &QAction::triggered, this, &MainWindow::enableBreakpointAtCursor);
+	connect(m_runToCursorAct, &QAction::triggered, this, &MainWindow::runToCursor);
 
 	// Right bar options
 	QActionGroup* rightBarGroup = new QActionGroup(this);
@@ -72,7 +78,7 @@ MainWindow::MainWindow(running_machine* machine, QWidget* parent) :
 	rightActEncrypted->setShortcut(QKeySequence("Ctrl+E"));
 	rightActComments->setShortcut(QKeySequence("Ctrl+C"));
 	rightActRaw->setChecked(true);
-	connect(rightBarGroup, SIGNAL(triggered(QAction*)), this, SLOT(rightBarChanged(QAction*)));
+	connect(rightBarGroup, &QActionGroup::triggered, this, &MainWindow::rightBarChanged);
 
 	// Assemble the options menu
 	QMenu* optionsMenu = menuBar()->addMenu("&Options");
@@ -115,7 +121,7 @@ MainWindow::MainWindow(running_machine* machine, QWidget* parent) :
 	dasmDock->setAllowedAreas(Qt::TopDockWidgetArea);
 	m_dasmFrame = new DasmDockWidget(m_machine, dasmDock);
 	dasmDock->setWidget(m_dasmFrame);
-	connect(m_dasmFrame->view(), SIGNAL(updated()), this, SLOT(dasmViewUpdated()));
+	connect(m_dasmFrame->view(), &DebuggerView::updated, this, &MainWindow::dasmViewUpdated);
 
 	addDockWidget(Qt::TopDockWidgetArea, dasmDock);
 	dockMenu->addAction(dasmDock->toggleViewAction());
@@ -300,6 +306,10 @@ void MainWindow::rightBarChanged(QAction* changedTo)
 	m_dasmFrame->view()->viewport()->update();
 }
 
+void MainWindow::executeCommandSlot()
+{
+	executeCommand(true);
+}
 
 void MainWindow::executeCommand(bool withClear)
 {
@@ -477,8 +487,8 @@ void MainWindow::createImagesMenu()
 		mountAct->setData(QVariant(interfaceIndex));
 		unmountAct->setObjectName("unmount");
 		unmountAct->setData(QVariant(interfaceIndex));
-		connect(mountAct, SIGNAL(triggered(bool)), this, SLOT(mountImage(bool)));
-		connect(unmountAct, SIGNAL(triggered(bool)), this, SLOT(unmountImage(bool)));
+		connect(mountAct, &QAction::triggered, this, &MainWindow::mountImage);
+		connect(unmountAct, &QAction::triggered, this, &MainWindow::unmountImage);
 
 		if (!img->exists())
 			unmountAct->setEnabled(false);

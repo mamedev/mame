@@ -220,7 +220,7 @@ WRITE8_MEMBER( gts3_state::segbank_w )
 	m_segment[offset] = data;
 	seg1 = m_segment[offset&2] | (m_segment[offset|1] << 8);
 	seg2 = BITSWAP32(seg1,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15,14,9,7,13,11,10,6,8,12,5,4,3,3,2,1,0,0);
-	output_set_digit_value(m_digit+(BIT(offset, 1) ? 0 : 20), seg2);
+	output().set_digit_value(m_digit+(BIT(offset, 1) ? 0 : 20), seg2);
 }
 
 WRITE8_MEMBER( gts3_state::u4b_w )

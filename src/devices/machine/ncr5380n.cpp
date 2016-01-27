@@ -165,7 +165,7 @@ void ncr5380n_device::step(bool timeout)
 			break;
 
 		int win;
-		for(win=7; win>=0 && !(data & (1<<win)); win--);
+		for(win=7; win>=0 && !(data & (1<<win)); win--) {};
 //      printf("arb complete: data %02x win %02x scsi_id %02x\n", data, win, scsi_id);
 		if(win != scsi_id) {
 			scsi_bus->data_w(scsi_refid, 0);
@@ -322,7 +322,7 @@ WRITE8_MEMBER(ncr5380n_device::icmd_w)
 	if (mask)
 	{
 		// translate data to nscsi
-		UINT8 newdata = 0;
+		UINT8 newdata;
 
 		newdata = (data & IC_RST ? S_RST : 0) |
 			(data & IC_ACK ? S_ACK : 0) |

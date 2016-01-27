@@ -56,14 +56,14 @@ static MACHINE_CONFIG_FRAGMENT( com_config )
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, ri_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, cts_w))
 
-	//MCFG_RS232_PORT_ADD( "serport2", isa_com, NULL )
+	//MCFG_RS232_PORT_ADD( "serport2", isa_com, nullptr )
 	//MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, rx_w))
 	//MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, dcd_w))
 	//MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, dsr_w))
 	//MCFG_RS232_RI_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, ri_w))
 	//MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, cts_w))
 
-	//MCFG_RS232_PORT_ADD( "serport3", isa_com, NULL )
+	//MCFG_RS232_PORT_ADD( "serport3", isa_com, nullptr )
 	//MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart_2", ins8250_uart_device, rx_w))
 	//MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart_2", ins8250_uart_device, dcd_w))
 	//MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart_2", ins8250_uart_device, dsr_w))
@@ -164,8 +164,8 @@ static MACHINE_CONFIG_FRAGMENT( com_at_config )
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, ri_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, cts_w))
 
-//  MCFG_RS232_PORT_ADD( "serport2", isa_com, NULL )
-//  MCFG_RS232_PORT_ADD( "serport3", isa_com, NULL )
+//  MCFG_RS232_PORT_ADD( "serport2", isa_com, nullptr )
+//  MCFG_RS232_PORT_ADD( "serport3", isa_com, nullptr )
 MACHINE_CONFIG_END
 
 //**************************************************************************

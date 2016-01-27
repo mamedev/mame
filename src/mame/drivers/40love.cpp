@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 /****************************************************************************
 
@@ -11,14 +11,11 @@
 /*
     TO DO:
     - sprites graphics decoding could be changed to only use
-      color codes 8-15 (now it decodes all 64 colors). Perhaps the same
-      applies to character graphics (colors 0-7 only),
+      color codes 8-15 (now it decodes all 64 colors).
 
     - sprite memory needs to be buffered ?
 
     - controls may be wrong (BUTTON 3 - not used ?)
-
-    - palette has 1024 colors, but only first 256 are used at the moment
 
     - pixel layer needs priority ?
 */
@@ -272,7 +269,7 @@ WRITE8_MEMBER(fortyl_state::nmi_enable_w)
 #if 0
 WRITE8_MEMBER(fortyl_state::fortyl_coin_counter_w)
 {
-	coin_counter_w(machine(), offset,data);
+	machine().bookkeeping().coin_counter_w(offset,data);
 }
 #endif
 
@@ -649,6 +646,7 @@ static ADDRESS_MAP_START( 40love_map, AS_PROGRAM, 8, fortyl_state )
 	AM_RANGE(0x9880, 0x98bf) AM_READWRITE(fortyl_bg_colorram_r, fortyl_bg_colorram_w) AM_SHARE("colorram")      /* background attributes (2 bytes per line) */
 	AM_RANGE(0x98c0, 0x98ff) AM_RAM AM_SHARE("spriteram2")/* sprites part 2 */
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
+	//AM_RANGE(0xbf00, 0xbfff) writes here when zooms-in/out, left-over or pixel line clearance?
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(fortyl_pixram_r, fortyl_pixram_w) /* banked pixel layer */
 ADDRESS_MAP_END
 
@@ -962,6 +960,8 @@ MACHINE_START_MEMBER(fortyl_state,40love)
 	/* video */
 	save_item(NAME(m_pix1));
 	save_item(NAME(m_pix2));
+	save_item(NAME(m_color_bank));
+	save_item(NAME(m_screen_disable));
 	/* sound */
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_pending_nmi));
@@ -995,6 +995,7 @@ MACHINE_RESET_MEMBER(fortyl_state,common)
 	m_pix1 = 0;
 	m_pix2[0] = 0;
 	m_pix2[1] = 0;
+	m_color_bank = false;
 
 	/* sound */
 	m_sound_nmi_enable = 0;

@@ -85,7 +85,7 @@ static cassette_image *cassette_init(const struct CassetteFormat *format, void *
 {
 	cassette_image *cassette;
 
-	cassette = global_alloc_clear(cassette_image);
+	cassette = global_alloc_clear<cassette_image>();
 	cassette->format = format;
 	cassette->io.file = file;
 	cassette->io.procs = procs;

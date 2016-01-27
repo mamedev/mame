@@ -16,8 +16,8 @@ public:
 		m_rpalette(*this, "rpalette") { }
 
 	/* memory pointers */
-	UINT16   *m_videoram[2][4];
-	UINT8    *m_bankedram;
+	std::unique_ptr<UINT16[]>   m_videoram[2][4];
+	std::unique_ptr<UINT8[]>    m_bankedram;
 
 	/* video-related */
 	tilemap_t  *m_tilemap[2][4];

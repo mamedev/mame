@@ -125,6 +125,7 @@ validity_checker::validity_checker(emu_options &options)
 	: m_drivlist(options),
 		m_errors(0),
 		m_warnings(0),
+		m_print_verbose(options.verbose()),
 		m_current_driver(nullptr),
 		m_current_config(nullptr),
 		m_current_device(nullptr),
@@ -183,10 +184,11 @@ void validity_checker::check_shared_source(const game_driver &driver)
 
 
 //-------------------------------------------------
-//  check_all - check all drivers
+//  check_all_matching - check all drivers whose
+//  names match the given string
 //-------------------------------------------------
 
-bool validity_checker::check_all()
+bool validity_checker::check_all_matching(const char *string)
 {
 	// start by checking core stuff
 	validate_begin();
@@ -194,26 +196,23 @@ bool validity_checker::check_all()
 	validate_inlines();
 
 	// if we had warnings or errors, output
-	if (m_errors > 0 || m_warnings > 0)
+	if (m_errors > 0 || m_warnings > 0 || !m_verbose_text.empty())
 	{
 		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Core: %d errors, %d warnings\n", m_errors, m_warnings);
 		if (m_errors > 0)
-		{
-			strreplace(m_error_text, "\n", "\n   ");
-			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Errors:\n   %s", m_error_text.c_str());
-		}
+			output_indented_errors(m_error_text, "Errors");
 		if (m_warnings > 0)
-		{
-			strreplace(m_warning_text, "\n", "\n   ");
-			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Warnings:\n   %s", m_warning_text.c_str());
-		}
+			output_indented_errors(m_warning_text, "Warnings");
+		if (!m_verbose_text.empty())
+			output_indented_errors(m_verbose_text, "Messages");
 		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "\n");
 	}
 
 	// then iterate over all drivers and check them
 	m_drivlist.reset();
 	while (m_drivlist.next())
-		validate_one(m_drivlist.driver());
+		if (m_drivlist.matches(string, m_drivlist.driver().name))
+			validate_one(m_drivlist.driver());
 
 	// cleanup
 	validate_end();
@@ -277,6 +276,7 @@ void validity_checker::validate_one(const game_driver &driver)
 	int start_warnings = m_warnings;
 	m_error_text.clear();
 	m_warning_text.clear();
+	m_verbose_text.clear();
 
 	// wrap in try/except to catch fatalerrors
 	try
@@ -295,20 +295,15 @@ void validity_checker::validate_one(const game_driver &driver)
 	}
 
 	// if we had warnings or errors, output
-	if (m_errors > start_errors || m_warnings > start_warnings)
+	if (m_errors > start_errors || m_warnings > start_warnings || !m_verbose_text.empty())
 	{
-		std::string tempstr;
-		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): %d errors, %d warnings\n", driver.name, core_filename_extract_base(tempstr, driver.source_file).c_str(), m_errors - start_errors, m_warnings - start_warnings);
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): %d errors, %d warnings\n", driver.name, core_filename_extract_base(driver.source_file).c_str(), m_errors - start_errors, m_warnings - start_warnings);
 		if (m_errors > start_errors)
-		{
-			strreplace(m_error_text, "\n", "\n   ");
-			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Errors:\n   %s", m_error_text.c_str());
-		}
+			output_indented_errors(m_error_text, "Errors");
 		if (m_warnings > start_warnings)
-		{
-			strreplace(m_warning_text, "\n", "\n   ");
-			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Warnings:\n   %s", m_warning_text.c_str());
-		}
+			output_indented_errors(m_warning_text, "Warnings");
+		if (!m_verbose_text.empty())
+			output_indented_errors(m_verbose_text, "Messages");
 		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "\n");
 	}
 
@@ -530,18 +525,17 @@ void validity_checker::validate_inlines()
 void validity_checker::validate_driver()
 {
 	// check for duplicate names
-	std::string tempstr;
 	if (!m_names_map.insert(std::make_pair(m_current_driver->name, m_current_driver)).second)
 	{
 		const game_driver *match = m_names_map.find(m_current_driver->name)->second;
-		osd_printf_error("Driver name is a duplicate of %s(%s)\n", core_filename_extract_base(tempstr, match->source_file).c_str(), match->name);
+		osd_printf_error("Driver name is a duplicate of %s(%s)\n", core_filename_extract_base(match->source_file).c_str(), match->name);
 	}
 
 	// check for duplicate descriptions
 	if (!m_descriptions_map.insert(std::make_pair(m_current_driver->description, m_current_driver)).second)
 	{
 		const game_driver *match = m_descriptions_map.find(m_current_driver->description)->second;
-		osd_printf_error("Driver description is a duplicate of %s(%s)\n", core_filename_extract_base(tempstr, match->source_file).c_str(), match->name);
+		osd_printf_error("Driver description is a duplicate of %s(%s)\n", core_filename_extract_base(match->source_file).c_str(), match->name);
 	}
 
 	// determine if we are a clone
@@ -615,8 +609,8 @@ void validity_checker::validate_roms()
 	device_iterator deviter(m_current_config->root_device());
 	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
 	{
-		// for non-root devices, track the current device
-		m_current_device = (device->owner() == nullptr) ? nullptr : device;
+		// track the current device
+		m_current_device = device;
 
 		// scan the ROM entries for this device
 		const char *last_region_name = "???";
@@ -880,8 +874,8 @@ void validity_checker::validate_inputs()
 		if (device->input_ports() == nullptr)
 			continue;
 
-		// for non-root devices, track the current device
-		m_current_device = (device == &m_current_config->root_device()) ? nullptr : device;
+		// track the current device
+		m_current_device = device;
 
 		// allocate the input ports
 		ioport_list portlist;
@@ -976,15 +970,11 @@ void validity_checker::validate_devices()
 	device_iterator iter_find(m_current_config->root_device());
 	for (const device_t *device = iter_find.first(); device != nullptr; device = iter_find.next())
 	{
-		device->findit(true);
-	}
+		// track the current device
+		m_current_device = device;
 
-	// iterate over devices
-	device_iterator iter(m_current_config->root_device());
-	for (const device_t *device = iter.first(); device != nullptr; device = iter.next())
-	{
-		// for non-root devices, track the current device
-		m_current_device = (device == &m_current_config->root_device()) ? nullptr : device;
+		// validate auto-finders
+		device->findit(true);
 
 		// validate the device tag
 		validate_tag(device->basetag());
@@ -1048,9 +1038,9 @@ void validity_checker::build_output_prefix(std::string &str)
 	// start empty
 	str.clear();
 
-	// if we have a current device, indicate that
-	if (m_current_device != nullptr)
-		str.append(m_current_device->name()).append(" device '").append(m_current_device->tag()).append("': ");
+	// if we have a current (non-root) device, indicate that
+	if (m_current_device != nullptr && m_current_device->owner() != nullptr)
+		str.append(m_current_device->name()).append(" device '").append(m_current_device->tag()+1).append("': ");
 
 	// if we have a current port, indicate that as well
 	if (m_current_ioport != nullptr)
@@ -1089,6 +1079,17 @@ void validity_checker::output_callback(osd_output_channel channel, const char *m
 			strcatvprintf(output, msg, args);
 			m_warning_text.append(output);
 			break;
+		case OSD_OUTPUT_CHANNEL_VERBOSE:
+			// if we're not verbose, skip it
+			if (!m_print_verbose) break;
+
+			// output the source(driver) device 'tag'
+			build_output_prefix(output);
+
+			// generate the string and output to the original target
+			strcatvprintf(output, msg, args);
+			m_verbose_text.append(output);
+			break;
 		default:
 			chain_output(channel, msg, args);
 			break;
@@ -1109,4 +1110,17 @@ void validity_checker::output_via_delegate(osd_output_channel channel, const cha
 	va_start(argptr, format);
 	this->chain_output(channel, format, argptr);
 	va_end(argptr);
+}
+
+//-------------------------------------------------
+//  output_indented_errors - helper to output error
+//  and warning messages with header and indents
+//-------------------------------------------------
+void validity_checker::output_indented_errors(std::string &text, const char *header)
+{
+	// remove trailing newline
+	if (text[text.size()-1] == '\n')
+		text.erase(text.size()-1, 1);
+	strreplace(text, "\n", "\n   ");
+	output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "%s:\n   %s\n", header, text.c_str());
 }

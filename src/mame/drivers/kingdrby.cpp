@@ -391,8 +391,8 @@ WRITE8_MEMBER(kingdrby_state::led_array_w)
 	they goes from 0 to 5, to indicate the number.
 	If one player bets something, the other led will toggle between p1 and p2 bets.
 	*/
-	output_set_digit_value(0xf + offset, led_map[(data & 0xf0) >> 4]);
-	output_set_digit_value(0x0 + offset, led_map[(data & 0x0f) >> 0]);
+	output().set_digit_value(0xf + offset, led_map[(data & 0xf0) >> 4]);
+	output().set_digit_value(0x0 + offset, led_map[(data & 0x0f) >> 0]);
 
 }
 

@@ -1,10 +1,9 @@
-// license:???
-// copyright-holders:Kenneth Lin
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
+// thanks-to:Kenneth Lin (original driver author)
 /***************************************************************************
 
   jackal.c
-
-  Written by Kenneth Lin (kenneth_lin@ai.vancouver.bc.ca)
 
 Notes:
 - This game uses two 005885 gfx chip in parallel. The unique thing about it is
@@ -121,8 +120,8 @@ WRITE8_MEMBER(jackal_state::jackal_rambank_w)
 	if (data & 0x04)
 		popmessage("jackal_rambank_w %02x", data);
 
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 	m_spritebank = &rgn[((data & 0x08) << 13)];
 	m_rambank = &rgn[((data & 0x10) << 12)];

@@ -593,7 +593,7 @@ void windows_osd_interface::init(running_machine &machine)
 	for (win_window_info *info = win_window_list; info != NULL; info = info->m_next)
 	{
 		strprintf(tempstring, "Orientation(%s)", info->m_monitor->devicename());
-		output_set_value(tempstring.c_str(), info->m_targetorient);
+		machine.output().set_value(tempstring.c_str(), info->m_targetorient);
 	}
 
 	// hook up the debugger log

@@ -641,9 +641,7 @@ public:
 
 	// getters
 	memory_share *next() const { return m_next; }
-	// NOTE: this being NULL in a C++ member function can lead to undefined behavior.
-	// However, it is relied on throughout MAME, so will remain for now.
-	void *ptr() const { if (this == nullptr) return nullptr; return m_ptr; }
+	void *ptr() const { return m_ptr; }
 	size_t bytes() const { return m_bytes; }
 	endianness_t endianness() const { return m_endianness; }
 	UINT8 bitwidth() const { return m_bitwidth; }
@@ -682,9 +680,9 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 	memory_region *next() const { return m_next; }
-	UINT8 *base() { return (this != nullptr) ? &m_buffer[0] : nullptr; }
-	UINT8 *end() { return (this != nullptr) ? base() + m_buffer.size() : nullptr; }
-	UINT32 bytes() const { return (this != nullptr) ? m_buffer.size() : 0; }
+	UINT8 *base() { return &m_buffer[0]; }
+	UINT8 *end() { return base() + m_buffer.size(); }
+	UINT32 bytes() const { return m_buffer.size(); }
 	const char *name() const { return m_name.c_str(); }
 
 	// flag expansion

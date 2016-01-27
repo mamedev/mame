@@ -8,10 +8,6 @@
 //
 //============================================================
 
-#if (!defined(NO_MEM_TRACKING))
-#define NO_MEM_TRACKING
-#endif
-
 #include "debug_module.h"
 #include "modules/osdmodule.h"
 
@@ -19,8 +15,9 @@
 
 #include <vector>
 
-#include <QtGui/QtGui>
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
+#include <QtCore/QAbstractEventDispatcher>
+#include <QtCore/QAbstractNativeEventFilter>
 
 #include "emu.h"
 #include "config.h"
@@ -36,6 +33,9 @@
 #include "qt/deviceinformationwindow.h"
 
 class debug_qt : public osd_module, public debug_module
+#if defined(WIN32) && !defined(SDLMAME_WIN32)
+, public QAbstractNativeEventFilter
+#endif
 {
 public:
 	debug_qt()
@@ -52,7 +52,9 @@ public:
 	virtual void init_debugger(running_machine &machine);
 	virtual void wait_for_debugger(device_t &device, bool firststop);
 	virtual void debugger_update();
-
+#if defined(WIN32) && !defined(SDLMAME_WIN32)
+	virtual bool nativeEventFilter(const QByteArray &eventType, void *message, long *) Q_DECL_OVERRIDE;
+#endif
 private:
 	running_machine *m_machine;
 };
@@ -75,10 +77,10 @@ static MainWindow* mainQtWindow = NULL;
 std::vector<WindowQtConfig*> xmlConfigurations;
 
 
-static void xml_configuration_load(running_machine &machine, int config_type, xml_data_node *parentnode)
+static void xml_configuration_load(running_machine &machine, config_type cfg_type, xml_data_node *parentnode)
 {
 	// We only care about game files
-	if (config_type != CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::CONFIG_TYPE_GAME)
 		return;
 
 	// Might not have any data
@@ -110,10 +112,10 @@ static void xml_configuration_load(running_machine &machine, int config_type, xm
 }
 
 
-static void xml_configuration_save(running_machine &machine, int config_type, xml_data_node *parentnode)
+static void xml_configuration_save(running_machine &machine, config_type cfg_type, xml_data_node *parentnode)
 {
 	// We only write to game configurations
-	if (config_type != CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::CONFIG_TYPE_GAME)
 		return;
 
 	for (int i = 0; i < xmlConfigurations.size(); i++)
@@ -234,6 +236,12 @@ static void bring_main_window_to_front()
 
 #if defined(WIN32) && !defined(SDLMAME_WIN32)
 bool winwindow_qt_filter(void *message);
+
+bool debug_qt::nativeEventFilter(const QByteArray &eventType, void *message, long *)
+{
+	winwindow_qt_filter(message);
+	return false;
+}
 #endif
 
 void debug_qt::init_debugger(running_machine &machine)
@@ -243,7 +251,7 @@ void debug_qt::init_debugger(running_machine &machine)
 		// If you're starting from scratch, create a new qApp
 		new QApplication(qtArgc, qtArgv);
 #if defined(WIN32) && !defined(SDLMAME_WIN32)
-		QAbstractEventDispatcher::instance()->setEventFilter((QAbstractEventDispatcher::EventFilter)&winwindow_qt_filter);
+		QAbstractEventDispatcher::instance()->installNativeEventFilter(this);
 #endif
 	}
 	else
@@ -260,8 +268,7 @@ void debug_qt::init_debugger(running_machine &machine)
 
 	m_machine = &machine;
 	// Setup the configuration XML saving and loading
-	config_register(machine,
-					"debugger",
+	machine.configuration().config_register("debugger",
 					config_saveload_delegate(FUNC(xml_configuration_load), &machine),
 					config_saveload_delegate(FUNC(xml_configuration_save), &machine));
 }

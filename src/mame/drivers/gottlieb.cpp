@@ -236,7 +236,7 @@ void gottlieb_state::machine_start()
 		m_laserdisc_philips_timer = timer_alloc(TIMER_LASERDISC_PHILIPS);
 
 		/* create some audio RAM */
-		m_laserdisc_audio_buffer = auto_alloc_array(machine(), UINT8, AUDIORAM_SIZE);
+		m_laserdisc_audio_buffer = std::make_unique<UINT8[]>(AUDIORAM_SIZE);
 		m_laserdisc_status = 0x38;
 
 		/* more save state registration */
@@ -244,7 +244,7 @@ void gottlieb_state::machine_start()
 		save_item(NAME(m_laserdisc_status));
 		save_item(NAME(m_laserdisc_philips_code));
 
-		save_pointer(NAME(m_laserdisc_audio_buffer), AUDIORAM_SIZE);
+		save_pointer(NAME(m_laserdisc_audio_buffer.get()), AUDIORAM_SIZE);
 		save_item(NAME(m_laserdisc_audio_address));
 		save_item(NAME(m_laserdisc_last_samples));
 		save_item(NAME(m_laserdisc_last_time));
@@ -311,7 +311,7 @@ WRITE8_MEMBER(gottlieb_state::general_output_w)
 		gottlieb_laserdisc_video_control_w(space, offset, data);
 
 	/* bit 4 normally controls the coin meter */
-	coin_counter_w(machine(), 0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 
 	/* bit 5 doesn't have a generic function */
 	/* bit 6 controls "COIN1"; it appears that no games used this */
@@ -323,9 +323,9 @@ WRITE8_MEMBER(gottlieb_state::reactor_output_w)
 {
 	general_output_w(space, offset, data & ~0xe0);
 
-	set_led_status(machine(), 0, data & 0x20);
-	set_led_status(machine(), 1, data & 0x40);
-	set_led_status(machine(), 2, data & 0x80);
+	output().set_led_value(0, data & 0x20);
+	output().set_led_value(1, data & 0x40);
+	output().set_led_value(2, data & 0x80);
 }
 
 WRITE8_MEMBER(gottlieb_state::qbert_output_w)
@@ -653,7 +653,7 @@ void gottlieb_state::laserdisc_audio_process(laserdisc_device &device, int sampl
 
 void gottlieb_state::qbert_knocker(UINT8 knock)
 {
-	output_set_value("knocker0", knock);
+	output().set_value("knocker0", knock);
 
 	// start sound on rising edge
 	if (knock & ~m_knocker_prev)

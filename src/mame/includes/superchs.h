@@ -34,7 +34,7 @@ public:
 	required_shared_ptr<UINT32> m_spriteram;
 	required_shared_ptr<UINT32> m_shared_ram;
 
-	struct schs_tempsprite *m_spritelist;
+	std::unique_ptr<schs_tempsprite[]> m_spritelist;
 	UINT32 m_mem[2];
 
 	DECLARE_READ16_MEMBER(shared_ram_r);

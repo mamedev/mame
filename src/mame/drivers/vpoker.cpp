@@ -112,7 +112,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	UINT8 *m_videoram;
+	std::unique_ptr<UINT8[]> m_videoram;
 	UINT8 m_blit_ram[8];
 	DECLARE_READ8_MEMBER(blitter_r);
 	DECLARE_WRITE8_MEMBER(blitter_w);
@@ -127,12 +127,12 @@ public:
 
 void vpoker_state::video_start()
 {
-	m_videoram = auto_alloc_array(machine(), UINT8, 0x200);
+	m_videoram = std::make_unique<UINT8[]>(0x200);
 }
 
 UINT32 vpoker_state::screen_update_vpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count = 0x0000;
 
@@ -163,7 +163,7 @@ READ8_MEMBER(vpoker_state::blitter_r)
 
 WRITE8_MEMBER(vpoker_state::blitter_w)
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 
 	m_blit_ram[offset] = data;
 

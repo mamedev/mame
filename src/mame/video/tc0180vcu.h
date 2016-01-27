@@ -35,8 +35,8 @@ private:
 	// internal state
 	UINT16         m_ctrl[0x10];
 
-	UINT16 *       m_ram;
-	UINT16 *       m_scrollram;
+	std::unique_ptr<UINT16[]>       m_ram;
+	std::unique_ptr<UINT16[]>       m_scrollram;
 
 	tilemap_t      *m_tilemap[3];
 

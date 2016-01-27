@@ -21,44 +21,45 @@ Sound Chips  :  OKIM6295 + YM2413  or
 Other        :  Memory Blitter
 
 ------------------------------------------------------------------------------------------------
-Year + Game                     PCB           Video  Sub CPU  Sound         Issues / Notes
+Year + Game                       PCB           Video  Sub CPU  Sound         Issues / Notes
 ------------------------------------------------------------------------------------------------
-92  Last Fortress - Toride      VG420         I4100  uPD7810  YM2413+M6295
-92  Last Fortress - Toride (Ger)VG460-(A)     I4100  uPD7810  YM2413+M6295
-92  Pang Pom's                  VG420         I4100  uPD7810  YM2413+M6295
-92  Sky Alert                   VG420         I4100  uPD7810  YM2413+M6295
-92  The Karate Tournament       VG460-B       I4100  uPD7810  YM2413+M6295
-93? Lady Killer / Moeyo Gonta!! VG460-B       I4100  uPD7810  YM2413+M6295
-93  Poitto!                     MTR5260-A     I4100  uPD7810  YM2413+M6295
+92  Last Fortress - Toride        VG420         I4100  uPD7810  YM2413+M6295
+92  Last Fortress - Toride (Ger)  VG460-(A)     I4100  uPD7810  YM2413+M6295
+92  Pang Pom's                    VG420         I4100  uPD7810  YM2413+M6295
+92  Sky Alert                     VG420         I4100  uPD7810  YM2413+M6295
+92  The Karate Tournament         VG460-(A)     I4100  uPD7810  YM2413+M6295
+92  The Karate Tournament (Japan) VG460-(A)     I4100  uPD7810  YM2413+M6295
+93? Lady Killer / Moeyo Gonta!!   VG460-B       I4100  uPD7810  YM2413+M6295
+93  Poitto!                       MTR5260-A     I4100  uPD7810  YM2413+M6295
 
-94  Dharma Doujou               MTR5260-A     I4220  uPD7810  YM2413+M6295
-94  Dharma Doujou (Korea)       MTR527        I4220  uPD7810  YM2413+M6295
-94  Toride II Adauchi Gaiden    MTR5260-A     I4220  uPD7810  YM2413+M6295
-94  Toride II Adauchi Gaiden(Kr)MTR5260-A     I4220  uPD7810  YM2413+M6295
-94  Gun Master                  MTR5260-A     I4220  uPD7810  YM2151+M6295
-95  Daitoride                   MTR5260-A     I4220  uPD7810  YM2151+M6295
-95  Pururun                     MTR5260-A     I4220  uPD7810  YM2151+M6295
-95  Puzzli                      MTR5260-A     I4220  uPD7810  YM2151+M6295
-96  Sankokushi                  MTR5260-A     I4220  uPD7810  YM2413+M6295
+94  Dharma Doujou                 MTR5260-A     I4220  uPD7810  YM2413+M6295
+94  Dharma Doujou (Korea)         MTR527        I4220  uPD7810  YM2413+M6295
+94  Toride II Adauchi Gaiden      MTR5260-A     I4220  uPD7810  YM2413+M6295
+94  Toride II Adauchi Gaiden(Kr)  MTR5260-A     I4220  uPD7810  YM2413+M6295
+94  Gun Master                    MTR5260-A     I4220  uPD7810  YM2151+M6295
+95  Daitoride                     MTR5260-A     I4220  uPD7810  YM2151+M6295
+95  Pururun                       MTR5260-A     I4220  uPD7810  YM2151+M6295
+95  Puzzli                        MTR5260-A     I4220  uPD7810  YM2151+M6295
+96  Sankokushi                    MTR5260-A     I4220  uPD7810  YM2413+M6295
 
-95  Mouse Shooter GoGo          -             I4220   -       YMF278B       GFX ROM data lines swapped
-96  Bal Cube                    -             I4220   -       YMF278B       GFX ROM data lines swapped
-96  Daitoride (YMF278B)         -             I4220   -       YMF278B       GFX ROM data lines swapped
-96  Bang Bang Ball              -             I4220   -       YMF278B       GFX ROM data lines swapped
-99  Battle Bubble v2.00         LM2D-Y        I4220   -       YMF278B       GFX ROM data lines swapped
+95  Mouse Shooter GoGo            -             I4220   -       YMF278B       GFX ROM data lines swapped
+96  Bal Cube                      -             I4220   -       YMF278B       GFX ROM data lines swapped
+96  Daitoride (YMF278B)           -             I4220   -       YMF278B       GFX ROM data lines swapped
+96  Bang Bang Ball                -             I4220   -       YMF278B       GFX ROM data lines swapped
+99  Battle Bubble v2.00           LM2D-Y        I4220   -       YMF278B       GFX ROM data lines swapped
 
-94  Blazing Tornado             HUM-002-A-(B) I4220  Z80      YM2610        Konami 053936 PSAC2
-96  Grand Striker 2             HUM-003(A)    I4220  Z80      YM2610        Konami 053936 PSAC2
+94  Blazing Tornado               HUM-002-A-(B) I4220  Z80      YM2610        Konami 053936 PSAC2
+96  Grand Striker 2               HUM-003(A)    I4220  Z80      YM2610        Konami 053936 PSAC2
 
-95  Varia Metal                 ES-9309B-B    I4220   -       ES8712+M6295+M6585
+95  Varia Metal                   ES-9309B-B    I4220   -       ES8712+M6295+M6585
 
-95  Mahjong Doukyuusei          VG330-B       I4300   -       YM2413+M6295
-95  Mahjong Doukyuusei Special  VG340-A       I4300   -       YM2413+M6295
-96  Mouja                       VG410-B       I4300   -       YM2413+M6295
-97  Mahjong Gakuensai           VG340-A       I4300   -       YM2413+M6295
-98  Mahjong Gakuensai 2         VG340-A       I4300   -       YM2413+M6295
+95  Mahjong Doukyuusei            VG330-B       I4300   -       YM2413+M6295
+95  Mahjong Doukyuusei Special    VG340-A       I4300   -       YM2413+M6295
+96  Mouja                         VG410-B       I4300   -       YM2413+M6295
+97  Mahjong Gakuensai             VG340-A       I4300   -       YM2413+M6295
+98  Mahjong Gakuensai 2           VG340-A       I4300   -       YM2413+M6295
 
-00  Puzzlet                     VG2200-(B)    I4300  Z86E02   YM2413+M6295  H8/3007 CPU
+00  Puzzlet                       VG2200-(B)    I4300  Z86E02   YM2413+M6295  H8/3007 CPU
 ------------------------------------------------------------------------------------------------
 
 Mouse Shooter GoGo, Bal Cube, Bang Bang Ball & Daitoride (YMF278B) PCBs have
@@ -450,8 +451,8 @@ WRITE16_MEMBER(metro_state::metro_coin_lockout_1word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//      coin_lockout_w(machine(), 0, data & 1);
-//      coin_lockout_w(machine(), 1, data & 2);
+//      machine().bookkeeping().coin_lockout_w(0, data & 1);
+//      machine().bookkeeping().coin_lockout_w(1, data & 2);
 	}
 	if (data & ~3)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
 }
@@ -459,7 +460,7 @@ WRITE16_MEMBER(metro_state::metro_coin_lockout_1word_w)
 
 WRITE16_MEMBER(metro_state::metro_coin_lockout_4words_w)
 {
-//  coin_lockout_w(machine(), (offset >> 1) & 1, offset & 1);
+//  machine().bookkeeping().coin_lockout_w((offset >> 1) & 1, offset & 1);
 	if (data & ~1)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
 }
 
@@ -1879,10 +1880,10 @@ WRITE8_MEMBER(metro_state::vmetal_control_w)
 {
 	/* Lower nibble is the coin control bits shown in
 	   service mode, but in game mode they're different */
-	coin_counter_w(machine(), 0, data & 0x04);
-	coin_counter_w(machine(), 1, data & 0x08);  /* 2nd coin schute activates coin 0 counter in game mode?? */
-//  coin_lockout_w(machine(), 0, data & 0x01);  /* always on in game mode?? */
-	coin_lockout_w(machine(), 1, data & 0x02);  /* never activated in game mode?? */
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);  /* 2nd coin schute activates coin 0 counter in game mode?? */
+//  machine().bookkeeping().coin_lockout_w(0, data & 0x01);  /* always on in game mode?? */
+	machine().bookkeeping().coin_lockout_w(1, data & 0x02);  /* never activated in game mode?? */
 
 	if ((data & 0x40) == 0)
 		m_essnd->reset();
@@ -5066,6 +5067,25 @@ Notes:
 
 ROM_START( karatour )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "2.2FAB.8G",  0x000000, 0x040000, CRC(199a28d4) SHA1(ae880b5d5a1703c54e0ef27015039c7bb05eb185) )  // Hand-written label "(2) 2FAB"
+	ROM_LOAD16_BYTE( "3.0560.10G", 0x000001, 0x040000, CRC(b054e683) SHA1(51e28a99f87684f3e56c7a168523f94717903d79) )  // Hand-written label "(3) 0560"
+
+	ROM_REGION( 0x02c000, "audiocpu", 0 )       /* NEC78C10 Code */
+	ROM_LOAD( "KT001.1I", 0x000000, 0x004000, CRC(1dd2008c) SHA1(488b6f5d15bdbc069ee2cd6d7a0980a228d2f790) )    // 11xxxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(         0x010000, 0x01c000 )
+
+	ROM_REGION( 0x400000, "gfx1", 0 )   /* Gfx + Data (Addressable by CPU & Blitter) */
+	ROMX_LOAD( "361A04.15F", 0x000000, 0x100000, CRC(f6bf20a5) SHA1(cb4cb249eb1c106fe7ef0ace735c0cc3106f1ab7) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "361A07.17D", 0x000002, 0x100000, CRC(794cc1c0) SHA1(ecfdec5874a95846c0fb7966fdd1da625d85531f) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "361A05.17F", 0x000004, 0x100000, CRC(ea9c11fc) SHA1(176c4419cfe13ff019654a93cd7b0befa238bbc3) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "361A06.15D", 0x000006, 0x100000, CRC(7e15f058) SHA1(267f0a5acb874d4fff3556ffa405e24724174667) , ROM_GROUPWORD | ROM_SKIP(6))
+
+	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
+	ROM_LOAD( "8.4A06.1D", 0x000000, 0x040000, CRC(8d208179) SHA1(54a27ef155828435bc5eba60790a8584274c8b4a) )  // Hand-written label "(8) 4A06"
+ROM_END
+
+ROM_START( karatourj )
+	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "kt002.8g",  0x000000, 0x040000, CRC(316a97ec) SHA1(4b099d2fa91822c9c85d647aab3d6779fc400250) )
 	ROM_LOAD16_BYTE( "kt003.10g", 0x000001, 0x040000, CRC(abe1b991) SHA1(9b6327169d66717dd9dd74816bc33eb208c3763c) )
 
@@ -5082,7 +5102,6 @@ ROM_START( karatour )
 	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
 	ROM_LOAD( "kt008.1d", 0x000000, 0x040000, CRC(47cf9fa1) SHA1(88923ace550154c58c066f859cadfa7864c5344c) )
 ROM_END
-
 
 /***************************************************************************
 
@@ -6292,7 +6311,8 @@ DRIVER_INIT_MEMBER(metro_state,puzzlet)
 
 ***************************************************************************/
 
-GAME( 1992, karatour,  0,        karatour, karatour, metro_state, karatour, ROT0,   "Mitchell",                                        "The Karate Tournament",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, karatour,  0,        karatour, karatour, metro_state, karatour, ROT0,   "Mitchell",                                        "The Karate Tournament",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, karatourj, karatour, karatour, karatour, metro_state, karatour, ROT0,   "Mitchell",                                        "The Karate Tournament (Japan)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1992, pangpoms,  0,        pangpoms, pangpoms, metro_state, metro,    ROT0,   "Metro",                                           "Pang Pom's",                             MACHINE_SUPPORTS_SAVE )
 GAME( 1992, pangpomsm, pangpoms, pangpoms, pangpoms, metro_state, metro,    ROT0,   "Metro (Mitchell license)",                        "Pang Pom's (Mitchell)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1992, skyalert,  0,        skyalert, skyalert, metro_state, metro,    ROT270, "Metro",                                           "Sky Alert",                              MACHINE_SUPPORTS_SAVE )

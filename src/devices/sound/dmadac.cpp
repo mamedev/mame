@@ -47,7 +47,7 @@
 void dmadac_sound_device::device_start()
 {
 	/* allocate a clear a buffer */
-	m_buffer = auto_alloc_array_clear(machine(), INT16, BUFFER_SIZE);
+	m_buffer = make_unique_clear<INT16[]>(BUFFER_SIZE);
 
 	/* reset the state */
 	m_volume = 0x100;
@@ -61,7 +61,7 @@ void dmadac_sound_device::device_start()
 	save_item(NAME(m_volume));
 	save_item(NAME(m_enabled));
 	save_item(NAME(m_frequency));
-	save_pointer(NAME(m_buffer), BUFFER_SIZE);
+	save_pointer(NAME(m_buffer.get()), BUFFER_SIZE);
 }
 
 
@@ -217,7 +217,7 @@ dmadac_sound_device::dmadac_sound_device(const machine_config &mconfig, const ch
 void dmadac_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *output = outputs[0];
-	INT16 *source = m_buffer;
+	INT16 *source = m_buffer.get();
 	UINT32 curout = m_bufout;
 	UINT32 curin = m_bufin;
 	int volume = m_volume;

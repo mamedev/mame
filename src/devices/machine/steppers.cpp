@@ -142,7 +142,7 @@ int stepper_device::update(UINT8 pattern)
 	a small movement that may trigger the optic tab.
 	*/
 
-	int pos,steps=0;
+	int pos,steps;
 	m_pattern = pattern;
 	switch ( m_type )
 	{

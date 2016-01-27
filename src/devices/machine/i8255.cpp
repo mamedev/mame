@@ -313,7 +313,7 @@ void i8255_device::device_reset()
 
 UINT8 i8255_device::read_mode0(int port)
 {
-	UINT8 data = 0;
+	UINT8 data;
 
 	if (port_mode(port) == MODE_OUTPUT)
 	{
@@ -336,7 +336,7 @@ UINT8 i8255_device::read_mode0(int port)
 
 UINT8 i8255_device::read_mode1(int port)
 {
-	UINT8 data = 0;
+	UINT8 data;
 
 	if (port_mode(port) == MODE_OUTPUT)
 	{
@@ -368,7 +368,7 @@ UINT8 i8255_device::read_mode1(int port)
 
 UINT8 i8255_device::read_mode2()
 {
-	UINT8 data = 0;
+	UINT8 data;
 
 	// read data from input latch
 	data = m_input[PORT_A];

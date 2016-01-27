@@ -79,7 +79,6 @@ public:
 	UINT8 m_bank0;
 	UINT8 m_bank1;
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
-	DECLARE_WRITE8_MEMBER(dummy_w);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);

@@ -226,11 +226,11 @@ void towns_state::init_serial_rom()
 
 	if(m_serial)
 		srom = m_serial->base();
-	memset(m_towns_serial_rom,0,256/8);
+	memset(m_towns_serial_rom.get(),0,256/8);
 
 	if(srom)
 	{
-		memcpy(m_towns_serial_rom,srom,32);
+		memcpy(m_towns_serial_rom.get(),srom,32);
 		m_towns_machine_id = (m_towns_serial_rom[0x18] << 8) | m_towns_serial_rom[0x17];
 		logerror("Machine ID in serial ROM: %04x\n",m_towns_machine_id);
 		return;
@@ -2564,12 +2564,12 @@ INPUT_PORTS_END
 
 void towns_state::driver_start()
 {
-	m_towns_vram = auto_alloc_array(machine(),UINT32,0x20000);
-	m_towns_gfxvram = auto_alloc_array(machine(),UINT8,0x80000);
-	m_towns_txtvram = auto_alloc_array(machine(),UINT8,0x20000);
-	memset(m_towns_txtvram, 0, sizeof(UINT8)*0x20000);
-	//towns_sprram = auto_alloc_array(machine(),UINT8,0x20000);
-	m_towns_serial_rom = auto_alloc_array(machine(),UINT8,256/8);
+	m_towns_vram = std::make_unique<UINT32[]>(0x20000);
+	m_towns_gfxvram = std::make_unique<UINT8[]>(0x80000);
+	m_towns_txtvram = std::make_unique<UINT8[]>(0x20000);
+	memset(m_towns_txtvram.get(), 0, sizeof(UINT8)*0x20000);
+	//towns_sprram = std::make_unique<UINT8[]>(0x20000);
+	m_towns_serial_rom = std::make_unique<UINT8[]>(256/8);
 	init_serial_rom();
 	init_rtc();
 	m_towns_rtc_timer = timer_alloc(TIMER_RTC);

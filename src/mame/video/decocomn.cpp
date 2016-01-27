@@ -53,10 +53,10 @@ void decocomn_device::device_start()
 //  width = m_screen->width();
 //  height = m_screen->height();
 
-	m_dirty_palette = auto_alloc_array_clear(machine(), UINT8, 4096);
+	m_dirty_palette = make_unique_clear<UINT8[]>(4096);
 
 	save_item(NAME(m_priority));
-	save_pointer(NAME(m_dirty_palette), 4096);
+	save_pointer(NAME(m_dirty_palette.get()), 4096);
 }
 
 //-------------------------------------------------

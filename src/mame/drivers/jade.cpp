@@ -34,7 +34,6 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_READ8_MEMBER(data_r);
 private:
 	UINT8 m_term_data;
 	virtual void machine_reset() override;

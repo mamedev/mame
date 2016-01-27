@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include <limits>
+#include <thread>
 #include "lua.hpp"
 #include "luabridge/Source/LuaBridge/LuaBridge.h"
 #include <signal.h>
@@ -330,7 +331,7 @@ void lua_engine::emu_hook_output(lua_State *L)
 	hook_output_cb.set(L, 1);
 
 	if (!output_notifier_set) {
-		output_set_notifier(nullptr, s_output_notifier, this);
+		machine().output().set_notifier(nullptr, s_output_notifier, this);
 		output_notifier_set = true;
 	}
 }
@@ -356,7 +357,7 @@ void lua_engine::emu_set_hook(lua_State *L)
 	if (strcmp(hookname, "output") == 0) {
 		hook_output_cb.set(L, 1);
 		if (!output_notifier_set) {
-			output_set_notifier(nullptr, s_output_notifier, this);
+			machine().output().set_notifier(nullptr, s_output_notifier, this);
 			output_notifier_set = true;
 		}
 	} else if (strcmp(hookname, "frame") == 0) {
@@ -812,7 +813,7 @@ osd_lock *lock;
 void lua_engine::serve_lua()
 {
 	osd_sleep(osd_ticks_per_second() / 1000 * 50);
-	printf("%s v%s - %s\n%s\n%s\n\n", emulator_info::get_applongname(),build_version,emulator_info::get_fulllongname(),emulator_info::get_copyright_info(),LUA_COPYRIGHT);
+	printf("%s v%s\n%s\n%s\n\n", emulator_info::get_appname(),build_version,emulator_info::get_copyright_info(),LUA_COPYRIGHT);
 	fflush(stdout);
 	char buff[LUA_MAXINPUT];
 	std::string oldbuff;
@@ -860,14 +861,12 @@ void lua_engine::serve_lua()
 	} while (1);
 }
 
-/*
 static void *serve_lua(void *param)
 {
-    lua_engine *engine = (lua_engine *)param;
-    engine->serve_lua();
-    return NULL;
+	lua_engine *engine = (lua_engine *)param;
+	engine->serve_lua();
+	return NULL;
 }
-*/
 
 //-------------------------------------------------
 //  lua_engine - constructor
@@ -1024,6 +1023,8 @@ void lua_engine::initialize()
 
 void lua_engine::start_console()
 {
+	std::thread th(::serve_lua, this);
+	th.detach();
 }
 
 //-------------------------------------------------

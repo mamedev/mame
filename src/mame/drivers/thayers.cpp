@@ -409,7 +409,7 @@ WRITE8_MEMBER(thayers_state::laserdsc_control_w)
 
 	*/
 
-	coin_counter_w(machine(), 0, BIT(data, 4));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
 
 	if (BIT(data, 5))
 	{
@@ -445,7 +445,7 @@ WRITE8_MEMBER(thayers_state::den1_w)
 
 	*/
 
-	output_set_digit_value(data >> 4, led_map[data & 0x0f]);
+	output().set_digit_value(data >> 4, led_map[data & 0x0f]);
 }
 
 WRITE8_MEMBER(thayers_state::den2_w)
@@ -465,7 +465,7 @@ WRITE8_MEMBER(thayers_state::den2_w)
 
 	*/
 
-	output_set_digit_value(8 + (data >> 4), led_map[data & 0x0f]);
+	output().set_digit_value(8 + (data >> 4), led_map[data & 0x0f]);
 }
 
 /* SSI-263 */

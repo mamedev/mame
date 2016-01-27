@@ -57,7 +57,7 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 	UINT32* m_cpuregion;
-	UINT32* m_mainram;
+	std::unique_ptr<UINT32[]> m_mainram;
 	SEC sec;
 
 	UINT8 m_led_strobe_temp;
@@ -234,9 +234,9 @@ WRITE8_MEMBER(mpu5_state::asic_w8)
 		}
 		case 0x0b:
 		{
-			output_set_value("statuslamp1", ((data&0x10) != 0));
+			output().set_value("statuslamp1", ((data&0x10) != 0));
 
-			output_set_value("statuslamp2", ((data&0x20) != 0));
+			output().set_value("statuslamp2", ((data&0x20) != 0));
 
 			if (data & 0x40)
 			{
@@ -386,7 +386,7 @@ INPUT_PORTS_END
 void mpu5_state::machine_start()
 {
 	m_cpuregion = (UINT32*)memregion( "maincpu" )->base();
-	m_mainram = (UINT32*)auto_alloc_array_clear(machine(), UINT32, 0x10000);
+	m_mainram = make_unique_clear<UINT32[]>(0x10000);
 	m_pic_output_bit =0;
 }
 

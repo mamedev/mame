@@ -652,7 +652,7 @@ SAMPLES_START_CB_MEMBER(tnzs_state::kageki_init_samples)
 		}
 
 		/* 2009-11 FP: should these be saved? */
-		m_sampledata[i] = auto_alloc_array(machine(), INT16, size);
+		m_sampledata[i] = std::make_unique<INT16[]>(size);
 		m_samplesize[i] = size;
 
 
@@ -660,7 +660,7 @@ SAMPLES_START_CB_MEMBER(tnzs_state::kageki_init_samples)
 			start = size = 0;
 
 		// signed 8-bit sample to unsigned 8-bit sample convert
-		dest = m_sampledata[i];
+		dest = m_sampledata[i].get();
 		scan = &src[start];
 		for (n = 0; n < size; n++)
 		{
@@ -720,7 +720,7 @@ WRITE8_MEMBER(tnzs_state::kageki_csport_w)
 		else
 		{
 			// play samples
-			m_samples->start_raw(0, m_sampledata[data], m_samplesize[data], 7000);
+			m_samples->start_raw(0, m_sampledata[data].get(), m_samplesize[data], 7000);
 			sprintf(mess, "VOICE:%02X PLAY", data);
 		}
 	//  popmessage(mess);

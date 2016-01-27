@@ -376,7 +376,8 @@ public:
 	viper_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ata(*this, "ata")
+		m_ata(*this, "ata"),
+		m_voodoo(*this, "voodoo")
 	{
 	}
 
@@ -421,7 +422,6 @@ public:
 	INTERRUPT_GEN_MEMBER(viper_vblank);
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
-	const char* epic_get_register_name(UINT32 reg);
 	void epic_update_interrupts();
 	void mpc8240_interrupt(int irq);
 	void mpc8240_epic_init();
@@ -430,6 +430,7 @@ public:
 	void DS2430_w(int bit);
 	required_device<ppc_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
+	required_device<voodoo_3_device> m_voodoo;
 };
 
 UINT32 viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -440,6 +441,7 @@ UINT32 viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bit
 
 UINT32 m_mpc8240_regs[256/4];
 
+#ifdef UNUSED_FUNCTION
 static inline UINT64 read64le_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
@@ -458,12 +460,16 @@ static inline void write64le_with_32le_device_handler(write32_delegate handler, 
 	if (ACCESSING_BITS_32_63)
 		handler(space, offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
+#endif
 
 static inline UINT64 read64be_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, UINT64 mem_mask)
 {
-	UINT64 result;
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	result = read64le_with_32le_device_handler(handler, space, offset, mem_mask);
+	UINT64 result = 0;
+	if (ACCESSING_BITS_0_31)
+		result = (UINT64)(handler)(space, offset * 2, mem_mask & 0xffffffff);
+	if (ACCESSING_BITS_32_63)
+		result |= (UINT64)(handler)(space, offset * 2 + 1, mem_mask >> 32) << 32;
 	return FLIPENDIAN_INT64(result);
 }
 
@@ -472,7 +478,10 @@ static inline void write64be_with_32le_device_handler(write32_delegate handler, 
 {
 	data = FLIPENDIAN_INT64(data);
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	write64le_with_32le_device_handler(handler, space, offset, data, mem_mask);
+	if (ACCESSING_BITS_0_31)
+		handler(space, offset * 2, data & 0xffffffff, mem_mask & 0xffffffff);
+	if (ACCESSING_BITS_32_63)
+		handler(space, offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
 
 /*****************************************************************************/
@@ -1659,41 +1668,35 @@ static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, i
 
 READ64_MEMBER(viper_state::voodoo3_io_r)
 {
-	voodoo_banshee_device *device = machine().device<voodoo_banshee_device>("voodoo");
-	return read64be_with_32le_device_handler(read32_delegate(FUNC(voodoo_banshee_device::banshee_io_r), device), space, offset, mem_mask);
+	return read64be_with_32le_device_handler(read32_delegate(FUNC(voodoo_3_device::banshee_io_r), &(*m_voodoo)), space, offset, mem_mask);
 }
 WRITE64_MEMBER(viper_state::voodoo3_io_w)
 {
 //  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, space.device().safe_pc());
 
-	voodoo_banshee_device *device = machine().device<voodoo_banshee_device>("voodoo");
-	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_banshee_device::banshee_io_w), device), space, offset, data, mem_mask);
+	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_io_w), &(*m_voodoo)), space, offset, data, mem_mask);
 }
 
 READ64_MEMBER(viper_state::voodoo3_r)
 {
-	voodoo_banshee_device *device = machine().device<voodoo_banshee_device>("voodoo");
-	return read64be_with_32le_device_handler(read32_delegate(FUNC(voodoo_banshee_device::banshee_r), device), space, offset, mem_mask);
+	return read64be_with_32le_device_handler(read32_delegate(FUNC(voodoo_3_device::banshee_r), &(*m_voodoo)), space, offset, mem_mask);
 }
 WRITE64_MEMBER(viper_state::voodoo3_w)
 {
 //  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, space.device().safe_pc());
 
-	voodoo_banshee_device *device = machine().device<voodoo_banshee_device>("voodoo");
-	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_banshee_device::banshee_w), device), space, offset, data, mem_mask);
+	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_w), &(*m_voodoo)), space, offset, data, mem_mask);
 }
 
 READ64_MEMBER(viper_state::voodoo3_lfb_r)
 {
-	voodoo_banshee_device *device = machine().device<voodoo_banshee_device>("voodoo");
-	return read64be_with_32le_device_handler(read32_delegate(FUNC(voodoo_banshee_device::banshee_fb_r), device), space, offset, mem_mask);
+	return read64be_with_32le_device_handler(read32_delegate(FUNC(voodoo_3_device::banshee_fb_r), &(*m_voodoo)), space, offset, mem_mask);
 }
 WRITE64_MEMBER(viper_state::voodoo3_lfb_w)
 {
 //  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, space.device().safe_pc());
 
-	voodoo_banshee_device *device = machine().device<voodoo_banshee_device>("voodoo");
-	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_banshee_device::banshee_fb_w), device), space, offset, data, mem_mask);
+	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_fb_w), &(*m_voodoo)), space, offset, data, mem_mask);
 }
 
 
@@ -2233,6 +2236,8 @@ ROM_END
 ROM_START(gticlub2ea) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("941eaa_nvram.u39", 0x00000, 0x2000, CRC(5ee7004d) SHA1(92e0ce01049308f459985d466fbfcfac82f34a47))
 
@@ -2496,11 +2501,27 @@ ROM_END
 ROM_START(wcombatk) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("wcombatk_nvram.u39", 0x00000, 0x2000, CRC(ebd4d645) SHA1(2fa7e2c6b113214f3eb1900c8ceef4d5fcf0bb76))
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "c22c02", 0, BAD_DUMP SHA1(8bd1dfbf926ad5b28fa7dafd7e31c475325ec569) )
+ROM_END
+
+ROM_START(wcombatu) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("Warzaid u39 c22d02", 0x00000, 0x2000, CRC(71744990) SHA1(19ed07572f183e7b3a712704ebddf7a848c48a78) )
+
+	DISK_REGION( "ata:0:hdd:image" )
+	// CHD image provided had evidence of being altered by Windows, probably was put in a Windows machine without write protection hardware (bad idea)
+	// label was the same as this, so this should be a clean and correct version.
+	DISK_IMAGE( "c22d02", 0, SHA1(69a24c9e36b073021d55bec27d89fcc0254a60cc) ) // chs 978,8,3
 ROM_END
 
 ROM_START(wcombatj) //*
@@ -2635,8 +2656,9 @@ GAME(2001, thrild2a,  thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Ko
 GAME(2001, thrild2c,  thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, tsurugi,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, tsurugij,  tsurugi,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver JAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, wcombat,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver UAA?)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, wcombatk,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver KBC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, wcombat,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, wcombatk,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver KBC:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, wcombatu,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat / Warzaid (ver UCD:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, wcombatj,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, xtrial,    kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Xtrial Racing (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 

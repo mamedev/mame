@@ -169,10 +169,10 @@ WRITE8_MEMBER( c1581_t::cia_pa_w )
 	m_floppy->mon_w(BIT(data, 2));
 
 	// power led
-	output_set_led_value(LED_POWER, BIT(data, 5));
+	machine().output().set_led_value(LED_POWER, BIT(data, 5));
 
 	// activity led
-	output_set_led_value(LED_ACT, BIT(data, 6));
+	machine().output().set_led_value(LED_ACT, BIT(data, 6));
 }
 
 READ8_MEMBER( c1581_t::cia_pb_r )
@@ -192,7 +192,7 @@ READ8_MEMBER( c1581_t::cia_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	UINT8 data;
 
 	// data in
 	data = !m_bus->data_r();

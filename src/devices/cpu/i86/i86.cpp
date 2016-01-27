@@ -144,7 +144,7 @@ void i8086_cpu_device::execute_run()
 			m_seg_prefix = false;
 
 				/* Dispatch IRQ */
-			if ( m_pending_irq && m_no_interrupt == 0 )
+			if ( m_pending_irq && (m_no_interrupt == 0) )
 			{
 				if ( m_pending_irq & NMI_IRQ )
 				{
@@ -159,25 +159,29 @@ void i8086_cpu_device::execute_run()
 				}
 			}
 
-			/* No interrupt allowed between last instruction and this one */
-			if ( m_no_interrupt )
+			/* Trap should allow one instruction to be executed.
+			   CPUID.ASM (by Bob Smith, 1985) suggests that in situations where m_no_interrupt is 1,
+			   (directly after POP SS / MOV_SREG), single step IRQs don't fire.
+			*/
+			if (m_fire_trap )
 			{
-				m_no_interrupt--;
-			}
-
-			/* trap should allow one instruction to be executed */
-			if ( m_fire_trap )
-			{
-				if ( m_fire_trap >= 2 )
+				if ( (m_fire_trap >= 2) && (m_no_interrupt == 0) )
 				{
+					m_fire_trap = 0; // reset trap flag upon entry
 					interrupt(1);
-					m_fire_trap = 0;
 				}
 				else
 				{
 					m_fire_trap++;
 				}
 			}
+
+			/* No interrupt allowed between last instruction and this one */
+			if ( m_no_interrupt )
+			{
+				m_no_interrupt--;
+			}
+
 		}
 
 		if (!m_seg_prefix)
@@ -314,12 +318,12 @@ i8086_common_cpu_device::i8086_common_cpu_device(const machine_config &mconfig, 
 	memset(m_sregs, 0x00, sizeof(m_sregs));
 }
 
-void i8086_common_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void i8086_common_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
 		case STATE_GENPC:
-			strprintf(str, "%08X", pc());
+			strprintf(str, "%08X", (m_sregs[CS] << 4) + m_ip);
 			break;
 
 		case STATE_GENFLAGS:
@@ -1404,6 +1408,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 			m_src = GetRMWord();
 			m_sregs[(m_modrm & 0x18) >> 3] = m_src; // confirmed on hw: modrm bit 5 ignored
 			CLKM(MOV_SR,MOV_SM);
+			m_no_interrupt = 1; // Disable IRQ after load segment register.
 			break;
 
 		case 0x8f: // i_popw

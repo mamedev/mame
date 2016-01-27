@@ -218,11 +218,11 @@ READ8_MEMBER(champbwl_state::trackball_r)
 
 WRITE8_MEMBER(champbwl_state::champbwl_misc_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 
-	coin_lockout_w(machine(), 0, ~data & 8);
-	coin_lockout_w(machine(), 1, ~data & 4);
+	machine().bookkeeping().coin_lockout_w(0, ~data & 8);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 4);
 
 	membank("bank1")->set_entry((data & 0x30) >> 4);
 }
@@ -255,10 +255,10 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(champbwl_state::doraemon_outputs_w)
 {
-	coin_counter_w(machine(), 0, data & 1); // coin in counter
-	coin_counter_w(machine(), 1, data & 2); // gift out counter
+	machine().bookkeeping().coin_counter_w(0, data & 1); // coin in counter
+	machine().bookkeeping().coin_counter_w(1, data & 2); // gift out counter
 
-	coin_lockout_w(machine(), 0, ~data & 8);    // coin lockout
+	machine().bookkeeping().coin_lockout_w(0, ~data & 8);    // coin lockout
 	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x04) ? 0x00 : 0x80);  // gift out motor
 
 	membank("bank1")->set_entry((data & 0x30) >> 4);

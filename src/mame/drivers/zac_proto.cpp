@@ -217,9 +217,9 @@ WRITE8_MEMBER( zac_proto_state::digit_w )
 	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 }; // 9368 (outputs 0-9,A-F)
 	static const UINT8 decimals[10] = { 0, 0, 0x80, 0, 0, 0x80, 0, 0, 0, 0 };
 	offset<<=1;
-	output_set_digit_value(offset, patterns[data&15] | decimals[offset]);
+	output().set_digit_value(offset, patterns[data&15] | decimals[offset]);
 	offset++;
-	output_set_digit_value(offset, patterns[data>>4] | decimals[offset]);
+	output().set_digit_value(offset, patterns[data>>4] | decimals[offset]);
 }
 
 WRITE8_MEMBER( zac_proto_state::sound_w )
@@ -229,7 +229,7 @@ WRITE8_MEMBER( zac_proto_state::sound_w )
 
 void zac_proto_state::machine_reset()
 {
-	output_set_digit_value(10, 0x3f); // units shows zero all the time
+	output().set_digit_value(10, 0x3f); // units shows zero all the time
 }
 
 static MACHINE_CONFIG_START( zac_proto, zac_proto_state )

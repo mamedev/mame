@@ -830,7 +830,7 @@ public:
 	void post_coded(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
 
 	void frame_update(ioport_port &port, ioport_value &digital);
-	const char *key_name(std::string &str, unicode_char ch);
+	std::string key_name(unicode_char ch) const;
 
 	// debugging
 	std::string dump();
@@ -850,7 +850,7 @@ private:
 	attotime choose_delay(unicode_char ch);
 	void internal_post(unicode_char ch);
 	void timer(void *ptr, int param);
-	const char *unicode_to_string(std::string &buffer, unicode_char ch);
+	std::string unicode_to_string(unicode_char ch);
 	const keycode_map_entry *find_code(unicode_char ch) const;
 
 	// internal state
@@ -1353,6 +1353,8 @@ struct ioport_port_live
 };
 
 
+enum class config_type;
+
 // ======================> ioport_manager
 
 // private input port state
@@ -1396,7 +1398,7 @@ public:
 	bool has_keyboard() const;
 	INT32 frame_interpolate(INT32 oldval, INT32 newval);
 	ioport_type token_to_input_type(const char *string, int &player) const;
-	const char *input_type_to_token(std::string &str, ioport_type type, int player);
+	std::string input_type_to_token(ioport_type type, int player);
 
 private:
 	// internal helpers
@@ -1411,12 +1413,12 @@ private:
 	input_seq_type token_to_seq_type(const char *string);
 	void update_defaults();
 
-	void load_config(int config_type, xml_data_node *parentnode);
+	void load_config(config_type cfg_type, xml_data_node *parentnode);
 	void load_remap_table(xml_data_node *parentnode);
 	bool load_default_config(xml_data_node *portnode, int type, int player, const input_seq *newseq);
 	bool load_game_config(xml_data_node *portnode, int type, int player, const input_seq *newseq);
 
-	void save_config(int config_type, xml_data_node *parentnode);
+	void save_config(config_type cfg_type, xml_data_node *parentnode);
 	void save_sequence(xml_data_node *parentnode, input_seq_type type, ioport_type porttype, const input_seq &seq);
 	bool save_this_input_field_type(ioport_type type);
 	void save_default_inputs(xml_data_node *parentnode);

@@ -290,10 +290,10 @@ WRITE16_MEMBER(ssv_state::lockout_w)
 //  popmessage("%02X",data & 0xff);
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_lockout_w(machine(), 1,~data & 0x01);
-		coin_lockout_w(machine(), 0,~data & 0x02);
-		coin_counter_w(machine(), 1, data & 0x04);
-		coin_counter_w(machine(), 0, data & 0x08);
+		machine().bookkeeping().coin_lockout_w(1,~data & 0x01);
+		machine().bookkeeping().coin_lockout_w(0,~data & 0x02);
+		machine().bookkeeping().coin_counter_w(1, data & 0x04);
+		machine().bookkeeping().coin_counter_w(0, data & 0x08);
 //                        data & 0x40?
 		enable_video(data & 0x80);
 	}
@@ -305,10 +305,10 @@ WRITE16_MEMBER(ssv_state::lockout_inv_w)
 //  popmessage("%02X",data & 0xff);
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_lockout_w(machine(), 1, data & 0x01);
-		coin_lockout_w(machine(), 0, data & 0x02);
-		coin_counter_w(machine(), 1, data & 0x04);
-		coin_counter_w(machine(), 0, data & 0x08);
+		machine().bookkeeping().coin_lockout_w(1, data & 0x01);
+		machine().bookkeeping().coin_lockout_w(0, data & 0x02);
+		machine().bookkeeping().coin_counter_w(1, data & 0x04);
+		machine().bookkeeping().coin_counter_w(0, data & 0x08);
 //                        data & 0x40?
 		enable_video(data & 0x80);
 	}
@@ -4675,7 +4675,7 @@ ROM_START( gdfs )
 	ROM_LOAD( "vg004-10.u45", 0x200000, 0x200000, CRC(b3c6b1cb) SHA1(c601213e35d8dfd1244921da5c093f82145706d2) )
 	ROM_LOAD( "vg004-11.u48", 0x400000, 0x200000, CRC(1491def1) SHA1(344043302c81b4118cac4f692375b8af7ea68570) )
 
-	ROM_REGION( 0x1000000, "st0020", /*0*/0 )   // Zooming Sprites, read by a blitter
+	ROM_REGION( 0x1000000, "st0020_spr", /*0*/0 )   // Zooming Sprites, read by a blitter
 	ROM_LOAD( "vg004-01.u33", 0x0000000, 0x200000, CRC(aa9a81c2) SHA1(a7d005f9be199e317aa4c6aed8a2ab322fe82119) )
 	ROM_LOAD( "vg004-02.u34", 0x0200000, 0x200000, CRC(fa40ecb4) SHA1(0513f3b6879dc7d207646d949d6ddb7251f77bcc) )
 	ROM_LOAD( "vg004-03.u35", 0x0400000, 0x200000, CRC(90004023) SHA1(041edb77b34e6677ac5b85ce542d87a9bb1baf31) )

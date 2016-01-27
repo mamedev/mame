@@ -57,11 +57,15 @@
 			iscrosscompiler = true,
 			namestyle       = "windows",
 		},
+		PowerPC =
+		{
+			cfgsuffix       = "ppc",
+			iscrosscompiler = true,
+		},
 		ARM =
 		{
 			cfgsuffix       = "ARM",
 			iscrosscompiler = true,
-			namestyle       = "windows"
 		},
 		Orbis = 
 		{ 

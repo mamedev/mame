@@ -88,12 +88,12 @@ void zsg2_device::device_start()
 	m_stream = stream_alloc(0, 2, clock() / 768);
 
 	m_mem_blocks = m_mem_base.length();
-	m_mem_copy = auto_alloc_array_clear(machine(), UINT32, m_mem_blocks);
-	m_full_samples = auto_alloc_array_clear(machine(), INT16, m_mem_blocks * 4 + 4); // +4 is for empty block
+	m_mem_copy = make_unique_clear<UINT32[]>(m_mem_blocks);
+	m_full_samples = make_unique_clear<INT16[]>(m_mem_blocks * 4 + 4); // +4 is for empty block
 
 	// register for savestates
-	save_pointer(NAME(m_mem_copy), m_mem_blocks / sizeof(UINT32));
-	save_pointer(NAME(m_full_samples), (m_mem_blocks * 4 + 4) / sizeof(INT16));
+	save_pointer(NAME(m_mem_copy.get()), m_mem_blocks / sizeof(UINT32));
+	save_pointer(NAME(m_full_samples.get()), (m_mem_blocks * 4 + 4) / sizeof(INT16));
 	save_item(NAME(m_read_address));
 
 	for (int ch = 0; ch < 48; ch++)

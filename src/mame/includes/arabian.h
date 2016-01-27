@@ -23,8 +23,8 @@ public:
 	required_shared_ptr<UINT8> m_custom_cpu_ram;
 	required_shared_ptr<UINT8> m_blitter;
 
-	UINT8 *  m_main_bitmap;
-	UINT8 *  m_converted_gfx;
+	std::unique_ptr<UINT8[]>  m_main_bitmap;
+	std::unique_ptr<UINT8[]>  m_converted_gfx;
 
 	/* video-related */
 	UINT8    m_video_control;

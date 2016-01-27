@@ -43,15 +43,15 @@ void kaneko_grap2_device::static_set_palette_tag(device_t &device, const char *t
 
 void kaneko_grap2_device::device_start()
 {
-	m_framebuffer = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x80000/2);
-	m_framebuffer_palette = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x200/2);
-	m_framebuffer_unk1 = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x400/2);
-	m_framebuffer_unk2 = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x400/2);
+	m_framebuffer = make_unique_clear<UINT16[]>(0x80000/2);
+	m_framebuffer_palette = make_unique_clear<UINT16[]>(0x200/2);
+	m_framebuffer_unk1 = make_unique_clear<UINT16[]>(0x400/2);
+	m_framebuffer_unk2 = make_unique_clear<UINT16[]>(0x400/2);
 
-	save_pointer(NAME(m_framebuffer), 0x80000/2);
-	save_pointer(NAME(m_framebuffer_palette), 0x200/2);
-	save_pointer(NAME(m_framebuffer_unk1), 0x400/2);
-	save_pointer(NAME(m_framebuffer_unk2), 0x400/2);
+	save_pointer(NAME(m_framebuffer.get()), 0x80000/2);
+	save_pointer(NAME(m_framebuffer_palette.get()), 0x200/2);
+	save_pointer(NAME(m_framebuffer_unk1.get()), 0x400/2);
+	save_pointer(NAME(m_framebuffer_unk2.get()), 0x400/2);
 
 	save_item(NAME(m_framebuffer_bgcol));
 	save_item(NAME(m_framebuffer_scrolly));
@@ -160,7 +160,7 @@ WRITE16_MEMBER(kaneko_grap2_device::galpani3_regs1_go_w)
 	UINT8* rledata = memregion(":gfx2")->base();
 
 //  printf("galpani3_regs1_go_w? %08x\n",address );
-	if ((data==0x2000) || (data==0x3000)) gp3_do_rle(address, m_framebuffer, rledata);
+	if ((data==0x2000) || (data==0x3000)) gp3_do_rle(address, m_framebuffer.get(), rledata);
 }
 
 

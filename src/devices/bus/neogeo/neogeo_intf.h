@@ -38,7 +38,7 @@ public:
 	UINT32  get_audio_size() { return m_audio.size(); }
 
 	void audiocrypt_alloc(UINT32 size) { m_audiocrypt.resize(size); }
-	UINT8* get_audiocrypt_base() { return &m_audiocrypt[0]; }
+	UINT8* get_audiocrypt_base() { if (m_audiocrypt.size() == 0) return nullptr; else  return &m_audiocrypt[0]; }
 	UINT32  get_audiocrypt_size() { return m_audiocrypt.size(); }
 
 	void sprites_alloc(UINT32 size) { m_sprites.resize(size); }

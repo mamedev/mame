@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 // FPU math lib
@@ -14,10 +14,10 @@
 
 namespace bx
 {
-	static const float pi     = 3.14159265358979323846f;
-	static const float invPi  = 1.0f/3.14159265358979323846f;
-	static const float piHalf = 1.57079632679489661923f;
-	static const float sqrt2  = 1.41421356237309504880f;
+	static const float pi      = 3.14159265358979323846f;
+	static const float invPi   = 1.0f/3.14159265358979323846f;
+	static const float piHalf  = 1.57079632679489661923f;
+	static const float sqrt2   = 1.41421356237309504880f;
 
 	inline float toRad(float _deg)
 	{
@@ -89,9 +89,49 @@ namespace bx
 		return fabsf(_a);
 	}
 
+	inline float fsq(float _a)
+	{
+		return _a * _a;
+	}
+
+	inline float fsin(float _a)
+	{
+		return sinf(_a);
+	}
+
+	inline float fcos(float _a)
+	{
+		return cosf(_a);
+	}
+
+	inline float fpow(float _a, float _b)
+	{
+		return powf(_a, _b);
+	}
+
+	inline float fexp2(float _a)
+	{
+		return fpow(2.0f, _a);
+	}
+
+	inline float flog(float _a)
+	{
+		return logf(_a);
+	}
+
+	inline float flog2(float _a)
+	{
+		return flog(_a) * 1.442695041f;
+	}
+
 	inline float fsqrt(float _a)
 	{
 		return sqrtf(_a);
+	}
+
+	inline float frsqrt(float _a)
+	{
+		return 1.0f/fsqrt(_a);
 	}
 
 	inline float ffract(float _a)
@@ -101,7 +141,10 @@ namespace bx
 
 	inline bool fequal(float _a, float _b, float _epsilon)
 	{
-		return fabsolute(_a - _b) <= _epsilon;
+		// http://realtimecollisiondetection.net/blog/?p=89
+		const float lhs = fabsolute(_a - _b);
+		const float rhs = _epsilon * fmax3(1.0f, fabsolute(_a), fabsolute(_b) );
+		return lhs <= rhs;
 	}
 
 	inline bool fequal(const float* __restrict _a, const float* __restrict _b, uint32_t _num, float _epsilon)
@@ -168,11 +211,25 @@ namespace bx
 		_result[2] = _a[2] + _b[2];
 	}
 
+	inline void vec3Add(float* __restrict _result, const float* __restrict _a, float _b)
+	{
+		_result[0] = _a[0] + _b;
+		_result[1] = _a[1] + _b;
+		_result[2] = _a[2] + _b;
+	}
+
 	inline void vec3Sub(float* __restrict _result, const float* __restrict _a, const float* __restrict _b)
 	{
 		_result[0] = _a[0] - _b[0];
 		_result[1] = _a[1] - _b[1];
 		_result[2] = _a[2] - _b[2];
+	}
+
+	inline void vec3Sub(float* __restrict _result, const float* __restrict _a, float _b)
+	{
+		_result[0] = _a[0] - _b;
+		_result[1] = _a[1] - _b;
+		_result[2] = _a[2] - _b;
 	}
 
 	inline void vec3Mul(float* __restrict _result, const float* __restrict _a, const float* __restrict _b)
@@ -206,6 +263,20 @@ namespace bx
 		return fsqrt(vec3Dot(_a, _a) );
 	}
 
+	inline void vec3Lerp(float* __restrict _result, const float* __restrict _a, const float* __restrict _b, float _t)
+	{
+		_result[0] = flerp(_a[0], _b[0], _t);
+		_result[1] = flerp(_a[1], _b[1], _t);
+		_result[2] = flerp(_a[2], _b[2], _t);
+	}
+
+	inline void vec3Lerp(float* __restrict _result, const float* __restrict _a, const float* __restrict _b, const float* __restrict _c)
+	{
+		_result[0] = flerp(_a[0], _b[0], _c[0]);
+		_result[1] = flerp(_a[1], _b[1], _c[1]);
+		_result[2] = flerp(_a[2], _b[2], _c[2]);
+	}
+
 	inline float vec3Norm(float* __restrict _result, const float* __restrict _a)
 	{
 		const float len = vec3Length(_a);
@@ -216,12 +287,41 @@ namespace bx
 		return len;
 	}
 
+	inline void vec3Min(float* __restrict _result, const float* __restrict _a, const float* __restrict _b)
+	{
+		_result[0] = fmin(_a[0], _b[0]);
+		_result[1] = fmin(_a[1], _b[1]);
+		_result[2] = fmin(_a[2], _b[2]);
+	}
+
+	inline void vec3Max(float* __restrict _result, const float* __restrict _a, const float* __restrict _b)
+	{
+		_result[0] = fmax(_a[0], _b[0]);
+		_result[1] = fmax(_a[1], _b[1]);
+		_result[2] = fmax(_a[2], _b[2]);
+	}
+
+	inline void vec3Rcp(float* __restrict _result, const float* __restrict _a)
+	{
+		_result[0] = 1.0f / _a[0];
+		_result[1] = 1.0f / _a[1];
+		_result[2] = 1.0f / _a[2];
+	}
+
 	inline void quatIdentity(float* _result)
 	{
 		_result[0] = 0.0f;
 		_result[1] = 0.0f;
 		_result[2] = 0.0f;
 		_result[3] = 1.0f;
+	}
+
+	inline void quatMove(float* __restrict _result, const float* __restrict _a)
+	{
+		_result[0] = _a[0];
+		_result[1] = _a[1];
+		_result[2] = _a[2];
+		_result[3] = _a[3];
 	}
 
 	inline void quatMulXYZ(float* __restrict _result, const float* __restrict _qa, const float* __restrict _qb)
@@ -267,6 +367,32 @@ namespace bx
 		_result[3] =  _quat[3];
 	}
 
+	inline float quatDot(const float* __restrict _a, const float* __restrict _b)
+	{
+		return _a[0]*_b[0]
+			 + _a[1]*_b[1]
+			 + _a[2]*_b[2]
+			 + _a[3]*_b[3]
+			 ;
+	}
+
+	inline void quatNorm(float* __restrict _result, const float* __restrict _quat)
+	{
+		const float norm = quatDot(_quat, _quat);
+		if (0.0f < norm)
+		{
+			const float invNorm = 1.0f / fsqrt(norm);
+			_result[0] = _quat[0] * invNorm;
+			_result[1] = _quat[1] * invNorm;
+			_result[2] = _quat[2] * invNorm;
+			_result[3] = _quat[3] * invNorm;
+		}
+		else
+		{
+			quatIdentity(_result);
+		}
+	}
+
 	inline void quatToEuler(float* __restrict _result, const float* __restrict _quat)
 	{
 		const float x = _quat[0];
@@ -281,6 +407,17 @@ namespace bx
 		_result[0] = atan2f(2.0f * (x * w - y * z), 1.0f - 2.0f * (xx + zz) );
 		_result[1] = atan2f(2.0f * (y * w + x * z), 1.0f - 2.0f * (yy + zz) );
 		_result[2] = asinf (2.0f * (x * y + z * w) );
+	}
+
+	inline void quatRotateAxis(float* __restrict _result, const float* _axis, float _angle)
+	{
+		const float ha = _angle * 0.5f;
+		const float ca = cosf(ha);
+		const float sa = sinf(ha);
+		_result[0] = _axis[0] * sa;
+		_result[1] = _axis[1] * sa;
+		_result[2] = _axis[2] * sa;
+		_result[3] = ca;
 	}
 
 	inline void quatRotateX(float* _result, float _ax)
@@ -415,14 +552,8 @@ namespace bx
 		mtxQuatTranslation(_result, quat, _translation);
 	}
 
-	inline void mtxLookAt(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL)
+	inline void mtxLookAt_Impl(float* __restrict _result, const float* __restrict _eye, const float* __restrict _view, const float* __restrict _up = NULL)
 	{
-		float tmp[4];
-		vec3Sub(tmp, _at, _eye);
-
-		float view[4];
-		vec3Norm(view, tmp);
-
 		float up[3] = { 0.0f, 1.0f, 0.0f };
 		if (NULL != _up)
 		{
@@ -430,37 +561,66 @@ namespace bx
 			up[1] = _up[1];
 			up[2] = _up[2];
 		}
-		vec3Cross(tmp, up, view);
+
+		float tmp[4];
+		vec3Cross(tmp, up, _view);
 
 		float right[4];
 		vec3Norm(right, tmp);
 
-		vec3Cross(up, view, right);
+		vec3Cross(up, _view, right);
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = right[0];
 		_result[ 1] = up[0];
-		_result[ 2] = view[0];
+		_result[ 2] = _view[0];
 
 		_result[ 4] = right[1];
 		_result[ 5] = up[1];
-		_result[ 6] = view[1];
+		_result[ 6] = _view[1];
 
 		_result[ 8] = right[2];
 		_result[ 9] = up[2];
-		_result[10] = view[2];
+		_result[10] = _view[2];
 
 		_result[12] = -vec3Dot(right, _eye);
 		_result[13] = -vec3Dot(up, _eye);
-		_result[14] = -vec3Dot(view, _eye);
+		_result[14] = -vec3Dot(_view, _eye);
 		_result[15] = 1.0f;
 	}
 
-	inline void mtxProjXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool _oglNdc = false)
+	inline void mtxLookAtLh(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL)
+	{
+		float tmp[4];
+		vec3Sub(tmp, _eye, _at);
+
+		float view[4];
+		vec3Norm(view, tmp);
+
+		mtxLookAt_Impl(_result, _eye, view, _up);
+	}
+
+	inline void mtxLookAtRh(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL)
+	{
+		float tmp[4];
+		vec3Sub(tmp, _at, _eye);
+
+		float view[4];
+		vec3Norm(view, tmp);
+
+		mtxLookAt_Impl(_result, _eye, view, _up);
+	}
+
+	inline void mtxLookAt(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL)
+	{
+		mtxLookAtRh(_result, _eye, _at, _up);
+	}
+
+	inline void mtxProjRhXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool _oglNdc = false)
 	{
 		const float diff = _far-_near;
 		const float aa = _oglNdc ?       (_far+_near)/diff : _far/diff;
-		const float bb = _oglNdc ? -(2.0f*_far*_near)/diff : -_near*aa;
+		const float bb = _oglNdc ?  (2.0f*_far*_near)/diff : _near*aa;
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = _width;
@@ -469,28 +629,80 @@ namespace bx
 		_result[ 9] = -_y;
 		_result[10] = aa;
 		_result[11] = 1.0f;
-		_result[14] = bb;
+		_result[14] = -bb;
 	}
 
-	inline void mtxProj(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
+	inline void mtxProjRh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
 	{
 		const float width  = 2.0f / (_lt + _rt);
 		const float height = 2.0f / (_ut + _dt);
 		const float xx     = (_lt - _rt) * width  * 0.5f;
 		const float yy     = (_ut - _dt) * height * 0.5f;
-		mtxProjXYWH(_result, xx, yy, width, height, _near, _far, _oglNdc);
+		mtxProjRhXYWH(_result, xx, yy, width, height, _near, _far, _oglNdc);
+	}
+
+	inline void mtxProjRh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
+	{
+		mtxProjRh(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _far, _oglNdc);
+	}
+
+	inline void mtxProjRh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
+	{
+		const float height = 1.0f/tanf(toRad(_fovy)*0.5f);
+		const float width  = height * 1.0f/_aspect;
+		mtxProjRhXYWH(_result, 0.0f, 0.0f, width, height, _near, _far, _oglNdc);
+	}
+
+	inline void mtxProjLhXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool _oglNdc = false)
+	{
+		const float diff = _far-_near;
+		const float aa = _oglNdc ?       (_far+_near)/diff : _far/diff;
+		const float bb = _oglNdc ?  (2.0f*_far*_near)/diff : _near*aa;
+
+		memset(_result, 0, sizeof(float)*16);
+		_result[ 0] = _width;
+		_result[ 5] = _height;
+		_result[ 8] =  _x;
+		_result[ 9] = -_y;
+		_result[10] = -aa;
+		_result[11] = -1.0f;
+		_result[14] = -bb;
+	}
+
+	inline void mtxProjLh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
+	{
+		const float width  = 2.0f / (_lt + _rt);
+		const float height = 2.0f / (_ut + _dt);
+		const float xx     = (_lt - _rt) * width  * 0.5f;
+		const float yy     = (_ut - _dt) * height * 0.5f;
+		mtxProjLhXYWH(_result, xx, yy, width, height, _near, _far, _oglNdc);
+	}
+
+	inline void mtxProjLh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
+	{
+		mtxProjLh(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _far, _oglNdc);
+	}
+
+	inline void mtxProjLh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
+	{
+		const float height = 1.0f/tanf(toRad(_fovy)*0.5f);
+		const float width  = height * 1.0f/_aspect;
+		mtxProjLhXYWH(_result, 0.0f, 0.0f, width, height, _near, _far, _oglNdc);
+	}
+
+	inline void mtxProj(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
+	{
+		mtxProjRh(_result, _ut, _dt, _lt, _rt, _near, _far, _oglNdc);
 	}
 
 	inline void mtxProj(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProj(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _far, _oglNdc);
+		mtxProjRh(_result, _fov, _near, _far, _oglNdc);
 	}
 
 	inline void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
 	{
-		const float height = 1.0f/tanf(toRad(_fovy)*0.5f);
-		const float width  = height * 1.0f/_aspect;
-		mtxProjXYWH(_result, 0.0f, 0.0f, width, height, _near, _far, _oglNdc);
+		mtxProjRh(_result, _fovy, _aspect, _near, _far, _oglNdc);
 	}
 
 	inline void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f)

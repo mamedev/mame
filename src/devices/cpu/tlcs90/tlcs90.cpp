@@ -1328,7 +1328,7 @@ void tlcs90_device::check_interrupts()
 	if (!(F & IF))
 		return;
 
-	for (irq = INTSWI; irq < INTMAX; irq++)
+	for (irq = INTSWI; irq < INTMAX; ++irq)
 	{
 		mask = (1 << irq);
 		if(irq >= INT0) mask &= m_irq_mask;
@@ -2766,7 +2766,7 @@ void tlcs90_device::device_start()
 }
 
 
-void tlcs90_device::state_string_export(const device_state_entry &entry, std::string &str)
+void tlcs90_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

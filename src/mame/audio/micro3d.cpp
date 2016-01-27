@@ -68,9 +68,9 @@ static void filter_init(running_machine &machine, lp_filter *iir, double fs)
 	iir->ProtoCoef[1].b1 = 1.847759;
 	iir->ProtoCoef[1].b2 = 1.0;
 
-	iir->coef = (float *)auto_alloc_array_clear(machine, float, 4 * 2 + 1);
+	iir->coef = make_unique_clear<float[]>(4 * 2 + 1);
 	iir->fs = fs;
-	iir->history = (float *)auto_alloc_array_clear(machine, float, 2 * 2);
+	iir->history = make_unique_clear<float[]>(2 * 2);
 }
 
 static void prewarp(double *a0, double *a1, double *a2,double fc, double fs)
@@ -107,7 +107,7 @@ static void recompute_filter(lp_filter *iir, double k, double q, double fc)
 	int nInd;
 	double a0, a1, a2, b0, b1, b2;
 
-	float *coef = iir->coef + 1;
+	float *coef = iir->coef.get() + 1;
 
 	for (nInd = 0; nInd < 2; nInd++)
 	{
@@ -270,9 +270,9 @@ void micro3d_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 		input += white;
 		input *= 200.0f;
 
-		coef_ptr = iir->coef;
+		coef_ptr = iir->coef.get();
 
-		hist1_ptr = iir->history;
+		hist1_ptr = iir->history.get();
 		hist2_ptr = hist1_ptr + 1;
 
 		/* 1st number of coefficients array is overall input scale factor, * or filter gain */

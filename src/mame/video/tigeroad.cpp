@@ -40,14 +40,14 @@ WRITE16_MEMBER(tigeroad_state::tigeroad_videoctrl_w)
 		/* bits 4-5 are coin lockouts */
 		if (m_has_coinlock)
 		{
-			coin_lockout_w(machine(), 0, !(data & 0x10));
-			coin_lockout_w(machine(), 1, !(data & 0x20));
+			machine().bookkeeping().coin_lockout_w(0, !(data & 0x10));
+			machine().bookkeeping().coin_lockout_w(1, !(data & 0x20));
 		}
 
 		/* bits 6-7 are coin counters */
 
-		coin_counter_w(machine(), 0, data & 0x40);
-		coin_counter_w(machine(), 1, data & 0x80);
+		machine().bookkeeping().coin_counter_w(0, data & 0x40);
+		machine().bookkeeping().coin_counter_w(1, data & 0x80);
 	}
 }
 

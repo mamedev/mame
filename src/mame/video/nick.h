@@ -108,7 +108,6 @@ private:
 
 	void write_pixel(int ci);
 	void calc_visible_clocks(int width);
-	void init();
 	void write_border(int clocks);
 	void do_left_margin();
 	void do_right_margin();
@@ -130,8 +129,6 @@ private:
 	void reload_lpt();
 	void do_line();
 
-	/* horizontal position */
-	UINT8 horizontal_clock;
 	/* current scanline within LPT */
 	UINT8 m_scanline_count;
 

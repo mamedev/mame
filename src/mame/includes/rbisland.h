@@ -33,7 +33,7 @@ public:
 	UINT8       m_jumping_latch;
 
 	/* c-chip */
-	UINT8       *m_CRAM[8];
+	std::unique_ptr<UINT8[]>    m_CRAM[8];
 	int         m_extra_version;
 	UINT8       m_current_bank;
 

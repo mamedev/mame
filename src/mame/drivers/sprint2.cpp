@@ -100,8 +100,8 @@ INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 			case 4: m_gear[i] = 3; break;
 			case 8: m_gear[i] = 4; break;
 			}
-			output_set_value("P1gear", m_gear[0]);
-			output_set_value("P2gear", m_gear[1]);
+			output().set_value("P1gear", m_gear[0]);
+			output().set_value("P2gear", m_gear[1]);
 		}
 	}
 
@@ -239,20 +239,20 @@ WRITE8_MEMBER(sprint2_state::sprint2_skid2_w)
 
 WRITE8_MEMBER(sprint2_state::sprint2_lamp1_w)
 {
-	set_led_status(machine(), 0, offset & 1);
+	output().set_led_value(0, offset & 1);
 }
 WRITE8_MEMBER(sprint2_state::sprint2_lamp2_w)
 {
-	set_led_status(machine(), 1, offset & 1);
+	output().set_led_value(1, offset & 1);
 }
 
 WRITE8_MEMBER(sprint2_state::dominos4_lamp3_w)
 {
-	set_led_status(machine(), 2, offset & 1);
+	output().set_led_value(2, offset & 1);
 }
 WRITE8_MEMBER(sprint2_state::dominos4_lamp4_w)
 {
-	set_led_status(machine(), 3, offset & 1);
+	output().set_led_value(3, offset & 1);
 }
 
 static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8, sprint2_state )

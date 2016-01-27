@@ -80,13 +80,13 @@ void segaic16_road_device::segaic16_road_hangon_decode(running_machine &machine,
 	int len = memregion("^gfx3")->bytes();
 
 	/* allocate memory for the unpacked road data */
-	info->gfx = auto_alloc_array(machine, UINT8, 256 * 512);
+	info->gfx = std::make_unique<UINT8[]>(256 * 512);
 
 	/* loop over rows */
 	for (y = 0; y < 256; y++)
 	{
 		const UINT8 *src = gfx + ((y & 0xff) * 0x40) % len;
-		UINT8 *dst = info->gfx + y * 512;
+		UINT8 *dst = info->gfx.get() + y * 512;
 
 		/* loop over columns */
 		for (x = 0; x < 512; x++)
@@ -120,7 +120,7 @@ static void segaic16_road_hangon_draw(struct road_info *info, bitmap_ind16 &bitm
 			continue;
 
 		/* compute the offset of the road graphics for this line */
-		src = info->gfx + (0x000 + (control & 0xff)) * 512;
+		src = info->gfx.get() + (0x000 + (control & 0xff)) * 512;
 
 		/* initialize the 4-bit counter at 9M, which counts bits within each road byte */
 		ctr9m = hpos & 7;
@@ -341,13 +341,13 @@ void segaic16_road_device::segaic16_road_outrun_decode(running_machine &machine,
 	int len = memregion("^gfx3")->bytes();
 
 	/* allocate memory for the unpacked road data */
-	info->gfx = auto_alloc_array(machine, UINT8, (256 * 2 + 1) * 512);
+	info->gfx = std::make_unique<UINT8[]>((256 * 2 + 1) * 512);
 
 	/* loop over rows */
 	for (y = 0; y < 256 * 2; y++)
 	{
 		const UINT8 *src = gfx + ((y & 0xff) * 0x40 + (y >> 8) * 0x8000) % len;
-		UINT8 *dst = info->gfx + y * 512;
+		UINT8 *dst = info->gfx.get() + y * 512;
 
 		/* loop over columns */
 		for (x = 0; x < 512; x++)
@@ -361,13 +361,13 @@ void segaic16_road_device::segaic16_road_outrun_decode(running_machine &machine,
 	}
 
 	/* set up a dummy road in the last entry */
-	memset(info->gfx + 256 * 2 * 512, 3, 512);
+	memset(info->gfx.get() + 256 * 2 * 512, 3, 512);
 }
 
 
 static void segaic16_road_outrun_draw(struct road_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
-	UINT16 *roadram = info->buffer;
+	UINT16 *roadram = info->buffer.get();
 	int x, y;
 
 	/* loop over scanlines */
@@ -442,12 +442,12 @@ static void segaic16_road_outrun_draw(struct road_info *info, bitmap_ind16 &bitm
 				continue;
 
 			/* get road 0 data */
-			src0 = (data0 & 0x800) ? info->gfx + 256 * 2 * 512 : (info->gfx + (0x000 + ((data0 >> 1) & 0xff)) * 512);
+			src0 = (data0 & 0x800) ? info->gfx.get() + 256 * 2 * 512 : (info->gfx.get() + (0x000 + ((data0 >> 1) & 0xff)) * 512);
 			hpos0 = (roadram[0x200 + ((info->control & 4) ? y : (data0 & 0x1ff))]) & 0xfff;
 			color0 = roadram[0x600 + ((info->control & 4) ? y : (data0 & 0x1ff))];
 
 			/* get road 1 data */
-			src1 = (data1 & 0x800) ? info->gfx + 256 * 2 * 512 : (info->gfx + (0x100 + ((data1 >> 1) & 0xff)) * 512);
+			src1 = (data1 & 0x800) ? info->gfx.get() + 256 * 2 * 512 : (info->gfx.get() + (0x100 + ((data1 >> 1) & 0xff)) * 512);
 			hpos1 = (roadram[0x400 + ((info->control & 4) ? (0x100 + y) : (data1 & 0x1ff))]) & 0xfff;
 			color1 = roadram[0x600 + ((info->control & 4) ? (0x100 + y) : (data1 & 0x1ff))];
 
@@ -573,7 +573,7 @@ void segaic16_road_device::segaic16_road_init(running_machine &machine, int whic
 
 		case SEGAIC16_ROAD_OUTRUN:
 		case SEGAIC16_ROAD_XBOARD:
-			info->buffer = auto_alloc_array(machine, UINT16, 0x1000/2);
+			info->buffer = std::make_unique<UINT16[]>(0x1000/2);
 			info->draw = segaic16_road_outrun_draw;
 			segaic16_road_outrun_decode(machine, info);
 			break;
@@ -612,7 +612,7 @@ READ16_MEMBER( segaic16_road_device::segaic16_road_control_0_r )
 	if (info->buffer)
 	{
 		UINT32 *src = (UINT32 *)info->roadram;
-		UINT32 *dst = (UINT32 *)info->buffer;
+		UINT32 *dst = (UINT32 *)info->buffer.get();
 		int i;
 
 		/* swap the halves of the road RAM */

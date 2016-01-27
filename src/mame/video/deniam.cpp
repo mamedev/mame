@@ -159,7 +159,7 @@ WRITE16_MEMBER(deniam_state::deniam_coinctrl_w)
 	COMBINE_DATA(&m_coinctrl);
 
 	/* bit 0 is coin counter */
-	coin_counter_w(machine(), 0, m_coinctrl & 0x01);
+	machine().bookkeeping().coin_counter_w(0, m_coinctrl & 0x01);
 
 	/* bit 6 is display enable (0 freezes screen) */
 	m_display_enable = m_coinctrl & 0x20;

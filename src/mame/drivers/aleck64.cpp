@@ -184,14 +184,17 @@ public:
 			m_e90_pal(*this,"e90pal"),
 			m_dip_read_offset(0) { }
 
-	optional_shared_ptr<UINT32> m_e90_vram;
-	optional_shared_ptr<UINT32> m_e90_pal;
 	DECLARE_DRIVER_INIT(aleck64);
 	DECLARE_WRITE32_MEMBER(aleck_dips_w);
 	DECLARE_READ32_MEMBER(aleck_dips_r);
 	DECLARE_READ16_MEMBER(e90_prot_r);
 	DECLARE_WRITE16_MEMBER(e90_prot_w);
+
 	UINT32 screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+protected:
+	optional_shared_ptr<UINT32> m_e90_vram;
+	optional_shared_ptr<UINT32> m_e90_pal;
 
 private:
 	UINT32 m_dip_read_offset;

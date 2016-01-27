@@ -37,9 +37,9 @@ void k007420_device::device_start()
 	// bind the init function
 	m_callback.bind_relative_to(*owner());
 
-	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x200);
+	m_ram = make_unique_clear<UINT8[]>(0x200);
 
-	save_pointer(NAME(m_ram), 0x200);
+	save_pointer(NAME(m_ram.get()), 0x200);
 	save_item(NAME(m_flipscreen));   // current one uses 7342 one
 	save_item(NAME(m_regs)); // current one uses 7342 ones
 }

@@ -118,7 +118,6 @@ public:
 	void set_macpds_device();
 
 	// helper functions for card devices
-	void install_declaration_rom(device_t *dev, const char *romregion, bool mirror_all_mb = false, bool reverse_rom = false);
 	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
 	void install_rom(device_t *dev, const char *romregion, UINT32 addr);
 

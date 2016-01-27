@@ -284,16 +284,15 @@ static const UINT8 keyboard[8][10][8] = {
 
 MACHINE_RESET_MEMBER(kaypro_state,kay_kbd)
 {
-	kay_kbd_t *kbd = m_kbd = auto_alloc_clear(machine(), kay_kbd_t);
+	kay_kbd_t *kbd = m_kbd = auto_alloc_clear(machine(), <kay_kbd_t>());
 
 	/* disable CapsLock LED initially */
-	set_led_status(machine(), 1, 1);
-	set_led_status(machine(), 1, 0);
+	output().set_led_value(1, 1);
+	output().set_led_value(1, 0);
 	kbd->beeper = machine().device<beep_device>("beeper");
 	kbd->beep_on = 1;
 	kbd->control_status = 0x14;
 	kbd->beeper->set_state(0);
-	kbd->beeper->set_frequency(950);   /* piezo-device needs to be measured */
 	kbd->head = kbd->tail = 0;          /* init buffer */
 }
 
@@ -344,7 +343,7 @@ INTERRUPT_GEN_MEMBER(kaypro_state::kay_kbd_interrupt)
 		kbd->lastrow = row;
 		/* CapsLock LED */
 		if( row == 3 && chg == 0x80 )
-			set_led_status(machine(), 1, (kbd->keyrows[3] & 0x80) ? 0 : 1);
+			output().set_led_value(1, (kbd->keyrows[3] & 0x80) ? 0 : 1);
 
 		if (newval & chg)   /* key(s) pressed ? */
 		{

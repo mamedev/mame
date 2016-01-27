@@ -344,7 +344,7 @@ WRITE8_MEMBER( sage2_state::ppi1_pc_w )
 	m_pic->ir7_w(BIT(data, 2));
 
 	// processor LED
-	output_set_led_value(0, BIT(data, 3));
+	output().set_led_value(0, BIT(data, 3));
 
 	// centronics
 	m_centronics->write_strobe(BIT(data, 4));

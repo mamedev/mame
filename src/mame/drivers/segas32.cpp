@@ -891,10 +891,10 @@ void segas32_state::common_io_chip_w(address_space &space, int which, offs_t off
 				m_eeprom->cs_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 				m_eeprom->clk_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			}
-/*            coin_lockout_w(machine(), 1 + 2*which, data & 0x08);
-            coin_lockout_w(machine(), 0 + 2*which, data & 0x04);*/
-			coin_counter_w(machine(), 1 + 2*which, data & 0x02);
-			coin_counter_w(machine(), 0 + 2*which, data & 0x01);
+/*            machine().bookkeeping().coin_lockout_w(1 + 2*which, data & 0x08);
+            machine().bookkeeping().coin_lockout_w(0 + 2*which, data & 0x04);*/
+			machine().bookkeeping().coin_counter_w(1 + 2*which, data & 0x02);
+			machine().bookkeeping().coin_counter_w(0 + 2*which, data & 0x01);
 			break;
 
 		/* tile banking */
@@ -2655,7 +2655,7 @@ public:
 	DECLARE_DRIVER_INIT(f1lap);
 	DECLARE_DRIVER_INIT(orunners);
 
-	UINT16* m_dual_pcb_comms;
+	std::unique_ptr<UINT16[]> m_dual_pcb_comms;
 	DECLARE_WRITE16_MEMBER(dual_pcb_comms_w);
 	DECLARE_READ16_MEMBER(dual_pcb_comms_r);
 	DECLARE_READ16_MEMBER(dual_pcb_masterslave);
@@ -4945,15 +4945,15 @@ void segas32_state::segas32_common_init(read16_delegate custom_r, write16_delega
 void segas32_state::radm_sw1_output( int which, UINT16 data )
 {
 	if (which == 0)
-		output_set_value("Start_lamp", BIT(data, 2));
+		machine().output().set_value("Start_lamp", BIT(data, 2));
 }
 
 void segas32_state::radm_sw2_output( int which, UINT16 data )
 {
 	if (which == 0)
 	{
-		output_set_value("Wiper_lamp", BIT(data, 0));
-		output_set_value("Lights_lamp", BIT(data, 1));
+		machine().output().set_value("Wiper_lamp", BIT(data, 0));
+		machine().output().set_value("Lights_lamp", BIT(data, 1));
 	}
 }
 
@@ -4961,8 +4961,8 @@ void segas32_state::radr_sw2_output( int which, UINT16 data )
 {
 	if (which == 0)
 	{
-		output_set_value("Entry_lamp", BIT(data, 0));
-		output_set_value("Winner_lamp", BIT(data, 1));
+		machine().output().set_value("Entry_lamp", BIT(data, 0));
+		machine().output().set_value("Winner_lamp", BIT(data, 1));
 	}
 }
 
@@ -4970,8 +4970,8 @@ void segas32_state::alien3_sw1_output( int which, UINT16 data )
 {
 	if (which == 0)
 	{
-		output_set_value("Player1_Gun_Recoil", BIT(data, 2));
-		output_set_value("Player2_Gun_Recoil", BIT(data, 3));
+		machine().output().set_value("Player1_Gun_Recoil", BIT(data, 2));
+		machine().output().set_value("Player2_Gun_Recoil", BIT(data, 3));
 	}
 }
 
@@ -4979,8 +4979,8 @@ void segas32_state::arescue_sw1_output( int which, UINT16 data )
 {
 	if (which == 0)
 	{
-		output_set_value("Start_lamp", BIT(data, 2));
-		output_set_value("Back_lamp", BIT(data, 4));
+		machine().output().set_value("Start_lamp", BIT(data, 2));
+		machine().output().set_value("Back_lamp", BIT(data, 4));
 	}
 }
 
@@ -4988,8 +4988,8 @@ void segas32_state::f1lap_sw1_output( int which, UINT16 data )
 {
 	if (which == 0)
 	{
-		output_set_value("lamp0", BIT(data, 2));
-		output_set_value("lamp1", BIT(data, 3));
+		machine().output().set_value("lamp0", BIT(data, 2));
+		machine().output().set_value("lamp1", BIT(data, 3));
 	}
 }
 
@@ -4997,8 +4997,8 @@ void segas32_state::jpark_sw1_output( int which, UINT16 data )
 {
 	if (which == 0)
 	{
-		output_set_value("Left_lamp", BIT(data, 2));
-		output_set_value("Right_lamp", BIT(data, 3));
+		machine().output().set_value("Left_lamp", BIT(data, 2));
+		machine().output().set_value("Right_lamp", BIT(data, 3));
 	}
 }
 
@@ -5007,15 +5007,15 @@ void segas32_state::orunners_sw1_output( int which, UINT16 data )
 	/* note ma = monitor A and mb = Monitor B */
 	if (which == 0)
 	{
-		output_set_value("MA_Check_Point_lamp", BIT(data, 1));
-		output_set_value("MA_Race_Leader_lamp", BIT(data, 3));
-		output_set_value("MA_Steering_Wheel_motor", BIT(data, 4));
+		machine().output().set_value("MA_Check_Point_lamp", BIT(data, 1));
+		machine().output().set_value("MA_Race_Leader_lamp", BIT(data, 3));
+		machine().output().set_value("MA_Steering_Wheel_motor", BIT(data, 4));
 	}
 	else
 	{
-		output_set_value("MB_Check_Point_lamp", BIT(data, 1));
-		output_set_value("MB_Race_Leader_lamp", BIT(data, 3));
-		output_set_value("MB_Steering_Wheel_motor", BIT(data, 4));
+		machine().output().set_value("MB_Check_Point_lamp", BIT(data, 1));
+		machine().output().set_value("MB_Race_Leader_lamp", BIT(data, 3));
+		machine().output().set_value("MB_Steering_Wheel_motor", BIT(data, 4));
 	}
 }
 
@@ -5026,13 +5026,13 @@ void segas32_state::orunners_sw2_output( int which, UINT16 data )
 	/* the bijokkoy driver might be used as an example for handling these outputs */
 	if (which == 0)
 	{
-		output_set_value("MA_DJ_Music_lamp", BIT(data, 0));
-		output_set_value("MA_<<_>>_lamp", BIT(data, 1));
+		machine().output().set_value("MA_DJ_Music_lamp", BIT(data, 0));
+		machine().output().set_value("MA_<<_>>_lamp", BIT(data, 1));
 	}
 	else
 	{
-		output_set_value("MB_DJ_Music_lamp", BIT(data, 0));
-		output_set_value("MB_<<_>>_lamp", BIT(data, 1));
+		machine().output().set_value("MB_DJ_Music_lamp", BIT(data, 0));
+		machine().output().set_value("MB_<<_>>_lamp", BIT(data, 1));
 	}
 }
 
@@ -5040,68 +5040,68 @@ void segas32_state::harddunk_sw1_output( int which, UINT16 data )
 {
 	if (which == 0)
 	{
-		output_set_value("1P_Start_lamp", BIT(data, 2));
-		output_set_value("2P_Start_lamp", BIT(data, 3));
+		machine().output().set_value("1P_Start_lamp", BIT(data, 2));
+		machine().output().set_value("2P_Start_lamp", BIT(data, 3));
 	}
 	else
 	{
-		output_set_value("4P_Start_lamp", BIT(data, 2));
-		output_set_value("5P_Start_lamp", BIT(data, 3));
+		machine().output().set_value("4P_Start_lamp", BIT(data, 2));
+		machine().output().set_value("5P_Start_lamp", BIT(data, 3));
 	}
 }
 
 void segas32_state::harddunk_sw2_output( int which, UINT16 data )
 {
 	if (which == 0)
-		output_set_value("Left_Winner_lamp", BIT(data, 0));
+		machine().output().set_value("Left_Winner_lamp", BIT(data, 0));
 	else
-		output_set_value("Right_Winner_lamp", BIT(data, 0));
+		machine().output().set_value("Right_Winner_lamp", BIT(data, 0));
 }
 
 void segas32_state::harddunk_sw3_output( int which, UINT16 data )
 {
-	output_set_value("3P_Start_lamp", BIT(data, 4));
-	output_set_value("6P_Start_lamp", BIT(data, 5));
+	machine().output().set_value("3P_Start_lamp", BIT(data, 4));
+	machine().output().set_value("6P_Start_lamp", BIT(data, 5));
 }
 
 void segas32_state::titlef_sw1_output( int which, UINT16 data )
 {
 	if (which == 0)
 	{
-		output_set_value("Blue_Button_1P_lamp", BIT(data, 2));
-		output_set_value("Blue_Button_2P_lamp", BIT(data, 3));
+		machine().output().set_value("Blue_Button_1P_lamp", BIT(data, 2));
+		machine().output().set_value("Blue_Button_2P_lamp", BIT(data, 3));
 	}
 	else
 	{
-		output_set_value("Red_Button_1P_lamp", BIT(data, 2));
-		output_set_value("Red_Button_2P_lamp", BIT(data, 3));
+		machine().output().set_value("Red_Button_1P_lamp", BIT(data, 2));
+		machine().output().set_value("Red_Button_2P_lamp", BIT(data, 3));
 	}
 }
 
 void segas32_state::titlef_sw2_output( int which, UINT16 data )
 {
 	if (which == 0)
-		output_set_value("Blue_Corner_lamp", BIT(data, 0));
+		machine().output().set_value("Blue_Corner_lamp", BIT(data, 0));
 	else
-		output_set_value("Red_Corner_lamp", BIT(data, 0));
+		machine().output().set_value("Red_Corner_lamp", BIT(data, 0));
 }
 
 void segas32_state::scross_sw1_output( int which, UINT16 data )
 {
 	/* note ma = monitor A and mb = Monitor B */
 	if (which == 0)
-		output_set_value("MA_Start_lamp", BIT(data, 2));
+		machine().output().set_value("MA_Start_lamp", BIT(data, 2));
 	else
-		output_set_value("MB_Start_lamp", BIT(data, 2));
+		machine().output().set_value("MB_Start_lamp", BIT(data, 2));
 }
 
 void segas32_state::scross_sw2_output( int which, UINT16 data )
 {
 	/* Note:  I'm not an expert on digits, so I didn't know the right map to use, I just added it manually and it seems to work fine. */
 	if (which == 0)
-		output_set_value("MA_Digit", data);
+		machine().output().set_value("MA_Digit", data);
 	else
-		output_set_value("MB_Digit", data);
+		machine().output().set_value("MB_Digit", data);
 }
 
 /*************************************
@@ -5164,7 +5164,7 @@ DRIVER_INIT_MEMBER(segas32_new_state, arescue)
 	m_mainpcb->init_arescue(1);
 	m_slavepcb->init_arescue(0);
 
-	m_dual_pcb_comms = auto_alloc_array(machine(), UINT16, 0x1000/2);
+	m_dual_pcb_comms = std::make_unique<UINT16[]>(0x1000/2);
 	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
 	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_masterslave),this));
 
@@ -5176,8 +5176,8 @@ DRIVER_INIT_MEMBER(segas32_new_state,f1en) {
 	m_mainpcb->init_f1en();
 	m_slavepcb->init_f1en();
 
-	m_dual_pcb_comms = auto_alloc_array(machine(), UINT16, 0x1000/2);
-	memset(m_dual_pcb_comms, 0xff, 0x1000 / 2);
+	m_dual_pcb_comms = std::make_unique<UINT16[]>(0x1000/2);
+	memset(m_dual_pcb_comms.get(), 0xff, 0x1000 / 2);
 
 	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
 	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_masterslave),this));
@@ -5225,7 +5225,7 @@ void segas32_state::init_brival(void)
 	segas32_common_init(read16_delegate(FUNC(segas32_state::extra_custom_io_r),this), write16_delegate());
 
 	/* install protection handlers */
-	m_system32_protram = auto_alloc_array(machine(), UINT16, 0x1000/2);
+	m_system32_protram = std::make_unique<UINT16[]>(0x1000/2);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20ba00, 0x20ba07, read16_delegate(FUNC(segas32_state::brival_protection_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa00fff, write16_delegate(FUNC(segas32_state::brival_protection_w),this));
 }

@@ -60,7 +60,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pic8259_set_int_line);
 
 	DECLARE_WRITE8_MEMBER(pcjr_ppi_portb_w);
-	DECLARE_READ8_MEMBER(pcjr_ppi_porta_r);
 	DECLARE_READ8_MEMBER(pcjr_ppi_portc_r);
 	DECLARE_WRITE8_MEMBER(pcjr_fdc_dor_w);
 	DECLARE_READ8_MEMBER(pcjx_port_1ff_r);

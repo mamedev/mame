@@ -1367,7 +1367,7 @@ int shaders::phosphor_pass(render_target *rt, cache_target *ct, int source_index
 	int next_index = source_index;
 
 	// skip phosphor if no influencing settings
-	if (options->phosphor[0] == 0.0f && options->defocus[1] == 0.0f && options->defocus[2] == 0.0f)
+	if (options->phosphor[0] == 0.0f && options->defocus[0] == 0.0f && options->defocus[1] == 0.0f)
 	{
 		return next_index;
 	}
@@ -1416,11 +1416,11 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	float screen_scale[2] = { xscale, yscale };
 	float screen_offset[2] = { xoffset, yoffset };
 
-	rgb_t back_color_rgb = machine->first_screen()->palette() == NULL
+	rgb_t back_color_rgb = !machine->first_screen()->has_palette()
 		? rgb_t(0, 0, 0)
-		: machine->first_screen()->palette()->palette()->entry_color(0);
+		: machine->first_screen()->palette().palette()->entry_color(0);
 	back_color_rgb = apply_color_convolution(back_color_rgb);
-	float back_color[3] = { 
+	float back_color[3] = {
 		static_cast<float>(back_color_rgb.r()) / 255.0f,
 		static_cast<float>(back_color_rgb.g()) / 255.0f,
 		static_cast<float>(back_color_rgb.b()) / 255.0f };
@@ -1851,7 +1851,7 @@ bool shaders::register_prescaled_texture(texture_info *texture)
 //============================================================
 bool shaders::add_cache_target(renderer* d3d, texture_info* info, int width, int height, int xprescale, int yprescale, int screen_index)
 {
-	cache_target* target = (cache_target*)global_alloc_clear(cache_target);
+	cache_target* target = (cache_target*)global_alloc_clear<cache_target>();
 
 	if (!target->init(d3d, d3dintf, width, height, xprescale, yprescale))
 	{
@@ -1932,7 +1932,7 @@ bool shaders::add_render_target(renderer* d3d, texture_info* info, int width, in
 		}
 	}
 
-	render_target* target = (render_target*)global_alloc_clear(render_target);
+	render_target* target = (render_target*)global_alloc_clear<render_target>();
 
 	if (!target->init(d3d, d3dintf, width, height, xprescale, yprescale))
 	{
@@ -2779,18 +2779,18 @@ static INT32 slider_ntsc_enable(running_machine &machine, void *arg, std::string
 
 // static INT32 slider_ntsc_phase_count(running_machine &machine, void *arg, std::string *str, INT32 newval)
 // {
-// 	hlsl_options *options = (hlsl_options*)arg;
-// 	if (newval != SLIDER_NOCHANGE)
-// 	{
-// 		options->yiq_phase_count = newval;
-// 	}
-// 	if (str != NULL)
-// 	{
-// 		strprintf(*str, "%d", options->yiq_phase_count);
-// 	}
-// 	options->params_dirty = true;
+//  hlsl_options *options = (hlsl_options*)arg;
+//  if (newval != SLIDER_NOCHANGE)
+//  {
+//      options->yiq_phase_count = newval;
+//  }
+//  if (str != NULL)
+//  {
+//      strprintf(*str, "%d", options->yiq_phase_count);
+//  }
+//  options->params_dirty = true;
 
-// 	return options->yiq_phase_count;
+//  return options->yiq_phase_count;
 // }
 
 static INT32 slider_ntsc_jitter(running_machine &machine, void *arg, std::string *str, INT32 newval)
@@ -3091,7 +3091,7 @@ void uniform::update()
 			if (shadersys->curr_render_target != NULL)
 			{
 				float targetdims[2] = {
-					static_cast<float>(shadersys->curr_render_target->target_width), 
+					static_cast<float>(shadersys->curr_render_target->target_width),
 					static_cast<float>(shadersys->curr_render_target->target_height) };
 				m_shader->set_vector("TargetDims", 2, targetdims);
 			}

@@ -247,7 +247,7 @@ void igs017_state::decrypt_program_rom(int mask, int a7, int a6, int a5, int a4,
 {
 	int length = memregion("maincpu")->bytes();
 	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *tmp = auto_alloc_array(machine(), UINT8, length);
+	std::unique_ptr<UINT8[]> tmp = std::make_unique<UINT8[]>(length);
 	int i;
 
 	// decrypt the program ROM
@@ -283,7 +283,7 @@ void igs017_state::decrypt_program_rom(int mask, int a7, int a6, int a5, int a4,
 		}
 	}
 
-	memcpy(tmp,rom,length);
+	memcpy(tmp.get(),rom,length);
 
 	// address lines swap
 	for (i = 0;i < length;i++)
@@ -347,11 +347,11 @@ void igs017_state::tjsb_decrypt_sprites()
 {
 	int length = memregion("sprites")->bytes();
 	UINT8 *rom = memregion("sprites")->base();
-	UINT8 *tmp = auto_alloc_array(machine(), UINT8, length);
+	std::unique_ptr<UINT8[]> tmp = std::make_unique<UINT8[]>(length);
 	int i, addr;
 
 	// address lines swap
-	memcpy(tmp, rom, length);
+	memcpy(tmp.get(), rom, length);
 	for (i = 0; i < length; i++)
 	{
 		addr = (i & ~0xff) | BITSWAP8(i,7,6,5,2,1,4,3,0);
@@ -739,11 +739,11 @@ void igs017_state::lhzb2_decrypt_sprites()
 {
 	int length = memregion("sprites")->bytes();
 	UINT8 *rom = memregion("sprites")->base();
-	UINT8 *tmp = auto_alloc_array(machine(), UINT8, length);
+	std::unique_ptr<UINT8[]> tmp = std::make_unique<UINT8[]>(length);
 	int i, addr;
 
 	// address lines swap
-	memcpy(tmp, rom, length);
+	memcpy(tmp.get(), rom, length);
 	for (i = 0; i < length; i++)
 	{
 		addr = (i & ~0xffff) | BITSWAP16(i,15,14,13,6,7,10,9,8,11,12,5,4,3,2,1,0);
@@ -1053,11 +1053,11 @@ void igs017_state::spkrform_decrypt_sprites()
 {
 	int length = memregion("sprites")->bytes();
 	UINT8 *rom = memregion("sprites")->base();
-	UINT8 *tmp = auto_alloc_array(machine(), UINT8, length);
+	std::unique_ptr<UINT8[]> tmp = std::make_unique<UINT8[]>(length);
 	int i, addr;
 
 	// address lines swap
-	memcpy(tmp, rom, length);
+	memcpy(tmp.get(), rom, length);
 	for (i = 0; i < length; i++)
 	{
 		if (i & 0x80000)
@@ -1177,8 +1177,8 @@ void igs017_state::mgcs_igs029_run()
 		{
 			case 0x01:
 				m_oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
-				coin_counter_w(machine(), 0, (~data) & 0x20);   // coin in
-				coin_counter_w(machine(), 1, (~data) & 0x40);   // coin out
+				machine().bookkeeping().coin_counter_w(0, (~data) & 0x20);   // coin in
+				machine().bookkeeping().coin_counter_w(1, (~data) & 0x40);   // coin out
 
 //              popmessage("PORT1 %02X", data);
 
@@ -1456,7 +1456,7 @@ WRITE16_MEMBER(igs017_state::sdmg2_magic_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				m_input_select  =   data & 0x1f;
-				coin_counter_w(machine(), 0,    data & 0x20);
+				machine().bookkeeping().coin_counter_w(0,    data & 0x20);
 				//  coin out        data & 0x40
 				m_hopper            =   data & 0x80;
 			}
@@ -1537,7 +1537,7 @@ WRITE16_MEMBER(igs017_state::mgdha_magic_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				//  coin out     data & 0x40
-				coin_counter_w(machine(), 0, data & 0x80);
+				machine().bookkeeping().coin_counter_w(0, data & 0x80);
 			}
 
 			if ( data & ~0xc0 )
@@ -1628,13 +1628,13 @@ WRITE8_MEMBER(igs017_state::tjsb_output_w)
 	switch(m_input_select)
 	{
 		case 0x00:
-			coin_counter_w(machine(), 0,    data & 0x80);   // coin in
+			machine().bookkeeping().coin_counter_w(0,    data & 0x80);   // coin in
 			if (!(data & ~0x80))
 				return;
 			break;
 
 		case 0x01:
-			coin_counter_w(machine(), 1,    data & 0x01);   // coin out
+			machine().bookkeeping().coin_counter_w(1,    data & 0x01);   // coin out
 			if (!(data & ~0x01))
 				return;
 			break;
@@ -2101,8 +2101,8 @@ WRITE16_MEMBER(igs017_state::lhzb2a_input_select_w)
 	{
 		m_input_select      =           data & 0x1f;    // keys
 		m_hopper            =           data & 0x20;    // hopper motor
-		coin_counter_w(machine(), 1,    data & 0x40);   // coin out counter
-		coin_counter_w(machine(), 0,    data & 0x80);   // coin in  counter
+		machine().bookkeeping().coin_counter_w(1,    data & 0x40);   // coin out counter
+		machine().bookkeeping().coin_counter_w(0,    data & 0x80);   // coin in  counter
 	}
 	if (ACCESSING_BITS_8_15)
 	{
@@ -2150,8 +2150,8 @@ WRITE16_MEMBER(igs017_state::slqz2_magic_w)
 				m_oki->set_bank_base((data & 0x01) ? 0x40000 : 0);
 
 //              m_hopper            =           data & 0x20;    // hopper motor
-//              coin_counter_w(machine(), 1,    data & 0x40);   // coin out counter
-				coin_counter_w(machine(), 0,    data & 0x80);   // coin in  counter
+//              machine().bookkeeping().coin_counter_w(1,    data & 0x40);   // coin out counter
+				machine().bookkeeping().coin_counter_w(0,    data & 0x80);   // coin in  counter
 
 				if ( data & 0x7e )
 					logerror("%s: warning, unknown bits written in oki bank = %04x\n", machine().describe_context(), data);

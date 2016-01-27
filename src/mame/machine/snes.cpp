@@ -1187,7 +1187,7 @@ DRIVER_INIT_MEMBER(snes_state,snes)
 		if (nvram_size > 0x40000)
 			nvram_size = 0x40000;
 
-		m_cart.m_nvram = auto_alloc_array_clear(machine(), UINT8, nvram_size);
+		m_cart.m_nvram = make_unique_clear<UINT8[]>(nvram_size);
 		m_cart.m_nvram_size = nvram_size;
 	}
 
@@ -1208,7 +1208,7 @@ DRIVER_INIT_MEMBER(snes_state,snes_hirom)
 		if (nvram_size > 0x40000)
 			nvram_size = 0x40000;
 
-		m_cart.m_nvram = auto_alloc_array_clear(machine(), UINT8, nvram_size);
+		m_cart.m_nvram = make_unique_clear<UINT8[]>(nvram_size);
 		m_cart.m_nvram_size = nvram_size;
 	}
 

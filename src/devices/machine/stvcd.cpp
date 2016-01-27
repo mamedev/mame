@@ -1483,7 +1483,7 @@ void saturn_state::stvcd_reset( void )
 	else
 	{
 		// MAME case
-		cdrom = cdrom_open(get_disk_handle(machine(), "cdrom"));
+		cdrom = cdrom_open(machine().rom_load().get_disk_handle("cdrom"));
 	}
 
 	machine().device<cdda_device>("cdda")->set_cdrom(cdrom);
@@ -2346,7 +2346,7 @@ void saturn_state::cd_readTOC(void)
 saturn_state::partitionT *saturn_state::cd_filterdata(filterT *flt, int trktype, UINT8 *p_ok)
 {
 	int match, keepgoing;
-	partitionT *filterprt = (partitionT *)nullptr;
+	partitionT *filterprt;
 
 	CDROM_LOG(("cd_filterdata, trktype %d\n", trktype))
 	match = 1;
@@ -2678,7 +2678,7 @@ void saturn_state::stvcd_set_tray_close( void )
 	else
 	{
 		// MAME case
-		cdrom = cdrom_open(get_disk_handle(machine(), "cdrom"));
+		cdrom = cdrom_open(machine().rom_load().get_disk_handle("cdrom"));
 	}
 
 	machine().device<cdda_device>("cdda")->set_cdrom(cdrom);

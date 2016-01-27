@@ -171,7 +171,7 @@ void sc61860_device::device_start()
 }
 
 
-void sc61860_device::state_string_export(const device_state_entry &entry, std::string &str)
+void sc61860_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

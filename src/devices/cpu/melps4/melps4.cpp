@@ -42,7 +42,7 @@
 
 
 // disasm
-void melps4_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void melps4_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -367,7 +367,7 @@ void melps4_cpu_device::check_interrupt()
 	if (!m_inte)
 		return;
 
-	int which = 0;
+	int which;
 
 	// assume that lower irq vectors have higher priority
 	if (m_irqflag[0])

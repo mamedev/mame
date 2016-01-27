@@ -190,7 +190,7 @@ LOG (static INT32 or_data = 0)
 LOG (static INT32 or_ofs = 0)
 
 READ8_MEMBER (pit68230_device::read){
-		UINT8 data = 0;
+		UINT8 data;
 
 		switch (offset) {
 		case PIT_68230_PGCR:

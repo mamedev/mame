@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include <string.h> // strlen
@@ -22,7 +22,7 @@ namespace stl = tinystl;
 
 #include "bgfx_utils.h"
 
-void* load(bx::FileReaderI* _reader, bx::ReallocatorI* _allocator, const char* _filePath, uint32_t* _size)
+void* load(bx::FileReaderI* _reader, bx::AllocatorI* _allocator, const char* _filePath, uint32_t* _size)
 {
 	if (0 == bx::open(_reader, _filePath) )
 	{
@@ -35,6 +35,10 @@ void* load(bx::FileReaderI* _reader, bx::ReallocatorI* _allocator, const char* _
 			*_size = size;
 		}
 		return data;
+	}
+	else
+	{
+		DBG("Failed to open: %s.", _filePath);
 	}
 
 	if (NULL != _size)
@@ -66,10 +70,11 @@ static const bgfx::Memory* loadMem(bx::FileReaderI* _reader, const char* _filePa
 		return mem;
 	}
 
+	DBG("Failed to load %s.", _filePath);
 	return NULL;
 }
 
-static void* loadMem(bx::FileReaderI* _reader, bx::ReallocatorI* _allocator, const char* _filePath, uint32_t* _size)
+static void* loadMem(bx::FileReaderI* _reader, bx::AllocatorI* _allocator, const char* _filePath, uint32_t* _size)
 {
 	if (0 == bx::open(_reader, _filePath) )
 	{
@@ -85,6 +90,7 @@ static void* loadMem(bx::FileReaderI* _reader, bx::ReallocatorI* _allocator, con
 		return data;
 	}
 
+	DBG("Failed to load %s.", _filePath);
 	return NULL;
 }
 
@@ -175,7 +181,7 @@ bgfx::TextureHandle loadTexture(bx::FileReaderI* _reader, const char* _name, uin
 	}
 
 	bgfx::TextureHandle handle = BGFX_INVALID_HANDLE;
-	bx::ReallocatorI* allocator = entry::getAllocator();
+	bx::AllocatorI* allocator = entry::getAllocator();
 
 	uint32_t size = 0;
 	void* data = loadMem(_reader, allocator, filePath, &size);
@@ -399,7 +405,7 @@ struct Mesh
 
 		Group group;
 
-		bx::ReallocatorI* allocator = entry::getAllocator();
+		bx::AllocatorI* allocator = entry::getAllocator();
 
 		uint32_t chunk;
 		while (4 == bx::read(_reader, chunk) )

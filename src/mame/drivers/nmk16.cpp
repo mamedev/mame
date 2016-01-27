@@ -3834,8 +3834,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 	if (scanline == SPRDMA_SCANLINE)
 	{
 		// 2 buffers confirmed on PCB
-		memcpy(m_spriteram_old2,m_spriteram_old, 0x1000);
-		memcpy(m_spriteram_old, m_mainram + m_sprdma_base / 2, 0x1000);
+		memcpy(m_spriteram_old2.get(),m_spriteram_old.get(), 0x1000);
+		memcpy(m_spriteram_old.get(), m_mainram + m_sprdma_base / 2, 0x1000);
 	}
 
 	/* Vblank-in irq, Vandyke definitely relies that irq fires at scanline ~0 instead of 112 (as per previous
@@ -4596,7 +4596,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::manybloc_scanline)
 	if (scanline == 248)
 	{
 		// only a single buffer
-		memcpy(m_spriteram_old2, m_mainram + m_sprdma_base / 2, 0x1000);
+		memcpy(m_spriteram_old2.get(), m_mainram + m_sprdma_base / 2, 0x1000);
 	}
 
 	/* This is either vblank-in or sprite dma irq complete */

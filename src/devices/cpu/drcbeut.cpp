@@ -359,7 +359,7 @@ UINT32 drc_map_variables::get_value(drccodeptr codebase, UINT32 mapvar) const
 	UINT64 *endscan = (UINT64 *)m_cache.top();
 
 	// look for the signature
-	while (curscan < endscan && *curscan++ != m_uniquevalue) ;
+	while (curscan < endscan && *curscan++ != m_uniquevalue) {};
 	if (curscan >= endscan)
 		return 0;
 

@@ -109,7 +109,6 @@ public:
 	m68307_portb_write_delegate m_m68307_portb_w;
 
 	void init16_m68307(address_space &space);
-	void init_cpu_m68307(void);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 10; };

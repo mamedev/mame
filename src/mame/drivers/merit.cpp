@@ -99,7 +99,7 @@ public:
 	pen_t m_pens[NUM_PENS];
 	required_shared_ptr<UINT8> m_ram_attr;
 	required_shared_ptr<UINT8> m_ram_video;
-	UINT8 *m_ram_palette;
+	std::unique_ptr<UINT8[]> m_ram_palette;
 	UINT8 m_lscnblk;
 	int m_extra_video_bank_bit;
 	int m_question_address;
@@ -138,9 +138,9 @@ public:
 void merit_state::machine_start()
 {
 	m_question_address = 0;
-	m_ram_palette = auto_alloc_array(machine(), UINT8, RAM_PALETTE_SIZE);
+	m_ram_palette = std::make_unique<UINT8[]>(RAM_PALETTE_SIZE);
 
-	save_pointer(NAME(m_ram_palette), RAM_PALETTE_SIZE);
+	save_pointer(NAME(m_ram_palette.get()), RAM_PALETTE_SIZE);
 	save_item(NAME(m_lscnblk));
 	save_item(NAME(m_extra_video_bank_bit));
 	save_item(NAME(m_question_address));
@@ -318,24 +318,24 @@ WRITE_LINE_MEMBER(merit_state::vsync_changed)
 WRITE8_MEMBER(merit_state::led1_w)
 {
 	/* 5 button lamps player 1 */
-	set_led_status(machine(), 0,~data & 0x01);
-	set_led_status(machine(), 1,~data & 0x02);
-	set_led_status(machine(), 2,~data & 0x04);
-	set_led_status(machine(), 3,~data & 0x08);
-	set_led_status(machine(), 4,~data & 0x10);
+	output().set_led_value(0,~data & 0x01);
+	output().set_led_value(1,~data & 0x02);
+	output().set_led_value(2,~data & 0x04);
+	output().set_led_value(3,~data & 0x08);
+	output().set_led_value(4,~data & 0x10);
 }
 
 WRITE8_MEMBER(merit_state::led2_w)
 {
 	/* 5 button lamps player 2 */
-	set_led_status(machine(), 5,~data & 0x01);
-	set_led_status(machine(), 6,~data & 0x02);
-	set_led_status(machine(), 7,~data & 0x04);
-	set_led_status(machine(), 8,~data & 0x08);
-	set_led_status(machine(), 9,~data & 0x10);
+	output().set_led_value(5,~data & 0x01);
+	output().set_led_value(6,~data & 0x02);
+	output().set_led_value(7,~data & 0x04);
+	output().set_led_value(8,~data & 0x08);
+	output().set_led_value(9,~data & 0x10);
 
 	/* coin counter */
-	coin_counter_w(machine(),0,0x80-(data & 0x80));
+	machine().bookkeeping().coin_counter_w(0,0x80-(data & 0x80));
 }
 
 WRITE8_MEMBER(merit_state::misc_w)

@@ -163,7 +163,7 @@ void vector_device::device_start()
 	m_vector_index = 0;
 
 	/* allocate memory for tables */
-	m_vector_list = auto_alloc_array_clear(machine(), point, MAX_POINTS);
+	m_vector_list = make_unique_clear<point[]>(MAX_POINTS);
 }
 
 void vector_device::set_flicker(float newval)
@@ -306,7 +306,7 @@ UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	int lastx = 0;
 	int lasty = 0;
 
-	curpoint = m_vector_list;
+	curpoint = m_vector_list.get();
 
 	screen.container().empty();
 	screen.container().add_rect(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(0xff,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_VECTORBUF(1));

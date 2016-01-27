@@ -76,10 +76,10 @@ WRITE16_MEMBER( taitox_state::cchip1_ram_w )
 	{
 		m_cc_port = data;
 
-		coin_lockout_w(space.machine(), 1, data & 0x08);
-		coin_lockout_w(space.machine(), 0, data & 0x04);
-		coin_counter_w(space.machine(), 1, data & 0x02);
-		coin_counter_w(space.machine(), 0, data & 0x01);
+		space.machine().bookkeeping().coin_lockout_w(1, data & 0x08);
+		space.machine().bookkeeping().coin_lockout_w(0, data & 0x04);
+		space.machine().bookkeeping().coin_counter_w(1, data & 0x02);
+		space.machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	}
 	else
 	{

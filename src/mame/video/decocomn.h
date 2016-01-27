@@ -41,7 +41,7 @@ protected:
 
 private:
 	// internal state
-	UINT8 *m_dirty_palette;
+	std::unique_ptr<UINT8[]> m_dirty_palette;
 	UINT16 m_priority;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT16> m_generic_paletteram_16;

@@ -55,8 +55,6 @@ private:
 	UINT32 m_LastPalUpdate;
 
 	RenderStateInfo m_RenderState;
-
-	UINT16 Alpha(UINT16 Src, UINT16 Dst);
 };
 
 extern const device_type VIDEO_VRENDER0;

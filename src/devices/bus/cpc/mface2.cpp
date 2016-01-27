@@ -107,9 +107,9 @@ void cpc_multiface2_device::multiface_rethink_memory()
 	{
 		/* set bank addressess */
 		machine().root_device().membank("bank1")->set_base(multiface_rom);
-		machine().root_device().membank("bank2")->set_base(m_multiface_ram);
+		machine().root_device().membank("bank2")->set_base(m_multiface_ram.get());
 		machine().root_device().membank("bank9")->set_base(multiface_rom);
-		machine().root_device().membank("bank10")->set_base(m_multiface_ram);
+		machine().root_device().membank("bank10")->set_base(m_multiface_ram.get());
 	}
 }
 
@@ -326,7 +326,7 @@ void cpc_multiface2_device::device_start()
 	m_multiface_flags = MULTIFACE_VISIBLE;
 
 	/* allocate ram */
-	m_multiface_ram = auto_alloc_array(machine(), UINT8, 8192);
+	m_multiface_ram = std::make_unique<UINT8[]>(8192);
 }
 
 //-------------------------------------------------

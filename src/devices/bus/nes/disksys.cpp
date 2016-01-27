@@ -289,7 +289,7 @@ WRITE8_MEMBER(nes_disksys_device::write_ex)
 READ8_MEMBER(nes_disksys_device::read_ex)
 {
 	LOG_MMC(("Famicom Disk System read_ex, offset: %04x\n", offset));
-	UINT8 ret = 0x00;
+	UINT8 ret;
 
 	if (offset >= 0x20 && offset < 0x60)
 	{
@@ -416,11 +416,11 @@ void nes_disksys_device::load_disk(device_image_interface &image)
 	m_fds_sides = (image.length() - header) / 65500;
 
 	if (!m_fds_data)
-		m_fds_data = auto_alloc_array(machine(), UINT8, m_fds_sides * 65500);
+		m_fds_data = std::make_unique<UINT8[]>(m_fds_sides * 65500);
 
 	// if there is an header, skip it
 	image.fseek(header, SEEK_SET);
-	image.fread(m_fds_data, 65500 * m_fds_sides);
+	image.fread(m_fds_data.get(), 65500 * m_fds_sides);
 	return;
 }
 

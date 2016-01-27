@@ -708,7 +708,7 @@ unsigned lsi53c810_device::lsi53c810_dasm(char *buf, UINT32 pc)
 			{ 0x00000200, "TARGET" },
 			{ 0x00000400, "CARRY" }
 		};
-		int need_cojunction = FALSE;
+		int need_cojunction;
 
 		/* SET/CLEAR */
 		switch(op & 0xF8000000)

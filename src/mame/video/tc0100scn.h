@@ -76,7 +76,7 @@ private:
 	// internal state
 	UINT16       m_ctrl[8];
 
-	UINT16 *     m_ram;
+	std::unique_ptr<UINT16[]>    m_ram;
 	UINT16 *     m_bg_ram;
 	UINT16 *     m_fg_ram;
 	UINT16 *     m_tx_ram;

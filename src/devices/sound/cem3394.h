@@ -107,8 +107,8 @@ private:
 	double m_inv_sample_rate;
 	int m_sample_rate;
 
-	INT16 *m_mixer_buffer;
-	INT16 *m_external_buffer;
+	std::unique_ptr<INT16[]> m_mixer_buffer;
+	std::unique_ptr<INT16[]> m_external_buffer;
 };
 
 extern const device_type CEM3394;

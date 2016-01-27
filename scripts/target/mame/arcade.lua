@@ -766,6 +766,7 @@ function createMAMEProjects(_target, _subtarget, _name)
 	kind (LIBTYPE)
 	uuid (os.uuid("drv-" .. _target .."_" .. _subtarget .. "_" .._name))
 	addprojectflags()
+	precompiledheaders()
 
 	includedirs {
 		MAME_DIR .. "src/osd",
@@ -1324,6 +1325,7 @@ files {
 	MAME_DIR .. "src/mame/video/vulgus.cpp",
 	MAME_DIR .. "src/mame/machine/kabuki.cpp",
 	MAME_DIR .. "src/mame/machine/kabuki.h",
+	MAME_DIR .. "src/mame/drivers/tvcapcom.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "cinemat")
@@ -3661,6 +3663,8 @@ files {
 	MAME_DIR .. "src/mame/video/tc0110pcr.h",
 	MAME_DIR .. "src/mame/video/tc0180vcu.cpp",
 	MAME_DIR .. "src/mame/video/tc0180vcu.h",
+	MAME_DIR .. "src/mame/video/tc0780fpa.cpp",
+	MAME_DIR .. "src/mame/video/tc0780fpa.h",
 }
 
 createMAMEProjects(_target, _subtarget, "tatsumi")
@@ -4017,6 +4021,7 @@ createMAMEProjects(_target, _subtarget, "zaccaria")
 files {
 	MAME_DIR .. "src/mame/drivers/laserbat.cpp",
 	MAME_DIR .. "src/mame/includes/laserbat.h",
+	MAME_DIR .. "src/mame/video/laserbat.cpp",
 	MAME_DIR .. "src/mame/audio/laserbat.cpp",
 	MAME_DIR .. "src/mame/drivers/seabattl.cpp",
 	MAME_DIR .. "src/mame/drivers/zac2650.cpp",
@@ -4277,6 +4282,7 @@ files {
 	MAME_DIR .. "src/mame/video/esripsys.cpp",
 	MAME_DIR .. "src/mame/drivers/ettrivia.cpp",
 	MAME_DIR .. "src/mame/drivers/extrema.cpp",
+	MAME_DIR .. "src/mame/drivers/fastinvaders.cpp",
 	MAME_DIR .. "src/mame/drivers/fireball.cpp",
 	MAME_DIR .. "src/mame/drivers/flipjack.cpp",
 	MAME_DIR .. "src/mame/drivers/flower.cpp",
@@ -4297,6 +4303,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/gammagic.cpp",
 	MAME_DIR .. "src/mame/drivers/gamtor.cpp",
 	MAME_DIR .. "src/mame/drivers/gei.cpp",
+	MAME_DIR .. "src/mame/drivers/gkigt.cpp",
 	MAME_DIR .. "src/mame/drivers/globalfr.cpp",
 	MAME_DIR .. "src/mame/drivers/globalvr.cpp",
 	MAME_DIR .. "src/mame/drivers/gluck2.cpp",
@@ -4448,6 +4455,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/roul.cpp",
 	MAME_DIR .. "src/mame/drivers/savquest.cpp",
 	MAME_DIR .. "src/mame/drivers/sanremo.cpp",
+	MAME_DIR .. "src/mame/drivers/sanremmg.cpp",
 	MAME_DIR .. "src/mame/drivers/sealy.cpp",
 	MAME_DIR .. "src/mame/drivers/scm_500.cpp",
 	MAME_DIR .. "src/mame/drivers/sfbonus.cpp",

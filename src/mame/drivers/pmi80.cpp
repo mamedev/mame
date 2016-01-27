@@ -75,7 +75,7 @@ WRITE8_MEMBER( pmi80_state::leds_w )
 	if (m_ledready)
 	{
 		m_ledready = FALSE;
-		output_set_digit_value(m_keyrow^0xff, data^0xff);
+		output().set_digit_value(m_keyrow^0xff, data^0xff);
 	}
 }
 

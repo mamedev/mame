@@ -48,7 +48,9 @@ private:
 
 	UINT32 key;
 
-	UINT8 *buffer, *line_buffer, *line_buffer_prev;
+	std::unique_ptr<UINT8[]> buffer;
+	std::unique_ptr<UINT8[]> line_buffer;
+	std::unique_ptr<UINT8[]> line_buffer_prev;
 	UINT32 prot_cur_address;
 	UINT16 subkey, dec_hist;
 	UINT32 dec_header;

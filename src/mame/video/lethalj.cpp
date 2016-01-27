@@ -87,7 +87,7 @@ READ16_MEMBER(lethalj_state::lethalj_gun_r)
 void lethalj_state::video_start()
 {
 	/* allocate video RAM for screen */
-	m_screenram = auto_alloc_array(machine(), UINT16, BLITTER_DEST_WIDTH * BLITTER_DEST_HEIGHT);
+	m_screenram = std::make_unique<UINT16[]>(BLITTER_DEST_WIDTH * BLITTER_DEST_HEIGHT);
 
 	/* predetermine blitter info */
 	m_blitter_base = (UINT16 *)memregion("gfx1")->base();
@@ -136,7 +136,7 @@ void lethalj_state::do_blit()
 		if (dsty >= 0 && dsty < BLITTER_DEST_HEIGHT/2)
 		{
 			UINT16 *source = m_blitter_base + (srcy % m_blitter_rows) * BLITTER_SOURCE_WIDTH;
-			UINT16 *dest = m_screenram + (dsty + (m_vispage ^ 1) * 256) * BLITTER_DEST_WIDTH;
+			UINT16 *dest = m_screenram.get() + (dsty + (m_vispage ^ 1) * 256) * BLITTER_DEST_WIDTH;
 			int sx = srcx;
 			int dx = dstx;
 			int x;

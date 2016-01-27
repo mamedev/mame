@@ -375,7 +375,7 @@ WRITE8_MEMBER(exidy440_state::exidy440_input_port_3_w)
 
 WRITE8_MEMBER(exidy440_state::exidy440_coin_counter_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
 

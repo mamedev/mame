@@ -559,7 +559,7 @@ READ8_MEMBER( by133_state::m6803_port2_r )
 WRITE8_MEMBER( by133_state::m6803_port2_w )
 {
 	//m_u7_b = data >> 1;
-	m_beep->set_frequency(600);
+	m_beep->set_clock(600);
 	m_beep->set_state(BIT(data, 0));
 }
 
@@ -581,7 +581,7 @@ WRITE_LINE_MEMBER( by133_state::u11_ca2_w )
 WRITE_LINE_MEMBER( by133_state::u7_cb2_w )
 {
 	// red led
-	m_beep->set_frequency(950);
+	m_beep->set_clock(950);
 	m_beep->set_state(state);
 }
 
@@ -796,7 +796,7 @@ static MACHINE_CONFIG_START( babypac, by133_state )
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SPEAKER_STANDARD_MONO("beee")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 600)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "beee", 0.10)
 MACHINE_CONFIG_END
 

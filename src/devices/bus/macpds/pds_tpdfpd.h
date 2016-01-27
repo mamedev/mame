@@ -41,7 +41,7 @@ protected:
 		DECLARE_WRITE16_MEMBER(ramdac_w);
 
 public:
-		UINT8 *m_vram;
+		std::unique_ptr<UINT8[]> m_vram;
 		UINT32 m_vbl_disable;
 		UINT32 m_palette[256], m_colors[3], m_count, m_clutoffs;
 		emu_timer *m_timer;

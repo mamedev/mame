@@ -190,14 +190,14 @@ public:
 		{
 			char temp[32];
 			sprintf(temp, "molea_%d", i);
-			output_set_value(temp, mole_state_a[i]);
+			output().set_value(temp, mole_state_a[i]);
 		}
 
 		for (int i = 0; i < 6; i++)
 		{
 			char temp[32];
 			sprintf(temp, "moleb_%d", i);
-			output_set_value(temp, mole_state_b[i]);
+			output().set_value(temp, mole_state_b[i]);
 		}
 	}
 
@@ -260,7 +260,7 @@ public:
 void kenseim_state::set_leds(UINT32 ledstates)
 {
 	for (int i=0; i<20; i++)
-		output_set_lamp_value(i+1, ((ledstates & (1 << i)) != 0));
+		output().set_lamp_value(i+1, ((ledstates & (1 << i)) != 0));
 }
 
 // could be wrong
@@ -352,10 +352,10 @@ WRITE8_MEMBER(kenseim_state::cpu_portc_w)
 	// d5: coin lock
 	// d6: left start button lamp
 	// d7: right start button lamp
-	coin_lockout_w(machine(), 0, (data & 0x10) ? 0 : 1); // toggles if you attempt to insert a coin when there are already 15 coins inserted
-	coin_counter_w(machine(), 0, (data & 0x20) ? 0 : 1);
-	output_set_value("startlamp1", (data & 0x80) ? 0 : 1);
-	output_set_value("startlamp2", (data & 0x40) ? 0 : 1);
+	machine().bookkeeping().coin_lockout_w(0, (data & 0x10) ? 0 : 1); // toggles if you attempt to insert a coin when there are already 15 coins inserted
+	machine().bookkeeping().coin_counter_w(0, (data & 0x20) ? 0 : 1);
+	output().set_value("startlamp1", (data & 0x80) ? 0 : 1);
+	output().set_value("startlamp2", (data & 0x40) ? 0 : 1);
 }
 
 
@@ -400,10 +400,10 @@ WRITE16_MEMBER(kenseim_state::cps1_kensei_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		// NOTE: remapped from default jamma output pins:
-		// coin_counter_w(machine(), 0, data & 0x0100);
-		// coin_counter_w(machine(), 1, data & 0x0200);
-		// coin_lockout_w(machine(), 0, ~data & 0x0400);
-		// coin_lockout_w(machine(), 1, ~data & 0x0800);
+		// machine().bookkeeping().coin_counter_w(0, data & 0x0100);
+		// machine().bookkeeping().coin_counter_w(1, data & 0x0200);
+		// machine().bookkeeping().coin_lockout_w(0, ~data & 0x0400);
+		// machine().bookkeeping().coin_lockout_w(1, ~data & 0x0800);
 
 		// bit 15 = CPS-A custom reset?
 

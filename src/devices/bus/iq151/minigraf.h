@@ -46,7 +46,7 @@ private:
 	UINT8       m_pen;
 	UINT8       m_control;
 
-	bitmap_ind16 *  m_paper;
+	std::unique_ptr<bitmap_ind16>  m_paper;
 };
 
 

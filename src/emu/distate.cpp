@@ -113,8 +113,7 @@ device_state_entry &device_state_entry::formatstr(const char *_format)
 
 	// set the DSF_CUSTOM_STRING flag by formatting with a NULL string
 	m_flags &= ~DSF_CUSTOM_STRING;
-	std::string dummy;
-	format(dummy, nullptr);
+	format(nullptr);
 
 	return *this;
 }
@@ -164,8 +163,9 @@ UINT64 device_state_entry::value() const
 //  pieces of indexed state as a string
 //-------------------------------------------------
 
-std::string &device_state_entry::format(std::string &dest, const char *string, bool maxout) const
+std::string device_state_entry::format(const char *string, bool maxout) const
 {
+	std::string dest;
 	UINT64 result = value();
 
 	// parse the format
@@ -436,12 +436,12 @@ UINT64 device_state_interface::state_int(int index)
 //  pieces of indexed state as a string
 //-------------------------------------------------
 
-std::string &device_state_interface::state_string(int index, std::string &dest)
+std::string device_state_interface::state_string(int index) const
 {
 	// NULL or out-of-range entry returns bogus string
 	const device_state_entry *entry = state_find_entry(index);
 	if (entry == nullptr)
-		return dest.assign("???");
+		return std::string("???");
 
 	// get the custom string if needed
 	std::string custom;
@@ -449,7 +449,7 @@ std::string &device_state_interface::state_string(int index, std::string &dest)
 		state_string_export(*entry, custom);
 
 	// ask the entry to format itself
-	return entry->format(dest, custom.c_str());
+	return entry->format(custom.c_str());
 }
 
 
@@ -466,8 +466,7 @@ int device_state_interface::state_string_max_length(int index)
 		return 3;
 
 	// ask the entry to format itself maximally
-	std::string tempstring;
-	return entry->format(tempstring, "", true).length();
+	return entry->format("", true).length();
 }
 
 
@@ -591,7 +590,7 @@ void device_state_interface::state_string_import(const device_state_entry &entry
 //  written to perform any post-processing
 //-------------------------------------------------
 
-void device_state_interface::state_string_export(const device_state_entry &entry, std::string &str)
+void device_state_interface::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	// do nothing by default
 }
@@ -615,7 +614,7 @@ void device_state_interface::interface_post_start()
 //  state entry for the given index
 //-------------------------------------------------
 
-const device_state_entry *device_state_interface::state_find_entry(int index)
+const device_state_entry *device_state_interface::state_find_entry(int index) const
 {
 	// use fast lookup if possible
 	if (index >= FAST_STATE_MIN && index <= FAST_STATE_MAX)

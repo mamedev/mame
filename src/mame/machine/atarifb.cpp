@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Mike Balfour, Patrick Lawrence, Brad Oliver
 /*************************************************************************
 
@@ -31,7 +31,7 @@ WRITE8_MEMBER(atarifb_state::atarifb4_out1_w)
 	m_discrete->write(space, ATARIFB_ATTRACT_EN, data & 0x10);     // Attract
 	m_discrete->write(space, ATARIFB_NOISE_EN, data & 0x04);           // Noise Enable / Kicker
 
-	coin_counter_w(machine(), 1, data & 0x80);
+	machine().bookkeeping().coin_counter_w(1, data & 0x80);
 }
 
 
@@ -76,8 +76,8 @@ WRITE8_MEMBER(atarifb_state::soccer_out1_w)
 	m_discrete->write(space, ATARIFB_ATTRACT_EN, data & 0x10);     // Attract
 	m_discrete->write(space, ATARIFB_NOISE_EN, data & 0x04);           // Noise Enable / Kicker
 
-//  set_led_status(machine(), 0, data & 0x10);  // !!!!!!!!!! Is this correct????
-	set_led_status(machine(), 1, data & 0x80);
+//  output().set_led_value(0, data & 0x10);  // !!!!!!!!!! Is this correct????
+	output().set_led_value(1, data & 0x80);
 }
 
 
@@ -85,7 +85,7 @@ WRITE8_MEMBER(atarifb_state::atarifb_out2_w)
 {
 	m_discrete->write(space, ATARIFB_CROWD_DATA, data & 0x0f); // Crowd
 
-	coin_counter_w (machine(), 0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 }
 
 
@@ -93,9 +93,9 @@ WRITE8_MEMBER(atarifb_state::soccer_out2_w)
 {
 	m_discrete->write(space, ATARIFB_CROWD_DATA, data & 0x0f); // Crowd
 
-	coin_counter_w (machine(), 0, data & 0x10);
-	coin_counter_w (machine(), 1, data & 0x20);
-	coin_counter_w (machine(), 2, data & 0x40);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
+	machine().bookkeeping().coin_counter_w(2, data & 0x40);
 }
 
 
@@ -115,19 +115,19 @@ WRITE8_MEMBER(atarifb_state::atarifb_out3_w)
 	{
 		case 0x00:
 			/* Player 1 play select lamp */
-			output_set_value("ledleft0", (data >> 0) & 1);
-			output_set_value("ledleft1", (data >> 1) & 1);
-			output_set_value("ledleft2", (data >> 2) & 1);
-			output_set_value("ledleft3", (data >> 3) & 1);
-			output_set_value("ledleft4", (data >> 4) & 1);
+			output().set_value("ledleft0", (data >> 0) & 1);
+			output().set_value("ledleft1", (data >> 1) & 1);
+			output().set_value("ledleft2", (data >> 2) & 1);
+			output().set_value("ledleft3", (data >> 3) & 1);
+			output().set_value("ledleft4", (data >> 4) & 1);
 			break;
 		case 0x01:
 			/* Player 2 play select lamp */
-			output_set_value("ledright0", (data >> 0) & 1);
-			output_set_value("ledright1", (data >> 1) & 1);
-			output_set_value("ledright2", (data >> 2) & 1);
-			output_set_value("ledright3", (data >> 3) & 1);
-			output_set_value("ledright4", (data >> 4) & 1);
+			output().set_value("ledright0", (data >> 0) & 1);
+			output().set_value("ledright1", (data >> 1) & 1);
+			output().set_value("ledright2", (data >> 2) & 1);
+			output().set_value("ledright3", (data >> 3) & 1);
+			output().set_value("ledright4", (data >> 4) & 1);
 			break;
 	}
 //  logerror("out3_w, %02x:%02x\n", loop, data);

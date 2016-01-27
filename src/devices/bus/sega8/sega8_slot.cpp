@@ -421,7 +421,7 @@ void sega8_cart_slot_device::call_unload()
 
 bool sega8_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 	return TRUE;
 }
 
@@ -603,11 +603,11 @@ int sega8_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
  get default card software
  -------------------------------------------------*/
 
-void sega8_cart_slot_device::get_default_card_software(std::string &result)
+std::string sega8_cart_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "rom";
+		const char *slot_string;
 		UINT32 len = core_fsize(m_file), offset = 0;
 		dynamic_buffer rom(len);
 		int type;
@@ -623,11 +623,10 @@ void sega8_cart_slot_device::get_default_card_software(std::string &result)
 		//printf("type: %s\n", slot_string);
 		clear();
 
-		result.assign(slot_string);
-		return;
+		return std::string(slot_string);
 	}
 
-	software_get_default_slot(result, "rom");
+	return software_get_default_slot("rom");
 }
 
 
@@ -725,7 +724,7 @@ void sega8_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len, UIN
 	char reserved[10];
 	UINT8 version, csum_size, region, serial[3];
 	UINT16 checksum, csum = 0;
-	UINT32 csum_end = 0;
+	UINT32 csum_end;
 
 	// LOG FILE DETAILS
 	logerror("FILE DETAILS\n" );

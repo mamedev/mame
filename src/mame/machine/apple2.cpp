@@ -72,7 +72,7 @@ void apple2_state::apple2_update_memory()
 	{
 		for (i = 0; m_mem_config.memmap[i].end; i++)
 			;
-		m_current_meminfo = auto_alloc_array(machine(), apple2_meminfo, i);
+		m_current_meminfo = std::make_unique<apple2_meminfo[]>(i);
 		full_update = 1;
 	}
 
@@ -2336,8 +2336,8 @@ MACHINE_START_MEMBER(apple2_state,laser128)
 	apple2_init_common();
 
 	// 1 MB of expansion RAM in slot 5
-	m_exp_ram = auto_alloc_array(machine(), UINT8, 1024*1024);
-	memset(m_exp_ram, 0xff, 1024*1024);
+	m_exp_ram = std::make_unique<UINT8[]>(1024*1024);
+	memset(m_exp_ram.get(), 0xff, 1024*1024);
 
 	m_exp_bankhior = 0xf0;
 	m_exp_addrmask = 0xfffff;

@@ -196,7 +196,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_outtimer)
 	{
 		UINT8 display = (m_out_offs >> 3) & 7;
 		UINT8 digit = m_out_offs & 7;
-		output_set_digit_value(display * 10 + digit, patterns[m_p_ram[m_out_offs]&15]);
+		output().set_digit_value(display * 10 + digit, patterns[m_p_ram[m_out_offs]&15]);
 	}
 }
 

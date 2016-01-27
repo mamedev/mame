@@ -478,10 +478,10 @@ void core_options::revert(int priority)
 //  the optional diff
 //-------------------------------------------------
 
-const char *core_options::output_ini(std::string &buffer, const core_options *diff)
+std::string core_options::output_ini(const core_options *diff) const
 {
 	// INI files are complete, so always start with a blank buffer
-	buffer.clear();
+	std::string buffer;
 
 	int num_valid_headers = 0;
 	int unadorned_index = 0;
@@ -534,7 +534,7 @@ const char *core_options::output_ini(std::string &buffer, const core_options *di
 			}
 		}
 	}
-	return buffer.c_str();
+	return buffer;
 }
 
 
@@ -542,10 +542,10 @@ const char *core_options::output_ini(std::string &buffer, const core_options *di
 //  output_help - output option help to a string
 //-------------------------------------------------
 
-const char *core_options::output_help(std::string &buffer)
+std::string core_options::output_help() const
 {
 	// start empty
-	buffer.clear();
+	std::string buffer;
 
 	// loop over all items
 	for (entry *curentry = m_entrylist.first(); curentry != nullptr; curentry = curentry->next())
@@ -558,7 +558,7 @@ const char *core_options::output_help(std::string &buffer)
 		else if (curentry->description() != nullptr)
 			strcatprintf(buffer,"-%-20s%s\n", curentry->name(), curentry->description());
 	}
-	return buffer.c_str();
+	return buffer;
 }
 
 
@@ -634,15 +634,13 @@ bool core_options::set_value(const char *name, const char *value, int priority, 
 
 bool core_options::set_value(const char *name, int value, int priority, std::string &error_string)
 {
-	std::string tempstr;
-	strprintf(tempstr,"%d", value);
+	std::string tempstr = strformat("%d", value);
 	return set_value(name, tempstr.c_str(), priority, error_string);
 }
 
 bool core_options::set_value(const char *name, float value, int priority, std::string &error_string)
 {
-	std::string tempstr;
-	strprintf(tempstr, "%f", (double) value);
+	std::string tempstr = strformat("%f", (double)value);
 	return set_value(name, tempstr.c_str(), priority, error_string);
 }
 

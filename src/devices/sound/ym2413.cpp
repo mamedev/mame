@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 /*
 **
@@ -2008,7 +2008,7 @@ static YM2413 *OPLLCreate(device_t *device, int clock, int rate)
 	if (OPLL_LockTable(device) == -1) return nullptr;
 
 	/* allocate memory block */
-	chip = auto_alloc_clear(device->machine(), YM2413);
+	chip = auto_alloc_clear(device->machine(), <YM2413>());
 
 	chip->device = device;
 	chip->clock = clock;

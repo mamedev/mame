@@ -73,7 +73,7 @@ public:
 
 	UINT8 m_mux_data;
 	UINT8 m_rev;
-	UINT8 *m_ram1;
+	std::unique_ptr<UINT8[]> m_ram1;
 	required_shared_ptr<UINT8> m_ram2;
 	DECLARE_WRITE8_MEMBER(rambank_w);
 	DECLARE_READ8_MEMBER(macs_input_r);
@@ -639,7 +639,7 @@ static const UINT8 ramdata[160]=
 
 MACHINE_RESET_MEMBER(macs_state,macs)
 {
-	UINT8 *macs_ram1 = m_ram1;
+	UINT8 *macs_ram1 = m_ram1.get();
 	#if 0
 	UINT8 *macs_ram2 = m_ram2;
 /*
@@ -718,28 +718,28 @@ MACHINE_RESET_MEMBER(macs_state,macs)
 
 DRIVER_INIT_MEMBER(macs_state,macs)
 {
-	m_ram1=auto_alloc_array(machine(), UINT8, 0x20000);
+	m_ram1=std::make_unique<UINT8[]>(0x20000);
 	m_maincpu->st0016_game=10|0x80;
 	m_rev = 1;
 }
 
 DRIVER_INIT_MEMBER(macs_state,macs2)
 {
-	m_ram1=auto_alloc_array(machine(), UINT8, 0x20000);
+	m_ram1=std::make_unique<UINT8[]>(0x20000);
 	m_maincpu->st0016_game=10|0x80;
 	m_rev = 2;
 }
 
 DRIVER_INIT_MEMBER(macs_state,kisekaeh)
 {
-	m_ram1=auto_alloc_array(machine(), UINT8, 0x20000);
+	m_ram1=std::make_unique<UINT8[]>(0x20000);
 	m_maincpu->st0016_game=11|0x180;
 	m_rev = 1;
 }
 
 DRIVER_INIT_MEMBER(macs_state,kisekaem)
 {
-	m_ram1=auto_alloc_array(machine(), UINT8, 0x20000);
+	m_ram1=std::make_unique<UINT8[]>(0x20000);
 	m_maincpu->st0016_game=10|0x180;
 	m_rev = 1;
 }

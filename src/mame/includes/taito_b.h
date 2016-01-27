@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 #include "machine/mb87078.h"
 #include "machine/taitoio.h"
@@ -45,9 +45,9 @@ public:
 
 	/* video-related */
 	/* framebuffer is a raw bitmap, remapped as a last step */
-	bitmap_ind16      *m_framebuffer[2];
-	bitmap_ind16      *m_pixel_bitmap;
-	bitmap_ind16      *m_realpunc_bitmap;
+	std::unique_ptr<bitmap_ind16> m_framebuffer[2];
+	std::unique_ptr<bitmap_ind16> m_pixel_bitmap;
+	std::unique_ptr<bitmap_ind16> m_realpunc_bitmap;
 
 	UINT16        m_pixel_scroll[2];
 
@@ -125,8 +125,6 @@ public:
 	void hitice_clear_pixel_bitmap(  );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
-	void ryujin_patch(void);
-	void sbm_patch(void);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 protected:

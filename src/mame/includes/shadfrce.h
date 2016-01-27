@@ -47,7 +47,7 @@ public:
 	required_shared_ptr<UINT16> m_bg1videoram;
 	required_shared_ptr<UINT16> m_spvideoram;
 
-	UINT16 *m_spvideoram_old;
+	std::unique_ptr<UINT16[]> m_spvideoram_old;
 	tilemap_t *m_fgtilemap;
 	tilemap_t *m_bg0tilemap;
 	tilemap_t *m_bg1tilemap;

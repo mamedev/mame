@@ -87,17 +87,17 @@ void ninjakd2_state::robokid_get_bg_tile_info( tile_data& tileinfo, tilemap_memo
 
 TILE_GET_INFO_MEMBER(ninjakd2_state::robokid_get_bg0_tile_info)
 {
-	robokid_get_bg_tile_info(tileinfo, tile_index, 2, m_robokid_bg0_videoram);
+	robokid_get_bg_tile_info(tileinfo, tile_index, 2, m_robokid_bg0_videoram.get());
 }
 
 TILE_GET_INFO_MEMBER(ninjakd2_state::robokid_get_bg1_tile_info)
 {
-	robokid_get_bg_tile_info(tileinfo, tile_index, 3, m_robokid_bg1_videoram);
+	robokid_get_bg_tile_info(tileinfo, tile_index, 3, m_robokid_bg1_videoram.get());
 }
 
 TILE_GET_INFO_MEMBER(ninjakd2_state::robokid_get_bg2_tile_info)
 {
-	robokid_get_bg_tile_info(tileinfo, tile_index, 4, m_robokid_bg2_videoram);
+	robokid_get_bg_tile_info(tileinfo, tile_index, 4, m_robokid_bg2_videoram.get());
 }
 
 
@@ -113,13 +113,13 @@ void ninjakd2_state::video_init_common(UINT32 vram_alloc_size)
 	// create video ram
 	if (vram_alloc_size)
 	{
-		m_robokid_bg0_videoram = auto_alloc_array_clear(machine(), UINT8, vram_alloc_size);
-		m_robokid_bg1_videoram = auto_alloc_array_clear(machine(), UINT8, vram_alloc_size);
-		m_robokid_bg2_videoram = auto_alloc_array_clear(machine(), UINT8, vram_alloc_size);
+		m_robokid_bg0_videoram = make_unique_clear<UINT8[]>(vram_alloc_size);
+		m_robokid_bg1_videoram = make_unique_clear<UINT8[]>(vram_alloc_size);
+		m_robokid_bg2_videoram = make_unique_clear<UINT8[]>(vram_alloc_size);
 
-		save_pointer(NAME(m_robokid_bg0_videoram), vram_alloc_size);
-		save_pointer(NAME(m_robokid_bg1_videoram), vram_alloc_size);
-		save_pointer(NAME(m_robokid_bg2_videoram), vram_alloc_size);
+		save_pointer(NAME(m_robokid_bg0_videoram.get()), vram_alloc_size);
+		save_pointer(NAME(m_robokid_bg1_videoram.get()), vram_alloc_size);
+		save_pointer(NAME(m_robokid_bg2_videoram.get()), vram_alloc_size);
 	}
 
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);

@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo, Jarek Burczynski, Aaron Giles, Jonathan Gevaryahu, Couriersud
 #pragma once
 
@@ -66,10 +66,6 @@ public:
 	DECLARE_READ8_MEMBER( romclk_hack_r );
 
 	void set_frequency(int frequency);
-
-	int _speech_rom_read_bit();
-	void _speech_rom_set_addr(int addr);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -101,6 +97,9 @@ private:
 	void parse_frame();
 
 	// internal state
+	/* table */
+	optional_region_ptr<UINT8> m_table;
+
 	/* coefficient tables */
 	int m_variant;                /* Variant of the 5110 - see tms5110.h */
 
@@ -195,7 +194,6 @@ private:
 	UINT8 m_romclk_hack_state;
 
 	emu_timer *m_romclk_hack_timer;
-	const UINT8 *m_table;
 };
 
 extern const device_type TMS5110;

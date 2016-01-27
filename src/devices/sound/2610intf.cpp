@@ -16,6 +16,9 @@
 #include "2610intf.h"
 #include "fm.h"
 
+const char* YM2610_TAG = "ymsnd";
+const char* YM2610_DELTAT_TAG = "ymsnd.deltat";
+
 static void psg_set_clock(void *param, int clock)
 {
 	ym2610_device *ym2610 = (ym2610_device *) param;
@@ -143,9 +146,6 @@ void ym2610_device::device_start()
 	ay8910_device::device_start();
 
 	int rate = clock()/72;
-	void *pcmbufa,*pcmbufb;
-	int  pcmsizea,pcmsizeb;
-	std::string name(tag());
 
 	m_irq_handler.resolve();
 
@@ -155,16 +155,19 @@ void ym2610_device::device_start()
 
 	/* stream system initialize */
 	m_stream = machine().sound().stream_alloc(*this,0,2,rate, stream_update_delegate(FUNC(ym2610_device::stream_generate),this));
+
 	/* setup adpcm buffers */
-	pcmbufa  = region()->base();
-	pcmsizea = region()->bytes();
-	name.append(".deltat");
-	pcmbufb = (void *)(machine().root_device().memregion(name.c_str())->base());
-	pcmsizeb = machine().root_device().memregion(name.c_str())->bytes();
-	if (pcmbufb == nullptr || pcmsizeb == 0)
+	void *pcmbufa  = region()->base();
+	int pcmsizea = region()->bytes();
+
+	std::string name = tag() + std::string(".deltat");
+	memory_region *deltat_region = machine().root_device().memregion(name.c_str());
+	void *pcmbufb = pcmbufa;
+	int pcmsizeb = pcmsizea;
+	if (deltat_region != nullptr && deltat_region->base() != nullptr && deltat_region->bytes() != 0)
 	{
-		pcmbufb = pcmbufa;
-		pcmsizeb = pcmsizea;
+		pcmbufb = deltat_region->base();
+		pcmsizeb = deltat_region->bytes();
 	}
 
 	/**** initialize YM2610 ****/
@@ -207,14 +210,14 @@ WRITE8_MEMBER( ym2610_device::write )
 const device_type YM2610 = &device_creator<ym2610_device>;
 
 ym2610_device::ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ay8910_device(mconfig, YM2610, "YM2610", tag, owner, clock, PSG_TYPE_YM, 1, 0, "ym2610", __FILE__),
-		m_irq_handler(*this)
+	: ay8910_device(mconfig, YM2610, "YM2610", tag, owner, clock, PSG_TYPE_YM, 1, 0, "ym2610", __FILE__)
+	, m_irq_handler(*this)
 {
 }
 
 ym2610_device::ym2610_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: ay8910_device(mconfig, type, name, tag, owner, clock, PSG_TYPE_YM, 1, 0, shortname, source),
-		m_irq_handler(*this)
+	: ay8910_device(mconfig, type, name, tag, owner, clock, PSG_TYPE_YM, 1, 0, shortname, source)
+	, m_irq_handler(*this)
 {
 }
 

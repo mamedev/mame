@@ -66,7 +66,7 @@ public:
 	su2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag){ }
 
-	UINT32      *m_pc_ram;
+	std::unique_ptr<UINT32[]>      m_pc_ram;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
@@ -127,16 +127,16 @@ void su2000_state::machine_start()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* Configure RAM */
-	m_pc_ram = auto_alloc_array_clear(machine(), UINT32, PC_RAM_SIZE);
+	m_pc_ram = make_unique_clear<UINT32[]>(PC_RAM_SIZE);
 
 	/* Conventional memory */
-	membank("mem_bank")->set_base(m_pc_ram);
+	membank("mem_bank")->set_base(m_pc_ram.get());
 
 	/* HMA */
 	offs_t ram_limit = 0x100000 + PC_RAM_SIZE - 0x0a0000;
 	space.install_read_bank(0x100000, ram_limit - 1, "hma_bank");
 	space.install_write_bank(0x100000, ram_limit - 1, "hma_bank");
-	membank("hma_bank")->set_base(m_pc_ram + 0xa0000);
+	membank("hma_bank")->set_base(m_pc_ram.get() + 0xa0000);
 }
 
 void su2000_state::machine_reset()

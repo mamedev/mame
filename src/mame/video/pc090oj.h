@@ -47,8 +47,8 @@ private:
 	UINT16     m_ctrl;
 	UINT16     m_sprite_ctrl;
 
-	UINT16 *   m_ram;
-	UINT16 *   m_ram_buffered;
+	std::unique_ptr<UINT16[]>  m_ram;
+	std::unique_ptr<UINT16[]>  m_ram_buffered;
 
 	int        m_gfxnum;
 	int        m_x_offset, m_y_offset;

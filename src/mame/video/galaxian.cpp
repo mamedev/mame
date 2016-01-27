@@ -786,7 +786,7 @@ void galaxian_state::stars_init()
 	m_stars_blink_state = 0;
 
 	/* precalculate the RNG */
-	m_stars = auto_alloc_array(machine(), UINT8, STAR_RNG_PERIOD);
+	m_stars = std::make_unique<UINT8[]>(STAR_RNG_PERIOD);
 	shiftreg = 0;
 	for (i = 0; i < STAR_RNG_PERIOD; i++)
 	{

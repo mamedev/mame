@@ -42,8 +42,8 @@ public:
 	int m_clutsel;
 	int m_screen_refresh;
 	bitmap_ind16 m_tmpbitmap;
-	UINT8 *m_videoram;
-	UINT8 *m_clut;
+	std::unique_ptr<UINT8[]> m_videoram;
+	std::unique_ptr<UINT8[]> m_clut;
 	int m_flipscreen_old;
 	emu_timer *m_blitter_timer;
 

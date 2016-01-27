@@ -93,7 +93,7 @@ public:
 
 	UINT8   m_cga_palette_lut_2bpp[4];
 
-	UINT8  *m_videoram;
+	std::unique_ptr<UINT8[]>  m_videoram;
 };
 
 // device type definition

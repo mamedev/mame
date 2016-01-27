@@ -81,7 +81,6 @@ public:
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(nsmpoker_videoram_w);
 	DECLARE_WRITE8_MEMBER(nsmpoker_colorram_w);
-	DECLARE_WRITE8_MEMBER(debug_w);
 	DECLARE_READ8_MEMBER(debug_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;

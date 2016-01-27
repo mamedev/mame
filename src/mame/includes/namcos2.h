@@ -129,7 +129,7 @@ public:
 	int m_mcu_analog_ctrl;
 	int m_mcu_analog_data;
 	int m_mcu_analog_complete;
-	UINT8 *m_eeprom;
+	std::unique_ptr<UINT8[]> m_eeprom;
 	UINT16  m_68k_master_C148[0x20];
 	UINT16  m_68k_slave_C148[0x20];
 	UINT16  m_68k_gpu_C148[0x20];
@@ -363,6 +363,11 @@ public:
 	DECLARE_READ16_MEMBER( namcos2_68k_key_r );
 	DECLARE_WRITE16_MEMBER( namcos2_68k_key_w );
 	DECLARE_READ16_MEMBER( namcos2_finallap_prot_r );
+	void GollyGhostUpdateLED_c4( int data );
+	void GollyGhostUpdateLED_c6( int data );
+	void GollyGhostUpdateLED_c8( int data );
+	void GollyGhostUpdateLED_ca( int data );
+	void GollyGhostUpdateDiorama_c0( int data );
 
 };
 

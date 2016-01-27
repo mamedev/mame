@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 /***************************************************************************
 
@@ -316,14 +316,14 @@ WRITE8_MEMBER(boxer_state::boxer_crowd_w)
 	/* BIT2 => CROWD-2 */
 	/* BIT3 => CROWD-3 */
 
-	coin_lockout_global_w(machine(), data & 1);
+	machine().bookkeeping().coin_lockout_global_w(data & 1);
 }
 
 
 WRITE8_MEMBER(boxer_state::boxer_led_w)
 {
-	set_led_status(machine(), 1, !(data & 1));
-	set_led_status(machine(), 0, !(data & 2));
+	output().set_led_value(1, !(data & 1));
+	output().set_led_value(0, !(data & 2));
 }
 
 

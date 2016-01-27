@@ -108,8 +108,8 @@ WRITE8_MEMBER(bottom9_state::bankswitch_w)
 WRITE8_MEMBER(bottom9_state::bottom9_1f90_w)
 {
 	/* bits 0/1 = coin counters */
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 	/* bit 2 = enable char ROM reading through the video RAM */
 	m_k052109->set_rmrd_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);

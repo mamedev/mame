@@ -29,8 +29,8 @@ WRITE16_MEMBER(realbrk_state::realbrk_flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0,    data & 0x0001);
-		coin_counter_w(machine(), 1,    data & 0x0004);
+		machine().bookkeeping().coin_counter_w(0,    data & 0x0001);
+		machine().bookkeeping().coin_counter_w(1,    data & 0x0004);
 
 		flip_screen_set(    data & 0x0080);
 	}
@@ -154,8 +154,8 @@ void realbrk_state::video_start()
 	m_tilemap_1->set_transparent_pen(0);
 	m_tilemap_2->set_transparent_pen(0);
 
-	m_tmpbitmap0 = auto_bitmap_ind16_alloc(machine(),32,32);
-	m_tmpbitmap1 = auto_bitmap_ind16_alloc(machine(),32,32);
+	m_tmpbitmap0 = std::make_unique<bitmap_ind16>(32,32);
+	m_tmpbitmap1 = std::make_unique<bitmap_ind16>(32,32);
 
 	save_item(NAME(m_disable_video));
 }

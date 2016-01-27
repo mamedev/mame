@@ -198,7 +198,7 @@ WRITE8_MEMBER( jp_state::disp_w )
 		if (t == 8)
 		{ // ball number
 			segment = m_disp_data >> 6;
-			output_set_digit_value(94, BITSWAP8(segment, 0, 1, 2, 3, 4, 5, 6, 7) ^ 0xff);
+			output().set_digit_value(94, BITSWAP8(segment, 0, 1, 2, 3, 4, 5, 6, 7) ^ 0xff);
 		}
 		else
 		if (t < 8)
@@ -210,9 +210,9 @@ WRITE8_MEMBER( jp_state::disp_w )
 
 			for (i = 0; i < 32; i++)
 				if BIT(m_disp_data, i)
-					output_set_digit_value(i, (output_get_digit_value(i) & ~segment));
+					output().set_digit_value(i, (output().get_digit_value(i) & ~segment));
 				else
-					output_set_digit_value(i, (output_get_digit_value(i) | segment));
+					output().set_digit_value(i, (output().get_digit_value(i) | segment));
 		}
 	}
 }
@@ -258,10 +258,10 @@ void jp_state::machine_reset()
 	m_row = 0;
 	m_clock_bit = 0;
 	//m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	output_set_digit_value(96, 0x3f);
-	output_set_digit_value(97, 0x3f);
-	output_set_digit_value(98, 0x3f);
-	output_set_digit_value(99, 0x3f);
+	output().set_digit_value(96, 0x3f);
+	output().set_digit_value(97, 0x3f);
+	output().set_digit_value(98, 0x3f);
+	output().set_digit_value(99, 0x3f);
 }
 
 DRIVER_INIT_MEMBER( jp_state, jp )

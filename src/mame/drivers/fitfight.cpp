@@ -1021,5 +1021,5 @@ DRIVER_INIT_MEMBER(fitfight_state,hotmindff)
 
 GAME( 199?, fitfight, 0, fitfight, fitfight, fitfight_state, fitfight, ROT0, "bootleg", "Fit of Fighting", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, histryma, 0, fitfight, histryma, fitfight_state, histryma, ROT0, "bootleg", "The History of Martial Arts", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, bbprot,   0, bbprot,   bbprot, fitfight_state,   bbprot,   ROT0, "<unknown>", "unknown fighting game 'BB' (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, bbprot,   0, bbprot,   bbprot, fitfight_state,   bbprot,   ROT0, "<unknown>", "unknown fighting game 'BB' (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, hotmindff,  hotmind, fitfight,   fitfight, fitfight_state,   hotmindff,   ROT0, "Playmark", "Hot Mind (Fit of Fighting hardware)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // need to fix scroll offsets + inputs

@@ -1,6 +1,6 @@
 --
--- Copyright 2010-2015 Branimir Karadzic. All rights reserved.
--- License: http://www.opensource.org/licenses/BSD-2-Clause
+-- Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+-- License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 --
 
 function bgfxProject(_name, _kind, _defines)
@@ -83,9 +83,9 @@ function bgfxProject(_name, _kind, _defines)
 		configuration { "osx" }
 			linkoptions {
 				"-framework Cocoa",
-				"-framework Metal",
 				"-framework QuartzCore",
 				"-framework OpenGL",
+				"-weak_framework Metal",
 			}
 
 		configuration { "not nacl" }

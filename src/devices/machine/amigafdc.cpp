@@ -432,13 +432,13 @@ void amiga_fdc::setup_leds()
 			floppy == floppy_devices[2] ? 2 :
 			3;
 
-		output_set_value("drive_0_led", drive == 0);
-		output_set_value("drive_1_led", drive == 1);
-		output_set_value("drive_2_led", drive == 2);
-		output_set_value("drive_3_led", drive == 3);
+		machine().output().set_value("drive_0_led", drive == 0);
+		machine().output().set_value("drive_1_led", drive == 1);
+		machine().output().set_value("drive_2_led", drive == 2);
+		machine().output().set_value("drive_3_led", drive == 3);
 
-		set_led_status(machine(), 1, drive == 0); /* update internal drive led */
-		set_led_status(machine(), 2, drive == 1); /* update external drive led */
+		machine().output().set_led_value(1, drive == 0); /* update internal drive led */
+		machine().output().set_led_value(2, drive == 1); /* update external drive led */
 	}
 }
 
@@ -471,7 +471,7 @@ WRITE8_MEMBER( amiga_fdc::ciaaprb_w )
 		floppy->dir_w((data >> 1) & 1);
 		floppy->stp_w(data & 1);
 		floppy->mon_w((data >> 7) & 1);
-		output_set_value("fdc_led", data & 0x80); // LED directly connected to FDC motor
+		machine().output().set_value("fdc_led", data & 0x80); // LED directly connected to FDC motor
 	}
 
 	if(floppy) {

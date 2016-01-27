@@ -74,8 +74,8 @@ WRITE16_MEMBER(playmark_state::coinctrl_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0, data & 0x0100);
-		coin_counter_w(machine(), 1, data & 0x0200);
+		machine().bookkeeping().coin_counter_w(0, data & 0x0100);
+		machine().bookkeeping().coin_counter_w(1, data & 0x0200);
 	}
 	if (data & 0xfcff)
 		logerror("Writing %04x to unknown coin control bits\n", data);
@@ -93,10 +93,10 @@ WRITE16_MEMBER(playmark_state::wbeachvl_coin_eeprom_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bits 0-3 are coin counters? (only 0 used?) */
-		coin_counter_w(machine(), 0, data & 0x01);
-		coin_counter_w(machine(), 1, data & 0x02);
-		coin_counter_w(machine(), 2, data & 0x04);
-		coin_counter_w(machine(), 3, data & 0x08);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
+		machine().bookkeeping().coin_counter_w(2, data & 0x04);
+		machine().bookkeeping().coin_counter_w(3, data & 0x08);
 
 		/* bits 5-7 control EEPROM */
 		m_eeprom->cs_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
@@ -124,8 +124,8 @@ WRITE16_MEMBER(playmark_state::hotmind_coin_eeprom_w)
 		}
 		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x08) ? 0x80 : 0);
 
-		coin_counter_w(machine(), 0, data & 0x20);      /* Coin In counter - transistor driven */
-		coin_counter_w(machine(), 1, data & 0x40);      /* Token/Ticket Out counter - transistor driven */
+		machine().bookkeeping().coin_counter_w(0, data & 0x20);      /* Coin In counter - transistor driven */
+		machine().bookkeeping().coin_counter_w(1, data & 0x40);      /* Token/Ticket Out counter - transistor driven */
 
 		m_eeprom->cs_write((data & 1) ? ASSERT_LINE : CLEAR_LINE);
 		m_eeprom->di_write((data & 4) >> 2);
@@ -152,15 +152,15 @@ WRITE16_MEMBER(playmark_state::luckboomh_dispenser_w)
 		}
 		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x08) ? 0x80 : 0);
 
-		coin_counter_w(machine(), 0, data & 0x20);      /* Coin In counter - transistor driven */
-		coin_counter_w(machine(), 1, data & 0x40);      /* Token/Ticket Out counter - transistor driven */
+		machine().bookkeeping().coin_counter_w(0, data & 0x20);      /* Coin In counter - transistor driven */
+		machine().bookkeeping().coin_counter_w(1, data & 0x40);      /* Token/Ticket Out counter - transistor driven */
 	}
 }
 
 WRITE16_MEMBER(playmark_state::hrdtimes_coin_w)
 {
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 }
 
 WRITE16_MEMBER(playmark_state::playmark_snd_command_w)

@@ -73,13 +73,13 @@ WRITE8_MEMBER( sc1_state::pio_port_a_w )
 	UINT8 digit = BITSWAP8( data,3,4,6,0,1,2,7,5 );
 
 	if (m_matrix & 0x04)
-		output_set_digit_value(3, digit & 0x7f);
+		output().set_digit_value(3, digit & 0x7f);
 	if (m_matrix & 0x08)
-		output_set_digit_value(2, digit & 0x7f);
+		output().set_digit_value(2, digit & 0x7f);
 	if (m_matrix & 0x10)
-		output_set_digit_value(1, digit & 0x7f);
+		output().set_digit_value(1, digit & 0x7f);
 	if (m_matrix & 0x20)
-		output_set_digit_value(0, digit & 0x7f);
+		output().set_digit_value(0, digit & 0x7f);
 }
 
 

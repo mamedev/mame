@@ -60,7 +60,7 @@ public:
 
 	// RAM/ROM banks
 	required_shared_ptr<UINT8> m_ram;
-	UINT8 *m_paged_ram;
+	std::unique_ptr<UINT8[]> m_paged_ram;
 	UINT8 m_rom_bank;
 	UINT8 m_ram_bank;
 	UINT8 m_ram_bank_count;

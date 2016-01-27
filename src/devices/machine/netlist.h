@@ -178,9 +178,6 @@ public:
 	// construction/destruction
 	netlist_mame_cpu_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~netlist_mame_cpu_device_t() {}
-
-	static void static_set_constructor(device_t &device, void (*setup_func)(netlist::setup_t &));
-
 protected:
 	// netlist_mame_device_t
 	virtual void nl_register_devices() override;
@@ -223,7 +220,7 @@ protected:
 
 	//  device_state_interface overrides
 
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override
 	{
 		if (entry.index() >= 0)
 		{
@@ -255,8 +252,6 @@ public:
 	// construction/destruction
 	netlist_mame_sound_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~netlist_mame_sound_device_t() {}
-
-	static void static_set_constructor(device_t &device, void (*setup_func)(netlist::setup_t &));
 
 	inline sound_stream *get_stream() { return m_stream; }
 

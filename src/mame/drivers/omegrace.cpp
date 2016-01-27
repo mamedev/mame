@@ -322,14 +322,14 @@ READ8_MEMBER(omegrace_state::omegrace_spinner1_r)
 WRITE8_MEMBER(omegrace_state::omegrace_leds_w)
 {
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(machine(), 0,data & 0x01);
-	coin_counter_w(machine(), 1,data & 0x02);
+	machine().bookkeeping().coin_counter_w(0,data & 0x01);
+	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
 	/* bits 2 to 5 are the start leds (4 and 5 cocktail only) */
-	set_led_status(machine(), 0,~data & 0x04);
-	set_led_status(machine(), 1,~data & 0x08);
-	set_led_status(machine(), 2,~data & 0x10);
-	set_led_status(machine(), 3,~data & 0x20);
+	output().set_led_value(0,~data & 0x04);
+	output().set_led_value(1,~data & 0x08);
+	output().set_led_value(2,~data & 0x10);
+	output().set_led_value(3,~data & 0x20);
 
 	/* bit 6 flips screen (not supported) */
 }

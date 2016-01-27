@@ -716,8 +716,8 @@ TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_timer_exp )
 void S3C24_CLASS_NAME::s3c24xx_video_start()
 {
 	screen_device *screen = machine().first_screen();
-	m_lcd.bitmap[0] = auto_bitmap_rgb32_alloc(machine(), screen->width(), screen->height());
-	m_lcd.bitmap[1] = auto_bitmap_rgb32_alloc(machine(), screen->width(), screen->height());
+	m_lcd.bitmap[0] = std::make_unique<bitmap_rgb32>( screen->width(), screen->height());
+	m_lcd.bitmap[1] = std::make_unique<bitmap_rgb32>( screen->width(), screen->height());
 }
 
 void S3C24_CLASS_NAME::bitmap_blend( bitmap_rgb32 &bitmap_dst, bitmap_rgb32 &bitmap_src_1, bitmap_rgb32 &bitmap_src_2)

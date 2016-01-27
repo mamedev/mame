@@ -123,22 +123,22 @@ void k05324x_device::device_start()
 
 	/* decode the graphics */
 	decode_gfx();
-	m_gfx[0]->set_colors(m_palette->entries() / m_gfx[0]->depth());
+	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
 
-	if (VERBOSE && !(m_palette->shadows_enabled()))
+	if (VERBOSE && !(palette().shadows_enabled()))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	m_ramsize = 0x800;
 
 	m_z_rejection = -1;
-	m_ram = auto_alloc_array_clear(machine(), UINT16, m_ramsize / 2);
-	m_buffer = auto_alloc_array_clear(machine(), UINT16, m_ramsize / 2);
+	m_ram = make_unique_clear<UINT16[]>(m_ramsize / 2);
+	m_buffer = make_unique_clear<UINT16[]>(m_ramsize / 2);
 
 	// bind callbacks
 	m_k05324x_cb.bind_relative_to(*owner());
 
-	save_pointer(NAME(m_ram), m_ramsize / 2);
-	save_pointer(NAME(m_buffer), m_ramsize / 2);
+	save_pointer(NAME(m_ram.get()), m_ramsize / 2);
+	save_pointer(NAME(m_buffer.get()), m_ramsize / 2);
 	save_item(NAME(m_rombank));
 	save_item(NAME(m_z_rejection));
 	save_item(NAME(m_regs));
@@ -167,7 +167,7 @@ READ16_MEMBER( k05324x_device::k053245_word_r )
 
 WRITE16_MEMBER( k05324x_device::k053245_word_w )
 {
-	COMBINE_DATA(m_ram + offset);
+	COMBINE_DATA(m_ram.get() + offset);
 }
 
 READ8_MEMBER( k05324x_device::k053245_r )
@@ -197,7 +197,7 @@ void k05324x_device::clear_buffer()
 
 void k05324x_device::update_buffer()
 {
-	memcpy(m_buffer, m_ram, m_ramsize);
+	memcpy(m_buffer.get(), m_ram.get(), m_ramsize);
 }
 
 READ8_MEMBER( k05324x_device::k053244_r )
@@ -458,7 +458,7 @@ void k05324x_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		ox -= (zoomx * w) >> 13;
 		oy -= (zoomy * h) >> 13;
 
-		drawmode_table[m_gfx[0]->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+		drawmode_table[gfx(0)->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 
 		for (y = 0; y < h; y++)
 		{
@@ -522,7 +522,7 @@ void k05324x_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 
 				if (zoomx == 0x10000 && zoomy == 0x10000)
 				{
-					m_gfx[0]->prio_transtable(bitmap,cliprect,
+					gfx(0)->prio_transtable(bitmap,cliprect,
 							c,color,
 							fx,fy,
 							sx,sy,
@@ -531,7 +531,7 @@ void k05324x_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 				}
 				else
 				{
-					m_gfx[0]->prio_zoom_transtable(bitmap,cliprect,
+					gfx(0)->prio_zoom_transtable(bitmap,cliprect,
 							c,color,
 							fx,fy,
 							sx,sy,

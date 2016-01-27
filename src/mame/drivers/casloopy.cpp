@@ -175,9 +175,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	UINT16 *m_paletteram;
-	UINT8 *m_vram;
-	UINT8 *m_bitmap_vram;
+	std::unique_ptr<UINT16[]> m_paletteram;
+	std::unique_ptr<UINT8[]> m_vram;
+	std::unique_ptr<UINT8[]> m_bitmap_vram;
 	UINT16 sh7021_regs[0x100];
 	int m_gfx_index;
 	DECLARE_DRIVER_INIT(casloopy);
@@ -225,9 +225,9 @@ static const gfx_layout casloopy_8bpp_layout =
 void casloopy_state::video_start()
 {
 	/* TODO: proper sizes */
-	m_paletteram = auto_alloc_array_clear(machine(), UINT16, 0x1000);
-	m_vram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
-	m_bitmap_vram = auto_alloc_array_clear(machine(), UINT8, 0x20000);
+	m_paletteram = make_unique_clear<UINT16[]>(0x1000);
+	m_vram = make_unique_clear<UINT8[]>(0x10000);
+	m_bitmap_vram = make_unique_clear<UINT8[]>(0x20000);
 
 	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
 		if (m_gfxdecode->gfx(m_gfx_index) == nullptr)
@@ -236,8 +236,8 @@ void casloopy_state::video_start()
 	for(int i=0;i<0x10000;i++)
 		m_vram[i] = i & 0xff;
 
-	m_gfxdecode->set_gfx(m_gfx_index, global_alloc(gfx_element(m_palette, casloopy_4bpp_layout, m_vram, 0, 0x10, 0)));
-	m_gfxdecode->set_gfx(m_gfx_index+1, global_alloc(gfx_element(m_palette, casloopy_8bpp_layout, m_vram, 0, 1, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(m_palette, casloopy_4bpp_layout, m_vram.get(), 0, 0x10, 0));
+	m_gfxdecode->set_gfx(m_gfx_index+1, std::make_unique<gfx_element>(m_palette, casloopy_8bpp_layout, m_vram.get(), 0, 1, 0));
 }
 
 UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -320,8 +320,8 @@ READ16_MEMBER(casloopy_state::vregs_r)
 
 WRITE16_MEMBER(casloopy_state::vregs_w)
 {
-	if(offset != 6/2)
-		printf("%08x %08x\n",offset*2,data);
+//  if(offset != 6/2)
+//      printf("%08x %08x\n",offset*2,data);
 }
 
 READ16_MEMBER(casloopy_state::pal_r)
@@ -422,10 +422,10 @@ static ADDRESS_MAP_START( casloopy_map, AS_PROGRAM, 32, casloopy_state )
 	AM_RANGE(0x0405b000, 0x0405b00f) AM_RAM AM_SHARE("vregs") // RGB555 brightness control plus scrolling
 //  AM_RANGE(0x05ffff00, 0x05ffffff) AM_READWRITE16(sh7021_r, sh7021_w, 0xffffffff)
 //  AM_RANGE(0x05ffff00, 0x05ffffff) - SH7021 internal i/o
-	AM_RANGE(0x06000000, 0x061fffff) AM_READ(cart_r)
+	AM_RANGE(0x06000000, 0x062fffff) AM_READ(cart_r)
 	AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
 	AM_RANGE(0x09000000, 0x0907ffff) AM_RAM AM_SHARE("wram")
-	AM_RANGE(0x0e000000, 0x0e1fffff) AM_READ(cart_r)
+	AM_RANGE(0x0e000000, 0x0e2fffff) AM_READ(cart_r)
 	AM_RANGE(0x0f000000, 0x0f0003ff) AM_RAM AM_SHARE("oram")
 ADDRESS_MAP_END
 
@@ -479,7 +479,7 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 	UINT32 size = m_cart->common_get_size("rom");
 	UINT8 *SRC, *DST;
 	dynamic_buffer temp;
-	temp.resize(0x200000);
+	temp.resize(size);
 
 	m_cart->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_LITTLE);
 
@@ -488,7 +488,7 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 	m_cart->common_load_rom(&temp[0], size, "rom");
 
 	// fix endianness
-	for (int i = 0; i < 0x200000; i += 4)
+	for (int i = 0; i < size; i += 4)
 	{
 		UINT8 tempa = SRC[i + 0];
 		UINT8 tempb = SRC[i + 1];

@@ -27,7 +27,6 @@ public:
 	DECLARE_WRITE16_MEMBER( xscroll_word_w );
 	DECLARE_WRITE16_MEMBER( yscroll_word_w );
 	DECLARE_WRITE16_MEMBER( ctrl_word_w );
-	DECLARE_WRITE16_MEMBER( scrollram_w );
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -55,7 +54,7 @@ public:
 	// internal state
 	UINT16         m_ctrl[8];
 
-	UINT16         *m_ram;
+	std::unique_ptr<UINT16[]>         m_ram;
 	UINT16         *m_bg_ram[2];
 	UINT16         *m_bgscroll_ram[2];
 

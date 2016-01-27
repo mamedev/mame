@@ -181,8 +181,8 @@ WRITE8_MEMBER( segas16a_state::misc_control_w )
 	// bits 2 & 3: control the lamps, allowing for overrides
 	if (((m_video_control ^ data) & 0x0c) && !m_lamp_changed_w.isnull())
 		m_lamp_changed_w(m_video_control ^ data, data);
-	set_led_status(machine(), 1, data & 0x08);
-	set_led_status(machine(), 0, data & 0x04);
+	output().set_led_value(1, data & 0x08);
+	output().set_led_value(0, data & 0x04);
 
 	m_video_control = data;
 
@@ -198,8 +198,8 @@ WRITE8_MEMBER( segas16a_state::misc_control_w )
 	m_segaic16vid->set_display_enable(data & 0x10);
 
 	// bits 0 & 1: update coin counters
-	coin_counter_w(machine(), 1, data & 0x02);
-	coin_counter_w(machine(), 0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
 
@@ -988,6 +988,13 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas16a_state )
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(sound_data_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( sound_no7751_portmap, AS_IO, 8, segas16a_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_NOP
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(sound_data_r)
+ADDRESS_MAP_END
 
 
 //**************************************************************************
@@ -1964,6 +1971,9 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( system16a_no7751, system16a )
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_IO_MAP(sound_no7751_portmap)
+
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
 
@@ -1987,6 +1997,9 @@ MACHINE_CONFIG_END
 */
 
 static MACHINE_CONFIG_DERIVED( system16a_fd1089a_no7751, system16a_fd1089a )
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_IO_MAP(sound_no7751_portmap)
+
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
 
@@ -1995,6 +2008,9 @@ static MACHINE_CONFIG_DERIVED( system16a_fd1089a_no7751, system16a_fd1089a )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system16a_fd1089b_no7751, system16a_fd1089b )
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_IO_MAP(sound_no7751_portmap)
+
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
 
@@ -2003,6 +2019,9 @@ static MACHINE_CONFIG_DERIVED( system16a_fd1089b_no7751, system16a_fd1089b )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system16a_fd1094_no7751, system16a_fd1094 )
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_IO_MAP(sound_no7751_portmap)
+
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
 

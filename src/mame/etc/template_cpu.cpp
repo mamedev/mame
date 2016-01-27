@@ -107,7 +107,7 @@ xxx_cpu_device::xxx_cpu_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-void xxx_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void xxx_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

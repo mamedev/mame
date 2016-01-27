@@ -15,12 +15,20 @@ UINT16 tms32051_device::POP_STACK()
 	return pc;
 }
 
-INT32 tms32051_device::SUB(UINT32 a, UINT32 b)
+INT32 tms32051_device::SUB(UINT32 a, UINT32 b, bool shift16)
 {
 	UINT32 res = a - b;
 
-	// C is cleared if borrow was generated
-	m_st1.c = (b > a) ? 0 : 1;
+	if (shift16)
+	{
+		// C is cleared if borrow was generated, otherwise unaffected
+		if (a < res) m_st1.c = 0;
+	}
+	else
+	{
+		// C is cleared if borrow was generated
+		m_st1.c = (a < res) ? 0 : 1;
+	}
 
 	// check overflow
 	if ((a ^ b) & (a ^ res) & 0x80000000)
@@ -37,12 +45,20 @@ INT32 tms32051_device::SUB(UINT32 a, UINT32 b)
 	return (INT32)(res);
 }
 
-INT32 tms32051_device::ADD(UINT32 a, UINT32 b)
+INT32 tms32051_device::ADD(UINT32 a, UINT32 b, bool shift16)
 {
 	UINT32 res = a + b;
 
-	// C is set if carry was generated
-	m_st1.c = (a > res) ? 1 : 0;
+	if (shift16)
+	{
+		// C is set if carry was generated, otherwise unaffected
+		if (a > res) m_st1.c = 1;
+	}
+	else
+	{
+		// C is set if carry was generated
+		m_st1.c = (a > res) ? 1 : 0;
+	}
 
 	// check overflow
 	if ((a ^ res) & (b ^ res) & 0x80000000)
@@ -180,67 +196,63 @@ UINT16 tms32051_device::GET_ADDRESS()
 	}
 }
 
-int tms32051_device::GET_ZLVC_CONDITION(int zlvc, int zlvc_mask)
+bool tms32051_device::GET_ZLVC_CONDITION(int zlvc, int zlvc_mask)
 {
-	if (zlvc_mask & 0x2)        // OV-bit
+	if (zlvc_mask & 0x2)            // OV-bit
 	{
-		if ((zlvc & 0x2) && m_st0.ov)                           // OV
-		{
-			// clear OV
-			m_st0.ov = 0;
+		if ((zlvc & 0x2) && m_st0.ov == 0)          // OV
+			return false;
+		if (((zlvc & 0x2) == 0) && m_st0.ov != 0)   // NOV
+			return false;
+	}
+	if (zlvc_mask & 0x1)            // C-bit
+	{
+		if ((zlvc & 0x1) && m_st1.c == 0)           // C
+			return false;
+		if (((zlvc & 0x1) == 0) && m_st1.c != 0)        // NC
+			return false;
+	}
 
-			return 1;
-		}
-		else if ((zlvc & 0x2) == 0 && m_st0.ov == 0)            // NOV
-			return 1;
-	}
-	if (zlvc_mask & 0x1)        // C-bit
+	switch ((zlvc_mask & 0xc) | ((zlvc >> 2) & 0x3))
 	{
-		if ((zlvc & 0x1) && m_st1.c)                            // C
-			return 1;
-		else if ((zlvc & 0x1) == 0 && m_st1.c == 0)         // NC
-			return 1;
+		case 0x00: break;                                           // MZ=0, ML=0, Z=0, L=0
+		case 0x01: break;                                           // MZ=0, ML=0, Z=0, L=1
+		case 0x02: break;                                           // MZ=0, ML=0, Z=1, L=0
+		case 0x03: break;                                           // MZ=0, ML=0, Z=1, L=1
+		case 0x04: if ((INT32)(m_acc) <= 0) return false; break;        // MZ=0, ML=1, Z=0, L=0  (GT)
+		case 0x05: if ((INT32)(m_acc) >= 0) return false; break;        // MZ=0, ML=1, Z=0, L=1  (LT)
+		case 0x06: if ((INT32)(m_acc) <= 0) return false; break;        // MZ=0, ML=1, Z=1, L=0  (GT)
+		case 0x07: if ((INT32)(m_acc) >= 0) return false; break;        // MZ=0, ML=1, Z=1, L=1  (LT)
+		case 0x08: if ((INT32)(m_acc) == 0) return false; break;        // MZ=1, ML=0, Z=0, L=0  (NEQ)
+		case 0x09: if ((INT32)(m_acc) == 0) return false; break;        // MZ=1, ML=0, Z=0, L=1  (NEQ)
+		case 0x0a: if ((INT32)(m_acc) != 0) return false; break;        // MZ=1, ML=0, Z=1, L=0  (EQ)
+		case 0x0b: if ((INT32)(m_acc) != 0) return false; break;        // MZ=1, ML=0, Z=1, L=1  (EQ)
+		case 0x0c: if ((INT32)(m_acc) <= 0) return false; break;        // MZ=1, ML=1, Z=0, L=0  (GT)
+		case 0x0d: if ((INT32)(m_acc) >= 0) return false; break;        // MZ=1, ML=1, Z=0, L=1  (LT)
+		case 0x0e: if ((INT32)(m_acc) < 0) return false;     break;     // MZ=1, ML=1, Z=1, L=0  (GEQ)
+		case 0x0f: if ((INT32)(m_acc) > 0) return false;     break;     // MZ=1, ML=1, Z=1, L=1  (LEQ)
 	}
-	if (zlvc_mask & 0x8)        // Z-bit
-	{
-		if ((zlvc & 0x8) && (INT32)(m_acc) == 0)                // EQ
-			return 1;
-		else if ((zlvc & 0x8) == 0 && (INT32)(m_acc) != 0)  // NEQ
-			return 1;
-	}
-	if (zlvc_mask & 0x4)        // L-bit
-	{
-		if ((zlvc & 0x4) && (INT32)(m_acc) < 0)             // LT
-			return 1;
-		else if ((zlvc & 0x4) == 0 && (INT32)(m_acc) > 0)       // GT
-			return 1;
-	}
-	return 0;
+	return true;
 }
 
-int tms32051_device::GET_TP_CONDITION(int tp)
+bool tms32051_device::GET_TP_CONDITION(int tp)
 {
 	switch (tp)
 	{
 		case 0:     // BIO pin low
-		{
 			// TODO
-			return 0;
-		}
-		case 1:     // TC = 1
-		{
-			return m_st1.tc;
-		}
-		case 2:     // TC = 0
-		{
-			return m_st1.tc ^ 1;
-		}
-		case 3:     // always false
-		{
-			return 0;
-		}
+			return false;
+
+		case 1:     // TC == 1
+			return m_st1.tc != 0;
+
+		case 2:     // TC == 0
+			return m_st1.tc == 0;
+
+		case 3:
+			return true;
 	}
-	return 0;
+	return true;
 }
 
 INT32 tms32051_device::PREG_PSCALER(INT32 preg)
@@ -302,7 +314,7 @@ void tms32051_device::op_add_mem()
 		d = (UINT32)(UINT16)(data) << shift;
 	}
 
-	m_acc = ADD(m_acc, d);
+	m_acc = ADD(m_acc, d, false);
 
 	CYCLES(1);
 }
@@ -311,7 +323,7 @@ void tms32051_device::op_add_simm()
 {
 	UINT16 imm = m_op & 0xff;
 
-	m_acc = ADD(m_acc, imm);
+	m_acc = ADD(m_acc, imm, false);
 
 	CYCLES(1);
 }
@@ -331,7 +343,7 @@ void tms32051_device::op_add_limm()
 		d = (UINT32)(UINT16)(imm) << shift;
 	}
 
-	m_acc = ADD(m_acc, d);
+	m_acc = ADD(m_acc, d, false);
 
 	CYCLES(2);
 }
@@ -341,14 +353,14 @@ void tms32051_device::op_add_s16_mem()
 	UINT16 ea = GET_ADDRESS();
 	UINT32 data = DM_READ16(ea) << 16;
 
-	m_acc = ADD(m_acc, data);
+	m_acc = ADD(m_acc, data, true);
 
 	CYCLES(1);
 }
 
 void tms32051_device::op_addb()
 {
-	m_acc = ADD(m_acc, m_accb);
+	m_acc = ADD(m_acc, m_accb, false);
 
 	CYCLES(1);
 }
@@ -370,7 +382,12 @@ void tms32051_device::op_addt()
 
 void tms32051_device::op_and_mem()
 {
-	fatalerror("32051: unimplemented op and mem at %08X\n", m_pc-1);
+	UINT16 ea = GET_ADDRESS();
+	UINT16 data = DM_READ16(ea);
+
+	m_acc &= (UINT32)(data);
+
+	CYCLES(1);
 }
 
 void tms32051_device::op_and_limm()
@@ -658,12 +675,27 @@ void tms32051_device::op_sath()
 
 void tms32051_device::op_satl()
 {
-	fatalerror("32051: unimplemented op satl at %08X\n", m_pc-1);
+	int count = m_treg1 & 0xf;
+	if (m_st1.sxm)
+	{
+		m_acc = (INT32)(m_acc) >> count;
+	}
+	else
+	{
+		m_acc = (UINT32)(m_acc) >> count;
+	}
+
+	CYCLES(1);
 }
 
 void tms32051_device::op_sbb()
 {
-	m_acc = SUB(m_acc, m_accb);
+	UINT32 res = m_acc - m_accb;
+
+	// C is cleared if borrow was generated
+	m_st1.c = ((UINT32)(m_acc) < res) ? 0 : 1;
+
+	m_acc = res;
 
 	CYCLES(1);
 }
@@ -730,7 +762,7 @@ void tms32051_device::op_sub_mem()
 		d = (UINT32)(UINT16)(data) << shift;
 	}
 
-	m_acc = SUB(m_acc, d);
+	m_acc = SUB(m_acc, d, false);
 
 	CYCLES(1);
 }
@@ -744,7 +776,7 @@ void tms32051_device::op_sub_simm()
 {
 	UINT16 imm = m_op & 0xff;
 
-	m_acc = SUB(m_acc, imm);
+	m_acc = SUB(m_acc, imm, false);
 
 	CYCLES(1);
 }
@@ -764,7 +796,7 @@ void tms32051_device::op_sub_limm()
 		d = (UINT32)(UINT16)(imm) << shift;
 	}
 
-	m_acc = SUB(m_acc, d);
+	m_acc = SUB(m_acc, d, false);
 
 	CYCLES(2);
 }
@@ -1006,10 +1038,14 @@ void tms32051_device::op_bcnd()
 {
 	UINT16 pma = ROPCODE();
 
-	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
+	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
 		CHANGE_PC(pma);
 		CYCLES(4);
+
+		// clear overflow
+		if (m_op & 0x2)
+			m_st0.ov = 0;
 	}
 	else
 	{
@@ -1021,8 +1057,12 @@ void tms32051_device::op_bcndd()
 {
 	UINT16 pma = ROPCODE();
 
-	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
+	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
+		// clear overflow
+		if (m_op & 0x2)
+			m_st0.ov = 0;
+
 		delay_slot(m_pc);
 		CHANGE_PC(pma);
 		CYCLES(4);
@@ -1088,16 +1128,36 @@ void tms32051_device::op_calld()
 
 void tms32051_device::op_cc()
 {
-	fatalerror("32051: unimplemented op cc at %08X\n", m_pc-1);
+	UINT16 pma = ROPCODE();
+
+	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
+	{
+		PUSH_STACK(m_pc);
+
+		CHANGE_PC(pma);
+		CYCLES(4);
+
+		// clear overflow
+		if (m_op & 0x2)
+			m_st0.ov = 0;
+	}
+	else
+	{
+		CYCLES(2);
+	}
 }
 
 void tms32051_device::op_ccd()
 {
 	UINT16 pma = ROPCODE();
 
-	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
+	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
 		PUSH_STACK(m_pc+2);
+
+		// clear overflow
+		if (m_op & 0x2)
+			m_st0.ov = 0;
 
 		delay_slot(m_pc);
 		CHANGE_PC(pma);
@@ -1118,7 +1178,7 @@ void tms32051_device::op_nmi()
 
 void tms32051_device::op_retc()
 {
-	if ((m_op & 0x3ff) == 0x300 || GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
+	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
 		UINT16 pc = POP_STACK();
 		CHANGE_PC(pc);
@@ -1132,7 +1192,7 @@ void tms32051_device::op_retc()
 
 void tms32051_device::op_retcd()
 {
-	if ((m_op & 0x3ff) == 0x300 || GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
+	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
 		UINT16 pc = POP_STACK();
 		delay_slot(m_pc);
@@ -1169,7 +1229,7 @@ void tms32051_device::op_trap()
 
 void tms32051_device::op_xc()
 {
-	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
+	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
 		CYCLES(1);
 	}
@@ -1314,7 +1374,14 @@ void tms32051_device::op_lmmr()
 
 void tms32051_device::op_out()
 {
-	fatalerror("32051: unimplemented op out at %08X\n", m_pc-1);
+	UINT16 port = ROPCODE();
+	UINT16 ea = GET_ADDRESS();
+
+	UINT16 data = DM_READ16(ea);
+	m_io->write_word(port << 1, data);
+
+	// TODO: handle repeat
+	CYCLES(3);
 }
 
 void tms32051_device::op_smmr()
@@ -1371,7 +1438,11 @@ void tms32051_device::op_apl_dbmr()
 {
 	UINT16 ea = GET_ADDRESS();
 	UINT16 data = DM_READ16(ea);
+
 	data &= m_dbmr;
+
+	m_st1.tc = (data == 0) ? 1 : 0;
+
 	DM_WRITE16(ea, data);
 	CYCLES(1);
 }
@@ -1381,7 +1452,11 @@ void tms32051_device::op_apl_imm()
 	UINT16 ea = GET_ADDRESS();
 	UINT16 imm = ROPCODE();
 	UINT16 data = DM_READ16(ea);
+
 	data &= imm;
+
+	m_st1.tc = (data == 0) ? 1 : 0;
+
 	DM_WRITE16(ea, data);
 	CYCLES(1);
 }
@@ -1407,6 +1482,9 @@ void tms32051_device::op_opl_dbmr()
 	UINT16 ea = GET_ADDRESS();
 	UINT16 data = DM_READ16(ea);
 	data |= m_dbmr;
+
+	m_st1.tc = (data == 0) ? 1 : 0;
+
 	DM_WRITE16(ea, data);
 	CYCLES(1);
 }
@@ -1417,6 +1495,9 @@ void tms32051_device::op_opl_imm()
 	UINT16 imm = ROPCODE();
 	UINT16 data = DM_READ16(ea);
 	data |= imm;
+
+	m_st1.tc = (data == 0) ? 1 : 0;
+
 	DM_WRITE16(ea, data);
 	CYCLES(1);
 }
@@ -1444,7 +1525,7 @@ void tms32051_device::op_xpl_imm()
 void tms32051_device::op_apac()
 {
 	INT32 spreg = PREG_PSCALER(m_preg);
-	m_acc = ADD(m_acc, spreg);
+	m_acc = ADD(m_acc, spreg, false);
 
 	CYCLES(1);
 }
@@ -1477,7 +1558,7 @@ void tms32051_device::op_lta()
 
 	m_treg0 = data;
 	spreg = PREG_PSCALER(m_preg);
-	m_acc = ADD(m_acc, spreg);
+	m_acc = ADD(m_acc, spreg, false);
 	if (m_pmst.trm == 0)
 	{
 		m_treg1 = data;
@@ -1578,7 +1659,11 @@ void tms32051_device::op_sph()
 
 void tms32051_device::op_spl()
 {
-	fatalerror("32051: unimplemented op spl at %08X\n", m_pc-1);
+	UINT16 ea = GET_ADDRESS();
+	UINT16 spreg = (UINT16)(PREG_PSCALER(m_preg));
+	DM_WRITE16(ea, spreg);
+
+	CYCLES(1);
 }
 
 void tms32051_device::op_spm()
@@ -1670,7 +1755,9 @@ void tms32051_device::op_clrc_intm()
 
 void tms32051_device::op_clrc_xf()
 {
-	fatalerror("32051: unimplemented op clrc xf at %08X\n", m_pc-1);
+	m_st1.xf = 0;
+
+	CYCLES(1);
 }
 
 void tms32051_device::op_idle()
@@ -1780,7 +1867,9 @@ void tms32051_device::op_setc_hold()
 
 void tms32051_device::op_setc_tc()
 {
-	fatalerror("32051: unimplemented op setc tc at %08X\n", m_pc-1);
+	m_st1.tc = 1;
+
+	CYCLES(1);
 }
 
 void tms32051_device::op_setc_carry()
@@ -1790,7 +1879,9 @@ void tms32051_device::op_setc_carry()
 
 void tms32051_device::op_setc_xf()
 {
-	fatalerror("32051: unimplemented op setc xf at %08X\n", m_pc-1);
+	m_st1.xf = 1;
+
+	CYCLES(1);
 }
 
 void tms32051_device::op_setc_cnf()

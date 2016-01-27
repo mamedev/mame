@@ -62,9 +62,10 @@ class arcadia_amiga_state : public amiga_state
 {
 public:
 	arcadia_amiga_state(const machine_config &mconfig, device_type type, const char *tag)
-		: amiga_state(mconfig, type, tag) { }
-
-	UINT8 m_coin_counter[2];
+		: amiga_state(mconfig, type, tag)
+		, m_bios_region(*this, "user2")
+	{
+	}
 
 	DECLARE_WRITE16_MEMBER(arcadia_multibios_change_game);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
@@ -91,6 +92,10 @@ public:
 
 protected:
 	virtual void machine_reset() override;
+
+	optional_memory_region m_bios_region;
+
+	UINT8 m_coin_counter[2];
 };
 
 
@@ -238,15 +243,15 @@ static INPUT_PORTS_START( arcadia )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arcadia_amiga_state,coin_counter_r, 0)
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arcadia_amiga_state,coin_counter_r, 1)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arcadia_amiga_state,coin_counter_r, (void *)0)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arcadia_amiga_state,coin_counter_r, (void *)1)
 
 	PORT_START("joy_0_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arcadia_amiga_state,amiga_joystick_convert, 0)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arcadia_amiga_state,amiga_joystick_convert, (void *)0)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("joy_1_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arcadia_amiga_state,amiga_joystick_convert, 1)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arcadia_amiga_state,amiga_joystick_convert, (void *)1)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("potgo")
@@ -922,12 +927,16 @@ DRIVER_INIT_MEMBER( arcadia_amiga_state, arcadia )
 	m_agnus_id = AGNUS_HR_NTSC;
 	m_denise_id = DENISE;
 
-	/* OnePlay bios is encrypted, TenPlay is not */
-	UINT16 *biosrom = (UINT16 *)memregion("user2")->base();
+	if (m_bios_region != NULL)
+	{
+		/* OnePlay bios is encrypted, TenPlay is not */
+		UINT16 *rom = (UINT16 *)m_bios_region->base();
 
-	if (biosrom)
-		if (biosrom[0] != 0x4afc)
+		if (rom[0] != 0x4afc)
+		{
 			generic_decode("user2", 6, 1, 0, 2, 3, 4, 5, 7);
+		}
+	}
 }
 
 

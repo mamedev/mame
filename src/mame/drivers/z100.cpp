@@ -198,7 +198,7 @@ public:
 	DECLARE_WRITE8_MEMBER(video_pia_B_w);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_CA2_w);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_CB2_w);
-	UINT8 *m_gvram;
+	std::unique_ptr<UINT8[]> m_gvram;
 	UINT8 m_keyb_press,m_keyb_status;
 	UINT8 m_vram_enable;
 	UINT8 m_gbank;
@@ -239,7 +239,7 @@ public:
 
 void z100_state::video_start()
 {
-	m_gvram = auto_alloc_array_clear(machine(), UINT8, 0x30000);
+	m_gvram = make_unique_clear<UINT8[]>(0x30000);
 }
 
 UINT32 z100_state::screen_update_z100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

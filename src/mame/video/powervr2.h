@@ -55,7 +55,7 @@ public:
 
 	// the real accumulation buffer is a 32x32x8bpp buffer into which tiles get rendered before they get copied to the framebuffer
 	//  our implementation is not currently tile based, and thus the accumulation buffer is screen sized
-	bitmap_rgb32 *fake_accumulationbuffer_bitmap;
+	std::unique_ptr<bitmap_rgb32> fake_accumulationbuffer_bitmap;
 
 	struct texinfo  {
 		UINT32 address, vqbase;
@@ -220,7 +220,6 @@ public:
 	DECLARE_WRITE32_MEMBER( ta_yuv_tex_ctrl_w );
 	DECLARE_READ32_MEMBER(  ta_yuv_tex_cnt_r );
 	DECLARE_WRITE32_MEMBER( ta_yuv_tex_cnt_w );
-	DECLARE_READ32_MEMBER(  ta_list_cont_r );
 	DECLARE_WRITE32_MEMBER( ta_list_cont_w );
 	DECLARE_READ32_MEMBER(  ta_next_opb_init_r );
 	DECLARE_WRITE32_MEMBER( ta_next_opb_init_w );
@@ -248,11 +247,8 @@ public:
 	DECLARE_READ32_MEMBER(  sb_pdapro_r );
 	DECLARE_WRITE32_MEMBER( sb_pdapro_w );
 
-	DECLARE_READ32_MEMBER(  pvr_ta_r );
-	DECLARE_WRITE32_MEMBER( pvr_ta_w );
 	DECLARE_READ32_MEMBER(  pvr2_ta_r );
 	DECLARE_WRITE32_MEMBER( pvr2_ta_w );
-	DECLARE_READ32_MEMBER(  pvrs_ta_r );
 	DECLARE_WRITE32_MEMBER( pvrs_ta_w );
 	DECLARE_READ32_MEMBER(  elan_regs_r );
 	DECLARE_WRITE32_MEMBER( elan_regs_w );
@@ -452,7 +448,6 @@ private:
 	void computedilated();
 	void pvr_build_parameterconfig();
 	void process_ta_fifo();
-	void debug_paletteram();
 	void update_screen_format();
 
 	void fb_convert_0555krgb_to_555rgb(address_space &space, int x, int y);

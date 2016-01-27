@@ -266,7 +266,7 @@ CUSTOM_INPUT_MEMBER(bzone_state::clock_r)
 
 WRITE8_MEMBER(bzone_state::bzone_coin_counter_w)
 {
-	coin_counter_w(machine(), offset,data);
+	machine().bookkeeping().coin_counter_w(offset,data);
 }
 
 

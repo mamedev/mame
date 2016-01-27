@@ -104,8 +104,6 @@ public:
 	DECLARE_READ_LINE_MEMBER( dsra_r );
 
 	void update_tc();
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
 
 	int m_a8;
 

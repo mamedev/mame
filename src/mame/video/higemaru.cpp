@@ -77,8 +77,8 @@ WRITE8_MEMBER(higemaru_state::higemaru_c800_w)
 		logerror("c800 = %02x\n",data);
 
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(machine(), 0,data & 2);
-	coin_counter_w(machine(), 1,data & 1);
+	machine().bookkeeping().coin_counter_w(0,data & 2);
+	machine().bookkeeping().coin_counter_w(1,data & 1);
 
 	/* bit 7 flips screen */
 	if (flip_screen() != (data & 0x80))

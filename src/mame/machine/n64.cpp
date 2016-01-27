@@ -9,16 +9,8 @@
 #include "includes/n64.h"
 #include "video/n64.h"
 
-UINT32 *n64_sram;
-UINT32 *rdram;
-UINT32 *rsp_imem;
-UINT32 *rsp_dmem;
-
 // device type definition
 const device_type N64PERIPH = &device_creator<n64_periphs>;
-
-
-
 
 n64_periphs::n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, N64PERIPH, "N64 Periphal Chips", tag, owner, clock, "n64_periphs", __FILE__)
@@ -49,11 +41,11 @@ TIMER_CALLBACK_MEMBER(n64_periphs::reset_timer_callback)
 void n64_periphs::reset_tick()
 {
 	reset_timer->adjust(attotime::never);
-	maincpu->reset();
-	maincpu->execute().set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
-	rspcpu->reset();
-	rspcpu->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	rspcpu->state().set_state_int(RSP_SR, rspcpu->state().state_int(RSP_SR) | RSP_STATUS_HALT);
+	m_vr4300->reset();
+	m_vr4300->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
+	m_rsp->reset();
+	m_rsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_rsp->set_state_int(RSP_SR, m_rsp->state_int(RSP_SR) | RSP_STATUS_HALT);
 	reset_held = false;
 	cic_status = 0;
 	memset(pif_ram, 0, sizeof(pif_ram));
@@ -104,7 +96,7 @@ void n64_periphs::poll_reset_button(bool button)
 	reset_held = button;
 	if(!old_held && reset_held)
 	{
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
+		m_vr4300->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 	}
 	else if(old_held && reset_held)
 	{
@@ -123,15 +115,21 @@ void n64_periphs::device_start()
 	si_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::si_dma_callback),this));
 	vi_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::vi_scanline_callback),this));
 	reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::reset_timer_callback),this));
+	m_n64 = machine().driver_data<n64_state>();
 }
 
 void n64_periphs::device_reset()
 {
 	UINT32 *cart = (UINT32*)machine().root_device().memregion("user2")->base();
 
-	maincpu = machine().device("maincpu");
-	rspcpu = machine().device("rsp");
-	mem_map = &maincpu->memory().space(AS_PROGRAM);
+	m_vr4300 = machine().device<mips3_device>("maincpu");
+	m_rsp = machine().device<rsp_device>("rsp");
+	m_mem_map = &m_vr4300->space(AS_PROGRAM);
+
+	m_rdram = m_n64->rdram();
+	m_rsp_imem = m_n64->rsp_imem();
+	m_rsp_dmem = m_n64->rsp_dmem();
+	m_sram = m_n64->sram();
 
 	mi_version = 0x01010101;
 	mi_interrupt = 0;
@@ -238,7 +236,7 @@ void n64_periphs::device_reset()
 	pif_ram[0x26] = 0x3f;
 	pif_ram[0x27] = 0x3f;
 	cic_type=2;
-	mem_map->write_dword(0x00000318, 0x800000); /* RDRAM Size */
+	m_mem_map->write_dword(0x00000318, 0x800000); /* RDRAM Size */
 
 	if (boot_checksum == U64(0x00000000001ff230))
 	{
@@ -274,7 +272,7 @@ void n64_periphs::device_reset()
 		pif_ram[0x26] = 0x91;
 		pif_ram[0x27] = 0x3f;
 		cic_type=5;
-		mem_map->write_dword(0x000003f0, 0x800000);
+		m_mem_map->write_dword(0x000003f0, 0x800000);
 	}
 	else if (boot_checksum == U64(0x000000d6d5de4ba0))
 	{
@@ -329,7 +327,7 @@ READ32_MEMBER( n64_periphs::mi_reg_r )
 			break;
 
 		default:
-			logerror("mi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, mem_map->device().safe_pc());
+			logerror("mi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, m_vr4300->pc());
 			break;
 	}
 
@@ -414,7 +412,7 @@ WRITE32_MEMBER( n64_periphs::mi_reg_w )
 		}
 
 		default:
-			logerror("mi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, maincpu->safe_pc());
+			logerror("mi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_vr4300->pc());
 			break;
 	}
 }
@@ -428,11 +426,11 @@ void n64_periphs::check_interrupts()
 {
 	if (mi_intr_mask & mi_interrupt)
 	{
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		m_vr4300->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
 	else
 	{
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+		m_vr4300->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
 
@@ -529,7 +527,7 @@ READ32_MEMBER( n64_periphs::rdram_reg_r )
 {
 	if(offset > 0x24/4)
 	{
-		logerror("rdram_reg_r: %08X, %08X at %08X\n", offset, mem_mask, maincpu->safe_pc());
+		logerror("rdram_reg_r: %08X, %08X at %08X\n", offset, mem_mask, m_vr4300->pc());
 		return 0;
 	}
 	return rdram_regs[offset];
@@ -539,7 +537,7 @@ WRITE32_MEMBER( n64_periphs::rdram_reg_w )
 {
 	if(offset > 0x24/4)
 	{
-		logerror("rdram_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, maincpu->safe_pc());
+		logerror("rdram_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_vr4300->pc());
 		return;
 	}
 	COMBINE_DATA(&rdram_regs[offset]);
@@ -570,7 +568,7 @@ void n64_periphs::sp_dma(int direction)
 		length = 0x1000 - (sp_mem_addr & 0xfff);
 	}
 
-	UINT32 *sp_mem[2] = { rsp_dmem, rsp_imem };
+	UINT32 *sp_mem[2] = { m_rsp_dmem, m_rsp_imem };
 
 	int sp_mem_page = (sp_mem_addr >> 12) & 1;
 	if(direction == 0)// RDRAM -> I/DMEM
@@ -582,7 +580,7 @@ void n64_periphs::sp_dma(int direction)
 
 			for(int i = 0; i < length / 4; i++)
 			{
-				sp_mem[sp_mem_page][(dst + i) & 0x3ff] = rdram[src + i];
+				sp_mem[sp_mem_page][(dst + i) & 0x3ff] = m_rdram[src + i];
 			}
 
 			sp_mem_addr += length;
@@ -600,7 +598,7 @@ void n64_periphs::sp_dma(int direction)
 
 			for(int i = 0; i < length / 4; i++)
 			{
-				rdram[dst + i] = sp_mem[sp_mem_page][(src + i) & 0x3ff];
+				m_rdram[dst + i] = sp_mem[sp_mem_page][(src + i) & 0x3ff];
 			}
 
 			sp_mem_addr += length;
@@ -615,15 +613,15 @@ WRITE32_MEMBER(n64_periphs::sp_set_status)
 {
 	if (data & 0x1)
 	{
-		rspcpu->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		rspcpu->state().set_state_int(RSP_SR, rspcpu->state().state_int(RSP_SR) | RSP_STATUS_HALT);
+		m_rsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_rsp->set_state_int(RSP_SR, m_rsp->state_int(RSP_SR) | RSP_STATUS_HALT);
 	}
 
 	if (data & 0x2)
 	{
-		rspcpu->state().set_state_int(RSP_SR, rspcpu->state().state_int(RSP_SR) | RSP_STATUS_BROKE);
+		m_rsp->set_state_int(RSP_SR, m_rsp->state_int(RSP_SR) | RSP_STATUS_BROKE);
 
-		if (rspcpu->state().state_int(RSP_SR) & RSP_STATUS_INTR_BREAK)
+		if (m_rsp->state_int(RSP_SR) & RSP_STATUS_INTR_BREAK)
 		{
 			signal_rcp_interrupt(SP_INTERRUPT);
 		}
@@ -632,99 +630,73 @@ WRITE32_MEMBER(n64_periphs::sp_set_status)
 
 READ32_MEMBER(n64_periphs::sp_reg_r)
 {
-	UINT32 ret = 0;
 	switch (offset)
 	{
 		case 0x00/4:        // SP_MEM_ADDR_REG
-			ret = sp_mem_addr;
-			break;
+			return sp_mem_addr;
 
 		case 0x04/4:        // SP_DRAM_ADDR_REG
-			ret = sp_dram_addr;
-			break;
+			return sp_dram_addr;
 
 		case 0x08/4:        // SP_RD_LEN_REG
-			ret = (sp_dma_skip << 20) | (sp_dma_count << 12) | sp_dma_length;
-			break;
+			return (sp_dma_skip << 20) | (sp_dma_count << 12) | sp_dma_length;
 
 		case 0x10/4:        // SP_STATUS_REG
-			ret = rspcpu->state().state_int(RSP_SR);
-			break;
+			return m_rsp->state_int(RSP_SR);
 
 		case 0x14/4:        // SP_DMA_FULL_REG
-			ret = 0;
-			break;
+			return 0;
 
 		case 0x18/4:        // SP_DMA_BUSY_REG
-			ret = 0;
-			break;
+			return 0;
 
 		case 0x1c/4:        // SP_SEMAPHORE_REG
-			machine().device("maincpu")->execute().yield();
+			m_vr4300->yield();
 			if( sp_semaphore )
 			{
-				ret = 1;
+				return 1;
 			}
 			else
 			{
 				sp_semaphore = 1;
-				ret = 0;
+				return 0;
 			}
 			break;
 
 		case 0x20/4:        // DP_CMD_START
-		{
-			n64_state *state = machine().driver_data<n64_state>();
-			ret = state->m_rdp->get_start();
-			break;
-		}
+			return m_n64->rdp()->get_start();
 
 		case 0x24/4:        // DP_CMD_END
-		{
-			n64_state *state = machine().driver_data<n64_state>();
-			ret = state->m_rdp->get_end();
-			break;
-		}
+			return m_n64->rdp()->get_end();
 
 		case 0x28/4:        // DP_CMD_CURRENT
-		{
-			n64_state *state = machine().driver_data<n64_state>();
-			ret = state->m_rdp->get_current();
-			break;
-		}
+			return m_n64->rdp()->get_current();
 
 		case 0x34/4:        // DP_CMD_BUSY
 		case 0x38/4:        // DP_CMD_PIPE_BUSY
 		case 0x3c/4:        // DP_CMD_TMEM_BUSY
-			break;
+			return 0;
 
 		case 0x2c/4:        // DP_CMD_STATUS
-		{
-			n64_state *state = machine().driver_data<n64_state>();
-			ret = state->m_rdp->get_status();
-			break;
-		}
+			return m_n64->rdp()->get_status();
 
 		case 0x30/4:        // DP_CMD_CLOCK
-		{
-			if(!(machine().driver_data<n64_state>()->m_rdp->get_status() & DP_STATUS_FREEZE))
+			if(!(m_n64->rdp()->get_status() & DP_STATUS_FREEZE))
 			{
 				dp_clock += 13;
-				ret = dp_clock;
+				return dp_clock;
 			}
 			break;
-		}
 
 		case 0x40000/4:     // PC
-			ret = rspcpu->state().state_int(RSP_PC) & 0x00000fff;
-			break;
+			return m_rsp->state_int(RSP_PC) & 0x00000fff;
 
 		default:
-			logerror("sp_reg_r: %08X at %08X\n", offset, maincpu->safe_pc());
+			logerror("sp_reg_r: %08X at %08X\n", offset, m_vr4300->pc());
 			break;
 	}
 
-	return ret;
+	return 0;
 }
 
 
@@ -758,17 +730,17 @@ WRITE32_MEMBER(n64_periphs::sp_reg_w )
 
 			case 0x10/4:        // RSP_STATUS_REG
 			{
-				UINT32 oldstatus = rspcpu->state().state_int(RSP_SR);
+				UINT32 oldstatus = m_rsp->state_int(RSP_SR);
 				UINT32 newstatus = oldstatus;
 
 				if (data & 0x00000001)      // clear halt
 				{
-					rspcpu->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+					m_rsp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 					newstatus &= ~RSP_STATUS_HALT;
 				}
 				if (data & 0x00000002)      // set halt
 				{
-					rspcpu->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+					m_rsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 					newstatus |= RSP_STATUS_HALT;
 				}
 				if (data & 0x00000004)
@@ -792,8 +764,8 @@ WRITE32_MEMBER(n64_periphs::sp_reg_w )
 					newstatus |= RSP_STATUS_SSTEP;  // set single step
 					if(!(oldstatus & (RSP_STATUS_BROKE | RSP_STATUS_HALT)))
 					{
-						rspcpu->state().set_state_int(RSP_STEPCNT, 1 );
-						machine().device("rsp")->execute().yield();
+						m_rsp->set_state_int(RSP_STEPCNT, 1 );
+						m_rsp->yield();
 					}
 				}
 				if (data & 0x00000080)
@@ -868,7 +840,7 @@ WRITE32_MEMBER(n64_periphs::sp_reg_w )
 				{
 					newstatus |= RSP_STATUS_SIGNAL7;        // set signal 7
 				}
-				rspcpu->state().set_state_int(RSP_SR, newstatus);
+				m_rsp->set_state_int(RSP_SR, newstatus);
 				break;
 			}
 
@@ -880,7 +852,7 @@ WRITE32_MEMBER(n64_periphs::sp_reg_w )
 				break;
 
 			default:
-				logerror("sp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, maincpu->safe_pc());
+				logerror("sp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_vr4300->pc());
 				break;
 		}
 	}
@@ -889,18 +861,18 @@ WRITE32_MEMBER(n64_periphs::sp_reg_w )
 		switch (offset & 0xffff)
 		{
 			case 0x00/4:        // SP_PC_REG
-				if( rspcpu->state().state_int(RSP_NEXTPC) != 0xffffffff )
+				if( m_rsp->state_int(RSP_NEXTPC) != 0xffffffff )
 				{
-					rspcpu->state().set_state_int(RSP_NEXTPC, 0x1000 | (data & 0xfff));
+					m_rsp->set_state_int(RSP_NEXTPC, 0x1000 | (data & 0xfff));
 				}
 				else
 				{
-					rspcpu->state().set_state_int(RSP_PC, 0x1000 | (data & 0xfff));
+					m_rsp->set_state_int(RSP_PC, 0x1000 | (data & 0xfff));
 				}
 				break;
 
 			default:
-				logerror("sp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, maincpu->safe_pc());
+				logerror("sp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_vr4300->pc());
 				break;
 		}
 	}
@@ -916,85 +888,77 @@ void dp_full_sync(running_machine &machine)
 
 READ32_MEMBER( n64_periphs::dp_reg_r )
 {
-	n64_state *state = space.machine().driver_data<n64_state>();
-	UINT32 ret = 0;
-
 	switch (offset)
 	{
 		case 0x00/4:        // DP_START_REG
-			ret = state->m_rdp->get_start();
-			break;
+			return m_n64->rdp()->get_start();
 
 		case 0x04/4:        // DP_END_REG
-			ret = state->m_rdp->get_end();
-			break;
+			return m_n64->rdp()->get_end();
 
 		case 0x08/4:        // DP_CURRENT_REG
-			ret = state->m_rdp->get_current();
-			break;
+			return m_n64->rdp()->get_current();
 
 		case 0x0c/4:        // DP_STATUS_REG
-			ret = state->m_rdp->get_status();
-			break;
+			return m_n64->rdp()->get_status();
 
 		case 0x10/4:        // DP_CLOCK_REG
-		{
-			if(!(state->m_rdp->get_status() & DP_STATUS_FREEZE))
+			if(!(m_n64->rdp()->get_status() & DP_STATUS_FREEZE))
 			{
 				dp_clock += 13;
-				ret = dp_clock;
+				return dp_clock;
 			}
 			break;
-		}
 
 		default:
-			logerror("dp_reg_r: %08X, %08X at %08X\n", offset, mem_mask, safe_pc());
+			logerror("dp_reg_r: %08X, %08X at %08X\n", offset, mem_mask, m_vr4300->pc());
 			break;
 	}
 
-	return ret;
+	return 0;
 }
 
 WRITE32_MEMBER( n64_periphs::dp_reg_w )
 {
-	n64_state *state = space.machine().driver_data<n64_state>();
-	UINT32 status = state->m_rdp->get_status();
+	UINT32 status = m_n64->rdp()->get_status();
 
 	switch (offset)
 	{
 		case 0x00/4:        // DP_START_REG
 			if(status & DP_STATUS_START_VALID)
+			{
 				break;
+			}
 			else
 			{
-				state->m_rdp->set_status(status | DP_STATUS_START_VALID);
-				state->m_rdp->set_start(data & ~7);
+				m_n64->rdp()->set_status(status | DP_STATUS_START_VALID);
+				m_n64->rdp()->set_start(data & ~7);
 			}
 			break;
 
 		case 0x04/4:        // DP_END_REG
 			if(status & DP_STATUS_START_VALID)
 			{
-				state->m_rdp->set_status(status & ~DP_STATUS_START_VALID);
-				state->m_rdp->set_current(state->m_rdp->get_start());
-				state->m_rdp->set_end(data & ~7);
+				m_n64->rdp()->set_status(status & ~DP_STATUS_START_VALID);
+				m_n64->rdp()->set_current(m_n64->rdp()->get_start());
+				m_n64->rdp()->set_end(data & ~7);
 				g_profiler.start(PROFILER_USER1);
-				state->m_rdp->process_command_list();
+				m_n64->rdp()->process_command_list();
 				g_profiler.stop();
 				break;
 			}
 			else
 			{
-				state->m_rdp->set_end(data & ~7);
+				m_n64->rdp()->set_end(data & ~7);
 				g_profiler.start(PROFILER_USER1);
-				state->m_rdp->process_command_list();
+				m_n64->rdp()->process_command_list();
 				g_profiler.stop();
 				break;
 			}
 
 		case 0x0c/4:        // DP_STATUS_REG
 		{
-			UINT32 current_status = state->m_rdp->get_status();
+			UINT32 current_status = m_n64->rdp()->get_status();
 			if (data & 0x00000001)  current_status &= ~DP_STATUS_XBUS_DMA;
 			if (data & 0x00000002)  current_status |= DP_STATUS_XBUS_DMA;
 			if (data & 0x00000004)  current_status &= ~DP_STATUS_FREEZE;
@@ -1002,22 +966,17 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 			if (data & 0x00000010)  current_status &= ~DP_STATUS_FLUSH;
 			if (data & 0x00000020)  current_status |= DP_STATUS_FLUSH;
 			if (data & 0x00000200)  dp_clock = 0;
-			state->m_rdp->set_status(current_status);
+			m_n64->rdp()->set_status(current_status);
 			break;
 		}
 
 		default:
-			logerror("dp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, safe_pc());
+			logerror("dp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_vr4300->pc());
 			break;
 	}
 }
 
 TIMER_CALLBACK_MEMBER(n64_periphs::vi_scanline_callback)
-{
-	machine().device<n64_periphs>("rcp")->vi_scanline_tick();
-}
-
-void n64_periphs::vi_scanline_tick()
 {
 	signal_rcp_interrupt(VI_INTERRUPT);
 	vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr >> 1));
@@ -1124,7 +1083,7 @@ READ32_MEMBER( n64_periphs::vi_reg_r )
 			break;
 
 		default:
-			logerror("vi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, maincpu->safe_pc());
+			logerror("vi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, m_vr4300->pc());
 			break;
 	}
 
@@ -1152,7 +1111,6 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
 				vi_recalculate_resolution();
 			}
 			vi_width = data;
-			//state->m_rdp->m_misc_state.m_fb_width = data;
 			break;
 
 		case 0x0c/4:        // VI_INTR_REG
@@ -1214,7 +1172,7 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
 		*/
 
 		default:
-			logerror("vi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, maincpu->safe_pc());
+			logerror("vi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_vr4300->pc());
 			break;
 	}
 }
@@ -1289,7 +1247,7 @@ n64_periphs::AUDIO_DMA *n64_periphs::ai_fifo_get_top()
 
 void n64_periphs::ai_dma()
 {
-	INT16 *ram = (INT16*)rdram;
+	INT16 *ram = (INT16*)m_rdram;
 	AUDIO_DMA *current = ai_fifo_get_top();
 	attotime period;
 
@@ -1365,7 +1323,7 @@ READ32_MEMBER( n64_periphs::ai_reg_r )
 			break;
 
 		default:
-			logerror("ai_reg_r: %08X, %08X at %08X\n", offset, mem_mask, maincpu->safe_pc());
+			logerror("ai_reg_r: %08X, %08X at %08X\n", offset, mem_mask, m_vr4300->pc());
 			break;
 	}
 
@@ -1404,7 +1362,7 @@ WRITE32_MEMBER( n64_periphs::ai_reg_w )
 			break;
 
 		default:
-			logerror("ai_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, maincpu->safe_pc());
+			logerror("ai_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_vr4300->pc());
 			break;
 	}
 }
@@ -1414,15 +1372,15 @@ WRITE32_MEMBER( n64_periphs::ai_reg_w )
 
 TIMER_CALLBACK_MEMBER(n64_periphs::pi_dma_callback)
 {
-	machine().device<n64_periphs>("rcp")->pi_dma_tick();
-	machine().device("rsp")->execute().yield();
+	pi_dma_tick();
+	m_rsp->yield();
 }
 
 void n64_periphs::pi_dma_tick()
 {
 	bool update_bm = false;
 	UINT16 *cart16;
-	UINT16 *dram16 = (UINT16*)rdram;
+	UINT16 *dram16 = (UINT16*)m_rdram;
 
 	UINT32 cart_addr = (pi_cart_addr & 0x0fffffff) >> 1;
 	UINT32 dram_addr = (pi_dram_addr & 0x007fffff) >> 1;
@@ -1441,7 +1399,7 @@ void n64_periphs::pi_dma_tick()
 	}
 	else if((cart_addr & 0x04000000) == 0x04000000)
 	{
-		cart16 = (UINT16*)n64_sram;
+		cart16 = (UINT16*)m_sram;
 		cart_addr = (pi_cart_addr & 0x0001ffff) >> 1;
 	}
 	else if((cart_addr & 0x03000000) == 0x03000000 && dd_present)
@@ -1549,7 +1507,7 @@ READ32_MEMBER( n64_periphs::pi_reg_r )
 			break;
 
 		default:
-			logerror("pi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, maincpu->safe_pc());
+			logerror("pi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, m_vr4300->pc());
 			break;
 	}
 
@@ -1574,14 +1532,14 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 				dd_status_reg &= ~DD_ASIC_STATUS_DREQ;
 				dd_status_reg &= ~DD_ASIC_STATUS_BM_INT;
 				//logerror("Clearing DREQ, INT\n");
-				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+				m_vr4300->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 			}
 			if(pi_cart_addr == 0x05000000 && dd_present)
 			{
 				dd_status_reg &= ~DD_ASIC_STATUS_C2_XFER;
 				dd_status_reg &= ~DD_ASIC_STATUS_BM_INT;
 				//logerror("Clearing C2, INT\n");
-				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+				m_vr4300->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 			}
 			break;
 		}
@@ -1658,7 +1616,7 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 			break;
 
 		default:
-			logerror("pi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, maincpu->safe_pc());
+			logerror("pi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_vr4300->pc());
 			break;
 	}
 }
@@ -1678,12 +1636,12 @@ READ32_MEMBER( n64_periphs::ri_reg_r )
 		time recommended for letting the SI devices settle after startup.
 		This allows the initialization routines for the SI to see that a
 		proper amount of time has passed since system startup. */
-		machine().device<mips3_device>("maincpu")->burn_cycles(93750000/2);
+		m_vr4300->burn_cycles(93750000/2);
 	}
 
 	if(offset > 0x1c/4)
 	{
-		logerror("ri_reg_r: %08X, %08X at %08X\n", offset, mem_mask, maincpu->safe_pc());
+		logerror("ri_reg_r: %08X, %08X at %08X\n", offset, mem_mask, m_vr4300->pc());
 		return 0;
 	}
 	return ri_regs[offset];
@@ -1693,7 +1651,7 @@ WRITE32_MEMBER( n64_periphs::ri_reg_w )
 {
 	if(offset > 0x1c/4)
 	{
-		logerror("ri_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, maincpu->safe_pc());
+		logerror("ri_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_vr4300->pc());
 		return;
 	}
 	COMBINE_DATA(&ri_regs[offset]);
@@ -2138,7 +2096,7 @@ void n64_periphs::pif_dma(int direction)
 
 	if (direction)      // RDRAM -> PIF RAM
 	{
-		UINT32 *src = (UINT32*)&rdram[(si_dram_addr & 0x1fffffff) / 4];
+		UINT32 *src = m_rdram + ((si_dram_addr & 0x1fffffff) / 4);
 
 		for(int i = 0; i < 64; i+=4)
 		{
@@ -2155,7 +2113,7 @@ void n64_periphs::pif_dma(int direction)
 	{
 		handle_pif();
 
-		UINT32 *dst = (UINT32*)&rdram[(si_dram_addr & 0x1fffffff) / 4];
+		UINT32 *dst = m_rdram + ((si_dram_addr & 0x1fffffff) / 4);
 
 		for(int i = 0; i < 64; i+=4)
 		{
@@ -2315,7 +2273,7 @@ void n64_periphs::dd_update_bm()
 		}
 		//logerror("DD Write, Sending Interrupt\n");
 		dd_status_reg |= DD_ASIC_STATUS_BM_INT;
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+		m_vr4300->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 		return;
 	}
 	else // dd read, BM Mode 1
@@ -2359,7 +2317,7 @@ void n64_periphs::dd_update_bm()
 		}
 		//logerror("DD Read, Sending Interrupt\n");
 		dd_status_reg |= DD_ASIC_STATUS_BM_INT;
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+		m_vr4300->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 		return;
 	}
 }
@@ -2452,7 +2410,7 @@ READ32_MEMBER( n64_periphs::dd_reg_r )
 			{
 				dd_status_reg &= ~DD_ASIC_STATUS_BM_INT;
 				//logerror("DD Read Gap, Clearing INT\n");
-				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+				m_vr4300->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 				dd_update_bm();
 			}
 			break;
@@ -2623,7 +2581,7 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 			}
 			//logerror("Sending MECHA Int\n");
 			dd_status_reg |= DD_ASIC_STATUS_MECHA_INT;
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+			m_vr4300->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 			break;
 
 		case 0x10/4: // BM Status
@@ -2664,7 +2622,7 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 			if(!(dd_status_reg & DD_ASIC_STATUS_BM_INT) && !(dd_status_reg & DD_ASIC_STATUS_MECHA_INT))
 			{
 				//logerror("DD Status, Clearing INT\n");
-				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+				m_vr4300->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 			}
 			if(data & DD_BM_START)
 			{
@@ -2742,7 +2700,14 @@ void n64_state::n64_machine_stop()
 	device_image_interface *image = dynamic_cast<device_image_interface *>(periphs->m_nvram_image);
 
 	UINT8 data[0x30800];
-	memcpy(data, n64_sram, 0x20000);
+	if (m_sram != NULL)
+	{
+		memset(data, 0, 0x20000);
+	}
+	else
+	{
+		memcpy(data, m_sram, 0x20000);
+	}
 	memcpy(data + 0x20000, periphs->m_save_data.eeprom, 0x800);
 	memcpy(data + 0x20800, periphs->m_save_data.mempak[0], 0x8000);
 	memcpy(data + 0x28800, periphs->m_save_data.mempak[1], 0x8000);
@@ -2751,21 +2716,16 @@ void n64_state::n64_machine_stop()
 
 void n64_state::machine_start()
 {
-	rdram = reinterpret_cast<UINT32 *>(memshare("rdram")->ptr());
-	n64_sram = reinterpret_cast<UINT32 *>(memshare("sram")->ptr());
-	rsp_imem = reinterpret_cast<UINT32 *>(memshare("rsp_imem")->ptr());
-	rsp_dmem = reinterpret_cast<UINT32 *>(memshare("rsp_dmem")->ptr());
-
-	dynamic_cast<mips3_device *>(machine().device("maincpu"))->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS);
+	m_vr4300->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions */
-	dynamic_cast<mips3_device *>(machine().device("maincpu"))->add_fastram(0x00000000, 0x007fffff, FALSE, rdram);
+	m_vr4300->add_fastram(0x00000000, 0x007fffff, FALSE, m_rdram);
 
 	rsp_device *rsp = machine().device<rsp_device>("rsp");
 	rsp->rspdrc_set_options(RSPDRC_STRICT_VERIFY);
 	rsp->rspdrc_flush_drc_cache();
-	rsp->rsp_add_dmem(rsp_dmem);
-	rsp->rsp_add_imem(rsp_imem);
+	rsp->rsp_add_dmem(m_rsp_dmem);
+	rsp->rsp_add_imem(m_rsp_imem);
 
 	/* add a hook for battery save */
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(n64_state::n64_machine_stop),this));
@@ -2773,5 +2733,5 @@ void n64_state::machine_start()
 
 void n64_state::machine_reset()
 {
-	machine().device("rsp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_rsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }

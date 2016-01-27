@@ -16,7 +16,7 @@ public:
 	required_shared_ptr<UINT16> m_vregs;
 	required_shared_ptr<UINT16> m_spriteram;
 	int m_sprite_count[5];
-	int *m_sprite_table[5];
+	std::unique_ptr<int[]> m_sprite_table[5];
 	tilemap_t *m_pant[2];
 	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(thoop2_coin_w);

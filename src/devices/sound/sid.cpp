@@ -19,8 +19,8 @@
 #include "sidenvel.h"
 #include "sid.h"
 
-static float *filterTable;
-static float *bandPassParam;
+static std::unique_ptr<float[]> filterTable;
+static std::unique_ptr<float[]> bandPassParam;
 #define lowPassParam filterTable
 static float filterResTable[16];
 
@@ -168,8 +168,8 @@ static void filterTableInit(running_machine &machine)
 	float resDyMin;
 	float resDy;
 
-	filterTable = auto_alloc_array(machine, float, 0x800);
-	bandPassParam = auto_alloc_array(machine, float, 0x800);
+	filterTable = std::make_unique<float[]>(0x800);
+	bandPassParam = std::make_unique<float[]>(0x800);
 
 	uk = 0;
 	for ( rk = 0; rk < 0x800; rk++ )

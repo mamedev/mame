@@ -172,36 +172,50 @@ TODO:
 
 SAMPLES_START_CB_MEMBER(ninjakd2_state::ninjakd2_init_samples)
 {
-	const UINT8* const rom = memregion("pcm")->base();
-	const int length = memregion("pcm")->bytes();
+	if (m_pcm_region == NULL)
+	{
+		return;
+	}
+
+	const UINT8* const rom = m_pcm_region->base();
+	const int length = m_pcm_region->bytes();
 	INT16* sampledata = auto_alloc_array(machine(), INT16, length);
 
 	// convert unsigned 8-bit PCM to signed 16-bit
 	for (int i = 0; i < length; ++i)
+	{
 		sampledata[i] = rom[i] << 7;
+	}
 
 	m_sampledata = sampledata;
 }
 
 WRITE8_MEMBER(ninjakd2_state::ninjakd2_pcm_play_w)
 {
-	const UINT8* const rom = memregion("pcm")->base();
-
 	// only Ninja Kid II uses this
-	if (rom)
+	if (m_pcm_region == NULL)
 	{
-		const int length = memregion("pcm")->bytes();
-		const int start = data << 8;
+		return;
+	}
 
-		// find end of sample
-		int end = start;
-		while (end < length && rom[end] != 0x00)
-			++end;
+	const UINT8* const rom = m_pcm_region->base();
+	const int length = m_pcm_region->bytes();
+	const int start = data << 8;
 
-		if (end - start)
-			m_pcm->start_raw(0, &m_sampledata[start], end - start, NE555_FREQUENCY);
-		else
-			m_pcm->stop(0);
+	// find end of sample
+	int end = start;
+	while (end < length && rom[end] != 0x00)
+	{
+		++end;
+	}
+
+	if (end - start)
+	{
+		m_pcm->start_raw(0, &m_sampledata[start], end - start, NE555_FREQUENCY);
+	}
+	else
+	{
+		m_pcm->stop(0);
 	}
 }
 
@@ -453,6 +467,13 @@ static ADDRESS_MAP_START( ninjakd2_sound_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(ninjakd2_pcm_play_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( ninjakid_nopcm_sound_cpu, AS_PROGRAM, 8, ninjakd2_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf000, 0xf000) AM_NOP
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, ninjakd2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
@@ -972,6 +993,9 @@ static MACHINE_CONFIG_DERIVED( mnight, ninjakd2_core )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mnight_main_cpu)
 
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
+
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,mnight)
 
@@ -980,10 +1004,12 @@ static MACHINE_CONFIG_DERIVED( mnight, ninjakd2_core )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( arkarea, ninjakd2_core )
-
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mnight_main_cpu)
+
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,arkarea)
@@ -997,6 +1023,9 @@ static MACHINE_CONFIG_DERIVED( robokid, mnight )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(robokid_main_cpu)
+
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", robokid)
@@ -1015,6 +1044,9 @@ static MACHINE_CONFIG_DERIVED( omegaf, robokid )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(omegaf_main_cpu)
+
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
 
 	MCFG_MACHINE_START_OVERRIDE(ninjakd2_state,omegaf)
 	MCFG_MACHINE_RESET_OVERRIDE(ninjakd2_state,omegaf)
@@ -1114,6 +1146,35 @@ ROM_START( ninjakd2b )
 
 	ROM_REGION( 0x10000, "pcm", 0 )
 	ROM_LOAD( "nk2_09.rom",   0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) )   // 9.6d  unsigned 8-bit pcm samples
+ROM_END
+
+ROM_START( ninjakd2c )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "1.3U",         0x00000, 0x8000, CRC(06096412) SHA1(4a84a9326248ff899a04f32950b4c4a5ff58cf75) )
+	ROM_LOAD( "2.3T",         0x10000, 0x8000, CRC(9ed9a994) SHA1(ec95e09066ad51cf4514e269384b7609d6c345d9) )   // banked at 8000-bfff
+	ROM_LOAD( "nk2_03.rom",   0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )
+	ROM_LOAD( "nk2_04.rom",   0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )
+	ROM_LOAD( "5.3M",         0x28000, 0x8000, CRC(800d4951) SHA1(878516bd03a61ac970cd9e8c35116f8ec3020e79) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "nk2_06.rom",   0x00000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) )  // encrypted
+
+	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
+	ROM_LOAD( "ninjakd2.key",  0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
+	ROM_LOAD( "nk2_12.rom",   0x00000, 0x08000, CRC(db5657a9) SHA1(abbb033edb9a5a0c66ee5981d1e4df1ab334a82d) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )    // sprites (need lineswapping)
+	ROM_LOAD( "nk2_08.rom",   0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )
+	ROM_LOAD( "nk2_07.rom",   0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 )    // bg tiles (need lineswapping)
+	ROM_LOAD( "nk2_11.rom",   0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
+	ROM_LOAD( "nk2_10.rom",   0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
+
+	ROM_REGION( 0x10000, "pcm", 0 )
+	ROM_LOAD( "nk2_09.rom",   0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) )   // unsigned 8-bit pcm samples
 ROM_END
 
 ROM_START( rdaction )
@@ -1556,6 +1617,7 @@ DRIVER_INIT_MEMBER(ninjakd2_state,robokidj)
 GAME( 1987, ninjakd2,  0,        ninjakd2, ninjakd2, ninjakd2_state, ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ninjakd2a, ninjakd2, ninjakd2, ninjakd2, ninjakd2_state, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ninjakd2b, ninjakd2, ninjakd2, rdaction, ninjakd2_state, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjakd2c, ninjakd2, ninjakd2, rdaction, ninjakd2_state, ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 4)", MACHINE_SUPPORTS_SAVE ) // close to set 3
 GAME( 1987, rdaction,  ninjakd2, ninjakd2, rdaction, ninjakd2_state, ninjakd2, ROT0,   "UPL (World Games license)",       "Rad Action / NinjaKun Ashura no Shou", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, jt104,     ninjakd2, ninjakd2, rdaction, ninjakd2_state, bootleg,  ROT0,   "UPL (United Amusements license)", "JT-104 (title screen modification of Rad Action)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, mnight,    0,        mnight,   mnight,   ninjakd2_state, mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night", MACHINE_SUPPORTS_SAVE )

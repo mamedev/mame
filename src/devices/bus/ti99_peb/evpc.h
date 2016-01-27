@@ -55,7 +55,7 @@ private:
 	UINT8*          m_dsrrom;
 	bool            m_RAMEN;
 	int             m_dsr_page;
-	UINT8*          m_novram;   /* NOVRAM area */
+	std::unique_ptr<UINT8[]>          m_novram;   /* NOVRAM area */
 	evpc_palette    m_palette;
 };
 

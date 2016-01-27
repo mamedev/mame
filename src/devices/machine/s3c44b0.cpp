@@ -387,7 +387,7 @@ void s3c44b0_device::lcd_dma_read(int count, UINT8 *data)
 
 void s3c44b0_device::lcd_render_stn_04()
 {
-	UINT8 *bitmap = m_lcd.bitmap + ((m_lcd.vpos - m_lcd.vpos_min) * (m_lcd.hpos_max - m_lcd.hpos_min + 1)) + (m_lcd.hpos - m_lcd.hpos_min);
+	UINT8 *bitmap = m_lcd.bitmap.get() + ((m_lcd.vpos - m_lcd.vpos_min) * (m_lcd.hpos_max - m_lcd.hpos_min + 1)) + (m_lcd.hpos - m_lcd.hpos_min);
 	UINT8 data[16];
 	lcd_dma_read(16, data);
 	for (auto & elem : data)
@@ -403,7 +403,7 @@ void s3c44b0_device::lcd_render_stn_04()
 				if (m_lcd.vpos > m_lcd.vpos_max)
 				{
 					m_lcd.vpos = m_lcd.vpos_min;
-					bitmap = m_lcd.bitmap;
+					bitmap = m_lcd.bitmap.get();
 				}
 				m_lcd.hpos = m_lcd.hpos_min;
 			}
@@ -413,7 +413,7 @@ void s3c44b0_device::lcd_render_stn_04()
 
 void s3c44b0_device::lcd_render_stn_08()
 {
-	UINT8 *bitmap = m_lcd.bitmap + ((m_lcd.vpos - m_lcd.vpos_min) * (m_lcd.hpos_max - m_lcd.hpos_min + 1)) + (m_lcd.hpos - m_lcd.hpos_min);
+	UINT8 *bitmap = m_lcd.bitmap.get() + ((m_lcd.vpos - m_lcd.vpos_min) * (m_lcd.hpos_max - m_lcd.hpos_min + 1)) + (m_lcd.hpos - m_lcd.hpos_min);
 	UINT8 data[16];
 	lcd_dma_read(16, data);
 	for (auto & elem : data)
@@ -432,7 +432,7 @@ void s3c44b0_device::lcd_render_stn_08()
 				if (m_lcd.vpos > m_lcd.vpos_max)
 				{
 					m_lcd.vpos = m_lcd.vpos_min;
-					bitmap = m_lcd.bitmap;
+					bitmap = m_lcd.bitmap.get();
 				}
 				m_lcd.hpos = m_lcd.hpos_min;
 			}
@@ -510,7 +510,7 @@ UINT32 s3c44b0_device::video_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			for (int y = 0; y < screen.height(); y++)
 			{
 				UINT32 *scanline = &bitmap.pix32(y);
-				UINT8 *vram = m_lcd.bitmap + y * (m_lcd.hpos_max - m_lcd.hpos_min + 1);
+				UINT8 *vram = m_lcd.bitmap.get() + y * (m_lcd.hpos_max - m_lcd.hpos_min + 1);
 				for (int x = 0; x < screen.width(); x++)
 				{
 					*scanline++ = rgb_t(vram[0], vram[1], vram[2]);
@@ -596,9 +596,9 @@ void s3c44b0_device::lcd_configure()
 	verboselog( *this, 3, "LCD - min_x %d min_y %d max_x %d max_y %d\n", m_lcd.hpos_min, m_lcd.vpos_min, m_lcd.hpos_max, m_lcd.vpos_max);
 	if (m_lcd.bitmap)
 	{
-		auto_free(machine(), m_lcd.bitmap);
+		m_lcd.bitmap = nullptr;
 	}
-	m_lcd.bitmap = auto_alloc_array(machine(), UINT8, (m_lcd.hpos_max - m_lcd.hpos_min + 1) * (m_lcd.vpos_max - m_lcd.vpos_min + 1) * 3);
+	m_lcd.bitmap = std::make_unique<UINT8[]>((m_lcd.hpos_max - m_lcd.hpos_min + 1) * (m_lcd.vpos_max - m_lcd.vpos_min + 1) * 3);
 	m_lcd.frame_period = HZ_TO_ATTOSECONDS(m_lcd.framerate);
 	m_lcd.scantime = m_lcd.frame_period / m_lcd.vpos_end;
 	m_lcd.pixeltime = m_lcd.frame_period / (m_lcd.vpos_end * m_lcd.hpos_end);

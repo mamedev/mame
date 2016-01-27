@@ -34,12 +34,12 @@
 void turrett_state::machine_start()
 {
 	// Allocate memory for the two 256kx16 banks of video RAM
-	m_video_ram[0] = (UINT16*)auto_alloc_array(machine(), UINT16, VRAM_BANK_WORDS);
-	m_video_ram[1] = (UINT16*)auto_alloc_array(machine(), UINT16, VRAM_BANK_WORDS);
+	m_video_ram[0] = std::make_unique<UINT16[]>(VRAM_BANK_WORDS);
+	m_video_ram[1] = std::make_unique<UINT16[]>(VRAM_BANK_WORDS);
 
 	// Register our state for saving
-	save_pointer(NAME(m_video_ram[0]), VRAM_BANK_WORDS);
-	save_pointer(NAME(m_video_ram[1]), VRAM_BANK_WORDS);
+	save_pointer(NAME(m_video_ram[0].get()), VRAM_BANK_WORDS);
+	save_pointer(NAME(m_video_ram[1].get()), VRAM_BANK_WORDS);
 	save_item(NAME(m_inputs_active));
 	save_item(NAME(m_last_pixel));
 	save_item(NAME(m_video_ctrl));

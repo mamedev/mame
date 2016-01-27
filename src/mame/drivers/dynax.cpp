@@ -211,12 +211,12 @@ WRITE_LINE_MEMBER(dynax_state::jantouki_sound_callback)
 
 WRITE8_MEMBER(dynax_state::dynax_coincounter_0_w)
 {
-	coin_counter_w(machine(), 0, data);
+	machine().bookkeeping().coin_counter_w(0, data);
 }
 
 WRITE8_MEMBER(dynax_state::dynax_coincounter_1_w)
 {
-	coin_counter_w(machine(), 1, data);
+	machine().bookkeeping().coin_counter_w(1, data);
 }
 
 READ8_MEMBER(dynax_state::ret_ff)
@@ -308,8 +308,7 @@ WRITE8_MEMBER(dynax_state::hnoridur_palette_w)
 		// hnoridur: R/W RAM
 		case 0x18:
 		{
-			UINT8 *RAM = memregion("maincpu")->base() + 0x10000 + m_hnoridur_bank * 0x8000;
-			RAM[offset] = data;
+			m_hnoridur_ptr[offset] = data;
 			return;
 		}
 
@@ -601,7 +600,7 @@ WRITE8_MEMBER(dynax_state::hjingi_bank_w)
 
 WRITE8_MEMBER(dynax_state::hjingi_lockout_w)
 {
-	coin_lockout_w(machine(), 0, (~data) & 0x01);
+	machine().bookkeeping().coin_lockout_w(0, (~data) & 0x01);
 }
 
 WRITE8_MEMBER(dynax_state::hjingi_hopper_w)
@@ -968,7 +967,7 @@ READ8_MEMBER(dynax_state::jantouki_blitter_busy_r)
 WRITE8_MEMBER(dynax_state::jantouki_rombank_w)
 {
 	membank("bank1")->set_entry(data & 0x0f);
-	set_led_status(machine(), 0, data & 0x10);  // maybe
+	output().set_led_value(0, data & 0x10);  // maybe
 }
 
 static ADDRESS_MAP_START( jantouki_io_map, AS_IO, 8, dynax_state )
@@ -1158,8 +1157,8 @@ WRITE8_MEMBER(dynax_state::tenkai_ip_w)
 	switch (m_input_sel)
 	{
 	case 0x0c:
-		coin_counter_w(machine(), 0, data & 0x01);
-		coin_counter_w(machine(), 1, data & 0x02);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
 		// bit 2?
 		// bit 3?
 //          popmessage("%02x", data);
@@ -4335,6 +4334,9 @@ MACHINE_START_MEMBER(dynax_state,hnoridur)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 	int bank_n = (memregion("maincpu")->bytes() - 0x10000) / 0x8000;
+
+	m_hnoridur_ptr = &ROM[0x10000 + 0x18 * 0x8000];
+	save_pointer(NAME(m_hnoridur_ptr), 0x8000);
 
 	membank("bank1")->configure_entries(0, bank_n, &ROM[0x10000], 0x8000);
 

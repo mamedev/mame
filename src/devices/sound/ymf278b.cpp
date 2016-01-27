@@ -220,7 +220,7 @@ void ymf278b_device::compute_envelope(YMF278BSlot *slot)
 void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	int i, j;
-	YMF278BSlot *slot = nullptr;
+	YMF278BSlot *slot;
 	INT16 sample = 0;
 	INT32 *mixp;
 	INT32 vl, vr;
@@ -231,7 +231,7 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		return;
 	}
 
-	memset(m_mix_buffer, 0, sizeof(m_mix_buffer[0])*samples*2);
+	memset(m_mix_buffer.get(), 0, sizeof(m_mix_buffer[0])*samples*2);
 
 	for (i = 0; i < 24; i++)
 	{
@@ -239,7 +239,7 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 		if (slot->active)
 		{
-			mixp = m_mix_buffer;
+			mixp = m_mix_buffer.get();
 
 			for (j = 0; j < samples; j++)
 			{
@@ -299,7 +299,7 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		}
 	}
 
-	mixp = m_mix_buffer;
+	mixp = m_mix_buffer.get();
 	vl = m_mix_level[m_pcm_l];
 	vr = m_mix_level[m_pcm_r];
 	for (i = 0; i < samples; i++)
@@ -463,7 +463,7 @@ void ymf278b_device::C_w(UINT8 reg, UINT8 data)
 	// Handle slot registers specifically
 	if (reg >= 0x08 && reg <= 0xf7)
 	{
-		YMF278BSlot *slot = nullptr;
+		YMF278BSlot *slot;
 		int snum;
 		snum = (reg-8) % 24;
 		slot = &m_slots[snum];
@@ -985,7 +985,7 @@ void ymf278b_device::device_start()
 	}
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock()/768);
-	m_mix_buffer = auto_alloc_array(machine(), INT32, 44100*2);
+	m_mix_buffer = std::make_unique<INT32[]>(44100*2);
 
 	// rate tables
 	precompute_rate_tables();

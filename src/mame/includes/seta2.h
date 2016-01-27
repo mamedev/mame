@@ -40,7 +40,7 @@ public:
 	int m_xoffset;
 	int m_yoffset;
 	int m_keyboard_row;
-	UINT16 *m_buffered_spriteram;
+	std::unique_ptr<UINT16[]> m_buffered_spriteram;
 
 	UINT64 m_funcube_coin_start_cycles;
 	UINT8 m_funcube_hopper_motor;

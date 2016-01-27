@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Jarek Burczynski
+// license:GPL-2.0+
+// copyright-holders:Jarek Burczynski, Angelo Salese
 /****************************************************************************
 
 Mazer Blazer by Stern Electronics (c) 1983
@@ -194,14 +194,7 @@ public:
 
 	int m_planes_enabled[4];
 #endif
-	DECLARE_WRITE8_MEMBER(cfb_backgnd_color_w);
-	DECLARE_WRITE8_MEMBER(cfb_vbank_w);
 	DECLARE_WRITE8_MEMBER(cfb_rom_bank_sel_w);
-	DECLARE_READ8_MEMBER(cfb_port_02_r);
-	DECLARE_WRITE8_MEMBER(vcu_video_reg_w);
-	DECLARE_READ8_MEMBER(vcu_set_cmd_param_r);
-	DECLARE_READ8_MEMBER(vcu_set_gfx_addr_r);
-	DECLARE_READ8_MEMBER(vcu_set_clr_addr_r);
 	DECLARE_WRITE8_MEMBER(cfb_zpu_int_req_set_w);
 	DECLARE_READ8_MEMBER(cfb_zpu_int_req_clr);
 	DECLARE_READ8_MEMBER(ls670_0_r);
@@ -883,7 +876,7 @@ WRITE8_MEMBER(mazerbla_state::zpu_led_w)
 {
 	/* 0x6e - reset (offset = 0)*/
 	/* 0x6f - set */
-	set_led_status(machine(), 0, offset & 1);
+	output().set_led_value(0, offset & 1);
 }
 
 WRITE8_MEMBER(mazerbla_state::zpu_lamps_w)
@@ -891,26 +884,26 @@ WRITE8_MEMBER(mazerbla_state::zpu_lamps_w)
 	/* bit 4 = /LAMP0 */
 	/* bit 5 = /LAMP1 */
 
-	/*set_led_status(machine(), 0, (data & 0x10) >> 4);*/
-	/*set_led_status(machine(), 1, (data & 0x20) >> 4);*/
+	/*output().set_led_value(0, (data & 0x10) >> 4);*/
+	/*output().set_led_value(1, (data & 0x20) >> 4);*/
 }
 
 WRITE8_MEMBER(mazerbla_state::zpu_coin_counter_w)
 {
 	/* bit 6 = coin counter */
-	coin_counter_w(machine(), offset, BIT(data, 6));
+	machine().bookkeeping().coin_counter_w(offset, BIT(data, 6));
 }
 
 WRITE8_MEMBER(mazerbla_state::cfb_led_w)
 {
 	/* bit 7 - led on */
-	set_led_status(machine(), 2, BIT(data, 7));
+	output().set_led_value(2, BIT(data, 7));
 }
 
 WRITE8_MEMBER(mazerbla_state::gg_led_ctrl_w)
 {
 	/* bit 0, bit 1 - led on */
-	set_led_status(machine(), 1, BIT(data, 0));
+	output().set_led_value(1, BIT(data, 0));
 }
 
 
@@ -925,7 +918,7 @@ WRITE8_MEMBER(mazerbla_state::vsb_ls273_audio_control_w)
 	m_vsb_ls273 = data;
 
 	/* bit 5 - led on */
-	set_led_status(machine(), 1, BIT(data, 5));
+	output().set_led_value(1, BIT(data, 5));
 }
 
 READ8_MEMBER(mazerbla_state::soundcommand_r)

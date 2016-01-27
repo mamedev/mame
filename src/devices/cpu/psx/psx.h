@@ -153,7 +153,6 @@ class psxcpu_device : public cpu_device,
 {
 public:
 	// construction/destruction
-	psxcpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~psxcpu_device() {};
 
 	// static configuration helpers
@@ -223,7 +222,7 @@ protected:
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
@@ -239,11 +238,6 @@ protected:
 
 	// internal stuff
 	UINT32 m_op;
-
-	// memory access
-	inline UINT32 program_read(UINT32 addr);
-	inline void program_write(UINT32 addr, UINT32 data);
-	inline UINT32 opcode_read();
 
 	// address spaces
 	const address_space_config m_program_config;

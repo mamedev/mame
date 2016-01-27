@@ -124,8 +124,9 @@ protected:
 
 private:
 	// internal state
-	UINT16 *m_pf1_data, *m_pf2_data;
-	UINT16 *m_pf12_control;
+	std::unique_ptr<UINT16[]> m_pf1_data;
+	std::unique_ptr<UINT16[]> m_pf2_data;
+	std::unique_ptr<UINT16[]> m_pf12_control;
 
 	const UINT16 *m_pf1_rowscroll_ptr, *m_pf2_rowscroll_ptr;
 

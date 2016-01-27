@@ -64,7 +64,8 @@ public:
 	UINT32 update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void st0016_draw_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 *st0016_spriteram,*st0016_paletteram;
+	std::unique_ptr<UINT8[]> st0016_spriteram;
+	std::unique_ptr<UINT8[]> st0016_paletteram;
 
 	UINT32 st0016_game;
 
@@ -74,7 +75,7 @@ public:
 
 	UINT8 st0016_vregs[0xc0];
 	int st0016_ramgfx;
-	UINT8 *m_charram;
+	std::unique_ptr<UINT8[]> m_charram;
 
 protected:
 	// device-level overrides

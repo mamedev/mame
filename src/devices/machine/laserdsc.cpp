@@ -321,7 +321,7 @@ void laserdisc_device::device_start()
 	init_audio();
 
 	// register callbacks
-	config_register(machine(), "laserdisc", config_saveload_delegate(FUNC(laserdisc_device::config_load), this), config_saveload_delegate(FUNC(laserdisc_device::config_save), this));
+	machine().configuration().config_register("laserdisc", config_saveload_delegate(FUNC(laserdisc_device::config_load), this), config_saveload_delegate(FUNC(laserdisc_device::config_save), this));
 }
 
 
@@ -737,7 +737,7 @@ void laserdisc_device::init_disc()
 	if (!m_getdisc_callback.isnull())
 		m_disc = m_getdisc_callback(*this);
 	else
-		m_disc = get_disk_handle(machine(), tag());
+		m_disc = machine().rom_load().get_disk_handle(tag());
 
 	// set default parameters
 	m_width = 720;
@@ -805,7 +805,7 @@ void laserdisc_device::init_video()
 	for (auto & frame : m_frame)
 	{
 		// first allocate a YUY16 bitmap at 2x the height
-		
+
 		frame.m_bitmap.allocate(m_width, m_height * 2);
 		frame.m_bitmap.set_palette(m_videopalette);
 		fillbitmap_yuy16(frame.m_bitmap, 40, 109, 240);
@@ -1142,10 +1142,10 @@ void laserdisc_device::process_track_data()
 //  configuration file
 //-------------------------------------------------
 
-void laserdisc_device::config_load(int config_type, xml_data_node *parentnode)
+void laserdisc_device::config_load(config_type cfg_type, xml_data_node *parentnode)
 {
 	// we only care about game files
-	if (config_type != CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::CONFIG_TYPE_GAME)
 		return;
 
 	// might not have any data
@@ -1178,10 +1178,10 @@ void laserdisc_device::config_load(int config_type, xml_data_node *parentnode)
 //  file
 //-------------------------------------------------
 
-void laserdisc_device::config_save(int config_type, xml_data_node *parentnode)
+void laserdisc_device::config_save(config_type cfg_type, xml_data_node *parentnode)
 {
 	// we only care about game files
-	if (config_type != CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::CONFIG_TYPE_GAME)
 		return;
 
 	// create a node

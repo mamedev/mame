@@ -167,7 +167,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_vblank;
 
-	UINT32 *m_vram;
+	std::unique_ptr<UINT32[]> m_vram;
 	int m_vbuffer;
 	int m_flash_roms;
 	int m_old_vbuf;
@@ -309,8 +309,8 @@ WRITE32_MEMBER(dgpix_state::vbuffer_w)
 
 WRITE32_MEMBER(dgpix_state::coin_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
 READ32_MEMBER(dgpix_state::vblank_r)
@@ -376,9 +376,9 @@ INPUT_PORTS_END
 
 void dgpix_state::video_start()
 {
-	m_vram = auto_alloc_array(machine(), UINT32, 0x40000*2/4);
+	m_vram = std::make_unique<UINT32[]>(0x40000*2/4);
 
-	save_pointer(NAME(m_vram), 0x40000*2/4);
+	save_pointer(NAME(m_vram.get()), 0x40000*2/4);
 }
 
 UINT32 dgpix_state::screen_update_dgpix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

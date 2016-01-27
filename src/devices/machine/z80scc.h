@@ -137,7 +137,7 @@ public:
 	UINT8 do_sccreg_rr5();
 	UINT8 do_sccreg_rr6();
 	UINT8 do_sccreg_rr7();
-	UINT8 do_sccreg_rr8();
+//  UINT8 do_sccreg_rr8();
 	UINT8 do_sccreg_rr9();
 	UINT8 do_sccreg_rr10();
 	UINT8 do_sccreg_rr11();
@@ -555,6 +555,8 @@ public:
 	DECLARE_WRITE8_MEMBER( cd_ba_w );
 	DECLARE_READ8_MEMBER( ba_cd_r );
 	DECLARE_WRITE8_MEMBER( ba_cd_w );
+	DECLARE_READ8_MEMBER( ba_cd_inv_r );
+	DECLARE_WRITE8_MEMBER( ba_cd_inv_w );
 
 	/* Definitions moved to z80scc.c for enhencements */
 	DECLARE_READ8_MEMBER( da_r );  // { return m_chanA->data_read(); }

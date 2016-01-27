@@ -134,7 +134,7 @@ private:
 	int   m_waitcount;
 
 	/* Memory expansion (internal, 16 bit). */
-	UINT16 *m_ram16b;
+	std::unique_ptr<UINT16[]> m_ram16b;
 
 	/* Use the memory expansion? */
 	bool m_use32k;

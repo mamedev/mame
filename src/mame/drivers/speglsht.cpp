@@ -126,7 +126,7 @@ public:
 	required_shared_ptr<UINT8> m_shared;
 	required_shared_ptr<UINT32> m_framebuffer;
 	UINT32 m_videoreg;
-	bitmap_ind16 *m_bitmap;
+	std::unique_ptr<bitmap_ind16> m_bitmap;
 	required_shared_ptr<UINT32> m_cop_ram;
 	DECLARE_READ32_MEMBER(shared_r);
 	DECLARE_WRITE32_MEMBER(shared_w);
@@ -351,7 +351,7 @@ MACHINE_RESET_MEMBER(speglsht_state,speglsht)
 
 VIDEO_START_MEMBER(speglsht_state,speglsht)
 {
-	m_bitmap = auto_bitmap_ind16_alloc(machine(), 512, 5122 );
+	m_bitmap = std::make_unique<bitmap_ind16>(512, 5122 );
 //  VIDEO_START_CALL_MEMBER(st0016);
 }
 

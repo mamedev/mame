@@ -44,7 +44,7 @@ private:
 	bool _active;
 	const ns10_crypto_logic& _logic;
 	static const int initSbox[16];
-	const gf2_reducer *_reducer;
+	std::unique_ptr<const gf2_reducer>_reducer;
 
 	void device_start() override;
 	void init(int iv);

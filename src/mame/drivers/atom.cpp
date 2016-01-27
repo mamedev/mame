@@ -286,6 +286,22 @@ static ADDRESS_MAP_START( atombb_mem, AS_PROGRAM, 8, atom_state )
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
 ADDRESS_MAP_END
 
+/*-------------------------------------------------
+    ADDRESS_MAP( prophet2_mem )
+-------------------------------------------------*/
+
+//static ADDRESS_MAP_START( prophet2_mem, AS_PROGRAM, 8, atom_state )
+//  AM_RANGE(0x0000, 0x09ff) AM_RAM
+//  AM_RANGE(0x0a00, 0x7fff) AM_RAM
+//  AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("video_ram")
+//  AM_RANGE(0x9800, 0x9fff) AM_RAM
+//  AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
+////  AM_RANGE(0xb400, 0xb403) AM_DEVREADWRITE(MC6854_TAG, mc6854_device, read, write)
+////  AM_RANGE(0xb404, 0xb404) AM_READ_PORT("ECONET")
+//  AM_RANGE(0xb800, 0xb80f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
+//  AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
+//ADDRESS_MAP_END
+
 /***************************************************************************
     INPUT PORTS
 ***************************************************************************/
@@ -675,7 +691,7 @@ SLOT_INTERFACE_END
 
 FLOPPY_FORMATS_MEMBER(atom_state::floppy_formats)
 	FLOPPY_ATOM_FORMAT
-FLOPPY_FORMATS_END
+FLOPPY_FORMATS_END0
 
 /*-------------------------------------------------
     MACHINE_DRIVER( atom )
@@ -715,7 +731,9 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_I8271_IRQ_CALLBACK(WRITELINE(atom_state, atom_8271_interrupt_callback))
 	MCFG_I8271_HDL_CALLBACK(WRITELINE(atom_state, motor_w))
 	MCFG_FLOPPY_DRIVE_ADD(I8271_TAG ":0", atom_floppies, "525sssd", atom_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(I8271_TAG ":1", atom_floppies, "525sssd", atom_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_ca1))
@@ -726,6 +744,7 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(atom_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_CASSETTE_INTERFACE("atom_cass")
 
 	MCFG_QUICKLOAD_ADD("quickload", atom_state, atom_atm, "atm", 0)
 
@@ -736,11 +755,14 @@ static MACHINE_CONFIG_START( atom, atom_state )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
-	MCFG_RAM_EXTRA_OPTIONS("4K,6K,8K,10K,12K,32K")
+	MCFG_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_EXTRA_OPTIONS("2K,4K,6K,8K,10K,12K")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","atom")
+	MCFG_SOFTWARE_LIST_ADD("rom_list","atom_rom")
+	MCFG_SOFTWARE_LIST_ADD("cass_list","atom_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_list","atom_flop")
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -823,6 +845,7 @@ static MACHINE_CONFIG_START( atombb, atom_state )
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(atom_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_CASSETTE_INTERFACE("atom_cass")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -830,6 +853,42 @@ static MACHINE_CONFIG_START( atombb, atom_state )
 	MCFG_RAM_EXTRA_OPTIONS("8K,12K")
 
 MACHINE_CONFIG_END
+
+/*-------------------------------------------------
+    MACHINE_DRIVER( prophet2 )
+-------------------------------------------------*/
+
+//static MACHINE_CONFIG_DERIVED( prophet2, atom )
+//  /* basic machine hardware */
+//  MCFG_CPU_MODIFY(SY6502_TAG)
+//  MCFG_CPU_PROGRAM_MAP(prophet2_mem)
+//
+//  /* fdc */
+//  MCFG_DEVICE_REMOVE(I8271_TAG)
+//  MCFG_DEVICE_REMOVE(I8271_TAG ":0")
+//  MCFG_DEVICE_REMOVE(I8271_TAG ":1")
+//
+//  /* Software lists */
+//  MCFG_SOFTWARE_LIST_REMOVE("flop_list")
+//MACHINE_CONFIG_END
+
+/*-------------------------------------------------
+    MACHINE_DRIVER( prophet3 )
+-------------------------------------------------*/
+
+//static MACHINE_CONFIG_DERIVED( prophet3, atom )
+//
+//MACHINE_CONFIG_END
+
+/*-------------------------------------------------
+    MACHINE_DRIVER( atommc )
+-------------------------------------------------*/
+
+//static MACHINE_CONFIG_DERIVED( atommc, atom )
+//  /* Software lists */
+//  MCFG_SOFTWARE_LIST_ADD("mmc_list","atom_mmc")
+//  MCFG_SOFTWARE_LIST_REMOVE("flop_list")
+//MACHINE_CONFIG_END
 
 /***************************************************************************
     ROMS
@@ -870,6 +929,21 @@ ROM_START( atombb )
 	ROM_LOAD( "bbcbasic.rom", 0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) )
 ROM_END
 
+//#define rom_prophet2 rom_atom
+
+//#define rom_prophet3 rom_atom
+
+/*-------------------------------------------------
+    ROM( atommc )
+-------------------------------------------------*/
+
+//ROM_START( atommc )
+//  ROM_REGION( 0x4000, SY6502_TAG, 0 )
+//  ROM_LOAD( "abasic.ic20", 0x0000, 0x1000, CRC(289b7791) SHA1(0072c83458a9690a3ea1f6094f0f38cf8e96a445) )
+//  ROM_CONTINUE(            0x3000, 0x1000 )
+//  ROM_LOAD( "afloat.ic21", 0x1000, 0x1000, CRC(81d86af7) SHA1(ebcde5b36cb3a3344567cbba4c7b9fde015f4802) )
+//  ROM_LOAD( "atommc2-2.9-a000.rom", 0x2000, 0x1000, CRC(ba73e36c) SHA1(ea9739e96f3283c90b5306288c796fc01144b771) )
+//ROM_END
 
 DRIVER_INIT_MEMBER(atomeb_state, atomeb)
 {
@@ -887,8 +961,10 @@ DRIVER_INIT_MEMBER(atomeb_state, atomeb)
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      COMPANY   FULLNAME */
-COMP( 1979, atom,     0,        0,      atom,     atom, driver_device,     0,        "Acorn",  "Atom" , 0)
-COMP( 1979, atomeb,   atom,     0,      atomeb,   atom, atomeb_state, atomeb,        "Acorn",  "Atom with Eprom Box" , 0)
-COMP( 1979, atombb,   atom,     0,      atombb,   atom, driver_device,     0,        "Acorn",  "Atom with BBC Basic" , 0)
-//COMP( 1983, prophet2, atom,     0,        atom,     atom, driver_device,     0,        "Busicomputers",  "Prophet 2" , 0)
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT CLASS         INIT           COMPANY          FULLNAME                FLAGS */
+COMP( 1979, atom,     0,        0,      atom,     atom, driver_device,     0,        "Acorn",         "Atom"                , 0)
+COMP( 1979, atomeb,   atom,     0,      atomeb,   atom, atomeb_state, atomeb,        "Acorn",         "Atom with Eprom Box" , 0)
+COMP( 1982, atombb,   atom,     0,      atombb,   atom, driver_device,     0,        "Acorn",         "Atom with BBC Basic" , 0)
+//COMP( 1983, prophet2, atom,     0,      prophet2, atom, driver_device,     0,        "Busicomputers", "Prophet 2"           , 0)
+//COMP( 1983, prophet3, atom,     0,      prophet3, atom, driver_device,     0,        "Busicomputers", "Prophet 3"           , 0)
+//COMP( 2011, atommc,   atom,     0,      atommc,   atom, driver_device,     0,        "Acorn",         "Atom with AtoMMC2"   , 0)

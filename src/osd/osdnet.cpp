@@ -7,7 +7,7 @@ static class simple_list<osd_netdev::entry_t> netdev_list;
 
 void add_netdev(const char *name, const char *description, create_netdev func)
 {
-	auto entry = global_alloc_clear(osd_netdev::entry_t);
+	auto entry = global_alloc_clear<osd_netdev::entry_t>();
 	entry->id = netdev_list.count();
 	strncpy(entry->name, name, 255);
 	entry->name[255] = '\0';

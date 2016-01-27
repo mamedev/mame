@@ -163,11 +163,11 @@ READ8_MEMBER(caswin_state::vvillage_rng_r)
 
 WRITE8_MEMBER(caswin_state::vvillage_output_w)
 {
-	coin_counter_w(machine(), 0,data & 1);
-	coin_counter_w(machine(), 1,data & 1);
+	machine().bookkeeping().coin_counter_w(0,data & 1);
+	machine().bookkeeping().coin_counter_w(1,data & 1);
 	// data & 4 payout counter
-	coin_lockout_w(machine(), 0,data & 0x20);
-	coin_lockout_w(machine(), 1,data & 0x20);
+	machine().bookkeeping().coin_lockout_w(0,data & 0x20);
+	machine().bookkeeping().coin_lockout_w(1,data & 0x20);
 }
 
 WRITE8_MEMBER(caswin_state::vvillage_lamps_w)
@@ -179,11 +179,11 @@ WRITE8_MEMBER(caswin_state::vvillage_lamps_w)
 	---- --x- lamp button 2
 	---- ---x lamp button 1
 	*/
-	set_led_status(machine(), 0, data & 0x01);
-	set_led_status(machine(), 1, data & 0x02);
-	set_led_status(machine(), 2, data & 0x04);
-	set_led_status(machine(), 3, data & 0x08);
-	set_led_status(machine(), 4, data & 0x10);
+	output().set_led_value(0, data & 0x01);
+	output().set_led_value(1, data & 0x02);
+	output().set_led_value(2, data & 0x04);
+	output().set_led_value(3, data & 0x08);
+	output().set_led_value(4, data & 0x10);
 }
 
 static ADDRESS_MAP_START( vvillage_mem, AS_PROGRAM, 8, caswin_state )

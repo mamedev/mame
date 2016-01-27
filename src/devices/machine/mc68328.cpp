@@ -1794,7 +1794,7 @@ WRITE16_MEMBER( mc68328_device::write )
 
 READ16_MEMBER( mc68328_device::read )
 {
-	UINT16 temp16 = 0;
+	UINT16 temp16;
 	UINT32 address = offset << 1;
 
 	switch (address)

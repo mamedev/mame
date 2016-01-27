@@ -42,8 +42,8 @@ WRITE8_MEMBER(finalizr_state::finalizr_videoctrl_w)
 
 WRITE8_MEMBER(finalizr_state::finalizr_coin_w)
 {
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 }
 
 WRITE8_MEMBER(finalizr_state::finalizr_flipscreen_w)

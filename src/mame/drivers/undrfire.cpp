@@ -268,10 +268,10 @@ WRITE32_MEMBER(undrfire_state::undrfire_input_w)
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				coin_lockout_w(machine(), 0,~data & 0x01000000);
-				coin_lockout_w(machine(), 1,~data & 0x02000000);
-				coin_counter_w(machine(), 0, data & 0x04000000);
-				coin_counter_w(machine(), 1, data & 0x08000000);
+				machine().bookkeeping().coin_lockout_w(0,~data & 0x01000000);
+				machine().bookkeeping().coin_lockout_w(1,~data & 0x02000000);
+				machine().bookkeeping().coin_counter_w(0, data & 0x04000000);
+				machine().bookkeeping().coin_counter_w(1, data & 0x08000000);
 				m_coin_word = (data >> 16) &0xffff;
 			}
 		}
@@ -398,10 +398,10 @@ WRITE32_MEMBER(undrfire_state::motor_control_w)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		output_set_value("P1_lamp_start", (data >> 12) & 1 ); //p1 start
-		output_set_value("P2_lamp_start", (data >> 13) & 1 ); //p2 start
-		output_set_value("P1_gun_recoil", (data >> 14) & 1 ); //p1 recoil
-		output_set_value("P2_gun_recoil", (data >> 15) & 1 ); //p2 recoil
+		output().set_value("P1_lamp_start", (data >> 12) & 1 ); //p1 start
+		output().set_value("P2_lamp_start", (data >> 13) & 1 ); //p2 start
+		output().set_value("P1_gun_recoil", (data >> 14) & 1 ); //p1 recoil
+		output().set_value("P2_gun_recoil", (data >> 15) & 1 ); //p2 recoil
 	}
 }
 
@@ -411,13 +411,13 @@ WRITE32_MEMBER(undrfire_state::cbombers_cpua_ctrl_w)
     ........ ..xxxxxx   Lamp 1-6 enables
     ........ .x......   Vibration
 */
-	output_set_value("Lamp_1", data & 1 );
-	output_set_value("Lamp_2", (data >> 1) & 1 );
-	output_set_value("Lamp_3", (data >> 2) & 1 );
-	output_set_value("Lamp_4", (data >> 3) & 1 );
-	output_set_value("Lamp_5", (data >> 4) & 1 );
-	output_set_value("Lamp_6", (data >> 5) & 1 );
-	output_set_value("Wheel_vibration", (data >> 6) & 1 );
+	output().set_value("Lamp_1", data & 1 );
+	output().set_value("Lamp_2", (data >> 1) & 1 );
+	output().set_value("Lamp_3", (data >> 2) & 1 );
+	output().set_value("Lamp_4", (data >> 3) & 1 );
+	output().set_value("Lamp_5", (data >> 4) & 1 );
+	output().set_value("Lamp_6", (data >> 5) & 1 );
+	output().set_value("Wheel_vibration", (data >> 6) & 1 );
 
 	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
 }

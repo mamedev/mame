@@ -302,13 +302,13 @@ WRITE8_MEMBER( d9060_base_t::riot1_pb_w )
 	*/
 
 	// ready led
-	output_set_led_value(LED_READY, BIT(data, 4));
+	machine().output().set_led_value(LED_READY, BIT(data, 4));
 
 	// power led
-	output_set_led_value(LED_POWER, BIT(data, 5));
+	machine().output().set_led_value(LED_POWER, BIT(data, 5));
 
 	// error led
-	output_set_led_value(LED_ERROR, !BIT(data, 5));
+	machine().output().set_led_value(LED_ERROR, !BIT(data, 5));
 }
 
 

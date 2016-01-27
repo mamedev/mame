@@ -21,7 +21,7 @@ public:
 	required_shared_ptr<UINT8> m_video_control;
 
 	/* video-related */
-	UINT32       *m_videoram;
+	std::unique_ptr<UINT32[]>      m_videoram;
 
 	/* misc */
 	UINT8        m_mcu_clock;

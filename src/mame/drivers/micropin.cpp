@@ -189,8 +189,8 @@ WRITE8_MEMBER( micropin_state::p50a_w )
 	if (m_counter == 1)
 	{
 		static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7448
-		output_set_digit_value(m_row, patterns[data&15]);
-		output_set_digit_value(m_row+20, patterns[data>>4]);
+		output().set_digit_value(m_row, patterns[data&15]);
+		output().set_digit_value(m_row+20, patterns[data>>4]);
 	}
 }
 
@@ -200,8 +200,8 @@ WRITE8_MEMBER( micropin_state::p50b_w )
 	if (m_counter == 2)
 	{
 		static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7448
-		output_set_digit_value(m_row+40, patterns[data&15]);
-		output_set_digit_value(m_row+60, patterns[data>>4]);
+		output().set_digit_value(m_row+40, patterns[data&15]);
+		output().set_digit_value(m_row+60, patterns[data>>4]);
 	}
 }
 
@@ -213,7 +213,7 @@ WRITE_LINE_MEMBER( micropin_state::p50ca2_w )
 		char wordnum[8];
 		sprintf(wordnum,"led%d", m_row);
 		m_led_time[m_row] = 48; // 12 gives blinking leds; they blink in pinmame but is it correct?
-		output_set_value(wordnum, 0); // turn on
+		output().set_value(wordnum, 0); // turn on
 	}
 }
 
@@ -225,7 +225,7 @@ WRITE_LINE_MEMBER( micropin_state::p50ca2_w )
 WRITE8_MEMBER( micropin_state::p51a_w )
 {
 	static UINT16 frequency[16] = { 387, 435, 488, 517, 581, 652, 691, 775, 870, 977, 1035, 1161, 1304, 1381, 1550, 1740 };
-	m_beep->set_frequency(frequency[data & 15]);
+	m_beep->set_clock(frequency[data & 15]);
 	m_beep_time = 10; // number of 10ms intervals before it is silenced
 	m_beep->set_state(1);
 }
@@ -259,7 +259,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( micropin_state::timer_a )
 			if (m_led_time[i] == 0)
 			{
 				sprintf(wordnum,"led%d", i);
-				output_set_value(wordnum, 1); // turn off
+				output().set_value(wordnum, 1); // turn off
 			}
 		}
 	}
@@ -292,7 +292,7 @@ static MACHINE_CONFIG_START( micropin, micropin_state )
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 387)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

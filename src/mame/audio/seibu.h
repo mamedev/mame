@@ -72,7 +72,7 @@ protected:
 
 	private:
 	int m_encryption_mode;
-	UINT8 *m_decrypted_opcodes;
+	std::unique_ptr<UINT8[]> m_decrypted_opcodes;
 
 	// internal state
 	device_t *m_sound_cpu;

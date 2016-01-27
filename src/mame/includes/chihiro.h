@@ -393,6 +393,8 @@ public:
 		depthformat_rendertarget = NV2A_RT_DEPTH_FORMAT::Z24S8;
 		colorformat_rendertarget = NV2A_COLOR_FORMAT::A8R8G8B8;
 		bytespixel_rendertarget = 4;
+		clear_rendertarget.set(0, 0, 639, 479);
+		primitive_type = NV2A_BEGIN_END::STOP;
 		antialias_control = 0;
 		rendertarget = nullptr;
 		depthbuffer = nullptr;
@@ -449,7 +451,6 @@ public:
 	UINT32 dilate0(UINT32 value, int bits);
 	UINT32 dilate1(UINT32 value, int bits);
 	void computedilated(void);
-	void putpixtex(int xp, int yp, int up, int vp);
 	int toggle_register_combiners_usage();
 	int toggle_wait_vblank_support();
 	void debug_grab_texture(int type, const char *filename);
@@ -462,6 +463,7 @@ public:
 	int read_vertices_0x1810(address_space & space, vertex_nv *destination, int offset, int limit);
 	int read_vertices_0x1818(address_space & space, vertex_nv *destination, UINT32 address, int limit);
 	void convert_vertices_poly(vertex_nv *source, vertex_t *destination, int count);
+	void clear_render_target(int what, UINT32 value);
 	void clear_depth_buffer(int what, UINT32 value);
 	inline UINT8 *direct_access_ptr(offs_t address);
 	TIMER_CALLBACK_MEMBER(puller_timer_work);
@@ -494,6 +496,7 @@ public:
 	NV2A_RT_DEPTH_FORMAT depthformat_rendertarget;
 	NV2A_COLOR_FORMAT colorformat_rendertarget;
 	int bytespixel_rendertarget;
+	rectangle clear_rendertarget;
 	UINT32 antialias_control;
 	UINT32 *rendertarget;
 	UINT32 *depthbuffer;
@@ -512,10 +515,16 @@ public:
 		int rectangle_pitch;
 		void *buffer;
 	} texture[4];
+	NV2A_BEGIN_END primitive_type;
 	int primitives_count;
 	int indexesleft_count;
 	int indexesleft_first;
-	UINT32 indexesleft[8];
+	UINT32 indexesleft[1024]; // vertex indices sent by the software to the 3d accelerator
+	int vertex_count;
+	unsigned int vertex_first;
+	vertex_nv vertex_software[1024+2]; // vertex attributes sent by the software to the 3d accelerator
+	vertex_t vertex_xy[1024+2]; // vertex attributes computed by the 3d accelerator
+
 	struct {
 		float variable_A[4]; // 0=R 1=G 2=B 3=A
 		float variable_B[4];
@@ -641,9 +650,9 @@ public:
 	bool logical_operation_enabled;
 	NV2A_LOGIC_OP logical_operation;
 	struct {
-		float modelview[16];
-		float modelview_inverse[16];
-		float projection[16];
+		float modelview[4][4];
+		float modelview_inverse[4][4];
+		float projection[4][4];
 		float translate[4];
 		float scale[4];
 	} matrix;

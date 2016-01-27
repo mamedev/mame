@@ -160,38 +160,38 @@ private:
 
 
 void mgavegas_state::update_lamp(){
-	//output_set_value("AUXS", m_auxs); //unused
-	output_set_value("MGA4", m_anal&0x01);
-	output_set_value("MGA3", m_anacl&0x01);
-	output_set_value("MGA2", m_anacr&0x01);
-	output_set_value("MGA", m_anar&0x01);
-	output_set_value("PL", m_pl&0x01);
-	output_set_value("PC", m_pc&0x01);
-	output_set_value("PR", m_pr&0x01);
-	output_set_value("250", m_luz_250_rul&0x01);
-	output_set_value("1002", m_luz_100_rul&0x01);
-	output_set_value("50", m_luz_50_rlul&0x01);
-	output_set_value("252", m_luz_25_lrul&0x01);
-	output_set_value("25", m_luz_25_rrul&0x01);
-	output_set_value("FL", m_fl&0x01);
-	output_set_value("FC", m_fc&0x01);
-	output_set_value("FR", m_fr&0x01);
-	output_set_value("INSERTCOIN", m_insert_coin&0x01);
-	output_set_value("NOCAMBIO", m_no_cambio&0x01);
-	output_set_value("FUSE", m_fuse&0x01);
-	output_set_value("FALTA", m_falta&0x01);
-	//output_set_value("ANAG", m_anag&0x01);    //unused
-	output_set_value("CL", m_cl&0x01);
-	output_set_value("CC", m_cc&0x01);
-	output_set_value("CR", m_cr&0x01);
-	output_set_value("PREMIOS", m_premio_s&0x01);
-	output_set_value("100", m_100&0x01);
-	output_set_value("200", m_200&0x01);
-	output_set_value("300", m_300&0x01);
-	output_set_value("500", m_500&0x01);
-	output_set_value("ML", m_ml&0x01);
-	output_set_value("MC", m_mc&0x01);
-	output_set_value("MR", m_mr&0x01);
+	//output().set_value("AUXS", m_auxs); //unused
+	output().set_value("MGA4", m_anal&0x01);
+	output().set_value("MGA3", m_anacl&0x01);
+	output().set_value("MGA2", m_anacr&0x01);
+	output().set_value("MGA", m_anar&0x01);
+	output().set_value("PL", m_pl&0x01);
+	output().set_value("PC", m_pc&0x01);
+	output().set_value("PR", m_pr&0x01);
+	output().set_value("250", m_luz_250_rul&0x01);
+	output().set_value("1002", m_luz_100_rul&0x01);
+	output().set_value("50", m_luz_50_rlul&0x01);
+	output().set_value("252", m_luz_25_lrul&0x01);
+	output().set_value("25", m_luz_25_rrul&0x01);
+	output().set_value("FL", m_fl&0x01);
+	output().set_value("FC", m_fc&0x01);
+	output().set_value("FR", m_fr&0x01);
+	output().set_value("INSERTCOIN", m_insert_coin&0x01);
+	output().set_value("NOCAMBIO", m_no_cambio&0x01);
+	output().set_value("FUSE", m_fuse&0x01);
+	output().set_value("FALTA", m_falta&0x01);
+	//output().set_value("ANAG", m_anag&0x01);    //unused
+	output().set_value("CL", m_cl&0x01);
+	output().set_value("CC", m_cc&0x01);
+	output().set_value("CR", m_cr&0x01);
+	output().set_value("PREMIOS", m_premio_s&0x01);
+	output().set_value("100", m_100&0x01);
+	output().set_value("200", m_200&0x01);
+	output().set_value("300", m_300&0x01);
+	output().set_value("500", m_500&0x01);
+	output().set_value("ML", m_ml&0x01);
+	output().set_value("MC", m_mc&0x01);
+	output().set_value("MR", m_mr&0x01);
 /*
     m_inh=BIT(data, 3);
     m_printer=BIT(data, 6); //not_used

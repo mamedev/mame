@@ -17,6 +17,7 @@
 #include "ui/imgcntrl.h"
 #include "softlist.h"
 #include "image.h"
+#include "formats/ioprocs.h"
 
 //**************************************************************************
 //  DEVICE CONFIG IMAGE INTERFACE
@@ -378,7 +379,8 @@ UINT8 *device_image_interface::get_software_region(const char *tag)
 		return nullptr;
 
 	sprintf( full_tag, "%s:%s", device().tag(), tag );
-	return device().machine().root_device().memregion( full_tag )->base();
+	memory_region *region = device().machine().root_device().memregion(full_tag);
+	return region != NULL ? region->base() : NULL;
 }
 
 
@@ -391,7 +393,9 @@ UINT32 device_image_interface::get_software_region_length(const char *tag)
 	char full_tag[256];
 
 	sprintf( full_tag, "%s:%s", device().tag(), tag );
-	return device().machine().root_device().memregion( full_tag )->bytes();
+
+	memory_region *region = device().machine().root_device().memregion(full_tag);
+	return region != NULL ? region->bytes() : 0;
 }
 
 
@@ -508,14 +512,39 @@ UINT32 device_image_interface::crc()
 -------------------------------------------------*/
 void device_image_interface::battery_load(void *buffer, int length, int fill)
 {
+	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+
+	file_error filerr;
+	int bytes_read = 0;
 	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
-	image_battery_load_by_name(device().machine().options(), fname.c_str(), buffer, length, fill);
+
+	/* try to open the battery file and read it in, if possible */
+	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_READ);
+	filerr = file.open(fname.c_str());
+	if (filerr == FILERR_NONE)
+		bytes_read = file.read(buffer, length);
+
+	/* fill remaining bytes (if necessary) */
+	memset(((char *)buffer) + bytes_read, fill, length - bytes_read);
 }
 
 void device_image_interface::battery_load(void *buffer, int length, void *def_buffer)
 {
+	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+
+	file_error filerr;
+	int bytes_read = 0;
 	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
-	image_battery_load_by_name(device().machine().options(), fname.c_str(), buffer, length, def_buffer);
+
+	/* try to open the battery file and read it in, if possible */
+	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_READ);
+	filerr = file.open(fname.c_str());
+	if (filerr == FILERR_NONE)
+		bytes_read = file.read(buffer, length);
+
+	/* if no file was present, copy the default battery */
+	if (bytes_read == 0 && def_buffer)
+		memcpy((char *)buffer, (char *)def_buffer, length);
 }
 
 /*-------------------------------------------------
@@ -526,9 +555,14 @@ void device_image_interface::battery_load(void *buffer, int length, void *def_bu
 -------------------------------------------------*/
 void device_image_interface::battery_save(const void *buffer, int length)
 {
+	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
 	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
 
-	image_battery_save_by_name(device().machine().options(), fname.c_str(), buffer, length);
+	/* try to open the battery file and write it out, if possible */
+	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	file_error filerr = file.open(fname.c_str());
+	if (filerr == FILERR_NONE)
+		file.write(buffer, length);
 }
 
 //-------------------------------------------------
@@ -711,9 +745,8 @@ void device_image_interface::determine_open_plan(int is_create, UINT32 *open_pla
 
 static void dump_wrong_and_correct_checksums(const hash_collection &hashes, const hash_collection &acthashes)
 {
-	std::string tempstr;
-	osd_printf_error("    EXPECTED: %s\n", hashes.macro_string(tempstr));
-	osd_printf_error("       FOUND: %s\n", acthashes.macro_string(tempstr));
+	osd_printf_error("    EXPECTED: %s\n", hashes.macro_string().c_str());
+	osd_printf_error("       FOUND: %s\n", acthashes.macro_string().c_str());
 }
 
 /*-------------------------------------------------
@@ -735,8 +768,7 @@ static int verify_length_and_hash(emu_file *file, const char *name, UINT32 exple
 	}
 
 	/* If there is no good dump known, write it */
-	std::string tempstr;
-	hash_collection &acthashes = file->hashes(hashes.hash_types(tempstr));
+	hash_collection &acthashes = file->hashes(hashes.hash_types().c_str());
 	if (hashes.flag(hash_collection::FLAG_NO_DUMP))
 	{
 		osd_printf_error("%s NO GOOD DUMP KNOWN\n", name);
@@ -832,18 +864,18 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				// - if we are using lists, we have: list/clonename, list/parentname, clonename, parentname
 				// try to load from list/setname
 				if ((m_mame_file == nullptr) && (tag2.c_str() != nullptr))
-					filerr = common_process_file(device().machine().options(), tag2.c_str(), has_crc, crc, romp, &m_mame_file);
+					m_mame_file = common_process_file(device().machine().options(), tag2.c_str(), has_crc, crc, romp, filerr);
 				// try to load from list/parentname
 				if ((m_mame_file == nullptr) && (tag3.c_str() != nullptr))
-					filerr = common_process_file(device().machine().options(), tag3.c_str(), has_crc, crc, romp, &m_mame_file);
+					m_mame_file = common_process_file(device().machine().options(), tag3.c_str(), has_crc, crc, romp, filerr);
 				// try to load from setname
 				if ((m_mame_file == nullptr) && (tag4.c_str() != nullptr))
-					filerr = common_process_file(device().machine().options(), tag4.c_str(), has_crc, crc, romp, &m_mame_file);
+					m_mame_file = common_process_file(device().machine().options(), tag4.c_str(), has_crc, crc, romp, filerr);
 				// try to load from parentname
 				if ((m_mame_file == nullptr) && (tag5.c_str() != nullptr))
-					filerr = common_process_file(device().machine().options(), tag5.c_str(), has_crc, crc, romp, &m_mame_file);
+					m_mame_file = common_process_file(device().machine().options(), tag5.c_str(), has_crc, crc, romp, filerr);
 
-				warningcount += verify_length_and_hash(m_mame_file,ROM_GETNAME(romp),ROM_GETLENGTH(romp),hash_collection(ROM_GETHASHDATA(romp)));
+				warningcount += verify_length_and_hash(m_mame_file.get(),ROM_GETNAME(romp),ROM_GETLENGTH(romp),hash_collection(ROM_GETHASHDATA(romp)));
 
 				if (filerr == FILERR_NONE)
 				{
@@ -1090,7 +1122,6 @@ void device_image_interface::clear()
 {
 	if (m_mame_file)
 	{
-		global_free(m_mame_file);
 		m_mame_file = nullptr;
 		m_file = nullptr;
 	} else {
@@ -1209,7 +1240,7 @@ void device_image_interface::software_name_split(const char *swlist_swname, std:
 }
 
 
-software_part *device_image_interface::find_software_item(const char *path, bool restrict_to_interface)
+software_part *device_image_interface::find_software_item(const char *path, bool restrict_to_interface) const
 {
 	// split full software name into software list name and short software name
 	std::string swlist_name, swinfo_name, swpart_name;
@@ -1307,7 +1338,7 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 					{
 						const char *option = device().mconfig().options().value(req_image->brief_instance_name());
 						// mount only if not already mounted
-						if (strlen(option) == 0 && !req_image->filename())
+						if (*option == '\0' && !req_image->filename())
 						{
 							req_image->set_init_phase();
 							req_image->load(requirement);
@@ -1325,11 +1356,11 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 //  software_get_default_slot
 //-------------------------------------------------
 
-void device_image_interface::software_get_default_slot(std::string &result, const char *default_card_slot)
+std::string device_image_interface::software_get_default_slot(const char *default_card_slot) const
 {
 	const char *path = device().mconfig().options().value(instance_name());
-	result.clear();
-	if (strlen(path) > 0)
+	std::string result;
+	if (*path != '\0')
 	{
 		result.assign(default_card_slot);
 		software_part *swpart = find_software_item(path, true);
@@ -1340,6 +1371,7 @@ void device_image_interface::software_get_default_slot(std::string &result, cons
 				result.assign(slot);
 		}
 	}
+	return result;
 }
 
 /*-------------------------------------------------
@@ -1349,5 +1381,42 @@ void device_image_interface::software_get_default_slot(std::string &result, cons
 
 ui_menu *device_image_interface::get_selection_menu(running_machine &machine, render_container *container)
 {
-	return auto_alloc_clear(machine, ui_menu_control_device_image(machine, container, this));
+	return auto_alloc_clear(machine, <ui_menu_control_device_image>(machine, container, this));
 }
+
+/* ----------------------------------------------------------------------- */
+
+static int image_fseek_thunk(void *file, INT64 offset, int whence)
+{
+	device_image_interface *image = (device_image_interface *) file;
+	return image->fseek(offset, whence);
+}
+
+static size_t image_fread_thunk(void *file, void *buffer, size_t length)
+{
+	device_image_interface *image = (device_image_interface *) file;
+	return image->fread(buffer, length);
+}
+
+static size_t image_fwrite_thunk(void *file, const void *buffer, size_t length)
+{
+	device_image_interface *image = (device_image_interface *) file;
+	return image->fwrite(buffer, length);
+}
+
+static UINT64 image_fsize_thunk(void *file)
+{
+	device_image_interface *image = (device_image_interface *) file;
+	return image->length();
+}
+
+/* ----------------------------------------------------------------------- */
+
+struct io_procs image_ioprocs =
+{
+	nullptr,
+	image_fseek_thunk,
+	image_fread_thunk,
+	image_fwrite_thunk,
+	image_fsize_thunk
+};

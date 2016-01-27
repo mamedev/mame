@@ -9,7 +9,7 @@ newoption {
 premake.check_paths = true
 premake.make.override = { "TARGET" }
 MAME_DIR = (path.getabsolute("..") .. "/")
-MAME_DIR = string.gsub(MAME_DIR, "(%s)", "\\%1")
+--MAME_DIR = string.gsub(MAME_DIR, "(%s)", "\\%1")
 local MAME_BUILD_DIR = (MAME_DIR .. _OPTIONS["build-dir"] .. "/")
 local naclToolchain = ""
 
@@ -51,6 +51,10 @@ end
 function layoutbuildtask(_folder, _name)
 	return { MAME_DIR .. "src/".._folder.."/".. _name ..".lay" ,    GEN_DIR .. _folder .. "/".._name..".lh",
 		{  MAME_DIR .. "scripts/build/file2str.py" }, {"@echo Converting src/".._folder.."/".._name..".lay...",    PYTHON .. " $(1) $(<) $(@) layout_".._name }};
+end
+
+function precompiledheaders()
+	pchheader("emu.h")
 end
 
 function addprojectflags()
@@ -104,6 +108,7 @@ newoption {
 		{ "os2",           "OS/2 eComStation"       },
 		{ "haiku",         "Haiku"                  },
 		{ "solaris",       "Solaris SunOS"          },
+		{ "steamlink",     "Steam Link"             },
 	},
 }
 
@@ -324,15 +329,6 @@ newoption {
 }
 
 newoption {
-	trigger = "FILTER_DEPS",
-	description = "Filter dependency files.",
-	allowed = {
-		{ "0",   "Disabled" 	},
-		{ "1",   "Enabled"      },
-	}
-}
-
-newoption {
 	trigger = "SEPARATE_BIN",
 	description = "Use separate bin folders.",
 	allowed = {
@@ -386,6 +382,11 @@ newoption {
 		{ "0",   "Disabled" 	},
 		{ "1",   "Enabled"      },
 	}
+}
+
+newoption {
+	trigger = "PLATFORM",
+	description = "Target machine platform (x86,arm,...)",
 }
 
 if _OPTIONS["SHLIB"]=="1" then
@@ -451,11 +452,11 @@ language "C++"
 
 flags {
 	"StaticRuntime",
-	"NoPCH",
 }
 
 configuration { "vs*" }
 	flags {
+		"NoPCH",
 		"ExtraWarnings",
 		"NoEditAndContinue",
 		"EnableMinimalRebuild",
@@ -479,36 +480,6 @@ configuration { "Release", "vs*" }
 
 configuration {}
 
-local AWK = ""
-if (os.is("windows")) then
-	AWK_TEST = backtick("awk --version 2> NUL")
-	if (AWK_TEST~='') then
-		AWK = "awk"
-	else
-		AWK_TEST = backtick("gawk --version 2> NUL")
-		if (AWK_TEST~='') then
-			AWK = "gawk"
-		end
-	end
-else
-	AWK_TEST = backtick("awk --version 2> /dev/null")
-	if (AWK_TEST~='') then
-		AWK = "awk"
-	else
-		AWK_TEST = backtick("gawk --version 2> /dev/null")
-		if (AWK_TEST~='') then
-			AWK = "gawk"
-		end
-	end
-end
-
-if (_OPTIONS["FILTER_DEPS"]=="1") and (AWK~='') then
-	postcompiletasks {
-		AWK .. " -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)",
-		"mv $(@:%.o=%.dep) $(@:%.o=%.d)",
-	}
-end
-
 msgcompile ("Compiling $(subst ../,,$<)...")
 
 msgcompile_objc ("Objective-C compiling $(subst ../,,$<)...")
@@ -519,6 +490,8 @@ msglinking ("Linking $(notdir $@)...")
 
 msgarchiving ("Archiving $(notdir $@)...")
 
+msgprecompile ("Precompiling $(subst ../,,$<)...")
+
 messageskip { "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage" }
 
 if (_OPTIONS["SOURCES"] == nil) then
@@ -526,11 +499,8 @@ if (_OPTIONS["SOURCES"] == nil) then
 		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 	end
 	dofile (path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
-else
-	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " target " .. _OPTIONS["subtarget"])
-	load(OUT_STR)()
-	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.cpp")
 end
+
 configuration { "gmake" }
 	flags {
 		"SingleOutputDir",
@@ -703,16 +673,11 @@ end
 
 	if _ACTION == "gmake" then
 
-	--we compile C-only to C89 standard with GNU extensions
-if (_OPTIONS["targetos"]=="solaris") then
+	--we compile C-only to C99 standard with GNU extensions
+
 	buildoptions_c {
 		"-std=gnu99",
 	}
-else
-	buildoptions_c {
-		"-std=gnu89",
-	}
-end
 
 local version = str_to_version(_OPTIONS["gcc_version"])
 if string.find(_OPTIONS["gcc"], "clang") and ((version < 30500) or (_OPTIONS["targetos"]=="macosx" and (version <= 60000))) then
@@ -726,10 +691,17 @@ if string.find(_OPTIONS["gcc"], "clang") and ((version < 30500) or (_OPTIONS["ta
 		"-std=c++1y",
 	}
 else
-	buildoptions_cpp {
-		"-x c++",
-		"-std=c++14",
-	}
+	if _OPTIONS["targetos"]=="os2" then
+		buildoptions_cpp {
+			"-x c++",
+			"-std=gnu++14",
+		}
+	else
+		buildoptions_cpp {
+			"-x c++",
+			"-std=c++14",
+		}
+	end
 
 	buildoptions_objc {
 		"-x objective-c++",
@@ -1012,9 +984,12 @@ end
 				}
 		end
 	end
---ifeq ($(findstring arm,$(UNAME)),arm)
---	CCOMFLAGS += -Wno-cast-align
---endif
+	
+if (_OPTIONS["PLATFORM"]=="arm") then
+	buildoptions {
+		"-Wno-cast-align",
+	}
+end
 
 local subdir
 if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
@@ -1078,6 +1053,15 @@ configuration { "linux-*" }
 		end
 
 
+
+configuration { "steamlink" }
+	links {
+		"dl",
+	}
+	defines {
+		"EGL_API_FB",
+	}
+
 configuration { "osx*" }
 		links {
 			"pthread",
@@ -1087,6 +1071,7 @@ configuration { "mingw*" }
 		linkoptions {
 			"-static-libgcc",
 			"-static-libstdc++",
+			"-static",
 		}
 		links {
 			"user32",
@@ -1095,6 +1080,11 @@ configuration { "mingw*" }
 			"shlwapi",
 			"wsock32",
 		}
+configuration { "mingw-clang" }
+		linkoptions {
+			"-pthread",
+		}
+		
 
 configuration { "vs*" }
 		defines {
@@ -1247,6 +1237,11 @@ configuration { "winphone8* or winstore8*" }
 
 configuration { }
 
+if (_OPTIONS["SOURCES"] ~= nil) then
+	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " target " .. _OPTIONS["subtarget"])
+	load(OUT_STR)()
+	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.cpp")
+end
 
 group "libs"
 
@@ -1273,15 +1268,19 @@ findfunction("createProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarg
 
 group "emulator"
 dofile(path.join("src", "main.lua"))
-if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
-	startproject (_OPTIONS["target"])
-else
-	if (_OPTIONS["subtarget"]=="mess") then
-		startproject (_OPTIONS["subtarget"])
+if (_OPTIONS["SOURCES"] == nil) then 
+	if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
+		startproject (_OPTIONS["target"])
 	else
-		startproject (_OPTIONS["target"] .. _OPTIONS["subtarget"])
+		if (_OPTIONS["subtarget"]=="mess") then
+			startproject (_OPTIONS["subtarget"])
+		else
+			startproject (_OPTIONS["target"] .. _OPTIONS["subtarget"])
+		end
 	end
-end
+else
+	startproject (_OPTIONS["subtarget"])
+end 
 mainProject(_OPTIONS["target"],_OPTIONS["subtarget"])
 
 if (_OPTIONS["STRIP_SYMBOLS"]=="1") then

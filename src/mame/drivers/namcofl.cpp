@@ -188,13 +188,13 @@ WRITE32_MEMBER(namcofl_state::namcofl_sysreg_w)
 	{
 		if (data == 0)  // RAM at 00000000, ROM at 10000000
 		{
-			membank("bank1")->set_base(m_workram );
+			membank("bank1")->set_base(m_workram.get());
 			membank("bank2")->set_base(memregion("maincpu")->base() );
 		}
 		else        // ROM at 00000000, RAM at 10000000
 		{
 			membank("bank1")->set_base(memregion("maincpu")->base() );
-			membank("bank2")->set_base(m_workram );
+			membank("bank2")->set_base(m_workram.get());
 		}
 	}
 }
@@ -571,9 +571,9 @@ MACHINE_RESET_MEMBER(namcofl_state,namcofl)
 	machine().scheduler().timer_set(m_screen->time_until_pos(m_screen->visible_area().max_y + 1), timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));
 
 	membank("bank1")->set_base(memregion("maincpu")->base() );
-	membank("bank2")->set_base(m_workram );
+	membank("bank2")->set_base(m_workram.get() );
 
-	memset(m_workram, 0x00, 0x100000);
+	memset(m_workram.get(), 0x00, 0x100000);
 }
 
 
@@ -790,10 +790,10 @@ ROM_END
 
 void namcofl_state::common_init()
 {
-	m_workram = auto_alloc_array(machine(), UINT32, 0x100000/4);
+	m_workram = std::make_unique<UINT32[]>(0x100000/4);
 
 	membank("bank1")->set_base(memregion("maincpu")->base() );
-	membank("bank2")->set_base(m_workram );
+	membank("bank2")->set_base(m_workram.get());
 }
 
 DRIVER_INIT_MEMBER(namcofl_state,speedrcr)

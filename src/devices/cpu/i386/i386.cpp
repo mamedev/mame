@@ -275,7 +275,7 @@ UINT32 i386_device::i386_get_stack_ptr(UINT8 privilege)
 	return ret;
 }
 
-UINT32 i386_device::get_flags()
+UINT32 i386_device::get_flags() const
 {
 	UINT32 f = 0x2;
 	f |= m_CF;
@@ -475,7 +475,7 @@ void i386_device::i386_check_sreg_validity(int reg)
 	UINT8 CPL = m_CPL;
 	UINT8 DPL,RPL;
 	I386_SREG desc;
-	int invalid = 0;
+	int invalid;
 
 	memset(&desc, 0, sizeof(desc));
 	desc.selector = selector;
@@ -697,7 +697,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 	UINT32 offset, oldflags = get_flags();
 	UINT16 segment;
 	int entry = irq * (PROTECTED_MODE ? 8 : 4);
-	int SetRPL = 0;
+	int SetRPL;
 	m_lock = false;
 
 	if( !(PROTECTED_MODE) )
@@ -721,7 +721,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 		int type;
 		UINT16 flags;
 		I386_SREG desc;
-		UINT8 CPL = m_CPL, DPL = 0; //, RPL = 0;
+		UINT8 CPL = m_CPL, DPL; //, RPL = 0;
 
 		/* 32-bit */
 		v1 = READ32PL0(m_idtr.base + entry );
@@ -1347,7 +1347,7 @@ void i386_device::i386_protected_mode_jump(UINT16 seg, UINT32 off, int indirect,
 	I386_SREG desc;
 	I386_CALL_GATE call_gate;
 	UINT8 CPL,DPL,RPL;
-	UINT8 SetRPL = 0;
+	UINT8 SetRPL;
 	UINT16 segment = seg;
 	UINT32 offset = off;
 
@@ -1618,7 +1618,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 {
 	I386_SREG desc;
 	I386_CALL_GATE gate;
-	UINT8 SetRPL = 0;
+	UINT8 SetRPL;
 	UINT8 CPL, DPL, RPL;
 	UINT16 selector = seg;
 	UINT32 offset = off;
@@ -2769,9 +2769,6 @@ void i386_device::i386_protected_mode_iret(int operand32)
 
 #include "cycles.h"
 
-static UINT8 *cycle_table_rm[X86_NUM_CPUS];
-static UINT8 *cycle_table_pm[X86_NUM_CPUS];
-
 #define CYCLES_NUM(x)   (m_cycles -= (x))
 
 void i386_device::CYCLES(int x)
@@ -2817,8 +2814,8 @@ void i386_device::build_cycle_table()
 	int i, j;
 	for (j=0; j < X86_NUM_CPUS; j++)
 	{
-		cycle_table_rm[j] = auto_alloc_array(machine(), UINT8, CYCLES_NUM_OPCODES);
-		cycle_table_pm[j] = auto_alloc_array(machine(), UINT8, CYCLES_NUM_OPCODES);
+		cycle_table_rm[j] = std::make_unique<UINT8[]>(CYCLES_NUM_OPCODES);
+		cycle_table_pm[j] = std::make_unique<UINT8[]>(CYCLES_NUM_OPCODES);
 
 		for (i=0; i < sizeof(x86_cycle_table)/sizeof(X86_CYCLE_TABLE); i++)
 		{
@@ -3094,7 +3091,7 @@ UINT64 i386_device::debug_seglimit(symbol_table &table, int params, const UINT64
 
 UINT64 i386_device::debug_segofftovirt(symbol_table &table, int params, const UINT64 *param)
 {
-	UINT32 result = 0;
+	UINT32 result;
 	I386_SREG seg;
 
 	if(param[0] > 65535)
@@ -3300,8 +3297,8 @@ void i386_device::device_start()
 	i386_common_init(32);
 
 	build_opcode_table(OP_I386);
-	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_I386];
-	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_I386];
+	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_I386].get();
+	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_I386].get();
 
 	register_state_i386();
 }
@@ -3468,7 +3465,7 @@ void i386_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void i386_device::state_string_export(const device_state_entry &entry, std::string &str)
+void i386_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -3983,8 +3980,8 @@ void i486_device::device_start()
 
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486);
 	build_x87_opcode_table();
-	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_I486];
-	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_I486];
+	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_I486].get();
+	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_I486].get();
 
 	register_state_i386_x87();
 }
@@ -4042,8 +4039,8 @@ void pentium_device::device_start()
 
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM);
 	build_x87_opcode_table();
-	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM];
-	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM];
+	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM].get();
+	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM].get();
 }
 
 void pentium_device::device_reset()
@@ -4116,8 +4113,8 @@ void mediagx_device::device_start()
 
 	build_x87_opcode_table();
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_CYRIX);
-	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_MEDIAGX];
-	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_MEDIAGX];
+	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_MEDIAGX].get();
+	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_MEDIAGX].get();
 }
 
 void mediagx_device::device_reset()
@@ -4181,8 +4178,8 @@ void pentium_pro_device::device_start()
 
 	build_x87_opcode_table();
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO);
-	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM];  // TODO: generate own cycle tables
-	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM];  // TODO: generate own cycle tables
+	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
+	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
 }
 
 void pentium_pro_device::device_reset()
@@ -4256,8 +4253,8 @@ void pentium_mmx_device::device_start()
 
 	build_x87_opcode_table();
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_MMX);
-	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM];  // TODO: generate own cycle tables
-	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM];  // TODO: generate own cycle tables
+	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
+	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
 }
 
 void pentium_mmx_device::device_reset()
@@ -4329,8 +4326,8 @@ void pentium2_device::device_start()
 
 	build_x87_opcode_table();
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX);
-	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM];  // TODO: generate own cycle tables
-	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM];  // TODO: generate own cycle tables
+	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
+	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
 }
 
 void pentium2_device::device_reset()
@@ -4396,8 +4393,8 @@ void pentium3_device::device_start()
 
 	build_x87_opcode_table();
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX | OP_SSE);
-	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM];  // TODO: generate own cycle tables
-	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM];  // TODO: generate own cycle tables
+	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
+	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
 }
 
 void pentium3_device::device_reset()
@@ -4465,8 +4462,8 @@ void pentium4_device::device_start()
 
 	build_x87_opcode_table();
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX | OP_SSE | OP_SSE2);
-	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM];  // TODO: generate own cycle tables
-	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM];  // TODO: generate own cycle tables
+	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
+	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
 }
 
 void pentium4_device::device_reset()

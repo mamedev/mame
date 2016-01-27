@@ -38,8 +38,6 @@ public:
 	DECLARE_WRITE32_MEMBER(cdata_w);
 	DECLARE_WRITE32_MEMBER(kmdata_w);
 
-	bool int_level_get();
-
 	DECLARE_INPUT_CHANGED_MEMBER(update);
 
 protected:

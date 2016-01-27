@@ -14,18 +14,18 @@ namespace DSP56K
 /* |-------------------------------------| |-------------------------------| */
 /*                                                                           */
 /* ************************************************************************* */
-UINT8 LF_bit(dsp56k_core* cpustate) { return (SR & 0x8000) >> 15; }
-UINT8 FV_bit(dsp56k_core* cpustate) { return (SR & 0x4000) >> 14; }
-// UINT8 S_bits(dsp56k_core* cpustate) { return (SR & 0x0c00) >> 10; }
-UINT8 I_bits(dsp56k_core* cpustate) { return (SR & 0x0300) >> 8;  }
-UINT8 S_bit (dsp56k_core* cpustate) { return (SR & 0x0080) >> 7;  }
-UINT8 L_bit (dsp56k_core* cpustate) { return (SR & 0x0040) >> 6;  }
-UINT8 E_bit (dsp56k_core* cpustate) { return (SR & 0x0020) >> 5;  }
-UINT8 U_bit (dsp56k_core* cpustate) { return (SR & 0x0010) >> 4;  }
-UINT8 N_bit (dsp56k_core* cpustate) { return (SR & 0x0008) >> 3;  }
-UINT8 Z_bit (dsp56k_core* cpustate) { return (SR & 0x0004) >> 2;  }
-UINT8 V_bit (dsp56k_core* cpustate) { return (SR & 0x0002) >> 1;  }
-UINT8 C_bit (dsp56k_core* cpustate) { return (SR & 0x0001) >> 0;  }
+UINT8 LF_bit(const dsp56k_core* cpustate) { return (SR & 0x8000) >> 15; }
+UINT8 FV_bit(const dsp56k_core* cpustate) { return (SR & 0x4000) >> 14; }
+// UINT8 S_bits(const dsp56k_core* cpustate) { return (SR & 0x0c00) >> 10; }
+UINT8 I_bits(const dsp56k_core* cpustate) { return (SR & 0x0300) >> 8;  }
+UINT8 S_bit (const dsp56k_core* cpustate) { return (SR & 0x0080) >> 7;  }
+UINT8 L_bit (const dsp56k_core* cpustate) { return (SR & 0x0040) >> 6;  }
+UINT8 E_bit (const dsp56k_core* cpustate) { return (SR & 0x0020) >> 5;  }
+UINT8 U_bit (const dsp56k_core* cpustate) { return (SR & 0x0010) >> 4;  }
+UINT8 N_bit (const dsp56k_core* cpustate) { return (SR & 0x0008) >> 3;  }
+UINT8 Z_bit (const dsp56k_core* cpustate) { return (SR & 0x0004) >> 2;  }
+UINT8 V_bit (const dsp56k_core* cpustate) { return (SR & 0x0002) >> 1;  }
+UINT8 C_bit (const dsp56k_core* cpustate) { return (SR & 0x0001) >> 0;  }
 
 /* MR setters */
 void LF_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x8000); else (SR &= (~0x8000)); }
@@ -54,13 +54,13 @@ void C_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x0001); 
 /*  |---------------------------------------------------------------------|  */
 /*                                                                           */
 /* ************************************************************************* */
-// UINT8 CD_bit(dsp56k_core* cpustate) { return ((OMR & 0x0080) != 0); }
-// UINT8 SD_bit(dsp56k_core* cpustate) { return ((OMR & 0x0040) != 0); }
-// UINT8  R_bit(dsp56k_core* cpustate) { return ((OMR & 0x0020) != 0); }
-// UINT8 SA_bit(dsp56k_core* cpustate) { return ((OMR & 0x0010) != 0); }
-// UINT8 MC_bit(dsp56k_core* cpustate) { return ((OMR & 0x0004) != 0); }
-UINT8 MB_bit(dsp56k_core* cpustate) { return ((OMR & 0x0002) != 0); }
-UINT8 MA_bit(dsp56k_core* cpustate) { return ((OMR & 0x0001) != 0); }
+// UINT8 CD_bit(const dsp56k_core* cpustate) { return ((OMR & 0x0080) != 0); }
+// UINT8 SD_bit(const dsp56k_core* cpustate) { return ((OMR & 0x0040) != 0); }
+// UINT8  R_bit(const dsp56k_core* cpustate) { return ((OMR & 0x0020) != 0); }
+// UINT8 SA_bit(const dsp56k_core* cpustate) { return ((OMR & 0x0010) != 0); }
+// UINT8 MC_bit(const dsp56k_core* cpustate) { return ((OMR & 0x0004) != 0); }
+UINT8 MB_bit(const dsp56k_core* cpustate) { return ((OMR & 0x0002) != 0); }
+UINT8 MA_bit(const dsp56k_core* cpustate) { return ((OMR & 0x0001) != 0); }
 
 void CD_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (OMR |= 0x0080); else (OMR &= (~0x0080)); }
 void SD_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (OMR |= 0x0040); else (OMR &= (~0x0040)); }
@@ -70,7 +70,7 @@ void MC_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (OMR |= 0x0004)
 void MB_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (OMR |= 0x0002); else (OMR &= (~0x0002)); }
 void MA_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (OMR |= 0x0001); else (OMR &= (~0x0001)); }
 
-UINT8 dsp56k_operating_mode(dsp56k_core* cpustate)
+UINT8 dsp56k_operating_mode(const dsp56k_core* cpustate)
 {
 	return ((MB_bit(cpustate) << 1) | MA_bit(cpustate));
 }
@@ -86,8 +86,8 @@ UINT8 dsp56k_operating_mode(dsp56k_core* cpustate)
 /*  |---------------------------------------------------------------------|  */
 /*                                                                           */
 /* ************************************************************************* */
-UINT8 UF_bit(dsp56k_core* cpustate) { return ((SP & 0x0020) != 0); }
-UINT8 SE_bit(dsp56k_core* cpustate) { return ((SP & 0x0010) != 0); }
+UINT8 UF_bit(const dsp56k_core* cpustate) { return ((SP & 0x0020) != 0); }
+UINT8 SE_bit(const dsp56k_core* cpustate) { return ((SP & 0x0010) != 0); }
 
 //void UF_bit_set(dsp56k_core* cpustate, UINT8 value) {};
 //void SE_bit_set(dsp56k_core* cpustate, UINT8 value) {};

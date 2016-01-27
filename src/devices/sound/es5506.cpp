@@ -195,10 +195,39 @@ void es5506_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 2 * channels, clock() / (16*32));
 
 	/* initialize the regions */
-	m_region_base[0] = m_region0 ? (UINT16 *)machine().root_device().memregion(m_region0)->base() : nullptr;
-	m_region_base[1] = m_region1 ? (UINT16 *)machine().root_device().memregion(m_region1)->base() : nullptr;
-	m_region_base[2] = m_region2 ? (UINT16 *)machine().root_device().memregion(m_region2)->base() : nullptr;
-	m_region_base[3] = m_region3 ? (UINT16 *)machine().root_device().memregion(m_region3)->base() : nullptr;
+	m_region_base[0] = m_region_base[1] = m_region_base[2] = m_region_base[3] = nullptr;
+	if (m_region0)
+	{
+		memory_region *region0 = machine().root_device().memregion(m_region0);
+		if (region0 != nullptr)
+		{
+			m_region_base[0] = (UINT16 *)region0->base();
+		}
+	}
+	if (m_region1)
+	{
+		memory_region *region1 = machine().root_device().memregion(m_region1);
+		if (region1 != nullptr)
+		{
+			m_region_base[1] = (UINT16 *)region1->base();
+		}
+	}
+	if (m_region2)
+	{
+		memory_region *region2 = machine().root_device().memregion(m_region2);
+		if (region2 != nullptr)
+		{
+			m_region_base[2] = (UINT16 *)region2->base();
+		}
+	}
+	if (m_region3)
+	{
+		memory_region *region3 = machine().root_device().memregion(m_region3);
+		if (region3 != nullptr)
+		{
+			m_region_base[3] = (UINT16 *)region3->base();
+		}
+	}
 
 	/* initialize the rest of the structure */
 	m_master_clock = clock();
@@ -228,7 +257,7 @@ void es5506_device::device_start()
 	}
 
 	/* allocate memory */
-	m_scratch = auto_alloc_array_clear(machine(), INT32, 2 * MAX_SAMPLE_CHUNK);
+	m_scratch = make_unique_clear<INT32[]>(2 * MAX_SAMPLE_CHUNK);
 
 	/* register save */
 	save_item(NAME(m_sample_rate));
@@ -243,7 +272,7 @@ void es5506_device::device_start()
 	save_item(NAME(m_lrend));
 	save_item(NAME(m_irqv));
 
-	save_pointer(NAME(m_scratch), 2 * MAX_SAMPLE_CHUNK);
+	save_pointer(NAME(m_scratch.get()), 2 * MAX_SAMPLE_CHUNK);
 
 	for (j = 0; j < 32; j++)
 	{
@@ -337,8 +366,16 @@ void es5505_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 2 * channels, clock() / (16*32));
 
 	/* initialize the regions */
-	m_region_base[0] = m_region0 ? (UINT16 *)machine().root_device().memregion(m_region0)->base() : nullptr;
-	m_region_base[1] = m_region1 ? (UINT16 *)machine().root_device().memregion(m_region1)->base() : nullptr;
+	if (m_region0)
+	{
+		memory_region* region = machine().root_device().memregion(m_region0);
+		m_region_base[0] = region ? reinterpret_cast<UINT16 *>(region->base()) : nullptr;
+	}
+	if (m_region1)
+	{
+		memory_region* region = machine().root_device().memregion(m_region1);
+		m_region_base[1] = region ? reinterpret_cast<UINT16 *>(region->base()) : nullptr;
+	}
 
 	/* initialize the rest of the structure */
 	m_master_clock = clock();
@@ -363,7 +400,7 @@ void es5505_device::device_start()
 	}
 
 	/* allocate memory */
-	m_scratch = auto_alloc_array_clear(machine(), INT32, 2 * MAX_SAMPLE_CHUNK);
+	m_scratch = make_unique_clear<INT32[]>(2 * MAX_SAMPLE_CHUNK);
 
 	/* register save */
 	save_item(NAME(m_sample_rate));
@@ -378,7 +415,7 @@ void es5505_device::device_start()
 	save_item(NAME(m_lrend));
 	save_item(NAME(m_irqv));
 
-	save_pointer(NAME(m_scratch), 2 * MAX_SAMPLE_CHUNK);
+	save_pointer(NAME(m_scratch.get()), 2 * MAX_SAMPLE_CHUNK);
 
 	for (j = 0; j < 32; j++)
 	{
@@ -452,7 +489,7 @@ void es550x_device::compute_tables()
 	int i;
 
 	/* allocate ulaw lookup table */
-	m_ulaw_lookup = auto_alloc_array_clear(machine(), INT16, 1 << ULAW_MAXBITS);
+	m_ulaw_lookup = make_unique_clear<INT16[]>(1 << ULAW_MAXBITS);
 
 	/* generate ulaw lookup table */
 	for (i = 0; i < (1 << ULAW_MAXBITS); i++)
@@ -471,7 +508,7 @@ void es550x_device::compute_tables()
 	}
 
 	/* allocate volume lookup table */
-	m_volume_lookup = auto_alloc_array_clear(machine(), UINT16, 4096);
+	m_volume_lookup = make_unique_clear<UINT16[]>(4096);
 
 	/* generate volume lookup table */
 	for (i = 0; i < 4096; i++)
@@ -2139,7 +2176,7 @@ inline UINT16 es5505_device::reg_read_test(es550x_voice *voice, offs_t offset)
 READ16_MEMBER( es5505_device::read )
 {
 	es550x_voice *voice = &m_voice[m_current_page & 0x1f];
-	UINT16 result = 0;
+	UINT16 result;
 
 	if (LOG_COMMANDS && m_eslog)
 		fprintf(m_eslog, "read from %02x/%02x -> ", m_current_page, offset);

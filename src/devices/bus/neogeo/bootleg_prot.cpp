@@ -1033,7 +1033,7 @@ void ngbootleg_prot_device::matrimbl_decrypt(UINT8* sprrom, UINT32 sprrom_size, 
 	/* decrypt Z80 */
 	UINT8 *rom = audiorom+0x10000;
 	dynamic_buffer buf( 0x20000 );
-	int i, j=0;
+	int i, j;
 	memcpy( &buf[0], rom, 0x20000 );
 	for( i=0x00000; i<0x20000; i++ )
 	{

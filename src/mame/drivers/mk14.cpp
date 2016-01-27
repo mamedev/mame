@@ -60,7 +60,7 @@ READ8_MEMBER( mk14_state::keyboard_r )
 WRITE8_MEMBER( mk14_state::display_w )
 {
 	if (offset < 8 )
-		output_set_digit_value(offset, data);
+		output().set_digit_value(offset, data);
 	else
 	{
 		//logerror("write %02x to %02x\n",data,offset);

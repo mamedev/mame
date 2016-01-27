@@ -2185,7 +2185,7 @@ void ms32_state::configure_banks()
 
 DRIVER_INIT_MEMBER(ms32_state,ms32_common)
 {
-	m_nvram_8 = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_nvram_8 = std::make_unique<UINT8[]>(0x2000);
 	configure_banks();
 }
 

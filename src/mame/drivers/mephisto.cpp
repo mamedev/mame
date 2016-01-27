@@ -137,9 +137,9 @@ protected:
 
 WRITE8_MEMBER( mephisto_state::write_lcd )
 {
-	if (m_led7 == 0) output_set_digit_value(m_lcd_shift_counter,data);  // 0x109 MM IV // 0x040 MM V
+	if (m_led7 == 0) output().set_digit_value(m_lcd_shift_counter,data);  // 0x109 MM IV // 0x040 MM V
 
-	//output_set_digit_value(m_lcd_shift_counter,data ^ m_p_ram[0x165]);    // 0x109 MM IV // 0x040 MM V
+	//output().set_digit_value(m_lcd_shift_counter,data ^ m_p_ram[0x165]);    // 0x109 MM IV // 0x040 MM V
 	m_lcd_shift_counter--;
 	m_lcd_shift_counter &= 3;
 }
@@ -192,7 +192,7 @@ WRITE8_MEMBER( mephisto_state::write_led )
 	data &= 0x80;
 
 	if (data==0)m_led_status &= 255-(1<<offset) ; else m_led_status|=1<<offset;
-	if (offset<6)output_set_led_value(LED_offset+offset, m_led_status&1<<offset?1:0);
+	if (offset<6)output().set_led_value(LED_offset+offset, m_led_status&1<<offset?1:0);
 	if (offset==7) m_led7=data& 0x80 ? 0x00 :0xff;
 	logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
@@ -208,7 +208,7 @@ WRITE8_MEMBER( mephisto_state::write_led_mm2 )
 		m_led_status|=1<<offset;
 
 	if (offset<6)
-		output_set_led_value(LED_offset+offset, m_led_status&1<<offset?1:0);
+		output().set_led_value(LED_offset+offset, m_led_status&1<<offset?1:0);
 
 	if (offset==7)
 		m_led7= BIT(data, 7) ? 0xff :0x00;  //MM2
@@ -341,19 +341,19 @@ void mephisto_state::machine_reset()
 /* adjust artwork depending on current emulation*/
 
 	if (!strcmp(machine().system().name,"mm2") )
-		output_set_value("MM",1);
+		output().set_value("MM",1);
 	else if (!strcmp(machine().system().name,"mm4") )
-		output_set_value("MM",2);
+		output().set_value("MM",2);
 	else if (!strcmp(machine().system().name,"mm4tk") )
-		output_set_value("MM",5);
+		output().set_value("MM",5);
 	else if (!strcmp(machine().system().name,"mm5tk") )
-		output_set_value("MM",5);
+		output().set_value("MM",5);
 	else if (!strcmp(machine().system().name,"mm5") )
-		output_set_value("MM",3);
+		output().set_value("MM",3);
 	else if (!strcmp(machine().system().name,"mm50") )
-		output_set_value("MM",3);
+		output().set_value("MM",3);
 	else if (!strcmp(machine().system().name,"rebel5") )
-		output_set_value("MM",4);
+		output().set_value("MM",4);
 }
 
 
@@ -365,7 +365,7 @@ static MACHINE_CONFIG_START( mephisto, mephisto_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", mephisto_state, update_nmi, attotime::from_hz(600))

@@ -116,7 +116,7 @@ void debug_cpu_init(running_machine &machine)
 	int regnum;
 
 	/* allocate and reset globals */
-	machine.debugcpu_data = global = auto_alloc_clear(machine, debugcpu_private);
+	machine.debugcpu_data = global = auto_alloc_clear(machine, <debugcpu_private>());
 	global->execution_state = EXECUTION_STATE_STOPPED;
 	global->bpindex = 1;
 	global->wpindex = 1;
@@ -1690,8 +1690,6 @@ device_debug::device_debug(device_t &device)
 
 device_debug::~device_debug()
 {
-	auto_free(m_device.machine(), m_trace);
-
 	// free breakpoints and watchpoints
 	breakpoint_clear_all();
 	watchpoint_clear_all();
@@ -1756,7 +1754,7 @@ void device_debug::start_hook(const attotime &endtime)
 			}
 		}
 		// check for debug keypresses
-		if (ui_input_pressed(m_device.machine(), IPT_UI_DEBUG_BREAK))
+		if (m_device.machine().ui_input().pressed(IPT_UI_DEBUG_BREAK))
 			global->visiblecpu->debug()->halt_on_next_instruction("User-initiated break\n");
 	}
 
@@ -1873,7 +1871,7 @@ void device_debug::instruction_hook(offs_t curpc)
 			{
 				machine.debug_view().update_all();
 				machine.debug_view().flush_osd_updates();
-				debugger_refresh_display(machine);
+				machine.debugger().refresh_display();
 			}
 		}
 	}
@@ -1921,7 +1919,7 @@ void device_debug::instruction_hook(offs_t curpc)
 
 		// update all views
 		machine.debug_view().update_all();
-		debugger_refresh_display(m_device.machine());
+		machine.debugger().refresh_display();
 
 		// wait for the debugger; during this time, disable sound output
 		m_device.machine().sound().debugger_mute(true);
@@ -1940,7 +1938,7 @@ void device_debug::instruction_hook(offs_t curpc)
 			if (global->memory_modified)
 			{
 				machine.debug_view().update_all(DVT_DISASSEMBLY);
-				debugger_refresh_display(m_device.machine());
+				machine.debugger().refresh_display();
 			}
 
 			// check for commands in the source file
@@ -2759,12 +2757,11 @@ UINT32 device_debug::compute_opcode_crc32(offs_t pc) const
 void device_debug::trace(FILE *file, bool trace_over, const char *action)
 {
 	// delete any existing tracers
-	auto_free(m_device.machine(), m_trace);
 	m_trace = nullptr;
 
 	// if we have a new file, make a new tracer
 	if (file != nullptr)
-		m_trace = auto_alloc(m_device.machine(), tracer(*this, *file, trace_over, action));
+		m_trace = std::make_unique<tracer>(*this, *file, trace_over, action);
 }
 
 

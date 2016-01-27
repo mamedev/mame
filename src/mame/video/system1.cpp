@@ -121,19 +121,19 @@ void system1_state::video_start_common(int pagecount)
 	int pagenum;
 
 	/* allocate memory for the collision arrays */
-	m_mix_collide = auto_alloc_array_clear(machine(), UINT8, 64);
-	m_sprite_collide = auto_alloc_array_clear(machine(), UINT8, 1024);
+	m_mix_collide = make_unique_clear<UINT8[]>(64);
+	m_sprite_collide = make_unique_clear<UINT8[]>(1024);
 
 	/* allocate memory for videoram */
 	m_tilemap_pages = pagecount;
-	m_videoram = auto_alloc_array_clear(machine(), UINT8, 0x800 * pagecount);
+	m_videoram = make_unique_clear<UINT8[]>(0x800 * pagecount);
 
 	/* create the tilemap pages */
 	for (pagenum = 0; pagenum < pagecount; pagenum++)
 	{
 		m_tilemap_page[pagenum] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(system1_state::tile_get_info),this), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 		m_tilemap_page[pagenum]->set_transparent_pen(0);
-		m_tilemap_page[pagenum]->set_user_data(m_videoram + 0x800 * pagenum);
+		m_tilemap_page[pagenum]->set_user_data(m_videoram.get() + 0x800 * pagenum);
 	}
 
 	/* allocate a temporary bitmap for sprite rendering */
@@ -144,9 +144,9 @@ void system1_state::video_start_common(int pagecount)
 	save_item(NAME(m_mix_collide_summary));
 	save_item(NAME(m_sprite_collide_summary));
 	save_item(NAME(m_videoram_bank));
-	save_pointer(NAME(m_videoram), 0x800 * pagecount);
-	save_pointer(NAME(m_mix_collide), 64);
-	save_pointer(NAME(m_sprite_collide), 1024);
+	save_pointer(NAME(m_videoram.get()), 0x800 * pagecount);
+	save_pointer(NAME(m_mix_collide.get()), 64);
+	save_pointer(NAME(m_sprite_collide.get()), 1024);
 }
 
 
@@ -263,7 +263,7 @@ inline void system1_state::videoram_wait_states(cpu_device *cpu)
 
 READ8_MEMBER(system1_state::system1_videoram_r)
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	videoram_wait_states(m_maincpu);
 	offset |= 0x1000 * ((m_videoram_bank >> 1) % (m_tilemap_pages / 2));
 	return videoram[offset];
@@ -271,7 +271,7 @@ READ8_MEMBER(system1_state::system1_videoram_r)
 
 WRITE8_MEMBER(system1_state::system1_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	videoram_wait_states(m_maincpu);
 	offset |= 0x1000 * ((m_videoram_bank >> 1) % (m_tilemap_pages / 2));
 	videoram[offset] = data;
@@ -550,7 +550,7 @@ void system1_state::video_update_common(screen_device &screen, bitmap_ind16 &bit
 
 UINT32 system1_state::screen_update_system1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	bitmap_ind16 *bgpixmaps[4];
 	int bgrowscroll[32];
 	int xscroll, yscroll;
@@ -585,7 +585,7 @@ UINT32 system1_state::screen_update_system1(screen_device &screen, bitmap_ind16 
 
 UINT32 system1_state::screen_update_system2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	bitmap_ind16 *bgpixmaps[4];
 	int rowscroll[32];
 	int xscroll, yscroll;
@@ -627,7 +627,7 @@ UINT32 system1_state::screen_update_system2(screen_device &screen, bitmap_ind16 
 
 UINT32 system1_state::screen_update_system2_rowscroll(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	bitmap_ind16 *bgpixmaps[4];
 	int rowscroll[32];
 	int yscroll;

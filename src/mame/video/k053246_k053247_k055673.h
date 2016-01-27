@@ -110,7 +110,7 @@ public:
 
 	DECLARE_READ16_MEMBER( k053246_reg_word_r );    // OBJSET1
 
-	UINT16    *m_ram;
+	std::unique_ptr<UINT16[]>    m_ram;
 
 	gfx_element *m_gfx;
 

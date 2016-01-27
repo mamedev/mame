@@ -305,7 +305,7 @@ void a800_cart_slot_device::call_unload()
 
 bool a800_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 	return TRUE;
 }
 
@@ -406,11 +406,11 @@ int a800_cart_slot_device::identify_cart_type(UINT8 *header)
  get default card software
  -------------------------------------------------*/
 
-void a800_cart_slot_device::get_default_card_software(std::string &result)
+std::string a800_cart_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "a800_8k";
+		const char *slot_string;
 		dynamic_buffer head(0x10);
 		UINT32 len = core_fsize(m_file);
 		int type = A800_8K;
@@ -436,18 +436,18 @@ void a800_cart_slot_device::get_default_card_software(std::string &result)
 
 		clear();
 
-		result.assign(slot_string);
+		return std::string(slot_string);
 	}
 	else
-		software_get_default_slot(result, "a800_8k");
+		return software_get_default_slot("a800_8k");
 }
 
 
-void a5200_cart_slot_device::get_default_card_software(std::string &result)
+std::string a5200_cart_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "a5200";
+		const char *slot_string;
 		dynamic_buffer head(0x10);
 		UINT32 len = core_fsize(m_file);
 		int type = A5200_8K;
@@ -469,18 +469,18 @@ void a5200_cart_slot_device::get_default_card_software(std::string &result)
 
 		clear();
 
-		result.assign(slot_string);
+		return std::string(slot_string);
 	}
 	else
-		software_get_default_slot(result, "a5200");
+		return software_get_default_slot("a5200");
 }
 
 
-void xegs_cart_slot_device::get_default_card_software(std::string &result)
+std::string xegs_cart_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "xegs";
+		const char *slot_string;
 		dynamic_buffer head(0x10);
 		UINT32 len = core_fsize(m_file);
 		int type = A800_8K;
@@ -504,10 +504,10 @@ void xegs_cart_slot_device::get_default_card_software(std::string &result)
 
 		clear();
 
-		result.assign(slot_string);
+		return std::string(slot_string);
 	}
 	else
-		software_get_default_slot(result, "xegs");
+		return software_get_default_slot("xegs");
 }
 
 

@@ -811,7 +811,7 @@ int namcos21_state::init_dsp()
 	pMem[0x8000] = 0xFF80;
 	pMem[0x8001] = 0x0000;
 
-	m_mpDspState = auto_alloc_clear(machine(), dsp_state);
+	m_mpDspState = make_unique_clear<dsp_state>();
 
 	return 0;
 }
@@ -2448,7 +2448,7 @@ ROM_END
 void namcos21_state::init(int game_type)
 {
 	m_gametype = game_type;
-	m_pointram = auto_alloc_array(machine(), UINT8, PTRAM_SIZE);
+	m_pointram = std::make_unique<UINT8[]>(PTRAM_SIZE);
 	init_dsp();
 	m_mbNeedsKickstart = 20;
 	if( game_type==NAMCOS21_CYBERSLED )
@@ -2464,10 +2464,10 @@ DRIVER_INIT_MEMBER(namcos21_state,winrun)
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
 
-	m_winrun_dspcomram = auto_alloc_array(machine(), UINT16, 0x1000*2);
+	m_winrun_dspcomram = std::make_unique<UINT16[]>(0x1000*2);
 
 	m_gametype = NAMCOS21_WINRUN91;
-	m_pointram = auto_alloc_array(machine(), UINT8, PTRAM_SIZE);
+	m_pointram = std::make_unique<UINT8[]>(PTRAM_SIZE);
 	m_pointram_idx = 0;
 	m_mbNeedsKickstart = 0;
 }
@@ -2505,9 +2505,9 @@ DRIVER_INIT_MEMBER(namcos21_state,driveyes)
 	int pc = 0;
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
-	m_winrun_dspcomram = auto_alloc_array(machine(), UINT16, 0x1000*2);
+	m_winrun_dspcomram = std::make_unique<UINT16[]>(0x1000*2);
 	m_gametype = NAMCOS21_DRIVERS_EYES;
-	m_pointram = auto_alloc_array(machine(), UINT8, PTRAM_SIZE);
+	m_pointram = std::make_unique<UINT8[]>(PTRAM_SIZE);
 	m_pointram_idx = 0;
 	m_mbNeedsKickstart = 0;
 }

@@ -76,12 +76,12 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER( techno_state::disp1_w )
 {
-	output_set_digit_value(m_digit, BITSWAP16(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0));
+	output().set_digit_value(m_digit, BITSWAP16(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0));
 }
 
 WRITE16_MEMBER( techno_state::disp2_w )
 {
-	output_set_digit_value(m_digit+30, BITSWAP16(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0));
+	output().set_digit_value(m_digit+30, BITSWAP16(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0));
 }
 
 WRITE16_MEMBER( techno_state::sound_w )

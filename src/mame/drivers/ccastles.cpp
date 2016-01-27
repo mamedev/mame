@@ -1,10 +1,8 @@
-// license:???
-// copyright-holders:Patrick Lawrence, Aaron Giles
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /***************************************************************************
 
     Atari Crystal Castles hardware
-
-    driver by Patrick Lawrence
 
     Games supported:
         * Crystal Castles (1983) [8 sets]
@@ -249,13 +247,13 @@ WRITE8_MEMBER(ccastles_state::irq_ack_w)
 
 WRITE8_MEMBER(ccastles_state::led_w)
 {
-	set_led_status(machine(), offset, ~data & 1);
+	output().set_led_value(offset, ~data & 1);
 }
 
 
 WRITE8_MEMBER(ccastles_state::ccounter_w)
 {
-	coin_counter_w(machine(), offset, data & 1);
+	machine().bookkeeping().coin_counter_w(offset, data & 1);
 }
 
 

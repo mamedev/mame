@@ -70,6 +70,10 @@ private:
 	class KDSC_Voice
 	{
 	public:
+		KDSC_Voice() : m_device(nullptr), m_position(0), m_counter(0), m_output(0), m_playing(false), m_start(0), m_length(0), m_pitch(0), m_volume(0), m_pan(0), m_loop(false), m_kadpcm(false)
+		{
+		}
+
 		inline void voice_start(k053260_device &device, int index);
 		inline void voice_reset();
 		inline void set_register(offs_t offset, UINT8 data);

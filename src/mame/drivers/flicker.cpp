@@ -127,7 +127,7 @@ WRITE8_MEMBER( flicker_state::port00_w )
 {
 	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
 	offset = m_maincpu->state_int(I4004_RAM); // we need the full address
-	output_set_digit_value(offset, patterns[data]);
+	output().set_digit_value(offset, patterns[data]);
 }
 
 WRITE8_MEMBER( flicker_state::port01_w )

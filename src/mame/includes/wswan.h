@@ -57,7 +57,7 @@ public:
 	UINT8 m_internal_eeprom[INTERNAL_EEPROM_SIZE];
 	UINT8 m_system_type;
 	SoundDMA m_sound_dma;
-	UINT8 *m_ws_bios_bank;
+	std::unique_ptr<UINT8[]> m_ws_bios_bank;
 	UINT8 m_bios_disabled;
 	UINT8 m_rotate;
 

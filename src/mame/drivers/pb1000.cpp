@@ -57,7 +57,6 @@ public:
 	memory_region *m_card2_reg;
 
 	virtual void machine_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE16_MEMBER( gatearray_w );
 	DECLARE_WRITE8_MEMBER( lcd_control );
 	DECLARE_READ8_MEMBER( lcd_data_r );
@@ -505,7 +504,7 @@ static MACHINE_CONFIG_START( pb1000, pb1000_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
+	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 

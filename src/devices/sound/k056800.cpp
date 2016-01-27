@@ -108,11 +108,11 @@ WRITE8_MEMBER( k056800_device::host_w )
 
 		case 7:
 			// Sound interrupt
-			m_int_pending = true;
-
 			if (m_int_enabled)
+			{
+				m_int_pending = true;
 				m_int_handler(ASSERT_LINE);
-
+			}
 			break;
 	}
 }

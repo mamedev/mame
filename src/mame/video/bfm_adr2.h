@@ -9,8 +9,6 @@ public:
 	// construction/destruction
 	bfm_adder2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void static_set_palette_tag(device_t &device, const char *tag);
-
 	TILE_GET_INFO_MEMBER( get_tile0_info );
 	TILE_GET_INFO_MEMBER( get_tile1_info );
 	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

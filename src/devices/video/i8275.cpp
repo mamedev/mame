@@ -367,7 +367,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 							m_hlgt = (data & CA_H) ? 1 : 0;
 							m_vsp = (data & CA_B) ? 1 : 0;
 
-							UINT8 ca = 0;
+							UINT8 ca;
 							int cccc = (data >> 2) & 0x0f;
 
 							if (line_counter < UNDERLINE)
@@ -448,7 +448,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 READ8_MEMBER( i8275_device::read )
 {
-	UINT8 data = 0;
+	UINT8 data;
 
 	if (offset & 0x01)
 	{

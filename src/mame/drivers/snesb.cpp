@@ -155,9 +155,9 @@ public:
 	snesb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: snes_state(mconfig, type, tag) { }
 
-	INT8 *m_shared_ram;
+	std::unique_ptr<INT8[]> m_shared_ram;
 	UINT8 m_cnt;
-	INT8 *m_shared_ram2;
+	std::unique_ptr<INT8[]> m_shared_ram2;
 	DECLARE_READ8_MEMBER(sharedram_r);
 	DECLARE_WRITE8_MEMBER(sharedram_w);
 	DECLARE_READ8_MEMBER(sb2b_75bd37_r);
@@ -744,7 +744,7 @@ DRIVER_INIT_MEMBER(snesb_state,kinstb)
 		rom[i] = BITSWAP8(rom[i], 5, 0, 6, 1, 7, 4, 3, 2);
 	}
 
-	m_shared_ram = auto_alloc_array(machine(), INT8, 0x100);
+	m_shared_ram = std::make_unique<INT8[]>(0x100);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781000, 0x7810ff, read8_delegate(FUNC(snesb_state::sharedram_r),this), write8_delegate(FUNC(snesb_state::sharedram_w),this));
 
 	/* extra inputs */
@@ -987,8 +987,8 @@ DRIVER_INIT_MEMBER(snesb_state,endless)
 	/* work around missing content */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800b, 0x800c, read8_delegate(FUNC(snesb_state::endless_800b_r),this));
 
-	m_shared_ram = auto_alloc_array(machine(), INT8, 0x22);
-	m_shared_ram2 = auto_alloc_array(machine(), INT8, 0x22);
+	m_shared_ram = std::make_unique<INT8[]>(0x22);
+	m_shared_ram2 = std::make_unique<INT8[]>(0x22);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781000, 0x781021, read8_delegate(FUNC(snesb_state::sharedram_r),this), write8_delegate(FUNC(snesb_state::sharedram_w),this));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781200, 0x781221, read8_delegate(FUNC(snesb_state::sharedram2_r),this), write8_delegate(FUNC(snesb_state::sharedram2_w),this));
 
@@ -1023,7 +1023,7 @@ ROM_START( mk3snes ) // this is identical to the SNES release apart from a singl
 	ROM_LOAD( "1.U1", 0x200000, 0x080000, CRC(4cab6332) SHA1(3c417ba6d35532b4e2ca9ae4a3b730c589d26aee) )
 	ROM_LOAD( "2.U2", 0x280000, 0x080000, CRC(0327999b) SHA1(dc6bb11a925e893453e0e5e5d88b8ace8d6cf859) )
 	ROM_LOAD( "3.U3", 0x300000, 0x080000, CRC(229af2de) SHA1(1bbb02aec08afab979ffbe4b68a48dc4cc923f73) )
-	ROM_LOAD( "4.U4", 0x380000, 0x080000, CRC(b51930d9) SHA1(220f00d64809a6218015a738e53f11d8dc81578f) )  // 4.U4 is a 99.999809% match for the last part of sns-a3me-0.u1 (mk3u in snes softlist - 1 byte changed?!)  
+	ROM_LOAD( "4.U4", 0x380000, 0x080000, CRC(b51930d9) SHA1(220f00d64809a6218015a738e53f11d8dc81578f) )  // 4.U4 is a 99.999809% match for the last part of sns-a3me-0.u1 (mk3u in snes softlist - 1 byte changed?!)
 
 	ROM_REGION( 0x1000, "mcu", 0 )
 	ROM_LOAD( "D87C51.U9", 0x00000, 0x1000, CRC(f447620a) SHA1(ac0d78c7b339f13d5f96a6727a0f2147158697f9) )

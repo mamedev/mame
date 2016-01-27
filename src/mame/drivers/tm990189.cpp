@@ -92,8 +92,6 @@ public:
 	required_device<cassette_image_device> m_cass;
 	optional_device<tms9918_device> m_tms9918;
 
-	DECLARE_READ8_MEMBER( interrupt_level );
-
 	DECLARE_READ8_MEMBER(video_vdp_r);
 	DECLARE_WRITE8_MEMBER(video_vdp_w);
 	DECLARE_READ8_MEMBER(video_joy_r);
@@ -248,7 +246,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tm990189_state::display_callback)
 	{
 		m_old_segment_state[i] |= m_segment_state[i];
 		sprintf(ledname,"digit%d",i);
-		output_set_digit_value(i, m_old_segment_state[i]);
+		output().set_digit_value(i, m_old_segment_state[i]);
 		m_old_segment_state[i] = m_segment_state[i];
 		m_segment_state[i] = 0;
 	}
@@ -256,7 +254,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tm990189_state::display_callback)
 	for (i = 0; i < 7; i++)
 	{
 		sprintf(ledname,"led%d",i);
-		output_set_value(ledname, !BIT(m_LED_state, i));
+		output().set_value(ledname, !BIT(m_LED_state, i));
 	}
 }
 

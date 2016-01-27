@@ -114,7 +114,7 @@ CPU_DISASSEMBLE(e0c6200)
 {
 	UINT16 op = (oprom[1] | oprom[0] << 8) & 0xfff;
 
-	int m = -1;
+	int m;
 	int p1 = -1;
 	int p2 = -1;
 

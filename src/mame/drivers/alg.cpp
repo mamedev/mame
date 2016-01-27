@@ -56,7 +56,6 @@ public:
 	DECLARE_DRIVER_INIT(pal);
 
 	DECLARE_VIDEO_START(alg);
-	TIMER_CALLBACK_MEMBER(response_timer);
 
 protected:
 	// amiga_state overrides
@@ -214,11 +213,11 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( alg )
 	PORT_START("joy_0_dat")   /* read by Amiga core */
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,amiga_joystick_convert, 0)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,amiga_joystick_convert, (void *)0)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("joy_1_dat")   /* read by Amiga core */
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,amiga_joystick_convert, 1)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,amiga_joystick_convert, (void *)1)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("potgo")     /* read by Amiga core */
@@ -756,7 +755,7 @@ DRIVER_INIT_MEMBER(alg_state,aplatoon)
 
 	/* NOT DONE TODO FIGURE OUT THE RIGHT ORDER!!!! */
 	UINT8 *rom = memregion("user2")->base();
-	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x40000);
+	std::unique_ptr<UINT8[]> decrypted = std::make_unique<UINT8[]>(0x40000);
 	int i;
 
 	static const int shuffle[] =
@@ -766,8 +765,8 @@ DRIVER_INIT_MEMBER(alg_state,aplatoon)
 	};
 
 	for (i = 0; i < 64; i++)
-		memcpy(decrypted + i * 0x1000, rom + shuffle[i] * 0x1000, 0x1000);
-	memcpy(rom, decrypted, 0x40000);
+		memcpy(decrypted.get() + i * 0x1000, rom + shuffle[i] * 0x1000, 0x1000);
+	memcpy(rom, decrypted.get(), 0x40000);
 	logerror("decrypt done\n ");
 }
 

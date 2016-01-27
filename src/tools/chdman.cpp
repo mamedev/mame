@@ -775,7 +775,6 @@ static int print_help(const char *argv0, const char *error = nullptr)
 	printf("Usage:\n");
 	for (auto & desc : s_commands)
 	{
-		
 		printf("   %s %s%s\n", argv0, desc.name, desc.description);
 	}
 	printf("\nFor help with any command, run:\n");
@@ -1342,6 +1341,7 @@ void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_
 
 static void do_info(parameters_t &params)
 {
+	bool verbose = params.find(OPTION_VERBOSE) != params.end();
 	// parse out input files
 	chd_file input_parent_chd;
 	chd_file input_chd;
@@ -1370,13 +1370,13 @@ static void do_info(parameters_t &params)
 	sha1_t overall = input_chd.sha1();
 	if (overall != sha1_t::null)
 	{
-		printf("SHA1:         %s\n", overall.as_string(tempstr));
+		printf("SHA1:         %s\n", overall.as_string().c_str());
 		if (input_chd.version() >= 4)
-			printf("Data SHA1:    %s\n", input_chd.raw_sha1().as_string(tempstr));
+			printf("Data SHA1:    %s\n", input_chd.raw_sha1().as_string().c_str());
 	}
 	sha1_t parent = input_chd.parent_sha1();
 	if (parent != sha1_t::null)
-		printf("Parent SHA1:  %s\n", parent.as_string(tempstr));
+		printf("Parent SHA1:  %s\n", parent.as_string().c_str());
 
 	// print out metadata
 	dynamic_buffer buffer;
@@ -1414,15 +1414,17 @@ static void do_info(parameters_t &params)
 			printf("Metadata:     Tag=%08x  Index=%d  Length=%d bytes\n", metatag, metaindex, int(buffer.size()));
 		printf("              ");
 
-		// print up to 60 characters of metadata
-		UINT32 count = MIN(60, buffer.size());
+		UINT32 count = buffer.size();
+		// limit output to 60 characters of metadata if not verbose
+		if (!verbose)
+			count = MIN(60, count);
 		for (int chnum = 0; chnum < count; chnum++)
 			printf("%c", isprint(UINT8(buffer[chnum])) ? buffer[chnum] : '.');
 		printf("\n");
 	}
 
 	// print compression stats if verbose
-	if (params.find(OPTION_VERBOSE) != params.end())
+	if (verbose)
 	{
 		UINT32 compression_types[10] = { 0 };
 		for (UINT32 hunknum = 0; hunknum < input_chd.hunk_count(); hunknum++)
@@ -1524,9 +1526,8 @@ static void do_verify(parameters_t &params)
 	// finish up
 	if (raw_sha1 != computed_sha1)
 	{
-		std::string tempstr;
-		fprintf(stderr, "Error: Raw SHA1 in header = %s\n", raw_sha1.as_string(tempstr));
-		fprintf(stderr, "              actual SHA1 = %s\n", computed_sha1.as_string(tempstr));
+		fprintf(stderr, "Error: Raw SHA1 in header = %s\n", raw_sha1.as_string().c_str());
+		fprintf(stderr, "              actual SHA1 = %s\n", computed_sha1.as_string().c_str());
 
 		// fix it if requested; this also fixes the overall one so we don't need to do any more
 		if (params.find(OPTION_FIX) != params.end())
@@ -1547,9 +1548,8 @@ static void do_verify(parameters_t &params)
 				printf("Overall SHA1 verification successful!\n");
 			else
 			{
-				std::string tempstr;
-				fprintf(stderr, "Error: Overall SHA1 in header = %s\n", input_chd.sha1().as_string(tempstr));
-				fprintf(stderr, "                  actual SHA1 = %s\n", computed_overall_sha1.as_string(tempstr));
+				fprintf(stderr, "Error: Overall SHA1 in header = %s\n", input_chd.sha1().as_string().c_str());
+				fprintf(stderr, "                  actual SHA1 = %s\n", computed_overall_sha1.as_string().c_str());
 
 				// fix it if requested
 				if (params.find(OPTION_FIX) != params.end())
@@ -2404,14 +2404,13 @@ static void do_extract_cd(parameters_t &params)
 
 			// output the metadata about the track to the TOC file
 			const cdrom_track_info &trackinfo = toc->tracks[tracknum];
-			std::string temp;
 			if (mode == MODE_GDI)
 			{
-				output_track_metadata(mode, output_toc_file, tracknum, trackinfo, core_filename_extract_base(temp, trackbin_name.c_str()).c_str(), discoffs, outputoffs);
+				output_track_metadata(mode, output_toc_file, tracknum, trackinfo, core_filename_extract_base(trackbin_name.c_str()).c_str(), discoffs, outputoffs);
 			}
 			else
 			{
-				output_track_metadata(mode, output_toc_file, tracknum, trackinfo, core_filename_extract_base(temp, output_bin_file_str->c_str()).c_str(), discoffs, outputoffs);
+				output_track_metadata(mode, output_toc_file, tracknum, trackinfo, core_filename_extract_base(output_bin_file_str->c_str()).c_str(), discoffs, outputoffs);
 			}
 
 			// If this is bin/cue output and the CHD contains subdata, warn the user and don't include

@@ -50,11 +50,11 @@ WRITE16_MEMBER(gaelco_state::bigkarnk_coin_w)
 		{
 			case 0x00:  /* Coin Lockouts */
 			case 0x01:
-				coin_lockout_w(machine(), (offset >> 3) & 0x01, ~data & 0x01);
+				machine().bookkeeping().coin_lockout_w((offset >> 3) & 0x01, ~data & 0x01);
 				break;
 			case 0x02:  /* Coin Counters */
 			case 0x03:
-				coin_counter_w(machine(), (offset >> 3) & 0x01, data & 0x01);
+				machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01, data & 0x01);
 				break;
 		}
 	}

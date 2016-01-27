@@ -71,7 +71,7 @@ protected:
 	UINT16 m_current_cmd;
 	int m_cmd_stream_pos;
 	UINT16 m_osd_addr;
-	UINT8 *m_shadow_gfx;
+	std::unique_ptr<UINT8[]> m_shadow_gfx;
 
 	UINT8 m_bg_pen;
 	UINT8 m_phase;

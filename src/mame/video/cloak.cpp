@@ -49,7 +49,7 @@ WRITE8_MEMBER(cloak_state::cloak_paletteram_w)
 
 void cloak_state::set_pen(int i)
 {
-	UINT16 *palette_ram = m_palette_ram;
+	UINT16 *palette_ram = m_palette_ram.get();
 	static const int resistances[3] = { 10000, 4700, 2200 };
 	double weights[3];
 
@@ -86,8 +86,8 @@ void cloak_state::set_pen(int i)
 
 void cloak_state::set_current_bitmap_videoram_pointer()
 {
-	m_current_bitmap_videoram_accessed  = m_bitmap_videoram_selected ? m_bitmap_videoram1 : m_bitmap_videoram2;
-	m_current_bitmap_videoram_displayed = m_bitmap_videoram_selected ? m_bitmap_videoram2 : m_bitmap_videoram1;
+	m_current_bitmap_videoram_accessed  = m_bitmap_videoram_selected ? m_bitmap_videoram1.get() : m_bitmap_videoram2.get();
+	m_current_bitmap_videoram_displayed = m_bitmap_videoram_selected ? m_bitmap_videoram2.get() : m_bitmap_videoram1.get();
 }
 
 WRITE8_MEMBER(cloak_state::cloak_clearbmp_w)
@@ -163,18 +163,18 @@ void cloak_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cloak_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_bitmap_videoram1 = auto_alloc_array(machine(), UINT8, 256*256);
-	m_bitmap_videoram2 = auto_alloc_array(machine(), UINT8, 256*256);
-	m_palette_ram = auto_alloc_array(machine(), UINT16, NUM_PENS);
+	m_bitmap_videoram1 = std::make_unique<UINT8[]>(256*256);
+	m_bitmap_videoram2 = std::make_unique<UINT8[]>(256*256);
+	m_palette_ram = std::make_unique<UINT16[]>(NUM_PENS);
 
 	set_current_bitmap_videoram_pointer();
 
 	save_item(NAME(m_bitmap_videoram_address_x));
 	save_item(NAME(m_bitmap_videoram_address_y));
 	save_item(NAME(m_bitmap_videoram_selected));
-	save_pointer(NAME(m_bitmap_videoram1), 256*256);
-	save_pointer(NAME(m_bitmap_videoram2), 256*256);
-	save_pointer(NAME(m_palette_ram), NUM_PENS);
+	save_pointer(NAME(m_bitmap_videoram1.get()), 256*256);
+	save_pointer(NAME(m_bitmap_videoram2.get()), 256*256);
+	save_pointer(NAME(m_palette_ram.get()), NUM_PENS);
 	machine().save().register_postload(save_prepost_delegate(FUNC(cloak_state::set_current_bitmap_videoram_pointer), this));
 }
 

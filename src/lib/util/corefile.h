@@ -125,7 +125,7 @@ file_error core_truncate(core_file *f, UINT64 offset);
 /* ----- filename utilities ----- */
 
 /* extract the base part of a filename (remove extensions and paths) */
-std::string &core_filename_extract_base(std::string &result, const char *name, bool strip_extension = false);
+std::string core_filename_extract_base(const char *name, bool strip_extension = false);
 
 /* true if the given filename ends with a particular extension */
 int core_filename_ends_with(const char *filename, const char *extension);

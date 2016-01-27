@@ -28,8 +28,8 @@ public:
 	bool m_dhires;
 	bool m_80col;
 	bool m_altcharset;
-	UINT16 *m_hires_artifact_map;
-	UINT16 *m_dhires_artifact_map;
+	std::unique_ptr<UINT16[]> m_hires_artifact_map;
+	std::unique_ptr<UINT16[]> m_dhires_artifact_map;
 
 	UINT8 *m_ram_ptr, *m_aux_ptr, *m_char_ptr;
 	int m_char_size;

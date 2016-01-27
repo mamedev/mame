@@ -653,7 +653,7 @@ void pleiads_sound_device::common_start()
 
 	m_tms = machine().device<tms36xx_device>("tms");
 	m_pc4.level = PC4_MIN;
-	m_poly18 = auto_alloc_array_clear(machine(), UINT32, 1ul << (18-5));
+	m_poly18 = make_unique_clear<UINT32[]>(1ul << (18-5));
 
 	shiftreg = 0;
 	for( i = 0; i < (1ul << (18-5)); i++ )
@@ -715,7 +715,7 @@ void pleiads_sound_device::common_start()
 	save_item(NAME(m_noise.counter));
 	save_item(NAME(m_noise.polyoffs));
 	save_item(NAME(m_noise.freq));
-	save_pointer(NAME(m_poly18), (1ul << (18-5)));
+	save_pointer(NAME(m_poly18.get()), (1ul << (18-5)));
 }
 
 //-------------------------------------------------

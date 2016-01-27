@@ -204,7 +204,7 @@ static MACHINE_CONFIG_FRAGMENT( lk201 )
 	MCFG_CPU_PROGRAM_MAP(lk201_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(LK201_SPK_TAG, BEEP, 0)
+	MCFG_SOUND_ADD(LK201_SPK_TAG, BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -630,10 +630,10 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 			if (((data & 0x80) == 0) && (ports[offset] & 0x80))
 			{
 				// Lower nibble contains the LED values (1 = on, 0 = off)
-				output_set_value("led_wait"   , (led_data & 0x1) == 0);
-				output_set_value("led_compose", (led_data & 0x2) == 0);
-				output_set_value("led_hold"   , (led_data & 0x4) == 0);
-				output_set_value("led_lock"   , (led_data & 0x8) == 0);
+				machine().output().set_value("led_wait"   , (led_data & 0x1) == 0);
+				machine().output().set_value("led_compose", (led_data & 0x2) == 0);
+				machine().output().set_value("led_hold"   , (led_data & 0x4) == 0);
+				machine().output().set_value("led_lock"   , (led_data & 0x8) == 0);
 			}
 #endif
 

@@ -24,7 +24,6 @@
 #include <netdb.h>
 #include <errno.h>
 
-#define NO_MEM_TRACKING
 #include "emu.h"
 #include "sdlfile.h"
 

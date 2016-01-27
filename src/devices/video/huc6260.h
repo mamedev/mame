@@ -88,7 +88,7 @@ private:
 	UINT8   m_pixel_clock;
 
 	emu_timer   *m_timer;
-	bitmap_ind16    *m_bmp;
+	std::unique_ptr<bitmap_ind16>   m_bmp;
 };
 
 

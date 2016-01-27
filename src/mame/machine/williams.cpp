@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Michael Soderstrom, Marc LaFontaine, Aaron Giles
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /***************************************************************************
 
     Williams 6809 system
@@ -628,7 +628,7 @@ WRITE8_MEMBER(blaster_state::blaster_snd_cmd_w)
 
 WRITE_LINE_MEMBER(williams_state::lottofun_coin_lock_w)
 {
-	coin_lockout_global_w(machine(), state & 1); /* bit 5 of PIC control port A */
+	machine().bookkeeping().coin_lockout_global_w(state & 1); /* bit 5 of PIC control port A */
 }
 
 
@@ -658,13 +658,13 @@ WRITE_LINE_MEMBER(williams2_state::tshoot_maxvol_w)
 WRITE8_MEMBER(williams2_state::tshoot_lamp_w)
 {
 	/* set the grenade lamp */
-	output_set_value("Grenade_lamp", (~data & 0x4)>>2 );
+	output().set_value("Grenade_lamp", (~data & 0x4)>>2 );
 	/* set the gun lamp */
-	output_set_value("Gun_lamp", (~data & 0x8)>>3 );
+	output().set_value("Gun_lamp", (~data & 0x8)>>3 );
 	/* gun coil */
-	output_set_value("Player1_Gun_Recoil", (data & 0x10)>>4 );
+	output().set_value("Player1_Gun_Recoil", (data & 0x10)>>4 );
 	/* feather coil */
-	output_set_value("Feather_Blower", (data & 0x20)>>5 );
+	output().set_value("Feather_Blower", (data & 0x20)>>5 );
 }
 
 

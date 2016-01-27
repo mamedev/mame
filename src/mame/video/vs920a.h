@@ -10,7 +10,7 @@ public:
 	static void set_gfx_region(device_t &device, int gfxregion);
 
 	tilemap_t* m_tmap;
-	UINT16* m_vram;
+	std::unique_ptr<UINT16[]> m_vram;
 	UINT16 m_pal_base;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);

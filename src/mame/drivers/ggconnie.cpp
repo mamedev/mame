@@ -42,14 +42,12 @@ public:
 	required_device <okim6295_device> m_oki;
 	DECLARE_WRITE8_MEMBER(lamp_w);
 	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_READ8_MEMBER(rtc_r);
-	DECLARE_WRITE8_MEMBER(rtc_w);
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
 };
 
 WRITE8_MEMBER(ggconnie_state::lamp_w)
 {
-	output_set_value("lamp", !BIT(data,0));
+	output().set_value("lamp", !BIT(data,0));
 }
 
 WRITE8_MEMBER(ggconnie_state::output_w)

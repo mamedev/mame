@@ -159,7 +159,7 @@ WRITE8_MEMBER(maygay1b_state::m1_pia_portb_w)
 	{
 		if ( data & (1 << i) )
 		{
-			output_set_indexed_value("triac", i, data & (1 << i));
+			output().set_indexed_value("triac", i, data & (1 << i));
 		}
 	}
 }
@@ -283,17 +283,14 @@ INPUT_PORTS_END
 
 void maygay1b_state::machine_start()
 {
-// setup 8 mechanical meters ////////////////////////////////////////////
-	MechMtr_config(machine(),8);
-
 }
 WRITE8_MEMBER(maygay1b_state::reel12_w)
 {
 	m_reel0->update( data     & 0x0F);
 	m_reel1->update((data>>4) & 0x0F);
 
-	awp_draw_reel("reel1", m_reel0);
-	awp_draw_reel("reel2", m_reel1);
+	awp_draw_reel(machine(),"reel1", m_reel0);
+	awp_draw_reel(machine(),"reel2", m_reel1);
 }
 
 WRITE8_MEMBER(maygay1b_state::reel34_w)
@@ -301,8 +298,8 @@ WRITE8_MEMBER(maygay1b_state::reel34_w)
 	m_reel2->update( data     & 0x0F);
 	m_reel3->update((data>>4) & 0x0F);
 
-	awp_draw_reel("reel3", m_reel2);
-	awp_draw_reel("reel4", m_reel3);
+	awp_draw_reel(machine(),"reel3", m_reel2);
+	awp_draw_reel(machine(),"reel4", m_reel3);
 }
 
 WRITE8_MEMBER(maygay1b_state::reel56_w)
@@ -310,8 +307,8 @@ WRITE8_MEMBER(maygay1b_state::reel56_w)
 	m_reel4->update( data     & 0x0F);
 	m_reel5->update((data>>4) & 0x0F);
 
-	awp_draw_reel("reel5", m_reel4);
-	awp_draw_reel("reel6", m_reel5);
+	awp_draw_reel(machine(),"reel5", m_reel4);
+	awp_draw_reel(machine(),"reel6", m_reel5);
 }
 
 READ8_MEMBER(maygay1b_state::m1_duart_r)
@@ -326,7 +323,7 @@ WRITE8_MEMBER(maygay1b_state::m1_meter_w)
 	{
 		if ( data & (1 << i) )
 		{
-			MechMtr_update(i, data & (1 << i) );
+			m_meters->update(i, data & (1 << i) );
 			m_meter = data;
 		}
 	}
@@ -405,7 +402,7 @@ WRITE8_MEMBER(maygay1b_state::m1_lockout_w)
 	int i;
 	for (i=0; i<6; i++)
 	{
-		coin_lockout_w(machine(), i, data & (1 << i) );
+		machine().bookkeeping().coin_lockout_w(i, data & (1 << i) );
 	}
 }
 
@@ -553,7 +550,7 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_w )
 
 		for (int i = 0; i < 8; i++)
 		{
-			output_set_lamp_value((8*m_lamp_strobe)+i, ((data  & (1 << i)) !=0));
+			output().set_lamp_value((8*m_lamp_strobe)+i, ((data  & (1 << i)) !=0));
 		}
 		m_old_lamp_strobe = m_lamp_strobe;
 	}
@@ -578,7 +575,7 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_2_w )
 
 		for (int i = 0; i < 8; i++)
 		{
-			output_set_lamp_value((8*m_lamp_strobe)+i+128, ((data  & (1 << i)) !=0));
+			output().set_lamp_value((8*m_lamp_strobe)+i+128, ((data  & (1 << i)) !=0));
 		}
 		m_old_lamp_strobe2 = m_lamp_strobe2;
 	}
@@ -636,6 +633,9 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel4_optic_cb))
 	MCFG_STARPOINT_48STEP_ADD("reel5")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel5_optic_cb))
+
+	MCFG_DEVICE_ADD("meters", METERS, 0)
+	MCFG_METERS_NUMBER(8)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

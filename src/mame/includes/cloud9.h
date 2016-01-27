@@ -26,7 +26,7 @@ public:
 	required_device<m6502_device> m_maincpu;
 	required_device<x2212_device> m_nvram;
 	/* memory pointers */
-	UINT8 *     m_videoram;
+	std::unique_ptr<UINT8[]>    m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_paletteram;
 

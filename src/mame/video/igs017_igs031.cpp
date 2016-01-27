@@ -242,7 +242,7 @@ void igs017_igs031_device::expand_sprites()
 	int i;
 
 	m_sprites_gfx_size   =   size / 2 * 3;
-	m_sprites_gfx        =   auto_alloc_array(machine(), UINT8, m_sprites_gfx_size);
+	m_sprites_gfx        =   std::make_unique<UINT8[]>(m_sprites_gfx_size);
 
 	for (i = 0; i < size / 2 ; i++)
 	{
@@ -296,7 +296,7 @@ void igs017_igs031_device::draw_sprite(bitmap_ind16 &bitmap,const rectangle &cli
 	if ( addr + dimx * dimy >= m_sprites_gfx_size )
 		return;
 
-	gfx_element gfx(m_palette, m_sprites_gfx + addr, dimx, dimy, dimx, m_palette->entries(), 0x100, 32);
+	gfx_element gfx(m_palette, m_sprites_gfx.get() + addr, dimx, dimy, dimx, m_palette->entries(), 0x100, 32);
 
 	gfx.transpen(bitmap,cliprect,
 				0, color,

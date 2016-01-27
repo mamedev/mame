@@ -106,12 +106,9 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 #include "cpu/m68000/m68000.h"
 
 #include "includes/jpmimpct.h"
-#include "machine/meters.h"
 #include "machine/nvram.h"
 #include "jpmimpct.lh"
 #include "video/awpvid.h"
-#include "machine/steppers.h"
-#include "machine/roc10937.h"
 #include "machine/i8255.h"
 
 /*************************************
@@ -513,7 +510,7 @@ void jpmimpct_state::jpm_draw_lamps(int data, int lamp_strobe)
 	for (i=0; i<16; i++)
 	{
 		m_Lamps[16*(m_lamp_strobe+i)] = data & 1;
-		output_set_lamp_value((16*lamp_strobe)+i, (m_Lamps[(16*lamp_strobe)+i]));
+		output().set_lamp_value((16*lamp_strobe)+i, (m_Lamps[(16*lamp_strobe)+i]));
 		data = data >> 1;
 	}
 }
@@ -552,7 +549,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmio_w)
 			}
 			else
 //          slide = 0;
-			MechMtr_update(0, data >> 10);
+			m_meters->update(0, data >> 10);
 			m_duart_1.IP &= ~0x10;
 			break;
 		}
@@ -565,7 +562,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmio_w)
 
 		case 0x0b:
 		{
-			output_set_digit_value(m_lamp_strobe,data);
+			output().set_digit_value(m_lamp_strobe,data);
 			break;
 		}
 		case 0x0f:
@@ -865,6 +862,9 @@ static MACHINE_CONFIG_START( jpmimpct, jpmimpct_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_VIDEO_START_OVERRIDE(jpmimpct_state,jpmimpct)
+
+	MCFG_DEVICE_ADD("meters", METERS, 0)
+	MCFG_METERS_NUMBER(5)
 MACHINE_CONFIG_END
 
 
@@ -1076,8 +1076,8 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 	{
 		case 0x00:
 		{
-			output_set_value("PWRLED",!(data&0x100));
-			output_set_value("STATLED",!(data&0x200));
+			output().set_value("PWRLED",!(data&0x100));
+			output().set_value("STATLED",!(data&0x200));
 			break;
 		}
 
@@ -1088,18 +1088,18 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 			m_reel1->update((data >> 1)& 0x0F);
 			m_reel2->update((data >> 2)& 0x0F);
 			m_reel3->update((data >> 3)& 0x0F);
-			awp_draw_reel("reel1", m_reel0);
-			awp_draw_reel("reel2", m_reel1);
-			awp_draw_reel("reel3", m_reel2);
-			awp_draw_reel("reel4", m_reel3);
+			awp_draw_reel(machine(),"reel1", m_reel0);
+			awp_draw_reel(machine(),"reel2", m_reel1);
+			awp_draw_reel(machine(),"reel3", m_reel2);
+			awp_draw_reel(machine(),"reel4", m_reel3);
 			break;
 		}
 		case 0x04:
 		{
 			m_reel4->update((data >> 4)& 0x0F);
 			m_reel5->update((data >> 5)& 0x0F);
-			awp_draw_reel("reel5", m_reel4);
-			awp_draw_reel("reel6", m_reel5);
+			awp_draw_reel(machine(),"reel5", m_reel4);
+			awp_draw_reel(machine(),"reel6", m_reel5);
 			break;
 		}
 		case 0x06:
@@ -1122,20 +1122,20 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 					{
 						for (i=0; i<5; i++)
 						{
-							MechMtr_update(i, 0);
+							m_meters->update(i, 0);
 						}
 						break;
 					}
 					default:
 					{
-						MechMtr_update(((metno <<2) - 1), 1);
+						m_meters->update(((metno <<2) - 1), 1);
 					}
 					break;
 				}
 			}
-			int combined_meter = MechMtr_GetActivity(0) | MechMtr_GetActivity(1) |
-			MechMtr_GetActivity(2) | MechMtr_GetActivity(3) |
-			MechMtr_GetActivity(4);
+			int combined_meter = m_meters->GetActivity(0) | m_meters->GetActivity(1) |
+			m_meters->GetActivity(2) | m_meters->GetActivity(3) |
+			m_meters->GetActivity(4);
 
 			if(combined_meter)
 			{
@@ -1156,7 +1156,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 
 		case 0x0b:
 		{
-			output_set_digit_value(m_lamp_strobe,data);
+			output().set_digit_value(m_lamp_strobe,data);
 			break;
 		}
 		case 0x0f:
@@ -1339,6 +1339,9 @@ MACHINE_CONFIG_START( impctawp, jpmimpct_state )
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel4_optic_cb))
 	MCFG_STARPOINT_48STEP_ADD("reel5")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel5_optic_cb))
+
+	MCFG_DEVICE_ADD("meters", METERS, 0)
+	MCFG_METERS_NUMBER(5)
 
 MACHINE_CONFIG_END
 

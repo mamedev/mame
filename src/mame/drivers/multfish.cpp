@@ -376,14 +376,14 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_hopper_w)
 
 
 	m_hopper_motor = data & 0x10;
-	coin_lockout_w(machine(), 0, data & 0x01);
-	coin_lockout_w(machine(), 1, data & 0x01);
-	coin_lockout_w(machine(), 2, data & 0x01);
-	coin_lockout_w(machine(), 3, data & 0x01);
-	coin_lockout_w(machine(), 4, data & 0x04);
-	coin_lockout_w(machine(), 5, data & 0x04);
-	coin_lockout_w(machine(), 6, data & 0x04);
-	coin_lockout_w(machine(), 7, data & 0x04);
+	machine().bookkeeping().coin_lockout_w(0, data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, data & 0x01);
+	machine().bookkeeping().coin_lockout_w(2, data & 0x01);
+	machine().bookkeeping().coin_lockout_w(3, data & 0x01);
+	machine().bookkeeping().coin_lockout_w(4, data & 0x04);
+	machine().bookkeeping().coin_lockout_w(5, data & 0x04);
+	machine().bookkeeping().coin_lockout_w(6, data & 0x04);
+	machine().bookkeeping().coin_lockout_w(7, data & 0x04);
 }
 
 WRITE8_MEMBER(igrosoft_gamble_state::rollfr_hopper_w)
@@ -394,14 +394,14 @@ WRITE8_MEMBER(igrosoft_gamble_state::rollfr_hopper_w)
 
 
 	m_hopper_motor = data & 0x10;
-	coin_lockout_w(machine(), 0,~data & 0x01);
-	coin_lockout_w(machine(), 1,~data & 0x01);
-	coin_lockout_w(machine(), 2,~data & 0x01);
-	coin_lockout_w(machine(), 3,~data & 0x01);
-	coin_lockout_w(machine(), 4, data & 0x04);
-	coin_lockout_w(machine(), 5, data & 0x04);
-	coin_lockout_w(machine(), 6, data & 0x04);
-	coin_lockout_w(machine(), 7, data & 0x04);
+	machine().bookkeeping().coin_lockout_w(0,~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1,~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(2,~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(3,~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(4, data & 0x04);
+	machine().bookkeeping().coin_lockout_w(5, data & 0x04);
+	machine().bookkeeping().coin_lockout_w(6, data & 0x04);
+	machine().bookkeeping().coin_lockout_w(7, data & 0x04);
 }
 
 DRIVER_INIT_MEMBER(igrosoft_gamble_state,customl)
@@ -854,14 +854,14 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps1_w)
     -X-- ---- Start Lamp 34A
     X--- ---- Bet/Double Lamp 29B
 */
-	output_set_lamp_value(1, ((data) & 1));      /* Hold 1 Lamp */
-	output_set_lamp_value(2, ((data >> 1) & 1)); /* Hold 2 Lamp */
-	output_set_lamp_value(3, ((data >> 2) & 1)); /* Hold 3 Lamp */
-	output_set_lamp_value(4, ((data >> 3) & 1)); /* Hold 4 Lamp */
-	output_set_lamp_value(5, ((data >> 4) & 1)); /* Hold 5 Lamp */
-	output_set_lamp_value(8, ((data >> 5) & 1)); /* Help Lamp */
-	output_set_lamp_value(6, ((data >> 6) & 1)); /* Start Lamp */
-	output_set_lamp_value(0, ((data >> 7) & 1)); /* Bet/Double Lamp */
+	output().set_lamp_value(1, ((data) & 1));      /* Hold 1 Lamp */
+	output().set_lamp_value(2, ((data >> 1) & 1)); /* Hold 2 Lamp */
+	output().set_lamp_value(3, ((data >> 2) & 1)); /* Hold 3 Lamp */
+	output().set_lamp_value(4, ((data >> 3) & 1)); /* Hold 4 Lamp */
+	output().set_lamp_value(5, ((data >> 4) & 1)); /* Hold 5 Lamp */
+	output().set_lamp_value(8, ((data >> 5) & 1)); /* Help Lamp */
+	output().set_lamp_value(6, ((data >> 6) & 1)); /* Start Lamp */
+	output().set_lamp_value(0, ((data >> 7) & 1)); /* Bet/Double Lamp */
 }
 
 WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps2_w)
@@ -874,10 +874,10 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps2_w)
     ---- -X-- Maxbet Lamp 30B
     ---X ---- Upper Lamp Green 25B  (Demo Mode)
 */
-	output_set_lamp_value(9, ((data) & 1));       /* Payout Lamp */
-	output_set_lamp_value(12, ((data >> 1) & 1)); /* Upper Lamp Yellow */
-	output_set_lamp_value(7, ((data >> 2) & 1));  /* Maxbet Lamp */
-	output_set_lamp_value(10, ((data >> 4) & 1)); /* Upper Lamp Green */
+	output().set_lamp_value(9, ((data) & 1));       /* Payout Lamp */
+	output().set_lamp_value(12, ((data >> 1) & 1)); /* Upper Lamp Yellow */
+	output().set_lamp_value(7, ((data >> 2) & 1));  /* Maxbet Lamp */
+	output().set_lamp_value(10, ((data >> 4) & 1)); /* Upper Lamp Green */
 }
 
 WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps3_w)
@@ -887,7 +887,7 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps3_w)
     7654 3210
     ---- --X- Upper Lamp Red 26B (Service Mode)
 */
-	output_set_lamp_value(11, ((data >> 1) & 1)); /* Upper Lamp Red */
+	output().set_lamp_value(11, ((data >> 1) & 1)); /* Upper Lamp Red */
 }
 
 WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_counters_w)
@@ -902,12 +902,12 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_counters_w)
     -X-- ---- Key Out Counter 27A
     X--- ---- Total Bet Counter 28B
 */
-		coin_counter_w(machine(), 0, data & 0x01);
-		coin_counter_w(machine(), 1, data & 0x02);
-		coin_counter_w(machine(), 2, data & 0x04);
-		coin_counter_w(machine(), 3, data & 0x10);
-		coin_counter_w(machine(), 4, data & 0x40);
-		coin_counter_w(machine(), 5, data & 0x80);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
+		machine().bookkeeping().coin_counter_w(2, data & 0x04);
+		machine().bookkeeping().coin_counter_w(3, data & 0x10);
+		machine().bookkeeping().coin_counter_w(4, data & 0x40);
+		machine().bookkeeping().coin_counter_w(5, data & 0x80);
 }
 
 WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_f3_w)

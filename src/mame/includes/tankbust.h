@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 class tankbust_state : public driver_device
 {
@@ -37,7 +37,6 @@ public:
 	DECLARE_WRITE8_MEMBER(soundlatch_w);
 	DECLARE_WRITE8_MEMBER(e0xx_w);
 	DECLARE_READ8_MEMBER(debug_output_area_r);
-	DECLARE_READ8_MEMBER(read_from_unmapped_memory);
 	DECLARE_READ8_MEMBER(some_changing_input);
 	DECLARE_WRITE8_MEMBER(background_videoram_w);
 	DECLARE_WRITE8_MEMBER(background_colorram_w);

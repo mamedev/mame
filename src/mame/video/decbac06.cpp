@@ -108,9 +108,9 @@ void deco_bac06_device::device_start()
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_pf_data = auto_alloc_array_clear(machine(), UINT16, 0x4000 / 2); // 0x2000 is the maximum needed, some games / chip setups map less and mirror - stadium hero banks this to 0x4000?!
-	m_pf_rowscroll = auto_alloc_array_clear(machine(), UINT16, 0x2000 / 2);
-	m_pf_colscroll = auto_alloc_array_clear(machine(), UINT16, 0x2000 / 2);
+	m_pf_data = make_unique_clear<UINT16[]>(0x4000 / 2); // 0x2000 is the maximum needed, some games / chip setups map less and mirror - stadium hero banks this to 0x4000?!
+	m_pf_rowscroll = make_unique_clear<UINT16[]>(0x2000 / 2);
+	m_pf_colscroll = make_unique_clear<UINT16[]>(0x2000 / 2);
 
 	create_tilemaps(m_gfxregion8x8, m_gfxregion16x16);
 	m_gfxcolmask = 0x0f;
@@ -119,9 +119,9 @@ void deco_bac06_device::device_start()
 	m_bppmask = 0x0f;
 	m_rambank = 0;
 
-	save_pointer(NAME(m_pf_data), 0x4000/2);
-	save_pointer(NAME(m_pf_rowscroll), 0x2000/2);
-	save_pointer(NAME(m_pf_colscroll), 0x2000/2);
+	save_pointer(NAME(m_pf_data.get()), 0x4000/2);
+	save_pointer(NAME(m_pf_rowscroll.get()), 0x2000/2);
+	save_pointer(NAME(m_pf_colscroll.get()), 0x2000/2);
 	save_item(NAME(m_pf_control_0));
 	save_item(NAME(m_pf_control_1));
 	save_item(NAME(m_gfxcolmask));
@@ -344,7 +344,7 @@ void deco_bac06_device::deco_bac06_pf_draw(bitmap_ind16 &bitmap,const rectangle 
 	}
 
 	if (tm)
-		custom_tilemap_draw(bitmap,cliprect,tm,m_pf_rowscroll,m_pf_colscroll,m_pf_control_0,m_pf_control_1,flags, penmask, pencondition, colprimask, colpricondition);
+		custom_tilemap_draw(bitmap,cliprect,tm,m_pf_rowscroll.get(),m_pf_colscroll.get(),m_pf_control_0,m_pf_control_1,flags, penmask, pencondition, colprimask, colpricondition);
 
 }
 
@@ -355,7 +355,7 @@ void deco_bac06_device::deco_bac06_pf_draw_bootleg(bitmap_ind16 &bitmap,const re
 	if (!mode) tm = m_pf8x8_tilemap[type];
 	else tm = m_pf16x16_tilemap[type];
 
-	custom_tilemap_draw(bitmap,cliprect,tm,m_pf_rowscroll,m_pf_colscroll,nullptr,nullptr,flags, 0, 0, 0, 0);
+	custom_tilemap_draw(bitmap,cliprect,tm,m_pf_rowscroll.get(),m_pf_colscroll.get(),nullptr,nullptr,flags, 0, 0, 0, 0);
 }
 
 

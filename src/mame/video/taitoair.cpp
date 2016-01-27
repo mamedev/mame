@@ -502,9 +502,9 @@ void taitoair_state::video_start()
 
 	width = m_screen->width();
 	height = m_screen->height();
-	m_framebuffer[0] = auto_bitmap_ind16_alloc(machine(), width, height);
-	m_framebuffer[1] = auto_bitmap_ind16_alloc(machine(), width, height);
-	//m_buffer3d = auto_bitmap_ind16_alloc(machine(), width, height);
+	m_framebuffer[0] = std::make_unique<bitmap_ind16>(width, height);
+	m_framebuffer[1] = std::make_unique<bitmap_ind16>(width, height);
+	//m_buffer3d = std::make_unique<bitmap_ind16>(width, height);
 }
 
 UINT32 taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -66,7 +66,6 @@
 									const int wetvol_r,
 									const unsigned int sz);
 
-		void reset();
 	};
 
 #endif

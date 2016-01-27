@@ -23,9 +23,9 @@ public:
 	required_shared_ptr<UINT16> m_scroll1;
 	required_shared_ptr<UINT16> m_scroll2;
 	required_shared_ptr<UINT16> m_spriteram;
-	UINT16 *     m_spriteram_old;
+	std::unique_ptr<UINT16[]>     m_spriteram_old;
 	required_shared_ptr<UINT16> m_vidregs;
-	UINT16 *     m_vidregs_old;
+	std::unique_ptr<UINT16[]>     m_vidregs_old;
 
 	/* video-related */
 	tilemap_t    *m_tilemap1;
@@ -40,7 +40,6 @@ public:
 	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE16_MEMBER(mcat_soundlatch_w);
-	DECLARE_WRITE16_MEMBER(mcat_coin_w);
 	DECLARE_READ16_MEMBER(mcat_wd_r);
 	DECLARE_WRITE8_MEMBER(mcatadv_sound_bw_w);
 	DECLARE_WRITE16_MEMBER(mcatadv_videoram1_w);

@@ -225,8 +225,6 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_stop() override;
 
-	void make_ops();
-
 	// device_execute_interface overrides
 	virtual UINT32 execute_min_cycles() const override;
 	virtual UINT32 execute_max_cycles() const override;
@@ -243,7 +241,7 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// device_state_interface overrides
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// address spaces
 	const address_space_config m_program_config;
@@ -494,8 +492,6 @@ private:
 	void ope8();    void ope9();    void opea();    void opeb();    void opec();    void oped();    void opee();    void opef();
 	void opf0();    void opf1();    void opf2();    void opf3();    void opf4();    void opf5();    void opf6();    void opf7();
 	void opf8();    void opf9();    void opfa();    void opfb();    void opfc();    void opfd();    void opfe();    void opff();
-
-	void set_irq_line(int irqline, int state);
 };
 
 // device type definition

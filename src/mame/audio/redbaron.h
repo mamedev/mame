@@ -22,7 +22,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
-	INT16 *m_vol_lookup;
+	std::unique_ptr<INT16[]> m_vol_lookup;
 
 	INT16 m_vol_crash[16];
 

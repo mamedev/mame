@@ -51,7 +51,6 @@ public:
 	// common
 	DECLARE_READ16_MEMBER(dmmy_8f);
 	DECLARE_WRITE16_MEMBER(sound_command_w);
-	DECLARE_READ16_MEMBER(pending_command_r);
 	DECLARE_WRITE8_MEMBER(sh_pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(sh_bankswitch_w);
 

@@ -86,8 +86,8 @@ private:
 	int m_erase;
 	int m_read_write;
 
-	UINT8 *m_left;
-	UINT8 *m_right;
+	std::unique_ptr<UINT8[]> m_left;
+	std::unique_ptr<UINT8[]> m_right;
 
 	int m_bit_offset;
 	int m_byte_offset;

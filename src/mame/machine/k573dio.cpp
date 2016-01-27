@@ -116,8 +116,8 @@ k573dio_device::k573dio_device(const machine_config &mconfig, const char *tag, d
 void k573dio_device::device_start()
 {
 	output_cb.resolve_safe();
-	ram = auto_alloc_array( machine(), UINT16, 12 * 1024 * 1024 );
-	save_pointer( NAME(ram), 12 * 1024 * 1024 );
+	ram = std::make_unique<UINT16[]>(12 * 1024 * 1024 );
+	save_pointer( NAME(ram.get()), 12 * 1024 * 1024 );
 }
 
 void k573dio_device::device_reset()

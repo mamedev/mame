@@ -546,13 +546,13 @@ WRITE8_MEMBER(vk100_state::vgEX)
 /* port 0x68: "KBDW" d7 is beeper, d6 is keyclick, d5-d0 are keyboard LEDS */
 WRITE8_MEMBER(vk100_state::KBDW)
 {
-	output_set_value("online_led",BIT(data, 5) ? 1 : 0);
-	output_set_value("local_led", BIT(data, 5) ? 0 : 1);
-	output_set_value("noscroll_led",BIT(data, 4) ? 1 : 0);
-	output_set_value("basic_led", BIT(data, 3) ? 1 : 0);
-	output_set_value("hardcopy_led", BIT(data, 2) ? 1 : 0);
-	output_set_value("l1_led", BIT(data, 1) ? 1 : 0);
-	output_set_value("l2_led", BIT(data, 0) ? 1 : 0);
+	output().set_value("online_led",BIT(data, 5) ? 1 : 0);
+	output().set_value("local_led", BIT(data, 5) ? 0 : 1);
+	output().set_value("noscroll_led",BIT(data, 4) ? 1 : 0);
+	output().set_value("basic_led", BIT(data, 3) ? 1 : 0);
+	output().set_value("hardcopy_led", BIT(data, 2) ? 1 : 0);
+	output().set_value("l1_led", BIT(data, 1) ? 1 : 0);
+	output().set_value("l2_led", BIT(data, 0) ? 1 : 0);
 #ifdef LED_VERBOSE
 	if (BIT(data, 6)) logerror("kb keyclick bit 6 set: not emulated yet (multivibrator)!\n");
 #endif
@@ -918,14 +918,13 @@ INPUT_PORTS_END
 
 void vk100_state::machine_start()
 {
-	m_speaker->set_frequency(116); //116 hz (page 172 of TM), but duty cycle is wrong here!
-	output_set_value("online_led",1);
-	output_set_value("local_led", 0);
-	output_set_value("noscroll_led",1);
-	output_set_value("basic_led", 1);
-	output_set_value("hardcopy_led", 1);
-	output_set_value("l1_led", 1);
-	output_set_value("l2_led", 1);
+	output().set_value("online_led",1);
+	output().set_value("local_led", 0);
+	output().set_value("noscroll_led",1);
+	output().set_value("basic_led", 1);
+	output().set_value("hardcopy_led", 1);
+	output().set_value("l1_led", 1);
+	output().set_value("l2_led", 1);
 	m_vsync = 0;
 	m_dir_a6 = 1;
 	m_cout = 0;
@@ -1063,7 +1062,7 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 	MCFG_DEFAULT_LAYOUT( layout_vk100 )
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
+	MCFG_SOUND_ADD( "beeper", BEEP, 116 ) // 116 hz (page 172 of TM), but duty cycle is wrong here!
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.25 )
 MACHINE_CONFIG_END
 

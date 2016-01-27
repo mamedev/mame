@@ -126,8 +126,6 @@ public:
 	DECLARE_READ8_MEMBER(portc4_r);
 	DECLARE_READ8_MEMBER(portd0_r);
 	DECLARE_WRITE8_MEMBER(bigbord2_kbd_put);
-	DECLARE_WRITE_LINE_MEMBER(intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	DECLARE_WRITE_LINE_MEMBER(frame);
 	DECLARE_DRIVER_INIT(bigbord2);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
@@ -147,8 +145,6 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
 	address_space *m_mem;
 	address_space *m_io;
 	required_device<cpu_device> m_maincpu;
@@ -475,7 +471,6 @@ void bigbord2_state::machine_reset()
 	for (i = 0; i < 8; i++)
 		m_c8[i] = 0;
 	m_beeper->set_state(0);
-	m_beeper->set_frequency(950); // actual frequency is unknown
 	m_bankr->set_entry(0);
 	m_bankv->set_entry(0);
 	m_banka->set_entry(0);
@@ -599,7 +594,7 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 950) // actual frequency is unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

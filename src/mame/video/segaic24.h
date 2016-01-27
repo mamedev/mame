@@ -58,7 +58,8 @@ private:
 		SYS24_TILES = 0x4000
 	};
 
-	UINT16 *char_ram, *tile_ram;
+	std::unique_ptr<UINT16[]> char_ram;
+	std::unique_ptr<UINT16[]> tile_ram;
 	int char_gfx_index;
 	tilemap_t *tile_layer[4];
 	UINT16 tile_mask;
@@ -98,7 +99,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	UINT16 *sprite_ram;
+	std::unique_ptr<UINT16[]> sprite_ram;
 };
 
 

@@ -125,7 +125,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(z9001_state::timer_callback)
 
 void z9001_state::machine_reset()
 {
-	m_beeper->set_frequency(800);
 	m_maincpu->set_state_int(Z80_PC, 0xf000);
 }
 
@@ -224,7 +223,7 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

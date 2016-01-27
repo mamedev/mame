@@ -67,7 +67,7 @@ WRITE8_MEMBER(submar_state::submar_motor_w)
 	// d6: stir water
 	// d7: n/c
 	for (int i = 0; i < 8; i++)
-		output_set_indexed_value("motor", i, data >> i & 1);
+		output().set_indexed_value("motor", i, data >> i & 1);
 }
 
 WRITE8_MEMBER(submar_state::submar_lamp_w)
@@ -81,7 +81,7 @@ WRITE8_MEMBER(submar_state::submar_lamp_w)
 	// d6: front ship hit
 	// d7: scenery
 	for (int i = 0; i < 8; i++)
-		output_set_lamp_value(i, data >> i & 1);
+		output().set_lamp_value(i, data >> i & 1);
 }
 
 WRITE8_MEMBER(submar_state::submar_solenoid_w)
@@ -89,7 +89,7 @@ WRITE8_MEMBER(submar_state::submar_solenoid_w)
 	// d0-d4: ship1-5
 	// d5-d7: n/c
 	for (int i = 0; i < 8; i++)
-		output_set_indexed_value("solenoid", i, data >> i & 1);
+		output().set_indexed_value("solenoid", i, data >> i & 1);
 }
 
 WRITE8_MEMBER(submar_state::submar_sound_w)
@@ -111,8 +111,8 @@ WRITE8_MEMBER(submar_state::submar_led_w)
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	// 2 digits per write. port 4: time, port 5: score
-	output_set_digit_value((offset << 1 & 2) | 0, _7447_map[data >> 4]);
-	output_set_digit_value((offset << 1 & 2) | 1, _7447_map[data & 0x0f]);
+	output().set_digit_value((offset << 1 & 2) | 0, _7447_map[data >> 4]);
+	output().set_digit_value((offset << 1 & 2) | 1, _7447_map[data & 0x0f]);
 }
 
 WRITE8_MEMBER(submar_state::submar_irq_clear_w)

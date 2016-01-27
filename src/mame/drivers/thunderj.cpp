@@ -100,7 +100,7 @@ WRITE16_MEMBER(thunderj_state::latch_w)
 		if (m_alpha_tile_bank != ((data >> 2) & 7))
 		{
 			m_screen->update_partial(m_screen->vpos());
-			m_vad->alpha()->mark_all_dirty();
+			m_vad->alpha().mark_all_dirty();
 			m_alpha_tile_bank = (data >> 2) & 7;
 		}
 	}

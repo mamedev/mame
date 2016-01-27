@@ -951,9 +951,6 @@ machine_config_constructor atari_eeprom_2816_device::device_mconfig_additions() 
 
 atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
-		m_earom(*this, "earom"),
-		m_earom_data(0),
-		m_earom_control(0),
 		m_scanline_int_state(0),
 		m_sound_int_state(0),
 		m_video_int_state(0),
@@ -1004,9 +1001,6 @@ void atarigen_state::machine_start()
 	save_item(NAME(m_slapstic_last_address));
 
 	save_item(NAME(m_scanlines_per_callback));
-
-	save_item(NAME(m_earom_data));
-	save_item(NAME(m_earom_control));
 }
 
 
@@ -1014,10 +1008,6 @@ void atarigen_state::machine_reset()
 {
 	// reset the interrupt states
 	m_video_int_state = m_sound_int_state = m_scanline_int_state = 0;
-
-	// reset the control latch on the EAROM, if present
-	if (m_earom != nullptr)
-		m_earom->set_control(0, 1, 1, 0, 0);
 
 	// reset the slapstic
 	if (m_slapstic_num != 0)
@@ -1464,44 +1454,4 @@ void atarigen_state::blend_gfx(int gfx0, int gfx1, int mask0, int mask1)
 
 	// free the second graphics element
 	m_gfxdecode->set_gfx(gfx1, nullptr);
-}
-
-
-
-//**************************************************************************
-//  VECTOR AND EARLY RASTER EAROM INTERFACE
-//**************************************************************************
-
-READ8_MEMBER( atarigen_state::earom_r )
-{
-	// return data latched from previous clock
-	return m_earom->data();
-}
-
-
-WRITE8_MEMBER( atarigen_state::earom_w )
-{
-	// remember the value written
-	m_earom_data = data;
-
-	// output latch only enabled if control bit 2 is set
-	if (m_earom_control & 4)
-		m_earom->set_data(m_earom_data);
-
-	// always latch the address
-	m_earom->set_address(offset);
-}
-
-
-WRITE8_MEMBER( atarigen_state::earom_control_w )
-{
-	// remember the control state
-	m_earom_control = data;
-
-	// ensure ouput data is put on data lines prior to updating controls
-	if (m_earom_control & 4)
-		m_earom->set_data(m_earom_data);
-
-	// set the control lines; /CS2 is always held low
-	m_earom->set_control(data & 8, 1, ~data & 4, data & 2, data & 1);
 }

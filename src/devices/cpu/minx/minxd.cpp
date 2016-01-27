@@ -424,8 +424,8 @@ CPU_DISASSEMBLE( minx )
 {
 	const minxdasm *instr;
 	UINT8 op, op1;
-	INT8  ofs8 = 0;
-	UINT16 ea = 0;
+	INT8  ofs8;
+	UINT16 ea;
 	int pos = 0;
 	char *dst = buffer;
 

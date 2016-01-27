@@ -110,7 +110,6 @@ public:
 	// CTC callback
 	DECLARE_WRITE_LINE_MEMBER( ctc_zc0_callback );
 	DECLARE_WRITE_LINE_MEMBER( ctc_zc1_callback );
-	DECLARE_WRITE_LINE_MEMBER( ctc_zc2_callback );
 
 	// keyboard
 	DECLARE_WRITE_LINE_MEMBER( keyboard_cb );

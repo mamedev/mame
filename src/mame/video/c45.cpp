@@ -133,7 +133,7 @@ WRITE16_MEMBER( namco_c45_road_device::tilemap_w )
 WRITE16_MEMBER( namco_c45_road_device::tileram_w )
 {
 	COMBINE_DATA(&m_tileram[offset]);
-	m_gfx[0]->mark_dirty(offset / WORDS_PER_ROAD_TILE);
+	gfx(0)->mark_dirty(offset / WORDS_PER_ROAD_TILE);
 }
 
 
@@ -200,7 +200,7 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 			while (numpixels-- > 0)
 			{
 				int pen = source_gfx[sourcex >> 16];
-				if (m_palette->pen_indirect(pen) != m_transparent_color)
+				if (palette().pen_indirect(pen) != m_transparent_color)
 				{
 					if (m_clut != nullptr)
 						pen = (pen & ~0xff) | m_clut[pen & 0xff];
@@ -231,7 +231,8 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 void namco_c45_road_device::device_start()
 {
-	m_clut = memregion("clut")->base();
+	if (memregion("clut") != nullptr)
+		m_clut = memregion("clut")->base();
 
 	// create a tilemap for the road
 	m_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c45_road_device::get_road_info), this),

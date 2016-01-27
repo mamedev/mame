@@ -30,8 +30,8 @@ excellent_spr_device::excellent_spr_device(const machine_config &mconfig, const 
 
 void excellent_spr_device::device_start()
 {
-	m_ram = auto_alloc_array_clear(this->machine(), UINT8, 0x1000);
-	save_pointer(NAME(m_ram), 0x1000);
+	m_ram = make_unique_clear<UINT8[]>(0x1000);
+	save_pointer(NAME(m_ram.get()), 0x1000);
 }
 
 
@@ -154,7 +154,7 @@ void excellent_spr_device::aquarium_draw_sprites( bitmap_ind16 &bitmap, const re
 
 void excellent_spr_device::gcpinbal_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, gfxdecode_device *gfxdecode, int y_offs, int priority )
 {
-	UINT8 *spriteram = m_ram;
+	UINT8 *spriteram = m_ram.get();
 	int offs, chain_pos;
 	int x, y, curx, cury;
 //  int priority = 0;

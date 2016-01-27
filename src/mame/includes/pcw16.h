@@ -108,12 +108,6 @@ public:
 	DECLARE_READ8_MEMBER(pcw16_system_status_r);
 	DECLARE_READ8_MEMBER(pcw16_timer_interrupt_counter_r);
 	DECLARE_WRITE8_MEMBER(pcw16_system_control_w);
-	DECLARE_WRITE8_MEMBER(pcw16_superio_fdc_datarate_w);
-	DECLARE_WRITE8_MEMBER(pcw16_superio_fdc_digital_output_register_w);
-	DECLARE_WRITE8_MEMBER(pcw16_superio_fdc_data_w);
-	DECLARE_READ8_MEMBER(pcw16_superio_fdc_data_r);
-	DECLARE_READ8_MEMBER(pcw16_superio_fdc_main_status_register_r);
-	DECLARE_READ8_MEMBER(pcw16_superio_fdc_digital_input_register_r);
 	DECLARE_READ8_MEMBER(pcw16_mem_r);
 	DECLARE_WRITE8_MEMBER(pcw16_mem_w);
 	void pcw16_keyboard_init();
@@ -138,14 +132,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(pcw16_com_interrupt_1);
 	DECLARE_WRITE_LINE_MEMBER(pcw16_com_interrupt_2);
-	DECLARE_WRITE_LINE_MEMBER(pcw16_com_tx_0);
-	DECLARE_WRITE_LINE_MEMBER(pcw16_com_dtr_0);
-	DECLARE_WRITE_LINE_MEMBER(pcw16_com_rts_0);
-	DECLARE_WRITE_LINE_MEMBER(pcw16_com_tx_1);
-	DECLARE_WRITE_LINE_MEMBER(pcw16_com_dtr_1);
-	DECLARE_WRITE_LINE_MEMBER(pcw16_com_rts_1);
 	DECLARE_WRITE_LINE_MEMBER(pcw16_keyboard_callback);
-	INPUT_CHANGED_MEMBER(power);
 
 	void trigger_fdc_int();
 	DECLARE_WRITE_LINE_MEMBER( fdc_interrupt );
@@ -154,7 +141,6 @@ public:
 	void pcw16_vh_decode_mode0(bitmap_ind16 &bitmap, int x, int y, unsigned char byte);
 	void pcw16_vh_decode_mode1(bitmap_ind16 &bitmap, int x, int y, unsigned char byte);
 	void pcw16_vh_decode_mode2(bitmap_ind16 &bitmap, int x, int y, unsigned char byte);
-	void pcw16_begin_byte_transfer();
 };
 
 #endif /* PCW16_H_ */

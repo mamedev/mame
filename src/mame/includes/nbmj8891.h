@@ -11,16 +11,20 @@ public:
 	};
 
 	nbmj8891_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu"),
-		m_nb1413m3(*this, "nb1413m3"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette")   { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_nb1413m3(*this, "nb1413m3")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_clut_ptr(*this, "protection")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<nb1413m3_device> m_nb1413m3;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_region_ptr<UINT8> m_clut_ptr;
 
 	int m_scrolly;
 	int m_blitter_destx;
@@ -39,10 +43,10 @@ public:
 	int m_gfxdraw_mode;
 	bitmap_ind16 m_tmpbitmap0;
 	bitmap_ind16 m_tmpbitmap1;
-	UINT8 *m_videoram0;
-	UINT8 *m_videoram1;
-	UINT8 *m_palette_ptr;
-	UINT8 *m_clut;
+	std::unique_ptr<UINT8[]> m_videoram0;
+	std::unique_ptr<UINT8[]> m_videoram1;
+	std::unique_ptr<UINT8[]> m_palette_ptr;
+	std::unique_ptr<UINT8[]> m_clut;
 	int m_param_old[0x10];
 	int m_param_cnt;
 	int m_flipscreen_old;

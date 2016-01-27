@@ -48,9 +48,6 @@ public:
 	DECLARE_WRITE32_MEMBER( dsio_idma_data_w );
 	DECLARE_READ32_MEMBER( dsio_idma_data_r );
 
-	DECLARE_READ32_MEMBER(de_r);
-	DECLARE_WRITE32_MEMBER(de_w);
-
 	// non public
 	void dcs_boot();
 	TIMER_CALLBACK_MEMBER( dcs_reset );
@@ -59,8 +56,6 @@ public:
 	DECLARE_WRITE16_MEMBER( dcs_dataram_w );
 	DECLARE_WRITE16_MEMBER( dcs_data_bank_select_w );
 	DECLARE_WRITE16_MEMBER( dcs_data_bank_select2_w );
-	DECLARE_READ16_MEMBER( dcs_dataram_bank_select_r );
-	DECLARE_WRITE16_MEMBER( dcs_dataram_bank_select_w );
 	inline void sdrc_update_bank_pointers();
 	void sdrc_remap_memory();
 	void sdrc_reset();
@@ -169,6 +164,10 @@ protected:
 	UINT32      m_sounddata_words;
 	UINT32      m_sounddata_banks;
 	UINT16      m_sounddata_bank;
+
+	optional_memory_bank    m_data_bank;
+	memory_bank *           m_rom_page;
+	memory_bank *           m_dram_page;
 
 	/* I/O with the host */
 	UINT8       m_auto_ack;

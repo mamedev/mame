@@ -36,7 +36,6 @@ protected:
 	required_device<cpu_device> m_maincpu;
 public:
 	DECLARE_DRIVER_INIT(jpmsru);
-	DECLARE_READ8_MEMBER( interrupt_level );
 };
 
 // blind guess

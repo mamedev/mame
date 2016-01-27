@@ -103,7 +103,6 @@ public:
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 
 	UINT32 screen_update_amusco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(amusco_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<pic8259_device> m_pic;

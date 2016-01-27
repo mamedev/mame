@@ -25,7 +25,7 @@ void n64_texture_pipe_t::set_machine(running_machine &machine)
 {
 	n64_state* state = machine.driver_data<n64_state>();
 
-	m_rdp = state->m_rdp;
+	m_rdp = state->rdp();
 
 	for(INT32 i = 0; i < 0x10000; i++)
 	{

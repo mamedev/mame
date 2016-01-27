@@ -315,7 +315,6 @@ INPUT_PORTS_END
 
 void h19_state::machine_reset()
 {
-	m_beep->set_frequency(H19_BEEP_FRQ);
 }
 
 void h19_state::video_start()
@@ -418,7 +417,7 @@ static MACHINE_CONFIG_START( h19, h19_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, H19_BEEP_FRQ)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

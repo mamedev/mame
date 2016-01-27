@@ -286,12 +286,12 @@ WRITE16_MEMBER(highvdeo_state::write1_w)
     ---x ----  Hold5 lamp.
     --x- ----  Start lamp.
 */
-	output_set_lamp_value(1, (data & 1));           /* Lamp 1 - HOLD 1 */
-	output_set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - HOLD 2 */
-	output_set_lamp_value(3, (data >> 2) & 1);      /* Lamp 3 - HOLD 3 */
-	output_set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
-	output_set_lamp_value(5, (data >> 4) & 1);      /* Lamp 5 - HOLD 5 */
-	output_set_lamp_value(6, (data >> 5) & 1);      /* Lamp 6 - START  */
+	output().set_lamp_value(1, (data & 1));           /* Lamp 1 - HOLD 1 */
+	output().set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - HOLD 2 */
+	output().set_lamp_value(3, (data >> 2) & 1);      /* Lamp 3 - HOLD 3 */
+	output().set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
+	output().set_lamp_value(5, (data >> 4) & 1);      /* Lamp 5 - HOLD 5 */
+	output().set_lamp_value(6, (data >> 5) & 1);      /* Lamp 6 - START  */
 
 //  popmessage("%04x %04x",t1,t3);
 }
@@ -403,8 +403,8 @@ WRITE16_MEMBER(highvdeo_state::nyj_write2_w)
     xxx- ----  Unknown.
 */
 //  popmessage("%04x",data);
-	coin_counter_w(machine(), 0, ~data & 0x0f); // Coins (all)
-	coin_counter_w(machine(), 1, ~data & 0x10); // Notes (all)
+	machine().bookkeeping().coin_counter_w(0, ~data & 0x0f); // Coins (all)
+	machine().bookkeeping().coin_counter_w(1, ~data & 0x10); // Notes (all)
 }
 
 WRITE16_MEMBER(highvdeo_state::tv_tcf_bankselect_w)
@@ -470,8 +470,8 @@ WRITE16_MEMBER(highvdeo_state::write2_w)
 
 	for(i=0;i<4;i++)
 	{
-		coin_counter_w(machine(), i,data & 0x20);
-		coin_lockout_w(machine(), i,~data & 0x08);
+		machine().bookkeeping().coin_counter_w(i,data & 0x20);
+		machine().bookkeeping().coin_lockout_w(i,~data & 0x08);
 	}
 }
 
@@ -1408,6 +1408,21 @@ ROM_START( girotutt )
 	ROM_LOAD( "t41.bin", 0x00000, 0x80000, CRC(6f694406) SHA1(ec8b8baba0ee1bfe8986ce978412ee4de06f1906) )
 ROM_END
 
+
+ROM_START( galeone )
+	ROM_REGION( 0x100000, "user1", 0 ) /* V30 Code */
+	ROM_LOAD16_BYTE( "model.A8-vers.1.0.ic8", 0x00001, 0x40000, CRC(b9e1e7ce) SHA1(4e036285b26dc0a313e76259b7e67c8d55322c84) )
+	ROM_RELOAD(0x80001,0x40000)
+	ROM_LOAD16_BYTE( "model.A7-vers.1.0.ic7", 0x00000, 0x40000, CRC(1940b738) SHA1(81e40de8df4dc838342bf966658110989a233731) )
+	ROM_RELOAD(0x80000,0x40000)
+
+	ROM_REGION( 0x040000, "boot_prg", 0 ) /* copy for program code */
+	ROM_COPY( "user1", 0x040000, 0x000000, 0x40000 )
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* M6376 Samples */
+	ROM_LOAD( "model.GA-vers.1.ic25", 0x00000, 0x80000, CRC(4c2c2cc1) SHA1(20da29b2f1dd1f86ec23d9dbdaa9470878e900e2) )
+ROM_END
+
 /*
 CPU
 
@@ -1559,8 +1574,8 @@ WRITE16_MEMBER(highvdeo_state::fashion_output_w)
 
 	for(i=0;i<4;i++)
 	{
-		coin_counter_w(machine(), i,data & 0x20);
-		coin_lockout_w(machine(), i,~data & 0x01);
+		machine().bookkeeping().coin_counter_w(i,data & 0x20);
+		machine().bookkeeping().coin_lockout_w(i,~data & 0x01);
 	}
 }
 
@@ -1635,6 +1650,7 @@ GAMEL( 2000, cfever61,  0,      tv_ncf,   tv_ncf,  driver_device,   0,       ROT
 GAMEL( 2000, nyjoker,   0,      nyjoker,  nyjoker, driver_device,   0,       ROT0,  "High Video", "New York Joker",    0, layout_fashion )
 GAMEL( 2000, cfever1k,  0,      tv_tcf,   tv_tcf,  driver_device,   0,       ROT0,  "High Video", "Casino Fever 1k",   0, layout_fashion )
 GAMEL( 2000, girotutt,  0,      tv_tcf,   tv_tcf,  driver_device,   0,       ROT0,  "High Video", "GiroTutto",         0, layout_fashion )
+GAMEL( 2000, galeone,   0,      nyjoker,  nyjoker, driver_device,   0,       ROT0,  "San Remo Games", "Il Galeone",    0, layout_fashion )
 GAMEL( 2000, ciclone,   0,      ciclone,  tv_tcf,  highvdeo_state,  ciclone, ROT0,  "High Video", "Ciclone",           0, layout_fashion )
 GAMEL( 2000, newmcard,  0,      newmcard, tv_tcf,  driver_device,   0,       ROT0,  "High Video", "New Magic Card",    0, layout_fashion )
 GAMEL( 2000, brasil,    0,      brasil,   brasil,  driver_device,   0,       ROT0,  "High Video", "Bra$il (Version 3)",       0,                layout_fashion )

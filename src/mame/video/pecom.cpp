@@ -81,12 +81,12 @@ WRITE_LINE_MEMBER(pecom_state::pecom_prd_w)
 VIDEO_START_MEMBER(pecom_state,pecom)
 {
 	/* allocate memory */
-	m_charram = auto_alloc_array(machine(), UINT8, PECOM_CHAR_RAM_SIZE);
+	m_charram = std::make_unique<UINT8[]>(PECOM_CHAR_RAM_SIZE);
 
 	/* register for state saving */
 	save_item(NAME(m_reset));
 	save_item(NAME(m_dma));
-	save_pointer(NAME(m_charram), PECOM_CHAR_RAM_SIZE);
+	save_pointer(NAME(m_charram.get()), PECOM_CHAR_RAM_SIZE);
 }
 
 MACHINE_CONFIG_FRAGMENT( pecom_video )

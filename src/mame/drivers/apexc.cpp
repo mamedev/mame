@@ -26,7 +26,7 @@ public:
                                 be edited - the existence of this register is a personnal
                                 guess */
 
-	bitmap_ind16 *m_bitmap;
+	std::unique_ptr<bitmap_ind16> m_bitmap;
 
 	UINT32 m_old_edit_keys;
 	int m_old_control_keys;
@@ -568,7 +568,7 @@ void apexc_state::video_start()
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
+	m_bitmap = std::make_unique<bitmap_ind16>(width, height);
 	m_bitmap->fill(0, /*machine().visible_area*/teletyper_window);
 }
 

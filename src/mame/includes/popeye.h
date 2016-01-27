@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Marc Lafontaine, Couriersud
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Couriersud
+// thanks-to: Marc Lafontaine
 class popeye_state : public driver_device
 {
 public:
@@ -23,8 +24,8 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-	UINT8 *m_bitmapram;
-	bitmap_ind16 *m_tmpbitmap2;
+	std::unique_ptr<UINT8[]> m_bitmapram;
+	std::unique_ptr<bitmap_ind16> m_tmpbitmap2;
 	UINT8 m_invertmask;
 	UINT8 m_bitmap_type;
 	tilemap_t *m_fg_tilemap;

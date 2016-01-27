@@ -30,8 +30,8 @@ public:
 	required_shared_ptr<UINT32> m_vram_1;
 	required_shared_ptr<UINT32> m_vregs;
 	optional_shared_ptr<UINT32> m_bootleg_spritebuffer;
-	UINT32 *       m_spritebuf1;
-	UINT32 *       m_spritebuf2;
+	std::unique_ptr<UINT32[]>       m_spritebuf1;
+	std::unique_ptr<UINT32[]>       m_spritebuf2;
 
 	/* video-related */
 	tilemap_t        *m_tilemap_0_size0;

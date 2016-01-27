@@ -59,14 +59,11 @@ public:
 	DECLARE_WRITE8_MEMBER(lamp1_w) { };
 	//DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	//DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_WRITE8_MEMBER(sol2_w) { }; // solenoids 8-15
 	DECLARE_WRITE8_MEMBER(sol3_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(dac_w) { };
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_READ8_MEMBER(dmd_status_r);
 
 //  DECLARE_READ8_MEMBER(sound_latch_r);
@@ -91,7 +88,6 @@ private:
 	UINT8 m_kbdrow;
 	UINT8 m_diag;
 	bool m_ca1;
-	bool m_irq_active;
 	UINT8 m_sound_data;
 
 public:
@@ -203,7 +199,7 @@ WRITE8_MEMBER( de_3_state::dig0_w )
 //  data &= 0x7f;
 //  m_strobe = data & 15;
 //  m_diag = (data & 0x70) >> 4;
-//  output_set_digit_value(60, patterns[data>>4]); // diag digit
+//  output().set_digit_value(60, patterns[data>>4]); // diag digit
 //  m_segment1 = 0;
 //  m_segment2 = 0;
 }
@@ -215,9 +211,9 @@ WRITE8_MEMBER( de_3_state::dig1_w )
 //  if ((m_segment2 & 0x70000) == 0x30000)
 //  {
 //      if(m_is_alpha3)  // Alphanumeric type 2 uses 7 segment LEDs on the bottom row, type 3 uses 14 segment LEDs
-//          output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+//          output().set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 //      else
-//          output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
+//          output().set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
 //      m_segment2 |= 0x40000;
 //  }
 }
@@ -250,7 +246,7 @@ WRITE8_MEMBER( de_3_state::pia2c_pa_w )
 //  m_segment1 |= 0x10000;
 //  if ((m_segment1 & 0x70000) == 0x30000)
 //  {
-//      output_set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+//      output().set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 //      m_segment1 |= 0x40000;
 //  }
 }
@@ -282,7 +278,7 @@ WRITE8_MEMBER( de_3_state::pia2c_pb_w )
 //  m_segment1 |= 0x20000;
 //  if ((m_segment1 & 0x70000) == 0x30000)
 //  {
-//      output_set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+//      output().set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 //      m_segment1 |= 0x40000;
 //  }
 }
@@ -316,7 +312,7 @@ WRITE8_MEMBER( de_3_state::pia34_pa_w )
 //  m_segment2 |= 0x10000;
 //  if ((m_segment2 & 0x70000) == 0x30000)
 //  {
-//      output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+//      output().set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 //      m_segment2 |= 0x40000;
 //  }
 }

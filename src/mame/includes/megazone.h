@@ -34,7 +34,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
-	bitmap_ind16      *m_tmpbitmap;
+	std::unique_ptr<bitmap_ind16>   m_tmpbitmap;
 	int           m_flipscreen;
 
 	/* misc */

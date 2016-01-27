@@ -137,8 +137,8 @@ WRITE8_MEMBER(onetwo_state::onetwo_cpubank_w)
 WRITE8_MEMBER(onetwo_state::onetwo_coin_counters_w)
 {
 	machine().watchdog_reset();
-	coin_counter_w(machine(), 0, BIT(data, 1));
-	coin_counter_w(machine(), 1, BIT(data, 2));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
 }
 
 WRITE8_MEMBER(onetwo_state::onetwo_soundlatch_w)

@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, Stefan Jokisch
 /***************************************************************************
 
@@ -128,17 +128,17 @@ WRITE8_MEMBER(ultratnk_state::ultratnk_da_latch_w)
 
 WRITE8_MEMBER(ultratnk_state::ultratnk_led_1_w)
 {
-	set_led_status(machine(), 0, offset & 1); /* left player start */
+	output().set_led_value(0, offset & 1); /* left player start */
 }
 WRITE8_MEMBER(ultratnk_state::ultratnk_led_2_w)
 {
-	set_led_status(machine(), 1, offset & 1); /* right player start */
+	output().set_led_value(1, offset & 1); /* right player start */
 }
 
 
 WRITE8_MEMBER(ultratnk_state::ultratnk_lockout_w)
 {
-	coin_lockout_global_w(machine(), ~offset & 1);
+	machine().bookkeeping().coin_lockout_global_w(~offset & 1);
 }
 
 
@@ -203,7 +203,7 @@ static INPUT_PORTS_START( ultratnk )
 
 	PORT_START("COLLISION")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_collision, (void *)nullptr )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_collision, (void *)0 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_collision, (void *)1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) /* VCC */

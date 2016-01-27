@@ -88,7 +88,7 @@ public:
 	DECLARE_READ8_MEMBER(nmi_portb_r);
 	UINT8 m_vram_sel;
 	UINT8 m_mio_sel;
-	UINT8 *m_p7_pal;
+	std::unique_ptr<UINT8[]> m_p7_pal;
 	UINT8 m_bank_reg;
 	UINT16 m_cursor_addr;
 	UINT8 m_cursor_blink;
@@ -136,7 +136,7 @@ TIMER_CALLBACK_MEMBER(pasopia7_state::pio_timer)
 
 VIDEO_START_MEMBER(pasopia7_state,pasopia7)
 {
-	m_p7_pal = auto_alloc_array(machine(), UINT8, 0x10);
+	m_p7_pal = std::make_unique<UINT8[]>(0x10);
 }
 
 void pasopia7_state::draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width)

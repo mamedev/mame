@@ -334,8 +334,10 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 		//printf("Loading\n");
 		UINT8 data[0x30800];
 		battery_image->battery_load(data, 0x30800, 0x00);
-		//memcpy(n64_sram, data, 0x20000);
-		memcpy(memshare("sram")->ptr(), data, 0x20000);
+		if (m_sram != NULL)
+		{
+			memcpy(m_sram, data, 0x20000);
+		}
 		memcpy(periphs->m_save_data.eeprom, data + 0x20000, 0x800);
 		memcpy(periphs->m_save_data.mempak[0], data + 0x20800, 0x8000);
 		memcpy(periphs->m_save_data.mempak[1], data + 0x28800, 0x8000);

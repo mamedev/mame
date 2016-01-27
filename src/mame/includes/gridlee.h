@@ -41,14 +41,14 @@ public:
 
 	UINT8 m_last_analog_input[2];
 	UINT8 m_last_analog_output[2];
-	UINT8 *m_poly17;
+	std::unique_ptr<UINT8[]> m_poly17;
 	UINT8 *m_rand17;
 	emu_timer *m_irq_off;
 	emu_timer *m_irq_timer;
 	emu_timer *m_firq_off;
 	emu_timer *m_firq_timer;
 	UINT8 m_cocktail_flip;
-	UINT8 *m_local_videoram;
+	std::unique_ptr<UINT8[]> m_local_videoram;
 	UINT8 m_palettebank_vis;
 
 	DECLARE_READ8_MEMBER(analog_port_r);

@@ -1,6 +1,6 @@
 /*
  * Copyright 2011-2015 Attila Kocsis, Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef BGFX_RENDERER_METAL_H_HEADER_GUARD
@@ -141,7 +141,7 @@ namespace bgfx { namespace mtl
 			id<MTLLibrary> lib =  [m_obj newLibraryWithData:(dispatch_data_t)_data error:&error];
 			BX_WARN(NULL == error
 				, "newLibraryWithData failed: %s"
-				, error.localizedDescription.UTF8String
+				, [error.localizedDescription cStringUsingEncoding:NSASCIIStringEncoding]
 				);
 			return lib;
 		}
@@ -150,10 +150,9 @@ namespace bgfx { namespace mtl
 		{
 			NSError* error;
 			id<MTLLibrary> lib = [m_obj newLibraryWithSource:@(_source) options:nil error:&error];
-			//TODO: sometimes prints null as paremeter. string is too large
 			BX_WARN(NULL == error
 				, "Shader compilation failed: %s"
-				, error.localizedDescription.UTF8String
+				, [error.localizedDescription cStringUsingEncoding:NSASCIIStringEncoding]
 				);
 			return lib;
 		}
@@ -201,7 +200,7 @@ namespace bgfx { namespace mtl
 			id <MTLRenderPipelineState> state = [m_obj newRenderPipelineStateWithDescriptor:_descriptor error:&error];
 			BX_WARN(NULL == error
 				, "newRenderPipelineStateWithDescriptor failed: %s"
-				, error.localizedDescription.UTF8String
+				, [error.localizedDescription cStringUsingEncoding:NSASCIIStringEncoding]
 				);
 			return state;
 		}
@@ -213,7 +212,7 @@ namespace bgfx { namespace mtl
 
 			BX_WARN(NULL == error
 				, "newRenderPipelineStateWithDescriptor failed: %s"
-				, error.localizedDescription.UTF8String
+				, [error.localizedDescription cStringUsingEncoding:NSASCIIStringEncoding]
 				);
 			return state;
 		}
@@ -226,7 +225,7 @@ namespace bgfx { namespace mtl
 
 			BX_WARN(NULL == error
 				, "newComputePipelineStateWithFunction failed: %s"
-				, error.localizedDescription.UTF8String
+				, [error.localizedDescription cStringUsingEncoding:NSASCIIStringEncoding]
 				);
 			return state;
 		}
@@ -674,7 +673,7 @@ namespace bgfx { namespace mtl
 			MTL_RELEASE(m_ptrStencil);
 		}
 		void update(uint8_t _side, uint8_t _mip, const Rect& _rect, uint16_t _z, uint16_t _depth, uint16_t _pitch, const Memory* _mem);
-		void commit(uint8_t _stage, uint32_t _flags = BGFX_SAMPLER_DEFAULT_FLAGS);
+		void commit(uint8_t _stage, uint32_t _flags = BGFX_TEXTURE_INTERNAL_DEFAULT_SAMPLER);
 
 		Texture m_ptr;
 		Texture m_ptrStencil; // for emulating packed depth/stencil formats - only for iOS8...
@@ -710,6 +709,29 @@ namespace bgfx { namespace mtl
 		TextureHandle m_colorHandle[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS-1];
 		TextureHandle m_depthHandle;
 		uint8_t m_num; // number of color handles
+	};
+
+	struct OcclusionQueryMTL
+	{
+		OcclusionQueryMTL()
+			: m_control(BX_COUNTOF(m_query) )
+		{
+		}
+
+		void postReset();
+		void preReset();
+		void begin(RenderCommandEncoder& _rce, Frame* _render, OcclusionQueryHandle _handle);
+		void end(RenderCommandEncoder& _rce);
+		void resolve(Frame* _render, bool _wait = false);
+
+		struct Query
+		{
+			OcclusionQueryHandle m_handle;
+		};
+
+		Buffer m_buffer;
+		Query m_query[BGFX_CONFIG_MAX_OCCUSION_QUERIES];
+		bx::RingBufferControl m_control;
 	};
 
 } /* namespace metal */ } // namespace bgfx

@@ -2,7 +2,7 @@
 // copyright-holders:hap, Kevin Horton
 /***************************************************************************
 
-  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.c) **
+  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.cpp) **
 
   Marx Series 300 Electronic Bowling Game
   Main board:
@@ -191,8 +191,6 @@ static MACHINE_CONFIG_START( elecbowl, elecbowl_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_elecbowl)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

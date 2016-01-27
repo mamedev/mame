@@ -222,10 +222,10 @@ void ppu2c0x_device::device_start()
 	m_nmi_timer->adjust(attotime::never);
 
 	/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
-	m_bitmap = auto_bitmap_ind16_alloc(machine(), VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT);
-	m_spriteram = auto_alloc_array_clear(machine(), UINT8, SPRITERAM_SIZE);
-	m_colortable = auto_alloc_array(machine(), pen_t, ARRAY_LENGTH(default_colortable));
-	m_colortable_mono = auto_alloc_array(machine(), pen_t, ARRAY_LENGTH(default_colortable_mono));
+	m_bitmap = std::make_unique<bitmap_ind16>(VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT);
+	m_spriteram = make_unique_clear<UINT8[]>(SPRITERAM_SIZE);
+	m_colortable = std::make_unique<pen_t[]>(ARRAY_LENGTH(default_colortable));
+	m_colortable_mono = std::make_unique<pen_t[]>(ARRAY_LENGTH(default_colortable_mono));
 
 	/* initialize the color tables */
 	for (int i = 0; i < ARRAY_LENGTH(default_colortable_mono); i++)
@@ -256,9 +256,9 @@ void ppu2c0x_device::device_start()
 	save_item(NAME(m_palette_ram));
 	save_item(NAME(m_draw_phase));
 	save_item(NAME(m_tilecount));
-	save_pointer(NAME(m_spriteram), SPRITERAM_SIZE);
-	save_pointer(NAME(m_colortable), ARRAY_LENGTH(default_colortable));
-	save_pointer(NAME(m_colortable_mono), ARRAY_LENGTH(default_colortable_mono));
+	save_pointer(NAME(m_spriteram.get()), SPRITERAM_SIZE);
+	save_pointer(NAME(m_colortable.get()), ARRAY_LENGTH(default_colortable));
+	save_pointer(NAME(m_colortable_mono.get()), ARRAY_LENGTH(default_colortable_mono));
 	save_item(NAME(*m_bitmap));
 }
 
@@ -571,12 +571,12 @@ void ppu2c0x_device::draw_background( UINT8 *line_priority )
 	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
 	{
 		color_mask = 0xf0;
-		color_table = m_colortable_mono;
+		color_table = m_colortable_mono.get();
 	}
 	else
 	{
 		color_mask = 0xff;
-		color_table = m_colortable;
+		color_table = m_colortable.get();
 	}
 
 	/* cache the background pen */

@@ -33,7 +33,7 @@ public:
 	// image-level overrides
 	virtual bool call_load() override;
 	virtual void call_unload() override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override { load_software_part_region(*this, swlist, swname, start_entry ); return TRUE; }
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override { machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry ); return TRUE; }
 
 	virtual iodevice_t image_type() const override { return IO_CDROM; }
 

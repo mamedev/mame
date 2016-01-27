@@ -9,15 +9,17 @@
 
     TODO:
     - joystick code should be shared between -26, -86 and -118
+    - Test all pcm modes
+    - Make volume work
+    - Recording
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "machine/pc9801_86.h"
-#include "machine/pic8259.h"
-#include "sound/2608intf.h"
 
 #define MAIN_CLOCK_X1 XTAL_1_9968MHz
+#define QUEUE_SIZE 32768
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -37,21 +39,27 @@ READ8_MEMBER(pc9801_86_device::opn_porta_r)
 
 WRITE8_MEMBER(pc9801_86_device::opn_portb_w){ m_joy_sel = data; }
 
-WRITE_LINE_MEMBER(pc9801_86_device::pc9801_sound_irq)
+WRITE_LINE_MEMBER(pc9801_86_device::sound_irq)
 {
+	m_fmirq = state ? true : false;
 	/* TODO: seems to die very often */
-	machine().device<pic8259_device>(":pic8259_slave")->ir4_w(state);
+	machine().device<pic8259_device>(":pic8259_slave")->ir4_w(state || (m_pcmirq ? ASSERT_LINE : CLEAR_LINE));
 }
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_86_config )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("opna", YM2608, MAIN_CLOCK_X1*4) // unknown clock / divider
-	MCFG_YM2608_IRQ_HANDLER(WRITELINE(pc9801_86_device, pc9801_sound_irq))
+	MCFG_YM2608_IRQ_HANDLER(WRITELINE(pc9801_86_device, sound_irq))
 	MCFG_AY8910_PORT_A_READ_CB(READ8(pc9801_86_device, opn_porta_r))
 	//MCFG_AY8910_PORT_B_READ_CB(READ8(pc9801_state, opn_portb_r))
 	//MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(pc9801_state, opn_porta_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(pc9801_86_device, opn_portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ADD("dacl", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
+	MCFG_SOUND_ADD("dacr", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -119,8 +127,10 @@ ioport_constructor pc9801_86_device::device_input_ports() const
 
 pc9801_86_device::pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PC9801_86, "pc9801_86", tag, owner, clock, "pc9801_86", __FILE__),
-//      m_maincpu(*owner, "maincpu"),
-		m_opna(*this, "opna")
+		m_opna(*this, "opna"),
+		m_dacl(*this, "dacl"),
+		m_dacr(*this, "dacr"),
+		m_queue(QUEUE_SIZE)
 {
 }
 
@@ -160,6 +170,7 @@ void pc9801_86_device::install_device(offs_t start, offs_t end, offs_t mask, off
 
 void pc9801_86_device::device_start()
 {
+	m_dac_timer = timer_alloc();
 }
 
 
@@ -170,9 +181,15 @@ void pc9801_86_device::device_start()
 void pc9801_86_device::device_reset()
 {
 	UINT16 port_base = (ioport("OPNA_DSW")->read() & 1) << 8;
-	install_device(port_base + 0x0088, port_base + 0x008f, 0, 0, read8_delegate(FUNC(pc9801_86_device::pc9801_86_r), this), write8_delegate(FUNC(pc9801_86_device::pc9801_86_w), this) );
-//  install_device(0xa460, 0xa463, 0, 0, read8_delegate(FUNC(pc9801_86_device::pc9801_86_ext_r), this), write8_delegate(FUNC(pc9801_86_device::pc9801_86_ext_w), this) );
-
+	install_device(port_base + 0x0088, port_base + 0x008f, 0, 0, read8_delegate(FUNC(pc9801_86_device::opn_r), this), write8_delegate(FUNC(pc9801_86_device::opn_w), this) );
+	install_device(0xa460, 0xa463, 0, 0, read8_delegate(FUNC(pc9801_86_device::id_r), this), write8_delegate(FUNC(pc9801_86_device::mask_w), this));
+	install_device(0xa464, 0xa46f, 0, 0, read8_delegate(FUNC(pc9801_86_device::pcm_r), this), write8_delegate(FUNC(pc9801_86_device::pcm_w), this));
+	m_mask = 0;
+	m_head = m_tail = m_count = 0;
+	m_fmirq = m_pcmirq = false;
+	m_irq_rate = 0;
+	m_pcm_ctrl = m_pcm_mode = 0;
+	memset(&m_queue[0], 0, QUEUE_SIZE);
 }
 
 
@@ -181,47 +198,162 @@ void pc9801_86_device::device_reset()
 //**************************************************************************
 
 
-READ8_MEMBER(pc9801_86_device::pc9801_86_r)
+READ8_MEMBER(pc9801_86_device::opn_r)
 {
 	if((offset & 1) == 0)
 		return m_opna->read(space, offset >> 1);
 	else // odd
 	{
-		printf("PC9801-86: Read to undefined port [%02x]\n",offset+0x188);
+		logerror("PC9801-86: Read to undefined port [%02x]\n",offset+0x188);
 		return 0xff;
 	}
 }
 
-
-WRITE8_MEMBER(pc9801_86_device::pc9801_86_w)
+WRITE8_MEMBER(pc9801_86_device::opn_w)
 {
 	if((offset & 1) == 0)
 		m_opna->write(space, offset >> 1,data);
 	else // odd
-		printf("PC9801-86: Write to undefined port [%02x] %02x\n",offset+0x188,data);
+		logerror("PC9801-86: Write to undefined port [%02x] %02x\n",offset+0x188,data);
 }
 
-#if 0
-READ8_MEMBER( pc9801_86_device::pc9801_86_ext_r )
+READ8_MEMBER(pc9801_86_device::id_r)
 {
-	if(offset == 0)
-	{
-		printf("OPNA EXT read ID [%02x]\n",offset);
-		return 0xff;
-	}
+	return 0x40 | m_mask;
+}
 
-	printf("OPNA EXT read unk [%02x]\n",offset);
+WRITE8_MEMBER(pc9801_86_device::mask_w)
+{
+	m_mask = data & 1;
+}
+
+READ8_MEMBER(pc9801_86_device::pcm_r)
+{
+	if((offset & 1) == 0)
+	{
+		switch(offset >> 1)
+		{
+			case 1:
+				return ((queue_count() == QUEUE_SIZE) ? 0x80 : 0) |
+						(!queue_count() ? 0x40 : 0);
+			case 2:
+				return m_pcm_ctrl | (m_pcmirq ? 0x10 : 0);
+			case 3:
+				return m_pcm_mode;
+			case 4:
+				return 0;
+			case 5:
+				return m_pcm_mute;
+		}
+	}
+	else // odd
+		logerror("PC9801-86: Read to undefined port [%02x]\n",offset+0xa464);
 	return 0xff;
 }
 
-WRITE8_MEMBER( pc9801_86_device::pc9801_86_ext_w )
+WRITE8_MEMBER(pc9801_86_device::pcm_w)
 {
-	if(offset == 0)
+	const int rates[] = {44100, 33075, 22050, 16538, 11025, 8268, 5513, 4134};
+	if((offset & 1) == 0)
 	{
-		printf("OPNA EXT write mask %02x -> [%02x]\n",data,offset);
-		return;
+		switch(offset >> 1)
+		{
+			case 1:
+				m_vol[data >> 5] = data & 0x0f;
+				break;
+			case 2:
+				m_pcm_ctrl = data & ~0x10;
+				if(data & 0x80)
+					m_dac_timer->adjust(attotime::from_hz(rates[data & 7]), 0, attotime::from_hz(rates[data & 7]));
+				else
+					m_dac_timer->adjust(attotime::never);
+				if(data & 8)
+					m_head = m_tail = m_count = 0;
+				if(!(data & 0x10))
+				{
+					m_pcmirq = false;
+					machine().device<pic8259_device>(":pic8259_slave")->ir4_w(m_fmirq ? ASSERT_LINE : CLEAR_LINE);
+				}
+				break;
+			case 3:
+				if(m_pcm_ctrl & 0x20)
+					m_irq_rate = (data + 1) * 128;
+				else
+					m_pcm_mode = data;
+				break;
+			case 4:
+				if(queue_count() < QUEUE_SIZE)
+				{
+					m_queue[m_head++] = data;
+					m_head %= QUEUE_SIZE;
+					m_count++;
+				}
+				break;
+			case 5:
+				m_pcm_mute = data;
+				break;
+		}
 	}
-
-	printf("OPNA EXT write unk %02x -> [%02x]\n",data,offset);
+	else // odd
+		logerror("PC9801-86: Write to undefined port [%02x] %02x\n",offset+0xa464,data);
 }
-#endif
+
+int pc9801_86_device::queue_count()
+{
+	return m_count;
+}
+
+UINT8 pc9801_86_device::queue_pop()
+{
+	if(!queue_count())
+		return 0;
+	UINT8 ret = m_queue[m_tail++];
+	m_tail %= QUEUE_SIZE;
+	m_count--;
+	return ret;
+}
+
+void pc9801_86_device::device_timer(emu_timer& timer, device_timer_id id, int param, void* ptr)
+{
+	INT16 lsample, rsample;
+
+	if((m_pcm_ctrl & 0x40) || !(m_pcm_ctrl & 0x80) || !queue_count())
+		return;
+
+	switch(m_pcm_mode & 0x70)
+	{
+		case 0x70: // 8bit stereo
+			m_dacl->write(queue_pop() << 8);
+			m_dacr->write(queue_pop() << 8);
+			break;
+		case 0x60: // 8bit left only
+			m_dacl->write(queue_pop() << 8);
+			break;
+		case 0x50: // 8bit right only
+			m_dacr->write(queue_pop() << 8);
+			break;
+		case 0x30: // 16bit stereo
+			lsample = queue_pop();
+			lsample |= queue_pop() << 8;
+			rsample = queue_pop();
+			rsample |= queue_pop() << 8;
+			m_dacl->write(lsample);
+			m_dacr->write(rsample);
+			break;
+		case 0x20: // 16bit left only
+			lsample = queue_pop();
+			lsample |= queue_pop() << 8;
+			m_dacl->write(lsample);
+			break;
+		case 0x10: // 16bit right only
+			rsample = queue_pop();
+			rsample |= queue_pop() << 8;
+			m_dacr->write(rsample);
+			break;
+	}
+	if((queue_count() < m_irq_rate) && (m_pcm_ctrl & 0x20))
+	{
+		m_pcmirq = true;
+		machine().device<pic8259_device>(":pic8259_slave")->ir4_w(ASSERT_LINE);
+	}
+}

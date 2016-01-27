@@ -37,7 +37,7 @@ public:
 	optional_shared_ptr<UINT16> m_txram;
 	optional_shared_ptr<UINT16> m_bgram;
 	optional_shared_ptr<UINT16> m_f1superb_extraram;
-	UINT8 *m_nvram_8;
+	std::unique_ptr<UINT8[]> m_nvram_8;
 	UINT32 m_to_main;
 	UINT16 m_irqreq;
 	tilemap_t *m_tx_tilemap;

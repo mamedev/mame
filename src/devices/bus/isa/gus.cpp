@@ -479,7 +479,7 @@ WRITE8_MEMBER(gf1_device::global_reg_select_w)
 
 READ8_MEMBER(gf1_device::global_reg_data_r)
 {
-	UINT16 ret = 0x00;
+	UINT16 ret;
 
 	switch(m_current_reg)
 	{
@@ -1430,7 +1430,7 @@ READ8_MEMBER(isa16_gus_device::joy_r)
 {
 	if(offset == 1)
 	{
-		UINT8 data = 0;
+		UINT8 data;
 		int delta;
 		attotime new_time = machine().time();
 

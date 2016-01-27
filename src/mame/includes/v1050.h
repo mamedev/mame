@@ -105,9 +105,6 @@ public:
 	DECLARE_WRITE8_MEMBER( bank_w );
 	DECLARE_WRITE8_MEMBER( dint_w );
 	DECLARE_WRITE8_MEMBER( dvint_clr_w );
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_WRITE8_MEMBER( keyboard_w );
-	DECLARE_WRITE8_MEMBER( p2_w );
 	DECLARE_WRITE8_MEMBER( misc_ppi_pa_w );
 	DECLARE_WRITE8_MEMBER( misc_ppi_pc_w );
 	DECLARE_READ8_MEMBER( rtc_ppi_pa_r );
@@ -127,7 +124,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( crtc_vs_w );
 	DECLARE_WRITE8_MEMBER(sasi_data_w);
 	DECLARE_WRITE_LINE_MEMBER(write_sasi_io);
-	DECLARE_READ8_MEMBER( sasi_status_r );
 	DECLARE_WRITE8_MEMBER( sasi_ctrl_w );
 
 	WRITE_LINE_MEMBER( rtc_ppi_pa_0_w ){ m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 0)) | ((state & 1) << 0); }

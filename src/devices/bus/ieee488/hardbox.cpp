@@ -254,9 +254,9 @@ WRITE8_MEMBER( hardbox_device::ppi1_pc_w )
 
 	*/
 
-	output_set_led_value(LED_A, !BIT(data, 0));
-	output_set_led_value(LED_B, !BIT(data, 1));
-	output_set_led_value(LED_READY, !BIT(data, 2));
+	machine().output().set_led_value(LED_A, !BIT(data, 0));
+	machine().output().set_led_value(LED_B, !BIT(data, 1));
+	machine().output().set_led_value(LED_READY, !BIT(data, 2));
 }
 
 //-------------------------------------------------

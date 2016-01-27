@@ -55,11 +55,11 @@ private:
 	required_device<palette_device> m_palette;
 
 	UINT8 *m_commarea;
-	UINT8 *m_vram;
-	UINT8 *m_eram;
+	std::unique_ptr<UINT8[]> m_vram;
+	std::unique_ptr<UINT8[]> m_eram;
 	UINT8 m_stateparam[16];
 	UINT8 m_lut[256*3];
-	bitmap_ind16 *m_bitmap;
+	std::unique_ptr<bitmap_ind16> m_bitmap;
 };
 
 

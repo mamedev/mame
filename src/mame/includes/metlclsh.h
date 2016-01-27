@@ -25,7 +25,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_bgram;
 	required_shared_ptr<UINT8> m_scrollx;
-	UINT8 *        m_otherram;
+	std::unique_ptr<UINT8[]>        m_otherram;
 
 	/* video-related */
 	tilemap_t      *m_bg_tilemap;

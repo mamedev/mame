@@ -374,12 +374,12 @@ WRITE16_MEMBER( wicat_state::parallel_led_w )
 {
 	// bit 0 - parallel port A direction (0 = input)
 	// bit 1 - parallel port B direction (0 = input)
-	output_set_value("led1",data & 0x0400);
-	output_set_value("led2",data & 0x0800);
-	output_set_value("led3",data & 0x1000);
-	output_set_value("led4",data & 0x2000);
-	output_set_value("led5",data & 0x4000);
-	output_set_value("led6",data & 0x8000);
+	output().set_value("led1",data & 0x0400);
+	output().set_value("led2",data & 0x0800);
+	output().set_value("led3",data & 0x1000);
+	output().set_value("led4",data & 0x2000);
+	output().set_value("led5",data & 0x4000);
+	output().set_value("led6",data & 0x8000);
 }
 
 WRITE8_MEMBER( wicat_state::via_a_w )

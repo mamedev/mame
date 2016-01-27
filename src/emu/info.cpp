@@ -394,7 +394,7 @@ void info_xml_creator::output_devices()
 		device_iterator deviter(m_drivlist.config().root_device());
 		for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
 		{
-			if (device->owner() != nullptr && device->shortname()!= nullptr && strlen(device->shortname())!=0)
+			if (device->owner() != nullptr && device->shortname()!= nullptr && device->shortname()[0]!='\0')
 			{
 				if (shortnames.insert(device->shortname()).second)
 					output_one_device(*device, device->tag());
@@ -424,7 +424,7 @@ void info_xml_creator::output_devices()
 				device_iterator deviter2(*dev);
 				for (device_t *device = deviter2.first(); device != nullptr; device = deviter2.next())
 				{
-					if (device->owner() == dev && device->shortname()!= nullptr && strlen(device->shortname())!=0)
+					if (device->owner() == dev && device->shortname()!= nullptr && device->shortname()[0]!='\0')
 					{
 						if (shortnames.insert(device->shortname()).second)
 							output_one_device(*device, device->tag());
@@ -447,7 +447,7 @@ void info_xml_creator::output_device_roms()
 {
 	device_iterator deviter(m_drivlist.config().root_device());
 	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
-		if (device->owner() != nullptr && device->shortname()!= nullptr && strlen(device->shortname())!=0)
+		if (device->owner() != nullptr && device->shortname()!= nullptr && device->shortname()[0]!='\0')
 			fprintf(m_output, "\t\t<device_ref name=\"%s\"/>\n", xml_normalize_string(device->shortname()));
 }
 
@@ -572,8 +572,7 @@ void info_xml_creator::output_rom(device_t &device)
 				if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
 				{
 					// iterate over hash function types and print m_output their values
-					std::string tempstr;
-					strcatprintf(output," %s", hashes.attribute_string(tempstr));
+					output.append(" ").append(hashes.attribute_string());
 				}
 				else
 					output.append(" status=\"nodump\"");
@@ -620,7 +619,7 @@ void info_xml_creator::output_sample(device_t &device)
 		for (const char *samplename = iter.first(); samplename != nullptr; samplename = iter.next())
 		{
 			// filter out duplicates
-			if (already_printed.insert(samplename).second)
+			if (!already_printed.insert(samplename).second)
 				continue;
 
 			// output the sample name
@@ -1306,11 +1305,8 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 					fprintf(m_output, "\t\t\t<slotoption");
 					fprintf(m_output, " name=\"%s\"", xml_normalize_string(option->name()));
 					fprintf(m_output, " devname=\"%s\"", xml_normalize_string(dev->shortname()));
-					if (slot->default_option())
-					{
-						if (strcmp(slot->default_option(),option->name())==0)
-							fprintf(m_output, " default=\"yes\"");
-					}
+					if (slot->default_option() != nullptr && strcmp(slot->default_option(),option->name())==0)
+						fprintf(m_output, " default=\"yes\"");
 					fprintf(m_output, "/>\n");
 					const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), "dummy");
 				}

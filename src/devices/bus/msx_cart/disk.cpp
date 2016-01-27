@@ -335,7 +335,7 @@ void msx_cart_disk_type1::set_control(UINT8 data)
 
 	if ((old_m_control ^ m_control) & 0x40)
 	{
-		set_led_status(machine(), 0, !(m_control & 0x40));
+		machine().output().set_led_value(0, !(m_control & 0x40));
 	}
 }
 
@@ -495,7 +495,7 @@ void msx_cart_disk_type2::set_control(UINT8 data)
 
 	if ((old_m_control ^ m_control) & 0x40)
 	{
-		set_led_status(machine(), 0, !(m_control & 0x40));
+		machine().output().set_led_value(0, !(m_control & 0x40));
 	}
 }
 

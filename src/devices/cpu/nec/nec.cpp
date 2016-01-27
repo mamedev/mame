@@ -437,7 +437,7 @@ void nec_common_device::device_start()
 	m_icountptr = &m_icount;
 }
 
-void nec_common_device::state_string_export(const device_state_entry &entry, std::string &str)
+void nec_common_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	UINT16 flags = CompressFlags();
 

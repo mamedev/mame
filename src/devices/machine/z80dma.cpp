@@ -443,7 +443,7 @@ void z80dma_device::do_search()
 
 int z80dma_device::do_write()
 {
-	int done = 0;
+	int done;
 	UINT8 mode;
 
 	mode = TRANSFER_MODE;

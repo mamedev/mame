@@ -214,15 +214,15 @@ TIMER_CALLBACK_MEMBER( saturn_state::smpc_cd_enable )
 void saturn_state::smpc_system_reset()
 {
 	/*Only backup ram and SMPC ram are retained after that this command is issued.*/
-	memset(m_scu_regs ,0x00,0x000100);
-	memset(m_scsp_regs,0x00,0x001000);
+	memset(m_scu_regs.get() ,0x00,0x000100);
+	memset(m_scsp_regs.get(),0x00,0x001000);
 	memset(m_sound_ram,0x00,0x080000);
 	memset(m_workram_h,0x00,0x100000);
 	memset(m_workram_l,0x00,0x100000);
-	memset(m_vdp2_regs,0x00,0x040000);
-	memset(m_vdp2_vram,0x00,0x100000);
-	memset(m_vdp2_cram,0x00,0x080000);
-	memset(m_vdp1_vram,0x00,0x100000);
+	memset(m_vdp2_regs.get(),0x00,0x040000);
+	memset(m_vdp2_vram.get(),0x00,0x100000);
+	memset(m_vdp2_cram.get(),0x00,0x080000);
+	memset(m_vdp1_vram.get(),0x00,0x100000);
 	//A-Bus
 
 	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);

@@ -28,7 +28,7 @@ public:
 	UINT16   m_blitter_yparam[16];
 	UINT16   m_blitter_vidparam[32];
 
-	bitmap_ind16 *m_dstbitmap;
+	std::unique_ptr<bitmap_ind16> m_dstbitmap;
 	emu_timer *m_blitter_timer;
 
 	/* misc */

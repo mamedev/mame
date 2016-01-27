@@ -43,6 +43,10 @@ enum map_handler_type
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// forward declarations
+class validity_checker;
+
+
 // address map handler data
 class map_handler_data
 {
@@ -289,6 +293,7 @@ public:
 	simple_list<address_map_entry> m_entrylist; // list of entries
 
 	void uplift_submaps(running_machine &machine, device_t &device, device_t &owner, endianness_t endian);
+	void map_validity_check(validity_checker &valid, const device_t &device, address_spacenum spacenum) const;
 };
 
 
@@ -309,6 +314,7 @@ void ADDRESS_MAP_NAME(_name)(address_map &map, device_t &device) \
 	typedef write##_bits##_delegate write_delegate ATTR_UNUSED; \
 	address_map_entry##_bits *curentry = NULL; \
 	(void)curentry; \
+	assert(&device != nullptr); \
 	map.configure(_space, _bits); \
 	typedef _class drivdata_class ATTR_UNUSED;
 #define DEVICE_ADDRESS_MAP_START(_name, _bits, _class) \
@@ -318,6 +324,7 @@ void _class :: _name(::address_map &map, device_t &device) \
 	typedef write##_bits##_delegate write_delegate ATTR_UNUSED; \
 	address_map_entry##_bits *curentry = NULL; \
 	(void)curentry; \
+	assert(&device != nullptr); \
 	map.configure(AS_PROGRAM, _bits);  \
 	typedef _class drivdata_class ATTR_UNUSED;
 #define ADDRESS_MAP_END \

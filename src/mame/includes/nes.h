@@ -70,7 +70,7 @@ public:
 	ioport_port       *m_io_disksel;
 
 	UINT8      *m_vram;
-	UINT8      *m_ciram; //PPU nametable RAM - external to PPU!
+	std::unique_ptr<UINT8[]>    m_ciram; //PPU nametable RAM - external to PPU!
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;

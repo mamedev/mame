@@ -306,7 +306,7 @@ void arcadia_state::video_start()
 	{
 		int width = m_screen->width();
 		int height = m_screen->height();
-		m_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
+		m_bitmap = std::make_unique<bitmap_ind16>(width, height);
 	}
 }
 

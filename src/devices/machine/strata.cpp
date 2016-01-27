@@ -59,7 +59,7 @@ strataflash_device::strataflash_device(const machine_config &mconfig, const char
 
 void strataflash_device::nvram_default()
 {
-	memset(m_flashmemory, 0, COMPLETE_SIZE);
+	memset(m_flashmemory.get(), 0, COMPLETE_SIZE);
 }
 
 //-------------------------------------------------
@@ -69,7 +69,7 @@ void strataflash_device::nvram_default()
 
 void strataflash_device::nvram_read(emu_file &file)
 {
-	file.read(m_flashmemory, COMPLETE_SIZE);
+	file.read(m_flashmemory.get(), COMPLETE_SIZE);
 
 	// TODO
 
@@ -173,7 +173,7 @@ void strataflash_device::nvram_write(emu_file &file)
 	return 0;
 	*/
 
-	file.write(m_flashmemory, COMPLETE_SIZE);
+	file.write(m_flashmemory.get(), COMPLETE_SIZE);
 }
 
 //-------------------------------------------------
@@ -184,15 +184,15 @@ void strataflash_device::device_start(void)
 	m_mode = FM_NORMAL;
 	m_status = 0x80;
 	m_master_lock = 0;
-	m_flashmemory = auto_alloc_array(machine(), UINT8, COMPLETE_SIZE);
+	m_flashmemory = std::make_unique<UINT8[]>(COMPLETE_SIZE);
 
-	m_wrbuf = m_flashmemory + FEEPROM_SIZE;
+	m_wrbuf = m_flashmemory.get() + FEEPROM_SIZE;
 	m_prot_regs = m_wrbuf + WRBUF_SIZE;
 	m_blocklock = m_prot_regs + PROT_REGS_SIZE;
 
 	// clear various FEEPROM areas
 	memset(m_prot_regs, 0xff, 18);
-	memset(m_flashmemory, 0xff, FEEPROM_SIZE);
+	memset(m_flashmemory.get(), 0xff, FEEPROM_SIZE);
 	memset(m_blocklock, 0x00, BLOCKLOCK_SIZE);
 
 	// set-up factory-programmed protection register segment
@@ -234,7 +234,7 @@ UINT16 strataflash_device::read8_16(address_space& space, offs_t offset, bus_wid
 		case bw_8:
 			return m_flashmemory[BYTE_XOR_LE(offset)];
 		case bw_16:
-			return *(UINT16*)(m_flashmemory+offset);
+			return *(UINT16*)(m_flashmemory.get()+offset);
 		}
 		break;
 	case FM_READSTATUS:
@@ -562,7 +562,7 @@ void strataflash_device::write8_16(address_space& space, offs_t offset, UINT16 d
 				m_flashmemory[BYTE_XOR_LE(offset)] &= data;
 				break;
 			case bw_16:
-				*(UINT16*)(m_flashmemory+offset) &= data;
+				*(UINT16*)(m_flashmemory.get()+offset) &= data;
 				break;
 			}
 		}

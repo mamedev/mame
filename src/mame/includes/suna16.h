@@ -39,7 +39,7 @@ public:
 	optional_memory_bank m_bank2;
 
 
-	UINT16 *m_paletteram;
+	std::unique_ptr<UINT16[]> m_paletteram;
 	int m_color_bank;
 	UINT8 m_prot;
 

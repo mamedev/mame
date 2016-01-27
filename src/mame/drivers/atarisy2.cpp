@@ -338,8 +338,8 @@ READ8_MEMBER(atarisy2_state::switch_6502_r)
 
 WRITE8_MEMBER(atarisy2_state::switch_6502_w)
 {
-	set_led_status(machine(), 0, data & 0x04);
-	set_led_status(machine(), 1, data & 0x08);
+	output().set_led_value(0, data & 0x04);
+	output().set_led_value(1, data & 0x08);
 	if (m_has_tms5220)
 	{
 		data = 12 | ((data >> 5) & 1);
@@ -736,8 +736,8 @@ WRITE8_MEMBER(atarisy2_state::tms5220_strobe_w)
 
 WRITE8_MEMBER(atarisy2_state::coincount_w)
 {
-	coin_counter_w(machine(), 0, (data >> 0) & 1);
-	coin_counter_w(machine(), 1, (data >> 1) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 1);
+	machine().bookkeeping().coin_counter_w(1, (data >> 1) & 1);
 }
 
 

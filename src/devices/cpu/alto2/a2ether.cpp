@@ -600,7 +600,7 @@ void alto2_cpu_device::bs_early_eidfct()
 		m_eth.rx_packet[m_eth.rx_count] = r;
 	m_eth.rx_count++;
 	if (ALTO2_ETHER_PACKET_SIZE == m_eth.rx_count) {
-		dump_packet(this,"RX", m_eth.rx_packet, 0, m_eth.rx_count);
+		dump_packet(this,"RX", m_eth.rx_packet.get(), 0, m_eth.rx_count);
 		m_eth.rx_count = 0;
 	}
 #endif
@@ -709,7 +709,7 @@ void alto2_cpu_device::f2_late_eodfct()
 		m_eth.tx_packet[m_eth.tx_count] = m_bus;
 	m_eth.tx_count++;
 	if (ALTO2_ETHER_PACKET_SIZE == m_eth.tx_count) {
-		dump_packet(this,"TX", m_eth.tx_packet, 0, m_eth.tx_count);
+		dump_packet(this,"TX", m_eth.tx_packet.get(), 0, m_eth.tx_count);
 		m_eth.tx_count = 0;
 	}
 #endif
@@ -1338,8 +1338,8 @@ void alto2_cpu_device::init_ether(int task)
 
 	m_active_callback[task] = &alto2_cpu_device::activate_eth;
 
-	m_eth.rx_packet = auto_alloc_array(machine(), UINT16, sizeof(UINT16)*ALTO2_ETHER_PACKET_SIZE);
-	m_eth.tx_packet = auto_alloc_array(machine(), UINT16, sizeof(UINT16)*ALTO2_ETHER_PACKET_SIZE);
+	m_eth.rx_packet = std::make_unique<UINT16[]>(sizeof(UINT16)*ALTO2_ETHER_PACKET_SIZE);
+	m_eth.tx_packet = std::make_unique<UINT16[]>(sizeof(UINT16)*ALTO2_ETHER_PACKET_SIZE);
 
 	m_eth.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::tx_packet),this));
 	m_eth.tx_timer->reset();

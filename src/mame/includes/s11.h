@@ -60,10 +60,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pia40_pa_w);
 	DECLARE_WRITE8_MEMBER(pia40_pb_w);
 	DECLARE_WRITE_LINE_MEMBER(pia40_cb2_w);
-	DECLARE_READ8_MEMBER(dips_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_READ8_MEMBER(pia28_w7_r);
 	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pias_cb2_w);
@@ -179,8 +177,6 @@ public:
 	s11c_state(const machine_config &mconfig, device_type type, const char *tag)
 		: s11b_state(mconfig, type, tag)
 	{ }
-
-	DECLARE_WRITE8_MEMBER(bgbank_w);
 
 	DECLARE_MACHINE_RESET(s11c);
 	DECLARE_DRIVER_INIT(s11c);

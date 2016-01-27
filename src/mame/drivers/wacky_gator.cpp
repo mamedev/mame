@@ -106,7 +106,7 @@ WRITE8_MEMBER(wackygtr_state::status_lamps_w)
 
 	set_lamps(0, data & 0x3f);
 
-	coin_counter_w(machine(), 0, BIT(data, 6));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 6));
 	m_ticket->write(space, 0, data & 0x80);
 }
 
@@ -132,7 +132,7 @@ WRITE8_MEMBER(wackygtr_state::alligators_ctrl1_w)
 	m_pit8253_1->write_gate1(BIT(data, 3));
 	m_pit8253_1->write_gate2(BIT(data, 4));
 
-	coin_lockout_w(machine(), 0, data & 0x40 ? 0 : 1);
+	machine().bookkeeping().coin_lockout_w(0, data & 0x40 ? 0 : 1);
 }
 
 WRITE8_MEMBER(wackygtr_state::alligators_ctrl2_w)
@@ -157,7 +157,7 @@ void wackygtr_state::pmm8713_ck(int i, int state)
 		int alligator_state = m_motors_pos[i] / 10;
 		if (alligator_state > 5)    alligator_state = 5;
 		if (alligator_state < 0)    alligator_state = 0;
-		output_set_indexed_value("alligator", i, alligator_state);
+		output().set_indexed_value("alligator", i, alligator_state);
 	}
 }
 
@@ -190,14 +190,14 @@ void wackygtr_state::machine_reset()
 void wackygtr_state::set_digits(int p, UINT8 value)
 {
 	static UINT8 bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 };  // not accurate
-	output_set_digit_value(p + 0, bcd2hex[value & 0x0f]);
-	output_set_digit_value(p + 1, bcd2hex[(value >> 4) & 0x0f]);
+	output().set_digit_value(p + 0, bcd2hex[value & 0x0f]);
+	output().set_digit_value(p + 1, bcd2hex[(value >> 4) & 0x0f]);
 }
 
 void wackygtr_state::set_lamps(int p, UINT8 value)
 {
 	for(int i=0; i<8; i++)
-		output_set_lamp_value(p + i, BIT(value, i));
+		output().set_lamp_value(p + i, BIT(value, i));
 }
 
 static INPUT_PORTS_START( wackygtr )

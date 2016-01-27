@@ -56,7 +56,7 @@ public:
 WRITE8_MEMBER( cvicny_state::segment_w ) // output segments on the selected digit
 {
 	if (m_digit != m_digit_last)
-		output_set_digit_value(m_digit, data);
+		output().set_digit_value(m_digit, data);
 
 	m_digit_last = m_digit;
 }

@@ -130,7 +130,7 @@ elseif _OPTIONS["targetos"]=="linux" then
 		}
 	else
 		buildoptions {
-			backtick("pkg-config --cflags QtGui"),
+			backtick("pkg-config --cflags Qt5Widgets"),
 		}
 	end
 elseif _OPTIONS["targetos"]=="macosx" then

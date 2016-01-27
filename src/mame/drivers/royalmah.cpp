@@ -119,7 +119,7 @@ public:
 	UINT8 m_dsw_select;
 	UINT8 m_rombank;
 	int m_palette_base;
-	UINT8 *m_janptr96_nvram;
+	std::unique_ptr<UINT8[]> m_janptr96_nvram;
 	UINT8 m_suzume_bank;
 	UINT8 m_gfx_adr_l;
 	UINT8 m_gfx_adr_m;
@@ -273,7 +273,7 @@ PALETTE_INIT_MEMBER(royalmah_state,mjderngr)
 WRITE8_MEMBER(royalmah_state::royalmah_palbank_w)
 {
 	/* bit 1 = coin counter */
-	coin_counter_w(machine(), 0,data & 2);
+	machine().bookkeeping().coin_counter_w(0,data & 2);
 
 	/* bit 2 = flip screen */
 	m_flip_screen = (data & 4) >> 2;
@@ -286,7 +286,7 @@ WRITE8_MEMBER(royalmah_state::royalmah_palbank_w)
 WRITE8_MEMBER(royalmah_state::mjderngr_coin_w)
 {
 	/* bit 1 = coin counter */
-	coin_counter_w(machine(), 0,data & 2);
+	machine().bookkeeping().coin_counter_w(0,data & 2);
 
 	/* bit 2 = flip screen */
 	m_flip_screen = (data & 4) >> 2;
@@ -447,8 +447,8 @@ WRITE8_MEMBER(royalmah_state::mjapinky_palbank_w)
 {
 	m_flip_screen = (data & 4) >> 2;
 	m_palette_base = (data >> 3) & 0x01;
-	coin_counter_w(machine(), 0,data & 2);  // in
-	coin_counter_w(machine(), 1,data & 1);  // out
+	machine().bookkeeping().coin_counter_w(0,data & 2);  // in
+	machine().bookkeeping().coin_counter_w(1,data & 1);  // out
 }
 
 READ8_MEMBER(royalmah_state::mjapinky_dsw_r)
@@ -883,7 +883,7 @@ WRITE8_MEMBER(royalmah_state::janptr96_rombank_w)
 
 WRITE8_MEMBER(royalmah_state::janptr96_rambank_w)
 {
-	membank("bank2")->set_base(m_janptr96_nvram + 0x1000 + 0x1000 * data);
+	membank("bank2")->set_base(m_janptr96_nvram.get() + 0x1000 + 0x1000 * data);
 }
 
 READ8_MEMBER(royalmah_state::janptr96_unknown_r)
@@ -895,8 +895,8 @@ READ8_MEMBER(royalmah_state::janptr96_unknown_r)
 WRITE8_MEMBER(royalmah_state::janptr96_coin_counter_w)
 {
 	m_flip_screen = (data & 4) >> 2;
-	coin_counter_w(machine(), 0,data & 2);  // in
-	coin_counter_w(machine(), 1,data & 1);  // out
+	machine().bookkeeping().coin_counter_w(0,data & 2);  // in
+	machine().bookkeeping().coin_counter_w(1,data & 1);  // out
 }
 
 static ADDRESS_MAP_START( janptr96_iomap, AS_IO, 8, royalmah_state )
@@ -922,8 +922,8 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(royalmah_state::mjifb_coin_counter_w)
 {
 	m_flip_screen = ((data & 4) >> 2) ^ 1;
-	coin_counter_w(machine(), 0,data & 2);  // in
-	coin_counter_w(machine(), 1,data & 1);  // out
+	machine().bookkeeping().coin_counter_w(0,data & 2);  // in
+	machine().bookkeeping().coin_counter_w(1,data & 1);  // out
 }
 
 READ8_MEMBER(royalmah_state::mjifb_rom_io_r)
@@ -1260,8 +1260,8 @@ WRITE8_MEMBER(royalmah_state::mjvegasa_rom_io_w)
 WRITE8_MEMBER(royalmah_state::mjvegasa_coin_counter_w)
 {
 	m_flip_screen = (data & 4) >> 2;
-	coin_counter_w(machine(), 0,data & 2);  // in
-	coin_counter_w(machine(), 1,data & 1);  // out
+	machine().bookkeeping().coin_counter_w(0,data & 2);  // in
+	machine().bookkeeping().coin_counter_w(1,data & 1);  // out
 }
 
 // hopper?
@@ -4901,9 +4901,9 @@ DRIVER_INIT_MEMBER(royalmah_state,ippatsu)
 
 DRIVER_INIT_MEMBER(royalmah_state,janptr96)
 {
-	m_janptr96_nvram = auto_alloc_array(machine(), UINT8, 0x1000 * 9);
-	membank("bank3")->set_base(m_janptr96_nvram);
-	machine().device<nvram_device>("nvram")->set_base(m_janptr96_nvram, 0x1000 * 9);
+	m_janptr96_nvram = std::make_unique<UINT8[]>(0x1000 * 9);
+	membank("bank3")->set_base(m_janptr96_nvram.get());
+	machine().device<nvram_device>("nvram")->set_base(m_janptr96_nvram.get(), 0x1000 * 9);
 }
 
 GAME( 1981,  royalmj,  0,        royalmah, royalmah, driver_device,  0,        ROT0,   "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )

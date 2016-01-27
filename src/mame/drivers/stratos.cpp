@@ -28,7 +28,7 @@ public:
 	required_memory_bank bank_4000;
 	required_memory_bank nvram_bank;
 
-	UINT8 *nvram_data;
+	std::unique_ptr<UINT8[]> nvram_data;
 	UINT8 control, led_latch_control;
 	UINT32 individual_leds;
 	UINT8 latch_AH_red, latch_AH_green, latch_18_red, latch_18_green;
@@ -52,12 +52,12 @@ public:
 
 DRIVER_INIT_MEMBER( stratos_state, stratos )
 {
-	nvram_data = auto_alloc_array(machine(), UINT8, 0x2000);
-	nvram->set_base(nvram_data, 0x2000);
+	nvram_data = std::make_unique<UINT8[]>(0x2000);
+	nvram->set_base(nvram_data.get(), 0x2000);
 
 	bank_8000 ->configure_entries(0, 4, memregion("roms_8000")->base(), 0x8000);
 	bank_4000 ->configure_entries(0, 4, memregion("roms_4000")->base(), 0x4000);
-	nvram_bank->configure_entries(0, 2, nvram_data,                     0x1000);
+	nvram_bank->configure_entries(0, 2, nvram_data.get(),               0x1000);
 }
 
 void stratos_state::machine_reset()

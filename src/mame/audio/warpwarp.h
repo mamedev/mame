@@ -24,7 +24,7 @@ protected:
 
 private:
 	// internal state
-	UINT16 *m_decay;
+	std::unique_ptr<UINT16[]> m_decay;
 	sound_stream *m_channel;
 	int m_sound_latch;
 	int m_sound_signal;
@@ -67,7 +67,7 @@ protected:
 
 private:
 	// internal state
-	INT16 *m_decay;
+	std::unique_ptr<INT16[]> m_decay;
 	sound_stream *m_channel;
 	int m_sound_latch;
 	int m_music1_latch;

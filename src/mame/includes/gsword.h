@@ -78,5 +78,4 @@ public:
 	UINT32 screen_update_gsword(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gsword_snd_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	int coins_in(void); //if 0'd
 };

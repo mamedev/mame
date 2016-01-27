@@ -213,7 +213,7 @@ protected:
 	//! device (P)ROMs
 	virtual const rom_entry *device_rom_region() const override;
 	//! device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	//! device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
@@ -231,7 +231,7 @@ private:
 	address_space* m_iomem;
 
 	UINT8* m_ucode_crom;
-	UINT8* m_ucode_cram;
+	std::unique_ptr<UINT8[]> m_ucode_cram;
 	UINT8* m_const_data;
 
 	//! read microcode CROM
@@ -251,12 +251,6 @@ private:
 
 	//!< write i/o space RAM
 	DECLARE_WRITE16_MEMBER( ioram_w );
-
-	//!< read memory mapped i/o
-	DECLARE_READ16_MEMBER ( mmio_r );
-
-	//!< write memory mapped i/o
-	DECLARE_WRITE16_MEMBER( mmio_w );
 
 	int m_icount;
 

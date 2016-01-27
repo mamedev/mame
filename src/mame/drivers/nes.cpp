@@ -184,7 +184,7 @@ void nes_state::setup_disk(nes_disksys_device *slot)
 		slot->vram_alloc(0x2000);
 		slot->prgram_alloc(0x8000);
 
-		slot->pcb_start(machine(), m_ciram, FALSE);
+		slot->pcb_start(machine(), m_ciram.get(), FALSE);
 		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(device_nes_cart_interface::chr_r),(device_nes_cart_interface *)slot), write8_delegate(FUNC(device_nes_cart_interface::chr_w),(device_nes_cart_interface *)slot));
 		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(device_nes_cart_interface::nt_r),(device_nes_cart_interface *)slot), write8_delegate(FUNC(device_nes_cart_interface::nt_w),(device_nes_cart_interface *)slot));
 		m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(device_nes_cart_interface::scanline_irq),(device_nes_cart_interface *)slot));
@@ -196,13 +196,13 @@ void nes_state::setup_disk(nes_disksys_device *slot)
 
 MACHINE_START_MEMBER( nes_state, fds )
 {
-	m_ciram = auto_alloc_array(machine(), UINT8, 0x800);
+	m_ciram = std::make_unique<UINT8[]>(0x800);
 	m_io_disksel = ioport("FLIPDISK");
 	setup_disk(m_disk);
 
 	// register saves
 	save_item(NAME(m_last_frame_flip));
-	save_pointer(NAME(m_ciram), 0x800);
+	save_pointer(NAME(m_ciram.get()), 0x800);
 }
 
 MACHINE_RESET_MEMBER( nes_state, fds )

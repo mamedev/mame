@@ -90,9 +90,9 @@ public:
 	DECLARE_WRITE8_MEMBER( banksel_w );
 
 	UINT8 m_video_bank;
-	UINT8 *m_color_ram_r;
-	UINT8 *m_color_ram_g;
-	UINT8 *m_color_ram_b;
+	std::unique_ptr<UINT8[]> m_color_ram_r;
+	std::unique_ptr<UINT8[]> m_color_ram_g;
+	std::unique_ptr<UINT8[]> m_color_ram_b;
 };
 
 
@@ -636,16 +636,16 @@ void jtces40_state::video_start()
 {
 	/* allocate memory */
 	m_video_ram.allocate(JTC_ES40_VIDEORAM_SIZE);
-	m_color_ram_r = auto_alloc_array(machine(), UINT8, JTC_ES40_VIDEORAM_SIZE);
-	m_color_ram_g = auto_alloc_array(machine(), UINT8, JTC_ES40_VIDEORAM_SIZE);
-	m_color_ram_b = auto_alloc_array(machine(), UINT8, JTC_ES40_VIDEORAM_SIZE);
+	m_color_ram_r = std::make_unique<UINT8[]>(JTC_ES40_VIDEORAM_SIZE);
+	m_color_ram_g = std::make_unique<UINT8[]>(JTC_ES40_VIDEORAM_SIZE);
+	m_color_ram_b = std::make_unique<UINT8[]>(JTC_ES40_VIDEORAM_SIZE);
 
 	/* register for state saving */
 	save_item(NAME(m_video_bank));
 	save_pointer(NAME(m_video_ram.target()), JTC_ES40_VIDEORAM_SIZE);
-	save_pointer(NAME(m_color_ram_r), JTC_ES40_VIDEORAM_SIZE);
-	save_pointer(NAME(m_color_ram_g), JTC_ES40_VIDEORAM_SIZE);
-	save_pointer(NAME(m_color_ram_b), JTC_ES40_VIDEORAM_SIZE);
+	save_pointer(NAME(m_color_ram_r.get()), JTC_ES40_VIDEORAM_SIZE);
+	save_pointer(NAME(m_color_ram_g.get()), JTC_ES40_VIDEORAM_SIZE);
+	save_pointer(NAME(m_color_ram_b.get()), JTC_ES40_VIDEORAM_SIZE);
 	save_item(NAME(m_centronics_busy));
 }
 

@@ -224,11 +224,11 @@
 
 VIDEO_START_MEMBER(x1_state,x1)
 {
-	m_avram = auto_alloc_array_clear(machine(), UINT8, 0x800);
-	m_tvram = auto_alloc_array_clear(machine(), UINT8, 0x800);
-	m_kvram = auto_alloc_array_clear(machine(), UINT8, 0x800);
-	m_gfx_bitmap_ram = auto_alloc_array_clear(machine(), UINT8, 0xc000*2);
-	m_pal_4096 = auto_alloc_array_clear(machine(), UINT8, 0x1000*3);
+	m_avram = make_unique_clear<UINT8[]>(0x800);
+	m_tvram = make_unique_clear<UINT8[]>(0x800);
+	m_kvram = make_unique_clear<UINT8[]>(0x800);
+	m_gfx_bitmap_ram = make_unique_clear<UINT8[]>(0xc000*2);
+	m_pal_4096 = make_unique_clear<UINT8[]>(0x1000*3);
 }
 
 void x1_state::x1_draw_pixel(bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height)
@@ -340,7 +340,7 @@ void x1_state::draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprect)
 			int width = BIT(m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 7);
 			int height = BIT(m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 6);
 			int pcg_bank = BIT(m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 5);
-			UINT8 *gfx_data = pcg_bank ? m_pcg_ram : m_cg_rom; //machine.root_device().memregion(pcg_bank ? "pcg" : "cgrom")->base();
+			UINT8 *gfx_data = pcg_bank ? m_pcg_ram.get() : m_cg_rom; //machine.root_device().memregion(pcg_bank ? "pcg" : "cgrom")->base();
 			int knj_enable = 0;
 			int knj_side = 0;
 			int knj_bank = 0;
@@ -1041,6 +1041,7 @@ WRITE8_MEMBER( x1_state::x1_fdc_w )
 			break;
 
 		case 0x0ffc:
+			m_fdc_ctrl = data;
 			switch (data & 0x03)
 			{
 			case 0: floppy = m_floppy0->get_device(); break;
@@ -1069,6 +1070,22 @@ WRITE8_MEMBER( x1_state::x1_fdc_w )
 WRITE_LINE_MEMBER(x1_state::fdc_drq_w)
 {
 	m_dma->rdy_w(state ^ 1);
+}
+
+WRITE_LINE_MEMBER(x1_state::hdl_w)
+{
+	floppy_image_device *floppy = nullptr;
+
+	if(!state)
+		return;
+	switch (m_fdc_ctrl & 0x03)
+	{
+	case 0: floppy = m_floppy0->get_device(); break;
+	case 1: floppy = m_floppy1->get_device(); break;
+	case 2: floppy = m_floppy2->get_device(); break;
+	case 3: floppy = m_floppy3->get_device(); break;
+	}
+	floppy->mon_w(CLEAR_LINE);
 }
 
 /*************************************
@@ -1132,7 +1149,7 @@ READ8_MEMBER( x1_state::x1_pcg_r )
 		UINT8 y_char_size;
 
 		/* addr == 0 reads from the ANK rom */
-		gfx_data = addr == 0 ? m_cg_rom : m_pcg_ram;
+		gfx_data = addr == 0 ? m_cg_rom : m_pcg_ram.get();
 		y_char_size = ((m_crtc_vreg[9]+1) > 8) ? 8 : m_crtc_vreg[9]+1;
 		if(y_char_size == 0) { y_char_size = 1; }
 		pcg_offset = m_tvram[get_pcg_addr(m_crtc_vreg[1], y_char_size)]*8;
@@ -2332,7 +2349,7 @@ MACHINE_RESET_MEMBER(x1_state,x1)
 	//UINT8 *ROM = memregion("x1_cpu")->base();
 	int i;
 
-	memset(m_gfx_bitmap_ram,0x00,0xc000*2);
+	memset(m_gfx_bitmap_ram.get(),0x00,0xc000*2);
 
 	for(i=0;i<0x1800;i++)
 	{
@@ -2410,17 +2427,17 @@ MACHINE_START_MEMBER(x1_state,x1)
 	}
 
 	m_ipl_rom = memregion("ipl")->base();
-	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000*0x10);
-	m_emm_ram = auto_alloc_array_clear(machine(), UINT8, 0x1000000);
-	m_pcg_ram = auto_alloc_array_clear(machine(), UINT8, 0x1800);
+	m_work_ram = make_unique_clear<UINT8[]>(0x10000*0x10);
+	m_emm_ram = make_unique_clear<UINT8[]>(0x1000000);
+	m_pcg_ram = make_unique_clear<UINT8[]>(0x1800);
 	m_cg_rom = memregion("cgrom")->base();
 	m_kanji_rom = memregion("kanji")->base();
 
-	save_pointer(NAME(m_work_ram), 0x10000*0x10);
-	save_pointer(NAME(m_emm_ram), 0x1000000);
-	save_pointer(NAME(m_pcg_ram), 0x1800);
+	save_pointer(NAME(m_work_ram.get()), 0x10000*0x10);
+	save_pointer(NAME(m_emm_ram.get()), 0x1000000);
+	save_pointer(NAME(m_pcg_ram.get()), 0x1800);
 
-	m_gfxdecode->set_gfx(3, global_alloc(gfx_element(m_palette, x1_pcg_8x8, (UINT8 *)m_pcg_ram, 0, 1, 0)));
+	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(m_palette, x1_pcg_8x8, m_pcg_ram.get(), 0, 1, 0));
 }
 
 PALETTE_INIT_MEMBER(x1_state,x1)
@@ -2485,6 +2502,7 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)
 
 	MCFG_MB8877_ADD("fdc", MAIN_CLOCK / 16)
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(x1_state, hdl_w)) // XXX: wag
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", x1_floppies, "dd", x1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", x1_floppies, "dd", x1_state::floppy_formats)

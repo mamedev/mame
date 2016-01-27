@@ -81,7 +81,7 @@ void sms_rapid_fire_device::device_start()
 
 UINT8 sms_rapid_fire_device::peripheral_r()
 {
-	UINT8 data = 0xff;
+	UINT8 data;
 
 	int num_intervals = (machine().time() - m_start_time).as_double() / m_interval.as_double();
 	m_read_state = num_intervals & 1;

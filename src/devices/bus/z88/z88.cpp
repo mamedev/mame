@@ -121,7 +121,7 @@ bool z88cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		offs_t read_length = 0;
+		offs_t read_length;
 		UINT8 *cart_base = m_cart->get_cart_base();
 
 		if (cart_base != nullptr)
@@ -158,7 +158,11 @@ bool z88cart_slot_device::call_load()
 void z88cart_slot_device::call_unload()
 {
 	if (m_cart)
-		memset(m_cart->get_cart_base(), 0xff, m_cart->get_cart_size());
+	{
+		auto cart_size = m_cart->get_cart_size();
+		if (cart_size>0)
+			memset(m_cart->get_cart_base(), 0xff, cart_size);
+	}
 
 	// open the flap
 	m_out_flp_cb(ASSERT_LINE);
@@ -174,7 +178,7 @@ void z88cart_slot_device::call_unload()
 
 bool z88cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry );
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
@@ -182,9 +186,9 @@ bool z88cart_slot_device::call_softlist_load(software_list_device &swlist, const
     get default card software
 -------------------------------------------------*/
 
-void z88cart_slot_device::get_default_card_software(std::string &result)
+std::string z88cart_slot_device::get_default_card_software()
 {
-	software_get_default_slot(result, "128krom");
+	return software_get_default_slot("128krom");
 }
 
 

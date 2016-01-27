@@ -103,7 +103,7 @@ void ramdac_device::device_validity_check(validity_checker &valid) const
 
 void ramdac_device::device_start()
 {
-	m_palram = auto_alloc_array_clear(machine(), UINT8, 1 << 10);
+	m_palram = make_unique_clear<UINT8[]>(1 << 10);
 
 }
 

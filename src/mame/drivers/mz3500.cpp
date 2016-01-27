@@ -67,8 +67,8 @@ public:
 
 	UINT8 *m_ipl_rom;
 	UINT8 *m_basic_rom;
-	UINT8 *m_work_ram;
-	UINT8 *m_shared_ram;
+	std::unique_ptr<UINT8[]> m_work_ram;
+	std::unique_ptr<UINT8[]> m_shared_ram;
 	UINT8 *m_char_rom;
 
 	UINT8 m_ma,m_mo,m_ms,m_me2,m_me1;
@@ -741,8 +741,8 @@ void mz3500_state::machine_start()
 	m_ipl_rom = memregion("ipl")->base();
 	m_basic_rom = memregion("basic")->base();
 	m_char_rom = memregion("gfx1")->base();
-	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x40000);
-	m_shared_ram = auto_alloc_array_clear(machine(), UINT8, 0x800);
+	m_work_ram = make_unique_clear<UINT8[]>(0x40000);
+	m_shared_ram = make_unique_clear<UINT8[]>(0x800);
 
 	static const char *const m_fddnames[4] = { "upd765a:0", "upd765a:1", "upd765a:2", "upd765a:3"};
 
@@ -780,7 +780,6 @@ void mz3500_state::machine_reset()
 		}
 	}
 
-	m_beeper->set_frequency(2400);
 	m_beeper->set_state(0);
 }
 
@@ -848,7 +847,7 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 

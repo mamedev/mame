@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski,Tatsuyuki Satoh
 #define YM2610B_WARNING
 
@@ -1112,7 +1112,7 @@ static inline void advance_lfo(FM_OPN *OPN)
 static void advance_eg_channel(FM_OPN *OPN, FM_SLOT *SLOT)
 {
 	unsigned int out;
-	unsigned int swap_flag = 0;
+	unsigned int swap_flag;
 	unsigned int i;
 
 
@@ -2263,7 +2263,7 @@ void * ym2203_init(void *param, device_t *device, int clock, int rate,
 	YM2203 *F2203;
 
 	/* allocate ym2203 state space */
-	F2203 = auto_alloc_clear(device->machine(), YM2203);
+	F2203 = auto_alloc_clear(device->machine(), <YM2203>());
 
 	if( !init_tables() )
 	{
@@ -2941,7 +2941,7 @@ void * ym2608_init(void *param, device_t *device, int clock, int rate,
 	YM2608 *F2608;
 
 	/* allocate extend state space */
-	F2608 = auto_alloc_clear(device->machine(), YM2608);
+	F2608 = auto_alloc_clear(device->machine(), <YM2608>());
 	/* allocate total level table (128kb space) */
 	if( !init_tables() )
 	{
@@ -2949,6 +2949,7 @@ void * ym2608_init(void *param, device_t *device, int clock, int rate,
 		return nullptr;
 	}
 
+	F2608->device = device;
 	F2608->OPN.ST.param = param;
 	F2608->OPN.type = TYPE_YM2608;
 	F2608->OPN.P_CH = F2608->CH;
@@ -3072,7 +3073,7 @@ void ym2608_reset_chip(void *chip)
 	DELTAT->output_pointer = OPN->out_delta;
 	DELTAT->portshift = 5;      /* always 5bits shift */ /* ASG */
 	DELTAT->output_range = 1<<23;
-	YM_DELTAT_ADPCM_Reset(DELTAT,OUTD_CENTER,YM_DELTAT_EMULATION_MODE_NORMAL,DELTAT->device);
+	YM_DELTAT_ADPCM_Reset(DELTAT,OUTD_CENTER,YM_DELTAT_EMULATION_MODE_NORMAL,F2608->device);
 }
 
 /* YM2608 write */
@@ -3622,7 +3623,7 @@ void *ym2610_init(void *param, device_t *device, int clock, int rate,
 	YM2610 *F2610;
 
 	/* allocate extend state space */
-	F2610 = auto_alloc_clear(device->machine(), YM2610);
+	F2610 = auto_alloc_clear(device->machine(), <YM2610>());
 	/* allocate total level table (128kb space) */
 	if( !init_tables() )
 	{
@@ -3685,14 +3686,21 @@ void ym2610_reset_chip(void *chip)
 	F2610->pcmbuf = (const UINT8 *)dev->machine().root_device().memregion(name.c_str())->base();
 	F2610->pcm_size = dev->machine().root_device().memregion(name.c_str())->bytes();
 	name.append(".deltat");
-	F2610->deltaT.memory = (UINT8 *)dev->machine().root_device().memregion(name.c_str())->base();
+	memory_region *deltat_region = dev->machine().root_device().memregion(name.c_str());
+	F2610->deltaT.memory = nullptr;
+	if (deltat_region != nullptr)
+	{
+		F2610->deltaT.memory = (UINT8 *)dev->machine().root_device().memregion(name.c_str())->base();
+	}
 	if(F2610->deltaT.memory == nullptr)
 	{
 		F2610->deltaT.memory = (UINT8*)F2610->pcmbuf;
 		F2610->deltaT.memory_size = F2610->pcm_size;
 	}
 	else
+	{
 		F2610->deltaT.memory_size = dev->machine().root_device().memregion(name.c_str())->bytes();
+	}
 
 	/* Reset Prescaler */
 	OPNSetPres( OPN, 6*24, 6*24, 4*2); /* OPN 1/6 , SSG 1/4 */

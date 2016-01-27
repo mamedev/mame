@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 /***************************************************************************
 
@@ -96,7 +96,7 @@ WRITE8_MEMBER(tankbust_state::e0xx_w)
 		break;
 
 	case 2: /* 0xe002 coin counter */
-		coin_counter_w(machine(), 0, data&1);
+		machine().bookkeeping().coin_counter_w(0, data&1);
 		break;
 
 	case 6: /* 0xe006 screen disable ?? or disable screen update */

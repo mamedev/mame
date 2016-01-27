@@ -43,7 +43,7 @@ public:
 	UINT16 m_coin_word;
 	UINT16 m_frame_counter;
 	UINT16 m_port_sel;
-	struct gfx_tempsprite *m_spritelist;
+	std::unique_ptr<gfx_tempsprite[]> m_spritelist;
 	UINT16 m_rotate_ctrl[8];
 	rectangle m_hack_cliprect;
 

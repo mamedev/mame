@@ -127,7 +127,7 @@ void adc12138_device::convert(int channel, int bits16, int lsbfirst)
 {
 	int bits;
 	int input_value;
-	double input = 0;
+	double input;
 
 	if (bits16)
 		fatalerror("ADC1213X: 16-bit mode not supported\n");

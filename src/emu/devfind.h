@@ -83,8 +83,9 @@ public:
 
 	virtual _ObjectClass *operator->() const { assert(m_target != nullptr); return m_target; }
 
-	// getter for explicit fetching
+	// getters for explicit fetching
 	_ObjectClass *target() const { return m_target; }
+	bool found() const { return m_target != nullptr; }
 
 	// setter for setting the object
 	void set_target(_ObjectClass *target) { m_target = target; }
@@ -270,7 +271,7 @@ public:
 	{
 		for (int index = 0; index < _Count; index++)
 		{
-			strformat(m_tag[index], "%s.%d", basetag, index);
+			strprintf(m_tag[index], "%s.%d", basetag, index);
 			m_array[index] = std::make_unique<ioport_finder_type>(base, m_tag[index].c_str());
 		}
 	}
@@ -441,7 +442,7 @@ public:
 	{
 		for (int index = 0; index < _Count; index++)
 		{
-			strformat(m_tag[index],"%s.%d", basetag, index);
+			strprintf(m_tag[index],"%s.%d", basetag, index);
 			m_array[index] = std::make_unique<shared_ptr_type>(base, m_tag[index].c_str(), width);
 		}
 	}

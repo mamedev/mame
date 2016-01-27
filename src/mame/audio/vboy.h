@@ -88,9 +88,6 @@ protected:
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-	// inline data
-	s_sreg sound_registers(void);
-
 	s_snd_channel snd_channel[5];
 
 	UINT16 waveFreq2LenTbl[2048];

@@ -70,8 +70,6 @@ public:
 	DECLARE_MACHINE_START(ut88mini);
 	DECLARE_MACHINE_RESET(ut88mini);
 	UINT32 screen_update_ut88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(ut88_reset);
-	TIMER_CALLBACK_MEMBER(update_display);
 
 protected:
 	required_memory_region m_region_maincpu;

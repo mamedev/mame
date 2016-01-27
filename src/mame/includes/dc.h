@@ -57,7 +57,6 @@ class dc_state : public driver_device
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(g2_dma_irq);
 	TIMER_CALLBACK_MEMBER(ch2_dma_irq);
-	TIMER_CALLBACK_MEMBER(yuv_fifo_irq);
 	DECLARE_READ32_MEMBER(dc_aica_reg_r);
 	DECLARE_WRITE32_MEMBER(dc_aica_reg_w);
 	DECLARE_READ32_MEMBER(dc_arm_aica_r);

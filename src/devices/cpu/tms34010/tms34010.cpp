@@ -592,14 +592,13 @@ void tms340x0_device::device_start()
 		state_add(TMS34010_ST,     "ST",        m_st);
 		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_st).noshow().formatstr("%18s");
 
-		std::string tempstr;
 		for (int regnum = 0; regnum < 15; regnum++)
 		{
-			state_add(TMS34010_A0 + regnum, strformat(tempstr, "A%d", regnum).c_str(), m_regs[regnum].reg);
+			state_add(TMS34010_A0 + regnum, strformat("A%d", regnum).c_str(), m_regs[regnum].reg);
 		}
 		for (int regnum = 0; regnum < 15; regnum++)
 		{
-			state_add(TMS34010_B0 + regnum, strformat(tempstr, "B%d", regnum).c_str(), m_regs[30 - regnum].reg);
+			state_add(TMS34010_B0 + regnum, strformat("B%d", regnum).c_str(), m_regs[30 - regnum].reg);
 		}
 	}
 
@@ -1005,7 +1004,7 @@ void tms340x0_device::get_display_params(tms34010_display_params *params)
 
 UINT32 tms340x0_device::tms340x0_ind16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pen_t blackpen = screen.palette()->black_pen();
+	pen_t blackpen = screen.palette().black_pen();
 	tms34010_display_params params;
 	int x;
 
@@ -1599,7 +1598,7 @@ READ16_MEMBER( tms340x0_device::host_r )
 }
 
 
-void tms340x0_device::state_string_export(const device_state_entry &entry, std::string &str)
+void tms340x0_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

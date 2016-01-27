@@ -208,7 +208,7 @@ bool vectrex_cart_slot_device::call_load()
 
 bool vectrex_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 	return TRUE;
 }
 
@@ -217,11 +217,11 @@ bool vectrex_cart_slot_device::call_softlist_load(software_list_device &swlist, 
  get default card software
  -------------------------------------------------*/
 
-void vectrex_cart_slot_device::get_default_card_software(std::string &result)
+std::string vectrex_cart_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "vec_rom";
+		const char *slot_string;
 		UINT32 size = core_fsize(m_file);
 		dynamic_buffer rom(size);
 		int type = VECTREX_STD;
@@ -238,11 +238,10 @@ void vectrex_cart_slot_device::get_default_card_software(std::string &result)
 		//printf("type: %s\n", slot_string);
 		clear();
 
-		result.assign(slot_string);
-		return;
+		return std::string(slot_string);
 	}
 
-	software_get_default_slot(result, "vec_rom");
+	return software_get_default_slot("vec_rom");
 }
 
 /*-------------------------------------------------

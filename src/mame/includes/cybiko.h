@@ -61,7 +61,6 @@ public:
 		m_input(*this, "A")
 	{ }
 
-	DECLARE_READ16_MEMBER(serflash_r);
 	DECLARE_WRITE16_MEMBER(serflash_w);
 	DECLARE_READ16_MEMBER(clock_r);
 	DECLARE_WRITE16_MEMBER(clock_w);

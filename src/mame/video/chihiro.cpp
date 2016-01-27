@@ -1250,7 +1250,7 @@ inline UINT8 *nv2a_renderer::read_pixel(int x, int y, INT32 c[4])
 
 	if (type_rendertarget == NV2A_RT_TYPE::SWIZZLED)
 		offset = (dilated0[dilate_rendertarget][x] + dilated1[dilate_rendertarget][y]) * bytespixel_rendertarget;
-	else // type_rendertarget == LINEAR*/
+	else // type_rendertarget == LINEAR
 		offset = pitch_rendertarget * y + x * bytespixel_rendertarget;
 	switch (colorformat_rendertarget) {
 	case NV2A_COLOR_FORMAT::R5G6B5:
@@ -2197,9 +2197,9 @@ int nv2a_renderer::read_vertices_0x1800(address_space & space, vertex_nv *destin
 	for (m = 0; m < limit; m++) {
 		if (indexesleft_count == 0) {
 			data = space.read_dword(address);
-			i = (indexesleft_first + indexesleft_count) & 7;
-			indexesleft[i] = data & 0xffff;
-			indexesleft[(i + 1) & 7] = (data >> 16) & 0xffff;
+			i = indexesleft_first + indexesleft_count;
+			indexesleft[i & 1023] = data & 0xffff;
+			indexesleft[(i + 1) & 1023] = (data >> 16) & 0xffff;
 			indexesleft_count = indexesleft_count + 2;
 			address += 4;
 			c++;
@@ -2211,7 +2211,7 @@ int nv2a_renderer::read_vertices_0x1800(address_space & space, vertex_nv *destin
 			}
 			b = b >> 1;
 		}
-		indexesleft_first = (indexesleft_first + 1) & 7;
+		indexesleft_first = (indexesleft_first + 1) & 1023;
 		indexesleft_count--;
 	}
 	return (int)c;
@@ -2231,8 +2231,8 @@ int nv2a_renderer::read_vertices_0x1808(address_space & space, vertex_nv *destin
 	for (m = 0; m < limit; m++) {
 		if (indexesleft_count == 0) {
 			data = space.read_dword(address);
-			i = (indexesleft_first + indexesleft_count) & 7;
-			indexesleft[i] = data;
+			i = indexesleft_first + indexesleft_count;
+			indexesleft[i & 1023] = data;
 			indexesleft_count = indexesleft_count + 1;
 			address += 4;
 			c++;
@@ -2244,7 +2244,7 @@ int nv2a_renderer::read_vertices_0x1808(address_space & space, vertex_nv *destin
 			}
 			b = b >> 1;
 		}
-		indexesleft_first = (indexesleft_first + 1) & 7;
+		indexesleft_first = (indexesleft_first + 1) & 1023;
 		indexesleft_count--;
 	}
 	return (int)c;
@@ -2298,6 +2298,7 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, vertex_t *destinati
 {
 	vertex_nv vert[4];
 	int m, u;
+	float t[4],v[4];
 
 	// take each vertex with its attributes and obtain data for drawing
 	// should use either the vertex program or transformation matrices
@@ -2305,15 +2306,33 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, vertex_t *destinati
 		// transformation matrices
 		// it is not implemented, so we pretend its always using screen coordinates
 		for (m = 0; m < count; m++) {
-			destination[m].x = source[m].attribute[0].fv[0];
-			destination[m].y = source[m].attribute[0].fv[1];
+			for (int i = 0; i < 4; i++) {
+				t[i] = 0;
+				for (int j = 0; j < 4; j++)
+					t[i] += matrix.modelview[i][j] * source[m].attribute[0].fv[j];
+			};
+			for (int i = 0; i < 4; i++) {
+				v[i] = 0;
+				for (int j = 0; j < 4; j++)
+					v[i] += matrix.projection[i][j] * t[j];
+			};
+			/*
+			for (int i = 0; i < 4; i++) {
+			    v[i] *= matrix.scale[i];
+			}
+			for (int i = 0; i < 4; i++) {
+			    v[i] += matrix.translate[i];
+			}
+			*/
+			destination[m].x = v[0] / v[3]; // source[m].attribute[0].fv[0];
+			destination[m].y = v[1] / v[3]; // source[m].attribute[0].fv[1];
 			for (u = (int)VERTEX_PARAMETER::PARAM_COLOR_B; u <= (int)VERTEX_PARAMETER::PARAM_COLOR_A; u++) // 0=b 1=g 2=r 3=a
 				destination[m].p[u] = source[m].attribute[3].fv[u];
 			for (u = 0; u < 4; u++) {
 				destination[m].p[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + u * 2] = source[m].attribute[9 + u].fv[0];
 				destination[m].p[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + u * 2] = source[m].attribute[9 + u].fv[1];
 			}
-			destination[m].p[(int)VERTEX_PARAMETER::PARAM_Z] = 0xffffff;
+			destination[m].p[(int)VERTEX_PARAMETER::PARAM_Z] = v[2] / v[3];
 		}
 	}
 	else {
@@ -2333,6 +2352,123 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, vertex_t *destinati
 			destination[m].p[(int)VERTEX_PARAMETER::PARAM_Z] = vert[m].attribute[0].fv[2];
 		}
 	}
+}
+
+void nv2a_renderer::clear_render_target(int what, UINT32 value)
+{
+	int m;
+	int xi, yi, xf, yf;
+	int x, y;
+	UINT32 color;
+	UINT8 *addr;
+	UINT32 mask;
+	UINT32 offset;
+
+	if (what == 0)
+		return;
+	mask = 0;
+	switch (colorformat_rendertarget) {
+	case NV2A_COLOR_FORMAT::R5G6B5:
+		if (what & 1)
+			mask = 0x1f;
+		if (what & 2)
+			mask = mask | 0x07e0;
+		if (what & 4)
+			mask = mask | 0xf800;
+		break;
+	case NV2A_COLOR_FORMAT::X8R8G8B8_Z8R8G8B8:
+	case NV2A_COLOR_FORMAT::X8R8G8B8_X8R8G8B8:
+		for (x = 3; x >= 0; x--) {
+			if (what & 8)
+				mask = (mask << 8) | 255;
+			what = what << 1;
+		}
+		break;
+	case NV2A_COLOR_FORMAT::A8R8G8B8:
+		for (x = 3; x >= 0; x--) {
+			if (what & 8)
+				mask = (mask << 8) | 255;
+			what = what << 1;
+		}
+		break;
+	case NV2A_COLOR_FORMAT::B8:
+		if (what & 1)
+			mask = 255;
+		break;
+	default:
+		return;
+	}
+	m = antialias_control;
+	if (antialiasing_rendertarget != 0)
+		m = 2;
+	else
+		m = 1;
+	xi = limits_rendertarget.left();
+	if (clear_rendertarget.left() > xi)
+		xi = clear_rendertarget.left();
+	xf = limits_rendertarget.right();
+	if (clear_rendertarget.right() < xf)
+		xf = clear_rendertarget.right();
+	yi = limits_rendertarget.top();
+	if (clear_rendertarget.top() > yi)
+		yi = clear_rendertarget.top();
+	yf = limits_rendertarget.bottom();
+	if (clear_rendertarget.bottom() < yf)
+		yf = clear_rendertarget.bottom();
+	xi = xi*m;
+	yi = yi*m;
+	xf = xf*m;
+	yf = yf*m;
+	for (y = yi; y <= yf; y++)
+		for (x = xi; x <= xf; x++) {
+			if (type_rendertarget == NV2A_RT_TYPE::SWIZZLED)
+				offset = (dilated0[dilate_rendertarget][x] + dilated1[dilate_rendertarget][y]) * bytespixel_rendertarget;
+			else // type_rendertarget == LINEAR
+				offset = pitch_rendertarget * y + x * bytespixel_rendertarget;
+			switch (colorformat_rendertarget) {
+			case NV2A_COLOR_FORMAT::R5G6B5:
+				addr = (UINT8 *)rendertarget + offset;
+				color = *((UINT16 *)addr);
+				break;
+			case NV2A_COLOR_FORMAT::X8R8G8B8_Z8R8G8B8:
+			case NV2A_COLOR_FORMAT::X8R8G8B8_X8R8G8B8:
+				addr = (UINT8 *)rendertarget + offset;
+				color = *((UINT32 *)addr);
+				break;
+			case NV2A_COLOR_FORMAT::A8R8G8B8:
+				addr = (UINT8 *)rendertarget + offset;
+				color = *((UINT32 *)addr);
+				break;
+			case NV2A_COLOR_FORMAT::B8:
+				addr = (UINT8 *)rendertarget + offset;
+				color = *addr;
+				break;
+			default:
+				return;
+			}
+			color = (color & ~mask) | (value & mask);
+			switch (colorformat_rendertarget) {
+			case NV2A_COLOR_FORMAT::R5G6B5:
+				*((UINT16 *)addr) = color;
+				break;
+			case NV2A_COLOR_FORMAT::X8R8G8B8_Z8R8G8B8:
+			case NV2A_COLOR_FORMAT::X8R8G8B8_X8R8G8B8:
+				*((UINT32 *)addr) = color;
+				break;
+			case NV2A_COLOR_FORMAT::A8R8G8B8:
+				*((UINT32 *)addr) = color;
+				break;
+			case NV2A_COLOR_FORMAT::B8:
+				*addr = color;
+				break;
+			default:
+				return;
+			}
+
+		}
+#ifdef LOG_NV2A
+		printf("clearscreen\n\r");
+#endif
 }
 
 void nv2a_renderer::clear_depth_buffer(int what, UINT32 value)
@@ -2426,21 +2562,22 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 	printf("A:%08X MTHD:%08X D:%08X\n\r",address,maddress,data);
 #endif
 	if (maddress == 0x17fc) {
+		vertex_count = 0;
+		vertex_first = 0;
 		indexesleft_count = 0;
 		indexesleft_first = 0;
 		primitives_count = 0;
+		primitive_type = (NV2A_BEGIN_END)data;
 		countlen--;
 	}
 	if (maddress == 0x1810) {
 		// draw vertices
 		int offset, count;
-		NV2A_BEGIN_END type;
 		UINT32 n;
 		render_delegate renderspans;
 
 		offset = data & 0xffffff;
 		count = (data >> 24) & 0xff;
-		type = (NV2A_BEGIN_END)channel[chanel][subchannel].object.method[0x17fc / 4];
 		if (((channel[chanel][subchannel].object.method[0x1e60 / 4] & 7) > 0) && (combiner.used != 0)) {
 			renderspans = render_delegate(FUNC(nv2a_renderer::render_register_combiners), this);
 		}
@@ -2452,54 +2589,77 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 #ifdef LOG_NV2A
 		printf("vertex %d %d %d\n\r", type, offset, count);
 #endif
-		if (type == NV2A_BEGIN_END::QUADS) {
+		if (primitive_type == NV2A_BEGIN_END::QUADS) {
 			for (n = 0; n <= count; n += 4) {
-				vertex_nv vert[4];
-				vertex_t xy[4];
-
-				read_vertices_0x1810(space, vert, n + offset, 4);
-				convert_vertices_poly(vert, xy, 4);
-				render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, xy); // 4 rgba, 4 texture units 2 uv
+				read_vertices_0x1810(space, vertex_software + vertex_first, n + offset, 4);
+				convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 4);
+				render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy + vertex_first); // 4 rgba, 4 texture units 2 uv
+				vertex_first = (vertex_first + 4) & 1023;
+				vertex_count = vertex_count + 4;
 				wait();
 			}
 		}
-		else if (type == NV2A_BEGIN_END::TRIANGLE_FAN) {
-			vertex_nv vert[3];
-			vertex_t xy[3];
-
-			read_vertices_0x1810(space, vert, offset, 2);
-			convert_vertices_poly(vert, xy, 2);
-			count = count - 2;
-			offset = offset + 2;
-			for (n = 0; n <= count; n++) {
-				read_vertices_0x1810(space, vert + (((n + 1) & 1) + 1), offset + n, 1);
-				convert_vertices_poly(vert + (((n + 1) & 1) + 1), xy + (((n + 1) & 1) + 1), 1);
-				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[0], xy[(~(n + 1) & 1) + 1], xy[((n + 1) & 1) + 1]);
+		else if (primitive_type == NV2A_BEGIN_END::TRIANGLES) {
+			for (n = 0; n <= count; n += 3) {
+				read_vertices_0x1810(space, vertex_software + vertex_first, n + offset, 3);
+				convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 3);
+				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[vertex_first], vertex_xy[(vertex_first + 1) & 1023], vertex_xy[(vertex_first + 2) & 1023]); // 4 rgba, 4 texture units 2 uv
+				vertex_first = (vertex_first + 3) & 1023;
+				vertex_count = vertex_count + 3;
 				wait();
 			}
 		}
-		else if (type == NV2A_BEGIN_END::TRIANGLE_STRIP) {
-			vertex_nv vert[4];
-			vertex_t xy[4];
-
-			read_vertices_0x1810(space, vert, offset, 2);
-			convert_vertices_poly(vert, xy, 2);
-			count = count - 2;
-			offset = offset + 2;
+		else if (primitive_type == NV2A_BEGIN_END::TRIANGLE_FAN) {
+			if (vertex_count == 0) {
+				read_vertices_0x1810(space, vertex_software + 1024, offset, 1);
+				convert_vertices_poly(vertex_software + 1024, vertex_xy + 1024, 1);
+				read_vertices_0x1810(space, vertex_software, offset + 1, 1);
+				convert_vertices_poly(vertex_software, vertex_xy, 1);
+				count = count - 2;
+				offset = offset + 2;
+				vertex_first = 1;
+				vertex_count = 2;
+			}
+			// if software sends the vertices 0 1 2 3 4 5 6
+			// hardware will draw triangles made by (0,1,2) (0,2,3) (0,3,4) (0,4,5) (0,5,6)
 			for (n = 0; n <= count; n++) {
-				read_vertices_0x1810(space, vert + ((n + 2) & 3), offset + n, 1);
-				convert_vertices_poly(vert + ((n + 2) & 3), xy + ((n + 2) & 3), 1);
-				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[((n & 1) + n) & 3], xy[((~n & 1) + n) & 3], xy[(2 + n) & 3]);
+				read_vertices_0x1810(space, vertex_software + vertex_first, offset + n, 1);
+				convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 1);
+				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[1024], vertex_xy[(vertex_first - 1) & 1023], vertex_xy[vertex_first]);
+				vertex_first = (vertex_first + 1) & 1023;
+				vertex_count = vertex_count + 1;
+				wait();
+			}
+		}
+		else if (primitive_type == NV2A_BEGIN_END::TRIANGLE_STRIP) {
+			// if software sends the vertices 0 1 2 3 4 5 6
+			// hardware will draw triangles made by (0,1,2) (1,3,2) (2,3,4) (3,5,4) (4,5,6)
+			if (vertex_count == 0) {
+				read_vertices_0x1810(space, vertex_software, offset, 2);
+				convert_vertices_poly(vertex_software, vertex_xy, 2);
+				count = count - 2;
+				offset = offset + 2;
+				vertex_first = 2;
+				vertex_count = 2;
+			}
+			for (n = 0; n <= count; n++) {
+				read_vertices_0x1810(space, vertex_software + vertex_first, offset + n, 1);
+				convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 1);
+				if ((vertex_count & 1) == 0)
+					render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_first - 2) & 1023], vertex_xy[(vertex_first - 1) & 1023], vertex_xy[vertex_first]);
+				else
+					render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_first - 2) & 1023], vertex_xy[vertex_first], vertex_xy[(vertex_first - 1) & 1023]);
+				vertex_first = (vertex_first + 1) & 1023;
+				vertex_count = vertex_count + 1;
 				wait();
 			}
 		}
 		else {
-			machine().logerror("Unsupported primitive %d for method 0x1810\n", type);
+			machine().logerror("Unsupported primitive %d for method 0x1810\n", primitive_type);
 		}
 		countlen--;
 	}
 	if ((maddress == 0x1800) || (maddress == 0x1808)) {
-		NV2A_BEGIN_END type;
 		UINT32 n;
 		render_delegate renderspans;
 		int mult;
@@ -2519,116 +2679,140 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		// vertices are selected from the vertex buffer using an array of indexes
 		// each dword after 1800 contains two 16 bit index values to select the vartices
 		// each dword after 1808 contains a 32 bit index value to select the vartices
-		type = (NV2A_BEGIN_END)channel[chanel][subchannel].object.method[0x17fc / 4];
-		if (type == NV2A_BEGIN_END::QUADS) {
+		if (primitive_type == NV2A_BEGIN_END::QUADS) {
 			while (1) {
-				vertex_nv vert[4];
-				vertex_t xy[4];
 				int c;
 
 				if ((countlen * mult + indexesleft_count) < 4)
 					break;
 				if (mult == 1)
-					c = read_vertices_0x1808(space, vert, address, 4);
+					c = read_vertices_0x1808(space, vertex_software + vertex_first, address, 4);
 				else
-					c = read_vertices_0x1800(space, vert, address, 4);
+					c = read_vertices_0x1800(space, vertex_software + vertex_first, address, 4);
 				address = address + c * 4;
 				countlen = countlen - c;
-				convert_vertices_poly(vert, xy, 4);
-				render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, xy); // 4 rgba, 4 texture units 2 uv
+				convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 4);
+				render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy + vertex_first); // 4 rgba, 4 texture units 2 uv
+				vertex_first = (vertex_first + 4) & 1023;
+				vertex_count = vertex_count + 4;
 				wait();
 			}
 		}
-		else if (type == NV2A_BEGIN_END::TRIANGLE_FAN) {
-			if ((countlen * mult + indexesleft_count) >= 3) {
-				vertex_nv vert[3];
-				vertex_t xy[3];
-				int c, count;
+		else if (primitive_type == NV2A_BEGIN_END::TRIANGLE_FAN) {
+			int required, c, count;
 
-				if (mult == 1)
-					c = read_vertices_0x1808(space, vert, address, 2);
-				else
-					c = read_vertices_0x1800(space, vert, address, 2);
-				convert_vertices_poly(vert, xy, 2);
-				address = address + c * 4;
-				countlen = countlen - c;
-				count = countlen * mult + indexesleft_count;
-				for (n = 1; n <= count; n++) {
+			required = 1;
+			if (vertex_count == 0)
+				required = 3;
+			if ((countlen * mult + indexesleft_count) >= required) {
+				if (vertex_count == 0) {
 					if (mult == 1)
-						c = read_vertices_0x1808(space, vert + ((n & 1) + 1), address, 1);
+						c = read_vertices_0x1808(space, vertex_software + 1024, address, 1);
 					else
-						c = read_vertices_0x1800(space, vert + ((n & 1) + 1), address, 1);
-
-					convert_vertices_poly(vert + ((n & 1) + 1), xy + ((n & 1) + 1), 1);
+						c = read_vertices_0x1800(space, vertex_software + 1024, address, 1);
+					convert_vertices_poly(vertex_software + 1024, vertex_xy + 1024, 1);
 					address = address + c * 4;
 					countlen = countlen - c;
-					render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[0], xy[(~n & 1) + 1], xy[(n & 1) + 1]);
+					if (mult == 1)
+						c = read_vertices_0x1808(space, vertex_software, address, 1);
+					else
+						c = read_vertices_0x1800(space, vertex_software, address, 1);
+					convert_vertices_poly(vertex_software, vertex_xy, 1);
+					address = address + c * 4;
+					countlen = countlen - c;
+					vertex_first = 1;
+					vertex_count = 2;
+				}
+				count = countlen * mult + indexesleft_count;
+				// if software sends the vertices 0 1 2 3 4 5 6
+				// hardware will draw triangles made by (0,1,2) (0,2,3) (0,3,4) (0,4,5) (0,5,6)
+				for (n = 1; n <= count; n++) {
+					if (mult == 1)
+						c = read_vertices_0x1808(space, vertex_software + vertex_first, address, 1);
+					else
+						c = read_vertices_0x1800(space, vertex_software + vertex_first, address, 1);
+					convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 1);
+					address = address + c * 4;
+					countlen = countlen - c;
+					render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[1024], vertex_xy[(vertex_first - 1) & 1023], vertex_xy[vertex_first]);
+					vertex_first = (vertex_first + 1) & 1023;
+					vertex_count = vertex_count + 1;
 					wait();
 				}
 			}
 		}
-		else if (type == NV2A_BEGIN_END::TRIANGLES) {
+		else if (primitive_type == NV2A_BEGIN_END::TRIANGLES) {
 			while (1) {
-				vertex_nv vert[3];
-				vertex_t xy[3];
 				int c;
 
 				if ((countlen * mult + indexesleft_count) < 3)
 					break;
 				if (mult == 1)
-					c = read_vertices_0x1808(space, vert, address, 3);
+					c = read_vertices_0x1808(space, vertex_software + vertex_first, address, 3);
 				else
-					c = read_vertices_0x1800(space, vert, address, 3);
+					c = read_vertices_0x1800(space, vertex_software + vertex_first, address, 3);
 				address = address + c * 4;
 				countlen = countlen - c;
-				convert_vertices_poly(vert, xy, 3);
-				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[0], xy[1], xy[2]); // 4 rgba, 4 texture units 2 uv
+				convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 3);
+				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[vertex_first], vertex_xy[(vertex_first + 1) & 1023], vertex_xy[(vertex_first + 2) & 1023]); // 4 rgba, 4 texture units 2 uv
+				vertex_first = (vertex_first + 3) & 1023;
+				vertex_count = vertex_count + 3;
 				wait();
 			}
 		}
-		else if (type == NV2A_BEGIN_END::TRIANGLE_STRIP) {
-			if ((countlen * mult + indexesleft_count) >= 3) {
-				vertex_nv vert[4];
-				vertex_t xy[4];
-				int c, count;
+		else if (primitive_type == NV2A_BEGIN_END::TRIANGLE_STRIP) {
+			int required, c, count;
 
-				if (mult == 1)
-					c = read_vertices_0x1808(space, vert, address, 2);
-				else
-					c = read_vertices_0x1800(space, vert, address, 2);
-				convert_vertices_poly(vert, xy, 2);
-				address = address + c * 4;
-				countlen = countlen - c;
+			required = 1;
+			if (vertex_count == 0)
+				required = 3;
+			if ((countlen * mult + indexesleft_count) >= required) {
+				// if software sends the vertices 0 1 2 3 4 5 6
+				// hardware will draw triangles made by (0,1,2) (1,3,2) (2,3,4) (3,5,4) (4,5,6)
+				if (vertex_count == 0) {
+					if (mult == 1)
+						c = read_vertices_0x1808(space, vertex_software, address, 2);
+					else
+						c = read_vertices_0x1800(space, vertex_software, address, 2);
+					convert_vertices_poly(vertex_software, vertex_xy, 2);
+					address = address + c * 4;
+					countlen = countlen - c;
+					vertex_first = 2;
+					vertex_count = 2;
+				}
 				count = countlen * mult + indexesleft_count;
 				for (n = 0; n < count; n++) {
 					if (mult == 1)
-						c = read_vertices_0x1808(space, vert + ((n + 2) & 3), address, 1);
+						c = read_vertices_0x1808(space, vertex_software + vertex_first, address, 1);
 					else
-						c = read_vertices_0x1800(space, vert + ((n + 2) & 3), address, 1);
+						c = read_vertices_0x1800(space, vertex_software + vertex_first, address, 1);
 					address = address + c * 4;
 					countlen = countlen - c;
-					convert_vertices_poly(vert + ((n + 2) & 3), xy + ((n + 2) & 3), 1);
-					if (xy[(n + 2) & 3].y > 293800000.0f)
-						xy[(n + 2) & 3].y = xy[(n + 2) & 3].y + 1.0f;
-					render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[((n & 1) + n) & 3], xy[((~n & 1) + n) & 3], xy[(2 + n) & 3]);
+					convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 1);
+					if ((vertex_count & 1) == 0)
+						render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_first - 2) & 1023], vertex_xy[(vertex_first - 1) & 1023], vertex_xy[vertex_first]);
+					else
+						render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_first - 2) & 1023], vertex_xy[vertex_first], vertex_xy[(vertex_first - 1) & 1023]);
+					vertex_first = (vertex_first + 1) & 1023;
+					vertex_count = vertex_count + 1;
 					wait();
 				}
 			}
 		}
 		else {
-			machine().logerror("Unsupported primitive %d for method 0x1800/8\n", type);
+			machine().logerror("Unsupported primitive %d for method 0x1800/8\n", primitive_type);
 			countlen = 0;
 		}
 		while (countlen > 0) {
 			data = space.read_dword(address);
-			n = (indexesleft_first + indexesleft_count) & 7;
+			n = indexesleft_first + indexesleft_count;
 			if (mult == 2) {
-				indexesleft[n] = data & 0xffff;
-				indexesleft[(n + 1) & 7] = (data >> 16) & 0xffff;
+				indexesleft[n & 1023] = data & 0xffff;
+				indexesleft[(n + 1) & 1023] = (data >> 16) & 0xffff;
 				indexesleft_count = indexesleft_count + 2;
 			}
 			else {
-				indexesleft[n] = data;
+				indexesleft[n & 1023] = data;
 				indexesleft_count = indexesleft_count + 1;
 			}
 			address += 4;
@@ -2638,7 +2822,6 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 	}
 	if (maddress == 0x1818) {
 		int n;
-		NV2A_BEGIN_END type;
 		render_delegate renderspans;
 
 		if (((channel[chanel][subchannel].object.method[0x1e60 / 4] & 7) > 0) && (combiner.used != 0)) {
@@ -2654,71 +2837,12 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		// then countlen number of dwords with 1818
 		// end with 17fc primitive type 0
 		// at 1760 16 words specify the vertex format:for each possible vertex attribute the number of components (0=not present) and type of each
-		type = (NV2A_BEGIN_END)channel[chanel][subchannel].object.method[0x17fc / 4];
-		if (type == NV2A_BEGIN_END::TRIANGLE_FAN) {
-			vertex_nv vert[3];
-			vertex_t xy[3];
-			int c;
-
-			c = read_vertices_0x1818(space, vert, address, 2);
-			convert_vertices_poly(vert, xy, 2);
-			countlen = countlen - c;
-			if (countlen < 0) {
-				machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
-				countlen = 0;
-				return 0;
-			}
-			address = address + c * 4;
-			for (n = 1; countlen > 0; n++) {
-				c = read_vertices_0x1818(space, vert + ((n & 1) + 1), address, 1);
-				countlen = countlen - c;
-				if (countlen < 0) {
-					machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
-					countlen = 0;
-					break;
-				}
-				address = address + c * 4;
-				convert_vertices_poly(vert + ((n & 1) + 1), xy + ((n & 1) + 1), 1);
-				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[0], xy[(~n & 1) + 1], xy[(n & 1) + 1]);
-				wait();
-			}
-		}
-		else if (type == NV2A_BEGIN_END::TRIANGLES) {
+		if (primitive_type == NV2A_BEGIN_END::QUADS) {
 			while (countlen > 0) {
-				vertex_nv vert[3];
-				vertex_t xy[3];
 				int c;
 
-				c = read_vertices_0x1818(space, vert, address, 3);
-				convert_vertices_poly(vert, xy, 3);
-				countlen = countlen - c;
-				if (countlen < 0) {
-					machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
-					countlen = 0;
-					break;
-				}
-				address = address + c * 3;
-				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[0], xy[1], xy[2]); // 4 rgba, 4 texture units 2 uv
-				wait();
-			}
-		}
-		else if (type == NV2A_BEGIN_END::TRIANGLE_STRIP) {
-			vertex_nv vert[4];
-			vertex_t xy[4];
-			int c;
-
-			c = read_vertices_0x1818(space, vert, address, 2);
-			convert_vertices_poly(vert, xy, 2);
-			countlen = countlen - c;
-			if (countlen < 0) {
-				machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
-				countlen = 0;
-				return 0;
-			}
-			address = address + c * 4;
-			for (n = 0; countlen > 0; n++) {
-				c = read_vertices_0x1818(space, vert + ((n + 2) & 3), address, 1);
-				convert_vertices_poly(vert + ((n + 2) & 3), xy + ((n + 2) & 3), 1);
+				c = read_vertices_0x1818(space, vertex_software + vertex_first, address, 4);
+				convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 4);
 				countlen = countlen - c;
 				if (countlen < 0) {
 					machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
@@ -2726,36 +2850,17 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 					break;
 				}
 				address = address + c * 4;
-				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[((n & 1) + n) & 3], xy[((~n & 1) + n) & 3], xy[(2 + n) & 3]);
+				render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy); // 4 rgba, 4 texture units 2 uv
+				vertex_first = (vertex_first + 4) & 1023;
+				vertex_count = vertex_count + 4;
 				wait();
 			}
 		}
-		else if (type == NV2A_BEGIN_END::QUADS) {
-			while (countlen > 0) {
-				vertex_nv vert[4];
-				vertex_t xy[4];
-				int c;
-
-				c = read_vertices_0x1818(space, vert, address, 4);
-				convert_vertices_poly(vert, xy, 4);
-				countlen = countlen - c;
-				if (countlen < 0) {
-					machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
-					countlen = 0;
-					break;
-				}
-				address = address + c * 4;
-				render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, xy); // 4 rgba, 4 texture units 2 uv
-				wait();
-			}
-		}
-		else if (type == NV2A_BEGIN_END::QUAD_STRIP) {
-			vertex_nv vert[4];
-			vertex_t xy[4];
+		else if (primitive_type == NV2A_BEGIN_END::QUAD_STRIP) {
 			int c;
 
-			c = read_vertices_0x1818(space, vert, address, 2);
-			convert_vertices_poly(vert, xy, 2);
+			c = read_vertices_0x1818(space, vertex_software, address, 2);
+			convert_vertices_poly(vertex_software, vertex_xy, 2);
 			countlen = countlen - c;
 			if (countlen < 0) {
 				machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
@@ -2764,8 +2869,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			}
 			address = address + c * 4;
 			for (n = 0; countlen > 0; n += 2) {
-				c = read_vertices_0x1818(space, vert + ((n + 2) & 3), address + ((n + 2) & 3), 2);
-				convert_vertices_poly(vert + ((n + 2) & 3), xy + ((n + 2) & 3), 2);
+				c = read_vertices_0x1818(space, vertex_software + ((n + 2) & 3), address + ((n + 2) & 3), 2);
+				convert_vertices_poly(vertex_software + ((n + 2) & 3), vertex_xy + ((n + 2) & 3), 2);
 				countlen = countlen - c;
 				if (countlen < 0) {
 					machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
@@ -2773,13 +2878,107 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 					return 0;
 				}
 				address = address + c * 4;
-				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[n & 3], xy[(n + 1) & 3], xy[(n + 2) & 3]);
-				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[(n + 2) & 3], xy[(n + 1) & 3], xy[(n + 3) & 3]);
+				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[n & 3], vertex_xy[(n + 1) & 3], vertex_xy[(n + 2) & 3]);
+				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(n + 2) & 3], vertex_xy[(n + 1) & 3], vertex_xy[(n + 3) & 3]);
+				wait();
+			}
+		}
+		else if (primitive_type == NV2A_BEGIN_END::TRIANGLE_FAN) {
+			int c;
+
+			if (vertex_count == 0) {
+				c = read_vertices_0x1818(space, vertex_software + 1024, address, 1);
+				convert_vertices_poly(vertex_software + 1024, vertex_xy + 1024, 1);
+				countlen = countlen - c;
+				address = address + c * 4;
+				c = read_vertices_0x1818(space, vertex_software, address, 1);
+				convert_vertices_poly(vertex_software, vertex_xy, 1);
+				countlen = countlen - c;
+				if (countlen < 0) {
+					machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
+					countlen = 0;
+					return 0;
+				}
+				address = address + c * 4;
+				vertex_first = 1;
+				vertex_count = 2;
+			}
+			// if software sends the vertices 0 1 2 3 4 5 6
+			// hardware will draw triangles made by (0,1,2) (0,2,3) (0,3,4) (0,4,5) (0,5,6)
+			while (countlen > 0) {
+				c = read_vertices_0x1818(space, vertex_software + vertex_first, address, 1);
+				countlen = countlen - c;
+				if (countlen < 0) {
+					machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
+					countlen = 0;
+					break;
+				}
+				address = address + c * 4;
+				convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 1);
+				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[1024], vertex_xy[(vertex_first - 1) & 1023], vertex_xy[vertex_first]);
+				vertex_first = (vertex_first + 1) & 1023;
+				vertex_count = vertex_count + 1;
+				wait();
+			}
+		}
+		else if (primitive_type == NV2A_BEGIN_END::TRIANGLES) {
+			while (countlen > 0) {
+				int c;
+
+				c = read_vertices_0x1818(space, vertex_software + vertex_first, address, 3);
+				convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 3);
+				countlen = countlen - c;
+				if (countlen < 0) {
+					machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
+					countlen = 0;
+					break;
+				}
+				address = address + c * 4;
+				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[vertex_first], vertex_xy[(vertex_first + 1) & 1023], vertex_xy[(vertex_first + 2) & 1023]); // 4 rgba, 4 texture units 2 uv
+				vertex_first = (vertex_first + 3) & 1023;
+				vertex_count = vertex_count + 3;
+				wait();
+			}
+		}
+		else if (primitive_type == NV2A_BEGIN_END::TRIANGLE_STRIP) {
+			int c;
+
+			// if software sends the vertices 0 1 2 3 4 5 6
+			// hardware will draw triangles made by (0,1,2) (1,3,2) (2,3,4) (3,5,4) (4,5,6)
+			if (vertex_count == 0) {
+				c = read_vertices_0x1818(space, vertex_software, address, 2);
+				convert_vertices_poly(vertex_software, vertex_xy, 2);
+				countlen = countlen - c;
+				if (countlen < 0) {
+					machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
+					countlen = 0;
+					return 0;
+				}
+				address = address + c * 4;
+				vertex_first = 2;
+				vertex_count = 2;
+			}
+			while (countlen > 0) {
+				c = read_vertices_0x1818(space, vertex_software + vertex_first, address, 1);
+				convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 1);
+				countlen = countlen - c;
+				if (countlen < 0) {
+					machine().logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
+					countlen = 0;
+					break;
+				}
+				address = address + c * 4;
+				if ((vertex_count & 1) == 0)
+					render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_first - 2) & 1023], vertex_xy[(vertex_first - 1) & 1023], vertex_xy[vertex_first]);
+				else
+					render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_first - 2) & 1023], vertex_xy[vertex_first], vertex_xy[(vertex_first - 1) & 1023]);
+				vertex_first = (vertex_first + 1) & 1023;
+				vertex_count = vertex_count + 1;
 				wait();
 			}
 		}
 		else {
-			machine().logerror("Unsupported primitive %d for method 0x1818\n", type);
+			machine().logerror("Unsupported primitive %d for method 0x1818\n", primitive_type);
 			countlen = 0;
 		}
 	}
@@ -2853,44 +3052,25 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		countlen--;
 	}
 	if (maddress == 0x1d98) {
+		int x, w;
+
+		x = data & 0xffff;
+		w = (data >> 16) & 0xffff;
+		clear_rendertarget.setx(x, w);
 		countlen--;
 	}
 	if (maddress == 0x1d9c) {
+		int y, h;
+
+		y = data & 0xffff;
+		h = (data >> 16) & 0xffff;
+		clear_rendertarget.sety(y, h);
 		countlen--;
 	}
 	if (maddress == 0x1d94) {
-		int m;
-
-		m = antialias_control;
-		if (antialiasing_rendertarget != 0)
-			m = 2;
-		else
-			m = 1;
 		// possible buffers: color, depth, stencil
 		// clear framebuffer
-		if ((data & 0xf0) == 0xf0) {
-			if (bytespixel_rendertarget == 4) {
-				bitmap_rgb32 bm(rendertarget, (limits_rendertarget.right() + 1) * m, (limits_rendertarget.bottom() + 1) * m, pitch_rendertarget / 4);
-
-				UINT32 color = channel[chanel][subchannel].object.method[0x1d90 / 4];
-				bm.fill(color);
-			}
-			else if (bytespixel_rendertarget == 2) {
-				bitmap_ind16 bm((UINT16 *)rendertarget, (limits_rendertarget.right() + 1) * m, (limits_rendertarget.bottom() + 1) * m, pitch_rendertarget / 2);
-
-				UINT16 color = channel[chanel][subchannel].object.method[0x1d90 / 4] & 0xffff;
-
-				bm.fill(color);
-			}
-			else if (bytespixel_rendertarget == 1) {
-				UINT8 color = channel[chanel][subchannel].object.method[0x1d90 / 4] & 0xff;
-
-				memset(rendertarget, color, pitch_rendertarget*(limits_rendertarget.bottom() + 1) * m);
-			}
-#ifdef LOG_NV2A
-			printf("clearscreen\n\r");
-#endif
-		}
+		clear_render_target((data >> 4) & 15, channel[chanel][subchannel].object.method[0x1d90 / 4]);
 		clear_depth_buffer(data & 3, channel[chanel][subchannel].object.method[0x1d8c / 4]);
 		countlen--;
 	}
@@ -3153,19 +3333,19 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 	// modelview matrix
 	if ((maddress >= 0x0480) && (maddress < 0x04c0)) {
 		maddress = (maddress - 0x0480) / 4;
-		*(UINT32 *)(&matrix.modelview[maddress]) = data;
+		*(UINT32 *)(&matrix.modelview[maddress >> 2][maddress & 3]) = data;
 		countlen--;
 	}
 	// inverse modelview matrix
 	if ((maddress >= 0x0580) && (maddress < 0x05c0)) {
 		maddress = (maddress - 0x0580) / 4;
-		*(UINT32 *)(&matrix.modelview_inverse[maddress]) = data;
+		*(UINT32 *)(&matrix.modelview_inverse[maddress >> 2][maddress & 3]) = data;
 		countlen--;
 	}
 	// projection matrix
 	if ((maddress >= 0x0680) && (maddress < 0x06c0)) {
 		maddress = (maddress - 0x0680) / 4;
-		*(UINT32 *)(&matrix.projection[maddress]) = data;
+		*(UINT32 *)(&matrix.projection[maddress >> 2][maddress & 3]) = data;
 		countlen--;
 	}
 	// viewport translate
@@ -4157,7 +4337,12 @@ READ32_MEMBER(nv2a_renderer::geforce_r)
 		x = x ^ 0x08080808;
 		ret = x;
 	}
-	if ((offset >= 0x00101000 / 4) && (offset < 0x00102000 / 4)) {
+	if ((offset >= 0x00100000 / 4) && (offset < 0x00101000 / 4)) {
+		//machine().logerror("NV_2A: read 100000[%06X] mask %08X value %08X\n",offset*4-0x00101000,mem_mask,ret);
+		if (offset == 0x100200 / 4)
+			return 3;
+	}
+	else if ((offset >= 0x00101000 / 4) && (offset < 0x00102000 / 4)) {
 		//machine().logerror("NV_2A: read STRAPS[%06X] mask %08X value %08X\n",offset*4-0x00101000,mem_mask,ret);
 	}
 	else if ((offset >= 0x00002000 / 4) && (offset < 0x00004000 / 4)) {

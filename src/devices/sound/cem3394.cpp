@@ -176,7 +176,7 @@ void cem3394_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		INT16 last_ext = m_last_ext;
 
 		/* fetch the external data */
-		m_ext_cb(samples, m_external_buffer);
+		m_ext_cb(samples, m_external_buffer.get());
 
 		/* compute the modulation depth, and adjust fstep to the maximum frequency */
 		/* we lop off 13 bits of depth so that we can multiply by stepadjust, below, */
@@ -187,7 +187,7 @@ void cem3394_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 		/* "apply" the filter: note this is pretty cheesy; it basically just downsamples the
 		   external sample to filter_freq by allowing only 2 transitions for every cycle */
-		for (i = 0, ext = m_external_buffer, position = m_position; i < samples; i++, ext++)
+		for (i = 0, ext = m_external_buffer.get(), position = m_position; i < samples; i++, ext++)
 		{
 			UINT32 newposition;
 			INT32 stepadjust;
@@ -229,7 +229,7 @@ void cem3394_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			/* if the width is wider than the step, we're guaranteed to hit it once per cycle */
 			if (pulse_width >= step)
 			{
-				for (i = 0, mix = m_mixer_buffer, position = m_position; i < samples; i++, mix++)
+				for (i = 0, mix = m_mixer_buffer.get(), position = m_position; i < samples; i++, mix++)
 				{
 					if (position < pulse_width)
 						*mix = 0x1932;
@@ -243,7 +243,7 @@ void cem3394_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			else
 			{
 				INT16 volume = 0x1932 * pulse_width / step;
-				for (i = 0, mix = m_mixer_buffer, position = m_position; i < samples; i++, mix++)
+				for (i = 0, mix = m_mixer_buffer.get(), position = m_position; i < samples; i++, mix++)
 				{
 					UINT32 newposition = position + step;
 					if ((newposition ^ position) & ~FRACTION_MASK)
@@ -258,13 +258,13 @@ void cem3394_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 		/* otherwise, clear the mixing buffer */
 		else
-			memset(m_mixer_buffer, 0, sizeof(INT16) * samples);
+			memset(m_mixer_buffer.get(), 0, sizeof(INT16) * samples);
 
 		/* handle the sawtooth component; it maxes out at 0x2000, which is 27% larger */
 		/* than the pulse */
 		if (ENABLE_SAWTOOTH && (m_wave_select & WAVE_SAWTOOTH))
 		{
-			for (i = 0, mix = m_mixer_buffer, position = m_position; i < samples; i++, mix++)
+			for (i = 0, mix = m_mixer_buffer.get(), position = m_position; i < samples; i++, mix++)
 			{
 				*mix += ((position >> (FRACTION_BITS - 14)) & 0x3fff) - 0x2000;
 				position += step;
@@ -277,7 +277,7 @@ void cem3394_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		/* a multiplication) */
 		if (ENABLE_TRIANGLE && (m_wave_select & WAVE_TRIANGLE))
 		{
-			for (i = 0, mix = m_mixer_buffer, position = m_position; i < samples; i++, mix++)
+			for (i = 0, mix = m_mixer_buffer.get(), position = m_position; i < samples; i++, mix++)
 			{
 				INT16 value;
 				if (position & (1 << (FRACTION_BITS - 1)))
@@ -295,8 +295,8 @@ void cem3394_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	}
 
 	/* mix it down */
-	mix = m_mixer_buffer;
-	ext = m_external_buffer;
+	mix = m_mixer_buffer.get();
+	ext = m_external_buffer.get();
 	{
 		/* internal + external */
 		if (ext_volume != 0 && int_volume != 0)
@@ -336,8 +336,8 @@ void cem3394_device::device_start()
 	m_ext_cb.bind_relative_to(*owner());
 
 	/* allocate memory for a mixer buffer and external buffer (1 second should do it!) */
-	m_mixer_buffer = auto_alloc_array(machine(), INT16, m_sample_rate);
-	m_external_buffer = auto_alloc_array(machine(), INT16, m_sample_rate);
+	m_mixer_buffer = std::make_unique<INT16[]>(m_sample_rate);
+	m_external_buffer = std::make_unique<INT16[]>(m_sample_rate);
 
 	save_item(NAME(m_values));
 	save_item(NAME(m_wave_select));
