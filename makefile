@@ -1233,6 +1233,7 @@ clean:
 	@echo Cleaning...
 	-@rm -rf $(BUILDDIR)
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make clean
+	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000 clean
 
 GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET)/
 
@@ -1252,12 +1253,15 @@ $(GEN_FOLDERS):
 generate: \
 		$(GENIE) \
 		$(GEN_FOLDERS) \
-		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS))
+		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
+		$(SRC)/devices/cpu/m68000/m68kops.cpp
 
 $(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/file2str.py | $(GEN_FOLDERS)
 	@echo Converting $<...
 	$(SILENT)$(PYTHON) scripts/build/file2str.py $< $@ layout_$(basename $(notdir $<))
 
+$(SRC)/devices/cpu/m68000/m68kops.cpp: $(SRC)/devices/cpu/m68000/m68k_in.cpp $(SRC)/devices/cpu/m68000/m68kmake.cpp
+	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000
 
 #-------------------------------------------------
 # Regression tests

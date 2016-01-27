@@ -26,3 +26,7 @@ regtests/chdman/temp
 regtests/jedutil/output
 *.pyc
 /CMakeLists.txt
+/src/devices/cpu/m68000/m68kops.cpp
+/src/devices/cpu/m68000/m68kops.h
+/src/devices/cpu/m68000/m68kmake.*
+!/src/devices/cpu/m68000/m68kmake.cpp
