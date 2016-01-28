@@ -459,8 +459,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppj_audio_io, AS_IO, 8, kurukuru_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
+	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_READ(kurukuru_adpcm_timer_irqack_r) // to verify. I'm currently analyzing the code.
 ADDRESS_MAP_END
+/*
+  30h -W  --> 0x0b
+  40h R-  --> soundlatch?...
+  50h R-  --> adpcm irq ack
 
+*/
 
 /* YM2149 ports */
 WRITE8_MEMBER(kurukuru_state::ym2149_aout_w)
@@ -775,4 +781,4 @@ ROM_END
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY                   FULLNAME                        FLAGS  */
 GAME( 199?, kurukuru, 0,      kurukuru, kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",   0 )
-GAME( 199?, ppj,      0,      ppj,      ppj,      driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (V1.40, Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, ppj,      0,      ppj,      ppj,      driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (V1.40, Japan)", MACHINE_IMPERFECT_SOUND)
