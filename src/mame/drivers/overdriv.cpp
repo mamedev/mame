@@ -83,8 +83,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::overdriv_cpuA_scanline)
 INTERRUPT_GEN_MEMBER(overdriv_state::cpuB_interrupt)
 {
 	// this doesn't get turned on until the irq has happened? wrong irq?
-//  if (m_k053246->k053246_is_irq_enabled())
-	m_subcpu->set_input_line(4, HOLD_LINE); // likely wrong
+	if (m_k053246->k053246_is_irq_enabled())
+		m_subcpu->set_input_line(4, HOLD_LINE); // likely wrong
 }
 
 
@@ -168,7 +168,7 @@ static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x238000, 0x238001) AM_WRITE(overdriv_cpuB_irq_x_w)
 ADDRESS_MAP_END
 
-#if UNUSED_FUNCTION
+#ifdef UNUSED_FUNCTION
 WRITE16_MEMBER( overdriv_state::overdriv_k053246_word_w )
 {
 	m_k053246->k053246_word_w(space,offset,data,mem_mask);
