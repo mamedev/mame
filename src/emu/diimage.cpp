@@ -161,29 +161,27 @@ image_error_t device_image_interface::set_image_filename(const char *filename)
 	zippath_parent(m_working_directory, filename);
 	m_basename.assign(m_image_name);
 
-	int loc1 = m_image_name.find_last_of('\\');
-	int loc2 = m_image_name.find_last_of('/');
-	int loc3 = m_image_name.find_last_of(':');
-	int loc = MAX(loc1,MAX(loc2,loc3));
-	if (loc!=-1) {
+	size_t loc1 = m_image_name.find_last_of('\\');
+	size_t loc2 = m_image_name.find_last_of('/');
+	size_t loc3 = m_image_name.find_last_of(':');
+	size_t loc = MAX(loc1,MAX(loc2, loc3));
+	if (loc != -1) {
 		if (loc == loc3)
 		{
 			// temp workaround for softlists now that m_image_name contains the part name too (e.g. list:gamename:cart)
 			m_basename = m_basename.substr(0, loc);
-			std::string tmpstr = std::string(m_basename);
-			int tmploc = tmpstr.find_last_of(':');
-			m_basename = m_basename.substr(tmploc + 1,loc-tmploc);
+			size_t tmploc = m_basename.find_last_of(':');
+			m_basename = m_basename.substr(tmploc + 1, loc - tmploc);
 		}
 		else
-			m_basename = m_basename.substr(loc + 1, m_basename.length() - loc);
+			m_basename = m_basename.substr(loc + 1);
 	}
-	m_basename_noext = m_basename.assign(m_basename);
+	m_basename_noext = m_basename;
 	m_filetype = "";
 	loc = m_basename_noext.find_last_of('.');
-	if (loc!=-1) {
-		m_basename_noext = m_basename_noext.substr(0,loc);
-		m_filetype = m_basename.assign(m_basename);
-		m_filetype = m_filetype.substr(loc + 1, m_filetype.length() - loc);
+	if (loc != -1) {
+		m_basename_noext = m_basename_noext.substr(0, loc);
+		m_filetype = m_basename.substr(loc + 1);
 	}
 
 	return IMAGE_ERROR_SUCCESS;
