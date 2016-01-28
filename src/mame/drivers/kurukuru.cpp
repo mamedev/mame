@@ -652,6 +652,8 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+/*  Kuru Kuru Pyon Pyon.
+*/
 ROM_START( kurukuru )
 	ROM_REGION( 0x08000, "maincpu", 0 )
 	ROM_LOAD( "kp_17l.ic17",  0x00000, 0x08000, CRC(9b552ebc) SHA1(07d0e62b7fdad381963a345376b72ad31eb7b96d) ) // program code
@@ -672,6 +674,9 @@ ROM_START( kurukuru )
 	ROM_LOAD( "7908b-4.ic32", 0x0600, 0x0034, CRC(bddf925e) SHA1(861cf5966444d0c0392241e5cfa08db475fb439a) )
 ROM_END
 
+/*  Pyon Pyon Jump.
+    Ver 1.40.
+*/
 ROM_START( ppj )
 	ROM_REGION( 0x08000, "maincpu", 0 )
 	ROM_LOAD( "ppj17.ic17",  0x00000, 0x08000, CRC(5d9c9ceb) SHA1(0f52c8a0aaaf978afeb07e56493399133b4ce781) ) // program code
@@ -693,6 +698,6 @@ ROM_START( ppj )
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY                   FULLNAME                       FLAGS  */
-GAME( 199?, kurukuru, 0,      kurukuru, kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",  0 )
-GAME( 199?, ppj,      0,      ppj,      kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (Japan)",       MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY                   FULLNAME                        FLAGS  */
+GAME( 199?, kurukuru, 0,      kurukuru, kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",   0 )
+GAME( 199?, ppj,      0,      ppj,      kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (V1.40, Japan)", MACHINE_NOT_WORKING )
