@@ -2187,7 +2187,6 @@ van16    // 1991 Mephisto Vancouver 68000
 van32    // 1991 Mephisto Vancouver 68020
 gen32    // 1993 Mephisto Genius030 V4.00
 gen32_41 // 1993 Mephisto Genius030 V4.01
-gen32_oc // 1993 Mephisto Genius030 V4.01OC
 berlinp  // 1994 Mephisto Berlin Pro 68020
 bpl32    // 1996 Mephisto Berlin Pro London Upgrade V5.00
 lond020  // 1996 Mephisto London 68020 32 Bit

@@ -15,7 +15,6 @@
  Vancouver 68020 12Mhz
  Genius 68030 V4.00 33.333 Mhz
  Genius 68030 V4.01 33.333 Mhz
- Genius 68030 V4.01 33.333x2 Mhz (custom MESS overclocked version for higher ELO)
  Berlin Pro 68020 24.576 Mhz (not modular board, but otherwise close to milano)
  Berlin Pro (London) 68020 24.576 Mhz (not modular board, but otherwise close to milano)
  London 68030 V5.00k 33.333 Mhz (probably the Genius 3/4 update ROM)
@@ -998,16 +997,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::timer_update_irq_academy)
 MACHINE_START_MEMBER(polgar_state,van32)
 {
 // patch LCD delay loop on the 68030 machines until waitstates and/or opcode timings are fixed in MAME core
-// patches gen32 gen32_41 gen32_oc lond030
+// patches gen32 gen32_41 lond030
 
 	UINT8 *rom = memregion("maincpu")->base();
 
-	if(rom[0x870] == 0x0c && rom[0x871] == 0x78) {
-		if (!strcmp(machine().system().name,"gen32_oc")) {
-			rom[0x870] = 0x6c;
-		} else {
-			rom[0x870] = 0x38;
-		}
+	if(rom[0x870] == 0x0c && rom[0x871] == 0x78)
+		rom[0x870] = 0x38;
 	}
 }
 
@@ -1694,15 +1689,6 @@ static MACHINE_CONFIG_START( gen32, polgar_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gen32_oc, gen32 )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL_33_333MHz * 2 )
-	MCFG_DEVICE_REMOVE("int_timer")
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq6, attotime::from_hz(500))
-
-
-MACHINE_CONFIG_END
-
 static MACHINE_CONFIG_START( bpl32, polgar_state )
 	MCFG_CPU_ADD("maincpu", M68020, XTAL_24_576MHz)
 	MCFG_CPU_PROGRAM_MAP(bpl32_mem)
@@ -1851,11 +1837,6 @@ ROM_START( gen32_41 )
 	ROM_LOAD("gen32_41.bin", 0x00000, 0x40000,CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c))
 ROM_END
 
-ROM_START( gen32_oc )
-	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-	ROM_LOAD("gen32_41.bin", 0x00000, 0x40000,CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c))
-ROM_END
-
 ROM_START( berlinp )
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD("berlinp.bin", 0x00000, 0x40000,CRC(82FBAF6E) SHA1(729B7CEF3DFAECC4594A6178FC4BA6015AFA6202))
@@ -1904,7 +1885,6 @@ DRIVER_INIT_MEMBER(polgar_state,polgar)
 	CONS(  1992, risc,     0,       0,      risc,      van16, driver_device,    0,       "Saitek",                    "RISC2500", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1993, gen32,    van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.00", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1993, gen32_41, van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.01", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1993, gen32_oc, van16,   0,      gen32_oc,  gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.01OC", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_UNOFFICIAL | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1994, berlinp,  van16,   0,      bpl32,     bpl32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro 68020", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1996, bpl32,    van16,   0,      bpl32,     bpl32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro London Upgrade V5.00", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1996, lond020,  van16,   0,      van32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto London 68020 32 Bit", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
