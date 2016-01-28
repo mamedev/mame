@@ -127,8 +127,9 @@ WRITE16_MEMBER(overdriv_state::cpuB_ctrl_w)
 
 WRITE16_MEMBER(overdriv_state::overdriv_soundirq_w)
 {
-	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+	m_audiocpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
+
 
 WRITE16_MEMBER(overdriv_state::overdriv_cpuB_irq_x_w)
 {
@@ -167,7 +168,7 @@ static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x238000, 0x238001) AM_WRITE(overdriv_cpuB_irq_x_w)
 ADDRESS_MAP_END
 
-// HACK ALERT
+#if UNUSED_FUNCTION
 WRITE16_MEMBER( overdriv_state::overdriv_k053246_word_w )
 {
 	m_k053246->k053246_word_w(space,offset,data,mem_mask);
@@ -190,6 +191,7 @@ WRITE16_MEMBER( overdriv_state::overdriv_k053246_word_w )
 	//printf("%02x %04x %04x\n", offset, data, mem_mask);
 
 }
+#endif
 
 static ADDRESS_MAP_START( overdriv_slave_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -197,17 +199,24 @@ static ADDRESS_MAP_START( overdriv_slave_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM //AM_DEVREADWRITE("k053250_1", k053250_device, ram_r, ram_w)
 	AM_RANGE(0x100000, 0x10000f) AM_DEVREADWRITE("k053250_1", k053250_device, reg_r, reg_w)
 	AM_RANGE(0x108000, 0x10800f) AM_DEVREADWRITE("k053250_2", k053250_device, reg_r, reg_w)
-	AM_RANGE(0x118000, 0x118fff) AM_RAM AM_SHARE("sprram") //AM_DEVREADWRITE("k053246", k053247_device, k053247_word_r, k053247_word_w) // data gets copied to sprite chip with DMA..
+	AM_RANGE(0x118000, 0x118fff) AM_DEVREADWRITE("k053246", k053247_device, k053247_word_r, k053247_word_w) // data gets copied to sprite chip with DMA..
 	AM_RANGE(0x120000, 0x120001) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
 	AM_RANGE(0x128000, 0x128001) AM_READWRITE(cpuB_ctrl_r, cpuB_ctrl_w) /* enable K053247 ROM reading, plus something else */
-	AM_RANGE(0x130000, 0x130007) AM_WRITE(overdriv_k053246_word_w) // AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
+	AM_RANGE(0x130000, 0x130007) AM_DEVREADWRITE8("k053246", k053247_device, k053246_r,k053246_w,0xffff)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x208000, 0x20bfff) AM_RAM
 	AM_RANGE(0x218000, 0x219fff) AM_DEVREAD("k053250_1", k053250_device, rom_r)
 	AM_RANGE(0x220000, 0x221fff) AM_DEVREAD("k053250_2", k053250_device, rom_r)
 ADDRESS_MAP_END
 
+WRITE8_MEMBER(overdriv_state::sound_ack_w)
+{
+	m_audiocpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+}
+
 static ADDRESS_MAP_START( overdriv_sound_map, AS_PROGRAM, 8, overdriv_state )
+	AM_RANGE(0x0000, 0x0000) AM_WRITE(sound_ack_w)
+	// 0x180 
 	AM_RANGE(0x0200, 0x0201) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0x0400, 0x042f) AM_DEVREADWRITE("k053260_1", k053260_device, read, write)
 	AM_RANGE(0x0600, 0x062f) AM_DEVREADWRITE("k053260_2", k053260_device, read, write)
