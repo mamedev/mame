@@ -63,10 +63,10 @@ private:
 	std::string m_serial_str;
 	UINT8 m_serial_idx;
 	bool  m_serial_data;
+	UINT8 m_serial_com0[0x10];
 	UINT8 m_serial_com1[0x10];
 	UINT8 m_serial_com2[0x10];
 	UINT8 m_serial_com3[0x10];
-	UINT8 m_serial_com4[0x10];
 
 	UINT32 m_version;
 	UINT32 m_seq_init;
