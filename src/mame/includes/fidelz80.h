@@ -25,7 +25,7 @@ public:
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<10> m_inp_matrix; // max 10
+	optional_ioport_array<11> m_inp_matrix; // max 11
 	optional_device<s14001a_device> m_speech;
 	optional_region_ptr<UINT8> m_speech_rom;
 
