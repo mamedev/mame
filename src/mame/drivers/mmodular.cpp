@@ -1001,7 +1001,7 @@ MACHINE_START_MEMBER(polgar_state,van32)
 
 	UINT8 *rom = memregion("maincpu")->base();
 
-	if(rom[0x870] == 0x0c && rom[0x871] == 0x78)
+	if(rom[0x870] == 0x0c && rom[0x871] == 0x78) {
 		rom[0x870] = 0x38;
 	}
 }
