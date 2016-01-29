@@ -10,11 +10,6 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/2151intf.h"
-#include "sound/2413intf.h"
-#include "sound/tms5220.h"
-#include "sound/okim6295.h"
-#include "sound/pokey.h"
 #include "video/atarimo.h"
 #include "atarigen.h"
 
@@ -965,9 +960,6 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 		m_slapstic_mirror(0),
 		m_scanlines_per_callback(0),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_oki(*this, "oki"),
-		m_soundcomm(*this, "soundcomm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -1287,57 +1279,6 @@ READ16_MEMBER(atarigen_state::slapstic_r)
 	// then determine the new one
 	slapstic_update_bank(m_slapstic_device->slapstic_tweak(space, offset));
 	return result;
-}
-
-
-
-/***************************************************************************
-    SOUND HELPERS
-***************************************************************************/
-
-//-------------------------------------------------
-//  set_volume_by_type: Scans for a particular
-//  sound chip and changes the volume on all
-//  channels associated with it.
-//-------------------------------------------------
-
-void atarigen_state::set_volume_by_type(int volume, device_type type)
-{
-	sound_interface_iterator iter(*this);
-	for (device_sound_interface *sound = iter.first(); sound != nullptr; sound = iter.next())
-		if (sound->device().type() == type)
-			sound->set_output_gain(ALL_OUTPUTS, volume / 100.0);
-}
-
-
-//-------------------------------------------------
-//  set_XXXXX_volume: Sets the volume for a given
-//  type of chip.
-//-------------------------------------------------
-
-void atarigen_state::set_ym2151_volume(int volume)
-{
-	set_volume_by_type(volume, YM2151);
-}
-
-void atarigen_state::set_ym2413_volume(int volume)
-{
-	set_volume_by_type(volume, YM2413);
-}
-
-void atarigen_state::set_pokey_volume(int volume)
-{
-	set_volume_by_type(volume, POKEY);
-}
-
-void atarigen_state::set_tms5220_volume(int volume)
-{
-	set_volume_by_type(volume, TMS5220);
-}
-
-void atarigen_state::set_oki6295_volume(int volume)
-{
-	set_volume_by_type(volume, OKIM6295);
 }
 
 

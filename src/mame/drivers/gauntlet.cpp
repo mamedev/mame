@@ -191,13 +191,12 @@ WRITE16_MEMBER(gauntlet_state::sound_reset_w)
 			m_soundcomm->sound_cpu_reset();
 			if (m_sound_reset_val & 1)
 			{
-				machine().device("ymsnd")->reset();
-				tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
-				tms5220->reset();
-				tms5220->set_frequency(ATARI_CLOCK_14MHz/2 / 11);
-				set_ym2151_volume(0);
-				set_pokey_volume(0);
-				set_tms5220_volume(0);
+				m_ym2151->reset();
+				m_tms5220->reset();
+				m_tms5220->set_frequency(ATARI_CLOCK_14MHz/2 / 11);
+				m_ym2151->set_output_gain(ALL_OUTPUTS, 0.0f);
+				m_pokey->set_output_gain(ALL_OUTPUTS, 0.0f);
+				m_tms5220->set_output_gain(ALL_OUTPUTS, 0.0f);
 			}
 		}
 	}
@@ -213,12 +212,11 @@ WRITE16_MEMBER(gauntlet_state::sound_reset_w)
 
 READ8_MEMBER(gauntlet_state::switch_6502_r)
 {
-	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
 	int temp = 0x30;
 
 	if (m_soundcomm->main_to_sound_ready()) temp ^= 0x80;
 	if (m_soundcomm->sound_to_main_ready()) temp ^= 0x40;
-	if (!tms5220->readyq_r()) temp ^= 0x20;
+	if (!m_tms5220->readyq_r()) temp ^= 0x20;
 	if (!(ioport("803008")->read() & 0x0008)) temp ^= 0x10;
 
 	return temp;
@@ -233,24 +231,23 @@ READ8_MEMBER(gauntlet_state::switch_6502_r)
 
 WRITE8_MEMBER(gauntlet_state::sound_ctl_w)
 {
-	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
 	switch (offset & 7)
 	{
 		case 0: /* music reset, bit D7, low reset */
-			if (((data>>7)&1) == 0) machine().device("ymsnd")->reset();
+			if (((data>>7)&1) == 0) m_ym2151->reset();
 			break;
 
 		case 1: /* speech write, bit D7, active low */
-			tms5220->wsq_w(data >> 7);
+			m_tms5220->wsq_w(data >> 7);
 			break;
 
 		case 2: /* speech reset, bit D7, active low */
-			tms5220->rsq_w(data >> 7);
+			m_tms5220->rsq_w(data >> 7);
 			break;
 
 		case 3: /* speech squeak, bit D7 */
 			data = 5 | ((data >> 6) & 2);
-			tms5220->set_frequency(ATARI_CLOCK_14MHz/2 / (16 - data));
+			m_tms5220->set_frequency(ATARI_CLOCK_14MHz/2 / (16 - data));
 			break;
 	}
 }
@@ -265,9 +262,9 @@ WRITE8_MEMBER(gauntlet_state::sound_ctl_w)
 
 WRITE8_MEMBER(gauntlet_state::mixer_w)
 {
-	set_ym2151_volume((data & 7) * 100 / 7);
-	set_pokey_volume(((data >> 3) & 3) * 100 / 3);
-	set_tms5220_volume(((data >> 5) & 7) * 100 / 7);
+	m_ym2151->set_output_gain(ALL_OUTPUTS, (data & 7) / 7.0f);
+	m_pokey->set_output_gain(ALL_OUTPUTS, ((data >> 3) & 3) / 3.0f);
+	m_tms5220->set_output_gain(ALL_OUTPUTS, ((data >> 5) & 7) / 7.0f);
 }
 
 
