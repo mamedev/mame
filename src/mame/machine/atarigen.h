@@ -14,7 +14,6 @@
 #include "machine/eeprompar.h"
 #include "video/atarimo.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/okim6295.h"
 #include "includes/slapstic.h"
 
 
@@ -362,14 +361,6 @@ public:
 	DECLARE_WRITE16_MEMBER(slapstic_w);
 	DECLARE_READ16_MEMBER(slapstic_r);
 
-	// sound helpers
-	void set_volume_by_type(int volume, device_type type);
-	void set_ym2151_volume(int volume);
-	void set_ym2413_volume(int volume);
-	void set_pokey_volume(int volume);
-	void set_tms5220_volume(int volume);
-	void set_oki6295_volume(int volume);
-
 	// scanline timing
 	void scanline_timer_reset(screen_device &screen, int frequency);
 	void scanline_timer(emu_timer &timer, screen_device &screen, int scanline);
@@ -412,10 +403,7 @@ public:
 
 	atarigen_screen_timer   m_screen_timer[2];
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
-	optional_device<okim6295_device> m_oki;
 
-	optional_device<atari_sound_comm_device> m_soundcomm;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;

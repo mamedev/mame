@@ -127,9 +127,6 @@
 
 #include "emu.h"
 #include "includes/atarisy2.h"
-#include "sound/tms5220.h"
-#include "sound/2151intf.h"
-#include "sound/pokey.h"
 
 
 #define MASTER_CLOCK        XTAL_20MHz
@@ -328,7 +325,7 @@ READ8_MEMBER(atarisy2_state::switch_6502_r)
 {
 	int result = ioport("1840")->read();
 
-	if ((m_has_tms5220) && (machine().device<tms5220_device>("tms")->readyq_r() == 0))
+	if (m_tms5220.found() && (m_tms5220->readyq_r() == 0))
 		result &= ~0x04;
 	if (!(ioport("1801")->read() & 0x80)) result |= 0x10;
 
@@ -340,10 +337,10 @@ WRITE8_MEMBER(atarisy2_state::switch_6502_w)
 {
 	output().set_led_value(0, data & 0x04);
 	output().set_led_value(1, data & 0x08);
-	if (m_has_tms5220)
+	if (m_tms5220.found())
 	{
 		data = 12 | ((data >> 5) & 1);
-		machine().device<tms5220_device>("tms")->set_frequency(MASTER_CLOCK/4 / (16 - data) / 2);
+		m_tms5220->set_frequency(MASTER_CLOCK/4 / (16 - data) / 2);
 	}
 }
 
@@ -629,7 +626,7 @@ WRITE8_MEMBER(atarisy2_state::mixer_w)
 	if (!(data & 0x02)) rbott += 1.0/47;
 	if (!(data & 0x04)) rbott += 1.0/22;
 	gain = (rbott == 0) ? 1.0 : ((1.0/rbott) / (rtop + (1.0/rbott)));
-	set_ym2151_volume(gain * 100);
+	m_ym2151->set_output_gain(ALL_OUTPUTS, gain);
 
 	/* bits 3-4 control the volume of the POKEYs, using 47k and 100k resistors */
 	rtop = 1.0/(1.0/100 + 1.0/100);
@@ -637,16 +634,20 @@ WRITE8_MEMBER(atarisy2_state::mixer_w)
 	if (!(data & 0x08)) rbott += 1.0/47;
 	if (!(data & 0x10)) rbott += 1.0/22;
 	gain = (rbott == 0) ? 1.0 : ((1.0/rbott) / (rtop + (1.0/rbott)));
-	set_pokey_volume(gain * 100);
+	m_pokey1->set_output_gain(ALL_OUTPUTS, gain);
+	m_pokey2->set_output_gain(ALL_OUTPUTS, gain);
 
 	/* bits 5-7 control the volume of the TMS5220, using 22k, 47k, and 100k resistors */
-	rtop = 1.0/(1.0/100 + 1.0/100);
-	rbott = 0;
-	if (!(data & 0x20)) rbott += 1.0/100;
-	if (!(data & 0x40)) rbott += 1.0/47;
-	if (!(data & 0x80)) rbott += 1.0/22;
-	gain = (rbott == 0) ? 1.0 : ((1.0/rbott) / (rtop + (1.0/rbott)));
-	set_tms5220_volume(gain * 100);
+	if (m_tms5220.found())
+	{
+		rtop = 1.0/(1.0/100 + 1.0/100);
+		rbott = 0;
+		if (!(data & 0x20)) rbott += 1.0/100;
+		if (!(data & 0x40)) rbott += 1.0/47;
+		if (!(data & 0x80)) rbott += 1.0/22;
+		gain = (rbott == 0) ? 1.0 : ((1.0/rbott) / (rtop + (1.0/rbott)));
+		m_tms5220->set_output_gain(ALL_OUTPUTS, gain);
+	}
 }
 
 
@@ -664,9 +665,9 @@ WRITE8_MEMBER(atarisy2_state::sound_reset_w)
 	/* a large number of signals are reset when this happens */
 	m_soundcomm->reset();
 	machine().device("ymsnd")->reset();
-	if (m_has_tms5220)
+	if (m_tms5220.found())
 	{
-		machine().device("tms")->reset(); // technically what happens is the tms5220 gets a long stream of 0xFF written to it when sound_reset_state is 0 which halts the chip after a few frames, but this works just as well, even if it isn't exactly true to hardware... The hardware may not have worked either, the resistors to pull input to 0xFF are fighting against the ls263 gate holding the latched value to be sent to the chip.
+		m_tms5220->reset(); // technically what happens is the tms5220 gets a long stream of 0xFF written to it when sound_reset_state is 0 which halts the chip after a few frames, but this works just as well, even if it isn't exactly true to hardware... The hardware may not have worked either, the resistors to pull input to 0xFF are fighting against the ls263 gate holding the latched value to be sent to the chip.
 	}
 	mixer_w(space, 0, 0);
 }
@@ -714,17 +715,17 @@ READ8_MEMBER(atarisy2_state::sound_6502_r)
 
 WRITE8_MEMBER(atarisy2_state::tms5220_w)
 {
-	if (m_has_tms5220)
+	if (m_tms5220.found())
 	{
-		machine().device<tms5220_device>("tms")->data_w(space, 0, data);
+		m_tms5220->data_w(space, 0, data);
 	}
 }
 
 WRITE8_MEMBER(atarisy2_state::tms5220_strobe_w)
 {
-	if (m_has_tms5220)
+	if (m_tms5220.found())
 	{
-		machine().device<tms5220_device>("tms")->wsq_w(1-(offset & 1));
+		m_tms5220->wsq_w(1-(offset & 1));
 	}
 }
 
@@ -3142,8 +3143,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,paperboy)
 	}
 
 	m_pedal_count = 0;
-	m_has_tms5220 = 1;
-	machine().device<tms5220_device>("tms")->rsq_w(1); // /RS is tied high on sys2 hw
+	m_tms5220->rsq_w(1); // /RS is tied high on sys2 hw
 }
 
 
@@ -3155,8 +3155,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,720)
 	m_slapstic->slapstic_init(machine(), 107);
 
 	m_pedal_count = -1;
-	m_has_tms5220 = 1;
-	machine().device<tms5220_device>("tms")->rsq_w(1); // /RS is tied high on sys2 hw
+	m_tms5220->rsq_w(1); // /RS is tied high on sys2 hw
 }
 
 
@@ -3172,7 +3171,6 @@ DRIVER_INIT_MEMBER(atarisy2_state,ssprint)
 		memcpy(&cpu1[i + 0x10000], &cpu1[i], 0x10000);
 
 	m_pedal_count = 3;
-	m_has_tms5220 = 0;
 }
 
 
@@ -3188,7 +3186,6 @@ DRIVER_INIT_MEMBER(atarisy2_state,csprint)
 		memcpy(&cpu1[i + 0x10000], &cpu1[i], 0x10000);
 
 	m_pedal_count = 2;
-	m_has_tms5220 = 0;
 }
 
 
@@ -3197,8 +3194,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,apb)
 	m_slapstic->slapstic_init(machine(), 110);
 
 	m_pedal_count = 2;
-	m_has_tms5220 = 1;
-	machine().device<tms5220_device>("tms")->rsq_w(1); // /RS is tied high on sys2 hw
+	m_tms5220->rsq_w(1); // /RS is tied high on sys2 hw
 }
 
 

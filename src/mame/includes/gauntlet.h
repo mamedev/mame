@@ -8,15 +8,29 @@
 
 #include "machine/atarigen.h"
 #include "video/atarimo.h"
+#include "sound/2151intf.h"
+#include "sound/pokey.h"
+#include "sound/tms5220.h"
 
 class gauntlet_state : public atarigen_state
 {
 public:
 	gauntlet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
+			m_audiocpu(*this, "audiocpu"),
+			m_soundcomm(*this, "soundcomm"),
+			m_ym2151(*this, "ymsnd"),
+			m_pokey(*this, "pokey"),
+			m_tms5220(*this, "tms"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
 			m_mob(*this, "mob")  { }
+
+	required_device<cpu_device> m_audiocpu;
+	required_device<atari_sound_comm_device> m_soundcomm;
+	required_device<ym2151_device> m_ym2151;
+	required_device<pokey_device> m_pokey;
+	required_device<tms5220_device> m_tms5220;
 
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
