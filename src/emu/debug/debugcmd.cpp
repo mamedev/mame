@@ -2381,11 +2381,12 @@ static void execute_find(running_machine &machine, int ref, int params, const ch
 	for (int i = 2; i < params; i++)
 	{
 		const char *pdata = param[i];
+		size_t pdatalen = strlen(pdata) - 1;
 
 		/* check for a string */
-		if (pdata[0] == '"' && pdata[strlen(pdata) - 1] == '"')
+		if (pdata[0] == '"' && pdata[pdatalen] == '"')
 		{
-			for (j = 1; j < strlen(pdata) - 1; j++)
+			for (j = 1; j < pdatalen; j++)
 			{
 				data_to_find[data_count] = pdata[j];
 				data_size[data_count++] = 1;

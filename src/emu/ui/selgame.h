@@ -31,7 +31,7 @@ private:
 	// internal state
 	enum { VISIBLE_GAMES_IN_LIST = 15 };
 	UINT8                   m_error;
-	UINT8                   m_rerandomize;
+	bool                    m_rerandomize;
 	char                    m_search[40];
 	int                     m_matchlist[VISIBLE_GAMES_IN_LIST];
 	std::vector<const game_driver *> m_driverlist;

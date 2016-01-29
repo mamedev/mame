@@ -1049,7 +1049,7 @@ void lua_engine::periodic_check()
 	osd_lock_acquire(lock);
 	if (msg.ready == 1) {
 	lua_settop(m_lua_state, 0);
-	int status = luaL_loadbuffer(m_lua_state, msg.text.c_str(), strlen(msg.text.c_str()), "=stdin");
+	int status = luaL_loadbuffer(m_lua_state, msg.text.c_str(), msg.text.length(), "=stdin");
 	if (incomplete(status)==0)  /* cannot try to add lines? */
 	{
 		if (status == LUA_OK) status = docall(0, LUA_MULTRET);

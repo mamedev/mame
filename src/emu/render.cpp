@@ -1055,8 +1055,9 @@ int render_target::configured_view(const char *viewname, int targetindex, int nu
 	if (strcmp(viewname, "auto") != 0)
 	{
 		// scan for a matching view name
+		size_t viewlen = strlen(viewname);
 		for (view = view_by_index(viewindex = 0); view != nullptr; view = view_by_index(++viewindex))
-			if (core_strnicmp(view->name(), viewname, strlen(viewname)) == 0)
+			if (core_strnicmp(view->name(), viewname, viewlen) == 0)
 				break;
 	}
 

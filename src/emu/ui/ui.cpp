@@ -237,7 +237,7 @@ ui_manager::ui_manager(running_machine &machine)
 	m_handler_param = 0;
 	m_single_step = false;
 	m_showfps = false;
-	m_showfps_end = false;
+	m_showfps_end = 0;
 	m_show_profiler = false;
 	m_popup_text_end = 0;
 	m_use_natural_keyboard = false;
@@ -1504,7 +1504,6 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	// first draw the FPS counter
 	if (machine.ui().show_fps_counter())
 	{
-		std::string tempstring;
 		machine.ui().draw_text_full(container, machine.video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, nullptr, nullptr);
 	}
