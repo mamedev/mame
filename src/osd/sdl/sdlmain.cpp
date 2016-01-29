@@ -48,7 +48,6 @@
 
 // OSD headers
 #include "video.h"
-#include "input.h"
 #include "osdsdl.h"
 #include "modules/lib/osdlib.h"
 
@@ -610,3 +609,4 @@ void sdl_osd_interface::init(running_machine &machine)
 	SDL_EnableUNICODE(SDL_TRUE);
 #endif
 }
+

@@ -47,7 +47,6 @@
 // MAMEOS headers
 #include "video.h"
 #include "window.h"
-#include "input.h"
 #include "osdsdl.h"
 #include "modules/lib/osdlib.h"
 
@@ -316,7 +315,8 @@ void sdl_osd_interface::update(bool skip_redraw)
 	}
 
 	// poll the joystick values here
-	sdlinput_poll(machine());
+	downcast<sdl_osd_interface&>(machine().osd()).poll_inputs(machine());
+
 	check_osd_inputs(machine());
 	// if we're running, disable some parts of the debugger
 	if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
@@ -506,7 +506,12 @@ finishit:
 
 static void check_osd_inputs(running_machine &machine)
 {
+#ifdef USE_OLD_SDL_INPUT
 	sdl_window_info *window = sdlinput_get_focus_window();
+#else
+	// BUG: TODO: Fix focus window support
+	sdl_window_info *window = sdl_window_list;
+#endif
 
 	// check for toggling fullscreen mode
 	if (machine.ui_input().pressed(IPT_OSD_1))

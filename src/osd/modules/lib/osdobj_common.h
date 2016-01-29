@@ -16,6 +16,7 @@
 #include "osdepend.h"
 #include "modules/osdmodule.h"
 #include "modules/font/font_module.h"
+#include "modules/input/input_module.h"
 #include "modules/sound/sound_module.h"
 #include "modules/debugger/debug_module.h"
 #include "modules/netdev/netdev_module.h"
@@ -269,6 +270,10 @@ protected:
 	sound_module* m_sound;
 	debug_module* m_debugger;
 	midi_module* m_midi;
+    input_module* m_keyboard_input;
+    input_module* m_mouse_input;
+    input_module* m_lightgun_input;
+    input_module* m_joystick_input;
 private:
 	std::vector<const char *> m_video_names;
 };

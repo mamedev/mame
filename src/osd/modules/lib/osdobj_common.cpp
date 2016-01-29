@@ -25,6 +25,12 @@ const options_entry osd_options::s_option_entries[] =
 	{ NULL,                                   NULL,             OPTION_HEADER,    "OSD FONT OPTIONS" },
 	{ OSD_FONT_PROVIDER,                      OSDOPTVAL_AUTO,   OPTION_STRING,    "provider for ui font: " },
 
+	{ NULL,                                   NULL,             OPTION_HEADER,    "OSD INPUT OPTIONS" },
+	{ OSD_KEYBOARDINPUT_PROVIDER,             OSDOPTVAL_AUTO,   OPTION_STRING,    "provider for keyboard input: " },
+	{ OSD_MOUSEINPUT_PROVIDER,                OSDOPTVAL_AUTO,   OPTION_STRING,    "provider for mouse input: " },
+	{ OSD_LIGHTGUNINPUT_PROVIDER,             OSDOPTVAL_AUTO,   OPTION_STRING,    "provider for lightgun input: " },
+	{ OSD_JOYSTICKINPUT_PROVIDER,             OSDOPTVAL_AUTO,   OPTION_STRING,    "provider for joystick input: " },
+
 	{ NULL,                                   NULL,             OPTION_HEADER,    "OSD CLI OPTIONS" },
 	{ OSDCOMMAND_LIST_MIDI_DEVICES ";mlist",  "0",              OPTION_COMMAND,   "list available MIDI I/O devices" },
 	{ OSDCOMMAND_LIST_NETWORK_ADAPTERS ";nlist", "0",           OPTION_COMMAND,   "list available network adapters" },
@@ -155,7 +161,11 @@ osd_common_t::osd_common_t(osd_options &options)
 		m_options(options),
 		m_print_verbose(false),
 		m_sound(NULL),
-		m_debugger(NULL)
+		m_debugger(NULL),
+		m_keyboard_input(NULL),
+		m_mouse_input(NULL),
+		m_lightgun_input(NULL),
+		m_joystick_input(NULL)
 {
 	osd_output::push(this);
 }
@@ -207,6 +217,26 @@ void osd_common_t::register_options()
 #endif
 	REGISTER_MODULE(m_mod_man, MIDI_NONE);
 
+	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_SDL);
+	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_RAWINPUT);
+	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_DINPUT);
+	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_WIN32);
+	REGISTER_MODULE(m_mod_man, KEYBOARD_NONE);
+
+	REGISTER_MODULE(m_mod_man, MOUSEINPUT_SDL);
+	REGISTER_MODULE(m_mod_man, MOUSEINPUT_RAWINPUT);
+	REGISTER_MODULE(m_mod_man, MOUSEINPUT_DINPUT);
+	REGISTER_MODULE(m_mod_man, MOUSEINPUT_WIN32);
+	REGISTER_MODULE(m_mod_man, MOUSE_NONE);
+
+	REGISTER_MODULE(m_mod_man, LIGHTGUN_X11);
+	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_WIN32);
+	REGISTER_MODULE(m_mod_man, LIGHTGUN_NONE);
+
+	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_SDL);
+	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_DINPUT);
+	REGISTER_MODULE(m_mod_man, JOYSTICK_NONE);
+
 	// after initialization we know which modules are supported
 
 	const char *names[20];
@@ -216,6 +246,30 @@ void osd_common_t::register_options()
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
 	update_option(OSD_FONT_PROVIDER, dnames);
+
+	m_mod_man.get_module_names(OSD_KEYBOARDINPUT_PROVIDER, 20, &num, names);
+	dnames.clear();
+	for (int i = 0; i < num; i++)
+		dnames.push_back(names[i]);
+	update_option(OSD_KEYBOARDINPUT_PROVIDER, dnames);
+
+	m_mod_man.get_module_names(OSD_MOUSEINPUT_PROVIDER, 20, &num, names);
+	dnames.clear();
+	for (int i = 0; i < num; i++)
+		dnames.push_back(names[i]);
+	update_option(OSD_MOUSEINPUT_PROVIDER, dnames);
+
+	m_mod_man.get_module_names(OSD_LIGHTGUNINPUT_PROVIDER, 20, &num, names);
+	dnames.clear();
+	for (int i = 0; i < num; i++)
+		dnames.push_back(names[i]);
+	update_option(OSD_LIGHTGUNINPUT_PROVIDER, dnames);
+
+	m_mod_man.get_module_names(OSD_JOYSTICKINPUT_PROVIDER, 20, &num, names);
+	dnames.clear();
+	for (int i = 0; i < num; i++)
+		dnames.push_back(names[i]);
+	update_option(OSD_JOYSTICKINPUT_PROVIDER, dnames);
 
 	m_mod_man.get_module_names(OSD_SOUND_PROVIDER, 20, &num, names);
 	dnames.clear();
@@ -544,15 +598,14 @@ void osd_common_t::init_subsystems()
 		exit(-1);
 	}
 
-	input_init();
-	// we need pause callbacks
-	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(osd_common_t::input_pause), this));
-	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(osd_common_t::input_resume), this));
-
 	output_init();
 
-	m_font_module = select_module_options<font_module *>(options(), OSD_FONT_PROVIDER);
+	m_keyboard_input = select_module_options<input_module *>(options(), OSD_KEYBOARDINPUT_PROVIDER);
+	m_mouse_input = select_module_options<input_module *>(options(), OSD_MOUSEINPUT_PROVIDER);
+	m_lightgun_input = select_module_options<input_module *>(options(), OSD_LIGHTGUNINPUT_PROVIDER);
+	m_joystick_input = select_module_options<input_module *>(options(), OSD_JOYSTICKINPUT_PROVIDER);
 
+	m_font_module = select_module_options<font_module *>(options(), OSD_FONT_PROVIDER);
 	m_sound = select_module_options<sound_module *>(options(), OSD_SOUND_PROVIDER);
 	m_sound->m_sample_rate = options().sample_rate();
 	m_sound->m_audio_latency = options().audio_latency();
@@ -565,6 +618,10 @@ void osd_common_t::init_subsystems()
 
 	m_mod_man.init(options());
 
+	input_init();
+	// we need pause callbacks
+	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(osd_common_t::input_pause), this));
+	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(osd_common_t::input_resume), this));
 }
 
 bool osd_common_t::video_init()
@@ -588,15 +645,27 @@ void osd_common_t::video_register()
 
 bool osd_common_t::input_init()
 {
+	m_keyboard_input->input_init(machine());
+	m_mouse_input->input_init(machine());
+	m_lightgun_input->input_init(machine());
+	m_joystick_input->input_init(machine());
 	return true;
 }
 
 void osd_common_t::input_pause()
 {
+	m_keyboard_input->pause();
+	m_mouse_input->pause();
+	m_lightgun_input->pause();
+	m_joystick_input->pause();
 }
 
 void osd_common_t::input_resume()
 {
+	m_keyboard_input->resume();
+	m_mouse_input->resume();
+	m_lightgun_input->resume();
+	m_joystick_input->resume();
 }
 
 bool osd_common_t::output_init()
@@ -621,6 +690,10 @@ void osd_common_t::window_exit()
 
 void osd_common_t::input_exit()
 {
+	m_keyboard_input->exit();
+	m_mouse_input->exit();
+	m_lightgun_input->exit();
+	m_joystick_input->exit();
 }
 
 void osd_common_t::output_exit()
