@@ -45,6 +45,12 @@ extern int drawbgfx_init(running_machine &machine, osd_draw_callbacks *callbacks
 extern int drawogl_init(running_machine &machine, osd_draw_callbacks *callbacks);
 #endif
 
+#define NOT_ALREADY_DOWN(x) (x & 0x40000000) == 0
+#define SCAN_CODE(x) ((x >> 16) & 0xff)
+#define IS_EXTENDED(x) (0x01000000 & x)
+#define MAKE_DI_SCAN(scan, isextended) (scan & 0x7f) | (isextended ? 0x80 : 0x00)
+#define WINOSD(machine) downcast<windows_osd_interface*>(&machine.osd())
+
 //============================================================
 //  PARAMETERS
 //============================================================
@@ -133,11 +139,11 @@ struct mtlog
 };
 
 static mtlog mtlog[100000];
-static volatile INT32 mtlogindex;
+static volatile LONG mtlogindex;
 
 void mtlog_add(const char *event)
 {
-	int index = atomic_increment32((INT32 *) &mtlogindex) - 1;
+	int index = atomic_increment32((LONG *) &mtlogindex) - 1;
 	if (index < ARRAY_LENGTH(mtlog))
 	{
 		mtlog[index].timestamp = osd_ticks();
@@ -199,7 +205,7 @@ bool windows_osd_interface::window_init()
 			fatalerror("Failed to create window thread ready event\n");
 
 		// create a thread to run the windows from
-		temp = _beginthreadex(NULL, 0, win_window_info::thread_entry, NULL, 0, (unsigned *)&window_threadid);
+		temp = _beginthreadex(NULL, 0, win_window_info::thread_entry, this, 0, (unsigned *)&window_threadid);
 		window_thread = (HANDLE)temp;
 		if (window_thread == NULL)
 			fatalerror("Failed to create window thread\n");
@@ -262,6 +268,7 @@ void windows_osd_interface::window_exit()
 		win_window_list = temp->m_next;
 		temp->destroy();
 		global_free(temp);
+
 	}
 
 	// kill the drawers
@@ -299,6 +306,7 @@ win_window_info::win_window_info(running_machine &machine)
 		m_fullscreen(0),
 		m_fullscreen_safe(0),
 		m_aspect(0),
+		m_render_lock(NULL),
 		m_target(NULL),
 		m_targetview(0),
 		m_targetorient(0),
@@ -355,7 +363,25 @@ static BOOL is_mame_window(HWND hwnd)
 	return FALSE;
 }
 
+inline static BOOL handle_mouse_button(windows_osd_interface *osd, int button, int down, int x, int y)
+{
+	MouseButtonEventArgs args;
+	args.button = button;
+	args.keydown = down;
+	args.xpos = x;
+	args.ypos = y;
+	
+	return osd->handle_input_event(INPUT_EVENT_MOUSE_BUTTON, &args);
+}
 
+inline static BOOL handle_keypress(windows_osd_interface *osd, int vkey, int down, int scancode, BOOL extended_key)
+{
+	KeyPressEventArgs args;
+	args.scancode = MAKE_DI_SCAN(scancode, extended_key);
+	args.vkey = vkey;
+
+	return osd->handle_input_event(down ? INPUT_EVENT_KEYDOWN : INPUT_EVENT_KEYUP, &args);
+}
 
 //============================================================
 //  winwindow_process_events
@@ -396,36 +422,45 @@ void winwindow_process_events(running_machine &machine, int ingame, bool nodispa
 
 					// forward mouse button downs to the input system
 					case WM_LBUTTONDOWN:
-						dispatch = !wininput_handle_mouse_button(0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(WINOSD(machine), 0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_RBUTTONDOWN:
-						dispatch = !wininput_handle_mouse_button(1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(WINOSD(machine), 1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_MBUTTONDOWN:
-						dispatch = !wininput_handle_mouse_button(2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(WINOSD(machine), 2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_XBUTTONDOWN:
-						dispatch = !wininput_handle_mouse_button(3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(WINOSD(machine), 3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					// forward mouse button ups to the input system
 					case WM_LBUTTONUP:
-						dispatch = !wininput_handle_mouse_button(0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(WINOSD(machine), 0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_RBUTTONUP:
-						dispatch = !wininput_handle_mouse_button(1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(WINOSD(machine), 1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_MBUTTONUP:
-						dispatch = !wininput_handle_mouse_button(2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(WINOSD(machine), 2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_XBUTTONUP:
-						dispatch = !wininput_handle_mouse_button(3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(WINOSD(machine), 3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						break;
+
+					case WM_KEYDOWN:
+						if (NOT_ALREADY_DOWN(message.lParam))
+							dispatch = !handle_keypress(WINOSD(machine), message.wParam, TRUE, SCAN_CODE(message.lParam), IS_EXTENDED(message.lParam));
+						break;
+
+					case WM_KEYUP:
+						dispatch = !handle_keypress(WINOSD(machine), message.wParam, FALSE, SCAN_CODE(message.lParam), IS_EXTENDED(message.lParam));
 						break;
 				}
 			}
@@ -606,7 +641,7 @@ void winwindow_update_cursor_state(running_machine &machine)
 	//   2. we also hide the cursor in full screen mode and when the window doesn't have a menu
 	//   3. we also hide the cursor in windowed mode if we're not paused and
 	//      the input system requests it
-	if (winwindow_has_focus() && ((!video_config.windowed && !win_window_list->win_has_menu()) || (!machine.paused() && wininput_should_hide_mouse())))
+	if (winwindow_has_focus() && ((!video_config.windowed && !win_window_list->win_has_menu()) || (!machine.paused() && downcast<windows_osd_interface&>(machine.osd()).should_hide_mouse())))
 	{
 		win_window_info *window = win_window_list;
 		RECT bounds;
@@ -669,6 +704,9 @@ void win_window_info::create(running_machine &machine, int index, osd_monitor_in
 	// add us to the list
 	*last_window_ptr = window;
 	last_window_ptr = &window->m_next;
+
+	// create a lock that we can use to skip blitting
+	window->m_render_lock = osd_lock_alloc();
 
 	// load the layout
 	window->m_target = machine.render().target_alloc();
@@ -741,6 +779,11 @@ void win_window_info::destroy()
 
 	// free the render target
 	machine().render().target_free(m_target);
+
+	// FIXME: move to destructor
+	// free the lock
+	osd_lock_free(m_render_lock);
+
 }
 
 
@@ -782,15 +825,15 @@ void win_window_info::update()
 	// if we're visible and running and not in the middle of a resize, draw
 	if (m_hwnd != NULL && m_target != NULL && m_renderer != NULL)
 	{
-		bool got_lock = true;
+		int got_lock = TRUE;
 
 		mtlog_add("winwindow_video_window_update: try lock");
 
 		// only block if we're throttled
 		if (machine().video().throttled() || timeGetTime() - last_update_time > 250)
-			m_render_lock.lock();
+			osd_lock_acquire(m_render_lock);
 		else
-			got_lock = m_render_lock.try_lock();
+			got_lock = osd_lock_try(m_render_lock);
 
 		// only render if we were able to get the lock
 		if (got_lock)
@@ -800,7 +843,7 @@ void win_window_info::update()
 			mtlog_add("winwindow_video_window_update: got lock");
 
 			// don't hold the lock; we just used it to see if rendering was still happening
-			m_render_lock.unlock();
+			osd_lock_release(m_render_lock);
 
 			// ensure the target bounds are up-to-date, and then get the primitives
 			primlist = m_renderer->get_primitives();
@@ -1060,6 +1103,7 @@ int win_window_info::wnd_extra_height()
 unsigned __stdcall win_window_info::thread_entry(void *param)
 {
 	MSG message;
+	windows_osd_interface *osd = static_cast<windows_osd_interface*>(param);
 
 	// make a bogus user call to make us a message thread
 	PeekMessage(&message, NULL, 0, 0, PM_NOREMOVE);
@@ -1087,36 +1131,36 @@ unsigned __stdcall win_window_info::thread_entry(void *param)
 
 				// forward mouse button downs to the input system
 				case WM_LBUTTONDOWN:
-					dispatch = !wininput_handle_mouse_button(0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = !handle_mouse_button(osd, 0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				case WM_RBUTTONDOWN:
-					dispatch = !wininput_handle_mouse_button(1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = !handle_mouse_button(osd, 1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				case WM_MBUTTONDOWN:
-					dispatch = !wininput_handle_mouse_button(2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = !handle_mouse_button(osd, 2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				case WM_XBUTTONDOWN:
-					dispatch = !wininput_handle_mouse_button(3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = !handle_mouse_button(osd, 3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				// forward mouse button ups to the input system
 				case WM_LBUTTONUP:
-					dispatch = !wininput_handle_mouse_button(0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = !handle_mouse_button(osd, 0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				case WM_RBUTTONUP:
-					dispatch = !wininput_handle_mouse_button(1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = !handle_mouse_button(osd, 1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				case WM_MBUTTONUP:
-					dispatch = !wininput_handle_mouse_button(2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = !handle_mouse_button(osd, 2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				case WM_XBUTTONUP:
-					dispatch = !wininput_handle_mouse_button(3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = !handle_mouse_button(osd, 3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				// a terminate message to the thread posts a quit
@@ -1272,7 +1316,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 
 		// input: handle the raw input
 		case WM_INPUT:
-			wininput_handle_raw((HRAWINPUT)lparam);
+			downcast<windows_osd_interface&>(window->machine().osd()).handle_input_event(INPUT_EVENT_RAWINPUT, &lparam);
 			break;
 
 		// syskeys - ignore
@@ -1318,14 +1362,6 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		case WM_CHAR:
 			window->machine().ui_input().push_char_event(window->m_target, (unicode_char) wparam);
 			break;
-
-		case WM_MOUSEWHEEL:
-		{
-			UINT ucNumLines = 3; // default
-			SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &ucNumLines, 0);
-			window->machine().ui_input().push_mouse_wheel_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), GET_WHEEL_DELTA_WPARAM(wparam), ucNumLines);
-			break;
-		}
 
 		// pause the system when we start a menu or resize
 		case WM_ENTERSIZEMOVE:
@@ -1409,9 +1445,9 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		case WM_DESTROY:
 			if (!(window->m_renderer == NULL))
 			{
-			window->m_renderer->destroy();
-			global_free(window->m_renderer);
-			window->m_renderer = NULL;
+				window->m_renderer->destroy();
+				global_free(window->m_renderer);
+				window->m_renderer = NULL;
 			}
 			window->m_hwnd = NULL;
 			return DefWindowProc(wnd, message, wparam, lparam);
@@ -1490,7 +1526,7 @@ void win_window_info::draw_video_contents(HDC dc, int update)
 	mtlog_add("draw_video_contents: begin");
 
 	mtlog_add("draw_video_contents: render lock acquire");
-	std::lock_guard<std::mutex> lock(m_render_lock);
+	osd_lock_acquire(m_render_lock);
 	mtlog_add("draw_video_contents: render lock acquired");
 
 	// if we're iconic, don't bother
@@ -1514,6 +1550,7 @@ void win_window_info::draw_video_contents(HDC dc, int update)
 		}
 	}
 
+	osd_lock_release(m_render_lock);
 	mtlog_add("draw_video_contents: render lock released");
 
 	mtlog_add("draw_video_contents: end");

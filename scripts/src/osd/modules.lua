@@ -69,6 +69,14 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/sound/sdl_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/xaudio2_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/none.cpp",
+		MAME_DIR .. "src/osd/modules/input/eventagg.h",
+		MAME_DIR .. "src/osd/modules/input/input_dinput.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_module.h",
+		MAME_DIR .. "src/osd/modules/input/input_none.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_rawinput.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_win32.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_windows.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_windows.h",
 	}
 
 	if _OPTIONS["targetos"]=="windows" then
