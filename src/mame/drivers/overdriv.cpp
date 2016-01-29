@@ -70,21 +70,32 @@ WRITE16_MEMBER(overdriv_state::eeprom_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::overdriv_cpuA_scanline)
 {
+	const int timer_threshold = 160;
 	int scanline = param;
-
-	/* TODO: irqs routines are TOO slow right now, it ends up firing spurious irqs for whatever reason (shared ram fighting?) */
-	/*       this is a temporary solution to get rid of deprecat lib and the crashes, but also makes the game timer to be too slow */
-	if(scanline == 256 && m_screen->frame_number() & 1) // vblank-out irq
+	
+	m_fake_timer ++;
+	
+	// TODO: irqs routines are TOO slow right now, it ends up firing spurious irqs for whatever reason (shared ram fighting?)
+	//       this is a temporary solution to get rid of deprecat lib and the crashes, but also makes the game timer to be too slow.
+    //		 Update: gameplay is actually too fast compared to timer, first attract mode shouldn't even surpass first blue car on right.
+	if(scanline == 256) // vblank-out irq
+	{
+		// m_screen->frame_number() & 1
 		m_maincpu->set_input_line(4, HOLD_LINE);
-	else if((scanline % 128) == 0) // timer irq
+		m_subcpu->set_input_line(4, HOLD_LINE); // likely wrong
+	}
+	else if(m_fake_timer >= timer_threshold) // timer irq
+	{
+		m_fake_timer -= timer_threshold;
 		m_maincpu->set_input_line(5, HOLD_LINE);
+	}
 }
 
 INTERRUPT_GEN_MEMBER(overdriv_state::cpuB_interrupt)
 {
 	// this doesn't get turned on until the irq has happened? wrong irq?
 	if (m_k053246->k053246_is_irq_enabled())
-		m_subcpu->set_input_line(4, HOLD_LINE); // likely wrong
+		m_subcpu->set_input_line(6, HOLD_LINE); // likely wrong
 }
 
 
@@ -138,7 +149,6 @@ WRITE16_MEMBER(overdriv_state::overdriv_cpuB_irq_x_w)
 
 WRITE16_MEMBER(overdriv_state::overdriv_cpuB_irq_y_w)
 {
-	m_subcpu->set_input_line(6, HOLD_LINE); // likely wrong
 }
 
 static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
@@ -203,6 +213,7 @@ static ADDRESS_MAP_START( overdriv_slave_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x120000, 0x120001) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
 	AM_RANGE(0x128000, 0x128001) AM_READWRITE(cpuB_ctrl_r, cpuB_ctrl_w) /* enable K053247 ROM reading, plus something else */
 	AM_RANGE(0x130000, 0x130007) AM_DEVREADWRITE8("k053246", k053247_device, k053246_r,k053246_w,0xffff)
+	//AM_RANGE(0x140000, 0x140001) used in later stages
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x208000, 0x20bfff) AM_RAM
 	AM_RANGE(0x218000, 0x219fff) AM_DEVREAD("k053250_1", k053250_device, rom_r)
@@ -216,6 +227,7 @@ WRITE8_MEMBER(overdriv_state::sound_ack_w)
 
 static ADDRESS_MAP_START( overdriv_sound_map, AS_PROGRAM, 8, overdriv_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(sound_ack_w)
+	// 0x012 read during explosions
 	// 0x180 
 	AM_RANGE(0x0200, 0x0201) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0x0400, 0x042f) AM_DEVREADWRITE("k053260_1", k053260_device, read, write)
@@ -231,7 +243,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( overdriv )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
