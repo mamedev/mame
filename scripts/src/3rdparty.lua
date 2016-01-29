@@ -917,39 +917,3 @@ links {
 	"portaudio",
 }
 end
-
---------------------------------------------------
--- GoogleTest library objects
---------------------------------------------------
-
-project "gtest"
-	uuid "fa306a8d-fb10-4d4a-9d2e-fdb9076407b4"
-	kind "StaticLib"
-
-	configuration { "gmake" }
-		buildoptions {
-			"-Wno-undef",
-			"-Wno-unused-variable",
-		}
-
-	configuration { "mingw-clang" }
-		buildoptions {
-			"-O0", -- crash of compiler when doing optimization
-		}
-
-	configuration { "vs*" }
-if _OPTIONS["vs"]=="intel-15" then
-		buildoptions {
-			"/Qwd1195", 			-- error #1195: conversion from integer to smaller pointer
-		}
-end
-
-	configuration { }
-
-	includedirs {
-		MAME_DIR .. "3rdparty/googletest/googletest/include",
-		MAME_DIR .. "3rdparty/googletest/googletest",
-	}
-	files {
-		MAME_DIR .. "3rdparty/googletest/googletest/src/gtest-all.cc",
-	}

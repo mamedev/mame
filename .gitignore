@@ -2,6 +2,7 @@
 /*
 /*/
 !/3rdparty/
+!/benchmarks/
 !/artwork/
 !/docs/
 !/hash/

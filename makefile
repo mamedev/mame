@@ -20,6 +20,7 @@
 # SUBTARGET = tiny
 # TOOLS = 1
 # TESTS = 1
+# BENCHMARKS = 1
 # OSD = sdl
 
 # USE_BGFX = 1
@@ -473,6 +474,10 @@ ifdef TESTS
 PARAMS += --with-tests
 endif
 
+ifdef BENCHMARKS
+PARAMS += --with-benchmarks
+endif
+
 ifdef SYMBOLS
 PARAMS += --SYMBOLS='$(SYMBOLS)'
 endif
@@ -698,6 +703,7 @@ SCRIPTS = scripts/genie.lua \
 	scripts/src/sound.lua \
 	scripts/src/tools.lua \
 	scripts/src/tests.lua \
+	scripts/src/benchmarks.lua \
 	scripts/src/video.lua \
 	scripts/src/bus.lua \
 	scripts/src/netlist.lua \
