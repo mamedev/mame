@@ -1283,8 +1283,7 @@ void arkanoid_state::machine_reset()
 	// the following 3 are all part of the 74ls74 at ic26 and are cleared on reset
 	m_z80HasWritten = 0;
 	m_68705HasWritten = 0;
-	//if (m_bootleg_id == 0) m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE); // arkatayt will crash if this line is uncommented, but without this line present, arkanoid will watchdog-reset itself as soon as a level starts after pressing f3/soft reset.
-	// TODO: this can be better dealt with by having a separate machine_reset function for the mculess vs mcu sets.
+	if (m_mcu.found()) m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 
 	m_port_a_in = 0;
 	m_port_a_out = 0;
