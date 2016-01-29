@@ -29,6 +29,7 @@ mov sreg, doesnot disable until next operation is executed
 8086/8088
 ---------
 "mov cs, " causes unconditional jump!
+0xd6 is salc (sbb al,al) as all other intel x86-16 and -32 cpus
 
 80C86/80C88
 -----------
@@ -36,9 +37,10 @@ mov sreg, doesnot disable until next operation is executed
 
 80186/80188
 -----------
-integrated pic8259, pit8253, dma8253 (but not at standard pc addresses)
+integrated pic, timer and dmac entirely incompatible with 8259, 825[3,4] and 82[3,5]7
 additional instructions
-"mov cs, " ?
+#BR/bound/int 5, #UD/illegal instruction/int 6, #NM/coprocessor unavailable/int 7 support 
+"mov cs, " ignored (likely causes int 6) 
 shift count anded with 0x1f
 
 80188
@@ -52,6 +54,7 @@ although it is based on 80186 instruction set, some behaviours follow 8086
 8080 emulation mode
 "mov cs, " ignored
 shift count not anded (acts like 8086)
+0xd6 is xlat alias
 
 NEC 70116 (V30)
 ---------------
@@ -69,11 +72,11 @@ no 8080 emulation mode
 
 NEC V40
 -------
-pinout, integrated peripherals as 80186
+pinout, integrated peripherals 8259,54,37 clones at nonpc compatible addresses
 
 NEC V50
 -------
-pinout, integrated peripherals as 80188
+pinout, integrated peripherals as v40 
 
 NEC V33?
 --------
@@ -92,9 +95,9 @@ v30? emulation mode (without 8080 emulation mode)
 
 80286
 -----
-80186 with additional instructions
+80186 with additional instructions but no peripherals
 24 bit address bus,
-protected mode
+protected mode selector/descriptor
 
 80386 and later
 ---------------

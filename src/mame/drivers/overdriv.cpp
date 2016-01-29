@@ -70,21 +70,32 @@ WRITE16_MEMBER(overdriv_state::eeprom_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::overdriv_cpuA_scanline)
 {
+	const int timer_threshold = 168; // fwiw matches 0 on mask ROM check, so IF it's a timer irq then should be close ...
 	int scanline = param;
-
-	/* TODO: irqs routines are TOO slow right now, it ends up firing spurious irqs for whatever reason (shared ram fighting?) */
-	/*       this is a temporary solution to get rid of deprecat lib and the crashes, but also makes the game timer to be too slow */
-	if(scanline == 256 && m_screen->frame_number() & 1) // vblank-out irq
+	
+	m_fake_timer ++;
+	
+	// TODO: irqs routines are TOO slow right now, it ends up firing spurious irqs for whatever reason (shared ram fighting?)
+	//       this is a temporary solution to get rid of deprecat lib and the crashes, but also makes the game timer to be too slow.
+    //		 Update: gameplay is actually too fast compared to timer, first attract mode shouldn't even surpass first blue car on right.
+	if(scanline == 256) // vblank-out irq
+	{
+		// m_screen->frame_number() & 1
 		m_maincpu->set_input_line(4, HOLD_LINE);
-	else if((scanline % 128) == 0) // timer irq
+		m_subcpu->set_input_line(4, HOLD_LINE); // likely wrong
+	}
+	else if(m_fake_timer >= timer_threshold) // timer irq
+	{
+		m_fake_timer -= timer_threshold;
 		m_maincpu->set_input_line(5, HOLD_LINE);
+	}
 }
 
 INTERRUPT_GEN_MEMBER(overdriv_state::cpuB_interrupt)
 {
 	// this doesn't get turned on until the irq has happened? wrong irq?
-//  if (m_k053246->k053246_is_irq_enabled())
-	m_subcpu->set_input_line(4, HOLD_LINE); // likely wrong
+	if (m_k053246->k053246_is_irq_enabled())
+		m_subcpu->set_input_line(6, HOLD_LINE); // likely wrong
 }
 
 
@@ -127,8 +138,9 @@ WRITE16_MEMBER(overdriv_state::cpuB_ctrl_w)
 
 WRITE16_MEMBER(overdriv_state::overdriv_soundirq_w)
 {
-	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+	m_audiocpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
+
 
 WRITE16_MEMBER(overdriv_state::overdriv_cpuB_irq_x_w)
 {
@@ -137,7 +149,6 @@ WRITE16_MEMBER(overdriv_state::overdriv_cpuB_irq_x_w)
 
 WRITE16_MEMBER(overdriv_state::overdriv_cpuB_irq_y_w)
 {
-	m_subcpu->set_input_line(6, HOLD_LINE); // likely wrong
 }
 
 static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
@@ -167,7 +178,7 @@ static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x238000, 0x238001) AM_WRITE(overdriv_cpuB_irq_x_w)
 ADDRESS_MAP_END
 
-// HACK ALERT
+#ifdef UNUSED_FUNCTION
 WRITE16_MEMBER( overdriv_state::overdriv_k053246_word_w )
 {
 	m_k053246->k053246_word_w(space,offset,data,mem_mask);
@@ -190,6 +201,7 @@ WRITE16_MEMBER( overdriv_state::overdriv_k053246_word_w )
 	//printf("%02x %04x %04x\n", offset, data, mem_mask);
 
 }
+#endif
 
 static ADDRESS_MAP_START( overdriv_slave_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -197,17 +209,26 @@ static ADDRESS_MAP_START( overdriv_slave_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM //AM_DEVREADWRITE("k053250_1", k053250_device, ram_r, ram_w)
 	AM_RANGE(0x100000, 0x10000f) AM_DEVREADWRITE("k053250_1", k053250_device, reg_r, reg_w)
 	AM_RANGE(0x108000, 0x10800f) AM_DEVREADWRITE("k053250_2", k053250_device, reg_r, reg_w)
-	AM_RANGE(0x118000, 0x118fff) AM_RAM AM_SHARE("sprram") //AM_DEVREADWRITE("k053246", k053247_device, k053247_word_r, k053247_word_w) // data gets copied to sprite chip with DMA..
+	AM_RANGE(0x118000, 0x118fff) AM_DEVREADWRITE("k053246", k053247_device, k053247_word_r, k053247_word_w) // data gets copied to sprite chip with DMA..
 	AM_RANGE(0x120000, 0x120001) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
 	AM_RANGE(0x128000, 0x128001) AM_READWRITE(cpuB_ctrl_r, cpuB_ctrl_w) /* enable K053247 ROM reading, plus something else */
-	AM_RANGE(0x130000, 0x130007) AM_WRITE(overdriv_k053246_word_w) // AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
+	AM_RANGE(0x130000, 0x130007) AM_DEVREADWRITE8("k053246", k053247_device, k053246_r,k053246_w,0xffff)
+	//AM_RANGE(0x140000, 0x140001) used in later stages
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x208000, 0x20bfff) AM_RAM
 	AM_RANGE(0x218000, 0x219fff) AM_DEVREAD("k053250_1", k053250_device, rom_r)
 	AM_RANGE(0x220000, 0x221fff) AM_DEVREAD("k053250_2", k053250_device, rom_r)
 ADDRESS_MAP_END
 
+WRITE8_MEMBER(overdriv_state::sound_ack_w)
+{
+	m_audiocpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+}
+
 static ADDRESS_MAP_START( overdriv_sound_map, AS_PROGRAM, 8, overdriv_state )
+	AM_RANGE(0x0000, 0x0000) AM_WRITE(sound_ack_w)
+	// 0x012 read during explosions
+	// 0x180 
 	AM_RANGE(0x0200, 0x0201) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0x0400, 0x042f) AM_DEVREADWRITE("k053260_1", k053260_device, read, write)
 	AM_RANGE(0x0600, 0x062f) AM_DEVREADWRITE("k053260_2", k053260_device, read, write)
@@ -222,7 +243,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( overdriv )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -297,10 +318,7 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(64*8, 40*8)
-	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 0*8, 32*8-1 )
+	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4,384,0,305,264,0,224)
 	MCFG_SCREEN_UPDATE_DRIVER(overdriv_state, screen_update_overdriv)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -475,6 +493,6 @@ ROM_START( overdrivb )
 	ROM_LOAD( "789e02.f1", 0x100000, 0x100000, CRC(bdd3b5c6) SHA1(412332d64052c0a3714f4002c944b0e7d32980a4) )
 ROM_END
 
-GAMEL( 1990, overdriv,         0, overdriv, overdriv, driver_device, 0, ROT90, "Konami", "Over Drive (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv )
-GAMEL( 1990, overdriva, overdriv, overdriv, overdriv, driver_device, 0, ROT90, "Konami", "Over Drive (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv )
-GAMEL( 1990, overdrivb, overdriv, overdriv, overdriv, driver_device, 0, ROT90, "Konami", "Over Drive (set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv )
+GAMEL( 1990, overdriv,         0, overdriv, overdriv, driver_device, 0, ROT90, "Konami", "Over Drive (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // US version
+GAMEL( 1990, overdriva, overdriv, overdriv, overdriv, driver_device, 0, ROT90, "Konami", "Over Drive (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // Overseas?
+GAMEL( 1990, overdrivb, overdriv, overdriv, overdriv, driver_device, 0, ROT90, "Konami", "Over Drive (set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // Overseas?

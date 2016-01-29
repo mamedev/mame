@@ -36,16 +36,17 @@ public:
 		: fidelz80base_state(mconfig, type, tag),
 		m_6821pia(*this, "6821pia"),
 		m_cart(*this, "cartslot"),
-		m_speaker(*this, "speaker"),
-		m_irq_off(*this, "irq_off")
+		m_speaker(*this, "speaker")
 	{ }
 
 	// devices/pointers
 	optional_device<pia6821_device> m_6821pia;
 	optional_device<generic_slot_device> m_cart;
 	optional_device<speaker_sound_device> m_speaker;
-	optional_device<timer_device> m_irq_off;
 	
+	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
+	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
+
 	// model CSC
 	void csc_update_7442();
 	void csc_prepare_display();
@@ -65,8 +66,6 @@ public:
 	// model SC12
 	DECLARE_MACHINE_START(sc12);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(scc_cartridge);
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_off);
-	TIMER_DEVICE_CALLBACK_MEMBER(sc12_irq);
 	DECLARE_WRITE8_MEMBER(sc12_control_w);
 	DECLARE_READ8_MEMBER(sc12_input_r);
 };
@@ -244,20 +243,6 @@ MACHINE_START_MEMBER(fidel6502_state, sc12)
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
 	fidelz80base_state::machine_start();
-}
-
-
-// interrupt handling
-
-TIMER_DEVICE_CALLBACK_MEMBER(fidel6502_state::irq_off)
-{
-	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(fidel6502_state::sc12_irq)
-{
-	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	m_irq_off->adjust(attotime::from_nsec(15250)); // active low for 15.25us
 }
 
 
@@ -571,8 +556,9 @@ static MACHINE_CONFIG_START( sc12, fidel6502_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R65C02, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(sc12_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("sc12_irq", fidel6502_state, sc12_irq, attotime::from_hz(780)) // from 556 timer
-	MCFG_TIMER_DRIVER_ADD("irq_off", fidel6502_state, irq_off)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(780)) // from 556 timer
+	MCFG_TIMER_START_DELAY(attotime::from_hz(780) - attotime::from_nsec(15250)) // active for 15.25us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(780))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_sc12)
@@ -595,7 +581,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( fev, fidel6502_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65SC02, XTAL_3MHz) // M65SC102 (CMD)
+	MCFG_CPU_ADD("maincpu", M65SC02, XTAL_12MHz/4) // G65SC102
 	MCFG_CPU_PROGRAM_MAP(fev_map)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
@@ -649,6 +635,6 @@ ROM_END
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
 COMP( 1981, csc,     0,      0,      csc,  csc, driver_device,   0, "Fidelity Electronics", "Champion Sensory Chess Challenger", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-COMP( 1984, fscc12,     0,      0,      sc12,  sc12, driver_device,   0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_NOT_WORKING )
+COMP( 1984, fscc12,     0,      0,      sc12,  sc12, driver_device,   0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-COMP( 1987, fexcelv,     0,      0,      fev,  csc, driver_device,   0, "Fidelity Electronics", "Voice Excellence", MACHINE_NOT_WORKING )
+COMP( 1987, fexcelv,     0,      0,      fev,  csc, driver_device,   0, "Fidelity Electronics", "Voice Excellence", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

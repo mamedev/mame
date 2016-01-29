@@ -134,6 +134,8 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	{
 		(*file)->type = SDLFILE_SOCKET;
 		filerr = sdl_open_socket(path, openflags, file, filesize);
+		if(filerr != FILERR_NONE && (*file)->socket != -1)
+			close((*file)->socket);
 		goto error;
 	}
 

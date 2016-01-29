@@ -584,7 +584,7 @@ void video_manager::postload()
 //  forward
 //-------------------------------------------------
 
-inline int video_manager::effective_autoframeskip() const
+inline bool video_manager::effective_autoframeskip() const
 {
 	// if we're fast forwarding or paused, autoframeskip is disabled
 	if (m_fastforward || machine().paused())

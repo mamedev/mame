@@ -100,7 +100,7 @@ private:
 	void postload();
 
 	// effective value helpers
-	int effective_autoframeskip() const;
+	bool effective_autoframeskip() const;
 	int effective_frameskip() const;
 	bool effective_throttle() const;
 

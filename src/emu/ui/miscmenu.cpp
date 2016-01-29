@@ -434,9 +434,9 @@ void ui_menu_crosshair::populate()
 			file_enumerator path(machine().options().crosshair_path());
 			const osd_directory_entry *dir;
 			/* reset search flags */
-			int using_default = false;
-			int finished = false;
-			int found = false;
+			bool using_default = false;
+			bool finished = false;
+			bool found = false;
 
 			/* if we are using the default, then we just need to find the first in the list */
 			if (*(settings.name) == 0)
