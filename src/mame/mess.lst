@@ -2142,21 +2142,25 @@ diablo68 // 1991 Novag Diablo 68000 Chess Computer
 
 // Fidelity
 cc10
-vcc
-vccg
-vccfr
-vccsp
-uvc
-uvcg
-uvcfr
-uvcsp
-bridgec3
+vcc      // VCC: Voice Chess Challenger (English)
+vccg     // * Spanish
+vccfr    // * German
+vccsp    // * French
+uvc      // UVC: Advanced Voice Chess Challenger (English)
+uvcsp    // * Spanish
+uvcg     // * German
+uvcfr    // * French
+vsc      // VSC: Voice Sensory Chess Challenger (English)
+vscsp    // * Spanish
+vscg     // * German
+vscfr    // * French
 vbrc
-vsc
-vscg
-vscfr
-vscsp
-csc
+bridgec3
+
+csc      // CSC: Champion Sensory Chess Challenger (English)
+cscsp    // * Spanish
+cscg     // * German
+cscfr    // * French
 fscc12
 fexcelv
 

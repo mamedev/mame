@@ -1082,29 +1082,25 @@ READ8_MEMBER(fidelz80_state::vsc_pio_porta_r)
 {
 	// d0-d7: multiplexed inputs
 	return read_inputs(11);
-	
 }
 
 READ8_MEMBER(fidelz80_state::vsc_pio_portb_r)
 {
-	UINT8 ret = 0;
+	UINT8 data = 0;
 
 	// d4: TSI BUSY line
-	ret |= (m_speech->busy_r()) ? 0 : 0x10;
+	data |= (m_speech->busy_r()) ? 0 : 0x10;
 	
-	return ret;
+	return data;
 }
 
 WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 {
 	// d0,d1: input mux highest bits
 	// d5: enable language switch
-	m_inp_mux = (m_inp_mux & ~0x700) | (data << 8 & 0x300) | (data << 5 & 0x400);
-	
-	//if (m_inp_mux & 0x400) debugger_break(machine());
+	m_inp_mux = (m_inp_mux & 0xff) | (data << 8 & 0x300) | (data << 5 & 0x400);
 	
 	// d7: TSI ROM A12
-	
 	m_speech->force_update(); // update stream to now
 	m_speech_bank = data >> 7 & 1;
 	
@@ -1209,13 +1205,13 @@ ADDRESS_MAP_END
 // VSC io: A2 is 8255 _CE, A3 is Z80 PIO _CE - in theory, both chips can be accessed simultaneously
 READ8_MEMBER(fidelz80_state::vsc_io_trampoline_r)
 {
-	UINT8 ret = 0xff; // open bus
+	UINT8 data = 0xff; // open bus
 	if (~offset & 4)
-		ret &= m_ppi8255->read(space, offset & 3);
+		data &= m_ppi8255->read(space, offset & 3);
 	if (~offset & 8)
-		ret &= m_z80pio->read(space, offset & 3);
+		data &= m_z80pio->read(space, offset & 3);
 
-	return ret;
+	return data;
 }
 
 WRITE8_MEMBER(fidelz80_state::vsc_io_trampoline_w)
@@ -1309,8 +1305,8 @@ static INPUT_PORTS_START( cc10 )
 
 	PORT_START("LEVEL") // hardwired (VCC/GND?)
 	PORT_CONFNAME( 0x80, 0x00, "Maximum Levels" )
-	PORT_CONFSETTING( 0x00, "10" ) // factory setting
-	PORT_CONFSETTING( 0x80, "3" )
+	PORT_CONFSETTING(    0x00, "10" ) // factory setting
+	PORT_CONFSETTING(    0x80, "3" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vcc )
@@ -1461,10 +1457,10 @@ static INPUT_PORTS_START( vsc )
 
 	PORT_START("IN.10") // hardwired (2 diodes)
 	PORT_CONFNAME( 0x03, 0x00, "Language" )
-	PORT_CONFSETTING( 0x00, "English" )
-	PORT_CONFSETTING( 0x01, "1" ) // todo: game dasm says it checks against 0/not0, 2, 3.. which language is which?
-	PORT_CONFSETTING( 0x02, "2" )
-	PORT_CONFSETTING( 0x03, "3" )
+	PORT_CONFSETTING(    0x00, "English" )
+	PORT_CONFSETTING(    0x01, "1" ) // todo: game dasm says it checks against 0/not0, 2, 3.. which language is which?
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x03, "3" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vbrc )
