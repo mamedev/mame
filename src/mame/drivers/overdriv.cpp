@@ -70,7 +70,7 @@ WRITE16_MEMBER(overdriv_state::eeprom_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::overdriv_cpuA_scanline)
 {
-	const int timer_threshold = 160;
+	const int timer_threshold = 168; // fwiw matches 0 on mask ROM check, so IF it's a timer irq then should be close ...
 	int scanline = param;
 	
 	m_fake_timer ++;
