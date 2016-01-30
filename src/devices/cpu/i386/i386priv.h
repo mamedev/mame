@@ -557,7 +557,7 @@ UINT16 i386_device::FETCH16()
 	UINT16 value;
 	UINT32 address = m_pc, error;
 
-	if( address & 0x1 ) {       /* Unaligned read */
+	if( !WORD_ALIGNED(address) ) {       /* Unaligned read */
 		value = (FETCH() << 0);
 		value |= (FETCH() << 8);
 	} else {
@@ -575,7 +575,7 @@ UINT32 i386_device::FETCH32()
 	UINT32 value;
 	UINT32 address = m_pc, error;
 
-	if( m_pc & 0x3 ) {      /* Unaligned read */
+	if( !DWORD_ALIGNED(m_pc) ) {      /* Unaligned read */
 		value = (FETCH() << 0);
 		value |= (FETCH() << 8);
 		value |= (FETCH() << 16);
@@ -607,7 +607,7 @@ UINT16 i386_device::READ16(UINT32 ea)
 	UINT16 value;
 	UINT32 address = ea, error;
 
-	if( ea & 0x1 ) {        /* Unaligned read */
+	if( !WORD_ALIGNED(ea) ) {        /* Unaligned read */
 		value = (READ8( address+0 ) << 0);
 		value |= (READ8( address+1 ) << 8);
 	} else {
@@ -624,7 +624,7 @@ UINT32 i386_device::READ32(UINT32 ea)
 	UINT32 value;
 	UINT32 address = ea, error;
 
-	if( ea & 0x3 ) {        /* Unaligned read */
+	if( !DWORD_ALIGNED(ea) ) {        /* Unaligned read */
 		value = (READ8( address+0 ) << 0);
 		value |= (READ8( address+1 ) << 8);
 		value |= (READ8( address+2 ) << 16),
@@ -644,7 +644,7 @@ UINT64 i386_device::READ64(UINT32 ea)
 	UINT64 value;
 	UINT32 address = ea, error;
 
-	if( ea & 0x7 ) {        /* Unaligned read */
+	if( !QWORD_ALIGNED(ea) ) {        /* Unaligned read */
 		value = (((UINT64) READ8( address+0 )) << 0);
 		value |= (((UINT64) READ8( address+1 )) << 8);
 		value |= (((UINT64) READ8( address+2 )) << 16);
@@ -678,7 +678,7 @@ UINT16 i386_device::READ16PL0(UINT32 ea)
 	UINT16 value;
 	UINT32 address = ea, error;
 
-	if( ea & 0x1 ) {        /* Unaligned read */
+	if( !WORD_ALIGNED(ea) ) {        /* Unaligned read */
 		value = (READ8PL0( address+0 ) << 0);
 		value |= (READ8PL0( address+1 ) << 8);
 	} else {
@@ -696,7 +696,7 @@ UINT32 i386_device::READ32PL0(UINT32 ea)
 	UINT32 value;
 	UINT32 address = ea, error;
 
-	if( ea & 0x3 ) {        /* Unaligned read */
+	if( !DWORD_ALIGNED(ea) ) {        /* Unaligned read */
 		value = (READ8PL0( address+0 ) << 0);
 		value |= (READ8PL0( address+1 ) << 8);
 		value |= (READ8PL0( address+2 ) << 16);
@@ -732,7 +732,7 @@ void i386_device::WRITE16(UINT32 ea, UINT16 value)
 {
 	UINT32 address = ea, error;
 
-	if( ea & 0x1 ) {        /* Unaligned write */
+	if( !WORD_ALIGNED(ea) ) {        /* Unaligned write */
 		WRITE8( address+0, value & 0xff );
 		WRITE8( address+1, (value >> 8) & 0xff );
 	} else {
@@ -747,7 +747,7 @@ void i386_device::WRITE32(UINT32 ea, UINT32 value)
 {
 	UINT32 address = ea, error;
 
-	if( ea & 0x3 ) {        /* Unaligned write */
+	if( !DWORD_ALIGNED(ea) ) {        /* Unaligned write */
 		WRITE8( address+0, value & 0xff );
 		WRITE8( address+1, (value >> 8) & 0xff );
 		WRITE8( address+2, (value >> 16) & 0xff );
@@ -765,7 +765,7 @@ void i386_device::WRITE64(UINT32 ea, UINT64 value)
 {
 	UINT32 address = ea, error;
 
-	if( ea & 0x7 ) {        /* Unaligned write */
+	if( !QWORD_ALIGNED(ea) ) {        /* Unaligned write */
 		WRITE8( address+0, value & 0xff );
 		WRITE8( address+1, (value >> 8) & 0xff );
 		WRITE8( address+2, (value >> 16) & 0xff );

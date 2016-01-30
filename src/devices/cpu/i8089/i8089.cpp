@@ -289,7 +289,7 @@ UINT16 i8089_device::read_word(bool space, offs_t address)
 	UINT16 data;
 	address_space *aspace = (space ? m_io : m_mem);
 
-	if (sysbus_width() && !(address & 1))
+	if (sysbus_width() && WORD_ALIGNED(address))
 	{
 		data = aspace->read_word(address);
 	}
@@ -311,7 +311,7 @@ void i8089_device::write_word(bool space, offs_t address, UINT16 data)
 {
 	address_space *aspace = (space ? m_io : m_mem);
 
-	if (sysbus_width() && !(address & 1))
+	if (sysbus_width() && WORD_ALIGNED(address))
 	{
 		aspace->write_word(address, data);
 	}

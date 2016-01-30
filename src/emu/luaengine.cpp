@@ -505,21 +505,21 @@ int lua_engine::lua_addr_space::l_mem_read(lua_State *L)
 			mem_content = sp.read_byte(address);
 			break;
 		case 16:
-			if ((address & 1) == 0) {
+			if (WORD_ALIGNED(address)) {
 				mem_content = sp.read_word(address);
 			} else {
 				mem_content = sp.read_word_unaligned(address);
 			}
 			break;
 		case 32:
-			if ((address & 3) == 0) {
+			if (DWORD_ALIGNED(address)) {
 				mem_content = sp.read_dword(address);
 			} else {
 				mem_content = sp.read_dword_unaligned(address);
 			}
 			break;
 		case 64:
-			if ((address & 7) == 0) {
+			if (QWORD_ALIGNED(address)) {
 				mem_content = sp.read_qword(address);
 			} else {
 				mem_content = sp.read_qword_unaligned(address);
@@ -558,21 +558,21 @@ int lua_engine::lua_addr_space::l_mem_write(lua_State *L)
 			sp.write_byte(address, val);
 			break;
 		case 16:
-			if ((address & 1) == 0) {
+			if (WORD_ALIGNED(address)) {
 				sp.write_word(address, val);
 			} else {
 				sp.read_word_unaligned(address, val);
 			}
 			break;
 		case 32:
-			if ((address & 3) == 0) {
+			if (DWORD_ALIGNED(address)) {
 				sp.write_dword(address, val);
 			} else {
 				sp.write_dword_unaligned(address, val);
 			}
 			break;
 		case 64:
-			if ((address & 7) == 0) {
+			if (QWORD_ALIGNED(address)) {
 				sp.write_qword(address, val);
 			} else {
 				sp.write_qword_unaligned(address, val);

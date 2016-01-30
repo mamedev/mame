@@ -2128,7 +2128,7 @@ void cobra_renderer::gfx_reset()
 
 UINT32 cobra_renderer::gfx_read_gram(UINT32 address)
 {
-	if (address & 3)
+	if (!DWORD_ALIGNED(address))
 	{
 		printf("gfx_read_gram: %08X, not dword aligned!\n", address);
 		return 0;
@@ -2186,7 +2186,7 @@ void cobra_renderer::gfx_write_gram(UINT32 address, UINT32 mask, UINT32 data)
 		}
 	}
 
-	if (address & 3)
+	if (!DWORD_ALIGNED(address))
 	{
 		printf("gfx_write_gram: %08X, %08X, not dword aligned!\n", address, data);
 		return;

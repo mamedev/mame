@@ -26,7 +26,7 @@ i960_cpu_device::i960_cpu_device(const machine_config &mconfig, const char *tag,
 
 UINT32 i960_cpu_device::i960_read_dword_unaligned(UINT32 address)
 {
-	if (address & 3)
+	if (!DWORD_ALIGNED(address))
 		return m_program->read_byte(address) | m_program->read_byte(address+1)<<8 | m_program->read_byte(address+2)<<16 | m_program->read_byte(address+3)<<24;
 	else
 		return m_program->read_dword(address);
@@ -34,7 +34,7 @@ UINT32 i960_cpu_device::i960_read_dword_unaligned(UINT32 address)
 
 UINT16 i960_cpu_device::i960_read_word_unaligned(UINT32 address)
 {
-	if (address & 1)
+	if (!WORD_ALIGNED(address))
 		return m_program->read_byte(address) | m_program->read_byte(address+1)<<8;
 	else
 		return m_program->read_word(address);
@@ -42,7 +42,7 @@ UINT16 i960_cpu_device::i960_read_word_unaligned(UINT32 address)
 
 void i960_cpu_device::i960_write_dword_unaligned(UINT32 address, UINT32 data)
 {
-	if (address & 3)
+	if (!DWORD_ALIGNED(address))
 	{
 		m_program->write_byte(address, data & 0xff);
 		m_program->write_byte(address+1, (data>>8)&0xff);
@@ -57,7 +57,7 @@ void i960_cpu_device::i960_write_dword_unaligned(UINT32 address, UINT32 data)
 
 void i960_cpu_device::i960_write_word_unaligned(UINT32 address, UINT16 data)
 {
-	if (address & 1)
+	if (!WORD_ALIGNED(address))
 	{
 		m_program->write_byte(address, data & 0xff);
 		m_program->write_byte(address+1, (data>>8)&0xff);
