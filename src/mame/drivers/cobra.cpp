@@ -155,7 +155,8 @@
         0x000a4:        Viewport height / 2?
         0x000ac:        Viewport center Y
 
-        0x00114:        High word: framebuffer pitch?   Low word: framebuffer pixel size?
+        0x00114:        xxxxxxxx xxxxxxxx -------- --------             Framebuffer pixel read line count
+		                -------- -------- xxxxxxxx xxxxxxxx             Framebuffer pixel read pixel count
 
         0x00118:        xxxxxxxx xxxxxxxx -------- --------             Framebuffer pixel read X pos
                         -------- -------- xxxxxxxx xxxxxxxx             Framebuffer pixel read Y pos
@@ -1631,6 +1632,10 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 
 				gfx_ram[(0x38632c^4) / 4] = 0x38600000;     // skip check_one_scene()
 			}
+			// racjamdx
+			else if (strcmp(space.machine().system().name, "racjamdx") == 0)
+			{
+			}
 		}
 
 		m_main_debug_state = 0;
@@ -2639,33 +2644,42 @@ void cobra_renderer::gfx_fifo_exec()
 			{
 				// Read a specified pixel position from a pixelbuffer
 
-//              printf("GFX: FB read X: %d, Y: %d\n", (UINT16)(m_gfx_gram[0x118/4] >> 16), (UINT16)(m_gfx_gram[0x118/4]));
+//              printf("GFX: FB read X: %d, Y: %d, %08X\n", (UINT16)(m_gfx_gram[0x118/4] >> 16), (UINT16)(m_gfx_gram[0x118/4]), m_gfx_gram[0x114/4]);
 
 				int x = (m_gfx_gram[0x118/4] >> 16) & 0xffff;
 				int y = m_gfx_gram[0x118/4] & 0xffff;
 
-				UINT32 *buffer;
-				switch (m_gfx_gram[0x80104/4])
-				{
-					case 0x800000:      buffer = &m_framebuffer->pix32(y); break;
-					case 0x200000:      buffer = &m_backbuffer->pix32(y); break;
-					case 0x0e0000:      buffer = &m_overlay->pix32(y); break;
-					case 0x000800:      buffer = &m_zbuffer->pix32(y); break;
-					case 0x000200:      buffer = &m_stencil->pix32(y); break;
-
-					default:
-					{
-						fatalerror("gfxfifo_exec: fb read from buffer %08X!\n", m_gfx_gram[0x80100/4]);
-					}
-				}
+				int pix_count = m_gfx_gram[0x114/4] & 0xffff;
+				int line_count = (m_gfx_gram[0x114/4] >> 16) & 0xffff;
 
 				// flush fifo_out so we have fresh data at top
 				fifo_out->flush();
 
-				fifo_out->push(nullptr, buffer[x+0]);
-				fifo_out->push(nullptr, buffer[x+1]);
-				fifo_out->push(nullptr, buffer[x+2]);
-				fifo_out->push(nullptr, buffer[x+3]);
+				if (pix_count != 4)
+					fatalerror("GFX: fb read line count %d, pix count %d\n", line_count, pix_count);
+
+				for (int i=0; i < line_count; i++)
+				{
+					UINT32 *buffer;
+					switch (m_gfx_gram[0x80104/4])
+					{
+						case 0x800000:      buffer = &m_framebuffer->pix32(y+i); break;
+						case 0x200000:      buffer = &m_backbuffer->pix32(y+i); break;
+						case 0x0e0000:      buffer = &m_overlay->pix32(y+i); break;
+						case 0x000800:      buffer = &m_zbuffer->pix32(y+i); break;
+						case 0x000200:      buffer = &m_stencil->pix32(y+i); break;
+	
+						default:
+						{
+							fatalerror("gfxfifo_exec: fb read from buffer %08X!\n", m_gfx_gram[0x80100/4]);
+						}
+					}
+
+					fifo_out->push(nullptr, buffer[x+0]);
+					fifo_out->push(nullptr, buffer[x+1]);
+					fifo_out->push(nullptr, buffer[x+2]);
+					fifo_out->push(nullptr, buffer[x+3]);
+				}
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
 				break;
@@ -3022,7 +3036,7 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 
 	// teximage_load() / mbuslib_prc_read():    0x00A00001 0x10520800
 
-//  printf("prc_read %08X%08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), activecpu_get_pc());
+//  printf("prc_read %08X%08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), space.device().safe_pc());
 
 	m_renderer->gfx_fifo_exec();
 
