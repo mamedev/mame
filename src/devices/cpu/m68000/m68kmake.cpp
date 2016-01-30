@@ -670,7 +670,7 @@ static opcode_struct* find_opcode(char* name, int size, char* spec_proc, char* s
 	opcode_struct* op;
 
 
-	for(op = g_opcode_input_table;op->name != nullptr;op++)
+	for(op = g_opcode_input_table;op->name[0] != 0;op++)
 	{
 		if( strcmp(name, op->name) == 0 &&
 			(size == op->size) &&
