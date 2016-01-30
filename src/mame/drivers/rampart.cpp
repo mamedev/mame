@@ -339,7 +339,7 @@ static MACHINE_CONFIG_START( rampart, rampart_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
 
-	MCFG_SLAPSTIC_ADD("slapstic")
+	MCFG_SLAPSTIC_ADD("slapstic", 118)
 
 	MCFG_MACHINE_RESET_OVERRIDE(rampart_state,rampart)
 
@@ -481,7 +481,7 @@ DRIVER_INIT_MEMBER(rampart_state,rampart)
 	UINT8 *rom = memregion("maincpu")->base();
 
 	memcpy(&rom[0x140000], &rom[0x40000], 0x8000);
-	slapstic_configure(*m_maincpu, 0x140000, 0x438000, 118);
+	slapstic_configure(*m_maincpu, 0x140000, 0x438000);
 }
 
 

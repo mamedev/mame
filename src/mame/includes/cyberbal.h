@@ -78,8 +78,6 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_68k_w);
 	DECLARE_WRITE16_MEMBER(sound_68k_dac_w);
 	DECLARE_DRIVER_INIT(cyberbalt);
-	DECLARE_DRIVER_INIT(cyberbal2p);
-	DECLARE_DRIVER_INIT(cyberbal);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	DECLARE_MACHINE_START(cyberbal);

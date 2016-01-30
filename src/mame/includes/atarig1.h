@@ -55,9 +55,6 @@ public:
 	void update_bank(int bank);
 	DECLARE_DRIVER_INIT(hydrap);
 	DECLARE_DRIVER_INIT(hydra);
-	DECLARE_DRIVER_INIT(pitfight9);
-	DECLARE_DRIVER_INIT(pitfight7);
-	DECLARE_DRIVER_INIT(pitfightj);
 	DECLARE_DRIVER_INIT(pitfight);
 	DECLARE_DRIVER_INIT(pitfightb);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
@@ -67,6 +64,5 @@ public:
 	DECLARE_VIDEO_START(atarig1);
 	UINT32 screen_update_atarig1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
-	void init_common(offs_t slapstic_base, int slapstic, bool is_pitfight);
 	void pitfightb_cheap_slapstic_init();
 };

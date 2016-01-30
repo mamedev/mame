@@ -428,8 +428,6 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
 
-	MCFG_SLAPSTIC_ADD("slapstic")
-
 	MCFG_MACHINE_START_OVERRIDE(atarig1_state,atarig1)
 	MCFG_MACHINE_RESET_OVERRIDE(atarig1_state,atarig1)
 
@@ -461,11 +459,43 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+
 static MACHINE_CONFIG_DERIVED( hydra, atarig1 )
 	MCFG_ATARIRLE_ADD("rle", modesc_hydra)
+	MCFG_SLAPSTIC_ADD("slapstic", 116)
 MACHINE_CONFIG_END
 
+
+static MACHINE_CONFIG_DERIVED( hydrap, hydra )
+	MCFG_DEVICE_REMOVE("slapstic")
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( pitfight9, atarig1 )
+	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
+	MCFG_SLAPSTIC_ADD("slapstic", 114)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( pitfight7, atarig1 )
+	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
+	MCFG_SLAPSTIC_ADD("slapstic", 112)
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_DERIVED( pitfight, atarig1 )
+	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
+	MCFG_SLAPSTIC_ADD("slapstic", 111)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( pitfightj, atarig1 )
+	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
+	MCFG_SLAPSTIC_ADD("slapstic", 113)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( pitfightb, atarig1 )
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 MACHINE_CONFIG_END
 
@@ -1198,28 +1228,30 @@ ROM_END
  *
  *************************************/
 
-void atarig1_state::init_common(offs_t slapstic_base, int slapstic, bool is_pitfight)
+DRIVER_INIT_MEMBER(atarig1_state,hydra)
 {
-	if (slapstic == -1)
-	{
-		pitfightb_cheap_slapstic_init();
-		save_item(NAME(m_bslapstic_bank));
-		save_item(NAME(m_bslapstic_primed));
-	}
-	else if (slapstic != 0)
-		slapstic_configure(*m_maincpu, slapstic_base, 0, slapstic);
-
-	m_is_pitfight = is_pitfight;
+	slapstic_configure(*m_maincpu, 0x078000, 0);
+	m_is_pitfight = 0;
 }
 
-DRIVER_INIT_MEMBER(atarig1_state,hydra)     { init_common(0x078000, 116, 0); }
-DRIVER_INIT_MEMBER(atarig1_state,hydrap)    { init_common(0x000000,   0, 0); }
+DRIVER_INIT_MEMBER(atarig1_state,hydrap)
+{
+	m_is_pitfight = 0;
+}
 
-DRIVER_INIT_MEMBER(atarig1_state,pitfight9)  { init_common(0x038000, 114, 1); }
-DRIVER_INIT_MEMBER(atarig1_state,pitfight7)  { init_common(0x038000, 112, 1); }
-DRIVER_INIT_MEMBER(atarig1_state,pitfight)   { init_common(0x038000, 111, 1); }
-DRIVER_INIT_MEMBER(atarig1_state,pitfightj)  { init_common(0x038000, 113, 1); }
-DRIVER_INIT_MEMBER(atarig1_state,pitfightb)  { init_common(0x038000,  -1, 1); }
+DRIVER_INIT_MEMBER(atarig1_state,pitfight)
+{
+	slapstic_configure(*m_maincpu, 0x038000, 0);
+	m_is_pitfight = 1;
+}
+
+DRIVER_INIT_MEMBER(atarig1_state,pitfightb)
+{
+	pitfightb_cheap_slapstic_init();
+	save_item(NAME(m_bslapstic_bank));
+	save_item(NAME(m_bslapstic_primed));
+	m_is_pitfight = 1;
+}
 
 
 /*************************************
@@ -1228,15 +1260,15 @@ DRIVER_INIT_MEMBER(atarig1_state,pitfightb)  { init_common(0x038000,  -1, 1); }
  *
  *************************************/
 
-GAME( 1990, hydra,    0,        hydra, hydra, atarig1_state,    hydra,    ROT0, "Atari Games", "Hydra", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hydrap,   hydra,    hydra, hydra, atarig1_state,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/14/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hydrap2,  hydra,    hydra, hydra, atarig1_state,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/25/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hydra,    0,        hydra,  hydra, atarig1_state,    hydra,    ROT0, "Atari Games", "Hydra", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hydrap,   hydra,    hydrap, hydra, atarig1_state,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/14/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hydrap2,  hydra,    hydrap, hydra, atarig1_state,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/25/90)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, pitfight,  0,        pitfight, pitfight, atarig1_state, pitfight9, ROT0, "Atari Games", "Pit Fighter (rev 9)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfight7, pitfight, pitfight, pitfight, atarig1_state, pitfight7, ROT0, "Atari Games", "Pit Fighter (rev 7)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfight6, pitfight, pitfight, pitfight, atarig1_state, pitfightj, ROT0, "Atari Games", "Pit Fighter (rev 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfight5, pitfight, pitfight, pitfight, atarig1_state, pitfight7, ROT0, "Atari Games", "Pit Fighter (rev 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfight4, pitfight, pitfight, pitfight, atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfight3, pitfight, pitfight, pitfight, atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfightj, pitfight, pitfight, pitfightj, atarig1_state,pitfightj, ROT0, "Atari Games", "Pit Fighter (Japan, 2 players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfightb, pitfight, pitfight, pitfight, atarig1_state, pitfightb, ROT0, "bootleg",     "Pit Fighter (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight,  0,        pitfight9, pitfight, atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 9)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight7, pitfight, pitfight7, pitfight, atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight6, pitfight, pitfightj, pitfight, atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight5, pitfight, pitfight7, pitfight, atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight4, pitfight, pitfight,  pitfight, atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight3, pitfight, pitfight,  pitfight, atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfightj, pitfight, pitfightj, pitfightj, atarig1_state,pitfight,  ROT0, "Atari Games", "Pit Fighter (Japan, 2 players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfightb, pitfight, pitfightb, pitfight, atarig1_state, pitfightb, ROT0, "bootleg",     "Pit Fighter (bootleg)", MACHINE_SUPPORTS_SAVE )

@@ -333,8 +333,6 @@ static MACHINE_CONFIG_START( starwars, starwars_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(starwars_state, irq0_line_assert, CLOCK_3KHZ / 12)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(CLOCK_3KHZ / 128))
 
-	MCFG_SLAPSTIC_ADD("slapstic")
-
 	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
@@ -375,6 +373,11 @@ static MACHINE_CONFIG_START( starwars, starwars_state )
 
 	MCFG_SOUND_ADD("tms", TMS5220, MASTER_CLOCK/2/9)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( esb, starwars )
+	MCFG_SLAPSTIC_ADD("slapstic", 101)
 MACHINE_CONFIG_END
 
 
@@ -558,7 +561,7 @@ DRIVER_INIT_MEMBER(starwars_state,esb)
 	UINT8 *rom = memregion("maincpu")->base();
 
 	/* init the slapstic */
-	m_slapstic_device->slapstic_init(machine(), 101);
+	m_slapstic_device->slapstic_init();
 	m_slapstic_source = &rom[0x14000];
 	m_slapstic_base = &rom[0x08000];
 
@@ -603,4 +606,4 @@ GAME( 1983, starwarso,starwars, starwars, starwars, starwars_state, starwars, RO
 
 GAME( 1983, tomcatsw, tomcat,   starwars, starwars, starwars_state, starwars, ROT0, "Atari", "TomCat (Star Wars hardware, prototype)", MACHINE_NO_SOUND )
 
-GAME( 1985, esb,      0,        starwars, esb, starwars_state,      esb,      ROT0, "Atari Games", "The Empire Strikes Back", 0 )
+GAME( 1985, esb,      0,        esb,      esb,      starwars_state, esb,      ROT0, "Atari Games", "The Empire Strikes Back", 0 )
