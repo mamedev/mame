@@ -601,8 +601,8 @@ WRITE32_MEMBER( magictg_state::f0_w )
 				UINT32 dst_addr = m_dma_ch[ch].dst_addr;
 				//device_t *voodoo = dst_addr > 0xa000000 voodoo0 : voodoo1;
 
-				assert((src_addr & 3) == 0);
-				assert((dst_addr & 3) == 0);
+				assert(DWORD_ALIGNED(src_addr));
+				assert(DWORD_ALIGNED(dst_addr));
 
 				while (m_dma_ch[ch].count > 3)
 				{

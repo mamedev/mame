@@ -54,27 +54,22 @@ se3208_device::se3208_device(const machine_config &mconfig, const char *tag, dev
 
 UINT32 se3208_device::read_dword_unaligned(address_space &space, UINT32 address)
 {
-	switch (address & 3)
-	{
-	case 0:
+	if (DWORD_ALIGNED(address))
 		return space.read_dword(address);
-	case 1:
-	case 2:
-	case 3:
-		printf("%08x: dword READ unaligned %08x\n", m_PC, address);
+	else
+	{
+		osd_printf_debug("%08x: dword READ unaligned %08x\n", m_PC, address);
 #if ALLOW_UNALIGNED_DWORD_ACCESS
 		return space.read_byte(address) | space.read_byte(address + 1) << 8 | space.read_byte(address + 2) << 16 | space.read_byte(address + 3) << 24;
 #else
 		return 0;
 #endif
 	}
-
-	return 0;
 }
 
 UINT16 se3208_device::read_word_unaligned(address_space &space, UINT32 address)
 {
-	if (address & 1)
+	if (!WORD_ALIGNED(address))
 		return space.read_byte(address) | space.read_byte(address+1)<<8;
 	else
 		return space.read_word(address);
@@ -82,31 +77,24 @@ UINT16 se3208_device::read_word_unaligned(address_space &space, UINT32 address)
 
 void se3208_device::write_dword_unaligned(address_space &space, UINT32 address, UINT32 data)
 {
-	switch (address & 3)
-	{
-	case 0:
+	if (DWORD_ALIGNED(address))
 		space.write_dword(address, data);
-		break;
-
-	case 1:
-	case 2:
-	case 3:
+	else
+	{
 #if ALLOW_UNALIGNED_DWORD_ACCESS
 		space.write_byte(address, data & 0xff);
 		space.write_byte(address + 1, (data >> 8) & 0xff);
 		space.write_byte(address + 2, (data >> 16) & 0xff);
 		space.write_byte(address + 3, (data >> 24) & 0xff);
 #endif
-		printf("%08x: dword WRITE unaligned %08x\n", m_PC, address);
-
-		break;
+		osd_printf_debug("%08x: dword WRITE unaligned %08x\n", m_PC, address);
 	}
 
 }
 
 void se3208_device::write_word_unaligned(address_space &space, UINT32 address, UINT16 data)
 {
-	if (address & 1)
+	if (!WORD_ALIGNED(address))
 	{
 		space.write_byte(address, data & 0xff);
 		space.write_byte(address+1, (data>>8)&0xff);

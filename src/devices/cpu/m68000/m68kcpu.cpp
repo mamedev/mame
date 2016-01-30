@@ -1383,7 +1383,7 @@ UINT16 m68000_base_device::readword_d32_mmu(offs_t address)
 		UINT32 address0 = pmmu_translate_addr(this, address);
 		if (mmu_tmp_buserror_occurred) {
 			return ~0;
-		} else if (!(address & 1)) {
+		} else if (WORD_ALIGNED(address)) {
 			return m_space->read_word(address0);
 		} else {
 			UINT32 address1 = pmmu_translate_addr(this, address + 1);
@@ -1396,7 +1396,7 @@ UINT16 m68000_base_device::readword_d32_mmu(offs_t address)
 		}
 	}
 
-	if (!(address & 1))
+	if (WORD_ALIGNED(address))
 		return m_space->read_word(address);
 	result = m_space->read_byte(address) << 8;
 	return result | m_space->read_byte(address + 1);
@@ -1410,7 +1410,7 @@ void m68000_base_device::writeword_d32_mmu(offs_t address, UINT16 data)
 		UINT32 address0 = pmmu_translate_addr(this, address);
 		if (mmu_tmp_buserror_occurred) {
 			return;
-		} else if (!(address & 1)) {
+		} else if (WORD_ALIGNED(address)) {
 			m_space->write_word(address0, data);
 			return;
 		} else {
@@ -1425,7 +1425,7 @@ void m68000_base_device::writeword_d32_mmu(offs_t address, UINT16 data)
 		}
 	}
 
-	if (!(address & 1))
+	if (WORD_ALIGNED(address))
 	{
 		m_space->write_word(address, data);
 		return;
@@ -1447,13 +1447,13 @@ UINT32 m68000_base_device::readlong_d32_mmu(offs_t address)
 		} else if ((address +3) & 0xfc) {
 			// not at page boundary; use default code
 			address = address0;
-		} else if (!(address & 3)) { // 0
+		} else if (DWORD_ALIGNED(address)) { // 0
 			return m_space->read_dword(address0);
 		} else {
 			UINT32 address2 = pmmu_translate_addr(this, address+2);
 			if (mmu_tmp_buserror_occurred) {
 				return ~0;
-			} else if (!(address & 1)) { // 2
+			} else if (WORD_ALIGNED(address)) { // 2
 				result = m_space->read_word(address0) << 16;
 				return result | m_space->read_word(address2);
 			} else {
@@ -1470,9 +1470,9 @@ UINT32 m68000_base_device::readlong_d32_mmu(offs_t address)
 		}
 	}
 
-	if (!(address & 3))
+	if (DWORD_ALIGNED(address))
 		return m_space->read_dword(address);
-	else if (!(address & 1))
+	else if (WORD_ALIGNED(address))
 	{
 		result = m_space->read_word(address) << 16;
 		return result | m_space->read_word(address + 2);
@@ -1493,14 +1493,14 @@ void m68000_base_device::writelong_d32_mmu(offs_t address, UINT32 data)
 		} else if ((address +3) & 0xfc) {
 			// not at page boundary; use default code
 			address = address0;
-		} else if (!(address & 3)) { // 0
+		} else if (DWORD_ALIGNED(address)) { // 0
 			m_space->write_dword(address0, data);
 			return;
 		} else {
 			UINT32 address2 = pmmu_translate_addr(this, address+2);
 			if (mmu_tmp_buserror_occurred) {
 				return;
-			} else if (!(address & 1)) { // 2
+			} else if (WORD_ALIGNED(address)) { // 2
 				m_space->write_word(address0, data >> 16);
 				m_space->write_word(address2, data);
 				return;
@@ -1519,12 +1519,12 @@ void m68000_base_device::writelong_d32_mmu(offs_t address, UINT32 data)
 		}
 	}
 
-	if (!(address & 3))
+	if (DWORD_ALIGNED(address))
 	{
 		m_space->write_dword(address, data);
 		return;
 	}
-	else if (!(address & 1))
+	else if (WORD_ALIGNED(address))
 	{
 		m_space->write_word(address, data >> 16);
 		m_space->write_word(address + 2, data);
@@ -1594,7 +1594,7 @@ UINT16 m68000_base_device::readword_d32_hmmu(offs_t address)
 		address = hmmu_translate_addr(this, address);
 	}
 
-	if (!(address & 1))
+	if (WORD_ALIGNED(address))
 		return m_space->read_word(address);
 	result = m_space->read_byte(address) << 8;
 	return result | m_space->read_byte(address + 1);
@@ -1608,7 +1608,7 @@ void m68000_base_device::writeword_d32_hmmu(offs_t address, UINT16 data)
 		address = hmmu_translate_addr(this, address);
 	}
 
-	if (!(address & 1))
+	if (WORD_ALIGNED(address))
 	{
 		m_space->write_word(address, data);
 		return;
@@ -1627,9 +1627,9 @@ UINT32 m68000_base_device::readlong_d32_hmmu(offs_t address)
 		address = hmmu_translate_addr(this, address);
 	}
 
-	if (!(address & 3))
+	if (DWORD_ALIGNED(address))
 		return m_space->read_dword(address);
-	else if (!(address & 1))
+	else if (WORD_ALIGNED(address))
 	{
 		result = m_space->read_word(address) << 16;
 		return result | m_space->read_word(address + 2);
@@ -1647,12 +1647,12 @@ void m68000_base_device::writelong_d32_hmmu(offs_t address, UINT32 data)
 		address = hmmu_translate_addr(this, address);
 	}
 
-	if (!(address & 3))
+	if (DWORD_ALIGNED(address))
 	{
 		m_space->write_dword(address, data);
 		return;
 	}
-	else if (!(address & 1))
+	else if (WORD_ALIGNED(address))
 	{
 		m_space->write_word(address, data >> 16);
 		m_space->write_word(address + 2, data);
