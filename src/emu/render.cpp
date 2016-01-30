@@ -227,7 +227,6 @@ void render_primitive::reset()
 //-------------------------------------------------
 
 render_primitive_list::render_primitive_list()
-	: m_lock(osd_lock_alloc())
 {
 }
 
@@ -239,7 +238,6 @@ render_primitive_list::render_primitive_list()
 render_primitive_list::~render_primitive_list()
 {
 	release_all();
-	osd_lock_free(m_lock);
 }
 
 
@@ -296,10 +294,8 @@ inline render_primitive *render_primitive_list::alloc(render_primitive::primitiv
 void render_primitive_list::release_all()
 {
 	// release all the live items while under the lock
-	acquire_lock();
 	m_primitive_allocator.reclaim_all(m_primlist);
 	m_reference_allocator.reclaim_all(m_reflist);
-	release_lock();
 }
 
 

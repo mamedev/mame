@@ -125,7 +125,6 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/osdmini/minidir.cpp",
 		MAME_DIR .. "src/osd/osdmini/minifile.cpp",
 		MAME_DIR .. "src/osd/osdmini/minimisc.cpp",
-		MAME_DIR .. "src/osd/osdmini/minisync.cpp",
 		MAME_DIR .. "src/osd/osdmini/minitime.cpp",
 		MAME_DIR .. "src/osd/modules/sync/work_mini.cpp",
 	}

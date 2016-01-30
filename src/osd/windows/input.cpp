@@ -39,6 +39,7 @@
 #include "config.h"
 
 #include "winutil.h"
+#include <mutex>
 
 //============================================================
 //  PARAMETERS
@@ -166,7 +167,7 @@ typedef /*WINUSERAPI*/ BOOL (WINAPI *register_rawinput_devices_ptr)(IN PCRAWINPU
 
 // global states
 static bool                 input_enabled;
-static osd_lock *           input_lock;
+static std::mutex           input_lock;
 static bool                 input_paused;
 static DWORD                last_poll;
 
@@ -469,10 +470,6 @@ static inline INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawma
 
 bool windows_osd_interface::input_init()
 {
-	// allocate a lock for input synchronizations, since messages sometimes come from another thread
-	input_lock = osd_lock_alloc();
-	assert_always(input_lock != NULL, "Failed to allocate input_lock");
-
 	// decode the options
 	lightgun_shared_axis_mode = downcast<windows_options &>(machine().options()).dual_lightgun();
 
@@ -512,15 +509,8 @@ void windows_osd_interface::input_resume()
 void windows_osd_interface::input_exit()
 {
 	// acquire the lock and turn off input (this ensures everyone is done)
-	if (input_lock != NULL)
-	{
-		osd_lock_acquire(input_lock);
-		input_enabled = false;
-		osd_lock_release(input_lock);
-
-		// free the lock
-		osd_lock_free(input_lock);
-	}
+	std::lock_guard<std::mutex> lock(input_lock);
+	input_enabled = false;
 }
 
 
@@ -613,7 +603,7 @@ BOOL wininput_handle_mouse_button(int button, int down, int x, int y)
 	}
 
 	// take the lock
-	osd_lock_acquire(input_lock);
+	std::lock_guard<std::mutex> lock(input_lock);
 
 	// set the button state
 	devinfo->mouse.state.rgbButtons[button] = down ? 0x80 : 0x00;
@@ -632,9 +622,6 @@ BOOL wininput_handle_mouse_button(int button, int down, int x, int y)
 		devinfo->mouse.state.lX = normalize_absolute_axis(mousepos.x, client_rect.left, client_rect.right);
 		devinfo->mouse.state.lY = normalize_absolute_axis(mousepos.y, client_rect.top, client_rect.bottom);
 	}
-
-	// release the lock
-	osd_lock_release(input_lock);
 	return TRUE;
 }
 
@@ -675,18 +662,16 @@ BOOL wininput_handle_raw(HANDLE device)
 		// handle keyboard input
 		if (input->header.dwType == RIM_TYPEKEYBOARD)
 		{
-			osd_lock_acquire(input_lock);
+			std::lock_guard<std::mutex> lock(input_lock);
 			rawinput_keyboard_update(input->header.hDevice, &input->data.keyboard);
-			osd_lock_release(input_lock);
 			result = TRUE;
 		}
 
 		// handle mouse input
 		else if (input->header.dwType == RIM_TYPEMOUSE)
 		{
-			osd_lock_acquire(input_lock);
+			std::lock_guard<std::mutex> lock(input_lock);
 			rawinput_mouse_update(input->header.hDevice, &input->data.mouse);
-			osd_lock_release(input_lock);
 			result = TRUE;
 		}
 	}
@@ -2201,14 +2186,13 @@ static void rawinput_mouse_poll(device_info *devinfo)
 	poll_if_necessary(devinfo->machine());
 
 	// copy the accumulated raw state to the actual state
-	osd_lock_acquire(input_lock);
+	std::lock_guard<std::mutex> lock(input_lock);
 	devinfo->mouse.state.lX = devinfo->mouse.raw_x;
 	devinfo->mouse.state.lY = devinfo->mouse.raw_y;
 	devinfo->mouse.state.lZ = devinfo->mouse.raw_z;
 	devinfo->mouse.raw_x = 0;
 	devinfo->mouse.raw_y = 0;
 	devinfo->mouse.raw_z = 0;
-	osd_lock_release(input_lock);
 }
 
 

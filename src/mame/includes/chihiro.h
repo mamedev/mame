@@ -3,6 +3,8 @@
 /*
  * geforce 3d (NV2A) vertex program disassembler
  */
+#include <mutex>
+
 class vertex_program_disassembler {
 	static const char *srctypes[];
 	static const char *scaops[];
@@ -357,7 +359,6 @@ public:
 		objectdata = &(object_data_alloc());
 		objectdata->data = this;
 		combiner.used = 0;
-		combiner.lock = osd_lock_alloc();
 		enabled_vertex_attributes = 0;
 		indexesleft_count = 0;
 		vertex_pipeline = 4;
@@ -626,7 +627,7 @@ public:
 		} final;
 		int stages;
 		int used;
-		osd_lock *lock;
+		std::mutex lock;
 	} combiner;
 	UINT32 color_mask;
 	bool alpha_test_enabled;

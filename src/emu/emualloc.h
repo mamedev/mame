@@ -14,6 +14,7 @@
 #define __EMUALLOC_H__
 
 #include <new>
+#include <mutex>
 #include "osdcore.h"
 #include "coretmpl.h"
 
@@ -124,7 +125,7 @@ public:
 
 private:
 	int                     m_hash_size;
-	osd_lock *              m_listlock;
+	std::mutex              m_listlock;
 	std::vector<resource_pool_item *> m_hash;
 	resource_pool_item *    m_ordered_head;
 	resource_pool_item *    m_ordered_tail;

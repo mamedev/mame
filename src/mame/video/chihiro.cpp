@@ -1953,7 +1953,7 @@ void nv2a_renderer::render_register_combiners(INT32 scanline, const extent_t &ex
 
 	if ((extent.startx < 0) || (extent.stopx > 640))
 		return;
-	osd_lock_acquire(combiner.lock); // needed since multithreading is not supported yet
+	std::lock_guard<std::mutex> lock(combiner.lock); // needed since multithreading is not supported yet
 	x = extent.stopx - extent.startx - 1; // number of pixels to draw
 	while (x >= 0) {
 		xp = extent.startx + x;
@@ -1998,7 +1998,6 @@ void nv2a_renderer::render_register_combiners(INT32 scanline, const extent_t &ex
 		write_pixel(xp, scanline, a8r8g8b8, z);
 		x--;
 	}
-	osd_lock_release(combiner.lock);
 }
 
 #if 0

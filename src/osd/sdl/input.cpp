@@ -15,6 +15,7 @@
 #include "sdlinc.h"
 #include <ctype.h>
 #include <stddef.h>
+#include <mutex>
 
 #if USE_XINPUT
 // for xinput
@@ -154,7 +155,7 @@ struct device_info
 //============================================================
 
 // global states
-static osd_lock *           input_lock;
+static std::mutex           input_lock;
 static UINT8                input_paused;
 
 static sdl_window_info *    focus_window = NULL;
@@ -1380,10 +1381,6 @@ bool sdl_osd_interface::input_init()
 
 	app_has_mouse_focus = 1;
 
-	// allocate a lock for input synchronizations
-	input_lock = osd_lock_alloc();
-	assert_always(input_lock != NULL, "Failed to allocate input_lock");
-
 	// register the keyboards
 	sdlinput_register_keyboards(machine());
 
@@ -1441,9 +1438,6 @@ void sdl_osd_interface::input_resume()
 
 void sdl_osd_interface::input_exit()
 {
-	// free the lock
-	osd_lock_free(input_lock);
-
 	// deregister
 
 	sdlinput_deregister_joysticks(machine());
@@ -1568,7 +1562,7 @@ void sdlinput_process_events_buf()
 
 	if (SDLMAME_EVENTS_IN_WORKER_THREAD)
 	{
-		osd_lock_acquire(input_lock);
+		std::lock_guard<std::mutex> lock(input_lock);
 	#if (SDLMAME_SDL2)
 		/* Make sure we get all pending events */
 		SDL_PumpEvents();
@@ -1580,7 +1574,6 @@ void sdlinput_process_events_buf()
 			else
 				osd_printf_warning("Event Buffer Overflow!\n");
 		}
-		osd_lock_release(input_lock);
 	}
 	else
 		SDL_PumpEvents();
@@ -1709,11 +1702,10 @@ void sdlinput_poll(running_machine &machine)
 
 	if (SDLMAME_EVENTS_IN_WORKER_THREAD)
 	{
-		osd_lock_acquire(input_lock);
+		std::lock_guard<std::mutex> lock(input_lock);
 		memcpy(loc_event_buf, event_buf, sizeof(event_buf));
 		loc_event_buf_count = event_buf_count;
 		event_buf_count = 0;
-		osd_lock_release(input_lock);
 		bufp = 0;
 	}
 

@@ -49,6 +49,7 @@
 //#include "osdepend.h"
 
 #include <math.h>
+#include <mutex>
 
 
 //**************************************************************************
@@ -358,8 +359,8 @@ public:
 	render_primitive *first() const { return m_primlist.first(); }
 
 	// lock management
-	void acquire_lock() { osd_lock_acquire(m_lock); }
-	void release_lock() { osd_lock_release(m_lock); }
+	void acquire_lock() { m_lock.lock(); }
+	void release_lock() { m_lock.unlock(); }
 
 	// reference management
 	void add_reference(void *refptr);
@@ -388,7 +389,7 @@ private:
 	fixed_allocator<render_primitive> m_primitive_allocator;// allocator for primitives
 	fixed_allocator<reference> m_reference_allocator;       // allocator for references
 
-	osd_lock *          m_lock;                             // lock to protect list accesses
+	std::mutex          m_lock;                             // lock to protect list accesses
 };
 
 

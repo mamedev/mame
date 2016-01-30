@@ -17,6 +17,7 @@
 #include "drivenum.h"
 #include "ui/ui.h"
 #include "luaengine.h"
+#include <mutex>
 
 //**************************************************************************
 //  LUA ENGINE
@@ -808,7 +809,7 @@ struct msg {
 	int done;
 } msg;
 
-osd_lock *lock;
+static std::mutex g_mutex;
 
 void lua_engine::serve_lua()
 {
@@ -826,37 +827,39 @@ void lua_engine::serve_lua()
 		fgets(buff, LUA_MAXINPUT, stdin);
 
 		// Create message
-		osd_lock_acquire(lock);
-		if (msg.ready == 0) {
-			msg.text = oldbuff;
-			if (oldbuff.length()!=0) msg.text.append("\n");
-			msg.text.append(buff);
-			msg.ready = 1;
-			msg.done = 0;
+		{
+			std::lock_guard<std::mutex> lock(g_mutex);
+			if (msg.ready == 0) {
+				msg.text = oldbuff;
+				if (oldbuff.length() != 0) msg.text.append("\n");
+				msg.text.append(buff);
+				msg.ready = 1;
+				msg.done = 0;
+			}
 		}
-		osd_lock_release(lock);
 
 		// Wait for response
 		int done;
 		do {
 			osd_sleep(osd_ticks_per_second() / 1000);
-			osd_lock_acquire(lock);
+			std::lock_guard<std::mutex> lock(g_mutex);
 			done = msg.done;
-			osd_lock_release(lock);
 		} while (done==0);
 
 		// Do action on client side
-		osd_lock_acquire(lock);
-		if (msg.status == -1){
-			b = LUA_PROMPT2;
-			oldbuff = msg.response;
+		{
+			osd_sleep(osd_ticks_per_second() / 1000);
+
+			if (msg.status == -1) {
+				b = LUA_PROMPT2;
+				oldbuff = msg.response;
+			}
+			else {
+				b = LUA_PROMPT;
+				oldbuff = "";
+			}
+			msg.done = 0;
 		}
-		else {
-			b = LUA_PROMPT;
-			oldbuff = "";
-		}
-		msg.done = 0;
-		osd_lock_release(lock);
 
 	} while (1);
 }
@@ -891,7 +894,6 @@ lua_engine::lua_engine()
 	msg.ready = 0;
 	msg.status = 0;
 	msg.done = 0;
-	lock = osd_lock_alloc();
 }
 
 //-------------------------------------------------
@@ -1046,7 +1048,7 @@ bool lua_engine::frame_hook()
 
 void lua_engine::periodic_check()
 {
-	osd_lock_acquire(lock);
+	std::lock_guard<std::mutex> lock(g_mutex);
 	if (msg.ready == 1) {
 	lua_settop(m_lua_state, 0);
 	int status = luaL_loadbuffer(m_lua_state, msg.text.c_str(), msg.text.length(), "=stdin");
@@ -1075,7 +1077,6 @@ void lua_engine::periodic_check()
 	msg.ready = 0;
 	msg.done = 1;
 	}
-	osd_lock_release(lock);
 }
 
 //-------------------------------------------------
