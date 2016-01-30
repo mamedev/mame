@@ -79,6 +79,7 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/sound/coreaudio_sound.cpp",		
 		MAME_DIR .. "src/osd/modules/sound/sdl_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/none.cpp",
+		MAME_DIR .. "src/osd/modules/sound/xaudio2_sound.cpp",
 	}
 	
 project ("ocore_" .. _OPTIONS["osd"])
