@@ -47,9 +47,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_ctl_w);
 	DECLARE_WRITE8_MEMBER(mixer_w);
 	void swap_memory(void *ptr1, void *ptr2, int bytes);
-	void common_init(int slapstic, int vindctr2);
-	DECLARE_DRIVER_INIT(gauntlet2);
-	DECLARE_DRIVER_INIT(gaunt2p);
+	void common_init(int vindctr2);
 	DECLARE_DRIVER_INIT(gauntlet);
 	DECLARE_DRIVER_INIT(vindctr2);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);

@@ -23,8 +23,9 @@
 
 extern const device_type SLAPSTIC;
 
-#define MCFG_SLAPSTIC_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SLAPSTIC, 0)
+#define MCFG_SLAPSTIC_ADD(_tag, _chip) \
+	MCFG_DEVICE_ADD(_tag, SLAPSTIC, 0) \
+	MCFG_SLAPSTIC_NUM(_chip)
 
 
 /*************************************
@@ -123,6 +124,9 @@ enum
 };
 
 
+#define MCFG_SLAPSTIC_NUM(_chipnum) \
+	atari_slapstic_device::static_set_chipnum(*device, _chipnum);
+
 #define MCFG_SLAPSTIC_68K_ACCESS(_type) \
 	atari_slapstic_device::static_set_access68k(*device, _type);
 
@@ -134,10 +138,10 @@ public:
 	// construction/destruction
 	atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void slapstic_init(running_machine &machine, int chip);
-	void slapstic_reset(void);
+	void slapstic_init();
+	void slapstic_reset();
 
-	int slapstic_bank(void);
+	int slapstic_bank();
 	int slapstic_tweak(address_space &space, offs_t offset);
 
 	int alt2_kludge(address_space &space, offs_t offset);
@@ -148,6 +152,13 @@ public:
 		dev.access_68k = type;
 	}
 
+	static void static_set_chipnum(device_t &device, int chipnum)
+	{
+		atari_slapstic_device &dev = downcast<atari_slapstic_device &>(device);
+		dev.m_chipnum = chipnum;
+	}
+
+	int m_chipnum;
 
 	UINT8 state;
 	UINT8 current_bank;
@@ -168,6 +179,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_validity_check(validity_checker &valid) const override;
 
 
 private:

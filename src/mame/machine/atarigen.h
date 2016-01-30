@@ -355,7 +355,7 @@ public:
 	DECLARE_WRITE16_MEMBER(video_int_ack_w);
 
 	// slapstic helpers
-	void slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, int chipnum);
+	void slapstic_configure(cpu_device &device, offs_t base, offs_t mirror);
 	void slapstic_update_bank(int bank);
 	DECLARE_DIRECT_UPDATE_MEMBER(slapstic_setdirect);
 	DECLARE_WRITE16_MEMBER(slapstic_w);
