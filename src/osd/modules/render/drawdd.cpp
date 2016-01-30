@@ -566,7 +566,7 @@ int renderer_dd::ddraw_create_surfaces()
 	{
 		membuffersize = blitwidth * blitheight * 4;
 		global_free_array(membuffer);
-		membuffer = global_alloc_array(UINT8, membuffersize);
+		membuffer = global_alloc_array_nothrow(UINT8, membuffersize);
 	}
 	if (membuffer == NULL)
 		goto error;

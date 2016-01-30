@@ -661,7 +661,7 @@ BOOL wininput_handle_raw(HANDLE device)
 	// if necessary, allocate a temporary buffer and fetch the data
 	if (size > sizeof(small_buffer))
 	{
-		data = global_alloc_array(BYTE, size);
+		data = global_alloc_array_nothrow(BYTE, size);
 		if (data == NULL)
 			return result;
 	}
