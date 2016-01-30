@@ -8,6 +8,12 @@ ifeq ($(OS),os2)
 EXE := .exe
 endif
 
+ifndef verbose
+  SILENT = @
+endif
+CC  = gcc
+CXX = g++
+
 .PHONY: all clean
 
 all : m68kmake$(EXE) m68kops.cpp
@@ -19,13 +25,13 @@ clean:
 	-@rm -f m68kops.*
 	
 m68kmake.o: m68kmake.cpp
-	@gcc -x c++ -std=c++11 -o "$@" -c "$<"
+	$(SILENT) $(CC) -x c++ -std=c++11 -o "$@" -c "$<"
 
 m68kmake$(EXE) : m68kmake.o
 	@echo Linking $@...
-	@g++ -lstdc++ $^ -o $@
+	$(SILENT) $(CXX) -lstdc++ $^ -o $@
 
 m68kops.cpp: m68kmake$(EXE) 	m68k_in.cpp
 	@echo Generating M68K source files...
-	@./m68kmake$(EXE) . m68k_in.cpp
+	$(SILENT) ./m68kmake$(EXE) . m68k_in.cpp
 
