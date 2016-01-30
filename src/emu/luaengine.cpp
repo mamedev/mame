@@ -848,7 +848,7 @@ void lua_engine::serve_lua()
 
 		// Do action on client side
 		{
-			osd_sleep(osd_ticks_per_second() / 1000);
+			std::lock_guard<std::mutex> lock(g_mutex);
 
 			if (msg.status == -1) {
 				b = LUA_PROMPT2;
