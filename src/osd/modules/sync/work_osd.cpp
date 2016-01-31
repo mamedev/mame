@@ -445,11 +445,12 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 
 		// first allocate a new work item; try the free list first
 		{
-			std::lock_guard<std::mutex>(*queue->lock);
+			queue->lock->lock();
 			do
 			{
 				item = (osd_work_item *)queue->free;
 			} while (item != NULL && compare_exchange_ptr((PVOID volatile *)&queue->free, item, item->next) != item);
+			queue->lock->unlock();
 		}
 
 		// if nothing, allocate something new
@@ -484,9 +485,10 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 
 	// enqueue the whole thing within the critical section
 	{
-		std::lock_guard<std::mutex>(*queue->lock);
+		queue->lock->lock();
 		*queue->tailptr = itemlist;
 		queue->tailptr = item_tailptr;
+		queue->lock->unlock();
 	}
 
 	// increment the number of items in the queue
@@ -541,8 +543,9 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 	// if we don't have an event, create one
 	if (item->event == NULL)
 	{
-		std::lock_guard<std::mutex>(*item->queue->lock);
+		item->queue->lock->lock();
 		item->event = osd_event_alloc(TRUE, FALSE);     // manual reset, not signalled
+		item->queue->lock->unlock();
 	}
 	else
 		osd_event_reset(item->event);
@@ -585,12 +588,13 @@ void osd_work_item_release(osd_work_item *item)
 	osd_work_item_wait(item, 100 * osd_ticks_per_second());
 
 	// add us to the free list on our queue
-	std::lock_guard<std::mutex>(*item->queue->lock);
+	item->queue->lock->lock();
 	do
 	{
 		next = (osd_work_item *)item->queue->free;
 		item->next = next;
 	} while (compare_exchange_ptr((PVOID volatile *)&item->queue->free, next, item) != next);
+	item->queue->lock->unlock();
 }
 
 
@@ -711,7 +715,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 
 		// use a critical section to synchronize the removal of items
 		{
-			std::lock_guard<std::mutex>(*queue->lock);
+			queue->lock->lock();
 			if (queue->list == NULL)
 			{
 				end_loop = true;
@@ -727,6 +731,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 						queue->tailptr = (osd_work_item **)&queue->list;
 				}
 			}
+			queue->lock->unlock();
 		}
 
 		if (end_loop)
@@ -752,12 +757,13 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 			// set the result and signal the event
 			else
 			{
-				std::lock_guard<std::mutex>(*queue->lock);
+				queue->lock->lock();
 				if (item->event != NULL)
 				{
 					osd_event_set(item->event);
 					add_to_stat(&item->queue->setevents, 1);
 				}
+				queue->lock->unlock();
 			}
 
 			// if we removed an item and there's still work to do, bump the stats
@@ -778,7 +784,8 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 
 bool queue_has_list_items(osd_work_queue *queue)
 {
-	std::lock_guard<std::mutex>(*queue->lock);
+	queue->lock->lock();
 	bool has_list_items = (queue->list != NULL);
+	queue->lock->unlock();
 	return has_list_items;
 }
