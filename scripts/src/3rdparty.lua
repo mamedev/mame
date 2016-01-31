@@ -1090,3 +1090,22 @@ project "uv"
 			"-Wshadow"
 		}
 	end
+
+--------------------------------------------------
+-- HTTP parser library objects
+--------------------------------------------------
+
+project "http-parser"
+	uuid "90c6ba59-bdb2-4fee-8b44-57601d690e14"
+	kind "StaticLib"
+
+	configuration {  }
+
+	files {
+		MAME_DIR .. "3rdparty/http-parser/http_parser.c",
+	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
