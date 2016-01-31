@@ -149,7 +149,7 @@ READ8_MEMBER(fidel6502_state::csc_pia0_pb_r)
 
 	// d5: button row 8 (active low)
 	// d6,d7: language switches
-	data |= (~read_inputs(9) >> 3 & 0x20) | (m_inp_matrix[9]->read() << 6 & 0xc0);
+	data |= (~read_inputs(9) >> 3 & 0x20) | (~m_inp_matrix[9]->read() << 6 & 0xc0);
 	
 	return data;
 }
@@ -414,12 +414,23 @@ static INPUT_PORTS_START( csc )
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("IN.9") // hardwired
-	PORT_CONFNAME( 0x03, 0x03, "Language" )
-	PORT_CONFSETTING(    0x03, "English" )
-	PORT_CONFSETTING(    0x02, "2" ) // todo..
-	PORT_CONFSETTING(    0x01, "1" )
-	PORT_CONFSETTING(    0x00, "0" )
+	PORT_CONFNAME( 0x01, 0x00, "Language" )
+	PORT_CONFSETTING(    0x00, "English" )
+	PORT_CONFSETTING(    0x01, "Other" )
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( cscg )
+	PORT_INCLUDE( csc )
+
+	PORT_MODIFY("IN.9")
+	PORT_CONFNAME( 0x01, 0x01, "Language" )
+	PORT_CONFSETTING(    0x00, "English" )
+	PORT_CONFSETTING(    0x01, "Other" )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( sc12 )
 	PORT_START("IN.0")
@@ -503,12 +514,12 @@ static INPUT_PORTS_START( sc12 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square h8")
 
 	PORT_START("IN.8")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RV / Pawn") PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM / Knight") PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("TB / Bishop") PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV / Rook") PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PV / Queen") PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PB / King") PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RV / Pawn") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM / Knight") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("TB / Bishop") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV / Rook") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PV / Queen") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PB / King") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R)
 INPUT_PORTS_END
@@ -675,11 +686,11 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   INIT              COMPANY, FULLNAME, FLAGS */
-COMP( 1981, csc,     0,      0,      csc,     csc,    driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (English)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1981, cscsp,   csc,    0,      csc,     csc,    driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (Spanish)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1981, cscg,    csc,    0,      csc,     csc,    driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (German)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1981, cscfr,   csc,    0,      csc,     csc,    driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (French)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1981, csc,     0,      0,      csc,     csc,    driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1981, cscsp,   csc,    0,      csc,     cscg,   driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1981, cscg,    csc,    0,      csc,     cscg,   driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1981, cscfr,   csc,    0,      csc,     cscg,   driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-COMP( 1984, fscc12,  0,      0,      sc12,    sc12,   driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1984, fscc12,  0,      0,      sc12,    sc12,   driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 COMP( 1987, fexcelv, 0,      0,      fev,     csc,    driver_device, 0, "Fidelity Electronics", "Voice Excellence", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
