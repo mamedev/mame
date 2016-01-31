@@ -133,11 +133,11 @@ struct mtlog
 };
 
 static mtlog mtlog[100000];
-static volatile LONG mtlogindex;
+static volatile INT32 mtlogindex;
 
 void mtlog_add(const char *event)
 {
-	int index = atomic_increment32((LONG *) &mtlogindex) - 1;
+	int index = atomic_increment32((INT32 *) &mtlogindex) - 1;
 	if (index < ARRAY_LENGTH(mtlog))
 	{
 		mtlog[index].timestamp = osd_ticks();
@@ -262,7 +262,6 @@ void windows_osd_interface::window_exit()
 		win_window_list = temp->m_next;
 		temp->destroy();
 		global_free(temp);
-
 	}
 
 	// kill the drawers
@@ -783,7 +782,7 @@ void win_window_info::update()
 	// if we're visible and running and not in the middle of a resize, draw
 	if (m_hwnd != NULL && m_target != NULL && m_renderer != NULL)
 	{
-		int got_lock = TRUE;
+		bool got_lock = true;
 
 		mtlog_add("winwindow_video_window_update: try lock");
 
