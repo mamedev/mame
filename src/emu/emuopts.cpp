@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "drivenum.h"
+#include "softlist.h"
 
 #include <ctype.h>
 
@@ -205,6 +206,8 @@ emu_options::emu_options()
 , m_joystick_contradictory(false)
 , m_sleep(true)
 , m_refresh_speed(false)
+, m_slot_options(0)
+, m_device_options(0)
 {
 	add_entries(emu_options::s_option_entries);
 }
@@ -215,18 +218,17 @@ emu_options::emu_options()
 //  options for the configured system
 //-------------------------------------------------
 
-bool emu_options::add_slot_options(bool isfirstpass)
+bool emu_options::add_slot_options(const software_part *swpart)
 {
 	// look up the system configured by name; if no match, do nothing
 	const game_driver *cursystem = system();
 	if (cursystem == nullptr)
 		return false;
+
+	// create the configuration
 	machine_config config(*cursystem, *this);
 
 	// iterate through all slot devices
-	bool first = true;
-
-	// create the configuration
 	int starting_count = options_count();
 	slot_interface_iterator iter(config.root_device());
 	for (const device_slot_interface *slot = iter.first(); slot != nullptr; slot = iter.next())
@@ -236,9 +238,8 @@ bool emu_options::add_slot_options(bool isfirstpass)
 			continue;
 
 		// first device? add the header as to be pretty
-		if (isfirstpass && first)
+		if (m_slot_options++ == 0)
 			add_entry(nullptr, "SLOT DEVICES", OPTION_HEADER | OPTION_FLAG_DEVICE);
-		first = false;
 
 		// retrieve info about the device instance
 		const char *name = slot->device().tag() + 1;
@@ -255,6 +256,15 @@ bool emu_options::add_slot_options(bool isfirstpass)
 			}
 			add_entry(name, nullptr, flags, defvalue, true);
 		}
+
+		// allow software lists to supply their own defaults
+		if (swpart != nullptr)
+		{
+			std::string featurename = std::string(name).append("_default");
+			const char *value = swpart->feature(featurename.c_str());
+			if (value != nullptr)
+				set_default_value(name, value);
+		}
 	}
 	return (options_count() != starting_count);
 }
@@ -265,7 +275,7 @@ bool emu_options::add_slot_options(bool isfirstpass)
 //  depending of image mounted
 //-------------------------------------------------
 
-void emu_options::update_slot_options()
+void emu_options::update_slot_options(const software_part *swpart)
 {
 	// look up the system configured by name; if no match, do nothing
 	const game_driver *cursystem = system();
@@ -290,8 +300,8 @@ void emu_options::update_slot_options()
 			}
 		}
 	}
-	while (add_slot_options(false)) { }
-	add_device_options(false);
+	while (add_slot_options(swpart)) { }
+	add_device_options();
 }
 
 
@@ -300,7 +310,7 @@ void emu_options::update_slot_options()
 //  options for the configured system
 //-------------------------------------------------
 
-void emu_options::add_device_options(bool isfirstpass)
+void emu_options::add_device_options()
 {
 	// look up the system configured by name; if no match, do nothing
 	const game_driver *cursystem = system();
@@ -309,14 +319,12 @@ void emu_options::add_device_options(bool isfirstpass)
 	machine_config config(*cursystem, *this);
 
 	// iterate through all image devices
-	bool first = true;
 	image_interface_iterator iter(config.root_device());
 	for (const device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
 	{
 		// first device? add the header as to be pretty
-		if (first && isfirstpass)
+		if (m_device_options++ == 0)
 			add_entry(nullptr, "IMAGE DEVICES", OPTION_HEADER | OPTION_FLAG_DEVICE);
-		first = false;
 
 		// retrieve info about the device instance
 		std::string option_name;
@@ -348,6 +356,10 @@ void emu_options::remove_device_options()
 		if ((curentry->flags() & OPTION_FLAG_DEVICE) != 0)
 			remove_entry(*curentry);
 	}
+
+	// reset counters
+	m_slot_options = 0;
+	m_device_options = 0;
 }
 
 
@@ -356,7 +368,7 @@ void emu_options::remove_device_options()
 //  and update slot and image devices
 //-------------------------------------------------
 
-bool emu_options::parse_slot_devices(int argc, char *argv[], std::string &error_string, const char *name, const char *value)
+bool emu_options::parse_slot_devices(int argc, char *argv[], std::string &error_string, const char *name, const char *value, const software_part *swpart)
 {
 	// an initial parse to capture the initial set of values
 	bool result;
@@ -364,15 +376,13 @@ bool emu_options::parse_slot_devices(int argc, char *argv[], std::string &error_
 	core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 
 	// keep adding slot options until we stop seeing new stuff
-	bool isfirstpass = true;
-	while (add_slot_options(isfirstpass))
-	{
+	m_slot_options = 0;
+	while (add_slot_options(swpart))
 		core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
-		isfirstpass = false;
-	}
 
 	// add device options and reparse
-	add_device_options(true);
+	m_device_options = 0;
+	add_device_options();
 	if (name != nullptr && exists(name))
 		set_value(name, value, OPTION_PRIORITY_CMDLINE, error_string);
 	core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
@@ -380,7 +390,7 @@ bool emu_options::parse_slot_devices(int argc, char *argv[], std::string &error_
 	int num;
 	do {
 		num = options_count();
-		update_slot_options();
+		update_slot_options(swpart);
 		result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 	} while (num != options_count());
 
@@ -399,7 +409,7 @@ bool emu_options::parse_command_line(int argc, char *argv[], std::string &error_
 {
 	// parse as normal
 	core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
-	bool result = parse_slot_devices(argc, argv, error_string, nullptr, nullptr);
+	bool result = parse_slot_devices(argc, argv, error_string);
 	update_cached_options();
 	return result;
 }
@@ -523,11 +533,10 @@ void emu_options::set_system_name(const char *name)
 
 		// remove any existing device options and then add them afresh
 		remove_device_options();
-		if (add_slot_options(true))
-			while (add_slot_options(false)) { }
+		while (add_slot_options()) { }
 
 		// then add the options
-		add_device_options(true);
+		add_device_options();
 		int num;
 		do {
 			num = options_count();

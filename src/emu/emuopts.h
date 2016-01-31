@@ -197,6 +197,7 @@ enum
 
 // forward references
 struct game_driver;
+class software_part;
 
 
 class emu_options : public core_options
@@ -210,7 +211,7 @@ public:
 	// parsing wrappers
 	bool parse_command_line(int argc, char *argv[], std::string &error_string);
 	void parse_standard_inis(std::string &error_string);
-	bool parse_slot_devices(int argc, char *argv[], std::string &error_string, const char *name, const char *value);
+	bool parse_slot_devices(int argc, char *argv[], std::string &error_string, const char *name = nullptr, const char *value = nullptr, const software_part *swpart = nullptr);
 
 	// core options
 	const char *system_name() const { return value(OPTION_SYSTEMNAME); }
@@ -370,12 +371,12 @@ public:
 
 	std::string main_value(const char *option) const;
 	std::string sub_value(const char *name, const char *subname) const;
-	bool add_slot_options(bool isfirst);
+	bool add_slot_options(const software_part *swpart = nullptr);
 
 private:
 	// device-specific option handling
-	void add_device_options(bool isfirst);
-	void update_slot_options();
+	void add_device_options();
+	void update_slot_options(const software_part *swpart = nullptr);
 
 	// INI parsing helper
 	bool parse_one_ini(const char *basename, int priority, std::string *error_string = nullptr);
@@ -390,6 +391,8 @@ private:
 	bool m_joystick_contradictory;
 	bool m_sleep;
 	bool m_refresh_speed;
+	int m_slot_options;
+	int m_device_options;
 };
 
 
