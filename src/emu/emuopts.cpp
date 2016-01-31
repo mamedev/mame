@@ -262,7 +262,7 @@ bool emu_options::add_slot_options(const software_part *swpart)
 		{
 			std::string featurename = std::string(name).append("_default");
 			const char *value = swpart->feature(featurename.c_str());
-			if (value != nullptr)
+			if (value != nullptr && (*value == '\0' || slot->option(value) != nullptr))
 				set_default_value(name, value);
 		}
 	}
