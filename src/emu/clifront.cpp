@@ -148,7 +148,7 @@ int cli_frontend::execute(int argc, char **argv)
 												strprintf(val, "%s:%s:%s", swlistdev->list_name(), m_options.software_name(), swpart->name());
 
 												// call this in order to set slot devices according to mounting
-												m_options.parse_slot_devices(argc, argv, option_errors, image->instance_name(), val.c_str());
+												m_options.parse_slot_devices(argc, argv, option_errors, image->instance_name(), val.c_str(), swpart);
 												break;
 											}
 										}

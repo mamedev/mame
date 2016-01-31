@@ -189,7 +189,7 @@ void ui_menu_slot_devices::handle()
 	{
 		if ((FPTR)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
 		{
-			machine().options().add_slot_options(false);
+			machine().options().add_slot_options();
 			machine().schedule_hard_reset();
 		}
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
