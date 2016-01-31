@@ -967,6 +967,7 @@ project "uv"
 			"/wd4210", -- warning C4210: nonstandard extension used : function given file scope
 			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
 			"/wd4703", -- warning C4703: potentially uninitialized local pointer variable 'xxx' used
+			"/wd4477", -- warning C4477: '<function>' : format string '<format-string>' requires an argument of type '<type>', but variadic argument <position> has type '<type>'
 		}
 
 	configuration { }
