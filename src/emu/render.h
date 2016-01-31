@@ -389,7 +389,7 @@ private:
 	fixed_allocator<render_primitive> m_primitive_allocator;// allocator for primitives
 	fixed_allocator<reference> m_reference_allocator;       // allocator for references
 
-	std::mutex          m_lock;                             // lock to protect list accesses
+	std::recursive_mutex     m_lock;                             // lock to protect list accesses
 };
 
 
