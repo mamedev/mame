@@ -88,6 +88,7 @@ void i8271_device::soft_reset()
 		flopi[i].live = false;
 		flopi[i].ready = get_ready(i);
 	}
+	hdl_cb(false);
 	set_irq(false);
 	set_drq(false);
 	command_pos = 0;
@@ -887,6 +888,7 @@ void i8271_device::command_end(floppy_info &fi, bool data_completion)
 {
 	logerror("%s: command done (%s) - %02x\n", tag(), data_completion ? "data" : "seek", rr);
 	fi.main_state = fi.sub_state = IDLE;
+	idle_icnt = 0;
 	main_phase = PHASE_RESULT;
 	set_irq(true);
 }
@@ -981,6 +983,7 @@ void i8271_device::seek_continue(floppy_info &fi)
 void i8271_device::read_data_start(floppy_info &fi)
 {
 	fi.main_state = READ_DATA;
+	hdl_cb(true);
 	fi.sub_state = HEAD_LOAD_DONE;
 
 	logerror("%s: command read%s data%s cmd=%02x crn=(%d, %d, %d) len=%02x rate=%d\n",
@@ -1010,6 +1013,7 @@ void i8271_device::read_data_start(floppy_info &fi)
 void i8271_device::scan_start(floppy_info &fi)
 {
 	fi.main_state = SCAN_DATA;
+	hdl_cb(true);
 	fi.sub_state = HEAD_LOAD_DONE;
 
 	logerror("%s: command scan%s data%s cmd=%02x crn=(%d, %d, %d) len=%02x rate=%d\n",
@@ -1041,6 +1045,7 @@ void i8271_device::scan_start(floppy_info &fi)
 void i8271_device::verify_data_start(floppy_info &fi)
 {
 	fi.main_state = VERIFY_DATA;
+	hdl_cb(true);
 	fi.sub_state = HEAD_LOAD_DONE;
 
 	logerror("%s: command verify%s data%s cmd=%02x crn=(%d, %d, %d) len=%02x rate=%d\n",
@@ -1098,6 +1103,7 @@ void i8271_device::read_data_continue(floppy_info &fi)
 			return;
 
 		case SEEK_WAIT_STEP_TIME_DONE:
+			hdl_cb(true);
 			do {
 				if(fi.pcn > command[1])
 					fi.pcn--;
@@ -1181,7 +1187,9 @@ void i8271_device::read_data_continue(floppy_info &fi)
 void i8271_device::write_data_start(floppy_info &fi)
 {
 	fi.main_state = WRITE_DATA;
+	hdl_cb(true);
 	fi.sub_state = HEAD_LOAD_DONE;
+
 	logerror("%s: command write%s data%s cmd=%02x crn=(%d, %d, %d) len=%02x rate=%d\n",
 				tag(),
 				command[0] & 0x04 ? " deleted" : "",
@@ -1238,6 +1246,7 @@ void i8271_device::write_data_continue(floppy_info &fi)
 			return;
 
 		case SEEK_WAIT_STEP_TIME_DONE:
+			hdl_cb(true);
 			do {
 				if(fi.pcn > command[1])
 					fi.pcn--;
@@ -1311,6 +1320,7 @@ int i8271_device::calc_sector_size(UINT8 size)
 void i8271_device::format_track_start(floppy_info &fi)
 {
 	fi.main_state = FORMAT_TRACK;
+	hdl_cb(true);
 	fi.sub_state = HEAD_LOAD_DONE;
 
 	logerror("%s: command format track c=%02x n=%02x sc=%02x gap3=%02x gap5=%02x gap1=%02x\n",
@@ -1364,6 +1374,7 @@ void i8271_device::format_track_continue(floppy_info &fi)
 			return;
 
 		case SEEK_WAIT_STEP_TIME_DONE:
+			hdl_cb(true);
 			do {
 				if(fi.pcn > command[1])
 					fi.pcn--;
@@ -1402,6 +1413,7 @@ void i8271_device::format_track_continue(floppy_info &fi)
 void i8271_device::read_id_start(floppy_info &fi)
 {
 	fi.main_state = READ_ID;
+	hdl_cb(true);
 	fi.sub_state = HEAD_LOAD_DONE;
 
 	logerror("%s: command read id, rate=%d\n",
@@ -1457,6 +1469,7 @@ void i8271_device::read_id_continue(floppy_info &fi)
 			return;
 
 		case SEEK_WAIT_STEP_TIME_DONE:
+			hdl_cb(true);
 			do {
 				if(fi.pcn > command[1])
 					fi.pcn--;
@@ -1551,6 +1564,13 @@ void i8271_device::index_callback(floppy_image_device *floppy, int state)
 		if(!state) {
 			general_continue(fi);
 			continue;
+		}
+
+		if (fi.main_state == IDLE) {
+			idle_icnt++;
+			if (icnt != 0x0f && idle_icnt >= icnt) {
+				hdl_cb(false);
+			}
 		}
 
 		switch(fi.sub_state) {
