@@ -1267,7 +1267,11 @@ $(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/file2str.py | $(GEN_FOLDERS)
 	$(SILENT)$(PYTHON) scripts/build/file2str.py $< $@ layout_$(basename $(notdir $<))
 
 $(SRC)/devices/cpu/m68000/m68kops.cpp: $(SRC)/devices/cpu/m68000/m68k_in.cpp $(SRC)/devices/cpu/m68000/m68kmake.cpp
+ifeq ($(TARGETOS),asmjs)
+	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000
+else
 	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000 CC=$(CC) CXX=$(CXX)
+endif
 
 #-------------------------------------------------
 # Regression tests
