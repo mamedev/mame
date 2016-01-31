@@ -4411,6 +4411,7 @@ files {
 	MAME_DIR .. "src/mame/includes/news.h",
 	MAME_DIR .. "src/mame/video/news.cpp",
 	MAME_DIR .. "src/mame/drivers/nexus3d.cpp",
+	MAME_DIR .. "src/mame/drivers/nibble.cpp",
 	MAME_DIR .. "src/mame/drivers/norautp.cpp",
 	MAME_DIR .. "src/mame/includes/norautp.h",
 	MAME_DIR .. "src/mame/audio/norautp.cpp",
