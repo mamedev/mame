@@ -129,6 +129,8 @@ end
 		"7z",
 		"lua",
 		"lsqlite3",
+		"uv",
+		"http-parser",
 	}
 
 	if _OPTIONS["with-bundled-zlib"] then

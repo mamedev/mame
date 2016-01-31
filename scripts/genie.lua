@@ -1084,6 +1084,11 @@ configuration { "mingw*" }
 			"advapi32",
 			"shlwapi",
 			"wsock32",
+			"ws2_32",
+			"psapi",
+			"iphlpapi",
+			"shell32",
+			"userenv",
 		}
 configuration { "mingw-clang" }
 		linkoptions {
@@ -1105,6 +1110,11 @@ configuration { "vs*" }
 			"advapi32",
 			"shlwapi",
 			"wsock32",
+			"ws2_32",
+			"psapi",
+			"iphlpapi",
+			"shell32",
+			"userenv",
 		}
 
 		buildoptions {
