@@ -1625,6 +1625,7 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	if (machine.ui_input().pressed(IPT_UI_SAVE_STATE))
 	{
 		machine.pause();
+		machine.ui().m_load_save_hold = true;
 		return machine.ui().set_handler(handler_load_save, LOADSAVE_SAVE);
 	}
 
@@ -1632,6 +1633,7 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	if (machine.ui_input().pressed(IPT_UI_LOAD_STATE))
 	{
 		machine.pause();
+		machine.ui().m_load_save_hold = true;
 		return machine.ui().set_handler(handler_load_save, LOADSAVE_LOAD);
 	}
 
@@ -1712,6 +1714,23 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 		machine.ui().draw_message_window(container, "Select position to save to");
 	else
 		machine.ui().draw_message_window(container, "Select position to load from");
+
+	// if load/save state sequence is still being pressed, do not read the filename yet
+	if (machine.ui().m_load_save_hold) {
+		bool seq_in_progress = false;
+		const input_seq &load_save_seq = state == LOADSAVE_SAVE ?
+			machine.ioport().type_seq(IPT_UI_SAVE_STATE) :
+			machine.ioport().type_seq(IPT_UI_LOAD_STATE);
+
+		for (int i = 0; i < load_save_seq.length(); i++)
+			if (machine.input().code_pressed_once(load_save_seq[i]))
+				seq_in_progress = true;
+
+		if (seq_in_progress)
+			return state;
+		else
+			machine.ui().m_load_save_hold = false;
+	}
 
 	// check for cancel key
 	if (machine.ui_input().pressed(IPT_UI_CANCEL))

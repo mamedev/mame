@@ -182,6 +182,7 @@ private:
 	std::unique_ptr<UINT8[]> m_non_char_keys_down;
 	render_texture *        m_mouse_arrow_texture;
 	bool                    m_mouse_show;
+	bool                    m_load_save_hold;
 
 	// text generators
 	std::string &disclaimer_string(std::string &buffer);
