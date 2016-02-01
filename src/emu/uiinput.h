@@ -86,6 +86,8 @@ public:
 	void push_mouse_double_click_event(render_target* target, INT32 x, INT32 y);
 	void push_char_event(render_target* target, unicode_char ch);
 
+	void mark_all_as_pressed();
+
 private:
 
 	// internal state

@@ -324,3 +324,13 @@ void ui_input_manager::push_char_event(render_target* target, unicode_char ch)
 	event.ch = ch;
 	push_event(event);
 }
+
+/*-------------------------------------------------
+    mark_all_as_pressed - marks all buttons
+    as if they were already pressed once
+-------------------------------------------------*/
+void ui_input_manager::mark_all_as_pressed()
+{
+	for (int code = IPT_UI_FIRST + 1; code < IPT_UI_LAST; code++)
+		m_next_repeat[code] = osd_ticks();
+}

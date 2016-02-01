@@ -1755,6 +1755,9 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 		machine.schedule_load(filename);
 	}
 
+	// avoid handling the name of the save state slot as a seperate input
+	machine.ui_input().mark_all_as_pressed();
+
 	// remove the pause and reset the state
 	machine.resume();
 	return UI_HANDLER_CANCEL;
