@@ -435,8 +435,8 @@ public:
 
 UINT32 viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	device_t *device = machine().device("voodoo");
-	return voodoo_update(device, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo");
+	return voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 UINT32 m_mpc8240_regs[256/4];

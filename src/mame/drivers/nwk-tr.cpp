@@ -346,11 +346,11 @@ WRITE_LINE_MEMBER(nwktr_state::voodoo_vblank_0)
 
 UINT32 nwktr_state::screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	device_t *voodoo = machine().device("voodoo0");
+	voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo0");
 
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	voodoo_update(voodoo, bitmap, cliprect);
+	voodoo->voodoo_update(bitmap, cliprect);
 
 	const rectangle &visarea = screen.visible_area();
 	const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y+16, visarea.max_y);

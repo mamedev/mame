@@ -336,7 +336,7 @@ void savquest_state::vid_3dfx_init()
 	m_pci_3dfx_regs[0x08 / 4] = 2; // revision ID
 	m_pci_3dfx_regs[0x10 / 4] = 0xff000000;
 	m_pci_3dfx_regs[0x40 / 4] = 0x4000; //INITEN_SECONDARY_REV_ID
-	voodoo_set_init_enable(m_voodoo, 0x4000); //INITEN_SECONDARY_REV_ID
+	m_voodoo->voodoo_set_init_enable(0x4000); //INITEN_SECONDARY_REV_ID
 }
 
 static UINT32 pci_3dfx_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
@@ -358,7 +358,7 @@ osd_printf_warning("PCI write: %x %x\n", reg, data);
 	}
 	else if (reg == 0x40)
 	{
-		voodoo_set_init_enable(state->m_voodoo, data);
+		state->m_voodoo->voodoo_set_init_enable(data);
 	}
 	else if (reg == 0x54)
 	{

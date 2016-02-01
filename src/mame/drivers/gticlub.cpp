@@ -910,21 +910,21 @@ UINT32 gticlub_state::screen_update_hangplt(screen_device &screen, bitmap_rgb32 
 
 	if (strcmp(screen.tag(), ":lscreen") == 0)
 	{
-		device_t *voodoo = machine().device("voodoo0");
+		voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo0");
 
 	//  m_k001604_1->draw_back_layer(bitmap, cliprect);
 
-		voodoo_update(voodoo, bitmap, cliprect);
+		voodoo->voodoo_update(bitmap, cliprect);
 
 		m_k001604_1->draw_front_layer(screen, bitmap, cliprect);
 	}
 	else if (strcmp(screen.tag(), ":rscreen") == 0)
 	{
-		device_t *voodoo = machine().device("voodoo1");
+		voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo1");
 
 	//  m_k001604_2->draw_back_layer(bitmap, cliprect);
 
-		voodoo_update(voodoo, bitmap, cliprect);
+		voodoo->voodoo_update(bitmap, cliprect);
 
 		m_k001604_2->draw_front_layer(screen, bitmap, cliprect);
 	}
