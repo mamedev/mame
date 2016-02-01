@@ -2549,6 +2549,25 @@ void nv2a_renderer::clear_depth_buffer(int what, UINT32 value)
 	}
 }
 
+UINT32 nv2a_renderer::render_triangle_culling(const rectangle &cliprect, render_delegate callback, int paramcount, const vertex_t &_v1, const vertex_t &_v2, const vertex_t &_v3)
+{
+	float areax2;
+
+	if (backface_culling_enabled == false)
+		return render_triangle(cliprect, callback, paramcount, _v1, _v2, _v3);
+	if (backface_culling_culled == NV2A_GL_CULL_FACE::FRONT_AND_BACK)
+		return 0;
+	areax2 = _v1.x*(_v2.y - _v3.y) + _v2.x*(_v3.y - _v1.y) + _v3.x*(_v1.y - _v2.y);
+	if (backface_culling_winding == NV2A_GL_FRONT_FACE::CCW)
+		areax2 = -areax2;
+	// if areax2 >= 0 then front faced else back faced
+	if ((backface_culling_culled == NV2A_GL_CULL_FACE::FRONT) && (areax2 >= 0))
+		return 0;
+	if ((backface_culling_culled == NV2A_GL_CULL_FACE::BACK) && (areax2 < 0))
+		return 0;
+	return render_triangle(cliprect, callback, paramcount, _v1, _v2, _v3);
+}
+
 int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UINT32 subchannel, UINT32 method, UINT32 address, int &countlen)
 {
 	UINT32 maddress;
@@ -2592,7 +2611,9 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			for (n = 0; n <= count; n += 4) {
 				read_vertices_0x1810(space, vertex_software + vertex_first, n + offset, 4);
 				convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 4);
-				render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy + vertex_first); // 4 rgba, 4 texture units 2 uv
+				//render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy + vertex_first); // 4 rgba, 4 texture units 2 uv
+				render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[vertex_first], vertex_xy[vertex_first + 1], vertex_xy[vertex_first + 2]);
+				render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[vertex_first], vertex_xy[vertex_first + 2], vertex_xy[vertex_first + 3]);
 				vertex_first = (vertex_first + 4) & 1023;
 				vertex_count = vertex_count + 4;
 				wait();
@@ -2602,7 +2623,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			for (n = 0; n <= count; n += 3) {
 				read_vertices_0x1810(space, vertex_software + vertex_first, n + offset, 3);
 				convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 3);
-				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[vertex_first], vertex_xy[(vertex_first + 1) & 1023], vertex_xy[(vertex_first + 2) & 1023]); // 4 rgba, 4 texture units 2 uv
+				render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[vertex_first], vertex_xy[(vertex_first + 1) & 1023], vertex_xy[(vertex_first + 2) & 1023]); // 4 rgba, 4 texture units 2 uv
 				vertex_first = (vertex_first + 3) & 1023;
 				vertex_count = vertex_count + 3;
 				wait();
@@ -2624,7 +2645,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			for (n = 0; n <= count; n++) {
 				read_vertices_0x1810(space, vertex_software + vertex_first, offset + n, 1);
 				convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 1);
-				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[1024], vertex_xy[(vertex_first - 1) & 1023], vertex_xy[vertex_first]);
+				render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[1024], vertex_xy[(vertex_first - 1) & 1023], vertex_xy[vertex_first]);
 				vertex_first = (vertex_first + 1) & 1023;
 				vertex_count = vertex_count + 1;
 				wait();
@@ -2645,9 +2666,9 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				read_vertices_0x1810(space, vertex_software + vertex_first, offset + n, 1);
 				convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 1);
 				if ((vertex_count & 1) == 0)
-					render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_first - 2) & 1023], vertex_xy[(vertex_first - 1) & 1023], vertex_xy[vertex_first]);
+					render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_first - 2) & 1023], vertex_xy[(vertex_first - 1) & 1023], vertex_xy[vertex_first]);
 				else
-					render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_first - 2) & 1023], vertex_xy[vertex_first], vertex_xy[(vertex_first - 1) & 1023]);
+					render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_first - 2) & 1023], vertex_xy[vertex_first], vertex_xy[(vertex_first - 1) & 1023]);
 				vertex_first = (vertex_first + 1) & 1023;
 				vertex_count = vertex_count + 1;
 				wait();
@@ -2691,7 +2712,9 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				address = address + c * 4;
 				countlen = countlen - c;
 				convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 4);
-				render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy + vertex_first); // 4 rgba, 4 texture units 2 uv
+				//render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy + vertex_first); // 4 rgba, 4 texture units 2 uv
+				render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[vertex_first], vertex_xy[vertex_first + 1], vertex_xy[vertex_first + 2]);
+				render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[vertex_first], vertex_xy[vertex_first + 2], vertex_xy[vertex_first + 3]);
 				vertex_first = (vertex_first + 4) & 1023;
 				vertex_count = vertex_count + 4;
 				wait();
@@ -2733,7 +2756,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 					convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 1);
 					address = address + c * 4;
 					countlen = countlen - c;
-					render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[1024], vertex_xy[(vertex_first - 1) & 1023], vertex_xy[vertex_first]);
+					render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[1024], vertex_xy[(vertex_first - 1) & 1023], vertex_xy[vertex_first]);
 					vertex_first = (vertex_first + 1) & 1023;
 					vertex_count = vertex_count + 1;
 					wait();
@@ -2753,7 +2776,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				address = address + c * 4;
 				countlen = countlen - c;
 				convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 3);
-				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[vertex_first], vertex_xy[(vertex_first + 1) & 1023], vertex_xy[(vertex_first + 2) & 1023]); // 4 rgba, 4 texture units 2 uv
+				render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[vertex_first], vertex_xy[(vertex_first + 1) & 1023], vertex_xy[(vertex_first + 2) & 1023]); // 4 rgba, 4 texture units 2 uv
 				vertex_first = (vertex_first + 3) & 1023;
 				vertex_count = vertex_count + 3;
 				wait();
@@ -2789,9 +2812,9 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 					countlen = countlen - c;
 					convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 1);
 					if ((vertex_count & 1) == 0)
-						render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_first - 2) & 1023], vertex_xy[(vertex_first - 1) & 1023], vertex_xy[vertex_first]);
+						render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_first - 2) & 1023], vertex_xy[(vertex_first - 1) & 1023], vertex_xy[vertex_first]);
 					else
-						render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_first - 2) & 1023], vertex_xy[vertex_first], vertex_xy[(vertex_first - 1) & 1023]);
+						render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_first - 2) & 1023], vertex_xy[vertex_first], vertex_xy[(vertex_first - 1) & 1023]);
 					vertex_first = (vertex_first + 1) & 1023;
 					vertex_count = vertex_count + 1;
 					wait();
@@ -2849,7 +2872,9 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 					break;
 				}
 				address = address + c * 4;
-				render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy); // 4 rgba, 4 texture units 2 uv
+				//render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy); // 4 rgba, 4 texture units 2 uv
+				render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[vertex_first], vertex_xy[vertex_first + 1], vertex_xy[vertex_first + 2]);
+				render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[vertex_first], vertex_xy[vertex_first + 2], vertex_xy[vertex_first + 3]);
 				vertex_first = (vertex_first + 4) & 1023;
 				vertex_count = vertex_count + 4;
 				wait();
@@ -2877,8 +2902,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 					return 0;
 				}
 				address = address + c * 4;
-				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[n & 3], vertex_xy[(n + 1) & 3], vertex_xy[(n + 2) & 3]);
-				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(n + 2) & 3], vertex_xy[(n + 1) & 3], vertex_xy[(n + 3) & 3]);
+				render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[n & 3], vertex_xy[(n + 1) & 3], vertex_xy[(n + 2) & 3]);
+				render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(n + 2) & 3], vertex_xy[(n + 1) & 3], vertex_xy[(n + 3) & 3]);
 				wait();
 			}
 		}
@@ -2914,7 +2939,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				}
 				address = address + c * 4;
 				convert_vertices_poly(vertex_software + vertex_first, vertex_xy + vertex_first, 1);
-				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[1024], vertex_xy[(vertex_first - 1) & 1023], vertex_xy[vertex_first]);
+				render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[1024], vertex_xy[(vertex_first - 1) & 1023], vertex_xy[vertex_first]);
 				vertex_first = (vertex_first + 1) & 1023;
 				vertex_count = vertex_count + 1;
 				wait();
@@ -2933,7 +2958,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 					break;
 				}
 				address = address + c * 4;
-				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[vertex_first], vertex_xy[(vertex_first + 1) & 1023], vertex_xy[(vertex_first + 2) & 1023]); // 4 rgba, 4 texture units 2 uv
+				render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[vertex_first], vertex_xy[(vertex_first + 1) & 1023], vertex_xy[(vertex_first + 2) & 1023]); // 4 rgba, 4 texture units 2 uv
 				vertex_first = (vertex_first + 3) & 1023;
 				vertex_count = vertex_count + 3;
 				wait();
@@ -2968,9 +2993,9 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				}
 				address = address + c * 4;
 				if ((vertex_count & 1) == 0)
-					render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_first - 2) & 1023], vertex_xy[(vertex_first - 1) & 1023], vertex_xy[vertex_first]);
+					render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_first - 2) & 1023], vertex_xy[(vertex_first - 1) & 1023], vertex_xy[vertex_first]);
 				else
-					render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_first - 2) & 1023], vertex_xy[vertex_first], vertex_xy[(vertex_first - 1) & 1023]);
+					render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_first - 2) & 1023], vertex_xy[vertex_first], vertex_xy[(vertex_first - 1) & 1023]);
 				vertex_first = (vertex_first + 1) & 1023;
 				vertex_count = vertex_count + 1;
 				wait();
@@ -3028,6 +3053,15 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 	}
 	if ((maddress == 0x1d6c) || (maddress == 0x1d70) || (maddress == 0x1a4))
 		countlen--;
+	if (maddress == 0x0308) {
+		backface_culling_enabled = data != 0 ? true : false;
+	}
+	if (maddress == 0x03a0) {
+		backface_culling_winding = (NV2A_GL_FRONT_FACE)data;
+	}
+	if (maddress == 0x039c) {
+		backface_culling_culled = (NV2A_GL_CULL_FACE)data;
+	}
 	if (maddress == 0x019c) {
 		geforce_read_dma_object(data, dma_offset[0], dma_size[0]);
 	}

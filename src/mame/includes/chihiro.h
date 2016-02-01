@@ -346,6 +346,15 @@ public:
 		B8 = 9,
 		G8B8 = 10
 	};
+	enum class NV2A_GL_FRONT_FACE {
+		CW = 0x0900,
+		CCW = 0x0901
+	};
+	enum class NV2A_GL_CULL_FACE {
+		FRONT = 0x0404,
+		BACK = 0x0405,
+		FRONT_AND_BACK = 0x0408
+	};
 
 	nv2a_renderer(running_machine &machine) : poly_manager<float, nvidia_object_data, 13, 8192>(machine)
 	{
@@ -363,6 +372,9 @@ public:
 		indexesleft_count = 0;
 		vertex_pipeline = 4;
 		color_mask = 0xffffffff;
+		backface_culling_enabled = false;
+		backface_culling_winding = NV2A_GL_FRONT_FACE::CCW;
+		backface_culling_culled = NV2A_GL_CULL_FACE::BACK;
 		alpha_test_enabled = false;
 		alpha_reference = 0;
 		alpha_func = NV2A_COMPARISON_OP::ALWAYS;
@@ -464,6 +476,7 @@ public:
 	int read_vertices_0x1810(address_space & space, vertex_nv *destination, int offset, int limit);
 	int read_vertices_0x1818(address_space & space, vertex_nv *destination, UINT32 address, int limit);
 	void convert_vertices_poly(vertex_nv *source, vertex_t *destination, int count);
+	UINT32 render_triangle_culling(const rectangle &cliprect, render_delegate callback, int paramcount, const vertex_t &_v1, const vertex_t &_v2, const vertex_t &_v3);
 	void clear_render_target(int what, UINT32 value);
 	void clear_depth_buffer(int what, UINT32 value);
 	inline UINT8 *direct_access_ptr(offs_t address);
@@ -630,6 +643,9 @@ public:
 		std::mutex lock;
 	} combiner;
 	UINT32 color_mask;
+	bool backface_culling_enabled;
+	NV2A_GL_FRONT_FACE backface_culling_winding;
+	NV2A_GL_CULL_FACE backface_culling_culled;
 	bool alpha_test_enabled;
 	NV2A_COMPARISON_OP alpha_func;
 	int alpha_reference;
