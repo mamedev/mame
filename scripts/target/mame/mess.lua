@@ -2090,6 +2090,8 @@ files {
 	MAME_DIR .. "src/mame/machine/pc9801_cbus.h",
 	MAME_DIR .. "src/mame/machine/pc9801_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/pc9801_kbd.h",
+	MAME_DIR .. "src/mame/machine/pc9801_cd.cpp",
+	MAME_DIR .. "src/mame/machine/pc9801_cd.h",
 	MAME_DIR .. "src/mame/drivers/tk80bs.cpp",
 	MAME_DIR .. "src/mame/drivers/hh_ucom4.cpp",
 	MAME_DIR .. "src/mame/includes/hh_ucom4.h",

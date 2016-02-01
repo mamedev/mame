@@ -257,6 +257,7 @@ void pc9801_kbd_device::device_reset()
 
 	m_keyb_tx = 0xff;
 	m_keyb_rx = 0;
+	m_key_avail = false;
 }
 
 //-------------------------------------------------
@@ -276,6 +277,7 @@ void pc9801_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int p
 			{
 				m_keyb_tx = i | 0x80;
 				m_write_irq(ASSERT_LINE);
+				m_key_avail = true;
 				m_rx_buf[i] = 0;
 				return;
 			}
@@ -288,6 +290,7 @@ void pc9801_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int p
 			{
 				m_keyb_tx = i;
 				m_write_irq(ASSERT_LINE);
+				m_key_avail = true;
 				m_rx_buf[i] = 0;
 				return;
 			}
@@ -303,8 +306,11 @@ READ8_MEMBER( pc9801_kbd_device::rx_r )
 {
 	m_write_irq(CLEAR_LINE);
 	if(!offset)
+	{
+		m_key_avail = false;
 		return m_keyb_tx;
-	return 1 | 4 | 2;
+	}
+	return 1 | 4 | (m_key_avail ? 2 : 0);
 }
 
 WRITE8_MEMBER( pc9801_kbd_device::tx_w )

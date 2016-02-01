@@ -425,6 +425,7 @@ Keyboard TX commands:
 #include "machine/pc9801_118.h"
 #include "machine/pc9801_cbus.h"
 #include "machine/pc9801_kbd.h"
+#include "machine/pc9801_cd.h"
 
 #include "machine/idectrl.h"
 #include "machine/idehd.h"
@@ -3218,6 +3219,10 @@ TIMER_DEVICE_CALLBACK_MEMBER( pc9801_state::mouse_irq_cb )
 	}
 }
 
+SLOT_INTERFACE_START(pc9801_atapi_devices)
+	SLOT_INTERFACE("pc9801_cd", PC9801_CD)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_FRAGMENT( pc9801_keyboard )
 	MCFG_DEVICE_ADD("keyb", PC9801_KBD, 53)
 	MCFG_PC9801_KBD_IRQ_CALLBACK(DEVWRITELINE("pic8259_master", pic8259_device, ir1_w))
@@ -3266,7 +3271,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( pc9801_ide )
 	MCFG_ATA_INTERFACE_ADD("ide1", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(pc9801_state, ide1_irq_w))
-	MCFG_ATA_INTERFACE_ADD("ide2", ata_devices, "cdrom", nullptr, false)
+	MCFG_ATA_INTERFACE_ADD("ide2", pc9801_atapi_devices, "pc9801_cd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(pc9801_state, ide2_irq_w))
 MACHINE_CONFIG_END
 
