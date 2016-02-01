@@ -3130,7 +3130,7 @@ ROM_START( nclubv2 )
 	// unusual rom mapping compared to other games, the cartridge is a little different too, with a large PALCE16V8H-10 marked 315-6026
 	ROM_LOAD16_WORD_SWAP( "nclubv2.ic22",    0x0200000, 0x0200000, CRC(7e81676d) SHA1(fc0f0dcdb4aaf71218d7c1dd0e4ddc5381e8b13b) ) // OK
 	ROM_LOAD16_WORD_SWAP( "nclubv2.ic24",    0x0600000, 0x0200000, CRC(1b7637de) SHA1(43c3094f60a6582298a45bad923fef57e98c5b2b) ) // OK
-	ROM_LOAD16_WORD_SWAP( "ic26",            0x0a00000, 0x0200000, CRC(614deea4) SHA1(4af01ad961c72399481ab3ffce08fc8d30184323) ) // fails rom check
+	ROM_LOAD16_WORD_SWAP( "nclubv2.ic26",    0x0a00000, 0x0200000, CRC(630be99d) SHA1(ac7fbaae98b126fad5228b0ebffa91a0f0a94516) ) // OK
 	ROM_LOAD16_WORD_SWAP( "nclubv2.ic28",    0x0e00000, 0x0200000, CRC(1a3ca5e2) SHA1(4d3aed51d29c54e71175d828f648c9feb813ac04) ) // OK
 		
 
