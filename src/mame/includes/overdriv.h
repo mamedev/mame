@@ -51,12 +51,15 @@ public:
 	DECLARE_WRITE16_MEMBER(cpuB_ctrl_w);
 	DECLARE_WRITE16_MEMBER(overdriv_soundirq_w);
 	DECLARE_WRITE8_MEMBER(sound_ack_w);
-	DECLARE_WRITE16_MEMBER(overdriv_cpuB_irq_x_w);
-	DECLARE_WRITE16_MEMBER(overdriv_cpuB_irq_y_w);
+	DECLARE_WRITE16_MEMBER(slave_irq4_assert_w);
+	DECLARE_WRITE16_MEMBER(slave_irq5_assert_w);
+	DECLARE_WRITE16_MEMBER(objdma_w);
+	TIMER_CALLBACK_MEMBER(objdma_end_cb);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	UINT32 screen_update_overdriv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(cpuB_interrupt);
+	//INTERRUPT_GEN_MEMBER(cpuB_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(overdriv_cpuA_scanline);
 	int m_fake_timer;
 	
