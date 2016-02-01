@@ -4,8 +4,8 @@
 
     315-5838 - Decathlete (ST-V)
     317-0229 - Dead or Alive (Model 2A)
-	???-???? - Print CLub Love Love (ST-V)
-	???-???? - Name Club Ver 2 (ST-V) (tested as RCDD2 in the service menu!)
+	317-0229 - Name Club Ver 2 (ST-V) (tested as RCDD2 in the service menu!)
+	317-0231 - Print Club Love Love (ST-V)
 
 	Several Print Club (ST-V) carts have
 	an unpopulated space marked '317-0229' on the PCB

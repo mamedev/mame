@@ -2901,6 +2901,21 @@ ROM_START( pclub2fc ) // set to 1p
 ROM_END
 
 
+ROM_START( pclub2pf ) // set to 1p
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+
+	ROM_LOAD16_WORD_SWAP( "pclb2puf.IC22",    0x0200000, 0x0200000, CRC(a14282f2) SHA1(b96e70693d8e71b090e20efdd3aa6228e7289fa4) ) // OK
+	ROM_LOAD16_WORD_SWAP( "pclb2puf.IC24",    0x0400000, 0x0200000, CRC(4fb4dc74) SHA1(1f174512c9cd5420d7f935cbc6b5875836f6e825) ) // OK
+	ROM_LOAD16_WORD_SWAP( "pclb2puf.IC26",    0x0600000, 0x0200000, CRC(d20bbfb5) SHA1(5f2768e0e306bd0e3ed9b4e1d234aac8fd7155e6) ) // OK
+	ROM_LOAD16_WORD_SWAP( "pclb2puf.IC28",    0x0800000, 0x0200000, CRC(da658ae9) SHA1(24293c2b23b3009956fc05df5177a27415754301) ) // OK
+	ROM_LOAD16_WORD_SWAP( "pclb2puf.IC30",    0x0a00000, 0x0200000, CRC(cafc0e6b) SHA1(fa2ac54260336d5dd1ced7ccaf87115511ece1f8) ) // OK
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
+	ROM_LOAD( "pclub2pf.nv", 0x0000, 0x0080, CRC(447bb3bd) SHA1(9fefec09849bfa0c14b49e73ff13e2a538dff511) )
+ROM_END
+
 ROM_START( pclb297w ) // set to 1p
 	STV_BIOS
 
@@ -2939,6 +2954,37 @@ ROM_START( pclub298 ) // set to 1p
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "pclub298.nv", 0x0000, 0x0080, CRC(a23dd0f2) SHA1(457282b5d40a17477b95330bba91e05c603f951e) )
 ROM_END
+
+ROM_START( pclub27s ) // set to 1p
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+
+	ROM_LOAD16_WORD_SWAP( "pclub2v7.IC22",    0x0200000, 0x0200000, CRC(44c8ab27) SHA1(65e2705b2918da32ea40375707df4e148b311159) )
+	ROM_LOAD16_WORD_SWAP( "pclub2v7.IC24",    0x0400000, 0x0200000, CRC(24818437) SHA1(5293d45b53680301abaf0b32a62596aaaa2552d6) )
+	ROM_LOAD16_WORD_SWAP( "pclub2v7.IC26",    0x0600000, 0x0200000, CRC(076c1d44) SHA1(d597ed4524bb03eb0ef8ada08d49f3dc0fc8136d) )
+	ROM_LOAD16_WORD_SWAP( "pclub2v7.IC28",    0x0800000, 0x0200000, CRC(03b9eacf) SHA1(d69c10f7613d9f52042dd6cce64e74e2b1ecc2d8) )
+	ROM_LOAD16_WORD_SWAP( "pclub2v7.IC30",    0x0a00000, 0x0200000, CRC(e58c7167) SHA1(d88b1648c5d86a90615a8c6a1bf87bc9e75dc320) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
+	ROM_LOAD( "pclub27s.nv", 0x0000, 0x0080, CRC(323dd0f2) SHA1(457282b5d40a17477b95330bba91e05c603f951e) )
+ROM_END
+
+ROM_START( pclubyo2 ) // set to 1p
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+
+	ROM_LOAD16_WORD_SWAP( "pclbyov2.IC22",    0x0200000, 0x0200000, CRC(719a4d27) SHA1(328dfb8debea02e8660e636e953982d381529945) )
+	ROM_LOAD16_WORD_SWAP( "pclbyov2.IC24",    0x0400000, 0x0200000, CRC(790dc7b5) SHA1(829ead39930779617a9bef41d8615362ca86c4c7) )
+	ROM_LOAD16_WORD_SWAP( "pclbyov2.IC26",    0x0600000, 0x0200000, CRC(12ae1606) SHA1(9534fb2dbf6fd2c258ba2716783cc5bab8bd8dc0) )
+	ROM_LOAD16_WORD_SWAP( "pclbyov2.IC28",    0x0800000, 0x0200000, CRC(ff9643ca) SHA1(3309f970f87324b06cc48add386019f769abcd89) )
+	ROM_LOAD16_WORD_SWAP( "pclbyov2.IC30",    0x0a00000, 0x0200000, CRC(03b9eacf) SHA1(d69c10f7613d9f52042dd6cce64e74e2b1ecc2d8) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
+	ROM_LOAD( "pclubyo2.nv", 0x0000, 0x0080, CRC(2b26a8f7) SHA1(32f34096cac05a37c492ee389ed8e4c02694c268) )
+ROM_END
+
 
 ROM_START( pclb298a ) // set to 1p
 	STV_BIOS
@@ -3084,8 +3130,9 @@ ROM_START( nclubv2 )
 	// unusual rom mapping compared to other games, the cartridge is a little different too, with a large PALCE16V8H-10 marked 315-6026
 	ROM_LOAD16_WORD_SWAP( "nclubv2.ic22",    0x0200000, 0x0200000, CRC(7e81676d) SHA1(fc0f0dcdb4aaf71218d7c1dd0e4ddc5381e8b13b) ) // OK
 	ROM_LOAD16_WORD_SWAP( "nclubv2.ic24",    0x0600000, 0x0200000, CRC(1b7637de) SHA1(43c3094f60a6582298a45bad923fef57e98c5b2b) ) // OK
-	ROM_LOAD16_WORD_SWAP( "nclubv2.ic26",    0x0a00000, 0x0200000, CRC(bcf3f540) SHA1(e7f3174ccb2f1664baf4332dd99a71647c9c6108) ) // fails rom check (data doesn't look bad tho so probably a few bits at most)
+	ROM_LOAD16_WORD_SWAP( "ic26",            0x0a00000, 0x0200000, CRC(614deea4) SHA1(4af01ad961c72399481ab3ffce08fc8d30184323) ) // fails rom check
 	ROM_LOAD16_WORD_SWAP( "nclubv2.ic28",    0x0e00000, 0x0200000, CRC(1a3ca5e2) SHA1(4d3aed51d29c54e71175d828f648c9feb813ac04) ) // OK
+		
 
 	// the protection device is checked in the 'each game test' menu as 'RCDD2' might be worth investigating what the game passes to the device for it.
 	// I think the device is used to decompress the full size image data for the printer.
@@ -3151,21 +3198,29 @@ GAME( 1997, winterht,  stvbios, stv,      stv, stv_state,        winterht,   ROT
 GAME( 1997, znpwfv,    stvbios, stv,      stv, stv_state,        znpwfv,     ROT0,   "Sega",                         "Zen Nippon Pro-Wrestling Featuring Virtua (J 971123 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /* Unemulated printer / camera devices */
-GAME( 1998, stress,    stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Sega",                         "Stress Busters (J 981020 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, nclubv2,   stvbios, stv_5838, stv, stv_state,       decathlt,   ROT0,   "Sega",                         "Name Club Ver.2 (J 960315 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
-GAME( 1997, nclubv3,   stvbios, stv,      stv, stv_state,       nameclv3,   ROT0,   "Sega",                         "Name Club Ver.3 (J 970723 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+// USA sets
 GAME( 1997, pclub2,    stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 (U 970921 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1999, pclub2v3,  pclub2,  stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 3 (U 990310 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1999, pclubpok,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club Pokemon B (U 991126 V1.000)", MACHINE_NOT_WORKING )
+// Japan sets
 GAME( 1999, pclub2fc,  pclub2,  stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Felix The Cat (Rev. A) (J 970415 V1.100)", MACHINE_NOT_WORKING )
+GAME( 1998, pclub2pf,  pclub2,  stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Puffy (Japan)", MACHINE_NOT_WORKING ) // version info is blank
 GAME( 1997, pclb297w,  pclub2,  stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100)", MACHINE_NOT_WORKING )
 GAME( 1997, pclub298,  pclub2,  stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Spring Ver (J 971017 V1.100)", MACHINE_NOT_WORKING )
 GAME( 1998, pclb298a,  pclub2,  stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Autumn Ver (J 980827 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1997, pclb2elk,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Earth Limited Kobe (Print Club Custom) (J 970808 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1997, pclub27s,  pclub2,  stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 7 Spring (J 970313 V1.100)", MACHINE_NOT_WORKING ) // aka Print Club 2 '97 Spring Ver  ?
+
 GAME( 1999, pclubor,   stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club Goukakenran (J 991104 V1.000)", MACHINE_NOT_WORKING )
 GAME( 1999, pclubol,   stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club Olive (J 980717 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1999, pclub2v3,  pclub2,  stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 3 (U 990310 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1999, pclubpok,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club Pokemon B (U 991126 V1.000)", MACHINE_NOT_WORKING )
 GAME( 1997, pclub2kc,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club Kome Kome Club (J 970203 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1997, pclb2elk,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Earth Limited Kobe (Print Club Custom) (J 970808 V1.000)", MACHINE_NOT_WORKING )
 GAME( 1997, pclove,    stvbios, stv_5838, stv, stv_state,       decathlt,   ROT0,   "Atlus",                        "Print Club LoveLove (J 970421 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
+GAME( 1997, pclubyo2,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club Yoshimoto V2 (J 970422 V1.100)", MACHINE_NOT_WORKING )
+
+GAME( 1998, stress,    stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Sega",                         "Stress Busters (J 981020 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, nclubv2,   stvbios, stv_5838, stv, stv_state,       decathlt,   ROT0,   "Sega",                         "Name Club Ver.2 (J 960315 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
+GAME( 1997, nclubv3,   stvbios, stv,      stv, stv_state,       nameclv3,   ROT0,   "Sega",                         "Name Club Ver.3 (J 970723 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+
 
 
 /* Doing something.. but not enough yet */
