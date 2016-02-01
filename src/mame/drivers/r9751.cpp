@@ -67,6 +67,8 @@ public:
 
 	DECLARE_READ32_MEMBER(r9751_mmio_5ff_r);
 	DECLARE_WRITE32_MEMBER(r9751_mmio_5ff_w);
+	DECLARE_READ32_MEMBER(r9751_mmio_ff01_r);
+	DECLARE_WRITE32_MEMBER(r9751_mmio_ff01_w);
 	DECLARE_READ32_MEMBER(r9751_mmio_ff05_r);
 	DECLARE_WRITE32_MEMBER(r9751_mmio_ff05_w);
 	DECLARE_READ32_MEMBER(r9751_mmio_fff8_r);
@@ -90,6 +92,8 @@ private:
 	UINT32 fdd_dest_address; // 5FF080B0
 	UINT32 fdd_cmd_complete;
 	UINT32 smioc_out_addr;
+	UINT32 smioc_dma_bank;
+	UINT32 fdd_dma_bank;
 	attotime timer_32khz_last;
 	// End registers
 
@@ -110,12 +114,16 @@ UINT32 r9751_state::swap_uint32( UINT32 val )
 
 READ8_MEMBER(r9751_state::pdc_dma_r)
 {
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	/* This callback function takes the value written to 0xFF01000C as the bank offset */
+	UINT32 address = (fdd_dma_bank & 0x7FFFF800) + (offset&0xFFFF);
+	return m_maincpu->space(AS_PROGRAM).read_byte(address);
 }
 
 WRITE8_MEMBER(r9751_state::pdc_dma_w)
 {
-	m_maincpu->space(AS_PROGRAM).write_byte(m_pdc->fdd_68k_dma_address,data);
+	/* This callback function takes the value written to 0xFF01000C as the bank offset */
+	UINT32 address = (fdd_dma_bank & 0x7FFFF800) + (data&0xFFFF);
+	m_maincpu->space(AS_PROGRAM).write_byte(m_pdc->fdd_68k_dma_address,address);
 }
 
 DRIVER_INIT_MEMBER(r9751_state,r9751)
@@ -123,9 +131,10 @@ DRIVER_INIT_MEMBER(r9751_state,r9751)
 	reg_ff050004 = 0;
 	reg_fff80040 = 0;
 	fdd_dest_address = 0;
-//  fdd_scsi_command = 0;
 	fdd_cmd_complete = 0;
+	fdd_dma_bank = 0;
 	smioc_out_addr = 0;
+	smioc_dma_bank = 0;
 	m_mem = &m_maincpu->space(AS_PROGRAM);
 
 }
@@ -199,7 +208,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			switch(data)
 			{
 				case 0x4100: /* Send byte to serial */
-					if(TRACE_SMIOC) logerror("Serial byte: %02X\n", m_mem->read_dword(smioc_out_addr));
+					if(TRACE_SMIOC) logerror("Serial byte: %02X PC: %08X\n", m_mem->read_dword(smioc_out_addr), space.machine().firstcpu->pc());
 					m_terminal->write(space,0,m_mem->read_dword(smioc_out_addr));
 					break;
 				default:
@@ -207,7 +216,9 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			}
 			break;
 		case 0x5FF0C098: /* Serial DMA output address */
-			smioc_out_addr = data * 2;
+			//smioc_out_addr = data * 2;
+			smioc_out_addr = (smioc_dma_bank & 0x7FFFF800) | ((data&0x3FF)<<1);
+			if(TRACE_SMIOC) logerror("Serial output address: %08X PC: %08X\n", smioc_out_addr, space.machine().firstcpu->pc());
 			break;
 		/* PDC FDD region (0xB0, device 44 */
 		case 0x5FF001B0: /* FDD SCSI read command */
@@ -216,13 +227,17 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 		case 0x5FF002B0: /* FDD SCSI read command */
 			if(TRACE_FDC) logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
 			break;
+		case 0x5FF004B0: /* FDD RESET PDC */
+			if(TRACE_FDC) logerror("PDC RESET, PC: %08X\n", space.machine().firstcpu->pc());
+			m_pdc->reset();
+			break;
 		case 0x5FF008B0: /* FDD SCSI read command */
 			if(TRACE_FDC) logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
 			break;
 		case 0x5FF041B0: /* Unknown - Probably old style commands */
 			if(TRACE_FDC) logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
 
-			/* Clear FDD Command completion status 0x5FF030B0 (PDC 0x4, 0x5)*/
+			/* Clear FDD Command completion status 0x5FF030B0 (PDC 0x4, 0x5) */
 			m_pdc->reg_p4 = 0;
 			m_pdc->reg_p5 = 0;
 
@@ -248,7 +263,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			unsigned char c_fdd_scsi_command[8]; // Array for SCSI command
 			int scsi_lba; // FDD LBA location here, extracted from command
 
-			/* Clear FDD Command completion status 0x5FF030B0 (PDC 0x4, 0x5)*/
+			/* Clear FDD Command completion status 0x5FF030B0 (PDC 0x4, 0x5) */
 			m_pdc->reg_p4 = 0;
 			m_pdc->reg_p5 = 0;
 
@@ -286,12 +301,42 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 }
 
 /******************************************************************************
- CPU board registers [0xFF050000 - 0xFF06FFFF]
+ CPU board registers [0xFF010000 - 0xFF06FFFF]
 ******************************************************************************/
+READ32_MEMBER( r9751_state::r9751_mmio_ff01_r )
+{
+	//UINT32 data;
+	UINT32 address = offset * 4 + 0xFF010000;
+
+	switch(address)
+	{
+		default:
+			//return data;
+			return 0;
+	}
+}
+
+WRITE32_MEMBER( r9751_state::r9751_mmio_ff01_w )
+{
+	UINT32 address = offset * 4 + 0xFF010000;
+
+	switch(address)
+	{
+		case 0xFF01000C: /* FDD DMA Offset */
+			fdd_dma_bank = data;
+			return;
+		case 0xFF010010: /* SMIOC DMA Offset */
+			smioc_dma_bank = data;
+			return;
+		default:
+			return;
+	}
+}
+
 READ32_MEMBER( r9751_state::r9751_mmio_ff05_r )
 {
 	UINT32 data;
-		UINT32 address = offset * 4 + 0xFF050000;
+	UINT32 address = offset * 4 + 0xFF050000;
 
 	switch(address)
 	{
@@ -373,6 +418,7 @@ static ADDRESS_MAP_START(r9751_mem, AS_PROGRAM, 32, r9751_state)
 	AM_RANGE(0x00000000,0x00ffffff) AM_RAM AM_SHARE("main_ram") // 16MB
 	AM_RANGE(0x08000000,0x0800ffff) AM_ROM AM_REGION("prom", 0)
 	AM_RANGE(0x5FF00000,0x5FFFFFFF) AM_READWRITE(r9751_mmio_5ff_r, r9751_mmio_5ff_w)
+	AM_RANGE(0xFF010000,0xFF01FFFF) AM_READWRITE(r9751_mmio_ff01_r, r9751_mmio_ff01_w)
 	AM_RANGE(0xFF050000,0xFF06FFFF) AM_READWRITE(r9751_mmio_ff05_r, r9751_mmio_ff05_w)
 	AM_RANGE(0xFFF80000,0xFFF8FFFF) AM_READWRITE(r9751_mmio_fff8_r, r9751_mmio_fff8_w)
 	//AM_RANGE(0xffffff00,0xffffffff) AM_RAM // Unknown area
