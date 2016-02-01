@@ -140,14 +140,18 @@ WRITE16_MEMBER(overdriv_state::overdriv_soundirq_w)
 }
 
 
-WRITE16_MEMBER(overdriv_state::overdriv_cpuB_irq_x_w)
+
+
+WRITE16_MEMBER(overdriv_state::slave_irq4_assert_w)
 {
-	m_subcpu->set_input_line(5, HOLD_LINE); // likely wrong
+	// used in-game
+	m_subcpu->set_input_line(4, HOLD_LINE);
 }
 
-WRITE16_MEMBER(overdriv_state::overdriv_cpuB_irq_y_w)
+WRITE16_MEMBER(overdriv_state::slave_irq5_assert_w)
 {
-	m_subcpu->set_input_line(4, HOLD_LINE);
+	// tests GFX ROMs with this irq (indeed enabled only in test mode)
+	m_subcpu->set_input_line(5, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
@@ -173,8 +177,8 @@ static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x218000, 0x218fff) AM_DEVREADWRITE8("k051316_2", k051316_device, read, write, 0xff00)
 	AM_RANGE(0x220000, 0x220fff) AM_DEVREAD8("k051316_1", k051316_device, rom_r, 0xff00)
 	AM_RANGE(0x228000, 0x228fff) AM_DEVREAD8("k051316_2", k051316_device, rom_r, 0xff00)
-	AM_RANGE(0x230000, 0x230001) AM_WRITE(overdriv_cpuB_irq_y_w)
-	AM_RANGE(0x238000, 0x238001) AM_WRITE(overdriv_cpuB_irq_x_w)
+	AM_RANGE(0x230000, 0x230001) AM_WRITE(slave_irq4_assert_w)
+	AM_RANGE(0x238000, 0x238001) AM_WRITE(slave_irq5_assert_w)
 ADDRESS_MAP_END
 
 #ifdef UNUSED_FUNCTION
