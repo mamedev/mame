@@ -14,20 +14,24 @@
   
   Specs:
   
-  1x UM6845
-  1x AY38910A/p
+  1x UM6845 (U67).
+  1x AY38910A/p (U75).
 
-  3x HY6264P-12
-  2x IMSG171P-50G
+  3x HY6264P-12 (U153, U154, U25).
+  2x IMSG171P-50G (U32, U104).
 
   2 Chips with no markings!
 
-  8x 64K Graphics ROMs.
-  1x 64K Program ROM.
-  1x 128K unknown ROM.
+  8x 64K Graphics ROMs (U139, U141, U149, U147, U137, U143, U145, U152).
+  1x 64K Program ROM (U123).
+  1x 128K unknown ROM (U138).
+
+  1x TI LF347N (U158) Operational Amplifier.
+  1x LM380N (U82) 2.5W Audio Power Amplifier.
 
   2x XTAL - 11.98135 KDS9C
   2x 8 DIP switches banks.
+  1x 3.6V lithium battery.
 
 
 **************************************************************************
@@ -35,8 +39,8 @@
   Tech notes...
 
   About the unknown ICs:
-  DIP64 CPU with Xtal tied to pins 30 % 31. --> TMS9900? (ROM 9)
-  DIP40 CPU or sound IC driving 128k (ROM 10) data? (pin 20 tied to GND)
+  DIP64 (U101) CPU with Xtal tied to pins 30 % 31. --> TMS9900? (ROM 9)
+  DIP40 (U64) CPU or sound IC driving 128k (ROM 10) data? (pin 20 tied to GND)
 
 
 *************************************************************************/
@@ -331,17 +335,21 @@ ROM_START( l9nibble )
 	ROM_LOAD( "09.U123", 0x00000, 0x10000, CRC(dfef685d) SHA1(0aeb4257e408e8549df629a0cdb5f2b6790e32de) ) // tms9900 code?
 
 	ROM_REGION( 0x80000, "gfx", 0 )
-	ROM_LOAD( "01.U139", 0x00000, 0x10000, CRC(aba06e58) SHA1(5841beec122613eed2ba9f48cb1d51bfa0ff450c) )
-	ROM_LOAD( "02.U141", 0x10000, 0x10000, CRC(a1e5d6d1) SHA1(8ec85b0544dd75bcb13600bae503ad2b20978281) )
-	ROM_LOAD( "03.U149", 0x20000, 0x10000, CRC(ae66f77c) SHA1(6c9e98cc00b72252cb238f14686c0faef47134df) )
-	ROM_LOAD( "04.U147", 0x30000, 0x10000, CRC(f1864094) SHA1(b439f9e8c2cc4575f9edbda45b9e724257015a73) )
-	ROM_LOAD( "05.U137", 0x40000, 0x10000, CRC(2e8ae9de) SHA1(5f2831f71b351e34df82af37041c9aa815eb372c) )
-	ROM_LOAD( "06.U143", 0x50000, 0x10000, CRC(8a56f324) SHA1(68790a12ca57c999bd7b7f26adc206aab3c06976) )
-	ROM_LOAD( "07.U145", 0x60000, 0x10000, CRC(4f757912) SHA1(63e5fc2672552463060680b7a5a94df45f3d4b68) )
-	ROM_LOAD( "08.U152", 0x70000, 0x10000, CRC(4f878ee4) SHA1(215f3ead0c358cc09c21515981cbb0a1e58c2ca6) )
+	ROM_LOAD( "01.u139", 0x00000, 0x10000, CRC(aba06e58) SHA1(5841beec122613eed2ba9f48cb1d51bfa0ff450c) )
+	ROM_LOAD( "02.u141", 0x10000, 0x10000, CRC(a1e5d6d1) SHA1(8ec85b0544dd75bcb13600bae503ad2b20978281) )
+	ROM_LOAD( "03.u149", 0x20000, 0x10000, CRC(ae66f77c) SHA1(6c9e98cc00b72252cb238f14686c0faef47134df) )
+	ROM_LOAD( "04.u147", 0x30000, 0x10000, CRC(f1864094) SHA1(b439f9e8c2cc4575f9edbda45b9e724257015a73) )
+	ROM_LOAD( "05.u137", 0x40000, 0x10000, CRC(2e8ae9de) SHA1(5f2831f71b351e34df82af37041c9aa815eb372c) )
+	ROM_LOAD( "06.u143", 0x50000, 0x10000, CRC(8a56f324) SHA1(68790a12ca57c999bd7b7f26adc206aab3c06976) )
+	ROM_LOAD( "07.u145", 0x60000, 0x10000, CRC(4f757912) SHA1(63e5fc2672552463060680b7a5a94df45f3d4b68) )
+	ROM_LOAD( "08.u152", 0x70000, 0x10000, CRC(4f878ee4) SHA1(215f3ead0c358cc09c21515981cbb0a1e58c2ca6) )
 
 	ROM_REGION( 0x20000, "user", 0 )
-	ROM_LOAD( "10.U138", 0x00000, 0x20000, CRC(ed831d2a) SHA1(ce5c3b24979d220215d7f0e8d50f45550aec15bd) ) // unknown data...
+	ROM_LOAD( "10.u138", 0x00000, 0x20000, CRC(ed831d2a) SHA1(ce5c3b24979d220215d7f0e8d50f45550aec15bd) ) // unknown data...
+
+	ROM_REGION( 0x0400, "plds", 0 )
+	ROM_LOAD( "pal16l8acn.u23",  0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "pal16l8acn.uxx",  0x0200, 0x0104, NO_DUMP )
 
 ROM_END
 
