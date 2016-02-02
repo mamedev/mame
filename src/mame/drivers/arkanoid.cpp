@@ -1245,6 +1245,10 @@ GFXDECODE_END
 
 void arkanoid_state::machine_start()
 {
+	// allocate the MCU timer, even if we have no MCU, and set it to fire NEVER.
+	m_68705_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(arkanoid_state::timer_68705_increment),this));
+	m_68705_timer->adjust(attotime::never);
+
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_palettebank));
 
@@ -1284,6 +1288,7 @@ void arkanoid_state::machine_reset()
 	m_z80HasWritten = 0;
 	m_68705HasWritten = 0;
 	if (m_mcu.found()) m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+	if (m_mcu.found()) m_68705_timer->adjust(attotime::from_hz(((XTAL_12MHz/4)/4)/(1<<7)));
 
 	m_port_a_in = 0;
 	m_port_a_out = 0;
