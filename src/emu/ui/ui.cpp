@@ -37,6 +37,8 @@ enum
 	LOADSAVE_SAVE
 };
 
+#define MAX_SAVED_STATE_JOYSTICK   4
+
 
 /***************************************************************************
     LOCAL VARIABLES
@@ -1759,18 +1761,35 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 			if (machine.input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
 				file = id - ITEM_ID_0_PAD + '0';
 	if (file == 0)
-		return state;
+	{
+		bool found = false;
+
+		for (int joy_index = 0; joy_index <= MAX_SAVED_STATE_JOYSTICK; joy_index++)
+			for (input_item_id id = ITEM_ID_BUTTON1; id <= ITEM_ID_BUTTON32; ++id)
+				if (machine.input().code_pressed_once(input_code(DEVICE_CLASS_JOYSTICK, joy_index, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
+				{
+					snprintf(filename, sizeof(filename), "joy%i-%i", joy_index, id - ITEM_ID_BUTTON1 + 1);
+					found = true;
+					break;
+				}
+
+		if (!found)
+			return state;
+	}
+	else
+	{
+		sprintf(filename, "%c", file);
+	}
 
 	// display a popup indicating that the save will proceed
-	sprintf(filename, "%c", file);
 	if (state == LOADSAVE_SAVE)
 	{
-		machine.popmessage("Save to position %c", file);
+		machine.popmessage("Save to position %s", filename);
 		machine.schedule_save(filename);
 	}
 	else
 	{
-		machine.popmessage("Load from position %c", file);
+		machine.popmessage("Load from position %s", filename);
 		machine.schedule_load(filename);
 	}
 
