@@ -1862,7 +1862,9 @@ READ64_MEMBER(naomi_state::aw_modem_r )
 	{
 	/*
 	         0x00600280 r  0000dcba
-	             a/b/c/d - coin inputs 1-4, active low
+	             a/b - 1P/2P coin inputs (JAMMA), active low
+	             c/d - 3P/4P coin inputs (EX. IO board), active low
+
 	             (ab == 0) -> BIOS skip RAM test
 	    */
 		return U64(0xffffffff00000000) | (ioport("COINS")->read() & 0x0F);
@@ -1896,8 +1898,8 @@ WRITE64_MEMBER(naomi_state::aw_modem_w )
 	        TODO: hook this then MAME have such devices emulated
 
 	        0x00600288 rw 0000dcba
-	            a - 1P coin couner
-	            b - 2P coin couner
+	            a - 1P coin counter
+	            b - 2P coin counter
 	            c - 1P coin lockout
 	            d - 2P coin lockout
 
@@ -7963,6 +7965,26 @@ ROM_START( puyofev )
 	ROM_LOAD("317-0375-com.pic", 0x00, 0x4000, CRC(52b56b52) SHA1(221590efbb09824621714cb163bda51a921d7d54) )
 ROM_END
 
+/*
+   note:
+   both Dragon Treasure game binaries have only first 16MB encrypted using DES key from security PIC provided with GD-ROMs.
+   the rest of data encrypted using some other key, same in both game versions.
+   presumably this data uploaded via network to satellite units and decrypted using DES key from their own security PICs.
+*/
+
+// requires 837-14381 "G2 EXPANSION BD" I/O board
+ROM_START( dragntr2 )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0037a", 0, SHA1(ce65fe84cabaa1ac3f40bff9535a42c2055b5f1c) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC is missing
+	ROM_LOAD("317-xxxx-xxx.pic", 0x00, 0x4000, NO_DUMP )
+ROM_END
+
 // requires 837-14381 "G2 EXPANSION BD" I/O board
 ROM_START( dragntr3 )
 	NAOMIGD_BIOS
@@ -9566,7 +9588,7 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 // 0036E Virtua Fighter 4 Final Tuned (GDS-0036E)
 /* 0036F */ GAME( 2004, vf4tuned, naomi2,  naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Virtua Fighter 4 Final Tuned (Rev F) (GDS-0036F)", GAME_FLAGS )
 // 0037  Dragon Treasure 2 (GDS-0037)
-// 0037A Dragon Treasure 2 (Rev A) (GDS-0037A)
+/* 0037A */ GAME( 2004, dragntr2, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Dragon Treasure 2 (Rev A) (GDS-0037A)", GAME_FLAGS )
 // 0038
 // 0039  Initial D Arcade Stage Ver. 3 Cycraft Edition (GDS-0039)
 /* 0039A */ GAME( 2006, inidv3ca, inidv3cy,naomigd,  naomi,   naomi_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev A) (GDS-0039A)", GAME_FLAGS )
