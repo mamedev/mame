@@ -304,6 +304,7 @@ public:
 	int m_fpga_uploaded;
 	int m_lanc2_ram_r;
 	int m_lanc2_ram_w;
+	UINT8 m_lanc2_reg[3];
 	std::unique_ptr<UINT8[]> m_lanc2_ram;
 	std::unique_ptr<UINT32[]> m_sharc_dataram;
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
@@ -521,6 +522,7 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 					((value << 7) & 0x80);
 
 			m_fpga_uploaded = 1;
+			m_lanc2_reg[0] = (UINT8)(data >> 24);
 
 			//printf("lanc2_fpga_w: %02X at %08X\n", value, space.device().safe_pc());
 		}
@@ -528,11 +530,16 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 		{
 			m_lanc2_ram_r = 0;
 			m_lanc2_ram_w = 0;
+			m_lanc2_reg[1] = (UINT8)(data >> 8);
 		}
 		else if (ACCESSING_BITS_16_23)
 		{
-			m_lanc2_ram[2] = (data >> 20) & 0xf;
-			m_lanc2_ram[3] = 0;
+			if (m_lanc2_reg[0] != 0)
+			{
+				m_lanc2_ram[2] = (data >> 20) & 0xf;
+				m_lanc2_ram[3] = 0;
+			}
+			m_lanc2_reg[2] = (UINT8)(data >> 16);
 		}
 		else if (ACCESSING_BITS_0_7)
 		{
