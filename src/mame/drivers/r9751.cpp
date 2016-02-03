@@ -156,32 +156,31 @@ void r9751_state::machine_reset()
 READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 {
 	UINT32 data;
-	UINT32 address = offset * 4 + 0x5FF00000;
 
-	switch(address)
+	switch(offset << 2)
 	{
 		/* PDC HDD region (0x24, device 9) */
-		case 0x5FF00824: /* HDD Command result code */
+		case 0x0824: /* HDD Command result code */
 			return 0x10;
-		case 0x5FF03024: /* HDD SCSI command completed successfully */
+		case 0x3024: /* HDD SCSI command completed successfully */
 			data = 0x1;
-			if(TRACE_HDC) logerror("SCSI HDD command completion status - Read: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+			if(TRACE_HDC) logerror("SCSI HDD command completion status - Read: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000);
 			return data;
 		/* SMIOC region (0x98, device 26) */
-		case 0x5FF00898: /* Serial status or DMA status */
+		case 0x0898: /* Serial status or DMA status */
 			return 0x40;
 		/* PDC FDD region (0xB0, device 44 */
-		case 0x5FF008B0: /* FDD Command result code */
+		case 0x08B0: /* FDD Command result code */
 			return 0x10;
-		case 0x5FF010B0: /* Clear 5FF030B0 ?? */
+		case 0x10B0: /* Clear 5FF030B0 ?? */
 			if(TRACE_FDC) logerror("--- FDD 0x5FF010B0 READ (0)\n");
 			return 0;
-		case 0x5FF030B0: /* FDD command completion status */
+		case 0x30B0: /* FDD command completion status */
 			data = (m_pdc->reg_p5 << 8) + m_pdc->reg_p4;
-			if(TRACE_FDC) logerror("--- SCSI FDD command completion status - Read: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+			if(TRACE_FDC) logerror("--- SCSI FDD command completion status - Read: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000);
 			return data;
 		default:
-			if(TRACE_FDC || TRACE_HDC || TRACE_SMIOC) logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, 0, mem_mask);
+			if(TRACE_FDC || TRACE_HDC || TRACE_SMIOC) logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000, 0, mem_mask);
 			return 0;
 	}
 }
@@ -189,22 +188,24 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 {
 	UINT8 data_b0, data_b1;
-	UINT32 address = offset * 4 + 0x5FF00000;
+	/* Unknown mask */
+	if (mem_mask != 0xFFFFFFFF)
+		logerror("Mask found: %08X Register: %08X PC: %08X\n", mem_mask, offset << 2 | 0x5FF00000, space.machine().firstcpu->pc());
 
-	switch(address)
+	switch(offset << 2)
 	{
 		/* PDC HDD region (0x24, device 9 */
-		case 0x5FF00224: /* HDD SCSI read command */
-			if(TRACE_HDC) logerror("@@@ HDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+		case 0x0224: /* HDD SCSI read command */
+			if(TRACE_HDC) logerror("@@@ HDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000);
 			break;
-		case 0x5FF08024: /* HDD SCSI read command */
-			if(TRACE_HDC) logerror("@@@ HDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+		case 0x8024: /* HDD SCSI read command */
+			if(TRACE_HDC) logerror("@@@ HDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000);
 			break;
-		case 0x5FF0C024: /* HDD SCSI read command */
-			if(TRACE_HDC) logerror("@@@ HDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+		case 0xC024: /* HDD SCSI read command */
+			if(TRACE_HDC) logerror("@@@ HDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000);
 			break;
 		/* SMIOC region (0x98, device 26) */
-		case 0x5FF04098: /* Serial DMA Command */
+		case 0x4098: /* Serial DMA Command */
 			switch(data)
 			{
 				case 0x4100: /* Send byte to serial */
@@ -215,27 +216,27 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 					if(TRACE_SMIOC) logerror("Uknown serial DMA command: %X\n", data);
 			}
 			break;
-		case 0x5FF0C098: /* Serial DMA output address */
+		case 0xC098: /* Serial DMA output address */
 			//smioc_out_addr = data * 2;
 			smioc_out_addr = (smioc_dma_bank & 0x7FFFF800) | ((data&0x3FF)<<1);
 			if(TRACE_SMIOC) logerror("Serial output address: %08X PC: %08X\n", smioc_out_addr, space.machine().firstcpu->pc());
 			break;
 		/* PDC FDD region (0xB0, device 44 */
-		case 0x5FF001B0: /* FDD SCSI read command */
-			if(TRACE_FDC) logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+		case 0x01B0: /* FDD SCSI read command */
+			if(TRACE_FDC) logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000);
 			break;
-		case 0x5FF002B0: /* FDD SCSI read command */
-			if(TRACE_FDC) logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+		case 0x02B0: /* FDD SCSI read command */
+			if(TRACE_FDC) logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000);
 			break;
-		case 0x5FF004B0: /* FDD RESET PDC */
+		case 0x04B0: /* FDD RESET PDC */
 			if(TRACE_FDC) logerror("PDC RESET, PC: %08X\n", space.machine().firstcpu->pc());
 			m_pdc->reset();
 			break;
-		case 0x5FF008B0: /* FDD SCSI read command */
-			if(TRACE_FDC) logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+		case 0x08B0: /* FDD SCSI read command */
+			if(TRACE_FDC) logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000);
 			break;
-		case 0x5FF041B0: /* Unknown - Probably old style commands */
-			if(TRACE_FDC) logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
+		case 0x41B0: /* Unknown - Probably old style commands */
+			if(TRACE_FDC) logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000);
 
 			/* Clear FDD Command completion status 0x5FF030B0 (PDC 0x4, 0x5) */
 			m_pdc->reg_p4 = 0;
@@ -248,7 +249,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			m_pdc->reg_p38 |= 0x2; /* Set bit 1 on port 38 register, PDC polls this port looking for a command */
 			if(TRACE_FDC) logerror("--- FDD Old Command: %02X and %02X\n", data_b0, data_b1);
 			break;
-		case 0x5FF080B0: /* fdd_dest_address register */
+		case 0x80B0: /* fdd_dest_address register */
 			fdd_dest_address = data << 1;
 			if(TRACE_FDC) logerror("--- FDD destination address: %08X\n", fdd_dest_address);
 			data_b0 = data & 0xFF;
@@ -256,8 +257,8 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			m_pdc->reg_p6 = data_b0;
 			m_pdc->reg_p7 = data_b1;
 			break;
-		case 0x5FF0C0B0:
-		case 0x5FF0C1B0: /* FDD command address register */
+		case 0xC0B0:
+		case 0xC1B0: /* FDD command address register */
 			UINT32 fdd_scsi_command;
 			UINT32 fdd_scsi_command2;
 			unsigned char c_fdd_scsi_command[8]; // Array for SCSI command
@@ -296,7 +297,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			break;
 
 		default:
-			if(TRACE_FDC || TRACE_HDC || TRACE_SMIOC) logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
+			if(TRACE_FDC || TRACE_HDC || TRACE_SMIOC) logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000, data, mem_mask);
 	}
 }
 
@@ -306,9 +307,8 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 READ32_MEMBER( r9751_state::r9751_mmio_ff01_r )
 {
 	//UINT32 data;
-	UINT32 address = offset * 4 + 0xFF010000;
 
-	switch(address)
+	switch(offset << 2)
 	{
 		default:
 			//return data;
@@ -318,14 +318,16 @@ READ32_MEMBER( r9751_state::r9751_mmio_ff01_r )
 
 WRITE32_MEMBER( r9751_state::r9751_mmio_ff01_w )
 {
-	UINT32 address = offset * 4 + 0xFF010000;
+	/* Unknown mask */
+	if (mem_mask != 0xFFFFFFFF)
+		logerror("Mask found: %08X Register: %08X PC: %08X\n", mem_mask, offset << 2 | 0xFF010000, space.machine().firstcpu->pc());
 
-	switch(address)
+	switch(offset << 2)
 	{
-		case 0xFF01000C: /* FDD DMA Offset */
+		case 0x000C: /* FDD DMA Offset */
 			fdd_dma_bank = data;
 			return;
-		case 0xFF010010: /* SMIOC DMA Offset */
+		case 0x0010: /* SMIOC DMA Offset */
 			smioc_dma_bank = data;
 			return;
 		default:
@@ -336,76 +338,78 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_ff01_w )
 READ32_MEMBER( r9751_state::r9751_mmio_ff05_r )
 {
 	UINT32 data;
-	UINT32 address = offset * 4 + 0xFF050000;
 
-	switch(address)
+	switch(offset << 2)
 	{
-		case 0xFF050004:
+		case 0x0004:
 			return reg_ff050004;
-		case 0xFF050300:
+		case 0x0300:
 			return 0x1B | (1<<0x14);
-		case 0xFF050320: /* Some type of counter */
+		case 0x0320: /* Some type of counter */
 			return (machine().time() - timer_32khz_last).as_ticks(32768) & 0xFFFF;
-		case 0xFF050584:
+		case 0x0584:
 			return 0;
-		case 0xFF050610:
+		case 0x0610:
 			return 0xabacabac;
-		case 0xFF060014:
+		case 0x0014:
 			return 0x80;
 		default:
 			data = 0;
-			if(TRACE_CPU_REG) logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
+			if(TRACE_CPU_REG) logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), offset << 2 | 0xFF050000, data, mem_mask);
 			return data;
 	}
 }
 
 WRITE32_MEMBER( r9751_state::r9751_mmio_ff05_w )
 {
-	UINT32 address = offset * 4 + 0xFF050000;
+	/* Unknown mask */
+	if (mem_mask != 0xFFFFFFFF)
+		logerror("Mask found: %08X Register: %08X PC: %08X\n", mem_mask, offset << 2 | 0xFF050000, space.machine().firstcpu->pc());
 
-	switch(address)
+	switch(offset << 2)
 	{
-		case 0xFF050004:
+		case 0x0004:
 			reg_ff050004 = data;
 			return;
-		case 0xFF05000C: /* CPU LED hex display indicator */
+		case 0x000C: /* CPU LED hex display indicator */
 			if(TRACE_LED) logerror("\n*** LED: %02x, Instruction: %08x ***\n\n", data, space.machine().firstcpu->pc());
 			return;
-		case 0xFF050320:
+		case 0x0320:
 			timer_32khz_last = machine().time();
 		default:
-			if(TRACE_CPU_REG) logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
+			if(TRACE_CPU_REG) logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(),  offset << 2 | 0xFF050000, data, mem_mask);
 			return;
 	}
 }
 
 READ32_MEMBER( r9751_state::r9751_mmio_fff8_r )
 {
-		UINT32 data;
-		UINT32 address = offset * 4 + 0xFFF80000;
+	UINT32 data;
 
-	switch(address)
+	switch(offset << 2)
 	{
-		case 0xFFF80040:
+		case 0x0040:
 			return reg_fff80040;
 		default:
 			data = 0;
-			if(TRACE_CPU_REG) logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
+			if(TRACE_CPU_REG) logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), offset << 2 | 0xFFF80000, data, mem_mask);
 			return data;
 	}
 }
 
 WRITE32_MEMBER( r9751_state::r9751_mmio_fff8_w )
 {
-		UINT32 address = offset * 4 + 0xFFF80000;
+	/* Unknown mask */
+	if (mem_mask != 0xFFFFFFFF)
+		logerror("Mask found: %08X Register: %08X PC: %08X\n", mem_mask, offset << 2 | 0xFFF80000, space.machine().firstcpu->pc());
 
-	switch(address)
+	switch(offset << 2)
 	{
-		case 0xFFF80040:
+		case 0x0040:
 			reg_fff80040 = data;
 			return;
 		default:
-			if(TRACE_CPU_REG) logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
+			if(TRACE_CPU_REG) logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), offset << 2 | 0xFFF80000, data, mem_mask);
 	}
 }
 
