@@ -1537,6 +1537,22 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
+static MACHINE_CONFIG_START( cc7, fidelz80_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_PROGRAM_MAP(cc10_map)
+	//MCFG_CPU_IO_MAP(vcc_io)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_fidel_cc)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( cc10, fidelz80_state )
 
 	/* basic machine hardware */
@@ -1640,6 +1656,11 @@ MACHINE_CONFIG_END
 /******************************************************************************
     ROM Definitions
 ******************************************************************************/
+
+ROM_START( cc7 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cn19103n_bcc-revb", 0x0000, 0x1000, CRC(a397d471) SHA1(9b12bc442fccee40f4d8500c792bc9d886c5e1a5) ) // 2332
+ROM_END
 
 ROM_START( cc10 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1804,7 +1825,8 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   INIT              COMPANY, FULLNAME, FLAGS */
-COMP( 1978, cc10,     0,      0,      cc10,    cc10,   driver_device, 0, "Fidelity Electronics", "Chess Challenger 10 (version B)", MACHINE_SUPPORTS_SAVE )
+COMP( 1978, cc10,     0,      0,      cc10,    cc10,   driver_device, 0, "Fidelity Electronics", "Chess Challenger 10 (rev. B)", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, cc7,     0,      0,      cc7,    cc10,   driver_device, 0, "Fidelity Electronics", "Chess Challenger 7 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 COMP( 1979, vcc,      0,      0,      vcc,     vcc,    driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE )
 COMP( 1979, vccsp,    vcc,    0,      vcc,     vccsp,  driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE )
