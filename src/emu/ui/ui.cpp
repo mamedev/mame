@@ -244,6 +244,7 @@ ui_manager::ui_manager(running_machine &machine)
 	m_popup_text_end = 0;
 	m_use_natural_keyboard = false;
 	m_mouse_arrow_texture = nullptr;
+	m_load_save_hold = false;
 
 	// more initialization
 	set_handler(handler_messagebox, 0);
