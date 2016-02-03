@@ -271,6 +271,17 @@ void hh_tms1k_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
+void hh_tms1k_state::set_display_segmask(UINT32 digits, UINT32 mask)
+{
+	// set a segment mask per selected digit, but leave unselected ones alone
+	for (int i = 0; i < 0x20; i++)
+	{
+		if (digits & 1)
+			m_display_segmask[i] = mask;
+		digits >>= 1;
+	}
+}
+
 void hh_tms1k_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
 {
 	set_display_size(maxx, maxy);

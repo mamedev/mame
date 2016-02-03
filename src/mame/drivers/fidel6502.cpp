@@ -15,7 +15,6 @@
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
 #include "machine/6821pia.h"
-#include "sound/speaker.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "softlist.h"
@@ -34,14 +33,12 @@ public:
 	fidel6502_state(const machine_config &mconfig, device_type type, const char *tag)
 		: fidelz80base_state(mconfig, type, tag),
 		m_6821pia(*this, "6821pia"),
-		m_cart(*this, "cartslot"),
-		m_speaker(*this, "speaker")
+		m_cart(*this, "cartslot")
 	{ }
 
 	// devices/pointers
 	optional_device<pia6821_device> m_6821pia;
 	optional_device<generic_slot_device> m_cart;
-	optional_device<speaker_sound_device> m_speaker;
 	
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
@@ -94,16 +91,14 @@ void fidel6502_state::csc_prepare_display()
 
 	// 4 7seg leds + H
 	for (int i = 0; i < 4; i++)
-	{
-		m_display_segmask[i] = 0x7f;
 		m_display_state[i] = (m_inp_mux >> i & 1) ? m_7seg_data : 0;
-	}
 
 	// 8*8 chessboard leds
 	for (int i = 0; i < 8; i++)
 		m_display_state[i+4] = (m_inp_mux >> i & 1) ? m_led_data : 0;
 
 	set_display_size(8, 12);
+	set_display_segmask(0xf, 0x7f);
 	display_update();
 }
 
