@@ -189,6 +189,7 @@ Chess Challenger 7 (BCC)
 RE information from netlist by Berger
 
 Zilog Z80A, 3.579MHz from XTAL
+Z80 IRQ/NMI unused, no timer IC.
 This is a cost-reduced design from CC10, no special I/O chips.
 
 Memory map:

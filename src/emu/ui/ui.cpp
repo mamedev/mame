@@ -473,6 +473,7 @@ void ui_manager::update_and_render(render_container *container)
 	else
 		m_popup_text_end = 0;
 
+	// display the internal mouse cursor
 	if (m_mouse_show || (is_menu_active() && machine().options().ui_mouse()))
 	{
 		INT32 mouse_target_x, mouse_target_y;
@@ -482,10 +483,10 @@ void ui_manager::update_and_render(render_container *container)
 		if (mouse_target != nullptr)
 		{
 			float mouse_y=-1,mouse_x=-1;
-			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y)) {
-				float l_heigth = machine().ui().get_line_height();
-				container->add_quad(mouse_x, mouse_y, mouse_x + l_heigth*container->manager().ui_aspect(container), mouse_y + l_heigth, UI_TEXT_COLOR, m_mouse_arrow_texture, PRIMFLAG_ANTIALIAS(1) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-
+			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y))
+			{
+				const float cursor_size = 0.6 * machine().ui().get_line_height();
+				container->add_quad(mouse_x, mouse_y, mouse_x + cursor_size*container->manager().ui_aspect(container), mouse_y + cursor_size, UI_TEXT_COLOR, m_mouse_arrow_texture, PRIMFLAG_ANTIALIAS(1) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			}
 		}
 	}
