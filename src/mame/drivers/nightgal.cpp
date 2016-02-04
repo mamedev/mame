@@ -90,6 +90,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_READ8_MEMBER(input_1p_r);
 	DECLARE_READ8_MEMBER(input_2p_r);
+	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_DRIVER_INIT(ngalsumr);
 	DECLARE_DRIVER_INIT(royalqn);
 	virtual void machine_start() override;
@@ -514,52 +515,22 @@ READ8_MEMBER(nightgal_state::input_2p_r)
 			m_io_pl2_4->read() & m_io_pl2_5->read() & m_io_pl2_6->read()) | coin_port;
 }
 
+WRITE8_MEMBER(nightgal_state::output_w)
+{
+	/*
+	Doesn't match Charles notes?
+	--x- ---- unknown, set by Royal Queen on gameplay
+	---- -x-- flip screen
+	---- ---x out counter
+	*/
+	machine().bookkeeping().coin_counter_w(0, data & 0x02);
+}
+
 /********************************************
 *
 * Memory Maps
 *
 ********************************************/
-
-/********************************
-* Night Gal
-********************************/
-#ifdef UNUSED_CODE
-static ADDRESS_MAP_START( nightgal_map, AS_PROGRAM, 8, nightgal_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc100, 0xc100) AM_READ(nsc_latch_r)
-	AM_RANGE(0xc200, 0xc200) AM_WRITE(nsc_latch_w)
-	AM_RANGE(0xc300, 0xc30f) AM_WRITE(blit_vregs_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( nightgal_io, AS_IO, 8, nightgal_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-//  AM_RANGE(0x10,0x10) AM_WRITE(output_w)
-	AM_RANGE(0x10,0x10) AM_READ_PORT("DSWC")
-	AM_RANGE(0x11,0x11) AM_READ_PORT("SYSA")
-	AM_RANGE(0x12,0x12) AM_READ_PORT("DSWA")
-	AM_RANGE(0x13,0x13) AM_READ_PORT("DSWB")
-	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x14) AM_WRITE(blitter_w) //data for the nsc to be processed
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( nsc_map, AS_PROGRAM, 8, nightgal_state )
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0080) AM_READ(blitter_status_r)
-	AM_RANGE(0x0081, 0x0083) AM_READ(nsc_blit_r)
-	AM_RANGE(0x0080, 0x0086) AM_WRITE(nsc_true_blitter_w)
-
-	AM_RANGE(0x00a0, 0x00af) AM_WRITE(blit_true_vregs_w)
-
-	AM_RANGE(0x1100, 0x1100) AM_READWRITE(z80_latch_r,z80_latch_w) //irq control?
-	AM_RANGE(0x1200, 0x1200) AM_READNOP //flip screen set bit
-	AM_RANGE(0x1300, 0x130f) AM_READ(blit_vregs_r)
-//  AM_RANGE(0x1000, 0xdfff) AM_ROM AM_REGION("gfx1", 0 )
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_WRITENOP
-ADDRESS_MAP_END
-#endif
 
 /********************************
 * Sexy Gal
@@ -575,8 +546,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sexygal_io, AS_IO, 8, nightgal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00,0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-//  AM_RANGE(0x10,0x10) AM_WRITE(output_w)
-	AM_RANGE(0x10,0x10) AM_READ_PORT("DSWC")
+	AM_RANGE(0x10,0x10) AM_READ_PORT("DSWC") AM_WRITE(output_w)
 	AM_RANGE(0x11,0x11) AM_READ_PORT("SYSA") AM_WRITE(mux_w)
 	AM_RANGE(0x12,0x12) AM_MIRROR(0xe8) AM_READ_PORT("DSWA") AM_WRITE(royalqn_blitter_0_w)
 	AM_RANGE(0x13,0x13) AM_MIRROR(0xe8) AM_READ_PORT("DSWB") AM_WRITE(royalqn_blitter_1_w)
@@ -611,7 +581,7 @@ static ADDRESS_MAP_START( royalqn_io, AS_IO, 8, nightgal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01,0x01) AM_MIRROR(0xec) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x02,0x03) AM_MIRROR(0xec) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x10,0x10) AM_MIRROR(0xe8) AM_READ_PORT("DSWC") AM_WRITENOP //AM_WRITE(output_w)
+	AM_RANGE(0x10,0x10) AM_MIRROR(0xe8) AM_READ_PORT("DSWC") AM_WRITE(output_w)
 	AM_RANGE(0x11,0x11) AM_MIRROR(0xe8) AM_READ_PORT("SYSA") AM_WRITE(mux_w)
 	AM_RANGE(0x12,0x12) AM_MIRROR(0xe8) AM_READ_PORT("DSWA") AM_WRITE(royalqn_blitter_0_w)
 	AM_RANGE(0x13,0x13) AM_MIRROR(0xe8) AM_READ_PORT("DSWB") AM_WRITE(royalqn_blitter_1_w)
@@ -912,7 +882,6 @@ static MACHINE_CONFIG_START( royalqn, nightgal_state )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
-	/* TODO: blitter clock is MASTER_CLOCK / 4, 320 x 264 pixels, 256 x 224 of visible area */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4,320,0,256,264,16,240)
 	MCFG_SCREEN_UPDATE_DRIVER(nightgal_state, screen_update_nightgal)
