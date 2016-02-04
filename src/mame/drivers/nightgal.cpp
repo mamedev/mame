@@ -6,36 +6,16 @@ Night Gal (c) 1984 Nichibutsu
 
 a.k.a. same Jangou blitter but with NCS CPU for displaying graphics as protection.
 
-preliminary driver by David Haywood & Angelo Salese
+driver by David Haywood & Angelo Salese
 many thanks to Charles MacDonald for the schematics / documentation of this HW.
 
 TODO:
--Night Gal Summer trips illegal opcodes on the NCS side, presumably a CPU bug;
--Fix Sweet Gal/Sexy Gal gfxs if necessary (i.e. if the bugs aren't all caused by irq/nmi
- wrong firing);
--Proper Z80<->MCU comms,many video problems because of that;
--Abstract the video chip to a proper video file and get the name of that chip;
--Minor graphic glitches in Royal Queen (cross hatch test, some little glitches during gameplay),
- presumably due of the unemulated wait states on the comms.
-
- Notes:
--Night Gal Summer accesses the blitter in a weird fashion, perhaps it fails the ROM check 
- due of address line encryption?
- Example snippet:
-		 0  1  2  3  4  5  6
-		   RH XX YY WW HH DD
-		70 00 40 80 07 06 00 x = 2 y = 3 srcl = 0 srch = 1 srcd = 6
-        DD    YY RH WW HH XX
-		00 60 80 03 07 06 48 x = 6 y = 2 srcl = 1 srch = 3 srcd = 0
-		XX DD RH    WW HH YY
-		50 00 04 28 07 06 80 x = 0 y = 6 srcl = 3 srch = 2 srcd = 1
-		YY XX    DD WW HH RH
-		80 58 10 00 07 06 03 x = 1 y = 0 srcl = 2 srch = 6 srcd = 3
-		RH YY DD XX WW HH
-		02 80 00 68 07 06 a0 x = 3 y = 1 srcl = 6 srch = 0 srcd = 2
-		      .. .. .. .. ..
-			  
-		48 03 78 80 07 06 00 (again) 
+ - Night Gal Summer trips illegal opcodes on the NCS side, needs to check if bit-rotted or encrypted ROM;
+ - Fix Sweet Gal/Sexy Gal gfxs if necessary (i.e. if the bugs aren't all caused by irq/nmi wrong firing);
+ - unemulated WAIT pin for Z80, MCU asserts it when accessing communication RAM
+ - Abstract the video chip to a proper video file and get the name of that chip;
+ - Minor graphic glitches in Royal Queen (cross hatch test, some little glitches during gameplay),
+   presumably due of the unemulated wait states on the comms.
  
 *******************************************************************************************/
 
@@ -1242,7 +1222,7 @@ ROM_START( ngalsumr )
 	ROM_LOAD( "10.3v", 0x04000, 0x02000, CRC(31211088) SHA1(960b781c420602be3de66565a030cf5ebdcc2ffb) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "7.3p",  0x0c000, 0x02000, CRC(20c55a25) SHA1(9dc88cb6c016b594264f7272d4fd5f30567e7c5d) )
+	ROM_LOAD( "7.3p",  0x0c000, 0x02000, BAD_DUMP CRC(20c55a25) SHA1(9dc88cb6c016b594264f7272d4fd5f30567e7c5d) ) // either encrypted or bit-rotted.
 
 	ROM_REGION( 0xc000, "samples", 0 )
 	ROM_LOAD( "1s.ic7", 0x00000, 0x04000, CRC(47ad8a0f) SHA1(e3b1e13f0a5c613bd205338683bef8d005b54830) )
@@ -1274,9 +1254,15 @@ DRIVER_INIT_MEMBER(nightgal_state,ngalsumr)
 {
 	UINT8 *ROM = memregion("sub")->base();
 
-	/* patch protection */
-	ROM[0xd6ce] = 0x02;
-	ROM[0xd6cf] = 0x02;
+	/* patch blantantly wrong ROM checks */
+	//ROM[0xd6ce] = 0x02;
+	//ROM[0xd6cf] = 0x02;
+	// adcx $05 converted to 0x04 for debug purposes
+	ROM[0xd782] = 0x04;
+	//ROM[0xd655] = 0x20;
+	//ROM[0xd3f9] = 0x02;
+	//ROM[0xd3fa] = 0x02;
+	//ROM[0xd3a0] = 0x02;
 }
 
 /* Type 1 HW */
