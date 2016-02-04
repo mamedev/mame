@@ -2,16 +2,16 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/utils.h
+    ui/utils.h
 
-    Internal MEWUI user interface.
+    Internal UI user interface.
 
 ***************************************************************************/
 
 #pragma once
 
-#ifndef __MEWUI_UTILS_H__
-#define __MEWUI_UTILS_H__
+#ifndef __UI_UTILS_H__
+#define __UI_UTILS_H__
 
 #include "osdepend.h"
 #include "render.h"
@@ -364,4 +364,4 @@ void render_load_jpeg(_T &bitmap, emu_file &file, const char *dirname, const cha
 	global_free_array(jpg_buffer);
 }
 
-#endif /* __MEWUI_UTILS_H__ */
+#endif /* __UI_UTILS_H__ */

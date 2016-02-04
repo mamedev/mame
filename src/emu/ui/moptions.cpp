@@ -2,7 +2,7 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/moptions.c
+    ui/moptions.c
 
     MEWUI main options manager.
 

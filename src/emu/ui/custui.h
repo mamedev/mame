@@ -2,18 +2,18 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/custui.h
+    ui/custui.h
 
-    Internal MEWUI user interface.
+    Internal UI user interface.
 
 ***************************************************************************/
 
 #pragma once
 
-#ifndef __MEWUI_CUSTUI_H__
-#define __MEWUI_CUSTUI_H__
+#ifndef __UI_CUSTUI_H__
+#define __UI_CUSTUI_H__
 
-#ifdef MEWUI_WINDOWS
+#ifdef OSD_WINDOWS
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
@@ -64,7 +64,7 @@ private:
 		MUI_ITALIC
 	};
 
-#ifdef MEWUI_WINDOWS
+#ifdef OSD_WINDOWS
 	UINT16						m_actual;
 	std::vector<std::string>	m_fonts;
 	bool						m_bold, m_italic;
@@ -179,4 +179,4 @@ private:
 	rgb_t &m_original;
 };
 
-#endif /* __MEWUI_CUSTUI_H__ */
+#endif /* __UI_CUSTUI_H__ */

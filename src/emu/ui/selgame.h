@@ -2,7 +2,7 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/selgame.h
+    ui/selgame.h
 
     Main MEWUI menu.
 
@@ -10,17 +10,17 @@
 
 #pragma once
 
-#ifndef __MEWUI_MAIN_H__
-#define __MEWUI_MAIN_H__
+#ifndef __UI_MAIN_H__
+#define __UI_MAIN_H__
 
 #include "drivenum.h"
 #include "ui/menu.h"
 
-class ui_mewui_select_game : public ui_menu
+class ui_menu_select_game : public ui_menu
 {
 public:
-	ui_mewui_select_game(running_machine &machine, render_container *container, const char *gamename);
-	virtual ~ui_mewui_select_game();
+	ui_menu_select_game(running_machine &machine, render_container *container, const char *gamename);
+	virtual ~ui_menu_select_game();
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -85,4 +85,4 @@ private:
 };
 
 
-#endif  /* __MEWUI_MAIN_H__ */
+#endif  /* __UI_MAIN_H__ */

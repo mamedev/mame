@@ -2,7 +2,7 @@
 // copyright-holders:Dankan1890;Victor Laskin
 /***************************************************************************
 
-    mewui/icorender.h
+    ui/icorender.h
 
     ICOns file loader.
 
@@ -14,8 +14,8 @@
 ***************************************************************************/
 #pragma once
 
-#ifndef __MEWUI_ICORENDER_H__
-#define __MEWUI_ICORENDER_H__
+#ifndef __UI_ICORENDER_H__
+#define __UI_ICORENDER_H__
 
 // These next two structs represent how the icon information is stored
 // in an ICO file.
@@ -232,4 +232,4 @@ void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 	global_free_array(buffer);
 }
 
-#endif /* __MEWUI_ICORENDER_H__ */
+#endif /* __UI_ICORENDER_H__ */

@@ -2,15 +2,15 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/ctrlmenu.h
+    ui/ctrlmenu.h
 
-    Internal MEWUI user interface.
+    Internal UI user interface.
 
 ***************************************************************************/
 #pragma once
 
-#ifndef __MEWUI_CTRLMENU_H__
-#define __MEWUI_CTRLMENU_H__
+#ifndef __UI_CTRLMENU_H__
+#define __UI_CTRLMENU_H__
 
 //-------------------------------------------------
 //  class controller mapping menu
@@ -38,4 +38,4 @@ private:
 	int check_status(const char *status, const char *option);
 };
 
-#endif /* __MEWUI_CTRLMENU_H__ */
+#endif /* __UI_CTRLMENU_H__ */

@@ -2,7 +2,7 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/datfile.cpp
+    ui/datfile.cpp
 
     MEWUI DATs manager.
 

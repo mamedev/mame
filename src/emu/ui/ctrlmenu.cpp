@@ -2,9 +2,9 @@
 // copyright-holders:Dankan1890
 /*********************************************************************
 
-    mewui/ctrlmenu.cpp
+    ui/ctrlmenu.cpp
 
-    Internal MEWUI user interface.
+    Internal UI user interface.
 
 *********************************************************************/
 

@@ -2,16 +2,16 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/auditmenu.h
+    ui/auditmenu.h
 
-    Internal MEWUI user interface.
+    Internal UI user interface.
 
 ***************************************************************************/
 
 #pragma once
 
-#ifndef __MEWUI_AUDIT_H__
-#define __MEWUI_AUDIT_H__
+#ifndef __UI_AUDIT_H__
+#define __UI_AUDIT_H__
 
 //-------------------------------------------------
 //  class audit menu
@@ -34,4 +34,4 @@ private:
 	bool m_first;
 };
 
-#endif /* __MEWUI_AUDIT_H__ */
+#endif /* __UI_AUDIT_H__ */

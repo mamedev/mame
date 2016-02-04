@@ -2,7 +2,7 @@
 // copyright-holders:Dankan1890
 /*********************************************************************
 
-    mewui/dsplmenu.cpp
+    ui/dsplmenu.cpp
 
     MEWUI video options menu.
 
@@ -15,7 +15,7 @@
 #include "ui/selector.h"
 #include "ui/utils.h"
 
-#if defined(MEWUI_WINDOWS) && !defined(MEWUI_SDL)
+#if defined(OSD_WINDOWS) && !defined(OSD_SDL)
 #include "../osd/windows/winmain.h"
 #else
 #include "../osd/modules/lib/osdobj_common.h"
@@ -24,7 +24,7 @@
 ui_menu_display_options::video_modes ui_menu_display_options::m_video[] = {
 	{ "auto",    "Auto" },
 	{ "opengl",  "OpenGL" },
-#if defined(MEWUI_WINDOWS) && !defined(MEWUI_SDL)
+#if defined(OSD_WINDOWS) && !defined(OSD_SDL)
 	{ "d3d",     "Direct3D" },
 	{ "gdi",     "GDI" },
 	{ "ddraw",   "DirectDraw" }
@@ -37,7 +37,7 @@ ui_menu_display_options::video_modes ui_menu_display_options::m_video[] = {
 ui_menu_display_options::dspl_option ui_menu_display_options::m_options[] = {
 	{ 0, nullptr, nullptr },
 	{ 0, "Video Mode",               OSDOPTION_VIDEO },
-#if defined(MEWUI_WINDOWS) && !defined(MEWUI_SDL)
+#if defined(OSD_WINDOWS) && !defined(OSD_SDL)
 	{ 0, "Hardware Stretch",         WINOPTION_HWSTRETCH },
 	{ 0, "Triple Buffering",         WINOPTION_TRIPLEBUFFER },
 	{ 0, "HLSL",                     WINOPTION_HLSL_ENABLE },
@@ -60,7 +60,7 @@ ui_menu_display_options::dspl_option ui_menu_display_options::m_options[] = {
 
 ui_menu_display_options::ui_menu_display_options(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
-#if defined(MEWUI_WINDOWS) && !defined(MEWUI_SDL)
+#if defined(OSD_WINDOWS) && !defined(OSD_SDL)
 	windows_options &options = downcast<windows_options &>(machine.options());
 #else
 	osd_options &options = downcast<osd_options &>(machine.options());

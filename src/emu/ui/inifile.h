@@ -2,7 +2,7 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/inifile.h
+    ui/inifile.h
 
     MEWUI INIs file manager.
 
@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef __MEWUI_INIFILE_H__
-#define __MEWUI_INIFILE_H__
+#ifndef __UI_INIFILE_H__
+#define __UI_INIFILE_H__
 
 #include "ui/utils.h"
 
@@ -119,4 +119,4 @@ private:
 	running_machine &m_machine;  // reference to our machine
 };
 
-#endif  /* __MEWUI_INIFILE_H__ */
+#endif  /* __UI_INIFILE_H__ */

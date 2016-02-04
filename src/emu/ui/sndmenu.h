@@ -2,16 +2,16 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/sndmenu.h
+    ui/sndmenu.h
 
-    Internal MEWUI user interface.
+    Internal UI user interface.
 
 ***************************************************************************/
 
 #pragma once
 
-#ifndef __MEWUI_SNDMENU_H__
-#define __MEWUI_SNDMENU_H__
+#ifndef __UI_SNDMENU_H__
+#define __UI_SNDMENU_H__
 
 //-------------------------------------------------
 //  class sound options menu
@@ -39,4 +39,4 @@ private:
 	bool              m_samples, m_sound;
 };
 
-#endif /* __MEWUI_SNDMENU_H__ */
+#endif /* __UI_SNDMENU_H__ */

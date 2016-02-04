@@ -2,7 +2,7 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/cmdrender.h
+    ui/cmdrender.h
 
     MEWUI rendfont.
 

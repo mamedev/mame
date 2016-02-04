@@ -2,15 +2,15 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/selsoft.h
+    ui/selsoft.h
 
     MEWUI softwares menu.
 
 ***************************************************************************/
 #pragma once
 
-#ifndef __MEWUI_SELSOFT_H__
-#define __MEWUI_SELSOFT_H__
+#ifndef __UI_SELSOFT_H__
+#define __UI_SELSOFT_H__
 
 #include "ui/custmenu.h"
 
@@ -109,4 +109,4 @@ private:
 bool has_multiple_bios(const game_driver *driver, std::vector<s_bios> &biosname);
 
 
-#endif /* __MEWUI_SELSOFT_H__ */
+#endif /* __UI_SELSOFT_H__ */

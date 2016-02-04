@@ -2,7 +2,7 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/optsmenu.h
+    ui/optsmenu.h
 
     MEWUI main options menu manager.
 
@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef __MEWUI_OPTSMENU_H__
-#define __MEWUI_OPTSMENU_H__
+#ifndef __UI_OPTSMENU_H__
+#define __UI_OPTSMENU_H__
 
 class ui_menu_game_options : public ui_menu
 {
@@ -46,4 +46,4 @@ private:
 // save options to file
 void save_game_options(running_machine &machine);
 
-#endif /* __MEWUI_OPTSMENU_H__ */
+#endif /* __UI_OPTSMENU_H__ */

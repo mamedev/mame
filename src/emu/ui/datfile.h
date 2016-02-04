@@ -2,7 +2,7 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/datfile.h
+    ui/datfile.h
 
     MEWUI DATs manager.
 
@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef __MEWUI_DATFILE_H__
-#define __MEWUI_DATFILE_H__
+#ifndef __UI_DATFILE_H__
+#define __UI_DATFILE_H__
 
 //-------------------------------------------------
 //  Datafile Manager
@@ -76,4 +76,4 @@ private:
 };
 
 
-#endif  /* __MEWUI_DATFILE_H__ */
+#endif  /* __UI_DATFILE_H__ */

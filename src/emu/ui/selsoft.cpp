@@ -2,7 +2,7 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/selsoft.cpp
+    ui/selsoft.cpp
 
     MEWUI softwares menu.
 

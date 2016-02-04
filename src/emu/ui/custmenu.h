@@ -2,17 +2,17 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/custmenu.h
+    ui/custmenu.h
 
-    Internal MEWUI user interface.
+    Internal UI user interface.
 
 
 ***************************************************************************/
 
 #pragma once
 
-#ifndef __MEWUI_CUSTMENU_H__
-#define __MEWUI_CUSTMENU_H__
+#ifndef __UI_CUSTMENU_H__
+#define __UI_CUSTMENU_H__
 
 #include "ui/utils.h"
 
@@ -128,4 +128,4 @@ private:
 	void save_custom_filters();
 };
 
-#endif  /* __MEWUI_CUSTMENU_H__ */
+#endif  /* __UI_CUSTMENU_H__ */

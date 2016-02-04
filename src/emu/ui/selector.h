@@ -2,16 +2,16 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/selector.h
+    ui/selector.h
 
-    Internal MEWUI user interface.
+    Internal UI user interface.
 
 ***************************************************************************/
 
 #pragma once
 
-#ifndef __MEWUI_SELECTOR_H__
-#define __MEWUI_SELECTOR_H__
+#ifndef __UI_SELECTOR_H__
+#define __UI_SELECTOR_H__
 
 enum
 {
@@ -48,4 +48,4 @@ private:
 	void find_matches(const char *str);
 };
 
-#endif /* __MEWUI_SELECTOR_H__ */
+#endif /* __UI_SELECTOR_H__ */

@@ -2,7 +2,7 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/dsplmenu.h
+    ui/dsplmenu.h
 
     MEWUI video options menu.
 
@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef __MEWUI_DSPLMENU_H__
-#define __MEWUI_DSPLMENU_H__
+#ifndef __UI_DSPLMENU_H__
+#define __UI_DSPLMENU_H__
 
 //-------------------------------------------------
 //  class display options menu
@@ -43,4 +43,4 @@ private:
 	static dspl_option m_options[];
 };
 
-#endif /* __MEWUI_DSPLMENU_H__ */
+#endif /* __UI_DSPLMENU_H__ */

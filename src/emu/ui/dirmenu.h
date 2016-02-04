@@ -2,16 +2,16 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/dirmenu.h
+    ui/dirmenu.h
 
-    Internal MEWUI user interface.
+    Internal UI user interface.
 
 ***************************************************************************/
 
 #pragma once
 
-#ifndef __MEWUI_DIRMENU_H__
-#define __MEWUI_DIRMENU_H__
+#ifndef __UI_DIRMENU_H__
+#define __UI_DIRMENU_H__
 
 //-------------------------------------------------
 //  class directory menu
@@ -125,4 +125,4 @@ private:
 	bool         m_change;
 };
 
-#endif /* __MEWUI_DIRMENU_H__ */
+#endif /* __UI_DIRMENU_H__ */

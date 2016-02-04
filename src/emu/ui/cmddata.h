@@ -2,13 +2,13 @@
 // copyright-holders:Dankan1890
 /*********************************************************************
 
-    mewui/cmddata.h
+    ui/cmddata.h
 
 *********************************************************************/
 #pragma once
 
-#ifndef __MEWUI_CMDDATA_H__
-#define __MEWUI_CMDDATA_H__
+#ifndef __UI_CMDDATA_H__
+#define __UI_CMDDATA_H__
 
 #define BUTTON_COLOR_RED        rgb_t(255,64,64)
 #define BUTTON_COLOR_YELLOW     rgb_t(255,238,0)
@@ -401,4 +401,4 @@ static fix_strings_t convert_text[] =
 	{ 0, 0 }    // end of array
 };
 
-#endif /* __MEWUI_CMDDATA_H__ */
+#endif /* __UI_CMDDATA_H__ */

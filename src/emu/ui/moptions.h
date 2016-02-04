@@ -2,7 +2,7 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/moptions.h
+    ui/moptions.h
 
     MEWUI main options manager.
 
@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef __MEWUI_OPTS_H__
-#define __MEWUI_OPTS_H__
+#ifndef __UI_OPTS_H__
+#define __UI_OPTS_H__
 
 #include "options.h"
 
@@ -137,4 +137,4 @@ private:
 	static const options_entry s_option_entries[];
 };
 
-#endif /* __MEWUI_OPTS_H__ */
+#endif /* __UI_OPTS_H__ */

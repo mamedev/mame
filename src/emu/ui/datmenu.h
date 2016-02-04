@@ -2,17 +2,17 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/datmenu.h
+    ui/datmenu.h
 
-    Internal MEWUI user interface.
+    Internal UI user interface.
 
 
 ***************************************************************************/
 
 #pragma once
 
-#ifndef __MEWUI_DATMENU_H__
-#define __MEWUI_DATMENU_H__
+#ifndef __UI_DATMENU_H__
+#define __UI_DATMENU_H__
 
 struct ui_software_info;
 
@@ -90,4 +90,4 @@ private:
 	const game_driver *m_driver;
 };
 
-#endif  /* __MEWUI_DATMENU_H__ */
+#endif  /* __UI_DATMENU_H__ */

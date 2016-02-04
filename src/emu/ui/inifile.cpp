@@ -2,7 +2,7 @@
 // copyright-holders:Dankan1890
 /***************************************************************************
 
-    mewui/inifile.cpp
+    ui/inifile.cpp
 
     MEWUI INIs file manager.
 

@@ -2,7 +2,7 @@
 // copyright-holders:Dankan1890
 /*********************************************************************
 
-    mewui/selgame.cpp
+    ui/selgame.cpp
 
     Main MEWUI menu.
 
@@ -105,7 +105,7 @@ bool sort_game_list(const game_driver *x, const game_driver *y)
 //  ctor
 //-------------------------------------------------
 
-ui_mewui_select_game::ui_mewui_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container)
+ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container)
 {
 	std::string error_string, last_filter, sub_filter;
 	emu_options &moptions = machine.options();
@@ -181,7 +181,7 @@ ui_mewui_select_game::ui_mewui_select_game(running_machine &machine, render_cont
 //  dtor
 //-------------------------------------------------
 
-ui_mewui_select_game::~ui_mewui_select_game()
+ui_menu_select_game::~ui_menu_select_game()
 {
 	std::string error_string, last_driver;
 	const game_driver *driver = nullptr;
@@ -217,7 +217,7 @@ ui_mewui_select_game::~ui_mewui_select_game()
 //  handle
 //-------------------------------------------------
 
-void ui_mewui_select_game::handle()
+void ui_menu_select_game::handle()
 {
 	bool check_filter = false;
 	bool enabled_dats = machine().options().enabled_dats();
@@ -545,7 +545,7 @@ void ui_mewui_select_game::handle()
 //  populate
 //-------------------------------------------------
 
-void ui_mewui_select_game::populate()
+void ui_menu_select_game::populate()
 {
 	mewui_globals::redraw_icon = true;
 	mewui_globals::switch_image = true;
@@ -684,7 +684,7 @@ void ui_mewui_select_game::populate()
 //  build a list of available drivers
 //-------------------------------------------------
 
-void ui_mewui_select_game::build_available_list()
+void ui_menu_select_game::build_available_list()
 {
 	int m_total = driver_list::total();
 	std::vector<bool> m_included(m_total, false);
@@ -744,7 +744,7 @@ void ui_mewui_select_game::build_available_list()
 //  perform our special rendering
 //-------------------------------------------------
 
-void ui_mewui_select_game::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void ui_menu_select_game::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	const game_driver *driver = nullptr;
 	ui_software_info *swinfo = nullptr;
@@ -980,7 +980,7 @@ void ui_mewui_select_game::custom_render(void *selectedref, float top, float bot
 //  and inescapable
 //-------------------------------------------------
 
-void ui_mewui_select_game::force_game_select(running_machine &machine, render_container *container)
+void ui_menu_select_game::force_game_select(running_machine &machine, render_container *container)
 {
 	// reset the menu stack
 	ui_menu::stack_reset(machine);
@@ -989,7 +989,7 @@ void ui_mewui_select_game::force_game_select(running_machine &machine, render_co
 	ui_menu *quit = global_alloc_clear<ui_menu_quit_game>(machine, container);
 	quit->set_special_main_menu(true);
 	ui_menu::stack_push(quit);
-	ui_menu::stack_push(global_alloc_clear<ui_mewui_select_game>(machine, container, nullptr));
+	ui_menu::stack_push(global_alloc_clear<ui_menu_select_game>(machine, container, nullptr));
 
 	// force the menus on
 	machine.ui().show_menu();
@@ -1002,7 +1002,7 @@ void ui_mewui_select_game::force_game_select(running_machine &machine, render_co
 //  handle select key event
 //-------------------------------------------------
 
-void ui_mewui_select_game::inkey_select(const ui_menu_event *m_event)
+void ui_menu_select_game::inkey_select(const ui_menu_event *m_event)
 {
 	const game_driver *driver = (const game_driver *)m_event->itemref;
 
@@ -1061,7 +1061,7 @@ void ui_mewui_select_game::inkey_select(const ui_menu_event *m_event)
 //  handle select key event for favorites menu
 //-------------------------------------------------
 
-void ui_mewui_select_game::inkey_select_favorite(const ui_menu_event *m_event)
+void ui_menu_select_game::inkey_select_favorite(const ui_menu_event *m_event)
 {
 	ui_software_info *ui_swinfo = (ui_software_info *)m_event->itemref;
 	emu_options &mopt = machine().options();
@@ -1166,7 +1166,7 @@ void ui_mewui_select_game::inkey_select_favorite(const ui_menu_event *m_event)
 //  returns if the search can be activated
 //-------------------------------------------------
 
-inline bool ui_mewui_select_game::no_active_search()
+inline bool ui_menu_select_game::no_active_search()
 {
 	return (main_filters::actual == FILTER_FAVORITE_GAME);
 }
@@ -1175,7 +1175,7 @@ inline bool ui_mewui_select_game::no_active_search()
 //  handle special key event
 //-------------------------------------------------
 
-void ui_mewui_select_game::inkey_special(const ui_menu_event *m_event)
+void ui_menu_select_game::inkey_special(const ui_menu_event *m_event)
 {
 	int buflen = strlen(m_search);
 
@@ -1214,7 +1214,7 @@ void ui_mewui_select_game::inkey_special(const ui_menu_event *m_event)
 //  build list
 //-------------------------------------------------
 
-void ui_mewui_select_game::build_list(std::vector<const game_driver *> &s_drivers, const char *filter_text, int filter, bool bioscheck)
+void ui_menu_select_game::build_list(std::vector<const game_driver *> &s_drivers, const char *filter_text, int filter, bool bioscheck)
 {
 	int cx = 0;
 	bool cloneof = false;
@@ -1330,7 +1330,7 @@ void ui_mewui_select_game::build_list(std::vector<const game_driver *> &s_driver
 //  build custom display list
 //-------------------------------------------------
 
-void ui_mewui_select_game::build_custom()
+void ui_menu_select_game::build_custom()
 {
 	std::vector<const game_driver *> s_drivers;
 	bool bioscheck = false;
@@ -1395,7 +1395,7 @@ void ui_mewui_select_game::build_custom()
 //  build category list
 //-------------------------------------------------
 
-void ui_mewui_select_game::build_category()
+void ui_menu_select_game::build_category()
 {
 	std::vector<int> temp_filter;
 	machine().inifile().load_ini_category(temp_filter);
@@ -1411,7 +1411,7 @@ void ui_mewui_select_game::build_category()
 //  build list from cache
 //-------------------------------------------------
 
-void ui_mewui_select_game::build_from_cache(std::vector<const game_driver *> &s_drivers, int screens, int filter, bool bioscheck)
+void ui_menu_select_game::build_from_cache(std::vector<const game_driver *> &s_drivers, int screens, int filter, bool bioscheck)
 {
 	if (s_drivers.empty())
 	{
@@ -1471,7 +1471,7 @@ void ui_mewui_select_game::build_from_cache(std::vector<const game_driver *> &s_
 //  populate search list
 //-------------------------------------------------
 
-void ui_mewui_select_game::populate_search()
+void ui_menu_select_game::populate_search()
 {
 	// allocate memory to track the penalty value
 	std::vector<int> penalty(VISIBLE_GAMES_IN_SEARCH, 9999);
@@ -1522,7 +1522,7 @@ void ui_mewui_select_game::populate_search()
 //  generate general info
 //-------------------------------------------------
 
-void ui_mewui_select_game::general_info(const game_driver *driver, std::string &buffer)
+void ui_menu_select_game::general_info(const game_driver *driver, std::string &buffer)
 {
 	strprintf(buffer, "Romset: %-.100s\n", driver->name);
 	buffer.append("Year: ").append(driver->year).append("\n");
@@ -1598,7 +1598,7 @@ void ui_mewui_select_game::general_info(const game_driver *driver, std::string &
 		buffer.append("Roms Audit Pass: Disabled\nSamples Audit Pass: Disabled\n");
 }
 
-void ui_mewui_select_game::inkey_export()
+void ui_menu_select_game::inkey_export()
 {
 	std::string filename("exported");
 	emu_file infile(machine().options().mewui_path(), OPEN_FLAG_READ);
@@ -1654,7 +1654,7 @@ void ui_mewui_select_game::inkey_export()
 //  save drivers infos to file
 //-------------------------------------------------
 
-void ui_mewui_select_game::save_cache_info()
+void ui_menu_select_game::save_cache_info()
 {
 	// attempt to open the output file
 	emu_file file(machine().options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -1743,7 +1743,7 @@ void ui_mewui_select_game::save_cache_info()
 //  load drivers infos from file
 //-------------------------------------------------
 
-void ui_mewui_select_game::load_cache_info()
+void ui_menu_select_game::load_cache_info()
 {
 	driver_cache.resize(driver_list::total() + 1);
 
@@ -1817,7 +1817,7 @@ void ui_mewui_select_game::load_cache_info()
 //  load drivers infos from file
 //-------------------------------------------------
 
-bool ui_mewui_select_game::load_available_machines()
+bool ui_menu_select_game::load_available_machines()
 {
 	// try to load available drivers from file
 	emu_file file(machine().options().mewui_path(), OPEN_FLAG_READ);
@@ -1869,7 +1869,7 @@ bool ui_mewui_select_game::load_available_machines()
 //  load custom filters info from file
 //-------------------------------------------------
 
-void ui_mewui_select_game::load_custom_filters()
+void ui_menu_select_game::load_custom_filters()
 {
 	// attempt to open the output file
 	emu_file file(machine().options().mewui_path(), OPEN_FLAG_READ);
@@ -1937,7 +1937,7 @@ void ui_mewui_select_game::load_custom_filters()
 //  draw left box
 //-------------------------------------------------
 
-float ui_mewui_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
+float ui_menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 {
 	ui_manager &mui = machine().ui();
 	float line_height = mui.get_line_height();
@@ -2091,7 +2091,7 @@ float ui_mewui_select_game::draw_left_panel(float x1, float y1, float x2, float 
 //  draw infos
 //-------------------------------------------------
 
-void ui_mewui_select_game::infos_render(void *selectedref, float origx1, float origy1, float origx2, float origy2)
+void ui_menu_select_game::infos_render(void *selectedref, float origx1, float origy1, float origx2, float origy2)
 {
 	ui_manager &mui = machine().ui();
 	float line_height = mui.get_line_height();
@@ -2369,7 +2369,7 @@ void ui_mewui_select_game::infos_render(void *selectedref, float origx1, float o
 	}
 }
 
-void ui_mewui_select_game::draw_right_panel(void *selectedref, float origx1, float origy1, float origx2, float origy2)
+void ui_menu_select_game::draw_right_panel(void *selectedref, float origx1, float origy1, float origx2, float origy2)
 {
 	ui_manager &mui = machine().ui();
 	float line_height = mui.get_line_height();
@@ -2413,7 +2413,7 @@ void ui_mewui_select_game::draw_right_panel(void *selectedref, float origx1, flo
 //  perform our special rendering
 //-------------------------------------------------
 
-void ui_mewui_select_game::arts_render(void *selectedref, float origx1, float origy1, float origx2, float origy2)
+void ui_menu_select_game::arts_render(void *selectedref, float origx1, float origy1, float origx2, float origy2)
 {
 	ui_manager &mui = machine().ui();
 	float line_height = mui.get_line_height();
