@@ -917,10 +917,7 @@ static MACHINE_CONFIG_START( royalqn, nightgal_state )
 	/* video hardware */
 	/* TODO: blitter clock is MASTER_CLOCK / 4, 320 x 264 pixels, 256 x 224 of visible area */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4,320,0,256,264,16,240)
 	MCFG_SCREEN_UPDATE_DRIVER(nightgal_state, screen_update_nightgal)
 	MCFG_SCREEN_PALETTE("palette")
 
