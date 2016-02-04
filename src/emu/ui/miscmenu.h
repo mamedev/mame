@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods,Dankan1890
 /***************************************************************************
 
     ui/miscmenu.h
@@ -83,6 +83,29 @@ public:
 	virtual ~ui_menu_bios_selection();
 	virtual void populate() override;
 	virtual void handle() override;
+};
+
+//-------------------------------------------------
+//  class miscellaneous options menu
+//-------------------------------------------------
+class ui_menu_misc_options : public ui_menu
+{
+public:
+	ui_menu_misc_options(running_machine &machine, render_container *container);
+	virtual ~ui_menu_misc_options();
+	virtual void populate() override;
+	virtual void handle() override;
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+
+private:
+	struct misc_option
+	{
+		bool        status;
+		const char  *description;
+		const char  *option;
+	};
+
+	static misc_option m_options[];
 };
 
 #endif  /* __UI_MISCMENU_H__ */

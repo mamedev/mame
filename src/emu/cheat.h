@@ -321,8 +321,8 @@ private:
 	running_machine &   m_machine;                          // reference to our machine
 	simple_list<cheat_entry> m_cheatlist;                   // cheat list
 	UINT64              m_framecount;                       // frame count
-	std::string         m_output[UI_TARGET_FONT_ROWS * 2];    // array of output strings
-	UINT8               m_justify[UI_TARGET_FONT_ROWS*2];   // justification for each string
+	std::vector<std::string>  m_output;                     // array of output strings
+	std::vector<UINT8>        m_justify;                    // justification for each string
 	UINT8               m_numlines;                         // number of lines available for output
 	INT8                m_lastline;                         // last line used for output
 	bool                m_disabled;                         // true if the cheat engine is disabled

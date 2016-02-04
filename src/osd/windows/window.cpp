@@ -1319,6 +1319,14 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			window->machine().ui_input().push_char_event(window->m_target, (unicode_char) wparam);
 			break;
 
+		case WM_MOUSEWHEEL:
+		{
+			UINT ucNumLines = 3; // default
+			SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &ucNumLines, 0);
+			window->machine().ui_input().push_mouse_wheel_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), GET_WHEEL_DELTA_WPARAM(wparam), ucNumLines);
+			break;
+		}
+
 		// pause the system when we start a menu or resize
 		case WM_ENTERSIZEMOVE:
 			window->m_resize_state = RESIZE_STATE_RESIZING;
@@ -1401,9 +1409,9 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		case WM_DESTROY:
 			if (!(window->m_renderer == NULL))
 			{
-				window->m_renderer->destroy();
-				global_free(window->m_renderer);
-				window->m_renderer = NULL;
+			window->m_renderer->destroy();
+			global_free(window->m_renderer);
+			window->m_renderer = NULL;
 			}
 			window->m_hwnd = NULL;
 			return DefWindowProc(wnd, message, wparam, lparam);

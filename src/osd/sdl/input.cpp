@@ -1854,7 +1854,43 @@ void sdlinput_poll(running_machine &machine)
 					}
 				}
 			}
+#if (!SDLMAME_SDL2)
+			else if (event.button.button == 4) // SDL_BUTTON_WHEELUP
+			{
+				int cx, cy;
+				sdl_window_info *window = GET_FOCUS_WINDOW(&event.button);
+				if (window != NULL && window->xy_to_render_target(event.button.x,event.button.y, &cx, &cy) )
+				{
+					machine.ui_input().push_mouse_wheel_event(window->target(), cx, cy, 120, 3);
+				}
+			}
+
+			else if (event.button.button == 5) // SDL_BUTTON_WHEELDOWN
+			{
+				int cx, cy;
+				sdl_window_info *window = GET_FOCUS_WINDOW(&event.button);
+				if (window != NULL && window->xy_to_render_target(event.button.x,event.button.y, &cx, &cy) )
+				{
+					machine.ui_input().push_mouse_wheel_event(window->target(), cx, cy, -120, 3);
+				}
+			}
+#endif
 			break;
+#if (SDLMAME_SDL2)
+		case SDL_MOUSEWHEEL:
+#ifdef SDL2_MULTIAPI
+			devinfo = generic_device_find_index(mouse_list, mouse_map.logical[event.wheel.which]);
+#else
+			devinfo = generic_device_find_index(mouse_list, mouse_map.logical[0]);
+#endif
+			if (devinfo)
+			{
+				sdl_window_info *window = GET_FOCUS_WINDOW(&event.wheel);
+				if (window != NULL)
+					machine.ui_input().push_mouse_wheel_event(window->target(), 0, 0, event.wheel.y, 3);
+			}
+			break;
+#endif
 		case SDL_MOUSEBUTTONUP:
 #ifdef SDL2_MULTIAPI
 			devinfo = generic_device_find_index(mouse_list, mouse_map.logical[event.button.which]);
@@ -1970,8 +2006,8 @@ void sdlinput_poll(running_machine &machine)
 #endif
 					{
 						//printf("event data1,data2 %d x %d %ld\n", event.window.data1, event.window.data2, sizeof(SDL_Event));
-						window->resize(event.window.data1, event.window.data2);
-					}
+							window->resize(event.window.data1, event.window.data2);
+				}
 				}
 				focus_window = window;
 				break;

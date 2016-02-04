@@ -13,7 +13,8 @@
 #ifndef __EMUOPTS_H__
 #define __EMUOPTS_H__
 
-#include "options.h"
+#include "ui/moptions.h"
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -26,8 +27,7 @@ enum
 	OPTION_PRIORITY_CMDLINE = OPTION_PRIORITY_HIGH,
 
 	// INI-based options are NORMAL priority, in increasing order:
-	OPTION_PRIORITY_INI = OPTION_PRIORITY_NORMAL,
-	OPTION_PRIORITY_MAME_INI,
+	OPTION_PRIORITY_MAME_INI = OPTION_PRIORITY_NORMAL,
 	OPTION_PRIORITY_DEBUG_INI,
 	OPTION_PRIORITY_ORIENTATION_INI,
 	OPTION_PRIORITY_SYSTYPE_INI,
@@ -35,7 +35,8 @@ enum
 	OPTION_PRIORITY_SOURCE_INI,
 	OPTION_PRIORITY_GPARENT_INI,
 	OPTION_PRIORITY_PARENT_INI,
-	OPTION_PRIORITY_DRIVER_INI
+	OPTION_PRIORITY_DRIVER_INI,
+	OPTION_PRIORITY_INI
 };
 
 // core options
@@ -200,7 +201,7 @@ struct game_driver;
 class software_part;
 
 
-class emu_options : public core_options
+class emu_options : public mewui_options
 {
 	static const UINT32 OPTION_FLAG_DEVICE = 0x80000000;
 
@@ -372,6 +373,7 @@ public:
 	std::string main_value(const char *option) const;
 	std::string sub_value(const char *name, const char *subname) const;
 	bool add_slot_options(const software_part *swpart = nullptr);
+
 
 private:
 	// device-specific option handling

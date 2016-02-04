@@ -88,6 +88,25 @@ static const input_item_id non_char_keys[] =
 	ITEM_ID_CANCEL
 };
 
+static const char *s_color_list[] = {
+	OPTION_UI_BORDER_COLOR,
+	OPTION_UI_BACKGROUND_COLOR,
+	OPTION_UI_GFXVIEWER_BG_COLOR,
+	OPTION_UI_UNAVAILABLE_COLOR,
+	OPTION_UI_TEXT_COLOR,
+	OPTION_UI_TEXT_BG_COLOR,
+	OPTION_UI_SUBITEM_COLOR,
+	OPTION_UI_CLONE_COLOR,
+	OPTION_UI_SELECTED_COLOR,
+	OPTION_UI_SELECTED_BG_COLOR,
+	OPTION_UI_MOUSEOVER_COLOR,
+	OPTION_UI_MOUSEOVER_BG_COLOR,
+	OPTION_UI_MOUSEDOWN_COLOR,
+	OPTION_UI_MOUSEDOWN_BG_COLOR,
+	OPTION_UI_DIPSW_COLOR,
+	OPTION_UI_SLIDER_COLOR
+};
+
 /***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
@@ -245,6 +264,9 @@ ui_manager::ui_manager(running_machine &machine)
 	m_use_natural_keyboard = false;
 	m_mouse_arrow_texture = nullptr;
 	m_load_save_hold = false;
+
+	get_font_rows(&machine);
+	decode_ui_color(0, &machine);
 
 	// more initialization
 	set_handler(handler_messagebox, 0);
@@ -461,7 +483,9 @@ void ui_manager::update_and_render(render_container *container)
 		{
 			float mouse_y=-1,mouse_x=-1;
 			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y)) {
-				container->add_quad(mouse_x,mouse_y,mouse_x + 0.02f*container->manager().ui_aspect(container),mouse_y + 0.02f,UI_TEXT_COLOR,m_mouse_arrow_texture,PRIMFLAG_ANTIALIAS(1)|PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				float l_heigth = machine().ui().get_line_height();
+				container->add_quad(mouse_x, mouse_y, mouse_x + l_heigth*container->manager().ui_aspect(container), mouse_y + l_heigth, UI_TEXT_COLOR, m_mouse_arrow_texture, PRIMFLAG_ANTIALIAS(1) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+
 			}
 		}
 	}
@@ -596,9 +620,9 @@ void ui_manager::draw_text(render_container *container, const char *buf, float x
 //  and full size computation
 //-------------------------------------------------
 
-void ui_manager::draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight)
+void ui_manager::draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight, float text_size)
 {
-	float lineheight = get_line_height();
+	float lineheight = get_line_height() * text_size;
 	const char *ends = origs + strlen(origs);
 	float wrapwidth = origwrapwidth;
 	const char *s = origs;
@@ -1648,13 +1672,19 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	if (machine.ui_input().pressed(IPT_UI_PAUSE))
 	{
 		// with a shift key, it is single step
-		if (is_paused && (machine.input().code_pressed(KEYCODE_LSHIFT) || machine.input().code_pressed(KEYCODE_RSHIFT)))
-		{
-			machine.ui().set_single_step(true);
-			machine.resume();
-		}
-		else
+//		if (is_paused && (machine.input().code_pressed(KEYCODE_LSHIFT) || machine.input().code_pressed(KEYCODE_RSHIFT)))
+//		{
+//			machine.ui().set_single_step(true);
+//			machine.resume();
+//		}
+//		else
 			machine.toggle_pause();
+	}
+
+	if (machine.ui_input().pressed(IPT_UI_PAUSE_SINGLE))
+	{
+		machine.ui().set_single_step(true);
+		machine.resume();
 	}
 
 	// handle a toggle cheats request
@@ -2531,4 +2561,193 @@ void ui_manager::set_use_natural_keyboard(bool use_natural_keyboard)
 	std::string error;
 	machine().options().set_value(OPTION_NATURAL_KEYBOARD, use_natural_keyboard, OPTION_PRIORITY_CMDLINE, error);
 	assert(error.empty());
+}
+
+/**********************************************
+ * MEWUI
+ *********************************************/
+void ui_manager::wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, int &count, std::vector<int> &xstart, std::vector<int> &xend, float text_size)
+{
+	float lineheight = get_line_height() * text_size;
+	const char *ends = origs + strlen(origs);
+	float wrapwidth = origwrapwidth;
+	const char *s = origs;
+	const char *linestart;
+	float maxwidth = 0;
+	float aspect = machine().render().ui_aspect(container);
+	count = 0;
+
+	// loop over lines
+	while (*s != 0)
+	{
+		const char *lastbreak = nullptr;
+		unicode_char schar;
+		int scharcount;
+		float lastbreak_width = 0;
+		float curwidth = 0;
+
+		// get the current character
+		scharcount = uchar_from_utf8(&schar, s, ends - s);
+		if (scharcount == -1)
+			break;
+
+		// remember the starting position of the line
+		linestart = s;
+
+		// loop while we have characters and are less than the wrapwidth
+		while (*s != 0 && curwidth <= wrapwidth)
+		{
+			float chwidth;
+
+			// get the current chcaracter
+			scharcount = uchar_from_utf8(&schar, s, ends - s);
+			if (scharcount == -1)
+				break;
+
+			// if we hit a newline, stop immediately
+			if (schar == '\n')
+				break;
+
+			// get the width of this character
+			chwidth = get_font()->char_width(lineheight, aspect, schar);
+
+			// if we hit a space, remember the location and width *without* the space
+			if (schar == ' ')
+			{
+				lastbreak = s;
+				lastbreak_width = curwidth;
+			}
+
+			// add the width of this character and advance
+			curwidth += chwidth;
+			s += scharcount;
+
+			// if we hit any non-space breakable character, remember the location and width
+			// *with* the breakable character
+			if (schar != ' ' && is_breakable_char(schar) && curwidth <= wrapwidth)
+			{
+				lastbreak = s;
+				lastbreak_width = curwidth;
+			}
+		}
+
+		// if we accumulated too much for the current width, we need to back off
+		if (curwidth > wrapwidth)
+		{
+			// if we hit a break, back up to there with the appropriate width
+			if (lastbreak != nullptr)
+			{
+				s = lastbreak;
+				curwidth = lastbreak_width;
+			}
+
+			// if we didn't hit a break, back up one character
+			else if (s > linestart)
+			{
+				// get the previous character
+				s = (const char *)utf8_previous_char(s);
+				scharcount = uchar_from_utf8(&schar, s, ends - s);
+				if (scharcount == -1)
+					break;
+
+				curwidth -= get_font()->char_width(lineheight, aspect, schar);
+			}
+		}
+
+		// track the maximum width of any given line
+		if (curwidth > maxwidth)
+			maxwidth = curwidth;
+
+        xstart.push_back(linestart - origs);
+        xend.push_back(s - origs);
+
+		// loop from the line start and add the characters
+		while (linestart < s)
+		{
+			// get the current character
+			unicode_char linechar;
+			int linecharcount = uchar_from_utf8(&linechar, linestart, ends - linestart);
+			if (linecharcount == -1)
+				break;
+			linestart += linecharcount;
+		}
+
+		// advance by a row
+		count++;
+
+		// skip past any spaces at the beginning of the next line
+		scharcount = uchar_from_utf8(&schar, s, ends - s);
+		if (scharcount == -1)
+			break;
+
+		if (schar == '\n')
+			s += scharcount;
+		else
+			while (*s && isspace(schar))
+			{
+				s += scharcount;
+				scharcount = uchar_from_utf8(&schar, s, ends - s);
+				if (scharcount == -1)
+					break;
+			}
+	}
+}
+
+//-------------------------------------------------
+//  draw_textured_box - add primitives to
+//  draw an outlined box with the given
+//  textured background and line color
+//-------------------------------------------------
+
+void ui_manager::draw_textured_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture, UINT32 flags)
+{
+	container->add_quad(x0, y0, x1, y1, backcolor, texture, flags);
+	container->add_line(x0, y0, x1, y0, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container->add_line(x1, y0, x1, y1, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container->add_line(x1, y1, x0, y1, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container->add_line(x0, y1, x0, y0, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+}
+
+//-------------------------------------------------
+//  get_string_width_ex - return the width of a
+//  character string with given text size
+//-------------------------------------------------
+
+float ui_manager::get_string_width_ex(const char *s, float text_size)
+{
+	return get_font()->utf8string_width(get_line_height() * text_size, machine().render().ui_aspect(), s);
+}
+
+//-------------------------------------------------
+//  decode UI color options
+//-------------------------------------------------
+
+rgb_t decode_ui_color(int id, running_machine *machine)
+{
+	static rgb_t color[ARRAY_LENGTH(s_color_list)];
+
+	if (machine != nullptr) {
+		emu_options option;
+		for (int x = 0; x < ARRAY_LENGTH(s_color_list); x++) {
+			const char *o_default = option.value(s_color_list[x]);
+			const char *s_option = machine->options().value(s_color_list[x]);
+			int len = strlen(s_option);
+			if (len != 8)
+				color[x] = rgb_t((UINT32)strtoul(o_default, nullptr, 16));
+			else
+				color[x] = rgb_t((UINT32)strtoul(s_option, nullptr, 16));
+		}
+	}
+	return color[id];
+}
+
+//-------------------------------------------------
+//  get font rows from options
+//-------------------------------------------------
+
+int get_font_rows(running_machine *machine)
+{
+	static int value;
+
+	return ((machine != nullptr) ? value = machine->options().font_rows() : value);
 }
