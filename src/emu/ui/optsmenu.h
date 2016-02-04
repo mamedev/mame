@@ -4,7 +4,7 @@
 
     ui/optsmenu.h
 
-    MEWUI main options menu manager.
+    UI main options menu manager.
 
 ***************************************************************************/
 

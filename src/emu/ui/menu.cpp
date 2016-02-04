@@ -76,8 +76,8 @@ render_texture *ui_menu::snapx_texture;
 render_texture *ui_menu::hilight_main_texture;
 render_texture *ui_menu::bgrnd_texture;
 render_texture *ui_menu::star_texture;
-render_texture *ui_menu::toolbar_texture[MEWUI_TOOLBAR_BUTTONS];
-render_texture *ui_menu::sw_toolbar_texture[MEWUI_TOOLBAR_BUTTONS];
+render_texture *ui_menu::toolbar_texture[UI_TOOLBAR_BUTTONS];
+render_texture *ui_menu::sw_toolbar_texture[UI_TOOLBAR_BUTTONS];
 render_texture *ui_menu::icons_texture[MAX_ICONS_RENDER];
 std::unique_ptr<bitmap_argb32> ui_menu::snapx_bitmap;
 std::unique_ptr<bitmap_argb32> ui_menu::no_avail_bitmap;
@@ -85,8 +85,8 @@ std::unique_ptr<bitmap_argb32> ui_menu::star_bitmap;
 std::unique_ptr<bitmap_argb32> ui_menu::bgrnd_bitmap;
 bitmap_argb32 *ui_menu::icons_bitmap[MAX_ICONS_RENDER];
 std::unique_ptr<bitmap_rgb32> ui_menu::hilight_main_bitmap;
-bitmap_argb32 *ui_menu::toolbar_bitmap[MEWUI_TOOLBAR_BUTTONS];
-bitmap_argb32 *ui_menu::sw_toolbar_bitmap[MEWUI_TOOLBAR_BUTTONS];
+bitmap_argb32 *ui_menu::toolbar_bitmap[UI_TOOLBAR_BUTTONS];
+bitmap_argb32 *ui_menu::sw_toolbar_bitmap[UI_TOOLBAR_BUTTONS];
 
 /***************************************************************************
 	INLINE FUNCTIONS
@@ -149,8 +149,8 @@ void ui_menu::init(running_machine &machine)
 	// create a texture for arrow icons
 	arrow_texture = machine.render().texture_alloc(render_triangle);
 
-	// initialize mewui
-	init_mewui(machine);
+	// initialize ui
+	init_ui(machine);
 
 	// add an exit callback to free memory
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ui_menu::exit), &machine));
@@ -179,7 +179,7 @@ void ui_menu::exit(running_machine &machine)
 	for (auto & elem : icons_texture)
 		mre.texture_free(elem);
 
-	for (int i = 0; i < MEWUI_TOOLBAR_BUTTONS; i++)
+	for (int i = 0; i < UI_TOOLBAR_BUTTONS; i++)
 	{
 		mre.texture_free(sw_toolbar_texture[i]);
 		mre.texture_free(toolbar_texture[i]);
@@ -336,9 +336,9 @@ const ui_menu_event *ui_menu::process(UINT32 flags)
 	// draw the menu
 	if (item.size() > 1 && (item[0].flags & MENU_FLAG_MULTILINE) != 0)
 		draw_text_box();
-	else if ((item[0].flags & MENU_FLAG_MEWUI ) != 0 || (item[0].flags & MENU_FLAG_MEWUI_SWLIST ) != 0)
+	else if ((item[0].flags & MENU_FLAG_UI ) != 0 || (item[0].flags & MENU_FLAG_UI_SWLIST ) != 0)
 		draw_select_game(flags & UI_MENU_PROCESS_NOINPUT);
-	else if ((item[0].flags & MENU_FLAG_MEWUI_PALETTE ) != 0)
+	else if ((item[0].flags & MENU_FLAG_UI_PALETTE ) != 0)
 		draw_palette_menu();
 	else
 		draw(flags & UI_MENU_PROCESS_CUSTOM_ONLY, flags & UI_MENU_PROCESS_NOIMAGE, flags & UI_MENU_PROCESS_NOINPUT);
@@ -347,7 +347,7 @@ const ui_menu_event *ui_menu::process(UINT32 flags)
 	if (!(flags & UI_MENU_PROCESS_NOKEYS) && !(flags & UI_MENU_PROCESS_NOINPUT))
 	{
 		// read events
-		if ((item[0].flags & MENU_FLAG_MEWUI ) != 0 || (item[0].flags & MENU_FLAG_MEWUI_SWLIST ) != 0)
+		if ((item[0].flags & MENU_FLAG_UI ) != 0 || (item[0].flags & MENU_FLAG_UI_SWLIST ) != 0)
 			handle_main_events(flags);
 		else
 			handle_events(flags);
@@ -355,7 +355,7 @@ const ui_menu_event *ui_menu::process(UINT32 flags)
 		// handle the keys if we don't already have an menu_event
 		if (menu_event.iptkey == IPT_INVALID)
 		{
-			if ((item[0].flags & MENU_FLAG_MEWUI ) != 0 || (item[0].flags & MENU_FLAG_MEWUI_SWLIST ) != 0)
+			if ((item[0].flags & MENU_FLAG_UI ) != 0 || (item[0].flags & MENU_FLAG_UI_SWLIST ) != 0)
 				handle_main_keys(flags);
 			else
 				handle_keys(flags);
@@ -463,7 +463,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 	int itemnum, linenum;
 	bool mouse_hit, mouse_button;
 	float mouse_x = -1, mouse_y = -1;
-	bool history_flag = ((item[0].flags & MENU_FLAG_MEWUI_HISTORY) != 0);
+	bool history_flag = ((item[0].flags & MENU_FLAG_UI_HISTORY) != 0);
 
 	if (machine().options().use_background_image() && &machine().system() == &GAME_NAME(___empty) && bgrnd_bitmap->valid() && !noimage)
 		container->add_quad(0.0f, 0.0f, 1.0f, 1.0f, ARGB_WHITE, bgrnd_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -575,11 +575,11 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 
 			// set the hover if this is our item
 			if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && pitem.is_selectable()
-			    && (pitem.flags & MENU_FLAG_MEWUI_HISTORY) == 0)
+			    && (pitem.flags & MENU_FLAG_UI_HISTORY) == 0)
 				hover = itemnum;
 
 			// if we're selected, draw with a different background
-			if (itemnum == selected && (pitem.flags & MENU_FLAG_MEWUI_HISTORY) == 0)
+			if (itemnum == selected && (pitem.flags & MENU_FLAG_UI_HISTORY) == 0)
 			{
 				fgcolor = UI_SELECTED_COLOR;
 				bgcolor = UI_SELECTED_BG_COLOR;
@@ -588,7 +588,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 			}
 
 			// else if the mouse is over this item, draw with a different background
-			else if (itemnum == hover && (((pitem.flags & MENU_FLAG_MEWUI_HISTORY) == 0) || (linenum == 0 && top_line != 0)
+			else if (itemnum == hover && (((pitem.flags & MENU_FLAG_UI_HISTORY) == 0) || (linenum == 0 && top_line != 0)
 			         || (linenum == visible_lines - 1 && itemnum != item.size() - 1)))
 			{
 				fgcolor = UI_MOUSEOVER_COLOR;
@@ -634,7 +634,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 				container->add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			// draw the subitem left-justified
-			else if (pitem.subtext == nullptr && (pitem.flags & MENU_FLAG_MEWUI_HISTORY) != 0)
+			else if (pitem.subtext == nullptr && (pitem.flags & MENU_FLAG_UI_HISTORY) != 0)
 				machine().ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
 					JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 
@@ -820,7 +820,7 @@ void ui_menu::handle_events(UINT32 flags)
 {
 	int stop = FALSE;
 	ui_event local_menu_event;
-	bool historyflag = ((item[0].flags & MENU_FLAG_MEWUI_HISTORY) != 0);
+	bool historyflag = ((item[0].flags & MENU_FLAG_UI_HISTORY) != 0);
 
 	// loop while we have interesting events
 	while (!stop && machine().ui_input().pop_event(&local_menu_event))
@@ -917,7 +917,7 @@ void ui_menu::handle_keys(UINT32 flags)
 	// bail if no items
 	if (item.empty())
 		return;
-	bool historyflag = ((item[0].flags & MENU_FLAG_MEWUI_HISTORY) != 0);
+	bool historyflag = ((item[0].flags & MENU_FLAG_UI_HISTORY) != 0);
 
 
 	// if we hit select, return TRUE or pop the stack, depending on the item
@@ -1257,10 +1257,10 @@ void ui_menu::draw_arrow(render_container *container, float x0, float y0, float 
 }
 
 //-------------------------------------------------
-//  init - initialize the mewui menu system
+//  init - initialize the ui menu system
 //-------------------------------------------------
 
-void ui_menu::init_mewui(running_machine &machine)
+void ui_menu::init_ui(running_machine &machine)
 {
 	render_manager &mrender = machine.render();
 	// create a texture for hilighting items in main menu
@@ -1323,7 +1323,7 @@ void ui_menu::init_mewui(running_machine &machine)
 		bgrnd_bitmap->reset();
 
 	// create a texture for toolbar
-	for (int x = 0; x < MEWUI_TOOLBAR_BUTTONS; ++x)
+	for (int x = 0; x < UI_TOOLBAR_BUTTONS; ++x)
 	{
 		toolbar_bitmap[x] = auto_alloc(machine, bitmap_argb32(32, 32));
 		toolbar_texture[x] = mrender.texture_alloc();
@@ -1336,7 +1336,7 @@ void ui_menu::init_mewui(running_machine &machine)
 	}
 
 	// create a texture for toolbar
-	for (int x = 0; x < MEWUI_TOOLBAR_BUTTONS; ++x)
+	for (int x = 0; x < UI_TOOLBAR_BUTTONS; ++x)
 	{
 		sw_toolbar_bitmap[x] = auto_alloc(machine, bitmap_argb32(32, 32));
 		sw_toolbar_texture[x] = mrender.texture_alloc();
@@ -1367,8 +1367,8 @@ void ui_menu::draw_select_game(bool noinput)
 	float visible_width = 1.0f - 4.0f * UI_BOX_LR_BORDER;
 	float primary_left = (1.0f - visible_width) * 0.5f;
 	float primary_width = visible_width;
-	bool is_swlist = ((item[0].flags & MENU_FLAG_MEWUI_SWLIST) != 0);
-	bool is_favorites = ((item[0].flags & MENU_FLAG_MEWUI_FAVORITE) != 0);
+	bool is_swlist = ((item[0].flags & MENU_FLAG_UI_SWLIST) != 0);
+	bool is_favorites = ((item[0].flags & MENU_FLAG_UI_FAVORITE) != 0);
 	ui_manager &mui = machine().ui();
 
 	// draw background image if available
@@ -2139,7 +2139,7 @@ void ui_menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software
 	bitmap_argb32 **t_bitmap = (software) ? sw_toolbar_bitmap : toolbar_bitmap;
 
 	int m_valid = 0;
-	for (int x = 0; x < MEWUI_TOOLBAR_BUTTONS; ++x)
+	for (int x = 0; x < UI_TOOLBAR_BUTTONS; ++x)
 		if (t_bitmap[x]->valid())
 			m_valid++;
 
@@ -2148,7 +2148,7 @@ void ui_menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software
 	h_len = (h_len % 2 == 0) ? h_len : h_len - 1;
 	x1 = (x1 + x2) * 0.5f - x_pixel * (m_valid * ((h_len / 2) + 2));
 
-	for (int z = 0; z < MEWUI_TOOLBAR_BUTTONS; ++z)
+	for (int z = 0; z < UI_TOOLBAR_BUTTONS; ++z)
 	{
 		if (t_bitmap[z]->valid())
 		{
@@ -2543,14 +2543,14 @@ void ui_menu::draw_palette_menu()
 			hover = itemnum;
 
 		// if we're selected, draw with a different background
-		if (itemnum == selected && (pitem.flags & MENU_FLAG_MEWUI_HISTORY) == 0)
+		if (itemnum == selected && (pitem.flags & MENU_FLAG_UI_HISTORY) == 0)
 		{
 			fgcolor = UI_SELECTED_COLOR;
 			bgcolor = UI_SELECTED_BG_COLOR;
 		}
 
 		// else if the mouse is over this item, draw with a different background
-		else if (itemnum == hover && (pitem.flags & MENU_FLAG_MEWUI_HISTORY) == 0)
+		else if (itemnum == hover && (pitem.flags & MENU_FLAG_UI_HISTORY) == 0)
 		{
 			fgcolor = UI_MOUSEOVER_COLOR;
 			bgcolor = UI_MOUSEOVER_BG_COLOR;

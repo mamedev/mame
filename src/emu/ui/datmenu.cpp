@@ -161,10 +161,10 @@ void ui_menu_command_content::populate()
 				std::string first_part(tempbuf.substr(0, first_dspace));
 				std::string last_part(tempbuf.substr(first_dspace));
 				strtrimspace(last_part);
-				item_append(first_part.c_str(), last_part.c_str(), MENU_FLAG_MEWUI_HISTORY, nullptr);
+				item_append(first_part.c_str(), last_part.c_str(), MENU_FLAG_UI_HISTORY, nullptr);
 			}
 			else
-				item_append(tempbuf.c_str(), nullptr, MENU_FLAG_MEWUI_HISTORY, nullptr);
+				item_append(tempbuf.c_str(), nullptr, MENU_FLAG_UI_HISTORY, nullptr);
 		}
 		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 	}
@@ -302,7 +302,7 @@ void ui_menu_history_sw::populate()
 		for (int r = 0; r < total_lines; r++)
 		{
 			std::string tempbuf(buffer.substr(xstart[r], xend[r] - xstart[r]));
-			item_append(tempbuf.c_str(), nullptr, MENU_FLAG_MEWUI_HISTORY, nullptr);
+			item_append(tempbuf.c_str(), nullptr, MENU_FLAG_UI_HISTORY, nullptr);
 		}
 	}
 	else
@@ -410,28 +410,28 @@ void ui_menu_dats::populate()
 	machine().pause();
 	switch (m_flags)
 	{
-		case MEWUI_HISTORY_LOAD:
+		case UI_HISTORY_LOAD:
 			if (!get_data(m_driver, m_flags))
 				item_append("No available History for this machine.", nullptr, MENU_FLAG_DISABLE, nullptr);
 			break;
 
-		case MEWUI_MAMEINFO_LOAD:
+		case UI_MAMEINFO_LOAD:
 			if (!get_data(m_driver, m_flags))
 				item_append("No available MameInfo for this machine.", nullptr, MENU_FLAG_DISABLE, nullptr);
 			break;
 
-		case MEWUI_MESSINFO_LOAD:
+		case UI_MESSINFO_LOAD:
 			if (!get_data(m_driver, m_flags))
 				item_append("No available MessInfo for this machine.", nullptr, MENU_FLAG_DISABLE, nullptr);
 			break;
 
-		case MEWUI_STORY_LOAD:
-			if (!get_data(m_driver, MEWUI_STORY_LOAD))
+		case UI_STORY_LOAD:
+			if (!get_data(m_driver, UI_STORY_LOAD))
 				item_append("No available Mamescore for this machine.", nullptr, MENU_FLAG_DISABLE, nullptr);
 			break;
 
-		case MEWUI_SYSINFO_LOAD:
-			if (!get_data(m_driver, MEWUI_SYSINFO_LOAD))
+		case UI_SYSINFO_LOAD:
+			if (!get_data(m_driver, UI_SYSINFO_LOAD))
 				item_append("No available Sysinfo for this machine.", nullptr, MENU_FLAG_DISABLE, nullptr);
 			break;
 	}
@@ -454,27 +454,27 @@ void ui_menu_dats::custom_render(void *selectedref, float top, float bottom, flo
 
 	switch (m_flags)
 	{
-		case MEWUI_HISTORY_LOAD:
+		case UI_HISTORY_LOAD:
 			tempbuf.assign("History - Game / System: ").append(m_driver->description);
 			revision.assign("History.dat Revision: ").append(datfile.rev_history());
 			break;
 
-		case MEWUI_MESSINFO_LOAD:
+		case UI_MESSINFO_LOAD:
 			tempbuf.assign("MessInfo - System: ").append(m_driver->description);
 			revision.assign("Messinfo.dat Revision: ").append(datfile.rev_messinfo());
 			break;
 
-		case MEWUI_MAMEINFO_LOAD:
+		case UI_MAMEINFO_LOAD:
 			tempbuf.assign("MameInfo - Game: ").append(m_driver->description);
 			revision.assign("Mameinfo.dat Revision: ").append(datfile.rev_mameinfo());
 			break;
 
-		case MEWUI_SYSINFO_LOAD:
+		case UI_SYSINFO_LOAD:
 			tempbuf.assign("Sysinfo - System: ").append(m_driver->description);
 			revision.assign("Sysinfo.dat Revision: ").append(datfile.rev_sysinfo());
 			break;
 
-		case MEWUI_STORY_LOAD:
+		case UI_STORY_LOAD:
 			tempbuf.assign("MAMESCORE - Game: ").append(m_driver->description);
 			revision.assign("Story.dat Revision: ").append(machine().datfile().rev_storyinfo());
 			break;
@@ -552,7 +552,7 @@ bool ui_menu_dats::get_data(const game_driver *driver, int flags)
 	{
 		std::string tempbuf(buffer.substr(xstart[r], xend[r] - xstart[r]));
 		// special case for mamescore
-		if (flags == MEWUI_STORY_LOAD)
+		if (flags == UI_STORY_LOAD)
 		{
 			size_t last_underscore = tempbuf.find_last_of('_');
 			if (last_underscore != std::string::npos)
@@ -560,11 +560,11 @@ bool ui_menu_dats::get_data(const game_driver *driver, int flags)
 				std::string last_part(tempbuf.substr(last_underscore + 1));
 				int primary = tempbuf.find("___");
 				std::string first_part(tempbuf.substr(0, primary));
-				item_append(first_part.c_str(), last_part.c_str(), MENU_FLAG_MEWUI_HISTORY, nullptr);
+				item_append(first_part.c_str(), last_part.c_str(), MENU_FLAG_UI_HISTORY, nullptr);
 			}
 		}
 		else
-			item_append(tempbuf.c_str(), nullptr, MENU_FLAG_MEWUI_HISTORY, nullptr);
+			item_append(tempbuf.c_str(), nullptr, MENU_FLAG_UI_HISTORY, nullptr);
 	}
 		return true;
 }

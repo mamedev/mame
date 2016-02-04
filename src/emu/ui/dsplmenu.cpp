@@ -4,7 +4,7 @@
 
     ui/dsplmenu.cpp
 
-    MEWUI video options menu.
+    UI video options menu.
 
 *********************************************************************/
 

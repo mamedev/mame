@@ -25,7 +25,7 @@ struct folders_entry
 static const folders_entry s_folders_entry[] =
 {
 	{ "ROMs",                OPTION_MEDIAPATH },
-	{ "MEWUI",               OPTION_MEWUI_PATH },
+	{ "UI",                  OPTION_UI_PATH },
 	{ "Samples",             OPTION_SAMPLEPATH },
 	{ "DATs",                OPTION_HISTORY_PATH },
 	{ "INIs",                OPTION_INIPATH },
@@ -342,7 +342,7 @@ void ui_menu_directory::handle()
 	if (m_event != nullptr && m_event->itemref != nullptr && m_event->iptkey == IPT_UI_SELECT)
 	{
 		int ref = (FPTR)m_event->itemref;
-		bool change = (ref == HISTORY_FOLDERS || ref == EXTRAINI_FOLDERS || ref == MEWUI_FOLDERS);
+		bool change = (ref == HISTORY_FOLDERS || ref == EXTRAINI_FOLDERS || ref == UI_FOLDERS);
 		ui_menu::stack_push(global_alloc_clear<ui_menu_display_actual>(machine(), container, ref, change));
 	}
 }
@@ -354,7 +354,7 @@ void ui_menu_directory::handle()
 void ui_menu_directory::populate()
 {
 	item_append("Roms", nullptr, 0, (void *)(FPTR)ROM_FOLDERS);
-	item_append("MEWUI", nullptr, 0, (void *)(FPTR)MEWUI_FOLDERS);
+	item_append("UI", nullptr, 0, (void *)(FPTR)UI_FOLDERS);
 	item_append("Samples", nullptr, 0, (void *)(FPTR)SAMPLE_FOLDERS);
 	item_append("INIs", nullptr, 0, (void *)(FPTR)INI_FOLDERS);
 	item_append("Artwork", nullptr, 0, (void *)(FPTR)ARTWORK_FOLDERS);

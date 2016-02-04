@@ -247,4 +247,4 @@ static const UINT32 toolbar_bitmap_bmp[][1024] = {
 }
 };
 
-#define MEWUI_TOOLBAR_BUTTONS    ARRAY_LENGTH(toolbar_bitmap_bmp)
+#define UI_TOOLBAR_BUTTONS    ARRAY_LENGTH(toolbar_bitmap_bmp)

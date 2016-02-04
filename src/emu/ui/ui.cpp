@@ -2563,9 +2563,10 @@ void ui_manager::set_use_natural_keyboard(bool use_natural_keyboard)
 	assert(error.empty());
 }
 
-/**********************************************
- * MEWUI
- *********************************************/
+//-------------------------------------------------
+//  wrap_text
+//-------------------------------------------------
+
 void ui_manager::wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, int &count, std::vector<int> &xstart, std::vector<int> &xend, float text_size)
 {
 	float lineheight = get_line_height() * text_size;

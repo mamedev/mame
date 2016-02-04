@@ -4,7 +4,7 @@
 
     ui/selsoft.h
 
-    MEWUI softwares menu.
+    UI softwares menu.
 
 ***************************************************************************/
 #pragma once
@@ -64,11 +64,11 @@ private:
 	void inkey_special(const ui_menu_event *menu_event);
 };
 
-class ui_mewui_software_parts : public ui_menu
+class ui_software_parts : public ui_menu
 {
 public:
-	ui_mewui_software_parts(running_machine &machine, render_container *container, std::unordered_map<std::string, std::string> parts, ui_software_info *ui_info);
-	virtual ~ui_mewui_software_parts();
+	ui_software_parts(running_machine &machine, render_container *container, std::unordered_map<std::string, std::string> parts, ui_software_info *ui_info);
+	virtual ~ui_software_parts();
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -78,11 +78,11 @@ private:
 	std::unordered_map<std::string, std::string> m_parts;
 };
 
-class ui_mewui_bios_selection : public ui_menu
+class ui_bios_selection : public ui_menu
 {
 public:
-	ui_mewui_bios_selection(running_machine &machine, render_container *container, std::vector<s_bios> biosname, void *driver, bool software, bool inlist);
-	virtual ~ui_mewui_bios_selection();
+	ui_bios_selection(running_machine &machine, render_container *container, std::vector<s_bios> biosname, void *driver, bool software, bool inlist);
+	virtual ~ui_bios_selection();
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;

@@ -4,7 +4,7 @@
 
     ui/inifile.cpp
 
-    MEWUI INIs file manager.
+    UI INIs file manager.
 
 ***************************************************************************/
 
@@ -47,8 +47,8 @@ void inifile_manager::directory_scan()
 		int length = strlen(dir->name);
 		std::string filename(dir->name);
 
-		// skip mewui_favorite file
-		if (!core_stricmp("mewui_favorite.ini", filename.c_str()))
+		// skip ui_favorite file
+		if (!core_stricmp("ui_favorite.ini", filename.c_str()))
 			continue;
 
 		// check .ini file ending
@@ -357,7 +357,7 @@ bool favorite_manager::isgame_favorite(ui_software_info &swinfo)
 
 void favorite_manager::parse_favorite()
 {
-	emu_file file(machine().options().mewui_path(), OPEN_FLAG_READ);
+	emu_file file(machine().options().ui_path(), OPEN_FLAG_READ);
 	if (file.open(favorite_filename) == FILERR_NONE)
 	{
 		char readbuf[1024];
@@ -416,7 +416,7 @@ void favorite_manager::parse_favorite()
 void favorite_manager::save_favorite_games()
 {
 	// attempt to open the output file
-	emu_file file(machine().options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (file.open(favorite_filename) == FILERR_NONE)
 	{
 		if (m_list.empty())

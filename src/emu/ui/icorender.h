@@ -9,8 +9,6 @@
     Original code by Victor Laskin (victor.laskin@gmail.com)
     http://vitiy.info/Code/ico.cpp
 
-    Revised for MEWUI by dankan1890.
-
 ***************************************************************************/
 #pragma once
 

@@ -4,7 +4,7 @@
 
     ui/moptions.h
 
-    MEWUI main options manager.
+    UI main options manager.
 
 ***************************************************************************/
 
@@ -34,7 +34,7 @@
 #define OPTION_HOWTO_PATH             "howto_directory"
 #define OPTION_SELECT_PATH            "select_directory"
 #define OPTION_ICONS_PATH             "icons_directory"
-#define OPTION_MEWUI_PATH             "mewui_path"
+#define OPTION_UI_PATH                "ui_path"
 
 // core misc options
 #define OPTION_DATS_ENABLED           "dats_enabled"
@@ -95,7 +95,7 @@ public:
 	const char *howto_directory() const { return value(OPTION_HOWTO_PATH); }
 	const char *select_directory() const { return value(OPTION_SELECT_PATH); }
 	const char *icons_directory() const { return value(OPTION_ICONS_PATH); }
-	const char *mewui_path() const { return value(OPTION_MEWUI_PATH); }
+	const char *ui_path() const { return value(OPTION_UI_PATH); }
 
 	// Misc options
 	bool enabled_dats() const { return bool_value(OPTION_DATS_ENABLED); }

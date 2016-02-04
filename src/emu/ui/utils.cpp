@@ -12,8 +12,8 @@
 #include "ui/utils.h"
 #include <algorithm>
 
-extern const char MEWUI_VERSION_TAG[];
-const char MEWUI_VERSION_TAG[] = "# UI INFO ";
+extern const char UI_VERSION_TAG[];
+const char UI_VERSION_TAG[] = "# UI INFO ";
 
 // Years index
 UINT16 c_year::actual = 0;

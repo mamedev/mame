@@ -4,7 +4,7 @@
 
     ui/inifile.h
 
-    MEWUI INIs file manager.
+    UI INIs file manager.
 
 ***************************************************************************/
 
@@ -112,7 +112,7 @@ private:
 	// current
 	int m_current;
 
-	// parse file mewui_favorite
+	// parse file ui_favorite
 	void parse_favorite();
 
 	// internal state

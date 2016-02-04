@@ -27,11 +27,11 @@
 #define MENU_FLAG_MULTILINE         (1 << 3)
 #define MENU_FLAG_REDTEXT           (1 << 4)
 #define MENU_FLAG_DISABLE           (1 << 5)
-#define MENU_FLAG_MEWUI             (1 << 6)
-#define MENU_FLAG_MEWUI_HISTORY     (1 << 7)
-#define MENU_FLAG_MEWUI_SWLIST      (1 << 8)
-#define MENU_FLAG_MEWUI_FAVORITE    (1 << 9)
-#define MENU_FLAG_MEWUI_PALETTE     (1 << 10)
+#define MENU_FLAG_UI                (1 << 6)
+#define MENU_FLAG_UI_HISTORY        (1 << 7)
+#define MENU_FLAG_UI_SWLIST         (1 << 8)
+#define MENU_FLAG_UI_FAVORITE       (1 << 9)
+#define MENU_FLAG_UI_PALETTE        (1 << 10)
 
 // special menu item for separators
 #define MENU_SEPARATOR_ITEM         "---"
@@ -191,9 +191,6 @@ private:
 	static void clear_free_list(running_machine &machine);
 	static void render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 
-/*****************************************
-		MEWUI SECTION
-*****************************************/
 public:
 	int  visible_items;
 	bool ui_error;
@@ -217,7 +214,7 @@ public:
 	void draw_star(float x0, float y0);
 
 	// Global initialization
-	static void init_mewui(running_machine &machine);
+	static void init_ui(running_machine &machine);
 
 	// get arrows status
 	template <typename _T1, typename _T2, typename _T3>

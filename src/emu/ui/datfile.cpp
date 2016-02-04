@@ -4,7 +4,7 @@
 
     ui/datfile.cpp
 
-    MEWUI DATs manager.
+    UI DATs manager.
 
 ***************************************************************************/
 
@@ -215,29 +215,29 @@ void datfile_manager::load_data_info(const game_driver *drv, std::string &buffer
 
 	switch (type)
 	{
-		case MEWUI_HISTORY_LOAD:
+		case UI_HISTORY_LOAD:
 			filename = "history.dat";
 			tag = TAG_BIO;
 			index_idx = m_histidx;
 			break;
-		case MEWUI_MAMEINFO_LOAD:
+		case UI_MAMEINFO_LOAD:
 			filename = "mameinfo.dat";
 			tag = TAG_MAME;
 			index_idx = m_mameidx;
 			driver_idx = m_drvidx;
 			break;
-		case MEWUI_SYSINFO_LOAD:
+		case UI_SYSINFO_LOAD:
 			filename = "sysinfo.dat";
 			tag = TAG_BIO;
 			index_idx = m_sysidx;
 			break;
-		case MEWUI_MESSINFO_LOAD:
+		case UI_MESSINFO_LOAD:
 			filename = "messinfo.dat";
 			tag = TAG_MAME;
 			index_idx = m_messidx;
 			driver_idx = m_messdrvidx;
 			break;
-		case MEWUI_STORY_LOAD:
+		case UI_STORY_LOAD:
 			filename = "story.dat";
 			tag = TAG_STORY;
 			index_idx = m_storyidx;
@@ -253,7 +253,7 @@ void datfile_manager::load_data_info(const game_driver *drv, std::string &buffer
 			load_driver_text(drv, buffer, driver_idx, TAG_DRIVER);
 
 		// cleanup mameinfo and sysinfo double line spacing
-		if (tag == TAG_MAME || type == MEWUI_SYSINFO_LOAD)
+		if (tag == TAG_MAME || type == UI_SYSINFO_LOAD)
 			strreplace(buffer, "\n\n", "\n");
 
 		parseclose();

@@ -1016,7 +1016,7 @@ ui_menu_palette_sel::~ui_menu_palette_sel()
 void ui_menu_palette_sel::handle()
 {
 	// process the menu
-	const ui_menu_event *m_event = process(MENU_FLAG_MEWUI_PALETTE);
+	const ui_menu_event *m_event = process(MENU_FLAG_UI_PALETTE);
 	if (m_event != nullptr && m_event->itemref != nullptr)
 	{
 		if (m_event->iptkey == IPT_UI_SELECT)
@@ -1035,7 +1035,7 @@ void ui_menu_palette_sel::handle()
 void ui_menu_palette_sel::populate()
 {
 	for (int x = 0; x < ARRAY_LENGTH(m_palette); ++x)
-		item_append(m_palette[x].name, m_palette[x].argb, MENU_FLAG_MEWUI_PALETTE, (void *)(FPTR)(x + 1));
+		item_append(m_palette[x].name, m_palette[x].argb, MENU_FLAG_UI_PALETTE, (void *)(FPTR)(x + 1));
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 }

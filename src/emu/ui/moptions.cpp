@@ -4,7 +4,7 @@
 
     ui/moptions.c
 
-    MEWUI main options manager.
+    UI main options manager.
 
 ***************************************************************************/
 
@@ -13,13 +13,13 @@
 
 
 //**************************************************************************
-//  MEWUI EXTRA OPTIONS
+//  UI EXTRA OPTIONS
 //**************************************************************************
 
 const options_entry ui_options::s_option_entries[] =
 {
 	// seach path options
-	{ nullptr,                              nullptr,			OPTION_HEADER,  "MEWUI SEARCH PATH OPTIONS" },
+	{ nullptr,                              nullptr,			OPTION_HEADER,  "UI SEARCH PATH OPTIONS" },
 	{ OPTION_HISTORY_PATH,					"history;dats",		OPTION_STRING,  "path to history files" },
 	{ OPTION_EXTRAINI_PATH,					"folders",			OPTION_STRING,  "path to extra ini files" },
 	{ OPTION_CABINETS_PATH,					"cabinets;cabdevs",	OPTION_STRING,  "path to cabinets / devices image" },
@@ -38,10 +38,10 @@ const options_entry ui_options::s_option_entries[] =
 	{ OPTION_HOWTO_PATH,					"howto",			OPTION_STRING,  "path to howto image" },
 	{ OPTION_SELECT_PATH,					"select",			OPTION_STRING,  "path to select image" },
 	{ OPTION_ICONS_PATH,					"icons",			OPTION_STRING,  "path to ICOns image" },
-	{ OPTION_MEWUI_PATH,					"mewui",			OPTION_STRING,  "path to MEWUI files" },
+	{ OPTION_UI_PATH,	   				    "ui",			    OPTION_STRING,  "path to UI files" },
 
 	// misc options
-	{ nullptr,                              nullptr,	OPTION_HEADER,		"MEWUI MISC OPTIONS" },
+	{ nullptr,                              nullptr,	OPTION_HEADER,		"UI MISC OPTIONS" },
 	{ OPTION_DATS_ENABLED,                  "1",		OPTION_BOOLEAN,		"enable DATs support" },
 	{ OPTION_REMEMBER_LAST,                 "1",		OPTION_BOOLEAN,		"reselect in main menu last played game" },
 	{ OPTION_ENLARGE_SNAPS,                 "1",		OPTION_BOOLEAN,		"enlarge arts (snapshot, title, etc...) in right panel (keeping aspect ratio)" },
@@ -54,7 +54,7 @@ const options_entry ui_options::s_option_entries[] =
 	{ OPTION_INFO_AUTO_AUDIT,               "0",		OPTION_BOOLEAN,		"enable auto audit in the general info panel" },
 
 	// UI options
-	{ nullptr,                              nullptr,		OPTION_HEADER,		"MEWUI UI OPTIONS" },
+	{ nullptr,                              nullptr,		OPTION_HEADER,		"UI UI OPTIONS" },
 	{ OPTION_INFOS_SIZE "(0.05-1.00)",      "0.75",			OPTION_FLOAT,		"UI right panel infos text size (0.05 - 1.00)" },
 	{ OPTION_FONT_ROWS "(25-40)",           "30",			OPTION_INTEGER,		"UI font text size (25 - 40)" },
 	{ OPTION_HIDE_PANELS "(0-3)",           "0",			OPTION_INTEGER,		"UI hide left/right panel in main view (0 = Show all, 1 = hide left, 2 = hide right, 3 = hide both" },

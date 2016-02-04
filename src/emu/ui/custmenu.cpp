@@ -272,7 +272,7 @@ void ui_menu_custom_filter::custom_render(void *selectedref, float top, float bo
 void ui_menu_custom_filter::save_custom_filters()
 {
 	// attempt to open the output file
-	emu_file file(machine().options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == FILERR_NONE)
 	{
 		// generate custom filters info
@@ -338,7 +338,7 @@ void ui_menu_swcustom_filter::handle()
 				if (m_event->iptkey == IPT_UI_SELECT)
 				{
 					sw_custfltr::numother++;
-					sw_custfltr::other[sw_custfltr::numother] = MEWUI_SW_UNAVAILABLE + 1;
+					sw_custfltr::other[sw_custfltr::numother] = UI_SW_UNAVAILABLE + 1;
 					m_added = true;
 				}
 				break;
@@ -346,7 +346,7 @@ void ui_menu_swcustom_filter::handle()
 			case REMOVE_FILTER:
 				if (m_event->iptkey == IPT_UI_SELECT)
 				{
-					sw_custfltr::other[sw_custfltr::numother] = MEWUI_SW_UNAVAILABLE + 1;
+					sw_custfltr::other[sw_custfltr::numother] = UI_SW_UNAVAILABLE + 1;
 					sw_custfltr::numother--;
 					changed = true;
 				}
@@ -356,12 +356,12 @@ void ui_menu_swcustom_filter::handle()
 		if ((FPTR)m_event->itemref >= OTHER_FILTER && (FPTR)m_event->itemref < OTHER_FILTER + MAX_CUST_FILTER)
 		{
 			int pos = (int)((FPTR)m_event->itemref - OTHER_FILTER);
-			if (m_event->iptkey == IPT_UI_LEFT && sw_custfltr::other[pos] > MEWUI_SW_UNAVAILABLE + 1)
+			if (m_event->iptkey == IPT_UI_LEFT && sw_custfltr::other[pos] > UI_SW_UNAVAILABLE + 1)
 			{
 				sw_custfltr::other[pos]--;
 				changed = true;
 			}
-			else if (m_event->iptkey == IPT_UI_RIGHT && sw_custfltr::other[pos] < MEWUI_SW_LAST - 1)
+			else if (m_event->iptkey == IPT_UI_RIGHT && sw_custfltr::other[pos] < UI_SW_LAST - 1)
 			{
 				sw_custfltr::other[pos]++;
 				changed = true;
@@ -371,7 +371,7 @@ void ui_menu_swcustom_filter::handle()
 				size_t total = sw_filters::length;
 				std::vector<std::string> s_sel(total);
 				for (size_t index = 0; index < total; ++index)
-					if (index <= MEWUI_SW_UNAVAILABLE|| index == MEWUI_SW_CUSTOM)
+					if (index <= UI_SW_UNAVAILABLE|| index == UI_SW_CUSTOM)
 						s_sel[index] = "_skip_";
 					else
 						s_sel[index] = sw_filters::text[index];
@@ -473,7 +473,7 @@ void ui_menu_swcustom_filter::handle()
 void ui_menu_swcustom_filter::populate()
 {
 	// add main filter
-	UINT32 arrow_flags = get_arrow_flags((int)MEWUI_SW_ALL, (int)MEWUI_SW_UNAVAILABLE, sw_custfltr::main);
+	UINT32 arrow_flags = get_arrow_flags((int)UI_SW_ALL, (int)UI_SW_UNAVAILABLE, sw_custfltr::main);
 	item_append("Main filter", sw_filters::text[sw_custfltr::main], arrow_flags, (void *)(FPTR)MAIN_FILTER);
 
 	// add other filters
@@ -482,14 +482,14 @@ void ui_menu_swcustom_filter::populate()
 		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 
 		// add filter items
-		arrow_flags = get_arrow_flags((int)MEWUI_SW_UNAVAILABLE + 1, (int)MEWUI_SW_LAST - 1, sw_custfltr::other[x]);
+		arrow_flags = get_arrow_flags((int)UI_SW_UNAVAILABLE + 1, (int)UI_SW_LAST - 1, sw_custfltr::other[x]);
 		item_append("Other filter", sw_filters::text[sw_custfltr::other[x]], arrow_flags, (void *)(FPTR)(OTHER_FILTER + x));
 
 		if (m_added)
 			selected = item.size() - 2;
 
 		// add publisher subitem
-		if (sw_custfltr::other[x] == MEWUI_SW_PUBLISHERS && m_filter.publisher.ui.size() > 0)
+		if (sw_custfltr::other[x] == UI_SW_PUBLISHERS && m_filter.publisher.ui.size() > 0)
 		{
 			arrow_flags = get_arrow_flags(0, m_filter.publisher.ui.size() - 1, sw_custfltr::mnfct[x]);
 			std::string fbuff("^!Publisher");
@@ -498,7 +498,7 @@ void ui_menu_swcustom_filter::populate()
 		}
 
 		// add year subitem
-		else if (sw_custfltr::other[x] == MEWUI_SW_YEARS && m_filter.year.ui.size() > 0)
+		else if (sw_custfltr::other[x] == UI_SW_YEARS && m_filter.year.ui.size() > 0)
 		{
 			arrow_flags = get_arrow_flags(0, m_filter.year.ui.size() - 1, sw_custfltr::year[x]);
 			std::string fbuff("^!Year");
@@ -507,7 +507,7 @@ void ui_menu_swcustom_filter::populate()
 		}
 
 		// add year subitem
-		else if (sw_custfltr::other[x] == MEWUI_SW_LIST && m_filter.swlist.name.size() > 0)
+		else if (sw_custfltr::other[x] == UI_SW_LIST && m_filter.swlist.name.size() > 0)
 		{
 			arrow_flags = get_arrow_flags(0, m_filter.swlist.name.size() - 1, sw_custfltr::list[x]);
 			std::string fbuff("^!Software List");
@@ -516,7 +516,7 @@ void ui_menu_swcustom_filter::populate()
 		}
 
 		// add device type subitem
-		else if (sw_custfltr::other[x] == MEWUI_SW_TYPE && m_filter.type.ui.size() > 0)
+		else if (sw_custfltr::other[x] == UI_SW_TYPE && m_filter.type.ui.size() > 0)
 		{
 			arrow_flags = get_arrow_flags(0, m_filter.type.ui.size() - 1, sw_custfltr::type[x]);
 			std::string fbuff("^!Device type");
@@ -525,7 +525,7 @@ void ui_menu_swcustom_filter::populate()
 		}
 
 		// add region subitem
-		else if (sw_custfltr::other[x] == MEWUI_SW_REGION && m_filter.region.ui.size() > 0)
+		else if (sw_custfltr::other[x] == UI_SW_REGION && m_filter.region.ui.size() > 0)
 		{
 			arrow_flags = get_arrow_flags(0, m_filter.region.ui.size() - 1, sw_custfltr::region[x]);
 			std::string fbuff("^!Region");
@@ -587,7 +587,7 @@ void ui_menu_swcustom_filter::custom_render(void *selectedref, float top, float 
 void ui_menu_swcustom_filter::save_sw_custom_filters()
 {
 	// attempt to open the output file
-	emu_file file(machine().options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (file.open("custom_", m_driver->name, "_filter.ini") == FILERR_NONE)
 	{
 		// generate custom filters info
@@ -598,15 +598,15 @@ void ui_menu_swcustom_filter::save_sw_custom_filters()
 		for (int x = 1; x <= sw_custfltr::numother; x++)
 		{
 			cinfo.append("Other filter = ").append(sw_filters::text[sw_custfltr::other[x]]).append("\n");
-			if (sw_custfltr::other[x] == MEWUI_SW_PUBLISHERS)
+			if (sw_custfltr::other[x] == UI_SW_PUBLISHERS)
 				cinfo.append("  Manufacturer filter = ").append(m_filter.publisher.ui[sw_custfltr::mnfct[x]]).append("\n");
-			else if (sw_custfltr::other[x] == MEWUI_SW_LIST)
+			else if (sw_custfltr::other[x] == UI_SW_LIST)
 				cinfo.append("  Software List filter = ").append(m_filter.swlist.name[sw_custfltr::list[x]]).append("\n");
-			else if (sw_custfltr::other[x] == MEWUI_SW_YEARS)
+			else if (sw_custfltr::other[x] == UI_SW_YEARS)
 				cinfo.append("  Year filter = ").append(m_filter.year.ui[sw_custfltr::year[x]]).append("\n");
-			else if (sw_custfltr::other[x] == MEWUI_SW_TYPE)
+			else if (sw_custfltr::other[x] == UI_SW_TYPE)
 				cinfo.append("  Type filter = ").append(m_filter.type.ui[sw_custfltr::type[x]]).append("\n");
-			else if (sw_custfltr::other[x] == MEWUI_SW_REGION)
+			else if (sw_custfltr::other[x] == UI_SW_REGION)
 				cinfo.append("  Region filter = ").append(m_filter.region.ui[sw_custfltr::region[x]]).append("\n");
 		}
 		file.puts(cinfo.c_str());

@@ -4,7 +4,7 @@
 
     ui/dsplmenu.h
 
-    MEWUI video options menu.
+    UI video options menu.
 
 ***************************************************************************/
 

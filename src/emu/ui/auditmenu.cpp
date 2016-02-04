@@ -15,7 +15,7 @@
 #include "ui/auditmenu.h"
 #include <algorithm>
 
-extern const char MEWUI_VERSION_TAG[];
+extern const char UI_VERSION_TAG[];
 
 //-------------------------------------------------
 //  sort
@@ -173,11 +173,11 @@ void ui_menu_audit::populate()
 void ui_menu_audit::save_available_machines()
 {
 	// attempt to open the output file
-	emu_file file(machine().options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (file.open(emulator_info::get_configname(), "_avail.ini") == FILERR_NONE)
 	{
 		// generate header
-		std::string buffer = std::string("#\n").append(MEWUI_VERSION_TAG).append(bare_build_version).append("\n#\n\n");
+		std::string buffer = std::string("#\n").append(UI_VERSION_TAG).append(bare_build_version).append("\n#\n\n");
 		strcatprintf(buffer, "%d\n", (int)m_availablesorted.size());
 		strcatprintf(buffer, "%d\n", (int)m_unavailablesorted.size());
 

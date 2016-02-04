@@ -370,8 +370,6 @@ enum ioport_type
 		IPT_UI_LOAD_STATE,
 		IPT_UI_TAPE_START,
 		IPT_UI_TAPE_STOP,
-
-		// additional MEWUI options
 		IPT_UI_HISTORY,
 		IPT_UI_MAMEINFO,
 		IPT_UI_COMMAND,

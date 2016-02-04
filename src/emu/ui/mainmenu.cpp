@@ -296,18 +296,18 @@ void ui_menu_main::handle()
 			break;
 
 		case HISTORY:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, MEWUI_HISTORY_LOAD));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_HISTORY_LOAD));
 			break;
 
 		case MAMEINFO:
 			if ((machine().system().flags & MACHINE_TYPE_ARCADE) != 0)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, MEWUI_MAMEINFO_LOAD));
+				ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_MAMEINFO_LOAD));
 			else
-				ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, MEWUI_MESSINFO_LOAD));
+				ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_MESSINFO_LOAD));
 			break;
 
 		case SYSINFO:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, MEWUI_SYSINFO_LOAD));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_SYSINFO_LOAD));
 			break;
 
 		case COMMAND:
@@ -315,7 +315,7 @@ void ui_menu_main::handle()
 			break;
 
 		case STORYINFO:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, MEWUI_STORY_LOAD));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_STORY_LOAD));
 			break;
 
 		case ADD_FAVORITE:
