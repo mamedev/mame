@@ -120,7 +120,9 @@ protected:
 	required_ioport m_io_dswb;
 	required_ioport m_io_dswc;
 	required_device<palette_device> m_palette;
-
+	void z80_wait_assert_cb();
+	TIMER_CALLBACK_MEMBER( z80_wait_ack_cb );
+	
 	UINT8 nightgal_gfx_nibble( int niboffset );
 	void plot_nightgal_gfx_pixel( UINT8 pix, int x, int y );
 };
@@ -420,13 +422,29 @@ READ8_MEMBER(nightgal_state::royalqn_nsc_blit_r)
 	return m_blit_raw_data[offset];
 }
 
+TIMER_CALLBACK_MEMBER(nightgal_state::z80_wait_ack_cb)
+{
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+}
+
+void nightgal_state::z80_wait_assert_cb()
+{
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+	
+	// Note: cycles_to_attotime requires z80 context to work, calling for example m_subcpu as context gives a x4 cycle boost in z80 terms (reads execute_cycles_to_clocks() from NCS?) even if they runs at same speed basically.
+	// TODO: needs a getter that tells a given CPU how many cycles requires an executing opcode for the r/w operation, which stacks with wait state penalty for accessing this specific area.
+	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(4), timer_expired_delegate(FUNC(nightgal_state::z80_wait_ack_cb),this));	
+}
+
 READ8_MEMBER(nightgal_state::royalqn_comm_r)
 {
+	z80_wait_assert_cb();
 	return (m_comms_ram[offset] & 0x80) | (0x7f); //bits 6-0 are undefined, presumably open bus
 }
 
 WRITE8_MEMBER(nightgal_state::royalqn_comm_w)
 {
+	z80_wait_assert_cb();
 	m_comms_ram[offset] = data & 0x80;
 }
 
@@ -892,7 +910,6 @@ static MACHINE_CONFIG_START( royalqn, nightgal_state )
 	MCFG_CPU_PROGRAM_MAP(royalqn_nsc_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-
 
 	/* video hardware */
 	/* TODO: blitter clock is MASTER_CLOCK / 4, 320 x 264 pixels, 256 x 224 of visible area */

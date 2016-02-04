@@ -113,6 +113,10 @@
 
 #define VERBOSE             0
 
+/* Debug purpose: set to 1 to test /WAIT pin behaviour.
+ */
+#define STALLS_ON_WAIT_ASSERT 0
+
 /* On an NMOS Z80, if LD A,I or LD A,R is interrupted, P/V flag gets reset,
    even if IFF2 was set before this instruction. This issue was fixed on
    the CMOS Z80, so until knowing (most) Z80 types on hardware, it's disabled */
@@ -3478,6 +3482,7 @@ void nsc800_device::device_reset()
  ****************************************************************************/
 void z80_device::execute_run()
 {
+	
 	/* check for NMIs on the way in; they can only be set externally */
 	/* via timers, and can't be dynamically enabled, so it is safe */
 	/* to just check here */
@@ -3518,7 +3523,24 @@ void z80_device::execute_run()
 		PRVPC = PCD;
 		debugger_instruction_hook(this, PCD);
 		m_r++;
+#if STALLS_ON_WAIT_ASSERT
+		static int test_cycles;
+		
+		if(m_wait_state == ASSERT_LINE)
+		{
+			m_icount --;
+			test_cycles ++;
+		}
+		else
+		{
+			if(test_cycles != 0)
+				printf("stalls for %d z80 cycles\n",test_cycles);
+			test_cycles = 0;
+			EXEC(op,rop());
+		}
+#else
 		EXEC(op,rop());
+#endif
 	} while (m_icount > 0);
 }
 
