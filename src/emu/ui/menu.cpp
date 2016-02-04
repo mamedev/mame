@@ -1950,12 +1950,6 @@ void ui_menu::handle_main_events(UINT32 flags)
 					selected = visible_items + 2;
 					stop = true;
 				}
-				else if (hover >= HOVER_MAME_ALL && hover <= HOVER_MAME_SYSTEMS)
-				{
-					ume_filters::actual = (HOVER_MAME_ALL - hover) * (-1);
-					menu_event.iptkey = IPT_OTHER;
-					stop = true;
-				}
 				else if (hover >= HOVER_RP_FIRST && hover <= HOVER_RP_LAST)
 				{
 					ui_globals::rpanel = (HOVER_RP_FIRST - hover) * (-1);
@@ -2026,65 +2020,6 @@ void ui_menu::handle_main_events(UINT32 flags)
 		default:
 			break;
 		}
-	}
-}
-
-//-------------------------------------------------
-//  draw UME box
-//-------------------------------------------------
-
-void ui_menu::draw_ume_box(float x1, float y1, float x2, float y2)
-{
-	float text_size = 0.65f;
-	ui_manager &mui = machine().ui();
-	float line_height = mui.get_line_height() * text_size;
-	float maxwidth = 0.0f;
-
-	for (int x = 0; x < ume_filters::length; x++)
-	{
-		float width;
-		// compute width of left hand side
-		mui.draw_text_full(container, ume_filters::text[x], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-			DRAW_NONE, UI_TEXT_COLOR, ARGB_BLACK, &width, nullptr, text_size);
-		width += 2 * UI_BOX_LR_BORDER;
-		maxwidth = MAX(maxwidth, width);
-	}
-
-	x2 = x1 + maxwidth;
-
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-	y2 -= UI_BOX_TB_BORDER;
-
-	for (int filter = 0; filter < ume_filters::length; filter++)
-	{
-		rgb_t bgcolor = UI_TEXT_BG_COLOR;
-		rgb_t fgcolor = UI_TEXT_COLOR;
-
-		if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y1 + line_height > mouse_y)
-		{
-			bgcolor = UI_MOUSEOVER_BG_COLOR;
-			fgcolor = UI_MOUSEOVER_COLOR;
-			hover = HOVER_MAME_ALL + filter;
-		}
-
-		if (ume_filters::actual == filter)
-		{
-			bgcolor = UI_SELECTED_BG_COLOR;
-			fgcolor = UI_SELECTED_COLOR;
-		}
-
-		if (bgcolor != UI_TEXT_BG_COLOR)
-			container->add_rect(x1, y1, x2, y1 + line_height, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
-
-		mui.draw_text_full(container, ume_filters::text[filter], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-			DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
-
-		y1 += line_height;
 	}
 }
 

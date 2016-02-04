@@ -173,7 +173,6 @@ ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_contai
 	ui_globals::curdats_view = MEWUI_FIRST_LOAD;
 	ui_globals::switch_image = false;
 	ui_globals::default_image = true;
-	ume_filters::actual = moptions.start_filter();
 	ui_globals::panels_status = moptions.hide_panels();
 }
 
@@ -206,7 +205,6 @@ ui_menu_select_game::~ui_menu_select_game()
 	else if (main_filters::actual == FILTER_SCREEN)
 		filter.append(",").append(screen_filters::text[screen_filters::actual]);
 
-	mopt.set_value(OPTION_START_FILTER, ume_filters::actual, OPTION_PRIORITY_CMDLINE, error_string);
 	mopt.set_value(OPTION_LAST_USED_FILTER, filter.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 	mopt.set_value(OPTION_LAST_USED_MACHINE, last_driver.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 	mopt.set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE, error_string);
@@ -755,13 +753,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	ui_manager &mui = machine().ui();
 	float tbarspace = mui.get_line_height();
 
-	if (ume_filters::actual == MEWUI_MAME)
-		strprintf(tempbuf[0], "MAME %s ( %d / %d machines (%d BIOS) )", bare_build_version, visible_items, (driver_list::total() - 1), m_isabios + m_issbios);
-	else if (ume_filters::actual == MEWUI_ARCADES)
-		strprintf(tempbuf[0], "MAME %s ( %d / %d arcades (%d BIOS) )", bare_build_version, visible_items, m_isarcades, m_isabios);
-	else if (ume_filters::actual == MEWUI_SYSTEMS)
-		strprintf(tempbuf[0], "MAME %s ( %d / %d systems (%d BIOS) )", bare_build_version, visible_items, m_issystems, m_issbios);
-
+	strprintf(tempbuf[0], "MAME %s ( %d / %d machines (%d BIOS) )", bare_build_version, visible_items, (driver_list::total() - 1), m_isabios + m_issbios);	
 	std::string filtered;
 
 	if (main_filters::actual == FILTER_CATEGORY && !machine().inifile().ini_index.empty())
@@ -816,11 +808,6 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 			DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		y1 += mui.get_line_height();
 	}
-
-	// draw ume box
-	x1 -= UI_BOX_LR_BORDER;
-	y1 = origy1 - top;
-	draw_ume_box(x1, y1, x2, y2);
 
 	// determine the text to render below
 	if (main_filters::actual != FILTER_FAVORITE_GAME)
@@ -1235,12 +1222,6 @@ void ui_menu_select_game::build_list(std::vector<const game_driver *> &s_drivers
 		if (!bioscheck && filter != FILTER_BIOS && (s_driver->flags & MACHINE_IS_BIOS_ROOT) != 0)
 			continue;
 
-		if ((s_driver->flags & MACHINE_TYPE_ARCADE) && ume_filters::actual == MEWUI_SYSTEMS)
-			continue;
-
-		if (!(s_driver->flags & MACHINE_TYPE_ARCADE) && ume_filters::actual == MEWUI_ARCADES)
-			continue;
-
 		switch (filter)
 		{
 			case FILTER_ALL:
@@ -1344,12 +1325,6 @@ void ui_menu_select_game::build_custom()
 
 	for (auto & elem : s_drivers)
 	{
-		if ((elem->flags & MACHINE_TYPE_ARCADE) && ume_filters::actual == MEWUI_SYSTEMS)
-			continue;
-
-		if (!(elem->flags & MACHINE_TYPE_ARCADE) && ume_filters::actual == MEWUI_ARCADES)
-			continue;
-
 		m_displaylist.push_back(elem);
 	}
 
@@ -1423,13 +1398,6 @@ void ui_menu_select_game::build_from_cache(std::vector<const game_driver *> &s_d
 	{
 		if (!bioscheck && filter != FILTER_BIOS && (s_driver->flags & MACHINE_IS_BIOS_ROOT) != 0)
 			continue;
-
-		if ((s_driver->flags & MACHINE_TYPE_ARCADE) && ume_filters::actual == MEWUI_SYSTEMS)
-			continue;
-
-		if (!(s_driver->flags & MACHINE_TYPE_ARCADE) && ume_filters::actual == MEWUI_ARCADES)
-			continue;
-
 		int idx = driver_list::find(s_driver->name);
 
 		switch (filter)

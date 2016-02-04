@@ -204,9 +204,6 @@ public:
 	INT32 mouse_target_x, mouse_target_y;
 	float mouse_x, mouse_y;
 
-	// draw UME box
-	void draw_ume_box(float x1, float y1, float x2, float y2);
-
 	// draw toolbar
 	void draw_toolbar(float x1, float y1, float x2, float y2, bool software = false);
 

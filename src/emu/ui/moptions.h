@@ -44,7 +44,6 @@
 #define OPTION_USE_BACKGROUND         "use_background"
 #define OPTION_SKIP_BIOS_MENU         "skip_biosmenu"
 #define OPTION_SKIP_PARTS_MENU        "skip_partsmenu"
-#define OPTION_START_FILTER           "start_filter"
 #define OPTION_LAST_USED_FILTER       "last_used_filter"
 #define OPTION_LAST_USED_MACHINE      "last_used_machine"
 #define OPTION_INFO_AUTO_AUDIT        "info_audit_enabled"
@@ -106,7 +105,6 @@ public:
 	bool use_background_image() const { return bool_value(OPTION_USE_BACKGROUND); }
 	bool skip_bios_menu() const { return bool_value(OPTION_SKIP_BIOS_MENU); }
 	bool skip_parts_menu() const { return bool_value(OPTION_SKIP_PARTS_MENU); }
-	int start_filter() const { return int_value(OPTION_START_FILTER); }
 	const char *last_used_machine() const { return value(OPTION_LAST_USED_MACHINE); }
 	const char *last_used_filter() const { return value(OPTION_LAST_USED_FILTER); }
 	bool info_audit() const { return bool_value(OPTION_INFO_AUTO_AUDIT); }

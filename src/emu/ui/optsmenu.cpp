@@ -205,24 +205,6 @@ void ui_menu_game_options::handle()
 				if (m_event->iptkey == IPT_UI_SELECT)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_custom_filter>(machine(), container));
 				break;
-
-			case UME_SYSTEM:
-				if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT)
-				{
-					(m_event->iptkey == IPT_UI_RIGHT) ? ume_filters::actual++ : ume_filters::actual--;
-					changed = true;
-				}
-				else if (m_event->iptkey == IPT_UI_SELECT)
-				{
-					int total = ume_filters::length;
-					std::vector<std::string> s_sel(total);
-					for (int index = 0; index < total; ++index)
-						s_sel[index] = ume_filters::text[index];
-
-					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, ume_filters::actual));
-				}
-
-				break;
 		}
 
 	if (changed)
@@ -239,11 +221,7 @@ void ui_menu_game_options::populate()
 	std::string fbuff;
 
 	// add filter item
-	UINT32 arrow_flags = get_arrow_flags(0, ume_filters::length - 1, ume_filters::actual);
-	item_append("Machine", ume_filters::text[ume_filters::actual], arrow_flags, (void *)(FPTR)UME_SYSTEM);
-
-	// add filter item
-	arrow_flags = get_arrow_flags((int)FILTER_FIRST, (int)FILTER_LAST, main_filters::actual);
+	UINT32 arrow_flags = get_arrow_flags((int)FILTER_FIRST, (int)FILTER_LAST, main_filters::actual);
 	item_append("Filter", main_filters::text[main_filters::actual], arrow_flags, (void *)(FPTR)FILTER_MENU);
 
 	// add category subitem

@@ -42,11 +42,6 @@ UINT16 screen_filters::actual = 0;
 const char *screen_filters::text[] = { "<none>", "Raster", "Vector", "LCD" };
 size_t screen_filters::length = ARRAY_LENGTH(screen_filters::text);
 
-// UME
-UINT16 ume_filters::actual = 0;
-const char *ume_filters::text[] = { "ALL", "ARCADES", "SYSTEMS" };
-size_t ume_filters::length = ARRAY_LENGTH(ume_filters::text);
-
 // Globals
 UINT8 ui_globals::rpanel = 0;
 UINT8 ui_globals::curimage_view = 0;

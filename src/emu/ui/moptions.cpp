@@ -49,7 +49,6 @@ const options_entry ui_options::s_option_entries[] =
 	{ OPTION_USE_BACKGROUND,                "1",		OPTION_BOOLEAN,		"enable background image in main view" },
 	{ OPTION_SKIP_BIOS_MENU,                "0",		OPTION_BOOLEAN,		"skip bios submenu, start with configured or default" },
 	{ OPTION_SKIP_PARTS_MENU,               "0",		OPTION_BOOLEAN,		"skip parts submenu, start with first part" },
-	{ OPTION_START_FILTER,                  "0",		OPTION_INTEGER,		"startup filter (0 = ALL, 1 = ARCADES, 2 = SYSTEMS)" },
 	{ OPTION_LAST_USED_FILTER,              "",			OPTION_STRING,		"latest used filter" },
 	{ OPTION_LAST_USED_MACHINE,             "",			OPTION_STRING,		"latest used machine" },
 	{ OPTION_INFO_AUTO_AUDIT,               "0",		OPTION_BOOLEAN,		"enable auto audit in the general info panel" },
