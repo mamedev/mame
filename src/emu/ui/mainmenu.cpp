@@ -185,12 +185,12 @@ void ui_menu_main::populate()
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 
-	menu_text.assign("Quit from ").append(emulator_info::get_capstartgamenoun());
-	item_append(menu_text.c_str(), nullptr, 0, (void *)QUIT_GAME);
+//	menu_text.assign("Quit from ").append(emulator_info::get_capstartgamenoun());
+//	item_append(menu_text.c_str(), nullptr, 0, (void *)QUIT_GAME);
 
 	/* add reset and exit menus */
-//	strprintf(menu_text, "Select New %s", emulator_info::get_capstartgamenoun());
-//	item_append(menu_text.c_str(), nullptr, 0, (void *)SELECT_GAME);
+	strprintf(menu_text, "Select New %s", emulator_info::get_capstartgamenoun());
+	item_append(menu_text.c_str(), nullptr, 0, (void *)SELECT_GAME);
 }
 
 ui_menu_main::~ui_menu_main()
@@ -283,9 +283,9 @@ void ui_menu_main::handle()
 			ui_menu::stack_push(global_alloc_clear<ui_menu_cheat>(machine(), container));
 			break;
 
-//		case SELECT_GAME:
-//			ui_menu::stack_push(global_alloc_clear<ui_menu_select_game>(machine(), container, nullptr));
-//			break;
+		case SELECT_GAME:
+			ui_menu::stack_push(global_alloc_clear<ui_menu_select_game>(machine(), container, nullptr));
+			break;
 
 		case BIOS_SELECTION:
 			ui_menu::stack_push(global_alloc_clear<ui_menu_bios_selection>(machine(), container));
