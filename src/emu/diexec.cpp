@@ -46,7 +46,6 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 		m_disabled(false),
 		m_vblank_interrupt_screen(nullptr),
 		m_timed_interrupt_period(attotime::zero),
-		m_is_octal(false),
 		m_nextexec(nullptr),
 		m_timedint_timer(nullptr),
 		m_profiler(PROFILER_IDLE),

@@ -673,15 +673,10 @@ private:
 	{
 		if (m_space.log_unmap() && !m_space.debugger_access())
 		{
-			device_execute_interface *intf;
-			bool is_octal = false;
-			if (m_space.device().interface(intf))
-				is_octal = intf->is_octal();
-
 			m_space.device().logerror("%s: unmapped %s memory read from %s & %s\n",
 						m_space.machine().describe_context(), m_space.name(),
-						core_i64_format(m_space.byte_to_address(offset * sizeof(_UintType)), m_space.addrchars(),is_octal),
-						core_i64_format(mask, 2 * sizeof(_UintType),is_octal));
+						core_i64_format(m_space.byte_to_address(offset * sizeof(_UintType)), m_space.addrchars(),m_space.is_octal()),
+						core_i64_format(mask, 2 * sizeof(_UintType),m_space.is_octal()));
 		}
 		return m_space.unmap();
 	}
@@ -746,16 +741,11 @@ private:
 	{
 		if (m_space.log_unmap() && !m_space.debugger_access())
 		{
-			device_execute_interface *intf;
-			bool is_octal = false;
-			if (m_space.device().interface(intf))
-				is_octal = intf->is_octal();
-
 			m_space.device().logerror("%s: unmapped %s memory write to %s = %s & %s\n",
 					m_space.machine().describe_context(), m_space.name(),
-					core_i64_format(m_space.byte_to_address(offset * sizeof(_UintType)), m_space.addrchars(),is_octal),
-					core_i64_format(data, 2 * sizeof(_UintType),is_octal),
-					core_i64_format(mask, 2 * sizeof(_UintType),is_octal));
+					core_i64_format(m_space.byte_to_address(offset * sizeof(_UintType)), m_space.addrchars(),m_space.is_octal()),
+					core_i64_format(data, 2 * sizeof(_UintType),m_space.is_octal()),
+					core_i64_format(mask, 2 * sizeof(_UintType),m_space.is_octal()));
 		}
 	}
 

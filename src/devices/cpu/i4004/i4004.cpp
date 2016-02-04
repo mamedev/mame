@@ -30,7 +30,9 @@ i4004_cpu_device::i4004_cpu_device(const machine_config &mconfig, const char *ta
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 6, 0)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 12, 0), m_A(0), m_C(0), m_TEST(0), m_flags(0), m_program(nullptr), m_direct(nullptr), m_data(nullptr), m_io(nullptr), m_icount(0), m_pc_pos(0), m_addr_mask(0)
 {
-	m_is_octal = true;
+	m_program_config.m_is_octal = true;
+	m_io_config.m_is_octal = true;
+	m_data_config.m_is_octal = true;
 }
 
 
