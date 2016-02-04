@@ -13,7 +13,7 @@
 #ifndef __UI_CUSTUI_H__
 #define __UI_CUSTUI_H__
 
-#ifdef OSD_WINDOWS
+#ifdef UI_WINDOWS
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
@@ -64,7 +64,7 @@ private:
 		MUI_ITALIC
 	};
 
-#ifdef OSD_WINDOWS
+#ifdef UI_WINDOWS
 	UINT16						m_actual;
 	std::vector<std::string>	m_fonts;
 	bool						m_bold, m_italic;

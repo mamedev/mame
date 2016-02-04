@@ -38,6 +38,18 @@ if _OPTIONS["with-bundled-lua"] then
 	}
 end
 
+if (_OPTIONS["targetos"] == "windows") then
+	defines {
+		"UI_WINDOWS",
+	}
+end
+
+if (_OPTIONS["osd"] == "sdl") then
+	defines {
+		"UI_SDL",
+	}
+end
+
 files {
 	MAME_DIR .. "src/emu/emu.h",
 	MAME_DIR .. "src/emu/gamedrv.h",

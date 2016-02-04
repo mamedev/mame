@@ -141,7 +141,7 @@ void ui_menu_custom_ui::custom_render(void *selectedref, float top, float bottom
 ui_menu_font_ui::ui_menu_font_ui(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
 	emu_options &moptions = machine.options();
-#ifdef OSD_WINDOWS
+#ifdef UI_WINDOWS
 
 	std::string name(moptions.ui_font());
 	list();
@@ -180,7 +180,7 @@ ui_menu_font_ui::ui_menu_font_ui(running_machine &machine, render_container *con
 
 }
 
-#ifdef OSD_WINDOWS
+#ifdef UI_WINDOWS
 //-------------------------------------------------
 //  fonts enumerator CALLBACK
 //-------------------------------------------------
@@ -227,7 +227,7 @@ ui_menu_font_ui::~ui_menu_font_ui()
 	std::string error_string;
 	emu_options &moptions = machine().options();
 
-#ifdef OSD_WINDOWS
+#ifdef UI_WINDOWS
 	std::string name(m_fonts[m_actual]);
 	if (m_fonts[m_actual] != "default")
 	{
@@ -273,7 +273,7 @@ void ui_menu_font_ui::handle()
 				}
 				break;
 
-#ifdef OSD_WINDOWS
+#ifdef UI_WINDOWS
 
 			case MUI_FNT:
 				if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT)
@@ -313,7 +313,7 @@ void ui_menu_font_ui::populate()
 	UINT32 arrow_flags;
 	std::string tmptxt;
 
-#ifdef OSD_WINDOWS
+#ifdef UI_WINDOWS
 	// add fonts option
 	arrow_flags = get_arrow_flags(0, m_fonts.size() - 1, m_actual);
 	std::string name(m_fonts[m_actual]);
