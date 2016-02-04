@@ -5144,6 +5144,7 @@ vmahjong        // 1997.02 Virtual Mahjong (Micronet)
 pclub2kc        // 1997.02 Print Club Kome Kome Club
 pclub2fc        // 1997.04 Print Club 2 Felix The Cat
 pclub2pe		//
+pclub2wb		//
 pclub2pf		//
 pclub26w		//
 pclub27s		//
@@ -5157,8 +5158,10 @@ pclub2          // 1997.09 Print Club 2
 thunt           // 1997.09 Puzzle & Action Treasure Hunt (Sega (Deniam License))
 thuntk
 winterht        // 1997.10 Winter Heat (Data East)
-pclb297w        // 1997.10 Print Club 2 '97 Winter Ver
-pclub298        // 1997.10 Print Club 2 '98 Spring Ver
+prc297wi        // 1997.10 Print Club 2 '97 Winter Ver
+prc297wia		//
+prc298sp        // 1997.10 Print Club 2 '98 Spring Ver
+prc298su		//
 pclove
 cotton2         // 1997.11 Cotton 2 (Success)
 hanagumi        // 1997.11 Sakura Taisen Hanagumi Taisen Columns
@@ -5176,7 +5179,7 @@ astrass         // 1998.06 Astra Super Stars (Sunsoft)
 myfairld        // 1998.07 My Fair Lady (Micronet)
 othellos        // 1998.07 Othello Shiyouyo (Success)
 pclubol         // 1998.07 Print Club Olive
-pclb298a        // 1998.08 Print Club 2 '98 Autumn Ver
+prc298au        // 1998.08 Print Club 2 '98 Autumn Ver
 cottonbm        // 1998.09 Cotton Boomerang (Success)
 stress          // 1998.10 Stress Busters
 elandore        // 1998.11 Touryuu Densetsu Elandore (Sai-Mate)
