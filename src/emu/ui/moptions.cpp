@@ -20,7 +20,7 @@ const options_entry ui_options::s_option_entries[] =
 {
 	// seach path options
 	{ nullptr,                              nullptr,			OPTION_HEADER,  "UI SEARCH PATH OPTIONS" },
-	{ OPTION_HISTORY_PATH,					"history;dats",		OPTION_STRING,  "path to history files" },
+	{ OPTION_HISTORY_PATH,					"history;dats;.",	OPTION_STRING,  "path to history files" },
 	{ OPTION_EXTRAINI_PATH,					"folders",			OPTION_STRING,  "path to extra ini files" },
 	{ OPTION_CABINETS_PATH,					"cabinets;cabdevs",	OPTION_STRING,  "path to cabinets / devices image" },
 	{ OPTION_CPANELS_PATH,					"cpanel",			OPTION_STRING,  "path to control panel image" },
