@@ -89,7 +89,7 @@ ui_menu_display_options::~ui_menu_display_options()
 		machine().options().set_value(m_options[d].option, m_options[d].status, OPTION_PRIORITY_CMDLINE, error_string);
 
 	machine().options().set_value(m_options[1].option, m_video[m_options[1].status].option, OPTION_PRIORITY_CMDLINE, error_string);
-	mewui_globals::reset = true;
+	ui_globals::reset = true;
 }
 
 //-------------------------------------------------

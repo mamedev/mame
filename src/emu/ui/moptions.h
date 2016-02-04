@@ -71,11 +71,11 @@
 #define OPTION_UI_DIPSW_COLOR         "ui_dipsw_color"
 #define OPTION_UI_SLIDER_COLOR        "ui_slider_color"
 
-class mewui_options : public core_options
+class ui_options : public core_options
 {
 public:
 	// construction/destruction
-	mewui_options();
+	ui_options();
 
 	// Search path options
 	const char *history_path() const { return value(OPTION_HISTORY_PATH); }

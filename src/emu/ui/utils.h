@@ -223,7 +223,7 @@ struct c_year
 };
 
 // GLOBAL CLASS
-struct mewui_globals
+struct ui_globals
 {
 	static UINT8        curimage_view, curdats_view, cur_sw_dats_view, rpanel;
 	static bool         switch_image, redraw_icon, default_image, reset;

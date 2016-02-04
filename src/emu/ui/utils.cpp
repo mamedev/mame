@@ -13,7 +13,7 @@
 #include <algorithm>
 
 extern const char MEWUI_VERSION_TAG[];
-const char MEWUI_VERSION_TAG[] = "# MEWUI INFO ";
+const char MEWUI_VERSION_TAG[] = "# UI INFO ";
 
 // Years index
 UINT16 c_year::actual = 0;
@@ -48,17 +48,17 @@ const char *ume_filters::text[] = { "ALL", "ARCADES", "SYSTEMS" };
 size_t ume_filters::length = ARRAY_LENGTH(ume_filters::text);
 
 // Globals
-UINT8 mewui_globals::rpanel = 0;
-UINT8 mewui_globals::curimage_view = 0;
-UINT8 mewui_globals::curdats_view = 0;
-UINT8 mewui_globals::cur_sw_dats_view = 0;
-bool mewui_globals::switch_image = false;
-bool mewui_globals::default_image = true;
-bool mewui_globals::reset = false;
-bool mewui_globals::redraw_icon = false;
-int mewui_globals::visible_main_lines = 0;
-int mewui_globals::visible_sw_lines = 0;
-UINT16 mewui_globals::panels_status = 0;
+UINT8 ui_globals::rpanel = 0;
+UINT8 ui_globals::curimage_view = 0;
+UINT8 ui_globals::curdats_view = 0;
+UINT8 ui_globals::cur_sw_dats_view = 0;
+bool ui_globals::switch_image = false;
+bool ui_globals::default_image = true;
+bool ui_globals::reset = false;
+bool ui_globals::redraw_icon = false;
+int ui_globals::visible_main_lines = 0;
+int ui_globals::visible_sw_lines = 0;
+UINT16 ui_globals::panels_status = 0;
 
 // Custom filter
 UINT16 custfltr::main = 0;

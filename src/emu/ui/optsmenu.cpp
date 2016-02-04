@@ -40,7 +40,7 @@ ui_menu_game_options::~ui_menu_game_options()
 {
 	ui_menu::menu_stack->reset(UI_MENU_RESET_SELECT_FIRST);
 	save_game_options(machine());
-	mewui_globals::switch_image = true;
+	ui_globals::switch_image = true;
 }
 
 //-------------------------------------------------

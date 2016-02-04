@@ -201,7 +201,7 @@ struct game_driver;
 class software_part;
 
 
-class emu_options : public mewui_options
+class emu_options : public ui_options
 {
 	static const UINT32 OPTION_FLAG_DEVICE = 0x80000000;
 

@@ -201,7 +201,7 @@ const options_entry emu_options::s_option_entries[] =
 //-------------------------------------------------
 
 emu_options::emu_options()
-: mewui_options()
+: ui_options()
 , m_coin_impulse(0)
 , m_joystick_contradictory(false)
 , m_sleep(true)

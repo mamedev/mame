@@ -587,7 +587,7 @@ ui_menu_misc_options::~ui_menu_misc_options()
 	std::string error_string;
 	for (int d = 1; d < ARRAY_LENGTH(m_options); ++d)
 		machine().options().set_value(m_options[d].option, m_options[d].status, OPTION_PRIORITY_CMDLINE, error_string);
-	mewui_globals::reset = true;
+	ui_globals::reset = true;
 }
 
 //-------------------------------------------------
@@ -607,7 +607,7 @@ void ui_menu_misc_options::handle()
 			changed = true;
 			int value = (FPTR)m_event->itemref;
 			if (!strcmp(m_options[value].option, OPTION_ENLARGE_SNAPS))
-				mewui_globals::switch_image = true;
+				ui_globals::switch_image = true;
 			m_options[value].status = !m_options[value].status;
 		}
 	}

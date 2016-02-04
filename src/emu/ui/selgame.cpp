@@ -169,12 +169,12 @@ ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_contai
 	moptions.set_value(OPTION_SNAPNAME, "%g/%i", OPTION_PRIORITY_CMDLINE, error_string);
 	moptions.set_value(OPTION_SOFTWARENAME, "", OPTION_PRIORITY_CMDLINE, error_string);
 
-	mewui_globals::curimage_view = FIRST_VIEW;
-	mewui_globals::curdats_view = MEWUI_FIRST_LOAD;
-	mewui_globals::switch_image = false;
-	mewui_globals::default_image = true;
+	ui_globals::curimage_view = FIRST_VIEW;
+	ui_globals::curdats_view = MEWUI_FIRST_LOAD;
+	ui_globals::switch_image = false;
+	ui_globals::default_image = true;
 	ume_filters::actual = moptions.start_filter();
-	mewui_globals::panels_status = moptions.hide_panels();
+	ui_globals::panels_status = moptions.hide_panels();
 }
 
 //-------------------------------------------------
@@ -209,7 +209,7 @@ ui_menu_select_game::~ui_menu_select_game()
 	mopt.set_value(OPTION_START_FILTER, ume_filters::actual, OPTION_PRIORITY_CMDLINE, error_string);
 	mopt.set_value(OPTION_LAST_USED_FILTER, filter.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 	mopt.set_value(OPTION_LAST_USED_MACHINE, last_driver.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-	mopt.set_value(OPTION_HIDE_PANELS, mewui_globals::panels_status, OPTION_PRIORITY_CMDLINE, error_string);
+	mopt.set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE, error_string);
 	save_game_options(machine());
 }
 
@@ -223,9 +223,9 @@ void ui_menu_select_game::handle()
 	bool enabled_dats = machine().options().enabled_dats();
 
 	// if i have to load datfile, performe an hard reset
-	if (mewui_globals::reset)
+	if (ui_globals::reset)
 	{
-		mewui_globals::reset = false;
+		ui_globals::reset = false;
 		machine().schedule_hard_reset();
 		ui_menu::stack_reset(machine());
 		return;
@@ -263,17 +263,17 @@ void ui_menu_select_game::handle()
 		else if (m_event->iptkey == IPT_UI_LEFT)
 		{
 			// Images
-			if (mewui_globals::rpanel == RP_IMAGES && mewui_globals::curimage_view > FIRST_VIEW)
+			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view > FIRST_VIEW)
 			{
-				mewui_globals::curimage_view--;
-				mewui_globals::switch_image = true;
-				mewui_globals::default_image = false;
+				ui_globals::curimage_view--;
+				ui_globals::switch_image = true;
+				ui_globals::default_image = false;
 			}
 
 			// Infos
-			else if (mewui_globals::rpanel == RP_INFOS && mewui_globals::curdats_view > MEWUI_FIRST_LOAD)
+			else if (ui_globals::rpanel == RP_INFOS && ui_globals::curdats_view > MEWUI_FIRST_LOAD)
 			{
-				mewui_globals::curdats_view--;
+				ui_globals::curdats_view--;
 				topline_datsview = 0;
 			}
 		}
@@ -282,17 +282,17 @@ void ui_menu_select_game::handle()
 		else if (m_event->iptkey == IPT_UI_RIGHT)
 		{
 			// Images
-			if (mewui_globals::rpanel == RP_IMAGES && mewui_globals::curimage_view < LAST_VIEW)
+			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view < LAST_VIEW)
 			{
-				mewui_globals::curimage_view++;
-				mewui_globals::switch_image = true;
-				mewui_globals::default_image = false;
+				ui_globals::curimage_view++;
+				ui_globals::switch_image = true;
+				ui_globals::default_image = false;
 			}
 
 			// Infos
-			else if (mewui_globals::rpanel == RP_INFOS && mewui_globals::curdats_view < MEWUI_LAST_LOAD)
+			else if (ui_globals::rpanel == RP_INFOS && ui_globals::curdats_view < MEWUI_LAST_LOAD)
 			{
-				mewui_globals::curdats_view++;
+				ui_globals::curdats_view++;
 				topline_datsview = 0;
 			}
 		}
@@ -313,11 +313,11 @@ void ui_menu_select_game::handle()
 
 		// handle UI_LEFT_PANEL
 		else if (m_event->iptkey == IPT_UI_LEFT_PANEL)
-			mewui_globals::rpanel = RP_IMAGES;
+			ui_globals::rpanel = RP_IMAGES;
 
 		// handle UI_RIGHT_PANEL
 		else if (m_event->iptkey == IPT_UI_RIGHT_PANEL)
-			mewui_globals::rpanel = RP_INFOS;
+			ui_globals::rpanel = RP_INFOS;
 
 		// escape pressed with non-empty text clears the text
 		else if (m_event->iptkey == IPT_UI_CANCEL && m_search[0] != 0)
@@ -547,8 +547,8 @@ void ui_menu_select_game::handle()
 
 void ui_menu_select_game::populate()
 {
-	mewui_globals::redraw_icon = true;
-	mewui_globals::switch_image = true;
+	ui_globals::redraw_icon = true;
+	ui_globals::switch_image = true;
 	int old_item_selected = -1;
 
 	if (main_filters::actual != FILTER_FAVORITE_GAME)
@@ -668,10 +668,10 @@ void ui_menu_select_game::populate()
 	if (old_item_selected != -1)
 	{
 		selected = old_item_selected;
-		if (mewui_globals::visible_main_lines == 0)
+		if (ui_globals::visible_main_lines == 0)
 			top_line = (selected != 0) ? selected - 1 : 0;
 		else
-			top_line = selected - (mewui_globals::visible_main_lines / 2);
+			top_line = selected - (ui_globals::visible_main_lines / 2);
 
 		if (reselect_last::software.empty())
 			reselect_last::reset();
@@ -1942,7 +1942,7 @@ float ui_menu_select_game::draw_left_panel(float x1, float y1, float x2, float y
 	ui_manager &mui = machine().ui();
 	float line_height = mui.get_line_height();
 
-	if (mewui_globals::panels_status == SHOW_PANELS || mewui_globals::panels_status == HIDE_RIGHT_PANEL)
+	if (ui_globals::panels_status == SHOW_PANELS || ui_globals::panels_status == HIDE_RIGHT_PANEL)
 	{
 		float origy1 = y1;
 		float origy2 = y2;
@@ -2131,10 +2131,10 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 		float oy1 = origy1 + line_height;
 
 		// MAMESCORE? Full size text
-		if (mewui_globals::curdats_view == MEWUI_STORY_LOAD)
+		if (ui_globals::curdats_view == MEWUI_STORY_LOAD)
 			text_size = 1.0f;
 
-		std::string snaptext(dats_info[mewui_globals::curdats_view]);
+		std::string snaptext(dats_info[ui_globals::curdats_view]);
 
 		// apply title to right panel
 		float title_size = 0.0f;
@@ -2151,25 +2151,25 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 		mui.draw_text_full(container, snaptext.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, 
 			WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
-		draw_common_arrow(origx1, origy1, origx2, origy2, mewui_globals::curdats_view, MEWUI_FIRST_LOAD, MEWUI_LAST_LOAD, title_size);
+		draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::curdats_view, MEWUI_FIRST_LOAD, MEWUI_LAST_LOAD, title_size);
 
-		if (driver != olddriver || mewui_globals::curdats_view != oldview)
+		if (driver != olddriver || ui_globals::curdats_view != oldview)
 		{
 			buffer.clear();
 			olddriver = driver;
-			oldview = mewui_globals::curdats_view;
+			oldview = ui_globals::curdats_view;
 			topline_datsview = 0;
 			totallines = 0;
 			std::vector<std::string> m_item;
 
-			if (mewui_globals::curdats_view == MEWUI_GENERAL_LOAD)
+			if (ui_globals::curdats_view == MEWUI_GENERAL_LOAD)
 				general_info(driver, buffer);
-			else if (mewui_globals::curdats_view != MEWUI_COMMAND_LOAD)
-				machine().datfile().load_data_info(driver, buffer, mewui_globals::curdats_view);
+			else if (ui_globals::curdats_view != MEWUI_COMMAND_LOAD)
+				machine().datfile().load_data_info(driver, buffer, ui_globals::curdats_view);
 			else
 				machine().datfile().command_sub_menu(driver, m_item);
 
-			if (!m_item.empty() && mewui_globals::curdats_view == MEWUI_COMMAND_LOAD)
+			if (!m_item.empty() && ui_globals::curdats_view == MEWUI_COMMAND_LOAD)
 			{
 				for (size_t x = 0; x < m_item.size(); ++x)
 				{
@@ -2189,7 +2189,7 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 				WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 			return;
 		}
-		else if (mewui_globals::curdats_view != MEWUI_STORY_LOAD && mewui_globals::curdats_view != MEWUI_COMMAND_LOAD)
+		else if (ui_globals::curdats_view != MEWUI_STORY_LOAD && ui_globals::curdats_view != MEWUI_COMMAND_LOAD)
 			mui.wrap_text(container, buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), totallines, xstart, xend, text_size);
 		else
 			mui.wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (2.0f * gutter_width), totallines, xstart, xend, text_size);
@@ -2215,7 +2215,7 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 			else if (r == r_visible_lines - 1 && itemline != totallines - 1)
 				info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
 			// special case for mamescore
-			else if (mewui_globals::curdats_view == MEWUI_STORY_LOAD)
+			else if (ui_globals::curdats_view == MEWUI_STORY_LOAD)
 			{
 				// check size
 				float textlen = mui.get_string_width_ex(tempbuf.c_str(), text_size);
@@ -2245,13 +2245,13 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 			}
 
 			// special case for command
-			else if (mewui_globals::curdats_view == MEWUI_COMMAND_LOAD || mewui_globals::curdats_view == MEWUI_GENERAL_LOAD)
+			else if (ui_globals::curdats_view == MEWUI_COMMAND_LOAD || ui_globals::curdats_view == MEWUI_GENERAL_LOAD)
 			{
 				// check size
 				float textlen = mui.get_string_width_ex(tempbuf.c_str(), text_size);
 				float tmp_size = (textlen > sc) ? text_size * (sc / textlen) : text_size;
 
-				int first_dspace = (mewui_globals::curdats_view == MEWUI_COMMAND_LOAD) ? tempbuf.find("  ") : tempbuf.find(":");
+				int first_dspace = (ui_globals::curdats_view == MEWUI_COMMAND_LOAD) ? tempbuf.find("  ") : tempbuf.find(":");
 				if (first_dspace > 0)
 				{
 					float effective_width = origx2 - origx1 - gutter_width;
@@ -2290,7 +2290,7 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 		{
 			mui.draw_text_full(container, "History", origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE, 
 				DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-			mewui_globals::cur_sw_dats_view = 0;
+			ui_globals::cur_sw_dats_view = 0;
 		}
 		else
 		{
@@ -2308,18 +2308,18 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 				title_size = MAX(txt_lenght, title_size);
 			}
 
-			mui.draw_text_full(container, t_text[mewui_globals::cur_sw_dats_view].c_str(), origx1, origy1, origx2 - origx1, 
+			mui.draw_text_full(container, t_text[ui_globals::cur_sw_dats_view].c_str(), origx1, origy1, origx2 - origx1, 
 				JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
-			draw_common_arrow(origx1, origy1, origx2, origy2, mewui_globals::cur_sw_dats_view, 0, 1, title_size);
+			draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::cur_sw_dats_view, 0, 1, title_size);
 		}
 
-		if (oldsoft != soft || old_sw_view != mewui_globals::cur_sw_dats_view)
+		if (oldsoft != soft || old_sw_view != ui_globals::cur_sw_dats_view)
 		{
 			buffer.clear();
-			old_sw_view = mewui_globals::cur_sw_dats_view;
+			old_sw_view = ui_globals::cur_sw_dats_view;
 			oldsoft = soft;
-			if (mewui_globals::cur_sw_dats_view == 0)
+			if (ui_globals::cur_sw_dats_view == 0)
 			{
 				if (soft->startempty == 1)
 					machine().datfile().load_data_info(soft->driver, buffer, MEWUI_HISTORY_LOAD);
@@ -2375,7 +2375,7 @@ void ui_menu_select_game::draw_right_panel(void *selectedref, float origx1, floa
 	float line_height = mui.get_line_height();
 	float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
 	rgb_t fgcolor = UI_TEXT_COLOR;
-	bool hide = (mewui_globals::panels_status == HIDE_RIGHT_PANEL || mewui_globals::panels_status == HIDE_BOTH);
+	bool hide = (ui_globals::panels_status == HIDE_RIGHT_PANEL || ui_globals::panels_status == HIDE_BOTH);
 	float x2 = (hide) ? origx2 : origx1 + 2.0f * UI_BOX_LR_BORDER;
 
 	// set left-right arrows dimension
@@ -2403,7 +2403,7 @@ void ui_menu_select_game::draw_right_panel(void *selectedref, float origx1, floa
 	origx1 = x2;
 	origy1 = draw_right_box_title(origx1, origy1, origx2, origy2);
 
-	if (mewui_globals::rpanel == RP_IMAGES)
+	if (ui_globals::rpanel == RP_IMAGES)
 		arts_render(selectedref, origx1, origy1, origx2, origy2);
 	else
 		infos_render(selectedref, origx1, origy1, origx2, origy2);
@@ -2442,14 +2442,14 @@ void ui_menu_select_game::arts_render(void *selectedref, float origx1, float ori
 
 	if (driver)
 	{
-		if (mewui_globals::default_image)
-			((driver->flags & MACHINE_TYPE_ARCADE) == 0) ? mewui_globals::curimage_view = CABINETS_VIEW : mewui_globals::curimage_view = SNAPSHOT_VIEW;
+		if (ui_globals::default_image)
+			((driver->flags & MACHINE_TYPE_ARCADE) == 0) ? ui_globals::curimage_view = CABINETS_VIEW : ui_globals::curimage_view = SNAPSHOT_VIEW;
 
 		std::string searchstr;
 		searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 
 		// loads the image if necessary
-		if (driver != olddriver || !snapx_bitmap->valid() || mewui_globals::switch_image)
+		if (driver != olddriver || !snapx_bitmap->valid() || ui_globals::switch_image)
 		{
 			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
 			bitmap_argb32 *tmp_bitmap;
@@ -2501,7 +2501,7 @@ void ui_menu_select_game::arts_render(void *selectedref, float origx1, float ori
 			}
 
 			olddriver = driver;
-			mewui_globals::switch_image = false;
+			ui_globals::switch_image = false;
 			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2, false);
 			auto_free(machine(), tmp_bitmap);
 		}
@@ -2522,15 +2522,15 @@ void ui_menu_select_game::arts_render(void *selectedref, float origx1, float ori
 	{
 		std::string fullname, pathname;
 
-		if (mewui_globals::default_image)
-			(soft->startempty == 0) ? mewui_globals::curimage_view = SNAPSHOT_VIEW : mewui_globals::curimage_view = CABINETS_VIEW;
+		if (ui_globals::default_image)
+			(soft->startempty == 0) ? ui_globals::curimage_view = SNAPSHOT_VIEW : ui_globals::curimage_view = CABINETS_VIEW;
 
 		// arts title and searchpath
 		std::string searchstr;
 		searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 
 		// loads the image if necessary
-		if (soft != oldsoft || !snapx_bitmap->valid() || mewui_globals::switch_image)
+		if (soft != oldsoft || !snapx_bitmap->valid() || ui_globals::switch_image)
 		{
 			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
 			bitmap_argb32 *tmp_bitmap;
@@ -2548,7 +2548,7 @@ void ui_menu_select_game::arts_render(void *selectedref, float origx1, float ori
 					render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
 				}
 			}
-			else if (mewui_globals::curimage_view == TITLES_VIEW)
+			else if (ui_globals::curimage_view == TITLES_VIEW)
 			{
 				// First attempt from name list
 				pathname.assign(soft->listname).append("_titles");
@@ -2590,7 +2590,7 @@ void ui_menu_select_game::arts_render(void *selectedref, float origx1, float ori
 			}
 
 			oldsoft = soft;
-			mewui_globals::switch_image = false;
+			ui_globals::switch_image = false;
 			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2, true);
 			auto_free(machine(), tmp_bitmap);
 		}

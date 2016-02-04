@@ -33,8 +33,8 @@ ui_menu_custom_ui::ui_menu_custom_ui(running_machine &machine, render_container 
 ui_menu_custom_ui::~ui_menu_custom_ui()
 {
 	std::string error_string;
-	machine().options().set_value(OPTION_HIDE_PANELS, mewui_globals::panels_status, OPTION_PRIORITY_CMDLINE, error_string);
-	mewui_globals::reset = true;
+	machine().options().set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE, error_string);
+	ui_globals::reset = true;
 }
 
 //-------------------------------------------------
@@ -53,7 +53,7 @@ void ui_menu_custom_ui::handle()
 		if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT)
 		{
 			changed = true;
-			(m_event->iptkey == IPT_UI_RIGHT) ? mewui_globals::panels_status++ : mewui_globals::panels_status--;
+			(m_event->iptkey == IPT_UI_RIGHT) ? ui_globals::panels_status++ : ui_globals::panels_status--;
 		}
 
 
@@ -75,7 +75,7 @@ void ui_menu_custom_ui::handle()
 					for (int index = 0; index < total; ++index)
 						s_sel[index] = hide_status[index];
 
-					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, mewui_globals::panels_status));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, ui_globals::panels_status));
 				}
 			}
 		}
@@ -94,8 +94,8 @@ void ui_menu_custom_ui::populate()
 	item_append("Fonts", nullptr, 0, (void *)(FPTR)FONT_MENU);
 	item_append("Colors", nullptr, 0, (void *)(FPTR)COLORS_MENU);
 
-	UINT32 arrow_flags = get_arrow_flags(0, (int)HIDE_BOTH, mewui_globals::panels_status);
-	item_append("Filters and Info/Image", hide_status[mewui_globals::panels_status], arrow_flags, (void *)(FPTR)HIDE_MENU);
+	UINT32 arrow_flags = get_arrow_flags(0, (int)HIDE_BOTH, ui_globals::panels_status);
+	item_append("Filters and Info/Image", hide_status[ui_globals::panels_status], arrow_flags, (void *)(FPTR)HIDE_MENU);
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;

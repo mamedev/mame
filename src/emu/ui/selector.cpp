@@ -78,7 +78,7 @@ void ui_menu_selector::handle()
 					break;
 			}
 
-			mewui_globals::switch_image = true;
+			ui_globals::switch_image = true;
 			ui_menu::stack_pop(machine());
 		}
 		else if (m_event->iptkey == IPT_SPECIAL)

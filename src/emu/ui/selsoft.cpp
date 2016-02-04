@@ -132,9 +132,9 @@ ui_menu_select_software::ui_menu_select_software(running_machine &machine, rende
 	build_software_list();
 	load_sw_custom_filters();
 
-	mewui_globals::curimage_view = SNAPSHOT_VIEW;
-	mewui_globals::switch_image = true;
-	mewui_globals::cur_sw_dats_view = MEWUI_FIRST_LOAD;
+	ui_globals::curimage_view = SNAPSHOT_VIEW;
+	ui_globals::switch_image = true;
+	ui_globals::cur_sw_dats_view = MEWUI_FIRST_LOAD;
 
 	std::string error_string;
 	machine.options().set_value(OPTION_SOFTWARENAME, "", OPTION_PRIORITY_CMDLINE, error_string);
@@ -146,8 +146,8 @@ ui_menu_select_software::ui_menu_select_software(running_machine &machine, rende
 
 ui_menu_select_software::~ui_menu_select_software()
 {
-	mewui_globals::curimage_view = CABINETS_VIEW;
-	mewui_globals::switch_image = true;
+	ui_globals::curimage_view = CABINETS_VIEW;
+	ui_globals::switch_image = true;
 }
 
 //-------------------------------------------------
@@ -178,17 +178,17 @@ void ui_menu_select_software::handle()
 		else if (m_event->iptkey == IPT_UI_LEFT)
 		{
 			// Images
-			if (mewui_globals::rpanel == RP_IMAGES && mewui_globals::curimage_view > FIRST_VIEW)
+			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view > FIRST_VIEW)
 			{
-				mewui_globals::curimage_view--;
-				mewui_globals::switch_image = true;
-				mewui_globals::default_image = false;
+				ui_globals::curimage_view--;
+				ui_globals::switch_image = true;
+				ui_globals::default_image = false;
 			}
 
 			// Infos
-			else if (mewui_globals::rpanel == RP_INFOS && mewui_globals::cur_sw_dats_view > 0)
+			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view > 0)
 			{
-				mewui_globals::cur_sw_dats_view--;
+				ui_globals::cur_sw_dats_view--;
 				topline_datsview = 0;
 			}
 		}
@@ -197,17 +197,17 @@ void ui_menu_select_software::handle()
 		else if (m_event->iptkey == IPT_UI_RIGHT)
 		{
 			// Images
-			if (mewui_globals::rpanel == RP_IMAGES && mewui_globals::curimage_view < LAST_VIEW)
+			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view < LAST_VIEW)
 			{
-				mewui_globals::curimage_view++;
-				mewui_globals::switch_image = true;
-				mewui_globals::default_image = false;
+				ui_globals::curimage_view++;
+				ui_globals::switch_image = true;
+				ui_globals::default_image = false;
 			}
 
 			// Infos
-			else if (mewui_globals::rpanel == RP_INFOS && mewui_globals::cur_sw_dats_view < 1)
+			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view < 1)
 			{
-				mewui_globals::cur_sw_dats_view++;
+				ui_globals::cur_sw_dats_view++;
 				topline_datsview = 0;
 			}
 		}
@@ -237,11 +237,11 @@ void ui_menu_select_software::handle()
 
 		// handle UI_LEFT_PANEL
 		else if (m_event->iptkey == IPT_UI_LEFT_PANEL)
-			mewui_globals::rpanel = RP_IMAGES;
+			ui_globals::rpanel = RP_IMAGES;
 
 		// handle UI_RIGHT_PANEL
 		else if (m_event->iptkey == IPT_UI_RIGHT_PANEL)
-			mewui_globals::rpanel = RP_INFOS;
+			ui_globals::rpanel = RP_INFOS;
 
 		// escape pressed with non-empty text clears the text
 		else if (m_event->iptkey == IPT_UI_CANCEL && m_search[0] != 0)
@@ -444,7 +444,7 @@ void ui_menu_select_software::populate()
 	if (old_software != -1)
 	{
 		selected = old_software;
-		top_line = selected - (mewui_globals::visible_sw_lines / 2);
+		top_line = selected - (ui_globals::visible_sw_lines / 2);
 	}
 
 	reselect_last::reset();
@@ -1258,7 +1258,7 @@ float ui_menu_select_software::draw_left_panel(float x1, float y1, float x2, flo
 {
 	ui_manager &mui = machine().ui();
 
-	if (mewui_globals::panels_status == SHOW_PANELS || mewui_globals::panels_status == HIDE_RIGHT_PANEL)
+	if (ui_globals::panels_status == SHOW_PANELS || ui_globals::panels_status == HIDE_RIGHT_PANEL)
 	{
 		float origy1 = y1;
 		float origy2 = y2;
@@ -1431,7 +1431,7 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 	{
 		mui.draw_text_full(container, "History", origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 		                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-		mewui_globals::cur_sw_dats_view = 0;
+		ui_globals::cur_sw_dats_view = 0;
 	}
 	else
 	{
@@ -1449,19 +1449,19 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 			title_size = MAX(txt_lenght, title_size);
 		}
 
-		mui.draw_text_full(container, t_text[mewui_globals::cur_sw_dats_view].c_str(), origx1, origy1, origx2 - origx1,
+		mui.draw_text_full(container, t_text[ui_globals::cur_sw_dats_view].c_str(), origx1, origy1, origx2 - origx1,
 		                              JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
 		                              nullptr, nullptr);
 
-		draw_common_arrow(origx1, origy1, origx2, origy2, mewui_globals::cur_sw_dats_view, 0, 1, title_size);
+		draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::cur_sw_dats_view, 0, 1, title_size);
 	}
 
-	if (oldsoft != soft || old_sw_view != mewui_globals::cur_sw_dats_view)
+	if (oldsoft != soft || old_sw_view != ui_globals::cur_sw_dats_view)
 	{
 		buffer.clear();
-		old_sw_view = mewui_globals::cur_sw_dats_view;
+		old_sw_view = ui_globals::cur_sw_dats_view;
 		oldsoft = soft;
-		if (mewui_globals::cur_sw_dats_view == 0)
+		if (ui_globals::cur_sw_dats_view == 0)
 		{
 			if (soft->startempty == 1)
 				machine().datfile().load_data_info(soft->driver, buffer, MEWUI_HISTORY_LOAD);
@@ -1536,14 +1536,14 @@ void ui_menu_select_software::arts_render(void *selectedref, float origx1, float
 
 	if (driver)
 	{
-		if (mewui_globals::default_image)
-			((driver->flags & MACHINE_TYPE_ARCADE) == 0) ? mewui_globals::curimage_view = CABINETS_VIEW : mewui_globals::curimage_view = SNAPSHOT_VIEW;
+		if (ui_globals::default_image)
+			((driver->flags & MACHINE_TYPE_ARCADE) == 0) ? ui_globals::curimage_view = CABINETS_VIEW : ui_globals::curimage_view = SNAPSHOT_VIEW;
 
 		std::string searchstr;
 		searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 
 		// loads the image if necessary
-		if (driver != olddriver || !snapx_bitmap->valid() || mewui_globals::switch_image)
+		if (driver != olddriver || !snapx_bitmap->valid() || ui_globals::switch_image)
 		{
 			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
 			bitmap_argb32 *tmp_bitmap;
@@ -1595,7 +1595,7 @@ void ui_menu_select_software::arts_render(void *selectedref, float origx1, float
 			}
 
 			olddriver = driver;
-			mewui_globals::switch_image = false;
+			ui_globals::switch_image = false;
 			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2, false);
 			auto_free(machine(), tmp_bitmap);
 		}
@@ -1615,15 +1615,15 @@ void ui_menu_select_software::arts_render(void *selectedref, float origx1, float
 	else if (soft)
 	{
 		std::string fullname, pathname;
-		if (mewui_globals::default_image)
-			(soft->startempty == 0) ? mewui_globals::curimage_view = SNAPSHOT_VIEW : mewui_globals::curimage_view = CABINETS_VIEW;
+		if (ui_globals::default_image)
+			(soft->startempty == 0) ? ui_globals::curimage_view = SNAPSHOT_VIEW : ui_globals::curimage_view = CABINETS_VIEW;
 
 		// arts title and searchpath
 		std::string searchstr;
 		searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 
 		// loads the image if necessary
-		if (soft != oldsoft || !snapx_bitmap->valid() || mewui_globals::switch_image)
+		if (soft != oldsoft || !snapx_bitmap->valid() || ui_globals::switch_image)
 		{
 			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
 			bitmap_argb32 *tmp_bitmap;
@@ -1641,7 +1641,7 @@ void ui_menu_select_software::arts_render(void *selectedref, float origx1, float
 					render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
 				}
 			}
-			else if (mewui_globals::curimage_view == TITLES_VIEW)
+			else if (ui_globals::curimage_view == TITLES_VIEW)
 			{
 				// First attempt from name list
 				pathname.assign(soft->listname).append("_titles");
@@ -1683,7 +1683,7 @@ void ui_menu_select_software::arts_render(void *selectedref, float origx1, float
 			}
 
 			oldsoft = soft;
-			mewui_globals::switch_image = false;
+			ui_globals::switch_image = false;
 			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2, true);
 			auto_free(machine(), tmp_bitmap);
 		}
@@ -1708,7 +1708,7 @@ void ui_menu_select_software::draw_right_panel(void *selectedref, float origx1, 
 	float line_height = mui.get_line_height();
 	float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
 	rgb_t fgcolor = UI_TEXT_COLOR;
-	bool hide = (mewui_globals::panels_status == HIDE_RIGHT_PANEL || mewui_globals::panels_status == HIDE_BOTH);
+	bool hide = (ui_globals::panels_status == HIDE_RIGHT_PANEL || ui_globals::panels_status == HIDE_BOTH);
 	float x2 = (hide) ? origx2 : origx1 + 2.0f * UI_BOX_LR_BORDER;
 
 	// set left-right arrows dimension
@@ -1736,7 +1736,7 @@ void ui_menu_select_software::draw_right_panel(void *selectedref, float origx1, 
 	origx1 = x2;
 	origy1 = draw_right_box_title(origx1, origy1, origx2, origy2);
 
-	if (mewui_globals::rpanel == RP_IMAGES)
+	if (ui_globals::rpanel == RP_IMAGES)
 		arts_render(selectedref, origx1, origy1, origx2, origy2);
 	else
 		infos_render(selectedref, origx1, origy1, origx2, origy2);

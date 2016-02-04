@@ -1363,7 +1363,7 @@ void ui_menu::draw_select_game(bool noinput)
 	float ud_arrow_width = line_height * machine().render().ui_aspect();
 	float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
 	mouse_x = -1, mouse_y = -1;
-	float right_panel_size = (mewui_globals::panels_status == HIDE_BOTH || mewui_globals::panels_status == HIDE_RIGHT_PANEL) ? 2.0f * UI_BOX_LR_BORDER : 0.3f;
+	float right_panel_size = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL) ? 2.0f * UI_BOX_LR_BORDER : 0.3f;
 	float visible_width = 1.0f - 4.0f * UI_BOX_LR_BORDER;
 	float primary_left = (1.0f - visible_width) * 0.5f;
 	float primary_width = visible_width;
@@ -1397,9 +1397,9 @@ void ui_menu::draw_select_game(bool noinput)
 	visible_main_menu_height = (float)(visible_lines * line_height);
 
 	if (!is_swlist)
-		mewui_globals::visible_main_lines = visible_lines;
+		ui_globals::visible_main_lines = visible_lines;
 	else
-		mewui_globals::visible_sw_lines = visible_lines;
+		ui_globals::visible_sw_lines = visible_lines;
 
 	// compute top/left of inner menu area by centering
 	float visible_left = primary_left;
@@ -1600,7 +1600,7 @@ void ui_menu::draw_select_game(bool noinput)
 
 	// reset redraw icon stage
 	if (!is_swlist)
-		mewui_globals::redraw_icon = false;
+		ui_globals::redraw_icon = false;
 }
 
 //-------------------------------------------------
@@ -1610,17 +1610,17 @@ void ui_menu::draw_select_game(bool noinput)
 void ui_menu::get_title_search(std::string &snaptext, std::string &searchstr)
 {
 	// get arts title text
-	snaptext.assign(arts_info[mewui_globals::curimage_view].title);
+	snaptext.assign(arts_info[ui_globals::curimage_view].title);
 
 	// get search path
-	path_iterator path(machine().options().value(arts_info[mewui_globals::curimage_view].path));
+	path_iterator path(machine().options().value(arts_info[ui_globals::curimage_view].path));
 	std::string curpath;
-	searchstr.assign(machine().options().value(arts_info[mewui_globals::curimage_view].path));
+	searchstr.assign(machine().options().value(arts_info[ui_globals::curimage_view].path));
 
 	// iterate over path and add path for zipped formats
 	while (path.next(curpath))
 	{
-		path_iterator path_iter(arts_info[mewui_globals::curimage_view].addpath);
+		path_iterator path_iter(arts_info[ui_globals::curimage_view].addpath);
 		std::string c_path;
 		while (path_iter.next(c_path))
 			searchstr.append(";").append(curpath).append(PATH_SEPARATOR).append(c_path);
@@ -1664,10 +1664,10 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	validate_selection(1);
 
 	// swallow left/right keys if they are not appropriate
-	bool ignoreleft = ((item[selected].flags & MENU_FLAG_LEFT_ARROW) == 0 || mewui_globals::panels_status == HIDE_BOTH || mewui_globals::panels_status == HIDE_RIGHT_PANEL);
-	bool ignoreright = ((item[selected].flags & MENU_FLAG_RIGHT_ARROW) == 0 || mewui_globals::panels_status == HIDE_BOTH || mewui_globals::panels_status == HIDE_RIGHT_PANEL);
-	bool ignoreup = (mewui_globals::panels_status == HIDE_BOTH || mewui_globals::panels_status == HIDE_LEFT_PANEL);
-	bool ignoredown = (mewui_globals::panels_status == HIDE_BOTH || mewui_globals::panels_status == HIDE_LEFT_PANEL);
+	bool ignoreleft = ((item[selected].flags & MENU_FLAG_LEFT_ARROW) == 0 || ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL);
+	bool ignoreright = ((item[selected].flags & MENU_FLAG_RIGHT_ARROW) == 0 || ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL);
+	bool ignoreup = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_LEFT_PANEL);
+	bool ignoredown = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_LEFT_PANEL);
 
 	input_manager &minput = machine().input();
 	// accept left/right keys as-is with repeat
@@ -1893,25 +1893,25 @@ void ui_menu::handle_main_events(UINT32 flags)
 					topline_datsview -= right_visible_lines - 1;
 				else if (hover == HOVER_LPANEL_ARROW)
 				{
-					if (mewui_globals::panels_status == HIDE_LEFT_PANEL)
-						mewui_globals::panels_status = SHOW_PANELS;
-					else if (mewui_globals::panels_status == HIDE_BOTH)
-						mewui_globals::panels_status = HIDE_RIGHT_PANEL;
-					else if (mewui_globals::panels_status == SHOW_PANELS)
-						mewui_globals::panels_status = HIDE_LEFT_PANEL;
-					else if (mewui_globals::panels_status == HIDE_RIGHT_PANEL)
-						mewui_globals::panels_status = HIDE_BOTH;
+					if (ui_globals::panels_status == HIDE_LEFT_PANEL)
+						ui_globals::panels_status = SHOW_PANELS;
+					else if (ui_globals::panels_status == HIDE_BOTH)
+						ui_globals::panels_status = HIDE_RIGHT_PANEL;
+					else if (ui_globals::panels_status == SHOW_PANELS)
+						ui_globals::panels_status = HIDE_LEFT_PANEL;
+					else if (ui_globals::panels_status == HIDE_RIGHT_PANEL)
+						ui_globals::panels_status = HIDE_BOTH;
 				}
 				else if (hover == HOVER_RPANEL_ARROW)
 				{
-					if (mewui_globals::panels_status == HIDE_RIGHT_PANEL)
-						mewui_globals::panels_status = SHOW_PANELS;
-					else if (mewui_globals::panels_status == HIDE_BOTH)
-						mewui_globals::panels_status = HIDE_LEFT_PANEL;
-					else if (mewui_globals::panels_status == SHOW_PANELS)
-						mewui_globals::panels_status = HIDE_RIGHT_PANEL;
-					else if (mewui_globals::panels_status == HIDE_LEFT_PANEL)
-						mewui_globals::panels_status = HIDE_BOTH;
+					if (ui_globals::panels_status == HIDE_RIGHT_PANEL)
+						ui_globals::panels_status = SHOW_PANELS;
+					else if (ui_globals::panels_status == HIDE_BOTH)
+						ui_globals::panels_status = HIDE_LEFT_PANEL;
+					else if (ui_globals::panels_status == SHOW_PANELS)
+						ui_globals::panels_status = HIDE_RIGHT_PANEL;
+					else if (ui_globals::panels_status == HIDE_LEFT_PANEL)
+						ui_globals::panels_status = HIDE_BOTH;
 				}
 				else if (hover == HOVER_B_FAV)
 				{
@@ -1958,7 +1958,7 @@ void ui_menu::handle_main_events(UINT32 flags)
 				}
 				else if (hover >= HOVER_RP_FIRST && hover <= HOVER_RP_LAST)
 				{
-					mewui_globals::rpanel = (HOVER_RP_FIRST - hover) * (-1);
+					ui_globals::rpanel = (HOVER_RP_FIRST - hover) * (-1);
 					stop = true;
 				}
 				else if (hover >= HOVER_SW_FILTER_FIRST && hover <= HOVER_SW_FILTER_LAST)
@@ -2116,7 +2116,7 @@ float ui_menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 
 		if (mouse_hit && x1 <= mouse_x && x1 + midl > mouse_x && y1 <= mouse_y && y1 + line_height > mouse_y)
 		{
-			if (mewui_globals::rpanel != cells)
+			if (ui_globals::rpanel != cells)
 			{
 				bgcolor = UI_MOUSEOVER_BG_COLOR;
 				fgcolor = UI_MOUSEOVER_COLOR;
@@ -2124,7 +2124,7 @@ float ui_menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 			}
 		}
 
-		if (mewui_globals::rpanel != cells)
+		if (ui_globals::rpanel != cells)
 		{
 			container->add_line(x1, y1 + line_height, x1 + midl, y1 + line_height, UI_LINE_WIDTH,
 				UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -2168,7 +2168,7 @@ std::string ui_menu::arts_render_common(float origx1, float origy1, float origx2
 	machine().ui().draw_text_full(container, snaptext.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
-	draw_common_arrow(origx1, origy1, origx2, origy2, mewui_globals::curimage_view, FIRST_VIEW, LAST_VIEW, title_size);
+	draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::curimage_view, FIRST_VIEW, LAST_VIEW, title_size);
 
 	return searchstr;
 }
@@ -2272,7 +2272,7 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 		int dest_yPixel = tmp_bitmap->height();
 
 		// force 4:3 ratio min
-		if (machine().options().forced_4x3_snapshot() && ratioI < 0.75f && mewui_globals::curimage_view == SNAPSHOT_VIEW)
+		if (machine().options().forced_4x3_snapshot() && ratioI < 0.75f && ui_globals::curimage_view == SNAPSHOT_VIEW)
 		{
 			// smaller ratio will ensure that the image fits in the view
 			dest_yPixel = tmp_bitmap->width() * 0.75f;
@@ -2387,7 +2387,7 @@ void ui_menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 	if (driver == nullptr)
 		return;
 
-	if (olddriver[linenum] != driver || mewui_globals::redraw_icon)
+	if (olddriver[linenum] != driver || ui_globals::redraw_icon)
 	{
 		olddriver[linenum] = driver;
 

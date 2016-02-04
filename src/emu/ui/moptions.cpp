@@ -16,7 +16,7 @@
 //  MEWUI EXTRA OPTIONS
 //**************************************************************************
 
-const options_entry mewui_options::s_option_entries[] =
+const options_entry ui_options::s_option_entries[] =
 {
 	// seach path options
 	{ nullptr,                              nullptr,			OPTION_HEADER,  "MEWUI SEARCH PATH OPTIONS" },
@@ -79,11 +79,11 @@ const options_entry mewui_options::s_option_entries[] =
 };
 
 //-------------------------------------------------
-//  mewui_options - constructor
+//  ui_options - constructor
 //-------------------------------------------------
 
-mewui_options::mewui_options()
+ui_options::ui_options()
 : core_options()
 {
-	add_entries(mewui_options::s_option_entries);
+	add_entries(ui_options::s_option_entries);
 }
