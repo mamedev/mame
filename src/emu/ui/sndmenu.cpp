@@ -49,13 +49,21 @@ ui_menu_sound_options::~ui_menu_sound_options()
 	std::string error_string;
 	emu_options &moptions = machine().options();
 
-	if (m_sound)
-		moptions.set_value(OSDOPTION_SOUND, OSDOPTVAL_AUTO, OPTION_PRIORITY_CMDLINE, error_string);
-	else
-		moptions.set_value(OSDOPTION_SOUND, OSDOPTVAL_NONE, OPTION_PRIORITY_CMDLINE, error_string);
-
-	moptions.set_value(OPTION_SAMPLERATE, m_sound_rate[m_cur_rates], OPTION_PRIORITY_CMDLINE, error_string);
-	moptions.set_value(OPTION_SAMPLES, m_samples, OPTION_PRIORITY_CMDLINE, error_string);
+	if (strcmp(moptions.value(OSDOPTION_SOUND),m_sound ? OSDOPTVAL_AUTO : OSDOPTVAL_NONE)!=0)
+	{
+		moptions.set_value(OSDOPTION_SOUND, m_sound ? OSDOPTVAL_AUTO : OSDOPTVAL_NONE, OPTION_PRIORITY_CMDLINE, error_string);
+		save_main_option(machine(),OSDOPTION_SOUND, m_sound ? OSDOPTVAL_AUTO : OSDOPTVAL_NONE);
+	}
+	if (moptions.int_value(OPTION_SAMPLERATE)!=m_sound_rate[m_cur_rates])
+	{
+		moptions.set_value(OPTION_SAMPLERATE, m_sound_rate[m_cur_rates], OPTION_PRIORITY_CMDLINE, error_string);
+		save_main_option(machine(),OPTION_SAMPLERATE, m_sound_rate[m_cur_rates]);
+	}
+	if (moptions.bool_value(OPTION_SAMPLES)!=m_samples)
+	{
+		moptions.set_value(OPTION_SAMPLES, m_samples, OPTION_PRIORITY_CMDLINE, error_string);
+		save_main_option(machine(),OPTION_SAMPLES, m_samples);
+	}
 }
 
 //-------------------------------------------------

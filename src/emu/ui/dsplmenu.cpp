@@ -60,11 +60,7 @@ ui_menu_display_options::dspl_option ui_menu_display_options::m_options[] = {
 
 ui_menu_display_options::ui_menu_display_options(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
-#if defined(UI_WINDOWS) && !defined(UI_SDL)
-	windows_options &options = downcast<windows_options &>(machine.options());
-#else
 	osd_options &options = downcast<osd_options &>(machine.options());
-#endif
 
 	for (int d = 2; d < ARRAY_LENGTH(m_options); ++d)
 		m_options[d].status = options.int_value(m_options[d].option);
@@ -85,12 +81,22 @@ ui_menu_display_options::ui_menu_display_options(running_machine &machine, rende
 ui_menu_display_options::~ui_menu_display_options()
 {
 	std::string error_string;
-	for (int d = 2; d < ARRAY_LENGTH(m_options); ++d)
-		machine().options().set_value(m_options[d].option, m_options[d].status, OPTION_PRIORITY_CMDLINE, error_string);
-
-	machine().options().set_value(m_options[1].option, m_video[m_options[1].status].option, OPTION_PRIORITY_CMDLINE, error_string);
+	for (int d = 2; d < ARRAY_LENGTH(m_options); ++d) 
+	{
+		if (machine().options().int_value(m_options[d].option)!=m_options[d].status)
+		{
+			machine().options().set_value(m_options[d].option, m_options[d].status, OPTION_PRIORITY_CMDLINE, error_string);
+			save_main_option(machine(),m_options[d].option, m_options[d].status);
+		}	
+	}
+	if (strcmp(machine().options().value(m_options[1].option), m_video[m_options[1].status].option)!=0)
+	{
+		machine().options().set_value(m_options[1].option, m_video[m_options[1].status].option, OPTION_PRIORITY_CMDLINE, error_string);
+		save_main_option(machine(),m_options[1].option, m_video[m_options[1].status].option);
+	}	
 	ui_globals::reset = true;
 }
+
 
 //-------------------------------------------------
 //  handle
