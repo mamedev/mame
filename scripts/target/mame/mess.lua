@@ -273,6 +273,7 @@ VIDEOS["DL1416"] = true
 VIDEOS["DM9368"] = true
 VIDEOS["EF9340_1"] = true
 VIDEOS["EF9345"] = true
+VIDEOS["EF9364"] = true
 VIDEOS["EF9365"] = true
 VIDEOS["GF4500"] = true
 --VIDEOS+= EPIC12"] = true
@@ -3084,6 +3085,7 @@ files {
 	MAME_DIR .. "src/mame/audio/gamate.cpp",
 	MAME_DIR .. "src/mame/drivers/gameking.cpp",
 	MAME_DIR .. "src/mame/drivers/gimix.cpp",
+	MAME_DIR .. "src/mame/drivers/goupil.cpp",
 	MAME_DIR .. "src/mame/drivers/grfd2301.cpp",
 	MAME_DIR .. "src/mame/drivers/harriet.cpp",
 	MAME_DIR .. "src/mame/drivers/hprot1.cpp",
