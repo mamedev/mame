@@ -56,17 +56,17 @@ public:
 	DECLARE_READ_LINE_MEMBER(csc_pia1_ca1_r);
 	DECLARE_READ_LINE_MEMBER(csc_pia1_cb1_r);
 
-	// SC12
+	// SC12/6086
 	DECLARE_MACHINE_START(sc12);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(scc_cartridge);
 	DECLARE_WRITE8_MEMBER(sc12_control_w);
 	DECLARE_READ8_MEMBER(sc12_input_r);
 	
-	// FEV (6092)
-	DECLARE_INPUT_CHANGED_MEMBER(fev_bankswitch);
-	DECLARE_READ8_MEMBER(fev_speech_r);
-	DECLARE_WRITE8_MEMBER(fev_ttl_w);
-	DECLARE_READ8_MEMBER(fev_ttl_r);
+	// 6080/6092 (Excellence)
+	DECLARE_INPUT_CHANGED_MEMBER(fexcelv_bankswitch);
+	DECLARE_READ8_MEMBER(fexcelv_speech_r);
+	DECLARE_WRITE8_MEMBER(fexcel_ttl_w);
+	DECLARE_READ8_MEMBER(fexcel_ttl_r);
 };
 
 
@@ -209,7 +209,7 @@ WRITE_LINE_MEMBER(fidel6502_state::csc_pia1_ca2_w)
 
 
 /******************************************************************************
-    SC12
+    SC12/6086
 ******************************************************************************/
 
 // cartridge
@@ -268,19 +268,19 @@ READ8_MEMBER(fidel6502_state::sc12_input_r)
 
 
 /******************************************************************************
-    FEV
+    6080/6092 (Excellence)
 ******************************************************************************/
 
 // misc handlers
 
-INPUT_CHANGED_MEMBER(fidel6502_state::fev_bankswitch)
+INPUT_CHANGED_MEMBER(fidel6502_state::fexcelv_bankswitch)
 {
 	// tied to speech ROM highest bits
 	m_speech->force_update();
 	m_speech_bank = (m_speech_bank & 1) | newval << 1;
 }
 
-READ8_MEMBER(fidel6502_state::fev_speech_r)
+READ8_MEMBER(fidel6502_state::fexcelv_speech_r)
 {
 	// TSI A11 is A12, program controls A11, user controls A13,A14(language switches)
 	offset = (offset & 0x7ff) | (offset << 1 & 0x1000);
@@ -290,7 +290,7 @@ READ8_MEMBER(fidel6502_state::fev_speech_r)
 
 // TTL
 
-WRITE8_MEMBER(fidel6502_state::fev_ttl_w)
+WRITE8_MEMBER(fidel6502_state::fexcel_ttl_w)
 {
 	// a0-a2,d0: 74259(1)
 	UINT8 mask = 1 << offset;
@@ -301,33 +301,36 @@ WRITE8_MEMBER(fidel6502_state::fev_ttl_w)
 	UINT16 sel = 1 << (m_led_select & 0xf) & 0x3ff;
 	m_inp_mux = sel & 0x1ff;
 
-	// 7442 9: speaker out
+	// 7442 9: speaker out (optional?)
 	m_speaker->level_w(sel >> 9 & 1);
 
 	// 74259 Q4,Q5: led select (active low)
 	display_matrix(9, 2, sel & 0x1ff, ~m_led_select >> 4 & 3);
 	
-	// a0-a2,d2: 74259(2) to speech board
-	m_speech_data = (m_speech_data & ~mask) | ((data & 4) ? mask : 0);
+	// speech (model 6092)
+	if (m_speech != nullptr)
+	{
+		// a0-a2,d2: 74259(2) to speech board
+		m_speech_data = (m_speech_data & ~mask) | ((data & 4) ? mask : 0);
 	
-	// 74259 Q6: TSI ROM A11
-	m_speech->force_update(); // update stream to now
-	m_speech_bank = (m_speech_bank & ~1) | (m_speech_data >> 6 & 1);
+		// 74259 Q6: TSI ROM A11
+		m_speech->force_update(); // update stream to now
+		m_speech_bank = (m_speech_bank & ~1) | (m_speech_data >> 6 & 1);
 
-	// Q0-Q5: TSI C0-C5
-	// Q7: TSI START line
-	m_speech->data_w(space, 0, m_speech_data & 0x3f);
-	m_speech->start_w(m_speech_data >> 7 & 1);
+		// Q0-Q5: TSI C0-C5
+		// Q7: TSI START line
+		m_speech->data_w(space, 0, m_speech_data & 0x3f);
+		m_speech->start_w(m_speech_data >> 7 & 1);
+	}
 }
 
-READ8_MEMBER(fidel6502_state::fev_ttl_r)
+READ8_MEMBER(fidel6502_state::fexcel_ttl_r)
 {
+	// a0-a2,d6: from speech board: language switches and TSI BUSY line, otherwise tied to VCC
+	UINT8 d6 = (read_safe(m_inp_matrix[9], 0xff) >> offset & 1) ? 0x40 : 0;
+	
 	// a0-a2,d7: multiplexed inputs (active low)
-	UINT8 data = (read_inputs(9) >> offset & 1) ? 0 : 0x80;
-
-	// a0-a2,d6: from speech board: language switches and TSI BUSY line
-	data |= (m_inp_matrix[9]->read() >> offset & 1) ? 0x40 : 0;
-	return data;
+	return d6 | ((read_inputs(9) >> offset & 1) ? 0 : 0x80);
 }
 
 
@@ -349,7 +352,7 @@ static ADDRESS_MAP_START( csc_map, AS_PROGRAM, 8, fidel6502_state )
 ADDRESS_MAP_END
 
 
-// SC12
+// SC12/6086
 
 static ADDRESS_MAP_START( sc12_map, AS_PROGRAM, 8, fidel6502_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -362,12 +365,11 @@ static ADDRESS_MAP_START( sc12_map, AS_PROGRAM, 8, fidel6502_state )
 ADDRESS_MAP_END
 
 
-// FEV
+// 6080/6092 (Excellence)
 
-static ADDRESS_MAP_START( fev_map, AS_PROGRAM, 8, fidel6502_state )
-	ADDRESS_MAP_UNMAP_HIGH
+static ADDRESS_MAP_START( fexcel_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_READWRITE(fev_ttl_r, fev_ttl_w)
+	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_READWRITE(fexcel_ttl_r, fexcel_ttl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -588,7 +590,7 @@ static INPUT_PORTS_START( sc12 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( fev )
+static INPUT_PORTS_START( fexcel )
 	PORT_INCLUDE( sc12 )
 
 	PORT_MODIFY("IN.8")
@@ -600,9 +602,13 @@ static INPUT_PORTS_START( fev )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Options / Queen") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Verify / King") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("New Game") PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( fexcelv )
+	PORT_INCLUDE( fexcel )
 
 	PORT_START("IN.9")
-	PORT_CONFNAME( 0x03, 0x00, "Language" ) PORT_CHANGED_MEMBER(DEVICE_SELF, fidel6502_state, fev_bankswitch, 0)
+	PORT_CONFNAME( 0x03, 0x00, "Language" ) PORT_CHANGED_MEMBER(DEVICE_SELF, fidel6502_state, fexcelv_bankswitch, 0)
 	PORT_CONFSETTING(    0x00, "English" )
 	PORT_CONFSETTING(    0x01, "German" )
 	PORT_CONFSETTING(    0x02, "French" )
@@ -678,11 +684,11 @@ static MACHINE_CONFIG_START( sc12, fidel6502_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fev, fidel6502_state )
+static MACHINE_CONFIG_START( fexcel, fidel6502_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, XTAL_12MHz/4) // G65SC102P-3, 12.0M ceramic resonator
-	MCFG_CPU_PROGRAM_MAP(fev_map)
+	MCFG_CPU_PROGRAM_MAP(fexcel_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(780)) // from 556 timer, PCB photo suggests it's same as sc12
 	MCFG_TIMER_START_DELAY(attotime::from_hz(780) - attotime::from_nsec(15250)) // active for 15.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(780))
@@ -692,12 +698,16 @@ static MACHINE_CONFIG_START( fev, fidel6502_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidel6502_state, fev_speech_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( fexcelv, fexcel )
+
+	/* sound hardware */
+	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
+	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidel6502_state, fexcelv_speech_r))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
@@ -763,6 +773,12 @@ ROM_START( fscc12 )
 	ROM_LOAD("tmm2764d-2",    0xe000, 0x2000, CRC(183d3edc) SHA1(3296a4c3bce5209587d4a1694fce153558544e63) ) // Toshiba TMM2764D-2
 ROM_END
 
+
+ROM_START( fexcel )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) )
+ROM_END
+
 ROM_START( fexcelv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) )
@@ -771,16 +787,19 @@ ROM_START( fexcelv )
 	ROM_LOAD("101-1081a01.ic2", 0x0000, 0x8000, CRC(c8ae1607) SHA1(6491ce6be60ed77f3dd931c0ca17616f13af943e) )
 ROM_END
 
+
+
 /******************************************************************************
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   INIT              COMPANY, FULLNAME, FLAGS */
-COMP( 1981, csc,     0,      0,      csc,     csc,    driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1981, cscsp,   csc,    0,      csc,     cscg,   driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1981, cscg,    csc,    0,      csc,     cscg,   driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1981, cscfr,   csc,    0,      csc,     cscg,   driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    INIT              COMPANY, FULLNAME, FLAGS */
+COMP( 1981, csc,     0,      0,      csc,     csc,     driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1981, cscsp,   csc,    0,      csc,     cscg,    driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1981, cscg,    csc,    0,      csc,     cscg,    driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1981, cscfr,   csc,    0,      csc,     cscg,    driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-COMP( 1984, fscc12,  0,      0,      sc12,    sc12,   driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1984, fscc12,  0,      0,      sc12,    sc12,    driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-COMP( 1987, fexcelv, 0,      0,      fev,     fev,    driver_device, 0, "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1987, fexcel,  0,      0,      fexcel,  fexcel,  driver_device, 0, "Fidelity Electronics", "Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1987, fexcelv, 0,      0,      fexcelv, fexcelv, driver_device, 0, "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

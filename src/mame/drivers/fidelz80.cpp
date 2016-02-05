@@ -617,7 +617,7 @@ expect that the software reads these once on startup only.
 
 ******************************************************************************
 
-Sensory Chess Challenger (SC12-B)
+Sensory Chess Challenger (SC12-B, 6086)
 4 versions are known to exist: A,B,C, and X, with increasing CPU speed.
 ---------------------------------
 RE information from netlist by Berger
@@ -657,8 +657,8 @@ If control Q4 is set, printer data can be read from I0.
 
 ******************************************************************************
 
-Voice Excellence (FEV, model 6092)
-----------------------------------
+Voice Excellence (model 6092)
+----------------
 PCB 1: 510.1117A02, appears to be identical to other "Excellence" boards
 CPU: GTE G65SC102P-3, 32 KB PRG ROM: AMI 101-1080A01(IC5), 8192x8 SRAM SRM2264C10(IC6)
 2 rows of LEDs on the side: 1*8 green, 1*8 red
@@ -733,7 +733,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
-	// VCC/UVC/CC10
+	// CC10 and VCC/UVC
 	void vcc_prepare_display();
 	DECLARE_READ8_MEMBER(vcc_speech_r);
 	DECLARE_WRITE8_MEMBER(vcc_ppi_porta_w);
@@ -759,7 +759,7 @@ public:
 	DECLARE_READ8_MEMBER(vsc_pio_portb_r);
 	DECLARE_WRITE8_MEMBER(vsc_pio_portb_w);
 
-	// VBRC (7014)
+	// VBRC/7014
 	void vbrc_prepare_display();
 	DECLARE_WRITE8_MEMBER(vbrc_speech_w);
 	DECLARE_WRITE8_MEMBER(vbrc_mcu_p1_w);
@@ -1150,7 +1150,7 @@ WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 
 
 /******************************************************************************
-    VBRC
+    VBRC/7014
 ******************************************************************************/
 
 // misc handlers
@@ -1278,7 +1278,7 @@ static ADDRESS_MAP_START( vsc_io, AS_IO, 8, fidelz80_state )
 ADDRESS_MAP_END
 
 
-// VBRC
+// VBRC/7014
 
 WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
 {
