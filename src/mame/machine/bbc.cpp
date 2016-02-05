@@ -1426,14 +1426,26 @@ WRITE_LINE_MEMBER(bbc_state::write_acia_clock)
 
 WRITE_LINE_MEMBER(bbc_state::motor_w)
 {
-	m_i8271->subdevice<floppy_connector>("0")->get_device()->mon_w(!state);
-	m_i8271->subdevice<floppy_connector>("1")->get_device()->mon_w(!state);
+	for (int i=0; i != 2; i++) {
+		char devname[1];
+		sprintf(devname, "%d", i);
+		floppy_connector *con = m_i8271->subdevice<floppy_connector>(devname);
+		if (con) {
+			con->get_device()->mon_w(!state);
+		}
+	}
 }
 
 WRITE_LINE_MEMBER(bbc_state::side_w)
 {
-	m_i8271->subdevice<floppy_connector>("0")->get_device()->ss_w(state);
-	m_i8271->subdevice<floppy_connector>("1")->get_device()->ss_w(state);
+	for (int i=0; i != 2; i++) {
+		char devname[1];
+		sprintf(devname, "%d", i);
+		floppy_connector *con = m_i8271->subdevice<floppy_connector>(devname);
+		if (con) {
+			con->get_device()->ss_w(state);
+		}
+	}
 }
 
 
