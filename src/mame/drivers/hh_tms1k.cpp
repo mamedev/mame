@@ -74,7 +74,7 @@
  *MP7303   TMS1400?  19??, Tiger 7-in-1 Sports Stadium
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
  @MP7314   TMS1400   1980, Parker Brothers Split Second
- *MP7324   TMS1400?  1985, Coleco Talking Teacher
+  MP7324   TMS1400   1987, Coleco Talking Teacher -> ctteach.cpp
   MP7332   TMS1400   1981, Milton Bradley Dark Tower -> mbdtower.cpp
  @MP7334   TMS1400   1981, Coleco Total Control 4
  @MP7351   TMS1400CR 1982, Parker Brothers Master Merlin
