@@ -183,9 +183,30 @@
 			<bounds left="-2" right="98" top="-18" bottom="88" />
 		</bezel>
 
+		<bezel element="white"><bounds x="-2.5" y="-2" width="101" height="90.5" /></bezel>
+
+	<!-- chessboard coords -->
+
+		<bezel element="text_8"><bounds x="-0.8" y="7" width="2" height="2" /></bezel>
+		<bezel element="text_7"><bounds x="-0.8" y="17" width="2" height="2" /></bezel>
+		<bezel element="text_6"><bounds x="-0.8" y="27" width="2" height="2" /></bezel>
+		<bezel element="text_5"><bounds x="-0.8" y="37" width="2" height="2" /></bezel>
+		<bezel element="text_4"><bounds x="-0.8" y="47" width="2" height="2" /></bezel>
+		<bezel element="text_3"><bounds x="-0.8" y="57" width="2" height="2" /></bezel>
+		<bezel element="text_2"><bounds x="-0.8" y="67" width="2" height="2" /></bezel>
+		<bezel element="text_1"><bounds x="-0.8" y="77" width="2" height="2" /></bezel>
+
+		<bezel element="text_a"><bounds x="7" y="85" width="2" height="2" /></bezel>
+		<bezel element="text_b"><bounds x="17" y="85" width="2" height="2" /></bezel>
+		<bezel element="text_c"><bounds x="27" y="85" width="2" height="2" /></bezel>
+		<bezel element="text_d"><bounds x="37" y="85" width="2" height="2" /></bezel>
+		<bezel element="text_e"><bounds x="47" y="85" width="2" height="2" /></bezel>
+		<bezel element="text_f"><bounds x="57" y="85" width="2" height="2" /></bezel>
+		<bezel element="text_g"><bounds x="67" y="85" width="2" height="2" /></bezel>
+		<bezel element="text_h"><bounds x="77" y="85" width="2" height="2" /></bezel>
+
 	<!-- chessboard bezel -->
 
-		<bezel element="white"><bounds x="-2.5" y="-2" width="101" height="90.5" /></bezel>
 		<bezel element="black"><bounds x="2" y="2" width="82" height="82" /></bezel>
 		<bezel element="white"><bounds x="3" y="3" width="80" height="80" /></bezel>
 
@@ -376,26 +397,6 @@
 		<bezel element="hl" inputtag="IN.5" inputmask="0x01"><bounds x="53" y="73" width="10" height="10" /><color alpha="0.4" /></bezel>
 		<bezel element="hl" inputtag="IN.6" inputmask="0x01"><bounds x="63" y="73" width="10" height="10" /><color alpha="0.2" /></bezel>
 		<bezel element="hl" inputtag="IN.7" inputmask="0x01"><bounds x="73" y="73" width="10" height="10" /><color alpha="0.4" /></bezel>
-
-	<!-- chessboard coords -->
-
-		<bezel element="text_8"><bounds x="-0.8" y="7" width="2" height="2" /></bezel>
-		<bezel element="text_7"><bounds x="-0.8" y="17" width="2" height="2" /></bezel>
-		<bezel element="text_6"><bounds x="-0.8" y="27" width="2" height="2" /></bezel>
-		<bezel element="text_5"><bounds x="-0.8" y="37" width="2" height="2" /></bezel>
-		<bezel element="text_4"><bounds x="-0.8" y="47" width="2" height="2" /></bezel>
-		<bezel element="text_3"><bounds x="-0.8" y="57" width="2" height="2" /></bezel>
-		<bezel element="text_2"><bounds x="-0.8" y="67" width="2" height="2" /></bezel>
-		<bezel element="text_1"><bounds x="-0.8" y="77" width="2" height="2" /></bezel>
-
-		<bezel element="text_a"><bounds x="7" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_b"><bounds x="17" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_c"><bounds x="27" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_d"><bounds x="37" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_e"><bounds x="47" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_f"><bounds x="57" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_g"><bounds x="67" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_h"><bounds x="77" y="85" width="2" height="2" /></bezel>
 
 	<!-- right side -->
 

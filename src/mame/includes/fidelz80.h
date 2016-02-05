@@ -34,10 +34,11 @@ public:
 
 	// misc common
 	UINT16 m_inp_mux;                   // multiplexed keypad/leds mask
-	UINT16 m_led_select;             // 5 bit selects for 7 seg leds and for common other leds, bits are (7seg leds are 0 1 2 3, common other leds are C) 0bxx3210xc
-	UINT16 m_7seg_data;            // data for seg leds
+	UINT16 m_led_select;
+	UINT16 m_7seg_data;                 // data for seg leds
 	UINT16 m_led_data;
-	UINT8 m_speech_bank;
+	UINT8 m_speech_data;
+	UINT8 m_speech_bank;                // speech rom higher address bits
 
 	UINT16 read_inputs(int columns);
 

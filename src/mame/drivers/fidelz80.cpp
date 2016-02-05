@@ -665,7 +665,7 @@ CPU: GTE G65SC102P-3, 32 KB PRG ROM: AMI 101-1080A01(IC5), 8192x8 SRAM SRM2264C1
 
 PCB 2: 510.1117A01
 Speech: TSI S14001A, 32 KB ROM: AMI 101-1081A01(IC2)
-Dip Switches set ROM A13 and ROM A14, on the side of the tablet
+Dip Switches set ROM A13 and ROM A14, on the side of the board
 
 ROM A12 is tied to S14001A's A11 (yuck)
 ROM A11 is however tied to the CPU's XYZ
@@ -733,7 +733,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
-	// model VCC/UVC/CC10
+	// VCC/UVC/CC10
 	void vcc_prepare_display();
 	DECLARE_READ8_MEMBER(vcc_speech_r);
 	DECLARE_WRITE8_MEMBER(vcc_ppi_porta_w);
@@ -744,11 +744,11 @@ public:
 	DECLARE_WRITE8_MEMBER(cc10_ppi_porta_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off_callback);
 	
-	// model BCC
+	// BCC
 	DECLARE_READ8_MEMBER(bcc_input_r);
 	DECLARE_WRITE8_MEMBER(bcc_control_w);
 
-	// model VSC
+	// VSC
 	void vsc_prepare_display();
 	DECLARE_READ8_MEMBER(vsc_io_trampoline_r);
 	DECLARE_WRITE8_MEMBER(vsc_io_trampoline_w);
@@ -759,7 +759,7 @@ public:
 	DECLARE_READ8_MEMBER(vsc_pio_portb_r);
 	DECLARE_WRITE8_MEMBER(vsc_pio_portb_w);
 
-	// model 7014 and VBRC
+	// VBRC (7014)
 	void vbrc_prepare_display();
 	DECLARE_WRITE8_MEMBER(vbrc_speech_w);
 	DECLARE_WRITE8_MEMBER(vbrc_mcu_p1_w);
@@ -783,6 +783,7 @@ void fidelz80base_state::machine_start()
 	m_led_select = 0;
 	m_led_data = 0;
 	m_7seg_data = 0;
+	m_speech_data = 0;
 	m_speech_bank = 0;
 
 	// register for savestates
@@ -799,6 +800,7 @@ void fidelz80base_state::machine_start()
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_7seg_data));
+	save_item(NAME(m_speech_data));
 	save_item(NAME(m_speech_bank));
 }
 
@@ -1040,8 +1042,8 @@ WRITE8_MEMBER(fidelz80_state::cc10_ppi_porta_w)
 WRITE8_MEMBER(fidelz80_state::bcc_control_w)
 {
 	// a0-a2,d7: digit segment data via NE591, Q7 is speaker out
-	UINT8 sel = 1 << (offset & 7);
-	m_7seg_data = (m_7seg_data & ~sel) | ((data & 0x80) ? sel : 0);
+	UINT8 mask = 1 << (offset & 7);
+	m_7seg_data = (m_7seg_data & ~mask) | ((data & 0x80) ? mask : 0);
 	m_speaker->level_w(m_7seg_data >> 7 & 1);
 
 	// d0-d3: led select, input mux

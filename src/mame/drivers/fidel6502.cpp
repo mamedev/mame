@@ -5,9 +5,6 @@
     Fidelity Electronics 6502 based board driver
     See drivers/fidelz80.cpp for hardware description
 
-    TODO:
-    - x
-
 ******************************************************************************/
 
 #include "emu.h"
@@ -23,7 +20,7 @@
 
 // internal artwork
 #include "fidel_csc.lh" // clickable
-#include "fidel_fev.lh"
+#include "fidel_fev.lh" // clickable
 #include "fidel_sc12.lh" // clickable
 
 
@@ -43,7 +40,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
 
-	// model CSC
+	// CSC
 	void csc_update_7442();
 	void csc_prepare_display();
 	DECLARE_READ8_MEMBER(csc_speech_r);
@@ -59,11 +56,17 @@ public:
 	DECLARE_READ_LINE_MEMBER(csc_pia1_ca1_r);
 	DECLARE_READ_LINE_MEMBER(csc_pia1_cb1_r);
 
-	// model SC12
+	// SC12
 	DECLARE_MACHINE_START(sc12);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(scc_cartridge);
 	DECLARE_WRITE8_MEMBER(sc12_control_w);
 	DECLARE_READ8_MEMBER(sc12_input_r);
+	
+	// FEV (6092)
+	DECLARE_INPUT_CHANGED_MEMBER(fev_bankswitch);
+	DECLARE_READ8_MEMBER(fev_speech_r);
+	DECLARE_WRITE8_MEMBER(fev_ttl_w);
+	DECLARE_READ8_MEMBER(fev_ttl_r);
 };
 
 
@@ -81,7 +84,7 @@ void fidel6502_state::csc_update_7442()
 	// 7442 0-8: led select, input mux
 	m_inp_mux = 1 << m_led_select & 0x3ff;
 	
-	// 7442 9: buzzer speaker out
+	// 7442 9: speaker out
 	m_speaker->level_w(m_inp_mux >> 9 & 1);
 }
 
@@ -259,7 +262,72 @@ WRITE8_MEMBER(fidel6502_state::sc12_control_w)
 READ8_MEMBER(fidel6502_state::sc12_input_r)
 {
 	// a0-a2,d7: multiplexed inputs (active low)
-	return (read_inputs(9) << (offset^7) & 0x80) ^ 0xff;
+	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
+}
+
+
+
+/******************************************************************************
+    FEV
+******************************************************************************/
+
+// misc handlers
+
+INPUT_CHANGED_MEMBER(fidel6502_state::fev_bankswitch)
+{
+	// tied to speech ROM highest bits
+	m_speech->force_update();
+	m_speech_bank = (m_speech_bank & 1) | newval << 1;
+}
+
+READ8_MEMBER(fidel6502_state::fev_speech_r)
+{
+	// TSI A11 is A12, program controls A11, user controls A13,A14(language switches)
+	offset = (offset & 0x7ff) | (offset << 1 & 0x1000);
+	return m_speech_rom[offset | (m_speech_bank << 11 & 0x800) | (~m_speech_bank << 12 & 0x6000)];
+}
+
+
+// TTL
+
+WRITE8_MEMBER(fidel6502_state::fev_ttl_w)
+{
+	// a0-a2,d0: 74259(1)
+	UINT8 mask = 1 << offset;
+	m_led_select = (m_led_select & ~mask) | ((data & 1) ? mask : 0);
+	
+	// 74259 Q0-Q3: 7442 a0-a3
+	// 7442 0-8: led data, input mux
+	UINT16 sel = 1 << (m_led_select & 0xf) & 0x3ff;
+	m_inp_mux = sel & 0x1ff;
+
+	// 7442 9: speaker out
+	m_speaker->level_w(sel >> 9 & 1);
+
+	// 74259 Q4,Q5: led select (active low)
+	display_matrix(9, 2, sel & 0x1ff, ~m_led_select >> 4 & 3);
+	
+	// a0-a2,d2: 74259(2) to speech board
+	m_speech_data = (m_speech_data & ~mask) | ((data & 4) ? mask : 0);
+	
+	// 74259 Q6: TSI ROM A11
+	m_speech->force_update(); // update stream to now
+	m_speech_bank = (m_speech_bank & ~1) | (m_speech_data >> 6 & 1);
+
+	// Q0-Q5: TSI C0-C5
+	// Q7: TSI START line
+	m_speech->data_w(space, 0, m_speech_data & 0x3f);
+	m_speech->start_w(m_speech_data >> 7 & 1);
+}
+
+READ8_MEMBER(fidel6502_state::fev_ttl_r)
+{
+	// a0-a2,d7: multiplexed inputs (active low)
+	UINT8 data = (read_inputs(9) >> offset & 1) ? 0 : 0x80;
+
+	// a0-a2,d6: from speech board: language switches and TSI BUSY line
+	data |= (m_inp_matrix[9]->read() >> offset & 1) ? 0x40 : 0;
+	return data;
 }
 
 
@@ -298,7 +366,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fev_map, AS_PROGRAM, 8, fidel6502_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
+	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_READWRITE(fev_ttl_r, fev_ttl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -519,6 +588,29 @@ static INPUT_PORTS_START( sc12 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( fev )
+	PORT_INCLUDE( sc12 )
+
+	PORT_MODIFY("IN.8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Clear") PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Move / Pawn") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Hint / Knight") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Take Back / Bishop") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Level / Rook") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Options / Queen") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Verify / King") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("New Game") PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N)
+
+	PORT_START("IN.9")
+	PORT_CONFNAME( 0x03, 0x00, "Language" ) PORT_CHANGED_MEMBER(DEVICE_SELF, fidel6502_state, fev_bankswitch, 0)
+	PORT_CONFSETTING(    0x00, "English" )
+	PORT_CONFSETTING(    0x01, "German" )
+	PORT_CONFSETTING(    0x02, "French" )
+	PORT_CONFSETTING(    0x03, "Spanish" )
+	PORT_BIT(0x7c, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER("speech", s14001a_device, busy_r)
+INPUT_PORTS_END
+
 
 
 /******************************************************************************
@@ -601,8 +693,11 @@ static MACHINE_CONFIG_START( fev, fidel6502_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidel6502_state, csc_speech_r))
+	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidel6502_state, fev_speech_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -688,4 +783,4 @@ COMP( 1981, cscfr,   csc,    0,      csc,     cscg,   driver_device, 0, "Fidelit
 
 COMP( 1984, fscc12,  0,      0,      sc12,    sc12,   driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-COMP( 1987, fexcelv, 0,      0,      fev,     csc,    driver_device, 0, "Fidelity Electronics", "Voice Excellence", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, fexcelv, 0,      0,      fev,     fev,    driver_device, 0, "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
