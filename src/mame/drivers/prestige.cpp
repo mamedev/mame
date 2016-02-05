@@ -775,6 +775,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( snotec, glcolor )
 	MCFG_SOFTWARE_LIST_REMOVE("cart_list")
+	MCFG_SOFTWARE_LIST_REMOVE("snotec_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "snotec")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("glcolor_cart", "glcolor")
 MACHINE_CONFIG_END
