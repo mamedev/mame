@@ -377,7 +377,7 @@ Airline Pilots (Rev A)                          840-0005C    21739A  11 (64Mb)  
 Cosmic Smash                                    840-0044C    23428    8 (64Mb)   ?           315-6213  317-0289-COM   joystick + 2 buttons
 Cosmic Smash (Rev A)                            840-0044C    23428A   8 (64Mb)   ?           315-6213  317-0289-COM   joystick + 2 buttons
 Crazy Taxi                                      840-0002C    21684   13 (64Mb)*  present     315-6213  317-0248-COM   * ic8 and ic9 are not present
-Dead Or Alive 2 (Rev A)                         841-0003C    22121a  21 (64Mb)   present     315-6213  317-5048-COM   joystick + 3 buttons
+Dead Or Alive 2 (Rev A)                         841-0003C    22121A  21 (64Mb)   present     315-6213  317-5048-COM   joystick + 3 buttons
 Dead Or Alive 2 Millennium                      841-0003C    DOA2 M  21 (64Mb)   present     315-6213  317-5048-COM   joystick + 3 buttons
 Death Crimson OX                                841-0016C    23524   10 (64Mb)   present     315-6213  317-5066-COM
 Dengen Tenshi Taisen Janshi Shangri-La          841-0004C    22060   12 (64Mb)   ?           315-6213  317-5050-JPN
@@ -9030,6 +9030,9 @@ ROM_START( ngbc )
 	ROM_LOAD( "ax3301f01.bin", 0, 4, CRC(9afe949b) SHA1(4f7b039f3287da61a53a2d012993bfb57e1459bd) )
 ROM_END
 
+// note: it looks there no regional differences in KOF NW EN and JP cartridge dumps, possible JP is just newer revision
+
+// Build: Jul 2004
 ROM_START( kofnw )
 	AW_BIOS
 
@@ -9046,6 +9049,7 @@ ROM_START( kofnw )
 	ROM_LOAD( "ax2201f01.bin", 0, 4, CRC(b1fff0c8) SHA1(d83177e3672378a2bbc08653b4b73704333ca30a) )
 ROM_END
 
+// Build: Sep 2004
 ROM_START( kofnwj )
 	AW_BIOS
 
