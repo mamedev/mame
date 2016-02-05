@@ -1613,9 +1613,9 @@ void ui_menu::get_title_search(std::string &snaptext, std::string &searchstr)
 	snaptext.assign(arts_info[ui_globals::curimage_view].title);
 
 	// get search path
-	path_iterator path(machine().options().value(arts_info[ui_globals::curimage_view].path));
+	path_iterator path(machine().ui().options().value(arts_info[ui_globals::curimage_view].path));
 	std::string curpath;
-	searchstr.assign(machine().options().value(arts_info[ui_globals::curimage_view].path));
+	searchstr.assign(machine().ui().options().value(arts_info[ui_globals::curimage_view].path));
 
 	// iterate over path and add path for zipped formats
 	while (path.next(curpath))

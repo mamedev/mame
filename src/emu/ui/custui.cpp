@@ -33,11 +33,11 @@ ui_menu_custom_ui::ui_menu_custom_ui(running_machine &machine, render_container 
 ui_menu_custom_ui::~ui_menu_custom_ui()
 {
 	std::string error_string;
-	machine().options().set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE, error_string);
+	machine().ui().options().set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE, error_string);
 	ui_globals::reset = true;
 }
 
-//-------------------------------------------------
+//-------------------------------------------------	
 //  handle
 //-------------------------------------------------
 
@@ -143,7 +143,7 @@ ui_menu_font_ui::ui_menu_font_ui(running_machine &machine, render_container *con
 	ui_options &moptions = machine.ui().options();
 #ifdef UI_WINDOWS
 
-	std::string name(machine.options().ui_font());
+	std::string name(machine.ui().options().ui_font());
 	list();
 
 	m_bold = (strreplace(name, "[B]", "") + strreplace(name, "[b]", "") > 0);
@@ -442,7 +442,7 @@ ui_menu_colors_ui::~ui_menu_colors_ui()
 	for (int index = 1; index < MUI_RESTORE; index++)
 	{
 		strprintf(dec_color, "%x", (UINT32)m_color_table[index].color);
-		machine().options().set_value(m_color_table[index].option, dec_color.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+		machine().ui().options().set_value(m_color_table[index].option, dec_color.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 	}
 }
 

@@ -564,8 +564,8 @@ ui_menu_misc_options::misc_option ui_menu_misc_options::m_options[] = {
 	{ 0, "DATs info",                                       OPTION_DATS_ENABLED },
 	{ 0, "Cheats",                                          OPTION_CHEAT },
 	{ 0, "Show mouse pointer",                              OPTION_UI_MOUSE },
-	{ 0, "Confirm quit from machines",                      OPTION_CONFIRM_QUIT },
-	{ 0, "Skip displaying information's screen at startup", OPTION_SKIP_GAMEINFO },
+	{ 0, "Confirm quit from machines",                      OPTION_UI_CONFIRM_QUIT },
+	{ 0, "Skip displaying information's screen at startup", OPTION_UI_SKIP_GAMEINFO },
 	{ 0, "Force 4:3 appearance for software snapshot",      OPTION_FORCED4X3 },
 	{ 0, "Use image as background",                         OPTION_USE_BACKGROUND },
 	{ 0, "Skip bios selection menu",                        OPTION_SKIP_BIOS_MENU },
@@ -579,14 +579,14 @@ ui_menu_misc_options::misc_option ui_menu_misc_options::m_options[] = {
 ui_menu_misc_options::ui_menu_misc_options(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
 	for (int d = 1; d < ARRAY_LENGTH(m_options); ++d)
-		m_options[d].status = machine.options().bool_value(m_options[d].option);
+		m_options[d].status = machine.ui().options().bool_value(m_options[d].option);
 }
 
 ui_menu_misc_options::~ui_menu_misc_options()
 {
 	std::string error_string;
 	for (int d = 1; d < ARRAY_LENGTH(m_options); ++d)
-		machine().options().set_value(m_options[d].option, m_options[d].status, OPTION_PRIORITY_CMDLINE, error_string);
+		machine().ui().options().set_value(m_options[d].option, m_options[d].status, OPTION_PRIORITY_CMDLINE, error_string);
 	ui_globals::reset = true;
 }
 

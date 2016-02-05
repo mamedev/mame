@@ -52,9 +52,13 @@ const options_entry ui_options::s_option_entries[] =
 	{ OPTION_LAST_USED_FILTER,              "",			OPTION_STRING,		"latest used filter" },
 	{ OPTION_LAST_USED_MACHINE,             "",			OPTION_STRING,		"latest used machine" },
 	{ OPTION_INFO_AUTO_AUDIT,               "0",		OPTION_BOOLEAN,		"enable auto audit in the general info panel" },
+	{ OPTION_UI_SKIP_GAMEINFO,              "0",        OPTION_BOOLEAN,     "skip displaying the information screen at startup" },
+	{ OPTION_UI_FONT,                       "default",  OPTION_STRING,      "specify a font to use" },
+	{ OPTION_UI_CONFIRM_QUIT,               "0",        OPTION_BOOLEAN,     "display confirm quit screen on exit" },
+	{ OPTION_UI_MOUSE,                      "1",        OPTION_BOOLEAN,     "display ui mouse cursor" },
 
 	// UI options
-	{ nullptr,                              nullptr,		OPTION_HEADER,		"UI UI OPTIONS" },
+	{ nullptr,                              nullptr,		OPTION_HEADER,		"UI OPTIONS" },
 	{ OPTION_INFOS_SIZE "(0.05-1.00)",      "0.75",			OPTION_FLOAT,		"UI right panel infos text size (0.05 - 1.00)" },
 	{ OPTION_FONT_ROWS "(25-40)",           "30",			OPTION_INTEGER,		"UI font text size (25 - 40)" },
 	{ OPTION_HIDE_PANELS "(0-3)",           "0",			OPTION_INTEGER,		"UI hide left/right panel in main view (0 = Show all, 1 = hide left, 2 = hide right, 3 = hide both" },
