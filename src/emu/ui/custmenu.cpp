@@ -272,7 +272,7 @@ void ui_menu_custom_filter::custom_render(void *selectedref, float top, float bo
 void ui_menu_custom_filter::save_custom_filters()
 {
 	// attempt to open the output file
-	emu_file file(machine().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == FILERR_NONE)
 	{
 		// generate custom filters info
@@ -587,7 +587,7 @@ void ui_menu_swcustom_filter::custom_render(void *selectedref, float top, float 
 void ui_menu_swcustom_filter::save_sw_custom_filters()
 {
 	// attempt to open the output file
-	emu_file file(machine().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (file.open("custom_", m_driver->name, "_filter.ini") == FILERR_NONE)
 	{
 		// generate custom filters info

@@ -140,10 +140,10 @@ void ui_menu_custom_ui::custom_render(void *selectedref, float top, float bottom
 
 ui_menu_font_ui::ui_menu_font_ui(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
-	emu_options &moptions = machine.options();
+	ui_options &moptions = machine.ui().options();
 #ifdef UI_WINDOWS
 
-	std::string name(moptions.ui_font());
+	std::string name(machine.options().ui_font());
 	list();
 
 	m_bold = (strreplace(name, "[B]", "") + strreplace(name, "[b]", "") > 0);
@@ -163,7 +163,7 @@ ui_menu_font_ui::ui_menu_font_ui(running_machine &machine, render_container *con
 	m_info_size = moptions.infos_size();
 	m_font_size = moptions.font_rows();
 
-	for (emu_options::entry *f_entry = moptions.first(); f_entry != nullptr; f_entry = f_entry->next())
+	for (ui_options::entry *f_entry = moptions.first(); f_entry != nullptr; f_entry = f_entry->next())
 	{
 		const char *name = f_entry->name();
 		if (name && strlen(name) && !strcmp(OPTION_INFOS_SIZE, f_entry->name()))
@@ -225,7 +225,7 @@ void ui_menu_font_ui::list()
 ui_menu_font_ui::~ui_menu_font_ui()
 {
 	std::string error_string;
-	emu_options &moptions = machine().options();
+	ui_options &moptions = machine().ui().options();
 
 #ifdef UI_WINDOWS
 	std::string name(m_fonts[m_actual]);
@@ -655,7 +655,7 @@ void ui_menu_colors_ui::custom_render(void *selectedref, float top, float bottom
 
 void ui_menu_colors_ui::restore_colors()
 {
-	emu_options options;
+	ui_options options;
 	for (int index = 1; index < MUI_RESTORE; index++)
 		m_color_table[index].color = rgb_t((UINT32)strtoul(options.value(m_color_table[index].option), nullptr, 16));
 }

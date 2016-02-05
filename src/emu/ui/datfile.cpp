@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "drivenum.h"
+#include "ui/ui.h"
 #include "ui/datfile.h"
 #include "ui/utils.h"
 
@@ -56,7 +57,7 @@ bool datfile_manager::first_run = true;
 //-------------------------------------------------
 datfile_manager::datfile_manager(running_machine &machine) : m_machine(machine)
 {
-	if (machine.options().enabled_dats() && first_run)
+	if (machine.ui().options().enabled_dats() && first_run)
 	{
 		first_run = false;
 		if (parseopen("mameinfo.dat"))
@@ -539,7 +540,7 @@ bool datfile_manager::parseopen(const char *filename)
 	// MAME core file parsing functions fail in recognizing UNICODE chars in UTF-8 without BOM,
 	// so it's better and faster use standard C fileio functions.
 
-	emu_file file(machine().options().history_path(), OPEN_FLAG_READ);
+	emu_file file(machine().ui().options().history_path(), OPEN_FLAG_READ);
 	if (file.open(filename) != FILERR_NONE)
 		return false;
 

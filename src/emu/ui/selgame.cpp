@@ -108,7 +108,7 @@ bool sort_game_list(const game_driver *x, const game_driver *y)
 ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container)
 {
 	std::string error_string, last_filter, sub_filter;
-	emu_options &moptions = machine.options();
+	ui_options &moptions = machine.ui().options();
 
 	// load drivers cache
 	load_cache_info();
@@ -185,7 +185,7 @@ ui_menu_select_game::~ui_menu_select_game()
 	std::string error_string, last_driver;
 	const game_driver *driver = nullptr;
 	ui_software_info *swinfo = nullptr;
-	emu_options &mopt = machine().options();
+	ui_options &mopt = machine().ui().options();
 	if (main_filters::actual == FILTER_FAVORITE_GAME)
 		swinfo = (selected >= 0 && selected < item.size()) ? (ui_software_info *)item[selected].ref : nullptr;
 	else
@@ -208,7 +208,7 @@ ui_menu_select_game::~ui_menu_select_game()
 	mopt.set_value(OPTION_LAST_USED_FILTER, filter.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 	mopt.set_value(OPTION_LAST_USED_MACHINE, last_driver.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 	mopt.set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE, error_string);
-	save_game_options(machine());
+	save_ui_options(machine());
 }
 
 //-------------------------------------------------
@@ -218,7 +218,7 @@ ui_menu_select_game::~ui_menu_select_game()
 void ui_menu_select_game::handle()
 {
 	bool check_filter = false;
-	bool enabled_dats = machine().options().enabled_dats();
+	bool enabled_dats = machine().ui().options().enabled_dats();
 
 	// if i have to load datfile, performe an hard reset
 	if (ui_globals::reset)
@@ -1023,7 +1023,7 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *m_event)
 			}
 
 			std::vector<s_bios> biosname;
-			if (!machine().options().skip_bios_menu() && has_multiple_bios(driver, biosname))
+			if (!machine().ui().options().skip_bios_menu() && has_multiple_bios(driver, biosname))
 				ui_menu::stack_push(global_alloc_clear<ui_bios_selection>(machine(), container, biosname, (void *)driver, false, false));
 			else
 			{
@@ -1051,7 +1051,7 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *m_event)
 void ui_menu_select_game::inkey_select_favorite(const ui_menu_event *m_event)
 {
 	ui_software_info *ui_swinfo = (ui_software_info *)m_event->itemref;
-	emu_options &mopt = machine().options();
+	ui_options &mopt = machine().ui().options();
 
 	// special case for configure options
 	if ((FPTR)ui_swinfo == 1)
@@ -1064,7 +1064,7 @@ void ui_menu_select_game::inkey_select_favorite(const ui_menu_event *m_event)
 	else if (ui_swinfo->startempty == 1)
 	{
 		// audit the game first to see if we're going to work
-		driver_enumerator enumerator(mopt, *ui_swinfo->driver);
+		driver_enumerator enumerator(machine().options(), *ui_swinfo->driver);
 		enumerator.next();
 		media_auditor auditor(enumerator);
 		media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
@@ -1097,7 +1097,7 @@ void ui_menu_select_game::inkey_select_favorite(const ui_menu_event *m_event)
 	else
 	{
 		// first validate
-		driver_enumerator drv(mopt, *ui_swinfo->driver);
+		driver_enumerator drv(machine().options(), *ui_swinfo->driver);
 		media_auditor auditor(drv);
 		drv.next();
 		software_list_device *swlist = software_list_device::find_by_name(drv.config(), ui_swinfo->listname.c_str());
@@ -1541,7 +1541,7 @@ void ui_menu_select_game::general_info(const game_driver *driver, std::string &b
 	strcatprintf(buffer, "Requires CHD: %s\n", (driver_cache[idx].b_chd ? "Yes" : "No"));
 
 	// audit the game first to see if we're going to work
-	if (machine().options().info_audit())
+	if (machine().ui().options().info_audit())
 	{
 		driver_enumerator enumerator(machine().options(), *driver);
 		enumerator.next();
@@ -1569,7 +1569,7 @@ void ui_menu_select_game::general_info(const game_driver *driver, std::string &b
 void ui_menu_select_game::inkey_export()
 {
 	std::string filename("exported");
-	emu_file infile(machine().options().ui_path(), OPEN_FLAG_READ);
+	emu_file infile(machine().ui().options().ui_path(), OPEN_FLAG_READ);
 	if (infile.open(filename.c_str(), ".xml") == FILERR_NONE)
 		for (int seq = 0; ; ++seq)
 		{
@@ -1583,7 +1583,7 @@ void ui_menu_select_game::inkey_export()
 		}
 
 	// attempt to open the output file
-	emu_file file(machine().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (file.open(filename.c_str(), ".xml") == FILERR_NONE)
 	{
 		FILE *pfile;
@@ -1625,7 +1625,7 @@ void ui_menu_select_game::inkey_export()
 void ui_menu_select_game::save_cache_info()
 {
 	// attempt to open the output file
-	emu_file file(machine().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
 	if (file.open("info_", emulator_info::get_configname(), ".ini") == FILERR_NONE)
 	{
@@ -1716,7 +1716,7 @@ void ui_menu_select_game::load_cache_info()
 	driver_cache.resize(driver_list::total() + 1);
 
 	// try to load driver cache
-	emu_file file(machine().options().ui_path(), OPEN_FLAG_READ);
+	emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_READ);
 	if (file.open("info_", emulator_info::get_configname(), ".ini") != FILERR_NONE)
 	{
 		save_cache_info();
@@ -1788,7 +1788,7 @@ void ui_menu_select_game::load_cache_info()
 bool ui_menu_select_game::load_available_machines()
 {
 	// try to load available drivers from file
-	emu_file file(machine().options().ui_path(), OPEN_FLAG_READ);
+	emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_READ);
 	if (file.open(emulator_info::get_configname(), "_avail.ini") != FILERR_NONE)
 		return false;
 
@@ -1840,7 +1840,7 @@ bool ui_menu_select_game::load_available_machines()
 void ui_menu_select_game::load_custom_filters()
 {
 	// attempt to open the output file
-	emu_file file(machine().options().ui_path(), OPEN_FLAG_READ);
+	emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_READ);
 	if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == FILERR_NONE)
 	{
 		char buffer[MAX_CHAR_INFO];
@@ -2066,7 +2066,7 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 	static std::string buffer;
 	std::vector<int> xstart;
 	std::vector<int> xend;
-	float text_size = machine().options().infos_size();
+	float text_size = machine().ui().options().infos_size();
 	const game_driver *driver = nullptr;
 	ui_software_info *soft = nullptr;
 	bool is_favorites = ((item[0].flags & MENU_FLAG_UI_FAVORITE) != 0);

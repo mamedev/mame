@@ -213,7 +213,7 @@ void ui_menu_select_software::handle()
 		}
 
 		// handle UI_HISTORY
-		else if (m_event->iptkey == IPT_UI_HISTORY && machine().options().enabled_dats())
+		else if (m_event->iptkey == IPT_UI_HISTORY && machine().ui().options().enabled_dats())
 		{
 			ui_software_info *ui_swinfo = (ui_software_info *)m_event->itemref;
 
@@ -817,7 +817,7 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 void ui_menu_select_software::inkey_select(const ui_menu_event *m_event)
 {
 	ui_software_info *ui_swinfo = (ui_software_info *)m_event->itemref;
-	emu_options &mopt = machine().options();
+	ui_options &mopt = machine().ui().options();
 
 	if (ui_swinfo->startempty == 1)
 	{
@@ -925,7 +925,7 @@ void ui_menu_select_software::inkey_special(const ui_menu_event *m_event)
 void ui_menu_select_software::load_sw_custom_filters()
 {
 	// attempt to open the output file
-	emu_file file(machine().options().ui_path(), OPEN_FLAG_READ);
+	emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_READ);
 	if (file.open("custom_", m_driver->name, "_filter.ini") == FILERR_NONE)
 	{
 		char buffer[MAX_CHAR_INFO];
@@ -1417,7 +1417,7 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 	static std::string buffer;
 	std::vector<int> xstart;
 	std::vector<int> xend;
-	float text_size = machine().options().infos_size();
+	float text_size = machine().ui().options().infos_size();
 	ui_software_info *soft = ((FPTR)selectedref > 2) ? (ui_software_info *)selectedref : nullptr;
 	static ui_software_info *oldsoft = nullptr;
 	static int old_sw_view = -1;
@@ -1876,7 +1876,7 @@ void ui_bios_selection::handle()
 {
 	// process the menu
 	const ui_menu_event *event = process(0);
-	emu_options &moptions = machine().options();
+	ui_options &moptions = machine().ui().options();
 	if (event != nullptr && event->iptkey == IPT_UI_SELECT && event->itemref != nullptr)
 		for (auto & elem : m_bios)
 			if ((void*)&elem.name == event->itemref)
@@ -1905,7 +1905,7 @@ void ui_bios_selection::handle()
 					ui_software_info *ui_swinfo = (ui_software_info *)m_driver;
 					std::string error;
 					machine().options().set_value("bios", elem.id, OPTION_PRIORITY_CMDLINE, error);
-					driver_enumerator drivlist(moptions, *ui_swinfo->driver);
+					driver_enumerator drivlist(machine().options(), *ui_swinfo->driver);
 					drivlist.next();
 					software_list_device *swlist = software_list_device::find_by_name(drivlist.config(), ui_swinfo->listname.c_str());
 					software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());

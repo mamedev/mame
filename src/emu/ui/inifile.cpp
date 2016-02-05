@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "ui/ui.h"
 #include "ui/inifile.h"
 #include "softlist.h"
 #include "drivenum.h"
@@ -38,7 +39,7 @@ inifile_manager::inifile_manager(running_machine &machine)
 void inifile_manager::directory_scan()
 {
 	// open extra INIs folder
-	file_enumerator path(machine().options().extraini_path());
+	file_enumerator path(machine().ui().options().extraini_path());
 	const osd_directory_entry *dir;
 
 	// loop into folder's file
@@ -149,7 +150,7 @@ bool inifile_manager::parseopen(const char *filename)
 	// MAME core file parsing functions fail in recognizing UNICODE chars in UTF-8 without BOM,
 	// so it's better and faster use standard C fileio functions.
 
-	emu_file file(machine().options().extraini_path(), OPEN_FLAG_READ);
+	emu_file file(machine().ui().options().extraini_path(), OPEN_FLAG_READ);
 	if (file.open(filename) != FILERR_NONE)
 		return false;
 
@@ -357,7 +358,7 @@ bool favorite_manager::isgame_favorite(ui_software_info &swinfo)
 
 void favorite_manager::parse_favorite()
 {
-	emu_file file(machine().options().ui_path(), OPEN_FLAG_READ);
+	emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_READ);
 	if (file.open(favorite_filename) == FILERR_NONE)
 	{
 		char readbuf[1024];
@@ -416,7 +417,7 @@ void favorite_manager::parse_favorite()
 void favorite_manager::save_favorite_games()
 {
 	// attempt to open the output file
-	emu_file file(machine().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (file.open(favorite_filename) == FILERR_NONE)
 	{
 		if (m_list.empty())

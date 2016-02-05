@@ -39,7 +39,7 @@ ui_menu_game_options::ui_menu_game_options(running_machine &machine, render_cont
 ui_menu_game_options::~ui_menu_game_options()
 {
 	ui_menu::menu_stack->reset(UI_MENU_RESET_SELECT_FIRST);
-	save_game_options(machine());
+	save_ui_options(machine());
 	ui_globals::switch_image = true;
 }
 
@@ -323,20 +323,20 @@ void ui_menu_game_options::custom_render(void *selectedref, float top, float bot
 }
 
 //-------------------------------------------------
-//  save game options
+//  save ui options
 //-------------------------------------------------
 
-void save_game_options(running_machine &machine)
+void save_ui_options(running_machine &machine)
 {
 	// attempt to open the output file
 	emu_file file(machine.options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	if (file.open(emulator_info::get_configname(), ".ini") == FILERR_NONE)
+	if (file.open("ui.ini") == FILERR_NONE)
 	{
 		// generate the updated INI
-		std::string initext = machine.options().output_ini();
+		std::string initext = machine.ui().options().output_ini();
 		file.puts(initext.c_str());
 		file.close();
 	}
 	else
-		machine.popmessage("**Error to save %s.ini**", emulator_info::get_configname());
+		machine.popmessage("**Error to save ui.ini**", emulator_info::get_configname());
 }

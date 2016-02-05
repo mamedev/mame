@@ -14,7 +14,7 @@
 #define __USRINTRF_H__
 
 #include "render.h"
-
+#include "moptions.h"
 
 /***************************************************************************
     CONSTANTS
@@ -116,10 +116,13 @@ public:
     // construction/destruction
     ui_manager(running_machine &machine);
 
+	void init();
+
     // getters
     running_machine &machine() const { return m_machine; }
     bool single_step() const { return m_single_step; }
-
+	ui_options &options() { return m_ui_options; }
+	
     // setters
     void set_single_step(bool single_step) { m_single_step = single_step; }
 
@@ -193,6 +196,7 @@ private:
     render_texture *        m_mouse_arrow_texture;
     bool                    m_mouse_show;
 	bool                    m_load_save_hold;
+	ui_options              m_ui_options;
 
     // text generators
     std::string &disclaimer_string(std::string &buffer);

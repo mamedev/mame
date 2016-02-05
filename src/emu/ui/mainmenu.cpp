@@ -137,11 +137,11 @@ void ui_menu_main::populate()
 		item_append("Cheat", nullptr, 0, (void *)CHEAT);
 
 	/* add history menu */
-	if (machine().options().enabled_dats())
+	if (machine().ui().options().enabled_dats())
 		item_append("History Info", nullptr, 0, (void *)HISTORY);
 
 	// add software history menu
-	if ((machine().system().flags & MACHINE_TYPE_ARCADE) == 0 && machine().options().enabled_dats())
+	if ((machine().system().flags & MACHINE_TYPE_ARCADE) == 0 && machine().ui().options().enabled_dats())
 	{
 		image_interface_iterator iter(machine().root_device());
 		for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
@@ -156,7 +156,7 @@ void ui_menu_main::populate()
 	}
 
 	/* add mameinfo / messinfo menu */
-	if (machine().options().enabled_dats())
+	if (machine().ui().options().enabled_dats())
 	{
 		if ((machine().system().flags & MACHINE_TYPE_ARCADE) != 0)
 			item_append("MameInfo", nullptr, 0, (void *)MAMEINFO);
@@ -165,15 +165,15 @@ void ui_menu_main::populate()
 	}
 
 	/* add sysinfo menu */
-	if ((machine().system().flags & MACHINE_TYPE_ARCADE) == 0 && machine().options().enabled_dats())
+	if ((machine().system().flags & MACHINE_TYPE_ARCADE) == 0 && machine().ui().options().enabled_dats())
 		item_append("SysInfo", nullptr, 0, (void *)SYSINFO);
 
 	/* add command list menu */
-	if ((machine().system().flags & MACHINE_TYPE_ARCADE) != 0 && machine().options().enabled_dats())
+	if ((machine().system().flags & MACHINE_TYPE_ARCADE) != 0 && machine().ui().options().enabled_dats())
 		item_append("Commands Info", nullptr, 0, (void *)COMMAND);
 
 	/* add story menu */
-	if ((machine().system().flags & MACHINE_TYPE_ARCADE) != 0 && machine().options().enabled_dats())
+	if ((machine().system().flags & MACHINE_TYPE_ARCADE) != 0 && machine().ui().options().enabled_dats())
 		item_append("Mamescores", nullptr, 0, (void *)STORYINFO);
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);

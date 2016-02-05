@@ -173,7 +173,7 @@ void ui_menu_audit::populate()
 void ui_menu_audit::save_available_machines()
 {
 	// attempt to open the output file
-	emu_file file(machine().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (file.open(emulator_info::get_configname(), "_avail.ini") == FILERR_NONE)
 	{
 		// generate header

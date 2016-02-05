@@ -326,7 +326,7 @@ ui_menu_directory::ui_menu_directory(running_machine &machine, render_container 
 
 ui_menu_directory::~ui_menu_directory()
 {
-	save_game_options(machine());
+	save_ui_options(machine());
 	ui_globals::reset = true;
 }
 

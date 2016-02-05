@@ -160,6 +160,24 @@ static INT32 slider_crossoffset(running_machine &machine, void *arg, std::string
 ***************************************************************************/
 
 //-------------------------------------------------
+//  load ui options
+//-------------------------------------------------
+
+static void load_ui_options(running_machine &machine)
+{
+	// parse the file
+	std::string error;
+	// attempt to open the output file
+	emu_file file(machine.options().ini_path(), OPEN_FLAG_READ);
+	if (file.open("ui.ini") == FILERR_NONE)
+	{
+		bool result = machine.ui().options().parse_ini_file((core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
+		if (!result)
+			osd_printf_error("**Error to load ui.ini**");
+	}
+}
+
+//-------------------------------------------------
 //  is_breakable_char - is a given unicode
 //  character a possible line break?
 //-------------------------------------------------
@@ -248,9 +266,14 @@ static const UINT32 mouse_bitmap[32*32] =
 ui_manager::ui_manager(running_machine &machine)
 	: m_machine(machine)
 {
+}
+
+void ui_manager::init()
+{
+	load_ui_options(machine());
 	// initialize the other UI bits
-	ui_menu::init(machine);
-	ui_gfx_init(machine);
+	ui_menu::init(machine());
+	ui_gfx_init(machine());
 
 	// reset instance variables
 	m_font = nullptr;
@@ -265,23 +288,23 @@ ui_manager::ui_manager(running_machine &machine)
 	m_mouse_arrow_texture = nullptr;
 	m_load_save_hold = false;
 
-	get_font_rows(&machine);
-	decode_ui_color(0, &machine);
+	get_font_rows(&machine());
+	decode_ui_color(0, &machine());
 
 	// more initialization
 	set_handler(handler_messagebox, 0);
 	m_non_char_keys_down = std::make_unique<UINT8[]>((ARRAY_LENGTH(non_char_keys) + 7) / 8);
-	m_mouse_show = machine.system().flags & MACHINE_CLICKABLE_ARTWORK ? true : false;
+	m_mouse_show = machine().system().flags & MACHINE_CLICKABLE_ARTWORK ? true : false;
 
 	// request a callback upon exiting
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ui_manager::exit), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ui_manager::exit), this));
 
 	// retrieve options
-	m_use_natural_keyboard = machine.options().natural_keyboard();
-	bitmap_argb32 *ui_mouse_bitmap = auto_alloc(machine, bitmap_argb32(32, 32));
+	m_use_natural_keyboard = machine().options().natural_keyboard();
+	bitmap_argb32 *ui_mouse_bitmap = auto_alloc(machine(), bitmap_argb32(32, 32));
 	UINT32 *dst = &ui_mouse_bitmap->pix32(0);
 	memcpy(dst,mouse_bitmap,32*32*sizeof(UINT32));
-	m_mouse_arrow_texture = machine.render().texture_alloc();
+	m_mouse_arrow_texture = machine().render().texture_alloc();
 	m_mouse_arrow_texture->set_bitmap(*ui_mouse_bitmap, ui_mouse_bitmap->cliprect(), TEXFORMAT_ARGB32);
 }
 
@@ -2729,10 +2752,10 @@ rgb_t decode_ui_color(int id, running_machine *machine)
 	static rgb_t color[ARRAY_LENGTH(s_color_list)];
 
 	if (machine != nullptr) {
-		emu_options option;
+		ui_options option;
 		for (int x = 0; x < ARRAY_LENGTH(s_color_list); x++) {
 			const char *o_default = option.value(s_color_list[x]);
-			const char *s_option = machine->options().value(s_color_list[x]);
+			const char *s_option = machine->ui().options().value(s_color_list[x]);
 			int len = strlen(s_option);
 			if (len != 8)
 				color[x] = rgb_t((UINT32)strtoul(o_default, nullptr, 16));
@@ -2751,5 +2774,5 @@ int get_font_rows(running_machine *machine)
 {
 	static int value;
 
-	return ((machine != nullptr) ? value = machine->options().font_rows() : value);
+	return ((machine != nullptr) ? value = machine->ui().options().font_rows() : value);
 }

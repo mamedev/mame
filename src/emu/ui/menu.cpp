@@ -465,7 +465,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 	float mouse_x = -1, mouse_y = -1;
 	bool history_flag = ((item[0].flags & MENU_FLAG_UI_HISTORY) != 0);
 
-	if (machine().options().use_background_image() && &machine().system() == &GAME_NAME(___empty) && bgrnd_bitmap->valid() && !noimage)
+	if (machine().ui().options().use_background_image() && &machine().system() == &GAME_NAME(___empty) && bgrnd_bitmap->valid() && !noimage)
 		container->add_quad(0.0f, 0.0f, 1.0f, 1.0f, ARGB_WHITE, bgrnd_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	// compute the width and height of the full menu
@@ -1305,7 +1305,7 @@ void ui_menu::init_ui(running_machine &machine)
 	bgrnd_bitmap = std::make_unique<bitmap_argb32>(0, 0);
 	bgrnd_texture = mrender.texture_alloc(render_texture::hq_scale);
 
-	emu_options &mopt = machine.options();
+	ui_options &mopt = machine.ui().options();
 	if (mopt.use_background_image() && &machine.system() == &GAME_NAME(___empty))
 	{
 		emu_file backgroundfile(".", OPEN_FLAG_READ);
@@ -1372,7 +1372,7 @@ void ui_menu::draw_select_game(bool noinput)
 	ui_manager &mui = machine().ui();
 
 	// draw background image if available
-	if (machine().options().use_background_image() && bgrnd_bitmap->valid())
+	if (machine().ui().options().use_background_image() && bgrnd_bitmap->valid())
 		container->add_quad(0.0f, 0.0f, 1.0f, 1.0f, ARGB_WHITE, bgrnd_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	hover = item.size() + 1;
@@ -2207,7 +2207,7 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 		int dest_yPixel = tmp_bitmap->height();
 
 		// force 4:3 ratio min
-		if (machine().options().forced_4x3_snapshot() && ratioI < 0.75f && ui_globals::curimage_view == SNAPSHOT_VIEW)
+		if (machine().ui().options().forced_4x3_snapshot() && ratioI < 0.75f && ui_globals::curimage_view == SNAPSHOT_VIEW)
 		{
 			// smaller ratio will ensure that the image fits in the view
 			dest_yPixel = tmp_bitmap->width() * 0.75f;
@@ -2217,7 +2217,7 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 			dest_yPixel *= ratio;
 		}
 		// resize the bitmap if necessary
-		else if (ratioW < 1 || ratioH < 1 || (machine().options().enlarge_snaps() && !no_available))
+		else if (ratioW < 1 || ratioH < 1 || (machine().ui().options().enlarge_snaps() && !no_available))
 		{
 			// smaller ratio will ensure that the image fits in the view
 			ratio = MIN(ratioW, ratioH);
@@ -2336,9 +2336,9 @@ void ui_menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 		}
 
 		// get search path
-		path_iterator path(machine().options().icons_directory());
+		path_iterator path(machine().ui().options().icons_directory());
 		std::string curpath;
-		std::string searchstr(machine().options().icons_directory());
+		std::string searchstr(machine().ui().options().icons_directory());
 
 		// iterate over path and add path for zipped formats
 		while (path.next(curpath))
@@ -2446,7 +2446,7 @@ void ui_menu::draw_palette_menu()
 	float gutter_width = lr_arrow_width * 1.3f;
 	int itemnum, linenum;
 
-	if (machine().options().use_background_image() && machine().options().system() == nullptr && bgrnd_bitmap->valid())
+	if (machine().ui().options().use_background_image() && machine().options().system() == nullptr && bgrnd_bitmap->valid())
 		container->add_quad(0.0f, 0.0f, 1.0f, 1.0f, ARGB_WHITE, bgrnd_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	// compute the width and height of the full menu

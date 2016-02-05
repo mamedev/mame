@@ -43,6 +43,6 @@ private:
 };
 
 // save options to file
-void save_game_options(running_machine &machine);
+void save_ui_options(running_machine &machine);
 
 #endif /* __UI_OPTSMENU_H__ */
