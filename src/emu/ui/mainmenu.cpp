@@ -23,6 +23,7 @@
 #include "ui/mainmenu.h"
 #include "ui/miscmenu.h"
 #include "ui/selgame.h"
+#include "ui/simpleselgame.h"
 #include "ui/sliders.h"
 #include "ui/slotopt.h"
 #include "ui/tapectrl.h"
@@ -284,7 +285,11 @@ void ui_menu_main::handle()
 			break;
 
 		case SELECT_GAME:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_select_game>(machine(), container, nullptr));
+			if (strcmp(machine().options().ui(),"simple")==0) {
+				ui_menu::stack_push(global_alloc_clear<ui_simple_menu_select_game>(machine(), container, nullptr));
+			} else {
+				ui_menu::stack_push(global_alloc_clear<ui_menu_select_game>(machine(), container, nullptr));
+			}		
 			break;
 
 		case BIOS_SELECTION:

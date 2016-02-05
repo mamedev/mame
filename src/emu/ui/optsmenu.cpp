@@ -217,65 +217,68 @@ void ui_menu_game_options::handle()
 
 void ui_menu_game_options::populate()
 {
-	// set filter arrow
-	std::string fbuff;
+	if (strcmp(machine().options().ui(),"simple")!=0) 
+	{	
+		// set filter arrow
+		std::string fbuff;
 
-	// add filter item
-	UINT32 arrow_flags = get_arrow_flags((int)FILTER_FIRST, (int)FILTER_LAST, main_filters::actual);
-	item_append("Filter", main_filters::text[main_filters::actual], arrow_flags, (void *)(FPTR)FILTER_MENU);
+		// add filter item
+		UINT32 arrow_flags = get_arrow_flags((int)FILTER_FIRST, (int)FILTER_LAST, main_filters::actual);
+		item_append("Filter", main_filters::text[main_filters::actual], arrow_flags, (void *)(FPTR)FILTER_MENU);
 
-	// add category subitem
-	if (main_filters::actual == FILTER_CATEGORY && !machine().inifile().ini_index.empty())
-	{
-		inifile_manager &inif = machine().inifile();
-		int afile = inif.current_file;
+		// add category subitem
+		if (main_filters::actual == FILTER_CATEGORY && !machine().inifile().ini_index.empty())
+		{
+			inifile_manager &inif = machine().inifile();
+			int afile = inif.current_file;
 
-		arrow_flags = get_arrow_flags(0, inif.ini_index.size() - 1, afile);
-		fbuff = " ^!File";
-		convert_command_glyph(fbuff);
-		item_append(fbuff.c_str(), inif.actual_file().c_str(), arrow_flags, (void *)(FPTR)FILE_CATEGORY_FILTER);
+			arrow_flags = get_arrow_flags(0, inif.ini_index.size() - 1, afile);
+			fbuff = " ^!File";
+			convert_command_glyph(fbuff);
+			item_append(fbuff.c_str(), inif.actual_file().c_str(), arrow_flags, (void *)(FPTR)FILE_CATEGORY_FILTER);
 
-		arrow_flags = get_arrow_flags(0, inif.ini_index[afile].category.size() - 1, inif.current_category);
-		fbuff = " ^!Category";
-		convert_command_glyph(fbuff);
-		item_append(fbuff.c_str(), inif.actual_category().c_str(), arrow_flags, (void *)(FPTR)CATEGORY_FILTER);
+			arrow_flags = get_arrow_flags(0, inif.ini_index[afile].category.size() - 1, inif.current_category);
+			fbuff = " ^!Category";
+			convert_command_glyph(fbuff);
+			item_append(fbuff.c_str(), inif.actual_category().c_str(), arrow_flags, (void *)(FPTR)CATEGORY_FILTER);
+		}
+		// add manufacturer subitem
+		else if (main_filters::actual == FILTER_MANUFACTURER && c_mnfct::ui.size() > 0)
+		{
+			arrow_flags = get_arrow_flags(0, c_mnfct::ui.size() - 1, c_mnfct::actual);
+			fbuff = "^!Manufacturer";
+			convert_command_glyph(fbuff);
+			item_append(fbuff.c_str(), c_mnfct::ui[c_mnfct::actual].c_str(), arrow_flags, (void *)(FPTR)MANUFACT_CAT_FILTER);
+		}
+		// add year subitem
+		else if (main_filters::actual == FILTER_YEAR && c_year::ui.size() > 0)
+		{
+			arrow_flags = get_arrow_flags(0, c_year::ui.size() - 1, c_year::actual);
+			fbuff.assign("^!Year");
+			convert_command_glyph(fbuff);
+			item_append(fbuff.c_str(), c_year::ui[c_year::actual].c_str(), arrow_flags, (void *)(FPTR)YEAR_CAT_FILTER);
+		}
+		// add screen subitem
+		else if (main_filters::actual == FILTER_SCREEN)
+		{
+			arrow_flags = get_arrow_flags(0, screen_filters::length - 1, screen_filters::actual);
+			fbuff = "^!Screen type";
+			convert_command_glyph(fbuff);
+			item_append(fbuff.c_str(), screen_filters::text[screen_filters::actual], arrow_flags, (void *)(FPTR)SCREEN_CAT_FILTER);
+		}
+		// add custom subitem
+		else if (main_filters::actual == FILTER_CUSTOM)
+		{
+			fbuff = "^!Setup custom filter";
+			convert_command_glyph(fbuff);
+			item_append(fbuff.c_str(), nullptr, 0, (void *)(FPTR)CUSTOM_FILTER);
+		}
+
+		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+
+		// add options items
+		item_append("Customize UI", nullptr, 0, (void *)(FPTR)CUSTOM_MENU);
 	}
-	// add manufacturer subitem
-	else if (main_filters::actual == FILTER_MANUFACTURER && c_mnfct::ui.size() > 0)
-	{
-		arrow_flags = get_arrow_flags(0, c_mnfct::ui.size() - 1, c_mnfct::actual);
-		fbuff = "^!Manufacturer";
-		convert_command_glyph(fbuff);
-		item_append(fbuff.c_str(), c_mnfct::ui[c_mnfct::actual].c_str(), arrow_flags, (void *)(FPTR)MANUFACT_CAT_FILTER);
-	}
-	// add year subitem
-	else if (main_filters::actual == FILTER_YEAR && c_year::ui.size() > 0)
-	{
-		arrow_flags = get_arrow_flags(0, c_year::ui.size() - 1, c_year::actual);
-		fbuff.assign("^!Year");
-		convert_command_glyph(fbuff);
-		item_append(fbuff.c_str(), c_year::ui[c_year::actual].c_str(), arrow_flags, (void *)(FPTR)YEAR_CAT_FILTER);
-	}
-	// add screen subitem
-	else if (main_filters::actual == FILTER_SCREEN)
-	{
-		arrow_flags = get_arrow_flags(0, screen_filters::length - 1, screen_filters::actual);
-		fbuff = "^!Screen type";
-		convert_command_glyph(fbuff);
-		item_append(fbuff.c_str(), screen_filters::text[screen_filters::actual], arrow_flags, (void *)(FPTR)SCREEN_CAT_FILTER);
-	}
-	// add custom subitem
-	else if (main_filters::actual == FILTER_CUSTOM)
-	{
-		fbuff = "^!Setup custom filter";
-		convert_command_glyph(fbuff);
-		item_append(fbuff.c_str(), nullptr, 0, (void *)(FPTR)CUSTOM_FILTER);
-	}
-
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-
-	// add options items
-	item_append("Customize UI", nullptr, 0, (void *)(FPTR)CUSTOM_MENU);
 	item_append("Display Options", nullptr, 0, (void *)(FPTR)DISPLAY_MENU);
 	item_append("Sound Options", nullptr, 0, (void *)(FPTR)SOUND_MENU);
 	item_append("Miscellaneous Options", nullptr, 0, (void *)(FPTR)MISC_MENU);

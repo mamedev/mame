@@ -264,6 +264,8 @@ files {
 	MAME_DIR .. "src/emu/ui/selector.h",
 	MAME_DIR .. "src/emu/ui/selgame.cpp",
 	MAME_DIR .. "src/emu/ui/selgame.h",
+	MAME_DIR .. "src/emu/ui/simpleselgame.cpp",
+	MAME_DIR .. "src/emu/ui/simpleselgame.h",
 	MAME_DIR .. "src/emu/ui/selsoft.cpp",
 	MAME_DIR .. "src/emu/ui/selsoft.h",
 	MAME_DIR .. "src/emu/ui/sndmenu.cpp",
