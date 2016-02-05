@@ -124,14 +124,12 @@ public:
 	const char *name() const { return m_name.c_str(); }
 	debug_view_source *next() const { return m_next; }
 	device_t *device() const { return m_device; }
-	bool is_octal() const { return m_is_octal; }
 
 private:
 	// internal state
 	debug_view_source *     m_next;                 // link to next item
 	std::string             m_name;                 // name of the source item
 	device_t *              m_device;               // associated device (if applicable)
-	bool                    m_is_octal;             // is view in octal or hex
 };
 
 

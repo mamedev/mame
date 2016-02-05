@@ -188,7 +188,10 @@ const char *running_machine::describe_context()
 	{
 		cpu_device *cpu = dynamic_cast<cpu_device *>(&executing->device());
 		if (cpu != nullptr)
-			strprintf(m_context, "'%s' (%s)", cpu->tag(), core_i64_format(cpu->pc(), cpu->space(AS_PROGRAM).logaddrchars(), cpu->is_octal()));
+		{
+			address_space &prg = cpu->space(AS_PROGRAM);
+			strprintf(m_context, "'%s' (%s)", cpu->tag(), core_i64_format(cpu->pc(), prg.logaddrchars(), prg.is_octal()));
+		}
 	}
 	else
 		m_context.assign("(no context)");

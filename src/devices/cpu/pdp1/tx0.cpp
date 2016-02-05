@@ -61,7 +61,7 @@ tx0_device::tx0_device(const machine_config &mconfig, device_type type, const ch
 	, m_sel_handler(*this)
 	, m_io_reset_callback(*this)
 {
-	m_is_octal = true;
+	m_program_config.m_is_octal = true;
 }
 
 tx0_8kw_device::tx0_8kw_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
