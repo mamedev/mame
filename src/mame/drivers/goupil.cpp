@@ -464,7 +464,6 @@ static MACHINE_CONFIG_START( goupil_g1, goupil_g1_state )
     MCFG_FD1791_ADD("fd1791", XTAL_8MHz )
     MCFG_FLOPPY_DRIVE_ADD("fd1791:0", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
     MCFG_FLOPPY_DRIVE_ADD("fd1791:1", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
-    MCFG_SOFTWARE_LIST_ADD("flop525_list", "goupil")
 
     MCFG_DEVICE_ADD("i8279_kb1", I8279, CPU_CLOCK)
     MCFG_I8279_OUT_SL_CB(WRITE8(goupil_g1_state, scanlines_kbd1_w))           // scan SL lines
