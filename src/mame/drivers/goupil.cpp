@@ -417,7 +417,7 @@ WRITE8_MEMBER(goupil_g1_state::via_video_pbb_w)
 
 WRITE_LINE_MEMBER( goupil_g1_state::via_video_ca2_w )
 {
-    if(old_state_ca2==0 and state==1)
+    if(old_state_ca2==0 && state==1)
     {
         m_ef9364->command_w(via_video_pbb_data&0xF);
     }
