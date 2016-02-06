@@ -59,7 +59,7 @@ Merit Riviera Notes - There are several known versions:
   Riviera Super Star (not dumped)
   Riviera Montana Version (with journal printer, not dumped)
   Riviera Tennessee Draw (not dumped)
-  Michigan Superstar Draw Poker (not dumped)
+  Michigan Super Draw Poker (Is there a "Superstar" version?)
   Americana
 
   There are several law suites over the Riviera games. Riviera Distributors Inc. bought earlier versions
@@ -422,7 +422,7 @@ static ADDRESS_MAP_START( bigappg_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigappga_map, AS_PROGRAM, 8, merit_state )
+static ADDRESS_MAP_START( misdraw_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_SHARE("cpunvram") // overlays other NVRAM? or is it banked?
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("nvram")
@@ -1275,10 +1275,10 @@ static MACHINE_CONFIG_DERIVED( bigappg, pitboss )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bigappga, bigappg )
+static MACHINE_CONFIG_DERIVED( misdraw, bigappg )
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bigappga_map)
+	MCFG_CPU_PROGRAM_MAP(misdraw_map)
 
 	MCFG_NVRAM_ADD_0FILL("cpunvram")
 MACHINE_CONFIG_END
@@ -1502,9 +1502,9 @@ ROM_START( bigappg )
 	ROM_LOAD( "haip_u40.u40", 0x0000, 0x2000, CRC(ac4983b8) SHA1(a552a15f813c331de67eaae2ed42cc037b26c5bd) )
 ROM_END
 
-ROM_START( bigappga )
+ROM_START( misdraw )
    ROM_REGION( 0x10000, "maincpu", 0 )
-   ROM_LOAD( "2131-16_u5-2.u5", 0x0000, 0x8000, CRC(fc756320) SHA1(6b810c57ed1be844a04a6081d727e182509604b4) ) /* 2131-16 U5-0 081889 */
+   ROM_LOAD( "2131-16_u5-2.u5", 0x0000, 0x8000, CRC(fc756320) SHA1(6b810c57ed1be844a04a6081d727e182509604b4) ) /* 2131-16 U5-2 081889 */
 
    ROM_REGION( 0x6000, "gfx1", 0 )
    ROM_LOAD( "u39.u39", 0x0000, 0x2000, CRC(0f09d19b) SHA1(1f98559d5bad7c84d92ecea5a6df9429914a47f0) )
@@ -2225,7 +2225,7 @@ GAME( 1986, rivieraa, riviera, dodge,    riviera,  driver_device,  0,   ROT0,  "
 GAME( 1986, rivierab, riviera, dodge,    rivierab, driver_device,  0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-2D)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1986, bigappg,  0,       bigappg,  bigappg,  driver_device,  0,   ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-13, U5-0)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bigappga, bigappg, bigappga, bigappg,  driver_device,  0,   ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-16, U5-0 081889)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, misdraw,  0,       misdraw,  bigappg,  driver_device,  0,   ROT0,  "Big Apple Games / Merit", "Michigan Super Draw (2131-16, U5-2)",   MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, dodgectya,dodgecty,dodge,    dodge,    driver_device,  0,   ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1986, dodgectyb,dodgecty,dodge,    dodge,    driver_device,  0,   ROT0,  "Merit", "Dodge City (2131-82, U5-50)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
