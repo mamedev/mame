@@ -66,6 +66,7 @@ CPUs related:
 Sound related:
 ==============
 * 1xOKIM6295 @ C6
+* 1xOSC1MHz @ C7
 * 2xM27C4001 @ C1 & C3 (OKI ADPCM samples)
 * 1xPAL16R4 @ E2 (handles OKI ROM banking)
 
@@ -93,6 +94,12 @@ left and low when turn right). The second signal of the optical encoder goes dir
 to pin #2 (CLK) at ICs A16 and A17 and it is a clock for the 74LS169 ICs; this clock
 frequency is proportional to the movements of the steering wheel: fast movements
 produces a high clock frequency, slow movements a low freq.
+
+PCB: REF.930217
+
+The PCB has a layout that can either use the 4 rom set of I7, I9, I11 & I 13 or larger
+ roms at H8 & H12 for graphics as well as the ability to use different size sound sample
+ roms at C1 & C3
 
 ***************************************************************************/
 
@@ -329,11 +336,10 @@ ROM_START( wrallya )
 	ROM_LOAD( "pal16r8-b15.bin",      0x0000, 0x0104, CRC(b50337a6) SHA1(1f922753cb9982cad9a3c9246894ecd38273236e) )
 ROM_END
 
-
 ROM_START( wrallyb )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "rally.c23", 0x000000, 0x080000, CRC(ddd6f833) SHA1(f12f82c412fa93f46020d50c2620974ae2fb502b) )
-	ROM_LOAD16_BYTE( "rally.c22", 0x000001, 0x080000, CRC(59a0d35c) SHA1(7c6f376a53c1e6d793cbfb16861ee3298ee013a1) )
+	ROM_LOAD16_BYTE( "rally_c23.c23", 0x000000, 0x080000, CRC(ddd6f833) SHA1(f12f82c412fa93f46020d50c2620974ae2fb502b) )
+	ROM_LOAD16_BYTE( "rally_c22.c22", 0x000001, 0x080000, CRC(59a0d35c) SHA1(7c6f376a53c1e6d793cbfb16861ee3298ee013a1) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* DS5002FP code */
 	ROM_LOAD( "wrdallas.bin", 0x00000, 0x8000, CRC(547d1768) SHA1(c58d1edd072d796be0663fb265f4739ec006b688) )
@@ -379,7 +385,7 @@ ROM_START( wrallyat ) /* Board Marked 930217, Atari License */
 ROM_END
 
 
-GAME( 1993, wrally,  0,      wrally, wrally, driver_device, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 0E56)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Tension  baja " */
-GAME( 1993, wrallya, wrally, wrally, wrally, driver_device, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 3873)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Power  Failure" */
-GAME( 1993, wrallyb, wrally, wrally, wrally, driver_device, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 8AA2)", MACHINE_SUPPORTS_SAVE ) // uses a 930217 board like the Atari set
+GAME( 1993, wrally,   0,      wrally, wrally, driver_device, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 0E56)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Tension  baja " */
+GAME( 1993, wrallya,  wrally, wrally, wrally, driver_device, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 3873)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Power  Failure" */
+GAME( 1993, wrallyb,  wrally, wrally, wrally, driver_device, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 8AA2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, wrallyat, wrally, wrally, wrally, driver_device, 0, ROT0, "Gaelco (Atari license)", "World Rally (US, 930217)", MACHINE_SUPPORTS_SAVE )
