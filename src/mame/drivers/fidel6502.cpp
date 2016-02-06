@@ -41,7 +41,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
 
 	// CSC
-	void csc_update_7442();
 	void csc_prepare_display();
 	DECLARE_READ8_MEMBER(csc_speech_r);
 	DECLARE_WRITE8_MEMBER(csc_pia0_pa_w);
@@ -62,7 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sc12_control_w);
 	DECLARE_READ8_MEMBER(sc12_input_r);
 	
-	// 6080/6092 (Excellence)
+	// 6080/6092/6093 (Excellence)
 	DECLARE_INPUT_CHANGED_MEMBER(fexcelv_bankswitch);
 	DECLARE_READ8_MEMBER(fexcelv_speech_r);
 	DECLARE_WRITE8_MEMBER(fexcel_ttl_w);
@@ -79,18 +78,13 @@ public:
 
 // misc handlers
 
-void fidel6502_state::csc_update_7442()
+void fidel6502_state::csc_prepare_display()
 {
 	// 7442 0-8: led select, input mux
 	m_inp_mux = 1 << m_led_select & 0x3ff;
 	
 	// 7442 9: speaker out
 	m_speaker->level_w(m_inp_mux >> 9 & 1);
-}
-
-void fidel6502_state::csc_prepare_display()
-{
-	csc_update_7442();
 
 	// 4 7seg leds + H
 	for (int i = 0; i < 4; i++)
@@ -100,7 +94,7 @@ void fidel6502_state::csc_prepare_display()
 	for (int i = 0; i < 8; i++)
 		m_display_state[i+4] = (m_inp_mux >> i & 1) ? m_led_data : 0;
 
-	set_display_size(8, 12);
+	set_display_size(8, 4+8);
 	set_display_segmask(0xf, 0x7f);
 	display_update();
 }
@@ -268,7 +262,7 @@ READ8_MEMBER(fidel6502_state::sc12_input_r)
 
 
 /******************************************************************************
-    6080/6092 (Excellence)
+    6080/6092/6093 (Excellence)
 ******************************************************************************/
 
 // misc handlers
@@ -299,15 +293,28 @@ WRITE8_MEMBER(fidel6502_state::fexcel_ttl_w)
 	// 74259 Q0-Q3: 7442 a0-a3
 	// 7442 0-8: led data, input mux
 	UINT16 sel = 1 << (m_led_select & 0xf) & 0x3ff;
+	UINT8 led_data = sel & 0xff;
 	m_inp_mux = sel & 0x1ff;
 
 	// 7442 9: speaker out (optional?)
 	m_speaker->level_w(sel >> 9 & 1);
 
-	// 74259 Q4,Q5: led select (active low)
-	display_matrix(9, 2, sel & 0x1ff, ~m_led_select >> 4 & 3);
+	// 74259 Q4-Q7,Q2,Q1: digit/led select (active low)
+	UINT8 led_sel = ~BITSWAP8(m_led_select,0,3,1,2,7,6,5,4) & 0x3f;
+
+	// a0-a2,d1: digit segment data (optional/model 6093)
+	m_7seg_data = (m_7seg_data & ~mask) | ((data & 2) ? mask : 0);
+	UINT8 seg_data = BITSWAP8(m_7seg_data,0,1,3,2,7,5,6,4);
 	
-	// speech (model 6092)
+	// update display: 4 7seg leds, 2*8 chessboard leds
+	for (int i = 0; i < 6; i++)
+		m_display_state[i] = (led_sel >> i & 1) ? ((i < 2) ? led_data : seg_data) : 0;
+
+	set_display_size(8, 2+4);
+	set_display_segmask(0x3c, 0x7f);
+	display_update();
+
+	// speech (optional/model 6092)
 	if (m_speech != nullptr)
 	{
 		// a0-a2,d2: 74259(2) to speech board
@@ -365,7 +372,7 @@ static ADDRESS_MAP_START( sc12_map, AS_PROGRAM, 8, fidel6502_state )
 ADDRESS_MAP_END
 
 
-// 6080/6092 (Excellence)
+// 6080/6092/6093 (Excellence)
 
 static ADDRESS_MAP_START( fexcel_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
@@ -801,5 +808,5 @@ COMP( 1981, cscfr,   csc,    0,      csc,     cscg,    driver_device, 0, "Fideli
 
 COMP( 1984, fscc12,  0,      0,      sc12,    sc12,    driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-COMP( 1987, fexcel,  0,      0,      fexcel,  fexcel,  driver_device, 0, "Fidelity Electronics", "Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1987, fexcel,  0,      0,      fexcel,  fexcel,  driver_device, 0, "Fidelity Electronics", "Excellence (model 6080/6093)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 COMP( 1987, fexcelv, 0,      0,      fexcelv, fexcelv, driver_device, 0, "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
