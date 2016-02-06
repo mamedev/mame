@@ -625,6 +625,10 @@ ROM_START( wcvol95 )
 
 //  ROM_REGION( 0x80, "user1", 0 ) /* eeprom */
 //  ROM_LOAD( "93c46.3k",    0x00, 0x80, CRC(88f8e270) SHA1(cb82203ad38e0c12ea998562b7b785979726afe5) )
+
+	ROM_REGION( 0x200, "gals", 0 )
+	ROM_LOAD( "GAL16V8B.10J.bin",    0x000, 0x117,  CRC(06bbcbd5) SHA1(f7adb4bca13bb799bc42411eb178edfdc11a76c7) )
+	ROM_LOAD( "GAL16V8B.5D.bin",     0x000, 0x117,  CRC(117784f0) SHA1(daf3720740621fc3af49333c96795718b693f4d2))
 ROM_END
 
 
@@ -644,7 +648,12 @@ ROM_START( wcvol95x )
 
 	ROM_REGION( 0x200000, "ymz", 0 ) /* YMZ280B-F samples */
 	ROM_LOAD( "mbx-03.13j",    0x00000, 0x200000,  CRC(061632bc) SHA1(7900ac56e59f4a4e5768ce72f4a4b7c5875f5ae8) )
+
+	ROM_REGION( 0x200, "gals", 0 )
+	ROM_LOAD( "GAL16V8B.10J.bin",    0x000, 0x117,  CRC(06bbcbd5) SHA1(f7adb4bca13bb799bc42411eb178edfdc11a76c7) )
+	ROM_LOAD( "GAL16V8B.5D.bin",     0x000, 0x117,  CRC(117784f0) SHA1(daf3720740621fc3af49333c96795718b693f4d2))
 ROM_END
+
 
 /**********************************************************************************/
 
