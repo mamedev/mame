@@ -2967,8 +2967,19 @@ Probably at some stage of development NAOMI was planned as non-JVS system as wel
 	ROM_SYSTEM_BIOS( 20, "bios20", "Naomi Dev BIOS" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 20, "dcnaodev.bios",   0x000000, 0x080000, CRC(7a50fab9) SHA1(ef79f448e0bf735d1264ad4f051d24178822110f) ) \
 	ROM_SYSTEM_BIOS( 21, "bios21", "Naomi Dev BIOS v1.10" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 21, "develop110.ic27", 0x000000, 0x200000, CRC(de7cfdb0) SHA1(da16800edc4d49f70481c124d487f544c2fa8ce7) )
+	ROM_LOAD16_WORD_SWAP_BIOS( 21, "develop110.ic27", 0x000000, 0x200000, CRC(de7cfdb0) SHA1(da16800edc4d49f70481c124d487f544c2fa8ce7) ) \
+	ROM_SYSTEM_BIOS( 22, "bios22", "Naomi Unknown Dev board" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 22, "zukinver0930.ipl", 0x000000, 0x200000, CRC(58e17c23) SHA1(19330f906accf1b859f56bbcedc2edff73747599) )
 /* dcnaodev.bios comes from a dev / beta board. The eprom was a 27C4096 */
+
+/*
+ zukinver0930.ipl comes from 837-13502-01 / 837-13663 PCB which contains:
+  22 empty sockets ROM0 - ROM21
+  315-6187 Altera EPM7064LC68-10
+  PC16550DV UART
+  Fujitsu MB???? SCSI controller
+  IPL BOOT ROM with printed label "Zukin Ver.0930 / 99/5/24 / SUM:DB9C"
+*/
 
 // bios for House of the Dead 2
 #define HOTD2_BIOS \
