@@ -135,7 +135,7 @@ void ui_simple_menu_select_game::handle()
 //-------------------------------------------------
 //  inkey_select
 //-------------------------------------------------
-
+extern void save_main_option(running_machine &machine);
 void ui_simple_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 {
 	const game_driver *driver = (const game_driver *)menu_event->itemref;
@@ -143,7 +143,8 @@ void ui_simple_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 	// special case for configure inputs
 	if ((FPTR)driver == 1)
 		ui_menu::stack_push(global_alloc_clear<ui_menu_game_options>(machine(), container));
-
+	else if ((FPTR)driver == 2)
+		save_main_option(machine());
 	// anything else is a driver
 	else
 	{
@@ -262,6 +263,7 @@ void ui_simple_menu_select_game::populate()
 	{
 		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 		item_append("Configure Options", nullptr, 0, (void *)1);
+		item_append("Save Configuration", nullptr, 0, (void *)2);
 	}
 
 	// configure the custom rendering
@@ -314,8 +316,8 @@ void ui_simple_menu_select_game::custom_render(void *selectedref, float top, flo
 						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	// determine the text to render below
-	driver = ((FPTR)selectedref > 1) ? (const game_driver *)selectedref : nullptr;
-	if ((FPTR)driver > 1)
+	driver = ((FPTR)selectedref > 2) ? (const game_driver *)selectedref : nullptr;
+	if ((FPTR)driver > 2)
 	{
 		const char *gfxstat, *soundstat;
 
