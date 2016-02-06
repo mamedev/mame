@@ -27,6 +27,8 @@
 #include "osdepend.h"
 #include "softlist.h"
 
+#include "ui/moptions.h"
+
 #include <new>
 #include <ctype.h>
 
@@ -1618,6 +1620,14 @@ void cli_frontend::execute_commands(const char *exename)
 
 		// generate the updated INI
 		file.puts(m_options.output_ini().c_str());
+
+		ui_options ui_opts;
+		emu_file file_ui(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		if (file_ui.open("ui.ini") != FILERR_NONE)
+			throw emu_fatalerror("Unable to create file ui.ini\n");
+
+		// generate the updated INI
+		file_ui.puts(ui_opts.output_ini().c_str());
 		return;
 	}
 
