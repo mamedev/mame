@@ -633,7 +633,7 @@ NE556 dual-timer IC:
 
 Memory map:
 -----------
-6000-0FFF: 4K of RAM (2016 * 2)
+6000-0FFF: 4K RAM (2016 * 2)
 2000-5FFF: cartridge
 6000-7FFF: control(W)
 8000-9FFF: 8K ROM SSS SCM23C65E4
@@ -689,6 +689,51 @@ ROM A11 is however tied to the CPU's XYZ
 6800_6FFF - Bridge Challenger 1/2
 7000_77FF - English 2/2
 7800_7FFF - Bridge Challenger 2/2
+
+------------------
+RE info by hap, based on PCB photos
+
+Memory map:
+-----------
+0000-3FFF: 8K RAM (SRM2264)
+4000-7FFF: control (R/W)
+8000-FFFF: 32K ROM (M27256 compatible)
+
+control (W):
+------------
+Z80 A0-A2 to 3*74259, Z80 Dx to D (_C unused)
+
+Z80 D0:
+- Q4,Q5: led commons
+- Q6,Q7,Q2,Q1: 7seg panel digit select
+- Q0-Q3: 7442 A0-A3
+  + 0-7: led data
+  + 0-8: keypad mux
+  + 9: buzzer out
+
+Z80 D1: (model 6093)
+- Q0-Q7: 7seg data
+
+Z80 D2: (model 6092)
+- Q0-Q5: TSI C0-C5
+- Q6: TSI START pin
+- Q7: TSI ROM A11
+
+A11 from TSI is tied to TSI ROM A12(!)
+TSI ROM A13,A14 are hardwired to the 2 language switches.
+Sound comes from the Audio out pin, digital out pins are N/C.
+
+control (R):
+------------
+Z80 A0-A2 to 2*74251, Z80 Dx to output
+
+Z80 D7 to Y:
+- D0-D7: keypad row data
+
+Z80 D6 to W: (model 6092, tied to VCC otherwise)
+- D0,D1: language switches
+- D2-D6: VCC
+- D7: TSI BUSY
 
 ******************************************************************************/
 

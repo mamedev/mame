@@ -302,7 +302,7 @@ WRITE8_MEMBER(fidel6502_state::fexcel_ttl_w)
 	// 74259 Q4-Q7,Q2,Q1: digit/led select (active low)
 	UINT8 led_sel = ~BITSWAP8(m_led_select,0,3,1,2,7,6,5,4) & 0x3f;
 
-	// a0-a2,d1: digit segment data (optional/model 6093)
+	// a0-a2,d1: digit segment data (model 6093)
 	m_7seg_data = (m_7seg_data & ~mask) | ((data & 2) ? mask : 0);
 	UINT8 seg_data = BITSWAP8(m_7seg_data,0,1,3,2,7,5,6,4);
 	
@@ -314,7 +314,7 @@ WRITE8_MEMBER(fidel6502_state::fexcel_ttl_w)
 	set_display_segmask(0x3c, 0x7f);
 	display_update();
 
-	// speech (optional/model 6092)
+	// speech (model 6092)
 	if (m_speech != nullptr)
 	{
 		// a0-a2,d2: 74259(2) to speech board
@@ -712,15 +712,15 @@ ROM_END
 
 ROM_START( fexcel )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) )
+	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) ) // same as fexcelv
 ROM_END
 
 ROM_START( fexcelv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) )
+	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) ) // PCB1, M27256
 
 	ROM_REGION( 0x8000, "speech", 0 )
-	ROM_LOAD("101-1081a01.ic2", 0x0000, 0x8000, CRC(c8ae1607) SHA1(6491ce6be60ed77f3dd931c0ca17616f13af943e) )
+	ROM_LOAD("101-1081a01.ic2", 0x0000, 0x8000, CRC(c8ae1607) SHA1(6491ce6be60ed77f3dd931c0ca17616f13af943e) ) // PCB2, M27256
 ROM_END
 
 
