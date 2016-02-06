@@ -3841,6 +3841,11 @@ static MACHINE_CONFIG_DERIVED( fitegolf, tnk3 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( fitegolf2, fitegolf )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_fitegolf2)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_START( ikari, snk_state )
 
@@ -4636,6 +4641,47 @@ ROM_START( fitegolfu )  /*  Later US version containing enhancements to make the
 	ROM_LOAD( "gu9",   0x00000, 0x8000, CRC(d4957ec5) SHA1(8ead7866ba5ac66ead6b707aa868bcae30c486e1) )  // P2.256
 	ROM_LOAD( "gu10",  0x08000, 0x8000, CRC(b3acdac2) SHA1(7377480d5e1b5ab2c49f5fee2927623ce8240e19) )  // R2.256
 	ROM_LOAD( "gu11",  0x10000, 0x8000, CRC(b99cf73b) SHA1(23989fc3914e77d364807a9eb96a4ddf75ad7cf1) )  // S2.256
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "pal16r6a.6c", 0x0000, 0x0104, CRC(de291f4e) SHA1(b50294d30cb8eacc7a9bb8b46695a7463ef45ff1) )
+	ROM_LOAD( "pal16l8a.3f", 0x0200, 0x0104, CRC(c5f1c1da) SHA1(e17293be0f77d302c59c1095fe1ec65e45557627) )
+	ROM_LOAD( "pal20l8a.6r", 0x0400, 0x0144, CRC(0f011673) SHA1(383e6f6e78daec9c874d5b48378111ca60f5ed64) )
+ROM_END
+
+  
+
+
+ROM_START( fitegolf2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "fg_ver2_6.4e", 0x0000, 0x4000, CRC(4cc9ef0c) SHA1(0ac6071725db3ec85659b170eecec91d22e76abd) )
+	ROM_LOAD( "fg_ver2_7.g4", 0x4000, 0x4000, CRC(144b0beb) SHA1(5b5e58ee93cabbdd560487b16d0cc7217d9cea7f) )
+	ROM_LOAD( "fg_ver2_8.4h", 0x8000, 0x4000, CRC(057888c9) SHA1(bd412bbd9939358fedf6cc7635b46f737a288e64) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "fg_ver2_3.2e",    0x0000, 0x4000, CRC(cf8c29d7) SHA1(2153ed43ddd1967e3aea7b40415b6cd70fc6ff34) )
+	ROM_LOAD( "fg_ver2_4.2g",    0x4000, 0x4000, CRC(90c1fb09) SHA1(13dcb6e9ffb3ed1588225df195c9f6af8a868970) )
+	ROM_LOAD( "fg_ver2_5.2h",    0x8000, 0x4000, CRC(0ffbdbb8) SHA1(09e58551a8caf06ba420b6b44f16003b50b2ebc4) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "fg_2.3e",    0x0000, 0x4000, CRC(811b87d7) SHA1(fb387f42085d6e0e5a88729ca0e50656411ce037) )
+	ROM_LOAD( "fg_1.2e",    0x4000, 0x8000, CRC(2d998e2b) SHA1(a471cfbb4dabc90fcc29c562620b9965eaff6861) )
+
+	ROM_REGION( 0x0c00, "proms", 0 )
+	ROM_LOAD( "gl1.5f",  0x00000, 0x00400, CRC(6e4c7836) SHA1(3ab3c498939fac992e2bf1c33983ee821a9b6a18) )
+	ROM_LOAD( "gl2.5g",  0x00400, 0x00400, CRC(29e7986f) SHA1(85ba8d3443458c27728f633745857a1315dd183f) )
+	ROM_LOAD( "gl3.5h",  0x00800, 0x00400, CRC(27ba9ff9) SHA1(f021d10460f40de4447560df5ac47fa53bb57ff9) )
+
+	ROM_REGION( 0x4000, "tx_tiles", 0 )
+	ROM_LOAD( "fg_12.1e",   0x0000, 0x4000, CRC(f1628dcf) SHA1(efea343d3a9dd45ef74947c297e166e34afbb680) )
+
+	ROM_REGION( 0x8000, "bg_tiles", 0 )
+	ROM_LOAD( "fg_14.3d",       0x0000, 0x4000, CRC(29393a19) SHA1(bae5a61c16832dc217c6fd0bd9d54db86cb9692f) )
+	ROM_LOAD( "fg_ver2_13.3c",  0x4000, 0x4000, CRC(5cd57c93) SHA1(7f5fb0d9e40b4894f3940373ad09fa4e984b108e) )
+
+	ROM_REGION( 0x18000, "sp16_tiles", 0 )
+	ROM_LOAD( "fg_ver2_11.7h",  0x00000, 0x8000, CRC(d4957ec5) SHA1(8ead7866ba5ac66ead6b707aa868bcae30c486e1) )
+	ROM_LOAD( "fg_ver2_10.7g",  0x08000, 0x8000, CRC(b3acdac2) SHA1(7377480d5e1b5ab2c49f5fee2927623ce8240e19) )
+	ROM_LOAD( "fg_ver2_9.7e",   0x10000, 0x8000, CRC(b99cf73b) SHA1(23989fc3914e77d364807a9eb96a4ddf75ad7cf1) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "pal16r6a.6c", 0x0000, 0x0104, CRC(de291f4e) SHA1(b50294d30cb8eacc7a9bb8b46695a7463ef45ff1) )
@@ -6317,6 +6363,7 @@ GAME( 1985, tnk3j,    tnk3,     tnk3,     tnk3, driver_device,     0,        ROT
 GAME( 1986, athena,   0,        athena,   athena, driver_device,   0,        ROT0,   "SNK", "Athena", 0 )
 GAME( 1988, fitegolf, 0,        fitegolf, fitegolf, driver_device, 0,        ROT0,   "SNK", "Fighting Golf (World?)", 0 )
 GAME( 1988, fitegolfu,fitegolf, fitegolf, fitegolfu, driver_device,0,        ROT0,   "SNK", "Fighting Golf (US)", 0 )
+GAME( 1988, fitegolf2,fitegolf, fitegolf2,fitegolfu, driver_device,0,        ROT0,   "SNK", "Fighting Golf (US, Ver 2)", 0 )
 GAME( 1988, countryc, 0,        fitegolf, countryc, snk_state, countryc,     ROT0,   "SNK", "Country Club", 0 )
 
 GAME( 1986, ikari,    0,        ikari,    ikari, driver_device,    0,        ROT270, "SNK", "Ikari Warriors (US JAMMA)", 0 ) // distributed by Tradewest(?)
