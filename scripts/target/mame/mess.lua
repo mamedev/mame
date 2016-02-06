@@ -1464,7 +1464,6 @@ files {
 	MAME_DIR .. "src/mame/includes/coleco.h",
 	MAME_DIR .. "src/mame/machine/coleco.cpp",
 	MAME_DIR .. "src/mame/machine/coleco.h",
-	MAME_DIR .. "src/mame/drivers/ctteach.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "cromemco")

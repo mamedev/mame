@@ -2314,7 +2314,6 @@ tbreakup    // Tomy
 phpball     // Tomy
 
 // hh_tms1k derivatives
-ctteach     // Coleco
 elecbowl    // Marx
 mbdtower    // Milton Bradley
 
@@ -2332,10 +2331,6 @@ wizatron
 lilprof
 lilprof78
 dataman
-
-// hh_tms1k tispellb.cpp
-spellb
-mrchalgr
 
 // hh_tms1k tispeak.cpp
 snspell
@@ -2360,6 +2355,10 @@ tntelluk
 tntellfr
 tntellp
 vocaid
+
+// hh_tms1k tispellb.cpp
+spellb
+mrchalgr
 
 // hh_ucom4
 ufombs      // Bambino
