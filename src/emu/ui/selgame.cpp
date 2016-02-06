@@ -166,8 +166,8 @@ ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_contai
 	if (!moptions.remember_last())
 		reselect_last::reset();
 
-	moptions.set_value(OPTION_SNAPNAME, "%g/%i", OPTION_PRIORITY_CMDLINE, error_string);
-	moptions.set_value(OPTION_SOFTWARENAME, "", OPTION_PRIORITY_CMDLINE, error_string);
+	machine.options().set_value(OPTION_SNAPNAME, "%g/%i", OPTION_PRIORITY_CMDLINE, error_string);
+	machine.options().set_value(OPTION_SOFTWARENAME, "", OPTION_PRIORITY_CMDLINE, error_string);
 
 	ui_globals::curimage_view = FIRST_VIEW;
 	ui_globals::curdats_view = UI_FIRST_LOAD;

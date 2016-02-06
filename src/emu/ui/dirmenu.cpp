@@ -144,13 +144,40 @@ void ui_menu_add_change_folder::handle()
 				std::string error_string;
 				if (m_change)
 				{
-					machine().options().set_value(s_folders_entry[m_ref].option, m_current_path.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+					if (machine().ui().options().exists(s_folders_entry[m_ref].option))
+					{
+						machine().ui().options().set_value(s_folders_entry[m_ref].option, m_current_path.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+					}
+					else {
+						if (strcmp(machine().options().value(s_folders_entry[m_ref].option), m_current_path.c_str()) != 0)
+						{
+							machine().options().set_value(s_folders_entry[m_ref].option, m_current_path.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+							save_main_option(machine(), s_folders_entry[m_ref].option, m_current_path.c_str());
+						}
+					}
 					machine().datfile().reset_run();
 				}
 				else
 				{
-					std::string tmppath = std::string(machine().options().value(s_folders_entry[m_ref].option)).append(";").append(m_current_path.c_str());
-					machine().options().set_value(s_folders_entry[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+					std::string tmppath;
+					if (machine().ui().options().exists(s_folders_entry[m_ref].option)) {
+						tmppath.assign(machine().ui().options().value(s_folders_entry[m_ref].option)).append(";").append(m_current_path.c_str());
+					}
+					else {
+						tmppath.assign(machine().options().value(s_folders_entry[m_ref].option)).append(";").append(m_current_path.c_str());
+					}
+					
+					if (machine().ui().options().exists(s_folders_entry[m_ref].option))
+					{
+						machine().ui().options().set_value(s_folders_entry[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+					}
+					else {
+						if (strcmp(machine().options().value(s_folders_entry[m_ref].option), tmppath.c_str()) != 0)
+						{
+							machine().options().set_value(s_folders_entry[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+							save_main_option(machine(), s_folders_entry[m_ref].option, tmppath.c_str());
+						}
+					}
 				}
 
 				ui_menu::menu_stack->parent->reset(UI_MENU_RESET_SELECT_FIRST);
@@ -464,7 +491,12 @@ void ui_menu_display_actual::handle()
 void ui_menu_display_actual::populate()
 {
 	m_tempbuf.assign("Current ").append(s_folders_entry[m_ref - 1].name).append(" Folders");
-	m_searchpath.assign(machine().options().value(s_folders_entry[m_ref - 1].option));
+	if (machine().ui().options().exists(s_folders_entry[m_ref - 1].option)) {
+		m_searchpath.assign(machine().ui().options().value(s_folders_entry[m_ref - 1].option));
+	}
+	else {
+		m_searchpath.assign(machine().options().value(s_folders_entry[m_ref - 1].option));
+	}
 	path_iterator path(m_searchpath.c_str());
 	std::string curpath;
 	m_folders.clear();
@@ -557,7 +589,13 @@ void ui_menu_display_actual::custom_render(void *selectedref, float top, float b
 ui_menu_remove_folder::ui_menu_remove_folder(running_machine &machine, render_container *container, int ref) : ui_menu(machine, container)
 {
 	m_ref = ref - 1;
-	m_searchpath.assign(machine.options().value(s_folders_entry[m_ref].option));
+	if (machine.ui().options().exists(s_folders_entry[m_ref].option)) {
+		m_searchpath.assign(machine.ui().options().value(s_folders_entry[m_ref].option));
+	}
+	else {
+		m_searchpath.assign(machine.options().value(s_folders_entry[m_ref].option));
+	}
+
 }
 
 ui_menu_remove_folder::~ui_menu_remove_folder()
@@ -582,7 +620,18 @@ void ui_menu_remove_folder::handle()
 
 		tmppath.substr(0, tmppath.size() - 1);
 		std::string error_string;
-		machine().options().set_value(s_folders_entry[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+		if (machine().ui().options().exists(s_folders_entry[m_ref].option))
+		{
+			machine().ui().options().set_value(s_folders_entry[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+		}
+		else {
+			if (strcmp(machine().options().value(s_folders_entry[m_ref].option),tmppath.c_str())!=0)
+			{
+				machine().options().set_value(s_folders_entry[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+				save_main_option(machine(), s_folders_entry[m_ref].option, tmppath.c_str());
+			}
+		}
+
 		ui_menu::menu_stack->parent->reset(UI_MENU_RESET_REMEMBER_REF);
 		ui_menu::stack_pop(machine());
 	}

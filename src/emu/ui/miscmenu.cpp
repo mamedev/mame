@@ -585,8 +585,19 @@ ui_menu_misc_options::ui_menu_misc_options(running_machine &machine, render_cont
 ui_menu_misc_options::~ui_menu_misc_options()
 {
 	std::string error_string;
-	for (int d = 1; d < ARRAY_LENGTH(m_options); ++d)
-		machine().ui().options().set_value(m_options[d].option, m_options[d].status, OPTION_PRIORITY_CMDLINE, error_string);
+	for (int d = 1; d < ARRAY_LENGTH(m_options); ++d) {
+		if (machine().ui().options().exists(m_options[d].option))
+		{
+			machine().ui().options().set_value(m_options[d].option, m_options[d].status, OPTION_PRIORITY_CMDLINE, error_string);
+		}
+		else {
+			if (machine().options().bool_value(m_options[d].option) != m_options[d].status)
+			{
+				machine().options().set_value(m_options[d].option, m_options[d].status, OPTION_PRIORITY_CMDLINE, error_string);
+				save_main_option(machine(), m_options[d].option, m_options[d].status);
+			}
+		}
+	}
 	ui_globals::reset = true;
 }
 
