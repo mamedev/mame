@@ -313,8 +313,8 @@ static void notifier_callback(const char *outname, INT32 value, void *param)
 	// loop over clients and notify them
 	for (client = clientlist; client != nullptr; client = client->next)
 	{
-		printf("there are clients\n");
-		if (param == nullptr || param == client)
+		if (param == nullptr || param == client->machine) {
 			PostMessage(client->hwnd, om_mame_update_state, client->machine->output().name_to_id(outname), value);
+		}
 	}
 }
