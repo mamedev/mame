@@ -353,9 +353,20 @@ Language Tutor modules:
 
 Other manufacturers:
 
-Coleco Talking Teacher:
+    Coleco Talking Teacher:
+    - MCU: TMS1400 MP7324
+    - TMS51xx: TMS5110A
+    - VSM: 16KB CM62084
+    - LCD: unknown 8*16-seg
+    - known releases:
+      + Coleco: Talking Teacher
+      + Sears: Talkatron - Learning Computer
+      + Tiger Electronics(Hong Kong): K-2-8
 
-x
+    An earlier revision used the SC-01 speech chip?
+    
+    modules:
+    - x
 
 ----------------------------------------------------------------------------
 
@@ -375,6 +386,7 @@ x
 #include "softlist.h"
 
 // internal artwork
+#include "ctteach.lh"
 #include "lantutor.lh"
 #include "snmath.lh"
 #include "snspell.lh"
@@ -419,6 +431,7 @@ public:
 	DECLARE_WRITE16_MEMBER(snspellc_write_r);
 	DECLARE_READ8_MEMBER(tntell_read_k);
 
+	void ctteach_prepare_display(UINT8 old, UINT8 data);
 	DECLARE_READ8_MEMBER(ctteach_read_k);
 	DECLARE_WRITE16_MEMBER(ctteach_write_o);
 	DECLARE_WRITE16_MEMBER(ctteach_write_r);
@@ -644,6 +657,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 
 // ctteach specific
 
+void tispeak_state::ctteach_prepare_display(UINT8 old, UINT8 data)
+{
+	if (data == old)
+		return;
+}
+
 WRITE16_MEMBER(tispeak_state::ctteach_write_r)
 {
 	// R1234: TMS5100 CTL8421
@@ -660,8 +679,7 @@ WRITE16_MEMBER(tispeak_state::ctteach_write_r)
 		power_off();
 
 	// R7-R10: LCD data
-	//..
-	
+	ctteach_prepare_display(m_r >> 7 & 0xf, data >> 7 & 0xf);
 	m_r = data;
 }
 
@@ -1322,8 +1340,8 @@ static MACHINE_CONFIG_START( ctteach, tispeak_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, ctteach_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, ctteach_write_r))
 
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_ctteach)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ctteach)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
