@@ -351,10 +351,17 @@ Language Tutor modules:
     - English(4/4): VSM: 16KB CD3529
 
 
+Other manufacturers:
+
+Coleco Talking Teacher:
+
+x
+
 ----------------------------------------------------------------------------
 
   TODO:
   - why doesn't lantutor work?
+  - identify and emulate ctteach LCD
   - emulate other known devices
 
 
@@ -411,6 +418,10 @@ public:
 	DECLARE_WRITE16_MEMBER(snspellc_write_o);
 	DECLARE_WRITE16_MEMBER(snspellc_write_r);
 	DECLARE_READ8_MEMBER(tntell_read_k);
+
+	DECLARE_READ8_MEMBER(ctteach_read_k);
+	DECLARE_WRITE16_MEMBER(ctteach_write_o);
+	DECLARE_WRITE16_MEMBER(ctteach_write_r);
 
 	// cartridge
 	UINT32 m_cart_max_size;
@@ -631,6 +642,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 }
 
 
+// ctteach specific
+
+WRITE16_MEMBER(tispeak_state::ctteach_write_r)
+{
+}
+
+WRITE16_MEMBER(tispeak_state::ctteach_write_o)
+{
+}
+
+READ8_MEMBER(tispeak_state::ctteach_read_k)
+{
+	return 0;
+}
+
+
 
 /***************************************************************************
 
@@ -799,7 +826,7 @@ static INPUT_PORTS_START( snmath )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE) // /
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Mix It")
 
 	PORT_START("IN.6") // R6
@@ -1031,6 +1058,12 @@ static INPUT_PORTS_START( tntell )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( ctteach )
+
+
+INPUT_PORTS_END
+
+
 
 /***************************************************************************
 
@@ -1207,6 +1240,26 @@ static MACHINE_CONFIG_DERIVED( tntell, vocaid )
 	MCFG_GENERIC_LOAD(tispeak_state, tispeak_cartridge)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "tntell")
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_START( ctteach, tispeak_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1400, MASTER_CLOCK/2)
+	MCFG_TMS1XXX_READ_K_CB(READ8(tispeak_state, ctteach_read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, ctteach_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, ctteach_write_r))
+
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	//MCFG_DEFAULT_LAYOUT(layout_ctteach)
+
+	/* sound hardware */
+	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("tms5100", TMS5110A, MASTER_CLOCK)
+	MCFG_FRAGMENT_ADD(tms5110_route)
 MACHINE_CONFIG_END
 
 
@@ -1551,6 +1604,20 @@ ROM_START( vocaid )
 ROM_END
 
 
+ROM_START( ctteach )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp7324", 0x0000, 0x1000, CRC(08d15ab6) SHA1(5b0f6c53e6732a362c4bb25d966d4072fdd33db8) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_ctteach_output.pla", 0, 557, CRC(3a5c7005) SHA1(3fe5819c138a90e7fc12817415f2622ca81b40b2) )
+
+	ROM_REGION( 0x8000, "tms6100", ROMREGION_ERASEFF )
+	ROM_LOAD( "cm62084.vsm", 0x0000, 0x4000, CRC(cd1376f7) SHA1(96fa484c392c451599bc083b8376cad9c998df7d) )
+ROM_END
+
+
 
 /*    YEAR  NAME        PARENT COMPAT MACHINE      INPUT       INIT                     COMPANY, FULLNAME, FLAGS */
 COMP( 1979, snspell,    0,        0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1979 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
@@ -1581,3 +1648,5 @@ COMP( 1981, tntelluk,   tntell,   0, tntell,       tntell,     tispeak_state, tn
 COMP( 1981, tntellfr,   tntell,   0, tntell,       tntell,     tispeak_state, tntell,   "Texas Instruments", "Le Livre Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK )
 
 COMP( 1982, vocaid,     0,        0, vocaid,       tntell,     driver_device, 0,        "Texas Instruments", "Vocaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+
+COMP( 1985, ctteach,    0,        0, ctteach,      ctteach,    driver_device, 0,        "Coleco", "Talking Teacher", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

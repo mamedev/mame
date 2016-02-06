@@ -2332,6 +2332,10 @@ lilprof
 lilprof78
 dataman
 
+// hh_tms1k tispellb.cpp
+spellb
+mrchalgr
+
 // hh_tms1k tispeak.cpp
 snspell
 snspellp
@@ -2355,10 +2359,7 @@ tntelluk
 tntellfr
 tntellp
 vocaid
-
-// hh_tms1k tispellb.cpp
-spellb
-mrchalgr
+ctteach     // Coleco
 
 // hh_ucom4
 ufombs      // Bambino
