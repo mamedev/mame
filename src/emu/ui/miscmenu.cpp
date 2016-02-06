@@ -594,7 +594,7 @@ ui_menu_misc_options::~ui_menu_misc_options()
 			if (machine().options().bool_value(m_options[d].option) != m_options[d].status)
 			{
 				machine().options().set_value(m_options[d].option, m_options[d].status, OPTION_PRIORITY_CMDLINE, error_string);
-				save_main_option(machine(), m_options[d].option, m_options[d].status);
+				machine().options().mark_changed(m_options[d].option);
 			}
 		}
 	}

@@ -52,17 +52,17 @@ ui_menu_sound_options::~ui_menu_sound_options()
 	if (strcmp(moptions.value(OSDOPTION_SOUND),m_sound ? OSDOPTVAL_AUTO : OSDOPTVAL_NONE)!=0)
 	{
 		moptions.set_value(OSDOPTION_SOUND, m_sound ? OSDOPTVAL_AUTO : OSDOPTVAL_NONE, OPTION_PRIORITY_CMDLINE, error_string);
-		save_main_option(machine(),OSDOPTION_SOUND, m_sound ? OSDOPTVAL_AUTO : OSDOPTVAL_NONE);
+		machine().options().mark_changed(OSDOPTION_SOUND);
 	}
 	if (moptions.int_value(OPTION_SAMPLERATE)!=m_sound_rate[m_cur_rates])
 	{
 		moptions.set_value(OPTION_SAMPLERATE, m_sound_rate[m_cur_rates], OPTION_PRIORITY_CMDLINE, error_string);
-		save_main_option(machine(),OPTION_SAMPLERATE, m_sound_rate[m_cur_rates]);
+		machine().options().mark_changed(OPTION_SAMPLERATE);
 	}
 	if (moptions.bool_value(OPTION_SAMPLES)!=m_samples)
 	{
 		moptions.set_value(OPTION_SAMPLES, m_samples, OPTION_PRIORITY_CMDLINE, error_string);
-		save_main_option(machine(),OPTION_SAMPLES, m_samples);
+		machine().options().mark_changed(OPTION_SAMPLES);
 	}
 }
 

@@ -49,7 +49,7 @@ ui_menu_controller_mapping::~ui_menu_controller_mapping()
 		if (strcmp(machine().options().value(m_options[d].option),m_device_status[m_options[d].status])!=0)
 		{
 			machine().options().set_value(m_options[d].option, m_device_status[m_options[d].status], OPTION_PRIORITY_CMDLINE, error_string);
-			save_main_option(machine(),m_options[d].option, m_device_status[m_options[d].status]);
+			machine().options().mark_changed(m_options[d].option);
 		}
 	}
 }

@@ -152,7 +152,7 @@ void ui_menu_add_change_folder::handle()
 						if (strcmp(machine().options().value(s_folders_entry[m_ref].option), m_current_path.c_str()) != 0)
 						{
 							machine().options().set_value(s_folders_entry[m_ref].option, m_current_path.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-							save_main_option(machine(), s_folders_entry[m_ref].option, m_current_path.c_str());
+							machine().options().mark_changed(s_folders_entry[m_ref].option);
 						}
 					}
 					machine().datfile().reset_run();
@@ -175,7 +175,7 @@ void ui_menu_add_change_folder::handle()
 						if (strcmp(machine().options().value(s_folders_entry[m_ref].option), tmppath.c_str()) != 0)
 						{
 							machine().options().set_value(s_folders_entry[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-							save_main_option(machine(), s_folders_entry[m_ref].option, tmppath.c_str());
+							machine().options().mark_changed(s_folders_entry[m_ref].option);
 						}
 					}
 				}
@@ -627,8 +627,8 @@ void ui_menu_remove_folder::handle()
 		else {
 			if (strcmp(machine().options().value(s_folders_entry[m_ref].option),tmppath.c_str())!=0)
 			{
-				machine().options().set_value(s_folders_entry[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-				save_main_option(machine(), s_folders_entry[m_ref].option, tmppath.c_str());
+				machine().options().set_value(s_folders_entry[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);				
+				machine().options().mark_changed(s_folders_entry[m_ref].option);
 			}
 		}
 

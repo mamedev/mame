@@ -1376,8 +1376,8 @@ void ui_menu::draw_select_game(bool noinput)
 		container->add_quad(0.0f, 0.0f, 1.0f, 1.0f, ARGB_WHITE, bgrnd_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	hover = item.size() + 1;
-	visible_items = (is_swlist) ? item.size() - 2 : item.size() - 4;
-	float extra_height = (is_swlist) ? 2.0f * line_height : 4.0f * line_height;
+	visible_items = (is_swlist) ? item.size() - 2 : item.size() - 5;
+	float extra_height = (is_swlist) ? 2.0f * line_height : 5.0f * line_height;
 	float visible_extra_menu_height = customtop + custombottom + extra_height;
 
 	// locate mouse

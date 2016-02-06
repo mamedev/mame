@@ -278,8 +278,4 @@ private:
 	void draw_icon(int linenum, void *selectedref, float x1, float y1);
 };
 
-void save_main_option(running_machine &machine,const char *name, const char *value);
-void save_main_option(running_machine &machine,const char *name, int value);
-void save_main_option(running_machine &machine,const char *name, float value);
-
 #endif  // __UI_MENU_H__

@@ -102,6 +102,57 @@ bool sort_game_list(const game_driver *x, const game_driver *y)
 }
 
 //-------------------------------------------------
+//  save main option
+//-------------------------------------------------
+
+void save_main_option(running_machine &machine)
+{
+	// parse the file
+	std::string error;
+	emu_options options(machine.options()); // This way we make sure that all OSD parts are in
+	std::string error_string;
+
+	// attempt to open the main ini file
+	{
+		emu_file file(machine.options().ini_path(), OPEN_FLAG_READ);
+		if (file.open(emulator_info::get_configname(), ".ini") == FILERR_NONE)
+		{
+			bool result = options.parse_ini_file((core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
+			if (!result)
+			{
+				osd_printf_error("**Error to load %s.ini**", emulator_info::get_configname());
+				return;
+			}
+		}
+	}
+
+	for (emu_options::entry *f_entry = machine.options().first(); f_entry != nullptr; f_entry = f_entry->next())
+	{
+		if (f_entry->is_changed()) 
+		{
+			options.set_value(f_entry->name(), f_entry->value(), OPTION_PRIORITY_CMDLINE, error_string);
+		}
+	}
+
+	// attempt to open the output file
+	{
+		emu_file file(machine.options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		if (file.open(emulator_info::get_configname(), ".ini") == FILERR_NONE)
+		{
+			// generate the updated INI
+			std::string initext = options.output_ini();
+			file.puts(initext.c_str());
+			file.close();
+		}
+		else {
+			machine.popmessage("**Error to save %s.ini**", emulator_info::get_configname());
+			return;
+		}			
+	}
+	machine.ui().popup_time(3, "\n    Configuration saved    \n\n");
+}
+
+//-------------------------------------------------
 //  ctor
 //-------------------------------------------------
 
@@ -191,10 +242,10 @@ ui_menu_select_game::~ui_menu_select_game()
 	else
 		driver = (selected >= 0 && selected < item.size()) ? (const game_driver *)item[selected].ref : nullptr;
 
-	if ((FPTR)driver > 2)
+	if ((FPTR)driver > 3)
 		last_driver = driver->name;
 
-	if ((FPTR)swinfo > 2)
+	if ((FPTR)swinfo > 3)
 		last_driver = swinfo->shortname;
 
 	std::string filter(main_filters::text[main_filters::actual]);
@@ -330,13 +381,13 @@ void ui_menu_select_game::handle()
 			if (main_filters::actual != FILTER_FAVORITE_GAME)
 			{
 				const game_driver *driver = (const game_driver *)m_event->itemref;
-				if ((FPTR)driver > 2)
+				if ((FPTR)driver > 3)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_HISTORY_LOAD, driver));
 			}
 			else
 			{
 				ui_software_info *swinfo  = (ui_software_info *)m_event->itemref;
-				if ((FPTR)swinfo > 2)
+				if ((FPTR)swinfo > 3)
 				{
 					if (swinfo->startempty == 1)
 						ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_HISTORY_LOAD, swinfo->driver));
@@ -352,7 +403,7 @@ void ui_menu_select_game::handle()
 			if (main_filters::actual != FILTER_FAVORITE_GAME)
 			{
 				const game_driver *driver = (const game_driver *)m_event->itemref;
-				if ((FPTR)driver > 2)
+				if ((FPTR)driver > 3)
 				{
 					if ((driver->flags & MACHINE_TYPE_ARCADE) != 0)
 						ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_MAMEINFO_LOAD, driver));
@@ -363,7 +414,7 @@ void ui_menu_select_game::handle()
 			else
 			{
 				ui_software_info *swinfo  = (ui_software_info *)m_event->itemref;
-				if ((FPTR)swinfo > 2 && swinfo->startempty == 1)
+				if ((FPTR)swinfo > 3 && swinfo->startempty == 1)
 				{
 					if ((swinfo->driver->flags & MACHINE_TYPE_ARCADE) != 0)
 						ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_MAMEINFO_LOAD, swinfo->driver));
@@ -379,13 +430,13 @@ void ui_menu_select_game::handle()
 			if (main_filters::actual != FILTER_FAVORITE_GAME)
 			{
 				const game_driver *driver = (const game_driver *)m_event->itemref;
-				if ((FPTR)driver > 2)
+				if ((FPTR)driver > 3)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_STORY_LOAD, driver));
 			}
 			else
 			{
 				ui_software_info *swinfo  = (ui_software_info *)m_event->itemref;
-				if ((FPTR)swinfo > 2 && swinfo->startempty == 1)
+				if ((FPTR)swinfo > 3 && swinfo->startempty == 1)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_STORY_LOAD, swinfo->driver));
 			}
 		}
@@ -396,13 +447,13 @@ void ui_menu_select_game::handle()
 			if (main_filters::actual != FILTER_FAVORITE_GAME)
 			{
 				const game_driver *driver = (const game_driver *)m_event->itemref;
-				if ((FPTR)driver > 2)
+				if ((FPTR)driver > 3)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_SYSINFO_LOAD, driver));
 			}
 			else
 			{
 				ui_software_info *swinfo  = (ui_software_info *)m_event->itemref;
-				if ((FPTR)swinfo > 2 && swinfo->startempty == 1)
+				if ((FPTR)swinfo > 3 && swinfo->startempty == 1)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_SYSINFO_LOAD, swinfo->driver));
 			}
 		}
@@ -413,13 +464,13 @@ void ui_menu_select_game::handle()
 			if (main_filters::actual != FILTER_FAVORITE_GAME)
 			{
 				const game_driver *driver = (const game_driver *)m_event->itemref;
-				if ((FPTR)driver > 2)
+				if ((FPTR)driver > 3)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_command>(machine(), container, driver));
 			}
 			else
 			{
 				ui_software_info *swinfo  = (ui_software_info *)m_event->itemref;
-				if ((FPTR)swinfo > 2 && swinfo->startempty == 1)
+				if ((FPTR)swinfo > 3 && swinfo->startempty == 1)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_command>(machine(), container, swinfo->driver));
 			}
 		}
@@ -430,7 +481,7 @@ void ui_menu_select_game::handle()
 			if (main_filters::actual != FILTER_FAVORITE_GAME)
 			{
 				const game_driver *driver = (const game_driver *)m_event->itemref;
-				if ((FPTR)driver > 2)
+				if ((FPTR)driver > 3)
 				{
 					if (!machine().favorite().isgame_favorite(driver))
 					{
@@ -448,7 +499,7 @@ void ui_menu_select_game::handle()
 			else
 			{
 				ui_software_info *swinfo = (ui_software_info *)m_event->itemref;
-				if ((FPTR)swinfo > 2)
+				if ((FPTR)swinfo > 3)
 				{
 					machine().popmessage("%s\n removed from favorites list.", swinfo->longname.c_str());
 					machine().favorite().remove_favorite_game(*swinfo);
@@ -657,6 +708,7 @@ void ui_menu_select_game::populate()
 	item_append(MENU_SEPARATOR_ITEM, nullptr, MENU_FLAG_UI, nullptr);
 	item_append("Configure Options", nullptr, MENU_FLAG_UI, (void *)(FPTR)1);
 	item_append("Configure Directories", nullptr, MENU_FLAG_UI, (void *)(FPTR)2);
+	item_append("Save Configuration", nullptr, MENU_FLAG_UI, (void *)(FPTR)3);
 
 	// configure the custom rendering
 	customtop = 3.0f * machine().ui().get_line_height() + 5.0f * UI_BOX_TB_BORDER;
@@ -811,15 +863,15 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 
 	// determine the text to render below
 	if (main_filters::actual != FILTER_FAVORITE_GAME)
-		driver = ((FPTR)selectedref > 2) ? (const game_driver *)selectedref : nullptr;
+		driver = ((FPTR)selectedref > 3) ? (const game_driver *)selectedref : nullptr;
 	else
 	{
-		swinfo = ((FPTR)selectedref > 2) ? (ui_software_info *)selectedref : nullptr;
+		swinfo = ((FPTR)selectedref > 3) ? (ui_software_info *)selectedref : nullptr;
 		if (swinfo && swinfo->startempty == 1)
 			driver = swinfo->driver;
 	}
 
-	if ((FPTR)driver > 2)
+	if ((FPTR)driver > 3)
 	{
 		isstar = machine().favorite().isgame_favorite(driver);
 
@@ -868,7 +920,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 			color = UI_RED_COLOR;
 	}
 
-	else if ((FPTR)swinfo > 2)
+	else if ((FPTR)swinfo > 3)
 	{
 		isstar = machine().favorite().isgame_favorite(*swinfo);
 
@@ -1000,6 +1052,10 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *m_event)
 	else if ((FPTR)driver == 2)
 		ui_menu::stack_push(global_alloc_clear<ui_menu_directory>(machine(), container));
 	// anything else is a driver
+	else if ((FPTR)driver == 3) {
+		save_main_option(machine());		
+	}
+	// anything else is a driver
 	else
 	{
 		// audit the game first to see if we're going to work
@@ -1060,7 +1116,10 @@ void ui_menu_select_game::inkey_select_favorite(const ui_menu_event *m_event)
 	// special case for configure directory
 	else if ((FPTR)ui_swinfo == 2)
 		ui_menu::stack_push(global_alloc_clear<ui_menu_directory>(machine(), container));
-
+	else if ((FPTR)ui_swinfo == 3)
+	{
+		save_main_option(machine());
+	}
 	else if (ui_swinfo->startempty == 1)
 	{
 		// audit the game first to see if we're going to work
@@ -2077,7 +2136,7 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 
 	if (is_favorites)
 	{
-		soft = ((FPTR)selectedref > 2) ? (ui_software_info *)selectedref : nullptr;
+		soft = ((FPTR)selectedref > 3) ? (ui_software_info *)selectedref : nullptr;
 		if (soft && soft->startempty == 1)
 		{
 			driver = soft->driver;
@@ -2088,7 +2147,7 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 	}
 	else
 	{
-		driver = ((FPTR)selectedref > 2) ? (const game_driver *)selectedref : nullptr;
+		driver = ((FPTR)selectedref > 3) ? (const game_driver *)selectedref : nullptr;
 		oldsoft = nullptr;
 	}
 
@@ -2393,7 +2452,7 @@ void ui_menu_select_game::arts_render(void *selectedref, float origx1, float ori
 
 	if (is_favorites)
 	{
-		soft = ((FPTR)selectedref > 2) ? (ui_software_info *)selectedref : nullptr;
+		soft = ((FPTR)selectedref > 3) ? (ui_software_info *)selectedref : nullptr;
 		if (soft && soft->startempty == 1)
 		{
 			driver = soft->driver;
@@ -2404,7 +2463,7 @@ void ui_menu_select_game::arts_render(void *selectedref, float origx1, float ori
 	}
 	else
 	{
-		driver = ((FPTR)selectedref > 2) ? (const game_driver *)selectedref : nullptr;
+		driver = ((FPTR)selectedref > 3) ? (const game_driver *)selectedref : nullptr;
 		oldsoft = nullptr;
 	}
 
