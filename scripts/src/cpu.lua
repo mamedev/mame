@@ -10,14 +10,6 @@
 ---------------------------------------------------------------------------
 
 --------------------------------------------------
--- Shared code
---------------------------------------------------
-
-files {
-	MAME_DIR .. "src/devices/cpu/vtlb.cpp",
-}
-
---------------------------------------------------
 -- Dynamic recompiler objects
 --------------------------------------------------
 
@@ -43,7 +35,6 @@ if (CPUS["SH2"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RS
 		MAME_DIR .. "src/devices/cpu/drcbex64.cpp",
 		MAME_DIR .. "src/devices/cpu/drcbex64.h",
 		MAME_DIR .. "src/devices/cpu/drcumlsh.h",
-		MAME_DIR .. "src/devices/cpu/vtlb.h",
 		MAME_DIR .. "src/devices/cpu/x86emit.h",		
 	}
 end
