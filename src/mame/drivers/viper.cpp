@@ -2439,6 +2439,19 @@ ROM_START(p911e) //*
 	DISK_IMAGE( "a00eaa02", 0, SHA1(81565a2dce2e2b0a7927078a784354948af1f87c) )
 ROM_END
 
+ROM_START(p911ea)
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("a00eaa_nvram.u39", 0x000000, 0x2000,  CRC(4f3497b6) SHA1(3045c54f98dff92cdf3a1fc0cd4c76ba82d632d7) )
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "a00eaa02", 0, SHA1(fa057bf17f4c0fb9b9a09b820ff7a101e44fab7d) )
+ROM_END
+
 ROM_START(p911j) //*
 	VIPER_BIOS
 
@@ -2544,6 +2557,32 @@ ROM_START(thrild2a) //*
 	DISK_IMAGE( "a41a02", 0, SHA1(bbb71e23bddfa07dfa30b6565a35befd82b055b8) )
 ROM_END
 
+ROM_START(thrild2ab) 
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("a41aaa_nvram.u39", 0x00000, 0x2000, CRC(d5de9b8e) SHA1(768bcd46a6ad20948f60f5e0ecd2f7b9c2901061))
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "a41a02_alt", 0, SHA1(7a9cfdab7000765ffdd9198b209f7a74741248f2) )
+ROM_END
+
+ROM_START(thrild2ac) 
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("a41aaa_nvram.u39", 0x00000, 0x2000, CRC(d5de9b8e) SHA1(768bcd46a6ad20948f60f5e0ecd2f7b9c2901061))
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "a41a02_alt2", 0, SHA1(c8bfbac4f5a1a2241df7417ad2f9eba7d9e9a9df) )
+ROM_END
+
 /* This CF card has sticker 941EAA02 */
 ROM_START(thrild2c) //*
 	VIPER_BIOS
@@ -2584,6 +2623,17 @@ ROM_START(tsurugij) //*
 	DISK_IMAGE( "a30c02", 0, SHA1(533b5669b00884a800df9ba29651777a76559862) )
 ROM_END
 
+ROM_START(tsurugie)
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "a30eab02", 0, SHA1(fcc5b69f89e246f26ca4b8546cc409d3488bbdd9) )
+ROM_END
+
 /* This CF card has sticker C22D02 */
 ROM_START(wcombat) //*
 	VIPER_BIOS
@@ -2596,6 +2646,19 @@ ROM_START(wcombat) //*
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "c22d02", 0, SHA1(69a24c9e36b073021d55bec27d89fcc0254a60cc) ) // chs 978,8,32
+ROM_END
+
+ROM_START(wcombatb) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("wcombat_nvram.u39", 0x00000, 0x2000, CRC(4f8b5858) SHA1(68066241c6f9db7f45e55b3c5da101987f4ce53c))
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "c22d02_alt", 0, SHA1(772e3fe7910f5115ec8f2235bb48ba9fcac6950d) ) // chs 978,8,32
 ROM_END
 
 ROM_START(wcombatk) //*
@@ -2746,6 +2809,7 @@ GAME(2001, p911,      kviper,    viper, viper, viper_state, vipercf,  ROT90,  "K
 GAME(2001, p911uc,    p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 911 (ver UAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, p911kc,    p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 911 (ver KAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, p911e,     p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 24/7 (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, p911ea,    p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 24/7 (ver EAA, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, p911j,     p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Keisatsukan Shinjuku 24ji (ver JAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, p9112,     kviper,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2003, popn9,     kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Pop'n Music 9 (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
@@ -2754,10 +2818,14 @@ GAME(2001, sogeki,    sscopex,   viper, viper, viper_state, vipercf,  ROT0,  "Ko
 GAME(2002, sscopefh,  kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, thrild2,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EBB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, thrild2a,  thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, thrild2ab, thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, thrild2ac, thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt 2)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, thrild2c,  thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, tsurugi,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, tsurugie,  tsurugi,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, tsurugij,  tsurugi,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver JAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, wcombat,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, wcombatb,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, wcombatk,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver KBC:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, wcombatu,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat / Warzaid (ver UCD:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, wcombatj,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
