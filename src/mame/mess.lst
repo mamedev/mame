@@ -2261,7 +2261,6 @@ gckong      // Gakken
 gdigdug     // Gakken
 mwcbaseb    // Mattel
 pbqbert     // Parker Brothers
-mvbfree     // Mego
 kingman     // Tomy
 tmtron      // Tomy
 vinvader    // VTech
@@ -2374,6 +2373,8 @@ efball      // Epoch
 galaxy2     // Epoch
 astrocmd    // Epoch
 edracula    // Epoch
+mcompgin    // Mattel
+mvbfree     // Mego
 tccombat    // Tomy
 tmpacman    // Tomy
 tmtennis    // Tomy
@@ -2453,6 +2454,7 @@ vcs80
 v1050
 x820
 x820ii
+notetakr
 x168
 xor100
 iq151
