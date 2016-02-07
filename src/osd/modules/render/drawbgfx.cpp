@@ -675,7 +675,7 @@ int renderer_bgfx::draw(int update)
 					bgfx::submit(0, m_progQuad);
 				} else {
 					screenQuad(prim->bounds.x0, prim->bounds.y0, prim->bounds.x1, prim->bounds.y1,
-						0xFFFFFFFF,prim->texcoords);
+						u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255),prim->texcoords);
 					bgfx::TextureHandle m_texture;					
 					// render based on the texture coordinates
 					switch (prim->flags & PRIMFLAG_TEXFORMAT_MASK)
