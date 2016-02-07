@@ -239,6 +239,7 @@ protected:
 	void ei();
 
 	void take_interrupt();
+	void take_nmi();
 
 	// address spaces
 	const address_space_config m_program_config;

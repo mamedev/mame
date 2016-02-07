@@ -3125,6 +3125,27 @@ OP(op,fe) { cp(arg());                                                          
 OP(op,ff) { rst(0x38);                                                            } /* RST  7           */
 
 
+void z80_device::take_nmi()
+{
+	/* there isn't a valid previous program counter */
+	PRVPC = -1;
+
+	/* Check if processor was halted */
+	leave_halt();
+
+#if HAS_LDAIR_QUIRK
+	/* reset parity flag after LD A,I or LD A,R */
+	if (m_after_ldair) F &= ~PF;
+#endif
+
+	m_iff1 = 0;
+	push(m_pc);
+	PCD = 0x0066;
+	WZ=PCD;
+	m_icount -= 11;
+	m_nmi_pending = FALSE;
+}
+
 void z80_device::take_interrupt()
 {
 	int irq_vector;
@@ -3207,6 +3228,11 @@ void z80_device::take_interrupt()
 		m_icount -= m_cc_ex[0xff];
 	}
 	WZ=PCD;
+
+#if HAS_LDAIR_QUIRK
+	/* reset parity flag after LD A,I or LD A,R */
+	if (m_after_ldair) F &= ~PF;
+#endif
 }
 
 void nsc800_device::take_interrupt_nsc800()
@@ -3240,6 +3266,11 @@ void nsc800_device::take_interrupt_nsc800()
 	m_icount -= m_cc_op[0xff] + cc_ex[0xff];
 
 	WZ=PCD;
+
+#if HAS_LDAIR_QUIRK
+	/* reset parity flag after LD A,I or LD A,R */
+	if (m_after_ldair) F &= ~PF;
+#endif
 }
 
 /****************************************************************************
@@ -3486,40 +3517,14 @@ void z80_device::execute_run()
 		return;
 	}
 	
-	/* check for NMIs on the way in; they can only be set externally */
-	/* via timers, and can't be dynamically enabled, so it is safe */
-	/* to just check here */
-	if (m_nmi_pending)
-	{
-		LOG(("Z80 '%s' take NMI\n", tag()));
-		PRVPC = -1;            /* there isn't a valid previous program counter */
-		leave_halt();            /* Check if processor was halted */
-
-#if HAS_LDAIR_QUIRK
-		/* reset parity flag after LD A,I or LD A,R */
-		if (m_after_ldair) F &= ~PF;
-#endif
-		m_after_ldair = FALSE;
-
-		m_iff1 = 0;
-		push(m_pc);
-		PCD = 0x0066;
-		WZ=PCD;
-		m_icount -= 11;
-		m_nmi_pending = FALSE;
-	}
-
 	do
 	{
-		/* check for IRQs before each instruction */
-		if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei)
-		{
-#if HAS_LDAIR_QUIRK
-			/* reset parity flag after LD A,I or LD A,R */
-			if (m_after_ldair) F &= ~PF;
-#endif
+		// check for interrupts before each instruction
+		if (m_nmi_pending)
+			take_nmi();
+		else if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei)
 			take_interrupt();
-		}
+
 		m_after_ei = FALSE;
 		m_after_ldair = FALSE;
 
@@ -3543,34 +3548,18 @@ void nsc800_device::execute_run()
 		return;
 	}
 
-	/* check for NMIs on the way in; they can only be set externally */
-	/* via timers, and can't be dynamically enabled, so it is safe */
-	/* to just check here */
-	if (m_nmi_pending)
-	{
-		LOG(("Z80 '%s' take NMI\n", tag()));
-		PRVPC = -1;            /* there isn't a valid previous program counter */
-		leave_halt();            /* Check if processor was halted */
-
-		m_iff1 = 0;
-		push(m_pc);
-		PCD = 0x0066;
-		WZ=PCD;
-		m_icount -= 11;
-		m_nmi_pending = FALSE;
-	}
-
 	do
 	{
-		/* check for NSC800 IRQs line RSTA, RSTB, RSTC */
-		if ((m_nsc800_irq_state[NSC800_RSTA] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTB] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTC] != CLEAR_LINE) && m_iff1 && !m_after_ei)
+		// check for interrupts before each instruction
+		if (m_nmi_pending)
+			take_nmi();
+		else if ((m_nsc800_irq_state[NSC800_RSTA] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTB] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTC] != CLEAR_LINE) && m_iff1 && !m_after_ei)
 			take_interrupt_nsc800();
-
-		/* check for IRQs before each instruction */
-		if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei)
+		else if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei)
 			take_interrupt();
 
 		m_after_ei = FALSE;
+		m_after_ldair = FALSE;
 
 		PRVPC = PCD;
 		debugger_instruction_hook(this, PCD);
