@@ -133,11 +133,11 @@ struct mtlog
 };
 
 static mtlog mtlog[100000];
-static volatile LONG mtlogindex;
+static volatile INT32 mtlogindex;
 
 void mtlog_add(const char *event)
 {
-	int index = atomic_increment32((LONG *) &mtlogindex) - 1;
+	int index = atomic_increment32((INT32 *) &mtlogindex) - 1;
 	if (index < ARRAY_LENGTH(mtlog))
 	{
 		mtlog[index].timestamp = osd_ticks();
@@ -262,7 +262,6 @@ void windows_osd_interface::window_exit()
 		win_window_list = temp->m_next;
 		temp->destroy();
 		global_free(temp);
-
 	}
 
 	// kill the drawers
@@ -300,7 +299,6 @@ win_window_info::win_window_info(running_machine &machine)
 		m_fullscreen(0),
 		m_fullscreen_safe(0),
 		m_aspect(0),
-		m_render_lock(NULL),
 		m_target(NULL),
 		m_targetview(0),
 		m_targetorient(0),
@@ -672,9 +670,6 @@ void win_window_info::create(running_machine &machine, int index, osd_monitor_in
 	*last_window_ptr = window;
 	last_window_ptr = &window->m_next;
 
-	// create a lock that we can use to skip blitting
-	window->m_render_lock = osd_lock_alloc();
-
 	// load the layout
 	window->m_target = machine.render().target_alloc();
 
@@ -746,11 +741,6 @@ void win_window_info::destroy()
 
 	// free the render target
 	machine().render().target_free(m_target);
-
-	// FIXME: move to destructor
-	// free the lock
-	osd_lock_free(m_render_lock);
-
 }
 
 
@@ -792,15 +782,15 @@ void win_window_info::update()
 	// if we're visible and running and not in the middle of a resize, draw
 	if (m_hwnd != NULL && m_target != NULL && m_renderer != NULL)
 	{
-		int got_lock = TRUE;
+		bool got_lock = true;
 
 		mtlog_add("winwindow_video_window_update: try lock");
 
 		// only block if we're throttled
 		if (machine().video().throttled() || timeGetTime() - last_update_time > 250)
-			osd_lock_acquire(m_render_lock);
+			m_render_lock.lock();
 		else
-			got_lock = osd_lock_try(m_render_lock);
+			got_lock = m_render_lock.try_lock();
 
 		// only render if we were able to get the lock
 		if (got_lock)
@@ -810,7 +800,7 @@ void win_window_info::update()
 			mtlog_add("winwindow_video_window_update: got lock");
 
 			// don't hold the lock; we just used it to see if rendering was still happening
-			osd_lock_release(m_render_lock);
+			m_render_lock.unlock();
 
 			// ensure the target bounds are up-to-date, and then get the primitives
 			primlist = m_renderer->get_primitives();
@@ -1329,6 +1319,14 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			window->machine().ui_input().push_char_event(window->m_target, (unicode_char) wparam);
 			break;
 
+		case WM_MOUSEWHEEL:
+		{
+			UINT ucNumLines = 3; // default
+			SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &ucNumLines, 0);
+			window->machine().ui_input().push_mouse_wheel_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), GET_WHEEL_DELTA_WPARAM(wparam), ucNumLines);
+			break;
+		}
+
 		// pause the system when we start a menu or resize
 		case WM_ENTERSIZEMOVE:
 			window->m_resize_state = RESIZE_STATE_RESIZING;
@@ -1411,9 +1409,9 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		case WM_DESTROY:
 			if (!(window->m_renderer == NULL))
 			{
-				window->m_renderer->destroy();
-				global_free(window->m_renderer);
-				window->m_renderer = NULL;
+			window->m_renderer->destroy();
+			global_free(window->m_renderer);
+			window->m_renderer = NULL;
 			}
 			window->m_hwnd = NULL;
 			return DefWindowProc(wnd, message, wparam, lparam);
@@ -1492,7 +1490,7 @@ void win_window_info::draw_video_contents(HDC dc, int update)
 	mtlog_add("draw_video_contents: begin");
 
 	mtlog_add("draw_video_contents: render lock acquire");
-	osd_lock_acquire(m_render_lock);
+	std::lock_guard<std::mutex> lock(m_render_lock);
 	mtlog_add("draw_video_contents: render lock acquired");
 
 	// if we're iconic, don't bother
@@ -1516,7 +1514,6 @@ void win_window_info::draw_video_contents(HDC dc, int update)
 		}
 	}
 
-	osd_lock_release(m_render_lock);
 	mtlog_add("draw_video_contents: render lock released");
 
 	mtlog_add("draw_video_contents: end");

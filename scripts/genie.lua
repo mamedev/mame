@@ -83,6 +83,11 @@ newoption {
 }
 
 newoption {
+	trigger = "with-benchmarks",
+	description = "Enable building benchmarks.",
+}
+
+newoption {
 	trigger = "osd",
 	description = "Choose OSD layer implementation",
 }
@@ -108,6 +113,7 @@ newoption {
 		{ "os2",           "OS/2 eComStation"       },
 		{ "haiku",         "Haiku"                  },
 		{ "solaris",       "Solaris SunOS"          },
+		{ "steamlink",     "Steam Link"             },
 	},
 }
 
@@ -498,11 +504,8 @@ if (_OPTIONS["SOURCES"] == nil) then
 		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 	end
 	dofile (path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
-else
-	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " target " .. _OPTIONS["subtarget"])
-	load(OUT_STR)()
-	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.cpp")
 end
+
 configuration { "gmake" }
 	flags {
 		"SingleOutputDir",
@@ -693,10 +696,17 @@ if string.find(_OPTIONS["gcc"], "clang") and ((version < 30500) or (_OPTIONS["ta
 		"-std=c++1y",
 	}
 else
-	buildoptions_cpp {
-		"-x c++",
-		"-std=c++14",
-	}
+	if _OPTIONS["targetos"]=="os2" then
+		buildoptions_cpp {
+			"-x c++",
+			"-std=gnu++14",
+		}
+	else
+		buildoptions_cpp {
+			"-x c++",
+			"-std=c++14",
+		}
+	end
 
 	buildoptions_objc {
 		"-x objective-c++",
@@ -1048,6 +1058,15 @@ configuration { "linux-*" }
 		end
 
 
+
+configuration { "steamlink" }
+	links {
+		"dl",
+	}
+	defines {
+		"EGL_API_FB",
+	}
+
 configuration { "osx*" }
 		links {
 			"pthread",
@@ -1065,6 +1084,11 @@ configuration { "mingw*" }
 			"advapi32",
 			"shlwapi",
 			"wsock32",
+			"ws2_32",
+			"psapi",
+			"iphlpapi",
+			"shell32",
+			"userenv",
 		}
 configuration { "mingw-clang" }
 		linkoptions {
@@ -1086,6 +1110,11 @@ configuration { "vs*" }
 			"advapi32",
 			"shlwapi",
 			"wsock32",
+			"ws2_32",
+			"psapi",
+			"iphlpapi",
+			"shell32",
+			"userenv",
 		}
 
 		buildoptions {
@@ -1223,6 +1252,11 @@ configuration { "winphone8* or winstore8*" }
 
 configuration { }
 
+if (_OPTIONS["SOURCES"] ~= nil) then
+	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " target " .. _OPTIONS["subtarget"])
+	load(OUT_STR)()
+	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.cpp")
+end
 
 group "libs"
 
@@ -1249,15 +1283,19 @@ findfunction("createProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarg
 
 group "emulator"
 dofile(path.join("src", "main.lua"))
-if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
-	startproject (_OPTIONS["target"])
-else
-	if (_OPTIONS["subtarget"]=="mess") then
-		startproject (_OPTIONS["subtarget"])
+if (_OPTIONS["SOURCES"] == nil) then 
+	if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
+		startproject (_OPTIONS["target"])
 	else
-		startproject (_OPTIONS["target"] .. _OPTIONS["subtarget"])
+		if (_OPTIONS["subtarget"]=="mess") then
+			startproject (_OPTIONS["subtarget"])
+		else
+			startproject (_OPTIONS["target"] .. _OPTIONS["subtarget"])
+		end
 	end
-end
+else
+	startproject (_OPTIONS["subtarget"])
+end 
 mainProject(_OPTIONS["target"],_OPTIONS["subtarget"])
 
 if (_OPTIONS["STRIP_SYMBOLS"]=="1") then
@@ -1272,4 +1310,9 @@ end
 if _OPTIONS["with-tests"] then
 	group "tests"
 	dofile(path.join("src", "tests.lua"))
+end
+
+if _OPTIONS["with-benchmarks"] then
+	group "benchmarks"
+	dofile(path.join("src", "benchmarks.lua"))
 end

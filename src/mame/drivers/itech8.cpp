@@ -1090,6 +1090,17 @@ static INPUT_PORTS_START( stratab )
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_RESET PORT_REVERSE PORT_COCKTAIL PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( stratabs )
+	PORT_INCLUDE( stratab )
+
+	PORT_START("FAKEX") /* fake */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET PORT_PLAYER(1)
+
+	PORT_START("FAKEY") /* fake */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(100) PORT_RESET PORT_REVERSE PORT_PLAYER(1)
+INPUT_PORTS_END
+
+
 
 CUSTOM_INPUT_MEMBER(itech8_state::gtg_mux)
 {
@@ -2235,6 +2246,8 @@ ROM_START( slikshot16 )
 ROM_END
 
 
+
+
 ROM_START( dynobop )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "dynobop.u5", 0x04000, 0x4000, CRC(98452c40) SHA1(9b9316fc258792e0d825f16e0fadf8e0c35a864e) )
@@ -2280,6 +2293,30 @@ ROM_START( sstrike )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "sstsrom0.bin", 0x00000, 0x20000, CRC(6ff390b9) SHA1(f31dae9e31f3fc83b9253e49fd4204820db3587e) )
+ROM_END
+
+
+ROM_START( stratabs )
+	ROM_REGION( 0x1c000, "maincpu", 0 )
+	ROM_LOAD( "sb_prog-v4t.u5", 0x08000, 0x8000, CRC(38ddae75) SHA1(71a9cbd36cf7b180a88bab3ab92a4dff93ce365f) )
+	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "sb_snds_1.4.u27", 0x08000, 0x8000, CRC(526ef093) SHA1(884f9149b3d5eb33e47258e466ad9cd9ce5ffddb) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "z80_prg_v1.0t.u53", 0x00000, 0x0800, CRC(08203f9f) SHA1(be5044938c73bf6fc1a6130dc473997e8c219b24) )
+	ROM_CONTINUE(        0x00000, 0x0800 )
+	ROM_CONTINUE(        0x00000, 0x0800 )
+	ROM_CONTINUE(        0x00000, 0x0800 )
+
+	ROM_REGION( 0xc0000, "grom", 0 )
+	ROM_LOAD( "sb_grom00", 0x00000, 0x20000, CRC(22f6ce56) SHA1(8e423122384257d9c5d8f48192ff6fa1f544fd97) )
+	ROM_LOAD( "sb_grom01", 0x20000, 0x20000, CRC(6cc7ad6f) SHA1(d601b9bb81f26ad86e5cc053cab055831331ccde) )
+	ROM_LOAD( "sb_grom02",  0x40000, 0x20000, CRC(475134ef) SHA1(5920e7a211f1b2234e8a3f51e570303c3787d8fd) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "sb_srom0", 0x00000, 0x20000, CRC(6ff390b9) SHA1(f31dae9e31f3fc83b9253e49fd4204820db3587e) )
 ROM_END
 
 
@@ -2709,7 +2746,7 @@ GAME( 1989, wfortunea,wfortune, wfortune,          wfortune, driver_device, 0,  
 GAME( 1989, grmatch,  0,        grmatch,           grmatch, itech8_state,  grmatch,  ROT0,   "Yankee Game Technology", "Grudge Match (Yankee Game Technology)", 0 )
 
 /* Strata Bowling-style PCB */
-GAME( 1990, stratab,  0,        stratab_hi,        stratab, driver_device,  0,        ROT270, "Strata/Incredible Technologies", "Strata Bowling (V3)", 0 )
+GAME( 1990, stratab,  0,        stratab_hi,        stratab, driver_device,  0,        ROT270, "Strata/Incredible Technologies", "Strata Bowling (V3)", 0 ) // still says V1 in service mode?
 GAME( 1990, stratab1, stratab,  stratab_hi,        stratab, driver_device,  0,        ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1)", 0 )
 GAME( 1990, gtg,      0,        stratab_hi,        gtg, driver_device,      0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.1)", 0 )
 GAME( 1989, gtgt,     gtg,      stratab_hi,        gtgt, driver_device,     0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v2.0)", 0 )
@@ -2721,9 +2758,10 @@ GAME( 1991, gtg2j,    gtg2,     stratab_lo,        gtg, driver_device,      0,  
 GAME( 1990, slikshot,  0,        slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", MACHINE_MECHANICAL )
 GAME( 1990, slikshot17,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", MACHINE_MECHANICAL )
 GAME( 1990, slikshot16,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", MACHINE_MECHANICAL )
-GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop, itech8_state,  slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", MACHINE_MECHANICAL )
-GAME( 1990, sstrike,   0,        sstrike,           sstrike, itech8_state,  sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", MACHINE_MECHANICAL )
-GAME( 1991, pokrdice,  0,        slikshot_lo_noz80, pokrdice, driver_device, 0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
+GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop,  itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", MACHINE_MECHANICAL )
+GAME( 1990, sstrike,   0,        sstrike,           sstrike,  itech8_state, sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", MACHINE_MECHANICAL )
+GAME( 1991, pokrdice,  0,        slikshot_lo_noz80, pokrdice, driver_device,0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
+GAME( 1990, stratabs,  stratab,  sstrike,           stratabs, itech8_state, sstrike,  ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1 4T, Super Strike Bowling type PCB)", MACHINE_NOT_WORKING ) // need to figure out the control hookup for this set, service mode indicates it's still a trackball like stratab
 
 /* Hot Shots Tennis-style PCB */
 GAME( 1990, hstennis,  0,        hstennis_hi,       hstennis, itech8_state, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.1)", 0 )

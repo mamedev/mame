@@ -195,10 +195,10 @@ void ui_menu_file_manager::force_file_manager(running_machine &machine, render_c
 	ui_menu::stack_reset(machine);
 
 	// add the quit entry followed by the game select entry
-	ui_menu *quit = auto_alloc_clear(machine, <ui_menu_quit_game>(machine, container));
+	ui_menu *quit = global_alloc_clear<ui_menu_quit_game>(machine, container);
 	quit->set_special_main_menu(true);
 	ui_menu::stack_push(quit);
-	ui_menu::stack_push(auto_alloc_clear(machine, <ui_menu_file_manager>(machine, container, warnings)));
+	ui_menu::stack_push(global_alloc_clear<ui_menu_file_manager>(machine, container, warnings));
 
 	// force the menus on
 	machine.ui().show_menu();

@@ -41,7 +41,7 @@ void meters_device::device_start()
 		m_meter_info[i].on        = 0;
 		m_meter_info[i].meter_timer = timer_alloc(i);
 		m_meter_info[i].meter_timer->reset();
-		
+
 		//save_item(NAME(m_meter_info[i].reacttime), i); //enable if void ReactTime(int id, INT32 cycles) gets used
 		save_item(NAME(m_meter_info[i].state), i);
 		save_item(NAME(m_meter_info[i].count), i);
@@ -65,7 +65,7 @@ void meters_device::device_timer(emu_timer &timer, device_timer_id id, int param
 {
 	if (id >= m_number_mtr)
 			assert_always(FALSE, "Unknown id in meters_device::device_timer");
-	
+
 	m_meter_info[param].count++;
 }
 

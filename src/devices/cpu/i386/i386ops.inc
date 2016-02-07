@@ -701,7 +701,7 @@ void i386_device::i386_mov_cr_r32()        // Opcode 0x0f 22
 		case 2: CYCLES(CYCLES_MOV_REG_CR2); break;
 		case 3:
 			CYCLES(CYCLES_MOV_REG_CR3);
-			vtlb_flush_dynamic(m_vtlb);
+			vtlb_flush_dynamic();
 			break;
 		case 4: CYCLES(1); break; // TODO
 		default:

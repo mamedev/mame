@@ -384,7 +384,7 @@ pdp1_device::pdp1_device(const machine_config &mconfig, const char *tag, device_
 	: cpu_device(mconfig, PDP1, "PDP1", tag, owner, clock, "pdp1_cpu", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 18, 0)
 {
-	m_is_octal = true;
+	m_program_config.m_is_octal = true;
 }
 
 

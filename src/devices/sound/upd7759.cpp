@@ -145,52 +145,52 @@
 
 
 upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_sound_interface(mconfig, *this),
-		m_channel(nullptr),
-		m_sample_offset_shift(0),
-		m_pos(0),
-		m_step(0),
-		m_fifo_in(0),
-		m_reset(0),
-		m_start(0),
-		m_drq(0),
-		m_state(0),
-		m_clocks_left(0),
-		m_nibbles_left(0),
-		m_repeat_count(0),
-		m_post_drq_state(0),
-		m_post_drq_clocks(0),
-		m_req_sample(0),
-		m_last_sample(0),
-		m_block_header(0),
-		m_sample_rate(0),
-		m_first_valid_header(0),
-		m_offset(0),
-		m_repeat_offset(0),
-		m_adpcm_state(0),
-		m_adpcm_data(0),
-		m_sample(0),
-		m_rom(nullptr),
-		m_rombase(nullptr),
-		m_romoffset(0),
-		m_rommask(0),
-		m_drqcallback(*this)
-{
-}
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	, device_sound_interface(mconfig, *this)
+	, m_channel(nullptr)
+	, m_sample_offset_shift(0)
+	, m_pos(0)
+	, m_step(0)
+	, m_fifo_in(0)
+	, m_reset(0)
+	, m_start(0)
+	, m_drq(0)
+	, m_state(0)
+	, m_clocks_left(0)
+	, m_nibbles_left(0)
+	, m_repeat_count(0)
+	, m_post_drq_state(0)
+	, m_post_drq_clocks(0)
+	, m_req_sample(0)
+	, m_last_sample(0)
+	, m_block_header(0)
+	, m_sample_rate(0)
+	, m_first_valid_header(0)
+	, m_offset(0)
+	, m_repeat_offset(0)
+	, m_adpcm_state(0)
+	, m_adpcm_data(0)
+	, m_sample(0)
+	, m_rombase(*this, DEVICE_SELF)
+	, m_rom(nullptr)
+	, m_romoffset(0)
+	, m_rommask(0)
+	, m_drqcallback(*this)
+	{
+	}
 
 const device_type UPD7759 = &device_creator<upd7759_device>;
 
 upd7759_device::upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: upd775x_device(mconfig, UPD7759, "uPD7759", tag, owner, clock, "upd7759", __FILE__),
-		m_timer(nullptr)
+	: upd775x_device(mconfig, UPD7759, "uPD7759", tag, owner, clock, "upd7759", __FILE__)
+	, m_timer(nullptr)
 {
 }
 
 
 upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: upd775x_device(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_timer(nullptr)
+	: upd775x_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_timer(nullptr)
 {
 }
 
@@ -231,20 +231,26 @@ void upd7759_device::device_start()
 
 	/* compute the ROM base or allocate a timer */
 	m_romoffset = 0;
-	m_rom = m_rombase = region()->base();
-	if (m_rombase == nullptr)
+	m_rom = m_rombase;
+	if (m_rombase != nullptr)
+	{
+		UINT32 romsize = m_rombase.bytes();
+		if (romsize >= 0x20000)
+		{
+			m_rommask = 0x1ffff;
+		}
+		else
+		{
+			m_rommask = romsize - 1;
+		}
+
+		m_drqcallback.set_callback(DEVCB_NULL);
+	}
+	else
 	{
 		assert(type() == UPD7759); // other chips do not support slave mode
 		m_timer = timer_alloc(TIMER_SLAVE_UPDATE);
 		m_rommask = 0;
-	}
-	else
-	{
-		UINT32 romsize = region()->bytes();
-		if (romsize >= 0x20000) m_rommask = 0x1ffff;
-		else m_rommask = romsize - 1;
-
-		m_drqcallback.set_callback(DEVCB_NULL);
 	}
 
 	/* assume /RESET and /START are both high */
@@ -306,18 +312,24 @@ void upd7756_device::device_start()
 
 	/* compute the ROM base or allocate a timer */
 	m_romoffset = 0;
-	m_rom = m_rombase = region()->base();
-	if (m_rombase == nullptr)
+	m_rom = m_rombase;
+	if (m_rombase != nullptr)
 	{
-		m_rommask = 0;
+		UINT32 romsize = m_rombase.bytes();
+		if (romsize >= 0x20000)
+		{
+			m_rommask = 0x1ffff;
+		}
+		else
+		{
+			m_rommask = romsize - 1;
+		}
+
+		m_drqcallback.set_callback(DEVCB_NULL);
 	}
 	else
 	{
-		UINT32 romsize = region()->bytes();
-		if (romsize >= 0x20000) m_rommask = 0x1ffff;
-		else m_rommask = romsize - 1;
-
-		m_drqcallback.set_callback(DEVCB_NULL);
+		m_rommask = 0;
 	}
 
 	/* assume /RESET and /START are both high */
@@ -720,7 +732,9 @@ void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int para
 void upd775x_device::postload()
 {
 	if (m_rombase)
+	{
 		m_rom = m_rombase + m_romoffset;
+	}
 }
 
 /************************************************************

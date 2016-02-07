@@ -61,6 +61,7 @@ Games on this system include....
 |*| 2005 | Sangokushi Taisen                                  | Sega                     | DVDROM | CDV-10022  |              |
 |*| 2006 | Sangokushi Taisen 2 Firmware Update                | Sega                     | DVDROM | CDV-10023  |              |
 |*| 2006 | Sangokushi Taisen 2                                | Sega                     | DVDROM | CDV-10029  |              |
+|*| 2007 | Mobile Suit Gundam 0083 Card Builder               | Dimps - Banpresto        | DVDROM | CDV-10030  |              |
 |*| 2008 | Sangokushi Taisen 3                                | Sega                     | DVDROM | CDV-10036  |              |
 |*| 2008 | Sangokushi Taisen 3 (Ver.J)                        | Sega                     | DVDROM | CDV-10036J |              |
 |*| 2008 | Sangokushi Taisen 3 War Begins (Ver.3.59)          | Sega                     | DVDROM | CDV-10041  |              |

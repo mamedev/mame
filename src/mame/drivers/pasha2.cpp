@@ -96,7 +96,6 @@ public:
 
 	/* video-related */
 	int m_vbuffer;
-	int m_old_bank;
 
 	/* memory */
 	UINT16       m_bitmap0[0x40000/2];
@@ -131,20 +130,15 @@ WRITE16_MEMBER(pasha2_state::pasha2_misc_w)
 		{
 			int bank = data & 0xf000;
 
-			if (bank != m_old_bank)
+			switch (bank)
 			{
-				m_old_bank = bank;
-
-				switch (bank)
-				{
-					case 0x8000:
-					case 0x9000:
-					case 0xa000:
-					case 0xb000:
-					case 0xc000:
-					case 0xd000:
-						membank("bank1")->set_base(memregion("user2")->base() + 0x400 * (bank - 0x8000)); break;
-				}
+				case 0x8000:
+				case 0x9000:
+				case 0xa000:
+				case 0xb000:
+				case 0xc000:
+				case 0xd000:
+					membank("bank1")->set_entry((bank - 0x8000)>>12); break;
 			}
 		}
 	}
@@ -218,6 +212,7 @@ WRITE16_MEMBER(pasha2_state::oki2_bank_w)
 
 WRITE16_MEMBER(pasha2_state::pasha2_lamps_w)
 {
+#ifdef MAME_DEBUG
 	if (data)
 		popmessage("1P: %c%c%c 2P: %c%c%c 3P: %c%c%c",
 				(data & 0x001) ? 'R' : '-',
@@ -229,6 +224,7 @@ WRITE16_MEMBER(pasha2_state::pasha2_lamps_w)
 				(data & 0x100) ? 'R' : '-',
 				(data & 0x200) ? 'G' : '-',
 				(data & 0x400) ? 'B' : '-');
+#endif
 }
 
 static ADDRESS_MAP_START( pasha2_map, AS_PROGRAM, 16, pasha2_state )
@@ -405,13 +401,11 @@ UINT32 pasha2_state::screen_update_pasha2(screen_device &screen, bitmap_ind16 &b
 
 void pasha2_state::machine_start()
 {
-	save_item(NAME(m_old_bank));
 	save_item(NAME(m_vbuffer));
 }
 
 void pasha2_state::machine_reset()
 {
-	m_old_bank = -1;
 	m_vbuffer = 0;
 }
 
@@ -486,7 +480,8 @@ DRIVER_INIT_MEMBER(pasha2_state,pasha2)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x95744, 0x95747, read16_delegate(FUNC(pasha2_state::pasha2_speedup_r), this));
 
-	membank("bank1")->set_base(memregion("user2")->base());
+	membank("bank1")->configure_entries(0, 6, memregion("user2")->base(), 0x400000);
+	membank("bank1")->set_entry(0);
 }
 
 GAME( 1998, pasha2, 0, pasha2, pasha2, pasha2_state, pasha2, ROT0, "Dong Sung", "Pasha Pasha 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

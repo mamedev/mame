@@ -206,7 +206,7 @@ static MACHINE_CONFIG_START( electron, electron_state )
 	MCFG_PALETTE_INIT_OWNER(electron_state, electron)
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
+	MCFG_SOUND_ADD( "beeper", BEEP, 300 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_CASSETTE_ADD( "cassette" )

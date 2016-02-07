@@ -358,12 +358,12 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 			m_screen(*this, "screen"),
 			m_duartn68681(*this, "duartn68681"),
 			m_hd34010_host_access(0),
-			m_dsk_pio_access(0),
 			m_msp_ram(*this, "msp_ram"),
 			m_dsk_ram(nullptr),
 			m_dsk_rom(nullptr),
 			m_dsk_10c(*this, "dsk_10c"),
 			m_dsk_30c(*this, "dsk_30c"),
+			m_dsk_pio_access(0),
 			m_m68k_slapstic_base(nullptr),
 			m_m68k_sloop_alt_base(nullptr),
 			m_200e(*this, "200e"),
@@ -410,7 +410,7 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 			m_sim_memory(nullptr),
 			m_sim_memory_size(0),
 			m_adsp_pgm_memory_word(nullptr),
-			m_ds3_sdata_memory(nullptr),
+			m_ds3_sdata_memory(*this, "ds3sdsp_data"),
 			m_ds3_sdata_memory_size(0),
 			m_ds3_gcmd(0),
 			m_ds3_gflag(0),
@@ -1425,7 +1425,7 @@ static MACHINE_CONFIG_FRAGMENT( driver_nomsp )
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", harddriv_state, video_int_gen)
 	MCFG_CPU_PERIODIC_INT_DRIVER(harddriv_state, hd68k_irq_gen,  (double)HARDDRIV_MASTER_CLOCK/16/16/16/16/2)
 
-	MCFG_SLAPSTIC_ADD("slapstic")
+	MCFG_SLAPSTIC_ADD("slapstic", 117)
 	MCFG_SLAPSTIC_68K_ACCESS(1)
 
 	MCFG_CPU_ADD("gsp", TMS34010, HARDDRIV_GSP_CLOCK)
@@ -1472,6 +1472,7 @@ static MACHINE_CONFIG_FRAGMENT( driver_msp )
 	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(harddriv_state, hdmsp_irq_gen))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
+	MCFG_DEVICE_REMOVE("slapstic")
 MACHINE_CONFIG_END
 
 
@@ -1510,6 +1511,7 @@ static MACHINE_CONFIG_FRAGMENT( multisync_msp )
 	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(harddriv_state, hdmsp_irq_gen))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
+	MCFG_DEVICE_REMOVE("slapstic")
 MACHINE_CONFIG_END
 
 
@@ -1524,6 +1526,8 @@ static MACHINE_CONFIG_FRAGMENT( multisync2 )
 
 	MCFG_CPU_MODIFY("gsp")
 	MCFG_CPU_PROGRAM_MAP(multisync2_gsp_map)
+
+	MCFG_DEVICE_REMOVE("slapstic")
 MACHINE_CONFIG_END
 
 
@@ -1682,6 +1686,7 @@ static MACHINE_CONFIG_FRAGMENT( stunrun )
 	MCFG_CPU_MODIFY("gsp")
 	MCFG_TMS340X0_PIXEL_CLOCK(5000000)  /* pixel clock */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
+	MCFG_DEVICE_REMOVE("slapstic")
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2005,8 +2010,8 @@ MACHINE_CONFIG_END
 WRITE_LINE_MEMBER(harddriv_new_state::tx_a)
 {
 	// passive connection, one way, to both screens
-	m_leftpcb->m_duartn68681->rx_a_w(state);
-	m_rightpcb->m_duartn68681->rx_a_w(state);
+	m_leftpcb->get_duart()->rx_a_w(state);
+	m_rightpcb->get_duart()->rx_a_w(state);
 }
 
 static MACHINE_CONFIG_START( racedriv_panorama_machine, harddriv_new_state )
@@ -2018,6 +2023,10 @@ static MACHINE_CONFIG_START( racedriv_panorama_machine, harddriv_new_state )
 	MCFG_DEVICE_MODIFY("mainpcb:duartn68681")
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, harddriv_new_state,tx_a))
 
+	// boots with 'PROGRAM OK' when using standard Hard Drivin' board type (needs 137412-115 slapstic)
+	MCFG_DEVICE_MODIFY("mainpcb:slapstic")
+	MCFG_SLAPSTIC_NUM(115)
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hack_timer", harddriv_new_state, hack_timer, attotime::from_hz(60))
 //  MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 MACHINE_CONFIG_END
@@ -2026,9 +2035,9 @@ MACHINE_CONFIG_END
 // by forcing them to stay in sync using this ugly method everything works much better.
 TIMER_DEVICE_CALLBACK_MEMBER(harddriv_new_state::hack_timer)
 {
-	m_leftpcb->m_screen->reset_origin(0, 0);
-	m_mainpcb->m_screen->reset_origin(0, 0);
-	m_rightpcb->m_screen->reset_origin(0, 0);
+	m_leftpcb->get_screen()->reset_origin(0, 0);
+	m_mainpcb->get_screen()->reset_origin(0, 0);
+	m_rightpcb->get_screen()->reset_origin(0, 0);
 }
 
 /*************************************
@@ -4070,7 +4079,6 @@ Filename    Location    Label           Board
 ROM_START( racedrivpan )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 )        /* 2MB for 68000 code */
 	// Multisync PBB A045988 - Central Monitor
-	// boots with 'PROGRAM OK' when using standard Hard Drivin' board type (needs 137412-115 slapstic)
 	ROM_LOAD16_BYTE( "088-1002.bin", 0x000000, 0x010000, CRC(49a97391) SHA1(dbe4086cd87669a02d2a2133d0d9e2895946b383) )
 	ROM_LOAD16_BYTE( "088-1001.bin", 0x000001, 0x010000, CRC(4473accc) SHA1(099bda6cfe31d4e53cbe74046679ddf8b874982d) )
 	ROM_LOAD16_BYTE( "088-1004.bin", 0x020000, 0x010000, CRC(33b84ca6) SHA1(9e3cafadfb23bfc4a44e503043cc05db27d939a9) )
@@ -4485,7 +4493,7 @@ ROM_START( strtdriv )
 	ROM_LOAD( "136091-0033.10j", 0x000000, 0x010000, CRC(57504ab6) SHA1(ec8361b7da964c07ca0da48a87537badc3986fe0) )
 
 	ROM_REGION16_BE( 0x100000, "mainpcb:ds3xdsp", 0 )  /* DS III auxillary ADSP-2105 (unused) */
-	ROM_FILL(                    0x000000, 0x010000, nullptr)
+	ROM_FILL(                    0x000000, 0x010000, 0x00)
 
 	ROM_REGION( 0x80000, "mainpcb:ds3sdsp_data", 0 )
 	ROM_LOAD16_BYTE( "136052-1123.12lm",0x00000, 0x10000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
@@ -4652,7 +4660,7 @@ void harddriv_state::init_multisync(int compact_inputs)
 	m_gsp_multisync = TRUE;
 
 	// if we have a JSA board, install the read/write handlers
-	if (m_jsa != nullptr)
+	if (m_jsa.found())
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x600000, 0x603fff, read8_delegate(FUNC(atari_jsa_base_device::main_response_r),m_jsa.target()), write8_delegate(FUNC(atari_jsa_base_device::main_command_w),m_jsa.target()), 0xff00);
 
 	/* install handlers for the compact driving games' inputs */
@@ -4707,9 +4715,7 @@ void harddriv_state::init_ds3()
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x823800, 0x823fff, write16_delegate(FUNC(harddriv_state::hd68k_ds3_control_w), this));
 
 	/* predetermine memory regions */
-	m_ds3_sdata_memory = (UINT16 *)memregion("ds3sdsp_data")->base();
-	m_ds3_sdata_memory_size = memregion("ds3sdsp_data")->bytes() / 2;
-
+	m_ds3_sdata_memory_size = m_ds3_sdata_memory.bytes() / 2;
 /*
 
 
@@ -4938,7 +4944,7 @@ void harddriv_state::init_racedriv(void)
 	init_driver_sound();
 
 	/* set up the slapstic */
-	m_slapstic_device->slapstic_init(machine(), 117);
+	m_slapstic_device->slapstic_init();
 	m_m68k_slapstic_base = m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
 
 	/* synchronization */
@@ -4959,7 +4965,7 @@ void harddriv_state::racedrivc_init_common(offs_t gsp_protection)
 	init_driver_sound();
 
 	/* set up the slapstic */
-	m_slapstic_device->slapstic_init(machine(), 117);
+	m_slapstic_device->slapstic_init();
 	m_m68k_slapstic_base = m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
 
 	/* synchronization */
@@ -4989,7 +4995,7 @@ void harddriv_state::init_racedrivc_panorama_side()
 	init_adsp();
 
 	/* set up the slapstic */
-	m_slapstic_device->slapstic_init(machine(), 117);
+	m_slapstic_device->slapstic_init();
 	m_m68k_slapstic_base = m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
 
 	/* set up protection hacks */
@@ -5081,7 +5087,7 @@ void harddriv_state::init_strtdriv(void)
 	init_dsk();
 
 	/* set up the slapstic */
-	m_slapstic_device->slapstic_init(machine(), 117);
+	m_slapstic_device->slapstic_init();
 	m_m68k_slapstic_base = m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa80000, 0xafffff, read16_delegate(FUNC(harddriv_state::hda68k_port1_r), this));

@@ -4,6 +4,7 @@
 #include "coreutil.h"
 
 #define LOG_FPGA            (0)
+#define LOG_SERIAL          (0)
 #define LOG_RTC             (0)
 #define LOG_RAM             (0)
 #define LOG_EEPROM          (0)
@@ -80,14 +81,14 @@ void iteagle_fpga_device::device_reset()
 	m_serial_str.clear();
 	m_serial_idx = 0;
 	m_serial_data = false;
+	memset(m_serial_com0, 0, sizeof(m_serial_com0));
 	memset(m_serial_com1, 0, sizeof(m_serial_com1));
 	memset(m_serial_com2, 0, sizeof(m_serial_com2));
 	memset(m_serial_com3, 0, sizeof(m_serial_com3));
-	memset(m_serial_com4, 0, sizeof(m_serial_com4));
+	m_serial_com0[0] = 0x2c;
 	m_serial_com1[0] = 0x2c;
 	m_serial_com2[0] = 0x2c;
 	m_serial_com3[0] = 0x2c;
-	m_serial_com4[0] = 0x2c;
 }
 
 void iteagle_fpga_device::update_sequence(UINT32 data)
@@ -130,12 +131,10 @@ void iteagle_fpga_device::update_sequence_eg1(UINT32 data)
 		val1 = ((m_seq & 0x2)<<6) | ((m_seq & 0x4)<<4) | ((m_seq & 0x8)<<2) | ((m_seq & 0x10)<<0)
 				| ((m_seq & 0x20)>>2) | ((m_seq & 0x40)>>4) | ((m_seq & 0x80)>>6) | ((m_seq & 0x100)>>8);
 		m_seq = (m_seq>>8) | ((feed&0xff)<<16);
-		//m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | ((val1 + m_seq_rem1)&0xFF);
 		m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | ((val1 + m_seq_rem1 + m_seq_rem2)&0xFF);
 	} else if (data & 0x2) {
 		val1 = ((m_seq & 0x2)<<1) | ((m_seq & 0x4)>>1) | ((m_seq & 0x8)>>3);
 		m_seq_rem1 = ((m_seq & 0x10)) | ((m_seq & 0x20)>>2) | ((m_seq & 0x40)>>4);
-		//m_seq_rem2 = ((m_seq & 0x80)>>1) | ((m_seq & 0x100)>>3) | ((m_seq & 0x200)>>5);
 		m_seq = (m_seq>>6) | ((feed&0x3f)<<18);
 		m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | ((val1 + m_seq_rem1 + m_seq_rem2)&0xFF);
 	} else {
@@ -197,16 +196,16 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		case 0x0c/4: // 1d = modem byte
-			result = (result & 0xFFFF0000) | ((m_serial_com2[m_serial_idx]&0xff)<<8) | (m_serial_com1[m_serial_idx]&0xff);
+			result = (result & 0xFFFF0000) | ((m_serial_com1[m_serial_idx]&0xff)<<8) | (m_serial_com0[m_serial_idx]&0xff);
 			if (ACCESSING_BITS_0_15) {
 				m_serial_data = false;
 				m_serial_idx = 0;
 			}
-			if (LOG_FPGA)
+			if (0 && LOG_FPGA)
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		case 0x1c/4: // 1d = modem byte
-			result = (result & 0xFFFF0000) | ((m_serial_com4[m_serial_idx]&0xff)<<8) | (m_serial_com3[m_serial_idx]&0xff);
+			result = (result & 0xFFFF0000) | ((m_serial_com3[m_serial_idx]&0xff)<<8) | (m_serial_com2[m_serial_idx]&0xff);
 			if (ACCESSING_BITS_0_15) {
 				m_serial_data = false;
 				m_serial_idx = 0;
@@ -233,8 +232,8 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 				if ((m_version & 0xff00) == 0x0200)
 					update_sequence_eg1(data & 0xff);
 				else
-				// ATMEL Chip access.  Returns version id's when bit 7 is set.
-				update_sequence(data & 0xff);
+					// ATMEL Chip access.  Returns version id's when bit 7 is set.
+					update_sequence(data & 0xff);
 				if (0 && LOG_FPGA)
 						logerror("%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			}
@@ -242,7 +241,7 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 			if (ACCESSING_BITS_24_31 && (data & 0x01000000)) {
 				m_cpu->set_input_line(m_irq_num, CLEAR_LINE);
 				// Not sure what value to use here, needed for lightgun
-				m_timer->adjust(attotime::from_hz(25));
+				m_timer->adjust(attotime::from_hz(59));
 				if (LOG_FPGA)
 						logerror("%s:fpga_w offset %04X = %08X & %08X Clearing interrupt(%i)\n", machine().describe_context(), offset*4, data, mem_mask, m_irq_num);
 			} else {
@@ -269,7 +268,7 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 				if (!m_serial_data) {
 					m_serial_idx = data&0xf;
 				} else {
-					m_serial_com1[m_serial_idx] = data&0xff;
+					m_serial_com0[m_serial_idx] = data&0xff;
 					m_serial_idx = 0;
 				}
 				m_serial_data = !m_serial_data;
@@ -278,29 +277,31 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 				if (!m_serial_data) {
 					m_serial_idx = (data&0x0f00)>>8;
 				} else {
-					m_serial_com2[m_serial_idx] = (data&0xff00)>>8;
+					m_serial_com1[m_serial_idx] = (data&0xff00)>>8;
 				}
 				m_serial_data = !m_serial_data;
 			}
 			if (ACCESSING_BITS_16_23) {
 				if (m_serial_str.size()==0)
-					m_serial_str = "com1: ";
+					m_serial_str = "com0: ";
 				m_serial_str += (data>>16)&0xff;
 				if (((data>>16)&0xff)==0xd) {
+					if (LOG_SERIAL) logerror("%s\n", m_serial_str.c_str());
 					osd_printf_debug("%s\n", m_serial_str.c_str());
 					m_serial_str.clear();
 				}
 			}
 			if (ACCESSING_BITS_24_31) {
 				if (m_serial_str.size()==0)
-					m_serial_str = "com2: ";
+					m_serial_str = "com1: ";
 				m_serial_str += (data>>24)&0xff;
 				if (1 || ((data>>24)&0xff)==0xd) {
+					if (LOG_SERIAL) logerror("%s\n", m_serial_str.c_str());
 					osd_printf_debug("%s\n", m_serial_str.c_str());
 					m_serial_str.clear();
 				}
 			}
-			if (LOG_FPGA)
+			if (0 && LOG_FPGA)
 					logerror("%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			break;
 		case 0x1c/4:
@@ -308,7 +309,7 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 				if (!m_serial_data) {
 					m_serial_idx = data&0xf;
 				} else {
-					m_serial_com3[m_serial_idx] = data&0xff;
+					m_serial_com2[m_serial_idx] = data&0xff;
 					m_serial_idx = 0;
 				}
 				m_serial_data = !m_serial_data;
@@ -317,24 +318,26 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 				if (!m_serial_data) {
 					m_serial_idx = (data&0x0f00)>>8;
 				} else {
-					m_serial_com4[m_serial_idx] = (data&0xff00)>>8;
+					m_serial_com3[m_serial_idx] = (data&0xff00)>>8;
 				}
 				m_serial_data = !m_serial_data;
 			}
 			if (ACCESSING_BITS_16_23) {
 				if (m_serial_str.size()==0)
-					m_serial_str = "com3: ";
+					m_serial_str = "com2: ";
 				m_serial_str += (data>>16)&0xff;
 				if (1 || ((data>>16)&0xff)==0xd) {
+					if (LOG_SERIAL) logerror("%s\n", m_serial_str.c_str());
 					osd_printf_debug("%s\n", m_serial_str.c_str());
 					m_serial_str.clear();
 				}
 			}
 			if (ACCESSING_BITS_24_31) {
 				if (m_serial_str.size()==0)
-					m_serial_str = "com4: ";
+					m_serial_str = "com3: ";
 				m_serial_str += (data>>24)&0xff;
 				if (((data>>24)&0xff)==0xd) {
+					if (LOG_SERIAL) logerror("%s\n", m_serial_str.c_str());
 					osd_printf_debug("%s\n", m_serial_str.c_str());
 					m_serial_str.clear();
 				}
@@ -649,7 +652,7 @@ void iteagle_ide_device::device_reset()
 {
 	pci_device::device_reset();
 	memset(m_ctrl_regs, 0, sizeof(m_ctrl_regs));
-	m_ctrl_regs[0x10/4] =  0x00000000; // 0x6=No SIMM, 0x2, 0x1, 0x0 = SIMM .  Top 16 bits are compared to 0x3.
+	m_ctrl_regs[0x10/4] =  0x00070000; // 0x6=No SIMM, 0x2, 0x1, 0x0 = SIMM .  Top 16 bits are compared to 0x3. Bit 0 might be lan chip present.
 	memset(m_rtc_regs, 0, sizeof(m_rtc_regs));
 	m_rtc_regs[0xa] = 0x20; // 32.768 MHz
 	m_rtc_regs[0xb] = 0x02; // 24-hour format

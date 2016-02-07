@@ -1106,7 +1106,7 @@ static device_t* get_expansion_device(running_machine &machine, const char* tag)
 	amstrad_state *state = machine.driver_data<amstrad_state>();
 	cpc_expansion_slot_device* exp_port = state->m_exp;
 
-	while(exp_port != nullptr)
+	while (exp_port != nullptr)
 	{
 		device_t* temp;
 
@@ -1117,11 +1117,16 @@ static device_t* get_expansion_device(running_machine &machine, const char* tag)
 
 		// if it's not what we're looking for, then check the expansion port on this expansion device. if it exists.
 		temp = dynamic_cast<device_t*>(exp_port->get_card_device());
-		if(temp == nullptr)
+		if (temp == nullptr)
+		{
 			return nullptr; // no device attached
+		}
+
 		exp_port = temp->subdevice<cpc_expansion_slot_device>("exp");
-		if(exp_port == nullptr)
+		if (exp_port == nullptr)
+		{
 			return nullptr;  // we're at the end of the chain
+		}
 	}
 	return nullptr;
 }
@@ -2000,18 +2005,22 @@ WRITE8_MEMBER(amstrad_state::rom_select)
 	// expansion devices know the selected ROM by monitoring I/O writes to DFxx
 	// there are no signals related to which ROM is selected
 	cpc_expansion_slot_device* exp_port = m_exp;
-	while(exp_port != nullptr)
+	while (exp_port != nullptr)
 	{
 		device_cpc_expansion_card_interface* temp;
 		device_t* temp_dev;
 
 		temp = dynamic_cast<device_cpc_expansion_card_interface*>(exp_port->get_card_device());
 		temp_dev = dynamic_cast<device_t*>(exp_port->get_card_device());
-		if(temp != nullptr)
+		if (temp != nullptr)
 		{
 			temp->set_rom_bank(data);
+			exp_port = temp_dev->subdevice<cpc_expansion_slot_device>("exp");
 		}
-		exp_port = temp_dev->subdevice<cpc_expansion_slot_device>("exp");
+		else
+		{
+			exp_port = NULL;
+		}
 	}
 
 	amstrad_rethinkMemory();
@@ -2906,37 +2915,42 @@ static const UINT8 amstrad_cycle_table_ex[256]=
 void amstrad_state::enumerate_roms()
 {
 	UINT8 m_rom_count = 1;
-	device_t* romexp;
-	rom_image_device* romimage;
 	UINT8 *rom = m_region_maincpu->base();
-	char str[20];
-	int i;
-	bool slot3 = false,slot7 = false;
 
+	bool slot7 = false;
 	if (m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000)
 	{
 		UINT8 *crt = m_region_cart->base();
 		int bank_mask = (m_cart->get_rom_size() / 0x4000) - 1;
 
 		/* ROMs are stored on the inserted cartridge in the Plus/GX4000 */
-		for(i=0; i<128; i++)  // fill ROM table
+		for (int i = 0; i < 128; i++) // fill ROM table
+		{
 			m_Amstrad_ROM_Table[i] = &crt[0x4000];
-		for(i=128;i<160;i++)
+		}
+
+		for(int i = 128; i < 160; i++)
+		{
 			m_Amstrad_ROM_Table[i] = &crt[((i - 128) & bank_mask) * 0x4000];
+		}
 		m_Amstrad_ROM_Table[7] = &crt[0xc000];
 		slot7 = true;
 	}
 	else
 	{
 		/* slot 0 is always BASIC, as is any unused slot */
-		for(i=0; i<256; i++)
+		for (int i = 0; i<256; i++)
+		{
 			m_Amstrad_ROM_Table[i] = &rom[0x014000];
+		}
+
 		/* AMSDOS ROM -- TODO: exclude from 464 unless a DDI-1 device is connected */
 		m_Amstrad_ROM_Table[7] = &rom[0x018000];
 		slot7 = true;
 	}
 
 	/* MSX-DOS BIOS - Aleste MSX emulation */
+	bool slot3 = false;
 	if(m_system_type == SYSTEM_ALESTE)
 	{
 		m_Amstrad_ROM_Table[3] = &rom[0x01c000];
@@ -2955,36 +2969,41 @@ void amstrad_state::enumerate_roms()
 		temp = dynamic_cast<device_t*>(exp_port->get_card_device());
 		if(temp != nullptr)
 		{
-			if(temp->memregion("exp_rom")->base() != nullptr)
+			memory_region *temp_region = temp->memregion("exp_rom");
+			if(temp_region != nullptr && temp_region->base() != nullptr)
 			{
-				int num = temp->memregion("exp_rom")->bytes() / 0x4000;
-				for(i=0;i<num;i++)
+				int num = temp_region->bytes() / 0x4000;
+				for (int i = 0; i < num; i++)
 				{
-					m_Amstrad_ROM_Table[m_rom_count] = temp->memregion("exp_rom")->base()+0x4000*i;
+					m_Amstrad_ROM_Table[m_rom_count] = temp_region->base()+0x4000*i;
 					NEXT_ROM_SLOT
 				}
 			}
+			exp_port = temp->subdevice<cpc_expansion_slot_device>("exp");
 		}
-		exp_port = temp->subdevice<cpc_expansion_slot_device>("exp");
+		else
+		{
+			exp_port = NULL;
+		}
 	}
 
 
 	/* add ROMs from ROMbox expansion */
-	romexp = get_expansion_device(machine(),"rom");
+	device_t* romexp = get_expansion_device(machine(),"rom");
 	if(romexp)
 	{
-		for(i=0;i<8;i++)
+		for(int i = 0; i < 8; i++)
 		{
-			sprintf(str,"rom%i",i+1);
-			romimage = romexp->subdevice<rom_image_device>(str);
-			if(romimage->base() != nullptr)
+			char str[20];
+			sprintf(str, "rom%i", i + 1);
+			rom_image_device* romimage = romexp->subdevice<rom_image_device>(str);
+			if(romimage != NULL && romimage->base() != nullptr)
 			{
 				m_Amstrad_ROM_Table[m_rom_count] = romimage->base();
 				NEXT_ROM_SLOT
 			}
 		}
 	}
-
 }
 
 void amstrad_state::amstrad_common_init()
@@ -3106,7 +3125,9 @@ MACHINE_START_MEMBER(amstrad_state,plus)
 	std::string region_tag;
 	m_region_cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	if (!m_region_cart) // this should never happen, since we make carts mandatory!
+	{
 		m_region_cart = memregion("maincpu");
+	}
 }
 
 

@@ -2282,3 +2282,22 @@ OP_HANDLER( stx_ex )
 	EXTENDED;
 	WM16(EAD,&m_x);
 }
+
+/* NCS specific, guessed opcodes (tested by Night Gal Summer) */
+// $bb - load A from [X + $0]
+OP_HANDLER( ldax_imm )
+{
+	EA=X;
+	A=RM(EAD);
+	CLR_NZV;
+	SET_NZ8(A);
+}
+
+// $00 - store A to [X + $0]
+OP_HANDLER( stax_imm )
+{
+	CLR_NZV;
+	SET_NZ8(A);
+	EA=X;
+	WM(EAD,A);
+}

@@ -4,9 +4,8 @@
 #define _INCLUDES_N64_H_
 
 #include "cpu/rsp/rsp.h"
+#include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"
-
-/*----------- forward decls -----------*/
 
 /*----------- driver state -----------*/
 
@@ -16,11 +15,15 @@ class n64_state : public driver_device
 {
 public:
 	n64_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
-
-	/* video-related */
-	n64_rdp *m_rdp;
+		: driver_device(mconfig, type, tag)
+		, m_vr4300(*this, "maincpu")
+		, m_rsp(*this, "rsp")
+		, m_sram(*this, "sram")
+		, m_rdram(*this, "rdram")
+		, m_rsp_imem(*this, "rsp_imem")
+		, m_rsp_dmem(*this, "rsp_dmem")
+	{
+	}
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -29,7 +32,25 @@ public:
 
 	UINT32 screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_n64(screen_device &screen, bool state);
-	required_device<cpu_device> m_maincpu;
+
+	// Getters
+	n64_rdp* rdp() { return m_rdp; }
+	UINT32* rdram() { return m_rdram; }
+	UINT32* sram() { return m_sram; }
+	UINT32* rsp_imem() { return m_rsp_imem; }
+	UINT32* rsp_dmem() { return m_rsp_dmem; }
+
+protected:
+	required_device<mips3_device> m_vr4300;
+	required_device<rsp_device> m_rsp;
+
+	optional_shared_ptr<UINT32> m_sram;
+	required_shared_ptr<UINT32> m_rdram;
+	required_shared_ptr<UINT32> m_rsp_imem;
+	required_shared_ptr<UINT32> m_rsp_dmem;
+
+	/* video-related */
+	n64_rdp *m_rdp;
 };
 
 /*----------- devices -----------*/
@@ -98,7 +119,6 @@ public:
 	void ai_timer_tick();
 	void pi_dma_tick();
 	void si_dma_tick();
-	void vi_scanline_tick();
 	void reset_tick();
 	void video_update(bitmap_rgb32 &bitmap);
 
@@ -137,15 +157,22 @@ public:
 	void poll_reset_button(bool button);
 
 	UINT32 dp_clock;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
-	address_space *mem_map;
-	device_t *maincpu;
-	device_t *rspcpu;
+	n64_state* m_n64;
+	address_space *m_mem_map;
+	mips3_device *m_vr4300;
+	rsp_device *m_rsp;
+
+	UINT32 *m_rdram;
+	UINT32 *m_sram;
+	UINT32 *m_rsp_imem;
+	UINT32 *m_rsp_dmem;
 
 	void clear_rcp_interrupt(int interrupt);
 
@@ -369,13 +396,6 @@ const unsigned int ddZoneTrackSize[16] = {158,158,149,149,149,149,149,114,
 const unsigned int ddStartOffset[16] =
 	{0x0,0x5F15E0,0xB79D00,0x10801A0,0x1523720,0x1963D80,0x1D414C0,0x20BBCE0,
 		0x23196E0,0x28A1E00,0x2DF5DC0,0x3299340,0x36D99A0,0x3AB70E0,0x3E31900,0x4149200};
-
-
-
-extern UINT32 *n64_sram;
-extern UINT32 *rdram;
-extern UINT32 *rsp_imem;
-extern UINT32 *rsp_dmem;
 
 extern void dp_full_sync(running_machine &machine);
 

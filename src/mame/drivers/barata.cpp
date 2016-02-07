@@ -54,7 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_READ8_MEMBER(port2_r);
 	void fpga_send(unsigned char cmd);
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
 private:

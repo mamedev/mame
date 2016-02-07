@@ -33,7 +33,7 @@ k033906_device::k033906_device(const machine_config &mconfig, const char *tag, d
 
 void k033906_device::device_start()
 {
-	m_voodoo = machine().device(m_voodoo_tag);
+	m_voodoo = (voodoo_device*)machine().device(m_voodoo_tag);
 
 	m_reg_set = 0;
 
@@ -95,7 +95,7 @@ void k033906_device::reg_w(int reg, UINT32 data)
 
 		case 0x10:      // initEnable
 		{
-			voodoo_set_init_enable(m_voodoo, data);
+			m_voodoo->voodoo_set_init_enable(data);
 			break;
 		}
 

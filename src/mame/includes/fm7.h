@@ -136,6 +136,9 @@ public:
 		m_floppy0(*this, "fdc:0"),
 		m_floppy1(*this, "fdc:1"),
 		m_floppy(nullptr),
+		m_ram_ptr(*this, "maincpu"),
+		m_rom_ptr(*this, "init"),
+		m_basic_ptr(*this, "fbasic"),
 		m_kanji(*this, "kanji1"),
 		m_key1(*this, "key1"),
 		m_key2(*this, "key2"),
@@ -164,42 +167,22 @@ public:
 		m_avbank16(*this, "av_bank16")
 	{
 	}
+	DECLARE_DRIVER_INIT(fm7);
 
-	optional_shared_ptr<UINT8> m_shared_ram;
-	optional_shared_ptr<UINT8> m_boot_ram;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
-	UINT8 m_irq_flags;
-	UINT8 m_irq_mask;
-	emu_timer* m_timer;
-	emu_timer* m_subtimer;
-	emu_timer* m_keyboard_timer;
-	UINT8 m_basic_rom_en;
-	UINT8 m_init_rom_en;
-	unsigned int m_key_delay;
-	unsigned int m_key_repeat;
-	UINT16 m_current_scancode;
-	UINT32 m_key_data[4];
-	UINT32 m_mod_data;
-	UINT8 m_key_scan_mode;
-	UINT8 m_break_flag;
-	UINT8 m_psg_regsel;
-	UINT8 m_psg_data;
-	UINT8 m_fdc_side;
-	UINT8 m_fdc_drive;
-	UINT8 m_fdc_irq_flag;
-	UINT8 m_fdc_drq_flag;
-	UINT8 m_fm77av_ym_irq;
-	UINT8 m_speaker_active;
-	UINT16 m_kanji_address;
-	fm7_encoder_t m_encoder;
-	fm7_mmr_t m_mmr;
-	UINT8 m_cp_prev;
-	std::unique_ptr<UINT8[]> m_video_ram;
-	emu_timer* m_fm77av_vsync_timer;
-	UINT8 m_type;
-	fm7_video_t m_video;
-	fm7_alu_t m_alu;
-	int m_sb_prev;
+	DECLARE_MACHINE_START(fm7);
+	DECLARE_MACHINE_START(fm77av);
+	DECLARE_MACHINE_START(fm11);
+	DECLARE_MACHINE_START(fm16);
+
+	DECLARE_WRITE_LINE_MEMBER(fm7_fdc_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(fm7_fdc_drq_w);
+	DECLARE_READ8_MEMBER(fm77av_joy_1_r);
+	DECLARE_READ8_MEMBER(fm77av_joy_2_r);
+	DECLARE_WRITE_LINE_MEMBER(fm77av_fmirq);
+
 	DECLARE_READ8_MEMBER(fm7_subintf_r);
 	DECLARE_WRITE8_MEMBER(fm7_subintf_w);
 	DECLARE_READ8_MEMBER(fm7_sub_busyflag_r);
@@ -286,16 +269,62 @@ public:
 	DECLARE_WRITE8_MEMBER(fm7_mmr_w);
 	DECLARE_READ8_MEMBER(fm7_kanji_r);
 	DECLARE_WRITE8_MEMBER(fm7_kanji_w);
+
+	IRQ_CALLBACK_MEMBER(fm7_irq_ack);
+	IRQ_CALLBACK_MEMBER(fm7_sub_irq_ack);
+
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+
+	UINT32 screen_update_fm7(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+protected:
+	optional_shared_ptr<UINT8> m_shared_ram;
+	optional_shared_ptr<UINT8> m_boot_ram;
+
+	UINT8           m_irq_flags;
+	UINT8           m_irq_mask;
+	emu_timer*      m_timer;
+	emu_timer*      m_subtimer;
+	emu_timer*      m_keyboard_timer;
+	UINT8           m_basic_rom_en;
+	UINT8           m_init_rom_en;
+
+	unsigned int    m_key_delay;
+	unsigned int    m_key_repeat;
+	UINT16          m_current_scancode;
+	UINT32          m_key_data[4];
+	UINT32          m_mod_data;
+	UINT8           m_key_scan_mode;
+	UINT8           m_break_flag;
+
+	UINT8           m_psg_regsel;
+	UINT8           m_psg_data;
+
+	UINT8           m_fdc_side;
+	UINT8           m_fdc_drive;
+	UINT8           m_fdc_irq_flag;
+	UINT8           m_fdc_drq_flag;
+
+	UINT8           m_fm77av_ym_irq;
+	UINT8           m_speaker_active;
+
+	UINT16          m_kanji_address;
+	fm7_encoder_t   m_encoder;
+	fm7_mmr_t       m_mmr;
+	UINT8           m_cp_prev;
+
+	std::unique_ptr<UINT8[]>    m_video_ram;
+	emu_timer*                  m_fm77av_vsync_timer;
+	UINT8 m_type;
+	fm7_video_t     m_video;
+	fm7_alu_t       m_alu;
+	int             m_sb_prev;
+
 	void fm77av_encoder_setup_command();
 	void fm77av_encoder_handle_command();
-	DECLARE_DRIVER_INIT(fm7);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_MACHINE_START(fm7);
-	DECLARE_MACHINE_START(fm77av);
-	DECLARE_MACHINE_START(fm11);
-	DECLARE_MACHINE_START(fm16);
-	UINT32 screen_update_fm7(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(fm7_beeper_off);
 	TIMER_CALLBACK_MEMBER(fm77av_encoder_ack);
 	TIMER_CALLBACK_MEMBER(fm7_timer_irq);
@@ -303,13 +332,7 @@ public:
 	TIMER_CALLBACK_MEMBER(fm7_keyboard_poll);
 	TIMER_CALLBACK_MEMBER(fm77av_alu_task_end);
 	TIMER_CALLBACK_MEMBER(fm77av_vsync);
-	DECLARE_WRITE_LINE_MEMBER(fm7_fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fm7_fdc_drq_w);
-	DECLARE_READ8_MEMBER(fm77av_joy_1_r);
-	DECLARE_READ8_MEMBER(fm77av_joy_2_r);
-	IRQ_CALLBACK_MEMBER(fm7_irq_ack);
-	IRQ_CALLBACK_MEMBER(fm7_sub_irq_ack);
-	DECLARE_WRITE_LINE_MEMBER(fm77av_fmirq);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_sub;
 	optional_device<cpu_device> m_x86;
@@ -317,13 +340,18 @@ public:
 	required_device<beep_device> m_beeper;
 	optional_device<ym2203_device> m_ym;
 	optional_device<ay8910_device> m_psg;
+
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
+
 	required_device<mb8877_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-
 	floppy_image_device *m_floppy;
+
+	optional_region_ptr<UINT8> m_ram_ptr;
+	optional_region_ptr<UINT8> m_rom_ptr;
+	optional_region_ptr<UINT8> m_basic_ptr;
 
 	void fm7_alu_mask_write(UINT32 offset, int bank, UINT8 dat);
 	void fm7_alu_function_compare(UINT32 offset);
@@ -349,11 +377,6 @@ public:
 	int m_centronics_fault;
 	int m_centronics_ack;
 	int m_centronics_perror;
-
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 
 	optional_memory_region m_kanji;
 	required_ioport m_key1;
@@ -383,7 +406,6 @@ public:
 	optional_device<address_map_bank_device> m_avbank15;
 	optional_device<address_map_bank_device> m_avbank16;
 
-protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 

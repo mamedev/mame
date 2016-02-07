@@ -89,7 +89,7 @@ ROM board internal layouts:
  Type 1:
 
  00000000 - 00800000 IC18 flash ROM
- 00800000 - 01000000 unk, probably mirror of above
+ 00800000 - 01000000 mirror of above
  01000000 - 02000000 IC10 \
         .....               mask ROMs
  07000000 - 08000000 IC17 /
@@ -97,8 +97,9 @@ ROM board internal layouts:
  Type 2:
 
  00000000 - 00800000 FMEM1 flash ROM
- 00800000 - 01000000 FMEM2 flash ROM
- 01000000 - 02000000 unk, probably mirror of above
+ 00800000 - 01000000 mirror of above
+ 01000000 - 01800000 FMEM2 flash ROM
+ 01800000 - 02000000 mirror of above
  02000000 - 04000000 MROM1 MROM4 MROM7 MROM10 \
  04000000 - 06000000 MROM2 MROM5 MROM8 MROM11   banked mask ROMs
  06000000 - 08000000 MROM3 MROM6 MROM9 MROM12 /
@@ -307,7 +308,6 @@ READ16_MEMBER(aw_rom_board::pio_r)
 	if (roffset >= (mpr_offset / 2))
 		roffset += mpr_bank * 0x4000000;
 	UINT16 retval = (m_region->bytes() > roffset) ? m_region->u16(roffset) : 0;
-	epr_offset++;
 	return retval;
 }
 
@@ -316,7 +316,6 @@ WRITE16_MEMBER(aw_rom_board::pio_w)
 	// write to ROM board address space, including FlashROM programming using CFI (TODO)
 	if (epr_offset == 0x7fffff)
 		mpr_bank = data & 3;
-	epr_offset++;
 }
 
 WRITE16_MEMBER(aw_rom_board::epr_offsetl_w)

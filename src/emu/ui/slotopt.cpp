@@ -189,7 +189,7 @@ void ui_menu_slot_devices::handle()
 	{
 		if ((FPTR)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
 		{
-			machine().options().add_slot_options(false);
+			machine().options().add_slot_options();
 			machine().schedule_hard_reset();
 		}
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
@@ -204,7 +204,7 @@ void ui_menu_slot_devices::handle()
 			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;
 			device_slot_option *option = slot_get_current_option(slot);
 			if (option)
-				ui_menu::stack_push(auto_alloc_clear(machine(), <ui_menu_device_config>(machine(), container, slot, option)));
+				ui_menu::stack_push(global_alloc_clear<ui_menu_device_config>(machine(), container, slot, option));
 		}
 	}
 }

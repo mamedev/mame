@@ -273,6 +273,7 @@ VIDEOS["DL1416"] = true
 VIDEOS["DM9368"] = true
 VIDEOS["EF9340_1"] = true
 VIDEOS["EF9345"] = true
+VIDEOS["EF9364"] = true
 VIDEOS["EF9365"] = true
 VIDEOS["GF4500"] = true
 --VIDEOS+= EPIC12"] = true
@@ -301,6 +302,7 @@ VIDEOS["MSM6222B"] = true
 VIDEOS["MSM6255"] = true
 VIDEOS["MOS6566"] = true
 VIDEOS["PC_VGA"] = true
+VIDEOS["PCD8544"] = true
 --VIDEOS+= POLY"] = true
 VIDEOS["PSX"] = true
 VIDEOS["RAMDAC"] = true
@@ -1697,8 +1699,9 @@ files {
 
 createMESSProjects(_target, _subtarget, "fidelity")
 files {
-	MAME_DIR .. "src/mame/drivers/csc.cpp",
 	MAME_DIR .. "src/mame/drivers/fidelz80.cpp",
+	MAME_DIR .. "src/mame/includes/fidelz80.h",
+	MAME_DIR .. "src/mame/drivers/fidel6502.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "force")
@@ -2088,6 +2091,8 @@ files {
 	MAME_DIR .. "src/mame/machine/pc9801_cbus.h",
 	MAME_DIR .. "src/mame/machine/pc9801_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/pc9801_kbd.h",
+	MAME_DIR .. "src/mame/machine/pc9801_cd.cpp",
+	MAME_DIR .. "src/mame/machine/pc9801_cd.h",
 	MAME_DIR .. "src/mame/drivers/tk80bs.cpp",
 	MAME_DIR .. "src/mame/drivers/hh_ucom4.cpp",
 	MAME_DIR .. "src/mame/includes/hh_ucom4.h",
@@ -2362,6 +2367,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/rd110.cpp",
 	MAME_DIR .. "src/mame/drivers/rsc55.cpp",
 	MAME_DIR .. "src/mame/drivers/tb303.cpp",
+	MAME_DIR .. "src/mame/drivers/tr606.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "rolm")
@@ -3079,6 +3085,7 @@ files {
 	MAME_DIR .. "src/mame/audio/gamate.cpp",
 	MAME_DIR .. "src/mame/drivers/gameking.cpp",
 	MAME_DIR .. "src/mame/drivers/gimix.cpp",
+	MAME_DIR .. "src/mame/drivers/goupil.cpp",
 	MAME_DIR .. "src/mame/drivers/grfd2301.cpp",
 	MAME_DIR .. "src/mame/drivers/harriet.cpp",
 	MAME_DIR .. "src/mame/drivers/hprot1.cpp",

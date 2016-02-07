@@ -148,15 +148,30 @@ ROM_START( dpatrol )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0800, "roms", ROMREGION_ERASE00 )
-	ROM_LOAD( "bd1.d2", 0x0000, 0x0400, CRC(e4c8e4ab) SHA1(0b989ca9369139f212dcea1d1461998f20057db8)) // computer program game code. 6341-1 or 82S181 according to Desert Patrol schematics
-	ROM_LOAD( "bd1.e2", 0x0000, 0x0400, CRC(256b3320) SHA1(712573e3d9625a84c54bbe2e3edafb8879a14b2e)) // computer program game code. 6341-1 or 82S181 according to Desert Patrol schematics
+	ROM_LOAD( "bd1.d2", 0x0000, 0x0400, CRC(e4c8e4ab) SHA1(0b989ca9369139f212dcea1d1461998f20057db8)) // Computer program game code. 6341-1 or 82S181 according to Desert Patrol schematics
+	ROM_LOAD( "bd1.e2", 0x0000, 0x0400, CRC(256b3320) SHA1(712573e3d9625a84c54bbe2e3edafb8879a14b2e)) // Computer program game code. 6341-1 or 82S181 according to Desert Patrol schematics
 
-	ROM_LOAD( "bd2.l4", 0x0000, 0x0200, CRC(bc87c648) SHA1(c4709d155aa50cc87146abd152a11de618cfd64c)) // prom 1 contains aircraft target images and explosion image. pcb has 82S141; schematics show 6341-1
-	ROM_LOAD( "bd2.l1", 0x0000, 0x0800, CRC(f1e8ba9e) SHA1(605db3fdbaff4ba13729371ad0c4fbab3889378e)) // prom 2 contains parachute and man, falling man. pcb has 82S141; schematics show 6341-1
+	ROM_LOAD( "bd2.l4", 0x0000, 0x0200, CRC(bc87c648) SHA1(c4709d155aa50cc87146abd152a11de618cfd64c)) // PROM 1 contains aircraft target images and explosion image. PCB has 82S141; schematics show 6341-1
+	ROM_LOAD( "bd2.l1", 0x0000, 0x0800, CRC(f1e8ba9e) SHA1(605db3fdbaff4ba13729371ad0c4fbab3889378e)) // PROM 2 contains parachute and man, falling man. PCB has 82S141; schematics show 6341-1
 
-	ROM_LOAD( "bd2.h7", 0x0000, 0x0020, NO_DUMP) // contains prom address codes and image speeds. Each image has its own speed and address block in the image PROM. chip is 82S123
+	ROM_LOAD( "bd2.h7", 0x0000, 0x0020, NO_DUMP) // Contains PROM address codes and image speeds. Each image has its own speed and address block in the image PROM. Chip is 82S123
 
-	ROM_LOAD( "bd3.d1", 0x0000, 0x0020, NO_DUMP ) // data in prom is organized to produce the waveform of a human scream. Chip type is 8574 or MM6301-0J
+	ROM_LOAD( "bd3.d1", 0x0000, 0x0080, NO_DUMP ) // Data in PROM is organized to produce the waveform of a human scream. Chip type is 8574 or MM6301-0J
+ROM_END
+
+ROM_START( dpatrola )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0800, "roms", ROMREGION_ERASE00 )
+	ROM_LOAD( "bd1.d2", 0x0000, 0x0200, CRC(dd30f565) SHA1(04676adf9fe172c5332bdc9d235a899c7dbe90b5)) // Computer program game code. PCB has SN74S474; schematics show 6341-1 or 82S181
+	ROM_LOAD( "bd1.e2", 0x0000, 0x0200, CRC(e1f0941b) SHA1(57f51e9a74838708c3017c5a00e8ec33c6445e47)) // Computer program game code. PCB has SN74S474; schematics show 6341-1 or 82S181
+
+	ROM_LOAD( "bd2.l4", 0x0000, 0x0200, CRC(bc87c648) SHA1(c4709d155aa50cc87146abd152a11de618cfd64c)) // PROM 1 contains aircraft target images and explosion image. PCB has SN74S474; schematics show 6341-1
+	ROM_LOAD( "bd2.l1", 0x0000, 0x0200, CRC(4ddcc237) SHA1(6bfad6a8bf8387e93c0bb1a04b647690b3701d54)) // PROM 2 contains parachute and man, falling man. PCB has SN74S474; schematics show 6341-1
+
+	ROM_LOAD( "bd2.h7", 0x0000, 0x0020, CRC(7e8f20a2) SHA1(1fd16e10b7913bc6d949c7fc117ee80a87371777)) // Contains PROM address codes and image speeds. Each image has its own speed and address block in the image PROM. PCB had SN74S288; schematics show 82S123
+
+	ROM_LOAD( "bd3.d1", 0x0000, 0x0080, NO_DUMP ) // Data in PROM is organized to produce the waveform of a human scream. Chip type is 8574 or MM6301-0J. Was not present on dumped PCB.
 ROM_END
 
 /*
@@ -164,8 +179,8 @@ ROM_START( knightar )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
     ROM_REGION( 0x0020, "roms", ROMREGION_ERASE00 )
-    ROM_LOAD( "1.m1" ) // Man rom stores image characters of knights. 82S115P or 8205R according to KIA schematics
-    ROM_LOAD( "2.m2" ) // Horse rom stores image characters of horses. 82S115P or 8205R according to KIA schematics
+    ROM_LOAD( "1.m1" ) // Man ROM stores image characters of knights. 82S115P or 8205R according to Knights in Armor schematics
+    ROM_LOAD( "2.m2" ) // Horse ROM stores image characters of horses. 82S115P or 8205R according to Knights in Armor schematics
 ROM_END
 */
 
@@ -174,25 +189,24 @@ ROM_START( gametree )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
     ROM_REGION( 0x0020, "roms", ROMREGION_ERASE00 )
-    ROM_LOAD( "bd1.d2" ) // computer program game code. 6341-1 or 82S181 according to Game Tree schematics
-    ROM_LOAD( "bd1.e2" ) // computer program game code. 6341-1 or 82S181 according to Game Tree schematics
+    ROM_LOAD( "bd1.d2" ) // Computer program game code. 6341-1 or 82S181 according to Game Tree schematics
+    ROM_LOAD( "bd1.e2" ) // Computer program game code. 6341-1 or 82S181 according to Game Tree schematics
 
-    ROM_LOAD( "bd2.f12" ) // prom 1 contains squirrel and squirrel point value. 82S141 or 6341-1 according to Game Tree layout
-    ROM_LOAD( "bd2.f14" ) // prom 1 contains squirrel and squirrel point value. 82S141 or 6341-1 according to Game Tree layout
+    ROM_LOAD( "bd2.f12" ) // PROM 1 contains squirrel and squirrel point value. 82S141 or 6341-1 according to Game Tree layout
+    ROM_LOAD( "bd2.f14" ) // PROM 1 contains squirrel and squirrel point value. 82S141 or 6341-1 according to Game Tree layout
 
+    ROM_LOAD( "bd2.e12" ) // PROM 2 contains other targets (rabbit and turkey) and point values
+    ROM_LOAD( "bd2.e14" ) // PROM 2 82S141 or 6341-1 according to Game Tree layout
 
-    ROM_LOAD( "bd2.e12" ) // prom 2 contains other targets (rabbit and turkey) and point values
-    ROM_LOAD( "bd2.e14" ) // prom 2 82S141 or 6341-1 according to Game Tree layout.
+    ROM_LOAD( "bd2.a2" ) // Contains PROM address codes and image speeds. Each has its own speed and address block in the image PROM
 
-
-    ROM_LOAD( "bd2.a2" ) // contains prom address codes and image speeds. Each has its own speed and address block in the image prom.
-
-    ROM_LOAD( "bd2.a3" ) // contains prom address codes and image speeds. 82S123 or 6331-1 according to Game Tree layout.
+    ROM_LOAD( "bd2.a3" ) // Contains PROM address codes and image speeds. 82S123 or 6331-1 according to Game Tree layout
 ROM_END
 */
 
 GAME( 1976, bazooka,    0,       pse, 0, driver_device,  0, ROT0, "Project Support Engineering", "Bazooka [TTL]", MACHINE_IS_SKELETON )
 GAME( 1977, bazookabr,  bazooka, pse, 0, driver_device,  0, ROT0, "Taito do Brasil", "Bazooka (Brazil) [TTL]", MACHINE_IS_SKELETON )
 GAME( 1977, dpatrol,    0,       pse, 0, driver_device,  0, ROT0, "Project Support Engineering", "Desert Patrol [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, dpatrola,   dpatrol, pse, 0, driver_device,  0, ROT0, "Project Support Engineering (Telegames license)", "Desert Patrol (set 2) [TTL]", MACHINE_IS_SKELETON )
 //GAME( 1976, knightar, 0,       pse, 0, driver_device,  0, ROT0, "Project Support Engineering", "Knights in Armor [TTL]", MACHINE_IS_SKELETON )
 //GAME( 1978, gametree, 0,       pse, 0, driver_device,  0, ROT0, "Project Support Engineering", "Game Tree [TTL]", MACHINE_IS_SKELETON )

@@ -21,11 +21,11 @@ Japanese Releases - Pyuuta
 011E Mystery Gold ~ ミステリー ゴールド    [dumped]
 012E DonPan ~ ドンバン [dumped]
 013E Mickey Athletic Land ~ ミッキー アスレチックランド [dumped]
-014E Pooyan ~ プーヤン
-015E Jungler ~ ジャングラー
-016E Guttang Gottong ~ ガッタンゴットン
+014E Pooyan ~ プーヤン [dumped]
+015E Jungler ~ ジャングラー [dumped]
+016E Guttang Gottong ~ ガッタンゴットン [dumped]]
 017E Maze Patrol ~ メイズ パトロール    [dumped]
-018E Tron ~ トロン
+018E Tron ~ トロン [dumped]
 019E Mr. Do! ~ Mr.DO!    [dumped]
 020E Bermuda Triangle ~ バミューダ・ トライアングル  [dumped]
 021E 4-nin Mahjan ~ 四人麻雀 [dumped]
@@ -196,7 +196,18 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
-	<software name="jungler">
+	<software name="tron" cloneof="hyperspc">
+		<description>Tron (Jpn)</description>
+		<year>1983</year>
+		<publisher>Tomy / Walt Disney Productions</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="tron.bin" size="8192" crc="280f191d" sha1="0d8b5c43db89a438f6036794be7628793643818b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jungler"> <!-- US and Japan confirmed to be the same -->
 	<!-- Stock No: 8202, (Japanese 015E)-->
 		<description>Jungler</description>
 		<year>1981</year>
@@ -208,9 +219,9 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
-	<software name="locomotn">
+	<software name="locomotn"> <!-- US and Japan confirmed to be the same -->
 	<!-- Stock No: 8203, Clone of Guttang Gottong (Japanese 016E)-->
-		<description>Loco-motion (USA)</description>
+		<description>Loco-motion (USA) / Guttang Gottong (Jpn)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="8203"/>
@@ -312,7 +323,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
-	<software name="pooyan">
+	<software name="pooyan"> <!-- US and Japan confirmed to be the same -->
 	<!-- Stock No: 8200, (Japanese 014E)-->
 		<description>Pooyan</description>
 		<year>1982</year>

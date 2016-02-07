@@ -6,18 +6,17 @@ Night Gal (c) 1984 Nichibutsu
 
 a.k.a. same Jangou blitter but with NCS CPU for displaying graphics as protection.
 
-preliminary driver by David Haywood & Angelo Salese
+driver by David Haywood & Angelo Salese
 many thanks to Charles MacDonald for the schematics / documentation of this HW.
 
 TODO:
--Night Gal Summer trips illegal opcodes on the NCS side, presumably a CPU bug;
--Fix Sweet Gal/Sexy Gal gfxs if necessary (i.e. if the bugs aren't all caused by irq/nmi
- wrong firing);
--Proper Z80<->MCU comms,many video problems because of that;
--Abstract the video chip to a proper video file and get the name of that chip;
--Minor graphic glitches in Royal Queen (cross hatch test, some little glitches during gameplay),
- presumably due of the unemulated wait states on the comms.
-
+ - Night Gal Summer trips illegal opcodes on the NCS side, needs to check if bit-rotted or encrypted ROM;
+ - Fix Sweet Gal/Sexy Gal gfxs if necessary (i.e. if the bugs aren't all caused by irq/nmi wrong firing);
+ - unemulated WAIT pin for Z80, MCU asserts it when accessing communication RAM
+ - Abstract the video chip to a proper video file and get the name of that chip;
+ - Minor graphic glitches in Royal Queen (cross hatch test, some little glitches during gameplay),
+   presumably due of the unemulated wait states on the comms.
+ 
 *******************************************************************************************/
 
 #include "emu.h"
@@ -91,6 +90,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_READ8_MEMBER(input_1p_r);
 	DECLARE_READ8_MEMBER(input_2p_r);
+	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_DRIVER_INIT(ngalsumr);
 	DECLARE_DRIVER_INIT(royalqn);
 	virtual void machine_start() override;
@@ -121,7 +121,9 @@ protected:
 	required_ioport m_io_dswb;
 	required_ioport m_io_dswc;
 	required_device<palette_device> m_palette;
-
+	void z80_wait_assert_cb();
+	TIMER_CALLBACK_MEMBER( z80_wait_ack_cb );
+	
 	UINT8 nightgal_gfx_nibble( int niboffset );
 	void plot_nightgal_gfx_pixel( UINT8 pix, int x, int y );
 };
@@ -421,13 +423,29 @@ READ8_MEMBER(nightgal_state::royalqn_nsc_blit_r)
 	return m_blit_raw_data[offset];
 }
 
+TIMER_CALLBACK_MEMBER(nightgal_state::z80_wait_ack_cb)
+{
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+}
+
+void nightgal_state::z80_wait_assert_cb()
+{
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+	
+	// Note: cycles_to_attotime requires z80 context to work, calling for example m_subcpu as context gives a x4 cycle boost in z80 terms (reads execute_cycles_to_clocks() from NCS?) even if they runs at same speed basically.
+	// TODO: needs a getter that tells a given CPU how many cycles requires an executing opcode for the r/w operation, which stacks with wait state penalty for accessing this specific area.
+	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(4), timer_expired_delegate(FUNC(nightgal_state::z80_wait_ack_cb),this));	
+}
+
 READ8_MEMBER(nightgal_state::royalqn_comm_r)
 {
+	z80_wait_assert_cb();
 	return (m_comms_ram[offset] & 0x80) | (0x7f); //bits 6-0 are undefined, presumably open bus
 }
 
 WRITE8_MEMBER(nightgal_state::royalqn_comm_w)
 {
+	z80_wait_assert_cb();
 	m_comms_ram[offset] = data & 0x80;
 }
 
@@ -497,52 +515,22 @@ READ8_MEMBER(nightgal_state::input_2p_r)
 			m_io_pl2_4->read() & m_io_pl2_5->read() & m_io_pl2_6->read()) | coin_port;
 }
 
+WRITE8_MEMBER(nightgal_state::output_w)
+{
+	/*
+	Doesn't match Charles notes?
+	--x- ---- unknown, set by Royal Queen on gameplay
+	---- -x-- flip screen
+	---- ---x out counter
+	*/
+	machine().bookkeeping().coin_counter_w(0, data & 0x02);
+}
+
 /********************************************
 *
 * Memory Maps
 *
 ********************************************/
-
-/********************************
-* Night Gal
-********************************/
-#ifdef UNUSED_CODE
-static ADDRESS_MAP_START( nightgal_map, AS_PROGRAM, 8, nightgal_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc100, 0xc100) AM_READ(nsc_latch_r)
-	AM_RANGE(0xc200, 0xc200) AM_WRITE(nsc_latch_w)
-	AM_RANGE(0xc300, 0xc30f) AM_WRITE(blit_vregs_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( nightgal_io, AS_IO, 8, nightgal_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-//  AM_RANGE(0x10,0x10) AM_WRITE(output_w)
-	AM_RANGE(0x10,0x10) AM_READ_PORT("DSWC")
-	AM_RANGE(0x11,0x11) AM_READ_PORT("SYSA")
-	AM_RANGE(0x12,0x12) AM_READ_PORT("DSWA")
-	AM_RANGE(0x13,0x13) AM_READ_PORT("DSWB")
-	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x14) AM_WRITE(blitter_w) //data for the nsc to be processed
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( nsc_map, AS_PROGRAM, 8, nightgal_state )
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0080) AM_READ(blitter_status_r)
-	AM_RANGE(0x0081, 0x0083) AM_READ(nsc_blit_r)
-	AM_RANGE(0x0080, 0x0086) AM_WRITE(nsc_true_blitter_w)
-
-	AM_RANGE(0x00a0, 0x00af) AM_WRITE(blit_true_vregs_w)
-
-	AM_RANGE(0x1100, 0x1100) AM_READWRITE(z80_latch_r,z80_latch_w) //irq control?
-	AM_RANGE(0x1200, 0x1200) AM_READNOP //flip screen set bit
-	AM_RANGE(0x1300, 0x130f) AM_READ(blit_vregs_r)
-//  AM_RANGE(0x1000, 0xdfff) AM_ROM AM_REGION("gfx1", 0 )
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_WRITENOP
-ADDRESS_MAP_END
-#endif
 
 /********************************
 * Sexy Gal
@@ -558,8 +546,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sexygal_io, AS_IO, 8, nightgal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00,0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-//  AM_RANGE(0x10,0x10) AM_WRITE(output_w)
-	AM_RANGE(0x10,0x10) AM_READ_PORT("DSWC")
+	AM_RANGE(0x10,0x10) AM_READ_PORT("DSWC") AM_WRITE(output_w)
 	AM_RANGE(0x11,0x11) AM_READ_PORT("SYSA") AM_WRITE(mux_w)
 	AM_RANGE(0x12,0x12) AM_MIRROR(0xe8) AM_READ_PORT("DSWA") AM_WRITE(royalqn_blitter_0_w)
 	AM_RANGE(0x13,0x13) AM_MIRROR(0xe8) AM_READ_PORT("DSWB") AM_WRITE(royalqn_blitter_1_w)
@@ -594,7 +581,7 @@ static ADDRESS_MAP_START( royalqn_io, AS_IO, 8, nightgal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01,0x01) AM_MIRROR(0xec) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x02,0x03) AM_MIRROR(0xec) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x10,0x10) AM_MIRROR(0xe8) AM_READ_PORT("DSWC") AM_WRITENOP //AM_WRITE(output_w)
+	AM_RANGE(0x10,0x10) AM_MIRROR(0xe8) AM_READ_PORT("DSWC") AM_WRITE(output_w)
 	AM_RANGE(0x11,0x11) AM_MIRROR(0xe8) AM_READ_PORT("SYSA") AM_WRITE(mux_w)
 	AM_RANGE(0x12,0x12) AM_MIRROR(0xe8) AM_READ_PORT("DSWA") AM_WRITE(royalqn_blitter_0_w)
 	AM_RANGE(0x13,0x13) AM_MIRROR(0xe8) AM_READ_PORT("DSWB") AM_WRITE(royalqn_blitter_1_w)
@@ -894,14 +881,9 @@ static MACHINE_CONFIG_START( royalqn, nightgal_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-
 	/* video hardware */
-	/* TODO: blitter clock is MASTER_CLOCK / 4, 320 x 264 pixels, 256 x 224 of visible area */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4,320,0,256,264,16,240)
 	MCFG_SCREEN_UPDATE_DRIVER(nightgal_state, screen_update_nightgal)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1226,7 +1208,7 @@ ROM_START( ngalsumr )
 	ROM_LOAD( "10.3v", 0x04000, 0x02000, CRC(31211088) SHA1(960b781c420602be3de66565a030cf5ebdcc2ffb) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "7.3p",  0x0c000, 0x02000, CRC(20c55a25) SHA1(9dc88cb6c016b594264f7272d4fd5f30567e7c5d) )
+	ROM_LOAD( "7.3p",  0x0c000, 0x02000, BAD_DUMP CRC(20c55a25) SHA1(9dc88cb6c016b594264f7272d4fd5f30567e7c5d) ) // either encrypted or bit-rotted.
 
 	ROM_REGION( 0xc000, "samples", 0 )
 	ROM_LOAD( "1s.ic7", 0x00000, 0x04000, CRC(47ad8a0f) SHA1(e3b1e13f0a5c613bd205338683bef8d005b54830) )
@@ -1258,9 +1240,15 @@ DRIVER_INIT_MEMBER(nightgal_state,ngalsumr)
 {
 	UINT8 *ROM = memregion("sub")->base();
 
-	/* patch protection */
-	ROM[0xd6ce] = 0x02;
-	ROM[0xd6cf] = 0x02;
+	/* patch blantantly wrong ROM checks */
+	//ROM[0xd6ce] = 0x02;
+	//ROM[0xd6cf] = 0x02;
+	// adcx $05 converted to 0x04 for debug purposes
+	ROM[0xd782] = 0x04;
+	//ROM[0xd655] = 0x20;
+	//ROM[0xd3f9] = 0x02;
+	//ROM[0xd3fa] = 0x02;
+	//ROM[0xd3a0] = 0x02;
 }
 
 /* Type 1 HW */

@@ -24,7 +24,7 @@
 // ======================> cbm8000_hsg_t
 
 class cbm8000_hsg_t : public device_t,
-					  public device_pet_expansion_card_interface
+						public device_pet_expansion_card_interface
 {
 public:
 	// construction/destruction

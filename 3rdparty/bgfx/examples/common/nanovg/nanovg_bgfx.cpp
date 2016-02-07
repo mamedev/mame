@@ -128,6 +128,7 @@ namespace
 
 		uint64_t state;
 		bgfx::TextureHandle th;
+		bgfx::TextureHandle texMissing;
 
 		bgfx::TransientVertexBuffer tvb;
 		uint8_t viewid;
@@ -263,6 +264,11 @@ namespace
 						, true
 						);
 
+		const bgfx::Memory* mem = bgfx::alloc(4*4*4);
+		uint32_t* bgra8 = (uint32_t*)mem->data;
+		memset(bgra8, 0, 4*4*4);
+		gl->texMissing = bgfx::createTexture2D(4, 4, 0, bgfx::TextureFormat::BGRA8, 0, mem);
+
 		gl->u_scissorMat      = bgfx::createUniform("u_scissorMat",      bgfx::UniformType::Mat3);
 		gl->u_paintMat        = bgfx::createUniform("u_paintMat",        bgfx::UniformType::Mat3);
 		gl->u_innerCol        = bgfx::createUniform("u_innerCol",        bgfx::UniformType::Vec4);
@@ -323,8 +329,19 @@ namespace
 						, 1
 						, NVG_TEXTURE_RGBA == _type ? bgfx::TextureFormat::RGBA8 : bgfx::TextureFormat::R8
 						, BGFX_TEXTURE_NONE
-						, mem
 						);
+
+		if (NULL != mem)
+		{
+			bgfx::updateTexture2D(tex->id
+					, 0
+					, 0
+					, 0
+					, tex->width
+					, tex->height
+					, mem
+					);
+		}
 
 		return bgfx::isValid(tex->id) ? tex->id.idx : 0;
 	}
@@ -347,7 +364,12 @@ namespace
 		uint32_t bytesPerPixel = NVG_TEXTURE_RGBA == tex->type ? 4 : 1;
 		uint32_t pitch = tex->width * bytesPerPixel;
 
-		bgfx::updateTexture2D(tex->id, 0, x, y, w, h
+		bgfx::updateTexture2D(tex->id
+				, 0
+				, x
+				, y
+				, w
+				, h
 				, bgfx::copy(data + y*pitch + x*bytesPerPixel, h*pitch)
 				, pitch
 				);
@@ -444,8 +466,7 @@ namespace
 		memcpy(frag->extent, paint->extent, sizeof(frag->extent) );
 		frag->strokeMult = (width*0.5f + fringe*0.5f) / fringe;
 
-		bgfx::TextureHandle invalid = BGFX_INVALID_HANDLE;
-		gl->th = invalid;
+		gl->th = gl->texMissing;
 		if (paint->image != 0)
 		{
 			tex = glnvg__findTexture(gl, paint->image);
@@ -460,7 +481,7 @@ namespace
 		else
 		{
 			frag->type = NSVG_SHADER_FILLGRAD;
-			frag->radius = paint->radius;
+			frag->radius  = paint->radius;
 			frag->feather = paint->feather;
 		}
 
@@ -502,7 +523,7 @@ namespace
 		bgfx::setUniform(gl->u_extentRadius,    &frag->extent[0]);
 		bgfx::setUniform(gl->u_params,          &frag->feather);
 
-		bgfx::TextureHandle handle = BGFX_INVALID_HANDLE;
+		bgfx::TextureHandle handle = gl->texMissing;
 
 		if (image != 0)
 		{
@@ -976,6 +997,7 @@ namespace
 		}
 
 		bgfx::destroyProgram(gl->prog);
+		bgfx::destroyTexture(gl->texMissing);
 
 		bgfx::destroyUniform(gl->u_scissorMat);
 		bgfx::destroyUniform(gl->u_paintMat);

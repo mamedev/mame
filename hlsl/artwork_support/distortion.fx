@@ -4,6 +4,10 @@
 // Distortion Effect
 //-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
+// Sampler Definitions
+//-----------------------------------------------------------------------------
+
 texture DiffuseTexture;
 
 sampler DiffuseSampler = sampler_state
@@ -85,7 +89,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 // Distortion Effect
 //-----------------------------------------------------------------------------
 
-technique DistortionTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{

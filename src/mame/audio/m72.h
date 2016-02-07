@@ -51,7 +51,7 @@ private:
 	// internal state
 	UINT8 m_irqvector;
 	UINT32 m_sample_addr;
-	UINT8 *m_samples;
+	optional_region_ptr<UINT8> m_samples;
 	UINT32 m_samples_size;
 	address_space *m_space;
 	dac_device *m_dac;

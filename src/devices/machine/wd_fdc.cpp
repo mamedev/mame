@@ -360,6 +360,9 @@ void wd_fdc_t::seek_continue()
 		case SEEK_DONE:
 			if (TRACE_STATE) logerror("%s: SEEK_DONE\n", tag());
 			status |= S_HLD;
+			hld = true;
+			if (!hld_cb.isnull())
+				hld_cb(hld);
 			if(command & 0x04) {
 				if(!is_ready()) {
 					status |= S_RNF;

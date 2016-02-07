@@ -197,7 +197,7 @@ controller or home-made spinner built from a PC mouse will work but the player m
 slowly and the game is unplayable. The Taito geared spinner moves the optical wheel *very*
 fast to ensure the player moves fast enough to follow and return the ball easily. The ratio of
 the control knob rotation to the optical wheel rotation is 1:20 so for one rotation of the
-control knob the optical wheel rotates 20 times.
+control knob the optical wheel rotates 20 times. The optical quadrature wheel has 24 slots.
 Generally a half-turn of the control knob is enough to move the player across the full screen.
 
 The spinner connections are....
@@ -900,7 +900,7 @@ ic45 = 74ls74
 ic46 = 74ls08
 ic87 = 74ls74
 ~VCC = 'pulled to vcc through a resistor'
-icxx.y = ic xx pin y                                  
+icxx.y = ic xx pin y
                                                                                +--------\_/--------+
                                                         GND -- =   VSS(GND) -- |  1             28 | <- /RESET  = <- ~VCC & ic32.9 (4Q) & ic26.13 (/reset2) & ic26.1 (/reset1)
                          ~VCC & ic26.6 (/1Q) & ic9.10 (I1C) -> =       /INT -> |  2             27 | <> PA7     = -> ic27.18 (8D)
@@ -1245,6 +1245,10 @@ GFXDECODE_END
 
 void arkanoid_state::machine_start()
 {
+	// allocate the MCU timer, even if we have no MCU, and set it to fire NEVER.
+	m_68705_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(arkanoid_state::timer_68705_increment),this));
+	m_68705_timer->adjust(attotime::never);
+
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_palettebank));
 
@@ -1283,8 +1287,8 @@ void arkanoid_state::machine_reset()
 	// the following 3 are all part of the 74ls74 at ic26 and are cleared on reset
 	m_z80HasWritten = 0;
 	m_68705HasWritten = 0;
-	//if (m_bootleg_id == 0) m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE); // arkatayt will crash if this line is uncommented, but without this line present, arkanoid will watchdog-reset itself as soon as a level starts after pressing f3/soft reset.
-	// TODO: this can be better dealt with by having a separate machine_reset function for the mculess vs mcu sets.
+	if (m_mcu.found()) m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+	if (m_mcu.found()) m_68705_timer->adjust(attotime::from_hz(((XTAL_12MHz/4)/4)/(1<<7)));
 
 	m_port_a_in = 0;
 	m_port_a_out = 0;
@@ -1336,10 +1340,10 @@ static MACHINE_CONFIG_START( arkanoid, arkanoid_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", YM2149, XTAL_12MHz/4) /* YM2149 clock is 3mhz, pin 26 is low so final clock is 3mhz/2, handled inside the ay core */
-	MCFG_AY8910_OUTPUT_TYPE(/*AY8910_SINGLE_OUTPUT |*/ YM2149_PIN26_LOW) // all outputs are tied together with no resistors, and pin 26 is low
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | YM2149_PIN26_LOW) // all outputs are tied together with no resistors, and pin 26 is low
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNUSED"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.66)
 MACHINE_CONFIG_END
 
 
@@ -1527,7 +1531,7 @@ ROM_START( arkanoiduo ) // V1.1 USA/Romstar
 	ROM_LOAD( "a75-07.ic24",    0x0000, 0x0200, CRC(0af8b289) SHA1(6bc589e8a609b4cf450aebedc8ce02d5d45c970f) )  /* Chip Silkscreen: "A75-07"; red component */
 	ROM_LOAD( "a75-08.ic23",    0x0200, 0x0200, CRC(abb002fb) SHA1(c14f56b8ef103600862e7930709d293b0aa97a73) )  /* Chip Silkscreen: "A75-08"; green component */
 	ROM_LOAD( "a75-09.ic22",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) )  /* Chip Silkscreen: "A75-09"; blue component */
-	
+
 	ROM_REGION( 0x8000, "altgfx", 0 )
 	ROM_LOAD( "a75__03(alternate).ic64",   0x00000, 0x8000, CRC(983d4485) SHA1(603a8798d1f531a70a527a5c6122f0ffd6adcfb6) ) // this was found on a legit v1.1 Romstar USA pcb with serial number 29342; the only difference seems to be the first 32 tiles are all 0xFF instead of 0x00. Those tiles don't seem to be used by the game at all. This is likely another incidence of "Taito forgot to clear programmer ram before burning a rom from a sparse s-record/ihex file"
 ROM_END

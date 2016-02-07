@@ -626,7 +626,7 @@ static inline unsigned int m68k_read_pcrelative_8(m68000_base_device *m68k, unsi
 
 static inline unsigned int m68k_read_pcrelative_16(m68000_base_device *m68k, unsigned int address)
 {
-	if(address & 1)
+	if (!WORD_ALIGNED(address))
 		return
 			(m68k->readimm16(address-1) << 8) |
 			(m68k->readimm16(address+1) >> 8);
@@ -638,7 +638,7 @@ static inline unsigned int m68k_read_pcrelative_16(m68000_base_device *m68k, uns
 
 static inline unsigned int m68k_read_pcrelative_32(m68000_base_device *m68k, unsigned int address)
 {
-	if(address & 1)
+	if (!WORD_ALIGNED(address))
 		return
 			(m68k->readimm16(address-1) << 24) |
 			(m68k->readimm16(address+1) << 8)  |

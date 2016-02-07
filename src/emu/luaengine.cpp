@@ -17,6 +17,7 @@
 #include "drivenum.h"
 #include "ui/ui.h"
 #include "luaengine.h"
+#include <mutex>
 
 //**************************************************************************
 //  LUA ENGINE
@@ -505,21 +506,21 @@ int lua_engine::lua_addr_space::l_mem_read(lua_State *L)
 			mem_content = sp.read_byte(address);
 			break;
 		case 16:
-			if ((address & 1) == 0) {
+			if (WORD_ALIGNED(address)) {
 				mem_content = sp.read_word(address);
 			} else {
 				mem_content = sp.read_word_unaligned(address);
 			}
 			break;
 		case 32:
-			if ((address & 3) == 0) {
+			if (DWORD_ALIGNED(address)) {
 				mem_content = sp.read_dword(address);
 			} else {
 				mem_content = sp.read_dword_unaligned(address);
 			}
 			break;
 		case 64:
-			if ((address & 7) == 0) {
+			if (QWORD_ALIGNED(address)) {
 				mem_content = sp.read_qword(address);
 			} else {
 				mem_content = sp.read_qword_unaligned(address);
@@ -558,21 +559,21 @@ int lua_engine::lua_addr_space::l_mem_write(lua_State *L)
 			sp.write_byte(address, val);
 			break;
 		case 16:
-			if ((address & 1) == 0) {
+			if (WORD_ALIGNED(address)) {
 				sp.write_word(address, val);
 			} else {
 				sp.read_word_unaligned(address, val);
 			}
 			break;
 		case 32:
-			if ((address & 3) == 0) {
+			if (DWORD_ALIGNED(address)) {
 				sp.write_dword(address, val);
 			} else {
 				sp.write_dword_unaligned(address, val);
 			}
 			break;
 		case 64:
-			if ((address & 7) == 0) {
+			if (QWORD_ALIGNED(address)) {
 				sp.write_qword(address, val);
 			} else {
 				sp.write_qword_unaligned(address, val);
@@ -808,7 +809,7 @@ struct msg {
 	int done;
 } msg;
 
-osd_lock *lock;
+static std::mutex g_mutex;
 
 void lua_engine::serve_lua()
 {
@@ -826,46 +827,48 @@ void lua_engine::serve_lua()
 		fgets(buff, LUA_MAXINPUT, stdin);
 
 		// Create message
-		osd_lock_acquire(lock);
-		if (msg.ready == 0) {
-			msg.text = oldbuff;
-			if (oldbuff.length()!=0) msg.text.append("\n");
-			msg.text.append(buff);
-			msg.ready = 1;
-			msg.done = 0;
+		{
+			std::lock_guard<std::mutex> lock(g_mutex);
+			if (msg.ready == 0) {
+				msg.text = oldbuff;
+				if (oldbuff.length() != 0) msg.text.append("\n");
+				msg.text.append(buff);
+				msg.ready = 1;
+				msg.done = 0;
+			}
 		}
-		osd_lock_release(lock);
 
 		// Wait for response
 		int done;
 		do {
 			osd_sleep(osd_ticks_per_second() / 1000);
-			osd_lock_acquire(lock);
+			std::lock_guard<std::mutex> lock(g_mutex);
 			done = msg.done;
-			osd_lock_release(lock);
 		} while (done==0);
 
 		// Do action on client side
-		osd_lock_acquire(lock);
-		if (msg.status == -1){
-			b = LUA_PROMPT2;
-			oldbuff = msg.response;
+		{
+			std::lock_guard<std::mutex> lock(g_mutex);
+
+			if (msg.status == -1) {
+				b = LUA_PROMPT2;
+				oldbuff = msg.response;
+			}
+			else {
+				b = LUA_PROMPT;
+				oldbuff = "";
+			}
+			msg.done = 0;
 		}
-		else {
-			b = LUA_PROMPT;
-			oldbuff = "";
-		}
-		msg.done = 0;
-		osd_lock_release(lock);
 
 	} while (1);
 }
 
 static void *serve_lua(void *param)
 {
-    lua_engine *engine = (lua_engine *)param;
-    engine->serve_lua();
-    return NULL;
+	lua_engine *engine = (lua_engine *)param;
+	engine->serve_lua();
+	return NULL;
 }
 
 //-------------------------------------------------
@@ -891,7 +894,6 @@ lua_engine::lua_engine()
 	msg.ready = 0;
 	msg.status = 0;
 	msg.done = 0;
-	lock = osd_lock_alloc();
 }
 
 //-------------------------------------------------
@@ -1046,10 +1048,10 @@ bool lua_engine::frame_hook()
 
 void lua_engine::periodic_check()
 {
-	osd_lock_acquire(lock);
+	std::lock_guard<std::mutex> lock(g_mutex);
 	if (msg.ready == 1) {
 	lua_settop(m_lua_state, 0);
-	int status = luaL_loadbuffer(m_lua_state, msg.text.c_str(), strlen(msg.text.c_str()), "=stdin");
+	int status = luaL_loadbuffer(m_lua_state, msg.text.c_str(), msg.text.length(), "=stdin");
 	if (incomplete(status)==0)  /* cannot try to add lines? */
 	{
 		if (status == LUA_OK) status = docall(0, LUA_MULTRET);
@@ -1075,7 +1077,6 @@ void lua_engine::periodic_check()
 	msg.ready = 0;
 	msg.done = 1;
 	}
-	osd_lock_release(lock);
 }
 
 //-------------------------------------------------

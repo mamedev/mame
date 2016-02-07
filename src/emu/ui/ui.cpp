@@ -37,6 +37,8 @@ enum
 	LOADSAVE_SAVE
 };
 
+#define MAX_SAVED_STATE_JOYSTICK   4
+
 
 /***************************************************************************
     LOCAL VARIABLES
@@ -84,6 +86,25 @@ static const input_item_id non_char_keys[] =
 	ITEM_ID_RIGHT,
 	ITEM_ID_PAUSE,
 	ITEM_ID_CANCEL
+};
+
+static const char *s_color_list[] = {
+	OPTION_UI_BORDER_COLOR,
+	OPTION_UI_BACKGROUND_COLOR,
+	OPTION_UI_GFXVIEWER_BG_COLOR,
+	OPTION_UI_UNAVAILABLE_COLOR,
+	OPTION_UI_TEXT_COLOR,
+	OPTION_UI_TEXT_BG_COLOR,
+	OPTION_UI_SUBITEM_COLOR,
+	OPTION_UI_CLONE_COLOR,
+	OPTION_UI_SELECTED_COLOR,
+	OPTION_UI_SELECTED_BG_COLOR,
+	OPTION_UI_MOUSEOVER_COLOR,
+	OPTION_UI_MOUSEOVER_BG_COLOR,
+	OPTION_UI_MOUSEDOWN_COLOR,
+	OPTION_UI_MOUSEDOWN_BG_COLOR,
+	OPTION_UI_DIPSW_COLOR,
+	OPTION_UI_SLIDER_COLOR
 };
 
 /***************************************************************************
@@ -139,6 +160,24 @@ static INT32 slider_crossoffset(running_machine &machine, void *arg, std::string
 ***************************************************************************/
 
 //-------------------------------------------------
+//  load ui options
+//-------------------------------------------------
+
+static void load_ui_options(running_machine &machine)
+{
+	// parse the file
+	std::string error;
+	// attempt to open the output file
+	emu_file file(machine.options().ini_path(), OPEN_FLAG_READ);
+	if (file.open("ui.ini") == FILERR_NONE)
+	{
+		bool result = machine.ui().options().parse_ini_file((core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
+		if (!result)
+			osd_printf_error("**Error to load ui.ini**");
+	}
+}
+
+//-------------------------------------------------
 //  is_breakable_char - is a given unicode
 //  character a possible line break?
 //-------------------------------------------------
@@ -183,7 +222,8 @@ static inline int is_breakable_char(unicode_char ch)
     CORE IMPLEMENTATION
 ***************************************************************************/
 
-static const UINT32 mouse_bitmap[] = {
+static const UINT32 mouse_bitmap[32*32] =
+{
 	0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,
 	0x09a46f30,0x81ac7c43,0x24af8049,0x00ad7d45,0x00a8753a,0x00a46f30,0x009f6725,0x009b611c,0x00985b14,0x0095560d,0x00935308,0x00915004,0x00904e02,0x008f4e01,0x008f4d00,0x008f4d00,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,
 	0x00a16a29,0xa2aa783d,0xffbb864a,0xc0b0824c,0x5aaf7f48,0x09ac7b42,0x00a9773c,0x00a67134,0x00a26b2b,0x009e6522,0x009a5e19,0x00965911,0x0094550b,0x00925207,0x00915004,0x008f4e01,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,
@@ -226,9 +266,14 @@ static const UINT32 mouse_bitmap[] = {
 ui_manager::ui_manager(running_machine &machine)
 	: m_machine(machine)
 {
+}
+
+void ui_manager::init()
+{
+	load_ui_options(machine());
 	// initialize the other UI bits
-	ui_menu::init(machine);
-	ui_gfx_init(machine);
+	ui_menu::init(machine());
+	ui_gfx_init(machine());
 
 	// reset instance variables
 	m_font = nullptr;
@@ -236,26 +281,30 @@ ui_manager::ui_manager(running_machine &machine)
 	m_handler_param = 0;
 	m_single_step = false;
 	m_showfps = false;
-	m_showfps_end = false;
+	m_showfps_end = 0;
 	m_show_profiler = false;
 	m_popup_text_end = 0;
 	m_use_natural_keyboard = false;
 	m_mouse_arrow_texture = nullptr;
+	m_load_save_hold = false;
+
+	get_font_rows(&machine());
+	decode_ui_color(0, &machine());
 
 	// more initialization
 	set_handler(handler_messagebox, 0);
 	m_non_char_keys_down = std::make_unique<UINT8[]>((ARRAY_LENGTH(non_char_keys) + 7) / 8);
-	m_mouse_show = machine.system().flags & MACHINE_CLICKABLE_ARTWORK ? true : false;
+	m_mouse_show = machine().system().flags & MACHINE_CLICKABLE_ARTWORK ? true : false;
 
 	// request a callback upon exiting
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ui_manager::exit), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ui_manager::exit), this));
 
 	// retrieve options
-	m_use_natural_keyboard = machine.options().natural_keyboard();
-	bitmap_argb32 *ui_mouse_bitmap = auto_alloc(machine, bitmap_argb32(32, 32));
+	m_use_natural_keyboard = machine().options().natural_keyboard();
+	bitmap_argb32 *ui_mouse_bitmap = auto_alloc(machine(), bitmap_argb32(32, 32));
 	UINT32 *dst = &ui_mouse_bitmap->pix32(0);
 	memcpy(dst,mouse_bitmap,32*32*sizeof(UINT32));
-	m_mouse_arrow_texture = machine.render().texture_alloc();
+	m_mouse_arrow_texture = machine().render().texture_alloc();
 	m_mouse_arrow_texture->set_bitmap(*ui_mouse_bitmap, ui_mouse_bitmap->cliprect(), TEXFORMAT_ARGB32);
 }
 
@@ -312,7 +361,7 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 {
 	const int maxstate = 4;
 	int str = machine().options().seconds_to_run();
-	bool show_gameinfo = !machine().options().skip_gameinfo();
+	bool show_gameinfo = !machine().ui().options().skip_gameinfo();
 	bool show_warnings = true, show_mandatory_fileman = true;
 	int state;
 
@@ -447,7 +496,8 @@ void ui_manager::update_and_render(render_container *container)
 	else
 		m_popup_text_end = 0;
 
-	if (m_mouse_show || (is_menu_active() && machine().options().ui_mouse()))
+	// display the internal mouse cursor
+	if (m_mouse_show || (is_menu_active() && machine().ui().options().ui_mouse()))
 	{
 		INT32 mouse_target_x, mouse_target_y;
 		bool mouse_button;
@@ -456,8 +506,10 @@ void ui_manager::update_and_render(render_container *container)
 		if (mouse_target != nullptr)
 		{
 			float mouse_y=-1,mouse_x=-1;
-			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y)) {
-				container->add_quad(mouse_x,mouse_y,mouse_x + 0.05f*container->manager().ui_aspect(container),mouse_y + 0.05f,UI_TEXT_COLOR,m_mouse_arrow_texture,PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y))
+			{
+				const float cursor_size = 0.6 * machine().ui().get_line_height();
+				container->add_quad(mouse_x, mouse_y, mouse_x + cursor_size*container->manager().ui_aspect(container), mouse_y + cursor_size, UI_TEXT_COLOR, m_mouse_arrow_texture, PRIMFLAG_ANTIALIAS(1) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			}
 		}
 	}
@@ -476,7 +528,7 @@ render_font *ui_manager::get_font()
 {
 	// allocate the font and messagebox string
 	if (m_font == nullptr)
-		m_font = machine().render().font_alloc(machine().options().ui_font());
+		m_font = machine().render().font_alloc(machine().ui().options().ui_font());
 	return m_font;
 }
 
@@ -592,9 +644,9 @@ void ui_manager::draw_text(render_container *container, const char *buf, float x
 //  and full size computation
 //-------------------------------------------------
 
-void ui_manager::draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight)
+void ui_manager::draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight, float text_size)
 {
-	float lineheight = get_line_height();
+	float lineheight = get_line_height() * text_size;
 	const char *ends = origs + strlen(origs);
 	float wrapwidth = origwrapwidth;
 	const char *s = origs;
@@ -1019,7 +1071,9 @@ std::string &ui_manager::warnings_string(std::string &str)
 						MACHINE_IMPERFECT_SOUND |  \
 						MACHINE_IMPERFECT_GRAPHICS | \
 						MACHINE_IMPERFECT_KEYBOARD | \
-						MACHINE_NO_COCKTAIL)
+						MACHINE_NO_COCKTAIL| \
+						MACHINE_IS_INCOMPLETE| \
+						MACHINE_NO_SOUND_HW )
 
 	str.clear();
 
@@ -1081,6 +1135,20 @@ std::string &ui_manager::warnings_string(std::string &str)
 			str.append("The ");
 			str.append(emulator_info::get_gamenoun());
 			str.append(" requires external artwork files\n");
+		}
+
+		if (machine().system().flags & MACHINE_IS_INCOMPLETE )
+		{
+			str.append("This ");
+			str.append(emulator_info::get_gamenoun());
+			str.append(" was never completed. It may exhibit strange behavior or missing elements that are not bugs in the emulation.\n");
+		}
+
+		if (machine().system().flags & MACHINE_NO_SOUND_HW )
+		{
+			str.append("This ");
+			str.append(emulator_info::get_gamenoun());
+			str.append(" has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n");
 		}
 
 		// if there's a NOT WORKING, UNEMULATED PROTECTION or GAME MECHANICAL warning, make it stronger
@@ -1487,7 +1555,6 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	// first draw the FPS counter
 	if (machine.ui().show_fps_counter())
 	{
-		std::string tempstring;
 		machine.ui().draw_text_full(container, machine.video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, nullptr, nullptr);
 	}
@@ -1609,6 +1676,7 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	if (machine.ui_input().pressed(IPT_UI_SAVE_STATE))
 	{
 		machine.pause();
+		machine.ui().m_load_save_hold = true;
 		return machine.ui().set_handler(handler_load_save, LOADSAVE_SAVE);
 	}
 
@@ -1616,6 +1684,7 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	if (machine.ui_input().pressed(IPT_UI_LOAD_STATE))
 	{
 		machine.pause();
+		machine.ui().m_load_save_hold = true;
 		return machine.ui().set_handler(handler_load_save, LOADSAVE_LOAD);
 	}
 
@@ -1627,13 +1696,19 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	if (machine.ui_input().pressed(IPT_UI_PAUSE))
 	{
 		// with a shift key, it is single step
-		if (is_paused && (machine.input().code_pressed(KEYCODE_LSHIFT) || machine.input().code_pressed(KEYCODE_RSHIFT)))
-		{
-			machine.ui().set_single_step(true);
-			machine.resume();
-		}
-		else
+//		if (is_paused && (machine.input().code_pressed(KEYCODE_LSHIFT) || machine.input().code_pressed(KEYCODE_RSHIFT)))
+//		{
+//			machine.ui().set_single_step(true);
+//			machine.resume();
+//		}
+//		else
 			machine.toggle_pause();
+	}
+
+	if (machine.ui_input().pressed(IPT_UI_PAUSE_SINGLE))
+	{
+		machine.ui().set_single_step(true);
+		machine.resume();
 	}
 
 	// handle a toggle cheats request
@@ -1697,6 +1772,23 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 	else
 		machine.ui().draw_message_window(container, "Select position to load from");
 
+	// if load/save state sequence is still being pressed, do not read the filename yet
+	if (machine.ui().m_load_save_hold) {
+		bool seq_in_progress = false;
+		const input_seq &load_save_seq = state == LOADSAVE_SAVE ?
+			machine.ioport().type_seq(IPT_UI_SAVE_STATE) :
+			machine.ioport().type_seq(IPT_UI_LOAD_STATE);
+
+		for (int i = 0; i < load_save_seq.length(); i++)
+			if (machine.input().code_pressed_once(load_save_seq[i]))
+				seq_in_progress = true;
+
+		if (seq_in_progress)
+			return state;
+		else
+			machine.ui().m_load_save_hold = false;
+	}
+
 	// check for cancel key
 	if (machine.ui_input().pressed(IPT_UI_CANCEL))
 	{
@@ -1724,20 +1816,40 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 			if (machine.input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
 				file = id - ITEM_ID_0_PAD + '0';
 	if (file == 0)
-		return state;
+	{
+		bool found = false;
+
+		for (int joy_index = 0; joy_index <= MAX_SAVED_STATE_JOYSTICK; joy_index++)
+			for (input_item_id id = ITEM_ID_BUTTON1; id <= ITEM_ID_BUTTON32; ++id)
+				if (machine.input().code_pressed_once(input_code(DEVICE_CLASS_JOYSTICK, joy_index, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
+				{
+					snprintf(filename, sizeof(filename), "joy%i-%i", joy_index, id - ITEM_ID_BUTTON1 + 1);
+					found = true;
+					break;
+				}
+
+		if (!found)
+			return state;
+	}
+	else
+	{
+		sprintf(filename, "%c", file);
+	}
 
 	// display a popup indicating that the save will proceed
-	sprintf(filename, "%c", file);
 	if (state == LOADSAVE_SAVE)
 	{
-		machine.popmessage("Save to position %c", file);
+		machine.popmessage("Save to position %s", filename);
 		machine.schedule_save(filename);
 	}
 	else
 	{
-		machine.popmessage("Load from position %c", file);
+		machine.popmessage("Load from position %s", filename);
 		machine.schedule_load(filename);
 	}
+
+	// avoid handling the name of the save state slot as a seperate input
+	machine.ui_input().mark_all_as_pressed();
 
 	// remove the pause and reset the state
 	machine.resume();
@@ -1751,7 +1863,7 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 
 void ui_manager::request_quit()
 {
-	if (!machine().options().confirm_quit())
+	if (!machine().ui().options().confirm_quit())
 		machine().schedule_exit();
 	else
 		set_handler(handler_confirm_quit, 0);
@@ -1856,7 +1968,7 @@ static slider_state *slider_init(running_machine &machine)
 		INT32 maxval = 2000;
 		INT32 defval = 1000;
 
-		info.stream->input_name(info.inputnum, str);
+		str.assign(info.stream->input_name(info.inputnum));
 		str.append(" Volume");
 		*tailptr = slider_alloc(machine, str.c_str(), 0, defval, maxval, 20, slider_mixervol, (void *)(FPTR)item);
 		tailptr = &(*tailptr)->next;
@@ -2473,4 +2585,194 @@ void ui_manager::set_use_natural_keyboard(bool use_natural_keyboard)
 	std::string error;
 	machine().options().set_value(OPTION_NATURAL_KEYBOARD, use_natural_keyboard, OPTION_PRIORITY_CMDLINE, error);
 	assert(error.empty());
+}
+
+//-------------------------------------------------
+//  wrap_text
+//-------------------------------------------------
+
+void ui_manager::wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, int &count, std::vector<int> &xstart, std::vector<int> &xend, float text_size)
+{
+	float lineheight = get_line_height() * text_size;
+	const char *ends = origs + strlen(origs);
+	float wrapwidth = origwrapwidth;
+	const char *s = origs;
+	const char *linestart;
+	float maxwidth = 0;
+	float aspect = machine().render().ui_aspect(container);
+	count = 0;
+
+	// loop over lines
+	while (*s != 0)
+	{
+		const char *lastbreak = nullptr;
+		unicode_char schar;
+		int scharcount;
+		float lastbreak_width = 0;
+		float curwidth = 0;
+
+		// get the current character
+		scharcount = uchar_from_utf8(&schar, s, ends - s);
+		if (scharcount == -1)
+			break;
+
+		// remember the starting position of the line
+		linestart = s;
+
+		// loop while we have characters and are less than the wrapwidth
+		while (*s != 0 && curwidth <= wrapwidth)
+		{
+			float chwidth;
+
+			// get the current chcaracter
+			scharcount = uchar_from_utf8(&schar, s, ends - s);
+			if (scharcount == -1)
+				break;
+
+			// if we hit a newline, stop immediately
+			if (schar == '\n')
+				break;
+
+			// get the width of this character
+			chwidth = get_font()->char_width(lineheight, aspect, schar);
+
+			// if we hit a space, remember the location and width *without* the space
+			if (schar == ' ')
+			{
+				lastbreak = s;
+				lastbreak_width = curwidth;
+			}
+
+			// add the width of this character and advance
+			curwidth += chwidth;
+			s += scharcount;
+
+			// if we hit any non-space breakable character, remember the location and width
+			// *with* the breakable character
+			if (schar != ' ' && is_breakable_char(schar) && curwidth <= wrapwidth)
+			{
+				lastbreak = s;
+				lastbreak_width = curwidth;
+			}
+		}
+
+		// if we accumulated too much for the current width, we need to back off
+		if (curwidth > wrapwidth)
+		{
+			// if we hit a break, back up to there with the appropriate width
+			if (lastbreak != nullptr)
+			{
+				s = lastbreak;
+				curwidth = lastbreak_width;
+			}
+
+			// if we didn't hit a break, back up one character
+			else if (s > linestart)
+			{
+				// get the previous character
+				s = (const char *)utf8_previous_char(s);
+				scharcount = uchar_from_utf8(&schar, s, ends - s);
+				if (scharcount == -1)
+					break;
+
+				curwidth -= get_font()->char_width(lineheight, aspect, schar);
+			}
+		}
+
+		// track the maximum width of any given line
+		if (curwidth > maxwidth)
+			maxwidth = curwidth;
+
+        xstart.push_back(linestart - origs);
+        xend.push_back(s - origs);
+
+		// loop from the line start and add the characters
+		while (linestart < s)
+		{
+			// get the current character
+			unicode_char linechar;
+			int linecharcount = uchar_from_utf8(&linechar, linestart, ends - linestart);
+			if (linecharcount == -1)
+				break;
+			linestart += linecharcount;
+		}
+
+		// advance by a row
+		count++;
+
+		// skip past any spaces at the beginning of the next line
+		scharcount = uchar_from_utf8(&schar, s, ends - s);
+		if (scharcount == -1)
+			break;
+
+		if (schar == '\n')
+			s += scharcount;
+		else
+			while (*s && isspace(schar))
+			{
+				s += scharcount;
+				scharcount = uchar_from_utf8(&schar, s, ends - s);
+				if (scharcount == -1)
+					break;
+			}
+	}
+}
+
+//-------------------------------------------------
+//  draw_textured_box - add primitives to
+//  draw an outlined box with the given
+//  textured background and line color
+//-------------------------------------------------
+
+void ui_manager::draw_textured_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture, UINT32 flags)
+{
+	container->add_quad(x0, y0, x1, y1, backcolor, texture, flags);
+	container->add_line(x0, y0, x1, y0, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container->add_line(x1, y0, x1, y1, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container->add_line(x1, y1, x0, y1, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container->add_line(x0, y1, x0, y0, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+}
+
+//-------------------------------------------------
+//  get_string_width_ex - return the width of a
+//  character string with given text size
+//-------------------------------------------------
+
+float ui_manager::get_string_width_ex(const char *s, float text_size)
+{
+	return get_font()->utf8string_width(get_line_height() * text_size, machine().render().ui_aspect(), s);
+}
+
+//-------------------------------------------------
+//  decode UI color options
+//-------------------------------------------------
+
+rgb_t decode_ui_color(int id, running_machine *machine)
+{
+	static rgb_t color[ARRAY_LENGTH(s_color_list)];
+
+	if (machine != nullptr) {
+		ui_options option;
+		for (int x = 0; x < ARRAY_LENGTH(s_color_list); x++) {
+			const char *o_default = option.value(s_color_list[x]);
+			const char *s_option = machine->ui().options().value(s_color_list[x]);
+			int len = strlen(s_option);
+			if (len != 8)
+				color[x] = rgb_t((UINT32)strtoul(o_default, nullptr, 16));
+			else
+				color[x] = rgb_t((UINT32)strtoul(s_option, nullptr, 16));
+		}
+	}
+	return color[id];
+}
+
+//-------------------------------------------------
+//  get font rows from options
+//-------------------------------------------------
+
+int get_font_rows(running_machine *machine)
+{
+	static int value;
+
+	return ((machine != nullptr) ? value = machine->ui().options().font_rows() : value);
 }

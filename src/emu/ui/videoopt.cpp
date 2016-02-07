@@ -24,7 +24,7 @@ void ui_menu_video_targets::handle()
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
 	if (menu_event != nullptr && menu_event->iptkey == IPT_UI_SELECT)
-		ui_menu::stack_push(auto_alloc_clear(machine(), <ui_menu_video_options>(machine(), container, static_cast<render_target *>(menu_event->itemref))));
+		ui_menu::stack_push(global_alloc_clear<ui_menu_video_options>(machine(), container, static_cast<render_target *>(menu_event->itemref)));
 }
 
 

@@ -266,11 +266,8 @@ public:
 	int m_scrollx;
 	int m_scrolly;
 	UINT8 m_reg_a002;
-	int m_bank;
 	DECLARE_WRITE8_MEMBER(gfx0_vram_w);
 	DECLARE_WRITE8_MEMBER(gfx0_cram_w);
-	DECLARE_READ8_MEMBER(gfx0_vram_r);
-	DECLARE_READ8_MEMBER(gfx0_cram_r);
 	DECLARE_WRITE8_MEMBER(gfx1_vram_w);
 	DECLARE_WRITE8_MEMBER(gfx1_cram_w);
 	DECLARE_READ8_MEMBER(gfx1_vram_r);
@@ -354,15 +351,6 @@ WRITE8_MEMBER(witch_state::gfx0_cram_w)
 	m_gfx0a_tilemap->mark_tile_dirty(offset);
 	m_gfx0b_tilemap->mark_tile_dirty(offset);
 }
-READ8_MEMBER(witch_state::gfx0_vram_r)
-{
-	return m_gfx0_vram[offset];
-}
-
-READ8_MEMBER(witch_state::gfx0_cram_r)
-{
-	return m_gfx0_cram[offset];
-}
 
 #define FIX_OFFSET() do { \
 	offset=(((offset + ((m_scrolly & 0xf8) << 2) ) & 0x3e0)+((offset + (m_scrollx >> 3) ) & 0x1f)+32)&0x3ff; } while(0)
@@ -426,17 +414,9 @@ WRITE8_MEMBER(witch_state::write_a00x)
 	{
 		case 0x02: //A002 bit 7&6 = m_bank ????
 		{
-			int newbank;
 			m_reg_a002 = data;
-			newbank = (data>>6)&3;
 
-			if(newbank != m_bank)
-			{
-				UINT8 *ROM = memregion("maincpu")->base();
-				m_bank = newbank;
-				ROM = &ROM[0x10000+0x8000 * newbank + UNBANKED_SIZE];
-				membank("bank1")->set_base(ROM);
-			}
+			membank("bank1")->set_entry((data>>6)&3);
 		}
 		break;
 
@@ -495,8 +475,8 @@ static ADDRESS_MAP_START( map_main, AS_PROGRAM, 8, witch_state )
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(read_a00x, write_a00x)
-	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(gfx0_vram_r, gfx0_vram_w) AM_SHARE("gfx0_vram")
-	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE(gfx0_cram_r, gfx0_cram_w) AM_SHARE("gfx0_cram")
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_WRITE(gfx0_vram_w) AM_SHARE("gfx0_vram")
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_WRITE(gfx0_cram_w) AM_SHARE("gfx0_cram")
 	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(gfx1_vram_r, gfx1_vram_w) AM_SHARE("gfx1_vram")
 	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(gfx1_cram_r, gfx1_cram_w) AM_SHARE("gfx1_cram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("sprite_ram")
@@ -744,6 +724,10 @@ void witch_state::video_start()
 	m_gfx0a_tilemap->set_palette_offset(0x100);
 	m_gfx0b_tilemap->set_palette_offset(0x100);
 	m_gfx1_tilemap->set_palette_offset(0x200);
+
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
+	save_item(NAME(m_reg_a002));
 }
 
 void witch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -941,14 +925,13 @@ ROM_END
 
 DRIVER_INIT_MEMBER(witch_state,witch)
 {
-	UINT8 *ROM = (UINT8 *)memregion("maincpu")->base();
-	membank("bank1")->set_base(&ROM[0x10000+UNBANKED_SIZE]);
+	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000 + UNBANKED_SIZE, 0x8000);
+	membank("bank1")->set_entry(0);
 
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), this));
-	m_bank = -1;
 }
 
-GAME( 1992, witch,    0,     witch, witch, witch_state, witch, ROT0, "Excellent System",     "Witch",                0 )
-GAME( 1992, witchb,   witch, witch, witch, witch_state, witch, ROT0, "Excellent System",     "Witch (With ranking)", 0 )
-GAME( 1992, witchs,   witch, witch, witch, witch_state, witch, ROT0, "Sega / Vic Tokai",     "Witch (Sega License)", 0 )
-GAME( 1995, pbchmp95, witch, witch, witch, witch_state, witch, ROT0, "Veltmeijer Automaten", "Pinball Champ '95",    0 )
+GAME( 1992, witch,    0,     witch, witch, witch_state, witch, ROT0, "Excellent System",     "Witch",                MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witchb,   witch, witch, witch, witch_state, witch, ROT0, "Excellent System",     "Witch (With ranking)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witchs,   witch, witch, witch, witch_state, witch, ROT0, "Sega / Vic Tokai",     "Witch (Sega License)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, pbchmp95, witch, witch, witch, witch_state, witch, ROT0, "Veltmeijer Automaten", "Pinball Champ '95",    MACHINE_SUPPORTS_SAVE )

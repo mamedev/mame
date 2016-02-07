@@ -97,9 +97,13 @@ void atapi_hle_device::fill_buffer()
 		{
 			m_buffer_size = m_data_size;
 		}
-		else if (m_buffer_size & 1)
+		else
 		{
-			m_buffer_size--;
+			if (m_buffer_size & 1)
+				m_buffer_size--;
+			// if it is transferring less than the remaining data, make sure the size is a multiple of the sector size, otherwise data will be lost
+			if (m_buffer_size % m_sector_bytes)
+				m_buffer_size = m_buffer_size - (m_buffer_size % m_sector_bytes);
 		}
 
 		m_cylinder_low = m_buffer_size & 0xff;

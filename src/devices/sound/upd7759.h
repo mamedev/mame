@@ -95,8 +95,8 @@ protected:
 	INT16       m_sample;                     /* current sample value */
 
 	/* ROM access */
+	optional_region_ptr<UINT8> m_rombase;     /* pointer to ROM data or NULL for slave mode */
 	UINT8 *     m_rom;                        /* pointer to ROM data or NULL for slave mode */
-	UINT8 *     m_rombase;                    /* pointer to ROM data or NULL for slave mode */
 	UINT32      m_romoffset;                  /* ROM offset to make save/restore easier */
 	UINT32      m_rommask;                    /* maximum address offset */
 

@@ -151,7 +151,7 @@ SETADDRESS_DBIN_MEMBER( snug_bwg_device::setaddress_dbin )
 			&& ((state==ASSERT_LINE && ((m_address & 0x1ff8)==0x1ff0))    // read
 				|| (state==CLEAR_LINE && ((m_address & 0x1ff8)==0x1ff8)));  // write
 
-	m_WDsel = m_WDsel0 && ((m_address & 1)==0);
+	m_WDsel = m_WDsel0 && WORD_ALIGNED(m_address);
 
 	// Is the RTC selected on the card? (even addr)
 	m_RTCsel = m_inDsrArea && m_rtc_enabled && ((m_address & 0x1fe1)==0x1fe0);

@@ -12,6 +12,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"
 #include "machine/terminal.h"
+#include "softlist.h"
 
 #define TERMINAL_TAG "terminal"
 
@@ -108,6 +109,9 @@ static MACHINE_CONFIG_START( microdec, microdec_state )
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", microdec_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", microdec_floppies, "525hd", floppy_image_device::default_floppy_formats)
+
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "md2_flop")
 MACHINE_CONFIG_END
 
 /* ROM definition */

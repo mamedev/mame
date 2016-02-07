@@ -251,4 +251,16 @@
 		</part>
 	</software>
 
+	<software name="leapfrog" supported ="no"> <!-- major video timing glitches -->
+		<description>Leapfrog</description>
+		<year>1982</year>
+		<publisher>Voltmace</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<feature name="slot" value="rom4k" />
+			<dataarea name="rom" size="4096">
+				<rom name="leapfrog.bin" size="4096" crc="105eb530" sha1="7211b0b1c6e8798399f4f6d2a942db4e8379c691" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

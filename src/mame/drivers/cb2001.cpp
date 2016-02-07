@@ -860,7 +860,7 @@ ROM_START( scherrym )
 	ROM_LOAD16_WORD( "f11.bin", 0x000000, 0x40000, CRC(8967f58d) SHA1(eb01a16b7d108f5fbe5de8f611b4f77869aedbf1) )
 
 	ROM_REGION( 0x080000, "gfx", ROMREGION_ERASEFF )
-//  ROM_LOAD( "12a.bin", 0x000000, 0x80000,NO_DUMP ) // missing on PCB - 2 PCBs have been found this way, it probably uploads the GFX.
+	ROM_LOAD( "gfx.12c", 0x000000, 0x80000,NO_DUMP ) // this board uses an unmarked MASK rom at 12c, 12a is unpopulated.  Size unknown.
 
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "n82s135-1.bin", 0x000, 0x100, CRC(66ed363f) SHA1(65bd37842c441c2e712844b07c0cfe37ef16d0ef) )

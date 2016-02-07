@@ -14,16 +14,26 @@ class dynax_state : public driver_device
 {
 public:
 	dynax_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_soundcpu(*this, "soundcpu"),
-			m_ym2413(*this, "ym2413"),
-			m_oki(*this, "oki"),
-			m_msm(*this, "msm"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette"),
-			m_rtc(*this, "rtc")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_ym2413(*this, "ym2413")
+		, m_oki(*this, "oki")
+		, m_msm(*this, "msm")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_rtc(*this, "rtc")
+		, m_gfx_region1(*this, "gfx1")
+		, m_gfx_region2(*this, "gfx2")
+		, m_gfx_region3(*this, "gfx3")
+		, m_gfx_region4(*this, "gfx4")
+		, m_gfx_region5(*this, "gfx5")
+		, m_gfx_region6(*this, "gfx6")
+		, m_gfx_region7(*this, "gfx7")
+		, m_gfx_region8(*this, "gfx8")
+
+	{
+	}
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -34,6 +44,16 @@ public:
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<msm6242_device> m_rtc;
+	optional_region_ptr<UINT8> m_gfx_region1;
+	optional_region_ptr<UINT8> m_gfx_region2;
+	optional_region_ptr<UINT8> m_gfx_region3;
+	optional_region_ptr<UINT8> m_gfx_region4;
+	optional_region_ptr<UINT8> m_gfx_region5;
+	optional_region_ptr<UINT8> m_gfx_region6;
+	optional_region_ptr<UINT8> m_gfx_region7;
+	optional_region_ptr<UINT8> m_gfx_region8;
+
+	memory_region * m_gfxregions[8];
 
 	// up to 8 layers, 2 images per layer (interleaved on screen)
 	std::unique_ptr<UINT8[]>  m_pixmap[8][2];
@@ -112,6 +132,7 @@ public:
 	UINT8 m_gekisha_val[2];
 	UINT8 m_gekisha_rom_enable;
 	UINT8 *m_romptr;
+	UINT8 *m_hnoridur_ptr;
 
 	DECLARE_WRITE8_MEMBER(dynax_vblank_ack_w);
 	DECLARE_WRITE8_MEMBER(dynax_blitter_ack_w);
@@ -282,7 +303,7 @@ public:
 	DECLARE_VIDEO_START(neruton);
 
 	inline void blitter_plot_pixel( int layer, int mask, int x, int y, int pen, int wrap, int flags );
-	int blitter_drawgfx( int layer, int mask, const char *gfx, int src, int pen, int x, int y, int wrap, int flags );
+	int blitter_drawgfx( int layer, int mask, memory_region *gfx, int src, int pen, int x, int y, int wrap, int flags );
 	void dynax_blitter_start( int flags );
 	void jantouki_blitter_start( int flags );
 	void jantouki_blitter2_start( int flags );

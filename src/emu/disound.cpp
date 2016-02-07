@@ -443,7 +443,10 @@ void device_mixer_interface::interface_pre_start()
 
 void device_mixer_interface::interface_post_load()
 {
-	m_mixer_stream->set_sample_rate(device().machine().sample_rate());
+	// Beware that there's not going to be a mixer stream if there was
+	// no inputs
+	if (m_mixer_stream)
+		m_mixer_stream->set_sample_rate(device().machine().sample_rate());
 
 	// call our parent
 	device_sound_interface::interface_post_load();

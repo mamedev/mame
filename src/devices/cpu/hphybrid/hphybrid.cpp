@@ -1485,20 +1485,20 @@ UINT32 hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , UINT16 addr)
 				bsc_reg = HP_REG_R37_ADDR;
 				break;
 
-                case AEC_CASE_I:
-                                // Behaviour of AEC during interrupt vector fetch is undocumented but it can be guessed from 9845B firmware.
-                                // Basically in this case the integrated AEC seems to do what the discrete implementation in 9845A does:
-                                // top half of memory is mapped to block 0 (fixed) and bottom half is mapped according to content of R35
-                                // (see pg 334 of patent).
-                                bsc_reg = top_half ? 0 : HP_REG_R35_ADDR;
-                                break;
+				case AEC_CASE_I:
+								// Behaviour of AEC during interrupt vector fetch is undocumented but it can be guessed from 9845B firmware.
+								// Basically in this case the integrated AEC seems to do what the discrete implementation in 9845A does:
+								// top half of memory is mapped to block 0 (fixed) and bottom half is mapped according to content of R35
+								// (see pg 334 of patent).
+								bsc_reg = top_half ? 0 : HP_REG_R35_ADDR;
+								break;
 
-                default:
-                                logerror("hphybrid: aec_case=%d\n" , aec_case);
-                                return 0;
-                }
+				default:
+								logerror("hphybrid: aec_case=%d\n" , aec_case);
+								return 0;
+				}
 
-                UINT16 aec_reg = (bsc_reg != 0) ? (m_reg_aec[ bsc_reg - HP_REG_R32_ADDR ] & BSC_REG_MASK) : 0;
+				UINT16 aec_reg = (bsc_reg != 0) ? (m_reg_aec[ bsc_reg - HP_REG_R32_ADDR ] & BSC_REG_MASK) : 0;
 
 		if (m_forced_bsc_25) {
 				aec_reg = (aec_reg & 0xf) | 0x20;

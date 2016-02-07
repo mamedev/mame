@@ -645,11 +645,15 @@ void midway_ioasic_device::device_start()
 	m_cage = machine().device<atari_cage_device>("cage");
 	m_has_cage = (m_cage != nullptr);
 
-	m_dcs_cpu = m_dcs->subdevice("dcs2");
-	if (m_dcs_cpu == nullptr)
-		m_dcs_cpu = m_dcs->subdevice("dsio");
-	if (m_dcs_cpu == nullptr)
-		m_dcs_cpu = m_dcs->subdevice("denver");
+	if (m_has_dcs)
+	{
+		m_dcs_cpu = m_dcs->subdevice("dcs2");
+		if (m_dcs_cpu == nullptr)
+			m_dcs_cpu = m_dcs->subdevice("dsio");
+		if (m_dcs_cpu == nullptr)
+			m_dcs_cpu = m_dcs->subdevice("denver");
+	}
+
 	m_shuffle_map = &shuffle_maps[m_shuffle_type][0];
 	// resolve callbacks
 	m_irq_callback.resolve_safe();
@@ -662,6 +666,7 @@ void midway_ioasic_device::device_start()
 
 	m_reg[IOASIC_SOUNDCTL] = 0x0001;
 
+
 	/* configure the fifo */
 	if (m_has_dcs)
 	{
@@ -671,6 +676,7 @@ void midway_ioasic_device::device_start()
 		m_dcs->set_io_callbacks(write_line_delegate(FUNC(midway_ioasic_device::ioasic_output_full),this),
 			write_line_delegate(FUNC(midway_ioasic_device::ioasic_input_empty),this));
 	}
+
 	fifo_reset_w(1);
 }
 

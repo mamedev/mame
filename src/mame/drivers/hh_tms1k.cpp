@@ -13,15 +13,20 @@
 --------------------------------------------------------------------
  @CP0904A  TMS0970   1977, Milton Bradley Comp IV
  @MP0905B  TMS0970   1977, Parker Brothers Codename Sector
+ *MP0057   TMS1000   1978, APH Student Speech+ (same ROM contents as TSI Speech+?)
+ *MP0158   TMS1000   1979, Entex Soccer
  *MP0168   TMS1000?  1979, Conic Basketball
+ *MP0170   TMS1000?  1979, E.R.S. Football
  @MP0914   TMS1000   1979, Entex Baseball 1
  @MP0923   TMS1000   1979, Entex Baseball 2
  @MP1030   TMS1100   1980, APF Mathemagician
  @MP1133   TMS1470   1979, Kosmos Astro
  @MP1180   TMS1100   1980, Tomy Power House Pinball
+ *MP1181   TMS1100   1979, Conic Football 2
  @MP1204   TMS1100   1980, Entex Baseball 3 (6007)
  @MP1211   TMS1100   1980, Entex Space Invader
  @MP1218   TMS1100   1980, Entex Basketball 2 (6010)
+ *MP1219   TMS1100   1980, U.S. Games Super Sports 4
  @MP1221   TMS1100   1980, Entex Raise The Devil
  *MP1296   TMS1100?  1982, Entex Black Knight
  *MP1312   TMS1100   198?, Tandy/RadioShack Science Fair Microcomputer Trainer
@@ -39,7 +44,7 @@
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
  *MP3320A  TMS1000   1979, Coleco Head to Head Basketball
  *M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
-  MP3403   TMS1100   1978, Marx Electronic Bowling -> elecbowl.c
+  MP3403   TMS1100   1978, Marx Electronic Bowling -> elecbowl.cpp
  @MP3404   TMS1100   1978, Parker Brothers Merlin
  @MP3405   TMS1100   1979, Coleco Amaze-A-Tron
  *MP3415   TMS1100   1978, Coleco Electronic Quarterback
@@ -58,7 +63,9 @@
   MP3496   TMS1100   1980, MicroVision cartridge: Sea Duel
   M34009   TMS1100   1981, MicroVision cartridge: Alien Raiders (note: MP3498, MP3499, M3400x..)
  @M34012   TMS1100   1980, Mattel Dungeons & Dragons - Computer Labyrinth Game
+ *M34014   TMS1100   1981, Coleco Bowlatronic
   M34017   TMS1100   1981, MicroVision cartridge: Cosmic Hunter
+ *M34038   TMS1100   1982, Parker Brothers Lost Treasure
   M34047   TMS1100   1982, MicroVision cartridge: Super Blockbuster
  *M34078A  TMS1100   1983, Milton Bradley Arcade Mania
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
@@ -67,8 +74,8 @@
  *MP7303   TMS1400?  19??, Tiger 7-in-1 Sports Stadium
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
  @MP7314   TMS1400   1980, Parker Brothers Split Second
- *MP7324   TMS1400?  1985, Coleco Talking Teacher
-  MP7332   TMS1400   1981, Milton Bradley Dark Tower -> mbdtower.c
+  MP7324   TMS1400   1985, Tiger K28/Coleco Talking Teacher -> tispeak.cpp
+  MP7332   TMS1400   1981, Milton Bradley Dark Tower -> mbdtower.cpp
  @MP7334   TMS1400   1981, Coleco Total Control 4
  @MP7351   TMS1400CR 1982, Parker Brothers Master Merlin
  @MP7551   TMS1670   1980, Entex Color Football 4 (6009)
@@ -77,8 +84,9 @@
 
   inconsistent:
 
- *M95041   ?         1983, Tsukuda Game Pachinko (? note: 40-pin, VFD-capable)
+ *TMC1007  TMS1000   1976, TSI Speech+ (S14002-A)
  @CD7282SL TMS1100   1981, Tandy/RadioShack Tandy-12 (serial is similar to TI Speak & Spell series?)
+ *M95041   ?         1983, Tsukuda Game Pachinko (? note: 40-pin, VFD-capable)
 
   (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
@@ -261,6 +269,17 @@ void hh_tms1k_state::set_display_size(int maxx, int maxy)
 {
 	m_display_maxx = maxx;
 	m_display_maxy = maxy;
+}
+
+void hh_tms1k_state::set_display_segmask(UINT32 digits, UINT32 mask)
+{
+	// set a segment mask per selected digit, but leave unselected ones alone
+	for (int i = 0; i < 0x20; i++)
+	{
+		if (digits & 1)
+			m_display_segmask[i] = mask;
+		digits >>= 1;
+	}
 }
 
 void hh_tms1k_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
@@ -4902,19 +4921,19 @@ COMP( 1979, astro,     0,        0, astro,     astro,     driver_device, 0, "Kos
 CONS( 1980, mdndclab,  0,        0, mdndclab,  mdndclab,  driver_device, 0, "Mattel", "Dungeons & Dragons - Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE ) // ***
 
 CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, ssimon,    0,        0, ssimon,    ssimon,    driver_device, 0, "Milton Bradley", "Super Simon", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, ssimon,    0,        0, ssimon,    ssimon,    driver_device, 0, "Milton Bradley", "Super Simon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, bigtrak,   0,        0, bigtrak,   bigtrak,   driver_device, 0, "Milton Bradley", "Big Trak", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL ) // ***
 
 CONS( 1977, cnsector,  0,        0, cnsector,  cnsector,  driver_device, 0, "Parker Brothers", "Code Name: Sector", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
-CONS( 1978, merlin,    0,        0, merlin,    merlin,    driver_device, 0, "Parker Brothers", "Merlin - The Electronic Wizard", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, merlin,    0,        0, merlin,    merlin,    driver_device, 0, "Parker Brothers", "Merlin - The Electronic Wizard", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, stopthie,  0,        0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner)", MACHINE_SUPPORTS_SAVE ) // ***
 CONS( 1979, stopthiep, stopthie, 0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 CONS( 1980, bankshot,  0,        0, bankshot,  bankshot,  driver_device, 0, "Parker Brothers", "Bank Shot - Electronic Pool", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, splitsec,  0,        0, splitsec,  splitsec,  driver_device, 0, "Parker Brothers", "Split Second", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, mmerlin,   0,        0, mmerlin,   mmerlin,   driver_device, 0, "Parker Brothers", "Master Merlin", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, mmerlin,   0,        0, mmerlin,   mmerlin,   driver_device, 0, "Parker Brothers", "Master Merlin", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1981, tandy12,   0,        0, tandy12,   tandy12,   driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE ) // some of the minigames: ***
+CONS( 1981, tandy12,   0,        0, tandy12,   tandy12,   driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
 
 CONS( 1979, tbreakup,  0,        0, tbreakup,  tbreakup,  driver_device, 0, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, phpball,   0,        0, phpball,   phpball,   driver_device, 0, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

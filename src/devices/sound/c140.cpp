@@ -87,15 +87,16 @@ static inline int limit(INT32 in)
 //-------------------------------------------------
 
 c140_device::c140_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, C140, "C140", tag, owner, clock, "c140", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_sample_rate(0),
-		m_stream(nullptr),
-		m_banking_type(0),
-		m_mixer_buffer_left(nullptr),
-		m_mixer_buffer_right(nullptr),
-		m_baserate(0),
-		m_pRom(nullptr)
+	: device_t(mconfig, C140, "C140", tag, owner, clock, "c140", __FILE__)
+	, device_sound_interface(mconfig, *this)
+	, m_sample_rate(0)
+	, m_stream(nullptr)
+	, m_banking_type(0)
+	, m_mixer_buffer_left(nullptr)
+	, m_mixer_buffer_right(nullptr)
+	, m_baserate(0)
+	, m_rom_ptr(*this, DEVICE_SELF)
+	, m_pRom(nullptr)
 {
 	memset(m_REG, 0, sizeof(UINT8)*0x200);
 	memset(m_pcmtbl, 0, sizeof(INT16)*8);
@@ -108,27 +109,28 @@ c140_device::c140_device(const machine_config &mconfig, const char *tag, device_
 
 void c140_device::device_start()
 {
-	m_sample_rate=m_baserate=clock();
+	m_sample_rate = m_baserate = clock();
 
 	m_stream = stream_alloc(0, 2, m_sample_rate);
 
-	m_pRom = (INT8 *)region()->base();
+	if (m_rom_ptr != NULL)
+	{
+		m_pRom = m_rom_ptr;
+	}
 
 	/* make decompress pcm table */     //2000.06.26 CAB
+	INT32 segbase = 0;
+	for(int i = 0; i < 8; i++)
 	{
-		int i;
-		INT32 segbase=0;
-		for(i=0;i<8;i++)
-		{
-			m_pcmtbl[i]=segbase;    //segment base value
-			segbase += 16<<i;
-		}
+		m_pcmtbl[i]=segbase;    //segment base value
+		segbase += 16<<i;
 	}
 
 	memset(m_REG,0,sizeof(m_REG));
+
+	for(int i = 0; i < C140_MAX_VOICE; i++)
 	{
-		int i;
-		for(i=0;i<C140_MAX_VOICE;i++) init_voice( &m_voi[i] );
+		init_voice(&m_voi[i]);
 	}
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */

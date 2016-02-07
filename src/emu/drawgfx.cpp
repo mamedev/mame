@@ -86,6 +86,7 @@ gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *ta
 //  gfx_element - constructor
 //-------------------------------------------------
 
+#ifdef UNUSED_FUNCTION
 gfx_element::gfx_element()
 	: m_palette(nullptr),
 		m_width(0),
@@ -110,9 +111,10 @@ gfx_element::gfx_element()
 		m_layout_charincrement(0)
 {
 }
+#endif
 
-gfx_element::gfx_element(palette_device *palette, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 total_colors, UINT32 color_base, UINT32 color_granularity)
-	: m_palette(palette),
+gfx_element::gfx_element(palette_device &palette, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 total_colors, UINT32 color_base, UINT32 color_granularity)
+	: m_palette(&palette),
 		m_width(width),
 		m_height(height),
 		m_startx(0),
@@ -136,8 +138,8 @@ gfx_element::gfx_element(palette_device *palette, UINT8 *base, UINT32 width, UIN
 {
 }
 
-gfx_element::gfx_element(palette_device *palette, const gfx_layout &gl, const UINT8 *srcdata, UINT32 xormask, UINT32 total_colors, UINT32 color_base)
-	: m_palette(palette),
+gfx_element::gfx_element(palette_device &palette, const gfx_layout &gl, const UINT8 *srcdata, UINT32 xormask, UINT32 total_colors, UINT32 color_base)
+	: m_palette(&palette),
 		m_width(0),
 		m_height(0),
 		m_startx(0),

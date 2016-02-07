@@ -36,9 +36,7 @@ beep_device::beep_device(const machine_config &mconfig, const char *tag, device_
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
 		m_enable(0),
-		m_frequency(0),
-		m_incr(0),
-		m_signal(0)
+		m_frequency(clock)
 {
 }
 
@@ -51,9 +49,13 @@ void beep_device::device_start()
 {
 	m_stream = stream_alloc(0, 1, BEEP_RATE);
 	m_enable = 0;
-	m_frequency = 3250;
-	m_incr = 0;
 	m_signal = 0x07fff;
+
+	// register for savestates
+	save_item(NAME(m_enable));
+	save_item(NAME(m_frequency));
+	save_item(NAME(m_incr));
+	save_item(NAME(m_signal));
 }
 
 
@@ -102,9 +104,10 @@ void beep_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 //  changing state to on from off will restart tone
 //-------------------------------------------------
 
-void beep_device::set_state(int on)
+WRITE_LINE_MEMBER(beep_device::set_state)
 {
 	/* only update if new state is not the same as old state */
+	int on = (state) ? 1 : 0;
 	if (m_enable == on)
 		return;
 
@@ -117,12 +120,11 @@ void beep_device::set_state(int on)
 }
 
 
-
 //-------------------------------------------------
 //  setting new frequency starts from beginning
 //-------------------------------------------------
 
-void beep_device::set_frequency(int frequency)
+void beep_device::set_clock(UINT32 frequency)
 {
 	if (m_frequency == frequency)
 		return;
@@ -131,17 +133,4 @@ void beep_device::set_frequency(int frequency)
 	m_frequency = frequency;
 	m_signal = 0x07fff;
 	m_incr = 0;
-}
-
-
-
-//-------------------------------------------------
-//  change a channel volume
-//-------------------------------------------------
-
-void beep_device::set_volume(int volume)
-{
-	m_stream->update();
-	volume = 100 * volume / 7;
-	set_output_gain(0, volume);
 }

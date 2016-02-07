@@ -38,15 +38,16 @@ scanline_size           0.0 to 4.0      The overall height of each scanline.
 scanline_height         [height]        Individual height scaling value for scanlines.
 scanline_bright_scale   0.0 to 2.0      The overall brightness multiplier for each scanline.
 scanline_bright_offset  0.0 to 1.0      The overall brightness additive value for each scanline.
-scanline_jitter         0.0 to 2.0      The relative scanline movement per field.
+scanline_jitter         0.0 to 1.0      The relative scanline movement per field.
+hum_bar_alpha           0.0 to 1.0      The maximum darkness of the hum bar gradient.
 defocus                 [xval,yval]     This defines the overall defocus radius for the three
-                                        post-converged beams.  Values allowed range from 0.0 to
-                                        32.0.
+                                        post-converged beams. Values allowed range from 0.0 to
+                                        10.0.
 converge_x              [r,g,b]         Convergence in screen-relative X direction.
 converge_y              [r,g,b]         Convergence in screen-relative Y direction.
 radial_converge_x   	[r,g,b]         Radial convergence in screen-relative X direction.
 radial_converge_y   	[r,g,b]         Radial convergence in screen-relative Y direction.
-                                        Allowed values for convergence: -150 to 150 for each color.
+                                        Allowed values for convergence: -10.0 to 10.0 for each color.
 red_ratio               [r,g,b]         These parameters define a 3x3 matrix which is multiplied
 grn_ratio               [r,g,b]         by the incoming RGB signal. This can be used for any
 blu_ratio               [r,g,b]         standard matrix convolution, including H/S/V or simply
@@ -78,15 +79,16 @@ NTSC Processing Parameters
 --------------------------
 
 Name                    Default Values  Description
-yiq_cc                  3.59754545      Color Carrier frequency for NTSC signal processing.
-yiq_a                   0.5             A value for NTSC signal processing.
-yiq_b                   0.5             B value for NTSC signal processing.
-yiq_o                   0.0             Outgoing Color Carrier phase offset for NTSC signal processing.
-yiq_p                   1.0             Incoming Pixel Clock scaling value for NTSC signal processing.
-yiq_n                   1.0             Y filter notch width for NTSC signal processing.
-yiq_y                   6.0             Y filter cutoff frequency for NTSC signal processing.
-yiq_i                   1.2             I filter cutoff frequency for NTSC signal processing.
-yiq_q                   0.6             Q filter cutoff frequency for NTSC signal processing.
+yiq_jitter              0.0             Jitter for the NTSC signal processing. (0.0 to 1.0)
+yiq_cc                  3.57954545      Color Carrier frequency for NTSC signal processing. (0.0 to 6.0)
+yiq_a                   0.5             A value for NTSC signal processing. (-1.0 to 1.0)
+yiq_b                   0.5             B value for NTSC signal processing. (-1.0 to 1.0)
+yiq_o                   0.0             Outgoing Color Carrier phase offset for NTSC signal processing. (-3.0 to 3.0)
+yiq_p                   1.0             Incoming Pixel Clock scaling value for NTSC signal processing. (-3.0 to 3.0)
+yiq_n                   1.0             Y filter notch width for NTSC signal processing. (0.0 to 6.0)
+yiq_y                   6.0             Y filter cutoff frequency for NTSC signal processing. (0.0 to 6.0)
+yiq_i                   1.2             I filter cutoff frequency for NTSC signal processing. (0.0 to 6.0)
+yiq_q                   0.6             Q filter cutoff frequency for NTSC signal processing. (0.0 to 6.0)
 yiq_scan_time           52.6            Horizontal scanline duration for NTSC signal processing. (usec)
 yiq_phase_count         2               Phase Count value for NTSC signal processing. (3 for NES, else 2)
 

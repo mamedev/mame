@@ -856,7 +856,7 @@ static MACHINE_CONFIG_START( mpu3base, mpu3_state )
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu3_state, reel2_optic_cb))
 	MCFG_MPU3_REEL_ADD("reel3")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu3_state, reel3_optic_cb))
-	
+
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
 

@@ -780,7 +780,6 @@ void mz3500_state::machine_reset()
 		}
 	}
 
-	m_beeper->set_frequency(2400);
 	m_beeper->set_state(0);
 }
 
@@ -848,7 +847,7 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 

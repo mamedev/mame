@@ -36,6 +36,7 @@ address_space_config::address_space_config()
 		m_addrbus_shift(0),
 		m_logaddr_width(0),
 		m_page_shift(0),
+		m_is_octal(false),
 		m_internal_map(nullptr),
 		m_default_map(nullptr)
 {
@@ -58,6 +59,7 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 		m_addrbus_shift(addrshift),
 		m_logaddr_width(addrwidth),
 		m_page_shift(0),
+		m_is_octal(false),
 		m_internal_map(internal),
 		m_default_map(defmap)
 {
@@ -71,6 +73,7 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 		m_addrbus_shift(addrshift),
 		m_logaddr_width(logwidth),
 		m_page_shift(pageshift),
+		m_is_octal(false),
 		m_internal_map(internal),
 		m_default_map(defmap)
 {
@@ -84,6 +87,7 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 		m_addrbus_shift(addrshift),
 		m_logaddr_width(addrwidth),
 		m_page_shift(0),
+		m_is_octal(false),
 		m_internal_map(nullptr),
 		m_default_map(nullptr),
 		m_internal_map_delegate(std::move(internal)),
@@ -99,6 +103,7 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 		m_addrbus_shift(addrshift),
 		m_logaddr_width(logwidth),
 		m_page_shift(pageshift),
+		m_is_octal(false),
 		m_internal_map(nullptr),
 		m_default_map(nullptr),
 		m_internal_map_delegate(std::move(internal)),

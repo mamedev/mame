@@ -497,7 +497,7 @@ public:
 	// getters
 	running_machine &machine() const;
 	tilemap_device *device() const { return m_device; }
-	palette_device *palette() const { return m_palette; }
+	palette_device &palette() const { return *m_palette; }
 	tilemap_t *next() const { return m_next; }
 	void *user_data() const { return m_user_data; }
 	memory_array &basemem() { return m_basemem; }
@@ -518,7 +518,7 @@ public:
 	// setters
 	void enable(bool enable = true) { m_enable = enable; }
 	void set_user_data(void *user_data) { m_user_data = user_data; }
-	void set_palette(palette_device *palette) { m_palette = palette; }
+	void set_palette(palette_device &palette) { m_palette = &palette; }
 	void set_palette_offset(UINT32 offset) { m_palette_offset = offset; }
 	void set_scrolldx(int dx, int dx_flipped) { m_dx = dx; m_dx_flipped = dx_flipped; }
 	void set_scrolldy(int dy, int dy_flipped) { m_dy = dy; m_dy_flipped = dy_flipped; }

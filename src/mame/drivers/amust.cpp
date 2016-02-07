@@ -369,7 +369,6 @@ MACHINE_RESET_MEMBER( amust_state, amust )
 	m_p_videoram = memregion("videoram")->base();
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
-	m_beep->set_frequency(800);
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.write_byte(0x38, 0xed);
 	space.write_byte(0x39, 0x4d);
@@ -409,7 +408,7 @@ static MACHINE_CONFIG_START( amust, amust_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

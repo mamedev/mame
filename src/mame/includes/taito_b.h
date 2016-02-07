@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 #include "machine/mb87078.h"
 #include "machine/taitoio.h"

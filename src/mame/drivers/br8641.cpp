@@ -46,7 +46,6 @@ public:
 	DECLARE_READ8_MEMBER(port08_r);
 	DECLARE_WRITE8_MEMBER(port08_w);
 	DECLARE_WRITE8_MEMBER(port09_w);
-	DECLARE_MACHINE_RESET(br8641);
 
 private:
 	UINT8 m_port08;
@@ -142,11 +141,6 @@ WRITE8_MEMBER( brandt8641_state::port09_w )
 	m_port09 = data ^ 0xff;
 }
 
-MACHINE_RESET_MEMBER( brandt8641_state, br8641 )
-{
-	m_beep->set_frequency(2000);
-}
-
 static const z80_daisy_config daisy_chain_intf[] =
 {
 	{ "pio1" },
@@ -165,11 +159,9 @@ static MACHINE_CONFIG_START( brandt8641, brandt8641_state )
 	MCFG_CPU_IO_MAP(brandt8641_io)
 	MCFG_CPU_CONFIG(daisy_chain_intf)
 
-	MCFG_MACHINE_RESET_OVERRIDE(brandt8641_state, br8641)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 2000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// Z80APIO U9

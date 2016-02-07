@@ -45,7 +45,7 @@ struct SCSP_EG_t
 
 struct SCSP_LFO_t
 {
-	unsigned short phase;
+	UINT16 phase;
 	UINT32 phase_step;
 	int *table;
 	int *scale;
@@ -69,7 +69,7 @@ struct SCSP_SLOT
 	SCSP_LFO_t PLFO;     //Phase LFO
 	SCSP_LFO_t ALFO;     //Amplitude LFO
 	int slot;
-	signed short Prev;  //Previous sample (for interpolation)
+	INT16 Prev;  //Previous sample (for interpolation)
 };
 
 
@@ -112,13 +112,13 @@ private:
 	} m_udata;
 
 	SCSP_SLOT m_Slots[32];
-	signed short m_RINGBUF[128];
-	unsigned char m_BUFPTR;
+	INT16 m_RINGBUF[128];
+	UINT8 m_BUFPTR;
 #if FM_DELAY
-	signed short m_DELAYBUF[FM_DELAY];
-	unsigned char m_DELAYPTR;
+	INT16 m_DELAYBUF[FM_DELAY];
+	UINT8 m_DELAYPTR;
 #endif
-	unsigned char *m_SCSPRAM;
+	UINT8 *m_SCSPRAM;
 	UINT32 m_SCSPRAM_LENGTH;
 	char m_Master;
 	sound_stream * m_stream;
@@ -167,7 +167,7 @@ private:
 
 	int m_length;
 
-	signed short *m_RBUFDST;   //this points to where the sample will be stored in the RingBuf
+	INT16 *m_RBUFDST;   //this points to where the sample will be stored in the RingBuf
 
 	//LFO
 	int m_PLFO_TRI[256], m_PLFO_SQR[256], m_PLFO_SAW[256], m_PLFO_NOI[256];
@@ -176,7 +176,7 @@ private:
 	int m_ASCALES[8][256];
 
 	void exec_dma(address_space &space);       /*state DMA transfer function*/
-	unsigned char DecodeSCI(unsigned char irq);
+	UINT8 DecodeSCI(UINT8 irq);
 	void CheckPendingIRQ();
 	void MainCheckPendingIRQ(UINT16 irq_type);
 	void ResetInterrupts();
@@ -191,22 +191,22 @@ private:
 	UINT32 Step(SCSP_SLOT *slot);
 	void Compute_LFO(SCSP_SLOT *slot);
 	void StartSlot(SCSP_SLOT *slot);
-	void StopSlot(SCSP_SLOT *slot,int keyoff);
+	void StopSlot(SCSP_SLOT *slot, int keyoff);
 	void init();
-	void UpdateSlotReg(int s,int r);
+	void UpdateSlotReg(int s, int r);
 	void UpdateReg(address_space &space, int reg);
-	void UpdateSlotRegR(int slot,int reg);
+	void UpdateSlotRegR(int slot, int reg);
 	void UpdateRegR(address_space &space, int reg);
-	void w16(address_space &space,unsigned int addr,unsigned short val);
-	unsigned short r16(address_space &space, unsigned int addr);
+	void w16(address_space &space, UINT32 addr, UINT16 val);
+	UINT16 r16(address_space &space, UINT32 addr);
 	inline INT32 UpdateSlot(SCSP_SLOT *slot);
 	void DoMasterSamples(int nsamples);
 
 	//LFO
 	void LFO_Init();
-	signed int PLFO_Step(SCSP_LFO_t *LFO);
-	signed int ALFO_Step(SCSP_LFO_t *LFO);
-	void LFO_ComputeStep(SCSP_LFO_t *LFO,UINT32 LFOF,UINT32 LFOWS,UINT32 LFOS,int ALFO);
+	INT32 PLFO_Step(SCSP_LFO_t *LFO);
+	INT32 ALFO_Step(SCSP_LFO_t *LFO);
+	void LFO_ComputeStep(SCSP_LFO_t *LFO, UINT32 LFOF, UINT32 LFOWS, UINT32 LFOS, int ALFO);
 };
 
 extern const device_type SCSP;

@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Kenneth Lin
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
+// thanks-to:Kenneth Lin (original driver author)
 
 #define MASTER_CLOCK         XTAL_18_432MHz
 #define SOUND_CLOCK          XTAL_3_579545MHz

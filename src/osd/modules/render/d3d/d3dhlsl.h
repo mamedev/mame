@@ -50,6 +50,7 @@ public:
 		CU_TARGET_DIMS,
 		CU_QUAD_DIMS,
 
+		CU_SWAP_XY,
 		CU_ORIENTATION_SWAP,
 		CU_ROTATION_SWAP,
 		CU_ROTATION_TYPE,
@@ -100,11 +101,6 @@ public:
 		CU_POST_SCANLINE_BRIGHT_OFFSET,
 		CU_POST_POWER,
 		CU_POST_FLOOR,
-
-		CU_BLOOM_RESCALE,
-		CU_BLOOM_LVL0123_WEIGHTS,
-		CU_BLOOM_LVL4567_WEIGHTS,
-		CU_BLOOM_LVL89A_WEIGHTS,
 
 		CU_COUNT
 	};
@@ -214,7 +210,8 @@ struct hlsl_options
 	float                   scanline_height;
 	float                   scanline_bright_scale;
 	float                   scanline_bright_offset;
-	float                   scanline_offset;
+	float                   scanline_jitter;
+	float                   hum_bar_alpha;
 	float                   defocus[2];
 	float                   converge_x[3];
 	float                   converge_y[3];
@@ -232,6 +229,7 @@ struct hlsl_options
 
 	// NTSC
 	bool                    yiq_enable;
+	float                   yiq_jitter;
 	float                   yiq_cc;
 	float                   yiq_a;
 	float                   yiq_b;
@@ -431,8 +429,7 @@ private:
 	effect *                phosphor_effect;            // pointer to the phosphor-effect object
 	effect *                deconverge_effect;          // pointer to the deconvergence-effect object
 	effect *                color_effect;               // pointer to the color-effect object
-	effect *                yiq_encode_effect;          // pointer to the YIQ encoder effect object
-	effect *                yiq_decode_effect;          // pointer to the YIQ decoder effect object
+	effect *                ntsc_effect;                // pointer to the NTSC effect object
 	effect *                bloom_effect;               // pointer to the bloom composite effect
 	effect *                downsample_effect;          // pointer to the bloom downsample effect
 	effect *                vector_effect;              // pointer to the vector-effect object

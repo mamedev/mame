@@ -1,7 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// copyright-holders:Ryan Holtz,ImJezze
 //-----------------------------------------------------------------------------
 // Deconvergence Effect
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Sampler Definitions
 //-----------------------------------------------------------------------------
 
 texture Diffuse;
@@ -25,12 +29,8 @@ struct VS_OUTPUT
 {
 	float4 Position : POSITION;
 	float4 Color : COLOR0;
-	//float2 RedCoord : TEXCOORD0;
-	//float2 GrnCoord : TEXCOORD1;
-	//float2 BluCoord : TEXCOORD2;
-	float3 CoordX : TEXCOORD0;
-	float3 CoordY : TEXCOORD1;
-	float2 TexCoord : TEXCOORD2;
+	float3 TexCoordX : TEXCOORD0;
+	float3 TexCoordY : TEXCOORD1;
 };
 
 struct VS_INPUT
@@ -38,61 +38,78 @@ struct VS_INPUT
 	float4 Position : POSITION;
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
-	float2 Unused : TEXCOORD1;
 };
 
 struct PS_INPUT
 {
 	float4 Color : COLOR0;
-	//float2 RedCoord : TEXCOORD0;
-	//float2 GrnCoord : TEXCOORD1;
-	//float2 BluCoord : TEXCOORD2;
-	float3 CoordX : TEXCOORD0;
-	float3 CoordY : TEXCOORD1;
-	float2 TexCoord : TEXCOORD2;
+	float3 TexCoordX : TEXCOORD0;
+	float3 TexCoordY : TEXCOORD1;
 };
 
 //-----------------------------------------------------------------------------
 // Deconvergence Vertex Shader
 //-----------------------------------------------------------------------------
 
-uniform float3 ConvergeX = float3(0.0f, 0.0f, 0.0f);
-uniform float3 ConvergeY = float3(0.0f, 0.0f, 0.0f);
-
 uniform float2 ScreenDims;
 uniform float2 SourceDims;
 uniform float2 SourceRect;
+uniform float2 TargetDims;
+uniform float2 QuadDims;
 
+uniform bool SwapXY = false;
+
+uniform float3 ConvergeX = float3(0.0f, 0.0f, 0.0f);
+uniform float3 ConvergeY = float3(0.0f, 0.0f, 0.0f);
 uniform float3 RadialConvergeX = float3(0.0f, 0.0f, 0.0f);
 uniform float3 RadialConvergeY = float3(0.0f, 0.0f, 0.0f);
-
-uniform float Prescale;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
-	float2 invDims = 1.0f / SourceDims;
-	float2 Ratios = SourceRect;
+	float2 HalfSourceRect = SourceRect * 0.5f;
+
+	float2 QuadRatio =
+		float2(1.0f, SwapXY 
+			? QuadDims.y / QuadDims.x 
+			: QuadDims.x / QuadDims.y);
+
+	// imaginary texel dimensions independed from quad dimensions, but dependend on quad ratio
+	float2 FixedTexelDims = (1.0f / 1024.0) * SourceRect * QuadRatio;
+
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
-	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.xy -= 0.5f;
-	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
-	Output.Color = Input.Color;
+	Output.Position.y = 1.0f - Output.Position.y; // flip y
+	Output.Position.xy -= 0.5f; // center
+	Output.Position.xy *= 2.0f; // toom
+
 	float2 TexCoord = Input.TexCoord;
+	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
+	
+	Output.Color = Input.Color;
 
-	float2 RadialRed = float2(RadialConvergeX.x, RadialConvergeY.x);
-	float2 RadialGrn = float2(RadialConvergeX.y, RadialConvergeY.y);
-	float2 RadialBlu = float2(RadialConvergeX.z, RadialConvergeY.z);
-	float2 ConvergeRed = float2(ConvergeX.x, ConvergeY.x);
-	float2 ConvergeGrn = float2(ConvergeX.y, ConvergeY.y);
-	float2 ConvergeBlu = float2(ConvergeX.z, ConvergeY.z);
-	float2 ScaledRatio = ((TexCoord * SourceRect) - 0.5f);
+	Output.TexCoordX = TexCoord.xxx;
+	Output.TexCoordY = TexCoord.yyy;
 
-	Output.CoordX = ((((TexCoord.x / Ratios.x) - 0.5f)) * (1.0f + RadialConvergeX / SourceDims.x) + 0.5f) * Ratios.x + ConvergeX * invDims.x;
-	Output.CoordY = ((((TexCoord.y / Ratios.y) - 0.5f)) * (1.0f + RadialConvergeY / SourceDims.y) + 0.5f) * Ratios.y + ConvergeY * invDims.y;
-	Output.TexCoord = TexCoord;
+	// center coordinates
+	Output.TexCoordX -= HalfSourceRect.xxx;
+	Output.TexCoordY -= HalfSourceRect.yyy;
+
+	// radial converge offset to "translate" the most outer pixel as thay would be translated by the linar converge with the same amount
+	float2 radialConvergeOffset = 2.0f / SourceRect;
+
+	// radial converge
+	Output.TexCoordX *= 1.0f + RadialConvergeX * FixedTexelDims.xxx * radialConvergeOffset.xxx;
+	Output.TexCoordY *= 1.0f + RadialConvergeY * FixedTexelDims.yyy * radialConvergeOffset.yyy;
+	
+	// un-center coordinates
+	Output.TexCoordX += HalfSourceRect.xxx;
+	Output.TexCoordY += HalfSourceRect.yyy;
+
+	// linear converge
+	Output.TexCoordX += ConvergeX * FixedTexelDims.xxx;
+	Output.TexCoordY += ConvergeY * FixedTexelDims.yyy;
 
 	return Output;
 }
@@ -103,19 +120,18 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float Alpha = tex2D(DiffuseSampler, Input.TexCoord).a;
-	float RedTexel = tex2D(DiffuseSampler, float2(Input.CoordX.x, Input.CoordY.x)).r;
-	float GrnTexel = tex2D(DiffuseSampler, float2(Input.CoordX.y, Input.CoordY.y)).g;
-	float BluTexel = tex2D(DiffuseSampler, float2(Input.CoordX.z, Input.CoordY.z)).b;
+	float r = tex2D(DiffuseSampler, float2(Input.TexCoordX.x, Input.TexCoordY.x)).r;
+	float g = tex2D(DiffuseSampler, float2(Input.TexCoordX.y, Input.TexCoordY.y)).g;
+	float b = tex2D(DiffuseSampler, float2(Input.TexCoordX.z, Input.TexCoordY.z)).b;
 
-	return float4(RedTexel, GrnTexel, BluTexel, Alpha);
+	return float4(r, g, b, 1.0f);
 }
 
 //-----------------------------------------------------------------------------
-// Deconvergence Effect
+// Deconvergence Technique
 //-----------------------------------------------------------------------------
 
-technique DeconvergeTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{

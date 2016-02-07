@@ -489,7 +489,6 @@ void bigboard_state::machine_reset()
 
 	/* bigboard has a one-pulse output to drive a user-supplied beeper */
 	m_beeper->set_state(0);
-	m_beeper->set_frequency(950);
 
 	m_fdc->reset();
 }
@@ -610,7 +609,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED_CLASS( bigboard, xerox820, bigboard_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 950)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* bigboard only */
 MACHINE_CONFIG_END
 

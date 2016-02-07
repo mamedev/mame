@@ -124,7 +124,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes")
+		m_decrypted_opcodes(*this, "decrypted_opcodes"),
+		m_region_stars(*this, "stars")
 	{ }
 
 	/* memory pointers */
@@ -232,6 +233,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<UINT16> m_decrypted_opcodes;
+	optional_memory_region m_region_stars;
 
 	DECLARE_READ16_MEMBER(cps1_hack_dsw_r);
 	DECLARE_READ16_MEMBER(cps1_in1_r);

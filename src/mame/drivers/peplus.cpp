@@ -6909,12 +6909,15 @@ MG0183 has 4 poker games:
 Also uses a Dallas (Maxim) DS1216 SmartWatch RAM for RTC (Real Time Clock) functions
 
 Came out of an IGT machine with belly glass calling it Montana Choice
+
+Currently stalls with "PRINTER ERROR"
+
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "mg0183_756-782.u68",   0x00000, 0x10000, CRC(b89bcf75) SHA1(f436eb604c81ba6f08e1d11029ce8fff4f50dc3e) ) /* Stalls with "PRINTER ERROR" */
+	ROM_LOAD( "mg0183_756-782.u68",   0x00000, 0x10000, CRC(b89bcf75) SHA1(f436eb604c81ba6f08e1d11029ce8fff4f50dc3e) ) /* Game Version: 756, Library Version: 782 - 05/10/95   IGT MT */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg1209.u72",   0x00000, 0x8000, CRC(39b0cc43) SHA1(0a95a7122e64fed7355e762ff2eda2a7246d4693) )
+	ROM_LOAD( "mro-cg1209.u72",   0x00000, 0x8000, CRC(39b0cc43) SHA1(0a95a7122e64fed7355e762ff2eda2a7246d4693) ) /* 07/07/93   IGT  MT */
 	ROM_LOAD( "mgo-cg1209.u73",   0x08000, 0x8000, CRC(5285ffab) SHA1(e959bf2fec46ee62d7a625eb64f74635fd697643) )
 	ROM_LOAD( "mbo-cg1209.u74",   0x10000, 0x8000, CRC(4604ac16) SHA1(b3a7c6c807eb2be7f451d2fcbb6455a66c155a46) )
 	ROM_LOAD( "mxo-cg1209.u75",   0x18000, 0x8000, CRC(da344256) SHA1(1320c4a8b48a9e61a4607e0a9d08083fde2bd334) )
@@ -6944,9 +6947,12 @@ Requires a printer for ticket payout (no coins) made by Star Micronics Co. Ltd. 
   8.00MHz OSC and the LP 86 (handwritten label) EPROM
 
   Some Player's Choice machines contain and use a touchscreen for input
+
+Currently stalls with "PRINTER ERROR"
+
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "mg0252_752-778.u68",   0x00000, 0x10000, CRC(1d0ba4f1) SHA1(f906a11d171318a06fb0bb09783bd8e3b99f1ca9) ) /* Stalls with "PRINTER ERROR" */
+	ROM_LOAD( "mg0252_752-778.u68",   0x00000, 0x10000, CRC(1d0ba4f1) SHA1(f906a11d171318a06fb0bb09783bd8e3b99f1ca9) ) /* Game Version: 752, Library Version: 778 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2076.u72",   0x00000, 0x8000, CRC(84634f0e) SHA1(8f1b9aaa92e861f00569053c1112c2fb7eb577e8) )

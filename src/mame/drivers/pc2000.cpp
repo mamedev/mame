@@ -747,9 +747,8 @@ void pc2000_state::machine_start()
 {
 	std::string region_tag;
 	UINT8 *bios = memregion("bios")->base();
-	UINT8 *cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str())->base();
-	if (!cart)
-		cart = memregion("bios")->base();
+	memory_region *cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	UINT8 *cart = (cart_region != NULL) ? cart_region->base() : memregion("bios")->base();
 
 	m_bank0->configure_entries(0, 0x10, bios, 0x4000);
 	m_bank1->configure_entries(0, 0x10, bios, 0x4000);
@@ -761,9 +760,8 @@ void gl4004_state::machine_start()
 {
 	std::string region_tag;
 	UINT8 *bios = memregion("bios")->base();
-	UINT8 *cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str())->base();
-	if (!cart)
-		cart = memregion("bios")->base();
+	memory_region *cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	UINT8 *cart = (cart_region != NULL) ? cart_region->base() : memregion("bios")->base();
 
 	m_bank0->configure_entries(0, 0x20, bios, 0x4000);
 	m_bank1->configure_entries(0, 0x20, bios, 0x4000);
@@ -850,7 +848,7 @@ static MACHINE_CONFIG_START( pc2000, pc2000_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
+	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "genius_cart")
@@ -937,6 +935,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc1000, misterx )
 	MCFG_SOFTWARE_LIST_REMOVE("cart_list")
+	MCFG_SOFTWARE_LIST_REMOVE("pc1000_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "pc1000")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 MACHINE_CONFIG_END

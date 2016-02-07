@@ -275,6 +275,7 @@ VIDEOS["BUFSPRITE"] = true
 VIDEOS["DM9368"] = true
 --VIDEOS["EF9340_1"] = true
 --VIDEOS["EF9345"] = true
+--VIDEOS["EF9364"] = true
 --VIDEOS["EF9365"] = true
 --VIDEOS["GF4500"] = true
 VIDEOS["GF7600GS"] = true
@@ -4411,6 +4412,7 @@ files {
 	MAME_DIR .. "src/mame/includes/news.h",
 	MAME_DIR .. "src/mame/video/news.cpp",
 	MAME_DIR .. "src/mame/drivers/nexus3d.cpp",
+	MAME_DIR .. "src/mame/drivers/nibble.cpp",
 	MAME_DIR .. "src/mame/drivers/norautp.cpp",
 	MAME_DIR .. "src/mame/includes/norautp.h",
 	MAME_DIR .. "src/mame/audio/norautp.cpp",

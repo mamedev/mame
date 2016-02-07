@@ -163,8 +163,10 @@ float sound_stream::output_gain(int outputnum) const
 //  on a given stream's input
 //-------------------------------------------------
 
-const char *sound_stream::input_name(int inputnum, std::string &str) const
+std::string sound_stream::input_name(int inputnum) const
 {
+	std::string str;
+
 	// start with our device name and tag
 	assert(inputnum >= 0 && inputnum < m_input.size());
 	strprintf(str, "%s '%s': ", m_device.name(), m_device.tag());
@@ -191,7 +193,7 @@ const char *sound_stream::input_name(int inputnum, std::string &str) const
 				}
 		}
 	}
-	return str.c_str();
+	return str;
 }
 
 

@@ -24,7 +24,7 @@
 // ======================> cbm2_hrg_t
 
 class cbm2_hrg_t : public device_t,
-				   public device_cbm2_expansion_card_interface
+					public device_cbm2_expansion_card_interface
 {
 public:
 	// construction/destruction

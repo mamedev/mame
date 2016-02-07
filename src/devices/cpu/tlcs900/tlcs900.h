@@ -852,14 +852,14 @@ private:
 	devcb_write8   m_porte_write;
 
 	// analogue inputs, sampled at 10 bits
-	devcb_read16	   m_an0_read;
-	devcb_read16	   m_an1_read;
-	devcb_read16	   m_an2_read;
-	devcb_read16	   m_an3_read;
-	devcb_read16	   m_an4_read;
-	devcb_read16	   m_an5_read;
-	devcb_read16	   m_an6_read;
-	devcb_read16	   m_an7_read;
+	devcb_read16       m_an0_read;
+	devcb_read16       m_an1_read;
+	devcb_read16       m_an2_read;
+	devcb_read16       m_an3_read;
+	devcb_read16       m_an4_read;
+	devcb_read16       m_an5_read;
+	devcb_read16       m_an6_read;
+	devcb_read16       m_an7_read;
 };
 
 #endif

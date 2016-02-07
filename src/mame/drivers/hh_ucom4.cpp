@@ -49,8 +49,8 @@
  *060     uPD650C  1979, Mattel Computer Gin
  *085     uPD650C  1980, Roland TR-808
  *127     uPD650C  198?, Sony OA-S1100 Typecorder (subcpu, have dump)
- *128     uPD650C  1981, Roland TR-606
-  133     uPD650C  1982, Roland TB-303 -> tb303.c
+  128     uPD650C  1981, Roland TR-606 -> tr606.cpp
+  133     uPD650C  1982, Roland TB-303 -> tb303.cpp
 
   (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
@@ -2496,7 +2496,7 @@ CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, driver_device, 0, "Bambin
 
 CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, driver_device, 0, "Bandai", "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1980, tactix,   0,        0, tactix,   tactix,   driver_device, 0, "Castle Toy", "Tactix", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tactix,   0,        0, tactix,   tactix,   driver_device, 0, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, invspace, 0,        0, invspace, invspace, driver_device, 0, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1980, efball,   0,        0, efball,   efball,   driver_device, 0, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )

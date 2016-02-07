@@ -16,9 +16,9 @@
 const device_type ST0020_SPRITES = &device_creator<st0020_device>;
 
 st0020_device::st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ST0020_SPRITES, "Seta ST0020 Sprites", tag, owner, clock, "st0020", __FILE__),
-		m_gfxdecode(*this),
-		m_palette(*this)
+	: device_t(mconfig, ST0020_SPRITES, "Seta ST0020 Sprites", tag, owner, clock, "st0020", __FILE__)
+	, m_gfxdecode(*this)
+	, m_palette(*this)
 {
 	m_is_st0032 = 0;
 	m_is_jclub2 = 0;
@@ -73,6 +73,19 @@ static const gfx_layout layout_16x8x8_2 =
 
 void st0020_device::device_start()
 {
+	memory_region* rgn = memregion(tag());
+
+	if (rgn)
+	{
+		m_rom_ptr = rgn->base();
+		m_rom_size = rgn->bytes();
+	}
+	else
+	{
+		m_rom_ptr = nullptr;
+		m_rom_size = 0;
+	}
+
 	m_st0020_gfxram = make_unique_clear<UINT16[]>(4 * 0x100000 / 2);
 	m_st0020_spriteram = make_unique_clear<UINT16[]>(0x80000 / 2);
 	m_st0020_blitram = make_unique_clear<UINT16[]>(0x100 / 2);
@@ -183,20 +196,17 @@ WRITE16_MEMBER(st0020_device::st0020_blit_w)
 			UINT32 dst  =   (st0020_blitram[0xc4/2] + (st0020_blitram[0xc6/2] << 16)) << 4;
 			UINT32 len  =   (st0020_blitram[0xc8/2]) << 4;
 
-			UINT8 *rom  =   memregion(":st0020")->base();
-
-
-			if (!rom)
+			if (!m_rom_ptr)
 			{
 				logerror("CPU #0 PC: %06X - Blit out of range: src %x, dst %x, len %x\n",space.device().safe_pc(),src,dst,len);
 				return;
 			}
 
-			size_t size =   memregion(":st0020")->bytes();
+			size_t size = m_rom_size;
 
 			if ( (src+len <= size) && (dst+len <= 4 * 0x100000) )
 			{
-				memcpy( &m_st0020_gfxram[dst/2], &rom[src], len );
+				memcpy( &m_st0020_gfxram[dst/2], &m_rom_ptr[src], len );
 
 				if (len % (16*8))   len = len / (16*8) + 1;
 				else                len = len / (16*8);

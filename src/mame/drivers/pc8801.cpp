@@ -2448,7 +2448,6 @@ void pc8801_state::machine_reset()
 		m_crtc.status = 0;
 	}
 
-	m_beeper->set_frequency(2400);
 	m_beeper->set_state(0);
 
 	#ifdef USE_PROPER_I8214
@@ -2640,7 +2639,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_AY8910_PORT_B_READ_CB(READ8(pc8801_state, opn_portb_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", pc8801_state, pc8801_rtc_irq, attotime::from_hz(600))

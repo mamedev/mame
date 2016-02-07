@@ -1521,8 +1521,8 @@ static MACHINE_CONFIG_START( karatblzbl, aerofgt_state )
 	MCFG_CPU_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(karatblzbl_sound_map)
 
-//  MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
-//  MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1552,7 +1552,7 @@ static MACHINE_CONFIG_START( karatblzbl, aerofgt_state )
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,karatblz)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	//MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") // breaks savestate
 
 	// NEC D7759c + YM????
 MACHINE_CONFIG_END

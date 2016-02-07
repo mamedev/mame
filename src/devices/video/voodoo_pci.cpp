@@ -153,7 +153,7 @@ void voodoo_pci_device::map_extra(UINT64 memory_window_start, UINT64 memory_wind
 
 UINT32 voodoo_pci_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return voodoo_update(m_voodoo, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 // PCI bus control
@@ -170,7 +170,7 @@ WRITE32_MEMBER (voodoo_pci_device::pcictrl_w)
 	switch (offset) {
 		case 0x0/4:  // The address map starts at 0x40
 			// HW initEnable
-			voodoo_set_init_enable(m_voodoo, data);
+			m_voodoo->voodoo_set_init_enable(data);
 			logerror("%06X:voodoo_pci_device pcictrl_w to offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 			break;
 		default:

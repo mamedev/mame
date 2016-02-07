@@ -12,9 +12,11 @@
 
 SAMPLES_START_CB_MEMBER( cclimber_audio_device::sh_start )
 {
-	if (machine().root_device().memregion("samples")->base())
-		m_sample_buf = std::make_unique<INT16[]>(2 * machine().root_device().memregion("samples")->bytes());
-		save_pointer(NAME(m_sample_buf.get()), 2 * machine().root_device().memregion("samples")->bytes());
+	if (m_samples_region)
+	{
+		m_sample_buf = std::make_unique<INT16[]>(2 * m_samples_region.bytes());
+		save_pointer(NAME(m_sample_buf.get()), 2 * m_samples_region.bytes());
+	}
 }
 
 MACHINE_CONFIG_FRAGMENT( cclimber_audio )
@@ -49,7 +51,8 @@ cclimber_audio_device::cclimber_audio_device(const machine_config &mconfig, cons
 	m_sample_num(0),
 	m_sample_freq(0),
 	m_sample_volume(0),
-	m_samples(*this, "samples")
+	m_samples(*this, "samples"),
+	m_samples_region(*this, "^samples")
 {
 }
 
@@ -102,21 +105,23 @@ WRITE8_MEMBER( cclimber_audio_device::sample_trigger_w )
 void cclimber_audio_device::play_sample(int start,int freq,int volume)
 {
 	int len;
-	int romlen = machine().root_device().memregion("samples")->bytes();
-	const UINT8 *rom = machine().root_device().memregion("samples")->base();
+	int romlen = m_samples_region.bytes();
 
-	if (!rom) return;
+	if (m_samples_region == NULL)
+	{
+		return;
+	}
 
 	/* decode the rom samples */
 	len = 0;
-	while (start + len < romlen && rom[start+len] != 0x70)
+	while (start + len < romlen && m_samples_region[start+len] != 0x70)
 	{
 		int sample;
 
-		sample = (rom[start + len] & 0xf0) >> 4;
+		sample = (m_samples_region[start + len] & 0xf0) >> 4;
 		m_sample_buf[2*len] = SAMPLE_CONV4(sample) * volume / 31;
 
-		sample = rom[start + len] & 0x0f;
+		sample = m_samples_region[start + len] & 0x0f;
 		m_sample_buf[2*len + 1] = SAMPLE_CONV4(sample) * volume / 31;
 
 		len++;

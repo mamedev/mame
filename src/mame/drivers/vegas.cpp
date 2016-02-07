@@ -493,7 +493,7 @@ public:
 	UINT8 m_sio_led_state;
 	UINT8 m_pending_analog_read;
 	UINT8 m_cmos_unlocked;
-	device_t *m_voodoo;
+	voodoo_device *m_voodoo;
 	UINT8 m_dcs_idma_cs;
 	int m_count;
 	int m_dynamic_count;
@@ -567,7 +567,7 @@ public:
 
 UINT32 vegas_state::screen_update_vegas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return voodoo_update(m_voodoo, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 
@@ -579,7 +579,7 @@ UINT32 vegas_state::screen_update_vegas(screen_device &screen, bitmap_rgb32 &bit
 
 void vegas_state::machine_start()
 {
-	m_voodoo = machine().device("voodoo");
+	m_voodoo = (voodoo_device*)machine().device("voodoo");
 
 	/* allocate timers for the NILE */
 	m_timer[0] = machine().scheduler().timer_alloc(FUNC_NULL);
@@ -797,7 +797,7 @@ WRITE32_MEMBER( vegas_state::pci_ide_w )
 
 READ32_MEMBER( vegas_state::pci_3dfx_r )
 {
-	int voodoo_type = voodoo_get_type(m_voodoo);
+	int voodoo_type = m_voodoo->voodoo_get_type();
 	UINT32 result = m_pci_3dfx_regs[offset];
 
 	switch (offset)
@@ -830,7 +830,7 @@ READ32_MEMBER( vegas_state::pci_3dfx_r )
 
 WRITE32_MEMBER( vegas_state::pci_3dfx_w )
 {
-	int voodoo_type = voodoo_get_type(m_voodoo);
+	int voodoo_type = m_voodoo->voodoo_get_type();
 
 	m_pci_3dfx_regs[offset] = data;
 
@@ -869,7 +869,7 @@ WRITE32_MEMBER( vegas_state::pci_3dfx_w )
 			break;
 
 		case 0x10:      /* initEnable register */
-			voodoo_set_init_enable(m_voodoo, data);
+			m_voodoo->voodoo_set_init_enable(data);
 			break;
 
 	}
@@ -1555,7 +1555,7 @@ inline void vegas_state::_add_dynamic_address(offs_t start, offs_t end, read32_d
 void vegas_state::remap_dynamic_addresses()
 {
 	dynamic_address *dynamic = m_dynamic;
-	int voodoo_type = voodoo_get_type(m_voodoo);
+	int voodoo_type = m_voodoo->voodoo_get_type();
 	offs_t base;
 	int addr;
 

@@ -408,7 +408,7 @@ INPUT_PORTS_START( horizon )
 		PORT_DIPSETTING(    0x02, "Geneve mode" )
 
 	PORT_START( "HORIZONACT" )
-	PORT_DIPNAME( 0x01, 0x00, "Horizon killswitch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, horizon_ramdisk_device, ks_changed, 1)
+	PORT_DIPNAME( 0x01, 0x00, "Horizon killswitch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, horizon_ramdisk_device, ks_changed, nullptr)
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
@@ -432,7 +432,7 @@ INPUT_PORTS_END
 
 ROM_START( horizon )
 	ROM_REGION(MAXRAM_SIZE, NVRAMREGION, 0)
-	ROM_FILL(0x0000, MAXRAM_SIZE, nullptr)
+	ROM_FILL(0x0000, MAXRAM_SIZE, 0x00)
 	ROM_REGION(0x8000, RAMREGION, 0)
 	ROM_FILL(0x0000, 0x8000, 0x00)
 ROM_END

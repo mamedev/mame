@@ -938,7 +938,7 @@ void ef9365_device::screen_scanning( int force_clear )
 void ef9365_device::ef9365_exec(UINT8 cmd)
 {
 	int tmp_delta_x,tmp_delta_y;
-	int busy_cycles;
+	int busy_cycles = 0;
 	m_state = 0;
 
 	if( ( cmd>>4 ) == 0 )

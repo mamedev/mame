@@ -320,8 +320,8 @@ READ16_MEMBER(casloopy_state::vregs_r)
 
 WRITE16_MEMBER(casloopy_state::vregs_w)
 {
-	if(offset != 6/2)
-		printf("%08x %08x\n",offset*2,data);
+//  if(offset != 6/2)
+//      printf("%08x %08x\n",offset*2,data);
 }
 
 READ16_MEMBER(casloopy_state::pal_r)
@@ -422,10 +422,10 @@ static ADDRESS_MAP_START( casloopy_map, AS_PROGRAM, 32, casloopy_state )
 	AM_RANGE(0x0405b000, 0x0405b00f) AM_RAM AM_SHARE("vregs") // RGB555 brightness control plus scrolling
 //  AM_RANGE(0x05ffff00, 0x05ffffff) AM_READWRITE16(sh7021_r, sh7021_w, 0xffffffff)
 //  AM_RANGE(0x05ffff00, 0x05ffffff) - SH7021 internal i/o
-	AM_RANGE(0x06000000, 0x061fffff) AM_READ(cart_r)
+	AM_RANGE(0x06000000, 0x062fffff) AM_READ(cart_r)
 	AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
 	AM_RANGE(0x09000000, 0x0907ffff) AM_RAM AM_SHARE("wram")
-	AM_RANGE(0x0e000000, 0x0e1fffff) AM_READ(cart_r)
+	AM_RANGE(0x0e000000, 0x0e2fffff) AM_READ(cart_r)
 	AM_RANGE(0x0f000000, 0x0f0003ff) AM_RAM AM_SHARE("oram")
 ADDRESS_MAP_END
 
@@ -479,7 +479,7 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 	UINT32 size = m_cart->common_get_size("rom");
 	UINT8 *SRC, *DST;
 	dynamic_buffer temp;
-	temp.resize(0x200000);
+	temp.resize(size);
 
 	m_cart->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_LITTLE);
 
@@ -488,7 +488,7 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 	m_cart->common_load_rom(&temp[0], size, "rom");
 
 	// fix endianness
-	for (int i = 0; i < 0x200000; i += 4)
+	for (int i = 0; i < size; i += 4)
 	{
 		UINT8 tempa = SRC[i + 0];
 		UINT8 tempb = SRC[i + 1];

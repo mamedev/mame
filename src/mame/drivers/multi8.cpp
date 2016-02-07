@@ -609,7 +609,6 @@ void multi8_state::machine_start()
 
 void multi8_state::machine_reset()
 {
-	m_beeper->set_frequency(1200); //guesswork
 	m_beeper->set_state(0);
 	m_mcu_init = 0;
 }
@@ -637,7 +636,7 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	MCFG_SOUND_ADD("aysnd", AY8912, 1500000) //unknown clock / divider
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(multi8_state, ym2203_porta_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 1200) // guesswork
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
 	/* devices */

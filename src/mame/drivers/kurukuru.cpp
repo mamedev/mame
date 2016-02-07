@@ -363,6 +363,44 @@ static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_DEVWRITE("ym2149", ay8910_device, data_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( ppj_map, AS_PROGRAM, 8, kurukuru_state )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK("bank1")
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ppj_io, AS_IO, 8, kurukuru_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0f) AM_WRITE(kurukuru_bankswitch_w)
+	AM_RANGE(0x10, 0x13) AM_MIRROR(0x0c) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
+	AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_WRITE(kurukuru_soundlatch_w)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_READ_PORT("DSW1")
+	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_WRITE(kurukuru_out_latch_w)
+	AM_RANGE(0x60, 0x60) AM_MIRROR(0x0f) AM_READ_PORT("IN1")
+	AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) AM_READ_PORT("IN0")
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVWRITE("ym2149", ay8910_device, address_w)
+	AM_RANGE(0xc8, 0xc8) AM_MIRROR(0x0f) AM_DEVREAD("ym2149", ay8910_device, data_r)
+	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_DEVWRITE("ym2149", ay8910_device, data_w)
+ADDRESS_MAP_END
+/*
+
+ 00h  W --> bankswitching reg...
+ 
+ 10h  W --> 00's           \
+ 11h  W --> 02 8f 20 91...  > V9938 OK
+ 13h  W -->                /
+
+ 30h  W --> soundlatch...
+ 40h R  --> (very begining) seems DSW1
+ 50h  W --> Output port (counters)
+ 60h R  --> Input port
+ 70h R  --> Input port
+
+ C0h  W --> YM2149 address W
+ C8h R  --> YM2149 data R --> DSW2
+ D0h  W --> YM2149 data W
+
+*/
 
 // Audio CPU
 
@@ -401,12 +439,12 @@ READ8_MEMBER(kurukuru_state::kurukuru_adpcm_timer_irqack_r)
 }
 
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, kurukuru_state )
+static ADDRESS_MAP_START( kurukuru_audio_map, AS_PROGRAM, 8, kurukuru_state )
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_io, AS_IO, 8, kurukuru_state )
+static ADDRESS_MAP_START( kurukuru_audio_io, AS_IO, 8, kurukuru_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_WRITE(kurukuru_adpcm_data_w)
 	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_WRITE(kurukuru_adpcm_reset_w)
@@ -414,6 +452,23 @@ static ADDRESS_MAP_START( audio_io, AS_IO, 8, kurukuru_state )
 	AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) AM_READ(kurukuru_adpcm_timer_irqack_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( ppj_audio_map, AS_PROGRAM, 8, kurukuru_state )
+	AM_RANGE(0x0000, 0xf7ff) AM_ROM
+	AM_RANGE(0xf800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ppj_audio_io, AS_IO, 8, kurukuru_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x7f)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_WRITE(kurukuru_adpcm_data_w)
+	AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_WRITE(kurukuru_adpcm_reset_w)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_READ(kurukuru_soundlatch_r)
+	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_READ(kurukuru_adpcm_timer_irqack_r)
+ADDRESS_MAP_END
+/*
+  30h -W  --> 0x0b
+  40h R-  --> soundlatch...
+  50h R-  --> adpcm irq ack
+*/
 
 /* YM2149 ports */
 WRITE8_MEMBER(kurukuru_state::ym2149_aout_w)
@@ -441,8 +496,8 @@ static INPUT_PORTS_START( kurukuru )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("3rd (Pyoko)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V) PORT_NAME("4th (Kunio)")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("5th (Pyon Pyon)")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_N) PORT_NAME("Unknown A0h - bit5")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_M) PORT_NAME("Unknown A0h - bit6")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_N) PORT_NAME("Unknown A0h - bit5")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_M) PORT_NAME("Unknown A0h - bit6")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN1")
@@ -511,6 +566,81 @@ static INPUT_PORTS_START( kurukuru )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( ppj )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("1st (Boketa)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("2nd (Kunio)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("3rd (Pyon-Pyon)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V) PORT_NAME("4th (Pyokorin)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("5th (Botechin)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_S) PORT_NAME("Unknown 70h - bit5")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_D) PORT_NAME("Unknown 70h - bit6")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Bookkeeping")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Medal In")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Reset Button")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_A) PORT_NAME("Unknown 60h - bit4")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE (2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)    // hopper feedback
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+
+	PORT_START("DSW1")  // found in the PCB: 00000000 (arranged for sale since they are uncommon settings)
+	PORT_DIPNAME( 0x07, 0x03, "Coinage A (100 Y)" ) PORT_DIPLOCATION("DSW1:1,2,3")
+	PORT_DIPSETTING(    0x00, "1 Coin / 1 Medal" )
+	PORT_DIPSETTING(    0x04, "1 Coin / 2 Medal" )
+	PORT_DIPSETTING(    0x02, "1 Coin / 3 Medal" )
+	PORT_DIPSETTING(    0x06, "1 Coin / 4 Medal" )
+	PORT_DIPSETTING(    0x01, "1 Coin / 5 Medal" )
+	PORT_DIPSETTING(    0x05, "1 Coin / 6 Medal" )
+	PORT_DIPSETTING(    0x03, "1 Coin / 10 Medal" )
+	PORT_DIPSETTING(    0x07, "1 Coin / 11 Medal" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Unknown (related to coin1/payout)")  PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "Coinage Config" )    PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x00, "Coin 1 = Normal" )
+	PORT_DIPSETTING(    0x20, "Coin 1 = Payout" )
+	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )       PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x40, "Manual" )
+	PORT_DIPSETTING(    0x00, "Automatic" )
+	PORT_DIPNAME( 0x80, 0x00, "Repeat Last Bet")    PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+
+	PORT_START("DSW2")  // found in the PCB: 00000000 (arranged for sale since they are uncommon settings)
+	PORT_DIPNAME( 0x07, 0x01, "Percentage" )    PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPSETTING(    0x07, "50%" )
+	PORT_DIPSETTING(    0x03, "60%" )
+	PORT_DIPSETTING(    0x05, "70%" )
+	PORT_DIPSETTING(    0x01, "75%" )
+	PORT_DIPSETTING(    0x06, "80%" )
+	PORT_DIPSETTING(    0x02, "85%" )
+	PORT_DIPSETTING(    0x04, "90%" )
+	PORT_DIPSETTING(    0x00, "95%" )
+	PORT_DIPNAME( 0x08, 0x00, "Winwave" )       PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPSETTING(    0x08, "Small" )
+	PORT_DIPSETTING(    0x00, "Big" )
+	PORT_DIPNAME( 0x10, 0x00, "M.Medal" )       PORT_DIPLOCATION("DSW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x60, 0x60, "HG" )            PORT_DIPLOCATION("DSW2:6,7")
+	PORT_DIPSETTING(    0x60, "20-1" )
+	PORT_DIPSETTING(    0x20, "50-1" )
+	PORT_DIPSETTING(    0x40, "100-1" )
+	PORT_DIPSETTING(    0x00, "200-1" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+INPUT_PORTS_END
+
+
 /*************************************************
 *        Machine Start & Reset Routines          *
 *************************************************/
@@ -537,8 +667,43 @@ static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 	MCFG_CPU_IO_MAP(kurukuru_io)
 
 	MCFG_CPU_ADD("audiocpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_CPU_IO_MAP(audio_io)
+	MCFG_CPU_PROGRAM_MAP(kurukuru_audio_map)
+	MCFG_CPU_IO_MAP(kurukuru_audio_io)
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	/* video hardware */
+	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(kurukuru_state,kurukuru_vdp_interrupt))
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
+
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ym2149", YM2149, YM2149_CLOCK)
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(kurukuru_state, ym2149_aout_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kurukuru_state, ym2149_bout_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MCFG_SOUND_ADD("adpcm", MSM5205, M5205_CLOCK)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(kurukuru_state, kurukuru_msm5205_vck))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* changed on the fly */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_START( ppj, kurukuru_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(ppj_map)
+	MCFG_CPU_IO_MAP(ppj_io)
+
+	MCFG_CPU_ADD("audiocpu", Z80, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(ppj_audio_map)
+	MCFG_CPU_IO_MAP(ppj_audio_io)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -570,6 +735,8 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+/*  Kuru Kuru Pyon Pyon.
+*/
 ROM_START( kurukuru )
 	ROM_REGION( 0x08000, "maincpu", 0 )
 	ROM_LOAD( "kp_17l.ic17",  0x00000, 0x08000, CRC(9b552ebc) SHA1(07d0e62b7fdad381963a345376b72ad31eb7b96d) ) // program code
@@ -590,6 +757,30 @@ ROM_START( kurukuru )
 	ROM_LOAD( "7908b-4.ic32", 0x0600, 0x0034, CRC(bddf925e) SHA1(861cf5966444d0c0392241e5cfa08db475fb439a) )
 ROM_END
 
+/*  Pyon Pyon Jump.
+    Ver 1.40.
+*/
+ROM_START( ppj )
+	ROM_REGION( 0x08000, "maincpu", 0 )
+	ROM_LOAD( "ppj17.ic17",  0x00000, 0x08000, CRC(5d9c9ceb) SHA1(0f52c8a0aaaf978afeb07e56493399133b4ce781) ) // program code
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY                   FULLNAME                       FLAGS  */
-GAME( 199?, kurukuru, 0,      kurukuru, kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",  0 )
+	ROM_REGION( 0x40000, "user1", 0 ) // maincpu banked roms
+	ROM_FILL(                 0x00000, 0x10000, 0xff )                                                         // ic23: unpopulated
+	ROM_LOAD( "ppj18.ic18",   0x10000, 0x10000, CRC(69612fc6) SHA1(c6de2ec0db8ad2ace91c3a557a03ed73d0e7336d) ) // ic18: gfx set 1
+	ROM_LOAD( "ppj10.ic10",   0x20000, 0x10000, CRC(95314d84) SHA1(1a8cf50e9a1e9e8a8f5702cc735ec993ddd2fdce) ) // ic10: gfx set 2
+	ROM_FILL(                 0x30000, 0x10000, 0xff )                                                         // dummy entry for when no romchip is selected
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "ppj4.ic4",     0x00000, 0x10000, CRC(6573a0a0) SHA1(6bb99e153a22fce01a71efb3bba6c6cc04bbf8b1) ) // code & adpcm samples
+
+	ROM_REGION( 0x800, "plds", 0 )
+	ROM_LOAD( "pal16l8a_no21.ic26",    0x0000, 0x0104, CRC(414c8b50) SHA1(17f562c50a2bca41aeb7a1a7cb3916853cea0d24) )
+	ROM_LOAD( "pal16l8a_no22.ic27",    0x0200, 0x0104, CRC(ee2b9257) SHA1(15c79b143eafc7915e0f376a87c01afad8fad2b9) )
+	ROM_LOAD( "pal16l8a_no23.ic12",    0x0400, 0x0104, CRC(8a7fbbe0) SHA1(aab8d6b77d46cf2d8620861af1f7c039b6dcda99) )
+	ROM_LOAD( "pal12l6a_7908b-4.ic32", 0x0600, 0x0034, CRC(bddf925e) SHA1(861cf5966444d0c0392241e5cfa08db475fb439a) )  // identical to kurukuru...
+ROM_END
+
+
+/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY                   FULLNAME                        FLAGS  */
+GAME( 199?, kurukuru, 0,      kurukuru, kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",   0 )
+GAME( 199?, ppj,      0,      ppj,      ppj,      driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (V1.40, Japan)", 0 )

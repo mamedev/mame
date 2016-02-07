@@ -925,7 +925,6 @@ void smc777_state::machine_reset()
 	m_raminh_prefetch = 0xff;
 	m_pal_mode = 0x10;
 
-	m_beeper->set_frequency(300); //TODO: correct frequency
 	m_beeper->set_state(0);
 }
 
@@ -1003,7 +1002,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 	MCFG_SOUND_ADD("sn1", SN76489A, MASTER_CLOCK) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 300) // TODO: correct frequency
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", smc777_state, keyboard_callback, attotime::from_hz(240/32))

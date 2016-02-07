@@ -67,6 +67,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/sound/direct_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/coreaudio_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/sdl_sound.cpp",
+		MAME_DIR .. "src/osd/modules/sound/xaudio2_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/none.cpp",
 	}
 
@@ -395,6 +396,38 @@ if not _OPTIONS["NO_USE_MIDI"] then
 	else
 		_OPTIONS["NO_USE_MIDI"] = "0"
 	end
+end
+
+newoption {
+	trigger = "MODERN_WIN_API",
+	description = "Use Modern Windows APIs",
+	allowed = {
+		{ "0",  "Use classic Windows APIs - allows support for XP and later"   },
+		{ "1",  "Use Modern Windows APIs - support for Windows 8.1 and later"  },
+	},
+}
+
+newoption {
+	trigger = "USE_XAUDIO2",
+	description = "Use XAudio2 API for audio",
+	allowed = {
+		{ "0",  "Disable XAudio2"  },
+		{ "1",  "Enable XAudio2" },
+	},
+}
+
+if _OPTIONS["USE_XAUDIO2"]=="1" then
+	_OPTIONS["MODERN_WIN_API"] = "1",
+	defines {
+		"USE_XAUDIO2=1",
+	},
+	includedirs {
+		MAME_DIR .. "3rdparty/win81sdk/Include/um",
+	}
+else
+	defines {
+		"USE_XAUDIO2=0",
+	}
 end
 
 newoption {
