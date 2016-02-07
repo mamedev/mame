@@ -57,6 +57,11 @@ uniform float2 SourceRect;
 
 uniform bool PrepareVector;
 
+static const float2 Coord0Offset = float2(-0.5f, -0.5f);
+static const float2 Coord1Offset = float2( 0.5f, -0.5f);
+static const float2 Coord2Offset = float2(-0.5f,  0.5f);
+static const float2 Coord3Offset = float2( 0.5f,  0.5f);
+
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
@@ -72,14 +77,12 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Color = Input.Color;
 
 	float2 TexCoord = Input.Position.xy / ScreenDims;
-	TexCoord += PrepareVector
-		? 0.5f / TargetDims // half texel offset correction (DX9) - only for vector grpahics
-		: 0.0f;
+	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
-	Output.TexCoord01.xy = TexCoord + float2(-0.5f, -0.5f) * TargetTexelDims;
-	Output.TexCoord01.zw = TexCoord + float2( 0.5f, -0.5f) * TargetTexelDims;
-	Output.TexCoord23.xy = TexCoord + float2(-0.5f,  0.5f) * TargetTexelDims;
-	Output.TexCoord23.zw = TexCoord + float2( 0.5f,  0.5f) * TargetTexelDims;
+	Output.TexCoord01.xy = TexCoord + Coord0Offset * TargetTexelDims;
+	Output.TexCoord01.zw = TexCoord + Coord1Offset * TargetTexelDims;
+	Output.TexCoord23.xy = TexCoord + Coord2Offset * TargetTexelDims;
+	Output.TexCoord23.zw = TexCoord + Coord3Offset * TargetTexelDims;
 
 	return Output;
 }

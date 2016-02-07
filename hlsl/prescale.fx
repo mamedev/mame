@@ -54,13 +54,13 @@ uniform float2 TargetDims;
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
-	
+
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
 	Output.Position.y = 1.0f - Output.Position.y; // flip y
 	Output.Position.xy -= 0.5f; // center
 	Output.Position.xy *= 2.0f; // zoom
-	
+
 	Output.TexCoord = Input.TexCoord;
 	Output.TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 

@@ -1464,8 +1464,8 @@ int shaders::downsample_pass(render_target *rt, int source_index, poly_info *pol
 
 	int bloom_index = 0;
 	float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
-	float bloom_width = prepare_vector ? rt->target_width : rt->target_width / hlsl_prescale_x;
-	float bloom_height = prepare_vector ? rt->target_height : rt->target_height / hlsl_prescale_y;
+	float bloom_width = d3d->get_width();
+	float bloom_height = d3d->get_height();
 	for (; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
 	{
 		bloom_dims[bloom_index][0] = (float)(int)bloom_width;
@@ -2013,7 +2013,7 @@ bool shaders::register_texture(texture_info *texture)
 	enumerate_screens();
 
 	// Find the nearest prescale factor that is over our screen size
-	if (hlsl_prescale_x == 0)
+	if (hlsl_prescale_x < 1)
 	{
 		hlsl_prescale_x = 1;
 		while (width * xscale * hlsl_prescale_x <= d3d->get_width())
@@ -2023,7 +2023,7 @@ bool shaders::register_texture(texture_info *texture)
 		hlsl_prescale_x--;
 	}
 
-	if (hlsl_prescale_y == 0)
+	if (hlsl_prescale_y < 1)
 	{
 		hlsl_prescale_y = 1;
 		while (height * yscale * hlsl_prescale_y <= d3d->get_height())
@@ -2033,8 +2033,8 @@ bool shaders::register_texture(texture_info *texture)
 		hlsl_prescale_y--;
 	}
 
-	hlsl_prescale_x = ((hlsl_prescale_x == 0) ? 1 : hlsl_prescale_x);
-	hlsl_prescale_y = ((hlsl_prescale_y == 0) ? 1 : hlsl_prescale_y);
+	hlsl_prescale_x = hlsl_prescale_x < 1 ? 1 : hlsl_prescale_x;
+	hlsl_prescale_y = hlsl_prescale_y < 1 ? 1 : hlsl_prescale_y;
 
 	if (!add_render_target(d3d, texture, width, height, xscale * hlsl_prescale_x, yscale * hlsl_prescale_y))
 	{

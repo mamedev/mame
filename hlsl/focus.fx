@@ -78,18 +78,18 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 // Defocus Pixel Shader
 //-----------------------------------------------------------------------------
 
-float2 Coord1Offset = float2( 0.75f,  0.50f);
-float2 Coord2Offset = float2( 0.25f,  1.00f);
-float2 Coord3Offset = float2(-0.50f,  0.75f);
-float2 Coord4Offset = float2(-1.00f,  0.25f);
-float2 Coord5Offset = float2(-0.75f, -0.50f);
-float2 Coord6Offset = float2(-0.25f, -1.00f);
-float2 Coord7Offset = float2( 0.50f, -0.75f);
-float2 Coord8Offset = float2( 1.00f, -0.25f);
-
 uniform float2 Defocus = float2(0.0f, 0.0f);
 
 uniform bool SwapXY = false;
+
+static const float2 Coord1Offset = float2( 0.75f,  0.50f);
+static const float2 Coord2Offset = float2( 0.25f,  1.00f);
+static const float2 Coord3Offset = float2(-0.50f,  0.75f);
+static const float2 Coord4Offset = float2(-1.00f,  0.25f);
+static const float2 Coord5Offset = float2(-0.75f, -0.50f);
+static const float2 Coord6Offset = float2(-0.25f, -1.00f);
+static const float2 Coord7Offset = float2( 0.50f, -0.75f);
+static const float2 Coord8Offset = float2( 1.00f, -0.25f);
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {

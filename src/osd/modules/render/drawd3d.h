@@ -43,9 +43,11 @@ public:
 	surface *last_target;
 	texture *last_texture;
 
+	// real target dimension
 	int target_width;
 	int target_height;
 
+	// only used to identify/find the render target
 	int width;
 	int height;
 
@@ -66,12 +68,14 @@ public:
 	bool init(renderer *d3d, base *d3dintf, int width, int height, int prescale_x, int prescale_y);
 	int next_index(int index) { return ++index > 1 ? 0 : index; }
 
+	// real target dimension
 	int target_width;
 	int target_height;
 
 	int prescale_x;
 	int prescale_y;
 
+	// only used to identify/find the render target
 	int width;
 	int height;
 
