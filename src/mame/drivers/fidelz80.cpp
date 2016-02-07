@@ -10,7 +10,7 @@
       It sometimes does this on Voice Sensory Chess Challenger real hardware.
       It can also be heard on Advanced Voice Chess Challenger real hardware, but not the whole line:
       "I I am Fidelity's chess challenger", instead.
-    - correctly hook up VBRC speech so that the z80 is halted while words are being spoken
+    - VBRC card scanner
 
     Chess pieces are required, but theoretically blindfold chess is possible.
     Chessboard artwork is provided for boards with pressure/magnet sensors.
@@ -1327,21 +1327,16 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
 {
-	//printf("%X ",data);
-
-	// todo: HALT THE z80 here, and set up a callback to poll the s14001a BUSY line to resume z80
 	m_speech->data_w(space, 0, data & 0x3f);
 	m_speech->start_w(1);
 	m_speech->start_w(0);
-
-	//m_speech->start_w(BIT(data, 7));
 }
 
 static ADDRESS_MAP_START( vbrc_main_map, AS_PROGRAM, 8, fidelz80_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_MIRROR(0x1fff) AM_WRITE(vbrc_speech_w)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_WRITE(vbrc_speech_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vbrc_main_io, AS_IO, 8, fidelz80_state )
@@ -1408,13 +1403,13 @@ static INPUT_PORTS_START( vcc )
 	PORT_INCLUDE( vcc_base )
 
 	PORT_START("IN.4") // PCB jumpers, not consumer accessible
-	PORT_CONFNAME( 0x01, 0x00, "Language: French" )
+	PORT_CONFNAME( 0x01, 0x00, "Language: German" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-	PORT_CONFNAME( 0x02, 0x00, "Language: Spanish" )
+	PORT_CONFNAME( 0x02, 0x00, "Language: French" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
-	PORT_CONFNAME( 0x04, 0x00, "Language: German" )
+	PORT_CONFNAME( 0x04, 0x00, "Language: Spanish" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
 	PORT_CONFNAME( 0x08, 0x00, "Language: Special" )
@@ -1426,27 +1421,27 @@ static INPUT_PORTS_START( vccfr )
 	PORT_INCLUDE( vcc )
 
 	PORT_MODIFY("IN.4")
-	PORT_CONFNAME( 0x01, 0x01, "Language: French" )
+	PORT_CONFNAME( 0x02, 0x02, "Language: French" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vccsp )
 	PORT_INCLUDE( vcc )
 
 	PORT_MODIFY("IN.4")
-	PORT_CONFNAME( 0x02, 0x02, "Language: Spanish" )
+	PORT_CONFNAME( 0x04, 0x04, "Language: Spanish" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vccg )
 	PORT_INCLUDE( vcc )
 
 	PORT_MODIFY("IN.4")
-	PORT_CONFNAME( 0x04, 0x04, "Language: German" )
+	PORT_CONFNAME( 0x01, 0x01, "Language: German" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1766,6 +1761,7 @@ static MACHINE_CONFIG_START( vbrc, fidelz80_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
+	MCFG_S14001A_BSY_HANDLER(INPUTLINE("maincpu", Z80_INPUT_LINE_WAIT))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 

@@ -351,10 +351,38 @@ Language Tutor modules:
     - English(4/4): VSM: 16KB CD3529
 
 
+Other manufacturers:
+
+Tiger Electronics K28 (model 7-232) Sold in Hong Kong, distributed in US as:
+- Coleco: Talking Teacher
+- Sears: Talkatron - Learning Computer
+
+Earlier K28 models 7-230 and 7-231 are on different hardware, showing a different
+keyboard, VFD display, and use the SC-01 speech chip.
+
+    K28 model 7-232 (HK), 1985
+    - MCU: TMS1400 MP7324
+    - TMS51xx: TMS5110A
+    - VSM: 16KB CM62084
+    - LCD: unknown 8*16-seg
+
+K28 modules:
+
+    - Spelling I: VSM: 16KB CM62086
+    - Spelling II: VSM: 16KB CM62085?
+    - Spelling III: VSM: 16KB CM62087
+    - Expansion Module 1: VSM: 16KB CM62214? - assumed same VSM as CM62086
+    - Expansion Module 2: VSM: 16KB CM62216 - assumed same VSM as the one in Spelling II
+    - Expansion Module 3: VSM: 16KB CM62215 - same VSM as CM62087
+    - Expansion Module 4: VSM: 16KB CM62217
+    - Expansion Module 5: VSM: 16KB CM62218*
+    - Expansion Module 6: VSM: 16KB CM62219
+
 ----------------------------------------------------------------------------
 
   TODO:
   - why doesn't lantutor work?
+  - identify and emulate k28 LCD
   - emulate other known devices
 
 
@@ -368,6 +396,7 @@ Language Tutor modules:
 #include "softlist.h"
 
 // internal artwork
+#include "k28.lh"
 #include "lantutor.lh"
 #include "snmath.lh"
 #include "snspell.lh"
@@ -411,6 +440,11 @@ public:
 	DECLARE_WRITE16_MEMBER(snspellc_write_o);
 	DECLARE_WRITE16_MEMBER(snspellc_write_r);
 	DECLARE_READ8_MEMBER(tntell_read_k);
+
+	void k28_prepare_display(UINT8 old, UINT8 data);
+	DECLARE_READ8_MEMBER(k28_read_k);
+	DECLARE_WRITE16_MEMBER(k28_write_o);
+	DECLARE_WRITE16_MEMBER(k28_write_r);
 
 	// cartridge
 	UINT32 m_cart_max_size;
@@ -631,6 +665,46 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 }
 
 
+// k28 specific
+
+void tispeak_state::k28_prepare_display(UINT8 old, UINT8 data)
+{
+	// ?
+}
+
+WRITE16_MEMBER(tispeak_state::k28_write_r)
+{
+	// R1234: TMS5100 CTL8421
+	m_tms5100->ctl_w(space, 0, BITSWAP8(data,0,0,0,0,1,2,3,4) & 0xf);
+
+	// R0: TMS5100 PDC pin
+	m_tms5100->pdc_w(data & 1);
+	
+	// R5: input mux high bit
+	m_inp_mux = (m_inp_mux & 0xff) | (data << 3 & 0x100);
+
+	// R6: power-off request, on falling edge
+	if ((m_r >> 6 & 1) && !(data >> 6 & 1))
+		power_off();
+
+	// R7-R10: LCD data
+	k28_prepare_display(m_r >> 7 & 0xf, data >> 7 & 0xf);
+	m_r = data;
+}
+
+WRITE16_MEMBER(tispeak_state::k28_write_o)
+{
+	// O0-O7: input mux low
+	m_inp_mux = (m_inp_mux & ~0xff) | data;
+}
+
+READ8_MEMBER(tispeak_state::k28_read_k)
+{
+	// K: TMS5100 CTL, multiplexed inputs
+	return m_tms5100->ctl_r(space, 0) | read_inputs(9);
+}
+
+
 
 /***************************************************************************
 
@@ -799,7 +873,7 @@ static INPUT_PORTS_START( snmath )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE) // /
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Mix It")
 
 	PORT_START("IN.6") // R6
@@ -1031,6 +1105,63 @@ static INPUT_PORTS_START( tntell )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( k28 )
+	PORT_START("IN.0") // O0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") // -> auto_power_off
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('A') PORT_NAME("A/1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('J') PORT_NAME("J/0")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
+
+	PORT_START("IN.1") // O1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('B') PORT_NAME("B/2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('K') PORT_NAME("K/+")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
+
+	PORT_START("IN.2") // O2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Repeat")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR('C') PORT_NAME("C/3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR('L') PORT_NAME("L/-")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
+
+	PORT_START("IN.3") // O3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Prompt")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('D') PORT_NAME("D/4")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('M') PORT_NAME("M/" UTF8_MULTIPLY)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
+
+	PORT_START("IN.4") // O4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("Menu")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('E') PORT_NAME("E/5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR('N') PORT_NAME("N/" UTF8_DIVIDE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+
+	PORT_START("IN.5") // O5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) PORT_NAME("Module")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('F') PORT_NAME("F/6")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+
+	PORT_START("IN.6") // O6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Select")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('G') PORT_NAME("G/7")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
+
+	PORT_START("IN.7") // O7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Clear")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('H') PORT_NAME("H/8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
+
+	PORT_START("IN.8") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('I') PORT_NAME("I/9")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
+INPUT_PORTS_END
+
+
 
 /***************************************************************************
 
@@ -1207,6 +1338,33 @@ static MACHINE_CONFIG_DERIVED( tntell, vocaid )
 	MCFG_GENERIC_LOAD(tispeak_state, tispeak_cartridge)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "tntell")
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_START( k28, tispeak_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1400, MASTER_CLOCK/2)
+	MCFG_TMS1XXX_READ_K_CB(READ8(tispeak_state, k28_read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, k28_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, k28_write_r))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_k28)
+
+	/* sound hardware */
+	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("tms5100", TMS5110A, MASTER_CLOCK)
+	MCFG_FRAGMENT_ADD(tms5110_route)
+
+	/* cartridge */
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "k28")
+	MCFG_GENERIC_EXTENSIONS("vsm")
+	MCFG_GENERIC_LOAD(tispeak_state, tispeak_cartridge)
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "k28")
 MACHINE_CONFIG_END
 
 
@@ -1551,6 +1709,20 @@ ROM_START( vocaid )
 ROM_END
 
 
+ROM_START( k28 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp7324", 0x0000, 0x1000, CRC(08d15ab6) SHA1(5b0f6c53e6732a362c4bb25d966d4072fdd33db8) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_k28_output.pla", 0, 557, CRC(3a5c7005) SHA1(3fe5819c138a90e7fc12817415f2622ca81b40b2) )
+
+	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff? = space reserved for cartridge
+	ROM_LOAD( "cm62084.vsm", 0x0000, 0x4000, CRC(cd1376f7) SHA1(96fa484c392c451599bc083b8376cad9c998df7d) )
+ROM_END
+
+
 
 /*    YEAR  NAME        PARENT COMPAT MACHINE      INPUT       INIT                     COMPANY, FULLNAME, FLAGS */
 COMP( 1979, snspell,    0,        0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1979 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
@@ -1581,3 +1753,5 @@ COMP( 1981, tntelluk,   tntell,   0, tntell,       tntell,     tispeak_state, tn
 COMP( 1981, tntellfr,   tntell,   0, tntell,       tntell,     tispeak_state, tntell,   "Texas Instruments", "Le Livre Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK )
 
 COMP( 1982, vocaid,     0,        0, vocaid,       tntell,     driver_device, 0,        "Texas Instruments", "Vocaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+
+COMP( 1985, k28,        0,        0, k28,          k28,        tispeak_state, snspell,  "Tiger Electronics", "K28: Talking Learning Computer (model 7-232)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
