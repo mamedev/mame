@@ -29,9 +29,19 @@ namespace bx
 		return _rad * 180.0f / pi;
 	}
 
+	inline float ffloor(float _f)
+	{
+		return floorf(_f);
+	}
+
+	inline float fceil(float _f)
+	{
+		return ceilf(_f);
+	}
+
 	inline float fround(float _f)
 	{
-		return floorf(_f + 0.5f);
+		return ffloor(_f + 0.5f);
 	}
 
 	inline float fmin(float _a, float _b)
@@ -705,14 +715,14 @@ namespace bx
 		mtxProjRh(_result, _fovy, _aspect, _near, _far, _oglNdc);
 	}
 
-	inline void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f)
+	inline void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
 	{
 		const float aa = 2.0f/(_right - _left);
 		const float bb = 2.0f/(_top - _bottom);
-		const float cc = 1.0f/(_far - _near);
+		const float cc = (_oglNdc ? 2.0f : 1.0f) / (_far - _near);
 		const float dd = (_left + _right)/(_left - _right);
 		const float ee = (_top + _bottom)/(_bottom - _top);
-		const float ff = _near / (_near - _far);
+		const float ff = _oglNdc ? (_near + _far)/(_near - _far) : _near/(_near - _far);
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = aa;
