@@ -327,21 +327,21 @@ some other components. It will be documented at a later date.
     Game status:
         ppp2nd              POST: "DIP SWITCH ERROR", "NO SECURITY ERROR"
         boxingm             Goes to attract mode when ran with memory card check. Coins up.
-        code1d,b            Inf loop on blue screen (writes to I2C before)
-        gticlub2            Inf loop on blue screen (writes to I2C before)
+        code1d,b            RTC self check bad
+        gticlub2            Attract mode works. Coins up. Hangs in car selection.
         gticlub2ea          Doesn't boot: bad CHD?
         jpark3              POST?: Shows "Now loading..." then black screen (sets global timer 1 on EPIC...)
-        mocapglf            Inf loop on blue screen (writes to I2C before)
-        mocapb,j            POST: U13 bad
-        p911,e,j,uc,kc      POST: U13 bad
-        p9112               POST: U13 bad
+        mocapglf            Security code error
+        mocapb,j            Crash after self checks
+        p911,e,j,uc,kc      "Distribution error"
+        p9112               RTC self check bad
         popn9               Doesn't boot: bad CHD?
-        sscopex/sogeki      Inf loop on blue screen
+        sscopex/sogeki      Security code error
         thrild2,a           Attract mode with partial graphics. Coins up. Hangs in car selection screen.
         thrild2c            Inf loop on blue screen
         tsurugi             Goes to attract mode when ran with memory card check. Coins up.
         tsurugij            No NVRAM
-        wcombat             Hangs on blue screen
+        wcombat             Stuck on network check
         xtrial              Attract mode. Hangs.
         mfightc,c           Passes POST. Waits for network connection from main unit? Spams writes to 0xffe08000 (8-bit)
 */
@@ -355,7 +355,7 @@ some other components. It will be documented at a later date.
 #include "video/voodoo.h"
 
 #define VIPER_DEBUG_LOG
-#define VIPER_DEBUG_EPIC_INTS       1
+#define VIPER_DEBUG_EPIC_INTS       0
 #define VIPER_DEBUG_EPIC_TIMERS     0
 #define VIPER_DEBUG_EPIC_REGS       0
 #define VIPER_DEBUG_EPIC_I2C        0
@@ -363,7 +363,6 @@ some other components. It will be documented at a later date.
 
 #define SDRAM_CLOCK         166666666       // Main SDRAMs run at 166MHz
 
-static UINT32 *workram;
 
 
 static emu_timer *ds2430_timer;
@@ -377,7 +376,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ata(*this, "ata"),
-		m_voodoo(*this, "voodoo")
+		m_voodoo(*this, "voodoo"),
+		m_workram(*this, "workram")
 	{
 	}
 
@@ -430,6 +430,9 @@ public:
 	INTERRUPT_GEN_MEMBER(viper_vblank);
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
+#if VIPER_DEBUG_EPIC_REGS
+	const char* epic_get_register_name(UINT32 reg);
+#endif
 	void epic_update_interrupts();
 	void mpc8240_interrupt(int irq);
 	void mpc8240_epic_init();
@@ -439,6 +442,7 @@ public:
 	required_device<ppc_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
 	required_device<voodoo_3_device> m_voodoo;
+	required_shared_ptr<UINT64> m_workram;
 };
 
 UINT32 viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -624,7 +628,7 @@ struct MPC8240_EPIC
 static MPC8240_EPIC epic;
 
 #if VIPER_DEBUG_EPIC_REGS
-const viper_state::char* epic_get_register_name(UINT32 reg)
+const char* viper_state::epic_get_register_name(UINT32 reg)
 {
 	switch (reg >> 16)
 	{
@@ -866,7 +870,9 @@ READ32_MEMBER(viper_state::epic_r)
 					{
 						if (epic.i2c_state == I2C_STATE_ADDRESS_CYCLE)
 						{
+#if VIPER_DEBUG_EPIC_I2C
 							printf("I2C address cycle read\n");
+#endif
 
 							epic.i2c_state = I2C_STATE_DATA_TRANSFER;
 
@@ -876,7 +882,9 @@ READ32_MEMBER(viper_state::epic_r)
 							// generate interrupt if interrupt are enabled
 							if (epic.i2c_cr & 0x40)
 							{
+#if VIPER_DEBUG_EPIC_I2C
 								printf("I2C interrupt\n");
+#endif
 								mpc8240_interrupt(MPC8240_I2C_IRQ);
 
 								// set interrupt flag in status register
@@ -885,7 +893,9 @@ READ32_MEMBER(viper_state::epic_r)
 						}
 						else if (epic.i2c_state == I2C_STATE_DATA_TRANSFER)
 						{
+#if VIPER_DEBUG_EPIC_I2C
 							printf("I2C data read\n");
+#endif
 
 							epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
 
@@ -967,7 +977,7 @@ READ32_MEMBER(viper_state::epic_r)
 					ret |= epic.irq[MPC8240_I2C_IRQ].priority << 16;
 					ret |= epic.irq[MPC8240_I2C_IRQ].vector;
 					ret |= epic.irq[MPC8240_I2C_IRQ].active ? 0x40000000 : 0;
-					return ret;
+					break;
 				}
 			}
 			break;
@@ -1756,7 +1766,7 @@ READ64_MEMBER(viper_state::unk1_r)
 		reg |= (unk1_bit << 5);
 		reg |= 0x40;        // if this bit is 0, loads a disk copier instead
 		//r |= 0x04;    // screen flip
-		//reg |= 0x08;      // memory card check (1 = enable)
+		reg |= 0x08;      // memory card check (1 = enable)
 
 		r |= reg << 40;
 
@@ -1852,8 +1862,8 @@ void viper_state::DS2430_w(int bit)
 
 		case DS2430_STATE_READ_MEM:
 		{
+			unk1_bit = (ds2430_rom[(ds2430_data_count/8)] >> (ds2430_data_count%8)) & 1;
 			ds2430_data_count++;
-			unk1_bit = rand () & 1;
 			printf("DS2430_w: read mem %d, bit = %d\n", ds2430_data_count, unk1_bit);
 
 			if (ds2430_data_count >= 256)
@@ -2045,7 +2055,7 @@ WRITE64_MEMBER(viper_state::unk_serial_w)
 /*****************************************************************************/
 
 static ADDRESS_MAP_START(viper_map, AS_PROGRAM, 64, viper_state )
-	AM_RANGE(0x00000000, 0x00ffffff) AM_MIRROR(0x1000000) AM_RAM
+	AM_RANGE(0x00000000, 0x00ffffff) AM_MIRROR(0x1000000) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0x80000000, 0x800fffff) AM_READWRITE32(epic_r, epic_w,U64(0xffffffffffffffff))
 	AM_RANGE(0x82000000, 0x83ffffff) AM_READWRITE(voodoo3_r, voodoo3_w)
 	AM_RANGE(0x84000000, 0x85ffffff) AM_READWRITE(voodoo3_lfb_r, voodoo3_lfb_w)
@@ -2144,7 +2154,7 @@ void viper_state::machine_start()
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x00ffffff, FALSE, workram);
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x00ffffff, FALSE, m_workram);
 
 	ds2430_rom = (UINT8*)memregion("ds2430")->base();
 }
