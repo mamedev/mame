@@ -479,21 +479,21 @@ void ui_menu_colors_ui::handle()
 void ui_menu_colors_ui::populate()
 {
 	item_append("Normal text", nullptr, 0, (void *)(FPTR)MUI_TEXT_COLOR);
-	item_append("Selected m_color", nullptr, 0, (void *)(FPTR)MUI_SELECTED_COLOR);
+	item_append("Selected color", nullptr, 0, (void *)(FPTR)MUI_SELECTED_COLOR);
 	item_append("Normal text background", nullptr, 0, (void *)(FPTR)MUI_TEXT_BG_COLOR);
-	item_append("Selected background m_color", nullptr, 0, (void *)(FPTR)MUI_SELECTED_BG_COLOR);
-	item_append("Subitem m_color", nullptr, 0, (void *)(FPTR)MUI_SUBITEM_COLOR);
+	item_append("Selected background color", nullptr, 0, (void *)(FPTR)MUI_SELECTED_BG_COLOR);
+	item_append("Subitem color", nullptr, 0, (void *)(FPTR)MUI_SUBITEM_COLOR);
 	item_append("Clone", nullptr, 0, (void *)(FPTR)MUI_CLONE_COLOR);
 	item_append("Border", nullptr, 0, (void *)(FPTR)MUI_BORDER_COLOR);
 	item_append("Background", nullptr, 0, (void *)(FPTR)MUI_BACKGROUND_COLOR);
 	item_append("Dipswitch", nullptr, 0, (void *)(FPTR)MUI_DIPSW_COLOR);
-	item_append("Unavailable m_color", nullptr, 0, (void *)(FPTR)MUI_UNAVAILABLE_COLOR);
-	item_append("Slider m_color", nullptr, 0, (void *)(FPTR)MUI_SLIDER_COLOR);
+	item_append("Unavailable color", nullptr, 0, (void *)(FPTR)MUI_UNAVAILABLE_COLOR);
+	item_append("Slider color", nullptr, 0, (void *)(FPTR)MUI_SLIDER_COLOR);
 	item_append("Gfx viewer background", nullptr, 0, (void *)(FPTR)MUI_GFXVIEWER_BG_COLOR);
-	item_append("Mouse over m_color", nullptr, 0, (void *)(FPTR)MUI_MOUSEOVER_COLOR);
-	item_append("Mouse over background m_color", nullptr, 0, (void *)(FPTR)MUI_MOUSEOVER_BG_COLOR);
-	item_append("Mouse down m_color", nullptr, 0, (void *)(FPTR)MUI_MOUSEDOWN_COLOR);
-	item_append("Mouse down background m_color", nullptr, 0, (void *)(FPTR)MUI_MOUSEDOWN_BG_COLOR);
+	item_append("Mouse over color", nullptr, 0, (void *)(FPTR)MUI_MOUSEOVER_COLOR);
+	item_append("Mouse over background color", nullptr, 0, (void *)(FPTR)MUI_MOUSEOVER_BG_COLOR);
+	item_append("Mouse down color", nullptr, 0, (void *)(FPTR)MUI_MOUSEDOWN_COLOR);
+	item_append("Mouse down background color", nullptr, 0, (void *)(FPTR)MUI_MOUSEDOWN_BG_COLOR);
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 	item_append("Restore originals colors", nullptr, 0, (void *)(FPTR)MUI_RESTORE);
@@ -540,7 +540,7 @@ void ui_menu_colors_ui::custom_render(void *selectedref, float top, float bottom
 	// bottom text
 	// get the text for 'UI Select'
 	std::string ui_select_text = machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD));
-	topbuf.assign("Double click or press ").append(ui_select_text.c_str()).append(" to change the m_color value");
+	topbuf.assign("Double click or press ").append(ui_select_text.c_str()).append(" to change the color value");
 
 	mui.draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
 	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
