@@ -62,10 +62,6 @@
     * Service coin 1 input grants two credits the first time it's
       pushed, but remembers this and won't grant credits again unless
       unless you trigger the tilt input
-    * Flyer suggests there should be an "old lady" sprite, which is not
-      present in our ROM dump
-    * Sprite ROM is likely double size, banking could be controlled by
-      one of the many unused CSOUND bits, the NEG2 bit, or even H128
     * Judging by the PLA program, the colour weight resistors are likely
       different to what Laser Battle/Lazarian uses - we need a detailed
       colour photo of the game board or a schematic to confirm values
@@ -703,12 +699,8 @@ ROM_START( catnmous )
 	ROM_LOAD( "type01.10g",   0x0800, 0x0800, CRC(e5259f9b) SHA1(396753291ab36c3ed72208d619665fc0f33d1e17) )
 	ROM_LOAD( "type01.11g",   0x1000, 0x0800, CRC(2999f378) SHA1(929082383b2b0006de171587adb932ce57316963) )
 
-	ROM_REGION( 0x0800, "gfx2", 0 )
-	// This needs double checking, might be a case of the wrong ROM type being marked on the PCB like with the final program rom.
-	// Flyers indicate there should be an 'old lady' character, and even show a graphic for one approaching from the right.
-	// This graphic is not present in our ROM and instead we get incorrect looking sprites, so the rom could be half size with
-	// an additional sprite bank bit coming from somewhere?
-	ROM_LOAD( "type01.14l",   0x0000, 0x0800, BAD_DUMP CRC(af79179a) SHA1(de61af7d02c93be326a33ee51572e3da7a25dab0) )
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "cat'n_mouse-type01-mem_n.14l.14l",   0x0000, 0x1000, CRC(83502383) SHA1(9561f87e1a6425bb9544e71340336db8d43c1fd9) )
 
 	ROM_REGION( 0x0100, "gfxmix", 0 )
 	ROM_LOAD( "82s100.13m",   0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) )
@@ -748,9 +740,8 @@ ROM_START( catnmousa )
 	ROM_LOAD( "catnmous.10g", 0x0800, 0x0800, CRC(e5259f9b) SHA1(396753291ab36c3ed72208d619665fc0f33d1e17) )
 	ROM_LOAD( "catnmous.11g", 0x1000, 0x0800, CRC(2999f378) SHA1(929082383b2b0006de171587adb932ce57316963) )
 
-	ROM_REGION( 0x0800, "gfx2", 0 )
-	// see comment in parent set
-	ROM_LOAD( "catnmous.14l", 0x0000, 0x0800, BAD_DUMP CRC(af79179a) SHA1(de61af7d02c93be326a33ee51572e3da7a25dab0) )
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "cat'n_mouse-type01-mem_n.14l.14l",   0x0000, 0x1000, CRC(83502383) SHA1(9561f87e1a6425bb9544e71340336db8d43c1fd9) )
 
 	ROM_REGION( 0x0100, "gfxmix", 0 )
 	// copied from parent set to give working graphics, need dump to confirm
