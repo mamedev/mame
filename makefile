@@ -1367,3 +1367,7 @@ cppcheck:
 	@echo Generate CppCheck analysis report
 	cppcheck --enable=all src/ $(CPPCHECK_PARAMS) -j9
 
+.PHONY: shaders
+
+shaders:
+	$(SILENT) $(MAKE) -C $(SRC)/osd/modules/render/bgfx rebuild
