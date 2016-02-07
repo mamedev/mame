@@ -173,14 +173,14 @@ int renderer_bgfx::create()
 
 	bgfx::winSetHwnd(window().m_hwnd);
 	bgfx::init();
-	bgfx::reset(rect_width(&client), rect_height(&client), BGFX_RESET_VSYNC);
+	bgfx::reset(rect_width(&client), rect_height(&client), BGFX_RESET_NONE);
 #else
 	osd_dim d = window().get_size();
 	m_blittimer = 3;
 
 	bgfx::sdlSetWindow(window().sdl_window());
 	bgfx::init();
-	bgfx::reset(d.width(), d.height(), BGFX_RESET_VSYNC);
+	bgfx::reset(d.width(), d.height(), BGFX_RESET_NONE);
 #endif
 
 	// Enable debug text.
@@ -768,7 +768,7 @@ int renderer_bgfx::draw(int update)
 	height = m_blit_dim.height();
 #endif
 	bgfx::setViewRect(0, 0, 0, width, height);
-	bgfx::reset(width, height, BGFX_RESET_VSYNC);
+	bgfx::reset(width, height, BGFX_RESET_NONE);
 	// Setup view transform.
 	{
 		float view[16];
