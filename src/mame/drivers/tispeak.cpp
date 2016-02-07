@@ -357,8 +357,8 @@ Tiger Electronics K28 (model 7-232) Sold in Hong Kong, distributed in US as:
 - Coleco: Talking Teacher
 - Sears: Talkatron - Learning Computer
 
-Earlier K28 models 7-230 and 7-231 are on different hardware, showing a different keyboard,
-VFD display, and presumed to use the SC-01 speech chip.
+Earlier K28 models 7-230 and 7-231 are on different hardware, showing a different
+keyboard, VFD display, and use the SC-01 speech chip.
 
     K28 model 7-232 (HK), 1985
     - MCU: TMS1400 MP7324
@@ -1718,7 +1718,7 @@ ROM_START( k28 )
 	ROM_REGION( 557, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1400_k28_output.pla", 0, 557, CRC(3a5c7005) SHA1(3fe5819c138a90e7fc12817415f2622ca81b40b2) )
 
-	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge?
+	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff? = space reserved for cartridge
 	ROM_LOAD( "cm62084.vsm", 0x0000, 0x4000, CRC(cd1376f7) SHA1(96fa484c392c451599bc083b8376cad9c998df7d) )
 ROM_END
 
