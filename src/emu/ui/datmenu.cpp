@@ -68,7 +68,7 @@ void ui_menu_command::handle()
 	if (m_event != nullptr && m_event->iptkey == IPT_UI_SELECT)
 	{
 		std::string m_title(item[selected].text);
-		ui_menu::stack_push(auto_alloc_clear(machine(), <ui_menu_command_content>(machine(), container, m_title, m_driver)));
+		ui_menu::stack_push(global_alloc_clear<ui_menu_command_content>(machine(), container, m_title, m_driver));
 	}
 }
 
@@ -141,11 +141,11 @@ void ui_menu_command_content::populate()
 	machine().pause();
 	std::string buffer;
 	machine().datfile().load_command_info(buffer, m_title);
+	float line_height = machine().ui().get_line_height();
+
 	if (!buffer.empty())
 	{
-		float line_height = machine().ui().get_line_height();
-		float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
-		float gutter_width = lr_arrow_width * 1.3f;
+		float gutter_width = 0.52f * line_height * machine().render().ui_aspect();
 		std::vector<int> xstart;
 		std::vector<int> xend;
 		int total_lines;
@@ -170,7 +170,7 @@ void ui_menu_command_content::populate()
 	}
 
 	machine().resume();
-	customtop = custombottom = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = custombottom = line_height + 3.0f * UI_BOX_TB_BORDER;
 }
 
 //-------------------------------------------------
@@ -287,11 +287,11 @@ void ui_menu_history_sw::populate()
 	machine().pause();
 	std::string buffer;
 	machine().datfile().load_software_info(m_list, buffer, m_short, m_parent);
+	float line_height = machine().ui().get_line_height();
+
 	if (!buffer.empty())
 	{
-		float line_height = machine().ui().get_line_height();
-		float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
-		float gutter_width = lr_arrow_width * 1.3f;
+		float gutter_width = 0.52f * line_height * machine().render().ui_aspect();
 		std::vector<int> xstart;
 		std::vector<int> xend;
 		int total_lines;
@@ -541,8 +541,7 @@ bool ui_menu_dats::get_data(const game_driver *driver, int flags)
 		return false;
 
 	float line_height = machine().ui().get_line_height();
-	float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
-	float gutter_width = lr_arrow_width * 1.3f;
+	float gutter_width = 0.52f * line_height * machine().render().ui_aspect();
 	std::vector<int> xstart;
 	std::vector<int> xend;
 	int tlines;
