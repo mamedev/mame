@@ -425,12 +425,12 @@ READ8_MEMBER(nightgal_state::royalqn_nsc_blit_r)
 
 TIMER_CALLBACK_MEMBER(nightgal_state::z80_wait_ack_cb)
 {
-	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, CLEAR_LINE);
 }
 
 void nightgal_state::z80_wait_assert_cb()
 {
-	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, ASSERT_LINE);
 	
 	// Note: cycles_to_attotime requires z80 context to work, calling for example m_subcpu as context gives a x4 cycle boost in z80 terms (reads execute_cycles_to_clocks() from NCS?) even if they runs at same speed basically.
 	// TODO: needs a getter that tells a given CPU how many cycles requires an executing opcode for the r/w operation, which stacks with wait state penalty for accessing this specific area.

@@ -19,6 +19,7 @@ enum
 	NSC800_RSTB,
 	NSC800_RSTC,
 	Z80_INPUT_LINE_WAIT,
+	Z80_INPUT_LINE_BOGUSWAIT, /* WAIT pin implementation used to be nonexistent, please remove this when all drivers are updated with Z80_INPUT_LINE_WAIT */
 	Z80_INPUT_LINE_BUSRQ
 };
 

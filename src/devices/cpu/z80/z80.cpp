@@ -10,6 +10,7 @@
  *    - If LD A,I or LD A,R is interrupted, P/V flag gets reset, even if IFF2
  *      was set before this instruction (implemented, but not enabled: we need
  *      document Z80 types first, see below)
+ *    - WAIT only stalls between instructions now, it should stall immediately.
  *    - Ideally, the tiny differences between Z80 types should be supported,
  *      currently known differences:
  *       - LD A,I/R P/V flag reset glitch is fixed on CMOS Z80
@@ -112,10 +113,6 @@
 #include "z80daisy.h"
 
 #define VERBOSE             0
-
-/* Debug purpose: set to 1 to test /WAIT pin behaviour.
- */
-#define STALLS_ON_WAIT_ASSERT 0
 
 /* On an NMOS Z80, if LD A,I or LD A,R is interrupted, P/V flag gets reset,
    even if IFF2 was set before this instruction. This issue was fixed on
@@ -3478,10 +3475,16 @@ void nsc800_device::device_reset()
 }
 
 /****************************************************************************
- * Execute 'cycles' T-states. Return number of T-states really executed
+ * Execute 'cycles' T-states.
  ****************************************************************************/
 void z80_device::execute_run()
 {
+	if (m_wait_state)
+	{
+		// stalled
+		m_icount = 0;
+		return;
+	}
 	
 	/* check for NMIs on the way in; they can only be set externally */
 	/* via timers, and can't be dynamically enabled, so it is safe */
@@ -3523,29 +3526,23 @@ void z80_device::execute_run()
 		PRVPC = PCD;
 		debugger_instruction_hook(this, PCD);
 		m_r++;
-#if STALLS_ON_WAIT_ASSERT
-		static int test_cycles;
-		
-		if(m_wait_state == ASSERT_LINE)
-		{
-			m_icount --;
-			test_cycles ++;
-		}
-		else
-		{
-			if(test_cycles != 0)
-				printf("stalls for %d z80 cycles\n",test_cycles);
-			test_cycles = 0;
-			EXEC(op,rop());
-		}
-#else
 		EXEC(op,rop());
-#endif
+
+		if (m_wait_state)
+			m_icount = 0;
+
 	} while (m_icount > 0);
 }
 
 void nsc800_device::execute_run()
 {
+	if (m_wait_state)
+	{
+		// stalled
+		m_icount = 0;
+		return;
+	}
+
 	/* check for NMIs on the way in; they can only be set externally */
 	/* via timers, and can't be dynamically enabled, so it is safe */
 	/* to just check here */
@@ -3579,6 +3576,10 @@ void nsc800_device::execute_run()
 		debugger_instruction_hook(this, PCD);
 		m_r++;
 		EXEC(op,rop());
+		
+		if (m_wait_state)
+			m_icount = 0;
+
 	} while (m_icount > 0);
 }
 
@@ -3609,6 +3610,9 @@ void z80_device::execute_set_input(int inputnum, int state)
 	case Z80_INPUT_LINE_WAIT:
 		m_wait_state = state;
 		break;
+	
+	default:
+		break;
 	}
 }
 
@@ -3616,17 +3620,6 @@ void nsc800_device::execute_set_input(int inputnum, int state)
 {
 	switch (inputnum)
 	{
-	case Z80_INPUT_LINE_BUSRQ:
-		m_busrq_state = state;
-		break;
-
-	case INPUT_LINE_NMI:
-		/* mark an NMI pending on the rising edge */
-		if (m_nmi_state == CLEAR_LINE && state != CLEAR_LINE)
-			m_nmi_pending = TRUE;
-		m_nmi_state = state;
-		break;
-
 	case NSC800_RSTA:
 		m_nsc800_irq_state[NSC800_RSTA] = state;
 		break;
@@ -3639,17 +3632,8 @@ void nsc800_device::execute_set_input(int inputnum, int state)
 		m_nsc800_irq_state[NSC800_RSTC] = state;
 		break;
 
-	case INPUT_LINE_IRQ0:
-		/* update the IRQ state via the daisy chain */
-		m_irq_state = state;
-		if (m_daisy.present())
-			m_irq_state = m_daisy.update_irq_state();
-
-		/* the main execute loop will take the interrupt */
-		break;
-
-	case Z80_INPUT_LINE_WAIT:
-		m_wait_state = state;
+	default:
+		z80_device::execute_set_input(inputnum, state);
 		break;
 	}
 }
