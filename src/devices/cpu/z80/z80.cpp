@@ -3510,15 +3510,15 @@ void nsc800_device::device_reset()
  ****************************************************************************/
 void z80_device::execute_run()
 {
-	if (m_wait_state)
-	{
-		// stalled
-		m_icount = 0;
-		return;
-	}
-	
 	do
 	{
+		if (m_wait_state)
+		{
+			// stalled
+			m_icount = 0;
+			return;
+		}
+
 		// check for interrupts before each instruction
 		if (m_nmi_pending)
 			take_nmi();
@@ -3532,24 +3532,20 @@ void z80_device::execute_run()
 		debugger_instruction_hook(this, PCD);
 		m_r++;
 		EXEC(op,rop());
-
-		if (m_wait_state)
-			m_icount = 0;
-
 	} while (m_icount > 0);
 }
 
 void nsc800_device::execute_run()
 {
-	if (m_wait_state)
-	{
-		// stalled
-		m_icount = 0;
-		return;
-	}
-
 	do
 	{
+		if (m_wait_state)
+		{
+			// stalled
+			m_icount = 0;
+			return;
+		}
+
 		// check for interrupts before each instruction
 		if (m_nmi_pending)
 			take_nmi();
@@ -3565,10 +3561,6 @@ void nsc800_device::execute_run()
 		debugger_instruction_hook(this, PCD);
 		m_r++;
 		EXEC(op,rop());
-		
-		if (m_wait_state)
-			m_icount = 0;
-
 	} while (m_icount > 0);
 }
 
@@ -3745,10 +3737,3 @@ nsc800_device::nsc800_device(const machine_config &mconfig, const char *tag, dev
 }
 
 const device_type NSC800 = &device_creator<nsc800_device>;
-
-
-
-WRITE_LINE_MEMBER( z80_device::irq_line )
-{
-	set_input_line( INPUT_LINE_IRQ0, state );
-}
