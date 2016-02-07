@@ -586,15 +586,6 @@ uint32_t u32Color(uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a = 255)
 		;
 }
 
-static UINT32 getABGR(UINT32 ARGB) {
-	return
-		((ARGB >> 24) << 24) |          // Alpha
-		((ARGB >> 16) & 0xFF) |         // Red  -> Blue
-		((ARGB >> 8) & 0xFF) << 8 |     // Green
-		((ARGB)& 0xFF) << 16;           // Blue -> Red
-}
-
-
 //============================================================
 //  copyline_palette16
 //============================================================
@@ -602,7 +593,7 @@ static UINT32 getABGR(UINT32 ARGB) {
 static inline void copyline_palette16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette)
 {
 	for (int x = 0; x < width; x++)
-		*dst++ = 0xff000000 | getABGR(palette[*src++]);
+		*dst++ = 0xff000000 | palette[*src++];
 }
 
 
@@ -613,7 +604,7 @@ static inline void copyline_palette16(UINT32 *dst, const UINT16 *src, int width,
 static inline void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette)
 {
 	for (int x = 0; x < width; x++)
-		*dst++ = getABGR(palette[*src++]);
+		*dst++ = palette[*src++];
 }
 
 
@@ -631,7 +622,7 @@ static inline void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, con
 		for (x = 0; x < width; x++)
 		{
 			rgb_t srcpix = *src++;
-			*dst++ = 0xff000000 | palette[0x200 + srcpix.b()] | palette[0x100 + srcpix.g()] | palette[srcpix.r()];
+			*dst++ = 0xff000000 | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
 		}
 	}
 
@@ -639,7 +630,7 @@ static inline void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, con
 	else
 	{
 		for (x = 0; x < width; x++)
-			*dst++ = getABGR(0xff000000 | *src++);
+			*dst++ = 0xff000000 | *src++;
 	}
 }
 
@@ -657,7 +648,7 @@ static inline void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, co
 		for (x = 0; x < width; x++)
 		{
 			rgb_t srcpix = *src++;
-			*dst++ = (srcpix & 0xff000000) | palette[0x200 + srcpix.b()] | palette[0x100 + srcpix.g()] | palette[srcpix.r()];
+			*dst++ = (srcpix & 0xff000000) | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
 		}
 	}
 
@@ -665,7 +656,7 @@ static inline void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, co
 	else
 	{
 		for (x = 0; x < width; x++)
-			*dst++ = getABGR(*src++);
+			*dst++ = *src++;
 	}
 }
 
@@ -707,7 +698,7 @@ static inline UINT32 ycc_to_rgb(UINT8 y, UINT8 cb, UINT8 cr)
 	if (b < 0) b = 0;
 	else if (b > 255) b = 255;
 
-	return rgb_t(0xff, b, g, r);
+	return rgb_t(0xff, r, g, b);
 }
 
 //============================================================
@@ -870,7 +861,7 @@ int renderer_bgfx::draw(int update)
 						m_texture = bgfx::createTexture2D((uint16_t)prim->texture.width
 							, (uint16_t)prim->texture.height
 							, 1
-							, bgfx::TextureFormat::RGBA8
+							, bgfx::TextureFormat::BGRA8
 							, 0
 							, mem
 							);
@@ -886,7 +877,7 @@ int renderer_bgfx::draw(int update)
 						m_texture = bgfx::createTexture2D((uint16_t)prim->texture.width
 							, (uint16_t)prim->texture.height
 							, 1
-							, bgfx::TextureFormat::RGBA8
+							, bgfx::TextureFormat::BGRA8
 							, 0
 							, mem
 							);
@@ -915,7 +906,7 @@ int renderer_bgfx::draw(int update)
 						m_texture = bgfx::createTexture2D((uint16_t)prim->texture.width
 							, (uint16_t)prim->texture.height
 							, 1
-							, bgfx::TextureFormat::RGBA8
+							, bgfx::TextureFormat::BGRA8
 							, 0
 							, mem
 							);
