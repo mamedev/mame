@@ -184,7 +184,7 @@ int renderer_bgfx::create()
 #endif
 
 	// Enable debug text.
-	bgfx::setDebug(BGFX_DEBUG_STATS); //BGFX_DEBUG_STATS
+	bgfx::setDebug(BGFX_DEBUG_TEXT); //BGFX_DEBUG_STATS
 	// Create program from shaders.
 	m_progQuad = loadProgram("vs_quad", "fs_quad");
 	m_progQuadTexture = loadProgram("vs_quad_texture", "fs_quad_texture");
