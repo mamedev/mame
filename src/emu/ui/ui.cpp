@@ -286,6 +286,8 @@ void ui_manager::init()
 	m_popup_text_end = 0;
 	m_use_natural_keyboard = false;
 	m_mouse_arrow_texture = nullptr;
+	m_show_timecode_counter = false;
+	m_show_timecode_total = false;
 	m_load_save_hold = false;
 
 	get_font_rows(&machine());
@@ -1035,6 +1037,16 @@ bool ui_manager::is_menu_active(void)
 }
 
 
+bool ui_manager::show_timecode_counter()
+{
+	return m_show_timecode_counter;
+}
+bool ui_manager::show_timecode_total()
+{
+	return m_show_timecode_total;
+}
+
+
 
 /***************************************************************************
     TEXT GENERATORS
@@ -1558,6 +1570,20 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 		machine.ui().draw_text_full(container, machine.video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, nullptr, nullptr);
 	}
+
+	// Show the duration of current part (intro or gameplay or extra)
+	if (machine.ui().show_timecode_counter()) {
+		std::string tempstring;
+		machine.ui().draw_text_full(container, machine.video().timecode_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
+			JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, rgb_t(0xf0,0xf0,0x10,0x10), ARGB_BLACK, NULL, NULL);
+	}
+	// Show the total time elapsed for the video preview (all parts intro, gameplay, extras)
+	if (machine.ui().show_timecode_total()) {
+		std::string tempstring;
+		machine.ui().draw_text_full(container, machine.video().timecode_total_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
+			JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, rgb_t(0xf0,0x10,0xf0,0x10), ARGB_BLACK, NULL, NULL);
+	}
+
 
 	// draw the profiler if visible
 	if (machine.ui().show_profiler())
