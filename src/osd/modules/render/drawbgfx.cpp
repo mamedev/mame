@@ -887,29 +887,40 @@ int renderer_bgfx::draw(int update)
 					alpha = true;
 				case PRIMFLAG_TEXFORMAT(TEXFORMAT_RGB32):
 					{
-						auto mem = bgfx::alloc(prim->texture.width*prim->texture.height * 4);
-						if (alpha)
+						if (prim->texture.rowpixels!=prim->texture.width)
 						{
-							for (int y = 0; y < prim->texture.height; y++)
+							auto mem = bgfx::alloc(prim->texture.width*prim->texture.height * 4);
+							if (alpha)
 							{
-								copyline_argb32((UINT32*)mem->data + y*prim->texture.width, (UINT32*)prim->texture.base + y*prim->texture.rowpixels, prim->texture.width, prim->texture.palette);
+								for (int y = 0; y < prim->texture.height; y++)
+								{
+									copyline_argb32((UINT32*)mem->data + y*prim->texture.width, (UINT32*)prim->texture.base + y*prim->texture.rowpixels, prim->texture.width, prim->texture.palette);
+								}
 							}
-						}
-						else
-						{
-							for (int y = 0; y < prim->texture.height; y++)
+							else
 							{
-								copyline_rgb32((UINT32*)mem->data + y*prim->texture.width, (UINT32*)prim->texture.base + y*prim->texture.rowpixels, prim->texture.width, prim->texture.palette);
+								for (int y = 0; y < prim->texture.height; y++)
+								{
+									copyline_rgb32((UINT32*)mem->data + y*prim->texture.width, (UINT32*)prim->texture.base + y*prim->texture.rowpixels, prim->texture.width, prim->texture.palette);
+								}
 							}
-						}
 
-						m_texture = bgfx::createTexture2D((uint16_t)prim->texture.width
-							, (uint16_t)prim->texture.height
-							, 1
-							, bgfx::TextureFormat::BGRA8
-							, 0
-							, mem
-							);
+							m_texture = bgfx::createTexture2D((uint16_t)prim->texture.width
+								, (uint16_t)prim->texture.height
+								, 1
+								, bgfx::TextureFormat::BGRA8
+								, 0
+								, mem
+								);
+						} else {
+							m_texture = bgfx::createTexture2D((uint16_t)prim->texture.width
+								, (uint16_t)prim->texture.height
+								, 1
+								, bgfx::TextureFormat::BGRA8
+								, 0
+								, bgfx::copy(prim->texture.base, prim->texture.width*prim->texture.height*4)
+								);							
+						}
 					}
 					break;
 
