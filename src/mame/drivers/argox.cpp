@@ -7,6 +7,37 @@
 
   Skeleton driver by Felipe Correa da Silva Sanches <juca@members.fsf.org>
 
+  OVERALL HARDWARE DESCRIPTION:
+
+  There's a sticker labeled "V4.21"
+  The board is labeled "ARGOX INFORMATION 48.20401.002 DATE:2003/03/20 REV:4.2"
+
+  There's a soldered IC at U10 which is labeled "A511 093060006 55-20401-003 E" and "OK"
+  I guess it may be another flash ROM
+
+  External interfaces:
+  * RS232 serial interface
+  * Centronics port
+
+  Connectors:
+  * 4-pin labeled "PEELER" (unused)
+  * 4-pin labeled "RIBBON"
+  * 4-pin labeled "MEDIA"
+  * 4-pin labeled "MOTOR"
+  * 6-pin labeled "MOTOR" (unpopulated)
+  * 4-pin labeled "CUTTER" (unused)
+  * 18-pin unlabeled JP18 (with 4 unused pins) Connects to the printing subassembly
+  * 9-pin labeled "KEYPAD" (unpopulated)
+  * 6-pin labeled "LED/KEY" (connects to FEED button, POWER LED and READY LED)
+
+  Jumpers:
+  * set of 2 jumpers (JP1 and JP2) with a jumper inserted at JP2
+  * set of 6 unlabelled with jumpers inserted at position #0 and #3
+
+  DIP sockets:
+  * u8 and u9 hold the FLASH ROM chips
+  * U19 is an unpopulated DIP16 socket
+
 ***************************************************************************/
 
 #include "emu.h"
