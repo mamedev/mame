@@ -486,7 +486,7 @@ int i386_device::translate_address(int pl, int type, UINT32 *address, UINT32 *er
 	if(!(m_cr[0] & 0x80000000)) // Some (very few) old OS's won't work with this
 		return TRUE;
 
-	const vtlb_entry *table = vtlb_table(m_vtlb);
+	const vtlb_entry *table = vtlb_table();
 	UINT32 index = *address >> 12;
 	vtlb_entry entry = table[index];
 	if(type == TRANSLATE_FETCH)
@@ -506,7 +506,7 @@ int i386_device::translate_address(int pl, int type, UINT32 *address, UINT32 *er
 				*error |= 1;
 			return FALSE;
 		}
-		vtlb_dynload(m_vtlb, index, *address, entry);
+		vtlb_dynload(index, *address, entry);
 		return TRUE;
 	}
 	if(!(entry & (1 << type)))
