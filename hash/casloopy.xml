@@ -91,7 +91,7 @@
 		<year>1996</year>
 		<publisher>Casio</publisher>
 		<info name="serial" value="XK-504"/>
-	<info name="alt_name" value="ルーピータウンのおへやがほしい!"/>
+		<info name="alt_name" value="ルーピータウンのおへやがほしい!"/>
 		<part name="cart" interface="loopy_cart">
 			<dataarea name="rom" size="0x300000">
 				<rom name="CHIP1.IC104" size="0x200000" crc="bae71d45" sha1="79628715ccedd9bc3fd72d21fa9ea6513b88cf51" offset="0x000000" />
