@@ -152,7 +152,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 // Scanline, Shadowmask & Distortion Pixel Shader
 //-----------------------------------------------------------------------------
 
-uniform float HumBarHertzRate = 60.0f / 59.94f - 1.0f; // difference between the 59.94 Hz field rate and 60 Hz line frequency (NTSC)
+uniform float HumBarDesync = 60.0f / 59.94f - 1.0f; // difference between the 59.94 Hz field rate and 60 Hz line frequency (NTSC)
 uniform float HumBarAlpha = 0.0f;
 
 uniform float TimeMilliseconds = 0.0f;
@@ -464,21 +464,27 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		// Scanline Simulation (may not affect vector screen)
 		if (!PrepareVector && ScanlineAlpha > 0.0f)
 		{
-			float ScanCoord = BaseCoord.y * SourceDims.y * ScanlineScale * PI;
-			float ScanCoordJitter = ScanlineOffset * PHI;
-			float ScanSine = sin(ScanCoord + ScanCoordJitter);
-			float ScanSineScaled = pow(ScanSine * ScanSine, ScanlineHeight);
-			float ScanBrightness = ScanSineScaled * ScanlineBrightScale + 1.0f + ScanlineBrightOffset;
+			float BrightnessOffset = (ScanlineBrightOffset * ScanlineAlpha);
+			float BrightnessScale = (ScanlineBrightScale * ScanlineAlpha) + (1.0f - ScanlineAlpha);
 
-			BaseColor.rgb *= lerp(1.0f, ScanBrightness * 0.5f, ScanlineAlpha);
+			float ColorBrightness = 0.299f * BaseColor.r + 0.587f * BaseColor.g + 0.114 * BaseColor.b;
+
+			float ScanlineCoord = BaseCoord.y * SourceDims.y * ScanlineScale * PI;
+			float ScanlineCoordJitter = ScanlineOffset * PHI;
+			float ScanlineSine = sin(ScanlineCoord + ScanlineCoordJitter);
+			float ScanlineWide = ScanlineHeight + max(1.0f, ScanlineHeight) * (1.0f - ColorBrightness);
+			float ScanlineAmount = pow(ScanlineSine * ScanlineSine, ScanlineWide);
+			float ScanlineBrightness = ScanlineAmount * BrightnessScale + BrightnessOffset * BrightnessScale;
+
+			BaseColor.rgb *= lerp(1.0f, ScanlineBrightness, ScanlineAlpha);
 		}
 
 		// Hum Bar Simulation (may not affect vector screen)
 		if (!PrepareVector && HumBarAlpha > 0.0f)
 		{
-			float HumTimeStep = frac(TimeMilliseconds * HumBarHertzRate);
-			float HumBrightness = 1.0 - frac(BaseCoord.y / SourceRect.y + HumTimeStep) * HumBarAlpha;
-			BaseColor.rgb *= HumBrightness;
+			float HumBarStep = frac(TimeMilliseconds * HumBarDesync);
+			float HumBarBrightness = 1.0 - frac(BaseCoord.y / SourceRect.y + HumBarStep) * HumBarAlpha;
+			BaseColor.rgb *= HumBarBrightness;
 		}
 	}
 

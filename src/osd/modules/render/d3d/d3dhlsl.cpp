@@ -2375,25 +2375,25 @@ static INT32 slider_scanline_alpha(running_machine &machine, void *arg, std::str
 static INT32 slider_scanline_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
 	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->scanline_scale), 0.05f, "%2.2f", str, newval);
+	return slider_set(&(((hlsl_options*)arg)->scanline_scale), 0.01f, "%2.2f", str, newval);
 }
 
 static INT32 slider_scanline_height(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
 	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->scanline_height), 0.05f, "%2.2f", str, newval);
+	return slider_set(&(((hlsl_options*)arg)->scanline_height), 0.01f, "%2.2f", str, newval);
 }
 
 static INT32 slider_scanline_bright_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
 	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->scanline_bright_scale), 0.05f, "%2.2f", str, newval);
+	return slider_set(&(((hlsl_options*)arg)->scanline_bright_scale), 0.01f, "%2.2f", str, newval);
 }
 
 static INT32 slider_scanline_bright_offset(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
 	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->scanline_bright_offset), 0.05f, "%2.2f", str, newval);
+	return slider_set(&(((hlsl_options*)arg)->scanline_bright_offset), 0.01f, "%2.2f", str, newval);
 }
 
 static INT32 slider_scanline_jitter(running_machine &machine, void *arg, std::string *str, INT32 newval)
@@ -2879,10 +2879,10 @@ shaders::slider_desc shaders::s_sliders[] =
 	{ "Screen Reflection",                   0,     0,   100, 1, 7, slider_reflection },
 	{ "Image Vignetting",                    0,     0,   100, 1, 7, slider_vignetting },
 	{ "Scanline Darkness",                   0,     0,   100, 1, 5, slider_scanline_alpha },
-	{ "Scanline Screen Height",              1,    20,    80, 1, 5, slider_scanline_scale },
-	{ "Scanline Indiv. Height",              1,    20,    80, 1, 5, slider_scanline_height },
-	{ "Scanline Brightness",                 0,    20,    40, 1, 5, slider_scanline_bright_scale },
-	{ "Scanline Brightness Overdrive",       0,     0,    20, 1, 5, slider_scanline_bright_offset },
+	{ "Scanline Screen Scale",               0,   100,   400, 5, 5, slider_scanline_scale },
+	{ "Scanline Heigth",                     0,   100,   400, 5, 5, slider_scanline_height },
+	{ "Scanline Brightness",                 0,   100,   200, 1, 5, slider_scanline_bright_scale },
+	{ "Scanline Brightness Overdrive",       0,     0,   100, 1, 5, slider_scanline_bright_offset },
 	{ "Scanline Jitter",                     0,     0,   100, 1, 5, slider_scanline_jitter },
 	{ "Hum Bar Darkness",                    0,     0,   100, 1, 5, slider_hum_bar_alpha },
 	{ "Defocus X",                           0,     0,   100, 1, 7, slider_defocus_x },
