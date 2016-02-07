@@ -209,11 +209,11 @@ const device_type PPC405GP = &device_creator<ppc405gp_device>;
 
 ppc_device::ppc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int address_bits, int data_bits, powerpc_flavor flavor, UINT32 cap, UINT32 tb_divisor, address_map_constructor internal_map)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_BIG, data_bits, address_bits, 0, internal_map)
 	, c_bus_frequency(0)
 	, m_core(nullptr)
 	, m_bus_freq_multiplier(1)
-	, m_vtlb(nullptr)
 	, m_flavor(flavor)
 	, m_cap(cap)
 	, m_tb_divisor(tb_divisor)
@@ -224,6 +224,11 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 {
 	m_program_config.m_logaddr_width = 32;
 	m_program_config.m_page_shift = POWERPC_MIN_PAGE_SHIFT;
+
+	// configure the virtual TLB
+	set_vtlb_dynamic_entries(POWERPC_TLB_ENTRIES);
+	if (m_cap & PPCCAP_603_MMU)
+		set_vtlb_fixed_entries(PPC603_FIXED_TLB_ENTRIES);
 }
 
 //ppc403_device::ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -708,9 +713,6 @@ void ppc_device::device_start()
 	if (!(m_cap & PPCCAP_4XX) && space_config()->m_endianness != ENDIANNESS_NATIVE)
 		m_codexor = 4;
 
-	/* allocate the virtual TLB */
-	m_vtlb = vtlb_alloc(this, AS_PROGRAM, (m_cap & PPCCAP_603_MMU) ? PPC603_FIXED_TLB_ENTRIES : 0, POWERPC_TLB_ENTRIES);
-
 	/* allocate a timer for the compare interrupt */
 	if ((m_cap & PPCCAP_OEA) && (m_tb_divisor))
 		m_decrementer_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppc_device::decrementer_int_callback), this));
@@ -1148,9 +1150,6 @@ void ppc_device::state_string_export(const device_state_entry &entry, std::strin
 
 void ppc_device::device_stop()
 {
-	if (m_vtlb != nullptr)
-		vtlb_free(m_vtlb);
-	m_vtlb = nullptr;
 }
 
 
@@ -1199,12 +1198,11 @@ void ppc_device::device_reset()
 	m_core->irq_pending = 0;
 
 	/* flush the TLB */
-	vtlb_flush_dynamic(m_vtlb);
 	if (m_cap & PPCCAP_603_MMU)
 	{
 		for (int tlbindex = 0; tlbindex < PPC603_FIXED_TLB_ENTRIES; tlbindex++)
 		{
-			vtlb_load(m_vtlb, tlbindex, 0, 0, 0);
+			vtlb_load(tlbindex, 0, 0, 0);
 		}
 	}
 
@@ -1385,7 +1383,7 @@ UINT32 ppc_device::ppccom_translate_address_internal(int intention, offs_t &addr
 	/* if we're simulating the 603 MMU, fill in the data and stop here */
 	if (m_cap & PPCCAP_603_MMU)
 	{
-		UINT32 entry = vtlb_table(m_vtlb)[address >> 12];
+		UINT32 entry = vtlb_table()[address >> 12];
 		m_core->mmu603_cmp = 0x80000000 | ((segreg & 0xffffff) << 7) | (0 << 6) | ((address >> 22) & 0x3f);
 		m_core->mmu603_hash[0] = hashbase | ((hash << 6) & hashmask);
 		m_core->mmu603_hash[1] = hashbase | ((~hash << 6) & hashmask);
@@ -1465,7 +1463,7 @@ bool ppc_device::memory_translate(address_spacenum spacenum, int intention, offs
 
 void ppc_device::ppccom_tlb_fill()
 {
-	vtlb_fill(m_vtlb, m_core->param0, m_core->param1);
+	vtlb_fill(m_core->param0, m_core->param1);
 }
 
 
@@ -1476,7 +1474,7 @@ void ppc_device::ppccom_tlb_fill()
 
 void ppc_device::ppccom_tlb_flush()
 {
-	vtlb_flush_dynamic(m_vtlb);
+	vtlb_flush_dynamic();
 }
 
 
@@ -1492,7 +1490,7 @@ void ppc_device::ppccom_tlb_flush()
 
 void ppc_device::ppccom_execute_tlbie()
 {
-	vtlb_flush_address(m_vtlb, m_core->param0);
+	vtlb_flush_address(m_core->param0);
 }
 
 
@@ -1503,7 +1501,7 @@ void ppc_device::ppccom_execute_tlbie()
 
 void ppc_device::ppccom_execute_tlbia()
 {
-	vtlb_flush_dynamic(m_vtlb);
+	vtlb_flush_dynamic();
 }
 
 
@@ -1530,7 +1528,7 @@ void ppc_device::ppccom_execute_tlbl()
 		flags |= VTLB_FETCH_ALLOWED;
 
 	/* load the entry */
-	vtlb_load(m_vtlb, entrynum, 1, address, (m_core->spr[SPR603_RPA] & 0xfffff000) | flags);
+	vtlb_load(entrynum, 1, address, (m_core->spr[SPR603_RPA] & 0xfffff000) | flags);
 }
 
 

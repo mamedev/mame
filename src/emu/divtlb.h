@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    vtlb.h
+    divtlb.h
 
     Generic virtual TLB implementation.
 
@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef __VTLB_H__
-#define __VTLB_H__
+#ifndef __DIVTLB_H__
+#define __DIVTLB_H__
 
 
 
@@ -40,49 +40,50 @@
 typedef UINT32 vtlb_entry;
 
 
-/* opaque structure describing VTLB state */
-struct vtlb_state;
+// ======================> device_vtlb_interface
 
+class device_vtlb_interface : public device_interface
+{
+public:
+	// construction/destruction
+	device_vtlb_interface(const machine_config &mconfig, device_t &device, address_spacenum space);
+	virtual ~device_vtlb_interface();
 
+	// configuration helpers
+	void set_vtlb_dynamic_entries(int entries) { m_dynamic = entries; }
+	void set_vtlb_fixed_entries(int entries) { m_fixed = entries; }
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
+	// filling
+	int vtlb_fill(offs_t address, int intention);
+	void vtlb_load(int entrynum, int numpages, offs_t address, vtlb_entry value);
+	void vtlb_dynload(UINT32 index, offs_t address, vtlb_entry value);
 
+	// flushing
+	void vtlb_flush_dynamic();
+	void vtlb_flush_address(offs_t address);
 
-/* ----- initialization/teardown ----- */
+	// accessors
+	const vtlb_entry *vtlb_table() const;
 
-/* allocate a new VTLB for the given CPU */
-vtlb_state *vtlb_alloc(device_t *cpu, address_spacenum space, int fixed_entries, int dynamic_entries);
+protected:
+	// interface-level overrides
+	virtual void interface_validity_check(validity_checker &valid) const override;
+	virtual void interface_pre_start() override;
+	virtual void interface_post_start() override;
+	virtual void interface_pre_reset() override;
 
-/* free an allocated VTLB */
-void vtlb_free(vtlb_state *vtlb);
-
-
-/* ----- filling ----- */
-
-/* called by the CPU core in response to an unmapped access */
-int vtlb_fill(vtlb_state *vtlb, offs_t address, int intention);
-
-/* load a fixed VTLB entry */
-void vtlb_load(vtlb_state *vtlb, int entrynum, int numpages, offs_t address, vtlb_entry value);
-
-/* load a dynamic VTLB entry */
-void vtlb_dynload(vtlb_state *vtlb, UINT32 index, offs_t address, vtlb_entry value);
-
-/* ----- flushing ----- */
-
-/* flush all knowledge from the dynamic part of the VTLB */
-void vtlb_flush_dynamic(vtlb_state *vtlb);
-
-/* flush knowledge of a particular address from the VTLB */
-void vtlb_flush_address(vtlb_state *vtlb, offs_t address);
-
-
-/* ----- accessors ----- */
-
-/* return a pointer to the base of the linear VTLB lookup table */
-const vtlb_entry *vtlb_table(vtlb_state *vtlb);
+private:
+	// private state
+	address_spacenum    m_space;            // address space
+	int                 m_dynamic;          // number of dynamic entries
+	int                 m_fixed;            // number of fixed entries
+	int                 m_dynindex;         // index of next dynamic entry
+	int                 m_pageshift;        // bits to shift to get page index
+	int                 m_addrwidth;        // logical address bus width
+	std::vector<offs_t> m_live;             // array of live entries by table index
+	std::vector<int> m_fixedpages;          // number of pages each fixed entry covers
+	std::vector<vtlb_entry> m_table;        // table of entries by address
+};
 
 
 #endif /* __VTLB_H__ */

@@ -743,11 +743,11 @@ void ppc_device::static_generate_tlb_mismatch()
 	UML_HANDLE(block, *m_tlb_mismatch);                                            // handle  tlb_mismatch
 	UML_RECOVER(block, I0, MAPVAR_PC);                                                  // recover i0,PC
 	UML_SHR(block, I1, I0, 12);                                             // shr     i1,i0,12
-	UML_LOAD(block, I2, (void *)vtlb_table(m_vtlb), I1, SIZE_DWORD, SCALE_x4);   // load    i2,[vtlb],i1,dword
+	UML_LOAD(block, I2, (void *)vtlb_table(), I1, SIZE_DWORD, SCALE_x4);   // load    i2,[vtlb],i1,dword
 	UML_MOV(block, mem(&m_core->param0), I0);                                              // mov     [param0],i0
 	UML_MOV(block, mem(&m_core->param1), TRANSLATE_FETCH);                             // mov     [param1],TRANSLATE_FETCH
 	UML_CALLC(block, (c_function)cfunc_ppccom_tlb_fill, this);                                                 // callc   tlbfill,ppc
-	UML_LOAD(block, I1, (void *)vtlb_table(m_vtlb), I1, SIZE_DWORD, SCALE_x4);   // load    i1,[vtlb],i1,dword
+	UML_LOAD(block, I1, (void *)vtlb_table(), I1, SIZE_DWORD, SCALE_x4);   // load    i1,[vtlb],i1,dword
 	UML_TEST(block, I1, VTLB_FETCH_ALLOWED);                                        // test    i1,VTLB_FETCH_ALLOWED
 	UML_JMPc(block, COND_Z, isi = label++);                                                 // jmp     isi,z
 	UML_CMP(block, I2, 0);                                                      // cmp     i2,0
@@ -1021,7 +1021,7 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 	if (((m_cap & PPCCAP_OEA) && (mode & MODE_DATA_TRANSLATION)) || (iswrite && (m_cap & PPCCAP_4XX) && (mode & MODE_PROTECTION)))
 	{
 		UML_SHR(block, I3, I0, 12);                                         // shr     i3,i0,12
-		UML_LOAD(block, I3, (void *)vtlb_table(m_vtlb), I3, SIZE_DWORD, SCALE_x4);// load    i3,[vtlb],i3,dword
+		UML_LOAD(block, I3, (void *)vtlb_table(), I3, SIZE_DWORD, SCALE_x4);// load    i3,[vtlb],i3,dword
 		UML_TEST(block, I3, (UINT64)1 << translate_type);                           // test    i3,1 << translate_type
 		UML_JMPc(block, COND_Z, tlbmiss = label++);                                         // jmp     tlbmiss,z
 		UML_LABEL(block, tlbreturn = label++);                                          // tlbreturn:
@@ -1338,7 +1338,7 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 		UML_MOV(block, mem(&m_core->param1), translate_type);                              // mov     [param1],translate_type
 		UML_CALLC(block, (c_function)cfunc_ppccom_tlb_fill, this);                                             // callc   tlbfill,ppc
 		UML_SHR(block, I3, I0, 12);                                         // shr     i3,i0,12
-		UML_LOAD(block, I3, (void *)vtlb_table(m_vtlb), I3, SIZE_DWORD, SCALE_x4);// load    i3,[vtlb],i3,dword
+		UML_LOAD(block, I3, (void *)vtlb_table(), I3, SIZE_DWORD, SCALE_x4);// load    i3,[vtlb],i3,dword
 		UML_TEST(block, I3, (UINT64)1 << translate_type);                           // test    i3,1 << translate_type
 		UML_JMPc(block, COND_NZ, tlbreturn);                                                    // jmp     tlbreturn,nz
 
@@ -1703,7 +1703,7 @@ void ppc_device::generate_sequence_instruction(drcuml_block *block, compiler_sta
 	/* validate our TLB entry at this PC; if we fail, we need to handle it */
 	if ((desc->flags & OPFLAG_VALIDATE_TLB) && (m_core->mode & MODE_DATA_TRANSLATION))
 	{
-		const vtlb_entry *tlbtable = vtlb_table(m_vtlb);
+		const vtlb_entry *tlbtable = vtlb_table();
 
 		/* if we currently have a valid TLB read entry, we just verify */
 		if (tlbtable[desc->pc >> 12] != 0)
