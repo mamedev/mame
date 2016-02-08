@@ -969,12 +969,8 @@ static MACHINE_CONFIG_START( jangou, jangou_state )
 
 
 	/* video hardware */
-
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4,320,0,256,264,16,240) // assume same as nightgal.cpp
 	MCFG_SCREEN_UPDATE_DRIVER(jangou_state, screen_update_jangou)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1384,7 +1380,7 @@ DRIVER_INIT_MEMBER(jangou_state,luckygrl)
  *************************************/
 
 GAME( 1983,  jangou,     0,        jangou,   jangou, driver_device,    0,        ROT0, "Nichibutsu",     "Jangou [BET] (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983,  macha,      0,        jangou,   macha, driver_device,     0,        ROT0, "Logitec",        "Monoshiri Quiz Osyaberi Macha (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983,  macha,      0,        jangou,   macha,  driver_device,     0,        ROT0, "Logitec",        "Monoshiri Quiz Osyaberi Macha (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984,  jngolady,   0,        jngolady, jngolady, jangou_state,  jngolady, ROT0, "Nichibutsu",     "Jangou Lady (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984,  cntrygrl,   0,        cntrygrl, cntrygrl, driver_device,  0,        ROT0, "Royal Denshi",   "Country Girl (Japan set 1)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984,  cntrygrla,  cntrygrl, cntrygrl, cntrygrl, driver_device,  0,        ROT0, "Nichibutsu",     "Country Girl (Japan set 2)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
