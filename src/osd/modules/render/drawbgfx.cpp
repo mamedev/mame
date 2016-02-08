@@ -752,6 +752,7 @@ int renderer_bgfx::draw(int update)
 	width = wdim.width();
 	height = wdim.height();
 #endif
+	bgfx::setViewSeq(0, true);
 	bgfx::setViewRect(0, 0, 0, width, height);
 	bgfx::reset(width, height, video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 	// Setup view transform.
@@ -779,7 +780,6 @@ int renderer_bgfx::draw(int update)
 	bgfx::touch(0);
 
 	window().m_primlist->acquire_lock();
-
 	// Draw quad.
 	// now draw
 	uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
