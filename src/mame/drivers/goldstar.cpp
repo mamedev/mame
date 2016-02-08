@@ -8239,9 +8239,10 @@ ROM_END
    effect that shouldn't be there. Maybe is product of a bad dump. Need to be checked with
    the real board.
 
-   Also the cards gfx are corrupt. Tiles are ok, so maybe the code is triggering wrong
-   pointers to the tiles.
+   The hardware uses only the second half of the program ROM (double sized), that replaces
+   the double-up's cards graphics with 'drakkars' (scandinavian / viking ships).
 
+----------------------------------------------------------------------------------------
 28.bin                                          FIXED BITS (00xxxxxx)
 29.bin                                                 00xxxxxxxxxxxxxxx = 0xFF
                         moon-gfx1.bin           BADADDR     --xxxxxxxxxxxxxxxxx
@@ -8261,8 +8262,9 @@ ROM_END
 28.bin                  moon-gfx2.bin [4/4]      94.188690%
 */
 ROM_START( moonlghtb )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "moon-main.bin",       0x0000, 0x20000, CRC(0a4b5dd0) SHA1(825801e9b72c10fed8e07f42b3b475688bdbd878) )
+	ROM_REGION( 0x20000, "maincpu", 0 )  // using only the second half of the program ROM.
+	ROM_LOAD( "moon-main.bin",       0x10000, 0x10000, CRC(0a4b5dd0) SHA1(825801e9b72c10fed8e07f42b3b475688bdbd878) )
+	ROM_CONTINUE(                    0x00000, 0x10000)
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "moon-gfx2.bin",      0x00000, 0x80000, CRC(2ce5b722) SHA1(feb87fbf3b8d875842df80cd1edfef5071ed60c7) )
@@ -13324,7 +13326,7 @@ DRIVER_INIT_MEMBER(goldstar_state, wcherry)
 GAMEL( 199?, goldstar,  0,        goldstar, goldstar, goldstar_state, goldstar,  ROT0, "IGS",               "Golden Star",                                 0,                 layout_goldstar )
 GAMEL( 199?, goldstbl,  goldstar, goldstbl, goldstar, driver_device,  0,         ROT0, "IGS",               "Golden Star (Blue version)",                  0,                 layout_goldstar )
 GAME(  199?, moonlght,  goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (bootleg of Golden Star, set 1)",  0 )
-GAME(  199?, moonlghtb, goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (bootleg of Golden Star, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )  // need to check the odd palette value at 0xc780. should be black. also cards gfx are corrupt.
+GAME(  199?, moonlghtb, goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (bootleg of Golden Star, set 2)",  MACHINE_IMPERFECT_COLORS )  // need to check the odd palette value at 0xc780. should be black.
 GAMEL( 199?, chrygld,   0,        chrygld,  chrygld,  cb3_state,      chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0,                 layout_chrygld )
 GAMEL( 199?, chry10,    0,        chrygld,  chry10,   cb3_state,      chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0,                 layout_chrygld )
 GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,         ROT0, "bootleg",           "Gold Fruit",                                  0 )                  // maybe fullname should be 'Gold Fruit (main 40%)'
