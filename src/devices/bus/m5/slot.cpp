@@ -210,7 +210,7 @@ bool m5_cart_slot_device::call_load()
 
 bool m5_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 	return TRUE;
 }
 
@@ -219,12 +219,13 @@ bool m5_cart_slot_device::call_softlist_load(software_list_device &swlist, const
  get default card software
  -------------------------------------------------*/
 
-void m5_cart_slot_device::get_default_card_software(std::string &result)
+std::string m5_cart_slot_device::get_default_card_software()
 {
+	std::string result;
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string = "std";
-		UINT32 size = core_fsize(m_file);
+		//UINT32 size = core_fsize(m_file);
 		int type = M5_STD;
 
 
@@ -234,10 +235,10 @@ void m5_cart_slot_device::get_default_card_software(std::string &result)
 		clear();
 
 		result.assign(slot_string);
-		return;
+		return result;
 	}
 
-	software_get_default_slot(result, "std");
+	return software_get_default_slot("std");
 }
 
 /*-------------------------------------------------

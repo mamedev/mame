@@ -619,6 +619,7 @@ BUSES["ISA"] = true
 BUSES["ISBX"] = true
 BUSES["KC"] = true
 BUSES["LPCI"] = true
+BUSES["M5"] = true
 BUSES["MACPDS"] = true
 BUSES["MIDI"] = true
 BUSES["MEGADRIVE"] = true

@@ -93,7 +93,6 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_READ8_MEMBER(read_ram);
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
-	virtual DECLARE_SETOFFSET_MEMBER (read_off);
 
 protected:
 
