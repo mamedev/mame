@@ -8211,6 +8211,8 @@ ROM_START( chrygld )
 ROM_END
 
 
+/* Moon Light (set 1)
+*/
 ROM_START( moonlght )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "4.bin",       0x0000, 0x20000, CRC(ecb06cfb) SHA1(e32613cac5583a0fecf04fca98796b91698e530c) )
@@ -8223,6 +8225,53 @@ ROM_START( moonlght )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Audio ADPCM */
 	ROM_LOAD( "gs1-snd.bin",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
+ROM_END
+
+/* Moon Light (set 2)
+
+   GFX devices are 4 times bigger and contains 4 times the same data.
+   Maybe the manufacturers run out of proper devices...
+
+   The background is not set properly due to a palette error. The program ROM stores
+   the palette at offset 0xC700 onwards... The value stored at 0xC780 (color 0x80) should
+   be black to mask the reels tilemaps and turn them 'invisible'. This program has a value
+   of 0x40 instead, turning the tilemaps blue and therefore visible. The results is an odd
+   effect that shouldn't be there. Maybe is product of a bad dump. Need to be checked with
+   the real board.
+
+   Also the cards gfx are corrupt. Tiles are ok, so maybe the code is triggering wrong
+   pointers to the tiles.
+
+28.bin                                          FIXED BITS (00xxxxxx)
+29.bin                                                 00xxxxxxxxxxxxxxx = 0xFF
+                        moon-gfx1.bin           BADADDR     --xxxxxxxxxxxxxxxxx
+                        moon-gfx2.bin           FIXED BITS (00xxxxxx)
+                        moon-gfx2.bin           BADADDR     --xxxxxxxxxxxxxxxxx
+29.bin                  moon-gfx1.bin [1/4]      IDENTICAL
+29.bin                  moon-gfx1.bin [2/4]      IDENTICAL
+29.bin                  moon-gfx1.bin [3/4]      IDENTICAL
+29.bin                  moon-gfx1.bin [4/4]      IDENTICAL
+4.bin        [1/4]      moon-main.bin [1/4]      99.615479%
+4.bin        [3/4]      moon-main.bin [3/4]      99.426270%
+4.bin        [2/4]      moon-main.bin [2/4]      97.201538%
+4.bin        [4/4]      moon-main.bin [4/4]      95.953369%
+28.bin                  moon-gfx2.bin [1/4]      94.188690%
+28.bin                  moon-gfx2.bin [2/4]      94.188690%
+28.bin                  moon-gfx2.bin [3/4]      94.188690%
+28.bin                  moon-gfx2.bin [4/4]      94.188690%
+*/
+ROM_START( moonlghtb )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "moon-main.bin",       0x0000, 0x20000, CRC(0a4b5dd0) SHA1(825801e9b72c10fed8e07f42b3b475688bdbd878) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "moon-gfx2.bin",      0x00000, 0x80000, CRC(2ce5b722) SHA1(feb87fbf3b8d875842df80cd1edfef5071ed60c7) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "moon-gfx1.bin",      0x00000, 0x80000, CRC(ea7d4234) SHA1(4016227aabf176c6e0fd822ebc59cade811f4ce8) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Audio ADPCM */
+	ROM_LOAD( "moon-sound.bin",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
 ROM_END
 
 
@@ -13274,7 +13323,8 @@ DRIVER_INIT_MEMBER(goldstar_state, wcherry)
        YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT       ROT    COMPANY              FULLNAME                                      FLAGS              LAYOUT */
 GAMEL( 199?, goldstar,  0,        goldstar, goldstar, goldstar_state, goldstar,  ROT0, "IGS",               "Golden Star",                                 0,                 layout_goldstar )
 GAMEL( 199?, goldstbl,  goldstar, goldstbl, goldstar, driver_device,  0,         ROT0, "IGS",               "Golden Star (Blue version)",                  0,                 layout_goldstar )
-GAME(  199?, moonlght,  goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (bootleg of Golden Star)",         0 )
+GAME(  199?, moonlght,  goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (bootleg of Golden Star, set 1)",  0 )
+GAME(  199?, moonlghtb, goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (bootleg of Golden Star, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )  // need to check the odd palette value at 0xc780. should be black. also cards gfx are corrupt.
 GAMEL( 199?, chrygld,   0,        chrygld,  chrygld,  cb3_state,      chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0,                 layout_chrygld )
 GAMEL( 199?, chry10,    0,        chrygld,  chry10,   cb3_state,      chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0,                 layout_chrygld )
 GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,         ROT0, "bootleg",           "Gold Fruit",                                  0 )                  // maybe fullname should be 'Gold Fruit (main 40%)'
