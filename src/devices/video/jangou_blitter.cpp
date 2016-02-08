@@ -105,8 +105,8 @@ WRITE8_MEMBER( jangou_blitter_device::blitter_process_w )
 		int count = 0;
 		int xcount, ycount;
 
-		//printf("%02x %02x %02x %02x %02x %02x %02x\n", m_blit_data[0], m_blit_data[1], m_blit_data[2],
-		//           m_blit_data[3], m_blit_data[4], m_blit_data[5],m_blit_data[6]); 
+		printf("%02x %02x %02x %02x %02x %02x %02x\n", m_blit_data[0], m_blit_data[1], m_blit_data[2],
+		           m_blit_data[3], m_blit_data[4], m_blit_data[5],m_blit_data[6]); 
 		w = (m_blit_data[4] & 0xff) + 1;
 		h = (m_blit_data[5] & 0xff) + 1;
 		src = ((m_blit_data[1] << 8)|(m_blit_data[0] << 0));
@@ -143,6 +143,21 @@ WRITE8_MEMBER( jangou_blitter_device::blitter_process_w )
 					count++;
 			}
 		}
+	}
+}
+
+WRITE8_MEMBER( jangou_blitter_device::blitter_alt_process_w)
+{
+	switch(offset)
+	{
+		case 0: blitter_process_w(space,0,data); break;
+		case 1: blitter_process_w(space,1,data); break;
+		case 2: blitter_process_w(space,6,data); break;
+		case 3: blitter_process_w(space,2,data); break;
+		case 4: blitter_process_w(space,3,data); break;
+		case 5: blitter_process_w(space,4,data); break;
+		case 6: blitter_process_w(space,5,data); break;
+
 	}
 }
 

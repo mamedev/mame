@@ -302,12 +302,12 @@ READ8_MEMBER(nightgal_state::royalqn_nsc_blit_r)
 
 TIMER_CALLBACK_MEMBER(nightgal_state::z80_wait_ack_cb)
 {
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, CLEAR_LINE);
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 }
 
 void nightgal_state::z80_wait_assert_cb()
 {
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, ASSERT_LINE);
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 	
 	// Note: cycles_to_attotime requires z80 context to work, calling for example m_subcpu as context gives a x4 cycle boost in z80 terms (reads execute_cycles_to_clocks() from NCS?) even if they runs at same speed basically.
 	// TODO: needs a getter that tells a given CPU how many cycles requires an executing opcode for the r/w operation, which stacks with wait state penalty for accessing this specific area.
@@ -419,13 +419,12 @@ static ADDRESS_MAP_START( sexygal_nsc_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x0080) AM_READ(blitter_status_r)
 	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
-	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_process_w)
+	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_alt_process_w)
 	AM_RANGE(0x00a0, 0x00af) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_vregs_w)
-
 	AM_RANGE(0x00b0, 0x00b0) AM_WRITENOP // bltflip register
 
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_SHARE("comms_ram")
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_WRITENOP
+	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM AM_REGION("subrom", 0)
 ADDRESS_MAP_END
 
 /********************************
@@ -464,7 +463,7 @@ static ADDRESS_MAP_START( royalqn_nsc_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r,royalqn_comm_w)
 	AM_RANGE(0x4000, 0x4000) AM_NOP
 	AM_RANGE(0x8000, 0x8000) AM_NOP //open bus or protection check
-	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM AM_REGION("subrom", 0)
 ADDRESS_MAP_END
 
 /********************************************
@@ -817,8 +816,8 @@ ROM_START( nightgal )
 	ROM_LOAD( "ngal_11.bin", 0x02000, 0x02000, CRC(c52f7942) SHA1(e23b9e4936f9b3111ea14c0250190ee6de1ed4ab) )
 	ROM_LOAD( "ngal_12.bin", 0x04000, 0x02000, CRC(515e69a7) SHA1(234247c829c2b082360d7d44c1488fc5fcf45cd2) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "ngal_09.bin", 0x0c000, 0x02000, CRC(da3dcc08) SHA1(6f5319c1777dabf7041286698ac8f25eca1545a1) )
+	ROM_REGION( 0x2000, "subrom", 0 )
+	ROM_LOAD( "ngal_09.bin", 0x0000, 0x02000, CRC(da3dcc08) SHA1(6f5319c1777dabf7041286698ac8f25eca1545a1) )
 
 	ROM_REGION( 0x20000, "gfx", 0 )
 	ROM_LOAD( "ngal_01.bin",  0x00000, 0x02000, CRC(8e4c92ad) SHA1(13cebe765ebabe6be79c9c9ac3f778550e450380) )
@@ -867,8 +866,8 @@ ROM_START( ngtbunny )
 	ROM_LOAD( "7.3p", 0x02000, 0x02000, CRC(34024380) SHA1(ba535e2b198f55e68a45ad7030b12c9aa1389aea) )
 	ROM_LOAD( "8.3s", 0x04000, 0x02000, CRC(9bf96168) SHA1(f0e9302bc9577fe779b56cb72035672368c94481) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "5.3m",  0x0c000, 0x02000, CRC(b8a82966) SHA1(9f86b3208fb48f9735cfc4f8e62680f0cb4a92f0) )
+	ROM_REGION( 0x2000, "subrom", 0 )
+	ROM_LOAD( "5.3m",  0x0000, 0x02000, CRC(b8a82966) SHA1(9f86b3208fb48f9735cfc4f8e62680f0cb4a92f0) )
 
 	ROM_REGION( 0x20000, "gfx", 0 )
 	ROM_LOAD( "1.3a",  0x00000, 0x02000, CRC(16776c5f) SHA1(a2925eaed938ae3985ea796658b62d6fafb6412b) )
@@ -886,8 +885,8 @@ ROM_START( royalngt )
 	ROM_LOAD( "rn7.3p", 0x02000, 0x02000, CRC(ae9c082b) SHA1(ee3effea653f972fd732453e9ab72f48e75410f8) )
 	ROM_LOAD( "rn8.3s", 0x04000, 0x02000, CRC(1371a83a) SHA1(c7107b62534837dd51bb4a93ba9a690f91393930) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "rn5.3l",  0x0c000, 0x02000, CRC(b8a82966) SHA1(9f86b3208fb48f9735cfc4f8e62680f0cb4a92f0) )
+	ROM_REGION( 0x2000, "subrom", 0 )
+	ROM_LOAD( "rn5.3l",  0x00000, 0x02000, CRC(b8a82966) SHA1(9f86b3208fb48f9735cfc4f8e62680f0cb4a92f0) )
 
 	ROM_REGION( 0x20000, "gfx", 0 )
 	ROM_LOAD( "rn1.3a",  0x00000, 0x02000, CRC(16776c5f) SHA1(a2925eaed938ae3985ea796658b62d6fafb6412b) )
@@ -905,8 +904,8 @@ ROM_START( royalqn )
 	ROM_LOAD( "a11.3t", 0x02000, 0x02000, CRC(e7c5395b) SHA1(5131ab9b0fbf1b7b4d410aa2a57eceaf47f8ec3a) )
 	ROM_LOAD( "a12.3v", 0x04000, 0x02000, CRC(4e8efda4) SHA1(1959491fd899a4d85fd067d7674592ec25188a75) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "rq9.3p",  0x0c000, 0x02000, CRC(34b4cf82) SHA1(01f49ca11a695d41c181e92217e228bc1656ee57) )
+	ROM_REGION( 0x2000, "subrom", 0 )
+	ROM_LOAD( "rq9.3p",  0x0000, 0x02000, CRC(34b4cf82) SHA1(01f49ca11a695d41c181e92217e228bc1656ee57) )
 
 	ROM_REGION( 0xc000, "samples", ROMREGION_ERASE00 )
 
@@ -971,8 +970,8 @@ ROM_START( sexygal )
 	ROM_LOAD( "11.3pr", 0x04000, 0x04000, CRC(a3138b42) SHA1(1bf7f6e2c4020251379cc72fa731c17795f35e2e) )
 	ROM_LOAD( "12.s8b", 0x08000, 0x04000, CRC(7ac4a984) SHA1(7b41c522387938fe7625c9a6c62a385d6635cc5e) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "1.3a",   0x0c000, 0x04000, CRC(f814cf27) SHA1(ceba1f14a202d926380039d7cb4669eb8be58539) ) // has a big (16 byte wide) ASCII 'Y.M' art, written in YMs (!)
+	ROM_REGION( 0x4000, "subrom", 0 )
+	ROM_LOAD( "1.3a",   0x00000, 0x04000, CRC(f814cf27) SHA1(ceba1f14a202d926380039d7cb4669eb8be58539) ) // has a big (16 byte wide) ASCII 'Y.M' art, written in YMs (!)
 
 	ROM_REGION( 0xc000, "samples", 0 )
 	ROM_LOAD( "13.s7b",  0x04000, 0x04000, CRC(5eb75f56) SHA1(b7d81d786d1ac8d65a6a122140954eb89d76e8b4) )
@@ -997,8 +996,8 @@ ROM_START( sweetgal )
 	ROM_LOAD( "10.3n", 0x00000, 0x04000, CRC(0f6c4bf0) SHA1(50e5c6f08e124641f5df8938ccfcdebde18f6a0f) ) // sldh
 	ROM_LOAD( "11.3p", 0x04000, 0x04000, CRC(7388e9b3) SHA1(e318d2d3888679bbd43a0aab68252fd359b7969d) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "1.3a",  0x0e000, 0x2000, CRC(5342c757) SHA1(b4ff84c45bd2c6a6a468f1d0daaf5b19c4dbf8fe) ) // sldh
+	ROM_REGION( 0x2000, "subrom", 0 )
+	ROM_LOAD( "1.3a",  0x0000, 0x2000, CRC(5342c757) SHA1(b4ff84c45bd2c6a6a468f1d0daaf5b19c4dbf8fe) ) // sldh
 
 	ROM_REGION( 0xc000, "samples", 0 ) // sound samples
 	ROM_LOAD( "v2_12.bin",  0x00000, 0x04000, CRC(66a35be2) SHA1(4f0d73d753387acacc5ccc90e91d848a5ecce55e) )
@@ -1064,8 +1063,8 @@ ROM_START( ngalsumr )
 	ROM_LOAD( "9.3t", 0x02000, 0x02000, CRC(879fc493) SHA1(ec7c6928b5d4e46dcc99271466e7eb801f601a70) )
 	ROM_LOAD( "10.3v", 0x04000, 0x02000, CRC(31211088) SHA1(960b781c420602be3de66565a030cf5ebdcc2ffb) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "7.3p",  0x0c000, 0x02000, BAD_DUMP CRC(20c55a25) SHA1(9dc88cb6c016b594264f7272d4fd5f30567e7c5d) ) // either encrypted or bit-rotted.
+	ROM_REGION( 0x2000, "subrom", 0 )
+	ROM_LOAD( "7.3p",  0x0000, 0x02000, BAD_DUMP CRC(20c55a25) SHA1(9dc88cb6c016b594264f7272d4fd5f30567e7c5d) ) // either encrypted or bit-rotted.
 
 	ROM_REGION( 0xc000, "samples", 0 )
 	ROM_LOAD( "1s.ic7", 0x00000, 0x04000, CRC(47ad8a0f) SHA1(e3b1e13f0a5c613bd205338683bef8d005b54830) )
@@ -1086,22 +1085,22 @@ ROM_END
 
 DRIVER_INIT_MEMBER(nightgal_state,royalqn)
 {
-	UINT8 *ROM = memregion("sub")->base();
+	UINT8 *ROM = memregion("subrom")->base();
 
 	/* patch open bus / protection */
-	ROM[0xc27e] = 0x02;
-	ROM[0xc27f] = 0x02;
+	ROM[0x027e] = 0x02;
+	ROM[0x027f] = 0x02;
 }
 
 DRIVER_INIT_MEMBER(nightgal_state,ngalsumr)
 {
-	UINT8 *ROM = memregion("sub")->base();
+	//UINT8 *ROM = memregion("subrom")->base();
 
 	/* patch blantantly wrong ROM checks */
 	//ROM[0xd6ce] = 0x02;
 	//ROM[0xd6cf] = 0x02;
 	// adcx $05 converted to 0x04 for debug purposes
-	ROM[0xd782] = 0x04;
+	//ROM[0x1782] = 0x04;
 	//ROM[0xd655] = 0x20;
 	//ROM[0xd3f9] = 0x02;
 	//ROM[0xd3fa] = 0x02;
@@ -1112,7 +1111,7 @@ DRIVER_INIT_MEMBER(nightgal_state,ngalsumr)
 GAME( 1984, nightgal, 0,        royalqn, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Night Gal (Japan 840920 AG 1-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, ngtbunny, 0,        royalqn, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Night Bunny (Japan 840601 MRN 2-10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, royalngt, ngtbunny, royalqn, sexygal, driver_device,  0,       ROT0, "Royal Denshi", "Royal Night [BET] (Japan 840220 RN 2-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, royalqn,  0,        royalqn, sexygal, nightgal_state,  royalqn, ROT0, "Royal Denshi", "Royal Queen [BET] (Japan 841010 RQ 0-07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, royalqn,  0,        royalqn, sexygal, nightgal_state, royalqn, ROT0, "Royal Denshi", "Royal Queen [BET] (Japan 841010 RQ 0-07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* Type 2 HW */
 GAME( 1985, sexygal,  0,        sexygal, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, sweetgal, sexygal,  sexygal, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

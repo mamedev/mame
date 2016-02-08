@@ -34,6 +34,7 @@ public:
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( blitter_process_w );
+	DECLARE_WRITE8_MEMBER( blitter_alt_process_w );
 	DECLARE_WRITE8_MEMBER( blitter_vregs_w );
 	UINT8        m_blit_buffer[256 * 256];
 

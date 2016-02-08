@@ -2073,11 +2073,12 @@ OP_HANDLER( ldd_ix )
 }
 
 /* $ec ADCX immediate -****    NSC8105 only.  Flags are a guess - copied from addb_im() */
+// actually this is ADDX, causes garbage in nightgal.cpp otherwise
 OP_HANDLER( adcx_im )
 {
 	UINT16 t,r;
 	IMMBYTE(t);
-	r = X+t+(CC&0x01);
+	r = X+t;
 	CLR_HNZVC;
 	SET_FLAGS8(X,t,r);
 	SET_H(X,t,r);
