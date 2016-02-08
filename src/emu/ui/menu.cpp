@@ -459,7 +459,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 	float ud_arrow_width = line_height * machine().render().ui_aspect();
 	float gutter_width = lr_arrow_width * 1.3f;
 
-	int selected_subitem_too_big = FALSE;
+	bool selected_subitem_too_big = false;
 	int itemnum, linenum;
 	bool mouse_hit, mouse_button;
 	float mouse_x = -1, mouse_y = -1;
@@ -662,7 +662,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 				{
 					subitem_text = "...";
 					if (itemnum == selected)
-						selected_subitem_too_big = TRUE;
+						selected_subitem_too_big = true;
 				}
 
 				// customize subitem text color
@@ -1326,29 +1326,28 @@ void ui_menu::init_ui(running_machine &machine)
 	for (int x = 0; x < UI_TOOLBAR_BUTTONS; ++x)
 	{
 		toolbar_bitmap[x] = auto_alloc(machine, bitmap_argb32(32, 32));
+		sw_toolbar_bitmap[x] = auto_alloc(machine, bitmap_argb32(32, 32));
 		toolbar_texture[x] = mrender.texture_alloc();
+		sw_toolbar_texture[x] = mrender.texture_alloc();
 		UINT32 *dst = &toolbar_bitmap[x]->pix32(0);
 		memcpy(dst, toolbar_bitmap_bmp[x], 32 * 32 * sizeof(UINT32));
 		if (toolbar_bitmap[x]->valid())
 			toolbar_texture[x]->set_bitmap(*toolbar_bitmap[x], toolbar_bitmap[x]->cliprect(), TEXFORMAT_ARGB32);
 		else
 			toolbar_bitmap[x]->reset();
-	}
-
-	// create a texture for toolbar
-	for (int x = 0; x < UI_TOOLBAR_BUTTONS; ++x)
-	{
-		sw_toolbar_bitmap[x] = auto_alloc(machine, bitmap_argb32(32, 32));
-		sw_toolbar_texture[x] = mrender.texture_alloc();
+		
 		if (x == 0 || x == 2)
 		{
-			UINT32 *dst;
 			dst = &sw_toolbar_bitmap[x]->pix32(0);
 			memcpy(dst, toolbar_bitmap_bmp[x], 32 * 32 * sizeof(UINT32));
-			sw_toolbar_texture[x]->set_bitmap(*sw_toolbar_bitmap[x], sw_toolbar_bitmap[x]->cliprect(), TEXFORMAT_ARGB32);
+			if (sw_toolbar_bitmap[x]->valid())
+				sw_toolbar_texture[x]->set_bitmap(*sw_toolbar_bitmap[x], sw_toolbar_bitmap[x]->cliprect(), TEXFORMAT_ARGB32);
+			else
+				sw_toolbar_bitmap[x]->reset();
 		}
 		else
 			sw_toolbar_bitmap[x]->reset();
+
 	}
 }
 
@@ -1361,7 +1360,7 @@ void ui_menu::draw_select_game(bool noinput)
 {
 	float line_height = machine().ui().get_line_height();
 	float ud_arrow_width = line_height * machine().render().ui_aspect();
-	float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
+	float gutter_width = 0.52f * line_height * machine().render().ui_aspect();
 	mouse_x = -1, mouse_y = -1;
 	float right_panel_size = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL) ? 2.0f * UI_BOX_LR_BORDER : 0.3f;
 	float visible_width = 1.0f - 4.0f * UI_BOX_LR_BORDER;
@@ -1381,14 +1380,14 @@ void ui_menu::draw_select_game(bool noinput)
 	float visible_extra_menu_height = customtop + custombottom + extra_height;
 
 	// locate mouse
-	mouse_hit = FALSE;
-	mouse_button = FALSE;
+	mouse_hit = false;
+	mouse_button = false;
 	if (!noinput)
 	{
 		mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
 		if (mouse_target != nullptr)
 			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y))
-				mouse_hit = TRUE;
+				mouse_hit = true;
 	}
 
 	// account for extra space at the top and bottom
@@ -1473,9 +1472,8 @@ void ui_menu::draw_select_game(bool noinput)
 
 		// if we have some background hilighting to do, add a quad behind everything else
 		if (bgcolor != UI_TEXT_BG_COLOR)
-			mui.draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1,
-			bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture,
-			PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+			mui.draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(255, 43, 43, 43), 
+				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 		// if we're on the top line, display the up arrow
 		if (linenum == 0 && top_line != 0)
@@ -1498,7 +1496,7 @@ void ui_menu::draw_select_game(bool noinput)
 		// if we're just a divider, draw a line
 		else if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
 			container->add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height,
-			UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		// draw the item centered
 		else if (pitem.subtext == nullptr)
 		{
@@ -1518,9 +1516,8 @@ void ui_menu::draw_select_game(bool noinput)
 
 				space = mui.get_line_height() * container->manager().ui_aspect() * 1.5f;
 			}
-			mui.draw_text_full(container, itemtext, effective_left + space, line_y, effective_width - space,
-				JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor,
-				bgcolor, nullptr, nullptr);
+			mui.draw_text_full(container, itemtext, effective_left + space, line_y, effective_width - space, JUSTIFY_LEFT, WRAP_TRUNCATE, 
+				DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, nullptr, nullptr);
 		}
 		else
 		{
@@ -1573,14 +1570,14 @@ void ui_menu::draw_select_game(bool noinput)
 		// if we have some background hilighting to do, add a quad behind everything else
 		if (bgcolor != UI_TEXT_BG_COLOR)
 			mui.draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(255, 43, 43, 43),
-			hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 		if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
 			container->add_line(visible_left, line + 0.5f * line_height, visible_left + visible_width, line + 0.5f * line_height,
-			UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		else
-			mui.draw_text_full(container, itemtext, effective_left, line, effective_width,
-			JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+			mui.draw_text_full(container, itemtext, effective_left, line, effective_width, JUSTIFY_CENTER, WRAP_TRUNCATE, 
+				DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 		line += line_height;
 	}
 

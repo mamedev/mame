@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Jonathan Gevaryahu
 /* Xerox Notetaker
  * Driver by Jonathan Gevaryahu
  * prototype only, one? unit manufactured
