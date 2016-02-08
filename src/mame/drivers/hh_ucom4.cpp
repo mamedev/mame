@@ -1594,9 +1594,7 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
+	DECLARE_WRITE8_MEMBER(unk_w);
 };
 
 // handlers
@@ -1605,20 +1603,41 @@ void mcompgin_state::prepare_display()
 {
 }
 
-WRITE8_MEMBER(mcompgin_state::speaker_w)
+WRITE8_MEMBER(mcompgin_state::unk_w)
 {
+	// E=lcd
 }
 
 
 // config
 
 static INPUT_PORTS_START( mcompgin )
+	PORT_START("IN.0") // port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // 21 select
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // 23 deal
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // 22 discard
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) // 20 draw
+
+	PORT_START("IN.1") // port B
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) // 24 comp
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) // 25 score
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( mcompgin, mcompgin_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D650, 400000) // approximation
+	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
+	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(mcompgin_state, unk_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(mcompgin_state, unk_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(mcompgin_state, unk_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(mcompgin_state, unk_w))
+	MCFG_UCOM4_WRITE_G_CB(WRITE8(mcompgin_state, unk_w))
+	MCFG_UCOM4_WRITE_H_CB(WRITE8(mcompgin_state, unk_w))
+	MCFG_UCOM4_WRITE_I_CB(WRITE8(mcompgin_state, unk_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_mcompgin)
@@ -2501,7 +2520,7 @@ ROM_END
 
 ROM_START( mcompgin )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d650c-060", 0x0000, 0x0800, CRC(92a4d8be) SHA1(d67f14a2eb53b79a7d9eb08103325299bc643781) )
+	ROM_LOAD( "d650c-060", 0x0000, 0x0800, BAD_DUMP CRC(92a4d8be) SHA1(d67f14a2eb53b79a7d9eb08103325299bc643781) )
 ROM_END
 
 
