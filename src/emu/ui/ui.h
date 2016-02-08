@@ -171,6 +171,10 @@ public:
     // other
     void process_natural_keyboard();
 
+    void set_show_timecode_counter(bool value) { m_show_timecode_counter = value; m_show_timecode_total = true; }
+    bool show_timecode_counter();
+    bool show_timecode_total();
+
 	// word wrap
     int wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size = 1.0f);
 
@@ -195,6 +199,8 @@ private:
 	std::unique_ptr<UINT8[]> m_non_char_keys_down;
     render_texture *        m_mouse_arrow_texture;
     bool                    m_mouse_show;
+    bool                    m_show_timecode_counter;
+	bool                    m_show_timecode_total;
 	bool                    m_load_save_hold;
 	ui_options              m_ui_options;
 

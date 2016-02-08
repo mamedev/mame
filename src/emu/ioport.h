@@ -343,6 +343,7 @@ enum ioport_type
 		IPT_UI_FAST_FORWARD,
 		IPT_UI_SHOW_FPS,
 		IPT_UI_SNAPSHOT,
+		IPT_UI_TIMECODE,
 		IPT_UI_RECORD_MOVIE,
 		IPT_UI_TOGGLE_CHEAT,
 		IPT_UI_UP,
@@ -1452,6 +1453,10 @@ private:
 	void record_frame(const attotime &curtime);
 	void record_port(ioport_port &port);
 
+	template<typename _Type> void timecode_write(_Type value);
+	void timecode_init();
+	void timecode_end(const char *message = NULL);
+
 	// internal state
 	running_machine &       m_machine;              // reference to owning machine
 	bool                    m_safe_to_read;         // clear at start; set after state is loaded
@@ -1474,6 +1479,9 @@ private:
 	emu_file                m_playback_file;        // playback file (NULL if not recording)
 	UINT64                  m_playback_accumulated_speed; // accumulated speed during playback
 	UINT32                  m_playback_accumulated_frames; // accumulated frames during playback
+	emu_file                m_timecode_file;        // timecode/frames playback file (NULL if not recording)
+	int						m_timecode_count;
+	attotime				m_timecode_last_time;
 
 	// has...
 	bool                    m_has_configs;

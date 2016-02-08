@@ -2454,6 +2454,9 @@ ioport_manager::ioport_manager(running_machine &machine)
 		m_playback_file(machine.options().input_directory(), OPEN_FLAG_READ),
 		m_playback_accumulated_speed(0),
 		m_playback_accumulated_frames(0),
+		m_timecode_file(machine.options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS),
+		m_timecode_count(0),
+		m_timecode_last_time(attotime::zero),
 		m_has_configs(false),
 		m_has_analog(false),
 		m_has_dips(false),
@@ -2564,6 +2567,7 @@ time_t ioport_manager::initialize()
 	// open playback and record files if specified
 	time_t basetime = playback_init();
 	record_init();
+	timecode_init();
 	return basetime;
 }
 
@@ -2657,6 +2661,7 @@ void ioport_manager::exit()
 	// close any playback or recording files
 	playback_end();
 	record_end();
+	timecode_end();
 }
 
 
@@ -3428,6 +3433,12 @@ void ioport_manager::playback_end(const char *message)
 		m_playback_accumulated_speed /= m_playback_accumulated_frames;
 		osd_printf_info("Total playback frames: %d\n", UINT32(m_playback_accumulated_frames));
 		osd_printf_info("Average recorded speed: %d%%\n", UINT32((m_playback_accumulated_speed * 200 + 1) >> 21));
+
+		// close the program at the end of inp file playback
+		if (machine().options().exit_after_playback()) {
+			osd_printf_info("Exiting MAME now...\n");
+			machine().schedule_exit();
+		}
 	}
 }
 
@@ -3510,6 +3521,29 @@ void ioport_manager::record_write<bool>(bool value)
 	record_write(byte);
 }
 
+template<typename _Type>
+void ioport_manager::timecode_write(_Type value)
+{
+	// protect against NULL handles if previous reads fail
+	if (!m_timecode_file.is_open())
+		return;
+
+	// read the value; if we fail, end playback
+	if (m_timecode_file.write(&value, sizeof(value)) != sizeof(value))
+		timecode_end("Out of space");
+}
+
+/*template<>
+void ioport_manager::timecode_write<bool>(bool value)
+{
+	UINT8 byte = UINT8(value);
+	timecode_write(byte);
+}*/
+template<>
+void ioport_manager::timecode_write<std::string>(std::string value) {
+	timecode_write(value.c_str());
+}
+
 
 //-------------------------------------------------
 //  record_init - initialize INP recording
@@ -3554,6 +3588,44 @@ void ioport_manager::record_init()
 }
 
 
+void ioport_manager::timecode_init() {
+	// check if option -record_timecode is enabled
+	if (!machine().options().record_timecode()) {
+		machine().video().set_timecode_enabled(false);
+		return;
+	}
+	// if no file, nothing to do
+	const char *record_filename = machine().options().record();
+	if (record_filename[0] == 0) {
+		machine().video().set_timecode_enabled(false);
+		return;
+	}
+
+	machine().video().set_timecode_enabled(true);
+
+	// open the record file
+	std::string filename;
+	filename.append(record_filename).append(".timecode");
+	osd_printf_info("Record input timecode file: %s\n", record_filename);
+
+	file_error filerr = m_timecode_file.open(filename.c_str());
+	assert_always(filerr == FILERR_NONE, "Failed to open file for input timecode recording");
+
+	m_timecode_file.puts(std::string("# ==========================================\n").c_str());
+	m_timecode_file.puts(std::string("# TIMECODE FILE FOR VIDEO PREVIEW GENERATION\n").c_str());
+	m_timecode_file.puts(std::string("# ==========================================\n").c_str());
+	m_timecode_file.puts(std::string("#\n").c_str());
+	m_timecode_file.puts(std::string("# VIDEO_PART:     code of video timecode\n").c_str());
+	m_timecode_file.puts(std::string("# START:          start time (hh:mm:ss.mmm)\n").c_str());
+	m_timecode_file.puts(std::string("# ELAPSED:        elapsed time (hh:mm:ss.mmm)\n").c_str());
+	m_timecode_file.puts(std::string("# MSEC_START:     start time (milliseconds)\n").c_str());
+	m_timecode_file.puts(std::string("# MSEC_ELAPSED:   elapsed time (milliseconds)\n").c_str());
+	m_timecode_file.puts(std::string("# FRAME_START:    start time (frames)\n").c_str());
+	m_timecode_file.puts(std::string("# FRAME_ELAPSED:  elapsed time (frames)\n").c_str());
+	m_timecode_file.puts(std::string("#\n").c_str());
+	m_timecode_file.puts(std::string("# VIDEO_PART======= START======= ELAPSED===== MSEC_START===== MSEC_ELAPSED=== FRAME_START==== FRAME_ELAPSED==\n").c_str());
+}
+
 //-------------------------------------------------
 //  record_end - end INP recording
 //-------------------------------------------------
@@ -3573,6 +3645,19 @@ void ioport_manager::record_end(const char *message)
 }
 
 
+void ioport_manager::timecode_end(const char *message)
+{
+	// only applies if we have a live file
+	if (m_timecode_file.is_open()) {
+		// close the file
+		m_timecode_file.close();
+
+		// pop a message
+		if (message != nullptr)
+			machine().popmessage("Recording Timecode Ended\nReason: %s", message);
+	}
+}
+
 //-------------------------------------------------
 //  record_frame - start of frame callback for
 //  recording
@@ -3589,6 +3674,114 @@ void ioport_manager::record_frame(const attotime &curtime)
 
 		// then the current speed
 		record_write(UINT32(machine().video().speed_percent() * double(1 << 20)));
+	}
+
+	if (m_timecode_file.is_open() && machine().video().get_timecode_write()) {
+		// Display the timecode
+		std::string current_time_str;
+		m_timecode_count++;
+		strcatprintf(current_time_str, "%02d:%02d:%02d.%03d",
+			(int)curtime.seconds() / (60 * 60),
+			(curtime.seconds() / 60) % 60,
+			curtime.seconds() % 60,
+			(int)(curtime.attoseconds()/ATTOSECONDS_PER_MILLISECOND));
+
+		// Elapsed from previous timecode
+		attotime elapsed_time = curtime - m_timecode_last_time;
+		m_timecode_last_time = curtime;
+		std::string elapsed_time_str;
+		strcatprintf(elapsed_time_str, "%02d:%02d:%02d.%03d",
+			elapsed_time.seconds() / (60 * 60),
+			(elapsed_time.seconds() / 60) % 60,
+			elapsed_time.seconds() % 60,
+			int(elapsed_time.attoseconds()/ATTOSECONDS_PER_MILLISECOND));
+
+		// Number of ms from beginning of playback
+		int mseconds_start = curtime.seconds()*1000 + curtime.attoseconds()/ATTOSECONDS_PER_MILLISECOND;
+		std::string mseconds_start_str;
+		strcatprintf(mseconds_start_str, "%015d", mseconds_start);
+
+		// Number of ms from previous timecode
+		int mseconds_elapsed = elapsed_time.seconds()*1000 + elapsed_time.attoseconds()/ATTOSECONDS_PER_MILLISECOND;
+		std::string mseconds_elapsed_str;
+		strcatprintf(mseconds_elapsed_str, "%015d", mseconds_elapsed);
+
+		// Number of frames from beginning of playback
+		int frame_start = mseconds_start * 60 / 1000;
+		std::string frame_start_str;
+		strcatprintf(frame_start_str, "%015d", frame_start);
+
+		// Number of frames from previous timecode
+		int frame_elapsed = mseconds_elapsed * 60 / 1000;
+		std::string frame_elapsed_str;
+		strcatprintf(frame_elapsed_str, "%015d", frame_elapsed);
+
+		std::string message;
+		std::string timecode_text;
+		std::string timecode_key;
+		bool show_timecode_counter = false;
+		if (m_timecode_count==1) {
+			message += "TIMECODE: Intro started at " + current_time_str;
+			timecode_key = "INTRO_START";
+			timecode_text = "INTRO";
+			show_timecode_counter = true;
+		}
+		else if (m_timecode_count==2) {
+			message += "TIMECODE: Intro duration " + elapsed_time_str;
+			timecode_key = "INTRO_STOP";
+			machine().video().add_to_total_time(elapsed_time);
+			//timecode_text += "INTRO";
+		}
+		else if (m_timecode_count==3) {
+			message += "TIMECODE: Gameplay started at " + current_time_str;
+			timecode_key = "GAMEPLAY_START";
+			timecode_text += "GAMEPLAY";
+			show_timecode_counter = true;
+		}
+		else if (m_timecode_count==4) {
+			message += "TIMECODE: Gameplay duration " + elapsed_time_str;
+			timecode_key = "GAMEPLAY_STOP";
+			machine().video().add_to_total_time(elapsed_time);
+			//timecode_text += "GAMEPLAY";
+		}
+		else if (m_timecode_count % 2 == 1) {
+			std::string timecode_count_str;
+			strcatprintf(timecode_count_str, "%03d", (m_timecode_count-3)/2);
+			timecode_key = "EXTRA_START_" + timecode_count_str;
+			timecode_count_str.clear();
+			strcatprintf(timecode_count_str, "%d", (m_timecode_count-3)/2);
+			message += "TIMECODE: Extra " + timecode_count_str + " started at " + current_time_str;
+			timecode_text += "EXTRA " + timecode_count_str;
+			show_timecode_counter = true;
+		}
+		else {
+			machine().video().add_to_total_time(elapsed_time);
+
+			std::string timecode_count_str;
+			strcatprintf(timecode_count_str, "%d", (m_timecode_count-4)/2);
+			message += "TIMECODE: Extra " + timecode_count_str + " duration " + elapsed_time_str;
+
+			timecode_count_str.clear();
+			strcatprintf(timecode_count_str, "%03d", (m_timecode_count-4)/2);
+			timecode_key = "EXTRA_STOP_" + timecode_count_str;
+		}
+
+		osd_printf_info("%s \n", message.c_str());
+		machine().popmessage("%s \n", message.c_str());
+
+		std::string line_to_add;
+		line_to_add.append(timecode_key).append(19-timecode_key.length(), ' ');
+		line_to_add +=
+			" " + current_time_str   + " " + elapsed_time_str     +
+			" " + mseconds_start_str + " " + mseconds_elapsed_str +
+			" " + frame_start_str    + " " + frame_elapsed_str    +
+			"\n";
+		m_timecode_file.puts(line_to_add.c_str());
+
+		machine().video().set_timecode_write(false);
+		machine().video().set_timecode_text(timecode_text);
+		machine().video().set_timecode_start(m_timecode_last_time);
+		machine().ui().set_show_timecode_counter(show_timecode_counter);
 	}
 }
 
