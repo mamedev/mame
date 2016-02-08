@@ -1186,9 +1186,6 @@ files {
 createMESSProjects(_target, _subtarget, "apple")
 files {
 	MAME_DIR .. "src/mame/drivers/apple1.cpp",
-	MAME_DIR .. "src/mame/includes/apple1.h",
-	MAME_DIR .. "src/mame/machine/apple1.cpp",
-	MAME_DIR .. "src/mame/video/apple1.cpp",
 	MAME_DIR .. "src/mame/drivers/apple2.cpp",
 	MAME_DIR .. "src/mame/includes/apple2.h",
 	MAME_DIR .. "src/mame/drivers/apple2e.cpp",
