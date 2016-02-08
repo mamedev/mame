@@ -1270,7 +1270,7 @@ $(SRC)/devices/cpu/m68000/m68kops.cpp: $(SRC)/devices/cpu/m68000/m68k_in.cpp $(S
 ifeq ($(TARGETOS),asmjs)
 	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000
 else
-	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000 CC=$(CC) CXX=$(CXX)
+	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000 CC="$(CC)" CXX="$(CXX)"
 endif
 
 #-------------------------------------------------
