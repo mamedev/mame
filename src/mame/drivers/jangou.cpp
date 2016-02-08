@@ -264,7 +264,7 @@ WRITE8_MEMBER(jangou_state::blitter_process_w)
 	}
 }
 
-/* What is the bit 5 (0x20) for?*/
+/* What is bit 5 (0x20) for?*/
 WRITE8_MEMBER(jangou_state::blit_vregs_w)
 {
 	//  printf("%02x %02x\n", offset, data);
@@ -285,7 +285,7 @@ WRITE8_MEMBER(jangou_state::mux_w)
 WRITE8_MEMBER(jangou_state::output_w)
 {
 	/*
-	--x- ---- ? (polls between high and low in irq routine,probably signals the vblank routine)
+	--x- ---- ? (polls between high and low in irq routine, most likely irq mask)
 	---- -x-- flip screen
 	---- ---x coin counter
 	*/
