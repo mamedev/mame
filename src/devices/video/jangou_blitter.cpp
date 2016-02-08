@@ -5,8 +5,12 @@
 	Jangou Custom Blitter Chip, codename "???" (name scratched afaik)
 
 	device emulation by Angelo Salese, from original jangou.cpp implementation
-	by Angelo Salese, David Haywood and Phil Bennett
+	 by Angelo Salese, David Haywood and Phil Bennett
 
+	TODO:
+	- BLTFLIP mechanism;
+	- clean-ups;
+	 
 ***************************************************************************/
 
 #include "emu.h"
@@ -42,10 +46,13 @@ jangou_blitter_device::jangou_blitter_device(const machine_config &mconfig, cons
 
 void jangou_blitter_device::device_start()
 {
-	m_gfxrom =  machine().root_device().memregion("gfx")->base();
+	memory_region *devregion =  machine().root_device().memregion("gfx");
+	m_gfxrom = devregion->base();
 	if (m_gfxrom == nullptr)
 		fatalerror("JANGOU_BLITTER: \"gfx\" memory base not found");
-
+	m_gfxrommask = devregion->bytes()-1;
+	
+	
 	save_item(NAME(m_pen_data));
 	save_item(NAME(m_blit_data));
 	save_item(NAME(m_blit_buffer));
@@ -76,9 +83,9 @@ void jangou_blitter_device::device_reset()
 UINT8 jangou_blitter_device::gfx_nibble( UINT16 niboffset )
 {
 	if (niboffset & 1)
-		return (m_gfxrom[(niboffset >> 1) & 0xffff] & 0xf0) >> 4;
+		return (m_gfxrom[(niboffset >> 1) & m_gfxrommask] & 0xf0) >> 4;
 	else
-		return (m_gfxrom[(niboffset >> 1) & 0xffff] & 0x0f);
+		return (m_gfxrom[(niboffset >> 1) & m_gfxrommask] & 0x0f);
 }
 
 void jangou_blitter_device::plot_gfx_pixel( UINT8 pix, int x, int y )
