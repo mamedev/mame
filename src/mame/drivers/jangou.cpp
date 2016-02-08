@@ -32,8 +32,8 @@ $c088-$c095 player tiles
 #include "sound/hc55516.h"
 #include "sound/msm5205.h"
 #include "video/resnet.h"
+#include "video/jangou_blitter.h"
 #include "machine/nvram.h"
-
 
 #define MASTER_CLOCK    XTAL_19_968MHz
 
@@ -47,7 +47,8 @@ public:
 		m_nsc(*this, "nsc"),
 		m_msm(*this, "msm"),
 		m_cvsd(*this, "cvsd"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_blitter(*this, "blitter") { }
 
 	/* sound-related */
 	// Jangou CVSD Sound
@@ -70,13 +71,9 @@ public:
 	optional_device<msm5205_device> m_msm;
 	optional_device<hc55516_device> m_cvsd;
 	required_device<palette_device> m_palette;
+	required_device<jangou_blitter_device> m_blitter;
 
 	/* video-related */
-	UINT8        m_pen_data[0x10];
-	UINT8        m_blit_data[6];
-	UINT8        m_blit_buffer[256 * 256];
-	DECLARE_WRITE8_MEMBER(blitter_process_w);
-	DECLARE_WRITE8_MEMBER(blit_vregs_w);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_WRITE8_MEMBER(sound_latch_w);
@@ -102,8 +99,6 @@ public:
 	DECLARE_MACHINE_RESET(common);
 	UINT32 screen_update_jangou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(cvsd_bit_timer_callback);
-	UINT8 jangou_gfx_nibble( UINT16 niboffset );
-	void plot_jangou_gfx_pixel( UINT8 pix, int x, int y );
 	DECLARE_WRITE_LINE_MEMBER(jngolady_vclk_cb);
 };
 
@@ -157,7 +152,6 @@ PALETTE_INIT_MEMBER(jangou_state, jangou)
 
 void jangou_state::video_start()
 {
-	save_item(NAME(m_blit_buffer));
 }
 
 UINT32 jangou_state::screen_update_jangou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -166,7 +160,7 @@ UINT32 jangou_state::screen_update_jangou(screen_device &screen, bitmap_ind16 &b
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT8 *src = &m_blit_buffer[y * 512 / 2 + cliprect.min_x];
+		UINT8 *src = &m_blitter->m_blit_buffer[y * 256 + cliprect.min_x];
 		UINT16 *dst = &bitmap.pix16(y, cliprect.min_x);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
@@ -178,97 +172,6 @@ UINT32 jangou_state::screen_update_jangou(screen_device &screen, bitmap_ind16 &b
 	}
 
 	return 0;
-}
-
-/*
-Blitter Memory Map:
-
-src lo word[$12]
-src hi word[$13]
-x [$14]
-y [$15]
-h [$16]
-w [$17]
-*/
-
-UINT8 jangou_state::jangou_gfx_nibble( UINT16 niboffset )
-{
-	const UINT8 *const blit_rom = memregion("gfx")->base();
-
-	if (niboffset & 1)
-		return (blit_rom[(niboffset >> 1) & 0xffff] & 0xf0) >> 4;
-	else
-		return (blit_rom[(niboffset >> 1) & 0xffff] & 0x0f);
-}
-
-void jangou_state::plot_jangou_gfx_pixel( UINT8 pix, int x, int y )
-{
-	if (y < 0 || y >= 512)
-		return;
-	if (x < 0 || x >= 512)
-		return;
-
-	if (x & 1)
-		m_blit_buffer[(y * 256) + (x >> 1)] = (m_blit_buffer[(y * 256) + (x >> 1)] & 0x0f) | ((pix << 4) & 0xf0);
-	else
-		m_blit_buffer[(y * 256) + (x >> 1)] = (m_blit_buffer[(y * 256) + (x >> 1)] & 0xf0) | (pix & 0x0f);
-}
-
-WRITE8_MEMBER(jangou_state::blitter_process_w)
-{
-	int src, x, y, h, w, flipx;
-	m_blit_data[offset] = data;
-
-	if (offset == 5)
-	{
-		int count = 0;
-		int xcount, ycount;
-
-		/* printf("%02x %02x %02x %02x %02x %02x\n", m_blit_data[0], m_blit_data[1], m_blit_data[2],
-		            m_blit_data[3], m_blit_data[4], m_blit_data[5]); */
-		w = (m_blit_data[4] & 0xff) + 1;
-		h = (m_blit_data[5] & 0xff) + 1;
-		src = ((m_blit_data[1] << 8)|(m_blit_data[0] << 0));
-		x = (m_blit_data[2] & 0xff);
-		y = (m_blit_data[3] & 0xff);
-
-		// lowest bit of src controls flipping / draw direction?
-		flipx = (m_blit_data[0] & 1);
-
-		if (!flipx)
-			src += (w * h) - 1;
-		else
-			src -= (w * h) - 1;
-
-		for (ycount = 0; ycount < h; ycount++)
-		{
-			for(xcount = 0; xcount < w; xcount++)
-			{
-				int drawx = (x + xcount) & 0xff;
-				int drawy = (y + ycount) & 0xff;
-				UINT8 dat = jangou_gfx_nibble(src + count);
-				UINT8 cur_pen_hi = m_pen_data[(dat & 0xf0) >> 4];
-				UINT8 cur_pen_lo = m_pen_data[(dat & 0x0f) >> 0];
-
-				dat = cur_pen_lo | (cur_pen_hi << 4);
-
-				if ((dat & 0xff) != 0)
-					plot_jangou_gfx_pixel(dat, drawx, drawy);
-
-				if (!flipx)
-					count--;
-				else
-					count++;
-			}
-		}
-	}
-}
-
-/* What is bit 5 (0x20) for?*/
-WRITE8_MEMBER(jangou_state::blit_vregs_w)
-{
-	//  printf("%02x %02x\n", offset, data);
-	m_pen_data[offset] = data & 0xf;
 }
 
 /*************************************
@@ -418,8 +321,8 @@ static ADDRESS_MAP_START( cpu0_io, AS_IO, 8, jangou_state )
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") //dsw + blitter busy flag
 	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x17) AM_WRITE(blitter_process_w)
-	AM_RANGE(0x20,0x2f) AM_WRITE(blit_vregs_w)
+	AM_RANGE(0x12,0x17) AM_DEVWRITE("blitter",jangou_blitter_device, blitter_process_w)
+	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, blitter_vregs_w)
 	AM_RANGE(0x30,0x30) AM_WRITENOP //? polls 0x03 continuously
 	AM_RANGE(0x31,0x31) AM_WRITE(sound_latch_w)
 ADDRESS_MAP_END
@@ -489,8 +392,8 @@ static ADDRESS_MAP_START( cntrygrl_cpu0_io, AS_IO, 8, jangou_state )
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") //dsw + blitter busy flag
 	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x17) AM_WRITE(blitter_process_w)
-	AM_RANGE(0x20,0x2f) AM_WRITE(blit_vregs_w )
+	AM_RANGE(0x12,0x17) AM_DEVWRITE("blitter",jangou_blitter_device, blitter_process_w)
+	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, blitter_vregs_w)
 	AM_RANGE(0x30,0x30) AM_WRITENOP //? polls 0x03 continuously
 //  AM_RANGE(0x31,0x31) AM_WRITE(sound_latch_w)
 ADDRESS_MAP_END
@@ -514,8 +417,8 @@ static ADDRESS_MAP_START( roylcrdn_cpu0_io, AS_IO, 8, jangou_state )
 	AM_RANGE(0x10,0x10) AM_WRITENOP                 /* Writes continuosly 0's in attract mode, and 1's in game */
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
 	AM_RANGE(0x13,0x13) AM_READNOP                  /* Often reads bit7 with unknown purposes */
-	AM_RANGE(0x12,0x17) AM_WRITE(blitter_process_w)
-	AM_RANGE(0x20,0x2f) AM_WRITE(blit_vregs_w)
+	AM_RANGE(0x12,0x17) AM_DEVWRITE("blitter",jangou_blitter_device, blitter_process_w)
+	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, blitter_vregs_w)
 	AM_RANGE(0x30,0x30) AM_WRITENOP                 /* Seems to write 0x10 on each sound event */
 ADDRESS_MAP_END
 
@@ -896,8 +799,6 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(jangou_state,common)
 {
-	save_item(NAME(m_pen_data));
-	save_item(NAME(m_blit_data));
 	save_item(NAME(m_mux_data));
 }
 
@@ -925,15 +826,7 @@ MACHINE_START_MEMBER(jangou_state,jngolady)
 
 MACHINE_RESET_MEMBER(jangou_state,common)
 {
-	int i;
-
 	m_mux_data = 0;
-
-	for (i = 0; i < 6; i++)
-		m_blit_data[i] = 0;
-
-	for (i = 0; i < 16; i++)
-		m_pen_data[i] = 0;
 }
 
 void jangou_state::machine_reset()
@@ -967,7 +860,8 @@ static MACHINE_CONFIG_START( jangou, jangou_state )
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_IO_MAP(cpu1_io)
 
-
+	MCFG_JANGOU_BLITTER_ADD("blitter", MASTER_CLOCK/4)
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4,320,0,256,264,16,240) // assume same as nightgal.cpp

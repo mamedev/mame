@@ -842,3 +842,15 @@ if (VIDEOS["CRTC_EGA"]~=null) then
 		MAME_DIR .. "src/devices/video/crtc_ega.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/jangou_blitter.h,VIDEOS["JANGOU_BLITTER"] = true
+--------------------------------------------------
+
+if (VIDEOS["JANGOU_BLITTER"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/jangou_blitter.cpp",
+		MAME_DIR .. "src/devices/video/jangou_blitter.h",
+	}
+end
