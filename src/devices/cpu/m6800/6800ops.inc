@@ -2284,7 +2284,7 @@ OP_HANDLER( stx_ex )
 	WM16(EAD,&m_x);
 }
 
-/* NCS specific, guessed opcodes (tested by Night Gal Summer) */
+/* NSC8105 specific, guessed opcodes (tested by Night Gal Summer) */
 // $bb - load A from [X + $0]
 OP_HANDLER( ldax_imm )
 {
@@ -2292,6 +2292,17 @@ OP_HANDLER( ldax_imm )
 	A=RM(EAD);
 	CLR_NZV;
 	SET_NZ8(A);
+}
+
+// $b2 - assuming correct, store first byte to (X + $disp8)
+OP_HANDLER( nsc_unk )
+{
+	IMM8;
+	UINT8 val = RM(EAD);
+	IMM8;
+	EA = X + RM(EAD);
+	
+	WM(EAD,val);
 }
 
 // $00 - store A to [X + $0]
