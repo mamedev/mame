@@ -602,8 +602,14 @@ WRITE_LINE_MEMBER( atom_state::atom_8271_interrupt_callback )
 
 WRITE_LINE_MEMBER( atom_state::motor_w )
 {
-	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(!state);
-	m_fdc->subdevice<floppy_connector>("1")->get_device()->mon_w(!state);
+	for (int i=0; i != 2; i++) {
+		char devname[1];
+		sprintf(devname, "%d", i);
+		floppy_connector *con = m_fdc->subdevice<floppy_connector>(devname);
+		if (con) {
+			con->get_device()->mon_w(!state);
+		}
+	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(atom_state::cassette_output_tick)
