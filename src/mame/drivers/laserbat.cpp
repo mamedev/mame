@@ -62,6 +62,9 @@
     * Service coin 1 input grants two credits the first time it's
       pushed, but remembers this and won't grant credits again unless
       unless you trigger the tilt input
+    * The sprite ROM is twice the size as Laser Battle with the bank
+      selected using bit 9 of the 16-bit sound interface (there's a wire
+      making this connection visible on the component side of the PCB)
     * Judging by the PLA program, the colour weight resistors are likely
       different to what Laser Battle/Lazarian uses - we need a detailed
       colour photo of the game board or a schematic to confirm values
@@ -71,7 +74,6 @@
 
     TODO:
     - work out where all the magic layer offsets come from
-    - catnmous sprite ROM appears to be underdumped
     - need to confirm colour weight resistors on catnmous (detailed photo required):
       R58, R59, R60, R61, R62, R65, R66, R67, R68, R69, R72, R73, R74, R75
       (network connected between 11M, 12M, Q5, Q7, Q8)
