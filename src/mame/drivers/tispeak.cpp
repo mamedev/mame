@@ -396,7 +396,7 @@ K28 modules:
 #include "softlist.h"
 
 // internal artwork
-#include "k28.lh"
+#include "k28m2.lh"
 #include "lantutor.lh"
 #include "snmath.lh"
 #include "snspell.lh"
@@ -1105,7 +1105,7 @@ static INPUT_PORTS_START( tntell )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( k28 )
+static INPUT_PORTS_START( k28m2 )
 	PORT_START("IN.0") // O0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") // -> auto_power_off
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('A') PORT_NAME("A/1")
@@ -1341,7 +1341,7 @@ static MACHINE_CONFIG_DERIVED( tntell, vocaid )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( k28, tispeak_state )
+static MACHINE_CONFIG_START( k28m2, tispeak_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1400, MASTER_CLOCK/2)
@@ -1350,7 +1350,7 @@ static MACHINE_CONFIG_START( k28, tispeak_state )
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, k28_write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_k28)
+	MCFG_DEFAULT_LAYOUT(layout_k28m2)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
@@ -1360,11 +1360,11 @@ static MACHINE_CONFIG_START( k28, tispeak_state )
 	MCFG_FRAGMENT_ADD(tms5110_route)
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "k28")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "k28m2")
 	MCFG_GENERIC_EXTENSIONS("vsm")
 	MCFG_GENERIC_LOAD(tispeak_state, tispeak_cartridge)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "k28")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "k28m2")
 MACHINE_CONFIG_END
 
 
@@ -1709,14 +1709,14 @@ ROM_START( vocaid )
 ROM_END
 
 
-ROM_START( k28 )
+ROM_START( k28m2 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mp7324", 0x0000, 0x1000, CRC(08d15ab6) SHA1(5b0f6c53e6732a362c4bb25d966d4072fdd33db8) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
 	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_k28_output.pla", 0, 557, CRC(3a5c7005) SHA1(3fe5819c138a90e7fc12817415f2622ca81b40b2) )
+	ROM_LOAD( "tms1400_k28m2_output.pla", 0, 557, CRC(3a5c7005) SHA1(3fe5819c138a90e7fc12817415f2622ca81b40b2) )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff? = space reserved for cartridge
 	ROM_LOAD( "cm62084.vsm", 0x0000, 0x4000, CRC(cd1376f7) SHA1(96fa484c392c451599bc083b8376cad9c998df7d) )
@@ -1754,4 +1754,4 @@ COMP( 1981, tntellfr,   tntell,   0, tntell,       tntell,     tispeak_state, tn
 
 COMP( 1982, vocaid,     0,        0, vocaid,       tntell,     driver_device, 0,        "Texas Instruments", "Vocaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
 
-COMP( 1985, k28,        0,        0, k28,          k28,        tispeak_state, snspell,  "Tiger Electronics", "K28: Talking Learning Computer (model 7-232)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+COMP( 1985, k28m2,      0,        0, k28m2,        k28m2,      tispeak_state, snspell,  "Tiger Electronics", "K28: Talking Learning Computer (model 7-232)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
