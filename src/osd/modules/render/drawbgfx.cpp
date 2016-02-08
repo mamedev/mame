@@ -84,13 +84,8 @@ public:
 		window().target()->set_bounds(rect_width(&client), rect_height(&client), window().aspect());
 		return &window().target()->get_primitives();
 #else
-		osd_dim nd = window().blit_surface_size();
-		if (nd != m_blit_dim)
-		{
-			m_blit_dim = nd;
-			notify_changed();
-		}
-		window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().aspect());
+		osd_dim wdim = window().get_size();
+		window().target()->set_bounds(wdim.width(), wdim.height(), window().aspect());
 		return &window().target()->get_primitives();
 #endif
 	}
@@ -175,12 +170,10 @@ int renderer_bgfx::create()
 	bgfx::init();	
 	bgfx::reset(rect_width(&client), rect_height(&client), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 #else
-	osd_dim d = window().get_size();
-	m_blittimer = 3;
-
+	osd_dim wdim = window().get_size();
 	bgfx::sdlSetWindow(window().sdl_window());
 	bgfx::init();
-	bgfx::reset(d.width(), d.height(), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+	bgfx::reset(wdim.width(), wdim.height(), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 #endif
 
 	// Enable debug text.
@@ -755,8 +748,9 @@ int renderer_bgfx::draw(int update)
 	width = rect_width(&client);
 	height = rect_height(&client);
 #else
-	width = m_blit_dim.width();
-	height = m_blit_dim.height();
+	osd_dim wdim = window().get_size();
+	width = wdim.width();
+	height = wdim.height();
 #endif
 	bgfx::setViewRect(0, 0, 0, width, height);
 	bgfx::reset(width, height, video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
