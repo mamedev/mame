@@ -43,7 +43,7 @@ jangou_blitter_device::jangou_blitter_device(const machine_config &mconfig, cons
 void jangou_blitter_device::device_start()
 {
 	m_gfxrom =  machine().root_device().memregion("gfx")->base();
-	if (m_gfxrom == null)
+	if (m_gfxrom == nullptr)
 		fatalerror("JANGOU_BLITTER: \"gfx\" memory base not found");
 
 	save_item(NAME(m_pen_data));
