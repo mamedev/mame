@@ -47,7 +47,7 @@ public:
 static ADDRESS_MAP_START(notetaker_mem, AS_PROGRAM, 16, notetaker_state)
 	//	AM_RANGE(0x00000, 0x01fff) AM_RAM
 	AM_RANGE(0x00000, 0x00fff) AM_ROM AM_REGION("maincpu", 0xFF000) // I think this copy of rom is actually banked via io reg 0x20, there is ram which lives behind here?
-	// ram lives here?
+	AM_RANGE(0x01000, 0x01fff) AM_RAM // ram lives here, or at least some of it does for the stack.
 	AM_RANGE(0xff000, 0xfffff) AM_ROM // is this banked too?
 ADDRESS_MAP_END
 
@@ -72,7 +72,7 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( notetakr, notetaker_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL_14_7456MHz/3) /* unknown crystal and divider */
+	MCFG_CPU_ADD("maincpu", I8086, XTAL_24MHz/3) /* 24Mhz crystal divided down by i8284 clock generator */
 	MCFG_CPU_PROGRAM_MAP(notetaker_mem)
 	MCFG_CPU_IO_MAP(notetaker_io)
 
