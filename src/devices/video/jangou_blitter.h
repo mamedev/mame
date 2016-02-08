@@ -44,9 +44,9 @@ protected:
 	
 private:
 	void plot_gfx_pixel( UINT8 pix, int x, int y );
-	UINT8 gfx_nibble( UINT16 niboffset );
+	UINT8 gfx_nibble( UINT32 niboffset );
 	UINT8 m_pen_data[0x10];
-	UINT8 m_blit_data[6];
+	UINT8 m_blit_data[7];
 	UINT8 *m_gfxrom;
 	UINT32 m_gfxrommask;
 };

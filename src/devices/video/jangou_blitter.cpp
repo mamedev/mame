@@ -52,7 +52,6 @@ void jangou_blitter_device::device_start()
 		fatalerror("JANGOU_BLITTER: \"gfx\" memory base not found");
 	m_gfxrommask = devregion->bytes()-1;
 	
-	
 	save_item(NAME(m_pen_data));
 	save_item(NAME(m_blit_data));
 	save_item(NAME(m_blit_buffer));
@@ -65,13 +64,8 @@ void jangou_blitter_device::device_start()
 
 void jangou_blitter_device::device_reset()
 {
-	int i;
-
-	for (i = 0; i < 6; i++)
-		m_blit_data[i] = 0;
-
-	for (i = 0; i < 16; i++)
-		m_pen_data[i] = 0;
+	memset(m_blit_data, 0, ARRAY_LENGTH(m_blit_data));
+	memset(m_pen_data, 0, ARRAY_LENGTH(m_pen_data));
 }
 
 
@@ -80,7 +74,7 @@ void jangou_blitter_device::device_reset()
 //**************************************************************************
 
 // TODO: inline these
-UINT8 jangou_blitter_device::gfx_nibble( UINT16 niboffset )
+UINT8 jangou_blitter_device::gfx_nibble( UINT32 niboffset )
 {
 	if (niboffset & 1)
 		return (m_gfxrom[(niboffset >> 1) & m_gfxrommask] & 0xf0) >> 4;
@@ -111,11 +105,12 @@ WRITE8_MEMBER( jangou_blitter_device::blitter_process_w )
 		int count = 0;
 		int xcount, ycount;
 
-		/* printf("%02x %02x %02x %02x %02x %02x\n", m_blit_data[0], m_blit_data[1], m_blit_data[2],
-		            m_blit_data[3], m_blit_data[4], m_blit_data[5]); */
+		//printf("%02x %02x %02x %02x %02x %02x %02x\n", m_blit_data[0], m_blit_data[1], m_blit_data[2],
+		//           m_blit_data[3], m_blit_data[4], m_blit_data[5],m_blit_data[6]); 
 		w = (m_blit_data[4] & 0xff) + 1;
 		h = (m_blit_data[5] & 0xff) + 1;
 		src = ((m_blit_data[1] << 8)|(m_blit_data[0] << 0));
+		src |= (m_blit_data[6] & 3) << 16;
 		x = (m_blit_data[2] & 0xff);
 		y = (m_blit_data[3] & 0xff);
 
