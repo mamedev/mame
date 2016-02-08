@@ -782,6 +782,9 @@ int renderer_bgfx::draw(int update)
 
 	// Draw quad.
 	// now draw
+	uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
+	if (video_config.filter==0) texture_flags |= BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
+	
 	for (render_primitive *prim = window().m_primlist->first(); prim != NULL; prim = prim->next())
 	{
 		uint64_t flags = BGFX_STATE_RGB_WRITE;
@@ -856,7 +859,7 @@ int renderer_bgfx::draw(int update)
 							, (uint16_t)prim->texture.height
 							, 1
 							, bgfx::TextureFormat::BGRA8
-							, 0
+							, texture_flags
 							, mem
 							);
 					}
@@ -872,7 +875,7 @@ int renderer_bgfx::draw(int update)
 							, (uint16_t)prim->texture.height
 							, 1
 							, bgfx::TextureFormat::BGRA8
-							, 0
+							, texture_flags
 							, mem
 							);
 					}
@@ -903,7 +906,7 @@ int renderer_bgfx::draw(int update)
 								, (uint16_t)prim->texture.height
 								, 1
 								, bgfx::TextureFormat::BGRA8
-								, 0
+								, texture_flags
 								, mem
 								);
 						} else {
@@ -911,7 +914,7 @@ int renderer_bgfx::draw(int update)
 								, (uint16_t)prim->texture.height
 								, 1
 								, bgfx::TextureFormat::BGRA8
-								, 0
+								, texture_flags
 								, bgfx::copy(prim->texture.base, prim->texture.width*prim->texture.height*4)
 								);							
 						}
