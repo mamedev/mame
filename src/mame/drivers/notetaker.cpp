@@ -8,20 +8,35 @@
  * see http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker
  *
  * MISSING DUMP for 8741 I/O MCU
+ 
+TODO: Pretty much everything.
+* Get the bootrom to do something sane instead of infinite-looping (is the dump good?)
+* Get bootrom/ram bankswitching working
+* Get the running machine smalltalk-78 memory dump loaded as a rom and forced into ram on startup, since no boot disks have survived
+* floppy controller (rather complex and somewhat raw/low level)
+* crt5027 video controller
+* pic8259 interrupt controller
+* i8251? serial/EIA controller
+* 6402 keyboard UART
+* HLE for the missing 8741 which reads the mouse quadratures and buttons
+
 */
 
 #include "cpu/i86/i86.h"
+//#include "video/tms9927.h"
 
 class notetaker_state : public driver_device
 {
 public:
 	notetaker_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu")//,
+		//m_vtac(*this, "crt5027")
 	{
 	}
 // devices
 	required_device<cpu_device> m_maincpu;
+	//required_device<crt5027_device> m_vtac;
 
 //declarations
 
@@ -34,8 +49,19 @@ static ADDRESS_MAP_START(notetaker_mem, AS_PROGRAM, 16, notetaker_state)
 	AM_RANGE(0xff000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
+// io memory map comes from http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker/memos/19790605_Definition_of_8086_Ports.pdf
 static ADDRESS_MAP_START(notetaker_io, AS_IO, 16, notetaker_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	//AM_RANGE(0x02, 0x03) AM_READWRITE interrupt control register, high byte only
+	//AM_RANGE(0x20, 0x21) AM_WRITE processor (rom mapping, etc) control register
+	//AM_RANGE(0x42, 0x43) AM_READ read keyboard data (high byte only) [from mcu?]
+	//AM_RANGE(0x44, 0x45) AM_READ read keyboard fifo state (high byte only) [from mcu?]
+	//AM_RANGE(0x48, 0x49) AM_WRITE kbd->uart control register [to mcu?]
+	//AM_RANGE(0x4a, 0x4b) AM_WRITE kbd->uart data register [to mcu?]
+	//AM_RANGE(0x4c, 0x4d) AM_WRITE kbd data reset [to mcu?]
+	//AM_RANGE(0x4e, 0x4f) AM_WRITE kbd chip [mcu?] reset [to mcu?]
+	//AM_RANGE(0x60, 0x61) AM_WRITE DAC sample and hold and frequency setup
+	//AM_RANGE(0x140, 0x15f) AM_DEVREADWRITE("crt5027", crt5027_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -49,8 +75,19 @@ static MACHINE_CONFIG_START( notetakr, notetaker_state )
 	MCFG_CPU_IO_MAP(notetaker_io)
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT(layout_notetaker)
+	/*MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
+	MCFG_SCREEN_UPDATE_DRIVER(notetaker_state, screen_update)
+	MCFG_SCREEN_SIZE(64*6, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 32*8-1)
 
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+
+	MCFG_DEVICE_ADD("crt5027", CRT5027, XTAL_17_9712MHz/2)
+	//MCFG_TMS9927_CHAR_WIDTH(6)
+	//MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE(TMS5501_TAG, tms5501_device, sens_w))
+	MCFG_VIDEO_SET_SCREEN("screen")*/
 	/* Devices */
 
 MACHINE_CONFIG_END
