@@ -2767,6 +2767,7 @@ files {
 	MAME_DIR .. "src/mame/includes/gamecom.h",
 	MAME_DIR .. "src/mame/machine/gamecom.cpp",
 	MAME_DIR .. "src/mame/video/gamecom.cpp",
+	MAME_DIR .. "src/mame/drivers/k28.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "tigertel")
