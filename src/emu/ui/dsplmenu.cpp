@@ -21,17 +21,16 @@
 #include "../osd/modules/lib/osdobj_common.h"
 #endif
 
-ui_menu_display_options::video_modes ui_menu_display_options::m_video[] = {
-	{ "auto",    "Auto" },
-	{ "opengl",  "OpenGL" },
-#if defined(UI_WINDOWS) && !defined(UI_SDL)
-	{ "d3d",     "Direct3D" },
-	{ "gdi",     "GDI" },
-	{ "ddraw",   "DirectDraw" }
-#else
-	{ "soft",    "Software" },
-	{ "accel",   "SDL2 Accelerated" }
-#endif
+
+ui_menu_display_options::video_modes ui_menu_display_options::m_video = {
+	{ "auto",	"Auto" },
+	{ "opengl",	"OpenGL" },
+	{ "bgfx",	"BGFX" },
+	{ "d3d",	"Direct3D" },
+	{ "gdi",    "GDI" },
+	{ "ddraw",  "DirectDraw" },
+	{ "soft",   "Software" },
+	{ "accel",  "SDL2 Accelerated" }
 };
 
 ui_menu_display_options::dspl_option ui_menu_display_options::m_options[] = {
@@ -65,9 +64,30 @@ ui_menu_display_options::ui_menu_display_options(running_machine &machine, rende
 	for (int d = 2; d < ARRAY_LENGTH(m_options); ++d)
 		m_options[d].status = options.int_value(m_options[d].option);
 
+	// create video list
+	m_list.push_back("auto");
+
+	std::string descr = options.description(OSDOPTION_VIDEO);
+	std::string delim = ", ";
+	descr.erase(0, descr.find(":") + 2);
+	size_t start = 0;
+	size_t end = descr.find_first_of(delim, start);
+	while (end != std::string::npos)
+	{
+		std::string name = descr.substr(start, end - start);
+		if (name != "none" && name != "or")
+			m_list.push_back(name);
+		start = descr.find_first_not_of(delim, end);
+		if (start == std::string::npos)
+			break;
+		end = descr.find_first_of(delim, start);
+		if (end == std::string::npos)
+			end = descr.size();
+	}
+
 	m_options[1].status = 0;
-	for (int cur = 0; cur < ARRAY_LENGTH(m_video); ++cur)
-		if (!core_stricmp(options.video(), m_video[cur].option))
+	for (int cur = 0; cur < m_list.size(); ++cur)
+		if (options.video() == m_list[cur])
 		{
 			m_options[1].status = cur;
 			break;
@@ -83,15 +103,15 @@ ui_menu_display_options::~ui_menu_display_options()
 	std::string error_string;
 	for (int d = 2; d < ARRAY_LENGTH(m_options); ++d) 
 	{
-		if (machine().options().int_value(m_options[d].option)!=m_options[d].status)
+		if (machine().options().int_value(m_options[d].option) != m_options[d].status)
 		{
 			machine().options().set_value(m_options[d].option, m_options[d].status, OPTION_PRIORITY_CMDLINE, error_string);
 			machine().options().mark_changed(m_options[d].option);
 		}	
 	}
-	if (strcmp(machine().options().value(m_options[1].option), m_video[m_options[1].status].option)!=0)
+	if (machine().options().value(m_options[1].option) !=  m_list[m_options[1].status])
 	{
-		machine().options().set_value(m_options[1].option, m_video[m_options[1].status].option, OPTION_PRIORITY_CMDLINE, error_string);
+		machine().options().set_value(m_options[1].option, m_list[m_options[1].status].c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 		machine().options().mark_changed(m_options[1].option);
 
 	}	
@@ -122,10 +142,10 @@ void ui_menu_display_options::handle()
 			}
 			else if (m_event->iptkey == IPT_UI_SELECT && !strcmp(m_options[value].option, OSDOPTION_VIDEO))
 			{
-				int total = ARRAY_LENGTH(m_video);
+				int total = m_list.size();
 				std::vector<std::string> s_sel(total);
 				for (int index = 0; index < total; ++index)
-					s_sel[index] = m_video[index].label;
+					s_sel[index] = m_video[m_list[index]];
 
 				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, m_options[value].status));
 			}
@@ -148,15 +168,15 @@ void ui_menu_display_options::handle()
 void ui_menu_display_options::populate()
 {
 	// add video mode option
-	std::string v_text(m_video[m_options[1].status].label);
-	UINT32 arrow_flags = get_arrow_flags(0, ARRAY_LENGTH(m_video) - 1, m_options[1].status);
+	std::string v_text(m_video[m_list[m_options[1].status]]);
+	UINT32 arrow_flags = get_arrow_flags(0, m_list.size() - 1, m_options[1].status);
 	item_append(m_options[1].description, v_text.c_str(), arrow_flags, (void *)(FPTR)1);
 
 	// add options items
 	for (int opt = 2; opt < ARRAY_LENGTH(m_options); ++opt)
 		if (strcmp(m_options[opt].option, OSDOPTION_PRESCALE) != 0)
 			item_append(m_options[opt].description, m_options[opt].status ? "On" : "Off",
-			            m_options[opt].status ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)opt);
+				m_options[opt].status ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)opt);
 		else
 		{
 			strprintf(v_text, "%d", m_options[opt].status);
@@ -176,8 +196,8 @@ void ui_menu_display_options::custom_render(void *selectedref, float top, float 
 {
 	float width;
 	ui_manager &mui = machine().ui();
-	mui.draw_text_full(container, "Display Options", 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	mui.draw_text_full(container, "Display Options", 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE, 
+		ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -196,6 +216,6 @@ void ui_menu_display_options::custom_render(void *selectedref, float top, float 
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, "Display Options", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	mui.draw_text_full(container, "Display Options", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, 
+		UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }

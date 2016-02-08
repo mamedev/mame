@@ -148,10 +148,9 @@ void ui_menu_command_content::populate()
 		float gutter_width = 0.52f * line_height * machine().render().ui_aspect();
 		std::vector<int> xstart;
 		std::vector<int> xend;
-		int total_lines;
 		convert_command_glyph(buffer);
-		machine().ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (2.0f * UI_BOX_LR_BORDER) - 0.02f - (2.0f * gutter_width),
-		                         total_lines, xstart, xend);
+		int total_lines = machine().ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 
+			1.0f - (2.0f * UI_BOX_LR_BORDER) - 0.02f - (2.0f * gutter_width), xstart, xend);
 		for (int r = 0; r < total_lines; r++)
 		{
 			std::string tempbuf(buffer.substr(xstart[r], xend[r] - xstart[r]));
@@ -294,10 +293,8 @@ void ui_menu_history_sw::populate()
 		float gutter_width = 0.52f * line_height * machine().render().ui_aspect();
 		std::vector<int> xstart;
 		std::vector<int> xend;
-		int total_lines;
-
-		machine().ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (2.0f * UI_BOX_LR_BORDER) - 0.02f - (2.0f * gutter_width),
-		                         total_lines, xstart, xend);
+		int total_lines = machine().ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (2.0f * UI_BOX_LR_BORDER) - 0.02f - (2.0f * gutter_width),
+		                         xstart, xend);
 
 		for (int r = 0; r < total_lines; r++)
 		{
@@ -544,9 +541,7 @@ bool ui_menu_dats::get_data(const game_driver *driver, int flags)
 	float gutter_width = 0.52f * line_height * machine().render().ui_aspect();
 	std::vector<int> xstart;
 	std::vector<int> xend;
-	int tlines;
-
-	machine().ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (2.0f * UI_BOX_LR_BORDER) - 0.02f - (2.0f * gutter_width), tlines, xstart, xend);
+	int tlines = machine().ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (2.0f * UI_BOX_LR_BORDER) - 0.02f - (2.0f * gutter_width), xstart, xend);
 	for (int r = 0; r < tlines; r++)
 	{
 		std::string tempbuf(buffer.substr(xstart[r], xend[r] - xstart[r]));
