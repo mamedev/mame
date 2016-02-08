@@ -87,6 +87,7 @@ public:
 	// snapshots
 	void save_snapshot(screen_device *screen, emu_file &file);
 	void save_active_screen_snapshots();
+	void save_input_timecode();
 
 	// movies
 	void begin_recording(const char *name, movie_format format);

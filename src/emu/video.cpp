@@ -341,13 +341,6 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 
 void video_manager::save_active_screen_snapshots()
 {
-	// If record inp is acrive, no snapshot will be created
-	if (m_timecode_enabled) {
-		// This flag will write the line on file inp.timecode (see function ioport_manager::record_frame)
-		m_timecode_write = true;
-		return;
-	}
-
 	// if we're native, then write one snapshot per visible screen
 	if (m_snap_native)
 	{
@@ -371,6 +364,21 @@ void video_manager::save_active_screen_snapshots()
 		if (filerr == FILERR_NONE)
 			save_snapshot(nullptr, file);
 	}
+}
+
+
+//-------------------------------------------------
+//  save_input_timecode - add a line of current
+//  timestamp to inp.timecode file
+//-------------------------------------------------
+
+void video_manager::save_input_timecode()
+{
+	// if record timecode input is not active, do nothing
+	if (!m_timecode_enabled) {
+		return;
+	}
+	m_timecode_write = true;
 }
 
 std::string &video_manager::timecode_text(std::string &str) {

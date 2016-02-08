@@ -1648,6 +1648,10 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 
 	machine.ui().image_handler_ingame();
 
+	// handle a save input timecode request
+	if (machine.ui_input().pressed(IPT_UI_TIMECODE))
+		machine.video().save_input_timecode();
+
 	if (ui_disabled) return ui_disabled;
 
 	if (machine.ui_input().pressed(IPT_UI_CANCEL))

@@ -3434,11 +3434,11 @@ void ioport_manager::playback_end(const char *message)
 		osd_printf_info("Total playback frames: %d\n", UINT32(m_playback_accumulated_frames));
 		osd_printf_info("Average recorded speed: %d%%\n", UINT32((m_playback_accumulated_speed * 200 + 1) >> 21));
 
-		// Close the Mame at the end of inp file playback
-		//if (strcmp(message, "End of file")) {
+		// close the program at the end of inp file playback
+		if (machine().options().exit_after_playback()) {
 			osd_printf_info("Exiting MAME now...\n");
 			machine().schedule_exit();
-		//}
+		}
 	}
 }
 
@@ -3589,24 +3589,27 @@ void ioport_manager::record_init()
 
 
 void ioport_manager::timecode_init() {
+	// check if option -record_timecode is enabled
+	if (!machine().options().record_timecode()) {
+		machine().video().set_timecode_enabled(false);
+		return;
+	}
 	// if no file, nothing to do
 	const char *record_filename = machine().options().record();
 	if (record_filename[0] == 0) {
 		machine().video().set_timecode_enabled(false);
 		return;
 	}
-	//osd_printf_error("DEBUG FILENAME-1: %s\n", record_filename);
+
 	machine().video().set_timecode_enabled(true);
 
 	// open the record file
 	std::string filename;
 	filename.append(record_filename).append(".timecode");
-	//sprintf(filename, "%s.timecode", record_filename);
-
-	//osd_printf_error("DEBUG FILENAME-2: %s\n", filename.c_str());
+	osd_printf_info("Record input timecode file: %s\n", record_filename);
 
 	file_error filerr = m_timecode_file.open(filename.c_str());
-	assert_always(filerr == FILERR_NONE, "Failed to open file for timecode recording");
+	assert_always(filerr == FILERR_NONE, "Failed to open file for input timecode recording");
 
 	m_timecode_file.puts(std::string("# ==========================================\n").c_str());
 	m_timecode_file.puts(std::string("# TIMECODE FILE FOR VIDEO PREVIEW GENERATION\n").c_str());
@@ -3666,8 +3669,8 @@ void ioport_manager::record_frame(const attotime &curtime)
 	if (m_record_file.is_open())
 	{
 		// first the absolute time
-		record_write(curtime.m_seconds);
-		record_write(curtime.m_attoseconds);
+		record_write(curtime.seconds());
+		record_write(curtime.attoseconds());
 
 		// then the current speed
 		record_write(UINT32(machine().video().speed_percent() * double(1 << 20)));
@@ -3678,28 +3681,28 @@ void ioport_manager::record_frame(const attotime &curtime)
 		std::string current_time_str;
 		m_timecode_count++;
 		strcatprintf(current_time_str, "%02d:%02d:%02d.%03d",
-			(int)curtime.m_seconds / (60 * 60),
-			(curtime.m_seconds / 60) % 60,
-			curtime.m_seconds % 60,
-			(int)(curtime.m_attoseconds/ATTOSECONDS_PER_MILLISECOND));
+			(int)curtime.seconds() / (60 * 60),
+			(curtime.seconds() / 60) % 60,
+			curtime.seconds() % 60,
+			(int)(curtime.attoseconds()/ATTOSECONDS_PER_MILLISECOND));
 
 		// Elapsed from previous timecode
 		attotime elapsed_time = curtime - m_timecode_last_time;
 		m_timecode_last_time = curtime;
 		std::string elapsed_time_str;
 		strcatprintf(elapsed_time_str, "%02d:%02d:%02d.%03d",
-			elapsed_time.m_seconds / (60 * 60),
-			(elapsed_time.m_seconds / 60) % 60,
-			elapsed_time.m_seconds % 60,
-			int(elapsed_time.m_attoseconds/ATTOSECONDS_PER_MILLISECOND));
+			elapsed_time.seconds() / (60 * 60),
+			(elapsed_time.seconds() / 60) % 60,
+			elapsed_time.seconds() % 60,
+			int(elapsed_time.attoseconds()/ATTOSECONDS_PER_MILLISECOND));
 
 		// Number of ms from beginning of playback
-		int mseconds_start = curtime.m_seconds*1000 + curtime.m_attoseconds/ATTOSECONDS_PER_MILLISECOND;
+		int mseconds_start = curtime.seconds()*1000 + curtime.attoseconds()/ATTOSECONDS_PER_MILLISECOND;
 		std::string mseconds_start_str;
 		strcatprintf(mseconds_start_str, "%015d", mseconds_start);
 
 		// Number of ms from previous timecode
-		int mseconds_elapsed = elapsed_time.m_seconds*1000 + elapsed_time.m_attoseconds/ATTOSECONDS_PER_MILLISECOND;
+		int mseconds_elapsed = elapsed_time.seconds()*1000 + elapsed_time.attoseconds()/ATTOSECONDS_PER_MILLISECOND;
 		std::string mseconds_elapsed_str;
 		strcatprintf(mseconds_elapsed_str, "%015d", mseconds_elapsed);
 
@@ -3713,30 +3716,30 @@ void ioport_manager::record_frame(const attotime &curtime)
 		std::string frame_elapsed_str;
 		strcatprintf(frame_elapsed_str, "%015d", frame_elapsed);
 
-		std::string messaggio;
+		std::string message;
 		std::string timecode_text;
 		std::string timecode_key;
 		bool show_timecode_counter = false;
 		if (m_timecode_count==1) {
-			messaggio += "INTRO STARTED AT " + current_time_str;
+			message += "TIMECODE: Intro started at " + current_time_str;
 			timecode_key = "INTRO_START";
 			timecode_text = "INTRO";
 			show_timecode_counter = true;
 		}
 		else if (m_timecode_count==2) {
-			messaggio += "INTRO DURATION " + elapsed_time_str;
+			message += "TIMECODE: Intro duration " + elapsed_time_str;
 			timecode_key = "INTRO_STOP";
 			machine().video().add_to_total_time(elapsed_time);
 			//timecode_text += "INTRO";
 		}
 		else if (m_timecode_count==3) {
-			messaggio += "GAMEPLAY STARTED AT " + current_time_str;
+			message += "TIMECODE: Gameplay started at " + current_time_str;
 			timecode_key = "GAMEPLAY_START";
 			timecode_text += "GAMEPLAY";
 			show_timecode_counter = true;
 		}
 		else if (m_timecode_count==4) {
-			messaggio += "GAMEPLAY DURATION " + elapsed_time_str;
+			message += "TIMECODE: Gameplay duration " + elapsed_time_str;
 			timecode_key = "GAMEPLAY_STOP";
 			machine().video().add_to_total_time(elapsed_time);
 			//timecode_text += "GAMEPLAY";
@@ -3747,7 +3750,7 @@ void ioport_manager::record_frame(const attotime &curtime)
 			timecode_key = "EXTRA_START_" + timecode_count_str;
 			timecode_count_str.clear();
 			strcatprintf(timecode_count_str, "%d", (m_timecode_count-3)/2);
-			messaggio += "EXTRA " + timecode_count_str + " STARTED AT " + current_time_str;
+			message += "TIMECODE: Extra " + timecode_count_str + " started at " + current_time_str;
 			timecode_text += "EXTRA " + timecode_count_str;
 			show_timecode_counter = true;
 		}
@@ -3756,29 +3759,26 @@ void ioport_manager::record_frame(const attotime &curtime)
 
 			std::string timecode_count_str;
 			strcatprintf(timecode_count_str, "%d", (m_timecode_count-4)/2);
-			messaggio += "EXTRA " + timecode_count_str + " DURATION " + elapsed_time_str;
+			message += "TIMECODE: Extra " + timecode_count_str + " duration " + elapsed_time_str;
 
-			//std::string timecode_count_str;
 			timecode_count_str.clear();
 			strcatprintf(timecode_count_str, "%03d", (m_timecode_count-4)/2);
 			timecode_key = "EXTRA_STOP_" + timecode_count_str;
 		}
 
-		osd_printf_info("%s \n", messaggio.c_str());
-		machine().popmessage("%s \n", messaggio.c_str());
+		osd_printf_info("%s \n", message.c_str());
+		machine().popmessage("%s \n", message.c_str());
 
-		std::string riga_file;
-		riga_file.append(timecode_key).append(19-timecode_key.length(), ' ');
-		//riga_file += "INTRO_START        " +
-		riga_file +=
+		std::string line_to_add;
+		line_to_add.append(timecode_key).append(19-timecode_key.length(), ' ');
+		line_to_add +=
 			" " + current_time_str   + " " + elapsed_time_str     +
 			" " + mseconds_start_str + " " + mseconds_elapsed_str +
 			" " + frame_start_str    + " " + frame_elapsed_str    +
 			"\n";
-		m_timecode_file.puts(riga_file.c_str());
+		m_timecode_file.puts(line_to_add.c_str());
 
 		machine().video().set_timecode_write(false);
-		//machine().video().set_timecode_text(timecode_text);
 		machine().video().set_timecode_text(timecode_text);
 		machine().video().set_timecode_start(m_timecode_last_time);
 		machine().ui().set_show_timecode_counter(show_timecode_counter);
