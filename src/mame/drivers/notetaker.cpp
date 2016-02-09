@@ -9,8 +9,7 @@
  *
  * MISSING DUMP for 8741? I/O MCU which does mouse-related stuff
  
-TODO: Pretty much everything.
-* Get bootrom/ram bankswitching working
+TODO: everything below.
 * Get the running machine smalltalk-78 memory dump loaded as a rom and forced into ram on startup, since no boot disks have survived
 * floppy controller wd1791
 * crt5027 video controller
@@ -41,24 +40,93 @@ public:
 	//required_device<crt5027_device> m_vtac;
 
 //declarations
+	DECLARE_WRITE16_MEMBER(IPConReg_w);
+	DECLARE_READ16_MEMBER(maincpu_r);
+	DECLARE_WRITE16_MEMBER(maincpu_w);
 	DECLARE_DRIVER_INIT(notetakr);
 
 //variables
-
+	UINT8 m_BootSeqDone;
+	UINT8 m_DisableROM;
+	
+// overrides
+	virtual void machine_reset() override;
 };
 
+WRITE16_MEMBER(notetaker_state::IPConReg_w)
+{
+	m_BootSeqDone = (data&0x80)?1:0;
+	//m_ProcLock = (data&0x40)?1:0;
+	//m_CharCtr = (data&0x20)?1:0;
+	m_DisableROM = (data&0x10)?1:0;
+	//m_CorrOn = (data&0x08)?1:0; // also LedInd5
+	//m_LedInd6 = (data&0x04)?1:0;
+	//m_LedInd7 = (data&0x02)?1:0;
+	//m_LedInd8 = (data&0x01)?1:0;
+}
+
+READ16_MEMBER(notetaker_state::maincpu_r)
+{
+	UINT16 *rom = (UINT16 *)(memregion("maincpu")->base());
+	rom += 0x7f800;
+	UINT16 *ram = (UINT16 *)(memregion("ram")->base());
+	if ( (m_BootSeqDone == 0) || ((m_DisableROM == 0) && ((offset&0x7F800) == 0)) )
+	{
+		rom += (offset&0x7FF);
+		return *rom;
+	}
+	else
+	{
+		ram += (offset);
+		return *ram;
+	}
+}
+
+WRITE16_MEMBER(notetaker_state::maincpu_w)
+{
+	UINT16 *ram = (UINT16 *)(memregion("ram")->base());
+	ram += offset;
+	*ram = data;
+}
+
+/* Address map comes from http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker/schematics/19790423_Notetaker_IO_Processor.pdf
+a19 a18 a17 a16  a15 a14 a13 a12  a11 a10 a9  a8   a7  a6  a5  a4   a3  a2  a1  a0   BootSeqDone  DisableROM
+x   x   x   x    x   x   x   x    *   *   *   *    *   *   *   *    *   *   *   *    0            x          R   ROM
+0   0   0   0    0   0   0   0    *   *   *   *    *   *   *   *    *   *   *   *    1            0          R   ROM
+<  anything not all zeroes   >    *   *   *   *    *   *   *   *    *   *   *   *    1            0          RW  RAM
+x   x   x   x    ?   ?   *   *    *   *   *   *    *   *   *   *    *   *   *   *    x            x          W   RAM
+x   x   x   x    ?   ?   *   *    *   *   *   *    *   *   *   *    *   *   *   *    1            1          RW  RAM
+
+More or less:
+BootSeqDone is 0, DisableROM is ignored, mem map is 0x00000-0xfffff reading is the 0x1000-long ROM, repeated every 0x1000 bytes. writing goes to RAM.
+BootSeqDone is 1, DisableROM is 0,       mem map is 0x00000-0x00fff reading is the 0x1000-long ROM, remainder of memory map goes to RAM or open bus. writing goes to RAM.
+BootSeqDone is 1, DisableROM is 1,       mem map is entirely RAM or open bus for both reading and writing.
+*/
 static ADDRESS_MAP_START(notetaker_mem, AS_PROGRAM, 16, notetaker_state)
-	//	AM_RANGE(0x00000, 0x01fff) AM_RAM
-	AM_RANGE(0x00000, 0x00fff) AM_ROM AM_REGION("maincpu", 0xFF000) // I think this copy of rom is actually banked via io reg 0x20, there is ram which lives behind here?
+	/*AM_RANGE(0x00000, 0x00fff) AM_ROM AM_REGION("maincpu", 0xFF000) // I think this copy of rom is actually banked via io reg 0x20, there is RAM which lives behind here?
 	AM_RANGE(0x01000, 0x3ffff) AM_RAM // ram lives here, 256KB
-	AM_RANGE(0xff000, 0xfffff) AM_ROM // is this banked too? Don't think so...
+	AM_RANGE(0xff000, 0xfffff) AM_ROM // is this banked too? Don't think so...*/
+	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(maincpu_r, maincpu_w) // bypass MAME's memory map system as we need finer grained control
 ADDRESS_MAP_END
 
-// io memory map comes from http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker/memos/19790605_Definition_of_8086_Ports.pdf
+/* io memory map comes from http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker/memos/19790605_Definition_of_8086_Ports.pdf
+   and from the schematic at http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker/schematics/19790423_Notetaker_IO_Processor.pdf
+a19 a18 a17 a16  a15 a14 a13 a12  a11 a10 a9  a8   a7  a6  a5  a4   a3  a2  a1  a0
+?   ?   ?   ?    0   x   x   x    x   x   x   0    0   0   0   x    x   x   *   .       RW  IntCon (PIC8259)
+?   ?   ?   ?    0   x   x   x    x   x   x   0    0   0   1   x    x   x   x   .       W   IPConReg
+?   ?   ?   ?    0   x   x   x    x   x   x   0    0   1   0   x    x   x   x   .       W   KbdInt
+?   ?   ?   ?    0   x   x   x    x   x   x   0    0   1   1   x    x   x   x   .       W   FIFOReg
+?   ?   ?   ?    0   x   x   x    x   x   x   0    1   0   0   x    x   x   x   .       .   Open Bus
+?   ?   ?   ?    0   x   x   x    x   x   x   0    1   0   1   x    x   x   x   .       .   Open Bus
+?   ?   ?   ?    0   x   x   x    x   x   x   0    1   1   0   x    x   x   x   .       W   FIFOBus
+?   ?   ?   ?    0   x   x   x    x   x   x   0    1   1   1   x    x   x   x   .       .   Open Bus
+0   0   0   0    0   0   0   0    *   *   *   *    *   *   *   *    *   *   *   .       R   ROM, but ONLY if BootSegDone is TRUE, and /DisableROM is FALSE
+
+*/
 static ADDRESS_MAP_START(notetaker_io, AS_IO, 16, notetaker_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xFF00)
-	//AM_RANGE(0x20, 0x21) AM_WRITE processor (rom mapping, etc) control register
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7E1C) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff)
+	AM_RANGE(0x20, 0x21) AM_MIRROR(0x7E1E) AM_WRITE(IPConReg_w) // processor (rom mapping, etc) control register
 	//AM_RANGE(0x42, 0x43) AM_READ read keyboard data (high byte only) [from mcu?]
 	//AM_RANGE(0x44, 0x45) AM_READ read keyboard fifo state (high byte only) [from mcu?]
 	//AM_RANGE(0x48, 0x49) AM_WRITE kbd->uart control register [to mcu?]
@@ -99,6 +167,13 @@ read from 0x0002 (byte wide) (check interrupts) <looking for vblank int or odd/e
 0x0400 to 0x060 (select DAC fifo frequency 2)
 read from 0x44 (byte wide) in a loop forever (read keyboard fifo status)
 */
+
+/* Machine Reset */
+void notetaker_state::machine_reset()
+{
+	m_BootSeqDone = 0;
+	m_DisableROM = 0;
+}
 
 /* Input ports */
 static INPUT_PORTS_START( notetakr )
@@ -143,7 +218,7 @@ DRIVER_INIT_MEMBER(notetaker_state,notetakr)
 	UINT16 *temppointer;
 	UINT16 wordtemp;
 	UINT16 addrtemp;
-		romsrc += 0x7f800; // set the src pointer to 0xff000 (>>1 because 16 bits data)
+		// leave the src pointer alone, since we've only used a 0x1000 long address space
 		romdst += 0x7f800; // set the dest pointer to 0xff000 (>>1 because 16 bits data)
 		for (int i = 0; i < 0x800; i++)
 		{
@@ -157,10 +232,11 @@ DRIVER_INIT_MEMBER(notetaker_state,notetakr)
 
 /* ROM definition */
 ROM_START( notetakr )
-	ROM_REGION( 0x100000, "maincpuload", ROMREGION_ERASEFF ) // load roms here before descrambling
-	ROMX_LOAD( "biop__2.00_hi.b2716.h1", 0xff000, 0x0800, CRC(1119691d) SHA1(4c20b595b554e6f5489ab2c3fb364b4a052f05e3), ROM_SKIP(1))
-	ROMX_LOAD( "biop__2.00_lo.b2716.g1", 0xff001, 0x0800, CRC(b72aa4c7) SHA1(85dab2399f906c7695dc92e7c18f32e2303c5892), ROM_SKIP(1))
+	ROM_REGION( 0x1000, "maincpuload", ROMREGION_ERASEFF ) // load roms here before descrambling
+	ROMX_LOAD( "biop__2.00_hi.b2716.h1", 0x0000, 0x0800, CRC(1119691d) SHA1(4c20b595b554e6f5489ab2c3fb364b4a052f05e3), ROM_SKIP(1))
+	ROMX_LOAD( "biop__2.00_lo.b2716.g1", 0x0001, 0x0800, CRC(b72aa4c7) SHA1(85dab2399f906c7695dc92e7c18f32e2303c5892), ROM_SKIP(1))
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF ) // area for descrambled roms
+	ROM_REGION( 0x100000, "ram", ROMREGION_ERASEFF ) // ram cards
 ROM_END
 
 /* Driver */
