@@ -10,9 +10,9 @@ driver by David Haywood & Angelo Salese
 many thanks to Charles MacDonald for the schematics / documentation of this HW.
 
 TODO:
- - is opcode $bb right for Night Gal Summer?
- - extra protection for Night Gal Summer (ports 0x6000-3 for z80 and 0x8000-0x8020-1 for MCU);
+ - extra protection for Night Gal Summer (ports 0x6000-3 for z80);
  - Fix Sweet Gal/Sexy Gal layer clearances;
+ - NMI origin for Sexy Gal / Night Gal Summer
  - unemulated WAIT pin for Z80, MCU asserts it when accessing communication RAM
  
 *******************************************************************************************/
@@ -218,7 +218,7 @@ READ8_MEMBER(nightgal_state::royalqn_nsc_blit_r)
 {
 	if(offset == 2)
 		m_subcpu->set_input_line(0, CLEAR_LINE );
-
+	
 	return m_blit_raw_data[offset];
 }
 
@@ -710,7 +710,7 @@ static MACHINE_CONFIG_DERIVED( sexygal, royalqn )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sexygal_map)
 	MCFG_CPU_IO_MAP(sexygal_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 244)//???
+	MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 60)//???
 
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(sexygal_nsc_map)
@@ -728,7 +728,7 @@ static MACHINE_CONFIG_DERIVED( ngalsumr, royalqn )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(royalqn_map)
 	MCFG_CPU_IO_MAP(royalqn_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 244)//???
+	MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 60)//???
 MACHINE_CONFIG_END
 
 /*
