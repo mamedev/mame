@@ -426,9 +426,8 @@ protected:
 	void cpx_im();
 	void cpx_ix();
 	void trap();
-	void ldax_imm();
-	void stax_imm();
-	void nsc_unk();
+	void btst_ix();
+	void stx_nsc();
 };
 
 

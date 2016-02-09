@@ -87,7 +87,6 @@ public:
 	DECLARE_DRIVER_INIT(ngalsumr);
 	DECLARE_DRIVER_INIT(royalqn);
 	DECLARE_WRITE8_MEMBER(ngalsumr_unk_w);
-	DECLARE_READ8_MEMBER(ngalsumr_color_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -1099,17 +1098,10 @@ WRITE8_MEMBER(nightgal_state::ngalsumr_unk_w)
 	//m_z80_latch = data;
 }
 
-// check with the unknown opcode, maybe it actually just masks with first parameter and second one is displacement byte offset?
-READ8_MEMBER(nightgal_state::ngalsumr_color_r)
-{
-	return (m_comms_ram[offset] & 0x80);
-}
-
 DRIVER_INIT_MEMBER(nightgal_state,ngalsumr)
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(nightgal_state::ngalsumr_unk_w), this) );
 	// 0x6003 some kind of f/f state
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x9000, 0x903f, read8_delegate(FUNC(nightgal_state::ngalsumr_color_r),this) );
 }
 
 /* Type 1 HW */
