@@ -139,9 +139,11 @@ WRITE8_MEMBER( jangou_blitter_device::blitter_process_w )
 				int drawx = (x + xcount) & 0xff;
 				int drawy = (y + ycount) & 0xff;
 				UINT8 dat = gfx_nibble(src + count);
-				UINT8 cur_pen = m_pen_data[(dat & 0x0f) >> 0];
-				
-				if (cur_pen != 0)
+				UINT8 cur_pen = m_pen_data[dat & 0x0f];
+
+				//dat = cur_pen_lo | (cur_pen_hi << 4);
+
+				if ((cur_pen & 0xff) != 0)
 					plot_gfx_pixel(cur_pen, drawx, drawy);
 
 				if (!flipx)
@@ -151,14 +153,15 @@ WRITE8_MEMBER( jangou_blitter_device::blitter_process_w )
 			}
 		}
 		
-		UINT32 new_src = src + count;
+		//UINT32 new_src = src + count;
 		
 		// update source and height after blitter operation
-		m_blit_data[0] = new_src & 0xfe;
-		m_blit_data[1] = new_src >> 8;
-		m_blit_data[5] = 0;
-		m_blit_data[6] = new_src >> 16;
-		m_bltflip = false;
+		// TODO: Jangou doesn't agree with this, later HW?
+		//m_blit_data[0] = new_src & 0xfe;
+		//m_blit_data[1] = new_src >> 8;
+		//m_blit_data[5] = 0;
+		//m_blit_data[6] = new_src >> 16;
+		//m_bltflip = false;
 	}
 }
 
@@ -179,8 +182,8 @@ WRITE8_MEMBER( jangou_blitter_device::blitter_alt_process_w)
 
 WRITE8_MEMBER( jangou_blitter_device::blitter_vregs_w)
 {
-	//  printf("%02x %02x\n", offset, data);
-	m_pen_data[offset] = data & 0xf;
+	// bit 5 set by Jangou, left-over?
+	m_pen_data[offset] = data & 0x0f;
 }
 
 WRITE8_MEMBER( jangou_blitter_device::blitter_bltflip_w)
