@@ -324,11 +324,10 @@ static ADDRESS_MAP_START( cpu0_io, AS_IO, 8, jangou_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") //dsw + blitter busy flag
-	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
+	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") AM_WRITE(output_w) //dsw + blitter busy flag
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x17) AM_DEVWRITE("blitter",jangou_blitter_device, blitter_process_w)
-	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, blitter_vregs_w)
+	AM_RANGE(0x12,0x17) AM_DEVWRITE("blitter",jangou_blitter_device, process_w)
+	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, vregs_w)
 	AM_RANGE(0x30,0x30) AM_WRITENOP //? polls 0x03 continuously
 	AM_RANGE(0x31,0x31) AM_WRITE(sound_latch_w)
 ADDRESS_MAP_END
@@ -398,8 +397,8 @@ static ADDRESS_MAP_START( cntrygrl_cpu0_io, AS_IO, 8, jangou_state )
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") //dsw + blitter busy flag
 	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x17) AM_DEVWRITE("blitter",jangou_blitter_device, blitter_process_w)
-	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, blitter_vregs_w)
+	AM_RANGE(0x12,0x17) AM_DEVWRITE("blitter",jangou_blitter_device, process_w)
+	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, vregs_w)
 	AM_RANGE(0x30,0x30) AM_WRITENOP //? polls 0x03 continuously
 //  AM_RANGE(0x31,0x31) AM_WRITE(sound_latch_w)
 ADDRESS_MAP_END
@@ -423,8 +422,8 @@ static ADDRESS_MAP_START( roylcrdn_cpu0_io, AS_IO, 8, jangou_state )
 	AM_RANGE(0x10,0x10) AM_WRITENOP                 /* Writes continuosly 0's in attract mode, and 1's in game */
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
 	AM_RANGE(0x13,0x13) AM_READNOP                  /* Often reads bit7 with unknown purposes */
-	AM_RANGE(0x12,0x17) AM_DEVWRITE("blitter",jangou_blitter_device, blitter_process_w)
-	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, blitter_vregs_w)
+	AM_RANGE(0x12,0x17) AM_DEVWRITE("blitter",jangou_blitter_device, process_w)
+	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, vregs_w)
 	AM_RANGE(0x30,0x30) AM_WRITENOP                 /* Seems to write 0x10 on each sound event */
 ADDRESS_MAP_END
 
@@ -523,7 +522,7 @@ static INPUT_PORTS_START( jangou )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") // guess
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // blitter busy flag
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( macha )
@@ -584,7 +583,7 @@ static INPUT_PORTS_START( macha )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") // guess
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // blitter busy flag
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 INPUT_PORTS_END
 
 
@@ -669,7 +668,7 @@ static INPUT_PORTS_START( cntrygrl )
 	PORT_DIPNAME( 0x40, 0x40, "Coin B setting"  )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin / 10 Credits"  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // blitter busy flag
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 
 	PORT_START("IN_NOMUX")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -710,7 +709,7 @@ static INPUT_PORTS_START( jngolady )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) //blitter busy flag
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( roylcrdn )
@@ -768,29 +767,9 @@ static INPUT_PORTS_START( roylcrdn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                              PORT_NAME("Credit Clear")   /* Credit Clear */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                                                                 /* Spare 1 */
 
-	PORT_START("DSW")   /* Not a real DSW on PCB */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* blitter busy flag */
+	PORT_START("DSW")
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 
 	PORT_START("IN_NOMUX")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )

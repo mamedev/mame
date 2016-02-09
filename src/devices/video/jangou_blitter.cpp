@@ -96,7 +96,7 @@ void jangou_blitter_device::plot_gfx_pixel( UINT8 pix, int x, int y )
 		m_blit_buffer[(y * 256) + (x >> 1)] = (m_blit_buffer[(y * 256) + (x >> 1)] & 0xf0) | (pix & 0x0f);
 }
 
-WRITE8_MEMBER( jangou_blitter_device::blitter_process_w )
+WRITE8_MEMBER( jangou_blitter_device::process_w )
 {
 	int src, x, y, h, w, flipx;
 	m_blit_data[offset] = data;
@@ -168,22 +168,27 @@ WRITE8_MEMBER( jangou_blitter_device::blitter_process_w )
 }
 
 // Sexy Gal swaps around upper src address
-WRITE8_MEMBER( jangou_blitter_device::blitter_alt_process_w)
+WRITE8_MEMBER( jangou_blitter_device::alt_process_w )
 {
 	const UINT8 translate_addr[7] = { 0, 1, 6, 2, 3, 4, 5 };
 
-	blitter_process_w(space,translate_addr[offset],data);
+	process_w(space,translate_addr[offset],data);
 }
 
-WRITE8_MEMBER( jangou_blitter_device::blitter_vregs_w)
+WRITE8_MEMBER( jangou_blitter_device::vregs_w )
 {
 	// bit 5 set by Jangou, left-over?
 	m_pen_data[offset] = data & 0x0f;
 }
 
-WRITE8_MEMBER( jangou_blitter_device::blitter_bltflip_w)
+WRITE8_MEMBER( jangou_blitter_device::bltflip_w )
 {
 	// TODO: unsure about how this works, Charles says it swaps the nibble but afaik it's used for CPU tiles in Night Gal Summer/Sexy Gal and they seems fine?
 	//       Maybe flipx is actually bltflip for later HW?
 	m_bltflip = true;
+}
+
+READ_LINE_MEMBER( jangou_blitter_device::status_r )
+{
+	return false;
 }

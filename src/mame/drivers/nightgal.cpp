@@ -72,7 +72,6 @@ public:
 	required_device<cpu_device> m_subcpu;
 
 	/* memory */
-	DECLARE_READ8_MEMBER(blitter_status_r);
 	//DECLARE_WRITE8_MEMBER(sexygal_nsc_true_blitter_w);
 	DECLARE_WRITE8_MEMBER(royalqn_blitter_0_w);
 	DECLARE_WRITE8_MEMBER(royalqn_blitter_1_w);
@@ -120,13 +119,6 @@ protected:
 
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
 };
-
-
-
-READ8_MEMBER(nightgal_state::blitter_status_r)
-{
-	return 0x80;
-}
 
 void nightgal_state::video_start()
 {
@@ -203,23 +195,9 @@ PALETTE_INIT_MEMBER(nightgal_state, nightgal)
 ********************************************/
 
 /*
-(note:when I say "0x80" I just mean a negative result)
-master-slave algorithm
--z80 writes the data for the mcu;
--z80 writes 0 to c200;
--it waits with the bit 0x80 on c100 clears (i.e. the z80 halts),when this happens the z80 continues his logic algorithm (so stop it until we are done!!!)
-
--nsc takes an irq
--puts ff to [1100]
--it waits that the bit 0x80 on [1100] clears
--(puts default clut data,only the first time around)
--reads params from z80 and puts them on the blitter chip
--expects that bit [80] is equal to 0x80;
--clears [1100] and expects that [1100] is 0
--executes a wai (i.e. halt) opcode then expects to receive another irq...
-*/
-
-/* TODO: simplify this (error in the document) */
+   There are three unidirectional latches that also sends an irq from z80 to MCU.
+ */
+// TODO: simplify this (error in the document)
 WRITE8_MEMBER(nightgal_state::royalqn_blitter_0_w)
 {
 	m_blit_raw_data[0] = data;
@@ -362,11 +340,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sexygal_nsc_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0080) AM_READ(blitter_status_r)
+	AM_RANGE(0x0080, 0x0080) AM_READ_PORT("BLIT_PORT")
 	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
-	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_alt_process_w)
-	AM_RANGE(0x00a0, 0x00af) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_vregs_w)
-	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_bltflip_w) 
+	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, alt_process_w)
+	AM_RANGE(0x00a0, 0x00af) AM_DEVWRITE("blitter", jangou_blitter_device, vregs_w)
+	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("blitter", jangou_blitter_device, bltflip_w) 
 
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_SHARE("comms_ram")
 	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM AM_REGION("subrom", 0)
@@ -400,11 +378,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( royalqn_nsc_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0080) AM_READ(blitter_status_r)
+	AM_RANGE(0x0080, 0x0080) AM_READ_PORT("BLIT_PORT")
 	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
-	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_process_w)
-	AM_RANGE(0x00a0, 0x00af) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_vregs_w)
-	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_bltflip_w) 
+	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, process_w)
+	AM_RANGE(0x00a0, 0x00af) AM_DEVWRITE("blitter", jangou_blitter_device, vregs_w)
+	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("blitter", jangou_blitter_device, bltflip_w) 
 
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r,royalqn_comm_w)
 	AM_RANGE(0x4000, 0x4000) AM_NOP
@@ -648,6 +626,31 @@ static INPUT_PORTS_START( sexygal )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	
+	PORT_START("BLIT_PORT")
+	PORT_DIPNAME( 0x01, 0x01, "BLIT_PORT" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+
 INPUT_PORTS_END
 
 void nightgal_state::machine_start()
