@@ -295,6 +295,7 @@ VIDEOS["HUC6270"] = true
 --VIDEOS["HUC6272"] = true
 --VIDEOS["I8244"] = true
 VIDEOS["I8275"] = true
+VIDEOS["JANGOU_BLITTER"] = true
 VIDEOS["M50458"] = true
 VIDEOS["MB90082"] = true
 VIDEOS["MB_VCU"] = true

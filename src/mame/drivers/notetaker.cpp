@@ -147,8 +147,8 @@ DRIVER_INIT_MEMBER(notetaker_state,notetakr)
 		romdst += 0x7f800; // set the dest pointer to 0xff000 (>>1 because 16 bits data)
 		for (int i = 0; i < 0x800; i++)
 		{
-			wordtemp = BITSWAP16(*romsrc, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7);
-			addrtemp = BITSWAP16(i, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+			wordtemp = BITSWAP16(*romsrc, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); // data bus is completely reversed
+			addrtemp = BITSWAP16(i, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10); // address bus is completely reversed; 11-15 should always be zero
 			temppointer = romdst+(addrtemp&0x7FF);
 			*temppointer = wordtemp;
 			romsrc++;
@@ -158,8 +158,8 @@ DRIVER_INIT_MEMBER(notetaker_state,notetakr)
 /* ROM definition */
 ROM_START( notetakr )
 	ROM_REGION( 0x100000, "maincpuload", ROMREGION_ERASEFF ) // load roms here before descrambling
-	ROMX_LOAD( "NTIOLO_EPROM.BIN", 0xff000, 0x0800, CRC(b72aa4c7) SHA1(85dab2399f906c7695dc92e7c18f32e2303c5892), ROM_SKIP(1))
-	ROMX_LOAD( "NTIOHI_EPROM.BIN", 0xff001, 0x0800, CRC(1119691d) SHA1(4c20b595b554e6f5489ab2c3fb364b4a052f05e3), ROM_SKIP(1))
+	ROMX_LOAD( "biop__2.00_hi.b2716.h1", 0xff000, 0x0800, CRC(1119691d) SHA1(4c20b595b554e6f5489ab2c3fb364b4a052f05e3), ROM_SKIP(1))
+	ROMX_LOAD( "biop__2.00_lo.b2716.g1", 0xff001, 0x0800, CRC(b72aa4c7) SHA1(85dab2399f906c7695dc92e7c18f32e2303c5892), ROM_SKIP(1))
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF ) // area for descrambled roms
 ROM_END
 
