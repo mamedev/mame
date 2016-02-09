@@ -11,6 +11,8 @@
 #ifndef __HP_TACO_H__
 #define __HP_TACO_H__
 
+#include <map>
+
 #define MCFG_TACO_IRQ_HANDLER(_devcb) \
         devcb = &hp_taco_device::set_irq_handler(*device , DEVCB_##_devcb);
 
@@ -23,15 +25,15 @@
 class hp_taco_device : public device_t
 {
 public:
-	// construction/destruction
-	hp_taco_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
-	hp_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+        // construction/destruction
+        hp_taco_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
+        hp_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
         // static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<hp_taco_device &>(device).m_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_flg_handler(device_t &device, _Object object) { return downcast<hp_taco_device &>(device).m_flg_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_sts_handler(device_t &device, _Object object) { return downcast<hp_taco_device &>(device).m_sts_handler.set_callback(object); }
-        
+        template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<hp_taco_device &>(device).m_irq_handler.set_callback(object); }
+        template<class _Object> static devcb_base &set_flg_handler(device_t &device, _Object object) { return downcast<hp_taco_device &>(device).m_flg_handler.set_callback(object); }
+        template<class _Object> static devcb_base &set_sts_handler(device_t &device, _Object object) { return downcast<hp_taco_device &>(device).m_sts_handler.set_callback(object); }
+
         // Register read/write
         DECLARE_WRITE16_MEMBER(reg_w);
         DECLARE_READ16_MEMBER(reg_r);
@@ -40,21 +42,30 @@ public:
         DECLARE_READ_LINE_MEMBER(flg_r);
         DECLARE_READ_LINE_MEMBER(sts_r);
 
-        typedef UINT32 tape_pos_t;
+        // Tape position, 1 unit = 1 inch / (968 * 1024)
+        typedef INT32 tape_pos_t;
+
+        // Words stored on tape
+        typedef UINT16 tape_word_t;
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-        
+        // device-level overrides
+        virtual void device_start() override;
+        virtual void device_stop() override;
+        virtual void device_reset() override;
+        virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 private:
+        // Storage of tracks: mapping from a tape position to word stored there
+        typedef std::map<tape_pos_t , tape_word_t> tape_track_t;
+
         devcb_write_line m_irq_handler;
         devcb_write_line m_flg_handler;
         devcb_write_line m_sts_handler;
 
         // Registers
         UINT16 m_data_reg;
+        bool m_data_reg_full;
         UINT16 m_cmd_reg;
         UINT16 m_status_reg;
         UINT16 m_tach_reg;
@@ -65,25 +76,72 @@ private:
         bool m_irq;
         bool m_flg;
         bool m_sts;
+        UINT8 m_cmd_state;
 
-        // Tape position
+        // Tape position & motion
         tape_pos_t m_tape_pos;
-        attotime m_start_time;
+        attotime m_start_time;  // Tape moving if != never
+        bool m_tape_fwd;
+        bool m_tape_fast;
 
         // Timers
         emu_timer *m_tape_timer;
+        emu_timer *m_hole_timer;
+
+        // Content of tape tracks
+        tape_track_t m_tracks[ 2 ];
+
+        // Reading & writing
+        bool m_tape_wr;
+        tape_pos_t m_rw_pos;
+        UINT16 m_next_word;
+        tape_track_t::iterator m_rd_it;
+        bool m_rd_it_valid;
+
+        // Gap detection
+        tape_pos_t m_gap_detect_start;
+
+        typedef enum {
+                ADV_NO_MORE_DATA,
+                ADV_CONT_DATA,
+                ADV_DISCONT_DATA
+        } adv_res_t;
 
         void irq_w(bool state);
         void set_error(bool state);
-        bool check_for_errors(void);
-        static unsigned speed_to_tick_freq(bool fast);
+        unsigned speed_to_tick_freq(void) const;
+        bool pos_offset(tape_pos_t& pos , tape_pos_t offset) const;
+        void move_tape_pos(tape_pos_t delta_pos);
         void update_tape_pos(void);
-        static bool any_hole(UINT32 tape_pos_a , UINT32 tape_pos_b);
-        UINT32 next_hole(bool fwd) const;
-        static attotime time_to_distance(UINT32 distance, bool fast);
-        attotime time_to_target(UINT32 target, bool fast) const;
-        void start_tape(void);
+        static void ensure_a_lt_b(tape_pos_t& a , tape_pos_t& b);
+        static bool any_hole(tape_pos_t tape_pos_a , tape_pos_t tape_pos_b);
+        tape_pos_t next_hole(void) const;
+        static tape_pos_t met_first(tape_pos_t a , tape_pos_t b , bool fwd , bool& is_a);
+        attotime time_to_distance(tape_pos_t distance) const;
+        attotime time_to_target(tape_pos_t target) const;
+        bool start_tape_cmd(UINT16 cmd_reg , UINT16 must_be_1 , UINT16 must_be_0);
+        void start_tape(UINT16 cmd_reg);
         void stop_tape(void);
+        tape_track_t& current_track(void);
+        static tape_pos_t word_length(tape_word_t w);
+        static tape_pos_t word_end_pos(const tape_track_t::iterator& it);
+        static void adjust_it(tape_track_t& track , tape_track_t::iterator& it , tape_pos_t pos);
+        void write_word(tape_pos_t start , tape_word_t word , tape_pos_t& length);
+        void write_gap(tape_pos_t a , tape_pos_t b);
+        bool just_gap(tape_pos_t a , tape_pos_t b);
+        tape_pos_t farthest_end(const tape_track_t::iterator& it) const;
+        bool next_data(tape_track_t::iterator& it , tape_pos_t pos , bool inclusive);
+        adv_res_t adv_it(tape_track_t::iterator& it);
+        attotime fetch_next_wr_word(void);
+        attotime time_to_rd_next_word(tape_pos_t& word_rd_pos);
+        bool next_n_gap(tape_pos_t& pos , tape_track_t::iterator it , unsigned n_gaps , tape_pos_t min_gap);
+        bool next_n_gap(tape_pos_t& pos , unsigned n_gaps , tape_pos_t min_gap);
+        static void dump_sequence(FILE *out , tape_track_t::const_iterator it_start , unsigned n_words);
+        void save_tape(FILE *out) const;
+        bool load_track(FILE *in , tape_track_t& track);
+        void load_tape(FILE *in);
+        attotime time_to_next_hole(void) const;
+        attotime time_to_tach_pulses(void) const;
         void start_cmd_exec(UINT16 new_cmd_reg);
 };
 
