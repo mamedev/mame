@@ -51,6 +51,7 @@ private:
 	UINT8 m_blit_data[7];
 	UINT8 *m_gfxrom;
 	UINT32 m_gfxrommask;
+	bool m_bltflip;
 };
 
 

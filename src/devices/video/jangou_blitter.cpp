@@ -5,7 +5,7 @@
 	Jangou Custom Blitter Chip, codename "???" (name scratched afaik)
 
 	device emulation by Angelo Salese, from original jangou.cpp implementation
-	 by Angelo Salese, David Haywood and Phil Bennett
+	 by Angelo Salese, David Haywood and Phil Bennett.
 
 	TODO:
 	- BLTFLIP mechanism;
@@ -66,6 +66,7 @@ void jangou_blitter_device::device_reset()
 {
 	memset(m_blit_data, 0, ARRAY_LENGTH(m_blit_data));
 	memset(m_pen_data, 0, ARRAY_LENGTH(m_pen_data));
+	m_bltflip = false;
 }
 
 
@@ -105,14 +106,23 @@ WRITE8_MEMBER( jangou_blitter_device::blitter_process_w )
 		int count = 0;
 		int xcount, ycount;
 
-		//printf("%02x %02x %02x %02x %02x %02x %02x\n", m_blit_data[0], m_blit_data[1], m_blit_data[2],m_blit_data[3], m_blit_data[4], m_blit_data[5],m_blit_data[6]); 
 		w = (m_blit_data[4] & 0xff) + 1;
 		h = (m_blit_data[5] & 0xff) + 1;
 		src = ((m_blit_data[1] << 8)|(m_blit_data[0] << 0));
 		src |= (m_blit_data[6] & 3) << 16;
 		x = (m_blit_data[2] & 0xff);
 		y = (m_blit_data[3] & 0xff);
-
+		
+		#if 0
+		if(m_bltflip == true)
+		{
+			printf("%02x %02x %02x %02x %02x %02x %02x\n", m_blit_data[0], m_blit_data[1], m_blit_data[2],m_blit_data[3], m_blit_data[4], m_blit_data[5],m_blit_data[6]); 
+			printf("=>");
+			for(int i=0;i<0x10;i++)
+				printf("%02x ",m_pen_data[i]);
+			printf("\n");
+		}
+		#endif
 		// lowest bit of src controls flipping / draw direction?
 		flipx = (m_blit_data[0] & 1);
 
@@ -121,6 +131,7 @@ WRITE8_MEMBER( jangou_blitter_device::blitter_process_w )
 		else
 			src -= (w * h) - 1;
 
+		
 		for (ycount = 0; ycount < h; ycount++)
 		{
 			for(xcount = 0; xcount < w; xcount++)
@@ -128,13 +139,10 @@ WRITE8_MEMBER( jangou_blitter_device::blitter_process_w )
 				int drawx = (x + xcount) & 0xff;
 				int drawy = (y + ycount) & 0xff;
 				UINT8 dat = gfx_nibble(src + count);
-				UINT8 cur_pen_hi = m_pen_data[(dat & 0xf0) >> 4];
-				UINT8 cur_pen_lo = m_pen_data[(dat & 0x0f) >> 0];
-
-				dat = cur_pen_lo | (cur_pen_hi << 4);
-
-				if ((dat & 0xff) != 0)
-					plot_gfx_pixel(dat, drawx, drawy);
+				UINT8 cur_pen = m_pen_data[(dat & 0x0f) >> 0];
+				
+				if (cur_pen != 0)
+					plot_gfx_pixel(cur_pen, drawx, drawy);
 
 				if (!flipx)
 					count--;
@@ -142,6 +150,15 @@ WRITE8_MEMBER( jangou_blitter_device::blitter_process_w )
 					count++;
 			}
 		}
+		
+		UINT32 new_src = src + count;
+		
+		// update source and height after blitter operation
+		m_blit_data[0] = new_src & 0xfe;
+		m_blit_data[1] = new_src >> 8;
+		m_blit_data[5] = 0;
+		m_blit_data[6] = new_src >> 16;
+		m_bltflip = false;
 	}
 }
 
@@ -168,7 +185,8 @@ WRITE8_MEMBER( jangou_blitter_device::blitter_vregs_w)
 
 WRITE8_MEMBER( jangou_blitter_device::blitter_bltflip_w)
 {
-	// TODO: this flips gfx nibbles.
-	
+	// TODO: unsure about how this works, Charles says it swaps the nibble but afaik it's used for CPU tiles in Night Gal Summer/Sexy Gal and they seems fine?
+	//       Maybe flipx is actually bltflip for later HW?
+	m_bltflip = true;
 }
 
