@@ -257,7 +257,7 @@ WRITE8_MEMBER(k28_state::mcu_p0_w)
 	m_phoneme = (m_phoneme & 0xf) | (data << 4 & 0x30);
 	
 	// d3: SC-01 strobe, latch phoneme on rising edge
-	int strobe = ~data >> 3 & 1;
+	int strobe = data >> 3 & 1;
 	if (!strobe && m_speech_strobe)
 		m_speech->write(space, 0, m_phoneme);
 	m_speech_strobe = strobe;
@@ -423,7 +423,7 @@ static INPUT_PORTS_START( k28 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL_PAD)
 
 	PORT_START("IN.5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, k28_state, power_on, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, k28_state, power_on, nullptr)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V)
