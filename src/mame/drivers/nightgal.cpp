@@ -86,7 +86,6 @@ public:
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_DRIVER_INIT(ngalsumr);
 	DECLARE_DRIVER_INIT(royalqn);
-	DECLARE_READ8_MEMBER(ngalsumr_unk_r);
 	DECLARE_WRITE8_MEMBER(ngalsumr_unk_w);
 	DECLARE_READ8_MEMBER(ngalsumr_color_r);
 	virtual void machine_start() override;
@@ -1076,11 +1075,11 @@ ROM_START( ngalsumr )
 
 	ROM_REGION( 0x20000, "gfx", ROMREGION_ERASEFF )
 	ROM_LOAD( "1.3a",  0x00000, 0x04000, CRC(9626f812) SHA1(ca7162811a0ba05dfaa2aa8cc93a2e898b326e9e) )
-	ROM_LOAD( "2.3c",  0x04000, 0x04000, CRC(0d59cf7a) SHA1(600bc70d29853fb936f8adaef048d925cbae0ce9) )
-	ROM_LOAD( "3.3d",  0x08000, 0x04000, CRC(2fb2ec0b) SHA1(2f1735e33906783b8c0b283455a2a079431e6f11) )
-	ROM_LOAD( "4.3f",  0x0c000, 0x04000, CRC(c7b85199) SHA1(1c4ed2faf82f45d8a23c168793b02969f1201df6) )
-	ROM_LOAD( "5.3h",  0x10000, 0x04000, CRC(feaca6a3) SHA1(6658c01ac5769e8317a1c7eec6802e7c96885710) )
-	ROM_LOAD( "6.3l",  0x14000, 0x04000, CRC(de9e05f8) SHA1(724468eade222b513b7f39f0a24515f343428130) )
+	ROM_LOAD( "3.3d",  0x04000, 0x04000, CRC(2fb2ec0b) SHA1(2f1735e33906783b8c0b283455a2a079431e6f11) )
+	ROM_LOAD( "5.3h",  0x08000, 0x04000, CRC(feaca6a3) SHA1(6658c01ac5769e8317a1c7eec6802e7c96885710) )
+	ROM_LOAD( "2.3c",  0x10000, 0x04000, CRC(0d59cf7a) SHA1(600bc70d29853fb936f8adaef048d925cbae0ce9) )
+	ROM_LOAD( "4.3f",  0x14000, 0x04000, CRC(c7b85199) SHA1(1c4ed2faf82f45d8a23c168793b02969f1201df6) )
+	ROM_LOAD( "6.3l",  0x18000, 0x04000, CRC(de9e05f8) SHA1(724468eade222b513b7f39f0a24515f343428130) )
 
 	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "ng2.6u", 0x00, 0x20, CRC(0162a24a) SHA1(f7e1623c5bca3725f2e59ae2096b9bc42e0363bf) )
@@ -1095,58 +1094,22 @@ DRIVER_INIT_MEMBER(nightgal_state,royalqn)
 	ROM[0x027f] = 0x02;
 }
 
-// returns flipped gfxs if active?
-READ8_MEMBER(nightgal_state::ngalsumr_unk_r)
-{
-	return 0;
-}
-
 WRITE8_MEMBER(nightgal_state::ngalsumr_unk_w)
 {
 	//m_z80_latch = data;
 }
 
-// check with the unknown opcode, wants currently active color for 1bpp gfxs?
+// check with the unknown opcode, maybe it actually just masks with first parameter and second one is displacement byte offset?
 READ8_MEMBER(nightgal_state::ngalsumr_color_r)
 {
-	if(offset == 0xc)
-		return 1;
-
-
-	return 0;
+	return (m_comms_ram[offset] & 0x80);
 }
 
 DRIVER_INIT_MEMBER(nightgal_state,ngalsumr)
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(nightgal_state::ngalsumr_unk_w), this) );
 	// 0x6003 some kind of f/f state
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x9020, 0x9021, read8_delegate(FUNC(nightgal_state::ngalsumr_unk_r), this) );
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x9030, 0x903f, read8_delegate(FUNC(nightgal_state::ngalsumr_color_r),this) );
-
-#if 0
-	UINT8 *ROM = memregion("subrom")->base();
-
-//	ROM[0x165a] = 0x02; // illegal
-//	ROM[0x165b] = 0x02; // sts xx xx xx
-//	ROM[0x165c] = 0x02; 
-//	ROM[0x165d] = 0x02; 
-//	ROM[0x165e] = 0x02; // sts xx xx xx
-//	ROM[0x165f] = 0x02;
-//	ROM[0x1660] = 0x02;
-//	ROM[0x1661] = 0x02; // sts xx xx xx
-	ROM[0x1662] = 0x20;
-//	ROM[0x1663] = 0x02;
-
-	/* patch blantantly wrong ROM checks */
-	ROM[0x16ce] = 0x02;
-	ROM[0x16cf] = 0x02;
-	// adcx $05 converted to 0x04 for debug purposes
-	//ROM[0x1782] = 0x04;
-	//ROM[0xd655] = 0x20;
-	//ROM[0xd3f9] = 0x02;
-	//ROM[0xd3fa] = 0x02;
-	//ROM[0xd3a0] = 0x02;
-#endif
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x9000, 0x903f, read8_delegate(FUNC(nightgal_state::ngalsumr_color_r),this) );
 }
 
 /* Type 1 HW */
