@@ -10,68 +10,91 @@ class flagrall_state : public driver_device
 public:
 	flagrall_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_bg_videoram(*this, "bg_videoram"),
-	//	m_fg_videoram(*this, "fg_videoram"),
+		m_spr_info(*this, "spr_info"),
+		m_spr_videoram(*this, "spr_videoram"),
+		m_bak_videoram(*this, "bak_videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_bg_videoram;
-//	required_shared_ptr<UINT16> m_fg_videoram;
+	required_shared_ptr<UINT16> m_spr_info;
+	required_shared_ptr<UINT16> m_spr_videoram;
+	required_shared_ptr<UINT16> m_bak_videoram;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
-//	tilemap_t    *m_fg_tilemap;
-	DECLARE_WRITE16_MEMBER(flagrall_bg_videoram_w);
-//	DECLARE_WRITE16_MEMBER(flagrall_fg_videoram_w);
-	TILE_GET_INFO_MEMBER(get_flagrall_bg_tile_info);
-//	TILE_GET_INFO_MEMBER(get_flagrall_fg_tile_info);
+	tilemap_t    *m_spr_tilemap;
+	tilemap_t    *m_bak_tilemap;
+	DECLARE_WRITE16_MEMBER(flagrall_spr_videoram_w);
+	DECLARE_WRITE16_MEMBER(flagrall_bak_videoram_w);
+	TILE_GET_INFO_MEMBER(get_flagrall_spr_tile_info);
+	TILE_GET_INFO_MEMBER(get_flagrall_bak_tile_info);
 	virtual void video_start() override;
 	UINT32 screen_update_flagrall(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+
+	DECLARE_WRITE16_MEMBER(flagrall_xscroll_w);
+	DECLARE_WRITE16_MEMBER(flagrall_yscroll_w);
+
+
+	UINT16 xscroll;
+	UINT16 yscroll;
+
 };
 
 
 
-WRITE16_MEMBER(flagrall_state::flagrall_bg_videoram_w)
+WRITE16_MEMBER(flagrall_state::flagrall_spr_videoram_w)
 {
-	COMBINE_DATA(&m_bg_videoram[offset]);
-	m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_spr_videoram[offset]);
+	m_spr_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(flagrall_state::get_flagrall_bg_tile_info)
+TILE_GET_INFO_MEMBER(flagrall_state::get_flagrall_spr_tile_info)
 {
-	int tileno = m_bg_videoram[tile_index]/2;
+	int tileno = m_spr_videoram[tile_index]/2;
 	SET_TILE_INFO_MEMBER(0, tileno, 1, 0);
 }
 
-/*
-WRITE16_MEMBER(flagrall_state::flagrall_fg_videoram_w)
+WRITE16_MEMBER(flagrall_state::flagrall_xscroll_w)
 {
-	COMBINE_DATA(&m_fg_videoram[offset]);
-	m_fg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&xscroll);
+	m_bak_tilemap->set_scrollx(0, xscroll-64);
 }
 
-TILE_GET_INFO_MEMBER(flagrall_state::get_flagrall_fg_tile_info)
+WRITE16_MEMBER(flagrall_state::flagrall_yscroll_w)
 {
-	int tileno = m_fg_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(1, tileno, 1, 0);
+	COMBINE_DATA(&yscroll);
+	m_bak_tilemap->set_scrolly(0, yscroll);
 }
-*/
+
+WRITE16_MEMBER(flagrall_state::flagrall_bak_videoram_w)
+{
+	COMBINE_DATA(&m_bak_videoram[offset]);
+	m_bak_tilemap->mark_tile_dirty(offset);
+}
+
+TILE_GET_INFO_MEMBER(flagrall_state::get_flagrall_bak_tile_info)
+{
+	int tileno = m_bak_videoram[tile_index];
+	SET_TILE_INFO_MEMBER(1, tileno, 0, 0);
+}
+
 
 void flagrall_state::video_start()
 {
 	// doesn't actually seem to be be a tilemap, there is other data at the end of it ? sprite strips I guess
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(flagrall_state::get_flagrall_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 20, 64);
-//	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(flagrall_state::get_flagrall_fg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 4, 128, 64);
-//	m_fg_tilemap->set_transparent_pen(0xff);
+	m_spr_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(flagrall_state::get_flagrall_spr_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 20, 64);
+	m_spr_tilemap->set_transparent_pen(0x00);
+
+	m_bak_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(flagrall_state::get_flagrall_bak_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 }
 
 UINT32 flagrall_state::screen_update_flagrall(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-//	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bak_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	m_spr_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -81,20 +104,20 @@ static ADDRESS_MAP_START( flagrall_map, AS_PROGRAM, 16, flagrall_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM // main ram
 
 	AM_RANGE(0x200000, 0x2003ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // clears 0x200 - 0x3ff on startup, but writes 00 values to the other half at times?
-	AM_RANGE(0x240000, 0x240fff) AM_RAM // ??
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(flagrall_bg_videoram_w) AM_SHARE("bg_videoram") 
-	AM_RANGE(0x2c0000, 0x2c07ff) AM_RAM // ??
+	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_SHARE("spr_info") 
+	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(flagrall_spr_videoram_w) AM_SHARE("spr_videoram") 
+	AM_RANGE(0x2c0000, 0x2c07ff) AM_RAM_WRITE(flagrall_bak_videoram_w) AM_SHARE("bak_videoram") 
 
-	AM_RANGE(0x340000, 0x340001) AM_WRITENOP // ??
-	AM_RANGE(0x380000, 0x380001) AM_WRITENOP // ??
-	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP // ??
+	AM_RANGE(0x340000, 0x340001) AM_WRITE(flagrall_xscroll_w)
+	AM_RANGE(0x380000, 0x380001) AM_WRITE(flagrall_yscroll_w)
+//	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP // ??
 
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("IN0")
 	AM_RANGE(0x440000, 0x440001) AM_READ_PORT("IN1")
 	AM_RANGE(0x480000, 0x480001) AM_READ_PORT("IN2")
 	AM_RANGE(0x4c0000, 0x4c0001) AM_READ_PORT("IN3")
 
-	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP // ?? oki?
+//	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP // ?? oki?
 ADDRESS_MAP_END
 
 
@@ -314,8 +337,8 @@ static const gfx_layout flagrall_layout =
 
 
 static GFXDECODE_START( flagrall )
-	GFXDECODE_ENTRY( "gfx1", 0, flagrall_layout,   0x0, 2  ) /* bg tiles */
-	GFXDECODE_ENTRY( "gfx2", 0, flagrall_layout,  0x0, 2  ) /* fg tiles */
+	GFXDECODE_ENTRY( "sprites", 0, flagrall_layout,   0x0, 2  ) /* sprite tiles */
+	GFXDECODE_ENTRY( "tiles", 0, flagrall_layout,  0x0, 2  ) /* bg tiles */
 GFXDECODE_END
 
 
@@ -356,7 +379,7 @@ ROM_START( flagrall )
 	ROM_LOAD( "13_su4.bin", 0x00000, 0x80000, CRC(7b0630b3) SHA1(c615e6630ffd12c122762751c25c249393bf7abd) )
 	ROM_LOAD( "14_su6.bin", 0x80000, 0x40000, CRC(593b038f) SHA1(b00dcf321fe541ee52c34b79e69c44f3d7a9cd7c) )
 
-	ROM_REGION( 0x300000, "gfx1", 0 )
+	ROM_REGION( 0x300000, "sprites", 0 )
 	ROM_LOAD32_BYTE( "1_u5.bin",  0x000000, 0x080000, CRC(9377704b) SHA1(ac516a8ba6d1a70086469504c2a46d47a1f4560b) )
 	ROM_LOAD32_BYTE( "5_u6.bin",  0x000001, 0x080000, CRC(1ac0bd0c) SHA1(ab71bb84e61f5c7168601695f332a8d4a30d9948) )
 	ROM_LOAD32_BYTE( "2_u7.bin",  0x000002, 0x080000, CRC(5f6db2b3) SHA1(84caa019d3b75be30a14d19ccc2f28e5e94028bd) )
@@ -367,9 +390,9 @@ ROM_START( flagrall )
 	ROM_LOAD32_BYTE( "7_u60.bin", 0x200002, 0x040000, CRC(f187a7bf) SHA1(f4ce9ac9fe376250fe426de6ee404fc7841ef08a) )
 	ROM_LOAD32_BYTE( "8_u61.bin", 0x200003, 0x040000, CRC(b73fa441) SHA1(a5a3533563070c870276ead5e2f9cb9aaba303cc))
 
-	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "9_u103.bin",  0x00000, 0x80000, CRC(01e6d654) SHA1(821d61a5b16f5cb76e2a805c8504db1ef38c3a48) )
-	ROM_LOAD( "10_u102.bin", 0x80000, 0x80000, CRC(b1fd3279) SHA1(4a75581e13d43bef441ce81eae518c2f6bc1d5f8) )
+	ROM_REGION( 0x100000, "tiles", 0 )
+	ROM_LOAD( "10_u102.bin", 0x00000, 0x80000, CRC(b1fd3279) SHA1(4a75581e13d43bef441ce81eae518c2f6bc1d5f8) )
+	ROM_LOAD( "9_u103.bin",  0x80000, 0x80000, CRC(01e6d654) SHA1(821d61a5b16f5cb76e2a805c8504db1ef38c3a48) )
 ROM_END
 
 
