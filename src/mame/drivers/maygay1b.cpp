@@ -709,9 +709,7 @@ DRIVER_INIT_MEMBER(maygay1b_state,m1)
 	//AM_RANGE(0x2420, 0x2421) AM_WRITE(latch_ch2_w ) // oki
 	// if there is no OKI region disable writes here, the rom might be missing, so alert user
 
-	UINT8 *okirom = memregion( "msm6376" )->base();
-
-	if (!okirom) {
+	if (m_oki_region == nullptr) {
 		m_maincpu->space(AS_PROGRAM).install_write_handler(0x2420, 0x2421, write8_delegate(FUNC(maygay1b_state::m1ab_no_oki_w), this));
 	}
 }
