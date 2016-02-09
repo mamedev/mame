@@ -2288,10 +2288,10 @@ OP_HANDLER( stx_ex )
 // $bb - load A from [X + $0]
 OP_HANDLER( ldax_imm )
 {
-	EA=X;
-	A=RM(EAD);
-	CLR_NZV;
-	SET_NZ8(A);
+	UINT8 val;
+	{EA=X+((M_RDOP_ARG(PCD)<<8) | M_RDOP_ARG((PCD+1)&0xffff));PC+=2;}
+	val = RM(EAD);
+	CLR_NZVC; SET_NZ8(val);
 }
 
 // $b2 - assuming correct, store first byte to (X + $disp8)
@@ -2301,7 +2301,8 @@ OP_HANDLER( nsc_unk )
 	UINT8 val = RM(EAD);
 	IMM8;
 	EA = X + RM(EAD);
-	
+	CLR_NZV;
+	SET_NZ8(val);
 	WM(EAD,val);
 }
 

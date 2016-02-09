@@ -10,12 +10,10 @@ driver by David Haywood & Angelo Salese
 many thanks to Charles MacDonald for the schematics / documentation of this HW.
 
 TODO:
- - Night Gal Summer trips illegal opcodes on the NCS side, needs to check if bit-rotted or encrypted ROM;
- - Fix Sweet Gal/Sexy Gal gfxs if necessary (i.e. if the bugs aren't all caused by irq/nmi wrong firing);
+ - is opcode $bb right for Night Gal Summer?
+ - extra protection for Night Gal Summer (ports 0x6000-3 for z80 and 0x8000-0x8020-1 for MCU);
+ - Fix Sweet Gal/Sexy Gal layer clearances;
  - unemulated WAIT pin for Z80, MCU asserts it when accessing communication RAM
- - Abstract the video chip to a proper video file and get the name of that chip;
- - Minor graphic glitches in Royal Queen (cross hatch test, some little glitches during gameplay),
-   presumably due of the unemulated wait states on the comms.
  
 *******************************************************************************************/
 
@@ -88,6 +86,9 @@ public:
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_DRIVER_INIT(ngalsumr);
 	DECLARE_DRIVER_INIT(royalqn);
+	DECLARE_READ8_MEMBER(ngalsumr_unk_r);
+	DECLARE_WRITE8_MEMBER(ngalsumr_unk_w);
+	DECLARE_READ8_MEMBER(ngalsumr_color_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -431,6 +432,7 @@ ADDRESS_MAP_END
 * Royal Queen
 ********************************/
 
+
 static ADDRESS_MAP_START( royalqn_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
@@ -453,13 +455,14 @@ static ADDRESS_MAP_START( royalqn_io, AS_IO, 8, nightgal_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( royalqn_nsc_map, AS_PROGRAM, 8, nightgal_state )
-	AM_RANGE(0x0000, 0x007f) AM_RAM
+	AM_RANGE(0x0000, 0x007f) AM_RAM AM_SHARE("xx")
 	AM_RANGE(0x0080, 0x0080) AM_READ(blitter_status_r)
 	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
 	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_process_w)
 	AM_RANGE(0x00a0, 0x00af) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_vregs_w)
 	AM_RANGE(0x00b0, 0x00b0) AM_WRITENOP // bltflip register
 
+	AM_RANGE(0x1000, 0x1007) AM_RAM AM_SHARE("xx")
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r,royalqn_comm_w)
 	AM_RANGE(0x4000, 0x4000) AM_NOP
 	AM_RANGE(0x8000, 0x8000) AM_NOP //open bus or protection check
@@ -1092,8 +1095,34 @@ DRIVER_INIT_MEMBER(nightgal_state,royalqn)
 	ROM[0x027f] = 0x02;
 }
 
+// returns flipped gfxs if active?
+READ8_MEMBER(nightgal_state::ngalsumr_unk_r)
+{
+	return 0;
+}
+
+WRITE8_MEMBER(nightgal_state::ngalsumr_unk_w)
+{
+	//m_z80_latch = data;
+}
+
+// check with the unknown opcode, wants currently active color for 1bpp gfxs?
+READ8_MEMBER(nightgal_state::ngalsumr_color_r)
+{
+	if(offset == 0xc)
+		return 1;
+
+
+	return 0;
+}
+
 DRIVER_INIT_MEMBER(nightgal_state,ngalsumr)
 {
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(nightgal_state::ngalsumr_unk_w), this) );
+	// 0x6003 some kind of f/f state
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x9020, 0x9021, read8_delegate(FUNC(nightgal_state::ngalsumr_unk_r), this) );
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x9030, 0x903f, read8_delegate(FUNC(nightgal_state::ngalsumr_color_r),this) );
+
 #if 0
 	UINT8 *ROM = memregion("subrom")->base();
 
