@@ -145,6 +145,15 @@ READ8_MEMBER(electron_state::electron_read_keyboard)
 	return data;
 }
 
+READ8_MEMBER(electron_state::electron_fred_r)
+{
+	return 0xff;
+}
+
+WRITE8_MEMBER(electron_state::electron_fred_w)
+{
+}
+
 READ8_MEMBER(electron_state::electron_jim_r)
 {
 	return 0xff;
@@ -154,16 +163,7 @@ WRITE8_MEMBER(electron_state::electron_jim_w)
 {
 }
 
-READ8_MEMBER(electron_state::electron_1mhz_r)
-{
-	return 0xff;
-}
-
-WRITE8_MEMBER(electron_state::electron_1mhz_w)
-{
-}
-
-READ8_MEMBER(electron_state::electron_ula_r)
+READ8_MEMBER(electron_state::electron_sheila_r)
 {
 	UINT8 data = ((UINT8 *)memregion("user1")->base())[0x43E00 + offset];
 	switch ( offset & 0x0f )
@@ -186,7 +186,7 @@ READ8_MEMBER(electron_state::electron_ula_r)
 static const int electron_palette_offset[4] = { 0, 4, 5, 1 };
 static const UINT16 electron_screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 0x5800, 0x5800, 0x6000, 0x5800 };
 
-WRITE8_MEMBER(electron_state::electron_ula_w)
+WRITE8_MEMBER(electron_state::electron_sheila_w)
 {
 	int i = electron_palette_offset[(( offset >> 1 ) & 0x03)];
 	logerror( "ULA: write offset %02x <- %02x\n", offset & 0x0f, data );

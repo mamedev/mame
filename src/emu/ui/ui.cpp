@@ -2621,7 +2621,7 @@ void ui_manager::set_use_natural_keyboard(bool use_natural_keyboard)
 //  wrap_text
 //-------------------------------------------------
 
-void ui_manager::wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, int &count, std::vector<int> &xstart, std::vector<int> &xend, float text_size)
+int ui_manager::wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size)
 {
 	float lineheight = get_line_height() * text_size;
 	const char *ends = origs + strlen(origs);
@@ -2630,7 +2630,7 @@ void ui_manager::wrap_text(render_container *container, const char *origs, float
 	const char *linestart;
 	float maxwidth = 0;
 	float aspect = machine().render().ui_aspect(container);
-	count = 0;
+	int count = 0;
 
 	// loop over lines
 	while (*s != 0)
@@ -2746,6 +2746,7 @@ void ui_manager::wrap_text(render_container *container, const char *origs, float
 					break;
 			}
 	}
+	return count;
 }
 
 //-------------------------------------------------

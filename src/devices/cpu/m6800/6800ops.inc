@@ -2073,11 +2073,12 @@ OP_HANDLER( ldd_ix )
 }
 
 /* $ec ADCX immediate -****    NSC8105 only.  Flags are a guess - copied from addb_im() */
+// actually this is ADDX, causes garbage in nightgal.cpp otherwise
 OP_HANDLER( adcx_im )
 {
 	UINT16 t,r;
 	IMMBYTE(t);
-	r = X+t+(CC&0x01);
+	r = X+t;
 	CLR_HNZVC;
 	SET_FLAGS8(X,t,r);
 	SET_H(X,t,r);
@@ -2283,14 +2284,26 @@ OP_HANDLER( stx_ex )
 	WM16(EAD,&m_x);
 }
 
-/* NCS specific, guessed opcodes (tested by Night Gal Summer) */
+/* NSC8105 specific, guessed opcodes (tested by Night Gal Summer) */
 // $bb - load A from [X + $0]
 OP_HANDLER( ldax_imm )
 {
-	EA=X;
-	A=RM(EAD);
+	UINT8 val;
+	{EA=X+((M_RDOP_ARG(PCD)<<8) | M_RDOP_ARG((PCD+1)&0xffff));PC+=2;}
+	val = RM(EAD);
+	CLR_NZVC; SET_NZ8(val);
+}
+
+// $b2 - assuming correct, store first byte to (X + $disp8)
+OP_HANDLER( nsc_unk )
+{
+	IMM8;
+	UINT8 val = RM(EAD);
+	IMM8;
+	EA = X + RM(EAD);
 	CLR_NZV;
-	SET_NZ8(A);
+	SET_NZ8(val);
+	WM(EAD,val);
 }
 
 // $00 - store A to [X + $0]

@@ -619,6 +619,7 @@ BUSES["ISA"] = true
 BUSES["ISBX"] = true
 BUSES["KC"] = true
 BUSES["LPCI"] = true
+BUSES["M5"] = true
 BUSES["MACPDS"] = true
 BUSES["MIDI"] = true
 BUSES["MEGADRIVE"] = true
@@ -1186,9 +1187,6 @@ files {
 createMESSProjects(_target, _subtarget, "apple")
 files {
 	MAME_DIR .. "src/mame/drivers/apple1.cpp",
-	MAME_DIR .. "src/mame/includes/apple1.h",
-	MAME_DIR .. "src/mame/machine/apple1.cpp",
-	MAME_DIR .. "src/mame/video/apple1.cpp",
 	MAME_DIR .. "src/mame/drivers/apple2.cpp",
 	MAME_DIR .. "src/mame/includes/apple2.h",
 	MAME_DIR .. "src/mame/drivers/apple2e.cpp",
@@ -2770,6 +2768,7 @@ files {
 	MAME_DIR .. "src/mame/includes/gamecom.h",
 	MAME_DIR .. "src/mame/machine/gamecom.cpp",
 	MAME_DIR .. "src/mame/video/gamecom.cpp",
+	MAME_DIR .. "src/mame/drivers/k28.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "tigertel")
@@ -3031,6 +3030,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ampro.cpp",
 	MAME_DIR .. "src/mame/drivers/amust.cpp",
 	MAME_DIR .. "src/mame/drivers/applix.cpp",
+	MAME_DIR .. "src/mame/drivers/argox.cpp",
 	MAME_DIR .. "src/mame/drivers/attache.cpp",
 	MAME_DIR .. "src/mame/drivers/aussiebyte.cpp",
 	MAME_DIR .. "src/mame/includes/aussiebyte.h",
@@ -3129,6 +3129,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mx2178.cpp",
 	MAME_DIR .. "src/mame/drivers/mycom.cpp",
 	MAME_DIR .. "src/mame/drivers/myvision.cpp",
+	MAME_DIR .. "src/mame/drivers/notetaker.cpp",
 	MAME_DIR .. "src/mame/drivers/ngen.cpp",
 	MAME_DIR .. "src/mame/machine/ngen_kb.cpp",
 	MAME_DIR .. "src/mame/machine/ngen_kb.h",

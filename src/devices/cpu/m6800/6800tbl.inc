@@ -150,7 +150,7 @@ const m6800_cpu_device::op_func m6800_cpu_device::nsc8105_insn[0x100] = {
 // a8
 &m6800_cpu_device::asl_ix, &m6800_cpu_device::dec_ix, &m6800_cpu_device::rol_ix, &m6800_cpu_device::illegal,&m6800_cpu_device::inc_ix, &m6800_cpu_device::jmp_ix, &m6800_cpu_device::tst_ix, &m6800_cpu_device::clr_ix,
 // b0
-&m6800_cpu_device::neg_ex, &m6800_cpu_device::illegal,&m6800_cpu_device::illegal,&m6800_cpu_device::com_ex, &m6800_cpu_device::lsr_ex, &m6800_cpu_device::ror_ex, &m6800_cpu_device::illegal,&m6800_cpu_device::asr_ex,
+&m6800_cpu_device::neg_ex, &m6800_cpu_device::illegal,&m6800_cpu_device::nsc_unk,&m6800_cpu_device::com_ex, &m6800_cpu_device::lsr_ex, &m6800_cpu_device::ror_ex, &m6800_cpu_device::illegal,&m6800_cpu_device::asr_ex,
 // b8
 &m6800_cpu_device::asl_ex, &m6800_cpu_device::dec_ex, &m6800_cpu_device::rol_ex, &m6800_cpu_device::ldax_imm,&m6800_cpu_device::inc_ex, &m6800_cpu_device::jmp_ex, &m6800_cpu_device::tst_ex, &m6800_cpu_device::clr_ex,
 &m6800_cpu_device::subb_im,&m6800_cpu_device::sbcb_im,&m6800_cpu_device::cmpb_im,&m6800_cpu_device::illegal,&m6800_cpu_device::andb_im,&m6800_cpu_device::ldb_im, &m6800_cpu_device::bitb_im,&m6800_cpu_device::stb_im,

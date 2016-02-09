@@ -208,5 +208,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1979, sdk86,  0,      0,       sdk86,     sdk86, driver_device,    0,    "Intel",  "SDK-86", MACHINE_NO_SOUND_HW)
+/*    YEAR   NAME  PARENT  COMPAT   MACHINE    INPUT          STATE  INIT     COMPANY   FULLNAME                FLAGS */
+COMP( 1979, sdk86,      0,      0,    sdk86,   sdk86, driver_device,    0,    "Intel",  "SDK-86", MACHINE_NO_SOUND_HW)

@@ -382,6 +382,7 @@ hustlerb4       // bootleg
 frogger         // GX392 (c) 1981 Konami
 froggers1       // (c) 1981 Sega
 froggers2       // 834-0068 (c) 1981 Sega
+froggers3		// 
 froggermc       // 800-3110 (c) 1981 Sega
 amidar          // GX337 (c) 1982 Konami
 amidar1         // GX337 (c) 1981 Konami
@@ -4130,17 +4131,23 @@ p911            // 2001
 p911uc          // 2001
 p911kc          // 2001
 p911e           // 2001
+p911ea          // 2001
 p911j           // 2001
 p9112           // 2001
 popn9           // 2003
 sscopex         // 2001
 sogeki          // 2001
+sscopefh        // 2002
 thrild2         // 2001
 thrild2a        // 2001
+thrild2ab       // 2001
+thrild2ac       // 2001
 thrild2c        // 2001
 tsurugi         // 2001
+tsurugie        // 2001
 tsurugij        // 2001
 wcombat         // 2002
+wcombatb        // 2002
 wcombatk        // 2002
 wcombatj        // 2002
 wcombatu        // 2002
@@ -10068,6 +10075,7 @@ haekaka         // (c) 2001 Sammy
 goldstar        // (c) 198? IGS
 goldstbl        // (c) 198? IGS
 moonlght        // bootleg
+moonlghtb       // bootleg
 chry10          // bootleg
 chrygld         // bootleg
 goldfrui        // bootleg
@@ -10750,6 +10758,7 @@ coolpool        // (c) 1992 Catalina Games
 9ballsht3       // (c) 1993 E-Scape EnterMedia + "marketed by Bundra Games"
 9ballshtc       // (c) 1993 E-Scape EnterMedia + "marketed by Bundra Games"
 megaphx         // (c) 1991 Dinamic / Inder
+flagrall		// ?
 gumbo           // (c) 1994 Min Corp.
 mspuzzleg       // (c) 1994 Min Corp.
 mspuzzle        // (c) 1994 Min Corp.

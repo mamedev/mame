@@ -282,7 +282,7 @@ WRITE8_MEMBER(laserbat_state::csound2_w)
     |   6 | SOUND 5  | PIA CA1     |
     |   7 |          |             |
     |   8 |          |             |
-    |   9 |          |             |
+    |   9 |          | 14L A11     |
     |  10 |          |             |
     |  11 |          |             |
     |  12 |          |             |
@@ -291,6 +291,10 @@ WRITE8_MEMBER(laserbat_state::csound2_w)
     |  15 |          |             |
     |  16 | RESET    | Unknown     |
     +-----+----------+-------------+
+
+    Bit 9 is used to select the sprite ROM bank.  There's a wire visible
+    on the component side of the PCB connecting it to the high address
+    bit (A11) of the sprite ROM at 14L.
 
     There could well be other connections on the sound board - these are
     just what can be deduced by tracing the sound program.
@@ -308,8 +312,12 @@ WRITE8_MEMBER(catnmous_state::csound1_w)
 
 WRITE8_MEMBER(catnmous_state::csound2_w)
 {
+	// the bottom bit is used for sprite banking, of all things
+	m_gfx2 = memregion("gfx2")->base() + ((data & 0x01) ? 0x0800 : 0x0000);
+
 	// the top bit is called RESET on the wiring diagram - assume it resets the sound CPU
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+
 	m_csound2 = data;
 }
 

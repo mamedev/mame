@@ -428,6 +428,7 @@ protected:
 	void trap();
 	void ldax_imm();
 	void stax_imm();
+	void nsc_unk();
 };
 
 
