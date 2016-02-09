@@ -42,7 +42,7 @@ public:
 	// writers
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE8_MEMBER( inflection_w );
-	DECLARE_READ_LINE_MEMBER( request ) { return m_request_state; }
+	DECLARE_READ_LINE_MEMBER( request ) { m_stream->update(); return m_request_state; }
 
 protected:
 	// device-level overrides

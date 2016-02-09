@@ -14,10 +14,10 @@
 
 #include "imgui.h"
 #define IMGUI_DEFINE_MATH_OPERATORS
+#define IMGUI_DEFINE_PLACEMENT_NEW
 #include "imgui_internal.h"
 
 #include <stdio.h>      // vsnprintf, sscanf, printf
-#include <new>          // new (ptr)
 #if !defined(alloca) && !defined(__FreeBSD__)
 #ifdef _WIN32
 #include <malloc.h>     // alloca
@@ -37,7 +37,7 @@
 #pragma clang diagnostic ignored "-Wfloat-equal"            // warning : comparing floating point with == or != is unsafe   // storing and comparing against same constants ok.
 #pragma clang diagnostic ignored "-Wglobal-constructors"    // warning : declaration requires a global destructor           // similar to above, not sure what the exact difference it.
 #pragma clang diagnostic ignored "-Wsign-conversion"        // warning : implicit conversion changes signedness             //
-#pragma clang diagnostic ignored "-Wreserved-id-macro"      // warning : macro name is a reserved identifier                //
+//#pragma clang diagnostic ignored "-Wreserved-id-macro"    // warning : macro name is a reserved identifier                //
 #endif
 #ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wunused-function"          // warning: 'xxxx' defined but not used
@@ -267,7 +267,7 @@ void ImDrawList::ChannelsSplit(int channels_count)
     {
         if (i >= old_channels_count)
         {
-            new(&_Channels[i]) ImDrawChannel();
+            IM_PLACEMENT_NEW(&_Channels[i]) ImDrawChannel();
         }
         else
         {
@@ -346,13 +346,13 @@ void ImDrawList::PrimReserve(int idx_count, int vtx_count)
     _IdxWritePtr = IdxBuffer.Data + idx_buffer_size;
 }
 
+// Fully unrolled with inline call to keep our debug builds decently fast.
 void ImDrawList::PrimRect(const ImVec2& a, const ImVec2& c, ImU32 col)
 {
-    const ImVec2 uv = GImGui->FontTexUvWhitePixel;
-    const ImVec2 b(c.x, a.y);
-    const ImVec2 d(a.x, c.y);
-    _IdxWritePtr[0] = (ImDrawIdx)(_VtxCurrentIdx); _IdxWritePtr[1] = (ImDrawIdx)(_VtxCurrentIdx+1); _IdxWritePtr[2] = (ImDrawIdx)(_VtxCurrentIdx+2);
-    _IdxWritePtr[3] = (ImDrawIdx)(_VtxCurrentIdx); _IdxWritePtr[4] = (ImDrawIdx)(_VtxCurrentIdx+2); _IdxWritePtr[5] = (ImDrawIdx)(_VtxCurrentIdx+3);
+    ImVec2 b(c.x, a.y), d(a.x, c.y), uv(GImGui->FontTexUvWhitePixel);
+    ImDrawIdx idx = (ImDrawIdx)_VtxCurrentIdx;
+    _IdxWritePtr[0] = idx; _IdxWritePtr[1] = (ImDrawIdx)(idx+1); _IdxWritePtr[2] = (ImDrawIdx)(idx+2);
+    _IdxWritePtr[3] = idx; _IdxWritePtr[4] = (ImDrawIdx)(idx+2); _IdxWritePtr[5] = (ImDrawIdx)(idx+3);
     _VtxWritePtr[0].pos = a; _VtxWritePtr[0].uv = uv; _VtxWritePtr[0].col = col;
     _VtxWritePtr[1].pos = b; _VtxWritePtr[1].uv = uv; _VtxWritePtr[1].col = col;
     _VtxWritePtr[2].pos = c; _VtxWritePtr[2].uv = uv; _VtxWritePtr[2].col = col;
@@ -364,12 +364,24 @@ void ImDrawList::PrimRect(const ImVec2& a, const ImVec2& c, ImU32 col)
 
 void ImDrawList::PrimRectUV(const ImVec2& a, const ImVec2& c, const ImVec2& uv_a, const ImVec2& uv_c, ImU32 col)
 {
-    const ImVec2 b(c.x, a.y);
-    const ImVec2 d(a.x, c.y);
-    const ImVec2 uv_b(uv_c.x, uv_a.y);
-    const ImVec2 uv_d(uv_a.x, uv_c.y);
-    _IdxWritePtr[0] = (ImDrawIdx)(_VtxCurrentIdx); _IdxWritePtr[1] = (ImDrawIdx)(_VtxCurrentIdx+1); _IdxWritePtr[2] = (ImDrawIdx)(_VtxCurrentIdx+2);
-    _IdxWritePtr[3] = (ImDrawIdx)(_VtxCurrentIdx); _IdxWritePtr[4] = (ImDrawIdx)(_VtxCurrentIdx+2); _IdxWritePtr[5] = (ImDrawIdx)(_VtxCurrentIdx+3);
+    ImVec2 b(c.x, a.y), d(a.x, c.y), uv_b(uv_c.x, uv_a.y), uv_d(uv_a.x, uv_c.y);
+    ImDrawIdx idx = (ImDrawIdx)_VtxCurrentIdx;
+    _IdxWritePtr[0] = idx; _IdxWritePtr[1] = (ImDrawIdx)(idx+1); _IdxWritePtr[2] = (ImDrawIdx)(idx+2);
+    _IdxWritePtr[3] = idx; _IdxWritePtr[4] = (ImDrawIdx)(idx+2); _IdxWritePtr[5] = (ImDrawIdx)(idx+3);
+    _VtxWritePtr[0].pos = a; _VtxWritePtr[0].uv = uv_a; _VtxWritePtr[0].col = col;
+    _VtxWritePtr[1].pos = b; _VtxWritePtr[1].uv = uv_b; _VtxWritePtr[1].col = col;
+    _VtxWritePtr[2].pos = c; _VtxWritePtr[2].uv = uv_c; _VtxWritePtr[2].col = col;
+    _VtxWritePtr[3].pos = d; _VtxWritePtr[3].uv = uv_d; _VtxWritePtr[3].col = col;
+    _VtxWritePtr += 4;
+    _VtxCurrentIdx += 4;
+    _IdxWritePtr += 6;
+}
+
+void ImDrawList::PrimQuadUV(const ImVec2& a, const ImVec2& b, const ImVec2& c, const ImVec2& d, const ImVec2& uv_a, const ImVec2& uv_b, const ImVec2& uv_c, const ImVec2& uv_d, ImU32 col)
+{
+    ImDrawIdx idx = (ImDrawIdx)_VtxCurrentIdx;
+    _IdxWritePtr[0] = idx; _IdxWritePtr[1] = (ImDrawIdx)(idx+1); _IdxWritePtr[2] = (ImDrawIdx)(idx+2);
+    _IdxWritePtr[3] = idx; _IdxWritePtr[4] = (ImDrawIdx)(idx+2); _IdxWritePtr[5] = (ImDrawIdx)(idx+3);
     _VtxWritePtr[0].pos = a; _VtxWritePtr[0].uv = uv_a; _VtxWritePtr[0].col = col;
     _VtxWritePtr[1].pos = b; _VtxWritePtr[1].uv = uv_b; _VtxWritePtr[1].col = col;
     _VtxWritePtr[2].pos = c; _VtxWritePtr[2].uv = uv_c; _VtxWritePtr[2].col = col;
@@ -893,7 +905,7 @@ void ImDrawList::AddText(const ImFont* font, float font_size, const ImVec2& pos,
     CmdBuffer.back().ElemCount -= idx_unused;
     _VtxWritePtr -= vtx_unused;
     _IdxWritePtr -= idx_unused;
-    _VtxCurrentIdx = (ImDrawIdx)VtxBuffer.Size;
+    _VtxCurrentIdx = (unsigned int)VtxBuffer.Size;
 }
 
 // This is one of the few function breaking the encapsulation of ImDrawLst, but it is just so useful.
@@ -1087,7 +1099,7 @@ ImFont* ImFontAtlas::AddFont(const ImFontConfig* font_cfg)
     if (!font_cfg->MergeMode)
     {
         ImFont* font = (ImFont*)ImGui::MemAlloc(sizeof(ImFont));
-        new (font) ImFont();
+        IM_PLACEMENT_NEW(font) ImFont();
         Fonts.push_back(font);
     }
 
@@ -1235,8 +1247,9 @@ bool    ImFontAtlas::Build()
         }
     }
 
-    // Start packing
-    TexWidth = (TexDesiredWidth > 0) ? TexDesiredWidth : (total_glyph_count > 2000) ? 2048 : (total_glyph_count > 1000) ? 1024 : 512;  // Width doesn't actually matters much but some API/GPU have texture size limitations, and increasing width can decrease height.
+    // Start packing. We need a known width for the skyline algorithm. Using a cheap heuristic here to decide of width. User can override TexDesiredWidth if they wish.
+    // After packing is done, width shouldn't matter much, but some API/GPU have texture size limitations and increasing width can decrease height.
+    TexWidth = (TexDesiredWidth > 0) ? TexDesiredWidth : (total_glyph_count > 4000) ? 4096 : (total_glyph_count > 2000) ? 2048 : (total_glyph_count > 1000) ? 1024 : 512;
     TexHeight = 0;
     const int max_tex_height = 1024*32;
     stbtt_pack_context spc;

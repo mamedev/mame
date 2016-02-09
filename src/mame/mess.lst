@@ -2262,7 +2262,6 @@ gckong      // Gakken
 gdigdug     // Gakken
 mwcbaseb    // Mattel
 pbqbert     // Parker Brothers
-mvbfree     // Mego
 kingman     // Tomy
 tmtron      // Tomy
 vinvader    // VTech
@@ -2360,7 +2359,7 @@ tntelluk
 tntellfr
 tntellp
 vocaid
-ctteach     // Coleco
+k28m2       // Tiger Electronics
 
 // hh_ucom4
 ufombs      // Bambino
@@ -2375,6 +2374,8 @@ efball      // Epoch
 galaxy2     // Epoch
 astrocmd    // Epoch
 edracula    // Epoch
+mcompgin    // Mattel
+mvbfree     // Mego
 tccombat    // Tomy
 tmpacman    // Tomy
 tmtennis    // Tomy
@@ -2393,6 +2394,7 @@ microvsn    // Milton Bradley
 monty       // Ritam
 mmonty      // Ritam
 wildfire    // Parker Bros
+k28         // Tiger Electronics
 
 
 //********** Misc **********************************************************
@@ -2441,6 +2443,7 @@ hec2mdhrx
 hec2mx80
 hec2mx40
 hector1
+os214
 victor
 poly880
 sc1
@@ -2454,6 +2457,7 @@ vcs80
 v1050
 x820
 x820ii
+notetakr
 x168
 xor100
 iq151

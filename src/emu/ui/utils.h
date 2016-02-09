@@ -16,9 +16,6 @@
 #include "osdepend.h"
 #include "render.h"
 #include "libjpeg/jpeglib.h"
-//#include <algorithm>
-//#include "drivenum.h"
-//#include <map>
 
 #define MAX_CHAR_INFO            256
 #define MAX_CUST_FILTER          8

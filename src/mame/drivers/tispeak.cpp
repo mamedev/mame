@@ -353,15 +353,38 @@ Language Tutor modules:
 
 Other manufacturers:
 
-Coleco Talking Teacher:
+Tiger Electronics K28 (model 7-232) Sold in Hong Kong, distributed in US as:
+- Coleco: Talking Teacher
+- Sears: Talkatron - Learning Computer
 
-x
+1981 K28 models 7-230 and 7-231 are on different hardware, showing a different
+keyboard, VFD display, and use the SC-01 speech chip. --> driver k28.cpp
+
+    K28 model 7-232 (HK), 1985
+    - MCU: TMS1400 MP7324
+    - TMS51xx: TMS5110A
+    - VSM: 16KB CM62084
+    - LCD: unknown 8*16-seg
+
+K28 modules:
+
+    - Spelling I: VSM: 16KB CM62086
+    - Spelling II: VSM: 16KB CM62085?
+    - Spelling III: VSM: 16KB CM62087
+    - Expansion Module 1: VSM: 16KB CM62214? - assumed same VSM as CM62086
+    - Expansion Module 2: VSM: 16KB CM62216 - assumed same VSM as the one in Spelling II
+    - Expansion Module 3: VSM: 16KB CM62215 - same VSM as CM62087
+    - Expansion Module 4: VSM: 16KB CM62217
+    - Expansion Module 5: VSM: 16KB CM62218*
+    - Expansion Module 6: VSM: 16KB CM62219
+    
+    note: these won't work on the 1981 version(s)
 
 ----------------------------------------------------------------------------
 
   TODO:
   - why doesn't lantutor work?
-  - identify and emulate ctteach LCD
+  - identify and emulate k28 LCD
   - emulate other known devices
 
 
@@ -375,6 +398,7 @@ x
 #include "softlist.h"
 
 // internal artwork
+#include "k28m2.lh"
 #include "lantutor.lh"
 #include "snmath.lh"
 #include "snspell.lh"
@@ -419,9 +443,10 @@ public:
 	DECLARE_WRITE16_MEMBER(snspellc_write_r);
 	DECLARE_READ8_MEMBER(tntell_read_k);
 
-	DECLARE_READ8_MEMBER(ctteach_read_k);
-	DECLARE_WRITE16_MEMBER(ctteach_write_o);
-	DECLARE_WRITE16_MEMBER(ctteach_write_r);
+	void k28_prepare_display(UINT8 old, UINT8 data);
+	DECLARE_READ8_MEMBER(k28_read_k);
+	DECLARE_WRITE16_MEMBER(k28_write_o);
+	DECLARE_WRITE16_MEMBER(k28_write_r);
 
 	// cartridge
 	UINT32 m_cart_max_size;
@@ -642,9 +667,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 }
 
 
-// ctteach specific
+// k28 specific
 
-WRITE16_MEMBER(tispeak_state::ctteach_write_r)
+void tispeak_state::k28_prepare_display(UINT8 old, UINT8 data)
+{
+	// ?
+}
+
+WRITE16_MEMBER(tispeak_state::k28_write_r)
 {
 	// R1234: TMS5100 CTL8421
 	m_tms5100->ctl_w(space, 0, BITSWAP8(data,0,0,0,0,1,2,3,4) & 0xf);
@@ -660,18 +690,17 @@ WRITE16_MEMBER(tispeak_state::ctteach_write_r)
 		power_off();
 
 	// R7-R10: LCD data
-	//..
-	
+	k28_prepare_display(m_r >> 7 & 0xf, data >> 7 & 0xf);
 	m_r = data;
 }
 
-WRITE16_MEMBER(tispeak_state::ctteach_write_o)
+WRITE16_MEMBER(tispeak_state::k28_write_o)
 {
 	// O0-O7: input mux low
 	m_inp_mux = (m_inp_mux & ~0xff) | data;
 }
 
-READ8_MEMBER(tispeak_state::ctteach_read_k)
+READ8_MEMBER(tispeak_state::k28_read_k)
 {
 	// K: TMS5100 CTL, multiplexed inputs
 	return m_tms5100->ctl_r(space, 0) | read_inputs(9);
@@ -1078,7 +1107,7 @@ static INPUT_PORTS_START( tntell )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( ctteach )
+static INPUT_PORTS_START( k28m2 )
 	PORT_START("IN.0") // O0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") // -> auto_power_off
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('A') PORT_NAME("A/1")
@@ -1098,7 +1127,7 @@ static INPUT_PORTS_START( ctteach )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
 
 	PORT_START("IN.3") // O3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Prompt")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("Prompt")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('D') PORT_NAME("D/4")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('M') PORT_NAME("M/" UTF8_MULTIPLY)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
@@ -1314,16 +1343,16 @@ static MACHINE_CONFIG_DERIVED( tntell, vocaid )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ctteach, tispeak_state )
+static MACHINE_CONFIG_START( k28m2, tispeak_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1400, MASTER_CLOCK/2)
-	MCFG_TMS1XXX_READ_K_CB(READ8(tispeak_state, ctteach_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, ctteach_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, ctteach_write_r))
+	MCFG_TMS1XXX_READ_K_CB(READ8(tispeak_state, k28_read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, k28_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, k28_write_r))
 
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_ctteach)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_k28m2)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
@@ -1331,6 +1360,13 @@ static MACHINE_CONFIG_START( ctteach, tispeak_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("tms5100", TMS5110A, MASTER_CLOCK)
 	MCFG_FRAGMENT_ADD(tms5110_route)
+
+	/* cartridge */
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "k28m2")
+	MCFG_GENERIC_EXTENSIONS("vsm")
+	MCFG_GENERIC_LOAD(tispeak_state, tispeak_cartridge)
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "k28m2")
 MACHINE_CONFIG_END
 
 
@@ -1675,16 +1711,16 @@ ROM_START( vocaid )
 ROM_END
 
 
-ROM_START( ctteach )
+ROM_START( k28m2 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mp7324", 0x0000, 0x1000, CRC(08d15ab6) SHA1(5b0f6c53e6732a362c4bb25d966d4072fdd33db8) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
 	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_ctteach_output.pla", 0, 557, CRC(3a5c7005) SHA1(3fe5819c138a90e7fc12817415f2622ca81b40b2) )
+	ROM_LOAD( "tms1400_k28m2_output.pla", 0, 557, CRC(3a5c7005) SHA1(3fe5819c138a90e7fc12817415f2622ca81b40b2) )
 
-	ROM_REGION( 0x8000, "tms6100", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff? = space reserved for cartridge
 	ROM_LOAD( "cm62084.vsm", 0x0000, 0x4000, CRC(cd1376f7) SHA1(96fa484c392c451599bc083b8376cad9c998df7d) )
 ROM_END
 
@@ -1720,4 +1756,4 @@ COMP( 1981, tntellfr,   tntell,   0, tntell,       tntell,     tispeak_state, tn
 
 COMP( 1982, vocaid,     0,        0, vocaid,       tntell,     driver_device, 0,        "Texas Instruments", "Vocaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
 
-COMP( 1985, ctteach,    0,        0, ctteach,      ctteach,    driver_device, 0,        "Coleco", "Talking Teacher", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+COMP( 1985, k28m2,      0,        0, k28m2,        k28m2,      tispeak_state, snspell,  "Tiger Electronics", "K28: Talking Learning Computer (model 7-232)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

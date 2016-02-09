@@ -286,6 +286,8 @@ void ui_manager::init()
 	m_popup_text_end = 0;
 	m_use_natural_keyboard = false;
 	m_mouse_arrow_texture = nullptr;
+	m_show_timecode_counter = false;
+	m_show_timecode_total = false;
 	m_load_save_hold = false;
 
 	get_font_rows(&machine());
@@ -1035,6 +1037,16 @@ bool ui_manager::is_menu_active(void)
 }
 
 
+bool ui_manager::show_timecode_counter()
+{
+	return m_show_timecode_counter;
+}
+bool ui_manager::show_timecode_total()
+{
+	return m_show_timecode_total;
+}
+
+
 
 /***************************************************************************
     TEXT GENERATORS
@@ -1559,6 +1571,20 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, nullptr, nullptr);
 	}
 
+	// Show the duration of current part (intro or gameplay or extra)
+	if (machine.ui().show_timecode_counter()) {
+		std::string tempstring;
+		machine.ui().draw_text_full(container, machine.video().timecode_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
+			JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, rgb_t(0xf0,0xf0,0x10,0x10), ARGB_BLACK, NULL, NULL);
+	}
+	// Show the total time elapsed for the video preview (all parts intro, gameplay, extras)
+	if (machine.ui().show_timecode_total()) {
+		std::string tempstring;
+		machine.ui().draw_text_full(container, machine.video().timecode_total_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
+			JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, rgb_t(0xf0,0x10,0xf0,0x10), ARGB_BLACK, NULL, NULL);
+	}
+
+
 	// draw the profiler if visible
 	if (machine.ui().show_profiler())
 	{
@@ -1621,6 +1647,10 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	}
 
 	machine.ui().image_handler_ingame();
+
+	// handle a save input timecode request
+	if (machine.ui_input().pressed(IPT_UI_TIMECODE))
+		machine.video().save_input_timecode();
 
 	if (ui_disabled) return ui_disabled;
 
@@ -2591,7 +2621,7 @@ void ui_manager::set_use_natural_keyboard(bool use_natural_keyboard)
 //  wrap_text
 //-------------------------------------------------
 
-void ui_manager::wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, int &count, std::vector<int> &xstart, std::vector<int> &xend, float text_size)
+int ui_manager::wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size)
 {
 	float lineheight = get_line_height() * text_size;
 	const char *ends = origs + strlen(origs);
@@ -2600,7 +2630,7 @@ void ui_manager::wrap_text(render_container *container, const char *origs, float
 	const char *linestart;
 	float maxwidth = 0;
 	float aspect = machine().render().ui_aspect(container);
-	count = 0;
+	int count = 0;
 
 	// loop over lines
 	while (*s != 0)
@@ -2716,6 +2746,7 @@ void ui_manager::wrap_text(render_container *container, const char *origs, float
 					break;
 			}
 	}
+	return count;
 }
 
 //-------------------------------------------------

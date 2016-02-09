@@ -106,7 +106,7 @@ const m6800_cpu_device::op_func m6800_cpu_device::hd63701_insn[0x100] = {
 
 const m6800_cpu_device::op_func m6800_cpu_device::nsc8105_insn[0x100] = {
 // 0
-&m6800_cpu_device::stax_imm,&m6800_cpu_device::illegal,&m6800_cpu_device::nop,    &m6800_cpu_device::illegal,&m6800_cpu_device::illegal,&m6800_cpu_device::tap,    &m6800_cpu_device::illegal,&m6800_cpu_device::tpa,
+&m6800_cpu_device::illegal,&m6800_cpu_device::illegal,&m6800_cpu_device::nop,    &m6800_cpu_device::illegal,&m6800_cpu_device::illegal,&m6800_cpu_device::tap,    &m6800_cpu_device::illegal,&m6800_cpu_device::tpa,
 // 8
 &m6800_cpu_device::inx,    &m6800_cpu_device::clv,    &m6800_cpu_device::dex,    &m6800_cpu_device::sev,    &m6800_cpu_device::clc,    &m6800_cpu_device::cli,    &m6800_cpu_device::sec,    &m6800_cpu_device::sei,
 // 10
@@ -150,9 +150,9 @@ const m6800_cpu_device::op_func m6800_cpu_device::nsc8105_insn[0x100] = {
 // a8
 &m6800_cpu_device::asl_ix, &m6800_cpu_device::dec_ix, &m6800_cpu_device::rol_ix, &m6800_cpu_device::illegal,&m6800_cpu_device::inc_ix, &m6800_cpu_device::jmp_ix, &m6800_cpu_device::tst_ix, &m6800_cpu_device::clr_ix,
 // b0
-&m6800_cpu_device::neg_ex, &m6800_cpu_device::illegal,&m6800_cpu_device::illegal,&m6800_cpu_device::com_ex, &m6800_cpu_device::lsr_ex, &m6800_cpu_device::ror_ex, &m6800_cpu_device::illegal,&m6800_cpu_device::asr_ex,
+&m6800_cpu_device::neg_ex, &m6800_cpu_device::illegal,&m6800_cpu_device::stx_nsc,&m6800_cpu_device::com_ex, &m6800_cpu_device::lsr_ex, &m6800_cpu_device::ror_ex, &m6800_cpu_device::illegal,&m6800_cpu_device::asr_ex,
 // b8
-&m6800_cpu_device::asl_ex, &m6800_cpu_device::dec_ex, &m6800_cpu_device::rol_ex, &m6800_cpu_device::ldax_imm,&m6800_cpu_device::inc_ex, &m6800_cpu_device::jmp_ex, &m6800_cpu_device::tst_ex, &m6800_cpu_device::clr_ex,
+&m6800_cpu_device::asl_ex, &m6800_cpu_device::dec_ex, &m6800_cpu_device::rol_ex, &m6800_cpu_device::btst_ix,&m6800_cpu_device::inc_ex, &m6800_cpu_device::jmp_ex, &m6800_cpu_device::tst_ex, &m6800_cpu_device::clr_ex,
 &m6800_cpu_device::subb_im,&m6800_cpu_device::sbcb_im,&m6800_cpu_device::cmpb_im,&m6800_cpu_device::illegal,&m6800_cpu_device::andb_im,&m6800_cpu_device::ldb_im, &m6800_cpu_device::bitb_im,&m6800_cpu_device::stb_im,
 &m6800_cpu_device::eorb_im,&m6800_cpu_device::orb_im, &m6800_cpu_device::adcb_im,&m6800_cpu_device::addb_im,&m6800_cpu_device::illegal,&m6800_cpu_device::ldx_im, &m6800_cpu_device::illegal,&m6800_cpu_device::stx_im,
 &m6800_cpu_device::subb_di,&m6800_cpu_device::sbcb_di,&m6800_cpu_device::cmpb_di,&m6800_cpu_device::illegal,&m6800_cpu_device::andb_di,&m6800_cpu_device::ldb_di, &m6800_cpu_device::bitb_di,&m6800_cpu_device::stb_di,

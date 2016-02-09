@@ -495,6 +495,7 @@ namespace bgfx { namespace mtl
 
 			m_occlusionQuery.preReset();
 
+			g_internalData.context = m_device;
 			return true;
 		}
 
@@ -666,7 +667,7 @@ namespace bgfx { namespace mtl
 			tc.m_sides   = 0;
 			tc.m_depth   = 0;
 			tc.m_numMips = 1;
-			tc.m_format  = texture.m_requestedFormat;
+			tc.m_format  = TextureFormat::Enum(texture.m_requestedFormat);
 			tc.m_cubeMap = false;
 			tc.m_mem     = NULL;
 			bx::write(&writer, tc);
@@ -675,6 +676,17 @@ namespace bgfx { namespace mtl
 			texture.create(mem, tc.m_flags, 0);
 
 			release(mem);
+		}
+
+		void overrideInternal(TextureHandle _handle, uintptr_t _ptr) BX_OVERRIDE
+		{
+			BX_UNUSED(_handle, _ptr);
+		}
+
+		uintptr_t getInternal(TextureHandle _handle) BX_OVERRIDE
+		{
+			BX_UNUSED(_handle);
+			return 0;
 		}
 
 		void destroyTexture(TextureHandle _handle) BX_OVERRIDE
@@ -1887,7 +1899,7 @@ namespace bgfx { namespace mtl
 					 , 0 != (_flags&BGFX_TEXTURE_RT_MASK) ? " (render target)" : ""
 					 );
 
-			const bool bufferOnly   = 0 != (_flags&BGFX_TEXTURE_RT_BUFFER_ONLY);
+			const bool writeOnly   = 0 != (_flags&BGFX_TEXTURE_RT_WRITE_ONLY);
 //			const bool computeWrite = 0 != (_flags&BGFX_TEXTURE_COMPUTE_WRITE);
 //			const bool renderTarget = 0 != (_flags&BGFX_TEXTURE_RT_MASK);
 			const bool srgb			= 0 != (_flags&BGFX_TEXTURE_SRGB) || imageContainer.m_srgb;
@@ -1919,11 +1931,11 @@ namespace bgfx { namespace mtl
 			desc.resourceOptions  = MTLResourceStorageModePrivate;
 			desc.cpuCacheMode     = MTLCPUCacheModeDefaultCache;
 
-			desc.storageMode = (MTLStorageMode)(bufferOnly
+			desc.storageMode = (MTLStorageMode)(writeOnly
 				? 2 /*MTLStorageModePrivate*/
 				: 1 /*MTLStorageModeManaged*/
 				);
-			desc.usage       = bufferOnly
+			desc.usage       = writeOnly
 				? MTLTextureUsageShaderWrite
 				: MTLTextureUsageShaderRead
 				;
@@ -2040,7 +2052,13 @@ namespace bgfx { namespace mtl
 		if (convert)
 		{
 			temp = (uint8_t*)BX_ALLOC(g_allocator, rectpitch*_rect.m_height);
-			imageDecodeToBgra8(temp, data, _rect.m_width, _rect.m_height, srcpitch, m_requestedFormat);
+			imageDecodeToBgra8(temp
+				, data
+				, _rect.m_width
+				, _rect.m_height
+				, srcpitch
+				, TextureFormat::Enum(m_requestedFormat)
+				);
 			data = temp;
 		}
 

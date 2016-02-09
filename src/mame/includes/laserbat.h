@@ -65,9 +65,6 @@ public:
 	DECLARE_DRIVER_INIT(laserbat);
 	INTERRUPT_GEN_MEMBER(laserbat_interrupt);
 
-	// video initialisation
-	DECLARE_PALETTE_INIT(laserbat);
-
 	// video memory and control ports
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(wcoh_w);
@@ -162,6 +159,9 @@ public:
 	{
 	}
 
+	// video initialisation
+	DECLARE_PALETTE_INIT(laserbat);
+
 	// sound control ports
 	virtual DECLARE_WRITE8_MEMBER(csound2_w) override;
 
@@ -192,6 +192,9 @@ public:
 		, m_cb1(false)
 	{
 	}
+
+	// video initialisation
+	DECLARE_PALETTE_INIT(catnmous);
 
 	// sound control ports
 	virtual DECLARE_WRITE8_MEMBER(csound1_w) override;

@@ -14,7 +14,7 @@
 #ifndef __PPC_H__
 #define __PPC_H__
 
-#include "cpu/vtlb.h"
+#include "divtlb.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
@@ -171,7 +171,7 @@ enum
 class ppc_frontend;
 
 
-class ppc_device : public cpu_device
+class ppc_device : public cpu_device, public device_vtlb_interface
 {
 	friend class ppc_frontend;
 
@@ -461,9 +461,6 @@ protected:
 	UINT32 m_esasrr;
 	UINT32 m_sebr;
 	UINT32 m_ser;
-
-	/* MMU */
-	vtlb_state *m_vtlb;
 
 	/* architectural distinctions */
 	powerpc_flavor  m_flavor;

@@ -667,7 +667,7 @@ come from... they might be eventually removed -->
 
   <!-- Brno mod ROMs -->
 
-  <software name="brno_boot" supported="no">
+  <software name="brnoboot" supported="no">
     <description>Boot for Brno ramdisk</description>
     <year>1989</year>
     <publisher>&lt;Pavel Brychta a spol.&gt;</publisher>

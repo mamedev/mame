@@ -58,8 +58,8 @@ public:
 	required_ioport m_reset;
 	optional_ioport m_DIPS;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( sts_r );
 	DECLARE_WRITE8_MEMBER( com_w );
@@ -150,8 +150,8 @@ public:
 //	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(m5_cart);
 
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	UINT8 m_rambank; // bank #
 	UINT8 m_ramcpu; //where Ramdisk bank is mapped

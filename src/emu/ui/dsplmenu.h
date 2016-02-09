@@ -33,14 +33,12 @@ private:
 		const char  *option;
 	};
 
-	struct video_modes
-	{
-		const char  *option;
-		const char  *label;
-	};
+	using video_modes = std::unordered_map<std::string, std::string>;
 
-	static video_modes m_video[];
+	static video_modes m_video;
 	static dspl_option m_options[];
+
+	std::vector<std::string> m_list;
 };
 
 #endif /* __UI_DSPLMENU_H__ */

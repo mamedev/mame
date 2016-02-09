@@ -8,6 +8,7 @@
 
 #include <stdint.h> // uint32_t
 #include <stdlib.h> // size_t
+#include <string.h> // memcpy
 
 #include "config.h"
 #include "macros.h"
@@ -50,6 +51,32 @@ namespace bx
 		union { const void* ptr; size_t addr; } un;
 		un.ptr = _ptr;
 		return 0 == (un.addr & (_align-1) );
+	}
+
+	/// Scatter/gather memcpy.
+	inline void memCopy(void* _dst, const void* _src, uint32_t _size, uint32_t _num, uint32_t _srcPitch, uint32_t _dstPitch)
+	{
+		const uint8_t* src = (const uint8_t*)_src;
+		uint8_t* dst = (uint8_t*)_dst;
+
+		for (uint32_t ii = 0; ii < _num; ++ii)
+		{
+			memcpy(dst, src, _size);
+			src += _srcPitch;
+			dst += _dstPitch;
+		}
+	}
+
+	///
+	inline void gather(void* _dst, const void* _src, uint32_t _size, uint32_t _num, uint32_t _srcPitch)
+	{
+		memCopy(_dst, _src, _size, _num, _srcPitch, _size);
+	}
+
+	///
+	inline void scatter(void* _dst, const void* _src, uint32_t _size, uint32_t _num, uint32_t _dstPitch)
+	{
+		memCopy(_dst, _src, _size, _num, _size, _dstPitch);
 	}
 
 } // namespace bx

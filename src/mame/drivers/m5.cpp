@@ -1268,17 +1268,20 @@ void m5_state::machine_reset()
 	std::string region_tag;
 
 	//is ram/rom cart plugged in?
-	if (m_cart1->exists())
+	if (m_cart1->exists()) 
+	{
 		if (m_cart1->get_type() > 0) 
 			m_cart_ram=m_cart1;
 		else
 			m_cart=m_cart1;
-	if (m_cart2->exists())
+	}
+	if (m_cart2->exists()) 
+	{
 		if (m_cart2->get_type() > 0) 
 			m_cart_ram=m_cart2;
 		else
 			m_cart=m_cart2;
-	
+	}
 	// no cart inserted - there is nothing to do - not allowed in original Sord m5
 	if (m_cart_ram == NULL && m_cart == NULL)
 		{
@@ -1375,17 +1378,20 @@ void brno_state::machine_reset()
 	program.unmap_write(0x0000, 0x5fff);
 
 	//is ram/rom cart plugged in?
-	if (m_cart1->exists())
+	if (m_cart1->exists()) 
+	{
 		if (m_cart1->get_type() > 0) 
 			m_cart_ram=m_cart1;
 		else
 			m_cart=m_cart1;
+	}
 	if (m_cart2->exists())
+	{
 		if (m_cart2->get_type() > 0) 
 			m_cart_ram=m_cart2;
 		else
 			m_cart=m_cart2;
-
+	}
 
 	if (m_cart)
 		{

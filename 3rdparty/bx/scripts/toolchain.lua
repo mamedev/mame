@@ -13,29 +13,30 @@ function toolchain(_buildDir, _libDir)
 		value = "GCC",
 		description = "Choose GCC flavor",
 		allowed = {
-			{ "android-arm",    "Android - ARM"              },
-			{ "android-mips",   "Android - MIPS"             },
-			{ "android-x86",    "Android - x86"              },
-			{ "asmjs",          "Emscripten/asm.js"          },
-			{ "freebsd",        "FreeBSD"                    },
-			{ "linux-gcc",      "Linux (GCC compiler)"       },
-			{ "linux-gcc-5",    "Linux (GCC-5 compiler)"     },
-			{ "linux-clang",    "Linux (Clang compiler)"     },
-			{ "linux-mips-gcc", "Linux (MIPS, GCC compiler)" },
-			{ "linux-arm-gcc",  "Linux (ARM, GCC compiler)"  },
-			{ "ios-arm",        "iOS - ARM"                  },
-			{ "ios-simulator",  "iOS - Simulator"            },
-			{ "tvos-arm64",     "tvOS - ARM64"               },
-			{ "tvos-simulator", "tvOS - Simulator"           },
-			{ "mingw-gcc",      "MinGW"                      },
-			{ "mingw-clang",    "MinGW (clang compiler)"     },
-			{ "nacl",           "Native Client"              },
-			{ "nacl-arm",       "Native Client - ARM"        },
-			{ "osx",            "OSX"                        },
-			{ "pnacl",          "Native Client - PNaCl"      },
-			{ "ps4",            "PS4"                        },
-			{ "qnx-arm",        "QNX/Blackberry - ARM"       },
-			{ "rpi",            "RaspberryPi"                },
+			{ "android-arm",     "Android - ARM"              },
+			{ "android-mips",    "Android - MIPS"             },
+			{ "android-x86",     "Android - x86"              },
+			{ "asmjs",           "Emscripten/asm.js"          },
+			{ "freebsd",         "FreeBSD"                    },
+			{ "linux-gcc",       "Linux (GCC compiler)"       },
+			{ "linux-gcc-5",     "Linux (GCC-5 compiler)"     },
+			{ "linux-clang",     "Linux (Clang compiler)"     },
+			{ "linux-mips-gcc",  "Linux (MIPS, GCC compiler)" },
+			{ "linux-arm-gcc",   "Linux (ARM, GCC compiler)"  },
+			{ "linux-steamlink", "Steam Link"                 },
+			{ "ios-arm",         "iOS - ARM"                  },
+			{ "ios-simulator",   "iOS - Simulator"            },
+			{ "tvos-arm64",      "tvOS - ARM64"               },
+			{ "tvos-simulator",  "tvOS - Simulator"           },
+			{ "mingw-gcc",       "MinGW"                      },
+			{ "mingw-clang",     "MinGW (clang compiler)"     },
+			{ "nacl",            "Native Client"              },
+			{ "nacl-arm",        "Native Client - ARM"        },
+			{ "osx",             "OSX"                        },
+			{ "pnacl",           "Native Client - PNaCl"      },
+			{ "ps4",             "PS4"                        },
+			{ "qnx-arm",         "QNX/Blackberry - ARM"       },
+			{ "rpi",             "RaspberryPi"                },
 		},
 	}
 
@@ -84,6 +85,11 @@ function toolchain(_buildDir, _libDir)
 		trigger = "with-tvos",
 		value   = "#",
 		description = "Set tvOS target version (default: 9.0).",
+	}
+
+	newoption {
+		trigger = "with-dynamic-runtime",
+		description = "Dynamically link with the runtime rather than statically",
 	}
 
 	-- Avoid error when invoking genie --help.
@@ -157,7 +163,7 @@ function toolchain(_buildDir, _libDir)
 		elseif "asmjs" == _OPTIONS["gcc"] then
 
 			if not os.getenv("EMSCRIPTEN") then
-				print("Set EMSCRIPTEN enviroment variables.")
+				print("Set EMSCRIPTEN enviroment variable.")
 			end
 
 			premake.gcc.cc   = "$(EMSCRIPTEN)/emcc"
@@ -214,6 +220,16 @@ function toolchain(_buildDir, _libDir)
 		elseif "linux-arm-gcc" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-arm-gcc"))
 
+		elseif "linux-steamlink" == _OPTIONS["gcc"] then
+			if not os.getenv("MARVELL_SDK_PATH") then
+				print("Set MARVELL_SDK_PATH enviroment variable.")
+			end
+
+			premake.gcc.cc  = "$(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-gcc"
+			premake.gcc.cxx = "$(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-g++"
+			premake.gcc.ar  = "$(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-ar"
+			location (path.join(_buildDir, "projects", _ACTION .. "-linux-steamlink"))
+
 		elseif "mingw-gcc" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "$(MINGW)/bin/x86_64-w64-mingw32-gcc"
 			premake.gcc.cxx = "$(MINGW)/bin/x86_64-w64-mingw32-g++"
@@ -231,7 +247,7 @@ function toolchain(_buildDir, _libDir)
 		elseif "nacl" == _OPTIONS["gcc"] then
 
 			if not os.getenv("NACL_SDK_ROOT") then
-				print("Set NACL_SDK_ROOT enviroment variables.")
+				print("Set NACL_SDK_ROOT enviroment variable.")
 			end
 
 			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_x86_newlib/bin/x86_64-nacl-"
@@ -249,7 +265,7 @@ function toolchain(_buildDir, _libDir)
 		elseif "nacl-arm" == _OPTIONS["gcc"] then
 
 			if not os.getenv("NACL_SDK_ROOT") then
-				print("Set NACL_SDK_ROOT enviroment variables.")
+				print("Set NACL_SDK_ROOT enviroment variable.")
 			end
 
 			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_arm_newlib/bin/arm-nacl-"
@@ -277,7 +293,7 @@ function toolchain(_buildDir, _libDir)
 		elseif "pnacl" == _OPTIONS["gcc"] then
 
 			if not os.getenv("NACL_SDK_ROOT") then
-				print("Set NACL_SDK_ROOT enviroment variables.")
+				print("Set NACL_SDK_ROOT enviroment variable.")
 			end
 
 			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_pnacl/bin/pnacl-"
@@ -295,7 +311,7 @@ function toolchain(_buildDir, _libDir)
 		elseif "ps4" == _OPTIONS["gcc"] then
 
 			if not os.getenv("PS4_SDK_ROOT") then
-				print("Set PS4_SDK_ROOT enviroment variables.")
+				print("Set PS4_SDK_ROOT enviroment variable.")
 			end
 
 			ps4Toolchain = "$(PS4_SDK_ROOT)/host_tools/bin/orbis-"
@@ -308,7 +324,7 @@ function toolchain(_buildDir, _libDir)
 		elseif "qnx-arm" == _OPTIONS["gcc"] then
 
 			if not os.getenv("QNX_HOST") then
-				print("Set QNX_HOST enviroment variables.")
+				print("Set QNX_HOST enviroment variable.")
 			end
 
 			premake.gcc.cc  = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-gcc"
@@ -376,8 +392,11 @@ function toolchain(_buildDir, _libDir)
 		end
 	end
 
+	if not _OPTIONS["with-dynamic-runtime"] then
+		flags { "StaticRuntime" }
+	end
+
 	flags {
-		"StaticRuntime",
 		"NoPCH",
 		"NativeWChar",
 		"NoRTTI",
@@ -684,6 +703,30 @@ function toolchain(_buildDir, _libDir)
 			"-Wl,-z,noexecstack",
 			"-Wl,-z,relro",
 			"-Wl,-z,now",
+		}
+
+	configuration { "linux-steamlink" }
+		targetdir (path.join(_buildDir, "steamlink/bin"))
+		objdir (path.join(_buildDir, "steamlink/obj"))
+		libdirs { path.join(_libDir, "lib/steamlink") }
+		includedirs { path.join(bxDir, "include/compat/linux") }
+		defines {
+			"__STEAMLINK__=1", -- There is no special prefedined compiler symbol to detect SteamLink, faking it.
+		}
+		buildoptions {
+			"-std=c++0x",
+			"-Wfatal-errors",
+			"-Wunused-value",
+			"-Wundef",
+			"-pthread",
+			"-marm",
+			"-mfloat-abi=hard",
+			"--sysroot=$(MARVELL_SDK_PATH)/rootfs",
+		}
+		linkoptions {
+			"-static-libgcc",
+			"-static-libstdc++",
+			"--sysroot=$(MARVELL_SDK_PATH)/rootfs",
 		}
 
 	configuration { "android-arm" }

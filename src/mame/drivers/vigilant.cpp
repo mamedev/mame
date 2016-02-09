@@ -650,6 +650,9 @@ ROM_START( vigilant ) // World Rev E
 	ROM_LOAD( "VG_B-8R.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
 	ROM_LOAD( "VG_B-4M.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
 	ROM_LOAD( "VG_B-1B.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10_7a.ic52", 0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // tbp24s10, 82s129-equivalent - video timing
 ROM_END
 
 ROM_START( vigilantg ) // US Rev G
@@ -687,6 +690,9 @@ ROM_START( vigilantg ) // US Rev G
 	ROM_LOAD( "VG_B-8R.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
 	ROM_LOAD( "VG_B-4M.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
 	ROM_LOAD( "VG_B-1B.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10_7a.ic52", 0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // tbp24s10, 82s129-equivalent - video timing
 ROM_END
 
 ROM_START( vigilanto ) // US (earliest base version)
@@ -726,6 +732,9 @@ ROM_START( vigilanto ) // US (earliest base version)
 	ROM_LOAD( "VG_B-8R.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
 	ROM_LOAD( "VG_B-4M.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
 	ROM_LOAD( "VG_B-1B.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10_7a.ic52", 0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // tbp24s10, 82s129-equivalent - video timing
 ROM_END
 
 ROM_START( vigilanta ) // World Rev A
@@ -765,6 +774,9 @@ ROM_START( vigilanta ) // World Rev A
 	ROM_LOAD( "VG_B-8R.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
 	ROM_LOAD( "VG_B-4M.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
 	ROM_LOAD( "VG_B-1B.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10_7a.ic52", 0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // tbp24s10, 82s129-equivalent - video timing
 ROM_END
 
 ROM_START( vigilantb ) // US Rev B
@@ -804,6 +816,9 @@ ROM_START( vigilantb ) // US Rev B
 	ROM_LOAD( "VG_B-8R.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
 	ROM_LOAD( "VG_B-4M.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
 	ROM_LOAD( "VG_B-1B.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10_7a.ic52", 0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // tbp24s10, 82s129-equivalent - video timing
 ROM_END
 
 ROM_START( vigilantc ) // World Rev C
@@ -843,6 +858,9 @@ ROM_START( vigilantc ) // World Rev C
 	ROM_LOAD( "VG_B-8R.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
 	ROM_LOAD( "VG_B-4M.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
 	ROM_LOAD( "VG_B-1B.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10_7a.ic52", 0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // tbp24s10, 82s129-equivalent - video timing
 ROM_END
 
 ROM_START( vigilantd ) // Japan Rev D
@@ -882,6 +900,9 @@ ROM_START( vigilantd ) // Japan Rev D
 	ROM_LOAD( "VG_B-8R.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
 	ROM_LOAD( "VG_B-4M.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
 	ROM_LOAD( "VG_B-1B.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10_7a.ic52", 0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // tbp24s10, 82s129-equivalent - video timing
 ROM_END
 
 ROM_START( vigilantbl ) /* Bootleg */
@@ -1010,7 +1031,7 @@ ROM_START( buccanrs )
 	ROM_LOAD( "2.u74",  0x00000, 0x10000, CRC(36ee1dac) SHA1(6dfd2a885c0b1c9347abc4b204ade66551c4b404) )
 
 	ROM_REGION( 0x400, "proms", 0 )
-	ROM_LOAD( "prom1.u54",  0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) )
+	ROM_LOAD( "prom1.u54",  0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // == ic52 video timing prom from vigilante
 	ROM_LOAD( "prom4.u79",  0x0100, 0x0100, CRC(e6506ef4) SHA1(079841da7640b14d94aaaeb572bf018932b58293) )
 	ROM_LOAD( "prom3.u88",  0x0200, 0x0100, CRC(b43d094f) SHA1(2bed4892d8a91d7faac5a07bf858d9294eb30606) )
 	ROM_LOAD( "prom2.u99",  0x0300, 0x0100, CRC(e0aa8869) SHA1(ac8bdfeba69420ba56ec561bf3d0f1229d02cea2) )
@@ -1049,7 +1070,7 @@ ROM_START( buccanrsa )
 	ROM_LOAD( "2.u74",  0x00000, 0x10000, CRC(36ee1dac) SHA1(6dfd2a885c0b1c9347abc4b204ade66551c4b404) )
 
 	ROM_REGION( 0x400, "proms", 0 )
-	ROM_LOAD( "prom1.u54",  0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) )
+	ROM_LOAD( "prom1.u54",  0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // == ic52 video timing prom from vigilante
 	ROM_LOAD( "prom4.u79",  0x0100, 0x0100, CRC(e6506ef4) SHA1(079841da7640b14d94aaaeb572bf018932b58293) )
 	ROM_LOAD( "prom3.u88",  0x0200, 0x0100, CRC(b43d094f) SHA1(2bed4892d8a91d7faac5a07bf858d9294eb30606) )
 	ROM_LOAD( "prom2.u99",  0x0300, 0x0100, CRC(e0aa8869) SHA1(ac8bdfeba69420ba56ec561bf3d0f1229d02cea2) )

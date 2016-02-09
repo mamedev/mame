@@ -253,7 +253,7 @@ namespace bx
 		}
 
 	private:
-		void insertBefore(int16_t _before, uint16_t _handle)
+		void insertBefore(uint16_t _before, uint16_t _handle)
 		{
 			Link& curr = m_links[_handle];
 			curr.m_next = _before;
