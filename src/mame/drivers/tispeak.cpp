@@ -357,7 +357,7 @@ Tiger Electronics K28 (model 7-232) Sold in Hong Kong, distributed in US as:
 - Coleco: Talking Teacher
 - Sears: Talkatron - Learning Computer
 
-Earlier K28 models 7-230 and 7-231 are on different hardware, showing a different
+1981 K28 models 7-230 and 7-231 are on different hardware, showing a different
 keyboard, VFD display, and use the SC-01 speech chip. --> driver k28.cpp
 
     K28 model 7-232 (HK), 1985
@@ -377,6 +377,8 @@ K28 modules:
     - Expansion Module 4: VSM: 16KB CM62217
     - Expansion Module 5: VSM: 16KB CM62218*
     - Expansion Module 6: VSM: 16KB CM62219
+    
+    note: these won't work on the 1981 version(s)
 
 ----------------------------------------------------------------------------
 
