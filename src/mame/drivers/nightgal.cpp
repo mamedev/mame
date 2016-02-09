@@ -420,7 +420,7 @@ static ADDRESS_MAP_START( sexygal_nsc_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
 	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_alt_process_w)
 	AM_RANGE(0x00a0, 0x00af) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_vregs_w)
-	AM_RANGE(0x00b0, 0x00b0) AM_WRITENOP // bltflip register
+	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_bltflip_w) 
 
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_SHARE("comms_ram")
 	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM AM_REGION("subrom", 0)
@@ -453,14 +453,13 @@ static ADDRESS_MAP_START( royalqn_io, AS_IO, 8, nightgal_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( royalqn_nsc_map, AS_PROGRAM, 8, nightgal_state )
-	AM_RANGE(0x0000, 0x007f) AM_RAM AM_SHARE("xx")
+	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x0080) AM_READ(blitter_status_r)
 	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
 	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_process_w)
 	AM_RANGE(0x00a0, 0x00af) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_vregs_w)
-	AM_RANGE(0x00b0, 0x00b0) AM_WRITENOP // bltflip register
+	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_bltflip_w) 
 
-	AM_RANGE(0x1000, 0x1007) AM_RAM AM_SHARE("xx")
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r,royalqn_comm_w)
 	AM_RANGE(0x4000, 0x4000) AM_NOP
 	AM_RANGE(0x8000, 0x8000) AM_NOP //open bus or protection check

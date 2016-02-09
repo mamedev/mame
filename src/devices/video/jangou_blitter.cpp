@@ -166,3 +166,9 @@ WRITE8_MEMBER( jangou_blitter_device::blitter_vregs_w)
 	m_pen_data[offset] = data & 0xf;
 }
 
+WRITE8_MEMBER( jangou_blitter_device::blitter_bltflip_w)
+{
+	// TODO: this flips gfx nibbles.
+	
+}
+
