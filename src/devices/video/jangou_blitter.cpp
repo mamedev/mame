@@ -84,12 +84,12 @@ UINT8 jangou_blitter_device::gfx_nibble( UINT32 niboffset )
 }
 
 void jangou_blitter_device::plot_gfx_pixel( UINT8 pix, int x, int y )
-{
-	if (y < 0 || y >= 512)
+{	
+	if (y < 0 || y >= 256)
 		return;
-	if (x < 0 || x >= 512)
+	if (x < 0 || x >= 256)
 		return;
-
+	
 	if (x & 1)
 		m_blit_buffer[(y * 256) + (x >> 1)] = (m_blit_buffer[(y * 256) + (x >> 1)] & 0x0f) | ((pix << 4) & 0xf0);
 	else
@@ -157,11 +157,13 @@ WRITE8_MEMBER( jangou_blitter_device::blitter_process_w )
 		
 		// update source and height after blitter operation
 		// TODO: Jangou doesn't agree with this, later HW?
-		//m_blit_data[0] = new_src & 0xfe;
-		//m_blit_data[1] = new_src >> 8;
-		//m_blit_data[5] = 0;
-		//m_blit_data[6] = new_src >> 16;
-		//m_bltflip = false;
+		#if 0
+		m_blit_data[0] = new_src & 0xfe;
+		m_blit_data[1] = new_src >> 8;
+		m_blit_data[5] = 0;
+		m_blit_data[6] = new_src >> 16;
+		#endif
+		m_bltflip = false;
 	}
 }
 
@@ -185,4 +187,3 @@ WRITE8_MEMBER( jangou_blitter_device::blitter_bltflip_w)
 	//       Maybe flipx is actually bltflip for later HW?
 	m_bltflip = true;
 }
-

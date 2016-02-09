@@ -118,6 +118,7 @@ protected:
 	void z80_wait_assert_cb();
 	TIMER_CALLBACK_MEMBER( z80_wait_ack_cb );
 
+	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
 };
 
 
@@ -129,6 +130,7 @@ READ8_MEMBER(nightgal_state::blitter_status_r)
 
 void nightgal_state::video_start()
 {
+	m_tmp_bitmap = std::make_unique<bitmap_ind16>(256, 256);
 }
 
 UINT32 nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -138,7 +140,7 @@ UINT32 nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind1
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		UINT8 *src = &m_blitter->m_blit_buffer[y * 256 + cliprect.min_x];
-		UINT16 *dst = &bitmap.pix16(y, cliprect.min_x);
+		UINT16 *dst = &m_tmp_bitmap->pix16(y, cliprect.min_x);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
@@ -148,67 +150,10 @@ UINT32 nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind1
 		}
 	}
 
+	copybitmap(bitmap, *m_tmp_bitmap, flip_screen(), flip_screen(),0,0, cliprect);
 
 	return 0;
 }
-
-/* different register writes (probably a PAL line swapping).*/
-#ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(nightgal_state::sexygal_nsc_true_blitter_w)
-{
-	int src, x, y, h, w, flipx;
-	m_true_blit[offset] = data;
-
-	/*trigger blitter write to ram,might not be correct...*/
-	if (offset == 6)
-	{
-		//printf("%02x %02x %02x %02x %02x %02x %02x\n", m_true_blit[0], m_true_blit[1], m_true_blit[2], m_true_blit[3], m_true_blit[4], m_true_blit[5], m_true_blit[6]);
-		w = (m_true_blit[5] & 0xff) + 1;
-		h = (m_true_blit[6] & 0xff) + 1;
-		src = ((m_true_blit[1] << 8) | (m_true_blit[0] << 0));
-		src |= (m_true_blit[2] & 3) << 16;
-
-
-		x = (m_true_blit[3] & 0xff);
-		y = (m_true_blit[4] & 0xff);
-
-		// lowest bit of src controls flipping / draw direction?
-		flipx = (m_true_blit[0] & 1);
-
-		if (!flipx)
-			src += (w * h) - 1;
-		else
-			src -= (w * h) - 1;
-
-		{
-			int count = 0;
-			int xcount, ycount;
-			for (ycount = 0; ycount < h; ycount++)
-			{
-				for (xcount = 0; xcount < w; xcount++)
-				{
-					int drawx = (x + xcount) & 0xff;
-					int drawy = (y + ycount) & 0xff;
-					UINT8 dat = nightgal_gfx_nibble(src + count);
-					UINT8 cur_pen_hi = m_pen_data[(dat & 0xf0) >> 4];
-					UINT8 cur_pen_lo = m_pen_data[(dat & 0x0f) >> 0];
-
-					dat = cur_pen_lo | cur_pen_hi << 4;
-
-					if ((dat & 0xff) != 0)
-						plot_nightgal_gfx_pixel(dat, drawx, drawy);
-
-					if (!flipx)
-						count--;
-					else
-						count++;
-				}
-			}
-			//m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
-		}
-	}
-}
-#endif
 
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
 PALETTE_INIT_MEMBER(nightgal_state, nightgal)
@@ -385,6 +330,7 @@ WRITE8_MEMBER(nightgal_state::output_w)
 	---- ---x out counter
 	*/
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
+	flip_screen_set((data & 0x04) == 0);
 }
 
 /********************************************
@@ -1109,7 +1055,7 @@ GAME( 1984, ngtbunny, 0,        royalqn, sexygal, driver_device,  0,       ROT0,
 GAME( 1984, royalngt, ngtbunny, royalqn, sexygal, driver_device,  0,       ROT0, "Royal Denshi", "Royal Night [BET] (Japan 840220 RN 2-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, royalqn,  0,        royalqn, sexygal, nightgal_state, royalqn, ROT0, "Royal Denshi", "Royal Queen [BET] (Japan 841010 RQ 0-07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* Type 2 HW */
-GAME( 1985, sexygal,  0,        sexygal, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sweetgal, sexygal,  sexygal, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sexygal,  0,        sexygal, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sweetgal, sexygal,  sexygal, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* Type 3 HW */
-GAME( 1985, ngalsumr, 0,        ngalsumr,sexygal, nightgal_state,  ngalsumr,ROT0, "Nichibutsu",   "Night Gal Summer (Japan 850702 NGS 0-01)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ngalsumr, 0,        ngalsumr,sexygal, nightgal_state,  ngalsumr,ROT0, "Nichibutsu",   "Night Gal Summer (Japan 850702 NGS 0-01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

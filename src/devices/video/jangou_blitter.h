@@ -37,6 +37,7 @@ public:
 	DECLARE_WRITE8_MEMBER( blitter_alt_process_w );
 	DECLARE_WRITE8_MEMBER( blitter_vregs_w );
 	DECLARE_WRITE8_MEMBER( blitter_bltflip_w );
+
 	UINT8        m_blit_buffer[256 * 256];
 
 protected:
