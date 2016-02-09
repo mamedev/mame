@@ -65,6 +65,8 @@
     * The sprite ROM is twice the size as Laser Battle with the bank
       selected using bit 9 of the 16-bit sound interface (there's a wire
       making this connection visible on the component side of the PCB)
+    * If demo sounds are enabled (using DIP switches), background music
+      is played every sixth time through the attract loop
     * Sound board emulation is based on tracing the program and guessing
       what's connected where - we really need someone to trace out the
       1b11107 sound board if we want to get this right
