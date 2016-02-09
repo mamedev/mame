@@ -14,14 +14,11 @@
 //  PROTOTYPES
 //============================================================
 
-void wininput_poll(running_machine &machine);
+const TCHAR *default_button_name(int which);
 
-BOOL wininput_handle_mouse_button(int button, int down, int x, int y);
-BOOL wininput_handle_raw(HANDLE device);
-
-bool wininput_should_hide_mouse(void);
-
-int wininput_vkey_for_mame_code(input_code code);
-
+INT32 generic_button_get_state(void *device_internal, void *item_internal);
+INT32 generic_axis_get_state(void *device_internal, void *item_internal);
 
 #endif /* __INPUT_H */
+
+
