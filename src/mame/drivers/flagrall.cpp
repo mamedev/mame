@@ -22,12 +22,10 @@ public:
 	required_shared_ptr<UINT16> m_bak_videoram;
 
 	/* video-related */
-	tilemap_t    *m_spr_tilemap;
 	tilemap_t    *m_bak_tilemap;
-	DECLARE_WRITE16_MEMBER(flagrall_spr_videoram_w);
 	DECLARE_WRITE16_MEMBER(flagrall_bak_videoram_w);
-	TILE_GET_INFO_MEMBER(get_flagrall_spr_tile_info);
 	TILE_GET_INFO_MEMBER(get_flagrall_bak_tile_info);
+
 	virtual void video_start() override;
 	UINT32 screen_update_flagrall(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -46,17 +44,6 @@ public:
 
 
 
-WRITE16_MEMBER(flagrall_state::flagrall_spr_videoram_w)
-{
-	COMBINE_DATA(&m_spr_videoram[offset]);
-	m_spr_tilemap->mark_tile_dirty(offset);
-}
-
-TILE_GET_INFO_MEMBER(flagrall_state::get_flagrall_spr_tile_info)
-{
-	int tileno = m_spr_videoram[tile_index]/2;
-	SET_TILE_INFO_MEMBER(0, tileno, 1, 0);
-}
 
 WRITE16_MEMBER(flagrall_state::flagrall_xscroll_w)
 {
@@ -95,10 +82,6 @@ TILE_GET_INFO_MEMBER(flagrall_state::get_flagrall_bak_tile_info)
 
 void flagrall_state::video_start()
 {
-	// doesn't actually seem to be be a tilemap, there is other data at the end of it ? sprite strips I guess
-	m_spr_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(flagrall_state::get_flagrall_spr_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 20, 64);
-	m_spr_tilemap->set_transparent_pen(0x00);
-
 	m_bak_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(flagrall_state::get_flagrall_bak_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 }
 
@@ -106,7 +89,22 @@ UINT32 flagrall_state::screen_update_flagrall(screen_device &screen, bitmap_ind1
 {
 	m_bak_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	m_spr_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	for (int i = 0;i < 0x1000 / 2;i++)
+	{
+		gfx_element *gfx = m_gfxdecode->gfx(0);
+
+		int sprx = m_spr_info[i] >> 8;
+		int spry = m_spr_info[i] & 0x00ff;
+		sprx |= (m_spr_videoram[i] & 0x01) << 8;
+		UINT16 sprtile = m_spr_videoram[i] >> 1;
+
+		gfx->transpen(bitmap,cliprect,sprtile,1,0,0,sprx,spry,0);
+		gfx->transpen(bitmap,cliprect,sprtile,1,0,0,sprx,spry-0x100,0);
+		gfx->transpen(bitmap,cliprect,sprtile,1,0,0,sprx-0x200,spry,0);
+		gfx->transpen(bitmap,cliprect,sprtile,1,0,0,sprx-0x200,spry-0x100,0);
+
+	}
+
 	return 0;
 }
 
@@ -117,7 +115,7 @@ static ADDRESS_MAP_START( flagrall_map, AS_PROGRAM, 16, flagrall_state )
 
 	AM_RANGE(0x200000, 0x2003ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // clears 0x200 - 0x3ff on startup, but writes 00 values to the other half at times?
 	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_SHARE("spr_info") 
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(flagrall_spr_videoram_w) AM_SHARE("spr_videoram") 
+	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("spr_videoram") 
 	AM_RANGE(0x2c0000, 0x2c07ff) AM_RAM_WRITE(flagrall_bak_videoram_w) AM_SHARE("bak_videoram") 
 
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(flagrall_xscroll_w)
@@ -127,7 +125,6 @@ static ADDRESS_MAP_START( flagrall_map, AS_PROGRAM, 16, flagrall_state )
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("IN0")
 	AM_RANGE(0x440000, 0x440001) AM_READ_PORT("IN1")
 	AM_RANGE(0x480000, 0x480001) AM_READ_PORT("IN2")
-//	AM_RANGE(0x4c0000, 0x4c0001) AM_READ_PORT("IN3")
 
 	AM_RANGE(0x4c0000, 0x4c0001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
