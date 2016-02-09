@@ -35,11 +35,13 @@ public:
 
 	DECLARE_WRITE16_MEMBER(flagrall_xscroll_w);
 	DECLARE_WRITE16_MEMBER(flagrall_yscroll_w);
+	DECLARE_WRITE16_MEMBER(flagrall_ctrl_w);
 
+	
 
 	UINT16 xscroll;
 	UINT16 yscroll;
-
+	UINT16 ctrl;
 };
 
 
@@ -59,7 +61,7 @@ TILE_GET_INFO_MEMBER(flagrall_state::get_flagrall_spr_tile_info)
 WRITE16_MEMBER(flagrall_state::flagrall_xscroll_w)
 {
 	COMBINE_DATA(&xscroll);
-	m_bak_tilemap->set_scrollx(0, xscroll-64);
+	m_bak_tilemap->set_scrollx(0, xscroll);
 }
 
 WRITE16_MEMBER(flagrall_state::flagrall_yscroll_w)
@@ -67,6 +69,16 @@ WRITE16_MEMBER(flagrall_state::flagrall_yscroll_w)
 	COMBINE_DATA(&yscroll);
 	m_bak_tilemap->set_scrolly(0, yscroll);
 }
+
+WRITE16_MEMBER(flagrall_state::flagrall_ctrl_w)
+{
+	COMBINE_DATA(&ctrl);
+	
+	popmessage("control write %04x", ctrl);
+}
+
+
+
 
 WRITE16_MEMBER(flagrall_state::flagrall_bak_videoram_w)
 {
@@ -110,14 +122,14 @@ static ADDRESS_MAP_START( flagrall_map, AS_PROGRAM, 16, flagrall_state )
 
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(flagrall_xscroll_w)
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(flagrall_yscroll_w)
-//	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP // ??
+	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(flagrall_ctrl_w)
 
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("IN0")
 	AM_RANGE(0x440000, 0x440001) AM_READ_PORT("IN1")
 	AM_RANGE(0x480000, 0x480001) AM_READ_PORT("IN2")
-	AM_RANGE(0x4c0000, 0x4c0001) AM_READ_PORT("IN3")
+//	AM_RANGE(0x4c0000, 0x4c0001) AM_READ_PORT("IN3")
 
-//	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP // ?? oki?
+	AM_RANGE(0x4c0000, 0x4c0001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -173,13 +185,9 @@ static INPUT_PORTS_START( flagrall )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x0001, 0x0001, "1" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_DIPNAME( 0x0004, 0x0004, "1" )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
@@ -245,56 +253,6 @@ static INPUT_PORTS_START( flagrall )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0080, "Test" ) // some kind of test mode toggle, or at least 'show girls' might be service switch
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x0001, 0x0001, "3" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
@@ -396,5 +354,5 @@ ROM_START( flagrall )
 ROM_END
 
 
-GAME( 199?, flagrall, 0,        flagrall, flagrall, driver_device, 0, ROT0,  "<unknown>", "Flag Rally '96", MACHINE_SUPPORTS_SAVE ) // or '96 Flag Rally?
+GAME( 199?, flagrall, 0,        flagrall, flagrall, driver_device, 0, ROT0,  "<unknown>", "Flag Rally '96", MACHINE_NOT_WORKING ) // or '96 Flag Rally?
 
