@@ -13,7 +13,7 @@
 #include <new>
 
 #if BX_CONFIG_ALLOCATOR_CRT
-#	include <stdlib.h>
+#	include <malloc.h>
 #endif // BX_CONFIG_ALLOCATOR_CRT
 
 #if BX_CONFIG_ALLOCATOR_DEBUG
