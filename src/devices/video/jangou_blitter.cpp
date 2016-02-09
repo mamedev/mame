@@ -165,19 +165,12 @@ WRITE8_MEMBER( jangou_blitter_device::blitter_process_w )
 	}
 }
 
+// Sexy Gal swaps around upper src address
 WRITE8_MEMBER( jangou_blitter_device::blitter_alt_process_w)
 {
-	// TODO: convert this into a more useable function
-	switch(offset)
-	{
-		case 0: blitter_process_w(space,0,data); break;
-		case 1: blitter_process_w(space,1,data); break;
-		case 2: blitter_process_w(space,6,data); break;
-		case 3: blitter_process_w(space,2,data); break;
-		case 4: blitter_process_w(space,3,data); break;
-		case 5: blitter_process_w(space,4,data); break;
-		case 6: blitter_process_w(space,5,data); break;
-	}
+	const UINT8 translate_addr[7] = { 0, 1, 6, 2, 3, 4, 5 };
+
+	blitter_process_w(space,translate_addr[offset],data);
 }
 
 WRITE8_MEMBER( jangou_blitter_device::blitter_vregs_w)
