@@ -251,7 +251,7 @@ ROM_START( notetakr )
 	ROMX_LOAD( "biop__2.00_lo.b2716.g1", 0x0001, 0x0800, CRC(b72aa4c7) SHA1(85dab2399f906c7695dc92e7c18f32e2303c5892), ROM_SKIP(1) | ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v1.50", "IO Monitor v1.50" ) // typed from the source listing at http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790620_Z-IOP_1.5_ls.pdf and scrambled
 	ROMX_LOAD( "z-iop_1.50_hi.h1", 0x0000, 0x0800, CRC(2994656e) SHA1(ca2bb38eb9075c5c2f3cc5439b209e7e216084da), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "z-iop_1.50_lo.g1", 0x0001, 0x0800, CRC(3bcd08ff) SHA1(b687e295322dcbaafed59ad2573ab12373cb6537), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "z-iop_1.50_lo.g1", 0x0001, 0x0800, CRC(2cb79a67) SHA1(692aafd2aeea27533f6288dbb1cb8678ea08fade), ROM_SKIP(1) | ROM_BIOS(2))
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF ) // area for descrambled roms
 	ROM_REGION( 0x100000, "ram", ROMREGION_ERASEFF ) // ram cards
 	ROM_REGION( 0x1000, "proms", ROMREGION_ERASEFF )
