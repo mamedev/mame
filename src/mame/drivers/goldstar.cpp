@@ -8538,6 +8538,58 @@ ROM_START( cb3e )
 ROM_END
 
 
+/* Cherry Gold I (bootleg)
+   It runs in CB3e similar hardware...
+
+1x TMPZ84C00AP-6  u15 	            8-bit Microprocessor
+3x D71055C        u30, u39, u40 	Programmable Peripheral Interface
+1x WF19054        u27 	            Programmable Sound Generator
+1x SN76489AN      u28 	            Digital Complex Sound Generator
+1x oscillator 	unmarked  Y1 	
+
+ROMs
+1x D27256      1.u3
+1x AM27512     3.u22
+1x D27C010     2u6
+1x N82S147AF   u1
+
+RAMs
+4x HM6116LP-4   u9, u10, u11, u12
+1x D4016C-1     u23
+
+PLDs
+1x unknowun Cl-001 (QFP144)  CY144A    read protected
+4x GAL20V8A-15LNC  pl1, pl4, pl5, pl6  read protected
+2x PALCE20V8H-25PC/4   u2,u?           read protected
+1x PALCE22V10H-25PC/4  u?              read protected
+
+Others
+1x 36x2 edge connector
+1x 10x2 edge connector
+1x pushbutton (TS)
+2x trimmer (volume)(VR1,VR2)
+5x 8x2 switches DIP(SW1-5)
+1x battery 5,5V
+
+Notes
+PCB is marked "REV.3" 
+*/
+ROM_START( chryglda )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "3.u22",   0x00000, 0x10000, CRC(059857c5) SHA1(f4becfda1e25ab347f55f35dc9f5818ef9344e2c) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "2.u6",    0x00000, 0x20000, CRC(1359dfac) SHA1(78eb934055cda9e10d8e939c79bfa62262ecad7d) )
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "1.u3",    0x00000, 0x08000, CRC(919bd692) SHA1(1aeb66f1e4555b731858833445000593e613f74d) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "n82s147af.u1",   0x00000, 0x0100, CRC(d4eaa276) SHA1(b6598ee64ac3d41ca979c8667de8576cfb304451) )
+	ROM_CONTINUE(               0x00000, 0x0100)    // 2nd half has the data.
+ROM_END
+
+
 ROM_START( cmv801 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "prg512",   0x0000, 0x10000, CRC(2f6e3fe9) SHA1(c5ffa51478a0dc2d8ff6a0f286cfb461011bb55d) )
@@ -13369,7 +13421,7 @@ GAME(  199?, moonlght,  goldstar, moonlght, goldstar, driver_device,  0,        
 GAME(  199?, moonlghta, goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (v.0629, high program)",           0 )
 GAME(  199?, moonlghtb, goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (v.02L0A, low program)",           MACHINE_IMPERFECT_COLORS )  // need to check the odd palette value at 0xc780. should be black.
 GAME(  199?, moonlghtc, goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (v.02L0A, high program, alt gfx)", MACHINE_IMPERFECT_COLORS )  // need to check the odd palette value at 0xc780. should be black.
-GAMEL( 199?, chrygld,   0,        chrygld,  chrygld,  cb3_state,      chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0,                 layout_chrygld )
+GAMEL( 199?, chrygld,   0,        chrygld,  chrygld,  cb3_state,      chrygld,   ROT0, "bootleg",           "Cherry Gold I (set 1)",                       0,                 layout_chrygld )
 GAMEL( 199?, chry10,    0,        chrygld,  chry10,   cb3_state,      chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0,                 layout_chrygld )
 GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,         ROT0, "bootleg",           "Gold Fruit",                                  0 )                  // maybe fullname should be 'Gold Fruit (main 40%)'
 GAME(  2001, super9,    goldstar, super9,   goldstar, goldstar_state, super9,    ROT0, "Playmark",          "Super Nove (Playmark)",                       MACHINE_NOT_WORKING )   // need to decode gfx and see the program loops/reset...
@@ -13385,6 +13437,7 @@ GAMEL( 199?, cb3b,      ncb3,     cherrys,  ncb3,     cb3_state,      cherrys,  
 GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  cb3_state,      cb3,       ROT0, "bootleg",           "Cherry Bonus III (alt, set 2)",               MACHINE_NOT_WORKING)
 GAMEL( 199?, cb3d,      ncb3,     ncb3,     ncb3,     driver_device,  0,         ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    0,                 layout_cherryb3 )
 GAMEL( 199?, cb3e,      ncb3,     cb3e,     chrygld,  cb3_state,      cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0,                 layout_chrygld )
+GAMEL( 199?, chryglda,  ncb3,     cb3e,     chrygld,  cb3_state,      cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                 layout_chrygld )  // Runs in CB3e hardware.
 
 GAME(  1996, cmast97,   ncb3,     cm97,     chrygld,  driver_device,  0,         ROT0, "Dyna",              "Cherry Master '97",                           MACHINE_NOT_WORKING) // fix prom decode
 
