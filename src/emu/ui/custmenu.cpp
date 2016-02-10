@@ -83,14 +83,14 @@ void ui_menu_custom_filter::handle()
 			{
 				custfltr::other[pos]--;
 				for ( ; custfltr::other[pos] > FILTER_UNAVAILABLE && (custfltr::other[pos] == FILTER_CATEGORY
-						|| custfltr::other[pos] == FILTER_FAVORITE_GAME); custfltr::other[pos]--) ;
+						|| custfltr::other[pos] == FILTER_FAVORITE); custfltr::other[pos]--) ;
 				changed = true;
 			}
 			else if (m_event->iptkey == IPT_UI_RIGHT && custfltr::other[pos] < FILTER_LAST - 1)
 			{
 				custfltr::other[pos]++;
 				for ( ; custfltr::other[pos] < FILTER_LAST && (custfltr::other[pos] == FILTER_CATEGORY
-						|| custfltr::other[pos] == FILTER_FAVORITE_GAME); custfltr::other[pos]++) ;
+						|| custfltr::other[pos] == FILTER_FAVORITE); custfltr::other[pos]++) ;
 				changed = true;
 			}
 			else if (m_event->iptkey == IPT_UI_SELECT)
@@ -98,7 +98,7 @@ void ui_menu_custom_filter::handle()
 				size_t total = main_filters::length;
 				std::vector<std::string> s_sel(total);
 				for (size_t index = 0; index < total; ++index)
-					if (index <= FILTER_UNAVAILABLE || index == FILTER_CATEGORY || index == FILTER_FAVORITE_GAME || index == FILTER_CUSTOM)
+					if (index <= FILTER_UNAVAILABLE || index == FILTER_CATEGORY || index == FILTER_FAVORITE || index == FILTER_CUSTOM)
 						s_sel[index] = "_skip_";
 					else
 						s_sel[index] = main_filters::text[index];

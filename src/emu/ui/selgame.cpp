@@ -235,7 +235,7 @@ ui_menu_select_game::~ui_menu_select_game()
 	const game_driver *driver = nullptr;
 	ui_software_info *swinfo = nullptr;
 	ui_options &mopt = machine().ui().options();
-	if (main_filters::actual == FILTER_FAVORITE_GAME)
+	if (isfavorite())
 		swinfo = (selected >= 0 && selected < item.size()) ? (ui_software_info *)item[selected].ref : nullptr;
 	else
 		driver = (selected >= 0 && selected < item.size()) ? (const game_driver *)item[selected].ref : nullptr;
@@ -298,10 +298,10 @@ void ui_menu_select_game::handle()
 		// handle selections
 		else if (m_event->iptkey == IPT_UI_SELECT)
 		{
-			if (main_filters::actual != FILTER_FAVORITE_GAME)
-				inkey_select(m_event);
-			else
+			if (isfavorite())
 				inkey_select_favorite(m_event);
+			else
+				inkey_select(m_event);
 		}
 
 		// handle UI_LEFT
@@ -374,7 +374,7 @@ void ui_menu_select_game::handle()
 		// handle UI_HISTORY
 		else if (m_event->iptkey == IPT_UI_HISTORY && enabled_dats)
 		{
-			if (main_filters::actual != FILTER_FAVORITE_GAME)
+			if (!isfavorite())
 			{
 				const game_driver *driver = (const game_driver *)m_event->itemref;
 				if ((FPTR)driver > 3)
@@ -396,7 +396,7 @@ void ui_menu_select_game::handle()
 		// handle UI_MAMEINFO
 		else if (m_event->iptkey == IPT_UI_MAMEINFO && enabled_dats)
 		{
-			if (main_filters::actual != FILTER_FAVORITE_GAME)
+			if (!isfavorite())
 			{
 				const game_driver *driver = (const game_driver *)m_event->itemref;
 				if ((FPTR)driver > 3)
@@ -423,7 +423,7 @@ void ui_menu_select_game::handle()
 		// handle UI_STORY
 		else if (m_event->iptkey == IPT_UI_STORY && enabled_dats)
 		{
-			if (main_filters::actual != FILTER_FAVORITE_GAME)
+			if (!isfavorite())
 			{
 				const game_driver *driver = (const game_driver *)m_event->itemref;
 				if ((FPTR)driver > 3)
@@ -440,7 +440,7 @@ void ui_menu_select_game::handle()
 		// handle UI_SYSINFO
 		else if (m_event->iptkey == IPT_UI_SYSINFO && enabled_dats)
 		{
-			if (main_filters::actual != FILTER_FAVORITE_GAME)
+			if (!isfavorite())
 			{
 				const game_driver *driver = (const game_driver *)m_event->itemref;
 				if ((FPTR)driver > 3)
@@ -457,7 +457,7 @@ void ui_menu_select_game::handle()
 		// handle UI_COMMAND
 		else if (m_event->iptkey == IPT_UI_COMMAND && enabled_dats)
 		{
-			if (main_filters::actual != FILTER_FAVORITE_GAME)
+			if (!isfavorite())
 			{
 				const game_driver *driver = (const game_driver *)m_event->itemref;
 				if ((FPTR)driver > 3)
@@ -474,7 +474,7 @@ void ui_menu_select_game::handle()
 		// handle UI_FAVORITES
 		else if (m_event->iptkey == IPT_UI_FAVORITES)
 		{
-			if (main_filters::actual != FILTER_FAVORITE_GAME)
+			if (!isfavorite())
 			{
 				const game_driver *driver = (const game_driver *)m_event->itemref;
 				if ((FPTR)driver > 3)
@@ -588,10 +588,10 @@ void ui_menu_select_game::populate()
 	ui_globals::switch_image = true;
 	int old_item_selected = -1;
 
-	if (main_filters::actual != FILTER_FAVORITE_GAME)
+	if (!isfavorite())
 	{
 		// if search is not empty, find approximate matches
-		if (m_search[0] != 0 && !no_active_search())
+		if (m_search[0] != 0 && !isfavorite())
 			populate_search();
 		else
 		{
@@ -797,7 +797,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		filtered.assign(main_filters::text[main_filters::actual]).append(" (").append(c_year::ui[c_year::actual]).append(") -");
 
 	// display the current typeahead
-	if (no_active_search())
+	if (isfavorite())
 		tempbuf[1].clear();
 	else
 		tempbuf[1].assign(filtered).append(" Search: ").append(m_search).append("_");
@@ -834,7 +834,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	}
 
 	// determine the text to render below
-	if (main_filters::actual != FILTER_FAVORITE_GAME)
+	if (!isfavorite())
 		driver = ((FPTR)selectedref > 3) ? (const game_driver *)selectedref : nullptr;
 	else
 	{
@@ -1184,9 +1184,9 @@ void ui_menu_select_game::inkey_select_favorite(const ui_menu_event *m_event)
 //  returns if the search can be activated
 //-------------------------------------------------
 
-inline bool ui_menu_select_game::no_active_search()
+inline bool ui_menu_select_game::isfavorite()
 {
-	return (main_filters::actual == FILTER_FAVORITE_GAME);
+	return (main_filters::actual == FILTER_FAVORITE);
 }
 
 //-------------------------------------------------
@@ -1198,14 +1198,14 @@ void ui_menu_select_game::inkey_special(const ui_menu_event *m_event)
 	int buflen = strlen(m_search);
 
 	// if it's a backspace and we can handle it, do so
-	if (((m_event->unichar == 8 || m_event->unichar == 0x7f) && buflen > 0) && !no_active_search())
+	if (((m_event->unichar == 8 || m_event->unichar == 0x7f) && buflen > 0) && !isfavorite())
 	{
 		*(char *)utf8_previous_char(&m_search[buflen]) = 0;
 		reset(UI_MENU_RESET_SELECT_FIRST);
 	}
 
 	// if it's any other key and we're not maxed out, update
-	else if ((m_event->unichar >= ' ' && m_event->unichar < 0x7f) && !no_active_search())
+	else if ((m_event->unichar >= ' ' && m_event->unichar < 0x7f) && !isfavorite())
 	{
 		buflen += utf8_from_uchar(&m_search[buflen], ARRAY_LENGTH(m_search) - buflen, m_event->unichar);
 		m_search[buflen] = 0;

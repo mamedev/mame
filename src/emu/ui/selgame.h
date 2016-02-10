@@ -56,7 +56,7 @@ private:
 	void build_available_list();
 	void build_list(std::vector<const game_driver *> &vec, const char *filter_text = nullptr, int filter = 0, bool bioscheck = false);
 
-	bool no_active_search();
+	bool isfavorite();
 	void populate_search();
 	void init_sorted_list();
 	bool load_available_machines();

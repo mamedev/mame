@@ -2193,11 +2193,14 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 {
 	bool no_available = false;
 	float line_height = machine().ui().get_line_height();
+	static int old_panel_width_pixel = -1;
+	static int old_panel_height_pixel = -1;
+
 
 	// if it fails, use the default image
 	if (!tmp_bitmap->valid())
 	{
-		tmp_bitmap->reset();
+		//tmp_bitmap->reset();
 		tmp_bitmap->allocate(256, 256);
 		for (int x = 0; x < 256; x++)
 			for (int y = 0; y < 256; y++)
@@ -2213,6 +2216,16 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 		int screen_height = machine().render().ui_target().height();
 		int panel_width_pixel = panel_width * screen_width;
 		int panel_height_pixel = panel_height * screen_height;
+
+		if (old_panel_height_pixel == -1 || old_panel_width_pixel == -1)
+			snapx_bitmap->allocate(panel_width_pixel, panel_height_pixel);
+
+		if (old_panel_height_pixel != panel_height_pixel)
+			old_panel_height_pixel = panel_height_pixel;
+
+		if (old_panel_height_pixel != panel_width_pixel)
+			old_panel_width_pixel = panel_width_pixel;
+
 		float ratio = 0.0f;
 
 		// Calculate resize ratios for resizing
@@ -2254,8 +2267,9 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 		else
 			dest_bitmap = tmp_bitmap;
 
-		snapx_bitmap->reset();
-		snapx_bitmap->allocate(panel_width_pixel, panel_height_pixel);
+		//snapx_bitmap->reset();
+		if (old_panel_height_pixel != panel_height_pixel || old_panel_width_pixel != panel_width_pixel)
+			snapx_bitmap->allocate(panel_width_pixel, panel_height_pixel);
 		int x1 = (0.5f * panel_width_pixel) - (0.5f * dest_xPixel);
 		int y1 = (0.5f * panel_height_pixel) - (0.5f * dest_yPixel);
 
