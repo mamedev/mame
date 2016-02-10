@@ -2,39 +2,52 @@
 // copyright-holders:Jonathan Gevaryahu
 /* Xerox NoteTaker, 1978
  * Driver by Jonathan Gevaryahu
- *
- * <Note that below is a really lousy write-up, this system deserves much better.
-    We should use the Ingalls-2014-Smalltalk78.pdf as a better source for all this stuff!>
- * Designed by Alan Kay and many others, with BIOS written by Bruce Horn (BitBlt function in BIOS written by Dan Ingalls)
+
+ *  Notetaker Team At Xerox PARC 1976-1980:
+     Alan Kay - Team Lead
+     Bruce Horn - BIOS code and more
+     Ted Kaehler - SmallTalk-76 code porting[2] and more ( http://tedkaehler.weather-dimensions.com/us/ted/index.html )
+     Dan Ingalls - BitBlt engine and SmallTalk kernel and more[3]
+     Doug Fairbairn - NoteTaker Hardware ( http://www.computerhistory.org/atchm/author/dfairbairn/ )
+     <probably others I've missed>
+
  * History of the machine can be found at http://freudenbergs.de/bert/publications/Ingalls-2014-Smalltalk78.pdf
- * prototypes only, around 10 units manufactured 1978-1980
-   One at CHM (missing? mouse, no media)
-   One at Xerox Museum at PARC (with mouse and 2 floppies, no floppy images available)
- * This device was the origin of Smalltalk-78 (which acted as the operating system of the NoteTaker)
- * The NoteTaker also used the BitBlt graphical operation to do most graphical functions in Smalltalk-78
-   BitBlt was not invented for the NoteTaker, but for the Alto; however unlike the Alto, the NoteTaker used it for almost every graphical operation.
+
+ * Prototypes only, 10 units[2] manufactured 1978-1980
+   Known surviving units:
+   * One at CHM (missing? mouse, no media)
+   * One at Xerox Museum at PARC (with mouse and 2 floppies, floppies were not imaged to the best of my knowledge)
+
+ * The NoteTaker used the BitBlt graphical operation (from SmallTalk-76) to do most graphical functions, in order to fit the SmallTalk code and programs within 256K of RAM[2]. The actual BitBlt code lives in ROM[3].
+
  * As far as I am aware, no media (world disks/boot disks) for the NoteTaker have survived (except maybe the two disks at Xerox Museum at PARC), but an incomplete dump of the Smalltalk-76 'world' which was used to bootstrap Smalltalk-78 originally did survive on the Alto disks at CHM
  
  * see http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker for additional information
- * http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790620_Z-IOP_1.5_ls.pdf is listing of the biop v1.5 code
  * see http://xeroxalto.computerhistory.org/Filene/Smalltalk-76/ for the smalltalk-76 dump
- * see http://xeroxalto.computerhistory.org/Indigo/BasicDisks/Smalltalk14.bfs!1_/ for more notetaker/smalltalk related files
- *
- * MISSING DUMP for 8741? I/O MCU which does mouse-related stuff
+ * see http://xeroxalto.computerhistory.org/Indigo/BasicDisks/Smalltalk14.bfs!1_/ for more notetaker/smalltalk related files, including SmallTalk-80 files based on the notetaker smalltalk-78
+
+ References:
+ * [1] http://freudenbergs.de/bert/publications/Ingalls-2014-Smalltalk78.pdf
+ * [2] "Smalltalk and Object Orientation: An Introduction" By John Hunt, pages 45-46 [ISBN 978-3-540-76115-0]
+ * [3] http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790620_Z-IOP_1.5_ls.pdf
+ * [4] http://xeroxalto.computerhistory.org/Filene/Smalltalk-76/
+ * MISSING DUMP for 8741? Keyboard MCU which does row-column scanning and mouse-related stuff
  
 TODO: everything below.
-* Get the running machine smalltalk-78 memory dump loaded as a rom and forced into ram on startup, since no boot disks have survived
+* figure out the correct memory maps for the 256kB of shared ram, and what part of ram constitutes the framebuffer
+* figure out how the emulation-cpu boots and where its 4k of local ram maps to
+* Get smalltalk-78 loaded as a rom and forced into ram on startup, since no boot disks have survived (or if any survived, they are not dumped)
 * floppy controller wd1791
-  According to http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790620_Z-IOP_1.5_ls.pdf the format is 128 bytes per sector, 16 sectors per track (one sided)
+  According to [3] the format is 128 bytes per sector, 16 sectors per track (one sided)
   According to the schematics, we're missing an 82s147 DISKSEP.PROM used as a data separator
-* crt5027 video controller
-* i8251? serial/EIA controller
+* crt5027 video controller; we're missing a PROM used to handle memory arbitration between the crtc and the rest of the system, but the equations are on the schematic
+* Harris 6402 serial/EIA UART
 * Harris 6402 keyboard UART
-* HLE for the missing MCU which reads the mouse quadratures and buttons
+* HLE for the missing MCU which reads the mouse quadratures and buttons and talks serially to the Keyboard UART
 
 WIP:
 * pic8259 interrupt controller - this is attached as a device, but the interrupts are not hooked to it yet.
-
+* i/o cpu i/o area needs the memory map worked out per the schematics - partly done
 */
 
 #include "cpu/i86/i86.h"
