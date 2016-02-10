@@ -181,8 +181,8 @@ void ui_simple_menu_select_game::inkey_cancel(const ui_menu_event *menu_event)
 	// escape pressed with non-empty text clears the text
 	if (m_search[0] != 0)
 	{
-		// since we have already been popped, we must recreate ourself from scratch
-		ui_menu::stack_push(global_alloc_clear<ui_simple_menu_select_game>(machine(), container, nullptr));
+		m_search[0] = '\0';
+		reset(UI_MENU_RESET_SELECT_FIRST);
 	}
 }
 
