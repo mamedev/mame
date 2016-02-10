@@ -548,8 +548,8 @@ void ui_menu_select_game::handle()
 
 	// if we're in an error state, overlay an error message
 	if (ui_error)
-		machine().ui().draw_text_box(container, "The selected game is missing one or more required ROM or CHD images. " 
-			"Please select a different game.\n\nPress any key (except ESC) to continue.", JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+		machine().ui().draw_text_box(container, "The selected machine is missing one or more required ROM or CHD images. " 
+			"Please select a different machine.\n\nPress any key (except ESC) to continue.", JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 
 	// handle filters selection from key shortcuts
 	if (check_filter)
@@ -1618,24 +1618,24 @@ void ui_menu_select_game::init_sorted_list()
 	if (!m_sortedlist.empty())
 		return;
 
-		// generate full list
-		for (int x = 0; x < driver_list::total(); ++x)
-		{
-			const game_driver *driver = &driver_list::driver(x);
-			if (driver == &GAME_NAME(___empty))
-				continue;
+	// generate full list
+	for (int x = 0; x < driver_list::total(); ++x)
+	{
+		const game_driver *driver = &driver_list::driver(x);
+		if (driver == &GAME_NAME(___empty))
+			continue;
 		if (driver->flags & MACHINE_IS_BIOS_ROOT)
 			m_isabios++;
 
-			m_sortedlist.push_back(driver);
-			c_mnfct::set(driver->manufacturer);
-			c_year::set(driver->year);
-		}
+		m_sortedlist.push_back(driver);
+		c_mnfct::set(driver->manufacturer);
+		c_year::set(driver->year);
+	}
 
-		// sort manufacturers - years and driver
-		std::stable_sort(c_mnfct::ui.begin(), c_mnfct::ui.end());
-		std::stable_sort(c_year::ui.begin(), c_year::ui.end());
-		std::stable_sort(m_sortedlist.begin(), m_sortedlist.end(), sort_game_list);
+	// sort manufacturers - years and driver
+	std::stable_sort(c_mnfct::ui.begin(), c_mnfct::ui.end());
+	std::stable_sort(c_year::ui.begin(), c_year::ui.end());
+	std::stable_sort(m_sortedlist.begin(), m_sortedlist.end(), sort_game_list);
 }
 
 //-------------------------------------------------
