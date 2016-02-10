@@ -54,7 +54,6 @@ void zaccaria_state::machine_start()
 	save_item(NAME(m_port0a));
 	save_item(NAME(m_acs));
 	save_item(NAME(m_last_port0b));
-	save_item(NAME(m_toggle));
 	save_item(NAME(m_nmi_mask));
 }
 
@@ -65,7 +64,6 @@ void zaccaria_state::machine_reset()
 	m_port0a = 0;
 	m_acs = 0;
 	m_last_port0b = 0;
-	m_toggle = 0;
 	m_nmi_mask = 0;
 }
 
@@ -156,12 +154,6 @@ WRITE8_MEMBER(zaccaria_state::port0b_w)
 	}
 
 	m_last_port0b = data;
-}
-
-INTERRUPT_GEN_MEMBER(zaccaria_state::cb1_toggle)
-{
-	m_pia0->cb1_w(m_toggle & 1);
-	m_toggle ^= 1;
 }
 
 WRITE8_MEMBER(zaccaria_state::port1b_w)
@@ -510,7 +502,10 @@ static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 
 	MCFG_CPU_ADD("audiocpu", M6802,XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map_1)
-	MCFG_CPU_PERIODIC_INT_DRIVER(zaccaria_state, cb1_toggle, (double)XTAL_3_579545MHz/4096)
+
+	MCFG_DEVICE_ADD("timebase", CLOCK, XTAL_3_579545MHz/4096/2) /* verified on pcb */
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("pia0", pia6821_device, cb1_w))
+
 //  MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
 	MCFG_CPU_ADD("audio2", M6802,XTAL_3_579545MHz) /* verified on pcb */

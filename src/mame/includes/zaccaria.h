@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 #include "machine/6821pia.h"
+#include "machine/clock.h"
 #include "sound/ay8910.h"
 #include "sound/tms5220.h"
 
@@ -48,7 +49,6 @@ public:
 	int m_port0a;
 	int m_acs;
 	int m_last_port0b;
-	int m_toggle;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_nmi_mask;
 
@@ -76,7 +76,6 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(zaccaria);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(cb1_toggle);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,UINT8 *spriteram,int color,int section);
 };
