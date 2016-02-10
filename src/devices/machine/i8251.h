@@ -83,20 +83,25 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void update_rx_ready();
 	void update_tx_ready();
 	void update_tx_empty();
 	void transmit_clock();
 	void receive_clock();
+		bool is_tx_enabled(void) const;
+		void check_for_tx_start(void);
+		void start_tx(void);
+
 
 	enum
 	{
 		I8251_EXPECTING_MODE = 0x01,
-		I8251_EXPECTING_SYNC_BYTE = 0x02
+		I8251_EXPECTING_SYNC_BYTE = 0x02,
+				I8251_DELAYED_TX_EN = 0x04
 	};
 
 private:
@@ -133,9 +138,8 @@ private:
 
 	/* data being received */
 	UINT8 m_rx_data;
-		UINT8 m_tx_data;
-	bool m_tx_busy;
-	bool m_disable_tx_pending;
+		/* tx buffer */
+	UINT8 m_tx_data;
 };
 
 class v53_scu_device :  public i8251_device

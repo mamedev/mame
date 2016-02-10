@@ -76,11 +76,10 @@ public:
 	required_ioport m_restore;
 	required_ioport m_lock;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void check_interrupts();
-	UINT8 paddle_read(address_space &space, int which);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -88,10 +87,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
 	DECLARE_READ8_MEMBER( vic_videoram_r );
 	DECLARE_READ8_MEMBER( vic_colorram_r );
-	DECLARE_READ8_MEMBER( vic_lightpen_x_cb );
-	DECLARE_READ8_MEMBER( vic_lightpen_y_cb );
-	DECLARE_READ8_MEMBER( vic_lightpen_button_cb );
-	DECLARE_READ8_MEMBER( vic_rdy_cb );
 
 	DECLARE_READ8_MEMBER( sid_potx_r );
 	DECLARE_READ8_MEMBER( sid_poty_r );

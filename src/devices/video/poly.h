@@ -128,7 +128,7 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	screen_device &screen() const { assert(m_screen != NULL); return *m_screen; }
+	screen_device &screen() const { assert(m_screen != nullptr); return *m_screen; }
 
 	// synchronization
 	void wait(const char *debug_reason = "general");
@@ -186,16 +186,16 @@ private:
 		// construction
 		poly_array(running_machine &machine, poly_manager &manager)
 			: m_manager(manager),
-				m_base(auto_alloc_array_clear(machine, UINT8, k_itemsize * _Count)),
+				m_base(make_unique_clear<UINT8[]>(k_itemsize * _Count)),
 				m_next(0),
 				m_max(0),
 				m_waits(0) { }
 
 		// destruction
-		~poly_array() { auto_free(m_manager.machine(), m_base); }
+		~poly_array() { m_base = nullptr; }
 
 		// operators
-		_Type &operator[](int index) const { assert(index >= 0 && index < _Count); return *reinterpret_cast<_Type *>(m_base + index * k_itemsize); }
+		_Type &operator[](int index) const { assert(index >= 0 && index < _Count); return *reinterpret_cast<_Type *>(m_base.get() + index * k_itemsize); }
 
 		// getters
 		int count() const { return m_next; }
@@ -203,18 +203,18 @@ private:
 		int waits() const { return m_waits; }
 		int itemsize() const { return k_itemsize; }
 		int allocated() const { return _Count; }
-		int indexof(_Type &item) const { int result = (reinterpret_cast<UINT8 *>(&item) - m_base) / k_itemsize; assert(result >= 0 && result < _Count); return result; }
+		int indexof(_Type &item) const { int result = (reinterpret_cast<UINT8 *>(&item) - m_base.get()) / k_itemsize; assert(result >= 0 && result < _Count); return result; }
 
 		// operations
 		void reset() { m_next = 0; }
-		_Type &next() { if (m_next > m_max) m_max = m_next; assert(m_next < _Count); return *new(m_base + m_next++ * k_itemsize) _Type; }
+		_Type &next() { if (m_next > m_max) m_max = m_next; assert(m_next < _Count); return *new(m_base.get() + m_next++ * k_itemsize) _Type; }
 		_Type &last() const { return (*this)[m_next - 1]; }
 		void wait_for_space(int count = 1) { while ((m_next + count) >= _Count) { m_waits++; m_manager.wait(""); }  }
 
 	private:
 		// internal state
 		poly_manager &      m_manager;
-		UINT8 *             m_base;
+		std::unique_ptr<UINT8[]>             m_base;
 		int                 m_next;
 		int                 m_max;
 		int                 m_waits;
@@ -288,8 +288,8 @@ private:
 template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::poly_manager(running_machine &machine, UINT8 flags)
 	: m_machine(machine),
-		m_screen(NULL),
-		m_queue(NULL),
+		m_screen(nullptr),
+		m_queue(nullptr),
 		m_polygon(machine, *this),
 		m_object(machine, *this),
 		m_unit(machine, *this),
@@ -316,7 +316,7 @@ template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::poly_manager(screen_device &screen, UINT8 flags)
 	: m_machine(screen.machine()),
 		m_screen(&screen),
-		m_queue(NULL),
+		m_queue(nullptr),
 		m_polygon(screen.machine(), *this),
 		m_object(screen.machine(), *this),
 		m_unit(screen.machine(), *this),
@@ -372,7 +372,7 @@ poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::~poly_manager()
 #endif
 
 	// free the work queue
-	if (m_queue != NULL)
+	if (m_queue != nullptr)
 		osd_work_queue_free(m_queue);
 }
 
@@ -435,7 +435,7 @@ void *poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::work_item_cal
 			break;
 		param = &polygon.m_owner->m_unit[orig_count_next];
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -453,7 +453,7 @@ void poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::wait(const cha
 		time = get_profile_ticks();
 
 	// wait for all pending work items to complete
-	if (m_queue != NULL)
+	if (m_queue != nullptr)
 		osd_work_queue_wait(m_queue, osd_ticks_per_second() * 100);
 
 	// if we don't have a queue, just run the whole list now
@@ -466,7 +466,7 @@ void poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::wait(const cha
 	{
 		time = get_profile_ticks() - time;
 		if (time > LOG_WAIT_THRESHOLD)
-			logerror("Poly:Waited %d cycles for %s\n", (int)time, debug_reason);
+			machine().logerror("Poly:Waited %d cycles for %s\n", (int)time, debug_reason);
 	}
 
 	// reset the state
@@ -620,7 +620,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tile(
 	}
 
 	// enqueue the work items
-	if (m_queue != NULL)
+	if (m_queue != nullptr)
 		osd_work_item_queue_multiple(m_queue, work_item_callback, m_unit.count() - startunit, &m_unit[startunit], m_unit.itemsize(), WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	// return the total number of pixels in the triangle
@@ -656,9 +656,9 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 		v3 = tv;
 		if (v2->y < v1->y)
 		{
-			const vertex_t *tv = v1;
+			const vertex_t *tv2 = v1;
 			v1 = v2;
-			v2 = tv;
+			v2 = tv2;
 		}
 	}
 
@@ -794,7 +794,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 			extent_t &extent = unit.extent[extnum];
 			extent.startx = istartx;
 			extent.stopx = istopx;
-			extent.userdata = NULL;
+			extent.userdata = nullptr;
 			pixels += istopx - istartx;
 
 			// fill in the parameters for the extent
@@ -808,7 +808,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 	}
 
 	// enqueue the work items
-	if (m_queue != NULL)
+	if (m_queue != nullptr)
 		osd_work_item_queue_multiple(m_queue, work_item_callback, m_unit.count() - startunit, &m_unit[startunit], m_unit.itemsize(), WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	// return the total number of pixels in the triangle
@@ -924,7 +924,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 	}
 
 	// enqueue the work items
-	if (m_queue != NULL)
+	if (m_queue != nullptr)
 		osd_work_item_queue_multiple(m_queue, work_item_callback, m_unit.count() - startunit, &m_unit[startunit], m_unit.itemsize(), WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	// return the total number of pixels in the object
@@ -1002,7 +1002,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_polyg
 		edgeptr->dxdy = (edgeptr->v2->x - edgeptr->v1->x) * ooy;
 		for (int paramnum = 0; paramnum < paramcount; paramnum++)
 			edgeptr->dpdy[paramnum] = (edgeptr->v2->p[paramnum] - edgeptr->v1->p[paramnum]) * ooy;
-		edgeptr++;
+		++edgeptr;
 	}
 
 	// walk backward to build up the backward edge list
@@ -1023,7 +1023,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_polyg
 		edgeptr->dxdy = (edgeptr->v2->x - edgeptr->v1->x) * ooy;
 		for (int paramnum = 0; paramnum < paramcount; paramnum++)
 			edgeptr->dpdy[paramnum] = (edgeptr->v2->p[paramnum] - edgeptr->v1->p[paramnum]) * ooy;
-		edgeptr++;
+		++edgeptr;
 	}
 
 	// determine which list is left/right:
@@ -1068,9 +1068,9 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_polyg
 			// compute the ending X based on which part of the triangle we're in
 			_BaseType fully = _BaseType(curscan + extnum) + _BaseType(0.5);
 			while (fully > ledge->v2->y && fully < v[maxv].y)
-				ledge++;
+				++ledge;
 			while (fully > redge->v2->y && fully < v[maxv].y)
-				redge++;
+				++redge;
 			_BaseType startx = ledge->v1->x + (fully - ledge->v1->y) * ledge->dxdy;
 			_BaseType stopx = redge->v1->x + (fully - redge->v1->y) * redge->dxdy;
 
@@ -1117,13 +1117,13 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_polyg
 				istartx = istopx = 0;
 			extent.startx = istartx;
 			extent.stopx = istopx;
-			extent.userdata = NULL;
+			extent.userdata = nullptr;
 			pixels += istopx - istartx;
 		}
 	}
 
 	// enqueue the work items
-	if (m_queue != NULL)
+	if (m_queue != nullptr)
 		osd_work_item_queue_multiple(m_queue, work_item_callback, m_unit.count() - startunit, &m_unit[startunit], m_unit.itemsize(), WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	// return the total number of pixels in the triangle
@@ -1159,7 +1159,7 @@ int poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::zclip_if_less(i
 			nextout->y = v1.y + frac * (v2.y - v1.y);
 			for (int paramnum = 0; paramnum < paramcount; paramnum++)
 				nextout->p[paramnum] = v1.p[paramnum] + frac * (v2.p[paramnum] - v1.p[paramnum]);
-			nextout++;
+			++nextout;
 		}
 
 		// if this vertex is not clipped, copy it in
@@ -1177,7 +1177,7 @@ template<typename _BaseType, int _MaxParams>
 struct frustum_clip_vertex
 {
 	_BaseType x, y, z, w;       // A 3d coordinate already transformed by a projection matrix
-    _BaseType p[_MaxParams];    // Additional parameters to clip
+	_BaseType p[_MaxParams];    // Additional parameters to clip
 };
 
 
@@ -1212,11 +1212,11 @@ int frustum_clip_w(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_
 			clipv[clip_verts].y = v[previ].y + ((v[i].y - v[previ].y) * t);
 			clipv[clip_verts].z = v[previ].z + ((v[i].z - v[previ].z) * t);
 			clipv[clip_verts].w = v[previ].w + ((v[i].w - v[previ].w) * t);
-            
-            // Interpolate the rest of the parameters
-            for (int pi = 0; pi < _MaxParams; pi++)
-                clipv[clip_verts].p[pi] = v[previ].p[pi] + ((v[i].p[pi] - v[previ].p[pi]) * t);
-            
+
+			// Interpolate the rest of the parameters
+			for (int pi = 0; pi < _MaxParams; pi++)
+				clipv[clip_verts].p[pi] = v[previ].p[pi] + ((v[i].p[pi] - v[previ].p[pi]) * t);
+
 			++clip_verts;
 		}
 		if (v1_side > 0)                // current point is inside
@@ -1280,12 +1280,12 @@ int frustum_clip(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_ve
 			clipv[clip_verts].y = v[previ].y + ((v[i].y - v[previ].y) * t);
 			clipv[clip_verts].z = v[previ].z + ((v[i].z - v[previ].z) * t);
 			clipv[clip_verts].w = v[previ].w + ((v[i].w - v[previ].w) * t);
-            
-            // Interpolate the rest of the parameters
-            for (int pi = 0; pi < _MaxParams; pi++)
-                clipv[clip_verts].p[pi] = v[previ].p[pi] + ((v[i].p[pi] - v[previ].p[pi]) * t);
 
-            ++clip_verts;
+			// Interpolate the rest of the parameters
+			for (int pi = 0; pi < _MaxParams; pi++)
+				clipv[clip_verts].p[pi] = v[previ].p[pi] + ((v[i].p[pi] - v[previ].p[pi]) * t);
+
+			++clip_verts;
 		}
 		if (v1_side > 0)                // current point is inside
 		{
@@ -1304,15 +1304,15 @@ int frustum_clip(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_ve
 template<typename _BaseType, int _MaxParams>
 int frustum_clip_all(frustum_clip_vertex<_BaseType, _MaxParams>* clip_vert, int num_vertices, frustum_clip_vertex<_BaseType, _MaxParams>* out)
 {
-    num_vertices = frustum_clip_w<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert);
-    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 0, 0);      // W <= -X
-    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 0, 1);      // W <= +X
-    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 1, 0);      // W <= -Y
-    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 1, 1);      // W <= +X
-    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 2, 0);      // W <= -Z
-    num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 2, 1);      // W <= +Z
-    out = clip_vert;
-    return num_vertices;
+	num_vertices = frustum_clip_w<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert);
+	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 0, 0);      // W <= -X
+	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 0, 1);      // W <= +X
+	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 1, 0);      // W <= -Y
+	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 1, 1);      // W <= +X
+	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 2, 0);      // W <= -Z
+	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 2, 1);      // W <= +Z
+	out = clip_vert;
+	return num_vertices;
 }
 
 

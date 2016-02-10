@@ -39,6 +39,8 @@ struct OHCIIsochronousTransferDescriptor {
 	UINT32 nexttd; // NextTD
 	UINT32 be; // BufferEnd
 	UINT32 offset[8]; // Offset/PacketStatusWord
+	UINT32 word0;
+	UINT32 word1;
 };
 
 enum OHCIRegisters {
@@ -193,7 +195,11 @@ public:
 	int execute_transfer(int address, int endpoint, int pid, UINT8 *buffer, int size);
 private:
 	int address;
-	int controldir;
+	int newaddress;
+	int controldirection;
+	int controltype;
+	int controlrecipient;
+	bool settingaddress;
 	int remain;
 	UINT8 *position;
 };
@@ -203,7 +209,7 @@ class xbox_base_state : public driver_device
 public:
 	xbox_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		nvidia_nv2a(NULL),
+		nvidia_nv2a(nullptr),
 		debug_irq_active(false),
 		debug_irq_number(0),
 		m_maincpu(*this, "maincpu") { }
@@ -214,6 +220,10 @@ public:
 	DECLARE_WRITE32_MEMBER(usbctrl_w);
 	DECLARE_READ32_MEMBER(smbus_r);
 	DECLARE_WRITE32_MEMBER(smbus_w);
+	DECLARE_READ8_MEMBER(superio_read);
+	DECLARE_WRITE8_MEMBER(superio_write);
+	DECLARE_READ8_MEMBER(superiors232_read);
+	DECLARE_WRITE8_MEMBER(superiors232_write);
 	DECLARE_READ32_MEMBER(audio_apu_r);
 	DECLARE_WRITE32_MEMBER(audio_apu_w);
 	DECLARE_READ32_MEMBER(audio_ac93_r);
@@ -232,6 +242,7 @@ public:
 	void usb_ohci_read_transfer_descriptor(UINT32 address);
 	void usb_ohci_writeback_transfer_descriptor(UINT32 address);
 	void usb_ohci_read_isochronous_transfer_descriptor(UINT32 address);
+	void usb_ohci_writeback_isochronous_transfer_descriptor(UINT32 address);
 	void dword_write_le(UINT8 *addr, UINT32 d);
 	void word_write_le(UINT8 *addr, UINT16 d);
 	void debug_generate_irq(int irq, bool active);
@@ -241,7 +252,7 @@ public:
 	void vblank_callback(screen_device &screen, bool state);
 	UINT32 screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_WRITE_LINE_MEMBER(xbox_pic8259_1_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(xbox_pit8254_out0_changed);
@@ -309,8 +320,15 @@ public:
 		OHCITransferDescriptor transfer_descriptor;
 		OHCIIsochronousTransferDescriptor isochronous_transfer_descriptor;
 	} ohcist;
+	struct superio_state
+	{
+		bool configuration_mode;
+		int index;
+		int selected;
+		UINT8 registers[16][256]; // 256 registers for up to 16 devices, registers 0-0x2f common to all
+	} superiost;
 	UINT8 pic16lc_buffer[0xff];
-	nv2a_renderer *nvidia_nv2a;
+	std::unique_ptr<nv2a_renderer> nvidia_nv2a;
 	bool debug_irq_active;
 	int debug_irq_number;
 	required_device<cpu_device> m_maincpu;

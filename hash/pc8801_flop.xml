@@ -43797,7 +43797,7 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 	</software>
 
 	<software name="nt3mus05">
-		<description>NT-3 Music Disk - Yume no Fantasia - SBII </description>
+		<description>NT-3 Music Disk - Yume no Fantasia - SBII</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Active Gamers" />
@@ -53621,7 +53621,7 @@ ExtractDisk  [02]"DISK_B          " -> "game music library_02.d88"
 	</software>
 
 	<software name="pc8801gb">
-		<description>PC-8801 Game Pack </description>
+		<description>PC-8801 Game Pack</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">

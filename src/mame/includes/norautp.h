@@ -18,7 +18,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	UINT16 *m_np_vram;
+	std::unique_ptr<UINT16[]> m_np_vram;
 	UINT16 m_np_addr;
 	DECLARE_READ8_MEMBER(test_r);
 	DECLARE_READ8_MEMBER(vram_data_r);
@@ -31,7 +31,7 @@ public:
 	DECLARE_DRIVER_INIT(ssa);
 	DECLARE_DRIVER_INIT(enc);
 	DECLARE_DRIVER_INIT(deb);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(norautp);
 	UINT32 screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;

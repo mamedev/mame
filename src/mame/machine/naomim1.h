@@ -13,23 +13,23 @@ class naomi_m1_board : public naomi_board
 public:
 	naomi_m1_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_ADDRESS_MAP(submap, 16);
+	virtual DECLARE_ADDRESS_MAP(submap, 16) override;
 
 	DECLARE_READ16_MEMBER(actel_id_r);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void board_setup_address(UINT32 address, bool is_dma);
-	virtual void board_get_buffer(UINT8 *&base, UINT32 &limit);
-	virtual void board_advance(UINT32 size);
+	virtual void board_setup_address(UINT32 address, bool is_dma) override;
+	virtual void board_get_buffer(UINT8 *&base, UINT32 &limit) override;
+	virtual void board_advance(UINT32 size) override;
 
 private:
 	enum { BUFFER_SIZE = 32768 };
 	UINT32 key;
 
-	UINT8 *buffer;
+	std::unique_ptr<UINT8[]> buffer;
 	UINT8 dict[111], hist[2];
 	UINT64 avail_val;
 	UINT32 rom_cur_address, buffer_actual_size, avail_bits;

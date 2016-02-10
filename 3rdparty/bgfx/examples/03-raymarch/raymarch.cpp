@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "common.h"
@@ -102,14 +102,16 @@ void renderScreenSpaceQuad(uint32_t _view, bgfx::ProgramHandle _program, float _
 	}
 }
 
-int _main_(int /*_argc*/, char** /*_argv*/)
+int _main_(int _argc, char** _argv)
 {
+	Args args(_argc, _argv);
+
 	uint32_t width = 1280;
 	uint32_t height = 720;
 	uint32_t debug = BGFX_DEBUG_TEXT;
 	uint32_t reset = BGFX_RESET_VSYNC;
 
-	bgfx::init();
+	bgfx::init(args.m_type, args.m_pciId);
 	bgfx::reset(width, height, reset);
 
 	// Enable debug text.

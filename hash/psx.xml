@@ -2,7 +2,172 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="psx" description="Sony Playstation CD-ROMs">
 
-	<!-- todo, reconvert original dumps using current CHDMAN version - Feb 2014 -->
+<!-- Interactive CD Sampler Discs-->
+
+	<software name="intcdv1m">
+		<description>Interactive CD Sampler Disc - Volume 01 (M Rated)</description>
+		<year>1995</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 1 (M Rated)" sha1="de4924cbd635e0a11b33c03e6560e28790b09257"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="intcdv2">
+		<description>Interactive CD Sampler Disc - Volume 02</description>
+		<year>1996</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 2" sha1="867f9b3e42d4e9d439750d05dc4f18c86bab6f60"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="intcdv30">
+		<description>Interactive CD Sampler Disc - Volume 03 (1.0)</description>
+		<year>1996</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 3 (1.0)" sha1="3c87bcfe7395e5b3e5c007c80534778ed0b9f751"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="intcdv31">
+		<description>Interactive CD Sampler Disc - Volume 03 (1.1)</description>
+		<year>1996</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 3 (1.1)" sha1="c220e22c44a0f0a26b95110b937b398163490298"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="intcdv32">
+		<description>Interactive CD Sampler Disc - Volume 03 (1.2)</description>
+		<year>1996</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 3 (1.2)" sha1="2890dd570114ab7116a5556578d11632264cc13b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="intcdv4">
+		<description>Interactive CD Sampler Disc - Volume 04</description>
+		<year>1997</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 4" sha1="c558a684a28ccf6afe0d3fc166814539c75863f7"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="intcdv5">
+		<description>Interactive CD Sampler Disc - Volume 05</description>
+		<year>1997</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 5" sha1="f1ce1f4a942af852ee67f98c7d2a3c148d835abb"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="intcdv6">
+		<description>Interactive CD Sampler Disc - Volume 06</description>
+		<year>1998</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 6" sha1="78f9e8b125f440e626d1ccc1f3a5a5f5a3a1cb11"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="intcdv7">
+		<description>Interactive CD Sampler Disc - Volume 07</description>
+		<year>1998</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 7" sha1="73e8215a98da98d9f2d1468c62354b46af77fa56"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="intcdv8">
+		<description>Interactive CD Sampler Disc - Volume 08</description>
+		<year>1998</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 8" sha1="8145f022b1f44d2ed7140386acf5b293834fc6c8"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="intcdv9">
+		<description>Interactive CD Sampler Disc - Volume 09</description>
+		<year>1998</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 9" sha1="4b504a4ce093c255b40f4cc2cf3fb59b4216f501"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="intcdv10">
+		<description>Interactive CD Sampler Disc - Volume 10</description>
+		<year>1999</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 10" sha1="960319d09f9ca10663f06068a2ff134f343d22ad"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="intcdv11">
+		<description>Interactive CD Sampler Disc - Volume 11</description>
+		<year>1999</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Interactive CD Sampler Disc - Volume 11" sha1="0506aa051708f32f8470a19b7d6c8538ecedecc1"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="intcdtru">
+		<description>Toys R Us - Interactive CD Sampler Disc</description>
+		<year>1998</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Toys R Us - Interactive CD Sampler Disc" sha1="65e0b8973fb1c59a3b18e1c21659afb00ff7db33"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="intcdff7">
+		<description>Final Fantasy VII Interactive Sampler CD</description>
+		<year>1996</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Final Fantasy VII Interactive Sampler CD" sha1="820d6b26f12e68b0eb2a92895132083bb48a29bc"/>
+			</diskarea>
+		</part>
+	</software>
 
 <!--
 ***********************
@@ -27,7 +192,7 @@ A few comments on these:
    that subtle errors are introduced either in this procedure, or in the original creation of the mdf/mds/cdi image. These should
    be verified with the original media, and are marked as bad dumps.
 -->
-
+	<!-- todo, reconvert original dumps using current CHDMAN version - Feb 2014 -->
 
 <!-- Pirate disks -->
 
@@ -9241,7 +9406,7 @@ A few comments on these:
 		-->
 		<description>Keiba Eito '98 Haru Natsu (Jpn)</description>
 		<year>1998</year>
-		<publisher> Shangri-La</publisher>
+		<publisher>Shangri-La</publisher>
 		<info name="alt_title" value="競馬エイト '98春"/>
 		<info name="serial" value="SLPS-01372" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
@@ -11593,7 +11758,7 @@ A few comments on these:
 		<rom name="Mini-Yonku Hakusou Kyoudai - Rettsu &amp; Go!! - WGP Hyper Heat (Japan) [SLPS-01078].bin" size="460620384" crc="cbf98acb" />
 		<rom name="Mini-Yonku Hakusou Kyoudai - Rettsu &amp; Go!! - WGP Hyper Heat (Japan) [SLPS-01078].cue" size="144" crc="0da04544" />
 		-->
-		<description> Mini-Yonku Bakusou Kyoudai Let's &amp; Go!! - WGP Hyper Heat (Jpn)</description>
+		<description>Mini-Yonku Bakusou Kyoudai Let's &amp; Go!! - WGP Hyper Heat (Jpn)</description>
 		<year>1997</year>
 		<publisher>Jaleco</publisher>
 		<info name="alt_title" value="ミニ四駆爆走兄弟レッツ＆ゴー&#33;&#33;WGPハイパーヒート"/>
@@ -13015,7 +13180,7 @@ A few comments on these:
 		<rom name="Pachi-Slot Teiou 6 (Japan) [SLPS-02657].bin" size="38307024" crc="a0db9eb5" />
 		<rom name="Pachi-Slot Teiou 6 (Japan) [SLPS-02657].cue" size="105" crc="bb8946eb" />
 		-->
-		<description> Pachi-Slot Teiou 6 - Kung Fu Lady - BangBang - Prelude 2 (Jpn)</description>
+		<description>Pachi-Slot Teiou 6 - Kung Fu Lady - BangBang - Prelude 2 (Jpn)</description>
 		<year>2000</year>
 		<publisher>Media</publisher>
 		<info name="alt_title" value="パチスロ帝王6"/>
@@ -13051,7 +13216,7 @@ A few comments on these:
 		<rom name="Pachi-Slot Teiou Maker Suishou Manual 3 - I'm Angel - White 2 &amp; Blue 2 (Japan) [SLPS-03130].bin" size="74965296" crc="e480a0e4" />
 		<rom name="Pachi-Slot Teiou Maker Suishou Manual 3 - I'm Angel - White 2 &amp; Blue 2 (Japan) [SLPS-03130].cue" size="157" crc="bb5b72a8" />
 		-->
-		<description> Pachi-Slot Teiou - Maker Suishou Manual 3 - I'm Angel White 2 &amp; Blue 2 (Jpn)</description>
+		<description>Pachi-Slot Teiou - Maker Suishou Manual 3 - I'm Angel White 2 &amp; Blue 2 (Jpn)</description>
 		<year>2001</year>
 		<publisher>Media</publisher>
 		<info name="alt_title" value="パチスロ帝王 メーカー推奨マニュアル3 アイムエンジェル〜ホワイト2&amp;ブルー2〜"/>
@@ -15890,7 +16055,7 @@ A few comments on these:
 		<rom name="Simple 1500 Series Hello Kitty Vol.03 - Hello Kitty Block Kuzushi (Japan) [SLPM-86911].bin" size="290589600" crc="6e2afc57" />
 		<rom name="Simple 1500 Series Hello Kitty Vol.03 - Hello Kitty Block Kuzushi (Japan) [SLPM-86911].cue" size="728" crc="ad0cb3dc" />
 		-->
-		<description> Simple 1500 Series Hello Kitty vol.03 - Hello Kitty Block Kuzushi (Jpn)</description>
+		<description>Simple 1500 Series Hello Kitty vol.03 - Hello Kitty Block Kuzushi (Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="SIMPLE1500シリーズ ハローキティ Vol.03 Hello Kitty ブロックくずし"/>

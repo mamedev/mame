@@ -40,18 +40,18 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	// internal state
 	UINT8 m_irqvector;
 	UINT32 m_sample_addr;
-	UINT8 *m_samples;
+	optional_region_ptr<UINT8> m_samples;
 	UINT32 m_samples_size;
 	address_space *m_space;
 	dac_device *m_dac;

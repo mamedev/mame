@@ -51,7 +51,7 @@ public:
 		m_joysticks(*this, "JOYSTICKS"),
 		m_buttons(*this, "BUTTONS"),
 		m_palette(*this, "palette"),
-		m_floppy(NULL),
+		m_floppy(nullptr),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
@@ -90,8 +90,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(svi318_cart);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	memory_region *m_cart_rom;
@@ -131,7 +131,7 @@ private:
 	UINT8   m_bank_high1_read_only;
 	UINT8   m_bank_high2_read_only;
 
-	UINT8   *m_empty_bank;
+	std::unique_ptr<UINT8[]>   m_empty_bank;
 	UINT8   *m_bank_low_ptr;
 	UINT8   *m_bank_high1_ptr;
 	UINT8   *m_bank_high2_ptr;

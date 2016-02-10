@@ -46,7 +46,7 @@ public:
 
 	required_shared_ptr<UINT32> m_workram;
 	required_shared_ptr<UINT32> m_bufferram;
-	UINT16 *m_palram;
+	std::unique_ptr<UINT16[]> m_palram;
 	required_shared_ptr<UINT32> m_colorxlat;
 	required_shared_ptr<UINT32> m_textureram0;
 	required_shared_ptr<UINT32> m_textureram1;
@@ -85,11 +85,11 @@ public:
 	int m_dsp_type;
 	int m_copro_fifoin_rpos;
 	int m_copro_fifoin_wpos;
-	UINT32 *m_copro_fifoin_data;
+	std::unique_ptr<UINT32[]> m_copro_fifoin_data;
 	int m_copro_fifoin_num;
 	int m_copro_fifoout_rpos;
 	int m_copro_fifoout_wpos;
-	UINT32 *m_copro_fifoout_data;
+	std::unique_ptr<UINT32[]> m_copro_fifoout_data;
 	int m_copro_fifoout_num;
 	UINT16 m_cmd_data;
 	UINT8 m_driveio_comm_data;
@@ -143,19 +143,13 @@ public:
 	DECLARE_WRITE32_MEMBER(copro_fifo_w);
 	DECLARE_WRITE32_MEMBER(copro_sharc_iop_w);
 	DECLARE_WRITE32_MEMBER(geo_ctl1_w);
-	DECLARE_WRITE32_MEMBER(geo_sharc_ctl1_w);
-	DECLARE_READ32_MEMBER(geo_sharc_fifo_r);
-	DECLARE_WRITE32_MEMBER(geo_sharc_fifo_w);
-	DECLARE_WRITE32_MEMBER(geo_sharc_iop_w);
 	DECLARE_READ32_MEMBER(geo_prg_r);
 	DECLARE_WRITE32_MEMBER(geo_prg_w);
 	DECLARE_READ32_MEMBER(geo_r);
 	DECLARE_WRITE32_MEMBER(geo_w);
 	DECLARE_READ32_MEMBER(hotd_lightgun_r);
 	DECLARE_WRITE32_MEMBER(hotd_lightgun_w);
-	DECLARE_READ32_MEMBER(sonic_unk_r);
 	DECLARE_READ32_MEMBER(daytona_unk_r);
-	DECLARE_READ32_MEMBER(desert_unk_r);
 	DECLARE_READ32_MEMBER(model2_irq_r);
 	DECLARE_WRITE32_MEMBER(model2_irq_w);
 	DECLARE_READ32_MEMBER(model2_serial_r);
@@ -168,16 +162,11 @@ public:
 	DECLARE_READ32_MEMBER(maxx_r);
 	DECLARE_READ32_MEMBER(network_r);
 	DECLARE_WRITE32_MEMBER(network_w);
-	DECLARE_WRITE32_MEMBER(copro_w);
 	DECLARE_WRITE32_MEMBER(mode_w);
 	DECLARE_WRITE32_MEMBER(model2o_tex_w0);
 	DECLARE_WRITE32_MEMBER(model2o_tex_w1);
 	DECLARE_WRITE32_MEMBER(model2o_luma_w);
 	DECLARE_WRITE32_MEMBER(model2_3d_zclip_w);
-	DECLARE_READ16_MEMBER(m1_snd_68k_latch_r);
-	DECLARE_READ16_MEMBER(m1_snd_v60_ready_r);
-	DECLARE_WRITE16_MEMBER(m1_snd_68k_latch1_w);
-	DECLARE_WRITE16_MEMBER(m1_snd_68k_latch2_w);
 	DECLARE_WRITE16_MEMBER(model2snd_ctrl);
 	DECLARE_READ32_MEMBER(copro_sharc_input_fifo_r);
 	DECLARE_WRITE32_MEMBER(copro_sharc_output_fifo_w);
@@ -195,8 +184,6 @@ public:
 	DECLARE_READ32_MEMBER(jaleco_network_r);
 	DECLARE_WRITE32_MEMBER(jaleco_network_w);
 	void push_geo_data(UINT32 data);
-	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk1_w);
-	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk2_w);
 	DECLARE_DRIVER_INIT(overrev);
 	DECLARE_DRIVER_INIT(pltkids);
 	DECLARE_DRIVER_INIT(rchase2);
@@ -257,7 +244,7 @@ struct m2_poly_extra_data
 };
 
 
-INLINE UINT16 get_texel( UINT32 base_x, UINT32 base_y, int x, int y, UINT32 *sheet )
+static inline UINT16 get_texel( UINT32 base_x, UINT32 base_y, int x, int y, UINT32 *sheet )
 {
 	UINT32  baseoffs = ((base_y/2)*512)+(base_x/2);
 	UINT32  texeloffs = ((y/2)*512)+(x/2);

@@ -1,6 +1,6 @@
 --
--- Copyright 2010-2015 Branimir Karadzic. All rights reserved.
--- License: http://www.opensource.org/licenses/BSD-2-Clause
+-- Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+-- License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 --
 
 function bgfxProject(_name, _kind, _defines)
@@ -36,7 +36,7 @@ function bgfxProject(_name, _kind, _defines)
 		includedirs {
 			path.join(BGFX_DIR, "3rdparty"),
 			path.join(BGFX_DIR, "3rdparty/dxsdk/include"),
-			path.join(BGFX_DIR, "../bx/include"),
+			path.join(BX_DIR,   "include"),
 		}
 
 		defines {
@@ -81,8 +81,11 @@ function bgfxProject(_name, _kind, _defines)
 			}
 
 		configuration { "osx" }
-			links {
-				"Cocoa.framework",
+			linkoptions {
+				"-framework Cocoa",
+				"-framework QuartzCore",
+				"-framework OpenGL",
+				"-weak_framework Metal",
 			}
 
 		configuration { "not nacl" }
@@ -129,7 +132,7 @@ function bgfxProject(_name, _kind, _defines)
 				path.join(BGFX_DIR, "src/vertexdecl.cpp"),
 			}
 
-			configuration { "xcode4 or osx or ios*" }
+			configuration { "xcode* or osx or ios*" }
 				files {
 					path.join(BGFX_DIR, "src/amalgamated.mm"),
 				}
@@ -144,7 +147,7 @@ function bgfxProject(_name, _kind, _defines)
 			configuration {}
 
 		else
-			configuration { "xcode4 or osx or ios*" }
+			configuration { "xcode* or osx or ios*" }
 				files {
 					path.join(BGFX_DIR, "src/glcontext_eagl.mm"),
 					path.join(BGFX_DIR, "src/glcontext_nsgl.mm"),

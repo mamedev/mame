@@ -76,7 +76,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mahjong_input_select_w);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_WRITE8_MEMBER(spangbl_msm5205_data_w);
 	DECLARE_WRITE8_MEMBER(mstworld_sound_w);
 	DECLARE_WRITE8_MEMBER(pang_video_bank_w);
 	DECLARE_WRITE8_MEMBER(mstworld_video_bank_w);

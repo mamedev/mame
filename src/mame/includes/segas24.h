@@ -12,14 +12,16 @@ class segas24_state : public driver_device
 {
 public:
 	segas24_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "subcpu"),
-		m_dac(*this, "dac"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_16(*this, "paletteram")
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "subcpu")
+		, m_dac(*this, "dac")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_generic_paletteram_16(*this, "paletteram")
+		, m_romboard(*this, "romboard")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -27,6 +29,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
+	optional_memory_region m_romboard;
 
 	static const UINT8  mahmajn_mlt[8];
 	static const UINT8 mahmajn2_mlt[8];
@@ -132,8 +135,8 @@ public:
 	DECLARE_DRIVER_INIT(dcclubfd);
 	DECLARE_DRIVER_INIT(qsww);
 	DECLARE_DRIVER_INIT(sgmast);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_system24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer_clear_cb);

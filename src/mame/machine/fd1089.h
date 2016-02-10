@@ -46,7 +46,7 @@ public:
 
 protected:
 	// device overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// internal helpers
 	UINT8 rearrange_key(UINT8 table, bool opcode);
@@ -83,7 +83,7 @@ public:
 	fd1089a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual UINT8 decode(UINT8 val, UINT8 key, bool opcode);
+	virtual UINT8 decode(UINT8 val, UINT8 key, bool opcode) override;
 };
 
 
@@ -97,7 +97,7 @@ public:
 	fd1089b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual UINT8 decode(UINT8 val, UINT8 key, bool opcode);
+	virtual UINT8 decode(UINT8 val, UINT8 key, bool opcode) override;
 };
 
 

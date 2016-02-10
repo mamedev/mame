@@ -20,7 +20,8 @@ endif
 
 # $(info $(OS))
 
-GENIE=../bx/tools/bin/$(OS)/genie $(GENIE_FLAGS)
+BX_DIR?=../bx
+GENIE?=$(BX_DIR)/tools/bin/$(OS)/genie
 
 all:
 	$(GENIE) --with-tools --with-shared-lib vs2008
@@ -214,6 +215,14 @@ rpi-release: .build/projects/gmake-rpi
 	$(MAKE) -R -C .build/projects/gmake-rpi config=release
 rpi: rpi-debug rpi-release
 
+build-darwin: osx
+
+build-linux: linux-debug64 linux-release64
+
+build-windows: mingw-gcc
+
+build: build-$(OS)
+
 rebuild-shaders:
 	$(MAKE) -R -C examples rebuild
 
@@ -268,12 +277,16 @@ BUILD_TOOLS_SUFFIX=Release
 EXE=.exe
 endif
 
-tools/bin/$(OS)/shaderc$(EXE): .build/projects/$(BUILD_PROJECT_DIR)
-	$(SILENT) $(MAKE) -C .build/projects/$(BUILD_PROJECT_DIR) -f shaderc.make config=$(BUILD_TOOLS_CONFIG)
-	$(SILENT) cp .build/$(BUILD_OUTPUT_DIR)/bin/shaderc$(BUILD_TOOLS_SUFFIX)$(EXE) $(@)
-
-tools/bin/$(OS)/geometryc$(EXE): .build/projects/$(BUILD_PROJECT_DIR)
+geometryc: .build/projects/$(BUILD_PROJECT_DIR)
 	$(SILENT) $(MAKE) -C .build/projects/$(BUILD_PROJECT_DIR) -f geometryc.make config=$(BUILD_TOOLS_CONFIG)
-	$(SILENT) cp .build/$(BUILD_OUTPUT_DIR)/bin/geometryc$(BUILD_TOOLS_SUFFIX)$(EXE) $(@)
+	$(SILENT) cp .build/$(BUILD_OUTPUT_DIR)/bin/geometryc$(BUILD_TOOLS_SUFFIX)$(EXE) tools/bin/$(OS)/geometryc$(EXE)
 
-tools: tools/bin/$(OS)/shaderc$(EXE) tools/bin/$(OS)/geometryc$(EXE)
+shaderc: .build/projects/$(BUILD_PROJECT_DIR)
+	$(SILENT) $(MAKE) -C .build/projects/$(BUILD_PROJECT_DIR) -f shaderc.make config=$(BUILD_TOOLS_CONFIG)
+	$(SILENT) cp .build/$(BUILD_OUTPUT_DIR)/bin/shaderc$(BUILD_TOOLS_SUFFIX)$(EXE) tools/bin/$(OS)/shaderc$(EXE)
+
+texturec: .build/projects/$(BUILD_PROJECT_DIR)
+	$(SILENT) $(MAKE) -C .build/projects/$(BUILD_PROJECT_DIR) -f texturec.make config=$(BUILD_TOOLS_CONFIG)
+	$(SILENT) cp .build/$(BUILD_OUTPUT_DIR)/bin/texturec$(BUILD_TOOLS_SUFFIX)$(EXE) tools/bin/$(OS)/texturec$(EXE)
+
+tools: geometryc shaderc texturec

@@ -119,13 +119,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
-	UINT16 *m_pf1_data, *m_pf2_data;
-	UINT16 *m_pf12_control;
+	std::unique_ptr<UINT16[]> m_pf1_data;
+	std::unique_ptr<UINT16[]> m_pf2_data;
+	std::unique_ptr<UINT16[]> m_pf12_control;
 
 	const UINT16 *m_pf1_rowscroll_ptr, *m_pf2_rowscroll_ptr;
 

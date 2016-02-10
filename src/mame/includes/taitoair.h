@@ -67,7 +67,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	bitmap_ind16 *m_framebuffer[2];
+	std::unique_ptr<bitmap_ind16> m_framebuffer[2];
 
 	/* 3d info */
 	INT16 m_frustumLeft;
@@ -75,9 +75,6 @@ public:
 	INT16 m_eyecoordBuffer[4];  /* homogeneous */
 
 	bool m_gradbank;
-
-	DECLARE_READ16_MEMBER(dsp_m_r);
-	DECLARE_WRITE16_MEMBER(dsp_m_w);
 
 	UINT16 m_dsp_test_object_type;
 	INT16 m_dsp_test_or_clip, m_dsp_test_and_clip;
@@ -121,9 +118,9 @@ public:
 	DECLARE_WRITE16_MEMBER(dsp_flags_w);
 	DECLARE_WRITE16_MEMBER(dma_regs_w);
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_taitoair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	int draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset );
@@ -133,6 +130,5 @@ public:
 
 	void fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 header, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 );
 	void fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect, const struct taitoair_poly *q );
-	int projectEyeCoordToScreen(float* projectionMatrix,const int Res,INT16* eyePoint3d,int type);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

@@ -104,10 +104,10 @@ public:
 		m_io_in1(*this, "IN1"),
 		m_palette(*this, "palette")  { }
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	required_shared_ptr<UINT32> m_s3c240x_ram;
-	UINT8 *m_eeprom_data;
+	std::unique_ptr<UINT8[]> m_eeprom_data;
 	UINT32 m_s3c240x_lcd_regs[0x400/4];
 	emu_timer *m_s3c240x_lcd_timer;
 	s3c240x_lcd_t m_s3c240x_lcd;
@@ -176,8 +176,8 @@ public:
 	DECLARE_WRITE32_MEMBER(s3c240x_spi_w);
 	DECLARE_READ32_MEMBER(s3c240x_mmc_r);
 	DECLARE_WRITE32_MEMBER(s3c240x_mmc_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_gp32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(s3c240x_lcd_timer_exp);
 	TIMER_CALLBACK_MEMBER(s3c240x_pwm_timer_exp);
@@ -240,10 +240,6 @@ protected:
 	void s3c240x_lcd_render_04( );
 	void s3c240x_lcd_render_08( );
 	void s3c240x_lcd_render_16( );
-	UINT8 i2cmem_read_byte( int last);
-	void i2cmem_write_byte( UINT8 data);
-	void i2cmem_start( );
-	void i2cmem_stop( );
 };
 
 

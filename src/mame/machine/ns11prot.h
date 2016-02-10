@@ -12,8 +12,8 @@ class ns11_keycus_device : public device_t
 protected:
 	ns11_keycus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 protected:
 	UINT16 m_p1;
@@ -32,8 +32,8 @@ class keycus_c406_device : public ns11_keycus_device
 public:
 	keycus_c406_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ16_MEMBER( read );
-	virtual DECLARE_WRITE16_MEMBER( write );
+	virtual DECLARE_READ16_MEMBER( read ) override;
+	virtual DECLARE_WRITE16_MEMBER( write ) override;
 };
 
 extern const device_type KEYCUS_C406;
@@ -45,8 +45,8 @@ class keycus_c409_device : public ns11_keycus_device
 public:
 	keycus_c409_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ16_MEMBER( read );
-	virtual DECLARE_WRITE16_MEMBER( write );
+	virtual DECLARE_READ16_MEMBER( read ) override;
+	virtual DECLARE_WRITE16_MEMBER( write ) override;
 };
 
 extern const device_type KEYCUS_C409;
@@ -58,8 +58,8 @@ class keycus_c410_device : public ns11_keycus_device
 public:
 	keycus_c410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ16_MEMBER( read );
-	virtual DECLARE_WRITE16_MEMBER( write );
+	virtual DECLARE_READ16_MEMBER( read ) override;
+	virtual DECLARE_WRITE16_MEMBER( write ) override;
 };
 
 extern const device_type KEYCUS_C410;
@@ -71,8 +71,8 @@ class keycus_c411_device : public ns11_keycus_device
 public:
 	keycus_c411_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ16_MEMBER( read );
-	virtual DECLARE_WRITE16_MEMBER( write );
+	virtual DECLARE_READ16_MEMBER( read ) override;
+	virtual DECLARE_WRITE16_MEMBER( write ) override;
 };
 
 extern const device_type KEYCUS_C411;
@@ -84,8 +84,8 @@ class keycus_c430_device : public ns11_keycus_device
 public:
 	keycus_c430_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ16_MEMBER( read );
-	virtual DECLARE_WRITE16_MEMBER( write );
+	virtual DECLARE_READ16_MEMBER( read ) override;
+	virtual DECLARE_WRITE16_MEMBER( write ) override;
 };
 
 extern const device_type KEYCUS_C430;
@@ -97,8 +97,8 @@ class keycus_c431_device : public ns11_keycus_device
 public:
 	keycus_c431_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ16_MEMBER( read );
-	virtual DECLARE_WRITE16_MEMBER( write );
+	virtual DECLARE_READ16_MEMBER( read ) override;
+	virtual DECLARE_WRITE16_MEMBER( write ) override;
 };
 
 extern const device_type KEYCUS_C431;
@@ -110,8 +110,8 @@ class keycus_c432_device : public ns11_keycus_device
 public:
 	keycus_c432_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ16_MEMBER( read );
-	virtual DECLARE_WRITE16_MEMBER( write );
+	virtual DECLARE_READ16_MEMBER( read ) override;
+	virtual DECLARE_WRITE16_MEMBER( write ) override;
 };
 
 extern const device_type KEYCUS_C432;
@@ -123,8 +123,8 @@ class keycus_c442_device : public ns11_keycus_device
 public:
 	keycus_c442_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ16_MEMBER( read );
-	virtual DECLARE_WRITE16_MEMBER( write );
+	virtual DECLARE_READ16_MEMBER( read ) override;
+	virtual DECLARE_WRITE16_MEMBER( write ) override;
 };
 
 extern const device_type KEYCUS_C442;
@@ -136,8 +136,8 @@ class keycus_c443_device : public ns11_keycus_device
 public:
 	keycus_c443_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ16_MEMBER( read );
-	virtual DECLARE_WRITE16_MEMBER( write );
+	virtual DECLARE_READ16_MEMBER( read ) override;
+	virtual DECLARE_WRITE16_MEMBER( write ) override;
 };
 
 extern const device_type KEYCUS_C443;

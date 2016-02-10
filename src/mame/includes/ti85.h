@@ -100,7 +100,7 @@ public:
 	UINT8 m_interrupt_speed;
 	UINT8 m_port4_bit0;
 	UINT8 m_ti81_port_7_data;
-	UINT8 *m_ti8x_ram;
+	std::unique_ptr<UINT8[]> m_ti8x_ram;
 	UINT8 m_PCR;
 	UINT8 m_red_out;
 	UINT8 m_white_out;
@@ -111,7 +111,7 @@ public:
 	int m_ti_screen_x_size;
 	int m_ti_screen_y_size;
 	int m_ti_number_of_frames;
-	UINT8 * m_frames;
+	std::unique_ptr<UINT8[]> m_frames;
 	UINT8 * m_bios;
 	DECLARE_READ8_MEMBER(ti85_port_0000_r);
 	DECLARE_READ8_MEMBER(ti8x_keypad_r);
@@ -166,8 +166,8 @@ public:
 	DECLARE_READ8_MEMBER( ti83pse_port_0021_r );
 	DECLARE_READ8_MEMBER( ti84pse_port_0055_r );
 	DECLARE_READ8_MEMBER( ti84pse_port_0056_r );
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ti85);
 	DECLARE_MACHINE_RESET(ti85);
 	DECLARE_MACHINE_RESET(ti83p);
@@ -185,7 +185,7 @@ public:
 	TIMER_CALLBACK_MEMBER(ti83_timer2_callback);
 
 	//crystal timers
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void ti83pse_count( UINT8 timer, UINT8 data);
 
 	emu_timer *m_crystal_timer1;

@@ -27,8 +27,6 @@ class osd_interface;
 // cli_frontend handles command-line processing and emulator execution
 class cli_frontend
 {
-	typedef tagmap_t<FPTR> int_map;
-
 public:
 	// construction/destruction
 	cli_frontend(cli_options &options, osd_interface &osd);
@@ -57,8 +55,6 @@ public:
 	void romident(const char *filename);
 	void getsoftlist(const char *gamename = "*");
 	void verifysoftlist(const char *gamename = "*");
-	void listmididevices(const char *gamename = "*");
-	void listnetworkadapters(const char *gamename = "*");
 
 private:
 	// internal helpers
@@ -71,7 +67,6 @@ private:
 	cli_options &       m_options;
 	osd_interface &     m_osd;
 	int                 m_result;
-	UINT64              m_start_memory;
 };
 
 

@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "bgfx_p.h"
@@ -193,6 +193,14 @@ namespace bgfx
 			;
 	}
 
+	bool isValid(TextureFormat::Enum _format)
+	{
+		return _format != TextureFormat::Unknown
+			&& _format != TextureFormat::UnknownDepth
+			&& _format != TextureFormat::Count
+			;
+	}
+
 	uint8_t getBitsPerPixel(TextureFormat::Enum _format)
 	{
 		return s_imageBlockInfo[_format].bitsPerPixel;
@@ -211,6 +219,89 @@ namespace bgfx
 	const char* getName(TextureFormat::Enum _format)
 	{
 		return s_textureFormatName[_format];
+	}
+
+	TextureFormat::Enum getFormat(const char* _name)
+	{
+		for (uint32_t ii = 0; ii < TextureFormat::Count; ++ii)
+		{
+			const TextureFormat::Enum fmt = TextureFormat::Enum(ii);
+			if (isValid(fmt) )
+			{
+				if (0 == bx::stricmp(s_textureFormatName[ii], _name) )
+				{
+					return fmt;
+				}
+			}
+		}
+
+		return TextureFormat::Unknown;
+	}
+
+	uint8_t imageGetNumMips(TextureFormat::Enum _format, uint16_t _width, uint16_t _height, uint16_t _depth)
+	{
+		const ImageBlockInfo& blockInfo = getBlockInfo(_format);
+		const uint16_t blockWidth  = blockInfo.blockWidth;
+		const uint16_t blockHeight = blockInfo.blockHeight;
+		const uint16_t minBlockX   = blockInfo.minBlockX;
+		const uint16_t minBlockY   = blockInfo.minBlockY;
+
+		_width   = bx::uint16_max(blockWidth  * minBlockX, ( (_width  + blockWidth  - 1) / blockWidth)*blockWidth);
+		_height  = bx::uint16_max(blockHeight * minBlockY, ( (_height + blockHeight - 1) / blockHeight)*blockHeight);
+		_depth   = bx::uint16_max(1, _depth);
+
+		uint8_t numMips = 0;
+
+		for (uint32_t width = _width, height = _height, depth = _depth
+			; blockWidth < width || blockHeight < height || 1 < depth
+			; ++numMips)
+		{
+			width  = bx::uint32_max(blockWidth  * minBlockX, ( (width  + blockWidth  - 1) / blockWidth )*blockWidth);
+			height = bx::uint32_max(blockHeight * minBlockY, ( (height + blockHeight - 1) / blockHeight)*blockHeight);
+			depth  = bx::uint32_max(1, depth);
+
+			width  >>= 1;
+			height >>= 1;
+			depth  >>= 1;
+		}
+
+		return numMips;
+	}
+
+	uint32_t imageGetSize(TextureFormat::Enum _format, uint16_t _width, uint16_t _height, uint16_t _depth, bool _cubeMap, uint8_t _numMips)
+	{
+		const ImageBlockInfo& blockInfo = getBlockInfo(_format);
+		const uint8_t  bpp         = blockInfo.bitsPerPixel;
+		const uint16_t blockWidth  = blockInfo.blockWidth;
+		const uint16_t blockHeight = blockInfo.blockHeight;
+		const uint16_t minBlockX   = blockInfo.minBlockX;
+		const uint16_t minBlockY   = blockInfo.minBlockY;
+
+		_width   = bx::uint16_max(blockWidth  * minBlockX, ( (_width  + blockWidth  - 1) / blockWidth)*blockWidth);
+		_height  = bx::uint16_max(blockHeight * minBlockY, ( (_height + blockHeight - 1) / blockHeight)*blockHeight);
+		_depth   = bx::uint16_max(1, _depth);
+		_numMips = uint8_t(bx::uint16_max(1, _numMips) );
+
+		uint32_t width  = _width;
+		uint32_t height = _height;
+		uint32_t depth  = _depth;
+		uint32_t sides  = _cubeMap ? 6 : 1;
+		uint32_t size   = 0;
+
+		for (uint32_t lod = 0; lod < _numMips; ++lod)
+		{
+			width  = bx::uint32_max(blockWidth  * minBlockX, ( (width  + blockWidth  - 1) / blockWidth )*blockWidth);
+			height = bx::uint32_max(blockHeight * minBlockY, ( (height + blockHeight - 1) / blockHeight)*blockHeight);
+			depth  = bx::uint32_max(1, depth);
+
+			size += width*height*depth*bpp/8 * sides;
+
+			width  >>= 1;
+			height >>= 1;
+			depth  >>= 1;
+		}
+
+		return size;
 	}
 
 	void imageSolid(uint32_t _width, uint32_t _height, uint32_t _solid, void* _dst)
@@ -235,7 +326,7 @@ namespace bgfx
 		}
 	}
 
-	void imageRgba8Downsample2x2Ref(uint32_t _width, uint32_t _height, uint32_t _srcPitch, const void* _src, void* _dst)
+	void imageRgba8Downsample2x2Ref(uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src, void* _dst)
 	{
 		const uint32_t dstwidth  = _width/2;
 		const uint32_t dstheight = _height/2;
@@ -249,27 +340,27 @@ namespace bgfx
 		uint8_t* dst = (uint8_t*)_dst;
 		const uint8_t* src = (const uint8_t*)_src;
 
-		for (uint32_t yy = 0, ystep = _srcPitch*2; yy < dstheight; ++yy, src += ystep)
+		for (uint32_t yy = 0, ystep = _pitch*2; yy < dstheight; ++yy, src += ystep)
 		{
 			const uint8_t* rgba = src;
 			for (uint32_t xx = 0; xx < dstwidth; ++xx, rgba += 8, dst += 4)
 			{
-				float rr = powf(rgba[          0], 2.2f);
-				float gg = powf(rgba[          1], 2.2f);
-				float bb = powf(rgba[          2], 2.2f);
-				float aa =      rgba[          3];
-				rr      += powf(rgba[          4], 2.2f);
-				gg      += powf(rgba[          5], 2.2f);
-				bb      += powf(rgba[          6], 2.2f);
-				aa      +=      rgba[          7];
-				rr      += powf(rgba[_srcPitch+0], 2.2f);
-				gg      += powf(rgba[_srcPitch+1], 2.2f);
-				bb      += powf(rgba[_srcPitch+2], 2.2f);
-				aa      +=      rgba[_srcPitch+3];
-				rr      += powf(rgba[_srcPitch+4], 2.2f);
-				gg      += powf(rgba[_srcPitch+5], 2.2f);
-				bb      += powf(rgba[_srcPitch+6], 2.2f);
-				aa      +=      rgba[_srcPitch+7];
+				float rr = powf(rgba[       0], 2.2f);
+				float gg = powf(rgba[       1], 2.2f);
+				float bb = powf(rgba[       2], 2.2f);
+				float aa =      rgba[       3];
+				rr      += powf(rgba[       4], 2.2f);
+				gg      += powf(rgba[       5], 2.2f);
+				bb      += powf(rgba[       6], 2.2f);
+				aa      +=      rgba[       7];
+				rr      += powf(rgba[_pitch+0], 2.2f);
+				gg      += powf(rgba[_pitch+1], 2.2f);
+				bb      += powf(rgba[_pitch+2], 2.2f);
+				aa      +=      rgba[_pitch+3];
+				rr      += powf(rgba[_pitch+4], 2.2f);
+				gg      += powf(rgba[_pitch+5], 2.2f);
+				bb      += powf(rgba[_pitch+6], 2.2f);
+				aa      +=      rgba[_pitch+7];
 
 				rr *= 0.25f;
 				gg *= 0.25f;
@@ -286,7 +377,7 @@ namespace bgfx
 		}
 	}
 
-	void imageRgba8Downsample2x2(uint32_t _width, uint32_t _height, uint32_t _srcPitch, const void* _src, void* _dst)
+	void imageRgba8Downsample2x2(uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src, void* _dst)
 	{
 		const uint32_t dstwidth  = _width/2;
 		const uint32_t dstheight = _height/2;
@@ -311,15 +402,15 @@ namespace bgfx
 		const float4_t linear = float4_ld(2.2f, 2.2f, 2.2f, 1.0f);
 		const float4_t quater = float4_splat(0.25f);
 
-		for (uint32_t yy = 0, ystep = _srcPitch*2; yy < dstheight; ++yy, src += ystep)
+		for (uint32_t yy = 0, ystep = _pitch*2; yy < dstheight; ++yy, src += ystep)
 		{
 			const uint8_t* rgba = src;
 			for (uint32_t xx = 0; xx < dstwidth; ++xx, rgba += 8, dst += 4)
 			{
 				const float4_t abgr0  = float4_splat(rgba);
 				const float4_t abgr1  = float4_splat(rgba+4);
-				const float4_t abgr2  = float4_splat(rgba+_srcPitch);
-				const float4_t abgr3  = float4_splat(rgba+_srcPitch+4);
+				const float4_t abgr2  = float4_splat(rgba+_pitch);
+				const float4_t abgr3  = float4_splat(rgba+_pitch+4);
 
 				const float4_t abgr0m = float4_and(abgr0, umask);
 				const float4_t abgr1m = float4_and(abgr1, umask);
@@ -367,13 +458,56 @@ namespace bgfx
 		}
 	}
 
-	void imageSwizzleBgra8Ref(uint32_t _width, uint32_t _height, uint32_t _srcPitch, const void* _src, void* _dst)
+	void imageRgba32fDownsample2x2NormalMapRef(uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src, void* _dst)
 	{
-		const uint8_t* src = (uint8_t*) _src;
-		const uint8_t* next = src + _srcPitch;
+		const uint32_t dstwidth  = _width/2;
+		const uint32_t dstheight = _height/2;
+
+		if (0 == dstwidth
+		||  0 == dstheight)
+		{
+			return;
+		}
+
+		const uint8_t* src = (const uint8_t*)_src;
 		uint8_t* dst = (uint8_t*)_dst;
 
-		for (uint32_t yy = 0; yy < _height; ++yy, src = next, next += _srcPitch)
+		for (uint32_t yy = 0, ystep = _pitch*2; yy < dstheight; ++yy, src += ystep)
+		{
+			const float* rgba0 = (const float*)&src[0];
+			const float* rgba1 = (const float*)&src[_pitch];
+			for (uint32_t xx = 0; xx < dstwidth; ++xx, rgba0 += 8, rgba1 += 8, dst += 16)
+			{
+				float xyz[3];
+				xyz[0]  = rgba0[0];
+				xyz[1]  = rgba0[1];
+				xyz[2]  = rgba0[2];
+				xyz[0] += rgba0[4];
+				xyz[1] += rgba0[5];
+				xyz[2] += rgba0[6];
+				xyz[0] += rgba1[0];
+				xyz[1] += rgba1[1];
+				xyz[2] += rgba1[2];
+				xyz[0] += rgba1[4];
+				xyz[1] += rgba1[5];
+				xyz[2] += rgba1[6];
+				bx::vec3Norm( (float*)dst, xyz);
+			}
+		}
+	}
+
+	void imageRgba32fDownsample2x2NormalMap(uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src, void* _dst)
+	{
+		imageRgba32fDownsample2x2NormalMapRef(_width, _height, _pitch, _src, _dst);
+	}
+
+	void imageSwizzleBgra8Ref(uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src, void* _dst)
+	{
+		const uint8_t* src = (uint8_t*) _src;
+		const uint8_t* next = src + _pitch;
+		uint8_t* dst = (uint8_t*)_dst;
+
+		for (uint32_t yy = 0; yy < _height; ++yy, src = next, next += _pitch)
 		{
 			for (uint32_t xx = 0; xx < _width; ++xx, src += 4, dst += 4)
 			{
@@ -389,7 +523,7 @@ namespace bgfx
 		}
 	}
 
-	void imageSwizzleBgra8(uint32_t _width, uint32_t _height, uint32_t _srcPitch, const void* _src, void* _dst)
+	void imageSwizzleBgra8(uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src, void* _dst)
 	{
 		// Test can we do four 4-byte pixels at the time.
 		if (0 != (_width&0x3)
@@ -401,7 +535,7 @@ namespace bgfx
 			BX_WARN(bx::isPtrAligned(_src, 16), "Source %p is not 16-byte aligned.", _src);
 			BX_WARN(bx::isPtrAligned(_dst, 16), "Destination %p is not 16-byte aligned.", _dst);
 			BX_WARN(_width < 4, "Image width must be multiple of 4 (width %d).", _width);
-			imageSwizzleBgra8Ref(_width, _height, _srcPitch, _src, _dst);
+			imageSwizzleBgra8Ref(_width, _height, _pitch, _src, _dst);
 			return;
 		}
 
@@ -410,12 +544,12 @@ namespace bgfx
 		const float4_t mf0f0 = float4_isplat(0xff00ff00);
 		const float4_t m0f0f = float4_isplat(0x00ff00ff);
 		const uint8_t* src = (uint8_t*) _src;
-		const uint8_t* next = src + _srcPitch;
+		const uint8_t* next = src + _pitch;
 		uint8_t* dst = (uint8_t*)_dst;
 
 		const uint32_t width = _width/4;
 
-		for (uint32_t yy = 0; yy < _height; ++yy, src = next, next += _srcPitch)
+		for (uint32_t yy = 0; yy < _height; ++yy, src = next, next += _pitch)
 		{
 			for (uint32_t xx = 0; xx < width; ++xx, src += 16, dst += 16)
 			{
@@ -443,51 +577,856 @@ namespace bgfx
 		}
 	}
 
-	void imageCopy(uint32_t _width, uint32_t _height, uint32_t _bpp, uint32_t _srcPitch, const void* _src, void* _dst)
+	void imageCopy(uint32_t _width, uint32_t _height, uint32_t _bpp, uint32_t _pitch, const void* _src, void* _dst)
 	{
 		const uint32_t dstPitch = _width*_bpp/8;
-		imageCopy(_height, _srcPitch, _src, dstPitch, _dst);
+		imageCopy(_height, _pitch, _src, dstPitch, _dst);
 	}
 
-	void imageWriteTga(bx::WriterI* _writer, uint32_t _width, uint32_t _height, uint32_t _srcPitch, const void* _src, bool _grayscale, bool _yflip)
+	uint32_t toUnorm(float _value, float _scale)
 	{
-		uint8_t type = _grayscale ? 3 : 2;
-		uint8_t bpp = _grayscale ? 8 : 32;
+		return uint32_t(bx::fround(
+					bx::fsaturate(_value) * _scale)
+					);
+	}
 
-		uint8_t header[18] = {};
-		header[2] = type;
-		header[12] = _width&0xff;
-		header[13] = (_width>>8)&0xff;
-		header[14] = _height&0xff;
-		header[15] = (_height>>8)&0xff;
-		header[16] = bpp;
-		header[17] = 32;
+	float fromUnorm(uint32_t _value, float _scale)
+	{
+		return float(_value) / _scale;
+	}
 
-		bx::write(_writer, header, sizeof(header) );
+	int32_t toSnorm(float _value, float _scale)
+	{
+		return int32_t(bx::fround(
+					bx::fclamp(_value, -1.0f, 1.0f) * _scale)
+					);
+	}
 
-		uint32_t dstPitch = _width*bpp/8;
-		if (_yflip)
+	float fromSnorm(int32_t _value, float _scale)
+	{
+		return bx::fmax(-1.0f, float(_value) / _scale);
+	}
+
+	// R8
+	void packR8(void* _dst, const float* _src)
+	{
+		uint8_t* dst = (uint8_t*)_dst;
+		dst[0] = uint8_t(toUnorm(_src[0], 255.0f) );
+	}
+
+	void unpackR8(float* _dst, const void* _src)
+	{
+		const uint8_t* src = (const uint8_t*)_src;
+		_dst[0] = fromUnorm(src[0], 255.0f);
+	}
+
+	// R8S
+	void packR8S(void* _dst, const float* _src)
+	{
+		int8_t* dst = (int8_t*)_dst;
+		dst[0] = int8_t(toSnorm(_src[0], 127.0f) );
+	}
+
+	void unpackR8S(float* _dst, const void* _src)
+	{
+		const int8_t* src = (const int8_t*)_src;
+		_dst[0] = fromSnorm(src[0], 127.0f);
+	}
+
+	// R8I
+	void packR8I(void* _dst, const float* _src)
+	{
+		int8_t* dst = (int8_t*)_dst;
+		dst[0] = int8_t(_src[0]);
+	}
+
+	void unpackR8I(float* _dst, const void* _src)
+	{
+		const int8_t* src = (const int8_t*)_src;
+		_dst[0] = float(src[0]);
+	}
+
+	// R8U
+	void packR8U(void* _dst, const float* _src)
+	{
+		uint8_t* dst = (uint8_t*)_dst;
+		dst[0] = uint8_t(_src[0]);
+	}
+
+	void unpackR8U(float* _dst, const void* _src)
+	{
+		const uint8_t* src = (const uint8_t*)_src;
+		_dst[0] = float(src[0]);
+	}
+
+	// RG8
+	void packRg8(void* _dst, const float* _src)
+	{
+		uint8_t* dst = (uint8_t*)_dst;
+		dst[0] = uint8_t(toUnorm(_src[0], 255.0f) );
+		dst[1] = uint8_t(toUnorm(_src[1], 255.0f) );
+	}
+
+	void unpackRg8(float* _dst, const void* _src)
+	{
+		const uint8_t* src = (const uint8_t*)_src;
+		_dst[0] = fromUnorm(src[0], 255.0f);
+		_dst[1] = fromUnorm(src[1], 255.0f);
+	}
+
+	// RG8S
+	void packRg8S(void* _dst, const float* _src)
+	{
+		int8_t* dst = (int8_t*)_dst;
+		dst[0] = int8_t(toSnorm(_src[0], 127.0f) );
+		dst[1] = int8_t(toSnorm(_src[1], 127.0f) );
+	}
+
+	void unpackRg8S(float* _dst, const void* _src)
+	{
+		const int8_t* src = (const int8_t*)_src;
+		_dst[0] = fromSnorm(src[0], 127.0f);
+		_dst[1] = fromSnorm(src[1], 127.0f);
+	}
+
+	// RG8I
+	void packRg8I(void* _dst, const float* _src)
+	{
+		int8_t* dst = (int8_t*)_dst;
+		dst[0] = int8_t(_src[0]);
+		dst[1] = int8_t(_src[1]);
+	}
+
+	void unpackRg8I(float* _dst, const void* _src)
+	{
+		const int8_t* src = (const int8_t*)_src;
+		_dst[0] = float(src[0]);
+		_dst[1] = float(src[1]);
+	}
+
+	// RG8U
+	void packRg8U(void* _dst, const float* _src)
+	{
+		uint8_t* dst = (uint8_t*)_dst;
+		dst[0] = uint8_t(_src[0]);
+		dst[1] = uint8_t(_src[1]);
+	}
+
+	void unpackRg8U(float* _dst, const void* _src)
+	{
+		const uint8_t* src = (const uint8_t*)_src;
+		_dst[0] = float(src[0]);
+		_dst[1] = float(src[1]);
+	}
+
+	// RGBA8
+	void packRgba8(void* _dst, const float* _src)
+	{
+		uint8_t* dst = (uint8_t*)_dst;
+		dst[0] = uint8_t(toUnorm(_src[0], 255.0f) );
+		dst[1] = uint8_t(toUnorm(_src[1], 255.0f) );
+		dst[2] = uint8_t(toUnorm(_src[2], 255.0f) );
+		dst[3] = uint8_t(toUnorm(_src[3], 255.0f) );
+	}
+
+	void unpackRgba8(float* _dst, const void* _src)
+	{
+		const uint8_t* src = (const uint8_t*)_src;
+		_dst[0] = fromUnorm(src[0], 255.0f);
+		_dst[1] = fromUnorm(src[1], 255.0f);
+		_dst[2] = fromUnorm(src[2], 255.0f);
+		_dst[3] = fromUnorm(src[3], 255.0f);
+	}
+
+	// BGRA8
+	void packBgra8(void* _dst, const float* _src)
+	{
+		uint8_t* dst = (uint8_t*)_dst;
+		dst[2] = uint8_t(toUnorm(_src[0], 255.0f) );
+		dst[1] = uint8_t(toUnorm(_src[1], 255.0f) );
+		dst[0] = uint8_t(toUnorm(_src[2], 255.0f) );
+		dst[3] = uint8_t(toUnorm(_src[3], 255.0f) );
+	}
+
+	void unpackBgra8(float* _dst, const void* _src)
+	{
+		const uint8_t* src = (const uint8_t*)_src;
+		_dst[0] = fromUnorm(src[2], 255.0f);
+		_dst[1] = fromUnorm(src[1], 255.0f);
+		_dst[2] = fromUnorm(src[0], 255.0f);
+		_dst[3] = fromUnorm(src[3], 255.0f);
+	}
+
+	// RGBA8S
+	void packRgba8S(void* _dst, const float* _src)
+	{
+		int8_t* dst = (int8_t*)_dst;
+		dst[0] = int8_t(toSnorm(_src[0], 127.0f) );
+		dst[1] = int8_t(toSnorm(_src[1], 127.0f) );
+		dst[2] = int8_t(toSnorm(_src[2], 127.0f) );
+		dst[3] = int8_t(toSnorm(_src[3], 127.0f) );
+	}
+
+	void unpackRgba8S(float* _dst, const void* _src)
+	{
+		const int8_t* src = (const int8_t*)_src;
+		_dst[0] = fromSnorm(src[0], 127.0f);
+		_dst[1] = fromSnorm(src[1], 127.0f);
+		_dst[2] = fromSnorm(src[2], 127.0f);
+		_dst[3] = fromSnorm(src[3], 127.0f);
+	}
+
+	// RGBA8I
+	void packRgba8I(void* _dst, const float* _src)
+	{
+		int8_t* dst = (int8_t*)_dst;
+		dst[0] = int8_t(_src[0]);
+		dst[1] = int8_t(_src[1]);
+		dst[2] = int8_t(_src[2]);
+		dst[3] = int8_t(_src[3]);
+	}
+
+	void unpackRgba8I(float* _dst, const void* _src)
+	{
+		const int8_t* src = (const int8_t*)_src;
+		_dst[0] = float(src[0]);
+		_dst[1] = float(src[1]);
+		_dst[2] = float(src[2]);
+		_dst[3] = float(src[3]);
+	}
+
+	// RGBA8U
+	void packRgba8U(void* _dst, const float* _src)
+	{
+		uint8_t* dst = (uint8_t*)_dst;
+		dst[0] = uint8_t(_src[0]);
+		dst[1] = uint8_t(_src[1]);
+		dst[2] = uint8_t(_src[2]);
+		dst[3] = uint8_t(_src[3]);
+	}
+
+	void unpackRgba8U(float* _dst, const void* _src)
+	{
+		const uint8_t* src = (const uint8_t*)_src;
+		_dst[0] = float(src[0]);
+		_dst[1] = float(src[1]);
+		_dst[2] = float(src[2]);
+		_dst[3] = float(src[3]);
+	}
+
+	// R16
+	void packR16(void* _dst, const float* _src)
+	{
+		uint16_t* dst = (uint16_t*)_dst;
+		dst[0] = uint16_t(toUnorm(_src[0], 65535.0f) );
+	}
+
+	void unpackR16(float* _dst, const void* _src)
+	{
+		const uint16_t* src = (const uint16_t*)_src;
+		_dst[0] = fromUnorm(src[0], 65535.0f);
+	}
+
+	// R16S
+	void packR16S(void* _dst, const float* _src)
+	{
+		int16_t* dst = (int16_t*)_dst;
+		dst[0] = int16_t(toSnorm(_src[0], 32767.0f) );
+	}
+
+	void unpackR16S(float* _dst, const void* _src)
+	{
+		const int16_t* src = (const int16_t*)_src;
+		_dst[0] = fromSnorm(src[0], 32767.0f);
+	}
+
+	// R16I
+	void packR16I(void* _dst, const float* _src)
+	{
+		int16_t* dst = (int16_t*)_dst;
+		dst[0] = int16_t(_src[0]);
+	}
+
+	void unpackR16I(float* _dst, const void* _src)
+	{
+		const int16_t* src = (const int16_t*)_src;
+		_dst[0] = float(src[0]);
+	}
+
+	// R16U
+	void packR16U(void* _dst, const float* _src)
+	{
+		uint16_t* dst = (uint16_t*)_dst;
+		dst[0] = uint16_t(_src[0]);
+	}
+
+	void unpackR16U(float* _dst, const void* _src)
+	{
+		const uint16_t* src = (const uint16_t*)_src;
+		_dst[0] = float(src[0]);
+	}
+
+	// R16F
+	void packR16F(void* _dst, const float* _src)
+	{
+		uint16_t* dst = (uint16_t*)_dst;
+		dst[0] = bx::halfFromFloat(_src[0]);
+	}
+
+	void unpackR16F(float* _dst, const void* _src)
+	{
+		const uint16_t* src = (const uint16_t*)_src;
+		_dst[0] = bx::halfToFloat(src[0]);
+	}
+
+	// RG16
+	void packRg16(void* _dst, const float* _src)
+	{
+		uint16_t* dst = (uint16_t*)_dst;
+		dst[0] = uint16_t(toUnorm(_src[0], 65535.0f) );
+		dst[1] = uint16_t(toUnorm(_src[1], 65535.0f) );
+	}
+
+	void unpackRg16(float* _dst, const void* _src)
+	{
+		const uint16_t* src = (const uint16_t*)_src;
+		_dst[0] = fromUnorm(src[0], 65535.0f);
+		_dst[1] = fromUnorm(src[1], 65535.0f);
+	}
+
+	// RG16S
+	void packRg16S(void* _dst, const float* _src)
+	{
+		int16_t* dst = (int16_t*)_dst;
+		dst[0] = int16_t(toSnorm(_src[0], 32767.0f) );
+		dst[1] = int16_t(toSnorm(_src[1], 32767.0f) );
+	}
+
+	void unpackRg16S(float* _dst, const void* _src)
+	{
+		const int16_t* src = (const int16_t*)_src;
+		_dst[0] = fromSnorm(src[0], 32767.0f);
+		_dst[1] = fromSnorm(src[1], 32767.0f);
+	}
+
+	// RG16I
+	void packRg16I(void* _dst, const float* _src)
+	{
+		int16_t* dst = (int16_t*)_dst;
+		dst[0] = int16_t(_src[0]);
+		dst[1] = int16_t(_src[1]);
+	}
+
+	void unpackRg16I(float* _dst, const void* _src)
+	{
+		const int16_t* src = (const int16_t*)_src;
+		_dst[0] = float(src[0]);
+		_dst[1] = float(src[1]);
+	}
+
+	// RG16U
+	void packRg16U(void* _dst, const float* _src)
+	{
+		uint16_t* dst = (uint16_t*)_dst;
+		dst[0] = uint16_t(_src[0]);
+		dst[1] = uint16_t(_src[1]);
+	}
+
+	void unpackRg16U(float* _dst, const void* _src)
+	{
+		const uint16_t* src = (const uint16_t*)_src;
+		_dst[0] = float(src[0]);
+		_dst[1] = float(src[1]);
+	}
+
+	// RG16F
+	void packRg16F(void* _dst, const float* _src)
+	{
+		uint16_t* dst = (uint16_t*)_dst;
+		dst[0] = bx::halfFromFloat(_src[0]);
+		dst[1] = bx::halfFromFloat(_src[1]);
+	}
+
+	void unpackRg16F(float* _dst, const void* _src)
+	{
+		const uint16_t* src = (const uint16_t*)_src;
+		_dst[0] = bx::halfToFloat(src[0]);
+		_dst[1] = bx::halfToFloat(src[1]);
+	}
+
+	// RGBA16
+	void packRgba16(void* _dst, const float* _src)
+	{
+		uint16_t* dst = (uint16_t*)_dst;
+		dst[0] = uint16_t(toUnorm(_src[0], 65535.0f) );
+		dst[1] = uint16_t(toUnorm(_src[1], 65535.0f) );
+		dst[2] = uint16_t(toUnorm(_src[2], 65535.0f) );
+		dst[3] = uint16_t(toUnorm(_src[3], 65535.0f) );
+	}
+
+	void unpackRgba16(float* _dst, const void* _src)
+	{
+		const uint16_t* src = (const uint16_t*)_src;
+		_dst[0] = fromUnorm(src[0], 65535.0f);
+		_dst[1] = fromUnorm(src[1], 65535.0f);
+		_dst[2] = fromUnorm(src[2], 65535.0f);
+		_dst[3] = fromUnorm(src[3], 65535.0f);
+	}
+
+	// RGBA16S
+	void packRgba16S(void* _dst, const float* _src)
+	{
+		int16_t* dst = (int16_t*)_dst;
+		dst[0] = int16_t(toSnorm(_src[0], 32767.0f) );
+		dst[1] = int16_t(toSnorm(_src[1], 32767.0f) );
+		dst[2] = int16_t(toSnorm(_src[2], 32767.0f) );
+		dst[3] = int16_t(toSnorm(_src[3], 32767.0f) );
+	}
+
+	void unpackRgba16S(float* _dst, const void* _src)
+	{
+		const int16_t* src = (const int16_t*)_src;
+		_dst[0] = fromSnorm(src[0], 32767.0f);
+		_dst[1] = fromSnorm(src[1], 32767.0f);
+		_dst[2] = fromSnorm(src[2], 32767.0f);
+		_dst[3] = fromSnorm(src[3], 32767.0f);
+	}
+
+	// RGBA16I
+	void packRgba16I(void* _dst, const float* _src)
+	{
+		int16_t* dst = (int16_t*)_dst;
+		dst[0] = int16_t(_src[0]);
+		dst[1] = int16_t(_src[1]);
+		dst[2] = int16_t(_src[2]);
+		dst[3] = int16_t(_src[3]);
+	}
+
+	void unpackRgba16I(float* _dst, const void* _src)
+	{
+		const int16_t* src = (const int16_t*)_src;
+		_dst[0] = float(src[0]);
+		_dst[1] = float(src[1]);
+		_dst[2] = float(src[2]);
+		_dst[3] = float(src[3]);
+	}
+
+	// RGBA16U
+	void packRgba16U(void* _dst, const float* _src)
+	{
+		uint16_t* dst = (uint16_t*)_dst;
+		dst[0] = uint16_t(_src[0]);
+		dst[1] = uint16_t(_src[1]);
+		dst[2] = uint16_t(_src[2]);
+		dst[3] = uint16_t(_src[3]);
+	}
+
+	void unpackRgba16U(float* _dst, const void* _src)
+	{
+		const uint16_t* src = (const uint16_t*)_src;
+		_dst[0] = float(src[0]);
+		_dst[1] = float(src[1]);
+		_dst[2] = float(src[2]);
+		_dst[3] = float(src[3]);
+	}
+
+	// RGBA16F
+	void packRgba16F(void* _dst, const float* _src)
+	{
+		uint16_t* dst = (uint16_t*)_dst;
+		dst[0] = bx::halfFromFloat(_src[0]);
+		dst[1] = bx::halfFromFloat(_src[1]);
+		dst[2] = bx::halfFromFloat(_src[2]);
+		dst[3] = bx::halfFromFloat(_src[3]);
+	}
+
+	void unpackRgba16F(float* _dst, const void* _src)
+	{
+		const uint16_t* src = (const uint16_t*)_src;
+		_dst[0] = bx::halfToFloat(src[0]);
+		_dst[1] = bx::halfToFloat(src[1]);
+		_dst[2] = bx::halfToFloat(src[2]);
+		_dst[3] = bx::halfToFloat(src[3]);
+	}
+
+	// R32I
+	void packR32I(void* _dst, const float* _src)
+	{
+		memcpy(_dst, _src, 4);
+	}
+
+	void unpackR32I(float* _dst, const void* _src)
+	{
+		memcpy(_dst, _src, 4);
+	}
+
+	// R32U
+	void packR32U(void* _dst, const float* _src)
+	{
+		memcpy(_dst, _src, 4);
+	}
+
+	void unpackR32U(float* _dst, const void* _src)
+	{
+		memcpy(_dst, _src, 4);
+	}
+
+	// R32F
+	void packR32F(void* _dst, const float* _src)
+	{
+		memcpy(_dst, _src, 4);
+	}
+
+	void unpackR32F(float* _dst, const void* _src)
+	{
+		memcpy(_dst, _src, 4);
+	}
+
+	// RG32I
+	void packRg32I(void* _dst, const float* _src)
+	{
+		memcpy(_dst, _src, 8);
+	}
+
+	void unpackRg32I(float* _dst, const void* _src)
+	{
+		memcpy(_dst, _src, 8);
+	}
+
+	// RG32U
+	void packRg32U(void* _dst, const float* _src)
+	{
+		memcpy(_dst, _src, 8);
+	}
+
+	void unpackRg32U(float* _dst, const void* _src)
+	{
+		memcpy(_dst, _src, 8);
+	}
+
+	// RG32F
+	void packRg32F(void* _dst, const float* _src)
+	{
+		memcpy(_dst, _src, 8);
+	}
+
+	void unpackRg32F(float* _dst, const void* _src)
+	{
+		memcpy(_dst, _src, 8);
+	}
+
+	template<int32_t MantissaBits, int32_t ExpBits>
+	void encodeRgbE(float* _dst, const float* _src)
+	{
+		// Reference:
+		// https://www.opengl.org/registry/specs/EXT/texture_shared_exponent.txt
+		const int32_t expMax  = (1<<ExpBits) - 1;
+		const int32_t expBias = (1<<(ExpBits - 1) ) - 1;
+		const float   sharedExpMax = float(expMax) / float(expMax + 1) * float(1 << (expMax - expBias) );
+
+		const float rr  = bx::fclamp(_src[0], 0.0f, sharedExpMax);
+		const float gg  = bx::fclamp(_src[1], 0.0f, sharedExpMax);
+		const float bb  = bx::fclamp(_src[2], 0.0f, sharedExpMax);
+		const float max = bx::fmax3(rr, gg, bb);
+		union { float ff; uint32_t ui; } cast = { max };
+		int32_t expShared = int32_t(bx::uint32_imax(uint32_t(-expBias-1), ( ( (cast.ui>>23) & 0xff) - 127) ) ) + 1 + expBias;
+		float denom = bx::fpow(2.0f, float(expShared - expBias - MantissaBits) );
+
+		if ( (1<<MantissaBits) == int32_t(bx::fround(max/denom) ) )
 		{
-			uint8_t* data = (uint8_t*)_src + _srcPitch*_height - _srcPitch;
-			for (uint32_t yy = 0; yy < _height; ++yy)
+			denom *= 2.0f;
+			++expShared;
+		}
+
+		const float invDenom = 1.0f/denom;
+		_dst[0] = bx::fround(rr * invDenom);
+		_dst[1] = bx::fround(gg * invDenom);
+		_dst[2] = bx::fround(bb * invDenom);
+		_dst[3] = float(expShared);
+	}
+
+	template<int32_t MantissaBits, int32_t ExpBits>
+	void decodeRgbE(float* _dst, const float* _src)
+	{
+		const int32_t expBias = (1<<(ExpBits - 1) ) - 1;
+		const float exponent  = _src[3]-float(expBias-MantissaBits);
+		const float scale     = bx::fpow(2.0f, exponent);
+		_dst[0] = _src[0] * scale;
+		_dst[1] = _src[1] * scale;
+		_dst[2] = _src[2] * scale;
+	}
+
+	// RGB9E5F
+	void packRgb9E5F(void* _dst, const float* _src)
+	{
+		float tmp[4];
+		encodeRgbE<9, 5>(tmp, _src);
+
+		*( (uint32_t*)_dst) = 0
+			| (uint32_t(tmp[0])     )
+			| (uint32_t(tmp[1]) << 9)
+			| (uint32_t(tmp[2]) <<18)
+			| (uint32_t(tmp[3]) <<27)
+			;
+	}
+
+	void unpackRgb9E5F(float* _dst, const void* _src)
+	{
+		uint32_t packed = *( (const uint32_t*)_src);
+
+		float tmp[4];
+		tmp[0] = float( ( (packed    ) & 0x1ff) ) / 511.0f;
+		tmp[1] = float( ( (packed>> 9) & 0x1ff) ) / 511.0f;
+		tmp[2] = float( ( (packed>>18) & 0x1ff) ) / 511.0f;
+		tmp[3] = float( ( (packed>>27) &  0x1f) );
+
+		decodeRgbE<9, 5>(_dst, tmp);
+	}
+
+	// RGBA32I
+	void packRgba32I(void* _dst, const float* _src)
+	{
+		memcpy(_dst, _src, 16);
+	}
+
+	void unpackRgba32I(float* _dst, const void* _src)
+	{
+		memcpy(_dst, _src, 16);
+	}
+
+	// RGBA32U
+	void packRgba32U(void* _dst, const float* _src)
+	{
+		memcpy(_dst, _src, 16);
+	}
+
+	void unpackRgba32U(float* _dst, const void* _src)
+	{
+		memcpy(_dst, _src, 16);
+	}
+
+	// RGBA32F
+	void packRgba32F(void* _dst, const float* _src)
+	{
+		memcpy(_dst, _src, 16);
+	}
+
+	void unpackRgba32F(float* _dst, const void* _src)
+	{
+		memcpy(_dst, _src, 16);
+	}
+
+	// R5G6B5
+	void packR5G6B5(void* _dst, const float* _src)
+	{
+		*( (uint16_t*)_dst) = 0
+			| uint16_t(toUnorm(_src[0], 31.0f)    )
+			| uint16_t(toUnorm(_src[1], 63.0f)<< 5)
+			| uint16_t(toUnorm(_src[2], 31.0f)<<11)
+			;
+	}
+
+	void unpackR5G6B5(float* _dst, const void* _src)
+	{
+		uint16_t packed = *( (const uint16_t*)_src);
+		_dst[0] = float( ( (packed    ) & 0x1f) ) / 31.0f;
+		_dst[1] = float( ( (packed>> 5) & 0x3f) ) / 63.0f;
+		_dst[2] = float( ( (packed>>11) & 0x1f) ) / 31.0f;
+	}
+
+	// RGBA4
+	void packRgba4(void* _dst, const float* _src)
+	{
+		*( (uint16_t*)_dst) = 0
+			| uint16_t(toUnorm(_src[0], 15.0f)    )
+			| uint16_t(toUnorm(_src[1], 15.0f)<< 4)
+			| uint16_t(toUnorm(_src[2], 15.0f)<< 8)
+			| uint16_t(toUnorm(_src[3], 15.0f)<<12)
+			;
+	}
+
+	void unpackRgba4(float* _dst, const void* _src)
+	{
+		uint16_t packed = *( (const uint16_t*)_src);
+		_dst[0] = float( ( (packed    ) & 0xf) ) / 15.0f;
+		_dst[1] = float( ( (packed>> 4) & 0xf) ) / 15.0f;
+		_dst[2] = float( ( (packed>> 8) & 0xf) ) / 15.0f;
+		_dst[3] = float( ( (packed>>12) & 0xf) ) / 15.0f;
+	}
+
+	// RGB5A1
+	void packRgb5a1(void* _dst, const float* _src)
+	{
+		*( (uint16_t*)_dst) = 0
+			| uint16_t(toUnorm(_src[0], 31.0f)    )
+			| uint16_t(toUnorm(_src[1], 31.0f)<< 5)
+			| uint16_t(toUnorm(_src[2], 31.0f)<<10)
+			| uint16_t(toUnorm(_src[3],  1.0f)<<15)
+			;
+	}
+
+	void unpackRgb5a1(float* _dst, const void* _src)
+	{
+		uint16_t packed = *( (const uint16_t*)_src);
+		_dst[0] = float( ( (packed    ) & 0x1f) ) / 31.0f;
+		_dst[1] = float( ( (packed>> 5) & 0x1f) ) / 31.0f;
+		_dst[2] = float( ( (packed>>10) & 0x1f) ) / 31.0f;
+		_dst[3] = float( ( (packed>>14) &  0x1) );
+	}
+
+	// RGB10A2
+	void packRgb10A2(void* _dst, const float* _src)
+	{
+		*( (uint32_t*)_dst) = 0
+			| (toUnorm(_src[0], 1023.0f)    )
+			| (toUnorm(_src[1], 1023.0f)<<10)
+			| (toUnorm(_src[2], 1023.0f)<<20)
+			| (toUnorm(_src[3],    3.0f)<<30)
+			;
+	}
+
+	void unpackRgb10A2(float* _dst, const void* _src)
+	{
+		uint32_t packed = *( (const uint32_t*)_src);
+		_dst[0] = float( ( (packed    ) & 0x3ff) ) / 1023.0f;
+		_dst[1] = float( ( (packed>>10) & 0x3ff) ) / 1023.0f;
+		_dst[2] = float( ( (packed>>20) & 0x3ff) ) / 1023.0f;
+		_dst[3] = float( ( (packed>>30) &   0x3) ) /    3.0f;
+	}
+
+	// R11G11B10F
+	void packR11G11B10F(void* _dst, const float* _src)
+	{
+		*( (uint32_t*)_dst) = 0
+			| ( (bx::halfFromFloat(_src[0])>> 4) &      0x7ff)
+			| ( (bx::halfFromFloat(_src[0])<< 7) &   0x3ff800)
+			| ( (bx::halfFromFloat(_src[0])<<17) & 0xffc00000)
+			;
+	}
+
+	void unpackR11G11B10F(float* _dst, const void* _src)
+	{
+		uint32_t packed = *( (const uint32_t*)_src);
+		_dst[0] = bx::halfToFloat( (packed<< 4) & 0x7ff0);
+		_dst[1] = bx::halfToFloat( (packed>> 7) & 0x7ff0);
+		_dst[2] = bx::halfToFloat( (packed>>17) & 0x7fe0);
+	}
+
+	typedef void (*PackFn)(void*, const float*);
+	typedef void (*UnpackFn)(float*, const void*);
+
+	struct PackUnpack
+	{
+		PackFn pack;
+		UnpackFn unpack;
+	};
+
+	static PackUnpack s_packUnpack[] =
+	{
+		{ NULL,           NULL             }, // BC1
+		{ NULL,           NULL             }, // BC2
+		{ NULL,           NULL             }, // BC3
+		{ NULL,           NULL             }, // BC4
+		{ NULL,           NULL             }, // BC5
+		{ NULL,           NULL             }, // BC6H
+		{ NULL,           NULL             }, // BC7
+		{ NULL,           NULL             }, // ETC1
+		{ NULL,           NULL             }, // ETC2
+		{ NULL,           NULL             }, // ETC2A
+		{ NULL,           NULL             }, // ETC2A1
+		{ NULL,           NULL             }, // PTC12
+		{ NULL,           NULL             }, // PTC14
+		{ NULL,           NULL             }, // PTC12A
+		{ NULL,           NULL             }, // PTC14A
+		{ NULL,           NULL             }, // PTC22
+		{ NULL,           NULL             }, // PTC24
+		{ NULL,           NULL             }, // Unknown
+		{ NULL,           NULL             }, // R1
+		{ packR8,         unpackR8         }, // A8
+		{ packR8,         unpackR8         }, // R8
+		{ packR8I,        unpackR8I        }, // R8I
+		{ packR8U,        unpackR8U        }, // R8U
+		{ packR8S,        unpackR8S        }, // R8S
+		{ packR16,        unpackR16        }, // R16
+		{ packR16I,       unpackR16I       }, // R16I
+		{ packR16U,       unpackR16U       }, // R16U
+		{ packR16F,       unpackR16F       }, // R16F
+		{ packR16S,       unpackR16S       }, // R16S
+		{ packR32I,       unpackR32I       }, // R32I
+		{ packR32U,       unpackR32U       }, // R32U
+		{ packR32F,       unpackR32F       }, // R32F
+		{ packRg8,        unpackRg8        }, // RG8
+		{ packRg8I,       unpackRg8I       }, // RG8I
+		{ packRg8U,       unpackRg8U       }, // RG8U
+		{ packRg8S,       unpackRg8S       }, // RG8S
+		{ packRg16,       unpackRg16       }, // RG16
+		{ packRg16I,      unpackRg16I      }, // RG16I
+		{ packRg16U,      unpackRg16U      }, // RG16U
+		{ packRg16F,      unpackRg16F      }, // RG16F
+		{ packRg16S,      unpackRg16S      }, // RG16S
+		{ packRg32I,      unpackRg32I      }, // RG32I
+		{ packRg32U,      unpackRg32U      }, // RG32U
+		{ packRg32F,      unpackRg32F      }, // RG32F
+		{ packRgb9E5F,    unpackRgb9E5F    }, // RGB9E5F
+		{ packBgra8,      unpackBgra8      }, // BGRA8
+		{ packRgba8,      unpackRgba8      }, // RGBA8
+		{ packRgba8I,     unpackRgba8I     }, // RGBA8I
+		{ packRgba8U,     unpackRgba8U     }, // RGBA8U
+		{ packRgba8S,     unpackRgba8S     }, // RGBA8S
+		{ packRgba16,     unpackRgba16     }, // RGBA16
+		{ packRgba16I,    unpackRgba16I    }, // RGBA16I
+		{ packRgba16U,    unpackRgba16U    }, // RGBA16U
+		{ packRgba16F,    unpackRgba16F    }, // RGBA16F
+		{ packRgba16S,    unpackRgba16S    }, // RGBA16S
+		{ packRgba32I,    unpackRgba32I    }, // RGBA32I
+		{ packRgba32U,    unpackRgba32U    }, // RGBA32U
+		{ packRgba32F,    unpackRgba32F    }, // RGBA32F
+		{ packR5G6B5,     unpackR5G6B5     }, // R5G6B5
+		{ packRgba4,      unpackRgba4      }, // RGBA4
+		{ packRgb5a1,     unpackRgb5a1     }, // RGB5A1
+		{ packRgb10A2,    unpackRgb10A2    }, // RGB10A2
+		{ packR11G11B10F, unpackR11G11B10F }, // R11G11B10F
+		{ NULL,           NULL             }, // UnknownDepth
+		{ NULL,           NULL             }, // D16
+		{ NULL,           NULL             }, // D24
+		{ NULL,           NULL             }, // D24S8
+		{ NULL,           NULL             }, // D32
+		{ NULL,           NULL             }, // D16F
+		{ NULL,           NULL             }, // D24F
+		{ NULL,           NULL             }, // D32F
+		{ NULL,           NULL             }, // D0S8
+	};
+	BX_STATIC_ASSERT(TextureFormat::Count == BX_COUNTOF(s_packUnpack) );
+
+	bool imageConvert(void* _dst, TextureFormat::Enum _dstFormat, const void* _src, TextureFormat::Enum _srcFormat, uint32_t _width, uint32_t _height)
+	{
+		UnpackFn unpack = s_packUnpack[_srcFormat].unpack;
+		PackFn   pack   = s_packUnpack[_dstFormat].pack;
+		if (NULL == pack
+		||  NULL == unpack)
+		{
+			return false;
+		}
+
+		const uint8_t* src = (uint8_t*)_src;
+		uint8_t* dst = (uint8_t*)_dst;
+
+		const uint32_t srcBpp   = s_imageBlockInfo[_srcFormat].bitsPerPixel;
+		const uint32_t dstBpp   = s_imageBlockInfo[_dstFormat].bitsPerPixel;
+		const uint32_t srcPitch = _width * srcBpp / 8;
+		const uint32_t dstPitch = _width * dstBpp / 8;
+
+		for (uint32_t yy = 0; yy < _height; ++yy, src += srcPitch, dst += dstPitch)
+		{
+			for (uint32_t xx = 0; xx < _width; ++xx)
 			{
-				bx::write(_writer, data, dstPitch);
-				data -= _srcPitch;
+				float rgba[4];
+				unpack(rgba, &src[xx*srcBpp/8]);
+				pack(&dst[xx*dstBpp/8], rgba);
 			}
 		}
-		else if (_srcPitch == dstPitch)
-		{
-			bx::write(_writer, _src, _height*_srcPitch);
-		}
-		else
-		{
-			uint8_t* data = (uint8_t*)_src;
-			for (uint32_t yy = 0; yy < _height; ++yy)
-			{
-				bx::write(_writer, data, dstPitch);
-				data += _srcPitch;
-			}
-		}
+
+		return true;
 	}
 
 	uint8_t bitRangeConvert(uint32_t _in, uint32_t _from, uint32_t _to)
@@ -1274,6 +2213,34 @@ namespace bgfx
 		}
 	}
 
+	const Memory* imageAlloc(ImageContainer& _imageContainer, TextureFormat::Enum _format, uint16_t _width, uint16_t _height, uint16_t _depth, bool _cubeMap, bool _mips)
+	{
+		const uint8_t numMips = _mips ? imageGetNumMips(_format, _width, _height) : 1;
+		uint32_t size = imageGetSize(_format, _width, _height, 0, false, numMips);
+		const Memory* image = alloc(size);
+
+		_imageContainer.m_data     = image->data;
+		_imageContainer.m_format   = _format;
+		_imageContainer.m_size     = image->size;
+		_imageContainer.m_offset   = 0;
+		_imageContainer.m_width    = _width;
+		_imageContainer.m_height   = _height;
+		_imageContainer.m_depth    = _depth;
+		_imageContainer.m_numMips  = numMips;
+		_imageContainer.m_hasAlpha = false;
+		_imageContainer.m_cubeMap  = _cubeMap;
+		_imageContainer.m_ktx      = false;
+		_imageContainer.m_ktxLE    = false;
+		_imageContainer.m_srgb     = false;
+
+		return image;
+	}
+
+	void imageFree(const Memory* _memory)
+	{
+		release(_memory);
+	}
+
 // DDS
 #define DDS_MAGIC             BX_MAKEFOURCC('D', 'D', 'S', ' ')
 #define DDS_HEADER_SIZE       124
@@ -1614,18 +2581,19 @@ namespace bgfx
 			}
 		}
 
-		_imageContainer.m_data = NULL;
-		_imageContainer.m_size = 0;
-		_imageContainer.m_offset = (uint32_t)bx::seek(_reader);
-		_imageContainer.m_width  = width;
-		_imageContainer.m_height = height;
-		_imageContainer.m_depth  = depth;
-		_imageContainer.m_format   = uint8_t(format);
+		_imageContainer.m_data     = NULL;
+		_imageContainer.m_size     = 0;
+		_imageContainer.m_offset   = (uint32_t)bx::seek(_reader);
+		_imageContainer.m_width    = width;
+		_imageContainer.m_height   = height;
+		_imageContainer.m_depth    = depth;
+		_imageContainer.m_format   = format;
 		_imageContainer.m_numMips  = uint8_t( (caps[0] & DDSCAPS_MIPMAP) ? mips : 1);
 		_imageContainer.m_hasAlpha = hasAlpha;
 		_imageContainer.m_cubeMap  = cubeMap;
-		_imageContainer.m_ktx = false;
-		_imageContainer.m_srgb = srgb;
+		_imageContainer.m_ktx      = false;
+		_imageContainer.m_ktxLE    = false;
+		_imageContainer.m_srgb     = srgb;
 
 		return TextureFormat::Unknown != format;
 	}
@@ -1654,12 +2622,20 @@ namespace bgfx
 #define KTX_COMPRESSED_RGBA_S3TC_DXT1_EXT             0x83F1
 #define KTX_COMPRESSED_RGBA_S3TC_DXT3_EXT             0x83F2
 #define KTX_COMPRESSED_RGBA_S3TC_DXT5_EXT             0x83F3
+#define KTX_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT       0x8C4D
+#define KTX_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT       0x8C4E
+#define KTX_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT       0x8C4F
 #define KTX_COMPRESSED_LUMINANCE_LATC1_EXT            0x8C70
 #define KTX_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT      0x8C72
 #define KTX_COMPRESSED_RGBA_BPTC_UNORM_ARB            0x8E8C
 #define KTX_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB      0x8E8D
 #define KTX_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB      0x8E8E
 #define KTX_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB    0x8E8F
+#define KTX_COMPRESSED_SRGB_PVRTC_2BPPV1_EXT          0x8A54
+#define KTX_COMPRESSED_SRGB_PVRTC_4BPPV1_EXT          0x8A55
+#define KTX_COMPRESSED_SRGB_ALPHA_PVRTC_2BPPV1_EXT    0x8A56
+#define KTX_COMPRESSED_SRGB_ALPHA_PVRTC_4BPPV1_EXT    0x8A57
+
 #define KTX_R8                                        0x8229
 #define KTX_R16                                       0x822A
 #define KTX_RG8                                       0x822B
@@ -1668,62 +2644,151 @@ namespace bgfx
 #define KTX_R32F                                      0x822E
 #define KTX_RG16F                                     0x822F
 #define KTX_RG32F                                     0x8230
+#define KTX_RGBA8                                     0x8058
 #define KTX_RGBA16                                    0x805B
 #define KTX_RGBA16F                                   0x881A
 #define KTX_R32UI                                     0x8236
 #define KTX_RG32UI                                    0x823C
 #define KTX_RGBA32UI                                  0x8D70
-#define KTX_BGRA                                      0x80E1
 #define KTX_RGBA32F                                   0x8814
 #define KTX_RGB565                                    0x8D62
 #define KTX_RGBA4                                     0x8056
 #define KTX_RGB5_A1                                   0x8057
 #define KTX_RGB10_A2                                  0x8059
+#define KTX_R8I                                       0x8231
+#define KTX_R8UI                                      0x8232
+#define KTX_R16I                                      0x8233
+#define KTX_R16UI                                     0x8234
+#define KTX_R32I                                      0x8235
+#define KTX_R32UI                                     0x8236
+#define KTX_RG8I                                      0x8237
+#define KTX_RG8UI                                     0x8238
+#define KTX_RG16I                                     0x8239
+#define KTX_RG16UI                                    0x823A
+#define KTX_RG32I                                     0x823B
+#define KTX_RG32UI                                    0x823C
+#define KTX_R8_SNORM                                  0x8F94
+#define KTX_RG8_SNORM                                 0x8F95
+#define KTX_RGB8_SNORM                                0x8F96
+#define KTX_RGBA8_SNORM                               0x8F97
+#define KTX_R16_SNORM                                 0x8F98
+#define KTX_RG16_SNORM                                0x8F99
+#define KTX_RGB16_SNORM                               0x8F9A
+#define KTX_RGBA16_SNORM                              0x8F9B
+#define KTX_SRGB8_ALPHA8                              0x8C43
+#define KTX_RGBA32UI                                  0x8D70
+#define KTX_RGB32UI                                   0x8D71
+#define KTX_RGBA16UI                                  0x8D76
+#define KTX_RGB16UI                                   0x8D77
+#define KTX_RGBA8UI                                   0x8D7C
+#define KTX_RGB8UI                                    0x8D7D
+#define KTX_RGBA32I                                   0x8D82
+#define KTX_RGB32I                                    0x8D83
+#define KTX_RGBA16I                                   0x8D88
+#define KTX_RGB16I                                    0x8D89
+#define KTX_RGBA8I                                    0x8D8E
+#define KTX_RGB8I                                     0x8D8F
+#define KTX_RGB9_E5                                   0x8C3D
+#define KTX_R11F_G11F_B10F                            0x8C3A
 
-	static struct TranslateKtxFormat
-	{
-		uint32_t m_format;
-		TextureFormat::Enum m_textureFormat;
+#define KTX_ZERO                                      0
+#define KTX_RED                                       0x1903
+#define KTX_ALPHA                                     0x1906
+#define KTX_RGB                                       0x1907
+#define KTX_RGBA                                      0x1908
+#define KTX_BGRA                                      0x80E1
+#define KTX_RG                                        0x8227
 
-	} s_translateKtxFormat[] =
+#define KTX_BYTE                                      0x1400
+#define KTX_UNSIGNED_BYTE                             0x1401
+#define KTX_SHORT                                     0x1402
+#define KTX_UNSIGNED_SHORT                            0x1403
+#define KTX_INT                                       0x1404
+#define KTX_UNSIGNED_INT                              0x1405
+#define KTX_FLOAT                                     0x1406
+#define KTX_HALF_FLOAT                                0x140B
+#define KTX_UNSIGNED_INT_5_9_9_9_REV                  0x8C3E
+#define KTX_UNSIGNED_SHORT_5_6_5                      0x8363
+#define KTX_UNSIGNED_SHORT_4_4_4_4                    0x8033
+#define KTX_UNSIGNED_SHORT_5_5_5_1                    0x8034
+#define KTX_UNSIGNED_INT_2_10_10_10_REV               0x8368
+#define KTX_UNSIGNED_INT_10F_11F_11F_REV              0x8C3B
+
+	struct KtxFormatInfo
 	{
-		{ KTX_COMPRESSED_RGBA_S3TC_DXT1_EXT,             TextureFormat::BC1     },
-		{ KTX_COMPRESSED_RGBA_S3TC_DXT3_EXT,             TextureFormat::BC2     },
-		{ KTX_COMPRESSED_RGBA_S3TC_DXT5_EXT,             TextureFormat::BC3     },
-		{ KTX_COMPRESSED_LUMINANCE_LATC1_EXT,            TextureFormat::BC4     },
-		{ KTX_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT,      TextureFormat::BC5     },
-		{ KTX_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB,      TextureFormat::BC6H    },
-		{ KTX_COMPRESSED_RGBA_BPTC_UNORM_ARB,            TextureFormat::BC7     },
-		{ KTX_ETC1_RGB8_OES,                             TextureFormat::ETC1    },
-		{ KTX_COMPRESSED_RGB8_ETC2,                      TextureFormat::ETC2    },
-		{ KTX_COMPRESSED_RGBA8_ETC2_EAC,                 TextureFormat::ETC2A   },
-		{ KTX_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2,  TextureFormat::ETC2A1  },
-		{ KTX_COMPRESSED_RGB_PVRTC_2BPPV1_IMG,           TextureFormat::PTC12   },
-		{ KTX_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG,          TextureFormat::PTC12A  },
-		{ KTX_COMPRESSED_RGB_PVRTC_4BPPV1_IMG,           TextureFormat::PTC14   },
-		{ KTX_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG,          TextureFormat::PTC14A  },
-		{ KTX_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG,          TextureFormat::PTC22   },
-		{ KTX_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG,          TextureFormat::PTC24   },
-		{ KTX_R8,                                        TextureFormat::R8      },
-		{ KTX_RGBA16,                                    TextureFormat::RGBA16  },
-		{ KTX_RGBA16F,                                   TextureFormat::RGBA16F },
-		{ KTX_R32UI,                                     TextureFormat::R32U    },
-		{ KTX_R32F,                                      TextureFormat::R32F    },
-		{ KTX_RG8,                                       TextureFormat::RG8     },
-		{ KTX_RG16,                                      TextureFormat::RG16    },
-		{ KTX_RG16F,                                     TextureFormat::RG16F   },
-		{ KTX_RG32UI,                                    TextureFormat::RG32U   },
-		{ KTX_RG32F,                                     TextureFormat::RG32F   },
-		{ KTX_BGRA,                                      TextureFormat::BGRA8   },
-		{ KTX_RGBA16,                                    TextureFormat::RGBA16  },
-		{ KTX_RGBA16F,                                   TextureFormat::RGBA16F },
-		{ KTX_RGBA32UI,                                  TextureFormat::RGBA32U },
-		{ KTX_RGBA32F,                                   TextureFormat::RGBA32F },
-		{ KTX_RGB565,                                    TextureFormat::R5G6B5  },
-		{ KTX_RGBA4,                                     TextureFormat::RGBA4   },
-		{ KTX_RGB5_A1,                                   TextureFormat::RGB5A1  },
-		{ KTX_RGB10_A2,                                  TextureFormat::RGB10A2 },
+		uint32_t m_internalFmt;
+		uint32_t m_internalFmtSrgb;
+		uint32_t m_fmt;
+		uint32_t m_type;
 	};
+
+	static KtxFormatInfo s_translateKtxFormat[] =
+	{
+		{ KTX_COMPRESSED_RGBA_S3TC_DXT1_EXT,            KTX_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT,        KTX_COMPRESSED_RGBA_S3TC_DXT1_EXT,            KTX_ZERO,                         }, // BC1
+		{ KTX_COMPRESSED_RGBA_S3TC_DXT3_EXT,            KTX_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT,        KTX_COMPRESSED_RGBA_S3TC_DXT3_EXT,            KTX_ZERO,                         }, // BC2
+		{ KTX_COMPRESSED_RGBA_S3TC_DXT5_EXT,            KTX_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT,        KTX_COMPRESSED_RGBA_S3TC_DXT5_EXT,            KTX_ZERO,                         }, // BC3
+		{ KTX_COMPRESSED_LUMINANCE_LATC1_EXT,           KTX_ZERO,                                       KTX_COMPRESSED_LUMINANCE_LATC1_EXT,           KTX_ZERO,                         }, // BC4
+		{ KTX_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT,     KTX_ZERO,                                       KTX_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT,     KTX_ZERO,                         }, // BC5
+		{ KTX_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB,     KTX_ZERO,                                       KTX_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB,     KTX_ZERO,                         }, // BC6H
+		{ KTX_COMPRESSED_RGBA_BPTC_UNORM_ARB,           KTX_ZERO,                                       KTX_COMPRESSED_RGBA_BPTC_UNORM_ARB,           KTX_ZERO,                         }, // BC7
+		{ KTX_ETC1_RGB8_OES,                            KTX_ZERO,                                       KTX_ETC1_RGB8_OES,                            KTX_ZERO,                         }, // ETC1
+		{ KTX_COMPRESSED_RGB8_ETC2,                     KTX_ZERO,                                       KTX_COMPRESSED_RGB8_ETC2,                     KTX_ZERO,                         }, // ETC2
+		{ KTX_COMPRESSED_RGBA8_ETC2_EAC,                KTX_COMPRESSED_SRGB8_ETC2,                      KTX_COMPRESSED_RGBA8_ETC2_EAC,                KTX_ZERO,                         }, // ETC2A
+		{ KTX_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, KTX_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2,  KTX_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, KTX_ZERO,                         }, // ETC2A1
+		{ KTX_COMPRESSED_RGB_PVRTC_2BPPV1_IMG,          KTX_COMPRESSED_SRGB_PVRTC_2BPPV1_EXT,           KTX_COMPRESSED_RGB_PVRTC_2BPPV1_IMG,          KTX_ZERO,                         }, // PTC12
+		{ KTX_COMPRESSED_RGB_PVRTC_4BPPV1_IMG,          KTX_COMPRESSED_SRGB_PVRTC_4BPPV1_EXT,           KTX_COMPRESSED_RGB_PVRTC_4BPPV1_IMG,          KTX_ZERO,                         }, // PTC14
+		{ KTX_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG,         KTX_COMPRESSED_SRGB_ALPHA_PVRTC_2BPPV1_EXT,     KTX_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG,         KTX_ZERO,                         }, // PTC12A
+		{ KTX_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG,         KTX_COMPRESSED_SRGB_ALPHA_PVRTC_4BPPV1_EXT,     KTX_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG,         KTX_ZERO,                         }, // PTC14A
+		{ KTX_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG,         KTX_ZERO,                                       KTX_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG,         KTX_ZERO,                         }, // PTC22
+		{ KTX_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG,         KTX_ZERO,                                       KTX_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG,         KTX_ZERO,                         }, // PTC24
+		{ KTX_ZERO,                                     KTX_ZERO,                                       KTX_ZERO,                                     KTX_ZERO,                         }, // Unknown
+		{ KTX_ZERO,                                     KTX_ZERO,                                       KTX_ZERO,                                     KTX_ZERO,                         }, // R1
+		{ KTX_ALPHA,                                    KTX_ZERO,                                       KTX_ALPHA,                                    KTX_UNSIGNED_BYTE,                }, // A8
+		{ KTX_R8,                                       KTX_ZERO,                                       KTX_RED,                                      KTX_UNSIGNED_BYTE,                }, // R8
+		{ KTX_R8I,                                      KTX_ZERO,                                       KTX_RED,                                      KTX_BYTE,                         }, // R8S
+		{ KTX_R8UI,                                     KTX_ZERO,                                       KTX_RED,                                      KTX_UNSIGNED_BYTE,                }, // R8S
+		{ KTX_R8_SNORM,                                 KTX_ZERO,                                       KTX_RED,                                      KTX_BYTE,                         }, // R8S
+		{ KTX_R16,                                      KTX_ZERO,                                       KTX_RED,                                      KTX_UNSIGNED_SHORT,               }, // R16
+		{ KTX_R16I,                                     KTX_ZERO,                                       KTX_RED,                                      KTX_SHORT,                        }, // R16I
+		{ KTX_R16UI,                                    KTX_ZERO,                                       KTX_RED,                                      KTX_UNSIGNED_SHORT,               }, // R16U
+		{ KTX_R16F,                                     KTX_ZERO,                                       KTX_RED,                                      KTX_HALF_FLOAT,                   }, // R16F
+		{ KTX_R16_SNORM,                                KTX_ZERO,                                       KTX_RED,                                      KTX_SHORT,                        }, // R16S
+		{ KTX_R32I,                                     KTX_ZERO,                                       KTX_RED,                                      KTX_INT,                          }, // R32I
+		{ KTX_R32UI,                                    KTX_ZERO,                                       KTX_RED,                                      KTX_UNSIGNED_INT,                 }, // R32U
+		{ KTX_R32F,                                     KTX_ZERO,                                       KTX_RED,                                      KTX_FLOAT,                        }, // R32F
+		{ KTX_RG8,                                      KTX_ZERO,                                       KTX_RG,                                       KTX_UNSIGNED_BYTE,                }, // RG8
+		{ KTX_RG8I,                                     KTX_ZERO,                                       KTX_RG,                                       KTX_BYTE,                         }, // RG8I
+		{ KTX_RG8UI,                                    KTX_ZERO,                                       KTX_RG,                                       KTX_UNSIGNED_BYTE,                }, // RG8U
+		{ KTX_RG8_SNORM,                                KTX_ZERO,                                       KTX_RG,                                       KTX_BYTE,                         }, // RG8S
+		{ KTX_RG16,                                     KTX_ZERO,                                       KTX_RG,                                       KTX_UNSIGNED_SHORT,               }, // RG16
+		{ KTX_RG16I,                                    KTX_ZERO,                                       KTX_RG,                                       KTX_SHORT,                        }, // RG16
+		{ KTX_RG16UI,                                   KTX_ZERO,                                       KTX_RG,                                       KTX_UNSIGNED_SHORT,               }, // RG16
+		{ KTX_RG16F,                                    KTX_ZERO,                                       KTX_RG,                                       KTX_FLOAT,                        }, // RG16F
+		{ KTX_RG16_SNORM,                               KTX_ZERO,                                       KTX_RG,                                       KTX_SHORT,                        }, // RG16S
+		{ KTX_RG32I,                                    KTX_ZERO,                                       KTX_RG,                                       KTX_INT,                          }, // RG32I
+		{ KTX_RG32UI,                                   KTX_ZERO,                                       KTX_RG,                                       KTX_UNSIGNED_INT,                 }, // RG32U
+		{ KTX_RG32F,                                    KTX_ZERO,                                       KTX_RG,                                       KTX_FLOAT,                        }, // RG32F
+		{ KTX_RGB9_E5,                                  KTX_ZERO,                                       KTX_RGB,                                      KTX_UNSIGNED_INT_5_9_9_9_REV,     }, // RGB9E5F
+		{ KTX_BGRA,                                     KTX_SRGB8_ALPHA8,                               KTX_BGRA,                                     KTX_UNSIGNED_BYTE,                }, // BGRA8
+		{ KTX_RGBA8,                                    KTX_SRGB8_ALPHA8,                               KTX_RGBA,                                     KTX_UNSIGNED_BYTE,                }, // RGBA8
+		{ KTX_RGBA8I,                                   KTX_ZERO,                                       KTX_RGBA,                                     KTX_BYTE,                         }, // RGBA8I
+		{ KTX_RGBA8UI,                                  KTX_ZERO,                                       KTX_RGBA,                                     KTX_UNSIGNED_BYTE,                }, // RGBA8U
+		{ KTX_RGBA8_SNORM,                              KTX_ZERO,                                       KTX_RGBA,                                     KTX_BYTE,                         }, // RGBA8S
+		{ KTX_RGBA16,                                   KTX_ZERO,                                       KTX_RGBA,                                     KTX_UNSIGNED_SHORT,               }, // RGBA16
+		{ KTX_RGBA16I,                                  KTX_ZERO,                                       KTX_RGBA,                                     KTX_SHORT,                        }, // RGBA16I
+		{ KTX_RGBA16UI,                                 KTX_ZERO,                                       KTX_RGBA,                                     KTX_UNSIGNED_SHORT,               }, // RGBA16U
+		{ KTX_RGBA16F,                                  KTX_ZERO,                                       KTX_RGBA,                                     KTX_HALF_FLOAT,                   }, // RGBA16F
+		{ KTX_RGBA16_SNORM,                             KTX_ZERO,                                       KTX_RGBA,                                     KTX_SHORT,                        }, // RGBA16S
+		{ KTX_RGBA32I,                                  KTX_ZERO,                                       KTX_RGBA,                                     KTX_INT,                          }, // RGBA32I
+		{ KTX_RGBA32UI,                                 KTX_ZERO,                                       KTX_RGBA,                                     KTX_UNSIGNED_INT,                 }, // RGBA32U
+		{ KTX_RGBA32F,                                  KTX_ZERO,                                       KTX_RGBA,                                     KTX_FLOAT,                        }, // RGBA32F
+		{ KTX_RGB565,                                   KTX_ZERO,                                       KTX_RGB,                                      KTX_UNSIGNED_SHORT_5_6_5,         }, // R5G6B5
+		{ KTX_RGBA4,                                    KTX_ZERO,                                       KTX_RGBA,                                     KTX_UNSIGNED_SHORT_4_4_4_4,       }, // RGBA4
+		{ KTX_RGB5_A1,                                  KTX_ZERO,                                       KTX_RGBA,                                     KTX_UNSIGNED_SHORT_5_5_5_1,       }, // RGB5A1
+		{ KTX_RGB10_A2,                                 KTX_ZERO,                                       KTX_RGBA,                                     KTX_UNSIGNED_INT_2_10_10_10_REV,  }, // RGB10A2
+		{ KTX_R11F_G11F_B10F,                           KTX_ZERO,                                       KTX_RGB,                                      KTX_UNSIGNED_INT_10F_11F_11F_REV, }, // R11G11B10F
+	};
+	BX_STATIC_ASSERT(TextureFormat::UnknownDepth == BX_COUNTOF(s_translateKtxFormat) );
 
 	bool imageParseKtx(ImageContainer& _imageContainer, bx::ReaderSeekerI* _reader)
 	{
@@ -1785,24 +2850,26 @@ namespace bgfx
 
 		for (uint32_t ii = 0; ii < BX_COUNTOF(s_translateKtxFormat); ++ii)
 		{
-			if (s_translateKtxFormat[ii].m_format == glInternalFormat)
+			if (s_translateKtxFormat[ii].m_internalFmt == glInternalFormat)
 			{
-				format = s_translateKtxFormat[ii].m_textureFormat;
+				format = TextureFormat::Enum(ii);
 				break;
 			}
 		}
 
-		_imageContainer.m_data = NULL;
-		_imageContainer.m_size = 0;
-		_imageContainer.m_offset = (uint32_t)offset;
-		_imageContainer.m_width  = width;
-		_imageContainer.m_height = height;
-		_imageContainer.m_depth  = depth;
-		_imageContainer.m_format = uint8_t(format);
+		_imageContainer.m_data     = NULL;
+		_imageContainer.m_size     = 0;
+		_imageContainer.m_offset   = (uint32_t)offset;
+		_imageContainer.m_width    = width;
+		_imageContainer.m_height   = height;
+		_imageContainer.m_depth    = depth;
+		_imageContainer.m_format   = format;
 		_imageContainer.m_numMips  = uint8_t(numMips);
 		_imageContainer.m_hasAlpha = hasAlpha;
 		_imageContainer.m_cubeMap  = numFaces > 1;
-		_imageContainer.m_ktx = true;
+		_imageContainer.m_ktx      = true;
+		_imageContainer.m_ktxLE    = fromLittleEndian;
+		_imageContainer.m_srgb     = false;
 
 		return TextureFormat::Unknown != format;
 	}
@@ -1938,18 +3005,19 @@ namespace bgfx
 			}
 		}
 
-		_imageContainer.m_data = NULL;
-		_imageContainer.m_size = 0;
-		_imageContainer.m_offset = (uint32_t)offset;
-		_imageContainer.m_width  = width;
-		_imageContainer.m_height = height;
-		_imageContainer.m_depth  = depth;
-		_imageContainer.m_format = uint8_t(format);
+		_imageContainer.m_data     = NULL;
+		_imageContainer.m_size     = 0;
+		_imageContainer.m_offset   = (uint32_t)offset;
+		_imageContainer.m_width    = width;
+		_imageContainer.m_height   = height;
+		_imageContainer.m_depth    = depth;
+		_imageContainer.m_format   = format;
 		_imageContainer.m_numMips  = uint8_t(numMips);
 		_imageContainer.m_hasAlpha = hasAlpha;
 		_imageContainer.m_cubeMap  = numFaces > 1;
-		_imageContainer.m_ktx = false;
-		_imageContainer.m_srgb = colorSpace > 0;
+		_imageContainer.m_ktx      = false;
+		_imageContainer.m_ktxLE    = false;
+		_imageContainer.m_srgb     = colorSpace > 0;
 
 		return TextureFormat::Unknown != format;
 	}
@@ -1988,14 +3056,15 @@ namespace bgfx
 				_imageContainer.m_data = tc.m_mem->data;
 				_imageContainer.m_size = tc.m_mem->size;
 			}
-			_imageContainer.m_width = tc.m_width;
-			_imageContainer.m_height = tc.m_height;
-			_imageContainer.m_depth = tc.m_depth;
-			_imageContainer.m_numMips = tc.m_numMips;
+			_imageContainer.m_width    = tc.m_width;
+			_imageContainer.m_height   = tc.m_height;
+			_imageContainer.m_depth    = tc.m_depth;
+			_imageContainer.m_numMips  = tc.m_numMips;
 			_imageContainer.m_hasAlpha = false;
-			_imageContainer.m_cubeMap = tc.m_cubeMap;
-			_imageContainer.m_ktx = false;
-			_imageContainer.m_srgb = false;
+			_imageContainer.m_cubeMap  = tc.m_cubeMap;
+			_imageContainer.m_ktx      = false;
+			_imageContainer.m_ktxLE    = false;
+			_imageContainer.m_srgb     = false;
 
 			return true;
 		}
@@ -2009,16 +3078,17 @@ namespace bgfx
 		return imageParse(_imageContainer, &reader);
 	}
 
-	void imageDecodeToBgra8(uint8_t* _dst, const uint8_t* _src, uint32_t _width, uint32_t _height, uint32_t _pitch, uint8_t _type)
+	void imageDecodeToBgra8(void* _dst, const void* _src, uint32_t _width, uint32_t _height, uint32_t _pitch, TextureFormat::Enum _format)
 	{
-		const uint8_t* src = _src;
+		const uint8_t* src = (const uint8_t*)_src;
+		uint8_t* dst = (uint8_t*)_dst;
 
 		uint32_t width  = _width/4;
 		uint32_t height = _height/4;
 
 		uint8_t temp[16*4];
 
-		switch (_type)
+		switch (_format)
 		{
 		case TextureFormat::BC1:
 			for (uint32_t yy = 0; yy < height; ++yy)
@@ -2028,11 +3098,11 @@ namespace bgfx
 					decodeBlockDxt1(temp, src);
 					src += 8;
 
-					uint8_t* dst = &_dst[(yy*_pitch+xx*4)*4];
-					memcpy(&dst[0*_pitch], &temp[ 0], 16);
-					memcpy(&dst[1*_pitch], &temp[16], 16);
-					memcpy(&dst[2*_pitch], &temp[32], 16);
-					memcpy(&dst[3*_pitch], &temp[48], 16);
+					uint8_t* block = &dst[(yy*_pitch+xx*4)*4];
+					memcpy(&block[0*_pitch], &temp[ 0], 16);
+					memcpy(&block[1*_pitch], &temp[16], 16);
+					memcpy(&block[2*_pitch], &temp[32], 16);
+					memcpy(&block[3*_pitch], &temp[48], 16);
 				}
 			}
 			break;
@@ -2047,11 +3117,11 @@ namespace bgfx
 					decodeBlockDxt(temp, src);
 					src += 8;
 
-					uint8_t* dst = &_dst[(yy*_pitch+xx*4)*4];
-					memcpy(&dst[0*_pitch], &temp[ 0], 16);
-					memcpy(&dst[1*_pitch], &temp[16], 16);
-					memcpy(&dst[2*_pitch], &temp[32], 16);
-					memcpy(&dst[3*_pitch], &temp[48], 16);
+					uint8_t* block = &dst[(yy*_pitch+xx*4)*4];
+					memcpy(&block[0*_pitch], &temp[ 0], 16);
+					memcpy(&block[1*_pitch], &temp[16], 16);
+					memcpy(&block[2*_pitch], &temp[32], 16);
+					memcpy(&block[3*_pitch], &temp[48], 16);
 				}
 			}
 			break;
@@ -2066,11 +3136,11 @@ namespace bgfx
 					decodeBlockDxt(temp, src);
 					src += 8;
 
-					uint8_t* dst = &_dst[(yy*_pitch+xx*4)*4];
-					memcpy(&dst[0*_pitch], &temp[ 0], 16);
-					memcpy(&dst[1*_pitch], &temp[16], 16);
-					memcpy(&dst[2*_pitch], &temp[32], 16);
-					memcpy(&dst[3*_pitch], &temp[48], 16);
+					uint8_t* block = &dst[(yy*_pitch+xx*4)*4];
+					memcpy(&block[0*_pitch], &temp[ 0], 16);
+					memcpy(&block[1*_pitch], &temp[16], 16);
+					memcpy(&block[2*_pitch], &temp[32], 16);
+					memcpy(&block[3*_pitch], &temp[48], 16);
 				}
 			}
 			break;
@@ -2083,11 +3153,11 @@ namespace bgfx
 					decodeBlockDxt45A(temp, src);
 					src += 8;
 
-					uint8_t* dst = &_dst[(yy*_pitch+xx*4)*4];
-					memcpy(&dst[0*_pitch], &temp[ 0], 16);
-					memcpy(&dst[1*_pitch], &temp[16], 16);
-					memcpy(&dst[2*_pitch], &temp[32], 16);
-					memcpy(&dst[3*_pitch], &temp[48], 16);
+					uint8_t* block = &dst[(yy*_pitch+xx*4)*4];
+					memcpy(&block[0*_pitch], &temp[ 0], 16);
+					memcpy(&block[1*_pitch], &temp[16], 16);
+					memcpy(&block[2*_pitch], &temp[32], 16);
+					memcpy(&block[3*_pitch], &temp[48], 16);
 				}
 			}
 			break;
@@ -2097,9 +3167,9 @@ namespace bgfx
 			{
 				for (uint32_t xx = 0; xx < width; ++xx)
 				{
-					decodeBlockDxt45A(temp+1, src);
-					src += 8;
 					decodeBlockDxt45A(temp+2, src);
+					src += 8;
+					decodeBlockDxt45A(temp+1, src);
 					src += 8;
 
 					for (uint32_t ii = 0; ii < 16; ++ii)
@@ -2111,11 +3181,11 @@ namespace bgfx
 						temp[ii*4+3] = 0;
 					}
 
-					uint8_t* dst = &_dst[(yy*_pitch+xx*4)*4];
-					memcpy(&dst[0*_pitch], &temp[ 0], 16);
-					memcpy(&dst[1*_pitch], &temp[16], 16);
-					memcpy(&dst[2*_pitch], &temp[32], 16);
-					memcpy(&dst[3*_pitch], &temp[48], 16);
+					uint8_t* block = &dst[(yy*_pitch+xx*4)*4];
+					memcpy(&block[0*_pitch], &temp[ 0], 16);
+					memcpy(&block[1*_pitch], &temp[16], 16);
+					memcpy(&block[2*_pitch], &temp[32], 16);
+					memcpy(&block[3*_pitch], &temp[48], 16);
 				}
 			}
 			break;
@@ -2129,11 +3199,11 @@ namespace bgfx
 					decodeBlockEtc12(temp, src);
 					src += 8;
 
-					uint8_t* dst = &_dst[(yy*_pitch+xx*4)*4];
-					memcpy(&dst[0*_pitch], &temp[ 0], 16);
-					memcpy(&dst[1*_pitch], &temp[16], 16);
-					memcpy(&dst[2*_pitch], &temp[32], 16);
-					memcpy(&dst[3*_pitch], &temp[48], 16);
+					uint8_t* block = &dst[(yy*_pitch+xx*4)*4];
+					memcpy(&block[0*_pitch], &temp[ 0], 16);
+					memcpy(&block[1*_pitch], &temp[16], 16);
+					memcpy(&block[2*_pitch], &temp[32], 16);
+					memcpy(&block[3*_pitch], &temp[48], 16);
 				}
 			}
 			break;
@@ -2165,11 +3235,11 @@ namespace bgfx
 				{
 					decodeBlockPtc14(temp, src, xx, yy, width, height);
 
-					uint8_t* dst = &_dst[(yy*_pitch+xx*4)*4];
-					memcpy(&dst[0*_pitch], &temp[ 0], 16);
-					memcpy(&dst[1*_pitch], &temp[16], 16);
-					memcpy(&dst[2*_pitch], &temp[32], 16);
-					memcpy(&dst[3*_pitch], &temp[48], 16);
+					uint8_t* block = &dst[(yy*_pitch+xx*4)*4];
+					memcpy(&block[0*_pitch], &temp[ 0], 16);
+					memcpy(&block[1*_pitch], &temp[16], 16);
+					memcpy(&block[2*_pitch], &temp[32], 16);
+					memcpy(&block[3*_pitch], &temp[48], 16);
 				}
 			}
 			break;
@@ -2181,11 +3251,11 @@ namespace bgfx
 				{
 					decodeBlockPtc14A(temp, src, xx, yy, width, height);
 
-					uint8_t* dst = &_dst[(yy*_pitch+xx*4)*4];
-					memcpy(&dst[0*_pitch], &temp[ 0], 16);
-					memcpy(&dst[1*_pitch], &temp[16], 16);
-					memcpy(&dst[2*_pitch], &temp[32], 16);
-					memcpy(&dst[3*_pitch], &temp[48], 16);
+					uint8_t* block = &dst[(yy*_pitch+xx*4)*4];
+					memcpy(&block[0*_pitch], &temp[ 0], 16);
+					memcpy(&block[1*_pitch], &temp[16], 16);
+					memcpy(&block[2*_pitch], &temp[32], 16);
+					memcpy(&block[3*_pitch], &temp[48], 16);
 				}
 			}
 			break;
@@ -2215,9 +3285,9 @@ namespace bgfx
 		}
 	}
 
-	void imageDecodeToRgba8(uint8_t* _dst, const uint8_t* _src, uint32_t _width, uint32_t _height, uint32_t _pitch, uint8_t _type)
+	void imageDecodeToRgba8(void* _dst, const void* _src, uint32_t _width, uint32_t _height, uint32_t _pitch, TextureFormat::Enum _format)
 	{
-		switch (_type)
+		switch (_format)
 		{
 		case TextureFormat::RGBA8:
 			memcpy(_dst, _src, _pitch*_height);
@@ -2228,8 +3298,132 @@ namespace bgfx
 			break;
 
 		default:
-			imageDecodeToBgra8(_dst, _src, _width, _height, _pitch, _type);
+			imageDecodeToBgra8(_dst, _src, _width, _height, _pitch, _format);
 			imageSwizzleBgra8(_width, _height, _pitch, _dst, _dst);
+			break;
+		}
+	}
+
+	void imageRgba8ToRgba32fRef(void* _dst, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src)
+	{
+		const uint32_t dstwidth  = _width;
+		const uint32_t dstheight = _height;
+
+		if (0 == dstwidth
+		||  0 == dstheight)
+		{
+			return;
+		}
+
+		float* dst = (float*)_dst;
+		const uint8_t* src = (const uint8_t*)_src;
+
+		for (uint32_t yy = 0, ystep = _pitch; yy < dstheight; ++yy, src += ystep)
+		{
+			const uint8_t* rgba = src;
+			for (uint32_t xx = 0; xx < dstwidth; ++xx, rgba += 4, dst += 4)
+			{
+				dst[0] = powf(rgba[          0], 2.2f);
+				dst[1] = powf(rgba[          1], 2.2f);
+				dst[2] = powf(rgba[          2], 2.2f);
+				dst[3] =      rgba[          3];
+			}
+		}
+	}
+
+	void imageRgba8ToRgba32f(void* _dst, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src)
+	{
+		const uint32_t dstwidth  = _width;
+		const uint32_t dstheight = _height;
+
+		if (0 == dstwidth
+		||  0 == dstheight)
+		{
+			return;
+		}
+
+		float* dst = (float*)_dst;
+		const uint8_t* src = (const uint8_t*)_src;
+
+		using namespace bx;
+		const float4_t unpack = float4_ld(1.0f, 1.0f/256.0f, 1.0f/65536.0f, 1.0f/16777216.0f);
+		const float4_t umask  = float4_ild(0xff, 0xff00, 0xff0000, 0xff000000);
+		const float4_t wflip  = float4_ild(0, 0, 0, 0x80000000);
+		const float4_t wadd   = float4_ld(0.0f, 0.0f, 0.0f, 32768.0f*65536.0f);
+
+		for (uint32_t yy = 0, ystep = _pitch; yy < dstheight; ++yy, src += ystep)
+		{
+			const uint8_t* rgba = src;
+			for (uint32_t xx = 0; xx < dstwidth; ++xx, rgba += 4, dst += 4)
+			{
+				const float4_t abgr0  = float4_splat(rgba);
+				const float4_t abgr0m = float4_and(abgr0, umask);
+				const float4_t abgr0x = float4_xor(abgr0m, wflip);
+				const float4_t abgr0f = float4_itof(abgr0x);
+				const float4_t abgr0c = float4_add(abgr0f, wadd);
+				const float4_t abgr0n = float4_mul(abgr0c, unpack);
+
+				float4_st(dst, abgr0n);
+			}
+		}
+	}
+
+	void imageDecodeToRgba32f(bx::AllocatorI* _allocator, void* _dst, const void* _src, uint32_t _width, uint32_t _height, uint32_t _pitch, TextureFormat::Enum _format)
+	{
+		const uint8_t* src = (const uint8_t*)_src;
+		uint8_t* dst = (uint8_t*)_dst;
+
+		switch (_format)
+		{
+		case TextureFormat::BC5:
+			{
+				uint32_t width  = _width/4;
+				uint32_t height = _height/4;
+
+				for (uint32_t yy = 0; yy < height; ++yy)
+				{
+					for (uint32_t xx = 0; xx < width; ++xx)
+					{
+						uint8_t temp[16*4];
+
+						decodeBlockDxt45A(temp+2, src);
+						src += 8;
+						decodeBlockDxt45A(temp+1, src);
+						src += 8;
+
+						for (uint32_t ii = 0; ii < 16; ++ii)
+						{
+							float nx = temp[ii*4+2]*2.0f/255.0f - 1.0f;
+							float ny = temp[ii*4+1]*2.0f/255.0f - 1.0f;
+							float nz = sqrtf(1.0f - nx*nx - ny*ny);
+
+							const uint32_t offset = (yy*4 + ii/4)*_width*16 + (xx*4 + ii%4)*16;
+							float* block = (float*)&dst[offset];
+							block[0] = nx;
+							block[1] = ny;
+							block[2] = nz;
+							block[3] = 0.0f;
+						}
+					}
+				}
+			}
+			break;
+
+		case TextureFormat::RGBA32F:
+			memcpy(_dst, _src, _pitch*_height);
+			break;
+
+		case TextureFormat::RGBA8:
+			imageRgba8ToRgba32f(_dst, _width, _height, _pitch, _src);
+			break;
+
+		default:
+			{
+				void* temp = BX_ALLOC(_allocator, imageGetSize(_format, uint16_t(_pitch/4), uint16_t(_height) ) );
+				imageDecodeToRgba8(temp, _src, _width, _height, _pitch, _format);
+				imageRgba8ToRgba32f(_dst, _width, _height, _pitch, temp);
+				BX_FREE(_allocator, temp);
+			}
 			break;
 		}
 	}
@@ -2237,10 +3431,10 @@ namespace bgfx
 	bool imageGetRawData(const ImageContainer& _imageContainer, uint8_t _side, uint8_t _lod, const void* _data, uint32_t _size, ImageMip& _mip)
 	{
 		uint32_t offset = _imageContainer.m_offset;
-		TextureFormat::Enum type = TextureFormat::Enum(_imageContainer.m_format);
+		TextureFormat::Enum format = TextureFormat::Enum(_imageContainer.m_format);
 		bool hasAlpha = _imageContainer.m_hasAlpha;
 
-		const ImageBlockInfo& blockInfo = s_imageBlockInfo[type];
+		const ImageBlockInfo& blockInfo = s_imageBlockInfo[format];
 		const uint8_t  bpp         = blockInfo.bitsPerPixel;
 		const uint32_t blockSize   = blockInfo.blockSize;
 		const uint32_t blockWidth  = blockInfo.blockWidth;
@@ -2260,7 +3454,9 @@ namespace bgfx
 			_size = _imageContainer.m_size;
 		}
 
-		for (uint8_t side = 0, numSides = _imageContainer.m_cubeMap ? 6 : 1; side < numSides; ++side)
+		const uint8_t* data = (const uint8_t*)_data;
+
+		if (_imageContainer.m_ktx)
 		{
 			uint32_t width  = _imageContainer.m_width;
 			uint32_t height = _imageContainer.m_height;
@@ -2268,41 +3464,215 @@ namespace bgfx
 
 			for (uint8_t lod = 0, num = _imageContainer.m_numMips; lod < num; ++lod)
 			{
-				// skip imageSize in KTX format.
-				offset += _imageContainer.m_ktx ? sizeof(uint32_t) : 0;
+				uint32_t imageSize = bx::toHostEndian(*(const uint32_t*)&data[offset], _imageContainer.m_ktxLE);
+				offset += sizeof(uint32_t);
 
 				width  = bx::uint32_max(blockWidth  * minBlockX, ( (width  + blockWidth  - 1) / blockWidth )*blockWidth);
 				height = bx::uint32_max(blockHeight * minBlockY, ( (height + blockHeight - 1) / blockHeight)*blockHeight);
 				depth  = bx::uint32_max(1, depth);
 
 				uint32_t size = width*height*depth*bpp/8;
+				BX_CHECK(size == imageSize, "KTX: Image size mismatch %d (expected %d).", size, imageSize);
 
-				if (side == _side
-				&&  lod == _lod)
+				for (uint8_t side = 0, numSides = _imageContainer.m_cubeMap ? 6 : 1; side < numSides; ++side)
 				{
-					_mip.m_width     = width;
-					_mip.m_height    = height;
-					_mip.m_blockSize = blockSize;
-					_mip.m_size = size;
-					_mip.m_data = (const uint8_t*)_data + offset;
-					_mip.m_bpp  = bpp;
-					_mip.m_format   = uint8_t(type);
-					_mip.m_hasAlpha = hasAlpha;
-					return true;
+					if (side == _side
+					&&  lod  == _lod)
+					{
+						_mip.m_width     = width;
+						_mip.m_height    = height;
+						_mip.m_blockSize = blockSize;
+						_mip.m_size      = size;
+						_mip.m_data      = &data[offset];
+						_mip.m_bpp       = bpp;
+						_mip.m_format    = format;
+						_mip.m_hasAlpha  = hasAlpha;
+						return true;
+					}
+
+					offset += imageSize;
+
+					BX_CHECK(offset <= _size, "Reading past size of data buffer! (offset %d, size %d)", offset, _size);
+					BX_UNUSED(_size);
 				}
-
-				offset += size;
-
-				BX_CHECK(offset <= _size, "Reading past size of data buffer! (offset %d, size %d)", offset, _size);
-				BX_UNUSED(_size);
 
 				width  >>= 1;
 				height >>= 1;
 				depth  >>= 1;
 			}
 		}
+		else
+		{
+			for (uint8_t side = 0, numSides = _imageContainer.m_cubeMap ? 6 : 1; side < numSides; ++side)
+			{
+				uint32_t width  = _imageContainer.m_width;
+				uint32_t height = _imageContainer.m_height;
+				uint32_t depth  = _imageContainer.m_depth;
+
+				for (uint8_t lod = 0, num = _imageContainer.m_numMips; lod < num; ++lod)
+				{
+					width  = bx::uint32_max(blockWidth  * minBlockX, ( (width  + blockWidth  - 1) / blockWidth )*blockWidth);
+					height = bx::uint32_max(blockHeight * minBlockY, ( (height + blockHeight - 1) / blockHeight)*blockHeight);
+					depth  = bx::uint32_max(1, depth);
+
+					uint32_t size = width*height*depth*bpp/8;
+
+					if (side == _side
+					&&  lod  == _lod)
+					{
+						_mip.m_width     = width;
+						_mip.m_height    = height;
+						_mip.m_blockSize = blockSize;
+						_mip.m_size      = size;
+						_mip.m_data      = &data[offset];
+						_mip.m_bpp       = bpp;
+						_mip.m_format    = format;
+						_mip.m_hasAlpha  = hasAlpha;
+						return true;
+					}
+
+					offset += size;
+
+					BX_CHECK(offset <= _size, "Reading past size of data buffer! (offset %d, size %d)", offset, _size);
+					BX_UNUSED(_size);
+
+					width  >>= 1;
+					height >>= 1;
+					depth  >>= 1;
+				}
+			}
+		}
 
 		return false;
+	}
+
+	void imageWriteTga(bx::WriterI* _writer, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src, bool _grayscale, bool _yflip)
+	{
+		uint8_t type = _grayscale ? 3 :  2;
+		uint8_t bpp  = _grayscale ? 8 : 32;
+
+		uint8_t header[18] = {};
+		header[ 2] = type;
+		header[12] =  _width     &0xff;
+		header[13] = (_width >>8)&0xff;
+		header[14] =  _height    &0xff;
+		header[15] = (_height>>8)&0xff;
+		header[16] = bpp;
+		header[17] = 32;
+
+		bx::write(_writer, header, sizeof(header) );
+
+		uint32_t dstPitch = _width*bpp/8;
+		if (_yflip)
+		{
+			uint8_t* data = (uint8_t*)_src + _pitch*_height - _pitch;
+			for (uint32_t yy = 0; yy < _height; ++yy)
+			{
+				bx::write(_writer, data, dstPitch);
+				data -= _pitch;
+			}
+		}
+		else if (_pitch == dstPitch)
+		{
+			bx::write(_writer, _src, _height*_pitch);
+		}
+		else
+		{
+			uint8_t* data = (uint8_t*)_src;
+			for (uint32_t yy = 0; yy < _height; ++yy)
+			{
+				bx::write(_writer, data, dstPitch);
+				data += _pitch;
+			}
+		}
+	}
+
+	static int32_t imageWriteKtxHeader(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips)
+	{
+		const KtxFormatInfo& tfi = s_translateKtxFormat[_format];
+
+		int32_t size = 0;
+		size += bx::write(_writer, "\xabKTX 11\xbb\r\n\x1a\n", 12);
+		size += bx::write(_writer, UINT32_C(0x04030201) );
+		size += bx::write(_writer, UINT32_C(0) ); // glType
+		size += bx::write(_writer, UINT32_C(1) ); // glTypeSize
+		size += bx::write(_writer, UINT32_C(0) ); // glFormat
+		size += bx::write(_writer, tfi.m_internalFmt); // glInternalFormat
+		size += bx::write(_writer, tfi.m_fmt); // glBaseInternalFormat
+		size += bx::write(_writer, _width);
+		size += bx::write(_writer, _height);
+		size += bx::write(_writer, _depth);
+		size += bx::write(_writer, UINT32_C(0) ); // numberOfArrayElements
+		size += bx::write(_writer, _cubeMap ? UINT32_C(6) : UINT32_C(0) );
+		size += bx::write(_writer, uint32_t(_numMips) );
+		size += bx::write(_writer, UINT32_C(0) ); // Meta-data size.
+
+		BX_CHECK(size == 64, "KTX: Failed to write header size %d (expected: %d).", size, 64);
+		return size;
+	}
+
+	void imageWriteKtx(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips, const void* _src)
+	{
+		imageWriteKtxHeader(_writer, _format, _cubeMap, _width, _height, _depth, _numMips);
+
+		const ImageBlockInfo& blockInfo = s_imageBlockInfo[_format];
+		const uint8_t  bpp         = blockInfo.bitsPerPixel;
+		const uint32_t blockWidth  = blockInfo.blockWidth;
+		const uint32_t blockHeight = blockInfo.blockHeight;
+		const uint32_t minBlockX   = blockInfo.minBlockX;
+		const uint32_t minBlockY   = blockInfo.minBlockY;
+
+		const uint8_t* src = (const uint8_t*)_src;
+		uint32_t width  = _width;
+		uint32_t height = _height;
+		uint32_t depth  = _depth;
+
+		for (uint8_t lod = 0, num = _numMips; lod < num; ++lod)
+		{
+			width  = bx::uint32_max(blockWidth  * minBlockX, ( (width  + blockWidth  - 1) / blockWidth )*blockWidth);
+			height = bx::uint32_max(blockHeight * minBlockY, ( (height + blockHeight - 1) / blockHeight)*blockHeight);
+			depth  = bx::uint32_max(1, depth);
+
+			uint32_t size = width*height*depth*bpp/8;
+			bx::write(_writer, size);
+
+			for (uint8_t side = 0, numSides = _cubeMap ? 6 : 1; side < numSides; ++side)
+			{
+				bx::write(_writer, src, size);
+				src += size;
+			}
+
+			width  >>= 1;
+			height >>= 1;
+			depth  >>= 1;
+		}
+	}
+
+	void imageWriteKtx(bx::WriterI* _writer, ImageContainer& _imageContainer, const void* _data, uint32_t _size)
+	{
+		imageWriteKtxHeader(_writer
+			, TextureFormat::Enum(_imageContainer.m_format)
+			, _imageContainer.m_cubeMap
+			, _imageContainer.m_width
+			, _imageContainer.m_height
+			, _imageContainer.m_depth
+			, _imageContainer.m_numMips
+			);
+
+		for (uint8_t lod = 0, num = _imageContainer.m_numMips; lod < num; ++lod)
+		{
+			ImageMip mip;
+			imageGetRawData(_imageContainer, 0, lod, _data, _size, mip);
+			bx::write(_writer, mip.m_size);
+
+			for (uint8_t side = 0, numSides = _imageContainer.m_cubeMap ? 6 : 1; side < numSides; ++side)
+			{
+				if (imageGetRawData(_imageContainer, side, lod, _data, _size, mip) )
+				{
+					bx::write(_writer, mip.m_data, mip.m_size);
+				}
+			}
+		}
 	}
 
 } // namespace bgfx

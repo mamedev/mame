@@ -63,8 +63,8 @@ private:
 	required_ioport_array<4> m_io_keyboard;
 	required_ioport m_special;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT16 m_resetcnt;
 
 	/* keyboard state */

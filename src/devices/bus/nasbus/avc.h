@@ -35,9 +35,9 @@ public:
 	WRITE8_MEMBER(vram_w);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	required_device<mc6845_device> m_crtc;

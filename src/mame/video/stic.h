@@ -492,9 +492,9 @@ public:
 	void set_y_scale(int val) { m_y_scale = val; }
 
 	// device-level overrides
-	virtual void device_start();
-	virtual const rom_entry *device_rom_region() const;
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual void device_reset() override;
 
 	void screenrefresh();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

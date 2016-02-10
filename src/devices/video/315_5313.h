@@ -240,9 +240,9 @@ public:
 			m_render_bitmap->fill(0);
 	}
 
-	bitmap_ind16* m_render_bitmap;
-	UINT16* m_render_line;
-	UINT16* m_render_line_raw;
+	std::unique_ptr<bitmap_ind16> m_render_bitmap;
+	std::unique_ptr<UINT16[]> m_render_line;
+	std::unique_ptr<UINT16[]> m_render_line_raw;
 
 	TIMER_DEVICE_CALLBACK_MEMBER( megadriv_scanline_timer_callback_alt_timing );
 	TIMER_DEVICE_CALLBACK_MEMBER( megadriv_scanline_timer_callback );
@@ -251,9 +251,9 @@ public:
 	inline UINT16 vdp_get_word_from_68k_mem(UINT32 source);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// called when we hit 240 and 241 (used to control the z80 irq line on genesis, or the main irq on c2)
 	devcb_write_line m_sndirqline_callback;
@@ -295,13 +295,13 @@ private:
 	int m_use_cram; // c2 uses it's own palette ram, so it sets this to 0
 	int m_dma_delay;    // SVP and SegaCD have some 'lag' in DMA transfers
 
-	UINT16* m_regs;
-	UINT16* m_vram;
-	UINT16* m_cram;
-	UINT16* m_vsram;
+	std::unique_ptr<UINT16[]> m_regs;
+	std::unique_ptr<UINT16[]> m_vram;
+	std::unique_ptr<UINT16[]> m_cram;
+	std::unique_ptr<UINT16[]> m_vsram;
 	/* The VDP keeps a 0x400 byte on-chip cache of the Sprite Attribute Table
 	   to speed up processing, Castlevania Bloodlines abuses this on the upside down level */
-	UINT16* m_internal_sprite_attribute_table;
+	std::unique_ptr<UINT16[]> m_internal_sprite_attribute_table;
 
 	// these are used internally by the VDP to schedule when after the start of a scanline
 	// to trigger the various interrupts / rendering to our bitmap, bit of a hack really
@@ -342,13 +342,13 @@ private:
 	void render_videobuffer_to_screenbuffer(int scanline);
 
 	/* variables used during emulation - not saved */
-	UINT8* m_sprite_renderline;
-	UINT8* m_highpri_renderline;
-	UINT32* m_video_renderline;
-	UINT16* m_palette_lookup;
-	UINT16* m_palette_lookup_sprite; // for C2
-	UINT16* m_palette_lookup_shadow;
-	UINT16* m_palette_lookup_highlight;
+	std::unique_ptr<UINT8[]> m_sprite_renderline;
+	std::unique_ptr<UINT8[]> m_highpri_renderline;
+	std::unique_ptr<UINT32[]> m_video_renderline;
+	std::unique_ptr<UINT16[]> m_palette_lookup;
+	std::unique_ptr<UINT16[]> m_palette_lookup_sprite; // for C2
+	std::unique_ptr<UINT16[]> m_palette_lookup_shadow;
+	std::unique_ptr<UINT16[]> m_palette_lookup_highlight;
 
 	address_space *m_space68k;
 	m68000_base_device* m_cpu68k;

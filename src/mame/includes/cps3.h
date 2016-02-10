@@ -15,23 +15,26 @@ class cps3_state : public driver_device
 {
 public:
 	cps3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_cps3sound(*this, "cps3sound"),
-		m_mainram(*this, "mainram"),
-		m_spriteram(*this, "spriteram"),
-		m_colourram(*this, "colourram"),
-		m_tilemap20_regs_base(*this, "tmap20_regs"),
-		m_tilemap30_regs_base(*this, "tmap30_regs"),
-		m_tilemap40_regs_base(*this, "tmap40_regs"),
-		m_tilemap50_regs_base(*this, "tmap50_regs"),
-		m_fullscreenzoom(*this, "fullscreenzoom"),
-		m_0xc0000000_ram(*this, "0xc0000000_ram"),
-		m_decrypted_gamerom(*this, "decrypted_gamerom"),
-		m_0xc0000000_ram_decrypted(*this, "0xc0000000_ram_decrypted")
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_cps3sound(*this, "cps3sound")
+		, m_mainram(*this, "mainram")
+		, m_spriteram(*this, "spriteram")
+		, m_colourram(*this, "colourram")
+		, m_tilemap20_regs_base(*this, "tmap20_regs")
+		, m_tilemap30_regs_base(*this, "tmap30_regs")
+		, m_tilemap40_regs_base(*this, "tmap40_regs")
+		, m_tilemap50_regs_base(*this, "tmap50_regs")
+		, m_fullscreenzoom(*this, "fullscreenzoom")
+		, m_0xc0000000_ram(*this, "0xc0000000_ram")
+		, m_decrypted_gamerom(*this, "decrypted_gamerom")
+		, m_0xc0000000_ram_decrypted(*this, "0xc0000000_ram_decrypted")
+		, m_user4_region(*this, "user4")
+		, m_user5_region(*this, "user5")
+	{
+	}
 
 	required_device<sh2_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -50,23 +53,25 @@ public:
 	required_shared_ptr<UINT32> m_decrypted_gamerom;
 	required_shared_ptr<UINT32> m_0xc0000000_ram_decrypted;
 
+	optional_memory_region      m_user4_region;
+	optional_memory_region      m_user5_region;
+
 	fujitsu_29f016a_device *m_simm[7][8];
 	UINT32 m_cram_gfxflash_bank;
-	UINT32* m_nops;
-	UINT32* m_char_ram;
-	UINT32* m_eeprom;
+	std::unique_ptr<UINT32[]> m_char_ram;
+	std::unique_ptr<UINT32[]> m_eeprom;
 	UINT32 m_ss_pal_base;
 	UINT32 m_unk_vidregs[0x20/4];
 	UINT32 m_ss_bank_base;
 	UINT32 m_screenwidth;
-	UINT32* m_mame_colours;
+	std::unique_ptr<UINT32[]> m_mame_colours;
 	bitmap_rgb32 m_renderbuffer_bitmap;
 	rectangle m_renderbuffer_clip;
-	UINT8* m_user4region;
+	UINT8* m_user4;
 	UINT32 m_key1;
 	UINT32 m_key2;
 	int m_altEncryption;
-	UINT32* m_ss_ram;
+	std::unique_ptr<UINT32[]> m_ss_ram;
 	UINT32 m_cram_bank;
 	UINT16 m_current_eeprom_read;
 	UINT32 m_paldma_source;
@@ -82,7 +87,7 @@ public:
 	int m_last_normal_byte;
 	unsigned short m_lastb;
 	unsigned short m_lastb2;
-	UINT8* m_user5region;
+	UINT8* m_user5;
 
 	DECLARE_READ32_MEMBER(cps3_ssram_r);
 	DECLARE_WRITE32_MEMBER(cps3_ssram_w);
@@ -120,8 +125,8 @@ public:
 	DECLARE_DRIVER_INIT(sfiii2);
 	DECLARE_DRIVER_INIT(cps3boot);
 	SH2_DMA_KLUDGE_CB(dma_callback);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cps3_vbl_interrupt);
 	INTERRUPT_GEN_MEMBER(cps3_other_interrupt);

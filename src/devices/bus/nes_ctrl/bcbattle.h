@@ -29,15 +29,15 @@ public:
 	// construction/destruction
 	nes_bcbattle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual UINT8 read_exp(offs_t offset);
+	virtual UINT8 read_exp(offs_t offset) override;
 	int read_current_bit();
 
 	static const device_timer_id TIMER_BATTLER = 1;

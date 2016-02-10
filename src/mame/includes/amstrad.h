@@ -31,6 +31,7 @@
 #include "bus/cpc/hd20.h"
 #include "bus/cpc/magicsound.h"
 #include "bus/cpc/doubler.h"
+#include "bus/cpc/transtape.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"
@@ -49,7 +50,7 @@
  ****************************/
 struct gate_array_t
 {
-	bitmap_ind16    *bitmap;        /* The bitmap we work on */
+	std::unique_ptr<bitmap_ind16>    bitmap;        /* The bitmap we work on */
 	UINT8   pen_selected;       /* Pen selection */
 	UINT8   mrer;               /* Mode and ROM Enable Register */
 	UINT8   upper_bank;
@@ -100,6 +101,8 @@ struct asic_t
 	UINT8   horiz_disp;
 	UINT8   hscroll;
 	UINT8   de_start;           /* flag to check if DE is been enabled this frame yet */
+	bool    hsync_first_tick;   /* flag to check in first CRTC tick, used for knowing when to cover left side of screen to cover horizontal softscroll mess */
+	UINT8   hsync_tick_count;
 
 	/* DMA */
 	UINT8   dma_status;
@@ -242,7 +245,6 @@ public:
 	DECLARE_WRITE8_MEMBER(amstrad_ppi_portc_w);
 
 	DECLARE_WRITE_LINE_MEMBER( cpc_romdis );
-	DECLARE_WRITE_LINE_MEMBER( cpc_romen );
 	DECLARE_WRITE8_MEMBER(rom_select);
 
 	DECLARE_FLOPPY_FORMATS( aleste_floppy_formats );
@@ -311,9 +313,10 @@ protected:
 	void amstrad_common_init();
 	void enumerate_roms();
 	unsigned char kccomp_get_colour_element(int colour_value);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	int m_centronics_busy;
+	UINT8 m_last_write;
 };
 
 

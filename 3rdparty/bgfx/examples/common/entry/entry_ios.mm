@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "entry_p.h"
@@ -185,7 +185,7 @@ static	void* m_device = NULL;
 		}
 	}
 #endif
-	
+
 	return [CAEAGLLayer class];
 }
 
@@ -197,15 +197,15 @@ static	void* m_device = NULL;
 	{
 		return nil;
 	}
-	
+
 	bgfx::PlatformData pd;
 	pd.ndt          = NULL;
 	pd.nwh          = self.layer;
-	pd.context		= m_device;
+	pd.context      = m_device;
 	pd.backBuffer   = NULL;
 	pd.backBufferDS = NULL;
 	bgfx::setPlatformData(pd);
-	
+
 	return self;
 }
 
@@ -309,7 +309,7 @@ static	void* m_device = NULL;
 
 	[m_window setRootViewController:viewController];
 	[m_window makeKeyAndVisible];
-	
+
 	[m_window makeKeyAndVisible];
 
 	//float scaleFactor = [[UIScreen mainScreen] scale]; // should use this, but ui is too small on ipad retina

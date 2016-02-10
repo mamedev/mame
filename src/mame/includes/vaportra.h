@@ -48,8 +48,8 @@ public:
 	DECLARE_WRITE16_MEMBER(vaportra_palette_24bit_b_w);
 
 	DECLARE_DRIVER_INIT(vaportra);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	UINT32 screen_update_vaportra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_24bitcol( int offset );

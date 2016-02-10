@@ -299,7 +299,7 @@ const nes_mmc *nes_mapper_lookup( int mapper )
 			return &mmc_list[i];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 #if 0
@@ -325,7 +325,7 @@ int nes_get_mmc_id( running_machine &machine, int mapper )
 void ines_mapr_setup( int mapper, int *pcb_id )
 {
 	const nes_mmc *mmc = nes_mapper_lookup(mapper);
-	if (mmc == NULL)
+	if (mmc == nullptr)
 		fatalerror("Unimplemented Mapper %d\n", mapper);
 
 	*pcb_id = mmc->pcb_id;

@@ -128,10 +128,10 @@ public:
 	DECLARE_WRITE8_MEMBER(nimbus_mouse_js_w);
 	DECLARE_READ16_MEMBER(nimbus_video_io_r);
 	DECLARE_WRITE16_MEMBER(nimbus_video_io_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
-	virtual void video_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void video_reset() override;
 	UINT32 screen_update_nimbus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(sio_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_intrq_w);
@@ -161,7 +161,6 @@ public:
 	void fdc_reset();
 	UINT8 fdc_driveno(UINT8 drivesel);
 	void hdc_reset();
-	void hdc_ctrl_write(UINT8 data);
 	void hdc_post_rw();
 	void hdc_drq(bool state);
 	void pc8031_reset();
@@ -178,7 +177,7 @@ public:
 	int m_scsi_cd;
 	int m_scsi_req;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	enum
 	{

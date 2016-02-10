@@ -37,7 +37,7 @@ public:
 			m_gfxdecode(*this, "gfxdecode"),
 			m_screen(*this, "screen"),
 			m_palette(*this, "palette"),
-			m_upd71059c(*this, "upd71059c") 
+			m_upd71059c(*this, "upd71059c")
 	{ }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -50,8 +50,6 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<pic8259_device> m_upd71059c;
-
-	IRQ_CALLBACK_MEMBER(m92_irq_callback);
 
 	UINT16 m_sound_status;
 	UINT32 m_raster_irq_position;
@@ -105,5 +103,5 @@ public:
 	void m92_sprite_interrupt();
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

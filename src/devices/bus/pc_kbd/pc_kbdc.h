@@ -45,7 +45,7 @@ public:
 	pc_kbdc_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// inline configuration
 	static void static_set_pc_kbdc_slot(device_t &device, device_t *kbdc_device);
@@ -82,8 +82,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void update_clock_state();
 	void update_data_state();

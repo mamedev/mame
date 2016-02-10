@@ -91,8 +91,8 @@ protected:
 	required_memory_bank m_decrypted_opcodes_bank;
 
 	// device overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void device_postload();
 
 	// internal helpers

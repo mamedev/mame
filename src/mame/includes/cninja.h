@@ -82,8 +82,8 @@ public:
 	DECLARE_DRIVER_INIT(stoneage);
 	DECLARE_DRIVER_INIT(mutantf);
 	DECLARE_DRIVER_INIT(cninja);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(stoneage);
 	DECLARE_VIDEO_START(mutantf);
 	UINT32 screen_update_cninja(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

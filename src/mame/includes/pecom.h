@@ -31,7 +31,7 @@ public:
 	required_device<cosmac_device> m_cdp1802;
 	required_device<cdp1869_device> m_cdp1869;
 
-	UINT8 *m_charram;           /* character generator ROM */
+	std::unique_ptr<UINT8[]> m_charram;           /* character generator ROM */
 	int m_reset;                /* CPU mode */
 	int m_dma;              /* memory refresh DMA */
 
@@ -45,8 +45,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pecom_bank_w);
 	DECLARE_READ8_MEMBER(pecom_keyboard_r);
 	DECLARE_WRITE8_MEMBER(pecom_cdp1869_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(pecom);
 	DECLARE_INPUT_CHANGED_MEMBER(ef_w);
 	TIMER_CALLBACK_MEMBER(reset_tick);

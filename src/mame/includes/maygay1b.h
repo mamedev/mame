@@ -52,7 +52,9 @@ public:
 		m_reel2(*this, "reel2"),
 		m_reel3(*this, "reel3"),
 		m_reel4(*this, "reel4"),
-		m_reel5(*this, "reel5")
+		m_reel5(*this, "reel5"),
+		m_meters(*this, "meters"),
+		m_oki_region(*this, "msm6376")
 	{}
 
 	required_device<cpu_device> m_maincpu;
@@ -77,6 +79,8 @@ public:
 	required_device<stepper_device> m_reel3;
 	required_device<stepper_device> m_reel4;
 	required_device<stepper_device> m_reel5;
+	required_device<meters_device> m_meters;
+	optional_region_ptr<UINT8> m_oki_region;
 
 	UINT8 m_lamppos;
 	int m_lamp_strobe;
@@ -127,8 +131,8 @@ public:
 	DECLARE_DRIVER_INIT(m1);
 	DECLARE_DRIVER_INIT(m1common);
 	DECLARE_DRIVER_INIT(m1nec);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void cpu0_firq(int data);
 	void cpu0_nmi();
 };

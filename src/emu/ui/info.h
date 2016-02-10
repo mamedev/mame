@@ -17,8 +17,8 @@ class ui_menu_game_info : public ui_menu {
 public:
 	ui_menu_game_info(running_machine &machine, render_container *container);
 	virtual ~ui_menu_game_info();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 };
 
 
@@ -27,8 +27,8 @@ class ui_menu_image_info : public ui_menu
 public:
 	ui_menu_image_info(running_machine &machine, render_container *container);
 	virtual ~ui_menu_image_info();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 private:
 	void image_info(device_image_interface *image);

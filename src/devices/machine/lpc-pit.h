@@ -13,15 +13,15 @@ public:
 	lpc_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void map_device(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space);
+							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;
 
 	DECLARE_READ8_MEMBER( status_r);
 	DECLARE_WRITE8_MEMBER(access_w);
 	DECLARE_WRITE8_MEMBER(control_w);
 
 protected:
-	void device_start();
-	void device_reset();
+	void device_start() override;
+	void device_reset() override;
 
 private:
 	DECLARE_ADDRESS_MAP(map, 32);

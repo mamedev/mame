@@ -9,6 +9,7 @@
 #ifndef __WIN_WINDOW__
 #define __WIN_WINDOW__
 
+#include <mutex>
 #include "video.h"
 #include "render.h"
 
@@ -39,28 +40,28 @@ public:
 	win_window_info(running_machine &machine);
 	virtual ~win_window_info();
 
-	running_machine &machine() const { return m_machine; }
+	running_machine &machine() const override { return m_machine; }
 
-	render_target *target() { return m_target; }
-	int fullscreen() const { return m_fullscreen; }
+	virtual render_target *target() override { return m_target; }
+	int fullscreen() const override { return m_fullscreen; }
 
 	void update();
 
-	osd_monitor_info *winwindow_video_window_monitor(const osd_rect *proposed);
+	virtual osd_monitor_info *winwindow_video_window_monitor(const osd_rect *proposed) override;
 
-	bool win_has_menu()
+	virtual bool win_has_menu() override
 	{
 		return GetMenu(m_hwnd) ? true : false;
 	}
 
-	/* virtual */ osd_dim get_size()
+	virtual osd_dim get_size() override
 	{
 		RECT client;
 		GetClientRect(m_hwnd, &client);
 		return osd_dim(client.right - client.left, client.bottom - client.top);
 	}
 
-	osd_monitor_info *monitor() const { return m_monitor; }
+	virtual osd_monitor_info *monitor() const override { return m_monitor; }
 
 	void destroy();
 
@@ -92,7 +93,7 @@ public:
 	float               m_aspect;
 
 	// rendering info
-	osd_lock *          m_render_lock;
+	std::mutex          m_render_lock;
 	render_target *     m_target;
 	int                 m_targetview;
 	int                 m_targetorient;
@@ -171,13 +172,13 @@ extern int win_create_menu(running_machine &machine, HMENU *menus);
 //  rect_width / rect_height
 //============================================================
 
-INLINE int rect_width(const RECT *rect)
+static inline int rect_width(const RECT *rect)
 {
 	return rect->right - rect->left;
 }
 
 
-INLINE int rect_height(const RECT *rect)
+static inline int rect_height(const RECT *rect)
 {
 	return rect->bottom - rect->top;
 }

@@ -103,7 +103,7 @@ public:
 		m_read_k.set_callback(k);
 	}
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	UINT8 read(address_space &space, offs_t offset, int &cs0, int &cs1);
 	void write(address_space &space, offs_t offset, UINT8 data, int &cs0, int &cs1);
@@ -126,12 +126,12 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_sound_interface callbacks
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	inline void set_interrupt(int mask);
 	inline void clear_interrupt(int mask);
@@ -185,7 +185,7 @@ protected:
 	double m_rastertime;
 
 	/* sound part */
-	UINT8 *m_noise;
+	std::unique_ptr<UINT8[]> m_noise;
 	int m_tone1pos, m_tone2pos,
 	m_tone1samples, m_tone2samples,
 	m_noisesize,          /* number of samples */

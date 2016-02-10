@@ -4,6 +4,18 @@
 
 	<!-- Games -->
 
+	<software name="arttu">
+		<description>Little Knight Arthur</description>
+		<year>1986</year>
+		<publisher>Pasi Hytönen</publisher>
+		<info name="protection" value="none" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="arthurc64.d64" size="174848" crc="f741ada3" sha1="84eb7ce5152370fe53604209ee7fb54a284bfa6e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aztecchl">
 		<description>Aztec Challenge</description>
 		<year>1983</year>

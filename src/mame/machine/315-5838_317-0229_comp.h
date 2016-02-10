@@ -61,21 +61,23 @@ public:
 	DECLARE_WRITE32_MEMBER(doa_prot_w);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
+	UINT16 m_decathlt_prottable1[24];
+	UINT16 m_decathlt_dictionaryy[128];
+
+	UINT32 m_srcoffset;
+
+	UINT32 m_decathlt_lastcount;
+	UINT32 m_decathlt_prot_uploadmode;
+	UINT32 m_decathlt_prot_uploadoffset;
+
 
 	// Decathlete specific variables and functions (see machine/decathlt.c)
 	struct channel_type
 	{
-		UINT32 m_srcoffset;
-		UINT16 m_decathlt_prottable1[24];
-		UINT16 m_decathlt_dictionary[128];
-
-		UINT32 m_decathlt_lastcount;
-		UINT32 m_decathlt_prot_uploadmode;
-		UINT32 m_decathlt_prot_uploadoffset;
 		sega_dec_read_delegate m_read_ch;
 
 	};

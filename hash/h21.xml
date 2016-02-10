@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="h21" description="TRQ Video Computer H-21 cartridges">
+
+	<!--
+
+	TRQ distributed a total of 24 games for this system. The only exclusive title
+	appears to be "Come frutas", the rest of the games are copies of the respective
+	VC-4000 games.
+
+	TODO: Verify and add the rest of the games.
+
+	 1 Millón electrónico
+	 2 Guerra de tanques y aviones
+	 3 Batalla aero-naval
+	 4 Invasores
+	 5 Guerra de las galaxias
+	 6 Circo
+
+	-->
+
+	<software name="comefrut" supported="no">
+		<description>Come frutas</description>
+		<year>198?</year>
+		<publisher>TRQ</publisher>
+		<info name="serial" value="7" />
+		<part name="cart" interface="h21_cart">
+			<feature name="slot" value="rom4k" />
+			<dataarea name="rom" size="4096">
+				<rom name="comefrutas.bin" size="4096" crc="f66c8e3a" sha1="c695bd36b572dff2c8f6c49edfcfda6dda3675c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+
+	 8 En busca del tesoro / Memoria
+	 9 Caza
+	10 Othello
+	11 Super-Sport 60
+	12 Fútbol
+	13 Carrera de caballos
+	14 Las 4 en raya
+	15 Master-Mind (Código Secreto)
+	16 Carreras de coches
+	17 Laberinto
+	18 Boxeo
+	19 Juego de cartas / Black Jack
+	20 Órgano musical / Simon
+	21 Golf
+	22 Matemáticas I
+	23 Matemáticas II
+	24 Crazy Spider. La araña loca
+
+	-->
+
+</softwarelist>

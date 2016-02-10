@@ -58,11 +58,10 @@ public:
 	DECLARE_WRITE8_MEMBER(sprite_lookup_w);
 	DECLARE_DRIVER_INIT(25pacman);
 	DECLARE_DRIVER_INIT(20pacgal);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	void set_bankptr();
 	void get_pens(pen_t *pens);
 	void do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_rgb32 &bitmap);
@@ -82,7 +81,7 @@ public:
 	{ }
 
 	DECLARE_READ8_MEMBER( _25pacman_io_87_r );
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 /*----------- defined in video/20pacgal.c -----------*/

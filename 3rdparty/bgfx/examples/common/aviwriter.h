@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef AVIWRITER_H_HEADER_GUARD
@@ -26,7 +26,7 @@ struct AviWriter
 
 	bool open(const char* _filePath, uint32_t _width, uint32_t _height, uint32_t _fps, bool _yflip)
 	{
-		if (0 != m_writer->open(_filePath) )
+		if (!bx::open(m_writer, _filePath) )
 		{
 			return false;
 		}
@@ -36,7 +36,7 @@ struct AviWriter
 		m_numFrames = 0;
 		m_width = _width;
 		m_height = _height;
-		
+
 		// Bgfx returns _yflip true for OpenGL since bottom left corner is 0, 0. In D3D top left corner
 		// is 0, 0. DIB expect OpenGL style coordinates, so this is inverted logic for AVI writer.
 		m_yflip = !_yflip;
@@ -63,7 +63,7 @@ struct AviWriter
 		bx::write(m_writer, UINT32_C(0) );      // dwMicroSecPerFrame
 		bx::write(m_writer, UINT32_C(0) );      // dwMaxBytesPerSec
 		bx::write(m_writer, UINT32_C(0) );      // dwPaddingGranularity
-		bx::write(m_writer, UINT32_C(0x101) );  // dwFlags
+		bx::write(m_writer, UINT32_C(0x110) );  // dwFlags
 
 		m_totalFramesOffset = m_writer->seek();
 		bx::write(m_writer, UINT32_C(0) );      // dwTotalFrames
@@ -89,8 +89,8 @@ struct AviWriter
 		bx::write(m_writer, BX_MAKEFOURCC('v', 'i', 'd', 's') ); // fccType
 		bx::write(m_writer, BX_MAKEFOURCC('D', 'I', 'B', ' ') ); // fccHandler
 		bx::write(m_writer, UINT32_C(0) );      // dwFlags
-		bx::write(m_writer, UINT16_C(0) );      // wPriority
-		bx::write(m_writer, UINT16_C(0) );      // wLanguage
+		bx::write(m_writer, uint16_t(0) );      // wPriority
+		bx::write(m_writer, uint16_t(0) );      // wLanguage
 		bx::write(m_writer, UINT32_C(0) );      // dwInitialFrames
 		bx::write(m_writer, UINT32_C(1) );      // dwScale
 		bx::write(m_writer, _fps);              // dwRate
@@ -102,8 +102,8 @@ struct AviWriter
 		bx::write(m_writer, m_frameSize);       // dwSuggestedBufferSize
 		bx::write(m_writer, UINT32_MAX);        // dwQuality
 		bx::write(m_writer, UINT32_C(0) );      // dwSampleSize
-		bx::write(m_writer, INT16_C(0) );       // rcFrame.left
-		bx::write(m_writer, INT16_C(0) );       // rcFrame.top
+		bx::write(m_writer, int16_t(0) );       // rcFrame.left
+		bx::write(m_writer, int16_t(0) );       // rcFrame.top
 		bx::write(m_writer, uint16_t(_width) ); // rcFrame.right
 		bx::write(m_writer, uint16_t(_height) );// rcFrame.bottom
 
@@ -114,8 +114,8 @@ struct AviWriter
 		bx::write(m_writer, UINT32_C(40) );     // biSize
 		bx::write(m_writer, _width);            // biWidth
 		bx::write(m_writer, _height);           // biHeight
-		bx::write(m_writer, UINT16_C(1) );      // biPlanes
-		bx::write(m_writer, UINT16_C(24) );     // biBitCount
+		bx::write(m_writer, uint16_t(1) );      // biPlanes
+		bx::write(m_writer, uint16_t(24) );     // biBitCount
 		bx::write(m_writer, UINT32_C(0) );      // biCompression
 		bx::write(m_writer, m_frameSize);       // biSizeImage
 		bx::write(m_writer, UINT32_C(0) );      // biXPelsPerMeter
@@ -163,7 +163,7 @@ struct AviWriter
 			m_writer->seek(m_lengthOffset, bx::Whence::Begin);
 			bx::write(m_writer, m_numFrames);
 
-			m_writer->close();
+			bx::close(m_writer);
 
 			delete [] m_frame;
 			m_frame = NULL;

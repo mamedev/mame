@@ -286,7 +286,7 @@ struct snes_cart_info
 {
 	UINT8 *m_rom;
 	UINT32 m_rom_size;
-	UINT8 *m_nvram;
+	std::unique_ptr<UINT8[]> m_nvram;
 	UINT32 m_nvram_size;
 	UINT8  mode;        /* ROM memory mode */
 	UINT32 sram_max;    /* Maximum amount sram in cart (based on ROM mode) */
@@ -381,8 +381,6 @@ public:
 	required_device<screen_device> m_screen;
 
 
-	DECLARE_DIRECT_UPDATE_MEMBER(snes_spc_direct);
-	DECLARE_DIRECT_UPDATE_MEMBER(snes_direct);
 	DECLARE_DRIVER_INIT(snes);
 	DECLARE_DRIVER_INIT(snes_hirom);
 	DECLARE_DRIVER_INIT(snes_mess);
@@ -430,11 +428,11 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(snes_cart);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(sufami_cart);
 	void snes_init_timers();
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 /* Special chips, checked at init and used in memory handlers */

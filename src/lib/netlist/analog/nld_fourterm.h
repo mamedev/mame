@@ -63,10 +63,10 @@ public:
 	param_double_t m_RI;
 
 protected:
-	virtual void start();
-	virtual void reset();
-	virtual void update_param();
-	ATTR_HOT virtual void update();
+	virtual void start() override;
+	virtual void reset() override;
+	virtual void update_param() override;
+	ATTR_HOT virtual void update() override;
 
 	ATTR_COLD void start_internal(const nl_double def_RI);
 
@@ -95,10 +95,10 @@ public:
 	param_double_t m_cur_limit; /* current limit */
 
 protected:
-	virtual void start();
-	virtual void reset();
-	virtual void update_param();
-	ATTR_HOT virtual void update();
+	virtual void start() override;
+	virtual void reset() override;
+	virtual void update_param() override;
+	ATTR_HOT virtual void update() override;
 	NETLIB_UPDATE_TERMINALSI();
 
 	nl_double m_vi;
@@ -134,10 +134,10 @@ public:
 	: NETLIB_NAME(VCCS)(CCCS), m_gfac(1.0) {  }
 
 protected:
-	virtual void start();
-	virtual void reset();
-	virtual void update_param();
-	ATTR_HOT void update();
+	virtual void start() override;
+	virtual void reset() override;
+	virtual void update_param() override;
+	ATTR_HOT void update() override;
 
 	nl_double m_gfac;
 };
@@ -180,9 +180,9 @@ public:
 	param_double_t m_RO;
 
 protected:
-	virtual void start();
-	virtual void reset();
-	virtual void update_param();
+	virtual void start() override;
+	virtual void reset() override;
+	virtual void update_param() override;
 	//ATTR_HOT void update();
 
 	terminal_t m_OP2;

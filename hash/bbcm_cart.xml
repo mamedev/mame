@@ -12,7 +12,7 @@
 
 	<software name="demo">
 		<description>BBC Master Demonstration Cartridge</description>
-		<year>198?</year>
+		<year>1986</year>
 		<publisher>Acorn</publisher>
 		<part name="cart" interface="bbcm_cart">
 			<dataarea name="uprom" size="16384">
@@ -20,6 +20,21 @@
 			</dataarea>
 			<dataarea name="lorom" size="16384">
 				<rom name="bbcmasterdemonstrationcartridge_2.rom" size="16384" crc="2e73522d" sha1="ff39620d93b18fd36a4718474495211a46ef8184" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="overview">
+		<description>OverView</description>
+		<year>1985</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SQB30" />
+		<part name="cart" interface="bbcm_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="viewspell.rom" size="16384" crc="e8840023" sha1="94036e81c4684f245a0111279a0a665262e93271" offset="0" />
+			</dataarea>
+			<dataarea name="lorom" size="16384">
+				<rom name="viewstore.rom" size="16384" crc="bc69c63e" sha1="5b9bf5bd57af043ddeaa182d188ceaea801bd11f" offset="0" />
 			</dataarea>
 		</part>
 	</software>

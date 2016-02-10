@@ -9,15 +9,15 @@ class x68k_keyboard_device : public serial_keyboard_device
 {
 public:
 	x68k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void rcv_complete();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void rcv_complete() override;
 
 private:
-	virtual UINT8 keyboard_handler(UINT8 last_code, UINT8 *scan_line);
+	virtual UINT8 keyboard_handler(UINT8 last_code, UINT8 *scan_line) override;
 	void write(UINT8 data);
 
 	required_ioport m_io_kbd8;

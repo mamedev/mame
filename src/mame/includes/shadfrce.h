@@ -47,7 +47,7 @@ public:
 	required_shared_ptr<UINT16> m_bg1videoram;
 	required_shared_ptr<UINT16> m_spvideoram;
 
-	UINT16 *m_spvideoram_old;
+	std::unique_ptr<UINT16[]> m_spvideoram_old;
 	tilemap_t *m_fgtilemap;
 	tilemap_t *m_bg0tilemap;
 	tilemap_t *m_bg1tilemap;
@@ -77,11 +77,11 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg0tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1tile_info);
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offset );
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

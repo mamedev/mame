@@ -20,6 +20,8 @@
 //  TYPE DEFINITIONS
 //============================================================
 
+struct slider_state;
+
 namespace d3d
 {
 class effect;
@@ -35,6 +37,7 @@ public:
 		UT_VEC2,
 		UT_FLOAT,
 		UT_INT,
+		UT_BOOL,
 		UT_MATRIX,
 		UT_SAMPLER
 	} uniform_type;
@@ -46,6 +49,11 @@ public:
 		CU_SOURCE_RECT,
 		CU_TARGET_DIMS,
 		CU_QUAD_DIMS,
+
+		CU_SWAP_XY,
+		CU_ORIENTATION_SWAP,
+		CU_ROTATION_SWAP,
+		CU_ROTATION_TYPE,
 
 		CU_NTSC_CCFREQ,
 		CU_NTSC_A,
@@ -94,11 +102,6 @@ public:
 		CU_POST_POWER,
 		CU_POST_FLOOR,
 
-		CU_BLOOM_RESCALE,
-		CU_BLOOM_LVL0123_WEIGHTS,
-		CU_BLOOM_LVL4567_WEIGHTS,
-		CU_BLOOM_LVL89A_WEIGHTS,
-
 		CU_COUNT
 	};
 
@@ -112,6 +115,7 @@ public:
 	void        set(float x, float y);
 	void        set(float x);
 	void        set(int x);
+	void        set(bool x);
 	void        set(matrix *mat);
 	void        set(texture *tex);
 
@@ -123,6 +127,7 @@ protected:
 
 	float       m_vec[4];
 	int         m_ival;
+	bool        m_bval;
 	matrix      *m_mval;
 	texture     *m_texture;
 	int         m_count;
@@ -184,7 +189,9 @@ class renderer;
 /* in the future this will be moved into an OSD/emu shared buffer */
 struct hlsl_options
 {
+	bool                    params_init;
 	bool                    params_dirty;
+	int                     shadow_mask_tile_mode;
 	float                   shadow_mask_alpha;
 	char                    shadow_mask_texture[1024];
 	int                     shadow_mask_count_x;
@@ -203,7 +210,8 @@ struct hlsl_options
 	float                   scanline_height;
 	float                   scanline_bright_scale;
 	float                   scanline_bright_offset;
-	float                   scanline_offset;
+	float                   scanline_jitter;
+	float                   hum_bar_alpha;
 	float                   defocus[2];
 	float                   converge_x[3];
 	float                   converge_y[3];
@@ -221,6 +229,7 @@ struct hlsl_options
 
 	// NTSC
 	bool                    yiq_enable;
+	float                   yiq_jitter;
 	float                   yiq_cc;
 	float                   yiq_a;
 	float                   yiq_b;
@@ -238,6 +247,7 @@ struct hlsl_options
 	float                   vector_length_ratio;
 
 	// Bloom
+	int                     bloom_blend_mode;
 	float                   bloom_scale;
 	float                   bloom_overdrive[3];
 	float                   bloom_level0_weight;
@@ -307,6 +317,14 @@ public:
 	// slider-related functions
 	slider_state *init_slider_list();
 
+	enum slider_screen_type
+	{
+		SLIDER_SCREEN_TYPE_NONE = 0,
+		SLIDER_SCREEN_TYPE_RASTER = 1,
+		SLIDER_SCREEN_TYPE_VECTOR = 2,
+		SLIDER_SCREEN_TYPE_LCD = 4
+	};
+
 	struct slider_desc
 	{
 		const char *        name;
@@ -314,6 +332,7 @@ public:
 		int                 defval;
 		int                 maxval;
 		int                 step;
+		int                 screen_type;
 		INT32(*adjustor)(running_machine &, void *, std::string *, INT32);
 	};
 
@@ -329,6 +348,8 @@ private:
 	render_target*          find_render_target(int width, int height, UINT32 screen_index, UINT32 page_index);
 	cache_target *          find_cache_target(UINT32 screen_index, int width, int height);
 	void                    remove_cache_target(cache_target *cache);
+
+	rgb_t                   apply_color_convolution(rgb_t color);
 
 	// Shader passes
 	int                     ntsc_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
@@ -360,10 +381,6 @@ private:
 	int                     lastidx;                    // index of the last-encountered target
 	bool                    write_ini;                  // enable external ini saving
 	bool                    read_ini;                   // enable external ini loading
-	int                     prescale_force_x;           // prescale force x
-	int                     prescale_force_y;           // prescale force y
-	int                     prescale_size_x;            // prescale size x
-	int                     prescale_size_y;            // prescale size y
 	int                     hlsl_prescale_x;            // hlsl prescale x
 	int                     hlsl_prescale_y;            // hlsl prescale y
 	float                   bloom_dims[11][2];          // bloom texture dimensions
@@ -371,7 +388,7 @@ private:
 	int                     preset;                     // preset, if relevant
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
 	texture_info *          shadow_texture;             // shadow mask texture for post-processing shader
-	hlsl_options *          options;                    // current uniform state
+	hlsl_options *          options;                    // current options
 	D3DPRIMITIVETYPE        vecbuf_type;
 	UINT32                  vecbuf_index;
 	UINT32                  vecbuf_count;
@@ -412,8 +429,7 @@ private:
 	effect *                phosphor_effect;            // pointer to the phosphor-effect object
 	effect *                deconverge_effect;          // pointer to the deconvergence-effect object
 	effect *                color_effect;               // pointer to the color-effect object
-	effect *                yiq_encode_effect;          // pointer to the YIQ encoder effect object
-	effect *                yiq_decode_effect;          // pointer to the YIQ decoder effect object
+	effect *                ntsc_effect;                // pointer to the NTSC effect object
 	effect *                bloom_effect;               // pointer to the bloom composite effect
 	effect *                downsample_effect;          // pointer to the bloom downsample effect
 	effect *                vector_effect;              // pointer to the vector-effect object
@@ -422,13 +438,11 @@ private:
 	texture_info *          curr_texture;
 	render_target *         curr_render_target;
 	poly_info *             curr_poly;
-
-public:
 	render_target *         targethead;
 	cache_target *          cachehead;
 
 	static slider_desc      s_sliders[];
-	static hlsl_options     s_hlsl_presets[4];
+	static hlsl_options     last_options;               // last used options
 };
 
 }

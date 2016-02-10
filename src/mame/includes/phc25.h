@@ -45,7 +45,7 @@ public:
 	MC6847_GET_CHARROM_MEMBER(pal_char_rom_r);
 
 private:
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT8 *m_char_rom;
 	UINT8 m_port40;
 	required_shared_ptr<UINT8> m_video_ram;

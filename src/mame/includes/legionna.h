@@ -28,11 +28,11 @@ public:
 	}
 
 	required_shared_ptr<UINT16> m_spriteram;
-	UINT16* m_back_data;
-	UINT16* m_fore_data;
-	UINT16* m_mid_data;
-	UINT16* m_textram;
-	UINT16 *m_scrollram16;
+	std::unique_ptr<UINT16[]> m_back_data;
+	std::unique_ptr<UINT16[]> m_fore_data;
+	std::unique_ptr<UINT16[]> m_mid_data;
+	std::unique_ptr<UINT16[]> m_textram;
+	std::unique_ptr<UINT16[]> m_scrollram16;
 	UINT16 m_layer_disable;
 	int m_sprite_xoffs;
 	int m_sprite_yoffs;
@@ -48,6 +48,8 @@ public:
 	UINT16 scrollvals[6];
 	DECLARE_WRITE16_MEMBER(tilemap_enable_w);
 	DECLARE_WRITE16_MEMBER(tile_scroll_w);
+	DECLARE_WRITE16_MEMBER(tile_scroll_base_w);
+	DECLARE_WRITE16_MEMBER(tile_vreg_1a_w);
 	DECLARE_WRITE16_MEMBER(videowrite_cb_w);
 	DECLARE_WRITE16_MEMBER(wordswapram_w);
 	DECLARE_WRITE16_MEMBER(legionna_background_w);

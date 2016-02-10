@@ -23,8 +23,8 @@ public:
 	isa16_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	bool is_primary() { return m_is_primary; }
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
@@ -34,8 +34,8 @@ public:
 	WRITE8_MEMBER(ide16_alt_w);
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state

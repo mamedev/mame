@@ -92,7 +92,7 @@ public:
 	UINT16 m_ram_adr;
 	UINT16 m_ram_latch[2];
 	UINT16 m_ram_scanadr;
-	UINT32 *m_ram_data;
+	std::unique_ptr<UINT32[]> m_ram_data;
 	float m_tgp_vr_base[4];
 	int m_puuu;
 	int m_ccount;
@@ -111,11 +111,11 @@ public:
 	UINT16 m_listctl[2];
 	UINT16 *m_glist;
 	int m_render_done;
-	UINT16 *m_tgp_ram;
+	std::unique_ptr<UINT16[]> m_tgp_ram;
 	optional_shared_ptr<UINT16> m_paletteram16;
 	required_device<palette_device> m_palette;
 	UINT32 *m_poly_rom;
-	UINT32 *m_poly_ram;
+	std::unique_ptr<UINT32[]> m_poly_ram;
 	UINT16 m_lamp_state;
 	DECLARE_READ16_MEMBER(io_r);
 	DECLARE_WRITE16_MEMBER(io_w);
@@ -130,10 +130,6 @@ public:
 	DECLARE_WRITE16_MEMBER(mr2_w);
 	DECLARE_READ16_MEMBER(snd_68k_ready_r);
 	DECLARE_WRITE16_MEMBER(snd_latch_to_68k_w);
-	DECLARE_READ16_MEMBER(m1_snd_68k_latch_r);
-	DECLARE_READ16_MEMBER(m1_snd_v60_ready_r);
-	DECLARE_WRITE16_MEMBER(m1_snd_68k_latch1_w);
-	DECLARE_WRITE16_MEMBER(m1_snd_68k_latch2_w);
 	DECLARE_READ16_MEMBER(model1_tgp_copro_r);
 	DECLARE_WRITE16_MEMBER(model1_tgp_copro_w);
 	DECLARE_READ16_MEMBER(model1_tgp_copro_adr_r);
@@ -150,13 +146,10 @@ public:
 	DECLARE_WRITE32_MEMBER(copro_ram_w);
 	DECLARE_READ16_MEMBER(model1_listctl_r);
 	DECLARE_WRITE16_MEMBER(model1_listctl_w);
-	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk1_w);
-	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk2_w);
 	DECLARE_MACHINE_START(model1);
 	DECLARE_MACHINE_RESET(model1);
 	DECLARE_VIDEO_START(model1);
 	DECLARE_MACHINE_RESET(model1_vr);
-	DECLARE_WRITE_LINE_MEMBER(m1_to_main_irq);
 	UINT32 screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_model1(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(model1_interrupt);

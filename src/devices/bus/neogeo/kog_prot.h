@@ -26,15 +26,9 @@ public:
 	required_ioport m_jumper;
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual ioport_constructor device_input_ports() const;
-
-
-
-private:
-
-
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
 };
 
 #endif

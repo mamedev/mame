@@ -52,17 +52,16 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_update );
 
 	UINT8* get_lcd_state() { return m_lcd_state; }
-	void readback_trigger();
 
 	DECLARE_READ16_MEMBER( slave_r );
 	DECLARE_WRITE16_MEMBER( slave_w );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load() { }
-	virtual void device_clock_changed() { }
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override { }
+	virtual void device_clock_changed() override { }
 
 	// internal callbacks
 	TIMER_CALLBACK_MEMBER( trigger_readback_int );

@@ -27,8 +27,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 
 private:
 	// internal state
@@ -53,21 +53,21 @@ class m62_audio_device : public irem_audio_device
 {
 public:
 	m62_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class m52_soundc_audio_device : public irem_audio_device
 {
 public:
 	m52_soundc_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class m52_large_audio_device : public irem_audio_device
 {
 public:
 	m52_large_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 //MACHINE_CONFIG_EXTERN( m52_sound_c_audio );

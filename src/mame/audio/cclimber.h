@@ -46,17 +46,18 @@ public:
 
 protected:
 	// device level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	void play_sample(int start,int freq,int volume);
 
 private:
-	INT16 *m_sample_buf;    /* buffer to decode samples at run time */
+	std::unique_ptr<INT16[]> m_sample_buf;    /* buffer to decode samples at run time */
 	int m_sample_num;
 	int m_sample_freq;
 	int m_sample_volume;
-	required_device<samples_device> m_samples;
+	optional_device<samples_device> m_samples;
+	optional_region_ptr<UINT8> m_samples_region;
 };
 
 

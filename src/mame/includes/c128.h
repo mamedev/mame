@@ -137,8 +137,8 @@ public:
 	required_ioport m_caps;
 	required_ioport m_40_80;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	inline void check_interrupts();
 	int read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, int aec, int z80io, int ms3, int ms2, int ms1, int ms0);

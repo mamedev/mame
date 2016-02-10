@@ -117,21 +117,19 @@ class debug_view_source
 
 public:
 	// construction/destruction
-	debug_view_source(const char *name, device_t *device = NULL);
+	debug_view_source(const char *name, device_t *device = nullptr);
 	virtual ~debug_view_source();
 
 	// getters
 	const char *name() const { return m_name.c_str(); }
 	debug_view_source *next() const { return m_next; }
 	device_t *device() const { return m_device; }
-	bool is_octal() const { return m_is_octal; }
 
 private:
 	// internal state
 	debug_view_source *     m_next;                 // link to next item
 	std::string             m_name;                 // name of the source item
 	device_t *              m_device;               // associated device (if applicable)
-	bool                    m_is_octal;             // is view in octal or hex
 };
 
 
@@ -162,7 +160,6 @@ public:
 	const simple_list<debug_view_source> &source_list() const { return m_source_list; }
 
 	// setters
-	void set_size(int width, int height);
 	void set_visible_size(debug_view_xy size);
 	void set_visible_position(debug_view_xy pos);
 	void set_cursor_position(debug_view_xy pos);

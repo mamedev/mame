@@ -49,8 +49,8 @@ public:
 	required_device<rs232_port_device> m_rs232b;
 	required_device<ram_device> m_ram;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER( com8116_w );
 	DECLARE_READ8_MEMBER( pia_r );

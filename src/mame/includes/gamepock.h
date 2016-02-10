@@ -23,7 +23,7 @@ public:
 		m_cart(*this, "cartslot")
 		{ }
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	UINT8 m_port_a;
 	UINT8 m_port_b;

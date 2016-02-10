@@ -17,6 +17,7 @@
 		allowed = {
 			{ "gcc", "GNU GCC (gcc/g++)" },
 			{ "ow",  "OpenWatcom"        },
+			{ "ghs", "Green Hills Software" },
 		}
 	}
 
@@ -73,7 +74,8 @@
 			{ "ps3",         "Playstation 3 (experimental)" },
 			{ "orbis",       "Playstation 4" },
 			{ "xbox360",     "Xbox 360 (experimental)" },
-			{ "ARM",         "ARM (Microsoft)" },
+			{ "ARM",         "ARM" },
+			{ "PowerPC",     "PowerPC" },
 		}
 	}
 	

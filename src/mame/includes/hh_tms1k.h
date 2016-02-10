@@ -30,19 +30,19 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<11> m_inp_matrix; // max 11
+	optional_ioport_array<18> m_inp_matrix; // max 18
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
 	UINT16 m_r;                         // MCU R-pins data
 	UINT16 m_o;                         // MCU O-pins data
-	UINT16 m_inp_mux;                   // multiplexed inputs mask
+	UINT32 m_inp_mux;                   // multiplexed inputs mask
 	bool m_power_on;
 	bool m_power_led;
 
 	UINT8 read_inputs(int columns);
-	DECLARE_INPUT_CHANGED_MEMBER(power_button);
-	DECLARE_WRITE_LINE_MEMBER(auto_power_off);
+	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button);
+	virtual DECLARE_WRITE_LINE_MEMBER(auto_power_off);
 
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
@@ -60,12 +60,13 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
+	void set_display_segmask(UINT32 digits, UINT32 mask);
 	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
 	void display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask);
 
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 

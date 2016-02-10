@@ -60,10 +60,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pia40_pa_w);
 	DECLARE_WRITE8_MEMBER(pia40_pb_w);
 	DECLARE_WRITE_LINE_MEMBER(pia40_cb2_w);
-	DECLARE_READ8_MEMBER(dips_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_READ8_MEMBER(pia28_w7_r);
 	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pias_cb2_w);
@@ -109,7 +107,7 @@ protected:
 	void set_segment2(UINT32 s) { m_segment2 = s; }
 	void set_timer(emu_timer* t) { m_irq_timer = t; }
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 0;
 private:
 	UINT8 m_sound_data;
@@ -179,8 +177,6 @@ public:
 	s11c_state(const machine_config &mconfig, device_type type, const char *tag)
 		: s11b_state(mconfig, type, tag)
 	{ }
-
-	DECLARE_WRITE8_MEMBER(bgbank_w);
 
 	DECLARE_MACHINE_RESET(s11c);
 	DECLARE_DRIVER_INIT(s11c);

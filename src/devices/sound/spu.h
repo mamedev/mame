@@ -46,12 +46,12 @@ class spu_device : public device_t, public device_sound_interface
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load();
-	virtual void device_stop();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
+	virtual void device_stop() override;
 
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// internal state
 	devcb_write_line m_irq_handler;
@@ -165,7 +165,6 @@ protected:
 											void *fmnoise_ptr,
 											void *outxptr,
 											unsigned int *tleft);
-	void process();
 	void process_until(const unsigned int tsample);
 	void update_voice_loop(const unsigned int v);
 	bool update_voice_state(const unsigned int v);
@@ -232,8 +231,6 @@ public:
 
 	void reinit_sound();
 	void kill_sound();
-
-	void update();
 
 	void start_dma(UINT8 *mainram, bool to_spu, UINT32 size);
 	bool play_xa(const unsigned int sector, const unsigned char *sec);

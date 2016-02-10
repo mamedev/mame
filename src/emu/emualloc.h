@@ -14,35 +14,19 @@
 #define __EMUALLOC_H__
 
 #include <new>
+#include <mutex>
 #include "osdcore.h"
 #include "coretmpl.h"
-
-
-//**************************************************************************
-//  DEBUGGING
-//**************************************************************************
-
-// set to 1 to track memory allocated by emualloc.h itself as well
-#define TRACK_SELF_MEMORY       (0)
-
-
 
 //**************************************************************************
 //  MACROS
 //**************************************************************************
 
-// self-allocation helpers
-#if TRACK_SELF_MEMORY
-#define EMUALLOC_SELF_NEW new(__FILE__, __LINE__)
-#else
-#define EMUALLOC_SELF_NEW new
-#endif
-
 // pool allocation helpers
-#define pool_alloc(_pool, _type)                    (_pool).add_object(new(__FILE__, __LINE__) _type)
-#define pool_alloc_clear(_pool, _type)              (_pool).add_object(new(__FILE__, __LINE__, zeromem) _type)
-#define pool_alloc_array(_pool, _type, _num)        (_pool).add_array(new(__FILE__, __LINE__) _type[_num], (_num))
-#define pool_alloc_array_clear(_pool, _type, _num)  (_pool).add_array(new(__FILE__, __LINE__, zeromem) _type[_num], (_num))
+#define pool_alloc(_pool, _type)                    (_pool).add_object(global_alloc(_type))
+#define pool_alloc_clear(_pool, _type)              (_pool).add_object(global_alloc_clear _type)
+#define pool_alloc_array(_pool, _type, _num)        (_pool).add_array(global_alloc_array(_type,_num), (_num))
+#define pool_alloc_array_clear(_pool, _type, _num)  (_pool).add_array(global_alloc_array_clear<_type>(_num), (_num))
 #define pool_free(_pool, v)                         (_pool).remove(v)
 
 
@@ -60,9 +44,9 @@ private:
 
 public:
 	resource_pool_item(void *ptr, size_t size)
-		: m_next(NULL),
-			m_ordered_next(NULL),
-			m_ordered_prev(NULL),
+		: m_next(nullptr),
+			m_ordered_next(nullptr),
+			m_ordered_prev(nullptr),
 			m_ptr(ptr),
 			m_size(size),
 			m_id(~(UINT64)0) { }
@@ -136,12 +120,12 @@ public:
 	bool contains(void *ptrstart, void *ptrend);
 	void clear();
 
-	template<class _ObjectClass> _ObjectClass *add_object(_ObjectClass* object) { add(*EMUALLOC_SELF_NEW resource_pool_object<_ObjectClass>(object), sizeof(_ObjectClass), typeid(_ObjectClass).name()); return object; }
-	template<class _ObjectClass> _ObjectClass *add_array(_ObjectClass* array, int count) { add(*EMUALLOC_SELF_NEW resource_pool_array<_ObjectClass>(array, count), sizeof(_ObjectClass), typeid(_ObjectClass).name()); return array; }
+	template<class _ObjectClass> _ObjectClass *add_object(_ObjectClass* object) { add(*new resource_pool_object<_ObjectClass>(object), sizeof(_ObjectClass), typeid(_ObjectClass).name()); return object; }
+	template<class _ObjectClass> _ObjectClass *add_array(_ObjectClass* array, int count) { add(*new resource_pool_array<_ObjectClass>(array, count), sizeof(_ObjectClass), typeid(_ObjectClass).name()); return array; }
 
 private:
 	int                     m_hash_size;
-	osd_lock *              m_listlock;
+	std::mutex              m_listlock;
 	std::vector<resource_pool_item *> m_hash;
 	resource_pool_item *    m_ordered_head;
 	resource_pool_item *    m_ordered_tail;

@@ -136,7 +136,7 @@ NETLIB_DEVICE_WITH_PARAMS(extclock,
 
 NETLIB_DEVICE_WITH_PARAMS(logic_input,
 
-	virtual void stop();
+	virtual void stop() override;
 	logic_output_t m_Q;
 
 	param_logic_t m_IN;
@@ -163,16 +163,16 @@ public:
 
 protected:
 
-	void start()
+	void start() override
 	{
 		register_output("Q", m_Q);
 	}
 
-	void reset()
+	void reset() override
 	{
 	}
 
-	void update()
+	void update() override
 	{
 		OUTANALOG(m_Q, 0.0);
 	}
@@ -196,16 +196,16 @@ public:
 
 protected:
 
-	void start()
+	void start() override
 	{
 		register_input("I", m_I);
 	}
 
-	void reset()
+	void reset() override
 	{
 	}
 
-	void update()
+	void update() override
 	{
 	}
 
@@ -228,7 +228,7 @@ public:
 
 protected:
 
-	void start()
+	void start() override
 	{
 		register_param("RIN", m_p_RIN, 1.0e6);
 		register_param("ROUT", m_p_ROUT, 50.0);
@@ -244,13 +244,13 @@ protected:
 		connect_late(m_Q, m_ROUT.m_P);
 	}
 
-	void reset()
+	void reset() override
 	{
 		m_RIN.set(1.0 / m_p_RIN.Value(),0,0);
 		m_ROUT.set(1.0 / m_p_ROUT.Value(),0,0);
 	}
 
-	void update()
+	void update() override
 	{
 		OUTANALOG(m_Q, INPANALOG(m_I));
 	}
@@ -281,9 +281,9 @@ public:
 
 protected:
 
-	void start();
-	void reset();
-	void update();
+	void start() override;
+	void reset() override;
+	void update() override;
 
 private:
 
@@ -331,10 +331,10 @@ public:
 
 protected:
 
-	void start();
-	void reset();
-	ATTR_HOT void update();
-	ATTR_HOT void update_param();
+	void start() override;
+	void reset() override;
+	ATTR_HOT void update() override;
+	ATTR_HOT void update_param() override;
 
 private:
 	UINT8 m_last_state;
@@ -391,17 +391,17 @@ public:
 	logic_output_t m_Q;
 
 protected:
-	void start()
+	void start() override
 	{
 		register_input("I", m_I);
 		register_output("Q", m_Q);
 	}
 
-	void reset()
+	void reset() override
 	{
 	}
 
-	ATTR_HOT void update()
+	ATTR_HOT void update() override
 	{
 		if (m_I.Q_Analog() > logic_family().m_high_thresh_V)
 			OUTLOGIC(m_Q, 1, NLTIME_FROM_NS(1));
@@ -432,7 +432,7 @@ protected:
 	{
 	}
 
-	virtual void start()
+	virtual void start() override
 	{
 		register_input("I", m_I);
 	}
@@ -456,11 +456,11 @@ public:
 	virtual ~nld_d_to_a_proxy() {}
 
 protected:
-	virtual void start();
+	virtual void start() override;
 
-	virtual void reset();
+	virtual void reset() override;
 
-	ATTR_HOT void update();
+	ATTR_HOT void update() override;
 
 private:
 	analog_output_t m_Q;
@@ -484,20 +484,20 @@ public:
 	public:
 		dummy(const pstring &dev_name) : device_t(), m_dev_name(dev_name) { }
 	protected:
-		virtual void init(netlist_t &anetlist, const pstring &aname)
+		virtual void init(netlist_t &anetlist, const pstring &aname) override
 		{
 			anetlist.setup().namespace_push(aname);
 			anetlist.setup().include(m_dev_name);
 			anetlist.setup().namespace_pop();
 		}
-		void start() { }
-		void reset() { }
-		void update() { }
+		void start() override { }
+		void reset() override { }
+		void update() override { }
 
 		pstring m_dev_name;
 	};
 
-	ATTR_COLD device_t *Create()
+	ATTR_COLD device_t *Create() override
 	{
 		device_t *r = palloc(dummy(this->name()));
 		return r;

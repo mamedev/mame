@@ -17,16 +17,16 @@ public:
 	gb_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start() { shared_start(); };
-	virtual void device_reset() { shared_reset(); };
+	virtual void device_start() override { shared_start(); };
+	virtual void device_reset() override { shared_reset(); };
 
 	void shared_start();
 	void shared_reset();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_READ8_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
 };
 
 // ======================> gb_rom_tama5_device
@@ -37,13 +37,14 @@ public:
 	gb_rom_tama5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_READ8_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+
 	UINT16 m_tama5_data, m_tama5_addr, m_tama5_cmd;
 	UINT8 m_regs[32];
 	UINT8 m_rtc_reg;
@@ -57,12 +58,12 @@ public:
 	gb_rom_wisdom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start() { shared_start(); };
-	virtual void device_reset() { shared_reset(); };
+	virtual void device_start() override { shared_start(); };
+	virtual void device_reset() override { shared_reset(); };
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 };
 
 // ======================> gb_rom_yong_device
@@ -73,12 +74,12 @@ public:
 	gb_rom_yong_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start() { shared_start(); };
-	virtual void device_reset() { shared_reset(); };
+	virtual void device_start() override { shared_start(); };
+	virtual void device_reset() override { shared_reset(); };
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 };
 
 // ======================> gb_rom_atvrac_device
@@ -89,12 +90,12 @@ public:
 	gb_rom_atvrac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start() { shared_start(); };
-	virtual void device_reset() { shared_reset(); };
+	virtual void device_start() override { shared_start(); };
+	virtual void device_reset() override { shared_reset(); };
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 };
 
 // ======================> gb_rom_lasama_device
@@ -105,12 +106,12 @@ public:
 	gb_rom_lasama_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start() { shared_start(); };
-	virtual void device_reset() { shared_reset(); };
+	virtual void device_start() override { shared_start(); };
+	virtual void device_reset() override { shared_reset(); };
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 };
 
 
@@ -124,13 +125,13 @@ public:
 	megaduck_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
 };
 
 // device type definition

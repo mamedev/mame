@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include <string.h> // strlen
@@ -13,17 +13,18 @@
 namespace stl = tinystl;
 
 #include <bgfx/bgfx.h>
-#include <bx/readerwriter.h>
+#include <bx/commandline.h>
 #include <bx/fpumath.h>
+#include <bx/readerwriter.h>
 #include <bx/string.h>
 #include "entry/entry.h"
 #include <ib-compress/indexbufferdecompression.h>
 
 #include "bgfx_utils.h"
 
-void* load(bx::FileReaderI* _reader, bx::ReallocatorI* _allocator, const char* _filePath, uint32_t* _size)
+void* load(bx::FileReaderI* _reader, bx::AllocatorI* _allocator, const char* _filePath, uint32_t* _size)
 {
-	if (0 == bx::open(_reader, _filePath) )
+	if (bx::open(_reader, _filePath) )
 	{
 		uint32_t size = (uint32_t)bx::getSize(_reader);
 		void* data = BX_ALLOC(_allocator, size);
@@ -35,11 +36,16 @@ void* load(bx::FileReaderI* _reader, bx::ReallocatorI* _allocator, const char* _
 		}
 		return data;
 	}
+	else
+	{
+		DBG("Failed to open: %s.", _filePath);
+	}
 
 	if (NULL != _size)
 	{
 		*_size = 0;
 	}
+
 	return NULL;
 }
 
@@ -55,7 +61,7 @@ void unload(void* _ptr)
 
 static const bgfx::Memory* loadMem(bx::FileReaderI* _reader, const char* _filePath)
 {
-	if (0 == bx::open(_reader, _filePath) )
+	if (bx::open(_reader, _filePath) )
 	{
 		uint32_t size = (uint32_t)bx::getSize(_reader);
 		const bgfx::Memory* mem = bgfx::alloc(size+1);
@@ -65,12 +71,13 @@ static const bgfx::Memory* loadMem(bx::FileReaderI* _reader, const char* _filePa
 		return mem;
 	}
 
+	DBG("Failed to load %s.", _filePath);
 	return NULL;
 }
 
-static void* loadMem(bx::FileReaderI* _reader, bx::ReallocatorI* _allocator, const char* _filePath, uint32_t* _size)
+static void* loadMem(bx::FileReaderI* _reader, bx::AllocatorI* _allocator, const char* _filePath, uint32_t* _size)
 {
-	if (0 == bx::open(_reader, _filePath) )
+	if (bx::open(_reader, _filePath) )
 	{
 		uint32_t size = (uint32_t)bx::getSize(_reader);
 		void* data = BX_ALLOC(_allocator, size);
@@ -84,6 +91,7 @@ static void* loadMem(bx::FileReaderI* _reader, bx::ReallocatorI* _allocator, con
 		return data;
 	}
 
+	DBG("Failed to load %s.", _filePath);
 	return NULL;
 }
 
@@ -174,7 +182,7 @@ bgfx::TextureHandle loadTexture(bx::FileReaderI* _reader, const char* _name, uin
 	}
 
 	bgfx::TextureHandle handle = BGFX_INVALID_HANDLE;
-	bx::ReallocatorI* allocator = entry::getAllocator();
+	bx::AllocatorI* allocator = entry::getAllocator();
 
 	uint32_t size = 0;
 	void* data = loadMem(_reader, allocator, filePath, &size);
@@ -398,10 +406,12 @@ struct Mesh
 
 		Group group;
 
-		bx::ReallocatorI* allocator = entry::getAllocator();
+		bx::AllocatorI* allocator = entry::getAllocator();
 
 		uint32_t chunk;
-		while (4 == bx::read(_reader, chunk) )
+		bx::Error err;
+		while (4 == bx::read(_reader, chunk, &err)
+		&&     err.isOk() )
 		{
 			switch (chunk)
 			{
@@ -589,10 +599,14 @@ Mesh* meshLoad(bx::ReaderSeekerI* _reader)
 Mesh* meshLoad(const char* _filePath)
 {
 	bx::FileReaderI* reader = entry::getFileReader();
-	bx::open(reader, _filePath);
-	Mesh* mesh = meshLoad(reader);
-	bx::close(reader);
-	return mesh;
+	if (bx::open(reader, _filePath) )
+	{
+		Mesh* mesh = meshLoad(reader);
+		bx::close(reader);
+		return mesh;
+	}
+
+	return NULL;
 }
 
 void meshUnload(Mesh* _mesh)
@@ -620,4 +634,60 @@ void meshSubmit(const Mesh* _mesh, uint8_t _id, bgfx::ProgramHandle _program, co
 void meshSubmit(const Mesh* _mesh, const MeshState*const* _state, uint8_t _numPasses, const float* _mtx, uint16_t _numMatrices)
 {
 	_mesh->submit(_state, _numPasses, _mtx, _numMatrices);
+}
+
+Args::Args(int _argc, char** _argv)
+	: m_type(bgfx::RendererType::Count)
+	, m_pciId(BGFX_PCI_ID_NONE)
+{
+	bx::CommandLine cmdLine(_argc, (const char**)_argv);
+
+	if (cmdLine.hasArg("gl") )
+	{
+		m_type = bgfx::RendererType::OpenGL;
+	}
+	else if (cmdLine.hasArg("noop")
+		 ||  cmdLine.hasArg("vk") )
+	{
+		m_type = bgfx::RendererType::OpenGL;
+	}
+	else if (BX_ENABLED(BX_PLATFORM_WINDOWS) )
+	{
+		if (cmdLine.hasArg("d3d9") )
+		{
+			m_type = bgfx::RendererType::Direct3D9;
+		}
+		else if (cmdLine.hasArg("d3d11") )
+		{
+			m_type = bgfx::RendererType::Direct3D11;
+		}
+		else if (cmdLine.hasArg("d3d12") )
+		{
+			m_type = bgfx::RendererType::Direct3D12;
+		}
+	}
+	else if (BX_ENABLED(BX_PLATFORM_OSX) )
+	{
+		if (cmdLine.hasArg("mtl") )
+		{
+			m_type = bgfx::RendererType::Metal;
+		}
+	}
+
+	if (cmdLine.hasArg("amd") )
+	{
+		m_pciId = BGFX_PCI_ID_AMD;
+	}
+	else if (cmdLine.hasArg("nvidia") )
+	{
+		m_pciId = BGFX_PCI_ID_NVIDIA;
+	}
+	else if (cmdLine.hasArg("intel") )
+	{
+		m_pciId = BGFX_PCI_ID_INTEL;
+	}
+	else if (cmdLine.hasArg("sw") )
+	{
+		m_pciId = BGFX_PCI_ID_SOFTWARE_RASTERIZER;
+	}
 }

@@ -2,7 +2,7 @@
 // copyright-holders:Wilbert Pol
 #define RLC_8BIT(x)             \
 {                               \
-	register UINT8 f;           \
+	UINT8 f;           \
 	(x)=(UINT8)(((x)<<1)|((x)>>7));      \
 	if( (x)&1 )                 \
 		f=FLAG_C;               \
@@ -15,7 +15,7 @@
 
 #define RL_8BIT(x)              \
 {                               \
-	register UINT8 r;           \
+	UINT8 r;           \
 	r=((x)&0x80)?FLAG_C:0;      \
 	(x)=(UINT8)(((x)<<1)|((m_F&FLAG_C)?1:0));    \
 	if( (x)==0 )                \
@@ -25,7 +25,7 @@
 
 #define RRC_8BIT(x)             \
 {                               \
-	register UINT8 f;           \
+	UINT8 f;           \
 	(x)=(UINT8)(((x)>>1)|((x)<<7));      \
 	if( (x)&0x80 )              \
 		f=FLAG_C;               \
@@ -38,7 +38,7 @@
 
 #define RR_8BIT(x)              \
 {                               \
-	register UINT8 r;           \
+	UINT8 r;           \
 	r=((x)&1)?FLAG_C:0;         \
 	(x)=(UINT8)(((x)>>1)|((m_F&FLAG_C)?0x80:0));     \
 	if( (x)==0 )                \
@@ -48,7 +48,7 @@
 
 #define SLA_8BIT(x)             \
 {                               \
-	register UINT8 f;           \
+	UINT8 f;           \
 	if( (x)&0x80 )              \
 		f=FLAG_C;               \
 	else                        \
@@ -61,7 +61,7 @@
 
 #define SRA_8BIT(x)             \
 {                               \
-	register UINT8 f;           \
+	UINT8 f;           \
 	if( (x)&1 )                 \
 		f=FLAG_C;               \
 	else                        \
@@ -82,7 +82,7 @@
 
 #define SRL_8BIT(x)             \
 {                               \
-	register UINT8 f;           \
+	UINT8 f;           \
 	if( (x)&1 )                 \
 		f=FLAG_C;               \
 	else                        \

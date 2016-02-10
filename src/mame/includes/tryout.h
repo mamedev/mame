@@ -27,8 +27,8 @@ public:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_vram_bank;
-	UINT8 *m_vram;
-	UINT8 *m_vram_gfx;
+	std::unique_ptr<UINT8[]> m_vram;
+	std::unique_ptr<UINT8[]> m_vram_gfx;
 
 	DECLARE_WRITE8_MEMBER(nmi_ack_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
@@ -47,8 +47,8 @@ public:
 	TILEMAP_MAPPER_MEMBER(get_fg_memory_offset);
 	TILEMAP_MAPPER_MEMBER(get_bg_memory_offset);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(tryout);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

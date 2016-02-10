@@ -110,8 +110,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal region struct
@@ -135,12 +135,12 @@ private:
 		// configuration
 		void set_decrypt(fd1089_base_device *fd1089);
 		void set_decrypt(fd1094_device *fd1094);
-		void clear() { set(NULL, NULL, 0, 0, ~0, NULL); }
+		void clear() { set(nullptr, nullptr, 0, 0, ~0, nullptr); }
 		void set(memory_bank *bank, memory_bank *decrypted_bank, offs_t start, offs_t end, offs_t rgnoffs, UINT8 *src);
 
 		// updating
 		void update();
-		void reset() { m_fd1089_decrypted.clear(); if (m_fd1094_cache != NULL) m_fd1094_cache->reset(); }
+		void reset() { m_fd1089_decrypted.clear(); if (m_fd1094_cache != nullptr) m_fd1094_cache->reset(); }
 
 	private:
 		// internal state
@@ -152,7 +152,7 @@ private:
 		UINT8 *                 m_srcptr;
 		fd1089_base_device *    m_fd1089;
 		std::vector<UINT16>   m_fd1089_decrypted;
-		auto_pointer<fd1094_decryption_cache> m_fd1094_cache;
+		std::unique_ptr<fd1094_decryption_cache> m_fd1094_cache;
 	};
 
 	// internal helpers
@@ -190,8 +190,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
@@ -213,8 +213,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal helpers
@@ -247,8 +247,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal helpers

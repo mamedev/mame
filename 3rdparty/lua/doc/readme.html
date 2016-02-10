@@ -7,9 +7,9 @@
 <STYLE TYPE="text/css">
 blockquote, .display {
 	border: solid #a0a0a0 2px ;
+	border-radius: 8px ;
 	padding: 1em ;
 	margin: 0px ;
-	border-radius: 8px ;
 }
 
 .display {
@@ -28,13 +28,12 @@ tt, kbd, code {
 
 <BODY>
 
-<HR>
 <H1>
-<A HREF="http://www.lua.org/"><IMG SRC="logo.gif" ALT="Lua" BORDER=0></A>
-Welcome to Lua 5.3.0
+<A HREF="http://www.lua.org/"><IMG SRC="logo.gif" ALT="Lua"></A>
+Welcome to Lua 5.3
 </H1>
 
-<P>
+<DIV CLASS="menubar">
 <A HREF="#about">about</A>
 &middot;
 <A HREF="#install">installation</A>
@@ -44,9 +43,9 @@ Welcome to Lua 5.3.0
 <A HREF="#license">license</A>
 &middot;
 <A HREF="contents.html">reference manual</A>
+</DIV>
 
 <H2><A NAME="about">About Lua</A></H2>
-
 <P>
 Lua is a powerful, fast, lightweight, embeddable scripting language
 developed by a
@@ -76,7 +75,6 @@ which may differ slightly from the
 distributed in this package.
 
 <H2><A NAME="install">Installing Lua</A></H2>
-
 <P>
 Lua is distributed in
 <A HREF="http://www.lua.org/ftp/">source</A>
@@ -102,7 +100,6 @@ Try also
 a multi-platform distribution of Lua that includes batteries.
 
 <H3>Building Lua</H3>
-
 <P>
 In most Unix-like platforms, simply do "<KBD>make</KBD>" with a suitable target.
 Here are the details.
@@ -110,7 +107,7 @@ Here are the details.
 <OL>
 <LI>
 Open a terminal window and move to
-the top-level directory, which is named <TT>lua-5.3.0</TT>.
+the top-level directory, which is named <TT>lua-5.3.x</TT>.
 The <TT>Makefile</TT> there controls both the build process and the installation process.
 <P>
 <LI>
@@ -140,7 +137,8 @@ and liblua.a (the library).
 </OL>
 <P>
 If you're running Linux and get compilation errors,
-make sure you have installed the <TT>readline</TT> development package.
+make sure you have installed the <TT>readline</TT> development package
+(which is probably named <TT>libreadline-dev</TT> or <TT>readline-devel</TT>).
 If you get link errors after that,
 then try "<KBD>make linux MYLIBS=-ltermcap</KBD>".
 
@@ -174,7 +172,7 @@ then try "<KBD>make linux MYLIBS=-ltermcap</KBD>".
 <DT>
     include:
 <DD>
-    lauxlib.h lua.h lua.hpp luaconf.h lualib.h
+    lua.h luaconf.h lualib.h lauxlib.h lua.hpp
 <DT>
     lib:
 <DD>
@@ -215,7 +213,6 @@ then try "<KBD>make linux MYLIBS=-ltermcap</KBD>".
   Further customization is available to experts by editing the Lua sources.
 
 <H3><A NAME="other">Building Lua on other systems</A></H3>
-
 <P>
   If you're not using the usual Unix tools, then the instructions for
   building Lua depend on the compiler you use. You'll need to create
@@ -258,7 +255,6 @@ compiler:
   some features before building Lua.
 
 <H2><A NAME="changes">Changes since Lua 5.2</A></H2>
-
 <P>
 Here are the main changes introduced in Lua 5.3.
 The
@@ -315,11 +311,10 @@ Here are the other changes introduced in Lua 5.3:
 </UL>
 
 <H2><A NAME="license">License</A></H2>
-<A HREF="http://www.opensource.org/docs/definition.php">
-<IMG SRC="osi-certified-72x60.png" ALIGN="right" BORDER="0" ALT="[osi certified]" STYLE="padding-left: 30px ;">
-</A>
-
 <P>
+<A HREF="http://www.opensource.org/docs/definition.php">
+<IMG SRC="osi-certified-72x60.png" ALIGN="right" ALT="[osi certified]" STYLE="padding-left: 30px ;">
+</A>
 Lua is free software distributed under the terms of the
 <A HREF="http://www.opensource.org/licenses/mit-license.html">MIT license</A>
 reproduced below;
@@ -358,13 +353,12 @@ THE SOFTWARE.
 </BLOCKQUOTE>
 <P>
 
-<HR>
-<SMALL CLASS="footer">
+<P CLASS="footer">
 Last update:
-Fri Dec 12 09:58:42 BRST 2014
-</SMALL>
+Mon Jun  1 21:48:24 BRT 2015
+</P>
 <!--
-Last change: updated for Lua 5.3.0 (final)
+Last change: revised for Lua 5.3.1
 -->
 
 </BODY>

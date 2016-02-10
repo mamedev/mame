@@ -1,6 +1,6 @@
 /*
  * Copyright 2014 Dario Manesku. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include <vector>
@@ -213,14 +213,16 @@ struct LightProbe
 	bgfx::TextureHandle m_texIrr;
 };
 
-int _main_(int /*_argc*/, char** /*_argv*/)
+int _main_(int _argc, char** _argv)
 {
+	Args args(_argc, _argv);
+
 	uint32_t width = 1280;
 	uint32_t height = 720;
 	uint32_t debug = BGFX_DEBUG_TEXT;
 	uint32_t reset = BGFX_RESET_VSYNC;
 
-	bgfx::init();
+	bgfx::init(args.m_type, args.m_pciId);
 	bgfx::reset(width, height, reset);
 
 	// Enable debug text.
@@ -453,7 +455,7 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 		// Use debug font to print information about this example.
 		bgfx::dbgTextClear();
 		bgfx::dbgTextPrintf(0, 1, 0x4f, "bgfx/examples/18-ibl");
-		bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: Image based lightning.");
+		bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: Image-based lighting.");
 		bgfx::dbgTextPrintf(0, 3, 0x0f, "Frame: % 7.3f[ms]", double(frameTime)*toMs);
 
 		float at[3] = { 0.0f, 0.0f, 0.0f };

@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Mirko Buffoni,Richard Bush,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,Alex Marshall,Angelo Salese,Luca Elia
+// license:BSD-3-Clause
+// copyright-holders:Mirko Buffoni,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,Alex Marshall,Angelo Salese,Luca Elia
+// thanks-to:Richard Bush
 #include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "machine/nmk004.h"
@@ -54,8 +55,8 @@ public:
 	int mask[4*2];
 	int m_simple_scroll;
 	int m_redraw_bitmap;
-	UINT16 *m_spriteram_old;
-	UINT16 *m_spriteram_old2;
+	std::unique_ptr<UINT16[]> m_spriteram_old;
+	std::unique_ptr<UINT16[]> m_spriteram_old2;
 	int m_bgbank;
 	int m_videoshift;
 	int m_bioship_background_bank;
@@ -66,7 +67,7 @@ public:
 	tilemap_t *m_bg_tilemap3;
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_fg_tilemap;
-	bitmap_ind16 *m_background_bitmap;
+	std::unique_ptr<bitmap_ind16> m_background_bitmap;
 	int m_mustang_bg_xscroll;
 	UINT8 m_scroll[4];
 	UINT8 m_scroll_2[4];
@@ -87,19 +88,14 @@ public:
 	DECLARE_WRITE8_MEMBER(tharrier_oki6295_bankswitch_0_w);
 	DECLARE_WRITE8_MEMBER(tharrier_oki6295_bankswitch_1_w);
 	DECLARE_WRITE16_MEMBER(afega_soundlatch_w);
-	DECLARE_READ16_MEMBER(mcu_shared_r);
 	DECLARE_WRITE16_MEMBER(hachamf_mainram_w);
 	DECLARE_WRITE16_MEMBER(tdragon_mainram_w);
-	DECLARE_WRITE8_MEMBER(okibank_w);
 	DECLARE_WRITE8_MEMBER(raphero_sound_rombank_w);
 	DECLARE_READ16_MEMBER(vandykeb_r);
 	DECLARE_READ16_MEMBER(tdragonb_prot_r);
 	DECLARE_READ16_MEMBER(afega_unknown_r);
 	DECLARE_WRITE16_MEMBER(afega_scroll0_w);
 	DECLARE_WRITE16_MEMBER(afega_scroll1_w);
-	DECLARE_WRITE16_MEMBER(twinactn_scroll0_w);
-	DECLARE_WRITE16_MEMBER(twinactn_scroll1_w);
-	DECLARE_WRITE16_MEMBER(twinactn_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(nmk_bgvideoram0_w);
 	DECLARE_WRITE16_MEMBER(nmk_bgvideoram1_w);
 	DECLARE_WRITE16_MEMBER(nmk_bgvideoram2_w);

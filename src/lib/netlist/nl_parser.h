@@ -42,7 +42,7 @@ namespace netlist
 		/* for debugging messages */
 		netlist_t &netlist() { return m_setup.netlist(); }
 
-		virtual void verror(const pstring &msg, int line_num, const pstring &line);
+		virtual void verror(const pstring &msg, int line_num, const pstring &line) override;
 	private:
 
 		nl_double eval_param(const token_t tok);

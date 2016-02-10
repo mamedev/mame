@@ -68,7 +68,7 @@ public:
 	UINT16 m_printer_pins;
 	UINT8 m_printer_p2;  // MCU port P2 state
 	UINT32 m_paper_feed;  // amount of paper fed through printer, by n/360 inches.  One line feed is 61/360in (from the linefeed command in CP/M;s ptr menu)
-	bitmap_ind16* m_prn_output;
+	std::unique_ptr<bitmap_ind16> m_prn_output;
 	UINT8 m_printer_p2_prev;
 	emu_timer* m_prn_stepper;
 	emu_timer* m_prn_pins;
@@ -105,9 +105,9 @@ public:
 	DECLARE_WRITE8_MEMBER(pcw9512_parallel_w);
 	void mcu_transmit_serial(UINT8 bit);
 	DECLARE_DRIVER_INIT(pcw);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pcw);
 	UINT32 screen_update_pcw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_pcw_printer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

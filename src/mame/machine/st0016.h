@@ -64,7 +64,8 @@ public:
 	UINT32 update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void st0016_draw_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 *st0016_spriteram,*st0016_paletteram;
+	std::unique_ptr<UINT8[]> st0016_spriteram;
+	std::unique_ptr<UINT8[]> st0016_paletteram;
 
 	UINT32 st0016_game;
 
@@ -74,19 +75,19 @@ public:
 
 	UINT8 st0016_vregs[0xc0];
 	int st0016_ramgfx;
-	UINT8 *m_charram;
+	std::unique_ptr<UINT8[]> m_charram;
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	const address_space_config m_io_space_config;
 	const address_space_config m_space_config;
 
 
-	const address_space_config *memory_space_config(address_spacenum spacenum) const
+	const address_space_config *memory_space_config(address_spacenum spacenum) const override
 	{
 		switch (spacenum)
 		{

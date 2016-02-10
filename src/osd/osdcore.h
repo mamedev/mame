@@ -440,93 +440,6 @@ osd_ticks_t osd_ticks_per_second(void);
 -----------------------------------------------------------------------------*/
 void osd_sleep(osd_ticks_t duration);
 
-
-
-/***************************************************************************
-    SYNCHRONIZATION INTERFACES
-***************************************************************************/
-
-/* osd_lock is an opaque type which represents a recursive lock/mutex */
-struct osd_lock;
-
-
-/*-----------------------------------------------------------------------------
-    osd_lock_alloc: allocate a new lock
-
-    Parameters:
-
-        None.
-
-    Return value:
-
-        A pointer to the allocated lock.
------------------------------------------------------------------------------*/
-osd_lock *osd_lock_alloc(void);
-
-
-/*-----------------------------------------------------------------------------
-    osd_lock_acquire: acquire a lock, blocking until it can be acquired
-
-    Parameters:
-
-        lock - a pointer to a previously allocated osd_lock.
-
-    Return value:
-
-        None.
-
-    Notes:
-
-        osd_locks are defined to be recursive. If the current thread already
-        owns the lock, this function should return immediately.
------------------------------------------------------------------------------*/
-void osd_lock_acquire(osd_lock *lock);
-
-
-/*-----------------------------------------------------------------------------
-    osd_lock_try: attempt to acquire a lock
-
-    Parameters:
-
-        lock - a pointer to a previously allocated osd_lock.
-
-    Return value:
-
-        TRUE if the lock was available and was acquired successfully.
-        FALSE if the lock was already in used by another thread.
------------------------------------------------------------------------------*/
-int osd_lock_try(osd_lock *lock);
-
-
-/*-----------------------------------------------------------------------------
-    osd_lock_release: release control of a lock that has been acquired
-
-    Parameters:
-
-        lock - a pointer to a previously allocated osd_lock.
-
-    Return value:
-
-        None.
------------------------------------------------------------------------------*/
-void osd_lock_release(osd_lock *lock);
-
-
-/*-----------------------------------------------------------------------------
-    osd_lock_free: free the memory and resources associated with an osd_lock
-
-    Parameters:
-
-        lock - a pointer to a previously allocated osd_lock.
-
-    Return value:
-
-        None.
------------------------------------------------------------------------------*/
-void osd_lock_free(osd_lock *lock);
-
-
-
 /***************************************************************************
     WORK ITEM INTERFACES
 ***************************************************************************/
@@ -675,7 +588,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 
 
 /* inline helper to queue a single work item using the same interface */
-INLINE osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback callback, void *param, UINT32 flags)
+static inline osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback callback, void *param, UINT32 flags)
 {
 	return osd_work_item_queue_multiple(queue, callback, 1, param, 0, flags);
 }
@@ -945,6 +858,17 @@ void osd_list_network_adapters(void);
 -----------------------------------------------------------------------------*/
 const char *osd_get_volume_name(int idx);
 
+/*-----------------------------------------------------------------------------
+    osd_subst_env: substitute environment variables with values
+
+    Parameters:
+
+        dst - result pointer
+        src - source string
+
+-----------------------------------------------------------------------------*/
+void osd_subst_env(char **dst, const char *src);
+
 /* ----- output management ----- */
 
 // output channels
@@ -962,7 +886,7 @@ enum osd_output_channel
 class osd_output
 {
 public:
-	osd_output() : m_chain(NULL) { }
+	osd_output() : m_chain(nullptr) { }
 	virtual ~osd_output() { }
 
 	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args) = 0;
@@ -973,7 +897,7 @@ protected:
 
 	void chain_output(osd_output_channel channel, const char *msg, va_list args)
 	{
-		if (m_chain != NULL)
+		if (m_chain != nullptr)
 			m_chain->output_callback(channel, msg, args);
 	}
 private:

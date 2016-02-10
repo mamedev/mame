@@ -47,7 +47,7 @@ public:
 
 	DECLARE_DRIVER_INIT(deadang);
 	DECLARE_DRIVER_INIT(ghunter);
-	virtual void video_start();
+	virtual void video_start() override;
 
 	TILEMAP_MAPPER_MEMBER(bg_scan);
 	TILE_GET_INFO_MEMBER(get_pf3_tile_info);

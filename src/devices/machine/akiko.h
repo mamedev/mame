@@ -70,10 +70,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_stop();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_stop() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	// 1X CDROM sector time in msec (300KBps)
@@ -113,7 +113,7 @@ private:
 	cdda_device *m_cdda;
 	cdrom_file *m_cdrom;
 
-	UINT8 *m_cdrom_toc;
+	std::unique_ptr<UINT8[]> m_cdrom_toc;
 
 	emu_timer *m_dma_timer;
 	emu_timer *m_frame_timer;

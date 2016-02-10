@@ -31,7 +31,7 @@ public:
 	template<class _Object> static devcb_base &set_irqhandler_callback(device_t &device, _Object object) { return downcast<atari_cage_device &>(device).m_irqhandler.set_callback(object); }
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	void reset_w(int state);
 
@@ -58,7 +58,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	cpu_device *m_cpu;
@@ -100,7 +100,7 @@ public:
 	atari_cage_seattle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 };
 

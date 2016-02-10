@@ -20,8 +20,8 @@ class ui_menu_confirm_save_as : public ui_menu
 public:
 	ui_menu_confirm_save_as(running_machine &machine, render_container *container, bool *yes);
 	virtual ~ui_menu_confirm_save_as();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 private:
 	bool *m_yes;
@@ -35,9 +35,9 @@ class ui_menu_file_create : public ui_menu
 public:
 	ui_menu_file_create(running_machine &machine, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool *ok);
 	virtual ~ui_menu_file_create();
-	virtual void populate();
-	virtual void handle();
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
+	virtual void populate() override;
+	virtual void handle() override;
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
 	device_image_interface *        m_image;
@@ -59,9 +59,9 @@ public:
 	enum { R_EMPTY, R_SOFTLIST, R_CREATE, R_FILE };
 	ui_menu_file_selector(running_machine &machine, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, int *result);
 	virtual ~ui_menu_file_selector();
-	virtual void populate();
-	virtual void handle();
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
+	virtual void populate() override;
+	virtual void handle() override;
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
 	enum file_selector_entry_type
@@ -110,8 +110,8 @@ public:
 	ui_menu_select_format(running_machine &machine, render_container *container,
 							class floppy_image_format_t **formats, int ext_match, int total_usable, int *result);
 	virtual ~ui_menu_select_format();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 private:
 	// internal state
@@ -131,8 +131,8 @@ public:
 	ui_menu_select_rw(running_machine &machine, render_container *container,
 						bool can_in_place, int *result);
 	virtual ~ui_menu_select_rw();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 private:
 	// internal state

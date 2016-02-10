@@ -21,7 +21,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_bit7) { if (state) m_input_data |= 0x80; else m_input_data &= ~0x80; }
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 	UINT8 m_input_data;
 };

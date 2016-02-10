@@ -1,6 +1,6 @@
 --
--- Copyright 2010-2015 Branimir Karadzic. All rights reserved.
--- License: http://www.opensource.org/licenses/BSD-2-Clause
+-- Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+-- License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 --
 
 project "shaderc"
@@ -55,11 +55,6 @@ project "shaderc"
 			path.join(GLSL_OPTIMIZER, "include/c99"),
 		}
 
-	configuration { "vs* or mingw*" }
-		links {
-			"d3dcompiler",
-		}
-
 	configuration {}
 
 	defines { -- fcpp
@@ -73,6 +68,7 @@ project "shaderc"
 		path.join(BX_DIR, "include"),
 		path.join(BGFX_DIR, "include"),
 
+		path.join(BGFX_DIR, "3rdparty/dxsdk/include"),
 		FCPP_DIR,
 
 		path.join(GLSL_OPTIMIZER, "include"),

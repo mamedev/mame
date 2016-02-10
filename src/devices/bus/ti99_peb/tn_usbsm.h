@@ -25,17 +25,17 @@ class nouspikel_usb_smartmedia_device : public ti_expansion_card_device
 {
 public:
 	nouspikel_usb_smartmedia_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 
-	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	DECLARE_READ8Z_MEMBER(crureadz) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
 protected:
-	virtual void device_start(void);
-	virtual void device_reset(void);
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start(void) override;
+	virtual void device_reset(void) override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 

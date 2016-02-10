@@ -57,8 +57,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(ringking_get_bg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(kingofb);
 	DECLARE_PALETTE_INIT(kingofb);
 	DECLARE_VIDEO_START(ringking);

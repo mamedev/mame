@@ -9,15 +9,15 @@ class m20_keyboard_device : public serial_keyboard_device
 {
 public:
 	m20_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 protected:
-	virtual void device_start();
-	virtual void rcv_complete();
+	virtual void device_start() override;
+	virtual void rcv_complete() override;
 
 private:
 	void write(UINT8 data);
-	virtual UINT8 keyboard_handler(UINT8 last_code, UINT8 *scan_line);
+	virtual UINT8 keyboard_handler(UINT8 last_code, UINT8 *scan_line) override;
 	UINT8 m_state[16];
 };
 

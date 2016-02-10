@@ -109,21 +109,17 @@ public:
 		TIMER_ID_CASSETTE
 	};
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	void bankswitch();
 	void clock_cassette(int state);
 
 	DECLARE_READ8_MEMBER( pling_r );
-	DECLARE_READ8_MEMBER( keyboard_col_r );
-	DECLARE_WRITE8_MEMBER( keyboard_row_w );
-	DECLARE_WRITE8_MEMBER( keyboard_ctrl_w );
-	DECLARE_READ8_MEMBER( keyboard_t1_r );
 	DECLARE_WRITE8_MEMBER( hrs_w );
 	DECLARE_WRITE8_MEMBER( hrc_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
@@ -236,10 +232,10 @@ public:
 	required_ioport m_config;
 
 	DECLARE_DRIVER_INIT(driver_init);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void bankswitch();
@@ -286,10 +282,10 @@ public:
 	optional_shared_ptr<UINT8> m_attr_ram;
 
 	DECLARE_DRIVER_INIT(driver_init);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void bankswitch();

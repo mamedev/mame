@@ -31,15 +31,15 @@ public:
 	vp595_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_vip_expansion_card_interface overrides
-	virtual void vip_io_w(address_space &space, offs_t offset, UINT8 data);
-	virtual void vip_q_w(int state);
+	virtual void vip_io_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual void vip_q_w(int state) override;
 
 private:
 	required_device<cdp1863_device> m_pfg;

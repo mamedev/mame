@@ -21,7 +21,8 @@
 | implementations of C, `flag', `uint8', and `int8' should all be `typedef'ed
 | to the same as `int'.
 *----------------------------------------------------------------------------*/
-#include "emu.h"
+#include "assert.h"
+#include "osdcomm.h"
 
 typedef INT8 flag;
 typedef UINT8 uint8;
@@ -63,4 +64,4 @@ typedef INT64 sbits64;
 | a compiler does not support explicit inlining, this macro should be defined
 | to be `static'.
 *----------------------------------------------------------------------------*/
-// MAME defines INLINE
+#define INLINE static inline

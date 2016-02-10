@@ -28,12 +28,12 @@ public:
 	cgenie_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
 
-	virtual void pa_w(UINT8 data);
-	virtual UINT8 pb_r();
+	virtual void pa_w(UINT8 data) override;
+	virtual UINT8 pb_r() override;
 
 private:
 	required_ioport_array<4> m_joy;

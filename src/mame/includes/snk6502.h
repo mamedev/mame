@@ -65,7 +65,7 @@ public:
 	TILE_GET_INFO_MEMBER(satansat_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(satansat_get_fg_tile_info);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(sasuke);
 	DECLARE_VIDEO_START(satansat);
 	DECLARE_PALETTE_INIT(satansat);
@@ -123,10 +123,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	// internal state

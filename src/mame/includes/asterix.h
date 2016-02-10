@@ -44,15 +44,14 @@ public:
 	required_device<k056832_device> m_k056832;
 	required_device<k05324x_device> m_k053244;
 	required_device<k053251_device> m_k053251;
-	DECLARE_READ16_MEMBER(control2_r);
 	DECLARE_WRITE16_MEMBER(control2_w);
 	DECLARE_WRITE8_MEMBER(sound_arm_nmi_w);
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
 	DECLARE_WRITE16_MEMBER(protection_w);
 	DECLARE_WRITE16_MEMBER(asterix_spritebank_w);
 	DECLARE_DRIVER_INIT(asterix);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(asterix_interrupt);
 	K05324X_CB_MEMBER(sprite_callback);
@@ -60,5 +59,5 @@ public:
 	void reset_spritebank();
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

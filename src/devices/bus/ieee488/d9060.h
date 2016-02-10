@@ -41,9 +41,9 @@ public:
 	d9060_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// not really public
 	DECLARE_READ8_MEMBER( dio_r );
@@ -52,7 +52,6 @@ public:
 	DECLARE_WRITE8_MEMBER( riot1_pa_w );
 	DECLARE_READ8_MEMBER( riot1_pb_r );
 	DECLARE_WRITE8_MEMBER( riot1_pb_w );
-	DECLARE_READ8_MEMBER( via_pb_r );
 	DECLARE_WRITE8_MEMBER( via_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
 	DECLARE_WRITE_LINE_MEMBER( enable_w );
@@ -60,12 +59,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_ieee488_interface overrides
-	void ieee488_atn(int state);
-	void ieee488_ifc(int state);
+	void ieee488_atn(int state) override;
+	void ieee488_ifc(int state) override;
 
 private:
 	inline void update_ieee_signals();

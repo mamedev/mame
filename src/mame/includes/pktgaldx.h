@@ -54,7 +54,7 @@ public:
 	DECLARE_READ16_MEMBER(pckgaldx_protection_r);
 	DECLARE_WRITE16_MEMBER(pktgaldx_oki_bank_w);
 	DECLARE_DRIVER_INIT(pktgaldx);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	UINT32 screen_update_pktgaldx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_pktgaldb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

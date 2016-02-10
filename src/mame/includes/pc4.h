@@ -28,7 +28,7 @@ public:
 	required_device<beep_device> m_beep;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER( beep_w );
 	DECLARE_WRITE8_MEMBER( bank_w );
@@ -37,7 +37,7 @@ public:
 	//LCD controller
 	void update_ac(void);
 	void set_busy_flag(UINT16 usec);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	DECLARE_WRITE8_MEMBER(lcd_control_w);
 	DECLARE_READ8_MEMBER(lcd_control_r);

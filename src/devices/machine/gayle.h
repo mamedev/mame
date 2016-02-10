@@ -80,8 +80,8 @@ public:
 	static void set_id(device_t &device, UINT8 id);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	enum

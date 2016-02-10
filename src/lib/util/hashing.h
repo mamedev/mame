@@ -34,7 +34,7 @@ struct sha1_t
 	bool operator!=(const sha1_t &rhs) const { return memcmp(m_raw, rhs.m_raw, sizeof(m_raw)) != 0; }
 	operator UINT8 *() { return m_raw; }
 	bool from_string(const char *string, int length = -1);
-	const char *as_string(std::string &buffer) const;
+	std::string as_string() const;
 	UINT8 m_raw[20];
 	static const sha1_t null;
 };
@@ -85,7 +85,7 @@ struct md5_t
 	bool operator!=(const md5_t &rhs) const { return memcmp(m_raw, rhs.m_raw, sizeof(m_raw)) != 0; }
 	operator UINT8 *() { return m_raw; }
 	bool from_string(const char *string, int length = -1);
-	const char *as_string(std::string &buffer) const;
+	std::string as_string() const;
 	UINT8 m_raw[16];
 	static const md5_t null;
 };
@@ -136,7 +136,7 @@ struct crc32_t
 	crc32_t &operator=(const UINT32 crc) { m_raw = crc; return *this; }
 	operator UINT32() const { return m_raw; }
 	bool from_string(const char *string, int length = -1);
-	const char *as_string(std::string &buffer) const;
+	std::string as_string() const;
 	UINT32 m_raw;
 	static const crc32_t null;
 };
@@ -182,7 +182,7 @@ struct crc16_t
 	crc16_t &operator=(const UINT16 crc) { m_raw = crc; return *this; }
 	operator UINT16() const { return m_raw; }
 	bool from_string(const char *string, int length = -1);
-	const char *as_string(std::string &buffer) const;
+	std::string as_string() const;
 	UINT16 m_raw;
 	static const crc16_t null;
 };

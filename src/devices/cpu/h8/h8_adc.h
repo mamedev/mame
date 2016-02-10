@@ -94,8 +94,8 @@ protected:
 	bool analog_powered, adtrg;
 	UINT64 next_event;
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void sampling();
 	void start_conversion();
@@ -116,8 +116,8 @@ public:
 	h8_adc_3337_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual int conversion_time(bool first, bool poweron);
-	virtual void mode_update();
+	virtual int conversion_time(bool first, bool poweron) override;
+	virtual void mode_update() override;
 };
 
 class h8_adc_3006_device : public h8_adc_device {
@@ -125,8 +125,8 @@ public:
 	h8_adc_3006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual int conversion_time(bool first, bool poweron);
-	virtual void mode_update();
+	virtual int conversion_time(bool first, bool poweron) override;
+	virtual void mode_update() override;
 };
 
 class h8_adc_2245_device : public h8_adc_device {
@@ -134,8 +134,8 @@ public:
 	h8_adc_2245_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual int conversion_time(bool first, bool poweron);
-	virtual void mode_update();
+	virtual int conversion_time(bool first, bool poweron) override;
+	virtual void mode_update() override;
 };
 
 class h8_adc_2320_device : public h8_adc_device {
@@ -143,8 +143,8 @@ public:
 	h8_adc_2320_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual int conversion_time(bool first, bool poweron);
-	virtual void mode_update();
+	virtual int conversion_time(bool first, bool poweron) override;
+	virtual void mode_update() override;
 };
 
 class h8_adc_2357_device : public h8_adc_device {
@@ -152,8 +152,8 @@ public:
 	h8_adc_2357_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual int conversion_time(bool first, bool poweron);
-	virtual void mode_update();
+	virtual int conversion_time(bool first, bool poweron) override;
+	virtual void mode_update() override;
 };
 
 class h8_adc_2655_device : public h8_adc_device {
@@ -161,10 +161,10 @@ public:
 	h8_adc_2655_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual int conversion_time(bool first, bool poweron);
-	virtual void mode_update();
-	virtual void do_buffering(int buffer);
-	virtual int get_channel_index(int count);
+	virtual int conversion_time(bool first, bool poweron) override;
+	virtual void mode_update() override;
+	virtual void do_buffering(int buffer) override;
+	virtual int get_channel_index(int count) override;
 };
 
 extern const device_type H8_ADC_3337;

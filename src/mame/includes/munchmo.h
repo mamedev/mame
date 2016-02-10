@@ -31,7 +31,7 @@ public:
 	required_shared_ptr<UINT8> m_vreg;
 
 	/* video-related */
-	bitmap_ind16     *m_tmpbitmap;
+	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
 	int          m_palette_bank;
 	int          m_flipscreen;
 
@@ -51,9 +51,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mnchmobl_flipscreen_w);
 	DECLARE_READ8_MEMBER(munchmo_ay1reset_r);
 	DECLARE_READ8_MEMBER(munchmo_ay2reset_r);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(munchmo);
 	UINT32 screen_update_mnchmobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mnchmobl_vblank_irq);

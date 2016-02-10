@@ -31,7 +31,7 @@ public:
 	sms_sports_pad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_CUSTOM_INPUT_MEMBER( dir_pins_r );
 	DECLARE_CUSTOM_INPUT_MEMBER( th_pin_r );
@@ -39,11 +39,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_sms_control_port_interface overrides
-	virtual UINT8 peripheral_r();
-	virtual void peripheral_w(UINT8 data);
+	virtual UINT8 peripheral_r() override;
+	virtual void peripheral_w(UINT8 data) override;
 
 private:
 	required_ioport m_sports_in;
@@ -59,7 +59,7 @@ private:
 	emu_timer *m_sportspad_timer;
 	static const device_timer_id TIMER_SPORTSPAD = 0;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

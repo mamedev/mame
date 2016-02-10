@@ -85,14 +85,8 @@ public:
 	UINT16 m_cartridge_ram2[0x10000];
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-
-
-
-private:
-
-
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 #endif

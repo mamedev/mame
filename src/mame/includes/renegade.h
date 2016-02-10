@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, Carlos A. Lozano, Rob Rosenbrock
 #include "sound/msm5205.h"
 
@@ -98,9 +98,9 @@ public:
 	DECLARE_DRIVER_INIT(kuniokun);
 	DECLARE_DRIVER_INIT(kuniokunb);
 	DECLARE_DRIVER_INIT(renegade);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -12,7 +12,7 @@
 #define __OPTIONS_H__
 
 #include "corefile.h"
-#include "tagmap.h"
+#include <unordered_map>
 
 
 
@@ -70,12 +70,12 @@ public:
 		friend class simple_list<entry>;
 
 		// construction/destruction
-		entry(const char *name, const char *description, UINT32 flags = 0, const char *defvalue = NULL);
+		entry(const char *name, const char *description, UINT32 flags = 0, const char *defvalue = nullptr);
 
 	public:
 		// getters
 		entry *next() const { return m_next; }
-		const char *name(int index = 0) const { return (index < ARRAY_LENGTH(m_name) && !m_name[index].empty()) ? m_name[index].c_str() : NULL; }
+		const char *name(int index = 0) const { return (index < ARRAY_LENGTH(m_name) && !m_name[index].empty()) ? m_name[index].c_str() : nullptr; }
 		const char *description() const { return m_description; }
 		const char *value() const { return m_data.c_str(); }
 		const char *default_value() const { return m_defdata.c_str(); }
@@ -89,12 +89,14 @@ public:
 		bool is_internal() const { return m_flags & OPTION_FLAG_INTERNAL; }
 		bool has_range() const { return (!m_minimum.empty() && !m_maximum.empty()); }
 		int priority() const { return m_priority; }
+		bool is_changed() const { return m_changed; }
 
 		// setters
 		void set_value(const char *newvalue, int priority);
 		void set_default_value(const char *defvalue);
 		void set_description(const char *description);
 		void set_flag(UINT32 mask, UINT32 flag);
+		void mark_changed() { m_changed = true; }
 		void revert(int priority);
 
 	private:
@@ -110,6 +112,7 @@ public:
 		std::string             m_defdata;          // default data for this item
 		std::string             m_minimum;          // minimum value
 		std::string             m_maximum;          // maximum value
+		bool					m_changed;			// changed flag
 	};
 
 	// construction/destruction
@@ -130,7 +133,7 @@ public:
 	const char *command() const { return m_command.c_str(); }
 
 	// configuration
-	void add_entry(const char *name, const char *description, UINT32 flags = 0, const char *defvalue = NULL, bool override_existing = false);
+	void add_entry(const char *name, const char *description, UINT32 flags = 0, const char *defvalue = nullptr, bool override_existing = false);
 	void add_entry(const options_entry &data, bool override_existing = false) { add_entry(data.name, data.description, data.flags, data.defvalue, override_existing); }
 	void add_entries(const options_entry *entrylist, bool override_existing = false);
 	void set_default_value(const char *name, const char *defvalue);
@@ -145,8 +148,8 @@ public:
 	void revert(int priority = OPTION_PRIORITY_MAXIMUM);
 
 	// output
-	const char *output_ini(std::string &buffer, const core_options *diff = NULL);
-	const char *output_help(std::string &buffer);
+	std::string output_ini(const core_options *diff = nullptr) const;
+	std::string output_help() const;
 
 	// reading
 	const char *value(const char *option) const;
@@ -157,6 +160,7 @@ public:
 	float float_value(const char *name) const { return atof(value(name)); }
 	UINT32 seqid(const char *name) const;
 	bool exists(const char *name) const;
+	bool is_changed(const char *name) const;
 
 	// setting
 	void set_command(const char *command);
@@ -164,6 +168,7 @@ public:
 	bool set_value(const char *name, int value, int priority, std::string &error_string);
 	bool set_value(const char *name, float value, int priority, std::string &error_string);
 	void set_flag(const char *name, UINT32 mask, UINT32 flags);
+	void mark_changed(const char *name);
 
 	// misc
 	static const char *unadorned(int x = 0) { return s_option_unadorned[MIN(x, MAX_UNADORNED_OPTIONS)]; }
@@ -178,7 +183,7 @@ private:
 
 	// internal state
 	simple_list<entry>      m_entrylist;            // head of list of entries
-	tagmap_t<entry *>       m_entrymap;             // map for fast lookup
+	std::unordered_map<std::string,entry *>       m_entrymap;             // map for fast lookup
 	std::string             m_command;              // command found
 	static const char *const s_option_unadorned[];  // array of unadorned option "names"
 };

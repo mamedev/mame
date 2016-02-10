@@ -22,7 +22,7 @@ public:
 		{}
 	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
 protected:
-	ATTR_HOT virtual nl_double vsolve();
+	ATTR_HOT virtual nl_double vsolve() override;
 private:
 };
 

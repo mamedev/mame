@@ -50,6 +50,6 @@ public:
 	DECLARE_PALETTE_INIT(kopunch);
 	UINT32 screen_update_kopunch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 };

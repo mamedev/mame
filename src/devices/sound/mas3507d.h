@@ -32,9 +32,9 @@ public:
 	void i2c_sda_w(bool line);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	enum { IDLE, STARTED, NAK, ACK, ACK2 } i2c_bus_state;

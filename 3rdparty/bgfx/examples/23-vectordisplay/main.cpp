@@ -1,6 +1,6 @@
 /*
  * Copyright 2014 Kai Jourdan. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  *
  */
 
@@ -30,14 +30,16 @@ struct PosColorVertex
 
 bgfx::VertexDecl PosColorVertex::ms_decl;
 
-int _main_(int /*_argc*/, char** /*_argv*/)
+int _main_(int _argc, char** _argv)
 {
+	Args args(_argc, _argv);
+
 	uint32_t width = 1280;
 	uint32_t height = 720;
 	uint32_t debug = BGFX_DEBUG_TEXT;
 	uint32_t reset = BGFX_RESET_VSYNC;
 
-	bgfx::init();
+	bgfx::init(args.m_type, args.m_pciId);
 	bgfx::reset(width, height, reset);
 
 	const bgfx::RendererType::Enum renderer = bgfx::getRendererType();

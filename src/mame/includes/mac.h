@@ -161,11 +161,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 private:
 	// internal state
 
@@ -175,7 +175,7 @@ private:
 	sound_stream *m_mac_stream;
 	int m_sample_enable;
 	UINT16 *m_mac_snd_buf_ptr;
-	UINT8 *m_snd_cache;
+	std::unique_ptr<UINT8[]> m_snd_cache;
 	int m_snd_cache_len;
 	int m_snd_cache_head;
 	int m_snd_cache_tail;
@@ -242,8 +242,8 @@ public:
 	required_ioport m_key0, m_key1, m_key2, m_key3, m_key4, m_key5;
 	optional_ioport m_key6, m_montype;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	model_t m_model;
 
@@ -254,6 +254,10 @@ public:
 	UINT32 m_via2_vbl;
 	UINT32 m_se30_vbl_enable;
 	UINT8 m_nubus_irq_state;
+
+	emu_timer *m_overlay_timeout;
+	TIMER_CALLBACK_MEMBER(overlay_timeout_func);
+	DECLARE_READ32_MEMBER(rom_switch_r);
 
 #ifndef MAC_USE_EMULATED_KBD
 	/* used to store the reply to most keyboard commands */
@@ -333,10 +337,7 @@ public:
 	void set_via_interrupt(int value);
 	void set_via2_interrupt(int value);
 	void field_interrupts();
-	void rtc_write_rTCEnb(int data);
-	void rtc_shift_data(int data);
 	void vblank_irq();
-	void rtc_incticks();
 	void adb_talk();
 	void mouse_callback();
 	void rbv_recalc_irqs();
@@ -419,7 +420,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(mac_asc_irq);
 
-	DECLARE_DIRECT_UPDATE_MEMBER(overlay_opbaseoverride);
 private:
 	int has_adb();
 	void adb_reset();
@@ -543,7 +543,6 @@ public:
 	DECLARE_READ8_MEMBER(mac_via2_in_b_pmu);
 	DECLARE_WRITE8_MEMBER(mac_via2_out_a_pmu);
 	DECLARE_WRITE8_MEMBER(mac_via2_out_b_pmu);
-	DECLARE_WRITE_LINE_MEMBER(mac_kbd_clk_in);
 	void mac_state_load();
 	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
 	DECLARE_WRITE_LINE_MEMBER(mac_via2_irq);
@@ -554,7 +553,6 @@ public:
 	void kbd_shift_out(int data);
 	void keyboard_receive(int val);
 	void mac_driver_init(model_t model);
-	void mac_tracetrap(const char *cpu_name_local, int addr, int trap);
 	void mac_install_memory(offs_t memory_begin, offs_t memory_end,
 		offs_t memory_size, void *memory_data, int is_rom, const char *bank);
 };

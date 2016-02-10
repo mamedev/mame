@@ -41,7 +41,7 @@ public:
 	k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k056832_device()
 	{
-		m_k055555 = 0;
+		m_k055555 = nullptr;
 	}
 
 	static void set_k056832_callback(device_t &device, k056832_cb_delegate callback) { downcast<k056832_device &>(device).m_k056832_cb = callback; }
@@ -120,7 +120,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	// internal state

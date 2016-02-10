@@ -23,10 +23,10 @@
 #define INT_HIGH_TONE       0x40
 #define INT_TRANSMIT_EMPTY  0x20
 #define INT_RECEIVE_FULL    0x10
-#define INT_RTC         0x08
+#define INT_RTC             0x08
 #define INT_DISPLAY_END     0x04
-#define INT_SET         0x100
-#define INT_CLEAR       0x200
+#define INT_SET             0x100
+#define INT_CLEAR           0x200
 
 /* ULA context */
 
@@ -83,17 +83,17 @@ public:
 	int m_map16[256];
 	emu_timer *m_scanline_timer;
 	DECLARE_READ8_MEMBER(electron_read_keyboard);
+	DECLARE_READ8_MEMBER(electron_fred_r);
+	DECLARE_WRITE8_MEMBER(electron_fred_w);
 	DECLARE_READ8_MEMBER(electron_jim_r);
 	DECLARE_WRITE8_MEMBER(electron_jim_w);
-	DECLARE_READ8_MEMBER(electron_1mhz_r);
-	DECLARE_WRITE8_MEMBER(electron_1mhz_w);
-	DECLARE_READ8_MEMBER(electron_ula_r);
-	DECLARE_WRITE8_MEMBER(electron_ula_w);
+	DECLARE_READ8_MEMBER(electron_sheila_r);
+	DECLARE_WRITE8_MEMBER(electron_sheila_w);
 	void electron_tape_start();
 	void electron_tape_stop();
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(electron);
 	UINT32 screen_update_electron(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(electron_tape_timer_handler);
@@ -108,9 +108,10 @@ public:
 	inline void electron_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 	void electron_interrupt_handler(int mode, int interrupt);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( electron_cart );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

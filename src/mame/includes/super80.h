@@ -53,7 +53,6 @@ public:
 	DECLARE_READ8_MEMBER(port3e_r);
 	DECLARE_WRITE8_MEMBER(port3f_w);
 	DECLARE_WRITE8_MEMBER(super80_f1_w);
-	DECLARE_READ8_MEMBER(super80_dc_r);
 	DECLARE_READ8_MEMBER(super80_f2_r);
 	DECLARE_WRITE8_MEMBER(super80_dc_w);
 	DECLARE_WRITE8_MEMBER(super80_f0_w);
@@ -91,7 +90,7 @@ public:
 	UINT8 m_palette_index;
 	required_device<palette_device> m_palette;
 private:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	UINT8 m_keylatch;
 	UINT8 m_cass_data[4];
 	UINT8 m_int_sw;

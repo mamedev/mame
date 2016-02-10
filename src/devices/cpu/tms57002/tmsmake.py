@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+from __future__ import print_function
+
 import sys
 import re
 
@@ -138,7 +140,7 @@ VARIANT_CANONICAL_ORDER = [
 
 def EmitWithPrefix(f, out, prefix):
     for o in out:
-        print >>f, prefix + o
+        print(prefix + o, file=f)
 
 class Instruction:
 
@@ -201,23 +203,23 @@ class Instruction:
     def EmitDasm(self, f, prefix):
         opcode, args = self.GetDasmInfo()
         args = [", " + a for a in args]
-        print >>f, "%scase 0x%02x:" % (prefix, self._id)
-        print >>f, "%s  sprintf(buf, \"%s\"%s);" % (prefix, opcode, "".join(args))
-        print >>f, "%s  break;" % prefix
+        print("%scase 0x%02x:" % (prefix, self._id), file=f)
+        print("%s  sprintf(buf, \"%s\"%s);" % (prefix, opcode, "".join(args)), file=f)
+        print("%s  break;" % prefix, file=f)
 
 
     def EmitCdec(self, f, prefix, no, empty):
-        print >>f, "%scase 0x%02x: // %s" % (prefix, self._id, self._name)
+        print("%scase 0x%02x: // %s" % (prefix, self._id, self._name), file=f)
         if not empty:
-            print >>f, "%s  *op = %s%s;" % (prefix, no, self.GetCdecSum())
+            print("%s  *op = %s%s;" % (prefix, no, self.GetCdecSum()), file=f)
             if self._type == "f":
                 for l in self._run:
-                    print >>f, prefix + l
+                    print(prefix + l, file=f)
             else:
                 l = TYPES[self._type]
                 if l:
-                    print >>f, prefix + l
-        print >>f, "%s  break;" % prefix
+                    print(prefix + l, file=f)
+        print("%s  break;" % prefix, file=f)
 
 
     def ExpandCintrp(self, line, values):
@@ -267,7 +269,6 @@ class Instruction:
             vals = []
             for v in  VARIANT_CANONICAL_ORDER:
                 if v in flags_fixed:
-                    #print "@@@@", f
                     vals.append("%s=%d" % (v, flags_fixed[v]))
             out = ["case %d: // %s %s" % (no, self._name, " ".join(vals))]
             for line in self.PreprocessRunString():
@@ -317,13 +318,6 @@ class Instruction:
             self._run.append(line)
 
 
-def ins_cmp_dasm(a, b):
-    if a._cat[0] != b._cat[0]:
-        return cmp(a._cat[0], b._cat[0])
-    else:
-        return cmp(a._id, b._id)
-
-
 def LoadLst(filename):
     instructions = []
     ins = None
@@ -345,24 +339,24 @@ def LoadLst(filename):
 
 
 def EmitDasm(f, ins_list):
-    ins_list.sort(cmp=ins_cmp_dasm)
+    ins_list.sort(key=lambda x : (x._cat, x._id))
     last_cat = ""
     for i in ins_list:
         cat = i._cat[0]
         if cat != last_cat:
             if last_cat:
-                print >>f, "#endif"
-                print >>f
-            print >>f, "#ifdef DASM" + cat
+                print("#endif", file=f)
+                print("", file=f)
+            print("#ifdef DASM" + cat, file=f)
             last_cat = cat
         i.EmitDasm(f, "    ")
-        print >>f
-    print >>f, "#endif"
-    print >>f
+        print("", file=f)
+    print("#endif", file=f)
+    print("", file=f)
 
 
 def EmitCdec(f, ins_list):
-    ins_list.sort(cmp=ins_cmp_dasm)
+    ins_list.sort(key=lambda x : (x._cat, x._id))
     no = 4
     last_cat = ""
     for i in ins_list:
@@ -373,14 +367,14 @@ def EmitCdec(f, ins_list):
 
         if cat != last_cat:
             if last_cat:
-                print >>f, "#endif"
-                print >>f
-            print >>f, "#ifdef CDEC" + cat
+                print("#endif", file=f)
+                print("", file=f)
+            print("#ifdef CDEC" + cat, file=f)
             last_cat = cat
 
         i.EmitCdec(f, "", no, i._cat == "2b")
         no += i._variants
-        print >>f
+        print("", file=f)
 
     no = 4
     for i in ins_list:
@@ -394,24 +388,24 @@ def EmitCdec(f, ins_list):
 
         if cat != last_cat:
             if last_cat:
-                print >>f, "#endif"
-                print >>f
-            print >>f, "#ifdef CDEC" + cat
+                print("#endif", file=f)
+                print("", file=f)
+            print("#ifdef CDEC" + cat, file=f)
             last_cat = cat
 
         i.EmitCdec(f, "", no, i._cat == "2a")
         no += i._variants
-        print >>f
-    print >>f, "#endif"
-    print >>f
+        print("", file=f)
+    print("#endif", file=f)
+    print("", file=f)
 
 def EmitCintrp(f, ins_list):
-    ins_list.sort(cmp=ins_cmp_dasm)
-    print >>f, "#ifdef CINTRP"
+    ins_list.sort(key=lambda x : (x._cat, x._id))
+    print("#ifdef CINTRP", file=f)
     no = 4
     for i in ins_list:
         no = i.EmitCintrp(f, "", no)
-    print >>f, "#endif"
+    print("#endif", file=f)
 
 
 def CheckSelfAssign(line):

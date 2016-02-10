@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 //
@@ -22,11 +22,11 @@
 //
 
 #include "common.h"
+#include "bgfx_utils.h"
 
 #include <stdio.h>
 #include <math.h>
 
-#include <bgfx/bgfx.h>
 #include <bx/string.h>
 #include <bx/timer.h>
 #include "entry/entry.h"
@@ -946,7 +946,7 @@ int loadDemoData(struct NVGcontext* vg, struct DemoData* data)
 		char file[128];
 		bx::snprintf(file, 128, "images/image%d.jpg", ii+1);
 		data->images[ii] = nvgCreateImage(vg, file, 0);
-		if (data->images[ii] == bgfx::invalidHandle)
+		if (data->images[ii] == 0)
 		{
 			printf("Could not load %s.\n", file);
 			return -1;
@@ -1201,14 +1201,16 @@ void renderDemo(struct NVGcontext* vg, float mx, float my, float width, float he
 	nvgRestore(vg);
 }
 
-int _main_(int /*_argc*/, char** /*_argv*/)
+int _main_(int _argc, char** _argv)
 {
+	Args args(_argc, _argv);
+
 	uint32_t width = 1280;
 	uint32_t height = 720;
 	uint32_t debug = BGFX_DEBUG_TEXT;
 	uint32_t reset = BGFX_RESET_VSYNC;
 
-	bgfx::init();
+	bgfx::init(args.m_type, args.m_pciId);
 	bgfx::reset(width, height, reset);
 
 	// Enable debug text.

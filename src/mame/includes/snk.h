@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Marco Cassili,Ernesto Corvi,Tim Lindquist,Carlos A. Lozano,Bryan McPhail,Jarek Parchanski,Nicola Salmoria,Tomasz Slanina,Phil Stroffolino,Acho A. Tang,Victor Trucco
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi,Tim Lindquist,Carlos A. Lozano,Bryan McPhail,Jarek Parchanski,Nicola Salmoria,Tomasz Slanina,Phil Stroffolino,Acho A. Tang,Victor Trucco
+// thanks-to:Marco Cassili
 /*************************************************************************
 
     various SNK triple Z80 games
@@ -184,6 +185,7 @@ public:
 	UINT32 screen_update_ikari(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_gwar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_tdfever(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_fitegolf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sgladiat_sndirq_update_callback);
 	TIMER_CALLBACK_MEMBER(sndirq_update_callback);
 	DECLARE_WRITE_LINE_MEMBER(ymirq_callback_2);

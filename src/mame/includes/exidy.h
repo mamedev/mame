@@ -94,7 +94,7 @@ public:
 	DECLARE_DRIVER_INIT(spectar);
 	DECLARE_DRIVER_INIT(phantoma);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(teetert);
 
 	UINT32 screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -126,7 +126,7 @@ public:
 	SAMPLES_START_CB_MEMBER(targ_audio_start);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 MACHINE_CONFIG_EXTERN( spectar_audio );

@@ -98,8 +98,8 @@ public:
 	required_device<abcbus_slot_t> m_bus1;
 	required_device<abcbus_slot_t> m_bus2;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( bus_r );
 	DECLARE_WRITE8_MEMBER( bus_w );
@@ -126,13 +126,6 @@ public:
 	IRQ_CALLBACK_MEMBER( abc1600_int_ack );
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-
-	UINT8 read_io(offs_t offset);
-	void write_io(offs_t offset, UINT8 data);
-	UINT8 read_internal_io(offs_t offset);
-	void write_internal_io(offs_t offset, UINT8 data);
-	UINT8 read_external_io(offs_t offset);
-	void write_external_io(offs_t offset, UINT8 data);
 
 	void update_drdy0();
 	void update_drdy1();

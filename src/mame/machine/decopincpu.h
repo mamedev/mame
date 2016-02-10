@@ -108,10 +108,10 @@ public:
 
 protected:
 	// overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual ioport_constructor device_input_ports() const;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 0;
 
 private:
@@ -138,8 +138,8 @@ public:
 	decocpu_type2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 protected:
 	// overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 };
 
 class decocpu_type3_device : public decocpu_type2_device
@@ -150,7 +150,7 @@ public:
 
 protected:
 	// overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class decocpu_type3b_device : public decocpu_type3_device
@@ -160,7 +160,7 @@ public:
 
 protected:
 	// overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type DECOCPU1;

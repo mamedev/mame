@@ -9,13 +9,13 @@ class rmnimbus_keyboard_device : public serial_keyboard_device
 {
 public:
 	rmnimbus_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
-	virtual UINT8 keyboard_handler(UINT8 last_code, UINT8 *scan_line);
+	virtual UINT8 keyboard_handler(UINT8 last_code, UINT8 *scan_line) override;
 
 	required_ioport m_io_kbd8;
 	required_ioport m_io_kbd9;

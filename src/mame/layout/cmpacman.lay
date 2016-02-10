@@ -47,7 +47,7 @@
 			<color red="1.0" green="0.5" blue="0.0" />
 		</rect>
 		<rect state="0">
-			<color red="0.15" green="0.075" blue="0.0" />
+			<color red="0.5" green="0.25" blue="0.0" />
 		</rect>
 		<text string="TAKE">
 			<color red="0.0" green="0.0" blue="0.0" />
@@ -134,7 +134,7 @@
 			<color red="0.7" green="0.35" blue="0.0" />
 		</rect>
 		<rect state="0">
-			<color red="0.1" green="0.05" blue="0.0" />
+			<color red="0.4" green="0.2" blue="0.0" />
 		</rect>
 	</element>
 

@@ -29,11 +29,11 @@ public:
 	virtual ~beckerport_device();
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
-	virtual void device_start(void);
-	virtual void device_stop(void);
-	virtual void device_config_complete(void);
+	virtual void device_start(void) override;
+	virtual void device_stop(void) override;
+	virtual void device_config_complete(void) override;
 
 	void    update_port(void);
 

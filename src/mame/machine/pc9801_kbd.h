@@ -34,7 +34,7 @@ public:
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<pc9801_kbd_device &>(device).m_write_irq.set_callback(object); }
 
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( tx_w );
@@ -43,10 +43,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	devcb_write_line   m_write_irq;
 
@@ -55,6 +55,7 @@ protected:
 	UINT8               m_rx_buf[0x80];
 	UINT8               m_keyb_tx;
 	UINT8               m_keyb_rx;
+	bool				m_key_avail;
 };
 
 

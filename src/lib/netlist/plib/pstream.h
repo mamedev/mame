@@ -184,9 +184,9 @@ public:
 
 protected:
 	/* write n bytes to stream */
-	virtual void vwrite(const void *buf, const unsigned n);
-	virtual void vseek(const pos_type n);
-	virtual pos_type vtell();
+	virtual void vwrite(const void *buf, const unsigned n) override;
+	virtual void vseek(const pos_type n) override;
+	virtual pos_type vtell() override;
 
 private:
 	pos_type m_pos;
@@ -208,12 +208,12 @@ public:
 
 protected:
 	/* write n bytes to stream */
-	virtual void vwrite(const void *buf, const unsigned n)
+	virtual void vwrite(const void *buf, const unsigned n) override
 	{
 		m_buf.cat(buf, n);
 	}
-	virtual void vseek(const pos_type n) { }
-	virtual pos_type vtell() { return m_buf.len(); }
+	virtual void vseek(const pos_type n) override { }
+	virtual pos_type vtell() override { return m_buf.len(); }
 
 private:
 	pstringbuffer m_buf;
@@ -236,9 +236,9 @@ public:
 protected:
 	pofilestream(void *file, const bool do_close);
 	/* write n bytes to stream */
-	virtual void vwrite(const void *buf, const unsigned n);
-	virtual void vseek(const pos_type n);
-	virtual pos_type vtell();
+	virtual void vwrite(const void *buf, const unsigned n) override;
+	virtual void vseek(const pos_type n) override;
+	virtual pos_type vtell() override;
 
 private:
 	void *m_file;
@@ -288,9 +288,9 @@ protected:
 	pifilestream(void *file, const bool do_close);
 
 	/* read up to n bytes from stream */
-	virtual unsigned vread(void *buf, const unsigned n);
-	virtual void vseek(const pos_type n);
-	virtual pos_type vtell();
+	virtual unsigned vread(void *buf, const unsigned n) override;
+	virtual void vseek(const pos_type n) override;
+	virtual pos_type vtell() override;
 
 private:
 	void *m_file;
@@ -327,9 +327,9 @@ public:
 
 protected:
 	/* read up to n bytes from stream */
-	virtual unsigned vread(void *buf, const unsigned n);
-	virtual void vseek(const pos_type n);
-	virtual pos_type vtell();
+	virtual unsigned vread(void *buf, const unsigned n) override;
+	virtual void vseek(const pos_type n) override;
+	virtual pos_type vtell() override;
 
 private:
 	pos_type m_pos;
@@ -366,7 +366,7 @@ public:
 	virtual ~pstream_fmt_writer_t() { }
 
 protected:
-	virtual void vdowrite(const pstring &ls) const
+	virtual void vdowrite(const pstring &ls) const override
 	{
 		m_strm.write(ls);
 	}

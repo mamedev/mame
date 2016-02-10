@@ -15,8 +15,8 @@ public:
 	static void set_gfx_region(device_t &device, int region);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	UINT8 m_gfxregion;
 private:

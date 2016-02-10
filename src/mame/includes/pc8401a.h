@@ -64,8 +64,8 @@ public:
 
 	memory_region *m_cart_rom;
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	DECLARE_WRITE8_MEMBER( mmr_w );
 	DECLARE_READ8_MEMBER( mmr_r );
@@ -103,7 +103,7 @@ public:
 		: pc8401a_state(mconfig, type, tag)
 	{ }
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 

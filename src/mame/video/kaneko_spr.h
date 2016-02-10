@@ -56,8 +56,8 @@ public:
 	DECLARE_WRITE16_MEMBER(kaneko16_sprites_regs_w);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 
 	// flip latching (set when declaring device in MCFG )  probably needs figuring out properly, only brapboys wants it?
@@ -79,9 +79,9 @@ private:
 	// registers
 	UINT16 m_sprite_flipx;
 	UINT16 m_sprite_flipy;
-	UINT16* m_sprites_regs;
+	std::unique_ptr<UINT16[]> m_sprites_regs;
 
-	struct kan_tempsprite *m_first_sprite;
+	std::unique_ptr<struct kan_tempsprite[]> m_first_sprite;
 	int m_keep_sprites;
 	bitmap_ind16 m_sprites_bitmap;
 
@@ -114,8 +114,8 @@ class kaneko_vu002_sprite_device : public kaneko16_sprite_device
 {
 public:
 	kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void get_sprite_attributes(struct kan_tempsprite *s, UINT16 attr);
-	int get_sprite_type(void){ return 0; };
+	void get_sprite_attributes(struct kan_tempsprite *s, UINT16 attr) override;
+	int get_sprite_type(void) override{ return 0; };
 };
 
 extern const device_type KANEKO_VU002_SPRITE;
@@ -124,8 +124,8 @@ class kaneko_kc002_sprite_device : public kaneko16_sprite_device
 {
 public:
 	kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void get_sprite_attributes(struct kan_tempsprite *s, UINT16 attr);
-	int get_sprite_type(void){ return 1; };
+	void get_sprite_attributes(struct kan_tempsprite *s, UINT16 attr) override;
+	int get_sprite_type(void) override{ return 1; };
 };
 
 extern const device_type KANEKO_KC002_SPRITE;

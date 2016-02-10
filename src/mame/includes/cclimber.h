@@ -49,6 +49,7 @@ public:
 	tilemap_t *m_pf_tilemap;
 	tilemap_t *m_bs_tilemap;
 	tilemap_t *m_toproller_bg_tilemap;
+	std::unique_ptr<UINT8[]> m_opcodes;
 
 	DECLARE_WRITE8_MEMBER(swimmer_sh_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(yamato_p0_w);
@@ -60,7 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cclimber_colorram_w);
 	DECLARE_WRITE8_MEMBER(cannonb_flip_screen_w);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_DRIVER_INIT(cclimber);
 	DECLARE_DRIVER_INIT(yamato);
 	DECLARE_DRIVER_INIT(ckongb);
@@ -97,7 +98,6 @@ public:
 	void toprollr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 	void swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 	void cclimber_decode(const UINT8 convtable[8][16]);
-	void cannonb_patch();
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 };

@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include <algorithm>
@@ -359,8 +359,8 @@ void help(const char* _error = NULL)
 
 	fprintf(stderr
 		, "geometryc, bgfx geometry compiler tool\n"
-		  "Copyright 2011-2015 Branimir Karadzic. All rights reserved.\n"
-		  "License: http://www.opensource.org/licenses/BSD-2-Clause\n\n"
+		  "Copyright 2011-2016 Branimir Karadzic. All rights reserved.\n"
+		  "License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n\n"
 		);
 
 	fprintf(stderr
@@ -368,7 +368,7 @@ void help(const char* _error = NULL)
 
 		  "\n"
 		  "Supported input file types:\n"
-		  "    *.obj                    Wavefront\n"
+		  "    *.obj                  Wavefront\n"
 
 		  "\n"
 		  "Options:\n"
@@ -811,7 +811,7 @@ int main(int _argc, const char* _argv[])
 	PrimitiveArray primitives;
 
 	bx::CrtFileWriter writer;
-	if (0 != writer.open(outFilePath) )
+	if (bx::open(&writer, outFilePath) )
 	{
 		printf("Unable to open output file '%s'.", outFilePath);
 		exit(EXIT_FAILURE);
@@ -1000,8 +1000,8 @@ int main(int _argc, const char* _argv[])
 			);
 	}
 
-	printf("size: %d\n", uint32_t(writer.seek() ) );
-	writer.close();
+	printf("size: %d\n", uint32_t(bx::seek(&writer) ) );
+	bx::close(&writer);
 
 	delete [] indexData;
 	delete [] vertexData;

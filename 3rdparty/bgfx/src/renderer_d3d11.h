@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef BGFX_RENDERER_D3D11_H_HEADER_GUARD
@@ -223,6 +223,7 @@ namespace bgfx { namespace d3d11
 
 		void create(const Memory* _mem, uint32_t _flags, uint8_t _skip);
 		void destroy();
+		void overrideInternal(uintptr_t _ptr);
 		void update(uint8_t _side, uint8_t _mip, const Rect& _rect, uint16_t _z, uint16_t _depth, uint16_t _pitch, const Memory* _mem);
 		void commit(uint8_t _stage, uint32_t _flags, const float _palette[][4]);
 		void resolve();
@@ -238,6 +239,9 @@ namespace bgfx { namespace d3d11
 		ID3D11ShaderResourceView*  m_srv;
 		ID3D11UnorderedAccessView* m_uav;
 		uint32_t m_flags;
+		uint32_t m_width;
+		uint32_t m_height;
+		uint32_t m_depth;
 		uint8_t  m_type;
 		uint8_t  m_requestedFormat;
 		uint8_t  m_textureFormat;
@@ -293,14 +297,39 @@ namespace bgfx { namespace d3d11
 		struct Frame
 		{
 			ID3D11Query* m_disjoint;
-			ID3D11Query* m_start;
+			ID3D11Query* m_begin;
 			ID3D11Query* m_end;
 		};
 
+		uint64_t m_begin;
+		uint64_t m_end;
 		uint64_t m_elapsed;
 		uint64_t m_frequency;
 
 		Frame m_frame[4];
+		bx::RingBufferControl m_control;
+	};
+
+	struct OcclusionQueryD3D11
+	{
+		OcclusionQueryD3D11()
+			: m_control(BX_COUNTOF(m_query) )
+		{
+		}
+
+		void postReset();
+		void preReset();
+		void begin(Frame* _render, OcclusionQueryHandle _handle);
+		void end();
+		void resolve(Frame* _render, bool _wait = false);
+
+		struct Query
+		{
+			ID3D11Query* m_ptr;
+			OcclusionQueryHandle m_handle;
+		};
+
+		Query m_query[BGFX_CONFIG_MAX_OCCUSION_QUERIES];
 		bx::RingBufferControl m_control;
 	};
 

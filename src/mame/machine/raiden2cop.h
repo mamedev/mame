@@ -116,8 +116,6 @@ public:
 	DECLARE_READ16_MEMBER ( cop_status_r );
 	DECLARE_READ16_MEMBER ( cop_dist_r );
 	DECLARE_READ16_MEMBER ( cop_angle_r );
-	DECLARE_WRITE16_MEMBER( cop_angle_compare_w );
-	DECLARE_WRITE16_MEMBER( cop_angle_mod_val_w );
 
 	DECLARE_WRITE16_MEMBER(cop_hitbox_baseadr_w);
 
@@ -259,7 +257,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	// internal state

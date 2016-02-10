@@ -19,7 +19,7 @@
 class rgbaint_t
 {
 public:
-	inline rgbaint_t() { }
+	inline rgbaint_t(): m_a(0), m_r(0), m_g(0), m_b(0) { }
 	inline rgbaint_t(UINT32 rgba) { set(rgba); }
 	inline rgbaint_t(INT32 a, INT32 r, INT32 g, INT32 b) { set(a, r, g, b); }
 	inline rgbaint_t(rgb_t& rgba) { set(rgba); }

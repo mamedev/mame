@@ -95,9 +95,8 @@ public:
 	DECLARE_READ8_MEMBER( pot_y_r ) { return pot_y_r(); }
 
 	void joy_w( UINT8 data ) { if ( exists() ) m_device->vcs_joy_w( data ); }
-	DECLARE_WRITE8_MEMBER( joy_w );
 
-	bool exists() { return m_device != NULL; }
+	bool exists() { return m_device != nullptr; }
 	bool has_pot_x() { return exists() && m_device->has_pot_x(); }
 	bool has_pot_y() { return exists() && m_device->has_pot_y(); }
 
@@ -105,7 +104,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	device_vcs_control_port_interface *m_device;
 

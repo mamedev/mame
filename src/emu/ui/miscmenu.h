@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods,Dankan1890
 /***************************************************************************
 
     ui/miscmenu.h
@@ -20,24 +20,24 @@ class ui_menu_keyboard_mode : public ui_menu {
 public:
 	ui_menu_keyboard_mode(running_machine &machine, render_container *container);
 	virtual ~ui_menu_keyboard_mode();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 };
 
 class ui_menu_network_devices : public ui_menu {
 public:
 	ui_menu_network_devices(running_machine &machine, render_container *container);
 	virtual ~ui_menu_network_devices();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 };
 
 class ui_menu_bookkeeping : public ui_menu {
 public:
 	ui_menu_bookkeeping(running_machine &machine, render_container *container);
 	virtual ~ui_menu_bookkeeping();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 private:
 	attotime prevtime;
@@ -47,8 +47,8 @@ class ui_menu_crosshair : public ui_menu {
 public:
 	ui_menu_crosshair(running_machine &machine, render_container *container);
 	virtual ~ui_menu_crosshair();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 private:
 	enum {
@@ -73,18 +73,39 @@ class ui_menu_quit_game : public ui_menu {
 public:
 	ui_menu_quit_game(running_machine &machine, render_container *container);
 	virtual ~ui_menu_quit_game();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 };
 
 class ui_menu_bios_selection : public ui_menu {
 public:
 	ui_menu_bios_selection(running_machine &machine, render_container *container);
 	virtual ~ui_menu_bios_selection();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
+};
+
+//-------------------------------------------------
+//  class miscellaneous options menu
+//-------------------------------------------------
+class ui_menu_misc_options : public ui_menu
+{
+public:
+	ui_menu_misc_options(running_machine &machine, render_container *container);
+	virtual ~ui_menu_misc_options();
+	virtual void populate() override;
+	virtual void handle() override;
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
+	struct misc_option
+	{
+		bool        status;
+		const char  *description;
+		const char  *option;
+	};
+
+	static misc_option m_options[];
 };
 
 #endif  /* __UI_MISCMENU_H__ */

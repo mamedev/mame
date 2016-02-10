@@ -9,13 +9,25 @@
 
 #pragma once
 
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
 #ifndef __NETWORK_H__
 #define __NETWORK_H__
 
-void network_init(running_machine &machine);
+// ======================> network_manager
+
+class network_manager
+{
+public:
+	// construction/destruction
+	network_manager(running_machine &machine);
+
+	// getters
+	running_machine &machine() const { return m_machine; }
+private:
+	void config_load(config_type cfg_type, xml_data_node *parentnode);
+	void config_save(config_type cfg_type, xml_data_node *parentnode);
+
+	// internal state
+	running_machine &   m_machine;                  // reference to our machine
+};
 
 #endif /* __NETWORK_H__ */

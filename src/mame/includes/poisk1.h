@@ -52,7 +52,7 @@ public:
 	DECLARE_MACHINE_RESET(poisk1);
 
 	DECLARE_PALETTE_INIT(p1);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void set_palette_luts();
 	POISK1_UPDATE_ROW(cga_gfx_2bpp_update_row);
@@ -69,7 +69,7 @@ public:
 	struct
 	{
 		UINT8 trap[4];
-		UINT8 *videoram_base;
+		std::unique_ptr<UINT8[]> videoram_base;
 		UINT8 *videoram;
 		UINT8 mode_control_6a;
 		UINT8 color_select_68;

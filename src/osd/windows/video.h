@@ -150,7 +150,7 @@ public:
 	win_monitor_info(const HMONITOR handle, const char *monitor_device, float aspect);
 	virtual ~win_monitor_info();
 
-	virtual void refresh();
+	virtual void refresh() override;
 
 	// static
 

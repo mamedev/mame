@@ -22,6 +22,7 @@ class msx_internal_slot_interface
 {
 public:
 	msx_internal_slot_interface();
+	virtual ~msx_internal_slot_interface() { }
 
 	// static configuration helpers
 	static void set_start_address(device_t &device, UINT32 start_address);

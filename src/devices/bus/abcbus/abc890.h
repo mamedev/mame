@@ -31,24 +31,24 @@ public:
 	abc890_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_abcbus_interface overrides
-	virtual void abcbus_cs(UINT8 data);
-	virtual UINT8 abcbus_inp();
-	virtual void abcbus_out(UINT8 data);
-	virtual UINT8 abcbus_stat();
-	virtual void abcbus_c1(UINT8 data);
-	virtual void abcbus_c2(UINT8 data);
-	virtual void abcbus_c3(UINT8 data);
-	virtual void abcbus_c4(UINT8 data);
-	virtual UINT8 abcbus_xmemfl(offs_t offset);
-	virtual void abcbus_xmemw(offs_t offset, UINT8 data);
+	virtual void abcbus_cs(UINT8 data) override;
+	virtual UINT8 abcbus_inp() override;
+	virtual void abcbus_out(UINT8 data) override;
+	virtual UINT8 abcbus_stat() override;
+	virtual void abcbus_c1(UINT8 data) override;
+	virtual void abcbus_c2(UINT8 data) override;
+	virtual void abcbus_c3(UINT8 data) override;
+	virtual void abcbus_c4(UINT8 data) override;
+	virtual UINT8 abcbus_xmemfl(offs_t offset) override;
+	virtual void abcbus_xmemw(offs_t offset, UINT8 data) override;
 };
 
 
@@ -61,7 +61,7 @@ public:
 	abc_expansion_unit_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 
@@ -74,7 +74,7 @@ public:
 	abc894_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 
@@ -87,7 +87,7 @@ public:
 	abc850_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 
@@ -100,7 +100,7 @@ public:
 	abc852_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 
@@ -113,7 +113,7 @@ public:
 	abc856_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 

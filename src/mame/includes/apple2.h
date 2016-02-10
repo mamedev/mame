@@ -177,7 +177,7 @@ public:
 	double m_joystick_x2_time;
 	double m_joystick_y2_time;
 	apple2_memmap_config m_mem_config;
-	apple2_meminfo *m_current_meminfo;
+	std::unique_ptr<apple2_meminfo[]> m_current_meminfo;
 	int m_fdc_diskreg;
 	const UINT8 *m_a2_videoram, *m_a2_videoaux, *m_textgfx_data;
 	UINT32 m_a2_videomask, m_textgfx_datalen;
@@ -186,8 +186,8 @@ public:
 	int m_bgcolor;
 	int m_flash;
 	int m_alt_charset_value;
-	UINT16 *m_hires_artifact_map;
-	UINT16 *m_dhires_artifact_map;
+	std::unique_ptr<UINT16[]> m_hires_artifact_map;
+	std::unique_ptr<UINT16[]> m_dhires_artifact_map;
 	bool m_monochrome_dhr;
 	int m_inh_slot;
 	int m_reset_flag;
@@ -344,7 +344,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_iie_data_ready_w);
 	void apple2_update_memory_postload();
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	void apple2_setup_memory(const apple2_memmap_config *config);
 	void apple2_update_memory();
 	inline UINT32 effective_a2();
@@ -371,7 +371,7 @@ private:
 	UINT8 m_exp_bankhior;
 	int m_exp_addrmask;
 	UINT8 m_exp_regs[0x10];
-	UINT8 *m_exp_ram;
+	std::unique_ptr<UINT8[]> m_exp_ram;
 	int m_exp_wptr, m_exp_liveptr;
 };
 /*----------- defined in drivers/apple2.c -----------*/

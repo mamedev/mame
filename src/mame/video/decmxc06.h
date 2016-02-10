@@ -26,8 +26,8 @@ public:
 	void set_pri_type( int type ) { m_priority_type = type; }
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	UINT8 m_gfxregion;
 	int m_priority_type; // just so we can support the existing drivers without converting everything to pdrawgfx just yet

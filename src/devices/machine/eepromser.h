@@ -94,8 +94,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// read interfaces differ between implementations
 
@@ -191,7 +191,7 @@ public:
 
 protected:
 	// subclass overrides
-	virtual void parse_command_and_address();
+	virtual void parse_command_and_address() override;
 };
 
 
@@ -215,7 +215,7 @@ public:
 
 protected:
 	// subclass overrides
-	virtual void parse_command_and_address();
+	virtual void parse_command_and_address() override;
 };
 
 
@@ -240,13 +240,13 @@ public:
 
 protected:
 	// subclass overrides
-	virtual void parse_command_and_address();
-	void handle_event(eeprom_event event);
+	virtual void parse_command_and_address() override;
+	void handle_event(eeprom_event event) override;
 	virtual void parse_command_and_address_2_bit();
-	void execute_command();
+	void execute_command() override;
 	void copy_ram_to_eeprom();
 	void copy_eeprom_to_ram();
-	void device_start();
+	void device_start() override;
 	UINT8 m_ram_length;
 	UINT16 m_ram_data[16];
 	UINT16 m_reading;

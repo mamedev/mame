@@ -7001,6 +7001,19 @@
 		</part>
 	</software>
 
+	<software name="koalapnt">
+		<description>KoalaPainter</description>
+		<year>1984</year>
+		<publisher>Koala Technologies</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="koalapainter" size="0x4000" crc="cc75a06d" sha1="4707fe57b0575415a2c258392355941c130fcc80" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Dummy cartridge entries to allow requirement mappings from c64_flop -->
 
 	<software name="cpm">

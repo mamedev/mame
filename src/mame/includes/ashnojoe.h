@@ -76,9 +76,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_joe_tile_info_5);
 	TILE_GET_INFO_MEMBER(get_joe_tile_info_6);
 	TILE_GET_INFO_MEMBER(get_joe_tile_info_7);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_ashnojoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(ym2203_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(ashnojoe_vclk_cb);

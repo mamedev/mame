@@ -49,12 +49,12 @@ public:
 	DECLARE_READ16_MEMBER( dp8390_r );
 	DECLARE_WRITE_LINE_MEMBER( dp8390_cs );
 	DECLARE_WRITE_LINE_MEMBER( dp8390_reset );
-	void recv_cb(UINT8 *buf, int len);
+	void recv_cb(UINT8 *buf, int len) override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	int m_type;
 
@@ -72,7 +72,6 @@ private:
 	void set_cr(UINT8 newcr);
 	void check_dma_complete();
 	void do_tx();
-	bool mcast_ck(const UINT8 *buf, int len);
 	void check_irq() { m_irq_cb((m_regs.imr & m_regs.isr & 0x7f)?ASSERT_LINE:CLEAR_LINE); }
 	void recv_overflow();
 	void stop();

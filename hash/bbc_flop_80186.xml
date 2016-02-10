@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- BBC Micro - 80186 Co-Processor Discs -->
+
+<!-- Loading Instructions:
+
+      Hold down the SHIFT key and press and release the BREAK key.
+-->
+
+<softwarelist name="bbc_flop_80186" description="80186 Co-Processor Discs">
+
+	<software name="m512sys" supported="no">
+		<description>BBC Master 512 System Discs</description>
+		<year>1986</year>
+		<publisher>Acorn Computers</publisher>
+		<info name="format" value="ADFS-DOS" />
+		<info name="compatibility" value="80186 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="DOS Plus Boot v2.1"/>
+			<dataarea name="flop" size="655360">
+				<rom name="bbcmaster512-disc1-dosplusboot-v2.1.adl" size="655360" crc="7805045c" sha1="89ad16c97842f94809cf05eb9b079867944ca8d8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="DOS Plus Boot v1.2a"/>
+			<dataarea name="flop" size="655360">
+				<rom name="bbcmaster512-disc1-dosplusboot-v1.2a.adl" size="655360" crc="264fff88" sha1="7d3386e117b96cc08e78d80ba0d226821e945eac" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="DOS Plus Boot v1.2"/>
+			<dataarea name="flop" size="655360">
+				<rom name="bbcmaster512-disc1-dosplusboot-v1.2.adl" size="655360" crc="c2677483" sha1="2df6155aecfd4fc9595cd95359b153d158c313a3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="GEM Applications"/>
+			<dataarea name="flop" size="819200">
+				<rom name="bbcmaster512-disc2-gemapplications.img" size="819200" crc="68b1cdfe" sha1="0fd737ab5c8499727e6ec3711e59566e702244e7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="GEM Data"/>
+			<dataarea name="flop" size="819200">
+				<rom name="bbcmaster512-disc3-gemdata.img" size="819200" crc="b463f444" sha1="e80911c292aba1b601507c75d9233a79887e3b51" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Miscellaneous"/>
+			<dataarea name="flop" size="819200">
+				<rom name="bbcmaster512-disc4-miscellaneous.img" size="819200" crc="2de63513" sha1="e6718419d4d6f6a834653655f6334667b5c4c355" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dabs1" supported="no">
+		<description>Dabs Shareware Vol.1</description>
+		<year>1988</year>
+		<publisher>Dabs Press</publisher>
+		<info name="format" value="DOS+" />
+		<info name="compatibility" value="80186 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 1 - Word Processing"/>
+			<dataarea name="flop" size="819200">
+				<rom name="dabs-shareware-vol1-disc1.img" size="819200" crc="767569f6" sha1="103718d7410cf635eb56010fa6204012fcddb719" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 2 - Business"/>
+			<dataarea name="flop" size="819200">
+				<rom name="dabs-shareware-vol1-disc2.img" size="819200" crc="011ac2db" sha1="8dc11173655864c6a1d37251bc88f512ba43a09c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 3 - Games"/>
+			<dataarea name="flop" size="819200">
+				<rom name="dabs-shareware-vol1-disc3.img" size="819200" crc="531d3a4b" sha1="a75dd613f4f5bc096a01e259620d16b154305ba8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 4 - Printer Programs"/>
+			<dataarea name="flop" size="819200">
+				<rom name="dabs-shareware-vol1-disc4.img" size="819200" crc="ee1a6961" sha1="c970d723d9b9ee55717928850897d6b21c376c5e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 5 - Miscellaneous"/>
+			<dataarea name="flop" size="819200">
+				<rom name="dabs-shareware-vol1-disc5.img" size="819200" crc="4ab201a7" sha1="094d3af950631a803960d19b573be0e65c19158d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dabs2" supported="no">
+		<description>Dabs Shareware Vol.2</description>
+		<year>1988</year>
+		<publisher>Dabs Press</publisher>
+		<info name="format" value="DOS+" />
+		<info name="compatibility" value="80186 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 1"/>
+			<dataarea name="flop" size="819200">
+				<rom name="dabs-shareware-vol2-disc1.img" size="819200" crc="ba7e3ed4" sha1="b5d649a7bdc4ccd75f99e0636ad0a0b6ec71c4cf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 2"/>
+			<dataarea name="flop" size="819200">
+				<rom name="dabs-shareware-vol2-disc2.img" size="819200" crc="b858f06c" sha1="698c6a29fc2f549e8b8ff057e1289c41fc6647e5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 3"/>
+			<dataarea name="flop" size="819200">
+				<rom name="dabs-shareware-vol2-disc3.img" size="819200" crc="2f066a93" sha1="7b2c4b4355ba9855f9167e27d9316ed928dae010" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 4"/>
+			<dataarea name="flop" size="819200">
+				<rom name="dabs-shareware-vol2-disc4.img" size="819200" crc="d507700b" sha1="9d5a75b90eb73387eda913f12dde8cc5cf8c9cab" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 5"/>
+			<dataarea name="flop" size="819200">
+				<rom name="dabs-shareware-vol2-disc5.img" size="819200" crc="3cfdd202" sha1="e4e8230f29aff2c6bc4a1e218c9be4c9d157fbef" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Bonus"/>
+			<dataarea name="flop" size="819200">
+				<rom name="dabs-shareware-vol2-bonus.img" size="819200" crc="69b81821" sha1="2977d4628e262907ddf5f5b3ad35abf703092809" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

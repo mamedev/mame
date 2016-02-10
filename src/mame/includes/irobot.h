@@ -61,8 +61,8 @@ public:
 	const irmb_ops *m_irmb_stack[16];
 	UINT32 m_irmb_regs[16];
 	UINT32 m_irmb_latch;
-	UINT8 *m_polybitmap1;
-	UINT8 *m_polybitmap2;
+	std::unique_ptr<UINT8[]> m_polybitmap1;
+	std::unique_ptr<UINT8[]> m_polybitmap2;
 	int m_ir_xmin;
 	int m_ir_ymin;
 	int m_ir_xmax;
@@ -82,8 +82,8 @@ public:
 	DECLARE_READ8_MEMBER(quad_pokeyn_r);
 	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);
 	DECLARE_DRIVER_INIT(irobot);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(irobot);
 	UINT32 screen_update_irobot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);

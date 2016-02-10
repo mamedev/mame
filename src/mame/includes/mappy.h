@@ -114,7 +114,6 @@ public:
 	INTERRUPT_GEN_MEMBER(phozon_main_vblank_irq);
 	INTERRUPT_GEN_MEMBER(mappy_main_vblank_irq);
 	INTERRUPT_GEN_MEMBER(digdug2_main_vblank_irq);
-	INTERRUPT_GEN_MEMBER(todruaga_main_vblank_irq);
 	INTERRUPT_GEN_MEMBER(motos_main_vblank_irq);
 	INTERRUPT_GEN_MEMBER(sub_vblank_irq);
 	INTERRUPT_GEN_MEMBER(sub2_vblank_irq);
@@ -124,7 +123,6 @@ public:
 	TIMER_CALLBACK_MEMBER(phozon_io_run);
 	TIMER_CALLBACK_MEMBER(mappy_io_run);
 	TIMER_CALLBACK_MEMBER(digdug2_io_run);
-	TIMER_CALLBACK_MEMBER(todruaga_io_run);
 	TIMER_CALLBACK_MEMBER(motos_io_run);
 	DECLARE_DRIVER_INIT(superpac);
 	DECLARE_DRIVER_INIT(pacnpal);
@@ -138,5 +136,5 @@ public:
 	void phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

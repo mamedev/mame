@@ -76,7 +76,7 @@ public:
 	required_ioport m_y15;
 	required_ioport m_special;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -97,7 +97,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
-	DECLARE_READ_LINE_MEMBER(cassette_r);
 	DECLARE_WRITE_LINE_MEMBER(cassette_w);
 };
 

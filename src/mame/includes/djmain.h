@@ -60,9 +60,9 @@ public:
 	DECLARE_DRIVER_INIT(bmcompm2);
 	DECLARE_DRIVER_INIT(bmcorerm);
 	DECLARE_DRIVER_INIT(bmclubmx);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vb_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);

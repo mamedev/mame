@@ -94,20 +94,20 @@ protected:
 	gime_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, const char *shortname, const char *source);
 
 	// device-level overrides
-	virtual void device_start(void);
-	virtual void device_reset(void);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_pre_save(void);
-	virtual void device_post_load(void);
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start(void) override;
+	virtual void device_reset(void) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_pre_save(void) override;
+	virtual void device_post_load(void) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// other overrides
-	virtual void new_frame(void);
-	virtual void horizontal_sync_changed(bool line);
-	virtual void enter_bottom_border(void);
-	virtual void record_border_scanline(UINT16 physical_scanline);
-	virtual void record_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline);
-	virtual void record_partial_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline, INT32 start_clock, INT32 end_clock);
+	virtual void new_frame(void) override;
+	virtual void horizontal_sync_changed(bool line) override;
+	virtual void enter_bottom_border(void) override;
+	virtual void record_border_scanline(UINT16 physical_scanline) override;
+	virtual void record_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline) override;
+	virtual void record_partial_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline, INT32 start_clock, INT32 end_clock) override;
 
 private:
 	typedef mc6847_friend_device super;
@@ -270,7 +270,6 @@ private:
 	UINT32 get_data_mc6847(UINT32 video_position, UINT8 *data, UINT8 *mode);
 	UINT32 get_data_without_attributes(UINT32 video_position, UINT8 *data, UINT8 *mode);
 	UINT32 get_data_with_attributes(UINT32 video_position, UINT8 *data, UINT8 *mode);
-	bool is_blinking(void);
 
 	// template function for doing video update collection
 	template<UINT8 xres, get_data_func get_data, bool record_mode>

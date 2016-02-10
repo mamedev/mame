@@ -60,9 +60,9 @@ public:
 	DECLARE_WRITE8_MEMBER(unknown_port_2_w);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(chaknpop);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

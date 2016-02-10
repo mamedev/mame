@@ -8,37 +8,21 @@ C1016 - Volcano Panic
 C1020 - Bad Bud Chou Chu's Adventure (Unreleased?)
 C1025 - Jackpot (Unreleased?)
 C1030 - Beach Volleyball (Unreleased?)
-C1033 - Fist of Thunder
 C1034 - Superboy (Unreleased?)
-C1036 - Jewelriss
-C1038 - Mars Voyage (Unreleased?)
 C1039 - Column #5 (Unreleased?)
 C1040 - ??
 C1041 - Mighty Boxer
-C1042 - Flying Goblin
-C1045 - World Cup Soccer
 C1046 - Kiki Island
 C1047 - Fortune 'n Luck
 C1048 - Baseball (or Super Baseball)
-C1049 - Punk Boy
 C1050 - Fortress of Fierceness
 C1051 - Incantational Couple
-C1052 - Famous 7
-C1053 - Metamorphosiser
 C1055 - ??
 C1056 - GP Race
-C1057 - Fantasy Travel
-C1058 - Heaven Clash
 C1059 - ??
-C1060 - Further Adventures of Hannibal The Cat
 C1062 - ??
-C1063 - Basketball
-C1064 - Bao Qing Tian
 C1065 - Hot Hero
 C1066 - ??
-C1067 - Robin Hood
-C1069 - Riddle of the Ancient Tomb
-C1070 - Insect War
 -->
 
 <softwarelist name="gamate" description="Bit Corp Gamate cartridges">
@@ -46,11 +30,11 @@ C1070 - Insect War
 	<software name="cubeup" supported="no">
 		<description>Cube Up</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1001" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="cube up.bin" size="16384" crc="2a911e57" sha1="9d3b28887b6f375600bff29f8f233087b9152a60" offset="0x00000" />
+				<rom name="c1001_cubeup.bin" size="16384" crc="2a911e57" sha1="9d3b28887b6f375600bff29f8f233087b9152a60" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -58,7 +42,7 @@ C1070 - Insect War
 	<software name="wittyape" supported="no">
 		<description>Witty Apee</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1002" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -70,7 +54,7 @@ C1070 - Insect War
 	<software name="boxforum" supported="no">
 		<description>Box Forum</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1003" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -81,8 +65,8 @@ C1070 - Insect War
 
 	<software name="mightytk" supported="no">
 		<description>Mighty Tank</description>
-		<year>19??</year>
-		<publisher>Bit Corp.</publisher>
+		<year>199?</year>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1004" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -94,7 +78,7 @@ C1070 - Insect War
 	<software name="encbrick" supported="no">
 		<description>Enchanted Bricks</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1005" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -106,7 +90,7 @@ C1070 - Insect War
 	<software name="minigolf" supported="no">
 		<description>Mini Golf</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1006" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -118,7 +102,7 @@ C1070 - Insect War
 	<software name="galaxinv" supported="no">
 		<description>Galaxy Invaders</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1007" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -130,11 +114,11 @@ C1070 - Insect War
 	<software name="dknight" supported="no">
 		<description>Legend of Dragon Knight</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1008" />
 		<part name="cart" interface="gamate_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="c1008_legend_of_dragon_knight.bin" size="16384" crc="d65d1f4b" sha1="d247193a22ba34e6dc0e606d71460bd5dd1ccab5" offset="0" />
+			<dataarea name="rom" size="65536">
+				<rom name="c1-008.bin" size="65536" crc="a67ba296" sha1="d01988984e2950fde8096a0156808995a0e5c515" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -142,7 +126,7 @@ C1070 - Insect War
 	<software name="tornado" supported="no">
 		<description>Tornado</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1009" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -153,7 +137,7 @@ C1070 - Insect War
 
 	<software name="moneymaz" supported="no">
 		<description>Money Maze</description>
-		<year>19??</year>
+		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="C1011" />
 		<part name="cart" interface="gamate_cart">
@@ -166,7 +150,7 @@ C1070 - Insect War
 	<software name="pharaoh" supported="no">
 		<description>Pharaoh Revenger</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1012" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -177,7 +161,7 @@ C1070 - Insect War
 
 	<software name="dinobibo" supported="no">
 		<description>Dino Bibo</description>
-		<year>19??</year>
+		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="C1013" />
 		<part name="cart" interface="gamate_cart">
@@ -190,7 +174,7 @@ C1070 - Insect War
 	<software name="timewarr" supported="no">
 		<description>Time Warrior</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1014" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -202,7 +186,7 @@ C1070 - Insect War
 	<software name="killshot" supported="no">
 		<description>Kill Shot</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1015" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -214,7 +198,7 @@ C1070 - Insect War
 	<software name="dvcastle" supported="no">
 		<description>Devil Castle</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1017" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -226,7 +210,7 @@ C1070 - Insect War
 	<software name="kungfu" supported="no">
 		<description>Kung-Fu Fighter</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1018" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -238,7 +222,7 @@ C1070 - Insect War
 	<software name="dinoball" supported="no">
 		<description>Dino Ball</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1019" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -250,7 +234,7 @@ C1070 - Insect War
 	<software name="mythasam" supported="no">
 		<description>Myth of Asamia</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1021" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -262,7 +246,7 @@ C1070 - Insect War
 	<software name="pipemani" supported="no">
 		<description>Pipemania</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1022" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -274,7 +258,7 @@ C1070 - Insect War
 	<software name="tennis" supported="no">
 		<description>Tennis</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1023" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -286,7 +270,7 @@ C1070 - Insect War
 	<software name="marauder" supported="no">
 		<description>Marauder</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1024" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -298,7 +282,7 @@ C1070 - Insect War
 	<software name="flipuzle" supported="no">
 		<description>Flipuzzle</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1026" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -310,7 +294,7 @@ C1070 - Insect War
 	<software name="monstpit" supported="no">
 		<description>Monster Pitfall</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1027" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -322,7 +306,7 @@ C1070 - Insect War
 	<software name="vindicat" supported="no">
 		<description>Vindicators</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1028" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -334,7 +318,7 @@ C1070 - Insect War
 	<software name="brikblst" supported="no">
 		<description>Brick Blaster</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1029" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -346,7 +330,7 @@ C1070 - Insect War
 	<software name="bomblast" supported="no">
 		<description>Bomb Blaster</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1031" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -359,7 +343,7 @@ C1070 - Insect War
 	<software name="bomblasta" cloneof="bomblast" supported="no">
 		<description>Bomb Blaster (Alt)</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1031" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -371,7 +355,7 @@ C1070 - Insect War
 	<software name="cosmicfg" supported="no">
 		<description>Cosmic Fighter</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1032" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -380,10 +364,22 @@ C1070 - Insect War
 		</part>
 	</software>
 
+	<software name="fistofth" supported="no">
+		<description>Fist of Thunder</description>
+		<year>1991</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="C1033" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="c1-033.bin" size="65536" crc="9002269d" sha1="899d1592f0da06f9684cb271ec34541c702f21ab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="treashnt" supported="no">
 		<description>Treasure Hunter</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1035" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -392,10 +388,22 @@ C1070 - Insect War
 		</part>
 	</software>
 
+	<software name="jewelris" supported="no">
+		<description>Jewelriss</description>
+		<year>1990</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="C1036" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="c1-036.bin" size="32768" crc="5ba39d1c" sha1="23f4adad99f6c17fb556b512b6eca2645033aadd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="santa" supported="no">
 		<description>Nightmare of Santa Claus</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1037" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -404,10 +412,34 @@ C1070 - Insect War
 		</part>
 	</software>
 
+	<software name="marsvoya" supported="no">
+		<description>Mars Voyage</description>
+		<year>1991</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="C1038" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="c1-038.bin" size="65536" crc="19bba397" sha1="01163f89447c68554cd2fe60b22dea7b578f1605" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flgoblin" supported="no">
+		<description>Flying Goblin</description>
+		<year>1991</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="C1042" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="c1-042.bin" size="65536" crc="8363c32d" sha1="b07681e28b65af53fed23def3f6305ab929bb8f1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="boom" supported="no">
 		<description>Boom</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1043" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -419,7 +451,7 @@ C1070 - Insect War
 	<software name="snowman" supported="no">
 		<description>Snowman Legend</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1044" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -428,10 +460,58 @@ C1070 - Insect War
 		</part>
 	</software>
 
+	<software name="wcupsocc" supported="no">
+		<description>World Cup Soccer</description>
+		<year>199?</year>
+		<publisher>Unknown</publisher>
+		<info name="serial" value="C1045" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="c1-045.bin" size="65536" crc="c165094f" sha1="148bd0e461d8f967b483136460a770820d2e7226" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="punkboy" supported="no">
+		<description>Punk Boy</description>
+		<year>1992</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="C1049" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="c1-049.bin" size="65536" crc="aa2e0d32" sha1="1b3082be0698c12c8fc978db6a0c63c8958c33f8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="famous7" supported="no">
+		<description>Famous 7</description>
+		<year>1993</year>
+		<publisher>United Microelectronics Corporation</publisher>
+		<info name="serial" value="C1052" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="c1-052.bin" size="65536" crc="0fa48c23" sha1="ea422fe969b260296b99397cdeff6ae053ac4a86" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toughguy" supported="no">
+		<description>Tough Guy</description>
+		<year>1993</year>
+		<publisher>United Microelectronics Corporation</publisher>
+		<info name="serial" value="C1053" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="c1-053.bin" size="131072" crc="727299c7" sha1="5515f7dc5a00fa38677c4ac5b73af232008f3e51" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mjigsaw" supported="no">
 		<description>Magic Jigsaw</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1054" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -440,28 +520,146 @@ C1070 - Insect War
 		</part>
 	</software>
 
-<!-- This does not display anything, so it might not be this game! -->
-	<software name="dinopark" supported="no">
-		<description>Dinosaur Park</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value="C1061" />
+	<software name="fanttrav" supported="no">
+		<description>Fantasy Travel</description>
+		<year>1993</year>
+		<publisher>United Microelectronics Corporation</publisher>
+		<info name="serial" value="C1057" />
 		<part name="cart" interface="gamate_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="c1061_gamate_card.bin" size="16384" crc="c05d20b5" sha1="e45a028809738bfa265661414f755691a5b63ad0" offset="0" />
+			<dataarea name="rom" size="131072">
+				<rom name="c1-057.bin" size="131072" crc="a542c61f" sha1="2eccf1fe8d400a54ffb2f026af8b9842442b6d9f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- This does not display anything, so it might not be this game! -->
+	<software name="quizfigh" supported="no">
+		<description>QuizFighter</description>
+		<year>1993</year>
+		<publisher>United Microelectronics Corporation</publisher>
+		<info name="serial" value="C1058" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="c1-058.bin" size="262144" crc="16a79cd8" sha1="7d638bf61286adfa612de974efff2d9b5b4b3331" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hannibal" supported="no">
+		<description>Further Adventures of Hannibal The Cat</description>
+		<year>1993</year>
+		<publisher>Unknown</publisher>
+		<info name="serial" value="C1060" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="c1-060.bin" size="524288" crc="9aa13551" sha1="a1163f1da52e23bda0502f229488a5b4d04bbe8a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinopark" supported="no">
+		<description>Dinosaur Park</description>
+		<year>1993</year>
+		<publisher>Phinnex Co., Ltd.</publisher>
+		<info name="serial" value="C1061" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="c1-061.bin" size="524288" crc="00356983" sha1="e93c671ee1eb40bb4d7298671dc213a07afef9e0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basketba" supported="no">
+		<description>Basketball</description>
+		<year>199?</year>
+		<publisher>Unknown</publisher>
+		<info name="serial" value="C1063" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="c1-063.bin" size="262144" crc="93d5f365" sha1="91b9b9060b76d2012d5cbc6523839f67caa37aaf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baoqingt" supported="no">
+		<description>Bao Qing Tian</description>
+		<year>199?</year>
+		<publisher>Unknown</publisher>
+		<info name="serial" value="C1064" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="c1-064.bin" size="524288" crc="8574f0eb" sha1="ba42622b9ff4b2fa0cb70f322ee24b1d8c387222" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robinhoo" supported="no">
+		<description>Robin Hood</description>
+		<year>1994</year>
+		<publisher>Phinnex Co., Ltd.</publisher>
+		<info name="serial" value="C1067" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="c1-067.bin" size="524288" crc="76e26b63" sha1="bfb2f4b5b771277333ffc1e27cf3a5608e9ea163" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="goldpyra" supported="no">
 		<description>The Golden Pyramid</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>199?</year>
+		<publisher>Unknown</publisher>
 		<info name="serial" value="C1068" />
 		<part name="cart" interface="gamate_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="c1068_gamate_card.bin" size="16384" crc="fdd4dce6" sha1="156211b19d8e38f58955f95f9329cfa9d8b1c74c" offset="0" />
+			<dataarea name="rom" size="524288">
+				<rom name="c1-068.bin" size="524288" crc="96386b08" sha1="69909b78598184760b3e261da897a9bc90af9dfb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rotat" supported="no">
+		<description>Riddle of the Ancient Tomb</description>
+		<year>1994</year>
+		<publisher>Unknown</publisher>
+		<info name="serial" value="C1069" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="c1-069.bin" size="524288" crc="3bceb859" sha1="32187903c10dc80d62e9bf794b912921542d6d38" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="insectwa" supported="no">
+		<description>Insect War</description>
+		<year>1995</year>
+		<publisher>United Microelectronics Corporation</publisher>
+		<info name="serial" value="C1070" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="c1-070.bin" size="524288" crc="7ba8af6d" sha1="6aa0364010272c82c7cc8c7afd60254de148fa72" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4in1" supported="no">
+		<description>4-in-1 (Mini Golf, Cube-Up, Brick Blaster, and Vindicators)</description>
+		<year>1991</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="C1401" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="c1-401.bin" size="131072" crc="10e81571" sha1="4dd20632eb31023e18241290eca7d5a5acb1fa84" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1milwhys" supported="no">
+		<description>One Million Whys</description>
+		<year>1993</year>
+		<publisher>United Microelectronics Corporation</publisher>
+		<info name="serial" value="K1001" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="k1-001.bin" size="524288" crc="ebb46efe" sha1="beae4f3365031f4e8ae192a5e6d27a28979ef84b" offset="0" />
 			</dataarea>
 		</part>
 	</software>

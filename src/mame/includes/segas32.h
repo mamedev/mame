@@ -42,7 +42,7 @@ public:
 	struct layer_info
 	{
 		bitmap_ind16 *bitmap;
-		UINT8 *transparent;
+		UINT8* transparent;
 	};
 
 	struct extents_list
@@ -75,7 +75,7 @@ public:
 	sys32_output_callback m_sw1_output;
 	sys32_output_callback m_sw2_output;
 	sys32_output_callback m_sw3_output;
-	UINT16 *m_system32_protram;
+	std::unique_ptr<UINT16[]> m_system32_protram;
 	UINT16 m_system32_displayenable[2];
 	UINT16 m_system32_tilebank_external;
 	UINT16 m_arescue_dsp_io[6];
@@ -83,19 +83,17 @@ public:
 	struct cache_entry *m_cache_head;
 	struct layer_info m_layer_data[11];
 	UINT16 m_mixer_control[2][0x40];
-	UINT16 *m_solid_0000;
-	UINT16 *m_solid_ffff;
+	std::unique_ptr<UINT16[]> m_solid_0000;
+	std::unique_ptr<UINT16[]> m_solid_ffff;
 	UINT8 m_sprite_render_count;
 	UINT8 m_sprite_control_latched[8];
 	UINT8 m_sprite_control[8];
-	UINT32 *m_spriteram_32bit;
+	std::unique_ptr<UINT32[]> m_spriteram_32bit;
 	typedef void (segas32_state::*prot_vblank_func)();
 	prot_vblank_func m_system32_prot_vblank;
 	int m_print_count;
 	DECLARE_WRITE16_MEMBER(ga2_dpram_w);
 	DECLARE_READ16_MEMBER(ga2_dpram_r);
-	DECLARE_READ16_MEMBER(ga2_sprite_protection_r);
-	DECLARE_READ16_MEMBER(ga2_wakeup_protection_r);
 	DECLARE_WRITE16_MEMBER(sonic_level_load_protection);
 	DECLARE_READ16_MEMBER(brival_protection_r);
 	DECLARE_WRITE16_MEMBER(brival_protection_w);
@@ -261,8 +259,8 @@ public:
 	void init_titlef(void);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 class segas32_regular_state :  public segas32_state
@@ -271,7 +269,7 @@ public:
 	segas32_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 //  virtual void device_start();
 //  virtual void device_reset();
 };
@@ -282,8 +280,8 @@ public:
 	segas32_v25_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 
@@ -293,8 +291,8 @@ public:
 	sega_multi32_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 

@@ -24,11 +24,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// dmvcart_interface overrides
-	virtual void ram_read(UINT8 cas, offs_t offset, UINT8 &data);
-	virtual void ram_write(UINT8 cas, offs_t offset, UINT8 data);
+	virtual void ram_read(UINT8 cas, offs_t offset, UINT8 &data) override;
+	virtual void ram_write(UINT8 cas, offs_t offset, UINT8 data) override;
 
 private:
 	UINT8 *     m_ram;

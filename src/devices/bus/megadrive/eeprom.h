@@ -22,13 +22,13 @@ public:
 	md_std_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read);
-	virtual DECLARE_WRITE16_MEMBER(write);
+	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual DECLARE_WRITE16_MEMBER(write) override;
 
 	required_device<i2cmem_device> m_i2cmem;
 	UINT8 m_i2c_mem, m_i2c_clk;
@@ -43,11 +43,11 @@ public:
 	md_eeprom_nbajam_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read);
-	virtual DECLARE_WRITE16_MEMBER(write);
+	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual DECLARE_WRITE16_MEMBER(write) override;
 };
 
 // ======================> md_eeprom_nbajamte_device
@@ -59,11 +59,11 @@ public:
 	md_eeprom_nbajamte_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read);
-	virtual DECLARE_WRITE16_MEMBER(write);
+	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual DECLARE_WRITE16_MEMBER(write) override;
 };
 
 // ======================> md_eeprom_cslam_device (same read/write as nbajamte, but different I2C type)
@@ -75,11 +75,11 @@ public:
 	md_eeprom_cslam_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read);
-	virtual DECLARE_WRITE16_MEMBER(write);
+	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual DECLARE_WRITE16_MEMBER(write) override;
 };
 
 // ======================> md_eeprom_nflqb_device (same read/write as nbajamte, but different I2C type)
@@ -91,11 +91,11 @@ public:
 	md_eeprom_nflqb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read);
-	virtual DECLARE_WRITE16_MEMBER(write);
+	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual DECLARE_WRITE16_MEMBER(write) override;
 };
 
 // ======================> md_eeprom_nhlpa_device
@@ -107,11 +107,11 @@ public:
 	md_eeprom_nhlpa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read);
-	virtual DECLARE_WRITE16_MEMBER(write);
+	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual DECLARE_WRITE16_MEMBER(write) override;
 };
 
 // ======================> md_eeprom_blara_device (same read/write as codemast, but different I2C type)
@@ -123,11 +123,11 @@ public:
 	md_eeprom_blara_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read);
-	virtual DECLARE_WRITE16_MEMBER(write);
+	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual DECLARE_WRITE16_MEMBER(write) override;
 };
 
 

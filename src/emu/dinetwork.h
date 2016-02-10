@@ -19,14 +19,14 @@ public:
 	bool get_promisc() { return m_promisc; }
 	int get_interface() { return m_intf; }
 
-	int send(UINT8 *buf, int len);
+	int send(UINT8 *buf, int len) const;
 	virtual void recv_cb(UINT8 *buf, int len);
 
 protected:
 	bool m_promisc;
 	char m_mac[6];
 	float m_bandwidth;
-	auto_pointer<class osd_netdev> m_dev;
+	std::unique_ptr<osd_netdev> m_dev;
 	int m_intf;
 };
 

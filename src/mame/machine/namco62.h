@@ -39,15 +39,11 @@ public:
 
 	template<class _Object> static devcb_base &set_output_0_callback(device_t &device, _Object object) { return downcast<namco_62xx_device &>(device).m_out_0.set_callback(object); }
 	template<class _Object> static devcb_base &set_output_1_callback(device_t &device, _Object object) { return downcast<namco_62xx_device &>(device).m_out_1.set_callback(object); }
-
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	// internal state

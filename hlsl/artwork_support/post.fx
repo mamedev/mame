@@ -1,7 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz,ImJezze
 //-----------------------------------------------------------------------------
-// Scanline & Shadowmask Effect
+// Scanline, Shadowmask & Distortion Effect
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Sampler Definitions
 //-----------------------------------------------------------------------------
 
 texture DiffuseTexture;
@@ -62,6 +66,7 @@ struct PS_INPUT
 
 static const float Epsilon = 1.0e-7f;
 static const float PI = 3.1415927f;
+static const float PHI = 1.618034f;
 static const float E = 2.7182817f;
 static const float Gelfond = 23.140692f; // e^pi (Gelfond constant)
 static const float GelfondSchneider = 2.6651442f; // 2^sqrt(2) (Gelfond-Schneider constant)
@@ -69,11 +74,6 @@ static const float GelfondSchneider = 2.6651442f; // 2^sqrt(2) (Gelfond-Schneide
 //-----------------------------------------------------------------------------
 // Functions
 //-----------------------------------------------------------------------------
-
-bool xor(bool a, bool b)
-{
-	return (a || b) && !(a && b);
-}
 
 // www.stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader/
 float random(float2 seed)
@@ -98,7 +98,7 @@ float roundBox(float2 p, float2 b, float r)
 }
 
 //-----------------------------------------------------------------------------
-// Scanline & Shadowmask Vertex Shader
+// Scanline, Shadowmask & Distortion Vertex Shader
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims; // size of the window or fullscreen
@@ -110,8 +110,8 @@ uniform float2 QuadDims; // size of the screen quad
 uniform float2 ShadowDims = float2(32.0f, 32.0f); // size of the shadow texture (extended to power-of-two size)
 uniform float2 ShadowUVOffset = float2(0.0f, 0.0f);
 
-uniform bool OrientationSwapXY = false; // false landscape, true portrait for default screen orientation
-uniform bool RotationSwapXY = false; // swapped default screen orientation due to screen rotation
+uniform bool SwapXY = false;
+
 uniform int RotationType = 0; // 0 = 0°, 1 = 90°, 2 = 180°, 3 = 270°
 
 uniform bool PrepareBloom = false; // disables some effects for rendering bloom textures 
@@ -122,7 +122,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
 	float2 shadowUVOffset = ShadowUVOffset;
-	shadowUVOffset = xor(OrientationSwapXY, RotationSwapXY)
+	shadowUVOffset = SwapXY
 		? shadowUVOffset.yx
 		: shadowUVOffset.xy;
 
@@ -149,8 +149,16 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 }
 
 //-----------------------------------------------------------------------------
-// Post-Processing Pixel Shader
+// Scanline, Shadowmask & Distortion Pixel Shader
 //-----------------------------------------------------------------------------
+
+uniform float HumBarHertzRate = 60.0f / 59.94f - 1.0f; // difference between the 59.94 Hz field rate and 60 Hz line frequency (NTSC)
+uniform float HumBarAlpha = 0.0f;
+
+uniform float TimeMilliseconds = 0.0f;
+
+uniform float2 ScreenScale = float2(1.0f, 1.0f);
+uniform float2 ScreenOffset = float2(0.0f, 0.0f);
 
 uniform float ScanlineAlpha = 1.0f;
 uniform float ScanlineScale = 1.0f;
@@ -159,12 +167,15 @@ uniform float ScanlineBrightOffset = 1.0f;
 uniform float ScanlineOffset = 1.0f;
 uniform float ScanlineHeight = 1.0f;
 
+uniform float3 BackColor = float3(0.0f, 0.0f, 0.0f);
+
 uniform float CurvatureAmount = 1.0f;
 uniform float RoundCornerAmount = 0.0f;
 uniform float SmoothBorderAmount = 0.0f;
 uniform float VignettingAmount = 0.0f;
 uniform float ReflectionAmount = 0.0f;
 
+uniform int ShadowTileMode = 0; // 0 based on screen dimension, 1 based on source dimension
 uniform float ShadowAlpha = 0.0f;
 uniform float2 ShadowCount = float2(6.0f, 6.0f);
 uniform float2 ShadowUV = float2(0.25f, 0.25f);
@@ -217,7 +228,7 @@ float GetSpotAddend(float2 coord, float amount)
 	// normalized screen canvas ratio
 	float2 CanvasRatio = PrepareVector
 		? float2(1.0f, QuadDims.y / QuadDims.x)
-		: float2(1.0f, xor(OrientationSwapXY, RotationSwapXY) 
+		: float2(1.0f, SwapXY
 			? QuadDims.x / QuadDims.y 
 			: QuadDims.y / QuadDims.x);
 
@@ -230,9 +241,9 @@ float GetSpotAddend(float2 coord, float amount)
 				: RotationType == 3 // 270°
 					? float2(0.25f, 0.25f)
 					: float2(-0.25f, 0.25f)
-		: OrientationSwapXY
+		: SwapXY
 			? float2(0.25f, 0.25f)
-			: float2(-0.25f, 0.25f);		
+			: float2(-0.25f, 0.25f);
 
 	float2 SpotCoord = coord;
 	SpotCoord += spotOffset * RatioCorrection;
@@ -245,7 +256,7 @@ float GetSpotAddend(float2 coord, float amount)
 	float SpotRadius = amount * 0.75f;
 	float Spot = smoothstep(SpotRadius, SpotRadius - SpotBlur, length(SpotCoord));
 
-	float SigmoidSpot = normalizedSigmoid(Spot, 0.75) * amount;
+	float SigmoidSpot = amount * normalizedSigmoid(Spot, 0.75);
 
 	// increase strength by 100%
 	SigmoidSpot = SigmoidSpot * 2.0f;
@@ -262,7 +273,7 @@ float GetRoundCornerFactor(float2 coord, float radiusAmount, float smoothAmount)
 
 	float2 CanvasDims = PrepareVector
 		? ScreenDims
-		: xor(OrientationSwapXY, RotationSwapXY) 
+		: SwapXY 
 			? QuadDims.yx / SourceRect 
 			: QuadDims.xy / SourceRect;
 
@@ -289,8 +300,6 @@ float GetRoundCornerFactor(float2 coord, float radiusAmount, float smoothAmount)
 // www.francois-tarlier.com/blog/cubic-lens-distortion-shader/
 float2 GetDistortedCoords(float2 centerCoord, float amount)
 {
-	amount *= 0.25f; // reduced amount
-
 	// lens distortion coefficient
 	float k = amount;
 
@@ -334,19 +343,52 @@ float2 GetCoords(float2 coord, float2 centerOffset, float distortionAmount)
 	return coord;
 }
 
+float2 GetAdjustedCoords(float2 coord, float2 centerOffset, float distortionAmount)
+{
+	float2 RatioCorrection = GetRatioCorrection();
+
+	// center coordinates
+	coord -= centerOffset;
+
+	// apply ratio difference between screen and quad
+	coord /= RatioCorrection;
+
+	// apply screen scale
+	coord /= ScreenScale;
+
+	// distort coordinates
+	coord = GetDistortedCoords(coord, distortionAmount);
+
+	// revert ratio difference between screen and quad
+	coord *= RatioCorrection;
+
+	// un-center coordinates
+	coord += centerOffset;
+
+	// apply screen offset
+	coord += (centerOffset * 2.0) * ScreenOffset;
+
+	return coord;
+}
+
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 ScreenTexelDims = 1.0f / ScreenDims;
+	float2 SourceTexelDims = 1.0f / SourceDims;
 
-	float2 HalfSourceRect = PrepareVector
-		? float2(0.5f, 0.5f)
-		: SourceRect * 0.5f;
+	float2 HalfSourceRect = SourceRect * 0.5f;
 
 	float2 ScreenCoord = Input.ScreenCoord / ScreenDims;
-	ScreenCoord = GetCoords(ScreenCoord, float2(0.5f, 0.5f), CurvatureAmount);
+	ScreenCoord = GetCoords(ScreenCoord, float2(0.5f, 0.5f), CurvatureAmount * 0.25f); // reduced amount
+
+	float2 DistortionCoord = Input.TexCoord;
+	DistortionCoord = GetCoords(DistortionCoord, HalfSourceRect, CurvatureAmount * 0.25f); // reduced amount
 
 	float2 BaseCoord = Input.TexCoord;
-	BaseCoord = GetCoords(BaseCoord, HalfSourceRect, CurvatureAmount);
+	BaseCoord = GetAdjustedCoords(BaseCoord, HalfSourceRect, CurvatureAmount * 0.25f); // reduced amount
+
+	float2 DistortionCoordCentered = DistortionCoord;
+	DistortionCoordCentered -= HalfSourceRect;
 
 	float2 BaseCoordCentered = BaseCoord;
 	BaseCoordCentered -= HalfSourceRect;
@@ -354,45 +396,54 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float4 BaseColor = tex2D(DiffuseSampler, BaseCoord);
 	BaseColor.a = 1.0f;
 
+	if (BaseCoord.x < 0.0f || BaseCoord.y < 0.0f)
+	{
+		BaseColor.rgb = 0.0f;
+	}
+
 	// Mask Simulation (may not affect bloom)
-	if (!PrepareBloom)
+	if (!PrepareBloom && ShadowAlpha > 0.0f)
 	{
 		float2 shadowDims = ShadowDims;
-		shadowDims = xor(OrientationSwapXY, RotationSwapXY)
+		shadowDims = SwapXY
 			? shadowDims.yx
 			: shadowDims.xy;
 
 		float2 shadowUV = ShadowUV;
-		// shadowUV = xor(OrientationSwapXY, RotationSwapXY)
+		// shadowUV = SwapXY
 			// ? shadowUV.yx
 			// : shadowUV.xy;
 
-		float2 screenCoord = ScreenCoord;
-		screenCoord = xor(OrientationSwapXY, RotationSwapXY)
+		float2 screenCoord = ShadowTileMode == 0 ? ScreenCoord : BaseCoord;
+		screenCoord = SwapXY
 			? screenCoord.yx
 			: screenCoord.xy;
 
 		float2 shadowCount = ShadowCount;
-		shadowCount = xor(OrientationSwapXY, RotationSwapXY)
+		shadowCount = SwapXY
 			? shadowCount.yx
 			: shadowCount.xy;
 
-		float2 shadowTile = (ScreenTexelDims * shadowCount);
-		shadowTile = xor(OrientationSwapXY, RotationSwapXY)
+		float2 shadowTile = ((ShadowTileMode == 0 ? ScreenTexelDims : SourceTexelDims) * shadowCount);
+		shadowTile = SwapXY
 			? shadowTile.yx
 			: shadowTile.xy;
 
 		float2 ShadowFrac = frac(screenCoord / shadowTile);
 		float2 ShadowCoord = (ShadowFrac * shadowUV);
 		ShadowCoord += 0.5f / shadowDims; // half texel offset
-		// ShadowCoord = xor(OrientationSwapXY, RotationSwapXY)
+		// ShadowCoord = SwapXY
 			// ? ShadowCoord.yx
 			// : ShadowCoord.xy;
 
-		float3 ShadowColor = tex2D(ShadowSampler, ShadowCoord).rgb;
-		ShadowColor = lerp(1.0f, ShadowColor, ShadowAlpha);
+		float4 ShadowColor = tex2D(ShadowSampler, ShadowCoord);
+		float3 ShadowMaskColor = lerp(1.0f, ShadowColor.rgb, ShadowAlpha);
+		float ShadowMaskClear = (1.0f - ShadowColor.a) * ShadowAlpha;
 
-		BaseColor.rgb *= ShadowColor;
+		// apply shadow mask color
+		BaseColor.rgb *= ShadowMaskColor;
+		// clear shadow mask by background color
+		BaseColor.rgb = lerp(BaseColor.rgb, BackColor, ShadowMaskClear);
 	}
 
 	// Color Compression (may not affect bloom)
@@ -410,15 +461,24 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	// Scanline Simulation (may not affect bloom)
 	if (!PrepareBloom)
 	{
-		// Scanline Simulation (disabled for vector)
-		if (!PrepareVector)
+		// Scanline Simulation (may not affect vector screen)
+		if (!PrepareVector && ScanlineAlpha > 0.0f)
 		{
-			float InnerSine = BaseCoord.y * ScanlineScale * SourceDims.y;
-			float ScanJitter = ScanlineOffset * SourceDims.y;
-			float ScanBrightMod = sin(InnerSine * PI + ScanJitter);
-			float3 ScanColor = lerp(1.0f, (pow(ScanBrightMod * ScanBrightMod, ScanlineHeight) * ScanlineBrightScale + 1.0f + ScanlineBrightOffset) * 0.5f, ScanlineAlpha);
+			float ScanCoord = BaseCoord.y * SourceDims.y * ScanlineScale * PI;
+			float ScanCoordJitter = ScanlineOffset * PHI;
+			float ScanSine = sin(ScanCoord + ScanCoordJitter);
+			float ScanSineScaled = pow(ScanSine * ScanSine, ScanlineHeight);
+			float ScanBrightness = ScanSineScaled * ScanlineBrightScale + 1.0f + ScanlineBrightOffset;
 
-			BaseColor.rgb *= ScanColor;
+			BaseColor.rgb *= lerp(1.0f, ScanBrightness * 0.5f, ScanlineAlpha);
+		}
+
+		// Hum Bar Simulation (may not affect vector screen)
+		if (!PrepareVector && HumBarAlpha > 0.0f)
+		{
+			float HumTimeStep = frac(TimeMilliseconds * HumBarHertzRate);
+			float HumBrightness = 1.0 - frac(BaseCoord.y / SourceRect.y + HumTimeStep) * HumBarAlpha;
+			BaseColor.rgb *= HumBrightness;
 		}
 	}
 
@@ -431,7 +491,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	// Vignetting Simulation (may not affect bloom)
 	if (!PrepareBloom)
 	{
-		float2 VignetteCoord = BaseCoordCentered;
+		float2 VignetteCoord = DistortionCoordCentered;
 
 		float VignetteFactor = GetVignetteFactor(VignetteCoord, VignettingAmount);
 		Output.rgb *= VignetteFactor;
@@ -442,8 +502,8 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	{
 		float3 LightColor = float3(1.0f, 0.90f, 0.80f);
 
-		float2 SpotCoord = BaseCoordCentered;
-		float2 NoiseCoord = BaseCoordCentered;
+		float2 SpotCoord = DistortionCoordCentered;
+		float2 NoiseCoord = DistortionCoordCentered;
 
 		float SpotAddend = GetSpotAddend(SpotCoord, ReflectionAmount);
 		float NoiseFactor = GetNoiseFactor(SpotAddend, random(NoiseCoord));
@@ -451,7 +511,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	}
 
 	// Round Corners Simulation (may affect bloom)
-	float2 RoundCornerCoord = BaseCoordCentered;
+	float2 RoundCornerCoord = DistortionCoordCentered;
 
 	float roundCornerFactor = GetRoundCornerFactor(RoundCornerCoord, RoundCornerAmount, SmoothBorderAmount);
 	Output.rgb *= roundCornerFactor;
@@ -463,13 +523,11 @@ float4 ps_main(PS_INPUT Input) : COLOR
 // Scanline & Shadowmask Effect
 //-----------------------------------------------------------------------------
 
-technique ScanMaskTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{
 		Lighting = FALSE;
-
-		//Sampler[0] = <DiffuseSampler>;
 
 		VertexShader = compile vs_3_0 vs_main();
 		PixelShader = compile ps_3_0 ps_main();

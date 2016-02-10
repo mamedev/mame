@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "common.h"
@@ -141,14 +141,16 @@ inline float square(float _x)
 
 class HDR : public entry::AppI
 {
-	void init(int /*_argc*/, char** /*_argv*/) BX_OVERRIDE
+	void init(int _argc, char** _argv) BX_OVERRIDE
 	{
-		m_width = 1280;
-		m_height = 720;
-		m_debug = BGFX_DEBUG_TEXT;
-		m_reset = BGFX_RESET_VSYNC;
+		Args args(_argc, _argv);
 
-		bgfx::init();
+		m_width  = 1280;
+		m_height = 720;
+		m_debug  = BGFX_DEBUG_TEXT;
+		m_reset  = BGFX_RESET_VSYNC;
+
+		bgfx::init(args.m_type, args.m_pciId);
 		bgfx::reset(m_width, m_height, m_reset);
 
 		// Enable m_debug text.
@@ -203,7 +205,7 @@ class HDR : public entry::AppI
 		m_mesh = meshLoad("meshes/bunny.bin");
 
 		m_fbtextures[0] = bgfx::createTexture2D(m_width, m_height, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT|BGFX_TEXTURE_U_CLAMP|BGFX_TEXTURE_V_CLAMP);
-		m_fbtextures[1] = bgfx::createTexture2D(m_width, m_height, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_BUFFER_ONLY);
+		m_fbtextures[1] = bgfx::createTexture2D(m_width, m_height, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_WRITE_ONLY);
 		m_fbh = bgfx::createFrameBuffer(BX_COUNTOF(m_fbtextures), m_fbtextures, true);
 
 		m_lum[0] = bgfx::createFrameBuffer(128, 128, bgfx::TextureFormat::BGRA8);
@@ -214,6 +216,16 @@ class HDR : public entry::AppI
 
 		m_bright = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Half,   bgfx::TextureFormat::BGRA8);
 		m_blur   = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Eighth, bgfx::TextureFormat::BGRA8);
+
+		m_lumBgra8 = 0;
+		if ( (BGFX_CAPS_TEXTURE_BLIT|BGFX_CAPS_TEXTURE_READ_BACK) == (bgfx::getCaps()->supported & (BGFX_CAPS_TEXTURE_BLIT|BGFX_CAPS_TEXTURE_READ_BACK) ) )
+		{
+			m_rb = bgfx::createTexture2D(1, 1, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_READ_BACK);
+		}
+		else
+		{
+			m_rb.idx = bgfx::invalidHandle;
+		}
 
 		// Imgui.
 		imguiCreate();
@@ -259,6 +271,10 @@ class HDR : public entry::AppI
 		bgfx::destroyProgram(m_blurProgram);
 		bgfx::destroyProgram(m_brightProgram);
 		bgfx::destroyTexture(m_uffizi);
+		if (bgfx::isValid(m_rb) )
+		{
+			bgfx::destroyTexture(m_rb);
+		}
 
 		bgfx::destroyUniform(s_texCube);
 		bgfx::destroyUniform(s_texColor);
@@ -292,7 +308,7 @@ class HDR : public entry::AppI
 				bgfx::destroyFrameBuffer(m_fbh);
 
 				m_fbtextures[0] = bgfx::createTexture2D(m_width, m_height, 1, bgfx::TextureFormat::BGRA8, ( (msaa+1)<<BGFX_TEXTURE_RT_MSAA_SHIFT)|BGFX_TEXTURE_U_CLAMP|BGFX_TEXTURE_V_CLAMP);
-				m_fbtextures[1] = bgfx::createTexture2D(m_width, m_height, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_BUFFER_ONLY|( (msaa+1)<<BGFX_TEXTURE_RT_MSAA_SHIFT) );
+				m_fbtextures[1] = bgfx::createTexture2D(m_width, m_height, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_WRITE_ONLY|( (msaa+1)<<BGFX_TEXTURE_RT_MSAA_SHIFT) );
 				m_fbh = bgfx::createFrameBuffer(BX_COUNTOF(m_fbtextures), m_fbtextures, true);
 			}
 
@@ -306,7 +322,7 @@ class HDR : public entry::AppI
 					, m_height
 					);
 
-			imguiBeginScrollArea("Settings", m_width - m_width / 5 - 10, 10, m_width / 5, m_height / 3, &m_scrollArea);
+			imguiBeginScrollArea("Settings", m_width - m_width / 5 - 10, 10, m_width / 5, m_height / 2, &m_scrollArea);
 			imguiSeparatorLine();
 
 			imguiSlider("Speed", m_speed, 0.0f, 1.0f, 0.01f);
@@ -315,6 +331,14 @@ class HDR : public entry::AppI
 			imguiSlider("Middle gray", m_middleGray, 0.1f, 1.0f, 0.01f);
 			imguiSlider("White point", m_white,      0.1f, 2.0f, 0.01f);
 			imguiSlider("Threshold",   m_threshold,  0.1f, 2.0f, 0.01f);
+
+			if (bgfx::isValid(m_rb) )
+			{
+				union { uint32_t color; uint8_t bgra[4]; } cast = { m_lumBgra8 };
+				float exponent = cast.bgra[3]/255.0f * 255.0f - 128.0f;
+				float lumAvg   = cast.bgra[2]/255.0f * bx::fexp2(exponent);
+				imguiSlider("Lum Avg", lumAvg, 0.0f, 1.0f, 0.01f, false);
+			}
 
 			imguiEndScrollArea();
 			imguiEndFrame();
@@ -341,7 +365,7 @@ class HDR : public entry::AppI
 			// Set views.
 			for (uint32_t ii = 0; ii < 6; ++ii)
 			{
-				bgfx::setViewRect(ii, 0, 0, m_width, m_height);
+				bgfx::setViewRect(ii, 0, 0, bgfx::BackbufferRatio::Equal);
 			}
 			bgfx::setViewFrameBuffer(0, m_fbh);
 			bgfx::setViewFrameBuffer(1, m_fbh);
@@ -362,13 +386,13 @@ class HDR : public entry::AppI
 			bgfx::setViewRect(6, 0, 0, 1, 1);
 			bgfx::setViewFrameBuffer(6, m_lum[4]);
 
-			bgfx::setViewRect(7, 0, 0, m_width/2, m_height/2);
+			bgfx::setViewRect(7, 0, 0, bgfx::BackbufferRatio::Half);
 			bgfx::setViewFrameBuffer(7, m_bright);
 
-			bgfx::setViewRect(8, 0, 0, m_width/8, m_height/8);
+			bgfx::setViewRect(8, 0, 0, bgfx::BackbufferRatio::Eighth);
 			bgfx::setViewFrameBuffer(8, m_blur);
 
-			bgfx::setViewRect(9, 0, 0, m_width, m_height);
+			bgfx::setViewRect(9, 0, 0, bgfx::BackbufferRatio::Equal);
 
 			float view[16];
 			float proj[16];
@@ -473,6 +497,12 @@ class HDR : public entry::AppI
 			screenSpaceQuad( (float)m_width, (float)m_height, s_originBottomLeft);
 			bgfx::submit(9, m_tonemapProgram);
 
+			if (bgfx::isValid(m_rb) )
+			{
+				bgfx::blit(9, m_rb, 0, 0, m_lum[4]);
+				bgfx::readTexture(m_rb, &m_lumBgra8);
+			}
+
 			// Advance to next frame. Rendering thread will be kicked to
 			// process submitted rendering primitives.
 			bgfx::frame();
@@ -505,6 +535,7 @@ class HDR : public entry::AppI
 	Mesh* m_mesh;
 
 	bgfx::TextureHandle m_fbtextures[2];
+	bgfx::TextureHandle m_rb;
 	bgfx::FrameBufferHandle m_fbh;
 	bgfx::FrameBufferHandle m_lum[5];
 	bgfx::FrameBufferHandle m_bright;
@@ -514,6 +545,7 @@ class HDR : public entry::AppI
 	uint32_t m_height;
 	uint32_t m_debug;
 	uint32_t m_reset;
+	uint32_t m_lumBgra8;
 
 	uint32_t m_oldWidth;
 	uint32_t m_oldHeight;

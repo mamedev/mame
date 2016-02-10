@@ -106,8 +106,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// internal helpers
 	virtual void update_all_volumes() = 0;
@@ -149,11 +149,11 @@ public:
 
 protected:
 	// device level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// internal helpers
-	virtual void update_all_volumes();
+	virtual void update_all_volumes() override;
 
 	// devices
 	optional_device<okim6295_device> m_oki1;
@@ -189,13 +189,13 @@ public:
 
 protected:
 	// device level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// internal helpers
-	virtual void update_all_volumes();
+	virtual void update_all_volumes() override;
 
 	// devices
 	optional_device<pokey_device> m_pokey;
@@ -221,8 +221,8 @@ public:
 
 protected:
 	// device level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	required_ioport m_jsaii;
 };
@@ -246,8 +246,8 @@ public:
 
 protected:
 	// device level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	required_ioport m_jsaiii;
 };
@@ -263,7 +263,7 @@ public:
 
 protected:
 	// device level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 

@@ -22,11 +22,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 private:
 	// internal state
-	UINT8        *m_ram;
+	std::unique_ptr<UINT8[]>        m_ram;
 
 	int          m_flipscreen;    // current code uses the 7342 flipscreen!!
 	UINT8        m_regs[8];   // current code uses the 7342 regs!! (only [2])

@@ -87,7 +87,7 @@ protected:
 	// return the current value -- only for our friends who handle export
 	bool needs_export() const { return ((m_flags & DSF_EXPORT) != 0); }
 	UINT64 value() const;
-	std::string &format(std::string &dest, const char *string, bool maxout = false) const;
+	std::string format(const char *string, bool maxout = false) const;
 
 	// set the current value -- only for our friends who handle import
 	bool needs_import() const { return ((m_flags & DSF_IMPORT) != 0); }
@@ -128,7 +128,7 @@ public:
 
 	// state getters
 	UINT64 state_int(int index);
-	std::string &state_string(int index, std::string &dest);
+	std::string state_string(int index) const;
 	int state_string_max_length(int index);
 	offs_t pc() { return state_int(STATE_GENPC); }
 	offs_t pcbase() { return state_int(STATE_GENPCBASE); }
@@ -163,13 +163,13 @@ protected:
 	virtual void state_import(const device_state_entry &entry);
 	virtual void state_export(const device_state_entry &entry);
 	virtual void state_string_import(const device_state_entry &entry, std::string &str);
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const;
 
 	// internal operation overrides
-	virtual void interface_post_start();
+	virtual void interface_post_start() override;
 
 	// find the entry for a given index
-	const device_state_entry *state_find_entry(int index);
+	const device_state_entry *state_find_entry(int index) const;
 
 	// constants
 	static const int FAST_STATE_MIN = -4;                           // range for fast state
@@ -195,9 +195,9 @@ typedef device_interface_iterator<device_state_interface> state_interface_iterat
 //  or 0 if no state object exists
 //-------------------------------------------------
 
-inline offs_t device_t::safe_pc()
+inline offs_t device_t::safe_pc() const
 {
-	return (m_state != NULL) ? m_state->pc() : 0;
+	return (m_state != nullptr) ? m_state->pc() : 0;
 }
 
 
@@ -206,9 +206,9 @@ inline offs_t device_t::safe_pc()
 //  base or 0 if no state object exists
 //-------------------------------------------------
 
-inline offs_t device_t::safe_pcbase()
+inline offs_t device_t::safe_pcbase() const
 {
-	return (m_state != NULL) ? m_state->pcbase() : 0;
+	return (m_state != nullptr) ? m_state->pcbase() : 0;
 }
 
 

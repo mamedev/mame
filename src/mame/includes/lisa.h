@@ -161,7 +161,7 @@ public:
 	UINT16 m_mem_err_addr_latch;
 	int m_parity_error_pending;
 	int m_bad_parity_count;
-	UINT8 *m_bad_parity_table;
+	std::unique_ptr<UINT8[]> m_bad_parity_table;
 	int m_VTMSK;
 	int m_VTIR;
 	UINT16 m_video_address_latch;
@@ -204,9 +204,9 @@ public:
 	DECLARE_DRIVER_INIT(lisa210);
 	DECLARE_DRIVER_INIT(mac_xl);
 	DECLARE_DRIVER_INIT(lisa2);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 	UINT32 screen_update_lisa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lisa_interrupt);
@@ -231,7 +231,6 @@ public:
 	void scan_keyboard();
 	void unplug_keyboard();
 	void plug_keyboard();
-	void init_lisa1(void);
 };
 
 #endif /* LISA_H_ */

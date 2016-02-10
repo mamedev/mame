@@ -57,8 +57,8 @@ struct {
 	UINT16 tx_crc;                              //!< transmitter CRC
 	UINT32 rx_count;                            //!< received words count
 	UINT32 tx_count;                            //!< transmitted words count
-	UINT16* rx_packet;                          //!< buffer to collect received words
-	UINT16* tx_packet;                          //!< buffer to collect transmitted words
+	std::unique_ptr<UINT16[]> rx_packet;                          //!< buffer to collect received words
+	std::unique_ptr<UINT16[]> tx_packet;                          //!< buffer to collect transmitted words
 	emu_timer* rx_timer;                        //!< receiver timer
 	emu_timer* tx_timer;                        //!< transmitter timer
 	jkff_t ff_10a;                              //!< JK flip-flop 10a IBUSY (Sheet 13)

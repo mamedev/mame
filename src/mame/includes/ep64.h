@@ -79,14 +79,12 @@ public:
 	required_ioport m_y8;
 	required_ioport m_y9;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( rd0_r );
 	DECLARE_WRITE8_MEMBER( wr0_w );
 	DECLARE_READ8_MEMBER( rd1_r );
-	DECLARE_WRITE8_MEMBER( wr1_w );
-	DECLARE_READ8_MEMBER( rd2_r );
 	DECLARE_WRITE8_MEMBER( wr2_w );
 
 	UINT8 m_key;

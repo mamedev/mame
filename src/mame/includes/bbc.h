@@ -34,6 +34,15 @@
 
 #define RS232_TAG       "rs232"
 
+enum machine_type_t
+{
+	MODELA,
+	MODELB,
+	BPLUS,
+	MASTER,
+	COMPACT
+};
+
 class bbc_state : public driver_device
 {
 public:
@@ -41,7 +50,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
-		m_mc6845(*this, "mc6845"),
+		m_hd6845(*this, "hd6845"),
 		m_adlc(*this, "mc6854"),
 		m_sn(*this, "sn76489"),
 		m_trom(*this, "saa5050"),
@@ -129,6 +138,9 @@ public:
 	DECLARE_MACHINE_RESET(bbcb);
 	DECLARE_VIDEO_START(bbcb);
 
+	DECLARE_MACHINE_START(torch);
+	DECLARE_MACHINE_RESET(torch);
+
 	DECLARE_MACHINE_START(bbcbp);
 	DECLARE_MACHINE_RESET(bbcbp);
 	DECLARE_VIDEO_START(bbcbp);
@@ -137,11 +149,12 @@ public:
 	DECLARE_MACHINE_RESET(bbcm);
 	DECLARE_VIDEO_START(bbcm);
 
+	DECLARE_MACHINE_START(bbcmc);
+	DECLARE_MACHINE_RESET(bbcmc);
+
 	DECLARE_PALETTE_INIT(bbc);
-	UINT32 screen_update_bbc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(bbcb_vsync);
 	INTERRUPT_GEN_MEMBER(bbcb_keyscan);
-	INTERRUPT_GEN_MEMBER(bbcm_keyscan);
 	TIMER_CALLBACK_MEMBER(bbc_tape_timer_cb);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_WRITE_LINE_MEMBER(bbcb_acia6850_irq_w);
@@ -190,7 +203,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	required_device<mc6845_device> m_mc6845;
+	required_device<hd6845_device> m_hd6845;
 	optional_device<mc6854_device> m_adlc;
 	optional_device<sn76489_device> m_sn;
 public: // HACK FOR MC6845
@@ -226,6 +239,8 @@ public: // HACK FOR MC6845
 	optional_memory_bank m_bank8; //                          bbcm
 
 	void check_interrupts();
+
+	machine_type_t m_machinetype;
 
 	bool m_os01;            // flag indicating whether OS 0.1 is being used
 	int m_SWRAMtype;        // this stores the DIP switch setting for the SWRAM type being used
@@ -403,11 +418,6 @@ public: // HACK FOR MC6845
 	void bbc_setvideoshadow(int vdusel);
 	void common_init(int memorySize);
 	void set_pixel_lookup();
-	void set_cursor(bbc_state *state);
-	void BBC_Clock_CR(bbc_state *state);
-	void BBC_Set_HSync(int offset, int data);
-	void BBC_Set_VSync(int offset, int data);
-	void BBC_Set_CRE(int offset, int data);
 	int vdudriverset();
 	int bbcm_vdudriverset();
 	int bbc_keyboard(address_space &space, int data);

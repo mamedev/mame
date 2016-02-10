@@ -68,7 +68,7 @@ int strvprintf(std::string &str, const char *format, va_list args);
 int strcatvprintf(std::string &str, const char *format, va_list args);
 int strprintf(std::string &str, const char *format, ...) ATTR_PRINTF(2, 3);
 int strcatprintf(std::string &str, const char *format, ...) ATTR_PRINTF(2, 3);
-std::string strformat(std::string &str, const char *format, ...) ATTR_PRINTF(2, 3);
+std::string strformat(const char *format, ...) ATTR_PRINTF(1, 2);
 
 void strdelchr(std::string& str, char chr);
 void strreplacechr(std::string& str, char ch, char newch);

@@ -28,7 +28,7 @@ public:
 	a2bus_videx80_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -38,16 +38,16 @@ public:
 	int m_framecnt;
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// overrides of standard a2bus slot functions
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset);
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data);
-	virtual UINT8 read_cnxx(address_space &space, UINT8 offset);
-	virtual void write_cnxx(address_space &space, UINT8 offset, UINT8 data);
-	virtual UINT8 read_c800(address_space &space, UINT16 offset);
-	virtual void write_c800(address_space &space, UINT16 offset, UINT8 data);
+	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
+	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
+	virtual UINT8 read_cnxx(address_space &space, UINT8 offset) override;
+	virtual void write_cnxx(address_space &space, UINT8 offset, UINT8 data) override;
+	virtual UINT8 read_c800(address_space &space, UINT16 offset) override;
+	virtual void write_c800(address_space &space, UINT16 offset, UINT8 data) override;
 
 	required_device<mc6845_device> m_crtc;
 
@@ -62,7 +62,7 @@ class a2bus_videoterm_device : public a2bus_videx80_device
 public:
 	a2bus_videoterm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 class a2bus_ap16_device : public a2bus_videx80_device
@@ -70,9 +70,9 @@ class a2bus_ap16_device : public a2bus_videx80_device
 public:
 	a2bus_ap16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 
-	virtual UINT8 read_cnxx(address_space &space, UINT8 offset);
+	virtual UINT8 read_cnxx(address_space &space, UINT8 offset) override;
 };
 
 
@@ -81,9 +81,9 @@ class a2bus_ap16alt_device : public a2bus_videx80_device
 public:
 	a2bus_ap16alt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 
-	virtual UINT8 read_cnxx(address_space &space, UINT8 offset);
+	virtual UINT8 read_cnxx(address_space &space, UINT8 offset) override;
 };
 
 class a2bus_vtc1_device : public a2bus_videx80_device
@@ -91,7 +91,7 @@ class a2bus_vtc1_device : public a2bus_videx80_device
 public:
 	a2bus_vtc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 class a2bus_vtc2_device : public a2bus_videx80_device
@@ -99,7 +99,7 @@ class a2bus_vtc2_device : public a2bus_videx80_device
 public:
 	a2bus_vtc2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 class a2bus_aevm80_device : public a2bus_videx80_device
@@ -107,7 +107,7 @@ class a2bus_aevm80_device : public a2bus_videx80_device
 public:
 	a2bus_aevm80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 // device type definition

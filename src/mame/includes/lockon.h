@@ -55,8 +55,8 @@ public:
 	UINT8           m_ground_ctrl;
 	UINT16          m_scroll_h;
 	UINT16          m_scroll_v;
-	bitmap_ind16    *m_front_buffer;
-	bitmap_ind16    *m_back_buffer;
+	std::unique_ptr<bitmap_ind16> m_front_buffer;
+	std::unique_ptr<bitmap_ind16> m_back_buffer;
 	emu_timer       *m_bufend_timer;
 	emu_timer       *m_cursor_timer;
 
@@ -72,7 +72,7 @@ public:
 
 	/* Object palette RAM control */
 	UINT32      m_iden;
-	UINT8       *m_obj_pal_ram;
+	std::unique_ptr<UINT8[]>       m_obj_pal_ram;
 	UINT32      m_obj_pal_latch;
 	UINT32      m_obj_pal_addr;
 
@@ -120,9 +120,9 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_vol);
 	DECLARE_WRITE8_MEMBER(ym2203_out_b);
 	TILE_GET_INFO_MEMBER(get_lockon_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(lockon);
 	UINT32 screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_lockon(screen_device &screen, bool state);

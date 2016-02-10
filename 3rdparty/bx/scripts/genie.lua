@@ -1,6 +1,6 @@
 --
--- Copyright 2010-2015 Branimir Karadzic. All rights reserved.
--- License: http://www.opensource.org/licenses/BSD-2-Clause
+-- Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+-- License: https://github.com/bkaradzic/bx#license-bsd-2-clause
 --
 
 solution "bx"
@@ -58,17 +58,18 @@ project "bx.test"
 		path.join(BX_DIR, "tests/**.H"),
 	}
 
-	configuration { "vs*" }
+	configuration { "vs* or mingw*" }
+		links {
+			"psapi",
+		}
 
 	configuration { "android*" }
-		kind "ConsoleApp"
 		targetextension ".so"
 		linkoptions {
 			"-shared",
 		}
 
 	configuration { "nacl or nacl-arm" }
-		kind "ConsoleApp"
 		targetextension ".nexe"
 		links {
 			"ppapi",
@@ -76,7 +77,6 @@ project "bx.test"
 		}
 
 	configuration { "pnacl" }
-		kind "ConsoleApp"
 		targetextension ".pexe"
 		links {
 			"ppapi",

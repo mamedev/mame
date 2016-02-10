@@ -12,18 +12,18 @@ class psx_multitap_device : public device_t,
 {
 public:
 	psx_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 protected:
-	virtual void device_start();
-	virtual void device_stop() { device_psx_controller_interface::m_owner->disable_card(false); }
-	virtual void device_reset() { device_psx_controller_interface::m_owner->disable_card(true); }
-	virtual void device_config_complete() { m_shortname = "psx_multitap"; }
-	virtual void interface_pre_reset();
+	virtual void device_start() override;
+	virtual void device_stop() override { device_psx_controller_interface::m_owner->disable_card(false); }
+	virtual void device_reset() override { device_psx_controller_interface::m_owner->disable_card(true); }
+	virtual void device_config_complete() override { m_shortname = "psx_multitap"; }
+	virtual void interface_pre_reset() override;
 
 private:
-	virtual bool get_pad(int count, UINT8 *odata, UINT8 idata);
-	virtual void do_pad();
+	virtual bool get_pad(int count, UINT8 *odata, UINT8 idata) override;
+	virtual void do_pad() override;
 	void ack();
 	void set_tx_line(bool tx, int port);
 	bool get_rx_line(int port);

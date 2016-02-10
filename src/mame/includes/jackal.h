@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Kenneth Lin
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
+// thanks-to:Kenneth Lin (original driver author)
 
 #define MASTER_CLOCK         XTAL_18_432MHz
 #define SOUND_CLOCK          XTAL_3_579545MHz
@@ -45,9 +46,9 @@ public:
 	DECLARE_WRITE8_MEMBER(jackal_voram_w);
 	DECLARE_WRITE8_MEMBER(jackal_spriteram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jackal);
 	UINT32 screen_update_jackal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jackal_interrupt);

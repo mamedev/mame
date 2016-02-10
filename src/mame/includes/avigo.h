@@ -47,8 +47,8 @@ public:
 	required_device<palette_device> m_palette;
 
 	// defined in drivers/avigo.c
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void postload();
 	void refresh_memory(UINT8 bank, UINT8 chip_select);
 	void refresh_ints();
@@ -85,7 +85,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_down_irq);
 
 	// defined in video/avigo.c
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(vid_memory_r);
 	DECLARE_WRITE8_MEMBER(vid_memory_w);

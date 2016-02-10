@@ -28,10 +28,10 @@ public:
 	UINT16 m_sprite_character_bank_select[8];
 	UINT16 m_video_bank_select[8];
 	tilemap_t *m_bg_tilemap;
-	UINT16 *m_spriteram_old;
-	UINT16 *m_spriteram_older;
-	UINT16 *m_spriteram2_old;
-	UINT16 *m_spriteram2_older;
+	std::unique_ptr<UINT16[]> m_spriteram_old;
+	std::unique_ptr<UINT16[]> m_spriteram_older;
+	std::unique_ptr<UINT16[]> m_spriteram2_old;
+	std::unique_ptr<UINT16[]> m_spriteram2_older;
 
 	DECLARE_READ16_MEMBER(pending_command_r);
 	DECLARE_WRITE16_MEMBER(sound_command_w);
@@ -44,8 +44,8 @@ public:
 	TILE_GET_INFO_MEMBER(bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);

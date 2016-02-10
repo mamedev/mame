@@ -33,13 +33,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<deco16ic_device> m_deco_tilegen1;
-	DECLARE_READ16_MEMBER(tumblep_prot_r);
 	DECLARE_WRITE16_MEMBER(tumblep_sound_w);
-	DECLARE_WRITE16_MEMBER(jumppop_sound_w);
 	DECLARE_READ16_MEMBER(tumblepop_controls_r);
-	DECLARE_WRITE16_MEMBER(tumblep_oki_w);
 	DECLARE_DRIVER_INIT(tumblep);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	UINT32 screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tumblep_patch_code(UINT16 offset);
 };

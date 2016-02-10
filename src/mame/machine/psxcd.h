@@ -25,20 +25,19 @@ public:
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<psxcd_device &>(device).m_irq_handler.set_callback(object); }
-	static void static_set_devname(device_t &device, const char *devname);
-	virtual bool call_load();
-	virtual void call_unload();
+	virtual bool call_load() override;
+	virtual void call_unload() override;
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
 	void start_dma(UINT8 *mainram, UINT32 size);
 
 protected:
-	virtual void device_start();
-	virtual void device_stop();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual const rom_entry *device_rom_region() const;
+	virtual void device_start() override;
+	virtual void device_stop() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual const rom_entry *device_rom_region() const override;
 
 private:
 	void write_command(UINT8 byte);
@@ -90,8 +89,8 @@ private:
 	void illegalcmd(UINT8 cmd);
 
 	void cmd_complete(command_result *res);
-	void send_result(UINT8 res, UINT8 *data=NULL, int sz=0, int delay=default_irq_delay, UINT8 errcode = 0);
-	command_result *prepare_result(UINT8 res, UINT8 *data=NULL, int sz=0, UINT8 errcode = 0);
+	void send_result(UINT8 res, UINT8 *data=nullptr, int sz=0, int delay=default_irq_delay, UINT8 errcode = 0);
+	command_result *prepare_result(UINT8 res, UINT8 *data=nullptr, int sz=0, UINT8 errcode = 0);
 
 	void start_read();
 	void start_play();

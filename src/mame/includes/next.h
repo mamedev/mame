@@ -58,15 +58,12 @@ public:
 	DECLARE_READ32_MEMBER( irq_status_r );
 	DECLARE_READ32_MEMBER( irq_mask_r );
 	DECLARE_WRITE32_MEMBER( irq_mask_w );
-	DECLARE_READ32_MEMBER( modisk_r );
-	DECLARE_READ32_MEMBER( network_r );
 	DECLARE_READ32_MEMBER( event_counter_r );
 	DECLARE_READ32_MEMBER( dsp_r );
 	DECLARE_READ32_MEMBER( fdc_control_r );
 	DECLARE_WRITE32_MEMBER( fdc_control_w );
 	DECLARE_READ32_MEMBER( dma_ctrl_r );
 	DECLARE_WRITE32_MEMBER( dma_ctrl_w );
-	DECLARE_WRITE32_MEMBER( dma_040_ctrl_w );
 	DECLARE_READ32_MEMBER( dma_regs_r );
 	DECLARE_WRITE32_MEMBER( dma_regs_w );
 	DECLARE_READ32_MEMBER( scsictrl_r );
@@ -156,10 +153,10 @@ protected:
 	bool screen_color;
 	bool vbl_enabled;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void timer_start();
 	void timer_update();
 
@@ -172,7 +169,6 @@ protected:
 	void dma_write(int slot, UINT8 val, bool eof, bool &err);
 	void dma_check_update(int slot);
 	void dma_check_end(int slot, bool eof);
-	void dma_done(int slot);
 	void dma_end(int slot);
 
 public:

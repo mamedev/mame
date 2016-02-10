@@ -1,13 +1,11 @@
-// license:???
-// copyright-holders:Per Ola Ingvarsson, Tomas Karlsson
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
+// thanks-to:Per Ola Ingvarsson, Tomas Karlsson
 /*****************************************************************************
  *
  * includes/compis.h
  *
  * machine driver header
- *
- * Per Ola Ingvarsson
- * Tomas Karlsson
  *
  ****************************************************************************/
 
@@ -89,8 +87,8 @@ public:
 	required_shared_ptr<UINT16> m_video_ram;
 	required_ioport m_s8;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER( tape_mon_w );
 	DECLARE_READ16_MEMBER( isbx0_tdma_r );

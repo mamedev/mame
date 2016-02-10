@@ -74,7 +74,8 @@ public:
 	DECLARE_WRITE16_MEMBER(kaneko16_ay1_YM2149_w);
 	DECLARE_READ16_MEMBER(kaneko16_ay2_YM2149_r);
 	DECLARE_WRITE16_MEMBER(kaneko16_ay2_YM2149_w);
-	DECLARE_WRITE16_MEMBER(bakubrkr_oki_bank_sw);
+	DECLARE_WRITE16_MEMBER(bakubrkr_oki_bank_w);
+	DECLARE_WRITE8_MEMBER(wingforc_oki_bank_w);
 
 	DECLARE_READ8_MEMBER(eeprom_r);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
@@ -95,7 +96,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(shogwarr_interrupt);
 
 	template<class _BitmapClass>
-	void kaneko16_fill_bitmap(palette_device* palette, _BitmapClass &bitmap, const rectangle &cliprect);
+	void kaneko16_fill_bitmap(_BitmapClass &bitmap, const rectangle &cliprect);
 
 	void kaneko16_common_oki_bank_w(  const char *bankname, const char* tag, int bank, size_t fixedsize, size_t bankedsize );
 	void kaneko16_unscramble_tiles(const char *region);

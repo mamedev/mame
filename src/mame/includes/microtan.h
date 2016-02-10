@@ -42,7 +42,7 @@ public:
 
 	required_shared_ptr<UINT8> m_videoram;
 	UINT8 m_chunky_graphics;
-	UINT8 *m_chunky_buffer;
+	std::unique_ptr<UINT8[]> m_chunky_buffer;
 	UINT8 m_keypad_column;
 	UINT8 m_keyboard_ascii;
 	emu_timer *m_timer;
@@ -63,8 +63,8 @@ public:
 	DECLARE_WRITE8_MEMBER(microtan_videoram_w);
 	DECLARE_DRIVER_INIT(microtan);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_microtan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(microtan_interrupt);
 	TIMER_CALLBACK_MEMBER(microtan_read_cassette);
@@ -97,7 +97,7 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( microtan );
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 #endif /* MICROTAN_H_ */

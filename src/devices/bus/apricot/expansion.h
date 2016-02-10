@@ -102,7 +102,7 @@ public:
 		const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 // device type definition
@@ -154,8 +154,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	simple_list<device_apricot_expansion_card_interface> m_dev;

@@ -263,9 +263,9 @@ public:
 	parallel_drum_t m_parallel_drum;
 	required_device<pdp1_device> m_maincpu;
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pdp1);
 	UINT32 screen_update_pdp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_pdp1(screen_device &screen, bool state);
@@ -274,7 +274,6 @@ public:
 	TIMER_CALLBACK_MEMBER(puncher_callback);
 	TIMER_CALLBACK_MEMBER(tyo_callback);
 	TIMER_CALLBACK_MEMBER(dpy_callback);
-	TIMER_CALLBACK_MEMBER(il_timer_callback);
 	void pdp1_machine_stop();
 	inline void pdp1_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 	void pdp1_plot(int x, int y);
@@ -297,7 +296,6 @@ public:
 	void tape_write(UINT8 data);
 	void typewriter_out(UINT8 data);
 	void parallel_drum_set_il(int il);
-	void parallel_drum_init();
 	UINT32 drum_read(int field, int position);
 	void drum_write(int field, int position, UINT32 data);
 	void pdp1_keyboard();

@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef BGFX_RENDERER_D3D12_H_HEADER_GUARD
@@ -272,6 +272,9 @@ namespace bgfx { namespace d3d12
 		ID3D12Resource* m_ptr;
 		D3D12_RESOURCE_STATES m_state;
 		uint32_t m_flags;
+		uint32_t m_width;
+		uint32_t m_height;
+		uint32_t m_depth;
 		uint16_t m_samplerIdx;
 		uint8_t m_type;
 		uint8_t m_requestedFormat;
@@ -341,9 +344,9 @@ namespace bgfx { namespace d3d12
 		uint64_t m_currentFence;
 		uint64_t m_completedFence;
 		ID3D12Fence* m_fence;
-		CommandList m_commandList[32];
+		CommandList m_commandList[256];
 		typedef stl::vector<ID3D12Resource*> ResourceArray;
-		ResourceArray m_release[32];
+		ResourceArray m_release[256];
 		bx::RingBufferControl m_control;
 	};
 
@@ -427,6 +430,49 @@ namespace bgfx { namespace d3d12
 		uint32_t m_maxDrawPerBatch;
 		uint32_t m_minIndirect;
 		uint32_t m_flushPerBatch;
+	};
+
+	struct TimerQueryD3D12
+	{
+		TimerQueryD3D12()
+			: m_control(4)
+		{
+		}
+
+		void init();
+		void shutdown();
+		void begin(ID3D12GraphicsCommandList* _commandList);
+		void end(ID3D12GraphicsCommandList* _commandList);
+		bool get();
+
+		uint64_t m_begin;
+		uint64_t m_end;
+		uint64_t m_elapsed;
+		uint64_t m_frequency;
+
+		ID3D12Resource*  m_readback;
+		ID3D12QueryHeap* m_queryHeap;
+		uint64_t* m_result;
+		bx::RingBufferControl m_control;
+	};
+
+	struct OcclusionQueryD3D12
+	{
+		OcclusionQueryD3D12()
+			: m_control(BX_COUNTOF(m_handle) )
+		{
+		}
+
+		void init();
+		void shutdown();
+		void begin(ID3D12GraphicsCommandList* _commandList, Frame* _render, OcclusionQueryHandle _handle);
+		void end(ID3D12GraphicsCommandList* _commandList);
+
+		ID3D12Resource*  m_readback;
+		ID3D12QueryHeap* m_queryHeap;
+		OcclusionQueryHandle m_handle[BGFX_CONFIG_MAX_OCCUSION_QUERIES];
+		uint64_t* m_result;
+		bx::RingBufferControl m_control;
 	};
 
 } /* namespace d3d12 */ } // namespace bgfx

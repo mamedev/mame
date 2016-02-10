@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "common.h"
@@ -57,14 +57,16 @@ static const uint16_t s_cubeIndices[36] =
 
 class Cubes : public entry::AppI
 {
-	void init(int /*_argc*/, char** /*_argv*/) BX_OVERRIDE
+	void init(int _argc, char** _argv) BX_OVERRIDE
 	{
+		Args args(_argc, _argv);
+		
 		m_width  = 1280;
 		m_height = 720;
 		m_debug  = BGFX_DEBUG_TEXT;
 		m_reset  = BGFX_RESET_VSYNC;
 
-		bgfx::init();
+		bgfx::init(args.m_type, args.m_pciId);
 		bgfx::reset(m_width, m_height, m_reset);
 
 		// Enable debug text.

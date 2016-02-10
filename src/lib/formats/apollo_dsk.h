@@ -17,10 +17,10 @@ class apollo_format : public upd765_format {
 public:
 	apollo_format();
 
-	virtual int identify(io_generic *io, UINT32 form_factor);
-	virtual const char *name() const;
-	virtual const char *description() const;
-	virtual const char *extensions() const;
+	virtual int identify(io_generic *io, UINT32 form_factor) override;
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual const char *extensions() const override;
 
 private:
 	static const format formats[];

@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "bgfx_p.h"
@@ -722,8 +722,7 @@ namespace bgfx
 	{
 		bx::MemoryReader reader(_src.byteCode.data(), uint32_t(_src.byteCode.size() ) );
 
-		bx::CrtAllocator r;
-		bx::MemoryBlock mb(&r);
+		bx::MemoryBlock mb(g_allocator);
 		bx::MemoryWriter writer(&mb);
 
 		for (uint32_t token = 0, numTokens = uint32_t(_src.byteCode.size() / sizeof(uint32_t) ); token < numTokens;)

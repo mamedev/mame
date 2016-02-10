@@ -114,9 +114,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mario_sh3_w);
 	DECLARE_WRITE8_MEMBER(mario_z80dma_rdy_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start();
-	virtual void sound_start();
-	virtual void sound_reset();
+	virtual void video_start() override;
+	virtual void sound_start() override;
+	virtual void sound_reset() override;
 	DECLARE_PALETTE_INIT(mario);
 	UINT32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mario(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

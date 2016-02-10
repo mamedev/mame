@@ -26,20 +26,20 @@ class snug_high_speed_gpl_device : public ti_expansion_card_device
 {
 public:
 	snug_high_speed_gpl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 
-	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	DECLARE_READ8Z_MEMBER(crureadz) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
 protected:
-	virtual void device_start(void);
-	virtual void device_reset(void);
-	virtual void device_stop(void);
-	virtual void device_config_complete(void);
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start(void) override;
+	virtual void device_reset(void) override;
+	virtual void device_stop(void) override;
+	virtual void device_config_complete(void) override;
+	virtual ioport_constructor device_input_ports() const override;
 
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	at29c040a_device* m_dsr_eeprom;
@@ -47,8 +47,8 @@ private:
 	at29c040a_device* m_grom_a_eeprom;
 	at29c040a_device* m_grom_b_eeprom;
 
-	UINT8*          m_ram6_memory;
-	UINT8*          m_gram_memory;
+	std::unique_ptr<UINT8[]>         m_ram6_memory;
+	std::unique_ptr<UINT8[]>         m_gram_memory;
 
 	void            dsrspace_readz(address_space& space, offs_t offset, UINT8* value, UINT8 mem_mask);
 	void            cartspace_readz(address_space& space, offs_t offset, UINT8* value, UINT8 mem_mask);

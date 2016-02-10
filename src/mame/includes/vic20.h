@@ -84,16 +84,13 @@ public:
 	required_ioport m_restore;
 	required_ioport m_lock;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
 	DECLARE_READ8_MEMBER( vic_videoram_r );
-	DECLARE_READ8_MEMBER( vic_lightx_cb );
-	DECLARE_READ8_MEMBER( vic_lighty_cb );
-	DECLARE_READ8_MEMBER( vic_lightbut_cb );
 
 	DECLARE_WRITE_LINE_MEMBER( write_light_pen );
 	DECLARE_WRITE_LINE_MEMBER( write_user_joy0 );

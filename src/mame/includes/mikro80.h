@@ -54,12 +54,12 @@ public:
 	DECLARE_READ8_MEMBER(mikro80_tape_r);
 	DECLARE_DRIVER_INIT(radio99);
 	DECLARE_DRIVER_INIT(mikro80);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_mikro80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<i8255_device> m_ppi8255;
 	required_device<cassette_image_device> m_cassette;
 	required_memory_region m_region_maincpu;

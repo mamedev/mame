@@ -139,8 +139,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_srdarwin_tile_info);
 	TILE_GET_INFO_MEMBER(get_gondo_fix_tile_info);
 	TILE_GET_INFO_MEMBER(get_gondo_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(lastmisn);
 	DECLARE_VIDEO_START(shackled);
 	DECLARE_VIDEO_START(gondo);
@@ -165,5 +165,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(csilver_adpcm_int);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

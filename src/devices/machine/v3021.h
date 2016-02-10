@@ -49,12 +49,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start();
-	virtual void device_reset();
-
-	inline UINT8 rtc_read(UINT8 offset);
-	inline void rtc_write(UINT8 offset,UINT8 data);
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	static TIMER_CALLBACK( rtc_inc_callback );
 

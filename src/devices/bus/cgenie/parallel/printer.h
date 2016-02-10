@@ -34,13 +34,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fault_w);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void pa_w(UINT8 data);
-	virtual UINT8 pb_r();
-	virtual void pb_w(UINT8 data);
+	virtual void pa_w(UINT8 data) override;
+	virtual UINT8 pb_r() override;
+	virtual void pb_w(UINT8 data) override;
 
 private:
 	required_device<centronics_device> m_centronics;

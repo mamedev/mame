@@ -119,12 +119,12 @@ public:
 	const char *keymap_file() const { return value(SDLOPTION_KEYMAP_FILE); }
 
 	// joystick mapping
-	const char *joy_index(int index) const { std::string temp; return value(strformat(temp, "%s%d", SDLOPTION_JOYINDEX, index).c_str()); }
+	const char *joy_index(int index) const { return value(strformat("%s%d", SDLOPTION_JOYINDEX, index).c_str()); }
 	bool sixaxis() const { return bool_value(SDLOPTION_SIXAXIS); }
 
 #if (SDLMAME_SDL2)
-	const char *mouse_index(int index) const { std::string temp; return value(strformat(temp, "%s%d", SDLOPTION_MOUSEINDEX, index).c_str()); }
-	const char *keyboard_index(int index) const { std::string temp; return value(strformat(temp, "%s%d", SDLOPTION_KEYBINDEX, index).c_str()); }
+	const char *mouse_index(int index) const { return value(strformat("%s%d", SDLOPTION_MOUSEINDEX, index).c_str()); }
+	const char *keyboard_index(int index) const { return value(strformat("%s%d", SDLOPTION_KEYBINDEX, index).c_str()); }
 #endif
 
 	const char *video_driver() const { return value(SDLOPTION_VIDEODRIVER); }
@@ -147,32 +147,32 @@ public:
 	virtual ~sdl_osd_interface();
 
 	// general overridables
-	virtual void init(running_machine &machine);
-	virtual void update(bool skip_redraw);
+	virtual void init(running_machine &machine) override;
+	virtual void update(bool skip_redraw) override;
 
 	// input overridables
-	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist);
+	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
 
-	virtual void video_register();
+	virtual void video_register() override;
 
-	virtual bool video_init();
-	virtual bool window_init();
-	virtual bool input_init();
-	virtual void input_pause();
-	virtual void input_resume();
-	virtual bool output_init();
+	virtual bool video_init() override;
+	virtual bool window_init() override;
+	virtual bool input_init() override;
+	virtual void input_pause() override;
+	virtual void input_resume() override;
+	virtual bool output_init() override;
 	//virtual bool midi_init();
 
-	virtual void video_exit();
-	virtual void window_exit();
-	virtual void input_exit();
-	virtual void output_exit();
+	virtual void video_exit() override;
+	virtual void window_exit() override;
+	virtual void input_exit() override;
+	virtual void output_exit() override;
 	//virtual void midi_exit();
 
 	sdl_options &options() { return m_options; }
 
 private:
-	virtual void osd_exit();
+	virtual void osd_exit() override;
 
 	void extract_video_config();
 

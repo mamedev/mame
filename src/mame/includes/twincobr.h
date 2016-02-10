@@ -39,9 +39,9 @@ public:
 	int m_dsp_execute;
 	UINT32 m_dsp_addr_w;
 	UINT32 m_main_ram_seg;
-	UINT16 *m_bgvideoram16;
-	UINT16 *m_fgvideoram16;
-	UINT16 *m_txvideoram16;
+	std::unique_ptr<UINT16[]> m_bgvideoram16;
+	std::unique_ptr<UINT16[]> m_fgvideoram16;
+	std::unique_ptr<UINT16[]> m_txvideoram16;
 	size_t m_bgvideoram_size;
 	size_t m_fgvideoram_size;
 	size_t m_txvideoram_size;
@@ -106,7 +106,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	DECLARE_MACHINE_RESET(twincobr);
 	DECLARE_VIDEO_START(toaplan0);
-	void copy_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	UINT32 screen_update_toaplan0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(twincobr_interrupt);
 	INTERRUPT_GEN_MEMBER(wardner_interrupt);
@@ -115,7 +114,6 @@ public:
 	void twincobr_display(int enable);
 	void twincobr_flipscreen(int flip);
 	void twincobr_log_vram();
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void twincobr_dsp(int enable);
 	void toaplan0_control_w(int offset, int data);
 	void toaplan0_coin_dsp_w(address_space &space, int offset, int data);

@@ -51,7 +51,7 @@ public:
 
 	// getters
 	const game_driver &gamedrv() const { return m_gamedrv; }
-	device_t &root_device() const { assert(m_root_device != NULL); return *m_root_device; }
+	device_t &root_device() const { assert(m_root_device != nullptr); return *m_root_device; }
 	screen_device *first_screen() const;
 	emu_options &options() const { return m_options; }
 	inline device_t *device(const char *tag) const { return root_device().subdevice(tag); }
@@ -77,7 +77,7 @@ private:
 	// internal state
 	const game_driver &     m_gamedrv;
 	emu_options &           m_options;
-	auto_pointer<device_t>  m_root_device;
+	std::unique_ptr<device_t>  m_root_device;
 };
 
 

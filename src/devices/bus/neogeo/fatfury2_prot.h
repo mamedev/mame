@@ -29,14 +29,8 @@ public:
 	UINT32     m_fatfury2_prot_data;
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-
-
-
-private:
-
-
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 #endif

@@ -89,7 +89,7 @@ public:
 	DECLARE_DRIVER_INIT(midresb);
 	DECLARE_DRIVER_INIT(ffantasybl);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(slyspy);
 	DECLARE_VIDEO_START(dec0);
 	DECLARE_VIDEO_START(dec0_nodma);
@@ -131,7 +131,7 @@ public:
 	}
 	DECLARE_WRITE_LINE_MEMBER(automat_vclk_cb);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	UINT32 screen_update_automat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_secretab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

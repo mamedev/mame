@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_HANDLE_ALLOC_H_HEADER_GUARD
@@ -253,7 +253,7 @@ namespace bx
 		}
 
 	private:
-		void insertBefore(int16_t _before, uint16_t _handle)
+		void insertBefore(uint16_t _before, uint16_t _handle)
 		{
 			Link& curr = m_links[_handle];
 			curr.m_next = _before;

@@ -23,9 +23,9 @@ public:
 	void set_cpu(device_t &device);
 
 protected:
-	virtual void recompute_children();
-	virtual void update_menu();
-	virtual bool handle_command(WPARAM wparam, LPARAM lparam);
+	virtual void recompute_children() override;
+	virtual void update_menu() override;
+	virtual bool handle_command(WPARAM wparam, LPARAM lparam) override;
 
 private:
 	enum
@@ -41,7 +41,7 @@ private:
 		DEVOPTION_MAX
 	};
 
-	virtual void process_string(char const *string);
+	virtual void process_string(char const *string) override;
 
 	static void build_generic_filter(device_image_interface *img, bool is_save, std::string &filter);
 	static void add_filter_entry(std::string &dest, char const *description, char const *extensions);

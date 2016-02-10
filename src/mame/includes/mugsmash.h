@@ -31,14 +31,13 @@ public:
 	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE16_MEMBER(mugsmash_reg2_w);
-	DECLARE_READ16_MEMBER(mugsmash_input_ports_r);
 	DECLARE_WRITE16_MEMBER(mugsmash_videoram1_w);
 	DECLARE_WRITE16_MEMBER(mugsmash_videoram2_w);
 	DECLARE_WRITE16_MEMBER(mugsmash_reg_w);
 	TILE_GET_INFO_MEMBER(get_mugsmash_tile_info1);
 	TILE_GET_INFO_MEMBER(get_mugsmash_tile_info2);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update_mugsmash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

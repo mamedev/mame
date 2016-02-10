@@ -56,7 +56,7 @@ public:
 	// construction/destruction
 	kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	static void set_keyboard_type(device_t &device, kbdc8042_type_t keybtype) { downcast<kbdc8042_device &>(device).m_keybtype = keybtype; }
 	template<class _Object> static devcb_base &set_system_reset_callback(device_t &device, _Object object) { return downcast<kbdc8042_device &>(device).m_system_reset_cb.set_callback(object); }
@@ -79,8 +79,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	UINT8 m_inport, m_outport, m_data, m_command;
 

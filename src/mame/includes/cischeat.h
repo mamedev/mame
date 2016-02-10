@@ -2,6 +2,7 @@
 // copyright-holders:Luca Elia
 /* TODO: some variables are per-game specifics */
 #include "sound/okim6295.h"
+#include "machine/ticket.h"
 
 class cischeat_state : public driver_device
 {
@@ -22,7 +23,17 @@ public:
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_captflag_hopper(*this, "hopper"),
+		m_captflag_motor_left(*this, "motor_left"),
+		m_captflag_motor_right(*this, "motor_right"),
+		m_oki1_bank(*this, "oki1_bank"),
+		m_oki2_bank(*this, "oki2_bank")
+		{
+			for (int side = 0; side < 2; ++side)
+				m_captflag_motor_command[side] = m_captflag_motor_pos[side] = 0;
+			m_captflag_leds = 0;
+		}
 
 	required_shared_ptr<UINT16> m_vregs;
 	optional_shared_ptr_array<UINT16,3> m_scrollram;
@@ -114,4 +125,28 @@ public:
 	required_device<okim6295_device> m_oki2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	// captflag
+	optional_device<ticket_dispenser_device> m_captflag_hopper;
+
+	optional_device<timer_device> m_captflag_motor_left;
+	optional_device<timer_device> m_captflag_motor_right;
+	UINT16 m_captflag_motor_command[2];
+	UINT16 m_captflag_motor_pos[2];
+
+	DECLARE_WRITE16_MEMBER(captflag_motor_command_right_w);
+	DECLARE_WRITE16_MEMBER(captflag_motor_command_left_w);
+	void captflag_motor_move(int side, UINT16 data);
+	DECLARE_CUSTOM_INPUT_MEMBER(captflag_motor_busy_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(captflag_motor_pos_r);
+
+	optional_memory_bank m_oki1_bank;
+	optional_memory_bank m_oki2_bank;
+	DECLARE_WRITE16_MEMBER(captflag_oki_bank_w);
+
+	UINT16 m_captflag_leds;
+	DECLARE_WRITE16_MEMBER(captflag_leds_w);
+
+	DECLARE_DRIVER_INIT(captflag);
+	TIMER_DEVICE_CALLBACK_MEMBER(captflag_scanline);
 };

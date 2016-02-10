@@ -16,19 +16,19 @@ public:
 	naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	UINT32 rom_cur_address;
 	static const int RAM_SIZE = 65536;
-	UINT8* ram;
+	std::unique_ptr<UINT8[]> ram;
 
 	UINT16 read_callback(UINT32 addr);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void board_setup_address(UINT32 address, bool is_dma);
-	virtual void board_get_buffer(UINT8 *&base, UINT32 &limit);
-	virtual void board_advance(UINT32 size);
-	virtual void board_write(offs_t offset, UINT16 data);
+	virtual void board_setup_address(UINT32 address, bool is_dma) override;
+	virtual void board_get_buffer(UINT8 *&base, UINT32 &limit) override;
+	virtual void board_advance(UINT32 size) override;
+	virtual void board_write(offs_t offset, UINT16 data) override;
 
 private:
 	required_device<sega_315_5881_crypt_device> m_cryptdevice;

@@ -39,7 +39,7 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_floppy0(*this, UPD765_TAG ":0"),
 			m_floppy1(*this, UPD765_TAG ":1"),
-			m_floppy(NULL),
+			m_floppy(nullptr),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_ieee488(*this, IEEE488_TAG),
 			m_reset(1),
@@ -59,8 +59,8 @@ public:
 	required_device<centronics_device> m_centronics;
 	required_device<ieee488_device> m_ieee488;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void update_fdc_int();
 
@@ -71,8 +71,6 @@ public:
 	DECLARE_WRITE8_MEMBER( ppi0_pc_w );
 	DECLARE_READ8_MEMBER( ppi1_pb_r );
 	DECLARE_WRITE8_MEMBER( ppi1_pc_w );
-
-	DECLARE_WRITE8_MEMBER(kbd_put);
 
 	DECLARE_DIRECT_UPDATE_MEMBER(sage2_direct_update_handler);
 

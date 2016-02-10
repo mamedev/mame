@@ -17,11 +17,11 @@ public:
 	astrocade_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start() {}
-	virtual void device_reset() {}
+	virtual void device_start() override {}
+	virtual void device_reset() override {}
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 };
 
 // ======================> astrocade_rom_256k_device
@@ -32,11 +32,11 @@ public:
 	// construction/destruction
 	astrocade_rom_256k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 
 private:
 	UINT8 m_base_bank;
@@ -50,11 +50,11 @@ public:
 	// construction/destruction
 	astrocade_rom_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 
 private:
 	UINT8 m_base_bank;

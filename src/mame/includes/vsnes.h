@@ -1,40 +1,42 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
-#include "sound/nes_apu.h"
 #include "video/ppu2c0x.h"
 
 class vsnes_state : public driver_device
 {
 public:
 	vsnes_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub"),
-		m_nesapu1(*this, "nesapu1"),
-		m_nesapu2(*this, "nesapu2"),
-		m_ppu1(*this, "ppu1"),
-		m_ppu2(*this, "ppu2"),
-		m_work_ram(*this, "work_ram"),
-		m_work_ram_1(*this, "work_ram_1")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "sub")
+		, m_ppu1(*this, "ppu1")
+		, m_ppu2(*this, "ppu2")
+		, m_work_ram(*this, "work_ram")
+		, m_work_ram_1(*this, "work_ram_1")
+		, m_palette(*this, "palette")
+		, m_gfx1_rom(*this, "gfx1")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
-	required_device<nesapu_device> m_nesapu1;
-	optional_device<nesapu_device> m_nesapu2;
 	required_device<ppu2c0x_device> m_ppu1;
 	optional_device<ppu2c0x_device> m_ppu2;
 
 	required_shared_ptr<UINT8> m_work_ram;
 	optional_shared_ptr<UINT8> m_work_ram_1;
+	required_device<palette_device> m_palette;
+
+	optional_memory_region m_gfx1_rom;
+
 	int m_coin;
 	int m_do_vrom_bank;
 	int m_input_latch[4];
 	int m_sound_fix;
 	UINT8 m_last_bank;
-	UINT8* m_vram;
+	std::unique_ptr<UINT8[]> m_vram;
 	UINT8* m_vrom[2];
-	UINT8* m_nt_ram[2];
+	std::unique_ptr<UINT8[]> m_nt_ram[2];
 	UINT8* m_nt_page[2][4];
 	UINT32 m_vrom_size[2];
 	int m_vrom_banks;
@@ -91,12 +93,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vsdual_vrom_banking_main);
 	DECLARE_WRITE8_MEMBER(vsdual_vrom_banking_sub);
 	void v_set_mirroring(int ppu, int mirroring);
-	DECLARE_READ8_MEMBER(psg1_4015_r);
-	DECLARE_WRITE8_MEMBER(psg1_4015_w);
-	DECLARE_WRITE8_MEMBER(psg1_4017_w);
-	DECLARE_READ8_MEMBER(psg2_4015_r);
-	DECLARE_WRITE8_MEMBER(psg2_4015_w);
-	DECLARE_WRITE8_MEMBER(psg2_4017_w);
+
 	DECLARE_DRIVER_INIT(vskonami);
 	DECLARE_DRIVER_INIT(vsvram);
 	DECLARE_DRIVER_INIT(bnglngby);
@@ -129,4 +126,10 @@ public:
 	void ppu_irq_2(int *ppu_regs);
 
 	DECLARE_READ8_MEMBER( vsnes_bootleg_z80_latch_r );
+	DECLARE_WRITE8_MEMBER(bootleg_sound_write);
+	DECLARE_READ8_MEMBER(vsnes_bootleg_z80_data_r);
+	DECLARE_READ8_MEMBER(vsnes_bootleg_z80_address_r);
+	UINT8 m_bootleg_sound_offset;
+	UINT8 m_bootleg_sound_data;
+
 };

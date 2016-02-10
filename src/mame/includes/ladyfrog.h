@@ -23,7 +23,7 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
-	UINT8 *    m_spriteram;
+	std::unique_ptr<UINT8[]>    m_spriteram;
 	required_shared_ptr<UINT8> m_scrlram;
 	std::vector<UINT8> m_paletteram;
 	std::vector<UINT8> m_paletteram_ext;
@@ -57,14 +57,13 @@ public:
 	DECLARE_READ8_MEMBER(ladyfrog_palette_r);
 	DECLARE_WRITE8_MEMBER(ladyfrog_gfxctrl_w);
 	DECLARE_WRITE8_MEMBER(ladyfrog_gfxctrl2_w);
-	DECLARE_READ8_MEMBER(ladyfrog_gfxctrl_r);
 	DECLARE_READ8_MEMBER(ladyfrog_scrlram_r);
 	DECLARE_WRITE8_MEMBER(ladyfrog_scrlram_w);
 	DECLARE_WRITE8_MEMBER(unk_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(toucheme);
 	DECLARE_VIDEO_START(ladyfrog_common);
 	UINT32 screen_update_ladyfrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

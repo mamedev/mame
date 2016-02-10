@@ -333,6 +333,7 @@ enum ioport_type
 		IPT_UI_ON_SCREEN_DISPLAY,
 		IPT_UI_DEBUG_BREAK,
 		IPT_UI_PAUSE,
+		IPT_UI_PAUSE_SINGLE,
 		IPT_UI_RESET_MACHINE,
 		IPT_UI_SOFT_RESET,
 		IPT_UI_SHOW_GFX,
@@ -342,6 +343,7 @@ enum ioport_type
 		IPT_UI_FAST_FORWARD,
 		IPT_UI_SHOW_FPS,
 		IPT_UI_SNAPSHOT,
+		IPT_UI_TIMECODE,
 		IPT_UI_RECORD_MOVIE,
 		IPT_UI_TOGGLE_CHEAT,
 		IPT_UI_UP,
@@ -369,6 +371,21 @@ enum ioport_type
 		IPT_UI_LOAD_STATE,
 		IPT_UI_TAPE_START,
 		IPT_UI_TAPE_STOP,
+		IPT_UI_HISTORY,
+		IPT_UI_MAMEINFO,
+		IPT_UI_COMMAND,
+		IPT_UI_SYSINFO,
+		IPT_UI_FAVORITES,
+		IPT_UI_STORY,
+		IPT_UI_UP_FILTER,
+		IPT_UI_DOWN_FILTER,
+		IPT_UI_LEFT_PANEL,
+		IPT_UI_RIGHT_PANEL,
+		IPT_UI_UP_PANEL,
+		IPT_UI_DOWN_PANEL,
+		IPT_UI_EXPORT,
+		IPT_UI_AUDIT_FAST,
+		IPT_UI_AUDIT_ALL,
 
 		// additional OSD-specified UI port types (up to 16)
 		IPT_OSD_1,
@@ -830,7 +847,7 @@ public:
 	void post_coded(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
 
 	void frame_update(ioport_port &port, ioport_value &digital);
-	const char *key_name(std::string &str, unicode_char ch);
+	std::string key_name(unicode_char ch) const;
 
 	// debugging
 	std::string dump();
@@ -850,7 +867,7 @@ private:
 	attotime choose_delay(unicode_char ch);
 	void internal_post(unicode_char ch);
 	void timer(void *ptr, int param);
-	const char *unicode_to_string(std::string &buffer, unicode_char ch);
+	std::string unicode_to_string(unicode_char ch);
 	const keycode_map_entry *find_code(unicode_char ch) const;
 
 	// internal state
@@ -900,7 +917,7 @@ public:
 	bool none() const { return (m_condition == ALWAYS); }
 
 	// configuration
-	void reset() { set(ALWAYS, NULL, 0, 0); }
+	void reset() { set(ALWAYS, nullptr, 0, 0); }
 	void set(condition_t condition, const char *tag, ioport_value mask, ioport_value value)
 	{
 		m_condition = condition;
@@ -1003,7 +1020,7 @@ class ioport_field
 
 public:
 	// construction/destruction
-	ioport_field(ioport_port &port, ioport_type type, ioport_value defvalue, ioport_value maskbits, const char *name = NULL);
+	ioport_field(ioport_port &port, ioport_type type, ioport_value defvalue, ioport_value maskbits, const char *name = nullptr);
 	~ioport_field();
 
 	// getters
@@ -1054,7 +1071,7 @@ public:
 
 	UINT8 way() const { return m_way; }
 	unicode_char keyboard_code(int which) const;
-	ioport_field_live &live() const { assert(m_live != NULL); return *m_live; }
+	ioport_field_live &live() const { assert(m_live != nullptr); return *m_live; }
 
 	// setters
 	void set_crosshair_scale(double scale) { m_crosshair_scale = scale; }
@@ -1098,7 +1115,7 @@ private:
 	// internal state
 	ioport_field *              m_next;             // pointer to next field in sequence
 	ioport_port &               m_port;             // reference to the port that owns us
-	auto_pointer<ioport_field_live> m_live;         // live state of field (NULL if not live)
+	std::unique_ptr<ioport_field_live> m_live;         // live state of field (NULL if not live)
 	int                         m_modcount;         // modification count
 	simple_list<ioport_setting> m_settinglist;      // list of input_setting_configs
 	simple_list<ioport_diplocation> m_diploclist;   // list of locations for various bits
@@ -1200,13 +1217,11 @@ public:
 	const char *tag() const { return m_tag.c_str(); }
 	int modcount() const { return m_modcount; }
 	ioport_value active() const { return m_active; }
-	ioport_port_live &live() const { assert(m_live != NULL); return *m_live; }
+	ioport_port_live &live() const { assert(m_live != nullptr); return *m_live; }
 
 	// read/write to the port
 	ioport_value read();
-	ioport_value read_safe(ioport_value defval) { return (this == NULL) ? defval : read(); }
 	void write(ioport_value value, ioport_value mask = ~0);
-	void write_safe(ioport_value value, ioport_value mask = ~0) { if (this != NULL) write(value, mask); }
 
 	// other operations
 	ioport_field *field(ioport_value mask);
@@ -1224,8 +1239,11 @@ private:
 	std::string                 m_tag;          // copy of this port's tag
 	int                         m_modcount;     // modification count
 	ioport_value                m_active;       // mask of active bits in the port
-	auto_pointer<ioport_port_live> m_live;      // live state of port (NULL if not live)
+	std::unique_ptr<ioport_port_live> m_live;      // live state of port (NULL if not live)
 };
+
+inline ioport_value read_safe(ioport_port *port, ioport_value defval) { return (port == nullptr) ? defval : port->read(); }
+
 
 
 // ======================> analog_field
@@ -1352,6 +1370,8 @@ struct ioport_port_live
 };
 
 
+enum class config_type;
+
 // ======================> ioport_manager
 
 // private input port state
@@ -1393,10 +1413,9 @@ public:
 	int count_players() const;
 	bool crosshair_position(int player, float &x, float &y);
 	bool has_keyboard() const;
-	void setup_natural_keyboard(ioport_queue_chars_delegate queue_chars, ioport_accept_char_delegate accept_char, ioport_charqueue_empty_delegate charqueue_empty);
 	INT32 frame_interpolate(INT32 oldval, INT32 newval);
 	ioport_type token_to_input_type(const char *string, int &player) const;
-	const char *input_type_to_token(std::string &str, ioport_type type, int player);
+	std::string input_type_to_token(ioport_type type, int player);
 
 private:
 	// internal helpers
@@ -1411,12 +1430,12 @@ private:
 	input_seq_type token_to_seq_type(const char *string);
 	void update_defaults();
 
-	void load_config(int config_type, xml_data_node *parentnode);
+	void load_config(config_type cfg_type, xml_data_node *parentnode);
 	void load_remap_table(xml_data_node *parentnode);
 	bool load_default_config(xml_data_node *portnode, int type, int player, const input_seq *newseq);
 	bool load_game_config(xml_data_node *portnode, int type, int player, const input_seq *newseq);
 
-	void save_config(int config_type, xml_data_node *parentnode);
+	void save_config(config_type cfg_type, xml_data_node *parentnode);
 	void save_sequence(xml_data_node *parentnode, input_seq_type type, ioport_type porttype, const input_seq &seq);
 	bool save_this_input_field_type(ioport_type type);
 	void save_default_inputs(xml_data_node *parentnode);
@@ -1424,15 +1443,19 @@ private:
 
 	template<typename _Type> _Type playback_read(_Type &result);
 	time_t playback_init();
-	void playback_end(const char *message = NULL);
+	void playback_end(const char *message = nullptr);
 	void playback_frame(const attotime &curtime);
 	void playback_port(ioport_port &port);
 
 	template<typename _Type> void record_write(_Type value);
 	void record_init();
-	void record_end(const char *message = NULL);
+	void record_end(const char *message = nullptr);
 	void record_frame(const attotime &curtime);
 	void record_port(ioport_port &port);
+
+	template<typename _Type> void timecode_write(_Type value);
+	void timecode_init();
+	void timecode_end(const char *message = NULL);
 
 	// internal state
 	running_machine &       m_machine;              // reference to owning machine
@@ -1456,6 +1479,9 @@ private:
 	emu_file                m_playback_file;        // playback file (NULL if not recording)
 	UINT64                  m_playback_accumulated_speed; // accumulated speed during playback
 	UINT32                  m_playback_accumulated_frames; // accumulated frames during playback
+	emu_file                m_timecode_file;        // timecode/frames playback file (NULL if not recording)
+	int						m_timecode_count;
+	attotime				m_timecode_last_time;
 
 	// has...
 	bool                    m_has_configs;
@@ -1482,7 +1508,7 @@ public:
 	void port_modify(const char *tag);
 
 	// field helpers
-	void field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name = NULL);
+	void field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name = nullptr);
 	void field_add_char(unicode_char ch);
 	void field_add_code(input_seq_type which, input_code code);
 	void field_set_way(int way) const { m_curfield->m_way = way; }
@@ -1505,8 +1531,8 @@ public:
 	void field_set_analog_wraps() const { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_WRAPS; }
 	void field_set_remap_table(const ioport_value *table) { m_curfield->m_remap_table = table; }
 	void field_set_analog_invert() const { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_INVERT; }
-	void field_set_dynamic_read(ioport_field_read_delegate delegate, void *param = NULL) const { m_curfield->m_read = delegate; m_curfield->m_read_param = param; }
-	void field_set_dynamic_write(ioport_field_write_delegate delegate, void *param = NULL) const { m_curfield->m_write = delegate; m_curfield->m_write_param = param; }
+	void field_set_dynamic_read(ioport_field_read_delegate delegate, void *param = nullptr) const { m_curfield->m_read = delegate; m_curfield->m_read_param = param; }
+	void field_set_dynamic_write(ioport_field_write_delegate delegate, void *param = nullptr) const { m_curfield->m_write = delegate; m_curfield->m_write_param = param; }
 	void field_set_diplocation(const char *location) const { m_curfield->expand_diplocation(location, m_errorbuf); }
 
 	// setting helpers

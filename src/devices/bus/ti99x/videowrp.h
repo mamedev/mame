@@ -29,10 +29,10 @@ protected:
 
 	/* Constructor */
 	ti_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	virtual void device_start(void);
-	virtual void device_reset(void);
-	virtual DECLARE_READ8Z_MEMBER(readz) { };
-	virtual DECLARE_WRITE8_MEMBER(write) { };
+	virtual void device_start(void) override;
+	virtual void device_reset(void) override;
+	virtual DECLARE_READ8Z_MEMBER(readz) override { };
+	virtual DECLARE_WRITE8_MEMBER(write) override { };
 };
 
 /*
@@ -42,10 +42,10 @@ class ti_std_video_device : public ti_video_device
 {
 public:
 	ti_std_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 
-	void    reset_vdp(int state) { m_tms9928a->reset_line(state); }
+	void    reset_vdp(int state) override { m_tms9928a->reset_line(state); }
 };
 
 /*
@@ -56,14 +56,14 @@ class ti_exp_video_device : public ti_video_device
 public:
 	ti_exp_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	void video_update_mouse(int delta_x, int delta_y, int buttons);
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ16_MEMBER(read16);
 	DECLARE_WRITE16_MEMBER(write16);
-	void    reset_vdp(int state) { m_v9938->reset_line(state); }
+	void    reset_vdp(int state) override { m_v9938->reset_line(state); }
 
 protected:
-	virtual void    device_start(void);
+	virtual void    device_start(void) override;
 	v9938_device    *m_v9938;
 };
 
@@ -85,19 +85,19 @@ class ti_sound_system_device : public bus8z_device
 {
 public:
 	ti_sound_system_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source),
+	: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source), m_sound_chip(nullptr),
 		m_console_ready(*this) { };
 
 	// Cannot read from sound; just ignore silently
-	DECLARE_READ8Z_MEMBER(readz) { };
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override { };
+	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_WRITE_LINE_MEMBER( sound_ready );   // connect to console READY
 
 	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object) { return downcast<ti_sound_system_device &>(device).m_console_ready.set_callback(object); }
 
 protected:
-	virtual void device_start(void);
-	virtual machine_config_constructor device_mconfig_additions() const =0;
+	virtual void device_start(void) override;
+	virtual machine_config_constructor device_mconfig_additions() const override  =0;
 
 private:
 	sn76496_base_device*    m_sound_chip;
@@ -113,7 +113,7 @@ public:
 	ti_sound_sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 /*
@@ -125,7 +125,7 @@ public:
 	ti_sound_sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 
@@ -162,18 +162,6 @@ protected:
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(_class,_int)) \
 	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )                              \
 	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
-
-#define MCFG_TI_V9938_ADD(_tag, _rate, _screen, _blank, _x, _y, _class, _int)      \
-	MCFG_DEVICE_ADD(_tag, V9938VIDEO, 0)                                        \
-	MCFG_V9938_ADD(VDP_TAG, _screen, 0x20000, XTAL_21_4772MHz)  /* typical 9938 clock, not verified */     \
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(_class, _int))         \
-	MCFG_SCREEN_ADD(_screen, RASTER)                                        \
-	MCFG_SCREEN_REFRESH_RATE(_rate)                                         \
-	MCFG_SCREEN_UPDATE_DEVICE(VDP_TAG, v9938_device, screen_update) \
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(_blank))                    \
-	MCFG_SCREEN_SIZE(_x, _y)                                                \
-	MCFG_SCREEN_VISIBLE_AREA(0, _x - 1, 0, _y - 1)                          \
-	MCFG_SCREEN_PALETTE(VDP_TAG ":palette")
 
 #define MCFG_TI_SOUND_94624_ADD(_tag)            \
 	MCFG_DEVICE_ADD(_tag, TISOUND_94624, 0)

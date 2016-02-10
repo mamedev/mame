@@ -27,18 +27,18 @@ public:
 	virtual ~coco_vhd_image_device();
 
 	// image-level overrides
-	virtual bool call_load();
+	virtual bool call_load() override;
 
-	virtual iodevice_t image_type() const { return IO_HARDDISK; }
+	virtual iodevice_t image_type() const override { return IO_HARDDISK; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 1; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
-	virtual const char *file_extensions() const { return "vhd"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 1; }
+	virtual bool is_creatable() const override { return 1; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override { return nullptr; }
+	virtual const char *file_extensions() const override { return "vhd"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// specific implementation
 	DECLARE_READ8_MEMBER(read) { return read(offset); }
@@ -48,8 +48,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 
 	void coco_vhd_readwrite(UINT8 data);
 

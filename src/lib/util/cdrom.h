@@ -145,12 +145,12 @@ void ecc_clear(UINT8 *sector);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE UINT32 msf_to_lba(UINT32 msf)
+static inline UINT32 msf_to_lba(UINT32 msf)
 {
 	return ( ((msf&0x00ff0000)>>16) * 60 * 75) + (((msf&0x0000ff00)>>8) * 75) + ((msf&0x000000ff)>>0);
 }
 
-INLINE UINT32 lba_to_msf(UINT32 lba)
+static inline UINT32 lba_to_msf(UINT32 lba)
 {
 	UINT8 m, s, f;
 
@@ -167,7 +167,7 @@ INLINE UINT32 lba_to_msf(UINT32 lba)
 // segacd needs it like this.. investigate
 // Angelo also says PCE tracks often start playing at the
 // wrong address.. related?
-INLINE UINT32 lba_to_msf_alt(int lba)
+static inline UINT32 lba_to_msf_alt(int lba)
 {
 	UINT32 ret = 0;
 

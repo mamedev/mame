@@ -19,9 +19,9 @@ public:
 
 	static const disasm_entry disasm_entries[0x100];
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	virtual void do_exec_full();
-	virtual void do_exec_partial();
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual void do_exec_full() override;
+	virtual void do_exec_partial() override;
 
 protected:
 	class mi_6509_normal : public memory_interface {
@@ -30,25 +30,25 @@ protected:
 
 		mi_6509_normal(m6509_device *base);
 		virtual ~mi_6509_normal() {}
-		virtual UINT8 read(UINT16 adr);
-		virtual UINT8 read_9(UINT16 adr);
-		virtual UINT8 read_sync(UINT16 adr);
-		virtual UINT8 read_arg(UINT16 adr);
-		virtual void write(UINT16 adr, UINT8 val);
-		virtual void write_9(UINT16 adr, UINT8 val);
+		virtual UINT8 read(UINT16 adr) override;
+		virtual UINT8 read_9(UINT16 adr) override;
+		virtual UINT8 read_sync(UINT16 adr) override;
+		virtual UINT8 read_arg(UINT16 adr) override;
+		virtual void write(UINT16 adr, UINT8 val) override;
+		virtual void write_9(UINT16 adr, UINT8 val) override;
 	};
 
 	class mi_6509_nd : public mi_6509_normal {
 	public:
 		mi_6509_nd(m6509_device *base);
 		virtual ~mi_6509_nd() {}
-		virtual UINT8 read_sync(UINT16 adr);
-		virtual UINT8 read_arg(UINT16 adr);
+		virtual UINT8 read_sync(UINT16 adr) override;
+		virtual UINT8 read_arg(UINT16 adr) override;
 	};
 
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void state_export(const device_state_entry &entry);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void state_export(const device_state_entry &entry) override;
 
 	UINT32 XPC;
 

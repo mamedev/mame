@@ -93,10 +93,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load() { }
-	virtual void device_clock_changed() { }
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override { }
+	virtual void device_clock_changed() override { }
 
 	TIMER_CALLBACK_MEMBER( timerproc_callback );
 
@@ -106,9 +106,7 @@ private:
 	void clear_display();
 	void new_key(UINT8 data, bool skey, bool ckey);
 	void new_fifo(UINT8 data);
-	UINT8 get_segments();
 	void set_irq(bool state);
-	void set_display_mode(UINT8 data);
 
 	devcb_write_line    m_out_irq_cb;       // IRQ
 	devcb_write8        m_out_sl_cb;        // Scanlines SL0-3

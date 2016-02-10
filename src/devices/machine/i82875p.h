@@ -25,14 +25,14 @@ public:
 	void set_cpu_tag(const char *tag);
 	void set_ram_size(int ram_size);
 
-	virtual void reset_all_mappings();
+	virtual void reset_all_mappings() override;
 
 	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space);
+							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;
 
-	virtual DECLARE_ADDRESS_MAP(config_map, 32);
+	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
-	virtual DECLARE_READ8_MEMBER(capptr_r);
+	virtual DECLARE_READ8_MEMBER(capptr_r) override;
 
 	DECLARE_READ8_MEMBER(  agpm_r);
 	DECLARE_WRITE8_MEMBER( agpm_w);
@@ -79,8 +79,8 @@ public:
 	DECLARE_READ8_MEMBER(  capreg2_r);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	DECLARE_ADDRESS_MAP(agp_translation_map, 32);
@@ -101,8 +101,8 @@ public:
 	i82875p_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 class i82875p_overflow_device : public pci_device {
@@ -121,8 +121,8 @@ public:
 
 protected:
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	DECLARE_ADDRESS_MAP(overflow_map, 32);

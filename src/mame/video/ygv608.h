@@ -306,7 +306,7 @@ public:
 	DECLARE_READ16_MEMBER( debug_trigger_r );
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 private:
 	TILEMAP_MAPPER_MEMBER(get_tile_offset);
 	TILE_GET_INFO_MEMBER(get_tile_info_A_8);

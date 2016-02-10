@@ -193,8 +193,8 @@ const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_BIG;
 // macro for defining a copy constructor and assignment operator to prevent copying
 #define DISABLE_COPYING(_Type) \
 private: \
-	_Type(const _Type &); \
-	_Type &operator=(const _Type &)
+	_Type(const _Type &) = delete; \
+	_Type &operator=(const _Type &) = delete
 
 // macro for declaring enumerator operators that increment/decrement like plain old C
 #define DECLARE_ENUM_OPERATORS(_Type) \
@@ -321,7 +321,7 @@ inline _Dest downcast(_Source *src)
 	try {
 		if (dynamic_cast<_Dest>(src) != src)
 		{
-			if (dynamic_cast<const device_t *>(src) != NULL)
+			if (dynamic_cast<const device_t *>(src) != nullptr)
 				report_bad_device_cast(dynamic_cast<const device_t *>(src), typeid(src), typeid(_Dest));
 			else
 				report_bad_cast(typeid(src), typeid(_Dest));
@@ -342,7 +342,7 @@ inline _Dest downcast(_Source &src)
 	try {
 		if (&dynamic_cast<_Dest>(src) != &src)
 		{
-			if (dynamic_cast<const device_t *>(&src) != NULL)
+			if (dynamic_cast<const device_t *>(&src) != nullptr)
 				report_bad_device_cast(dynamic_cast<const device_t *>(&src), typeid(src), typeid(_Dest));
 			else
 				report_bad_cast(typeid(src), typeid(_Dest));

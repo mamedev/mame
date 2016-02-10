@@ -44,9 +44,9 @@ public:
 	template<class _Object> static devcb_base &static_set_ready_callback(device_t &device, _Object object)     {  return downcast<peribox_device &>(device).m_datamux_ready.set_callback(object); }
 
 	// Next seven methods are called from the console
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz);
 	DECLARE_WRITE8_MEMBER(cruwrite);
@@ -61,10 +61,10 @@ public:
 	void set_genmod(bool set);
 
 protected:
-	virtual void device_start(void);
-	virtual void device_config_complete(void);
+	virtual void device_start(void) override;
+	virtual void device_config_complete(void) override;
 
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// Next three methods call back the console
 	devcb_write_line m_console_inta;   // INTA line (Box to console)
@@ -101,7 +101,7 @@ public:
 	peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 /*
@@ -113,7 +113,7 @@ public:
 	peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 /*
@@ -125,7 +125,7 @@ public:
 	peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 /*
@@ -137,7 +137,7 @@ public:
 	peribox_998_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 /*****************************************************************************
@@ -151,9 +151,9 @@ public:
 	peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// Called from the box (direction to card)
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
 	DECLARE_WRITE_LINE_MEMBER(senila);
 	DECLARE_WRITE_LINE_MEMBER(senilb);
@@ -172,8 +172,8 @@ public:
 	device_t*   get_drive(const char* name);
 
 protected:
-	void device_start(void);
-	void device_config_complete(void);
+	void device_start(void) override;
+	void device_config_complete(void) override;
 
 private:
 	int get_index_from_tagname();
@@ -193,8 +193,8 @@ class ti_expansion_card_device : public bus8z_device, public device_slot_card_in
 public:
 	ti_expansion_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source),
-	device_slot_card_interface(mconfig, *this)
-	{
+	device_slot_card_interface(mconfig, *this), m_selected(false), m_cru_base(0), m_select_mask(0), m_select_value(0)
+{
 		m_slot = static_cast<peribox_slot_device*>(owner);
 		m_senila = CLEAR_LINE;
 		m_senilb = CLEAR_LINE;

@@ -28,7 +28,7 @@ public:
 	UINT16   m_blitter_yparam[16];
 	UINT16   m_blitter_vidparam[32];
 
-	bitmap_ind16 *m_dstbitmap;
+	std::unique_ptr<bitmap_ind16> m_dstbitmap;
 	emu_timer *m_blitter_timer;
 
 	/* misc */
@@ -55,8 +55,8 @@ public:
 	DECLARE_WRITE16_MEMBER(madmax_blitter_unknown_w);
 	DECLARE_READ16_MEMBER(madmax_blitter_vidparam_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(sound_latch_state_r);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(dcheese);
 	UINT32 screen_update_dcheese(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(dcheese_vblank);
@@ -68,7 +68,7 @@ public:
 	void do_blit(  );
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 /*----------- defined in drivers/dcheese.c -----------*/

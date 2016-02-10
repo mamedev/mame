@@ -36,9 +36,9 @@ public:
 	c2040_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_READ8_MEMBER( dio_r );
 	DECLARE_WRITE8_MEMBER( dio_w );
@@ -47,19 +47,17 @@ public:
 	DECLARE_READ8_MEMBER( riot1_pb_r );
 	DECLARE_WRITE8_MEMBER( riot1_pb_w );
 	DECLARE_WRITE8_MEMBER( via_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( mode_sel_w );
-	DECLARE_WRITE_LINE_MEMBER( rw_sel_w );
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_ieee488_interface overrides
-	virtual void ieee488_atn(int state);
-	virtual void ieee488_ifc(int state);
+	virtual void ieee488_atn(int state) override;
+	virtual void ieee488_ifc(int state) override;
 
 	enum
 	{
@@ -100,8 +98,8 @@ public:
 	c3040_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
@@ -116,8 +114,8 @@ public:
 	c4040_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
