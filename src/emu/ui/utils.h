@@ -42,12 +42,8 @@ enum
 	FILTER_NOSAVE,
 	FILTER_CHD,
 	FILTER_NOCHD,
-	FILTER_SAMPLES,
-	FILTER_NOSAMPLES,
-	FILTER_STEREO,
 	FILTER_VERTICAL,
 	FILTER_HORIZONTAL,
-	FILTER_SCREEN,
 	FILTER_CUSTOM,
 	FILTER_LAST = FILTER_CUSTOM
 };
@@ -226,8 +222,6 @@ struct name##_filters \
 
 main_struct(main);
 main_struct(sw);
-main_struct(ume);
-main_struct(screen);
 
 // Custom filter
 struct custfltr

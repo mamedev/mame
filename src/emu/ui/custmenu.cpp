@@ -106,29 +106,6 @@ void ui_menu_custom_filter::handle()
 				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, custfltr::other[pos]));
 			}
 		}
-		else if ((FPTR)m_event->itemref >= SCREEN_FILTER && (FPTR)m_event->itemref < SCREEN_FILTER + MAX_CUST_FILTER)
-		{
-			int pos = (int)((FPTR)m_event->itemref - SCREEN_FILTER);
-			if (m_event->iptkey == IPT_UI_LEFT && custfltr::screen[pos] > 0)
-			{
-				custfltr::screen[pos]--;
-				changed = true;
-			}
-			else if (m_event->iptkey == IPT_UI_RIGHT && custfltr::screen[pos] < screen_filters::length - 1)
-			{
-				custfltr::screen[pos]++;
-				changed = true;
-			}
-			else if (m_event->iptkey == IPT_UI_SELECT)
-			{
-				size_t total = screen_filters::length;
-				std::vector<std::string> s_sel(total);
-				for (size_t index = 0; index < total; ++index)
-					s_sel[index] = screen_filters::text[index];
-
-				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, custfltr::screen[pos]));
-			}
-		}
 		else if ((FPTR)m_event->itemref >= YEAR_FILTER && (FPTR)m_event->itemref < YEAR_FILTER + MAX_CUST_FILTER)
 		{
 			int pos = (int)((FPTR)m_event->itemref - YEAR_FILTER);
@@ -207,16 +184,6 @@ void ui_menu_custom_filter::populate()
 			convert_command_glyph(fbuff);
 			item_append(fbuff.c_str(), c_year::ui[custfltr::year[x]].c_str(), arrow_flags, (void *)(FPTR)(YEAR_FILTER + x));
 		}
-
-		// add screen subitem
-		else if (custfltr::other[x] == FILTER_SCREEN)
-		{
-			arrow_flags = get_arrow_flags(0, screen_filters::length - 1, custfltr::screen[x]);
-			std::string fbuff("^!Screen type");
-			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), screen_filters::text[custfltr::screen[x]], arrow_flags, (void *)(FPTR)(SCREEN_FILTER + x));
-		}
-
 	}
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
@@ -228,7 +195,6 @@ void ui_menu_custom_filter::populate()
 		item_append("Add filter", nullptr, 0, (void *)(FPTR)ADD_FILTER);
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
@@ -287,8 +253,6 @@ void ui_menu_custom_filter::save_custom_filters()
 				cinfo.append("  Manufacturer filter = ").append(c_mnfct::ui[custfltr::mnfct[x]]).append("\n");
 			else if (custfltr::other[x] == FILTER_YEAR)
 				cinfo.append("  Year filter = ").append(c_year::ui[custfltr::year[x]]).append("\n");
-			else if (custfltr::other[x] == FILTER_SCREEN)
-				cinfo.append("  Screen filter = ").append(screen_filters::text[custfltr::screen[x]]).append("\n");
 		}
 		file.puts(cinfo.c_str());
 		file.close();
