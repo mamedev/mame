@@ -1,19 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu
-/* Xerox Notetaker, 1978
+/* Xerox NoteTaker, 1978
  * Driver by Jonathan Gevaryahu
  *
- * <Note that below is a really lousy write-up, this system deserves much better. use the Ingalls-2014-Smalltalk78.pdf as a better source for all this stuff!>
- * Designed by Alan Kay and Many others, with BIOS written by Bruce Horn
+ * <Note that below is a really lousy write-up, this system deserves much better.
+    We should use the Ingalls-2014-Smalltalk78.pdf as a better source for all this stuff!>
+ * Designed by Alan Kay and many others, with BIOS written by Bruce Horn (BitBlt function in BIOS written by Dan Ingalls)
  * History of the machine can be found at http://freudenbergs.de/bert/publications/Ingalls-2014-Smalltalk78.pdf
- * prototypes only, around 10 units manufactured 1978-1980 (one at CHM, not sure where the others are)
- * This device was the origin of Smalltalk-78 (which acted as the operating system of the Notetaker)
- * The Notetaker also introduced the BitBlt graphical operation, which was used to do most graphical functions in Smalltalk-78
- * As far as I am aware, no media (world disks/boot disks) for the Notetaker have survived, only an incomplete ram dump of the smalltalk-76
- * 'world' which was used to bootstrap smalltalk-78 originally
- *
+ * prototypes only, around 10 units manufactured 1978-1980
+   One at CHM (missing? mouse, no media)
+   One at Xerox Museum at PARC (with mouse and 2 floppies, no floppy images available)
+ * This device was the origin of Smalltalk-78 (which acted as the operating system of the NoteTaker)
+ * The NoteTaker also used the BitBlt graphical operation to do most graphical functions in Smalltalk-78
+   BitBlt was not invented for the NoteTaker, but for the Alto; however unlike the Alto, the NoteTaker used it for almost every graphical operation.
+ * As far as I am aware, no media (world disks/boot disks) for the NoteTaker have survived (except maybe the two disks at Xerox Museum at PARC), but an incomplete dump of the Smalltalk-76 'world' which was used to bootstrap Smalltalk-78 originally did survive on the Alto disks at CHM
+ 
  * see http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker for additional information
  * http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790620_Z-IOP_1.5_ls.pdf is listing of the biop v1.5 code
+ * see http://xeroxalto.computerhistory.org/Filene/Smalltalk-76/ for the smalltalk-76 dump
+ * see http://xeroxalto.computerhistory.org/Indigo/BasicDisks/Smalltalk14.bfs!1_/ for more notetaker/smalltalk related files
  *
  * MISSING DUMP for 8741? I/O MCU which does mouse-related stuff
  
@@ -116,9 +121,13 @@ BootSeqDone is 1, DisableROM is 0,       mem map is 0x00000-0x00fff reading is t
 BootSeqDone is 1, DisableROM is 1,       mem map is entirely RAM or open bus for both reading and writing.
 */
 static ADDRESS_MAP_START(notetaker_mem, AS_PROGRAM, 16, notetaker_state)
-	/*AM_RANGE(0x00000, 0x00fff) AM_ROM AM_REGION("maincpu", 0xFF000) // I think this copy of rom is actually banked via io reg 0x20, there is RAM which lives behind here?
-	AM_RANGE(0x01000, 0x3ffff) AM_RAM // ram lives here, 256KB
-	AM_RANGE(0xff000, 0xfffff) AM_ROM // is this banked too? Don't think so...*/
+	/*
+	AM_RANGE(0x00000, 0x00fff) AM_ROM AM_REGION("maincpu", 0xFF000) // rom is here if either BootSeqDone OR DisableROM are zero. the 1.5 source code implies writes here are ignored
+	AM_RANGE(0x01000, 0x01fff) AM_RAM // 4k of ram, local to the io processor
+	AM_RANGE(0x02000, 0x3ffff) AM_RAM AM_BASE("sharedram") // 256k of ram (less 8k), shared between both processors
+	// note 4000-8fff? is the framebuffer for the screen?
+	AM_RANGE(0xff000, 0xfffff) AM_ROM // rom is only banked in here if bootseqdone is 0, so the reset vector is in the proper place
+	*/
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(maincpu_r, maincpu_w) // bypass MAME's memory map system as we need finer grained control
 ADDRESS_MAP_END
 
@@ -256,7 +265,7 @@ ROM_START( notetakr )
 	ROM_REGION( 0x100000, "ram", ROMREGION_ERASEFF ) // ram cards
 	ROM_REGION( 0x1000, "proms", ROMREGION_ERASEFF )
 	ROM_LOAD( "disksep.prom.82s147.a4", 0x000, 0x200, NO_DUMP ) // disk data separator prom from the disk/display module board
-	ROM_LOAD( "setmemrq.prom.82s126.d9", 0x200, 0x100, NO_DUMP ) // SETMEMRQ memory timing prom from the disk/display module board
+	ROM_LOAD( "setmemrq.prom.82s126.d9", 0x200, 0x100, NO_DUMP ) // SETMEMRQ memory timing prom from the disk/display module board; The equations for this one are actually listed on the schematic, so it should be pretty easy to recreate.
 ROM_END
 
 /* Driver */
