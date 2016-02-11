@@ -1646,7 +1646,9 @@ ADDRESS_MAP_END
 
 void xbox_base_state::machine_start()
 {
+#ifdef USB_ENABLED
 	ohci_function_device *usb_device;
+#endif
 
 	nvidia_nv2a = std::make_unique<nv2a_renderer>(machine());
 	memset(pic16lc_buffer, 0, sizeof(pic16lc_buffer));
