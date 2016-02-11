@@ -659,6 +659,7 @@ void win_window_info::create(running_machine &machine, int index, osd_monitor_in
 	window->m_win_config = *config;
 	window->m_monitor = monitor;
 	window->m_fullscreen = !video_config.windowed;
+	window->m_index = index;
 
 	// see if we are safe for fullscreen
 	window->m_fullscreen_safe = TRUE;
