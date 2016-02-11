@@ -9308,6 +9308,7 @@ ROM_END
 
 /* Cherry Master I (V1.10)
    Original Dyna upgrade for Cherry Master boards.
+   It laks of STOP ALL button.
 */
 ROM_START( cmasterh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
