@@ -8,8 +8,10 @@
      Bruce Horn - BIOS code and more
      Ted Kaehler - SmallTalk-76 code porting[2] and more ( http://tedkaehler.weather-dimensions.com/us/ted/index.html )
      Dan Ingalls - BitBlt engine and SmallTalk kernel and more[3]
-     Doug Fairbairn - NoteTaker Hardware ( http://www.computerhistory.org/atchm/author/dfairbairn/ )
-     <probably others I've missed>
+     Doug Fairbairn - NoteTaker Hardware/Electronics Design ( http://www.computerhistory.org/atchm/author/dfairbairn/ )
+     James Leung - NoteTaker Hardware/Electronics Design
+     Ron Freeman - NoteTaker Hardware/Electronics Design
+     <there are probably others I've missed>
 
  * History of the machine can be found at http://freudenbergs.de/bert/publications/Ingalls-2014-Smalltalk78.pdf
 
@@ -31,6 +33,7 @@
  * [2] "Smalltalk and Object Orientation: An Introduction" By John Hunt, pages 45-46 [ISBN 978-3-540-76115-0]
  * [3] http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790620_Z-IOP_1.5_ls.pdf
  * [4] http://xeroxalto.computerhistory.org/Filene/Smalltalk-76/
+ * [5] http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790118_NoteTaker_System_Manual.pdf
  * MISSING DUMP for 8741? Keyboard MCU which does row-column scanning and mouse-related stuff
  
 TODO: everything below.
@@ -38,16 +41,16 @@ TODO: everything below.
 * figure out how the emulation-cpu boots and where its 4k of local ram maps to
 * Get smalltalk-78 loaded as a rom and forced into ram on startup, since no boot disks have survived (or if any survived, they are not dumped)
 * floppy controller wd1791
-  According to [3] the format is 128 bytes per sector, 16 sectors per track (one sided)
+  According to [3] and [5] the format is double density/MFM, 128 bytes per sector, 16 sectors per track, 1 or 2 sided, for 170K or 340K per disk.
   According to the schematics, we're missing an 82s147 DISKSEP.PROM used as a data separator
 * crt5027 video controller; we're missing a PROM used to handle memory arbitration between the crtc and the rest of the system, but the equations are on the schematic
 * Harris 6402 serial/EIA UART
 * Harris 6402 keyboard UART
-* HLE for the missing MCU which reads the mouse quadratures and buttons and talks serially to the Keyboard UART
+* HLE for the missing i8748[5] MCU in the keyboard which reads the mouse quadratures and buttons and talks serially to the Keyboard UART
 
 WIP:
 * pic8259 interrupt controller - this is attached as a device, but the interrupts are not hooked to it yet.
-* i/o cpu i/o area needs the memory map worked out per the schematics - partly done
+* i/o cpu i/o area needs the memory map worked out per the schematics - mostly done
 */
 
 #include "cpu/i86/i86.h"
@@ -147,28 +150,48 @@ ADDRESS_MAP_END
 /* io memory map comes from http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker/memos/19790605_Definition_of_8086_Ports.pdf
    and from the schematic at http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker/schematics/19790423_Notetaker_IO_Processor.pdf
 a19 a18 a17 a16  a15 a14 a13 a12  a11 a10 a9  a8   a7  a6  a5  a4   a3  a2  a1  a0
-?   ?   ?   ?    0   x   x   x    x   x   x   0    0   0   0   x    x   x   *   .       RW  IntCon (PIC8259)
-?   ?   ?   ?    0   x   x   x    x   x   x   0    0   0   1   x    x   x   x   .       W   IPConReg
-?   ?   ?   ?    0   x   x   x    x   x   x   0    0   1   0   x    x   x   x   .       W   KbdInt
-?   ?   ?   ?    0   x   x   x    x   x   x   0    0   1   1   x    x   x   x   .       W   FIFOReg
-?   ?   ?   ?    0   x   x   x    x   x   x   0    1   0   0   x    x   x   x   .       .   Open Bus
-?   ?   ?   ?    0   x   x   x    x   x   x   0    1   0   1   x    x   x   x   .       .   Open Bus
-?   ?   ?   ?    0   x   x   x    x   x   x   0    1   1   0   x    x   x   x   .       W   FIFOBus
-?   ?   ?   ?    0   x   x   x    x   x   x   0    1   1   1   x    x   x   x   .       .   Open Bus
-0   0   0   0    0   0   0   0    *   *   *   *    *   *   *   *    *   *   *   .       R   ROM, but ONLY if BootSegDone is TRUE, and /DisableROM is FALSE
-
+x   x   x   x    0   x   x   x    x   x   x   0    0   0   0   x    x   x   *   .       RW  IntCon (PIC8259)
+x   x   x   x    0   x   x   x    x   x   x   0    0   0   1   x    x   x   x   .       W   IPConReg
+x   x   x   x    0   x   x   x    x   x   x   0    0   1   0   x    0   0   0   .       .   KbdInt:Open Bus
+x   x   x   x    0   x   x   x    x   x   x   0    0   1   0   x    0   0   1   .       R   KbdInt:ReadKeyData
+x   x   x   x    0   x   x   x    x   x   x   0    0   1   0   x    0   1   0   .       R   KbdInt:ReadOPStatus
+x   x   x   x    0   x   x   x    x   x   x   0    0   1   0   x    0   1   1   .       .   KbdInt:Open Bus
+x   x   x   x    0   x   x   x    x   x   x   0    0   1   0   x    1   0   0   .       W   KbdInt:LoadKeyCtlReg
+x   x   x   x    0   x   x   x    x   x   x   0    0   1   0   x    1   0   1   .       W   KbdInt:LoadKeyData
+x   x   x   x    0   x   x   x    x   x   x   0    0   1   0   x    1   1   0   .       W   KbdInt:KeyDataReset
+x   x   x   x    0   x   x   x    x   x   x   0    0   1   0   x    1   1   1   .       W   KbdInt:KeyChipReset
+x   x   x   x    0   x   x   x    x   x   x   0    0   1   1   x    x   x   x   .       W   FIFOReg
+x   x   x   x    0   x   x   x    x   x   x   0    1   0   0   x    x   x   x   .       .   Open Bus
+x   x   x   x    0   x   x   x    x   x   x   0    1   0   1   x    x   x   x   .       .   Open Bus
+x   x   x   x    0   x   x   x    x   x   x   0    1   1   0   x    x   x   x   .       W   FIFOBus
+x   x   x   x    0   x   x   x    x   x   x   0    1   1   1   x    x   x   x   .       .   Open Bus
+x   x   x   x    0   x   x   x    x   x   x   1    0   0   0   x    x   x   x   .       RW  SelDiskReg 
+x   x   x   x    0   x   x   x    x   x   x   1    0   0   1   x    x   *   *   .       RW  SelDiskInt
+x   x   x   x    0   x   x   x    x   x   x   1    0   1   0   *    *   *   *   .       W   SelCrtInt   
+x   x   x   x    0   x   x   x    x   x   x   1    0   1   1   x    x   x   x   .       W   LoadDispAddr
+x   x   x   x    0   x   x   x    x   x   x   1    1   0   0   x    x   x   x   .       .   Open Bus
+x   x   x   x    0   x   x   x    x   x   x   0    1   0   1   x    0   0   0   .       R   SelEIA:ReadEIAStatus
+x   x   x   x    0   x   x   x    x   x   x   0    1   0   1   x    0   0   1   .       R   SelEIA:ReadEIAData
+x   x   x   x    0   x   x   x    x   x   x   0    1   0   1   x    0   1   0   .       .   SelEIA:Open Bus
+x   x   x   x    0   x   x   x    x   x   x   0    1   0   1   x    0   1   1   .       .   SelEIA:Open Bus
+x   x   x   x    0   x   x   x    x   x   x   0    1   0   1   x    1   0   0   .       W   SelEIA:LoadEIACtlReg
+x   x   x   x    0   x   x   x    x   x   x   0    1   0   1   x    1   0   1   .       W   SelEIA:LoadEIAData
+x   x   x   x    0   x   x   x    x   x   x   0    1   0   1   x    1   1   0   .       W   SelEIA:EIADataReset
+x   x   x   x    0   x   x   x    x   x   x   0    1   0   1   x    1   1   1   .       W   SelEIA:EIAChipReset
+x   x   x   x    0   x   x   x    x   x   x   1    1   1   0   x    x   x   x   .       R   SelADCHi
+x   x   x   x    0   x   x   x    x   x   x   1    1   1   1   x    x   x   x   .       W   CRTSwitch
 */
 static ADDRESS_MAP_START(notetaker_io, AS_IO, 16, notetaker_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7E1C) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x20, 0x21) AM_MIRROR(0x7E1E) AM_WRITE(IPConReg_w) // processor (rom mapping, etc) control register
-	//AM_RANGE(0x42, 0x43) AM_READ read keyboard data (high byte only) [from mcu?]
-	//AM_RANGE(0x44, 0x45) AM_READ read keyboard fifo state (high byte only) [from mcu?]
-	//AM_RANGE(0x48, 0x49) AM_WRITE kbd->uart control register [to mcu?]
-	//AM_RANGE(0x4a, 0x4b) AM_WRITE kbd->uart data register [to mcu?]
-	//AM_RANGE(0x4c, 0x4d) AM_WRITE kbd data reset [to mcu?]
-	//AM_RANGE(0x4e, 0x4f) AM_WRITE kbd chip [mcu?] reset [to mcu?]
-	//AM_RANGE(0x60, 0x61) AM_WRITE DAC sample and hold and frequency setup
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0xF7E1C) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff)
+	AM_RANGE(0x20, 0x21) AM_MIRROR(0xF7E1E) AM_WRITE(IPConReg_w) // processor (rom mapping, etc) control register
+	//AM_RANGE(0x42, 0x43) AM_MIRROR(0xF7E10) AM_READ(ReadKeyData_r) // read keyboard data (high byte only) [from mcu?]
+	//AM_RANGE(0x44, 0x45) AM_MIRROR(0xF7E10) AM_READ(ReadOPStatus_r) // read keyboard fifo state (high byte only) [from mcu?]
+	//AM_RANGE(0x48, 0x49) AM_MIRROR(0xF7E10) AM_WRITE(LoadKeyCtlReg_w) // kbd uart control register
+	//AM_RANGE(0x4a, 0x4b) AM_MIRROR(0xF7E10) AM_WRITE(LoadKeyData_w) // kbd uart data register
+	//AM_RANGE(0x4c, 0x4d) AM_MIRROR(0xF7E10) AM_WRITE(KeyDataReset_w) // kbd uart ddr switch (data reset)
+	//AM_RANGE(0x4e, 0x4f) AM_MIRROR(0xF7E10) AM_WRITE(KeyChipReset_w) // kbd uart reset
+	//AM_RANGE(0x60, 0x61) AM_MIRROR(0xF7E1E) AM_WRITE(FIFOReg_w) // DAC sample and hold and frequency setup
 	//AM_RANGE(0x100, 0x101) AM_WRITE I/O register (adc speed, crtc pixel clock enable, etc)
 	//AM_RANGE(0x140, 0x15f) AM_DEVREADWRITE("crt5027", crt5027_device, read, write)
 ADDRESS_MAP_END
