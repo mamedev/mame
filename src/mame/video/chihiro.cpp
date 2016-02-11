@@ -2552,6 +2552,7 @@ void nv2a_renderer::clear_depth_buffer(int what, UINT32 value)
 UINT32 nv2a_renderer::render_triangle_culling(const rectangle &cliprect, render_delegate callback, int paramcount, const vertex_t &_v1, const vertex_t &_v2, const vertex_t &_v3)
 {
 	float areax2;
+	NV2A_GL_CULL_FACE face = NV2A_GL_CULL_FACE::FRONT;
 
 	if (backface_culling_enabled == false)
 		return render_triangle(cliprect, callback, paramcount, _v1, _v2, _v3);
@@ -2559,13 +2560,25 @@ UINT32 nv2a_renderer::render_triangle_culling(const rectangle &cliprect, render_
 		return 0;
 	areax2 = _v1.x*(_v2.y - _v3.y) + _v2.x*(_v3.y - _v1.y) + _v3.x*(_v1.y - _v2.y);
 	if (backface_culling_winding == NV2A_GL_FRONT_FACE::CCW)
-		areax2 = -areax2;
-	// if areax2 >= 0 then front faced else back faced
-	if ((backface_culling_culled == NV2A_GL_CULL_FACE::FRONT) && (areax2 >= 0))
-		return 0;
-	if ((backface_culling_culled == NV2A_GL_CULL_FACE::BACK) && (areax2 < 0))
-		return 0;
-	return render_triangle(cliprect, callback, paramcount, _v1, _v2, _v3);
+	{
+		if (-areax2 <= 0)
+			face = NV2A_GL_CULL_FACE::BACK;
+		else
+			face = NV2A_GL_CULL_FACE::FRONT;
+	} else
+	{
+		if (areax2 <= 0)
+			face = NV2A_GL_CULL_FACE::BACK;
+		else
+			face = NV2A_GL_CULL_FACE::FRONT;
+	}
+	if (face == NV2A_GL_CULL_FACE::FRONT)
+		if (backface_culling_culled == NV2A_GL_CULL_FACE::BACK)
+			return render_triangle(cliprect, callback, paramcount, _v1, _v2, _v3);
+	if (face == NV2A_GL_CULL_FACE::BACK)
+		if (backface_culling_culled == NV2A_GL_CULL_FACE::FRONT)
+			return render_triangle(cliprect, callback, paramcount, _v1, _v2, _v3);
+	return 0;
 }
 
 int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UINT32 subchannel, UINT32 method, UINT32 address, int &countlen)
@@ -2580,6 +2593,16 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 	printf("A:%08X MTHD:%08X D:%08X\n\r",address,maddress,data);
 #endif
 	if (maddress == 0x17fc) {
+#if 1 // useful while debugging to see what coordinates have been used
+		static int debugvc = 0;
+		if (debugvc)
+			if (data == 0)
+			{
+				printf("%d %d\n\r", primitive_type, vertex_first);
+				for (int n = 0; n < vertex_first; n++)
+					printf("%d X:%f Y:%f Z:%f W:%f x:%f y:%f\n\r", n, vertex_software[n].attribute[0].fv[0], vertex_software[n].attribute[0].fv[1], vertex_software[n].attribute[0].fv[2], vertex_software[n].attribute[0].fv[3], vertex_xy[n].x, vertex_xy[n].y);
+			}
+#endif
 		vertex_count = 0;
 		vertex_first = 0;
 		indexesleft_count = 0;
