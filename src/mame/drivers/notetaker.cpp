@@ -183,15 +183,15 @@ x   x   x   x    0   x   x   x    x   x   x   1    1   1   1   x    x   x   x   
 */
 static ADDRESS_MAP_START(notetaker_io, AS_IO, 16, notetaker_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0xF7E1C) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x20, 0x21) AM_MIRROR(0xF7E1E) AM_WRITE(IPConReg_w) // processor (rom mapping, etc) control register
-	//AM_RANGE(0x42, 0x43) AM_MIRROR(0xF7E10) AM_READ(ReadKeyData_r) // read keyboard data (high byte only) [from mcu?]
-	//AM_RANGE(0x44, 0x45) AM_MIRROR(0xF7E10) AM_READ(ReadOPStatus_r) // read keyboard fifo state (high byte only) [from mcu?]
-	//AM_RANGE(0x48, 0x49) AM_MIRROR(0xF7E10) AM_WRITE(LoadKeyCtlReg_w) // kbd uart control register
-	//AM_RANGE(0x4a, 0x4b) AM_MIRROR(0xF7E10) AM_WRITE(LoadKeyData_w) // kbd uart data register
-	//AM_RANGE(0x4c, 0x4d) AM_MIRROR(0xF7E10) AM_WRITE(KeyDataReset_w) // kbd uart ddr switch (data reset)
-	//AM_RANGE(0x4e, 0x4f) AM_MIRROR(0xF7E10) AM_WRITE(KeyChipReset_w) // kbd uart reset
-	//AM_RANGE(0x60, 0x61) AM_MIRROR(0xF7E1E) AM_WRITE(FIFOReg_w) // DAC sample and hold and frequency setup
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7E1C) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff)
+	AM_RANGE(0x20, 0x21) AM_MIRROR(0x7E1E) AM_WRITE(IPConReg_w) // processor (rom mapping, etc) control register
+	//AM_RANGE(0x42, 0x43) AM_MIRROR(0x7E10) AM_READ(ReadKeyData_r) // read keyboard data (high byte only) [from mcu?]
+	//AM_RANGE(0x44, 0x45) AM_MIRROR(0x7E10) AM_READ(ReadOPStatus_r) // read keyboard fifo state (high byte only) [from mcu?]
+	//AM_RANGE(0x48, 0x49) AM_MIRROR(0x7E10) AM_WRITE(LoadKeyCtlReg_w) // kbd uart control register
+	//AM_RANGE(0x4a, 0x4b) AM_MIRROR(0x7E10) AM_WRITE(LoadKeyData_w) // kbd uart data register
+	//AM_RANGE(0x4c, 0x4d) AM_MIRROR(0x7E10) AM_WRITE(KeyDataReset_w) // kbd uart ddr switch (data reset)
+	//AM_RANGE(0x4e, 0x4f) AM_MIRROR(0x7E10) AM_WRITE(KeyChipReset_w) // kbd uart reset
+	//AM_RANGE(0x60, 0x61) AM_MIRROR(0x7E1E) AM_WRITE(FIFOReg_w) // DAC sample and hold and frequency setup
 	//AM_RANGE(0x100, 0x101) AM_WRITE I/O register (adc speed, crtc pixel clock enable, etc)
 	//AM_RANGE(0x140, 0x15f) AM_DEVREADWRITE("crt5027", crt5027_device, read, write)
 ADDRESS_MAP_END
