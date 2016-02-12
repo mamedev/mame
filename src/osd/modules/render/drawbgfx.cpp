@@ -180,42 +180,34 @@ static void* sdlNativeWindowHandle(SDL_Window* _window)
 	return wmi.info.win.window;
 #	endif // BX_PLATFORM_
 }
-
 #endif
+
 int renderer_bgfx::create()
 {
 	// create renderer
 
-#ifdef OSD_WINDOWS
-	RECT client;
-	GetClientRect(window().m_hwnd, &client);
-	if (window().m_index == 0)
-	{
-		bgfx::winSetHwnd(window().m_hwnd);
-		bgfx::init();
-		bgfx::reset(rect_width(&client), rect_height(&client), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
-		// Enable debug text.
-		bgfx::setDebug(BGFX_DEBUG_TEXT); //BGFX_DEBUG_STATS
-		m_dimensions = osd_dim(rect_width(&client), rect_height(&client));
-	}
-	else {
-		fbh = bgfx::createFrameBuffer(window().m_hwnd, rect_width(&client), rect_height(&client));
-		bgfx::touch(window().m_index);
-	}
-#else
 	osd_dim wdim = window().get_size();
 	if (window().m_index == 0)
 	{
+#ifdef OSD_WINDOWS
+		bgfx::winSetHwnd(window().m_hwnd);
+#else
 		bgfx::sdlSetWindow(window().sdl_window());
+#endif
 		bgfx::init();
 		bgfx::reset(wdim.width(), wdim.height(), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+		// Enable debug text.
+		bgfx::setDebug(BGFX_DEBUG_TEXT); //BGFX_DEBUG_STATS
 		m_dimensions = osd_dim(wdim.width(), wdim.height());
 	}
 	else {
+#ifdef OSD_WINDOWS
+		fbh = bgfx::createFrameBuffer(window().m_hwnd, wdim.width(), wdim.height());
+#else
 		fbh = bgfx::createFrameBuffer(sdlNativeWindowHandle(window().sdl_window()), wdim.width(), wdim.height());
+#endif
 		bgfx::touch(window().m_index);
 	}
-#endif
 	// Create program from shaders.
 	m_progQuad = loadProgram("vs_quad", "fs_quad");
 	m_progQuadTexture = loadProgram("vs_quad_texture", "fs_quad_texture");
@@ -780,18 +772,9 @@ int renderer_bgfx::draw(int update)
 	initVertexDecls();	
 	int index = window().m_index;
 	// Set view 0 default viewport.
-	int width, height;
-#ifdef OSD_WINDOWS
-	RECT client;
-	GetClientRect(window().m_hwnd, &client);
-	width = rect_width(&client);
-	height = rect_height(&client);
-	
-#else
 	osd_dim wdim = window().get_size();
-	width = wdim.width();
-	height = wdim.height();
-#endif
+	int width = wdim.width();
+	int height = wdim.height();
 	if (index == 0)
 	{
 		if ((m_dimensions != osd_dim(width, height))) {
