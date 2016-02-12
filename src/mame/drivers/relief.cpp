@@ -84,7 +84,7 @@ WRITE16_MEMBER(relief_state::audio_control_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_ym2413_volume = (data >> 1) & 15;
-		set_ym2413_volume((m_ym2413_volume * m_overall_volume * 100) / (127 * 15));
+		m_ym2413->set_output_gain(ALL_OUTPUTS, (m_ym2413_volume * m_overall_volume) / (127.0f * 15.0f));
 		m_adpcm_bank = ((data >> 6) & 3) | (m_adpcm_bank & 4);
 	}
 	if (ACCESSING_BITS_8_15)
@@ -99,8 +99,8 @@ WRITE16_MEMBER(relief_state::audio_volume_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_overall_volume = data & 127;
-		set_ym2413_volume((m_ym2413_volume * m_overall_volume * 100) / (127 * 15));
-		set_oki6295_volume(m_overall_volume * 100 / 127);
+		m_ym2413->set_output_gain(ALL_OUTPUTS, (m_ym2413_volume * m_overall_volume) / (127.0f * 15.0f));
+		m_oki->set_output_gain(ALL_OUTPUTS, m_overall_volume / 127.0f);
 	}
 }
 

@@ -722,5 +722,5 @@ CONS(1979, telngtcs, rwtrntcs,  0,        rwtrntcs,  vc4000, driver_device,     
 CONS(1979, krvnjvtv, 0,         vc4000,   vc4000,    vc4000, driver_device,      0,        "SOE",              "OC Jeu Video TV Karvan", MACHINE_IMPERFECT_GRAPHICS )    /* France */
 CONS(1979, oc2000,   krvnjvtv,  0,        vc4000,    vc4000, driver_device,      0,        "SOE",              "OC-2000",          MACHINE_IMPERFECT_GRAPHICS )          /* France */
 CONS(1980, mpt05,    0,         vc4000,   vc4000,    vc4000, driver_device,      0,        "ITMC",             "MPT-05",           MACHINE_IMPERFECT_GRAPHICS )          /* France */
-CONS(1982, h21,      0,         0,        h21,       vc4000, driver_device,      0,        "TRQ",              "Video Computer H-21", MACHINE_IMPERFECT_GRAPHICS) // Spain
+CONS(1982, h21,      0,         vc4000,   h21,       vc4000, driver_device,      0,        "TRQ",              "Video Computer H-21", MACHINE_IMPERFECT_GRAPHICS) // Spain
 CONS(1979, elektor,  0,         0,        elektor,   elektor, driver_device,     0,        "Elektor",          "Elektor TV Games Computer", MACHINE_IMPERFECT_GRAPHICS )

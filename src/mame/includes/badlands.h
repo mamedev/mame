@@ -14,8 +14,13 @@ class badlands_state : public atarigen_state
 public:
 	badlands_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
+			m_audiocpu(*this, "audiocpu"),
+			m_soundcomm(*this, "soundcomm"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_mob(*this, "mob") { }
+
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<atari_sound_comm_device> m_soundcomm;
 
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<atari_motion_objects_device> m_mob;

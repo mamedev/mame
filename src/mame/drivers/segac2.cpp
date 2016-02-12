@@ -30,6 +30,7 @@
     1992  Puyo Puyo                  Sega / Compile    317-0203         C2     171-5992A
     1992  Tant-R (Japan)             Sega              317-0211         C2
     1992  Tant-R (Korea)             Sega              ?                C2
+    1992  Waku Waku Marine           Sega              317-0140         C2
     1993  SegaSonic Popcorn Shop     Sega              317-0140         C2
     1994  PotoPoto (Japan)           Sega              317-0218         C2
     1994  Stack Columns (Japan)      Sega              317-0219         C2
@@ -98,11 +99,14 @@ class segac2_state : public md_base_state
 {
 public:
 	segac2_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_base_state(mconfig, type, tag),
-	m_paletteram(*this, "paletteram"),
-	m_upd7759(*this, "upd"),
-	m_screen(*this, "screen"),
-	m_palette(*this, "palette") { }
+		: md_base_state(mconfig, type, tag)
+		, m_paletteram(*this, "paletteram")
+		, m_upd_region(*this, "upd")
+		, m_upd7759(*this, "upd")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+	{
+	}
 
 	// for Print Club only
 	int m_cam_data;
@@ -110,6 +114,7 @@ public:
 	int m_segac2_enable_display;
 
 	required_shared_ptr<UINT16> m_paletteram;
+	optional_memory_region m_upd_region;
 
 	/* protection-related tracking */
 	segac2_prot_delegate m_prot_func;     /* emulation of protection chip */
@@ -244,8 +249,10 @@ MACHINE_RESET_MEMBER(segac2_state,segac2)
 
 	/* determine how many sound banks */
 	m_sound_banks = 0;
-	if (memregion("upd")->base())
-		m_sound_banks = memregion("upd")->bytes() / 0x20000;
+	if (m_upd_region != NULL)
+	{
+		m_sound_banks = m_upd_region->bytes() / 0x20000;
+	}
 
 	/* reset the protection */
 	m_prot_write_buf = 0;
@@ -934,7 +941,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( wwmarine )
 	PORT_INCLUDE( systemc_generic )
-	
+
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // Button 1
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Button 2
@@ -1780,7 +1787,7 @@ ROM_START( ribbit ) /* Ribbit  (c)1991 Sega */
 ROM_END
 
 
-ROM_START( tantr ) /* Tant-R (Puzzle & Action)  (c)1992 Sega */
+ROM_START( tantr ) /* Tant-R (Puzzle & Action)  (c)1992 Sega - 834-9664 TANT-R (EMP5032 labeled 317-0211) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-15614.ic32", 0x000000, 0x080000, CRC(557782bc) SHA1(1546a999ab97c380dc87f6c95d5687722206740d) )
 	ROM_LOAD16_BYTE( "epr-15613.ic31", 0x000001, 0x080000, CRC(14bbb235) SHA1(8dbfec5fb1d7a695acbb2fc0e78e4bdf76eb8d9d) )
@@ -1955,8 +1962,8 @@ ROM_END
 
 ROM_START( potopoto ) /* Poto Poto  (c)1994 Sega */
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "epr-16662.ic32", 0x000000, 0x040000, CRC(bbd305d6) SHA1(1a4f4869fefac188c69bc67df0b625e43a0c3f1f) )
-	ROM_LOAD16_BYTE( "epr-16661.ic31", 0x000001, 0x040000, CRC(5a7d14f4) SHA1(a615b5f481256366db7b1c6302a8dcb69708102b) )
+	ROM_LOAD16_BYTE( "epr-16662a.ic32", 0x000000, 0x040000, CRC(bbd305d6) SHA1(1a4f4869fefac188c69bc67df0b625e43a0c3f1f) )
+	ROM_LOAD16_BYTE( "epr-16661a.ic31", 0x000001, 0x040000, CRC(5a7d14f4) SHA1(a615b5f481256366db7b1c6302a8dcb69708102b) )
 
 	ROM_REGION( 0x040000, "upd", 0 )
 	ROM_LOAD( "epr-16660.ic4", 0x000000, 0x040000, CRC(8251c61c) SHA1(03eef3aa0bdde2c1d93128648f54fd69278d85dd) )
@@ -2499,7 +2506,7 @@ GAME( 1992, wwmarine,   0,       segac2, wwmarine, segac2_state, bloxeedc, ROT0,
 // not really sure how this should hook up, things like the 'sold out' flags could be mechanical sensors, or from another MCU / CPU board in the actual popcorn part of the machine?
 GAME( 1993, sonicpop,   0,       segac2, sonicpop, segac2_state, bloxeedc, ROT0,   "Sega", "SegaSonic Popcorn Shop (Rev B)", MACHINE_MECHANICAL ) // region DSW for USA / Export / Japan, still speaks Japanese tho.  'Mechanical' part isn't emulated
 
-GAME( 1994, potopoto,  0,        segac2, potopoto, segac2_state, potopoto, ROT0,   "Sega", "Poto Poto (Japan)", 0 )
+GAME( 1994, potopoto,  0,        segac2, potopoto, segac2_state, potopoto, ROT0,   "Sega", "Poto Poto (Japan, Rev A)", 0 )
 
 GAME( 1994, stkclmns,  0,        segac2, stkclmns, segac2_state, stkclmns, ROT0,   "Sega", "Stack Columns (World)", 0 )
 GAME( 1994, stkclmnsj, stkclmns, segac2, stkclmns, segac2_state, stkclmnj, ROT0,   "Sega", "Stack Columns (Japan)", 0 )

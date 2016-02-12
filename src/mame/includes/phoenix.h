@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Richard Davies
 #include "audio/pleiads.h"
 #include "sound/discrete.h"

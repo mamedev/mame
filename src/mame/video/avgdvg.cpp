@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Eric Smith, Brad Oliver, Bernd Wiebelt, Aaron Giles, Andrew Caldwell
+// copyright-holders:Mathis Rosenhauer
+// thanks-to:Eric Smith, Brad Oliver, Bernd Wiebelt, Aaron Giles, Andrew Caldwell
 /*************************************************************************
 
     avgdvg.c: Atari DVG and AVG
@@ -1343,7 +1344,11 @@ void avg_device::device_start()
 	avgdvg_vectorram = reinterpret_cast<UINT8 *>(machine().root_device().memshare("vectorram")->ptr());
 	avgdvg_vectorram_size = machine().root_device().memshare("vectorram")->bytes();
 
-	avgdvg_colorram = reinterpret_cast<UINT8 *>(machine().root_device().memshare("colorram")->ptr());
+	memory_share *colorram = machine().root_device().memshare("colorram");
+	if (colorram != NULL)
+	{
+		avgdvg_colorram = reinterpret_cast<UINT8 *>(colorram->ptr());
+	}
 
 	xmin = visarea.min_x;
 	ymin = visarea.min_y;
@@ -1379,7 +1384,11 @@ void dvg_device::device_start()
 	avgdvg_vectorram = reinterpret_cast<UINT8 *>(machine().root_device().memshare("vectorram")->ptr());
 	avgdvg_vectorram_size = machine().root_device().memshare("vectorram")->bytes();
 
-	avgdvg_colorram = reinterpret_cast<UINT8 *>(machine().root_device().memshare("colorram")->ptr());
+	memory_share *colorram = machine().root_device().memshare("colorram");
+	if (colorram != NULL)
+	{
+		avgdvg_colorram = reinterpret_cast<UINT8 *>(colorram->ptr());
+	}
 
 	xmin = visarea.min_x;
 	ymin = visarea.min_y;

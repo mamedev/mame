@@ -1,13 +1,11 @@
-// license:???
-// copyright-holders:Per Ola Ingvarsson, Tomas Karlsson
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
+// thanks-to:Per Ola Ingvarsson, Tomas Karlsson
 /*****************************************************************************
  *
  * includes/compis.h
  *
  * machine driver header
- *
- * Per Ola Ingvarsson
- * Tomas Karlsson
  *
  ****************************************************************************/
 

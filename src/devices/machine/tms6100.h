@@ -56,7 +56,7 @@
        DATA/ADD8 | 6    11 |  CS          NC        | 6    11 |  /CS
        NC        | 7    10 |  M1          NC        | 7    10 |  M1
        M0        | 8     9 |  VSS         M0        | 8     9 |  VSS
-                 +---------+                        +---------+         
+                 +---------+                        +---------+
 
 
     Mitsubishi M58819S EPROM Interface:
@@ -112,14 +112,14 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	
+
 	void handle_command(UINT8 cmd);
 
 	// internal state
 	required_region_ptr<UINT8> m_rom;
 	bool m_reverse_bits;
 	bool m_4bit_mode;
-	
+
 	UINT32 m_rommask;
 	UINT32 m_address;   // internal address + chipselect
 	UINT8 m_sa;         // romdata shift register

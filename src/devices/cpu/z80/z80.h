@@ -19,6 +19,7 @@ enum
 	NSC800_RSTB,
 	NSC800_RSTC,
 	Z80_INPUT_LINE_WAIT,
+	Z80_INPUT_LINE_BOGUSWAIT, /* WAIT pin implementation used to be nonexistent, please remove this when all drivers are updated with Z80_INPUT_LINE_WAIT */
 	Z80_INPUT_LINE_BUSRQ
 };
 
@@ -40,8 +41,6 @@ class z80_device : public cpu_device
 {
 public:
 	z80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	DECLARE_WRITE_LINE_MEMBER( irq_line );
 
 	void z80_set_cycle_tables(const UINT8 *op, const UINT8 *cb, const UINT8 *ed, const UINT8 *xy, const UINT8 *xycb, const UINT8 *ex);
 	template<class _Object> static devcb_base &set_irqack_cb(device_t &device, _Object object) { return downcast<z80_device &>(device).m_irqack_cb.set_callback(object); }
@@ -238,6 +237,7 @@ protected:
 	void ei();
 
 	void take_interrupt();
+	void take_nmi();
 
 	// address spaces
 	const address_space_config m_program_config;

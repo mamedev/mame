@@ -61,8 +61,8 @@ void pcd8544_device::device_start()
 
 void pcd8544_device::device_reset()
 {
-	m_mode      = 0x04;	// PD=1, V=0, H=0
-	m_control   = 0x00;	// E=0, D=0
+	m_mode      = 0x04; // PD=1, V=0, H=0
+	m_control   = 0x00; // E=0, D=0
 	m_addr_y    = 0;
 	m_addr_x    = 0;
 	m_bias      = 0;
@@ -207,13 +207,13 @@ UINT32 pcd8544_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	{
 		switch (m_control)
 		{
-			case 0:		// display blank
-			case 1:		// all display segments on
+			case 0:     // display blank
+			case 1:     // all display segments on
 				bitmap.fill(m_control & 1, cliprect);
 				break;
 
-			case 2:		// normal mode
-			case 3:		// inverse video mode
+			case 2:     // normal mode
+			case 3:     // inverse video mode
 				if (!m_screen_update_cb.isnull())
 					m_screen_update_cb(screen, bitmap, cliprect, m_vram, m_control & 1);
 				break;

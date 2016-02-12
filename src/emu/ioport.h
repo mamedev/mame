@@ -333,6 +333,7 @@ enum ioport_type
 		IPT_UI_ON_SCREEN_DISPLAY,
 		IPT_UI_DEBUG_BREAK,
 		IPT_UI_PAUSE,
+		IPT_UI_PAUSE_SINGLE,
 		IPT_UI_RESET_MACHINE,
 		IPT_UI_SOFT_RESET,
 		IPT_UI_SHOW_GFX,
@@ -342,6 +343,7 @@ enum ioport_type
 		IPT_UI_FAST_FORWARD,
 		IPT_UI_SHOW_FPS,
 		IPT_UI_SNAPSHOT,
+		IPT_UI_TIMECODE,
 		IPT_UI_RECORD_MOVIE,
 		IPT_UI_TOGGLE_CHEAT,
 		IPT_UI_UP,
@@ -369,6 +371,21 @@ enum ioport_type
 		IPT_UI_LOAD_STATE,
 		IPT_UI_TAPE_START,
 		IPT_UI_TAPE_STOP,
+		IPT_UI_HISTORY,
+		IPT_UI_MAMEINFO,
+		IPT_UI_COMMAND,
+		IPT_UI_SYSINFO,
+		IPT_UI_FAVORITES,
+		IPT_UI_STORY,
+		IPT_UI_UP_FILTER,
+		IPT_UI_DOWN_FILTER,
+		IPT_UI_LEFT_PANEL,
+		IPT_UI_RIGHT_PANEL,
+		IPT_UI_UP_PANEL,
+		IPT_UI_DOWN_PANEL,
+		IPT_UI_EXPORT,
+		IPT_UI_AUDIT_FAST,
+		IPT_UI_AUDIT_ALL,
 
 		// additional OSD-specified UI port types (up to 16)
 		IPT_OSD_1,
@@ -1436,6 +1453,10 @@ private:
 	void record_frame(const attotime &curtime);
 	void record_port(ioport_port &port);
 
+	template<typename _Type> void timecode_write(_Type value);
+	void timecode_init();
+	void timecode_end(const char *message = NULL);
+
 	// internal state
 	running_machine &       m_machine;              // reference to owning machine
 	bool                    m_safe_to_read;         // clear at start; set after state is loaded
@@ -1458,6 +1479,9 @@ private:
 	emu_file                m_playback_file;        // playback file (NULL if not recording)
 	UINT64                  m_playback_accumulated_speed; // accumulated speed during playback
 	UINT32                  m_playback_accumulated_frames; // accumulated frames during playback
+	emu_file                m_timecode_file;        // timecode/frames playback file (NULL if not recording)
+	int						m_timecode_count;
+	attotime				m_timecode_last_time;
 
 	// has...
 	bool                    m_has_configs;

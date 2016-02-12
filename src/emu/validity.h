@@ -46,7 +46,7 @@ public:
 	// operations
 	void check_driver(const game_driver &driver);
 	void check_shared_source(const game_driver &driver);
-	bool check_all();
+	bool check_all_matching(const char *string = "*");
 
 	// helpers for devices
 	void validate_tag(const char *tag);

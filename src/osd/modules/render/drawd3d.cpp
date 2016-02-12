@@ -2734,20 +2734,6 @@ void texture_info::prescale()
 
 cache_target::~cache_target()
 {
-	for (int index = 0; index < 11; index++)
-	{
-		if (bloom_texture[index] != NULL)
-		{
-			(*d3dintf->texture.release)(bloom_texture[index]);
-			bloom_texture[index] = NULL;
-		}
-		if (bloom_target[index] != NULL)
-		{
-			(*d3dintf->surface.release)(bloom_target[index]);
-			bloom_target[index] = NULL;
-		}
-	}
-
 	if (last_texture != NULL)
 	{
 		(*d3dintf->texture.release)(last_texture);
@@ -2767,25 +2753,6 @@ cache_target::~cache_target()
 
 bool cache_target::init(renderer *d3d, base *d3dintf, int width, int height, int prescale_x, int prescale_y)
 {
-	int bloom_index = 0;
-	int bloom_size = (width < height) ? width : height;
-	int bloom_width = width;
-	int bloom_height = height;
-	for (; bloom_size >= 2 && bloom_index < 11; bloom_size >>= 1)
-	{
-		bloom_width >>= 1;
-		bloom_height >>= 1;
-
-		HRESULT result = (*d3dintf->device.create_texture)(d3d->get_device(), bloom_width, bloom_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &bloom_texture[bloom_index]);
-		if (result != D3D_OK)
-		{
-			return false;
-		}
-		(*d3dintf->texture.get_surface_level)(bloom_texture[bloom_index], 0, &bloom_target[bloom_index]);
-
-		bloom_index++;
-	}
-
 	HRESULT result = (*d3dintf->device.create_texture)(d3d->get_device(), width * prescale_x, height * prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &last_texture);
 	if (result != D3D_OK)
 	{

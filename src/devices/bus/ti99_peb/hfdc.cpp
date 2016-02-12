@@ -232,7 +232,7 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
 			if (m_dip == CLEAR_LINE) *value = m_buffer_ram[(m_ram_page[bank]<<10) | (m_address & 0x03ff)];
 			if (TRACE_RAM)
 			{
-				if ((m_address & 1)==0)  // only show even addresses with words
+				if (WORD_ALIGNED(m_address))
 				{
 					int valword = (((*value) << 8) | m_buffer_ram[(m_ram_page[bank]<<10) | ((m_address+1) & 0x03ff)])&0xffff;
 					logerror("%s: %04x[%02x] -> %04x\n", tag(), m_address & 0xffff, m_ram_page[bank], valword);
@@ -246,7 +246,7 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
 			*value = m_dsrrom[(m_rom_page << 12) | (m_address & 0x0fff)];
 			if (TRACE_ROM)
 			{
-				if ((m_address & 1)==0)  // only show even addresses with words
+				if (WORD_ALIGNED(m_address))
 				{
 					int valword = (((*value) << 8) | m_dsrrom[(m_rom_page << 12) | ((m_address + 1) & 0x0fff)])&0xffff;
 					logerror("%s: %04x[%02x] -> %04x\n", tag(), m_address & 0xffff, m_rom_page, valword);

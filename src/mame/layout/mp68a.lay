@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="pcb">
+		<image file="mp68A.png" />
+	</element>
+	<element name="button" defstate="1"/>
+	<element name="digit" defstate="1">
+		<led7seg>
+			<color red="0.75" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+	<view name="Full Artwork">
+		<backdrop element="pcb">
+			<bounds left="0" top="0" right="840" bottom="1105" />
+		</backdrop>
+		<bezel name="digit0" element="digit">
+			<bounds left="70" top="840" right="100" bottom="885" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds left="100" top="840" right="125" bottom="885" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds left="125" top="840" right="150" bottom="885" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds left="150" top="840" right="175" bottom="885" />
+		</bezel>
+		<bezel name="digit4" element="digit">
+			<bounds left="175" top="840" right="200" bottom="885" />
+		</bezel>
+		<bezel name="digit5" element="digit">
+			<bounds left="200" top="840" right="225" bottom="885" />
+		</bezel>
+
+		<!-- Buttons -->
+		<!-- Row 3 : C D E F -->
+		<bezel element="button" inputtag="LINE0" inputmask="0x10">
+			<bounds x="240" y="750" width="85" height="85"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE0" inputmask="0x20">
+			<bounds x="325" y="750" width="85" height="85"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE0" inputmask="0x40">
+			<bounds x="410" y="750" width="85" height="85"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE0" inputmask="0x80">
+			<bounds x="495" y="750" width="85" height="85"/>
+		</bezel>
+
+		<!-- Buttons -->
+		<!-- Row 2 : 8 9 A B -->
+		<bezel element="button" inputtag="LINE1" inputmask="0x01">
+			<bounds x="240" y="835" width="85" height="85"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE1" inputmask="0x02">
+			<bounds x="325" y="835" width="85" height="85"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE1" inputmask="0x04">
+			<bounds x="410" y="835" width="85" height="85"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE1" inputmask="0x08">
+			<bounds x="495" y="835" width="85" height="85"/>
+		</bezel>
+
+		<!-- Buttons -->
+		<!-- Row 1 : SHIFT 4 5 6 7 -->
+		<bezel element="button" inputtag="LINE4" inputmask="0x08">
+			<bounds x="155" y="920" width="85" height="85"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE2" inputmask="0x10">
+			<bounds x="240" y="920" width="85" height="85"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE2" inputmask="0x20">
+			<bounds x="325" y="920" width="85" height="85"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE2" inputmask="0x40">
+			<bounds x="410" y="920" width="85" height="85"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE2" inputmask="0x80">
+			<bounds x="495" y="920" width="85" height="85"/>
+		</bezel>
+
+		<!-- Buttons -->
+		<!-- Row 0 : RESET 0 1 2 3 -->
+		<bezel element="button" inputtag="LINE4" inputmask="0x04">
+			<bounds x="155" y="1005" width="85" height="85"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE3" inputmask="0x01">
+			<bounds x="240" y="1005" width="85" height="85"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE3" inputmask="0x02">
+			<bounds x="325" y="1005" width="85" height="85"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE3" inputmask="0x04">
+			<bounds x="410" y="1005" width="85" height="85"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE3" inputmask="0x08">
+			<bounds x="495" y="1005" width="85" height="85"/>
+		</bezel>
+
+	</view>
+</mamelayout>

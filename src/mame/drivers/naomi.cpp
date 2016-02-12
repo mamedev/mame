@@ -377,7 +377,7 @@ Airline Pilots (Rev A)                          840-0005C    21739A  11 (64Mb)  
 Cosmic Smash                                    840-0044C    23428    8 (64Mb)   ?           315-6213  317-0289-COM   joystick + 2 buttons
 Cosmic Smash (Rev A)                            840-0044C    23428A   8 (64Mb)   ?           315-6213  317-0289-COM   joystick + 2 buttons
 Crazy Taxi                                      840-0002C    21684   13 (64Mb)*  present     315-6213  317-0248-COM   * ic8 and ic9 are not present
-Dead Or Alive 2                                 841-0003C    22121   21 (64Mb)   present     315-6213  317-5048-COM   joystick + 3 buttons
+Dead Or Alive 2 (Rev A)                         841-0003C    22121A  21 (64Mb)   present     315-6213  317-5048-COM   joystick + 3 buttons
 Dead Or Alive 2 Millennium                      841-0003C    DOA2 M  21 (64Mb)   present     315-6213  317-5048-COM   joystick + 3 buttons
 Death Crimson OX                                841-0016C    23524   10 (64Mb)   present     315-6213  317-5066-COM
 Dengen Tenshi Taisen Janshi Shangri-La          841-0004C    22060   12 (64Mb)   ?           315-6213  317-5050-JPN
@@ -1429,6 +1429,7 @@ Notes:
                Extreme Hunting 2 Tournament Edition  315-6428P  315-6248
                Dirty Pigskin Football                315-6248   -
                Sega Bass Fishing Challenge           315-6248   -
+               Sega Bass Fishing Challenge Version A 315-6248   -
                Sega Clay Challenge                   315-6248   -
 
           U* - Fujitsu MBM29PL12LM-10PCN 128M MirrorFlash TSOP56 flash ROM.
@@ -1859,21 +1860,17 @@ READ64_MEMBER(naomi_state::aw_modem_r )
 
 	if (reg == 0x280/4)
 	{
-		UINT32 coins = ioport("COINS")->read();
+	/*
+	         0x00600280 r  0000dcba
+	             a/b - 1P/2P coin inputs (JAMMA), active low
+	             c/d - 3P/4P coin inputs (EX. IO board), active low
 
-		if (coins & 0x01)
-		{
-			return U64(0xffffffff00000002); // coin A
-		}
-		else if (coins & 0x02)
-		{
-			return U64(0xffffffff00000001); // coin B
-		}
-
-		return U64(0xffffffffffffffff);
+	             (ab == 0) -> BIOS skip RAM test
+	    */
+		return U64(0xffffffff00000000) | (ioport("COINS")->read() & 0x0F);
 	} else
 		if (reg == 0x284/4)
-			return U64(0xffffffffffffff00) | aw_ctrl_type;
+			return U64(0xffffffff00000000) | aw_ctrl_type;
 
 
 	osd_printf_verbose("MODEM:  Unmapped read %08x\n", 0x600000+reg*4);
@@ -1890,16 +1887,24 @@ WRITE64_MEMBER(naomi_state::aw_modem_w )
 	dat = (UINT32)(data >> shift);
 	if (reg == 0x284/4)
 	{
-	/*
-	    0x00600284 rw ddccbbaa
-	        aa/bb/cc/dd - set type of Maple devices at ports 0/1/2/3
-	    0 - regular DC controller, but with 4 analogue channels (default)
-	    1 - DC lightgun
-	    2 - DC mouse/trackball
-	    TODO: hook this then MAME have such devices emulated
-	*/
-		aw_ctrl_type = dat & 0xFF;
+		aw_ctrl_type = dat & 0xF0;
 	}
+	/*
+	        0x00600284 rw ddcc0000
+	            cc/dd - set type of Maple devices at ports 2/3 (EX. IO board)
+	        0 - regular Atomiswave controller
+	        1 - DC lightgun
+	        2 - DC mouse/trackball
+	        TODO: hook this then MAME have such devices emulated
+
+	        0x00600288 rw 0000dcba
+	            a - 1P coin counter
+	            b - 2P coin counter
+	            c - 1P coin lockout
+	            d - 2P coin lockout
+
+	        0x0060028C rw POUT CN304 (EX. IO board)
+	*/
 
 	osd_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
 }
@@ -2589,8 +2594,9 @@ static INPUT_PORTS_START( aw2c )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0C, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_INCLUDE( naomi_debug )
 INPUT_PORTS_END
@@ -2627,8 +2633,9 @@ static INPUT_PORTS_START( aw1w )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0C, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_INCLUDE( naomi_debug )
 INPUT_PORTS_END
@@ -2960,8 +2967,19 @@ Probably at some stage of development NAOMI was planned as non-JVS system as wel
 	ROM_SYSTEM_BIOS( 20, "bios20", "Naomi Dev BIOS" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 20, "dcnaodev.bios",   0x000000, 0x080000, CRC(7a50fab9) SHA1(ef79f448e0bf735d1264ad4f051d24178822110f) ) \
 	ROM_SYSTEM_BIOS( 21, "bios21", "Naomi Dev BIOS v1.10" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 21, "develop110.ic27", 0x000000, 0x200000, CRC(de7cfdb0) SHA1(da16800edc4d49f70481c124d487f544c2fa8ce7) )
+	ROM_LOAD16_WORD_SWAP_BIOS( 21, "develop110.ic27", 0x000000, 0x200000, CRC(de7cfdb0) SHA1(da16800edc4d49f70481c124d487f544c2fa8ce7) ) \
+	ROM_SYSTEM_BIOS( 22, "bios22", "Naomi Unknown Dev board" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 22, "zukinver0930.ipl", 0x000000, 0x200000, CRC(58e17c23) SHA1(19330f906accf1b859f56bbcedc2edff73747599) )
 /* dcnaodev.bios comes from a dev / beta board. The eprom was a 27C4096 */
+
+/*
+ zukinver0930.ipl comes from 837-13502-01 / 837-13663 PCB which contains:
+  22 empty sockets ROM0 - ROM21
+  315-6187 Altera EPM7064LC68-10
+  PC16550DV UART
+  Fujitsu MB???? SCSI controller
+  IPL BOOT ROM with printed label "Zukin Ver.0930 / 99/5/24 / SUM:DB9C"
+*/
 
 // bios for House of the Dead 2
 #define HOTD2_BIOS \
@@ -3406,7 +3424,7 @@ ROM_START( doa2 )
 	NAOMI_DEFAULT_EEPROM_NO_BD
 
 	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD("epr-22121.ic22", 0x0000000, 0x0400000,  CRC(30f93b5e) SHA1(0e33383e7ab9a721dab4708b063598f2e9c9f2e7) ) // partially encrypted
+	ROM_LOAD("epr-22121a.ic22", 0x0000000, 0x0400000,  CRC(30f93b5e) SHA1(0e33383e7ab9a721dab4708b063598f2e9c9f2e7) ) // partially encrypted
 
 	ROM_LOAD("mpr-22100.ic1",  0x0800000, 0x0800000, CRC(92a53e5e) SHA1(87fcdeee9c4e65a3eb6eb345eed85d4f2df26c3c) )
 	ROM_LOAD("mpr-22101.ic2",  0x1000000, 0x0800000, CRC(14cd7dce) SHA1(5df14a5dad14bc922b4f88881dc2e9c8e74d6170) )
@@ -7958,6 +7976,40 @@ ROM_START( puyofev )
 	ROM_LOAD("317-0375-com.pic", 0x00, 0x4000, CRC(52b56b52) SHA1(221590efbb09824621714cb163bda51a921d7d54) )
 ROM_END
 
+/*
+   note:
+   both Dragon Treasure game binaries have only first 16MB encrypted using DES key from security PIC provided with GD-ROMs.
+   the rest of data encrypted using some other key, same in both game versions.
+   presumably this data uploaded via network to satellite units and decrypted using DES key from their own security PICs.
+*/
+
+// requires 837-14381 "G2 EXPANSION BD" I/O board
+ROM_START( dragntr2 )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0037a", 0, SHA1(ce65fe84cabaa1ac3f40bff9535a42c2055b5f1c) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC is missing
+	ROM_LOAD("317-xxxx-xxx.pic", 0x00, 0x4000, NO_DUMP )
+ROM_END
+
+// requires 837-14381 "G2 EXPANSION BD" I/O board
+ROM_START( dragntr3 )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0041a", 0, SHA1(955f6b0509aefba43048adf5f5fd6fec5024da53) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16F628A
+	// copy, original labels unknown
+	ROM_LOAD("317-xxxx-xxx.pic", 0x00, 0x4000, CRC(8df4d33a) SHA1(0d27ec46a64af60b1e46ad4b3d34b6df5448f81a) )
+ROM_END
+
 ROM_START( ndcfboxa )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -8714,6 +8766,11 @@ ROM_START( wccf212e )
 	//PIC16C621A (317-0369-EXP)
 	//(sticker 253-5508-0369E)
 	ROM_LOAD("317-0369-exp.pic", 0x00, 0x4000, CRC(adf2d113) SHA1(a5703f0926d6fd4ed95daa730184067865f4b5d8) )
+
+	// 837-14229 "IC BD FLAT READER"
+	// SH4-based camera sensor board connected to MAPLE CN7
+	ROM_REGION( 0x200000, "camera", ROMREGION_ERASE)
+	ROM_LOAD("fpr23911.ic18", 0x000000, 0x200000, CRC(1a1da741) SHA1(532ea7fc4dab11e012a521abcf5fdadd9b40d631) )
 ROM_END
 
 ROM_START( wccf234j )
@@ -8984,6 +9041,9 @@ ROM_START( ngbc )
 	ROM_LOAD( "ax3301f01.bin", 0, 4, CRC(9afe949b) SHA1(4f7b039f3287da61a53a2d012993bfb57e1459bd) )
 ROM_END
 
+// note: it looks there no regional differences in KOF NW EN and JP cartridge dumps, possible JP is just newer revision
+
+// Build: Jul 2004
 ROM_START( kofnw )
 	AW_BIOS
 
@@ -9000,6 +9060,7 @@ ROM_START( kofnw )
 	ROM_LOAD( "ax2201f01.bin", 0, 4, CRC(b1fff0c8) SHA1(d83177e3672378a2bbc08653b4b73704333ca30a) )
 ROM_END
 
+// Build: Sep 2004
 ROM_START( kofnwj )
 	AW_BIOS
 
@@ -9118,6 +9179,7 @@ ROM_START( ftspeed )
 	ROM_LOAD( "ax1701f01.bin", 0, 4, CRC(f3f03c35) SHA1(2a8329a29cdcc0219e9360cc573c0f3ad44d0175) )
 ROM_END
 
+// contents of cartridges labeled as JP and EN is the same
 ROM_START( kofxi )
 	AW_BIOS
 
@@ -9259,18 +9321,38 @@ ROM_START( claychal )
 	ROM_LOAD( "315-6248.bin", 0x000000, 0x000004, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
 ROM_END
 
+// Build:Feb 08 2009 22:35:34
+ROM_START( basschalo )
+	AW_BIOS
+
+	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
+	ROM_LOAD("610-0811.u3",  0x00000000, 0x01000000, CRC(ef31abe7) SHA1(bf8a66da4ceead350c200626792af55b7f258db4) )
+	ROM_LOAD("610-0811.u1",  0x01000000, 0x01000000, CRC(44c3cf90) SHA1(620a55f8f971f86fd65a3e3e9f0784fed5ca891e) )
+	ROM_LOAD("vera.u4",      0x02000000, 0x01000000, CRC(bd1f13aa) SHA1(1ef9a7e684418baf8a61fef2610839fd72887d4c) )
+	ROM_LOAD("610-0811.u2",  0x03000000, 0x01000000, CRC(1c61ed69) SHA1(e5a53362ea3e285a05d69d0fb56e1f8625272c18) )
+	ROM_LOAD("610-0811.u15", 0x04000000, 0x01000000, CRC(e8f02238) SHA1(f762a0a93e80899f71af6d2e0126a3fe9586815a) )
+	ROM_LOAD("610-0811.u17", 0x05000000, 0x01000000, CRC(db799f5a) SHA1(f85f35388ffb4399382b676773314f9a651e38df) )
+	ROM_LOAD("610-0811.u14", 0x06000000, 0x01000000, CRC(f2769383) SHA1(c580577df9d140bb6ecce192efafb0284d22c32d) )
+	ROM_LOAD("vera.u16",     0x07000000, 0x01000000, CRC(3590072d) SHA1(3375a0334c35de1d7d8231d7cc27775451042f91) )
+
+	ROM_REGION( 4, "rom_key", 0 )
+	ROM_LOAD( "315-6248.bin", 0x000000, 0x000004, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
+ROM_END
+
+// Version A
+// Build:Jul 15 2009 16:27:40
 ROM_START( basschal )
 	AW_BIOS
 
-	ROM_REGION( 0x8000100, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "610-0811.u3",  0x0000000, 0x1000100, CRC(f690d722) SHA1(03c2b53dda8cc11ba94468e7bd2fcb4e20a95c2d) )
-	ROM_LOAD( "610-0811.u1",  0x1000000, 0x1000100, CRC(d744d326) SHA1(fa3f25d683411c5ba63ed188cfcdba05d9cd9910) )
-	ROM_LOAD( "610-0811.u4",  0x2000000, 0x1000100, CRC(ac58d81d) SHA1(97a61895f543ee00e1f377af0793ad8f83ac34c4) )
-	ROM_LOAD( "610-0811.u2",  0x3000000, 0x1000100, CRC(15351d45) SHA1(6e3cbf356f7a4f4adb32f1b216fbd4fe51ac915f) )
-	ROM_LOAD( "610-0811.u15", 0x4000000, 0x1000100, CRC(1da03c68) SHA1(060b5bad3f79f934c8359a7ae9f9d1bd43c08087) )
-	ROM_LOAD( "610-0811.u17", 0x5000000, 0x1000100, CRC(77cc6fe6) SHA1(3e0567f80738f83113bd6ac01f2b5fc5cea9fb3d) )
-	ROM_LOAD( "610-0811.u14", 0x6000000, 0x1000100, CRC(9f33f186) SHA1(d656f3c11dba50620158394866054e08cdc7f4f0) )
-	ROM_LOAD( "610-0811.u16", 0x7000000, 0x1000100, CRC(5f0a3bd1) SHA1(39c66fce9ef0660491372e1aa4faff5b21524177) )
+	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
+	ROM_LOAD("vera.u3",  0x00000000, 0x01000000, CRC(8cbec9d7) SHA1(080f5edd817993946b1008ebe8ba489f818d3f99) )
+	ROM_LOAD("vera.u1",  0x01000000, 0x01000000, CRC(cfef27e5) SHA1(e0e27adc1b3635a310c50c6374d85572db608675) )
+	ROM_LOAD("vera.u4",  0x02000000, 0x01000000, CRC(bd1f13aa) SHA1(1ef9a7e684418baf8a61fef2610839fd72887d4c) )
+	ROM_LOAD("vera.u2",  0x03000000, 0x01000000, CRC(0a463c37) SHA1(630ad98d2f80fd458729bd56e8d665a88263da28) )
+	ROM_LOAD("vera.u15", 0x04000000, 0x01000000, CRC(e588afd1) SHA1(0ce3aeb2bcea66beaec2410d1df6857c4365aecf) )
+	ROM_LOAD("vera.u17", 0x05000000, 0x01000000, CRC(d78389a4) SHA1(50babfe3d58929a26a69dd4a4120fd87f507a95e) )
+	ROM_LOAD("vera.u14", 0x06000000, 0x01000000, CRC(35df044f) SHA1(eeac6c4062f697205558846d6ac262cb5c1b10cf) )
+	ROM_LOAD("vera.u16", 0x07000000, 0x01000000, CRC(3590072d) SHA1(3375a0334c35de1d7d8231d7cc27775451042f91) )
 
 	ROM_REGION( 4, "rom_key", 0 )
 	ROM_LOAD( "315-6248.bin", 0x000000, 0x000004, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
@@ -9412,8 +9494,8 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 /* 841-xxxxx ("Licensed by Sega" Naomi cart games)*/
 /* 0001 */ GAME( 1999, pstone,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Power Stone (JPN, USA, EUR, ASI, AUS)", GAME_FLAGS )
 /* 0002 */ GAME( 1999, suchie3,  naomi, naomim2, suchie3, naomi_state,naomi_mp,ROT0,  "Jaleco",          "Idol Janshi Suchie-Pai 3 (JPN)", GAME_FLAGS )
-/* 0003 */ GAME( 1999, doa2,     naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Tecmo",           "Dead or Alive 2 (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
-/* 0003 */ GAME( 2000, doa2m,    doa2,  naomim2, naomi,   naomi_state, naomi,  ROT0,  "Tecmo",           "Dead or Alive 2 Millennium (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
+/* 0003 */ GAME( 1999, doa2,     naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Tecmo",           "Dead or Alive 2 (Rev A)", GAME_FLAGS )
+/* 0003 */ GAME( 2000, doa2m,    doa2,  naomim2, naomi,   naomi_state, naomi,  ROT0,  "Tecmo",           "Dead or Alive 2 Millennium", GAME_FLAGS )
 /* 0004 */ GAME( 1999, shangril, naomi, naomim2, naomi_mp,naomi_state,naomi_mp,ROT0,  "Marvelous Ent.",  "Dengen Tenshi Taisen Janshi Shangri-la (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
 /* 0005 */ GAME( 1999, spawn,    naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Todd Mc Farlane / Capcom","Spawn In the Demon's Hand (JPN, USA, EUR, ASI, AUS) (Rev B)", GAME_FLAGS )
 /* 0006 */ GAME( 1999, puyoda,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Compile",         "Puyo Puyo Da!", GAME_FLAGS )
@@ -9522,14 +9604,14 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 // 0036E Virtua Fighter 4 Final Tuned (GDS-0036E)
 /* 0036F */ GAME( 2004, vf4tuned, naomi2,  naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Virtua Fighter 4 Final Tuned (Rev F) (GDS-0036F)", GAME_FLAGS )
 // 0037  Dragon Treasure 2 (GDS-0037)
-// 0037A Dragon Treasure 2 (Rev A) (GDS-0037A)
+/* 0037A */ GAME( 2004, dragntr2, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Dragon Treasure 2 (Rev A) (GDS-0037A)", GAME_FLAGS )
 // 0038
 // 0039  Initial D Arcade Stage Ver. 3 Cycraft Edition (GDS-0039)
 /* 0039A */ GAME( 2006, inidv3ca, inidv3cy,naomigd,  naomi,   naomi_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev A) (GDS-0039A)", GAME_FLAGS )
 /* 0039B */ GAME( 2006, inidv3cy, naomi2,  naomigd,  naomi,   naomi_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev B) (GDS-0039B)", GAME_FLAGS )
 // 0040
 // 0041  Dragon Treasure 3 (GDS-0041)
-// 0041A Dragon Treasure 3 (Rev A) (GDS-0041A)
+/* 0041A */ GAME( 2005, dragntr3, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Dragon Treasure 3 (Rev A) (GDS-0041A)", GAME_FLAGS )
 // 0042  NAOMI DIMM Firm Update for CF-BOX (GDS-0042)
 /* 0042A */ GAME( 2001, ndcfboxa, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Naomi DIMM Firmware Update for CF-BOX (Rev A) (GDS-0042A)", GAME_FLAGS )
 // 00??  Dragon Treasure (GDS-00xx)
@@ -9617,32 +9699,33 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 
 
 /* Atomiswave */
-GAME( 2001, awbios,   0,      aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Atomiswave Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+GAME( 2001, awbios,    0,        aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Atomiswave Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
 
-GAME( 2003, maxspeed, awbios, aw1c, aw1w, naomi_state, atomiswave, ROT0,   "Sammy",                    "Maximum Speed", GAME_FLAGS )
-GAME( 2003, sprtshot, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy USA",                "Sports Shooting USA", GAME_FLAGS )
-GAME( 2003, ggx15,    awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear X ver. 1.5", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
-GAME( 2003, demofist, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Polygon Magic / Dimps",    "Demolish Fist", GAME_FLAGS )
-GAME( 2003, dolphin,  awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Dolphin Blue", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
-GAME( 2003, kov7sprt, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "IGS / Sammy",              "Knights of Valour - The Seven Spirits", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
-GAME( 2003, ggisuka,  awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear Isuka", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
-GAME( 2004, dirtypig, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Dirty Pigskin Football", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
-GAME( 2004, rumblef,  awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
-GAME( 2004, rangrmsn, awbios, aw2c, aw1w, naomi_state, atomiswave, ROT0,   "Sammy",                    "Ranger Mission", GAME_FLAGS )
-GAME( 2004, salmankt, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Salary Man Kintarou", GAME_FLAGS )
-GAME( 2004, ftspeed,  awbios, aw1c, aw1w, naomi_state, atomiswave, ROT0,   "Sammy",                    "Faster Than Speed", GAME_FLAGS )
-GAME( 2005, vfurlong, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Net Select Keiba Victory Furlong", GAME_FLAGS )
-GAME( 2005, rumblef2, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish 2", GAME_FLAGS )
-GAME( 2005, rumblf2p,rumblef2,aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish 2 (prototype)", GAME_FLAGS )
-GAME( 2005, anmlbskt, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT270, "MOSS / Sammy",             "Animal Basket", GAME_FLAGS )
-GAME( 2005, ngbc,     awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "Neo-Geo Battle Coliseum", GAME_FLAGS )
-GAME( 2005, samsptk,  awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "Samurai Spirits Tenkaichi Kenkakuden", GAME_FLAGS )
-GAME( 2005, kofxi,    awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters XI", GAME_FLAGS )
-GAME( 2005, fotns,    awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Arc System Works / Sega",  "Fist Of The North Star", GAME_FLAGS )
-GAME( 2005, kofnw,    awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters Neowave", GAME_FLAGS )
-GAME( 2005, kofnwj,   kofnw,  aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters Neowave (Japan)", GAME_FLAGS )
-GAME( 2005, xtrmhunt, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Extreme Hunting", GAME_FLAGS )
-GAME( 2006, mslug6,   awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sega / SNK Playmore",      "Metal Slug 6", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
-GAME( 2006, xtrmhnt2, awbios, aw2c, aw2c, naomi_state, xtrmhnt2,   ROT0,   "Sega",                     "Extreme Hunting 2", GAME_FLAGS )
-GAME( 2008, claychal, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sega",                     "Sega Clay Challenge", GAME_FLAGS )
-GAME( 2009, basschal, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sega",                     "Sega Bass Fishing Challenge", GAME_FLAGS )
+GAME( 2003, maxspeed,  awbios,   aw1c, aw1w, naomi_state, atomiswave, ROT0,   "Sammy",                    "Maximum Speed", GAME_FLAGS )
+GAME( 2003, sprtshot,  awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy USA",                "Sports Shooting USA", GAME_FLAGS )
+GAME( 2003, ggx15,     awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear X ver. 1.5", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
+GAME( 2003, demofist,  awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Polygon Magic / Dimps",    "Demolish Fist", GAME_FLAGS )
+GAME( 2003, dolphin,   awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Dolphin Blue", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
+GAME( 2003, kov7sprt,  awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "IGS / Sammy",              "Knights of Valour - The Seven Spirits", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
+GAME( 2003, ggisuka,   awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear Isuka", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
+GAME( 2004, dirtypig,  awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Dirty Pigskin Football", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
+GAME( 2004, rumblef,   awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
+GAME( 2004, rangrmsn,  awbios,   aw2c, aw1w, naomi_state, atomiswave, ROT0,   "Sammy",                    "Ranger Mission", GAME_FLAGS )
+GAME( 2004, salmankt,  awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Salary Man Kintarou", GAME_FLAGS )
+GAME( 2004, ftspeed,   awbios,   aw1c, aw1w, naomi_state, atomiswave, ROT0,   "Sammy",                    "Faster Than Speed", GAME_FLAGS )
+GAME( 2005, vfurlong,  awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Net Select Keiba Victory Furlong", GAME_FLAGS )
+GAME( 2005, rumblef2,  awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish 2", GAME_FLAGS )
+GAME( 2005, rumblf2p,  rumblef2, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish 2 (prototype)", GAME_FLAGS )
+GAME( 2005, anmlbskt,  awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT270, "MOSS / Sammy",             "Animal Basket", GAME_FLAGS )
+GAME( 2005, ngbc,      awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "Neo-Geo Battle Coliseum", GAME_FLAGS )
+GAME( 2005, samsptk,   awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "Samurai Spirits Tenkaichi Kenkakuden", GAME_FLAGS )
+GAME( 2005, kofxi,     awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters XI", GAME_FLAGS )
+GAME( 2005, fotns,     awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Arc System Works / Sega",  "Fist Of The North Star", GAME_FLAGS )
+GAME( 2005, kofnw,     awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters Neowave", GAME_FLAGS )
+GAME( 2005, kofnwj,    kofnw,    aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters Neowave (Japan)", GAME_FLAGS )
+GAME( 2005, xtrmhunt,  awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Extreme Hunting", GAME_FLAGS )
+GAME( 2006, mslug6,    awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sega / SNK Playmore",      "Metal Slug 6", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
+GAME( 2006, xtrmhnt2,  awbios,   aw2c, aw2c, naomi_state, xtrmhnt2,   ROT0,   "Sega",                     "Extreme Hunting 2", GAME_FLAGS )
+GAME( 2008, claychal,  awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sega",                     "Sega Clay Challenge", GAME_FLAGS )
+GAME( 2009, basschalo, basschal, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sega",                     "Sega Bass Fishing Challenge", GAME_FLAGS )
+GAME( 2009, basschal,  awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sega",                     "Sega Bass Fishing Challenge Version A", GAME_FLAGS )

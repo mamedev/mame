@@ -452,7 +452,8 @@ inline void dsp32c_device::WBYTE(offs_t addr, UINT8 data)
 inline UINT16 dsp32c_device::RWORD(offs_t addr)
 {
 #if DETECT_MISALIGNED_MEMORY
-	if (addr & 1) fprintf(stderr, "Unaligned word read @ %06X, PC=%06X\n", addr, PC);
+	if (!WORD_ALIGNED(addr))
+		osd_printf_error("Unaligned word read @ %06X, PC=%06X\n", addr, PC);
 #endif
 	return m_program->read_word(addr);
 }
@@ -460,7 +461,8 @@ inline UINT16 dsp32c_device::RWORD(offs_t addr)
 inline UINT32 dsp32c_device::RLONG(offs_t addr)
 {
 #if DETECT_MISALIGNED_MEMORY
-	if (addr & 3) fprintf(stderr, "Unaligned long read @ %06X, PC=%06X\n", addr, PC);
+	if (!DWORD_ALIGNED(addr))
+		osd_printf_error("Unaligned long read @ %06X, PC=%06X\n", addr, PC);
 #endif
 	return m_program->read_dword(addr);
 }
@@ -468,7 +470,8 @@ inline UINT32 dsp32c_device::RLONG(offs_t addr)
 inline void dsp32c_device::WWORD(offs_t addr, UINT16 data)
 {
 #if DETECT_MISALIGNED_MEMORY
-	if (addr & 1) fprintf(stderr, "Unaligned word write @ %06X, PC=%06X\n", addr, PC);
+	if (!WORD_ALIGNED(addr))
+		osd_printf_error("Unaligned word write @ %06X, PC=%06X\n", addr, PC);
 #endif
 	m_program->write_word(addr, data);
 }
@@ -476,7 +479,8 @@ inline void dsp32c_device::WWORD(offs_t addr, UINT16 data)
 inline void dsp32c_device::WLONG(offs_t addr, UINT32 data)
 {
 #if DETECT_MISALIGNED_MEMORY
-	if (addr & 3) fprintf(stderr, "Unaligned long write @ %06X, PC=%06X\n", addr, PC);
+	if (!DWORD_ALIGNED(addr))
+		osd_printf_error("Unaligned long write @ %06X, PC=%06X\n", addr, PC);
 #endif
 	m_program->write_dword(addr, data);
 }

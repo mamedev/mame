@@ -486,7 +486,7 @@ UINT16 debug_read_word(address_space &space, offs_t address, int apply_translati
 	address &= space.logbytemask();
 
 	/* if this is misaligned read, or if there are no word readers, just read two bytes */
-	if ((address & 1) != 0)
+	if (!WORD_ALIGNED(address))
 	{
 		UINT8 byte0 = debug_read_byte(space, address + 0, apply_translation);
 		UINT8 byte1 = debug_read_byte(space, address + 1, apply_translation);
@@ -540,7 +540,7 @@ UINT32 debug_read_dword(address_space &space, offs_t address, int apply_translat
 	address &= space.logbytemask();
 
 	/* if this is misaligned read, or if there are no dword readers, just read two words */
-	if ((address & 3) != 0)
+	if (!DWORD_ALIGNED(address))
 	{
 		UINT16 word0 = debug_read_word(space, address + 0, apply_translation);
 		UINT16 word1 = debug_read_word(space, address + 2, apply_translation);
@@ -594,7 +594,7 @@ UINT64 debug_read_qword(address_space &space, offs_t address, int apply_translat
 	address &= space.logbytemask();
 
 	/* if this is misaligned read, or if there are no qword readers, just read two dwords */
-	if ((address & 7) != 0)
+	if (!QWORD_ALIGNED(address))
 	{
 		UINT32 dword0 = debug_read_dword(space, address + 0, apply_translation);
 		UINT32 dword1 = debug_read_dword(space, address + 4, apply_translation);
@@ -699,7 +699,7 @@ void debug_write_word(address_space &space, offs_t address, UINT16 data, int app
 	address &= space.logbytemask();
 
 	/* if this is a misaligned write, or if there are no word writers, just read two bytes */
-	if ((address & 1) != 0)
+	if (!WORD_ALIGNED(address))
 	{
 		if (space.endianness() == ENDIANNESS_LITTLE)
 		{
@@ -751,7 +751,7 @@ void debug_write_dword(address_space &space, offs_t address, UINT32 data, int ap
 	address &= space.logbytemask();
 
 	/* if this is a misaligned write, or if there are no dword writers, just read two words */
-	if ((address & 3) != 0)
+	if (!DWORD_ALIGNED(address))
 	{
 		if (space.endianness() == ENDIANNESS_LITTLE)
 		{
@@ -803,7 +803,7 @@ void debug_write_qword(address_space &space, offs_t address, UINT64 data, int ap
 	address &= space.logbytemask();
 
 	/* if this is a misaligned write, or if there are no qword writers, just read two dwords */
-	if ((address & 7) != 0)
+	if (!QWORD_ALIGNED(address))
 	{
 		if (space.endianness() == ENDIANNESS_LITTLE)
 		{
@@ -966,7 +966,7 @@ UINT64 debug_read_opcode(address_space &space, offs_t address, int size)
 
 		case 2:
 			result = space.direct().read_word(address & ~1, addrxor);
-			if ((address & 1) != 0)
+			if (!WORD_ALIGNED(address))
 			{
 				result2 = space.direct().read_word((address & ~1) + 2, addrxor);
 				if (space.endianness() == ENDIANNESS_LITTLE)
@@ -979,7 +979,7 @@ UINT64 debug_read_opcode(address_space &space, offs_t address, int size)
 
 		case 4:
 			result = space.direct().read_dword(address & ~3, addrxor);
-			if ((address & 3) != 0)
+			if (!DWORD_ALIGNED(address))
 			{
 				result2 = space.direct().read_dword((address & ~3) + 4, addrxor);
 				if (space.endianness() == ENDIANNESS_LITTLE)
@@ -992,7 +992,7 @@ UINT64 debug_read_opcode(address_space &space, offs_t address, int size)
 
 		case 8:
 			result = space.direct().read_qword(address & ~7, addrxor);
-			if ((address & 7) != 0)
+			if (!QWORD_ALIGNED(address))
 			{
 				result2 = space.direct().read_qword((address & ~7) + 8, addrxor);
 				if (space.endianness() == ENDIANNESS_LITTLE)

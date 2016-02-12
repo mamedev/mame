@@ -156,7 +156,7 @@ WRITE8_MEMBER(namco_c116_device::write)
 	}
 	int color = ((offset & 0x6000) >> 2) | (offset & 0x7ff);
 	RAM[color] = data;
-	m_palette->set_pen_color(color,m_ram_r[color],m_ram_g[color],m_ram_b[color]);
+	palette().set_pen_color(color,m_ram_r[color],m_ram_g[color],m_ram_b[color]);
 }
 
 

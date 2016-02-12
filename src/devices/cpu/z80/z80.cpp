@@ -10,6 +10,7 @@
  *    - If LD A,I or LD A,R is interrupted, P/V flag gets reset, even if IFF2
  *      was set before this instruction (implemented, but not enabled: we need
  *      document Z80 types first, see below)
+ *    - WAIT only stalls between instructions now, it should stall immediately.
  *    - Ideally, the tiny differences between Z80 types should be supported,
  *      currently known differences:
  *       - LD A,I/R P/V flag reset glitch is fixed on CMOS Z80
@@ -3124,6 +3125,27 @@ OP(op,fe) { cp(arg());                                                          
 OP(op,ff) { rst(0x38);                                                            } /* RST  7           */
 
 
+void z80_device::take_nmi()
+{
+	/* there isn't a valid previous program counter */
+	PRVPC = -1;
+
+	/* Check if processor was halted */
+	leave_halt();
+
+#if HAS_LDAIR_QUIRK
+	/* reset parity flag after LD A,I or LD A,R */
+	if (m_after_ldair) F &= ~PF;
+#endif
+
+	m_iff1 = 0;
+	push(m_pc);
+	PCD = 0x0066;
+	WZ=PCD;
+	m_icount -= 11;
+	m_nmi_pending = FALSE;
+}
+
 void z80_device::take_interrupt()
 {
 	int irq_vector;
@@ -3206,6 +3228,11 @@ void z80_device::take_interrupt()
 		m_icount -= m_cc_ex[0xff];
 	}
 	WZ=PCD;
+
+#if HAS_LDAIR_QUIRK
+	/* reset parity flag after LD A,I or LD A,R */
+	if (m_after_ldair) F &= ~PF;
+#endif
 }
 
 void nsc800_device::take_interrupt_nsc800()
@@ -3239,6 +3266,11 @@ void nsc800_device::take_interrupt_nsc800()
 	m_icount -= m_cc_op[0xff] + cc_ex[0xff];
 
 	WZ=PCD;
+
+#if HAS_LDAIR_QUIRK
+	/* reset parity flag after LD A,I or LD A,R */
+	if (m_after_ldair) F &= ~PF;
+#endif
 }
 
 /****************************************************************************
@@ -3474,44 +3506,25 @@ void nsc800_device::device_reset()
 }
 
 /****************************************************************************
- * Execute 'cycles' T-states. Return number of T-states really executed
+ * Execute 'cycles' T-states.
  ****************************************************************************/
 void z80_device::execute_run()
 {
-	/* check for NMIs on the way in; they can only be set externally */
-	/* via timers, and can't be dynamically enabled, so it is safe */
-	/* to just check here */
-	if (m_nmi_pending)
-	{
-		LOG(("Z80 '%s' take NMI\n", tag()));
-		PRVPC = -1;            /* there isn't a valid previous program counter */
-		leave_halt();            /* Check if processor was halted */
-
-#if HAS_LDAIR_QUIRK
-		/* reset parity flag after LD A,I or LD A,R */
-		if (m_after_ldair) F &= ~PF;
-#endif
-		m_after_ldair = FALSE;
-
-		m_iff1 = 0;
-		push(m_pc);
-		PCD = 0x0066;
-		WZ=PCD;
-		m_icount -= 11;
-		m_nmi_pending = FALSE;
-	}
-
 	do
 	{
-		/* check for IRQs before each instruction */
-		if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei)
+		if (m_wait_state)
 		{
-#if HAS_LDAIR_QUIRK
-			/* reset parity flag after LD A,I or LD A,R */
-			if (m_after_ldair) F &= ~PF;
-#endif
-			take_interrupt();
+			// stalled
+			m_icount = 0;
+			return;
 		}
+
+		// check for interrupts before each instruction
+		if (m_nmi_pending)
+			take_nmi();
+		else if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei)
+			take_interrupt();
+
 		m_after_ei = FALSE;
 		m_after_ldair = FALSE;
 
@@ -3524,34 +3537,25 @@ void z80_device::execute_run()
 
 void nsc800_device::execute_run()
 {
-	/* check for NMIs on the way in; they can only be set externally */
-	/* via timers, and can't be dynamically enabled, so it is safe */
-	/* to just check here */
-	if (m_nmi_pending)
-	{
-		LOG(("Z80 '%s' take NMI\n", tag()));
-		PRVPC = -1;            /* there isn't a valid previous program counter */
-		leave_halt();            /* Check if processor was halted */
-
-		m_iff1 = 0;
-		push(m_pc);
-		PCD = 0x0066;
-		WZ=PCD;
-		m_icount -= 11;
-		m_nmi_pending = FALSE;
-	}
-
 	do
 	{
-		/* check for NSC800 IRQs line RSTA, RSTB, RSTC */
-		if ((m_nsc800_irq_state[NSC800_RSTA] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTB] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTC] != CLEAR_LINE) && m_iff1 && !m_after_ei)
-			take_interrupt_nsc800();
+		if (m_wait_state)
+		{
+			// stalled
+			m_icount = 0;
+			return;
+		}
 
-		/* check for IRQs before each instruction */
-		if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei)
+		// check for interrupts before each instruction
+		if (m_nmi_pending)
+			take_nmi();
+		else if ((m_nsc800_irq_state[NSC800_RSTA] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTB] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTC] != CLEAR_LINE) && m_iff1 && !m_after_ei)
+			take_interrupt_nsc800();
+		else if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei)
 			take_interrupt();
 
 		m_after_ei = FALSE;
+		m_after_ldair = FALSE;
 
 		PRVPC = PCD;
 		debugger_instruction_hook(this, PCD);
@@ -3587,6 +3591,9 @@ void z80_device::execute_set_input(int inputnum, int state)
 	case Z80_INPUT_LINE_WAIT:
 		m_wait_state = state;
 		break;
+	
+	default:
+		break;
 	}
 }
 
@@ -3594,17 +3601,6 @@ void nsc800_device::execute_set_input(int inputnum, int state)
 {
 	switch (inputnum)
 	{
-	case Z80_INPUT_LINE_BUSRQ:
-		m_busrq_state = state;
-		break;
-
-	case INPUT_LINE_NMI:
-		/* mark an NMI pending on the rising edge */
-		if (m_nmi_state == CLEAR_LINE && state != CLEAR_LINE)
-			m_nmi_pending = TRUE;
-		m_nmi_state = state;
-		break;
-
 	case NSC800_RSTA:
 		m_nsc800_irq_state[NSC800_RSTA] = state;
 		break;
@@ -3617,17 +3613,8 @@ void nsc800_device::execute_set_input(int inputnum, int state)
 		m_nsc800_irq_state[NSC800_RSTC] = state;
 		break;
 
-	case INPUT_LINE_IRQ0:
-		/* update the IRQ state via the daisy chain */
-		m_irq_state = state;
-		if (m_daisy.present())
-			m_irq_state = m_daisy.update_irq_state();
-
-		/* the main execute loop will take the interrupt */
-		break;
-
-	case Z80_INPUT_LINE_WAIT:
-		m_wait_state = state;
+	default:
+		z80_device::execute_set_input(inputnum, state);
 		break;
 	}
 }
@@ -3750,10 +3737,3 @@ nsc800_device::nsc800_device(const machine_config &mconfig, const char *tag, dev
 }
 
 const device_type NSC800 = &device_creator<nsc800_device>;
-
-
-
-WRITE_LINE_MEMBER( z80_device::irq_line )
-{
-	set_input_line( INPUT_LINE_IRQ0, state );
-}

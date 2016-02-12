@@ -1127,7 +1127,8 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 			//  D0 : Output to coin counter 1
 			//
 			m_segaic16vid->tilemap_set_flip(0, data & 0x40);
-			m_sprites->set_flip(data & 0x40);
+			if (m_sprites.found())
+				m_sprites->set_flip(data & 0x40);
 			if (!m_disable_screen_blanking)
 				m_segaic16vid->set_display_enable(data & 0x20);
 			output().set_led_value(1, data & 0x08);
@@ -7142,6 +7143,7 @@ ROM_END
 //  Sonic Boom, Sega System 16B
 //  CPU: FD1094 (317-0053)
 //  ROM Board type: 171-5358
+//  Sega ID# for ROM board: 834-6532-01
 //
 //  Pos.   Silk        Type        Part                Pos.   Silk        Type        Part
 //
@@ -8241,9 +8243,11 @@ DRIVER_INIT_MEMBER(segas16b_state,sdi_5358_small)
 	DRIVER_INIT_CALL(generic_5358_small);
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::sdi_custom_io_r), this);
 
-	UINT8 *rom = memregion("maincpux")->base();
-	if (rom)
+	if (memregion("maincpux") != nullptr)
+	{
+		UINT8 *rom = memregion("maincpux")->base();
 		memcpy(m_decrypted_opcodes, rom, 0x30000);
+	}
 }
 
 

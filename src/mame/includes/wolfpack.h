@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "sound/s14001a_new.h"
+#include "sound/s14001a.h"
 
 class wolfpack_state : public driver_device
 {
@@ -29,7 +29,7 @@ public:
 	// devices, pointers
 	required_shared_ptr<UINT8> m_alpha_num_ram;
 	required_device<cpu_device> m_maincpu;
-	required_device<s14001a_new_device> m_s14001a;
+	required_device<s14001a_device> m_s14001a;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

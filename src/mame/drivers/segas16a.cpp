@@ -988,6 +988,13 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas16a_state )
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(sound_data_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( sound_no7751_portmap, AS_IO, 8, segas16a_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_NOP
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(sound_data_r)
+ADDRESS_MAP_END
 
 
 //**************************************************************************
@@ -1964,6 +1971,9 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( system16a_no7751, system16a )
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_IO_MAP(sound_no7751_portmap)
+
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
 
@@ -1987,6 +1997,9 @@ MACHINE_CONFIG_END
 */
 
 static MACHINE_CONFIG_DERIVED( system16a_fd1089a_no7751, system16a_fd1089a )
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_IO_MAP(sound_no7751_portmap)
+
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
 
@@ -1995,6 +2008,9 @@ static MACHINE_CONFIG_DERIVED( system16a_fd1089a_no7751, system16a_fd1089a )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system16a_fd1089b_no7751, system16a_fd1089b )
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_IO_MAP(sound_no7751_portmap)
+
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
 
@@ -2003,6 +2019,9 @@ static MACHINE_CONFIG_DERIVED( system16a_fd1089b_no7751, system16a_fd1089b )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system16a_fd1094_no7751, system16a_fd1094 )
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_IO_MAP(sound_no7751_portmap)
+
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
 

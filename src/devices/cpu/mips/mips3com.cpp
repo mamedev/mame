@@ -325,8 +325,8 @@ void mips3_device::tlb_map_entry(int tlbindex)
 	/* the ASID doesn't match the current ASID, and if the page isn't global, unmap it from the TLB */
 	if (!tlb_entry_matches_asid(entry, current_asid) && !tlb_entry_is_global(entry))
 	{
-		vtlb_load(m_vtlb, 2 * tlbindex + 0, 0, 0, 0);
-		vtlb_load(m_vtlb, 2 * tlbindex + 1, 0, 0, 0);
+		vtlb_load(2 * tlbindex + 0, 0, 0, 0);
+		vtlb_load(2 * tlbindex + 1, 0, 0, 0);
 		return;
 	}
 
@@ -334,8 +334,8 @@ void mips3_device::tlb_map_entry(int tlbindex)
 	vpn = ((entry->entry_hi >> 13) & 0x07ffffff) << 1;
 	if (vpn >= (1 << (MIPS3_MAX_PADDR_SHIFT - MIPS3_MIN_PAGE_SHIFT)))
 	{
-		vtlb_load(m_vtlb, 2 * tlbindex + 0, 0, 0, 0);
-		vtlb_load(m_vtlb, 2 * tlbindex + 1, 0, 0, 0);
+		vtlb_load(2 * tlbindex + 0, 0, 0, 0);
+		vtlb_load(2 * tlbindex + 1, 0, 0, 0);
 		return;
 	}
 
@@ -369,9 +369,9 @@ void mips3_device::tlb_map_entry(int tlbindex)
 
 		/* load the virtual TLB with the corresponding entries */
 		if ((effvpn + count) <= (0x80000000 >> MIPS3_MIN_PAGE_SHIFT) || effvpn >= (0xc0000000 >> MIPS3_MIN_PAGE_SHIFT))
-			vtlb_load(m_vtlb, 2 * tlbindex + which, count, effvpn << MIPS3_MIN_PAGE_SHIFT, (pfn << MIPS3_MIN_PAGE_SHIFT) | flags);
+			vtlb_load(2 * tlbindex + which, count, effvpn << MIPS3_MIN_PAGE_SHIFT, (pfn << MIPS3_MIN_PAGE_SHIFT) | flags);
 		else
-			vtlb_load(m_vtlb, 2 * tlbindex + which, 0, 0, 0);
+			vtlb_load(2 * tlbindex + which, 0, 0, 0);
 	}
 }
 

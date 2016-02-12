@@ -60,6 +60,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
+	void set_display_segmask(UINT32 digits, UINT32 mask);
 	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
 	void display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask);
 

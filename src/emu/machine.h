@@ -95,8 +95,10 @@ class image_manager;
 class rom_load_manager;
 class debugger_manager;
 class osd_interface;
+class datfile_manager;
 enum class config_type;
-
+class inifile_manager;
+class favorite_manager;
 struct debugcpu_private;
 
 
@@ -165,6 +167,9 @@ public:
 	ioport_manager &ioport() { return m_ioport; }
 	parameters_manager &parameters() { return m_parameters; }
 	cheat_manager &cheat() const { assert(m_cheat != nullptr); return *m_cheat; }
+	datfile_manager &datfile() const { assert(m_datfile != nullptr); return *m_datfile; }
+	inifile_manager &inifile() const { assert(m_inifile != nullptr); return *m_inifile; }
+	favorite_manager &favorite() const { assert(m_favorite != nullptr); return *m_favorite; }
 	render_manager &render() const { assert(m_render != nullptr); return *m_render; }
 	input_manager &input() const { assert(m_input != nullptr); return *m_input; }
 	sound_manager &sound() const { assert(m_sound != nullptr); return *m_sound; }
@@ -294,11 +299,11 @@ private:
 	std::unique_ptr<network_manager> m_network;        // internal data from network.cpp
 	std::unique_ptr<bookkeeping_manager> m_bookkeeping;// internal data from bookkeeping.cpp
 	std::unique_ptr<configuration_manager> m_configuration; // internal data from config.cpp
-	std::unique_ptr<output_manager> m_output;		   // internal data from output.cpp
-	std::unique_ptr<crosshair_manager> m_crosshair;	   // internal data from crsshair.cpp
-	std::unique_ptr<image_manager> m_image;	           // internal data from image.cpp
-	std::unique_ptr<rom_load_manager> m_rom_load;	   // internal data from romload.cpp
-	std::unique_ptr<debugger_manager> m_debugger;	   // internal data from debugger.cpp
+	std::unique_ptr<output_manager> m_output;          // internal data from output.cpp
+	std::unique_ptr<crosshair_manager> m_crosshair;    // internal data from crsshair.cpp
+	std::unique_ptr<image_manager> m_image;            // internal data from image.cpp
+	std::unique_ptr<rom_load_manager> m_rom_load;      // internal data from romload.cpp
+	std::unique_ptr<debugger_manager> m_debugger;      // internal data from debugger.cpp
 
 	// system state
 	machine_phase           m_current_phase;        // current execution phase
@@ -363,7 +368,10 @@ private:
 	parameters_manager      m_parameters;           // parameters manager
 	device_scheduler        m_scheduler;            // scheduler object
 	emu_timer               *m_autoboot_timer;      // autoboot timer
-};
 
+	std::unique_ptr<datfile_manager>   m_datfile;      // internal data from datfile.c
+	std::unique_ptr<inifile_manager>   m_inifile;      // internal data from inifile.c for INIs
+	std::unique_ptr<favorite_manager>  m_favorite;     // internal data from inifile.c for favorites
+};
 
 #endif  /* __MACHINE_H__ */

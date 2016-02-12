@@ -9,6 +9,7 @@
 #ifndef __WIN_WINDOW__
 #define __WIN_WINDOW__
 
+#include <mutex>
 #include "video.h"
 #include "render.h"
 
@@ -92,7 +93,7 @@ public:
 	float               m_aspect;
 
 	// rendering info
-	osd_lock *          m_render_lock;
+	std::mutex          m_render_lock;
 	render_target *     m_target;
 	int                 m_targetview;
 	int                 m_targetorient;

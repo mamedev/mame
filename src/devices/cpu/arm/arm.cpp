@@ -259,7 +259,7 @@ void arm_cpu_device::cpu_write32( int addr, UINT32 data )
 {
 	/* Unaligned writes are treated as normal writes */
 	m_program->write_dword(addr&ADDRESS_MASK,data);
-	if (ARM_DEBUG_CORE && addr&3) logerror("%08x: Unaligned write %08x\n",R15,addr);
+	if (ARM_DEBUG_CORE && !DWORD_ALIGNED(addr)) logerror("%08x: Unaligned write %08x\n",R15,addr);
 }
 
 void arm_cpu_device::cpu_write8( int addr, UINT8 data )
@@ -272,9 +272,9 @@ UINT32 arm_cpu_device::cpu_read32( int addr )
 	UINT32 result = m_program->read_dword(addr&ADDRESS_MASK);
 
 	/* Unaligned reads rotate the word, they never combine words */
-	if (addr&3)
+	if (!DWORD_ALIGNED(addr))
 	{
-		if (ARM_DEBUG_CORE && addr&1)
+		if (ARM_DEBUG_CORE && !WORD_ALIGNED(addr))
 			logerror("%08x: Unaligned byte read %08x\n",R15,addr);
 
 		if ((addr&3)==1)

@@ -53,7 +53,8 @@ public:
 		m_reel3(*this, "reel3"),
 		m_reel4(*this, "reel4"),
 		m_reel5(*this, "reel5"),
-		m_meters(*this, "meters")
+		m_meters(*this, "meters"),
+		m_oki_region(*this, "msm6376")
 	{}
 
 	required_device<cpu_device> m_maincpu;
@@ -79,6 +80,7 @@ public:
 	required_device<stepper_device> m_reel4;
 	required_device<stepper_device> m_reel5;
 	required_device<meters_device> m_meters;
+	optional_region_ptr<UINT8> m_oki_region;
 
 	UINT8 m_lamppos;
 	int m_lamp_strobe;

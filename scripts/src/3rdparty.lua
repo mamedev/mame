@@ -919,37 +919,194 @@ links {
 end
 
 --------------------------------------------------
--- GoogleTest library objects
+-- libuv library objects
 --------------------------------------------------
-
-project "gtest"
-	uuid "fa306a8d-fb10-4d4a-9d2e-fdb9076407b4"
+project "uv"
+	uuid "cd2afe7f-139d-49c3-9000-fc9119f3cea0"
 	kind "StaticLib"
 
+	includedirs {
+		MAME_DIR .. "3rdparty/libuv/include",
+		MAME_DIR .. "3rdparty/libuv/src",
+		MAME_DIR .. "3rdparty/libuv/src/win",
+	}
+
 	configuration { "gmake" }
-		buildoptions {
+		buildoptions_c {
+			"-Wno-strict-prototypes",
+			"-Wno-bad-function-cast",
+			"-Wno-write-strings",
+			"-Wno-missing-braces",
 			"-Wno-undef",
 			"-Wno-unused-variable",
 		}
 
-	configuration { "mingw-clang" }
-		buildoptions {
-			"-O0", -- crash of compiler when doing optimization
-		}
+
+	local version = str_to_version(_OPTIONS["gcc_version"])
+	if (_OPTIONS["gcc"]~=nil) then
+		if string.find(_OPTIONS["gcc"], "clang") then
+			buildoptions_c {
+				"-Wno-unknown-warning-option",
+				"-Wno-unknown-attributes",
+				"-Wno-null-dereference",
+				"-Wno-unused-but-set-variable",
+				"-Wno-maybe-uninitialized",
+			}
+		else
+			buildoptions_c {
+				"-Wno-unused-but-set-variable",
+				"-Wno-maybe-uninitialized",
+			}
+		end
+	end
 
 	configuration { "vs*" }
-if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd1195", 			-- error #1195: conversion from integer to smaller pointer
+			"/wd4054", -- warning C4054: 'type cast' : from function pointer 'xxx' to data pointer 'void *'
+			"/wd4204", -- warning C4204: nonstandard extension used : non-constant aggregate initializer
+			"/wd4210", -- warning C4210: nonstandard extension used : function given file scope
+			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
+			"/wd4703", -- warning C4703: potentially uninitialized local pointer variable 'xxx' used
+			"/wd4477", -- warning C4477: '<function>' : format string '<format-string>' requires an argument of type '<type>', but variadic argument <position> has type '<type>'
 		}
-end
 
 	configuration { }
 
-	includedirs {
-		MAME_DIR .. "3rdparty/googletest/googletest/include",
-		MAME_DIR .. "3rdparty/googletest/googletest",
-	}
 	files {
-		MAME_DIR .. "3rdparty/googletest/googletest/src/gtest-all.cc",
+			MAME_DIR .. "3rdparty/libuv/src/fs-poll.c",
+			MAME_DIR .. "3rdparty/libuv/src/inet.c",
+			MAME_DIR .. "3rdparty/libuv/src/threadpool.c",
+			MAME_DIR .. "3rdparty/libuv/src/uv-common.c",
+			MAME_DIR .. "3rdparty/libuv/src/version.c",
 	}
+
+	if _OPTIONS["targetos"]=="windows" then
+		defines {
+			"WIN32_LEAN_AND_MEAN",
+			"_WIN32_WINNT=0x0502",
+		}
+        if _ACTION == "vs2013" then
+			files {
+				MAME_DIR .. "3rdparty/libuv/src/win/snprintf.c",
+			}
+		end
+		configuration { }
+		files {
+			MAME_DIR .. "3rdparty/libuv/src/win/async.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/core.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/dl.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/error.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/fs-event.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/fs.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/getaddrinfo.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/getnameinfo.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/handle.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/loop-watcher.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/pipe.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/poll.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/process-stdio.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/process.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/req.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/signal.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/stream.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/tcp.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/thread.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/timer.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/tty.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/udp.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/util.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/winapi.c",
+			MAME_DIR .. "3rdparty/libuv/src/win/winsock.c",
+		}
+	end
+
+	if _OPTIONS["targetos"]~="windows" then
+		files {
+			MAME_DIR .. "3rdparty/libuv/src/unix/async.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/atomic-ops.h",
+			MAME_DIR .. "3rdparty/libuv/src/unix/core.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/dl.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/fs.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/getaddrinfo.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/getnameinfo.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/internal.h",
+			MAME_DIR .. "3rdparty/libuv/src/unix/loop-watcher.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/loop.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/pipe.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/poll.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/process.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/signal.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/spinlock.h",
+			MAME_DIR .. "3rdparty/libuv/src/unix/stream.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/tcp.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/thread.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/timer.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/tty.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/udp.c",
+		}
+	end
+	if _OPTIONS["targetos"]=="linux" then
+		defines {
+			"_GNU_SOURCE",
+		}
+		files {
+			MAME_DIR .. "3rdparty/libuv/src/unix/linux-core.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/linux-inotify.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/linux-syscalls.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/linux-syscalls.h",
+			MAME_DIR .. "3rdparty/libuv/src/unix/proctitle.c",
+		}
+	end
+	if _OPTIONS["targetos"]=="macosx" then
+		defines {
+			"_DARWIN_USE_64_BIT_INODE=1",
+			"_DARWIN_UNLIMITED_SELECT=1",
+		}
+		files {
+			MAME_DIR .. "3rdparty/libuv/src/unix/darwin.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/darwin-proctitle.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/fsevents.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/kqueue.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/proctitle.c",
+		}
+	end
+	if _OPTIONS["targetos"]=="solaris" then
+		defines {
+			"__EXTENSIONS__",
+			"_XOPEN_SOURCE=500",
+		}
+		files {
+			MAME_DIR .. "3rdparty/libuv/src/unix/sunos.c",
+		}
+	end
+	if _OPTIONS["targetos"]=="freebsd" then
+		files {
+			MAME_DIR .. "3rdparty/libuv/src/unix/freebsd.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/kqueue.c",
+		}
+	end
+
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
+
+--------------------------------------------------
+-- HTTP parser library objects
+--------------------------------------------------
+
+project "http-parser"
+	uuid "90c6ba59-bdb2-4fee-8b44-57601d690e14"
+	kind "StaticLib"
+
+	configuration {  }
+
+	files {
+		MAME_DIR .. "3rdparty/http-parser/http_parser.c",
+	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end

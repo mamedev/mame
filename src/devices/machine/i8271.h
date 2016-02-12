@@ -215,6 +215,7 @@ private:
 	UINT8 srate, hset, icnt, hload;
 	int sector_size;
 	int cur_rate;
+	int idle_icnt;
 
 	static std::string tts(attotime t);
 	std::string ttsn();

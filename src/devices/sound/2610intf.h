@@ -29,6 +29,9 @@ public:
 	void _timer_handler(int c,int count,int clock);
 	void _ym2610_update_request();
 
+	static const char* YM2610_TAG;
+	static const char* YM2610_DELTAT_TAG;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;

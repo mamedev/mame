@@ -50,20 +50,20 @@ protected:
 	void write_data(UINT8 data);
 
 private:
-	pcd8544_screen_update_delegate m_screen_update_cb;	// screen update callback
-	int		m_sdin;
-	int		m_sclk;
-	int		m_dc;
-	int		m_bits;
-	UINT8	m_mode;
-	UINT8	m_control;
-	UINT8	m_op_vol;
-	UINT8	m_bias;
-	UINT8	m_temp_coef;
-	UINT8	m_indata;
-	UINT8	m_addr_y;
-	UINT8	m_addr_x;
-	UINT8	m_vram[6*84];		// 4032 bit video ram
+	pcd8544_screen_update_delegate m_screen_update_cb;  // screen update callback
+	int     m_sdin;
+	int     m_sclk;
+	int     m_dc;
+	int     m_bits;
+	UINT8   m_mode;
+	UINT8   m_control;
+	UINT8   m_op_vol;
+	UINT8   m_bias;
+	UINT8   m_temp_coef;
+	UINT8   m_indata;
+	UINT8   m_addr_y;
+	UINT8   m_addr_x;
+	UINT8   m_vram[6*84];       // 4032 bit video ram
 };
 
 // device type definition

@@ -1726,7 +1726,7 @@ GAME( 1988, pc_pinbt, playch10, playch10_hboard, playch10, playch10_state, pchbo
 
 /* i-Board Games */
 GAME( 1989, pc_cshwk, playch10, playch10, playch10, playch10_state, pciboard, ROT0, "Rare (Nintendo of America license)",       "Captain Sky Hawk (PlayChoice-10)", 0 )
-GAME( 1990, pc_sjetm, playch10, playch10, playch10, playch10_state, pciboard, ROT0, "Rare",                                     "Solar Jetman (PlayChoice-10)", 0 )
+GAME( 1990, pc_sjetm, playch10, playch10, playch10, playch10_state, pciboard, ROT0, "Rare",                                     "Solar Jetman (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* K-Board Games */
 GAME( 1991, pc_moglf, playch10, playch10, playch10, playch10_state, pckboard, ROT0, "Nintendo",                                 "Mario's Open Golf (PlayChoice-10)", 0 )

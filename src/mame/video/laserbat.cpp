@@ -82,58 +82,6 @@
 #include "includes/laserbat.h"
 
 
-PALETTE_INIT_MEMBER(laserbat_state_base, laserbat)
-{
-	/*
-	    Uses GRBGRBGR pixel format.  The two topmost bist are the LSBs
-	    for red and green.  LSB for blue is always effectively 1.  The
-	    middle group is the MSB.  Yet another crazy thing they did.
-
-	    Each colour channel has an emitter follower buffer amlpifier
-	    biased with a 1k resistor to +5V and a 3k3 resistor to ground.
-	    Output is adjusted by connecting additional resistors across the
-	    leg to ground using an open collector buffer - 270R, 820R and
-	    1k0 for unset MSB to LSB, respectively (blue has no LSB so it
-	    has no 1k0 resistor).
-
-	    Assuming 0.7V drop across the emitter follower and no drop
-	    across the open collector buffer, these are the approximate
-	    output voltages:
-
-	    0.0000, 0.1031, 0.1324, 0.2987 , 0.7194, 1.2821, 1.4711, 3.1372
-
-	    The game never sets the colour to any value above 4, effectively
-	    treating it as 5-level red and green, and 3-level blue, for a
-	    total of 75 usable colours.
-
-	    From the fact that there's no DC offset on red and green, and
-	    the highest value used is just over 0.7V, I'm guessing the game
-	    expects to drive a standard 0.7V RGB monitor, and higher colour
-	    values would simply saturate the input.  To make it not look
-	    like the inside of a coal mine, I've applied gamma decoding at
-	    2.2
-
-	    However there's that nasty DC offset on the blue caused by the
-	    fact that it has no LSB, but it's eliminated at the AC-coupling
-	    of the input and output of the buffer amplifier on the monitor
-	    interface board.  I'm treating it as though it has the same gain
-	    as the other channels.  After gamma adjustment, medium red and
-	    medium blue as used by the game have almost the same intensity.
-	*/
-
-	int const weights[] = { 0, 107, 120, 173, 255, 255, 255, 255 };
-	int const blue_weights[] = { 0, 0, 60, 121, 241, 255, 255, 255, 255 };
-	for (int entry = 0; palette.entries() > entry; entry++)
-	{
-		UINT8 const bits(entry & 0xff);
-		UINT8 const r(((bits & 0x01) << 1) | ((bits & 0x08) >> 1) | ((bits & 0x40) >> 6));
-		UINT8 const g(((bits & 0x02) >> 0) | ((bits & 0x10) >> 2) | ((bits & 0x80) >> 7));
-		UINT8 const b(((bits & 0x04) >> 1) | ((bits & 0x20) >> 3) | 0x01);
-		palette.set_pen_color(entry, rgb_t(weights[r], weights[g], blue_weights[b]));
-	}
-}
-
-
 WRITE8_MEMBER(laserbat_state_base::videoram_w)
 {
 	if (!m_mpx_bkeff)
@@ -373,5 +321,108 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 				}
 			}
 		}
+	}
+}
+
+
+PALETTE_INIT_MEMBER(laserbat_state, laserbat)
+{
+	/*
+	    Uses GRBGRBGR pixel format.  The two topmost bist are the LSBs
+	    for red and green.  LSB for blue is always effectively 1.  The
+	    middle group is the MSB.  Yet another crazy thing they did.
+
+	    Each colour channel has an emitter follower buffer amlpifier
+	    biased with a 1k resistor to +5V and a 3k3 resistor to ground.
+	    Output is adjusted by connecting additional resistors across the
+	    leg to ground using an open collector buffer - 270R, 820R and
+	    1k0 for unset MSB to LSB, respectively (blue has no LSB so it
+	    has no 1k0 resistor).
+
+	    Assuming 0.7V drop across the emitter follower and no drop
+	    across the open collector buffer, these are the approximate
+	    output voltages:
+
+	    0.0000, 0.1031, 0.1324, 0.2987, 0.7194, 1.2821, 1.4711, 3.1372
+
+	    The game never sets the colour to any value above 4, effectively
+	    treating it as 5-level red and green, and 3-level blue, for a
+	    total of 75 usable colours.
+
+	    From the fact that there's no DC offset on red and green, and
+	    the highest value used is just over 0.7V, I'm guessing the game
+	    expects to drive a standard 0.7V RGB monitor, and higher colour
+	    values would simply saturate the input.  To make it not look
+	    like the inside of a coal mine, I've applied gamma decoding at
+	    2.2
+
+	    However there's that nasty DC offset on the blue caused by the
+	    fact that it has no LSB, but it's eliminated at the AC-coupling
+	    of the input and output of the buffer amplifier on the monitor
+	    interface board.  I'm treating it as though it has the same gain
+	    as the other channels.  After gamma adjustment, medium red and
+	    medium blue as used by the game have almost the same intensity.
+	*/
+
+	int const weights[] = { 0, 107, 120, 173, 255, 255, 255, 255 };
+	int const blue_weights[] = { 0, 0, 60, 121, 241, 255, 255, 255 };
+	for (int entry = 0; palette.entries() > entry; entry++)
+	{
+		UINT8 const bits(entry & 0xff);
+		UINT8 const r(((bits & 0x01) << 1) | ((bits & 0x08) >> 1) | ((bits & 0x40) >> 6));
+		UINT8 const g(((bits & 0x02) >> 0) | ((bits & 0x10) >> 2) | ((bits & 0x80) >> 7));
+		UINT8 const b(((bits & 0x04) >> 1) | ((bits & 0x20) >> 3) | 0x01);
+		palette.set_pen_color(entry, rgb_t(weights[r], weights[g], blue_weights[b]));
+	}
+}
+
+
+PALETTE_INIT_MEMBER(catnmous_state, catnmous)
+{
+	/*
+	    Uses GRBGRBGR pixel format.  The two topmost bist are the LSBs
+	    for red and green.  The middle group is the MSB.  Yet another
+	    crazy thing they did.
+
+	    Each colour channel has an emitter follower buffer amlpifier
+	    biased with a 1k resistor to +5V and a 3k3 resistor to ground.
+	    Output is adjusted by connecting additional resistors across the
+	    leg to ground using an open collector buffer.  Red and green use
+	    560R, 820R and 1k0 for unset MSB to LSB, respectively.  Blue
+	    uses 47R and 820R on the PCB we have a photo of, although the
+	    47R resistor looks like it could be a bad repair (opposite
+	    orientation and burn marks on PCB).
+
+	    Assuming 0.7V drop across the emitter follower and no drop
+	    across the open collector buffer, these are the approximate
+	    output voltages for red and green:
+
+	    0.2419, 0.4606, 0.5229, 0.7194, 0.9188, 1.2821, 1.4711, 3.1372
+
+	    The game uses all colour values except 4.  The DC offset will be
+	    eliminated by the AC coupling on the monitor interface board.
+	    The differences steps aren't very linear, they vary from 0.06V
+	    to 0.36V with no particular order.  The input would be expected
+	    to saturate somewhere inside the big jump to the highest level.
+
+	    Let's assume the 47R resistor is a bad repair and it's supposed
+	    to be 470R.  That gives us these output voltages for blue:
+
+	    0.3752, 0.7574, 1.2821, 3.1372
+
+	    To make life easier, I'll assume the monitor is expected to have
+	    half the gain of a standard monitor and no gamma decoding is
+	    necessary.
+	*/
+
+	int const weights[] = { 0, 40, 51, 87, 123, 189, 224, 255 };
+	int const blue_weights[] = { 0, 70, 165, 255 };
+	for (int entry = 0; palette.entries() > entry; entry++)
+	{
+		UINT8 const bits(entry & 0xff);
+		UINT8 const r(((bits & 0x01) << 1) | ((bits & 0x08) >> 1) | ((bits & 0x40) >> 6));
+		UINT8 const g(((bits & 0x02) >> 0) | ((bits & 0x10) >> 2) | ((bits & 0x80) >> 7));
+		UINT8 const b(((bits & 0x04) >> 2) | ((bits & 0x20) >> 4));
+		palette.set_pen_color(entry, rgb_t(weights[r], weights[g], blue_weights[b]));
 	}
 }

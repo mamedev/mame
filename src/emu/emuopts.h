@@ -71,6 +71,8 @@ enum
 #define OPTION_AUTOSAVE             "autosave"
 #define OPTION_PLAYBACK             "playback"
 #define OPTION_RECORD               "record"
+#define OPTION_RECORD_TIMECODE      "record_timecode"
+#define OPTION_EXIT_AFTER_PLAYBACK	"exit_after_playback"
 #define OPTION_MNGWRITE             "mngwrite"
 #define OPTION_AVIWRITE             "aviwrite"
 #ifdef MAME_DEBUG
@@ -172,8 +174,7 @@ enum
 #define OPTION_DRC_LOG_NATIVE       "drc_log_native"
 #define OPTION_BIOS                 "bios"
 #define OPTION_CHEAT                "cheat"
-#define OPTION_SKIP_GAMEINFO        "skip_gameinfo"
-#define OPTION_UI_FONT              "uifont"
+#define OPTION_UI 		            "ui"
 #define OPTION_RAMSIZE              "ramsize"
 
 // core comm options
@@ -181,9 +182,6 @@ enum
 #define OPTION_COMM_LOCAL_PORT      "comm_localport"
 #define OPTION_COMM_REMOTE_HOST     "comm_remotehost"
 #define OPTION_COMM_REMOTE_PORT     "comm_remoteport"
-
-#define OPTION_CONFIRM_QUIT         "confirm_quit"
-#define OPTION_UI_MOUSE             "ui_mouse"
 
 #define OPTION_AUTOBOOT_COMMAND     "autoboot_command"
 #define OPTION_AUTOBOOT_DELAY       "autoboot_delay"
@@ -197,6 +195,7 @@ enum
 
 // forward references
 struct game_driver;
+class software_part;
 
 
 class emu_options : public core_options
@@ -210,7 +209,7 @@ public:
 	// parsing wrappers
 	bool parse_command_line(int argc, char *argv[], std::string &error_string);
 	void parse_standard_inis(std::string &error_string);
-	bool parse_slot_devices(int argc, char *argv[], std::string &error_string, const char *name, const char *value);
+	bool parse_slot_devices(int argc, char *argv[], std::string &error_string, const char *name = nullptr, const char *value = nullptr, const software_part *swpart = nullptr);
 
 	// core options
 	const char *system_name() const { return value(OPTION_SYSTEMNAME); }
@@ -247,6 +246,8 @@ public:
 	bool autosave() const { return bool_value(OPTION_AUTOSAVE); }
 	const char *playback() const { return value(OPTION_PLAYBACK); }
 	const char *record() const { return value(OPTION_RECORD); }
+	bool record_timecode() const { return bool_value(OPTION_RECORD_TIMECODE); }
+	bool exit_after_playback() const { return bool_value(OPTION_EXIT_AFTER_PLAYBACK); }
 	const char *mng_write() const { return value(OPTION_MNGWRITE); }
 	const char *avi_write() const { return value(OPTION_AVIWRITE); }
 #ifdef MAME_DEBUG
@@ -346,8 +347,7 @@ public:
 	bool drc_log_native() const { return bool_value(OPTION_DRC_LOG_NATIVE); }
 	const char *bios() const { return value(OPTION_BIOS); }
 	bool cheat() const { return bool_value(OPTION_CHEAT); }
-	bool skip_gameinfo() const { return bool_value(OPTION_SKIP_GAMEINFO); }
-	const char *ui_font() const { return value(OPTION_UI_FONT); }
+	const char *ui() const { return value(OPTION_UI); }
 	const char *ram_size() const { return value(OPTION_RAMSIZE); }
 
 	// core comm options
@@ -355,10 +355,7 @@ public:
 	const char *comm_localport() const { return value(OPTION_COMM_LOCAL_PORT); }
 	const char *comm_remotehost() const { return value(OPTION_COMM_REMOTE_HOST); }
 	const char *comm_remoteport() const { return value(OPTION_COMM_REMOTE_PORT); }
-
-	bool confirm_quit() const { return bool_value(OPTION_CONFIRM_QUIT); }
-	bool ui_mouse() const { return bool_value(OPTION_UI_MOUSE); }
-
+	
 	const char *autoboot_command() const { return value(OPTION_AUTOBOOT_COMMAND); }
 	int autoboot_delay() const { return int_value(OPTION_AUTOBOOT_DELAY); }
 	const char *autoboot_script() const { return value(OPTION_AUTOBOOT_SCRIPT); }
@@ -370,12 +367,13 @@ public:
 
 	std::string main_value(const char *option) const;
 	std::string sub_value(const char *name, const char *subname) const;
-	bool add_slot_options(bool isfirst);
+	bool add_slot_options(const software_part *swpart = nullptr);
+
 
 private:
 	// device-specific option handling
-	void add_device_options(bool isfirst);
-	void update_slot_options();
+	void add_device_options();
+	void update_slot_options(const software_part *swpart = nullptr);
 
 	// INI parsing helper
 	bool parse_one_ini(const char *basename, int priority, std::string *error_string = nullptr);
@@ -390,6 +388,8 @@ private:
 	bool m_joystick_contradictory;
 	bool m_sleep;
 	bool m_refresh_speed;
+	int m_slot_options;
+	int m_device_options;
 };
 
 

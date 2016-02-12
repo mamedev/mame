@@ -27,6 +27,8 @@
 #include "osdepend.h"
 #include "softlist.h"
 
+#include "ui/moptions.h"
+
 #include <new>
 #include <ctype.h>
 
@@ -148,7 +150,7 @@ int cli_frontend::execute(int argc, char **argv)
 												strprintf(val, "%s:%s:%s", swlistdev->list_name(), m_options.software_name(), swpart->name());
 
 												// call this in order to set slot devices according to mounting
-												m_options.parse_slot_devices(argc, argv, option_errors, image->instance_name(), val.c_str());
+												m_options.parse_slot_devices(argc, argv, option_errors, image->instance_name(), val.c_str(), swpart);
 												break;
 											}
 										}
@@ -1595,7 +1597,8 @@ void cli_frontend::execute_commands(const char *exename)
 	if (strcmp(m_options.command(), CLICOMMAND_VALIDATE) == 0)
 	{
 		validity_checker valid(m_options);
-		bool result = valid.check_all();
+		const char *sysname = m_options.system_name();
+		bool result = valid.check_all_matching((sysname[0] == 0) ? "*" : sysname);
 		if (!result)
 			throw emu_fatalerror(MAMERR_FAILED_VALIDITY, "Validity check failed (%d errors, %d warnings in total)\n", valid.errors(), valid.warnings());
 		return;
@@ -1617,6 +1620,14 @@ void cli_frontend::execute_commands(const char *exename)
 
 		// generate the updated INI
 		file.puts(m_options.output_ini().c_str());
+
+		ui_options ui_opts;
+		emu_file file_ui(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		if (file_ui.open("ui.ini") != FILERR_NONE)
+			throw emu_fatalerror("Unable to create file ui.ini\n");
+
+		// generate the updated INI
+		file_ui.puts(ui_opts.output_ini().c_str());
 		return;
 	}
 

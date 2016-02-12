@@ -527,7 +527,7 @@ void mc6845_device::recompute_parameters(bool postload)
 			}
 
 			if(m_show_border_area)
-				visarea.set(0, horiz_pix_total-1, 0, vert_pix_total-1);
+				visarea.set(0, horiz_pix_total-2, 0, vert_pix_total-2);
 			else
 				visarea.set(0 + m_visarea_adjust_min_x, max_visible_x + m_visarea_adjust_max_x, 0 + m_visarea_adjust_min_y, max_visible_y + m_visarea_adjust_max_y);
 
@@ -553,7 +553,8 @@ void mc6845_device::recompute_parameters(bool postload)
 		m_hsync_off_pos = hsync_off_pos;
 		m_vsync_on_pos = vsync_on_pos;
 		m_vsync_off_pos = vsync_off_pos;
-		m_line_counter = 0;
+		if (!postload) // set m_line_counter to 0 on normal operation, but not on postload
+			m_line_counter = 0;
 	}
 }
 

@@ -1607,7 +1607,7 @@ static INPUT_PORTS_START( kikstart )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("IN3")      /* Service */
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,kikstart_gear_r, (void *)nullptr)
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,kikstart_gear_r, (void *)0)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* needs to be 0, otherwise cannot shift */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 )

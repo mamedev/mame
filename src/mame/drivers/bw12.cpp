@@ -574,8 +574,8 @@ static MACHINE_CONFIG_START( common, bw12_state )
 	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_PIA_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(bw12_state, pia_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE(Z80_TAG, z80_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE(Z80_TAG, z80_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_16MHz/4, 0, 0, 0, 0)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
@@ -645,6 +645,9 @@ static MACHINE_CONFIG_DERIVED( bw14, common )
 	/* floppy drives */
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats)
+
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "bw14")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

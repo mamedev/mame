@@ -197,7 +197,8 @@ public:
 	// information getters
 	render_container &container() const { assert(m_container != nullptr); return *m_container; }
 	bitmap_ind8 &priority() { return m_priority; }
-	palette_device *palette() { return m_palette; }
+	palette_device &palette() const { assert(m_palette.found()); return *m_palette; }
+	bool has_palette() const { return m_palette.found(); }
 
 	// dynamic configuration
 	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
@@ -218,7 +219,7 @@ public:
 	attotime time_until_vblank_end() const;
 	attotime time_until_update() const { return (m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK) ? time_until_vblank_end() : time_until_vblank_start(); }
 	attotime scan_period() const { return attotime(0, m_scantime); }
-	attotime frame_period() const { return (this == nullptr) ? DEFAULT_FRAME_PERIOD : attotime(0, m_frame_period); };
+	attotime frame_period() const { return attotime(0, m_frame_period); }
 	UINT64 frame_number() const { return m_frame_number; }
 
 	// updating

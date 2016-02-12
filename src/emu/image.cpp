@@ -231,7 +231,7 @@ void image_manager::postdevice_init()
 			{
 				/* retrieve image error message */
 				std::string image_err = std::string(image->error());
-				
+
 				/* unload all images */
 				unload_all();
 
@@ -243,4 +243,3 @@ void image_manager::postdevice_init()
 	/* add a callback for when we shut down */
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(image_manager::unload_all), this));
 }
-

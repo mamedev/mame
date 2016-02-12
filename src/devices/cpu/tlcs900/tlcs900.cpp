@@ -1748,62 +1748,62 @@ void tmp95c063_device::tlcs900_handle_ad()
 			int ad_value;
 
 			/* Store A/D converted value */
-			if ((m_reg[TMP95C063_ADMOD1] & 0x10) == 0)		// conversion channel fixed
+			if ((m_reg[TMP95C063_ADMOD1] & 0x10) == 0)      // conversion channel fixed
 			{
 				switch( m_reg[TMP95C063_ADMOD2] & 0x07 )
 				{
-				case 0x00:	// AN0
+				case 0x00:  // AN0
 					ad_value = m_an0_read(0) & 0x3ff;
 					m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 					m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
 					break;
-				case 0x01:	// AN1
+				case 0x01:  // AN1
 					ad_value = m_an1_read(0) & 0x3ff;
 					m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
 					m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
 					break;
-				case 0x02:	// AN2
+				case 0x02:  // AN2
 					ad_value = m_an2_read(0) & 0x3ff;
 					m_reg[TMP95C063_ADREG26L] = (ad_value & 0x3) << 6;
 					m_reg[TMP95C063_ADREG26H] = (ad_value >> 2) & 0xff;
 					break;
-				case 0x03:	// AN3
+				case 0x03:  // AN3
 					ad_value = m_an3_read(0) & 0x3ff;
 					m_reg[TMP95C063_ADREG37L] = (ad_value & 0x3) << 6;
 					m_reg[TMP95C063_ADREG37H] = (ad_value >> 2) & 0xff;
 					break;
-				case 0x04:	// AN4				
+				case 0x04:  // AN4
 					ad_value = m_an4_read(0) & 0x3ff;
 					m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 					m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
 					break;
-				case 0x05:	// AN5
+				case 0x05:  // AN5
 					ad_value = m_an5_read(0) & 0x3ff;
 					m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
 					m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
 					break;
-				case 0x06:	// AN6
+				case 0x06:  // AN6
 					ad_value = m_an6_read(0) & 0x3ff;
 					m_reg[TMP95C063_ADREG26L] = (ad_value & 0x3) << 6;
 					m_reg[TMP95C063_ADREG26H] = (ad_value >> 2) & 0xff;
 					break;
-				case 0x07:	// AN7
+				case 0x07:  // AN7
 					ad_value = m_an7_read(0) & 0x3ff;
 					m_reg[TMP95C063_ADREG37L] = (ad_value & 0x3) << 6;
 					m_reg[TMP95C063_ADREG37H] = (ad_value >> 2) & 0xff;
 					break;
 				}
 			}
-			else			// conversion channel sweep
+			else            // conversion channel sweep
 			{
 				switch( m_reg[TMP95C063_ADMOD2] & 0x07 )
 				{
-					case 0x00:		// AN0
+					case 0x00:      // AN0
 						ad_value = m_an0_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
 						break;
-					case 0x01:		// AN0 -> AN1
+					case 0x01:      // AN0 -> AN1
 						ad_value = m_an0_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
@@ -1811,7 +1811,7 @@ void tmp95c063_device::tlcs900_handle_ad()
 						m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
 						break;
-					case 0x02:		// AN0 -> AN1 -> AN2
+					case 0x02:      // AN0 -> AN1 -> AN2
 						ad_value = m_an0_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
@@ -1822,7 +1822,7 @@ void tmp95c063_device::tlcs900_handle_ad()
 						m_reg[TMP95C063_ADREG26L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG26H] = (ad_value >> 2) & 0xff;
 						break;
-					case 0x03:		// AN0 -> AN1 -> AN2 -> AN3
+					case 0x03:      // AN0 -> AN1 -> AN2 -> AN3
 						ad_value = m_an0_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
@@ -1836,12 +1836,12 @@ void tmp95c063_device::tlcs900_handle_ad()
 						m_reg[TMP95C063_ADREG37L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG37H] = (ad_value >> 2) & 0xff;
 						break;
-					case 0x04:		// AN4
+					case 0x04:      // AN4
 						ad_value = m_an4_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
 						break;
-					case 0x05:		// AN4 -> AN5
+					case 0x05:      // AN4 -> AN5
 						ad_value = m_an4_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
@@ -1849,7 +1849,7 @@ void tmp95c063_device::tlcs900_handle_ad()
 						m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
 						break;
-					case 0x06:		// AN4 -> AN5 -> AN6
+					case 0x06:      // AN4 -> AN5 -> AN6
 						ad_value = m_an4_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
@@ -1860,7 +1860,7 @@ void tmp95c063_device::tlcs900_handle_ad()
 						m_reg[TMP95C063_ADREG26L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG26H] = (ad_value >> 2) & 0xff;
 						break;
-					case 0x07:		// AN4 -> AN5 -> AN6 -> AN7
+					case 0x07:      // AN4 -> AN5 -> AN6 -> AN7
 						ad_value = m_an4_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;

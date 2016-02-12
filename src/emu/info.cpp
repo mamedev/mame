@@ -188,7 +188,7 @@ info_xml_creator::info_xml_creator(driver_enumerator &drivlist)
 //  for all known games
 //-------------------------------------------------
 
-void info_xml_creator::output(FILE *out)
+void info_xml_creator::output(FILE *out, bool nodevices)
 {
 	m_output = out;
 
@@ -218,7 +218,8 @@ void info_xml_creator::output(FILE *out)
 		output_one();
 
 	// output devices (both devices with roms and slot devices)
-	output_devices();
+	if (!nodevices)
+		output_devices();
 
 	// close the top level tag
 	fprintf(m_output, "</%s>\n",emulator_info::get_xml_root());

@@ -76,27 +76,10 @@
 
 #define LOG(n,x) do { if (VERBOSE >= (n)) logerror x; } while (0)
 
-#define CHECK_CHIP_NUM                  assert(this != NULL)
-#define CHECK_CHIP_NUM_AND_BOOLEAN      CHECK_CHIP_NUM; assert((state & 0x01) == state)
-#define CHECK_CHIP_NUM_AND_POSITIVE     CHECK_CHIP_NUM; assert(data >= 0.0)
-#define CHECK_CHIP_NUM_AND_VOLTAGE      CHECK_CHIP_NUM; assert((data >= 0.0) && (data <= 5.0))
-#define CHECK_CHIP_NUM_AND_CAP_VOLTAGE  CHECK_CHIP_NUM; assert(((data >= 0.0) && (data <= 5.0)) || (data == SN76477_EXTERNAL_VOLTAGE_DISCONNECT))
-
-
-
-/*****************************************************************************
- *
- *  Test Mode
- *
- *  in test mode, calls by the driver to
- *  the input setter functions are ignored.
- *  Interface values can be set in device_start
- *  to any desired test value.
- *  Use the space bar to enable/disable the chip.
- *
- *****************************************************************************/
-
-#define TEST_MODE   0
+#define CHECK_BOOLEAN      assert((state & 0x01) == state)
+#define CHECK_POSITIVE     assert(data >= 0.0)
+#define CHECK_VOLTAGE      assert((data >= 0.0) && (data <= 5.0))
+#define CHECK_CAP_VOLTAGE  assert(((data >= 0.0) && (data <= 5.0)) || (data == SN76477_EXTERNAL_VOLTAGE_DISCONNECT))
 
 /*****************************************************************************
  *
@@ -233,11 +216,11 @@ void sn76477_device::device_start()
 	intialize_noise();
 
 	// set up mixer and envelope modes, based on interface values
-	_SN76477_mixer_a_w(m_mixer_a);
-	_SN76477_mixer_b_w(m_mixer_b);
-	_SN76477_mixer_c_w(m_mixer_c);
-	_SN76477_envelope_1_w(m_envelope_1);
-	_SN76477_envelope_2_w(m_envelope_2);
+	mixer_a_w(m_mixer_a);
+	mixer_b_w(m_mixer_b);
+	mixer_c_w(m_mixer_c);
+	envelope_1_w(m_envelope_1);
+	envelope_2_w(m_envelope_2);
 
 	m_one_shot_cap_voltage = ONE_SHOT_CAP_VOLTAGE_MIN;
 	m_slf_cap_voltage = SLF_CAP_VOLTAGE_MIN;
@@ -966,42 +949,28 @@ inline UINT32 sn76477_device::generate_next_real_noise_bit()
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_enable_w(UINT32 data)
+WRITE_LINE_MEMBER(sn76477_device::enable_w)
 {
-	m_enable = data;
+	CHECK_BOOLEAN;
 
-		/* if falling edge */
-	if (!m_enable)
-	{
-		/* start the attack phase */
-		m_attack_decay_cap_voltage = AD_CAP_VOLTAGE_MIN;
-
-		/* one-shot runs regardless of envelope mode */
-		m_one_shot_running_ff = 1;
-	}
-}
-
-
-void sn76477_device::SN76477_test_enable_w(UINT32 data)
-{
-	if (data != m_enable)
+	if (state != m_enable)
 	{
 		m_channel->update();
 
-		_SN76477_enable_w(data);
+		m_enable = state;
+
+			/* if falling edge */
+		if (!m_enable)
+		{
+			/* start the attack phase */
+			m_attack_decay_cap_voltage = AD_CAP_VOLTAGE_MIN;
+
+			/* one-shot runs regardless of envelope mode */
+			m_one_shot_running_ff = 1;
+		}
 
 		log_enable_line();
 	}
-}
-
-
-WRITE_LINE_MEMBER( sn76477_device::enable_w )
-{
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_BOOLEAN;
-
-	SN76477_test_enable_w(state);
-#endif
 }
 
 
@@ -1012,75 +981,47 @@ WRITE_LINE_MEMBER( sn76477_device::enable_w )
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_mixer_a_w(UINT32 data)
-{
-	m_mixer_mode = (m_mixer_mode & ~0x01) | (data << 0);
-}
-
-
 WRITE_LINE_MEMBER( sn76477_device::mixer_a_w )
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_BOOLEAN;
+	CHECK_BOOLEAN;
 
 	if (state != ((m_mixer_mode >> 0) & 0x01))
 	{
 		m_channel->update();
 
-		_SN76477_mixer_a_w(state);
+		m_mixer_mode = (m_mixer_mode & ~0x01) | state;
 
 		log_mixer_mode();
 	}
-#endif
 }
-
-
-void sn76477_device::_SN76477_mixer_b_w(UINT32 data)
-{
-	m_mixer_mode = (m_mixer_mode & ~0x02) | (data << 1);
-}
-
 
 WRITE_LINE_MEMBER( sn76477_device::mixer_b_w )
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_BOOLEAN;
+	CHECK_BOOLEAN;
 
 	if (state != ((m_mixer_mode >> 1) & 0x01))
 	{
 		m_channel->update();
 
-		_SN76477_mixer_b_w(state);
+		m_mixer_mode = (m_mixer_mode & ~0x02) | (state << 1);
 
 		log_mixer_mode();
 	}
-#endif
 }
-
-
-void sn76477_device::_SN76477_mixer_c_w(UINT32 data)
-{
-	m_mixer_mode = (m_mixer_mode & ~0x04) | (data << 2);
-}
-
 
 WRITE_LINE_MEMBER( sn76477_device::mixer_c_w )
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_BOOLEAN;
+	CHECK_BOOLEAN;
 
 	if (state != ((m_mixer_mode >> 2) & 0x01))
 	{
 		m_channel->update();
 
-		_SN76477_mixer_c_w(state);
+		m_mixer_mode = (m_mixer_mode & ~0x04) | (state << 2);
 
 		log_mixer_mode();
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1088,52 +1029,33 @@ WRITE_LINE_MEMBER( sn76477_device::mixer_c_w )
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_envelope_1_w(UINT32 data)
-{
-	m_envelope_mode = (m_envelope_mode & ~0x01) | (data << 0);
-}
-
-
 WRITE_LINE_MEMBER( sn76477_device::envelope_1_w )
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_BOOLEAN;
+	CHECK_BOOLEAN;
 
 	if (state != ((m_envelope_mode >> 0) & 0x01))
 	{
 		m_channel->update();
 
-		_SN76477_envelope_1_w(state);
+		m_envelope_mode = (m_envelope_mode & ~0x01) | state;
 
 		log_envelope_mode();
 	}
-#endif
 }
-
-
-void sn76477_device::_SN76477_envelope_2_w(UINT32 data)
-{
-	m_envelope_mode = (m_envelope_mode & ~0x02) | (data << 1);
-}
-
 
 WRITE_LINE_MEMBER( sn76477_device::envelope_2_w )
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_BOOLEAN;
+	CHECK_BOOLEAN;
 
 	if (state != ((m_envelope_mode >> 1) & 0x01))
 	{
 		m_channel->update();
 
-		_SN76477_envelope_2_w(state);
+		m_envelope_mode = (m_envelope_mode & ~0x02) | (state << 1);
 
 		log_envelope_mode();
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1141,29 +1063,19 @@ WRITE_LINE_MEMBER( sn76477_device::envelope_2_w )
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_vco_w(UINT32 data)
-{
-	m_vco_mode = data;
-}
-
-
 WRITE_LINE_MEMBER( sn76477_device::vco_w )
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_BOOLEAN;
+	CHECK_BOOLEAN;
 
 	if (state != m_vco_mode)
 	{
 		m_channel->update();
 
-		_SN76477_vco_w(state);
+		m_vco_mode = state;
 
 		log_vco_mode();
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1171,29 +1083,19 @@ WRITE_LINE_MEMBER( sn76477_device::vco_w )
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_one_shot_res_w(double data)
-{
-	m_one_shot_res = data;
-}
-
-
 void sn76477_device::one_shot_res_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_POSITIVE;
+	CHECK_POSITIVE;
 
 	if (data != m_one_shot_res)
 	{
 		m_channel->update();
 
-		_SN76477_one_shot_res_w(data);
+		m_one_shot_res = data;
 
 		log_one_shot_time();
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1201,29 +1103,19 @@ void sn76477_device::one_shot_res_w(double data)
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_one_shot_cap_w(double data)
-{
-	m_one_shot_cap = data;
-}
-
-
 void sn76477_device::one_shot_cap_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_POSITIVE;
+	CHECK_POSITIVE;
 
 	if (data != m_one_shot_cap)
 	{
 		m_channel->update();
 
-		_SN76477_one_shot_cap_w(data);
+		m_one_shot_cap = data;
 
 		log_one_shot_time();
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1233,8 +1125,7 @@ void sn76477_device::one_shot_cap_w(double data)
 
 void sn76477_device::one_shot_cap_voltage_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_CAP_VOLTAGE;
+	CHECK_CAP_VOLTAGE;
 
 	if (data == SN76477_EXTERNAL_VOLTAGE_DISCONNECT)
 	{
@@ -1261,10 +1152,7 @@ void sn76477_device::one_shot_cap_voltage_w(double data)
 			log_one_shot_time();
 		}
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1272,29 +1160,19 @@ void sn76477_device::one_shot_cap_voltage_w(double data)
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_slf_res_w(double data)
-{
-	m_slf_res = data;
-}
-
-
 void sn76477_device::slf_res_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_POSITIVE;
+	CHECK_POSITIVE;
 
 	if (data != m_slf_res)
 	{
 		m_channel->update();
 
-		_SN76477_slf_res_w(data);
+		m_slf_res = data;
 
 		log_slf_freq();
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1302,29 +1180,19 @@ void sn76477_device::slf_res_w(double data)
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_slf_cap_w(double data)
-{
-	m_slf_cap = data;
-}
-
-
 void sn76477_device::slf_cap_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_POSITIVE;
+	CHECK_POSITIVE;
 
 	if (data != m_slf_cap)
 	{
 		m_channel->update();
 
-		_SN76477_slf_cap_w(data);
+		m_slf_cap = data;
 
 		log_slf_freq();
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1336,8 +1204,7 @@ void sn76477_device::slf_cap_w(double data)
 
 void sn76477_device::slf_cap_voltage_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_CAP_VOLTAGE;
+	CHECK_CAP_VOLTAGE;
 
 	if (data == SN76477_EXTERNAL_VOLTAGE_DISCONNECT)
 	{
@@ -1364,10 +1231,7 @@ void sn76477_device::slf_cap_voltage_w(double data)
 			log_slf_freq();
 		}
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1375,29 +1239,19 @@ void sn76477_device::slf_cap_voltage_w(double data)
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_vco_res_w(double data)
-{
-	m_vco_res = data;
-}
-
-
 void sn76477_device::vco_res_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_POSITIVE;
+	CHECK_POSITIVE;
 
 	if (data != m_vco_res)
 	{
 		m_channel->update();
 
-		_SN76477_vco_res_w(data);
+		m_vco_res = data;
 
 		log_vco_freq();
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1405,29 +1259,19 @@ void sn76477_device::vco_res_w(double data)
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_vco_cap_w(double data)
-{
-	m_vco_cap = data;
-}
-
-
 void sn76477_device::vco_cap_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_POSITIVE;
+	CHECK_POSITIVE;
 
 	if (data != m_vco_cap)
 	{
 		m_channel->update();
 
-		_SN76477_vco_cap_w(data);
+		m_vco_cap = data;
 
 		log_vco_freq();
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1437,8 +1281,7 @@ void sn76477_device::vco_cap_w(double data)
 
 void sn76477_device::vco_cap_voltage_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_CAP_VOLTAGE;
+	CHECK_CAP_VOLTAGE;
 
 	if (data == SN76477_EXTERNAL_VOLTAGE_DISCONNECT)
 	{
@@ -1465,10 +1308,7 @@ void sn76477_device::vco_cap_voltage_w(double data)
 			log_vco_freq();
 		}
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1476,30 +1316,20 @@ void sn76477_device::vco_cap_voltage_w(double data)
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_vco_voltage_w(double data)
-{
-	m_vco_voltage = data;
-}
-
-
 void sn76477_device::vco_voltage_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_VOLTAGE;
+	CHECK_VOLTAGE;
 
 	if (data != m_vco_voltage)
 	{
 		m_channel->update();
 
-		_SN76477_vco_voltage_w(data);
+		m_vco_voltage = data;
 
 		log_vco_ext_voltage();
 		log_vco_duty_cycle();
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1507,30 +1337,20 @@ void sn76477_device::vco_voltage_w(double data)
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_pitch_voltage_w(double data)
-{
-	m_pitch_voltage = data;
-}
-
-
 void sn76477_device::pitch_voltage_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_VOLTAGE;
+	CHECK_VOLTAGE;
 
 	if (data != m_pitch_voltage)
 	{
 		m_channel->update();
 
-		_SN76477_pitch_voltage_w(data);
+		m_pitch_voltage = data;
 
 		log_vco_pitch_voltage();
 		log_vco_duty_cycle();
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1540,8 +1360,7 @@ void sn76477_device::pitch_voltage_w(double data)
 
 WRITE_LINE_MEMBER( sn76477_device::noise_clock_w )
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_BOOLEAN;
+	CHECK_BOOLEAN;
 
 	if (state != m_noise_clock)
 	{
@@ -1556,10 +1375,7 @@ WRITE_LINE_MEMBER( sn76477_device::noise_clock_w )
 			m_real_noise_bit_ff = generate_next_real_noise_bit();
 		}
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1567,39 +1383,29 @@ WRITE_LINE_MEMBER( sn76477_device::noise_clock_w )
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_noise_clock_res_w(double data)
-{
-	if (data == 0)
-	{
-		m_noise_clock_ext = 1;
-	}
-	else
-	{
-		m_noise_clock_ext = 0;
-
-		m_noise_clock_res = data;
-	}
-}
-
-
 void sn76477_device::noise_clock_res_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_POSITIVE;
+	CHECK_POSITIVE;
 
 	if (((data == 0) && !m_noise_clock_ext) ||
 		((data != 0) && (data != m_noise_clock_res)))
 	{
 		m_channel->update();
 
-		_SN76477_noise_clock_res_w(data);
+		if (data == 0)
+		{
+			m_noise_clock_ext = 1;
+		}
+		else
+		{
+			m_noise_clock_ext = 0;
+
+			m_noise_clock_res = data;
+		}
 
 		log_noise_gen_freq();
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1607,29 +1413,19 @@ void sn76477_device::noise_clock_res_w(double data)
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_noise_filter_res_w(double data)
-{
-	m_noise_filter_res = data;
-}
-
-
 void sn76477_device::noise_filter_res_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_POSITIVE;
+	CHECK_POSITIVE;
 
 	if (data != m_noise_filter_res)
 	{
 		m_channel->update();
 
-		_SN76477_noise_filter_res_w(data);
+		m_noise_filter_res = data;
 
 		log_noise_filter_freq();
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1637,29 +1433,19 @@ void sn76477_device::noise_filter_res_w(double data)
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_noise_filter_cap_w(double data)
-{
-	m_noise_filter_cap = data;
-}
-
-
 void sn76477_device::noise_filter_cap_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_POSITIVE;
+	CHECK_POSITIVE;
 
 	if (data != m_noise_filter_cap)
 	{
 		m_channel->update();
 
-		_SN76477_noise_filter_cap_w(data);
+		m_noise_filter_cap = data;
 
 		log_noise_filter_freq();
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1669,8 +1455,7 @@ void sn76477_device::noise_filter_cap_w(double data)
 
 void sn76477_device::noise_filter_cap_voltage_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_CAP_VOLTAGE;
+	CHECK_CAP_VOLTAGE;
 
 	if (data == SN76477_EXTERNAL_VOLTAGE_DISCONNECT)
 	{
@@ -1697,10 +1482,7 @@ void sn76477_device::noise_filter_cap_voltage_w(double data)
 			log_noise_filter_freq();
 		}
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1708,29 +1490,19 @@ void sn76477_device::noise_filter_cap_voltage_w(double data)
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_attack_res_w(double data)
-{
-	m_attack_res = data;
-}
-
-
 void sn76477_device::attack_res_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_POSITIVE;
+	CHECK_POSITIVE;
 
 	if (data != m_attack_res)
 	{
 		m_channel->update();
 
-		_SN76477_attack_res_w(data);
+		m_attack_res = data;
 
 		log_attack_time();
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1738,29 +1510,19 @@ void sn76477_device::attack_res_w(double data)
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_decay_res_w(double data)
-{
-	m_decay_res = data;
-}
-
-
 void sn76477_device::decay_res_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_POSITIVE;
+	CHECK_POSITIVE;
 
 	if (data != m_decay_res)
 	{
 		m_channel->update();
 
-		_SN76477_decay_res_w(data);
+		m_decay_res = data;
 
 		log_decay_time();
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1768,30 +1530,20 @@ void sn76477_device::decay_res_w(double data)
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_attack_decay_cap_w(double data)
-{
-	m_attack_decay_cap = data;
-}
-
-
 void sn76477_device::attack_decay_cap_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_POSITIVE;
+	CHECK_POSITIVE;
 
 	if (data != m_attack_decay_cap)
 	{
 		m_channel->update();
 
-		_SN76477_attack_decay_cap_w(data);
+		m_attack_decay_cap = data;
 
 		log_attack_time();
 		log_decay_time();
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1801,8 +1553,7 @@ void sn76477_device::attack_decay_cap_w(double data)
 
 void sn76477_device::attack_decay_cap_voltage_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_CAP_VOLTAGE;
+	CHECK_CAP_VOLTAGE;
 
 	if (data == SN76477_EXTERNAL_VOLTAGE_DISCONNECT)
 	{
@@ -1831,10 +1582,7 @@ void sn76477_device::attack_decay_cap_voltage_w(double data)
 			log_decay_time();
 		}
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1842,29 +1590,19 @@ void sn76477_device::attack_decay_cap_voltage_w(double data)
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_amplitude_res_w(double data)
-{
-	m_amplitude_res = data;
-}
-
-
 void sn76477_device::amplitude_res_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_POSITIVE;
+	CHECK_POSITIVE;
 
 	if (data != m_amplitude_res)
 	{
 		m_channel->update();
 
-		_SN76477_amplitude_res_w(data);
+		m_amplitude_res = data;
 
 		log_voltage_out();
 	}
-#endif
 }
-
-
 
 /*****************************************************************************
  *
@@ -1872,28 +1610,19 @@ void sn76477_device::amplitude_res_w(double data)
  *
  *****************************************************************************/
 
-void sn76477_device::_SN76477_feedback_res_w(double data)
-{
-	m_feedback_res = data;
-}
-
-
 void sn76477_device::feedback_res_w(double data)
 {
-#if TEST_MODE == 0
-	CHECK_CHIP_NUM_AND_POSITIVE;
+	CHECK_POSITIVE;
 
 	if (data != m_feedback_res)
 	{
 		m_channel->update();
 
-		_SN76477_feedback_res_w(data);
+		m_feedback_res = data;
 
 		log_voltage_out();
 	}
-#endif
 }
-
 
 /*****************************************************************************
  *
@@ -1981,21 +1710,6 @@ void sn76477_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	double center_to_peak_voltage_out;
 
 	stream_sample_t *buffer = outputs[0];
-
-
-#if TEST_MODE
-	static int recursing = 0;   /* we need to prevent recursion since enable_w calls machine().input().code_pressed_once(KEYCODE_SPACE->update */
-
-	if () && !recursing)
-	{
-		recursing = 1;
-
-		machine().sound().system_enable();
-		SN76477_test_enable_w(!m_enable);
-	}
-
-	recursing = 0;
-#endif
 
 	/* compute charging values, doing it here ensures that we always use the latest values */
 	one_shot_cap_charging_step = compute_one_shot_cap_charging_rate() / m_our_sample_rate;

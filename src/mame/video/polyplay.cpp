@@ -1,10 +1,13 @@
 // license:BSD-3-Clause
-// copyright-holders:James Wallace
-// thanks-to:Martin Buchholz,Juergen Oppermann,Volker Hann, Jan-Ole Christian
+// copyright-holders:Martin Buchholz
 /***************************************************************************
 
   Poly-Play
   (c) 1985 by VEB Polytechnik Karl-Marx-Stadt
+
+  video hardware
+
+  driver written by Martin Buchholz (buchholz@mail.uni-greifswald.de)
 
 ***************************************************************************/
 
@@ -16,6 +19,7 @@ PALETTE_INIT_MEMBER(polyplay_state, polyplay)
 {
 	palette.set_pen_color(0,rgb_t(0x00,0x00,0x00));
 	palette.set_pen_color(1,rgb_t(0xff,0xff,0xff));
+
 	palette.set_pen_color(2,rgb_t(0x00,0x00,0x00));
 	palette.set_pen_color(3,rgb_t(0xff,0x00,0x00));
 	palette.set_pen_color(4,rgb_t(0x00,0xff,0x00));
@@ -47,6 +51,7 @@ UINT32 polyplay_state::screen_update_polyplay(screen_device &screen, bitmap_ind1
 {
 	UINT8 *videoram = m_videoram;
 	offs_t offs;
+
 
 	for (offs = 0; offs < 0x800; offs++)
 	{

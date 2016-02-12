@@ -1349,7 +1349,7 @@ MACHINE_CONFIG_END
 
 ROM_START(pcw8256)
 	ROM_REGION(0x10000,"maincpu",0)
-	ROM_FILL(0x0000,0x10000,nullptr)                                           \
+	ROM_FILL(0x0000,0x10000,0x00)
 	ROM_REGION(0x400,"printer_mcu",0)  // i8041 9-pin dot-matrix
 	ROM_LOAD("40026.ic701", 0, 0x400, CRC(ee8890ae) SHA1(91679cc5e07464ac55ef9a10f7095b2438223332))
 	ROM_REGION(0x400,"keyboard_mcu",0) // i8048
@@ -1358,7 +1358,7 @@ ROM_END
 
 ROM_START(pcw8512)
 	ROM_REGION(0x10000,"maincpu",0)
-	ROM_FILL(0x0000,0x10000,nullptr)                                           \
+	ROM_FILL(0x0000,0x10000,0x00)
 	ROM_REGION(0x400,"printer_mcu",0)  // i8041 9-pin dot-matrix
 	ROM_LOAD("40026.ic701", 0, 0x400, CRC(ee8890ae) SHA1(91679cc5e07464ac55ef9a10f7095b2438223332))
 	ROM_REGION(0x400,"keyboard_mcu",0) // i8048
@@ -1367,7 +1367,7 @@ ROM_END
 
 ROM_START(pcw9256)
 	ROM_REGION(0x10000,"maincpu",0)
-	ROM_FILL(0x0000,0x10000,nullptr)                                           \
+	ROM_FILL(0x0000,0x10000,0x00)
 	ROM_REGION(0x2000,"printer_mcu",0) // i8041 9-pin dot-matrix
 	ROM_LOAD("40026.ic701", 0, 0x400, CRC(ee8890ae) SHA1(91679cc5e07464ac55ef9a10f7095b2438223332))
 	ROM_REGION(0x400,"keyboard_mcu",0) // i8048
@@ -1376,7 +1376,7 @@ ROM_END
 
 ROM_START(pcw9512)
 	ROM_REGION(0x10000,"maincpu",0)
-	ROM_FILL(0x0000,0x10000,nullptr)                                           \
+	ROM_FILL(0x0000,0x10000,0x00)
 	ROM_REGION(0x2000,"printer_mcu",0) // i8041 daisywheel (schematics say i8039?)
 	ROM_LOAD("40103.ic109", 0, 0x2000, CRC(a64d450a) SHA1(ebbf0ef19d39912c1c127c748514dd299915f88b))
 	ROM_REGION(0x400,"keyboard_mcu",0) // i8048
@@ -1385,7 +1385,7 @@ ROM_END
 
 ROM_START(pcw10)
 	ROM_REGION(0x10000,"maincpu",0)
-	ROM_FILL(0x0000,0x10000,nullptr)                                           \
+	ROM_FILL(0x0000,0x10000,0x00)
 	ROM_REGION(0x2000,"printer_mcu",0) // i8041 9-pin dot matrix
 	ROM_LOAD("40026.ic701", 0, 0x400, CRC(ee8890ae) SHA1(91679cc5e07464ac55ef9a10f7095b2438223332))
 	ROM_REGION(0x400,"keyboard_mcu",0) // i8048

@@ -59,7 +59,7 @@ Merit Riviera Notes - There are several known versions:
   Riviera Super Star (not dumped)
   Riviera Montana Version (with journal printer, not dumped)
   Riviera Tennessee Draw (not dumped)
-  Michigan Superstar Draw Poker (not dumped)
+  Michigan Super Draw Poker (Is there a "Superstar" version?)
   Americana
 
   There are several law suites over the Riviera games. Riviera Distributors Inc. bought earlier versions
@@ -422,6 +422,19 @@ static ADDRESS_MAP_START( bigappg_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( misdraw_map, AS_PROGRAM, 8, merit_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_SHARE("cpunvram") // overlays other NVRAM? or is it banked?
+	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write) // swapped compared to other set?
+	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("ravideo")
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( dodge_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("nvram")
@@ -589,6 +602,8 @@ static INPUT_PORTS_START( meritpoker )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW1:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW1:8" )
 INPUT_PORTS_END
+
+
 
 static INPUT_PORTS_START( bigappg )
 	PORT_INCLUDE( meritpoker )
@@ -1260,6 +1275,14 @@ static MACHINE_CONFIG_DERIVED( bigappg, pitboss )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( misdraw, bigappg )
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(misdraw_map)
+
+	MCFG_NVRAM_ADD_0FILL("cpunvram")
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( dodge, pitboss )
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -1477,6 +1500,23 @@ ROM_START( bigappg )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "haip_u40.u40", 0x0000, 0x2000, CRC(ac4983b8) SHA1(a552a15f813c331de67eaae2ed42cc037b26c5bd) )
+ROM_END
+
+ROM_START( misdraw )
+   ROM_REGION( 0x10000, "maincpu", 0 )
+   ROM_LOAD( "2131-16_u5-2.u5", 0x0000, 0x8000, CRC(fc756320) SHA1(6b810c57ed1be844a04a6081d727e182509604b4) ) /* 2131-16 U5-2 081889 */
+
+   ROM_REGION( 0x6000, "gfx1", 0 )
+   ROM_LOAD( "u39.u39", 0x0000, 0x2000, CRC(0f09d19b) SHA1(1f98559d5bad7c84d92ecea5a6df9429914a47f0) )
+   ROM_LOAD( "u38.u38", 0x2000, 0x2000, CRC(8210a48d) SHA1(9af3e8ac8dcf1e548c4ba3ca8096e48dbb3b4700) )
+   ROM_LOAD( "u37.u37", 0x4000, 0x2000, CRC(34ca07d5) SHA1(3656b3eb78dd6ea06cf323a08fc3f949a01b76a3) )
+
+   ROM_REGION( 0x2000, "gfx2", 0 )
+   ROM_LOAD( "haip_u40.u40", 0x0000, 0x2000, CRC(ac4983b8) SHA1(a552a15f813c331de67eaae2ed42cc037b26c5bd) )
+
+   ROM_REGION( 0x0800, "cpunvram", ROMREGION_ERASEFF )
+   // this contains CODE, the game jumps there on startup
+   ROM_LOAD( "crt-209_2131-16", 0x0000, 0x0800, CRC(34729437) SHA1(f097a1a97d8078d7d6a6af85be416b1d1d09c7f2) ) /* 2816 EEPROM in Z80 epoxy CPU module */
 ROM_END
 
 ROM_START( dodgectya )
@@ -2185,6 +2225,7 @@ GAME( 1986, rivieraa, riviera, dodge,    riviera,  driver_device,  0,   ROT0,  "
 GAME( 1986, rivierab, riviera, dodge,    rivierab, driver_device,  0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-2D)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1986, bigappg,  0,       bigappg,  bigappg,  driver_device,  0,   ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-13, U5-0)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, misdraw,  0,       misdraw,  bigappg,  driver_device,  0,   ROT0,  "Big Apple Games / Merit", "Michigan Super Draw (2131-16, U5-2)",   MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, dodgectya,dodgecty,dodge,    dodge,    driver_device,  0,   ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1986, dodgectyb,dodgecty,dodge,    dodge,    driver_device,  0,   ROT0,  "Merit", "Dodge City (2131-82, U5-50)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

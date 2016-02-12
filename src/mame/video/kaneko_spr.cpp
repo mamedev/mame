@@ -308,7 +308,7 @@ void kaneko16_sprite_device::kaneko16_draw_sprites_custom(_BitmapClass &dest_bmp
 			if (sizeof(*dest) == 2) rgb = 0;
 			else rgb = 1;
 
-			const pen_t *pal = gfx->palette()->pens();
+			const pen_t *pal = gfx->palette().pens();
 
 			for (int y = sy; y < ey; y++)
 			{
@@ -575,7 +575,7 @@ void kaneko16_sprite_device::kaneko16_copybitmap(bitmap_ind16 &bitmap, const rec
 
 void kaneko16_sprite_device::kaneko16_copybitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pal = m_gfxdecode->gfx(0)->palette()->pens();
+	const pen_t *pal = m_gfxdecode->gfx(0)->palette().pens();
 	UINT16* srcbitmap;
 	UINT32* dstbitmap;
 

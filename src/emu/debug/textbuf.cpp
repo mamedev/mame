@@ -86,12 +86,12 @@ text_buffer *text_buffer_alloc(UINT32 bytes, UINT32 lines)
 	text_buffer *text;
 
 	/* allocate memory for the text buffer object */
-	text = (text_buffer *)global_alloc(text_buffer);
+	text = global_alloc_nothrow(text_buffer);
 	if (!text)
 		return nullptr;
 
 	/* allocate memory for the buffer itself */
-	text->buffer = (char *)global_alloc_array(char, bytes);
+	text->buffer = global_alloc_array_nothrow(char, bytes);
 	if (!text->buffer)
 	{
 		global_free(text);
@@ -99,7 +99,7 @@ text_buffer *text_buffer_alloc(UINT32 bytes, UINT32 lines)
 	}
 
 	/* allocate memory for the lines array */
-	text->lineoffs = (INT32 *)global_alloc_array(INT32, lines);
+	text->lineoffs = global_alloc_array_nothrow(INT32, lines);
 	if (!text->lineoffs)
 	{
 		global_free_array(text->buffer);

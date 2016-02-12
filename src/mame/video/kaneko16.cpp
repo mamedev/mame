@@ -29,11 +29,11 @@ VIDEO_START_MEMBER(kaneko16_state,kaneko16)
    the times. To do it right, each pixel should be drawn with pen 0
    of the bottomost tile that covers it (which is pretty tricky to do) */
 template<class _BitmapClass>
-void kaneko16_state::kaneko16_fill_bitmap(palette_device* palette, _BitmapClass &bitmap, const rectangle &cliprect)
+void kaneko16_state::kaneko16_fill_bitmap(_BitmapClass &bitmap, const rectangle &cliprect)
 {
 	int pen = 0;
 
-	if (m_kaneko_spr)
+	if (m_kaneko_spr.found())
 	{
 		if (m_kaneko_spr->get_sprite_type() == 1)
 		{
@@ -49,7 +49,7 @@ void kaneko16_state::kaneko16_fill_bitmap(palette_device* palette, _BitmapClass 
 	}
 	else
 	{
-		const pen_t *pal = palette->pens();
+		const pen_t *pal = m_palette->pens();
 		bitmap.fill(pal[pen], cliprect);
 	}
 }
@@ -82,7 +82,7 @@ UINT32 kaneko16_state::screen_update_common(screen_device &screen, _BitmapClass 
 
 UINT32 kaneko16_state::screen_update_kaneko16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	kaneko16_fill_bitmap(m_palette, bitmap,cliprect);
+	kaneko16_fill_bitmap(bitmap,cliprect);
 
 	// if the display is disabled, do nothing?
 	if (!m_disp_enable) return 0;

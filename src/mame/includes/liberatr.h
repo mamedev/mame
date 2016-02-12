@@ -7,14 +7,18 @@
 *************************************************************************/
 
 #include "cpu/m6502/m6502.h"
-#include "machine/atarigen.h"
+#include "machine/er2055.h"
 #include "sound/pokey.h"
 
-class liberatr_state : public atarigen_state
+class liberatr_state : public driver_device
 {
 public:
 	liberatr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),
+			m_earom(*this, "earom"),
+			m_earom_data(0),
+			m_earom_control(0),
+			m_screen(*this, "screen"),
 			m_base_ram(*this, "base_ram"),
 			m_planet_frame(*this, "planet_frame"),
 			m_planet_select(*this, "planet_select"),
@@ -35,11 +39,20 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	// early raster EAROM interface
+	DECLARE_READ8_MEMBER( earom_r );
+	DECLARE_WRITE8_MEMBER( earom_w );
+	DECLARE_WRITE8_MEMBER( earom_control_w );
+
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	virtual void update_interrupts() override { }
+	// vector and early raster EAROM interface
+	required_device<er2055_device> m_earom;
+	UINT8               m_earom_data;
+	UINT8               m_earom_control;
 
 	struct planet;
 
@@ -48,6 +61,7 @@ protected:
 	void draw_planet(bitmap_rgb32 &bitmap, pen_t *pens);
 	void draw_bitmap(bitmap_rgb32 &bitmap, pen_t *pens);
 
+	required_device<screen_device> m_screen;
 	required_shared_ptr<UINT8> m_base_ram;
 	required_shared_ptr<UINT8> m_planet_frame;
 	required_shared_ptr<UINT8> m_planet_select;

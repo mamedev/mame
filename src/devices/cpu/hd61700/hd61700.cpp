@@ -2654,7 +2654,7 @@ void hd61700_cpu_device::execute_run()
 		}
 
 		//if is in the internal ROM align the pc
-		if ((m_fetch_addr&1) && m_pc < INT_ROM)
+		if (!WORD_ALIGNED(m_fetch_addr) && m_pc < INT_ROM)
 			set_pc((m_fetch_addr+1)>>1);
 
 		m_icount -= 3;
@@ -2871,7 +2871,7 @@ inline void hd61700_cpu_device::check_optional_jr(UINT8 arg)
 {
 	if (arg & 0x80)
 	{
-		if (m_pc < INT_ROM && !(m_fetch_addr&1)) read_op();
+		if (m_pc < INT_ROM && WORD_ALIGNED(m_fetch_addr)) read_op();
 
 		UINT8 arg1 = read_op();
 

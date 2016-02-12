@@ -1,0 +1,55 @@
+version: '{build}'
+
+configuration:
+  - Static Debug
+  - Static Release
+#  - Shared Debug
+#  - Shared Release
+
+platform:
+  - x86
+  - x64
+
+environment:
+  matrix:
+    - compiler: gcc-4.9.2-posix
+#    - compiler: gcc-4.8.4-posix
+#    - compiler: msvc-12-seh
+
+install:
+  # derive some extra information
+  - for /f "tokens=1-2" %%a in ("%configuration%") do (@set "linkage=%%a")
+  - for /f "tokens=1-2" %%a in ("%configuration%") do (@set "variant=%%b")
+  - if "%linkage%"=="Shared" (set shared=YES) else (set shared=NO)
+  - for /f "tokens=1-3 delims=-" %%a in ("%compiler%") do (@set "compiler_name=%%a")
+  - for /f "tokens=1-3 delims=-" %%a in ("%compiler%") do (@set "compiler_version=%%b")
+  - for /f "tokens=1-3 delims=-" %%a in ("%compiler%") do (@set "compiler_threading=%%c")
+  - if "%platform%"=="x64" (set arch=x86_64)
+  - if "%platform%"=="x86" (set arch=i686)
+  # download the specific version of MinGW
+  - if "%compiler_name%"=="gcc" (for /f %%a in ('python mingw.py --quiet --version "%compiler_version%" --arch "%arch%" --threading "%compiler_threading%" --location "C:\mingw-builds"') do @set "compiler_path=%%a")
+
+before_build:
+  # Set up mingw commands
+  - if "%compiler_name%"=="gcc" (set "generator=MinGW Makefiles")
+  - if "%compiler_name%"=="gcc" (set "build=mingw32-make -j4")
+  - if "%compiler_name%"=="gcc" (set "test=mingw32-make CTEST_OUTPUT_ON_FAILURE=1 test")
+  # msvc specific commands
+  # TODO :)
+  # add the compiler path if needed
+  - if not "%compiler_path%"=="" (set "PATH=%PATH%;%compiler_path%")
+  # git bash conflicts with MinGW makefiles
+  - if "%generator%"=="MinGW Makefiles" (set "PATH=%PATH:C:\Program Files (x86)\Git\bin=%")
+
+build_script:
+  - cmake -G "%generator%" "-DCMAKE_BUILD_TYPE=%variant%" "-DBUILD_SHARED_LIBS=%shared%"
+  - cmd /c "%build%"
+
+test_script:
+  - cmd /c "%test%"
+
+matrix:
+  fast_finish: true
+
+cache:
+  - C:\mingw-builds

@@ -3,7 +3,6 @@
 
 defines {
 	"OSD_WINDOWS",
-	"_WIN32_WINNT=0x0501",
 }
 
 configuration { "mingw*-gcc or vs*" }
@@ -24,6 +23,23 @@ configuration { "vs*" }
 	}
 
 configuration { }
+
+if not _OPTIONS["MODERN_WIN_API"] then
+	_OPTIONS["MODERN_WIN_API"] = "0"
+end
+
+if _OPTIONS["MODERN_WIN_API"]=="1" then
+	defines {
+		"WINVER=0x0602",
+		"_WIN32_WINNT=0x0602",
+		"NTDDI_VERSION=0x06030000",
+		"MODERN_WIN_API",
+	}
+else
+	defines {
+		"_WIN32_WINNT=0x0501",
+	}
+end
 
 if not _OPTIONS["DONT_USE_NETWORK"] then
 	defines {

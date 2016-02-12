@@ -12,7 +12,7 @@ It is not Y2K compliant.
 
 Rough cpanel sketch:
 
-    [LED-array dispay]          1  2  3  M
+    [LED-array display]         1  2  3  M
                                 4  5  6  F
                                 7  8  9  0
                                 CLEAR ENTER
@@ -235,7 +235,7 @@ static INPUT_PORTS_START( destiny )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, destiny_state, coin_inserted, (void *)nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, destiny_state, coin_inserted, (void *)0)
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CHANGED_MEMBER(DEVICE_SELF, destiny_state, coin_inserted, (void *)1)

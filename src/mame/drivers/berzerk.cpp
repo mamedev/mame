@@ -15,7 +15,7 @@
 #include "audio/exidy.h"
 #include "machine/74181.h"
 #include "machine/nvram.h"
-#include "sound/s14001a_new.h"
+#include "sound/s14001a.h"
 #include "video/resnet.h"
 
 
@@ -35,7 +35,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<s14001a_new_device> m_s14001a;
+	required_device<s14001a_device> m_s14001a;
 	required_device<ttl74181_device> m_ls181_10c;
 	required_device<ttl74181_device> m_ls181_12c;
 	required_device<exidy_sound_device> m_custom;
@@ -1120,7 +1120,7 @@ static MACHINE_CONFIG_START( berzerk, berzerk_state )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("speech", S14001A_NEW, S14001_CLOCK/16/8) /* placeholder - the clock is software controllable */
+	MCFG_SOUND_ADD("speech", S14001A, S14001_CLOCK/16/8) /* placeholder - the clock is software controllable */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_ADD("exidy", EXIDY, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)

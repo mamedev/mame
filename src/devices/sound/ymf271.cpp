@@ -1706,8 +1706,8 @@ void ymf271_device::device_start()
 	m_timA = timer_alloc(0);
 	m_timB = timer_alloc(1);
 
-	m_mem_base = region()->base();
-	m_mem_size = region()->bytes();
+	m_mem_size = m_mem_base.bytes();
+
 	m_irq_handler.resolve();
 
 	m_ext_read_handler.resolve();
@@ -1747,19 +1747,26 @@ void ymf271_device::device_reset()
 const device_type YMF271 = &device_creator<ymf271_device>;
 
 ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, YMF271, "YMF271", tag, owner, clock, "ymf271", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_timerA(0),
-		m_timerB(0),
-		m_irqstate(0),
-		m_status(0),
-		m_enable(0),
-		m_ext_address(0),
-		m_ext_rw(0),
-		m_ext_readlatch(0),
-		m_irq_handler(*this),
-		m_ext_read_handler(*this),
-		m_ext_write_handler(*this)
+	: device_t(mconfig, YMF271, "YMF271", tag, owner, clock, "ymf271", __FILE__)
+	, device_sound_interface(mconfig, *this)
+	, m_timerA(0)
+	, m_timerB(0)
+	, m_irqstate(0)
+	, m_status(0)
+	, m_enable(0)
+	, m_ext_address(0)
+	, m_ext_rw(0)
+	, m_ext_readlatch(0)
+	, m_mem_base(*this, DEVICE_SELF)
+	, m_mem_size(0)
+	, m_clock(0)
+	, m_timA(nullptr)
+	, m_timB(nullptr)
+	, m_stream(nullptr)
+	, m_mix_buffer(nullptr)
+	, m_irq_handler(*this)
+	, m_ext_read_handler(*this)
+	, m_ext_write_handler(*this)
 {
 	memset(m_slots, 0, sizeof(m_slots));
 	memset(m_groups, 0, sizeof(m_groups));

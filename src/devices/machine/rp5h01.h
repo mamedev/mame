@@ -52,6 +52,7 @@ protected:
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
 private:
 	// internal state
 	int m_counter;
@@ -60,6 +61,7 @@ private:
 	int m_old_reset;      /* reset pin state (level-triggered) */
 	int m_old_clock;      /* clock pin state (level-triggered) */
 	const UINT8 *m_data;
+	optional_region_ptr<UINT8> m_rom_ptr;
 };
 
 extern const device_type RP5H01;

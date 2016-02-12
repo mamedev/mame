@@ -1368,7 +1368,7 @@ void taitotz_renderer::push_tnl_fifo(UINT32 data)
 		UINT32 alpha = m_tnl_fifo[2];
 		render_tnl_object(m_tnl_fifo[0] & 0x1fffff, scale, alpha);
 
-//		printf("TNL FIFO: %08X, %f, %08X, %08X\n", m_tnl_fifo[0], u2f(m_tnl_fifo[1]), m_tnl_fifo[2], m_tnl_fifo[3]);
+//      printf("TNL FIFO: %08X, %f, %08X, %08X\n", m_tnl_fifo[0], u2f(m_tnl_fifo[1]), m_tnl_fifo[2], m_tnl_fifo[3]);
 		m_tnl_fifo_ptr = 0;
 	}
 }
@@ -1382,7 +1382,7 @@ void taitotz_renderer::push_direct_poly_fifo(UINT32 data)
 	int expected_size;
 	switch ((m_direct_fifo[0] >> 8) & 0x7)
 	{
-		case 0: expected_size = 24; break;		
+		case 0: expected_size = 24; break;
 		case 2: expected_size = 16; break;
 		case 3: expected_size = 24; break;
 		case 4: expected_size = 24; break;
@@ -1650,7 +1650,7 @@ READ64_MEMBER(taitotz_state::video_chip_r)
 		{
 			case 0x14:
 				{
-					r |= 0xff;		// more busy flags? (value & 0x11ff == 0xff expected)
+					r |= 0xff;      // more busy flags? (value & 0x11ff == 0xff expected)
 					break;
 				}
 
@@ -2612,8 +2612,8 @@ void taitotz_state::init_taitotz_152()
 //  rom[(0x2c620^4)/4] = 0x48000014;    // ID check skip (not needed with correct serial number)
 
 #if 0
-	rom[(0x2c164^4)/4] = 0x39600001;		// enable game debug output
-	rom[(0x2c174^4)/4] = 0x39200001;		// enable game debug output
+	rom[(0x2c164^4)/4] = 0x39600001;        // enable game debug output
+	rom[(0x2c174^4)/4] = 0x39200001;        // enable game debug output
 	rom[(0x2c978^4)/4] = 0x48000028;
 #endif
 }
@@ -2751,9 +2751,9 @@ Logical Cylinders 14,848
 Logical Sectors/Track 63
 Physical Heads 6
 Physical Disks 3
-Sectors Per Drive 8,418,816	
-Average Seek Time  10.0 ms (read)	
-Buffer Size 	128K
+Sectors Per Drive 8,418,816
+Average Seek Time  10.0 ms (read)
+Buffer Size     128K
 
 */
 

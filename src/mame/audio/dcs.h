@@ -165,6 +165,10 @@ protected:
 	UINT32      m_sounddata_banks;
 	UINT16      m_sounddata_bank;
 
+	optional_memory_bank    m_data_bank;
+	memory_bank *           m_rom_page;
+	memory_bank *           m_dram_page;
+
 	/* I/O with the host */
 	UINT8       m_auto_ack;
 	UINT16      m_latch_control;

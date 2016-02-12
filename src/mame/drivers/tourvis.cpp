@@ -24,7 +24,7 @@
     Ballistix
     Be Ball
     Bomberman
-    Chōzetsurinjin Beraboh Man (Super Foolish Man)
+    Chozetsurinjin Beraboh Man (Super Foolish Man)
     Chuka Taisen
     Columns
     Coryoon
@@ -471,7 +471,7 @@ ROM_END
 
 
 
-/* 1943 Kai */ 
+/* 1943 Kai */
 ROM_START(tv1943)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_1943_kia.bin", 0x00000, 0x100000, CRC(de4672ab) SHA1(2da1ee082bfb920c632a95014208f11fb48c58e1) )
@@ -479,7 +479,7 @@ ROM_START(tv1943)
 	TOURVISION_BIOS
 ROM_END
 
-/* Aero Blasters - Hudson / Kaneko */ 
+/* Aero Blasters - Hudson / Kaneko */
 ROM_START(tvablast)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_ablast.bin", 0x00000, 0x100000, CRC(9302f6d0) SHA1(76ef27a6d639514ed261b9d65f37217f2989d1c0) )
@@ -487,7 +487,7 @@ ROM_START(tvablast)
 	TOURVISION_BIOS
 ROM_END
 
-/* After Burner */ 
+/* After Burner */
 ROM_START(tvaburn)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_afterburner.bin", 0x00000, 0x100000, CRC(5ce31322) SHA1(08918d443891bd70f1b0b0c739522b764b16bc96) )
@@ -495,7 +495,7 @@ ROM_START(tvaburn)
 	TOURVISION_BIOS
 ROM_END
 
-/* Armed-F */ 
+/* Armed-F */
 ROM_START(tvarmedf)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_armed-f.bin", 0x00000, 0x100000, CRC(056617f5) SHA1(d10eb80b8436b8d217170309647104181cca750a) )
@@ -503,7 +503,7 @@ ROM_START(tvarmedf)
 	TOURVISION_BIOS
 ROM_END
 
-/* Ballistix */ 
+/* Ballistix */
 ROM_START(tvbalstx)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_ballistix.bin", 0x00000, 0x100000, CRC(9d32ed98) SHA1(404cc3695940a7fdc802ac166ec564a858a894d0) )
@@ -511,7 +511,7 @@ ROM_START(tvbalstx)
 	TOURVISION_BIOS
 ROM_END
 
-/* Be Ball */ 
+/* Be Ball */
 ROM_START(tvbeball)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_be_ball.bin", 0x00000, 0x100000, CRC(4b1e2861) SHA1(bea449543284bb6f4b33b1fb4156cd18a782ad6a) )
@@ -519,7 +519,7 @@ ROM_START(tvbeball)
 	TOURVISION_BIOS
 ROM_END
 
-/* Bomberman */ 
+/* Bomberman */
 ROM_START(tvbomber)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_bomberman.bin", 0x00000, 0x100000, CRC(cfcabe78) SHA1(bdd1766fad43c6c76e1b0d6e8b4f0ba3363442d6) )
@@ -527,7 +527,7 @@ ROM_START(tvbomber)
 	TOURVISION_BIOS
 ROM_END
 
-/* Chōzetsurinjin Beraboh Man (Super Foolist Man) */ 
+/* Chozetsurinjin Beraboh Man (Super Foolist Man) */
 ROM_START(tvbrabho)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_chozetsurinjin_beraboh_man.bin", 0x00000, 0x100000, CRC(1f80cf04) SHA1(121bfb9ba4de4d047b08442d900b7f351210dd48) )
@@ -535,7 +535,7 @@ ROM_START(tvbrabho)
 	TOURVISION_BIOS
 ROM_END
 
-/* Chuka Taisen */ 
+/* Chuka Taisen */
 ROM_START(tvtaisen)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_chuka_taisen.bin", 0x00000, 0x100000, CRC(3b9e9185) SHA1(96f9f82a9fa6ee2b92c0294e71d47886e27fdc06) )
@@ -551,7 +551,7 @@ ROM_START(tvcolumn)
 	TOURVISION_BIOS
 ROM_END
 
-/* Coryoon */ 
+/* Coryoon */
 ROM_START(tvcoryon)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_corycoon.bin", 0x00000, 0x100000, CRC(c377db91) SHA1(1585d886f775ed361b2558839e544660533e9297) )
@@ -559,7 +559,7 @@ ROM_START(tvcoryon)
 	TOURVISION_BIOS
 ROM_END
 
-/* Daisenpu */ 
+/* Daisenpu */
 ROM_START(tvdsenpu)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_daisenpu.bin", 0x00000, 0x100000, CRC(5a8cef75) SHA1(00f27127114e4f5bf69c81212e66948caaec755d) )
@@ -567,7 +567,7 @@ ROM_START(tvdsenpu)
 	TOURVISION_BIOS
 ROM_END
 
-/* Dead Moon */ 
+/* Dead Moon */
 ROM_START(tvdmoon)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_dead_moon.bin", 0x00000, 0x100000, CRC(b54793c1) SHA1(8899947092d9a02f3be61ac9c293642e83a015ec) )
@@ -575,7 +575,7 @@ ROM_START(tvdmoon)
 	TOURVISION_BIOS
 ROM_END
 
-/* Devil Crash */ 
+/* Devil Crash */
 ROM_START(tvdevilc)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_devil_crash.bin", 0x00000, 0x100000, CRC(c163e5c1) SHA1(2134b3943df87af556694dbe6c77b30723f9175a) )
@@ -583,7 +583,7 @@ ROM_START(tvdevilc)
 	TOURVISION_BIOS
 ROM_END
 
-/* Dodge Ball */ 
+/* Dodge Ball */
 ROM_START(tvdodgeb)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_dodge_ball.bin", 0x00000, 0x100000, CRC(7a12cf72) SHA1(c477bc5dae4e82a89766052f185afb73ca2234f3) )
@@ -591,7 +591,7 @@ ROM_START(tvdodgeb)
 	TOURVISION_BIOS
 ROM_END
 
-/* Doraemon Meikyuu Daisakusen */ 
+/* Doraemon Meikyuu Daisakusen */
 ROM_START(tvdormon)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_doreamon.bin", 0x00000, 0x100000, CRC(22e8b5ba) SHA1(f21101358df8625c39a5078b9f1b1a0215470bed) )
@@ -599,7 +599,7 @@ ROM_START(tvdormon)
 	TOURVISION_BIOS
 ROM_END
 
-/* Dragon Spirit */ 
+/* Dragon Spirit */
 ROM_START(tvdrgnst)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_dragon_spirit.bin", 0x00000, 0x100000, CRC(5733951f) SHA1(0256b4c343a3ad1ca625c316a470cc91a5254e8e) )
@@ -620,7 +620,7 @@ ROM_START(tvdunexp)
 	TOURVISION_BIOS
 ROM_END
 
-/* Final Blaster */ 
+/* Final Blaster */
 ROM_START(tvfblast)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_final_blaster.bin", 0x00000, 0x100000, CRC(f5f7483c) SHA1(3933719bdd7a0c73cdad76de78d80463112b475a) )
@@ -636,7 +636,7 @@ ROM_START(tvflaptw)
 	TOURVISION_BIOS
 ROM_END
 
-/* Final Match Tennis */ 
+/* Final Match Tennis */
 ROM_START(tvftenis)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_final_match_tennis.bin", 0x00000, 0x100000, CRC(f83ed70f) SHA1(f566bd7a806c11f3d33ba0a976e36026a131e6fd) )
@@ -660,7 +660,7 @@ ROM_START(tvgomola)
 	TOURVISION_BIOS
 ROM_END
 
-/* Gunhed */ 
+/* Gunhed */
 ROM_START(tvgunhed)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_gunhed.bin", 0x00000, 0x100000, CRC(9baace99) SHA1(ab676ba72a80314e8cba3810789041d3cc6298f9) )
@@ -668,7 +668,7 @@ ROM_START(tvgunhed)
 	TOURVISION_BIOS
 ROM_END
 
-/* Hana Taka Daka (Super Long Nose Goblin) */ 
+/* Hana Taka Daka (Super Long Nose Goblin) */
 ROM_START(tvhtdaka)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_hana_taka_daka.bin", 0x00000, 0x100000, CRC(0fbfda5c) SHA1(02b2ce93ee5e2aaa11c8640ced15258d0d844e6f) )
@@ -684,7 +684,7 @@ ROM_START(tvjchan)
 	TOURVISION_BIOS
 ROM_END
 
-/* jinmu Densho */ 
+/* jinmu Densho */
 ROM_START(tvdensho)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_dinmu_densho.bin", 0x00000, 0x100000, CRC(411a8643) SHA1(46258042dcf6510404ebccaf47034421928f72a8) )
@@ -692,7 +692,7 @@ ROM_START(tvdensho)
 	TOURVISION_BIOS
 ROM_END
 
-/* Kiki Kaikai */ 
+/* Kiki Kaikai */
 ROM_START(tvkaikai)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_kiki_kaikai.bin", 0x00000, 0x100000, CRC(2bdd93f9) SHA1(9b08606865abb8cc8fa17a22becae34b172ff81a) )
@@ -700,7 +700,7 @@ ROM_START(tvkaikai)
 	TOURVISION_BIOS
 ROM_END
 
-/* Ledgnd of Hero Tonma */ 
+/* Ledgnd of Hero Tonma */
 ROM_START(tvtonma)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_legend_of_hero_tonma.bin", 0x00000, 0x100000, CRC(e7c2efe3) SHA1(5767bdfa5600b1586e49c17cebd0fd7ef2c5426c) )
@@ -716,7 +716,7 @@ ROM_START(tvlegaxe)
 	TOURVISION_BIOS
 ROM_END
 
-/* Mizubaku Daibouken Liquid Kids */ 
+/* Mizubaku Daibouken Liquid Kids */
 ROM_START(tvlqkids)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_liquid_kids.bin", 0x00000, 0x100000, CRC(23a8636d) SHA1(752e03dcf8617b5a39cd250f4db1fe13cd13b761) )
@@ -724,7 +724,7 @@ ROM_START(tvlqkids)
 	TOURVISION_BIOS
 ROM_END
 
-/* Mr Heli */ 
+/* Mr Heli */
 ROM_START(tvmrheli)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_mr_heli.bin", 0x00000, 0x100000, CRC(bf197c7a) SHA1(048f91f8ab86220a39ab146e531081950eaf1138) )
@@ -732,7 +732,7 @@ ROM_START(tvmrheli)
 	TOURVISION_BIOS
 ROM_END
 
-/* Ninja Ryukenden */ 
+/* Ninja Ryukenden */
 ROM_START(tvninjar)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_ninja_ryukenden.bin", 0x00000, 0x100000, CRC(d9cc00ca) SHA1(42d914d338d7d0073b5cc98a4e85729e86bbfad1) )
@@ -740,7 +740,7 @@ ROM_START(tvninjar)
 	TOURVISION_BIOS
 ROM_END
 
-/* Operation Wolf */ 
+/* Operation Wolf */
 ROM_START(tvopwolf)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_operation_wolf.bin", 0x00000, 0x100000, CRC(d4a755a9) SHA1(cd236ba0c3439ba2356cb270f56a41a52e0d6dc6) )
@@ -748,7 +748,7 @@ ROM_START(tvopwolf)
 	TOURVISION_BIOS
 ROM_END
 
-/* Override */ 
+/* Override */
 ROM_START(tvovride)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_override.bin", 0x00000, 0x100000, CRC(4dbbf4ef) SHA1(180a68f87a881db1d01ffa3566e0d2e28303d09e) )
@@ -756,7 +756,7 @@ ROM_START(tvovride)
 	TOURVISION_BIOS
 ROM_END
 
-/* Pac-Land */ 
+/* Pac-Land */
 ROM_START(tvpaclnd)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_pac-land.bin", 0x00000, 0x100000, CRC(32aee4e2) SHA1(900a918e73aaa1dc5752f851ebd85217e736109b) )
@@ -764,7 +764,7 @@ ROM_START(tvpaclnd)
 	TOURVISION_BIOS
 ROM_END
 
-/* PC Genjin Punkic Cyborg */ 
+/* PC Genjin Punkic Cyborg */
 ROM_START(tvpcybrg)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_pc_genijin_punkic_cyborg.bin", 0x00000, 0x100000, CRC(5dfdc8fd) SHA1(e4e263cf7c102837c7d669d27894085f3369dd9b) )
@@ -788,7 +788,7 @@ ROM_START(tvpow11)
 	TOURVISION_BIOS
 ROM_END
 
-/* Power Drift */ 
+/* Power Drift */
 ROM_START(tvpdrift)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_power_drift.bin", 0x00000, 0x100000, CRC(eb2fdf0b) SHA1(da2191dd6e9d186c10c1c4d415254b8d7c456159) )
@@ -811,7 +811,7 @@ ROM_START(tvpwlg4)
 	TOURVISION_BIOS
 ROM_END
 
-/* Pro Yakyuu World Stadium '91 */ 
+/* Pro Yakyuu World Stadium '91 */
 ROM_START(tvpros91)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_pro_yakyuu_world_stadium_91.bin", 0x00000, 0x100000, CRC(2a5f1283) SHA1(e5044e397e6ccbc5c5741fa3f073697b60116325) )
@@ -819,7 +819,7 @@ ROM_START(tvpros91)
 	TOURVISION_BIOS
 ROM_END
 
-/* Psycho Chaser */ 
+/* Psycho Chaser */
 ROM_START(tvpchasr)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_pyscho_chaser.bin", 0x00000, 0x100000, CRC(e0b65280) SHA1(83248975e9bea62e67b5314c663d372c12b08416) )
@@ -827,7 +827,7 @@ ROM_START(tvpchasr)
 	TOURVISION_BIOS
 ROM_END
 
-/* Puzzle Boy */ 
+/* Puzzle Boy */
 ROM_START(tvpzlboy)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_puzzle_boy.bin", 0x00000, 0x100000, CRC(0dd96cda) SHA1(652ce8b06f2aef69698d4372ff67b86362655de5) )
@@ -835,7 +835,7 @@ ROM_START(tvpzlboy)
 	TOURVISION_BIOS
 ROM_END
 
-/* Raiden */ 
+/* Raiden */
 ROM_START(tvraiden)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_raiden.bin", 0x00000, 0x100000, CRC(b99a85b6) SHA1(5c8b103c5a7bfeba20dcc490204d672b55e36452) )
@@ -856,7 +856,7 @@ ROM_START(tvrs2)
 	TOURVISION_BIOS
 ROM_END
 
-/* R-Type II */ 
+/* R-Type II */
 ROM_START(tvrtype2)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_r-type_ii.bin", 0x00000, 0x100000, CRC(b03bfd7a) SHA1(cc8cec1fc4bae3937d0ed60468ff703d07ce9d0c) )
@@ -864,7 +864,7 @@ ROM_START(tvrtype2)
 	TOURVISION_BIOS
 ROM_END
 
-/* Saiga No Nindou - Ninja Spirit */ 
+/* Saiga No Nindou - Ninja Spirit */
 ROM_START(tvninjas)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_saiga_no_nindou.bin", 0x00000, 0x100000, CRC(87894514) SHA1(6845c29247f9dd805b7cd8cb046e88526e853a11) )
@@ -872,7 +872,7 @@ ROM_START(tvninjas)
 	TOURVISION_BIOS
 ROM_END
 
-/* Salamander */ 
+/* Salamander */
 ROM_START(tvslmndr)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_salamander.bin", 0x00000, 0x100000, CRC(ae8bcdf1) SHA1(3cc48fa594ab5ce1573c61861ec8e927163b6abb) )
@@ -880,7 +880,7 @@ ROM_START(tvslmndr)
 	TOURVISION_BIOS
 ROM_END
 
-/* Shinobi */ 
+/* Shinobi */
 ROM_START(tvshnobi)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_shinobi.bin", 0x00000, 0x100000, CRC(091a2b01) SHA1(aac2d5fadc74f837b73f662456f8a308413de57a) )
@@ -888,7 +888,7 @@ ROM_START(tvshnobi)
 	TOURVISION_BIOS
 ROM_END
 
-/* Side arms */ 
+/* Side arms */
 ROM_START(tvsdarms)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_side_arms.bin", 0x00000, 0x100000, CRC(04256267) SHA1(a4ff8f19fa528fc8a7aae5ad7e0c574dc52c3388) )
@@ -896,7 +896,7 @@ ROM_START(tvsdarms)
 	TOURVISION_BIOS
 ROM_END
 
-/* Skweek */ 
+/* Skweek */
 ROM_START(tvskweek)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_skweek.bin", 0x00000, 0x100000, CRC(b2a86ecc) SHA1(c1b113132ca6be1b0f3f16f31cc5ba894bee7e91) )
@@ -904,7 +904,7 @@ ROM_START(tvskweek)
 	TOURVISION_BIOS
 ROM_END
 
-/* Son Son II */ 
+/* Son Son II */
 ROM_START(tvsson2)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_son_son_ii.bin", 0x00000, 0x100000, CRC(8fb484cd) SHA1(553838dcb3524fe0b620ea60e926a57cc371068d) )
@@ -943,7 +943,7 @@ ROM_START(tvsvball)
 	TOURVISION_BIOS
 ROM_END
 
-/* Tatsujin */ 
+/* Tatsujin */
 ROM_START(tvtsujin)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_tatsujin.bin", 0x00000, 0x100000, CRC(023adbcc) SHA1(bef7d03fff2e74970a0747c12d31ec8661703deb) )
@@ -951,7 +951,7 @@ ROM_START(tvtsujin)
 	TOURVISION_BIOS
 ROM_END
 
-/* Terra Cresta II */ 
+/* Terra Cresta II */
 ROM_START(tvtcrst2)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_terra_cresta_ii.bin", 0x00000, 0x100000, CRC(8e7bb390) SHA1(af13afe006313b0db1273782c977efdad6100291) )
@@ -974,7 +974,7 @@ ROM_START(tvthbld)
 	TOURVISION_BIOS
 ROM_END
 
-/* Toy Shop Boys */ 
+/* Toy Shop Boys */
 ROM_START(tvtsboys)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_toy_shop_boys.bin", 0x00000, 0x100000, CRC(a9ed3440) SHA1(c519744cc16dad7a1455e359020ce95f4ac0b51a) )
@@ -997,7 +997,7 @@ ROM_START(tvusapb)
 	TOURVISION_BIOS
 ROM_END
 
-/* Veigues */ 
+/* Veigues */
 ROM_START(tveigues)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_veigues.bin", 0x00000, 0x100000, CRC(64ef8be7) SHA1(634191a181cbccbed8cf7a86e4f074691ba9b715) )
@@ -1013,7 +1013,7 @@ ROM_START(tvvolfd)
 	TOURVISION_BIOS
 ROM_END
 
-/* Winning Shot */ 
+/* Winning Shot */
 ROM_START(tvwnshot)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_winning_shot.bin", 0x00000, 0x100000, CRC(7196b2ca) SHA1(a1ae2e875541ad39751a95629d614d2c913b8c02) )
@@ -1021,7 +1021,7 @@ ROM_START(tvwnshot)
 	TOURVISION_BIOS
 ROM_END
 
-/* W-Ring */ 
+/* W-Ring */
 ROM_START(tvwring)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_w-ring.bin", 0x00000, 0x100000, CRC(609dc08d) SHA1(191b8751fc5b8700c7d9dae23d194016fe84586c) )
@@ -1029,7 +1029,7 @@ ROM_START(tvwring)
 	TOURVISION_BIOS
 ROM_END
 
-/* Xevious */ 
+/* Xevious */
 ROM_START(tvxvious)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_xevious.bin", 0x00000, 0x100000, CRC(3c0fb5a9) SHA1(1fd9ff582da83e1b9fee569da4db4de15e912f62) )
@@ -1061,7 +1061,7 @@ GAME( 1990, tvaburn,  tourvis, tourvision, tourvision, pce_common_state, pce_com
 GAME( 1990, tvarmedf, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Nichibutsu / Big Don",               "Armed-F (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1990, tvbeball, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Hudson Soft",                        "Be Ball (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1990, tvbomber, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Hudson Soft",                        "Bomberman (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1990, tvbrabho, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Namco / Namcot",                     "Chōzetsurinjin Beraboh Man (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1990, tvbrabho, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Namco / Namcot",                     "Ch??zetsurinjin Beraboh Man (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1990, tvdsenpu, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Toaplan / Nec Avenue",               "Daisenpu (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1990, tvdevilc, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Naxat / Red",                        "Devil Crash (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1990, tvdodgeb, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Technos Japan Corp / Naxat Soft",    "Dodge Ball (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

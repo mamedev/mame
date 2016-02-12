@@ -691,12 +691,10 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	MCFG_TMS9995_DBIN_HANDLER( WRITELINE(geneve_state, dbin_line) )
 
 	// video hardware
-	// Although we should have a 60 Hz screen rate, we have to set it to 30 here.
-	// The reason is that that the number of screen lines is counted twice for the
-	// interlace mode, but in non-interlace modes only half of the lines are
-	// painted. Accordingly, the full set of lines is refreshed at 30 Hz,
-	// not 60 Hz. This should be fixed in the v9938 emulation.
-	MCFG_TI_V9938_ADD(VIDEO_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, geneve_state, set_tms9901_INT2_from_v9938)
+	MCFG_DEVICE_ADD(VIDEO_SYSTEM_TAG, V9938VIDEO, 0)
+	MCFG_V9938_ADD(VDP_TAG, SCREEN_TAG, 0x20000, XTAL_21_4772MHz)  /* typical 9938 clock, not verified */
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(geneve_state, set_tms9901_INT2_from_v9938))
+	MCFG_V99X8_SCREEN_ADD_NTSC(SCREEN_TAG, VDP_TAG, XTAL_21_4772MHz)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", geneve_state, geneve_hblank_interrupt, SCREEN_TAG, 0, 1) /* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	// Main board components

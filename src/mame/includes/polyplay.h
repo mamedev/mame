@@ -1,11 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:James Wallace
-// thanks-to:Martin Buchholz,Juergen Oppermann,Volker Hann, Jan-Ole Christian
+// copyright-holders:Martin Buchholz
 #include "sound/samples.h"
 
 #define SAMPLE_LENGTH 32
-
-#define POLYPLAY_MAIN_CLOCK XTAL_9_8304MHz
 
 class polyplay_state : public driver_device
 {
@@ -17,7 +14,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_in0_port(*this, "IN0"),
 		m_palette(*this, "palette")  { }
 
 	required_shared_ptr<UINT8> m_videoram;
@@ -26,34 +22,36 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_ioport m_in0_port;
 	required_device<palette_device> m_palette;
 
-	int m_freq[2];
+	int m_freq1;
+	int m_freq2;
+	int m_channel_playing1;
+	int m_channel_playing2;
 	INT16 m_backgroundwave[SAMPLE_LENGTH];
-	int m_prescale[2];
-	int m_channel_const[2];
-	int m_light_state;
+	int m_prescale1;
+	int m_prescale2;
+	int m_channel1_active;
+	int m_channel1_const;
+	int m_channel2_active;
+	int m_channel2_const;
 	timer_device* m_timer;
-	timer_device* m_timer2;
-	timer_device* m_light_timer;
+	int m_last;
 
-	DECLARE_WRITE8_MEMBER(polyplay_sound_w);
-	DECLARE_WRITE8_MEMBER(polyplay_timer_40hz);
-	DECLARE_WRITE8_MEMBER(polyplay_timer_75hz);
-	DECLARE_READ8_MEMBER(polyplay_in1_r);
-	DECLARE_READ8_MEMBER(polyplay_porta_r);
+	DECLARE_WRITE8_MEMBER(polyplay_sound_channel);
+	DECLARE_WRITE8_MEMBER(polyplay_start_timer2);
+	DECLARE_READ8_MEMBER(polyplay_random_read);
 	DECLARE_WRITE8_MEMBER(polyplay_characterram_w);
-	DECLARE_WRITE8_MEMBER(polyplay_portb_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	SAMPLES_START_CB_MEMBER(sh_start);
-	void process_channel(int channel, int data);	
-	void play_channel(int channel, int data);
+	void set_channel1(int active);
+	void set_channel2(int active);
+	void play_channel1(int data);
+	void play_channel2(int data);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(polyplay);
 	UINT32 screen_update_polyplay(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(polyplay_timer_callback_40);
-	TIMER_DEVICE_CALLBACK_MEMBER(polyplay_timer_callback_75);
-	TIMER_DEVICE_CALLBACK_MEMBER(polyplay_timer_callback_lights);
+	INTERRUPT_GEN_MEMBER(periodic_interrupt);
+	INTERRUPT_GEN_MEMBER(coin_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(polyplay_timer_callback);
 };

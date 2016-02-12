@@ -302,8 +302,8 @@ void rom_load_manager::determine_bios_rom(device_t *device, const char *specbios
 		/* if we got neither an empty string nor 'default' then warn the user */
 		if (specbios[0] != 0 && strcmp(specbios, "default") != 0)
 		{
-			strcatprintf(m_errorstring, "%s: invalid bios\n", specbios);
-			m_errors++;
+			strcatprintf(m_errorstring, "%s: invalid bios, reverting to default\n", specbios);
+			m_warnings++;
 		}
 
 		/* set to default */

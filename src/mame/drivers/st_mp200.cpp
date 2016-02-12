@@ -19,7 +19,7 @@ ToDo:
 #include "machine/genpin.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
-#include "sound/s14001a_new.h"
+#include "sound/s14001a.h"
 #include "st_mp200.lh"
 
 #define S14001_CLOCK                (25e5)
@@ -73,7 +73,6 @@ private:
 	bool m_u11_cb2;
 	bool m_timer_x;
 	bool m_u11_timer;
-	bool m_su; // speech unit fitted yes/no
 	bool m_7d; // 7-digit display yes/no
 	UINT8 m_digit;
 	UINT8 m_counter;
@@ -81,7 +80,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<m6800_cpu_device> m_maincpu;
-	optional_device<s14001a_new_device> m_s14001a;
+	optional_device<s14001a_device> m_s14001a;
 	required_device<pia6821_device> m_pia_u10;
 	required_device<pia6821_device> m_pia_u11;
 	required_ioport m_io_test;
@@ -321,7 +320,7 @@ WRITE_LINE_MEMBER( st_mp200_state::u10_ca2_w )
 
 WRITE_LINE_MEMBER( st_mp200_state::u10_cb2_w )
 {
-	if (m_su)
+	if (m_s14001a)
 	{
 		if (m_s14001a->busy_r())
 			m_pia_u11->cb1_w(0);
@@ -334,7 +333,7 @@ WRITE_LINE_MEMBER( st_mp200_state::u11_ca2_w )
 {
 	output().set_value("led0", !state);
 
-	if ((m_su) & (state))
+	if (m_s14001a && state)
 	{
 		if BIT(m_u10a, 7)
 		{
@@ -552,19 +551,16 @@ void st_mp200_state::machine_reset()
 DRIVER_INIT_MEMBER( st_mp200_state, st_mp200 )
 {
 	m_7d = 1;
-	m_su = 0;
 }
 
 DRIVER_INIT_MEMBER( st_mp200_state, st_mp201 )
 {
 	m_7d = 1;
-	m_su = 1;
 }
 
 DRIVER_INIT_MEMBER( st_mp200_state, st_mp202 )
 {
 	m_7d = 0;
-	m_su = 0;
 }
 
 // zero-cross detection
@@ -619,7 +615,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( st_mp201, st_mp200 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speech", S14001A_NEW, S14001_CLOCK)
+	MCFG_SOUND_ADD("speech", S14001A, S14001_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

@@ -34,6 +34,7 @@ const device_type RP5H01 = &device_creator<rp5h01_device>;
 
 rp5h01_device::rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RP5H01, "RP5H01 6/7-bit Counter", tag, owner, clock, "rp5h01", __FILE__)
+	, m_rom_ptr(*this, DEVICE_SELF)
 {
 }
 
@@ -53,11 +54,15 @@ void rp5h01_device::device_config_complete()
 
 void rp5h01_device::device_start()
 {
-	m_data = region()->base();
-	if (m_data == nullptr)
+	if (m_rom_ptr == nullptr)
+	{
 		m_data = initial_data;
+	}
 	else
+	{
+		m_data = m_rom_ptr;
 		assert(region()->bytes() == 0x10);
+	}
 
 	/* register for state saving */
 	save_item(NAME(m_counter));

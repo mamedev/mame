@@ -26,7 +26,7 @@
  */
 
 #include "epson_lx810l.h"
-extern const char layout_lx800[]; /* use layout from lx800 */
+//extern const char layout_lx800[]; /* use layout from lx800 */
 
 //#define LX810LDEBUG
 #ifdef LX810LDEBUG
@@ -132,7 +132,7 @@ static MACHINE_CONFIG_FRAGMENT( epson_lx810l )
 	MCFG_UPD7810_CO0(WRITELINE(epson_lx810l_t, co0_w))
 	MCFG_UPD7810_CO1(WRITELINE(epson_lx810l_t, co1_w))
 
-	MCFG_DEFAULT_LAYOUT(layout_lx800)
+//	MCFG_DEFAULT_LAYOUT(layout_lx800)
 
 	/* video hardware (simulates paper) */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -192,7 +192,7 @@ static INPUT_PORTS_START( epson_lx810l )
 
 	/* Buttons on printer */
 	PORT_START("ONLINE")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_O) PORT_CHANGED_MEMBER(DEVICE_SELF, epson_lx810l_t, online_sw, NULL)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_O) PORT_CHANGED_MEMBER(DEVICE_SELF, epson_lx810l_t, online_sw, nullptr)
 	PORT_START("FORMFEED")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Form Feed") PORT_CODE(KEYCODE_F) PORT_TOGGLE
 	PORT_START("LINEFEED")
