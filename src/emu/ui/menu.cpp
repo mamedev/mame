@@ -506,7 +506,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 	if (visible_main_menu_height + visible_extra_menu_height + 2.0f * UI_BOX_TB_BORDER > 1.0f)
 		visible_main_menu_height = 1.0f - 2.0f * UI_BOX_TB_BORDER - visible_extra_menu_height;
 
-	int visible_lines = floor(visible_main_menu_height / line_height);
+	visible_lines = floor(visible_main_menu_height / line_height);
 	visible_main_menu_height = (float)visible_lines * line_height;
 
 	// compute top/left of inner menu area by centering
@@ -525,10 +525,8 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 		machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// determine the first visible line based on the current selection
-	int top_line = selected - visible_lines / 2;
-	if (top_line < 0)
+	if (top_line < 0 || selected == 0)
 		top_line = 0;
-
 	if (top_line + visible_lines >= item.size())
 	{
 		if (history_flag)
@@ -818,7 +816,7 @@ void ui_menu::draw_text_box()
 
 void ui_menu::handle_events(UINT32 flags)
 {
-	int stop = FALSE;
+	bool stop = false;
 	ui_event local_menu_event;
 	bool historyflag = ((item[0].flags & MENU_FLAG_UI_HISTORY) != 0);
 
@@ -835,35 +833,33 @@ void ui_menu::handle_events(UINT32 flags)
 						selected = hover;
 					else if (hover == HOVER_ARROW_UP)
 					{
-						selected -= visitems - 1;
-						validate_selection(1);
+						selected -= visitems;
+						if (selected < 0)
+							selected = 0;
+						top_line -= visitems - (top_line + visible_lines == item.size() - 1);
 					}
 					else if (hover == HOVER_ARROW_DOWN)
 					{
-						selected += visitems - 1;
-						validate_selection(1);
+						selected += visible_lines - 2 + (selected == 0);
+						if (selected > item.size() - 1)
+							selected = item.size() - 1;
+						top_line += visible_lines - 2;
 					}
 				}
 				break;
 
 			// if we are hovering over a valid item, fake a UI_SELECT with a double-click
 			case UI_EVENT_MOUSE_DOUBLE_CLICK:
-				if ((flags & UI_MENU_PROCESS_ONLYCHAR) == 0)
+				if ((flags & UI_MENU_PROCESS_ONLYCHAR) == 0 && hover >= 0 && hover < item.size())
 				{
-					if (hover >= 0 && hover < item.size())
+					selected = hover;
+					menu_event.iptkey = IPT_UI_SELECT;
+					if (selected == item.size() - 1)
 					{
-						selected = hover;
-						if (local_menu_event.event_type == UI_EVENT_MOUSE_DOUBLE_CLICK)
-						{
-							menu_event.iptkey = IPT_UI_SELECT;
-							if (selected == item.size() - 1)
-							{
-								menu_event.iptkey = IPT_UI_CANCEL;
-								ui_menu::stack_pop(machine());
-							}
-						}
-						stop = TRUE;
+						menu_event.iptkey = IPT_UI_CANCEL;
+						ui_menu::stack_pop(machine());
 					}
+					stop = true;
 				}
 				break;
 
@@ -878,11 +874,17 @@ void ui_menu::handle_events(UINT32 flags)
 						else
 							selected -= local_menu_event.num_lines;
 						validate_selection(-1);
+						if (selected < top_line + (top_line != 0))
+							top_line -= local_menu_event.num_lines;
 					}
 					else
 					{
 						selected += local_menu_event.num_lines;
 						validate_selection(1);
+						if (selected > item.size() - 1)
+							selected = item.size() - 1;
+						if (selected >= top_line + visitems + (top_line != 0))
+							top_line += local_menu_event.num_lines;
 					}
 				}
 				break;
@@ -891,7 +893,7 @@ void ui_menu::handle_events(UINT32 flags)
 			case UI_EVENT_CHAR:
 				menu_event.iptkey = IPT_SPECIAL;
 				menu_event.unichar = local_menu_event.ch;
-				stop = TRUE;
+				stop = true;
 				break;
 
 			// ignore everything else
@@ -909,9 +911,7 @@ void ui_menu::handle_events(UINT32 flags)
 
 void ui_menu::handle_keys(UINT32 flags)
 {
-	int ignorepause = ui_menu::stack_has_special_main_menu();
-	int ignoreright;
-	int ignoreleft;
+	bool ignorepause = ui_menu::stack_has_special_main_menu();
 	int code;
 
 	// bail if no items
@@ -947,8 +947,8 @@ void ui_menu::handle_keys(UINT32 flags)
 	validate_selection(1);
 
 	// swallow left/right keys if they are not appropriate
-	ignoreleft = ((item[selected].flags & MENU_FLAG_LEFT_ARROW) == 0);
-	ignoreright = ((item[selected].flags & MENU_FLAG_RIGHT_ARROW) == 0);
+	bool ignoreleft = ((item[selected].flags & MENU_FLAG_LEFT_ARROW) == 0);
+	bool ignoreright = ((item[selected].flags & MENU_FLAG_RIGHT_ARROW) == 0);
 
 	// accept left/right keys as-is with repeat
 	if (!ignoreleft && exclusive_input_pressed(IPT_UI_LEFT, (flags & UI_MENU_PROCESS_LR_REPEAT) ? 6 : 0))
@@ -959,60 +959,80 @@ void ui_menu::handle_keys(UINT32 flags)
 	// up backs up by one item
 	if (exclusive_input_pressed(IPT_UI_UP, 6))
 	{
-		if (historyflag && selected <= (visitems / 2))
-			return;
-		else if (historyflag && visitems == item.size())
+		if (historyflag)
 		{
-			selected = item.size() - 1;
-			return;
+			if (selected <= (visitems / 2))
+				return;
+			else if (visitems == item.size())
+			{
+				selected = item.size() - 1;
+				return;
+			}
+			else if (selected == item.size() - 1)
+				selected = (item.size() - 1) - (visitems / 2);
 		}
-		else if (historyflag && selected == item.size() - 1)
-			selected = (item.size() - 1) - (visitems / 2);
+			
+		if (selected == 0)
+			return;
 
-		selected = (selected + item.size() - 1) % item.size();
+		selected--;
 		validate_selection(-1);
+		top_line -= (selected == top_line && top_line != 0);
 	}
 
 	// down advances by one item
 	if (exclusive_input_pressed(IPT_UI_DOWN, 6))
 	{
-		if (historyflag && (selected < visitems / 2))
-			selected = visitems / 2;
-		else if (historyflag && (selected + (visitems / 2) >= item.size()))
+		if (historyflag)
 		{
-			selected = item.size() - 1;
-			return;
+			if (selected < visitems / 2)
+				selected = visitems / 2;
+			else if (selected + (visitems / 2) >= item.size())
+			{
+				selected = item.size() - 1;
+				return;
+			}
 		}
 
-		selected = (selected + 1) % item.size();
-		validate_selection(1);
+		if (selected == item.size() - 1)
+			return;
+		
+		selected++;
+		top_line += (selected == top_line + visitems + (top_line != 0));
 	}
 
 	// page up backs up by visitems
 	if (exclusive_input_pressed(IPT_UI_PAGE_UP, 6))
 	{
-		selected -= visitems - 1;
+		selected -= visitems;
+		top_line -= visitems - (top_line + visible_lines == item.size() - 1);
+		if (selected < 0)
+			selected = 0;
 		validate_selection(1);
 	}
 
 	// page down advances by visitems
 	if (exclusive_input_pressed(IPT_UI_PAGE_DOWN, 6))
 	{
-		selected += visitems - 1;
+		selected += visible_lines - 2 + (selected == 0);
+		top_line += visible_lines - 2;
+
+		if (selected > item.size() - 1)
+			selected = item.size() - 1;
 		validate_selection(-1);
 	}
 
 	// home goes to the start
 	if (exclusive_input_pressed(IPT_UI_HOME, 0))
 	{
-		selected = 0;
+		selected = top_line = 0;
 		validate_selection(1);
 	}
 
 	// end goes to the last
 	if (exclusive_input_pressed(IPT_UI_END, 0))
 	{
-		selected = item.size() - 1;
+		selected = top_line = item.size() - 1;
 		validate_selection(-1);
 	}
 
@@ -1681,12 +1701,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	}
 
 	if (!ignoreright && exclusive_input_pressed(IPT_UI_RIGHT, (flags & UI_MENU_PROCESS_LR_REPEAT) ? 6 : 0))
-	{
-		// Swap the right panel
-//		if (minput.code_pressed(KEYCODE_LCONTROL) || minput.code_pressed(JOYCODE_BUTTON1))
-//			menu_event.iptkey = IPT_UI_RIGHT_PANEL;
 		return;
-	}
 
 	// up backs up by one item
 	if (exclusive_input_pressed(IPT_UI_UP, 6))
@@ -2182,7 +2197,7 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 	// if it fails, use the default image
 	if (!tmp_bitmap->valid())
 	{
-		tmp_bitmap->reset();
+		//tmp_bitmap->reset();
 		tmp_bitmap->allocate(256, 256);
 		for (int x = 0; x < 256; x++)
 			for (int y = 0; y < 256; y++)
@@ -2239,7 +2254,7 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 		else
 			dest_bitmap = tmp_bitmap;
 
-		snapx_bitmap->reset();
+		//snapx_bitmap->reset();
 		snapx_bitmap->allocate(panel_width_pixel, panel_height_pixel);
 		int x1 = (0.5f * panel_width_pixel) - (0.5f * dest_xPixel);
 		int y1 = (0.5f * panel_height_pixel) - (0.5f * dest_yPixel);

@@ -2107,6 +2107,7 @@ sboblbobl       // bootleg
 sboblbobla      // bootleg
 sboblboblb      // bootleg
 sboblboblc      // bootleg
+sboblbobld		// bootleg
 bublboblb       // bootleg
 bub68705        // bootleg
 dland           // bootleg
@@ -5922,8 +5923,8 @@ mj2c            // 2004.12 Sega Network Taisen Mahjong MJ 2 (Rev C)
 				// 2004.12 Sega Network Taisen Mahjong MJ 2 (Rev D)
 ghostsqu        // 2004.12.09 Ghost Squad (Rev A)
 				// 2005.02 Sega Network Taisen Mahjong MJ 2 (Rev E)
-mj2             // 2005.02 Sega Network Taisen Mahjong MJ 2 (Rev F)
-mj2g            // 2005.02.02 Sega Network Taisen Mahjong MJ 2 (Rev G)
+mj2f            // 2005.02 Sega Network Taisen Mahjong MJ 2 (Rev F)
+mj2             // 2005.02.02 Sega Network Taisen Mahjong MJ 2 (Rev G)
 				// 2005.03 Sangokushi Taisen
 gundamos        // 2005.03 Gundam Battle Operating Simulator
 				// 2005.04 Quest of D Ver.1.20
@@ -10080,6 +10081,7 @@ moonlghtb       // bootleg
 moonlghtc       // bootleg
 chry10          // bootleg
 chrygld         // bootleg
+chryglda        // bootleg
 goldfrui        // bootleg
 wcherry         // bootleg
 super9          // (c) 2001 Playmark
@@ -10558,6 +10560,7 @@ fastdraw_130    // (c) 1995
 aplatoon        // (c) 199? Nova?
 zortonbr        // (c) 1993 Web Picmatic
 
+crospuzl		//
 // Crystal System
 crysbios
 crysking        // 2001 Brezzasoft. Crystal of the kings
@@ -12283,6 +12286,8 @@ cmasterbv       // (c) 1991 Dyna Electronics / Gerald Duhamel?
 cmasterd        // (c) 1991 Dyna Electronics
 cmastere        // (c) 1991 Dyna Electronics
 cmasterf        // (c) 1991 Dyna Electronics
+cmasterg        // (c) 1991 Dyna Electronics
+cmasterh        // (c) 1991 Dyna Electronics
 cmast91         // (c) 1991 Dyna Electronics
 cmast92         // (c) 1992 Dyna Electronics
 cmast97         // (c) 1996 Dyna Electronics

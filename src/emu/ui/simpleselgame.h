@@ -27,6 +27,7 @@ public:
 	// force game select menu
 	static void force_game_select(running_machine &machine, render_container *container);
 
+	virtual bool menu_has_search_active() override { return (m_search[0] != 0); }
 private:
 	// internal state
 	enum { VISIBLE_GAMES_IN_LIST = 15 };

@@ -230,7 +230,9 @@ WRITE8_MEMBER(laserbat_state::csound2_w)
     The Cat and Mouse sound board has a 6802 processor with three ROMs,
     a 6821 PIA, two AY-3-8910 PSGs, and some other logic and analog
     circuitry.  Unfortunately we lack a schematic, so all knowledge of
-    this board is based on tracing the sound program.
+    this board is based on tracing the sound program, examining PCB
+    photos and cross-referencing with the schematic for the 1B11142
+    schematic.
 
     The 6821 PIA is mapped at addresses $005C..$005F.  The known PIA
     signal assignments are as follows:
@@ -306,7 +308,8 @@ WRITE8_MEMBER(laserbat_state::csound2_w)
 
 WRITE8_MEMBER(catnmous_state::csound1_w)
 {
-	m_pia->ca1_w((data & 0x20) ? 1 : 0);
+	m_audiopcb->sound_w(space, offset, data);
+
 	m_csound1 = data;
 }
 
@@ -315,76 +318,8 @@ WRITE8_MEMBER(catnmous_state::csound2_w)
 	// the bottom bit is used for sprite banking, of all things
 	m_gfx2 = memregion("gfx2")->base() + ((data & 0x01) ? 0x0800 : 0x0000);
 
-	// the top bit is called RESET on the wiring diagram - assume it resets the sound CPU
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	// the top bit is called RESET on the wiring diagram
+	m_audiopcb->reset_w((data & 0x80) ? 1 : 0);
 
 	m_csound2 = data;
-}
-
-READ8_MEMBER(catnmous_state::pia_porta_r)
-{
-	UINT8 const control = m_pia->b_output();
-	UINT8 data = 0xff;
-
-	if (0x01 == (control & 0x03))
-		data &= m_psg1->data_r(space, 0);
-
-	if (0x04 == (control & 0x0c))
-		data &= m_psg2->data_r(space, 0);
-
-	return data;
-}
-
-WRITE8_MEMBER(catnmous_state::pia_porta_w)
-{
-	UINT8 const control = m_pia->b_output();
-
-	if (control & 0x02)
-		m_psg1->data_address_w(space, (control >> 0) & 0x01, data);
-
-	if (control & 0x08)
-		m_psg2->data_address_w(space, (control >> 2) & 0x01, data);
-}
-
-WRITE8_MEMBER(catnmous_state::pia_portb_w)
-{
-	if (data & 0x02)
-		m_psg1->data_address_w(space, (data >> 0) & 0x01, m_pia->a_output());
-
-	if (data & 0x08)
-		m_psg2->data_address_w(space, (data >> 2) & 0x01, m_pia->a_output());
-}
-
-WRITE_LINE_MEMBER(catnmous_state::pia_irqa)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER(catnmous_state::pia_irqb)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE8_MEMBER(catnmous_state::psg1_porta_w)
-{
-	// similar to zaccaria.c since we have no clue how this board really works
-	// this code could be completely wrong/inappropriate for this game for all we know
-	static double const table[8] = {
-			RES_K(8.2),
-			RES_R(820),
-			RES_K(3.3),
-			RES_R(150),
-			RES_K(5.6),
-			RES_R(390),
-			RES_K(1.5),
-			RES_R(47) };
-	RES_VOLTAGE_DIVIDER(RES_K(4.7), table[data & 0x07]);
-	m_psg2->set_volume(1, 150 * RES_VOLTAGE_DIVIDER(RES_K(4.7), table[data & 0x07]));
-}
-
-READ8_MEMBER(catnmous_state::psg1_portb_r)
-{
-	// the sound program masks out the three most significant bits
-	// assume they're not connected and read high from the internal pull-ups
-	return m_csound1 | 0xe0;
 }

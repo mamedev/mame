@@ -1668,6 +1668,7 @@ static INPUT_PORTS_START( cmasterb )
 	/* Test Mode For Disp. Of Doll not checked */
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( cmezspin )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1738,6 +1739,7 @@ static INPUT_PORTS_START( cmezspin )
 	/* Test Mode For Disp. Of Doll not checked */
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( cmasterc )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1795,6 +1797,66 @@ static INPUT_PORTS_START( cmasterc )
 	/* DSW5-7 listed as unused */
 	/* Test Mode For Disp. Of Doll not checked */
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( cmasterg )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big / Stop All")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small / Info")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
+
+	PORT_INCLUDE( cmv4_coins )
+
+	PORT_INCLUDE( cmv4_service )
+
+	PORT_INCLUDE( cmv4_dsw1 )
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )           PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	/* Hopper Out Switch not checked */
+	/* Payout Mode not checked */
+	/* '7' In Double Up Game OK */
+	PORT_DIPNAME( 0x10, 0x00, "Double Up Game Pay Rate" )   PORT_DIPLOCATION("DSW1:5")  /* OK */
+	PORT_DIPSETTING(    0x00, "60%" )
+	PORT_DIPSETTING(    0x10, "70%" )
+	/* Double Up Game OK */
+	/* Bet Max OK */
+
+	PORT_INCLUDE( cmv4_dsw2 )
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x07, 0x00, "Main Game Pay Rate" )    PORT_DIPLOCATION("DSW2:1,2,3")  /* OK */
+	PORT_DIPSETTING(    0x07, "45%" )
+	PORT_DIPSETTING(    0x06, "50%" )
+	PORT_DIPSETTING(    0x05, "55%" )
+	PORT_DIPSETTING(    0x04, "60%" )
+	PORT_DIPSETTING(    0x03, "65%" )
+	PORT_DIPSETTING(    0x02, "70%" )
+	PORT_DIPSETTING(    0x01, "75%" )
+	PORT_DIPSETTING(    0x00, "80%" )
+	/* Hopper Limit OK */
+	/* 100+ Odds Sound not checked */
+	/* Key In Type OK */
+	/* Center Super 7 Bet Limit related with Min. Bet For Bonus Play (DSW4-6) */
+
+	PORT_INCLUDE( cmv4_dsw3 )   /* all OK */
+
+	PORT_INCLUDE( cmv4_dsw4 )   /* all OK */
+
+	PORT_INCLUDE( cmv4_dsw5 )
+	/* Display of Doll On Demo only affects payout table screen */
+	/* Coin In Limit OK */
+	/* Condition For 3 Kind Of Bonus not checked */
+	/* Display Of Doll At All Fr. Bonus not checked */
+	/* DSW5-7 listed as unused */
+	/* Test Mode For Disp. Of Doll not checked */
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( cmast91 )
 	PORT_START("IN0")
@@ -8538,6 +8600,58 @@ ROM_START( cb3e )
 ROM_END
 
 
+/* Cherry Gold I (bootleg)
+   It runs in CB3e similar hardware...
+
+1x TMPZ84C00AP-6  u15 	            8-bit Microprocessor
+3x D71055C        u30, u39, u40 	Programmable Peripheral Interface
+1x WF19054        u27 	            Programmable Sound Generator
+1x SN76489AN      u28 	            Digital Complex Sound Generator
+1x oscillator 	unmarked  Y1 	
+
+ROMs
+1x D27256      1.u3
+1x AM27512     3.u22
+1x D27C010     2u6
+1x N82S147AF   u1
+
+RAMs
+4x HM6116LP-4   u9, u10, u11, u12
+1x D4016C-1     u23
+
+PLDs
+1x unknowun Cl-001 (QFP144)  CY144A    read protected
+4x GAL20V8A-15LNC  pl1, pl4, pl5, pl6  read protected
+2x PALCE20V8H-25PC/4   u2,u?           read protected
+1x PALCE22V10H-25PC/4  u?              read protected
+
+Others
+1x 36x2 edge connector
+1x 10x2 edge connector
+1x pushbutton (TS)
+2x trimmer (volume)(VR1,VR2)
+5x 8x2 switches DIP(SW1-5)
+1x battery 5,5V
+
+Notes
+PCB is marked "REV.3" 
+*/
+ROM_START( chryglda )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "3.u22",   0x00000, 0x10000, CRC(059857c5) SHA1(f4becfda1e25ab347f55f35dc9f5818ef9344e2c) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "2.u6",    0x00000, 0x20000, CRC(1359dfac) SHA1(78eb934055cda9e10d8e939c79bfa62262ecad7d) )
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "1.u3",    0x00000, 0x08000, CRC(919bd692) SHA1(1aeb66f1e4555b731858833445000593e613f74d) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "n82s147af.u1",   0x00000, 0x0100, CRC(d4eaa276) SHA1(b6598ee64ac3d41ca979c8667de8576cfb304451) )
+	ROM_CONTINUE(               0x00000, 0x0100)    // 2nd half has the data.
+ROM_END
+
+
 ROM_START( cmv801 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "prg512",   0x0000, 0x10000, CRC(2f6e3fe9) SHA1(c5ffa51478a0dc2d8ff6a0f286cfb461011bb55d) )
@@ -9124,6 +9238,109 @@ ROM_START( cmasterf )
 
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+
+/* Cherry Master I (CM1-1.01)
+   Sticker with "Cherry Master V4 -B-" on the PCB.   
+   Similar to cmasterb. Different program.
+
+1x TMPZ84C00AP-6   u80    8-bit Microprocessor
+1x D8255AC-5       u36    Programmable Peripheral Interface
+1x D71055C         u54    Parallel Interface Unit
+1x YM2149F         u13    Programmable Sound Generator
+1x oscillator 12.000MHz   Y1
+
+ROMs
+4x 2764    1,2,3,4
+4x 27256   5,6,7,9
+1x 27512   8
+3x N82S129AN    u46, u79, u84
+
+RAMs
+1x LC3517AL-10    u82
+4x D4016CX-15-10  u22, u26, u28, u38
+
+PLDs
+4x PALCE16V8H-25pc/4    u51, u66, u73, u74
+
+Others
+1x 36x2 edge connector
+1x 10x2 edge connector
+1x pushbutton (SW6)
+1x trimmer (volume)(VR1)
+5x 8x2 switches DIP(SW1-SW5)
+1x battery 5.5V(BT1) 
+*/
+ROM_START( cmasterg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "9.u81",  0x0000,  0x1000, CRC(10979629) SHA1(a7342e37c75c85aef8a86ab5366a9e27f2c4bab8) )
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0x2000,0x1000)
+	ROM_CONTINUE(0x5000,0x1000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u16", 0x00000,  0x8000, CRC(19cc1d67) SHA1(47487f9362bfb36a32100ed772960628844462bf) )
+	ROM_LOAD( "6.u11", 0x08000,  0x8000, CRC(63b3df4e) SHA1(9bacd23da598805ec18ec5ad15cab95d71eb9262) )
+	ROM_LOAD( "5.u4",  0x10000,  0x8000, CRC(e39fff9c) SHA1(22fdc517fa478441622c6245cecb5728c5595757) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15",  0x0000,  0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "3.u10",  0x2000,  0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "2.u14",  0x4000,  0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "1.u9",   0x6000,  0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "n82s129an.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "n82s129an.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "n82s129an.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+
+/* Cherry Master I (V1.10)
+   Original Dyna upgrade for Cherry Master boards.
+   It laks of STOP ALL button.
+*/
+ROM_START( cmasterh )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cm_v1.10_dyna.bin",  0x0000,  0x1000, CRC(872f2ef0) SHA1(ec68a03a1e8ab793d4a5eae1ce25f91608351c55) )
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0x2000,0x1000)
+	ROM_CONTINUE(0x5000,0x1000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u16", 0x00000,  0x8000, CRC(19cc1d67) SHA1(47487f9362bfb36a32100ed772960628844462bf) )
+	ROM_LOAD( "6.u11", 0x08000,  0x8000, CRC(63b3df4e) SHA1(9bacd23da598805ec18ec5ad15cab95d71eb9262) )
+	ROM_LOAD( "5.u4",  0x10000,  0x8000, CRC(e39fff9c) SHA1(22fdc517fa478441622c6245cecb5728c5595757) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15",  0x0000,  0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "3.u10",  0x2000,  0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "2.u14",  0x4000,  0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "1.u9",   0x6000,  0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "n82s129an.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "n82s129an.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "n82s129an.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
 
@@ -13369,7 +13586,7 @@ GAME(  199?, moonlght,  goldstar, moonlght, goldstar, driver_device,  0,        
 GAME(  199?, moonlghta, goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (v.0629, high program)",           0 )
 GAME(  199?, moonlghtb, goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (v.02L0A, low program)",           MACHINE_IMPERFECT_COLORS )  // need to check the odd palette value at 0xc780. should be black.
 GAME(  199?, moonlghtc, goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (v.02L0A, high program, alt gfx)", MACHINE_IMPERFECT_COLORS )  // need to check the odd palette value at 0xc780. should be black.
-GAMEL( 199?, chrygld,   0,        chrygld,  chrygld,  cb3_state,      chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0,                 layout_chrygld )
+GAMEL( 199?, chrygld,   0,        chrygld,  chrygld,  cb3_state,      chrygld,   ROT0, "bootleg",           "Cherry Gold I (set 1)",                       0,                 layout_chrygld )
 GAMEL( 199?, chry10,    0,        chrygld,  chry10,   cb3_state,      chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0,                 layout_chrygld )
 GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,         ROT0, "bootleg",           "Gold Fruit",                                  0 )                  // maybe fullname should be 'Gold Fruit (main 40%)'
 GAME(  2001, super9,    goldstar, super9,   goldstar, goldstar_state, super9,    ROT0, "Playmark",          "Super Nove (Playmark)",                       MACHINE_NOT_WORKING )   // need to decode gfx and see the program loops/reset...
@@ -13385,6 +13602,7 @@ GAMEL( 199?, cb3b,      ncb3,     cherrys,  ncb3,     cb3_state,      cherrys,  
 GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  cb3_state,      cb3,       ROT0, "bootleg",           "Cherry Bonus III (alt, set 2)",               MACHINE_NOT_WORKING)
 GAMEL( 199?, cb3d,      ncb3,     ncb3,     ncb3,     driver_device,  0,         ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    0,                 layout_cherryb3 )
 GAMEL( 199?, cb3e,      ncb3,     cb3e,     chrygld,  cb3_state,      cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0,                 layout_chrygld )
+GAMEL( 199?, chryglda,  ncb3,     cb3e,     chrygld,  cb3_state,      cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                 layout_chrygld )  // Runs in CB3e hardware.
 
 GAME(  1996, cmast97,   ncb3,     cm97,     chrygld,  driver_device,  0,         ROT0, "Dyna",              "Cherry Master '97",                           MACHINE_NOT_WORKING) // fix prom decode
 
@@ -13394,7 +13612,6 @@ GAME(  199?, chryangl,  ncb3,     cm,       chryangl, cmaster_state,  cmv4,     
 
 // cherry master hardware has a rather different mem map, but is basically the same
 GAMEL( 198?, cmv801,    0,        cm,       cmv801,   cmaster_state,  cm,        ROT0, "Corsica",           "Cherry Master (Corsica, ver.8.01)",           0,                 layout_cmv4 ) /* says ED-96 where the manufacturer is on some games.. */
-
 
 
 
@@ -13413,6 +13630,8 @@ GAMEL( 1991, cmasterbv, cmaster,  cm,       cmasterb, cmaster_state,  cmv4,     
 GAMEL( 1991, cmasterd,  cmaster,  cm,       cmasterb, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 5)",           0,                 layout_cmasterb )
 GAMEL( 1991, cmastere,  cmaster,  cm,       cmasterb, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 6)",           0,                 layout_cmasterb )
 GAMEL( 1991, cmasterf,  cmaster,  cm,       cmasterb, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 7)",           0,                 layout_cmasterb )
+GAMEL( 1991, cmasterg,  cmaster,  cm,       cmasterg, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 8, V4-B-)",    0,                 layout_cmasterb )
+GAMEL( 1991, cmasterh,  cmaster,  cm,       cmasterb, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.10)",                  0,                 layout_cmasterb )
 GAME(  199?, cmast99,   0,        cm,       cmv4,     cmaster_state,  cmv4,      ROT0, "????",              "Cherry Master '99",                           MACHINE_NOT_WORKING )
 
 
@@ -13516,7 +13735,7 @@ GAMEL( 198?, cmpacman, 0,        cm,       cmpacman, cmaster_state,  cm,      RO
 GAMEL( 198?, cmtetris, 0,        cm,       cmtetris, cmaster_state,  cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 1)",         0,                     layout_cmpacman ) // need to press K/L to switch between games...
 GAMEL( 198?, cmtetrsa, 0,        cm,       cmtetris, cmaster_state,  cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 2)",         MACHINE_NOT_WORKING,      layout_cmpacman ) // seems banked...
 GAMEL( 198?, cmtetrsb, 0,        cm,       cmtetris, cmaster_state,  cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (+K, Canada Version, encrypted)", MACHINE_NOT_WORKING,      layout_cmpacman ) // different Tetris game. press insert to throttle and see the attract running.
-GAMEL( 1997, crazybon, 0,        pkrmast,  crazybon, driver_device,  0,       ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002",                                       MACHINE_IMPERFECT_COLORS, layout_crazybon )
+GAMEL( 1997, crazybon, 0,        pkrmast,  crazybon, driver_device,  0,       ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002",                                       MACHINE_IMPERFECT_COLORS, layout_crazybon ) // Windows ME desktop... but not found the way to switch it.
 
 /* other possible stealth sets:
  - cmv4a    ---> see the 1fxx zone. put a bp in 1f9f to see the loop.

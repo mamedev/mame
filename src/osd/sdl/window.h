@@ -52,7 +52,7 @@ public:
 #else
 		m_sdlsurf(NULL),
 #endif
-		m_machine(a_machine), m_monitor(a_monitor), m_fullscreen(0), m_index(0)
+		m_machine(a_machine), m_monitor(a_monitor), m_fullscreen(0)
 	{
 		m_win_config = *config;
 		m_index = index;
@@ -165,7 +165,6 @@ private:
 	// monitor info
 	osd_monitor_info *  m_monitor;
 	int                 m_fullscreen;
-	int                 m_index;
 	osd_renderer *      m_renderer;
 
 	// static callbacks ...

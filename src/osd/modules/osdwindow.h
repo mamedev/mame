@@ -37,7 +37,9 @@ public:
 #else
 		m_hwnd(0), m_dc(0), m_focus_hwnd(0), m_resize_state(0),
 #endif
-		m_primlist(NULL),
+		m_primlist(nullptr),
+		m_index(0),
+		m_main(nullptr),
 		m_prescale(1)
 		{}
 	virtual ~osd_window() { }
@@ -78,6 +80,8 @@ public:
 
 	render_primitive_list   *m_primlist;
 	osd_window_config       m_win_config;
+	int						m_index;
+	osd_window				*m_main;
 protected:
 	int                     m_prescale;
 };

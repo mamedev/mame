@@ -1015,7 +1015,7 @@ ROM_START( mj2c )
 	ROM_LOAD( "317-0374-jpn.pic", 0x000000, 0x004000, CRC(004f77a1) SHA1(bc5c6950293f3bff60bf7913d20a2046aa19ea69) )
 ROM_END
 
-ROM_START( mj2 )
+ROM_START( mj2f )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
@@ -1041,12 +1041,11 @@ track01.bin           150         599     1058400
 track02.raw 750 2101    3179904
 track03.bin 45150   549299  1185760800
 */
-ROM_START( mj2g )
+ROM_START( mj2 )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	// this is not CHDv4, but a really bad dump, only ~1/3 of disk content is dumped
-	DISK_IMAGE_READONLY( "gdx-0006g", 0, BAD_DUMP SHA1(e306837d5c093fdf1e9ff02239a8563535b1c181) )
+	DISK_IMAGE_READONLY( "gdx-0006g", 0, SHA1(b8c8b440d4cd2488be78e3a002058ea5b176a1f2) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD( "317-0374-jpn.pic", 0x000000, 0x004000, CRC(004f77a1) SHA1(bc5c6950293f3bff60bf7913d20a2046aa19ea69) )
@@ -1237,8 +1236,8 @@ ROM_END
 /* 0006C */ GAME( 2004, mj2c,     mj2,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 2 (Rev C) (GDX-0006C)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0006D    GAME( 2004, mj2d,     mj2,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 2 (Rev D) (GDX-0006D)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0006E    GAME( 2004, mj2e,     mj2,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 2 (Rev E) (GDX-0006E)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-/* 0006F */ GAME( 2004, mj2,      chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 2 (Rev F) (GDX-0006F)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-/* 0006G */ GAME( 2004, mj2g,     mj2,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 2 (Rev G) (GDX-0006G)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0006F */ GAME( 2004, mj2f,     mj2,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 2 (Rev F) (GDX-0006F)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0006G */ GAME( 2004, mj2,      chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 2 (Rev G) (GDX-0006G)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0007  */ GAME( 2004, ollie,    chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega / Amusement Vision",  "Ollie King (GDX-0007)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0008     GAME( 2004, wangmdjo, wangmidj, chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Japan) (GDX-0008)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0008A    GAME( 2004, wangmdja, wangmidj, chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Japan) (Rev A) (GDX-0008A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

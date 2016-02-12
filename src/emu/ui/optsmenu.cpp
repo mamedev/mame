@@ -77,7 +77,6 @@ void ui_menu_game_options::handle()
 				}
 				break;
 			}
-
 			case FILE_CATEGORY_FILTER:
 			{
 				if (m_event->iptkey == IPT_UI_LEFT)
@@ -105,7 +104,6 @@ void ui_menu_game_options::handle()
 				}
 				break;
 			}
-
 			case CATEGORY_FILTER:
 			{
 				if (m_event->iptkey == IPT_UI_LEFT)
@@ -131,7 +129,6 @@ void ui_menu_game_options::handle()
 				}
 				break;
 			}
-
 			case MANUFACT_CAT_FILTER:
 				if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT)
 				{
@@ -142,7 +139,6 @@ void ui_menu_game_options::handle()
 					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, c_mnfct::ui, c_mnfct::actual));
 
 				break;
-
 			case YEAR_CAT_FILTER:
 				if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT)
 				{
@@ -153,44 +149,22 @@ void ui_menu_game_options::handle()
 					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, c_year::ui, c_year::actual));
 
 				break;
-
-			case SCREEN_CAT_FILTER:
-				if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT)
-				{
-					(m_event->iptkey == IPT_UI_RIGHT) ? screen_filters::actual++ : screen_filters::actual--;
-					changed = true;
-				}
-				else if (m_event->iptkey == IPT_UI_SELECT)
-				{
-					std::vector<std::string> text(screen_filters::length);
-					for (int x = 0; x < screen_filters::length; ++x)
-						text[x] = screen_filters::text[x];
-
-					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, text, screen_filters::actual));
-				}
-
-				break;
-
 			case MISC_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_misc_options>(machine(), container));
 				break;
-
 			case SOUND_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_sound_options>(machine(), container));
 				break;
-
 			case DISPLAY_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_display_options>(machine(), container));
 				break;
-
 			case CUSTOM_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_custom_ui>(machine(), container));
 				break;
-
 			case CONTROLLER_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_controller_mapping>(machine(), container));
@@ -257,14 +231,6 @@ void ui_menu_game_options::populate()
 			fbuff.assign("^!Year");
 			convert_command_glyph(fbuff);
 			item_append(fbuff.c_str(), c_year::ui[c_year::actual].c_str(), arrow_flags, (void *)(FPTR)YEAR_CAT_FILTER);
-		}
-		// add screen subitem
-		else if (main_filters::actual == FILTER_SCREEN)
-		{
-			arrow_flags = get_arrow_flags(0, screen_filters::length - 1, screen_filters::actual);
-			fbuff = "^!Screen type";
-			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), screen_filters::text[screen_filters::actual], arrow_flags, (void *)(FPTR)SCREEN_CAT_FILTER);
 		}
 		// add custom subitem
 		else if (main_filters::actual == FILTER_CUSTOM)
