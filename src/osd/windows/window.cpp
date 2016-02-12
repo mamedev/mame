@@ -661,6 +661,18 @@ void win_window_info::create(running_machine &machine, int index, osd_monitor_in
 	window->m_fullscreen = !video_config.windowed;
 	window->m_index = index;
 
+	// set main window
+	if (index > 0)
+	{
+		for (auto w = win_window_list; w != NULL; w = w->m_next)
+		{
+			if (w->m_index == 0)
+			{
+				window->m_main = w;
+				break;
+			}
+		}
+	}
 	// see if we are safe for fullscreen
 	window->m_fullscreen_safe = TRUE;
 	for (win = win_window_list; win != NULL; win = win->m_next)

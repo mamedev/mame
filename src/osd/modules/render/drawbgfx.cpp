@@ -63,7 +63,8 @@ public:
 	: osd_renderer(w, FLAG_NONE), m_blittimer(0),
 		m_blit_dim(0, 0),
 		m_last_hofs(0), m_last_vofs(0),
-		m_last_blit_time(0), m_last_blit_pixels(0)
+		m_last_blit_time(0), m_last_blit_pixels(0),
+		m_dimensions(0,0)
 	{}
 
 	virtual int create() override;
@@ -111,8 +112,9 @@ public:
 	bgfx::ProgramHandle m_progQuadTexture;
 	bgfx::ProgramHandle m_progLine;
 	bgfx::UniformHandle m_s_texColor;
-
+	bgfx::FrameBufferHandle fbh;
 	// Original display_mode
+	osd_dim			m_dimensions;
 };
 
 
@@ -158,6 +160,28 @@ static void drawbgfx_exit(void)
 //  renderer_bgfx::create
 //============================================================
 bgfx::ProgramHandle loadProgram(const char* _vsName, const char* _fsName);
+
+
+#ifdef OSD_SDL
+static void* sdlNativeWindowHandle(SDL_Window* _window)
+{
+	SDL_SysWMinfo wmi;
+	SDL_VERSION(&wmi.version);
+	if (!SDL_GetWindowWMInfo(_window, &wmi))
+	{
+		return NULL;
+	}
+
+#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
+	return (void*)wmi.info.x11.window;
+#	elif BX_PLATFORM_OSX
+	return wmi.info.cocoa.window;
+#	elif BX_PLATFORM_WINDOWS
+	return wmi.info.win.window;
+#	endif // BX_PLATFORM_
+}
+
+#endif
 int renderer_bgfx::create()
 {
 	// create renderer
@@ -165,26 +189,39 @@ int renderer_bgfx::create()
 #ifdef OSD_WINDOWS
 	RECT client;
 	GetClientRect(window().m_hwnd, &client);
-
-	bgfx::winSetHwnd(window().m_hwnd);
-	bgfx::init();	
-	bgfx::reset(rect_width(&client), rect_height(&client), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+	if (window().m_index == 0)
+	{
+		bgfx::winSetHwnd(window().m_hwnd);
+		bgfx::init();
+		bgfx::reset(rect_width(&client), rect_height(&client), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+		// Enable debug text.
+		bgfx::setDebug(BGFX_DEBUG_TEXT); //BGFX_DEBUG_STATS
+		m_dimensions = osd_dim(rect_width(&client), rect_height(&client));
+	}
+	else {
+		fbh = bgfx::createFrameBuffer(window().m_hwnd, rect_width(&client), rect_height(&client));
+		bgfx::touch(window().m_index);
+	}
 #else
 	osd_dim wdim = window().get_size();
-	bgfx::sdlSetWindow(window().sdl_window());
-	bgfx::init();
-	bgfx::reset(wdim.width(), wdim.height(), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+	if (window().m_index == 0)
+	{
+		bgfx::sdlSetWindow(window().sdl_window());
+		bgfx::init();
+		bgfx::reset(wdim.width(), wdim.height(), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+		m_dimensions = osd_dim(wdim.width(), wdim.height());
+	}
+	else {
+		fbh = bgfx::createFrameBuffer(sdlNativeWindowHandle(window().sdl_window()), wdim.width(), wdim.height());
+		bgfx::touch(window().m_index);
+	}
 #endif
-
-	// Enable debug text.
-	bgfx::setDebug(BGFX_DEBUG_TEXT); //BGFX_DEBUG_STATS
 	// Create program from shaders.
 	m_progQuad = loadProgram("vs_quad", "fs_quad");
 	m_progQuadTexture = loadProgram("vs_quad_texture", "fs_quad_texture");
 	m_progLine = loadProgram("vs_line", "fs_line");
 	m_s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Int1);
 
-	osd_printf_verbose("Leave drawsdl2_window_create\n");
 	return 0;
 }
 
@@ -195,17 +232,19 @@ int renderer_bgfx::create()
 void renderer_bgfx::destroy()
 {
 	// free the memory in the window
+	if (window().m_index == 0)
+	{
+		// destroy_all_textures();
+		// 
+		bgfx::destroyUniform(m_s_texColor);
+		// Cleanup.
+		bgfx::destroyProgram(m_progQuad);
+		bgfx::destroyProgram(m_progQuadTexture);
+		bgfx::destroyProgram(m_progLine);
 
-	// destroy_all_textures();
-	// 
-	bgfx::destroyUniform(m_s_texColor);
-	// Cleanup.
-	bgfx::destroyProgram(m_progQuad);
-	bgfx::destroyProgram(m_progQuadTexture);
-	bgfx::destroyProgram(m_progLine);
-
-	// Shutdown bgfx.
-	bgfx::shutdown();
+		// Shutdown bgfx.
+		bgfx::shutdown();
+	}
 }
 
 
@@ -738,8 +777,8 @@ static inline void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int wi
 }
 int renderer_bgfx::draw(int update)
 {
-	initVertexDecls();
-
+	initVertexDecls();	
+	int index = window().m_index;
 	// Set view 0 default viewport.
 	int width, height;
 #ifdef OSD_WINDOWS
@@ -747,14 +786,48 @@ int renderer_bgfx::draw(int update)
 	GetClientRect(window().m_hwnd, &client);
 	width = rect_width(&client);
 	height = rect_height(&client);
+	
 #else
 	osd_dim wdim = window().get_size();
 	width = wdim.width();
 	height = wdim.height();
 #endif
-	bgfx::setViewSeq(0, true);
-	bgfx::setViewRect(0, 0, 0, width, height);
-	bgfx::reset(width, height, video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+	if (index == 0)
+	{
+		if ((m_dimensions != osd_dim(width, height))) {
+			bgfx::reset(width, height, video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+			m_dimensions = osd_dim(width, height);
+		}
+	}
+	else {
+		if ((m_dimensions != osd_dim(width, height))) {
+			bgfx::reset(window().m_main->get_size().width(), window().m_main->get_size().height(), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+			if (bgfx::isValid(fbh))
+			{
+				bgfx::destroyFrameBuffer(fbh);
+			}
+#ifdef OSD_WINDOWS
+			fbh = bgfx::createFrameBuffer(window().m_hwnd, width, height);
+#else
+			fbh = bgfx::createFrameBuffer(sdlNativeWindowHandle(window().sdl_window()), width, height);
+#endif
+			bgfx::setViewFrameBuffer(index, fbh);
+			m_dimensions = osd_dim(width, height);
+			bgfx::setViewClear(index
+				, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
+				, 0x000000ff
+				, 1.0f
+				, 0
+				);
+			bgfx::touch(index);
+			bgfx::frame();
+			return 0;
+		}
+	}
+	if (index != 0) bgfx::setViewFrameBuffer(index, fbh);
+	bgfx::setViewSeq(index, true);
+	bgfx::setViewRect(index, 0, 0, width, height);
+
 	// Setup view transform.
 	{
 		float view[16];
@@ -766,9 +839,9 @@ int renderer_bgfx::draw(int update)
 		float bottom = height;
 		float proj[16];
 		bx::mtxOrtho(proj, left, right, bottom, top, 0.0f, 100.0f);
-		bgfx::setViewTransform(0, view, proj);
+		bgfx::setViewTransform(index, view, proj);
 	}
-	bgfx::setViewClear(0
+	bgfx::setViewClear(index
 		, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
 		, 0x000000ff
 		, 1.0f
@@ -777,7 +850,7 @@ int renderer_bgfx::draw(int update)
 
 	// This dummy draw call is here to make sure that view 0 is cleared
 	// if no other draw calls are submitted to view 0.
-	bgfx::touch(0);
+	bgfx::touch(index);
 
 	window().m_primlist->acquire_lock();
 	// Draw quad.
@@ -815,7 +888,7 @@ int renderer_bgfx::draw(int update)
 				u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255),
 				1.0f);
 			bgfx::setState(flags);
-			bgfx::submit(0, m_progLine);
+			bgfx::submit(index, m_progLine);
 			break;
 
 		case render_primitive::QUAD:
@@ -826,7 +899,7 @@ int renderer_bgfx::draw(int update)
 				screenQuad(prim->bounds.x0, prim->bounds.y0, prim->bounds.x1, prim->bounds.y1,
 					u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255), uv);
 				bgfx::setState(flags);
-				bgfx::submit(0, m_progQuad);
+				bgfx::submit(index, m_progQuad);
 			}
 			else {
 				screenQuad(prim->bounds.x0, prim->bounds.y0, prim->bounds.x1, prim->bounds.y1,
@@ -926,7 +999,7 @@ int renderer_bgfx::draw(int update)
 				}
 				bgfx::setTexture(0, m_s_texColor, m_texture);
 				bgfx::setState(flags);
-				bgfx::submit(0, m_progQuadTexture);
+				bgfx::submit(index, m_progQuadTexture);
 				bgfx::destroyTexture(m_texture);
 			}
 			break;
@@ -939,7 +1012,7 @@ int renderer_bgfx::draw(int update)
 	window().m_primlist->release_lock();
 	// Advance to next frame. Rendering thread will be kicked to
 	// process submitted rendering primitives.
-	bgfx::frame();
+	if (index==0) bgfx::frame();
 
 	return 0;
 }
