@@ -9308,8 +9308,14 @@ ROM_END
 
 /* Cherry Master I (V1.10)
    Original Dyna upgrade for Cherry Master boards.
+   The game runs in an original Dyna D9001 PCB.
    It laks of STOP ALL button.
-*/
+
+   From the owner (sic):
+   - The reels cannot be stop, not exist all stop button or cannot be stop from small, big, double-up button.
+   - The odds still be "high" (on the version 4.x be "low" odds).
+   - Not hold a pair option to, and the min bet to start is fixed x1.
+ */
 ROM_START( cmasterh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cm_v1.10_dyna.bin",  0x0000,  0x1000, CRC(872f2ef0) SHA1(ec68a03a1e8ab793d4a5eae1ce25f91608351c55) )
