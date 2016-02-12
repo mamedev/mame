@@ -83,6 +83,8 @@
 #include "cpu/m6800/m6800.h"
 #include "cpu/s2650/s2650.h"
 
+#include "machine/clock.h"
+
 
 WRITE8_MEMBER(laserbat_state_base::ct_io_w)
 {
@@ -459,13 +461,6 @@ void laserbat_state::machine_start()
 	save_item(NAME(m_keys));
 }
 
-void catnmous_state::machine_start()
-{
-	laserbat_state_base::machine_start();
-
-	save_item(NAME(m_cb1));
-}
-
 void laserbat_state_base::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
@@ -550,9 +545,11 @@ static MACHINE_CONFIG_DERIVED_CLASS( catnmous, laserbat_base, catnmous_state )
 	MCFG_PALETTE_INIT_OWNER(catnmous_state, catnmous)
 
 	// sound board devices
-	MCFG_CPU_ADD("audiocpu", M6802, 3580000) // ?
+	MCFG_CPU_ADD("audiocpu", M6802, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(catnmous_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(catnmous_state, cb1_toggle,  (double)3580000/4096)
+
+	MCFG_DEVICE_ADD("timebase", CLOCK, XTAL_3_579545MHz/4096/2) // CPU clock divided with 4040 and half of 7474
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("pia", pia6821_device, cb1_w))
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(catnmous_state, pia_porta_r))
@@ -563,11 +560,11 @@ static MACHINE_CONFIG_DERIVED_CLASS( catnmous, laserbat_base, catnmous_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("psg1", AY8910, 3580000/2) // ?
+	MCFG_SOUND_ADD("psg1", AY8910, XTAL_3_579545MHz/2) // CPU clock divided with 4040
 	MCFG_AY8910_PORT_B_READ_CB(READ8(catnmous_state, psg1_portb_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("psg2", AY8910, 3580000/2) // ?
+	MCFG_SOUND_ADD("psg2", AY8910, XTAL_3_579545MHz/2) // CPU clock divided with 4040
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END

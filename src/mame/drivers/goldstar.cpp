@@ -8211,11 +8211,17 @@ ROM_START( chrygld )
 ROM_END
 
 
-/* Moon Light (set 1)
+/* Moon Light (V.0629)
+   Rip off / clone of Gold Star.
+
+   The program ROM is double size and stores two different programs.
+   Whilst we have not idea about the real addressing, we can support
+   both sets separately.
+
 */
 ROM_START( moonlght )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "4.bin",       0x0000, 0x20000, CRC(ecb06cfb) SHA1(e32613cac5583a0fecf04fca98796b91698e530c) )
+	ROM_REGION( 0x20000, "maincpu", 0 )  // using only the first half of the program ROM.
+	ROM_LOAD( "4.bin",       0x0000, 0x20000, CRC(ecb06cfb) SHA1(e32613cac5583a0fecf04fca98796b91698e530c) )    // low program, normal gfx
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "28.bin",      0x00000, 0x20000, CRC(76915c0f) SHA1(3f6d1c0dd3d9bf29538181a0e930291b822dad8c) )
@@ -8227,7 +8233,27 @@ ROM_START( moonlght )
 	ROM_LOAD( "gs1-snd.bin",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
 ROM_END
 
-/* Moon Light (set 2)
+ROM_START( moonlghta )
+	ROM_REGION( 0x20000, "maincpu", 0 )  // using only the second half of the program ROM.
+	ROM_LOAD( "4.bin",       0x10000, 0x10000, CRC(ecb06cfb) SHA1(e32613cac5583a0fecf04fca98796b91698e530c) )   // high program, normal gfx
+	ROM_CONTINUE(            0x00000, 0x10000)
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "28.bin",      0x00000, 0x20000, CRC(76915c0f) SHA1(3f6d1c0dd3d9bf29538181a0e930291b822dad8c) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "29.bin",      0x00000, 0x20000, CRC(8a5f274d) SHA1(0f2ad61b00e220fc509c01c11c1a8f4e47b54f2a) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Audio ADPCM */
+	ROM_LOAD( "gs1-snd.bin",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
+ROM_END
+
+/* Moon Light (V.02L0A)
+   Rip off / clone of Gold Star.
+
+   The program ROM is double size and stores two different programs.
+   Whilst we have not idea about the real addressing, we can support
+   both sets separately.
 
    GFX devices are 4 times bigger and contains 4 times the same data.
    Maybe the manufacturers run out of proper devices...
@@ -8239,8 +8265,8 @@ ROM_END
    effect that shouldn't be there. Maybe is product of a bad dump. Need to be checked with
    the real board.
 
-   The hardware uses only the second half of the program ROM (double sized), that replaces
-   the double-up's cards graphics with 'drakkars' (scandinavian / viking ships).
+   The hardware currently uses only the second half of the program ROM (high program), that
+   replaces the double-up's cards graphics with 'drakkars' (scandinavian / viking ships).
 
 ----------------------------------------------------------------------------------------
 28.bin                                          FIXED BITS (00xxxxxx)
@@ -8262,15 +8288,29 @@ ROM_END
 28.bin                  moon-gfx2.bin [4/4]      94.188690%
 */
 ROM_START( moonlghtb )
+	ROM_REGION( 0x20000, "maincpu", 0 )  // using only the first half of the program ROM.
+	ROM_LOAD( "moon-main.bin",       0x00000, 0x20000, CRC(0a4b5dd0) SHA1(825801e9b72c10fed8e07f42b3b475688bdbd878) )  // low program, normal gfx
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "28.bin",      0x00000, 0x20000, CRC(76915c0f) SHA1(3f6d1c0dd3d9bf29538181a0e930291b822dad8c) )    // Normal GFX, from the other PCB
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "29.bin",      0x00000, 0x20000, CRC(8a5f274d) SHA1(0f2ad61b00e220fc509c01c11c1a8f4e47b54f2a) )    // Normal GFX, from the other PCB
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Audio ADPCM */
+	ROM_LOAD( "moon-sound.bin",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
+ROM_END
+
+ROM_START( moonlghtc )
 	ROM_REGION( 0x20000, "maincpu", 0 )  // using only the second half of the program ROM.
-	ROM_LOAD( "moon-main.bin",       0x10000, 0x10000, CRC(0a4b5dd0) SHA1(825801e9b72c10fed8e07f42b3b475688bdbd878) )
+	ROM_LOAD( "moon-main.bin",       0x10000, 0x10000, CRC(0a4b5dd0) SHA1(825801e9b72c10fed8e07f42b3b475688bdbd878) )  // high program, alt gfx
 	ROM_CONTINUE(                    0x00000, 0x10000)
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "moon-gfx2.bin",      0x00000, 0x80000, CRC(2ce5b722) SHA1(feb87fbf3b8d875842df80cd1edfef5071ed60c7) )
+	ROM_LOAD( "moon-gfx2.bin",      0x00000, 0x80000, CRC(2ce5b722) SHA1(feb87fbf3b8d875842df80cd1edfef5071ed60c7) )  // Alt GFX set. Ships instead of cards
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "moon-gfx1.bin",      0x00000, 0x80000, CRC(ea7d4234) SHA1(4016227aabf176c6e0fd822ebc59cade811f4ce8) )
+	ROM_LOAD( "moon-gfx1.bin",      0x00000, 0x80000, CRC(ea7d4234) SHA1(4016227aabf176c6e0fd822ebc59cade811f4ce8) )  // Alt GFX set. Ships instead of cards
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Audio ADPCM */
 	ROM_LOAD( "moon-sound.bin",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
@@ -13325,8 +13365,10 @@ DRIVER_INIT_MEMBER(goldstar_state, wcherry)
        YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT       ROT    COMPANY              FULLNAME                                      FLAGS              LAYOUT */
 GAMEL( 199?, goldstar,  0,        goldstar, goldstar, goldstar_state, goldstar,  ROT0, "IGS",               "Golden Star",                                 0,                 layout_goldstar )
 GAMEL( 199?, goldstbl,  goldstar, goldstbl, goldstar, driver_device,  0,         ROT0, "IGS",               "Golden Star (Blue version)",                  0,                 layout_goldstar )
-GAME(  199?, moonlght,  goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (bootleg of Golden Star, set 1)",  0 )
-GAME(  199?, moonlghtb, goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (bootleg of Golden Star, set 2)",  MACHINE_IMPERFECT_COLORS )  // need to check the odd palette value at 0xc780. should be black.
+GAME(  199?, moonlght,  goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (v.0629, low program)",            0 )
+GAME(  199?, moonlghta, goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (v.0629, high program)",           0 )
+GAME(  199?, moonlghtb, goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (v.02L0A, low program)",           MACHINE_IMPERFECT_COLORS )  // need to check the odd palette value at 0xc780. should be black.
+GAME(  199?, moonlghtc, goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (v.02L0A, high program, alt gfx)", MACHINE_IMPERFECT_COLORS )  // need to check the odd palette value at 0xc780. should be black.
 GAMEL( 199?, chrygld,   0,        chrygld,  chrygld,  cb3_state,      chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0,                 layout_chrygld )
 GAMEL( 199?, chry10,    0,        chrygld,  chry10,   cb3_state,      chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0,                 layout_chrygld )
 GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,         ROT0, "bootleg",           "Gold Fruit",                                  0 )                  // maybe fullname should be 'Gold Fruit (main 40%)'

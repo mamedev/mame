@@ -388,9 +388,3 @@ READ8_MEMBER(catnmous_state::psg1_portb_r)
 	// assume they're not connected and read high from the internal pull-ups
 	return m_csound1 | 0xe0;
 }
-
-INTERRUPT_GEN_MEMBER(catnmous_state::cb1_toggle)
-{
-	m_cb1 = !m_cb1;
-	m_pia->cb1_w(m_cb1 ? 1 : 0);
-}

@@ -2,21 +2,33 @@
 // copyright-holders:Jonathan Gevaryahu
 /* Xerox Notetaker, 1978
  * Driver by Jonathan Gevaryahu
- * prototype only, three? units manufactured (one at CHM, not sure where the other two are)
- * This device was the origin of Smalltalk-78
- * NO MEDIA for this device has survived, only a ram dump
- * see http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker
+ *
+ * <Note that below is a really lousy write-up, this system deserves much better. use the Ingalls-2014-Smalltalk78.pdf as a better source for all this stuff!>
+ * Designed by Alan Kay and Many others, with BIOS written by Bruce Horn
+ * History of the machine can be found at http://freudenbergs.de/bert/publications/Ingalls-2014-Smalltalk78.pdf
+ * prototypes only, around 10 units manufactured 1978-1980 (one at CHM, not sure where the others are)
+ * This device was the origin of Smalltalk-78 (which acted as the operating system of the Notetaker)
+ * The Notetaker also introduced the BitBlt graphical operation, which was used to do most graphical functions in Smalltalk-78
+ * As far as I am aware, no media (world disks/boot disks) for the Notetaker have survived, only an incomplete ram dump of the smalltalk-76
+ * 'world' which was used to bootstrap smalltalk-78 originally
+ *
+ * see http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker for additional information
+ * http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790620_Z-IOP_1.5_ls.pdf is listing of the biop v1.5 code
  *
  * MISSING DUMP for 8741? I/O MCU which does mouse-related stuff
  
 TODO: everything below.
 * Get the running machine smalltalk-78 memory dump loaded as a rom and forced into ram on startup, since no boot disks have survived
 * floppy controller wd1791
+  According to http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790620_Z-IOP_1.5_ls.pdf the format is 128 bytes per sector, 16 sectors per track (one sided)
+  According to the schematics, we're missing an 82s147 DISKSEP.PROM used as a data separator
 * crt5027 video controller
-* pic8259 interrupt controller - this is attached as a device, but the interrupts are not hooked to it yet.
 * i8251? serial/EIA controller
-* 6402 keyboard UART
+* Harris 6402 keyboard UART
 * HLE for the missing MCU which reads the mouse quadratures and buttons
+
+WIP:
+* pic8259 interrupt controller - this is attached as a device, but the interrupts are not hooked to it yet.
 
 */
 
@@ -56,13 +68,14 @@ public:
 WRITE16_MEMBER(notetaker_state::IPConReg_w)
 {
 	m_BootSeqDone = (data&0x80)?1:0;
-	//m_ProcLock = (data&0x40)?1:0;
-	//m_CharCtr = (data&0x20)?1:0;
-	m_DisableROM = (data&0x10)?1:0;
+	//m_ProcLock = (data&0x40)?1:0; // processor lock
+	//m_CharCtr = (data&0x20)?1:0; // battery charge control
+	m_DisableROM = (data&0x10)?1:0; // disable rom at 0000-0fff
 	//m_CorrOn = (data&0x08)?1:0; // also LedInd5
 	//m_LedInd6 = (data&0x04)?1:0;
 	//m_LedInd7 = (data&0x02)?1:0;
 	//m_LedInd8 = (data&0x01)?1:0;
+	popmessage("LEDS: CR1: %d, CR2: %d, CR3: %d, CR4: %d", (data&0x04)>>2, (data&0x08)>>3, (data&0x02)>>1, (data&0x01)); // cr1 and 2 are in the reverse order as expected, according to the schematic
 }
 
 READ16_MEMBER(notetaker_state::maincpu_r)
@@ -143,7 +156,7 @@ ADDRESS_MAP_END
 0x02 to port 0x100 (IOR write: enable 5v only relay control for powering up 4116 dram enabled)
 0x03 to port 0x100 (IOR write: in addition to above, enable 12v relay control for powering up 4116 dram enabled)
 <dram memory 0x00000-0x3ffff is zeroed here>
-0x13 to port 0x000 (?????)
+0x13 to port 0x000 PIC (?????)
 0x08 to port 0x002 PIC (UART int enabled)
 0x0D to port 0x002 PIC (UART, wd1791, and parity error int enabled)
 0xff to port 0x002 PIC (all ints enabled)
@@ -181,13 +194,13 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( notetakr, notetaker_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL_24MHz/3) /* 24Mhz crystal divided down by i8284 clock generator */
+	MCFG_CPU_ADD("maincpu", I8086, XTAL_24MHz/3) /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
 	MCFG_CPU_PROGRAM_MAP(notetaker_mem)
 	MCFG_CPU_IO_MAP(notetaker_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
-	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NULL)
+	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NULL) // iP8259A-2 @ E6
 
-	//Note there is a second i8086 cpu on the 'emulator board', which is probably loaded with code once smalltalk boots
+	//Note there is a second i8086 cpu on the 'emulator board', which is probably loaded with code once smalltalk-78 loads
 
 	/* video hardware */
 	/*MCFG_SCREEN_ADD("screen", RASTER)
@@ -209,7 +222,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(notetaker_state,notetakr)
 {
-	// descramble the rom; the whole thing is a gigantic scrambled mess probably to ease
+	// descramble the rom; the whole thing is a gigantic scrambled mess either to ease
 	// interfacing with older xerox technologies which used A0 and D0 as the MSB bits
 	// or maybe because someone screwed up somewhere along the line. we may never know.
 	// see http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker/schematics/19790423_Notetaker_IO_Processor.pdf pages 12 and onward
@@ -233,10 +246,17 @@ DRIVER_INIT_MEMBER(notetaker_state,notetakr)
 /* ROM definition */
 ROM_START( notetakr )
 	ROM_REGION( 0x1000, "maincpuload", ROMREGION_ERASEFF ) // load roms here before descrambling
-	ROMX_LOAD( "biop__2.00_hi.b2716.h1", 0x0000, 0x0800, CRC(1119691d) SHA1(4c20b595b554e6f5489ab2c3fb364b4a052f05e3), ROM_SKIP(1))
-	ROMX_LOAD( "biop__2.00_lo.b2716.g1", 0x0001, 0x0800, CRC(b72aa4c7) SHA1(85dab2399f906c7695dc92e7c18f32e2303c5892), ROM_SKIP(1))
+	ROM_SYSTEM_BIOS( 0, "v2.00", "IO Monitor v2.00" ) // dumped from Notetaker
+	ROMX_LOAD( "biop__2.00_hi.b2716.h1", 0x0000, 0x0800, CRC(1119691d) SHA1(4c20b595b554e6f5489ab2c3fb364b4a052f05e3), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "biop__2.00_lo.b2716.g1", 0x0001, 0x0800, CRC(b72aa4c7) SHA1(85dab2399f906c7695dc92e7c18f32e2303c5892), ROM_SKIP(1) | ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "v1.50", "IO Monitor v1.50" ) // typed from the source listing at http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790620_Z-IOP_1.5_ls.pdf and scrambled
+	ROMX_LOAD( "z-iop_1.50_hi.h1", 0x0000, 0x0800, CRC(2994656e) SHA1(ca2bb38eb9075c5c2f3cc5439b209e7e216084da), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "z-iop_1.50_lo.g1", 0x0001, 0x0800, CRC(2cb79a67) SHA1(692aafd2aeea27533f6288dbb1cb8678ea08fade), ROM_SKIP(1) | ROM_BIOS(2))
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF ) // area for descrambled roms
 	ROM_REGION( 0x100000, "ram", ROMREGION_ERASEFF ) // ram cards
+	ROM_REGION( 0x1000, "proms", ROMREGION_ERASEFF )
+	ROM_LOAD( "disksep.prom.82s147.a4", 0x000, 0x200, NO_DUMP ) // disk data separator prom from the disk/display module board
+	ROM_LOAD( "setmemrq.prom.82s126.d9", 0x200, 0x100, NO_DUMP ) // SETMEMRQ memory timing prom from the disk/display module board
 ROM_END
 
 /* Driver */

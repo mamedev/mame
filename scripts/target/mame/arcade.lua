@@ -4286,7 +4286,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/extrema.cpp",
 	MAME_DIR .. "src/mame/drivers/fastinvaders.cpp",
 	MAME_DIR .. "src/mame/drivers/fireball.cpp",
-	MAME_DIR .. "src/mame/drivers/flagrall.cpp",
 	MAME_DIR .. "src/mame/drivers/flipjack.cpp",
 	MAME_DIR .. "src/mame/drivers/flower.cpp",
 	MAME_DIR .. "src/mame/includes/flower.h",
