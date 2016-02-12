@@ -1046,9 +1046,6 @@ ROM_START( snowboara )
 	ROM_LOAD( "sb44",       0x0000000, 0x0400000, CRC(1bbe88bc) SHA1(15bce9ada2b742ba4d537fa8efc0f29f661bff00) )    /* GFX only */
 	ROM_LOAD( "sb45",       0x0400000, 0x0400000, CRC(373983d9) SHA1(05e35a8b27cab469885f0ec2a5df200a366b50a1) )    /* Sound only */
 	ROM_LOAD( "sb46",       0x0800000, 0x0400000, CRC(22e7c648) SHA1(baddb9bc13accd83bea61533d7286cf61cd89279) )    /* GFX only */
-
-	DISK_REGION( "decrypt" )
-	DISK_IMAGE( "snowboar", 0, SHA1(fecf611bd9289d24a0b1cabaaf030e2cee322cfa) )
 ROM_END
 
 ROM_START( snowboar )
@@ -1086,9 +1083,6 @@ ROM_START( snowboar )
 	ROM_LOAD( "sb.e2",      0x1100000, 0x0080000, CRC(f5948c6c) SHA1(91bba817ced194b02885ce84b7a8132ef5ca631a) )    /* GFX only */
 	ROM_LOAD( "sb.e3",      0x1180000, 0x0080000, CRC(4baa678f) SHA1(a7fbbd687e2d8d7e96207c8ace0799a3cc9c3272) )    /* GFX only */
 	ROM_FILL(               0x1200000, 0x0200000, 0x00 )         /* Empty */
-
-	DISK_REGION( "decrypt" )
-	DISK_IMAGE( "snowboar", 0, SHA1(fecf611bd9289d24a0b1cabaaf030e2cee322cfa) )
 ROM_END
 
 

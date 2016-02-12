@@ -4021,6 +4021,8 @@ files {
 
 createMAMEProjects(_target, _subtarget, "zaccaria")
 files {
+	MAME_DIR .. "src/mame/audio/zaccaria.cpp",
+	MAME_DIR .. "src/mame/audio/zaccaria.h",
 	MAME_DIR .. "src/mame/drivers/laserbat.cpp",
 	MAME_DIR .. "src/mame/includes/laserbat.h",
 	MAME_DIR .. "src/mame/video/laserbat.cpp",
