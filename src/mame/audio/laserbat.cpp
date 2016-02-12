@@ -355,16 +355,6 @@ WRITE8_MEMBER(catnmous_state::pia_portb_w)
 		m_psg2->data_address_w(space, (data >> 2) & 0x01, m_pia->a_output());
 }
 
-WRITE_LINE_MEMBER(catnmous_state::pia_irqa)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER(catnmous_state::pia_irqb)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 WRITE8_MEMBER(catnmous_state::psg1_porta_w)
 {
 	// similar to zaccaria.c since we have no clue how this board really works

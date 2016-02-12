@@ -555,8 +555,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( catnmous, laserbat_base, catnmous_state )
 	MCFG_PIA_READPA_HANDLER(READ8(catnmous_state, pia_porta_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(catnmous_state, pia_porta_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(catnmous_state, pia_portb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(catnmous_state, pia_irqa))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(catnmous_state, pia_irqb))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, nmi_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, irq_line))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

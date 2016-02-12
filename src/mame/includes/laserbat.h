@@ -203,8 +203,6 @@ public:
 	DECLARE_READ8_MEMBER(pia_porta_r);
 	DECLARE_WRITE8_MEMBER(pia_porta_w);
 	DECLARE_WRITE8_MEMBER(pia_portb_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqa);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqb);
 
 	// PSG handlers
 	DECLARE_WRITE8_MEMBER(psg1_porta_w);
