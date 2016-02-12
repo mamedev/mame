@@ -127,6 +127,8 @@ int drawbgfx_init(running_machine &machine, osd_draw_callbacks *callbacks)
 
 static void drawbgfx_exit(void)
 {
+	// Shutdown bgfx.
+	bgfx::shutdown();
 }
 
 //============================================================
@@ -196,20 +198,15 @@ int renderer_bgfx::create()
 
 void renderer_bgfx::destroy()
 {
-	// free the memory in the window
-	if (window().m_index == 0)
+	if (window().m_index > 0) 
 	{
-		// destroy_all_textures();
-		// 
-		bgfx::destroyUniform(m_s_texColor);
-		// Cleanup.
-		bgfx::destroyProgram(m_progQuad);
-		bgfx::destroyProgram(m_progQuadTexture);
-		bgfx::destroyProgram(m_progLine);
-
-		// Shutdown bgfx.
-		bgfx::shutdown();
+		bgfx::destroyFrameBuffer(fbh);
 	}
+	bgfx::destroyUniform(m_s_texColor);
+	// Cleanup.
+	bgfx::destroyProgram(m_progQuad);
+	bgfx::destroyProgram(m_progQuadTexture);
+	bgfx::destroyProgram(m_progLine);
 }
 
 
