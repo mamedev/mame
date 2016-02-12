@@ -60,10 +60,7 @@ class renderer_bgfx : public osd_renderer
 {
 public:
 	renderer_bgfx(osd_window *w)
-	: osd_renderer(w, FLAG_NONE), m_blittimer(0),
-		m_blit_dim(0, 0),
-		m_last_hofs(0), m_last_vofs(0),
-		m_last_blit_time(0), m_last_blit_pixels(0),
+	: osd_renderer(w, FLAG_NONE),
 		m_dimensions(0,0)
 	{}
 
@@ -79,34 +76,10 @@ public:
 	virtual void destroy() override;
 	virtual render_primitive_list *get_primitives() override
 	{
-#ifdef OSD_WINDOWS
-		RECT client;
-		GetClientRect(window().m_hwnd, &client);
-		window().target()->set_bounds(rect_width(&client), rect_height(&client), window().aspect());
-		return &window().target()->get_primitives();
-#else
 		osd_dim wdim = window().get_size();
 		window().target()->set_bounds(wdim.width(), wdim.height(), window().aspect());
 		return &window().target()->get_primitives();
-#endif
 	}
-
-	// void render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y);
-
-	//texture_info *texture_find(const render_primitive &prim, const quad_setup_data &setup);
-	//texture_info *texture_update(const render_primitive &prim);
-
-	INT32           m_blittimer;
-
-	//simple_list<texture_info>  m_texlist;                // list of active textures
-
-	osd_dim         m_blit_dim;
-	float           m_last_hofs;
-	float           m_last_vofs;
-
-	// Stats
-	INT64           m_last_blit_time;
-	INT64           m_last_blit_pixels;
 
 	bgfx::ProgramHandle m_progQuad;
 	bgfx::ProgramHandle m_progQuadTexture;
@@ -247,11 +220,11 @@ void renderer_bgfx::destroy()
 #ifdef OSD_SDL
 int renderer_bgfx::xy_to_render_target(int x, int y, int *xt, int *yt)
 {
-	*xt = x - m_last_hofs;
-	*yt = y - m_last_vofs;
-	if (*xt<0 || *xt >= m_blit_dim.width())
+	*xt = x;
+	*yt = y;
+	if (*xt<0 || *xt >= m_dimensions.width())
 		return 0;
-	if (*yt<0 || *yt >= m_blit_dim.height())
+	if (*yt<0 || *yt >= m_dimensions.height())
 		return 0;
 	return 1;
 }
