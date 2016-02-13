@@ -133,7 +133,7 @@ void ui_menu_main::populate()
 		item_append("Crosshair Options", nullptr, 0, (void *)CROSSHAIR);
 
 	/* add cheat menu */
-	if (machine().options().cheat() && machine().cheat().first() != nullptr)
+	if (machine().options().cheat())
 		item_append("Cheat", nullptr, 0, (void *)CHEAT);
 
 	// add dats menu
