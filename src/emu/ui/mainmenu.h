@@ -52,7 +52,7 @@ private:
 		QUIT_GAME
 	};
 
-	bool submenu;
+	//bool submenu;
 };
 
 #endif  /* __UI_MAINMENU_H__ */
