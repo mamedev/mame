@@ -387,6 +387,15 @@ void apple1_state::machine_start()
 	m_ready_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple1_state::ready_start_cb), this));
 	m_ready_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple1_state::ready_end_cb), this));
 	m_kbd_strobe_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple1_state::keyboard_strobe_cb), this));
+
+	// setup save states
+	save_item(NAME(m_vram));
+	save_item(NAME(m_cursx));
+	save_item(NAME(m_cursy));
+	save_item(NAME(m_reset_down));
+	save_item(NAME(m_clear_down));
+	save_item(NAME(m_transchar));
+	save_item(NAME(m_lastports));
 }
 
 void apple1_state::machine_reset()
@@ -614,5 +623,5 @@ ROM_START(apple1)
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   STATE         INIT     COMPANY            FULLNAME */
-COMP( 1976, apple1,  0,     0,      apple1,     apple1, driver_device,  0,        "Apple Computer",    "Apple I", MACHINE_NO_SOUND_HW )
+COMP( 1976, apple1,  0,     0,      apple1,     apple1, driver_device,  0,        "Apple Computer",    "Apple I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
 
