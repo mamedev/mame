@@ -1780,7 +1780,7 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 		{
 			bool autofire_toggle = machine.ioport().get_autofire_toggle();
 			machine.ioport().set_autofire_toggle(!autofire_toggle);
-			machine.popmessage("Autofire %s", autofire_toggle ? "Disabled" : "Enabled");
+			machine.popmessage("Autofire %s", autofire_toggle ? "Enabled" : "Disabled");
 		}
 	}
 
