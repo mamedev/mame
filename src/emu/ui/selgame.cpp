@@ -377,13 +377,13 @@ void ui_menu_select_game::handle()
 			if (!isfavorite())
 			{
 				const game_driver *driver = (const game_driver *)m_event->itemref;
-				if ((FPTR)driver > 3)
+				if ((FPTR)driver > 3 && machine().datfile().has_data(driver))
 					ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, driver));
 			}
 			else
 			{
 				ui_software_info *swinfo  = (ui_software_info *)m_event->itemref;
-				if ((FPTR)swinfo > 3)
+				if ((FPTR)swinfo > 3 && machine().datfile().has_data(swinfo->driver))
 				{
 					if (swinfo->startempty == 1)
 						ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, swinfo->driver));

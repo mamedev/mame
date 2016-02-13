@@ -216,7 +216,7 @@ void ui_menu_select_software::handle()
 		{
 			ui_software_info *ui_swinfo = (ui_software_info *)m_event->itemref;
 
-			if ((FPTR)ui_swinfo > 1)
+			if ((FPTR)ui_swinfo > 1 && machine().datfile().has_data(ui_swinfo->driver))
 			{
 				if (ui_swinfo->startempty == 1)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo->driver));
