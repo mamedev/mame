@@ -66,23 +66,25 @@ ui_menu_display_options::ui_menu_display_options(running_machine &machine, rende
 
 	// create video list
 	m_list.push_back("auto");
+	m_list.push_back("opengl"); // TODO: check USE_OPENGL
 
 	std::string descr = options.description(OSDOPTION_VIDEO);
-	std::string delim = ", ";
 	descr.erase(0, descr.find(":") + 2);
-	size_t start = 0;
-	size_t end = descr.find_first_of(delim, start);
-	while (end != std::string::npos)
+	std::string delim = ", ";
+	size_t p1, p2 = 0;
+	for (;;)
 	{
-		std::string name = descr.substr(start, end - start);
-		if (name != "none" && name != "or")
-			m_list.push_back(name);
-		start = descr.find_first_not_of(delim, end);
-		if (start == std::string::npos)
+		p1 = descr.find_first_not_of(delim, p2);
+		if (p1 == std::string::npos)
 			break;
-		end = descr.find_first_of(delim, start);
-		if (end == std::string::npos)
-			end = descr.size();
+		p2 = descr.find_first_of(delim, p1 + 1);
+		if (p2 != std::string::npos)
+			m_list.push_back(descr.substr(p1, p2 - p1));
+		else
+		{
+			m_list.push_back(descr.substr(p1));
+			break;
+		}
 	}
 
 	m_options[1].status = 0;

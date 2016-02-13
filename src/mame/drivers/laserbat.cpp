@@ -83,6 +83,8 @@
 #include "cpu/m6800/m6800.h"
 #include "cpu/s2650/s2650.h"
 
+#include "machine/clock.h"
+
 
 WRITE8_MEMBER(laserbat_state_base::ct_io_w)
 {
@@ -192,14 +194,6 @@ static ADDRESS_MAP_START( laserbat_io_map, AS_IO, 8, laserbat_state_base )
 	AM_RANGE(0x07, 0x07)                    AM_WRITE(csound2_w)
 
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( catnmous_sound_map, AS_PROGRAM, 8, catnmous_state )
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xc000, 0xcfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -459,13 +453,6 @@ void laserbat_state::machine_start()
 	save_item(NAME(m_keys));
 }
 
-void catnmous_state::machine_start()
-{
-	laserbat_state_base::machine_start();
-
-	save_item(NAME(m_cb1));
-}
-
 void laserbat_state_base::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
@@ -550,25 +537,9 @@ static MACHINE_CONFIG_DERIVED_CLASS( catnmous, laserbat_base, catnmous_state )
 	MCFG_PALETTE_INIT_OWNER(catnmous_state, catnmous)
 
 	// sound board devices
-	MCFG_CPU_ADD("audiocpu", M6802, 3580000) // ?
-	MCFG_CPU_PROGRAM_MAP(catnmous_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(catnmous_state, cb1_toggle,  (double)3580000/4096)
-
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(catnmous_state, pia_porta_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(catnmous_state, pia_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(catnmous_state, pia_portb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(catnmous_state, pia_irqa))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(catnmous_state, pia_irqb))
-
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("psg1", AY8910, 3580000/2) // ?
-	MCFG_AY8910_PORT_B_READ_CB(READ8(catnmous_state, psg1_portb_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_SOUND_ADD("psg2", AY8910, 3580000/2) // ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_ZACCARIA_1B11107("audiopcb")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 MACHINE_CONFIG_END
 
@@ -708,7 +679,7 @@ ROM_START( catnmous )
 	ROM_REGION( 0x0100, "gfxmix", 0 )
 	ROM_LOAD( "82s100.13m",   0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 )
 	ROM_LOAD( "sound01.1f",   0xc000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
 	ROM_LOAD( "sound01.1d",   0xe000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
 	ROM_LOAD( "sound01.1e",   0xf000, 0x1000, CRC(1bd90c93) SHA1(20fd2b765a42e25cf7f716e6631b8c567785a866) )
@@ -750,7 +721,7 @@ ROM_START( catnmousa )
 	// copied from parent set to give working graphics, need dump to confirm
 	ROM_LOAD( "catnmousa_82s100.13m", 0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) BAD_DUMP )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 )
 	ROM_LOAD( "snd.1f",       0xc000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
 	ROM_LOAD( "snd.1d",       0xe000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
 	ROM_LOAD( "snd.1e",       0xf000, 0x1000, CRC(1bd90c93) SHA1(20fd2b765a42e25cf7f716e6631b8c567785a866) )

@@ -10,9 +10,9 @@ driver by David Haywood & Angelo Salese
 many thanks to Charles MacDonald for the schematics / documentation of this HW.
 
 TODO:
- - is opcode $bb right for Night Gal Summer?
- - extra protection for Night Gal Summer (ports 0x6000-3 for z80 and 0x8000-0x8020-1 for MCU);
+ - extra protection for Night Gal Summer (ports 0x6000-3 for z80);
  - Fix Sweet Gal/Sexy Gal layer clearances;
+ - NMI origin for Sexy Gal / Night Gal Summer
  - unemulated WAIT pin for Z80, MCU asserts it when accessing communication RAM
  
 *******************************************************************************************/
@@ -72,7 +72,6 @@ public:
 	required_device<cpu_device> m_subcpu;
 
 	/* memory */
-	DECLARE_READ8_MEMBER(blitter_status_r);
 	//DECLARE_WRITE8_MEMBER(sexygal_nsc_true_blitter_w);
 	DECLARE_WRITE8_MEMBER(royalqn_blitter_0_w);
 	DECLARE_WRITE8_MEMBER(royalqn_blitter_1_w);
@@ -87,7 +86,6 @@ public:
 	DECLARE_DRIVER_INIT(ngalsumr);
 	DECLARE_DRIVER_INIT(royalqn);
 	DECLARE_WRITE8_MEMBER(ngalsumr_unk_w);
-	DECLARE_READ8_MEMBER(ngalsumr_color_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -119,17 +117,12 @@ protected:
 	void z80_wait_assert_cb();
 	TIMER_CALLBACK_MEMBER( z80_wait_ack_cb );
 
+	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
 };
-
-
-
-READ8_MEMBER(nightgal_state::blitter_status_r)
-{
-	return 0x80;
-}
 
 void nightgal_state::video_start()
 {
+	m_tmp_bitmap = std::make_unique<bitmap_ind16>(256, 256);
 }
 
 UINT32 nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -139,7 +132,7 @@ UINT32 nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind1
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		UINT8 *src = &m_blitter->m_blit_buffer[y * 256 + cliprect.min_x];
-		UINT16 *dst = &bitmap.pix16(y, cliprect.min_x);
+		UINT16 *dst = &m_tmp_bitmap->pix16(y, cliprect.min_x);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
@@ -149,67 +142,10 @@ UINT32 nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind1
 		}
 	}
 
+	copybitmap(bitmap, *m_tmp_bitmap, flip_screen(), flip_screen(),0,0, cliprect);
 
 	return 0;
 }
-
-/* different register writes (probably a PAL line swapping).*/
-#ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(nightgal_state::sexygal_nsc_true_blitter_w)
-{
-	int src, x, y, h, w, flipx;
-	m_true_blit[offset] = data;
-
-	/*trigger blitter write to ram,might not be correct...*/
-	if (offset == 6)
-	{
-		//printf("%02x %02x %02x %02x %02x %02x %02x\n", m_true_blit[0], m_true_blit[1], m_true_blit[2], m_true_blit[3], m_true_blit[4], m_true_blit[5], m_true_blit[6]);
-		w = (m_true_blit[5] & 0xff) + 1;
-		h = (m_true_blit[6] & 0xff) + 1;
-		src = ((m_true_blit[1] << 8) | (m_true_blit[0] << 0));
-		src |= (m_true_blit[2] & 3) << 16;
-
-
-		x = (m_true_blit[3] & 0xff);
-		y = (m_true_blit[4] & 0xff);
-
-		// lowest bit of src controls flipping / draw direction?
-		flipx = (m_true_blit[0] & 1);
-
-		if (!flipx)
-			src += (w * h) - 1;
-		else
-			src -= (w * h) - 1;
-
-		{
-			int count = 0;
-			int xcount, ycount;
-			for (ycount = 0; ycount < h; ycount++)
-			{
-				for (xcount = 0; xcount < w; xcount++)
-				{
-					int drawx = (x + xcount) & 0xff;
-					int drawy = (y + ycount) & 0xff;
-					UINT8 dat = nightgal_gfx_nibble(src + count);
-					UINT8 cur_pen_hi = m_pen_data[(dat & 0xf0) >> 4];
-					UINT8 cur_pen_lo = m_pen_data[(dat & 0x0f) >> 0];
-
-					dat = cur_pen_lo | cur_pen_hi << 4;
-
-					if ((dat & 0xff) != 0)
-						plot_nightgal_gfx_pixel(dat, drawx, drawy);
-
-					if (!flipx)
-						count--;
-					else
-						count++;
-				}
-			}
-			//m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
-		}
-	}
-}
-#endif
 
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
 PALETTE_INIT_MEMBER(nightgal_state, nightgal)
@@ -259,23 +195,9 @@ PALETTE_INIT_MEMBER(nightgal_state, nightgal)
 ********************************************/
 
 /*
-(note:when I say "0x80" I just mean a negative result)
-master-slave algorithm
--z80 writes the data for the mcu;
--z80 writes 0 to c200;
--it waits with the bit 0x80 on c100 clears (i.e. the z80 halts),when this happens the z80 continues his logic algorithm (so stop it until we are done!!!)
-
--nsc takes an irq
--puts ff to [1100]
--it waits that the bit 0x80 on [1100] clears
--(puts default clut data,only the first time around)
--reads params from z80 and puts them on the blitter chip
--expects that bit [80] is equal to 0x80;
--clears [1100] and expects that [1100] is 0
--executes a wai (i.e. halt) opcode then expects to receive another irq...
-*/
-
-/* TODO: simplify this (error in the document) */
+   There are three unidirectional latches that also sends an irq from z80 to MCU.
+ */
+// TODO: simplify this (error in the document)
 WRITE8_MEMBER(nightgal_state::royalqn_blitter_0_w)
 {
 	m_blit_raw_data[0] = data;
@@ -296,7 +218,7 @@ READ8_MEMBER(nightgal_state::royalqn_nsc_blit_r)
 {
 	if(offset == 2)
 		m_subcpu->set_input_line(0, CLEAR_LINE );
-
+	
 	return m_blit_raw_data[offset];
 }
 
@@ -386,6 +308,7 @@ WRITE8_MEMBER(nightgal_state::output_w)
 	---- ---x out counter
 	*/
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
+	flip_screen_set((data & 0x04) == 0);
 }
 
 /********************************************
@@ -417,11 +340,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sexygal_nsc_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0080) AM_READ(blitter_status_r)
+	AM_RANGE(0x0080, 0x0080) AM_READ_PORT("BLIT_PORT")
 	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
-	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_alt_process_w)
-	AM_RANGE(0x00a0, 0x00af) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_vregs_w)
-	AM_RANGE(0x00b0, 0x00b0) AM_WRITENOP // bltflip register
+	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, alt_process_w)
+	AM_RANGE(0x00a0, 0x00af) AM_DEVWRITE("blitter", jangou_blitter_device, vregs_w)
+	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("blitter", jangou_blitter_device, bltflip_w) 
 
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_SHARE("comms_ram")
 	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM AM_REGION("subrom", 0)
@@ -454,14 +377,13 @@ static ADDRESS_MAP_START( royalqn_io, AS_IO, 8, nightgal_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( royalqn_nsc_map, AS_PROGRAM, 8, nightgal_state )
-	AM_RANGE(0x0000, 0x007f) AM_RAM AM_SHARE("xx")
-	AM_RANGE(0x0080, 0x0080) AM_READ(blitter_status_r)
+	AM_RANGE(0x0000, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x0080) AM_READ_PORT("BLIT_PORT")
 	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
-	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_process_w)
-	AM_RANGE(0x00a0, 0x00af) AM_DEVWRITE("blitter", jangou_blitter_device, blitter_vregs_w)
-	AM_RANGE(0x00b0, 0x00b0) AM_WRITENOP // bltflip register
+	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, process_w)
+	AM_RANGE(0x00a0, 0x00af) AM_DEVWRITE("blitter", jangou_blitter_device, vregs_w)
+	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("blitter", jangou_blitter_device, bltflip_w) 
 
-	AM_RANGE(0x1000, 0x1007) AM_RAM AM_SHARE("xx")
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r,royalqn_comm_w)
 	AM_RANGE(0x4000, 0x4000) AM_NOP
 	AM_RANGE(0x8000, 0x8000) AM_NOP //open bus or protection check
@@ -704,6 +626,31 @@ static INPUT_PORTS_START( sexygal )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	
+	PORT_START("BLIT_PORT")
+	PORT_DIPNAME( 0x01, 0x01, "BLIT_PORT" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+
 INPUT_PORTS_END
 
 void nightgal_state::machine_start()
@@ -763,7 +710,7 @@ static MACHINE_CONFIG_DERIVED( sexygal, royalqn )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sexygal_map)
 	MCFG_CPU_IO_MAP(sexygal_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 244)//???
+	MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 60)//???
 
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(sexygal_nsc_map)
@@ -781,7 +728,7 @@ static MACHINE_CONFIG_DERIVED( ngalsumr, royalqn )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(royalqn_map)
 	MCFG_CPU_IO_MAP(royalqn_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 244)//???
+	MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 60)//???
 MACHINE_CONFIG_END
 
 /*
@@ -1099,17 +1046,10 @@ WRITE8_MEMBER(nightgal_state::ngalsumr_unk_w)
 	//m_z80_latch = data;
 }
 
-// check with the unknown opcode, maybe it actually just masks with first parameter and second one is displacement byte offset?
-READ8_MEMBER(nightgal_state::ngalsumr_color_r)
-{
-	return (m_comms_ram[offset] & 0x80);
-}
-
 DRIVER_INIT_MEMBER(nightgal_state,ngalsumr)
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(nightgal_state::ngalsumr_unk_w), this) );
 	// 0x6003 some kind of f/f state
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x9000, 0x903f, read8_delegate(FUNC(nightgal_state::ngalsumr_color_r),this) );
 }
 
 /* Type 1 HW */
@@ -1118,7 +1058,7 @@ GAME( 1984, ngtbunny, 0,        royalqn, sexygal, driver_device,  0,       ROT0,
 GAME( 1984, royalngt, ngtbunny, royalqn, sexygal, driver_device,  0,       ROT0, "Royal Denshi", "Royal Night [BET] (Japan 840220 RN 2-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, royalqn,  0,        royalqn, sexygal, nightgal_state, royalqn, ROT0, "Royal Denshi", "Royal Queen [BET] (Japan 841010 RQ 0-07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* Type 2 HW */
-GAME( 1985, sexygal,  0,        sexygal, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sweetgal, sexygal,  sexygal, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sexygal,  0,        sexygal, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sweetgal, sexygal,  sexygal, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* Type 3 HW */
-GAME( 1985, ngalsumr, 0,        ngalsumr,sexygal, nightgal_state,  ngalsumr,ROT0, "Nichibutsu",   "Night Gal Summer (Japan 850702 NGS 0-01)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ngalsumr, 0,        ngalsumr,sexygal, nightgal_state,  ngalsumr,ROT0, "Nichibutsu",   "Night Gal Summer (Japan 850702 NGS 0-01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

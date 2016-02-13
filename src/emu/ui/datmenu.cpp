@@ -18,236 +18,11 @@
 #include "ui/utils.h"
 #include "softlist.h"
 
-/**************************************************
-    MENU COMMAND
-**************************************************/
 //-------------------------------------------------
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_command::ui_menu_command(running_machine &machine, render_container *container, const game_driver *driver) : ui_menu(machine, container)
-{
-	m_driver = (driver == nullptr) ? &machine.system() : driver;
-}
-
-ui_menu_command::~ui_menu_command()
-{
-}
-
-//-------------------------------------------------
-//  populate
-//-------------------------------------------------
-
-void ui_menu_command::populate()
-{
-	std::vector<std::string> text;
-	machine().datfile().command_sub_menu(m_driver, text);
-
-	if (!text.empty())
-	{
-		for (size_t menu_items = 0; menu_items < text.size(); menu_items++)
-			item_append(text[menu_items].c_str(), nullptr, 0, (void *)(FPTR)menu_items);
-	}
-	else
-		item_append("No available Command for this machine.", nullptr, MENU_FLAG_DISABLE, nullptr);
-
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
-
-}
-
-//-------------------------------------------------
-//  handle
-//-------------------------------------------------
-
-void ui_menu_command::handle()
-{
-	// process the menu
-	const ui_menu_event *m_event = process(0);
-
-	if (m_event != nullptr && m_event->iptkey == IPT_UI_SELECT)
-	{
-		std::string m_title(item[selected].text);
-		ui_menu::stack_push(global_alloc_clear<ui_menu_command_content>(machine(), container, m_title, m_driver));
-	}
-}
-
-//-------------------------------------------------
-//  perform our special rendering
-//-------------------------------------------------
-
-void ui_menu_command::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
-{
-	float width;
-	ui_manager &mui = machine().ui();
-	std::string tempbuf = std::string("Command Info - Game: ").append(m_driver->description);
-
-	// get the size of the text
-	mui.draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
-	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
-	float maxwidth = MAX(width, origx2 - origx1);
-
-	// compute our bounds
-	float x1 = 0.5f - 0.5f * maxwidth;
-	float x2 = x1 + maxwidth;
-	float y1 = origy1 - top;
-	float y2 = origy1 - UI_BOX_TB_BORDER;
-
-	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// draw the text within it
-	mui.draw_text_full(container, tempbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-
-}
-
-//-------------------------------------------------
-//  ctor / dtor
-//-------------------------------------------------
-
-ui_menu_command_content::ui_menu_command_content(running_machine &machine, render_container *container, std::string p_title, const game_driver *driver) : ui_menu(machine, container)
-{
-	m_driver = (driver == nullptr) ? &machine.system() : driver;
-	m_title = p_title;
-}
-
-ui_menu_command_content::~ui_menu_command_content()
-{
-}
-
-//-------------------------------------------------
-//  handle
-//-------------------------------------------------
-
-void ui_menu_command_content::handle()
-{
-	// process the menu
-	process(0);
-}
-
-//-------------------------------------------------
-//  populate
-//-------------------------------------------------
-
-void ui_menu_command_content::populate()
-{
-	machine().pause();
-	std::string buffer;
-	machine().datfile().load_command_info(buffer, m_title);
-	float line_height = machine().ui().get_line_height();
-
-	if (!buffer.empty())
-	{
-		float gutter_width = 0.52f * line_height * machine().render().ui_aspect();
-		std::vector<int> xstart;
-		std::vector<int> xend;
-		convert_command_glyph(buffer);
-		int total_lines = machine().ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 
-			1.0f - (2.0f * UI_BOX_LR_BORDER) - 0.02f - (2.0f * gutter_width), xstart, xend);
-		for (int r = 0; r < total_lines; r++)
-		{
-			std::string tempbuf(buffer.substr(xstart[r], xend[r] - xstart[r]));
-			int first_dspace = tempbuf.find("  ");
-			if (first_dspace > 0 )
-			{
-				std::string first_part(tempbuf.substr(0, first_dspace));
-				std::string last_part(tempbuf.substr(first_dspace));
-				strtrimspace(last_part);
-				item_append(first_part.c_str(), last_part.c_str(), MENU_FLAG_UI_HISTORY, nullptr);
-			}
-			else
-				item_append(tempbuf.c_str(), nullptr, MENU_FLAG_UI_HISTORY, nullptr);
-		}
-		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-	}
-
-	machine().resume();
-	customtop = custombottom = line_height + 3.0f * UI_BOX_TB_BORDER;
-}
-
-//-------------------------------------------------
-//  perform our special rendering
-//-------------------------------------------------
-
-void ui_menu_command_content::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
-{
-	float width;
-	ui_manager &mui = machine().ui();
-
-	// get the size of the text
-	mui.draw_text_full(container, m_title.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
-	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
-	float maxwidth = MAX(width, origx2 - origx1);
-
-	// compute our bounds
-	float x1 = 0.5f - 0.5f * maxwidth;
-	float x2 = x1 + maxwidth;
-	float y1 = origy1 - top;
-	float y2 = origy1 - UI_BOX_TB_BORDER;
-
-	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// draw the text within it
-	mui.draw_text_full(container, m_title.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-
-	std::string tempbuf = std::string("Command Info - Game: ").append(m_driver->description);
-
-	mui.draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
-	width += 2 * UI_BOX_LR_BORDER;
-	maxwidth = MAX(origx2 - origx1, width);
-
-	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy2 + UI_BOX_TB_BORDER;
-	y2 = origy2 + bottom;
-
-	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// draw the text within it
-	mui.draw_text_full(container, tempbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-}
-
-/**************************************************
-    MENU SOFTWARE HISTORY
-**************************************************/
-//-------------------------------------------------
-//  ctor / dtor
-//-------------------------------------------------
-
-ui_menu_history_sw::ui_menu_history_sw(running_machine &machine, render_container *container, ui_software_info *swinfo, const game_driver *driver) : ui_menu(machine, container)
-{
-	m_list = swinfo->listname;
-	m_short = swinfo->shortname;
-	m_long = swinfo->longname;
-	m_parent = swinfo->parentname;
-	m_driver = (driver == nullptr) ? &machine.system() : driver;
-}
-
-ui_menu_history_sw::ui_menu_history_sw(running_machine &machine, render_container *container, const game_driver *driver) : ui_menu(machine, container)
+ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container *container, const game_driver *driver) : ui_menu(machine, container)
 {
 	image_interface_iterator iter(machine.root_device());
 	for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
@@ -261,9 +36,36 @@ ui_menu_history_sw::ui_menu_history_sw(running_machine &machine, render_containe
 		}
 	}
 	m_driver = (driver == nullptr) ? &machine.system() : driver;
+
+	init_items();
 }
 
-ui_menu_history_sw::~ui_menu_history_sw()
+//-------------------------------------------------
+//  ctor
+//-------------------------------------------------
+
+ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container *container, ui_software_info *swinfo, const game_driver *driver) : ui_menu(machine, container)
+{
+	m_list = swinfo->listname;
+	m_short = swinfo->shortname;
+	m_long = swinfo->longname;
+	m_parent = swinfo->parentname;
+	m_driver = (driver == nullptr) ? &machine.system() : driver;
+	m_swinfo = swinfo;
+
+	issoft = true;
+
+	if (machine.datfile().has_software(m_list, m_short, m_parent))
+		m_items_list.emplace_back("Software History", UI_HISTORY_LOAD, machine.datfile().rev_history());
+	if (swinfo && !swinfo->usage.empty())
+		m_items_list.emplace_back("Software Usage", 0, "");		
+}
+
+//-------------------------------------------------
+//  dtor
+//-------------------------------------------------
+
+ui_menu_dats_view::~ui_menu_dats_view()
 {
 }
 
@@ -271,223 +73,69 @@ ui_menu_history_sw::~ui_menu_history_sw()
 //  handle
 //-------------------------------------------------
 
-void ui_menu_history_sw::handle()
+void ui_menu_dats_view::handle()
 {
-	// process the menu
-	process(0);
+	const ui_menu_event *m_event = process(MENU_FLAG_UI_DATS);
+	if (m_event != nullptr)
+	{
+		if (m_event->iptkey == IPT_UI_LEFT && actual > 0)
+		{
+			actual--;
+			reset(UI_MENU_RESET_SELECT_FIRST);
+		}
+
+		if (m_event->iptkey == IPT_UI_RIGHT && actual < m_items_list.size() - 1)
+		{
+			actual++;
+			reset(UI_MENU_RESET_SELECT_FIRST);
+		}
+	}
 }
 
 //-------------------------------------------------
 //  populate
 //-------------------------------------------------
 
-void ui_menu_history_sw::populate()
+void ui_menu_dats_view::populate()
 {
 	machine().pause();
-	std::string buffer;
-	machine().datfile().load_software_info(m_list, buffer, m_short, m_parent);
-	float line_height = machine().ui().get_line_height();
-
-	if (!buffer.empty())
-	{
-		float gutter_width = 0.52f * line_height * machine().render().ui_aspect();
-		std::vector<int> xstart;
-		std::vector<int> xend;
-		int total_lines = machine().ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (2.0f * UI_BOX_LR_BORDER) - 0.02f - (2.0f * gutter_width),
-		                         xstart, xend);
-
-		for (int r = 0; r < total_lines; r++)
-		{
-			std::string tempbuf(buffer.substr(xstart[r], xend[r] - xstart[r]));
-			item_append(tempbuf.c_str(), nullptr, MENU_FLAG_UI_HISTORY, nullptr);
-		}
-	}
+	if (!issoft)
+		get_data();
 	else
-		item_append("No available History for this software.", nullptr, MENU_FLAG_DISABLE, nullptr);
+		get_data_sw();
 
+	item_append(MENU_SEPARATOR_ITEM, nullptr, (MENU_FLAG_UI_DATS | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), nullptr);
+	customtop = 2.0f * machine().ui().get_line_height() + 4.0f * UI_BOX_TB_BORDER;
+	custombottom = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	machine().resume();
-
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-	customtop = custombottom = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 //-------------------------------------------------
 //  perform our special rendering
 //-------------------------------------------------
 
-void ui_menu_history_sw::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float width;
-	std::string tempbuf = std::string("Software info - ").append(m_long);
 	ui_manager &mui = machine().ui();
+	float maxwidth = origx2 - origx1;
+	float width;
+	std::string driver;
 
-	// get the size of the text
-	mui.draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
-	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
-	float maxwidth = MAX(width, origx2 - origx1);
+	if (issoft)
+		driver = m_swinfo->longname;
+	else
+		driver = m_driver->description;
 
-	// compute our bounds
-	float x1 = 0.5f - 0.5f * maxwidth;
-	float x2 = x1 + maxwidth;
-	float y1 = origy1 - top;
-	float y2 = origy1 - UI_BOX_TB_BORDER;
-
-	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// draw the text within it
-	mui.draw_text_full(container, tempbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-
-	tempbuf.assign("System driver: ").append(m_driver->description);
-
-	mui.draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	mui.draw_text_full(container, driver.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(origx2 - origx1, width);
 
 	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy2 + UI_BOX_TB_BORDER;
-	y2 = origy2 + bottom;
-
-	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// draw the text within it
-	mui.draw_text_full(container, tempbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-}
-
-/**************************************************
-    MENU DATS
-**************************************************/
-//-------------------------------------------------
-//  ctor / dtor
-//-------------------------------------------------
-
-ui_menu_dats::ui_menu_dats(running_machine &machine, render_container *container, int _flags, const game_driver *driver) : ui_menu(machine, container)
-{
-	m_driver = (driver == nullptr) ? &machine.system() : driver;
-	m_flags = _flags;
-}
-
-ui_menu_dats::~ui_menu_dats()
-{
-}
-
-//-------------------------------------------------
-//  handle
-//-------------------------------------------------
-
-void ui_menu_dats::handle()
-{
-	// process the menu
-	process(0);
-}
-
-//-------------------------------------------------
-//  populate
-//-------------------------------------------------
-
-void ui_menu_dats::populate()
-{
-	machine().pause();
-	switch (m_flags)
-	{
-		case UI_HISTORY_LOAD:
-			if (!get_data(m_driver, m_flags))
-				item_append("No available History for this machine.", nullptr, MENU_FLAG_DISABLE, nullptr);
-			break;
-
-		case UI_MAMEINFO_LOAD:
-			if (!get_data(m_driver, m_flags))
-				item_append("No available MameInfo for this machine.", nullptr, MENU_FLAG_DISABLE, nullptr);
-			break;
-
-		case UI_MESSINFO_LOAD:
-			if (!get_data(m_driver, m_flags))
-				item_append("No available MessInfo for this machine.", nullptr, MENU_FLAG_DISABLE, nullptr);
-			break;
-
-		case UI_STORY_LOAD:
-			if (!get_data(m_driver, UI_STORY_LOAD))
-				item_append("No available Mamescore for this machine.", nullptr, MENU_FLAG_DISABLE, nullptr);
-			break;
-
-		case UI_SYSINFO_LOAD:
-			if (!get_data(m_driver, UI_SYSINFO_LOAD))
-				item_append("No available Sysinfo for this machine.", nullptr, MENU_FLAG_DISABLE, nullptr);
-			break;
-	}
-
-	machine().resume();
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-	customtop = custombottom = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
-}
-
-//-------------------------------------------------
-//  perform our special rendering
-//-------------------------------------------------
-
-void ui_menu_dats::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
-{
-	float width;
-	std::string tempbuf, revision;
-	datfile_manager &datfile = machine().datfile();
-	ui_manager &mui = machine().ui();
-
-	switch (m_flags)
-	{
-		case UI_HISTORY_LOAD:
-			tempbuf.assign("History - Game / System: ").append(m_driver->description);
-			revision.assign("History.dat Revision: ").append(datfile.rev_history());
-			break;
-
-		case UI_MESSINFO_LOAD:
-			tempbuf.assign("MessInfo - System: ").append(m_driver->description);
-			revision.assign("Messinfo.dat Revision: ").append(datfile.rev_messinfo());
-			break;
-
-		case UI_MAMEINFO_LOAD:
-			tempbuf.assign("MameInfo - Game: ").append(m_driver->description);
-			revision.assign("Mameinfo.dat Revision: ").append(datfile.rev_mameinfo());
-			break;
-
-		case UI_SYSINFO_LOAD:
-			tempbuf.assign("Sysinfo - System: ").append(m_driver->description);
-			revision.assign("Sysinfo.dat Revision: ").append(datfile.rev_sysinfo());
-			break;
-
-		case UI_STORY_LOAD:
-			tempbuf.assign("MAMESCORE - Game: ").append(m_driver->description);
-			revision.assign("Story.dat Revision: ").append(machine().datfile().rev_storyinfo());
-			break;
-	}
-
-	// get the size of the text
-	mui.draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
-	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
-	float maxwidth = MAX(width, origx2 - origx1);
-
-	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;
 	float x2 = x1 + maxwidth;
 	float y1 = origy1 - top;
-	float y2 = origy1 - UI_BOX_TB_BORDER;
+	float y2 = origy1 - 2.0f * UI_BOX_TB_BORDER - mui.get_line_height();
 
 	// draw a box
 	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
@@ -497,10 +145,58 @@ void ui_menu_dats::custom_render(void *selectedref, float top, float bottom, flo
 	x2 -= UI_BOX_LR_BORDER;
 	y1 += UI_BOX_TB_BORDER;
 
-	// draw the text within it
-	mui.draw_text_full(container, tempbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	mui.draw_text_full(container, driver.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
+		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
+
+	// take off the borders
+	x1 -= UI_BOX_LR_BORDER;
+	x2 += UI_BOX_LR_BORDER;
+	y1 -= UI_BOX_TB_BORDER;
+
+	maxwidth = 0;
+	for (auto & elem : m_items_list)
+	{
+		mui.draw_text_full(container, elem.label.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
+			DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+		maxwidth += width;
+	}
+
+	float space = (1.0f - maxwidth) / (m_items_list.size() * 2);
+
+	// compute our bounds
+	y1 = y2 + UI_BOX_TB_BORDER;
+	y2 += mui.get_line_height() + 2.0f * UI_BOX_TB_BORDER;
+
+	// draw a box
+	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+
+	// take off the borders
+	x2 -= UI_BOX_LR_BORDER;
+	y1 += UI_BOX_TB_BORDER;
+
+	// draw the text within it
+	int x = 0;
+	for (auto & elem : m_items_list)
+	{
+		x1 += space;
+		rgb_t fcolor = (actual == x) ? rgb_t(0xff, 0xff, 0xff, 0x00) : UI_TEXT_COLOR;
+		rgb_t bcolor = (actual == x) ? rgb_t(0xff, 0xff, 0xff, 0xff) : UI_TEXT_BG_COLOR;
+		mui.draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, JUSTIFY_LEFT, WRAP_NEVER,
+			DRAW_NONE, fcolor, bcolor, &width, nullptr);
+		if (bcolor != UI_TEXT_BG_COLOR)
+			mui.draw_textured_box(container, x1 - (space / 2), y1, x1 + width + (space / 2), y2, bcolor, rgb_t(255, 43, 43, 43),
+				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+
+		mui.draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, JUSTIFY_LEFT, WRAP_NEVER,
+			DRAW_NORMAL, fcolor, bcolor, &width, nullptr);
+		x1 += width + space;
+		++x;
+	}
+
+	// bottom
+	std::string revision;
+	revision.assign("Revision: ").append(m_items_list[actual].revision);
 	mui.draw_text_full(container, revision.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
@@ -529,36 +225,79 @@ void ui_menu_dats::custom_render(void *selectedref, float top, float bottom, flo
 //  load data from DATs
 //-------------------------------------------------
 
-bool ui_menu_dats::get_data(const game_driver *driver, int flags)
+void ui_menu_dats_view::get_data()
 {
-	std::string buffer;
-	machine().datfile().load_data_info(driver, buffer, flags);
-
-	if (buffer.empty())
-		return false;
-
-	float line_height = machine().ui().get_line_height();
-	float gutter_width = 0.52f * line_height * machine().render().ui_aspect();
 	std::vector<int> xstart;
 	std::vector<int> xend;
-	int tlines = machine().ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (2.0f * UI_BOX_LR_BORDER) - 0.02f - (2.0f * gutter_width), xstart, xend);
-	for (int r = 0; r < tlines; r++)
+	std::string buffer;
+	std::vector<std::string> m_item;
+	if (m_items_list[actual].option == UI_COMMAND_LOAD)
 	{
-		std::string tempbuf(buffer.substr(xstart[r], xend[r] - xstart[r]));
-		// special case for mamescore
-		if (flags == UI_STORY_LOAD)
+		machine().datfile().command_sub_menu(m_driver, m_item);
+		if (!m_item.empty())
 		{
-			size_t last_underscore = tempbuf.find_last_of('_');
-			if (last_underscore != std::string::npos)
+			for (size_t x = 0; x < m_item.size(); ++x)
 			{
-				std::string last_part(tempbuf.substr(last_underscore + 1));
-				int primary = tempbuf.find("___");
-				std::string first_part(tempbuf.substr(0, primary));
-				item_append(first_part.c_str(), last_part.c_str(), MENU_FLAG_UI_HISTORY, nullptr);
+				std::string t_buffer;
+				buffer.append(m_item[x]).append("\n");
+				machine().datfile().load_command_info(t_buffer, m_item[x]);
+				if (!t_buffer.empty())
+					buffer.append(t_buffer).append("\n");
 			}
+			convert_command_glyph(buffer);
 		}
-		else
-			item_append(tempbuf.c_str(), nullptr, MENU_FLAG_UI_HISTORY, nullptr);
 	}
-		return true;
+	else
+		machine().datfile().load_data_info(m_driver, buffer, m_items_list[actual].option);
+
+	int totallines = machine().ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
+	for (int x = 0; x < totallines; ++x)
+	{
+		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
+		item_append(tempbuf.c_str(), nullptr, (MENU_FLAG_UI_DATS | MENU_FLAG_DISABLE), (void *)(FPTR)(x + 1));
+
+	}
 }
+
+void ui_menu_dats_view::get_data_sw()
+{
+	std::vector<int> xstart;
+	std::vector<int> xend;
+	std::string buffer;
+	std::vector<std::string> m_item;
+	if (m_items_list[actual].option == 0)
+		buffer = m_swinfo->usage;
+	else
+	{
+		if (m_swinfo->startempty == 1)
+			machine().datfile().load_data_info(m_swinfo->driver, buffer, UI_HISTORY_LOAD);
+		else
+			machine().datfile().load_software_info(m_swinfo->listname, buffer, m_swinfo->shortname, m_swinfo->parentname);
+	}
+
+	int totallines = machine().ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
+	for (int x = 0; x < totallines; ++x)
+	{
+		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
+		item_append(tempbuf.c_str(), nullptr, (MENU_FLAG_UI_DATS | MENU_FLAG_DISABLE), (void *)(FPTR)(x + 1));
+
+	}
+}
+
+void ui_menu_dats_view::init_items()
+{
+	datfile_manager &datfile = machine().datfile();
+	if (datfile.has_history(m_driver))
+		m_items_list.emplace_back("History", UI_HISTORY_LOAD, datfile.rev_history());
+	if (datfile.has_mameinfo(m_driver))
+		m_items_list.emplace_back("Mameinfo", UI_MAMEINFO_LOAD, datfile.rev_mameinfo());
+	if (datfile.has_messinfo(m_driver))
+		m_items_list.emplace_back("Messinfo", UI_MESSINFO_LOAD, datfile.rev_messinfo());
+	if (datfile.has_sysinfo(m_driver))
+		m_items_list.emplace_back("Sysinfo", UI_SYSINFO_LOAD, datfile.rev_sysinfo());
+	if (datfile.has_story(m_driver))
+		m_items_list.emplace_back("Mamescore", UI_STORY_LOAD, datfile.rev_storyinfo());
+	if (datfile.has_command(m_driver))
+		m_items_list.emplace_back("Command", UI_COMMAND_LOAD, "");
+}
+

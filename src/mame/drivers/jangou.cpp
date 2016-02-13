@@ -100,6 +100,8 @@ public:
 	UINT32 screen_update_jangou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(cvsd_bit_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(jngolady_vclk_cb);
+	
+	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
 };
 
 
@@ -152,6 +154,7 @@ PALETTE_INIT_MEMBER(jangou_state, jangou)
 
 void jangou_state::video_start()
 {
+	m_tmp_bitmap = std::make_unique<bitmap_ind16>(256, 256);
 }
 
 UINT32 jangou_state::screen_update_jangou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -161,7 +164,7 @@ UINT32 jangou_state::screen_update_jangou(screen_device &screen, bitmap_ind16 &b
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		UINT8 *src = &m_blitter->m_blit_buffer[y * 256 + cliprect.min_x];
-		UINT16 *dst = &bitmap.pix16(y, cliprect.min_x);
+		UINT16 *dst = &m_tmp_bitmap->pix16(y, cliprect.min_x);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
@@ -170,6 +173,9 @@ UINT32 jangou_state::screen_update_jangou(screen_device &screen, bitmap_ind16 &b
 			*dst++ = m_palette->pen((srcpix >> 4) & 0xf);
 		}
 	}
+	//void copybitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle &cliprect)
+
+	copybitmap(bitmap, *m_tmp_bitmap, flip_screen(), flip_screen(),0,0, cliprect);
 
 	return 0;
 }
@@ -194,7 +200,7 @@ WRITE8_MEMBER(jangou_state::output_w)
 	*/
 //  printf("%02x\n", data);
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
-//  flip_screen_set(data & 0x04);
+	flip_screen_set(data & 0x04);
 //  machine().bookkeeping().coin_lockout_w(0, ~data & 0x20);
 }
 
@@ -318,11 +324,10 @@ static ADDRESS_MAP_START( cpu0_io, AS_IO, 8, jangou_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") //dsw + blitter busy flag
-	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
+	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") AM_WRITE(output_w) //dsw + blitter busy flag
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x17) AM_DEVWRITE("blitter",jangou_blitter_device, blitter_process_w)
-	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, blitter_vregs_w)
+	AM_RANGE(0x12,0x17) AM_DEVWRITE("blitter",jangou_blitter_device, process_w)
+	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, vregs_w)
 	AM_RANGE(0x30,0x30) AM_WRITENOP //? polls 0x03 continuously
 	AM_RANGE(0x31,0x31) AM_WRITE(sound_latch_w)
 ADDRESS_MAP_END
@@ -392,8 +397,8 @@ static ADDRESS_MAP_START( cntrygrl_cpu0_io, AS_IO, 8, jangou_state )
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") //dsw + blitter busy flag
 	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x17) AM_DEVWRITE("blitter",jangou_blitter_device, blitter_process_w)
-	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, blitter_vregs_w)
+	AM_RANGE(0x12,0x17) AM_DEVWRITE("blitter",jangou_blitter_device, process_w)
+	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, vregs_w)
 	AM_RANGE(0x30,0x30) AM_WRITENOP //? polls 0x03 continuously
 //  AM_RANGE(0x31,0x31) AM_WRITE(sound_latch_w)
 ADDRESS_MAP_END
@@ -417,8 +422,8 @@ static ADDRESS_MAP_START( roylcrdn_cpu0_io, AS_IO, 8, jangou_state )
 	AM_RANGE(0x10,0x10) AM_WRITENOP                 /* Writes continuosly 0's in attract mode, and 1's in game */
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
 	AM_RANGE(0x13,0x13) AM_READNOP                  /* Often reads bit7 with unknown purposes */
-	AM_RANGE(0x12,0x17) AM_DEVWRITE("blitter",jangou_blitter_device, blitter_process_w)
-	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, blitter_vregs_w)
+	AM_RANGE(0x12,0x17) AM_DEVWRITE("blitter",jangou_blitter_device, process_w)
+	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, vregs_w)
 	AM_RANGE(0x30,0x30) AM_WRITENOP                 /* Seems to write 0x10 on each sound event */
 ADDRESS_MAP_END
 
@@ -517,7 +522,7 @@ static INPUT_PORTS_START( jangou )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") // guess
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // blitter busy flag
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( macha )
@@ -578,7 +583,7 @@ static INPUT_PORTS_START( macha )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") // guess
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // blitter busy flag
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 INPUT_PORTS_END
 
 
@@ -663,7 +668,7 @@ static INPUT_PORTS_START( cntrygrl )
 	PORT_DIPNAME( 0x40, 0x40, "Coin B setting"  )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin / 10 Credits"  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // blitter busy flag
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 
 	PORT_START("IN_NOMUX")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -704,7 +709,7 @@ static INPUT_PORTS_START( jngolady )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) //blitter busy flag
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( roylcrdn )
@@ -762,29 +767,9 @@ static INPUT_PORTS_START( roylcrdn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                              PORT_NAME("Credit Clear")   /* Credit Clear */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                                                                 /* Spare 1 */
 
-	PORT_START("DSW")   /* Not a real DSW on PCB */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* blitter busy flag */
+	PORT_START("DSW")
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 
 	PORT_START("IN_NOMUX")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1273,13 +1258,13 @@ DRIVER_INIT_MEMBER(jangou_state,luckygrl)
  *
  *************************************/
 
-GAME( 1983,  jangou,     0,        jangou,   jangou, driver_device,    0,        ROT0, "Nichibutsu",     "Jangou [BET] (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983,  macha,      0,        jangou,   macha,  driver_device,     0,        ROT0, "Logitec",        "Monoshiri Quiz Osyaberi Macha (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  jngolady,   0,        jngolady, jngolady, jangou_state,  jngolady, ROT0, "Nichibutsu",     "Jangou Lady (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  cntrygrl,   0,        cntrygrl, cntrygrl, driver_device,  0,        ROT0, "Royal Denshi",   "Country Girl (Japan set 1)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  cntrygrla,  cntrygrl, cntrygrl, cntrygrl, driver_device,  0,        ROT0, "Nichibutsu",     "Country Girl (Japan set 2)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  fruitbun,   cntrygrl, cntrygrl, cntrygrl, driver_device,  0,        ROT0, "Nichibutsu",     "Fruits & Bunny (World?)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1985,  roylcrdn,   0,        roylcrdn, roylcrdn, driver_device,  0,        ROT0, "Nichibutsu",     "Royal Card (Nichibutsu)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983,  jangou,     0,        jangou,   jangou, driver_device,    0,        ROT0, "Nichibutsu",     "Jangou [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983,  macha,      0,        jangou,   macha,  driver_device,     0,        ROT0, "Logitec",        "Monoshiri Quiz Osyaberi Macha (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  jngolady,   0,        jngolady, jngolady, jangou_state,  jngolady, ROT0, "Nichibutsu",     "Jangou Lady (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  cntrygrl,   0,        cntrygrl, cntrygrl, driver_device,  0,        ROT0, "Royal Denshi",   "Country Girl (Japan set 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  cntrygrla,  cntrygrl, cntrygrl, cntrygrl, driver_device,  0,        ROT0, "Nichibutsu",     "Country Girl (Japan set 2)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  fruitbun,   cntrygrl, cntrygrl, cntrygrl, driver_device,  0,        ROT0, "Nichibutsu",     "Fruits & Bunny (World?)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985,  roylcrdn,   0,        roylcrdn, roylcrdn, driver_device,  0,        ROT0, "Nichibutsu",     "Royal Card (Nichibutsu)", MACHINE_SUPPORTS_SAVE )
 
 /* The following might not run there... */
 GAME( 1984?, luckygrl,   0,        cntrygrl, cntrygrl, jangou_state,  luckygrl, ROT0, "Wing Co., Ltd.", "Lucky Girl? (Wing)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

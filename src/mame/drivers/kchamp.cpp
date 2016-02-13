@@ -481,10 +481,10 @@ static MACHINE_CONFIG_START( kchamp, kchamp_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/12) /* Guess based on actual pcb recordings of karatedo */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/12) /* Guess based on actual pcb recordings of karatedo */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_DAC_ADD("dac")

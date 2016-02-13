@@ -1,4 +1,4 @@
-<?xml version="1.0" ?>
+<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!-- Electron Tapes -->
@@ -1229,7 +1229,7 @@
 	<software name="bugs">
 		<description>Bugs</description>
 		<year>1984</year>
-		<publisher>>Virgin Games</publisher>
+		<publisher>Virgin Games</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="4276">
 				<rom name="bugs_e.uef" size="4276" crc="baccb319" sha1="65db34438d85422e2dccd3c1ad47ec1c1df21205" offset="0"/>
@@ -5066,7 +5066,7 @@
 	<software name="jungleji">
 		<description>Jungle Jive</description>
 		<year>1984</year>
-		<publisher>>Virgin Games</publisher>
+		<publisher>Virgin Games</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="4738">
 				<rom name="junglejive_e.uef" size="4738" crc="d6b33eb1" sha1="db009e9bfab2cbe95a3c397b923892f477f38a1b" offset="0"/>
@@ -6065,7 +6065,7 @@
 		</part>
 	</software>
 
-	<software name="nmaremazbr" cloneof="nmaremaz">>
+	<software name="nmaremazbr" cloneof="nmaremaz">
 		<description>Nightmare Maze (Blue Ribbon)</description>
 		<year>1984</year>
 		<publisher>Blue Ribbon</publisher>

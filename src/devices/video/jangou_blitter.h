@@ -33,9 +33,12 @@ public:
 	jangou_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// I/O operations
-	DECLARE_WRITE8_MEMBER( blitter_process_w );
-	DECLARE_WRITE8_MEMBER( blitter_alt_process_w );
-	DECLARE_WRITE8_MEMBER( blitter_vregs_w );
+	DECLARE_WRITE8_MEMBER( process_w );
+	DECLARE_WRITE8_MEMBER( alt_process_w );
+	DECLARE_WRITE8_MEMBER( vregs_w );
+	DECLARE_WRITE8_MEMBER( bltflip_w );
+	DECLARE_READ_LINE_MEMBER( status_r );
+
 	UINT8        m_blit_buffer[256 * 256];
 
 protected:
@@ -50,6 +53,7 @@ private:
 	UINT8 m_blit_data[7];
 	UINT8 *m_gfxrom;
 	UINT32 m_gfxrommask;
+	bool m_bltflip;
 };
 
 

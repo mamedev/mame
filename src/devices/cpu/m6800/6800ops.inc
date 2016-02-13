@@ -2285,17 +2285,18 @@ OP_HANDLER( stx_ex )
 }
 
 /* NSC8105 specific, guessed opcodes (tested by Night Gal Summer) */
-// $bb - load A from [X + $0]
-OP_HANDLER( ldax_imm )
+// $bb - $mask & [X + $disp8]
+OP_HANDLER( btst_ix )
 {
 	UINT8 val;
-	{EA=X+((M_RDOP_ARG(PCD)<<8) | M_RDOP_ARG((PCD+1)&0xffff));PC+=2;}
-	val = RM(EAD);
+	UINT8 mask = M_RDOP_ARG(PCD);
+	{EA=X+(M_RDOP_ARG(PCD+1));PC+=2;}
+	val = RM(EAD) & mask;
 	CLR_NZVC; SET_NZ8(val);
 }
 
 // $b2 - assuming correct, store first byte to (X + $disp8)
-OP_HANDLER( nsc_unk )
+OP_HANDLER( stx_nsc )
 {
 	IMM8;
 	UINT8 val = RM(EAD);
@@ -2304,13 +2305,4 @@ OP_HANDLER( nsc_unk )
 	CLR_NZV;
 	SET_NZ8(val);
 	WM(EAD,val);
-}
-
-// $00 - store A to [X + $0]
-OP_HANDLER( stax_imm )
-{
-	CLR_NZV;
-	SET_NZ8(A);
-	EA=X;
-	WM(EAD,A);
 }

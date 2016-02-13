@@ -204,7 +204,9 @@ def parse_file_for_drivers(root, srcfile):
         if len(content)>0:
             if content.startswith('COMP') or content.startswith('CONS') or content.startswith('GAME') or content.startswith('SYST')  or content.startswith('GAMEL'):
                name = content[4:]
-               drivers.append(name.rsplit(',', 14)[1])
+               splitname = name.rsplit(',', 14)
+               if len(splitname)>1:
+                  drivers.append(splitname[1])
     return 0
 
 def parse_lua_file(srcfile):

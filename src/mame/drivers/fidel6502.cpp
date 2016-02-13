@@ -3,7 +3,260 @@
 /******************************************************************************
 
     Fidelity Electronics 6502 based board driver
-    See drivers/fidelz80.cpp for hardware description
+    
+******************************************************************************
+
+Champion Sensory Chess Challenger (CSC)
+---------------------------------------
+
+Memory map:
+-----------
+0000-07FF: 2K of RAM
+0800-0FFF: 1K of RAM (note: mirrored twice)
+1000-17FF: PIA 0 (display, TSI speech chip)
+1800-1FFF: PIA 1 (keypad, LEDs)
+2000-3FFF: 101-64019 ROM (also used on the regular sensory chess challenger)
+4000-7FFF: mirror of 0000-3FFF
+8000-9FFF: not used
+A000-BFFF: 101-1025A03 ROM
+C000-DFFF: 101-1025A02 ROM
+E000-FDFF: 101-1025A01 ROM
+FE00-FFFF: 512 byte 74S474 PROM
+
+CPU is a 6502 running at 1.95MHz (3.9MHz resonator, divided by 2)
+
+NMI is not used.
+IRQ is connected to a 600Hz oscillator (38.4KHz divided by 64).
+Reset is connected to a power-on reset circuit.
+
+PIA 0:
+------
+PA0 - 7seg segments E, TSI A0
+PA1 - 7seg segments D, TSI A1
+PA2 - 7seg segments C, TSI A2
+PA3 - 7seg segments H, TSI A3
+PA4 - 7seg segments G, TSI A4
+PA5 - 7seg segments F, TSI A5
+PA6 - 7seg segments B
+PA7 - 7seg segments A
+
+PB0 - A12 on speech ROM (if used... not used on this model, ROM is 4K)
+PB1 - START line on TSI
+PB2 - white wire
+PB3 - BUSY line from TSI
+PB4 - hi/lo TSI speaker volume
+PB5 - button row 9
+PB6 - selection jumper (resistor to 5V)
+PB7 - selection jumper (resistor to ground)
+
+CA1 - NC
+CA2 - violet wire
+
+CB1 - NC
+CB2 - NC (connects to pin 14 of soldered connector)
+
+PIA 1:
+------
+PA0 - button row 1
+PA1 - button row 2
+PA2 - button row 3
+PA3 - button row 4
+PA4 - button row 5
+PA5 - button row 6
+PA6 - 7442 selector bit 0
+PA7 - 7442 selector bit 1
+
+PB0 - LED row 1
+PB1 - LED row 2
+PB2 - LED row 3
+PB3 - LED row 4
+PB4 - LED row 5
+PB5 - LED row 6
+PB6 - LED row 7
+PB7 - LED row 8
+
+CA1 - button row 7
+CA2 - selector bit 3
+
+CB1 - button row 8
+CB2 - selector bit 2
+
+Selector: (attached to PIA 1, outputs 1 of 10 pins low.  7442)
+---------
+output # (selected turns this column on, and all others off)
+0 - LED column A, button column A, 7seg digit 1
+1 - LED column B, button column B, 7seg digit 2
+2 - LED column C, button column C, 7seg digit 3
+3 - LED column D, button column D, 7seg digit 4
+4 - LED column E, button column E
+5 - LED column F, button column F
+6 - LED column G, button column G
+7 - LED column H, button column H
+8 - button column I
+9 - Tone line (toggle to make a tone in the buzzer)
+
+The rows/columns are indicated on the game board:
+
+ ABCDEFGH   I
+--------------
+|            | 8
+|            | 7
+|            | 6
+|            | 5
+|            | 4
+|            | 3
+|            | 2
+|            | 1
+--------------
+
+The "lone LED" is above the control column.
+column I is the "control column" on the right for starting a new game, etc.
+
+The upper 6 buttons are connected as such:
+
+column A - speak
+column B - RV
+column C - TM
+column D - LV
+column E - DM
+column F - ST
+
+these 6 buttons use row 9 (connects to PIA 0)
+
+LED display:
+------------
+43 21 (digit number)
+-----
+88:88
+
+The LED display is four 7 segment digits.  normal ABCDEFG lettering is used for segments.
+
+The upper dot is connected to digit 3 common
+The lower dot is connected to digit 4 common
+The lone LED is connected to digit 1 common
+
+All three of the above are called "segment H".
+
+
+******************************************************************************
+
+Sensory Chess Challenger (SC12-B, 6086)
+4 versions are known to exist: A,B,C, and X, with increasing CPU speed.
+---------------------------------
+RE information from netlist by Berger
+
+8*(8+1) buttons, 8+8+2 red LEDs
+DIN 41524C printer port
+36-pin edge connector
+CPU is a R65C02P4, running at 4MHz
+
+NE556 dual-timer IC:
+- timer#1, one-shot at power-on, to CPU _RESET
+- timer#2: R1=82K, R2=1K, C=22nf, to CPU _IRQ: ~780Hz, active low=15.25us
+
+Memory map:
+-----------
+6000-0FFF: 4K RAM (2016 * 2)
+2000-5FFF: cartridge
+6000-7FFF: control(W)
+8000-9FFF: 8K ROM SSS SCM23C65E4
+A000-BFFF: keypad(R)
+C000-DFFF: 4K ROM TI TMS2732AJL-45
+E000-FFFF: 8K ROM Toshiba TMM2764D-2
+
+control: (74LS377)
+--------
+Q0-Q3: 7442 A0-A3
+Q4: enable printer port pin 1 input
+Q5: printer port pin 5 output
+Q6,Q7: LEDs common anode
+
+7442 0-8: input mux and LEDs cathode
+7442 9: buzzer
+
+The keypad is read through a 74HC251, where S0,1,2 is from CPU A0,1,2, Y is connected to CPU D7.
+If control Q4 is set, printer data can be read from I0.
+
+
+******************************************************************************
+
+Voice Excellence (model 6092)
+----------------
+PCB 1: 510.1117A02, appears to be identical to other "Excellence" boards
+CPU: GTE G65SC102P-3, 32 KB PRG ROM: AMI 101-1080A01(IC5), 8192x8 SRAM SRM2264C10(IC6)
+2 rows of LEDs on the side: 1*8 green, 1*8 red
+
+PCB 2: 510.1117A01
+Speech: TSI S14001A, 32 KB ROM: AMI 101-1081A01(IC2)
+Dip Switches set ROM A13 and ROM A14, on the side of the board
+
+ROM A12 is tied to S14001A's A11 (yuck)
+ROM A11 is however tied to the CPU's XYZ
+
+0000_07FF - Spanish 1/4
+0800_0FFF - Spanish 3/4
+1000_17FF - Spanish 2/4
+1800_1FFF - Spanish 4/4
+
+2000_27FF - French 1/4
+2800_2FFF - French 3/4
+3000_3FFF - French 2/4
+3800_3FFF - French 4/4
+
+4000_47FF - German 1/4
+4800_4FFF - German 3/4
+5000_57FF - German 2/4
+5800_5FFF - German 4/4
+
+6000_67FF - English 1/2
+6800_6FFF - Bridge Challenger 1/2
+7000_77FF - English 2/2
+7800_7FFF - Bridge Challenger 2/2
+
+------------------
+RE info by hap, based on PCB photos
+
+Memory map:
+-----------
+0000-3FFF: 8K RAM (SRM2264)
+4000-7FFF: control (R/W)
+8000-FFFF: 32K ROM (M27256 compatible)
+
+control (W):
+------------
+Z80 A0-A2 to 3*74259, Z80 Dx to D (_C unused)
+
+Z80 D0:
+- Q4,Q5: led commons
+- Q6,Q7,Q2,Q1: 7seg panel digit select
+- Q0-Q3: 7442 A0-A3
+  + 0-7: led data
+  + 0-8: keypad mux
+  + 9: buzzer out
+
+Z80 D1: (model 6093)
+- Q0-Q7: 7seg data
+
+Z80 D2: (model 6092)
+- Q0-Q5: TSI C0-C5
+- Q6: TSI START pin
+- Q7: TSI ROM A11
+
+A11 from TSI is tied to TSI ROM A12(!)
+TSI ROM A13,A14 are hardwired to the 2 language switches.
+Sound comes from the Audio out pin, digital out pins are N/C.
+
+control (R):
+------------
+Z80 A0-A2 to 2*74251, Z80 Dx to output
+
+Z80 D7 to Y:
+- D0-D7: keypad row data
+
+Z80 D6 to W: (model 6092, tied to VCC otherwise)
+- D0,D1: language switches
+- D2-D6: VCC
+- D7: TSI BUSY
 
 ******************************************************************************/
 

@@ -608,85 +608,85 @@ come from... they might be eventually removed -->
 
 
 <!-- This is only Sord memory expansion -->
-  <software name="em-5" supported="no">
-    <description>EM-5 Expansion memory 32Kb</description>
-    <year>198?</year>
-    <publisher>Sord</publisher>
-    <part name="cart" interface="m5_cart">
-      <feature name="slot" value="ram"/>
-      <dataarea name="ram" size="32768">
-      </dataarea>
-    </part>
-  </software>
+	<software name="em-5" supported="no">
+		<description>EM-5 Expansion memory 32Kb</description>
+		<year>198?</year>
+		<publisher>Sord</publisher>
+		<part name="cart" interface="m5_cart">
+			<feature name="slot" value="ram"/>
+			<dataarea name="ram" size="32768">
+			</dataarea>
+		</part>
+	</software>
 
 <!-- Homebrew memory modules -->  
 
-  <software name="64kbi" supported="no">
-    <description>EM-64 Expansion memory 64Kb</description>
-    <year>198?</year>
-    <publisher>unknown</publisher>
-    <part name="cart" interface="m5_cart">
-      <feature name="slot" value="ram"/>
-      <dataarea name="ram" size="65536">
-      </dataarea>
-    </part>
-  </software>
-
-  <software name="64kbf" supported="no">
-    <description>64Kbf Expansion memory 64Kb</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cart" interface="m5_cart">
-      <feature name="slot" value="ram"/>
-      <dataarea name="ram" size="65536">
-      </dataarea>
-      <dataarea name="rom" size="20480">
-        <rom name="basic-f (198x)(sord)(jp).bin" size="20480" crc="47be051f" sha1="9942b8f05a441b5dee7ab31ec5b8a643f7e268b8" offset="00000"/>
-      </dataarea>
-    </part>
-  </software>
-  
-  <software name="64krx" supported="no">
-    <description>64Krx Expansion board 64Kb</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cart" interface="m5_cart">
-      <feature name="slot" value="ram"/>
-      <dataarea name="ram" size="65536">
-      </dataarea>
-      <dataarea name="rom" size="0x16000">
-        <rom name="krx_rom2.rom" size="0x2000" crc="5AF18FBD" sha1="cd67d65fb51cdb3a47cc8350a878a77360a353c8" offset="0x0000"/>
-				<rom name="basic-i (198x)(sord)(jp).bin" size="0x2000" crc="9a98e6ce" sha1="d11f7623919ee593e275e9f00f8a4acf7aed3cf5" offset="0x2000"/>
-        <rom name="krx_rom4.rom" size="0x4000" crc="27FFB883" sha1="be930946e7cd5f0f3e803792906e087cce122703" offset="0x6000"/>
-        <rom name="krx_rom5.rom" size="0x4000" crc="107B5DDC" sha1="071fa84c7b10d9d7841c504564825609ebf66140" offset="0xa000"/>
-        <rom name="krx_rom6.rom" size="0x4000" crc="4D6E9C1A" sha1="d8bf96fc4016e245fd84d713fd988dd503a38d0b" offset="0xe000"/>
-        <rom name="krx_rom7.rom" size="0x4000" crc="4EF7830A" sha1="9527236af9dd0db25498f4029793703ba8672af5" offset="0x12000"/>     
+	<software name="64kbi" supported="no">
+		<description>EM-64 Expansion memory 64Kb</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<part name="cart" interface="m5_cart">
+			<feature name="slot" value="ram"/>
+			<dataarea name="ram" size="65536">
 			</dataarea>
-    </part>
-  </software>
+		</part>
+	</software>
+
+	<software name="64kbf" supported="no">
+		<description>64Kbf Expansion memory 64Kb</description>
+		<year>199?</year>
+		<publisher>unknown</publisher>
+		<part name="cart" interface="m5_cart">
+			<feature name="slot" value="ram"/>
+			<dataarea name="ram" size="65536">
+			</dataarea>
+			<dataarea name="rom" size="20480">
+				<rom name="basic-f (198x)(sord)(jp).bin" size="20480" crc="47be051f" sha1="9942b8f05a441b5dee7ab31ec5b8a643f7e268b8" offset="00000"/>
+			</dataarea>
+		</part>
+	</software>
+  
+	<software name="64krx" supported="no">
+		<description>64Krx Expansion board 64Kb</description>
+		<year>199?</year>
+		<publisher>unknown</publisher>
+		<part name="cart" interface="m5_cart">
+			<feature name="slot" value="ram"/>
+			<dataarea name="ram" size="65536">
+			</dataarea>
+			<dataarea name="rom" size="0x16000">
+				<rom name="krx_rom2.rom" size="0x2000" crc="5AF18FBD" sha1="cd67d65fb51cdb3a47cc8350a878a77360a353c8" offset="0x0000"/>
+				<rom name="basic-i (198x)(sord)(jp).bin" size="0x2000" crc="9a98e6ce" sha1="d11f7623919ee593e275e9f00f8a4acf7aed3cf5" offset="0x2000"/>
+				<rom name="krx_rom4.rom" size="0x4000" crc="27FFB883" sha1="be930946e7cd5f0f3e803792906e087cce122703" offset="0x6000"/>
+				<rom name="krx_rom5.rom" size="0x4000" crc="107B5DDC" sha1="071fa84c7b10d9d7841c504564825609ebf66140" offset="0xa000"/>
+				<rom name="krx_rom6.rom" size="0x4000" crc="4D6E9C1A" sha1="d8bf96fc4016e245fd84d713fd988dd503a38d0b" offset="0xe000"/>
+				<rom name="krx_rom7.rom" size="0x4000" crc="4EF7830A" sha1="9527236af9dd0db25498f4029793703ba8672af5" offset="0x12000"/>
+			</dataarea>
+		</part>
+	</software>
 
   <!-- Brno mod ROMs -->
 
-  <software name="brnoboot" supported="no">
-    <description>Boot for Brno ramdisk</description>
-    <year>1989</year>
-    <publisher>&lt;Pavel Brychta a spol.&gt;</publisher>
-    <part name="cart" interface="m5_cart">
-      <dataarea name="rom" size="3456">
-        <rom name="brno_boot.rom" size="3456" crc="60008729" sha1="FB26E2AE9F74B0AE0D723B417A038A8EF3D72782" offset="00000"/>
-      </dataarea>
-    </part>
-  </software>
+	<software name="brnoboot" supported="no">
+		<description>Boot for Brno ramdisk</description>
+		<year>1989</year>
+		<publisher>&lt;Pavel Brychta a spol.&gt;</publisher>
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="3456">
+				<rom name="brno_boot.rom" size="3456" crc="60008729" sha1="FB26E2AE9F74B0AE0D723B417A038A8EF3D72782" offset="00000"/>
+			</dataarea>
+		</part>
+	</software>
 
-  <software name="brno_win" supported="no">
-    <description>Brno windows boot</description>
-    <year>1989</year>
-    <publisher>&lt;Ladislav Novak&gt;</publisher>
-    <part name="cart" interface="m5_cart">
-      <dataarea name="rom" size="8192">
-        <rom name="brno_win.rom" size="8192" crc="f4cfb2ee" sha1="23f41d2d9ac915545409dd0163f3dc298f04eea2" offset="00000"/>
-      </dataarea>
-    </part>
-  </software>
+	<software name="brno_win" supported="no">
+		<description>Brno windows boot</description>
+		<year>1989</year>
+		<publisher>&lt;Ladislav Novak&gt;</publisher>
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="brno_win.rom" size="8192" crc="f4cfb2ee" sha1="23f41d2d9ac915545409dd0163f3dc298f04eea2" offset="00000"/>
+			</dataarea>
+		</part>
+	</software>
   
 </softwarelist>

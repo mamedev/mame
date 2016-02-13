@@ -4021,6 +4021,8 @@ files {
 
 createMAMEProjects(_target, _subtarget, "zaccaria")
 files {
+	MAME_DIR .. "src/mame/audio/zaccaria.cpp",
+	MAME_DIR .. "src/mame/audio/zaccaria.h",
 	MAME_DIR .. "src/mame/drivers/laserbat.cpp",
 	MAME_DIR .. "src/mame/includes/laserbat.h",
 	MAME_DIR .. "src/mame/video/laserbat.cpp",
@@ -4247,6 +4249,7 @@ files {
 	MAME_DIR .. "src/mame/machine/inder_vid.cpp",
 	MAME_DIR .. "src/mame/machine/inder_vid.h",
 	MAME_DIR .. "src/mame/drivers/corona.cpp",
+	MAME_DIR .. "src/mame/drivers/amazonlf.cpp",
 	MAME_DIR .. "src/mame/drivers/crystal.cpp",
 	MAME_DIR .. "src/mame/video/vrender0.cpp",
 	MAME_DIR .. "src/mame/video/vrender0.h",
@@ -4286,7 +4289,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/extrema.cpp",
 	MAME_DIR .. "src/mame/drivers/fastinvaders.cpp",
 	MAME_DIR .. "src/mame/drivers/fireball.cpp",
-	MAME_DIR .. "src/mame/drivers/flagrall.cpp",
 	MAME_DIR .. "src/mame/drivers/flipjack.cpp",
 	MAME_DIR .. "src/mame/drivers/flower.cpp",
 	MAME_DIR .. "src/mame/includes/flower.h",
