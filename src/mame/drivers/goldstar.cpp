@@ -12051,6 +12051,18 @@ ROM_START( unkch4 )  // all roms unique
 ROM_END
 
 
+ROM_START( cherry96 )  // all roms unique
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "new_96-16-3.u6",  0x00000, 0x10000, CRC(84d5f2fc) SHA1(e3ed0670350920c661c5a40581966671b8a8c7df) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "new_96-16-2.u29", 0x00000, 0x20000, CRC(dd8f7450) SHA1(c897e5151809d4e0a0b1e46609f07bb0156b489a) )
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "new_96-16-1.u41", 0x00000, 0x20000, CRC(9ab19bdc) SHA1(2f34789729b5d12f6fa098a29253d5a80aef5b39) )
+ROM_END
+
+
 /*
   Cherry Master '97
 
@@ -13750,6 +13762,8 @@ GAMEL(1999, unkch1,   scmaster,  unkch,    unkch,     unkch_state,    unkch1,   
 GAMEL(1999, unkch2,   scmaster,  unkch,    unkch,     unkch_state,    unkch1,    ROT0, "bootleg", "Super Cherry Gold (bootleg of Super Cherry Master)",           0,    layout_unkch )
 GAMEL(1999, unkch3,   scmaster,  unkch,    unkch3,    unkch_state,    unkch3,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 2)", 0,    layout_unkch ) // cards have been hacked to look like barrels, girl removed?
 GAMEL(1999, unkch4,   scmaster,  unkch,    unkch4,    unkch_state,    unkch4,    ROT0, "bootleg", "Grand Cherry Master (bootleg of Super Cherry Master)",         0,    layout_unkch ) // by 'Toy System' Hungary
+
+GAME( 1996, cherry96, scmaster,  unkch,    unkch4,    unkch_state,    unkch4,    ROT0, "bootleg", "New Cherry '96 (bootleg of New Fruit Bonus?)",                 MACHINE_NOT_WORKING ) // need to be moved to another machine...
 
 
 /* Stealth sets.
