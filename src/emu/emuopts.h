@@ -56,6 +56,7 @@ enum
 #define OPTION_FONTPATH             "fontpath"
 #define OPTION_CHEATPATH            "cheatpath"
 #define OPTION_CROSSHAIRPATH        "crosshairpath"
+#define OPTION_PLUGINSPATH          "pluginspath"
 
 // core directory options
 #define OPTION_CFG_DIRECTORY        "cfg_directory"
@@ -231,6 +232,7 @@ public:
 	const char *font_path() const { return value(OPTION_FONTPATH); }
 	const char *cheat_path() const { return value(OPTION_CHEATPATH); }
 	const char *crosshair_path() const { return value(OPTION_CROSSHAIRPATH); }
+	const char *plugins_path() const { return value(OPTION_PLUGINSPATH); }
 
 	// core directory options
 	const char *cfg_directory() const { return value(OPTION_CFG_DIRECTORY); }

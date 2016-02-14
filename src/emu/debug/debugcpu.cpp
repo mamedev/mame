@@ -19,6 +19,7 @@
 #include "uiinput.h"
 #include "xmlfile.h"
 #include "coreutil.h"
+#include "luaengine.h"
 #include <ctype.h>
 
 
@@ -1928,6 +1929,8 @@ void device_debug::instruction_hook(offs_t curpc)
 			// flush any pending updates before waiting again
 			machine.debug_view().flush_osd_updates();
 
+			machine.manager().lua()->periodic_check();
+			
 			// clear the memory modified flag and wait
 			global->memory_modified = false;
 			if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)

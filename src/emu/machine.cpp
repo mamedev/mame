@@ -387,8 +387,10 @@ int running_machine::run(bool firstrun)
 
 			// execute CPUs if not paused
 			if (!m_paused)
+			{
 				m_scheduler.timeslice();
-
+				manager().lua()->periodic_check();
+			}
 			// otherwise, just pump video updates through
 			else
 				m_video->frame_update();
