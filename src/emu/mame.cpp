@@ -151,6 +151,20 @@ void machine_manager::update_machine()
 	m_lua->set_machine(m_machine);
 }
 
+
+void machine_manager::start_luaengine()
+{
+	m_lua->initialize();
+	{
+		emu_file file(options().plugins_path(), OPEN_FLAG_READ);
+		file_error filerr = file.open("boot.lua");
+		if (filerr == FILERR_NONE)
+		{
+			m_lua->load_script(file.fullpath());
+		}
+	}
+}
+
 /*-------------------------------------------------
     execute - run the core emulation
 -------------------------------------------------*/
@@ -165,16 +179,6 @@ int machine_manager::execute()
 	// loop across multiple hard resets
 	bool exit_pending = false;
 	int error = MAMERR_NONE;
-
-	m_lua->initialize();
-	{
-		emu_file file(options().plugins_path(), OPEN_FLAG_READ);
-		file_error filerr = file.open("boot.lua");
-		if (filerr == FILERR_NONE)
-		{
-			m_lua->load_script(file.fullpath());
-		}
-	}
 
 	if (m_options.console()) {
 		m_lua->start_console();

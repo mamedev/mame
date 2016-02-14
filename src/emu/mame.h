@@ -96,6 +96,7 @@ public:
 
 	/* execute as configured by the OPTION_SYSTEMNAME option on the specified options */
 	int execute();
+	void start_luaengine();
 	void schedule_new_driver(const game_driver &driver);
 private:
 	osd_interface &         m_osd;                  // reference to OSD system
