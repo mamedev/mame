@@ -926,6 +926,98 @@ lua_engine::~lua_engine()
 	close();
 }
 
+void lua_engine::execute_function(const char *id)
+{
+	lua_settop(m_lua_state, 0);
+	lua_getfield(m_lua_state, LUA_REGISTRYINDEX, id);
+
+	if (lua_istable(m_lua_state, -1))
+	{
+		lua_pushnil(m_lua_state);
+		while (lua_next(m_lua_state, -2) != 0)
+		{
+			if (lua_isfunction(m_lua_state, -1))
+			{
+				lua_pcall(m_lua_state, 0, 0, 0);
+			}
+			else
+			{
+				lua_pop(m_lua_state, 1);
+			}
+		}
+	}
+}
+
+int lua_engine::register_function(lua_State *L, const char *id)
+{
+	if (!lua_isnil(L, 1))
+		luaL_checktype(L, 1, LUA_TFUNCTION);
+	lua_settop(L, 1);
+	lua_getfield(L, LUA_REGISTRYINDEX, id);
+	if (lua_isnil(L, -1))
+	{
+		lua_newtable(L);
+	}
+	luaL_checktype(L, -1, LUA_TTABLE);
+	int len = lua_rawlen(L, -1);
+	lua_pushnumber(L, len + 1);
+	lua_pushvalue(L, 1);
+	lua_rawset(L, -3);      /* Stores the pair in the table */
+
+	lua_pushvalue(L, -1);
+	lua_setfield(L, LUA_REGISTRYINDEX, id);
+	return 1;
+}
+
+int lua_engine::l_emu_register_start(lua_State *L)
+{
+	return register_function(L, "LUA_ON_START");
+}
+
+int lua_engine::l_emu_register_stop(lua_State *L)
+{
+	return register_function(L, "LUA_ON_STOP");
+}
+
+int lua_engine::l_emu_register_pause(lua_State *L)
+{
+	return register_function(L, "LUA_ON_PAUSE");
+}
+
+int lua_engine::l_emu_register_resume(lua_State *L)
+{
+	return register_function(L, "LUA_ON_RESUME");
+}
+
+int lua_engine::l_emu_register_frame(lua_State *L)
+{
+	return register_function(L, "LUA_ON_FRAME");
+}
+
+void lua_engine::on_machine_start()
+{
+	execute_function("LUA_ON_START");
+}
+
+void lua_engine::on_machine_stop()
+{
+	execute_function("LUA_ON_STOP");
+}
+
+void lua_engine::on_machine_pause()
+{
+	execute_function("LUA_ON_PAUSE");
+}
+
+void lua_engine::on_machine_resume()
+{
+	execute_function("LUA_ON_RESUME");
+}
+
+void lua_engine::on_machine_frame()
+{
+	execute_function("LUA_ON_FRAME");
+}
 
 void lua_engine::update_machine()
 {
@@ -945,9 +1037,15 @@ void lua_engine::update_machine()
 			}
 			port = port->next();
 		}
+		machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(lua_engine::on_machine_start), this));
+		machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(lua_engine::on_machine_stop), this));
+		machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(lua_engine::on_machine_pause), this));
+		machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(lua_engine::on_machine_resume), this));
+		machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(lua_engine::on_machine_frame), this));
 	}
 	lua_setglobal(m_lua_state, "ioport");
 }
+
 
 //-------------------------------------------------
 //  initialize - initialize lua hookup to emu engine
@@ -971,6 +1069,11 @@ void lua_engine::initialize()
 			.addCFunction ("start",       l_emu_start )
 			.addCFunction ("pause",       l_emu_pause )
 			.addCFunction ("unpause",     l_emu_unpause )
+			.addCFunction ("register_start", l_emu_register_start )
+			.addCFunction ("register_stop",  l_emu_register_stop )
+			.addCFunction ("register_pause", l_emu_register_pause )
+			.addCFunction ("register_resume",l_emu_register_resume )
+			.addCFunction ("register_frame", l_emu_register_frame )
 			.beginClass <machine_manager> ("manager")
 				.addFunction ("machine", &machine_manager::machine)
 				.addFunction ("options", &machine_manager::options)
