@@ -13743,7 +13743,7 @@ GAME( 2003, nfm,       0,        nfm,      nfm,       driver_device,  0,        
 
 
 // super cherry master sets...
-GAMEL(1999, scmaster, 0,         unkch,    unkch4,    unkch_state,    unkch4,    ROT0, "bootleg", "Super Cherry Master (v1.0)",                                   0,    layout_unkch )
+GAMEL(1994, scmaster, 0,         unkch,    unkch4,    unkch_state,    unkch4,    ROT0, "bootleg", "Super Cherry Master (v1.0)",                                   0,    layout_unkch )
 
 // these have 'cherry 1994' in the program roms, but also "Super Cherry / New Cherry Gold '99". probably hacks of a 1994 version of Super Cherry Master.
 GAMEL(1999, unkch1,   scmaster,  unkch,    unkch,     unkch_state,    unkch1,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 1)", 0,    layout_unkch )
