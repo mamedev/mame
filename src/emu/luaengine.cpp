@@ -374,6 +374,34 @@ void lua_engine::emu_set_hook(lua_State *L)
 }
 
 //-------------------------------------------------
+//  machine_options - return table of options
+//  -> manager:machine().options[]
+//-------------------------------------------------
+
+luabridge::LuaRef lua_engine::l_machine_get_options(const running_machine *r)
+{
+	lua_State *L = luaThis->m_lua_state;
+	luabridge::LuaRef options_table = luabridge::LuaRef::newTable(L);
+
+	int unadorned_index = 0;
+	for (core_options::entry *curentry = r->options().first(); curentry != nullptr; curentry = curentry->next())
+	{
+		const char *name = curentry->name();
+		bool is_unadorned = false;
+		// check if it's unadorned
+		if (name && strlen(name) && !strcmp(name, core_options::unadorned(unadorned_index)))
+		{
+			unadorned_index++;
+			is_unadorned = true;
+		}
+		if (!curentry->is_header() && !curentry->is_command() && !curentry->is_internal() && !is_unadorned)
+			options_table[name] = curentry;
+	}
+
+	return options_table;
+}
+
+//-------------------------------------------------
 //  machine_get_screens - return table of available screens userdata
 //  -> manager:machine().screens[":screen"]
 //-------------------------------------------------
@@ -591,6 +619,47 @@ int lua_engine::lua_addr_space::l_mem_write(lua_State *L)
 	return 0;
 }
 
+int lua_engine::lua_options_entry::l_entry_value(lua_State *L)
+{
+	core_options::entry *e = luabridge::Stack<core_options::entry *>::get(L, 1);
+	if(!e) {
+		return 0;
+	}
+
+	luaL_argcheck(L, !lua_isfunction(L, 2), 2, "optional argument: unsupported value");
+
+	if (!lua_isnone(L, 2))
+	{
+		std::string error;
+		luaThis->machine().options().set_value(e->name(),
+				lua_isboolean(L, 2) ? (lua_toboolean(L, 2) ? "1" : "0") : lua_tostring(L, 2),
+				OPTION_PRIORITY_CMDLINE, error);
+
+		if (!error.empty())
+		{
+			lua_writestringerror("%s", error.c_str());
+		}
+	}
+	
+	switch (e->type())
+	{
+		case OPTION_BOOLEAN:
+			lua_pushboolean(L, (atoi(e->value()) != 0));
+			break;
+		case OPTION_INTEGER:
+			lua_pushnumber(L, atoi(e->value()));
+			break;
+		case OPTION_FLOAT:
+			lua_pushnumber(L, atof(e->value()));
+			break;
+		default:
+			lua_pushstring(L, e->value());
+			break;
+	}
+
+	return 1;
+}
+
 //-------------------------------------------------
 //  screen_height - return screen visible height
 //  -> manager:machine().screens[":screen"]:height()
@@ -620,6 +689,86 @@ int lua_engine::lua_screen::l_width(lua_State *L)
 	}
 
 	lua_pushunsigned(L, sc->visible_area().width());
+	return 1;
+}
+
+//-------------------------------------------------
+//  screen_refresh - return screen refresh rate
+//  -> manager:machine().screens[":screen"]:refresh()
+//-------------------------------------------------
+
+int lua_engine::lua_screen::l_refresh(lua_State *L)
+{
+	screen_device *sc = luabridge::Stack<screen_device *>::get(L, 1);
+	if(!sc) {
+		return 0;
+	}
+
+	lua_pushnumber(L, ATTOSECONDS_TO_HZ(sc->refresh_attoseconds()));
+	return 1;
+}
+
+//-------------------------------------------------
+//  screen_snapshot - save png bitmap of screen to snapshots folder
+//  -> manager:machine().screens[":screen"]:snapshot("filename.png")
+//-------------------------------------------------
+
+int lua_engine::lua_screen::l_snapshot(lua_State *L)
+{
+	screen_device *sc = luabridge::Stack<screen_device *>::get(L, 1);
+	if(!sc || !sc->machine().render().is_live(*sc))
+	{
+		return 0;
+	}
+
+	luaL_argcheck(L, lua_isstring(L, 2) || lua_isnone(L, 2), 2, "optional argument: filename, string expected");
+
+	emu_file file(sc->machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	file_error filerr;
+
+	if (!lua_isnone(L, 5)) {
+		const char *filename = lua_tostring(L, 2);
+		std::string snapstr(filename);
+		strreplace(snapstr, "/", PATH_SEPARATOR);
+		strreplace(snapstr, "%g", sc->machine().basename());
+		filerr = file.open(snapstr.c_str());
+	}
+	else
+	{
+		filerr = sc->machine().video().open_next(file, "png");
+	}
+
+	if (filerr != FILERR_NONE)
+	{
+		lua_writestringerror("Error creating snapshot, file_error=%d", filerr);
+		return 0;
+	}
+
+	sc->machine().video().save_snapshot(sc, file);
+	file.close();
+	return 1;
+}
+
+//-------------------------------------------------
+//  screen_type - return human readable screen type
+//  -> manager:machine().screens[":screen"]:type()
+//-------------------------------------------------
+
+int lua_engine::lua_screen::l_type(lua_State *L)
+{
+	screen_device *sc = luabridge::Stack<screen_device *>::get(L, 1);
+	if(!sc) {
+		return 0;
+	}
+
+	switch (sc->screen_type())
+	{
+		case SCREEN_TYPE_RASTER:  lua_pushliteral(L, "raster"); break;
+		case SCREEN_TYPE_VECTOR:  lua_pushliteral(L, "vector"); break;
+		case SCREEN_TYPE_LCD:     lua_pushliteral(L, "lcd"); break;
+		default:                  lua_pushliteral(L, "unknown"); break;
+	}
+
 	return 1;
 }
 
@@ -1087,12 +1236,17 @@ void lua_engine::initialize()
 				.addFunction ("system", &running_machine::system)
 				.addProperty <luabridge::LuaRef, void> ("devices", &lua_engine::l_machine_get_devices)
 				.addProperty <luabridge::LuaRef, void> ("screens", &lua_engine::l_machine_get_screens)
+				.addProperty <luabridge::LuaRef, void> ("options", &lua_engine::l_machine_get_options)
 			.endClass ()
 			.beginClass <game_driver> ("game_driver")
+				.addData ("source_file", &game_driver::source_file)
+				.addData ("parent", &game_driver::parent)
 				.addData ("name", &game_driver::name)
 				.addData ("description", &game_driver::description)
 				.addData ("year", &game_driver::year)
 				.addData ("manufacturer", &game_driver::manufacturer)
+				.addData ("compatible_with", &game_driver::compatible_with)
+				.addData ("default_layout", &game_driver::default_layout)
 			.endClass ()
 			.beginClass <device_t> ("device")
 				.addFunction ("name", &device_t::name)
@@ -1100,6 +1254,16 @@ void lua_engine::initialize()
 				.addFunction ("tag", &device_t::tag)
 				.addProperty <luabridge::LuaRef, void> ("spaces", &lua_engine::l_dev_get_memspaces)
 				.addProperty <luabridge::LuaRef, void> ("state", &lua_engine::l_dev_get_states)
+			.endClass()
+			.beginClass <lua_options_entry> ("lua_options_entry")
+				.addCFunction ("value", &lua_options_entry::l_entry_value)
+			.endClass()
+			.deriveClass <core_options::entry, lua_options_entry> ("core_options_entry")
+				.addFunction ("description", &core_options::entry::description)
+				.addFunction ("default_value", &core_options::entry::default_value)
+				.addFunction ("minimum", &core_options::entry::minimum)
+				.addFunction ("maximum", &core_options::entry::maximum)
+				.addFunction ("has_range", &core_options::entry::has_range)
 			.endClass()
 			.beginClass <lua_addr_space> ("lua_addr_space")
 				.addCFunction ("read_i8", &lua_addr_space::l_mem_read<INT8>)
@@ -1128,12 +1292,17 @@ void lua_engine::initialize()
 				.addCFunction ("draw_text", &lua_screen::l_draw_text)
 				.addCFunction ("height", &lua_screen::l_height)
 				.addCFunction ("width", &lua_screen::l_width)
+				.addCFunction ("refresh", &lua_screen::l_refresh)
+				.addCFunction ("snapshot", &lua_screen::l_snapshot)
+				.addCFunction ("type", &lua_screen::l_type)
 			.endClass()
 			.deriveClass <screen_device, lua_screen> ("screen_dev")
 				.addFunction ("frame_number", &screen_device::frame_number)
 				.addFunction ("name", &screen_device::name)
 				.addFunction ("shortname", &screen_device::shortname)
 				.addFunction ("tag", &screen_device::tag)
+				.addFunction ("xscale", &screen_device::xscale)
+				.addFunction ("yscale", &screen_device::yscale)
 			.endClass()
 			.beginClass <device_state_entry> ("dev_space")
 				.addFunction ("name", &device_state_entry::symbol)

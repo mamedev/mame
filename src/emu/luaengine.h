@@ -118,6 +118,7 @@ private:
 	static int register_function(lua_State *L, const char *id);
 
 	// "emu.machine" namespace
+	static luabridge::LuaRef l_machine_get_options(const running_machine *r);
 	static luabridge::LuaRef l_machine_get_devices(const running_machine *r);
 	static luabridge::LuaRef devtree_dfs(device_t *root, luabridge::LuaRef dev_table);
 	static luabridge::LuaRef l_dev_get_states(const device_t *d);
@@ -132,9 +133,16 @@ private:
 	struct lua_screen {
 		int l_height(lua_State *L);
 		int l_width(lua_State *L);
+		int l_refresh(lua_State *L);
+		int l_type(lua_State *L);
+		int l_snapshot(lua_State *L);
 		int l_draw_box(lua_State *L);
 		int l_draw_line(lua_State *L);
 		int l_draw_text(lua_State *L);
+	};
+
+	struct lua_options_entry {
+		int l_entry_value(lua_State *L);
 	};
 
 	void resume(void *L, INT32 param);
