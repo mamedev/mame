@@ -18,6 +18,7 @@
 #include "ui/ui.h"
 #include "luaengine.h"
 #include <mutex>
+#include "libuv/include/uv.h"
 
 //**************************************************************************
 //  LUA ENGINE
@@ -46,6 +47,10 @@ lua_engine* lua_engine::luaThis = nullptr;
 
 extern "C" {
 	int luaopen_lsqlite3(lua_State *L);
+	int luaopen_zlib(lua_State *L);
+	int luaopen_luv(lua_State *L);
+	int luaopen_lfs(lua_State *L);
+	uv_loop_t* luv_loop(lua_State* L);	
 }
 
 static void lstop(lua_State *L, lua_Debug *ar)
@@ -886,8 +891,24 @@ lua_engine::lua_engine()
 	lua_gc(m_lua_state, LUA_GCSTOP, 0);  /* stop collector during initialization */
 	luaL_openlibs(m_lua_state);  /* open libraries */
 
-	luaopen_lsqlite3(m_lua_state);
+	 // Get package.preload so we can store builtins in it.
+	lua_getglobal(m_lua_state, "package");
+	lua_getfield(m_lua_state, -1, "preload");
+	lua_remove(m_lua_state, -2); // Remove package
 
+	// Store uv module definition at preload.uv
+	lua_pushcfunction(m_lua_state, luaopen_luv);
+	lua_setfield(m_lua_state, -2, "luv");
+
+	lua_pushcfunction(m_lua_state, luaopen_zlib);
+	lua_setfield(m_lua_state, -2, "zlib");
+	
+	lua_pushcfunction(m_lua_state, luaopen_lsqlite3);
+	lua_setfield(m_lua_state, -2, "lsqlite3");
+
+	lua_pushcfunction(m_lua_state, luaopen_lfs);
+	lua_setfield(m_lua_state, -2, "lfs");
+	
 	luaopen_ioport(m_lua_state);
 
 	lua_gc(m_lua_state, LUA_GCRESTART, 0);
@@ -1050,33 +1071,37 @@ void lua_engine::periodic_check()
 {
 	std::lock_guard<std::mutex> lock(g_mutex);
 	if (msg.ready == 1) {
-	lua_settop(m_lua_state, 0);
-	int status = luaL_loadbuffer(m_lua_state, msg.text.c_str(), msg.text.length(), "=stdin");
-	if (incomplete(status)==0)  /* cannot try to add lines? */
-	{
-		if (status == LUA_OK) status = docall(0, LUA_MULTRET);
-		report(status);
-		if (status == LUA_OK && lua_gettop(m_lua_state) > 0)   /* any result to print? */
+		lua_settop(m_lua_state, 0);
+		int status = luaL_loadbuffer(m_lua_state, msg.text.c_str(), msg.text.length(), "=stdin");
+		if (incomplete(status)==0)  /* cannot try to add lines? */
 		{
-			luaL_checkstack(m_lua_state, LUA_MINSTACK, "too many results to print");
-			lua_getglobal(m_lua_state, "print");
-			lua_insert(m_lua_state, 1);
-			if (lua_pcall(m_lua_state, lua_gettop(m_lua_state) - 1, 0, 0) != LUA_OK)
-				lua_writestringerror("%s\n", lua_pushfstring(m_lua_state,
-				"error calling " LUA_QL("print") " (%s)",
-				lua_tostring(m_lua_state, -1)));
+			if (status == LUA_OK) status = docall(0, LUA_MULTRET);
+			report(status);
+			if (status == LUA_OK && lua_gettop(m_lua_state) > 0)   /* any result to print? */
+			{
+				luaL_checkstack(m_lua_state, LUA_MINSTACK, "too many results to print");
+				lua_getglobal(m_lua_state, "print");
+				lua_insert(m_lua_state, 1);
+				if (lua_pcall(m_lua_state, lua_gettop(m_lua_state) - 1, 0, 0) != LUA_OK)
+					lua_writestringerror("%s\n", lua_pushfstring(m_lua_state,
+					"error calling " LUA_QL("print") " (%s)",
+					lua_tostring(m_lua_state, -1)));
+			}
 		}
+		else
+		{
+			status = -1;
+		}
+		msg.status = status;
+		msg.response = msg.text;
+		msg.text = "";
+		msg.ready = 0;
+		msg.done = 1;
 	}
-	else
-	{
-		status = -1;
-	}
-	msg.status = status;
-	msg.response = msg.text;
-	msg.text = "";
-	msg.ready = 0;
-	msg.done = 1;
-	}
+	auto loop = luv_loop(m_lua_state);
+	if (loop!=nullptr)
+		uv_run(loop, UV_RUN_NOWAIT);
+	
 }
 
 //-------------------------------------------------

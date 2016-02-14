@@ -128,7 +128,8 @@ end
 		"jpeg",
 		"7z",
 		"lua",
-		"lsqlite3",
+		"lualibs",
+		"luv",
 		"uv",
 		"http-parser",
 	}

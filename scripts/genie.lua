@@ -671,9 +671,10 @@ end
 --DEFS += -DUSE_SYSTEM_JPEGLIB
 --endif
 
-	--To support casting in Lua 5.3
 	defines {
-		"LUA_COMPAT_APIINTCASTS",
+		"LUA_COMPAT_ALL",
+		"LUA_COMPAT_5_1",
+		"LUA_COMPAT_5_2",
 	}
 
 	if _ACTION == "gmake" then
