@@ -69,12 +69,13 @@
 # SDL_INSTALL_ROOT = /opt/sdl2
 # SDL_FRAMEWORK_PATH = $(HOME)/Library/Frameworks
 # SDL_LIBVER = sdl
-# MACOSX_USE_LIBSDL = 1
+# USE_LIBSDL = 1
 # CYGWIN_BUILD = 1
 
 # BUILDDIR = build
 # TARGETOS = windows
 # CROSS_BUILD = 1
+# TOOLCHAIN =
 # OVERRIDE_CC = cc
 # OVERRIDE_CXX = c++
 # OVERRIDE_LD = ld
@@ -270,9 +271,9 @@ WINDRES  := $(MINGW32)/bin/windres
 endif
 else
 ifeq ($(ARCHITECTURE),_x64)
-WINDRES  := x86_64-w64-mingw32-windres
+WINDRES  := $(word 1,$(TOOLCHAIN) x86_64-w64-mingw32-)windres
 else
-WINDRES  := i686-w64-mingw32-windres
+WINDRES  := $(word 1,$(TOOLCHAIN) i686-w64-mingw32-)windres
 endif
 endif
 
@@ -311,6 +312,7 @@ PYTHON := $(PYTHON_EXECUTABLE)
 endif
 CC := $(SILENT)gcc
 LD := $(SILENT)g++
+CXX:= $(SILENT)g++
 
 #-------------------------------------------------
 # specify OSD layer: windows, sdl, etc.
@@ -406,6 +408,9 @@ endif
 
 PARAMS+= --distro=$(DISTRO)
 
+ifdef TOOLCHAIN
+PARAMS += --TOOLCHAIN='$(TOOLCHAIN)'
+endif
 ifdef OVERRIDE_CC
 PARAMS += --CC='$(OVERRIDE_CC)'
 ifndef CROSS_BUILD
@@ -626,8 +631,8 @@ ifdef SDL_FRAMEWORK_PATH
 PARAMS += --SDL_FRAMEWORK_PATH='$(SDL_FRAMEWORK_PATH)'
 endif
 
-ifdef MACOSX_USE_LIBSDL
-PARAMS += --MACOSX_USE_LIBSDL='$(MACOSX_USE_LIBSDL)'
+ifdef USE_LIBSDL
+PARAMS += --USE_LIBSDL='$(USE_LIBSDL)'
 endif
 
 ifdef LDOPTS
@@ -776,12 +781,12 @@ endif
 
 ifeq ($(OS),windows)
 ifeq (posix,$(SHELLTYPE))
-GCC_VERSION      := $(shell $(subst @,,$(CC)) -dumpversion 2> /dev/null)
-CLANG_VERSION    := $(shell $(subst @,,$(CC)) --version 2> /dev/null| head -n 1 | grep clang | sed "s/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$$/\1/" | head -n 1)
+GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) -dumpversion 2> /dev/null)
+CLANG_VERSION    := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) --version 2> /dev/null| head -n 1 | grep clang | sed "s/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$$/\1/" | head -n 1)
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > /dev/null 2>&1 && echo python)
 else
-GCC_VERSION      := $(shell $(subst @,,$(CC)) -dumpversion 2> NUL)
-CLANG_VERSION    := $(shell $(subst @,,$(CC)) --version 2> NUL| head -n 1 | grep clang | sed "s/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$$/\1/" | head -n 1)
+GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) -dumpversion 2> NUL)
+CLANG_VERSION    := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) --version 2> NUL| head -n 1 | grep clang | sed "s/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$$/\1/" | head -n 1)
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > NUL 2>&1 && echo python)
 endif
 ifdef MSBUILD
@@ -798,9 +803,9 @@ MSBUILD_PARAMS += /p:Platform=win32
 endif
 endif
 else
-GCC_VERSION      := $(shell $(subst @,,$(CC)) -dumpversion 2> /dev/null)
+GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) -dumpversion 2> /dev/null)
 ifneq ($(OS),solaris)
-CLANG_VERSION    := $(shell $(subst @,,$(CC))  --version  2> /dev/null | head -n 1 | grep -e 'version [0-9]\.[0-9]\(\.[0-9]\)\?' -o | grep -e '[0-9]\.[0-9]\(\.[0-9]\)\?' -o | tail -n 1)
+CLANG_VERSION    := $(shell $(TOOLCHAIN)$(subst @,,$(CC))  --version  2> /dev/null | head -n 1 | grep -e 'version [0-9]\.[0-9]\(\.[0-9]\)\?' -o | grep -e '[0-9]\.[0-9]\(\.[0-9]\)\?' -o | tail -n 1)
 endif
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > /dev/null 2>&1 && echo python)
 endif
@@ -1195,7 +1200,7 @@ endif
 ifndef MARVELL_ROOTFS
 	$(error MARVELL_ROOTFS is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=steamlink --gcc_version=$(GCC_VERSION) --USE_BGFX=0 --NO_OPENGL=1 --NO_USE_MIDI=1 --NO_X11=1 --NOASM=1 --SDL_INSTALL_ROOT=$(MARVELL_ROOTFS)/usr  gmake 
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=steamlink --gcc_version=$(GCC_VERSION) --USE_BGFX=0 --NO_OPENGL=1 --NO_USE_MIDI=1 --NO_X11=1 --NOASM=1 --SDL_INSTALL_ROOT=$(MARVELL_ROOTFS)/usr  gmake  
 
 .PHONY: steamlink
 ifndef MARVELL_SDK_PATH
@@ -1235,10 +1240,13 @@ $(GENIE): $(GENIE_SRC)
 
 3rdparty/genie/src/hosts/%.c:
 
-clean:
+.PHONY: genieclean
+genieclean:
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make clean
+
+clean: genieclean
 	@echo Cleaning...
 	-@rm -rf $(BUILDDIR)
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make clean
 	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000 clean
 
 GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET)/
@@ -1256,8 +1264,10 @@ endif
 $(GEN_FOLDERS):
 	-$(call MKDIR,$@)
 
+genie: $(GENIE)
+
 generate: \
-		$(GENIE) \
+		genie \
 		$(GEN_FOLDERS) \
 		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
 		$(SRC)/devices/cpu/m68000/m68kops.cpp

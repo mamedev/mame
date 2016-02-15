@@ -1297,7 +1297,7 @@ avi_error avi_read_sound_samples(avi_file *file, int channel, UINT32 firstsample
 	UINT32 bytes_per_sample;
 	file_error filerr;
 	avi_stream *stream;
-	int offset;
+	int offset = 0;
 
 	/* get the audio stream */
 	stream = get_audio_stream(file, channel, &offset);

@@ -2091,6 +2091,8 @@ ROM_START( blockjoy )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "ble_05.bin",   0x00000, 0x08000, CRC(fa2a4536) SHA1(8f584745116bd0ced4d66719cd80c0372b797134) )
 	ROM_LOAD( "blf_06.bin",   0x10000, 0x20000, CRC(e114ebde) SHA1(12362e809443644b43fbc72e7eead5f376fe11d3) )
+// a ble_06a labeled rom has been dumped and verified identical to blf_06.bin.
+
 // this seems to be a bad version of the above rom, although the rom code is different it is 99% the same, and level 6
 // is impossible to finish due to a missing block.  Probably bitrot
 //  ROM_LOAD( "ble_06.bin",   0x10000, 0x20000, BAD_DUMP CRC(58a77402) SHA1(cb24b1edd53a0965c3a9a34fe764b5c1f8dd9733) )

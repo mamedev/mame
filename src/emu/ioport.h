@@ -371,12 +371,8 @@ enum ioport_type
 		IPT_UI_LOAD_STATE,
 		IPT_UI_TAPE_START,
 		IPT_UI_TAPE_STOP,
-		IPT_UI_HISTORY,
-		IPT_UI_MAMEINFO,
-		IPT_UI_COMMAND,
-		IPT_UI_SYSINFO,
+		IPT_UI_DATS,
 		IPT_UI_FAVORITES,
-		IPT_UI_STORY,
 		IPT_UI_UP_FILTER,
 		IPT_UI_DOWN_FILTER,
 		IPT_UI_LEFT_PANEL,
@@ -386,6 +382,7 @@ enum ioport_type
 		IPT_UI_EXPORT,
 		IPT_UI_AUDIT_FAST,
 		IPT_UI_AUDIT_ALL,
+		IPT_UI_TOGGLE_AUTOFIRE,
 
 		// additional OSD-specified UI port types (up to 16)
 		IPT_OSD_1,
@@ -1099,6 +1096,7 @@ public:
 	struct user_settings
 	{
 		ioport_value    value;                  // for DIP switches
+		bool			autofire;				// for autofire settings
 		input_seq       seq[SEQ_TYPE_TOTAL];    // sequences of all types
 		INT32           sensitivity;            // for analog controls
 		INT32           delta;                  // for analog controls
@@ -1175,6 +1173,8 @@ struct ioport_field_live
 	bool                    last;               // were we pressed last time?
 	bool                    toggle;             // current toggle setting
 	digital_joystick::direction_t joydir;       // digital joystick direction index
+	bool                    autofire;           // autofire
+	int                     autopressed;        // autofire status
 	std::string             name;               // overridden name
 };
 
@@ -1417,6 +1417,12 @@ public:
 	ioport_type token_to_input_type(const char *string, int &player) const;
 	std::string input_type_to_token(ioport_type type, int player);
 
+	// autofire
+	bool get_autofire_toggle() { return m_autofire_toggle; }
+	void set_autofire_toggle(bool toggle) { m_autofire_toggle = toggle; }
+	int get_autofire_delay() { return m_autofire_delay; }
+	void set_autofire_delay(int delay) { m_autofire_delay = delay; }
+
 private:
 	// internal helpers
 	void init_port_types();
@@ -1488,6 +1494,10 @@ private:
 	bool                    m_has_analog;
 	bool                    m_has_dips;
 	bool                    m_has_bioses;
+
+	// autofire
+	bool                    m_autofire_toggle;      // autofire toggle
+	int                     m_autofire_delay;       // autofire delay
 };
 
 

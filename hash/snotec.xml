@@ -72,4 +72,42 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="caudit">
+		<description>Challenge Audition</description>
+		<year>1998</year>
+		<publisher>Bandai</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x40000">
+				<rom name="Audition.ic1" size="0x40000" crc="685fc899" sha1="0e203ed002450031663d6626380d39b88dc7b1ab" offset="0" />
+			</dataarea>
+			<dataarea name="eeprom" size="0x4000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conan">
+		<description>Detective Conan</description>
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x40000">
+				<rom name="LH532KV6.IC1" size="0x40000" crc="edf3cc1e" sha1="0b759ff7dd2bd6809e5634679f758de106fed654" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicalf">
+		<description>Magical Fortune</description>
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x40000">
+				<rom name="LH532KWU.ic1" size="0x40000" crc="b0017e0d" sha1="0147f0c61fa47509971222cbacfafd382ed2e31d" offset="0" />
+			</dataarea>
+			<dataarea name="eeprom" size="0x800">
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

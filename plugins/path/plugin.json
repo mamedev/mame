@@ -1,0 +1,8 @@
+{
+  "plugin": {
+    "name": "path",
+    "version": "1.0.0",
+    "author": "Tim Caswell",
+	"type": "library",
+  }
+}

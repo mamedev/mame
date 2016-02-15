@@ -145,6 +145,8 @@ void dmac_device::check_interrupts()
 		// any interrupts pending?
 		if (m_istr & ISTR_INT_MASK)
 			m_istr |= ISTR_INT_P;
+		else
+			m_istr &= ~ISTR_INT_P;
 	}
 	else
 		m_istr &= ~ISTR_INT_P;
@@ -202,18 +204,19 @@ READ16_MEMBER( dmac_device::register_read )
 
 	case 0x48:
 	case 0x49:
-	case 0x50:
-	case 0x58:
-	case 0x59:
-	case 0x5a:
-	case 0x5b:
-	case 0x5c:
-	case 0x5e:
-	case 0x5f:
 		data = m_scsi_read_handler(offset);
 
 		if (VERBOSE)
-			logerror("%s('%s'): read scsi data @ %02x %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
+			logerror("%s('%s'): read scsi register @ %02x %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
+
+		break;
+
+	case 0x50:
+	case 0x51:
+	case 0x52:
+	case 0x53:
+		if (VERBOSE)
+			logerror("%s('%s'): read xt register @ %02x %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
 
 		break;
 
@@ -306,18 +309,18 @@ WRITE16_MEMBER( dmac_device::register_write )
 
 	case 0x48:
 	case 0x49:
-	case 0x50:
-	case 0x58:
-	case 0x59:
-	case 0x5a:
-	case 0x5b:
-	case 0x5c:
-	case 0x5e:
-	case 0x5f:
 		if (VERBOSE)
-			logerror("%s('%s'): write scsi data @ %02x %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
+			logerror("%s('%s'): write scsi register @ %02x %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
 
 		m_scsi_write_handler(offset, data, 0xff);
+		break;
+
+	case 0x50:
+	case 0x51:
+	case 0x52:
+	case 0x53:
+		if (VERBOSE)
+			logerror("%s('%s'): write xt register @ %02x %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
 		break;
 
 	case 0x70:

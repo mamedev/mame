@@ -41,6 +41,7 @@ public:
 	bool m_power_led;
 
 	UINT8 read_inputs(int columns);
+	UINT8 read_rotated_inputs(int columns, UINT8 rowmask = 0xf);
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button);
 	virtual DECLARE_WRITE_LINE_MEMBER(auto_power_off);
 

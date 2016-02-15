@@ -1,0 +1,8 @@
+{
+  "plugin": {
+    "name": "http-codec",
+    "version": "1.0.0-1",
+    "author": "Tim Caswell",
+	"type": "library",
+  }
+}

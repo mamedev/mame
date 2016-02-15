@@ -59,9 +59,13 @@ static const ui_arts_info arts_info[] =
 	{ nullptr }
 };
 
-static const char *hover_msg[] = { "Add or remove favorites", "Export displayed list to file", "Show history.dat info",
-								"Show mameinfo.dat / messinfo.dat info", "Show command.dat info", "Setup directories",
-								"Configure options" };
+static const char *hover_msg[] = {
+	"Add or remove favorites",
+	"Export displayed list to file",
+	"Show DATs view",
+	"Setup directories",
+	"Configure options"
+};
 
 /***************************************************************************
 	GLOBAL VARIABLES
@@ -340,6 +344,8 @@ const ui_menu_event *ui_menu::process(UINT32 flags)
 		draw_select_game(flags & UI_MENU_PROCESS_NOINPUT);
 	else if ((item[0].flags & MENU_FLAG_UI_PALETTE ) != 0)
 		draw_palette_menu();
+	else if ((item[0].flags & MENU_FLAG_UI_DATS) != 0)
+		draw_dats_menu();
 	else
 		draw(flags & UI_MENU_PROCESS_CUSTOM_ONLY, flags & UI_MENU_PROCESS_NOIMAGE, flags & UI_MENU_PROCESS_NOINPUT);
 
@@ -454,6 +460,13 @@ void ui_menu::set_selection(void *selected_itemref)
 
 void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 {
+	// first draw the FPS counter
+	if (machine().ui().show_fps_counter())
+	{
+		machine().ui().draw_text_full(container, machine().video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
+					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, nullptr, nullptr);
+	}
+
 	float line_height = machine().ui().get_line_height();
 	float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
 	float ud_arrow_width = line_height * machine().render().ui_aspect();
@@ -463,7 +476,6 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 	int itemnum, linenum;
 	bool mouse_hit, mouse_button;
 	float mouse_x = -1, mouse_y = -1;
-	bool history_flag = ((item[0].flags & MENU_FLAG_UI_HISTORY) != 0);
 
 	if (machine().ui().options().use_background_image() && &machine().system() == &GAME_NAME(___empty) && bgrnd_bitmap->valid() && !noimage)
 		container->add_quad(0.0f, 0.0f, 1.0f, 1.0f, ARGB_WHITE, bgrnd_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -528,14 +540,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 	if (top_line < 0 || selected == 0)
 		top_line = 0;
 	if (top_line + visible_lines >= item.size())
-	{
-		if (history_flag)
-			selected = item.size() - 1;
 		top_line = item.size() - visible_lines;
-	}
-
-	if (history_flag && selected != item.size() - 1)
-		selected = top_line + visible_lines / 2;
 
 	// determine effective positions taking into account the hilighting arrows
 	float effective_width = visible_width - 2.0f * gutter_width;
@@ -572,12 +577,11 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 			float line_y1 = line_y + line_height;
 
 			// set the hover if this is our item
-			if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && pitem.is_selectable()
-			    && (pitem.flags & MENU_FLAG_UI_HISTORY) == 0)
+			if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && pitem.is_selectable())
 				hover = itemnum;
 
 			// if we're selected, draw with a different background
-			if (itemnum == selected && (pitem.flags & MENU_FLAG_UI_HISTORY) == 0)
+			if (itemnum == selected)
 			{
 				fgcolor = UI_SELECTED_COLOR;
 				bgcolor = UI_SELECTED_BG_COLOR;
@@ -586,8 +590,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 			}
 
 			// else if the mouse is over this item, draw with a different background
-			else if (itemnum == hover && (((pitem.flags & MENU_FLAG_UI_HISTORY) == 0) || (linenum == 0 && top_line != 0)
-			         || (linenum == visible_lines - 1 && itemnum != item.size() - 1)))
+			else if (itemnum == hover && ((linenum == 0 && top_line != 0) || (linenum == visible_lines - 1 && itemnum != item.size() - 1)))
 			{
 				fgcolor = UI_MOUSEOVER_COLOR;
 				bgcolor = UI_MOUSEOVER_BG_COLOR;
@@ -630,11 +633,6 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 			// if we're just a divider, draw a line
 			else if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
 				container->add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-
-			// draw the subitem left-justified
-			else if (pitem.subtext == nullptr && (pitem.flags & MENU_FLAG_UI_HISTORY) != 0)
-				machine().ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
-					JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 
 			// if we don't have a subitem, just draw the string centered
 			else if (pitem.subtext == nullptr)
@@ -818,7 +816,6 @@ void ui_menu::handle_events(UINT32 flags)
 {
 	bool stop = false;
 	ui_event local_menu_event;
-	bool historyflag = ((item[0].flags & MENU_FLAG_UI_HISTORY) != 0);
 
 	// loop while we have interesting events
 	while (!stop && machine().ui_input().pop_event(&local_menu_event))
@@ -833,6 +830,11 @@ void ui_menu::handle_events(UINT32 flags)
 						selected = hover;
 					else if (hover == HOVER_ARROW_UP)
 					{
+						if ((flags & MENU_FLAG_UI_DATS) != 0)
+						{
+							top_line -= visitems - (top_line + visible_lines == item.size() - 1);
+							return;
+						}
 						selected -= visitems;
 						if (selected < 0)
 							selected = 0;
@@ -840,6 +842,11 @@ void ui_menu::handle_events(UINT32 flags)
 					}
 					else if (hover == HOVER_ARROW_DOWN)
 					{
+						if ((flags & MENU_FLAG_UI_DATS) != 0)
+						{
+							top_line += visible_lines - 2;
+							return;
+						}
 						selected += visible_lines - 2 + (selected == 0);
 						if (selected > item.size() - 1)
 							selected = item.size() - 1;
@@ -869,16 +876,23 @@ void ui_menu::handle_events(UINT32 flags)
 				{
 					if (local_menu_event.zdelta > 0)
 					{
-						if (historyflag && selected == item.size() - 1)
-							selected -= visitems + 1;
-						else
-							selected -= local_menu_event.num_lines;
+						if ((flags & MENU_FLAG_UI_DATS) != 0)
+						{
+							top_line -= local_menu_event.num_lines;
+							return;
+						}
+						selected -= local_menu_event.num_lines;
 						validate_selection(-1);
 						if (selected < top_line + (top_line != 0))
 							top_line -= local_menu_event.num_lines;
 					}
 					else
 					{
+						if ((flags & MENU_FLAG_UI_DATS) != 0)
+						{
+							top_line += local_menu_event.num_lines;
+							return;
+						}
 						selected += local_menu_event.num_lines;
 						validate_selection(1);
 						if (selected > item.size() - 1)
@@ -917,8 +931,6 @@ void ui_menu::handle_keys(UINT32 flags)
 	// bail if no items
 	if (item.empty())
 		return;
-	bool historyflag = ((item[0].flags & MENU_FLAG_UI_HISTORY) != 0);
-
 
 	// if we hit select, return TRUE or pop the stack, depending on the item
 	if (exclusive_input_pressed(IPT_UI_SELECT, 0))
@@ -950,6 +962,9 @@ void ui_menu::handle_keys(UINT32 flags)
 	bool ignoreleft = ((item[selected].flags & MENU_FLAG_LEFT_ARROW) == 0);
 	bool ignoreright = ((item[selected].flags & MENU_FLAG_RIGHT_ARROW) == 0);
 
+	if ((item[0].flags & MENU_FLAG_UI_DATS) != 0)
+		ignoreleft = ignoreright = false;
+
 	// accept left/right keys as-is with repeat
 	if (!ignoreleft && exclusive_input_pressed(IPT_UI_LEFT, (flags & UI_MENU_PROCESS_LR_REPEAT) ? 6 : 0))
 		return;
@@ -959,23 +974,12 @@ void ui_menu::handle_keys(UINT32 flags)
 	// up backs up by one item
 	if (exclusive_input_pressed(IPT_UI_UP, 6))
 	{
-		if (historyflag)
+		if ((item[0].flags & MENU_FLAG_UI_DATS) != 0)
 		{
-			if (selected <= (visitems / 2))
-				return;
-			else if (visitems == item.size())
-			{
-				selected = item.size() - 1;
-				return;
-			}
-			else if (selected == item.size() - 1)
-				selected = (item.size() - 1) - (visitems / 2);
-		}
-			
-		if (selected == 0)
+			top_line--;
 			return;
-
-		selected--;
+		}
+		(selected == 0) ? selected = top_line = item.size() - 1 : --selected;
 		validate_selection(-1);
 		top_line -= (selected == top_line && top_line != 0);
 	}
@@ -983,21 +987,12 @@ void ui_menu::handle_keys(UINT32 flags)
 	// down advances by one item
 	if (exclusive_input_pressed(IPT_UI_DOWN, 6))
 	{
-		if (historyflag)
+		if ((item[0].flags & MENU_FLAG_UI_DATS) != 0)
 		{
-			if (selected < visitems / 2)
-				selected = visitems / 2;
-			else if (selected + (visitems / 2) >= item.size())
-			{
-				selected = item.size() - 1;
-				return;
-			}
-		}
-
-		if (selected == item.size() - 1)
+			top_line++;
 			return;
-		
-		selected++;
+		}
+		(selected == item.size() - 1) ? selected = top_line = 0 : ++selected;
 		top_line += (selected == top_line + visitems + (top_line != 0));
 	}
 
@@ -1263,7 +1258,7 @@ void ui_menu::render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const 
 
 void ui_menu::highlight(render_container *container, float x0, float y0, float x1, float y1, rgb_t bgcolor)
 {
-	container->add_quad(x0, y0, x1, y1, bgcolor, hilight_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+	container->add_quad(x0, y0, x1, y1, bgcolor, hilight_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE) | PRIMFLAG_PACKABLE);
 }
 
 
@@ -1273,7 +1268,7 @@ void ui_menu::highlight(render_container *container, float x0, float y0, float x
 
 void ui_menu::draw_arrow(render_container *container, float x0, float y0, float x1, float y1, rgb_t fgcolor, UINT32 orientation)
 {
-	container->add_quad(x0, y0, x1, y1, fgcolor, arrow_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(orientation));
+	container->add_quad(x0, y0, x1, y1, fgcolor, arrow_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(orientation) | PRIMFLAG_PACKABLE);
 }
 
 //-------------------------------------------------
@@ -1355,7 +1350,7 @@ void ui_menu::init_ui(running_machine &machine)
 			toolbar_texture[x]->set_bitmap(*toolbar_bitmap[x], toolbar_bitmap[x]->cliprect(), TEXFORMAT_ARGB32);
 		else
 			toolbar_bitmap[x]->reset();
-		
+
 		if (x == 0 || x == 2)
 		{
 			dst = &sw_toolbar_bitmap[x]->pix32(0);
@@ -1492,7 +1487,7 @@ void ui_menu::draw_select_game(bool noinput)
 
 		// if we have some background hilighting to do, add a quad behind everything else
 		if (bgcolor != UI_TEXT_BG_COLOR)
-			mui.draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(255, 43, 43, 43), 
+			mui.draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(255, 43, 43, 43),
 				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 		// if we're on the top line, display the up arrow
@@ -1536,7 +1531,7 @@ void ui_menu::draw_select_game(bool noinput)
 
 				space = mui.get_line_height() * container->manager().ui_aspect() * 1.5f;
 			}
-			mui.draw_text_full(container, itemtext, effective_left + space, line_y, effective_width - space, JUSTIFY_LEFT, WRAP_TRUNCATE, 
+			mui.draw_text_full(container, itemtext, effective_left + space, line_y, effective_width - space, JUSTIFY_LEFT, WRAP_TRUNCATE,
 				DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, nullptr, nullptr);
 		}
 		else
@@ -1596,7 +1591,7 @@ void ui_menu::draw_select_game(bool noinput)
 			container->add_line(visible_left, line + 0.5f * line_height, visible_left + visible_width, line + 0.5f * line_height,
 				UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		else
-			mui.draw_text_full(container, itemtext, effective_left, line, effective_width, JUSTIFY_CENTER, WRAP_TRUNCATE, 
+			mui.draw_text_full(container, itemtext, effective_left, line, effective_width, JUSTIFY_CENTER, WRAP_TRUNCATE,
 				DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 		line += line_height;
 	}
@@ -1939,19 +1934,9 @@ void ui_menu::handle_main_events(UINT32 flags)
 					menu_event.iptkey = IPT_UI_EXPORT;
 					stop = true;
 				}
-				else if (hover == HOVER_B_HISTORY)
+				else if (hover == HOVER_B_DATS)
 				{
-					menu_event.iptkey = IPT_UI_HISTORY;
-					stop = true;
-				}
-				else if (hover == HOVER_B_MAMEINFO)
-				{
-					menu_event.iptkey = IPT_UI_MAMEINFO;
-					stop = true;
-				}
-				else if (hover == HOVER_B_COMMAND)
-				{
-					menu_event.iptkey = IPT_UI_COMMAND;
+					menu_event.iptkey = IPT_UI_DATS;
 					stop = true;
 				}
 				else if (hover == HOVER_B_SETTINGS)
@@ -2050,7 +2035,6 @@ float ui_menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 	float midl = (x2 - x1) * 0.5f;
 
 	// add outlined box for options
-	//machine().ui().draw_outlined_box(container, x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// add separator line
@@ -2089,7 +2073,7 @@ float ui_menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 
 		mui.draw_text_full(container, buffer[cells].c_str(), x1 + UI_LINE_WIDTH, y1, midl - UI_LINE_WIDTH,
 			JUSTIFY_CENTER, WRAP_NEVER, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
-		x1 = x1 + midl;
+		x1 += midl;
 	}
 
 	return (y1 + line_height + UI_LINE_WIDTH);
@@ -2132,7 +2116,7 @@ void ui_menu::draw_star(float x0, float y0)
 {
 	float y1 = y0 + machine().ui().get_line_height();
 	float x1 = x0 + machine().ui().get_line_height() * container->manager().ui_aspect();
-	container->add_quad(x0, y0, x1, y1, ARGB_WHITE, star_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container->add_quad(x0, y0, x1, y1, ARGB_WHITE, star_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_PACKABLE);
 }
 
 //-------------------------------------------------
@@ -2314,13 +2298,13 @@ void ui_menu::draw_common_arrow(float origx1, float origy1, float origx2, float 
 
 	// apply arrow
 	if (current == dmin)
-		container->add_quad(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor_right, arrow_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT90));
+		container->add_quad(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor_right, arrow_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT90) | PRIMFLAG_PACKABLE);
 	else if (current == dmax)
-		container->add_quad(al_x0, al_y0, al_x1, al_y1, fgcolor_left, arrow_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT90 ^ ORIENTATION_FLIP_X));
+		container->add_quad(al_x0, al_y0, al_x1, al_y1, fgcolor_left, arrow_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT90 ^ ORIENTATION_FLIP_X) | PRIMFLAG_PACKABLE);
 	else
 	{
-		container->add_quad(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor_right, arrow_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT90));
-		container->add_quad(al_x0, al_y0, al_x1, al_y1, fgcolor_left, arrow_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT90 ^ ORIENTATION_FLIP_X));
+		container->add_quad(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor_right, arrow_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT90) | PRIMFLAG_PACKABLE);
+		container->add_quad(al_x0, al_y0, al_x1, al_y1, fgcolor_left, arrow_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT90 ^ ORIENTATION_FLIP_X) | PRIMFLAG_PACKABLE);
 	}
 }
 
@@ -2425,7 +2409,7 @@ void ui_menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 	}
 
 	if (icons_bitmap[linenum]->valid())
-		container->add_quad(x0, y0, x1, y1, ARGB_WHITE, icons_texture[linenum], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container->add_quad(x0, y0, x1, y1, ARGB_WHITE, icons_texture[linenum], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_PACKABLE);
 }
 
 //-------------------------------------------------
@@ -2450,7 +2434,7 @@ void ui_menu::info_arrow(int ub, float origx1, float origx2, float oy1, float li
 }
 
 //-------------------------------------------------
-//  draw - draw a menu
+//  draw - draw palette menu
 //-------------------------------------------------
 
 void ui_menu::draw_palette_menu()
@@ -2559,14 +2543,14 @@ void ui_menu::draw_palette_menu()
 			hover = itemnum;
 
 		// if we're selected, draw with a different background
-		if (itemnum == selected && (pitem.flags & MENU_FLAG_UI_HISTORY) == 0)
+		if (itemnum == selected)
 		{
 			fgcolor = UI_SELECTED_COLOR;
 			bgcolor = UI_SELECTED_BG_COLOR;
 		}
 
 		// else if the mouse is over this item, draw with a different background
-		else if (itemnum == hover && (pitem.flags & MENU_FLAG_UI_HISTORY) == 0)
+		else if (itemnum == hover)
 		{
 			fgcolor = UI_MOUSEOVER_COLOR;
 			bgcolor = UI_MOUSEOVER_BG_COLOR;
@@ -2636,4 +2620,152 @@ void ui_menu::draw_palette_menu()
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
 	visitems = visible_lines - (top_line != 0) - (top_line + visible_lines != item.size());
+}
+
+//-------------------------------------------------
+//  draw - draw dats menu
+//-------------------------------------------------
+
+void ui_menu::draw_dats_menu()
+{
+	float line_height = machine().ui().get_line_height();
+	float ud_arrow_width = line_height * machine().render().ui_aspect();
+	float gutter_width = 0.52f * line_height * machine().render().ui_aspect();
+	mouse_x = -1, mouse_y = -1;
+	float visible_width = 1.0f - 2.0f * UI_BOX_LR_BORDER;
+	float visible_left = (1.0f - visible_width) * 0.5f;
+	ui_manager &mui = machine().ui();
+
+	// draw background image if available
+	if (machine().ui().options().use_background_image() && bgrnd_bitmap->valid())
+		container->add_quad(0.0f, 0.0f, 1.0f, 1.0f, ARGB_WHITE, bgrnd_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+
+	hover = item.size() + 1;
+	visible_items = item.size() - 2;
+	float extra_height = 2.0f * line_height;
+	float visible_extra_menu_height = customtop + custombottom + extra_height;
+
+	// locate mouse
+	mouse_hit = false;
+	mouse_button = false;
+	mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
+	if (mouse_target != nullptr)
+		if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y))
+			mouse_hit = true;
+
+	// account for extra space at the top and bottom
+	float visible_main_menu_height = 1.0f - 2.0f * UI_BOX_TB_BORDER - visible_extra_menu_height;
+	visible_lines = floor(visible_main_menu_height / line_height);
+	visible_main_menu_height = (float)(visible_lines * line_height);
+
+	// compute top/left of inner menu area by centering
+	float visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
+
+	// if the menu is at the bottom of the extra, adjust
+	visible_top += customtop;
+
+	// compute left box size
+	float x1 = visible_left;
+	float y1 = visible_top - UI_BOX_TB_BORDER;
+	float x2 = x1 + visible_width;
+	float y2 = visible_top + visible_main_menu_height + UI_BOX_TB_BORDER + extra_height;
+	float line = visible_top + (float)(visible_lines * line_height);
+
+	//machine().ui().draw_outlined_box(container, x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
+	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+
+	if (visible_items < visible_lines)
+		visible_lines = visible_items;
+	if (top_line < 0)
+		top_line = 0;
+	if (top_line + visible_lines >= visible_items)
+		top_line = visible_items - visible_lines;
+
+	// determine effective positions taking into account the hilighting arrows
+	float effective_width = visible_width - 2.0f * gutter_width;
+	float effective_left = visible_left + gutter_width;
+
+	int n_loop = (visible_items >= visible_lines) ? visible_lines : visible_items;
+
+	for (int linenum = 0; linenum < n_loop; linenum++)
+	{
+		float line_y = visible_top + (float)linenum * line_height;
+		int itemnum = top_line + linenum;
+		const ui_menu_item &pitem = item[itemnum];
+		const char *itemtext = pitem.text;
+		rgb_t fgcolor = UI_TEXT_COLOR;
+		rgb_t bgcolor = UI_TEXT_BG_COLOR;
+		float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
+		float line_y0 = line_y;
+		float line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
+		float line_y1 = line_y + line_height;
+
+		// if we're on the top line, display the up arrow
+		if (linenum == 0 && top_line != 0)
+		{
+			draw_arrow(container, 0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
+				0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0);
+
+			if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y)
+			{
+				fgcolor = UI_MOUSEOVER_COLOR;
+				bgcolor = UI_MOUSEOVER_BG_COLOR;
+				highlight(container, line_x0, line_y0, line_x1, line_y1, bgcolor);
+				hover = HOVER_ARROW_UP;
+			}
+		}
+		// if we're on the bottom line, display the down arrow
+		else if (linenum == visible_lines - 1 && itemnum != visible_items - 1)
+		{
+			draw_arrow(container, 0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
+				0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0 ^ ORIENTATION_FLIP_Y);
+
+			if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y)
+			{
+				fgcolor = UI_MOUSEOVER_COLOR;
+				bgcolor = UI_MOUSEOVER_BG_COLOR;
+				highlight(container, line_x0, line_y0, line_x1, line_y1, bgcolor);
+				hover = HOVER_ARROW_DOWN;
+			}
+		}
+
+		// draw dats text
+		else if (pitem.subtext == nullptr)
+		{
+			mui.draw_text_full(container, itemtext, effective_left, line_y, effective_width, JUSTIFY_LEFT, WRAP_NEVER,
+				DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+		}
+	}
+
+	for (size_t count = visible_items; count < item.size(); count++)
+	{
+		const ui_menu_item &pitem = item[count];
+		const char *itemtext = pitem.text;
+		float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
+		float line_y0 = line;
+		float line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
+		float line_y1 = line + line_height;
+		rgb_t fgcolor = UI_SELECTED_COLOR;
+		rgb_t bgcolor = UI_SELECTED_BG_COLOR;
+
+		if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && pitem.is_selectable())
+			hover = count;
+
+		if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
+			container->add_line(visible_left, line + 0.5f * line_height, visible_left + visible_width, line + 0.5f * line_height,
+				UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		else
+		{
+			highlight(container, line_x0, line_y0, line_x1, line_y1, bgcolor);
+			mui.draw_text_full(container, itemtext, effective_left, line, effective_width, JUSTIFY_CENTER, WRAP_TRUNCATE,
+				DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+		}
+		line += line_height;
+	}
+
+	// if there is something special to add, do it by calling the virtual method
+	custom_render((selected >= 0 && selected < item.size()) ? item[selected].ref : nullptr, customtop, custombottom, x1, y1, x2, y2);
+
+	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
+	visitems = visible_lines - (top_line != 0) - (top_line + visible_lines != visible_items);
 }

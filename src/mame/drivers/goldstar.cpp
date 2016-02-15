@@ -11988,9 +11988,24 @@ ROM_START( nfm )
 ROM_END
 
 
+/* Super Cherry Master.
+   Dyna.
+*/
+ROM_START( scmaster )  // all roms unique
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512.u6",  0x00000, 0x10000, CRC(4eef290a) SHA1(27cca383de49d5f0072ecdda11591b78727469c6) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "27c010.u29", 0x00000, 0x20000, CRC(98bd34b6) SHA1(e3ff6536eb421ed2e2f5d4354099078ba4ae5671) )
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "27c020.u41", 0x00000, 0x40000, CRC(ece34be2) SHA1(fdfaaffb12a7f6de6bf21b46ad50e845abc00734) )
+ROM_END
+
+
 ROM_START( unkch1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "u6.bin",  0x0000, 0x10000, CRC(30309996) SHA1(290f35f587fdf78dcb4f09403c510deec533c9c2) )
+	ROM_LOAD( "u6.bin",  0x00000, 0x10000, CRC(30309996) SHA1(290f35f587fdf78dcb4f09403c510deec533c9c2) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "u29.bin", 0x00000, 0x20000, CRC(6db245a1) SHA1(e9f85ba29b0af483eae6f999f49f1e431d9d2e27) )
@@ -12002,7 +12017,7 @@ ROM_END
 
 ROM_START( unkch2 ) // only gfx2 differs from unkch1
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "u6.bin",  0x0000, 0x10000, CRC(30309996) SHA1(290f35f587fdf78dcb4f09403c510deec533c9c2) )
+	ROM_LOAD( "u6.bin",  0x00000, 0x10000, CRC(30309996) SHA1(290f35f587fdf78dcb4f09403c510deec533c9c2) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "u29.bin", 0x00000, 0x20000, CRC(6db245a1) SHA1(e9f85ba29b0af483eae6f999f49f1e431d9d2e27) )
@@ -12014,7 +12029,7 @@ ROM_END
 
 ROM_START( unkch3 )  // gfx2 is the same as unkch1, others differ
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "u6.3",  0x0000, 0x10000, CRC(902f9e42) SHA1(ac5843089748d457f70ea52d15285a0ccda705ad) )
+	ROM_LOAD( "u6.3",  0x00000, 0x10000, CRC(902f9e42) SHA1(ac5843089748d457f70ea52d15285a0ccda705ad) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "u29.3", 0x00000, 0x20000, CRC(546929e6) SHA1(f97fe5687f8776f0abe68962a0246c9bbeb6acd1) )
@@ -12026,13 +12041,25 @@ ROM_END
 
 ROM_START( unkch4 )  // all roms unique
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "u6.4",  0x0000, 0x10000, CRC(eb191efa) SHA1(3004f26f9af7633df572f609647716cc4ac75990) )
+	ROM_LOAD( "u6.4",  0x00000, 0x10000, CRC(eb191efa) SHA1(3004f26f9af7633df572f609647716cc4ac75990) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "u29.4", 0x00000, 0x20000, CRC(eaec0034) SHA1(6b2d3922873979eafcd4c71c52017263482b82ab) )
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "u41.4", 0x00000, 0x40000, CRC(ef586512) SHA1(a720e40903dd04b2c498efad40d583618596e048) )
+ROM_END
+
+
+ROM_START( cherry96 )  // all roms unique
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "new_96-16-3.u6",  0x00000, 0x10000, CRC(84d5f2fc) SHA1(e3ed0670350920c661c5a40581966671b8a8c7df) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "new_96-16-2.u29", 0x00000, 0x20000, CRC(dd8f7450) SHA1(c897e5151809d4e0a0b1e46609f07bb0156b489a) )
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "new_96-16-1.u41", 0x00000, 0x20000, CRC(9ab19bdc) SHA1(2f34789729b5d12f6fa098a29253d5a80aef5b39) )
 ROM_END
 
 
@@ -12158,7 +12185,7 @@ ROM_END
   and Eagle & Fun World stickers (serial numbers).
 
 
-  For custom IC's 06B49P, and 06B53P, see the reverse-engineering notes in lucky74.c.
+  For custom IC's 06B49P, and 06B53P, see the reverse-engineering notes in lucky74.cpp.
 
   ------------------------
 
@@ -13726,11 +13753,17 @@ GAME( 2003, carb2003,  nfb96,    amcoe2,   nfb96bl,   driver_device,  0,        
 
 GAME( 2003, nfm,       0,        nfm,      nfm,       driver_device,  0,         ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic)",                    MACHINE_NOT_WORKING ) // vFB02-07A "Copyright By Ms. Liu Orchis 2003/03/06"
 
-// these have 'cherry 1994' in the program roms, but also "Super Cherry / New Cherry Gold '99" probably hacks of a 1994 version of Cherry Bonus / Cherry Master (Super Cherry Master?)
-GAMEL(1999, unkch1,   0,         unkch,    unkch,     unkch_state,    unkch1,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 1)", 0,    layout_unkch )
-GAMEL(1999, unkch2,   unkch1,    unkch,    unkch,     unkch_state,    unkch1,    ROT0, "bootleg", "Super Cherry Gold (bootleg of Super Cherry Master)",           0,    layout_unkch )
-GAMEL(1999, unkch3,   unkch1,    unkch,    unkch3,    unkch_state,    unkch3,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 2)", 0,    layout_unkch ) // cards have been hacked to look like barrels, girl removed?
-GAMEL(1999, unkch4,   unkch1,    unkch,    unkch4,    unkch_state,    unkch4,    ROT0, "bootleg", "Grand Cherry Master (bootleg of Super Cherry Master)",         0,    layout_unkch ) // by 'Toy System' Hungary
+
+// super cherry master sets...
+GAMEL(1994, scmaster, 0,         unkch,    unkch4,    unkch_state,    unkch4,    ROT0, "bootleg", "Super Cherry Master (v1.0)",                                   0,    layout_unkch )
+
+// these have 'cherry 1994' in the program roms, but also "Super Cherry / New Cherry Gold '99". probably hacks of a 1994 version of Super Cherry Master.
+GAMEL(1999, unkch1,   scmaster,  unkch,    unkch,     unkch_state,    unkch1,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 1)", 0,    layout_unkch )
+GAMEL(1999, unkch2,   scmaster,  unkch,    unkch,     unkch_state,    unkch1,    ROT0, "bootleg", "Super Cherry Gold (bootleg of Super Cherry Master)",           0,    layout_unkch )
+GAMEL(1999, unkch3,   scmaster,  unkch,    unkch3,    unkch_state,    unkch3,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 2)", 0,    layout_unkch ) // cards have been hacked to look like barrels, girl removed?
+GAMEL(1999, unkch4,   scmaster,  unkch,    unkch4,    unkch_state,    unkch4,    ROT0, "bootleg", "Grand Cherry Master (bootleg of Super Cherry Master)",         0,    layout_unkch ) // by 'Toy System' Hungary
+
+GAME( 1996, cherry96, scmaster,  unkch,    unkch4,    unkch_state,    unkch4,    ROT0, "bootleg", "New Cherry '96 (bootleg of New Fruit Bonus?)",                 MACHINE_NOT_WORKING ) // need to be moved to another machine...
 
 
 /* Stealth sets.

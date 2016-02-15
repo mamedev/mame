@@ -133,48 +133,12 @@ void ui_menu_main::populate()
 		item_append("Crosshair Options", nullptr, 0, (void *)CROSSHAIR);
 
 	/* add cheat menu */
-	if (machine().options().cheat() && machine().cheat().first() != nullptr)
+	if (machine().options().cheat())
 		item_append("Cheat", nullptr, 0, (void *)CHEAT);
 
-	/* add history menu */
-	if (machine().ui().options().enabled_dats())
-		item_append("History Info", nullptr, 0, (void *)HISTORY);
-
-	// add software history menu
-	if ((machine().system().flags & MACHINE_TYPE_ARCADE) == 0 && machine().ui().options().enabled_dats())
-	{
-		image_interface_iterator iter(machine().root_device());
-		for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
-		{
-			const char *name = image->filename();
-			if (name != nullptr)
-			{
-				item_append("Software History Info", nullptr, 0, (void *)SW_HISTORY);
-				break;
-			}
-		}
-	}
-
-	/* add mameinfo / messinfo menu */
-	if (machine().ui().options().enabled_dats())
-	{
-		if ((machine().system().flags & MACHINE_TYPE_ARCADE) != 0)
-			item_append("MameInfo", nullptr, 0, (void *)MAMEINFO);
-		else if ((machine().system().flags & MACHINE_TYPE_ARCADE) == 0)
-			item_append("MessInfo", nullptr, 0, (void *)MAMEINFO);
-	}
-
-	/* add sysinfo menu */
-	if ((machine().system().flags & MACHINE_TYPE_ARCADE) == 0 && machine().ui().options().enabled_dats())
-		item_append("SysInfo", nullptr, 0, (void *)SYSINFO);
-
-	/* add command list menu */
-	if ((machine().system().flags & MACHINE_TYPE_ARCADE) != 0 && machine().ui().options().enabled_dats())
-		item_append("Commands Info", nullptr, 0, (void *)COMMAND);
-
-	/* add story menu */
-	if ((machine().system().flags & MACHINE_TYPE_ARCADE) != 0 && machine().ui().options().enabled_dats())
-		item_append("Mamescores", nullptr, 0, (void *)STORYINFO);
+	// add dats menu
+	if (machine().ui().options().enabled_dats() && machine().datfile().has_data(&machine().system()))
+		item_append("External DAT View", nullptr, 0, (void *)EXTERNAL_DATS);
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 
@@ -300,27 +264,8 @@ void ui_menu_main::handle()
 			ui_menu::stack_push(global_alloc_clear<ui_menu_barcode_reader>(machine(), container, nullptr));
 			break;
 
-		case HISTORY:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_HISTORY_LOAD));
-			break;
-
-		case MAMEINFO:
-			if ((machine().system().flags & MACHINE_TYPE_ARCADE) != 0)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_MAMEINFO_LOAD));
-			else
-				ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_MESSINFO_LOAD));
-			break;
-
-		case SYSINFO:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_SYSINFO_LOAD));
-			break;
-
-		case COMMAND:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_command>(machine(), container));
-			break;
-
-		case STORYINFO:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_STORY_LOAD));
+		case EXTERNAL_DATS:
+			ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container));
 			break;
 
 		case ADD_FAVORITE:
@@ -331,10 +276,6 @@ void ui_menu_main::handle()
 		case REMOVE_FAVORITE:
             machine().favorite().remove_favorite_game();
 			reset(UI_MENU_RESET_REMEMBER_POSITION);
-			break;
-
-		case SW_HISTORY:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_history_sw>(machine(), container));
 			break;
 
 		case QUIT_GAME:

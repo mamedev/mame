@@ -103,6 +103,9 @@ public:
 	DECLARE_DRIVER_INIT( pal );
 	DECLARE_DRIVER_INIT( ntsc );
 
+	DECLARE_WRITE_LINE_MEMBER( side_int2_w );
+	DECLARE_WRITE_LINE_MEMBER( side_int6_w );
+
 protected:
 	virtual void machine_reset() override;
 
@@ -614,6 +617,18 @@ void a500_state::machine_reset()
 
 	// reset side expansion slot device
 	m_side->reset();
+}
+
+WRITE_LINE_MEMBER( a500_state::side_int2_w )
+{
+	m_side_int2 = state;
+	update_int2();
+}
+
+WRITE_LINE_MEMBER( a500_state::side_int6_w )
+{
+	m_side_int6 = state;
+	update_int6();
 }
 
 bool a500_state::int2_pending()
@@ -1457,6 +1472,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( a500, amiga_base, a500_state )
 
 	// cpu slot
 	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, nullptr)
+	MCFG_EXPANSION_SLOT_INT2_HANDLER(WRITELINE(a500_state, side_int2_w))
+	MCFG_EXPANSION_SLOT_INT6_HANDLER(WRITELINE(a500_state, side_int6_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( a500n, a500, a500_state )

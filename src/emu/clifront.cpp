@@ -99,6 +99,8 @@ int cli_frontend::execute(int argc, char **argv)
 {
 	// wrap the core execution in a try/catch to field all fatal errors
 	m_result = MAMERR_NONE;
+	machine_manager *manager = machine_manager::instance(m_options, m_osd);
+
 	try
 	{
 		// first parse options to be able to get software from it
@@ -106,6 +108,8 @@ int cli_frontend::execute(int argc, char **argv)
 		m_options.parse_command_line(argc, argv, option_errors);
 
 		m_options.parse_standard_inis(option_errors);
+		
+		manager->start_luaengine();
 
 		if (*(m_options.software_name()) != 0)
 		{
@@ -211,9 +215,7 @@ int cli_frontend::execute(int argc, char **argv)
 				throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
 
 			// otherwise just run the game
-			machine_manager *manager = machine_manager::instance(m_options, m_osd);
 			m_result = manager->execute();
-			global_free(manager);
 		}
 	}
 
@@ -264,6 +266,7 @@ int cli_frontend::execute(int argc, char **argv)
 	}
 
 	_7z_file_cache_clear();
+	global_free(manager);
 
 	return m_result;
 }

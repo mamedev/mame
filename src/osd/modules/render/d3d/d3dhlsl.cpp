@@ -1416,14 +1416,9 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	float screen_scale[2] = { xscale, yscale };
 	float screen_offset[2] = { xoffset, yoffset };
 
-	rgb_t back_color_rgb = !machine->first_screen()->has_palette()
-		? rgb_t(0, 0, 0)
-		: machine->first_screen()->palette().palette()->entry_color(0);
+	rgb_t back_color_rgb = !machine->first_screen()->has_palette() ? rgb_t(0, 0, 0) : machine->first_screen()->palette().palette()->entry_color(0);
 	back_color_rgb = apply_color_convolution(back_color_rgb);
-	float back_color[3] = {
-		static_cast<float>(back_color_rgb.r()) / 255.0f,
-		static_cast<float>(back_color_rgb.g()) / 255.0f,
-		static_cast<float>(back_color_rgb.b()) / 255.0f };
+	float back_color[3] = { static_cast<float>(back_color_rgb.r()) / 255.0f, static_cast<float>(back_color_rgb.g()) / 255.0f, static_cast<float>(back_color_rgb.b()) / 255.0f };
 
 	curr_effect = post_effect;
 	curr_effect->update_uniforms();
@@ -1463,9 +1458,9 @@ int shaders::downsample_pass(render_target *rt, int source_index, poly_info *pol
 	curr_effect->set_bool("PrepareVector", prepare_vector);
 
 	int bloom_index = 0;
-	float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
 	float bloom_width = prepare_vector ? rt->target_width : rt->target_width / hlsl_prescale_x;
 	float bloom_height = prepare_vector ? rt->target_height : rt->target_height / hlsl_prescale_y;
+	float bloom_size = (bloom_width < bloom_height) ? bloom_width : bloom_height;
 	for (; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
 	{
 		bloom_dims[bloom_index][0] = (float)(int)bloom_width;

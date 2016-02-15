@@ -371,103 +371,25 @@ void ui_menu_select_game::handle()
 			reset(UI_MENU_RESET_SELECT_FIRST);
 		}
 
-		// handle UI_HISTORY
-		else if (m_event->iptkey == IPT_UI_HISTORY && enabled_dats)
+		// handle UI_DATS
+		else if (m_event->iptkey == IPT_UI_DATS && enabled_dats)
 		{
 			if (!isfavorite())
 			{
 				const game_driver *driver = (const game_driver *)m_event->itemref;
-				if ((FPTR)driver > 3)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_HISTORY_LOAD, driver));
+				if ((FPTR)driver > 3 && machine().datfile().has_data(driver))
+					ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, driver));
 			}
 			else
 			{
 				ui_software_info *swinfo  = (ui_software_info *)m_event->itemref;
-				if ((FPTR)swinfo > 3)
+				if ((FPTR)swinfo > 3 && machine().datfile().has_data(swinfo->driver))
 				{
 					if (swinfo->startempty == 1)
-						ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_HISTORY_LOAD, swinfo->driver));
+						ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, swinfo->driver));
 					else
-						ui_menu::stack_push(global_alloc_clear<ui_menu_history_sw>(machine(), container, swinfo));
+						ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, swinfo));
 				}
-			}
-		}
-
-		// handle UI_MAMEINFO
-		else if (m_event->iptkey == IPT_UI_MAMEINFO && enabled_dats)
-		{
-			if (!isfavorite())
-			{
-				const game_driver *driver = (const game_driver *)m_event->itemref;
-				if ((FPTR)driver > 3)
-				{
-					if ((driver->flags & MACHINE_TYPE_ARCADE) != 0)
-						ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_MAMEINFO_LOAD, driver));
-					else
-						ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_MESSINFO_LOAD, driver));
-				}
-			}
-			else
-			{
-				ui_software_info *swinfo  = (ui_software_info *)m_event->itemref;
-				if ((FPTR)swinfo > 3 && swinfo->startempty == 1)
-				{
-					if ((swinfo->driver->flags & MACHINE_TYPE_ARCADE) != 0)
-						ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_MAMEINFO_LOAD, swinfo->driver));
-					else
-						ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_MESSINFO_LOAD, swinfo->driver));
-				}
-			}
-		}
-
-		// handle UI_STORY
-		else if (m_event->iptkey == IPT_UI_STORY && enabled_dats)
-		{
-			if (!isfavorite())
-			{
-				const game_driver *driver = (const game_driver *)m_event->itemref;
-				if ((FPTR)driver > 3)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_STORY_LOAD, driver));
-			}
-			else
-			{
-				ui_software_info *swinfo  = (ui_software_info *)m_event->itemref;
-				if ((FPTR)swinfo > 3 && swinfo->startempty == 1)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_STORY_LOAD, swinfo->driver));
-			}
-		}
-
-		// handle UI_SYSINFO
-		else if (m_event->iptkey == IPT_UI_SYSINFO && enabled_dats)
-		{
-			if (!isfavorite())
-			{
-				const game_driver *driver = (const game_driver *)m_event->itemref;
-				if ((FPTR)driver > 3)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_SYSINFO_LOAD, driver));
-			}
-			else
-			{
-				ui_software_info *swinfo  = (ui_software_info *)m_event->itemref;
-				if ((FPTR)swinfo > 3 && swinfo->startempty == 1)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_dats>(machine(), container, UI_SYSINFO_LOAD, swinfo->driver));
-			}
-		}
-
-		// handle UI_COMMAND
-		else if (m_event->iptkey == IPT_UI_COMMAND && enabled_dats)
-		{
-			if (!isfavorite())
-			{
-				const game_driver *driver = (const game_driver *)m_event->itemref;
-				if ((FPTR)driver > 3)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_command>(machine(), container, driver));
-			}
-			else
-			{
-				ui_software_info *swinfo  = (ui_software_info *)m_event->itemref;
-				if ((FPTR)swinfo > 3 && swinfo->startempty == 1)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_command>(machine(), container, swinfo->driver));
 			}
 		}
 

@@ -46,16 +46,13 @@ private:
 		BIOS_SELECTION,
 		BARCODE_READ,
 		PTY_INFO,
-		HISTORY,
-		MAMEINFO,
-		SYSINFO,
+		EXTERNAL_DATS,
 		ADD_FAVORITE,
 		REMOVE_FAVORITE,
-		COMMAND,
-		STORYINFO,
-		SW_HISTORY,
 		QUIT_GAME
 	};
+
+	//bool submenu;
 };
 
 #endif  /* __UI_MAINMENU_H__ */

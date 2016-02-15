@@ -211,13 +211,18 @@ void ui_menu_select_software::handle()
 			}
 		}
 
-		// handle UI_HISTORY
-		else if (m_event->iptkey == IPT_UI_HISTORY && machine().ui().options().enabled_dats())
+		// handle UI_DATS
+		else if (m_event->iptkey == IPT_UI_DATS && machine().ui().options().enabled_dats())
 		{
 			ui_software_info *ui_swinfo = (ui_software_info *)m_event->itemref;
 
-			if ((FPTR)ui_swinfo > 1)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_history_sw>(machine(), container, ui_swinfo, m_driver));
+			if ((FPTR)ui_swinfo > 1 && machine().datfile().has_data(ui_swinfo->driver))
+			{
+				if (ui_swinfo->startempty == 1)
+					ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo->driver));
+				else
+					ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo));
+			}
 		}
 
 		// handle UI_UP_FILTER

@@ -734,6 +734,7 @@ public:
 		UINT8 freq_index;
 	}m_mouse;
 	TIMER_DEVICE_CALLBACK_MEMBER( mouse_irq_cb );
+	DECLARE_READ8_MEMBER(unk_r);
 
 	DECLARE_DRIVER_INIT(pc9801_kanji);
 	inline void set_dma_channel(int channel, int state);
@@ -2485,6 +2486,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0050, 0x0053) AM_WRITE8(pc9801rs_nmi_w, 0xffffffff)
 	AM_RANGE(0x005c, 0x005f) AM_READ16(pc9821_timestamp_r,0xffffffff) AM_WRITENOP // artic
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("upd7220_chr", upd7220_device, read, write, 0x00ff00ff) //upd7220 character ports / <undefined>
+	AM_RANGE(0x0060, 0x0063) AM_READ8(unk_r, 0xff00ff00) // mouse related (unmapped checking for AT keyb controller\PS/2 mouse?)
 	AM_RANGE(0x0064, 0x0067) AM_WRITE8(vrtc_clear_w, 0x000000ff)
 	AM_RANGE(0x0068, 0x006b) AM_WRITE8(pc9821_video_ff_w,  0x00ff00ff) //mode FF / <undefined>
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0xff00ff00)
@@ -2967,6 +2969,11 @@ WRITE8_MEMBER(pc9801_state::ppi_mouse_portc_w)
 	}
 
 	m_mouse.control = data;
+}
+
+READ8_MEMBER(pc9801_state::unk_r)
+{
+	return 0xff;
 }
 
 /****************************************
@@ -3682,6 +3689,10 @@ ROM_START( pc9821 )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "itf.rom",  0x18000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
 	ROM_LOAD( "bios.rom", 0x28000, 0x18000, BAD_DUMP CRC(34a19a59) SHA1(2e92346727b0355bc1ec9a7ded1b444a4917f2b9) )
+	ROM_FILL(0x34c40, 4, 0) // hide the _32_ marker until we have a 32-bit clean IDE bios otherwise windows tries to
+							// make a 32-bit call into 16-bit code
+	ROM_FILL(0x37ffe, 1, 0x92)
+	ROM_FILL(0x37fff, 1, 0xd7)
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )

@@ -1,0 +1,8 @@
+{
+  "plugin": {
+    "name": "querystring",
+    "version": "1.0.2",
+    "author": "Tim Caswell",
+	"type": "library",
+  }
+}
