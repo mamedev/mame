@@ -496,7 +496,9 @@ function toolchain(_buildDir, _subDir)
 
 	configuration { "steamlink" }
 		objdir ( _buildDir .. "steamlink/obj")
-
+		defines {
+			"__STEAMLINK__=1", -- There is no special prefedined compiler symbol to detect SteamLink, faking it.
+		}
 		buildoptions {
 			"-marm",
 			"-mfloat-abi=hard",
