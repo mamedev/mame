@@ -198,6 +198,11 @@ newoption {
 }
 
 newoption {
+	trigger = "TOOLCHAIN",
+	description = "Toolchain prefix"
+}
+
+newoption {
 	trigger = "PROFILE",
 	description = "Enable profiling.",
 }
@@ -425,6 +430,10 @@ end
 USE_BGFX = 1
 if(_OPTIONS["USE_BGFX"]~=nil) then
 	USE_BGFX = tonumber(_OPTIONS["USE_BGFX"])
+end
+
+if(_OPTIONS["TOOLCHAIN"] == nil) then
+	_OPTIONS['TOOLCHAIN'] = ""
 end
 
 GEN_DIR = MAME_BUILD_DIR .. "generated/"
@@ -1300,10 +1309,7 @@ else
 	startproject (_OPTIONS["subtarget"])
 end 
 mainProject(_OPTIONS["target"],_OPTIONS["subtarget"])
-
-if (_OPTIONS["STRIP_SYMBOLS"]=="1") then
-	strip()
-end
+strip()
 
 if _OPTIONS["with-tools"] then
 	group "tools"
