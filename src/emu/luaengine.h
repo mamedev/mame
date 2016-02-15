@@ -120,6 +120,7 @@ private:
 	// "emu.machine" namespace
 	static luabridge::LuaRef l_machine_get_options(const running_machine *r);
 	static luabridge::LuaRef l_machine_get_devices(const running_machine *r);
+	static luabridge::LuaRef l_render_get_targets(const render_manager *r);
 	static luabridge::LuaRef devtree_dfs(device_t *root, luabridge::LuaRef dev_table);
 	static luabridge::LuaRef l_dev_get_states(const device_t *d);
 	static UINT64 l_state_get_value(const device_state_entry *d);
@@ -141,6 +142,7 @@ private:
 		int l_draw_text(lua_State *L);
 	};
 
+	static luabridge::LuaRef l_ui_get_options(const ui_manager *ui);
 	struct lua_options_entry {
 		int l_entry_value(lua_State *L);
 	};

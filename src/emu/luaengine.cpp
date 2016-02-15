@@ -438,6 +438,25 @@ luabridge::LuaRef lua_engine::l_machine_get_devices(const running_machine *r)
 	return devs_table;
 }
 
+//-------------------------------------------------
+//  render_get_targets - return table of render targets
+//  -> manager:machine():render().targets[0]
+//-------------------------------------------------
+
+luabridge::LuaRef lua_engine::l_render_get_targets(const render_manager *r)
+{
+	lua_State *L = luaThis->m_lua_state;
+	luabridge::LuaRef target_table = luabridge::LuaRef::newTable(L);
+
+	int tc = 0;
+	for (render_target *curr_rt = r->first_target(); curr_rt != nullptr; curr_rt = curr_rt->next())
+	{
+		target_table[tc++] = curr_rt;
+	}
+
+	return target_table;
+}
+
 // private helper for get_devices - DFS visit all devices in a running machine
 luabridge::LuaRef lua_engine::devtree_dfs(device_t *root, luabridge::LuaRef devs_table)
 {
@@ -617,6 +636,36 @@ int lua_engine::lua_addr_space::l_mem_write(lua_State *L)
 	}
 
 	return 0;
+}
+
+//-------------------------------------------------
+//  ui_options - return table of options
+//  -> manager:machine():ui().options[]
+//-------------------------------------------------
+
+luabridge::LuaRef lua_engine::l_ui_get_options(const ui_manager *u)
+{
+	lua_State *L = luaThis->m_lua_state;
+	luabridge::LuaRef options_table = luabridge::LuaRef::newTable(L);
+
+	ui_manager &ui = luaThis->machine().ui();
+
+	int unadorned_index = 0;
+	for (core_options::entry *curentry = ui.options().first(); curentry != nullptr; curentry = curentry->next())
+	{
+		const char *name = curentry->name();
+		bool is_unadorned = false;
+		// check if it's unadorned
+		if (name && strlen(name) && !strcmp(name, core_options::unadorned(unadorned_index)))
+		{
+			unadorned_index++;
+			is_unadorned = true;
+		}
+		if (!curentry->is_header() && !curentry->is_command() && !curentry->is_internal() && !is_unadorned)
+			options_table[name] = curentry;
+	}
+
+	return options_table;
 }
 
 int lua_engine::lua_options_entry::l_entry_value(lua_State *L)
@@ -1234,6 +1283,8 @@ void lua_engine::initialize()
 				.addFunction ("save", &running_machine::schedule_save)
 				.addFunction ("load", &running_machine::schedule_load)
 				.addFunction ("system", &running_machine::system)
+				.addFunction ("ui", &running_machine::ui)
+				.addFunction ("render", &running_machine::render)
 				.addProperty <luabridge::LuaRef, void> ("devices", &lua_engine::l_machine_get_devices)
 				.addProperty <luabridge::LuaRef, void> ("screens", &lua_engine::l_machine_get_screens)
 				.addProperty <luabridge::LuaRef, void> ("options", &lua_engine::l_machine_get_options)
@@ -1285,6 +1336,44 @@ void lua_engine::initialize()
 			.endClass()
 			.deriveClass <address_space, lua_addr_space> ("addr_space")
 				.addFunction("name", &address_space::name)
+			.endClass()
+			.beginClass <render_target> ("target")
+				.addFunction ("width", &render_target::width)
+				.addFunction ("height", &render_target::height)
+				.addFunction ("pixel_aspect", &render_target::pixel_aspect)
+				.addFunction ("hidden", &render_target::hidden)
+				.addFunction ("is_ui_target", &render_target::is_ui_target)
+				.addFunction ("index", &render_target::index)
+				.addProperty <float, float> ("max_update_rate", &render_target::max_update_rate, &render_target::set_max_update_rate)
+				.addProperty <int, int> ("view", &render_target::view, &render_target::set_view)
+				.addProperty <int, int> ("orientation", &render_target::orientation, &render_target::set_orientation)
+				.addProperty <bool, bool> ("backdrops", &render_target::backdrops_enabled, &render_target::set_backdrops_enabled)
+				.addProperty <bool, bool> ("overlays", &render_target::overlays_enabled, &render_target::set_overlays_enabled)
+				.addProperty <bool, bool> ("bezels", &render_target::bezels_enabled, &render_target::set_bezels_enabled)
+				.addProperty <bool, bool> ("marquees", &render_target::marquees_enabled, &render_target::set_marquees_enabled)
+				.addProperty <bool, bool> ("screen_overlay", &render_target::screen_overlay_enabled, &render_target::set_screen_overlay_enabled)
+				.addProperty <bool, bool> ("zoom", &render_target::zoom_to_screen, &render_target::set_zoom_to_screen)
+			.endClass()
+			.beginClass <render_container> ("render_container")
+				.addFunction ("orientation", &render_container::orientation)
+				.addFunction ("xscale", &render_container::xscale)
+				.addFunction ("yscale", &render_container::yscale)
+				.addFunction ("xoffset", &render_container::xoffset)
+				.addFunction ("yoffset", &render_container::yoffset)
+				.addFunction ("is_empty", &render_container::is_empty)
+			.endClass()
+			.beginClass <render_manager> ("render")
+				.addFunction ("max_update_rate", &render_manager::max_update_rate)
+				.addFunction ("ui_target", &render_manager::ui_target)
+				.addFunction ("ui_container", &render_manager::ui_container)
+				.addProperty <luabridge::LuaRef, void> ("targets", &lua_engine::l_render_get_targets)
+			.endClass()
+			.beginClass <ui_manager> ("ui")
+				.addFunction ("is_menu_active", &ui_manager::is_menu_active)
+				.addProperty <bool, bool> ("show_fps", &ui_manager::show_fps, &ui_manager::set_show_fps)
+				.addProperty <bool, bool> ("show_profiler", &ui_manager::show_profiler, &ui_manager::set_show_profiler)
+				.addProperty <bool, bool> ("single_step", &ui_manager::single_step, &ui_manager::set_single_step)
+				.addProperty <luabridge::LuaRef, void> ("options", &lua_engine::l_ui_get_options)
 			.endClass()
 			.beginClass <lua_screen> ("lua_screen_dev")
 				.addCFunction ("draw_box",  &lua_screen::l_draw_box)
