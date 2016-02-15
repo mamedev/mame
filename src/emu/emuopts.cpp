@@ -43,6 +43,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_FONTPATH,                                   ".",         OPTION_STRING,     "path to font files" },
 	{ OPTION_CHEATPATH,                                  "cheat",     OPTION_STRING,     "path to cheat files" },
 	{ OPTION_CROSSHAIRPATH,                              "crosshair", OPTION_STRING,     "path to crosshair files" },
+	{ OPTION_PLUGINSPATH,                                "plugins",   OPTION_STRING,     "path to plugin files" },
 
 	// output directory options
 	{ nullptr,                                              nullptr,        OPTION_HEADER,     "CORE OUTPUT DIRECTORY OPTIONS" },
@@ -60,6 +61,9 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_AUTOSAVE,                                   "0",         OPTION_BOOLEAN,    "enable automatic restore at startup, and automatic save at exit time" },
 	{ OPTION_PLAYBACK ";pb",                             nullptr,        OPTION_STRING,     "playback an input file" },
 	{ OPTION_RECORD ";rec",                              nullptr,        OPTION_STRING,     "record an input file" },
+	{ OPTION_RECORD_TIMECODE,                            "0",            OPTION_BOOLEAN,    "record an input timecode file (requires -record option)" },
+	{ OPTION_EXIT_AFTER_PLAYBACK,                        "0",            OPTION_BOOLEAN,    "close the program at the end of playback" },
+
 	{ OPTION_MNGWRITE,                                   nullptr,        OPTION_STRING,     "optional filename to write a MNG movie of the current session" },
 	{ OPTION_AVIWRITE,                                   nullptr,        OPTION_STRING,     "optional filename to write an AVI movie of the current session" },
 #ifdef MAME_DEBUG

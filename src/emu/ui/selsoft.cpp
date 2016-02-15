@@ -19,7 +19,6 @@
 #include "ui/datfile.h"
 #include "ui/inifile.h"
 #include "ui/selector.h"
-#include "ui/custmenu.h"
 #include "rendfont.h"
 #include "rendutil.h"
 #include "softlist.h"
@@ -212,13 +211,18 @@ void ui_menu_select_software::handle()
 			}
 		}
 
-		// handle UI_HISTORY
-		else if (m_event->iptkey == IPT_UI_HISTORY && machine().ui().options().enabled_dats())
+		// handle UI_DATS
+		else if (m_event->iptkey == IPT_UI_DATS && machine().ui().options().enabled_dats())
 		{
 			ui_software_info *ui_swinfo = (ui_software_info *)m_event->itemref;
 
-			if ((FPTR)ui_swinfo > 1)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_history_sw>(machine(), container, ui_swinfo, m_driver));
+			if ((FPTR)ui_swinfo > 1 && machine().datfile().has_data(ui_swinfo->driver))
+			{
+				if (ui_swinfo->startempty == 1)
+					ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo->driver));
+				else
+					ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo));
+			}
 		}
 
 		// handle UI_UP_FILTER
@@ -416,8 +420,7 @@ void ui_menu_select_software::populate()
 			if (reselect_last::software == "[Start empty]" && !reselect_last::driver.empty())
 				old_software = 0;
 
-			else if (!reselect_last::software.empty() && m_displaylist[curitem]->shortname == reselect_last::software
-			         && m_displaylist[curitem]->listname == reselect_last::swlist)
+			else if (m_displaylist[curitem]->shortname == reselect_last::software && m_displaylist[curitem]->listname == reselect_last::swlist)
 				old_software = m_has_empty_start ? curitem + 1 : curitem;
 
 			item_append(m_displaylist[curitem]->longname.c_str(), m_displaylist[curitem]->devicetype.c_str(),
@@ -822,7 +825,7 @@ void ui_menu_select_software::inkey_select(const ui_menu_event *m_event)
 	if (ui_swinfo->startempty == 1)
 	{
 		std::vector<s_bios> biosname;
-		if (has_multiple_bios(ui_swinfo->driver, biosname) && !mopt.skip_bios_menu())
+		if (!mopt.skip_bios_menu() && has_multiple_bios(ui_swinfo->driver, biosname))
 			ui_menu::stack_push(global_alloc_clear<ui_bios_selection>(machine(), container, biosname, (void *)ui_swinfo->driver, false, true));
 		else
 		{
@@ -1479,8 +1482,7 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 		return;
 	}
 	else
-		mui.wrap_text(container, buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), totallines,
-			xstart, xend, text_size);
+		totallines = mui.wrap_text(container, buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), xstart, xend, text_size);
 
 	int r_visible_lines = floor((origy2 - oy1) / (line_height * text_size));
 	if (totallines < r_visible_lines)

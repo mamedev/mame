@@ -1,5 +1,5 @@
-// license:GPL-2.0+
-// copyright-holders:Dirk Best
+// license: BSD-3-Clause
+// copyright-holders: Dirk Best
 /*************************************************************************
 
     RAM device
@@ -23,8 +23,6 @@
 // device type definition
 const device_type RAM = &device_creator<ram_device>;
 
-
-
 //-------------------------------------------------
 //  ram_device - constructor
 //-------------------------------------------------
@@ -37,8 +35,6 @@ ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t 
 	m_extra_options = nullptr;
 	m_default_value = 0xCD;
 }
-
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -67,7 +63,6 @@ void ram_device::device_start()
 	save_item(NAME(m_size));
 	save_item(NAME(m_pointer));
 }
-
 
 //-------------------------------------------------
 //  device_validity_check - device-specific validity
@@ -171,8 +166,6 @@ void ram_device::device_validity_check(validity_checker &valid) const
 	}
 }
 
-
-
 //-------------------------------------------------
 //  parse_string - convert a ram string to an
 //  integer value
@@ -209,8 +202,6 @@ UINT32 ram_device::parse_string(const char *s)
 
 	return ram;
 }
-
-
 
 //-------------------------------------------------
 //  default_size

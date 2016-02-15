@@ -166,8 +166,10 @@
 
 #define MCFG_EXPANSION_SLOT_ADD(_cputag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(EXP_SLOT_TAG, EXP_SLOT, 0) \
+	device_t *temp = device; \
 	zorro_device::set_cputag(*device, _cputag); \
-	MCFG_ZORRO_SLOT_ADD(EXP_SLOT_TAG, "slot", _slot_intf, _def_slot)
+	MCFG_ZORRO_SLOT_ADD(EXP_SLOT_TAG, "slot", _slot_intf, _def_slot) \
+	device = temp;
 
 // callbacks
 #define MCFG_EXPANSION_SLOT_OVR_HANDLER(_devcb) \

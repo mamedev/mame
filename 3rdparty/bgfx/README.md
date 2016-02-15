@@ -1,6 +1,9 @@
 [bgfx](https://github.com/bkaradzic/bgfx) - Cross-platform rendering library
 ============================================================================
 
+[![Build Status](https://travis-ci.org/bkaradzic/bgfx.svg?branch=master)](https://travis-ci.org/bkaradzic/bgfx)
+[![Build status](https://ci.appveyor.com/api/projects/status/ipa3ojgeaet1oko5?svg=true)](https://ci.appveyor.com/project/bkaradzic/bgfx)
+
 [What is it?](https://bkaradzic.github.io/bgfx/overview.html)
 -------------------------------------------------------------
 
@@ -29,12 +32,12 @@ Supported platforms:
  * asm.js/Emscripten (1.25.0)
  * FreeBSD
  * iOS (iPhone, iPad, AppleTV)
- * Linux ![](https://tc27.draster.com/app/rest/builds/buildType:(id:Bgfx_Linux)/statusIcon)
+ * Linux
  * MIPS Creator CI20
  * Native Client (PPAPI 37+, ARM, x86, x64, PNaCl)
  * OSX (10.9+)
  * RaspberryPi
- * Windows (XP, Vista, 7, 8, 10) ![](https://tc27.draster.com/app/rest/builds/buildType:(id:Bgfx_Windows)/statusIcon)
+ * Windows (XP, Vista, 7, 8, 10)
  * WinRT (WinPhone 8.0+)
 
 Supported compilers:
@@ -51,11 +54,13 @@ Languages:
  * [Go language API bindings](https://github.com/james4k/go-bgfx)
  * [Java language API bindings](https://github.com/enleeten/twilight-bgfx)
  * [Haskell language API bindings](https://github.com/haskell-game/bgfx)
+ * [Rust language API bindings](https://github.com/rhoot/bgfx-rs)
 
-Build status
-------------
+Build
+-----
 
-https://tc27.draster.com/guestAuth/overview.html
+ - AppVeyor https://ci.appveyor.com/project/bkaradzic/bgfx
+ - TravisCI https://travis-ci.org/bkaradzic/bgfx
 
 Who is using it?
 ----------------
@@ -106,6 +111,11 @@ toolbox inspired by Bitsquid/Stingray engine.
 https://github.com/jpcy/ioq3-renderer-bgfx - A renderer for ioquake3 written in
 C++ and using bgfx to support multiple rendering APIs.  
 ![ioq3-renderer-bgfx screenshot](https://camo.githubusercontent.com/052aa40c05120e56306294d3a1bb5f99f97de8c8/687474703a2f2f692e696d6775722e636f6d2f64364f6856594b2e6a7067)
+
+http://makingartstudios.itch.io/dls - DLS the digital logic simulator game.  
+![dls-screenshot](https://img.itch.io/aW1hZ2UvMzk3MTgvMTc5MjQ4LnBuZw==/original/kA%2FQPb.png)
+
+https://github.com/mamedev/mame MAME - Multiple Arcade Machine Emulator
 
 [Building](https://bkaradzic.github.io/bgfx/build.html)
 -------------------------------------------------------

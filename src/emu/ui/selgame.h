@@ -37,19 +37,12 @@ public:
 	virtual void draw_right_panel(void *selectedref, float origx1, float origy1, float origx2, float origy2) override;
 
 private:
-	struct cache_info
-	{
-		UINT8 b_screen, b_stereo, b_samples, b_chd;
-	};
-
-	std::vector<cache_info> driver_cache;
-
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
 	char m_search[40];
 	int  m_prev_selected;
-	int  m_isabios, m_issbios, m_isarcades, m_issystems;
+	static int  m_isabios;
 
-	std::vector<const game_driver *> m_sortedlist;
+	static std::vector<const game_driver *> m_sortedlist;
 	std::vector<const game_driver *> m_availsortedlist;
 	std::vector<const game_driver *> m_unavailsortedlist;
 	std::vector<const game_driver *> m_displaylist;
@@ -62,12 +55,10 @@ private:
 	void build_category();
 	void build_available_list();
 	void build_list(std::vector<const game_driver *> &vec, const char *filter_text = nullptr, int filter = 0, bool bioscheck = false);
-	void build_from_cache(std::vector<const game_driver *> &vec, int screens = 0, int filter = 0, bool bioscheck = false);
 
-	bool no_active_search();
+	bool isfavorite();
 	void populate_search();
-	void load_cache_info();
-	void save_cache_info();
+	void init_sorted_list();
 	bool load_available_machines();
 	void load_custom_filters();
 

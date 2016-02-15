@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "audio/zaccaria.h"
+
 #include "machine/6821pia.h"
 #include "machine/pla.h"
 #include "machine/s2636.h"
@@ -64,9 +66,6 @@ public:
 
 	DECLARE_DRIVER_INIT(laserbat);
 	INTERRUPT_GEN_MEMBER(laserbat_interrupt);
-
-	// video initialisation
-	DECLARE_PALETTE_INIT(laserbat);
 
 	// video memory and control ports
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -162,6 +161,9 @@ public:
 	{
 	}
 
+	// video initialisation
+	DECLARE_PALETTE_INIT(laserbat);
+
 	// sound control ports
 	virtual DECLARE_WRITE8_MEMBER(csound2_w) override;
 
@@ -185,43 +187,17 @@ class catnmous_state : public laserbat_state_base
 public:
 	catnmous_state(const machine_config &mconfig, device_type type, const char *tag)
 		: laserbat_state_base(mconfig, type, tag)
-		, m_audiocpu(*this, "audiocpu")
-		, m_pia(*this, "pia")
-		, m_psg1(*this, "psg1")
-		, m_psg2(*this, "psg2")
-		, m_cb1(false)
+		, m_audiopcb(*this, "audiopcb")
 	{
 	}
+
+	// video initialisation
+	DECLARE_PALETTE_INIT(catnmous);
 
 	// sound control ports
 	virtual DECLARE_WRITE8_MEMBER(csound1_w) override;
 	virtual DECLARE_WRITE8_MEMBER(csound2_w) override;
 
-	// PIA handlers
-	DECLARE_READ8_MEMBER(pia_porta_r);
-	DECLARE_WRITE8_MEMBER(pia_porta_w);
-	DECLARE_WRITE8_MEMBER(pia_portb_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqa);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqb);
-
-	// PSG handlers
-	DECLARE_WRITE8_MEMBER(psg1_porta_w);
-	DECLARE_READ8_MEMBER(psg1_portb_r);
-
-	// periodic signal generators
-	INTERRUPT_GEN_MEMBER(cb1_toggle);
-
 protected:
-
-	// initialisation/startup
-	virtual void machine_start() override;
-
-	// sound board devices
-	required_device<cpu_device>     m_audiocpu;
-	required_device<pia6821_device> m_pia;
-	required_device<ay8910_device>  m_psg1;
-	required_device<ay8910_device>  m_psg2;
-
-	// control line states
-	bool    m_cb1;
+	required_device<zac1b11107_audio_device>    m_audiopcb;
 };

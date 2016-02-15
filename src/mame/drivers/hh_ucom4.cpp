@@ -46,7 +46,7 @@
 
  @512     uPD557LC 1980, Castle Toy Tactix
 
- *060     uPD650C  1979, Mattel Computer Gin
+ @060     uPD650C  1979, Mattel Computer Gin
  *085     uPD650C  1980, Roland TR-808
  *127     uPD650C  198?, Sony OA-S1100 Typecorder (subcpu, have dump)
   128     uPD650C  1981, Roland TR-606 -> tr606.cpp
@@ -65,6 +65,7 @@ TODO:
 
 // internal artwork
 #include "efball.lh"
+#include "mcompgin.lh"
 #include "mvbfree.lh"
 #include "tactix.lh" // clickable
 
@@ -1580,6 +1581,79 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Mattel Computer Gin
+  * NEC uCOM-43 MCU, labeled D650C 060
+
+***************************************************************************/
+
+class mcompgin_state : public hh_ucom4_state
+{
+public:
+	mcompgin_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_ucom4_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(unk_w);
+};
+
+// handlers
+
+void mcompgin_state::prepare_display()
+{
+}
+
+WRITE8_MEMBER(mcompgin_state::unk_w)
+{
+	// E=lcd
+}
+
+
+// config
+
+static INPUT_PORTS_START( mcompgin )
+	PORT_START("IN.0") // port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // 21 select
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // 23 deal
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // 22 discard
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) // 20 draw
+
+	PORT_START("IN.1") // port B
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) // 24 comp
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) // 25 score
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( mcompgin, mcompgin_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", NEC_D650, 400000) // approximation
+	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
+	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(mcompgin_state, unk_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(mcompgin_state, unk_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(mcompgin_state, unk_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(mcompgin_state, unk_w))
+	MCFG_UCOM4_WRITE_G_CB(WRITE8(mcompgin_state, unk_w))
+	MCFG_UCOM4_WRITE_H_CB(WRITE8(mcompgin_state, unk_w))
+	MCFG_UCOM4_WRITE_I_CB(WRITE8(mcompgin_state, unk_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_mcompgin)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Mego Mini-Vid Break Free (manufactured in Japan)
   * PCB label Mego 79 rev F
   * NEC uCOM-43 MCU, labeled D553C 049
@@ -2444,6 +2518,12 @@ ROM_START( edracula )
 ROM_END
 
 
+ROM_START( mcompgin )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d650c-060", 0x0000, 0x0800, BAD_DUMP CRC(92a4d8be) SHA1(d67f14a2eb53b79a7d9eb08103325299bc643781) ) // d5 stuck: xx1x xxxx
+ROM_END
+
+
 ROM_START( mvbfree )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-049", 0x0000, 0x0800, CRC(d64a8399) SHA1(97887e486fa29b1fc4a5a40cacf3c960f67aacbf) )
@@ -2503,6 +2583,8 @@ CONS( 1980, efball,   0,        0, efball,   efball,   driver_device, 0, "Epoch"
 CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  driver_device, 0, "Epoch", "Galaxy II", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, driver_device, 0, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, edracula, 0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+
+CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, driver_device, 0, "Mattel", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  driver_device, 0, "Mego", "Mini-Vid Break Free", MACHINE_SUPPORTS_SAVE )
 

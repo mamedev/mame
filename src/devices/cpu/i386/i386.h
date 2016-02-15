@@ -8,7 +8,7 @@
 #include "softfloat/milieu.h"
 #include "softfloat/softfloat.h"
 #include "debug/debugcpu.h"
-#include "cpu/vtlb.h"
+#include "divtlb.h"
 
 
 #define INPUT_LINE_A20      1
@@ -24,7 +24,7 @@
 
 #define X86_NUM_CPUS        4
 
-class i386_device : public cpu_device
+class i386_device : public cpu_device, public device_vtlb_interface
 {
 public:
 	// construction/destruction
@@ -269,8 +269,6 @@ struct I386_CALL_GATE
 
 	UINT8 *m_cycle_table_pm;
 	UINT8 *m_cycle_table_rm;
-
-	vtlb_state *m_vtlb;
 
 	bool m_smm;
 	bool m_smi;
@@ -1411,7 +1409,7 @@ struct I386_CALL_GATE
 	void build_x87_opcode_table_df();
 	void build_x87_opcode_table();
 	void i386_postload();
-	void i386_common_init(int tlbsize);
+	void i386_common_init();
 	void build_opcode_table(UINT32 features);
 	void pentium_smi();
 	void zero_state();

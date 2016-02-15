@@ -9,10 +9,12 @@
 !/hlsl/
 !/keymaps/
 !/nl_examples/
+!/plugins/
 !/regtests/
 !/samples/
 !/scripts/
 !/src/
+!/shaders/
 !/tests/
 !/doxygen/
 !/web/

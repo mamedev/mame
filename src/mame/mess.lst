@@ -1153,6 +1153,7 @@ jupace   // Jupiter Ace
 // Sord
 m5
 m5p
+m5p_brno
 
 // APF Electronics Inc.
 apfm1000
@@ -2166,6 +2167,8 @@ fscc12
 fexcel
 fexcelv
 
+feagv2
+
 // Hegener & Glaser Munich
 //mephisto  // Mephisto 1 - roms needed - not in driver
 mm2       // Mephisto 2
@@ -2261,7 +2264,6 @@ gckong      // Gakken
 gdigdug     // Gakken
 mwcbaseb    // Mattel
 pbqbert     // Parker Brothers
-mvbfree     // Mego
 kingman     // Tomy
 tmtron      // Tomy
 vinvader    // VTech
@@ -2359,7 +2361,7 @@ tntelluk
 tntellfr
 tntellp
 vocaid
-k28         // Tiger Electronics
+k28m2       // Tiger Electronics
 
 // hh_ucom4
 ufombs      // Bambino
@@ -2374,6 +2376,8 @@ efball      // Epoch
 galaxy2     // Epoch
 astrocmd    // Epoch
 edracula    // Epoch
+mcompgin    // Mattel
+mvbfree     // Mego
 tccombat    // Tomy
 tmpacman    // Tomy
 tmtennis    // Tomy
@@ -2392,6 +2396,7 @@ microvsn    // Milton Bradley
 monty       // Ritam
 mmonty      // Ritam
 wildfire    // Parker Bros
+k28         // Tiger Electronics
 
 
 //********** Misc **********************************************************
@@ -2440,6 +2445,7 @@ hec2mdhrx
 hec2mx80
 hec2mx40
 hector1
+os214
 victor
 poly880
 sc1
@@ -2453,6 +2459,7 @@ vcs80
 v1050
 x820
 x820ii
+notetakr
 x168
 xor100
 iq151

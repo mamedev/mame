@@ -111,7 +111,7 @@ struct USBSetupPacket {
 	UINT16 wLength;
 };
 
-struct USBStandardDeviceDscriptor {
+struct USBStandardDeviceDescriptor {
 	UINT8 bLength;
 	UINT8 bDescriptorType;
 	UINT16 bcdUSB;
@@ -190,10 +190,14 @@ enum USBDescriptorType {
 
 class ohci_function_device {
 public:
-	ohci_function_device();
+	ohci_function_device(running_machine &machine);
 	void execute_reset();
 	int execute_transfer(int address, int endpoint, int pid, UINT8 *buffer, int size);
 private:
+	void add_device_descriptor(USBStandardDeviceDescriptor &descriptor);
+	void add_configuration_descriptor(USBStandardConfigurationDescriptor &descriptor);
+	void add_interface_descriptor(USBStandardInterfaceDescriptor &descriptor);
+	void add_endpoint_descriptor(USBStandardEndpointDescriptor &descriptor);
 	int address;
 	int newaddress;
 	int controldirection;
@@ -202,6 +206,8 @@ private:
 	bool settingaddress;
 	int remain;
 	UINT8 *position;
+	UINT8 *descriptors;
+	int descriptors_pos;
 };
 
 class xbox_base_state : public driver_device

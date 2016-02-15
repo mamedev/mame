@@ -310,14 +310,14 @@ WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_intrq_w )
 	m_fdc_irq = state;
 	m_pio->port_b_write(state << 7);
 
-	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_drq_w )
 {
 	m_fdc_drq = state;
 
-	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, CLEAR_LINE);
 }
 
 
@@ -654,7 +654,7 @@ READ8_MEMBER( luxor_55_10828_device::fdc_r )
 	{
 		logerror("Z80 WAIT not supported by MAME core\n");
 
-		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, ASSERT_LINE);
 	}
 
 	return m_fdc->gen_r(offset);
@@ -671,7 +671,7 @@ WRITE8_MEMBER( luxor_55_10828_device::fdc_w )
 	{
 		logerror("Z80 WAIT not supported by MAME core\n");
 
-		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, ASSERT_LINE);
 	}
 
 	m_fdc->gen_w(offset, data);

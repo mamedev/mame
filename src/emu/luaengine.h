@@ -45,6 +45,7 @@ public:
 	void serve_lua();
 	void periodic_check();
 	bool frame_hook();
+	void execute_function(const char *id);
 
 	void resume(lua_State *L, int nparam = 0, lua_State *root = nullptr);
 	void set_machine(running_machine *machine) { m_machine = machine; update_machine(); }
@@ -78,6 +79,13 @@ private:
 	running_machine &machine() const { return *m_machine; }
 
 	void update_machine();
+
+	void on_machine_start();
+	void on_machine_stop();
+	void on_machine_pause();
+	void on_machine_resume();
+	void on_machine_frame();
+
 	void output_notifier(const char *outname, INT32 value);
 	static void s_output_notifier(const char *outname, INT32 value, void *param);
 
@@ -102,6 +110,12 @@ private:
 	static int l_emu_pause(lua_State *L);
 	static int l_emu_unpause(lua_State *L);
 	static int l_emu_set_hook(lua_State *L);
+	static int l_emu_register_start(lua_State *L);
+	static int l_emu_register_stop(lua_State *L);
+	static int l_emu_register_pause(lua_State *L);
+	static int l_emu_register_resume(lua_State *L);
+	static int l_emu_register_frame(lua_State *L);
+	static int register_function(lua_State *L, const char *id);
 
 	// "emu.machine" namespace
 	static luabridge::LuaRef l_machine_get_devices(const running_machine *r);

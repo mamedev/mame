@@ -62,23 +62,17 @@
     * Service coin 1 input grants two credits the first time it's
       pushed, but remembers this and won't grant credits again unless
       unless you trigger the tilt input
-    * Flyer suggests there should be an "old lady" sprite, which is not
-      present in our ROM dump
-    * Sprite ROM is likely double size, banking could be controlled by
-      one of the many unused CSOUND bits, the NEG2 bit, or even H128
-    * Judging by the PLA program, the colour weight resistors are likely
-      different to what Laser Battle/Lazarian uses - we need a detailed
-      colour photo of the game board or a schematic to confirm values
+    * The sprite ROM is twice the size as Laser Battle with the bank
+      selected using bit 9 of the 16-bit sound interface (there's a wire
+      making this connection visible on the component side of the PCB)
+    * If demo sounds are enabled (using DIP switches), background music
+      is played every sixth time through the attract loop
     * Sound board emulation is based on tracing the program and guessing
       what's connected where - we really need someone to trace out the
       1b11107 sound board if we want to get this right
 
     TODO:
     - work out where all the magic layer offsets come from
-    - catnmous sprite ROM appears to be underdumped
-    - need to confirm colour weight resistors on catnmous (detailed photo required):
-      R58, R59, R60, R61, R62, R65, R66, R67, R68, R69, R72, R73, R74, R75
-      (network connected between 11M, 12M, Q5, Q7, Q8)
     - sound in laserbat (with schematics) and in catnmous
 */
 
@@ -88,6 +82,8 @@
 
 #include "cpu/m6800/m6800.h"
 #include "cpu/s2650/s2650.h"
+
+#include "machine/clock.h"
 
 
 WRITE8_MEMBER(laserbat_state_base::ct_io_w)
@@ -198,14 +194,6 @@ static ADDRESS_MAP_START( laserbat_io_map, AS_IO, 8, laserbat_state_base )
 	AM_RANGE(0x07, 0x07)                    AM_WRITE(csound2_w)
 
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( catnmous_sound_map, AS_PROGRAM, 8, catnmous_state )
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xc000, 0xcfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -465,13 +453,6 @@ void laserbat_state::machine_start()
 	save_item(NAME(m_keys));
 }
 
-void catnmous_state::machine_start()
-{
-	laserbat_state_base::machine_start();
-
-	save_item(NAME(m_cb1));
-}
-
 void laserbat_state_base::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
@@ -499,9 +480,6 @@ static MACHINE_CONFIG_START( laserbat_base, laserbat_state_base )
 	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state_base, screen_update_laserbat)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(laserbat_state_base, laserbat)
-
 	MCFG_PLS100_ADD("gfxmix")
 
 	MCFG_DEVICE_ADD("pvi1", S2636, XTAL_14_31818MHz/3)
@@ -522,6 +500,10 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( laserbat, laserbat_base, laserbat_state )
 
+	// video hardware
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(laserbat_state, laserbat)
+
 	// sound board devices
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -540,36 +522,24 @@ static MACHINE_CONFIG_DERIVED_CLASS( laserbat, laserbat_base, laserbat_state )
 	MCFG_SN76477_ENVELOPE_PARAMS(0, 1)              // GND, Vreg
 	MCFG_SN76477_ENABLE(0)                          // AB SOUND
 
-	MCFG_TMS3615_ADD("synth_high", XTAL_4MHz/16/2) // from the other one's /2 clock output
+	MCFG_TMS3615_ADD("synth_low", XTAL_4MHz/16/2) // from the other one's /2 clock output
 	MCFG_SOUND_ROUTE(TMS3615_FOOTAGE_8, "mono", 1.0)
 
-	MCFG_TMS3615_ADD("synth_low", XTAL_4MHz/16) // 4MHz divided down with a 74LS161
+	MCFG_TMS3615_ADD("synth_high", XTAL_4MHz/16) // 4MHz divided down with a 74LS161
 	MCFG_SOUND_ROUTE(TMS3615_FOOTAGE_8, "mono", 1.0)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( catnmous, laserbat_base, catnmous_state )
 
+	// video hardware
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(catnmous_state, catnmous)
+
 	// sound board devices
-	MCFG_CPU_ADD("audiocpu", M6802, 3580000) // ?
-	MCFG_CPU_PROGRAM_MAP(catnmous_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(catnmous_state, cb1_toggle,  (double)3580000/4096)
-
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(catnmous_state, pia_porta_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(catnmous_state, pia_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(catnmous_state, pia_portb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(catnmous_state, pia_irqa))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(catnmous_state, pia_irqb))
-
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("psg1", AY8910, 3580000/2) // ?
-	MCFG_AY8910_PORT_B_READ_CB(READ8(catnmous_state, psg1_portb_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_SOUND_ADD("psg2", AY8910, 3580000/2) // ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_ZACCARIA_1B11107("audiopcb")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 MACHINE_CONFIG_END
 
@@ -703,17 +673,13 @@ ROM_START( catnmous )
 	ROM_LOAD( "type01.10g",   0x0800, 0x0800, CRC(e5259f9b) SHA1(396753291ab36c3ed72208d619665fc0f33d1e17) )
 	ROM_LOAD( "type01.11g",   0x1000, 0x0800, CRC(2999f378) SHA1(929082383b2b0006de171587adb932ce57316963) )
 
-	ROM_REGION( 0x0800, "gfx2", 0 )
-	// This needs double checking, might be a case of the wrong ROM type being marked on the PCB like with the final program rom.
-	// Flyers indicate there should be an 'old lady' character, and even show a graphic for one approaching from the right.
-	// This graphic is not present in our ROM and instead we get incorrect looking sprites, so the rom could be half size with
-	// an additional sprite bank bit coming from somewhere?
-	ROM_LOAD( "type01.14l",   0x0000, 0x0800, BAD_DUMP CRC(af79179a) SHA1(de61af7d02c93be326a33ee51572e3da7a25dab0) )
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "cat'n_mouse-type01-mem_n.14l.14l",   0x0000, 0x1000, CRC(83502383) SHA1(9561f87e1a6425bb9544e71340336db8d43c1fd9) )
 
 	ROM_REGION( 0x0100, "gfxmix", 0 )
 	ROM_LOAD( "82s100.13m",   0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 )
 	ROM_LOAD( "sound01.1f",   0xc000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
 	ROM_LOAD( "sound01.1d",   0xe000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
 	ROM_LOAD( "sound01.1e",   0xf000, 0x1000, CRC(1bd90c93) SHA1(20fd2b765a42e25cf7f716e6631b8c567785a866) )
@@ -748,15 +714,14 @@ ROM_START( catnmousa )
 	ROM_LOAD( "catnmous.10g", 0x0800, 0x0800, CRC(e5259f9b) SHA1(396753291ab36c3ed72208d619665fc0f33d1e17) )
 	ROM_LOAD( "catnmous.11g", 0x1000, 0x0800, CRC(2999f378) SHA1(929082383b2b0006de171587adb932ce57316963) )
 
-	ROM_REGION( 0x0800, "gfx2", 0 )
-	// see comment in parent set
-	ROM_LOAD( "catnmous.14l", 0x0000, 0x0800, BAD_DUMP CRC(af79179a) SHA1(de61af7d02c93be326a33ee51572e3da7a25dab0) )
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "cat'n_mouse-type01-mem_n.14l.14l",   0x0000, 0x1000, CRC(83502383) SHA1(9561f87e1a6425bb9544e71340336db8d43c1fd9) )
 
 	ROM_REGION( 0x0100, "gfxmix", 0 )
 	// copied from parent set to give working graphics, need dump to confirm
 	ROM_LOAD( "catnmousa_82s100.13m", 0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) BAD_DUMP )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 )
 	ROM_LOAD( "snd.1f",       0xc000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
 	ROM_LOAD( "snd.1d",       0xe000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
 	ROM_LOAD( "snd.1e",       0xf000, 0x1000, CRC(1bd90c93) SHA1(20fd2b765a42e25cf7f716e6631b8c567785a866) )
@@ -765,5 +730,5 @@ ROM_END
 
 GAME( 1981, laserbat,  0,        laserbat, laserbat, laserbat_state_base, laserbat, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, lazarian,  laserbat, laserbat, lazarian, laserbat_state_base, laserbat, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catnmous,  0,        catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catnmousa, catnmous, catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catnmous,  0,        catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catnmousa, catnmous, catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

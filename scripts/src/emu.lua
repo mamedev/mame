@@ -117,6 +117,8 @@ files {
 	MAME_DIR .. "src/emu/distate.h",
 	MAME_DIR .. "src/emu/divideo.cpp",
 	MAME_DIR .. "src/emu/divideo.h",
+	MAME_DIR .. "src/emu/divtlb.cpp",
+	MAME_DIR .. "src/emu/divtlb.h",
 	MAME_DIR .. "src/emu/drawgfx.cpp",
 	MAME_DIR .. "src/emu/drawgfx.h",
 	MAME_DIR .. "src/emu/drawgfxm.h",

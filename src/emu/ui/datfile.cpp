@@ -165,6 +165,21 @@ void datfile_manager::init_command()
 	osd_printf_verbose("Command.dat games found = %i\n", count);
 }
 
+bool datfile_manager::has_software(std::string &softlist, std::string &softname, std::string &parentname)
+{
+	// Find software in software list index
+	if (m_swindex.find(softlist) == m_swindex.end())
+		return false;
+
+	m_itemsiter = m_swindex[softlist].find(softname);
+	if (m_itemsiter == m_swindex[softlist].end() && !parentname.empty())
+		m_itemsiter = m_swindex[softlist].find(parentname);
+
+	if (m_itemsiter == m_swindex[softlist].end())
+		return false;
+
+	return true;
+}
 //-------------------------------------------------
 //  load software info
 //-------------------------------------------------
@@ -174,18 +189,10 @@ void datfile_manager::load_software_info(std::string &softlist, std::string &buf
 	if (!m_swindex.empty() && parseopen("history.dat"))
 	{
 		// Find software in software list index
-		if (m_swindex.find(softlist) == m_swindex.end())
+		if (!has_software(softlist, softname, parentname))
 			return;
 
-		drvindex::iterator itemsiter;
-		itemsiter = m_swindex[softlist].find(softname);
-		if (itemsiter == m_swindex[softlist].end() && !parentname.empty())
-			itemsiter = m_swindex[softlist].find(parentname);
-
-		if (itemsiter == m_swindex[softlist].end())
-			return;
-
-		long s_offset = (*itemsiter).second;
+		long s_offset = (*m_itemsiter).second;
 		char rbuf[64 * 1024];
 		fseek(fp, s_offset, SEEK_SET);
 		std::string readbuf;

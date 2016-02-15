@@ -25,22 +25,16 @@ std::vector<std::string> c_mnfct::ui;
 
 // Main filters
 UINT16 main_filters::actual = 0;
-const char *main_filters::text[] = { "All", "Available", "Unavailable", "Working", "Not Mechanical", "Category", "Favorites", "BIOS",
-                                     "Originals", "Clones", "Not Working", "Mechanical", "Manufacturers", "Years", "Support Save",
-                                     "Not Support Save", "CHD", "No CHD", "Use Samples", "Not Use Samples", "Stereo", "Vertical",
-                                     "Horizontal", "Screen Type", "Custom" };
+const char *main_filters::text[] = { "All", "Available", "Unavailable", "Working", "Not Working", "Mechanical", "Not Mechanical", 
+	"Category", "Favorites", "BIOS", "Originals", "Clones", "Manufacturers", "Years", "Support Save",
+	"Not Support Save", "CHD", "No CHD", "Vertical", "Horizontal", "Custom" };
 size_t main_filters::length = ARRAY_LENGTH(main_filters::text);
 
 // Software filters
 UINT16 sw_filters::actual = 0;
 const char *sw_filters::text[] = { "All", "Available", "Unavailable", "Originals", "Clones", "Years", "Publishers", "Supported",
-                                   "Partial Supported", "Unsupported", "Region", "Device Type", "Software List", "Custom" };
+	"Partial Supported", "Unsupported", "Region", "Device Type", "Software List", "Custom" };
 size_t sw_filters::length = ARRAY_LENGTH(sw_filters::text);
-
-// Screens
-UINT16 screen_filters::actual = 0;
-const char *screen_filters::text[] = { "<none>", "Raster", "Vector", "LCD" };
-size_t screen_filters::length = ARRAY_LENGTH(screen_filters::text);
 
 // Globals
 UINT8 ui_globals::rpanel = 0;

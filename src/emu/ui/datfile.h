@@ -31,13 +31,25 @@ public:
 	void load_software_info(std::string &softlist, std::string &buffer, std::string &softname, std::string &parentname);
 	void command_sub_menu(const game_driver *drv, std::vector<std::string> &menuitems);
 	void reset_run() { first_run = true; }
+	bool has_software(std::string &softlist, std::string &softname, std::string &parentname);
 
 	std::string rev_history() const { return m_history_rev; }
 	std::string rev_mameinfo() const { return m_mame_rev; }
 	std::string rev_messinfo() const { return m_mess_rev; }
 	std::string rev_sysinfo() const { return m_sysinfo_rev; }
 	std::string rev_storyinfo() const { return m_story_rev; }
+	
+	bool has_history(const game_driver *driver) { return (m_histidx.find(driver) != m_histidx.end()); }
+	bool has_mameinfo(const game_driver *driver) { return (m_mameidx.find(driver) != m_mameidx.end()); }
+	bool has_messinfo(const game_driver *driver) { return (m_messidx.find(driver) != m_messidx.end()); }
+	bool has_command(const game_driver *driver) { return (m_cmdidx.find(driver) != m_cmdidx.end()); }
+	bool has_sysinfo(const game_driver *driver) { return (m_sysidx.find(driver) != m_sysidx.end()); }
+	bool has_story(const game_driver *driver) { return (m_storyidx.find(driver) != m_storyidx.end()); }
 
+	bool has_data(const game_driver *d) 
+	{ 
+		return (has_history(d) || has_mameinfo(d) || has_messinfo(d) || has_command(d) || has_sysinfo(d) || has_story(d));
+	}
 private:
 	using drvindex = std::unordered_map<std::string, long>;
 	using dataindex = std::unordered_map<const game_driver *, long>;
@@ -63,6 +75,7 @@ private:
 	int index_mame_mess_info(dataindex &index, drvindex &index_drv, int &drvcount);
 	int index_datafile(dataindex &index, int &swcount);
 	void index_menuidx(const game_driver *drv, dataindex &idx, drvindex &index);
+	drvindex::iterator m_itemsiter;
 
 	void load_data_text(const game_driver *drv, std::string &buffer, dataindex &idx, std::string &tag);
 	void load_driver_text(const game_driver *drv, std::string &buffer, drvindex &idx, std::string &tag);

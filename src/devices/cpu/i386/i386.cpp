@@ -41,23 +41,31 @@ const device_type PENTIUM4 = &device_creator<pentium4_device>;
 
 i386_device::i386_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, I386, "I386", tag, owner, clock, "i386", __FILE__)
+	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 32, 16, 0)
 	, m_smiact(*this)
 {
 	m_program_config.m_logaddr_width = 32;
 	m_program_config.m_page_shift = 12;
+
+	// 32 unified
+	set_vtlb_dynamic_entries(32);
 }
 
 
 i386_device::i386_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int program_data_width, int program_addr_width, int io_data_width)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
 	, m_smiact(*this)
 {
 	m_program_config.m_logaddr_width = 32;
 	m_program_config.m_page_shift = 12;
+
+	// 32 unified
+	set_vtlb_dynamic_entries(32);
 }
 
 i386SX_device::i386SX_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -73,11 +81,15 @@ i486_device::i486_device(const machine_config &mconfig, const char *tag, device_
 pentium_device::pentium_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i386_device(mconfig, PENTIUM, "PENTIUM", tag, owner, clock, "pentium", __FILE__)
 {
+	// 64 dtlb small, 8 dtlb large, 32 itlb
+	set_vtlb_dynamic_entries(96);
 }
 
 pentium_device::pentium_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: i386_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
+	// 64 dtlb small, 8 dtlb large, 32 itlb
+	set_vtlb_dynamic_entries(96);
 }
 
 mediagx_device::mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -93,21 +105,29 @@ pentium_pro_device::pentium_pro_device(const machine_config &mconfig, const char
 pentium_mmx_device::pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pentium_device(mconfig, PENTIUM_MMX, "Pentium MMX", tag, owner, clock, "pentium_mmx", __FILE__)
 {
+	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
+	set_vtlb_dynamic_entries(96);
 }
 
 pentium2_device::pentium2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pentium_device(mconfig, PENTIUM2, "Pentium II", tag, owner, clock, "pentium2", __FILE__)
 {
+	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
+	set_vtlb_dynamic_entries(96);
 }
 
 pentium3_device::pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pentium_device(mconfig, PENTIUM3, "Pentium III", tag, owner, clock, "pentium3", __FILE__)
 {
+	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
+	set_vtlb_dynamic_entries(96);
 }
 
 pentium4_device::pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pentium_device(mconfig, PENTIUM4, "Pentium 4", tag, owner, clock, "pentium4", __FILE__)
 {
+	// 128 dtlb, 64 itlb
+	set_vtlb_dynamic_entries(196);
 }
 
 
@@ -1306,7 +1326,7 @@ void i386_device::i386_task_switch(UINT16 selector, UINT8 nested)
 	}
 	m_cr[3] = READ32(tss+0x1c);  // CR3 (PDBR)
 	if(oldcr3 != m_cr[3])
-		vtlb_flush_dynamic(m_vtlb);
+		vtlb_flush_dynamic();
 
 	/* Set the busy bit in the new task's descriptor */
 	if(selector & 0x0004)
@@ -2344,6 +2364,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 	I386_SREG desc,stack;
 	UINT8 CPL, RPL, DPL;
 	UINT32 newflags;
+	UINT8 IOPL = m_IOP1 | (m_IOP2 << 1);
 
 	CPL = m_CPL;
 	UINT32 ea = i386_translate(SS, (STACK_32BIT)?REG32(ESP):REG16(SP), 0);
@@ -2363,7 +2384,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 	if(V8086_MODE)
 	{
 		UINT32 oldflags = get_flags();
-		if(!m_IOP1 || !m_IOP2)
+		if(IOPL != 3)
 		{
 			logerror("IRET (%08x): Is in Virtual 8086 mode and IOPL != 3.\n",m_pc);
 			FAULT(FAULT_GP,0)
@@ -2435,6 +2456,8 @@ void i386_device::i386_protected_mode_iret(int operand32)
 			{
 				UINT32 oldflags = get_flags();
 				newflags = (newflags & ~0x00003000) | (oldflags & 0x00003000);
+				if(CPL > IOPL)
+					newflags = (newflags & ~0x200 ) | (oldflags & 0x200);
 			}
 			set_flags(newflags);
 			m_eip = POP32() & 0xffff;  // high 16 bits are ignored
@@ -2564,6 +2587,8 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				{
 					UINT32 oldflags = get_flags();
 					newflags = (newflags & ~0x00003000) | (oldflags & 0x00003000);
+					if(CPL > IOPL)
+						newflags = (newflags & ~0x200 ) | (oldflags & 0x200);
 				}
 
 				if(operand32 == 0)
@@ -2733,6 +2758,8 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				{
 					UINT32 oldflags = get_flags();
 					newflags = (newflags & ~0x00003000) | (oldflags & 0x00003000);
+					if(CPL > IOPL)
+						newflags = (newflags & ~0x200 ) | (oldflags & 0x200);
 				}
 
 				if(operand32 == 0)
@@ -3178,7 +3205,7 @@ void i386_device::i386_postload()
 	CHANGE_PC(m_eip);
 }
 
-void i386_device::i386_common_init(int tlbsize)
+void i386_device::i386_common_init()
 {
 	int i, j;
 	static const int regs8[8] = {AL,CL,DL,BL,AH,CH,DH,BH};
@@ -3211,7 +3238,6 @@ void i386_device::i386_common_init(int tlbsize)
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 	m_io = &space(AS_IO);
-	m_vtlb = vtlb_alloc(this, AS_PROGRAM, 0, tlbsize);
 	m_smi = false;
 	m_debugger_temp = 0;
 	m_lock = false;
@@ -3294,7 +3320,7 @@ void i386_device::i386_common_init(int tlbsize)
 
 void i386_device::device_start()
 {
-	i386_common_init(32);
+	i386_common_init();
 
 	build_opcode_table(OP_I386);
 	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_I386].get();
@@ -3698,7 +3724,6 @@ void i386_device::zero_state()
 void i386_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -3890,7 +3915,7 @@ void i386_device::i386_set_a20_line(int state)
 		m_a20_mask = ~(1 << 20);
 	}
 	// TODO: how does A20M and the tlb interact
-	vtlb_flush_dynamic(m_vtlb);
+	vtlb_flush_dynamic();
 }
 
 void i386_device::execute_run()
@@ -3976,7 +4001,7 @@ offs_t i386_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opr
 
 void i486_device::device_start()
 {
-	i386_common_init(32);
+	i386_common_init();
 
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486);
 	build_x87_opcode_table();
@@ -3989,7 +4014,6 @@ void i486_device::device_start()
 void i486_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4033,8 +4057,7 @@ void i486_device::device_reset()
 
 void pentium_device::device_start()
 {
-	// 64 dtlb small, 8 dtlb large, 32 itlb
-	i386_common_init(96);
+	i386_common_init();
 	register_state_i386_x87();
 
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM);
@@ -4046,7 +4069,6 @@ void pentium_device::device_start()
 void pentium_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4107,8 +4129,7 @@ void pentium_device::device_reset()
 
 void mediagx_device::device_start()
 {
-	// probably 32 unified
-	i386_common_init(32);
+	i386_common_init();
 	register_state_i386_x87();
 
 	build_x87_opcode_table();
@@ -4120,7 +4141,6 @@ void mediagx_device::device_start()
 void mediagx_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4172,8 +4192,7 @@ void mediagx_device::device_reset()
 
 void pentium_pro_device::device_start()
 {
-	// 64 dtlb small, 32 itlb
-	i386_common_init(96);
+	i386_common_init();
 	register_state_i386_x87();
 
 	build_x87_opcode_table();
@@ -4185,7 +4204,6 @@ void pentium_pro_device::device_start()
 void pentium_pro_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4247,8 +4265,7 @@ void pentium_pro_device::device_reset()
 
 void pentium_mmx_device::device_start()
 {
-	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
-	i386_common_init(96);
+	i386_common_init();
 	register_state_i386_x87();
 
 	build_x87_opcode_table();
@@ -4260,7 +4277,6 @@ void pentium_mmx_device::device_start()
 void pentium_mmx_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4320,8 +4336,7 @@ void pentium_mmx_device::device_reset()
 
 void pentium2_device::device_start()
 {
-	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
-	i386_common_init(96);
+	i386_common_init();
 	register_state_i386_x87();
 
 	build_x87_opcode_table();
@@ -4333,7 +4348,6 @@ void pentium2_device::device_start()
 void pentium2_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4387,8 +4401,7 @@ void pentium2_device::device_reset()
 
 void pentium3_device::device_start()
 {
-	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
-	i386_common_init(96);
+	i386_common_init();
 	register_state_i386_x87_xmm();
 
 	build_x87_opcode_table();
@@ -4400,7 +4413,6 @@ void pentium3_device::device_start()
 void pentium3_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4456,8 +4468,7 @@ void pentium3_device::device_reset()
 
 void pentium4_device::device_start()
 {
-	// 128 dtlb, 64 itlb
-	i386_common_init(196);
+	i386_common_init();
 	register_state_i386_x87_xmm();
 
 	build_x87_opcode_table();
@@ -4469,7 +4480,6 @@ void pentium4_device::device_start()
 void pentium4_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;

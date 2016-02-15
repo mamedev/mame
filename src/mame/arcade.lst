@@ -382,6 +382,7 @@ hustlerb4       // bootleg
 frogger         // GX392 (c) 1981 Konami
 froggers1       // (c) 1981 Sega
 froggers2       // 834-0068 (c) 1981 Sega
+froggers3		// 
 froggermc       // 800-3110 (c) 1981 Sega
 amidar          // GX337 (c) 1982 Konami
 amidar1         // GX337 (c) 1981 Konami
@@ -1106,6 +1107,7 @@ tekken4
 tekken4a
 tekken4b
 tekken4c
+wanganmr
 prdgp03
 timecrs3
 timecrs3e
@@ -2106,6 +2108,7 @@ sboblbobl       // bootleg
 sboblbobla      // bootleg
 sboblboblb      // bootleg
 sboblboblc      // bootleg
+sboblbobld		// bootleg
 bublboblb       // bootleg
 bub68705        // bootleg
 dland           // bootleg
@@ -3090,6 +3093,7 @@ supduck         // (c) Comad
 1943j           //  6/1987 (c) 1987 (Japan) Rev B
 1943ja          //  6/1987 (c) 1987 (Japan)
 1943b           // bootleg
+1943bj          // bootleg
 blktiger        //  8/1987 (c) 1987 (US)
 blktigera       //  8/1987 (c) 1987 (US)
 blktigerb1      // bootleg
@@ -4130,17 +4134,23 @@ p911            // 2001
 p911uc          // 2001
 p911kc          // 2001
 p911e           // 2001
+p911ea          // 2001
 p911j           // 2001
 p9112           // 2001
 popn9           // 2003
 sscopex         // 2001
 sogeki          // 2001
+sscopefh        // 2002
 thrild2         // 2001
 thrild2a        // 2001
+thrild2ab       // 2001
+thrild2ac       // 2001
 thrild2c        // 2001
 tsurugi         // 2001
+tsurugie        // 2001
 tsurugij        // 2001
 wcombat         // 2002
+wcombatb        // 2002
 wcombatk        // 2002
 wcombatj        // 2002
 wcombatu        // 2002
@@ -5915,8 +5925,8 @@ mj2c            // 2004.12 Sega Network Taisen Mahjong MJ 2 (Rev C)
 				// 2004.12 Sega Network Taisen Mahjong MJ 2 (Rev D)
 ghostsqu        // 2004.12.09 Ghost Squad (Rev A)
 				// 2005.02 Sega Network Taisen Mahjong MJ 2 (Rev E)
-mj2             // 2005.02 Sega Network Taisen Mahjong MJ 2 (Rev F)
-mj2g            // 2005.02.02 Sega Network Taisen Mahjong MJ 2 (Rev G)
+mj2f            // 2005.02 Sega Network Taisen Mahjong MJ 2 (Rev F)
+mj2             // 2005.02.02 Sega Network Taisen Mahjong MJ 2 (Rev G)
 				// 2005.03 Sangokushi Taisen
 gundamos        // 2005.03 Gundam Battle Operating Simulator
 				// 2005.04 Quest of D Ver.1.20
@@ -7217,6 +7227,7 @@ asteroid        // 035127-035145    (c) 1979
 asteroid2       // 035127-035145    (c) 1979
 asteroid1       // 035127-035145    no copyright notice
 asteroidb       // (bootleg)
+spcrocks        // J.Estevez        (c) 1981
 aerolitos       // Rodmar Elec. bootleg
 asterock        // Sidam bootleg    (c) 1979
 asterockv       // Videotron bootleg(c) 1979
@@ -10068,8 +10079,12 @@ haekaka         // (c) 2001 Sammy
 goldstar        // (c) 198? IGS
 goldstbl        // (c) 198? IGS
 moonlght        // bootleg
+moonlghta       // bootleg
+moonlghtb       // bootleg
+moonlghtc       // bootleg
 chry10          // bootleg
 chrygld         // bootleg
+chryglda        // bootleg
 goldfrui        // bootleg
 wcherry         // bootleg
 super9          // (c) 2001 Playmark
@@ -10548,6 +10563,7 @@ fastdraw_130    // (c) 1995
 aplatoon        // (c) 199? Nova?
 zortonbr        // (c) 1993 Web Picmatic
 
+crospuzl		//
 // Crystal System
 crysbios
 crysking        // 2001 Brezzasoft. Crystal of the kings
@@ -10750,6 +10766,7 @@ coolpool        // (c) 1992 Catalina Games
 9ballsht3       // (c) 1993 E-Scape EnterMedia + "marketed by Bundra Games"
 9ballshtc       // (c) 1993 E-Scape EnterMedia + "marketed by Bundra Games"
 megaphx         // (c) 1991 Dinamic / Inder
+flagrall		// ?
 gumbo           // (c) 1994 Min Corp.
 mspuzzleg       // (c) 1994 Min Corp.
 mspuzzle        // (c) 1994 Min Corp.
@@ -12272,6 +12289,8 @@ cmasterbv       // (c) 1991 Dyna Electronics / Gerald Duhamel?
 cmasterd        // (c) 1991 Dyna Electronics
 cmastere        // (c) 1991 Dyna Electronics
 cmasterf        // (c) 1991 Dyna Electronics
+cmasterg        // (c) 1991 Dyna Electronics
+cmasterh        // (c) 1991 Dyna Electronics
 cmast91         // (c) 1991 Dyna Electronics
 cmast92         // (c) 1992 Dyna Electronics
 cmast97         // (c) 1996 Dyna Electronics
@@ -12412,10 +12431,12 @@ excitbj         // (c) 1992 Wing Co. Ltd
 carb2002        // bootleg
 carb2003        // bootleg
 nfm             // bootleg
+scmaster        // 1994, unknown
 unkch1          // bootleg
 unkch2          // bootleg
 unkch3          // bootleg
 unkch4          // bootleg
+cherry96        // bootleg
 ns8lines        // unknown
 ns8linew        // unknown
 ladylinr        // (c) 198? TAB Austria
