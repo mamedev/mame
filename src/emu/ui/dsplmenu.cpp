@@ -79,7 +79,11 @@ ui_menu_display_options::ui_menu_display_options(running_machine &machine, rende
 			break;
 		p2 = descr.find_first_of(delim, p1 + 1);
 		if (p2 != std::string::npos)
+		{
+			std::string txt(descr.substr(p1, p2 - p1));
+			if (txt != "or" && txt != "none")
 			m_list.push_back(descr.substr(p1, p2 - p1));
+		}
 		else
 		{
 			m_list.push_back(descr.substr(p1));
