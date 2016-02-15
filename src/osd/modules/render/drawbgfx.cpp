@@ -283,47 +283,74 @@ void renderer_bgfx::put_packed_quad(render_primitive *prim, UINT32 hash, PosColo
 	float v1 = v0 + float(rect.height()) / float(CACHE_SIZE);
 	UINT32 rgba = u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255);
 
-	vertex[0].m_x = prim->bounds.x0;
-	vertex[0].m_y = prim->bounds.y0;
+	float x[4] = { prim->bounds.x0, prim->bounds.x1, prim->bounds.x0, prim->bounds.x1 };
+	float y[4] = { prim->bounds.y0, prim->bounds.y0, prim->bounds.y1, prim->bounds.y1 };
+	float u[4] = { u0, u1, u0, u1 };
+	float v[4] = { v0, v0, v1, v1 };
+
+	if (PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_SWAP_XY)
+	{
+		std::swap(u[1], u[2]);
+		std::swap(v[1], v[2]);
+	}
+
+	if (PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_FLIP_X)
+	{
+		std::swap(u[0], u[1]);
+		std::swap(v[0], v[1]);
+		std::swap(u[2], u[3]);
+		std::swap(v[2], v[3]);
+	}
+
+	if (PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_FLIP_Y)
+	{
+		std::swap(u[0], u[2]);
+		std::swap(v[0], v[2]);
+		std::swap(u[1], u[3]);
+		std::swap(v[1], v[3]);
+	}
+
+	vertex[0].m_x = x[0]; // 0
+	vertex[0].m_y = y[0];
 	vertex[0].m_z = 0;
 	vertex[0].m_rgba = rgba;
-	vertex[0].m_u = u0;
-	vertex[0].m_v = v0;
+	vertex[0].m_u = u[0];
+	vertex[0].m_v = v[0];
 
-	vertex[1].m_x = prim->bounds.x1;
-	vertex[1].m_y = prim->bounds.y0;
+	vertex[1].m_x = x[1]; // 1
+	vertex[1].m_y = y[1];
 	vertex[1].m_z = 0;
 	vertex[1].m_rgba = rgba;
-	vertex[1].m_u = u1;
-	vertex[1].m_v = v0;
+	vertex[1].m_u = u[1];
+	vertex[1].m_v = v[1];
 
-	vertex[2].m_x = prim->bounds.x1;
-	vertex[2].m_y = prim->bounds.y1;
+	vertex[2].m_x = x[3]; // 3
+	vertex[2].m_y = y[3];
 	vertex[2].m_z = 0;
 	vertex[2].m_rgba = rgba;
-	vertex[2].m_u = u1;
-	vertex[2].m_v = v1;
+	vertex[2].m_u = u[3];
+	vertex[2].m_v = v[3];
 
-	vertex[3].m_x = prim->bounds.x1;
-	vertex[3].m_y = prim->bounds.y1;
+	vertex[3].m_x = x[3]; // 3
+	vertex[3].m_y = y[3];
 	vertex[3].m_z = 0;
 	vertex[3].m_rgba = rgba;
-	vertex[3].m_u = u1;
-	vertex[3].m_v = v1;
+	vertex[3].m_u = u[3];
+	vertex[3].m_v = v[3];
 
-	vertex[4].m_x = prim->bounds.x0;
-	vertex[4].m_y = prim->bounds.y1;
+	vertex[4].m_x = x[2]; // 2
+	vertex[4].m_y = y[2];
 	vertex[4].m_z = 0;
 	vertex[4].m_rgba = rgba;
-	vertex[4].m_u = u0;
-	vertex[4].m_v = v1;
+	vertex[4].m_u = u[2];
+	vertex[4].m_v = v[2];
 
-	vertex[5].m_x = prim->bounds.x0;
-	vertex[5].m_y = prim->bounds.y0;
+	vertex[5].m_x = x[0]; // 0
+	vertex[5].m_y = y[0];
 	vertex[5].m_z = 0;
 	vertex[5].m_rgba = rgba;
-	vertex[5].m_u = u0;
-	vertex[5].m_v = v0;
+	vertex[5].m_u = u[0];
+	vertex[5].m_v = v[0];
 }
 
 void renderer_bgfx::render_textured_quad(int view, render_primitive* prim)

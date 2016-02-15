@@ -442,7 +442,7 @@ void render_texture::hq_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const 
 //  get_scaled - get a scaled bitmap (if we can)
 //-------------------------------------------------
 
-void render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &texinfo, render_primitive_list &primlist, bool packable)
+void render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &texinfo, render_primitive_list &primlist, UINT32 flags)
 {
 	texinfo.hash = 0;
 
@@ -524,11 +524,7 @@ void render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 	}
 
 	UINT32 hash = 0;
-	if (packable)
-	{
-		//printf("Packable, %d, %d\n", texinfo.width, texinfo.height);
-	}
-	if (packable && texinfo.width <= 128 && texinfo.height <= 128)
+	if ((flags & PRIMFLAG_PACKABLE) && texinfo.width <= 128 && texinfo.height <= 128)
 	{
 		hash = reinterpret_cast<UINT64>(texinfo.base) & 0xffffffff;
 	}
@@ -1764,7 +1760,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					width = MIN(width, m_maxtexwidth);
 					height = MIN(height, m_maxtexheight);
 
-					curitem->texture()->get_scaled(width, height, prim->texture, list, (curitem->flags() & PRIMFLAG_PACKABLE) ? true : false);
+					curitem->texture()->get_scaled(width, height, prim->texture, list, curitem->flags());
 
 					// set the palette
 					prim->texture.palette = curitem->texture()->get_adjusted_palette(container);
@@ -1867,7 +1863,7 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 
 		// get the scaled texture and append it
 
-		texture->get_scaled(width, height, prim->texture, list, (prim->flags & PRIMFLAG_PACKABLE) ? true : false);
+		texture->get_scaled(width, height, prim->texture, list, prim->flags);
 
 		// compute the clip rect
 		render_bounds cliprect;
