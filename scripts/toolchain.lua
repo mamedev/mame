@@ -920,7 +920,7 @@ function toolchain(_buildDir, _subDir)
 end
 
 function strip()
-	if not _OPTIONS["STRIP_SYMBOLS"]=="1" then
+	if _OPTIONS["STRIP_SYMBOLS"]~="1" then
 		return true
 	end
 
