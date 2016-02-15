@@ -63,8 +63,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
+	void set_display_segmask(UINT32 digits, UINT32 mask);
 	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
-	void display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask);
 
 	bool m_power_on;
 	UINT8 m_inp_mux;
@@ -101,7 +101,7 @@ void k28_state::machine_start()
 	memset(m_display_state, 0, sizeof(m_display_state));
 	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
-	memset(m_display_segmask, ~0, sizeof(m_display_segmask)); // !
+	memset(m_display_segmask, 0, sizeof(m_display_segmask));
 
 	m_power_on = false;
 	m_inp_mux = 0;
@@ -237,6 +237,17 @@ void k28_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
+void k28_state::set_display_segmask(UINT32 digits, UINT32 mask)
+{
+	// set a segment mask per selected digit, but leave unselected ones alone
+	for (int i = 0; i < 0x20; i++)
+	{
+		if (digits & 1)
+			m_display_segmask[i] = mask;
+		digits >>= 1;
+	}
+}
+
 void k28_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
 {
 	set_display_size(maxx, maxy);
@@ -247,15 +258,6 @@ void k28_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
 	display_update();
-}
-
-void k28_state::display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask)
-{
-	// expects m_display_segmask to be not-0
-	for (int y = 0; y < maxy; y++)
-		m_display_segmask[y] &= segmask;
-
-	display_matrix(maxx, maxy, setx, sety);
 }
 
 
@@ -356,7 +358,8 @@ WRITE8_MEMBER(k28_state::mcu_prog_w)
 
 			// output 16-24: digit select
 			UINT16 digit_sel = (UINT16)(m_vfd_shiftreg >> 10) & 0x1ff;
-			display_matrix_seg(16, 9, seg_data, digit_sel, 0x3fff);
+			set_display_segmask(0x1ff, 0x3fff);
+			display_matrix(16, 9, seg_data, digit_sel);
 			
 			// output 25: power-off request on falling edge
 			if (~m_vfd_shiftreg & m_vfd_shiftreg_out & 0x200)
