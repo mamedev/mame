@@ -2364,6 +2364,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 	I386_SREG desc,stack;
 	UINT8 CPL, RPL, DPL;
 	UINT32 newflags;
+	UINT8 IOPL = m_IOP1 | (m_IOP2 << 1);
 
 	CPL = m_CPL;
 	UINT32 ea = i386_translate(SS, (STACK_32BIT)?REG32(ESP):REG16(SP), 0);
@@ -2383,7 +2384,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 	if(V8086_MODE)
 	{
 		UINT32 oldflags = get_flags();
-		if(!m_IOP1 || !m_IOP2)
+		if(IOPL != 3)
 		{
 			logerror("IRET (%08x): Is in Virtual 8086 mode and IOPL != 3.\n",m_pc);
 			FAULT(FAULT_GP,0)
@@ -2455,6 +2456,8 @@ void i386_device::i386_protected_mode_iret(int operand32)
 			{
 				UINT32 oldflags = get_flags();
 				newflags = (newflags & ~0x00003000) | (oldflags & 0x00003000);
+				if(CPL > IOPL)
+					newflags = (newflags & ~0x200 ) | (oldflags & 0x200);
 			}
 			set_flags(newflags);
 			m_eip = POP32() & 0xffff;  // high 16 bits are ignored
@@ -2584,6 +2587,8 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				{
 					UINT32 oldflags = get_flags();
 					newflags = (newflags & ~0x00003000) | (oldflags & 0x00003000);
+					if(CPL > IOPL)
+						newflags = (newflags & ~0x200 ) | (oldflags & 0x200);
 				}
 
 				if(operand32 == 0)
@@ -2753,6 +2758,8 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				{
 					UINT32 oldflags = get_flags();
 					newflags = (newflags & ~0x00003000) | (oldflags & 0x00003000);
+					if(CPL > IOPL)
+						newflags = (newflags & ~0x200 ) | (oldflags & 0x200);
 				}
 
 				if(operand32 == 0)
