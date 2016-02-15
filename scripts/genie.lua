@@ -1050,6 +1050,7 @@ configuration { "nacl*" }
 configuration { "linux-*" }
 		links {
 			"dl",
+			"rt",
 		}
 		if _OPTIONS["distro"]=="debian-stable" then
 			defines
