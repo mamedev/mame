@@ -460,6 +460,13 @@ void ui_menu::set_selection(void *selected_itemref)
 
 void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 {
+	// first draw the FPS counter
+	if (machine().ui().show_fps_counter())
+	{
+		machine().ui().draw_text_full(container, machine().video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
+					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, nullptr, nullptr);
+	}
+
 	float line_height = machine().ui().get_line_height();
 	float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
 	float ud_arrow_width = line_height * machine().render().ui_aspect();
