@@ -439,6 +439,44 @@ luabridge::LuaRef lua_engine::l_machine_get_devices(const running_machine *r)
 }
 
 //-------------------------------------------------
+//  machine_ioports - return table of ioports
+//  -> manager:machine():ioport().ports[':P1']
+//-------------------------------------------------
+
+luabridge::LuaRef lua_engine::l_ioport_get_ports(const ioport_manager *m)
+{
+	ioport_manager *im = const_cast<ioport_manager *>(m);
+	lua_State *L = luaThis->m_lua_state;
+	luabridge::LuaRef port_table = luabridge::LuaRef::newTable(L);
+	ioport_port *port;
+
+	for (port = im->first_port(); port != nullptr; port = port->next()) {
+		port_table[port->tag()] = port;
+	}
+
+	return port_table;
+}
+
+//-------------------------------------------------
+//  ioport_fields - return table of ioport fields
+//  -> manager:machine().ioport().ports[':P1'].fields[':']
+//-------------------------------------------------
+
+luabridge::LuaRef lua_engine::l_ioports_port_get_fields(const ioport_port *i)
+{
+	ioport_port *p = const_cast<ioport_port *>(i);
+	lua_State *L = luaThis->m_lua_state;
+	luabridge::LuaRef f_table = luabridge::LuaRef::newTable(L);
+	ioport_field *field;
+
+	for (field = p->first_field(); field != nullptr; field = field->next()) {
+		f_table[field->name()] = field;
+	}
+
+	return f_table;
+}
+
+//-------------------------------------------------
 //  render_get_targets - return table of render targets
 //  -> manager:machine():render().targets[0]
 //-------------------------------------------------
@@ -645,13 +683,12 @@ int lua_engine::lua_addr_space::l_mem_write(lua_State *L)
 
 luabridge::LuaRef lua_engine::l_ui_get_options(const ui_manager *u)
 {
+	ui_manager *ui = const_cast<ui_manager *>(u);
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef options_table = luabridge::LuaRef::newTable(L);
 
-	ui_manager &ui = luaThis->machine().ui();
-
 	int unadorned_index = 0;
-	for (core_options::entry *curentry = ui.options().first(); curentry != nullptr; curentry = curentry->next())
+	for (core_options::entry *curentry = ui->options().first(); curentry != nullptr; curentry = curentry->next())
 	{
 		const char *name = curentry->name();
 		bool is_unadorned = false;
@@ -1335,6 +1372,8 @@ void lua_engine::initialize()
 				.addFunction ("video", &running_machine::video)
 				.addFunction ("ui", &running_machine::ui)
 				.addFunction ("render", &running_machine::render)
+				.addFunction ("ioport", &running_machine::ioport)
+				.addFunction ("parameters", &running_machine::parameters)
 				.addProperty <luabridge::LuaRef, void> ("devices", &lua_engine::l_machine_get_devices)
 				.addProperty <luabridge::LuaRef, void> ("screens", &lua_engine::l_machine_get_screens)
 				.addProperty <luabridge::LuaRef, void> ("options", &lua_engine::l_machine_get_options)
@@ -1355,6 +1394,45 @@ void lua_engine::initialize()
 				.addFunction ("tag", &device_t::tag)
 				.addProperty <luabridge::LuaRef, void> ("spaces", &lua_engine::l_dev_get_memspaces)
 				.addProperty <luabridge::LuaRef, void> ("state", &lua_engine::l_dev_get_states)
+			.endClass()
+			.beginClass <ioport_manager> ("ioport")
+				.addFunction ("has_configs", &ioport_manager::has_configs)
+				.addFunction ("has_analog", &ioport_manager::has_analog)
+				.addFunction ("has_dips", &ioport_manager::has_dips)
+				.addFunction ("has_bioses", &ioport_manager::has_bioses)
+				.addFunction ("has_keyboard", &ioport_manager::has_keyboard)
+				.addFunction ("count_players", &ioport_manager::count_players)
+				.addProperty <luabridge::LuaRef, void> ("ports", &lua_engine::l_ioport_get_ports)
+			.endClass()
+			.beginClass <ioport_port> ("ioport_port")
+				.addFunction ("tag", &ioport_port::tag)
+				.addFunction ("active", &ioport_port::active)
+				.addFunction ("live", &ioport_port::live)
+				.addProperty <luabridge::LuaRef, void> ("fields", &lua_engine::l_ioports_port_get_fields)
+			.endClass()
+			.beginClass <ioport_field> ("ioport_field")
+				.addFunction ("set_value", &ioport_field::set_value)
+				.addProperty ("device", &ioport_field::device)
+				.addProperty ("name", &ioport_field::name)
+				.addProperty <UINT8, UINT8> ("player", &ioport_field::player, &ioport_field::set_player)
+				.addProperty ("mask", &ioport_field::mask)
+				.addProperty ("defvalue", &ioport_field::defvalue)
+				.addProperty ("sensitivity", &ioport_field::sensitivity)
+				.addProperty ("way", &ioport_field::way)
+				.addProperty ("is_analog", &ioport_field::is_analog)
+				.addProperty ("is_digitial_joystick", &ioport_field::is_digital_joystick)
+				.addProperty ("enabled", &ioport_field::enabled)
+				.addProperty ("unused", &ioport_field::unused)
+				.addProperty ("cocktail", &ioport_field::cocktail)
+				.addProperty ("toggle", &ioport_field::toggle)
+				.addProperty ("rotated", &ioport_field::rotated)
+				.addProperty ("analog_reverse", &ioport_field::analog_reverse)
+				.addProperty ("analog_reset", &ioport_field::analog_reset)
+				.addProperty ("analog_wraps", &ioport_field::analog_wraps)
+				.addProperty ("analog_invert", &ioport_field::analog_invert)
+				.addProperty ("impulse", &ioport_field::impulse)
+				.addProperty <double, double> ("crosshair_scale", &ioport_field::crosshair_scale, &ioport_field::set_crosshair_scale)
+				.addProperty <double, double> ("crosshair_offset", &ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset)
 			.endClass()
 			.beginClass <lua_options_entry> ("lua_options_entry")
 				.addCFunction ("value", &lua_options_entry::l_entry_value)

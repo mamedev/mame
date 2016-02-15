@@ -120,7 +120,9 @@ private:
 	// "emu.machine" namespace
 	static luabridge::LuaRef l_machine_get_options(const running_machine *r);
 	static luabridge::LuaRef l_machine_get_devices(const running_machine *r);
+	static luabridge::LuaRef l_ioport_get_ports(const ioport_manager *i);
 	static luabridge::LuaRef l_render_get_targets(const render_manager *r);
+	static luabridge::LuaRef l_ioports_port_get_fields(const ioport_port *i);
 	static luabridge::LuaRef devtree_dfs(device_t *root, luabridge::LuaRef dev_table);
 	static luabridge::LuaRef l_dev_get_states(const device_t *d);
 	static UINT64 l_state_get_value(const device_state_entry *d);
