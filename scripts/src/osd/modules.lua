@@ -104,6 +104,7 @@ function osdmodulesbuild()
 	if USE_BGFX == 1 then
 		files {
 			MAME_DIR .. "src/osd/modules/render/drawbgfx.cpp",
+			MAME_DIR .. "src/osd/modules/render/binpacker.cpp",
 		}
 		defines {
 			"USE_BGFX"
