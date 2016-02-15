@@ -710,6 +710,55 @@ int lua_engine::lua_options_entry::l_entry_value(lua_State *L)
 }
 
 //-------------------------------------------------
+//  begin_recording - start avi
+//  -> manager:machine():video():begin_recording()
+//-------------------------------------------------
+
+int lua_engine::lua_video::l_begin_recording(lua_State *L)
+{
+	video_manager *vm = luabridge::Stack<video_manager *>::get(L, 1);
+	if (!vm) {
+		return 0;
+	}
+
+	luaL_argcheck(L, lua_isstring(L, 2) || lua_isnone(L, 2), 2, "optional argument: filename, string expected");
+
+	const char *filename = lua_tostring(L, 2);
+	if (!lua_isnone(L, 2)) {
+		std::string vidname(filename);
+		strreplace(vidname, "/", PATH_SEPARATOR);
+		strreplace(vidname, "%g", luaThis->machine().basename());
+		filename = vidname.c_str();
+	} else {
+		filename = nullptr;
+	}
+	vm->begin_recording(filename, video_manager::MF_AVI);
+
+	return 1;
+}
+
+//-------------------------------------------------
+//  end_recording - start saving avi
+//  -> manager:machine():video():end_recording()
+//-------------------------------------------------
+
+int lua_engine::lua_video::l_end_recording(lua_State *L)
+{
+	video_manager *vm = luabridge::Stack<video_manager *>::get(L, 1);
+	if (!vm) {
+		return 0;
+	}
+
+	if (!vm->is_recording()) {
+		lua_writestringerror("%s", "Error, no active recording to stop");
+		return 0;
+	}
+
+	vm->end_recording(video_manager::MF_AVI);
+	return 1;
+}
+
+//-------------------------------------------------
 //  screen_height - return screen visible height
 //  -> manager:machine().screens[":screen"]:height()
 //-------------------------------------------------
@@ -1283,6 +1332,7 @@ void lua_engine::initialize()
 				.addFunction ("save", &running_machine::schedule_save)
 				.addFunction ("load", &running_machine::schedule_load)
 				.addFunction ("system", &running_machine::system)
+				.addFunction ("video", &running_machine::video)
 				.addFunction ("ui", &running_machine::ui)
 				.addFunction ("render", &running_machine::render)
 				.addProperty <luabridge::LuaRef, void> ("devices", &lua_engine::l_machine_get_devices)
@@ -1319,6 +1369,20 @@ void lua_engine::initialize()
 			.beginClass <parameters_manager> ("parameters")
 				.addFunction ("add", &parameters_manager::add)
 				.addFunction ("lookup", &parameters_manager::lookup)
+			.endClass()
+			.beginClass <lua_video> ("lua_video_manager")
+				.addCFunction ("begin_recording", &lua_video::l_begin_recording)
+				.addCFunction ("end_recording", &lua_video::l_end_recording)
+			.endClass()
+			.deriveClass <video_manager, lua_video> ("video")
+				.addFunction ("snapshot", &video_manager::save_active_screen_snapshots)
+				.addFunction ("is_recording", &video_manager::is_recording)
+				.addFunction ("skip_this_frame", &video_manager::skip_this_frame)
+				.addFunction ("speed_factor", &video_manager::speed_factor)
+				.addFunction ("speed_percent", &video_manager::speed_percent)
+				.addProperty <int, int> ("frameskip", &video_manager::frameskip, &video_manager::set_frameskip)
+				.addProperty <bool, bool> ("throttled", &video_manager::throttled, &video_manager::set_throttled)
+				.addProperty <float, float> ("throttle_rate", &video_manager::throttle_rate, &video_manager::set_throttle_rate)
 			.endClass()
 			.beginClass <lua_addr_space> ("lua_addr_space")
 				.addCFunction ("read_i8", &lua_addr_space::l_mem_read<INT8>)
