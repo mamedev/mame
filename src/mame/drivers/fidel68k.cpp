@@ -28,10 +28,15 @@ V6-V11 are on model 6117. Older 1986 model 6081 uses a 6502 CPU.
 
 - MC68HC000P12F 16MHz CPU, 16MHz XTAL
 - MB1422A DRAM Controller, 25MHz XTAL near, 4 DRAM slots(V2: slot 1 and 2 64KB)
-- 2*27C512 EPROM, 2*KM6264AL-10 SRAM, 2*AT28C64X EEPROM(parallel)
+- 2*27C512 64KB EPROM, 2*KM6264AL-10 8KB SRAM, 2*AT28C64X 8KB EEPROM
 - external module slot, no dumps yet
 - OKI M82C51A-2 USART, 4.9152MHz XTAL, assume it's used for factory test/debug
 - other special: Chessboard squares are magnet sensors
+
+IRQ source is unknown. Several possibilities:
+- NE555 timer IC
+- MM/SN74HC4060 binary counter IC (near the M82C51A)
+- one of the XTALs, plus divider of course
 
 Memory map: (of what is known)
 -----------
@@ -40,10 +45,42 @@ Memory map: (of what is known)
 200000-2FFFFF: hashtable DRAM (max. 1MB)
 300000-30000F W hi d0: NE591: 7seg data
 300000-30000F W lo d0: NE591: LED data
-300000-30000F R lo d7: 74259?: keypad rows 0-7
-400000-400001 W lo d0-d3: 74145: led/keypad mux, buzzer out
-700002-700003 R lo d7: 74251?: keypad row 8
+300000-30000F R lo d7: 74259: keypad rows 0-7
+400000-400001 W lo d0-d3: 74145/7442: led/keypad mux, buzzer out
+700002-700003 R lo d7: 74251: keypad row 8
 604000-607FFF: 16KB EEPROM
+
+
+******************************************************************************
+
+Elite Avant Garde (EAG, model 6117)
+-----------------------------------
+
+There are 6 versions of model 6114(V6 to V11). The one emulated here came from a V7.
+From a programmer's point of view, the hardware is very similar to model 6114.
+
+V6: 68020, 512KB hashtable RAM
+V7: 68020, 1MB h.RAM
+V8: 2*68020, 512KB+128KB h.RAM
+V9: 68030, 1MB h.RAM
+V10: 68040, 1MB h.RAM
+V11: 68060, 2MB h.RAM, high speed
+
+- MC68020RC25E CPU, QFP 25MHz XTAL, 2*GAL16V8C
+- 4*AS7C164-20PC 8KB SRAM, 2*KM684000ALG-7L 512KB CMOS SRAM
+- 2*27C512? 64KB EPROM, 2*HM6264LP-15 8KB SRAM, 2*AT28C64B 8KB EEPROM
+- same as 6114: M82C51A, SN74HC4060, module slot?, chessboard
+
+Memory map:
+-----------
+000000-01FFFF: 128KB ROM
+104000-107FFF: 16KB SRAM (unused?)
+200000-2FFFFF: hashtable SRAM
+300000-30000F: see model 6114
+400000-400007: see model 6114
+700000-700003: see model 6114
+604000-607FFF: 16KB EEPROM
+800000-807FFF: 32KB SRAM
 
 ******************************************************************************/
 
@@ -142,13 +179,25 @@ WRITE8_MEMBER(fidel68k_state::eag_mux_w)
 static ADDRESS_MAP_START( eag_map, AS_PROGRAM, 16, fidel68k_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM
-	AM_RANGE(0x200000, 0x2fffff) AM_RAM // DRAM, max 1MB
+	AM_RANGE(0x200000, 0x2fffff) AM_RAM // DRAM slots
 	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_READWRITE8(eag_input1_r, eag_leds_w, 0x00ff)
 	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_WRITE8(eag_7seg_w, 0xff00) AM_READNOP
 	AM_RANGE(0x400000, 0x400001) AM_WRITE8(eag_mux_w, 0x00ff)
 	AM_RANGE(0x400002, 0x400007) AM_WRITENOP // ?
 	AM_RANGE(0x604000, 0x607fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x700002, 0x700003) AM_READ8(eag_input2_r, 0x00ff)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( eagv7_map, AS_PROGRAM, 32, fidel68k_state )
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+	AM_RANGE(0x200000, 0x2fffff) AM_RAM
+	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_READWRITE8(eag_input1_r, eag_leds_w, 0x00ff00ff)
+	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_WRITE8(eag_7seg_w, 0xff00ff00) AM_READNOP
+	AM_RANGE(0x400000, 0x400003) AM_WRITE8(eag_mux_w, 0x00ff0000)
+	AM_RANGE(0x400004, 0x400007) AM_WRITENOP // ?
+	AM_RANGE(0x604000, 0x607fff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x800000, 0x807fff) AM_RAM
+	AM_RANGE(0x700000, 0x700003) AM_READ8(eag_input2_r, 0x000000ff)
 ADDRESS_MAP_END
 
 
@@ -276,6 +325,14 @@ static MACHINE_CONFIG_START( eag, fidel68k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( eagv7, eag )
+
+	/* basic machine hardware */
+	MCFG_CPU_REPLACE("maincpu", M68020, XTAL_25MHz)
+	MCFG_CPU_PROGRAM_MAP(eagv7_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+MACHINE_CONFIG_END
+
 
 
 /******************************************************************************
@@ -289,9 +346,18 @@ ROM_START( feagv2 )
 ROM_END
 
 
+ROM_START( feagv7 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("eag-v7b", 0x00000, 0x10000, CRC(f2f68b63) SHA1(621e5073e9c5083ac9a9b467f3ef8aa29beac5ac) )
+	ROM_LOAD16_BYTE("eag-v7a", 0x00001, 0x10000, CRC(506b688f) SHA1(0a091c35d0f01166b57f964b111cde51c5720d58) )
+ROM_END
+
+
+
 /******************************************************************************
     Drivers
 ******************************************************************************/
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    INIT              COMPANY, FULLNAME, FLAGS */
 COMP( 1989, feagv2,  0,      0,      eag,     eag,     driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1990, feagv7,  0,      0,      eagv7,   eag,     driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6117-7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
