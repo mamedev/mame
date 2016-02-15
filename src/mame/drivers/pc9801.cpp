@@ -3689,6 +3689,10 @@ ROM_START( pc9821 )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "itf.rom",  0x18000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
 	ROM_LOAD( "bios.rom", 0x28000, 0x18000, BAD_DUMP CRC(34a19a59) SHA1(2e92346727b0355bc1ec9a7ded1b444a4917f2b9) )
+	ROM_FILL(0x34c40, 4, 0) // hide the _32_ marker until we have a 32-bit clean IDE bios otherwise windows tries to
+							// make a 32-bit call into 16-bit code
+	ROM_FILL(0x37ffe, 1, 0x92)
+	ROM_FILL(0x37fff, 1, 0xd7)
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
