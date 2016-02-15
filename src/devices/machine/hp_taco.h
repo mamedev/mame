@@ -22,7 +22,8 @@
 #define MCFG_TACO_STS_HANDLER(_devcb) \
         devcb = &hp_taco_device::set_sts_handler(*device , DEVCB_##_devcb);
 
-class hp_taco_device : public device_t
+class hp_taco_device : public device_t ,
+                       public device_image_interface
 {
 public:
         // construction/destruction
@@ -42,6 +43,19 @@ public:
         DECLARE_READ_LINE_MEMBER(flg_r);
         DECLARE_READ_LINE_MEMBER(sts_r);
 
+        // device_image_interface overrides
+	virtual bool call_load() override;
+	virtual bool call_create(int format_type, option_resolution *format_options) override;
+	virtual void call_unload() override;
+	virtual iodevice_t image_type() const override { return IO_MAGTAPE; }
+	virtual bool is_readable() const override { return true; }
+	virtual bool is_writeable() const override { return true; }
+	virtual bool is_creatable() const override { return true; }
+	virtual bool must_be_loaded() const override { return false; }
+	virtual bool is_reset_on_load() const override { return false; }
+	virtual const char *file_extensions() const override;
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
+
         // Tape position, 1 unit = 1 inch / (968 * 1024)
         typedef INT32 tape_pos_t;
 
@@ -50,6 +64,7 @@ public:
 
 protected:
         // device-level overrides
+	virtual void device_config_complete() override;
         virtual void device_start() override;
         virtual void device_stop() override;
         virtual void device_reset() override;
@@ -90,6 +105,7 @@ private:
 
         // Content of tape tracks
         tape_track_t m_tracks[ 2 ];
+        bool m_image_dirty;
 
         // Reading & writing
         bool m_tape_wr;
@@ -136,10 +152,12 @@ private:
         attotime time_to_rd_next_word(tape_pos_t& word_rd_pos);
         bool next_n_gap(tape_pos_t& pos , tape_track_t::iterator it , unsigned n_gaps , tape_pos_t min_gap);
         bool next_n_gap(tape_pos_t& pos , unsigned n_gaps , tape_pos_t min_gap);
-        static void dump_sequence(FILE *out , tape_track_t::const_iterator it_start , unsigned n_words);
-        void save_tape(FILE *out) const;
-        bool load_track(FILE *in , tape_track_t& track);
-        void load_tape(FILE *in);
+        void clear_tape(void);
+        void dump_sequence(tape_track_t::const_iterator it_start , unsigned n_words);
+        void save_tape(void);
+        bool load_track(tape_track_t& track);
+        bool load_tape(void);
+        void set_tape_present(bool present);
         attotime time_to_next_hole(void) const;
         attotime time_to_tach_pulses(void) const;
         void start_cmd_exec(UINT16 new_cmd_reg);
