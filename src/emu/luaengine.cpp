@@ -14,6 +14,7 @@
 #include "luabridge/Source/LuaBridge/LuaBridge.h"
 #include <signal.h>
 #include "emu.h"
+#include "cheat.h"
 #include "drivenum.h"
 #include "ui/ui.h"
 #include "luaengine.h"
@@ -436,6 +437,51 @@ luabridge::LuaRef lua_engine::l_machine_get_devices(const running_machine *r)
 	devs_table = devtree_dfs(root, devs_table);
 
 	return devs_table;
+}
+
+//-------------------------------------------------
+//  machine_cheat_entries - return cheat entries
+//  -> manager:machine():cheat().entries[0]
+//-------------------------------------------------
+
+luabridge::LuaRef lua_engine::l_cheat_get_entries(const cheat_manager *c)
+{
+	cheat_manager *cm = const_cast<cheat_manager *>(c);
+	lua_State *L = luaThis->m_lua_state;
+	luabridge::LuaRef entry_table = luabridge::LuaRef::newTable(L);
+
+	int cheatnum = 0;
+	for (cheat_entry *entry = cm->first(); entry != nullptr; entry = entry->next()) {
+		entry_table[cheatnum++] = entry;
+	}
+
+	return entry_table;
+}
+
+//-------------------------------------------------
+//  cheat_entry_state - return cheat entry state
+//  -> manager:machine():cheat().entries[0]:state()
+//-------------------------------------------------
+
+int lua_engine::lua_cheat_entry::l_get_state(lua_State *L)
+{
+	cheat_entry *ce = luabridge::Stack<cheat_entry *>::get(L, 1);
+
+	switch (ce->state())
+	{
+		case SCRIPT_STATE_ON:
+			lua_pushliteral(L, "on");
+		case SCRIPT_STATE_RUN:
+			lua_pushliteral(L, "run");
+		case SCRIPT_STATE_CHANGE:
+			lua_pushliteral(L, "change");
+		case SCRIPT_STATE_COUNT:
+			lua_pushliteral(L, "count");
+		default:
+			lua_pushliteral(L, "off");
+	}
+
+	return 1;
 }
 
 //-------------------------------------------------
@@ -1374,6 +1420,7 @@ void lua_engine::initialize()
 				.addFunction ("render", &running_machine::render)
 				.addFunction ("ioport", &running_machine::ioport)
 				.addFunction ("parameters", &running_machine::parameters)
+				.addFunction ("cheat", &running_machine::cheat)
 				.addProperty <luabridge::LuaRef, void> ("devices", &lua_engine::l_machine_get_devices)
 				.addProperty <luabridge::LuaRef, void> ("screens", &lua_engine::l_machine_get_screens)
 				.addProperty <luabridge::LuaRef, void> ("options", &lua_engine::l_machine_get_options)
@@ -1394,6 +1441,37 @@ void lua_engine::initialize()
 				.addFunction ("tag", &device_t::tag)
 				.addProperty <luabridge::LuaRef, void> ("spaces", &lua_engine::l_dev_get_memspaces)
 				.addProperty <luabridge::LuaRef, void> ("state", &lua_engine::l_dev_get_states)
+			.endClass()
+			.beginClass <cheat_manager> ("cheat")
+				.addProperty <bool, bool> ("enabled", &cheat_manager::enabled, &cheat_manager::set_enable)
+				.addFunction ("reload", &cheat_manager::reload)
+				.addFunction ("save_all", &cheat_manager::save_all)
+				.addProperty <luabridge::LuaRef, void> ("entries", &lua_engine::l_cheat_get_entries)
+			.endClass()
+			.beginClass <lua_cheat_entry> ("lua_cheat_entry")
+				.addCFunction ("state", &lua_cheat_entry::l_get_state)
+			.endClass()
+			.deriveClass <cheat_entry, lua_cheat_entry> ("cheat_entry")
+				.addFunction ("description", &cheat_entry::description)
+				.addFunction ("comment", &cheat_entry::comment)
+				.addFunction ("has_run_script", &cheat_entry::has_run_script)
+				.addFunction ("has_on_script", &cheat_entry::has_on_script)
+				.addFunction ("has_off_script", &cheat_entry::has_off_script)
+				.addFunction ("has_change_script", &cheat_entry::has_change_script)
+				.addFunction ("execute_off_script", &cheat_entry::execute_off_script)
+				.addFunction ("execute_on_script", &cheat_entry::execute_on_script)
+				.addFunction ("execute_run_script", &cheat_entry::execute_run_script)
+				.addFunction ("execute_change_script", &cheat_entry::execute_change_script)
+				.addFunction ("is_text_only", &cheat_entry::is_text_only)
+				.addFunction ("is_oneshot", &cheat_entry::is_oneshot)
+				.addFunction ("is_onoff", &cheat_entry::is_onoff)
+				.addFunction ("is_value_parameter", &cheat_entry::is_value_parameter)
+				.addFunction ("is_itemlist_parameter", &cheat_entry::is_itemlist_parameter)
+				.addFunction ("is_oneshot_parameter", &cheat_entry::is_oneshot_parameter)
+				.addFunction ("activate", &cheat_entry::activate)
+				.addFunction ("select_default_state", &cheat_entry::select_default_state)
+				.addFunction ("select_previous_state", &cheat_entry::select_previous_state)
+				.addFunction ("select_next_state", &cheat_entry::select_next_state)
 			.endClass()
 			.beginClass <ioport_manager> ("ioport")
 				.addFunction ("has_configs", &ioport_manager::has_configs)

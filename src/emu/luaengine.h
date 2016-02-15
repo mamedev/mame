@@ -24,6 +24,8 @@
 #undef None
 #endif
 
+class cheat_manager;
+
 struct lua_State;
 namespace luabridge
 {
@@ -147,6 +149,11 @@ private:
 	struct lua_video {
 		int l_begin_recording(lua_State *L);
 		int l_end_recording(lua_State *L);
+	};
+
+	static luabridge::LuaRef l_cheat_get_entries(const cheat_manager *c);
+	struct lua_cheat_entry {
+		int l_get_state(lua_State *L);
 	};
 
 	static luabridge::LuaRef l_ui_get_options(const ui_manager *ui);
