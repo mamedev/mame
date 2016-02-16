@@ -287,7 +287,6 @@ if BASE_TARGETOS=="unix" then
 	else
 		if _OPTIONS["NO_X11"]=="1" then
 			_OPTIONS["USE_QTDEBUG"] = "0"
-			USE_BGFX = 0
 		else
 			libdirs {
 				"/usr/X11/lib",

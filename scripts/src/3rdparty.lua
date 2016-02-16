@@ -730,9 +730,13 @@ end
 		MAME_DIR .. "3rdparty/bgfx/include",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty",
 		MAME_DIR .. "3rdparty/bx/include",
-		MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/dxsdk/include",
 	}
+
+	configuration { "not steamlink"}
+		includedirs {
+			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
+		}
 
 	configuration { "vs*" }
 		includedirs {

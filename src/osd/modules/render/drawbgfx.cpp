@@ -120,6 +120,8 @@ static void* sdlNativeWindowHandle(SDL_Window* _window)
 	return wmi.info.cocoa.window;
 #	elif BX_PLATFORM_WINDOWS
 	return wmi.info.win.window;
+#	elif BX_PLATFORM_STEAMLINK
+	return wmi.info.vivante.window;		
 #	endif // BX_PLATFORM_
 }
 #endif

@@ -1073,7 +1073,10 @@ configuration { "linux-*" }
 configuration { "steamlink" }
 	links {
 		"dl",
-	}
+		"EGL",		
+		"GLESv2",
+ 		"SDL2",
+	}	
 	defines {
 		"EGL_API_FB",
 	}
