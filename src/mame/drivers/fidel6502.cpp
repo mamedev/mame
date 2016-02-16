@@ -309,8 +309,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(csc_pia1_cb1_r);
 
 	// SC12/6086
-	DECLARE_MACHINE_START(sc12);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(scc_cartridge);
+	DECLARE_READ8_MEMBER(sc12_cart_r);
 	DECLARE_WRITE8_MEMBER(sc12_control_w);
 	DECLARE_READ8_MEMBER(sc12_input_r);
 	
@@ -478,12 +478,12 @@ DEVICE_IMAGE_LOAD_MEMBER(fidel6502_state, scc_cartridge)
 	return IMAGE_INIT_PASS;
 }
 
-MACHINE_START_MEMBER(fidel6502_state, sc12)
+READ8_MEMBER(fidel6502_state::sc12_cart_r)
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
-
-	fidelz80base_state::machine_start();
+		return m_cart->read_rom(space, offset);
+	else
+		return 0;
 }
 
 
@@ -617,6 +617,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sc12_map, AS_PROGRAM, 8, fidel6502_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x2000, 0x5fff) AM_READ(sc12_cart_r)
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_WRITE(sc12_control_w)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x1ff8) AM_READ(sc12_input_r)
@@ -858,8 +859,6 @@ static MACHINE_CONFIG_START( sc12, fidel6502_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_sc12)
-
-	MCFG_MACHINE_START_OVERRIDE(fidel6502_state, sc12)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

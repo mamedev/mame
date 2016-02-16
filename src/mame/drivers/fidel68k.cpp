@@ -7,7 +7,6 @@
     TODO:
     - how does dual-CPU work?
     - the EAG manual mentions optional voice(speech)
-    - where does the cartridge slot map to?
     - IRQ level/timing is unknown
 
 ******************************************************************************
@@ -29,14 +28,16 @@ V6-V11 are on model 6117. Older 1986 model 6081 uses a 6502 CPU.
 - MC68HC000P12F 16MHz CPU, 16MHz XTAL
 - MB1422A DRAM Controller, 25MHz XTAL near, 4 DRAM slots(V2: slot 1 and 2 64KB)
 - 2*27C512 64KB EPROM, 2*KM6264AL-10 8KB SRAM, 2*AT28C64X 8KB EEPROM
-- external module slot, no dumps yet
 - OKI M82C51A-2 USART, 4.9152MHz XTAL, assume it's used for factory test/debug
-- other special: Chessboard squares are magnet sensors
+- other special: magnet sensors, external module slot
 
 IRQ source is unknown. Several possibilities:
 - NE555 timer IC
 - MM/SN74HC4060 binary counter IC (near the M82C51A)
 - one of the XTALs, plus divider of course
+
+The module slot pinout is different from SCC series. The data on those appears
+to be compatible with EAG though and will load fine with an adapter.
 
 Memory map: (of what is known)
 -----------
@@ -47,6 +48,7 @@ Memory map: (of what is known)
 300000-30000F W lo d0: NE591: LED data
 300000-30000F R lo d7: 74259: keypad rows 0-7
 400000-400001 W lo d0-d3: 74145/7442: led/keypad mux, buzzer out
+400000-4????? R hi: external module slot
 700002-700003 R lo d7: 74251: keypad row 8
 604000-607FFF: 16KB EEPROM
 
@@ -69,16 +71,16 @@ V11: 68060, 2MB h.RAM, high speed
 - MC68020RC25E CPU, QFP 25MHz XTAL, 2*GAL16V8C
 - 4*AS7C164-20PC 8KB SRAM, 2*KM684000ALG-7L 512KB CMOS SRAM
 - 2*27C512? 64KB EPROM, 2*HM6264LP-15 8KB SRAM, 2*AT28C64B 8KB EEPROM
-- same as 6114: M82C51A, SN74HC4060, module slot?, chessboard
+- same as 6114: M82C51A, SN74HC4060, module slot, chessboard
 
 Memory map:
 -----------
 000000-01FFFF: 128KB ROM
 104000-107FFF: 16KB SRAM (unused?)
 200000-2FFFFF: hashtable SRAM
-300000-30000F: see model 6114
-400000-400007: see model 6114
-700000-700003: see model 6114
+300000-30000x: see model 6114
+400000-40000x: see model 6114
+700000-70000x: see model 6114
 604000-607FFF: 16KB EEPROM
 800000-807FFF: 32KB SRAM
 
@@ -87,6 +89,9 @@ Memory map:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+#include "softlist.h"
 
 #include "includes/fidelz80.h"
 
@@ -98,11 +103,17 @@ class fidel68k_state : public fidelz80base_state
 {
 public:
 	fidel68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: fidelz80base_state(mconfig, type, tag)
+		: fidelz80base_state(mconfig, type, tag),
+		m_cart(*this, "cartslot")
 	{ }
 
-	// EAG(6114)
+	// devices/pointers
+	optional_device<generic_slot_device> m_cart;
+
+	// EAG(6114/6117)
 	void eag_prepare_display();
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(eag_cartridge);
+	DECLARE_READ8_MEMBER(eag_cart_r);
 	DECLARE_READ8_MEMBER(eag_input1_r);
 	DECLARE_WRITE8_MEMBER(eag_leds_w);
 	DECLARE_WRITE8_MEMBER(eag_7seg_w);
@@ -126,6 +137,34 @@ void fidel68k_state::eag_prepare_display()
 	UINT8 seg_data = BITSWAP8(m_7seg_data,0,1,3,2,7,5,6,4);
 	set_display_segmask(0x1ef, 0x7f);
 	display_matrix(16, 9, m_led_data << 8 | seg_data, m_inp_mux);
+}
+
+
+// cartridge
+
+DEVICE_IMAGE_LOAD_MEMBER(fidel68k_state, eag_cartridge)
+{
+	UINT32 size = m_cart->common_get_size("rom");
+
+	// max size is 16KB?
+	if (size > 0x4000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
+		return IMAGE_INIT_FAIL;
+	}
+
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return IMAGE_INIT_PASS;
+}
+
+READ8_MEMBER(fidel68k_state::eag_cart_r)
+{
+	if (m_cart->exists())
+		return m_cart->read_rom(space, offset);
+	else
+		return 0;
 }
 
 
@@ -182,6 +221,7 @@ static ADDRESS_MAP_START( eag_map, AS_PROGRAM, 16, fidel68k_state )
 	AM_RANGE(0x200000, 0x2fffff) AM_RAM // DRAM slots
 	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_READWRITE8(eag_input1_r, eag_leds_w, 0x00ff)
 	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_WRITE8(eag_7seg_w, 0xff00) AM_READNOP
+	AM_RANGE(0x400000, 0x407fff) AM_READ8(eag_cart_r, 0xff00)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE8(eag_mux_w, 0x00ff)
 	AM_RANGE(0x400002, 0x400007) AM_WRITENOP // ?
 	AM_RANGE(0x604000, 0x607fff) AM_RAM AM_SHARE("nvram")
@@ -190,9 +230,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( eagv7_map, AS_PROGRAM, 32, fidel68k_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+	AM_RANGE(0x104000, 0x107fff) AM_RAM
 	AM_RANGE(0x200000, 0x2fffff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_READWRITE8(eag_input1_r, eag_leds_w, 0x00ff00ff)
 	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_WRITE8(eag_7seg_w, 0xff00ff00) AM_READNOP
+	AM_RANGE(0x400000, 0x407fff) AM_READ8(eag_cart_r, 0xff00ff00)
 	AM_RANGE(0x400000, 0x400003) AM_WRITE8(eag_mux_w, 0x00ff0000)
 	AM_RANGE(0x400004, 0x400007) AM_WRITENOP // ?
 	AM_RANGE(0x604000, 0x607fff) AM_RAM AM_SHARE("nvram")
@@ -323,6 +365,13 @@ static MACHINE_CONFIG_START( eag, fidel68k_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* cartridge */
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_eag")
+	MCFG_GENERIC_EXTENSIONS("bin,dat")
+	MCFG_GENERIC_LOAD(fidel68k_state, eag_cartridge)
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_eag")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("fidel_scc_list", "fidel_scc")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( eagv7, eag )
