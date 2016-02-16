@@ -96,7 +96,9 @@ end
 
 
 function sdlconfigcmd()
-	if not _OPTIONS["SDL_INSTALL_ROOT"] then
+	if _OPTIONS["targetos"]=="asmjs" then
+		return "sdl2-config"
+	elseif not _OPTIONS["SDL_INSTALL_ROOT"] then
 		return _OPTIONS['TOOLCHAIN'] .. "pkg-config sdl2"
 	else
 		return path.join(_OPTIONS["SDL_INSTALL_ROOT"],"bin","sdl2") .. "-config"
