@@ -149,6 +149,11 @@ namespace bx
 		return _a - floorf(_a);
 	}
 
+	inline float fmod(float _a, float _b)
+	{
+		return fmodf(_a, _b);
+	}
+
 	inline bool fequal(float _a, float _b, float _epsilon)
 	{
 		// http://realtimecollisiondetection.net/blog/?p=89
@@ -169,7 +174,7 @@ namespace bx
 
 	inline float fwrap(float _a, float _wrap)
 	{
-		const float mod    = fmodf(_a, _wrap);
+		const float mod    = fmod(_a, _wrap);
 		const float result = mod < 0.0f ? _wrap + mod : mod;
 		return result;
 	}
@@ -422,8 +427,8 @@ namespace bx
 	inline void quatRotateAxis(float* __restrict _result, const float* _axis, float _angle)
 	{
 		const float ha = _angle * 0.5f;
-		const float ca = cosf(ha);
-		const float sa = sinf(ha);
+		const float ca = fcos(ha);
+		const float sa = fsin(ha);
 		_result[0] = _axis[0] * sa;
 		_result[1] = _axis[1] * sa;
 		_result[2] = _axis[2] * sa;
@@ -433,8 +438,8 @@ namespace bx
 	inline void quatRotateX(float* _result, float _ax)
 	{
 		const float hx = _ax * 0.5f;
-		const float cx = cosf(hx);
-		const float sx = sinf(hx);
+		const float cx = fcos(hx);
+		const float sx = fsin(hx);
 		_result[0] = sx;
 		_result[1] = 0.0f;
 		_result[2] = 0.0f;
@@ -444,8 +449,8 @@ namespace bx
 	inline void quatRotateY(float* _result, float _ay)
 	{
 		const float hy = _ay * 0.5f;
-		const float cy = cosf(hy);
-		const float sy = sinf(hy);
+		const float cy = fcos(hy);
+		const float sy = fsin(hy);
 		_result[0] = 0.0f;
 		_result[1] = sy;
 		_result[2] = 0.0f;
@@ -455,8 +460,8 @@ namespace bx
 	inline void quatRotateZ(float* _result, float _az)
 	{
 		const float hz = _az * 0.5f;
-		const float cz = cosf(hz);
-		const float sz = sinf(hz);
+		const float cz = fcos(hz);
+		const float sz = fsin(hz);
 		_result[0] = 0.0f;
 		_result[1] = 0.0f;
 		_result[2] = sz;
@@ -736,8 +741,8 @@ namespace bx
 
 	inline void mtxRotateX(float* _result, float _ax)
 	{
-		const float sx = sinf(_ax);
-		const float cx = cosf(_ax);
+		const float sx = fsin(_ax);
+		const float cx = fcos(_ax);
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = 1.0f;
@@ -750,8 +755,8 @@ namespace bx
 
 	inline void mtxRotateY(float* _result, float _ay)
 	{
-		const float sy = sinf(_ay);
-		const float cy = cosf(_ay);
+		const float sy = fsin(_ay);
+		const float cy = fcos(_ay);
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = cy;
@@ -764,8 +769,8 @@ namespace bx
 
 	inline void mtxRotateZ(float* _result, float _az)
 	{
-		const float sz = sinf(_az);
-		const float cz = cosf(_az);
+		const float sz = fsin(_az);
+		const float cz = fcos(_az);
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = cz;
@@ -778,10 +783,10 @@ namespace bx
 
 	inline void mtxRotateXY(float* _result, float _ax, float _ay)
 	{
-		const float sx = sinf(_ax);
-		const float cx = cosf(_ax);
-		const float sy = sinf(_ay);
-		const float cy = cosf(_ay);
+		const float sx = fsin(_ax);
+		const float cx = fcos(_ax);
+		const float sy = fsin(_ay);
+		const float cy = fcos(_ay);
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = cy;
@@ -797,12 +802,12 @@ namespace bx
 
 	inline void mtxRotateXYZ(float* _result, float _ax, float _ay, float _az)
 	{
-		const float sx = sinf(_ax);
-		const float cx = cosf(_ax);
-		const float sy = sinf(_ay);
-		const float cy = cosf(_ay);
-		const float sz = sinf(_az);
-		const float cz = cosf(_az);
+		const float sx = fsin(_ax);
+		const float cx = fcos(_ax);
+		const float sy = fsin(_ay);
+		const float cy = fcos(_ay);
+		const float sz = fsin(_az);
+		const float cz = fcos(_az);
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = cy*cz;
@@ -819,12 +824,12 @@ namespace bx
 
 	inline void mtxRotateZYX(float* _result, float _ax, float _ay, float _az)
 	{
-		const float sx = sinf(_ax);
-		const float cx = cosf(_ax);
-		const float sy = sinf(_ay);
-		const float cy = cosf(_ay);
-		const float sz = sinf(_az);
-		const float cz = cosf(_az);
+		const float sx = fsin(_ax);
+		const float cx = fcos(_ax);
+		const float sy = fsin(_ay);
+		const float cy = fcos(_ay);
+		const float sz = fsin(_az);
+		const float cz = fcos(_az);
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = cy*cz;
@@ -841,12 +846,12 @@ namespace bx
 
 	inline void mtxSRT(float* _result, float _sx, float _sy, float _sz, float _ax, float _ay, float _az, float _tx, float _ty, float _tz)
 	{
-		const float sx = sinf(_ax);
-		const float cx = cosf(_ax);
-		const float sy = sinf(_ay);
-		const float cy = cosf(_ay);
-		const float sz = sinf(_az);
-		const float cz = cosf(_az);
+		const float sx = fsin(_ax);
+		const float cx = fcos(_ax);
+		const float sy = fsin(_ay);
+		const float cy = fcos(_ay);
+		const float sz = fsin(_az);
+		const float cz = fcos(_az);
 
 		const float sxsz = sx*sz;
 		const float cycz = cy*cz;
