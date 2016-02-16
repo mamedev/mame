@@ -156,10 +156,12 @@ program
 41
 ```
 
-manager:machine().options[]
+manager:options()
+manager:machine():options()
+manager:machine():ui():options()
 ```
-> opts = manager:machine().options
-> for k, entry in pairs(opts) do print(string.format("%10s: %s\n%11s %s", k, entry:value(), "", entry:description())) end
+> opts = manager:machine():options()
+> for k, entry in pairs(opts.entries) do print(string.format("%10s: %s\n%11s %s", k, entry:value(), "", entry:description())) end
 diff_directory: diff
             directory to save hard drive image differeVnce files
 joystick_contradictory: false
@@ -169,9 +171,20 @@ joystick_contradictory: false
      oslog: false
             output error.log data to the system debugger
 [...]
-> print(opts["sleep"]:value())
+> print(opts.entries["sleep"]:value())
 true
-> print(opts["sleep"]:value("invalid"))
-Illegal boolean value for sleep: "invalid"; reverting to 0
+> print(opts.entries["sleep"]:value("invalid"))
+Illegal boolean value for sleep: "invalid"; reverting to 1
+true
+> print(opts.entries["sleep"]:value(false))
 false
+```
+
+individual screen snapshots
+```
+> local screen = manager:machine().screens[":screen"]
+> screen:snapshot()
+saved snap/gridlee/0000.png
+> screen:snapshot('%g.png')
+saved snap/gridlee.png
 ```

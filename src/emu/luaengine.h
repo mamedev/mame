@@ -120,7 +120,6 @@ private:
 	static int register_function(lua_State *L, const char *id);
 
 	// "emu.machine" namespace
-	static luabridge::LuaRef l_machine_get_options(const running_machine *r);
 	static luabridge::LuaRef l_machine_get_devices(const running_machine *r);
 	static luabridge::LuaRef l_ioport_get_ports(const ioport_manager *i);
 	static luabridge::LuaRef l_render_get_targets(const render_manager *r);
@@ -156,7 +155,7 @@ private:
 		int l_get_state(lua_State *L);
 	};
 
-	static luabridge::LuaRef l_ui_get_options(const ui_manager *ui);
+	template<typename T> static luabridge::LuaRef l_options_get_entries(const T *o);
 	struct lua_options_entry {
 		int l_entry_value(lua_State *L);
 	};

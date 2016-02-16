@@ -375,31 +375,35 @@ void lua_engine::emu_set_hook(lua_State *L)
 }
 
 //-------------------------------------------------
-//  machine_options - return table of options
-//  -> manager:machine().options[]
+//  options_entry - return table of option entries
+//  -> manager:options().entries
+//  -> manager:machine():options().entries
+//  -> manager:machine():ui():options().entries
 //-------------------------------------------------
 
-luabridge::LuaRef lua_engine::l_machine_get_options(const running_machine *r)
+template <typename T>
+luabridge::LuaRef lua_engine::l_options_get_entries(const T *o)
 {
+	T *options = const_cast<T *>(o);
 	lua_State *L = luaThis->m_lua_state;
-	luabridge::LuaRef options_table = luabridge::LuaRef::newTable(L);
+	luabridge::LuaRef entries_table = luabridge::LuaRef::newTable(L);
 
 	int unadorned_index = 0;
-	for (core_options::entry *curentry = r->options().first(); curentry != nullptr; curentry = curentry->next())
+	for (typename T::entry *curentry = options->first(); curentry != nullptr; curentry = curentry->next())
 	{
 		const char *name = curentry->name();
 		bool is_unadorned = false;
 		// check if it's unadorned
-		if (name && strlen(name) && !strcmp(name, core_options::unadorned(unadorned_index)))
+		if (name && strlen(name) && !strcmp(name, options->unadorned(unadorned_index)))
 		{
 			unadorned_index++;
 			is_unadorned = true;
 		}
 		if (!curentry->is_header() && !curentry->is_command() && !curentry->is_internal() && !is_unadorned)
-			options_table[name] = curentry;
+			entries_table[name] = curentry;
 	}
 
-	return options_table;
+	return entries_table;
 }
 
 //-------------------------------------------------
@@ -469,16 +473,11 @@ int lua_engine::lua_cheat_entry::l_get_state(lua_State *L)
 
 	switch (ce->state())
 	{
-		case SCRIPT_STATE_ON:
-			lua_pushliteral(L, "on");
-		case SCRIPT_STATE_RUN:
-			lua_pushliteral(L, "run");
-		case SCRIPT_STATE_CHANGE:
-			lua_pushliteral(L, "change");
-		case SCRIPT_STATE_COUNT:
-			lua_pushliteral(L, "count");
-		default:
-			lua_pushliteral(L, "off");
+		case SCRIPT_STATE_ON:     lua_pushliteral(L, "on"); break;
+		case SCRIPT_STATE_RUN:    lua_pushliteral(L, "run"); break;
+		case SCRIPT_STATE_CHANGE: lua_pushliteral(L, "change"); break;
+		case SCRIPT_STATE_COUNT:  lua_pushliteral(L, "count"); break;
+		default:                  lua_pushliteral(L, "off"); break;
 	}
 
 	return 1;
@@ -722,35 +721,6 @@ int lua_engine::lua_addr_space::l_mem_write(lua_State *L)
 	return 0;
 }
 
-//-------------------------------------------------
-//  ui_options - return table of options
-//  -> manager:machine():ui().options[]
-//-------------------------------------------------
-
-luabridge::LuaRef lua_engine::l_ui_get_options(const ui_manager *u)
-{
-	ui_manager *ui = const_cast<ui_manager *>(u);
-	lua_State *L = luaThis->m_lua_state;
-	luabridge::LuaRef options_table = luabridge::LuaRef::newTable(L);
-
-	int unadorned_index = 0;
-	for (core_options::entry *curentry = ui->options().first(); curentry != nullptr; curentry = curentry->next())
-	{
-		const char *name = curentry->name();
-		bool is_unadorned = false;
-		// check if it's unadorned
-		if (name && strlen(name) && !strcmp(name, core_options::unadorned(unadorned_index)))
-		{
-			unadorned_index++;
-			is_unadorned = true;
-		}
-		if (!curentry->is_header() && !curentry->is_command() && !curentry->is_internal() && !is_unadorned)
-			options_table[name] = curentry;
-	}
-
-	return options_table;
-}
-
 int lua_engine::lua_options_entry::l_entry_value(lua_State *L)
 {
 	core_options::entry *e = luabridge::Stack<core_options::entry *>::get(L, 1);
@@ -763,13 +733,15 @@ int lua_engine::lua_options_entry::l_entry_value(lua_State *L)
 	if (!lua_isnone(L, 2))
 	{
 		std::string error;
+		// FIXME: not working with ui_options::entry
+		// TODO: optional arg for priority
 		luaThis->machine().options().set_value(e->name(),
 				lua_isboolean(L, 2) ? (lua_toboolean(L, 2) ? "1" : "0") : lua_tostring(L, 2),
 				OPTION_PRIORITY_CMDLINE, error);
 
 		if (!error.empty())
 		{
-			lua_writestringerror("%s", error.c_str());
+			luaL_error(L, "%s", error.c_str());
 		}
 	}
 	
@@ -833,7 +805,7 @@ int lua_engine::lua_video::l_end_recording(lua_State *L)
 	}
 
 	if (!vm->is_recording()) {
-		lua_writestringerror("%s", "Error, no active recording to stop");
+		lua_writestringerror("%s", "No active recording to stop");
 		return 0;
 	}
 
@@ -907,7 +879,7 @@ int lua_engine::lua_screen::l_snapshot(lua_State *L)
 	emu_file file(sc->machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	file_error filerr;
 
-	if (!lua_isnone(L, 5)) {
+	if (!lua_isnone(L, 2)) {
 		const char *filename = lua_tostring(L, 2);
 		std::string snapstr(filename);
 		strreplace(snapstr, "/", PATH_SEPARATOR);
@@ -921,11 +893,12 @@ int lua_engine::lua_screen::l_snapshot(lua_State *L)
 
 	if (filerr != FILERR_NONE)
 	{
-		lua_writestringerror("Error creating snapshot, file_error=%d", filerr);
+		luaL_error(L, "file_error=%d", filerr);
 		return 0;
 	}
 
 	sc->machine().video().save_snapshot(sc, file);
+	lua_writestringerror("saved %s", file.fullpath());
 	file.close();
 	return 1;
 }
@@ -1421,9 +1394,9 @@ void lua_engine::initialize()
 				.addFunction ("ioport", &running_machine::ioport)
 				.addFunction ("parameters", &running_machine::parameters)
 				.addFunction ("cheat", &running_machine::cheat)
+				.addFunction ("options", &running_machine::options)
 				.addProperty <luabridge::LuaRef, void> ("devices", &lua_engine::l_machine_get_devices)
 				.addProperty <luabridge::LuaRef, void> ("screens", &lua_engine::l_machine_get_screens)
-				.addProperty <luabridge::LuaRef, void> ("options", &lua_engine::l_machine_get_options)
 			.endClass ()
 			.beginClass <game_driver> ("game_driver")
 				.addData ("source_file", &game_driver::source_file)
@@ -1512,6 +1485,11 @@ void lua_engine::initialize()
 				.addProperty <double, double> ("crosshair_scale", &ioport_field::crosshair_scale, &ioport_field::set_crosshair_scale)
 				.addProperty <double, double> ("crosshair_offset", &ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset)
 			.endClass()
+			.beginClass <core_options> ("core_options")
+				.addFunction ("help", &core_options::output_help)
+				.addFunction ("command", &core_options::command)
+				.addProperty <luabridge::LuaRef, void> ("entries", &lua_engine::l_options_get_entries)
+			.endClass()
 			.beginClass <lua_options_entry> ("lua_options_entry")
 				.addCFunction ("value", &lua_options_entry::l_entry_value)
 			.endClass()
@@ -1521,6 +1499,10 @@ void lua_engine::initialize()
 				.addFunction ("minimum", &core_options::entry::minimum)
 				.addFunction ("maximum", &core_options::entry::maximum)
 				.addFunction ("has_range", &core_options::entry::has_range)
+			.endClass()
+			.deriveClass <emu_options, core_options> ("emu_options")
+			.endClass()
+			.deriveClass <ui_options, core_options> ("ui_options")
 			.endClass()
 			.beginClass <parameters_manager> ("parameters")
 				.addFunction ("add", &parameters_manager::add)
@@ -1594,10 +1576,10 @@ void lua_engine::initialize()
 			.endClass()
 			.beginClass <ui_manager> ("ui")
 				.addFunction ("is_menu_active", &ui_manager::is_menu_active)
+				.addFunction ("options", &ui_manager::options)
 				.addProperty <bool, bool> ("show_fps", &ui_manager::show_fps, &ui_manager::set_show_fps)
 				.addProperty <bool, bool> ("show_profiler", &ui_manager::show_profiler, &ui_manager::set_show_profiler)
 				.addProperty <bool, bool> ("single_step", &ui_manager::single_step, &ui_manager::set_single_step)
-				.addProperty <luabridge::LuaRef, void> ("options", &lua_engine::l_ui_get_options)
 			.endClass()
 			.beginClass <lua_screen> ("lua_screen_dev")
 				.addCFunction ("draw_box",  &lua_screen::l_draw_box)
