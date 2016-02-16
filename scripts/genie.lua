@@ -276,15 +276,6 @@ newoption {
 }
 
 newoption {
-	trigger = "USE_BGFX",
-	description = "Use of BGFX.",
-	allowed = {
-		{ "0",   "Disabled" 	},
-		{ "1",   "Enabled"      },
-	}
-}
-
-newoption {
 	trigger = "DEPRECATED",
 	description = "Generate deprecation warnings during compilation.",
 	allowed = {
@@ -425,11 +416,6 @@ end
 
 if _OPTIONS["NOASM"]=="1" and not _OPTIONS["FORCE_DRC_C_BACKEND"] then
 	_OPTIONS["FORCE_DRC_C_BACKEND"] = "1"
-end
-
-USE_BGFX = 1
-if(_OPTIONS["USE_BGFX"]~=nil) then
-	USE_BGFX = tonumber(_OPTIONS["USE_BGFX"])
 end
 
 if(_OPTIONS["TOOLCHAIN"] == nil) then

@@ -705,7 +705,6 @@ end
 -- BGFX library objects
 --------------------------------------------------
 
-if (USE_BGFX == 1) then
 project "bgfx"
 	uuid "d3e7e119-35cf-4f4f-aba0-d3bdcd1b879a"
 	kind "StaticLib"
@@ -833,7 +832,6 @@ end
 			MAME_DIR .. "3rdparty/bgfx/src/renderer_mtl.mm",
 		}
 	end
-end
 
 --------------------------------------------------
 -- PortAudio library objects

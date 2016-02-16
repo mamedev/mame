@@ -91,19 +91,14 @@ function osdmodulesbuild()
 		}
 	end
 
-	if USE_BGFX == 1 then
-		files {
-			MAME_DIR .. "src/osd/modules/render/drawbgfx.cpp",
-			MAME_DIR .. "src/osd/modules/render/binpacker.cpp",
-		}
-		defines {
-			"USE_BGFX"
-		}
-		includedirs {
-			MAME_DIR .. "3rdparty/bgfx/include",
-			MAME_DIR .. "3rdparty/bx/include",
-		}
-	end
+	files {
+		MAME_DIR .. "src/osd/modules/render/drawbgfx.cpp",
+		MAME_DIR .. "src/osd/modules/render/binpacker.cpp",
+	}
+	includedirs {
+		MAME_DIR .. "3rdparty/bgfx/include",
+		MAME_DIR .. "3rdparty/bx/include",
+	}
 
 	if _OPTIONS["NO_USE_MIDI"]=="1" then
 		defines {
@@ -346,11 +341,7 @@ newoption {
 }
 
 if not _OPTIONS["USE_DISPATCH_GL"] then
-	if USE_BGFX == 1 then
-		_OPTIONS["USE_DISPATCH_GL"] = "0"
-	else
-		_OPTIONS["USE_DISPATCH_GL"] = "1"
-	end
+	_OPTIONS["USE_DISPATCH_GL"] = "0"
 end
 
 newoption {

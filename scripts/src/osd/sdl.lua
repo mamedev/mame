@@ -87,11 +87,9 @@ function maintargetosdoptions(_target,_subtarget)
 
 	configuration { "mingw*" or "vs*" }
 		targetprefix "sdl"
-		if USE_BGFX == 1 then
-			links {
-				"psapi"
-			}
-		end
+		links {
+			"psapi"
+		}
 
 	configuration { }
 end

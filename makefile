@@ -23,8 +23,6 @@
 # BENCHMARKS = 1
 # OSD = sdl
 
-# USE_BGFX = 1
-# NO_OPENGL = 1
 # USE_DISPATCH_GL = 0
 # MODERN_WIN_API = 0
 # USE_XAUDIO2 = 0
@@ -68,7 +66,6 @@
 # MESA_INSTALL_ROOT = /opt/mesa
 # SDL_INSTALL_ROOT = /opt/sdl2
 # SDL_FRAMEWORK_PATH = $(HOME)/Library/Frameworks
-# SDL_LIBVER = sdl
 # USE_LIBSDL = 1
 # CYGWIN_BUILD = 1
 
@@ -561,10 +558,6 @@ endif
 
 ifdef DONT_USE_NETWORK
 PARAMS += --DONT_USE_NETWORK='$(DONT_USE_NETWORK)'
-endif
-
-ifdef NO_OPENGL
-PARAMS += --NO_OPENGL='$(NO_OPENGL)'
 endif
 
 ifdef USE_DISPATCH_GL
@@ -1200,7 +1193,7 @@ endif
 ifndef MARVELL_ROOTFS
 	$(error MARVELL_ROOTFS is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=steamlink --gcc_version=$(GCC_VERSION) --NO_OPENGL=1 --NO_USE_MIDI=1 --NO_X11=1 --NOASM=1 --SDL_INSTALL_ROOT=$(MARVELL_ROOTFS)/usr  gmake  
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=steamlink --gcc_version=$(GCC_VERSION) --NO_USE_MIDI=1 --NO_X11=1 --NOASM=1 --SDL_INSTALL_ROOT=$(MARVELL_ROOTFS)/usr  gmake  
 
 .PHONY: steamlink
 ifndef MARVELL_SDK_PATH
