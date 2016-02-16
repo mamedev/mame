@@ -223,13 +223,11 @@ bool sdl_osd_interface::window_init()
 	}
 
 	// initialize the drawers
-#if USE_OPENGL
 	if (video_config.mode == VIDEO_MODE_OPENGL)
 	{
 		if (drawogl_init(machine(), &draw))
 			video_config.mode = VIDEO_MODE_SOFT;
 	}
-#endif
 	if (video_config.mode == VIDEO_MODE_SDL2ACCEL)
 	{
 		if (drawsdl2_init(machine(), &draw))

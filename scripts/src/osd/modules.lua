@@ -77,28 +77,18 @@ function osdmodulesbuild()
 		}
 	end
 
-	if _OPTIONS["NO_OPENGL"]=="1" then
+	files {
+		MAME_DIR .. "src/osd/modules/render/drawogl.cpp",
+		MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.cpp",
+		MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.cpp",
+		MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.h",
+		MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.h",
+		MAME_DIR .. "src/osd/modules/opengl/osd_opengl.h",
+	}
+	if _OPTIONS["USE_DISPATCH_GL"]=="1" then
 		defines {
-			"USE_OPENGL=0",
+			"USE_DISPATCH_GL=1",
 		}
-	else
-		files {
-			MAME_DIR .. "src/osd/modules/render/drawogl.cpp",
-			MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.cpp",
-			MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.cpp",
-			MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.h",
-			MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.h",
-			MAME_DIR .. "src/osd/modules/opengl/osd_opengl.h",
-			MAME_DIR .. "src/osd/modules/opengl/SDL1211_opengl.h",
-		}
-		defines {
-			"USE_OPENGL=1",
-		}
-		if _OPTIONS["USE_DISPATCH_GL"]=="1" then
-			defines {
-				"USE_DISPATCH_GL=1",
-			}
-		end
 	end
 
 	if USE_BGFX == 1 then
@@ -257,21 +247,19 @@ end
 
 function osdmodulestargetconf()
 
-	if _OPTIONS["NO_OPENGL"]~="1" then
-		if _OPTIONS["targetos"]=="macosx" then
+	if _OPTIONS["targetos"]=="macosx" then
+		links {
+			"OpenGL.framework",
+		}
+	elseif _OPTIONS["USE_DISPATCH_GL"]~="1" then
+		if _OPTIONS["targetos"]=="windows" then
 			links {
-				"OpenGL.framework",
+				"opengl32",
 			}
-		elseif _OPTIONS["USE_DISPATCH_GL"]~="1" then
-			if _OPTIONS["targetos"]=="windows" then
-				links {
-					"opengl32",
-				}
-			else
-				links {
-					"GL",
-				}
-			end
+		else
+			links {
+				"GL",
+			}
 		end
 	end
 
@@ -347,23 +335,6 @@ newoption {
 	trigger = "DONT_USE_NETWORK",
 	description = "Disable network access",
 }
-
-newoption {
-	trigger = "NO_OPENGL",
-	description = "Disable use of OpenGL",
-	allowed = {
-		{ "0",  "Enable OpenGL"  },
-		{ "1",  "Disable OpenGL" },
-	},
-}
-
-if not _OPTIONS["NO_OPENGL"] then
-	if _OPTIONS["targetos"]=="os2" then
-		_OPTIONS["NO_OPENGL"] = "1"
-	else
-		_OPTIONS["NO_OPENGL"] = "0"
-	end
-end
 
 newoption {
 	trigger = "USE_DISPATCH_GL",

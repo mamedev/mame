@@ -12,7 +12,7 @@ if SDL_NETWORK~="" and not _OPTIONS["DONT_USE_NETWORK"] then
 	}
 end
 
-if _OPTIONS["NO_OPENGL"]~="1" and _OPTIONS["USE_DISPATCH_GL"]~="1" and _OPTIONS["MESA_INSTALL_ROOT"] then
+if _OPTIONS["USE_DISPATCH_GL"]~="1" and _OPTIONS["MESA_INSTALL_ROOT"] then
 	includedirs {
 		path.join(_OPTIONS["MESA_INSTALL_ROOT"],"include"),
 	}

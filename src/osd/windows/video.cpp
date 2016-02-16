@@ -387,10 +387,8 @@ void windows_osd_interface::extract_video_config()
 		if (options().seconds_to_run() == 0)
 			osd_printf_warning("Warning: -video none doesn't make much sense without -seconds_to_run\n");
 	}
-#if (USE_OPENGL)
 	else if (strcmp(stemp, "opengl") == 0)
 		video_config.mode = VIDEO_MODE_OPENGL;
-#endif
 	else
 	{
 		osd_printf_warning("Invalid video value %s; reverting to gdi\n", stemp);
@@ -409,64 +407,62 @@ void windows_osd_interface::extract_video_config()
 		osd_printf_warning("Invalid prescale option, reverting to '1'\n");
 		video_config.prescale = 1;
 	}
-	#if (USE_OPENGL)
-		// default to working video please
-		video_config.forcepow2texture = options().gl_force_pow2_texture();
-		video_config.allowtexturerect = !(options().gl_no_texture_rect());
-		video_config.vbo         = options().gl_vbo();
-		video_config.pbo         = options().gl_pbo();
-		video_config.glsl        = options().gl_glsl();
-		if ( video_config.glsl )
+	// default to working video please
+	video_config.forcepow2texture = options().gl_force_pow2_texture();
+	video_config.allowtexturerect = !(options().gl_no_texture_rect());
+	video_config.vbo         = options().gl_vbo();
+	video_config.pbo         = options().gl_pbo();
+	video_config.glsl        = options().gl_glsl();
+	if ( video_config.glsl )
+	{
+		int i;
+
+		video_config.glsl_filter = options().glsl_filter();
+
+		video_config.glsl_shader_mamebm_num=0;
+
+		for(i=0; i<GLSL_SHADER_MAX; i++)
 		{
-			int i;
-
-			video_config.glsl_filter = options().glsl_filter();
-
-			video_config.glsl_shader_mamebm_num=0;
-
-			for(i=0; i<GLSL_SHADER_MAX; i++)
+			stemp = options().shader_mame(i);
+			if (stemp && strcmp(stemp, OSDOPTVAL_NONE) != 0 && strlen(stemp)>0)
 			{
-				stemp = options().shader_mame(i);
-				if (stemp && strcmp(stemp, OSDOPTVAL_NONE) != 0 && strlen(stemp)>0)
-				{
-					video_config.glsl_shader_mamebm[i] = (char *) malloc(strlen(stemp)+1);
-					strcpy(video_config.glsl_shader_mamebm[i], stemp);
-					video_config.glsl_shader_mamebm_num++;
-				} else {
-					video_config.glsl_shader_mamebm[i] = NULL;
-				}
-			}
-
-			video_config.glsl_shader_scrn_num=0;
-
-			for(i=0; i<GLSL_SHADER_MAX; i++)
-			{
-				stemp = options().shader_screen(i);
-				if (stemp && strcmp(stemp, OSDOPTVAL_NONE) != 0 && strlen(stemp)>0)
-				{
-					video_config.glsl_shader_scrn[i] = (char *) malloc(strlen(stemp)+1);
-					strcpy(video_config.glsl_shader_scrn[i], stemp);
-					video_config.glsl_shader_scrn_num++;
-				} else {
-					video_config.glsl_shader_scrn[i] = NULL;
-				}
-			}
-		} else {
-			int i;
-			video_config.glsl_filter = 0;
-			video_config.glsl_shader_mamebm_num=0;
-			for(i=0; i<GLSL_SHADER_MAX; i++)
-			{
+				video_config.glsl_shader_mamebm[i] = (char *) malloc(strlen(stemp)+1);
+				strcpy(video_config.glsl_shader_mamebm[i], stemp);
+				video_config.glsl_shader_mamebm_num++;
+			} else {
 				video_config.glsl_shader_mamebm[i] = NULL;
-			}
-			video_config.glsl_shader_scrn_num=0;
-			for(i=0; i<GLSL_SHADER_MAX; i++)
-			{
-				video_config.glsl_shader_scrn[i] = NULL;
 			}
 		}
 
-	#endif /* USE_OPENGL */
+		video_config.glsl_shader_scrn_num=0;
+
+		for(i=0; i<GLSL_SHADER_MAX; i++)
+		{
+			stemp = options().shader_screen(i);
+			if (stemp && strcmp(stemp, OSDOPTVAL_NONE) != 0 && strlen(stemp)>0)
+			{
+				video_config.glsl_shader_scrn[i] = (char *) malloc(strlen(stemp)+1);
+				strcpy(video_config.glsl_shader_scrn[i], stemp);
+				video_config.glsl_shader_scrn_num++;
+			} else {
+				video_config.glsl_shader_scrn[i] = NULL;
+			}
+		}
+	} else {
+		int i;
+		video_config.glsl_filter = 0;
+		video_config.glsl_shader_mamebm_num=0;
+		for(i=0; i<GLSL_SHADER_MAX; i++)
+		{
+			video_config.glsl_shader_mamebm[i] = NULL;
+		}
+		video_config.glsl_shader_scrn_num=0;
+		for(i=0; i<GLSL_SHADER_MAX; i++)
+		{
+			video_config.glsl_shader_scrn[i] = NULL;
+		}
+	}
+
 
 }
 

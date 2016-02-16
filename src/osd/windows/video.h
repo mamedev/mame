@@ -25,9 +25,7 @@ enum {
 #if defined (USE_BGFX)
 	VIDEO_MODE_BGFX,
 #endif
-#if (USE_OPENGL)
 	VIDEO_MODE_OPENGL,
-#endif
 	VIDEO_MODE_D3D
 };
 

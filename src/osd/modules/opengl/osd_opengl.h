@@ -12,15 +12,17 @@
 	#ifndef _OSD_OPENGL_H
 	#define _OSD_OPENGL_H
 
-	#if USE_OPENGL
-
 	/* equivalent to #include <GL/gl.h>
 	 * #include <GL/glext.h>
 	 */
 	#ifdef OSD_WINDOWS
 		#ifdef _MSC_VER
 			#include <windows.h>
-			#include "SDL1211_opengl.h"
+			#include "GL/GL.h"
+			#include "bgfx/3rdparty/khronos/gl/glext.h "
+			#ifndef USE_DISPATCH_GL
+			#include "bgfx/3rdparty/khronos/wgl/wglext.h"
+			#endif
 		#else
 			#include "GL/gl.h"
 			#include "GL/glext.h"
@@ -106,8 +108,6 @@
 	#include "osd_opengl.h"
 
 	#endif /* USE_DISPATCH_GL */
-
-	#endif /* USE_OPENGL */
 
 	#endif /* _OSD_OPENGL_H */
 

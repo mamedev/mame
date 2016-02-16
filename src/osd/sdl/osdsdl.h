@@ -122,9 +122,7 @@ public:
 	const char *video_driver() const { return value(SDLOPTION_VIDEODRIVER); }
 	const char *render_driver() const { return value(SDLOPTION_RENDERDRIVER); }
 	const char *audio_driver() const { return value(SDLOPTION_AUDIODRIVER); }
-#if USE_OPENGL
 	const char *gl_lib() const { return value(SDLOPTION_GL_LIB); }
-#endif
 
 private:
 	static const options_entry s_option_entries[];
