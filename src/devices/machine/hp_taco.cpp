@@ -28,8 +28,6 @@
 //  1     R   Cartridge out (1)
 //  0     R   Hole detected (1)
 
-// TODO: R6 è modificato durante il conteggio impulsi? Viene azzerato alla lettura?
-
 #include "emu.h"
 #include "hp_taco.h"
 
@@ -171,15 +169,10 @@ hp_taco_device::hp_taco_device(const machine_config &mconfig, device_type type, 
           m_irq_handler(*this),
           m_flg_handler(*this),
           m_sts_handler(*this),
-          m_data_reg(0),
-          m_data_reg_full(false),
-          m_cmd_reg(0),
-          m_status_reg(0),
-          m_tach_reg(0),
-          m_checksum_reg(0),
-          m_timing_reg(0),
-          m_tape_pos(TAPE_INIT_POS)
+          m_tape_pos(TAPE_INIT_POS),
+          m_image_dirty(false)
 {
+        clear_state();
 }
 
 hp_taco_device::hp_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -188,15 +181,10 @@ hp_taco_device::hp_taco_device(const machine_config &mconfig, const char *tag, d
           m_irq_handler(*this),
           m_flg_handler(*this),
           m_sts_handler(*this),
-          m_data_reg(0),
-          m_data_reg_full(false),
-          m_cmd_reg(0),
-          m_status_reg(0),
-          m_tach_reg(0),
-          m_checksum_reg(0),
-          m_timing_reg(0),
-          m_tape_pos(TAPE_INIT_POS)
+          m_tape_pos(TAPE_INIT_POS),
+          m_image_dirty(false)
 {
+        clear_state();
 }
 
 WRITE16_MEMBER(hp_taco_device::reg_w)
@@ -325,24 +313,7 @@ void hp_taco_device::device_stop()
 void hp_taco_device::device_reset()
 {
         LOG(("device_reset"));
-        m_data_reg = 0;
-        m_data_reg_full = false;
-        m_cmd_reg = 0;
-        m_status_reg = 0;
-        m_tach_reg = 0;
-        m_checksum_reg = 0;
-        m_timing_reg = 0;
-        m_cmd_state = 0;
-        // m_tape_pos is not reset, tape stays where it is
-        m_start_time = attotime::never;
-        m_tape_fwd = false;
-        m_tape_fast = false;
-        m_image_dirty = false;
-        m_tape_wr = false;
-        m_rw_pos = 0;
-        m_next_word = 0;
-        m_rd_it_valid = false;
-        m_gap_detect_start = NULL_TAPE_POS;
+        clear_state();
 
         m_irq = false;
         m_flg = true;
@@ -552,6 +523,31 @@ void hp_taco_device::device_timer(emu_timer &timer, device_timer_id id, int para
         }
 }
 
+void hp_taco_device::clear_state(void)
+{
+        m_data_reg = 0;
+        m_data_reg_full = false;
+        m_cmd_reg = 0;
+        m_status_reg = 0;
+        m_tach_reg = 0;
+        m_checksum_reg = 0;
+        m_timing_reg = 0;
+        m_cmd_state = 0;
+        // m_tape_pos is not reset, tape stays where it is
+        m_start_time = attotime::never;
+        m_tape_fwd = false;
+        m_tape_fast = false;
+        // m_image_dirty is not touched
+        m_tape_wr = false;
+        m_rw_pos = 0;
+        m_next_word = 0;
+        m_rd_it_valid = false;
+        m_gap_detect_start = NULL_TAPE_POS;
+
+        set_tape_present(false);
+        set_tape_present(is_loaded());
+}
+
 void hp_taco_device::irq_w(bool state)
 {
         if (state != m_irq) {
@@ -686,27 +682,6 @@ hp_taco_device::tape_pos_t hp_taco_device::next_hole(void) const
                 }
                 // No more holes: will hit start of tape
                 return 0;
-        }
-}
-
-hp_taco_device::tape_pos_t hp_taco_device::met_first(tape_pos_t a , tape_pos_t b , bool fwd , bool& is_a)
-{
-        if (fwd) {
-                if (a < b) {
-                        is_a = true;
-                        return a;
-                } else {
-                        is_a = false;
-                        return b;
-                }
-        } else {
-                if (a >= b) {
-                        is_a = true;
-                        return a;
-                } else {
-                        is_a = false;
-                        return b;
-                }
         }
 }
 
@@ -1094,7 +1069,6 @@ bool hp_taco_device::load_track(tape_track_t& track)
                                 return false;
                         }
 
-                        // TODO: usare end() come hint
                         track.insert(std::make_pair(pos , tmp16));
                         pos += word_length(tmp16);
                 }
@@ -1125,9 +1099,7 @@ bool hp_taco_device::load_tape(void)
 void hp_taco_device::set_tape_present(bool present)
 {
         if (present) {
-                // FU_TEST
                 if (is_readonly()) {
-                        //if (false) {
                         BIT_SET(m_status_reg, STATUS_WPR_BIT);
                 } else {
                         BIT_CLR(m_status_reg, STATUS_WPR_BIT);
@@ -1191,8 +1163,6 @@ void hp_taco_device::start_cmd_exec(UINT16 new_cmd_reg)
                 BIT_CLR(m_status_reg, STATUS_HOLE_BIT);
                 BIT_CLR(m_status_reg, STATUS_CART_OUT_BIT);
                 BIT_CLR(m_status_reg, STATUS_WPR_BIT);
-                //set_tape_present(false);
-                // FU_TEST
                 set_tape_present(is_loaded());
                 // This is a special command: it doesn't raise IRQ at completion and it
                 // doesn't replace current command
@@ -1362,8 +1332,11 @@ void hp_taco_device::start_cmd_exec(UINT16 new_cmd_reg)
 
 bool hp_taco_device::call_load()
 {
-        LOG(("call_load\n"));
-        if (!load_tape()) {
+        LOG(("call_load %d\n" , has_been_created()));
+        if (has_been_created()) {
+                clear_tape();
+                save_tape();
+        } else if (!load_tape()) {
                 seterror(IMAGE_ERROR_INVALIDIMAGE , "Wrong format");
                 set_tape_present(false);
                 return IMAGE_INIT_FAIL;
@@ -1377,8 +1350,8 @@ bool hp_taco_device::call_load()
 
 bool hp_taco_device::call_create(int format_type, option_resolution *format_options)
 {
-        LOG(("call_create\n"));
-        return IMAGE_INIT_PASS;
+        LOG(("call_create %d\n" , has_been_created()));
+        return call_load();
 }
 
 void hp_taco_device::call_unload()

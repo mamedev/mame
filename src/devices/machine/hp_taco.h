@@ -123,6 +123,7 @@ private:
                 ADV_DISCONT_DATA
         } adv_res_t;
 
+        void clear_state(void);
         void irq_w(bool state);
         void set_error(bool state);
         unsigned speed_to_tick_freq(void) const;
@@ -132,7 +133,6 @@ private:
         static void ensure_a_lt_b(tape_pos_t& a , tape_pos_t& b);
         static bool any_hole(tape_pos_t tape_pos_a , tape_pos_t tape_pos_b);
         tape_pos_t next_hole(void) const;
-        static tape_pos_t met_first(tape_pos_t a , tape_pos_t b , bool fwd , bool& is_a);
         attotime time_to_distance(tape_pos_t distance) const;
         attotime time_to_target(tape_pos_t target) const;
         bool start_tape_cmd(UINT16 cmd_reg , UINT16 must_be_1 , UINT16 must_be_0);
