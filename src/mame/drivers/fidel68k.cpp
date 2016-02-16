@@ -6,7 +6,6 @@
     
     TODO:
     - how does dual-CPU work?
-    - the EAG manual mentions optional voice(speech)
     - IRQ level/timing is unknown
 
 ******************************************************************************
@@ -29,7 +28,7 @@ V6-V11 are on model 6117. Older 1986 model 6081 uses a 6502 CPU.
 - MB1422A DRAM Controller, 25MHz XTAL near, 4 DRAM slots(V2: slot 1 and 2 64KB)
 - 2*27C512 64KB EPROM, 2*KM6264AL-10 8KB SRAM, 2*AT28C64X 8KB EEPROM
 - OKI M82C51A-2 USART, 4.9152MHz XTAL, assume it's used for factory test/debug
-- other special: magnet sensors, external module slot
+- other special: magnet sensors, external module slot, printer port
 
 IRQ source is unknown. Several possibilities:
 - NE555 timer IC
@@ -71,7 +70,7 @@ V11: 68060, 2MB h.RAM, high speed
 - MC68020RC25E CPU, QFP 25MHz XTAL, 2*GAL16V8C
 - 4*AS7C164-20PC 8KB SRAM, 2*KM684000ALG-7L 512KB CMOS SRAM
 - 2*27C512? 64KB EPROM, 2*HM6264LP-15 8KB SRAM, 2*AT28C64B 8KB EEPROM
-- same as 6114: M82C51A, SN74HC4060, module slot, chessboard
+- same as 6114: M82C51A, SN74HC4060, module slot, chessboard, ..
 
 Memory map:
 -----------
@@ -89,9 +88,6 @@ Memory map:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
-#include "softlist.h"
 
 #include "includes/fidelz80.h"
 
@@ -103,22 +99,19 @@ class fidel68k_state : public fidelz80base_state
 {
 public:
 	fidel68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: fidelz80base_state(mconfig, type, tag),
-		m_cart(*this, "cartslot")
+		: fidelz80base_state(mconfig, type, tag)
 	{ }
 
 	// devices/pointers
-	optional_device<generic_slot_device> m_cart;
 
 	// EAG(6114/6117)
 	void eag_prepare_display();
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(eag_cartridge);
-	DECLARE_READ8_MEMBER(eag_cart_r);
 	DECLARE_READ8_MEMBER(eag_input1_r);
 	DECLARE_WRITE8_MEMBER(eag_leds_w);
 	DECLARE_WRITE8_MEMBER(eag_7seg_w);
 	DECLARE_WRITE8_MEMBER(eag_mux_w);
 	DECLARE_READ8_MEMBER(eag_input2_r);
+	DECLARE_READ8_MEMBER(eag_cart_r);
 };
 
 
@@ -140,40 +133,7 @@ void fidel68k_state::eag_prepare_display()
 }
 
 
-// cartridge
-
-DEVICE_IMAGE_LOAD_MEMBER(fidel68k_state, eag_cartridge)
-{
-	UINT32 size = m_cart->common_get_size("rom");
-
-	// max size is 16KB?
-	if (size > 0x4000)
-	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
-		return IMAGE_INIT_FAIL;
-	}
-
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	return IMAGE_INIT_PASS;
-}
-
-READ8_MEMBER(fidel68k_state::eag_cart_r)
-{
-	if (m_cart->exists())
-	{
-		static int yay=0;
-		if (!yay) { printf("Yay!\n"); yay=1; }
-		
-		return m_cart->read_rom(space, offset);
-	}
-	else
-		return 0;
-}
-
-
-// TTL
+// TTL/generic
 
 READ8_MEMBER(fidel68k_state::eag_input1_r)
 {
@@ -210,6 +170,14 @@ WRITE8_MEMBER(fidel68k_state::eag_mux_w)
 	m_speaker->level_w(sel >> 9 & 1);
 	m_inp_mux = sel & 0x1ff;
 	eag_prepare_display();
+}
+
+READ8_MEMBER(fidel68k_state::eag_cart_r)
+{
+	if (m_cart->exists())
+		return m_cart->read_rom(space, offset);
+	else
+		return 0;
 }
 
 
@@ -372,11 +340,10 @@ static MACHINE_CONFIG_START( eag, fidel68k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_eag")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
 	MCFG_GENERIC_EXTENSIONS("bin,dat")
-	MCFG_GENERIC_LOAD(fidel68k_state, eag_cartridge)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_eag")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("fidel_scc_list", "fidel_scc")
+	MCFG_GENERIC_LOAD(fidelz80base_state, scc_cartridge)
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( eagv7, eag )

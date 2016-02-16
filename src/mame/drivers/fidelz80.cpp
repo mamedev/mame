@@ -728,6 +728,26 @@ INPUT_CHANGED_MEMBER(fidelz80_state::reset_button)
 }
 
 
+// cartridge
+
+DEVICE_IMAGE_LOAD_MEMBER(fidelz80base_state, scc_cartridge)
+{
+	UINT32 size = m_cart->common_get_size("rom");
+
+	// max size is 16KB?
+	if (size > 0x4000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
+		return IMAGE_INIT_FAIL;
+	}
+
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return IMAGE_INIT_PASS;
+}
+
+
 
 // Devices, I/O
 

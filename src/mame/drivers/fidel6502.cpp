@@ -265,9 +265,6 @@ Z80 D6 to W: (model 6092, tied to VCC otherwise)
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
 #include "machine/6821pia.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
-#include "softlist.h"
 
 #include "includes/fidelz80.h"
 
@@ -309,10 +306,9 @@ public:
 	DECLARE_READ_LINE_MEMBER(csc_pia1_cb1_r);
 
 	// SC12/6086
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(scc_cartridge);
-	DECLARE_READ8_MEMBER(sc12_cart_r);
 	DECLARE_WRITE8_MEMBER(sc12_control_w);
 	DECLARE_READ8_MEMBER(sc12_input_r);
+	DECLARE_READ8_MEMBER(sc12_cart_r);
 	
 	// 6080/6092/6093 (Excellence)
 	DECLARE_INPUT_CHANGED_MEMBER(fexcelv_bankswitch);
@@ -459,35 +455,9 @@ WRITE_LINE_MEMBER(fidel6502_state::csc_pia1_ca2_w)
     SC12/6086
 ******************************************************************************/
 
-// cartridge
-
-DEVICE_IMAGE_LOAD_MEMBER(fidel6502_state, scc_cartridge)
-{
-	UINT32 size = m_cart->common_get_size("rom");
-
-	// max size is 16KB
-	if (size > 0x4000)
-	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
-		return IMAGE_INIT_FAIL;
-	}
-
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	return IMAGE_INIT_PASS;
-}
-
-READ8_MEMBER(fidel6502_state::sc12_cart_r)
-{
-	if (m_cart->exists())
-		return m_cart->read_rom(space, offset);
-	else
-		return 0;
-}
 
 
-// TTL
+// TTL/generic
 
 WRITE8_MEMBER(fidel6502_state::sc12_control_w)
 {
@@ -510,6 +480,14 @@ READ8_MEMBER(fidel6502_state::sc12_input_r)
 {
 	// a0-a2,d7: multiplexed inputs (active low)
 	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
+}
+
+READ8_MEMBER(fidel6502_state::sc12_cart_r)
+{
+	if (m_cart->exists())
+		return m_cart->read_rom(space, offset);
+	else
+		return 0;
 }
 
 
@@ -868,7 +846,7 @@ static MACHINE_CONFIG_START( sc12, fidel6502_state )
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
 	MCFG_GENERIC_EXTENSIONS("bin,dat")
-	MCFG_GENERIC_LOAD(fidel6502_state, scc_cartridge)
+	MCFG_GENERIC_LOAD(fidelz80base_state, scc_cartridge)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
