@@ -162,7 +162,12 @@ DEVICE_IMAGE_LOAD_MEMBER(fidel68k_state, eag_cartridge)
 READ8_MEMBER(fidel68k_state::eag_cart_r)
 {
 	if (m_cart->exists())
+	{
+		static int yay=0;
+		if (!yay) { printf("Yay!\n"); yay=1; }
+		
 		return m_cart->read_rom(space, offset);
+	}
 	else
 		return 0;
 }
