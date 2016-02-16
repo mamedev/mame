@@ -7,33 +7,6 @@
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
 //============================================================
-
-#ifdef SDLMAME_X11
-#include <X11/extensions/Xinerama.h>
-#endif
-
-#ifdef SDLMAME_MACOSX
-#undef Status
-#include <Carbon/Carbon.h>
-#endif
-
-#ifdef SDLMAME_WIN32
-// for multimonitor
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x501
-#endif
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
-#include "strconv.h"
-#endif
-
-#ifdef SDLMAME_OS2
-#define INCL_WINSYS
-#include <os2.h>
-#endif
-
 #include "sdlinc.h"
 
 // MAME headers
