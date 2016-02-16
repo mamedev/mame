@@ -107,12 +107,7 @@ void sdl_osd_interface::video_exit()
 //============================================================
 //  sdlvideo_monitor_refresh
 //============================================================
-#if defined(SDLMAME_WIN32)  // Win32 version
-inline osd_rect RECT_to_osd_rect(const RECT &r)
-{
-	return osd_rect(r.left, r.top, r.right - r.left, r.bottom - r.top);
-}
-#endif
+
 void sdl_monitor_info::refresh()
 {
 	SDL_DisplayMode dmode;
