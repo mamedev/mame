@@ -11,11 +11,6 @@
 #ifndef __SDLVIDEO__
 #define __SDLVIDEO__
 
-#if defined(SDLMAME_WIN32) && !(SDLMAME_SDL2)
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
-
 #include "osdsdl.h"
 
 //============================================================
@@ -164,12 +159,6 @@ public:
 	// STATIC
 	static void init();
 	static void exit();
-#if !defined(SDLMAME_WIN32) && !(SDLMAME_SDL2)
-	static void add_primary_monitor(void *data);
-#endif
-#if defined(SDLMAME_WIN32) && !(SDLMAME_SDL2)
-	static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
-#endif
 private:
 	void virtual refresh() override;
 

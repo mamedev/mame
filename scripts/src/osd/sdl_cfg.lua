@@ -56,18 +56,12 @@ if _OPTIONS["NO_USE_MIDI"]~="1" and _OPTIONS["targetos"]=="linux" then
 	}
 end
 
-if _OPTIONS["SDL_LIBVER"]=="sdl2" then
+defines {
+	"SDLMAME_SDL2=1",
+}
+if _OPTIONS["SDL2_MULTIAPI"]=="1" then
 	defines {
-		"SDLMAME_SDL2=1",
-	}
-	if _OPTIONS["SDL2_MULTIAPI"]=="1" then
-		defines {
-			"SDL2_MULTIAPI",
-		}
-	end
-else
-	defines {
-		"SDLMAME_SDL2=0",
+		"SDL2_MULTIAPI",
 	}
 end
 

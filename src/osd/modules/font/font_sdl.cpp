@@ -10,11 +10,7 @@
 
 #if defined(SDLMAME_UNIX) && (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_SOLARIS)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
 
-#if (SDLMAME_SDL2)
 #include <SDL2/SDL_ttf.h>
-#else
-#include <SDL/SDL_ttf.h>
-#endif
 #ifndef SDLMAME_HAIKU
 #include <fontconfig/fontconfig.h>
 #endif

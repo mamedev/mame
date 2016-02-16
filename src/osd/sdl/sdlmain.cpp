@@ -101,11 +101,7 @@ const options_entry sdl_options::s_option_entries[] =
 // OS X can be trusted to have working hardware OpenGL, so default to it on for the best user experience
 	{ SDLOPTION_CENTERH,                      "1",        OPTION_BOOLEAN,    "center horizontally within the view area" },
 	{ SDLOPTION_CENTERV,                      "1",        OPTION_BOOLEAN,    "center vertically within the view area" },
-#if (SDLMAME_SDL2)
 	{ SDLOPTION_SCALEMODE ";sm",         OSDOPTVAL_NONE,  OPTION_STRING,     "Scale mode: none, hwblit, hwbest, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
-#else
-	{ SDLOPTION_SCALEMODE ";sm",         OSDOPTVAL_NONE,  OPTION_STRING,     "Scale mode: none, async, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
-#endif
 
 	// full screen options
 	#ifdef SDLMAME_X11
@@ -143,7 +139,6 @@ const options_entry sdl_options::s_option_entries[] =
 	{ SDLOPTION_LIGHTGUNINDEX "8",           OSDOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #8" },
 #endif
 
-#if (SDLMAME_SDL2)
 	{ NULL,                                  NULL,   OPTION_HEADER,     "SDL MOUSE MAPPING" },
 	{ SDLOPTION_MOUSEINDEX "1",              OSDOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #1" },
 	{ SDLOPTION_MOUSEINDEX "2",              OSDOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #2" },
@@ -163,13 +158,11 @@ const options_entry sdl_options::s_option_entries[] =
 	{ SDLOPTION_KEYBINDEX "6",               OSDOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #6" },
 	{ SDLOPTION_KEYBINDEX "7",               OSDOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #7" },
 	{ SDLOPTION_KEYBINDEX "8",               OSDOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #8" },
-#endif
+
 	// SDL low level driver options
 	{ NULL,                                  NULL,   OPTION_HEADER,     "SDL LOWLEVEL DRIVER OPTIONS" },
 	{ SDLOPTION_VIDEODRIVER ";vd",           OSDOPTVAL_AUTO,  OPTION_STRING,        "sdl video driver to use ('x11', 'directfb', ... or 'auto' for SDL default" },
-#if (SDLMAME_SDL2)
 	{ SDLOPTION_RENDERDRIVER ";rd",          OSDOPTVAL_AUTO,  OPTION_STRING,        "sdl render driver to use ('software', 'opengl', 'directfb' ... or 'auto' for SDL default" },
-#endif
 	{ SDLOPTION_AUDIODRIVER ";ad",           OSDOPTVAL_AUTO,  OPTION_STRING,        "sdl audio driver to use ('alsa', 'arts', ... or 'auto' for SDL default" },
 #if USE_OPENGL
 	{ SDLOPTION_GL_LIB,                      SDLOPTVAL_GLLIB, OPTION_STRING,        "alternative libGL.so to use; 'auto' for system default" },
@@ -225,21 +218,6 @@ int main(int argc, char *argv[])
 {
 	int res = 0;
 
-#if defined(SDLMAME_X11) && !(SDLMAME_SDL2)
-	XInitThreads();
-#endif
-
-#if defined(SDLMAME_WIN32)
-#if !(SDLMAME_SDL2)
-	/* Load SDL dynamic link library */
-	if ( SDL_Init(SDL_INIT_NOPARACHUTE) < 0 ) {
-		fprintf(stderr, "WinMain() error: %s", SDL_GetError());
-		return(FALSE);
-	}
-	SDL_SetModuleHandle(GetModuleHandle(NULL));
-#endif
-#endif
-
 	// disable I/O buffering
 	setvbuf(stdout, (char *) NULL, _IONBF, 0);
 	setvbuf(stderr, (char *) NULL, _IONBF, 0);
@@ -255,25 +233,6 @@ int main(int argc, char *argv[])
 
 #ifdef SDLMAME_OS2
 	MorphToPM();
-#endif
-
-#if defined(SDLMAME_X11) && (SDL_MAJOR_VERSION == 1) && (SDL_MINOR_VERSION == 2)
-	if (SDL_Linked_Version()->patch < 10)
-	/* workaround for SDL choosing a 32-bit ARGB visual */
-	{
-		Display *display;
-		if ((display = XOpenDisplay(NULL)) && (DefaultDepth(display, DefaultScreen(display)) >= 24))
-		{
-			XVisualInfo vi;
-			char buf[130];
-			if (XMatchVisualInfo(display, DefaultScreen(display), 24, TrueColor, &vi)) {
-				snprintf(buf, sizeof(buf), "0x%lx", vi.visualid);
-				osd_setenv(SDLENV_VISUALID, buf, 0);
-			}
-		}
-		if (display)
-			XCloseDisplay(display);
-	}
 #endif
 
 	{
@@ -340,11 +299,7 @@ void sdl_osd_interface::osd_exit()
 	if (!SDLMAME_INIT_IN_WORKER_THREAD)
 	{
 		/* FixMe: Bug in SDL2.0, Quitting joystick will cause SIGSEGV */
-#if SDLMAME_SDL2
 		SDL_QuitSubSystem(SDL_INIT_TIMER| SDL_INIT_VIDEO /*| SDL_INIT_JOYSTICK */);
-#else
-		SDL_Quit();
-#endif
 	}
 }
 
@@ -419,7 +374,6 @@ static void defines_verbose(void)
 
 static void osd_sdl_info(void)
 {
-#if SDLMAME_SDL2
 	int i, num = SDL_GetNumVideoDrivers();
 
 	osd_printf_verbose("Available videodrivers: ");
@@ -456,8 +410,6 @@ static void osd_sdl_info(void)
 	{
 		osd_printf_verbose("\t%-20s\n", SDL_GetAudioDriver(i));
 	}
-
-#endif
 }
 
 
@@ -512,7 +464,6 @@ void sdl_osd_interface::init(running_machine &machine)
 		osd_setenv(SDLENV_VIDEODRIVER, stemp, 1);
 	}
 
-#if (SDLMAME_SDL2)
 		stemp = options().render_driver();
 		if (stemp != NULL)
 		{
@@ -532,7 +483,6 @@ void sdl_osd_interface::init(running_machine &machine)
 #endif
 			}
 		}
-#endif
 
 	/* Set the SDL environment variable for drivers wanting to load the
 	 * lib at startup.
@@ -567,15 +517,11 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	if (!SDLMAME_INIT_IN_WORKER_THREAD)
 	{
-#if (SDLMAME_SDL2)
 #ifdef SDLMAME_EMSCRIPTEN
 		// timer brings in threads which are not supported in Emscripten
 		if (SDL_InitSubSystem(SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
 #else
 		if (SDL_InitSubSystem(SDL_INIT_TIMER| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
-#endif
-#else
-		if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
 #endif
 			osd_printf_error("Could not initialize SDL %s\n", SDL_GetError());
 			exit(-1);
@@ -600,13 +546,9 @@ void sdl_osd_interface::init(running_machine &machine)
 		m_watchdog->setTimeout(watchdog_timeout);
 	}
 
-#if (SDLMAME_SDL2)
 #ifdef SDLMAME_EMSCRIPTEN
 	SDL_EventState(SDL_TEXTINPUT, SDL_FALSE);
 #else
 	SDL_EventState(SDL_TEXTINPUT, SDL_TRUE);
-#endif
-#else
-	SDL_EnableUNICODE(SDL_TRUE);
 #endif
 }

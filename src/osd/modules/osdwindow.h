@@ -57,11 +57,7 @@ public:
 #ifdef OSD_SDL
 	virtual osd_dim blit_surface_size() = 0;
 	virtual osd_monitor_info *monitor() const = 0;
-#if (SDLMAME_SDL2)
 	virtual SDL_Window *sdl_window() = 0;
-#else
-	virtual SDL_Surface *sdl_surface() = 0;
-#endif
 #else
 	virtual osd_monitor_info *monitor() const = 0;
 	virtual bool win_has_menu() = 0;

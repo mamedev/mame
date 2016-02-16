@@ -29,28 +29,14 @@
 			#endif
 		#endif
 	#else
-	#if (SDLMAME_SDL2)
 	#include <SDL2/SDL_version.h>
-	#else
-	#include <SDL/SDL_version.h>
-	#endif
 
 	#if (SDL_VERSION_ATLEAST(1,2,10))
 	#if defined(SDLMAME_WIN32)
 		// Avoid that winnt.h (included via sdl_opengl.h, windows.h, windef.h includes intrin.h
 		#define __INTRIN_H_
 	#endif
-	#if (SDLMAME_SDL2)
 	#include <SDL2/SDL_opengl.h>
-	#else
-	#include <SDL/SDL_opengl.h>
-	#endif
-	#else
-	/*
-	 * SDL 1.2.9 does not provide everything we need
-	 * We therefore distribute it ourselves
-	 */
-	#include "SDL1211_opengl.h"
 	#endif
 	#endif
 
