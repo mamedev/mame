@@ -1068,7 +1068,7 @@ static kt_table * sdlinput_read_keymap(running_machine &machine)
 			{
 				sdl2section = 1;
 			}
-			else if (((SDLMAME_SDL2) ^ sdl2section) == 0)
+			else if (((1) ^ sdl2section) == 0)
 			{
 				mks[0]=0;
 				sks[0]=0;
@@ -1799,9 +1799,7 @@ void sdlinput_poll(running_machine &machine)
 		}
 		}
 	}
-#if (SDLMAME_SDL2)
 	resize_all_windows();
-#endif
 }
 
 
@@ -1812,10 +1810,6 @@ void sdlinput_poll(running_machine &machine)
 
 void  sdlinput_release_keys()
 {
-	// FIXME: SDL >= 1.3 will nuke the window event buffer when
-	// a window is closed. This will leave keys in a pressed
-	// state when a window is destroyed and recreated.
-#if (SDLMAME_SDL2)
 	device_info *devinfo;
 	int index;
 
@@ -1826,7 +1820,6 @@ void  sdlinput_release_keys()
 			break;
 		memset(&devinfo->keyboard.state, 0, sizeof(devinfo->keyboard.state));
 	}
-#endif
 }
 
 
