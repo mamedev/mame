@@ -86,6 +86,7 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_FILTER ";glfilter;flt",       "1",              OPTION_BOOLEAN,   "enable bilinear filtering on screen output" },
 	{ OSDOPTION_PRESCALE,                     "1",              OPTION_INTEGER,   "scale screen rendering by this amount in software" },
 
+#if USE_OPENGL
 	{ NULL,                                   NULL,             OPTION_HEADER,    "OpenGL-SPECIFIC OPTIONS" },
 	{ OSDOPTION_GL_FORCEPOW2TEXTURE,          "0",              OPTION_BOOLEAN,   "force power of two textures  (default no)" },
 	{ OSDOPTION_GL_NOTEXTURERECT,             "0",              OPTION_BOOLEAN,   "don't use OpenGL GL_ARB_texture_rectangle (default on)" },
@@ -113,6 +114,7 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_SHADER_SCREEN "7",            OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader screen bitmap 7" },
 	{ OSDOPTION_SHADER_SCREEN "8",            OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader screen bitmap 8" },
 	{ OSDOPTION_SHADER_SCREEN "9",            OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader screen bitmap 9" },
+#endif
 
 	{ NULL,                                   NULL,             OPTION_HEADER,    "OSD SOUND OPTIONS" },
 	{ OSDOPTION_SOUND,                        OSDOPTVAL_AUTO,   OPTION_STRING,    "sound output method: " },

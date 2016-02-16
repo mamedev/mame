@@ -12,6 +12,8 @@
 	#ifndef _OSD_OPENGL_H
 	#define _OSD_OPENGL_H
 
+	#if USE_OPENGL
+
 	/* equivalent to #include <GL/gl.h>
 	 * #include <GL/glext.h>
 	 */
@@ -108,6 +110,8 @@
 	#include "osd_opengl.h"
 
 	#endif /* USE_DISPATCH_GL */
+
+	#endif /* USE_OPENGL */
 
 	#endif /* _OSD_OPENGL_H */
 

@@ -39,7 +39,9 @@ extern int drawgdi_init(running_machine &machine, osd_draw_callbacks *callbacks)
 extern int drawdd_init(running_machine &machine, osd_draw_callbacks *callbacks);
 extern int drawd3d_init(running_machine &machine, osd_draw_callbacks *callbacks);
 extern int drawbgfx_init(running_machine &machine, osd_draw_callbacks *callbacks);
+#if (USE_OPENGL)
 extern int drawogl_init(running_machine &machine, osd_draw_callbacks *callbacks);
+#endif
 
 //============================================================
 //  PARAMETERS
@@ -228,8 +230,10 @@ bool windows_osd_interface::window_init()
 		drawbgfx_init(machine(), &draw);
 	if (video_config.mode == VIDEO_MODE_NONE)
 		drawnone_init(machine(), &draw);
+#if (USE_OPENGL)
 	if (video_config.mode == VIDEO_MODE_OPENGL)
 		drawogl_init(machine(), &draw);
+#endif
 	// set up the window list
 	last_window_ptr = &win_window_list;
 

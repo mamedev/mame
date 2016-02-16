@@ -77,18 +77,27 @@ function osdmodulesbuild()
 		}
 	end
 
-	files {
-		MAME_DIR .. "src/osd/modules/render/drawogl.cpp",
-		MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.cpp",
-		MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.cpp",
-		MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.h",
-		MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.h",
-		MAME_DIR .. "src/osd/modules/opengl/osd_opengl.h",
-	}
-	if _OPTIONS["USE_DISPATCH_GL"]=="1" then
+	if _OPTIONS["NO_OPENGL"]=="1" then
 		defines {
-			"USE_DISPATCH_GL=1",
+			"USE_OPENGL=0",
 		}
+	else
+		files {
+			MAME_DIR .. "src/osd/modules/render/drawogl.cpp",
+			MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.cpp",
+			MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.cpp",
+			MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.h",
+			MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.h",
+			MAME_DIR .. "src/osd/modules/opengl/osd_opengl.h",
+		}
+		defines {
+			"USE_OPENGL=1",
+		}
+		if _OPTIONS["USE_DISPATCH_GL"]=="1" then
+			defines {
+				"USE_DISPATCH_GL=1",
+			}
+		end
 	end
 
 	files {
@@ -242,19 +251,21 @@ end
 
 function osdmodulestargetconf()
 
-	if _OPTIONS["targetos"]=="macosx" then
-		links {
-			"OpenGL.framework",
-		}
-	elseif _OPTIONS["USE_DISPATCH_GL"]~="1" then
-		if _OPTIONS["targetos"]=="windows" then
+	if _OPTIONS["NO_OPENGL"]~="1" then
+		if _OPTIONS["targetos"]=="macosx" then
 			links {
-				"opengl32",
+				"OpenGL.framework",
 			}
-		else
-			links {
-				"GL",
-			}
+		elseif _OPTIONS["USE_DISPATCH_GL"]~="1" then
+			if _OPTIONS["targetos"]=="windows" then
+				links {
+					"opengl32",
+				}
+			else
+				links {
+					"GL",
+				}
+			end
 		end
 	end
 
@@ -329,6 +340,15 @@ end
 newoption {
 	trigger = "DONT_USE_NETWORK",
 	description = "Disable network access",
+}
+
+newoption {
+	trigger = "NO_OPENGL",
+	description = "Disable use of OpenGL",
+	allowed = {
+		{ "0",  "Enable OpenGL"  },
+		{ "1",  "Disable OpenGL" },
+	},
 }
 
 newoption {

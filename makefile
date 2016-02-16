@@ -1193,7 +1193,7 @@ endif
 ifndef MARVELL_ROOTFS
 	$(error MARVELL_ROOTFS is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=steamlink --gcc_version=$(GCC_VERSION) --NO_USE_MIDI=1 --NO_X11=1 --NOASM=1 --SDL_INSTALL_ROOT=$(MARVELL_ROOTFS)/usr  gmake  
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=steamlink --gcc_version=$(GCC_VERSION) --NO_OPENGL=1 --NO_USE_MIDI=1 --NO_X11=1 --NOASM=1 --SDL_INSTALL_ROOT=$(MARVELL_ROOTFS)/usr  gmake  
 
 .PHONY: steamlink
 ifndef MARVELL_SDK_PATH

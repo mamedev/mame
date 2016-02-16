@@ -546,8 +546,12 @@ int drawsdl2_init(running_machine &machine, osd_draw_callbacks *callbacks)
 
 	osd_printf_verbose("Using SDL native texturing driver (SDL 2.0+)\n");
 
+#if USE_OPENGL
 	// Load the GL library now - else MT will fail
 	const char *stemp = downcast<sdl_options &>(machine.options()).gl_lib();
+#else
+	const char *stemp = NULL;
+#endif
 	if (stemp != NULL && strcmp(stemp, OSDOPTVAL_AUTO) == 0)
 		stemp = NULL;
 
