@@ -7,6 +7,8 @@
     TODO:
     - how does dual-CPU work?
     - IRQ level/timing is unknown
+    - USART is not emulated
+    - V11 CPU should be M68EC060, not yet emulated
 
 ******************************************************************************
 
@@ -24,11 +26,13 @@ V5: 128KB+64KB DRAM, dual-CPU! (2*68K @ 16MHz)
 
 V6-V11 are on model 6117. Older 1986 model 6081 uses a 6502 CPU.
 
+Hardware info:
+--------------
 - MC68HC000P12F 16MHz CPU, 16MHz XTAL
 - MB1422A DRAM Controller, 25MHz XTAL near, 4 DRAM slots(V2: slot 1 and 2 64KB)
 - 2*27C512 64KB EPROM, 2*KM6264AL-10 8KB SRAM, 2*AT28C64X 8KB EEPROM
-- OKI M82C51A-2 USART, 4.9152MHz XTAL, assume it's used for factory test/debug
-- other special: magnet sensors, external module slot, printer port
+- OKI M82C51A-2 USART, 4.9152MHz XTAL
+- other special: magnet sensors, external module slot, serial port
 
 IRQ source is unknown. Several possibilities:
 - NE555 timer IC
@@ -37,6 +41,11 @@ IRQ source is unknown. Several possibilities:
 
 The module slot pinout is different from SCC series. The data on those appears
 to be compatible with EAG though and will load fine with an adapter.
+
+The USART allows for a serial connection between the chess computer and another
+device, for example a PC. Fidelity released a DOS tool called EAGLINK which
+featured PC printer support, complete I/O control, detailed information while
+the program is 'thinking', etc.
 
 Memory map: (of what is known)
 -----------
@@ -57,8 +66,8 @@ Memory map: (of what is known)
 Elite Avant Garde (EAG, model 6117)
 -----------------------------------
 
-There are 6 versions of model 6114(V6 to V11). The one emulated here came from a V7.
-From a programmer's point of view, the hardware is very similar to model 6114.
+There are 6 versions of model 6114(V6 to V11). From a programmer's point of view,
+the hardware is very similar to model 6114.
 
 V6: 68020, 512KB hashtable RAM
 V7: 68020, 1MB h.RAM
@@ -67,13 +76,15 @@ V9: 68030, 1MB h.RAM
 V10: 68040, 1MB h.RAM
 V11: 68060, 2MB h.RAM, high speed
 
-- MC68020RC25E CPU, QFP 25MHz XTAL, 2*GAL16V8C
+V7 Hardware info:
+-----------------
+- MC68020RC25E CPU, 25MHz XTAL
 - 4*AS7C164-20PC 8KB SRAM, 2*KM684000ALG-7L 512KB CMOS SRAM
-- 2*27C512? 64KB EPROM, 2*HM6264LP-15 8KB SRAM, 2*AT28C64B 8KB EEPROM
-- same as 6114: M82C51A, SN74HC4060, module slot, chessboard, ..
+- 2*27C512? 64KB EPROM, 2*HM6264LP-15 8KB SRAM, 2*AT28C64B 8KB EEPROM, 2*GAL16V8C
+- same as 6114: M82C51A, NE555, SN74HC4060, module slot, chessboard, ..
 
-Memory map:
------------
+V7 Memory map:
+--------------
 000000-01FFFF: 128KB ROM
 104000-107FFF: 16KB SRAM (unused?)
 200000-2FFFFF: hashtable SRAM
@@ -82,6 +93,42 @@ Memory map:
 700000-70000x: see model 6114
 604000-607FFF: 16KB EEPROM
 800000-807FFF: 32KB SRAM
+
+V10 Hardware info:
+------------------
+- 68040 CPU, 25MHz
+- other: assume same or very similar to V11(see below)
+
+The ROM dump came from the V11(see below). Built-in factory test proves
+that this program is a V10. Hold TB button immediately after power-on and
+press it for a sequence of tests:
+1) all LEDs on
+2) F40C: V10 program version
+3) 38b9: V10 ROM checksum
+4) xxxx: external module ROM checksum (0000 if no module present)
+5) xxxx: user settings (stored in EEPROM)
+6) xxxx: "
+7) 1024: hashtable RAM size
+8) return to game
+
+V11 Hardware info:
+------------------
+- MC68EC060RC75 CPU, 36MHz XTAL(36MHz bus, 72MHz CPU), CPU cooler required
+- 4*CXK5863AP-20 8KB SRAM, 4*K6X4008C1F-DF55 512KB CMOS SRAM
+- 4*M27C256B 32KB EPROM, 2*AT28C64 8KB EEPROM, 5*GAL16V8D
+- NEC D71051C USART, assume 8MHz, on quick glance it's same as the OKI USART
+- same as 6114: NE555, SN74HC4060, module slot, chessboard, ..
+
+This is a custom overclocked V10, manufactured by Wilfried Bucke. PCB is marked:
+"CHESS HW DESIGN COPYRIGHT 22-10-2002: REVA03 510.1136A01/510.1144B01 COMPONENT SIDE"
+There are two versions of this, one with a 66MHz CPU, one with a 72MHz CPU.
+Maybe other differences too?
+
+V1x Memory map:
+---------------
+000000-01FFFF: 128KB ROM
+200000-3FFFFF: hashtable SRAM (less on V10?)
+B0000x-xxxxxx: see V7, -800000
 
 ******************************************************************************/
 
@@ -211,8 +258,21 @@ static ADDRESS_MAP_START( eagv7_map, AS_PROGRAM, 32, fidel68k_state )
 	AM_RANGE(0x400000, 0x400003) AM_WRITE8(eag_mux_w, 0x00ff0000)
 	AM_RANGE(0x400004, 0x400007) AM_WRITENOP // ?
 	AM_RANGE(0x604000, 0x607fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x800000, 0x807fff) AM_RAM
 	AM_RANGE(0x700000, 0x700003) AM_READ8(eag_input2_r, 0x000000ff)
+	AM_RANGE(0x800000, 0x807fff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( eagv11_map, AS_PROGRAM, 32, fidel68k_state )
+	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
+	AM_RANGE(0x00200000, 0x003fffff) AM_RAM
+	AM_RANGE(0x00b00000, 0x00b0000f) AM_MIRROR(0x00000010) AM_READWRITE8(eag_input1_r, eag_leds_w, 0x00ff00ff)
+	AM_RANGE(0x00b00000, 0x00b0000f) AM_MIRROR(0x00000010) AM_WRITE8(eag_7seg_w, 0xff00ff00) AM_READNOP
+	AM_RANGE(0x00c00000, 0x00c07fff) AM_READ8(eag_cart_r, 0xff00ff00)
+	AM_RANGE(0x00c00000, 0x00c00003) AM_WRITE8(eag_mux_w, 0x00ff0000)
+	AM_RANGE(0x00c00004, 0x00c00007) AM_WRITENOP // ?
+	AM_RANGE(0x00e04000, 0x00e07fff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x00f00000, 0x00f00003) AM_READ8(eag_input2_r, 0x000000ff)
+	AM_RANGE(0x01000000, 0x0101ffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -354,6 +414,22 @@ static MACHINE_CONFIG_DERIVED( eagv7, eag )
 	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( eagv10, eag )
+
+	/* basic machine hardware */
+	MCFG_CPU_REPLACE("maincpu", M68040, XTAL_25MHz)
+	MCFG_CPU_PROGRAM_MAP(eagv11_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( eagv11, eag )
+
+	/* basic machine hardware */
+	MCFG_CPU_REPLACE("maincpu", M68EC040, XTAL_36MHz*2) // wrong! should be M68EC060
+	MCFG_CPU_PROGRAM_MAP(eagv11_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+MACHINE_CONFIG_END
+
 
 
 /******************************************************************************
@@ -363,7 +439,7 @@ MACHINE_CONFIG_END
 ROM_START( feagv2 )
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("6114_e5.u18", 0x00000, 0x10000, CRC(f9c7bada) SHA1(60e545f829121b9a4f1100d9e85ac83797715e80) ) // 27c512
-	ROM_LOAD16_BYTE("6114_o5.u19", 0x00001, 0x10000, CRC(04f97b22) SHA1(8b2845dd115498f7b385e8948eca6a5893c223d1) ) // 27c512
+	ROM_LOAD16_BYTE("6114_o5.u19", 0x00001, 0x10000, CRC(04f97b22) SHA1(8b2845dd115498f7b385e8948eca6a5893c223d1) ) // "
 ROM_END
 
 
@@ -374,11 +450,24 @@ ROM_START( feagv7 )
 ROM_END
 
 
+ROM_START( feagv11 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD32_BYTE("16", 0x00000, 0x08000, CRC(8375d61f) SHA1(e042f6f01480c59ee09a458cf34f135664479824) ) // 27c256
+	ROM_LOAD32_BYTE("18", 0x00002, 0x08000, CRC(9341dcaf) SHA1(686bd4799e89ffaf11a813d4cf5a2aedd4c2d97a) ) // "
+	ROM_LOAD32_BYTE("19", 0x00003, 0x08000, CRC(a70c5468) SHA1(7f6b4f46577d5cfdaa84d387c7ce35d941e5bbc7) ) // "
+	ROM_LOAD32_BYTE("17", 0x00001, 0x08000, CRC(bfd14916) SHA1(115af6dfd29ddd8ad6d2ce390f8ecc4d60de6fce) ) // "
+ROM_END
+
+#define rom_feagv10 rom_feagv11
+
+
 
 /******************************************************************************
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    INIT              COMPANY, FULLNAME, FLAGS */
-COMP( 1989, feagv2,  0,      0,      eag,     eag,     driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1990, feagv7,  0,      0,      eagv7,   eag,     driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6117-7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    INIT              COMPANY, FULLNAME, FLAGS */
+COMP( 1989, feagv2,  0,       0,      eag,     eag,     driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1990, feagv7,  0,       0,      eagv7,   eag,     driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6117-7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1990, feagv10, 0,       0,      eagv10,  eag,     driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 2002, feagv11, feagv10, 0,      eagv11,  eag,     driver_device, 0, "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
