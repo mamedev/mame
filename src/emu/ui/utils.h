@@ -208,6 +208,7 @@ struct ui_globals
 	static bool         switch_image, redraw_icon, default_image, reset;
 	static int          visible_main_lines, visible_sw_lines;
 	static UINT16       panels_status;
+	static bool         has_icons;
 };
 
 #define main_struct(name) \
