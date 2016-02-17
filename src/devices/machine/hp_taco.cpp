@@ -8,17 +8,48 @@
 
 *********************************************************************/
 
+// This device has been reverse engineered entirely through documents & study of HP software.
+// I had no access to the real device to experiment.
+// Available documentation on the internal working of TACO chip is close to nothing. The best
+// I could find is [1] (see below) where all that's described is a (too) brief summary of registers and little else.
+// In other words, no description of the commands that can be issued to TACO chips.
+// So, my main source of information was the careful study of HP software, especially the 9845 system test ROM (09845-66520).
+// The second half of this ROM holds a comprehensive set of tape drive tests.
+// The main shortcomings of my approach are:
+// * I could indentify only those TACO commands that are actually used by the software. I managed
+//   to identify 17 out of 32 possible commands. The purpose of the rest of commands is anyone's guess.
+// * I could only guess the behavior of TACO chips in corner cases (especially behavior in various error/abnormal
+//   conditions)
+//
 // Documentation I used:
 // [1]  HP, manual 64940-90905, may 80 rev. - Model 64940A tape control & drive service manual
-// [2]  US patent 4,075,679 describing HP9825 system (this system had a discrete implementation of tape controller)
+// [2]  US patent 4,075,679 describing HP9825 system (this system had a discrete implementation of tape controller). The
+//      firmware listing was quite useful in identifying sequences of commands (for example how to find a specific sector etc.).
+// [3]  http://www.hp9845.net site
+// [4]  April 1978 issue of HP Journal. There is a one-page summary of TACO chip on page 20.
 
+// This is an overview of the TACO/CPU interface.
+//
+// Reg. | R/W | Content
+// =====================
+// R4   | R/W | Data register: words read/written to/from tape pass through this register
+// R5   | R/W | Command and status register (see below)
+// R6   | R/W | Tachometer register. Writing it sets a pulse counter that counts up on either tachometer pulses or IRGs, depending
+//      |     | on command. When the counter rolls over from 0xffff to 0 it typically ends the command. It's not clear to me
+//      |     | what value could be read from this register, if it's just the same value that was written last time or the internal
+//      |     | counter or something else entirely.
+// R7   | R   | Checksum register. Reading it clears it.
+// R7   | W   | Timing register. It controls somehow the encoding and decoding of bits. For now I completely ignore it because its
+//      |     | content it's totally unknown to me. It seems safe to do so, anyway. I can see that it's always set to 0x661d before
+//      |     | writing to tape and to 0x0635 before reading.
+//
 // Format of TACO command/status register (R5)
 // Bit    R/W Content
 // ===============
 // 15     RW  Tape direction (1 = forward)
-// 14..10 RW  Command
-//  9     RW  ? Drive ON according to [1], doesn't match usage of firmware
-//  8     RW  ? Size of gaps according to [1]
+// 14..10 RW  Command (see the "enum" below)
+//  9     RW  ? Drive ON according to [1], the actual use seems to be selection of gap length
+//  8     RW  ? Size of gaps according to [1], N/U in my opinion
 //  7     RW  Speed of tape (1 = 90 ips, 0 = 22 ips)
 //  6     RW  Option bit for various commands
 //  5     R   Current track (1 = B)
@@ -28,6 +59,71 @@
 //  1     R   Cartridge out (1)
 //  0     R   Hole detected (1)
 
+// Here's a summary of the on-tape format of HP9845 systems.
+// * A tape has two independent tracks (A & B).
+// * Each track holds 426 sectors.
+// * Each sector has an header and 256 bytes of payload (see below)
+// * Sectors are separated by gaps of uniform magnetization called IRGs (Inter-Record Gaps)
+// * The basic unit of data I/O are 16-bit words
+// * Bits are encoded by different distances between magnetic flux reversals
+// * The structure of tracks is:
+//   - Begin of tape holes
+//   - The deadzone: 350x 0xffff words
+//   - 1" of IRG
+//   - Sector #0 (track A) or #426 (track B)
+//   - 1" of IRG (2.5" on track A)
+//   - Sector #1 (track A) or #427 (track B)
+//   - 1" of IRG
+//   - Sector #2 (track A) or #428 (track B)
+//   - ...and so on up to sector #425/#851
+//   - 6" of final gap
+//   - Non-recorded tape
+//   - End of tape holes
+// * Sector #0 is not used
+// * Sectors #1 and #2 hold the first copy of tape directory
+// * Sectors #3 and #4 hold the second/backup copy of tape directory
+// * User data are stored starting from sector #5
+// * There is no "fragmentation" map (like file allocation table in FAT filesystem): a file
+//   spanning more than 1 sector always occupy a single block of contiguous sectors.
+//
+// A sector is structured like this:
+// Word 0:      Invisible preamble word (always 0). Preamble comes from 9825, don't know if it's
+//              actually there in TACO encoding. I assumed it is.
+// Word 1:      Format/sector in use and other unidentified bits.
+// Word 2:      Sector number
+// Word 3:      Sector length and other bits
+// Word 4:      Checksum (sum of words 1..3)
+// Words 5..132:        Payload
+// Word 133:    Checksum (sum of words 5..132)
+//
+// Physical encoding of words is borrowed from 9825 as I wasn't able
+// to gather any info on the actual encoding of TACO chips.
+// This is how 9825 encodes words on tape:
+// - the unit of encoding are 16-bit words
+// - each word is encoded from MSB to LSB
+// - each word has an extra invisible "1" encoded at the end
+// - tape is read/written at slow speed only (21.98 ips)
+// - a 0 is encoded with a distance between flux reversals of 1/35200 s
+//   (giving a maximum density of about 1600 reversals per inch)
+// - a 1 is encoded with a distance that's 1.75 times that of a 0
+//
+// This driver is based on the following model of the actual TACO/tape system:
+// * Tape immediately reaches working speed (no spin-up time)
+// * Inversion of tape direction and change of speed are immediate as well
+// * Time & distance to stop the tape are modeled, though. Firmware is upset by
+//   a tape with null braking time/distance.
+// * Speed of tape is exceptionally accurate. Real tape was controlled by a closed loop
+//   with something like 1% accuracy on speed.
+// * Storage is modeled by one "map" data structure per track. Each map maps the tape position
+//   to the 16-bit word stored at that position. Gaps are modeled by lack of data in the map.
+//   There is no model of the physical encoding of bits (except to compute how long each word
+//   is on tape).
+// * Read threshold is ignored. Real tapes could be read with either a low or high threshold.
+// * "Flag" bit is used as a busy/ready signal in real TACO. Here I assumed the device is
+//   always ready, so Flag is always active.
+// * I tried to fill the (many) gaps on chip behavior with "sensible" solutions. I could only
+//   validate my solutions by running the original firmware in MAME, though (no real hw at hand).
+//
 #include "emu.h"
 #include "hp_taco.h"
 
@@ -759,15 +855,6 @@ hp_taco_device::tape_pos_t hp_taco_device::word_length(tape_word_t w)
 
         zeros = 16 - ones;
 
-        // Physical encoding of words is borrowed from 9825 as I wasn't able
-        // to gather any info on the actual encoding of TACO chips.
-        // This should be enough for emulation.
-        // Anyway, this is how 9825 encodes words on tape:
-        // - the unit of encoding are 16-bit words
-        // - each word is encoded from MSB to LSB
-        // - each word has an extra "1" encoded at the end
-        // - a 0 is encoded with a distance between flux reversals of 1/35200 s
-        // - a 1 is encoded with a distance that's 1.75 times that of a 0
         return zeros * ZERO_BIT_LEN + (ones + 1) * ONE_BIT_LEN;
 }
 
