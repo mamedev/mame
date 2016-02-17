@@ -841,6 +841,7 @@ static USBStandardEndpointDescriptor enddesc02 = {7,5,0x02,3,0x20,4};
 
 ohci_function_device::ohci_function_device(running_machine &machine)
 {
+	state = DefaultState;
 	descriptors = auto_alloc_array(machine, UINT8, 1024);
 	descriptors_pos = 0;
 	address = 0;
@@ -848,6 +849,7 @@ ohci_function_device::ohci_function_device(running_machine &machine)
 	controldirection = 0;
 	controltype = 0;
 	controlrecipient = 0;
+	configurationvalue = 0;
 	remain = 0;
 	position = nullptr;
 	settingaddress = false;
@@ -861,25 +863,25 @@ ohci_function_device::ohci_function_device(running_machine &machine)
 void ohci_function_device::add_device_descriptor(USBStandardDeviceDescriptor &descriptor)
 {
 	memcpy(descriptors + descriptors_pos, &descriptor, sizeof(descriptor));
-	descriptors_pos += sizeof(descriptor);
+	descriptors_pos += descriptor.bLength;
 }
 
 void ohci_function_device::add_configuration_descriptor(USBStandardConfigurationDescriptor &descriptor)
 {
 	memcpy(descriptors + descriptors_pos, &descriptor, sizeof(descriptor));
-	descriptors_pos += sizeof(descriptor);
+	descriptors_pos += descriptor.bLength;
 }
 
 void ohci_function_device::add_interface_descriptor(USBStandardInterfaceDescriptor &descriptor)
 {
 	memcpy(descriptors + descriptors_pos, &descriptor, sizeof(descriptor));
-	descriptors_pos += sizeof(descriptor);
+	descriptors_pos += descriptor.bLength;
 }
 
 void ohci_function_device::add_endpoint_descriptor(USBStandardEndpointDescriptor &descriptor)
 {
 	memcpy(descriptors + descriptors_pos, &descriptor, sizeof(descriptor));
-	descriptors_pos += sizeof(descriptor);
+	descriptors_pos += descriptor.bLength;
 }
 
 void ohci_function_device::execute_reset()
@@ -890,9 +892,11 @@ void ohci_function_device::execute_reset()
 
 int ohci_function_device::execute_transfer(int address, int endpoint, int pid, UINT8 *buffer, int size)
 {
+	int descriptortype;// descriptorindex;
+
 	if (endpoint == 0) {
 		if (pid == SetupPid) {
-			struct USBSetupPacket *p=(struct USBSetupPacket *)buffer;
+			USBSetupPacket *p=(struct USBSetupPacket *)buffer;
 			// define direction 0:host->device 1:device->host
 			controldirection = (p->bmRequestType & 128) >> 7;
 			// case ==1, IN data stage and OUT status stage
@@ -901,9 +905,10 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 			controltype = (p->bmRequestType & 0x60) >> 5;
 			controlrecipient = p->bmRequestType & 0x1f;
 			position = nullptr;
+			// number of byte to transfer in data stage (0 no data stage)
 			remain = p->wLength;
-			// if standard
-			if (controltype == 0) {
+			// if standard device request
+			if ((controltype == StandardType) && (controlrecipient == DeviceRecipient)) {
 				switch (p->bRequest) {
 				case GET_STATUS:
 				case CLEAR_FEATURE:
@@ -914,29 +919,39 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 					settingaddress = true;
 					break;
 				case GET_DESCRIPTOR:
-					if ((p->wValue >> 8) == DEVICE) { // device descriptor
-						//p->wValue & 255;
+					descriptortype = p->wValue >> 8;
+					//descriptorindex = p->wValue & 255;
+					if (descriptortype == DEVICE) { // device descriptor
 						position = descriptors;
 						remain = descriptors[0];
 					}
-					else if ((p->wValue >> 8) == CONFIGURATION) { // configuration descriptor
+					else if (descriptortype == CONFIGURATION) { // configuration descriptor
 						position = descriptors + 18;
 						remain = descriptors[18+2];
 					}
-					else if ((p->wValue >> 8) == INTERFACE) { // interface descriptor
+					else if (descriptortype == INTERFACE) { // interface descriptor
 						position = descriptors + 18 + 9;
 						remain = descriptors[18 + 9];
 					}
-					else if ((p->wValue >> 8) == ENDPOINT) { // endpoint descriptor
+					else if (descriptortype == ENDPOINT) { // endpoint descriptor
 						position = descriptors + 18 + 9 + 9;
 						remain = descriptors[18 + 9 + 9];
 					}
+					else
+						remain = 0;
 					if (remain > p->wLength)
 						remain = p->wLength;
 					break;
+				case SET_CONFIGURATION:
+					if (p->wValue == 0)
+						state = AddressState;
+					else {
+						configurationvalue = p->wValue;
+						state = ConfiguredState;
+					}
+					break;
 				case SET_DESCRIPTOR:
 				case GET_CONFIGURATION:
-				case SET_CONFIGURATION:
 				case GET_INTERFACE:
 				case SET_INTERFACE:
 				case SYNCH_FRAME:
@@ -944,18 +959,21 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 					break;
 				}
 			}
+			else
+				return handle_nonstandard_request(p);
 			size = 0;
 		}
 		else if (pid == InPid) {
 			// if no data has been transferred (except for the setup stage)
 			// and the lenght of this IN transaction is 0
 			// assume this is the status stage
-			if (size == 0) {
+			if ((size == 0) && (remain == 0)) {
 				if (settingaddress == true)
 				{
 					// set of address is active at end of status stage
 					address = newaddress;
 					settingaddress = false;
+					state = AddressState;
 				}
 				return 0;
 			}
@@ -987,7 +1005,25 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 			}
 		}
 	}
+	else
+		return -1;
 	return size;
+}
+
+int ohci_function_device::handle_nonstandard_request(USBSetupPacket *setup)
+{
+	if ((controltype == VendorType) && (controlrecipient == InterfaceRecipient))
+	{
+		if (setup->bRequest == GET_DESCRIPTOR)
+		{
+			if (setup->wValue == 0x4200)
+			{
+				position = nullptr;
+				remain = 0;
+			}
+		}
+	}
+	return 0;
 }
 
 void xbox_base_state::usb_ohci_interrupts()
