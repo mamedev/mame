@@ -16,12 +16,12 @@
 // - LPU & PPU ROMs
 // - LPU & PPU RAMs
 // - Text mode screen
-// - Keyboard (most of keys)
+// - Keyboard
+// - T15 tape drive
 // What's not yet in:
 // - Beeper
-// - Rest of keyboard
 // - Graphic screen
-// - Tape drive (this needs some heavy RE of the TACO chip)
+// - Better naming of tape drive image (it's now "magt", should be "t15")
 // - Better documentation of this file
 // - Software list to load optional ROMs
 // What's wrong:

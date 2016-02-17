@@ -124,6 +124,14 @@
 // * I tried to fill the (many) gaps on chip behavior with "sensible" solutions. I could only
 //   validate my solutions by running the original firmware in MAME, though (no real hw at hand).
 //
+// TODOs/issues:
+// * Some code cleanup
+// * Handling of tape holes seems to be wrong: test "C" of test ROM only works partially
+// * Find out what is read from register R6
+// * Handle device_image_interface::call_display to show state of tape
+// * Find more info on TACO chips (does anyone with a working 9845 or access to internal HP docs want to
+//   help me here, please?)
+//
 #include "emu.h"
 #include "hp_taco.h"
 
