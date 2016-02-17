@@ -2089,9 +2089,9 @@ ROM_END
 
 ROM_START( blockj )
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "blj_05.rom",   0x00000, 0x08000, CRC(3b55969a) SHA1(86de2f1f5878de380a8b1e3935cffa146863f07f) )
-	ROM_LOAD( "ble_06.rom",   0x10000, 0x20000, CRC(cdb13d55) SHA1(2e4489d12a603b4c7dfb90d246ebff9176e88a0b) )
-	ROM_LOAD( "blj_07.rom",   0x30000, 0x20000, CRC(1723883c) SHA1(e6b7575a55c045b90fb41290a60306713121acfb) )
+	ROM_LOAD( "blj_05.14f",   0x00000, 0x08000, CRC(3b55969a) SHA1(86de2f1f5878de380a8b1e3935cffa146863f07f) )
+	ROM_LOAD( "ble_06.15f",   0x10000, 0x20000, CRC(cdb13d55) SHA1(2e4489d12a603b4c7dfb90d246ebff9176e88a0b) )
+	ROM_LOAD( "blj_07.16f",   0x30000, 0x20000, CRC(1723883c) SHA1(e6b7575a55c045b90fb41290a60306713121acfb) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
 	ROM_LOAD( "bl_08.8h",    0x000000, 0x20000, CRC(aa0f4ff1) SHA1(58f3c468f89d834caaf66d3c084ab87addbb75c0) ) /* chars */
@@ -2111,9 +2111,9 @@ ROM_END
 
 ROM_START( blockjoy )
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "ble_05.bin",   0x00000, 0x08000, CRC(fa2a4536) SHA1(8f584745116bd0ced4d66719cd80c0372b797134) )
-	ROM_LOAD( "blf_06.bin",   0x10000, 0x20000, CRC(e114ebde) SHA1(12362e809443644b43fbc72e7eead5f376fe11d3) )
-	ROM_LOAD( "ble_07.rom",   0x30000, 0x20000, CRC(1d114f13) SHA1(ee3588e1752b3432fd611e2d7d4fb43f942de580) )
+	ROM_LOAD( "ble_05.14f",   0x00000, 0x08000, CRC(fa2a4536) SHA1(8f584745116bd0ced4d66719cd80c0372b797134) ) /* Are these actually rev "A"? */
+	ROM_LOAD( "blf_06.15f",   0x10000, 0x20000, CRC(e114ebde) SHA1(12362e809443644b43fbc72e7eead5f376fe11d3) ) /* Are these actually rev "A"? - Also more likely it's "BLE" and not BLF */
+	ROM_LOAD( "ble_07.16f",   0x30000, 0x20000, CRC(1d114f13) SHA1(ee3588e1752b3432fd611e2d7d4fb43f942de580) ) /* Are these actually rev "A"? */
 
 	/* the highscore table specifies an unused tile number, so we need ROMREGION_ERASEFF to ensure it is blank */
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
