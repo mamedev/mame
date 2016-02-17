@@ -36,7 +36,6 @@
 
 extern int drawnone_init(running_machine &machine, osd_draw_callbacks *callbacks);
 extern int drawgdi_init(running_machine &machine, osd_draw_callbacks *callbacks);
-extern int drawdd_init(running_machine &machine, osd_draw_callbacks *callbacks);
 extern int drawd3d_init(running_machine &machine, osd_draw_callbacks *callbacks);
 extern int drawbgfx_init(running_machine &machine, osd_draw_callbacks *callbacks);
 #if (USE_OPENGL)
@@ -217,11 +216,6 @@ bool windows_osd_interface::window_init()
 	if (video_config.mode == VIDEO_MODE_D3D)
 	{
 		if (drawd3d_init(machine(), &draw))
-			video_config.mode = VIDEO_MODE_GDI;
-	}
-	if (video_config.mode == VIDEO_MODE_DDRAW)
-	{
-		if (drawdd_init(machine(), &draw))
 			video_config.mode = VIDEO_MODE_GDI;
 	}
 	if (video_config.mode == VIDEO_MODE_GDI)
