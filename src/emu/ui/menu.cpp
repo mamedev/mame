@@ -1314,8 +1314,6 @@ void ui_menu::init_ui(running_machine &machine)
 	const osd_directory_entry *dir;
 	while ((dir = path.next()) != nullptr)
 	{
-		char drivername[50];
-		char *dst = drivername;
 		const char *src;
 
 		// build a name for it
