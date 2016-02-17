@@ -107,6 +107,7 @@ function osdmodulesbuild()
 	includedirs {
 		MAME_DIR .. "3rdparty/bgfx/include",
 		MAME_DIR .. "3rdparty/bx/include",
+		MAME_DIR .. "3rdparty/rapidjson/include",
 	}
 
 	if _OPTIONS["NO_USE_MIDI"]=="1" then
