@@ -36,7 +36,7 @@ public:
 	}
 
 private:
-	struct PosColorTexCoord0Vertex
+	struct ScreenVertex
 	{
 		float m_x;
 		float m_y;
@@ -57,33 +57,21 @@ private:
 		static bgfx::VertexDecl ms_decl;
 	};
 
-	struct PosColorVertex
+	void allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::TransientVertexBuffer *buffer);
+	enum buffer_status
 	{
-		float m_x;
-		float m_y;
-		float m_z;
-		UINT32 m_rgba;
-
-		static void init()
-		{
-			ms_decl
-				.begin()
-				.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-				.add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-				.end();
-		}
-
-		static bgfx::VertexDecl ms_decl;
+		BUFFER_PRE_FLUSH,
+		BUFFER_FLUSH,
+		BUFFER_EMPTY,
+		BUFFER_DONE
 	};
+	buffer_status buffer_primitives(int view, bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer);
 
-	void allocate_buffers(bgfx::TransientVertexBuffer *flat_buffer, bgfx::TransientVertexBuffer *textured_buffer);
+	void render_textured_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer);
 
-	void render_textured_quad(int view, render_primitive* prim);
-	void render_flat_quad(int view, render_primitive *prim);
-
-	void put_packed_quad(render_primitive *prim, UINT32 hash, PosColorTexCoord0Vertex* vertex);
-	void put_polygon(const float* coords, UINT32 num_coords, float r, UINT32 rgba, PosColorVertex* vertex);
-	void put_line(float x0, float y0, float x1, float y1, float r, UINT32 rgba, PosColorVertex* vertex, float fth = 1.0f);
+	void put_packed_quad(render_primitive *prim, UINT32 hash, ScreenVertex* vertex);
+	void put_polygon(const float* coords, UINT32 num_coords, float r, UINT32 rgba, ScreenVertex* vertex);
+	void put_line(float x0, float y0, float x1, float y1, float r, UINT32 rgba, ScreenVertex* vertex, float fth = 1.0f);
 
 	void set_bgfx_state(UINT32 blend);
 
@@ -91,7 +79,9 @@ private:
 
 	bool check_for_dirty_atlas();
 	bool update_atlas();
+	void process_atlas_packs(std::vector<std::vector<rectangle_packer::packed_rectangle>>& packed);
 	const bgfx::Memory* mame_texture_data_to_bgfx_texture_data(UINT32 format, int width, int height, int rowpixels, const rgb_t *palette, void *base);
+	UINT32 get_texture_hash(render_primitive *prim);
 
 	bgfx::ProgramHandle loadProgram(bx::FileReaderI* _reader, const char* _vsName, const char* _fsName);
 	bgfx::ProgramHandle loadProgram(const char* _vsName, const char* _fsName);
@@ -109,7 +99,10 @@ private:
 	std::vector<rectangle_packer::packable_rectangle> m_texinfo;
 	rectangle_packer m_packer;
 
+	uint32_t m_white[16*16];
 	static const uint16_t CACHE_SIZE = 1024;
+	static const uint32_t PACKABLE_SIZE = 128;
+	static const UINT32 WHITE_HASH = 0x87654321;
 };
 
 #endif

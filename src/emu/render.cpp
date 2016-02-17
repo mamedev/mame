@@ -444,8 +444,6 @@ void render_texture::hq_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const 
 
 void render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &texinfo, render_primitive_list &primlist, UINT32 flags)
 {
-	texinfo.hash = 0;
-
 	// source width/height come from the source bounds
 	int swidth = m_sbounds.width();
 	int sheight = m_sbounds.height();
@@ -522,13 +520,6 @@ void render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 		// palette will be set later
 		texinfo.seqid = scaled->seqid;
 	}
-
-	UINT32 hash = 0;
-	if ((flags & PRIMFLAG_PACKABLE) && texinfo.width <= 128 && texinfo.height <= 128)
-	{
-		hash = reinterpret_cast<UINT64>(texinfo.base) & 0xffffffff;
-	}
-	texinfo.hash = hash;
 }
 
 

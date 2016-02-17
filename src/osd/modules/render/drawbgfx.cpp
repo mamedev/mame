@@ -44,6 +44,8 @@
 //  MACROS
 //============================================================
 
+#define GIBBERISH	(0)
+
 //============================================================
 //  INLINES
 //============================================================
@@ -152,16 +154,22 @@ int renderer_bgfx::create()
 		bgfx::touch(window().m_index);
 	}
 
-	PosColorTexCoord0Vertex::init();
-	PosColorVertex::init();
+	ScreenVertex::init();
 
 	// Create program from shaders.
 	m_progQuad = loadProgram("vs_quad", "fs_quad");
 	m_progQuadTexture = loadProgram("vs_quad_texture", "fs_quad_texture");
 	m_s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Int1);
 
-	uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_ANISOTROPIC | BGFX_TEXTURE_MAG_ANISOTROPIC;
+	uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
 	m_texture_cache = bgfx::createTexture2D(CACHE_SIZE, CACHE_SIZE, 1, bgfx::TextureFormat::BGRA8, flags);
+
+	const bgfx::Memory* memory = bgfx::alloc(sizeof(uint32_t) * CACHE_SIZE * CACHE_SIZE);
+	memset(memory->data, 0, sizeof(uint32_t) * CACHE_SIZE * CACHE_SIZE);
+	bgfx::updateTexture2D(m_texture_cache, 0, 0, 0, CACHE_SIZE, CACHE_SIZE, memory, CACHE_SIZE * sizeof(uint32_t));
+
+	memset(m_white, 0xff, sizeof(uint32_t) * 16 * 16);
+	m_texinfo.push_back(rectangle_packer::packable_rectangle(WHITE_HASH, PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32), 16, 16, 16, nullptr, m_white));
 
 	return 0;
 }
@@ -272,16 +280,20 @@ bgfx::ProgramHandle renderer_bgfx::loadProgram(const char* _vsName, const char* 
 //  drawbgfx_window_draw
 //============================================================
 
-bgfx::VertexDecl renderer_bgfx::PosColorTexCoord0Vertex::ms_decl;
+bgfx::VertexDecl renderer_bgfx::ScreenVertex::ms_decl;
 
-void renderer_bgfx::put_packed_quad(render_primitive *prim, UINT32 hash, PosColorTexCoord0Vertex* vertex)
+void renderer_bgfx::put_packed_quad(render_primitive *prim, UINT32 hash, ScreenVertex* vertex)
 {
 	rectangle_packer::packed_rectangle& rect = m_hash_to_entry[hash];
 	float u0 = float(rect.x()) / float(CACHE_SIZE);
 	float v0 = float(rect.y()) / float(CACHE_SIZE);
 	float u1 = u0 + float(rect.width()) / float(CACHE_SIZE);
 	float v1 = v0 + float(rect.height()) / float(CACHE_SIZE);
-	UINT32 rgba = u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255);
+    u1 -= 0.5f / float(CACHE_SIZE);
+    v1 -= 0.5f / float(CACHE_SIZE);
+    u0 += 0.5f / float(CACHE_SIZE);
+    v0 += 0.5f / float(CACHE_SIZE);
+    UINT32 rgba = u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255);
 
 	float x[4] = { prim->bounds.x0, prim->bounds.x1, prim->bounds.x0, prim->bounds.x1 };
 	float y[4] = { prim->bounds.y0, prim->bounds.y0, prim->bounds.y1, prim->bounds.y1 };
@@ -353,87 +365,84 @@ void renderer_bgfx::put_packed_quad(render_primitive *prim, UINT32 hash, PosColo
 	vertex[5].m_v = v[0];
 }
 
-void renderer_bgfx::render_textured_quad(int view, render_primitive* prim)
+void renderer_bgfx::render_textured_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer)
 {
-	if (bgfx::checkAvailTransientVertexBuffer(6, PosColorTexCoord0Vertex::ms_decl))
+	ScreenVertex* vertex = (ScreenVertex*)buffer->data;
+
+	UINT32 rgba = u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255);
+
+	vertex[0].m_x = prim->bounds.x0;
+	vertex[0].m_y = prim->bounds.y0;
+	vertex[0].m_z = 0;
+	vertex[0].m_rgba = rgba;
+	vertex[0].m_u = prim->texcoords.tl.u;
+	vertex[0].m_v = prim->texcoords.tl.v;
+
+	vertex[1].m_x = prim->bounds.x1;
+	vertex[1].m_y = prim->bounds.y0;
+	vertex[1].m_z = 0;
+	vertex[1].m_rgba = rgba;
+	vertex[1].m_u = prim->texcoords.tr.u;
+	vertex[1].m_v = prim->texcoords.tr.v;
+
+	vertex[2].m_x = prim->bounds.x1;
+	vertex[2].m_y = prim->bounds.y1;
+	vertex[2].m_z = 0;
+	vertex[2].m_rgba = rgba;
+	vertex[2].m_u = prim->texcoords.br.u;
+	vertex[2].m_v = prim->texcoords.br.v;
+
+	vertex[3].m_x = prim->bounds.x1;
+	vertex[3].m_y = prim->bounds.y1;
+	vertex[3].m_z = 0;
+	vertex[3].m_rgba = rgba;
+	vertex[3].m_u = prim->texcoords.br.u;
+	vertex[3].m_v = prim->texcoords.br.v;
+
+	vertex[4].m_x = prim->bounds.x0;
+	vertex[4].m_y = prim->bounds.y1;
+	vertex[4].m_z = 0;
+	vertex[4].m_rgba = rgba;
+	vertex[4].m_u = prim->texcoords.bl.u;
+	vertex[4].m_v = prim->texcoords.bl.v;
+
+	vertex[5].m_x = prim->bounds.x0;
+	vertex[5].m_y = prim->bounds.y0;
+	vertex[5].m_z = 0;
+	vertex[5].m_rgba = rgba;
+	vertex[5].m_u = prim->texcoords.tl.u;
+	vertex[5].m_v = prim->texcoords.tl.v;
+	bgfx::setVertexBuffer(buffer);
+
+	uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
+	if (video_config.filter == 0)
 	{
-		bgfx::TransientVertexBuffer vb;
-		bgfx::allocTransientVertexBuffer(&vb, 6, PosColorTexCoord0Vertex::ms_decl);
-		PosColorTexCoord0Vertex* vertex = (PosColorTexCoord0Vertex*)vb.data;
-
-		UINT32 rgba = u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255);
-
-		vertex[0].m_x = prim->bounds.x0;
-		vertex[0].m_y = prim->bounds.y0;
-		vertex[0].m_z = 0;
-		vertex[0].m_rgba = rgba;
-		vertex[0].m_u = prim->texcoords.tl.u;
-		vertex[0].m_v = prim->texcoords.tl.v;
-
-		vertex[1].m_x = prim->bounds.x1;
-		vertex[1].m_y = prim->bounds.y0;
-		vertex[1].m_z = 0;
-		vertex[1].m_rgba = rgba;
-		vertex[1].m_u = prim->texcoords.tr.u;
-		vertex[1].m_v = prim->texcoords.tr.v;
-
-		vertex[2].m_x = prim->bounds.x1;
-		vertex[2].m_y = prim->bounds.y1;
-		vertex[2].m_z = 0;
-		vertex[2].m_rgba = rgba;
-		vertex[2].m_u = prim->texcoords.br.u;
-		vertex[2].m_v = prim->texcoords.br.v;
-
-		vertex[3].m_x = prim->bounds.x1;
-		vertex[3].m_y = prim->bounds.y1;
-		vertex[3].m_z = 0;
-		vertex[3].m_rgba = rgba;
-		vertex[3].m_u = prim->texcoords.br.u;
-		vertex[3].m_v = prim->texcoords.br.v;
-
-		vertex[4].m_x = prim->bounds.x0;
-		vertex[4].m_y = prim->bounds.y1;
-		vertex[4].m_z = 0;
-		vertex[4].m_rgba = rgba;
-		vertex[4].m_u = prim->texcoords.bl.u;
-		vertex[4].m_v = prim->texcoords.bl.v;
-
-		vertex[5].m_x = prim->bounds.x0;
-		vertex[5].m_y = prim->bounds.y0;
-		vertex[5].m_z = 0;
-		vertex[5].m_rgba = rgba;
-		vertex[5].m_u = prim->texcoords.tl.u;
-		vertex[5].m_v = prim->texcoords.tl.v;
-		bgfx::setVertexBuffer(&vb);
-
-		uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
-		if (video_config.filter == 0)
-		{
-			texture_flags |= BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
-		}
-
-		const bgfx::Memory* mem = mame_texture_data_to_bgfx_texture_data(prim->flags & PRIMFLAG_TEXFORMAT_MASK,
-			prim->texture.width, prim->texture.height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
-
-		bgfx::TextureHandle texture = bgfx::createTexture2D((uint16_t)prim->texture.width, (uint16_t)prim->texture.height, 1, bgfx::TextureFormat::BGRA8, texture_flags, mem);
-
-		bgfx::setTexture(0, m_s_texColor, texture);
-
-		set_bgfx_state(PRIMFLAG_GET_BLENDMODE(prim->flags));
-		bgfx::submit(view, m_progQuadTexture);
-
-		bgfx::destroyTexture(texture);
+		texture_flags |= BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
 	}
-}
 
-bgfx::VertexDecl renderer_bgfx::PosColorVertex::ms_decl;
+	const bgfx::Memory* mem = mame_texture_data_to_bgfx_texture_data(prim->flags & PRIMFLAG_TEXFORMAT_MASK,
+		prim->texture.width, prim->texture.height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
+
+	bgfx::TextureHandle texture = bgfx::createTexture2D((uint16_t)prim->texture.width, (uint16_t)prim->texture.height, 1, bgfx::TextureFormat::BGRA8, texture_flags, mem);
+
+	bgfx::setTexture(0, m_s_texColor, texture);
+
+	set_bgfx_state(PRIMFLAG_GET_BLENDMODE(prim->flags));
+	bgfx::submit(view, m_progQuadTexture);
+
+	bgfx::destroyTexture(texture);
+}
 
 #define MAX_TEMP_COORDS 100
 
-void renderer_bgfx::put_polygon(const float* coords, UINT32 num_coords, float r, UINT32 rgba, PosColorVertex* vertex)
+void renderer_bgfx::put_polygon(const float* coords, UINT32 num_coords, float r, UINT32 rgba, ScreenVertex* vertex)
 {
 	float tempCoords[MAX_TEMP_COORDS * 3];
 	float tempNormals[MAX_TEMP_COORDS * 2];
+
+	rectangle_packer::packed_rectangle& rect = m_hash_to_entry[WHITE_HASH];
+	float u0 = float(rect.x()) / float(CACHE_SIZE);
+	float v0 = float(rect.y()) / float(CACHE_SIZE);
 
 	num_coords = num_coords < MAX_TEMP_COORDS ? num_coords : MAX_TEMP_COORDS;
 
@@ -489,36 +498,48 @@ void renderer_bgfx::put_polygon(const float* coords, UINT32 num_coords, float r,
 		vertex[vertIndex].m_y = coords[ii * 3 + 1];
 		vertex[vertIndex].m_z = coords[ii * 3 + 2];
 		vertex[vertIndex].m_rgba = rgba;
+		vertex[vertIndex].m_u = u0;
+		vertex[vertIndex].m_v = v0;
 		vertIndex++;
 
 		vertex[vertIndex].m_x = coords[jj * 3 + 0];
 		vertex[vertIndex].m_y = coords[jj * 3 + 1];
 		vertex[vertIndex].m_z = coords[jj * 3 + 2];
 		vertex[vertIndex].m_rgba = rgba;
+		vertex[vertIndex].m_u = u0;
+		vertex[vertIndex].m_v = v0;
 		vertIndex++;
 
 		vertex[vertIndex].m_x = tempCoords[jj * 3 + 0];
 		vertex[vertIndex].m_y = tempCoords[jj * 3 + 1];
 		vertex[vertIndex].m_z = tempCoords[jj * 3 + 2];
 		vertex[vertIndex].m_rgba = trans;
+		vertex[vertIndex].m_u = u0;
+		vertex[vertIndex].m_v = v0;
 		vertIndex++;
 
 		vertex[vertIndex].m_x = tempCoords[jj * 3 + 0];
 		vertex[vertIndex].m_y = tempCoords[jj * 3 + 1];
 		vertex[vertIndex].m_z = tempCoords[jj * 3 + 2];
 		vertex[vertIndex].m_rgba = trans;
+		vertex[vertIndex].m_u = u0;
+		vertex[vertIndex].m_v = v0;
 		vertIndex++;
 
 		vertex[vertIndex].m_x = tempCoords[ii * 3 + 0];
 		vertex[vertIndex].m_y = tempCoords[ii * 3 + 1];
 		vertex[vertIndex].m_z = tempCoords[ii * 3 + 2];
 		vertex[vertIndex].m_rgba = trans;
+		vertex[vertIndex].m_u = u0;
+		vertex[vertIndex].m_v = v0;
 		vertIndex++;
 
 		vertex[vertIndex].m_x = coords[ii * 3 + 0];
 		vertex[vertIndex].m_y = coords[ii * 3 + 1];
 		vertex[vertIndex].m_z = coords[ii * 3 + 2];
 		vertex[vertIndex].m_rgba = rgba;
+		vertex[vertIndex].m_u = u0;
+		vertex[vertIndex].m_v = v0;
 		vertIndex++;
 	}
 
@@ -528,23 +549,29 @@ void renderer_bgfx::put_polygon(const float* coords, UINT32 num_coords, float r,
 		vertex[vertIndex].m_y = coords[1];
 		vertex[vertIndex].m_z = coords[2];
 		vertex[vertIndex].m_rgba = rgba;
+		vertex[vertIndex].m_u = u0;
+		vertex[vertIndex].m_v = v0;
 		vertIndex++;
 
 		vertex[vertIndex].m_x = coords[(ii - 1) * 3 + 0];
 		vertex[vertIndex].m_y = coords[(ii - 1) * 3 + 1];
 		vertex[vertIndex].m_z = coords[(ii - 1) * 3 + 2];
 		vertex[vertIndex].m_rgba = rgba;
+		vertex[vertIndex].m_u = u0;
+		vertex[vertIndex].m_v = v0;
 		vertIndex++;
 
 		vertex[vertIndex].m_x = coords[ii * 3 + 0];
 		vertex[vertIndex].m_y = coords[ii * 3 + 1];
 		vertex[vertIndex].m_z = coords[ii * 3 + 2];
 		vertex[vertIndex].m_rgba = rgba;
+		vertex[vertIndex].m_u = u0;
+		vertex[vertIndex].m_v = v0;
 		vertIndex++;
 	}
 }
 
-void renderer_bgfx::put_line(float x0, float y0, float x1, float y1, float r, UINT32 rgba, PosColorVertex* vertex, float fth)
+void renderer_bgfx::put_line(float x0, float y0, float x1, float y1, float r, UINT32 rgba, ScreenVertex* vertex, float fth)
 {
 	float dx = x1 - x0;
 	float dy = y1 - y0;
@@ -851,73 +878,30 @@ int renderer_bgfx::draw(int update)
 
 	window().m_primlist->acquire_lock();
 
-	bgfx::TransientVertexBuffer flat_buffer[4];
-	bgfx::TransientVertexBuffer textured_buffer[4];
-
-	allocate_buffers(flat_buffer, textured_buffer);
-
-	int flat_vertices[4] = { 0, 0, 0, 0 };
-	int textured_vertices[4] = { 0, 0, 0, 0 };
-
 	// Mark our texture atlas as dirty if we need to do so
 	bool atlas_valid = update_atlas();
 
-	memset(flat_vertices, 0, sizeof(int) * 4);
-	memset(textured_vertices, 0, sizeof(int) * 4);
-
-	for (render_primitive *prim = window().m_primlist->first(); prim != nullptr; prim = prim->next())
+	render_primitive *prim = window().m_primlist->first();
+	while (prim != nullptr)
 	{
 		UINT32 blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
 
-		switch (prim->type)
+		bgfx::TransientVertexBuffer buffer;
+		allocate_buffer(prim, blend, &buffer);
+
+		buffer_status status = buffer_primitives(index, atlas_valid, &prim, &buffer);
+
+		if (status != BUFFER_EMPTY)
 		{
-		case render_primitive::LINE:
-			put_line(prim->bounds.x0, prim->bounds.y0, prim->bounds.x1, prim->bounds.y1, 1.0f, u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255), (PosColorVertex*)flat_buffer[blend].data + flat_vertices[blend], 1.0f);
-			flat_vertices[blend] += 30;
-			break;
-
-		case render_primitive::QUAD:
-			if (prim->texture.base == nullptr)
-			{
-				render_flat_quad(index, prim);
-			}
-			else
-			{
-				if (atlas_valid && (prim->flags & PRIMFLAG_PACKABLE) && prim->texture.hash != 0 && m_hash_to_entry[prim->texture.hash].hash())
-				{
-					put_packed_quad(prim, prim->texture.hash, (PosColorTexCoord0Vertex*)textured_buffer[blend].data + textured_vertices[blend]);
-					textured_vertices[blend] += 6;
-				}
-				else
-				{
-					render_textured_quad(index, prim);
-				}
-			}
-			break;
-
-		default:
-			throw emu_fatalerror("Unexpected render_primitive type");
-		}
-	}
-
-	for (UINT32 blend_mode = 0; blend_mode < BLENDMODE_COUNT; blend_mode++)
-	{
-		if (flat_vertices[blend_mode] > 0)
-		{
-			set_bgfx_state(blend_mode);
-			bgfx::setVertexBuffer(&flat_buffer[blend_mode]);
-			bgfx::submit(index, m_progQuad);
-		}
-	}
-
-	for (UINT32 blend_mode = 0; blend_mode < BLENDMODE_COUNT; blend_mode++)
-	{
-		if (textured_vertices[blend_mode] > 0)
-		{
-			set_bgfx_state(blend_mode);
-			bgfx::setVertexBuffer(&textured_buffer[blend_mode]);
+			set_bgfx_state(blend);
+			bgfx::setVertexBuffer(&buffer);
 			bgfx::setTexture(0, m_s_texColor, m_texture_cache);
 			bgfx::submit(index, m_progQuadTexture);
+		}
+
+		if (status != BUFFER_DONE && status != BUFFER_PRE_FLUSH)
+		{
+			prim = prim->next();
 		}
 	}
 
@@ -927,6 +911,70 @@ int renderer_bgfx::draw(int update)
 	if (index==0) bgfx::frame();
 
 	return 0;
+}
+
+renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer)
+{
+	int vertices = 0;
+
+	UINT32 blend = PRIMFLAG_GET_BLENDMODE((*prim)->flags);
+	while (*prim != nullptr)
+	{
+		switch ((*prim)->type)
+		{
+			case render_primitive::LINE:
+				put_line((*prim)->bounds.x0, (*prim)->bounds.y0, (*prim)->bounds.x1, (*prim)->bounds.y1, 1.0f, u32Color((*prim)->color.r * 255, (*prim)->color.g * 255, (*prim)->color.b * 255, (*prim)->color.a * 255), (ScreenVertex*)buffer->data + vertices, 1.0f);
+				vertices += 30;
+				break;
+
+			case render_primitive::QUAD:
+				if ((*prim)->texture.base == nullptr)
+				{
+					put_packed_quad(*prim, WHITE_HASH, (ScreenVertex*)buffer->data + vertices);
+					vertices += 6;
+				}
+				else
+				{
+					const UINT32 hash = get_texture_hash(*prim);
+					if (atlas_valid && (*prim)->packable(PACKABLE_SIZE) && hash != 0 && m_hash_to_entry[hash].hash())
+					{
+						put_packed_quad(*prim, hash, (ScreenVertex*)buffer->data + vertices);
+						vertices += 6;
+					}
+					else
+					{
+						if (vertices > 0)
+						{
+							return BUFFER_PRE_FLUSH;
+						}
+						render_textured_quad(view, *prim, buffer);
+						return BUFFER_EMPTY;
+					}
+				}
+				break;
+
+			default:
+				// Unhandled
+				break;
+		}
+
+		if ((*prim)->next() != nullptr && PRIMFLAG_GET_BLENDMODE((*prim)->next()->flags) != blend)
+		{
+			break;
+		}
+
+		*prim = (*prim)->next();
+	}
+
+	if (*prim == nullptr)
+	{
+		return BUFFER_DONE;
+	}
+	if (vertices == 0)
+	{
+		return BUFFER_EMPTY;
+	}
+	return BUFFER_FLUSH;
 }
 
 void renderer_bgfx::set_bgfx_state(UINT32 blend)
@@ -950,52 +998,6 @@ void renderer_bgfx::set_bgfx_state(UINT32 blend)
 	}
 }
 
-void renderer_bgfx::render_flat_quad(int view, render_primitive *prim)
-{
-	if (bgfx::checkAvailTransientVertexBuffer(6, PosColorVertex::ms_decl))
-	{
-		bgfx::TransientVertexBuffer vb;
-		bgfx::allocTransientVertexBuffer(&vb, 6, PosColorVertex::ms_decl);
-		PosColorVertex* vertex = (PosColorVertex*)vb.data;
-
-		UINT32 rgba = u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255);
-
-		vertex[0].m_x = prim->bounds.x0;
-		vertex[0].m_y = prim->bounds.y0;
-		vertex[0].m_z = 0;
-		vertex[0].m_rgba = rgba;
-
-		vertex[1].m_x = prim->bounds.x1;
-		vertex[1].m_y = prim->bounds.y0;
-		vertex[1].m_z = 0;
-		vertex[1].m_rgba = rgba;
-
-		vertex[2].m_x = prim->bounds.x1;
-		vertex[2].m_y = prim->bounds.y1;
-		vertex[2].m_z = 0;
-		vertex[2].m_rgba = rgba;
-
-		vertex[3].m_x = prim->bounds.x1;
-		vertex[3].m_y = prim->bounds.y1;
-		vertex[3].m_z = 0;
-		vertex[3].m_rgba = rgba;
-
-		vertex[4].m_x = prim->bounds.x0;
-		vertex[4].m_y = prim->bounds.y1;
-		vertex[4].m_z = 0;
-		vertex[4].m_rgba = rgba;
-
-		vertex[5].m_x = prim->bounds.x0;
-		vertex[5].m_y = prim->bounds.y0;
-		vertex[5].m_z = 0;
-		vertex[5].m_rgba = rgba;
-		bgfx::setVertexBuffer(&vb);
-
-		set_bgfx_state(PRIMFLAG_GET_BLENDMODE(prim->flags));
-		bgfx::submit(view, m_progQuad);
-	}
-}
-
 bool renderer_bgfx::update_atlas()
 {
 	bool atlas_dirty = check_for_dirty_atlas();
@@ -1005,29 +1007,68 @@ bool renderer_bgfx::update_atlas()
 		m_hash_to_entry.clear();
 
 		std::vector<std::vector<rectangle_packer::packed_rectangle>> packed;
-		if (m_packer.pack(m_texinfo, packed, 1024))
+		if (m_packer.pack(m_texinfo, packed, CACHE_SIZE))
 		{
-			for (std::vector<rectangle_packer::packed_rectangle> pack : packed)
-			{
-				for (rectangle_packer::packed_rectangle rect : pack)
-				{
-					if (rect.hash() == 0xffffffff)
-					{
-						continue;
-					}
-					m_hash_to_entry[rect.hash()] = rect;
-					const bgfx::Memory* mem = mame_texture_data_to_bgfx_texture_data(rect.format(), rect.width(), rect.height(), rect.rowpixels(), rect.palette(), rect.base());
-					bgfx::updateTexture2D(m_texture_cache, 0, rect.x(), rect.y(), rect.width(), rect.height(), mem);
-				}
-			}
+			process_atlas_packs(packed);
 		}
 		else
 		{
+			packed.clear();
+
 			m_texinfo.clear();
+			m_texinfo.push_back(rectangle_packer::packable_rectangle(WHITE_HASH, PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32), 16, 16, 16, nullptr, m_white));
+
+			m_packer.pack(m_texinfo, packed, CACHE_SIZE);
+			process_atlas_packs(packed);
+
 			return false;
 		}
 	}
 	return true;
+}
+
+void renderer_bgfx::process_atlas_packs(std::vector<std::vector<rectangle_packer::packed_rectangle>>& packed)
+{
+	for (std::vector<rectangle_packer::packed_rectangle> pack : packed)
+	{
+		for (rectangle_packer::packed_rectangle rect : pack)
+		{
+			if (rect.hash() == 0xffffffff)
+			{
+				continue;
+			}
+			m_hash_to_entry[rect.hash()] = rect;
+			const bgfx::Memory* mem = mame_texture_data_to_bgfx_texture_data(rect.format(), rect.width(), rect.height(), rect.rowpixels(), rect.palette(), rect.base());
+			bgfx::updateTexture2D(m_texture_cache, 0, rect.x(), rect.y(), rect.width(), rect.height(), mem);
+		}
+	}
+}
+
+UINT32 renderer_bgfx::get_texture_hash(render_primitive *prim)
+{
+#if GIBBERISH
+	UINT32 xor_value = 0x87;
+	UINT32 hash = 0xdabeefed;
+
+	int bpp = 2;
+	UINT32 format = PRIMFLAG_GET_TEXFORMAT(prim->flags);
+	if (format == TEXFORMAT_ARGB32 || format == TEXFORMAT_RGB32)
+	{
+		bpp = 4;
+	}
+
+	for (int y = 0; y < prim->texture.height; y++)
+	{
+		UINT8 *base = reinterpret_cast<UINT8*>(prim->texture.base) + prim->texture.rowpixels * y;
+		for (int x = 0; x < prim->texture.width * bpp; x++)
+		{
+			hash += base[x] ^ xor_value;
+		}
+	}
+	return hash;
+#else
+	return (reinterpret_cast<size_t>(prim->texture.base)) & 0xffffffff;
+#endif
 }
 
 bool renderer_bgfx::check_for_dirty_atlas()
@@ -1037,13 +1078,13 @@ bool renderer_bgfx::check_for_dirty_atlas()
 	std::map<UINT32, rectangle_packer::packable_rectangle> acquired_infos;
 	for (render_primitive *prim = window().m_primlist->first(); prim != nullptr; prim = prim->next())
 	{
-		bool pack = prim->flags & PRIMFLAG_PACKABLE;
+		bool pack = prim->packable(PACKABLE_SIZE);
 		if (prim->type == render_primitive::QUAD && prim->texture.base != nullptr && pack)
 		{
-			const UINT32 hash = prim->texture.hash;
-
+			const UINT32 hash = get_texture_hash(prim);
 			// If this texture is packable and not currently in the atlas, prepare the texture for putting in the atlas
-			if (hash != 0 && m_hash_to_entry[hash].hash() == 0 && acquired_infos[hash].hash() == 0)
+			if ((hash != 0 && m_hash_to_entry[hash].hash() == 0 && acquired_infos[hash].hash() == 0)
+             || (hash != 0 && m_hash_to_entry[hash].hash() != hash && acquired_infos[hash].hash() == 0))
 			{	// Create create the texture and mark the atlas dirty
 				atlas_dirty = true;
 
@@ -1055,43 +1096,63 @@ bool renderer_bgfx::check_for_dirty_atlas()
 		}
 	}
 
+	if (m_texinfo.size() == 1)
+	{
+		atlas_dirty = true;
+	}
+
 	return atlas_dirty;
 }
 
-void renderer_bgfx::allocate_buffers(bgfx::TransientVertexBuffer *flat_buffer, bgfx::TransientVertexBuffer *textured_buffer)
+void renderer_bgfx::allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::TransientVertexBuffer *buffer)
 {
-	int flat_vertices[4] = { 0, 0, 0, 0 };
-	int textured_vertices[4] = { 0, 0, 0, 0 };
+	int vertices = 0;
 
-	for (render_primitive *prim = window().m_primlist->first(); prim != nullptr; prim = prim->next())
+	bool mode_switched = false;
+	while (prim != nullptr && !mode_switched)
 	{
 		switch (prim->type)
 		{
 			case render_primitive::LINE:
-				flat_vertices[PRIMFLAG_GET_BLENDMODE(prim->flags)] += 30;
+				vertices += 30;
 				break;
 
 			case render_primitive::QUAD:
-				if (prim->flags & PRIMFLAG_PACKABLE && prim->texture.base != nullptr && prim->texture.hash != 0)
+				if (!prim->packable(PACKABLE_SIZE))
 				{
-					textured_vertices[PRIMFLAG_GET_BLENDMODE(prim->flags)] += 6;
+					if (prim->texture.base == nullptr)
+					{
+						vertices += 6;
+					}
+					else
+					{
+						mode_switched = true;
+						if (vertices == 0)
+						{
+							vertices += 6;
+						}
+					}
+				}
+				else
+				{
+					vertices += 6;
 				}
 				break;
 			default:
 				// Do nothing
 				break;
 		}
+
+		prim = prim->next();
+
+		if (prim != nullptr && PRIMFLAG_GET_BLENDMODE(prim->flags) != blend)
+		{
+			mode_switched = true;
+		}
 	}
 
-	for (int blend_mode = 0; blend_mode < 4; blend_mode++)
+	if (vertices > 0 && bgfx::checkAvailTransientVertexBuffer(vertices, ScreenVertex::ms_decl))
 	{
-		if (flat_vertices[blend_mode] > 0 && bgfx::checkAvailTransientVertexBuffer(flat_vertices[blend_mode], PosColorVertex::ms_decl))
-		{
-			bgfx::allocTransientVertexBuffer(&flat_buffer[blend_mode], flat_vertices[blend_mode], PosColorVertex::ms_decl);
-		}
-		if (textured_vertices[blend_mode] > 0 && bgfx::checkAvailTransientVertexBuffer(textured_vertices[blend_mode], PosColorTexCoord0Vertex::ms_decl))
-		{
-			bgfx::allocTransientVertexBuffer(&textured_buffer[blend_mode], textured_vertices[blend_mode], PosColorTexCoord0Vertex::ms_decl);
-		}
+		bgfx::allocTransientVertexBuffer(buffer, vertices, ScreenVertex::ms_decl);
 	}
 }

@@ -211,7 +211,6 @@ struct render_texinfo
 	UINT32              height;             // height of the image
 	UINT32              seqid;              // sequence ID
 	UINT64              osddata;            // aux data to pass to osd
-	UINT32				hash;				// hash (where applicable)
 	const rgb_t *       palette;            // palette for PALETTE16 textures, bcg lookup table for RGB32/YUY16
 };
 
@@ -329,6 +328,7 @@ public:
 
 	// getters
 	render_primitive *next() const { return m_next; }
+	bool packable(const INT32 pack_size) const { return (flags & PRIMFLAG_PACKABLE) && texture.base != nullptr && texture.width <= pack_size && texture.height <= pack_size; }
 
 	// reset to prepare for re-use
 	void reset();
