@@ -22,9 +22,7 @@ enum {
 	VIDEO_MODE_NONE,
 	VIDEO_MODE_GDI,
 	VIDEO_MODE_DDRAW,
-#if defined (USE_BGFX)
 	VIDEO_MODE_BGFX,
-#endif
 #if (USE_OPENGL)
 	VIDEO_MODE_OPENGL,
 #endif

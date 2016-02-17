@@ -203,12 +203,6 @@ private:
 
 	INT32           m_blittimer;
 
-#if (SDLMAME_SDL2)
-	//SDL_GLContext   m_gl_context_id;
-#else
-	// SDL surface
-	SDL_Surface         *m_sdlsurf;
-#endif
 
 	simple_list<texture_info>  m_texlist;                // list of active textures
 
@@ -601,32 +595,6 @@ static void drawsdl2_exit(void)
 
 //============================================================
 //  sdl_info::create
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
 //============================================================
 
 static void drawsdl_show_info(struct SDL_RendererInfo *render_info)
@@ -661,7 +629,6 @@ static void drawsdl_show_info(struct SDL_RendererInfo *render_info)
 
 int sdl_info13::create()
 {
-#if (SDLMAME_SDL2)
 	// create renderer
 
 	/* Enable bilinear filtering in case it is supported.
@@ -699,9 +666,6 @@ int sdl_info13::create()
 	SDL_GetRendererInfo(m_sdl_renderer, &render_info);
 	drawsdl_show_info(&render_info);
 
-#else
-
-#endif
 	return 0;
 }
 

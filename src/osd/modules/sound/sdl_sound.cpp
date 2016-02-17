@@ -421,11 +421,7 @@ int sound_sdl::init(const osd_options &options)
 		}
 
 		osd_printf_verbose("Audio: Start initialization\n");
-	#if (SDLMAME_SDL2)
 		strncpy(audio_driver, SDL_GetCurrentAudioDriver(), sizeof(audio_driver));
-	#else
-		SDL_AudioDriverName(audio_driver, sizeof(audio_driver));
-	#endif
 		osd_printf_verbose("Audio: Driver is %s\n", audio_driver);
 
 		sdl_xfer_samples = SDL_XFER_SAMPLES;

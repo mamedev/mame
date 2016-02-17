@@ -468,7 +468,6 @@ protected:
 void tispeak_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
-	memset(m_display_segmask, ~0, sizeof(m_display_segmask)); // !
 
 	init_cartridge();
 }
@@ -541,8 +540,9 @@ DRIVER_INIT_MEMBER(tispeak_state, lantutor)
 
 void tispeak_state::prepare_display()
 {
-	UINT16 gridmask = (m_display_decay[15][16] != 0) ? 0xffff : 0x8000;
-	display_matrix_seg(16+1, 16, m_plate | 0x10000, m_grid & gridmask, 0x3fff);
+	UINT16 gridmask = (m_display_decay[15][16] != 0) ? 0xffff : 0x8000; // vfd filament on/off
+	set_display_segmask(0x21ff, 0x3fff);
+	display_matrix(16+1, 16, m_plate | 1<<16, m_grid & gridmask);
 }
 
 WRITE16_MEMBER(tispeak_state::snspell_write_r)

@@ -280,6 +280,11 @@ end
 		buildoptions {
 			"-Wno-enum-conversion",
 		}
+		if _OPTIONS["targetos"]=="macosx" then
+			buildoptions_c {
+				"-Wno-unknown-attributes",
+			}
+		end
 	end
 	configuration { }
 
@@ -700,7 +705,6 @@ end
 -- BGFX library objects
 --------------------------------------------------
 
-if (USE_BGFX == 1) then
 project "bgfx"
 	uuid "d3e7e119-35cf-4f4f-aba0-d3bdcd1b879a"
 	kind "StaticLib"
@@ -725,9 +729,13 @@ end
 		MAME_DIR .. "3rdparty/bgfx/include",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty",
 		MAME_DIR .. "3rdparty/bx/include",
-		MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/dxsdk/include",
 	}
+
+	configuration { "not steamlink"}
+		includedirs {
+			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
+		}
 
 	configuration { "vs*" }
 		includedirs {
@@ -824,7 +832,6 @@ end
 			MAME_DIR .. "3rdparty/bgfx/src/renderer_mtl.mm",
 		}
 	end
-end
 
 --------------------------------------------------
 -- PortAudio library objects

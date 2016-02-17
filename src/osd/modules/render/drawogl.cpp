@@ -30,10 +30,6 @@
 #include "modules/lib/osdlib.h"
 #include "modules/lib/osdobj_common.h"
 
-#if defined(OSD_WINDOWS) && !defined(SDLMAME_SDL2)
-#define SDLMAME_SDL2 0
-#endif
-
 // OpenGL headers
 #include "modules/opengl/osd_opengl.h"
 
@@ -344,7 +340,7 @@ private:
 HMODULE win_gl_context::m_module;
 
 
-#elif SDLMAME_SDL2
+#else
 
 class sdl_gl_context : public osd_gl_context
 {
@@ -392,51 +388,6 @@ public:
 private:
 	SDL_GLContext m_context;
 	SDL_Window *m_window;
-	char m_error[256];
-};
-
-#else
-// SDL 1.2
-class sdl12_gl_context : public osd_gl_context
-{
-public:
-	sdl12_gl_context(SDL_Surface *window) : osd_gl_context(), m_window(window)
-	{
-		m_error[0] = 0;
-	}
-	virtual ~sdl12_gl_context()
-	{
-	}
-	virtual void MakeCurrent()
-	{
-	}
-
-	virtual int SetSwapInterval(const int swap)
-	{
-		// Not supported on 1.2
-		return 0;
-	}
-
-	virtual const char *LastErrorMsg()
-	{
-		if (m_error[0] == 0)
-			return NULL;
-		else
-			return m_error;
-	}
-
-	virtual void *getProcAddress(const char *proc)
-	{
-		return SDL_GL_GetProcAddress(proc);
-	}
-
-	virtual void SwapBuffer()
-	{
-		SDL_GL_SwapBuffers();
-	}
-
-private:
-	SDL_Surface *m_window;
 	char m_error[256];
 };
 
@@ -766,10 +717,8 @@ int drawogl_init(running_machine &machine, osd_draw_callbacks *callbacks)
 	load_gl_lib(machine);
 #if defined(OSD_WINDOWS)
 	osd_printf_verbose("Using Windows OpenGL driver\n");
-#elif SDLMAME_SDL2
-	osd_printf_verbose("Using SDL multi-window OpenGL driver (SDL 2.0+)\n");
 #else
-	osd_printf_verbose("Using SDL single-window OpenGL driver (SDL 1.2)\n");
+	osd_printf_verbose("Using SDL multi-window OpenGL driver (SDL 2.0+)\n");
 #endif
 
 	return 0;
@@ -1035,10 +984,8 @@ int sdl_info_ogl::create()
 	// create renderer
 #if defined(OSD_WINDOWS)
 	m_gl_context = global_alloc(win_gl_context(window().m_hwnd));
-#elif SDLMAME_SDL2
-	m_gl_context = global_alloc(sdl_gl_context(window().sdl_window()));
 #else
-	m_gl_context = global_alloc(sdl12_gl_context(window().sdl_surface()));
+	m_gl_context = global_alloc(sdl_gl_context(window().sdl_window()));
 #endif
 	if  (m_gl_context->LastErrorMsg() != NULL)
 	{
@@ -1530,11 +1477,9 @@ int sdl_info_ogl::draw(const int update)
 	if (m_init_context)
 	{
 		// do some one-time OpenGL setup
-#if SDLMAME_SDL2
 		// FIXME: SRGB conversion is working on SDL2, may be of use
 		// when we eventually target gamma and monitor profiles.
 		//glEnable(GL_FRAMEBUFFER_SRGB);
-#endif
 		glShadeModel(GL_SMOOTH);
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClearDepth(1.0f);
@@ -1559,11 +1504,6 @@ int sdl_info_ogl::draw(const int update)
 		{
 			loadGLExtensions();
 		}
-
-#if !defined(OSD_WINDOWS) && !SDLMAME_SDL2
-		// force all textures to be regenerated
-		destroy_all_textures();
-#endif
 
 		m_surf_w = m_width;
 		m_surf_h = m_height;

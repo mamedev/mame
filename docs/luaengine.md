@@ -26,9 +26,10 @@ currently available to LUA scripts:
  * machine metadata (app version, current rom, rom details)
  * machine control (starting, pausing, resetting, stopping)
  * machine hooks (on frame painting and on user events)
+ * machine options (hard reset required for options to take affect)
  * devices introspection (device tree listing, memory and register enumeration)
  * screens introspection (screens listing, screen details, frames counting)
- * screen HUD drawing (text, lines, boxes on multiple screens)
+ * screen snaps and HUD drawing (text, lines, boxes on multiple screens)
  * memory read/write (8/16/32/64 bits, signed and unsigned)
  * registers and states control (states enumeration, get and set)
 
@@ -155,3 +156,35 @@ program
 41
 ```
 
+manager:options()
+manager:machine():options()
+manager:machine():ui():options()
+```
+> opts = manager:machine():options()
+> for k, entry in pairs(opts.entries) do print(string.format("%10s: %s\n%11s %s", k, entry:value(), "", entry:description())) end
+diff_directory: diff
+            directory to save hard drive image differeVnce files
+joystick_contradictory: false
+            enable contradictory direction digital joystick input at the same time
+ scalemode: none
+            Scale mode: none, hwblit, hwbest, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)
+     oslog: false
+            output error.log data to the system debugger
+[...]
+> print(opts.entries["sleep"]:value())
+true
+> print(opts.entries["sleep"]:value("invalid"))
+Illegal boolean value for sleep: "invalid"; reverting to 1
+true
+> print(opts.entries["sleep"]:value(false))
+false
+```
+
+individual screen snapshots
+```
+> local screen = manager:machine().screens[":screen"]
+> screen:snapshot()
+saved snap/gridlee/0000.png
+> screen:snapshot('%g.png')
+saved snap/gridlee.png
+```

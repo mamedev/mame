@@ -76,6 +76,7 @@ public:
 	// misc
 	void toggle_throttle();
 	void toggle_record_movie();
+	file_error open_next(emu_file &file, const char *extension);
 
 	// render a frame
 	void frame_update(bool debug = false);
@@ -127,7 +128,6 @@ private:
 
 	// snapshot/movie helpers
 	void create_snapshot_bitmap(screen_device *screen);
-	file_error open_next(emu_file &file, const char *extension);
 	void record_frame();
 
 	// internal state

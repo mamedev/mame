@@ -16,11 +16,7 @@
 // standard SDL headers
 #include "sdlinc.h"
 
-#if (SDLMAME_SDL2)
 #include <SDL2/SDL_thread.h>
-#else
-#include <SDL/SDL_thread.h>
-#endif
 
 // standard C headers
 #include <math.h>
@@ -91,10 +87,6 @@ static sdl_window_info **last_window_ptr;
 // event handling
 static int multithreading_enabled;
 static osd_work_queue *work_queue;
-
-#if !(SDLMAME_SDL2) && (!defined(SDLMAME_EMSCRIPTEN))
-typedef int SDL_threadID;
-#endif
 
 static SDL_threadID main_threadid;
 static SDL_threadID window_threadid;
@@ -189,11 +181,7 @@ static OSDWORK_CALLBACK(sdlwindow_thread_id)
 
 	if (SDLMAME_INIT_IN_WORKER_THREAD)
 	{
-#if (SDLMAME_SDL2)
 		if (SDL_InitSubSystem(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE))
-#else
-		if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE))
-#endif
 		{
 			osd_printf_error("Could not initialize SDL: %s.\n", SDL_GetError());
 			exit(-1);
@@ -242,27 +230,22 @@ bool sdl_osd_interface::window_init()
 			video_config.mode = VIDEO_MODE_SOFT;
 	}
 #endif
-#if SDLMAME_SDL2
 	if (video_config.mode == VIDEO_MODE_SDL2ACCEL)
 	{
 		if (drawsdl2_init(machine(), &draw))
 			video_config.mode = VIDEO_MODE_SOFT;
 	}
-#endif
-#ifdef USE_BGFX
 	if (video_config.mode == VIDEO_MODE_BGFX)
 	{
 		if (drawbgfx_init(machine(), &draw))
 			video_config.mode = VIDEO_MODE_SOFT;
 	}
-#endif
 	if (video_config.mode == VIDEO_MODE_SOFT)
 	{
 		if (drawsdl_init(&draw))
 			return false;
 	}
 
-#if SDLMAME_SDL2
 	/* We may want to set a number of the hints SDL2 provides.
 	 * The code below will document which hints were set.
 	 */
@@ -294,7 +277,6 @@ bool sdl_osd_interface::window_init()
 	osd_printf_verbose("\nHints:\n");
 	for (int i = 0; hints[i] != NULL; i++)
 		osd_printf_verbose("\t%-40s %s\n", hints[i], SDL_GetHint(hints[i]));
-#endif
 
 	// set up the window list
 	last_window_ptr = &sdl_window_list;
@@ -478,14 +460,7 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_resize_wt )
 
 	ASSERT_WINDOW_THREAD();
 
-#if (SDLMAME_SDL2)
 	SDL_SetWindowSize(window->sdl_window(), width, height);
-#else
-	SDL_FreeSurface(window->m_sdlsurf);
-
-	window->m_sdlsurf = SDL_SetVideoMode(width, height, 0,
-			SDL_SWSURFACE | SDL_ANYFORMAT | window->m_extra_flags);
-#endif
 	window->renderer().notify_changed();
 
 	osd_free(wp);
@@ -559,7 +534,6 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_toggle_full_screen_wt )
 	global_free(window->m_renderer);
 	window->m_renderer = NULL;
 
-#if (SDLMAME_SDL2)
 	bool is_osx = false;
 #ifdef SDLMAME_MACOSX
 	// FIXME: This is weird behaviour and certainly a bug in SDL
@@ -572,15 +546,6 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_toggle_full_screen_wt )
 		SDL_SetWindowFullscreen(window->sdl_window(), SDL_WINDOW_FULLSCREEN);    // Try to set mode
 	}
 	SDL_DestroyWindow(window->sdl_window());
-#else
-	if (window->m_sdlsurf)
-	{
-		SDL_FreeSurface(window->m_sdlsurf);
-		window->m_sdlsurf = NULL;
-	}
-#endif
-
-
 	sdlinput_release_keys();
 
 	window->set_renderer(draw.create(window));
@@ -647,7 +612,6 @@ void sdl_window_info::update_cursor_state()
 	c=SDL_CreateCursor(data, data, 8, 8, 0, 0);
 	SDL_SetCursor(c);
 #else
-#if (SDLMAME_SDL2)
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
 	if (!(machine().debug_flags & DEBUG_FLAG_OSD_ENABLED))
@@ -670,30 +634,6 @@ void sdl_window_info::update_cursor_state()
 		}
 		SDL_SetCursor(NULL); // Force an update in case the underlying driver has changed visibility
 	}
-
-#else
-	// do not do mouse capture if the debugger's enabled to avoid
-	// the possibility of losing control
-	if (!(machine().debug_flags & DEBUG_FLAG_OSD_ENABLED))
-	{
-		if ( fullscreen() || sdlinput_should_hide_mouse() )
-		{
-			SDL_ShowCursor(SDL_DISABLE);
-			if (!SDL_WM_GrabInput(SDL_GRAB_QUERY))
-			{
-				SDL_WM_GrabInput(SDL_GRAB_ON);
-			}
-		}
-		else
-		{
-			SDL_ShowCursor(SDL_ENABLE);
-			if (SDL_WM_GrabInput(SDL_GRAB_QUERY))
-			{
-				SDL_WM_GrabInput(SDL_GRAB_OFF);
-			}
-		}
-	}
-#endif
 #endif
 }
 
@@ -793,7 +733,6 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_video_window_destroy_wt )
 	// free the textures etc
 	window->renderer().destroy();
 
-#if (SDLMAME_SDL2)
 	if (window->fullscreen() && video_config.switchres)
 	{
 		SDL_SetWindowFullscreen(window->sdl_window(), 0);    // Try to set mode
@@ -801,14 +740,6 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_video_window_destroy_wt )
 		SDL_SetWindowFullscreen(window->sdl_window(), SDL_WINDOW_FULLSCREEN);    // Try to set mode
 	}
 	SDL_DestroyWindow(window->sdl_window());
-#else
-	if (window->m_sdlsurf)
-	{
-		SDL_FreeSurface(window->m_sdlsurf);
-		window->m_sdlsurf = NULL;
-	}
-#endif
-
 	// release all keys ...
 	sdlinput_release_keys();
 
@@ -853,7 +784,6 @@ void sdl_window_info::destroy()
 //  pick_best_mode
 //============================================================
 
-#if SDLMAME_SDL2
 osd_dim sdl_window_info::pick_best_mode()
 {
 	int minimum_width, minimum_height, target_width, target_height;
@@ -922,82 +852,6 @@ osd_dim sdl_window_info::pick_best_mode()
 	}
 	return ret;
 }
-#else
-osd_dim sdl_window_info::pick_best_mode()
-{
-	int minimum_width, minimum_height, target_width, target_height;
-	int i;
-	float size_score, best_score = 0.0f;
-	int best_width = 0, best_height = 0;
-	SDL_Rect **modes;
-
-	// determine the minimum width/height for the selected target
-	m_target->compute_minimum_size(minimum_width, minimum_height);
-
-	// use those as the target for now
-	target_width = minimum_width * MAX(1, prescale());
-	target_height = minimum_height * MAX(1, prescale());
-
-	// if we're not stretching, allow some slop on the minimum since we can handle it
-	{
-		minimum_width -= 4;
-		minimum_height -= 4;
-	}
-
-#if 1 // defined(SDLMAME_WIN32)
-	/*
-	 *  We need to do this here. If SDL_ListModes is
-	 * called in init_monitors, the call will crash
-	 * on win32
-	 */
-	modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_DOUBLEBUF);
-#else
-	modes = window->m_monitor->modes;
-#endif
-
-	if (modes == (SDL_Rect **)0)
-	{
-		osd_printf_error("SDL: No modes available?!\n");
-		exit(-1);
-	}
-	else if (modes == (SDL_Rect **)-1)  // all modes are possible
-	{
-		return osd_dim(m_win_config.width, m_win_config.height);
-	}
-	else
-	{
-		for (i = 0; modes[i]; ++i)
-		{
-			// compute initial score based on difference between target and current
-			size_score = 1.0f / (1.0f + fabsf((INT32)modes[i]->w - target_width) + fabsf((INT32)modes[i]->h - target_height));
-
-			// if the mode is too small, give a big penalty
-			if (modes[i]->w < minimum_width || modes[i]->h < minimum_height)
-				size_score *= 0.01f;
-
-			// if mode is smaller than we'd like, it only scores up to 0.1
-			if (modes[i]->w < target_width || modes[i]->h < target_height)
-				size_score *= 0.1f;
-
-			// if we're looking for a particular mode, that's a winner
-			if (modes[i]->w == m_win_config.width && modes[i]->h == m_win_config.height)
-				size_score = 2.0f;
-
-			osd_printf_verbose("%4dx%4d -> %f\n", (int)modes[i]->w, (int)modes[i]->h, size_score);
-
-			// best so far?
-			if (size_score > best_score)
-			{
-				best_score = size_score;
-				best_width = modes[i]->w;
-				best_height = modes[i]->h;
-			}
-
-		}
-	}
-	return osd_dim(best_width, best_height);
-}
-#endif
 
 //============================================================
 //  sdlwindow_video_window_update
@@ -1142,8 +996,6 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 	 */
 	osd_printf_verbose("Enter sdl_info::create\n");
 
-#if (SDLMAME_SDL2)
-
 	if (window->renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL))
 	{
 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
@@ -1227,49 +1079,7 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 		SDL_SetWindowGrab(window->sdl_window(), SDL_TRUE);
 #endif
 
-#else
-	window->m_extra_flags = (window->fullscreen() ?  SDL_FULLSCREEN : SDL_RESIZABLE);
-
-	if (window->renderer().has_flags(osd_renderer::FLAG_NEEDS_DOUBLEBUF))
-		window->m_extra_flags |= SDL_DOUBLEBUF;
-	if (window->renderer().has_flags(osd_renderer::FLAG_NEEDS_ASYNCBLIT))
-		window->m_extra_flags |= SDL_ASYNCBLIT;
-
-	if (window->renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL))
-	{
-		window->m_extra_flags |= SDL_DOUBLEBUF | SDL_OPENGL;
-		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-		#if (SDL_VERSION_ATLEAST(1,2,10)) && (!defined(SDLMAME_EMSCRIPTEN))
-		SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, video_config.waitvsync ? 1 : 0);
-		#endif
-		//  load_gl_lib(window->machine());
-	}
-
-	// create the SDL surface (which creates the window in windowed mode)
-#if 0
-	window->m_sdlsurf = SDL_SetVideoMode(tempwidth, tempheight,
-							0, SDL_OPENGL | SDL_FULLSCREEN);// | window->m_extra_flags);
-	if (!window->m_sdlsurf)
-		printf("completely failed\n");
-#endif
-	window->m_sdlsurf = SDL_SetVideoMode(temp.width(), temp.height(),
-							0, SDL_SWSURFACE  | SDL_ANYFORMAT | window->m_extra_flags);
-
-	if (!window->m_sdlsurf)
-	{
-		osd_printf_error("SDL Error: %s\n", SDL_GetError());
-		return (void *) &result[1];
-	}
-	if ( (video_config.mode  == VIDEO_MODE_OPENGL) && !(window->m_sdlsurf->flags & SDL_OPENGL) )
-	{
-		osd_printf_error("OpenGL not supported on this driver!\n");
-		return (void *) &result[1];
-	}
-	// set the window title
-	SDL_WM_SetCaption(window->m_title, "SDLMAME");
-#endif
-
-		// set main window
+	// set main window
 	if (window->m_index > 0)
 	{
 		for (auto w = sdl_window_list; w != NULL; w = w->m_next)

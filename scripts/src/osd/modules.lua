@@ -89,7 +89,6 @@ function osdmodulesbuild()
 			MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.h",
 			MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.h",
 			MAME_DIR .. "src/osd/modules/opengl/osd_opengl.h",
-			MAME_DIR .. "src/osd/modules/opengl/SDL1211_opengl.h",
 		}
 		defines {
 			"USE_OPENGL=1",
@@ -101,18 +100,14 @@ function osdmodulesbuild()
 		end
 	end
 
-	if USE_BGFX == 1 then
-		files {
-			MAME_DIR .. "src/osd/modules/render/drawbgfx.cpp",
-		}
-		defines {
-			"USE_BGFX"
-		}
-		includedirs {
-			MAME_DIR .. "3rdparty/bgfx/include",
-			MAME_DIR .. "3rdparty/bx/include",
-		}
-	end
+	files {
+		MAME_DIR .. "src/osd/modules/render/drawbgfx.cpp",
+		MAME_DIR .. "src/osd/modules/render/binpacker.cpp",
+	}
+	includedirs {
+		MAME_DIR .. "3rdparty/bgfx/include",
+		MAME_DIR .. "3rdparty/bx/include",
+	}
 
 	if _OPTIONS["NO_USE_MIDI"]=="1" then
 		defines {
@@ -356,14 +351,6 @@ newoption {
 	},
 }
 
-if not _OPTIONS["NO_OPENGL"] then
-	if _OPTIONS["targetos"]=="os2" then
-		_OPTIONS["NO_OPENGL"] = "1"
-	else
-		_OPTIONS["NO_OPENGL"] = "0"
-	end
-end
-
 newoption {
 	trigger = "USE_DISPATCH_GL",
 	description = "Use GL-dispatching",
@@ -374,11 +361,7 @@ newoption {
 }
 
 if not _OPTIONS["USE_DISPATCH_GL"] then
-	if USE_BGFX == 1 then
-		_OPTIONS["USE_DISPATCH_GL"] = "0"
-	else
-		_OPTIONS["USE_DISPATCH_GL"] = "1"
-	end
+	_OPTIONS["USE_DISPATCH_GL"] = "0"
 end
 
 newoption {

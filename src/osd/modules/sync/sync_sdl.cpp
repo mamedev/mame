@@ -191,11 +191,7 @@ osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 		return NULL;
 	thread->callback = callback;
 	thread->param = cbparam;
-#ifdef SDLMAME_SDL2
 	thread->thread = SDL_CreateThread(worker_thread_entry, "Thread", thread);
-#else
-	thread->thread = SDL_CreateThread(worker_thread_entry, thread);
-#endif
 	if ( thread->thread == NULL )
 	{
 		free(thread);

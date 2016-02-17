@@ -62,7 +62,9 @@ enum
 	BLENDMODE_NONE = 0,                                 // no blending
 	BLENDMODE_ALPHA,                                    // standard alpha blend
 	BLENDMODE_RGB_MULTIPLY,                             // apply source alpha to source pix, then multiply RGB values
-	BLENDMODE_ADD                                       // apply source alpha to source pix, then add to destination
+	BLENDMODE_ADD,                                      // apply source alpha to source pix, then add to destination
+
+	BLENDMODE_COUNT
 };
 
 
@@ -104,6 +106,9 @@ const int PRIMFLAG_TYPE_SHIFT = 19;
 const UINT32 PRIMFLAG_TYPE_MASK = 3 << PRIMFLAG_TYPE_SHIFT;
 const UINT32 PRIMFLAG_TYPE_LINE = 0 << PRIMFLAG_TYPE_SHIFT;
 const UINT32 PRIMFLAG_TYPE_QUAD = 1 << PRIMFLAG_TYPE_SHIFT;
+
+const int PRIMFLAG_PACKABLE_SHIFT = 21;
+const UINT32 PRIMFLAG_PACKABLE = 1 << PRIMFLAG_PACKABLE_SHIFT;
 
 //**************************************************************************
 //  MACROS
@@ -323,6 +328,7 @@ public:
 
 	// getters
 	render_primitive *next() const { return m_next; }
+	bool packable(const INT32 pack_size) const { return (flags & PRIMFLAG_PACKABLE) && texture.base != nullptr && texture.width <= pack_size && texture.height <= pack_size; }
 
 	// reset to prepare for re-use
 	void reset();
@@ -430,7 +436,7 @@ public:
 
 private:
 	// internal helpers
-	void get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &texinfo, render_primitive_list &primlist);
+	void get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &texinfo, render_primitive_list &primlist, UINT32 flags = 0);
 	const rgb_t *get_adjusted_palette(render_container &container);
 
 	static const int MAX_TEXTURE_SCALES = 16;

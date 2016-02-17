@@ -24,6 +24,8 @@
 #undef None
 #endif
 
+class cheat_manager;
+
 struct lua_State;
 namespace luabridge
 {
@@ -119,6 +121,9 @@ private:
 
 	// "emu.machine" namespace
 	static luabridge::LuaRef l_machine_get_devices(const running_machine *r);
+	static luabridge::LuaRef l_ioport_get_ports(const ioport_manager *i);
+	static luabridge::LuaRef l_render_get_targets(const render_manager *r);
+	static luabridge::LuaRef l_ioports_port_get_fields(const ioport_port *i);
 	static luabridge::LuaRef devtree_dfs(device_t *root, luabridge::LuaRef dev_table);
 	static luabridge::LuaRef l_dev_get_states(const device_t *d);
 	static UINT64 l_state_get_value(const device_state_entry *d);
@@ -132,9 +137,27 @@ private:
 	struct lua_screen {
 		int l_height(lua_State *L);
 		int l_width(lua_State *L);
+		int l_refresh(lua_State *L);
+		int l_type(lua_State *L);
+		int l_snapshot(lua_State *L);
 		int l_draw_box(lua_State *L);
 		int l_draw_line(lua_State *L);
 		int l_draw_text(lua_State *L);
+	};
+
+	struct lua_video {
+		int l_begin_recording(lua_State *L);
+		int l_end_recording(lua_State *L);
+	};
+
+	static luabridge::LuaRef l_cheat_get_entries(const cheat_manager *c);
+	struct lua_cheat_entry {
+		int l_get_state(lua_State *L);
+	};
+
+	template<typename T> static luabridge::LuaRef l_options_get_entries(const T *o);
+	struct lua_options_entry {
+		int l_entry_value(lua_State *L);
 	};
 
 	void resume(void *L, INT32 param);

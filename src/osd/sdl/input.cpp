@@ -235,7 +235,6 @@ struct kt_table {
 	char        *   ui_name;
 };
 
-#if (SDLMAME_SDL2)
 
 #define OSD_SDL_INDEX(x) (x)
 #define OSD_SDL_INDEX_KEYSYM(keysym) ((keysym)->scancode)
@@ -365,132 +364,6 @@ static kt_table sdl_key_trans_table[] =
 	KTT_ENTRY0(  BACKSLASH2,    NONUSBACKSLASH,     0xdc,   '\\', "BACKSLASH2" ),
 	{ ITEM_ID_INVALID }
 };
-#else
-
-#define OSD_SDL_INDEX(x) (SDLK_INDEX(x)-SDLK_FIRST)
-#define OSD_SDL_INDEX_KEYSYM(keysym) (OSD_SDL_INDEX((keysym)->sym))
-#define GET_WINDOW(ev) sdl_window_list
-#define GET_FOCUS_WINDOW(ev) sdl_window_list
-
-#define KTT_ENTRY0(MAME, SDL, VK, AS, UI) { ITEM_ID_ ## MAME, SDLK_ ## SDL, "ITEM_ID_" #MAME, (char *) UI }
-#define KTT_ENTRY1(MAME, SDL) KTT_ENTRY0(MAME, SDL, MAME, MAME, #MAME)
-// only for reference ...
-#define KTT_ENTRY2(MAME, SDL) KTT_ENTRY0(MAME, SDL, 0, 0, #MAME)
-
-
-static kt_table sdl_key_trans_table[] =
-{
-	// MAME key         SDL key         vkey    ascii
-	KTT_ENTRY0(  ESC,           ESCAPE,         0x1b,   0x1b,       "ESC"  ),
-	KTT_ENTRY1(  1,             1 ),
-	KTT_ENTRY1(  2,             2 ),
-	KTT_ENTRY1(  3,             3 ),
-	KTT_ENTRY1(  4,             4 ),
-	KTT_ENTRY1(  5,             5 ),
-	KTT_ENTRY1(  6,             6 ),
-	KTT_ENTRY1(  7,             7 ),
-	KTT_ENTRY1(  8,             8 ),
-	KTT_ENTRY1(  9,             9 ),
-	KTT_ENTRY1(  0,             0 ),
-	KTT_ENTRY0(  MINUS,         MINUS,          0xbd,   '-',    "MINUS" ),
-	KTT_ENTRY0(  EQUALS,        EQUALS,         0xbb,   '=',    "EQUALS" ),
-	KTT_ENTRY0(  BACKSPACE,     BACKSPACE,      0x08,   0x08,   "BACKSPACE" ),
-	KTT_ENTRY0(  TAB,           TAB,            0x09,   0x09,   "TAB" ),
-	KTT_ENTRY1(  Q,             q ),
-	KTT_ENTRY1(  W,             w ),
-	KTT_ENTRY1(  E,             e ),
-	KTT_ENTRY1(  R,             r ),
-	KTT_ENTRY1(  T,             t ),
-	KTT_ENTRY1(  Y,             y ),
-	KTT_ENTRY1(  U,             u ),
-	KTT_ENTRY1(  I,             i ),
-	KTT_ENTRY1(  O,             o ),
-	KTT_ENTRY1(  P,             p ),
-	KTT_ENTRY0(  OPENBRACE, LEFTBRACKET,        0xdb,   '[',    "OPENBRACE" ),
-	KTT_ENTRY0(  CLOSEBRACE,RIGHTBRACKET,       0xdd,   ']',    "CLOSEBRACE" ),
-	KTT_ENTRY0(  ENTER,     RETURN,             0x0d,   0x0d,   "RETURN" ),
-	KTT_ENTRY2(  LCONTROL,  LCTRL ),
-	KTT_ENTRY1(  A,             a ),
-	KTT_ENTRY1(  S,             s ),
-	KTT_ENTRY1(  D,             d ),
-	KTT_ENTRY1(  F,             f ),
-	KTT_ENTRY1(  G,             g ),
-	KTT_ENTRY1(  H,             h ),
-	KTT_ENTRY1(  J,             j ),
-	KTT_ENTRY1(  K,             k ),
-	KTT_ENTRY1(  L,             l ),
-	KTT_ENTRY0(  COLON,         SEMICOLON,      0xba,   ';',    "COLON" ),
-	KTT_ENTRY0(  QUOTE,         QUOTE,          0xde,   '\'',   "QUOTE" ),
-	KTT_ENTRY2(  LSHIFT,        LSHIFT ),
-	KTT_ENTRY0(  BACKSLASH,     BACKSLASH,      0xdc,   '\\',   "BACKSLASH" ),
-	KTT_ENTRY1(  Z,             z ),
-	KTT_ENTRY1(  X,             x ),
-	KTT_ENTRY1(  C,             c ),
-	KTT_ENTRY1(  V,             v ),
-	KTT_ENTRY1(  B,             b ),
-	KTT_ENTRY1(  N,             n ),
-	KTT_ENTRY1(  M,             m ),
-	KTT_ENTRY0(  COMMA,         COMMA,          0xbc,   ',',    "COMMA" ),
-	KTT_ENTRY0(  STOP,          PERIOD,         0xbe,   '.',    "STOP"  ),
-	KTT_ENTRY0(  SLASH,         SLASH,          0xbf,   '/',    "SLASH" ),
-	KTT_ENTRY2(  RSHIFT,        RSHIFT ),
-	KTT_ENTRY0(  ASTERISK,      KP_MULTIPLY,    '*',    '*',    "ASTERIX" ),
-	KTT_ENTRY2(  LALT,          LALT ),
-	KTT_ENTRY0(  SPACE,         SPACE,          ' ',    ' ',    "SPACE" ),
-	KTT_ENTRY2(  CAPSLOCK,      CAPSLOCK ),
-	KTT_ENTRY2(  F1,            F1 ),
-	KTT_ENTRY2(  F2,            F2 ),
-	KTT_ENTRY2(  F3,            F3 ),
-	KTT_ENTRY2(  F4,            F4 ),
-	KTT_ENTRY2(  F5,            F5 ),
-	KTT_ENTRY2(  F6,            F6 ),
-	KTT_ENTRY2(  F7,            F7 ),
-	KTT_ENTRY2(  F8,            F8 ),
-	KTT_ENTRY2(  F9,            F9 ),
-	KTT_ENTRY2(  F10,           F10 ),
-	KTT_ENTRY2(  NUMLOCK,       NUMLOCK ),
-	KTT_ENTRY2(  SCRLOCK,       SCROLLOCK ),
-	KTT_ENTRY2(  7_PAD,         KP7 ),
-	KTT_ENTRY2(  8_PAD,         KP8 ),
-	KTT_ENTRY2(  9_PAD,         KP9 ),
-	KTT_ENTRY2(  MINUS_PAD,     KP_MINUS ),
-	KTT_ENTRY2(  4_PAD,         KP4 ),
-	KTT_ENTRY2(  5_PAD,         KP5 ),
-	KTT_ENTRY2(  6_PAD,         KP6 ),
-	KTT_ENTRY2(  PLUS_PAD,      KP_PLUS ),
-	KTT_ENTRY2(  1_PAD,         KP1 ),
-	KTT_ENTRY2(  2_PAD,         KP2 ),
-	KTT_ENTRY2(  3_PAD,         KP3 ),
-	KTT_ENTRY2(  0_PAD,         KP0 ),
-	KTT_ENTRY2(  DEL_PAD,       KP_PERIOD ),
-	KTT_ENTRY2(  F11,           F11 ),
-	KTT_ENTRY2(  F12,           F12 ),
-	KTT_ENTRY2(  F13,           F13 ),
-	KTT_ENTRY2(  F14,           F14 ),
-	KTT_ENTRY2(  F15,           F15 ),
-	KTT_ENTRY2(  ENTER_PAD,     KP_ENTER  ),
-	KTT_ENTRY2(  RCONTROL,      RCTRL ),
-	KTT_ENTRY2(  SLASH_PAD,     KP_DIVIDE ),
-	KTT_ENTRY2(  PRTSCR,        PRINT ),
-	KTT_ENTRY2(  RALT,          RALT ),
-	KTT_ENTRY2(  HOME,          HOME ),
-	KTT_ENTRY2(  UP,            UP ),
-	KTT_ENTRY2(  PGUP,          PAGEUP ),
-	KTT_ENTRY2(  LEFT,          LEFT ),
-	KTT_ENTRY2(  RIGHT,         RIGHT ),
-	KTT_ENTRY2(  END,           END ),
-	KTT_ENTRY2(  DOWN,          DOWN ),
-	KTT_ENTRY2(  PGDN,          PAGEDOWN ),
-	KTT_ENTRY2(  INSERT,        INSERT ),
-	{ ITEM_ID_DEL, SDLK_DELETE,  "ITEM_ID_DEL", (char *)"DELETE" },
-	KTT_ENTRY2(  LWIN,          LSUPER ),
-	KTT_ENTRY2(  RWIN,          RSUPER ),
-	KTT_ENTRY2(  MENU,          MENU ),
-	KTT_ENTRY0(  TILDE,         BACKQUOTE,      0xc0,   '`',    "TILDE" ),
-	KTT_ENTRY0(  BACKSLASH2,    HASH,     0xdc,   '\\', "BACKSLASH2" ),
-	{ ITEM_ID_INVALID }
-};
-#endif
 
 struct key_lookup_table
 {
@@ -498,7 +371,6 @@ struct key_lookup_table
 	const char *name;
 };
 
-#if (SDLMAME_SDL2)
 #define KE(x) { SDL_SCANCODE_ ## x, "SDL_SCANCODE_" #x },
 #define KE8(A, B, C, D, E, F, G, H) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G) KE(H)
 #define KE7(A, B, C, D, E, F, G) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G)
@@ -527,46 +399,6 @@ static key_lookup_table sdl_lookup_table[] =
 	KE(UNDO)
 	{-1, ""}
 };
-#else
-#define KE(x) { SDLK_ ## x, "SDLK_" #x },
-#define KE8(A, B, C, D, E, F, G, H) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G) KE(H)
-
-static key_lookup_table sdl_lookup_table[] =
-{
-	KE8(UNKNOWN,    FIRST,      BACKSPACE,      TAB,        CLEAR,      RETURN,     PAUSE,      ESCAPE      )
-	KE8(SPACE,      EXCLAIM,    QUOTEDBL,       HASH,       DOLLAR,     AMPERSAND,  QUOTE,      LEFTPAREN   )
-	KE8(RIGHTPAREN, ASTERISK,   PLUS,           COMMA,      MINUS,      PERIOD,     SLASH,      0           )
-	KE8(1,          2,          3,              4,          5,          6,          7,          8           )
-	KE8(9,          COLON,      SEMICOLON,      LESS,       EQUALS,     GREATER,    QUESTION,   AT          )
-	KE8(LEFTBRACKET,BACKSLASH,  RIGHTBRACKET,   CARET,      UNDERSCORE, BACKQUOTE,  a,          b           )
-	KE8(c,          d,          e,              f,          g,          h,          i,          j           )
-	KE8(k,          l,          m,              n,          o,          p,          q,          r           )
-	KE8(s,          t,          u,              v,          w,          x,          y,          z           )
-	KE8(DELETE,     WORLD_0,    WORLD_1,        WORLD_2,    WORLD_3,    WORLD_4,    WORLD_5,    WORLD_6     )
-	KE8(WORLD_7,    WORLD_8,    WORLD_9,        WORLD_10,   WORLD_11,   WORLD_12,   WORLD_13,   WORLD_14    )
-	KE8(WORLD_15,   WORLD_16,   WORLD_17,       WORLD_18,   WORLD_19,   WORLD_20,   WORLD_21,   WORLD_22    )
-	KE8(WORLD_23,   WORLD_24,   WORLD_25,       WORLD_26,   WORLD_27,   WORLD_28,   WORLD_29,   WORLD_30    )
-	KE8(WORLD_31,   WORLD_32,   WORLD_33,       WORLD_34,   WORLD_35,   WORLD_36,   WORLD_37,   WORLD_38    )
-	KE8(WORLD_39,   WORLD_40,   WORLD_41,       WORLD_42,   WORLD_43,   WORLD_44,   WORLD_45,   WORLD_46    )
-	KE8(WORLD_47,   WORLD_48,   WORLD_49,       WORLD_50,   WORLD_51,   WORLD_52,   WORLD_53,   WORLD_54    )
-	KE8(WORLD_55,   WORLD_56,   WORLD_57,       WORLD_58,   WORLD_59,   WORLD_60,   WORLD_61,   WORLD_62    )
-	KE8(WORLD_63,   WORLD_64,   WORLD_65,       WORLD_66,   WORLD_67,   WORLD_68,   WORLD_69,   WORLD_70    )
-	KE8(WORLD_71,   WORLD_72,   WORLD_73,       WORLD_74,   WORLD_75,   WORLD_76,   WORLD_77,   WORLD_78    )
-	KE8(WORLD_79,   WORLD_80,   WORLD_81,       WORLD_82,   WORLD_83,   WORLD_84,   WORLD_85,   WORLD_86    )
-	KE8(WORLD_87,   WORLD_88,   WORLD_89,       WORLD_90,   WORLD_91,   WORLD_92,   WORLD_93,   WORLD_94    )
-	KE8(WORLD_95,   KP0,        KP1,            KP2,        KP3,        KP4,        KP5,        KP6         )
-	KE8(KP7,        KP8,        KP9,            KP_PERIOD,  KP_DIVIDE,  KP_MULTIPLY,KP_MINUS,   KP_PLUS     )
-	KE8(KP_ENTER,   KP_EQUALS,  UP,             DOWN,       RIGHT,      LEFT,       INSERT,     HOME        )
-	KE8(END,        PAGEUP,     PAGEDOWN,       F1,         F2,         F3,         F4,         F5          )
-	KE8(F6,         F7,         F8,             F9,         F10,        F11,        F12,        F13         )
-	KE8(F14,        F15,        NUMLOCK,        CAPSLOCK,   SCROLLOCK,  RSHIFT,     LSHIFT,     RCTRL       )
-	KE8(LCTRL,      RALT,       LALT,           RMETA,      LMETA,      LSUPER,     RSUPER,     MODE        )
-	KE8(COMPOSE,    HELP,       PRINT,          SYSREQ,     BREAK,      MENU,       POWER,      EURO        )
-	KE(UNDO)
-	KE(LAST)
-	{-1, ""}
-};
-#endif
 
 //============================================================
 //  INLINE FUNCTIONS
@@ -718,14 +550,9 @@ static void sdlinput_register_joysticks(running_machine &machine)
 	{
 		char *joy_name;
 
-#if (SDLMAME_SDL2)
 		joy = SDL_JoystickOpen(physical_stick);
 		joy_name = remove_spaces(machine, SDL_JoystickName(joy));
 		SDL_JoystickClose(joy);
-#else
-		joy_name = remove_spaces(machine, SDL_JoystickName(physical_stick));
-#endif
-
 		devmap_register(&joy_map, physical_stick, joy_name);
 	}
 
@@ -1241,7 +1068,7 @@ static kt_table * sdlinput_read_keymap(running_machine &machine)
 			{
 				sdl2section = 1;
 			}
-			else if (((SDLMAME_SDL2) ^ sdl2section) == 0)
+			else if (((1) ^ sdl2section) == 0)
 			{
 				mks[0]=0;
 				sks[0]=0;
@@ -1518,7 +1345,6 @@ INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawmax)
 //  sdlinput_poll
 //============================================================
 
-#if (SDLMAME_SDL2)
 static inline sdl_window_info * window_from_id(Uint32 windowID)
 {
 	sdl_window_info *w;
@@ -1554,8 +1380,6 @@ static inline void resize_all_windows(void)
 	}
 }
 
-#endif
-
 void sdlinput_process_events_buf()
 {
 	SDL_Event event;
@@ -1563,10 +1387,8 @@ void sdlinput_process_events_buf()
 	if (SDLMAME_EVENTS_IN_WORKER_THREAD)
 	{
 		std::lock_guard<std::mutex> lock(input_lock);
-	#if (SDLMAME_SDL2)
 		/* Make sure we get all pending events */
 		SDL_PumpEvents();
-	#endif
 		while(SDL_PollEvent(&event))
 		{
 			if (event_buf_count < MAX_BUF_EVENTS)
@@ -1731,12 +1553,8 @@ void sdlinput_poll(running_machine &machine)
 			devinfo = generic_device_find_index( keyboard_list, keyboard_map.logical[0]);
 #endif
 			devinfo->keyboard.state[OSD_SDL_INDEX_KEYSYM(&event.key.keysym)] = 0x80;
-#if (SDLMAME_SDL2)
 			if (event.key.keysym.sym < 0x20)
 				machine.ui_input().push_char_event(sdl_window_list->target(), event.key.keysym.sym);
-#else
-			ui_input_push_char_event(machine, sdl_window_list->target(), (unicode_char) event.key.keysym.unicode);
-#endif
 			break;
 		case SDL_KEYUP:
 #ifdef SDL2_MULTIAPI
@@ -1854,29 +1672,7 @@ void sdlinput_poll(running_machine &machine)
 					}
 				}
 			}
-#if (!SDLMAME_SDL2)
-			else if (event.button.button == 4) // SDL_BUTTON_WHEELUP
-			{
-				int cx, cy;
-				sdl_window_info *window = GET_FOCUS_WINDOW(&event.button);
-				if (window != NULL && window->xy_to_render_target(event.button.x,event.button.y, &cx, &cy) )
-				{
-					machine.ui_input().push_mouse_wheel_event(window->target(), cx, cy, 120, 3);
-				}
-			}
-
-			else if (event.button.button == 5) // SDL_BUTTON_WHEELDOWN
-			{
-				int cx, cy;
-				sdl_window_info *window = GET_FOCUS_WINDOW(&event.button);
-				if (window != NULL && window->xy_to_render_target(event.button.x,event.button.y, &cx, &cy) )
-				{
-					machine.ui_input().push_mouse_wheel_event(window->target(), cx, cy, -120, 3);
-				}
-			}
-#endif
 			break;
-#if (SDLMAME_SDL2)
 		case SDL_MOUSEWHEEL:
 #ifdef SDL2_MULTIAPI
 			devinfo = generic_device_find_index(mouse_list, mouse_map.logical[event.wheel.which]);
@@ -1890,7 +1686,6 @@ void sdlinput_poll(running_machine &machine)
 					machine.ui_input().push_mouse_wheel_event(window->target(), 0, 0, event.wheel.y, 3);
 			}
 			break;
-#endif
 		case SDL_MOUSEBUTTONUP:
 #ifdef SDL2_MULTIAPI
 			devinfo = generic_device_find_index(mouse_list, mouse_map.logical[event.button.which]);
@@ -1917,15 +1712,10 @@ void sdlinput_poll(running_machine &machine)
 #else
 			devinfo = generic_device_find_index(mouse_list, mouse_map.logical[0]);
 #endif
-#if (SDLMAME_SDL2)
 			// FIXME: may apply to 1.2 as well ...
 			//printf("Motion %d %d %d %s\n", event.motion.which, event.motion.x, event.motion.y, devinfo->name.c_str());
 			devinfo->mouse.lX += event.motion.xrel * INPUT_RELATIVE_PER_PIXEL;
 			devinfo->mouse.lY += event.motion.yrel * INPUT_RELATIVE_PER_PIXEL;
-#else
-			devinfo->mouse.lX = event.motion.xrel * INPUT_RELATIVE_PER_PIXEL;
-			devinfo->mouse.lY = event.motion.yrel * INPUT_RELATIVE_PER_PIXEL;
-#endif
 			{
 				int cx=-1, cy=-1;
 				sdl_window_info *window = GET_FOCUS_WINDOW(&event.motion);
@@ -1940,22 +1730,6 @@ void sdlinput_poll(running_machine &machine)
 			devinfo->joystick.balls[event.jball.ball * 2] = event.jball.xrel * INPUT_RELATIVE_PER_PIXEL;
 			devinfo->joystick.balls[event.jball.ball * 2 + 1] = event.jball.yrel * INPUT_RELATIVE_PER_PIXEL;
 			break;
-#if (!SDLMAME_SDL2)
-		case SDL_APPMOUSEFOCUS:
-			app_has_mouse_focus = event.active.gain;
-			if (!event.active.gain)
-			{
-				sdl_window_info *window = GET_FOCUS_WINDOW(&event.motion);
-				ui_input_push_mouse_leave_event(machine, window->target());
-			}
-			break;
-		case SDL_QUIT:
-			machine.schedule_exit();
-			break;
-		case SDL_VIDEORESIZE:
-			sdl_window_list->resize(event.resize.w, event.resize.h);
-			break;
-#else
 		case SDL_TEXTINPUT:
 			if (*event.text.text)
 			{
@@ -2023,12 +1797,9 @@ void sdlinput_poll(running_machine &machine)
 			}
 			break;
 		}
-#endif
 		}
 	}
-#if (SDLMAME_SDL2)
 	resize_all_windows();
-#endif
 }
 
 
@@ -2039,10 +1810,6 @@ void sdlinput_poll(running_machine &machine)
 
 void  sdlinput_release_keys()
 {
-	// FIXME: SDL >= 1.3 will nuke the window event buffer when
-	// a window is closed. This will leave keys in a pressed
-	// state when a window is destroyed and recreated.
-#if (SDLMAME_SDL2)
 	device_info *devinfo;
 	int index;
 
@@ -2053,7 +1820,6 @@ void  sdlinput_release_keys()
 			break;
 		memset(&devinfo->keyboard.state, 0, sizeof(devinfo->keyboard.state));
 	}
-#endif
 }
 
 

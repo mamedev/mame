@@ -169,12 +169,8 @@ end
 			"portmidi",
 		}
 	end
-	if (USE_BGFX == 1) then
-		links {
-			"bgfx"
-		}
-	end
-	links{
+	links {
+		"bgfx",
 		"ocore_" .. _OPTIONS["osd"],
 	}
 	

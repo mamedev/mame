@@ -1699,6 +1699,7 @@ void ioport_field::get_user_settings(user_settings &settings)
 	else
 	{
 		settings.toggle = m_live->toggle;
+		settings.autofire = m_live->autofire;
 	}
 }
 
@@ -1737,6 +1738,7 @@ void ioport_field::set_user_settings(const user_settings &settings)
 	else
 	{
 		m_live->toggle = settings.toggle;
+		m_live->autofire = settings.autofire;
 	}
 }
 
@@ -1904,6 +1906,19 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 
 	// if the state changed, look for switch down/switch up
 	bool curstate = mouse_down || machine().input().seq_pressed(seq()) || m_digital_value;
+	if (m_live->autofire && !machine().ioport().get_autofire_toggle())
+	{
+		if (curstate)
+		{
+			if (m_live->autopressed > machine().ioport().get_autofire_delay())
+				m_live->autopressed = 0;
+			else if (m_live->autopressed > machine().ioport().get_autofire_delay() / 2)
+				curstate = false;
+			m_live->autopressed++;
+		}
+		else
+			m_live->autopressed = 0;
+	}
 	bool changed = false;
 	if (curstate != m_live->last)
 	{
@@ -2156,7 +2171,9 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 		impulse(0),
 		last(0),
 		toggle(field.toggle()),
-		joydir(digital_joystick::JOYDIR_COUNT)
+		joydir(digital_joystick::JOYDIR_COUNT),
+		autofire(false),
+		autopressed(0)
 {
 	// fill in the basic values
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
@@ -2460,7 +2477,9 @@ ioport_manager::ioport_manager(running_machine &machine)
 		m_has_configs(false),
 		m_has_analog(false),
 		m_has_dips(false),
-		m_has_bioses(false)
+		m_has_bioses(false),
+		m_autofire_toggle(false),
+		m_autofire_delay(3)					// 1 seems too fast for a bunch of games
 {
 	memset(m_type_to_entry, 0, sizeof(m_type_to_entry));
 }
