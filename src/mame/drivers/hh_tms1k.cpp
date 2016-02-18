@@ -65,7 +65,7 @@
  @M34012   TMS1100   1980, Mattel Dungeons & Dragons - Computer Labyrinth Game
  *M34014   TMS1100   1981, Coleco Bowlatronic
   M34017   TMS1100   1981, MicroVision cartridge: Cosmic Hunter
- *M34038   TMS1100   1982, Parker Brothers Lost Treasure
+ @M34038   TMS1100   1982, Parker Brothers Lost Treasure
   M34047   TMS1100   1982, MicroVision cartridge: Super Blockbuster
  *M34078A  TMS1100   1983, Milton Bradley Arcade Mania
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
@@ -127,6 +127,7 @@
 #include "gpoker.lh"
 #include "h2hbaseb.lh"
 #include "h2hfootb.lh"
+#include "lostreas.lh"
 #include "mathmagi.lh"
 #include "merlin.lh" // clickable
 #include "mmerlin.lh" // clickable
@@ -2407,7 +2408,7 @@ MACHINE_CONFIG_END
   * TMS0980NLL MP6100A (die labeled 0980B-00)
   * 10-digit 7seg LED display, 1bit sound
 
-  hardware (and concept) is very similar to Parker Bros Stop Thief
+  hardware (and concept) is very similar to Parker Brothers Stop Thief
 
   This is an electronic board game. It requires game cards with suspect info,
   and good old pen and paper to record game progress. To start the game, enter
@@ -3474,7 +3475,7 @@ void bigtrak_state::machine_start()
 	save_item(NAME(m_gearbox_pos));
 }
 
-static const INT16 bigtrak_speaker_levels[] = { 0, 32767/3, 32767/3, 32767/3*2, 32767/3, 32767/3*2, 32767/3*2, 32767 };
+static const INT16 bigtrak_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
 
 static MACHINE_CONFIG_START( bigtrak, bigtrak_state )
 
@@ -3624,7 +3625,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Parker Bros Merlin handheld game, by Bob Doyle
+  Parker Brothers Merlin handheld game, by Bob Doyle
   * TMS1100NLL MP3404A-N2
   * 11 LEDs behind buttons, 3-level sound
 
@@ -3717,7 +3718,7 @@ static INPUT_PORTS_START( merlin )
 INPUT_PORTS_END
 
 
-static const INT16 merlin_speaker_levels[] = { 0, 32767/3, 32767/3, 32767/3*2, 32767/3, 32767/3*2, 32767/3*2, 32767 };
+static const INT16 merlin_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
 
 static MACHINE_CONFIG_START( merlin, merlin_state )
 
@@ -4133,6 +4134,113 @@ static MACHINE_CONFIG_START( splitsec, splitsec_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Parker Brothers Lost Treasure - The Electronic Deep-Sea Diving Game,
+  Featuring The Electronic Dive-Control Center
+  * TMS1100 M34038-NLL (die labeled 1100E, M34038)
+  * 11 LEDs, 4-bit sound
+  
+  This is a board game. The electronic accessory is the emulated part here.
+
+***************************************************************************/
+
+class lostreas_state : public hh_tms1k_state
+{
+public:
+	lostreas_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(lostreas_state::write_r)
+{
+	// R0-R10: leds
+	display_matrix(11, 1, data, 1);
+}
+
+WRITE16_MEMBER(lostreas_state::write_o)
+{
+	// O0-O3: input mux
+	m_inp_mux = data & 0xf;
+
+	// O4: 330 ohm resistor - speaker out
+	// O5: 220 ohm resistor - speaker out
+	// O6: 180 ohm resistor - speaker out
+	// O7:  68 ohm resistor - speaker out
+	m_speaker->level_w(data >> 4 & 0xf);
+}
+
+READ8_MEMBER(lostreas_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(4);
+}
+
+
+// config
+
+static INPUT_PORTS_START( lostreas )
+	PORT_START("IN.0") // O0
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) // num
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) // num
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) // num
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) // num
+
+	PORT_START("IN.1") // O1
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) // num
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) // num
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) // num
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) // num
+
+	PORT_START("IN.2") // O2
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) // clear
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R)
+
+	PORT_START("IN.3") // O3
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CODE(KEYCODE_T) // direction
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) // direction
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) // direction
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) // direction
+INPUT_PORTS_END
+
+
+static const INT16 lostreas_speaker_levels[16] =
+{
+	0, 0x7fff/15, 0x7fff/14, 0x7fff/13, 0x7fff/12, 0x7fff/11, 0x7fff/10, 0x7fff/9,
+	0x7fff/8, 0x7fff/7, 0x7fff/6, 0x7fff/5, 0x7fff/4, 0x7fff/3, 0x7fff/2, 0x7fff/1
+};
+
+static MACHINE_CONFIG_START( lostreas, lostreas_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1100, 400000) // approximation - RC osc. R=39K, C=47pf
+	MCFG_TMS1XXX_READ_K_CB(READ8(lostreas_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(lostreas_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(lostreas_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_lostreas)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(16, lostreas_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -4991,6 +5099,17 @@ ROM_START( splitsec )
 ROM_END
 
 
+ROM_START( lostreas )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "m34038", 0x0000, 0x0800, CRC(4c996f63) SHA1(ebbaa8b2f909f4300887aa2dbdb7185eedc75d3f) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_lostreas_output.pla", 0, 365, CRC(c62d850f) SHA1(d25974e6901eb10c52cdda12e6d4a13e26745e6f) )
+ROM_END
+
+
 ROM_START( tandy12 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "cd7282sl", 0x0000, 0x0800, CRC(a10013dd) SHA1(42ebd3de3449f371b99937f9df39c240d15ac686) )
@@ -5066,6 +5185,7 @@ CONS( 1979, stopthiep, stopthie, 0, stopthief, stopthief, driver_device, 0, "Par
 CONS( 1980, bankshot,  0,        0, bankshot,  bankshot,  driver_device, 0, "Parker Brothers", "Bank Shot - Electronic Pool", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, splitsec,  0,        0, splitsec,  splitsec,  driver_device, 0, "Parker Brothers", "Split Second", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, mmerlin,   0,        0, mmerlin,   mmerlin,   driver_device, 0, "Parker Brothers", "Master Merlin", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, lostreas,  0,        0, lostreas,  lostreas,  driver_device, 0, "Parker Brothers", "Lost Treasure - The Electronic Deep-Sea Diving Game (Electronic Dive-Control Center)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
 
 CONS( 1981, tandy12,   0,        0, tandy12,   tandy12,   driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
 
