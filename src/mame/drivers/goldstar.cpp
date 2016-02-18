@@ -12019,7 +12019,10 @@ ROM_END
 
 
 /* Super Cherry Master.
-   Dyna.
+   Lacks of Dyna copyright. Maybe bootleg.
+
+   Not reels stop options.
+   Tried any input on the real hardware without luck.   
 */
 ROM_START( scmaster )  // all roms unique
 	ROM_REGION( 0x10000, "maincpu", 0 )
