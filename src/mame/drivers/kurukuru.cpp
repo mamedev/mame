@@ -736,6 +736,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 /*  Kuru Kuru Pyon Pyon.
+    1990, Success / Taiyo Jidoki.
 */
 ROM_START( kurukuru )
 	ROM_REGION( 0x08000, "maincpu", 0 )
@@ -759,6 +760,7 @@ ROM_END
 
 /*  Pyon Pyon Jump.
     Ver 1.40.
+	199?, Success / Taiyo Jidoki.
 */
 ROM_START( ppj )
 	ROM_REGION( 0x08000, "maincpu", 0 )
@@ -782,5 +784,5 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY                   FULLNAME                        FLAGS  */
-GAME( 199?, kurukuru, 0,      kurukuru, kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",   0 )
+GAME( 1990, kurukuru, 0,      kurukuru, kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",   0 )
 GAME( 199?, ppj,      0,      ppj,      ppj,      driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (V1.40, Japan)", 0 )
