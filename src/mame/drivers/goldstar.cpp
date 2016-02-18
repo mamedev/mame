@@ -6752,6 +6752,16 @@ static const gfx_layout sangho_tilelayout =
 	128*8   /* every char takes 128 consecutive bytes */
 };
 
+static const gfx_layout super9_charlayout =
+{
+	8,8,    /* 8*8 characters */
+	4096,    /* 4096 characters */
+	3,      /* 3 bits per pixel */
+	{ 2, 4, 6 }, /* the bitplanes are packed in one byte */
+	{ 0*8+0, 0*8+1, 1*8+0, 1*8+1, 2*8+0, 2*8+1, 3*8+0, 3*8+1 },
+	{ 0*32, 4*32, 2*32, 6*32, 1*32, 5*32, 3*32, 7*32 },
+	32*8   /* every char takes 32 consecutive bytes */
+};
 
 
 static GFXDECODE_START( goldstar )
@@ -6850,6 +6860,11 @@ static GFXDECODE_START( sangho )
    2*16,16 oranges and title girl in game
    1*16,16 nines in game
 */
+GFXDECODE_END
+
+static GFXDECODE_START( super9 )
+	GFXDECODE_ENTRY( "gfx1", 0, super9_charlayout,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 128,  8 )
 GFXDECODE_END
 
 
@@ -7153,12 +7168,12 @@ static MACHINE_CONFIG_START( super9, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldstar)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", super9)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
