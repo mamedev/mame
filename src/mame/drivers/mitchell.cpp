@@ -2069,7 +2069,7 @@ ROM_START( blockr1 )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "ble_05a.14f",   0x00000, 0x08000, CRC(fa2a4536) SHA1(8f584745116bd0ced4d66719cd80c0372b797134) )
 	ROM_LOAD( "ble_06a.15f",   0x10000, 0x20000, CRC(e114ebde) SHA1(12362e809443644b43fbc72e7eead5f376fe11d3) )
-	ROM_LOAD( "ble_07a.16f",   0x30000, 0x20000, CRC(1d114f13) SHA1(ee3588e1752b3432fd611e2d7d4fb43f942de580) )
+	ROM_LOAD( "ble_07.16f",    0x30000, 0x20000, CRC(1d114f13) SHA1(ee3588e1752b3432fd611e2d7d4fb43f942de580) )
 
 	/* the highscore table specifies an unused tile number, so we need ROMREGION_ERASEFF to ensure it is blank */
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
