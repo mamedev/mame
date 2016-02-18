@@ -12,6 +12,7 @@
 
 // MAME headers
 #include "emu.h"
+#include "ui/ui.h"
 #include "emuopts.h"
 #include "render.h"
 #include "uiinput.h"
@@ -66,8 +67,6 @@ static osd_window_config   windows[MAX_WINDOWS];        // configuration data pe
 
 bool windows_osd_interface::video_init()
 {
-	int index;
-
 	// extract data from the options
 	extract_video_config();
 
@@ -79,14 +78,47 @@ bool windows_osd_interface::video_init()
 
 	// create the windows
 	windows_options &options = downcast<windows_options &>(machine().options());
-	for (index = 0; index < video_config.numscreens; index++)
+	for (int index = 0; index < video_config.numscreens; index++)
+	{
 		win_window_info::create(machine(), index, osd_monitor_info::pick_monitor(options, index), &windows[index]);
+	}
+
+	m_sliders = nullptr;
+	slider_state *curr = m_sliders;
+	for (win_window_info *info = win_window_list; info != nullptr; info = info->m_next)
+	{
+		slider_state *window_sliders = info->m_renderer->get_slider_list();
+		if (window_sliders != nullptr)
+		{
+			if (m_sliders == nullptr)
+			{
+				m_sliders = curr = window_sliders;
+			}
+			else
+			{
+				while (curr->next != nullptr)
+				{
+					curr = curr->next;
+				}
+				curr->next = window_sliders;
+			}
+		}
+	}
+
 	if (video_config.mode != VIDEO_MODE_NONE)
 		SetForegroundWindow(win_window_list->m_hwnd);
 
 	return true;
 }
 
+//============================================================
+//  get_slider_list
+//============================================================
+
+slider_state *windows_osd_interface::get_slider_list()
+{
+	return m_sliders;
+}
 
 //============================================================
 //  video_exit

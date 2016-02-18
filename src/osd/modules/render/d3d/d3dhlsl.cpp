@@ -3525,7 +3525,7 @@ ULONG effect::release()
 //  get_slider_list
 //============================================================
 
-slider_state *windows_osd_interface::get_slider_list()
+slider_state *renderer_d3d9::get_slider_list()
 {
 	return g_slider_list;
 }

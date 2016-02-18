@@ -124,15 +124,24 @@ int renderer_bgfx::create()
 	m_effects = new effect_manager(*m_shaders);
 
 	// Create program from shaders.
+	printf("1\n"); fflush(stdout);
 	m_gui_effect[0] = m_effects->effect("gui_opaque");
+	printf("2\n"); fflush(stdout);
 	m_gui_effect[1] = m_effects->effect("gui_blend");
+	printf("3\n"); fflush(stdout);
 	m_gui_effect[2] = m_effects->effect("gui_multiply");
+	printf("4\n"); fflush(stdout);
 	m_gui_effect[3] = m_effects->effect("gui_add");
+	printf("5\n"); fflush(stdout);
 
 	m_screen_effect[0] = m_effects->effect("screen_opaque");
+	printf("6\n"); fflush(stdout);
 	m_screen_effect[1] = m_effects->effect("screen_blend");
+	printf("7\n"); fflush(stdout);
 	m_screen_effect[2] = m_effects->effect("screen_multiply");
+	printf("8\n"); fflush(stdout);
 	m_screen_effect[3] = m_effects->effect("screen_add");
+	printf("9\n"); fflush(stdout);
 
 	uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
 	m_texture_cache = m_textures->create_texture("#cache", bgfx::TextureFormat::RGBA8, CACHE_SIZE, CACHE_SIZE, nullptr, flags);
@@ -1077,4 +1086,9 @@ void renderer_bgfx::allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::
 	{
 		bgfx::allocTransientVertexBuffer(buffer, vertices, ScreenVertex::ms_decl);
 	}
+}
+
+slider_state* renderer_bgfx::get_slider_list()
+{
+	return nullptr;
 }

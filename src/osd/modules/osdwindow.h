@@ -10,6 +10,7 @@
 #define __OSDWINDOW__
 
 #include "emu.h"
+#include "ui/ui.h"
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -221,6 +222,7 @@ public:
 	virtual int init(running_machine &machine) = 0;
 	virtual render_primitive_list *get_primitives() = 0;
 
+	virtual slider_state* get_slider_list() { return nullptr; }
 	virtual int draw(const int update) = 0;
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) { return 0; };
 	virtual void save() { };

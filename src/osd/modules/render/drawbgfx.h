@@ -28,6 +28,7 @@ public:
 	virtual ~renderer_bgfx();
 
 	virtual int create() override;
+	virtual slider_state* get_slider_list() override;
 	virtual int init(running_machine &machine) override { return 0; }
 	virtual int draw(const int update) override;
 #ifdef OSD_SDL
