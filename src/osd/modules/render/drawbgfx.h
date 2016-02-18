@@ -109,6 +109,8 @@ private:
 	std::vector<rectangle_packer::packable_rectangle> m_texinfo;
 	rectangle_packer m_packer;
 
+	uint32_t m_width;
+	uint32_t m_height;
 	uint32_t m_white[16*16];
 	enum : uint16_t { CACHE_SIZE = 1024 };
 	enum : uint32_t { PACKABLE_SIZE = 128 };

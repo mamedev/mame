@@ -4,12 +4,13 @@
 #include "emu.h"
 
 #include "chain.h"
-#include "chainreader.h"
 #include "sliderreader.h"
 #include "paramreader.h"
 #include "chainentryreader.h"
+#include "targetmanager.h"
+#include "chainreader.h"
 
-bgfx_chain* chain_reader::read_from_value(const Value& value, texture_manager& textures, target_manager& targets, effect_manager& effects)
+bgfx_chain* chain_reader::read_from_value(const Value& value, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t screen_width, uint32_t screen_height)
 {
     validate_parameters(value);
 
@@ -43,6 +44,33 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, texture_manager& t
 		for (UINT32 i = 0; i < entry_array.Size(); i++)
 		{
 			entries.push_back(chain_entry_reader::read_from_value(entry_array[i], textures, targets, effects));
+		}
+	}
+
+	if (value.HasMember("targets"))
+	{
+		const Value& target_array = value["targets"];
+		for (UINT32 i = 0; i < target_array.Size(); i++)
+		{
+			assert(target_array[i].HasMember("name"));
+			assert(target_array[i]["name"].IsString());
+			uint32_t width = 0;
+			uint32_t height = 0;
+			if (target_array[i].HasMember("screen") && target_array[i]["screen"].IsBool())
+			{
+				width = screen_width;
+				height = screen_height;
+			}
+			else
+			{
+				assert(target_array[i].HasMember("width"));
+				assert(target_array[i]["width"].IsDouble());
+				assert(target_array[i].HasMember("height"));
+				assert(target_array[i]["height"].IsDouble());
+				width = uint32_t(target_array[i]["width"].GetDouble());
+				height = uint32_t(target_array[i]["height"].GetDouble());
+			}
+			targets.create_target(target_array[i]["name"].GetString(), bgfx::TextureFormat::RGBA8, width, height);
 		}
 	}
 

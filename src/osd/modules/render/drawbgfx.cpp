@@ -94,6 +94,8 @@ int renderer_bgfx::create()
 	// create renderer
 
 	osd_dim wdim = window().get_size();
+	m_width = wdim.width();
+	m_height = wdim.height();
 	if (window().m_index == 0)
 	{
 #ifdef OSD_WINDOWS
@@ -102,17 +104,17 @@ int renderer_bgfx::create()
 		bgfx::sdlSetWindow(window().sdl_window());
 #endif
 		bgfx::init();
-		bgfx::reset(wdim.width(), wdim.height(), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+		bgfx::reset(m_width, m_height, video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 		// Enable debug text.
 		bgfx::setDebug(BGFX_DEBUG_TEXT); //BGFX_DEBUG_STATS
-		m_dimensions = osd_dim(wdim.width(), wdim.height());
+		m_dimensions = osd_dim(m_width, m_height);
 	}
 	else
 	{
 #ifdef OSD_WINDOWS
-		m_framebuffer = bgfx::createFrameBuffer(window().m_hwnd, wdim.width(), wdim.height());
+		m_framebuffer = bgfx::createFrameBuffer(window().m_hwnd, m_width, m_height);
 #else
-		m_framebuffer = bgfx::createFrameBuffer(sdlNativeWindowHandle(window().sdl_window()), wdim.width(), wdim.height());
+		m_framebuffer = bgfx::createFrameBuffer(sdlNativeWindowHandle(window().sdl_window()), m_width, m_height);
 #endif
 		bgfx::touch(window().m_index);
 	}

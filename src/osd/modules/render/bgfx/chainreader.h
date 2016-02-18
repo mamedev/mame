@@ -13,7 +13,7 @@ class effect_manager;
 class chain_reader : public state_reader
 {
 public:
-    static bgfx_chain* read_from_value(const Value& value, texture_manager& textures, target_manager& targets, effect_manager& effects);
+    static bgfx_chain* read_from_value(const Value& value, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t screen_width, uint32_t screen_height);
 
 private:
     static void validate_parameters(const Value& value);
