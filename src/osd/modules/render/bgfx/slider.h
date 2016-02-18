@@ -14,9 +14,6 @@
 class bgfx_slider
 {
 public:
-    bgfx_slider(slider_type type, std::string name, std::string description, void *defaults, void *min, void *max);
-    ~bgfx_slider();
-
 	enum slider_type
 	{
 		SLIDER_BOOL,
@@ -26,15 +23,19 @@ public:
 		SLIDER_VEC2
 	};
 
-    // Getters
-    bgfx_uniform* uniform(std::string name);
-    bgfx::ProgramHandle get_program() const { return m_program_handle; }
+    bgfx_slider(slider_type type, std::string name, std::string description, void *defaults, void *min, void *max);
+    ~bgfx_slider();
 
+	static size_t size(slider_type type);
+	static size_t storage_size(slider_type type);
 protected:
+
+	slider_type m_type;
 	std::string m_name;
-	void *	m_data;
-	void *	m_min;
-	void *	m_max;
+	std::string m_description;
+	char*	m_data;
+	char*	m_min;
+	char*	m_max;
 };
 
 #endif // __DRAWBGFX_SLIDER__
