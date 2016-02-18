@@ -41,7 +41,7 @@ public:
 
 // ======================> osd_interface
 
-class slider_state;
+struct slider_state;
 
 // description of the currently-running machine
 class osd_interface

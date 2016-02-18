@@ -11,10 +11,12 @@
 #include "binpacker.h"
 
 class texture_manager;
+class target_manager;
 class shader_manager;
 class effect_manager;
 class bgfx_texture;
 class bgfx_effect;
+class bgfx_target;
 
 /* sdl_info is the information about SDL for the current screen */
 class renderer_bgfx : public osd_renderer
@@ -93,13 +95,14 @@ private:
 	const bgfx::Memory* mame_texture_data_to_bgfx_texture_data(UINT32 format, int width, int height, int rowpixels, const rgb_t *palette, void *base);
 	UINT32 get_texture_hash(render_primitive *prim);
 
-	bgfx::FrameBufferHandle m_framebuffer;
+	bgfx_target* m_framebuffer;
 	bgfx_texture* m_texture_cache;
 
 	// Original display_mode
 	osd_dim m_dimensions;
 
 	texture_manager* m_textures;
+	target_manager* m_targets;
 	shader_manager* m_shaders;
 	effect_manager* m_effects;
 	bgfx_effect* m_gui_effect[4];
@@ -109,8 +112,8 @@ private:
 	std::vector<rectangle_packer::packable_rectangle> m_texinfo;
 	rectangle_packer m_packer;
 
-	uint32_t m_width;
-	uint32_t m_height;
+	uint32_t m_width[16];
+	uint32_t m_height[16];
 	uint32_t m_white[16*16];
 	enum : uint16_t { CACHE_SIZE = 1024 };
 	enum : uint32_t { PACKABLE_SIZE = 128 };

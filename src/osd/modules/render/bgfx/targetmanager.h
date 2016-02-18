@@ -18,6 +18,7 @@ public:
     ~target_manager();
 
 	bgfx_target* create_target(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, bool filter = false);
+	bgfx_target* create_target(std::string name, void *handle, uint32_t width, uint32_t height);
 
     // Getters
     bgfx_target* target(std::string name);

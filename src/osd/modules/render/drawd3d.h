@@ -25,13 +25,13 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-class vertex;
+struct vertex;
 class texture_info;
 class texture_manager;
-class device;
-class vertex_buffer;
+struct device;
+struct vertex_buffer;
 class shaders;
-class hlsl_options;
+struct hlsl_options;
 class poly_info;
 
 /* renderer is the information about Direct3D for the current screen */

@@ -64,6 +64,6 @@ void effect_reader::validate_parameters(const Value& value)
     {
     	assert(value["pixel"].IsString());
 	}
-    assert(value.HasMember("uniform"));
-    assert(value["uniform"].IsArray());
+    assert(value.HasMember("uniforms"));
+    assert(value["uniforms"].IsArray());
 }

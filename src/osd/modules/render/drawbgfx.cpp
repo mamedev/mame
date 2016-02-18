@@ -32,10 +32,12 @@
 
 #include "drawbgfx.h"
 #include "bgfx/texturemanager.h"
+#include "bgfx/targetmanager.h"
 #include "bgfx/shadermanager.h"
 #include "bgfx/effectmanager.h"
 #include "bgfx/effect.h"
 #include "bgfx/texture.h"
+#include "bgfx/target.h"
 
 //============================================================
 //  DEBUGGING
@@ -94,8 +96,8 @@ int renderer_bgfx::create()
 	// create renderer
 
 	osd_dim wdim = window().get_size();
-	m_width = wdim.width();
-	m_height = wdim.height();
+	m_width[window().m_index] = wdim.width();
+	m_height[window().m_index] = wdim.height();
 	if (window().m_index == 0)
 	{
 #ifdef OSD_WINDOWS
@@ -104,46 +106,39 @@ int renderer_bgfx::create()
 		bgfx::sdlSetWindow(window().sdl_window());
 #endif
 		bgfx::init();
-		bgfx::reset(m_width, m_height, video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+		bgfx::reset(m_width[window().m_index], m_height[window().m_index], video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 		// Enable debug text.
 		bgfx::setDebug(BGFX_DEBUG_TEXT); //BGFX_DEBUG_STATS
-		m_dimensions = osd_dim(m_width, m_height);
-	}
-	else
-	{
-#ifdef OSD_WINDOWS
-		m_framebuffer = bgfx::createFrameBuffer(window().m_hwnd, m_width, m_height);
-#else
-		m_framebuffer = bgfx::createFrameBuffer(sdlNativeWindowHandle(window().sdl_window()), m_width, m_height);
-#endif
-		bgfx::touch(window().m_index);
-	}
+		m_dimensions = osd_dim(m_width[0], m_height[0]);
 
-	ScreenVertex::init();
+		ScreenVertex::init();
+	}
 
 	m_textures = new texture_manager();
+	m_targets = new target_manager(*m_textures);
 	m_shaders = new shader_manager();
 	m_effects = new effect_manager(*m_shaders);
 
+    if (window().m_index != 0)
+    {
+#ifdef OSD_WINDOWS
+	    m_framebuffer = m_targets->create_target("backbuffer", window().m_hwnd, m_width[window().m_index], m_height[window().m_index]);
+#else
+	    m_framebuffer = m_targets->create_target("backbuffer", sdlNativeWindowHandle(window().sdl_window()), m_width[window().m_index], m_height[window().m_index]);
+#endif
+	    bgfx::touch(window().m_index);
+    }
+
 	// Create program from shaders.
-	printf("1\n"); fflush(stdout);
 	m_gui_effect[0] = m_effects->effect("gui_opaque");
-	printf("2\n"); fflush(stdout);
 	m_gui_effect[1] = m_effects->effect("gui_blend");
-	printf("3\n"); fflush(stdout);
 	m_gui_effect[2] = m_effects->effect("gui_multiply");
-	printf("4\n"); fflush(stdout);
 	m_gui_effect[3] = m_effects->effect("gui_add");
-	printf("5\n"); fflush(stdout);
 
 	m_screen_effect[0] = m_effects->effect("screen_opaque");
-	printf("6\n"); fflush(stdout);
 	m_screen_effect[1] = m_effects->effect("screen_blend");
-	printf("7\n"); fflush(stdout);
 	m_screen_effect[2] = m_effects->effect("screen_multiply");
-	printf("8\n"); fflush(stdout);
 	m_screen_effect[3] = m_effects->effect("screen_add");
-	printf("9\n"); fflush(stdout);
 
 	uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
 	m_texture_cache = m_textures->create_texture("#cache", bgfx::TextureFormat::RGBA8, CACHE_SIZE, CACHE_SIZE, nullptr, flags);
@@ -160,15 +155,11 @@ int renderer_bgfx::create()
 
 renderer_bgfx::~renderer_bgfx()
 {
-	if (window().m_index > 0)
-	{
-		bgfx::destroyFrameBuffer(m_framebuffer);
-	}
-
 	// Cleanup.
+	delete m_targets;
+	delete m_textures;
 	delete m_effects;
 	delete m_shaders;
-	delete m_textures;
 
 	bgfx::shutdown();
 }
@@ -741,32 +732,29 @@ int renderer_bgfx::draw(int update)
 	int index = window().m_index;
 	// Set view 0 default viewport.
 	osd_dim wdim = window().get_size();
-	int width = wdim.width();
-	int height = wdim.height();
+	m_width[index] = wdim.width();
+	m_height[index] = wdim.height();
 	if (index == 0)
 	{
-		if ((m_dimensions != osd_dim(width, height)))
+		if ((m_dimensions != osd_dim(m_width[index], m_height[index])))
 		{
-			bgfx::reset(width, height, video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
-			m_dimensions = osd_dim(width, height);
+			bgfx::reset(m_width[index], m_height[index], video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+			m_dimensions = osd_dim(m_width[index], m_height[index]);
 		}
 	}
 	else
 	{
-		if ((m_dimensions != osd_dim(width, height)))
+		if ((m_dimensions != osd_dim(m_width[index], m_height[index])))
 		{
 			bgfx::reset(window().m_main->get_size().width(), window().m_main->get_size().height(), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
-			if (bgfx::isValid(m_framebuffer))
-			{
-				bgfx::destroyFrameBuffer(m_framebuffer);
-			}
+			delete m_framebuffer;
 #ifdef OSD_WINDOWS
-			m_framebuffer = bgfx::createFrameBuffer(window().m_hwnd, width, height);
+			m_framebuffer = m_targets->create_target("backbuffer", window().m_hwnd, m_width[index], m_height[index]);
 #else
-			m_framebuffer = bgfx::createFrameBuffer(sdlNativeWindowHandle(window().sdl_window()), width, height);
+			m_framebuffer = m_targets->create_target("backbuffer", sdlNativeWindowHandle(window().sdl_window()), m_width[index], m_height[index]);
 #endif
-			bgfx::setViewFrameBuffer(index, m_framebuffer);
-			m_dimensions = osd_dim(width, height);
+			bgfx::setViewFrameBuffer(index, m_framebuffer->target());
+			m_dimensions = osd_dim(m_width[index], m_height[index]);
 			bgfx::setViewClear(index
 				, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
 				, 0x000000ff
@@ -779,12 +767,12 @@ int renderer_bgfx::draw(int update)
 		}
 	}
 
-	if (index != 0)
-	{
-		bgfx::setViewFrameBuffer(index, m_framebuffer);
-	}
-	bgfx::setViewSeq(index, true);
-	bgfx::setViewRect(index, 0, 0, width, height);
+    if (index != 0)
+    {
+        bgfx::setViewFrameBuffer(index, m_framebuffer->target());
+    }
+    	bgfx::setViewSeq(index, true);
+	bgfx::setViewRect(index, 0, 0, m_width[index], m_height[index]);
 
 	// Setup view transform.
 	{
@@ -793,8 +781,8 @@ int renderer_bgfx::draw(int update)
 
 		float left = 0.0f;
 		float top = 0.0f;
-		float right = width;
-		float bottom = height;
+		float right = m_width[index];
+		float bottom = m_height[index];
 		float proj[16];
 		bx::mtxOrtho(proj, left, right, bottom, top, 0.0f, 100.0f);
 		bgfx::setViewTransform(index, view, proj);
@@ -805,10 +793,6 @@ int renderer_bgfx::draw(int update)
 		, 1.0f
 		, 0
 		);
-
-	// This dummy draw call is here to make sure that view 0 is cleared
-	// if no other draw calls are submitted to view 0.
-	bgfx::touch(index);
 
 	window().m_primlist->acquire_lock();
 
@@ -839,6 +823,11 @@ int renderer_bgfx::draw(int update)
 	}
 
 	window().m_primlist->release_lock();
+
+	// This dummy draw call is here to make sure that view 0 is cleared
+	// if no other draw calls are submitted to view 0.
+	bgfx::touch(index);
+
 	// Advance to next frame. Rendering thread will be kicked to
 	// process submitted rendering primitives.
 	if (index==0) bgfx::frame();
