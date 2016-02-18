@@ -373,8 +373,6 @@ void windows_osd_interface::extract_video_config()
 		video_config.mode = VIDEO_MODE_D3D;
 	else if (strcmp(stemp, "auto") == 0)
 		video_config.mode = VIDEO_MODE_D3D;
-	else if (strcmp(stemp, "ddraw") == 0)
-		video_config.mode = VIDEO_MODE_DDRAW;
 	else if (strcmp(stemp, "gdi") == 0)
 		video_config.mode = VIDEO_MODE_GDI;
 	else if (strcmp(stemp, "bgfx") == 0)
@@ -398,9 +396,6 @@ void windows_osd_interface::extract_video_config()
 	video_config.syncrefresh   = options().sync_refresh();
 	video_config.triplebuf     = options().triple_buffer();
 	video_config.switchres     = options().switch_res();
-
-	// ddraw options: extract the data
-	video_config.hwstretch     = options().hwstretch();
 
 	if (video_config.prescale < 1 || video_config.prescale > 3)
 	{

@@ -48,6 +48,7 @@ bool ui_globals::redraw_icon = false;
 int ui_globals::visible_main_lines = 0;
 int ui_globals::visible_sw_lines = 0;
 UINT16 ui_globals::panels_status = 0;
+bool ui_globals::has_icons = false;
 
 // Custom filter
 UINT16 custfltr::main = 0;

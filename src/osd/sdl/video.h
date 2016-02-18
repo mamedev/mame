@@ -181,9 +181,6 @@ struct osd_video_config
 
 	int                 fullstretch;    // FXIME: implement in windows!
 
-	// ddraw options
-	int                 hwstretch;                  // stretch using the hardware
-
 	// d3d, accel, opengl
 	int                 filter;                     // enable filtering
 	//int                 filter;         // enable filtering, disabled if glsl_filter>0

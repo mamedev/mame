@@ -389,7 +389,7 @@ static MACHINE_CONFIG_START( eag, fidel68k_state )
 	MCFG_CPU_PROGRAM_MAP(eag_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_eag)

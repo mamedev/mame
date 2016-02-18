@@ -1309,11 +1309,25 @@ void ui_menu::init_ui(running_machine &machine)
 	star_texture = mrender.texture_alloc();
 	star_texture->set_bitmap(*star_bitmap, star_bitmap->cliprect(), TEXFORMAT_ARGB32);
 
-	// allocates icons bitmap and texture
-	for (int i = 0; i < MAX_ICONS_RENDER; i++)
+	// check and allocate icons
+	file_enumerator path(machine.ui().options().icons_directory());
+	const osd_directory_entry *dir;
+	while ((dir = path.next()) != nullptr)
 	{
-		icons_bitmap[i] = auto_alloc(machine, bitmap_argb32);
-		icons_texture[i] = mrender.texture_alloc();
+		const char *src;
+
+		// build a name for it
+		src = dir->name;
+		if (*src != 0 && *src != '.')
+		{
+			ui_globals::has_icons = true;
+			for (int i = 0; i < MAX_ICONS_RENDER; i++)
+			{
+				icons_bitmap[i] = auto_alloc(machine, bitmap_argb32);
+				icons_texture[i] = mrender.texture_alloc();
+			}
+			break;
+		}
 	}
 
 	// create a texture for main menu background

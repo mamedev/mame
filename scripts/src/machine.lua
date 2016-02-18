@@ -773,6 +773,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/hp_taco.h,MACHINES["HP_TACO"] = true
+---------------------------------------------------
+
+if (MACHINES["HP_TACO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/hp_taco.cpp",
+		MAME_DIR .. "src/devices/machine/hp_taco.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/i2cmem.h,MACHINES["I2CMEM"] = true
 ---------------------------------------------------
 

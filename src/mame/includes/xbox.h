@@ -188,6 +188,29 @@ enum USBDescriptorType {
 	ENDPOINT=5
 };
 
+enum USBRequestType
+{
+	StandardType=0,
+	ClassType,
+	VendorType,
+	ReservedType
+};
+
+enum USBRequestRecipient
+{
+	DeviceRecipient=0,
+	InterfaceRecipient,
+	EndpointRecipient,
+	OtherRecipient
+};
+
+enum USBDeviceState
+{
+	DefaultState,
+	AddressState,
+	ConfiguredState
+};
+
 class ohci_function_device {
 public:
 	ohci_function_device(running_machine &machine);
@@ -198,11 +221,14 @@ private:
 	void add_configuration_descriptor(USBStandardConfigurationDescriptor &descriptor);
 	void add_interface_descriptor(USBStandardInterfaceDescriptor &descriptor);
 	void add_endpoint_descriptor(USBStandardEndpointDescriptor &descriptor);
+	int handle_nonstandard_request(USBSetupPacket *setup);
+	int state;
 	int address;
 	int newaddress;
 	int controldirection;
 	int controltype;
 	int controlrecipient;
+	int configurationvalue;
 	bool settingaddress;
 	int remain;
 	UINT8 *position;
