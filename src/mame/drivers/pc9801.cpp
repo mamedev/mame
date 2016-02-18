@@ -2894,10 +2894,13 @@ READ8_MEMBER(pc9801_state::dma_read_byte)
 		switch(m_dma_autoinc[m_dack])
 		{
 			case 1:
-				++m_dma_offset[m_dack] &= 0xf;
+			{
+				UINT8 page = m_dma_offset[m_dack];
+				m_dma_offset[m_dack] = ((page + 1) & 0xf) | (page & 0xf0);
 				break;
+			}
 			case 3:
-				++m_dma_offset[m_dack] &= 0xff;
+				m_dma_offset[m_dack]++;
 				break;
 		}
 	}
@@ -2917,10 +2920,13 @@ WRITE8_MEMBER(pc9801_state::dma_write_byte)
 		switch(m_dma_autoinc[m_dack])
 		{
 			case 1:
-				++m_dma_offset[m_dack] &= 0xf;
+			{
+				UINT8 page = m_dma_offset[m_dack];
+				m_dma_offset[m_dack] = ((page + 1) & 0xf) | (page & 0xf0);
 				break;
+			}
 			case 3:
-				++m_dma_offset[m_dack] &= 0xff;
+				m_dma_offset[m_dack]++;
 				break;
 		}
 	}
