@@ -31,6 +31,11 @@
 #include <algorithm>
 
 #include "drawbgfx.h"
+#include "bgfx/texturemanager.h"
+#include "bgfx/shadermanager.h"
+#include "bgfx/effectmanager.h"
+#include "bgfx/effect.h"
+#include "bgfx/texture.h"
 
 //============================================================
 //  DEBUGGING
@@ -57,50 +62,8 @@
 
 
 //============================================================
-//  PROTOTYPES
-//============================================================
-
-// core functions
-static void drawbgfx_exit(void);
-
-//============================================================
-//  drawnone_create
-//============================================================
-
-static osd_renderer *drawbgfx_create(osd_window *window)
-{
-	return global_alloc(renderer_bgfx(window));
-}
-
-//============================================================
-//  drawbgfx_init
-//============================================================
-
-int drawbgfx_init(running_machine &machine, osd_draw_callbacks *callbacks)
-{
-	// fill in the callbacks
-	//memset(callbacks, 0, sizeof(*callbacks));
-	callbacks->exit = drawbgfx_exit;
-	callbacks->create = drawbgfx_create;
-
-	return 0;
-}
-
-//============================================================
-//  drawbgfx_exit
-//============================================================
-
-static void drawbgfx_exit(void)
-{
-	// Shutdown bgfx.
-	bgfx::shutdown();
-}
-
-//============================================================
 //  renderer_bgfx::create
 //============================================================
-bgfx::ProgramHandle loadProgram(const char* _vsName, const char* _fsName);
-
 
 #ifdef OSD_SDL
 static void* sdlNativeWindowHandle(SDL_Window* _window)
@@ -147,26 +110,32 @@ int renderer_bgfx::create()
 	else
 	{
 #ifdef OSD_WINDOWS
-		fbh = bgfx::createFrameBuffer(window().m_hwnd, wdim.width(), wdim.height());
+		m_framebuffer = bgfx::createFrameBuffer(window().m_hwnd, wdim.width(), wdim.height());
 #else
-		fbh = bgfx::createFrameBuffer(sdlNativeWindowHandle(window().sdl_window()), wdim.width(), wdim.height());
+		m_framebuffer = bgfx::createFrameBuffer(sdlNativeWindowHandle(window().sdl_window()), wdim.width(), wdim.height());
 #endif
 		bgfx::touch(window().m_index);
 	}
 
 	ScreenVertex::init();
 
+	m_textures = new texture_manager();
+	m_shaders = new shader_manager();
+	m_effects = new effect_manager(*m_shaders);
+
 	// Create program from shaders.
-	m_progQuad = loadProgram("vs_quad", "fs_quad");
-	m_progQuadTexture = loadProgram("vs_quad_texture", "fs_quad_texture");
-	m_s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Int1);
+	m_gui_effect[0] = m_effects->effect("gui_opaque");
+	m_gui_effect[1] = m_effects->effect("gui_blend");
+	m_gui_effect[2] = m_effects->effect("gui_multiply");
+	m_gui_effect[3] = m_effects->effect("gui_add");
+
+	m_screen_effect[0] = m_effects->effect("screen_opaque");
+	m_screen_effect[1] = m_effects->effect("screen_blend");
+	m_screen_effect[2] = m_effects->effect("screen_multiply");
+	m_screen_effect[3] = m_effects->effect("screen_add");
 
 	uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
-	m_texture_cache = bgfx::createTexture2D(CACHE_SIZE, CACHE_SIZE, 1, bgfx::TextureFormat::RGBA8, flags);
-
-	const bgfx::Memory* memory = bgfx::alloc(sizeof(uint32_t) * CACHE_SIZE * CACHE_SIZE);
-	memset(memory->data, 0, sizeof(uint32_t) * CACHE_SIZE * CACHE_SIZE);
-	bgfx::updateTexture2D(m_texture_cache, 0, 0, 0, CACHE_SIZE, CACHE_SIZE, memory, CACHE_SIZE * sizeof(uint32_t));
+	m_texture_cache = m_textures->create_texture("#cache", bgfx::TextureFormat::RGBA8, CACHE_SIZE, CACHE_SIZE, nullptr, flags);
 
 	memset(m_white, 0xff, sizeof(uint32_t) * 16 * 16);
 	m_texinfo.push_back(rectangle_packer::packable_rectangle(WHITE_HASH, PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32), 16, 16, 16, nullptr, m_white));
@@ -175,19 +144,22 @@ int renderer_bgfx::create()
 }
 
 //============================================================
-//  drawbgfx_window_destroy
+//  destructor
 //============================================================
 
-void renderer_bgfx::destroy()
+renderer_bgfx::~renderer_bgfx()
 {
 	if (window().m_index > 0)
 	{
-		bgfx::destroyFrameBuffer(fbh);
+		bgfx::destroyFrameBuffer(m_framebuffer);
 	}
-	bgfx::destroyUniform(m_s_texColor);
+
 	// Cleanup.
-	bgfx::destroyProgram(m_progQuad);
-	bgfx::destroyProgram(m_progQuadTexture);
+	delete m_effects;
+	delete m_shaders;
+	delete m_textures;
+
+	bgfx::shutdown();
 }
 
 
@@ -207,74 +179,6 @@ int renderer_bgfx::xy_to_render_target(int x, int y, int *xt, int *yt)
 	return 1;
 }
 #endif
-
-static const bgfx::Memory* loadMem(bx::FileReaderI* _reader, const char* _filePath)
-{
-	if (bx::open(_reader, _filePath))
-	{
-		uint32_t size = (uint32_t)bx::getSize(_reader);
-		const bgfx::Memory* mem = bgfx::alloc(size + 1);
-		bx::read(_reader, mem->data, size);
-		bx::close(_reader);
-		mem->data[mem->size - 1] = '\0';
-		return mem;
-	}
-
-	return nullptr;
-}
-static bgfx::ShaderHandle loadShader(bx::FileReaderI* _reader, const char* _name)
-{
-	char filePath[512];
-
-	const char* shaderPath = "shaders/dx9/";
-
-	switch (bgfx::getRendererType())
-	{
-	case bgfx::RendererType::Direct3D11:
-	case bgfx::RendererType::Direct3D12:
-		shaderPath = "shaders/dx11/";
-		break;
-
-	case bgfx::RendererType::OpenGL:
-		shaderPath = "shaders/glsl/";
-		break;
-
-	case bgfx::RendererType::Metal:
-		shaderPath = "shaders/metal/";
-		break;
-
-	case bgfx::RendererType::OpenGLES:
-		shaderPath = "shaders/gles/";
-		break;
-
-	default:
-		break;
-	}
-
-	strcpy(filePath, shaderPath);
-	strcat(filePath, _name);
-	strcat(filePath, ".bin");
-
-	return bgfx::createShader(loadMem(_reader, filePath));
-}
-
-bgfx::ProgramHandle renderer_bgfx::loadProgram(bx::FileReaderI* _reader, const char* _vsName, const char* _fsName)
-{
-	bgfx::ShaderHandle vsh = loadShader(_reader, _vsName);
-	bgfx::ShaderHandle fsh = BGFX_INVALID_HANDLE;
-	if (nullptr != _fsName)
-	{
-		fsh = loadShader(_reader, _fsName);
-	}
-
-	return bgfx::createProgram(vsh, fsh, true /* destroy shaders when program is destroyed */);
-}
-static auto s_fileReader = new bx::CrtFileReader;
-
-bgfx::ProgramHandle renderer_bgfx::loadProgram(const char* _vsName, const char* _fsName)
-{
-	return loadProgram(s_fileReader, _vsName, _fsName);
-}
 
 //============================================================
 //  drawbgfx_window_draw
@@ -425,10 +329,10 @@ void renderer_bgfx::render_textured_quad(int view, render_primitive* prim, bgfx:
 
 	bgfx::TextureHandle texture = bgfx::createTexture2D((uint16_t)prim->texture.width, (uint16_t)prim->texture.height, 1, bgfx::TextureFormat::RGBA8, texture_flags, mem);
 
-	bgfx::setTexture(0, m_s_texColor, texture);
-
-	set_bgfx_state(PRIMFLAG_GET_BLENDMODE(prim->flags));
-	bgfx::submit(view, m_progQuadTexture);
+	bgfx_effect** effects = PRIMFLAG_GET_SCREENTEX(prim->flags) ? m_screen_effect : m_gui_effect;
+	UINT32 blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
+	bgfx::setTexture(0, effects[blend]->uniform("s_tex")->handle(), texture);
+	effects[blend]->submit(view);
 
 	bgfx::destroyTexture(texture);
 }
@@ -830,24 +734,27 @@ int renderer_bgfx::draw(int update)
 	int height = wdim.height();
 	if (index == 0)
 	{
-		if ((m_dimensions != osd_dim(width, height))) {
+		if ((m_dimensions != osd_dim(width, height)))
+		{
 			bgfx::reset(width, height, video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 			m_dimensions = osd_dim(width, height);
 		}
 	}
-	else {
-		if ((m_dimensions != osd_dim(width, height))) {
+	else
+	{
+		if ((m_dimensions != osd_dim(width, height)))
+		{
 			bgfx::reset(window().m_main->get_size().width(), window().m_main->get_size().height(), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
-			if (bgfx::isValid(fbh))
+			if (bgfx::isValid(m_framebuffer))
 			{
-				bgfx::destroyFrameBuffer(fbh);
+				bgfx::destroyFrameBuffer(m_framebuffer);
 			}
 #ifdef OSD_WINDOWS
-			fbh = bgfx::createFrameBuffer(window().m_hwnd, width, height);
+			m_framebuffer = bgfx::createFrameBuffer(window().m_hwnd, width, height);
 #else
-			fbh = bgfx::createFrameBuffer(sdlNativeWindowHandle(window().sdl_window()), width, height);
+			m_framebuffer = bgfx::createFrameBuffer(sdlNativeWindowHandle(window().sdl_window()), width, height);
 #endif
-			bgfx::setViewFrameBuffer(index, fbh);
+			bgfx::setViewFrameBuffer(index, m_framebuffer);
 			m_dimensions = osd_dim(width, height);
 			bgfx::setViewClear(index
 				, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
@@ -860,7 +767,11 @@ int renderer_bgfx::draw(int update)
 			return 0;
 		}
 	}
-	if (index != 0) bgfx::setViewFrameBuffer(index, fbh);
+
+	if (index != 0)
+	{
+		bgfx::setViewFrameBuffer(index, m_framebuffer);
+	}
 	bgfx::setViewSeq(index, true);
 	bgfx::setViewRect(index, 0, 0, width, height);
 
@@ -905,10 +816,9 @@ int renderer_bgfx::draw(int update)
 
 		if (status != BUFFER_EMPTY)
 		{
-			set_bgfx_state(blend);
 			bgfx::setVertexBuffer(&buffer);
-			bgfx::setTexture(0, m_s_texColor, m_texture_cache);
-			bgfx::submit(index, m_progQuadTexture);
+			bgfx::setTexture(0, m_gui_effect[blend]->uniform("s_tex")->handle(), m_texture_cache->handle());
+			m_gui_effect[blend]->submit(index);
 		}
 
 		if (status != BUFFER_DONE && status != BUFFER_PRE_FLUSH)
@@ -1051,7 +961,7 @@ void renderer_bgfx::process_atlas_packs(std::vector<std::vector<rectangle_packer
 			}
 			m_hash_to_entry[rect.hash()] = rect;
 			const bgfx::Memory* mem = mame_texture_data_to_bgfx_texture_data(rect.format(), rect.width(), rect.height(), rect.rowpixels(), rect.palette(), rect.base());
-			bgfx::updateTexture2D(m_texture_cache, 0, rect.x(), rect.y(), rect.width(), rect.height(), mem);
+			bgfx::updateTexture2D(m_texture_cache->handle(), 0, rect.x(), rect.y(), rect.width(), rect.height(), mem);
 		}
 	}
 }

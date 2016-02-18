@@ -103,6 +103,23 @@ function osdmodulesbuild()
 	files {
 		MAME_DIR .. "src/osd/modules/render/drawbgfx.cpp",
 		MAME_DIR .. "src/osd/modules/render/binpacker.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/blendreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/cullreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/depthreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/effect.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/effectmanager.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/effectreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/pass.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/passreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/shadermanager.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/statereader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/target.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/targetmanager.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/texture.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/texturemanager.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/uniform.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/uniformreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/writereader.cpp",
 	}
 	includedirs {
 		MAME_DIR .. "3rdparty/bgfx/include",

@@ -103,7 +103,8 @@ struct slider_state
 	INT32           defval;             /* default value */
 	INT32           maxval;             /* maximum value */
 	INT32           incval;             /* increment value */
-	char            description[1];     /* textual description */
+	bool			hidden;				/* hidden or not */
+	char 			description[1];     /* textual description */
 };
 
 
@@ -121,7 +122,7 @@ public:
     running_machine &machine() const { return m_machine; }
     bool single_step() const { return m_single_step; }
 	ui_options &options() { return m_ui_options; }
-	
+
     // setters
     void set_single_step(bool single_step) { m_single_step = single_step; }
 

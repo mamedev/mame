@@ -152,15 +152,17 @@ project ("osd_" .. _OPTIONS["osd"])
 	}
 
 	files {
-		MAME_DIR .. "src/osd/modules/render/drawd3d.cpp",
-		MAME_DIR .. "src/osd/modules/render/drawd3d.h",
 		MAME_DIR .. "src/osd/modules/render/d3d/d3d9intf.cpp",
+		MAME_DIR .. "src/osd/modules/render/d3d/d3dintf.h",
 		MAME_DIR .. "src/osd/modules/render/d3d/d3dhlsl.cpp",
 		MAME_DIR .. "src/osd/modules/render/d3d/d3dcomm.h",
 		MAME_DIR .. "src/osd/modules/render/d3d/d3dhlsl.h",
-		MAME_DIR .. "src/osd/modules/render/d3d/d3dintf.h",
+		MAME_DIR .. "src/osd/modules/render/drawd3d.cpp",
+		MAME_DIR .. "src/osd/modules/render/drawd3d.h",
 		MAME_DIR .. "src/osd/modules/render/drawgdi.cpp",
+		MAME_DIR .. "src/osd/modules/render/drawgdi.h",
 		MAME_DIR .. "src/osd/modules/render/drawnone.cpp",
+		MAME_DIR .. "src/osd/modules/render/drawnone.h",
 		MAME_DIR .. "src/osd/windows/input.cpp",
 		MAME_DIR .. "src/osd/windows/input.h",
 		MAME_DIR .. "src/osd/windows/output.cpp",
@@ -169,6 +171,7 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/windows/video.h",
 		MAME_DIR .. "src/osd/windows/window.cpp",
 		MAME_DIR .. "src/osd/windows/window.h",
+		MAME_DIR .. "src/osd/modules/osdwindow.cpp",
 		MAME_DIR .. "src/osd/modules/osdwindow.h",
 		MAME_DIR .. "src/osd/windows/winmenu.cpp",
 		MAME_DIR .. "src/osd/windows/winmain.cpp",

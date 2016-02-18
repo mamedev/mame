@@ -14,16 +14,6 @@
 //  Windows NT shipped with DirectX 3.0a
 //  Windows 95 shipped with DirectX 2
 
-// standard windows headers
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <tchar.h>
-#include <mmsystem.h>
-#include <d3d9.h>
-#include <d3dx9.h>
-#include <math.h>
-#undef interface
-
 // MAME headers
 #include "emu.h"
 #include "render.h"
@@ -35,12 +25,12 @@
 #include "screen.h"
 
 // MAMEOS headers
-#include "d3dintf.h"
 #include "winmain.h"
 #include "window.h"
-#include "d3dcomm.h"
 #include "modules/render/drawd3d.h"
+#include "d3dcomm.h"
 #include "strconv.h"
+#include "d3dhlsl.h"
 
 
 //============================================================
@@ -48,10 +38,8 @@
 //============================================================
 
 static slider_state *g_slider_list;
-static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *templ, const char *extension, int idx);
+static file_error open_next(renderer_d3d9 *d3d, emu_file &file, const char *templ, const char *extension, int idx);
 
-namespace d3d
-{
 //============================================================
 //  PROTOTYPES
 //============================================================
@@ -108,7 +96,7 @@ shaders::~shaders()
 		currcache = cachehead;
 	}
 
-	render_target *currtarget = targethead;
+	d3d_render_target *currtarget = targethead;
 	while(targethead != NULL)
 	{
 		targethead = currtarget->next;
@@ -565,14 +553,14 @@ void shaders::remove_render_target(texture_info *texture)
 
 void shaders::remove_render_target(int width, int height, UINT32 screen_index, UINT32 page_index)
 {
-	render_target *target = find_render_target(width, height, screen_index, page_index);
+	d3d_render_target *target = find_render_target(width, height, screen_index, page_index);
 	if (target != NULL)
 	{
 		remove_render_target(target);
 	}
 }
 
-void shaders::remove_render_target(render_target *rt)
+void shaders::remove_render_target(d3d_render_target *rt)
 {
 	if (rt != NULL)
 	{
@@ -645,7 +633,7 @@ void shaders::set_texture(texture_info *texture)
 //  shaders::init
 //============================================================
 
-void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *renderer)
+void shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *renderer)
 {
 	if (!d3dintf->post_fx_available)
 	{
@@ -1165,13 +1153,13 @@ void shaders::init_effect_info(poly_info *poly)
 //  shaders::find_render_target
 //============================================================
 
-render_target* shaders::find_render_target(texture_info *info)
+d3d_render_target* shaders::find_render_target(texture_info *info)
 {
 	UINT32 screen_index_data = (UINT32)info->get_texinfo().osddata;
 	UINT32 screen_index = screen_index_data >> 1;
 	UINT32 page_index = screen_index_data & 1;
 
-	render_target *curr = targethead;
+	d3d_render_target *curr = targethead;
 	while (curr != NULL && (
 		curr->screen_index != screen_index ||
 		curr->page_index != page_index ||
@@ -1189,9 +1177,9 @@ render_target* shaders::find_render_target(texture_info *info)
 //  shaders::find_render_target
 //============================================================
 
-render_target* shaders::find_render_target(int width, int height, UINT32 screen_index, UINT32 page_index)
+d3d_render_target* shaders::find_render_target(int width, int height, UINT32 screen_index, UINT32 page_index)
 {
-	render_target *curr = targethead;
+	d3d_render_target *curr = targethead;
 	while (curr != NULL && (
 		curr->width != width ||
 		curr->height != height ||
@@ -1223,7 +1211,7 @@ cache_target* shaders::find_cache_target(UINT32 screen_index, int width, int hei
 	return curr;
 }
 
-int shaders::ntsc_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::ntsc_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1290,7 +1278,7 @@ rgb_t shaders::apply_color_convolution(rgb_t color)
 		MAX(0, MIN(255, static_cast<int>(b * 255.0f))));
 }
 
-int shaders::color_convolution_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::color_convolution_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1305,7 +1293,7 @@ int shaders::color_convolution_pass(render_target *rt, int source_index, poly_in
 	return next_index;
 }
 
-int shaders::prescale_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::prescale_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1319,7 +1307,7 @@ int shaders::prescale_pass(render_target *rt, int source_index, poly_info *poly,
 	return next_index;
 }
 
-int shaders::deconverge_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::deconverge_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1342,7 +1330,7 @@ int shaders::deconverge_pass(render_target *rt, int source_index, poly_info *pol
 	return next_index;
 }
 
-int shaders::defocus_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::defocus_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1362,7 +1350,7 @@ int shaders::defocus_pass(render_target *rt, int source_index, poly_info *poly, 
 	return next_index;
 }
 
-int shaders::phosphor_pass(render_target *rt, cache_target *ct, int source_index, poly_info *poly, int vertnum)
+int shaders::phosphor_pass(d3d_render_target *rt, cache_target *ct, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1393,7 +1381,7 @@ int shaders::phosphor_pass(render_target *rt, cache_target *ct, int source_index
 	return next_index;
 }
 
-int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int vertnum, bool prepare_bloom)
+int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum, bool prepare_bloom)
 {
 	int next_index = source_index;
 
@@ -1440,7 +1428,7 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	return next_index;
 }
 
-int shaders::downsample_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::downsample_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1485,7 +1473,7 @@ int shaders::downsample_pass(render_target *rt, int source_index, poly_info *pol
 	return next_index;
 }
 
-int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::bloom_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1557,7 +1545,7 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 	return next_index;
 }
 
-int shaders::distortion_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::distortion_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1601,7 +1589,7 @@ int shaders::distortion_pass(render_target *rt, int source_index, poly_info *pol
 	return next_index;
 }
 
-int shaders::vector_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::vector_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1618,7 +1606,7 @@ int shaders::vector_pass(render_target *rt, int source_index, poly_info *poly, i
 	return next_index;
 }
 
-int shaders::vector_buffer_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::vector_buffer_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1635,7 +1623,7 @@ int shaders::vector_buffer_pass(render_target *rt, int source_index, poly_info *
 	return next_index;
 }
 
-int shaders::screen_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1698,7 +1686,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		curr_render_target = find_render_target(curr_texture);
 
-		render_target *rt = curr_render_target;
+		d3d_render_target *rt = curr_render_target;
 		if (rt == NULL)
 		{
 			return;
@@ -1744,7 +1732,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	{
 		curr_render_target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
 
-		render_target *rt = curr_render_target;
+		d3d_render_target *rt = curr_render_target;
 		if (rt == NULL)
 		{
 			return;
@@ -1766,7 +1754,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	{
 		curr_render_target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
 
-		render_target *rt = curr_render_target;
+		d3d_render_target *rt = curr_render_target;
 		if (rt == NULL)
 		{
 			return;
@@ -1844,7 +1832,7 @@ bool shaders::register_prescaled_texture(texture_info *texture)
 //============================================================
 //  shaders::add_cache_target - register a cache target
 //============================================================
-bool shaders::add_cache_target(renderer* d3d, texture_info* info, int width, int height, int xprescale, int yprescale, int screen_index)
+bool shaders::add_cache_target(renderer_d3d9* d3d, texture_info* info, int width, int height, int xprescale, int yprescale, int screen_index)
 {
 	cache_target* target = (cache_target*)global_alloc_clear<cache_target>();
 
@@ -1879,7 +1867,7 @@ bool shaders::add_cache_target(renderer* d3d, texture_info* info, int width, int
 	return true;
 }
 
-render_target* shaders::get_vector_target()
+d3d_render_target* shaders::get_vector_target()
 {
 	if (!vector_enable)
 	{
@@ -1902,13 +1890,13 @@ void shaders::create_vector_target(render_primitive *prim)
 //  shaders::add_render_target - register a render target
 //============================================================
 
-bool shaders::add_render_target(renderer* d3d, texture_info* info, int width, int height, int xprescale, int yprescale)
+bool shaders::add_render_target(renderer_d3d9* d3d, texture_info* info, int width, int height, int xprescale, int yprescale)
 {
 	UINT32 screen_index = 0;
 	UINT32 page_index = 0;
 	if (info != NULL)
 	{
-		render_target *existing_target = find_render_target(info);
+		d3d_render_target *existing_target = find_render_target(info);
 		if (existing_target != NULL)
 		{
 			remove_render_target(existing_target);
@@ -1920,14 +1908,14 @@ bool shaders::add_render_target(renderer* d3d, texture_info* info, int width, in
 	}
 	else
 	{
-		render_target *existing_target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
+		d3d_render_target *existing_target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
 		if (existing_target != NULL)
 		{
 			remove_render_target(existing_target);
 		}
 	}
 
-	render_target* target = (render_target*)global_alloc_clear<render_target>();
+	d3d_render_target* target = (d3d_render_target*)global_alloc_clear<d3d_render_target>();
 
 	if (!target->init(d3d, d3dintf, width, height, xprescale, yprescale))
 	{
@@ -2069,7 +2057,7 @@ void shaders::delete_resources(bool reset)
 		currcache = cachehead;
 	}
 
-	render_target *currtarget = targethead;
+	d3d_render_target *currtarget = targethead;
 	while(targethead != NULL)
 	{
 		targethead = currtarget->next;
@@ -2229,6 +2217,7 @@ static slider_state *slider_alloc(running_machine &machine, const char *title, I
 	state->incval = incval;
 	state->update = update;
 	state->arg = arg;
+	state->hidden = false;
 	strcpy(state->description, title);
 
 	return state;
@@ -3040,7 +3029,7 @@ void uniform::update()
 
 	shaders *shadersys = m_shader->m_shaders;
 	hlsl_options *options = shadersys->options;
-	renderer *d3d = shadersys->d3d;
+	renderer_d3d9 *d3d = shadersys->d3d;
 
 	switch (m_id)
 	{
@@ -3531,16 +3520,14 @@ ULONG effect::release()
 	return m_effect->Release();
 }
 
-}
-
 
 //============================================================
 //  get_slider_list
 //============================================================
 
-void *windows_osd_interface::get_slider_list()
+slider_state *windows_osd_interface::get_slider_list()
 {
-	return (void*)g_slider_list;
+	return g_slider_list;
 }
 
 
@@ -3551,7 +3538,7 @@ void *windows_osd_interface::get_slider_list()
 //  scheme
 //-------------------------------------------------
 
-static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *templ, const char *extension, int idx)
+static file_error open_next(renderer_d3d9 *d3d, emu_file &file, const char *templ, const char *extension, int idx)
 {
 	UINT32 origflags = file.openflags();
 

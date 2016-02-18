@@ -23,6 +23,8 @@
 #include "input.h"
 #include "strconv.h"
 
+#include "modules/osdwindow.h"
+
 //============================================================
 //  CONSTANTS
 //============================================================
@@ -266,8 +268,9 @@ static void init_monitors(void)
 //  pick_monitor
 //============================================================
 
-osd_monitor_info *osd_monitor_info::pick_monitor(windows_options &options, int index)
+osd_monitor_info *osd_monitor_info::pick_monitor(osd_options &osdopts, int index)
 {
+	windows_options &options = reinterpret_cast<windows_options &>(osdopts);
 	osd_monitor_info *monitor;
 	const char *scrname, *scrname2;
 	int moncount = 0;
