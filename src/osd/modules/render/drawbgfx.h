@@ -100,9 +100,9 @@ private:
 	rectangle_packer m_packer;
 
 	uint32_t m_white[16*16];
-	static const uint16_t CACHE_SIZE = 1024;
-	static const uint32_t PACKABLE_SIZE = 128;
-	static const UINT32 WHITE_HASH = 0x87654321;
+	enum : uint16_t { CACHE_SIZE = 1024 };
+	enum : uint32_t { PACKABLE_SIZE = 128 };
+	enum : UINT32 { WHITE_HASH = 0x87654321 };
 };
 
 #endif
