@@ -4193,6 +4193,15 @@ READ8_MEMBER(lostreas_state::read_k)
 
 // config
 
+/* physical button layout and labels is like this:
+  (note: Canadian version differs slightly to accomodoate dual-language)
+
+    [N-S(gold)]    [1] [2] [3]    [AIR]
+    [E-W(gold)]    [4] [5] [6]    [UP]
+    [N-S(silv)]    [7] [8] [9]    [$ VALUE]
+    [E-W(silv)]                   [CLEAR]
+*/
+
 static INPUT_PORTS_START( lostreas )
 	PORT_START("IN.0") // O0
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) // num
