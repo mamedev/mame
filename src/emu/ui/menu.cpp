@@ -2416,13 +2416,16 @@ void ui_menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 
 			icons_texture[linenum]->set_bitmap(*icons_bitmap[linenum], icons_bitmap[linenum]->cliprect(), TEXFORMAT_ARGB32);
 		}
-		else
-			icons_bitmap[linenum]->reset();
-
+		else {
+			if (icons_bitmap[linenum] != nullptr)
+			{
+				icons_bitmap[linenum]->reset();
+			}
+		}
 		auto_free(machine(), tmp);
 	}
 
-	if (icons_bitmap[linenum]->valid())
+	if (icons_bitmap[linenum] != nullptr && icons_bitmap[linenum]->valid())
 		container->add_quad(x0, y0, x1, y1, ARGB_WHITE, icons_texture[linenum], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_PACKABLE);
 }
 
