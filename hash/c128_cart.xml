@@ -12,7 +12,7 @@ Missing dumps:
 
 -->
 	<software name="c128diag">
-		<description>C128 Diagnostic (v1.1)</description>
+		<description>C-128 Diagnostic (v1.1)</description>
 		<year>1987</year>
 		<publisher>Commodore</publisher>
 
@@ -21,13 +21,13 @@ Missing dumps:
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="c128diag.bin" size="0x2000" crc="584f6750" sha1="b3cfd8508b887e9c7e72ed2b0c44fe63e6b44ac4" offset="0x0000" />
+				<rom name="c128diag.bin" size="0x2000" crc="584f6750" sha1="b3cfd8508b887e9c7e72ed2b0c44fe63e6b44ac4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="c128diaga" cloneof="c128diag">
-		<description>C128 Diagnostic</description>
+		<description>C-128 Diagnostic (v1.4)</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 
@@ -41,8 +41,23 @@ Missing dumps:
 		</part>
 	</software>
 
+	<software name="c128diagb" cloneof="c128diag">
+		<description>C128/C128D Diagnostic (Rev 785260)</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
+
+			<dataarea name="roml" size="0x4000">
+				<rom name="c128_785260.bin" size="0x2000" crc="d4a4e162" sha1="2c861c89be4e556982435d076b012362545f03ca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="c128diagdcr" cloneof="c128diag">
-		<description>C128DCR Diagnostic</description>
+		<description>C-128DCR Integral Diag 1.0</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 
@@ -67,7 +82,23 @@ Missing dumps:
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="c128diag.bin" size="0x2000" crc="b11107be" sha1="c7149ed420d95faa1ab2ecb4a536f5e6effd45e3" offset="0" />
+				<rom name="c128diag_588121.bin" size="0x2000" crc="b11107be" sha1="c7149ed420d95faa1ab2ecb4a536f5e6effd45e3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c128dg40a" cloneof="c128dg40">
+		<description>C128/40 Diagnostic (Rev 789010)</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
+
+			<dataarea name="roml" size="0x2000">
+				<rom name="c128diag_789010.bin" size="0x2000" crc="3b5fcdbd" sha1="da8851745b90dfafe4e05b2bf4e8e224b553170a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -101,7 +132,7 @@ Missing dumps:
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="mach_128_v1a.bin" size="0x2000" crc="f91ed380" sha1="6f04d73fcde8b28903075e3adcd2d7ff49d2518a" offset="0x0000" />
+				<rom name="mach_128_v1a.bin" size="0x2000" crc="f91ed380" sha1="6f04d73fcde8b28903075e3adcd2d7ff49d2518a" offset="0" />
 			</dataarea>
 		</part>
 
@@ -123,7 +154,7 @@ Missing dumps:
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="mach_128_v2a.bin" size="0x2000" crc="fc60d92e" sha1="7f487134d314b4c5158954ad057e01c0da32a468" offset="0x0000" />
+				<rom name="mach_128_v2a.bin" size="0x2000" crc="fc60d92e" sha1="7f487134d314b4c5158954ad057e01c0da32a468" offset="0" />
 			</dataarea>
 		</part>
 
