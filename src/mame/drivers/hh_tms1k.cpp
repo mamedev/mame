@@ -694,8 +694,9 @@ MACHINE_CONFIG_END
   Coleco Zodiac - The Astrology Computer
   * TMS1100 MP3435 (no decap)
   * 8-digit 7seg display, 12 other LEDs, 1bit sound
-
-
+  
+  As the name suggests, this is an astrologic calculator. Refer to the
+  (very extensive) manual on how to use it.
 
 ***************************************************************************/
 
@@ -737,7 +738,7 @@ WRITE16_MEMBER(zodiac_state::write_r)
 WRITE16_MEMBER(zodiac_state::write_o)
 {
 	// O0-O7: digit segment/led data
-	m_o = (data >> 1 & 0x7f) | (data << 7 & 0x80);
+	m_o = data;
 	prepare_display();
 }
 
@@ -793,16 +794,44 @@ INPUT_PORTS_END
 // output PLA is not dumped
 static const UINT16 zodiac_output_pla[0x20] =
 {
-	0x7e, 0x0c, 0xb6, 0x9e, 0xcc, 0xda, 0xfa, 0x0e,
-	0xfe, 0xce, 0xee, 0xbc, 0xf2, 0x3c, 0x70, 0x7c,
-	0x01, 0x08, 0xa0, 0xa8, 0x40, 0x48, 0xe0, 0xe8,
-	0x06, 0x10, 0xa6, 0xb0, 0x46, 0x50, 0xe6, 0xf0
+	0x80,                   // empty/led 1/7
+	lC,                     // i/led 2/8
+	lE+lG,                  // r/led 3/9
+	lC+lE+lG,               // n
+	lF,                     // seg F/led 4/10
+	0,                      // ?
+	0,                      // ?
+	lC+lE+lF+lG,            // h
+	lB,                     // seg B/led 5/11
+	lD,                     // seg D/led 6/12
+	0,                      // ?
+	0,                      // ?
+	0,                      // ?
+	0,                      // ?
+	lA+lB+lE+lF+lG,         // P
+	0,                      // ?
+	lA+lB+lC+lD+lE+lF,      // 0
+	lB+lC,                  // 1
+	lA+lB+lD+lE+lG,         // 2
+	lA+lB+lC+lD+lG,         // 3
+	lB+lC+lF+lG,            // 4
+	lA+lC+lD+lF+lG,         // 5
+	lA+lC+lD+lE+lF+lG,      // 6
+	lA+lB+lC,               // 7
+	lA+lB+lC+lD+lE+lF+lG,   // 8
+	lA+lB+lC+lD+lF+lG,      // 9
+	lA+lB+lC+lE+lF+lG,      // A
+	lB+lC+lD+lE+lG,         // d
+	lA+lD+lE+lF+lG,         // E
+	lB+lC+lD+lE,            // J
+	lD+lE+lF,               // L
+	lB+lC+lD+lE+lF          // U
 };
 
 static MACHINE_CONFIG_START( zodiac, zodiac_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 425000) // approximation - RC osc. R=18K, C=100pf
+	MCFG_CPU_ADD("maincpu", TMS1100, 500000) // approximation - RC osc. R=18K, C=100pf
 	MCFG_TMS1XXX_OUTPUT_PLA(zodiac_output_pla)
 	MCFG_TMS1XXX_READ_K_CB(READ8(zodiac_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(zodiac_state, write_r))
@@ -4339,28 +4368,28 @@ READ8_MEMBER(lostreas_state::read_k)
 
 static INPUT_PORTS_START( lostreas )
 	PORT_START("IN.0") // O0
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) // num
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) // num
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) // num
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) // num
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
 
 	PORT_START("IN.1") // O1
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) // num
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) // num
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) // num
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) // num
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 
 	PORT_START("IN.2") // O2
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) // clear
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_U) PORT_NAME("Air/Up")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("$ Value")
 
 	PORT_START("IN.3") // O3
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CODE(KEYCODE_T) // direction
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) // direction
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) // direction
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) // direction
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("E-W (silver)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("N-S (silver)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("E-W (gold)")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("N-S (gold)")
 INPUT_PORTS_END
 
 
@@ -4373,7 +4402,7 @@ static const INT16 lostreas_speaker_levels[16] =
 static MACHINE_CONFIG_START( lostreas, lostreas_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 400000) // approximation - RC osc. R=39K, C=47pf
+	MCFG_CPU_ADD("maincpu", TMS1100, 425000) // approximation - RC osc. R=39K, C=47pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(lostreas_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(lostreas_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(lostreas_state, write_o))
@@ -5303,7 +5332,7 @@ ROM_END
 COMP( 1980, mathmagi,  0,        0, mathmagi,  mathmagi,  driver_device, 0, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1979, amaztron,  0,        0, amaztron,  amaztron,  driver_device, 0, "Coleco", "Amaze-A-Tron", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, zodiac,    0,        0, zodiac,    zodiac,    driver_device, 0, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1979, zodiac,    0,        0, zodiac,    zodiac,    driver_device, 0, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE )
 CONS( 1978, cqback,    0,        0, cqback,    cqback,    driver_device, 0, "Coleco", "Electronic Quarterback", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, h2hfootb,  0,        0, h2hfootb,  h2hfootb,  driver_device, 0, "Coleco", "Head to Head Football", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, h2hbaseb,  0,        0, h2hbaseb,  h2hbaseb,  driver_device, 0, "Coleco", "Head to Head Baseball", MACHINE_SUPPORTS_SAVE )
@@ -5341,7 +5370,7 @@ CONS( 1979, stopthiep, stopthie, 0, stopthief, stopthief, driver_device, 0, "Par
 CONS( 1980, bankshot,  0,        0, bankshot,  bankshot,  driver_device, 0, "Parker Brothers", "Bank Shot - Electronic Pool", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, splitsec,  0,        0, splitsec,  splitsec,  driver_device, 0, "Parker Brothers", "Split Second", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, mmerlin,   0,        0, mmerlin,   mmerlin,   driver_device, 0, "Parker Brothers", "Master Merlin", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, lostreas,  0,        0, lostreas,  lostreas,  driver_device, 0, "Parker Brothers", "Lost Treasure - The Electronic Deep-Sea Diving Game (Electronic Dive-Control Center)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
+CONS( 1982, lostreas,  0,        0, lostreas,  lostreas,  driver_device, 0, "Parker Brothers", "Lost Treasure - The Electronic Deep-Sea Diving Game (Electronic Dive-Control Center)", MACHINE_SUPPORTS_SAVE ) // ***
 
 CONS( 1981, tandy12,   0,        0, tandy12,   tandy12,   driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
 
