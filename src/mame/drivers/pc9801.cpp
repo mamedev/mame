@@ -2293,6 +2293,8 @@ WRITE8_MEMBER(pc9801_state::pc9821_video_ff_w)
 {
 	if(offset == 1)
 	{
+		if(((data & 0xfe) == 4) && !m_ex_video_ff[3]) // TODO: many other settings are protected
+			return;
 		m_ex_video_ff[(data & 0xfe) >> 1] = data & 1;
 
 		//if((data & 0xfe) == 0x20)
@@ -3466,7 +3468,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("640K,3712K,7808K,16M")
+	MCFG_RAM_EXTRA_OPTIONS("640K,3712K,7808K,14M")
 
 	MCFG_DEVICE_MODIFY("upd7220_btm")
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_grcg_2_map)
