@@ -25,17 +25,59 @@
 // device type definition
 const device_type COM8116 = &device_creator<com8116_device>;
 
+// Parts with T after the number do not have an internal oscillator and require an external clock source
+// The SMC/COM 5xxx parts are all dual 5v/12v parts, while the 8xxx parts are 5v only
 
+// SMC/COM5016(T) with no dash, aka 'STD' part on the datasheet
+// Also COM8116(T)/8126(T)/8136(T)/8146(T) and Synertek sy2661-3 and GI AY-5-8116(T)-000 and GI AY-5-8136(T)-000 and WD WD-1943-00 (aka WD8136-00)
+// SMC/COM8156(T) is the same chip but clocked twice as fast and 32x clocks per baud instead of 16x
+// baud rates are 50, 75, 110, 134.5, 150, 300, 600, 1200, 1800, 2000, 2400, 3600, 4800, 7200, 9600, 19200
 const int com8116_device::divisors_16X_5_0688MHz[] =
 	{ 6336, 4224, 2880, 2355, 2112, 1056, 528, 264, 176, 158, 132, 88, 66, 44, 33, 16 };
 
+// SMC/COM8116-003
+// from http://www.vintagecomputer.net/fjkraan/comp/divcomp/doc/SMC_BaudGen.pdf page 283 (pdf page 20)
+// baud rates are 50, 75, 110, 134.5, 150, 200, 300, 600, 1200, 1800, 2000, 2400, 3600, 4800, 9600, 19200
+const int com8116_device::divisors_16X_6_01835MHz[] =
+	{ 7523, 5015, 3420, 2797, 2508, 1881, 1254, 627, 313, 209, 188, 157, 104, 78, 39, 20 };
+
+// SMC/COM5016(T)-5 and WD WD-1943-05; Synertek SY2661-1 and 2 are NOT the same as this despite using same clock speed, see below
+// SMC/COM8156(T)-5 is the same chip but clocked twice as fast and 32x clocks per baud instead of 16x
+// baud rates are 50, 75, 110, 134.5, 150, 300, 600, 1200, 1800, 2000, 2400, 3600, 4800, 7200, 9600, 19200
 const int com8116_device::divisors_16X_4_9152MHz[] =
 	{ 6144, 4096, 2793, 2284, 2048, 1024, 512, 256, 171, 154, 128, 85, 64, 43, 32, 16 };
 
+// SMC/COM5016(T)-6 and WD WD-1943-06
+// baud rates are 50, 75, 110, 134.5, 150, 200, 300, 600, 1200, 1800, 2400, 3600, 4800, 7200, 9600, 19200
 const int com8116_device::divisors_32X_5_0688MHz[] =
 	{ 3168, 2112, 1440, 1177, 1056, 792, 528, 264, 132, 88, 66, 44, 33, 22, 16, 8 };
 
+// SMC/COM5016(T)-013 (from http://bitsavers.informatik.uni-stuttgart.de/pdf/dec/terminal/vt100/EK-VT100-TM-003_VT100_Technical_Manual_Jul82.pdf page 4-27 (pdf page 78))
+// and from http://www.vintagecomputer.net/fjkraan/comp/divcomp/doc/SMC_BaudGen.pdf page 283 (pdf page 20)
+// SMC/COM5106-013A is the same chip clocked twice as fast, but with 32x clocks per baud instead of 16x
+// baud rates are 50, 75, 110, 134.5, 150, 200, 300, 600, 1200, 1800, 2000, 2400, 3600, 4800, 9600, 19200
+const int com8116_device::divisors_16X_2_7648MHz[] =
+	{ 3456, 2304, 1571, 1285, 1152, 864, 576, 288, 144, 96, 86, 72, 48, 36, 18, 9 };
 
+// SMC/COM5026(T)-030 (non-standard serial rates, from http://bitsavers.informatik.uni-stuttgart.de/pdf/standardMicrosystems/_dataBooks/1979_StandardMicrosystems.pdf page 135)
+const int com8116_device::divisors_16X_5_0688MHz_030[] =
+	{ 731, 733, 735, 737, 741, 743, 745, 751, 6970, 5569, 5433, 4752, 4269, 1920, 1584, 301 };
+
+// SMC/COM5036(T)-080 (from http://bitsavers.informatik.uni-stuttgart.de/pdf/standardMicrosystems/_dataBooks/1979_StandardMicrosystems.pdf page 135)
+const int com8116_device::divisors_16X_4_6080MHz[] =
+	{ 5760, 3840, 2618, 2141, 1920, 960, 480, 240, 160, 144, 120, 80, 60, 40, 30, 15 };
+
+// COM8046 combines the -6 and STD tables into one device as a 32-entry table
+
+// Synertek SY2661-1 (from http://bitsavers.informatik.uni-stuttgart.de/pdf/synertek/_dataBooks/Synertek_1981-1982_Data_Catalog.pdf page 3-40 (pdf page 139))
+// baud rates are 50, 75, 110, 134.5, 150, 200, 300, 600, 1050, 1200, 1800, 2000, 2400, 4800, 9600, 19200
+const int com8116_device::divisors_16X_4_9152MHz_SY2661_1[] =
+	{ 6144, 4096, 2793, 2284, 2048, 1536, 1024, 512, 292, 256, 171, 154, 128, 64, 32, 16 };
+
+// Synertek SY2661-2 (from http://bitsavers.informatik.uni-stuttgart.de/pdf/synertek/_dataBooks/Synertek_1981-1982_Data_Catalog.pdf page 3-40 (pdf page 139))
+// baud rates are 45.5, 50, 75, 110, 134.5, 150, 300, 600, 1200, 1800, 2000, 2400, 4800, 9600, 19200, 38400
+const int com8116_device::divisors_16X_4_9152MHz_SY2661_2[] =
+	{ 6752, 6144, 4096, 2793, 2284, 2048, 1024, 512, 256, 171, 154, 128, 64, 32, 16, 8 };
 
 //**************************************************************************
 //  LIVE DEVICE
