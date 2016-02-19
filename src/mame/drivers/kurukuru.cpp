@@ -777,11 +777,9 @@ static MACHINE_CONFIG_START( ppj, kurukuru_state )
 MACHINE_CONFIG_END
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************************
+*                 ROMs Loading                   *
+*************************************************/
 
 /*  Kuru Kuru Pyon Pyon.
     1990, Success / Taiyo Jidoki.
@@ -831,6 +829,15 @@ ROM_START( ppj )
 ROM_END
 
 
+/***************************************************************************
+*                              Game Drivers                                *
+***************************************************************************/
+
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY                   FULLNAME                        FLAGS  */
 GAME( 1990, kurukuru, 0,      kurukuru, kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",   0 )
 GAME( 199?, ppj,      0,      ppj,      ppj,      driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (V1.40, Japan)", 0 )
+
+// unemulated....
+
+//    199?, Success / Taiyo Jidoki, Pyon Pyon
+//    1990, Success / Taiyo Jidoki, Sui Sui Pyon Pyon
