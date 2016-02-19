@@ -222,22 +222,26 @@
 
   ADPCM Samples....
 
-  There are 14 samples in the system.
+  There are 14 samples in Kuru Kuru Pyon Pyon.
 
   00: "Botechin"
   01:
-  02: "Hakase" ("professor")
+  02: "Hakase" (professor)
   03: "Pyokorin"
   04: "Kunio"
-  05: "Pyon Pyon"
-  06:
+  05: "Pyon-Pyon"
+  06: "Boketa"
   07:
   08: "Oume"
-  09: "Haipaa" ("hyper")
-  10: "Ichi ni tsuite" ("on your marks")
-  11: "Youi" ("get ready")
-  12: Bang sound for the tadpoles landing in the right panel.
+  09: "Haipaa" (hyper)
+  10: "Ichi ni tsuite" (on your marks)
+  11: "Youi" (get ready)
+  12: "Bang" (sound for the tadpoles landing in the right panel).
   13: Sound effect for reels when running.
+
+  The fact that there are samples for "on your marks", "get ready", and "bang",
+  make me think that these sounds could be shared with the other unemulated marathon
+  game of the series called just "Pyon Pyon".
 
 ***********************************************************************************/
 
