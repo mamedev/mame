@@ -691,7 +691,7 @@ void fidelz80base_state::set_display_segmask(UINT32 digits, UINT32 mask)
 	}
 }
 
-void fidelz80base_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
+void fidelz80base_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
@@ -700,7 +700,8 @@ void fidelz80base_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
-	display_update();
+	if (update)
+		display_update();
 }
 
 

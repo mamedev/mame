@@ -62,7 +62,7 @@ void mbdtower_state::prepare_display()
 {
 	// declare display matrix size and the 2 7segs
 	set_display_size(7, 3);
-	m_display_segmask[1] = m_display_segmask[2] = 0x7f;
+	set_display_segmask(6, 0x7f);
 
 	// update current state
 	if (~m_r & 0x10)
@@ -246,7 +246,7 @@ void mbdtower_state::machine_start()
 static MACHINE_CONFIG_START( mbdtower, mbdtower_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1400, 425000) // approximation - RC osc. R=43K, C=56pf, but unknown RC curve
+	MCFG_CPU_ADD("maincpu", TMS1400, 425000) // approximation - RC osc. R=43K, C=56pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(mbdtower_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(mbdtower_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(mbdtower_state, write_o))

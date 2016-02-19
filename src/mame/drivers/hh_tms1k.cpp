@@ -286,7 +286,7 @@ void hh_tms1k_state::set_display_segmask(UINT32 digits, UINT32 mask)
 	}
 }
 
-void hh_tms1k_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
+void hh_tms1k_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
@@ -295,18 +295,12 @@ void hh_tms1k_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
-	display_update();
+	if (update)
+		display_update();
 }
 
-void hh_tms1k_state::display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask)
-{
-	// expects m_display_segmask to be not-0
-	for (int y = 0; y < maxy; y++)
-		m_display_segmask[y] &= segmask;
 
-	display_matrix(maxx, maxy, setx, sety);
-}
-
+// generic input handlers
 
 UINT8 hh_tms1k_state::read_inputs(int columns)
 {
@@ -362,7 +356,7 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 /***************************************************************************
 
   APF Mathemagician
-  * TMS1100 MCU, labeled MP1030
+  * TMS1100 MCU, labeled MP1030 (no decap)
   * 2 x DS8870N - Hex LED Digit Driver
   * 2 x DS8861N - MOS-to-LED 5-Segment Driver
   * 10-digit 7seg LED display(2 custom ones) + 4 LEDs, no sound
@@ -399,21 +393,8 @@ public:
 
 void mathmagi_state::prepare_display()
 {
-	// R0-R7: 7seg leds
-	for (int y = 0; y < 8; y++)
-	{
-		m_display_segmask[y] = 0x7f;
-		m_display_state[y] = (m_r >> y & 1) ? (m_o >> 1) : 0;
-	}
-
-	// R8: custom math symbols digit
-	// R9: custom equals digit
-	// R10: misc lamps
-	for (int y = 8; y < 11; y++)
-		m_display_state[y] = (m_r >> y & 1) ? m_o : 0;
-
-	set_display_size(8, 11);
-	display_update();
+	set_display_segmask(0xff, 0x7f);
+	display_matrix(7, 11, m_o, m_r);
 }
 
 WRITE16_MEMBER(mathmagi_state::write_r)
@@ -421,16 +402,18 @@ WRITE16_MEMBER(mathmagi_state::write_r)
 	// R3,R5-R7,R9,R10: input mux
 	m_inp_mux = (data >> 3 & 1) | (data >> 4 & 0xe) | (data >> 5 & 0x30);
 
-	// +others:
+	// R0-R7: 7seg leds
+	// R8: custom math symbols digit
+	// R9: custom equals digit
+	// R10: misc lamps
 	m_r = data;
 	prepare_display();
 }
 
 WRITE16_MEMBER(mathmagi_state::write_o)
 {
-	// O1-O7: digit segments A-G
+	// O1-O7: led/digit segment data
 	// O0: N/C
-	data = (data << 1 & 0xfe) | (data >> 7 & 1); // because opla is unknown
 	m_o = data;
 	prepare_display();
 }
@@ -532,7 +515,7 @@ static const UINT16 mathmagi_output_pla[0x20] =
 static MACHINE_CONFIG_START( mathmagi, mathmagi_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 175000) // RC osc. R=68K, C=82pf -> ~175kHz
+	MCFG_CPU_ADD("maincpu", TMS1100, 175000) // approximation - RC osc. R=68K, C=82pf
 	MCFG_TMS1XXX_OUTPUT_PLA(mathmagi_output_pla)
 	MCFG_TMS1XXX_READ_K_CB(READ8(mathmagi_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(mathmagi_state, write_r))
@@ -552,7 +535,7 @@ MACHINE_CONFIG_END
 
   Coleco Amaze-A-Tron, by Ralph Baer
   * TMS1100 MCU, labeled MP3405(die label too)
-  * 2-digit 7seg LED display + 2 LEDs(one red, one green), 1bit sound
+  * 2-digit 7seg LED display + 2 LEDs(one red, one green), 1-bit sound
   * 5x5 pressure-sensitive playing board
 
   This is an electronic board game with a selection of 8 maze games,
@@ -671,7 +654,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( amaztron, amaztron_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // RC osc. R=33K?, C=100pf -> ~350kHz
+	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // approximation - RC osc. R=33K?, C=100pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(amaztron_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(amaztron_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(amaztron_state, write_o))
@@ -693,7 +676,7 @@ MACHINE_CONFIG_END
 
   Coleco Zodiac - The Astrology Computer
   * TMS1100 MP3435 (no decap)
-  * 8-digit 7seg display, 12 other LEDs, 1bit sound
+  * 8-digit 7seg display, 12 other LEDs, 1-bit sound
   
   As the name suggests, this is an astrologic calculator. Refer to the
   (very extensive) manual on how to use it.
@@ -854,7 +837,7 @@ MACHINE_CONFIG_END
 
   Coleco Electronic Quarterback
   * TMS1100NLL MP3415 (die labeled MP3415)
-  * 9-digit LED grid, 1bit sound
+  * 9-digit LED grid, 1-bit sound
 
   known releases:
   - USA(1): Electronic Quarterback
@@ -965,7 +948,7 @@ MACHINE_CONFIG_END
 
   Coleco Head to Head Football
   * TMS1100NLLE (rev. E!) MP3460 (die labeled MP3460)
-  * 2*SN75492N LED display drivers, 9-digit LED grid, 1bit sound
+  * 2*SN75492N LED display drivers, 9-digit LED grid, 1-bit sound
 
   known releases:
   - USA(1): Head to Head Football
@@ -1057,7 +1040,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( h2hfootb, h2hfootb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 310000) // approximation - RC osc. R=39K, C=100pf, but unknown RC curve
+	MCFG_CPU_ADD("maincpu", TMS1100, 310000) // approximation - RC osc. R=39K, C=100pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(h2hfootb_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(h2hfootb_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(h2hfootb_state, write_o))
@@ -1080,7 +1063,7 @@ MACHINE_CONFIG_END
   Coleco Head to Head Baseball
   * PCB labels Coleco rev C 73891/2
   * TMS1170NLN MP1525-N2 (die labeled MP1525)
-  * 9-digit cyan VFD display, and other LEDs behind bezel, 1bit sound
+  * 9-digit cyan VFD display, and other LEDs behind bezel, 1-bit sound
 
   known releases:
   - USA: Head to Head Baseball
@@ -1219,7 +1202,7 @@ MACHINE_CONFIG_END
 
   Coleco Total Control 4
   * TMS1400NLL MP7334-N2 (die labeled MP7334)
-  * 2x2-digit 7seg LED display + 4 LEDs, LED grid display, 1bit sound
+  * 2x2-digit 7seg LED display + 4 LEDs, LED grid display, 1-bit sound
 
   This is a head to head electronic tabletop LED-display sports console.
   One cartridge(Football) was included with the console, the other three were
@@ -1353,7 +1336,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( tc4, tc4_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1400, 450000) // approximation - RC osc. R=27.3K, C=100pf, but unknown RC curve
+	MCFG_CPU_ADD("maincpu", TMS1400, 450000) // approximation - RC osc. R=27.3K, C=100pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(tc4_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tc4_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tc4_state, write_o))
@@ -1375,7 +1358,7 @@ MACHINE_CONFIG_END
 
   Entex (Electronic) Baseball (1)
   * TMS1000NLP MP0914 (die labeled MP0914A)
-  * 1 7seg LED, and other LEDs behind bezel, 1bit sound
+  * 1 7seg LED, and other LEDs behind bezel, 1-bit sound
 
   This is a handheld LED baseball game. One player controls the batter, the CPU
   or other player controls the pitcher. Pitcher throw buttons are on a 'joypad'
@@ -1488,7 +1471,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( ebball, ebball_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 375000) // RC osc. R=43K, C=47pf -> ~375kHz
+	MCFG_CPU_ADD("maincpu", TMS1000, 375000) // approximation - RC osc. R=43K, C=47pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(ebball_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ebball_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ebball_state, write_o))
@@ -1511,7 +1494,7 @@ MACHINE_CONFIG_END
   Entex (Electronic) Baseball 2
   * PCBs are labeled: ZENY
   * TMS1000 MCU, MP0923 (die labeled MP0923)
-  * 3 7seg LEDs, and other LEDs behind bezel, 1bit sound
+  * 3 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
   The Japanese version was published by Gakken, black casing instead of white.
 
@@ -1613,7 +1596,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( ebball2, ebball2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // RC osc. R=47K, C=47pf -> ~350kHz
+	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // approximation - RC osc. R=47K, C=47pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(ebball2_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ebball2_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ebball2_state, write_o))
@@ -1637,7 +1620,7 @@ MACHINE_CONFIG_END
   * PCBs are labeled: ZENY
   * TMS1100NLL 6007 MP1204 (rev. E!) (die labeled MP1204)
   * 2*SN75492N LED display driver
-  * 4 7seg LEDs, and other LEDs behind bezel, 1bit sound
+  * 4 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
   This is another improvement over Entex Baseball, where gameplay is a bit more
   varied. Like the others, the pitcher controls are on a separate joypad.
@@ -1816,7 +1799,7 @@ MACHINE_CONFIG_END
 
   Entex Space Invader
   * TMS1100 MP1211 (die labeled MP1211)
-  * 3 7seg LEDs, LED matrix and overlay mask, 1bit sound
+  * 3 7seg LEDs, LED matrix and overlay mask, 1-bit sound
 
   There are two versions of this game: the first release(this one) is on
   TMS1100, the second more widespread release runs on a COP400. There are
@@ -1930,7 +1913,7 @@ MACHINE_CONFIG_END
 
   Entex Color Football 4
   * TMS1670 6009 MP7551 (die also labeled MP7551)
-  * 9-digit cyan VFD display, 60 red and green LEDs behind bezel, 1bit sound
+  * 9-digit cyan VFD display, 60 red and green LEDs behind bezel, 1-bit sound
 
 ***************************************************************************/
 
@@ -2025,7 +2008,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( efootb4, efootb4_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1670, 475000) // approximation - RC osc. R=42K, C=47pf, but unknown RC curve
+	MCFG_CPU_ADD("maincpu", TMS1670, 475000) // approximation - RC osc. R=42K, C=47pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(efootb4_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(efootb4_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(efootb4_state, write_o))
@@ -2047,7 +2030,7 @@ MACHINE_CONFIG_END
 
   Entex (Electronic) Basketball 2
   * TMS1100 6010 MP1218 (die also labeled MP1218)
-  * 4 7seg LEDs, and other LEDs behind bezel, 1bit sound
+  * 4 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
   lamp translation table: led zz from game PCB = MAME lampyx:
 
@@ -2148,7 +2131,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( ebaskb2, ebaskb2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 360000) // RC osc. R=33K, C=82pf -> ~360kHz
+	MCFG_CPU_ADD("maincpu", TMS1100, 360000) // approximation - RC osc. R=33K, C=82pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(ebaskb2_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ebaskb2_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ebaskb2_state, write_o))
@@ -2170,7 +2153,7 @@ MACHINE_CONFIG_END
 
   Entex Raise The Devil
   * TMS1100 MP1221 (die labeled MP1221)
-  * 4 7seg LEDs(rightmost one unused), and other LEDs behind bezel, 1bit sound
+  * 4 7seg LEDs(rightmost one unused), and other LEDs behind bezel, 1-bit sound
 
   lamp translation table: led zz from game PCB = MAME lampyx:
 
@@ -2344,8 +2327,8 @@ protected:
 
 void gpoker_state::prepare_display()
 {
-	memset(m_display_segmask, ~0, sizeof(m_display_segmask));
-	display_matrix_seg(12, 11, m_o | (m_r >> 3 & 0xf00), m_r & 0x7ff, 0x7f);
+	set_display_segmask(0x7ff, 0x7f);
+	display_matrix(12, 11, m_o | (m_r >> 3 & 0xf00), m_r & 0x7ff);
 }
 
 WRITE16_MEMBER(gpoker_state::write_r)
@@ -2435,7 +2418,7 @@ void gpoker_state::machine_reset()
 static MACHINE_CONFIG_START( gpoker, gpoker_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1370, 350000) // RC osc. R=47K, C=47pf -> ~350kHz
+	MCFG_CPU_ADD("maincpu", TMS1370, 350000) // approximation - RC osc. R=47K, C=47pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(gpoker_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(gpoker_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(gpoker_state, write_o))
@@ -2548,7 +2531,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( gjackpot, gjackpot_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1670, 450000) // approximation - RC osc. R=47K, C=47pf, but unknown RC curve
+	MCFG_CPU_ADD("maincpu", TMS1670, 450000) // approximation - RC osc. R=47K, C=47pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(gpoker_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(gjackpot_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(gpoker_state, write_o))
@@ -2570,7 +2553,7 @@ MACHINE_CONFIG_END
 
   Ideal Electronic Detective
   * TMS0980NLL MP6100A (die labeled 0980B-00)
-  * 10-digit 7seg LED display, 1bit sound
+  * 10-digit 7seg LED display, 2-level sound
 
   hardware (and concept) is very similar to Parker Brothers Stop Thief
 
@@ -2597,12 +2580,12 @@ public:
 
 WRITE16_MEMBER(elecdet_state::write_r)
 {
-	// R7,R8: speaker on
-	m_speaker->level_w((data & 0x180 && m_o & 0x80) ? 1 : 0);
+	// R7,R8: speaker out
+	m_speaker->level_w((m_o & 0x80) ? (data >> 7 & 3) : 0);
 
 	// R0-R6: select digit
-	memset(m_display_segmask, ~0, sizeof(m_display_segmask));
-	display_matrix_seg(7, 7, BITSWAP8(m_o,7,5,2,1,4,0,6,3), data, 0x7f);
+	set_display_segmask(0x7f, 0x7f);
+	display_matrix(7, 7, BITSWAP8(m_o,7,5,2,1,4,0,6,3), data);
 }
 
 WRITE16_MEMBER(elecdet_state::write_o)
@@ -2611,7 +2594,7 @@ WRITE16_MEMBER(elecdet_state::write_o)
 	m_inp_mux = (data & 3) | (data >> 2 & 4) | (data >> 3 & 8);
 
 	// O0-O6: digit segments A-G
-	// O7: speaker out -> write_r
+	// O7: speaker on -> write_r
 	m_o = data;
 }
 
@@ -2671,6 +2654,9 @@ static INPUT_PORTS_START( elecdet )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
+
+static const INT16 elecdet_speaker_levels[4] = { 0, 0x3fff, 0x3fff, 0x7fff };
+
 static MACHINE_CONFIG_START( elecdet, elecdet_state )
 
 	/* basic machine hardware */
@@ -2686,6 +2672,7 @@ static MACHINE_CONFIG_START( elecdet, elecdet_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(4, elecdet_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2697,7 +2684,7 @@ MACHINE_CONFIG_END
 
   Kenner Star Wars - Electronic Battle Command
   * TMS1100 MCU, labeled MP3438A
-  * 4x4 LED grid display + 2 separate LEDs and 2-digit 7segs, 1bit sound
+  * 4x4 LED grid display + 2 separate LEDs and 2-digit 7segs, 1-bit sound
 
   This is a small tabletop space-dogfighting game. To start the game,
   press BASIC/INTER/ADV and enter P#(number of players), then
@@ -2801,7 +2788,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( starwbc, starwbc_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 325000) // RC osc. R=51K, C=47pf -> ~325kHz
+	MCFG_CPU_ADD("maincpu", TMS1100, 325000) // approximation - RC osc. R=51K, C=47pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(starwbc_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(starwbc_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(starwbc_state, write_o))
@@ -2847,8 +2834,8 @@ public:
 
 void astro_state::prepare_display()
 {
-	memset(m_display_segmask, ~0, sizeof(m_display_segmask));
-	display_matrix_seg(8, 10, m_o, m_r, 0xff);
+	set_display_segmask(0x3ff, 0xff);
+	display_matrix(8, 10, m_o, m_r);
 }
 
 WRITE16_MEMBER(astro_state::write_r)
@@ -2928,7 +2915,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( astro, astro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1470, 450000) // approximation - RC osc. R=4.7K, C=33pf, but unknown RC curve
+	MCFG_CPU_ADD("maincpu", TMS1470, 450000) // approximation - RC osc. R=4.7K, C=33pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(astro_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(astro_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(astro_state, write_o))
@@ -2947,7 +2934,7 @@ MACHINE_CONFIG_END
 
   Mattel Dungeons & Dragons - Computer Labyrinth Game
   * TMS1100 M34012-N2LL (die labeled M34012)
-  * 72 buttons, no LEDs, 1bit sound
+  * 72 buttons, no LEDs, 1-bit sound
 
   This is an electronic board game. It requires markers and wall pieces to play.
   Refer to the official manual for more information.
@@ -3116,7 +3103,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( mdndclab, mdndclab_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 500000) // approximation - RC osc. R=27K, C=100pf, but unknown RC curve
+	MCFG_CPU_ADD("maincpu", TMS1100, 500000) // approximation - RC osc. R=27K, C=100pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(mdndclab_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(mdndclab_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(mdndclab_state, write_o))
@@ -3241,7 +3228,7 @@ MACHINE_CONFIG_END
 
   Revision A hardware:
   * TMS1000 (die labeled MP3226)
-  * DS75494 Hex digit LED driver, 4 big lamps, 1bit sound
+  * DS75494 Hex digit LED driver, 4 big lamps, 1-bit sound
 
   Newer revisions (also Pocket Simon) have a smaller 16-pin MB4850 chip
   instead of the TMS1000. This one has been decapped too, but we couldn't
@@ -3321,7 +3308,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( simon, simon_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // RC osc. R=33K, C=100pf -> ~350kHz
+	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // approximation - RC osc. R=33K, C=100pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(simon_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(simon_state, write_r))
 
@@ -3342,7 +3329,7 @@ MACHINE_CONFIG_END
 
   Milton Bradley Super Simon
   * TMS1100 MP3476NLL (die labeled MP3476)
-  * 8 big lamps(2 turn on at same time), 1bit sound
+  * 8 big lamps(2 turn on at same time), 1-bit sound
 
   The semi-squel to Simon, not as popular. It includes more game variations
   and a 2-player head-to-head mode.
@@ -3644,7 +3631,7 @@ static const INT16 bigtrak_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3
 static MACHINE_CONFIG_START( bigtrak, bigtrak_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=83K, C=100pf, but unknown RC curve
+	MCFG_CPU_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=83K, C=100pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(bigtrak_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(bigtrak_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(bigtrak_state, write_o))
@@ -3692,18 +3679,10 @@ public:
 
 WRITE16_MEMBER(cnsector_state::write_r)
 {
-	// R0-R5: select digit (right-to-left)
-	for (int y = 0; y < 6; y++)
-	{
-		m_display_segmask[y] = 0xff;
-		m_display_state[y] = (data >> y & 1) ? m_o : 0;
-	}
-
-	// R6-R9: direction leds (-> lamp60-63)
-	m_display_state[6] = data >> 6 & 0xf;
-
-	set_display_size(8, 7);
-	display_update();
+	// R0-R5: select digit
+	// R6-R9: direction leds
+	set_display_segmask(0x3f, 0xff);
+	display_matrix(8, 10, m_o, data);
 }
 
 WRITE16_MEMBER(cnsector_state::write_o)
@@ -3887,7 +3866,7 @@ static const INT16 merlin_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*
 static MACHINE_CONFIG_START( merlin, merlin_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // RC osc. R=33K, C=100pf -> ~350kHz
+	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // approximation - RC osc. R=33K, C=100pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(merlin_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(merlin_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(merlin_state, write_o))
@@ -3951,7 +3930,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( mmerlin, mmerlin_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1400, 425000) // approximation - RC osc. R=30K, C=100pf, but unknown RC curve
+	MCFG_CPU_ADD("maincpu", TMS1400, 425000) // approximation - RC osc. R=30K, C=100pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(mmerlin_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(mmerlin_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(mmerlin_state, write_o))
@@ -3974,7 +3953,7 @@ MACHINE_CONFIG_END
 
   Parker Brothers Stop Thief, by Bob Doyle
   * TMS0980NLL MP6101B (die labeled 0980B-01A)
-  * 3-digit 7seg LED display, 1bit sound
+  * 3-digit 7seg LED display, 6-level sound
 
   Stop Thief is actually a board game, the electronic device emulated here
   (called Electronic Crime Scanner) is an accessory. To start a game, press
@@ -3999,18 +3978,14 @@ public:
 WRITE16_MEMBER(stopthief_state::write_r)
 {
 	// R0-R2: select digit
-	UINT8 o = BITSWAP8(m_o,3,5,2,1,4,0,6,7) & 0x7f;
-	for (int y = 0; y < 3; y++)
-	{
-		m_display_segmask[y] = 0x7f;
-		m_display_state[y] = (data >> y & 1) ? o : 0;
-	}
+	set_display_segmask(7, 0x7f);
+	display_matrix(7, 3, BITSWAP8(m_o,3,5,2,1,4,0,6,7) & 0x7f, data & 7);
 
-	set_display_size(7, 3);
-	display_update();
-
-	// R3-R8: speaker on
-	m_speaker->level_w((data & 0x1f8 && m_o & 8) ? 1 : 0);
+	// R3-R8(tied together): speaker out
+	int level = 0;
+	for (int i = 0; m_o & 8 && i < 6; i++)
+		level += (data >> (i+3) & 1);
+	m_speaker->level_w(level);
 }
 
 WRITE16_MEMBER(stopthief_state::write_o)
@@ -4018,7 +3993,7 @@ WRITE16_MEMBER(stopthief_state::write_o)
 	// O0,O6: input mux
 	m_inp_mux = (data & 1) | (data >> 5 & 2);
 
-	// O3: speaker out
+	// O3: speaker on
 	// O0-O2,O4-O7: led segments A-G
 	m_o = data;
 }
@@ -4065,6 +4040,9 @@ static INPUT_PORTS_START( stopthief )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
+
+static const INT16 stopthief_speaker_levels[7] = { 0, 0x7fff/6, 0x7fff/5, 0x7fff/4, 0x7fff/3, 0x7fff/2, 0x7fff };
+
 static MACHINE_CONFIG_START( stopthief, stopthief_state )
 
 	/* basic machine hardware */
@@ -4080,6 +4058,7 @@ static MACHINE_CONFIG_START( stopthief, stopthief_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(7, stopthief_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -4091,7 +4070,7 @@ MACHINE_CONFIG_END
 
   Parker Brothers Bank Shot (known as Cue Ball in the UK), by Garry Kitchen
   * TMS1400NLL MP7313-N2 (die labeled MP7313)
-  * LED grid display, 1bit sound
+  * LED grid display, 1-bit sound
 
   Bank Shot is an electronic pool game. To select a game, repeatedly press
   the [SELECT] button, then press [CUE UP] to start. Refer to the official
@@ -4176,7 +4155,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( bankshot, bankshot_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1400, 475000) // approximation - RC osc. R=24K, C=100pf, but unknown RC curve
+	MCFG_CPU_ADD("maincpu", TMS1400, 475000) // approximation - RC osc. R=24K, C=100pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(bankshot_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(bankshot_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(bankshot_state, write_o))
@@ -4198,7 +4177,7 @@ MACHINE_CONFIG_END
 
   Parker Brothers Split Second
   * TMS1400NLL MP7314-N2 (die labeled MP7314)
-  * LED grid display(default round LEDs, and rectangular shape ones), 1bit sound
+  * LED grid display(default round LEDs, and rectangular shape ones), 1-bit sound
 
   This is an electronic handheld reflex gaming device, it's straightforward
   to use. The included mini-games are:
@@ -4287,7 +4266,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( splitsec, splitsec_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1400, 475000) // approximation - RC osc. R=24K, C=100pf, but unknown RC curve
+	MCFG_CPU_ADD("maincpu", TMS1400, 475000) // approximation - RC osc. R=24K, C=100pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(splitsec_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(splitsec_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(splitsec_state, write_o))
@@ -4425,7 +4404,7 @@ MACHINE_CONFIG_END
 
   Tandy Radio Shack Computerized Arcade (1981, 1982, 1995)
   * TMS1100 MCU, labeled CD7282SL
-  * 12 lamps behind buttons, 1bit sound
+  * 12 lamps behind buttons, 1-bit sound
 
   This handheld contains 12 minigames. It looks and plays like "Fabulous Fred"
   by the Japanese company Mego Corp. in 1980, which in turn is a mix of Merlin
@@ -4561,7 +4540,7 @@ static const UINT16 tandy12_output_pla[0x20] =
 static MACHINE_CONFIG_START( tandy12, tandy12_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 400000) // RC osc. R=39K, C=47pf -> ~400kHz
+	MCFG_CPU_ADD("maincpu", TMS1100, 400000) // approximation - RC osc. R=39K, C=47pf
 	MCFG_TMS1XXX_OUTPUT_PLA(tandy12_output_pla)
 	MCFG_TMS1XXX_READ_K_CB(READ8(tandy12_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tandy12_state, write_r))
@@ -4586,7 +4565,7 @@ MACHINE_CONFIG_END
   * PCB label TOMY B.O.
   * TMS1040 MP2726 TOMY WIPE (die labeled MP2726A)
   * TMS1025N2LL I/O expander
-  * 2-digit 7seg display, 46 other leds, 1bit sound
+  * 2-digit 7seg display, 46 other leds, 1-bit sound
 
   known releases:
   - USA: Break Up
@@ -4787,7 +4766,7 @@ MACHINE_CONFIG_END
   Tomy Power House Pinball
   * PCB label TOMY P-B
   * TMS1100 MP1180 TOMY PINB (die labeled MP1180)
-  * 3 7seg LEDs, and other LEDs behind bezel, 1bit sound
+  * 3 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
   known releases:
   - USA: Power House Pinball
@@ -4889,7 +4868,7 @@ INPUT_CHANGED_MEMBER(phpball_state::flipper_button)
 static MACHINE_CONFIG_START( phpball, phpball_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 375000) // RC osc. R=47K, C=47pf -> ~375kHz
+	MCFG_CPU_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=47pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(phpball_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(phpball_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(phpball_state, write_o))
