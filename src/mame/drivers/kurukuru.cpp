@@ -1,10 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca, hap
-/******************************************************************************
+/***********************************************************************************
 
   KURU KURU PYON PYON
-  Taiyo Jidoki / Success
-
+  Success / Taiyo Jidoki
 
   Driver by Roberto Fresca & hap.
 
@@ -16,7 +15,7 @@
   ports, descriptions and a lot of things... :)
 
 
-*******************************************************************************
+************************************************************************************
 
   Technical Notes....
 
@@ -114,12 +113,16 @@
   AB =  NEC C1663C 8926B.
 
 
-*******************************************************************************
+************************************************************************************
 
   General Notes....
 
-  The game name could be translated as "Croak Croak Hop Hop"
-  Kuru is the frog sound, and Pyon is the sound of jumps.
+  There are at least 4 games in the Pyon Pyon series...
+
+  1) Pyon Pyon (a marathon game with froggy characters).
+  2) Kuru Kuru Pyon Pyon (a kind of slots game with the same froggy characters).
+  3) Pyon Pyon Jump (a contents where the same characters try to cross the river jumping on pads).
+  4) Sui Sui Pyon Pyon (a swimming competition where the same characters swim with different styles, even walking).
 
   Coin 1 (key 5) could be set either as Coin 1 or as Payout button, through
   a DIP switch.
@@ -129,12 +132,19 @@
   will be cleared).
 
 
-*******************************************************************************
+************************************************************************************
 
-  * How to play...
+  Games Notes:
+  ------------
 
-  Insert tokens (medals)...
+  * Kuru Kuru Pyon Pyon:
 
+  The game name could be translated as "Croak Croak Hop Hop"
+  Kuru is the frog sound, and Pyon is the sound of jumps.
+
+  How to play...
+
+  Insert tokens (medals).
   You can bet to any (or all) of the following 5 characters: Bote, Oume, Pyoko,
   Kunio, and Pyon Pyon. Press start, and the reels start to roll. You'll win if
   you can get 3 of the choosen character(s) in a row, column or diagonal.
@@ -146,8 +156,7 @@
   Red tadpoles are a bonus. Once you get one, it will go to the right panel,
   revealing a number. This number represents the extra credits you won.
 
-
-  * Bookkeeping...
+  Bookkeeping...
 
   Pressing Bookkeeping key (key 9), you enter the Bookkeeping Mode. There are
   2 screens with all the game information like DIP switches and statistics...
@@ -168,14 +177,54 @@
 
   Pressing the Bookkeeping key once more, you exit the mode and go back to the game.
 
+  ----------------------------------------------------------------------------------
 
-*******************************************************************************
+  * Pyon Pyon Jump:
+
+  The game name could be translated as "Hop Hop Jump"
+  Pyon is the sound of jumps.
+
+  How to play...
+
+  Insert tokens (medals).
+  You can bet to any (or all) of the following 5 characters: Boketa, Kunio, Pyon-Pyon,
+  Pyokorin and Botechin. Press start, and the river's pads start to roll. You'll win
+  if your character gets the three pads to jump to the other side of the river.
+
+  There is also a bonus game with a black tadpole rounding some pads with extra credits.
+  you'll get the extra credits marked in the pad where the tadpole stopped.
+
+  Bookkeeping...
+
+  Pressing Bookkeeping key (key 9), you enter the Bookkeeping Mode. There are
+  2 screens with all the game information like DIP switches and statistics...
+
+  1st screen...
+
+  - [Left panel]:  All the DIP switches parameters.
+
+  - [Right panel]: Bet and Win totals, 100Y/10Y/medal IN/OUT, total of games,
+                   won, loss, won by paid range, and 'omake' (extra/bonus).
+
+  2nd screen (press Bookkeeping key again)...
+
+  - Win distribution by character
+   (Boketa, Kunio, Pyon-Pyon, Pyokorin and Botechin).
+
+  - Bet distribution (1, 2, 3, 4, 5~10)
+
+  - Omake (bonus) distribution (games total, win games, loss games)
+  
+  Pressing the Bookkeeping key once more, you exit the mode and go back to the game.
+
+
+************************************************************************************
 
   ADPCM Samples....
 
   There are 14 samples in the system.
 
-  00: "Boterin"
+  00: "Botechin"
   01:
   02: "Hakase" ("professor")
   03: "Pyokorin"
@@ -190,8 +239,7 @@
   12: Bang sound for the tadpoles landing in the right panel.
   13: Sound effect for reels when running.
 
-
-******************************************************************************/
+***********************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -491,11 +539,11 @@ static INPUT_PORTS_START( kurukuru )
 /*  bits d0-d3 are JAMMA top side pins 20,21,22,23, bits d4-d7 are JAMMA bottom side pins 20,21,22,23
     so that's player 1 left/right/button1/button2 then player 2 left/right/button1/button2
 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("1st (Bote)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("1st (Bote/Botechin)")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("2nd (Oume)")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("3rd (Pyoko)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("3rd (Pyoko/Pyokorin)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V) PORT_NAME("4th (Kunio)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("5th (Pyon Pyon)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("5th (Pyon-Pyon)")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_N) PORT_NAME("Unknown A0h - bit5")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_M) PORT_NAME("Unknown A0h - bit6")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
