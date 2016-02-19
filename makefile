@@ -1374,3 +1374,9 @@ cppcheck:
 
 shaders:
 	$(SILENT) $(MAKE) -C $(SRC)/osd/modules/render/bgfx rebuild
+	
+.PHONY: translation
+
+translation:
+	$(SILENT) echo Generating mame.po
+	$(SILENT) find src -iname "*.cpp" | xargs xgettext --from-code=ASCII -k_ --default-domain=mame
