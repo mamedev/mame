@@ -1379,4 +1379,4 @@ shaders:
 
 translation:
 	$(SILENT) echo Generating mame.po
-	$(SILENT) find src -iname "*.cpp" | xargs xgettext --from-code=ASCII -k_ --default-domain=mame
+	$(SILENT) find src/emu/ui -iname "*.cpp" | xargs xgettext --from-code=ASCII -k_ --default-domain=mame
