@@ -1378,5 +1378,159 @@ shaders:
 .PHONY: translation
 
 translation:
-	$(SILENT) echo Generating mame.po
-	$(SILENT) find src/emu/ui -iname "*.cpp" | xargs xgettext --from-code=ASCII -k_ --default-domain=mame
+	$(SILENT) echo Generating mame.pot
+	$(SILENT) find src/emu/ui -iname "*.cpp" | xargs xgettext --from-code=UTF-8 -k_ -o mame.pot
+	$(SILENT) echo Afrikaans
+	$(SILENT) msgmerge -U "language/Afrikaans/strings.po"                     mame.pot
+	$(SILENT) echo Albanian
+	$(SILENT) msgmerge -U "language/Albanian/strings.po"                      mame.pot
+	$(SILENT) echo Arabic
+	$(SILENT) msgmerge -U "language/Arabic/strings.po"                        mame.pot
+	$(SILENT) echo Basque
+	$(SILENT) msgmerge -U "language/Basque/strings.po"                        mame.pot
+	$(SILENT) echo Belarusian
+	$(SILENT) msgmerge -U "language/Belarusian/strings.po"                    mame.pot
+	$(SILENT) echo Bosnian
+	$(SILENT) msgmerge -U "language/Bosnian/strings.po"                       mame.pot
+	$(SILENT) echo Bulgarian
+	$(SILENT) msgmerge -U "language/Bulgarian/strings.po"                     mame.pot
+	$(SILENT) echo Burmese 
+	$(SILENT) msgmerge -U "language/Burmese/strings.po"                       mame.pot
+	$(SILENT) echo Catalan
+	$(SILENT) msgmerge -U "language/Catalan/strings.po"                       mame.pot
+	$(SILENT) echo Chinese (Simple)
+	$(SILENT) msgmerge -U "language/Chinese (Simple)/strings.po"              mame.pot
+	$(SILENT) echo Chinese (Traditional)
+	$(SILENT) msgmerge -U "language/Chinese (Traditional)/strings.po"         mame.pot
+	$(SILENT) echo Croatian
+	$(SILENT) msgmerge -U "language/Croatian/strings.po"                      mame.pot
+	$(SILENT) echo Czech
+	$(SILENT) msgmerge -U "language/Czech/strings.po"                         mame.pot
+	$(SILENT) echo Danish
+	$(SILENT) msgmerge -U "language/Danish/strings.po"                        mame.pot
+	$(SILENT) echo Dutch
+	$(SILENT) msgmerge -U "language/Dutch/strings.po"                         mame.pot
+	$(SILENT) echo English
+	$(SILENT) msgmerge -U "language/English/strings.po"                       mame.pot
+	$(SILENT) echo Estonian
+	$(SILENT) msgmerge -U "language/Estonian/strings.po"                      mame.pot
+	$(SILENT) echo Finnish
+	$(SILENT) msgmerge -U "language/Finnish/strings.po"                       mame.pot
+	$(SILENT) echo French
+	$(SILENT) msgmerge -U "language/French/strings.po"                        mame.pot
+	$(SILENT) echo French (Canada)
+	$(SILENT) msgmerge -U "language/French (Canada)/strings.po"               mame.pot
+	$(SILENT) echo Georgian
+	$(SILENT) msgmerge -U "language/Georgian/strings.po"                      mame.pot
+	$(SILENT) echo German
+	$(SILENT) msgmerge -U "language/German/strings.po"                        mame.pot
+	$(SILENT) echo Greek
+	$(SILENT) msgmerge -U "language/Greek/strings.po"                         mame.pot
+	$(SILENT) echo Hebrew
+	$(SILENT) msgmerge -U "language/Hebrew/strings.po"                        mame.pot
+	$(SILENT) echo Hindi
+	$(SILENT) msgmerge -U "language/Hindi/strings.po"                         mame.pot
+	$(SILENT) echo Hungarian
+	$(SILENT) msgmerge -U "language/Hungarian/strings.po"                     mame.pot
+	$(SILENT) echo Indonesian
+	$(SILENT) msgmerge -U "language/Indonesian/strings.po"                    mame.pot
+	$(SILENT) echo Italian
+	$(SILENT) msgmerge -U "language/Italian/strings.po"                       mame.pot
+	$(SILENT) echo Japanese
+	$(SILENT) msgmerge -U "language/Japanese/strings.po"                      mame.pot
+	$(SILENT) echo Korean  
+	$(SILENT) msgmerge -U "language/Korean/strings.po"                        mame.pot
+	$(SILENT) echo Latvian
+	$(SILENT) msgmerge -U "language/Latvian/strings.po"                       mame.pot
+	$(SILENT) echo Lithuanian
+	$(SILENT) msgmerge -U "language/Lithuanian/strings.po"                    mame.pot
+	$(SILENT) echo Macedonian
+	$(SILENT) msgmerge -U "language/Macedonian/strings.po"                    mame.pot
+	$(SILENT) echo Norwegian
+	$(SILENT) msgmerge -U "language/Norwegian/strings.po"                     mame.pot
+	$(SILENT) echo Persian 
+	$(SILENT) msgmerge -U "language/Persian/strings.po"                       mame.pot
+	$(SILENT) echo Polish
+	$(SILENT) msgmerge -U "language/Polish/strings.po"                        mame.pot
+	$(SILENT) echo Portuguese
+	$(SILENT) msgmerge -U "language/Portuguese/strings.po"                    mame.pot
+	$(SILENT) echo Portuguese (Brazil)
+	$(SILENT) msgmerge -U "language/Portuguese (Brazil)/strings.po"           mame.pot
+	$(SILENT) echo Romanian
+	$(SILENT) msgmerge -U "language/Romanian/strings.po"                      mame.pot
+	$(SILENT) echo Russian
+	$(SILENT) msgmerge -U "language/Russian/strings.po"                       mame.pot
+	$(SILENT) echo Serbian
+	$(SILENT) msgmerge -U "language/Serbian/strings.po"                       mame.pot
+	$(SILENT) echo Serbian (Cyrillic)
+	$(SILENT) msgmerge -U "language/Serbian (Cyrillic)/strings.po"            mame.pot
+	$(SILENT) echo Slovak
+	$(SILENT) msgmerge -U "language/Slovak/strings.po"                        mame.pot
+	$(SILENT) echo Slovenian
+	$(SILENT) msgmerge -U "language/Slovenian/strings.po"                     mame.pot
+	$(SILENT) echo Spanish 
+	$(SILENT) msgmerge -U "language/Spanish/strings.po"                       mame.pot
+	$(SILENT) echo Spanish (Mexico)
+	$(SILENT) msgmerge -U "language/Spanish (Mexico)/strings.po"              mame.pot
+	$(SILENT) echo Swedish
+	$(SILENT) msgmerge -U "language/Swedish/strings.po"                       mame.pot
+	$(SILENT) echo Thai
+	$(SILENT) msgmerge -U "language/Thai/strings.po"                          mame.pot
+	$(SILENT) echo Turkish
+	$(SILENT) msgmerge -U "language/Turkish/strings.po"                       mame.pot
+	$(SILENT) echo Ukrainian
+	$(SILENT) msgmerge -U "language/Ukrainian/strings.po"                     mame.pot
+	$(SILENT) echo Vietnamese
+	$(SILENT) msgmerge -U "language/Vietnamese/strings.po"                    mame.pot
+	$(SILENT) msgfmt --check --output-file "language/Afrikaans/strings.mo"             "language/Afrikaans/strings.po"             
+	$(SILENT) msgfmt --check --output-file "language/Albanian/strings.mo"              "language/Albanian/strings.po"              
+	$(SILENT) msgfmt --check --output-file "language/Arabic/strings.mo"                "language/Arabic/strings.po"                
+	$(SILENT) msgfmt --check --output-file "language/Basque/strings.mo"                "language/Basque/strings.po"                
+	$(SILENT) msgfmt --check --output-file "language/Belarusian/strings.mo"            "language/Belarusian/strings.po"            
+	$(SILENT) msgfmt --check --output-file "language/Bosnian/strings.mo"               "language/Bosnian/strings.po"               
+	$(SILENT) msgfmt --check --output-file "language/Bulgarian/strings.mo"             "language/Bulgarian/strings.po"             
+	$(SILENT) msgfmt --check --output-file "language/Burmese/strings.mo"               "language/Burmese/strings.po"               
+	$(SILENT) msgfmt --check --output-file "language/Catalan/strings.mo"               "language/Catalan/strings.po"               
+	$(SILENT) msgfmt --check --output-file "language/Chinese (Simple)/strings.mo"      "language/Chinese (Simple)/strings.po"      
+	$(SILENT) msgfmt --check --output-file "language/Chinese (Traditional)/strings.mo" "language/Chinese (Traditional)/strings.po" 
+	$(SILENT) msgfmt --check --output-file "language/Croatian/strings.mo"              "language/Croatian/strings.po"              
+	$(SILENT) msgfmt --check --output-file "language/Czech/strings.mo"                 "language/Czech/strings.po"                 
+	$(SILENT) msgfmt --check --output-file "language/Danish/strings.mo"                "language/Danish/strings.po"                
+	$(SILENT) msgfmt --check --output-file "language/Dutch/strings.mo"                 "language/Dutch/strings.po"                 
+	$(SILENT) msgfmt --check --output-file "language/English/strings.mo"               "language/English/strings.po"               
+	$(SILENT) msgfmt --check --output-file "language/Estonian/strings.mo"              "language/Estonian/strings.po"              
+	$(SILENT) msgfmt --check --output-file "language/Finnish/strings.mo"               "language/Finnish/strings.po"               
+	$(SILENT) msgfmt --check --output-file "language/French/strings.mo"                "language/French/strings.po"                
+	$(SILENT) msgfmt --check --output-file "language/French (Canada)/strings.mo"       "language/French (Canada)/strings.po"       
+	$(SILENT) msgfmt --check --output-file "language/Georgian/strings.mo"              "language/Georgian/strings.po"              
+	$(SILENT) msgfmt --check --output-file "language/German/strings.mo"                "language/German/strings.po"                
+	$(SILENT) msgfmt --check --output-file "language/Greek/strings.mo"                 "language/Greek/strings.po"                 
+	$(SILENT) msgfmt --check --output-file "language/Hebrew/strings.mo"                "language/Hebrew/strings.po"                
+	$(SILENT) msgfmt --check --output-file "language/Hindi/strings.mo"                 "language/Hindi/strings.po"                 
+	$(SILENT) msgfmt --check --output-file "language/Hungarian/strings.mo"             "language/Hungarian/strings.po"             
+	$(SILENT) msgfmt --check --output-file "language/Indonesian/strings.mo"            "language/Indonesian/strings.po"            
+	$(SILENT) msgfmt --check --output-file "language/Italian/strings.mo"               "language/Italian/strings.po"               
+	$(SILENT) msgfmt --check --output-file "language/Japanese/strings.mo"              "language/Japanese/strings.po"              
+	$(SILENT) msgfmt --check --output-file "language/Korean/strings.mo"                "language/Korean/strings.po"                
+	$(SILENT) msgfmt --check --output-file "language/Latvian/strings.mo"               "language/Latvian/strings.po"               
+	$(SILENT) msgfmt --check --output-file "language/Lithuanian/strings.mo"            "language/Lithuanian/strings.po"            
+	$(SILENT) msgfmt --check --output-file "language/Macedonian/strings.mo"            "language/Macedonian/strings.po"            
+	$(SILENT) msgfmt --check --output-file "language/Norwegian/strings.mo"             "language/Norwegian/strings.po"             
+	$(SILENT) msgfmt --check --output-file "language/Persian/strings.mo"               "language/Persian/strings.po"               
+	$(SILENT) msgfmt --check --output-file "language/Polish/strings.mo"                "language/Polish/strings.po"                
+	$(SILENT) msgfmt --check --output-file "language/Portuguese/strings.mo"            "language/Portuguese/strings.po"            
+	$(SILENT) msgfmt --check --output-file "language/Portuguese (Brazil)/strings.mo"   "language/Portuguese (Brazil)/strings.po"   
+	$(SILENT) msgfmt --check --output-file "language/Romanian/strings.mo"              "language/Romanian/strings.po"              
+	$(SILENT) msgfmt --check --output-file "language/Russian/strings.mo"               "language/Russian/strings.po"               
+	$(SILENT) msgfmt --check --output-file "language/Serbian/strings.mo"               "language/Serbian/strings.po"               
+	$(SILENT) msgfmt --check --output-file "language/Serbian (Cyrillic)/strings.mo"    "language/Serbian (Cyrillic)/strings.po"    
+	$(SILENT) msgfmt --check --output-file "language/Slovak/strings.mo"                "language/Slovak/strings.po"                
+	$(SILENT) msgfmt --check --output-file "language/Slovenian/strings.mo"             "language/Slovenian/strings.po"             
+	$(SILENT) msgfmt --check --output-file "language/Spanish/strings.mo"               "language/Spanish/strings.po"               
+	$(SILENT) msgfmt --check --output-file "language/Spanish (Mexico)/strings.mo"      "language/Spanish (Mexico)/strings.po"      
+	$(SILENT) msgfmt --check --output-file "language/Swedish/strings.mo"               "language/Swedish/strings.po"               
+	$(SILENT) msgfmt --check --output-file "language/Thai/strings.mo"                  "language/Thai/strings.po"                  
+	$(SILENT) msgfmt --check --output-file "language/Turkish/strings.mo"               "language/Turkish/strings.po"               
+	$(SILENT) msgfmt --check --output-file "language/Ukrainian/strings.mo"             "language/Ukrainian/strings.po"             
+	$(SILENT) msgfmt --check --output-file "language/Vietnamese/strings.mo"            "language/Vietnamese/strings.po"            
+	
