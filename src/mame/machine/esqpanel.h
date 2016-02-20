@@ -7,6 +7,7 @@
 
 #include "emu.h"
 #include "machine/esqvfd.h"
+#include "machine/esqlcd.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -30,13 +31,13 @@
 #define MCFG_ESQPANEL_2x40_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 
-#define MCFG_ESQPANEL2x40_SQ1_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, ESQPANEL2x40_SQ1, 0)
+#define MCFG_ESQPANEL2x16_SQ1_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, ESQPANEL2x16_SQ1, 0)
 
-#define MCFG_ESQPANEL2x40_SQ1_REPLACE(_tag) \
-	MCFG_DEVICE_REPLACE(_tag, ESQPANEL2x40_SQ1, 0)
+#define MCFG_ESQPANEL2x16_SQ1_REPLACE(_tag) \
+	MCFG_DEVICE_REPLACE(_tag, ESQPANEL2x16_SQ1, 0)
 
-#define MCFG_ESQPANEL2x40_SQ1_REMOVE(_tag) \
+#define MCFG_ESQPANEL2x16_SQ1_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 
 #define MCFG_ESQPANEL_TX_CALLBACK(_write) \
@@ -133,8 +134,23 @@ protected:
 private:
 };
 
+// --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
+class esqpanel2x16_sq1_device : public esqpanel_device {
+public:
+	esqpanel2x16_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	required_device<esq2x16_sq1_t> m_vfd;
+
+	virtual void send_to_display(UINT8 data) override { m_vfd->write_char(data); }
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const override;
+
+private:
+};
+
 extern const device_type ESQPANEL1x22;
 extern const device_type ESQPANEL2x40;
-extern const device_type ESQPANEL2x40_SQ1;
+extern const device_type ESQPANEL2x16_SQ1;
 
 #endif

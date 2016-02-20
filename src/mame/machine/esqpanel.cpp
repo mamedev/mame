@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont
+// copyright-holders:R. Belmont, Parduz
 /*
     Ensoniq panel/display device
 */
@@ -16,7 +16,7 @@
 
 const device_type ESQPANEL1x22 = &device_creator<esqpanel1x22_device>;
 const device_type ESQPANEL2x40 = &device_creator<esqpanel2x40_device>;
-const device_type ESQPANEL2x40_SQ1 = &device_creator<esqpanel2x40_sq1_device>;
+const device_type ESQPANEL2x16_SQ1 = &device_creator<esqpanel2x16_sq1_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -234,19 +234,18 @@ esqpanel2x40_device::esqpanel2x40_device(const machine_config &mconfig, const ch
 	m_eps_mode = false;
 }
 
-/* panel with 2x16? LCD display used in the SQ and MR series, plus probably more */
-
-static MACHINE_CONFIG_FRAGMENT(esqpanel2x40_sq1)
-	MCFG_ESQ2x40_SQ1_ADD("vfd")
+// --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
+static MACHINE_CONFIG_FRAGMENT(esqpanel2x16_sq1)
+	MCFG_ESQ2x16_SQ1_ADD("vfd")
 MACHINE_CONFIG_END
-
-machine_config_constructor esqpanel2x40_sq1_device::device_mconfig_additions() const
+// --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
+machine_config_constructor esqpanel2x16_sq1_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( esqpanel2x40_sq1 );
+	return MACHINE_CONFIG_NAME( esqpanel2x16_sq1 );
 }
-
-esqpanel2x40_sq1_device::esqpanel2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	esqpanel_device(mconfig, ESQPANEL2x40, "Ensoniq front panel with 2x16 LCD", tag, owner, clock, "esqpanel240_sq1", __FILE__),
+// --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
+esqpanel2x16_sq1_device::esqpanel2x16_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	esqpanel_device(mconfig, ESQPANEL2x16_SQ1, "Ensoniq front panel with 2x16 LCD", tag, owner, clock, "esqpanel216_sq1", __FILE__),
 	m_vfd(*this, "vfd")
 {
 	m_eps_mode = false;
