@@ -1425,11 +1425,7 @@ READ8_MEMBER(xbox_base_state::get_slave_ack)
 IRQ_CALLBACK_MEMBER(xbox_base_state::irq_callback)
 {
 	int r = 0;
-	r = xbox_base_devs.pic8259_2->acknowledge();
-	if (r == 0)
-	{
-		r = xbox_base_devs.pic8259_1->acknowledge();
-	}
+	r = xbox_base_devs.pic8259_1->acknowledge();
 	if (debug_irq_active)
 		debug_generate_irq(debug_irq_number, false);
 	return r;
