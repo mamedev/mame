@@ -1379,7 +1379,7 @@ shaders:
 
 translation:
 	$(SILENT) echo Generating mame.pot
-	$(SILENT) find src/emu/ui -iname "*.cpp" | xargs xgettext --from-code=UTF-8 -k_ -o mame.pot
+	$(SILENT) find src -iname "*.cpp" | xargs xgettext --from-code=UTF-8 -k_ -o mame.pot
 	$(SILENT) echo Afrikaans
 	$(SILENT) msgmerge -U "language/Afrikaans/strings.po"                     mame.pot
 	$(SILENT) echo Albanian
