@@ -281,7 +281,7 @@ void h8_device::disassemble_am(char *&buffer, int am, offs_t pc, const UINT8 *op
 		"e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7",
 	};
 
-	static const char *const r32_names[88] = {
+	static const char *const r32_names[8] = {
 		"er0", "er1", "er2", "er3", "er4", "er5", "er6", "sp",
 	};
 
