@@ -49,6 +49,7 @@ enum
 	SS_MSB_FIRST = 0x02
 };
 
+#define STATE_MAGIC_NUM         "MAMESAVE"
 
 //**************************************************************************
 //  INITIALIZATION
@@ -292,7 +293,7 @@ save_error save_manager::write_file(emu_file &file)
 
 	// generate the header
 	UINT8 header[HEADER_SIZE];
-	memcpy(&header[0], emulator_info::get_state_magic_num(), 8);
+	memcpy(&header[0], STATE_MAGIC_NUM, 8);
 	header[8] = SAVE_VERSION;
 	header[9] = NATIVE_ENDIAN_VALUE_LE_BE(0, SS_MSB_FIRST);
 	strncpy((char *)&header[0x0a], machine().system().name, 0x1c - 0x0a);
@@ -365,7 +366,7 @@ save_error save_manager::validate_header(const UINT8 *header, const char *gamena
 	void (CLIB_DECL *errormsg)(const char *fmt, ...), const char *error_prefix)
 {
 	// check magic number
-	if (memcmp(header, emulator_info::get_state_magic_num(), 8))
+	if (memcmp(header, STATE_MAGIC_NUM, 8))
 	{
 		if (errormsg != nullptr)
 			(*errormsg)("%sThis is not a %s save file", error_prefix,emulator_info::get_appname());

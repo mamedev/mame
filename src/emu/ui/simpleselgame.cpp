@@ -231,10 +231,9 @@ void ui_simple_menu_select_game::populate()
 	if (matchcount == 0)
 	{
 		std::string txt;
-		strprintf(txt, "No %s found. Please check the rompath specified in the %s.ini file.\n\n"
+		strprintf(txt, "No machines found. Please check the rompath specified in the %s.ini file.\n\n"
 					"If this is your first time using %s, please see the config.txt file in "
 					"the docs directory for information on configuring %s.",
-					emulator_info::get_gamesnoun(),
 					emulator_info::get_configname(),
 					emulator_info::get_appname(),emulator_info::get_appname() );
 		item_append(txt.c_str(), nullptr, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, nullptr);

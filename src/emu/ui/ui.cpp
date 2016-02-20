@@ -1096,11 +1096,7 @@ std::string &ui_manager::warnings_string(std::string &str)
 	// add a warning if any ROMs were loaded with warnings
 	if (machine().rom_load().warnings() > 0)
 	{
-		str.append("One or more ROMs/CHDs for this ");
-		str.append(emulator_info::get_gamenoun());
-		str.append(" are incorrect. The ");
-		str.append(emulator_info::get_gamenoun());
-		str.append(" may not run correctly.\n");
+		str.append("One or more ROMs/CHDs for this machine are incorrect. The machine may not run correctly.\n");
 		if (machine().system().flags & WARNING_FLAGS)
 			str.append("\n");
 	}
@@ -1113,15 +1109,11 @@ std::string &ui_manager::warnings_string(std::string &str)
 	// if we have at least one warning flag, print the general header
 	if ((machine().system().flags & WARNING_FLAGS) || machine().rom_load().knownbad() > 0)
 	{
-		str.append("There are known problems with this ");
-		str.append(emulator_info::get_gamenoun());
-		str.append("\n\n");
+		str.append("There are known problems with this machine\n\n");
 
 		// add a warning if any ROMs are flagged BAD_DUMP/NO_DUMP
 		if (machine().rom_load().knownbad() > 0) {
-			str.append("One or more ROMs/CHDs for this ");
-			str.append(emulator_info::get_gamenoun());
-			str.append(" have not been correctly dumped.\n");
+			str.append("One or more ROMs/CHDs for this machine have not been correctly dumped.\n");
 		}
 		// add one line per warning flag
 		if (machine().system().flags & MACHINE_IMPERFECT_KEYBOARD)
@@ -1135,32 +1127,24 @@ std::string &ui_manager::warnings_string(std::string &str)
 		if (machine().system().flags & MACHINE_IMPERFECT_SOUND)
 			str.append("The sound emulation isn't 100% accurate.\n");
 		if (machine().system().flags & MACHINE_NO_SOUND) {
-			str.append("The ");
-			str.append(emulator_info::get_gamenoun());
-			str.append(" lacks sound.\n");
+			str.append("The machine lacks sound.\n");
 		}
 		if (machine().system().flags & MACHINE_NO_COCKTAIL)
 			str.append("Screen flipping in cocktail mode is not supported.\n");
 
 		// check if external artwork is present before displaying this warning?
 		if (machine().system().flags & MACHINE_REQUIRES_ARTWORK) {
-			str.append("The ");
-			str.append(emulator_info::get_gamenoun());
-			str.append(" requires external artwork files\n");
+			str.append("The machine requires external artwork files\n");
 		}
 
 		if (machine().system().flags & MACHINE_IS_INCOMPLETE )
 		{
-			str.append("This ");
-			str.append(emulator_info::get_gamenoun());
-			str.append(" was never completed. It may exhibit strange behavior or missing elements that are not bugs in the emulation.\n");
+			str.append("This machine was never completed. It may exhibit strange behavior or missing elements that are not bugs in the emulation.\n");
 		}
 
 		if (machine().system().flags & MACHINE_NO_SOUND_HW )
 		{
-			str.append("This ");
-			str.append(emulator_info::get_gamenoun());
-			str.append(" has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n");
+			str.append("This machine has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n");
 		}
 
 		// if there's a NOT WORKING, UNEMULATED PROTECTION or GAME MECHANICAL warning, make it stronger
@@ -1168,25 +1152,15 @@ std::string &ui_manager::warnings_string(std::string &str)
 		{
 			// add the strings for these warnings
 			if (machine().system().flags & MACHINE_UNEMULATED_PROTECTION) {
-				str.append("The ");
-				str.append(emulator_info::get_gamenoun());
-				str.append(" has protection which isn't fully emulated.\n");
+				str.append("The machine has protection which isn't fully emulated.\n");
 			}
 			if (machine().system().flags & MACHINE_NOT_WORKING) {
-				str.append("\nTHIS ");
-				str.append(emulator_info::get_capgamenoun());
-				str.append(" DOESN'T WORK. The emulation for this ");
-				str.append(emulator_info::get_gamenoun());
-				str.append(" is not yet complete. "
+				str.append("\nTHIS MACHINE DOESN'T WORK. The emulation for this machine is not yet complete. "
 						"There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
 			}
 			if (machine().system().flags & MACHINE_MECHANICAL) {
-				str.append("\nCertain elements of this ");
-				str.append(emulator_info::get_gamenoun());
-				str.append(" cannot be emulated as it requires actual physical interaction or consists of mechanical devices. "
-						"It is not possible to fully play this ");
-				str.append(emulator_info::get_gamenoun());
-				str.append(".\n");
+				str.append("\nCertain elements of this machine cannot be emulated as it requires actual physical interaction or consists of mechanical devices. "
+						"It is not possible to fully play this machine.\n");
 			}
 
 			// find the parent of this driver
@@ -1204,9 +1178,7 @@ std::string &ui_manager::warnings_string(std::string &str)
 					{
 						// this one works, add a header and display the name of the clone
 						if (!foundworking) {
-							str.append("\n\nThere are working clones of this ");
-							str.append(emulator_info::get_gamenoun());
-							str.append(": ");
+							str.append("\n\nThere are working clones of this machine: ");
 						}
 						else
 							str.append(", ");

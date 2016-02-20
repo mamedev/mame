@@ -464,7 +464,7 @@ void rom_load_manager::display_loading_rom_message(const char *name, bool from_l
 	char buffer[200];
 
 	if (name != nullptr)
-		sprintf(buffer, "Loading %s (%d%%)", from_list ? "Software" : emulator_info::get_capstartgamenoun(), (UINT32)(100 * (UINT64)m_romsloadedsize / (UINT64)m_romstotalsize));
+		sprintf(buffer, "%s (%d%%)", from_list ? "Loading Software" : "Loading Machine", (UINT32)(100 * (UINT64)m_romsloadedsize / (UINT64)m_romstotalsize));
 	else
 		sprintf(buffer, "Loading Complete");
 
@@ -488,15 +488,13 @@ void rom_load_manager::display_rom_load_results(bool from_list)
 	{
 		/* create the error message and exit fatally */
 		osd_printf_error("%s", m_errorstring.c_str());
-		fatalerror_exitcode(machine(), MAMERR_MISSING_FILES, "Required files are missing, the %s cannot be run.",emulator_info::get_gamenoun());
+		fatalerror_exitcode(machine(), MAMERR_MISSING_FILES, "Required files are missing, the machine cannot be run.");
 	}
 
 	/* if we had warnings, output them, but continue */
 	if ((m_warnings) || (m_knownbad))
 	{
-		m_errorstring.append("WARNING: the ");
-		m_errorstring.append(emulator_info::get_gamenoun());
-		m_errorstring.append(" might not run correctly.");
+		m_errorstring.append("WARNING: the machine might not run correctly.");
 		osd_printf_warning("%s\n", m_errorstring.c_str());
 	}
 }

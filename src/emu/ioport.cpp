@@ -3424,7 +3424,7 @@ time_t ioport_manager::playback_init()
 
 	// verify the header against the current game
 	if (memcmp(machine().system().name, header + 0x14, strlen(machine().system().name) + 1) != 0)
-		osd_printf_info("Input file is for %s '%s', not for current %s '%s'\n", emulator_info::get_gamenoun(), header + 0x14, emulator_info::get_gamenoun(), machine().system().name);
+		osd_printf_info("Input file is for machine '%s', not for current machine '%s'\n", header + 0x14, machine().system().name);
 
 	// enable compression
 	m_playback_file.compress(FCOMPRESS_MEDIUM);

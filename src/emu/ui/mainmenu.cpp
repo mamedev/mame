@@ -49,13 +49,10 @@ ui_menu_main::ui_menu_main(running_machine &machine, render_container *container
 
 void ui_menu_main::populate()
 {
-	std::string menu_text;
-
 	/* add input menu items */
 	item_append(_("Input (general)"), nullptr, 0, (void *)INPUT_GROUPS);
 
-	strprintf(menu_text, _("Input (this %s)"), emulator_info::get_capstartgamenoun());
-	item_append(menu_text.c_str(), nullptr, 0, (void *)INPUT_SPECIFIC);
+	item_append(_("Input (this Machine)"), nullptr, 0, (void *)INPUT_SPECIFIC);
 
 	/* add optional input-related menus */
 	if (machine().ioport().has_analog())
@@ -64,16 +61,14 @@ void ui_menu_main::populate()
 		item_append(_("Dip Switches"), nullptr, 0, (void *)SETTINGS_DIP_SWITCHES);
 	if (machine().ioport().has_configs())
 	{
-		strprintf(menu_text, _("%s Configuration"), emulator_info::get_capstartgamenoun());
-		item_append(menu_text.c_str(), nullptr, 0, (void *)SETTINGS_DRIVER_CONFIG);
+		item_append(_("Machine Configuration"), nullptr, 0, (void *)SETTINGS_DRIVER_CONFIG);
 	}
 
 	/* add bookkeeping menu */
 	item_append(_("Bookkeeping Info"), nullptr, 0, (void *)BOOKKEEPING);
 
 	/* add game info menu */
-	strprintf(menu_text, _("%s Information"), emulator_info::get_capstartgamenoun());
-	item_append(menu_text.c_str(), nullptr, 0, (void *)GAME_INFO);
+	item_append(_("Machine Information"), nullptr, 0, (void *)GAME_INFO);
 
 	image_interface_iterator imgiter(machine().root_device());
 	if (imgiter.first() != nullptr)
@@ -150,12 +145,10 @@ void ui_menu_main::populate()
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 
-//	menu_text.assign(_("Quit from ")).append(emulator_info::get_capstartgamenoun());
-//	item_append(menu_text.c_str(), nullptr, 0, (void *)QUIT_GAME);
+//	item_append(_("Quit from Machine"), nullptr, 0, (void *)QUIT_GAME);
 
 	/* add reset and exit menus */
-	strprintf(menu_text, _("Select New %s"), emulator_info::get_capstartgamenoun());
-	item_append(menu_text.c_str(), nullptr, 0, (void *)SELECT_GAME);
+	item_append(_("Select New Machine"), nullptr, 0, (void *)SELECT_GAME);
 }
 
 ui_menu_main::~ui_menu_main()

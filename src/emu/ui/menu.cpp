@@ -249,7 +249,7 @@ void ui_menu::reset(ui_menu_reset_options options)
 	visitems = 0;
 	selected = 0;
 	std::string backtext;
-	strprintf(backtext, "Return to %s", emulator_info::get_capstartgamenoun());
+	strprintf(backtext, "Return to Machine");
 
 	// add an item to return
 	if (parent == nullptr)
