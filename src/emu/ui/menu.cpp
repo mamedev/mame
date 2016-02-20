@@ -1309,25 +1309,11 @@ void ui_menu::init_ui(running_machine &machine)
 	star_texture = mrender.texture_alloc();
 	star_texture->set_bitmap(*star_bitmap, star_bitmap->cliprect(), TEXFORMAT_ARGB32);
 
-	// check and allocate icons
-	file_enumerator path(machine.ui().options().icons_directory());
-	const osd_directory_entry *dir;
-	while ((dir = path.next()) != nullptr)
+	// allocate icons
+	for (int i = 0; i < MAX_ICONS_RENDER; i++)
 	{
-		const char *src;
-
-		// build a name for it
-		src = dir->name;
-		if (*src != 0 && *src != '.')
-		{
-			ui_globals::has_icons = true;
-			for (int i = 0; i < MAX_ICONS_RENDER; i++)
-			{
-				icons_bitmap[i] = auto_alloc(machine, bitmap_argb32);
-				icons_texture[i] = mrender.texture_alloc();
-			}
-			break;
-		}
+		icons_bitmap[i] = auto_alloc(machine, bitmap_argb32);
+		icons_texture[i] = mrender.texture_alloc();
 	}
 
 	// create a texture for main menu background
@@ -1404,8 +1390,8 @@ void ui_menu::draw_select_game(bool noinput)
 		container->add_quad(0.0f, 0.0f, 1.0f, 1.0f, ARGB_WHITE, bgrnd_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	hover = item.size() + 1;
-	visible_items = (is_swlist) ? item.size() - 2 : item.size() - 5;
-	float extra_height = (is_swlist) ? 2.0f * line_height : 5.0f * line_height;
+	visible_items = (is_swlist) ? item.size() - 2 : item.size() - 2 - skip_main_items;
+	float extra_height = (is_swlist) ? 2.0f * line_height : (2.0f + skip_main_items) * line_height;
 	float visible_extra_menu_height = customtop + custombottom + extra_height;
 
 	// locate mouse
@@ -1532,7 +1518,7 @@ void ui_menu::draw_select_game(bool noinput)
 			int item_invert = pitem.flags & MENU_FLAG_INVERT;
 			float space = 0.0f;
 
-			if (!is_swlist)
+			if (ui_globals::has_icons && !is_swlist)
 			{
 				if (is_favorites)
 				{
@@ -2195,7 +2181,6 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 	// if it fails, use the default image
 	if (!tmp_bitmap->valid())
 	{
-		//tmp_bitmap->reset();
 		tmp_bitmap->allocate(256, 256);
 		for (int x = 0; x < 256; x++)
 			for (int y = 0; y < 256; y++)
@@ -2240,11 +2225,11 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 		}
 
 		bitmap_argb32 *dest_bitmap;
-		dest_bitmap = auto_alloc(machine(), bitmap_argb32);
 
 		// resample if necessary
 		if (dest_xPixel != tmp_bitmap->width() || dest_yPixel != tmp_bitmap->height())
 		{
+			dest_bitmap = auto_alloc(machine(), bitmap_argb32);
 			dest_bitmap->allocate(dest_xPixel, dest_yPixel);
 			render_color color = { 1.0f, 1.0f, 1.0f, 1.0f };
 			render_resample_argb_bitmap_hq(*dest_bitmap, *tmp_bitmap, color, true);
@@ -2252,7 +2237,6 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 		else
 			dest_bitmap = tmp_bitmap;
 
-		//snapx_bitmap->reset();
 		snapx_bitmap->allocate(panel_width_pixel, panel_height_pixel);
 		int x1 = (0.5f * panel_width_pixel) - (0.5f * dest_xPixel);
 		int y1 = (0.5f * panel_height_pixel) - (0.5f * dest_yPixel);
@@ -2331,10 +2315,7 @@ void ui_menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 	static const game_driver *olddriver[MAX_ICONS_RENDER] = { nullptr };
 	float x1 = x0 + machine().ui().get_line_height() * container->manager().ui_aspect(container);
 	float y1 = y0 + machine().ui().get_line_height();
-	const game_driver *driver = ((FPTR)selectedref > 2) ? (const game_driver *)selectedref : nullptr;
-
-	if (driver == nullptr)
-		return;
+	const game_driver *driver = (const game_driver *)selectedref;
 
 	if (olddriver[linenum] != driver || ui_globals::redraw_icon)
 	{

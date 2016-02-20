@@ -264,6 +264,7 @@ void ui_simple_menu_select_game::populate()
 		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 		item_append("Configure Options", nullptr, 0, (void *)1);
 		item_append("Save Configuration", nullptr, 0, (void *)2);
+		skip_main_items = 2;
 	}
 
 	// configure the custom rendering
@@ -316,8 +317,8 @@ void ui_simple_menu_select_game::custom_render(void *selectedref, float top, flo
 						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	// determine the text to render below
-	driver = ((FPTR)selectedref > 2) ? (const game_driver *)selectedref : nullptr;
-	if ((FPTR)driver > 2)
+	driver = ((FPTR)selectedref > skip_main_items) ? (const game_driver *)selectedref : nullptr;
+	if (driver != nullptr)
 	{
 		const char *gfxstat, *soundstat;
 
