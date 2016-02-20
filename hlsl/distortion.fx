@@ -119,7 +119,7 @@ uniform float ReflectionAmount = 0.0f;
 
 uniform int RotationType = 0; // 0 = 0°, 1 = 90°, 2 = 180°, 3 = 270°
 
-float2 GetRatioCorrection()
+float2 GetScreenQuadRatio()
 {
 	float ScreenRatio = ScreenDims.x / ScreenDims.y;
 	float QuadRatio = QuadDims.x / QuadDims.y;
@@ -130,6 +130,15 @@ float2 GetRatioCorrection()
 		: float2(ScreenQuadRatio, 1.0);
 }
 
+float2 GetQuadRatio()
+{
+	float QuadRatio = QuadDims.x / QuadDims.y;
+
+	return QuadRatio > 1.0f
+		? float2 (1.0f, 1.0f / QuadRatio)
+		: float2 (QuadRatio, 1.0f);
+}
+
 float GetNoiseFactor(float3 n, float random)
 {
 	// smaller n become more noisy
@@ -138,7 +147,7 @@ float GetNoiseFactor(float3 n, float random)
 
 float GetVignetteFactor(float2 coord, float amount)
 {
-	float2 VignetteCoord = coord;
+	float2 VignetteCoord = coord / (QuadDims / ScreenDims);
 
 	float VignetteLength = length(VignetteCoord);
 	float VignetteBlur = (amount * 0.75f) + 0.25;
@@ -152,10 +161,7 @@ float GetVignetteFactor(float2 coord, float amount)
 
 float GetSpotAddend(float2 coord, float amount)
 {
-	float2 RatioCorrection = GetRatioCorrection();
-
-	// normalized screen quad ratio
-	float2 QuadRatio = float2 (1.0f, QuadDims.y / QuadDims.x);
+	float2 QuadRatio = GetQuadRatio();
 
 	// upper right quadrant
 	float2 spotOffset =
@@ -167,10 +173,9 @@ float GetSpotAddend(float2 coord, float amount)
 					? float2(0.25f, 0.25f)
 					: float2(-0.25f, 0.25f);
 
-	float2 SpotCoord = coord;
-	SpotCoord += spotOffset * RatioCorrection;
+	float2 SpotCoord = coord / (QuadDims / ScreenDims);
+	SpotCoord += spotOffset * QuadRatio;
 	SpotCoord *= QuadRatio;
-	SpotCoord /= RatioCorrection;
 
 	float SpotBlur = amount;
 
@@ -188,7 +193,7 @@ float GetSpotAddend(float2 coord, float amount)
 
 float GetRoundCornerFactor(float2 coord, float radiusAmount, float smoothAmount)
 {
-	float2 RatioCorrection = GetRatioCorrection();
+	float2 ScreenQuadRatio = GetScreenQuadRatio();
 
 	// reduce smooth amount down to radius amount
 	smoothAmount = min(smoothAmount, radiusAmount);
@@ -198,7 +203,7 @@ float GetRoundCornerFactor(float2 coord, float radiusAmount, float smoothAmount)
 	float smooth = 1.0 / (range * max(smoothAmount, 0.0025f));
 
 	// compute box
-	float box = roundBox(ScreenDims * (coord * 2.0f), ScreenDims * RatioCorrection, radius);
+	float box = roundBox(ScreenDims * (coord * 2.0f), ScreenDims * ScreenQuadRatio, radius);
 
 	// apply smooth
 	box *= smooth;
@@ -235,19 +240,19 @@ float2 GetDistortedCoords(float2 centerCoord, float amount)
 
 float2 GetCoords(float2 coord, float distortionAmount)
 {
-	float2 RatioCorrection = GetRatioCorrection();
+	float2 ScreenQuadRatio = GetScreenQuadRatio();
 
 	// center coordinates
 	coord -= 0.5f;
 
 	// apply ratio difference between screen and quad
-	coord /= RatioCorrection;
+	coord /= ScreenQuadRatio;
 
 	// distort coordinates
 	coord = GetDistortedCoords(coord, distortionAmount);
 
 	// revert ratio difference between screen and quad
-	coord *= RatioCorrection;
+	coord *= ScreenQuadRatio;
 
 	// un-center coordinates
 	coord += 0.5f;
@@ -257,21 +262,18 @@ float2 GetCoords(float2 coord, float distortionAmount)
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float2 TexCoord = Input.TexCoord;
-	float2 BaseCoord = TexCoord;
-
 	// Screen Curvature
-	BaseCoord = GetCoords(BaseCoord, CurvatureAmount * 0.25f); // reduced amount
+	float2 TexCoord = GetCoords(Input.TexCoord, CurvatureAmount * 0.25f); // reduced amount
 
-	float2 BaseCoordCentered = BaseCoord;
-	BaseCoordCentered -= 0.5f;
+	float2 TexCoordCentered = TexCoord;
+	TexCoordCentered -= 0.5f;
 
 	// Color
-	float4 BaseColor = tex2D(DiffuseSampler, BaseCoord);
+	float4 BaseColor = tex2D(DiffuseSampler, TexCoord);
 	BaseColor.a = 1.0f;
 
 	// Vignetting Simulation
-	float2 VignetteCoord = BaseCoordCentered;
+	float2 VignetteCoord = TexCoordCentered;
 
 	float VignetteFactor = GetVignetteFactor(VignetteCoord, VignettingAmount);
 	BaseColor.rgb *= VignetteFactor;
@@ -279,15 +281,15 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	// Light Reflection Simulation
 	float3 LightColor = float3(1.0f, 0.90f, 0.80f); // color temperature 5.000 Kelvin
 
-	float2 SpotCoord = BaseCoordCentered;
-	float2 NoiseCoord = BaseCoordCentered;
+	float2 SpotCoord = TexCoordCentered;
+	float2 NoiseCoord = TexCoordCentered;
 
 	float SpotAddend = GetSpotAddend(SpotCoord, ReflectionAmount);
 	float NoiseFactor = GetNoiseFactor(SpotAddend, random(NoiseCoord));
 	BaseColor.rgb += SpotAddend * NoiseFactor * LightColor;
 
 	// Round Corners Simulation
-	float2 RoundCornerCoord = BaseCoordCentered;
+	float2 RoundCornerCoord = TexCoordCentered;
 
 	float roundCornerFactor = GetRoundCornerFactor(RoundCornerCoord, RoundCornerAmount, SmoothBorderAmount);
 	BaseColor.rgb *= roundCornerFactor;

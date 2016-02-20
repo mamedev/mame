@@ -54,6 +54,7 @@ public:
 		CU_ORIENTATION_SWAP,
 		CU_ROTATION_SWAP,
 		CU_ROTATION_TYPE,
+		CU_VECTOR_SCREEN,
 
 		CU_NTSC_CCFREQ,
 		CU_NTSC_A,
@@ -292,9 +293,8 @@ public:
 	void render_quad(poly_info *poly, int vertnum);
 
 	bool register_texture(texture_info *texture);
-	bool register_prescaled_texture(texture_info *texture);
-	bool add_render_target(renderer* d3d, texture_info* info, int width, int height, int xprescale, int yprescale);
-	bool add_cache_target(renderer* d3d, texture_info* info, int width, int height, int xprescale, int yprescale, int screen_index);
+	bool add_render_target(renderer* d3d, texture_info* info, int width, int height, int target_width, int target_height);
+	bool add_cache_target(renderer* d3d, texture_info* info, int width, int height, int screen_index);
 
 	void window_save();
 	void window_record();
@@ -379,13 +379,8 @@ private:
 	int                     curr_screen;                // current screen for render target operations
 	int                     curr_frame;                 // current frame (0/1) of a screen for render target operations
 	int                     lastidx;                    // index of the last-encountered target
-	bool                    write_ini;                  // enable external ini saving
-	bool                    read_ini;                   // enable external ini loading
-	int                     hlsl_prescale_x;            // hlsl prescale x
-	int                     hlsl_prescale_y;            // hlsl prescale y
 	float                   bloom_dims[11][2];          // bloom texture dimensions
 	int                     bloom_count;                // count of used bloom textures
-	int                     preset;                     // preset, if relevant
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
 	texture_info *          shadow_texture;             // shadow mask texture for post-processing shader
 	hlsl_options *          options;                    // current options

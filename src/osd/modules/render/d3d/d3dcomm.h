@@ -78,6 +78,8 @@ public:
 	DWORD                   get_max_texture_width() { return m_texture_max_width; }
 	DWORD                   get_max_texture_height() { return m_texture_max_height; }
 
+	void                    compute_texture_size(int texwidth, int texheight, int* p_width, int* p_height);
+
 	texture_info *          get_default_texture() { return m_default_texture; }
 	texture_info *          get_vector_texture() { return m_vector_texture; }
 
@@ -149,7 +151,6 @@ public:
 private:
 	void prescale();
 	void compute_size(int texwidth, int texheight);
-	void compute_size_subroutine(int texwidth, int texheight, int* p_width, int* p_height);
 
 	texture_manager *       m_texture_manager;          // texture manager pointer
 

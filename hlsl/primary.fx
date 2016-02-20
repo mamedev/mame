@@ -55,8 +55,7 @@ uniform float2 ScreenDims;
 uniform float2 TargetDims;
 
 uniform bool PostPass;
-
-uniform float Brighten;
+uniform bool VectorScreen;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -70,12 +69,16 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 	float2 targetDims = TargetDims + Epsilon; // bug: with exact target dimensions the font disappears
 
-	Output.TexCoord = PostPass
-		? Input.Position.xy / ScreenDims
-		: Input.TexCoord;
-	Output.TexCoord += PostPass
-		? 0.5f / targetDims // half texel offset correction (DX9)
-		: 0.0f;
+	if (PostPass)
+	{
+		Output.TexCoord = Input.Position.xy / ScreenDims;
+		Output.TexCoord += 0.5f / targetDims; // half texel offset correction (DX9)
+	}
+	else
+	{
+		Output.TexCoord = Input.TexCoord;
+		// Output.TexCoord += 0.5f / targetDims; // half texel offset correction (DX9)
+	}
 
 	Output.Color = Input.Color;
 
@@ -89,7 +92,9 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
-	BaseTexel *= Input.Color + float4(Brighten, Brighten, Brighten, 0.0f);
+	BaseTexel *= PostPass && VectorScreen
+		? Input.Color + float4(1.0f, 1.0f, 1.0f, 0.0f)
+		: Input.Color;
 
 	return BaseTexel;
 }

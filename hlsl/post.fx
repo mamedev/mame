@@ -49,15 +49,17 @@ struct VS_OUTPUT
 {
 	float4 Position : POSITION;
 	float4 Color : COLOR0;
-	float2 TexCoord : TEXCOORD0;
-	float2 ScreenCoord : TEXCOORD1;
+	float2 SourceCoord : TEXCOORD0;
+	float2 TexCoord : TEXCOORD1;
+	float2 ScreenCoord : TEXCOORD2;
 };
 
 struct PS_INPUT
 {
 	float4 Color : COLOR0;
-	float2 TexCoord : TEXCOORD0;
-	float2 ScreenCoord : TEXCOORD1;
+	float2 SourceCoord : TEXCOORD0;
+	float2 TexCoord : TEXCOORD1;
+	float2 ScreenCoord : TEXCOORD2;
 };
 
 //-----------------------------------------------------------------------------
@@ -82,22 +84,11 @@ uniform float2 ShadowUVOffset = float2(0.0f, 0.0f);
 uniform bool SwapXY = false;
 
 uniform bool PrepareBloom = false; // disables some effects for rendering bloom textures
-uniform bool PrepareVector = false;
+uniform bool VectorScreen = false;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
-
-	float2 shadowUVOffset = ShadowUVOffset;
-	shadowUVOffset = SwapXY
-		? shadowUVOffset.yx
-		: shadowUVOffset.xy;
-
-	float2 ScreenCoordOffset = 0.0f;
-	ScreenCoordOffset += shadowUVOffset;
-
-	Output.ScreenCoord = Input.Position.xy;
-	Output.ScreenCoord += ScreenCoordOffset;
 
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
@@ -105,10 +96,18 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.xy -= 0.5f; // center
 	Output.Position.xy *= 2.0f; // zoom
 
-	Output.TexCoord = PrepareVector
-		? Input.Position.xy / ScreenDims
-		: Input.TexCoord;
+	Output.TexCoord = Input.Position.xy / ScreenDims;
 	Output.TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
+
+	Output.SourceCoord = Input.TexCoord;
+
+	float2 ScreenCoordOffset = ShadowUVOffset;
+	ScreenCoordOffset = SwapXY
+		? ShadowUVOffset.yx
+		: ShadowUVOffset.xy;
+
+	Output.ScreenCoord = Input.Position.xy / ScreenDims;
+	Output.ScreenCoord += ScreenCoordOffset / ScreenDims;
 
 	Output.Color = Input.Color;
 
@@ -165,21 +164,16 @@ float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 ScreenTexelDims = 1.0f / ScreenDims;
 	float2 SourceTexelDims = 1.0f / SourceDims;
-	float2 SourceRes = SourceDims * SourceRect;
 
-	float2 HalfSourceRect = SourceRect * 0.5f;
-
-	float2 ScreenCoord = Input.ScreenCoord / ScreenDims;
-	float2 BaseCoord = GetAdjustedCoords(Input.TexCoord, HalfSourceRect);
+	float2 ScreenCoord = Input.ScreenCoord;
+	float2 TexCoord = GetAdjustedCoords(Input.TexCoord, 0.5f);
+	float2 SourceCoord = GetAdjustedCoords(Input.SourceCoord, 0.5f * SourceRect);
 
 	// Color
-	float4 BaseColor = tex2D(DiffuseSampler, BaseCoord);
+	float4 BaseColor = tex2D(DiffuseSampler, TexCoord);
 	BaseColor.a = 1.0f;
 
-	if (BaseCoord.x < 0.0f || BaseCoord.y < 0.0f)
-	{
-		BaseColor.rgb = 0.0f;
-	}
+	clip(TexCoord < 0.0f || TexCoord > 1.0f ? -1 : 1);
 
 	// Mask Simulation (may not affect bloom)
 	if (!PrepareBloom && ShadowAlpha > 0.0f)
@@ -194,7 +188,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 			// ? shadowUV.yx
 			// : shadowUV.xy;
 
-		float2 screenCoord = ShadowTileMode == 0 ? ScreenCoord : BaseCoord;
+		float2 screenCoord = ShadowTileMode == 0 ? ScreenCoord : SourceCoord;
 		screenCoord = SwapXY
 			? screenCoord.yx
 			: screenCoord.xy;
@@ -204,7 +198,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 			? shadowCount.yx
 			: shadowCount.xy;
 
-		float2 shadowTile = ((ShadowTileMode == 0 ? ScreenTexelDims : SourceTexelDims) * shadowCount);
+		float2 shadowTile = (ShadowTileMode == 0 ? ScreenTexelDims : SourceTexelDims) * shadowCount;
 		shadowTile = SwapXY
 			? shadowTile.yx
 			: shadowTile.xy;
@@ -242,14 +236,14 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	if (!PrepareBloom)
 	{
 		// Scanline Simulation (may not affect vector screen)
-		if (!PrepareVector && ScanlineAlpha > 0.0f)
+		if (!VectorScreen && ScanlineAlpha > 0.0f)
 		{
 			float BrightnessOffset = (ScanlineBrightOffset * ScanlineAlpha);
 			float BrightnessScale = (ScanlineBrightScale * ScanlineAlpha) + (1.0f - ScanlineAlpha);
 
 			float ColorBrightness = 0.299f * BaseColor.r + 0.587f * BaseColor.g + 0.114 * BaseColor.b;
 
-			float ScanlineCoord = BaseCoord.y * SourceDims.y * ScanlineScale * PI;
+			float ScanlineCoord = SourceCoord.y * SourceDims.y * ScanlineScale * PI;
 			float ScanlineCoordJitter = ScanlineOffset * PHI;
 			float ScanlineSine = sin(ScanlineCoord + ScanlineCoordJitter);
 			float ScanlineWide = ScanlineHeight + max(1.0f, ScanlineHeight) * (1.0f - ColorBrightness);
@@ -260,21 +254,15 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		}
 
 		// Hum Bar Simulation (may not affect vector screen)
-		if (!PrepareVector && HumBarAlpha > 0.0f)
+		if (!VectorScreen && HumBarAlpha > 0.0f)
 		{
 			float HumBarStep = frac(TimeMilliseconds * HumBarDesync);
-			float HumBarBrightness = 1.0 - frac(BaseCoord.y / SourceRect.y + HumBarStep) * HumBarAlpha;
+			float HumBarBrightness = 1.0 - frac(SourceCoord.y / SourceRect.y + HumBarStep) * HumBarAlpha;
 			BaseColor.rgb *= HumBarBrightness;
 		}
 	}
 
-	// Output
-	float4 Output = PrepareVector
-		? BaseColor * (Input.Color + float4(1.0f, 1.0f, 1.0f, 0.0f))
-		: BaseColor * Input.Color;
-	Output.a = 1.0f;
-
-	return Output;
+	return BaseColor;
 }
 
 //-----------------------------------------------------------------------------

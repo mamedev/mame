@@ -72,7 +72,7 @@ static direct3dx9_loadeffect_ptr g_load_effect = NULL;
 //============================================================
 
 shaders::shaders() :
-	d3dintf(NULL), machine(NULL), d3d(NULL), num_screens(0), curr_screen(0), curr_frame(0), write_ini(false), read_ini(false), hlsl_prescale_x(0), hlsl_prescale_y(0), bloom_count(0),
+	d3dintf(NULL), machine(NULL), d3d(NULL), num_screens(0), curr_screen(0), curr_frame(0), bloom_count(0),
 	vecbuf_type(), vecbuf_index(0), vecbuf_count(0), avi_output_file(NULL), avi_frame(0), avi_copy_surface(NULL), avi_copy_texture(NULL), avi_final_target(NULL), avi_final_texture(NULL),
 	black_surface(NULL), black_texture(NULL), render_snap(false), snap_rendered(false), snap_copy_target(NULL), snap_copy_texture(NULL), snap_target(NULL), snap_texture(NULL),
 	snap_width(0), snap_height(0), lines_pending(false), backbuffer(NULL), curr_effect(NULL), default_effect(NULL), prescale_effect(NULL), post_effect(NULL), distortion_effect(NULL),
@@ -81,9 +81,6 @@ shaders::shaders() :
 {
 	master_enable = false;
 	vector_enable = true;
-	hlsl_prescale_x = 1;
-	hlsl_prescale_x = 1;
-	preset = -1;
 	shadow_texture = NULL;
 	options = NULL;
 	paused = true;
@@ -675,8 +672,6 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 	windows_options &winoptions = downcast<windows_options &>(machine->options());
 
 	master_enable = winoptions.d3d_hlsl_enable();
-	hlsl_prescale_x = winoptions.d3d_hlsl_prescale_x();
-	hlsl_prescale_y = winoptions.d3d_hlsl_prescale_y();
 	snap_width = winoptions.d3d_snap_width();
 	snap_height = winoptions.d3d_snap_height();
 
@@ -964,6 +959,7 @@ int shaders::create_resources(bool reset)
 		effects[i]->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 		effects[i]->add_uniform("QuadDims", uniform::UT_VEC2, uniform::CU_QUAD_DIMS);
 		effects[i]->add_uniform("SwapXY", uniform::UT_BOOL, uniform::CU_SWAP_XY);
+		effects[i]->add_uniform("VectorScreen", uniform::UT_BOOL, uniform::CU_VECTOR_SCREEN);
 	}
 
 	ntsc_effect->add_uniform("CCValue", uniform::UT_FLOAT, uniform::CU_NTSC_CCFREQ);
@@ -1243,9 +1239,9 @@ int shaders::ntsc_pass(render_target *rt, int source_index, poly_info *poly, int
 	curr_effect->set_float("SignalOffset", signal_offset);
 
 	next_index = rt->next_index(next_index);
-	blit(rt->native_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->source_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
 
-	color_effect->set_texture("Diffuse", rt->native_texture[next_index]);
+	color_effect->set_texture("Diffuse", rt->source_texture[next_index]);
 
 	return next_index;
 }
@@ -1300,7 +1296,7 @@ int shaders::color_convolution_pass(render_target *rt, int source_index, poly_in
 	// initial "Diffuse" texture is set in shaders::set_texture() or the result of shaders::ntsc_pass()
 
 	next_index = rt->next_index(next_index);
-	blit(rt->native_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->source_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1311,10 +1307,11 @@ int shaders::prescale_pass(render_target *rt, int source_index, poly_info *poly,
 
 	curr_effect = prescale_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->native_texture[next_index]);
+	curr_effect->set_texture("Diffuse", rt->source_texture[next_index]);
 
 	next_index = rt->next_index(next_index);
-	blit(rt->prescale_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	// blit(rt->target_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index], true, poly->get_type(), vertnum, poly->get_count());
 
 	return next_index;
 }
@@ -1334,10 +1331,11 @@ int shaders::deconverge_pass(render_target *rt, int source_index, poly_info *pol
 
 	curr_effect = deconverge_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
+	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
 
 	next_index = rt->next_index(next_index);
-	blit(rt->prescale_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	// blit(rt->target_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index], true, poly->get_type(), vertnum, poly->get_count());	
 
 	return next_index;
 }
@@ -1354,10 +1352,11 @@ int shaders::defocus_pass(render_target *rt, int source_index, poly_info *poly, 
 
 	curr_effect = focus_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
+	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
 
 	next_index = rt->next_index(next_index);
-	blit(rt->prescale_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	// blit(rt->target_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index], true, poly->get_type(), vertnum, poly->get_count());	
 
 	return next_index;
 }
@@ -1374,21 +1373,23 @@ int shaders::phosphor_pass(render_target *rt, cache_target *ct, int source_index
 
 	curr_effect = phosphor_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
+	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
 	curr_effect->set_texture("LastPass", ct->last_texture);
 	curr_effect->set_bool("Passthrough", false);
 
 	next_index = rt->next_index(next_index);
-	blit(rt->prescale_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	// blit(rt->target_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index], true, poly->get_type(), vertnum, poly->get_count());	
 
 	// Pass along our phosphor'd screen
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
-	curr_effect->set_texture("LastPass", rt->prescale_texture[next_index]);
+	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
+	curr_effect->set_texture("LastPass", rt->target_texture[next_index]);
 	curr_effect->set_bool("Passthrough", true);
 
 	// Avoid changing targets due to page flipping
-	blit(ct->last_target, true, D3DPT_TRIANGLELIST, 0, 2);
+	// blit(ct->last_target, true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(ct->last_target, true, poly->get_type(), vertnum, poly->get_count());	
 
 	return next_index;
 }
@@ -1396,9 +1397,6 @@ int shaders::phosphor_pass(render_target *rt, cache_target *ct, int source_index
 int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int vertnum, bool prepare_bloom)
 {
 	int next_index = source_index;
-
-	bool prepare_vector =
-		machine->first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
 
 	screen_device_iterator screen_iterator(machine->root_device());
 	screen_device *screen = screen_iterator.first();
@@ -1429,7 +1427,7 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("ShadowTexture", shadow_texture == NULL ? NULL : shadow_texture->get_finaltex());
 	curr_effect->set_int("ShadowTileMode", options->shadow_mask_tile_mode);
-	curr_effect->set_texture("DiffuseTexture", rt->prescale_texture[next_index]);
+	curr_effect->set_texture("DiffuseTexture", rt->target_texture[next_index]);
 	curr_effect->set_vector("BackColor", 3, back_color);
 	curr_effect->set_vector("ScreenScale", 2, screen_scale);
 	curr_effect->set_vector("ScreenOffset", 2, screen_offset);
@@ -1437,10 +1435,10 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	curr_effect->set_float("TimeMilliseconds", (float)machine->time().as_double() * 1000.0f);
 	curr_effect->set_float("HumBarAlpha", options->hum_bar_alpha);
 	curr_effect->set_bool("PrepareBloom", prepare_bloom);
-	curr_effect->set_bool("PrepareVector", prepare_vector);
 
 	next_index = rt->next_index(next_index);
-	blit(prepare_bloom ? rt->native_target[next_index] : rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
+	// blit(prepare_bloom ? rt->source_surface[next_index] : rt->target_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(prepare_bloom ? rt->source_surface[next_index] : rt->target_surface[next_index], true, poly->get_type(), vertnum, poly->get_count());
 
 	return next_index;
 }
@@ -1455,12 +1453,8 @@ int shaders::downsample_pass(render_target *rt, int source_index, poly_info *pol
 		return next_index;
 	}
 
-	bool prepare_vector =
-		machine->first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
-
 	curr_effect = downsample_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_bool("PrepareVector", prepare_vector);
 
 	int bloom_index = 0;
 	float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
@@ -1474,9 +1468,10 @@ int shaders::downsample_pass(render_target *rt, int source_index, poly_info *pol
 		curr_effect->set_vector("TargetDims", 2, bloom_dims[bloom_index]);
 		curr_effect->set_texture("DiffuseTexture",
 			bloom_index == 0
-				? rt->native_texture[next_index]
+				? rt->source_texture[next_index]
 				: rt->bloom_texture[bloom_index - 1]);
 
+		// blit(rt->bloom_target[bloom_index], true, D3DPT_TRIANGLELIST, 0, 2);
 		blit(rt->bloom_target[bloom_index], true, poly->get_type(), vertnum, poly->get_count());
 
 		bloom_width *= 0.5f;
@@ -1542,7 +1537,7 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 	curr_effect->set_float("BloomScale", options->bloom_scale);
 	curr_effect->set_vector("BloomOverdrive", 3, options->bloom_overdrive);
 
-	curr_effect->set_texture("DiffuseA", rt->prescale_texture[next_index]);
+	curr_effect->set_texture("DiffuseA", rt->target_texture[next_index]);
 
 	char name[9] = "Diffuse*";
 	for (int index = 1; index < bloom_count; index++)
@@ -1557,7 +1552,8 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 	}
 
 	next_index = rt->next_index(next_index);
-	blit(rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
+	// blit(rt->target_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index], true, poly->get_type(), vertnum, poly->get_count());
 
 	return next_index;
 }
@@ -1578,7 +1574,7 @@ int shaders::distortion_pass(render_target *rt, int source_index, poly_info *pol
 
 	int screen_count = d3d->window().target()->current_view()->screens().count();
 
-	// only one screen is supported
+	// todo: only one screen is supported
 	if (screen_count > 1)
 	{
 		return next_index;
@@ -1586,22 +1582,26 @@ int shaders::distortion_pass(render_target *rt, int source_index, poly_info *pol
 
 	render_bounds bounds = d3d->window().target()->current_view()->bounds();
 	render_bounds screen_bounds = d3d->window().target()->current_view()->screen_bounds();
-
-	// artworks are not supported
-	if (bounds.x0 != screen_bounds.x0 ||
+	bool screen_bounds_zoomed = d3d->window().target()->zoom_to_screen();
+	bool screen_bounds_differ = 
+		bounds.x0 != screen_bounds.x0 ||
 		bounds.y0 != screen_bounds.y0 ||
 		bounds.x1 != screen_bounds.x1 ||
-		bounds.y1 != screen_bounds.y1)
+		bounds.y1 != screen_bounds.y1;
+
+	// todo: full artworks are not supported
+	if (screen_bounds_differ && !screen_bounds_zoomed)
 	{
 		return next_index;
 	}
 
 	curr_effect = distortion_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("DiffuseTexture", rt->prescale_texture[next_index]);
+	curr_effect->set_texture("DiffuseTexture", rt->target_texture[next_index]);
 
 	next_index = rt->next_index(next_index);
-	blit(rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
+	// blit(rt->target_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index], true, poly->get_type(), vertnum, poly->get_count());
 
 	return next_index;
 }
@@ -1618,7 +1618,8 @@ int shaders::vector_pass(render_target *rt, int source_index, poly_info *poly, i
 	curr_effect->set_vector("TimeParams", 2, time_params);
 	curr_effect->set_vector("LengthParams", 3, length_params);
 
-	blit(rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
+	// blit(rt->target_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index], true, poly->get_type(), vertnum, poly->get_count());
 
 	return next_index;
 }
@@ -1630,12 +1631,12 @@ int shaders::vector_buffer_pass(render_target *rt, int source_index, poly_info *
 	curr_effect = default_effect;
 	curr_effect->update_uniforms();
 
-	curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
+	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
 	curr_effect->set_bool("PostPass", true);
-	curr_effect->set_float("Brighten", 1.0f);
 
 	next_index = rt->next_index(next_index);
-	blit(rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
+	// blit(rt->target_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index], true, poly->get_type(), vertnum, poly->get_count());
 
 	return next_index;
 }
@@ -1644,15 +1645,11 @@ int shaders::screen_pass(render_target *rt, int source_index, poly_info *poly, i
 {
 	int next_index = source_index;
 
-	bool prepare_vector =
-		machine->first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
-
 	curr_effect = default_effect;
 	curr_effect->update_uniforms();
 
-	curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
+	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
 	curr_effect->set_bool("PostPass", true);
-	curr_effect->set_float("Brighten", prepare_vector ? 1.0f : 0.0f);
 
 	// we do not clear the backbuffe here because multiple screens might rendered into
 	blit(backbuffer, false, poly->get_type(), vertnum, poly->get_count());
@@ -1677,7 +1674,6 @@ void shaders::menu_pass(poly_info *poly, int vertnum)
 	curr_effect = default_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_bool("PostPass", false);
-	curr_effect->set_float("Brighten", 0.0f);
 
 	blit(NULL, false, poly->get_type(), vertnum, poly->get_count());
 }
@@ -1706,6 +1702,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		render_target *rt = curr_render_target;
 		if (rt == NULL)
 		{
+			osd_printf_verbose("Direct3D: No raster render target\n");
 			return;
 		}
 
@@ -1752,6 +1749,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		render_target *rt = curr_render_target;
 		if (rt == NULL)
 		{
+			osd_printf_verbose("Direct3D: No vector render target\n");
 			return;
 		}
 
@@ -1774,6 +1772,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		render_target *rt = curr_render_target;
 		if (rt == NULL)
 		{
+			osd_printf_verbose("Direct3D: No vector buffer render target\n");
 			return;
 		}
 
@@ -1837,23 +1836,13 @@ void shaders::end_draw()
 
 
 //============================================================
-//  shaders::register_prescaled_texture
-//============================================================
-
-bool shaders::register_prescaled_texture(texture_info *texture)
-{
-	return register_texture(texture);
-}
-
-
-//============================================================
 //  shaders::add_cache_target - register a cache target
 //============================================================
-bool shaders::add_cache_target(renderer* d3d, texture_info* info, int width, int height, int xprescale, int yprescale, int screen_index)
+bool shaders::add_cache_target(renderer* d3d, texture_info* info, int width, int height, int screen_index)
 {
 	cache_target* target = (cache_target*)global_alloc_clear<cache_target>();
 
-	if (!target->init(d3d, d3dintf, width, height, xprescale, yprescale))
+	if (!target->init(d3d, d3dintf, width, height))
 	{
 		global_free(target);
 		return false;
@@ -1896,7 +1885,10 @@ render_target* shaders::get_vector_target()
 
 void shaders::create_vector_target(render_primitive *prim)
 {
-	if (!add_render_target(d3d, NULL, d3d->get_width(), d3d->get_height(), 1, 1))
+	int width = d3d->get_width();
+	int height = d3d->get_height();
+
+	if (!add_render_target(d3d, NULL, width, height, width, height))
 	{
 		vector_enable = false;
 	}
@@ -1907,7 +1899,7 @@ void shaders::create_vector_target(render_primitive *prim)
 //  shaders::add_render_target - register a render target
 //============================================================
 
-bool shaders::add_render_target(renderer* d3d, texture_info* info, int width, int height, int xprescale, int yprescale)
+bool shaders::add_render_target(renderer* d3d, texture_info* info, int width, int height, int target_width, int target_height)
 {
 	UINT32 screen_index = 0;
 	UINT32 page_index = 0;
@@ -1934,7 +1926,7 @@ bool shaders::add_render_target(renderer* d3d, texture_info* info, int width, in
 
 	render_target* target = (render_target*)global_alloc_clear<render_target>();
 
-	if (!target->init(d3d, d3dintf, width, height, xprescale, yprescale))
+	if (!target->init(d3d, d3dintf, width, height, target_width, target_height))
 	{
 		global_free(target);
 		return false;
@@ -1951,7 +1943,7 @@ bool shaders::add_render_target(renderer* d3d, texture_info* info, int width, in
 		target->height = d3d->get_height();
 	}
 
-	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, target->prescale_target[0]);
+	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, target->target_surface[0]);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
 	result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
@@ -1964,7 +1956,7 @@ bool shaders::add_render_target(renderer* d3d, texture_info* info, int width, in
 	cache_target* cache = find_cache_target(target->screen_index, target->width, target->height);
 	if (cache == NULL)
 	{
-		if (!add_cache_target(d3d, info, width, height, xprescale, yprescale, target->screen_index))
+		if (!add_cache_target(d3d, info, target_width, target_height, target->screen_index))
 		{
 			global_free(target);
 			return false;
@@ -2000,11 +1992,6 @@ void shaders::enumerate_screens()
 
 bool shaders::register_texture(texture_info *texture)
 {
-	int width = texture->get_width();
-	int height = texture->get_height();
-	int xscale = texture->get_xscale();
-	int yscale = texture->get_yscale();
-
 	if (!master_enable || !d3dintf->post_fx_available)
 	{
 		return false;
@@ -2012,31 +1999,7 @@ bool shaders::register_texture(texture_info *texture)
 
 	enumerate_screens();
 
-	// Find the nearest prescale factor that is over our screen size
-	if (hlsl_prescale_x < 1)
-	{
-		hlsl_prescale_x = 1;
-		while (width * xscale * hlsl_prescale_x <= d3d->get_width())
-		{
-			hlsl_prescale_x++;
-		}
-		hlsl_prescale_x--;
-	}
-
-	if (hlsl_prescale_y < 1)
-	{
-		hlsl_prescale_y = 1;
-		while (height * yscale * hlsl_prescale_y <= d3d->get_height())
-		{
-			hlsl_prescale_y++;
-		}
-		hlsl_prescale_y--;
-	}
-
-	hlsl_prescale_x = hlsl_prescale_x < 1 ? 1 : hlsl_prescale_x;
-	hlsl_prescale_y = hlsl_prescale_y < 1 ? 1 : hlsl_prescale_y;
-
-	if (!add_render_target(d3d, texture, width, height, xscale * hlsl_prescale_x, yscale * hlsl_prescale_y))
+	if (!add_render_target(d3d, texture, texture->get_width(), texture->get_height(), d3d->get_width(), d3d->get_height()))
 	{
 		return false;
 	}
@@ -3062,28 +3025,25 @@ void uniform::update()
 				vec2f sourcedims = shadersys->curr_texture->get_rawdims();
 				m_shader->set_vector("SourceDims", 2, &sourcedims.c.x);
 			}
-
+			else
+			{
+				vec2f sourcedims = d3d->get_dims();
+				m_shader->set_vector("SourceDims", 2, &sourcedims.c.x);
+			}
 			break;
 		}
 		case CU_SOURCE_RECT:
 		{
-			bool prepare_vector =
-				d3d->window().machine().first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
-
-			if (prepare_vector)
-			{
-				float delta[2] = { 1.0f, 1.0f };
-				m_shader->set_vector("SourceRect", 2, delta);
-				break;
-			}
-
 			if (shadersys->curr_texture != NULL)
 			{
 				vec2f delta = shadersys->curr_texture->get_uvstop() - shadersys->curr_texture->get_uvstart();
 				m_shader->set_vector("SourceRect", 2, &delta.c.x);
-				break;
 			}
-
+			else
+			{
+				float delta[2] = { 1.0f, 1.0f };
+				m_shader->set_vector("SourceRect", 2, delta);
+			}
 			break;
 		}
 		case CU_TARGET_DIMS:
@@ -3117,12 +3077,14 @@ void uniform::update()
 				(d3d->window().target()->orientation() & ROT90) == ROT90 ||
 				(d3d->window().target()->orientation() & ROT270) == ROT270;
 			m_shader->set_bool("SwapXY", orientation_swap_xy ^ rotation_swap_xy);
+			break;
 		}
 		case CU_ORIENTATION_SWAP:
 		{
 			bool orientation_swap_xy =
 				(d3d->window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
 			m_shader->set_bool("OrientationSwapXY", orientation_swap_xy);
+			break;
 
 		}
 		case CU_ROTATION_SWAP:
@@ -3131,6 +3093,7 @@ void uniform::update()
 				(d3d->window().target()->orientation() & ROT90) == ROT90 ||
 				(d3d->window().target()->orientation() & ROT270) == ROT270;
 			m_shader->set_bool("RotationSwapXY", rotation_swap_xy);
+			break;
 		}
 		case CU_ROTATION_TYPE:
 		{
@@ -3143,6 +3106,14 @@ void uniform::update()
 							? 3
 							: 0;
 			m_shader->set_int("RotationType", rotation_type);
+			break;
+		}
+		case CU_VECTOR_SCREEN:
+		{	
+			bool vector_screen =
+				d3d->window().machine().first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
+			m_shader->set_bool("VectorScreen", vector_screen);
+			break;
 		}
 
 		case CU_NTSC_CCFREQ:

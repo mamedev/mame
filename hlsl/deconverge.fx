@@ -68,48 +68,47 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
-	float2 HalfSourceRect = SourceRect * 0.5f;
-
-	float2 QuadRatio =
-		float2(1.0f, SwapXY 
-			? QuadDims.y / QuadDims.x 
-			: QuadDims.x / QuadDims.y);
-
-	// imaginary texel dimensions independed from quad dimensions, but dependend on quad ratio
-	float2 FixedTexelDims = (1.0f / 1024.0) * SourceRect * QuadRatio;
-
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
 	Output.Position.y = 1.0f - Output.Position.y; // flip y
 	Output.Position.xy -= 0.5f; // center
 	Output.Position.xy *= 2.0f; // toom
 
-	float2 TexCoord = Input.TexCoord;
+	float2 TexCoord = Input.Position.xy / ScreenDims;
 	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
-	
-	Output.Color = Input.Color;
+
+	// we have to handle the swap of the coordinates ourself, because we are using screen not texture coordinates
+	float3 convergeX = SwapXY ? ConvergeY : ConvergeX;
+	float3 convergeY = SwapXY ? ConvergeX : ConvergeY;
+	float3 radialConvergeX = SwapXY ? RadialConvergeY : RadialConvergeX;
+	float3 radialConvergeY = SwapXY ? RadialConvergeX : RadialConvergeY;
+
+	// imaginary texel dimensions independed from screen dimension, but ratio
+	float2 TexelDims = (1.0f / 1024) * (QuadDims / ScreenDims);
 
 	Output.TexCoordX = TexCoord.xxx;
 	Output.TexCoordY = TexCoord.yyy;
 
 	// center coordinates
-	Output.TexCoordX -= HalfSourceRect.xxx;
-	Output.TexCoordY -= HalfSourceRect.yyy;
+	Output.TexCoordX -= 0.5f * SourceRect.xxx;
+	Output.TexCoordY -= 0.5f * SourceRect.yyy;
 
 	// radial converge offset to "translate" the most outer pixel as thay would be translated by the linar converge with the same amount
 	float2 radialConvergeOffset = 2.0f / SourceRect;
 
 	// radial converge
-	Output.TexCoordX *= 1.0f + RadialConvergeX * FixedTexelDims.xxx * radialConvergeOffset.xxx;
-	Output.TexCoordY *= 1.0f + RadialConvergeY * FixedTexelDims.yyy * radialConvergeOffset.yyy;
-	
+	Output.TexCoordX *= 1.0f + radialConvergeX * TexelDims.xxx * radialConvergeOffset.xxx;
+	Output.TexCoordY *= 1.0f + radialConvergeY * TexelDims.yyy * radialConvergeOffset.yyy;
+
 	// un-center coordinates
-	Output.TexCoordX += HalfSourceRect.xxx;
-	Output.TexCoordY += HalfSourceRect.yyy;
+	Output.TexCoordX += 0.5f * SourceRect.xxx;
+	Output.TexCoordY += 0.5f * SourceRect.yyy;
 
 	// linear converge
-	Output.TexCoordX += ConvergeX * FixedTexelDims.xxx;
-	Output.TexCoordY += ConvergeY * FixedTexelDims.yyy;
+	Output.TexCoordX += convergeX * TexelDims.xxx;
+	Output.TexCoordY += convergeY * TexelDims.yyy;
+
+	Output.Color = Input.Color;
 
 	return Output;
 }

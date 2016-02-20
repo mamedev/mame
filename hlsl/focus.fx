@@ -51,7 +51,6 @@ struct PS_INPUT
 
 uniform float2 ScreenDims;
 uniform float2 TargetDims;
-uniform float2 SourceRect;
 uniform float2 QuadDims;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
@@ -64,7 +63,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.xy -= 0.5f; // center
 	Output.Position.xy *= 2.0f; // zoom
 
-	float2 TexCoord = Input.TexCoord;
+	float2 TexCoord = Input.Position.xy / ScreenDims;
 	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
 	Output.TexCoord = TexCoord;
@@ -93,15 +92,13 @@ static const float2 Coord8Offset = float2( 1.00f, -0.25f);
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float2 QuadRatio = 
-		float2(1.0f, SwapXY 
-			? QuadDims.y / QuadDims.x 
-			: QuadDims.x / QuadDims.y);
+	// we have to handle the swap of the coordinates ourself, because we are using screen not texture coordinates
+	float2 defocus = SwapXY ? Defocus.yx : Defocus.xy;
 
-	// imaginary texel dimensions independed from quad dimensions, but dependend on quad ratio
-	float2 TexelDims = (1.0f / 1024.0) * SourceRect * QuadRatio;
+	// imaginary texel dimensions independed from screen dimension, but ratio
+	float2 TexelDims = (1.0f / 1024) * (QuadDims / ScreenDims);
 
-	float2 DefocusTexelDims = Defocus * TexelDims;
+	float2 DefocusTexelDims = defocus * TexelDims;
 
 	float4 d = tex2D(DiffuseSampler, Input.TexCoord);
 	float3 d1 = tex2D(DiffuseSampler, Input.TexCoord + Coord1Offset * DefocusTexelDims).rgb;
