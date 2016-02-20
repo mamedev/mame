@@ -438,9 +438,8 @@ public:
 WRITE16_MEMBER(ti1000_state::write_r)
 {
 	// R0-R7: select digit
-	UINT8 o = BITSWAP8(m_o,7,4,3,2,1,0,6,5);
 	set_display_segmask(0xff, 0xff);
-	display_matrix(8, 8, o, data);
+	display_matrix(8, 8, m_o, data);
 }
 
 WRITE16_MEMBER(ti1000_state::write_o)
@@ -448,7 +447,7 @@ WRITE16_MEMBER(ti1000_state::write_o)
 	// O0-O3,O5(?): input mux
 	// O0-O7: digit segments
 	m_inp_mux = (data & 0xf) | (data >> 1 & 0x10);
-	m_o = data;
+	m_o = BITSWAP8(data,7,4,3,2,1,0,6,5);
 }
 
 READ8_MEMBER(ti1000_state::read_k)

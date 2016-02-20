@@ -161,7 +161,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-// output PLA is not dumped
+// output PLA is not decapped
 static const UINT16 elecbowl_output_pla[0x20] =
 {
 	lA+lB+lC+lD+lE+lF,      // 0

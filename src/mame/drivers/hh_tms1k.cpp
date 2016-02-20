@@ -22,7 +22,7 @@
  @MP1030   TMS1100   1980, APF Mathemagician
  @MP1133   TMS1470   1979, Kosmos Astro
  @MP1180   TMS1100   1980, Tomy Power House Pinball
- *MP1181   TMS1100   1979, Conic Football 2
+ @MP1181   TMS1100   1979, Conic Football 2
  @MP1204   TMS1100   1980, Entex Baseball 3 (6007)
  @MP1211   TMS1100   1980, Entex Space Invader
  @MP1218   TMS1100   1980, Entex Basketball 2 (6010)
@@ -114,6 +114,7 @@
 #include "astro.lh"
 #include "bankshot.lh"
 #include "bigtrak.lh"
+#include "cnfball2.lh"
 #include "cnsector.lh"
 #include "comp4.lh"
 #include "cqback.lh"
@@ -475,7 +476,7 @@ static INPUT_PORTS_START( mathmagi )
 INPUT_PORTS_END
 
 
-// output PLA is not dumped
+// output PLA is not decapped
 static const UINT16 mathmagi_output_pla[0x20] =
 {
 	lA+lB+lC+lD+lE+lF,      // 0
@@ -774,7 +775,7 @@ static INPUT_PORTS_START( zodiac )
 INPUT_PORTS_END
 
 
-// output PLA is not dumped
+// output PLA is not decapped
 static const UINT16 zodiac_output_pla[0x20] =
 {
 	0x80,                   // empty/led 1/7
@@ -1343,6 +1344,130 @@ static MACHINE_CONFIG_START( tc4, tc4_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tc4)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Conic Electronic Football II
+  * TMS1100 MP1181 (no decap)
+  * 9-digit LED grid, 1-bit sound
+  
+  This is a clone of Coleco's Quarterback, similar at hardware-level too.
+  It was also sold by Tandy under the same title.
+
+***************************************************************************/
+
+class cnfball2_state : public hh_tms1k_state
+{
+public:
+	cnfball2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void cnfball2_state::prepare_display()
+{
+	// R1 selects between segments B/C or A'/D'
+	UINT16 seg = m_o;
+	if (~m_r & 2)
+		seg = (m_o << 7 & 0x300) | (m_o & 0xf9);
+	
+	set_display_segmask(0x1ff, 0xff);
+	display_matrix(11, 9, seg, m_r >> 1 & 0x1ff);
+}
+
+WRITE16_MEMBER(cnfball2_state::write_r)
+{
+	// R0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// R8-R10: input mux
+	m_inp_mux = data >> 8 & 7;
+	
+	// R1-R10: select digit/segment
+	m_r = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(cnfball2_state::write_o)
+{
+	// O0-O7: digit segments
+	m_o = data;
+	prepare_display();
+}
+
+READ8_MEMBER(cnfball2_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(3);
+}
+
+
+// config
+
+static INPUT_PORTS_START( cnfball2 )
+	PORT_START("IN.0") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x02, 0x00, "Factory Test" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_TOGGLE PORT_NAME("Play Selector") // pass/run
+	PORT_CONFNAME( 0x08, 0x00, "Skill Level" )
+	PORT_CONFSETTING(    0x00, "1" ) // college
+	PORT_CONFSETTING(    0x08, "2" ) // professional
+
+	PORT_START("IN.1") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+
+	PORT_START("IN.2") // R10
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Kick/Pass")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Score")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Status")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+// output PLA is not decapped
+static const UINT16 cnfball2_output_pla[0x20] =
+{
+	// first half was dumped electronically
+	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x40, 0x01, 0x08, 0x02, 0x04, 0x00,
+
+	// rest is unknown
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0
+};
+
+static MACHINE_CONFIG_START( cnfball2, cnfball2_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=47pf
+	MCFG_TMS1XXX_OUTPUT_PLA(cnfball2_output_pla)
+	MCFG_TMS1XXX_READ_K_CB(READ8(cnfball2_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(cnfball2_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(cnfball2_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_cnfball2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4525,6 +4650,7 @@ static INPUT_PORTS_START( tandy12 )
 INPUT_PORTS_END
 
 
+// output PLA is not decapped
 static const UINT16 tandy12_output_pla[0x20] =
 {
 	// these are certain
@@ -4809,10 +4935,7 @@ public:
 
 void phpball_state::prepare_display()
 {
-	// R0-R2 are 7segs
-	for (int y = 0; y < 3; y++)
-		m_display_segmask[y] = 0x7f;
-
+	set_display_segmask(7, 0x7f);
 	display_matrix(7, 9, m_o, m_r);
 }
 
@@ -4824,6 +4947,7 @@ WRITE16_MEMBER(phpball_state::write_r)
 	// R9: input mux
 	m_inp_mux = data >> 9 & 1;
 
+	// R0-R2: digit select
 	// R0-R8: led select
 	m_r = data;
 	prepare_display();
@@ -4831,7 +4955,7 @@ WRITE16_MEMBER(phpball_state::write_r)
 
 WRITE16_MEMBER(phpball_state::write_o)
 {
-	// O0-O6: led state
+	// O0-O6: digit segment/led data
 	// O7: N/C
 	m_o = data & 0x7f;
 	prepare_display();
@@ -4966,6 +5090,17 @@ ROM_START( tc4 )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
 	ROM_REGION( 557, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1400_tc4_output.pla", 0, 557, CRC(3b908725) SHA1(f83bf5faa5b3cb51f87adc1639b00d6f9a71ad19) )
+ROM_END
+
+
+ROM_START( cnfball2 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1181", 0x0000, 0x0800, CRC(4553a840) SHA1(2e1132c9bc51641f77ba7f2430b5a3b2766b3a3d) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_cnfball2_output.pla", 0, 365, NO_DUMP )
 ROM_END
 
 
@@ -5316,6 +5451,8 @@ CONS( 1978, cqback,    0,        0, cqback,    cqback,    driver_device, 0, "Col
 CONS( 1980, h2hfootb,  0,        0, h2hfootb,  h2hfootb,  driver_device, 0, "Coleco", "Head to Head Football", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, h2hbaseb,  0,        0, h2hbaseb,  h2hbaseb,  driver_device, 0, "Coleco", "Head to Head Baseball", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Coleco", "Total Control 4", MACHINE_SUPPORTS_SAVE )
+
+CONS( 1979, cnfball2,  0,        0, cnfball2,  cnfball2,  driver_device, 0, "Conic", "Electronic Football II (Conic)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1979, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Entex", "Electronic Baseball (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, ebball2,   0,        0, ebball2,   ebball2,   driver_device, 0, "Entex", "Electronic Baseball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
