@@ -2560,7 +2560,7 @@ void i386_device::i386_loadall()       // Opcode 0x0f 0x07 (0x0f 0x05 on 80286),
 
 	for(int i = 0; i < GS; i++)
 	{
-		m_sreg[i].valid = (m_sreg[i].flags & 0x8000) ? true : false;
+		m_sreg[i].valid = (m_sreg[i].flags & 0x80) ? true : false;
 		m_sreg[i].d = (m_sreg[i].flags & 0x4000) ? 1 : 0;
 	}
 	CHANGE_PC(m_eip);
