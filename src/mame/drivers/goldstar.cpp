@@ -13487,6 +13487,28 @@ DRIVER_INIT_MEMBER(cmaster_state, rp36c3)
 	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, read8_delegate(FUNC(cmaster_state::fixedval48_r),this));
 }
 
+DRIVER_INIT_MEMBER(cmaster_state, rp96sub)	// 95 33 95 33 70 6C 70 6C... XORs seem ok. need bitswap and handler.
+{
+	int i;
+	UINT8 *ROM = memregion("maincpu")->base();
+	for (i = 0;i < 0x10000;i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 5)
+		{
+			case 0: x = BITSWAP8(x^0x6a, 7,6,5,4,3,2,1,0); break;
+			case 1: x = BITSWAP8(x^0xcc, 7,6,5,4,3,2,1,0); break;
+			case 4: x = BITSWAP8(x^0x8f, 7,6,5,4,3,2,1,0); break;
+			case 5: x = BITSWAP8(x^0x93, 7,6,5,4,3,2,1,0); break;
+		}
+
+		ROM[i] = x;
+	}
+
+//	m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8_delegate(FUNC(cmaster_state::fixedvalb2_r),this));
+}
+
 
 DRIVER_INIT_MEMBER(cmaster_state, po33)
 {
@@ -13813,7 +13835,7 @@ GAME(  2009, fb2010,    0,        amcoe2,   nfb96tx,   cmaster_state,  fb2010,  
 GAMEL( 1996, roypok96,  0,        amcoe2,   roypok96,  cmaster_state,  rp35,      ROT0, "Amcoe",   "Royal Poker '96 (set 1, v97-3.5)",                             0,                 layout_roypok96 )
 GAMEL( 1996, roypok96a, roypok96, amcoe2,   roypok96a, cmaster_state,  rp36,      ROT0, "Amcoe",   "Royal Poker '96 (set 2, v98-3.6)",                             0,                 layout_roypok96 )
 GAMEL( 1996, roypok96b, roypok96, amcoe2,   roypok96a, cmaster_state,  rp36c3,    ROT0, "Amcoe",   "Royal Poker '96 (set 3, v98-3.6?)",                            0,                 layout_roypok96 )
-GAME(  1996, roypok96c, roypok96, amcoe2,   roypok96a, driver_device,  0,         ROT0, "Amcoe",   "Royal Poker '96 (set 4, C3 board)",                            MACHINE_NOT_WORKING )
+GAME(  1996, roypok96c, roypok96, amcoe2,   roypok96a, cmaster_state,  rp96sub,   ROT0, "Amcoe",   "Royal Poker '96 (set 4, C3 board)",                            MACHINE_NOT_WORKING )
 
 
 /* these all appear to be graphic hacks of 'New Fruit Bonus '96', they can run with the same program rom
