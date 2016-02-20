@@ -37,3 +37,4 @@ src/osd/sdl/shader/*.fsh svneol=native#text/plain
 readme svneol=native#text/plain
 README svneol=native#text/plain
 *.ppm -text svneol=unset#image/x-portable-pixmap
+*.po eol=lf
