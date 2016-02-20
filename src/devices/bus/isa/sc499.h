@@ -80,6 +80,7 @@ private:
 	virtual void eop_w(int state) override;
 
 	const char *cpu_context();
+	void logerror(const char *format, ...) const;
 
 	void tape_status_clear(UINT16 value);
 	void tape_status_set(UINT16 value);
