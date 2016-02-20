@@ -976,10 +976,10 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 					//logerror("IRQ (%08x): Interrupt during V8086 task\n",m_pc);
 					if(type & 0x08)
 					{
-						PUSH32(m_sreg[GS].selector & 0xffff);
-						PUSH32(m_sreg[FS].selector & 0xffff);
-						PUSH32(m_sreg[DS].selector & 0xffff);
-						PUSH32(m_sreg[ES].selector & 0xffff);
+						PUSH32SEG(m_sreg[GS].selector & 0xffff);
+						PUSH32SEG(m_sreg[FS].selector & 0xffff);
+						PUSH32SEG(m_sreg[DS].selector & 0xffff);
+						PUSH32SEG(m_sreg[ES].selector & 0xffff);
 					}
 					else
 					{
@@ -1001,7 +1001,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 				if(type & 0x08)
 				{
 					// 32-bit gate
-					PUSH32(oldSS);
+					PUSH32SEG(oldSS);
 					PUSH32(oldESP);
 				}
 				else
@@ -1063,7 +1063,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 			else
 			{
 				PUSH32(oldflags & 0x00ffffff );
-				PUSH32(m_sreg[CS].selector );
+				PUSH32SEG(m_sreg[CS].selector );
 				if(irq == 3 || irq == 4 || irq == 9 || irq_gate == 1)
 					PUSH32(m_eip );
 				else
@@ -1935,7 +1935,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 
 					if(operand32 != 0)
 					{
-						PUSH32(oldSS);
+						PUSH32SEG(oldSS);
 						PUSH32(oldESP);
 					}
 					else
@@ -2069,7 +2069,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 		else
 		{
 			/* 32-bit operand size */
-			PUSH32(m_sreg[CS].selector );
+			PUSH32SEG(m_sreg[CS].selector );
 			PUSH32(m_eip );
 			m_sreg[CS].selector = selector;
 			m_performed_intersegment_jump = 1;
@@ -2574,7 +2574,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				}
 				if((desc.flags & 0x0080) == 0)
 				{
-					logerror("IRET: Return CS segment is not present.\n");
+					logerror("IRET: (%08x) Return CS segment is not present.\n", m_pc);
 					FAULT(FAULT_NP,newCS & ~0x03)
 				}
 				if(newEIP > desc.limit)
@@ -3756,6 +3756,7 @@ void i386_device::device_reset()
 	// Family 3 (386), Model 0 (DX), Stepping 8 (D1)
 	REG32(EAX) = 0;
 	REG32(EDX) = (3 << 8) | (0 << 4) | (8);
+	m_cpu_version = REG32(EDX);
 
 	m_CPL = 0;
 
@@ -3829,7 +3830,7 @@ void i386_device::pentium_smi()
 	WRITE32(REG32(ESI), smram_state+SMRAM_ESI);
 	WRITE32(REG32(EDI), smram_state+SMRAM_EDI);
 	WRITE32(m_eip, smram_state+SMRAM_EIP);
-	WRITE32(old_flags, smram_state+SMRAM_EAX);
+	WRITE32(old_flags, smram_state+SMRAM_EFLAGS);
 	WRITE32(m_cr[3], smram_state+SMRAM_CR3);
 	WRITE32(old_cr0, smram_state+SMRAM_CR0);
 
@@ -4046,6 +4047,7 @@ void i486_device::device_reset()
 	// Family 4 (486), Model 0/1 (DX), Stepping 3
 	REG32(EAX) = 0;
 	REG32(EDX) = (4 << 8) | (0 << 4) | (3);
+	m_cpu_version = REG32(EDX);
 
 	CHANGE_PC(m_eip);
 }

@@ -1000,6 +1000,23 @@ void i386_device::PUSH32(UINT32 value)
 		REG16(SP) = new_esp;
 	}
 }
+
+void i386_device::PUSH32SEG(UINT32 value)
+{
+	UINT32 ea, new_esp;
+	if( STACK_32BIT ) {
+		new_esp = REG32(ESP) - 4;
+		ea = i386_translate(SS, new_esp, 1);
+		((m_cpu_version & 0xf00) == 0x300) ? WRITE16(ea, value) : WRITE32(ea, value ); // 486 also?
+		REG32(ESP) = new_esp;
+	} else {
+		new_esp = (REG16(SP) - 4) & 0xffff;
+		ea = i386_translate(SS, new_esp, 1);
+		((m_cpu_version & 0xf00) == 0x300) ? WRITE16(ea, value) : WRITE32(ea, value );
+		REG16(SP) = new_esp;
+	}
+}
+
 void i386_device::PUSH8(UINT8 value)
 {
 	if( m_operand_size ) {
