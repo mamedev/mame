@@ -1042,6 +1042,8 @@ namespace bgfx { namespace d3d12
 				m_gpuTimer.init();
 				m_occlusionQuery.init();
 			}
+
+			g_internalData.context = m_device;
 			return true;
 
 		error:
@@ -1359,7 +1361,7 @@ namespace bgfx { namespace d3d12
 			tc.m_sides   = 0;
 			tc.m_depth   = 0;
 			tc.m_numMips = 1;
-			tc.m_format  = texture.m_requestedFormat;
+			tc.m_format  = TextureFormat::Enum(texture.m_requestedFormat);
 			tc.m_cubeMap = false;
 			tc.m_mem     = NULL;
 			bx::write(&writer, tc);
@@ -1370,14 +1372,25 @@ namespace bgfx { namespace d3d12
 			release(mem);
 		}
 
+		void overrideInternal(TextureHandle _handle, uintptr_t _ptr) BX_OVERRIDE
+		{
+			BX_UNUSED(_handle, _ptr);
+		}
+
+		uintptr_t getInternal(TextureHandle _handle) BX_OVERRIDE
+		{
+			BX_UNUSED(_handle);
+			return 0;
+		}
+
 		void destroyTexture(TextureHandle _handle) BX_OVERRIDE
 		{
 			m_textures[_handle.idx].destroy();
 		}
 
-		void createFrameBuffer(FrameBufferHandle _handle, uint8_t _num, const TextureHandle* _textureHandles) BX_OVERRIDE
+		void createFrameBuffer(FrameBufferHandle _handle, uint8_t _num, const Attachment* _attachment) BX_OVERRIDE
 		{
-			m_frameBuffers[_handle.idx].create(_num, _textureHandles);
+			m_frameBuffers[_handle.idx].create(_num, _attachment);
 		}
 
 		void createFrameBuffer(FrameBufferHandle _handle, void* _nwh, uint32_t _width, uint32_t _height, TextureFormat::Enum _depthFormat) BX_OVERRIDE
@@ -1860,8 +1873,8 @@ data.NumQualityLevels = 0;
 				if (isValid(frameBuffer.m_depth) )
 				{
 					TextureD3D12& texture = m_textures[frameBuffer.m_depth.idx];
-					const bool bufferOnly = 0 != (texture.m_flags&BGFX_TEXTURE_RT_BUFFER_ONLY);
-					if (!bufferOnly)
+					const bool writeOnly  = 0 != (texture.m_flags&BGFX_TEXTURE_RT_WRITE_ONLY);
+					if (!writeOnly)
 					{
 						texture.setState(m_commandList, D3D12_RESOURCE_STATE_DEPTH_READ);
 					}
@@ -3801,7 +3814,7 @@ data.NumQualityLevels = 0;
 				blockHeight = blockInfo.blockHeight;
 			}
 
-			const bool bufferOnly   = 0 != (m_flags&BGFX_TEXTURE_RT_BUFFER_ONLY);
+			const bool writeOnly    = 0 != (m_flags&BGFX_TEXTURE_RT_WRITE_ONLY);
 			const bool computeWrite = 0 != (m_flags&BGFX_TEXTURE_COMPUTE_WRITE);
 			const bool renderTarget = 0 != (m_flags&BGFX_TEXTURE_RT_MASK);
 
@@ -3813,7 +3826,7 @@ data.NumQualityLevels = 0;
 				, textureHeight
 				, imageContainer.m_cubeMap ? "x6" : ""
 				, renderTarget ? 'x' : ' '
-				, bufferOnly   ? 'x' : ' '
+				, writeOnly    ? 'x' : ' '
 				, computeWrite ? 'x' : ' '
 				, swizzle ? " (swizzle BGRA8 -> RGBA8)" : ""
 				);
@@ -3969,7 +3982,7 @@ data.NumQualityLevels = 0;
 				resourceDesc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
 			}
 
-			if (bufferOnly)
+			if (writeOnly)
 			{
 				resourceDesc.Flags |= D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
 				state              &= ~D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
@@ -4171,10 +4184,10 @@ data.NumQualityLevels = 0;
 		return _state;
 	}
 
-	void FrameBufferD3D12::create(uint8_t _num, const TextureHandle* _handles)
+	void FrameBufferD3D12::create(uint8_t _num, const Attachment* _attachment)
 	{
 		m_numTh = _num;
-		memcpy(m_th, _handles, _num*sizeof(TextureHandle) );
+		memcpy(m_attachment, _attachment, _num*sizeof(Attachment) );
 
 		postReset();
 	}
@@ -4204,7 +4217,7 @@ data.NumQualityLevels = 0;
 			m_num = 0;
 			for (uint32_t ii = 0; ii < m_numTh; ++ii)
 			{
-				TextureHandle handle = m_th[ii];
+				TextureHandle handle = m_attachment[ii].handle;
 				if (isValid(handle) )
 				{
 					const TextureD3D12& texture = s_renderD3D12->m_textures[handle.idx];

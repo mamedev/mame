@@ -223,6 +223,7 @@ namespace bgfx { namespace d3d11
 
 		void create(const Memory* _mem, uint32_t _flags, uint8_t _skip);
 		void destroy();
+		void overrideInternal(uintptr_t _ptr);
 		void update(uint8_t _side, uint8_t _mip, const Rect& _rect, uint16_t _z, uint16_t _depth, uint16_t _pitch, const Memory* _mem);
 		void commit(uint8_t _stage, uint32_t _flags, const float _palette[][4]);
 		void resolve();
@@ -260,7 +261,7 @@ namespace bgfx { namespace d3d11
 		{
 		}
 
-		void create(uint8_t _num, const TextureHandle* _handles);
+		void create(uint8_t _num, const Attachment* _attachment);
 		void create(uint16_t _denseIdx, void* _nwh, uint32_t _width, uint32_t _height, TextureFormat::Enum _depthFormat);
 		uint16_t destroy();
 		void preReset(bool _force = false);
@@ -277,7 +278,7 @@ namespace bgfx { namespace d3d11
 		uint16_t m_denseIdx;
 		uint8_t m_num;
 		uint8_t m_numTh;
-		TextureHandle m_th[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
+		Attachment m_attachment[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
 	};
 
 	struct TimerQueryD3D11

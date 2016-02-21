@@ -13,6 +13,7 @@
 			|| BX_PLATFORM_BSD \
 			|| BX_PLATFORM_QNX \
 			|| BX_PLATFORM_RPI \
+			|| BX_PLATFORM_STEAMLINK \
 			|| BX_PLATFORM_WINDOWS \
 			) )
 
@@ -320,6 +321,18 @@ typedef uint64_t GLuint64;
 #ifndef GL_R11F_G11F_B10F
 #	define GL_R11F_G11F_B10F 0x8C3A
 #endif // GL_R11F_G11F_B10F
+
+#ifndef GL_UNSIGNED_SHORT_5_6_5_REV
+#	define GL_UNSIGNED_SHORT_5_6_5_REV 0x8364
+#endif // GL_UNSIGNED_SHORT_5_6_5_REV
+
+#ifndef GL_UNSIGNED_SHORT_1_5_5_5_REV
+#	define GL_UNSIGNED_SHORT_1_5_5_5_REV 0x8366
+#endif // GL_UNSIGNED_SHORT_1_5_5_5_REV
+
+#ifndef GL_UNSIGNED_SHORT_4_4_4_4_REV
+#	define GL_UNSIGNED_SHORT_4_4_4_4_REV 0x8365
+#endif // GL_UNSIGNED_SHORT_4_4_4_4_REV
 
 #ifndef GL_UNSIGNED_INT_10F_11F_11F_REV
 #	define GL_UNSIGNED_INT_10F_11F_11F_REV 0x8C3B
@@ -742,6 +755,10 @@ typedef uint64_t GLuint64;
 #	define GL_FRAMEBUFFER_SRGB 0x8DB9
 #endif // GL_FRAMEBUFFER_SRGB
 
+#ifndef GL_NUM_EXTENSIONS
+#	define GL_NUM_EXTENSIONS 0x821D
+#endif // GL_NUM_EXTENSIONS
+
 // _KHR or _ARB...
 #define GL_DEBUG_OUTPUT_SYNCHRONOUS         0x8242
 #define GL_DEBUG_NEXT_LOGGED_MESSAGE_LENGTH 0x8243
@@ -1103,9 +1120,10 @@ namespace bgfx { namespace gl
 		{
 		}
 
-		bool init(GLenum _target, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _format, uint8_t _numMips, uint32_t _flags);
+		bool init(GLenum _target, uint32_t _width, uint32_t _height, uint32_t _depth, TextureFormat::Enum _format, uint8_t _numMips, uint32_t _flags);
 		void create(const Memory* _mem, uint32_t _flags, uint8_t _skip);
 		void destroy();
+		void overrideInternal(uintptr_t _ptr);
 		void update(uint8_t _side, uint8_t _mip, const Rect& _rect, uint16_t _z, uint16_t _depth, uint16_t _pitch, const Memory* _mem);
 		void setSamplerState(uint32_t _flags, const float _rgba[4]);
 		void commit(uint32_t _stage, uint32_t _flags, const float _palette[][4]);
@@ -1152,7 +1170,7 @@ namespace bgfx { namespace gl
 			memset(m_fbo, 0, sizeof(m_fbo) );
 		}
 
-		void create(uint8_t _num, const TextureHandle* _handles);
+		void create(uint8_t _num, const Attachment* _attachment);
 		void create(uint16_t _denseIdx, void* _nwh, uint32_t _width, uint32_t _height, TextureFormat::Enum _depthFormat);
 		void postReset();
 		uint16_t destroy();
@@ -1166,7 +1184,7 @@ namespace bgfx { namespace gl
 		uint16_t m_denseIdx;
 		uint8_t  m_num;
 		uint8_t  m_numTh;
-		TextureHandle m_th[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
+		Attachment m_attachment[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
 	};
 
 	struct ProgramGL

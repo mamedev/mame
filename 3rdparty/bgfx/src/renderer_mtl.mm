@@ -495,6 +495,7 @@ namespace bgfx { namespace mtl
 
 			m_occlusionQuery.preReset();
 
+			g_internalData.context = m_device;
 			return true;
 		}
 
@@ -666,7 +667,7 @@ namespace bgfx { namespace mtl
 			tc.m_sides   = 0;
 			tc.m_depth   = 0;
 			tc.m_numMips = 1;
-			tc.m_format  = texture.m_requestedFormat;
+			tc.m_format  = TextureFormat::Enum(texture.m_requestedFormat);
 			tc.m_cubeMap = false;
 			tc.m_mem     = NULL;
 			bx::write(&writer, tc);
@@ -677,14 +678,25 @@ namespace bgfx { namespace mtl
 			release(mem);
 		}
 
+		void overrideInternal(TextureHandle _handle, uintptr_t _ptr) BX_OVERRIDE
+		{
+			BX_UNUSED(_handle, _ptr);
+		}
+
+		uintptr_t getInternal(TextureHandle _handle) BX_OVERRIDE
+		{
+			BX_UNUSED(_handle);
+			return 0;
+		}
+
 		void destroyTexture(TextureHandle _handle) BX_OVERRIDE
 		{
 			m_textures[_handle.idx].destroy();
 		}
 
-		void createFrameBuffer(FrameBufferHandle _handle, uint8_t _num, const TextureHandle* _textureHandles) BX_OVERRIDE
+		void createFrameBuffer(FrameBufferHandle _handle, uint8_t _num, const Attachment* _attachment) BX_OVERRIDE
 		{
-			m_frameBuffers[_handle.idx].create(_num, _textureHandles);
+			m_frameBuffers[_handle.idx].create(_num, _attachment);
 		}
 
 		void createFrameBuffer(FrameBufferHandle _handle, void* _nwh, uint32_t _width, uint32_t _height, TextureFormat::Enum _depthFormat) BX_OVERRIDE
@@ -1887,7 +1899,7 @@ namespace bgfx { namespace mtl
 					 , 0 != (_flags&BGFX_TEXTURE_RT_MASK) ? " (render target)" : ""
 					 );
 
-			const bool bufferOnly   = 0 != (_flags&BGFX_TEXTURE_RT_BUFFER_ONLY);
+			const bool writeOnly   = 0 != (_flags&BGFX_TEXTURE_RT_WRITE_ONLY);
 //			const bool computeWrite = 0 != (_flags&BGFX_TEXTURE_COMPUTE_WRITE);
 //			const bool renderTarget = 0 != (_flags&BGFX_TEXTURE_RT_MASK);
 			const bool srgb			= 0 != (_flags&BGFX_TEXTURE_SRGB) || imageContainer.m_srgb;
@@ -1919,11 +1931,11 @@ namespace bgfx { namespace mtl
 			desc.resourceOptions  = MTLResourceStorageModePrivate;
 			desc.cpuCacheMode     = MTLCPUCacheModeDefaultCache;
 
-			desc.storageMode = (MTLStorageMode)(bufferOnly
+			desc.storageMode = (MTLStorageMode)(writeOnly
 				? 2 /*MTLStorageModePrivate*/
 				: 1 /*MTLStorageModeManaged*/
 				);
-			desc.usage       = bufferOnly
+			desc.usage       = writeOnly
 				? MTLTextureUsageShaderWrite
 				: MTLTextureUsageShaderRead
 				;
@@ -2040,7 +2052,13 @@ namespace bgfx { namespace mtl
 		if (convert)
 		{
 			temp = (uint8_t*)BX_ALLOC(g_allocator, rectpitch*_rect.m_height);
-			imageDecodeToBgra8(temp, data, _rect.m_width, _rect.m_height, srcpitch, m_requestedFormat);
+			imageDecodeToBgra8(temp
+				, data
+				, _rect.m_width
+				, _rect.m_height
+				, srcpitch
+				, TextureFormat::Enum(m_requestedFormat)
+				);
 			data = temp;
 		}
 
@@ -2061,12 +2079,12 @@ namespace bgfx { namespace mtl
 																	: m_sampler, _stage);
 	}
 
-	void FrameBufferMtl::create(uint8_t _num, const TextureHandle* _handles)
+	void FrameBufferMtl::create(uint8_t _num, const Attachment* _attachment)
 	{
 		m_num = 0;
 		for (uint32_t ii = 0; ii < _num; ++ii)
 		{
-			TextureHandle handle = _handles[ii];
+			TextureHandle handle = _attachment[ii].handle;
 			if (isValid(handle) )
 			{
 				const TextureMtl& texture = s_renderMtl->m_textures[handle.idx];

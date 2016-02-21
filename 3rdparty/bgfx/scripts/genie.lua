@@ -66,9 +66,13 @@ solution "bgfx"
 	startproject "example-00-helloworld"
 
 BGFX_DIR = path.getabsolute("..")
+BX_DIR   = os.getenv("BX_DIR")
+
 local BGFX_BUILD_DIR = path.join(BGFX_DIR, ".build")
 local BGFX_THIRD_PARTY_DIR = path.join(BGFX_DIR, "3rdparty")
-BX_DIR = path.getabsolute(path.join(BGFX_DIR, "../bx"))
+if not BX_DIR then
+	BX_DIR = path.getabsolute(path.join(BGFX_DIR, "../bx"))
+end
 
 if not os.isdir(BX_DIR) then
 	print("bx not found at " .. BX_DIR)
@@ -140,20 +144,15 @@ function exampleProject(_name)
 		defines { "ENTRY_CONFIG_USE_SDL=1" }
 		links   { "SDL2" }
 
-		configuration { "x32", "windows" }
-			libdirs { "$(SDL2_DIR)/lib/x86" }
-
-		configuration { "x64", "windows" }
-			libdirs { "$(SDL2_DIR)/lib/x64" }
+		configuration { "osx" }
+			libdirs { "$(SDL2_DIR)/lib" }
 
 		configuration {}
 	end
 
 	if _OPTIONS["with-glfw"] then
 		defines { "ENTRY_CONFIG_USE_GLFW=1" }
-		links   {
-			"glfw3"
-		}
+		links   { "glfw3" }
 
 		configuration { "linux or freebsd" }
 			links {
@@ -305,13 +304,21 @@ function exampleProject(_name)
 		kind "ConsoleApp"
 		targetextension ".bc"
 
-	configuration { "linux-* or freebsd" }
+	configuration { "linux-* or freebsd", "not linux-steamlink" }
 		links {
 			"X11",
 			"GL",
 			"pthread",
 		}
 
+	configuration { "linux-steamlink" }
+		links {
+			"EGL",
+			"GLESv2",
+			"SDL2",
+			"pthread",
+		}
+		
 	configuration { "rpi" }
 		links {
 			"X11",
@@ -415,7 +422,6 @@ end
 
 if _OPTIONS["with-tools"] then
 	group "tools"
-	dofile "makedisttex.lua"
 	dofile "shaderc.lua"
 	dofile "texturec.lua"
 	dofile "geometryc.lua"

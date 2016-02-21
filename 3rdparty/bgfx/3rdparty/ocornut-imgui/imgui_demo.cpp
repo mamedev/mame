@@ -223,8 +223,7 @@ void ImGui::ShowTestWindow(bool* p_opened)
 
         if (ImGui::TreeNode("Fonts", "Fonts (%d)", ImGui::GetIO().Fonts->Fonts.Size))
         {
-            ImGui::SameLine();
-            ShowHelpMarker("Tip: Load fonts with io.Fonts->AddFontFromFileTTF()\nbefore calling io.Fonts->GetTex* functions.");
+            ImGui::SameLine(); ShowHelpMarker("Tip: Load fonts with io.Fonts->AddFontFromFileTTF()\nbefore calling io.Fonts->GetTex* functions.");
             ImFontAtlas* atlas = ImGui::GetIO().Fonts;
             if (ImGui::TreeNode("Atlas texture", "Atlas texture (%dx%d pixels)", atlas->TexWidth, atlas->TexHeight))
             {
@@ -442,9 +441,9 @@ void ImGui::ShowTestWindow(bool* p_opened)
 
             ImGui::Text("Password input");
             static char bufpass[64] = "password123"; 
-            ImGui::InputText("password", bufpass, 64, ImGuiInputTextFlags_Password);
+            ImGui::InputText("password", bufpass, 64, ImGuiInputTextFlags_Password | ImGuiInputTextFlags_CharsNoBlank);
             ImGui::SameLine(); ShowHelpMarker("Display all characters as '*'.\nDisable clipboard cut and copy.\nDisable logging.\n");
-            ImGui::InputText("password (clear)", bufpass, 64);
+            ImGui::InputText("password (clear)", bufpass, 64, ImGuiInputTextFlags_CharsNoBlank);
 
             ImGui::TreePop();
         }
@@ -812,24 +811,34 @@ void ImGui::ShowTestWindow(bool* p_opened)
         if (ImGui::TreeNode("Widgets Width"))
         {
             static float f = 0.0f;
-            ImGui::Text("PushItemWidth(100)");
+            ImGui::Text("PushItemWidth(100)"); 
+            ImGui::SameLine(); ShowHelpMarker("Fixed width.");
             ImGui::PushItemWidth(100);
             ImGui::DragFloat("float##1", &f);
             ImGui::PopItemWidth();
 
-            ImGui::Text("PushItemWidth(GetWindowWidth() * 0.5f);");
+            ImGui::Text("PushItemWidth(GetWindowWidth() * 0.5f)");
+            ImGui::SameLine(); ShowHelpMarker("Half of window width.");
             ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
             ImGui::DragFloat("float##2", &f);
             ImGui::PopItemWidth();
 
-            ImGui::Text("PushItemWidth(GetContentRegionAvailWidth() * 0.5f);");
+            ImGui::Text("PushItemWidth(GetContentRegionAvailWidth() * 0.5f)");
+            ImGui::SameLine(); ShowHelpMarker("Half of available width.\n(~ right-cursor_pos)\n(works within a column set)");
             ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.5f);
             ImGui::DragFloat("float##3", &f);
             ImGui::PopItemWidth();
 
-            ImGui::Text("PushItemWidth(-100);");
+            ImGui::Text("PushItemWidth(-100)");
+            ImGui::SameLine(); ShowHelpMarker("Align to right edge minus 100");
             ImGui::PushItemWidth(-100);
             ImGui::DragFloat("float##4", &f);
+            ImGui::PopItemWidth();
+
+            ImGui::Text("PushItemWidth(-1)");
+            ImGui::SameLine(); ShowHelpMarker("Align to right edge");
+            ImGui::PushItemWidth(-1);
+            ImGui::DragFloat("float##5", &f);
             ImGui::PopItemWidth();
 
             ImGui::TreePop();
@@ -1885,6 +1894,11 @@ struct ExampleAppConsole
             free(History[i]);
     }
 
+    // Portable helpers
+    static int   Stricmp(const char* str1, const char* str2)         { int d; while ((d = toupper(*str2) - toupper(*str1)) == 0 && *str1) { str1++; str2++; } return d; }
+    static int   Strnicmp(const char* str1, const char* str2, int n) { int d = 0; while (n > 0 && (d = toupper(*str2) - toupper(*str1)) == 0 && *str1) { str1++; str2++; n--; } return d; }
+    static char* Strdup(const char *str)                             { size_t len = strlen(str) + 1; void* buff = ImGui::MemAlloc(len); return (char*)memcpy(buff, (const void*)str, len); }
+
     void    ClearLog()
     {
         for (int i = 0; i < Items.Size; i++)
@@ -1901,7 +1915,7 @@ struct ExampleAppConsole
         vsnprintf(buf, IM_ARRAYSIZE(buf), fmt, args);
         buf[IM_ARRAYSIZE(buf)-1] = 0;
         va_end(args);
-        Items.push_back(strdup(buf));
+        Items.push_back(Strdup(buf));
         ScrollToBottom = true;
     }
 
@@ -1978,9 +1992,6 @@ struct ExampleAppConsole
         ImGui::End();
     }
 
-    static int Stricmp(const char* str1, const char* str2)               { int d; while ((d = toupper(*str2) - toupper(*str1)) == 0 && *str1) { str1++; str2++; } return d; }
-    static int Strnicmp(const char* str1, const char* str2, int count)   { int d = 0; while (count > 0 && (d = toupper(*str2) - toupper(*str1)) == 0 && *str1) { str1++; str2++; count--; } return d; }
-
     void    ExecCommand(const char* command_line)
     {
         AddLog("# %s\n", command_line);
@@ -1994,7 +2005,7 @@ struct ExampleAppConsole
                 History.erase(History.begin() + i);
                 break;
             }
-        History.push_back(strdup(command_line));
+        History.push_back(Strdup(command_line));
 
         // Process command
         if (Stricmp(command_line, "CLEAR") == 0)

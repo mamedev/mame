@@ -220,3 +220,8 @@ tools/bin/$(OS)/bin2c$(EXE): .build/$(BUILD_OUTPUT_DIR)/bin/bin2cRelease$(EXE)
 	$(SILENT) cp $(<) $(@)
 
 tools: tools/bin/$(OS)/bin2c$(EXE)
+
+.build/$(BUILD_OUTPUT_DIR)/bin/bx.testRelease$(EXE): .build/projects/$(BUILD_PROJECT_DIR)
+	$(SILENT) make -C .build/projects/$(BUILD_PROJECT_DIR) bx.test config=$(BUILD_TOOLS_CONFIG)
+
+test: .build/$(BUILD_OUTPUT_DIR)/bin/bx.testRelease$(EXE)

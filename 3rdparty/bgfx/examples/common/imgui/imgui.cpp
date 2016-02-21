@@ -468,7 +468,7 @@ struct Imgui
 
 		IMGUI_create(_data, _size, _fontSize, m_allocator);
 
-		m_nvg = nvgCreate(1, m_view);
+		m_nvg = nvgCreate(1, m_view, m_allocator);
  		nvgCreateFontMem(m_nvg, "default", (unsigned char*)_data, INT32_MAX, 0);
  		nvgFontSize(m_nvg, _fontSize);
  		nvgFontFace(m_nvg, "default");
@@ -3571,4 +3571,11 @@ float imguiGetTextLength(const char* _text, ImguiFontHandle _handle)
 bool imguiMouseOverArea()
 {
 	return s_imgui.m_insideArea;
+}
+
+bgfx::ProgramHandle imguiGetImageProgram(uint8_t _mip)
+{
+	const float lodEnabled[4] = { float(_mip), 1.0f, 0.0f, 0.0f };
+	bgfx::setUniform(s_imgui.u_imageLodEnabled, lodEnabled);
+	return s_imgui.m_imageProgram;
 }
