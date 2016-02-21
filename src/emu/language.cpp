@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include "language.h"
+#include "emu.h"
 
 static std::unordered_map<std::string, std::string> g_translation;
 

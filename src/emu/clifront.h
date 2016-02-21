@@ -32,8 +32,6 @@ public:
 	cli_frontend(cli_options &options, osd_interface &osd);
 	~cli_frontend();
 
-//	void load_translation();
-
 	// execute based on the incoming argc/argv
 	int execute(int argc, char **argv);
 

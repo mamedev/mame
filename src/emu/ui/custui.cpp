@@ -15,7 +15,6 @@
 #include "ui/custui.h"
 #include "ui/utils.h"
 #include <algorithm>
-#include "language.h"
 
 const char *ui_menu_custom_ui::hide_status[] = { "Show All", "Hide Filters", "Hide Info/Image", "Hide Both" };
 

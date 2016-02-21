@@ -9,10 +9,18 @@
 ***************************************************************************/
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __LANGUAGE_H__
 #define __LANGUAGE_H__
 
-#include "emu.h"
+//**************************************************************************
+//  LOCALIZATION SUPPORT
+//**************************************************************************
+
+#define _(param)	lang_translate(param)
 
 void load_translation(emu_options &option);
 const char *lang_translate(const char *word);
