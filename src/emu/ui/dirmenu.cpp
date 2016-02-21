@@ -16,11 +16,8 @@
 #include "ui/utils.h"
 #include "ui/optsmenu.h"
 
-static enum
-{
-	ADDING = 1,
-	CHANGE
-};
+static int ADDING = 1;
+static int CHANGE = 1;
 
 struct folders_entry
 {
