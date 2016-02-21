@@ -28,12 +28,14 @@ ui_menu_custom_ui::ui_menu_custom_ui(running_machine &machine, render_container 
 	file_enumerator path(machine.options().language_path());
 	const char *lang = machine.options().language();
 	const osd_directory_entry *dirent;
+	int cnt = 0;
 	for (int x = 0; (dirent = path.next()) != nullptr; ++x)
 		if (dirent->type == ENTTYPE_DIR && strcmp(dirent->name, ".") != 0 && strcmp(dirent->name, "..") != 0)
 		{
 			m_lang.push_back(dirent->name);
 			if (strcmp(dirent->name, lang) == 0)
-				m_currlang = x;
+				m_currlang = cnt;
+			++cnt;
 		}
 }
 
@@ -48,6 +50,7 @@ ui_menu_custom_ui::~ui_menu_custom_ui()
 	if (!m_lang.empty())
 	{
 		machine().options().set_value(OPTION_LANGUAGE, m_lang[m_currlang].c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+		machine().options().mark_changed(OPTION_LANGUAGE);
 		load_translation(machine().options());
 	}
 	ui_globals::reset = true;
