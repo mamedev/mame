@@ -1094,10 +1094,10 @@ macosx_x86_clang: generate $(PROJECTDIR)/gmake-osx-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-osx-clang config=$(CONFIG)32
 
 xcode4: generate
-	$(SILENT) $(GENIE) $(PARAMS) --targetos=macosx --xcode=osx xcode4
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --gcc_version=$(CLANG_VERSION) --targetos=macosx --xcode=osx xcode4
 
 xcode4-ios: generate
-	$(SILENT) $(GENIE) $(PARAMS) --targetos=macosx --xcode=ios xcode4
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --gcc_version=$(CLANG_VERSION) --targetos=macosx --xcode=ios xcode4
 
 #-------------------------------------------------
 # gmake-solaris

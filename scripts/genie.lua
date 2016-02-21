@@ -54,7 +54,9 @@ function layoutbuildtask(_folder, _name)
 end
 
 function precompiledheaders()
-	pchheader("emu.h")
+    configuration { "not xcode4" }
+	   pchheader("emu.h")
+    configuration { }
 end
 
 function addprojectflags()
@@ -672,7 +674,7 @@ end
 		"LUA_COMPAT_5_2",
 	}
 
-	if _ACTION == "gmake" then
+	if _ACTION == "gmake" or _ACTION == "xcode4" then
 
 	--we compile C-only to C99 standard with GNU extensions
 
@@ -1067,7 +1069,7 @@ configuration { "steamlink" }
 		"EGL_API_FB",
 	}
 
-configuration { "osx*" }
+configuration { "osx* or xcode4" }
 		links {
 			"pthread",
 		}
