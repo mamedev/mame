@@ -1279,12 +1279,8 @@ else
 endif
 
 %.mo: %.po
-ifeq (posix,$(SHELLTYPE))
-	@echo "Converting translation $<..."
-else
 	@echo Converting translation $<...
-endif
-	$(SILENT) msgfmt --check --output-file "$@" $<
+	$(SILENT) msgfmt --check --output-file $@ $<
 
 #-------------------------------------------------
 # Regression tests

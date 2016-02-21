@@ -39,6 +39,8 @@ void load_translation(emu_options &m_options)
 	emu_file file(m_options.language_path(), OPEN_FLAG_READ);
 	auto name = std::string(m_options.language());
 	strreplace(name, " ", "_");
+	strreplace(name, "(", "");
+	strreplace(name, ")", "");
 	if (file.open(name.c_str(), PATH_SEPARATOR "strings.mo") == FILERR_NONE)
 	{
 		UINT64 size = file.size();
