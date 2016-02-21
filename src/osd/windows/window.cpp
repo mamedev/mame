@@ -274,7 +274,7 @@ void windows_osd_interface::update_slider_list()
 {
 	for (win_window_info *window = win_window_list; window != nullptr; window = window->m_next)
 	{
-		if (window->m_renderer->sliders_dirty())
+		if (window->m_renderer && window->m_renderer->sliders_dirty())
 		{
 			build_slider_list();
 			return;

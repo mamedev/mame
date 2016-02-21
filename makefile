@@ -1280,7 +1280,7 @@ endif
 
 %.mo: %.po
 	@echo Converting translation $<...
-	$(SILENT) msgfmt --check --output-file $@ $<
+	$(SILENT)$(PYTHON) scripts/build/msgfmt.py --output-file $@ $<
 
 #-------------------------------------------------
 # Regression tests
@@ -1386,55 +1386,4 @@ shaders:
 translation:
 	$(SILENT) echo Generating mame.pot
 	$(SILENT) find src -iname "*.cpp" | xargs xgettext --from-code=UTF-8 -k_ -k__ -o mame.pot
-	$(SILENT) msgmerge -U "language/Afrikaans/strings.po"                     mame.pot
-	$(SILENT) msgmerge -U "language/Albanian/strings.po"                      mame.pot
-	$(SILENT) msgmerge -U "language/Arabic/strings.po"                        mame.pot
-	$(SILENT) msgmerge -U "language/Basque/strings.po"                        mame.pot
-	$(SILENT) msgmerge -U "language/Belarusian/strings.po"                    mame.pot
-	$(SILENT) msgmerge -U "language/Bosnian/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Bulgarian/strings.po"                     mame.pot
-	$(SILENT) msgmerge -U "language/Burmese/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Catalan/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Chinese_(Simple)/strings.po"              mame.pot
-	$(SILENT) msgmerge -U "language/Chinese_(Traditional)/strings.po"         mame.pot
-	$(SILENT) msgmerge -U "language/Croatian/strings.po"                      mame.pot
-	$(SILENT) msgmerge -U "language/Czech/strings.po"                         mame.pot
-	$(SILENT) msgmerge -U "language/Danish/strings.po"                        mame.pot
-	$(SILENT) msgmerge -U "language/Dutch/strings.po"                         mame.pot
-	$(SILENT) msgmerge -U "language/English/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Estonian/strings.po"                      mame.pot
-	$(SILENT) msgmerge -U "language/Finnish/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/French/strings.po"                        mame.pot
-	$(SILENT) msgmerge -U "language/French_(Canada)/strings.po"               mame.pot
-	$(SILENT) msgmerge -U "language/Georgian/strings.po"                      mame.pot
-	$(SILENT) msgmerge -U "language/German/strings.po"                        mame.pot
-	$(SILENT) msgmerge -U "language/Greek/strings.po"                         mame.pot
-	$(SILENT) msgmerge -U "language/Hebrew/strings.po"                        mame.pot
-	$(SILENT) msgmerge -U "language/Hindi/strings.po"                         mame.pot
-	$(SILENT) msgmerge -U "language/Hungarian/strings.po"                     mame.pot
-	$(SILENT) msgmerge -U "language/Indonesian/strings.po"                    mame.pot
-	$(SILENT) msgmerge -U "language/Italian/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Japanese/strings.po"                      mame.pot
-	$(SILENT) msgmerge -U "language/Korean/strings.po"                        mame.pot
-	$(SILENT) msgmerge -U "language/Latvian/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Lithuanian/strings.po"                    mame.pot
-	$(SILENT) msgmerge -U "language/Macedonian/strings.po"                    mame.pot
-	$(SILENT) msgmerge -U "language/Norwegian/strings.po"                     mame.pot
-	$(SILENT) msgmerge -U "language/Persian/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Polish/strings.po"                        mame.pot
-	$(SILENT) msgmerge -U "language/Portuguese/strings.po"                    mame.pot
-	$(SILENT) msgmerge -U "language/Portuguese_(Brazil)/strings.po"           mame.pot
-	$(SILENT) msgmerge -U "language/Romanian/strings.po"                      mame.pot
-	$(SILENT) msgmerge -U "language/Russian/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Serbian/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Serbian_(Cyrillic)/strings.po"            mame.pot
-	$(SILENT) msgmerge -U "language/Slovak/strings.po"                        mame.pot
-	$(SILENT) msgmerge -U "language/Slovenian/strings.po"                     mame.pot
-	$(SILENT) msgmerge -U "language/Spanish/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Spanish_(Mexico)/strings.po"              mame.pot
-	$(SILENT) msgmerge -U "language/Swedish/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Thai/strings.po"                          mame.pot
-	$(SILENT) msgmerge -U "language/Turkish/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Ukrainian/strings.po"                     mame.pot
-	$(SILENT) msgmerge -U "language/Vietnamese/strings.po"                    mame.pot
-	
+	$(SILENT) find language -iname "*.po" | xargs -n 1 msgmerge -U  mame.pot

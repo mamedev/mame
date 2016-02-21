@@ -33,7 +33,8 @@ ui_menu_custom_ui::ui_menu_custom_ui(running_machine &machine, render_container 
 		if (dirent->type == ENTTYPE_DIR && strcmp(dirent->name, ".") != 0 && strcmp(dirent->name, "..") != 0)
 		{
 			auto name = std::string(dirent->name);
-			strreplace(name, "_", " ");
+			int i = strreplace(name, "_", " (");
+			if (i > 0) name = name.append(")");
 			m_lang.push_back(name);
 			if (strcmp(name.c_str(), lang) == 0)
 				m_currlang = cnt;

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
@@ -667,7 +667,7 @@ come from... they might be eventually removed -->
 
   <!-- Brno mod ROMs -->
 
-	<software name="brno_boot" supported="no">
+	<software name="brno_con" supported="no">
 		<description>Boot for Brno ramdisk [console version]</description>
 		<year>1989</year>
 		<publisher>&lt;Pavel Brychta a spol.&gt;</publisher>
