@@ -444,11 +444,17 @@ configurations {
 	"Release",
 }
 
-platforms {
-	"x32",
-	"x64",
-	"Native", -- for targets where bitness is not specified
-}
+if _ACTION == "xcode4" then
+    platforms {
+        "Universal",
+    }
+else
+    platforms {
+        "x32",
+        "x64",
+        "Native", -- for targets where bitness is not specified
+    }
+end
 
 language "C++"
 
