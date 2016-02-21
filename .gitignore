@@ -30,6 +30,7 @@
 regtests/chdman/temp
 regtests/jedutil/output
 *.pyc
+*.mo
 /CMakeLists.txt
 /src/devices/cpu/m68000/m68kops.cpp
 /src/devices/cpu/m68000/m68kops.h
