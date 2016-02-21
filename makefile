@@ -1263,7 +1263,6 @@ genie: $(GENIE)
 generate: \
 		genie \
 		$(GEN_FOLDERS) \
-		$(patsubst %.po,%.mo,$(call rwildcard, language/, *.po)) \
 		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
 		$(SRC)/devices/cpu/m68000/m68kops.cpp
 
