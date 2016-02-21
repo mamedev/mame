@@ -34,11 +34,14 @@ public:
 private:
 	enum
 	{
-		FONT_MENU = 1,
+		LANGUAGE_MENU = 1,
+		FONT_MENU,
 		COLORS_MENU,
 		HIDE_MENU
 	};
 	static const char *hide_status[];
+	std::vector<std::string> m_lang;
+	UINT16 m_currlang;
 };
 
 //-------------------------------------------------
