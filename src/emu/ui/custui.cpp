@@ -16,7 +16,11 @@
 #include "ui/utils.h"
 #include <algorithm>
 
-const char *ui_menu_custom_ui::hide_status[] = { "Show All", "Hide Filters", "Hide Info/Image", "Hide Both" };
+const char *ui_menu_custom_ui::hide_status[] = { 
+	__("Show All"), 
+	__("Hide Filters"), 
+	__("Hide Info/Image"), 
+	__("Hide Both") };
 
 //-------------------------------------------------
 //  ctor
@@ -94,7 +98,7 @@ void ui_menu_custom_ui::handle()
 					int total = ARRAY_LENGTH(hide_status);
 					std::vector<std::string> s_sel(total);
 					for (int index = 0; index < total; ++index)
-						s_sel[index] = hide_status[index];
+						s_sel[index] = _(hide_status[index]);
 
 					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, ui_globals::panels_status));
 				}
@@ -140,7 +144,7 @@ void ui_menu_custom_ui::populate()
 	}
 
 	arrow_flags = get_arrow_flags(0, (int)HIDE_BOTH, ui_globals::panels_status);
-	item_append(_("Show side panels"), hide_status[ui_globals::panels_status], arrow_flags, (void *)(FPTR)HIDE_MENU);
+	item_append(_("Show side panels"), _(hide_status[ui_globals::panels_status]), arrow_flags, (void *)(FPTR)HIDE_MENU);
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
