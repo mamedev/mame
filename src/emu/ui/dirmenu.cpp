@@ -278,8 +278,8 @@ void ui_menu_add_change_folder::custom_render(void *selectedref, float top, floa
 	float width, maxwidth = origx2 - origx1;
 	ui_manager &mui = machine().ui();
 	std::string tempbuf[2];
-	tempbuf[0] = (m_change) ? "Change" : "Add";
-	tempbuf[0].append(" ").append(s_folders_entry[m_ref].name).append(" Folder - Search: ").append(m_search).append("_");
+	tempbuf[0] = (m_change) ? _("Change)") : _("Add");
+	tempbuf[0].append(" ").append(s_folders_entry[m_ref].name).append(_(" Folder - Search: ")).append(m_search).append("_");
 	tempbuf[1] = m_current_path;
 
 	// get the size of the text
@@ -314,7 +314,7 @@ void ui_menu_add_change_folder::custom_render(void *selectedref, float top, floa
 	}
 
 	// bottom text
-	tempbuf[0] = "Press TAB to set";
+	tempbuf[0] = _("Press TAB to set");
 
 	mui.draw_text_full(container, tempbuf[0].c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
@@ -422,7 +422,7 @@ void ui_menu_directory::custom_render(void *selectedref, float top, float bottom
 	ui_manager &mui = machine().ui();
 
 	// get the size of the text
-	mui.draw_text_full(container, "Folder Setup", 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	mui.draw_text_full(container, _("Folders Setup"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 	float maxwidth = MAX(width, origx2 - origx1);
@@ -442,7 +442,7 @@ void ui_menu_directory::custom_render(void *selectedref, float top, float bottom
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, "Folder Setup", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	mui.draw_text_full(container, _("Folders Setup"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
@@ -491,7 +491,7 @@ void ui_menu_display_actual::handle()
 
 void ui_menu_display_actual::populate()
 {
-	m_tempbuf.assign("Current ").append(s_folders_entry[m_ref - 1].name).append(" Folders");
+	m_tempbuf.assign(_("Current ")).append(s_folders_entry[m_ref - 1].name).append(_(" Folders"));
 	if (machine().ui().options().exists(s_folders_entry[m_ref - 1].option)) {
 		m_searchpath.assign(machine().ui().options().value(s_folders_entry[m_ref - 1].option));
 	}
@@ -505,12 +505,12 @@ void ui_menu_display_actual::populate()
 		m_folders.push_back(curpath);
 
 	if (m_change)
-		item_append("Change Folder", nullptr, 0, (void *)CHANGE_FOLDER);
+		item_append(_("Change Folder"), nullptr, 0, (void *)CHANGE_FOLDER);
 	else
-		item_append("Add Folder", nullptr, 0, (void *)ADD_FOLDER);
+		item_append(_("Add Folder"), nullptr, 0, (void *)ADD_FOLDER);
 
 	if (m_folders.size() > 1)
-		item_append("Remove Folder", nullptr, 0, (void *)REMOVE_FOLDER);
+		item_append(_("Remove Folder"), nullptr, 0, (void *)REMOVE_FOLDER);
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 	customtop = (m_folders.size() + 1) * machine().ui().get_line_height() + 6.0f * UI_BOX_TB_BORDER;
@@ -664,7 +664,7 @@ void ui_menu_remove_folder::custom_render(void *selectedref, float top, float bo
 {
 	float width;
 	ui_manager &mui = machine().ui();
-	std::string tempbuf = std::string("Remove ").append(s_folders_entry[m_ref].name).append(" Folder");
+	std::string tempbuf = std::string(_("Remove ")).append(s_folders_entry[m_ref].name).append(_(" Folder"));
 
 	// get the size of the text
 	mui.draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
