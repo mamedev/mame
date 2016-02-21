@@ -398,6 +398,7 @@ Keyboard TX commands:
 #include "machine/upd765.h"
 #include "machine/upd1990a.h"
 #include "machine/i8251.h"
+#include "machine/bankdev.h"
 
 #include "bus/scsi/pc9801_sasi.h"
 #include "bus/scsi/scsi.h"
@@ -465,6 +466,7 @@ public:
 		m_ext_gvram(*this, "ext_gvram"),
 		m_beeper(*this, "beeper"),
 		m_ram(*this, RAM_TAG),
+		m_ipl(*this, "ipl_bank"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen")
@@ -494,6 +496,7 @@ public:
 	optional_shared_ptr<UINT32> m_ext_gvram;
 	required_device<beep_device> m_beeper;
 	optional_device<ram_device> m_ram;
+	optional_device<address_map_bank_device> m_ipl;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -508,7 +511,6 @@ public:
 	};
 
 	emu_timer *m_vbirq;
-	UINT8 *m_ipl_rom;
 	UINT8 *m_char_rom;
 	UINT8 *m_kanji_rom;
 
@@ -526,8 +528,6 @@ public:
 	UINT8 m_font_line;
 	UINT16 m_font_lr;
 
-	UINT8 m_keyb_press;
-
 	UINT8 m_fdc_2dd_ctrl,m_fdc_2hd_ctrl;
 	UINT8 m_nmi_ff;
 
@@ -537,7 +537,6 @@ public:
 	/* PC9801RS specific */
 	UINT8 m_gate_a20; //A20 line
 	UINT8 m_access_ctrl; // DMA related
-	UINT8 m_rom_bank;
 	UINT8 m_fdc_ctrl;
 	UINT8 m_ex_video_ff[128];
 	struct {
@@ -626,7 +625,6 @@ public:
 	int m_sasi_data_enable;
 	UINT8 m_sasi_ctrl;
 
-	DECLARE_READ8_MEMBER(pc9801rs_ipl_r);
 	DECLARE_READ8_MEMBER(pc9801rs_knjram_r);
 	DECLARE_WRITE8_MEMBER(pc9801rs_knjram_w);
 	DECLARE_WRITE8_MEMBER(pc9801rs_bank_w);
@@ -646,8 +644,6 @@ public:
 	DECLARE_READ8_MEMBER(midi_r);
 //  DECLARE_READ8_MEMBER(winram_r);
 //  DECLARE_WRITE8_MEMBER(winram_w);
-//  DECLARE_READ8_MEMBER(pc9801_ext_opna_r);
-//  DECLARE_WRITE8_MEMBER(pc9801_ext_opna_w);
 	DECLARE_READ8_MEMBER(pic_r);
 	DECLARE_WRITE8_MEMBER(pic_w);
 
@@ -1001,7 +997,7 @@ WRITE8_MEMBER(pc9801_state::dmapg8_w)
 
 WRITE8_MEMBER(pc9801_state::nmi_ctrl_w)
 {
-	m_nmi_ff = (offset & 2) >> 1;
+	m_nmi_ff = offset;
 }
 
 WRITE8_MEMBER(pc9801_state::vrtc_clear_w)
@@ -1735,14 +1731,11 @@ static ADDRESS_MAP_START( pc9801_io, AS_IO, 16, pc9801_state )
 	AM_IMPORT_FROM(pc9801_common_io)
 ADDRESS_MAP_END
 
-
 /*************************************
  *
  * PC-9801RS specific handlers (IA-32)
  *
  ************************************/
-
-READ8_MEMBER(pc9801_state::pc9801rs_ipl_r) { return m_ipl_rom[(offset & 0x1ffff)+(m_rom_bank*0x20000)]; }
 
 /* TODO: it's possible that the offset calculation is actually linear. */
 /* TODO: having this non-linear makes the system to boot in BASIC for PC-9821. Perhaps it stores settings? How to change these? */
@@ -1795,7 +1788,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_bank_w)
 		{
 			if((data & 0xed) == 0x00)
 			{
-				m_rom_bank = (data & 2) >> 1;
+				m_ipl->set_bank((data & 2) >> 1);
 				return;
 			}
 		}
@@ -2103,13 +2096,17 @@ WRITE16_MEMBER(pc9801_state::grcg_gvram0_w)
 	upd7220_grcg_w(space, offset | (m_vram_bank << 16), data, mem_mask);
 }
 
+static ADDRESS_MAP_START( ipl_bank, AS_0, 16, pc9801_state )
+	AM_RANGE(0x00000, 0x2ffff) AM_ROM AM_REGION("ipl", 0)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( pc9801ux_map, AS_PROGRAM, 16, pc9801_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_RAMBANK("wram")
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_READWRITE(tvram_r, tvram_w)
 	AM_RANGE(0x0a4000, 0x0a4fff) AM_READWRITE8(pc9801rs_knjram_r, pc9801rs_knjram_w, 0xffff)
 	AM_RANGE(0x0a8000, 0x0bffff) AM_READWRITE(grcg_gvram_r, grcg_gvram_w)
 	AM_RANGE(0x0e0000, 0x0e7fff) AM_READWRITE(grcg_gvram0_r,grcg_gvram0_w)
-	AM_RANGE(0x0e0000, 0x0fffff) AM_READ8(pc9801rs_ipl_r, 0xffff)
+	AM_RANGE(0x0e8000, 0x0fffff) AM_DEVICE("ipl_bank", address_map_bank_device, amap16)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
@@ -2134,8 +2131,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pc9801rs_map, AS_PROGRAM, 16, pc9801_state )
 //  AM_RANGE(0x0d8000, 0x0d9fff) AM_ROM AM_REGION("ide",0)
 	AM_RANGE(0x0da000, 0x0dbfff) AM_RAM // ide ram
-	AM_RANGE(0xee0000, 0xefffff) AM_READ8(pc9801rs_ipl_r, 0xffff)
-	AM_RANGE(0xfe0000, 0xffffff) AM_READ8(pc9801rs_ipl_r, 0xffff)
+	AM_RANGE(0xee8000, 0xefffff) AM_DEVICE("ipl_bank", address_map_bank_device, amap16)
+	AM_RANGE(0xfe8000, 0xffffff) AM_DEVICE("ipl_bank", address_map_bank_device, amap16)
 	AM_IMPORT_FROM(pc9801ux_map)
 ADDRESS_MAP_END
 
@@ -2343,10 +2340,10 @@ static ADDRESS_MAP_START( pc9821_map, AS_PROGRAM, 32, pc9801_state )
 //  AM_RANGE(0x000d8000, 0x000d9fff) AM_ROM AM_REGION("ide",0)
 	AM_RANGE(0x000da000, 0x000dbfff) AM_RAM // ide ram
 	AM_RANGE(0x000e0000, 0x000e7fff) AM_READWRITE16(grcg_gvram0_r,grcg_gvram0_w, 0xffffffff)
-	AM_RANGE(0x000e0000, 0x000fffff) AM_READ8(pc9801rs_ipl_r, 0xffffffff)
+	AM_RANGE(0x000e8000, 0x000fffff) AM_DEVICE16("ipl_bank", address_map_bank_device, amap16, 0xffffffff)
 	AM_RANGE(0x00f00000, 0x00f9ffff) AM_RAM AM_SHARE("ext_gvram")
-	AM_RANGE(0xffee0000, 0xffefffff) AM_READ8(pc9801rs_ipl_r, 0xffffffff)
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_READ8(pc9801rs_ipl_r, 0xffffffff)
+	AM_RANGE(0xffee8000, 0xffefffff) AM_DEVICE16("ipl_bank", address_map_bank_device, amap16, 0xffffffff)
+	AM_RANGE(0xfffe8000, 0xffffffff) AM_DEVICE16("ipl_bank", address_map_bank_device, amap16, 0xffffffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
@@ -2435,7 +2432,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( upd7220_1_map, AS_0, 16, pc9801_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram_1")
+	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_SHARE("video_ram_1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( upd7220_2_map, AS_0, 16, pc9801_state )
@@ -2965,7 +2962,6 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
 
-	m_ipl_rom = memregion("ipl")->base();
 	m_vbirq = timer_alloc(TIMER_VBIRQ);
 
 	save_item(NAME(m_sasi_data));
@@ -3075,13 +3071,10 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 	MACHINE_RESET_CALL_MEMBER(pc9801_common);
 
 	m_gate_a20 = 0;
-	m_rom_bank = 0;
 	m_fdc_ctrl = 3;
 	m_access_ctrl = 0;
 	m_ide_sel = 0;
 	m_ide1_irq = m_ide2_irq = false;
-	m_keyb_press = 0xff; // temp kludge, for PC-9821 booting
-//  m_has_opna = ioport("SOUND_CONFIG")->read() & 1;
 	m_maincpu->set_input_line(INPUT_LINE_A20, m_gate_a20);
 
 	if(memregion("ide"))
@@ -3306,15 +3299,6 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc9801vm, pc9801 )
-	MCFG_CPU_REPLACE("maincpu",V30,10000000)
-	MCFG_CPU_PROGRAM_MAP(pc9801ux_map)
-	MCFG_CPU_IO_MAP(pc9801ux_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
-
-	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801_common)
-	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801_common)
-MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_CPU_ADD("maincpu", I386SX, MAIN_CLOCK_X1*8) // unknown clock.
@@ -3324,6 +3308,13 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_FRAGMENT_ADD(pc9801_common)
+
+	MCFG_DEVICE_ADD("ipl_bank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(ipl_bank)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(18)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x18000)
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801rs)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801rs)
@@ -3343,6 +3334,20 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 
 	MCFG_PALETTE_ADD("palette", 16+16)
 	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( pc9801vm, pc9801rs )
+	MCFG_CPU_REPLACE("maincpu",V30,10000000)
+	MCFG_CPU_PROGRAM_MAP(pc9801ux_map)
+	MCFG_CPU_IO_MAP(pc9801ux_io)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
+
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("640K")
+	MCFG_RAM_EXTRA_OPTIONS("640K")
+
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801_common)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801_common)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc9801ux, pc9801rs )
@@ -3468,9 +3473,9 @@ UX - 80286 10 + V30 8
 */
 
 ROM_START( pc9801ux )
-	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf_ux.rom",  0x18000, 0x08000, CRC(c7942563) SHA1(61bb210d64c7264be939b11df1e9cd14ffeee3c9) )
-	ROM_LOAD( "bios_ux.rom", 0x28000, 0x18000, BAD_DUMP CRC(97375ca2) SHA1(bfe458f671d90692104d0640730972ca8dc0a100) )
+	ROM_REGION( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "itf_ux.rom",  0x10000, 0x08000, CRC(c7942563) SHA1(61bb210d64c7264be939b11df1e9cd14ffeee3c9) )
+	ROM_LOAD( "bios_ux.rom", 0x18000, 0x18000, BAD_DUMP CRC(97375ca2) SHA1(bfe458f671d90692104d0640730972ca8dc0a100) )
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound_ux.rom", 0x0000, 0x4000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
@@ -3489,11 +3494,11 @@ The bios is from a 386 model not an RX
 */
 
 ROM_START( pc9801rx )
-	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf_rs.rom",  0x18000, 0x08000, BAD_DUMP CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
-	ROM_LOAD( "bios_rx.rom", 0x28000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
+	ROM_REGION( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "itf_rs.rom",  0x10000, 0x08000, BAD_DUMP CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
+	ROM_LOAD( "bios_rx.rom", 0x18000, 0x18000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
 	// fix csum
-	ROM_FILL(0x3fffe, 1, 0x0d)
+	ROM_FILL(0x2fffe, 1, 0x0d)
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound_rx.rom",    0x000000, 0x004000, CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef) )
@@ -3512,9 +3517,9 @@ RS - 386SX 16
 */
 
 ROM_START( pc9801rs )
-	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf_rs.rom",  0x18000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
-	ROM_LOAD( "bios_rs.rom", 0x28000, 0x18000, BAD_DUMP CRC(315d2703) SHA1(4f208d1dbb68373080d23bff5636bb6b71eb7565) )
+	ROM_REGION( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "itf_rs.rom",  0x10000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
+	ROM_LOAD( "bios_rs.rom", 0x18000, 0x18000, BAD_DUMP CRC(315d2703) SHA1(4f208d1dbb68373080d23bff5636bb6b71eb7565) )
 
 	/* following is an emulator memory dump, should be checked and nuked */
 	ROM_REGION( 0x100000, "memory", 0 )
@@ -3544,12 +3549,12 @@ Yet another franken-dump done with a lame program, shrug
 */
 
 ROM_START( pc9801bx2 )
-	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
+	ROM_REGION( 0x30000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "pc98bank0.bin",  0x00000, 0x08000, BAD_DUMP CRC(bfd100cc) SHA1(cf8e6a5679cca7761481abef0ba4b35ead39efdb) )
 	ROM_LOAD( "pc98bank1.bin",  0x00000, 0x08000, BAD_DUMP CRC(d0562af8) SHA1(2c4fd27eb598f4b8a00f3e86941ba27007d58e47) )
 	ROM_LOAD( "pc98bank2.bin",  0x00000, 0x08000, BAD_DUMP CRC(12818a14) SHA1(9c31e8ac85d78fa779d6bbc2095557065294ec09) )
 	ROM_LOAD( "pc98bank3.bin",  0x00000, 0x08000, BAD_DUMP CRC(d0bda44e) SHA1(c1022a3b2be4d2a1e43914df9e4605254e5f99d5) )
-	ROM_LOAD( "pc98bank4.bin",  0x18000, 0x08000, BAD_DUMP CRC(be8092f4) SHA1(12c8a166b8c6ebbef85568b67e1f098562883365) )
+	ROM_LOAD( "pc98bank4.bin",  0x10000, 0x08000, BAD_DUMP CRC(be8092f4) SHA1(12c8a166b8c6ebbef85568b67e1f098562883365) )
 	ROM_LOAD( "pc98bank5.bin",  0x00000, 0x08000, BAD_DUMP CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )
 	ROM_LOAD( "pc98bank6.bin",  0x00000, 0x08000, BAD_DUMP CRC(f878c160) SHA1(cad47f09075ffe4f7b51bb937c9f716c709d4596) )
 	ROM_LOAD( "pc98bank7.bin",  0x00000, 0x08000, BAD_DUMP CRC(1bd6537b) SHA1(ff9ee1c976a12b87851635ce8991ac4ad607675b) )
@@ -3571,9 +3576,9 @@ TODO: this ISN'T a real VM model!
 */
 
 ROM_START( pc9801vm )
-	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf_ux.rom",  0x18000, 0x08000, BAD_DUMP CRC(c7942563) SHA1(61bb210d64c7264be939b11df1e9cd14ffeee3c9) )
-	ROM_LOAD( "bios_vm.rom", 0x28000, 0x018000, CRC(2e2d7cee) SHA1(159549f845dc70bf61955f9469d2281a0131b47f) )
+	ROM_REGION( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "itf_ux.rom",  0x10000, 0x08000, BAD_DUMP CRC(c7942563) SHA1(61bb210d64c7264be939b11df1e9cd14ffeee3c9) )
+	ROM_LOAD( "bios_vm.rom", 0x18000, 0x18000, CRC(2e2d7cee) SHA1(159549f845dc70bf61955f9469d2281a0131b47f) )
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound_vm.rom",    0x000000, 0x004000, CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef) )
@@ -3592,13 +3597,13 @@ ROM_END
 */
 
 ROM_START( pc9821 )
-	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf.rom",  0x18000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
-	ROM_LOAD( "bios.rom", 0x28000, 0x18000, BAD_DUMP CRC(34a19a59) SHA1(2e92346727b0355bc1ec9a7ded1b444a4917f2b9) )
-	ROM_FILL(0x34c40, 4, 0) // hide the _32_ marker until we have a 32-bit clean IDE bios otherwise windows tries to
+	ROM_REGION( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "itf.rom",  0x10000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+	ROM_LOAD( "bios.rom", 0x18000, 0x18000, BAD_DUMP CRC(34a19a59) SHA1(2e92346727b0355bc1ec9a7ded1b444a4917f2b9) )
+	ROM_FILL(0x24c40, 4, 0) // hide the _32_ marker until we have a 32-bit clean IDE bios otherwise windows tries to
 							// make a 32-bit call into 16-bit code
-	ROM_FILL(0x37ffe, 1, 0x92)
-	ROM_FILL(0x37fff, 1, 0xd7)
+	ROM_FILL(0x27ffe, 1, 0x92)
+	ROM_FILL(0x27fff, 1, 0xd7)
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
@@ -3615,9 +3620,9 @@ As - 80486DX 33
 */
 
 ROM_START( pc9821as )
-	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf.rom",     0x18000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
-	ROM_LOAD( "bios_as.rom", 0x28000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
+	ROM_REGION( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "itf.rom",     0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+	ROM_LOAD( "bios_as.rom", 0x18000, 0x18000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound_as.rom",    0x000000, 0x004000, CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef) )
@@ -3647,9 +3652,9 @@ ROM_START( pc9821ap2 )
 	ROM_SYSTEM_BIOS(1, "phd0102",  "PHD0102")
 	ROMX_LOAD( "phd0102.rom",     0x000000, 0x80000, CRC(3036774c) SHA1(59856a348f156adf5eca06326f967aca54ff871c), ROM_BIOS(2) )
 
-	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF ) // TODO: identify ROM banks
-	ROM_COPY( "biosrom", 0x20000, 0x18000, 0x08000 )
-	ROM_COPY( "biosrom", 0x30000, 0x28000, 0x18000 )
+	ROM_REGION( 0x30000, "ipl", ROMREGION_ERASEFF ) // TODO: identify ROM banks
+	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x08000 )
+	ROM_COPY( "biosrom", 0x30000, 0x18000, 0x18000 )
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
@@ -3667,9 +3672,9 @@ ROM_END
 */
 
 ROM_START( pc9821ne )
-	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf.rom",     0x18000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
-	ROM_LOAD( "bios_ne.rom", 0x28000, 0x18000, BAD_DUMP CRC(2ae070c4) SHA1(d7963942042bfd84ed5fc9b7ba8f1c327c094172) )
+	ROM_REGION( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "itf.rom",     0x10000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+	ROM_LOAD( "bios_ne.rom", 0x18000, 0x18000, BAD_DUMP CRC(2ae070c4) SHA1(d7963942042bfd84ed5fc9b7ba8f1c327c094172) )
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound_ne.rom", 0x0000, 0x4000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
@@ -3686,9 +3691,9 @@ Epson PC-486MU - 486 based, unknown clock
 */
 
 ROM_START( pc486mu )
-	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "bios_486mu.rom", 0x08000, 0x18000, BAD_DUMP CRC(57b5d701) SHA1(15029800842e93e07615b0fd91fb9f2bfe3e3c24))
-	ROM_RELOAD(                 0x28000, 0x18000 ) // missing rom?
+	ROM_REGION( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "bios_486mu.rom", 0x00000, 0x18000, BAD_DUMP CRC(57b5d701) SHA1(15029800842e93e07615b0fd91fb9f2bfe3e3c24))
+	ROM_RELOAD(                 0x18000, 0x18000 ) // missing rom?
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound_486mu.rom", 0x0000, 0x4000, CRC(6cdfa793) SHA1(4b8250f9b9db66548b79f961d61010558d6d6e1c))
@@ -3705,9 +3710,9 @@ ROM_END
 */
 
 ROM_START( pc9821ce2 )
-	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf_ce2.rom",  0x18000, 0x08000, CRC(273e9e88) SHA1(9bca7d5116788776ed0f297bccb4dfc485379b41) )
-	ROM_LOAD( "bios_ce2.rom", 0x28000, 0x018000, BAD_DUMP CRC(76affd90) SHA1(910fae6763c0cd59b3957b6cde479c72e21f33c1) )
+	ROM_REGION( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "itf_ce2.rom",  0x10000, 0x08000, CRC(273e9e88) SHA1(9bca7d5116788776ed0f297bccb4dfc485379b41) )
+	ROM_LOAD( "bios_ce2.rom", 0x18000, 0x018000, BAD_DUMP CRC(76affd90) SHA1(910fae6763c0cd59b3957b6cde479c72e21f33c1) )
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound_ce2.rom",    0x000000, 0x004000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
@@ -3724,9 +3729,9 @@ ROM_END
 */
 
 ROM_START( pc9821xs )
-	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf.rom",  0x18000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
-	ROM_LOAD( "bios_xs.rom",     0x28000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
+	ROM_REGION( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "itf.rom",  0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+	ROM_LOAD( "bios_xs.rom",     0x18000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound_xs.rom",    0x000000, 0x004000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
@@ -3744,9 +3749,9 @@ ROM_END
 */
 
 ROM_START( pc9821v13 )
-	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf.rom",      0x18000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
-	ROM_LOAD( "bios_v13.rom", 0x28000, 0x18000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
+	ROM_REGION( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "itf.rom",      0x10000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+	ROM_LOAD( "bios_v13.rom", 0x18000, 0x18000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound_v13.rom", 0x0000, 0x4000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
@@ -3763,9 +3768,9 @@ ROM_END
 */
 
 ROM_START( pc9821v20 )
-	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf_v20.rom",  0x38000, 0x08000, CRC(10e52302) SHA1(f95b8648e3f5a23e507a9fbda8ab2e317d8e5151) )
-	ROM_LOAD( "bios_v20.rom", 0x08000, 0x018000, BAD_DUMP CRC(d5d1f13b) SHA1(bf44b5f4e138e036f1b848d6616fbd41b5549764) )
+	ROM_REGION( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "itf_v20.rom",  0x10000, 0x08000, CRC(10e52302) SHA1(f95b8648e3f5a23e507a9fbda8ab2e317d8e5151) )
+	ROM_LOAD( "bios_v20.rom", 0x18000, 0x18000, BAD_DUMP CRC(d5d1f13b) SHA1(bf44b5f4e138e036f1b848d6616fbd41b5549764) )
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound_v20.rom",    0x000000, 0x004000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
