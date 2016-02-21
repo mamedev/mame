@@ -6,7 +6,7 @@
 
   Marx Series 300 Electronic Bowling Game
   Main board:
-  * TMS1100NLL MP3403 DBS 7836 SINGAPORE
+  * TMS1100NLL MP3403 DBS 7836 SINGAPORE (no decap)
   * 4*SN75492 quad segment driver, 2*SN74259 8-line demultiplexer,
     2*CD4043 quad r/s input latch
   * 5 7seg LEDs, 15 lamps(10 lamps projected to bowling pins reflection),
@@ -161,7 +161,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-// output PLA is not dumped
+// output PLA is not decapped
 static const UINT16 elecbowl_output_pla[0x20] =
 {
 	lA+lB+lC+lD+lE+lF,      // 0
@@ -183,7 +183,7 @@ static const UINT16 elecbowl_output_pla[0x20] =
 static MACHINE_CONFIG_START( elecbowl, elecbowl_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // RC osc. R=33K, C=100pf -> ~350kHz
+	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // approximation - RC osc. R=33K, C=100pf
 	MCFG_TMS1XXX_OUTPUT_PLA(elecbowl_output_pla)
 	MCFG_TMS1XXX_READ_K_CB(READ8(elecbowl_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(elecbowl_state, write_r))
@@ -211,7 +211,7 @@ ROM_START( elecbowl )
 	ROM_LOAD( "mp3403.u9", 0x0000, 0x0800, CRC(9eabaa7d) SHA1(b1f54587ed7f2bbf3a5d49075c807296384c2b06) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, BAD_DUMP CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) ) // not verified
+	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, BAD_DUMP CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) ) // not verified
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_elecbowl_output.pla", 0, 365, NO_DUMP )
 ROM_END

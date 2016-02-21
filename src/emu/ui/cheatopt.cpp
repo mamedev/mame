@@ -75,7 +75,7 @@ void ui_menu_cheat::handle()
 				case IPT_UI_DOWN:
 					string = curcheat->comment();
 					if (string != nullptr && string[0] != 0)
-						machine().popmessage("Cheat Comment:\n%s", string);
+						machine().popmessage(_("Cheat Comment:\n%s"), string);
 					break;
 			}
 		}
@@ -88,7 +88,7 @@ void ui_menu_cheat::handle()
 
 			/* display the reloaded cheats */
 			reset(UI_MENU_RESET_REMEMBER_REF);
-			machine().popmessage("All cheats reloaded");
+			machine().popmessage(_("All cheats reloaded"));
 		}
 
 		/* handle autofire menu */
@@ -119,7 +119,7 @@ void ui_menu_cheat::populate()
 	std::string subtext;
 
 	// add the autofire menu
-	item_append("Autofire Settings", nullptr, 0, (void *)ITEMREF_CHEATS_AUTOFIRE_SETTINGS);
+	item_append(_("Autofire Settings"), nullptr, 0, (void *)ITEMREF_CHEATS_AUTOFIRE_SETTINGS);
 
 	/* add a separator */
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
@@ -137,10 +137,10 @@ void ui_menu_cheat::populate()
 		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 
 		/* add a reset all option */
-		item_append("Reset All", nullptr, 0, (void *)ITEMREF_CHEATS_RESET_ALL);
+		item_append(_("Reset All"), nullptr, 0, (void *)ITEMREF_CHEATS_RESET_ALL);
 
 		/* add a reload all cheats option */
-		item_append("Reload All", nullptr, 0, (void *)ITEMREF_CHEATS_RELOAD_ALL);
+		item_append(_("Reload All"), nullptr, 0, (void *)ITEMREF_CHEATS_RELOAD_ALL);
 	}
 }
 
@@ -256,7 +256,7 @@ void ui_menu_autofire::populate()
 
 	/* add autofire toggle item */
 	bool autofire_toggle = machine().ioport().get_autofire_toggle();
-	item_append("Autofire Status", (autofire_toggle ? "Disabled" : "Enabled"),
+	item_append(_("Autofire Status"), (autofire_toggle ? _("Disabled") : _("Enabled")),
 			(autofire_toggle ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW), (void *)ITEMREF_AUTOFIRE_STATUS);
 
 	/* iterate over the input ports and add autofire toggle items */
@@ -282,13 +282,13 @@ void ui_menu_autofire::populate()
 				if (!autofire_toggle)
 				{
 					// item is enabled and can be switched to values on/off
-					item_append(field->name(), (settings.autofire ? "On" : "Off"),
+					item_append(field->name(), (settings.autofire ? _("On") : _("Off")),
 							(settings.autofire ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW), (void *)field);
 				}
 				else
 				{
 					// item is disabled
-					item_append(field->name(), (settings.autofire ? "On" : "Off"),
+					item_append(field->name(), (settings.autofire ? _("On") : _("Off")),
 							MENU_FLAG_DISABLE | MENU_FLAG_INVERT, nullptr);
 				}
 			}
@@ -299,7 +299,7 @@ void ui_menu_autofire::populate()
 	if (menu_items==0)
 	{
 		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-		item_append("No buttons found on this machine!", nullptr, MENU_FLAG_DISABLE, nullptr);
+		item_append(_("No buttons found on this machine!"), nullptr, MENU_FLAG_DISABLE, nullptr);
 	}
 
 	/* add a separator */
@@ -310,11 +310,11 @@ void ui_menu_autofire::populate()
 	snprintf(temp_text, ARRAY_LENGTH(temp_text), "%d = %.2f Hz", value, (float)refresh/value);
 	if (!autofire_toggle)
 	{
-		item_append("Autofire Delay", temp_text, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)ITEMREF_AUTOFIRE_DELAY);
+		item_append(_("Autofire Delay"), temp_text, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)ITEMREF_AUTOFIRE_DELAY);
 	}
 	else
 	{
-		item_append("Autofire Delay", temp_text, MENU_FLAG_DISABLE | MENU_FLAG_INVERT, nullptr);
+		item_append(_("Autofire Delay"), temp_text, MENU_FLAG_DISABLE | MENU_FLAG_INVERT, nullptr);
 	}
 
 	/* add a separator */

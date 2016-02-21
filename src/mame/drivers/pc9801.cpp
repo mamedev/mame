@@ -513,6 +513,7 @@ public:
 	UINT8 *m_kanji_rom;
 
 	UINT8 m_dma_offset[4];
+	UINT8 m_dma_autoinc[4];
 	int m_dack;
 
 	UINT8 m_video_ff[8],m_gfx_ff;
@@ -570,7 +571,9 @@ public:
 	UINT8 m_sys_type;
 
 	DECLARE_WRITE_LINE_MEMBER( write_uart_clock );
-	DECLARE_WRITE8_MEMBER(rtc_dmapg_w);
+	DECLARE_WRITE8_MEMBER(rtc_w);
+	DECLARE_WRITE8_MEMBER(dmapg4_w);
+	DECLARE_WRITE8_MEMBER(dmapg8_w);
 	DECLARE_WRITE8_MEMBER(nmi_ctrl_w);
 	DECLARE_WRITE8_MEMBER(vrtc_clear_w);
 	DECLARE_WRITE8_MEMBER(pc9801_video_ff_w);
@@ -975,29 +978,29 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 }
 
 
-WRITE8_MEMBER(pc9801_state::rtc_dmapg_w)
+WRITE8_MEMBER(pc9801_state::rtc_w)
 {
-	if((offset & 1) == 0)
-	{
-		if(offset == 0)
-		{
-			m_rtc->c0_w((data & 0x01) >> 0);
-			m_rtc->c1_w((data & 0x02) >> 1);
-			m_rtc->c2_w((data & 0x04) >> 2);
-			m_rtc->stb_w((data & 0x08) >> 3);
-			m_rtc->clk_w((data & 0x10) >> 4);
-			m_rtc->data_in_w(((data & 0x20) >> 5));
-			if(data & 0xc0)
-				logerror("RTC write to undefined bits %02x\n",data & 0xc0);
-		}
-		else
-			logerror("Write to undefined port [%02x] <- %02x\n",offset+0x20,data);
-	}
-	else // odd
-	{
-//      logerror("Write to DMA bank register %d %02x\n",((offset >> 1)+1) & 3,data);
-		m_dma_offset[((offset >> 1)+1) & 3] = data & 0x0f;
-	}
+	m_rtc->c0_w((data & 0x01) >> 0);
+	m_rtc->c1_w((data & 0x02) >> 1);
+	m_rtc->c2_w((data & 0x04) >> 2);
+	m_rtc->stb_w((data & 0x08) >> 3);
+	m_rtc->clk_w((data & 0x10) >> 4);
+	m_rtc->data_in_w(((data & 0x20) >> 5));
+	if(data & 0xc0)
+		logerror("RTC write to undefined bits %02x\n",data & 0xc0);
+}
+
+WRITE8_MEMBER(pc9801_state::dmapg4_w)
+{
+	m_dma_offset[(offset+1) & 3] = data & 0x0f;
+}
+
+WRITE8_MEMBER(pc9801_state::dmapg8_w)
+{
+	if(offset == 4)
+		m_dma_autoinc[data & 3] = (data >> 2) & 3;
+	else if(offset < 4)
+		m_dma_offset[(offset+1) & 3] = data;
 }
 
 WRITE8_MEMBER(pc9801_state::nmi_ctrl_w)
@@ -1783,7 +1786,8 @@ static ADDRESS_MAP_START( pc9801_io, AS_IO, 16, pc9801_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("i8237", am9517a_device, read, write, 0xff00)
 	AM_RANGE(0x0000, 0x000f) AM_READWRITE8(pic_r, pic_w, 0x00ff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
-	AM_RANGE(0x0020, 0x0027) AM_WRITE8(rtc_dmapg_w,0xffff) // RTC / DMA registers (LS244)
+	AM_RANGE(0x0020, 0x0021) AM_WRITE8(rtc_w,0x00ff)
+	AM_RANGE(0x0020, 0x0027) AM_WRITE8(dmapg4_w,0xff00)
 	AM_RANGE(0x0030, 0x0037) AM_DEVREADWRITE8("ppi8255_sys", i8255_device, read, write, 0xff00) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("ppi8255_prn", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("keyb", pc9801_kbd_device, rx_r, tx_w, 0xff00) //i8255 printer port / i8251 keyboard
@@ -2241,6 +2245,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0020, 0x002f) AM_WRITE8(dmapg8_w,0xff00)
 	AM_RANGE(0x0050, 0x0057) AM_NOP // 2dd ppi?
 	AM_RANGE(0x005c, 0x005f) AM_READ(pc9821_timestamp_r) AM_WRITENOP // artic
 	AM_RANGE(0x0068, 0x006b) AM_WRITE8(pc9801rs_video_ff_w,0x00ff) //mode FF / <undefined>
@@ -2288,6 +2293,8 @@ WRITE8_MEMBER(pc9801_state::pc9821_video_ff_w)
 {
 	if(offset == 1)
 	{
+		if(((data & 0xfe) == 4) && !m_ex_video_ff[3]) // TODO: many other settings are protected
+			return;
 		m_ex_video_ff[(data & 0xfe) >> 1] = data & 1;
 
 		//if((data & 0xfe) == 0x20)
@@ -2479,7 +2486,8 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 //  ADDRESS_MAP_UNMAP_HIGH // TODO: a read to somewhere makes this to fail at POST
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("i8237", am9517a_device, read, write, 0xff00ff00)
 	AM_RANGE(0x0000, 0x000f) AM_READWRITE8(pic_r, pic_w, 0x00ff00ff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
-	AM_RANGE(0x0020, 0x0027) AM_WRITE8(rtc_dmapg_w,        0xffffffff) // RTC / DMA registers (LS244)
+	AM_RANGE(0x0020, 0x0023) AM_WRITE8(rtc_w,0x000000ff)
+	AM_RANGE(0x0020, 0x002f) AM_WRITE8(dmapg8_w,0xff00ff00)
 	AM_RANGE(0x0030, 0x0037) AM_DEVREADWRITE8("ppi8255_sys", i8255_device, read, write, 0xff00ff00) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("ppi8255_prn", i8255_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("keyb", pc9801_kbd_device, rx_r, tx_w, 0xff00ff00) //i8255 printer port / i8251 keyboard
@@ -2883,6 +2891,21 @@ READ8_MEMBER(pc9801_state::dma_read_byte)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
+	if(offset == 0xffff)
+	{
+		switch(m_dma_autoinc[m_dack])
+		{
+			case 1:
+			{
+				UINT8 page = m_dma_offset[m_dack];
+				m_dma_offset[m_dack] = ((page + 1) & 0xf) | (page & 0xf0);
+				break;
+			}
+			case 3:
+				m_dma_offset[m_dack]++;
+				break;
+		}
+	}
 
 //  logerror("%08x\n",addr);
 
@@ -2894,7 +2917,21 @@ WRITE8_MEMBER(pc9801_state::dma_write_byte)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
-
+	if(offset == 0xffff)
+	{
+		switch(m_dma_autoinc[m_dack])
+		{
+			case 1:
+			{
+				UINT8 page = m_dma_offset[m_dack];
+				m_dma_offset[m_dack] = ((page + 1) & 0xf) | (page & 0xf0);
+				break;
+			}
+			case 3:
+				m_dma_offset[m_dack]++;
+				break;
+		}
+	}
 //  logerror("%08x %02x\n",addr,data);
 
 	program.write_byte(addr, data);
@@ -3139,6 +3176,7 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 	m_mouse.control = 0xff;
 	m_mouse.freq_reg = 0;
 	m_mouse.freq_index = 0;
+	m_dma_autoinc[0] = m_dma_autoinc[1] = m_dma_autoinc[2] = m_dma_autoinc[3] = 0;
 	memset(&m_egc, 0, sizeof(m_egc));
 }
 
@@ -3430,7 +3468,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("640K,3712K,7808K")
+	MCFG_RAM_EXTRA_OPTIONS("640K,3712K,7808K,14M")
 
 	MCFG_DEVICE_MODIFY("upd7220_btm")
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_grcg_2_map)

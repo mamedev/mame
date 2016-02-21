@@ -66,7 +66,7 @@ ui_menu_add_change_folder::ui_menu_add_change_folder(running_machine &machine, r
 	m_change = _change;
 	m_search[0] = '\0';
 
-	// configure the starting's path
+	// configure the starting path
 	char *dst = nullptr;
 	osd_get_full_path(&dst, ".");
 	m_current_path = dst;
@@ -227,6 +227,7 @@ void ui_menu_add_change_folder::handle()
 						}
 					}
 				}
+				top_line = selected - (visible_lines / 2);
 			}
 		}
 		else if (m_event->iptkey == IPT_UI_CANCEL)

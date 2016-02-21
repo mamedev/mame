@@ -89,6 +89,68 @@ cli_frontend::~cli_frontend()
 	m_options.remove_device_options();
 }
 
+const UINT32 MO_MAGIC		   = 0x950412de;
+const UINT32 MO_MAGIC_REVERSED = 0xde120495;
+
+inline UINT32 endianchange(UINT32 value) {
+	UINT32 b0 = (value >> 0) & 0xff;
+	UINT32 b1 = (value >> 8) & 0xff;
+	UINT32 b2 = (value >> 16) & 0xff;
+	UINT32 b3 = (value >> 24) & 0xff;
+
+	return (b0 << 24) | (b1 << 16) |(b2 << 8) | b3;
+}
+
+static std::unordered_map<std::string, std::string> g_translation;
+
+const char *lang_translate(const char *word)
+{
+	if (g_translation.find(word) == g_translation.end())
+	{
+		return word;
+	}
+	return g_translation[word].c_str();
+}
+
+void cli_frontend::load_translation()
+{	
+	g_translation.empty();
+	emu_file file(m_options.language_path(), OPEN_FLAG_READ);
+	if (file.open(m_options.language(), PATH_SEPARATOR "strings.mo") == FILERR_NONE)
+	{
+		UINT64 size = file.size();
+		UINT32 *buffer = global_alloc_array(UINT32,size / 4 + 1);
+		file.read(buffer, size);
+		file.close();
+
+		if (buffer[0] != MO_MAGIC && buffer[0] != MO_MAGIC_REVERSED) 
+		{
+			global_free_array(buffer);
+			return;
+		}
+		if (buffer[0] == MO_MAGIC_REVERSED)
+		{
+			for (auto i = 0; i < (size / 4)+1; ++i)
+			{
+				buffer[i] = endianchange(buffer[i]);
+			}
+		}
+
+		UINT32 number_of_strings = buffer[2];
+		UINT32 original_table_offset = buffer[3] >> 2;
+		UINT32 translation_table_offset = buffer[4] >> 2;
+
+		const char *data = reinterpret_cast<const char*>(buffer);
+
+		for (auto i = 1; i < number_of_strings; ++i)
+		{
+			std::string original = (const char *)data + buffer[original_table_offset + 2 * i + 1];
+			std::string translation= (const char *)data + buffer[translation_table_offset + 2 * i + 1];
+			g_translation.insert(std::pair<std::string, std::string>(original, translation));
+		}
+		global_free_array(buffer);
+	}
+}
 
 //-------------------------------------------------
 //  execute - execute a game via the standard
@@ -108,6 +170,8 @@ int cli_frontend::execute(int argc, char **argv)
 		m_options.parse_command_line(argc, argv, option_errors);
 
 		m_options.parse_standard_inis(option_errors);
+		
+		load_translation();
 		
 		manager->start_luaengine();
 
@@ -238,7 +302,7 @@ int cli_frontend::execute(int argc, char **argv)
 
 			// print them out
 			osd_printf_error("\n\"%s\" approximately matches the following\n"
-					"supported %s (best match first):\n\n", m_options.system_name(),emulator_info::get_gamesnoun());
+					"supported machines (best match first):\n\n", m_options.system_name());
 			for (auto & matche : matches)
 				if (matche != -1)
 					osd_printf_error("%-18s%s\n", drivlist.driver(matche).name, drivlist.driver(matche).description);
@@ -1591,7 +1655,7 @@ void cli_frontend::execute_commands(const char *exename)
 	// showusage?
 	if (strcmp(m_options.command(), CLICOMMAND_SHOWUSAGE) == 0)
 	{
-		emulator_info::printf_usage(exename, emulator_info::get_gamenoun());
+		osd_printf_info("Usage:  %s [machine] [media] [software] [options]",exename);
 		osd_printf_info("\n\nOptions:\n%s", m_options.output_help().c_str());
 		return;
 	}
@@ -1693,8 +1757,10 @@ void cli_frontend::execute_commands(const char *exename)
 void cli_frontend::display_help()
 {
 	osd_printf_info("%s v%s\n%s\n\n", emulator_info::get_appname(),build_version,emulator_info::get_copyright_info());
-	osd_printf_info("%s\n", emulator_info::get_disclaimer());
-	emulator_info::printf_usage(emulator_info::get_appname(),emulator_info::get_gamenoun());
+	osd_printf_info("This software reproduces, more or less faithfully, the behaviour of a wide range\n"
+					"of machines. But hardware is useless without software, so images of the ROMs and\n"
+					"other media which run on that hardware are also required.\n\n");
+	osd_printf_info("Usage:  %s [machine] [media] [software] [options]",emulator_info::get_appname());
 	osd_printf_info("\n\n"
 			"        %s -showusage    for a brief list of options\n"
 			"        %s -showconfig   for a list of configuration options\n"

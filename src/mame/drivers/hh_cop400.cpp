@@ -66,7 +66,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
-	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
+	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update = true);
 
 protected:
 	virtual void machine_start() override;
@@ -194,7 +194,7 @@ void hh_cop400_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
-void hh_cop400_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
+void hh_cop400_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
@@ -203,9 +203,12 @@ void hh_cop400_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 set
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
-	display_update();
+	if (update)
+		display_update();
 }
 
+
+// generic input handlers
 
 UINT8 hh_cop400_state::read_inputs(int columns)
 {
@@ -232,7 +235,7 @@ UINT8 hh_cop400_state::read_inputs(int columns)
 
   Castle Toy Einstein
   * COP421 MCU labeled ~/927 COP421-NEZ/N
-  * 4 lamps, 1bit sound
+  * 4 lamps, 1-bit sound
 
 ***************************************************************************/
 
@@ -277,7 +280,7 @@ MACHINE_CONFIG_END
 
   Entex Space Invader
   * COP444L MCU labeled /B138 COPL444-HRZ/N INV II (die labeled HRZ COP 444L/A)
-  * 3 7seg LEDs, LED matrix and overlay mask, 1bit sound
+  * 3 7seg LEDs, LED matrix and overlay mask, 1-bit sound
 
   The first version was on TMS1100 (see hh_tms1k.c), this is the reprogrammed
   second release with a gray case instead of black.
@@ -393,7 +396,7 @@ MACHINE_CONFIG_END
 
   Mattel Funtronics Jacks
   * COP410L MCU bonded directly to PCB (die labeled COP410L/B NGS)
-  * 8 LEDs, 1bit sound
+  * 8 LEDs, 1-bit sound
 
 ***************************************************************************/
 
@@ -500,7 +503,7 @@ MACHINE_CONFIG_END
 
   Mattel Funtronics Red Light Green Light
   * COP410L MCU bonded directly to PCB (die labeled COP410L/B NHZ)
-  * 14 LEDs, 1bit sound
+  * 14 LEDs, 1-bit sound
 
   known releases:
   - USA: Funtronics Red Light Green Light
@@ -595,7 +598,7 @@ MACHINE_CONFIG_END
 
   Milton Bradley Plus One
   * COP410L MCU in 8-pin DIP, labeled ~/029 MM 57405 (die labeled COP410L/B NNE)
-  * 4 sensors(1 on each die side), 1bit sound
+  * 4 sensors(1 on each die side), 1-bit sound
 
 ***************************************************************************/
 
@@ -639,7 +642,7 @@ MACHINE_CONFIG_END
 
   Milton Bradley (Electronic) Lightfight
   * COP421L MCU labeled /B119 COP421L-HLA/N
-  * LED matrix, 1bit sound
+  * LED matrix, 1-bit sound
 
   Xbox-shaped electronic game for 2 or more players, with long diagonal buttons
   next to each outer LED. The main object of the game is to pinpoint a light

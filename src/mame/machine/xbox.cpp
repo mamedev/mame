@@ -896,7 +896,7 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 
 	if (endpoint == 0) {
 		if (pid == SetupPid) {
-			USBSetupPacket *p=(struct USBSetupPacket *)buffer;
+			USBSetupPacket *p=(USBSetupPacket *)buffer;
 			// define direction 0:host->device 1:device->host
 			controldirection = (p->bmRequestType & 128) >> 7;
 			// case ==1, IN data stage and OUT status stage
@@ -1012,14 +1012,17 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 
 int ohci_function_device::handle_nonstandard_request(USBSetupPacket *setup)
 {
+	//                              >=8  ==42  !=0  !=0  1,3       2<20 <=20
+	static UINT8 mytestdata[16] = { 0x10,0x42 ,0x32,0x43,1   ,0x65,0x18,0x20,0x98,0xa9,0xba,0xcb,0xdc,0xed,0xfe };
+
 	if ((controltype == VendorType) && (controlrecipient == InterfaceRecipient))
 	{
 		if (setup->bRequest == GET_DESCRIPTOR)
 		{
 			if (setup->wValue == 0x4200)
 			{
-				position = nullptr;
-				remain = 0;
+				position = mytestdata;
+				remain = 16;
 			}
 		}
 	}
@@ -1425,11 +1428,7 @@ READ8_MEMBER(xbox_base_state::get_slave_ack)
 IRQ_CALLBACK_MEMBER(xbox_base_state::irq_callback)
 {
 	int r = 0;
-	r = xbox_base_devs.pic8259_2->acknowledge();
-	if (r == 0)
-	{
-		r = xbox_base_devs.pic8259_1->acknowledge();
-	}
+	r = xbox_base_devs.pic8259_1->acknowledge();
 	if (debug_irq_active)
 		debug_generate_irq(debug_irq_number, false);
 	return r;

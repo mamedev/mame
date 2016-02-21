@@ -232,6 +232,7 @@ protected:
 	int l_sw_hover;
 	int l_hover;
 	int totallines;
+	int skip_main_items;
 
 	// draw right box
 	float draw_right_box_title(float x1, float y1, float x2, float y2);

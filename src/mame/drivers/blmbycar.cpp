@@ -460,7 +460,7 @@ ROM_END
 Waterball by ABM (sticker on the pcb 12-3-96)
 The pcb has some empty sockets, maybe it was used for other games since it has no markings.
 
-The game has fonts identical to World Rally and obviously Blomby Var ;)
+The game has fonts identical to World Rally and obviously Blomby Car ;)
 
 1x 68k
 1x oki 6295

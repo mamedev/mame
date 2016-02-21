@@ -603,7 +603,7 @@ void ui_menu_select_software::build_software_list()
 
 void ui_menu_select_software::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	ui_software_info *swinfo = (FPTR)selectedref > 1 ? (ui_software_info *)selectedref : nullptr;
+	ui_software_info *swinfo = (ui_software_info *)selectedref;
 	const game_driver *driver = nullptr;
 	ui_manager &mui = machine().ui();
 	float width;
@@ -1421,7 +1421,7 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 	std::vector<int> xstart;
 	std::vector<int> xend;
 	float text_size = machine().ui().options().infos_size();
-	ui_software_info *soft = ((FPTR)selectedref > 2) ? (ui_software_info *)selectedref : nullptr;
+	ui_software_info *soft = (ui_software_info *)selectedref;
 	static ui_software_info *oldsoft = nullptr;
 	static int old_sw_view = -1;
 
@@ -1526,7 +1526,7 @@ void ui_menu_select_software::arts_render(void *selectedref, float origx1, float
 	static ui_software_info *oldsoft = nullptr;
 	static const game_driver *olddriver = nullptr;
 	const game_driver *driver = nullptr;
-	ui_software_info *soft = ((FPTR)selectedref > 2) ? (ui_software_info *)selectedref : nullptr;
+	ui_software_info *soft = (ui_software_info *)selectedref;
 
 	if (soft && soft->startempty == 1)
 	{
